@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BE275A504B
-	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 17:39:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DAA445A506C
+	for <lists+kvm@lfdr.de>; Mon, 29 Aug 2022 17:46:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229538AbiH2PjD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Aug 2022 11:39:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37378 "EHLO
+        id S229850AbiH2PqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Aug 2022 11:46:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbiH2PjB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Aug 2022 11:39:01 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D10678A6CC
-        for <kvm@vger.kernel.org>; Mon, 29 Aug 2022 08:38:59 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id bx38so8409479ljb.10
-        for <kvm@vger.kernel.org>; Mon, 29 Aug 2022 08:38:59 -0700 (PDT)
+        with ESMTP id S229712AbiH2PqN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Aug 2022 11:46:13 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 619897FFAA
+        for <kvm@vger.kernel.org>; Mon, 29 Aug 2022 08:46:11 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id m2so7953696lfp.11
+        for <kvm@vger.kernel.org>; Mon, 29 Aug 2022 08:46:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc;
-        bh=qtzMJN2IhwIOKg+LEINBh2ep7v5OmXo7vf2/7aGCYLw=;
-        b=Uou770Z69zcy9Fx491hC0/9hhWGQ5eEEbqSRe/YlCorX0tbOdNIUazpXYiYK8Of6Ol
-         dC/EY0JbyhxTSGbA+pnZtzbggRVE/nHVKt/oQ4UN8/1oUYcxndBsxiCvusjqNp/lz/B8
-         dNQ8kPplmMJZpkBjGEZ4iIrwy3pcW03sTp/65tKECv+EPgAygoLPl2KEfv8B/T277sEz
-         6XvtDO3E8e4ALPfDD5XXu/98juMN2M/v/gtB3vkPZOBopuyYwuO9QT/vRsFPzyUPx2H+
-         1j5jH254P5XYLaKqlLZMATHmRI8SCJXTwrMrR18BYhElKqiRRQyKBAFfVuwpnqr0d4/t
-         DIUQ==
+        bh=3meqtXbTYxJmns+VU1IFRu37s6xoAgQHZSDijK61tz4=;
+        b=edhns5+ibpza5cnoclqkhsHKueRr/cmtpIZAuHlzyb0bTfEPRNDvcq1R0JoAuRP+Ih
+         UHSq2t/76VsG03kG/rB5gmkylLs+o/oK2XvRfDxCy95HXznVf66+oXxb1i7Qg7xuAKnu
+         pNlTHuHu3A5RUH/S9xbLGuEEIONxCptjG63O0lvw00zRpEBznDf53OlNDuqcsQIW4U78
+         oacpH1SB8cS/WY+eYRYzcNqWiF4a30TfvRGzbJHt+sZ+8lPZnlPbansa/C0fsCBtgRna
+         LroemF3STxBRf0lJZ3QjAOSbhDY6kDYhXCxjGTpP8mhqW7bbnBkcufA7cADzQSMRwQHI
+         gSPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc;
-        bh=qtzMJN2IhwIOKg+LEINBh2ep7v5OmXo7vf2/7aGCYLw=;
-        b=HZmohkfpo0FWq4y+BwFzwx9MSa4zn76moGuuLD+E9rIYjGqVmxYApQtiqmwHSVlQLe
-         hNWWAxpODDpM7vyc/cqrh0TqOc+TW6Y2fTMGnkYxCY0HvWax9YJnHshyMkqg/ctnZ2No
-         BR0ZOYoYONfkDf7rJ9c6xekjfVHv6SNiBfHjlvQaK9V8deMsnAbEKlb2nnuIWV7VIlrZ
-         6sqhKRJ0EcibnLpKV1HD/Z0d0qjNvSiHLLyyPMYrsYPUdzrGKMwtEWxH+ybFxjCyNUKq
-         dkSeTbj5K+9ezH9/zW7WWyujmTFFGhOZRMROIhNuKj3aICiXuuYEPPmjqK5K09umNViA
-         EC0A==
-X-Gm-Message-State: ACgBeo1a9JZ3fkP5zdhwk3nUo76CBG0zfA4LZTBcDGC0VTIMFHlePuVP
-        OyHVXWmJkKxTR90wCTw25jZ5aYRwoQYMbQX+CPZI+g==
-X-Google-Smtp-Source: AA6agR62YqFrZZsQGwicm8/fjP4Jpt/uuJYGWEFHNIbGeY3FG1XsTaQ6pSWykQej8AxLmdziTLzvGGo8QOdl7C5gCOA=
-X-Received: by 2002:a2e:a552:0:b0:25e:6fa1:a6c4 with SMTP id
- e18-20020a2ea552000000b0025e6fa1a6c4mr5489880ljn.90.1661787537928; Mon, 29
- Aug 2022 08:38:57 -0700 (PDT)
+        bh=3meqtXbTYxJmns+VU1IFRu37s6xoAgQHZSDijK61tz4=;
+        b=Npu4BDrLLtv4Ja/P1thy2gI4LoW6hMyjfD/jP5NCbnkGWO36H2gkxisvliAtCTWXBz
+         lKm1nd9s3O+esHOipxj7YHWfocz1d1sKK+5HPFObfSLTaiRhbGPmbHN7aEdGirrhTN8+
+         Yh/L2Ag+hvTQa6GbyB9X+38qg/RIMSycYwo2R3XluqppSK4ks+0qtZ/jlf0kRZ6/v+/A
+         PCtHlR6jtRYbyiMYydPIG5ipINKXkUDSXx6nLXXirvZBYa13CfxWHDazNSRd3i8CNpXv
+         ZBNcCC92sEnkwyS8rSK/OmSjgu1iVcHTsXL04b/AXoKuzWw2Kabpe1iL8eJLPH5jXI2c
+         oxZA==
+X-Gm-Message-State: ACgBeo1Vq/MNDJobcO7wELF+mR4shN4azqnBerDvBgeE+Ep2Mytt3JtX
+        8OUVdkKqrlnblSaYfr4GV7smHy2m10G/X/pYb+CPAA==
+X-Google-Smtp-Source: AA6agR77LJ+xzS/LIsRxYhg7g023PHZpA7hzN92OnEVBaA0dIpVIYD9T30FIiBpgS9sf7+CTU8GDiTPD7K+NBjJrMTI=
+X-Received: by 2002:a05:6512:2525:b0:494:7562:dd54 with SMTP id
+ be37-20020a056512252500b004947562dd54mr539627lfb.70.1661787969495; Mon, 29
+ Aug 2022 08:46:09 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220810152033.946942-1-pgonda@google.com> <20220810152033.946942-12-pgonda@google.com>
- <Yv2GN1WPvi7K8LdI@google.com>
-In-Reply-To: <Yv2GN1WPvi7K8LdI@google.com>
+References: <20220810152033.946942-1-pgonda@google.com> <20220810152033.946942-9-pgonda@google.com>
+ <Yv2I48GqFpc9PHIy@google.com>
+In-Reply-To: <Yv2I48GqFpc9PHIy@google.com>
 From:   Peter Gonda <pgonda@google.com>
-Date:   Mon, 29 Aug 2022 09:38:46 -0600
-Message-ID: <CAMkAt6qo624CvoA==+umFJJtAiG4XOL277xOwwznZ9EmPzTxjw@mail.gmail.com>
-Subject: Re: [V3 11/11] KVM: selftests: Add simple sev vm testing
+Date:   Mon, 29 Aug 2022 09:45:57 -0600
+Message-ID: <CAMkAt6oGtMukLM223x5Lj3A1DpQ=4ZxZ8U8L72=eKuPcjZKSbQ@mail.gmail.com>
+Subject: Re: [V3 08/11] KVM: selftests: add library for creating/interacting
+ with SEV guests
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     kvm list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
@@ -68,240 +69,173 @@ X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 17, 2022 at 6:22 PM Sean Christopherson <seanjc@google.com> wrote:
+On Wed, Aug 17, 2022 at 6:33 PM Sean Christopherson <seanjc@google.com> wrote:
 >
-> /sev_vm_launch_measurOn Wed, Aug 10, 2022, Peter Gonda wrote:
-> > diff --git a/tools/testing/selftests/kvm/include/x86_64/sev.h b/tools/testing/selftests/kvm/include/x86_64/sev.h
-> > index 2f7f7c741b12..b6552ea1c716 100644
-> > --- a/tools/testing/selftests/kvm/include/x86_64/sev.h
-> > +++ b/tools/testing/selftests/kvm/include/x86_64/sev.h
-> > @@ -22,6 +22,9 @@
-> >  #define SEV_POLICY_NO_DBG    (1UL << 0)
-> >  #define SEV_POLICY_ES                (1UL << 2)
-> >
-> > +#define CPUID_MEM_ENC_LEAF 0x8000001f
-> > +#define CPUID_EBX_CBIT_MASK 0x3f
+> On Wed, Aug 10, 2022, Peter Gonda wrote:
+> > +enum {
+> > +       SEV_GSTATE_UNINIT = 0,
+> > +       SEV_GSTATE_LUPDATE,
+> > +       SEV_GSTATE_LSECRET,
+> > +       SEV_GSTATE_RUNNING,
+> > +};
+> > +
 >
-> Ha!  I was going to say "put these in processor.h", but I have an even better idea.
-> I'll try to a series posted tomorrow (compile tested only at this point), but what
-> I'm hoping to do is to allow automagic retrieval of multi-bit CPUID properties, a la
-> the existing this_cpu_has() stuff.
->
-> E.g.
->
->         #define X86_PROPERTY_CBIT_LOCATION              KVM_X86_CPU_PROPERTY(0x8000001F, 0, EBX, 0, 5)
->
-> and then
->
->         sev->enc_bit = this_cpu_property(X86_PROPERTY_CBIT_LOCATION);
->
-> LOL, now I see that the defines in sev.c were introduced back in patch 08.  That's
-> probably fine for your submission so as not to take a dependency on the "property"
-> idea.  This patch doesn't need to move the CPUID_* defines because it can use
-> this_cpu_has(X86_FEATURE_SEV) and avoid referencing CPUID_MEM_ENC_LEAF.
+> Name the enum, e.g. enum sev_guest_state?
 
-OK I've put these into sev.c instead of the header. I can clean up
-after you property patch series goes in.
+Done
 
 >
-> >  enum {
-> >       SEV_GSTATE_UNINIT = 0,
-> >       SEV_GSTATE_LUPDATE,
-> > diff --git a/tools/testing/selftests/kvm/lib/x86_64/sev.c b/tools/testing/selftests/kvm/lib/x86_64/sev.c
-> > index 3abcf50c0b5d..8f9f55c685a7 100644
-> > --- a/tools/testing/selftests/kvm/lib/x86_64/sev.c
-> > +++ b/tools/testing/selftests/kvm/lib/x86_64/sev.c
-> > @@ -13,8 +13,6 @@
-> >  #include "sev.h"
-> >
-> >  #define PAGE_SHIFT           12
+> And s/GSTATE/GUEST?  Ugh, AMD's documentation uses GSTATE.
 >
-> Already defined in processor.h
+> But looking at the docs, I only see GSTATE_LAUNCH?  Or does SEV have different
+> status codes than -ES and/or -SNP?
 
-Removed
+SEV and SEV-ES have the same states, SNP has a different set.
+
+See "Table 43. GSTATE Finite State Machine":
+https://www.amd.com/system/files/TechDocs/55766_SEV-KM_API_Specification.pdf
 
 >
-> > -#define CPUID_MEM_ENC_LEAF 0x8000001f
-> > -#define CPUID_EBX_CBIT_MASK 0x3f
-> >
-> >  struct sev_vm {
-> >       struct kvm_vm *vm;
-> > diff --git a/tools/testing/selftests/kvm/x86_64/sev_all_boot_test.c b/tools/testing/selftests/kvm/x86_64/sev_all_boot_test.c
-> > new file mode 100644
-> > index 000000000000..b319d18bdb60
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/kvm/x86_64/sev_all_boot_test.c
-> > @@ -0,0 +1,131 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/*
-> > + * Basic SEV boot tests.
-> > + *
-> > + * Copyright (C) 2021 Advanced Micro Devices
-> > + */
-> > +#define _GNU_SOURCE /* for program_invocation_short_name */
-> > +#include <fcntl.h>
-> > +#include <stdio.h>
-> > +#include <stdlib.h>
-> > +#include <string.h>
-> > +#include <sys/ioctl.h>
-> > +
-> > +#include "test_util.h"
-> > +
-> > +#include "kvm_util.h"
-> > +#include "processor.h"
-> > +#include "svm_util.h"
-> > +#include "linux/psp-sev.h"
-> > +#include "sev.h"
-> > +
-> > +#define VCPU_ID                      2
->
-> Nooooooo.  Unless there is a really, REALLY good reason this needs to be '2', just
-> pass '0' as a literal to vm_vcpu_add() and delete VCPU_ID.
-
-Not needed, removed.
-
->
-> > +#define PAGE_STRIDE          32
-> > +
-> > +#define SHARED_PAGES         8192
-> > +#define SHARED_VADDR_MIN     0x1000000
-> > +
-> > +#define PRIVATE_PAGES                2048
-> > +#define PRIVATE_VADDR_MIN    (SHARED_VADDR_MIN + SHARED_PAGES * PAGE_SIZE)
-> > +
-> > +#define TOTAL_PAGES          (512 + SHARED_PAGES + PRIVATE_PAGES)
-> > +
-> > +#define NR_SYNCS 1
-> > +
-> > +static void guest_run_loop(struct kvm_vcpu *vcpu)
+> > +struct kvm_vm *sev_get_vm(struct sev_vm *sev)
 > > +{
-> > +     struct ucall uc;
-> > +     int i;
-> > +
-> > +     for (i = 0; i <= NR_SYNCS; ++i) {
-> > +             vcpu_run(vcpu);
-> > +             switch (get_ucall(vcpu, &uc)) {
-> > +             case UCALL_SYNC:
-> > +                     continue;
-> > +             case UCALL_DONE:
-> > +                     return;
-> > +             case UCALL_ABORT:
-> > +                     TEST_ASSERT(false, "%s at %s:%ld\n\tvalues: %#lx, %#lx",
-> > +                                 (const char *)uc.args[0], __FILE__,
-> > +                                 uc.args[1], uc.args[2], uc.args[3]);
-> > +             default:
-> > +                     TEST_ASSERT(
-> > +                             false, "Unexpected exit: %s",
-> > +                             exit_reason_str(vcpu->run->exit_reason));
-> > +             }
-> > +     }
+> > +     return sev->vm;
+>
+> Why bother with a wrapper?
+>
 > > +}
 > > +
-> > +static void __attribute__((__flatten__)) guest_sev_code(void)
->
-> Is __flatten__ strictly necessary?  I don't see this being copied over anything
-> that would require it to be a contiguous chunk.
-
-Nope, removed.
-
->
+> > +uint8_t sev_get_enc_bit(struct sev_vm *sev)
 > > +{
-> > +     uint32_t eax, ebx, ecx, edx;
-> > +     uint64_t sev_status;
-> > +
-> > +     GUEST_SYNC(1);
-> > +
-> > +     cpuid(CPUID_MEM_ENC_LEAF, &eax, &ebx, &ecx, &edx);
-> > +     GUEST_ASSERT(eax & (1 << 1));
 >
->         GUEST_ASSERT(this_cpu_has(X86_FEATURE_SEV));
+> Same here, IMO it just obfuscates code with no real benefit.  ANd it's inconsistent,
+> e.g. why have a wrapper for enc_bit but not sev->fd?
+>
 
-Done.
+Removed.
 
-> > +
-> > +     sev_status = rdmsr(MSR_AMD64_SEV);
-> > +     GUEST_ASSERT((sev_status & 0x1) == 1);
-> > +
-> > +     GUEST_DONE();
+> > +     return sev->enc_bit;
 > > +}
 > > +
-> > +static struct sev_vm *setup_test_common(void *guest_code, uint64_t policy,
-> > +                                     struct kvm_vcpu **vcpu)
+> > +void sev_ioctl(int sev_fd, int cmd, void *data)
 > > +{
-> > +     uint8_t measurement[512];
-> > +     struct sev_vm *sev;
-> > +     struct kvm_vm *vm;
-> > +     int i;
+> > +     int ret;
+> > +     struct sev_issue_cmd arg;
 > > +
-> > +     sev = sev_vm_create(policy, TOTAL_PAGES);
+> > +     arg.cmd = cmd;
+> > +     arg.data = (unsigned long)data;
+> > +     ret = ioctl(sev_fd, SEV_ISSUE_CMD, &arg);
+> > +     TEST_ASSERT(ret == 0,
+> > +                 "SEV ioctl %d failed, error: %d, fw_error: %d",
+> > +                 cmd, ret, arg.error);
+> > +}
+> > +
+> > +void kvm_sev_ioctl(struct sev_vm *sev, int cmd, void *data)
+> > +{
+> > +     struct kvm_sev_cmd arg = {0};
+> > +     int ret;
+> > +
+> > +     arg.id = cmd;
+> > +     arg.sev_fd = sev->fd;
+> > +     arg.data = (__u64)data;
+> > +
+> > +     ret = ioctl(sev->vm->fd, KVM_MEMORY_ENCRYPT_OP, &arg);
+> > +     TEST_ASSERT(ret == 0,
+> > +                 "SEV KVM ioctl %d failed, rc: %i errno: %i (%s), fw_error: %d",
+> > +                 cmd, ret, errno, strerror(errno), arg.error);
+> > +}
+> > +
+> > +/* Local helpers. */
+> > +
+> > +static void
 >
->         TEST_ASSERT(sev, ...) so that this doesn't silently "pass"?
+> Don't split here, e.g. a grep/search for the function, should also show the return
+> type and any attributes, e.g. "static" vs. something else is typically much more
+> interesting than the parameters (and parameters is not a fully solvable problem).
+>
+> > +sev_register_user_region(struct sev_vm *sev, void *hva, uint64_t size)
+>
+> Align like so:
+>
+> static void sev_register_user_region(struct sev_vm *sev, void *hva,
+>                                      uint64_t size)
+>
+> or maybe even let it poke out.
+
+Ah never thought about that, sounds good. Done.
+
+>
+> > +{
+> > +     struct kvm_enc_region range = {0};
+> > +     int ret;
+> > +
+> > +     pr_debug("%s: hva: %p, size: %lu\n", __func__, hva, size);
+> > +
+> > +     range.addr = (__u64)hva;
+> > +     range.size = size;
+> > +
+> > +     ret = ioctl(sev->vm->fd, KVM_MEMORY_ENCRYPT_REG_REGION, &range);
+> > +     TEST_ASSERT(ret == 0, "failed to register user range, errno: %i\n", errno);
+> > +}
+> > +
+> > +static void
+> > +sev_encrypt_phy_range(struct sev_vm *sev, vm_paddr_t gpa, uint64_t size)
+>
+> Same thing here.
+>
+> > +{
+> > +     struct kvm_sev_launch_update_data ksev_update_data = {0};
+> > +
+> > +     pr_debug("%s: addr: 0x%lx, size: %lu\n", __func__, gpa, size);
+> > +
+> > +     ksev_update_data.uaddr = (__u64)addr_gpa2hva(sev->vm, gpa);
+> > +     ksev_update_data.len = size;
+> > +
+> > +     kvm_sev_ioctl(sev, KVM_SEV_LAUNCH_UPDATE_DATA, &ksev_update_data);
+> > +}
+> > +
+> > +static void sev_encrypt(struct sev_vm *sev)
+> > +{
+> > +     const struct sparsebit *enc_phy_pages;
+> > +     struct kvm_vm *vm = sev->vm;
+> > +     sparsebit_idx_t pg = 0;
+> > +     vm_paddr_t gpa_start;
+> > +     uint64_t memory_size;
+> > +
+> > +     /* Only memslot 0 supported for now. */
+>
+> Eww.  Haven't looked at this in depth, but is there a way to avoid hardcoding the
+> memslot in this code?
 
 Done.
 
 >
-> > +     if (!sev)
-> > +             return NULL;
-> > +     vm = sev_get_vm(sev);
-> > +
-> > +     /* Set up VCPU and initial guest kernel. */
-> > +     *vcpu = vm_vcpu_add(vm, VCPU_ID, guest_code);
-> > +     kvm_vm_elf_load(vm, program_invocation_name);
-> > +
-> > +     /* Allocations/setup done. Encrypt initial guest payload. */
-> > +     sev_vm_launch(sev);
-> > +
-> > +     /* Dump the initial measurement. A test to actually verify it would be nice. */
-> > +     sev_vm_launch_measure(sev, measurement);
-> > +     pr_info("guest measurement: ");
-> > +     for (i = 0; i < 32; ++i)
-> > +             pr_info("%02x", measurement[i]);
-> > +     pr_info("\n");
-> > +
-> > +     sev_vm_launch_finish(sev);
-> > +
-> > +     return sev;
-> > +}
-> > +
-> > +static void test_sev(void *guest_code, uint64_t policy)
+> > +void sev_vm_launch(struct sev_vm *sev)
 > > +{
-> > +     struct sev_vm *sev;
-> > +     struct kvm_vcpu *vcpu;
-> > +
-> > +     sev = setup_test_common(guest_code, policy, &vcpu);
-> > +     if (!sev)
-> > +             return;
+> > +     struct kvm_sev_launch_start ksev_launch_start = {0};
+> > +     struct kvm_sev_guest_status ksev_status = {0};
 >
-> And with an assert above, this return goes away.  Or better yet, fold setup_test_common()
-> into test_sev(), there's only the one user of the so called "common" function.
+> Doesn't " = {};" do the same thing?  And for the status, and any other cases where
+> userspace is reading, wouldn't it be better from a test coverage perspective to
+> _not_ zero the data?  Hmm, though I suppose false passes are possible in that case...
 
-Done.
+We want to zero out kvm_sev_launch_start because it has main fields we
+explicitly want zero: the dh_* and session_* fields need to be set up
+correctly or zeroed. We can add a test for these later if we want, but
+it would be mostly testing userspace + the PSP.
+
+We can not zero status I agree.
 
 >
-> > +
-> > +     /* Guest is ready to run. Do the tests. */
-> > +     guest_run_loop(vcpu);
-> > +
-> > +     pr_info("guest ran successfully\n");
-> > +
-> > +     sev_vm_free(sev);
-> > +}
-> > +
-> > +int main(int argc, char *argv[])
-> > +{
-> > +     /* SEV tests */
-> > +     test_sev(guest_sev_code, SEV_POLICY_NO_DBG);
-> > +     test_sev(guest_sev_code, 0);
-> > +
-> > +     return 0;
-> > +}
-> > --
-> > 2.37.1.559.g78731f0fdb-goog
-> >
+> > +     /* Need to use ucall_shared for synchronization. */
+> > +     //ucall_init_ops(sev_get_vm(sev), NULL, &ucall_ops_halt);
+>
+> Can this be deleted?  If not, what's up?
+
+Whoops, removed.
