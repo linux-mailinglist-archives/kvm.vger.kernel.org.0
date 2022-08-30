@@ -2,105 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA5E65A71E4
-	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 01:34:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EDDF5A71F1
+	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 01:39:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232399AbiH3XeV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 19:34:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42282 "EHLO
+        id S231487AbiH3XjG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 19:39:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232016AbiH3Xdi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 19:33:38 -0400
-Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 053BE9F1BE
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 16:32:34 -0700 (PDT)
-Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-11f34610d4aso9703684fac.9
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 16:32:34 -0700 (PDT)
+        with ESMTP id S231490AbiH3XjE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 19:39:04 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B6EB117
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 16:39:03 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id fa2so4886314pjb.2
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 16:39:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=QoQMpjqxJlADfnUCJp6OYozlgIQ996aVrO548ZR6pGU=;
-        b=hVsETSJFSqjLYqgLzaFV0FMIxY+wnY0KAmZPQUvvwLWCmvi1aqhDFlnNl1HiC515hk
-         TxgH1ta3K5GmjZx1DCoJgZ+OOPEo0mU1h7F2k1XTigWiBCsWJRGHZOr7lOWYfZpY8lsD
-         fT818ScHdr4UktGV5H7wcZzXPYWo/hM3ibynQrKLvYuwjZ+OzAuywHGUppmdsYgqtfxh
-         rdwSqzqQFIaErGLH+nHLbyD3M9yZv9bWLmyDY39Wt86TchqoBEPWAvZdl2SVFbVez0+1
-         1PpJOHguSszj1Y9bUGX7mENJo86qHVbMgGoM/MN4cNhZuB16v4O26GQvvAjgHt8aEkxY
-         VjIQ==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=jV+TJTznHVc9eXF49TFmoCezKm/gvS3NXfE7LqS48eA=;
+        b=SD5HkEsbFOgrLQoUbLpEQLLNthNpDPBPrFlbszyD5h61nDl11EuIcf0fLwK/KHStsL
+         +DxR72frBUm207L43KgeEKcLyOj/39SETvqqn4vYNyoWEl2qMT0NeK8GqDo27vdTs/2i
+         UBxP7GgCa5j4LrWBFixVLUyG/7lEB4+Jzw3c6HqMB4iqWrNElpbiFqiRmGnAj02UMggZ
+         4gW5vSUKvSmBnSFVoUWvX0nt9na6fJlnx9vv+4D+8VfTZzq39UaGKR2d18CI+ike/0UW
+         roCoy/iXlgMp2K/RHXtbhCvZ92IhrYhJzBC8txeMr62+xuU1YeF01UvX2la10jpwY+i5
+         H7KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=QoQMpjqxJlADfnUCJp6OYozlgIQ996aVrO548ZR6pGU=;
-        b=hE6NIZ1Z5/M36WzoZ+fdtZaxYMcepxVTqVR23nIgFpG3VklHIiAkpJun8ixPrHJ7b8
-         fexDlX/XupNU/mqeemHlFQw9jzPy/ato/mxaJpOpRnwW9lqK+GpCna7sZFrTWkVzqesN
-         1huadHIcR3CNmFRYAcojGKb/9Aq62/8FnJz+Ws1hqEH3pilXGc1tIL6OLK5dJInwdDqI
-         lOdCw5YM3NA3ZcgYqpg9S64PcVRT3+Lpk+lma1xlto61YmoABtj7rqnspEjpAzmYUIOE
-         zWrlK9mDqwwid61woz9prEmqy5Mrgy7PKfBEHWm9JXicRlmGKyQ6/T9g1DC7Zv+5ObZm
-         p6uw==
-X-Gm-Message-State: ACgBeo3ffWEPjNEfsK2eImgSqte91BFHpfGj7N2wz3dUyJBBZQkWHE+C
-        dSI/fi2EaRilHNIHqbKSS2wjqbjikD/lFFC59Dju0w==
-X-Google-Smtp-Source: AA6agR4OkbuNvoTGDO1VVxpTty/2Pz0+OSr97rGkNyttNIvw2drXz6UkYH4u+wva8KNxgg4OvLgKQyCLR1UgvQLcxrQ=
-X-Received: by 2002:a05:6870:c596:b0:101:6409:ae62 with SMTP id
- ba22-20020a056870c59600b001016409ae62mr213149oab.112.1661902348958; Tue, 30
- Aug 2022 16:32:28 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=jV+TJTznHVc9eXF49TFmoCezKm/gvS3NXfE7LqS48eA=;
+        b=Z9tdzopZjHAbisb9u0JGdPNYRkuMK9OnC/+2r0wSZLWfHYuDHiugX+wfVtUR7FTWBR
+         pHQSPol2yN8Sbe8mZM0h+SrY/qkjmLvMFuyUd3Cv5NRVHJ7v75AOADeppqk74kRRPtpH
+         JIZxVbx1z2LhsA7Ta6/Kr/zYB2lT/mV1PU+vd4oPgcCgVU17s2vMb3A2xK9RaC9CL30g
+         hglccA8duPiqSg1DjQrjTBIDXZ4+D2WNLH61C+bERgGnciy9kvuime3ua4f3rz8NgHqk
+         gs70K6In1OfYNhuFXAEhLr7zmZsDs8EOrZsuVnWLQoiqNyuCxE1jgHGU/fPCx4m4kWt/
+         +ZYg==
+X-Gm-Message-State: ACgBeo2oY4FHA6CGG7bqCBbsRZJ+2UV5eTNNJiSVoWdPR7lA1E/8CsXN
+        wEHpjeYI/GVofLdoHq5RLx9etA==
+X-Google-Smtp-Source: AA6agR5SY20p6CFS+Y3GegFNkuwSJDjP3H19PvzkvO+MX9gajHk1Cs7Y/q0gd6Jha5B1AGQgKIWpXA==
+X-Received: by 2002:a17:902:d50b:b0:172:a41f:b204 with SMTP id b11-20020a170902d50b00b00172a41fb204mr22948509plg.70.1661902743060;
+        Tue, 30 Aug 2022 16:39:03 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id q3-20020a170902dac300b001751d0ac555sm2239942plx.148.2022.08.30.16.39.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Aug 2022 16:39:02 -0700 (PDT)
+Date:   Tue, 30 Aug 2022 23:38:59 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [PATCH v2 2/2] KVM: x86: Expose Predictive Store Forwarding
+ Disable on Intel parts
+Message-ID: <Yw6fkyJrsu/i+Byy@google.com>
+References: <20220830225210.2381310-1-jmattson@google.com>
+ <20220830225210.2381310-2-jmattson@google.com>
 MIME-Version: 1.0
-References: <20220830225210.2381310-1-jmattson@google.com> <Yw6c7X1ymnrAEIVu@google.com>
-In-Reply-To: <Yw6c7X1ymnrAEIVu@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 30 Aug 2022 16:32:18 -0700
-Message-ID: <CALMp9eQA-D+=1Os=WaHh29_z=kz8_7uuR+D584_Mc1OS9fN4gw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] KVM: x86: Insert "AMD" in KVM_X86_FEATURE_PSFD
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com,
-        Babu Moger <Babu.Moger@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220830225210.2381310-2-jmattson@google.com>
+X-Spam-Status: No, score=-14.9 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 30, 2022 at 4:27 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Tue, Aug 30, 2022, Jim Mattson wrote:
-> > Intel and AMD have separate CPUID bits for each SPEC_CTRL bit. In the
-> > case of every bit other than PFSD, the Intel CPUID bit has no vendor
-> > name qualifier, but the AMD CPUID bit does. For consistency, rename
-> > KVM_X86_FEATURE_PSFD to KVM_X86_FEATURE_AMD_PSFD.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > Cc: Babu Moger <Babu.Moger@amd.com>
-> > ---
-> >  v1 -> v2: Dropped patch 2/3.
-> >
-> >  arch/x86/kvm/cpuid.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index 75dcf7a72605..07be45c5bb93 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -62,7 +62,7 @@ u32 xstate_required_size(u64 xstate_bv, bool compacted)
-> >   * This one is tied to SSB in the user API, and not
-> >   * visible in /proc/cpuinfo.
-> >   */
-> > -#define KVM_X86_FEATURE_PSFD         (13*32+28) /* Predictive Store Forwarding Disable */
-> > +#define KVM_X86_FEATURE_AMD_PSFD     (13*32+28) /* Predictive Store Forwarding Disable */
->
-> This is asinine.  If KVM is forced to carry the feature bit then IMO we have every
-> right to the "real" name.  If we can't convince others that this belongs in
-> cpufeatures.h, then I vote to rename this to X86_FEATURE_AMD_PSFD so that we don't
-> have to special case this thing.
+On Tue, Aug 30, 2022, Jim Mattson wrote:
+> Intel enumerates support for PSFD in CPUID.(EAX=7,ECX=2):EDX.PSFD[bit
+> 0]. Report support for this feature in KVM if it is available on the
+> host.
+> 
+> Presumably, this feature bit, like its AMD counterpart, is not welcome
+> in cpufeatures.h, so add a local definition of this feature in KVM.
+> 
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>  arch/x86/kvm/cpuid.c | 23 +++++++++++++++++------
+>  1 file changed, 17 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 07be45c5bb93..b5af9e451bef 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -62,6 +62,7 @@ u32 xstate_required_size(u64 xstate_bv, bool compacted)
+>   * This one is tied to SSB in the user API, and not
+>   * visible in /proc/cpuinfo.
+>   */
+> +#define KVM_X86_FEATURE_PSFD		0          /* Predictive Store Forwarding Disable */
 
-You won't get any argument from me!
+I believe we can use "enum kvm_only_cpuid_leafs" to handle this.  E.g. 
 
-If Borislav objects to seeing the feature in /proc/cpuinfo, can't we
-just begin the cpufeatures.h descriptive comment with ""?
+	enum kvm_only_cpuid_leafs {
+		CPUID_12_EAX	 = NCAPINTS,
+		CPUID_7_2_EDX,
+		NR_KVM_CPU_CAPS,
+
+		NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
+	};
+
+then the intended use of KVM_X86_FEATURE_*
+
+	#define KVM_X86_FEATURE_PSFD	KVM_X86_FEATURE(CPUID_7_2_EDX, 0)
+
+I _think_ we can then define an arbitrary word for X86_FEATURE_PSFD, e.g.
+
+	#define X86_FEATURE_PSFD	(NKVMCAPINTS*32+0)
+
+and then wire up the translation:
+
+	static __always_inline u32 __feature_translate(int x86_feature)
+	{
+		if (x86_feature == X86_FEATURE_SGX1)
+			return KVM_X86_FEATURE_SGX1;
+		else if (x86_feature == X86_FEATURE_SGX2)
+			return KVM_X86_FEATURE_SGX2;
+		else if (x86_feature == X86_FEATURE_PSFD)
+			return KVM_X86_FEATURE_PSFD;
+	
+		return x86_feature;
+	}
+
+I believe/hope that allows us to use at least cpuid_entry_override().  Open coding
+masking of specific registers was a mess that I don't want to repeat.
