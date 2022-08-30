@@ -2,251 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A85535A6C81
-	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 20:44:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6B2E5A6CAF
+	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 21:02:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231515AbiH3SoQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 14:44:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51288 "EHLO
+        id S230038AbiH3TCB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 15:02:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231342AbiH3SoP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 14:44:15 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7715174BA8
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 11:44:13 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id m2so11978367pls.4
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 11:44:13 -0700 (PDT)
+        with ESMTP id S229476AbiH3TB7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 15:01:59 -0400
+Received: from mail-io1-xd49.google.com (mail-io1-xd49.google.com [IPv6:2607:f8b0:4864:20::d49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD21E5EDCF
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 12:01:58 -0700 (PDT)
+Received: by mail-io1-xd49.google.com with SMTP id x9-20020a056602210900b006897b3869e4so7249771iox.16
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 12:01:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=LaMQFRX0UeRPFbdW+nLRpQghiuZmlwDm+nxHKxvjpKY=;
-        b=P1rCIF3dZwQAQywAd5XezzR+dcnrRrYYfWVQaK2/SItThyh1FNTOv40ThKrDkYmeGq
-         lbuBt8YmnQX4uqrCGmgf/xQQc+FBssbaSi+YyAK2mObTVwO+KaEtmuO6ekzPOFoo3A2S
-         Km/oUV9GIcLhz3h/Weh0eE/uIXtx6yWi1YuRIWrcgndbSjYrqPsWzDE8r976Vh3KBC37
-         TsTph/fAcyqqIpYLQ36445xpK+6MyjZsEHHfEXXpuCOsMbWuQsEPHLAitVJf4lpI71gc
-         mdF7+Hl3jj1dg3QeiKkXvYg5smOU8peCXZjeJvBdK5sWbv4GTHknSPGG+NKGEqxmw2hz
-         ApkA==
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc;
+        bh=KF2FaYFBo9TGsmChrHM9AH6GzUReTMVwLGccXsi5P2A=;
+        b=SFZLQjrPGX2xL+uz1iv19W19PwvYSRioSqvFzrYa6C12WSNiNjFimJSDYwN+AqneR8
+         cLiB5VyKuSG/MHzuzAFfFrfbFOorF2W5QKVYenw/4Tf+v+V4Yqu6zYZChm6VXKcZ11Kf
+         DGo4fXbTzZ2BAE/aQpOy0lC6okEWLIe13GYgMvsCDCqJ4oUdfasrPhmG0JBTqR0kjtCi
+         RpoXIaHtmaBgKcrclGleB+s4t6aVQ007IlVpEjAadag6oWo+y2cVzyiIGGLmibgrFxwF
+         y4Ml/GhY+wHkSFWxJNb7kUdwPWoPHfiSVM/T11iA6Ch+VHZwJi5v8W9Hm4rOqAba6trz
+         dQ1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=LaMQFRX0UeRPFbdW+nLRpQghiuZmlwDm+nxHKxvjpKY=;
-        b=zHHQYT777xzjIqngwYST468J8ZREbBDqtPtNO+sPun3R+ffsjkrYevv+1+vlW4trpA
-         Hbe3CV32QRxlYm03Nthi8BG5MT1pRt1aM3FrCk0N6GURvUzi8EJZGa4SuCLti/PCov0V
-         PiBFRXIaFGNp5J67nRJNjmRIAbh0WL9VylYx7SuJ7zG2S7PohXmeO+yZAgZz4/jbI0hx
-         0my6CMmMIptctuz0sDewtKUEaOW3rxOGk/v+7H1GvOPr7SaezAbrzVHNHEIEK2AmX9Lp
-         E2PKqKz/3f+UAzZGWYuFg+4x3+qAAM2bUCh+Tc4JfU2YYP/oUBfEVe1a2CzMznF+bF2m
-         54ZA==
-X-Gm-Message-State: ACgBeo1+n/VD2kC3CASnfSXpV8eZ+ELp3JQ32yME74+PGOrnPqE0cluA
-        jyIJUA9S8k7JbN9Lzt2XFd5gHw==
-X-Google-Smtp-Source: AA6agR6UYArRhVdJRzK2hp/ujTBg3oQGUm0TIgZfDwN7OKJ/efZVIoz3IOViIM51Ok0EcKVOTjgwwA==
-X-Received: by 2002:a17:902:c945:b0:16d:c318:4480 with SMTP id i5-20020a170902c94500b0016dc3184480mr22601569pla.147.1661885052862;
-        Tue, 30 Aug 2022 11:44:12 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id z5-20020a17090a66c500b001f334aa9170sm8829426pjl.48.2022.08.30.11.44.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Aug 2022 11:44:12 -0700 (PDT)
-Date:   Tue, 30 Aug 2022 18:44:08 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Hou Wenlong <houwenlong.hwl@antgroup.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: x86: Return emulator error if RDMSR/WRMSR
- emulation failed
-Message-ID: <Yw5aeFp9rTs4tkDb@google.com>
-References: <cover.1658913543.git.houwenlong.hwl@antgroup.com>
- <a845c3e93b2e94b510abbc26ab4ffc0eb8a8b67a.1658913543.git.houwenlong.hwl@antgroup.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a845c3e93b2e94b510abbc26ab4ffc0eb8a8b67a.1658913543.git.houwenlong.hwl@antgroup.com>
-X-Spam-Status: No, score=-14.9 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc;
+        bh=KF2FaYFBo9TGsmChrHM9AH6GzUReTMVwLGccXsi5P2A=;
+        b=nXITrMbPbRJdWGaMFaCsOscZavOyJutCBYdxxA57U4Rwha/bJ2SRj4ubyAe1lkz6ZW
+         CFi0iL6l6W1wydzHdUV2/Ie6PKVFARlU00LWZGVt5lHH6lRnfMWnfJH80V8qESfYizQJ
+         Mtlp5aXdQKsEopuC2jhcUEYwr7fI6cjPRguvCvtxNNbMIXPGcLtVhyJEpZbKonK6E+z0
+         UtrMQl+aY78eQyANB01WPvp/67i9k5ShrcmzfXQKOg31SettfKzpa80FTu+rHLK6rJD+
+         Tg1JIfesw9JG1WrHUMy1NG3SK4qFEmv22QxdAOE/Xb4Uhv0lEbhI7N3wxvW1iGtOdk0u
+         qXjg==
+X-Gm-Message-State: ACgBeo3Y7jHGZP2Pjle02mDP6gq/SSGmHgw34W98JQF68BDT7I3xF3CD
+        HZEWvyhQO2GlrwZVyIBjGC6OuVR/t+/4JgmC0g==
+X-Google-Smtp-Source: AA6agR6ZiVWuzjXKr4lL4KAcNDj9FSxUlrYMqQiZkvBRCU1kEWlpWFIECw6A4o5mNF+UAqO5XXG6noP+S8fkHqGpiQ==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6e02:1aa7:b0:2de:b9f1:593f with
+ SMTP id l7-20020a056e021aa700b002deb9f1593fmr12518893ilv.243.1661886118175;
+ Tue, 30 Aug 2022 12:01:58 -0700 (PDT)
+Date:   Tue, 30 Aug 2022 19:01:57 +0000
+In-Reply-To: <YwlCGAD2S0aK7/vo@google.com> (message from David Matlack on Fri,
+ 26 Aug 2022 14:58:48 -0700)
+Mime-Version: 1.0
+Message-ID: <gsntk06pwo62.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v2 1/3] KVM: selftests: Create source of randomness for
+ guest code.
+From:   Colton Lewis <coltonlewis@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        seanjc@google.com, oupton@google.com, ricarkol@google.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jul 28, 2022, Hou Wenlong wrote:
-> The return value of emulator_{get|set}_mst_with_filter()
-> is confused, since msr access error and emulator error
-> are mixed. Although, KVM_MSR_RET_* doesn't conflict with
-> X86EMUL_IO_NEEDED at present, it is better to convert
-> msr access error to emulator error if error value is
-> needed.
-> 
-> Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
-> ---
->  arch/x86/kvm/x86.c | 22 ++++++++++++----------
->  1 file changed, 12 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 5366f884e9a7..8df89b9c212f 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -7908,11 +7908,12 @@ static int emulator_get_msr_with_filter(struct x86_emulate_ctxt *ctxt,
->  	int r;
->  
->  	r = kvm_get_msr_with_filter(vcpu, msr_index, pdata);
-> -
-> -	if (r && kvm_msr_user_space(vcpu, msr_index, KVM_EXIT_X86_RDMSR, 0,
-> -				    complete_emulated_rdmsr, r)) {
-> -		/* Bounce to user space */
-> -		return X86EMUL_IO_NEEDED;
-> +	if (r) {
-> +		if (kvm_msr_user_space(vcpu, msr_index, KVM_EXIT_X86_RDMSR, 0,
-> +				       complete_emulated_rdmsr, r))
-> +			r = X86EMUL_IO_NEEDED;
-> +		else
-> +			r = X86EMUL_UNHANDLEABLE;
+David Matlack <dmatlack@google.com> writes:
 
-This should be X86EMUL_PROPAGATE_FAULT, X86EMUL_UNHANDLEABLE is used to indicate
-that KVM needs to bail all the way to userspace.
+> On Wed, Aug 17, 2022 at 09:41:44PM +0000, Colton Lewis wrote:
+>> Create for each vcpu an array of random numbers to be used as a source
+>> of randomness when executing guest code. Randomness should be useful
+>> for approaching more realistic conditions in dirty_log_perf_test.
 
-I definitely like the idea of converting to X86EMUL_* here instead of spreading
-it across these helpers and the emulator, but in that case should convert _all_
-types.
+>> Create a -r argument to specify a random seed. If no argument
+>> is provided, the seed defaults to the current Unix timestamp.
 
-And I think it makes sense to opportunistically handle "r < 0" in the get helper.
-KVM may not return -errno today, but assuming that will always hold true is
-unnecessarily risking.
+>> The random arrays are allocated and filled as part of VM creation. The
+>> additional memory used is one 32-bit number per guest VM page to
+>> ensure one number for each iteration of the inner loop of guest_code.
 
-E.g. what about:
+> nit: I find it helpful to put this in more practical terms as well. e.g.
+
+>    The random arrays are allocated and filled as part of VM creation. The
+>    additional memory used is one 32-bit number per guest VM page (so
+>    1MiB of additional memory when using the default 1GiB per-vCPU region
+>    size) to ensure one number for each iteration of the inner loop of
+>    guest_code.
+
+> Speaking of, this commit always allocates the random arrays, even if
+> they are not used. I think that's probably fine but it deserves to be
+> called out in the commit description with an explanation of why it is
+> the way it is.
 
 
-static int emulator_get_msr_with_filter(struct x86_emulate_ctxt *ctxt,
-					u32 msr_index, u64 *pdata)
-{
-	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
-	int r;
+I'll add a concrete example and explain always allocating.
 
-	r = kvm_get_msr_with_filter(vcpu, msr_index, pdata);
-	if (r < 0)
-		return X86EMUL_UNHANDLEABLE;
+Technically, the random array will always be accessed even if it never
+changes the code path when write_percent = 0 or write_percent =
+100. Always allocating avoids extra code that adds complexity for no
+benefit.
 
-	if (r) {
-		if (kvm_msr_user_space(vcpu, msr_index, KVM_EXIT_X86_RDMSR, 0,
-				       complete_emulated_rdmsr, r))
-			return X86EMUL_IO_NEEDED;
-		else
-			return X86EMUL_PROPAGATE_FAULT;
-	}
+>> @@ -442,6 +446,9 @@ int main(int argc, char *argv[])
+>>   		case 'o':
+>>   			p.partition_vcpu_memory_access = false;
+>>   			break;
+>> +		case 'r':
+>> +			p.random_seed = atoi(optarg);
 
-	return X86EMUL_CONTINUE;
-}
-
-static int emulator_set_msr_with_filter(struct x86_emulate_ctxt *ctxt,
-					u32 msr_index, u64 data)
-{
-	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
-	int r;
-
-	r = kvm_set_msr_with_filter(vcpu, msr_index, data);
-	if (r < 0)
-		return X86EMUL_UNHANDLEABLE;
-
-	if (r) {
-		if (kvm_msr_user_space(vcpu, msr_index, KVM_EXIT_X86_WRMSR, data,
-				       complete_emulated_msr_access, r))
-			return X86EMUL_IO_NEEDED;
-		else
-			return X86EMUL_PROPAGATE_FAULT;
-	}
-
-	return X86EMUL_CONTINUE;
-}
+> Putting the random seed in test_params seems unnecessary. This flag
+> could just set perf_test_args.randome_seed directly. Doing this would
+> avoid the need for duplicating the time(NULL) initialization, and allow
+> you to drop perf_test_set_random_seed().
 
 
-Or maybe even add a helper to do the translation?  Can't tell if this is a net
-positive or not.  It's a bit gratuitous, but it does ensure consistent behavior
-for RDMSR vs. WRMSR.
+I understand there is some redundancy in this approach and had
+originally done what you suggest. My reason for changing was based on
+the consideration that perf_test_util.c is library code that is used for
+other tests and could be used for more in the future, so it should
+always initialize everything in perf_test_args rather than rely on the
+test to do it. This is what is done for wr_fract (renamed write_percent
+later in this patch). perf_test_set_random_seed is there for interface
+consistency with the other perf_test_set* functions.
 
-static int emulator_handle_msr_return(struct kvm_vcpu *vcpu *, int r,
-				      u32 msr, u64 data, u32 exit_reason,
-				      int (*comp)(struct kvm_vcpu *vcpu))
-{
-	if (r < 0)
-		return X86EMUL_UNHANDLEABLE;
+But per the point below, moving random generation to VM creation means
+we are dependent on the seed being set before then. So I do need a
+change here, but I'd rather keep the redundancy and
+perf_test_set_random_seed.
 
-	if (r) {
-		if (kvm_msr_user_space(vcpu, msr, exit_reason, data, comp, r))
-			return X86EMUL_IO_NEEDED;
-		else
-			return X86EMUL_UNHANDLEABLE;
-	}
+>> +void perf_test_fill_random_arrays(uint32_t nr_vcpus, uint32_t  
+>> nr_randoms)
+>> +{
+>> +	struct perf_test_args *pta = &perf_test_args;
+>> +	uint32_t *host_row;
 
-	return X86EMUL_CONTINUE;
-}
-
-static int emulator_get_msr_with_filter(struct x86_emulate_ctxt *ctxt,
-					u32 msr_index, u64 *pdata)
-{
-	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
-	int r;
-
-	r = kvm_get_msr_with_filter(vcpu, msr_index, pdata);
-	return emulator_handle_msr_return(vcpu, r, msr_index, 0,
-					  KVM_EXIT_X86_RDMSR,
-					  complete_emulated_rdmsr);
-}
-
-static int emulator_set_msr_with_filter(struct x86_emulate_ctxt *ctxt,
-					u32 msr_index, u64 data)
-{
-	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
-	int r;
-
-	r = kvm_set_msr_with_filter(vcpu, msr_index, data);
-	return emulator_handle_msr_return(vcpu, r, msr_index, data,
-					  KVM_EXIT_X86_WRMSR,
-					  complete_emulated_msr_access);
-}
+> "host_row" is a confusing variable name here since you are no longer
+> operating on a 2D array. Each vCPU has it's own array.
 
 
-And then the emulator side of things can be:
+Agreed.
 
-static int em_wrmsr(struct x86_emulate_ctxt *ctxt)
-{
-	u64 msr_index = reg_read(ctxt, VCPU_REGS_RCX);
-	u64 msr_data;
-	int r;
+>> @@ -120,8 +149,9 @@ struct kvm_vm *perf_test_create_vm(enum  
+>> vm_guest_mode mode, int nr_vcpus,
 
-	msr_data = (u32)reg_read(ctxt, VCPU_REGS_RAX)
-		| ((u64)reg_read(ctxt, VCPU_REGS_RDX) << 32);
-	r = ctxt->ops->set_msr_with_filter(ctxt, msr_index, msr_data);
+>>   	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
 
-	if (r == X86EMUL_PROPAGATE_FAULT)
-		return emulate_gp(ctxt, 0);
+>> -	/* By default vCPUs will write to memory. */
+>> -	pta->wr_fract = 1;
+>> +	/* Set perf_test_args defaults. */
+>> +	pta->wr_fract = 100;
+>> +	pta->random_seed = time(NULL);
 
-	return r;
-}
+> Won't this override write the random_seed provided by the test?
 
-static int em_rdmsr(struct x86_emulate_ctxt *ctxt)
-{
-	u64 msr_index = reg_read(ctxt, VCPU_REGS_RCX);
-	u64 msr_data;
-	int r;
 
-	r = ctxt->ops->get_msr_with_filter(ctxt, msr_index, &msr_data);
+Yes. I had thought I accounted for that by setting random_seed later in
+run_test, but now realize that has no effect because I moved the
+generation of all the random numbers to happen before then.
 
-	if (r == X86EMUL_PROPAGATE_FAULT)
-		return emulate_gp(ctxt, 0);
 
-	if (r == X86EMUL_CONTINUE) {
-		*reg_write(ctxt, VCPU_REGS_RAX) = (u32)msr_data;
-		*reg_write(ctxt, VCPU_REGS_RDX) = msr_data >> 32;
-	}
-	return r;
-}
+>>   	/*
+>>   	 * Snapshot the non-huge page size.  This is used by the guest code to
+>> @@ -211,6 +241,11 @@ struct kvm_vm *perf_test_create_vm(enum  
+>> vm_guest_mode mode, int nr_vcpus,
+
+>>   	ucall_init(vm, NULL);
+
+>> +	srandom(perf_test_args.random_seed);
+>> +	pr_info("Random seed: %d\n", perf_test_args.random_seed);
+>> +	perf_test_alloc_random_arrays(nr_vcpus, vcpu_memory_bytes >>  
+>> vm->page_shift);
+>> +	perf_test_fill_random_arrays(nr_vcpus, vcpu_memory_bytes >>  
+>> vm->page_shift);
+
+> I think this is broken if !partition_vcpu_memory_access. nr_randoms
+> (per-vCPU) should be `nr_vcpus * vcpu_memory_bytes >> vm->page_shift`.
+
+
+Agree it will break then and should not. But allocating that many more
+random numbers may eat too much memory. In a test with 64 vcpus, it would
+try to allocate 64x64 times as many random numbers. I'll try it but may
+need something different in that case.
+
+> Speaking of, this should probably just be done in
+> perf_test_setup_vcpus(). That way you can just use vcpu_args->pages for
+> nr_randoms, and you don't have to add another for-each-vcpu loop.
+
+
+Agreed.
+
+>> +
+>>   	/* Export the shared variables to the guest. */
+>>   	sync_global_to_guest(vm, perf_test_args);
+
+>> @@ -229,6 +264,12 @@ void perf_test_set_wr_fract(struct kvm_vm *vm, int  
+>> wr_fract)
+>>   	sync_global_to_guest(vm, perf_test_args);
+>>   }
+
+>> +void perf_test_set_random_seed(struct kvm_vm *vm, uint32_t random_seed)
+>> +{
+>> +	perf_test_args.random_seed = random_seed;
+>> +	sync_global_to_guest(vm, perf_test_args);
+
+> sync_global_to_guest() is unnecessary here since the guest does not need
+> to access perf_test_args.random_seed (and I can't imagine it ever will).
+
+> That being said, I think you can drop this function (see earlier
+> comment).
+
+
+See earlier response about consistency.
