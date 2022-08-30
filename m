@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E8CF85A70B0
-	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 00:22:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0C5A5A70B4
+	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 00:22:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232324AbiH3WWU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 18:22:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52940 "EHLO
+        id S231190AbiH3WWg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 18:22:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229949AbiH3WVq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 18:21:46 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C3E87EFE1
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 15:20:56 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id oo12-20020a17090b1c8c00b001faa0b549caso11850736pjb.0
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 15:20:56 -0700 (PDT)
+        with ESMTP id S232276AbiH3WV6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 18:21:58 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4E4E832C6
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 15:20:59 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id e9-20020aa78249000000b00537a62a6175so5178975pfn.20
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 15:20:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date;
-        bh=2AzASQeU88APEljBXBn0RNVGXW+shwwgUtawD6/ADN8=;
-        b=XxqBa5YUPEuIofhtRPgfQP1Gp7yJBPrhB27iJVTj5hKg2qUgSwojvxOwPl1mqNddVk
-         EvLfXqPC7nzUVlzuvW0kzXSJdPKfu576AOZ5UZcRRd44IzixhkQfNSVGLTbFEsotJ7lH
-         w3kaELzdP+sFBMynBIe9kYmybdDrc3m8ps34xZ5UhYxfLTX0FN/ZbNvQOunYsj/1WVry
-         PC8RvwlhuKpik45jWpSrhGU/4j/BmLkbdRUaMDB4p42YF9ICdlsSwc+afhYAIpKsHdVF
-         dW2yEJqpRTTGVXnkT+Ps0wMPO1gfjvZxwFJXci6mZ2WCAg9f0kkjjIbF/j3X/dSTmaYl
-         RgJA==
+        bh=zd+lBScqnSmkIetLC1xR4dudPj5a700X/6NrBlSgAV4=;
+        b=ET5No9KOQARFFK18hAOs093fKjXxVroc6nLNGj2YcF5XnW5vp4KG7BMHABT3lvRkys
+         pfcLwV/CjF9DMORwkMQghxC6FjPEk3/jq0Ew5hs/MwfGWZsYNaOE0oHaufvVrEQeo569
+         hJSw8//FeEyvOm0pZcf6MlA/u9hOGhHMk5hip7rFr/OrGgMsGnG9vfKcF8/7EOR+w0QI
+         ZeAIg4uworipwrLCrej+fyLhv5V1O8psD/t2XZnlObKRo9Dn/hVDoA/awOceWqrzLz09
+         JnyetQF7n21GylCr13ssH7SFgct8iPEYG27cyc+5FvWQiXM1zEyt+NIVoP6x/huPjdnQ
+         JhGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date;
-        bh=2AzASQeU88APEljBXBn0RNVGXW+shwwgUtawD6/ADN8=;
-        b=JlPIJ82d42o7gaQpmQHNTJn2TuKrNgDB0Y7g+ndgC5qOuoaKVgwYFe6tgVlhgoXBEg
-         0qTRpKR8vsdhB3NdMwZMRbXogz1IMQAeJ/bTZp5mBN7sq/hFBtBZN45LBpydTgwuvc7M
-         sc/MCqH7tHQgoOOlk/nh6SQkIZkipRZrB1Ed452SyMD5Y8VTeXy9MUjPDM5DAGYh2y76
-         hvZIxke7aflGP3eiJRGEOEu8QdZUgi9DPTIy3d4eICY2jfy/Hc3JoubCC9lLeBrM7gLN
-         AXCSuhtnIEvUxqEpYqjqvNe5EMqS+nOW9z7rnTL8LyomIWlh3rVLcEvjLR28Msywbpnh
-         0MLw==
-X-Gm-Message-State: ACgBeo2AycTTivgsNG5sNcLWPVw1CwJWLohQyzD8McNj8pTNRE+4ajWa
-        HMxPZUYZ7KEbi/Ff/QBmHijV/fys+Q==
-X-Google-Smtp-Source: AA6agR7m/uiWOU0X1ALpMi8LPsl7IheXdMIzK8T+7BYvKoXpERL9W/YFwQ3v9zngVlKofPdPkx5efJAG2Q==
+        bh=zd+lBScqnSmkIetLC1xR4dudPj5a700X/6NrBlSgAV4=;
+        b=vJPe0ArSPswFHijWssGhBb3k0Bhx3Y2EKvqhbadEZ0CYZD04t/eKF2PJrfeIHBNT1R
+         Eb38j0KshUR4n+IV8zZFMiX9OvpuBu+qPnKCH3kXSgplDDuytJlY5Gq4OvFO2s3OmfBr
+         8cCvjiDIUXVLwN668+Qr2FAGsmztcNJo/eI3FS/KHvx5Ru5w7o2+QTUZygbGHXJFQP51
+         Of7RulDUfq9Kcq8r580uTSzrWA6ZJ2PBUqjgIssxf6vG7Y4KGkHM+pDHpXxh5FnDoZ8V
+         +W0zIcx3FG2puBeNFVFc+Q8MCdasKrMpPd5uJCe+LmIc88cnRJd/RpqjEY/R6qHImnc4
+         8ntg==
+X-Gm-Message-State: ACgBeo0nYKdOFlRvQbvN2XA1QFyQJNFAYTaOcFfCQ8L1SZpxGqN9ARHl
+        neZLp05kTRBaqHPysx0EAWcc2wAEow==
+X-Google-Smtp-Source: AA6agR7l+9nzCrkMd2h5pdfU7qg8qiGZHLUMkG4txvqEY4nDBo+Jb6sEYsb5hHykvJHBJQ7xBXLtiptpiw==
 X-Received: from sagi.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:241b])
- (user=sagis job=sendgmr) by 2002:a05:6a00:acc:b0:530:e79e:fc27 with SMTP id
- c12-20020a056a000acc00b00530e79efc27mr23466087pfl.61.1661898031820; Tue, 30
- Aug 2022 15:20:31 -0700 (PDT)
-Date:   Tue, 30 Aug 2022 22:19:58 +0000
+ (user=sagis job=sendgmr) by 2002:a17:90a:738a:b0:1fa:d930:49d1 with SMTP id
+ j10-20020a17090a738a00b001fad93049d1mr177774pjg.130.1661898033307; Tue, 30
+ Aug 2022 15:20:33 -0700 (PDT)
+Date:   Tue, 30 Aug 2022 22:19:59 +0000
 In-Reply-To: <20220830222000.709028-1-sagis@google.com>
 Mime-Version: 1.0
 References: <20220830222000.709028-1-sagis@google.com>
 X-Mailer: git-send-email 2.37.2.789.g6183377224-goog
-Message-ID: <20220830222000.709028-16-sagis@google.com>
-Subject: [RFC PATCH v2 15/17] KVM: selftest: TDX: Verify the behavior when
- host consumes a TD private memory
+Message-ID: <20220830222000.709028-17-sagis@google.com>
+Subject: [RFC PATCH v2 16/17] KVM: selftest: TDX: Add TDG.VP.INFO test
 From:   Sagi Shahar <sagis@google.com>
 To:     linux-kselftest@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -89,119 +88,378 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Ryan Afranji <afranji@google.com>
+From: Roger Wang <runanwang@google.com>
 
-The test checks that host can only read fixed values when trying to
-access the guest's private memory.
+Adds a test for TDG.VP.INFO
 
-Signed-off-by: Ryan Afranji <afranji@google.com>
+Signed-off-by: Roger Wang <runanwang@google.com>
 Signed-off-by: Sagi Shahar <sagis@google.com>
 ---
- .../selftests/kvm/x86_64/tdx_vm_tests.c       | 93 +++++++++++++++++++
- 1 file changed, 93 insertions(+)
+ tools/testing/selftests/kvm/lib/x86_64/tdx.h  | 103 ++++++++----
+ .../selftests/kvm/lib/x86_64/tdx_lib.c        |  18 ++-
+ .../selftests/kvm/x86_64/tdx_vm_tests.c       | 150 ++++++++++++++++++
+ 3 files changed, 235 insertions(+), 36 deletions(-)
 
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx.h b/tools/testing/selftests/kvm/lib/x86_64/tdx.h
+index 3729543a05a3..7af2d189043f 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/tdx.h
++++ b/tools/testing/selftests/kvm/lib/x86_64/tdx.h
+@@ -10,6 +10,11 @@
+  */
+ #define TDX_GUEST_MAX_NR_PAGES 10000
+ 
++/*
++ * Max number of vCPUs for the guest VM
++ */
++ #define TDX_GUEST_MAX_NUM_VCPUS 3
++
+ /*
+  * Page Table Address used when paging is enabled.
+  */
+@@ -71,6 +76,11 @@
+ #define TDX_MMIO_READ 0
+ #define TDX_MMIO_WRITE 1
+ 
++#define TDX_TDCALL_INFO   1
++
++#define TDX_TDPARAM_ATTR_SEPT_VE_DISABLE_BIT	(1UL << 28)
++#define TDX_TDPARAM_ATTR_PKS_BIT		(1UL << 30)
++
+ #define GDT_ENTRY(flags, base, limit)				\
+ 		((((base)  & 0xff000000ULL) << (56-24)) |	\
+ 		 (((flags) & 0x0000f0ffULL) << 40) |		\
+@@ -98,6 +108,7 @@ void add_td_memory(struct kvm_vm *vm, void *source_page,
+ 		   uint64_t gpa, int size);
+ void finalize_td_memory(struct kvm_vm *vm);
+ void initialize_td(struct kvm_vm *vm);
++void initialize_td_with_attributes(struct kvm_vm *vm, uint64_t attributes);
+ void initialize_td_vcpu(struct kvm_vcpu *vcpu);
+ void prepare_source_image(struct kvm_vm *vm, void *guest_code,
+ 			  size_t guest_code_size,
+@@ -116,40 +127,41 @@ void prepare_source_image(struct kvm_vm *vm, void *guest_code,
+ static inline void tdcall(struct kvm_regs *regs)
+ {
+ 	asm volatile (
+-			"mov %13, %%rax;\n\t"
+-			"mov %14, %%rbx;\n\t"
+-			"mov %15, %%rcx;\n\t"
+-			"mov %16, %%rdx;\n\t"
+-			"mov %17, %%r8;\n\t"
+-			"mov %18, %%r9;\n\t"
+-			"mov %19, %%r10;\n\t"
+-			"mov %20, %%r11;\n\t"
+-			"mov %21, %%r12;\n\t"
+-			"mov %22, %%r13;\n\t"
+-			"mov %23, %%r14;\n\t"
+-			"mov %24, %%r15;\n\t"
+-			"mov %25, %%rbp;\n\t"
+-			"mov %26, %%rsi;\n\t"
+-			"mov %27, %%rdi;\n\t"
++			"mov %14, %%rax;\n\t"
++			"mov %15, %%rbx;\n\t"
++			"mov %16, %%rcx;\n\t"
++			"mov %17, %%rdx;\n\t"
++			"mov %18, %%r8;\n\t"
++			"mov %19, %%r9;\n\t"
++			"mov %20, %%r10;\n\t"
++			"mov %21, %%r11;\n\t"
++			"mov %22, %%r12;\n\t"
++			"mov %23, %%r13;\n\t"
++			"mov %24, %%r14;\n\t"
++			"mov %25, %%r15;\n\t"
++			"mov %26, %%rbp;\n\t"
++			"mov %27, %%rsi;\n\t"
++			"mov %28, %%rdi;\n\t"
+ 			".byte 0x66, 0x0F, 0x01, 0xCC;\n\t"
+ 			"mov %%rax, %0;\n\t"
+ 			"mov %%rbx, %1;\n\t"
+-			"mov %%rdx, %2;\n\t"
+-			"mov %%r8, %3;\n\t"
+-			"mov %%r9, %4;\n\t"
+-			"mov %%r10, %5;\n\t"
+-			"mov %%r11, %6;\n\t"
+-			"mov %%r12, %7;\n\t"
+-			"mov %%r13, %8;\n\t"
+-			"mov %%r14, %9;\n\t"
+-			"mov %%r15, %10;\n\t"
+-			"mov %%rsi, %11;\n\t"
+-			"mov %%rdi, %12;\n\t"
+-			: "=m" (regs->rax), "=m" (regs->rbx), "=m" (regs->rdx),
+-			"=m" (regs->r8), "=m" (regs->r9), "=m" (regs->r10),
+-			"=m" (regs->r11), "=m" (regs->r12), "=m" (regs->r13),
+-			"=m" (regs->r14), "=m" (regs->r15), "=m" (regs->rsi),
+-			"=m" (regs->rdi)
++			"mov %%rcx, %2;\n\t"
++			"mov %%rdx, %3;\n\t"
++			"mov %%r8, %4;\n\t"
++			"mov %%r9, %5;\n\t"
++			"mov %%r10, %6;\n\t"
++			"mov %%r11, %7;\n\t"
++			"mov %%r12, %8;\n\t"
++			"mov %%r13, %9;\n\t"
++			"mov %%r14, %10;\n\t"
++			"mov %%r15, %11;\n\t"
++			"mov %%rsi, %12;\n\t"
++			"mov %%rdi, %13;\n\t"
++			: "=m" (regs->rax), "=m" (regs->rbx), "=m" (regs->rcx),
++			"=m" (regs->rdx), "=m" (regs->r8), "=m" (regs->r9),
++			"=m" (regs->r10), "=m" (regs->r11), "=m" (regs->r12),
++			"=m" (regs->r13), "=m" (regs->r14), "=m" (regs->r15),
++			"=m" (regs->rsi), "=m" (regs->rdi)
+ 			: "m" (regs->rax), "m" (regs->rbx), "m" (regs->rcx),
+ 			"m" (regs->rdx), "m" (regs->r8), "m" (regs->r9),
+ 			"m" (regs->r10), "m" (regs->r11), "m" (regs->r12),
+@@ -370,6 +382,35 @@ static inline uint64_t tdvmcall_cpuid(uint32_t eax, uint32_t ecx,
+ 	return regs.r10;
+ }
+ 
++/*
++ * Execute TDG.VP.INFO instruction.
++ */
++static inline uint64_t tdcall_vp_info(uint64_t *rcx, uint64_t *rdx,
++				      uint64_t *r8, uint64_t *r9,
++				      uint64_t *r10, uint64_t *r11)
++{
++	struct kvm_regs regs;
++
++	memset(&regs, 0, sizeof(regs));
++	regs.rax = TDX_TDCALL_INFO;
++	tdcall(&regs);
++
++	if (rcx)
++		*rcx = regs.rcx;
++	if (rdx)
++		*rdx = regs.rdx;
++	if (r8)
++		*r8 = regs.r8;
++	if (r9)
++		*r9 = regs.r9;
++	if (r10)
++		*r10 = regs.r10;
++	if (r11)
++		*r11 = regs.r11;
++
++	return regs.rax;
++}
++
+ /*
+  * Reports a 32 bit value from the guest to user space using a TDVM IO call.
+  * Data is reported on port TDX_DATA_REPORT_PORT.
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx_lib.c b/tools/testing/selftests/kvm/lib/x86_64/tdx_lib.c
+index 72bf2ff24a29..dc9a44ae4064 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/tdx_lib.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/tdx_lib.c
+@@ -78,10 +78,10 @@ static struct tdx_cpuid_data get_tdx_cpuid_data(struct kvm_vm *vm)
+ }
+ 
+ /*
+- * Initialize a VM as a TD.
++ * Initialize a VM as a TD with attributes.
+  *
+  */
+-void initialize_td(struct kvm_vm *vm)
++void initialize_td_with_attributes(struct kvm_vm *vm, uint64_t attributes)
+ {
+ 	struct tdx_cpuid_data cpuid_data;
+ 	int rc;
+@@ -99,7 +99,7 @@ void initialize_td(struct kvm_vm *vm)
+ 			      KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK);
+ 	vm_enable_cap(vm, KVM_CAP_SPLIT_IRQCHIP, 24);
+ 
+-	/* Allocate and setup memoryfor the td guest. */
++	/* Allocate and setup memory for the td guest. */
+ 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+ 				    TDX_GUEST_PT_FIXED_ADDR,
+ 				    0, TDX_GUEST_MAX_NR_PAGES, 0);
+@@ -108,12 +108,20 @@ void initialize_td(struct kvm_vm *vm)
+ 
+ 	cpuid_data = get_tdx_cpuid_data(vm);
+ 
+-	init_vm.max_vcpus = 1;
+-	init_vm.attributes = 0;
++	init_vm.max_vcpus = TDX_GUEST_MAX_NUM_VCPUS;
++	init_vm.attributes = attributes;
+ 	memcpy(&init_vm.cpuid, &cpuid_data, sizeof(cpuid_data));
+ 	tdx_ioctl(vm->fd, KVM_TDX_INIT_VM, 0, &init_vm);
+ }
+ 
++/*
++ * Initialize a VM as a TD with no attributes.
++ *
++ */
++void initialize_td(struct kvm_vm *vm)
++{
++	initialize_td_with_attributes(vm, 0);
++}
+ 
+ void initialize_td_vcpu(struct kvm_vcpu *vcpu)
+ {
 diff --git a/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
-index 934f2f7a5df9..1776b39b7d9e 100644
+index 1776b39b7d9e..8d49099e1ed8 100644
 --- a/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
 +++ b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
-@@ -1274,6 +1274,98 @@ void verify_mmio_writes(void)
+@@ -2,6 +2,7 @@
+ 
+ #include "asm/kvm.h"
+ #include "linux/kernel.h"
++#include <assert.h>
+ #include <bits/stdint-uintn.h>
+ #include <fcntl.h>
+ #include <limits.h>
+@@ -1366,6 +1367,154 @@ void verify_host_reading_private_mem(void)
  	printf("\t ... PASSED\n");
  }
  
-+TDX_GUEST_FUNCTION(guest_host_read_priv_mem)
++/*
++ * Do a TDG.VP.INFO call from the guest
++ */
++TDX_GUEST_FUNCTION(guest_tdcall_vp_info)
 +{
-+	uint64_t guest_var = 0xABCD;
-+	uint64_t ret;
++	uint64_t err;
++	uint64_t rcx, rdx, r8, r9, r10, r11;
 +
-+	/* Sends address to host. */
-+	ret = tdvm_report_64bit_to_user_space((uint64_t)&guest_var);
-+	if (ret)
-+		tdvmcall_fatal(ret);
++	err = tdcall_vp_info(&rcx, &rdx, &r8, &r9, &r10, &r11);
++	if (err)
++		tdvmcall_fatal(err);
 +
-+	/* Update guest_var's value and have host reread it. */
-+	guest_var = 0xFEDC;
++	/* return values to user space host */
++	err = tdvm_report_64bit_to_user_space(rcx);
++	if (err)
++		tdvmcall_fatal(err);
++
++	err = tdvm_report_64bit_to_user_space(rdx);
++	if (err)
++		tdvmcall_fatal(err);
++
++	err = tdvm_report_64bit_to_user_space(r8);
++	if (err)
++		tdvmcall_fatal(err);
++
++	err = tdvm_report_64bit_to_user_space(r9);
++	if (err)
++		tdvmcall_fatal(err);
++
++	err = tdvm_report_64bit_to_user_space(r10);
++	if (err)
++		tdvmcall_fatal(err);
++
++	err = tdvm_report_64bit_to_user_space(r11);
++	if (err)
++		tdvmcall_fatal(err);
 +
 +	tdvmcall_success();
 +}
 +
-+void verify_host_reading_private_mem(void)
++/*
++ * TDG.VP.INFO call from the guest. Verify the right values are returned
++ */
++void verify_tdcall_vp_info(void)
 +{
-+	struct kvm_vcpu *vcpu;
++	const int num_vcpus = 2;
++	struct kvm_vcpu *vcpus[num_vcpus];
 +	struct kvm_vm *vm;
-+	struct userspace_mem_region *region;
-+	uint64_t guest_var_addr;
-+	uint64_t host_virt;
-+	uint64_t first_host_read;
-+	uint64_t second_host_read;
-+	int ctr;
++	uint64_t rcx, rdx, r8, r9, r10, r11;
++	uint32_t ret_num_vcpus, ret_max_vcpus;
++	uint64_t attributes;
++	uint32_t i;
++	struct kvm_cpuid_entry2 *cpuid_entry;
++	struct tdx_cpuid_data cpuid_data;
++	int max_pa = -1;
++	int ret;
 +
-+	printf("Verifying host's behavior when reading TD private memory:\n");
-+	/* Create a TD VM with no memory. */
++	printf("Verifying TDG.VP.INFO call:\n");
++	/* Create a TD VM with no memory.*/
 +	vm = vm_create_tdx();
 +
-+	/* Allocate TD guest memory and initialize the TD. */
-+	initialize_td(vm);
++	/* Setting attributes parameter used by TDH.MNG.INIT to 0x50000000 */
++	attributes = TDX_TDPARAM_ATTR_SEPT_VE_DISABLE_BIT |
++		     TDX_TDPARAM_ATTR_PKS_BIT;
 +
-+	/* Initialize the TD vcpu and copy the test code to the guest memory. */
-+	vcpu = vm_vcpu_add_tdx(vm, 0);
++	/* Allocate TD guest memory and initialize the TD.*/
++	initialize_td_with_attributes(vm, attributes);
 +
-+	/* Setup and initialize VM memory. */
-+	prepare_source_image(vm, guest_host_read_priv_mem,
-+			     TDX_FUNCTION_SIZE(guest_host_read_priv_mem), 0);
++	/* Create vCPUs*/
++	for (i = 0; i < num_vcpus; i++)
++		vcpus[i] = vm_vcpu_add_tdx(vm, i);
++
++	/* Setup and initialize VM memory */
++	prepare_source_image(vm, guest_tdcall_vp_info,
++			     TDX_FUNCTION_SIZE(guest_tdcall_vp_info), 0);
 +	finalize_td_memory(vm);
 +
-+	/* Get the address of the guest's variable. */
-+	vcpu_run(vcpu);
-+	CHECK_GUEST_FAILURE(vcpu);
-+	printf("\t ... Guest's variable contains 0xABCD\n");
++	/* Get KVM CPUIDs for reference */
++	memset(&cpuid_data, 0, sizeof(cpuid_data));
++	cpuid_data.cpuid.nent = KVM_MAX_CPUID_ENTRIES;
++	ret = ioctl(vm->kvm_fd, KVM_GET_SUPPORTED_CPUID, &cpuid_data);
++	TEST_ASSERT(!ret, "KVM_GET_SUPPORTED_CPUID failed\n");
++	cpuid_entry = find_cpuid_entry(cpuid_data, 0x80000008, 0);
++	TEST_ASSERT(cpuid_entry, "CPUID entry missing\n");
++	max_pa = cpuid_entry->eax & 0xff;
 +
-+	/* Guest virtual and guest physical addresses have 1:1 mapping. */
-+	guest_var_addr = read_64bit_from_guest(vcpu, TDX_DATA_REPORT_PORT);
++	for (i = 0; i < num_vcpus; i++) {
++		struct kvm_vcpu *vcpu = vcpus[i];
 +
-+	/* Search for the guest's address in guest's memory regions. */
-+	host_virt = 0;
-+	hash_for_each(vm->regions.slot_hash, ctr, region, slot_node) {
-+		uint64_t offset;
-+		uint64_t host_virt_base;
-+		uint64_t guest_base;
++		/* Wait for guest to report rcx value */
++		vcpu_run(vcpu);
++		CHECK_GUEST_FAILURE(vcpu);
++		rcx = read_64bit_from_guest(vcpu, TDX_DATA_REPORT_PORT);
 +
-+		guest_base = (uint64_t)region->region.guest_phys_addr;
-+		offset = guest_var_addr - guest_base;
++		/* Wait for guest to report rdx value */
++		vcpu_run(vcpu);
++		CHECK_GUEST_FAILURE(vcpu);
++		rdx = read_64bit_from_guest(vcpu, TDX_DATA_REPORT_PORT);
 +
-+		if (guest_base <= guest_var_addr &&
-+		    offset <= region->region.memory_size) {
-+			host_virt_base = (uint64_t)region->host_mem;
-+			host_virt = host_virt_base + offset;
-+			break;
-+		}
++		/* Wait for guest to report r8 value */
++		vcpu_run(vcpu);
++		CHECK_GUEST_FAILURE(vcpu);
++		r8 = read_64bit_from_guest(vcpu, TDX_DATA_REPORT_PORT);
++
++		/* Wait for guest to report r9 value */
++		vcpu_run(vcpu);
++		CHECK_GUEST_FAILURE(vcpu);
++		r9 = read_64bit_from_guest(vcpu, TDX_DATA_REPORT_PORT);
++
++		/* Wait for guest to report r10 value */
++		vcpu_run(vcpu);
++		CHECK_GUEST_FAILURE(vcpu);
++		r10 = read_64bit_from_guest(vcpu, TDX_DATA_REPORT_PORT);
++
++		/* Wait for guest to report r11 value */
++		vcpu_run(vcpu);
++		CHECK_GUEST_FAILURE(vcpu);
++		r11 = read_64bit_from_guest(vcpu, TDX_DATA_REPORT_PORT);
++
++		ret_num_vcpus = r8 & 0xFFFFFFFF;
++		ret_max_vcpus = (r8 >> 32) & 0xFFFFFFFF;
++
++		/* first bits 5:0 of rcx represent the GPAW */
++		ASSERT_EQ(rcx & 0x3F, max_pa);
++		/* next 63:6 bits of rcx is reserved and must be 0 */
++		ASSERT_EQ(rcx >> 6, 0);
++		ASSERT_EQ(rdx, attributes);
++		ASSERT_EQ(ret_num_vcpus, num_vcpus);
++		ASSERT_EQ(ret_max_vcpus, TDX_GUEST_MAX_NUM_VCPUS);
++		/* VCPU_INDEX = i */
++		ASSERT_EQ(r9, i);
++		/* verify reserved registers are 0 */
++		ASSERT_EQ(r10, 0);
++		ASSERT_EQ(r11, 0);
++
++		/* Wait for guest to complete execution */
++		vcpu_run(vcpu);
++
++		CHECK_GUEST_FAILURE(vcpu);
++		CHECK_GUEST_COMPLETION(vcpu);
++
++		printf("\t ... Guest completed run on VCPU=%u\n", i);
 +	}
-+	TEST_ASSERT(host_virt != 0,
-+		    "Guest address not found in guest memory regions\n");
-+
-+	/* Host reads guest's variable. */
-+	first_host_read = *(uint64_t *)host_virt;
-+	printf("\t ... Host's read attempt value: %lu\n", first_host_read);
-+
-+	/* Guest updates variable and host rereads it. */
-+	vcpu_run(vcpu);
-+	CHECK_GUEST_FAILURE(vcpu);
-+	printf("\t ... Guest's variable updated to 0xFEDC\n");
-+
-+	second_host_read = *(uint64_t *)host_virt;
-+	printf("\t ... Host's second read attempt value: %lu\n",
-+	       second_host_read);
-+
-+	TEST_ASSERT(first_host_read == second_host_read,
-+		    "Host did not read a fixed pattern\n");
-+
-+	printf("\t ... Fixed pattern was returned to the host\n");
 +
 +	kvm_vm_free(vm);
 +	printf("\t ... PASSED\n");
@@ -210,11 +468,11 @@ index 934f2f7a5df9..1776b39b7d9e 100644
  int main(int argc, char **argv)
  {
  	if (!is_tdx_enabled()) {
-@@ -1294,6 +1386,7 @@ int main(int argc, char **argv)
- 	run_in_new_process(&verify_guest_hlt);
+@@ -1387,6 +1536,7 @@ int main(int argc, char **argv)
  	run_in_new_process(&verify_mmio_reads);
  	run_in_new_process(&verify_mmio_writes);
-+	run_in_new_process(&verify_host_reading_private_mem);
+ 	run_in_new_process(&verify_host_reading_private_mem);
++	run_in_new_process(&verify_tdcall_vp_info);
  
  	return 0;
  }
