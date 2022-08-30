@@ -2,234 +2,378 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 924295A607F
-	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 12:17:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DE275A6147
+	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 13:00:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230214AbiH3KQx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 06:16:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41770 "EHLO
+        id S230003AbiH3LAF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 07:00:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229794AbiH3KQ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 06:16:29 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D6AFF4397
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 03:13:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661854404; x=1693390404;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=KhYTU1Mz+eGkrotpxwFaNrDvAfjVM4SMgsY9tCs8t5c=;
-  b=CqPtAAgMr21d2ofoG+Cwl325CTaOA8I34YIPd2Eb4ddnvsdGVlHu4MqP
-   WiBeTMzCQ9THOnMBqXcej+qZA6/rGFjc3/hA9fPPI0oDgyJ+dbbhH43eY
-   /GH6US0A7/CgpPfTVmkL61/aN/X6yd+HmgnZfmncp7/B3KdaAaaGXrGBx
-   xG3njUn0KCPP03qTWL0iKMscmzHOmnE2jDXadd6AyL93KbPH+aHCykgor
-   GxxqyqEzq1SWbeiDPLqN29NJktyuidC6Q5yV+FNOar3uHMJkYJ8YVVYCC
-   ZgfsAZn/ncfDl72VY7N3oDkS8HHMCQbUPaKHPZKymbBU9jvCoC+aJON8+
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10454"; a="275537865"
-X-IronPort-AV: E=Sophos;i="5.93,274,1654585200"; 
-   d="scan'208";a="275537865"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2022 03:12:49 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,274,1654585200"; 
-   d="scan'208";a="562588814"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga003.jf.intel.com with ESMTP; 30 Aug 2022 03:12:49 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 30 Aug 2022 03:12:49 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31 via Frontend Transport; Tue, 30 Aug 2022 03:12:49 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.109)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.31; Tue, 30 Aug 2022 03:12:49 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lifV5A5uuyWrOSjvZEaeQd8pOrpF2iMetPvsplEI7rSYIo1zrlL+uijFFzKxPdbiY5KWLjCqc7qr4FEPMGewXJ6yF/hj5rnwj8Sb9RN++tDOV4LK5QK6RnYkgevslJld1KrlKENQr8tMQv11tVOU1naPwxUHqXpB/L5Pc3EOHoWuBHdQoaU+CW1XnO9O4NAbrqNlbOlcp1YGCVrlqvzSg0Wni22X/ZWlr5n0D3lwTEOCulHFf/91N/JizKLrYkAx3y4JiX0kqqH8+ynZ9l/MhqI+UzwFuKn8OkCAD63CTa3kJm8+LBgqoFaZYmlEvgy9vCyzVy9KoA8DRB5YTjchIA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KhYTU1Mz+eGkrotpxwFaNrDvAfjVM4SMgsY9tCs8t5c=;
- b=E/srvU16d2+nFPldepQxV0Q+hTxMeUSUSoailRG4SrbrSK5M7Lsx2kLZwmqN4oSvKGke9n1cWU7DcO1EE0rNvSsNyFMUZUJXaIKEIix92ac8W6Ap1IU6koYx4++nnFcowBuZUTSY7/X7afulA2iJDkkCkWCR3KKlVLJ0IAmBBZtIQ0g/OATd1t+GgpncAW0eRXGD7EXkz/DNBwygSX626ESeQArWPGCE9r5m6svUL6u8BjqoTRX0wWYAUF1qdnGKtme4C9ZmLVPfitcK0lFlOylldYFtfB07DePpqKWNTiwc7R/xhNdEtAJAVnmCyLakuBnl6xN59wxGf5XNGKRc9g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by DM6PR11MB3193.namprd11.prod.outlook.com (2603:10b6:5:57::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.15; Tue, 30 Aug
- 2022 10:12:46 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::fce1:b229:d351:a708]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::fce1:b229:d351:a708%9]) with mapi id 15.20.5566.021; Tue, 30 Aug 2022
- 10:12:46 +0000
-From:   "Huang, Kai" <kai.huang@intel.com>
-To:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "dmatlack@google.com" <dmatlack@google.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>
-Subject: Re: [PATCH v2 01/10] KVM: x86/mmu: Change tdp_mmu to a read-only
- parameter
-Thread-Topic: [PATCH v2 01/10] KVM: x86/mmu: Change tdp_mmu to a read-only
- parameter
-Thread-Index: AQHYuaFVUKotwXOBH0if+KDdPORKha3HPtWA
-Date:   Tue, 30 Aug 2022 10:12:46 +0000
-Message-ID: <2433d3dba221ade6f3f42941692f9439429e0b6b.camel@intel.com>
-References: <20220826231227.4096391-1-dmatlack@google.com>
-         <20220826231227.4096391-2-dmatlack@google.com>
-In-Reply-To: <20220826231227.4096391-2-dmatlack@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.44.4 (3.44.4-1.fc36) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c8cbad16-d404-436a-499e-08da8a702f9d
-x-ms-traffictypediagnostic: DM6PR11MB3193:EE_
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: akd45EZaWLPR11Q7aNPfrbTsw3gGc/O74S+lGuPoFX877AITDIaSpPMab37uHeqoqKE7h3oFaZA5fQjN5NfhcB063BSTg5c28ejihvm+CC5cC9FMld79HIBIqpKK2cNr6gzmGDjT+lbSlVQyIjT3TmSFXlEvSPYDHsPiCdlUOsi01wzzksP3ajfyv/S8LPyJtknwQU2hPVoxJdsFc2BTH7y29Uka5Kd9X26G+4u0u6UL7EdhtYKETZe76/k3B1pdNH0eQMMS/JKtJDE4VGegNBl9cjs1ompLbvZU6Hs+F/ietIm4Zk9/T5rP49vfzhzIFHO7r1nTkeuhviF/7C655WDvm4mdNQCtwATGkRGD6Vg6B9oDAyivMQGcCCk8rvBFvvYYixv/ACleOO9Mx3CHsEgNfzCBYJcW23s37i+mtLANBpl9hpNZkYHh/QOD+AesF53X+y/JDha9+ozfDT+2BnX4NeZEkTDzPptEhH+Uv0dW6zK5+ODRZfo6I9ZuKjX5wD/x8WWd/AKbsdUAkK9l3D6Xc0k2ephStW7KsDpWlDJaYoTpCUlxlYyoE8+CuDEhWnV6XB44q6pcZBLRPvPzCSQCLEZV07myfelww9DyxXECKVZJy+vXf+SqX1R/RVEAbryhvuAT8CsuTjYkz9ckg31XE20sDTlqK7QvG9WfzFKejrJBua9V3qhLbbx7FAh4Ml49Bmof8Wo1vs76EtDAmW2+vqDABhC7AxAcnLynpWicVVOgiZxPzPPHDnPPaXJN7f3o8k/2PnBG8b7yjwnVew==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(136003)(39860400002)(346002)(376002)(396003)(366004)(122000001)(38100700002)(26005)(6512007)(82960400001)(316002)(41300700001)(5660300002)(478600001)(86362001)(8936002)(38070700005)(6506007)(2906002)(6486002)(64756008)(8676002)(4326008)(66476007)(66446008)(76116006)(66946007)(66556008)(91956017)(54906003)(110136005)(2616005)(186003)(83380400001)(36756003)(71200400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?S1Y3bFFZRXdHNUtSNlZyNi9TZkZ0cUhOMDEyZklWY2EwbVNPcXRncHFQNjhG?=
- =?utf-8?B?dFFRUDhmTlNPREp4b01acTJUaWc3Z3dsdHB5Rzd1K0dFNXpRK3V5MGNiem04?=
- =?utf-8?B?Rmk3Ynp4NDFaOHQyTUlHTEJmamFRbjRqdVBoN05RYUZNMS9PdTZGcU5iRkZp?=
- =?utf-8?B?Tk5OSmRXY255ZmxQZkJlWlZQTkFLK2NtYU9lQlRiclZxY3RZVDkwKytpcW5G?=
- =?utf-8?B?emlqRk0rNGR2TEJHQ3BCMk53MkE3RjVOcURFUGdKL1VHb1ZOd0ZyaVNBcTZV?=
- =?utf-8?B?UHhJKzlYUnNmeGlRcWdxeERQUmRxdEpTUCs1NHRBaFh3dGFLREkzcmhOMEU5?=
- =?utf-8?B?WUNDOGxCbzFRSkxMcnp6aXIyVDFiRWRwVlloUFF6ZlJYcTRvdWZnZXpXQW1K?=
- =?utf-8?B?RXR5ZnlBanFLQ05la25iVzRudzQyckVpTVRwN21Oa2xDSFNzNHhobE5FVHlD?=
- =?utf-8?B?aDlxcTEwTWNPckxJRWoxRGYzaWk1NzZOS1o4anN5SG14V3V6V0dqMUZaaVAx?=
- =?utf-8?B?M1k2VWZVWE1iblhnVkYrRTFUaFF0bHBFdEdIRzJBN2p5MVZrdkFKS3lYdkxo?=
- =?utf-8?B?ZFRuWXh5WkllRnBkWDlENlhLVmZ1aWdQcEpBU0h6Y1NBclgxcHdQTFhMZmM4?=
- =?utf-8?B?WU9EMFJIOGtpeTY4cHZhNGt6UXdCZ2VyRnRuWkpHWU9wQk1sQ09QS1ZRT3dH?=
- =?utf-8?B?N2dSS2RNa1JsRXRuTWVlRTdLQUdGajJIV3k2NVp4a1VORG5ZK2c0cHoyVmZG?=
- =?utf-8?B?YklRNnpFcmdtSUJFR2NSNm8xcmFTOW1uVWtWN2ZDSytzNktmekNtSFpVVjFt?=
- =?utf-8?B?M2V2VTdEMCsxMWh4QVdRZ0ZRbEUrVUtKQVpwSG1BdUtiZ3dHekt2ZndlYytt?=
- =?utf-8?B?ZkwvZFQ1bHhqSi92akhzV0RUUFo0UitPNy9vdkNFeDU0NnYxR3NSUUs5VTNI?=
- =?utf-8?B?Y1U2U3lNaFZNdUFqTjdXZncrbCsyUEZ2UDlZYXFDaFV1Y2RSVWhubUVvRE9k?=
- =?utf-8?B?LzcrYnlhUk1MOVpuL0RqUUh0YlUxVWl5d0NYOUdsb3Y2Tm4wSzdCYjVidSs3?=
- =?utf-8?B?c1NjZGlOY08rUkkvM3JVUTR0RDJVVU9jRURUSFBad1c5ZUx3M2NxRndoM3FF?=
- =?utf-8?B?SW16cm9rMmlxYVo1UkFhODlxYWdkYll0WE45aS81aDVDVEJncmlKS2VWQyt1?=
- =?utf-8?B?amFBUVlRcnEvU3BCK0RJb0R4dmpvREVrTTloQnp3QUd4NjZCSnlUd09aanNz?=
- =?utf-8?B?WENQdFVjWnFKM2hmQWltY2lYL3VHak53TVpYVXcxYW1VVm9RWUczWGkrZ3FZ?=
- =?utf-8?B?QTJrZW9OdkQ1SWd3aFNxQmNQeXdTVWhjMi82OE9NNHJ1VGI2Q0FNRU5rSmlC?=
- =?utf-8?B?cEJDZ2hCNHZLOURmUnpRbDZtTmZibk11d1Jjekg5QmYreU4rR1BBb3V2YWtK?=
- =?utf-8?B?NWdSak9SdUUzbWxWclBYaEZRSlhoMzdMMnhIV0w4eFJzSEV2SUYzNUM1TzVN?=
- =?utf-8?B?elJpQXVlRGlsOGpYd25Ibk5FcmFKYXR3T2ZaZGU5MFljcmUyVS8zVW5PdnlF?=
- =?utf-8?B?c3lrczdEZ2lBTWNVZW5FWkwrSnRRNlpmRVVtblM3S2tQRzNYVkh2UVRDMkRu?=
- =?utf-8?B?b1Z4NTROd0hLV3pYSkJ1UjAxcXlhZEZkVk4vZDZKeWQwbVZTdTBnUXRoQWRs?=
- =?utf-8?B?b3ZjQ0t6aS94dVo0N25TT2wzMXVHaWYwMFpNR0hndlZseVBwenFPK2NHclBy?=
- =?utf-8?B?SlFXbmN4ZDVpQU0yS3hMK3RRWitBVTdOTFh1dWpZZGd4aUFnbHBtN1hTTUdE?=
- =?utf-8?B?bkJWVW9hQXFlQkRaKzhLMWtQd2hiYjVuTU9veW40ZlZIVUtyemZZWThhclZO?=
- =?utf-8?B?eDFGcW8xNEtlTFRwM0F4c2dab2R0eXFDVWI3bS9tbHRIOWZrc256RkFPeG5O?=
- =?utf-8?B?MlM5aTJwMEhsVkZ2Z3pyT2ZTY21XK3pud1Q2NjRLWURzL1pGNXcrWXBJZnVE?=
- =?utf-8?B?eDlzTmNPUGszNllveUp6VjJaY2V2MExOTzNPY0dZZU40Y3orVGVmK2F1bEFD?=
- =?utf-8?B?bFpLTTVDcFlWcENTcjZGKzhJSjR1RGNYS3V4KzlTYzhXWVczTjJVTjlKaW1R?=
- =?utf-8?B?TERkak5Pd2RWby9XOUlwS1R3eVQ2QnNBTytYbm0zR1c1eHZISkVkY0dnQTdk?=
- =?utf-8?B?TGc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <39C5C2165292C9449CEDFA58A0A5C647@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        with ESMTP id S230127AbiH3K74 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 06:59:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB761CD4
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 03:59:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661857191;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6zYu4Rswu3fgZ8KgLqAlhfqI/MTWsVxlsGOUdPxztzk=;
+        b=IsnZn+TVdrRiQ+wr9++82xemCjofNPxit9R0tdYFSYd/VoKltjOZ6o4bJ0bYgHyHSi7Lw5
+        wQS4JW/NUkgvyn7rVpwlCoH38157LkNFDYR75Z2YiDqrZixwQlDWvUxQYeX97MH5UrH87R
+        UwRMSfwH8IjR3loh0ULsjvr/RWRUTTo=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-412-JHe-PuOhNiqG_pb75xFM5Q-1; Tue, 30 Aug 2022 06:59:50 -0400
+X-MC-Unique: JHe-PuOhNiqG_pb75xFM5Q-1
+Received: by mail-wm1-f70.google.com with SMTP id p19-20020a05600c1d9300b003a5c3141365so9902136wms.9
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 03:59:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:subject:organization:from
+         :references:cc:to:content-language:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc;
+        bh=6zYu4Rswu3fgZ8KgLqAlhfqI/MTWsVxlsGOUdPxztzk=;
+        b=eh0erub4g6ISAPd2hH0uwkX9acKZTkJlFpdPzHyofVvFwVIxJZAHmXF0bqZbQU8kTx
+         yhkh7N44sCHMXN50PLKAPzQyx0ItaNsALtWiTFs/ckkSpEEGpvhzsGh3eXn9iB49Qlh8
+         IQTXndHR7fvIp2GosBwT+kx/YUFc9xr+MZt5/ub/LdWGnXQeVsLxHRF6V+a4L/hJzoTr
+         KBLXNEHa6B4hFYqKsxC1BTcwN3pMUO4H87CI+ANeNAYFKPJWJ7/yOTmy4Ts8n4BiDJWz
+         x70nWCKwkffL47kCmFFaLo53an/DVcQT+oxuVyw2DW6ip+b1SEOXpofCkixF02yCYEKt
+         5rKg==
+X-Gm-Message-State: ACgBeo0HH2Tva7IOSfqJHKTuydMIwVDkmYY6i4Ko4aYeA35mTwlP2KXA
+        uKDf+OFe7bn5egQUiEn0pcufFPtRnrvTLFeU9W+CYaWEVmZx3S1FO2e2BWsEt9yVCaeKawXS0mM
+        MHuRVXa96fKi+
+X-Received: by 2002:a5d:6e8e:0:b0:220:5fa1:d508 with SMTP id k14-20020a5d6e8e000000b002205fa1d508mr9202666wrz.337.1661857189307;
+        Tue, 30 Aug 2022 03:59:49 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR5lGsBox+69uaFFHcIdly3TYMqybdSHUIVTFKVN7rX9IGVZwxq/KmA65ehoeZ3QPWeXU7uIGQ==
+X-Received: by 2002:a5d:6e8e:0:b0:220:5fa1:d508 with SMTP id k14-20020a5d6e8e000000b002205fa1d508mr9202649wrz.337.1661857188931;
+        Tue, 30 Aug 2022 03:59:48 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c70a:1000:ecb4:919b:e3d3:e20b? (p200300cbc70a1000ecb4919be3d3e20b.dip0.t-ipconnect.de. [2003:cb:c70a:1000:ecb4:919b:e3d3:e20b])
+        by smtp.gmail.com with ESMTPSA id j9-20020a05600c190900b003a2e92edeccsm13792728wmq.46.2022.08.30.03.59.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Aug 2022 03:59:48 -0700 (PDT)
+Message-ID: <d02d6a6e-637e-48f9-9acc-811344712cd3@redhat.com>
+Date:   Tue, 30 Aug 2022 12:59:47 +0200
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c8cbad16-d404-436a-499e-08da8a702f9d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Aug 2022 10:12:46.5528
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 1NMnMqzzOiLr2ZQTZlJoHkP6icatgMu3srXiwteTqiatCK6GezfeLHG8VZ3fHsjxoh1ts8k3NVHlN/lmBcWYpw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB3193
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Content-Language: en-US
+To:     Peter Xu <peterx@redhat.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Cc:     Leonardo Bras Soares Passos <lsoaresp@redhat.com>,
+        qemu-devel <qemu-devel@nongnu.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+References: <20220816101250.1715523-1-eesposit@redhat.com>
+ <20220816101250.1715523-3-eesposit@redhat.com> <Yv6baJoNikyuZ38R@xz-m1.local>
+ <CAJ6HWG6maoPjbP8T5qo=iXCbNeHu4dq3wHLKtRLahYKuJmMY-g@mail.gmail.com>
+ <YwOOcC72KKABKgU+@xz-m1.local>
+ <d4601180-4c95-a952-2b40-d40fa8e55005@redhat.com>
+ <YwqFfyZ1fMA9knnK@xz-m1.local>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [RFC PATCH 2/2] kvm/kvm-all.c: listener should delay kvm_vm_ioctl
+ to the commit phase
+In-Reply-To: <YwqFfyZ1fMA9knnK@xz-m1.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gRnJpLCAyMDIyLTA4LTI2IGF0IDE2OjEyIC0wNzAwLCBEYXZpZCBNYXRsYWNrIHdyb3RlOg0K
-PiBDaGFuZ2UgdGRwX21tdSB0byBhIHJlYWQtb25seSBwYXJhbWV0ZXIgYW5kIGRyb3AgdGhlIHBl
-ci12bQ0KPiB0ZHBfbW11X2VuYWJsZWQuIEZvciAzMi1iaXQgS1ZNLCBtYWtlIHRkcF9tbXVfZW5h
-YmxlZCBhIGNvbnN0IGJvb2wgc28NCj4gdGhhdCB0aGUgY29tcGlsZXIgY2FuIGNvbnRpbnVlIG9t
-aXR0aW5nIGNhbGxzIHRvIHRoZSBURFAgTU1VLg0KPiANCj4gVGhlIFREUCBNTVUgd2FzIGludHJv
-ZHVjZWQgaW4gNS4xMCBhbmQgaGFzIGJlZW4gZW5hYmxlZCBieSBkZWZhdWx0IHNpbmNlDQo+IDUu
-MTUuIEF0IHRoaXMgcG9pbnQgdGhlcmUgYXJlIG5vIGtub3duIGZ1bmN0aW9uYWxpdHkgZ2FwcyBi
-ZXR3ZWVuIHRoZQ0KPiBURFAgTU1VIGFuZCB0aGUgc2hhZG93IE1NVSwgYW5kIHRoZSBURFAgTU1V
-IHVzZXMgbGVzcyBtZW1vcnkgYW5kIHNjYWxlcw0KPiBiZXR0ZXIgd2l0aCB0aGUgbnVtYmVyIG9m
-IHZDUFVzLiBJbiBvdGhlciB3b3JkcywgdGhlcmUgaXMgbm8gZ29vZCByZWFzb24NCj4gdG8gZGlz
-YWJsZSB0aGUgVERQIE1NVSBvbiBhIGxpdmUgc3lzdGVtLg0KPiANCj4gRG8gbm90IGRyb3AgdGRw
-X21tdT1OIHN1cHBvcnQgKGkuZS4gZG8gbm90IGZvcmNlIDY0LWJpdCBLVk0gdG8gYWx3YXlzDQo+
-IHVzZSB0aGUgVERQIE1NVSkgc2luY2UgdGRwX21tdT1OIGlzIHN0aWxsIHVzZWQgdG8gZ2V0IHRl
-c3QgY292ZXJhZ2Ugb2YNCj4gS1ZNJ3Mgc2hhZG93IE1NVSBURFAgc3VwcG9ydCwgd2hpY2ggaXMg
-dXNlZCBpbiAzMi1iaXQgS1ZNLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogRGF2aWQgTWF0bGFjayA8
-ZG1hdGxhY2tAZ29vZ2xlLmNvbT4NCj4gLS0tDQo+ICBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1f
-aG9zdC5oIHwgIDkgLS0tLS0tDQo+ICBhcmNoL3g4Ni9rdm0vbW11LmggICAgICAgICAgICAgIHwg
-MTEgKysrLS0tLQ0KPiAgYXJjaC94ODYva3ZtL21tdS9tbXUuYyAgICAgICAgICB8IDU0ICsrKysr
-KysrKysrKysrKysrKysrKystLS0tLS0tLS0tLQ0KPiAgYXJjaC94ODYva3ZtL21tdS90ZHBfbW11
-LmMgICAgICB8ICA5ICsrLS0tLQ0KPiAgNCBmaWxlcyBjaGFuZ2VkLCA0NCBpbnNlcnRpb25zKCsp
-LCAzOSBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9pbmNsdWRlL2Fz
-bS9rdm1faG9zdC5oIGIvYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaA0KPiBpbmRleCAy
-Yzk2YzQzYzMxM2EuLmQ3NjA1OTI3MGE0MyAxMDA2NDQNCj4gLS0tIGEvYXJjaC94ODYvaW5jbHVk
-ZS9hc20va3ZtX2hvc3QuaA0KPiArKysgYi9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5o
-DQo+IEBAIC0xMjYyLDE1ICsxMjYyLDYgQEAgc3RydWN0IGt2bV9hcmNoIHsNCj4gIAlzdHJ1Y3Qg
-dGFza19zdHJ1Y3QgKm54X2xwYWdlX3JlY292ZXJ5X3RocmVhZDsNCj4gIA0KPiAgI2lmZGVmIENP
-TkZJR19YODZfNjQNCj4gLQkvKg0KPiAtCSAqIFdoZXRoZXIgdGhlIFREUCBNTVUgaXMgZW5hYmxl
-ZCBmb3IgdGhpcyBWTS4gVGhpcyBjb250YWlucyBhDQo+IC0JICogc25hcHNob3Qgb2YgdGhlIFRE
-UCBNTVUgbW9kdWxlIHBhcmFtZXRlciBmcm9tIHdoZW4gdGhlIFZNIHdhcw0KPiAtCSAqIGNyZWF0
-ZWQgYW5kIHJlbWFpbnMgdW5jaGFuZ2VkIGZvciB0aGUgbGlmZSBvZiB0aGUgVk0uIElmIHRoaXMg
-aXMNCj4gLQkgKiB0cnVlLCBURFAgTU1VIGhhbmRsZXIgZnVuY3Rpb25zIHdpbGwgcnVuIGZvciB2
-YXJpb3VzIE1NVQ0KPiAtCSAqIG9wZXJhdGlvbnMuDQo+IC0JICovDQo+IC0JYm9vbCB0ZHBfbW11
-X2VuYWJsZWQ7DQo+IC0NCj4gIAkvKg0KPiAgCSAqIExpc3Qgb2Ygc3RydWN0IGt2bV9tbXVfcGFn
-ZXMgYmVpbmcgdXNlZCBhcyByb290cy4NCj4gIAkgKiBBbGwgc3RydWN0IGt2bV9tbXVfcGFnZXMg
-aW4gdGhlIGxpc3Qgc2hvdWxkIGhhdmUNCj4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS9tbXUu
-aCBiL2FyY2gveDg2L2t2bS9tbXUuaA0KPiBpbmRleCA2YmRhYWNiNmZhYTAuLmRkMDE0YmVjZTdm
-MCAxMDA2NDQNCj4gLS0tIGEvYXJjaC94ODYva3ZtL21tdS5oDQo+ICsrKyBiL2FyY2gveDg2L2t2
-bS9tbXUuaA0KPiBAQCAtMjMwLDE1ICsyMzAsMTQgQEAgc3RhdGljIGlubGluZSBib29sIGt2bV9z
-aGFkb3dfcm9vdF9hbGxvY2F0ZWQoc3RydWN0IGt2bSAqa3ZtKQ0KPiAgfQ0KPiAgDQo+ICAjaWZk
-ZWYgQ09ORklHX1g4Nl82NA0KPiAtc3RhdGljIGlubGluZSBib29sIGlzX3RkcF9tbXVfZW5hYmxl
-ZChzdHJ1Y3Qga3ZtICprdm0pIHsgcmV0dXJuIGt2bS0+YXJjaC50ZHBfbW11X2VuYWJsZWQ7IH0N
-Cj4gLSNlbHNlDQo+IC1zdGF0aWMgaW5saW5lIGJvb2wgaXNfdGRwX21tdV9lbmFibGVkKHN0cnVj
-dCBrdm0gKmt2bSkgeyByZXR1cm4gZmFsc2U7IH0NCj4gLSNlbmRpZg0KPiAtDQo+ICtleHRlcm4g
-Ym9vbCB0ZHBfbW11X2VuYWJsZWQ7DQo+ICBzdGF0aWMgaW5saW5lIGJvb2wga3ZtX21lbXNsb3Rz
-X2hhdmVfcm1hcHMoc3RydWN0IGt2bSAqa3ZtKQ0KPiAgew0KPiAtCXJldHVybiAhaXNfdGRwX21t
-dV9lbmFibGVkKGt2bSkgfHwga3ZtX3NoYWRvd19yb290X2FsbG9jYXRlZChrdm0pOw0KPiArCXJl
-dHVybiAhdGRwX21tdV9lbmFibGVkIHx8IGt2bV9zaGFkb3dfcm9vdF9hbGxvY2F0ZWQoa3ZtKTsN
-Cj4gIH0NCj4gKyNlbHNlDQo+ICtzdGF0aWMgaW5saW5lIGJvb2wga3ZtX21lbXNsb3RzX2hhdmVf
-cm1hcHMoc3RydWN0IGt2bSAqa3ZtKSB7IHJldHVybiB0cnVlOyB9DQo+ICsjZW5kaWYNCj4gIA0K
-PiAgc3RhdGljIGlubGluZSBnZm5fdCBnZm5fdG9faW5kZXgoZ2ZuX3QgZ2ZuLCBnZm5fdCBiYXNl
-X2dmbiwgaW50IGxldmVsKQ0KPiAgew0KPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL21tdS9t
-bXUuYyBiL2FyY2gveDg2L2t2bS9tbXUvbW11LmMNCj4gaW5kZXggZTQxOGVmM2VjZmNiLi43Y2Fm
-NTEwMjNkNDcgMTAwNjQ0DQo+IC0tLSBhL2FyY2gveDg2L2t2bS9tbXUvbW11LmMNCj4gKysrIGIv
-YXJjaC94ODYva3ZtL21tdS9tbXUuYw0KPiBAQCAtOTgsNiArOTgsMTYgQEAgbW9kdWxlX3BhcmFt
-X25hbWVkKGZsdXNoX29uX3JldXNlLCBmb3JjZV9mbHVzaF9hbmRfc3luY19vbl9yZXVzZSwgYm9v
-bCwgMDY0NCk7DQo+ICAgKi8NCj4gIGJvb2wgdGRwX2VuYWJsZWQgPSBmYWxzZTsNCj4gIA0KPiAr
-Ym9vbCBfX3JlYWRfbW9zdGx5IHRkcF9tbXVfYWxsb3dlZDsNCg0KVGhpcyBjYW4gYmUgX19yb19h
-ZnRlcl9pbml0IHNpbmNlIGl0IGlzIG9ubHkgc2V0IGluIGt2bV9tbXVfeDg2X21vZHVsZV9pbml0
-KCkNCndoaWNoIGlzIHRhZ2dlZCB3aXRoIF9faW5pdC4NCg0KPiArDQo+ICsjaWZkZWYgQ09ORklH
-X1g4Nl82NA0KPiArYm9vbCBfX3JlYWRfbW9zdGx5IHRkcF9tbXVfZW5hYmxlZCA9IHRydWU7DQo+
-ICttb2R1bGVfcGFyYW1fbmFtZWQodGRwX21tdSwgdGRwX21tdV9lbmFibGVkLCBib29sLCAwNDQ0
-KTsNCj4gKyNlbHNlDQo+ICsvKiBURFAgTU1VIGlzIG5vdCBzdXBwb3J0ZWQgb24gMzItYml0IEtW
-TS4gKi8NCj4gK2NvbnN0IGJvb2wgdGRwX21tdV9lbmFibGVkOw0KPiArI2VuZGlmDQo+ICsNCg0K
-SSBhbSBub3Qgc3VyZSBieSB1c2luZyAnY29uc3QgYm9vbCcgdGhlIGNvbXBpbGUgd2lsbCBhbHdh
-eXMgb21pdCB0aGUgZnVuY3Rpb24NCmNhbGw/ICBJIGRpZCBzb21lIGV4cGVyaW1lbnQgb24gbXkg
-NjQtYml0IHN5c3RlbSBhbmQgaXQgc2VlbXMgaWYgd2UgZG9uJ3QgdXNlDQphbnkgLU8gb3B0aW9u
-IHRoZW4gdGhlIGdlbmVyYXRlZCBjb2RlIHN0aWxsIGRvZXMgZnVuY3Rpb24gY2FsbC4NCg0KSG93
-IGFib3V0IGp1c3QgKGlmIGl0IHdvcmtzKToNCg0KCSNkZWZpbmUgdGRwX21tdV9lbmFibGVkIGZh
-bHNlDQoNCj8NCg0KLS0gDQpUaGFua3MsDQotS2FpDQoNCg0K
+On 27.08.22 22:58, Peter Xu wrote:
+> Hi, Emanuele,
+> 
+> On Fri, Aug 26, 2022 at 04:07:01PM +0200, Emanuele Giuseppe Esposito wrote:
+>>
+>>
+>> Am 22/08/2022 um 16:10 schrieb Peter Xu:
+>>> On Thu, Aug 18, 2022 at 09:55:20PM -0300, Leonardo Bras Soares Passos wrote:
+>>>> On Thu, Aug 18, 2022 at 5:05 PM Peter Xu <peterx@redhat.com> wrote:
+>>>>>
+>>>>> On Tue, Aug 16, 2022 at 06:12:50AM -0400, Emanuele Giuseppe Esposito wrote:
+>>>>>> +static void kvm_memory_region_node_add(KVMMemoryListener *kml,
+>>>>>> +                                       struct kvm_userspace_memory_region *mem)
+>>>>>> +{
+>>>>>> +    MemoryRegionNode *node;
+>>>>>> +
+>>>>>> +    node = g_malloc(sizeof(MemoryRegionNode));
+>>>>>> +    *node = (MemoryRegionNode) {
+>>>>>> +        .mem = mem,
+>>>>>> +    };
+>>>>>
+>>>>> Nit: direct assignment of struct looks okay, but maybe pointer assignment
+>>>>> is clearer (with g_malloc0?  Or iirc we're suggested to always use g_new0):
+>>>>>
+>>>>>   node = g_new0(MemoryRegionNode, 1);
+>>>>>   node->mem = mem;
+>>>>>
+>>>>> [...]
+>>
+>> Makes sense
+>>
+>>>>>
+>>>>>> +/* for KVM_SET_USER_MEMORY_REGION_LIST */
+>>>>>> +struct kvm_userspace_memory_region_list {
+>>>>>> +     __u32 nent;
+>>>>>> +     __u32 flags;
+>>>>>> +     struct kvm_userspace_memory_region entries[0];
+>>>>>> +};
+>>>>>> +
+>>>>>>  /*
+>>>>>>   * The bit 0 ~ bit 15 of kvm_memory_region::flags are visible for userspace,
+>>>>>>   * other bits are reserved for kvm internal use which are defined in
+>>>>>> @@ -1426,6 +1433,8 @@ struct kvm_vfio_spapr_tce {
+>>>>>>                                       struct kvm_userspace_memory_region)
+>>>>>>  #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
+>>>>>>  #define KVM_SET_IDENTITY_MAP_ADDR _IOW(KVMIO,  0x48, __u64)
+>>>>>> +#define KVM_SET_USER_MEMORY_REGION_LIST _IOW(KVMIO, 0x49, \
+>>>>>> +                                     struct kvm_userspace_memory_region_list)
+>>>>>
+>>>>> I think this is probably good enough, but just to provide the other small
+>>>>> (but may not be important) piece of puzzle here.  I wanted to think through
+>>>>> to understand better but I never did..
+>>>>>
+>>>>> For a quick look, please read the comment in kvm_set_phys_mem().
+>>>>>
+>>>>>                 /*
+>>>>>                  * NOTE: We should be aware of the fact that here we're only
+>>>>>                  * doing a best effort to sync dirty bits.  No matter whether
+>>>>>                  * we're using dirty log or dirty ring, we ignored two facts:
+>>>>>                  *
+>>>>>                  * (1) dirty bits can reside in hardware buffers (PML)
+>>>>>                  *
+>>>>>                  * (2) after we collected dirty bits here, pages can be dirtied
+>>>>>                  * again before we do the final KVM_SET_USER_MEMORY_REGION to
+>>>>>                  * remove the slot.
+>>>>>                  *
+>>>>>                  * Not easy.  Let's cross the fingers until it's fixed.
+>>>>>                  */
+>>>>>
+>>>>> One example is if we have 16G mem, we enable dirty tracking and we punch a
+>>>>> hole of 1G at offset 1G, it'll change from this:
+>>>>>
+>>>>>                      (a)
+>>>>>   |----------------- 16G -------------------|
+>>>>>
+>>>>> To this:
+>>>>>
+>>>>>      (b)    (c)              (d)
+>>>>>   |--1G--|XXXXXX|------------14G------------|
+>>>>>
+>>>>> Here (c) will be a 1G hole.
+>>>>>
+>>>>> With current code, the hole punching will del region (a) and add back
+>>>>> region (b) and (d).  After the new _LIST ioctl it'll be atomic and nicer.
+>>>>>
+>>>>> Here the question is if we're with dirty tracking it means for each region
+>>>>> we have a dirty bitmap.  Currently we do the best effort of doing below
+>>>>> sequence:
+>>>>>
+>>>>>   (1) fetching dirty bmap of (a)
+>>>>>   (2) delete region (a)
+>>>>>   (3) add region (b) (d)
+>>>>>
+>>>>> Here (a)'s dirty bmap is mostly kept as best effort, but still we'll lose
+>>>>> dirty pages written between step (1) and (2) (and actually if the write
+>>>>> comes within (2) and (3) I think it'll crash qemu, and iiuc that's what
+>>>>> we're going to fix..).
+>>>>>
+>>>>> So ideally the atomic op can be:
+>>>>>
+>>>>>   "atomically fetch dirty bmap for removed regions, remove regions, and add
+>>>>>    new regions"
+>>>>>
+>>>>> Rather than only:
+>>>>>
+>>>>>   "atomically remove regions, and add new regions"
+>>>>>
+>>>>> as what the new _LIST ioctl do.
+>>>>>
+>>>>> But... maybe that's not a real problem, at least I didn't know any report
+>>>>> showing issue with current code yet caused by losing of dirty bits during
+>>>>> step (1) and (2).  Neither do I know how to trigger an issue with it.
+>>>>>
+>>>>> I'm just trying to still provide this information so that you should be
+>>>>> aware of this problem too, at the meantime when proposing the new ioctl
+>>>>> change for qemu we should also keep in mind that we won't easily lose the
+>>>>> dirty bmap of (a) here, which I think this patch does the right thing.
+>>>>>
+>>>>
+>>>> Thanks for bringing these details Peter!
+>>>>
+>>>> What do you think of adding?
+>>>> (4) Copy the corresponding part of (a)'s dirty bitmap to (b) and (d)'s
+>>>> dirty bitmaps.
+>>>
+>>> Sounds good to me, but may not cover dirty ring?  Maybe we could move on
+>>> with the simple but clean scheme first and think about a comprehensive
+>>> option only if very necessary.  The worst case is we need one more kvm cap
+>>> but we should still have enough.
+>>
+>> Ok then, I will not consider this for now.
+>>
+>> Might or might not be relevant, but I was also considering to
+>> pre-process the list of memslots passed to the ioctl and merge
+>> operations when necessary, to avoid unnecessary operations.
+>>
+>> For example, if we are creating an area and punching a hole (assuming
+>> this is a valid example), we would have
+>>
+>> transaction_begin()
+>> CREATE(offset=0, memory area)
+>> DELETE(memory area)
+>> CREATE(offset=0, memory area / 2 - 1)
+>> CREATE(offset=memory_area/2, memory area / 2)
+>> transaction_commmit()
+>>
+>> Instead, if we pre-process the memory regions and detect overlaps with
+>> an interval tree, we could simplify the above with:
+>> CREATE(offset=0, memory area / 2 - 1)
+>> CREATE(offset=memory_area/2, memory area / 2)
+> 
+> As I replied in the private email, I don't think the pre-process here is
+> needed, because afaict flat views already handle that.
+> 
+> See generate_memory_topology() and especially render_memory_region().
+> 
+> In above example, the 1st CREATE + DELETE shouldn't reach any of the memory
+> listners, including the KVM one, because the flatview only contains the
+> final layout of the address space when commit() happens.
+> 
+>>
+>> In addition, I was thinking to also provide the operation type (called
+>> enum kvm_mr_change) from userspace directly, and not "figure" it
+>> ourselves in KVM.
+>>
+>> The reason for these two changes come from KVM implementation. I know
+>> this is no KVM place, but a background explanation might be necessary.
+>> Basically KVM 1) figures the request type by looking at the fields
+>> passed by userspace (for example mem_size == 0 means DELETE) and the
+>> current status of the memslot (id not found means CREATE, found means
+>> MOVE/UPDATE_FLAGS), and 2) has 2 memslot lists per address space: the
+>> active (visible) and inactive. Any operation is performed in the
+>> inactive list, then we "swap" the two so that the change is visible.
+>>
+>> The "atomic" goal of this serie just means that we want to apply
+>> multiple memslot operation and then perform a single "swap".
+>> The problem is that each DELETE and MOVE request perform 2 swaps: first
+>> substitute current memslot with an invalid one (so that page faults are
+>> retried), and then remove the invalid one (in case of MOVE, substitute
+>> with new memslot).
+>>
+>> Therefore:
+>> - KVM should ideally pre-process all DELETE/MOVE memslots and perform a
+>> first swap(s) to replace the current memslot with an invalid one, and
+>> then perform all other operations in order (deletion/move included).
+> 
+> This sounds correct.
+> 
+>> This is why QEMU should just send pre-merged MR, so that we don't have
+>> CREATE(x)- DELETE(x). Otherwise we would process a DELETE on a MR that
+>> doesn't exist yet.
+> 
+> As discussed above, IMHO pre-merge isn't an issue here and I think the
+> sequence in your example won't happen.  But you raised a great question on
+> whether we should allow the new ioctl (if there's going to be one) to do
+> whatever it wants by batching any sequence of memslot operations.
+> 
+> More below.
+> 
+>>
+>> - Doing the above is still not enough, as KVM figures what operation to
+>> do depending on the current state of the memslots.
+>> Assuming we already have an already existing MR y, and now we get the
+>> list DELETE(y) CREATE(y/2) (ie reducing y to half its size).
+>> In this case the interval tree can't do anything, but it's very hard to
+>> understand that the second request in the list is a CREATE, because when
+>> KVM performs the check to understand which type of operation it is
+>> (before doing any modification at all in the memslot list), it finds
+>> that y (memslot with same id) exist, but has a different size than what
+>> provided from userspace, therefore it could either fail, or misinterpret
+>> it as another operation (currently fails -EINVALID).
+> 
+> Another good question..  I think that can be partly solved by not allowing
+> ID duplication in the same batched ioctl, or maybe we can fail it.  From
+> qemu perspective, we may need to change the memslot id allocation to not
+> reuse IDs of being-deleted memslots until the batch is processed.
+> 
+> Something like adding similar INVALID tags to kvm memslots in QEMU when we
+> are preparing the batch, then we should only reset memory_size==0 and clear
+> INVALID tag after the ioctl returns.  Then during the batch, any new slots
+> to be added from kvm_get_free_slot() will not return any duplication of a
+> deleting one.
+> 
+>> If we instead already provide the labels, then we can:
+>> 	1. substitute the memslots pointed by DELETE/MOVE with invalid & swap
+>> (so it is visible, non-atomic. But we don't care, as we are not deleting
+>> anything)
+>> 	2. delete the invalid memslot (in the inactive memslot list)
+>> 	3. process the other requests (in the inactive memslot list)
+>> 	4. single and atomic swap (step 2 and 3 are now visible).
+>>
+>> What do you think?
+> 
+> Adding some limitation to the new ioctl makes sense to me, especially
+> moving the DELETE/MOVE to be handled earlier, rather than a complete
+> mixture of all of them.
+> 
+> I'm wondering whether the batch ioctl can be layed out separately on the
+> operations, then it can be clearly documented on the sequence of handling
+> each op:
+> 
+>   struct kvm_userspace_memory_region_batch {
+>          struct kvm_userspace_memory_region deletes[];
+>          struct kvm_userspace_memory_region moves[];
+>          struct kvm_userspace_memory_region creates[];
+>          struct kvm_userspace_memory_region flags_only[];
+>   };
+> 
+> So that the ordering can be very obvious.  But I didn't really think deeper
+> than that.
+> 
+> Side note: do we use MOVE at all in QEMU?
+> 
+>>
+>> Bonus question: with this atomic operation, do we really need the
+>> invalid memslot logic for MOVE/DELETE?
+> 
+> I think so.  Not an expert on that, but iiuc that's to make sure we'll zap
+> all shadow paging that maps to the slots being deleted/moved.
+> 
+> Paolo can always help to keep me honest above.
+> 
+> One thing I forgot to ask: iirc we used to have a workaround to kick all
+> vcpus out, update memory slots, then continue all vcpus.  Would that work
+> for us too for the problem you're working on?
+
+As reference, here is one such approach for region resizes only:
+
+https://lore.kernel.org/qemu-devel/20200312161217.3590-1-david@redhat.com/
+
+which notes:
+
+"Instead of inhibiting during the region_resize(), we could inhibit for
+the hole memory transaction (from begin() to commit()). This could be
+nice, because also splitting of memory regions would be atomic (I
+remember there was a BUG report regarding that), however, I am not sure
+if that might impact any RT users."
+
+
+-- 
+Thanks,
+
+David / dhildenb
+
