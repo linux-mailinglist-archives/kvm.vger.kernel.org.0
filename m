@@ -2,167 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E0ABB5A5CBA
-	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 09:18:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69E975A5D8A
+	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 10:00:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230019AbiH3HSB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 03:18:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56568 "EHLO
+        id S231355AbiH3IAC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 04:00:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230496AbiH3HRz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 03:17:55 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8F82C6CF4;
-        Tue, 30 Aug 2022 00:17:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661843873; x=1693379873;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=dlI6P2fTBtab2f16iHCRw4MUjaOTwAsgez2vvAWGNtU=;
-  b=h3PC2Aafs8HHbXT0F1nAvRm5KJ6OHeGh6H5KD+BGJ26+C517DL+P0OEG
-   g21rXXt9F7iWnH3xWfJaCbC+Nk+LZQvxTyDXVVItLieZ+Ns54e1sHrAu9
-   53HnJi7SN1QU5UV1ML047wWDFLac8oYNj//Kd842jSkBioe3vjFM0yWdS
-   tpKHKG3XcIaoIKA4+ZIKallrZXcJNzOIyrbQSwO0HMEWG5s5m963utTv1
-   TTIlYoDhIbIPgd5CM3+ARHy0dyKPyoLbahPCEfpTTsEmUyoIf6s24pWiW
-   5nIc4ltszqIUBI/ckEiZGZzh+HVH0tkw+TSsDm/uqZ9ROb9AeCix4v3Qz
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10454"; a="359067385"
-X-IronPort-AV: E=Sophos;i="5.93,274,1654585200"; 
-   d="scan'208";a="359067385"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2022 00:17:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,274,1654585200"; 
-   d="scan'208";a="562539715"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by orsmga003.jf.intel.com with ESMTP; 30 Aug 2022 00:17:48 -0700
-Date:   Tue, 30 Aug 2022 15:17:48 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     isaku.yamahata@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>
-Subject: Re: [PATCH v8 019/103] x86/cpu: Add helper functions to
- allocate/free TDX private host key id
-Message-ID: <20220830071748.dtr2h3x7dvblkc4b@yy-desk-7060>
-References: <cover.1659854790.git.isaku.yamahata@intel.com>
- <b96a789edc879dc2a902c9c31a675e08f1796a00.1659854790.git.isaku.yamahata@intel.com>
+        with ESMTP id S231361AbiH3H7m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 03:59:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1AE2D2771
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 00:59:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661846377;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KCfrLsUUliFZAsT7cuTFQ+KKBb55P+r5AzSlUp1Nkos=;
+        b=YGrFVMlaAkw+NBUw8cfQgpuVZI62rugemmdZN7GOQ1FOuQ8ImEvXg748uHB2+AGHa5mORR
+        9LZtN10QkQ2zyFP918lNLXk7zRz2o3RXx5/ltTjmbuU8E8uam+6rBFAsDoCKSSTddauuE6
+        KktHpDLrMxq/yy6YoZQGUAqSBndoBxw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-106-cEvAzmeDNc2_1VNdLsDCXQ-1; Tue, 30 Aug 2022 03:59:36 -0400
+X-MC-Unique: cEvAzmeDNc2_1VNdLsDCXQ-1
+Received: by mail-wm1-f70.google.com with SMTP id j3-20020a05600c1c0300b003a5e72421c2so422911wms.1
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 00:59:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc;
+        bh=KCfrLsUUliFZAsT7cuTFQ+KKBb55P+r5AzSlUp1Nkos=;
+        b=OaAkWzHLYtt2bDIrFSHLVIMQoyYI21aDzaCDstglgM5NxZW2iIKIYvPqJY5QgLKHDC
+         LcPUdavmQt0h/1qzMcv1vFtTMmhoPck8+t0gYloWzc2J2pTYrHt+REE2u2rQDYPakGIg
+         OYV1bqT1tTNUw6YgUtcb1rtYlNIAGj6W5TGWWTBkL9+OCXOYeC5Df+vV47BfDSdIIF06
+         aQ7DmJDPxuMKr1VjgjLWnxjXJfJTGPArSiCiV7l1aF4SWZyhNJRPVQFyljxPhRFL9qRw
+         CmOWUTGqWbX4XCcsflKgkVMaM6dNi3VxJeyDgjzBRGNRfqiuW2YftIijjYGjQKBhlENM
+         5Nmg==
+X-Gm-Message-State: ACgBeo2x7wKhprplGTRLb7UTgvcbSURDxmQyA1/LTUCstbDo5nEZD9Av
+        2vPsgljcfXgFa4carKuZeNNydsZeoSYA2XXtVk5QaJ88xoFpHrAxnKnsYwlje3djTb0/MyD7I09
+        TxG/MHq7Apsw9
+X-Received: by 2002:a05:600c:1992:b0:3a6:23f6:8417 with SMTP id t18-20020a05600c199200b003a623f68417mr8373208wmq.14.1661846374817;
+        Tue, 30 Aug 2022 00:59:34 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR6G+HNENoZbk/kP0Upti13ajYwcNsvPHgO3ZJjPM9lTCEmTs9Are0AGapPE11SllUCzKZrfKw==
+X-Received: by 2002:a05:600c:1992:b0:3a6:23f6:8417 with SMTP id t18-20020a05600c199200b003a623f68417mr8373198wmq.14.1661846374508;
+        Tue, 30 Aug 2022 00:59:34 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c70a:1000:ecb4:919b:e3d3:e20b? (p200300cbc70a1000ecb4919be3d3e20b.dip0.t-ipconnect.de. [2003:cb:c70a:1000:ecb4:919b:e3d3:e20b])
+        by smtp.gmail.com with ESMTPSA id l14-20020a05600c4f0e00b003a83d5f3678sm11136280wmq.7.2022.08.30.00.59.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Aug 2022 00:59:34 -0700 (PDT)
+Message-ID: <39145649-c378-d027-8856-81b4f09050fc@redhat.com>
+Date:   Tue, 30 Aug 2022 09:59:33 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b96a789edc879dc2a902c9c31a675e08f1796a00.1659854790.git.isaku.yamahata@intel.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [PATCH] vfio/type1: Unpin zero pages
+Content-Language: en-US
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        lpivarc@redhat.com
+References: <166182871735.3518559.8884121293045337358.stgit@omen>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <166182871735.3518559.8884121293045337358.stgit@omen>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Aug 07, 2022 at 03:01:04PM -0700, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> TDX private host key id is assigned to guest TD.  The memory controller
-> encrypts guest TD memory with the assigned TDX private host key id (HIKD).
-> Add helper functions to allocate/free TDX private host key id so that TDX
-> KVM manage it.
->
-> Also export the global TDX private host key id that is used to encrypt TDX
-> module, its memory and some dynamic data (TDR).  When VMM releasing
-> encrypted page to reuse it, the page needs to be flushed with the used host
-> key id.  VMM needs the global TDX private host key id to flush such pages
-> TDX module accesses with the global TDX private host key id.
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+On 30.08.22 05:05, Alex Williamson wrote:
+> There's currently a reference count leak on the zero page.  We increment
+> the reference via pin_user_pages_remote(), but the page is later handled
+> as an invalid/reserved page, therefore it's not accounted against the
+> user and not unpinned by our put_pfn().
+> 
+> Introducing special zero page handling in put_pfn() would resolve the
+> leak, but without accounting of the zero page, a single user could
+> still create enough mappings to generate a reference count overflow.
+> 
+> The zero page is always resident, so for our purposes there's no reason
+> to keep it pinned.  Therefore, add a loop to walk pages returned from
+> pin_user_pages_remote() and unpin any zero pages.
+> 
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: stable@vger.kernel.org
+> Reported-by: Luboslav Pivarc <lpivarc@redhat.com>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 > ---
->  arch/x86/include/asm/tdx.h  | 12 ++++++++++++
->  arch/x86/virt/vmx/tdx/tdx.c | 28 +++++++++++++++++++++++++++-
->  2 files changed, 39 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index c887618e3cec..a32e8881e758 100644
-> --- a/arch/x86/include/asm/tdx.h
-> +++ b/arch/x86/include/asm/tdx.h
-> @@ -144,6 +144,16 @@ struct tdsysinfo_struct {
->  bool platform_tdx_enabled(void);
->  int tdx_init(void);
->  const struct tdsysinfo_struct *tdx_get_sysinfo(void);
-> +/*
-> + * Key id globally used by TDX module: TDX module maps TDR with this TDX global
-> + * key id.  TDR includes key id assigned to the TD.  Then TDX module maps other
-> + * TD-related pages with the assigned key id.  TDR requires this TDX global key
-> + * id for cache flush unlike other TD-related pages.
-> + */
-> +extern u32 tdx_global_keyid __read_mostly;
-> +int tdx_keyid_alloc(void);
-> +void tdx_keyid_free(int keyid);
+>  drivers/vfio/vfio_iommu_type1.c |   12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index db516c90a977..8706482665d1 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -558,6 +558,18 @@ static int vaddr_get_pfns(struct mm_struct *mm, unsigned long vaddr,
+>  	ret = pin_user_pages_remote(mm, vaddr, npages, flags | FOLL_LONGTERM,
+>  				    pages, NULL, NULL);
+>  	if (ret > 0) {
+> +		int i;
 > +
->  u64 __seamcall(u64 op, u64 rcx, u64 rdx, u64 r8, u64 r9,
->  	       struct tdx_module_output *out);
->  #else	/* !CONFIG_INTEL_TDX_HOST */
-> @@ -151,6 +161,8 @@ static inline bool platform_tdx_enabled(void) { return false; }
->  static inline int tdx_init(void)  { return -ENODEV; }
->  struct tdsysinfo_struct;
->  static inline const struct tdsysinfo_struct *tdx_get_sysinfo(void) { return NULL; }
-> +static inline int tdx_keyid_alloc(void) { return -EOPNOTSUPP; }
-> +static inline void tdx_keyid_free(int keyid) { }
->  #endif	/* CONFIG_INTEL_TDX_HOST */
->
->  #endif /* !__ASSEMBLY__ */
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index 918e79159bbf..2168e6133d45 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -56,7 +56,8 @@ static struct cmr_info tdx_cmr_array[MAX_CMRS] __aligned(CMR_INFO_ARRAY_ALIGNMEN
->  static int tdx_cmr_num;
->
->  /* TDX module global KeyID.  Used in TDH.SYS.CONFIG ABI. */
-> -static u32 tdx_global_keyid;
-> +u32 tdx_global_keyid __read_mostly;
-> +EXPORT_SYMBOL_GPL(tdx_global_keyid);
->
->  /* Detect whether CPU supports SEAM */
->  static int detect_seam(void)
-> @@ -80,6 +81,31 @@ static int detect_seam(void)
->  	return 0;
->  }
->
-> +/* TDX KeyID pool */
-> +static DEFINE_IDA(tdx_keyid_pool);
+> +		/*
+> +		 * The zero page is always resident, we don't need to pin it
+> +		 * and it falls into our invalid/reserved test so we don't
+> +		 * unpin in put_pfn().  Unpin all zero pages in the batch here.
+> +		 */
+> +		for (i = 0 ; i < ret; i++) {
+> +			if (unlikely(is_zero_pfn(page_to_pfn(pages[i]))))
+> +				unpin_user_page(pages[i]);
+> +		}
 > +
-> +int tdx_keyid_alloc(void)
-> +{
-> +	if (WARN_ON_ONCE(!tdx_keyid_start || !tdx_keyid_num))
-> +		return -EINVAL;
-> +
-> +	/* The first keyID is reserved for the global key. */
-> +	return ida_alloc_range(&tdx_keyid_pool, tdx_keyid_start + 1,
-> +			       tdx_keyid_start + tdx_keyid_num - 1,
-> +			       GFP_KERNEL);
-> +}
-> +EXPORT_SYMBOL_GPL(tdx_keyid_alloc);
-> +
-> +void tdx_keyid_free(int keyid)
-> +{
-> +	/* keyid = 0 is reserved. */
-> +	if (!keyid || keyid <= 0)
+>  		*pfn = page_to_pfn(pages[0]);
+>  		goto done;
+>  	}
+> 
+> 
 
-keyid <=0 covers !keyid.
+As discussed offline, for the shared zeropage (that's not even
+refcounted when mapped into a process), this makes perfect sense to me.
 
-> +		return;
-> +
-> +	ida_free(&tdx_keyid_pool, keyid);
-> +}
-> +EXPORT_SYMBOL_GPL(tdx_keyid_free);
-> +
->  static int detect_tdx_keyids(void)
->  {
->  	u64 keyid_part;
-> --
-> 2.25.1
->
+Good question raised by Sean if ZONE_DEVICE pages might similarly be
+problematic. But for them, we cannot simply always unpin here.
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+-- 
+Thanks,
+
+David / dhildenb
+
