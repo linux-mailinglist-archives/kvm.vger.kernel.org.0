@@ -2,150 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 03D875A710C
-	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 00:44:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5896E5A7118
+	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 00:49:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231822AbiH3WoX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 18:44:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39958 "EHLO
+        id S229829AbiH3WtS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 18:49:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232212AbiH3Wnq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 18:43:46 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 927DD861FE
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 15:43:37 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id q128-20020a632a86000000b0042fadb61e4aso1196780pgq.3
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 15:43:37 -0700 (PDT)
+        with ESMTP id S229591AbiH3WtR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 18:49:17 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FC501573C
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 15:49:16 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id l65so2394486pfl.8
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 15:49:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc;
-        bh=SZFI/BD05xGXUwWRf10O9GR3zZEiAgwS8+s9rPD1nCs=;
-        b=Vwrj9vaDWiIAREcxlkWs0glRtmYa/bvTrp9YFdAUMOToYQ/jD2vTpSo+mv1IBBtwAG
-         M3ITYnVQRBUdmQYzzVVPX5vdP3ZMEurc/94khBlubV3HgdL5stp2v+lPFcvf9TBd8NgN
-         xrlHIl4wkwnMzqTR9T5+bZ+udASe8M2Mz6OczwNLYyAxwvJiP7tElKXOYpxDndH1/+4X
-         C7mgUnfvokFFAgzbzf31jhSdVRLUPR45TOj74L+KgoouNHqAepXGu2HpOnETpOcMzmzd
-         W1x9DMjSjl6xxJDaJ1ZdHTDS43ilcCt9EqAsOZZORWSW2z1WYj3tfon8hUDPGIDoyq3c
-         kpiA==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=5oVGlJD5RlpBf+9i4Q45ZK+hg97pjNTENblv1UXq3mI=;
+        b=a2RBon5JNWe3lm0XYeQauPY76q6W2TLM+z8FitojgMaKdSmaQlb6yyVmHkhA/GD2m/
+         cC5zmwa1XAV64X5H6e35KV4icyiHKe3Wi0+1fN2+WWwAxXfms+jqFCSyBKSmUV5xUmG/
+         o4ps6SIQQE5nCz5X75SpO3DbIgbzM+HEcQq2S7a3uHaigKrFVd9Mj/1ygcm7tcvZva6F
+         m2llpT20jV3TgGoMSebcQ06SbKyy3PB7grIz7ahMHa6kUdYPxpOaFcqaZGUUXbszMaqg
+         fraBOme/Rsv25LSBMP2rKk58LZr0e4SmoXiQFQt2sj5L9o/BiEaqxuRlS7+lf7RL1hp0
+         174g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc;
-        bh=SZFI/BD05xGXUwWRf10O9GR3zZEiAgwS8+s9rPD1nCs=;
-        b=1tEvwzX/4dMkEbm3jYeWhJBVHptx2V3gzy94Tm2wsvQVBjKTedpS+giNTJffQ5G603
-         r1Z/V2fDcCXNY9gPdY/M3q5dMYN2BVbKDxu1BJyCBEwbim8h7W1ynkX+xqub0wir+lLC
-         oQb+Qbczlk6f++CJwJpVbgiIgdgLtdCIfpHZCYxfslPSOvm64dYrAUnx3ZKzUSGk/OIv
-         jntq1uz6B0DGcFmYEt4kXnC6t81MEtI6ifGKEXU1VH62UENMPfKsiEYt7davxPW8mzZR
-         qzxz6IxpmemcJ2uIqp9JN8uCMXPzmuvTVs5JqxFrF6IK9GygEUFQgEBP36NrPq59Hpuv
-         ip3A==
-X-Gm-Message-State: ACgBeo2SxxROEN0Fiu0Wm/+SGIOV/HQ/B5Dv1EPbG60YWX28ViBPJD1R
-        54ZiXDEEtD5W9CZT1kDWS/6vNXzyjZ3/oOEA
-X-Google-Smtp-Source: AA6agR5w/7GSSIl/Y9SPf0ncYlhNdf+tjVar8dIyS0KvqIeS5dpzuysMFBeXdDbt8wMm5SsXSQ2EpS1h7NawurFS
-X-Received: from vannapurve2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:41f8])
- (user=vannapurve job=sendgmr) by 2002:a17:90b:1b0f:b0:1fd:e29c:d8e1 with SMTP
- id nu15-20020a17090b1b0f00b001fde29cd8e1mr255751pjb.118.1661899416074; Tue,
- 30 Aug 2022 15:43:36 -0700 (PDT)
-Date:   Tue, 30 Aug 2022 22:42:59 +0000
-In-Reply-To: <20220830224259.412342-1-vannapurve@google.com>
-Mime-Version: 1.0
-References: <20220830224259.412342-1-vannapurve@google.com>
-X-Mailer: git-send-email 2.37.2.672.g94769d06f0-goog
-Message-ID: <20220830224259.412342-9-vannapurve@google.com>
-Subject: [RFC V2 PATCH 8/8] selftests: kvm: Add private memory test for SEV VMs
-From:   Vishal Annapurve <vannapurve@google.com>
-To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, shuah@kernel.org, yang.zhong@intel.com,
-        drjones@redhat.com, ricarkol@google.com, aaronlewis@google.com,
-        wei.w.wang@intel.com, kirill.shutemov@linux.intel.com,
-        corbet@lwn.net, hughd@google.com, jlayton@kernel.org,
-        bfields@fieldses.org, akpm@linux-foundation.org,
-        chao.p.peng@linux.intel.com, yu.c.zhang@linux.intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com,
-        michael.roth@amd.com, qperret@google.com, steven.price@arm.com,
-        ak@linux.intel.com, david@redhat.com, luto@kernel.org,
-        vbabka@suse.cz, marcorr@google.com, erdemaktas@google.com,
-        pgonda@google.com, nikunj@amd.com, seanjc@google.com,
-        diviness@google.com, maz@kernel.org, dmatlack@google.com,
-        axelrasmussen@google.com, maciej.szmigiero@oracle.com,
-        mizhang@google.com, bgardon@google.com,
-        Vishal Annapurve <vannapurve@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=5oVGlJD5RlpBf+9i4Q45ZK+hg97pjNTENblv1UXq3mI=;
+        b=FoijrvcE4FCET1qzwyLwDGxg/wGvlgi1GksTQiRV7GHO5KyK03X1H10N/3MDD5r2J1
+         DwDeEsooZX7Fz41Bu9kIRxrULAi57XLZt7B9KyFHarDNmXgU9Yr6l8Nj11DBAYSLXx82
+         95+Nav8Db1GQhX+irSad8GjFjYxv3K21lIyFv9/KuLnSdBLgQgwmb2hW5ZAGuzCs2NMX
+         5EO58fHpNmMDSaQdFg7gWJktf5I1VDw6WIuEru4+NNvHISMTkHpN6fmtPt6T8XpHwter
+         BRAgyCrqyCHnMHQJZRXvbDiImnqftRHS4yRIm/eufJzNNl5lRdETM71R/tsJBOnGEGhN
+         II2w==
+X-Gm-Message-State: ACgBeo1uPMHnImZ7WMi4RPdhHXHWG5pTsNFEpjwW/0S8B75HFVTEhoks
+        UDVnxfXe3i4Hwp9WBeLtSrG2kQ==
+X-Google-Smtp-Source: AA6agR5ucf7AY4Hf9zxzxqljlu4xWd8WTb4l/ihE6IyhFh+R+7yPhC7zESFtQu1dU8jXxRWFTZHAbg==
+X-Received: by 2002:a05:6a00:230f:b0:52f:6734:90fe with SMTP id h15-20020a056a00230f00b0052f673490femr23777723pfh.67.1661899755594;
+        Tue, 30 Aug 2022 15:49:15 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id k18-20020aa79732000000b00539aa7f0b53sm2237687pfg.104.2022.08.30.15.49.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Aug 2022 15:49:15 -0700 (PDT)
+Date:   Tue, 30 Aug 2022 22:49:11 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, maz@kernel.org,
+        alexandru.elisei@arm.com, eric.auger@redhat.com, oupton@google.com,
+        reijiw@google.com, rananta@google.com, bgardon@google.com,
+        dmatclack@google.com, axelrasmussen@google.com
+Subject: Re: [PATCH v5 07/13] KVM: selftests: Change ____vm_create() to take
+ struct kvm_vm_mem_params
+Message-ID: <Yw6T591G5hGTBx2t@google.com>
+References: <20220823234727.621535-1-ricarkol@google.com>
+ <20220823234727.621535-8-ricarkol@google.com>
+ <20220829172508.oc3rr44q2irwudi5@kamzik>
+ <Yw6JAiIfenYafJnZ@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yw6JAiIfenYafJnZ@google.com>
+X-Spam-Status: No, score=-14.9 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a selftest placeholder for executing private memory
-conversion tests with SEV VMs.
+On Tue, Aug 30, 2022, Ricardo Koller wrote:
+> On Mon, Aug 29, 2022 at 07:25:08PM +0200, Andrew Jones wrote:
+> > On Tue, Aug 23, 2022 at 11:47:21PM +0000, Ricardo Koller wrote:
+> > I feel we'll be revisiting this frequently when more and more region types
+> > are desired. For example, Sean wants a read-only memory region for ucall
+> > exits. How about putting a mem slot array in struct kvm_vm, defining an
+> > enum to index it (which will expand), and then single helper function,
+> > something like
+> > 
+> >  inline struct userspace_mem_region *
+> >  vm_get_mem_region(struct kvm_vm *vm, enum memslot_type mst)
+> >  {
+> >     return memslot2region(vm, vm->memslots[mst]);
+> >  }
 
-Signed-off-by: Vishal Annapurve <vannapurve@google.com>
----
- tools/testing/selftests/kvm/.gitignore        |  1 +
- tools/testing/selftests/kvm/Makefile          |  1 +
- .../kvm/x86_64/sev_private_mem_test.c         | 21 +++++++++++++++++++
- 3 files changed, 23 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/sev_private_mem_test.c
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 095b67dc632e..757d4cac19b4 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -37,6 +37,7 @@
- /x86_64/set_sregs_test
- /x86_64/sev_all_boot_test
- /x86_64/sev_migrate_tests
-+/x86_64/sev_private_mem_test
- /x86_64/smm_test
- /x86_64/state_test
- /x86_64/svm_vmcall_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 36874fedff4a..3f8030c46b72 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -98,6 +98,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/pmu_event_filter_test
- TEST_GEN_PROGS_x86_64 += x86_64/private_mem_test
- TEST_GEN_PROGS_x86_64 += x86_64/set_boot_cpu_id
- TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
-+TEST_GEN_PROGS_x86_64 += x86_64/sev_private_mem_test
- TEST_GEN_PROGS_x86_64 += x86_64/smm_test
- TEST_GEN_PROGS_x86_64 += x86_64/state_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_preemption_timer_test
-diff --git a/tools/testing/selftests/kvm/x86_64/sev_private_mem_test.c b/tools/testing/selftests/kvm/x86_64/sev_private_mem_test.c
-new file mode 100644
-index 000000000000..2c8edbaef627
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/sev_private_mem_test.c
-@@ -0,0 +1,21 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2022, Google LLC.
-+ */
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+
-+#include <test_util.h>
-+#include <kvm_util.h>
-+#include <private_mem_test_helper.h>
-+
-+int main(int argc, char *argv[])
-+{
-+	/* Tell stdout not to buffer its content */
-+	setbuf(stdout, NULL);
-+
-+	execute_sev_memory_conversion_tests();
-+	return 0;
-+}
--- 
-2.37.2.672.g94769d06f0-goog
+> > 
+> > > +
+> > >  /* Minimum allocated guest virtual and physical addresses */
+> > >  #define KVM_UTIL_MIN_VADDR		0x2000
+> > >  #define KVM_GUEST_PAGE_TABLE_MIN_PADDR	0x180000
+> > > @@ -637,19 +662,51 @@ vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+> > >  			      vm_paddr_t paddr_min, uint32_t memslot);
+> > >  vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm);
+> > >  
+> > > +#define MEM_PARAMS_MAX_MEMSLOTS 3
+> > 
+> > And this becomes MEMSLOT_MAX of the enum proposed above
+> > 
+> >  enum memslot_type {
+> >      MEMSLOT_CODE,
+> >      MEMSLOT_PT,
+> >      MEMSLOT_DATA,
 
+"memslot" is going to be confusing, e.g. MEMSLOT_MAX is some arbitrary selftests
+constant that has no relationship to maximum number of memslots.
+
+> >      MEMSLOT_MAX,
+
+I dislike "max" because it's ambiguous, e.g. is it the maximum number of regions,
+or is the max valid region?
+
+Maybe something like this?
+
+	enum kvm_mem_region_type {
+		MEM_REGION_CODE
+		...
+		NR_MEM_REGIONS,
+	}
+
+> > > +#else
+> > > +	.mode = VM_MODE_DEFAULT,
+> > > +#endif
+> > > +	.region[0] = {
+> > > +		.src_type = VM_MEM_SRC_ANONYMOUS,
+> > > +		.guest_paddr = 0,
+> > > +		.slot = 0,
+> > > +		/*
+> > > +		 * 4mb when page size is 4kb. Note that vm_nr_pages_required(),
+> > > +		 * the function used by most tests to calculate guest memory
+> > > +		 * requirements uses around ~520 pages for more tests.
+> > 
+> > ...requirements, currently returns ~520 pages for the majority of tests.
+> > 
+> > > +		 */
+> > > +		.npages = 1024,
+> > 
+> > And here we double it, but it's still fragile. I see we override this
+> > in __vm_create() below though, so now I wonder why we set it at all.
+> > 
+> 
+> I would prefer having a default that can be used by a test as-is. WDYT?
+> or should we make it explicit that the default needs some updates?
+
+In that case, the default should be '0'.  There are two users of ____vm_create().
+__vm_create() takes the number of "extra" pages and calculates the "base" number
+of pages.  vm_create_barebones() passes '0', i.e. can use default.
+
+If '0' as a default is too weird, make it an illegal value and force the caller
+to define the number of pages.
+
+It's not a coincidence that those are the only two callers, ____vm_create() isn't
+intended to be used directly.  If a test wants to create a VM just to create a VM,
+then it shoulid use vm_create_barebones().  If a test wants to doing anything
+remotely useful with the VM, it should use __vm_create() or something higher up
+the food chain.
