@@ -2,122 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E1235A6662
-	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 16:35:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EFDF5A6677
+	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 16:42:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229722AbiH3OfL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 10:35:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59614 "EHLO
+        id S230267AbiH3OmY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 10:42:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229716AbiH3OfI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 10:35:08 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CAB22A40F;
-        Tue, 30 Aug 2022 07:35:03 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27UEO2kf021078;
-        Tue, 30 Aug 2022 14:35:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : cc :
- to : subject : from : message-id : date; s=pp1;
- bh=IxnAgDcalSTnCkZrv2Ik/WyALlvnHZVHoC6v1OGF8zg=;
- b=SDV18ZLF+z+RizNKpsP+4AVZ8UjEAgzI/NtvdN8VL3UtKRNeZH73U8nnSge06w9C1PMt
- CjDtymg3uGLCDmHOYZn2LWkq9sunnjK+FjUms7PHY2dbnnCKPc+OKw1PbPbMhFIucTU3
- XrgsCPYe2NgGwz4p5uO+jRUUULd/mywyhnu8IXvJ9+Y/0pewlXARZToMAQrXIQzaE4uO
- rqoPDRoOdnqaliXkJZ5lsKtJIzjveZ880WY7puF7Oqfs4rjG/6b0rW/4NeFdSRWkgxOx
- Vkkfwk9mUrRAcYpS7gB0xwTLD/mb51XgXP7W73ujPHwjrk/TYUuDW59zDPL88u1IkNZh Pw== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j9m9dgd24-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 30 Aug 2022 14:35:02 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27UELifc008119;
-        Tue, 30 Aug 2022 14:34:53 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3j7aw93uqg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 30 Aug 2022 14:34:53 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27UEYoOs37421494
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 30 Aug 2022 14:34:50 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9E79CA405B;
-        Tue, 30 Aug 2022 14:34:50 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 83E62A4054;
-        Tue, 30 Aug 2022 14:34:50 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.66.184])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 30 Aug 2022 14:34:50 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S229622AbiH3OmX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 10:42:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD10DB95A0
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 07:42:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661870541;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+te87sYtTGczNabgaJy1Pj2NfLsGoso4jkdFkum7FlU=;
+        b=b2/XSxWPaY3A0uZ0jqYq/654nxllL8+IPfWSjjRUkhh0kd9fpGJnD+Ysg7Qa3NlunJbFhY
+        QDwi+iF5qO2XuOa4YVnMJMut8fsI3PMhG1vQp/wb7olTLQhB4n/GkKOL6khzVRgZq3yw3E
+        3A23S9+0I3SosTABacwwk6lhfhniQtE=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-590-uXIY6pn3OPSZZGxBCPHDzA-1; Tue, 30 Aug 2022 10:42:20 -0400
+X-MC-Unique: uXIY6pn3OPSZZGxBCPHDzA-1
+Received: by mail-qt1-f198.google.com with SMTP id z6-20020ac875c6000000b0034454b14c91so8947422qtq.15
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 07:42:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=+te87sYtTGczNabgaJy1Pj2NfLsGoso4jkdFkum7FlU=;
+        b=KFTVZDLFq5U2U4xhLXFPEkT9BXyWu1XQz86nsLFnCS+CzWL1I60lEh23BKVCPP6fP1
+         F2VkOQmLCn7gb8J2AQQ5UhlHKh1GFYGm23SZSYGy7YjOxIHPzdbUiTO6gorQ51jIqQPN
+         96AiTRyvYQfhWC3jcZHROwZwuJ0anRm/RTmPJvYJn4jh9VGzN24/+pTiBNcZquMWwHKn
+         Bpb8AbAVad8QOBwjvYZACuMQR3+RRc+fpVSPF5QT/QrTEVkquMHbTtT8T+d5LRQbNjjo
+         Jd/v4CU9SnEBcxCyO0j5X79/DCc9/sWl7yqaOG8/MHBgVW0ttWvdpO7XsNqWFJhQj05E
+         RTBw==
+X-Gm-Message-State: ACgBeo2Fd3tS9Nr7EwIfvcSAZkOAIfjKmh+D9iLQvgPsq0yfuG5qLcWp
+        RSoI9pCAYcHYVeBa4DPJaZg5QW7A5JcDVdTE7sPxmuhB5YxgEH8G/ymbkW8SoQrKPyzURZD9RJc
+        zICMHMvwUjHPD
+X-Received: by 2002:a05:622a:1a0d:b0:343:6284:cbc8 with SMTP id f13-20020a05622a1a0d00b003436284cbc8mr15163346qtb.341.1661870540139;
+        Tue, 30 Aug 2022 07:42:20 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR6D8op/R0BZbn270yGLNeyiqE7221aPAIVz7ZsIkOvVsCOIjnQ86kAB8hellaaWH315TLq1vg==
+X-Received: by 2002:a05:622a:1a0d:b0:343:6284:cbc8 with SMTP id f13-20020a05622a1a0d00b003436284cbc8mr15163320qtb.341.1661870539902;
+        Tue, 30 Aug 2022 07:42:19 -0700 (PDT)
+Received: from xz-m1.local (bras-base-aurron9127w-grc-35-70-27-3-10.dsl.bell.ca. [70.27.3.10])
+        by smtp.gmail.com with ESMTPSA id x6-20020ac86b46000000b00339b8a5639csm7064707qts.95.2022.08.30.07.42.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Aug 2022 07:42:19 -0700 (PDT)
+Date:   Tue, 30 Aug 2022 10:42:16 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Gavin Shan <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, corbet@lwn.net,
+        james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org,
+        shuah@kernel.org, seanjc@google.com, drjones@redhat.com,
+        dmatlack@google.com, bgardon@google.com, ricarkol@google.com,
+        zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v1 1/5] KVM: arm64: Enable ring-based dirty memory
+ tracking
+Message-ID: <Yw4hyEAyivKT35vQ@xz-m1.local>
+References: <20220819005601.198436-1-gshan@redhat.com>
+ <20220819005601.198436-2-gshan@redhat.com>
+ <87lerkwtm5.wl-maz@kernel.org>
+ <41fb5a1f-29a9-e6bb-9fab-4c83a2a8fce5@redhat.com>
+ <87fshovtu0.wl-maz@kernel.org>
+ <YwTn2r6FLCx9mAU7@google.com>
+ <87a67uwve8.wl-maz@kernel.org>
+ <99364855-b4e9-8a69-e1ca-ed09d103e4c8@redhat.com>
+ <874jxzvxak.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20220826161112.3786131-2-scgl@linux.ibm.com>
-References: <20220826161112.3786131-1-scgl@linux.ibm.com> <20220826161112.3786131-2-scgl@linux.ibm.com>
-Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-To:     kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v6 1/2] s390x: Add specification exception test
-From:   Nico Boehr <nrb@linux.ibm.com>
-Message-ID: <166187009028.75997.13672950150134705250@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Tue, 30 Aug 2022 16:34:50 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: fd2KSIG3zamYN5DqmLyRP3BMBAeV_9Q4
-X-Proofpoint-ORIG-GUID: fd2KSIG3zamYN5DqmLyRP3BMBAeV_9Q4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-30_08,2022-08-30_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- malwarescore=0 priorityscore=1501 mlxlogscore=999 mlxscore=0
- suspectscore=0 spamscore=0 impostorscore=0 adultscore=0 bulkscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208300073
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <874jxzvxak.wl-maz@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Janis Schoetterl-Glausch (2022-08-26 18:11:11)
-> Generate specification exceptions and check that they occur.
->=20
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+On Fri, Aug 26, 2022 at 04:28:51PM +0100, Marc Zyngier wrote:
+> On Fri, 26 Aug 2022 11:58:08 +0100,
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > 
+> > On 8/23/22 22:35, Marc Zyngier wrote:
+> > >> Heh, yeah I need to get that out the door. I'll also note that Gavin's
+> > >> changes are still relevant without that series, as we do write unprotect
+> > >> in parallel at PTE granularity after commit f783ef1c0e82 ("KVM: arm64:
+> > >> Add fast path to handle permission relaxation during dirty logging").
+> > > 
+> > > Ah, true. Now if only someone could explain how the whole
+> > > producer-consumer thing works without a trace of a barrier, that'd be
+> > > great...
+> > 
+> > Do you mean this?
+> >
+> > void kvm_dirty_ring_push(struct kvm_dirty_ring *ring, u32 slot, u64 offset)
+> 
+> Of course not. I mean this:
+> 
+> static int kvm_vm_ioctl_reset_dirty_pages(struct kvm *kvm)
+> {
+> 	unsigned long i;
+> 	struct kvm_vcpu *vcpu;
+> 	int cleared = 0;
+> 
+> 	if (!kvm->dirty_ring_size)
+> 		return -EINVAL;
+> 
+> 	mutex_lock(&kvm->slots_lock);
+> 
+> 	kvm_for_each_vcpu(i, vcpu, kvm)
+> 		cleared += kvm_dirty_ring_reset(vcpu->kvm, &vcpu->dirty_ring);
+> [...]
+> }
+> 
+> and this
+> 
+> int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
+> {
+> 	u32 cur_slot, next_slot;
+> 	u64 cur_offset, next_offset;
+> 	unsigned long mask;
+> 	int count = 0;
+> 	struct kvm_dirty_gfn *entry;
+> 	bool first_round = true;
+> 
+> 	/* This is only needed to make compilers happy */
+> 	cur_slot = cur_offset = mask = 0;
+> 
+> 	while (true) {
+> 		entry = &ring->dirty_gfns[ring->reset_index & (ring->size - 1)];
+> 
+> 		if (!kvm_dirty_gfn_harvested(entry))
+> 			break;
+> [...]
+> 
+> }
+> 
+> which provides no ordering whatsoever when a ring is updated from one
+> CPU and reset from another.
 
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+Marc,
 
-with minor nits below you may want to consider
+I thought we won't hit this as long as we properly take care of other
+orderings of (a) gfn push, and (b) gfn collect, but after a second thought
+I think it's indeed logically possible that with a reversed ordering here
+we can be reading some garbage gfn before (a) happens butt also read the
+valid flag after (b).
 
-> diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
-> new file mode 100644
-[...]
-> +static int bad_alignment(void)
-> +{
-> +       uint32_t words[5] __attribute__((aligned(16)));
-> +       uint32_t (*bad_aligned)[4] =3D (uint32_t (*)[4])&words[1];
+It seems we must have all the barriers correctly applied always.  If that's
+correct, do you perhaps mean something like this to just add the last piece
+of barrier?
 
-Why not simply:
+===8<===
+diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
+index f4c2a6eb1666..ea620bfb012d 100644
+--- a/virt/kvm/dirty_ring.c
++++ b/virt/kvm/dirty_ring.c
+@@ -84,7 +84,7 @@ static inline void kvm_dirty_gfn_set_dirtied(struct kvm_dirty_gfn *gfn)
+ 
+ static inline bool kvm_dirty_gfn_harvested(struct kvm_dirty_gfn *gfn)
+ {
+-       return gfn->flags & KVM_DIRTY_GFN_F_RESET;
++       return smp_load_acquire(&gfn->flags) & KVM_DIRTY_GFN_F_RESET;
+ }
+ 
+ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
+===8<===
 
-uint32_t *bad_aligned =3D &words[1];
+Thanks,
 
-> +
-> +       /* LOAD PAIR FROM QUADWORD (LPQ) requires quadword alignment */
-> +       asm volatile ("lpq %%r6,%[bad]"
-> +                     : : [bad] "T" (*bad_aligned)
-> +                     : "%r6", "%r7"
-> +       );
-> +       return 0;
-> +}
-> +
-> +static int not_even(void)
-> +{
-> +       uint64_t quad[2] __attribute__((aligned(16))) =3D {0};
-> +
-> +       asm volatile (".insn    rxy,0xe3000000008f,%%r7,%[quad]" /* lpq %=
-%r7,%[quad] */
+-- 
+Peter Xu
 
-Here you use .insn above you use lpq - why?
