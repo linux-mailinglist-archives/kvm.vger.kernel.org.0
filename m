@@ -2,65 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DCAD35A6ADA
-	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 19:34:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 45EFC5A6B06
+	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 19:44:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231975AbiH3ReY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 13:34:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32848 "EHLO
+        id S232039AbiH3RoU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 13:44:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232286AbiH3Rd4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 13:33:56 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE9E9564F6
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 10:30:13 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id q9so11279069pgq.6
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 10:30:13 -0700 (PDT)
+        with ESMTP id S231416AbiH3RoE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 13:44:04 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D91BA15A238
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 10:40:59 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id 145so11684400pfw.4
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 10:40:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc;
-        bh=YQ8ZcpbXRjUN1AF+PorHGIrk4GnuSWoX8YJ2o7FF8qA=;
-        b=e7cMo785PTbK7lQdEBG57/gp/Ipq1BCKVCh1ENIlKVPAr+BYXoS4rDG2wsGGbBey3p
-         eNKJLDnb5eg3GNHnV/ST9qvvevVcnoXr1vIIeGVn8USdr0bPIJxl83j3yzK40VNlQnHl
-         rzrf58riSAvaYykXGoY6MevmEyT2jHsUfCg2yAddhRE7t2qiuR10DKSK7KPVPC4hbd/w
-         9IfFKWUvIbcCEizv+7h4CwiR/2SGHVZTDlyDneaMxhBTflzZhFoMfM163EpS+sneyDAC
-         YMNsTJi2sDBUp2VkXt7/EoE1e6P7Gj6fAnc69RbT+XAtYdhiR2F28yNTTIESbHPLD5Z3
-         HqHA==
+        bh=X7JitvZ40xFd8j5KzH/sIuPG4bhnsbnZMIdQrR5Fai0=;
+        b=b4Wz9KZiIfUfCTKt2eJ+DnUUT9wp4nBUCi5RRVpJp41rXdOaKz298FzBnW1J6Xfq4X
+         5696Kh9mgNcyS5yoWO3qUQiPMJoeAi1kW8bCY/Om0faGdH9Izvx7lud7OxO3Xf1c8Tnk
+         vhA8ZN+ST6xIjVt+MBf9HdGYK7iWL9uyfuIud1g5xzHrHENAxFgxOwn4bUTMAz/h97jI
+         J2P0c5K6/7u+HXgz2APwqlTd05LWOXYKLyAjnVL4sw/JNOGwxJR9Ch6cyYuT+xl0R9Rp
+         xKPOmTomUE3jIzrYyhs37pQNTc6Hldm6vIeHzXKew6qpVwUqhD/LBz8wJqdIVZQ7NgwC
+         KTtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=YQ8ZcpbXRjUN1AF+PorHGIrk4GnuSWoX8YJ2o7FF8qA=;
-        b=ZgWIsmz6sufzKsEEbgJbXyfLWTugTO+ipp/z68Jq0euj6Mc/Y7A5G/Sb/fzBxY5GS8
-         c1qkZX6MpkZjpqbU9UUsX1JCM3TZYGeT5AHWm7avc3efyo8g2nD5YPW8KtYN7WjeVB08
-         REIvCoHDVYMViK1vgMxEgbMWy/iOY41yAcyDlwe8+ghI9U2gHkIyDQCo5pHZQCrK/fvw
-         DIocgMZOovnLIRPHjt9ZbL/K7PhPeQCETJw15ga0kBFmrvJo6p3vPIBeOEB5WYbr1Z8r
-         ZF+4ejLeyeq9xUTDJsywQTbH6Qcr/IraUnpEQHzzRmyVTdSK9jZnMvQqRAXr/xzxG6PX
-         lTNg==
-X-Gm-Message-State: ACgBeo2i1TWrSr/Ok4T1k7GLIqZZgBoT+TIYZj20Ei3Ns9gnCblVrQ5D
-        NidVpRlCV1D2PceK41BIOzBR2w==
-X-Google-Smtp-Source: AA6agR6ahQC3OgKadAHRpGKGebHE8Y2/JSHi4S1bjD4R//knQWK67U9OFqK0gXSTU9JortNXulmakQ==
-X-Received: by 2002:a63:8143:0:b0:42b:9e2f:548e with SMTP id t64-20020a638143000000b0042b9e2f548emr13267763pgd.548.1661880544516;
-        Tue, 30 Aug 2022 10:29:04 -0700 (PDT)
+        bh=X7JitvZ40xFd8j5KzH/sIuPG4bhnsbnZMIdQrR5Fai0=;
+        b=R1J/oQTb+oHJgRlIEpQJnlMo++V0zQeeulKGvScBFouH4i52CRxlTBBf133I+TTqq5
+         PoFSKLKlZvGEPP6HlDVKZR5pw9RmHXw4jjNVMigAD8yGCBMy26B8n0hlHo9KJ/q02Aiz
+         bFHBxY7bAT1EgE5uF+NgmL0ofwt9z3THL4yqHcGzwU8VJrd5ry4IJ540P0x+2lRb4R6L
+         Ovo9GEBm5ZcPKVSc3QpFo7bJrlPqrq9czMbi5L4xGAErG3O7W+D1VWecm8A4DwV97Gdo
+         tiUk0ie/lII6OZuIJNOZmKfnbly/e2NAsHukOSrJ+R6MIp3n2rk0UxP87GtoLY2pbm24
+         dedw==
+X-Gm-Message-State: ACgBeo3gkBFNwKYPuyaHQqGieD+Ty1MfrMd+22CIl8/mBfZiCNBEKgYH
+        EfR71n3K4r/KuOKHl3QiF8O5Dw==
+X-Google-Smtp-Source: AA6agR4bXjThSD2dacT//3gKZ0o1hAghStfDSJzk9bLdtQvwFZwf3GzKCKzF+wm0xZ9+D0FdEn8T/Q==
+X-Received: by 2002:a05:6a00:1996:b0:52e:b0f7:8c83 with SMTP id d22-20020a056a00199600b0052eb0f78c83mr22489521pfl.59.1661881236647;
+        Tue, 30 Aug 2022 10:40:36 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id g8-20020a17090a290800b001fb398e5e6esm8754499pjd.55.2022.08.30.10.29.04
+        by smtp.gmail.com with ESMTPSA id m18-20020a170902f65200b001732a019dddsm9957288plg.174.2022.08.30.10.40.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Aug 2022 10:29:04 -0700 (PDT)
-Date:   Tue, 30 Aug 2022 17:29:00 +0000
+        Tue, 30 Aug 2022 10:40:36 -0700 (PDT)
+Date:   Tue, 30 Aug 2022 17:40:32 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Like Xu <like.xu.linux@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH RESEND v2 0/8] x86/pmu: Corner cases fixes and
- optimization
-Message-ID: <Yw5I3P4Vs5GGBtuJ@google.com>
+Subject: Re: [PATCH RESEND v2 1/8] perf/x86/core: Completely disable guest
+ PEBS via guest's global_ctrl
+Message-ID: <Yw5LkLhzTRa1Zxzb@google.com>
 References: <20220823093221.38075-1-likexu@tencent.com>
+ <20220823093221.38075-2-likexu@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220823093221.38075-1-likexu@tencent.com>
+In-Reply-To: <20220823093221.38075-2-likexu@tencent.com>
 X-Spam-Status: No, score=-14.9 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
@@ -73,29 +74,41 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, Aug 23, 2022, Like Xu wrote:
-> Good well-designed tests can help us find more bugs, especially when
-> the test steps differ from the Linux kernel behaviour in terms of the
-> timing of access to virtualized hw resources.
+> From: Like Xu <likexu@tencent.com>
 > 
-> In this patch series, there are three small optimization (006/007/008),
-> one hardware surprise (001), and most of these fixes have stepped
-> on my little toes.
+> When a guest PEBS counter is cross-mapped by a host counter, software
+> will remove the corresponding bit in the arr[global_ctrl].guest and
+> expect hardware to perform a change of state "from enable to disable"
+> via the msr_slot[] switch during the vmx transaction.
 > 
-> Please feel free to run tests, add more or share comments.
+> The real world is that if user adjust the counter overflow value small
+> enough, it still opens a tiny race window for the previously PEBS-enabled
+> counter to write cross-mapped PEBS records into the guest's PEBS buffer,
+> when arr[global_ctrl].guest has been prioritised (switch_msr_special stuff)
+> to switch into the enabled state, while the arr[pebs_enable].guest has not.
 > 
-> Previous:
-> https://lore.kernel.org/kvm/20220721103549.49543-1-likexu@tencent.com/
-> https://lore.kernel.org/kvm/20220803130124.72340-1-likexu@tencent.com/
+> Close this window by clearing invalid bits in the arr[global_ctrl].guest.
 > 
-> V2 -> V2 RESEND Changelog:
-> - The "pebs_capable" fix has been merged into tip/perf/tree tree;
-> - Move the other two AMD vPMU optimization here;
+> Fixes: 854250329c02 ("KVM: x86/pmu: Disable guest PEBS temporarily in two rare situations")
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+>  arch/x86/events/intel/core.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+> index 2db93498ff71..75cdd11ab014 100644
+> --- a/arch/x86/events/intel/core.c
+> +++ b/arch/x86/events/intel/core.c
+> @@ -4052,8 +4052,9 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
+>  		/* Disable guest PEBS if host PEBS is enabled. */
+>  		arr[pebs_enable].guest = 0;
+>  	} else {
+> -		/* Disable guest PEBS for cross-mapped PEBS counters. */
+> +		/* Disable guest PEBS thoroughly for cross-mapped PEBS counters. */
+>  		arr[pebs_enable].guest &= ~kvm_pmu->host_cross_mapped_mask;
+> +		arr[global_ctrl].guest &= ~kvm_pmu->host_cross_mapped_mask;
+>  		/* Set hw GLOBAL_CTRL bits for PEBS counter when it runs for guest */
+>  		arr[global_ctrl].guest |= arr[pebs_enable].guest;
+>  	}
 
-This is not a RESEND.  These things very much matter because I'm sitting here
-trying to figure out whether I need to review this "v2", which is really v3, or
-whether I can just review the real v2.
-
-  Don't add "RESEND" when you are submitting a modified version of your
-  patch or patch series - "RESEND" only applies to resubmission of a
-  patch or patch series which have not been modified in any way from the
-  previous submission.       
+Please post this as a separate patch to the perf folks (Cc: kvm@).
