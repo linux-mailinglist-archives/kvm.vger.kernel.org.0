@@ -2,204 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB9255A6D60
-	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 21:29:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A41D25A6D86
+	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 21:41:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230473AbiH3T3V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 15:29:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46198 "EHLO
+        id S229923AbiH3Tlx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 15:41:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229744AbiH3T3T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 15:29:19 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F37AD18F
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 12:29:17 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id y29so8257961pfq.0
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 12:29:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=p+lkmBdpbq3WAh4jvVmTQBMTdKT2FnQcs7Xr9pvsI60=;
-        b=akEYCxtSt9b3ZOoxTQ0B8rO6Fav+0KneyxKSMB7zNQyp66UA2h98ykKva6Mw6MWCOW
-         /uloT2Kf97r6jH8vDwgCfzynh2aixFbidQ1mDwWsqcoh9xIrUNP7m3aevD6ajK1r0FfF
-         H+v2rVN7V2JUnnSrZCByME6MrbdM4yZohTY1oEb02IqBKJ9IIbi3ZOVAHEB052+4jl1B
-         PS1/SR2w4MibcmQQirJ5lXNzh7uEer5m3yK7sFuE22uSyFOL1yRo2/OObnZf9OmKgY+j
-         Knq91Erbf8qIqYDZIeS0c119J6nQMdAB9ckhc8ngFWuKbOk6s3pWixAFZCVqD6YY5Q9H
-         Au9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=p+lkmBdpbq3WAh4jvVmTQBMTdKT2FnQcs7Xr9pvsI60=;
-        b=Fk17wG4jVl/f54Py9+TtRCTgABjLKT4u89MdzoZYvJSLGBjHL1WJQ/SIeQp9ijtzJn
-         UlCRygpJTrwHaZWspsKTZ4ZqHI9sxMlEnoMXZiJoX2axd7IKRu9tSECAhFmHg6JTpU0q
-         jCk/oj83UMLB/wuIWTiOQyYjpXIjsNZyNp3SsJM43R8Ity1ylPh5OhtzkUsCjgUIn4FU
-         DKvZf/GO2BkJky+OzyGYVcZ5+cEo0rTFNKtsLLPv6Ed9G17sS05pzBF1nlYAkcAvU34w
-         1TGZ1GxWoAdbM+nCcbzI/9ic+fyun/vhwZmsWnFz94u8xfIQo4wciwqfEhgUfv9eVLxw
-         gkGA==
-X-Gm-Message-State: ACgBeo2Y6ViFmTSw02CQD8ujt/hAWtwk9+ppIOyMZf104SlNelCz09zi
-        ZdCmxC+FBBw+4gIzHlQxl0WOig==
-X-Google-Smtp-Source: AA6agR7OoMeNnpkcsyUOySp9SJadQ8cuMnR9d1pAaLm8fRo7GWGTLR05tAwuzIc9NOUvGLV6NJ9rsw==
-X-Received: by 2002:a05:6a00:4147:b0:52d:fe84:2614 with SMTP id bv7-20020a056a00414700b0052dfe842614mr23250897pfb.10.1661887757374;
-        Tue, 30 Aug 2022 12:29:17 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id im23-20020a170902bb1700b00172bd84c8b4sm10053121plb.98.2022.08.30.12.29.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Aug 2022 12:29:16 -0700 (PDT)
-Date:   Tue, 30 Aug 2022 19:29:13 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Wonhyuk Yang <vvghjk1234@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Baik Song An <bsahn@etri.re.kr>,
-        Hong Yeon Kim <kimhy@etri.re.kr>,
-        Taeung Song <taeung@reallinux.co.kr>, linuxgeek@linuxgeek.io,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: Add extra information in kvm_page_fault trace point
-Message-ID: <Yw5lCY5/SOmFGQrK@google.com>
-References: <20220510071001.87169-1-vvghjk1234@gmail.com>
+        with ESMTP id S229513AbiH3Tlw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 15:41:52 -0400
+Received: from out1.migadu.com (out1.migadu.com [IPv6:2001:41d0:2:863f::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0E8672B4A
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 12:41:50 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1661888508;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=SDzXqDxM55ayeb7XSHm97qt3/HgukfVMRYvpXvq6Bww=;
+        b=KjHTgycPeLozF1oPcoStTE5XQnoDeutqMeTI88Rj2BL8ySz7NJ14eEnaNkfD9smQMKTIXH
+        xh1j6f0tKODpAB6AYTuXEWV46HdbUZuvuKzQOkVvlQMgLV48QK2PeNwnRBIX0fuKKmQ0XB
+        53WH0jRq95s5ezrF0qWW95D5dah15Rg=
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Gavin Shan <gshan@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH 00/14] KVM: arm64: Parallel stage-2 fault handling
+Date:   Tue, 30 Aug 2022 19:41:18 +0000
+Message-Id: <20220830194132.962932-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220510071001.87169-1-vvghjk1234@gmail.com>
-X-Spam-Status: No, score=-14.9 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,FSL_HELO_FAKE,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, May 10, 2022, Wonhyuk Yang wrote:
-> Currently, kvm_page_fault trace point provide fault_address and error
-> code. However it is not enough to find which cpu and instruction
-> cause kvm_page_faults. So add vcpu id and instruction pointer in
-> kvm_page_fault trace point.
-> 
-> Cc: Baik Song An <bsahn@etri.re.kr>
-> Cc: Hong Yeon Kim <kimhy@etri.re.kr>
-> Cc: Taeung Song <taeung@reallinux.co.kr>
-> Cc: linuxgeek@linuxgeek.io
-> Signed-off-by: Wonhyuk Yang <vvghjk1234@gmail.com>
-> ---
+Presently KVM only takes a read lock for stage 2 faults if it believes
+the fault can be fixed by relaxing permissions on a PTE (write unprotect
+for dirty logging). Otherwise, stage 2 faults grab the write lock, which
+predictably can pile up all the vCPUs in a sufficiently large VM.
 
-Patch is good, some tangentially related FYI comments below.
+Like the TDP MMU for x86, this series loosens the locking around
+manipulations of the stage 2 page tables to allow parallel faults. RCU
+and atomics are exploited to safely build/destroy the stage 2 page
+tables in light of multiple software observers.
 
-> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-> index e3a24b8f04be..78d20d392904 100644
-> --- a/arch/x86/kvm/trace.h
-> +++ b/arch/x86/kvm/trace.h
-> @@ -383,20 +383,26 @@ TRACE_EVENT(kvm_inj_exception,
->   * Tracepoint for page fault.
->   */
->  TRACE_EVENT(kvm_page_fault,
-> -	TP_PROTO(unsigned long fault_address, unsigned int error_code),
-> -	TP_ARGS(fault_address, error_code),
-> +	TP_PROTO(struct kvm_vcpu *vcpu, unsigned long fault_address,
-> +		 unsigned int error_code),
-> +	TP_ARGS(vcpu, fault_address, error_code),
->  
->  	TP_STRUCT__entry(
-> +		__field(	unsigned int,	vcpu_id		)
-> +		__field(	unsigned long,	guest_rip	)
->  		__field(	unsigned long,	fault_address	)
->  		__field(	unsigned int,	error_code	)
+Patches 1-2 are a cleanup to the way we collapse page tables, with the
+added benefit of narrowing the window of time a range of memory is
+unmapped.
 
-This tracepoint is comically bad.  The address should be a u64 since GPAs can be
-64 bits even on 32-bit hosts.  Ditto for error_code since #NPF has 64-bit error
-codes.
+Patches 3-7 are minor cleanups and refactorings to the way KVM reads
+PTEs and traverses the stage 2 page tables to make it amenable to
+concurrent modification.
 
->  	),
->  
->  	TP_fast_assign(
-> +		__entry->vcpu_id	= vcpu->vcpu_id;
-> +		__entry->guest_rip	= kvm_rip_read(vcpu);
->  		__entry->fault_address	= fault_address;
->  		__entry->error_code	= error_code;
->  	),
->  
-> -	TP_printk("address %lx error_code %x",
-> +	TP_printk("vcpu %u rip 0x%lx address 0x%lx error_code %x",
+Patches 8-9 use RCU to punt page table cleanup out of the vCPU fault
+path, which should also improve fault latency a bit.
 
-And here the error code needs a "0x" prefix, especially since the majority of error
-codes end up being valid decimal values, e.g. 182, 184, 181.
+Patches 10-14 implement the meat of this series, extending the
+'break-before-make' sequence with atomics to realize locking on PTEs.
+Effectively a cmpxchg() is used to 'break' a PTE, thereby serializing
+changes to a given PTE.
 
-I also think it makes sense to force "address" to pad to 16, but not the others.
-Padding error_code is wasteful most of the time, and I actually like that user vs.
-kernel addresses and up with different formatting as it makes it trivial to see
-where the fault originated (when running "real" guests).
+Finally, patch 15 flips the switch on all the new code and starts
+grabbing the read side of the MMU lock for stage 2 faults.
 
-       CPU 5/KVM-4145    [002] .....    86.581928: kvm_page_fault: vcpu 5 rip 0x7f08a4602116 address 0x0000000113600002 error_code 0x181
-       CPU 7/KVM-4150    [001] .....    86.581936: kvm_page_fault: vcpu 7 rip 0xffffffff81511f37 address 0x0000000113674000 error_code 0x182
-       CPU 5/KVM-4145    [002] .....    86.582585: kvm_page_fault: vcpu 5 rip 0xffffffff81040f72 address 0x00000000fee000b0 error_code 0x182
-       CPU 1/KVM-4136    [006] .....    86.588913: kvm_page_fault: vcpu 1 rip 0xffffffff81511ba7 address 0x0000000111400000 error_code 0x182
-       CPU 6/KVM-4146    [001] .....    86.594913: kvm_page_fault: vcpu 6 rip 0xffffffff81040f72 address 0x00000000fee000b0 error_code 0x182
-       CPU 5/KVM-4145    [002] .....    86.595872: kvm_page_fault: vcpu 5 rip 0x7f08a4602116 address 0x0000000113810002 error_code 0x181
-       CPU 5/KVM-4145    [002] .....    86.603341: kvm_page_fault: vcpu 5 rip 0x7f08a4602116 address 0x0000000113a00002 error_code 0x181
+Applies to 6.0-rc3. Tested with KVM selftests and benchmarked with
+dirty_log_perf_test, scaling from 1 to 48 vCPUs with 4GB of memory per
+vCPU backed by THP.
 
-All in all, what about me adding this on top?
+  ./dirty_log_perf_test -s anonymous_thp -m 2 -b 4G -v ${NR_VCPUS}
 
----
-From: Sean Christopherson <seanjc@google.com>
-Date: Tue, 30 Aug 2022 12:26:24 -0700
-Subject: [PATCH] KVM: x86: Use u64 for address and error code in page fault
- tracepoint
+Time to dirty memory:
 
-Track the address and error code as 64-bit values in the page fault
-tracepoint.  When TDP is enabled, the address is a GPA and thus can be a
-64-bit value even on 32-bit hosts.  And SVM's #NPF genereates 64-bit
-error codes.
+        +-------+---------+------------------+
+        | vCPUs | 6.0-rc3 | 6.0-rc3 + series |
+        +-------+---------+------------------+
+        |     1 | 0.89s   | 0.92s            |
+        |     2 | 1.13s   | 1.18s            |
+        |     4 | 2.42s   | 1.25s            |
+        |     8 | 5.03s   | 1.36s            |
+        |    16 | 8.84s   | 2.09s            |
+        |    32 | 19.60s  | 4.47s            |
+        |    48 | 31.39s  | 6.22s            |
+        +-------+---------+------------------+
 
-Opportunistically clean up the formatting.
+It is also worth mentioning that the time to populate memory has
+improved:
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/trace.h | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+        +-------+---------+------------------+
+        | vCPUs | 6.0-rc3 | 6.0-rc3 + series |
+        +-------+---------+------------------+
+        |     1 | 0.19s   | 0.18s            |
+        |     2 | 0.25s   | 0.21s            |
+        |     4 | 0.38s   | 0.32s            |
+        |     8 | 0.64s   | 0.40s            |
+        |    16 | 1.22s   | 0.54s            |
+        |    32 | 2.50s   | 1.03s            |
+        |    48 | 3.88s   | 1.52s            |
+        +-------+---------+------------------+
 
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index 331bdb0ae4b1..c369ebc7269c 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -394,15 +394,14 @@ TRACE_EVENT(kvm_inj_exception,
-  * Tracepoint for page fault.
-  */
- TRACE_EVENT(kvm_page_fault,
--	TP_PROTO(struct kvm_vcpu *vcpu, unsigned long fault_address,
--		 unsigned int error_code),
-+	TP_PROTO(struct kvm_vcpu *vcpu, u64 fault_address, u64 error_code),
- 	TP_ARGS(vcpu, fault_address, error_code),
+RFC: https://lore.kernel.org/kvmarm/20220415215901.1737897-1-oupton@google.com/
 
- 	TP_STRUCT__entry(
- 		__field(	unsigned int,	vcpu_id		)
- 		__field(	unsigned long,	guest_rip	)
--		__field(	unsigned long,	fault_address	)
--		__field(	unsigned int,	error_code	)
-+		__field(	u64,		fault_address	)
-+		__field(	u64,		error_code	)
- 	),
+RFC -> v1:
+ - Factored out page table teardown from kvm_pgtable_stage2_map()
+ - Use the RCU callback to tear down a subtree, instead of scheduling a
+   callback for every individual table page.
+ - Reorganized series to (hopefully) avoid intermediate breakage.
+ - Dropped the use of page headers, instead stuffing KVM metadata into
+   page::private directly
 
- 	TP_fast_assign(
-@@ -412,7 +411,7 @@ TRACE_EVENT(kvm_page_fault,
- 		__entry->error_code	= error_code;
- 	),
+Oliver Upton (14):
+  KVM: arm64: Add a helper to tear down unlinked stage-2 subtrees
+  KVM: arm64: Tear down unlinked stage-2 subtree after break-before-make
+  KVM: arm64: Directly read owner id field in stage2_pte_is_counted()
+  KVM: arm64: Read the PTE once per visit
+  KVM: arm64: Split init and set for table PTE
+  KVM: arm64: Return next table from map callbacks
+  KVM: arm64: Document behavior of pgtable visitor callback
+  KVM: arm64: Protect page table traversal with RCU
+  KVM: arm64: Free removed stage-2 tables in RCU callback
+  KVM: arm64: Atomically update stage 2 leaf attributes in parallel
+    walks
+  KVM: arm64: Make changes block->table to leaf PTEs parallel-aware
+  KVM: arm64: Make leaf->leaf PTE changes parallel-aware
+  KVM: arm64: Make table->block changes parallel-aware
+  KVM: arm64: Handle stage-2 faults in parallel
 
--	TP_printk("vcpu %u rip 0x%lx address 0x%lx error_code %x",
-+	TP_printk("vcpu %u rip 0x%lx address 0x%016llx error_code 0x%llx",
- 		  __entry->vcpu_id, __entry->guest_rip,
- 		  __entry->fault_address, __entry->error_code)
- );
+ arch/arm64/include/asm/kvm_pgtable.h  |  59 ++++-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c |   7 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c       |   4 +-
+ arch/arm64/kvm/hyp/pgtable.c          | 360 ++++++++++++++++----------
+ arch/arm64/kvm/mmu.c                  |  65 +++--
+ 5 files changed, 325 insertions(+), 170 deletions(-)
 
-base-commit: ca362851673d7c01c6624fff0f5a4ee192e6e56a
---
+
+base-commit: b90cb1053190353cc30f0fef0ef1f378ccc063c5
+-- 
+2.37.2.672.g94769d06f0-goog
 
