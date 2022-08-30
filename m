@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32BDC5A6CB0
-	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 21:02:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BD635A6CB1
+	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 21:02:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230082AbiH3TCQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 15:02:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54090 "EHLO
+        id S230112AbiH3TCf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 15:02:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229658AbiH3TCN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 15:02:13 -0400
-Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 463115F22A
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 12:02:12 -0700 (PDT)
-Received: by mail-il1-x149.google.com with SMTP id i13-20020a056e02152d00b002e97839ff00so8944853ilu.15
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 12:02:12 -0700 (PDT)
+        with ESMTP id S230098AbiH3TCe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 15:02:34 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC18D5E326
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 12:02:32 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-33d9f6f4656so188043417b3.21
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 12:02:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
          :cc;
-        bh=PfjwHn1bJsvfyD146B3GFr85bVvbp9LW+rqSccI+EoM=;
-        b=ElDhTSCMq6kMQomTtJ1Mju9JnTSMEI0p2mPR3t79NDcdZJg1x1OGHthQhiyrnDdQ8D
-         Csl6WVuAgXyjyplnLpI5jJK1+yIQgGHRd3pZmd8N05fdjv0oXzPgJHgcpVJDLQMi2zrd
-         XrrbJqFBS2erZkOP5hc0fhp5XX49SoYmmyPP2h4brqz3UlYG7K7CbLcA3zm3Oev1ECYe
-         JlAqs2p1dAuehjJwsJUTN6wniKt4y3LfvktEGfbTxhT0dSnja8QNQIZ+0jI5Dw1WNevZ
-         HO9XmMzVtBd63vQOvUM7/xjClbljhd6kPSCkKGxIojdlMnTs/0BxksByHS3R2OtofAB9
-         5xIQ==
+        bh=g9fHXRQMjR1WftTF0Pm4Vs2SJMWfpbzJ6q7WYa79n+I=;
+        b=JLH7lKBfePsfrglOvQ2HP0oY4AxeJa8QDowxrEDfRLI6kG/axJlipsOAyw9AbowhSq
+         WrDmAd5/bJbyctVgqRiHKtghPnkdEDWhUQvtUEdHmBZriTUgV7FJZbOAgBB7ToMiQm6Z
+         4p8z/A4j7e8OnmG0/1O5xnKRZmogeXxO0heDQahdOq5wRwT29PgIszI5FAE7gEsfJlN3
+         yDa+VxSvCAStnNGQ5FJ73DeLmaYSb1Z5CuUYWDTi16WiZ9HJexzu+ptGkcCOEyS718fj
+         NZPoc4DGjpSR694EDzq4XtzOtYzkXqm3wOyqpCaUdswtR712L0akQxzFXxcjaDrTE9we
+         w7Xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc;
-        bh=PfjwHn1bJsvfyD146B3GFr85bVvbp9LW+rqSccI+EoM=;
-        b=3SasXjx0tOioV13ZjXAYFTu6u3rM/kzoz4s+GQay6W5hzAAKKuuxmUegOyXczweprp
-         ymXCUvAq1Buv8JRrc+Nog4MoN0rXZWKRc77i1isQM1WEhHEW+VcP6eb3Q2FoUSlfRK3Y
-         CWJBUwOosrF1HjHT7NONZCnNBBdoUoCCuVmPb4YfSabwa6IytxHLov8LINW50cK70irq
-         tQNohQz47rKTAsWIaVbmLy8WhconjnmVQC3i21R9SFqH4Hz74XXxCpdiPWtUnkwtSXYI
-         iv5InfrT9hTOIht082zUM1OWEEJHTKwXMZ+Y3xKtXC79c7lY+Fz/vPgUyGcKUrzlZcQ/
-         i/vg==
-X-Gm-Message-State: ACgBeo1DTiWoT7yLEZoMkQj8QAw9TkuAcacJw7S1UlPBbJOLqJgBxVP0
-        myQgn59aRzAvQ50u9VbEtLXguta3ebMXOCgTsg==
-X-Google-Smtp-Source: AA6agR6TsUwYUmt5+Q3y/EmIPq3RHm1ER0Yg2nGHZBBdDBw8tdLg8tnQ+wNNHe+0Ky1NaJdgBJwjx61o22y6XQCK2g==
+        bh=g9fHXRQMjR1WftTF0Pm4Vs2SJMWfpbzJ6q7WYa79n+I=;
+        b=tHm8nk0GT3na+m8UK4zvxjVFkMJ2XGF7VBsX44dRgKCXwmKeSR3Q5wMw64byThlB2+
+         m/zUG8QwRRW7QcsDFZhAGo4pDxH/LhEnr59pGkuMBmsQgYLewcwIexNdTCZbquIP8afU
+         /eDzWrpHubHIfnRyI2mhxNKeFgGFYFb7P2/k290mEN1IUockNaEs6hJl0o4sJGmwdgal
+         MR7kqmQ5rP1KHniprxEM5ly9mzkqR9TKMqwcC6z2mBM+JoJt94aGfoXLhoXf5Oim4qVK
+         01lfPa6/3DtAYAfKtonSN6hjtqm40/vejmmkToe0UAOy3P6aVvPykdGEluVCbxshMRQJ
+         Y74Q==
+X-Gm-Message-State: ACgBeo2rdghcdRXaQqWpVn94xndI5pk/Wu651VQCSr/mGhlZr6yNfgiD
+        eRq0FBBKGZv7jyNzT3F+VZ+Qr/OGx0wuhw/8iA==
+X-Google-Smtp-Source: AA6agR6ykG8d45Ks/qTR6H/S7+HK1XSqEaPyvYIwAMk22mnFVplimzAxSy6ucXyKJ4saux1dkzwOQvJHNIe+6d48eQ==
 X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6602:1554:b0:688:87a6:e1a4 with
- SMTP id h20-20020a056602155400b0068887a6e1a4mr11468340iow.49.1661886131658;
- Tue, 30 Aug 2022 12:02:11 -0700 (PDT)
-Date:   Tue, 30 Aug 2022 19:02:10 +0000
-In-Reply-To: <YwlFcGn4w34uXPQd@google.com> (message from David Matlack on Fri,
- 26 Aug 2022 15:13:04 -0700)
+ (user=coltonlewis job=sendgmr) by 2002:a25:741:0:b0:696:4b8c:956 with SMTP id
+ 62-20020a250741000000b006964b8c0956mr12253220ybh.266.1661886152061; Tue, 30
+ Aug 2022 12:02:32 -0700 (PDT)
+Date:   Tue, 30 Aug 2022 19:02:31 +0000
+In-Reply-To: <YwlHJnZORkp2XRmJ@google.com> (message from David Matlack on Fri,
+ 26 Aug 2022 15:20:22 -0700)
 Mime-Version: 1.0
-Message-ID: <gsntilm9wo5p.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v2 2/3] KVM: selftests: Randomize which pages are written
- vs read.
+Message-ID: <gsnth71two54.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v2 3/3] KVM: selftests: Randomize page access order.
 From:   Colton Lewis <coltonlewis@google.com>
 To:     David Matlack <dmatlack@google.com>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
@@ -69,46 +68,28 @@ X-Mailing-List: kvm@vger.kernel.org
 
 David Matlack <dmatlack@google.com> writes:
 
-> On Wed, Aug 17, 2022 at 09:41:45PM +0000, Colton Lewis wrote:
->> Randomize which tables are written vs read using the random number
->> arrays. Change the variable wr_fract and associated function calls to
->> write_percent that now operates as a percentage from 0 to 100 where X
->> means each page has an X% chance of being written. Change the -f
->> argument to -w to reflect the new variable semantics. Keep the same
->> default of 100 percent writes.
+> On Wed, Aug 17, 2022 at 09:41:46PM +0000, Colton Lewis wrote:
+>> @@ -271,6 +272,9 @@ static void run_test(enum vm_guest_mode mode, void  
+>> *arg)
+>>   	pr_info("Enabling dirty logging time: %ld.%.9lds\n\n",
+>>   		ts_diff.tv_sec, ts_diff.tv_nsec);
 
-> Doesn't the new option cause like a 1000x slowdown in "Dirty memory
-> time"?  I don't think we should merge this until that is understood and
-> addressed (and it should be at least called out here so that reviewers
-> can be made aware).
+>> +	/* Set random access here, after population phase. */
+>> +	perf_test_set_random_access(vm, p->random_access);
 
+> Optional suggestion: We don't have any use-case for disabling random
+> access, so perhaps this would be simpler as:
 
-I'm guessing you got that from my internally posted tests. This option
-itself does not cause the slowdown. If this option is set to 0% or 100%
-(the default), there is no slowdown at all. The slowdown I measured was
-at 50%, probably because that makes branch prediction impossible because
-it has an equal chance of doing a read or a write each time. This is a
-good thing. It's much more realistic than predictably alternating read
-and write.
+>    if (p->random_access)
+>            perf_test_enable_random_access(vm);
 
-I can see this would be worth mentioning.
+> And then:
 
->> @@ -433,10 +434,11 @@ int main(int argc, char *argv[])
->>   		case 'b':
->>   			guest_percpu_mem_size = parse_size(optarg);
->>   			break;
->> -		case 'f':
->> -			p.wr_fract = atoi(optarg);
->> -			TEST_ASSERT(p.wr_fract >= 1,
->> -				    "Write fraction cannot be less than one");
->> +		case 'w':
->> +			perf_test_args.write_percent = atoi(optarg);
->> +			TEST_ASSERT(perf_test_args.write_percent >= 0
->> +				    && perf_test_args.write_percent <= 100,
->> +				    "Write percentage must be between 0 and 100");
-
-> perf_test_create_vm() overwrites this with 100. Did you mean
-> p.write_percent?
+>    void perf_test_enable_random_access(struct kvm_vm *vm)
+>    {
+>            perf_test_args.random_access = true;
+>            sync_global_to_guest(vm, perf_test_args);
+>    }
 
 
-I did.
+I don't think it's simpler and it's less flexible.
