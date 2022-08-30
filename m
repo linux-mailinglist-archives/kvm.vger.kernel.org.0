@@ -2,60 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EAB95A5EEC
-	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 11:11:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 375AF5A5F58
+	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 11:26:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230474AbiH3JK6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 05:10:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38372 "EHLO
+        id S231818AbiH3J0k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 05:26:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230056AbiH3JKz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 05:10:55 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B09597B11;
-        Tue, 30 Aug 2022 02:10:53 -0700 (PDT)
+        with ESMTP id S231790AbiH3J0d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 05:26:33 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4AD3D86D1;
+        Tue, 30 Aug 2022 02:26:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661850653; x=1693386653;
+  t=1661851591; x=1693387591;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=dZmopdiMcPjPfcsZ0W9MJ5yhsH0VEN58f6Mq1jkLDIE=;
-  b=ksZWj1xBTJeMmne83uZXTgsz34IcFQQnhQT88jsVlqGU6pZoDsL081dQ
-   7lkDuXbir8IB5c68glvJVUzoZU8m2uz5YS0Et9nCy5IhU8uZ9T2CHmyVF
-   tzf45q3cKjqRi5EHqvE0ZFI0wH0LxKSfrHjKq+3gxpGiJ4+pV6D1JKDxl
-   CgctL5f3lQ+FekmfTNLspjNgCtQ4JGXMZ6SB9LYcn8PuoOs7EmRuTEftk
-   kdj2+Sk1J+XEk7aNC7uAFUUCPflkGxQQAcC6kEPHzS/pM7VfU4WJYIkTD
-   4fnfdFxcoZGm9wCMxefjgGUR7N2eScXqfvbHhzxv7XlXyU61gGOapc4Wm
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10454"; a="321253896"
+  bh=yCWYSMqigSyE57DfRG6ddCpuzq/kzzgVQql2z0Dcpo4=;
+  b=dweFlS8OjpZJqud/BHp6NHDuceYxjzZHxp+TRtacvSySTRC3yObbwa5Z
+   WW3qSf8RHBv0FIiTy6uVcbG/HtrnMt8GmLRQGWRwivUbRx53GtIBAaWgj
+   6PiWYZlCdGFrGKGddCobk3uQaXfUjgdzmGrsG8aapyhed8S7EnG/Gqk2R
+   JEmJ29G+9IVuJVdZJvdMK0Dk9DW/2HqhPJYCDM3GipdKuYAMUfsCLWnEe
+   jzdB6ntJcZudaSed0vml/ArY+EcVZvcxQHorEwdD+FaoP4BV3issgyvV9
+   AaGCOszJBIsuy+ebRGjT8eOw4z/GEfwa/w8/+y4AHkYE1ZgVhI497b6UH
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10454"; a="296407798"
 X-IronPort-AV: E=Sophos;i="5.93,274,1654585200"; 
-   d="scan'208";a="321253896"
+   d="scan'208";a="296407798"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2022 02:10:53 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2022 02:26:30 -0700
 X-IronPort-AV: E=Sophos;i="5.93,274,1654585200"; 
-   d="scan'208";a="641295186"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.249.172.100]) ([10.249.172.100])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2022 02:10:51 -0700
-Message-ID: <55d18e94-c9a5-7425-1ed0-898ad0745928@linux.intel.com>
-Date:   Tue, 30 Aug 2022 17:10:49 +0800
+   d="scan'208";a="641301004"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.255.29.86]) ([10.255.29.86])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2022 02:26:28 -0700
+Message-ID: <6064e98c-7229-f982-2b23-37d8f2d40607@intel.com>
+Date:   Tue, 30 Aug 2022 17:26:24 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.1.2
-Subject: Re: [PATCH v8 027/103] KVM: TDX: Do TDX specific vcpu initialization
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.12.0
+Subject: Re: [PATCH v8 020/103] KVM: TDX: create/destroy VM structure
+Content-Language: en-US
+To:     Binbin Wu <binbin.wu@linux.intel.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>
 References: <cover.1659854790.git.isaku.yamahata@intel.com>
- <c02d3a975e984fadb02673fe7fc234bd251f858b.1659854790.git.isaku.yamahata@intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <c02d3a975e984fadb02673fe7fc234bd251f858b.1659854790.git.isaku.yamahata@intel.com>
+ <810ce6dbd0330f06a80e05afa0a068b5f5b332f3.1659854790.git.isaku.yamahata@intel.com>
+ <bd9ae0af-47de-c8ea-3880-a98fed2de48d@linux.intel.com>
+ <20220829190921.GA2700446@ls.amr.corp.intel.com>
+ <6704f880-14ed-b8e8-4204-ac0d8afef5ef@linux.intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <6704f880-14ed-b8e8-4204-ac0d8afef5ef@linux.intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -63,224 +68,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 8/30/2022 4:57 PM, Binbin Wu wrote:
+> 
+> On 2022/8/30 3:09, Isaku Yamahata wrote:
+>>
+>>>> +}
+>>>> +
+>>>> +static int tdx_reclaim_page(unsigned long va, hpa_t pa, bool do_wb, 
+>>>> u16 hkid)
+>>>> +{
+>>>> +    struct tdx_module_output out;
+>>>> +    u64 err;
+>>>> +
+>>>> +    err = tdh_phymem_page_reclaim(pa, &out);
+>>>> +    if (WARN_ON_ONCE(err)) {
+>>>> +        pr_tdx_error(TDH_PHYMEM_PAGE_RECLAIM, err, &out);
+>>>> +        return -EIO;
+>>>> +    }
+>>>> +
+>>>> +    if (do_wb) {
+>>>> +        err = tdh_phymem_page_wbinvd(set_hkid_to_hpa(pa, hkid));
+>>>> +        if (WARN_ON_ONCE(err)) {
+>>>> +            pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err, NULL);
+>>>> +            return -EIO;
+>>>> +        }
+>>>> +    }
+>>>> +
+>>>> +    tdx_clear_page(va);
+>>> Is it really necessary to clear the reclaimed page using MOVDIR64?
+>>>
+>>> According to the TDX module spec,  when add a page to TD, both for 
+>>> control
+>>> structures and TD private memory, during the process some function of 
+>>> the
+>>> TDX module will initialize the page using binding hkid and direct write
+>>> (MOVDIR64B).
+>>>
+>>> So still need to clear the page using direct write to avoid integrity 
+>>> error
+>>> when re-assign one page from old keyid to a new keyid as you 
+>>> mentioned in
+>>> the comment?
+>> Yes. As you described above, TDX module does when assining a page to a 
+>> private
+>> hkid. i.e. TDH.MEM.PAGE.{ADD, AUG}.  But when re-assigning a page from 
+>> an old
+>> private hkid to a new _shared_ hkid, i.e. TDH.MEM.PAGE.REMOVE or
+>> TDH.PHYMEM.PAGE.RECLAIM, TDX module doesn't.
+> 
+> Is the reason you added the tdx_clear_page() here due to the description 
+> in 1.3.1 of Intel CPU Architectural Extensions Specification for TDX 
+> (343754-002US)?
 
-On 2022/8/8 6:01, isaku.yamahata@intel.com wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
->
-> TD guest vcpu need to be configured before ready to run which requests
-> addtional information from Device model (e.g. qemu), one 64bit value is
-> passed to vcpu's RCX as an initial value.  Repurpose KVM_MEMORY_ENCRYPT_OP
-> to vcpu-scope and add new sub-commands KVM_TDX_INIT_VCPU under it for such
-> additional vcpu configuration.
->
-> Add callback for kvm vCPU-scoped operations of KVM_MEMORY_ENCRYPT_OP and
-> add a new subcommand, KVM_TDX_INIT_VCPU, for further vcpu initialization.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->   arch/x86/include/asm/kvm-x86-ops.h    |  1 +
->   arch/x86/include/asm/kvm_host.h       |  1 +
->   arch/x86/include/uapi/asm/kvm.h       |  1 +
->   arch/x86/kvm/vmx/main.c               |  9 +++++++
->   arch/x86/kvm/vmx/tdx.c                | 36 +++++++++++++++++++++++++++
->   arch/x86/kvm/vmx/tdx.h                |  4 +++
->   arch/x86/kvm/vmx/x86_ops.h            |  2 ++
->   arch/x86/kvm/x86.c                    |  6 +++++
->   tools/arch/x86/include/uapi/asm/kvm.h |  1 +
->   9 files changed, 61 insertions(+)
->
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index d8d48a8f602c..de392bee9159 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -119,6 +119,7 @@ KVM_X86_OP(leave_smm)
->   KVM_X86_OP(enable_smi_window)
->   KVM_X86_OP_OPTIONAL(dev_mem_enc_ioctl)
->   KVM_X86_OP_OPTIONAL(mem_enc_ioctl)
-> +KVM_X86_OP_OPTIONAL(vcpu_mem_enc_ioctl)
->   KVM_X86_OP_OPTIONAL(mem_enc_register_region)
->   KVM_X86_OP_OPTIONAL(mem_enc_unregister_region)
->   KVM_X86_OP_OPTIONAL(vm_copy_enc_context_from)
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 8131256e69ff..e856abbe80ab 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1613,6 +1613,7 @@ struct kvm_x86_ops {
->   
->   	int (*dev_mem_enc_ioctl)(void __user *argp);
->   	int (*mem_enc_ioctl)(struct kvm *kvm, void __user *argp);
-> +	int (*vcpu_mem_enc_ioctl)(struct kvm_vcpu *vcpu, void __user *argp);
->   	int (*mem_enc_register_region)(struct kvm *kvm, struct kvm_enc_region *argp);
->   	int (*mem_enc_unregister_region)(struct kvm *kvm, struct kvm_enc_region *argp);
->   	int (*vm_copy_enc_context_from)(struct kvm *kvm, unsigned int source_fd);
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index 97ce34d746af..3cd723b7e2cf 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -539,6 +539,7 @@ struct kvm_pmu_event_filter {
->   enum kvm_tdx_cmd_id {
->   	KVM_TDX_CAPABILITIES = 0,
->   	KVM_TDX_INIT_VM,
-> +	KVM_TDX_INIT_VCPU,
->   
->   	KVM_TDX_CMD_NR_MAX,
->   };
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index 4f4ed4ad65a7..ce12cc8276ef 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -113,6 +113,14 @@ static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
->   	return tdx_vm_ioctl(kvm, argp);
->   }
->   
-> +static int vt_vcpu_mem_enc_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
-> +{
-> +	if (!is_td_vcpu(vcpu))
-> +		return -EINVAL;
-> +
-> +	return tdx_vcpu_ioctl(vcpu, argp);
-> +}
-> +
->   struct kvm_x86_ops vt_x86_ops __initdata = {
->   	.name = "kvm_intel",
->   
-> @@ -255,6 +263,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->   
->   	.dev_mem_enc_ioctl = tdx_dev_ioctl,
->   	.mem_enc_ioctl = vt_mem_enc_ioctl,
-> +	.vcpu_mem_enc_ioctl = vt_vcpu_mem_enc_ioctl,
->   };
->   
->   struct kvm_x86_init_ops vt_init_ops __initdata = {
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index ee682a65b233..37272fe1e69f 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -69,6 +69,11 @@ static inline bool is_hkid_assigned(struct kvm_tdx *kvm_tdx)
->   	return kvm_tdx->hkid > 0;
->   }
->   
-> +static inline bool is_td_finalized(struct kvm_tdx *kvm_tdx)
-> +{
-> +	return kvm_tdx->finalized;
-> +}
-> +
->   static void tdx_clear_page(unsigned long page)
->   {
->   	const void *zero_page = (const void *) __va(page_to_phys(ZERO_PAGE(0)));
-> @@ -784,6 +789,37 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
->   	return r;
->   }
->   
-> +int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
-> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
-> +	struct kvm_tdx_cmd cmd;
-> +	u64 err;
-> +
-> +	if (tdx->vcpu_initialized)
-> +		return -EINVAL;
-> +
-> +	if (!is_td_initialized(vcpu->kvm) || is_td_finalized(kvm_tdx))
-> +		return -EINVAL;
-> +
-> +	if (copy_from_user(&cmd, argp, sizeof(cmd)))
-> +		return -EFAULT;
-> +
-> +	if (cmd.error || cmd.unused)
-> +		return -EINVAL;
-> +	if (cmd.flags || cmd.id != KVM_TDX_INIT_VCPU)
-> +		return -EINVAL;
-> +
-> +	err = tdh_vp_init(tdx->tdvpr.pa, cmd.data);
-> +	if (WARN_ON_ONCE(err)) {
-> +		pr_tdx_error(TDH_VP_INIT, err, NULL);
-> +		return -EIO;
-> +	}
-> +
-> +	tdx->vcpu_initialized = true;
-> +	return 0;
-> +}
-> +
->   int __init tdx_module_setup(void)
->   {
->   	const struct tdsysinfo_struct *tdsysinfo;
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index 3b34dfdbc699..91961d4f4b65 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -25,6 +25,8 @@ struct kvm_tdx {
->   	u64 xfam;
->   	int hkid;
->   
-> +	bool finalized;
-> +
->   	u64 tsc_offset;
->   };
->   
-> @@ -34,6 +36,8 @@ struct vcpu_tdx {
->   	struct tdx_td_page tdvpr;
->   	struct tdx_td_page *tdvpx;
->   
-> +	bool vcpu_initialized;
-> +
->   	/*
->   	 * Dummy to make pmu_intel not corrupt memory.
->   	 * TODO: Support PMU for TDX.  Future work.
-> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-> index b98bbcd9ef42..b4ffa1590d41 100644
-> --- a/arch/x86/kvm/vmx/x86_ops.h
-> +++ b/arch/x86/kvm/vmx/x86_ops.h
-> @@ -143,6 +143,7 @@ void tdx_vcpu_free(struct kvm_vcpu *vcpu);
->   void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
->   
->   int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
-> +int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
->   #else
->   static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return 0; }
->   static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
-> @@ -159,6 +160,7 @@ static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
->   static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
->   
->   static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
-> +static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
->   #endif
->   
->   #endif /* __KVM_X86_VMX_X86_OPS_H */
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index f0784f506a16..702012f56502 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5901,6 +5901,12 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->   	case KVM_SET_DEVICE_ATTR:
->   		r = kvm_vcpu_ioctl_device_attr(vcpu, ioctl, argp);
->   		break;
-> +	case KVM_MEMORY_ENCRYPT_OP:
-> +		r = -ENOTTY;
-> +		if (!kvm_x86_ops.vcpu_mem_enc_ioctl)
-> +			goto out;
-> +		r = kvm_x86_ops.vcpu_mem_enc_ioctl(vcpu, argp);
+NO. The purpose of tdx_clear_page() is to update the HKID associated 
+with the memory to 0. Otherwise the page cannot be used for host/KVM. 
+Because the cacheline is still associated with a TD HKID, and it will 
+get TD-bit mismatch when host accesses it without MOVDIR64B to update 
+the HKID.
 
-In previous 2 added ioctl handing, static_call is used, is this one 
-different for a reason?
+> The description as following:
+> "MKTME on an SOC that supports SEAM might support an integrity 
+> protected, memory encryption mode. When using keys with integrity 
+> enabled, the MKTME associates a message authentication code (MAC) with 
+> each cache line. By design, when reading a cache line using a KeyID with 
+> integrity enabled, if the MAC stored in the metadata does not match the 
+> MAC regenerated by the MKTME, then the cache line is marked poisoned to 
+> prevent the data from being consumed. Integrity protected memory must be 
+> initialized before being read, and such initialization must be performed 
+> using 64-bytes direct-store with 64-byte write atomicity using the 
+> MOVDIR64B instruction"
+> 
+> Actually I have a question about the description,  does the 
+> initialization using MOVDIR64B must associated with the according hkid?
+> 
 
+MOVDIR64B is just an instruction to write memory. What HKID is used 
+depends on your purpose. When TDX module tries to initialize the private 
+memory for TDs, TD's HKID is embedded into the PA. When host kernel/KVM 
+tries to reclaim the memory from TD, it needs to embed HKID 0 into PA to 
+clear the page.
 
-
-> +		break;
->   	default:
->   		r = -EINVAL;
->   	}
-> diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
-> index 965a1c2e347d..938fcf6bc002 100644
-> --- a/tools/arch/x86/include/uapi/asm/kvm.h
-> +++ b/tools/arch/x86/include/uapi/asm/kvm.h
-> @@ -533,6 +533,7 @@ struct kvm_pmu_event_filter {
->   enum kvm_tdx_cmd_id {
->   	KVM_TDX_CAPABILITIES = 0,
->   	KVM_TDX_INIT_VM,
-> +	KVM_TDX_INIT_VCPU,
->   
->   	KVM_TDX_CMD_NR_MAX,
->   };
