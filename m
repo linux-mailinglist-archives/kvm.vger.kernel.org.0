@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3743D5A6D9E
-	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 21:42:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A730A5A6DA2
+	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 21:43:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231641AbiH3Tmy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 15:42:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37614 "EHLO
+        id S231403AbiH3Tm6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 15:42:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231555AbiH3Tmi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 15:42:38 -0400
+        with ESMTP id S231310AbiH3Tmk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 15:42:40 -0400
 Received: from out1.migadu.com (out1.migadu.com [IPv6:2001:41d0:2:863f::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 598047B7AF;
-        Tue, 30 Aug 2022 12:42:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3EF57C753;
+        Tue, 30 Aug 2022 12:42:27 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1661888542;
+        t=1661888545;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=PAa+cBkl9mtwNYK8/w+PcWpN4aBBuzKZQpA5735hA3U=;
-        b=ZLs5MEMDu72sPbf1oddAbPXFBK5HqyrH0LLuSMgJABWcVJhbffI94ChKh6fxlG4PUKb7Vt
-        fp76TAzFIbxRDAKaCkX+hrkh4G3NnP0ojf+1rETVa0eO6qJqWT0Ozz+ovLennkecVRUXjy
-        TzWk0l+KpUzy6uyX60KuJjkrZ/YIBkM=
+        bh=NFwSFftgtou/xmW0mHXjm84oZeXHuVM1GyZ5T83/2Wg=;
+        b=uI1s1ijlRaMGjo0jD+nYZDxRHNF+xtPjYfu05N6LNtXIkm3dIie5gtYAIPsiOyuJ6ClfhV
+        ybPxb7Q1Jo+wBTKNu8gdTSY/P1/46syt8d1oBiKjfi4BdrV1c4EXFGM6kN02too/RLt5YY
+        AYtX+JXtuvSVgqwwikvtaPajlrG+7rA=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -42,9 +42,9 @@ To:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 08/14] KVM: arm64: Protect page table traversal with RCU
-Date:   Tue, 30 Aug 2022 19:41:26 +0000
-Message-Id: <20220830194132.962932-9-oliver.upton@linux.dev>
+Subject: [PATCH 09/14] KVM: arm64: Free removed stage-2 tables in RCU callback
+Date:   Tue, 30 Aug 2022 19:41:27 +0000
+Message-Id: <20220830194132.962932-10-oliver.upton@linux.dev>
 In-Reply-To: <20220830194132.962932-1-oliver.upton@linux.dev>
 References: <20220830194132.962932-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -61,66 +61,79 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The use of RCU is necessary to change the paging structures in parallel.
-Acquire and release an RCU read lock when traversing the page tables.
+There is no real urgency to free a stage-2 subtree that was pruned.
+Nonetheless, KVM does the tear down in the stage-2 fault path while
+holding the MMU lock.
+
+Free removed stage-2 subtrees after an RCU grace period. To guarantee
+all stage-2 table pages are freed before killing a VM, add an
+rcu_barrier() to the flush path.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_pgtable.h | 19 ++++++++++++++++++-
- arch/arm64/kvm/hyp/pgtable.c         |  7 ++++++-
- 2 files changed, 24 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/mmu.c | 35 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 34 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 78fbb7be1af6..7d2de0a98ccb 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -578,9 +578,26 @@ enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(kvm_pte_t pte);
-  */
- enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 91521f4aab97..265951c05879 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -97,6 +97,38 @@ static void *stage2_memcache_zalloc_page(void *arg)
+ 	return kvm_mmu_memory_cache_alloc(mc);
+ }
  
-+#if defined(__KVM_NVHE_HYPERVISOR___)
++#define STAGE2_PAGE_PRIVATE_LEVEL_MASK	GENMASK_ULL(2, 0)
 +
-+static inline void kvm_pgtable_walk_begin(void) {}
-+static inline void kvm_pgtable_walk_end(void) {}
++static inline unsigned long stage2_page_private(u32 level, void *arg)
++{
++	unsigned long pvt = (unsigned long)arg;
 +
-+#define kvm_dereference_ptep rcu_dereference_raw
++	BUILD_BUG_ON(KVM_PGTABLE_MAX_LEVELS > STAGE2_PAGE_PRIVATE_LEVEL_MASK);
++	WARN_ON_ONCE(pvt & STAGE2_PAGE_PRIVATE_LEVEL_MASK);
 +
-+#else	/* !defined(__KVM_NVHE_HYPERVISOR__) */
++	return pvt | level;
++}
 +
-+#define kvm_pgtable_walk_begin	rcu_read_lock
-+#define kvm_pgtable_walk_end	rcu_read_unlock
-+#define kvm_dereference_ptep	rcu_dereference
++static void stage2_free_removed_table_rcu_cb(struct rcu_head *head)
++{
++	struct page *page = container_of(head, struct page, rcu_head);
++	unsigned long pvt = page_private(page);
++	void *arg = (void *)(pvt & ~STAGE2_PAGE_PRIVATE_LEVEL_MASK);
++	u32 level = (u32)(pvt & STAGE2_PAGE_PRIVATE_LEVEL_MASK);
++	void *pgtable = page_to_virt(page);
 +
-+#endif	/* defined(__KVM_NVHE_HYPERVISOR__) */
++	kvm_pgtable_stage2_free_removed(pgtable, level, arg);
++}
 +
- static inline kvm_pte_t kvm_pte_read(kvm_pte_t *ptep)
++static void stage2_free_removed_table(void *pgtable, u32 level, void *arg)
++{
++	unsigned long pvt = stage2_page_private(level, arg);
++	struct page *page = virt_to_page(pgtable);
++
++	set_page_private(page, (unsigned long)pvt);
++	call_rcu(&page->rcu_head, stage2_free_removed_table_rcu_cb);
++}
++
+ static void *kvm_host_zalloc_pages_exact(size_t size)
  {
--	return READ_ONCE(*ptep);
-+	kvm_pte_t __rcu *p = (kvm_pte_t __rcu *)ptep;
-+
-+	return READ_ONCE(*kvm_dereference_ptep(p));
+ 	return alloc_pages_exact(size, GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+@@ -627,7 +659,7 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
+ 	.zalloc_page		= stage2_memcache_zalloc_page,
+ 	.zalloc_pages_exact	= kvm_host_zalloc_pages_exact,
+ 	.free_pages_exact	= free_pages_exact,
+-	.free_removed_table	= kvm_pgtable_stage2_free_removed,
++	.free_removed_table	= stage2_free_removed_table,
+ 	.get_page		= kvm_host_get_page,
+ 	.put_page		= kvm_host_put_page,
+ 	.page_count		= kvm_host_page_count,
+@@ -770,6 +802,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+ 	if (pgt) {
+ 		kvm_pgtable_stage2_destroy(pgt);
+ 		kfree(pgt);
++		rcu_barrier();
+ 	}
  }
  
- #endif	/* __ARM64_KVM_PGTABLE_H__ */
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index f911509e6512..215a14c434ed 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -284,8 +284,13 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 		.end	= PAGE_ALIGN(walk_data.addr + size),
- 		.walker	= walker,
- 	};
-+	int r;
- 
--	return _kvm_pgtable_walk(&walk_data);
-+	kvm_pgtable_walk_begin();
-+	r = _kvm_pgtable_walk(&walk_data);
-+	kvm_pgtable_walk_end();
-+
-+	return r;
- }
- 
- struct leaf_walk_data {
 -- 
 2.37.2.672.g94769d06f0-goog
 
