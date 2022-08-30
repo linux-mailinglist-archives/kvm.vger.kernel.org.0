@@ -2,143 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 69E975A5D8A
-	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 10:00:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 85C6E5A5E3D
+	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 10:35:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231355AbiH3IAC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 04:00:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38532 "EHLO
+        id S231565AbiH3If3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 04:35:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231361AbiH3H7m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 03:59:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1AE2D2771
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 00:59:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661846377;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KCfrLsUUliFZAsT7cuTFQ+KKBb55P+r5AzSlUp1Nkos=;
-        b=YGrFVMlaAkw+NBUw8cfQgpuVZI62rugemmdZN7GOQ1FOuQ8ImEvXg748uHB2+AGHa5mORR
-        9LZtN10QkQ2zyFP918lNLXk7zRz2o3RXx5/ltTjmbuU8E8uam+6rBFAsDoCKSSTddauuE6
-        KktHpDLrMxq/yy6YoZQGUAqSBndoBxw=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-106-cEvAzmeDNc2_1VNdLsDCXQ-1; Tue, 30 Aug 2022 03:59:36 -0400
-X-MC-Unique: cEvAzmeDNc2_1VNdLsDCXQ-1
-Received: by mail-wm1-f70.google.com with SMTP id j3-20020a05600c1c0300b003a5e72421c2so422911wms.1
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 00:59:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc;
-        bh=KCfrLsUUliFZAsT7cuTFQ+KKBb55P+r5AzSlUp1Nkos=;
-        b=OaAkWzHLYtt2bDIrFSHLVIMQoyYI21aDzaCDstglgM5NxZW2iIKIYvPqJY5QgLKHDC
-         LcPUdavmQt0h/1qzMcv1vFtTMmhoPck8+t0gYloWzc2J2pTYrHt+REE2u2rQDYPakGIg
-         OYV1bqT1tTNUw6YgUtcb1rtYlNIAGj6W5TGWWTBkL9+OCXOYeC5Df+vV47BfDSdIIF06
-         aQ7DmJDPxuMKr1VjgjLWnxjXJfJTGPArSiCiV7l1aF4SWZyhNJRPVQFyljxPhRFL9qRw
-         CmOWUTGqWbX4XCcsflKgkVMaM6dNi3VxJeyDgjzBRGNRfqiuW2YftIijjYGjQKBhlENM
-         5Nmg==
-X-Gm-Message-State: ACgBeo2x7wKhprplGTRLb7UTgvcbSURDxmQyA1/LTUCstbDo5nEZD9Av
-        2vPsgljcfXgFa4carKuZeNNydsZeoSYA2XXtVk5QaJ88xoFpHrAxnKnsYwlje3djTb0/MyD7I09
-        TxG/MHq7Apsw9
-X-Received: by 2002:a05:600c:1992:b0:3a6:23f6:8417 with SMTP id t18-20020a05600c199200b003a623f68417mr8373208wmq.14.1661846374817;
-        Tue, 30 Aug 2022 00:59:34 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6G+HNENoZbk/kP0Upti13ajYwcNsvPHgO3ZJjPM9lTCEmTs9Are0AGapPE11SllUCzKZrfKw==
-X-Received: by 2002:a05:600c:1992:b0:3a6:23f6:8417 with SMTP id t18-20020a05600c199200b003a623f68417mr8373198wmq.14.1661846374508;
-        Tue, 30 Aug 2022 00:59:34 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c70a:1000:ecb4:919b:e3d3:e20b? (p200300cbc70a1000ecb4919be3d3e20b.dip0.t-ipconnect.de. [2003:cb:c70a:1000:ecb4:919b:e3d3:e20b])
-        by smtp.gmail.com with ESMTPSA id l14-20020a05600c4f0e00b003a83d5f3678sm11136280wmq.7.2022.08.30.00.59.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Aug 2022 00:59:34 -0700 (PDT)
-Message-ID: <39145649-c378-d027-8856-81b4f09050fc@redhat.com>
-Date:   Tue, 30 Aug 2022 09:59:33 +0200
+        with ESMTP id S231449AbiH3If1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 04:35:27 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDB834B495;
+        Tue, 30 Aug 2022 01:35:26 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27U8JQr8023862;
+        Tue, 30 Aug 2022 08:35:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=Z0NpnLtel1OykdhGMb3I4wRWDo/nQNEbCIJD8hZWBIM=;
+ b=NJ1OZwzcOQJvQhf9EblafUWEh2+06NiORKLd5PGQuBjYfhobjwZQ/ZuHGUeQnbir8KXp
+ YKEptVkOkMrYu8CJKAbQnTtEc3R63MhRsaPILY2iCXJif06TzbZHeRGfXkWAAeGQj1/z
+ QIZ0sWWu7ULjz9RytqcsfeuERgnRZlCuPDF+xALLa4aFFhLsT7HKq9knDRVOdGUQpghn
+ k1r3A53EEXLOiMZFAJSSVYNvYMFgynbFoctATf9ORcZPbjDKPG3y315JSRQpCtVDfkyR
+ 8RylR+cSPUS+r2U1K6EtbxLvSLP4j6C4zbwMF+Qqlos5/x4fu68raPeHD76DmbMObJO4 Ag== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j9exj8dgb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 30 Aug 2022 08:35:26 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27U8K74s027522;
+        Tue, 30 Aug 2022 08:35:25 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j9exj8df6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 30 Aug 2022 08:35:25 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27U8LiRk032163;
+        Tue, 30 Aug 2022 08:35:23 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03ams.nl.ibm.com with ESMTP id 3j7aw93ebs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 30 Aug 2022 08:35:23 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27U8ZKij40108474
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 30 Aug 2022 08:35:20 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EBAA642041;
+        Tue, 30 Aug 2022 08:35:19 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7EDC34203F;
+        Tue, 30 Aug 2022 08:35:19 +0000 (GMT)
+Received: from localhost.localdomain.com (unknown [9.145.56.39])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 30 Aug 2022 08:35:19 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        pmorel@linux.ibm.com
+Subject: [GIT PULL 0/1] KVM: s390: VFIO PCI build fix
+Date:   Tue, 30 Aug 2022 10:32:49 +0200
+Message-Id: <20220830083250.25720-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.34.3
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ZU7frhvgsyOaHvTB53MuHzgU0H3h1H0d
+X-Proofpoint-GUID: H7H26RZg-5RqeqUvvVB7F8jAwdGXRK1z
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.12.0
-Subject: Re: [PATCH] vfio/type1: Unpin zero pages
-Content-Language: en-US
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        lpivarc@redhat.com
-References: <166182871735.3518559.8884121293045337358.stgit@omen>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <166182871735.3518559.8884121293045337358.stgit@omen>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-30_04,2022-08-25_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ lowpriorityscore=0 malwarescore=0 impostorscore=0 bulkscore=0
+ priorityscore=1501 phishscore=0 spamscore=0 clxscore=1015 mlxlogscore=955
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208300041
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30.08.22 05:05, Alex Williamson wrote:
-> There's currently a reference count leak on the zero page.  We increment
-> the reference via pin_user_pages_remote(), but the page is later handled
-> as an invalid/reserved page, therefore it's not accounted against the
-> user and not unpinned by our put_pfn().
-> 
-> Introducing special zero page handling in put_pfn() would resolve the
-> leak, but without accounting of the zero page, a single user could
-> still create enough mappings to generate a reference count overflow.
-> 
-> The zero page is always resident, so for our purposes there's no reason
-> to keep it pinned.  Therefore, add a loop to walk pages returned from
-> pin_user_pages_remote() and unpin any zero pages.
-> 
-> Cc: David Hildenbrand <david@redhat.com>
-> Cc: stable@vger.kernel.org
-> Reported-by: Luboslav Pivarc <lpivarc@redhat.com>
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c |   12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index db516c90a977..8706482665d1 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -558,6 +558,18 @@ static int vaddr_get_pfns(struct mm_struct *mm, unsigned long vaddr,
->  	ret = pin_user_pages_remote(mm, vaddr, npages, flags | FOLL_LONGTERM,
->  				    pages, NULL, NULL);
->  	if (ret > 0) {
-> +		int i;
-> +
-> +		/*
-> +		 * The zero page is always resident, we don't need to pin it
-> +		 * and it falls into our invalid/reserved test so we don't
-> +		 * unpin in put_pfn().  Unpin all zero pages in the batch here.
-> +		 */
-> +		for (i = 0 ; i < ret; i++) {
-> +			if (unlikely(is_zero_pfn(page_to_pfn(pages[i]))))
-> +				unpin_user_page(pages[i]);
-> +		}
-> +
->  		*pfn = page_to_pfn(pages[0]);
->  		goto done;
->  	}
-> 
-> 
+Paolo,
 
-As discussed offline, for the shared zeropage (that's not even
-refcounted when mapped into a process), this makes perfect sense to me.
+here's a lone fix for a KVM/VFIO build problem.
 
-Good question raised by Sean if ZONE_DEVICE pages might similarly be
-problematic. But for them, we cannot simply always unpin here.
+A few PV fixes are currently still in development but fixing those
+issues will be harder.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+The following changes since commit b90cb1053190353cc30f0fef0ef1f378ccc063c5:
+
+  Linux 6.0-rc3 (2022-08-28 15:05:29 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git tags/kvm-s390-master-6.0-1
+
+for you to fetch changes up to ca922fecda6caa5162409406dc3b663062d75089:
+
+  KVM: s390: pci: Hook to access KVM lowlevel from VFIO (2022-08-29 13:29:28 +0200)
+
+----------------------------------------------------------------
+PCI interpretation compile fixes
+
+----------------------------------------------------------------
+
+Pierre Morel (1):
+  KVM: s390: pci: Hook to access KVM lowlevel from VFIO
+
+ arch/s390/include/asm/kvm_host.h | 17 ++++++-----------
+ arch/s390/kvm/pci.c              | 12 ++++++++----
+ arch/s390/pci/Makefile           |  2 +-
+ arch/s390/pci/pci_kvm_hook.c     | 11 +++++++++++
+ drivers/vfio/pci/vfio_pci_zdev.c |  8 ++++++--
+ 5 files changed, 32 insertions(+), 18 deletions(-)
+ create mode 100644 arch/s390/pci/pci_kvm_hook.c
 
 -- 
-Thanks,
-
-David / dhildenb
+2.34.3
 
