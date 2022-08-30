@@ -2,126 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FE905A6DB0
-	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 21:44:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 338985A6DC9
+	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 21:50:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231720AbiH3Tow (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 15:44:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36952 "EHLO
+        id S231470AbiH3Tuz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 15:50:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230350AbiH3Toa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 15:44:30 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCD637E311;
-        Tue, 30 Aug 2022 12:43:45 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27UIVl7k008865;
-        Tue, 30 Aug 2022 19:43:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=nvlS2VMNsmy2wY435KnShBDYElsWCPC73ASoLmOHEMg=;
- b=Nb8L8Cp4KAHCTal/vuwjPpH9Ubi0o+qLKIMBmWwNidpI7ZC2Ka3AgfZoBy4lmulwYp9K
- oFRNocY7nDDce38NUGbXmBWMV3N9tLgP0mEbIISvvzThhyO9ZOdq7kjYU5FdKGMqEAxL
- mlgPC/Fsr22Tfd9HnByFtLaJaPTgMne/vOcoXeDF6JcFFKSNf33Sj9hMw8/f9ZuXKrl8
- bFtgoxTYAhZAV5/ndXul0sxNfzwZiH+TKzREQDV0yK32mKjhXI9yxGPkJ+tlKWS1kCdU
- i2K+w/qwpWOY1t6P445W/uD/nNyjxmCLjDmeAa3EccPDUbUyQizN5DMeANlV1Cu3HTj0 ug== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j9qwm1s4d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 30 Aug 2022 19:43:25 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27UJQeVB002546;
-        Tue, 30 Aug 2022 19:43:24 GMT
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j9qwm1s3t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 30 Aug 2022 19:43:24 +0000
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27UJZwRa028948;
-        Tue, 30 Aug 2022 19:43:23 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma05wdc.us.ibm.com with ESMTP id 3j7aw9nv30-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 30 Aug 2022 19:43:23 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27UJhMf638732266
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 30 Aug 2022 19:43:22 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 82ED72805A;
-        Tue, 30 Aug 2022 19:43:22 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 69F6E28058;
-        Tue, 30 Aug 2022 19:43:20 +0000 (GMT)
-Received: from [9.160.64.167] (unknown [9.160.64.167])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 30 Aug 2022 19:43:20 +0000 (GMT)
-Message-ID: <857ca47a-e37a-450d-385f-8bdd3fbd2ed9@linux.ibm.com>
-Date:   Tue, 30 Aug 2022 15:43:20 -0400
+        with ESMTP id S229923AbiH3Tux (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 15:50:53 -0400
+Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB490422E3;
+        Tue, 30 Aug 2022 12:50:51 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1661889050;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wmlaPuCg5CtRxJvAdYOU8R7EmSZufHl35iEQ4YqU9EM=;
+        b=gZwcKwarj6vtKm4xaDadIqmvqzkEqNnWTT5UVK4aQjMzPEiAmWQm88cHA06R3FZQbXgM2G
+        dV6QOVzhnU9Hwbxs1sI9upcn5KUz6nFNtrrD05GTTrR32L6nCWig4wtILoZlwCYlRviJF8
+        zNj6lMvzeENPIAPn2eR/zKb59oUuyXo=
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Quentin Perret <qperret@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Gavin Shan <gshan@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 10/14] KVM: arm64: Atomically update stage 2 leaf attributes in parallel walks
+Date:   Tue, 30 Aug 2022 19:50:36 +0000
+Message-Id: <20220830195036.964607-1-oliver.upton@linux.dev>
+In-Reply-To: <20220830194132.962932-1-oliver.upton@linux.dev>
+References: <20220830194132.962932-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH 01/15] vfio: Add helpers for unifying vfio_device life
- cycle
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Kevin Tian <kevin.tian@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Longfang Liu <liulongfang@huawei.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Abhishek Sahu <abhsahu@nvidia.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, Yi Liu <yi.l.liu@intel.com>
-References: <20220827171037.30297-1-kevin.tian@intel.com>
- <20220827171037.30297-2-kevin.tian@intel.com>
- <907c54c6-7f5b-77f3-c284-45604c60c12e@linux.ibm.com>
- <Yw4oUL33TbJK6inc@ziepe.ca>
-From:   Anthony Krowiak <akrowiak@linux.ibm.com>
-In-Reply-To: <Yw4oUL33TbJK6inc@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: aRCafsSVB4WDgZKQoAh5T0ZD6U8Lpe4c
-X-Proofpoint-GUID: iUNzE8Y1B8EAR70qXetOvkvDM2I5g5Bu
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-30_10,2022-08-30_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 bulkscore=0 mlxscore=0 clxscore=1015 adultscore=0
- phishscore=0 spamscore=0 mlxlogscore=999 impostorscore=0
- priorityscore=1501 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2207270000 definitions=main-2208300088
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
         SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -130,67 +61,123 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The stage2 attr walker is already used for parallel walks. Since commit
+f783ef1c0e82 ("KVM: arm64: Add fast path to handle permission relaxation
+during dirty logging"), KVM acquires the read lock when
+write-unprotecting a PTE. However, the walker only uses a simple store
+to update the PTE. This is safe as the only possible race is with
+hardware updates to the access flag, which is benign.
 
-On 8/30/22 11:10 AM, Jason Gunthorpe wrote:
-> On Tue, Aug 30, 2022 at 09:42:42AM -0400, Anthony Krowiak wrote:
->
->>> +/*
->>> + * Alloc and initialize vfio_device so it can be registered to vfio
->>> + * core.
->>> + *
->>> + * Drivers should use the wrapper vfio_alloc_device() for allocation.
->>> + * @size is the size of the structure to be allocated, including any
->>> + * private data used by the driver.
->>
->> It seems the purpose of the wrapper is to ensure that the object being
->> allocated has as its first field a struct vfio_device object and to return
->> its container. Why not just make that a requirement for this function -
->> which I would rename vfio_alloc_device - and document it in the prologue?
->> The caller can then cast the return pointer or use container_of.
-> There are three fairly common patterns for this kind of thing
->
-> 1) The caller open codes everything:
->
->     driver_struct = kzalloc()
->     core_init(&driver_struct->core)
->
-> 2) Some 'get priv' / 'get data' is used instead of container_of():
->
->     core_struct = core_alloc(sizeof(*driver_struct))
->     driver_struct = core_get_priv(core_struct)
->
-> 3) The allocations and initialization are consolidated in the core,
->     but we continue to use container_of()
->
->     driver_struct = core_alloc(typeof(*driver_struct))
->
-> #1 has a general drawback that people routinely mess up the lifecycle
-> model and get really confused about when to do kfree() vs put(),
-> creating bugs.
->
-> #2 has a general drawback of not using container_of() at all, and being
-> a bit confusing in some cases
->
-> #3 has the general drawback of being a bit magical, but solves 1 and
-> 2's problems.
->
-> I would not fix the struct layout without the BUILD_BUG_ON because
-> someone will accidently change the order and that becomes a subtle
-> runtime error - so at a minimum the wrapper macro has to exist to
-> check that.
->
-> If you want to allow a dynamic struct layout and avoid the pitfall of
-> exposing the user to kalloc/kfree, then you still need the macro, and
-> it does some more complicated offset stuff.
->
-> Having the wrapper macro be entirely type safe is appealing and
-> reduces code in the drivers, IMHO. Tell it what type you are initing
-> and get back init'd memory for that type that you always, always free
-> with a put operation.
+However, a subsequent change to KVM will allow more changes to the stage
+2 page tables to be done in parallel. Prepare the stage 2 attribute
+walker by performing atomic updates to the PTE when walking in parallel.
 
+Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+---
+ arch/arm64/kvm/hyp/pgtable.c | 28 +++++++++++++++++++++-------
+ 1 file changed, 21 insertions(+), 7 deletions(-)
 
-Sounds reasonable, okay I'm buying.
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 215a14c434ed..61a4437c8c16 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -691,6 +691,16 @@ static bool stage2_pte_is_counted(kvm_pte_t pte)
+ 	return kvm_pte_valid(pte) || kvm_invalid_pte_owner(pte);
+ }
+ 
++static bool stage2_try_set_pte(kvm_pte_t *ptep, kvm_pte_t old, kvm_pte_t new, bool shared)
++{
++	if (!shared) {
++		WRITE_ONCE(*ptep, new);
++		return true;
++	}
++
++	return cmpxchg(ptep, old, new) == old;
++}
++
+ static void stage2_put_pte(kvm_pte_t *ptep, struct kvm_s2_mmu *mmu, u64 addr,
+ 			   u32 level, struct kvm_pgtable_mm_ops *mm_ops)
+ {
+@@ -985,6 +995,7 @@ struct stage2_attr_data {
+ 	kvm_pte_t			pte;
+ 	u32				level;
+ 	struct kvm_pgtable_mm_ops	*mm_ops;
++	bool				shared;
+ };
+ 
+ static int stage2_attr_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+@@ -1017,7 +1028,9 @@ static int stage2_attr_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 		    stage2_pte_executable(pte) && !stage2_pte_executable(data->pte))
+ 			mm_ops->icache_inval_pou(kvm_pte_follow(pte, mm_ops),
+ 						  kvm_granule_size(level));
+-		WRITE_ONCE(*ptep, pte);
++
++		if (!stage2_try_set_pte(ptep, data->pte, pte, data->shared))
++			return -EAGAIN;
+ 	}
+ 
+ 	return 0;
+@@ -1026,7 +1039,7 @@ static int stage2_attr_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
+ 				    u64 size, kvm_pte_t attr_set,
+ 				    kvm_pte_t attr_clr, kvm_pte_t *orig_pte,
+-				    u32 *level)
++				    u32 *level, bool shared)
+ {
+ 	int ret;
+ 	kvm_pte_t attr_mask = KVM_PTE_LEAF_ATTR_LO | KVM_PTE_LEAF_ATTR_HI;
+@@ -1034,6 +1047,7 @@ static int stage2_update_leaf_attrs(struct kvm_pgtable *pgt, u64 addr,
+ 		.attr_set	= attr_set & attr_mask,
+ 		.attr_clr	= attr_clr & attr_mask,
+ 		.mm_ops		= pgt->mm_ops,
++		.shared		= shared,
+ 	};
+ 	struct kvm_pgtable_walker walker = {
+ 		.cb		= stage2_attr_walker,
+@@ -1057,14 +1071,14 @@ int kvm_pgtable_stage2_wrprotect(struct kvm_pgtable *pgt, u64 addr, u64 size)
+ {
+ 	return stage2_update_leaf_attrs(pgt, addr, size, 0,
+ 					KVM_PTE_LEAF_ATTR_LO_S2_S2AP_W,
+-					NULL, NULL);
++					NULL, NULL, false);
+ }
+ 
+ kvm_pte_t kvm_pgtable_stage2_mkyoung(struct kvm_pgtable *pgt, u64 addr)
+ {
+ 	kvm_pte_t pte = 0;
+ 	stage2_update_leaf_attrs(pgt, addr, 1, KVM_PTE_LEAF_ATTR_LO_S2_AF, 0,
+-				 &pte, NULL);
++				 &pte, NULL, false);
+ 	dsb(ishst);
+ 	return pte;
+ }
+@@ -1073,7 +1087,7 @@ kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr)
+ {
+ 	kvm_pte_t pte = 0;
+ 	stage2_update_leaf_attrs(pgt, addr, 1, 0, KVM_PTE_LEAF_ATTR_LO_S2_AF,
+-				 &pte, NULL);
++				 &pte, NULL, false);
+ 	/*
+ 	 * "But where's the TLBI?!", you scream.
+ 	 * "Over in the core code", I sigh.
+@@ -1086,7 +1100,7 @@ kvm_pte_t kvm_pgtable_stage2_mkold(struct kvm_pgtable *pgt, u64 addr)
+ bool kvm_pgtable_stage2_is_young(struct kvm_pgtable *pgt, u64 addr)
+ {
+ 	kvm_pte_t pte = 0;
+-	stage2_update_leaf_attrs(pgt, addr, 1, 0, 0, &pte, NULL);
++	stage2_update_leaf_attrs(pgt, addr, 1, 0, 0, &pte, NULL, false);
+ 	return pte & KVM_PTE_LEAF_ATTR_LO_S2_AF;
+ }
+ 
+@@ -1109,7 +1123,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+ 	if (prot & KVM_PGTABLE_PROT_X)
+ 		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
+ 
+-	ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level);
++	ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level, true);
+ 	if (!ret)
+ 		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, level);
+ 	return ret;
+-- 
+2.37.2.672.g94769d06f0-goog
 
-
->
-> Jason
