@@ -2,119 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D76BE5A62CE
-	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 14:03:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44CFE5A6349
+	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 14:27:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231157AbiH3MCq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 08:02:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39670 "EHLO
+        id S229523AbiH3M1q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 08:27:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229756AbiH3MCg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 08:02:36 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F4B2EF9D8;
-        Tue, 30 Aug 2022 05:02:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661860928; x=1693396928;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=eeD6WJYKHUyfZ/PXC4poyF6VyKFe0V4LAqKVsAEhnLI=;
-  b=CSqQfYURJd8rkqxNgLXcQ2YySp2cJZ49YZsXvGQmTFM47UqF307o167C
-   M2AIfIJ/pzLxJek3sDX3iPRlkxmtgL+sIM9BEPH64jl9u5ceeAs/ASjxg
-   EkqHM6eyfxM0cGi2PHkgZhD4tyb86Ncd4AmetbaeheQWTnEn3Kea/wJkl
-   cCRUjXbpCocUB7kZEcz3VwxhptAomNQillKi/ZEw/wsR/dGITbodYYnup
-   tBJcCOj2zchOhjndqlsFXQZM8eDzqC9S1hQLsXr1jDeuaR+wGTb+u7YcB
-   wp3o83Y4AZjiNJp0Mnkkl06v0GnvaI0mO3fkPRXB9GViL0tIbGaxjSxNz
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10454"; a="356871006"
-X-IronPort-AV: E=Sophos;i="5.93,274,1654585200"; 
-   d="scan'208";a="356871006"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2022 05:02:01 -0700
-X-IronPort-AV: E=Sophos;i="5.93,274,1654585200"; 
-   d="scan'208";a="787469680"
-Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2022 05:02:01 -0700
-From:   isaku.yamahata@intel.com
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
-        Will Deacon <will@kernel.org>
-Subject: [PATCH v2 19/19] RFC: KVM: Remove cpus_hardware_enabled and related sanity check
-Date:   Tue, 30 Aug 2022 05:01:34 -0700
-Message-Id: <21b2efeb4b43605a8c1a327a3656650d96be0968.1661860550.git.isaku.yamahata@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1661860550.git.isaku.yamahata@intel.com>
-References: <cover.1661860550.git.isaku.yamahata@intel.com>
+        with ESMTP id S229477AbiH3M1o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 08:27:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B5098FD6D
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 05:27:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661862462;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0wGTB9LFd8O3OQX6VCV8VsTwQxbK1zUmkJN478H5liE=;
+        b=X/zcUStkkC1o0tGo+TpCt4R2IeuSCuUaYu27nzDdNoahh2W+/UCV9C46XHyA9xYJgPcYM9
+        a7yd4/XIOxz5cgZDbKRhNbhQ9SCRy1HkXaSRf4AzX+rqgl1yXvR68vnG7oIppqXtDogjlf
+        7ZFiG4vYZ+E/IvOVS1ICkDM6EGpOD2M=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-424--p1VGdoINdWzspyYWrNMtg-1; Tue, 30 Aug 2022 08:27:33 -0400
+X-MC-Unique: -p1VGdoINdWzspyYWrNMtg-1
+Received: by mail-wm1-f70.google.com with SMTP id b4-20020a05600c4e0400b003a5a96f1756so10030307wmq.0
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 05:27:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=0wGTB9LFd8O3OQX6VCV8VsTwQxbK1zUmkJN478H5liE=;
+        b=zpcigASONfPwQIWDXgJt07iBxsIfGle+6fdvMJmktd7AxdBOHtlTckh2CfILHEdain
+         0lwd1Ks+ZYNyvk8Yf13lDAM5qTLdeKEo4q8PuIQ7dvKVk01zhoR0P64LTyZCUgwKgKAy
+         VvdcrUpafB1NljJJUUauCuV0KqAhkfRo8euwj/OTigrPWuEiY8Ll8gXPNoXroECUE85U
+         a+6cLw+Udhr5pwVU6szWEMmnoP6A2E2HJAK3STLXdFKOfvdDxy3jLTT4R2Kodcwz4Zht
+         mkjS2lXEsHurhpEltTgHQGnRdPWAqbBnJ2quqs5Ttev4G/2oNswpq3NSDwRU7sWJuJts
+         K1Rg==
+X-Gm-Message-State: ACgBeo113QYU3G9XXH4MmcYB45JQnS7kCctzm8UIOkV2mmjLE15eFlKH
+        LJiQDslHQCyLqUbOQfGPHXMWN1m2vxx8MVZeMcH95BF2ivPzGmLkqCZwiwK3XV5001lOcE49ZJ7
+        bjBo0er12WSUw
+X-Received: by 2002:adf:a447:0:b0:226:133a:907a with SMTP id e7-20020adfa447000000b00226133a907amr9193781wra.250.1661862452444;
+        Tue, 30 Aug 2022 05:27:32 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7V/2Muy1TsPe0NqPrmDvdajHgQR8Z5aWTacV/SFEn+39QU9cpdmgkolLyttcpPOo6tBRFjcw==
+X-Received: by 2002:adf:a447:0:b0:226:133a:907a with SMTP id e7-20020adfa447000000b00226133a907amr9193774wra.250.1661862452247;
+        Tue, 30 Aug 2022 05:27:32 -0700 (PDT)
+Received: from [192.168.0.5] (ip-109-43-176-96.web.vodafone.de. [109.43.176.96])
+        by smtp.gmail.com with ESMTPSA id n1-20020a05600c4f8100b003a5c064717csm13549463wmq.22.2022.08.30.05.27.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Aug 2022 05:27:31 -0700 (PDT)
+Message-ID: <2867caf0-b944-6cf5-f0f5-2af5706feb49@redhat.com>
+Date:   Tue, 30 Aug 2022 14:27:30 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [kvm-unit-tests PATCH v1 1/2] lib/s390x: time: add wrapper for
+ stckf
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com
+References: <20220830115623.515981-1-nrb@linux.ibm.com>
+ <20220830115623.515981-2-nrb@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20220830115623.515981-2-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+On 30/08/2022 13.56, Nico Boehr wrote:
+> Upcoming changes will do performance measurements of instructions. Since
+> stck is designed to return unique values even on concurrent calls, it is
+> unsuited for performance measurements. stckf should be used in this
+> case.
+> 
+> Hence, add a nice wrapper for stckf to the time library.
+> 
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>   lib/s390x/asm/time.h | 9 +++++++++
+>   1 file changed, 9 insertions(+)
+> 
+> diff --git a/lib/s390x/asm/time.h b/lib/s390x/asm/time.h
+> index 7652a151e87a..d7c2bcb4f306 100644
+> --- a/lib/s390x/asm/time.h
+> +++ b/lib/s390x/asm/time.h
+> @@ -14,6 +14,15 @@
+>   #define STCK_SHIFT_US	(63 - 51)
+>   #define STCK_MAX	((1UL << 52) - 1)
+>   
+> +static inline uint64_t get_clock_fast(void)
+> +{
+> +	uint64_t clk;
+> +
+> +	asm volatile(" stckf %0 " : : "Q"(clk) : "memory");
+> +
+> +	return clk;
+> +}
 
-cpus_hardware_enabled mask seems incomplete protection against other kernel
-component using CPU virtualization feature.  Because it's obscure and
-incomplete, remove the check.
+Using clk as input parameter together with memory clobbing sounds like a bad 
+solution to me here. The Linux kernel properly uses it as output parameter 
+instead:
 
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- virt/kvm/kvm_arch.c | 16 ++--------------
- 1 file changed, 2 insertions(+), 14 deletions(-)
+static inline unsigned long get_tod_clock_fast(void)
+{
+         unsigned long clk;
 
-diff --git a/virt/kvm/kvm_arch.c b/virt/kvm/kvm_arch.c
-index 8f2d920a2a8f..cbad0181c177 100644
---- a/virt/kvm/kvm_arch.c
-+++ b/virt/kvm/kvm_arch.c
-@@ -12,22 +12,16 @@
- 
- #include <linux/kvm_host.h>
- 
--static cpumask_t cpus_hardware_enabled = CPU_MASK_NONE;
--
- static int __hardware_enable(void)
- {
--	int cpu = raw_smp_processor_id();
- 	int r;
- 
- 	WARN_ON_ONCE(preemptible());
- 
--	if (cpumask_test_cpu(cpu, &cpus_hardware_enabled))
--		return 0;
- 	r = kvm_arch_hardware_enable();
- 	if (r)
--		pr_info("kvm: enabling virtualization on CPU%d failed\n", cpu);
--	else
--		cpumask_set_cpu(cpu, &cpus_hardware_enabled);
-+		pr_info("kvm: enabling virtualization on CPU%d failed\n",
-+			smp_processor_id());
- 	return r;
- }
- 
-@@ -41,13 +35,7 @@ static void hardware_enable(void *arg)
- 
- static void hardware_disable(void *junk)
- {
--	int cpu = raw_smp_processor_id();
--
- 	WARN_ON_ONCE(preemptible());
--
--	if (!cpumask_test_cpu(cpu, &cpus_hardware_enabled))
--		return;
--	cpumask_clear_cpu(cpu, &cpus_hardware_enabled);
- 	kvm_arch_hardware_disable();
- }
- 
--- 
-2.25.1
+         asm volatile("stckf %0" : "=Q" (clk) : : "cc");
+         return clk;
+}
+
+(see arch/s390/include/asm/timex.h in the kernel sources)
+
+As you can see, also the "cc" should be in the clobber list here.
+
+  Thomas
 
