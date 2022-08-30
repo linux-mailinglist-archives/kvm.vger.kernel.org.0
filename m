@@ -2,61 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CED35A6551
-	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 15:42:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 94F125A657A
+	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 15:50:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231241AbiH3Nmc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 09:42:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42522 "EHLO
+        id S231158AbiH3Nt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 09:49:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229653AbiH3NmF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 09:42:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45E6A13E8F
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 06:40:11 -0700 (PDT)
+        with ESMTP id S231537AbiH3NtN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 09:49:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDA6425CC
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 06:47:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661866749;
+        s=mimecast20190719; t=1661867221;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jtIS1VsLeTWsr8wnUR6qesTZez08emIVhcN1jg/PKaE=;
-        b=SDOpAu9NaxNv6lKh70oXG/QblzPD757jdQxK5y9Jqn7M0AMlHEuPG1xROPQxlyXL4Onqn6
-        7qusmuojBIB5aD+w6d3N7mDspD/xJgHdnM7O1aBocHxDYVneOq28XWrYOj+9FE5fzD2mSg
-        PMRu2DgTj/MX+kWteU7wR59+0Vffhr0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-602-sQBjN_0tPxWdEtmME_E3BQ-1; Tue, 30 Aug 2022 09:39:05 -0400
-X-MC-Unique: sQBjN_0tPxWdEtmME_E3BQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 26E19811E9B;
-        Tue, 30 Aug 2022 13:39:05 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.40.194.232])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BA3782166B2A;
-        Tue, 30 Aug 2022 13:39:02 +0000 (UTC)
+        bh=xSYsGT+JuRUnE0x8Uu6rvpfH2JA8fm0UMDh7oy78WJU=;
+        b=iYFRrTUSsHmXd1Xmy2vgR5SJ6VVFsnD+J42GWk7CJfvfjPz9tWZjW6aGevQV2IsNNMlUto
+        uLwaE8LM1xkOwLTugCC5Ykt5jxLmwrYezZxJ1LiniZA7sdIaI3U2Jw87hQzyLwnZhhfJ5F
+        HPi0Tia2u9jBTTE9RWv9tSsqWnwcBYY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-216-YKWDRl1QO0ylJCCxC6JrvA-1; Tue, 30 Aug 2022 09:43:45 -0400
+X-MC-Unique: YKWDRl1QO0ylJCCxC6JrvA-1
+Received: by mail-wr1-f70.google.com with SMTP id t12-20020adfa2cc000000b00224f577fad1so1763741wra.4
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 06:43:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc;
+        bh=xSYsGT+JuRUnE0x8Uu6rvpfH2JA8fm0UMDh7oy78WJU=;
+        b=VpUHm4YXoaeCXNIjdMXyUe8JBCrIwXtkiUTKXCLzhxRw1E9qBpeUy44KHZaJEVFy93
+         E0+slIm6ye74cWeBF3qYQqUuzN66yIhdeAg2QvdZuDlo9Zyn9q6r8FK4dvc4UivqNxB+
+         RpACyxTrJEFNLuCdn/Aq0Xiesjk8ETR6wIbi9kv1N4ufBaXbTn4JcC5CmZSjtuKZe6fO
+         b+Ah3L/mgW1NbNr6zWGHlnO7owtB0NAmmZhcf5d66dHyKXQuyo+0/bnZszk73dnezILo
+         m6VLeLFUFwsQQ6C9gIXf8HX8HT8x+6x5PYtQfeKZr9ixYV1jDaS7idHxDFB4JhPkWB8I
+         ruQw==
+X-Gm-Message-State: ACgBeo3GoH5x99yVrVTp2jK7qdClOTghMX2VJMgvFKo9fk9umsuaIBhM
+        6kDqOKu5oPmerXdB99X9jG1J97ow1xxGaVXxQdASX8WybmOjIr2DE84EGf9dm0llcy2jOMTQ2jX
+        NxCgPCqg6r0mvBdOM3A9tuEtL1QgETf1bsIq+anRAv0b580sSSLWiXRw331TIz39E
+X-Received: by 2002:a05:600c:418a:b0:3a5:168e:a918 with SMTP id p10-20020a05600c418a00b003a5168ea918mr9782010wmh.31.1661867023783;
+        Tue, 30 Aug 2022 06:43:43 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7J7amscRJ3WfZNYVzhrBCLo4tjoSRLTzgx5nbx4QzFf31AtfhlXNT2cljEHY97bXhWh+p3lQ==
+X-Received: by 2002:a05:600c:418a:b0:3a5:168e:a918 with SMTP id p10-20020a05600c418a00b003a5168ea918mr9781989wmh.31.1661867023521;
+        Tue, 30 Aug 2022 06:43:43 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id i20-20020a05600c2d9400b003a604a29a34sm11680851wmg.35.2022.08.30.06.43.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Aug 2022 06:43:42 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
         Yuan Yao <yuan.yao@linux.intel.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v6 33/33] KVM: nVMX: Use cached host MSR_IA32_VMX_MISC value for setting up nested MSR
-Date:   Tue, 30 Aug 2022 15:37:37 +0200
-Message-Id: <20220830133737.1539624-34-vkuznets@redhat.com>
-In-Reply-To: <20220830133737.1539624-1-vkuznets@redhat.com>
-References: <20220830133737.1539624-1-vkuznets@redhat.com>
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v9 00/40] KVM: x86: hyper-v: Fine-grained TLB flush + L2
+ TLB flush features
+In-Reply-To: <20220803134110.397885-1-vkuznets@redhat.com>
+References: <20220803134110.397885-1-vkuznets@redhat.com>
+Date:   Tue, 30 Aug 2022 15:43:41 +0200
+Message-ID: <8735ddvoc2.fsf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -65,36 +82,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-vmcs_config has cached host MSR_IA32_VMX_MISC value, use it for setting
-up nested MSR_IA32_VMX_MISC in nested_vmx_setup_ctls_msrs() and avoid the
-redundant rdmsr().
+Vitaly Kuznetsov <vkuznets@redhat.com> writes:
 
-No (real) functional change intended.
+> Changes since v8:
+> - Rebase to the current kvm/queue (93472b797153)
+> - selftests: move Hyper-V test pages to a dedicated struct untangling from 
+>  vendor-specific (VMX/SVM) pages allocation [Sean].
 
-Reviewed-by: Jim Mattson <jmattson@google.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/nested.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+Sean, Paolo,
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index a079f013ccbc..02d442b3357a 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -6748,10 +6748,7 @@ void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
- 		msrs->secondary_ctls_high |= SECONDARY_EXEC_ENCLS_EXITING;
- 
- 	/* miscellaneous data */
--	rdmsr(MSR_IA32_VMX_MISC,
--		msrs->misc_low,
--		msrs->misc_high);
--	msrs->misc_low &= VMX_MISC_SAVE_EFER_LMA;
-+	msrs->misc_low = (u32)vmcs_conf->misc & VMX_MISC_SAVE_EFER_LMA;
- 	msrs->misc_low |=
- 		MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS |
- 		VMX_MISC_EMULATED_PREEMPTION_TIMER_RATE |
+I've jsut checked and this series applies cleanly on top of the latest
+kvm/queue [372d07084593]. I also don't seem to have any feedback to
+address.
+
+Any chance this can be queued?
+
 -- 
-2.37.2
+Vitaly
 
