@@ -2,101 +2,358 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 94F125A657A
-	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 15:50:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C957D5A6609
+	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 16:16:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231158AbiH3Nt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 09:49:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34024 "EHLO
+        id S229800AbiH3OQF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 10:16:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231537AbiH3NtN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 09:49:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDA6425CC
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 06:47:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661867221;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=xSYsGT+JuRUnE0x8Uu6rvpfH2JA8fm0UMDh7oy78WJU=;
-        b=iYFRrTUSsHmXd1Xmy2vgR5SJ6VVFsnD+J42GWk7CJfvfjPz9tWZjW6aGevQV2IsNNMlUto
-        uLwaE8LM1xkOwLTugCC5Ykt5jxLmwrYezZxJ1LiniZA7sdIaI3U2Jw87hQzyLwnZhhfJ5F
-        HPi0Tia2u9jBTTE9RWv9tSsqWnwcBYY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-216-YKWDRl1QO0ylJCCxC6JrvA-1; Tue, 30 Aug 2022 09:43:45 -0400
-X-MC-Unique: YKWDRl1QO0ylJCCxC6JrvA-1
-Received: by mail-wr1-f70.google.com with SMTP id t12-20020adfa2cc000000b00224f577fad1so1763741wra.4
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 06:43:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc;
-        bh=xSYsGT+JuRUnE0x8Uu6rvpfH2JA8fm0UMDh7oy78WJU=;
-        b=VpUHm4YXoaeCXNIjdMXyUe8JBCrIwXtkiUTKXCLzhxRw1E9qBpeUy44KHZaJEVFy93
-         E0+slIm6ye74cWeBF3qYQqUuzN66yIhdeAg2QvdZuDlo9Zyn9q6r8FK4dvc4UivqNxB+
-         RpACyxTrJEFNLuCdn/Aq0Xiesjk8ETR6wIbi9kv1N4ufBaXbTn4JcC5CmZSjtuKZe6fO
-         b+Ah3L/mgW1NbNr6zWGHlnO7owtB0NAmmZhcf5d66dHyKXQuyo+0/bnZszk73dnezILo
-         m6VLeLFUFwsQQ6C9gIXf8HX8HT8x+6x5PYtQfeKZr9ixYV1jDaS7idHxDFB4JhPkWB8I
-         ruQw==
-X-Gm-Message-State: ACgBeo3GoH5x99yVrVTp2jK7qdClOTghMX2VJMgvFKo9fk9umsuaIBhM
-        6kDqOKu5oPmerXdB99X9jG1J97ow1xxGaVXxQdASX8WybmOjIr2DE84EGf9dm0llcy2jOMTQ2jX
-        NxCgPCqg6r0mvBdOM3A9tuEtL1QgETf1bsIq+anRAv0b580sSSLWiXRw331TIz39E
-X-Received: by 2002:a05:600c:418a:b0:3a5:168e:a918 with SMTP id p10-20020a05600c418a00b003a5168ea918mr9782010wmh.31.1661867023783;
-        Tue, 30 Aug 2022 06:43:43 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR7J7amscRJ3WfZNYVzhrBCLo4tjoSRLTzgx5nbx4QzFf31AtfhlXNT2cljEHY97bXhWh+p3lQ==
-X-Received: by 2002:a05:600c:418a:b0:3a5:168e:a918 with SMTP id p10-20020a05600c418a00b003a5168ea918mr9781989wmh.31.1661867023521;
-        Tue, 30 Aug 2022 06:43:43 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id i20-20020a05600c2d9400b003a604a29a34sm11680851wmg.35.2022.08.30.06.43.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Aug 2022 06:43:42 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v9 00/40] KVM: x86: hyper-v: Fine-grained TLB flush + L2
- TLB flush features
-In-Reply-To: <20220803134110.397885-1-vkuznets@redhat.com>
-References: <20220803134110.397885-1-vkuznets@redhat.com>
-Date:   Tue, 30 Aug 2022 15:43:41 +0200
-Message-ID: <8735ddvoc2.fsf@redhat.com>
+        with ESMTP id S230398AbiH3OQB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 10:16:01 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C37E46D57B;
+        Tue, 30 Aug 2022 07:15:59 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27UDcdj5018226;
+        Tue, 30 Aug 2022 13:42:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=dLMj4scT81hn+piIbAARyqrM8RYZW+n5ahtgpt1B8BU=;
+ b=E+EFWoEUKDGLYpQzvmjFv2E6WiW7Cltu3RhfxFO0GXgKUCXxQX4SYSLYLZzRm/rnfkkf
+ y97miLE5w/iSJSfToy9BFgMSRwN89Oii8exSmy4HNWiqBNIPMSKoRM6E9yDYoM0N6xOf
+ mib2DWDNDHc/W1Pas4JbC1WZQsRKrkTo5brV4kGCq+p84yGmKFwN23qsGfS6hYPQ7+ZH
+ xvDYqFi+/EOEOCg21StOIJem5F/0A18c5pQsK9GUOuQaOWlwSfhEdkzP7Ob0ZrCprWI2
+ Nhb6PMQynXz+8hrKS00En035zgneTS4Eake6oYMBecxF/8AueHGwvRMIbg24VtxTpOVC +Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j9k439dkx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 30 Aug 2022 13:42:48 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27UDckmC018907;
+        Tue, 30 Aug 2022 13:42:47 GMT
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3j9k439dk4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 30 Aug 2022 13:42:47 +0000
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27UDaSft028999;
+        Tue, 30 Aug 2022 13:42:45 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
+        by ppma02wdc.us.ibm.com with ESMTP id 3j7aw9c0jx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 30 Aug 2022 13:42:45 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27UDgjo9197318
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 30 Aug 2022 13:42:45 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0DFB52805C;
+        Tue, 30 Aug 2022 13:42:45 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 369D528058;
+        Tue, 30 Aug 2022 13:42:43 +0000 (GMT)
+Received: from [9.160.64.167] (unknown [9.160.64.167])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue, 30 Aug 2022 13:42:43 +0000 (GMT)
+Message-ID: <907c54c6-7f5b-77f3-c284-45604c60c12e@linux.ibm.com>
+Date:   Tue, 30 Aug 2022 09:42:42 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH 01/15] vfio: Add helpers for unifying vfio_device life
+ cycle
+Content-Language: en-US
+To:     Kevin Tian <kevin.tian@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Eric Farman <farman@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Longfang Liu <liulongfang@huawei.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Yi Liu <yi.l.liu@intel.com>
+References: <20220827171037.30297-1-kevin.tian@intel.com>
+ <20220827171037.30297-2-kevin.tian@intel.com>
+From:   Anthony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <20220827171037.30297-2-kevin.tian@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: UInNfzO6UhsQq9SoGPUVlLqjbU3nCkc-
+X-Proofpoint-ORIG-GUID: RsKFVoA40hj8rxhPhQ80Xt5teHYxtGki
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-30_08,2022-08-30_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ adultscore=0 spamscore=0 mlxlogscore=999 clxscore=1011 phishscore=0
+ impostorscore=0 priorityscore=1501 suspectscore=0 lowpriorityscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208300067
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vitaly Kuznetsov <vkuznets@redhat.com> writes:
+Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
 
-> Changes since v8:
-> - Rebase to the current kvm/queue (93472b797153)
-> - selftests: move Hyper-V test pages to a dedicated struct untangling from 
->  vendor-specific (VMX/SVM) pages allocation [Sean].
+I have a couple of review comments, but nothing critical that would 
+prevent my r-b.
 
-Sean, Paolo,
+On 8/27/22 1:10 PM, Kevin Tian wrote:
+> The idea is to let vfio core manage the vfio_device life cycle instead
+> of duplicating the logic cross drivers. This is also a preparatory
+> step for adding struct device into vfio_device.
+>
+> New pair of helpers together with a kref in vfio_device:
+>
+>   - vfio_alloc_device()
+>   - vfio_put_device()
+>
+> Drivers can register @init/@release callbacks to manage any private
+> state wrapping the vfio_device.
+>
+> However vfio-ccw doesn't fit this model due to a life cycle mess
+> that its private structure mixes both parent and mdev info hence must
+> be allocated/free'ed outside of the life cycle of vfio device.
+>
+> Per prior discussions this won't be fixed in short term by IBM folks.
+>
+> Instead of waiting introduce another helper vfio_init_device() so ccw
+> can call it to initialize a pre-allocated vfio_device.
+>
+> Further implication of the ccw trick is that vfio_device cannot be
+> free'ed uniformly in vfio core. Instead, require *EVERY* driver to
+> implement @release and free vfio_device inside. Then ccw can choose
+> to delay the free at its own discretion.
+>
+> Another trick down the road is that kvzalloc() is used to accommodate
+> the need of gvt which uses vzalloc() while all others use kzalloc().
+> So drivers should call a helper vfio_free_device() to free the
+> vfio_device instead of assuming that kfree() or vfree() is appliable.
+>
+> Later once the ccw mess is fixed we can remove those tricks and
+> fully handle structure alloc/free in vfio core.
+>
+> Existing vfio_{un}init_group_dev() will be deprecated after all
+> existing usages are converted to the new model.
+>
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Co-developed-by: Yi Liu <yi.l.liu@intel.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> Signed-off-by: Kevin Tian <kevin.tian@intel.com>
+> ---
+>   drivers/vfio/vfio_main.c | 92 ++++++++++++++++++++++++++++++++++++++++
+>   include/linux/vfio.h     | 25 ++++++++++-
+>   2 files changed, 116 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 7cb56c382c97..af8aad116f2b 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -496,6 +496,98 @@ void vfio_uninit_group_dev(struct vfio_device *device)
+>   }
+>   EXPORT_SYMBOL_GPL(vfio_uninit_group_dev);
+>   
+> +/*
+> + * Alloc and initialize vfio_device so it can be registered to vfio
+> + * core.
+> + *
+> + * Drivers should use the wrapper vfio_alloc_device() for allocation.
+> + * @size is the size of the structure to be allocated, including any
+> + * private data used by the driver.
 
-I've jsut checked and this series applies cleanly on top of the latest
-kvm/queue [372d07084593]. I also don't seem to have any feedback to
-address.
 
-Any chance this can be queued?
+It seems the purpose of the wrapper is to ensure that the object being 
+allocated has as its first field a struct vfio_device object and to 
+return its container. Why not just make that a requirement for this 
+function - which I would rename vfio_alloc_device - and document it in 
+the prologue? The caller can then cast the return pointer or use 
+container_of.
 
--- 
-Vitaly
 
+> + *
+> + * Driver may provide an @init callback to cover device private data.
+> + *
+> + * Use vfio_put_device() to release the structure after success return.
+> + */
+> +struct vfio_device *_vfio_alloc_device(size_t size, struct device *dev,
+> +		const struct vfio_device_ops *ops)
+> +{
+> +	struct vfio_device *device;
+> +	int ret;
+> +
+> +	if (WARN_ON(size < sizeof(struct vfio_device)))
+> +		return ERR_PTR(-EINVAL);
+> +
+> +	device = kvzalloc(size, GFP_KERNEL);
+> +	if (!device)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	ret = vfio_init_device(device, dev, ops);
+> +	if (ret)
+> +		goto out_free;
+> +	return device;
+> +
+> +out_free:
+> +	kvfree(device);
+> +	return ERR_PTR(ret);
+> +}
+> +EXPORT_SYMBOL_GPL(_vfio_alloc_device);
+> +
+> +/*
+> + * Initialize a vfio_device so it can be registered to vfio core.
+> + *
+> + * Only vfio-ccw driver should call this interface.
+> + */
+> +int vfio_init_device(struct vfio_device *device, struct device *dev,
+> +		     const struct vfio_device_ops *ops)
+> +{
+> +	int ret;
+> +
+> +	vfio_init_group_dev(device, dev, ops);
+> +
+> +	if (ops->init) {
+> +		ret = ops->init(device);
+> +		if (ret)
+> +			goto out_uninit;
+> +	}
+> +
+> +	kref_init(&device->kref);
+> +	return 0;
+> +
+> +out_uninit:
+> +	vfio_uninit_group_dev(device);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(vfio_init_device);
+> +
+> +/*
+> + * The helper called by driver @release callback to free the device
+> + * structure. Drivers which don't have private data to clean can
+> + * simply use this helper as its @release.
+> + */
+> +void vfio_free_device(struct vfio_device *device)
+> +{
+> +	kvfree(device);
+> +}
+> +EXPORT_SYMBOL_GPL(vfio_free_device);
+> +
+> +/* Release helper called by vfio_put_device() */
+> +void vfio_device_release(struct kref *kref)
+> +{
+> +	struct vfio_device *device =
+> +			container_of(kref, struct vfio_device, kref);
+> +
+> +	vfio_uninit_group_dev(device);
+> +
+> +	/*
+> +	 * kvfree() cannot be done here due to a life cycle mess in
+> +	 * vfio-ccw. Before the ccw part is fixed all drivers are
+> +	 * required to support @release and call vfio_free_device()
+> +	 * from there.
+> +	 */
+> +	device->ops->release(device);
+> +}
+> +EXPORT_SYMBOL_GPL(vfio_device_release);
+> +
+>   static struct vfio_group *vfio_noiommu_group_alloc(struct device *dev,
+>   		enum vfio_group_type type)
+>   {
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index e05ddc6fe6a5..e1e9e8352903 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -45,7 +45,8 @@ struct vfio_device {
+>   	struct kvm *kvm;
+>   
+>   	/* Members below here are private, not for driver use */
+> -	refcount_t refcount;
+> +	struct kref kref;	/* object life cycle */
+> +	refcount_t refcount;	/* user count on registered device*/
+>   	unsigned int open_count;
+>   	struct completion comp;
+>   	struct list_head group_next;
+> @@ -55,6 +56,8 @@ struct vfio_device {
+>   /**
+>    * struct vfio_device_ops - VFIO bus driver device callbacks
+>    *
+> + * @init: initialize private fields in device structure
+> + * @release: Reclaim private fields in device structure
+>    * @open_device: Called when the first file descriptor is opened for this device
+>    * @close_device: Opposite of open_device
+>    * @read: Perform read(2) on device file descriptor
+> @@ -72,6 +75,8 @@ struct vfio_device {
+>    */
+>   struct vfio_device_ops {
+>   	char	*name;
+> +	int	(*init)(struct vfio_device *vdev);
+> +	void	(*release)(struct vfio_device *vdev);
+>   	int	(*open_device)(struct vfio_device *vdev);
+>   	void	(*close_device)(struct vfio_device *vdev);
+>   	ssize_t	(*read)(struct vfio_device *vdev, char __user *buf,
+> @@ -137,6 +142,24 @@ static inline int vfio_check_feature(u32 flags, size_t argsz, u32 supported_ops,
+>   	return 1;
+>   }
+>   
+> +struct vfio_device *_vfio_alloc_device(size_t size, struct device *dev,
+> +				       const struct vfio_device_ops *ops);
+> +#define vfio_alloc_device(dev_struct, member, dev, ops)				\
+> +	container_of(_vfio_alloc_device(sizeof(struct dev_struct) +		\
+> +					BUILD_BUG_ON_ZERO(offsetof(		\
+> +						struct dev_struct, member)),	\
+> +					dev, ops),				\
+> +		     struct dev_struct, member)
+
+
+I found the use of this macro confusing and unnecessary. I'd prefer 
+vfio_alloc_device be a function (see my comments above).
+
+
+> +
+> +int vfio_init_device(struct vfio_device *device, struct device *dev,
+> +		     const struct vfio_device_ops *ops);
+> +void vfio_free_device(struct vfio_device *device);
+> +void vfio_device_release(struct kref *kref);
+> +static inline void vfio_put_device(struct vfio_device *device)
+> +{
+> +	kref_put(&device->kref, vfio_device_release);
+> +}
+> +
+>   void vfio_init_group_dev(struct vfio_device *device, struct device *dev,
+>   			 const struct vfio_device_ops *ops);
+>   void vfio_uninit_group_dev(struct vfio_device *device);
