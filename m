@@ -2,106 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 558C45A66F9
-	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 17:10:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 478935A66FE
+	for <lists+kvm@lfdr.de>; Tue, 30 Aug 2022 17:11:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230296AbiH3PKT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 11:10:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53474 "EHLO
+        id S229652AbiH3PL2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 11:11:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230272AbiH3PKQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 11:10:16 -0400
-Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9795A3DBDA
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 08:10:11 -0700 (PDT)
-Received: by mail-qv1-xf2d.google.com with SMTP id j1so8903089qvv.8
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 08:10:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc;
-        bh=CBamQzSNNxE6SjxTKzzEO+qM/bRDvj9E4TwCaLJXBMk=;
-        b=fXNdwdpK40/W9ZV/jtDtFanBo50pdD9Zqq2j76SqDodQNMcH/S/9ZORqwpujvM/1o7
-         Y6ijjlraOllJTnfE8hkllQZkWTkVYG+l9AgDUUsf4ThP+1u3Lezl0Ah/HcTMhGdPhepr
-         6oaOHPhbuuQXVL7zA8adj2Q6F6wDptOrEHfHvWpbBkt1JOkwh5bMK0Ps71apRT8m0wKL
-         AOMSw1qxFu5ZtF1ie2DWVMI+XNlOgLhGsqhKFseVmGJOBV0nuysZvPAUoIJ8ecRUEdf7
-         8NQ34drZxPG72BJMShFI1bT2VX5a+waMVxy4LYhuSx5L0ejfGHWsTQ/GqJcHZt7AT8AA
-         7NCA==
+        with ESMTP id S229925AbiH3PLZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 11:11:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5624C7A52F
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 08:11:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661872283;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9Uj1KSGVvpg1e2uy6Lmq+BilnZLZf+fvAkkGZhgZ/JI=;
+        b=ElgX8nNU72xIzuf5OFPDsBSi8CnY55rfIjnKDJyvHJ8fr3H7mm/vXOPQgbj+m+SqdYLU5k
+        yw0gphay4pEH5gJYKXlWhAB4fhPWmizeEfS684bLIn/VRS71B1yC65kVcPEKYvT9FitlKC
+        GndEMLtl7L3Ze9ucXCgiuF0Jxv4ihB4=
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
+ [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-495-s-z1bSfrMsyd2Zf53vE3Sw-1; Tue, 30 Aug 2022 11:11:19 -0400
+X-MC-Unique: s-z1bSfrMsyd2Zf53vE3Sw-1
+Received: by mail-oo1-f69.google.com with SMTP id z22-20020a4a9c96000000b0044b699279ddso5172301ooj.22
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 08:11:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=CBamQzSNNxE6SjxTKzzEO+qM/bRDvj9E4TwCaLJXBMk=;
-        b=DDxnaCF8GYoxYiq3A2vVyltgy+i73ffuOsNgw4t6QPZhASFiVEK1wmTl1kdKCOSPoY
-         is/m0yoToAh8Oiz+9mbWUl8nY1of1dlxIlFxJ4OXUGYmhT3xFF0rhBnp5MQfAxNn3SaY
-         7OdETiCQXvETNBz4tWnHdAiJ3/cjOViDrFvFdMfejhAckBT4RQiabOFY1FceiAoFHrkZ
-         22v2Xq7T6s3bDZIBtzCsb9CmttO5hPl5b6W2ik+G8qBovAgu6TYfh2z/jAAhW5hhhCUs
-         W/X4pn5jrcC1OPSL4bRawCxUZW+u9ZByam0RnbeRT9FJFesXInmzuJgwR03/2U+WUPn0
-         rF1Q==
-X-Gm-Message-State: ACgBeo3wcohAIvN16x4BvuYa3Qf90+RldTmxpv8dowL4gXdkQwG9tQH0
-        sb9FofizI93Ype4RRLHBQKj7FA==
-X-Google-Smtp-Source: AA6agR6UUGFhrYHDf4KVE6IxiHBU+9Pg/pWLmRZ4Y2KqjrWUkINgLEKIUkRA9mAuIBzucBWjgrkfbQ==
-X-Received: by 2002:a0c:f1c7:0:b0:474:725e:753e with SMTP id u7-20020a0cf1c7000000b00474725e753emr15301629qvl.49.1661872210775;
-        Tue, 30 Aug 2022 08:10:10 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id bl8-20020a05620a1a8800b006bbdcb3fff7sm7634727qkb.69.2022.08.30.08.10.09
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc;
+        bh=9Uj1KSGVvpg1e2uy6Lmq+BilnZLZf+fvAkkGZhgZ/JI=;
+        b=fnCoNS9CwFyH7Q81oSfEckf0HfwmAmaVkUWI7MX6//MGP5MX1hA0ngT0jS8N5Z1dXP
+         +fAWk1wF3kW7etetR2HrNOcnqroKpmg3zdJ70e2dOf4BXulUPe9c4ys3PEXBJ5Sdulm7
+         YfWlOp0as2A5Dtidfr8YAtWszZcC9nvzRc6VXzSrbtVdIqONFIU+4JkbAsAVQYbbpXEp
+         qDFeSIYVtuthH2ohpIbYEyBGxJw6zDBEeQqniLd4lOkC965kKC+3Fv22Hmohx4YqewIV
+         xMKNNQpIEfFYmktP50qJr8sZrPtHyqTXvWTU87FQMpuQrR4St478Wp6P8n62F9vu5Ufu
+         FuSQ==
+X-Gm-Message-State: ACgBeo1gm50ZFbXkwFRX08gJXHAifNGpJ1fjzNn/56wQneiur5JtMP0y
+        /biTP4HHpPXFvjKTPzx6nDCw6k/k0MuIAfyWruhW5+rN0PCcpLH/xVVUxgI0R+dKiYZDD39doer
+        xX7ihtETuCBWt
+X-Received: by 2002:a05:6830:1e64:b0:63b:25dd:ed07 with SMTP id m4-20020a0568301e6400b0063b25dded07mr5689835otr.159.1661872278756;
+        Tue, 30 Aug 2022 08:11:18 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7imdzhCAin1zc5CWFAJrLO27P5NJLOlKojo5DBQINDuHfcvZzdAo7eVrmJH+TF0TXpUXCpRg==
+X-Received: by 2002:a05:6830:1e64:b0:63b:25dd:ed07 with SMTP id m4-20020a0568301e6400b0063b25dded07mr5689827otr.159.1661872278524;
+        Tue, 30 Aug 2022 08:11:18 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id e5-20020aca1305000000b00344e3751fc4sm6192535oii.36.2022.08.30.08.11.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Aug 2022 08:10:09 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1oT2sS-003kUN-QX;
-        Tue, 30 Aug 2022 12:10:08 -0300
-Date:   Tue, 30 Aug 2022 12:10:08 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Anthony Krowiak <akrowiak@linux.ibm.com>
-Cc:     Kevin Tian <kevin.tian@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Longfang Liu <liulongfang@huawei.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Abhishek Sahu <abhsahu@nvidia.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, Yi Liu <yi.l.liu@intel.com>
-Subject: Re: [PATCH 01/15] vfio: Add helpers for unifying vfio_device life
- cycle
-Message-ID: <Yw4oUL33TbJK6inc@ziepe.ca>
-References: <20220827171037.30297-1-kevin.tian@intel.com>
- <20220827171037.30297-2-kevin.tian@intel.com>
- <907c54c6-7f5b-77f3-c284-45604c60c12e@linux.ibm.com>
+        Tue, 30 Aug 2022 08:11:18 -0700 (PDT)
+Date:   Tue, 30 Aug 2022 09:11:10 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        lpivarc@redhat.com
+Subject: Re: [PATCH] vfio/type1: Unpin zero pages
+Message-ID: <20220830091110.3f6d1737.alex.williamson@redhat.com>
+In-Reply-To: <39145649-c378-d027-8856-81b4f09050fc@redhat.com>
+References: <166182871735.3518559.8884121293045337358.stgit@omen>
+        <39145649-c378-d027-8856-81b4f09050fc@redhat.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <907c54c6-7f5b-77f3-c284-45604c60c12e@linux.ibm.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -109,62 +79,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 30, 2022 at 09:42:42AM -0400, Anthony Krowiak wrote:
+On Tue, 30 Aug 2022 09:59:33 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-> > +/*
-> > + * Alloc and initialize vfio_device so it can be registered to vfio
-> > + * core.
-> > + *
-> > + * Drivers should use the wrapper vfio_alloc_device() for allocation.
-> > + * @size is the size of the structure to be allocated, including any
-> > + * private data used by the driver.
+> On 30.08.22 05:05, Alex Williamson wrote:
+> > There's currently a reference count leak on the zero page.  We increment
+> > the reference via pin_user_pages_remote(), but the page is later handled
+> > as an invalid/reserved page, therefore it's not accounted against the
+> > user and not unpinned by our put_pfn().
+> > 
+> > Introducing special zero page handling in put_pfn() would resolve the
+> > leak, but without accounting of the zero page, a single user could
+> > still create enough mappings to generate a reference count overflow.
+> > 
+> > The zero page is always resident, so for our purposes there's no reason
+> > to keep it pinned.  Therefore, add a loop to walk pages returned from
+> > pin_user_pages_remote() and unpin any zero pages.
+> > 
+> > Cc: David Hildenbrand <david@redhat.com>
+> > Cc: stable@vger.kernel.org
+> > Reported-by: Luboslav Pivarc <lpivarc@redhat.com>
+> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > ---
+> >  drivers/vfio/vfio_iommu_type1.c |   12 ++++++++++++
+> >  1 file changed, 12 insertions(+)
+> > 
+> > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> > index db516c90a977..8706482665d1 100644
+> > --- a/drivers/vfio/vfio_iommu_type1.c
+> > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > @@ -558,6 +558,18 @@ static int vaddr_get_pfns(struct mm_struct *mm, unsigned long vaddr,
+> >  	ret = pin_user_pages_remote(mm, vaddr, npages, flags | FOLL_LONGTERM,
+> >  				    pages, NULL, NULL);
+> >  	if (ret > 0) {
+> > +		int i;
+> > +
+> > +		/*
+> > +		 * The zero page is always resident, we don't need to pin it
+> > +		 * and it falls into our invalid/reserved test so we don't
+> > +		 * unpin in put_pfn().  Unpin all zero pages in the batch here.
+> > +		 */
+> > +		for (i = 0 ; i < ret; i++) {
+> > +			if (unlikely(is_zero_pfn(page_to_pfn(pages[i]))))
+> > +				unpin_user_page(pages[i]);
+> > +		}
+> > +
+> >  		*pfn = page_to_pfn(pages[0]);
+> >  		goto done;
+> >  	}
+> > 
+> >   
 > 
+> As discussed offline, for the shared zeropage (that's not even
+> refcounted when mapped into a process), this makes perfect sense to me.
 > 
-> It seems the purpose of the wrapper is to ensure that the object being
-> allocated has as its first field a struct vfio_device object and to return
-> its container. Why not just make that a requirement for this function -
-> which I would rename vfio_alloc_device - and document it in the prologue?
-> The caller can then cast the return pointer or use container_of.
+> Good question raised by Sean if ZONE_DEVICE pages might similarly be
+> problematic. But for them, we cannot simply always unpin here.
 
-There are three fairly common patterns for this kind of thing
+What sort of VM mapping would give me ZONE_DEVICE pages?  Thanks,
 
-1) The caller open codes everything:
+Alex
 
-   driver_struct = kzalloc()
-   core_init(&driver_struct->core)
-
-2) Some 'get priv' / 'get data' is used instead of container_of():
-
-   core_struct = core_alloc(sizeof(*driver_struct))
-   driver_struct = core_get_priv(core_struct)
-
-3) The allocations and initialization are consolidated in the core,
-   but we continue to use container_of()
-
-   driver_struct = core_alloc(typeof(*driver_struct))
-
-#1 has a general drawback that people routinely mess up the lifecycle
-model and get really confused about when to do kfree() vs put(),
-creating bugs.
-
-#2 has a general drawback of not using container_of() at all, and being
-a bit confusing in some cases
-
-#3 has the general drawback of being a bit magical, but solves 1 and
-2's problems.
-
-I would not fix the struct layout without the BUILD_BUG_ON because
-someone will accidently change the order and that becomes a subtle
-runtime error - so at a minimum the wrapper macro has to exist to
-check that.
-
-If you want to allow a dynamic struct layout and avoid the pitfall of
-exposing the user to kalloc/kfree, then you still need the macro, and
-it does some more complicated offset stuff.
-
-Having the wrapper macro be entirely type safe is appealing and
-reduces code in the drivers, IMHO. Tell it what type you are initing
-and get back init'd memory for that type that you always, always free
-with a put operation.
-
-Jason
