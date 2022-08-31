@@ -2,137 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1809B5A73B2
-	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 04:00:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 076B95A73D5
+	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 04:18:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231439AbiHaCAi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 22:00:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43168 "EHLO
+        id S230134AbiHaCSc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 22:18:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbiHaCAf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 22:00:35 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C45CF2C107
-        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 19:00:32 -0700 (PDT)
+        with ESMTP id S229589AbiHaCSb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 22:18:31 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF46496FD9;
+        Tue, 30 Aug 2022 19:18:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661911232; x=1693447232;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=XhaVOaApViG4U0OOBi8j4fO36jFAMwO1PvA0qNcPjbw=;
-  b=CuWmtWfzh3UBPg6qcDxY4muOxQqgwX9TCZBO0HA62yHIDp5HIxr6FG2g
-   tN4FwMZlc+oVN57TuUlBLVl1pQ8J0+Wiq3RR58q76WgOGtDwMjXqTX+7Z
-   Kv0yXPeFanetFweVF7KsLilLf0ZrtL0l3lbamQJOrxN5aPfKv6FeYsKFr
-   UPWOZ0ACQOrYwQ5q16cKXKJ44eZ/Qp8gJypOI6BoZz/6widm+P4nuLcah
-   48mMnW+EQPiDf1DlM5hADfn1kEU2xUvjfhIGIahyPHWlhoupV3hXBPXLV
-   RJoepK+fUEcUqmB5Dljp+Z/J40WkmNFd9UvkHXAoqg6/vrx60MTSJENc3
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10455"; a="357067451"
+  t=1661912308; x=1693448308;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=61P+IO0szUMx//fRCLpfxHfQX38wzvHaIv4kI5y43As=;
+  b=NDB3ZyPwf49LaevtFnP0DYNcwqO5e1xBQq/BVlATa/VNAoZdlCWAseOk
+   8lrAjAf/rA4N1r4nwN0iEzMfBwsi5KcdI0zC+cP8DKwXEQlGV27QNKX99
+   MC37x4RaehmNPBS1hoMml8WeRUoAyDpx1/TvxzZm4/I+rvjRulOror7yu
+   cFUvMLDwuzyp/aYlEojjbaxKMK2PDHe0znLdacGjWbux4se8yxMYXOMIj
+   OrQDJOd4PVuLBkB1xLzOEKZQURGlHnpBYOb5tXbiPhahvocNGC13jN26m
+   XxoDmk/Nad7adUEE2asnJsKjhGmyl2AI5Z8W/4Dy5fB/WCLmPaGEPKkfg
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10455"; a="295357769"
 X-IronPort-AV: E=Sophos;i="5.93,276,1654585200"; 
-   d="scan'208";a="357067451"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2022 19:00:28 -0700
+   d="scan'208";a="295357769"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2022 19:18:28 -0700
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.93,276,1654585200"; 
-   d="scan'208";a="673151342"
-Received: from jwan100-mobl2.ccr.corp.intel.com (HELO [10.249.192.207]) ([10.249.192.207])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2022 19:00:26 -0700
-Message-ID: <47f23202-65e6-bd0b-f9a0-0d288df5e9fc@intel.com>
-Date:   Wed, 31 Aug 2022 10:00:24 +0800
+   d="scan'208";a="680267668"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by fmsmga004.fm.intel.com with ESMTP; 30 Aug 2022 19:18:26 -0700
+Date:   Wed, 31 Aug 2022 10:18:25 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>
+Subject: Re: [PATCH v8 022/103] KVM: TDX: Add place holder for TDX VM
+ specific mem_enc_op ioctl
+Message-ID: <20220831021825.6uevl3xkvwog47ht@yy-desk-7060>
+References: <cover.1659854790.git.isaku.yamahata@intel.com>
+ <2d65bd56a7ab8c0776f5c6b7c8481dd45ad96794.1659854790.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.13.0
-Subject: Re: [PATCH v2] KVM: x86: Mask off unsupported and unknown bits of
- IA32_ARCH_CAPABILITIES
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vipin Sharma <vipinsh@google.com>
-References: <20220830174947.2182144-1-jmattson@google.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20220830174947.2182144-1-jmattson@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2d65bd56a7ab8c0776f5c6b7c8481dd45ad96794.1659854790.git.isaku.yamahata@intel.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/31/2022 1:49 AM, Jim Mattson wrote:
-> KVM should not claim to virtualize unknown IA32_ARCH_CAPABILITIES
-> bits. When kvm_get_arch_capabilities() was originally written, there
-> were only a few bits defined in this MSR, and KVM could virtualize all
-> of them. However, over the years, several bits have been defined that
-> KVM cannot just blindly pass through to the guest without additional
-> work (such as virtualizing an MSR promised by the
-> IA32_ARCH_CAPABILITES feature bit).
-> 
-> Define a mask of supported IA32_ARCH_CAPABILITIES bits, and mask off
-> any other bits that are set in the hardware MSR.
-
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Fixes: 5b76a3cff011 ("KVM: VMX: Tell the nested hypervisor to skip L1D flush on vmentry")
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> Reviewed-by: Vipin Sharma <vipinsh@google.com>
+On Sun, Aug 07, 2022 at 03:01:07PM -0700, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>
+> Add a place holder function for TDX specific VM-scoped ioctl as mem_enc_op.
+> TDX specific sub-commands will be added to retrieve/pass TDX specific
+> parameters.
+>
+> KVM_MEMORY_ENCRYPT_OP was introduced for VM-scoped operations specific for
+> guest state-protected VM.  It defined subcommands for technology-specific
+> operations under KVM_MEMORY_ENCRYPT_OP.  Despite its name, the subcommands
+> are not limited to memory encryption, but various technology-specific
+> operations are defined.  It's natural to repurpose KVM_MEMORY_ENCRYPT_OP
+> for TDX specific operations and define subcommands.
+>
+> TDX requires VM-scoped TDX-specific operations for device model, for
+> example, qemu.  Getting system-wide parameters, TDX-specific VM
+> initialization.
+>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > ---
-> 
->   v1 -> v2: Clarified comment about unsupported bits.
-> 
->   arch/x86/kvm/x86.c | 25 +++++++++++++++++++++----
->   1 file changed, 21 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 205ebdc2b11b..9a18acfcfdc8 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1557,12 +1557,32 @@ static const u32 msr_based_features_all[] = {
->   static u32 msr_based_features[ARRAY_SIZE(msr_based_features_all)];
->   static unsigned int num_msr_based_features;
->   
-> +/*
-> + * Some IA32_ARCH_CAPABILITIES bits have dependencies on MSRs that KVM
-> + * does not yet virtualize. These include:
-> + *   10 - MISC_PACKAGE_CTRLS
-> + *   11 - ENERGY_FILTERING_CTL
-> + *   12 - DOITM
-> + *   18 - FB_CLEAR_CTRL
-> + *   21 - XAPIC_DISABLE_STATUS
-> + *   23 - OVERCLOCKING_STATUS
-> + */
+>  arch/x86/kvm/vmx/main.c    |  9 +++++++++
+>  arch/x86/kvm/vmx/tdx.c     | 26 ++++++++++++++++++++++++++
+>  arch/x86/kvm/vmx/x86_ops.h |  4 ++++
+>  3 files changed, 39 insertions(+)
+>
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index 7b497ed1f21c..067f5de56c53 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -73,6 +73,14 @@ static void vt_vm_free(struct kvm *kvm)
+>  		return tdx_vm_free(kvm);
+>  }
+>
+> +static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+> +{
+> +	if (!is_td(kvm))
+> +		return -ENOTTY;
 > +
-> +#define KVM_SUPPORTED_ARCH_CAP \
-> +	(ARCH_CAP_RDCL_NO | ARCH_CAP_IBRS_ALL | ARCH_CAP_RSBA | \
-> +	 ARCH_CAP_SKIP_VMENTRY_L1DFLUSH | ARCH_CAP_SSB_NO | ARCH_CAP_MDS_NO | \
-> +	 ARCH_CAP_PSCHANGE_MC_NO | ARCH_CAP_TSX_CTRL_MSR | ARCH_CAP_TAA_NO | \
-> +	 ARCH_CAP_SBDR_SSDP_NO | ARCH_CAP_FBSDP_NO | ARCH_CAP_PSDP_NO | \
-> +	 ARCH_CAP_FB_CLEAR | ARCH_CAP_RRSBA | ARCH_CAP_PBRSB_NO)
+> +	return tdx_vm_ioctl(kvm, argp);
+> +}
 > +
->   static u64 kvm_get_arch_capabilities(void)
->   {
->   	u64 data = 0;
->   
-> -	if (boot_cpu_has(X86_FEATURE_ARCH_CAPABILITIES))
-> +	if (boot_cpu_has(X86_FEATURE_ARCH_CAPABILITIES)) {
->   		rdmsrl(MSR_IA32_ARCH_CAPABILITIES, data);
-> +		data &= KVM_SUPPORTED_ARCH_CAP;
-> +	}
->   
->   	/*
->   	 * If nx_huge_pages is enabled, KVM's shadow paging will ensure that
-> @@ -1610,9 +1630,6 @@ static u64 kvm_get_arch_capabilities(void)
->   		 */
->   	}
->   
-> -	/* Guests don't need to know "Fill buffer clear control" exists */
-> -	data &= ~ARCH_CAP_FB_CLEAR_CTRL;
-> -
->   	return data;
->   }
->   
+>  struct kvm_x86_ops vt_x86_ops __initdata = {
+>  	.name = "kvm_intel",
+>
+> @@ -214,6 +222,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+>  	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
+>
+>  	.dev_mem_enc_ioctl = tdx_dev_ioctl,
+> +	.mem_enc_ioctl = vt_mem_enc_ioctl,
+>  };
+>
+>  struct kvm_x86_init_ops vt_init_ops __initdata = {
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 16c6570dbe52..d3b9f653da4b 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -424,6 +424,32 @@ int tdx_dev_ioctl(void __user *argp)
+>  	return 0;
+>  }
+>
+> +int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
+> +{
+> +	struct kvm_tdx_cmd tdx_cmd;
+> +	int r;
+> +
+> +	if (copy_from_user(&tdx_cmd, argp, sizeof(struct kvm_tdx_cmd)))
 
+Minor: sizeof(tdx_cmd), escape from type change & better readability.
+
+> +		return -EFAULT;
+> +	if (tdx_cmd.error || tdx_cmd.unused)
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&kvm->lock);
+> +
+> +	switch (tdx_cmd.id) {
+> +	default:
+> +		r = -EINVAL;
+> +		goto out;
+> +	}
+> +
+> +	if (copy_to_user(argp, &tdx_cmd, sizeof(struct kvm_tdx_cmd)))
+
+Ditto
+
+> +		r = -EFAULT;
+> +
+> +out:
+> +	mutex_unlock(&kvm->lock);
+> +	return r;
+> +}
+> +
+>  int __init tdx_module_setup(void)
+>  {
+>  	const struct tdsysinfo_struct *tdsysinfo;
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index 02490515d190..f0fe40c7ac34 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -137,6 +137,8 @@ int tdx_dev_ioctl(void __user *argp);
+>  int tdx_vm_init(struct kvm *kvm);
+>  void tdx_mmu_release_hkid(struct kvm *kvm);
+>  void tdx_vm_free(struct kvm *kvm);
+> +
+> +int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
+>  #else
+>  static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return 0; }
+>  static inline bool tdx_is_vm_type_supported(unsigned long type) { return false; }
+> @@ -147,6 +149,8 @@ static inline int tdx_vm_init(struct kvm *kvm) { return -EOPNOTSUPP; }
+>  static inline void tdx_mmu_release_hkid(struct kvm *kvm) {}
+>  static inline void tdx_flush_shadow_all_private(struct kvm *kvm) {}
+>  static inline void tdx_vm_free(struct kvm *kvm) {}
+> +
+> +static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
+>  #endif
+>
+>  #endif /* __KVM_X86_VMX_X86_OPS_H */
+> --
+> 2.25.1
+>
