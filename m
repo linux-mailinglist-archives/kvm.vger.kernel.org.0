@@ -2,67 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 223BA5A84E6
-	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 20:01:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 55E425A850B
+	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 20:09:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231594AbiHaSBu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Aug 2022 14:01:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33134 "EHLO
+        id S232440AbiHaSJX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Aug 2022 14:09:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230437AbiHaSBq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Aug 2022 14:01:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E790BC6962
-        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 11:01:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661968905;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Rk0SIObkGc/OzoHqCX/ztgHsCZlml4ew8HfMbq2hEx8=;
-        b=HUBf2UMv9x0ydgDtWwel1wYn55EZANCjDtWFGJMDCfH+nNWNi4qNBqQ5QNyPK/H1bSR1B/
-        7qiFO8+sKoEmCmScr1danzQN5ZHxzjADqrRPwtxpXzNaFvAS52lE5xvFK2iIhfgPf9/wfh
-        c3PK88WgzkPZt3P0Rbo2fv/UfuqAnV4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-393-9aXchQ55PFKabLqbci9nsA-1; Wed, 31 Aug 2022 14:01:42 -0400
-X-MC-Unique: 9aXchQ55PFKabLqbci9nsA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S232449AbiHaSIn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Aug 2022 14:08:43 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0C45E68C2;
+        Wed, 31 Aug 2022 11:08:38 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7D016294EDE3;
-        Wed, 31 Aug 2022 18:01:41 +0000 (UTC)
-Received: from starship (unknown [10.40.194.96])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AC928C15BB3;
-        Wed, 31 Aug 2022 18:01:39 +0000 (UTC)
-Message-ID: <30eee80130339f31847caa9fc0aa79999c0902d5.camel@redhat.com>
-Subject: Re: [PATCH 03/19] Revert "KVM: SVM: Introduce hybrid-AVIC mode"
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Li RongQing <lirongqing@baidu.com>
-Date:   Wed, 31 Aug 2022 21:01:38 +0300
-In-Reply-To: <CALMp9eRKa97GbvbML=VTrQ=Y3gaF6eZtNhrWD2UNGbL1Q8r0fA@mail.gmail.com>
-References: <20220831003506.4117148-1-seanjc@google.com>
-         <20220831003506.4117148-4-seanjc@google.com>
-         <17e776dccf01e03bce1356beb8db0741e2a13d9a.camel@redhat.com>
-         <84c2e836d6ba4eae9fa20329bcbc1d19f8134b0f.camel@redhat.com>
-         <Yw+MYLyVXvxmbIRY@google.com>
-         <59206c01da236c836c58ff96c5b4123d18a28b2b.camel@redhat.com>
-         <CALMp9eRKa97GbvbML=VTrQ=Y3gaF6eZtNhrWD2UNGbL1Q8r0fA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        by ams.source.kernel.org (Postfix) with ESMTPS id D4E5DB82221;
+        Wed, 31 Aug 2022 18:08:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 431B7C433D6;
+        Wed, 31 Aug 2022 18:08:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661969315;
+        bh=+JjElnI5IjOCD0ml2rzIPbAQ+2yKUfZWwuoUc78T+4U=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Hfa+oD1uUUs2d9r0k5XrVD0NjeEB8EEqrGsuhqiXSJsWdk9oPHgxQs3PlHlA41btc
+         YvHMiJk0ha3z2itd9l1pGNll45OnmpJ1quUsu/rkWQjEAxVWMo+hryCMaoCLta3G4M
+         6QoryKkOTwmn5HwJsdlR41K7nTGvKXD9vMP1BlE7CNNO501Wty7/OOzrCgkfrkQNmx
+         s7FJW8wv1Td+Cv+EmWBMyIqUGHB9FYkYPtC4x5dR8QVZE5TPWp90d1Hvc6/eO1p+8k
+         U6SxWyOER38RdBgD/fPQgjs9gryoD4H5T/eE4DBULcvCUNfHC/u/Xa/I3Z7OGZP0TV
+         2tuLz7Q57y5Jw==
+From:   Jisheng Zhang <jszhang@kernel.org>
+To:     Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Steven Rostedt <rostedt@goodmis.org>
+Cc:     linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Subject: [PATCH v2 0/5] riscv: add PREEMPT_RT support
+Date:   Thu,  1 Sep 2022 01:59:15 +0800
+Message-Id: <20220831175920.2806-1-jszhang@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,17 +58,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-08-31 at 10:58 -0700, Jim Mattson wrote:
-> On Wed, Aug 31, 2022 at 10:49 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
-> 
-> > In this case I say that there is no wiggle room for KVM to not allow different APIC bases
-> > on each CPU - the spec 100% allows it, but in KVM it is broken.
-> 
-> This would actually be my first candidate for
-> Documentation/virt/kvm/x86/errata.rst!
-> 
-100% agree.
+This series is to add PREEMPT_RT support to riscv:
+patch1 adds the missing number of signal exits in vCPU stat
+patch2 switches to the generic guest entry infrastructure
+patch3 select HAVE_POSIX_CPU_TIMERS_TASK_WORK which is a requirement for
+RT
+patch4 adds lazy preempt support
+patch5 allows to enable PREEMPT_RT
 
-Best regards,
-	Maxim Levitsky
+I assume patch1, patch2 and patch3 can be reviewed and merged for
+riscv-next, patch4 and patch5 can be reviewed and maintained in rt tree,
+and finally merged once the remaining patches in rt tree are all
+mainlined.
+
+Since v1:
+  - send to related maillist, I press ENTER too quickly when sending v1
+  - remove the signal_pending() handling because that's covered by
+    generic guest entry infrastructure
+
+Jisheng Zhang (5):
+  RISC-V: KVM: Record number of signal exits as a vCPU stat
+  RISC-V: KVM: Use generic guest entry infrastructure
+  riscv: select HAVE_POSIX_CPU_TIMERS_TASK_WORK
+  riscv: add lazy preempt support
+  riscv: Allow to enable RT
+
+ arch/riscv/Kconfig                   |  3 +++
+ arch/riscv/include/asm/kvm_host.h    |  1 +
+ arch/riscv/include/asm/thread_info.h |  7 +++++--
+ arch/riscv/kernel/asm-offsets.c      |  1 +
+ arch/riscv/kernel/entry.S            |  9 +++++++--
+ arch/riscv/kvm/Kconfig               |  1 +
+ arch/riscv/kvm/vcpu.c                | 18 +++++++-----------
+ 7 files changed, 25 insertions(+), 15 deletions(-)
+
+-- 
+2.34.1
 
