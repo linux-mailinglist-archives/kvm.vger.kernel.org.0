@@ -2,116 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CC2F75A7EB6
-	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 15:26:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97E655A7F03
+	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 15:37:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231821AbiHaN0t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Aug 2022 09:26:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35698 "EHLO
+        id S230071AbiHaNhl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Aug 2022 09:37:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231845AbiHaN0p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Aug 2022 09:26:45 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF47ED0215
-        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 06:26:42 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27VD1ZDP027488
-        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 13:26:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : from
- : subject : cc : to : message-id : date; s=pp1;
- bh=NJ8zZaP8Hx896Er+gAx+RS2RDqsgf1NgPrkcnPtWLPc=;
- b=ZT4K2PuuTvLsUiwEaamjVijBPoGu4MX61tHss9ZQo2gumeUhuFz6s0022YH9ohATnZ4q
- FgrrFYifsTbvs2xFhELUSFghukzPcjalHnRiCqSwYObi7vtOzUylqG2YBFLIiDefPkvt
- aKyHAiXoWPTlSSj1CPiFrtDnVQEGfDUmjfHrXGHMb9nS5Co4jcxFbnwqbBoSRqKrtgsg
- dxsERPi+BrHZLdWS9TsFFiFy6aKdwfW9kaz8PDEolsq2aeGpMyWEb8fC47A9uFgyOXSr
- myz3ybtXRWVHKTXpmeICH+iA+5llcfS1Oql/owe2RG/V7XnucIOOyiswuBtr6NC1JAJ0 TA== 
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ja85ts3mx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 13:26:42 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27VDPSlf010062
-        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 13:26:39 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04fra.de.ibm.com with ESMTP id 3j7aw9bvjk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 13:26:39 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27VDQarI37224844
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 31 Aug 2022 13:26:36 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5746B42042;
-        Wed, 31 Aug 2022 13:26:36 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 37E8C42041;
-        Wed, 31 Aug 2022 13:26:36 +0000 (GMT)
-Received: from t14-nrb (unknown [9.155.203.253])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 31 Aug 2022 13:26:36 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S231248AbiHaNhR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Aug 2022 09:37:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D831520BB
+        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 06:37:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661953030;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NqLLZpX9/rdPQC8fXuBgpE6QXfGA/f4RUY0GEcjEdZM=;
+        b=LVuNwyFFFaM3h3ZSdEpHqKR8iV0EUHzcoty2lho15ol3fmnuzJ2qtqcwxybp2K8lwYgA1s
+        139mtyBN2FcwiHWb+ok54DmQkZjZZ7O09F21oP2sjgxnbryU0cTvHVzRpghB94FVVAHNyF
+        YpSDhTPQ+TWjSq0tmaz/0WUgQp080SQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-669-tGwd2OQcOdOgi8DEc-XrbA-1; Wed, 31 Aug 2022 09:37:05 -0400
+X-MC-Unique: tGwd2OQcOdOgi8DEc-XrbA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EEAD285A597;
+        Wed, 31 Aug 2022 13:37:04 +0000 (UTC)
+Received: from starship (unknown [10.40.194.96])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5962940CF8EE;
+        Wed, 31 Aug 2022 13:37:03 +0000 (UTC)
+Message-ID: <5f6d99bc28fde0c48907991b6f67009430aea243.camel@redhat.com>
+Subject: Re: [PATCH 14/19] KVM: x86: Honor architectural behavior for
+ aliased 8-bit APIC IDs
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Li RongQing <lirongqing@baidu.com>
+Date:   Wed, 31 Aug 2022 16:37:02 +0300
+In-Reply-To: <20220831003506.4117148-15-seanjc@google.com>
+References: <20220831003506.4117148-1-seanjc@google.com>
+         <20220831003506.4117148-15-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20220829075602.6611-2-nrb@linux.ibm.com>
-References: <20220829075602.6611-1-nrb@linux.ibm.com> <20220829075602.6611-2-nrb@linux.ibm.com>
-From:   Nico Boehr <nrb@linux.ibm.com>
-Subject: Re: [RFC PATCH v2 1/1] KVM: s390: pv: don't allow userspace to set the clock under PV
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com,
-        borntraeger@linux.ibm.com, Marc Hartmayer <mhartmay@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Message-ID: <166195239599.44305.2713073327282944995@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Wed, 31 Aug 2022 15:26:35 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: tSrrqBwZ7pHgK8tb69Lmte7IycdKeMnV
-X-Proofpoint-ORIG-GUID: tSrrqBwZ7pHgK8tb69Lmte7IycdKeMnV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-08-31_07,2022-08-31_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=618
- priorityscore=1501 spamscore=0 mlxscore=0 lowpriorityscore=0
- suspectscore=0 malwarescore=0 impostorscore=0 bulkscore=0 clxscore=1015
- adultscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2208310065
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Nico Boehr (2022-08-29 09:56:02)
-> When running under PV, the guest's TOD clock is under control of the
-> ultravisor and the hypervisor isn't allowed to change it. Hence, don't
-> allow userspace to change the guest's TOD clock by returning
-> -EOPNOTSUPP.
->=20
-> When userspace changes the guest's TOD clock, KVM updates its
-> kvm.arch.epoch field and, in addition, the epoch field in all state
-> descriptions of all VCPUs.
->=20
-> But, under PV, the ultravisor will ignore the epoch field in the state
-> description and simply overwrite it on next SIE exit with the actual
-> guest epoch. This leads to KVM having an incorrect view of the guest's
-> TOD clock: it has updated its internal kvm.arch.epoch field, but the
-> ultravisor ignores the field in the state description.
->=20
-> Whenever a guest is now waiting for a clock comparator, KVM will
-> incorrectly calculate the time when the guest should wake up, possibly
-> causing the guest to sleep for much longer than expected.
->=20
-> With this change, kvm_s390_set_tod() will now take the kvm->lock to be
-> able to call kvm_s390_pv_is_protected(). Since kvm_s390_set_tod_clock()
-> also takes kvm->lock, use __kvm_s390_set_tod_clock() instead.
->=20
-> Fixes: 0f3035047140 ("KVM: s390: protvirt: Do only reset registers that a=
-re accessible")
+On Wed, 2022-08-31 at 00:35 +0000, Sean Christopherson wrote:
+> Apply KVM's hotplug hack if and only if userspace has enabled 32-bit IDs
+> for x2APIC.  If 32-bit IDs are not enabled, disable the optimized map to
+> honor x86 architectural behavior if multiple vCPUs shared a physical APIC
+> ID.  As called out in the changelog that added the hack, all CPUs whose
+> (possibly truncated) APIC ID matches the target are supposed to receive
+> the IPI.
+> 
+>   KVM intentionally differs from real hardware, because real hardware
+>   (Knights Landing) does just "x2apic_id & 0xff" to decide whether to
+>   accept the interrupt in xAPIC mode and it can deliver one interrupt to
+>   more than one physical destination, e.g. 0x123 to 0x123 and 0x23.
+> 
+> Applying the hack even when x2APIC is not fully enabled means KVM doesn't
+> correctly handle scenarios where the guest has aliased xAPIC IDs across
+> multiple vCPUs, as only the vCPU with the lowest vCPU ID will receive any
+> interrupts.  It's extremely unlikely any real world guest aliase APIC IDs,
+> or even modifies APIC IDs, but KVM's behavior is arbitrary, e.g. the
+> lowest vCPU ID "wins" regardless of which vCPU is "aliasing" and which
+> vCPU is "normal".
+> 
+> Furthermore, the hack is _not_ guaranteed to work!  The hack works if and
+> only if the optimized APIC map is successfully allocated.  If the map
+> allocation fails (unlikely), KVM will fall back to its unoptimized
+> behavior, which _does_ honor the architectural behavior.
+> 
+> Pivot on 32-bit x2APIC IDs being enabled as that is required to take
+> advantage of the hotplug hack (see kvm_apic_state_fixup()), i.e. won't
+> break existing setups unless they are way, way off in the weeds.
+> 
+> And an entry in KVM's errata to document the hack.  Alternatively, KVM
+> could provide an actual x2APIC quirk and document the hack that way, but
+> there's unlikely to ever be a use case for disabling the quirk.  Go the
+> errata route to avoid having to validate a quirk no one cares about.
+> 
+> Fixes: 5bd5db385b3e ("KVM: x86: allow hotplug of VCPU with APIC ID over 0xff")
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  Documentation/virt/kvm/x86/errata.rst | 11 ++++++
+>  arch/x86/kvm/lapic.c                  | 50 ++++++++++++++++++++++-----
+>  2 files changed, 52 insertions(+), 9 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/x86/errata.rst b/Documentation/virt/kvm/x86/errata.rst
+> index 410e0aa63493..49a05f24747b 100644
+> --- a/Documentation/virt/kvm/x86/errata.rst
+> +++ b/Documentation/virt/kvm/x86/errata.rst
+> @@ -37,3 +37,14 @@ Nested virtualization features
+>  ------------------------------
+>  
+>  TBD
+> +
+> +x2APIC
+> +------
+> +When KVM_X2APIC_API_USE_32BIT_IDS is enabled, KVM activates a hack/quirk that
+> +allows sending events to a single vCPU using its x2APIC ID even if the target
+> +vCPU has legacy xAPIC enabled, e.g. to bring up hotplugged vCPUs via INIT-SIPI
+> +on VMs with > 255 vCPUs.  A side effect of the quirk is that, if multiple vCPUs
+> +have the same physical APIC ID, KVM will deliver events targeting that APIC ID
+> +only to the vCPU with the lowest vCPU ID.  If KVM_X2APIC_API_USE_32BIT_IDS is
+> +not enabled, KVM follows x86 architecture when processing interrupts (all vCPUs
+> +matching the target APIC ID receive the interrupt).
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index d537b51295d6..c224b5c7cd92 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -260,10 +260,10 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+>  	kvm_for_each_vcpu(i, vcpu, kvm) {
+>  		struct kvm_lapic *apic = vcpu->arch.apic;
+>  		struct kvm_lapic **cluster;
+> +		u32 x2apic_id, physical_id;
+>  		u16 mask;
+>  		u32 ldr;
+>  		u8 xapic_id;
+> -		u32 x2apic_id;
+>  
+>  		if (!kvm_apic_present(vcpu))
+>  			continue;
+> @@ -271,16 +271,48 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+>  		xapic_id = kvm_xapic_id(apic);
+>  		x2apic_id = kvm_x2apic_id(apic);
+>  
+> -		/* Hotplug hack: see kvm_apic_match_physical_addr(), ... */
+> -		if ((apic_x2apic_mode(apic) || x2apic_id > 0xff) &&
+> -				x2apic_id <= new->max_apic_id)
+> -			new->phys_map[x2apic_id] = apic;
+>  		/*
+> -		 * ... xAPIC ID of VCPUs with APIC ID > 0xff will wrap-around,
+> -		 * prevent them from masking VCPUs with APIC ID <= 0xff.
+> +		 * Apply KVM's hotplug hack if userspace has enable 32-bit APIC
+> +		 * IDs.  Allow sending events to vCPUs by their x2APIC ID even
+> +		 * if the target vCPU is in legacy xAPIC mode, and silently
+> +		 * ignore aliased xAPIC IDs (the x2APIC ID is truncated to 8
+> +		 * bits, causing IDs > 0xff to wrap and collide).
+> +		 *
+> +		 * Honor the architectural (and KVM's non-optimized) behavior
+> +		 * if userspace has not enabled 32-bit x2APIC IDs.  Each APIC
+> +		 * is supposed to process messages independently.  If multiple
+> +		 * vCPUs have the same effective APIC ID, e.g. due to the
+> +		 * x2APIC wrap or because the guest manually modified its xAPIC
+> +		 * IDs, events targeting that ID are supposed to be recognized
+> +		 * by all vCPUs with said ID.
+>  		 */
+> -		if (!apic_x2apic_mode(apic) && !new->phys_map[xapic_id])
+> -			new->phys_map[xapic_id] = apic;
+> +		if (kvm->arch.x2apic_format) {
+> +			/* See also kvm_apic_match_physical_addr(). */
+> +			if ((apic_x2apic_mode(apic) || x2apic_id > 0xff) &&
+> +			    x2apic_id <= new->max_apic_id)
+> +				new->phys_map[x2apic_id] = apic;
+> +
+> +			if (!apic_x2apic_mode(apic) && !new->phys_map[xapic_id])
+> +				new->phys_map[xapic_id] = apic;
+> +		} else {
+> +			/*
+> +			 * Disable the optimized map if the physical APIC ID is
+> +			 * already mapped, i.e. is aliased to multiple vCPUs.
+> +			 * The optimized map requires a strict 1:1 mapping
+> +			 * between IDs and vCPUs.
+> +			 */
+> +			if (apic_x2apic_mode(apic))
+> +				physical_id = x2apic_id;
+> +			else
+> +				physical_id = xapic_id;
+> +
+> +			if (new->phys_map[physical_id]) {
+> +				kvfree(new);
+> +				new = NULL;
+> +				goto out;
+Why not to use the same  KVM_APIC_MODE_XAPIC_FLAT |  KVM_APIC_MODE_XAPIC_CLUSTER
+hack here?
 
-I missed a=20
+Other than that looks correct but I don't know this area well enough to be 100% sure.
 
-Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+Best regards,
+	Maxim Levitsky
 
-here. Sorry Marc.
+
+> +			}
+> +			new->phys_map[physical_id] = apic;
+> +		}
+>  
+>  		if (!kvm_apic_sw_enabled(apic))
+>  			continue;
+
+
