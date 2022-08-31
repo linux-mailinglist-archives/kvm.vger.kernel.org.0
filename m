@@ -2,63 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C3C7B5A7B99
-	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 12:44:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B00815A7C06
+	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 13:13:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230249AbiHaKo2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Aug 2022 06:44:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35422 "EHLO
+        id S230478AbiHaLNN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Aug 2022 07:13:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230243AbiHaKoS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Aug 2022 06:44:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 573EFC88BE
-        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 03:44:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661942656;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=glJVeUkKg3tox5zcMh5W5s7ejcgNPbJiczeeGyhy1x0=;
-        b=Z+gnkn3IQMn62LWQIl4eo7+VcpGsI6ZDe65BBZm1zn8u2zb+BF1X9v0rAfiLX0t7QNksEl
-        lyoLKFLgsULpvthTXuaaSyCu/gM9NJr4D7JwS/TzOhb4zn6G3IoP1ZPUCRFte5vtRER8ym
-        cIp5MLieUuo00wfXIjrfc/ulXZ07aJc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-446-abKaBme1Mkmze0NZBgk68g-1; Wed, 31 Aug 2022 06:44:15 -0400
-X-MC-Unique: abKaBme1Mkmze0NZBgk68g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C62F83C0D865;
-        Wed, 31 Aug 2022 10:44:14 +0000 (UTC)
-Received: from starship (unknown [10.40.194.96])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8E14CC15BB3;
-        Wed, 31 Aug 2022 10:44:12 +0000 (UTC)
-Message-ID: <4ad924e282fd9a387a9c40d4780a1b9f2eaf4f06.camel@redhat.com>
-Subject: Re: [PATCH v2 2/3] KVM: selftests: Rename 'msr->availble' to
- 'msr->should_not_gp' in hyperv_features test
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Wed, 31 Aug 2022 13:44:11 +0300
-In-Reply-To: <20220831085009.1627523-3-vkuznets@redhat.com>
-References: <20220831085009.1627523-1-vkuznets@redhat.com>
-         <20220831085009.1627523-3-vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S230468AbiHaLNL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Aug 2022 07:13:11 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA363D0228;
+        Wed, 31 Aug 2022 04:13:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1661944389; x=1693480389;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ZXYlj1IqxZaV4DXbBX1YoGEIIdFLaXU6ViVzynme9rE=;
+  b=EqsvE2y2OIrhxVfvacZwcJMO8qX4+Nj9bpy5TuqSYh8465koGxwd2jkH
+   gbFZ1vRJnUQLcxbpa0e+EIjQLh9rcK0ssHJERzGQfncXgG7yILrzOddEo
+   NplAgX186sw2v/jE5e++bbITaOrsagWYJynpPOl9gh8m8EEFgcNnGPQiH
+   1oJoLDjH8nyUuSPD7RxV11TUlcNjymttLha90l0etVeECfDTM9Y37aEWB
+   3zT9X+S5EHG1FsI5LZUXlT66qE/lArmik0KCQTPEx7CAg5QjqJjZcWnKU
+   DbVtlN11AgHREIKqLdbhqMZXyb07I8rP1xTHBhDGQEWicwvrRY+2e1BH6
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10455"; a="359383043"
+X-IronPort-AV: E=Sophos;i="5.93,277,1654585200"; 
+   d="scan'208";a="359383043"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2022 04:13:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,277,1654585200"; 
+   d="scan'208";a="701332161"
+Received: from lkp-server02.sh.intel.com (HELO 811e2ceaf0e5) ([10.239.97.151])
+  by FMSMGA003.fm.intel.com with ESMTP; 31 Aug 2022 04:13:06 -0700
+Received: from kbuild by 811e2ceaf0e5 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oTLeb-0000Di-1k;
+        Wed, 31 Aug 2022 11:13:05 +0000
+Date:   Wed, 31 Aug 2022 19:12:34 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kbuild-all@lists.01.org, Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Like Xu <like.xu.linux@gmail.com>
+Subject: Re: [PATCH v3 3/3] KVM: VMX: Advertise PMU LBRs if and only if perf
+ supports LBRs
+Message-ID: <202208311831.zQ4oCG1b-lkp@intel.com>
+References: <20220831000051.4015031-4-seanjc@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220831000051.4015031-4-seanjc@google.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -67,366 +72,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-08-31 at 10:50 +0200, Vitaly Kuznetsov wrote:
-> It may not be clear what 'msr->availble' means. The test actually
-> checks that accessing the particular MSR doesn't cause #GP, rename
-> the varialble accordingly.
-> 
-> Suggested-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  .../selftests/kvm/x86_64/hyperv_features.c    | 92 +++++++++----------
->  1 file changed, 46 insertions(+), 46 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> index 79ab0152d281..4ec4776662a4 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> @@ -33,7 +33,7 @@ static inline uint8_t hypercall(u64 control, vm_vaddr_t input_address,
->  
->  struct msr_data {
->  	uint32_t idx;
-> -	bool available;
-> +	bool should_not_gp;
->  	bool write;
->  	u64 write_val;
->  };
-> @@ -56,7 +56,7 @@ static void guest_msr(struct msr_data *msr)
->  	else
->  		vector = wrmsr_safe(msr->idx, msr->write_val);
->  
-> -	if (msr->available)
-> +	if (msr->should_not_gp)
->  		GUEST_ASSERT_2(!vector, msr->idx, vector);
->  	else
->  		GUEST_ASSERT_2(vector == GP_VECTOR, msr->idx, vector);
-> @@ -153,12 +153,12 @@ static void guest_test_msrs_access(void)
->  			 */
->  			msr->idx = HV_X64_MSR_GUEST_OS_ID;
->  			msr->write = 0;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  		case 1:
->  			msr->idx = HV_X64_MSR_HYPERCALL;
->  			msr->write = 0;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  		case 2:
->  			feat->eax |= HV_MSR_HYPERCALL_AVAILABLE;
-> @@ -169,116 +169,116 @@ static void guest_test_msrs_access(void)
->  			msr->idx = HV_X64_MSR_GUEST_OS_ID;
->  			msr->write = 1;
->  			msr->write_val = LINUX_OS_ID;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  		case 3:
->  			msr->idx = HV_X64_MSR_GUEST_OS_ID;
->  			msr->write = 0;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  		case 4:
->  			msr->idx = HV_X64_MSR_HYPERCALL;
->  			msr->write = 0;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  
->  		case 5:
->  			msr->idx = HV_X64_MSR_VP_RUNTIME;
->  			msr->write = 0;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  		case 6:
->  			feat->eax |= HV_MSR_VP_RUNTIME_AVAILABLE;
->  			msr->idx = HV_X64_MSR_VP_RUNTIME;
->  			msr->write = 0;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  		case 7:
->  			/* Read only */
->  			msr->idx = HV_X64_MSR_VP_RUNTIME;
->  			msr->write = 1;
->  			msr->write_val = 1;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  
->  		case 8:
->  			msr->idx = HV_X64_MSR_TIME_REF_COUNT;
->  			msr->write = 0;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  		case 9:
->  			feat->eax |= HV_MSR_TIME_REF_COUNT_AVAILABLE;
->  			msr->idx = HV_X64_MSR_TIME_REF_COUNT;
->  			msr->write = 0;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  		case 10:
->  			/* Read only */
->  			msr->idx = HV_X64_MSR_TIME_REF_COUNT;
->  			msr->write = 1;
->  			msr->write_val = 1;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  
->  		case 11:
->  			msr->idx = HV_X64_MSR_VP_INDEX;
->  			msr->write = 0;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  		case 12:
->  			feat->eax |= HV_MSR_VP_INDEX_AVAILABLE;
->  			msr->idx = HV_X64_MSR_VP_INDEX;
->  			msr->write = 0;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  		case 13:
->  			/* Read only */
->  			msr->idx = HV_X64_MSR_VP_INDEX;
->  			msr->write = 1;
->  			msr->write_val = 1;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  
->  		case 14:
->  			msr->idx = HV_X64_MSR_RESET;
->  			msr->write = 0;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  		case 15:
->  			feat->eax |= HV_MSR_RESET_AVAILABLE;
->  			msr->idx = HV_X64_MSR_RESET;
->  			msr->write = 0;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  		case 16:
->  			msr->idx = HV_X64_MSR_RESET;
->  			msr->write = 1;
->  			msr->write_val = 0;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  
->  		case 17:
->  			msr->idx = HV_X64_MSR_REFERENCE_TSC;
->  			msr->write = 0;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  		case 18:
->  			feat->eax |= HV_MSR_REFERENCE_TSC_AVAILABLE;
->  			msr->idx = HV_X64_MSR_REFERENCE_TSC;
->  			msr->write = 0;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  		case 19:
->  			msr->idx = HV_X64_MSR_REFERENCE_TSC;
->  			msr->write = 1;
->  			msr->write_val = 0;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  
->  		case 20:
->  			msr->idx = HV_X64_MSR_EOM;
->  			msr->write = 0;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  		case 21:
->  			/*
-> @@ -287,145 +287,145 @@ static void guest_test_msrs_access(void)
->  			 */
->  			msr->idx = HV_X64_MSR_EOM;
->  			msr->write = 0;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  		case 22:
->  			feat->eax |= HV_MSR_SYNIC_AVAILABLE;
->  			msr->idx = HV_X64_MSR_EOM;
->  			msr->write = 0;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  		case 23:
->  			msr->idx = HV_X64_MSR_EOM;
->  			msr->write = 1;
->  			msr->write_val = 0;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  
->  		case 24:
->  			msr->idx = HV_X64_MSR_STIMER0_CONFIG;
->  			msr->write = 0;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  		case 25:
->  			feat->eax |= HV_MSR_SYNTIMER_AVAILABLE;
->  			msr->idx = HV_X64_MSR_STIMER0_CONFIG;
->  			msr->write = 0;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  		case 26:
->  			msr->idx = HV_X64_MSR_STIMER0_CONFIG;
->  			msr->write = 1;
->  			msr->write_val = 0;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  		case 27:
->  			/* Direct mode test */
->  			msr->idx = HV_X64_MSR_STIMER0_CONFIG;
->  			msr->write = 1;
->  			msr->write_val = 1 << 12;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  		case 28:
->  			feat->edx |= HV_STIMER_DIRECT_MODE_AVAILABLE;
->  			msr->idx = HV_X64_MSR_STIMER0_CONFIG;
->  			msr->write = 1;
->  			msr->write_val = 1 << 12;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  
->  		case 29:
->  			msr->idx = HV_X64_MSR_EOI;
->  			msr->write = 0;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  		case 30:
->  			feat->eax |= HV_MSR_APIC_ACCESS_AVAILABLE;
->  			msr->idx = HV_X64_MSR_EOI;
->  			msr->write = 1;
->  			msr->write_val = 1;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  
->  		case 31:
->  			msr->idx = HV_X64_MSR_TSC_FREQUENCY;
->  			msr->write = 0;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  		case 32:
->  			feat->eax |= HV_ACCESS_FREQUENCY_MSRS;
->  			msr->idx = HV_X64_MSR_TSC_FREQUENCY;
->  			msr->write = 0;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  		case 33:
->  			/* Read only */
->  			msr->idx = HV_X64_MSR_TSC_FREQUENCY;
->  			msr->write = 1;
->  			msr->write_val = 1;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  
->  		case 34:
->  			msr->idx = HV_X64_MSR_REENLIGHTENMENT_CONTROL;
->  			msr->write = 0;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  		case 35:
->  			feat->eax |= HV_ACCESS_REENLIGHTENMENT;
->  			msr->idx = HV_X64_MSR_REENLIGHTENMENT_CONTROL;
->  			msr->write = 0;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  		case 36:
->  			msr->idx = HV_X64_MSR_REENLIGHTENMENT_CONTROL;
->  			msr->write = 1;
->  			msr->write_val = 1;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  		case 37:
->  			/* Can only write '0' */
->  			msr->idx = HV_X64_MSR_TSC_EMULATION_STATUS;
->  			msr->write = 1;
->  			msr->write_val = 1;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  
->  		case 38:
->  			msr->idx = HV_X64_MSR_CRASH_P0;
->  			msr->write = 0;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  		case 39:
->  			feat->edx |= HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE;
->  			msr->idx = HV_X64_MSR_CRASH_P0;
->  			msr->write = 0;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  		case 40:
->  			msr->idx = HV_X64_MSR_CRASH_P0;
->  			msr->write = 1;
->  			msr->write_val = 1;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  
->  		case 41:
->  			msr->idx = HV_X64_MSR_SYNDBG_STATUS;
->  			msr->write = 0;
-> -			msr->available = 0;
-> +			msr->should_not_gp = 0;
->  			break;
->  		case 42:
->  			feat->edx |= HV_FEATURE_DEBUG_MSRS_AVAILABLE;
->  			dbg->eax |= HV_X64_SYNDBG_CAP_ALLOW_KERNEL_DEBUGGING;
->  			msr->idx = HV_X64_MSR_SYNDBG_STATUS;
->  			msr->write = 0;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  		case 43:
->  			msr->idx = HV_X64_MSR_SYNDBG_STATUS;
->  			msr->write = 1;
->  			msr->write_val = 0;
-> -			msr->available = 1;
-> +			msr->should_not_gp = 1;
->  			break;
->  
->  		case 44:
+Hi Sean,
+
+I love your patch! Yet something to improve:
+
+[auto build test ERROR on 372d07084593dc7a399bf9bee815711b1fb1bcf2]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Sean-Christopherson/KVM-x86-Intel-LBR-related-perf-cleanups/20220831-080309
+base:   372d07084593dc7a399bf9bee815711b1fb1bcf2
+config: i386-randconfig-s001 (https://download.01.org/0day-ci/archive/20220831/202208311831.zQ4oCG1b-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-5) 11.3.0
+reproduce:
+        # apt-get install sparse
+        # sparse version: v0.6.4-39-gce1a6720-dirty
+        # https://github.com/intel-lab-lkp/linux/commit/094f42374997562fff3f9f9637ec9aa8257490a0
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Sean-Christopherson/KVM-x86-Intel-LBR-related-perf-cleanups/20220831-080309
+        git checkout 094f42374997562fff3f9f9637ec9aa8257490a0
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=i386 prepare
+
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+   In file included from arch/x86/kernel/../kvm/vmx/vmx.h:11,
+                    from arch/x86/kernel/asm-offsets.c:22:
+   arch/x86/kernel/../kvm/vmx/capabilities.h: In function 'vmx_get_perf_capabilities':
+>> arch/x86/kernel/../kvm/vmx/capabilities.h:416:9: error: implicit declaration of function 'x86_perf_get_lbr' [-Werror=implicit-function-declaration]
+     416 |         x86_perf_get_lbr(&lbr);
+         |         ^~~~~~~~~~~~~~~~
+   cc1: some warnings being treated as errors
+   make[2]: *** [scripts/Makefile.build:117: arch/x86/kernel/asm-offsets.s] Error 1
+   make[2]: Target '__build' not remade because of errors.
+   make[1]: *** [Makefile:1207: prepare0] Error 2
+   make[1]: Target 'prepare' not remade because of errors.
+   make: *** [Makefile:222: __sub-make] Error 2
+   make: Target 'prepare' not remade because of errors.
 
 
-Thanks,
+vim +/x86_perf_get_lbr +416 arch/x86/kernel/../kvm/vmx/capabilities.h
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+   403	
+   404	static inline u64 vmx_get_perf_capabilities(void)
+   405	{
+   406		u64 perf_cap = PMU_CAP_FW_WRITES;
+   407		struct x86_pmu_lbr lbr;
+   408		u64 host_perf_cap = 0;
+   409	
+   410		if (!enable_pmu)
+   411			return 0;
+   412	
+   413		if (boot_cpu_has(X86_FEATURE_PDCM))
+   414			rdmsrl(MSR_IA32_PERF_CAPABILITIES, host_perf_cap);
+   415	
+ > 416		x86_perf_get_lbr(&lbr);
+   417		if (lbr.nr)
+   418			perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
+   419	
+   420		if (vmx_pebs_supported()) {
+   421			perf_cap |= host_perf_cap & PERF_CAP_PEBS_MASK;
+   422			if ((perf_cap & PERF_CAP_PEBS_FORMAT) < 4)
+   423				perf_cap &= ~PERF_CAP_PEBS_BASELINE;
+   424		}
+   425	
+   426		return perf_cap;
+   427	}
+   428	
 
-Best regards,
-	Maxim Levitsky
-
-
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
