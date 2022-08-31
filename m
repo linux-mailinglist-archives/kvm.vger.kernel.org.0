@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 56DA75A8AEC
+	by mail.lfdr.de (Postfix) with ESMTP id E71235A8AEE
 	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 03:37:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232757AbiIABhb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Aug 2022 21:37:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34568 "EHLO
+        id S232820AbiIABhe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Aug 2022 21:37:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232731AbiIABhM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S232732AbiIABhM (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 31 Aug 2022 21:37:12 -0400
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94CAA15C7A2;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 995BB15C7A4;
         Wed, 31 Aug 2022 18:37:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1661996230; x=1693532230;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=An8CLRxjOxfQySqbVQCCPBwU05ER2TI9Q891SfZu5/8=;
-  b=TfOFVEph+mrEeFysEnVGWIJZIcwJOJjPw6PLqMDPa8aclJ4E7Yeda/YH
-   8D7+/GXk3ZxFdaARL2iujXbuxcHwe5Tr3lgIG3Y7MQqvW3Z/HdTtazqvq
-   TN1ZksCrnEjU+yr/xTu6yx9iRnZxEAolOrIEeVRtVFUFlWDFSPiE6nsXs
-   2P0YQmQyJPunUSwM6rNPrl22x0O2qy5SjyiqayPKwCQm30R2n30QkftAr
-   rZ9lmWjxyUURG0u8gH71tUraIsMVDnBncAhVmJLQrlKf0PKeQHdYBk7EY
-   /HJ0iTJwrk4docjvlOB1xg+xdYcKu9SBALJiaoldP8hyvs5D5ZN7dDiP2
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10456"; a="321735098"
+  bh=QQZXyrfCFB2SIU10xprMsEt/LgTiLGVOqV7GcDK0KV4=;
+  b=WFE8nfPxTZWkirf/PLV6ZVtAmk+LXjxgMt5YuLaBjDvIRQDsT3krQh7v
+   cFf6LbnY5bXU9SjYyrUFQQV2srxcj8P7XsVtHlEeQqtcCrGAAdATJSTuQ
+   gsHGsr9wKJDG1f/tJa+9GDML032YQUCtYF2P9wP9ZU13Y34jD7qzzs8Yz
+   p7AjUskYRrclPNIDQ/8FP1f3FBGo0ayEls4GeQmnWU7VH8/FuDNzOGO7T
+   +Io1TAJYE9gcjBOj6qSu5fbzx6mS+zS841AtREk6YcfeSAs6Iah4Bmi9v
+   FmVot9IY+oovj+qeCK8dNJcnTsdPGk3LNYOCq+fmDeLXC2RegrImwiLRg
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10456"; a="321735100"
 X-IronPort-AV: E=Sophos;i="5.93,279,1654585200"; 
-   d="scan'208";a="321735098"
+   d="scan'208";a="321735100"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2022 18:37:02 -0700
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2022 18:37:03 -0700
 X-IronPort-AV: E=Sophos;i="5.93,279,1654585200"; 
-   d="scan'208";a="754626028"
+   d="scan'208";a="754626038"
 Received: from embargo.jf.intel.com ([10.165.9.183])
   by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2022 18:37:02 -0700
 From:   Yang Weijiang <weijiang.yang@intel.com>
 To:     pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org
 Cc:     like.xu.linux@gmail.com, kan.liang@linux.intel.com,
         wei.w.wang@intel.com, linux-kernel@vger.kernel.org
-Subject: [PATCH 11/15] KVM: x86: Add XSAVE Support for Architectural LBR
-Date:   Wed, 31 Aug 2022 18:34:34 -0400
-Message-Id: <20220831223438.413090-12-weijiang.yang@intel.com>
+Subject: [PATCH 12/15] KVM: x86/vmx: Clear Arch LBREn bit before inject #DB to guest
+Date:   Wed, 31 Aug 2022 18:34:35 -0400
+Message-Id: <20220831223438.413090-13-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220831223438.413090-1-weijiang.yang@intel.com>
 References: <20220831223438.413090-1-weijiang.yang@intel.com>
@@ -59,53 +59,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <like.xu@linux.intel.com>
+On a debug breakpoint event (#DB), IA32_LBR_CTL.LBREn is cleared.
+So need to clear the bit manually before inject #DB.
 
-On processors supporting XSAVES and XRSTORS, Architectural LBR XSAVE
-support is enumerated from CPUID.(EAX=0DH, ECX=1):ECX[bit 15].
-The detailed sub-leaf for Arch LBR is enumerated in CPUID.(0DH, 0FH).
-
-XSAVES provides a faster means than RDMSR for guest to read all LBRs.
-When guest IA32_XSS[bit 15] is set, the Arch LBR state can be saved using
-XSAVES and restored by XRSTORS with the appropriate RFBM.
-
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-Message-Id: <20220517154100.29983-12-weijiang.yang@intel.com>
+Reviewed-by: Kan Liang <kan.liang@linux.intel.com>
+Message-Id: <20220517154100.29983-14-weijiang.yang@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 4 ++++
- arch/x86/kvm/x86.c     | 2 +-
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/vmx.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index cdf65cdcb45a..9d50e3703ea2 100644
+index 9d50e3703ea2..dddba2a48542 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7714,6 +7714,10 @@ static __init void vmx_set_cpu_caps(void)
- 		kvm_cpu_cap_check_and_set(X86_FEATURE_DS);
- 		kvm_cpu_cap_check_and_set(X86_FEATURE_DTES64);
- 	}
-+	if (!cpu_has_vmx_arch_lbr()) {
-+		kvm_cpu_cap_clear(X86_FEATURE_ARCH_LBR);
-+		kvm_caps.supported_xss &= ~XFEATURE_MASK_LBR;
+@@ -1687,6 +1687,20 @@ static void vmx_clear_hlt(struct kvm_vcpu *vcpu)
+ 		vmcs_write32(GUEST_ACTIVITY_STATE, GUEST_ACTIVITY_ACTIVE);
+ }
+ 
++static void disable_arch_lbr_ctl(struct kvm_vcpu *vcpu)
++{
++	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
++	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
++
++	if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR) &&
++	    test_bit(INTEL_PMC_IDX_FIXED_VLBR, pmu->pmc_in_use) &&
++	    lbr_desc->event) {
++		u64 ctl = vmcs_read64(GUEST_IA32_LBR_CTL);
++
++		vmcs_write64(GUEST_IA32_LBR_CTL, ctl & ~ARCH_LBR_CTL_LBREN);
 +	}
++}
++
+ static void vmx_queue_exception(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+@@ -1722,6 +1736,9 @@ static void vmx_queue_exception(struct kvm_vcpu *vcpu)
+ 	vmcs_write32(VM_ENTRY_INTR_INFO_FIELD, intr_info);
  
- 	if (!enable_pmu)
- 		kvm_cpu_cap_clear(X86_FEATURE_PDCM);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 19cb5840300b..e9f0f97014de 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -213,7 +213,7 @@ static struct kvm_user_return_msrs __percpu *user_return_msrs;
- 				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
- 				| XFEATURE_MASK_PKRU | XFEATURE_MASK_XTILE)
+ 	vmx_clear_hlt(vcpu);
++
++	if (nr == DB_VECTOR)
++		disable_arch_lbr_ctl(vcpu);
+ }
  
--#define KVM_SUPPORTED_XSS     0
-+#define KVM_SUPPORTED_XSS     XFEATURE_MASK_LBR
+ static void vmx_setup_uret_msr(struct vcpu_vmx *vmx, unsigned int msr,
+@@ -4886,6 +4903,9 @@ static void vmx_inject_nmi(struct kvm_vcpu *vcpu)
+ 			INTR_TYPE_NMI_INTR | INTR_INFO_VALID_MASK | NMI_VECTOR);
  
- u64 __read_mostly host_efer;
- EXPORT_SYMBOL_GPL(host_efer);
+ 	vmx_clear_hlt(vcpu);
++
++	if (vcpu->arch.exception.nr == DB_VECTOR)
++		disable_arch_lbr_ctl(vcpu);
+ }
+ 
+ bool vmx_get_nmi_mask(struct kvm_vcpu *vcpu)
 -- 
 2.27.0
 
