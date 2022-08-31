@@ -2,261 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B3515A7628
-	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 08:04:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 61D755A7634
+	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 08:07:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230002AbiHaGEE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Aug 2022 02:04:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34596 "EHLO
+        id S230037AbiHaGHY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Aug 2022 02:07:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230001AbiHaGEB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Aug 2022 02:04:01 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 125D9BBA6F;
-        Tue, 30 Aug 2022 23:03:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661925839; x=1693461839;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=O0dd6MC0+L4iRE/KwWuGaNJ6S+7n5AURg8FMpmOwZlY=;
-  b=QCHKMv1glPzaehvoogxrGxYL5Kh0ukbeta51Bb3sDoB/EnRuPRQrS509
-   jv+INyOhLsZscUiZdgOhvVizpiSY1ajXw2BGTqACufLkNpVM4OIsbxTiu
-   7lN7FApwATM8LpFLom+qKjUUwIk4izo6I5HSnUcmnuKBFGsbMqsDAR4me
-   He+2kW3ef8rCM+Zyq4R7q5kbgauQZGmD4ETwbA7yYvIwuvwCjTJv9a/hk
-   WEttKJC/J/HHrWjdJKRAitCcTQ09e6nz2ZeHup6FF7LT3yIV1pcqRgjuX
-   KIs5mEzdoEAsusd2QUAzV7ZI3hFVy6M/3n4iarJm5DJg2lU9zVWSo8Arl
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10455"; a="296164539"
-X-IronPort-AV: E=Sophos;i="5.93,277,1654585200"; 
-   d="scan'208";a="296164539"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2022 23:03:58 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,277,1654585200"; 
-   d="scan'208";a="738007380"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga004.jf.intel.com with ESMTP; 30 Aug 2022 23:03:57 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 30 Aug 2022 23:03:57 -0700
-Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 30 Aug 2022 23:03:56 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31 via Frontend Transport; Tue, 30 Aug 2022 23:03:56 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.44) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.31; Tue, 30 Aug 2022 23:03:56 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ddY8Uu8tl1tmO47gF0zqBm1lTgNr5zWLLsS7m4xL8HtJwbxj5jty4uyBLP/RtLieqZdGzXFvK1eTtcTAM6glElzdzVYtbPMSSou0UeBqtDKAlRTQUw3sCPcJMdf2JhAutuY/pL38qdxj8yxxbvmOFJVpDKQmAeHM76hkWNDdjC9IIgfXXDNgmk0/F0UTZKcZKKN8cCmILUZKJ42hsfOJPLAd/yqV9rboGJfbiK3HaylPjQOGRDD+iubI/tfN+aKPxoyyWlgw0Uhx+9px2fI73zcZYf6VYBojm7hXF7K5wOtS+dKmMFDRXfgC+7Bp0CYXq3ni+t7TKOE+6zNu24PLuA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4sw7USuCOuP2MVZMu5jQE00cPViUqw8CNite/GF0hpk=;
- b=VM7/ST9veCdGbazxENNVrCAStEmwVQ8rpJtGg+iVeORDsUFfwHre7vnjjeRVqAIXlmSnpTkBSolZK+auCBooqvx8XvGInbGM0B6oHvDTTvKn6xPYHfmsyHBu0/zn5UnNkIFZsy2vKHrpn2wkHANW2HbZubN8XtSRP9VXJO0Njp/C1j4SkgyrUiHAxgBDOwiZhf3mEOHXqTAsOn9hcHsr0GEjH6tSrvUc6s5vQ5im6LMJXH1D/echzkgQqA5VKusZxoWB/9N58t7kGtVggvpcvexXcWeVt2xa4R2JwNvvlqGkyBYoYlSgz8HaKYfI7f84ZRxvjsdpi9k+bqlo3FQO9g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by BN0PR11MB5695.namprd11.prod.outlook.com (2603:10b6:408:163::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.10; Wed, 31 Aug
- 2022 06:03:54 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::a435:3eff:aa83:73d7]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::a435:3eff:aa83:73d7%5]) with mapi id 15.20.5588.010; Wed, 31 Aug 2022
- 06:03:54 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Gunthorpe <jgg@ziepe.ca>,
-        Anthony Krowiak <akrowiak@linux.ibm.com>
-CC:     Zhenyu Wang <zhenyuw@linux.intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        "Joonas Lahtinen" <joonas.lahtinen@linux.intel.com>,
-        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        "Peter Oberparleiter" <oberpar@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Longfang Liu <liulongfang@huawei.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Abhishek Sahu <abhsahu@nvidia.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: RE: [PATCH 01/15] vfio: Add helpers for unifying vfio_device life
- cycle
-Thread-Topic: [PATCH 01/15] vfio: Add helpers for unifying vfio_device life
- cycle
-Thread-Index: AQHYufpgD2KvzjTjxECQ8qBhswxZGK3HeMwAgAAYbgCAAPkekA==
-Date:   Wed, 31 Aug 2022 06:03:54 +0000
-Message-ID: <BN9PR11MB527696C9C458E1DE6E60B3A98C789@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20220827171037.30297-1-kevin.tian@intel.com>
- <20220827171037.30297-2-kevin.tian@intel.com>
- <907c54c6-7f5b-77f3-c284-45604c60c12e@linux.ibm.com>
- <Yw4oUL33TbJK6inc@ziepe.ca>
-In-Reply-To: <Yw4oUL33TbJK6inc@ziepe.ca>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 382780bd-ddac-4a6e-b3f3-08da8b1695bd
-x-ms-traffictypediagnostic: BN0PR11MB5695:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: rdBkXeZHpxHyKERYWc5/2MXmfbrkMqiqW5C8M8HdxsCLgwZXooiPLjzcLp9O56reQdGYIKjxEz1Mf4/rcug2p/6oKhS72T4Ccx0GTV3iW/kLGq8KQ7YCCOt8RiHdwzCX6Bw7L3+qb7NKOJyJzFno618vBNJ+aia/MYZd+cLH9uNukX1yiU9480eb+gLeUQ69n4PjFV6VhmZSiwcFNM5hudMTzY+f/drALi91tbCBnTFOu2hsbDA1Oc1PVNSJgoL7vobXja2F1eNrfFw4ctOQsi4r4o1137UpwWNcc+m0LZzaFvluHobjl50afF4SQB1Vj2B/Gj3bBLv3wlFlRA5ksaaEeqMm8gKfk1v20NQMDc+HTqosaGFuqm++pkjv4v0zhnp4mzyFksL922WE/AdpFiG+uqf3nvgGjymcuA7aikmNIa+zoiavSonrX/4VjDK9X60oPPogdiudGMtXiHxSu7lbQKHkr0tO7DV/Z1taY6VxZcDMnS8eGR6/Ld/InCmv9EPWwHGFbRj5wsNJoYent+P/mZ53Oal2C42u26P9WF6Z2q3Yu0bQnGKflEThaCeOvTKw6LY0rRQwoLc4xj18kKTPwlnGmSAPjfm2k98Orv1zGiNZuGC+Eoga62pTd2sImVMo7cBs4d8FYoIW9BubIuJu4NElIIUkjnjX6R8JkcvSrj49hZaJm0iedz5dZwMXD3xCM6nHiJ+yRnyh0wqqNQLxLPWmGRyKRvyucJ9CbksBbs8fm+Rxo/IBNEBsKDw+gqBf9IQmjQPwKQtwM8T1EQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(376002)(366004)(136003)(346002)(396003)(39860400002)(478600001)(4326008)(66446008)(66556008)(316002)(66946007)(66476007)(76116006)(110136005)(54906003)(71200400001)(55016003)(2906002)(8676002)(5660300002)(52536014)(8936002)(7416002)(7406005)(38070700005)(64756008)(82960400001)(122000001)(38100700002)(86362001)(33656002)(6506007)(9686003)(7696005)(26005)(186003)(41300700001)(83380400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?mGMfSgAT9GYZhHkZc0w+sedZmAi4IvFxtqayCG5hRQWo6ZL+DSc1DEnYvghI?=
- =?us-ascii?Q?oLiwBkGHjEc6c5++VHnV4LL0qcRJuzDf6o/V0DBnJ85qerj42FGqECd+RNJf?=
- =?us-ascii?Q?mI3dw6wet4I3TuC5uy9tb/jxbx850cVFlTQztBn0I+lAC0NDfSqvFQsAOAZu?=
- =?us-ascii?Q?OCMxY2lQ4uZHCYoVZdKZO6cpASBDJ7azXaGtQTZFPuKtZsld6jVDSQVG0URf?=
- =?us-ascii?Q?JupZTuB2E8p3SejLlhMCOs+rXMstbvpMMy862EX9xj7aTAavJKKO0UNEuN3x?=
- =?us-ascii?Q?tv7KoxxK0sFrFeONBsCuX8JqOQuBJTlfpJ+1dhn9k1nzqSUyOtFxuGPXkK9o?=
- =?us-ascii?Q?6g29iE7KCT3QQrJt64mJzNOkLYkHx8i3UzTnIXTFzg6dyZxJS9jw/mz8Yeyx?=
- =?us-ascii?Q?TKSC1UsRj5xNXLrRu4D+v/D1NPvhEbWalqHc8HmxS4GNfM3ebvANoUVxBGgC?=
- =?us-ascii?Q?CnhQ1918Ekj/IWX50vzQoI01UMQMMZlhtb2P6aK4V0C06CK/YMx3An9LPUAH?=
- =?us-ascii?Q?8tIBcYr6vlI9DFUHFSvU8kSv0K8i+3iiaL3ltKRkQRZuZpS+HiKCUL4F67SH?=
- =?us-ascii?Q?PhrDJX8lANDSYQexUQSfQX/7EtQ2jPUzDl2LoqUkysGDmqVDvIdKBEQDNZ0r?=
- =?us-ascii?Q?nsW1uumrhbQA5YX+TdKlMKY1wDZ4/kxlEb2FdJMLUg2qmJe2qdUstb7Mb06k?=
- =?us-ascii?Q?eFA1AvYOU8cEoyFoGamNDNKBJVGTESNtBusrck6MbScedhFI1AYn43CQ90+k?=
- =?us-ascii?Q?S4vC1femWmNgYSnV2PmDMIWFmvupyd+8H4eQkujaqctjs+ZAomLDUSL1xm1N?=
- =?us-ascii?Q?O2w7Pn8leWEWSQe8yb1xneQx1s7IFJlQmd8OQOTi+XdAcQkbZZdyT+qKvw6j?=
- =?us-ascii?Q?1bpJwl4cSrWpuurfvRaOf+/P/9zDiS3k1wMuTkfb4D/vhTEdUJd8AkmDzZvz?=
- =?us-ascii?Q?J31ejgiF1fNwvzH2OkHUyhv0w8/qSCL8Wh2YEJ8DzSJONAM1BbhO0GfV8t8j?=
- =?us-ascii?Q?tgCG78hEG/EumGPkTPR8DVVRr4wQ4a7HCKMeKhSYE9pXw51AusrfFqZLZjOx?=
- =?us-ascii?Q?9ShzoHyKqpzOhLetO6AbdQ2IbV6MN0+w8qwNYWmABAnHsZh7LamUhfxV/lpT?=
- =?us-ascii?Q?TJPd9sYaE9iBh7oYi2ql7+xdjI1gvIFxT2VIMxQWqNeqEQ0MJ+32YQUxSQc/?=
- =?us-ascii?Q?0qZ8timPa98mhxYGD2SohCAvTLUF+VcUCBshAHKCfVjjV0PmEATL5WjKYR66?=
- =?us-ascii?Q?Ox/EjAJxtsZUQQsuNQAPifryX0qHh3c8nXILc4Jo/Zdv+MBISktXVgkOtdPX?=
- =?us-ascii?Q?21T8XwchxJ97RzQ7vR6TyusZUAPTjdlssqh1g6lcCJzFVHV0JKTAz+bQNVkk?=
- =?us-ascii?Q?+WW8+t6DjnjVAHkkXsvxF7i7CoDTDTJE21iiA3fZaiDX/qrbTIq8FI/lFPBS?=
- =?us-ascii?Q?kWAymkfK9MRVqrRGFefgTzo92EXfLC1Z32PH2m1NW85PSyptrAdYKpqzwo6m?=
- =?us-ascii?Q?zULimoKn7x+32SPjYKKY6Urf6+FNwdfYoBzjnZWcq8lIzpmv+6bRLNmJoYr5?=
- =?us-ascii?Q?pSS1Ik2vhS92RTcPKj5d8VpqFpNT7ekQy2b+vOOd?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S230026AbiHaGHW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Aug 2022 02:07:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 664689AFD4
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 23:07:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661926040;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=28ym5xn5CncpI4sc7VXIv13Zg85Y3cioTTzu0mfpAeI=;
+        b=WeFtG3wPKIAFde74JPkj4Btz526VPRlav/ifZIljV9e2k6ylTXb8JLIbJ2xHZw+akNBY65
+        D8AoCZSuLdIolNZBkf8RCdwTXOiLsAVrEU6tyU/D3gtHg7IWAHVMdxoxTFsBDiEcAP+8Vl
+        wFyUZnfo8FyO+fJrEnwwgVeySUXEFi0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-633-fuK6VMlWONKxGmZlQLnjvQ-1; Wed, 31 Aug 2022 02:07:15 -0400
+X-MC-Unique: fuK6VMlWONKxGmZlQLnjvQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BDD0F811E80;
+        Wed, 31 Aug 2022 06:07:14 +0000 (UTC)
+Received: from starship (unknown [10.40.194.96])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 26F69141512E;
+        Wed, 31 Aug 2022 06:07:12 +0000 (UTC)
+Message-ID: <fd349966a87ef3cb93fe1670e91cf6d2142ed442.camel@redhat.com>
+Subject: Re: [PATCH 19/19] Revert "KVM: SVM: Do not throw warning when
+ calling avic_vcpu_load on a running vcpu"
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Li RongQing <lirongqing@baidu.com>
+Date:   Wed, 31 Aug 2022 09:07:11 +0300
+In-Reply-To: <20220831003506.4117148-20-seanjc@google.com>
+References: <20220831003506.4117148-1-seanjc@google.com>
+         <20220831003506.4117148-20-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 382780bd-ddac-4a6e-b3f3-08da8b1695bd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Aug 2022 06:03:54.3500
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pnKxdQUPv13R4UoXG512sc7SQ5gyVsFPYRnXlCUC7TLSe3eDXVGLaAS6Hi955A0MC4Y8U3gcavcQ4aRn5tfodQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR11MB5695
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Gunthorpe <jgg@ziepe.ca>
-> Sent: Tuesday, August 30, 2022 11:10 PM
->=20
-> On Tue, Aug 30, 2022 at 09:42:42AM -0400, Anthony Krowiak wrote:
->=20
-> > > +/*
-> > > + * Alloc and initialize vfio_device so it can be registered to vfio
-> > > + * core.
-> > > + *
-> > > + * Drivers should use the wrapper vfio_alloc_device() for allocation=
-.
-> > > + * @size is the size of the structure to be allocated, including any
-> > > + * private data used by the driver.
-> >
-> >
-> > It seems the purpose of the wrapper is to ensure that the object being
-> > allocated has as its first field a struct vfio_device object and to ret=
-urn
-> > its container. Why not just make that a requirement for this function -
-> > which I would rename vfio_alloc_device - and document it in the prologu=
-e?
-> > The caller can then cast the return pointer or use container_of.
->=20
-> There are three fairly common patterns for this kind of thing
->=20
-> 1) The caller open codes everything:
->=20
->    driver_struct =3D kzalloc()
->    core_init(&driver_struct->core)
->=20
-> 2) Some 'get priv' / 'get data' is used instead of container_of():
->=20
->    core_struct =3D core_alloc(sizeof(*driver_struct))
->    driver_struct =3D core_get_priv(core_struct)
->=20
-> 3) The allocations and initialization are consolidated in the core,
->    but we continue to use container_of()
->=20
->    driver_struct =3D core_alloc(typeof(*driver_struct))
->=20
-> #1 has a general drawback that people routinely mess up the lifecycle
-> model and get really confused about when to do kfree() vs put(),
-> creating bugs.
->=20
-> #2 has a general drawback of not using container_of() at all, and being
-> a bit confusing in some cases
->=20
-> #3 has the general drawback of being a bit magical, but solves 1 and
-> 2's problems.
->=20
-> I would not fix the struct layout without the BUILD_BUG_ON because
-> someone will accidently change the order and that becomes a subtle
-> runtime error - so at a minimum the wrapper macro has to exist to
-> check that.
+On Wed, 2022-08-31 at 00:35 +0000, Sean Christopherson wrote:
+> Turns out that some warnings exist for good reasons.  Restore the warning
+> in avic_vcpu_load() that guards against calling avic_vcpu_load() on a
+> running vCPU now that KVM avoids doing so when switching between x2APIC
+> and xAPIC.  The entire point of the WARN is to highlight that KVM should
+> not be reloading an AVIC.
+> 
+> Opportunistically convert the WARN_ON() to WARN_ON_ONCE() to avoid
+> spamming the kernel if it does fire.
+> 
+> This reverts commit c0caeee65af3944b7b8abbf566e7cc1fae15c775.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/svm/avic.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index b2033a56010c..3c300113d40b 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -1080,6 +1080,7 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  		return;
+>  
+>  	entry = READ_ONCE(*(svm->avic_physical_id_cache));
+> +	WARN_ON_ONCE(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK);
+>  
+>  	entry &= ~AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK;
+>  	entry |= (h_physical_id & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK);
 
-Agree. And gvt happened to hit this BUILD_BUG_ON when this series
-was being worked on.
+Note that this warning was removed because it would trigger wheh x2avic code would switch
+between xapic and x2apic.
 
->=20
-> If you want to allow a dynamic struct layout and avoid the pitfall of
-> exposing the user to kalloc/kfree, then you still need the macro, and
-> it does some more complicated offset stuff.
->=20
-> Having the wrapper macro be entirely type safe is appealing and
-> reduces code in the drivers, IMHO. Tell it what type you are initing
-> and get back init'd memory for that type that you always, always free
-> with a put operation.
->=20
-> Jason
+I do agree 100% that this warning is useful.
+
+Best regards,
+	Maxim Levitsky
+
