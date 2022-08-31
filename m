@@ -2,115 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C99035A7AC5
-	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 12:00:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CD785A7B3D
+	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 12:20:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230513AbiHaKAp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Aug 2022 06:00:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48120 "EHLO
+        id S230241AbiHaKUC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Aug 2022 06:20:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230520AbiHaKAW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Aug 2022 06:00:22 -0400
-Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6523B1A81B
-        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 02:59:55 -0700 (PDT)
-Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-324ec5a9e97so301903907b3.7
-        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 02:59:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=QzmBqQ4SfkIwtO5X0oA1wekRElIR/KPxIyLjjv2vIww=;
-        b=Jn/UOdFd29TQgyjWRD619Kb9TnpUTJGMBPtB3Xp6OP9c0eTgGyhxQcRsVl7mYjMFe9
-         Wq0WLqYSWTb5Jg8NwQXUgqEXM+flSl+pZLm5EUJo78oWqNCOZtSp9pOpAW1hs4Imw5Bl
-         v0InsiLhnhvhdcahZbZjtAFlywsBlQ636e4Vfp6ZvwyS2sqciDveBBp38ECh7AY0ypuc
-         sasQLg4Sisa1Ocm6Ygc/2BPuOODDFpp9yRM5oSsAwru7LqOUqGsXOju9klBf6yw80n+n
-         qh57UG34fBQExSjn9Jenvpfk4Vaqz6LMQiuohfiHiudzesQ8zPrQen0zFE7FniyHutJn
-         7QYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=QzmBqQ4SfkIwtO5X0oA1wekRElIR/KPxIyLjjv2vIww=;
-        b=fc/WUuARRzzoGxYzsvYHjK9tsJBLWw9VIC2FIiplpJUhNinFQjMNEpjqI46qeVakVT
-         470qMCZbKJRPKZ9uZcuwOA+QEnZXaQVZmud/tyi7655YIhYC80g8gqyLEMFSOiFGbLub
-         eUNdH/lFHJbKZUHSWy1VKO9qrx5X8HVKbkAre2z+hmviyHCuHLQ6Af5zM70sJK0jcXJv
-         x27+LyuyiUtx9Uj2Y7MtzMwU+G8gYgB3utN7M33KOABoDb/apQbw0pXdNjJ75DlczwMR
-         wRFxi7TND4mM5Hr9ne82kCEEI5IK/D8xMG1lNrmtSvuvvQoNw1jycH0oIi8Q6R6LlJyf
-         L8Xw==
-X-Gm-Message-State: ACgBeo3aAUh+wg0o9V4mIfD8NfVRSz40d04rfLNGFUuULVTOFPVd7xbI
-        5dtkZ/wu3YpcL44A7i4NLZVMgKBEF5J2XjyJSfUg0A==
-X-Google-Smtp-Source: AA6agR4wjllGpmRdc6agWSxgw1dM9XwI25Q2D+CZ1o/4txWCT3JrDHeo2e3anei3zpySux4Y+pYW8EQFoPFV95xzbl0=
-X-Received: by 2002:a81:10a:0:b0:333:618e:190b with SMTP id
- 10-20020a81010a000000b00333618e190bmr16067876ywb.10.1661939994069; Wed, 31
- Aug 2022 02:59:54 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220815101325.477694-1-apatel@ventanamicro.com>
-In-Reply-To: <20220815101325.477694-1-apatel@ventanamicro.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Wed, 31 Aug 2022 15:29:42 +0530
-Message-ID: <CAAhSdy3XF79M1juW7T_A2YvrZS+rcywDih2xi02=6uius33-0g@mail.gmail.com>
-Subject: Re: [PATCH kvmtool 0/5] KVMTOOL RISC-V Svpbmt and Sstc Support
-To:     Will Deacon <will@kernel.org>
-Cc:     julien.thierry.kdev@gmail.com, maz@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        Anup Patel <apatel@ventanamicro.com>
+        with ESMTP id S230142AbiHaKT7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Aug 2022 06:19:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0B4E14D29
+        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 03:19:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661941197;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7BAfut2fqnOI2gHOJTwiv+Oolt0KrYkM0Hx7Bxxkc38=;
+        b=WX8LHXzeyyEMXZRoQvyfqwpzWDYhU8hMVlOLb8OkQ6qEj/06NSFBdid8PVVSuBSzu4xI6B
+        tTgWuInQcoXNvfk+CbAEZHrToMVX0FcmK0ZRIGhUzsx0qFnAoPpi5znfat6589NbBvlotE
+        OOF2DNRSx0pAeHtE5eCJR/hbhYTgr4M=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-648-lLZg_qBLOEyqVqzixgEHFg-1; Wed, 31 Aug 2022 06:19:53 -0400
+X-MC-Unique: lLZg_qBLOEyqVqzixgEHFg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8F3723C00086;
+        Wed, 31 Aug 2022 10:19:53 +0000 (UTC)
+Received: from starship (unknown [10.40.194.96])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EFA721410F3C;
+        Wed, 31 Aug 2022 10:19:51 +0000 (UTC)
+Message-ID: <7281e42323b53a016cf8545b7a4547d70d87efce.camel@redhat.com>
+Subject: Re: [PATCH 08/19] KVM: SVM: Remove redundant cluster calculation
+ that also creates a shadow
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Li RongQing <lirongqing@baidu.com>
+Date:   Wed, 31 Aug 2022 13:19:50 +0300
+In-Reply-To: <20220831003506.4117148-9-seanjc@google.com>
+References: <20220831003506.4117148-1-seanjc@google.com>
+         <20220831003506.4117148-9-seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Will,
+On Wed, 2022-08-31 at 00:34 +0000, Sean Christopherson wrote:
+> Drop the redundant "cluster" calculation and its horrific shadowing in
+> the x2avic logical mode path.  The "cluster" that is declared at an outer
+> scope is derived using the exact same calculation and has performed the
+> left-shift.
 
-On Mon, Aug 15, 2022 at 3:43 PM Anup Patel <apatel@ventanamicro.com> wrote:
->
-> The latest Linux-6.0-rc1 has support for Svpbmt and Sstc extensions
-> in KVM RISC-V. This series adds corresponding changes in KVMTOOL to
-> allow Guest/VM use these new RISC-V extensions.
->
-> The PATCH5 is an unrelated fix which was discovered while developing
-> this series.
->
-> These patches can also be found in the riscv_svpbmt_sstc_v1 branch
-> at: https://github.com/avpatel/kvmtool.git
->
-> Anup Patel (3):
->   Update UAPI headers based on Linux-6.0-rc1
->   riscv: Add Svpbmt extension support
->   riscv: Fix serial0 alias path
->
-> Atish Patra (2):
->   riscv: Append ISA extensions to the device tree
->   riscv: Add Sstc extension support
->
->  arm/aarch64/include/asm/kvm.h    |  36 ++++++
->  include/linux/kvm.h              | 181 +++++++++++++++++++++++++++++--
->  include/linux/virtio_9p.h        |   2 +-
->  include/linux/virtio_config.h    |   7 +-
->  include/linux/virtio_ids.h       |  14 +--
->  include/linux/virtio_net.h       |  34 +++++-
->  include/linux/virtio_pci.h       |   2 +
->  riscv/fdt.c                      |  44 +++++++-
->  riscv/include/asm/kvm.h          |  22 ++++
->  riscv/include/kvm/kvm-cpu-arch.h |  11 ++
->  riscv/kvm-cpu.c                  |  11 --
->  x86/include/asm/kvm.h            |  33 +++---
->  12 files changed, 352 insertions(+), 45 deletions(-)
->
-> --
-> 2.34.1
->
+Actually I think we should just revert the commit 
+'KVM: SVM: Use target APIC ID to complete x2AVIC IRQs when possible'
 
-Ping ?
-Does this series look fine to you ?
 
-Regards,
-Anup
+I know that the patch that intially introduced the the avic_kick_target_vcpus_fast had
+x2apic/x2avic code, and then it was split to avoid adding x2avic code before it was merged,
+resulting in this patch to add the x2apic specific code.
+
+But when I fixed most issues of avic_kick_target_vcpus_fast in my 
+'KVM: x86: SVM: fix avic_kick_target_vcpus_fast', I added back x2apic code because
+it was just natural to do since I had to calculate cluster/bitmap masks anyway.
+
+I expected this patch to be dropped because of this but I guess it was not noticed,
+or patches were merged in the wrong order.
+
+This is the reason of shadowing, duplicate calculations/etc.
+
+Patch 9 and 7 of your series can be dropped as well then.
+
+Best regards,
+	Maxim Levitsky
+
+
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/svm/avic.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 14f567550a1e..8c9cad96008e 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -410,10 +410,9 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
+>  			 * For x2APIC logical mode, cannot leverage the index.
+>  			 * Instead, calculate physical ID from logical ID in ICRH.
+>  			 */
+> -			int cluster = (icrh & 0xffff0000) >> 16;
+>  			int apic = ffs(bitmap) - 1;
+>  
+> -			l1_physical_id = (cluster << 4) + apic;
+> +			l1_physical_id = cluster + apic;
+>  		}
+>  	}
+>  
+
+
