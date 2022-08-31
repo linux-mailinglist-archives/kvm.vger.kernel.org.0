@@ -2,499 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D1A905A75FD
-	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 07:51:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4D865A7617
+	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 07:59:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229891AbiHaFvb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Aug 2022 01:51:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41460 "EHLO
+        id S229943AbiHaF72 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Aug 2022 01:59:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229876AbiHaFvQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Aug 2022 01:51:16 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88C502613B;
-        Tue, 30 Aug 2022 22:51:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661925074; x=1693461074;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=4ZkHxhD3Guth2abYGWOtRWB5ZEY0n83yJjU5EPSEcUk=;
-  b=d1AAqTd3czP/a2MlKPHgF1k1dfym1Qfl1tqTETtlDoEpe71xr74FY50N
-   096/sWiexcv1/7Ad96sZhm38zfyukIhr09DevzNVLQaEOFQbrOk2K+KHI
-   wOG8I+JBdFK16YNW8lU9pnKUQ2X2lgqGyv2+k47fZCr5U7DD/UeqA7CgQ
-   3g/qrRf4ltEkBDHrw4b0uOaNWk9hKNhgb/D1rdJbhPK9wkSVWnZKYCIz2
-   HBetwUOP8ImNVRFaXP7PDtLq6eInwJRwNt8sTCeVo6Iscjmvj+CtcBgJq
-   F/+jBre39c/6lVuGDxtQ88+85nPCEfHH/4741weDHBTlAXODSx1md/2Mv
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10455"; a="359338254"
-X-IronPort-AV: E=Sophos;i="5.93,277,1654585200"; 
-   d="scan'208";a="359338254"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2022 22:51:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,277,1654585200"; 
-   d="scan'208";a="614877254"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by fmsmga007.fm.intel.com with ESMTP; 30 Aug 2022 22:51:11 -0700
-Date:   Wed, 31 Aug 2022 13:51:10 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     isaku.yamahata@intel.com
+        with ESMTP id S229930AbiHaF71 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Aug 2022 01:59:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99D75BB913
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 22:59:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661925564;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IxcjaUqp+5ClMxUcwECOmWU+q5iSWtAQsNsREE6Alcs=;
+        b=Pbg2527dQDZXzGeeSryIAaav0unytEWZyLYX3XBHfkn7GZL9vnm5D+DoUj61aE8kbwVpfb
+        uBQvNFVwb7A8rwW/hkhIr3Yf3bDnplQHYJZ7eZaGX00PSg5m2XAFvq7QFDxgoJ4cIx9Vr9
+        xDVkPk53kh1qX5iy2ZYrkUCOFt3Tbzg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-449-DxuGihFiMdK9HhGh_43AcA-1; Wed, 31 Aug 2022 01:59:21 -0400
+X-MC-Unique: DxuGihFiMdK9HhGh_43AcA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C8A33101A54E;
+        Wed, 31 Aug 2022 05:59:20 +0000 (UTC)
+Received: from starship (unknown [10.40.194.96])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E27CF2026D4C;
+        Wed, 31 Aug 2022 05:59:17 +0000 (UTC)
+Message-ID: <17e776dccf01e03bce1356beb8db0741e2a13d9a.camel@redhat.com>
+Subject: Re: [PATCH 03/19] Revert "KVM: SVM: Introduce hybrid-AVIC mode"
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>
-Subject: Re: [PATCH v8 023/103] KVM: TDX: initialize VM with TDX specific
- parameters
-Message-ID: <20220831055110.2ev4wvpptkywijfe@yy-desk-7060>
-References: <cover.1659854790.git.isaku.yamahata@intel.com>
- <031bea8db0c579b4866a33faeb85ce4d461dc8a3.1659854790.git.isaku.yamahata@intel.com>
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Li RongQing <lirongqing@baidu.com>
+Date:   Wed, 31 Aug 2022 08:59:16 +0300
+In-Reply-To: <20220831003506.4117148-4-seanjc@google.com>
+References: <20220831003506.4117148-1-seanjc@google.com>
+         <20220831003506.4117148-4-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <031bea8db0c579b4866a33faeb85ce4d461dc8a3.1659854790.git.isaku.yamahata@intel.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Aug 07, 2022 at 03:01:08PM -0700, isaku.yamahata@intel.com wrote:
-> From: Xiaoyao Li <xiaoyao.li@intel.com>
->
-> TDX requires additional parameters for TDX VM for confidential execution to
-> protect its confidentiality of its memory contents and its CPU state from
-> any other software, including VMM. When creating guest TD VM before
-> creating vcpu, the number of vcpu, TSC frequency (that is same among
-> vcpus. and it can't be changed.)  CPUIDs which is emulated by the TDX
-> module. It means guest can trust those CPUIDs. and sha384 values for
-> measurement.
->
-> Add new subcommand, KVM_TDX_INIT_VM, to pass parameters for TDX guest.  It
-> assigns encryption key to the TDX guest for memory encryption.  TDX
+On Wed, 2022-08-31 at 00:34 +0000, Sean Christopherson wrote:
+> Remove SVM's so called "hybrid-AVIC mode" and reinstate the restriction
+> where AVIC is disabled if x2APIC is enabled.  The argument that the
+> "guest is not supposed to access xAPIC mmio when uses x2APIC" is flat out
+> wrong.  Activating x2APIC completely disables the xAPIC MMIO region,
+> there is nothing that says the guest must not access that address.
+> 
+> Concretely, KVM-Unit-Test's existing "apic" test fails the subtests that
+> expect accesses to the APIC base region to not be emulated when x2APIC is
+> enabled.
+> 
+> Furthermore, allowing the guest to trigger MMIO emulation in a mode where
+> KVM doesn't expect such emulation to occur is all kinds of dangerous.
+> 
+> Tweak the restriction so that it only inhibits AVIC if x2APIC is actually
+> enabled instead of inhibiting AVIC is x2APIC is exposed to the guest.
+> 
+> This reverts commit 0e311d33bfbef86da130674e8528cc23e6acfe16.
 
-This paragraph talks about the parameters carried with KVM_TDX_INIT_VM,
-but the encryption key is not part of them, suggest to move the encryption
-related things to solo paragraph or just remove them.
+I don't agree with this patch.
 
-> encrypts memory per-guest bases.  It assigns device model passes per-VM
-> parameters for the TDX guest.  The maximum number of vcpus, tsc frequency
-> (TDX guest has fised VM-wide TSC frequency. not per-vcpu.  The TDX guest
-> can not change it.), attributes (production or debug), available extended
-> features (which is reflected into guest XCR0, IA32_XSS MSR), cpuids, sha384
-> measurements, and etc.
->
-> This subcommand is called before creating vcpu and KVM_SET_CPUID2, i.e.
-> cpuids configurations aren't available yet.  So CPUIDs configuration values
-> needs to be passed in struct kvm_init_vm.  It's device model responsibility
+When reviewing this code I did note that MMIO is left enabled which is kind of errata on KVM
+side, and nobody objected to this.
 
-s/kvm_init_vm/kvm_tdx_init_vm OR:
-"So CPUIDs configuration values need to be passed with KVM_TDX_INIT_VM"
+Keeping AVIC enabled allows to have performance benefits with guests that have to use x2apic
+(e.g after migration, or OS requirements) - aside from emulated msr access they get all the
+AVIC benefits like doorbell, IOMMU posted interrupts, etc.
 
-> to make this cpuid config for KVM_TDX_INIT_VM and KVM_SET_CPUID2.
->
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+What we should do, and I even suggested doing it 
+(and what I somewhat assumed that you will ask when the patch was in review),
+is to disable the AVIC mmio hole when one of the guest vCPUs is in x2apic mode
+which can be done by disabling our APIC private memslot.
+
+Best regards,
+	Maxim Levitsky
+
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/include/asm/tdx.h            |   3 +
->  arch/x86/include/uapi/asm/kvm.h       |  33 +++++
->  arch/x86/kvm/vmx/tdx.c                | 199 ++++++++++++++++++++++++++
->  arch/x86/kvm/vmx/tdx.h                |  22 +++
->  tools/arch/x86/include/uapi/asm/kvm.h |  33 +++++
->  5 files changed, 290 insertions(+)
->
-> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index a32e8881e758..8a1905ae3ad6 100644
-> --- a/arch/x86/include/asm/tdx.h
-> +++ b/arch/x86/include/asm/tdx.h
-> @@ -89,6 +89,9 @@ static inline long tdx_kvm_hypercall(unsigned int nr, unsigned long p1,
->  #endif /* CONFIG_INTEL_TDX_GUEST && CONFIG_KVM_GUEST */
->
->  #ifdef CONFIG_INTEL_TDX_HOST
+>  arch/x86/include/asm/kvm_host.h |  6 ++++++
+>  arch/x86/kvm/svm/avic.c         | 21 ++++++++++-----------
+>  2 files changed, 16 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 2c96c43c313a..1f51411f3112 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1128,6 +1128,12 @@ enum kvm_apicv_inhibit {
+>  	 */
+>  	APICV_INHIBIT_REASON_PIT_REINJ,
+>  
+> +	/*
+> +	 * AVIC is inhibited because the vCPU has x2apic enabled and x2AVIC is
+> +	 * not supported.
+> +	 */
+> +	APICV_INHIBIT_REASON_X2APIC,
 > +
-> +/* -1 indicates CPUID leaf with no sub-leaves. */
-> +#define TDX_CPUID_NO_SUBLEAF	((u32)-1)
->  struct tdx_cpuid_config {
->  	u32	leaf;
->  	u32	sub_leaf;
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index 9effc64e547e..97ce34d746af 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -538,6 +538,7 @@ struct kvm_pmu_event_filter {
->  /* Trust Domain eXtension sub-ioctl() commands. */
->  enum kvm_tdx_cmd_id {
->  	KVM_TDX_CAPABILITIES = 0,
-> +	KVM_TDX_INIT_VM,
->
->  	KVM_TDX_CMD_NR_MAX,
->  };
-> @@ -583,4 +584,36 @@ struct kvm_tdx_capabilities {
->  	struct kvm_tdx_cpuid_config cpuid_configs[0];
->  };
->
-> +struct kvm_tdx_init_vm {
-> +	__u64 attributes;
-> +	__u32 max_vcpus;
-> +	__u32 padding;
-> +	__u64 mrconfigid[6];	/* sha384 digest */
-> +	__u64 mrowner[6];	/* sha384 digest */
-> +	__u64 mrownerconfig[6];	/* sha348 digest */
-> +	union {
-> +		/*
-> +		 * KVM_TDX_INIT_VM is called before vcpu creation, thus before
-> +		 * KVM_SET_CPUID2.  CPUID configurations needs to be passed.
-> +		 *
-> +		 * This configuration supersedes KVM_SET_CPUID{,2}.
-> +		 * The user space VMM, e.g. qemu, should make them consistent
-> +		 * with this values.
-> +		 * sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES(256)
-> +		 * = 8KB.
-> +		 */
-> +		struct {
-> +			struct kvm_cpuid2 cpuid;
-> +			/* 8KB with KVM_MAX_CPUID_ENTRIES. */
-> +			struct kvm_cpuid_entry2 entries[];
-> +		};
-> +		/*
-> +		 * For future extensibility.
-> +		 * The size(struct kvm_tdx_init_vm) = 16KB.
-> +		 * This should be enough given sizeof(TD_PARAMS) = 1024
-
-Do you mean that in TD_PARAMS now maximum CPUID item count is 48 (1024
-- CPUID ITEM START(is 256)) / CPUID size(is 16)) and here we already
-defined 256 which is much enough for TD_PARAMS ?
-
-> +		 */
-> +		__u64 reserved[2028];
-> +	};
-> +};
+>  	/*
+>  	 * AVIC is disabled because SEV doesn't support it.
+>  	 */
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index f3a74c8284cb..1d516d658f9a 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -71,22 +71,12 @@ static void avic_activate_vmcb(struct vcpu_svm *svm)
+>  	vmcb->control.avic_physical_id &= ~AVIC_PHYSICAL_MAX_INDEX_MASK;
+>  
+>  	vmcb->control.int_ctl |= AVIC_ENABLE_MASK;
+> -
+> -	/* Note:
+> -	 * KVM can support hybrid-AVIC mode, where KVM emulates x2APIC
+> -	 * MSR accesses, while interrupt injection to a running vCPU
+> -	 * can be achieved using AVIC doorbell. The AVIC hardware still
+> -	 * accelerate MMIO accesses, but this does not cause any harm
+> -	 * as the guest is not supposed to access xAPIC mmio when uses x2APIC.
+> -	 */
+> -	if (apic_x2apic_mode(svm->vcpu.arch.apic) &&
+> -	    avic_mode == AVIC_MODE_X2) {
+> +	if (apic_x2apic_mode(svm->vcpu.arch.apic)) {
+>  		vmcb->control.int_ctl |= X2APIC_MODE_MASK;
+>  		vmcb->control.avic_physical_id |= X2AVIC_MAX_PHYSICAL_ID;
+>  		/* Disabling MSR intercept for x2APIC registers */
+>  		svm_set_x2apic_msr_interception(svm, false);
+>  	} else {
+> -		/* For xAVIC and hybrid-xAVIC modes */
+>  		vmcb->control.avic_physical_id |= AVIC_MAX_PHYSICAL_ID;
+>  		/* Enabling MSR intercept for x2APIC registers */
+>  		svm_set_x2apic_msr_interception(svm, true);
+> @@ -537,6 +527,14 @@ unsigned long avic_vcpu_get_apicv_inhibit_reasons(struct kvm_vcpu *vcpu)
+>  {
+>  	if (is_guest_mode(vcpu))
+>  		return APICV_INHIBIT_REASON_NESTED;
 > +
->  #endif /* _ASM_X86_KVM_H */
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index d3b9f653da4b..dcd2f460275e 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -424,6 +424,202 @@ int tdx_dev_ioctl(void __user *argp)
+> +	/*
+> +	 * AVIC must be disabled if x2AVIC isn't supported and the guest has
+> +	 * x2APIC enabled.
+> +	 */
+> +	if (avic_mode != AVIC_MODE_X2 && apic_x2apic_mode(vcpu->arch.apic))
+> +		return APICV_INHIBIT_REASON_X2APIC;
+> +
 >  	return 0;
 >  }
->
-> +/*
-> + * cpuid entry lookup in TDX cpuid config way.
-> + * The difference is how to specify index(subleaves).
-> + * Specify index to TDX_CPUID_NO_SUBLEAF for CPUID leaf with no-subleaves.
-> + */
-> +static const struct kvm_cpuid_entry2 *tdx_find_cpuid_entry(
-> +	const struct kvm_cpuid2 *cpuid, u32 function, u32 index)
-> +{
-> +	int i;
-> +
-> +	/* In TDX CPU CONFIG, TDX_CPUID_NO_SUBLEAF means index = 0. */
-> +	if (index == TDX_CPUID_NO_SUBLEAF)
-> +		index = 0;
-> +
-> +	for (i = 0; i < cpuid->nent; i++) {
-> +		const struct kvm_cpuid_entry2 *e = &cpuid->entries[i];
-> +
-> +		if (e->function == function &&
-> +		    (e->index == index ||
-> +		     !(e->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX)))
-> +			return e;
-> +	}
-> +	return NULL;
-> +}
-> +
-> +static int setup_tdparams(struct kvm *kvm, struct td_params *td_params,
-> +			struct kvm_tdx_init_vm *init_vm)
-> +{
-> +	const struct kvm_cpuid2 *cpuid = &init_vm->cpuid;
-> +	const struct kvm_cpuid_entry2 *entry;
-> +	u64 guest_supported_xcr0;
-> +	u64 guest_supported_xss;
-> +	int max_pa;
-> +	int i;
-> +
-> +	td_params->max_vcpus = init_vm->max_vcpus;
-> +
-> +	td_params->attributes = init_vm->attributes;
-> +	if (td_params->attributes & TDX_TD_ATTRIBUTE_PERFMON) {
-> +		/*
-> +		 * TODO: save/restore PMU related registers around TDENTER.
-> +		 * Once it's done, remove this guard.
-> +		 */
-> +		pr_warn("TD doesn't support perfmon yet. KVM needs to save/restore "
-> +			"host perf registers properly.\n");
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	for (i = 0; i < tdx_caps.nr_cpuid_configs; i++) {
-> +		const struct tdx_cpuid_config *config = &tdx_caps.cpuid_configs[i];
-> +		const struct kvm_cpuid_entry2 *entry =
-> +			tdx_find_cpuid_entry(cpuid, config->leaf, config->sub_leaf);
-> +		struct tdx_cpuid_value *value = &td_params->cpuid_values[i];
-> +
-> +		if (!entry)
-> +			continue;
+>  
+> @@ -993,6 +991,7 @@ bool avic_check_apicv_inhibit_reasons(enum kvm_apicv_inhibit reason)
+>  			  BIT(APICV_INHIBIT_REASON_NESTED) |
+>  			  BIT(APICV_INHIBIT_REASON_IRQWIN) |
+>  			  BIT(APICV_INHIBIT_REASON_PIT_REINJ) |
+> +			  BIT(APICV_INHIBIT_REASON_X2APIC) |
+>  			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |
+>  			  BIT(APICV_INHIBIT_REASON_SEV)      |
+>  			  BIT(APICV_INHIBIT_REASON_APIC_ID_MODIFIED) |
 
-So the corresponding CPUID's configurable bits are all set to 0 if
-user space doesn't pass it down, a pr_warn() is needed here if this
-isn't the expected case.
 
-> +
-> +		value->eax = entry->eax & config->eax;
-> +		value->ebx = entry->ebx & config->ebx;
-> +		value->ecx = entry->ecx & config->ecx;
-> +		value->edx = entry->edx & config->edx;
-> +	}
-> +
-> +	max_pa = 36;
-> +	entry = tdx_find_cpuid_entry(cpuid, 0x80000008, 0);
-> +	if (entry)
-> +		max_pa = entry->eax & 0xff;
-> +
-> +	td_params->eptp_controls = VMX_EPTP_MT_WB;
-> +	/*
-> +	 * No CPU supports 4-level && max_pa > 48.
-> +	 * "5-level paging and 5-level EPT" section 4.1 4-level EPT
-> +	 * "4-level EPT is limited to translating 48-bit guest-physical
-> +	 *  addresses."
-> +	 * cpu_has_vmx_ept_5levels() check is just in case.
-> +	 */
-> +	if (cpu_has_vmx_ept_5levels() && max_pa > 48) {
-> +		td_params->eptp_controls |= VMX_EPTP_PWL_5;
-> +		td_params->exec_controls |= TDX_EXEC_CONTROL_MAX_GPAW;
-> +	} else {
-> +		td_params->eptp_controls |= VMX_EPTP_PWL_4;
-> +	}
-> +
-> +	/* Setup td_params.xfam */
-> +	entry = tdx_find_cpuid_entry(cpuid, 0xd, 0);
-> +	if (entry)
-> +		guest_supported_xcr0 = (entry->eax | ((u64)entry->edx << 32));
-> +	else
-> +		guest_supported_xcr0 = 0;
-> +	guest_supported_xcr0 &= kvm_caps.supported_xcr0;
-> +
-> +	entry = tdx_find_cpuid_entry(cpuid, 0xd, 1);
-> +	if (entry)
-> +		guest_supported_xss = (entry->ecx | ((u64)entry->edx << 32));
-> +	else
-> +		guest_supported_xss = 0;
-> +	/* PT can be exposed to TD guest regardless of KVM's XSS support */
-> +	guest_supported_xss &= (kvm_caps.supported_xss | XFEATURE_MASK_PT);
-> +
-> +	td_params->xfam = guest_supported_xcr0 | guest_supported_xss;
-> +	if (td_params->xfam & XFEATURE_MASK_LBR) {
-> +		/*
-> +		 * TODO: once KVM supports LBR(save/restore LBR related
-> +		 * registers around TDENTER), remove this guard.
-> +		 */
-> +		pr_warn("TD doesn't support LBR yet. KVM needs to save/restore "
-> +			"IA32_LBR_DEPTH properly.\n");
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	if (td_params->xfam & XFEATURE_MASK_XTILE) {
-> +		/*
-> +		 * TODO: once KVM supports AMX(save/restore AMX related
-> +		 * registers around TDENTER), remove this guard.
-> +		 */
-> +		pr_warn("TD doesn't support AMX yet. KVM needs to save/restore "
-> +			"IA32_XFD, IA32_XFD_ERR properly.\n");
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	td_params->tsc_frequency =
-> +		TDX_TSC_KHZ_TO_25MHZ(kvm->arch.default_tsc_khz);
-> +
-> +#define MEMCPY_SAME_SIZE(dst, src)				\
-> +	do {							\
-> +		BUILD_BUG_ON(sizeof(dst) != sizeof(src));	\
-> +		memcpy((dst), (src), sizeof(dst));		\
-> +	} while (0)
-> +
-> +	MEMCPY_SAME_SIZE(td_params->mrconfigid, init_vm->mrconfigid);
-> +	MEMCPY_SAME_SIZE(td_params->mrowner, init_vm->mrowner);
-> +	MEMCPY_SAME_SIZE(td_params->mrownerconfig, init_vm->mrownerconfig);
-> +
-> +	return 0;
-> +}
-> +
-> +static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	struct kvm_tdx_init_vm *init_vm = NULL;
-> +	struct td_params *td_params = NULL;
-> +	struct tdx_module_output out;
-> +	int ret;
-> +	u64 err;
-> +
-> +	BUILD_BUG_ON(sizeof(*init_vm) != 16 * 1024);
-> +	BUILD_BUG_ON((sizeof(*init_vm) - offsetof(typeof(*init_vm), entries)) /
-> +		     sizeof(init_vm->entries[0]) < KVM_MAX_CPUID_ENTRIES);
-> +	BUILD_BUG_ON(sizeof(struct td_params) != 1024);
-> +
-> +	if (is_td_initialized(kvm))
-> +		return -EINVAL;
-> +
-> +	if (cmd->flags)
-> +		return -EINVAL;
-> +
-> +	init_vm = kzalloc(sizeof(*init_vm), GFP_KERNEL);
-> +	if (copy_from_user(init_vm, (void __user *)cmd->data, sizeof(*init_vm))) {
-> +		ret = -EFAULT;
-> +		goto out;
-> +	}
-> +
-> +	if (init_vm->max_vcpus > KVM_MAX_VCPUS) {
-> +		ret = -EINVAL;
-> +		goto out;
-> +	}
-> +
-> +	td_params = kzalloc(sizeof(struct td_params), GFP_KERNEL);
-> +	if (!td_params) {
-> +		ret = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	ret = setup_tdparams(kvm, td_params, init_vm);
-> +	if (ret)
-> +		goto out;
-> +
-> +	err = tdh_mng_init(kvm_tdx->tdr.pa, __pa(td_params), &out);
-> +	if (WARN_ON_ONCE(err)) {
-> +		pr_tdx_error(TDH_MNG_INIT, err, &out);
-> +		ret = -EIO;
-> +		goto out;
-> +	}
-> +
-> +	kvm_tdx->tsc_offset = td_tdcs_exec_read64(kvm_tdx, TD_TDCS_EXEC_TSC_OFFSET);
-> +	kvm_tdx->attributes = td_params->attributes;
-> +	kvm_tdx->xfam = td_params->xfam;
-> +	kvm->max_vcpus = td_params->max_vcpus;
-> +
-> +out:
-> +	/* kfree() accepts NULL. */
-> +	kfree(init_vm);
-> +	kfree(td_params);
-> +	return ret;
-> +}
-> +
->  int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
->  {
->  	struct kvm_tdx_cmd tdx_cmd;
-> @@ -437,6 +633,9 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
->  	mutex_lock(&kvm->lock);
->
->  	switch (tdx_cmd.id) {
-> +	case KVM_TDX_INIT_VM:
-> +		r = tdx_td_init(kvm, &tdx_cmd);
-> +		break;
->  	default:
->  		r = -EINVAL;
->  		goto out;
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index 8058b6b153f8..3e5782438dc9 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -20,7 +20,11 @@ struct kvm_tdx {
->  	struct tdx_td_page tdr;
->  	struct tdx_td_page *tdcs;
->
-> +	u64 attributes;
-> +	u64 xfam;
->  	int hkid;
-> +
-> +	u64 tsc_offset;
->  };
->
->  struct vcpu_tdx {
-> @@ -50,6 +54,11 @@ static inline struct vcpu_tdx *to_tdx(struct kvm_vcpu *vcpu)
->  	return container_of(vcpu, struct vcpu_tdx, vcpu);
->  }
->
-> +static inline bool is_td_initialized(struct kvm *kvm)
-> +{
-> +	return !!kvm->max_vcpus;
-> +}
-> +
->  static __always_inline void tdvps_vmcs_check(u32 field, u8 bits)
->  {
->  	BUILD_BUG_ON_MSG(__builtin_constant_p(field) && (field) & 0x1,
-> @@ -135,6 +144,19 @@ TDX_BUILD_TDVPS_ACCESSORS(64, VMCS, vmcs);
->  TDX_BUILD_TDVPS_ACCESSORS(64, STATE_NON_ARCH, state_non_arch);
->  TDX_BUILD_TDVPS_ACCESSORS(8, MANAGEMENT, management);
->
-> +static __always_inline u64 td_tdcs_exec_read64(struct kvm_tdx *kvm_tdx, u32 field)
-> +{
-> +	struct tdx_module_output out;
-> +	u64 err;
-> +
-> +	err = tdh_mng_rd(kvm_tdx->tdr.pa, TDCS_EXEC(field), &out);
-> +	if (unlikely(err)) {
-> +		pr_err("TDH_MNG_RD[EXEC.0x%x] failed: 0x%llx\n", field, err);
-> +		return 0;
-> +	}
-> +	return out.r8;
-> +}
-> +
->  #else
->  static inline int tdx_module_setup(void) { return -ENODEV; };
->
-> diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
-> index ca85a070ac19..965a1c2e347d 100644
-> --- a/tools/arch/x86/include/uapi/asm/kvm.h
-> +++ b/tools/arch/x86/include/uapi/asm/kvm.h
-> @@ -532,6 +532,7 @@ struct kvm_pmu_event_filter {
->  /* Trust Domain eXtension sub-ioctl() commands. */
->  enum kvm_tdx_cmd_id {
->  	KVM_TDX_CAPABILITIES = 0,
-> +	KVM_TDX_INIT_VM,
->
->  	KVM_TDX_CMD_NR_MAX,
->  };
-> @@ -577,4 +578,36 @@ struct kvm_tdx_capabilities {
->  	struct kvm_tdx_cpuid_config cpuid_configs[0];
->  };
->
-> +struct kvm_tdx_init_vm {
-> +	__u64 attributes;
-> +	__u32 max_vcpus;
-> +	__u32 padding;
-> +	__u64 mrconfigid[6];    /* sha384 digest */
-> +	__u64 mrowner[6];       /* sha384 digest */
-> +	__u64 mrownerconfig[6]; /* sha348 digest */
-> +	union {
-> +		/*
-> +		 * KVM_TDX_INIT_VM is called before vcpu creation, thus before
-> +		 * KVM_SET_CPUID2.  CPUID configurations needs to be passed.
-> +		 *
-> +		 * This configuration supersedes KVM_SET_CPUID{,2}.
-> +		 * The user space VMM, e.g. qemu, should make them consistent
-> +		 * with this values.
-> +		 * sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES(256)
-> +		 * = 8KB.
-> +		 */
-> +		struct {
-> +			struct kvm_cpuid2 cpuid;
-> +			/* 8KB with KVM_MAX_CPUID_ENTRIES. */
-> +			struct kvm_cpuid_entry2 entries[];
-> +		};
-> +		/*
-> +		 * For future extensibility.
-> +		 * The size(struct kvm_tdx_init_vm) = 16KB.
-> +		 * This should be enough given sizeof(TD_PARAMS) = 1024
-> +		 */
-> +		__u64 reserved[2028];
-> +	};
-> +};
-> +
->  #endif /* _ASM_X86_KVM_H */
-> --
-> 2.25.1
->
