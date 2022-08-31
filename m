@@ -2,115 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C9A55A7701
-	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 09:03:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 36F695A770A
+	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 09:07:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230395AbiHaHDy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Aug 2022 03:03:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42526 "EHLO
+        id S230318AbiHaHHR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Aug 2022 03:07:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229538AbiHaHDw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Aug 2022 03:03:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78345BB01F
-        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 00:03:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661929429;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=F4hkpM3t1SPDuL+oYdpd1nLRpbIa0E4FQzXvygiJGl0=;
-        b=bs6t5ctzhPWN31Jxh82uC74a/U4xDdOd5WRSsGLu9Z4+tTCbF0pyEsIFCcwUfYYgl+9An0
-        K/kGkh5GKwLan800O8ngEYrKplZbDQuMOq8IRpAeV9HUoYIK2ayug0CZK4ogSYN1cBwR2k
-        tLK7fElFWmSr8DZUFngTlzW4dr/3yvA=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-657-kCVIJ8jZOO-kl_vEArdlUg-1; Wed, 31 Aug 2022 03:03:46 -0400
-X-MC-Unique: kCVIJ8jZOO-kl_vEArdlUg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 134EC3C0CD3C;
-        Wed, 31 Aug 2022 07:03:46 +0000 (UTC)
-Received: from starship (unknown [10.40.194.96])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5EED84010E3C;
-        Wed, 31 Aug 2022 07:03:44 +0000 (UTC)
-Message-ID: <ad4986e64a02fbd75d4b3f0199fae546e2cea2c6.camel@redhat.com>
-Subject: Re: [PATCH 19/19] Revert "KVM: SVM: Do not throw warning when
- calling avic_vcpu_load on a running vcpu"
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
+        with ESMTP id S229810AbiHaHHP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Aug 2022 03:07:15 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFE695E33D;
+        Wed, 31 Aug 2022 00:07:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1661929634; x=1693465634;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=kVV9HRdEeMuPwKG8bSE257Bhd6inSuO7fo2Ew7TH9RU=;
+  b=Zbbz03rNP1dOzVxAMyr3MejPH9D2wose/Hv1qBjz9CSNuHlGLYTLBvi5
+   YOvE6y7VCf6h/irhHs8kw+ZXQwqQSbMWoJ8YuDPNdmuZpgcjxccDT99am
+   IuxKxDeT1Gcqaa1EAEdMbwZnnJgeQ54EpZjjmk0gCJ7/OAoPL4B5ita4U
+   F6pqqbfFq85p7ahWOELgDOjClmgyHdV2cJi2ePXRzmwTe+Rbob6Q3ujgB
+   OF93vs2tAEZlJL4e7/jufiVOtj/4KrdbaT/OU9VGli0pjbM/No6JxYgz3
+   D30rChVrGJfYcaEBDDaI1a3GxuUxbirp3EUbii5Z9jxG+VWLzneqnhiyL
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10455"; a="294129498"
+X-IronPort-AV: E=Sophos;i="5.93,277,1654585200"; 
+   d="scan'208";a="294129498"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2022 00:07:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,277,1654585200"; 
+   d="scan'208";a="641739280"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by orsmga008.jf.intel.com with ESMTP; 31 Aug 2022 00:07:12 -0700
+Date:   Wed, 31 Aug 2022 15:07:11 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     isaku.yamahata@intel.com
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Li RongQing <lirongqing@baidu.com>
-Date:   Wed, 31 Aug 2022 10:03:43 +0300
-In-Reply-To: <fd349966a87ef3cb93fe1670e91cf6d2142ed442.camel@redhat.com>
-References: <20220831003506.4117148-1-seanjc@google.com>
-         <20220831003506.4117148-20-seanjc@google.com>
-         <fd349966a87ef3cb93fe1670e91cf6d2142ed442.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>
+Subject: Re: [PATCH v8 030/103] KVM: x86/mmu: Add address conversion
+ functions for TDX shared bit of GPA
+Message-ID: <20220831070711.yli6s6yk7euyvgqu@yy-desk-7060>
+References: <cover.1659854790.git.isaku.yamahata@intel.com>
+ <97e6f89f0460ac0b29392528e848cca2458b54c9.1659854790.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <97e6f89f0460ac0b29392528e848cca2458b54c9.1659854790.git.isaku.yamahata@intel.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-08-31 at 09:07 +0300, Maxim Levitsky wrote:
-> On Wed, 2022-08-31 at 00:35 +0000, Sean Christopherson wrote:
-> > Turns out that some warnings exist for good reasons.  Restore the warning
-> > in avic_vcpu_load() that guards against calling avic_vcpu_load() on a
-> > running vCPU now that KVM avoids doing so when switching between x2APIC
-> > and xAPIC.  The entire point of the WARN is to highlight that KVM should
-> > not be reloading an AVIC.
-> > 
-> > Opportunistically convert the WARN_ON() to WARN_ON_ONCE() to avoid
-> > spamming the kernel if it does fire.
-> > 
-> > This reverts commit c0caeee65af3944b7b8abbf566e7cc1fae15c775.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/svm/avic.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> > index b2033a56010c..3c300113d40b 100644
-> > --- a/arch/x86/kvm/svm/avic.c
-> > +++ b/arch/x86/kvm/svm/avic.c
-> > @@ -1080,6 +1080,7 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-> >  		return;
-> >  
-> >  	entry = READ_ONCE(*(svm->avic_physical_id_cache));
-> > +	WARN_ON_ONCE(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK);
-> >  
-> >  	entry &= ~AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK;
-> >  	entry |= (h_physical_id & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK);
-> 
-> Note that this warning was removed because it would trigger wheh x2avic code would switch
-> between xapic and x2apic.
-> 
-> I do agree 100% that this warning is useful.
+On Sun, Aug 07, 2022 at 03:01:15PM -0700, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>
+> TDX repurposes one GPA bit (51 bit or 47 bit based on configuration) to
+> indicate the GPA is private(if cleared) or shared (if set) with VMM.  If
+> GPA.shared is set, GPA is covered by the existing conventional EPT pointed
+> by EPTP.  If GPA.shared bit is cleared, GPA is covered by TDX module.
+> VMM has to issue SEAMCALLs to operate.
+>
+> Add a member to remember GPA shared bit for each guest TDs, add address
+> conversion functions between private GPA and shared GPA and test if GPA
+> is private.
+>
+> Because struct kvm_arch (or struct kvm which includes struct kvm_arch. See
+> kvm_arch_alloc_vm() that passes __GPF_ZERO) is zero-cleared when allocated,
+> the new member to remember GPA shared bit is guaranteed to be zero with
+> this patch unless it's initialized explicitly.
+>
+> Co-developed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Ah I see that you fixed the apic reloading to not trigger this code,
-need more coffee - in this case this patch makes lot of sense.
+Reviewed-by: Yuan Yao <yuan.yao@intel.com>
 
-I'll review it again when I review rest of the patches in the patch series.
-
-Best regards,
-	Maxim Levitsky
-> 
-> Best regards,
-> 	Maxim Levitsky
-
-
+> ---
+>  arch/x86/include/asm/kvm_host.h |  4 ++++
+>  arch/x86/kvm/mmu.h              | 32 ++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/vmx/tdx.c          |  5 +++++
+>  3 files changed, 41 insertions(+)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index e856abbe80ab..6787d5214fd8 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1358,6 +1358,10 @@ struct kvm_arch {
+>  	 */
+>  #define SPLIT_DESC_CACHE_MIN_NR_OBJECTS (SPTE_ENT_PER_PAGE + 1)
+>  	struct kvm_mmu_memory_cache split_desc_cache;
+> +
+> +#ifdef CONFIG_KVM_MMU_PRIVATE
+> +	gfn_t gfn_shared_mask;
+> +#endif
+>  };
+>
+>  struct kvm_vm_stat {
+> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> index a99acec925eb..df9f79ee07d4 100644
+> --- a/arch/x86/kvm/mmu.h
+> +++ b/arch/x86/kvm/mmu.h
+> @@ -276,4 +276,36 @@ static inline gpa_t kvm_translate_gpa(struct kvm_vcpu *vcpu,
+>  		return gpa;
+>  	return translate_nested_gpa(vcpu, gpa, access, exception);
+>  }
+> +
+> +static inline gfn_t kvm_gfn_shared_mask(const struct kvm *kvm)
+> +{
+> +#ifdef CONFIG_KVM_MMU_PRIVATE
+> +	return kvm->arch.gfn_shared_mask;
+> +#else
+> +	return 0;
+> +#endif
+> +}
+> +
+> +static inline gfn_t kvm_gfn_shared(const struct kvm *kvm, gfn_t gfn)
+> +{
+> +	return gfn | kvm_gfn_shared_mask(kvm);
+> +}
+> +
+> +static inline gfn_t kvm_gfn_private(const struct kvm *kvm, gfn_t gfn)
+> +{
+> +	return gfn & ~kvm_gfn_shared_mask(kvm);
+> +}
+> +
+> +static inline gpa_t kvm_gpa_private(const struct kvm *kvm, gpa_t gpa)
+> +{
+> +	return gpa & ~gfn_to_gpa(kvm_gfn_shared_mask(kvm));
+> +}
+> +
+> +static inline bool kvm_is_private_gpa(const struct kvm *kvm, gpa_t gpa)
+> +{
+> +	gfn_t mask = kvm_gfn_shared_mask(kvm);
+> +
+> +	return mask && !(gpa_to_gfn(gpa) & mask);
+> +}
+> +
+>  #endif
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 37272fe1e69f..36d2127cb7b7 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -753,6 +753,11 @@ static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
+>  	kvm_tdx->xfam = td_params->xfam;
+>  	kvm->max_vcpus = td_params->max_vcpus;
+>
+> +	if (td_params->exec_controls & TDX_EXEC_CONTROL_MAX_GPAW)
+> +		kvm->arch.gfn_shared_mask = gpa_to_gfn(BIT_ULL(51));
+> +	else
+> +		kvm->arch.gfn_shared_mask = gpa_to_gfn(BIT_ULL(47));
+> +
+>  out:
+>  	/* kfree() accepts NULL. */
+>  	kfree(init_vm);
+> --
+> 2.25.1
+>
