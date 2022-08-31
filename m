@@ -2,69 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2277C5A834A
-	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 18:35:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B67EC5A8356
+	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 18:37:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231926AbiHaQfl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Aug 2022 12:35:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56610 "EHLO
+        id S232227AbiHaQhp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Aug 2022 12:37:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231724AbiHaQfi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Aug 2022 12:35:38 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C01F5C35E
-        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 09:35:37 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id x19so13087815pfr.1
-        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 09:35:37 -0700 (PDT)
+        with ESMTP id S231874AbiHaQhn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Aug 2022 12:37:43 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CACC7D7426
+        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 09:37:41 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id w88-20020a17090a6be100b001fbb0f0b013so15508013pjj.5
+        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 09:37:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=aACaOYwjaK/bs9fwI2VTNHaA/NOZ1I7CvfyYxGNhpLU=;
-        b=j4g+6dBZqVdNp2C4ziwiEuAYw6KWrNKBFfazO0/nWDNwx6nYFzRv6WyBiqybX7nTc5
-         Fi5uh0F34lRD26lgeoecBkcU1fyqspTYW9FrIR8vUjY3RAWkeM5raZzysG7mtV+wXzw6
-         b4Pcg8vVt4zcVn8j3unuvBOxyrKBXWo81uNj1h+mkUCVaYeDQlUGGUMCse+V31+kUBHs
-         mInU958qZg8J2qJS+/nlNtfh6c1cRACFHcMpvSd/fGJ2DZxKsrcbHOb8Qbb2QwCmTczE
-         ocy7tpTF/dpxHLyoRW/DaBZiD0PpYn8mNuCXWUOpRKPri090sS3dwySShwPl1G4loxct
-         5v8w==
+        bh=/FJSEh1V45RFMHMbfBC/sbmtNpZrWIPYgncZYN6O8Eo=;
+        b=RT9xiJf3Xo/GkFE55Wne/Ya5ou4nSORjFT3juE8qKMXQ1SUBYRrsSEqQK6HFbBmYfH
+         JN53r6aehB/q4hccIR7FoWTqABqvr98p8RkMDnvXZIhtj8KVRHPdTPL619vA/fhS2ZTv
+         yeNpTXsJADrnGC4F+6sJulvA4Fws3blnqierVwkXObJnh22EktBZWvk0OIgReS9gMr7a
+         dDmnfgbdTHuAzYcttZa7yh2NvBBuaLPVjhN5XoUD2XjYqbpFUagECvPiXSge1Jm5NUsm
+         89Q/ytYGm0W8M+UZKFHW9TqNhnFXnP02e/LJGk3XHCRWIadywyZYGpqUuGxP8LBtw58T
+         su7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=aACaOYwjaK/bs9fwI2VTNHaA/NOZ1I7CvfyYxGNhpLU=;
-        b=gp3p5mKXD49rRGVzYtDperfSZxguB9VeT0Y82CHwm5hLdRYqw6amN8SqAEzCHoGB4g
-         MZPX7JZHSKmDfJsAZesBBIdWCRkYmK2Dx9q7faLQoYiujcFnt5nlR1PchGcMJvuiLOCc
-         Xo9wY9Ax1ASjNPJav7ugkXnCoRnqaWffXzJmNDcRu6r6Ei/ozTJhR3I7OgGN33nuzs6a
-         PYVsvFRfpwy5fJSL4wWA5ipr8k7PFWX6AUSyia3F6Z0iWytVPt5OHhdr3BdQgSLr8UfS
-         1Yti2i/pJmudvw9xTFcAM4skAUns69q//rGaLcvler3Kq125Wou6gduwg+Lm9t4nptCB
-         h0rg==
-X-Gm-Message-State: ACgBeo0s0g0Qmz7/j1/nFE+RJRtKufLOgxR/zA3/k+eglVpvYNo5mUfu
-        Tcw12rR+wJ4r/G69Zep8cjXimQ==
-X-Google-Smtp-Source: AA6agR7z6/HXxsp30lAJFrT2o+SRXJV7qrOwdBOkVeSdamoUEFhrmJ7HNSs0jW3g3goQaWBgcLOBUQ==
-X-Received: by 2002:a05:6a00:1307:b0:53a:9663:1bd6 with SMTP id j7-20020a056a00130700b0053a96631bd6mr6014200pfu.55.1661963736839;
-        Wed, 31 Aug 2022 09:35:36 -0700 (PDT)
+        bh=/FJSEh1V45RFMHMbfBC/sbmtNpZrWIPYgncZYN6O8Eo=;
+        b=YluFsbMBHnPLCUuSAis5OabH+RA4qib4CJB0FAPucksWU092AXmarmSuWtvz0MG1jN
+         aXVxCR6u8iXz92WvBCWeQgLHbdA00qbOigmhhxtDZ0dMcMEa9mySLfU7gizq34xESYw2
+         8/2PPs+Q4B76OzjyoEDkUGFbJgtjc1rix3gttFgFKw+1VyTlRnKW4aeYmc51vVy8AYxG
+         sFUVlnHuJhpWcBQgASkiA4A+PcP4S8x6D665szAxTY+XzmryHNH2VpbbGM0Fl/mTd3h0
+         TWJ+HBaFH4icTVpfRopD3p8uzvfIdMgDq3BJbMvJAtKsre9sEepL3BgTaEFPs0qNZJ1d
+         LldA==
+X-Gm-Message-State: ACgBeo2Dmt80sd7oLvfBB8NQ1jV0RQoaCb6DZlOgxvFJgbQ2+H5l/neC
+        cYpUEGKGqIDQfNIzk80gDsj9vg==
+X-Google-Smtp-Source: AA6agR7WBEdXp34JiIngWPb7UH+UuvBGe/3mx/+q9RaGK06vi3QOVSQ4iTXVCkKQ6/Xpf+bRFx4Gkw==
+X-Received: by 2002:a17:902:e5cc:b0:16f:1e31:da6c with SMTP id u12-20020a170902e5cc00b0016f1e31da6cmr26626057plf.66.1661963861208;
+        Wed, 31 Aug 2022 09:37:41 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id n15-20020a170902e54f00b0016dbaf3ff2esm6343520plf.22.2022.08.31.09.35.36
+        by smtp.gmail.com with ESMTPSA id 96-20020a17090a0fe900b001f54fa41242sm1488864pjz.42.2022.08.31.09.37.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Aug 2022 09:35:36 -0700 (PDT)
-Date:   Wed, 31 Aug 2022 16:35:32 +0000
+        Wed, 31 Aug 2022 09:37:40 -0700 (PDT)
+Date:   Wed, 31 Aug 2022 16:37:37 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Maxim Levitsky <mlevitsk@redhat.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
         Li RongQing <lirongqing@baidu.com>
-Subject: Re: [PATCH 06/19] KVM: SVM: Get x2APIC logical dest bitmap from
- ICRH[15:0], not ICHR[31:16]
-Message-ID: <Yw+N1BdfSansWh8h@google.com>
+Subject: Re: [PATCH 07/19] KVM: SVM: Drop buggy and redundant AVIC "single
+ logical dest" check
+Message-ID: <Yw+OUa3l1Rg036fb@google.com>
 References: <20220831003506.4117148-1-seanjc@google.com>
- <20220831003506.4117148-7-seanjc@google.com>
- <7a7827ec2652a8409fccfe070659497df229211b.camel@redhat.com>
- <b660f600ff5f6c107d899ced46c04de3b99c425f.camel@redhat.com>
+ <20220831003506.4117148-8-seanjc@google.com>
+ <dd8c92855762258d87486f719bf7e52e36169ef2.camel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b660f600ff5f6c107d899ced46c04de3b99c425f.camel@redhat.com>
+In-Reply-To: <dd8c92855762258d87486f719bf7e52e36169ef2.camel@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,46 +76,58 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Aug 31, 2022, Maxim Levitsky wrote:
-> On Wed, 2022-08-31 at 09:09 +0300, Maxim Levitsky wrote:
-> > On Wed, 2022-08-31 at 00:34 +0000, Sean Christopherson wrote:
-> > > When attempting a fast kick for x2AVIC, get the destination bitmap from
-> > > ICR[15:0], not ICHR[31:16].  The upper 16 bits contain the cluster, the
-> > > lower 16 bits hold the bitmap.
-> > > 
-> > > Fixes: 603ccef42ce9 ("KVM: x86: SVM: fix avic_kick_target_vcpus_fast")
-> > > Cc: Maxim Levitsky <mlevitsk@redhat.com>
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > ---
-> > >  arch/x86/kvm/svm/avic.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> > > index 3ace0f2f52f0..3c333cd2e752 100644
-> > > --- a/arch/x86/kvm/svm/avic.c
-> > > +++ b/arch/x86/kvm/svm/avic.c
-> > > @@ -368,7 +368,7 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
-> > >  
-> > >  		if (apic_x2apic_mode(source)) {
-> > >  			/* 16 bit dest mask, 16 bit cluster id */
-> > > -			bitmap = dest & 0xFFFF0000;
-> > > +			bitmap = dest & 0xFFFF;
-> > >  			cluster = (dest >> 16) << 4;
-> > >  		} else if (kvm_lapic_get_reg(source, APIC_DFR) == APIC_DFR_FLAT) {
-> > >  			/* 8 bit dest mask*/
+> On Wed, 2022-08-31 at 00:34 +0000, Sean Christopherson wrote:
+> > Use the already-calculated-and-sanity-checked destination bitmap when
+> > processing a fast AVIC kick in logical mode, and drop the logical path's
+> > flawed logic.  The intent of the check is to ensure the bitmap is a power
+> > of two, whereas "icrh != (1 << avic)" effectively checks that the bitmap
+> > is a power of two _and_ the target cluster is '0'.
 > > 
-> > I swear I have seen a patch from Suravee Suthikulpanit fixing this my mistake, I don't know why it was not
-> > accepted upstream.
+> > Note, the flawed check isn't a functional issue, it simply means that KVM
+> > will go down the slow path if the target cluster is non-zero.
+> > 
+> > Fixes: 8c9e639da435 ("KVM: SVM: Use target APIC ID to complete x2AVIC IRQs when possible")
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/kvm/svm/avic.c | 10 +---------
+> >  1 file changed, 1 insertion(+), 9 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> > index 3c333cd2e752..14f567550a1e 100644
+> > --- a/arch/x86/kvm/svm/avic.c
+> > +++ b/arch/x86/kvm/svm/avic.c
+> > @@ -411,15 +411,7 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
+> >  			 * Instead, calculate physical ID from logical ID in ICRH.
+> >  			 */
+> >  			int cluster = (icrh & 0xffff0000) >> 16;
+> > -			int apic = ffs(icrh & 0xffff) - 1;
+> > -
+> > -			/*
+> > -			 * If the x2APIC logical ID sub-field (i.e. icrh[15:0])
+> > -			 * contains anything but a single bit, we cannot use the
+> > -			 * fast path, because it is limited to a single vCPU.
+> > -			 */
+> > -			if (apic < 0 || icrh != (1 << apic))
+> > -				return -EINVAL;
+> > +			int apic = ffs(bitmap) - 1;
+> >  
+> >  			l1_physical_id = (cluster << 4) + apic;
+> >  		}
 > 
-> This is the patch, which I guess got forgotten.
+> Oh, I didn't notice this bug. However isn't removing the check is wrong as well?
 > 
-> https://www.spinics.net/lists/kernel/msg4417427.html
+> What if we do have multiple bits set in the bitmap? After you remove this code,
+> we will set IPI only to APIC which matches the 1st bit, no?
 
-Ah, we just missed it, doubt there's anything more than that to the story.
+The common code (out of sight here) already ensures the bitmap has exactly one bit set:
 
-> Since it is literaly the same patch, you can just add credit to Suravee Suthikulpanit.
-> 
-> So with the credit added:
-> 
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+                if (unlikely(!bitmap))
+                        /* guest bug: nobody to send the logical interrupt to */
+                        return 0;
 
-I'll grab Suravee's patch and added your review.  Thanks!
+                if (!is_power_of_2(bitmap))
+                        /* multiple logical destinations, use slow path */
+                        return -EINVAL;
+
+                logid_index = cluster + __ffs(bitmap);
+
