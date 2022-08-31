@@ -2,170 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36F695A770A
-	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 09:07:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E9DA5A7751
+	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 09:13:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230318AbiHaHHR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Aug 2022 03:07:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48732 "EHLO
+        id S229846AbiHaHNu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Aug 2022 03:13:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229810AbiHaHHP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Aug 2022 03:07:15 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFE695E33D;
-        Wed, 31 Aug 2022 00:07:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661929634; x=1693465634;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=kVV9HRdEeMuPwKG8bSE257Bhd6inSuO7fo2Ew7TH9RU=;
-  b=Zbbz03rNP1dOzVxAMyr3MejPH9D2wose/Hv1qBjz9CSNuHlGLYTLBvi5
-   YOvE6y7VCf6h/irhHs8kw+ZXQwqQSbMWoJ8YuDPNdmuZpgcjxccDT99am
-   IuxKxDeT1Gcqaa1EAEdMbwZnnJgeQ54EpZjjmk0gCJ7/OAoPL4B5ita4U
-   F6pqqbfFq85p7ahWOELgDOjClmgyHdV2cJi2ePXRzmwTe+Rbob6Q3ujgB
-   OF93vs2tAEZlJL4e7/jufiVOtj/4KrdbaT/OU9VGli0pjbM/No6JxYgz3
-   D30rChVrGJfYcaEBDDaI1a3GxuUxbirp3EUbii5Z9jxG+VWLzneqnhiyL
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10455"; a="294129498"
-X-IronPort-AV: E=Sophos;i="5.93,277,1654585200"; 
-   d="scan'208";a="294129498"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2022 00:07:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,277,1654585200"; 
-   d="scan'208";a="641739280"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by orsmga008.jf.intel.com with ESMTP; 31 Aug 2022 00:07:12 -0700
-Date:   Wed, 31 Aug 2022 15:07:11 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     isaku.yamahata@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>
-Subject: Re: [PATCH v8 030/103] KVM: x86/mmu: Add address conversion
- functions for TDX shared bit of GPA
-Message-ID: <20220831070711.yli6s6yk7euyvgqu@yy-desk-7060>
-References: <cover.1659854790.git.isaku.yamahata@intel.com>
- <97e6f89f0460ac0b29392528e848cca2458b54c9.1659854790.git.isaku.yamahata@intel.com>
+        with ESMTP id S230202AbiHaHMk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Aug 2022 03:12:40 -0400
+Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A309C8FD5C;
+        Wed, 31 Aug 2022 00:10:48 -0700 (PDT)
+Received: by mail-qv1-xf32.google.com with SMTP id kh8so10458111qvb.1;
+        Wed, 31 Aug 2022 00:10:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=4H6Ap5iYRv7tpvy1RQr8BbbT4SuQAg4q/F9AMK7kUsE=;
+        b=nQsvUMM7gPD0MfxFck6Gx7rnh5GgDRrLnxF5+lzgvgGP2W0neOwAOpnIkihVmYmhnj
+         g/QozrVUh/ut5/ZBecYX4GKEHTXw6Nd1YMXccL6CHC8ZMtaEnuR4keOMXxnei7fElw6W
+         oS0orSOhbkNbPdl1lPwSkH5VxGgZWZ5Ewd6Pn/lfBPC+HxtHLc3g/VwDqZbfk1v1qB28
+         mRyFWEfi1nINqBgE6N0zuT4nozA0kkypJeIzTRYxfkeq/uypYJRWO0sj4StHJQlYNA2v
+         GrU/f6K5aRfZpApcdRyrFGNv/mUenugIMbl9ryj4q948MOTJI/qKaLfKS93VRBJbqCk0
+         N8Jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=4H6Ap5iYRv7tpvy1RQr8BbbT4SuQAg4q/F9AMK7kUsE=;
+        b=CFobw5+Bi1aaSyYdmueK8fhlqN/iL2rOSe+p2iLoosRFCav9XNCcNS/ZvcTOe0eaZl
+         d4hferDFpiFr1rZOJDexIUlF7CEHDSsBDSUFknnRRUgWCsytONcJB0u5exqe1aqaaT0n
+         M6GWsK/9Ydqvq1asswKXFRpX9RypyJGvx7lPveRc2dUALwGTbqDmBiyC+pHOP+HAHVST
+         +GSRCCMdnhL5BVMoo2W7MWqKXgbh0bsltFJpZuvEnJoDsnp7AD41XvG+/ABZbzHNh+UA
+         HmtEPiWGfHKQKzvVVX8EUap1CZ8T/72Rqc/6hTIGRKec3HNg/Jpur5DSkHzyrtW267Ml
+         Mn+Q==
+X-Gm-Message-State: ACgBeo3vaHQxPo9d9/k/P88ZTO7xgjSAyn8fPkw3iFEb67l+LcGZXXw0
+        +k0jjJ0OVrx4L8tLkHsO132inMg7LlqCv3phgq8=
+X-Google-Smtp-Source: AA6agR6pVIwGsshTqW4W1Ww2G4fQrnbCfhAxvo2a0nXNTfKZi/6YL5FJH3r6Gmd9tQShyqtgATCNZIDlS+4HFxhktbc=
+X-Received: by 2002:a05:6214:27e3:b0:497:f73:7c2 with SMTP id
+ jt3-20020a05621427e300b004970f7307c2mr18196483qvb.1.1661929837495; Wed, 31
+ Aug 2022 00:10:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <97e6f89f0460ac0b29392528e848cca2458b54c9.1659854790.git.isaku.yamahata@intel.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <20220817144045.3206-1-ubizjak@gmail.com> <Yv0QFZUdePurfjKh@google.com>
+In-Reply-To: <Yv0QFZUdePurfjKh@google.com>
+From:   Uros Bizjak <ubizjak@gmail.com>
+Date:   Wed, 31 Aug 2022 09:10:26 +0200
+Message-ID: <CAFULd4bVQ73Cur85Oj=oXHiMRvfrxkAVy=V4TfHcbtNWbqOQzw@mail.gmail.com>
+Subject: Re: [PATCH] KVM/VMX: Do not declare vmread_error asmlinkage
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Aug 07, 2022 at 03:01:15PM -0700, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Wed, Aug 17, 2022 at 5:58 PM Sean Christopherson <seanjc@google.com> wrote:
 >
-> TDX repurposes one GPA bit (51 bit or 47 bit based on configuration) to
-> indicate the GPA is private(if cleared) or shared (if set) with VMM.  If
-> GPA.shared is set, GPA is covered by the existing conventional EPT pointed
-> by EPTP.  If GPA.shared bit is cleared, GPA is covered by TDX module.
-> VMM has to issue SEAMCALLs to operate.
+> +PeterZ
 >
-> Add a member to remember GPA shared bit for each guest TDs, add address
-> conversion functions between private GPA and shared GPA and test if GPA
-> is private.
+> On Wed, Aug 17, 2022, Uros Bizjak wrote:
+> > There is no need to declare vmread_error asmlinkage, its arguments
+> > can be passed via registers for both, 32-bit and 64-bit targets.
+> > Function argument registers are considered call-clobbered registers,
+> > they are saved in the trampoline just before the function call and
+> > restored afterwards.
 >
-> Because struct kvm_arch (or struct kvm which includes struct kvm_arch. See
-> kvm_arch_alloc_vm() that passes __GPF_ZERO) is zero-cleared when allocated,
-> the new member to remember GPA shared bit is guaranteed to be zero with
-> this patch unless it's initialized explicitly.
+> I'm officially confused.  What's the purpose of asmlinkage when used in the kernel?
+> Is it some historical wart that's no longer truly necessary and only causes pain?
 >
-> Co-developed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> When I wrote this code, I thought that the intent was that it should be applied to
+> any and all asm => C function calls.  But that's obviously not required as there
+> are multiple instances of asm code calling C functions without annotations of any
+> kind.
 
-Reviewed-by: Yuan Yao <yuan.yao@intel.com>
+It is the other way around. As written in coding-style.rst:
 
-> ---
->  arch/x86/include/asm/kvm_host.h |  4 ++++
->  arch/x86/kvm/mmu.h              | 32 ++++++++++++++++++++++++++++++++
->  arch/x86/kvm/vmx/tdx.c          |  5 +++++
->  3 files changed, 41 insertions(+)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index e856abbe80ab..6787d5214fd8 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1358,6 +1358,10 @@ struct kvm_arch {
->  	 */
->  #define SPLIT_DESC_CACHE_MIN_NR_OBJECTS (SPTE_ENT_PER_PAGE + 1)
->  	struct kvm_mmu_memory_cache split_desc_cache;
-> +
-> +#ifdef CONFIG_KVM_MMU_PRIVATE
-> +	gfn_t gfn_shared_mask;
-> +#endif
->  };
->
->  struct kvm_vm_stat {
-> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index a99acec925eb..df9f79ee07d4 100644
-> --- a/arch/x86/kvm/mmu.h
-> +++ b/arch/x86/kvm/mmu.h
-> @@ -276,4 +276,36 @@ static inline gpa_t kvm_translate_gpa(struct kvm_vcpu *vcpu,
->  		return gpa;
->  	return translate_nested_gpa(vcpu, gpa, access, exception);
->  }
-> +
-> +static inline gfn_t kvm_gfn_shared_mask(const struct kvm *kvm)
-> +{
-> +#ifdef CONFIG_KVM_MMU_PRIVATE
-> +	return kvm->arch.gfn_shared_mask;
-> +#else
-> +	return 0;
-> +#endif
-> +}
-> +
-> +static inline gfn_t kvm_gfn_shared(const struct kvm *kvm, gfn_t gfn)
-> +{
-> +	return gfn | kvm_gfn_shared_mask(kvm);
-> +}
-> +
-> +static inline gfn_t kvm_gfn_private(const struct kvm *kvm, gfn_t gfn)
-> +{
-> +	return gfn & ~kvm_gfn_shared_mask(kvm);
-> +}
-> +
-> +static inline gpa_t kvm_gpa_private(const struct kvm *kvm, gpa_t gpa)
-> +{
-> +	return gpa & ~gfn_to_gpa(kvm_gfn_shared_mask(kvm));
-> +}
-> +
-> +static inline bool kvm_is_private_gpa(const struct kvm *kvm, gpa_t gpa)
-> +{
-> +	gfn_t mask = kvm_gfn_shared_mask(kvm);
-> +
-> +	return mask && !(gpa_to_gfn(gpa) & mask);
-> +}
-> +
->  #endif
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 37272fe1e69f..36d2127cb7b7 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -753,6 +753,11 @@ static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
->  	kvm_tdx->xfam = td_params->xfam;
->  	kvm->max_vcpus = td_params->max_vcpus;
->
-> +	if (td_params->exec_controls & TDX_EXEC_CONTROL_MAX_GPAW)
-> +		kvm->arch.gfn_shared_mask = gpa_to_gfn(BIT_ULL(51));
-> +	else
-> +		kvm->arch.gfn_shared_mask = gpa_to_gfn(BIT_ULL(47));
-> +
->  out:
->  	/* kfree() accepts NULL. */
->  	kfree(init_vm);
-> --
-> 2.25.1
->
+Large, non-trivial assembly functions should go in .S files, with corresponding
+C prototypes defined in C header files.  The C prototypes for assembly
+functions should use ``asmlinkage``.
+
+So, prototypes for *assembly functions* should use asmlinkage.
+
+That said, asmlinkage for i386 just switches ABI to the default
+stack-passing ABI. However, we are calling assembly files, so the
+argument handling in the callee is totally under our control and there
+is no need to switch ABIs. It looks to me that besides syscalls,
+asmlinkage is and should be used only for a large imported body of asm
+functions that use standard stack-passing ABI (e.g. x86 crypto and
+math-emu functions), otherwise it is just a burden to push and pop
+registers to/from stack for no apparent benefit.
+
+> And vmread_error() isn't the only case where asmlinkage appears to be a burden, e.g.
+> schedule_tail_wrapper() => schedule_tail() seems to exist purely to deal with the
+> side affect of asmlinkage generating -regparm=0 on 32-bit kernels.
+
+schedule_tail is external to the x86 arch directory, and for some
+reason marked asmlinkage. So, the call from asm must follow asmlinkage
+ABI.
+
+FYI, there is some discussion about asmlinkage on stackoverflow:
+
+https://stackoverflow.com/questions/61635931/does-asmlinkage-mean-stack-or-registers
+
+Uros.
