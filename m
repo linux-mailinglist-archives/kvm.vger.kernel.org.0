@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 448DB5A8ADC
-	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 03:37:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 209C35A8AE4
+	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 03:37:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232604AbiIABhI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Aug 2022 21:37:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34204 "EHLO
+        id S232674AbiIABhL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Aug 2022 21:37:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232628AbiIABhF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Aug 2022 21:37:05 -0400
+        with ESMTP id S229631AbiIABhG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Aug 2022 21:37:06 -0400
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FF6315C7B3;
-        Wed, 31 Aug 2022 18:37:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8663E15C7BB;
+        Wed, 31 Aug 2022 18:37:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661996221; x=1693532221;
+  t=1661996222; x=1693532222;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=hxbf2utA2IeEcFqzKPwgIPrC8NPr8bW4YWh+Jt8swY4=;
-  b=CYfZkTv3Htdli8igYB8fqci6OnSE9e9kJgF4IH5xTaDGzBYF8NY/fdKG
-   dlhiYwLJeAjkc5G+f2LyjxI0QEvhf11GDn5zYcXUkcZE0bENbZZAjue+8
-   hp+W/1s6CVeYNCCiiqMGk45sbEgecP+sF/NKHPBmppJKqZfbSPfFtptnH
-   ipRpPuP6uCMW7txrKr+XXNWJ2N063SLiUeHCWZ3mH5xM6axoTslp0Zo4W
-   irq+d3z5JVk/00v1/yat+GUPPGug12NW//ZOwNeyqW6NOLXRldWWgWzVD
-   nB1j8Xp3DFdZKaLDFn76o3CFIuebv1xgr/aAVCkYYNqw975xBrwQPclks
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10456"; a="321735072"
+  bh=HjgMwKTZykfdA+1htNESqHrms1sqLb8OUHjI998bUVA=;
+  b=kPw0sCs4TttJGBfnSjIC+oRwvEahE1Gz65tWfnZlgLNsuzW+iQb9vjGw
+   zhWdQm2GgIYlF6JBK2DX88RDeiQuQsA3lVPmjHZTXG/6VQUGBAKrfveFh
+   HXSGATRXN/gTmlRDYXxMwEb/J1VMqYwfwRn9pKEn5CPxcT+jLuOpFM+B0
+   NSOp/l2dUNhjwpBEDytWd8lscnczXFt93sQYCGG6NUVRR5cws0fX0PREM
+   eUGTW5vBdOWzlfIfcR4GigEgGqOr+N41TcJ/Wm4ZYjiOvS4z0nj7GcQgC
+   62bUNh5W5l3UoYdi0lmCFdMs+oAB7b07OHp5Q44+0eQe9nKvk7PCxwrWl
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10456"; a="321735075"
 X-IronPort-AV: E=Sophos;i="5.93,279,1654585200"; 
-   d="scan'208";a="321735072"
+   d="scan'208";a="321735075"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2022 18:36:59 -0700
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2022 18:37:00 -0700
 X-IronPort-AV: E=Sophos;i="5.93,279,1654585200"; 
-   d="scan'208";a="754625963"
+   d="scan'208";a="754625970"
 Received: from embargo.jf.intel.com ([10.165.9.183])
   by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2022 18:36:59 -0700
 From:   Yang Weijiang <weijiang.yang@intel.com>
 To:     pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org
 Cc:     like.xu.linux@gmail.com, kan.liang@linux.intel.com,
         wei.w.wang@intel.com, linux-kernel@vger.kernel.org
-Subject: [PATCH 01/15] perf/x86/lbr: Simplify the exposure check for the LBR_INFO registers
-Date:   Wed, 31 Aug 2022 18:34:24 -0400
-Message-Id: <20220831223438.413090-2-weijiang.yang@intel.com>
+Subject: [PATCH 02/15] KVM: x86: Report XSS as an MSR to be saved if there are supported features
+Date:   Wed, 31 Aug 2022 18:34:25 -0400
+Message-Id: <20220831223438.413090-3-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20220831223438.413090-1-weijiang.yang@intel.com>
 References: <20220831223438.413090-1-weijiang.yang@intel.com>
@@ -59,40 +59,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <like.xu@linux.intel.com>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-The x86_pmu.lbr_info is 0 unless explicitly initialized, so there's
-no point checking x86_pmu.intel_cap.lbr_format.
+Add MSR_IA32_XSS to the list of MSRs reported to userspace if
+supported_xss is non-zero, i.e. KVM supports at least one XSS based
+feature.
 
-Cc: Peter Zijlstra <peterz@infradead.org>
-Reviewed-by: Kan Liang <kan.liang@linux.intel.com>
-Reviewed-by: Andi Kleen <ak@linux.intel.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-Message-Id: <20220517154100.29983-3-weijiang.yang@intel.com>
+Message-Id: <20220517154100.29983-4-weijiang.yang@intel.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/events/intel/lbr.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ arch/x86/kvm/x86.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/x86/events/intel/lbr.c b/arch/x86/events/intel/lbr.c
-index 4f70fb6c2c1e..4ed6d3691e10 100644
---- a/arch/x86/events/intel/lbr.c
-+++ b/arch/x86/events/intel/lbr.c
-@@ -1873,12 +1873,10 @@ void __init intel_pmu_arch_lbr_init(void)
-  */
- int x86_perf_get_lbr(struct x86_pmu_lbr *lbr)
- {
--	int lbr_fmt = x86_pmu.intel_cap.lbr_format;
--
- 	lbr->nr = x86_pmu.lbr_nr;
- 	lbr->from = x86_pmu.lbr_from;
- 	lbr->to = x86_pmu.lbr_to;
--	lbr->info = (lbr_fmt == LBR_FORMAT_INFO) ? x86_pmu.lbr_info : 0;
-+	lbr->info = x86_pmu.lbr_info;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index d7374d768296..17663cade3fa 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1451,6 +1451,7 @@ static const u32 msrs_to_save_all[] = {
+ 	MSR_F15H_PERF_CTR0, MSR_F15H_PERF_CTR1, MSR_F15H_PERF_CTR2,
+ 	MSR_F15H_PERF_CTR3, MSR_F15H_PERF_CTR4, MSR_F15H_PERF_CTR5,
+ 	MSR_IA32_XFD, MSR_IA32_XFD_ERR,
++	MSR_IA32_XSS,
+ };
  
- 	return 0;
- }
+ static u32 msrs_to_save[ARRAY_SIZE(msrs_to_save_all)];
+@@ -6941,6 +6942,10 @@ static void kvm_init_msr_list(void)
+ 			if (!kvm_cpu_cap_has(X86_FEATURE_XFD))
+ 				continue;
+ 			break;
++		case MSR_IA32_XSS:
++			if (!kvm_caps.supported_xss)
++				continue;
++			break;
+ 		default:
+ 			break;
+ 		}
 -- 
 2.27.0
 
