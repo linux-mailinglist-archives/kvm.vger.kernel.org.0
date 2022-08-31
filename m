@@ -2,146 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B00815A7C06
-	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 13:13:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BBBC55A7C23
+	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 13:26:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230478AbiHaLNN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Aug 2022 07:13:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52478 "EHLO
+        id S229742AbiHaL0X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Aug 2022 07:26:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230468AbiHaLNL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Aug 2022 07:13:11 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA363D0228;
-        Wed, 31 Aug 2022 04:13:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661944389; x=1693480389;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ZXYlj1IqxZaV4DXbBX1YoGEIIdFLaXU6ViVzynme9rE=;
-  b=EqsvE2y2OIrhxVfvacZwcJMO8qX4+Nj9bpy5TuqSYh8465koGxwd2jkH
-   gbFZ1vRJnUQLcxbpa0e+EIjQLh9rcK0ssHJERzGQfncXgG7yILrzOddEo
-   NplAgX186sw2v/jE5e++bbITaOrsagWYJynpPOl9gh8m8EEFgcNnGPQiH
-   1oJoLDjH8nyUuSPD7RxV11TUlcNjymttLha90l0etVeECfDTM9Y37aEWB
-   3zT9X+S5EHG1FsI5LZUXlT66qE/lArmik0KCQTPEx7CAg5QjqJjZcWnKU
-   DbVtlN11AgHREIKqLdbhqMZXyb07I8rP1xTHBhDGQEWicwvrRY+2e1BH6
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10455"; a="359383043"
-X-IronPort-AV: E=Sophos;i="5.93,277,1654585200"; 
-   d="scan'208";a="359383043"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2022 04:13:09 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,277,1654585200"; 
-   d="scan'208";a="701332161"
-Received: from lkp-server02.sh.intel.com (HELO 811e2ceaf0e5) ([10.239.97.151])
-  by FMSMGA003.fm.intel.com with ESMTP; 31 Aug 2022 04:13:06 -0700
-Received: from kbuild by 811e2ceaf0e5 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oTLeb-0000Di-1k;
-        Wed, 31 Aug 2022 11:13:05 +0000
-Date:   Wed, 31 Aug 2022 19:12:34 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kbuild-all@lists.01.org, Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Like Xu <like.xu.linux@gmail.com>
-Subject: Re: [PATCH v3 3/3] KVM: VMX: Advertise PMU LBRs if and only if perf
- supports LBRs
-Message-ID: <202208311831.zQ4oCG1b-lkp@intel.com>
-References: <20220831000051.4015031-4-seanjc@google.com>
+        with ESMTP id S230393AbiHaL0R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Aug 2022 07:26:17 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1793A6050F
+        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 04:25:39 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 27VAuKFc013491
+        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 11:25:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : to :
+ cc : from : subject : message-id : date; s=pp1;
+ bh=NI0G5j4Aqt2r/2/HHOOVZyzx9tGIoJc9OebtxACBHnw=;
+ b=CEbGBkyIMwDETVrPvI7Dnb9sJ2yoQK9KwDftbrD734OwGEVptyTX8+iBW1Ww+No/WSJv
+ 7kLTqTh0hMuEkLdRHJiyGmzcRH2eDBa6tPq0Ht7yJ/tg9/N9caEobFWBu46TcDzsuDPb
+ fiQtCBM8zAzGlTNapggB0tK+fY+tJNtSTKrlN98NDVv6un5tBoQArgOlCCIgD9G2ipXM
+ wJr6HuApkj40g8wPz4fSq/PUzv34yFMS/iz60iQe4iLkdA2uq7YAsO5mYyopUKbqxSPv
+ rNFiolghc7OmY7GtiABQ4BA+fChJysxBCYtHfAjIjfxbAnri61ZDW3ViSuNlPDdTadnm Zg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ja6b48ymp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 11:25:38 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 27VB66B7027680
+        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 11:25:37 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ja6b48ym1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 31 Aug 2022 11:25:37 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 27VBMYTR014526;
+        Wed, 31 Aug 2022 11:25:36 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03ams.nl.ibm.com with ESMTP id 3j7aw95581-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 31 Aug 2022 11:25:35 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 27VBPWMU32309650
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 31 Aug 2022 11:25:32 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BFB3CA405B;
+        Wed, 31 Aug 2022 11:25:32 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A88E3A4054;
+        Wed, 31 Aug 2022 11:25:32 +0000 (GMT)
+Received: from t14-nrb (unknown [9.155.203.253])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 31 Aug 2022 11:25:32 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220831000051.4015031-4-seanjc@google.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <47fe3036-3566-0118-ac0c-86f4a0d1c838@redhat.com>
+References: <20220830115623.515981-1-nrb@linux.ibm.com> <20220830115623.515981-3-nrb@linux.ibm.com> <47fe3036-3566-0118-ac0c-86f4a0d1c838@redhat.com>
+To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com
+From:   Nico Boehr <nrb@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v1 2/2] s390x: add exittime tests
+Message-ID: <166194513247.21737.14734474351149617278@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Wed, 31 Aug 2022 13:25:32 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: SmzdatUSulKYj34sLREIHRJYhZHqSoD9
+X-Proofpoint-GUID: 6Jf2FZUGOCD2XDq17Iyc8o0bVcGtgKDo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-08-31_06,2022-08-31_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=786
+ impostorscore=0 lowpriorityscore=0 malwarescore=0 clxscore=1015
+ suspectscore=0 phishscore=0 priorityscore=1501 spamscore=0 adultscore=0
+ bulkscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2208310055
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean,
+Quoting Thomas Huth (2022-08-30 14:52:14)
+> I wonder whether we should execute this test by default, since nothing ca=
+n=20
+> fail here? I assume this is rather something that you want to run manuall=
+y?
 
-I love your patch! Yet something to improve:
+This could be one idea.
 
-[auto build test ERROR on 372d07084593dc7a399bf9bee815711b1fb1bcf2]
+My idea was to run it even if it can't fail since the execution times are p=
+rinted in log files. Collecting them may be interesting to establish a base=
+line for later measurements. It also is what x86 does with their vmexit tes=
+ts. In addition, running them doesn't hurt and makes sure the tests don't s=
+uddenly break.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sean-Christopherson/KVM-x86-Intel-LBR-related-perf-cleanups/20220831-080309
-base:   372d07084593dc7a399bf9bee815711b1fb1bcf2
-config: i386-randconfig-s001 (https://download.01.org/0day-ci/archive/20220831/202208311831.zQ4oCG1b-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-5) 11.3.0
-reproduce:
-        # apt-get install sparse
-        # sparse version: v0.6.4-39-gce1a6720-dirty
-        # https://github.com/intel-lab-lkp/linux/commit/094f42374997562fff3f9f9637ec9aa8257490a0
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Sean-Christopherson/KVM-x86-Intel-LBR-related-perf-cleanups/20220831-080309
-        git checkout 094f42374997562fff3f9f9637ec9aa8257490a0
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=i386 prepare
-
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>):
-
-   In file included from arch/x86/kernel/../kvm/vmx/vmx.h:11,
-                    from arch/x86/kernel/asm-offsets.c:22:
-   arch/x86/kernel/../kvm/vmx/capabilities.h: In function 'vmx_get_perf_capabilities':
->> arch/x86/kernel/../kvm/vmx/capabilities.h:416:9: error: implicit declaration of function 'x86_perf_get_lbr' [-Werror=implicit-function-declaration]
-     416 |         x86_perf_get_lbr(&lbr);
-         |         ^~~~~~~~~~~~~~~~
-   cc1: some warnings being treated as errors
-   make[2]: *** [scripts/Makefile.build:117: arch/x86/kernel/asm-offsets.s] Error 1
-   make[2]: Target '__build' not remade because of errors.
-   make[1]: *** [Makefile:1207: prepare0] Error 2
-   make[1]: Target 'prepare' not remade because of errors.
-   make: *** [Makefile:222: __sub-make] Error 2
-   make: Target 'prepare' not remade because of errors.
-
-
-vim +/x86_perf_get_lbr +416 arch/x86/kernel/../kvm/vmx/capabilities.h
-
-   403	
-   404	static inline u64 vmx_get_perf_capabilities(void)
-   405	{
-   406		u64 perf_cap = PMU_CAP_FW_WRITES;
-   407		struct x86_pmu_lbr lbr;
-   408		u64 host_perf_cap = 0;
-   409	
-   410		if (!enable_pmu)
-   411			return 0;
-   412	
-   413		if (boot_cpu_has(X86_FEATURE_PDCM))
-   414			rdmsrl(MSR_IA32_PERF_CAPABILITIES, host_perf_cap);
-   415	
- > 416		x86_perf_get_lbr(&lbr);
-   417		if (lbr.nr)
-   418			perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
-   419	
-   420		if (vmx_pebs_supported()) {
-   421			perf_cap |= host_perf_cap & PERF_CAP_PEBS_MASK;
-   422			if ((perf_cap & PERF_CAP_PEBS_FORMAT) < 4)
-   423				perf_cap &= ~PERF_CAP_PEBS_BASELINE;
-   424		}
-   425	
-   426		return perf_cap;
-   427	}
-   428	
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+I will address your other comments in an upcoming iteration, thank you.
