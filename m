@@ -2,117 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 790975A83B7
-	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 18:57:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 621A95A840E
+	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 19:16:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232392AbiHaQ5V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Aug 2022 12:57:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32824 "EHLO
+        id S231898AbiHaRQS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Aug 2022 13:16:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232093AbiHaQ4y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Aug 2022 12:56:54 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61C2EDD4F4
-        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 09:56:52 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id 78so503503pgb.13
-        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 09:56:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=HdAipv40/QqUuhoEN6Hq6J9CX7+XanSXNZDP7WXuA2w=;
-        b=E+dpjJqqZDnYhWyJB7NPrHbcJXnwY/FVAxgTif0XLDolthQbNU2kb5duOzTXFJRyNt
-         2hw1fG/0dF2n9h3l7igOMBUOwD2I41lLkJ5A3S4SqigYhZ2F8AUr6PC7+mm5zna0OiKM
-         7uSVQlx3qx8FVlP7XSuym/DhcVMW27h6f3oRVcIyKbXjcccx6adclZmABrC7J+dh5qYF
-         9svm06eXHLHJKMUb1s1RGoYVAzDRYFtPIwVWRXoIMKYBYtBbgkwoUtrsKu4p7H+856ti
-         3Xtm+2zdCedDRsDBZpFhZLp5JndSPq3kmB7RN63yD4rkTyjuj/KhtREr8vQwwZl4Cd0S
-         SiyA==
+        with ESMTP id S231301AbiHaRQP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Aug 2022 13:16:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E60272B181
+        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 10:15:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661966117;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3wNDRJb+y9GkEb33I7HiMe0aeP3rl6XFj5xgf5bJFgc=;
+        b=b7wsog1x/991oo6422DmCbdsN+DI1gYzVgH6IFVSYVZmv/yuUeUTX2k07JC71yPJHWS5d5
+        t4qswtBS0aGeDxu9aF8uxltfixIWCfFlEz7PBM3tRHONB2Nr8NeOho4+DlmApr1wgvqwUg
+        AF+Yih/bV5zQZu6kPkAeSSs0m/AI7Mc=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-29-6dgw9EKfPvO9hpshys8iWw-1; Wed, 31 Aug 2022 13:15:15 -0400
+X-MC-Unique: 6dgw9EKfPvO9hpshys8iWw-1
+Received: by mail-il1-f200.google.com with SMTP id h8-20020a92c268000000b002e95299cff0so11040005ild.23
+        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 10:15:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=HdAipv40/QqUuhoEN6Hq6J9CX7+XanSXNZDP7WXuA2w=;
-        b=G0wyQe62jdt2TdL6z4jsUjUs6WHXo8Hc/3epsy2NvJ3oNJjmP+7gBaWdlE1s8VPfED
-         wGqAZ4oi5jaOjgQwe8sr6qqBJKcC02PDjTQcutzCYvoiJkkKSM6GigMoy8T3ERkBcaSe
-         KtXvCRCtxOt+efX6A1tNvcMAMKwzW22LfxhQCl2jYxHv/yojeC5gjtkBpm/v/vlJIiaE
-         UHqQQwH3lAiNWA6yFKomHbCGaTDVKwW7W/ltX1PgTm3VH6KQVLN5wmHaNmV75gocMSC/
-         ELxpsA7raITHBDODBzMpQxghpGO6myFudWm1nHWPgwWZYUBADl6XQ/fuQ0/Wh2GH8GP+
-         u8Qw==
-X-Gm-Message-State: ACgBeo00jm1j3AM0tEsy98thl4lfrafbNPFIWSK4oAJoEggu00uRgCHe
-        BPV+fndDO3pg3zlHBrlfjPHLjA==
-X-Google-Smtp-Source: AA6agR6cQdWCJj8nIL8lC0/B1orERU83CcRBe8mpU1Xnak54m5SKBPoax0iLrY8he6N8y6biTQJi5g==
-X-Received: by 2002:a63:fb56:0:b0:429:983f:b91e with SMTP id w22-20020a63fb56000000b00429983fb91emr22939560pgj.399.1661965011770;
-        Wed, 31 Aug 2022 09:56:51 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id p15-20020a170902780f00b0017555cef23asm199694pll.232.2022.08.31.09.56.51
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc;
+        bh=3wNDRJb+y9GkEb33I7HiMe0aeP3rl6XFj5xgf5bJFgc=;
+        b=YyhhhBCu7Skfm/+a+5Sgreb8kpTat1kOPG0QG3TTu4/wrsaUdJUGslPdPhsMo1f5SN
+         22isXU4XGQamAhMcD/tmBF+VyXt7VAtwMLe/VaBa/fN1P9cMIObjZLAsKcxGb9gClSqj
+         4m8KvZZgiQZDI0nI/vgwxVBNiSA4rZdjDVnXQYZ2tb3YA0qU7j/tTipJGW0EpVx54nuq
+         U4pDHksJp4NEAz32A+rrbBkV2CrrkiEu2PgYwb8vEu02GsdihPS3Vy8X4U/BRNbR3Ih3
+         7eaY7bAAy1iuVYBNoa9wRV+70A3PjbBTTgO5SSmRfx0LJ7cI3QkqnP9X+/lpu6SeBS1J
+         RBJQ==
+X-Gm-Message-State: ACgBeo0cR0fB4f1yKKp0XUoi4SFbeQQSD51860BmrHlHh6f8H8tvvs6R
+        zUxof5cdJCLzD55X8xrLmojP58AUIjZJRsPtwRWAnSlnYQU5nO4oY7Ad237bnXcXnJSK7GgtJws
+        CkI95zLUmTEmh
+X-Received: by 2002:a05:6638:dd4:b0:349:ebfd:e705 with SMTP id m20-20020a0566380dd400b00349ebfde705mr15532675jaj.4.1661966114827;
+        Wed, 31 Aug 2022 10:15:14 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7UqftyvxL/mEDNedrHFErMBY8p1pSeatls/DmKqtUta1ABwUYFXwUlUJQ1689Lfg3tEQsWAQ==
+X-Received: by 2002:a05:6638:dd4:b0:349:ebfd:e705 with SMTP id m20-20020a0566380dd400b00349ebfde705mr15532650jaj.4.1661966114600;
+        Wed, 31 Aug 2022 10:15:14 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id u190-20020a0223c7000000b00343617e8368sm7084182jau.99.2022.08.31.10.15.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Aug 2022 09:56:51 -0700 (PDT)
-Date:   Wed, 31 Aug 2022 16:56:47 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Li RongQing <lirongqing@baidu.com>
-Subject: Re: [PATCH 16/19] KVM: x86: Explicitly track all possibilities for
- APIC map's logical modes
-Message-ID: <Yw+Sz+5rB+QNP2Z9@google.com>
-References: <20220831003506.4117148-1-seanjc@google.com>
- <20220831003506.4117148-17-seanjc@google.com>
- <8d3569a8b2d1563eb3ff665118ffc5c8d7e1e2f2.camel@redhat.com>
+        Wed, 31 Aug 2022 10:15:14 -0700 (PDT)
+Date:   Wed, 31 Aug 2022 11:15:12 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        "Joonas Lahtinen" <joonas.lahtinen@linux.intel.com>,
+        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Eric Farman <farman@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        "Peter Oberparleiter" <oberpar@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        "Cornelia Huck" <cohuck@redhat.com>,
+        Longfang Liu <liulongfang@huawei.com>,
+        "Shameer Kolothum" <shameerali.kolothum.thodi@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Liu, Yi L" <yi.l.liu@intel.com>
+Subject: Re: [PATCH 15/15] vfio: Add struct device to vfio_device
+Message-ID: <20220831111512.4924e152.alex.williamson@redhat.com>
+In-Reply-To: <BN9PR11MB5276BF3B8D65B66DB292CAE58C789@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20220827171037.30297-1-kevin.tian@intel.com>
+        <20220827171037.30297-16-kevin.tian@intel.com>
+        <20220830161838.4aa47045.alex.williamson@redhat.com>
+        <Yw6i7btDKcUDPADP@ziepe.ca>
+        <BN9PR11MB5276BF3B8D65B66DB292CAE58C789@BN9PR11MB5276.namprd11.prod.outlook.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8d3569a8b2d1563eb3ff665118ffc5c8d7e1e2f2.camel@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 31, 2022, Maxim Levitsky wrote:
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 8209caffe3ab..3b6ef36b3963 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -168,7 +168,12 @@ static bool kvm_use_posted_timer_interrupt(struct kvm_vcpu *vcpu)
-> >  
-> >  static inline bool kvm_apic_map_get_logical_dest(struct kvm_apic_map *map,
-> >  		u32 dest_id, struct kvm_lapic ***cluster, u16 *mask) {
-> > -	switch (map->mode) {
-> > +	switch (map->logical_mode) {
-> > +	case KVM_APIC_MODE_SW_DISABLED:
-> > +		/* Arbitrarily use the flat map so that @cluster isn't NULL. */
-> > +		*cluster = map->xapic_flat_map;
-> > +		*mask = 0;
-> > +		return true;
-> Could you explain why this is needed? I probably missed something.
+On Wed, 31 Aug 2022 06:10:51 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-If all vCPUs leave their APIC software disabled, or leave LDR=0, then the overall
-mode will be KVM_APIC_MODE_SW_DISABLED.  In this case, the effective "mask" is '0'
-because there are no targets.  And this returns %true because there are no targets,
-i.e. there's no need to go down the slow path after kvm_apic_map_get_dest_lapic().
-
-> > @@ -993,7 +1011,7 @@ static bool kvm_apic_is_broadcast_dest(struct kvm *kvm, struct kvm_lapic **src,
-> >  {
-> >  	if (kvm->arch.x2apic_broadcast_quirk_disabled) {
-> >  		if ((irq->dest_id == APIC_BROADCAST &&
-> > -				map->mode != KVM_APIC_MODE_X2APIC))
-> > +		     map->logical_mode != KVM_APIC_MODE_X2APIC))
-> >  			return true;
-> >  		if (irq->dest_id == X2APIC_BROADCAST)
-> >  			return true;
+> > From: Jason Gunthorpe <jgg@ziepe.ca>
+> > Sent: Wednesday, August 31, 2022 7:53 AM
+> > 
+> > On Tue, Aug 30, 2022 at 04:18:38PM -0600, Alex Williamson wrote:  
+> > > On Sun, 28 Aug 2022 01:10:37 +0800
+> > > Kevin Tian <kevin.tian@intel.com> wrote:
+> > >  
+> > > > From: Yi Liu <yi.l.liu@intel.com>
+> > > >
+> > > > and replace kref. With it a 'vfio-dev/vfioX' node is created under the
+> > > > sysfs path of the parent, indicating the device is bound to a vfio
+> > > > driver, e.g.:
+> > > >
+> > > > /sys/devices/pci0000\:6f/0000\:6f\:01.0/vfio-dev/vfio0
+> > > >
+> > > > It is also a preparatory step toward adding cdev for supporting future
+> > > > device-oriented uAPI.  
+> > >
+> > > Shall we start Documentation/ABI/testing/vfio-dev now?  Thanks.  
+> > 
+> > I always thought that was something to use when adding new custom
+> > sysfs attributes?
+> > 
+> > Here we are just creating a standard struct device with its standard
+> > sysfs?
+> >   
 > 
-> To be honest I would put that patch first, and then do all the other patches,
-> this way you would avoid all of the hacks they do and removed here.
+> There is nothing special for vfio-dev/vfioX. But from pci device p.o.v
+> this does introduce a custom node in the directory, which is probably
+> what Alex referred to?
 
-I did it this way so that I could test this patch for correctness.  Without the
-bug fixes in place it's not really possible to verify this patch is 100% correct.
+Yup, but not just for pci, we're adding a node into the device
+directory for any device bound to vfio.
 
-I completely agree that it would be a lot easier to read/understand/review if
-this came first, but I'd rather not sacrifice the ability to easily test this patch.
+> Anyway if required following can be introduced:
+> 
+> diff --git a/Documentation/ABI/testing/sysfs-devices-vfio-dev b/Documentation/ABI/testing/sysfs-devices-vfio-dev
+> new file mode 100644
+> index 000000000000..dfe8baaf1ccb
+> --- /dev/null
+> +++ b/Documentation/ABI/testing/sysfs-devices-vfio-dev
+> @@ -0,0 +1,8 @@
+> +What:		 /sys/.../<device>/vfio-dev/vfioX/
+> +Date:		 September 2022
+> +Contact:	 Yi Liu <yi.l.liu@intel.com>
+> +Description:
+> +		 This directory is created when the device is bound to a
+> +		 vfio driver. The layout under this directory matches what
+> +		 exists for a standard 'struct device'. 'X' is a random
+> +		 number marking this device in vfio.
+
+It's not really random, it's a unique index.  Seems like a good
+starting point.
+
+> 
+> At the start I thought it might make more sense to add it into an
+> existing vfio ABI file. But looks it doesn't exist.
+> 
+> Curious why nobody asked for ABI doc for /dev/vfio/vfio, /sys/class/vfio, etc...
+
+Oversight, there should probably be a sysfs-class-vfio file.  Thanks,
+
+Alex
+
