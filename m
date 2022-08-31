@@ -2,180 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 71A2E5A7666
-	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 08:15:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 75ACF5A7676
+	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 08:19:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230133AbiHaGPT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 31 Aug 2022 02:15:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54334 "EHLO
+        id S230060AbiHaGTz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 31 Aug 2022 02:19:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230151AbiHaGPL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 31 Aug 2022 02:15:11 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C384860F5;
-        Tue, 30 Aug 2022 23:15:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1661926503; x=1693462503;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=/a8NfaXgmgPaEzJAB0o2mVog14TDaPPcLAKcCJVgmOI=;
-  b=Y+rgydBVyf3E2opt/7bJdzYnI7bB1dBmfYbqA4U2/h+PKFHwShr4XwfP
-   gNueqMiShuhxo5nvvTVFeLtybAxNMy4Zj/HTSIhBulEoD48pvsi0vY8V3
-   rwlNY1h9jBqP5hAsCNiYL8YMTy0Gl31nGiKA2HtjmdxyJcIr8iQ1RoBw0
-   /geLoHvwOumzPVPMPpN/IyusgQXgIsz9Dd5/x0JcDfkr1gQVFtJoR7x9e
-   OX1zCkTwqE1GdOkVERCXnxOknXDPYV05zWH2sDUBtQTfY5VR98n32WKf1
-   XXBtK9ysd9PSFZIpgBTBCQSPMQpEEa4i05g4awj7GIBLvCT3Q4Bp17FQs
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10455"; a="275129598"
-X-IronPort-AV: E=Sophos;i="5.93,277,1654585200"; 
-   d="scan'208";a="275129598"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2022 23:15:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,277,1654585200"; 
-   d="scan'208";a="562931733"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga003.jf.intel.com with ESMTP; 30 Aug 2022 23:15:00 -0700
-Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 30 Aug 2022 23:14:59 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31 via Frontend Transport; Tue, 30 Aug 2022 23:14:59 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.106)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.31; Tue, 30 Aug 2022 23:14:59 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RIzHjeszVj/sBzI8ZB9eWKU9I6CZOQtqtWezzs1BKyO0csXQl5C4Rsk//7XsmQVJX8UUGj2QkFOXg8U/J25gAcBdI85tIA1W1/pLq8NWTWQLD3OeiQPxAHKStPQ2C0TS0MFgEVmj0KnTRR9OSCvHn5aLtSGkanS2MvSmrr36JogMWcSxEiS0gaMlDLnI68DrWduQP6+aV/WpVXdyAZV8gmHyKhMGo0XOTlSp3up6SyKl0/olmjbZpco52guJYX69q5Th/2Hk9HLmvCgY7YK6TDTga/z5n8Iid9sOGlseRZuEKZIIY89V6Q2KWXx/SM10w9YaH7UMgPMYAR4Pd0jEjw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SJ26j8Rv0tJv8NYmy9yTq1k3uvxIMMJyomu/D68P3vE=;
- b=YnE3on5I2DRACET/2CFtUF2N2IoicMf1AvzcIXD3kg6OpnR7i2GAaMaD3HhgciQgDdRF5mnkD9WhO2zEmtKZpaJinHXbMVBOE+X+gn0PjtJVMN4ArVw7jFE5mK10f9LlSRA1GELyagizE1X4V4hKGVVuybxqZgotD79CvYH7dcZT/vzlhsaXUpjBvW8ofmb19kDBZ04KxI82kEkX0yCYqV3H9LaOq1UIHymkDpAfZ40KfhDuM7OzTKG1o2WqyWeD1Xma0Y9kj73olx2JcohEAXX4TtSc8NiYEkrFq9Y5uzszf9ebGBgUCXXyMgT7Y39McCyPrj9xRAF9YeyimREK9A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by DM5PR1101MB2233.namprd11.prod.outlook.com (2603:10b6:4:4f::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.19; Wed, 31 Aug
- 2022 06:14:57 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::a435:3eff:aa83:73d7]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::a435:3eff:aa83:73d7%5]) with mapi id 15.20.5588.010; Wed, 31 Aug 2022
- 06:14:57 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     Zhenyu Wang <zhenyuw@linux.intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        "Joonas Lahtinen" <joonas.lahtinen@linux.intel.com>,
-        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        "Peter Oberparleiter" <oberpar@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        "Alex Williamson" <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Longfang Liu <liulongfang@huawei.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Abhishek Sahu <abhsahu@nvidia.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: RE: [PATCH 00/15] Tidy up vfio_device life cycle
-Thread-Topic: [PATCH 00/15] Tidy up vfio_device life cycle
-Thread-Index: AQHYufpaEERp1jw5Hk6i2eOqrykz5a3ILwAAgABe8kA=
-Date:   Wed, 31 Aug 2022 06:14:57 +0000
-Message-ID: <BN9PR11MB5276E554A15E589D364D37268C789@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20220827171037.30297-1-kevin.tian@intel.com>
- <Yw6sqidAP7puXApd@ziepe.ca>
-In-Reply-To: <Yw6sqidAP7puXApd@ziepe.ca>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 5f804c1e-fb9c-4613-c6f7-08da8b18211c
-x-ms-traffictypediagnostic: DM5PR1101MB2233:EE_
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 1IokXJhRSEig/VVcLQhsAFT0oWos4it92/8JLjdkx+B27COI2HSqE7CIhaTnRhG0ZNCB3dqtbcISLRsHC7Uw5bpyJP6BsGOPEvbNxy0DUcYcFdr9Lqc+fLMhZ/jHvjow1kwkjEZkPe91yUjlhUoLeJwFZURhToBf+D7xTQ3epNPPON91DZayPjFkv10cOTSDHVjfTvEm1CMxdE52S5nR0FU81jKKrv0so/2MITLxty1vqH+XlNuFdKVwTbvxAfgxUeCJkbcgfa+tcDQrL5COncPI/Uy1BaN2vdU8ncYgT0nf7tWoVfYVrJ2XmMbefty5VXPvIuSqg5ug7eN4PXVRPUMA+G8Cd5D8Y7508U8AWI5KD4v5iiePZdqJJqPoMhq1DqOKS5dMqc4iKWKy1nMQyT0UGmjPBbjCC2+RfFOnuRCSfbOg/DWgAtIlrTZDj86RRE14xM3w6mIk9UiuLUXZWguONyVkRUa5FZTHtW+Il0jKMH8MDgf6ogMthMo58AfBqkjJPlZiSb6kuTfrDHsAKdnh+AtI9WovSo5eBZLpzq3X2FcZ1wHIDRAhRjaJNh873JXOQ6u9DH2cRaylYL/dQalVV0fYVOwLxsqkaUyU6jAdue0Yx+WpNesQz6UByMnzlu5JGksNZvFUM7JJlaKGzgksye9U0Wsx5glJ5ZjNUOzrFIOstaGYGcQOiG3TndASElBDtcQd6j1TZdEWJSAVRmfu/pkTYVSkuvCtHJAYAIJfP0N97JO1dIsknHfyiz1NDBxHa/q0MKdG1ccvWkzRMw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(366004)(376002)(396003)(346002)(136003)(39860400002)(38070700005)(4326008)(26005)(7696005)(9686003)(41300700001)(86362001)(478600001)(71200400001)(122000001)(6506007)(54906003)(66446008)(82960400001)(186003)(38100700002)(66946007)(5660300002)(7406005)(2906002)(7416002)(76116006)(52536014)(66556008)(8936002)(33656002)(55016003)(6916009)(64756008)(316002)(8676002)(66476007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?pEWIRCEgrhHsr4f2NZuRo0gMg4T13tPxAns8xUGxieV9T7RkeMHVgq7HOB7x?=
- =?us-ascii?Q?Ko1Dp3d4Ryp95B1FrjBEJ8bb6SfTOkGYE/boHHdpARzs/eM8K1YAFsPK/1bc?=
- =?us-ascii?Q?JYPiQksT7CshKDcNsqxubJW1zIQMc+e+LnAkBtcfO+idyR6IoFDMiClv3bXF?=
- =?us-ascii?Q?Won4UK4mplNqydI2w0DklY5rpREjasgkVY3ryDmr3lLABfZ5R2OhneNiX8UA?=
- =?us-ascii?Q?TelhSvpNPQXVWCwotYA1U7beiFQxRloynCN/9a+uNawsyg67JW7gFOFmU0mS?=
- =?us-ascii?Q?lVtZdbvxmhCwE2Xon1lA3FlTSRCVROeBlcCZYgHI8dYOtPoO+cK/GEFhKpmu?=
- =?us-ascii?Q?ZdSbKmsEkHgED+wAvsJprRe2dog29mmaWj3o0RCo2XB5xun9goROTKnCLFyg?=
- =?us-ascii?Q?GFgYYR6gkJTCDyLt+EkrOkpYB4lz5IjdxjOakbfcWY9ZjLIAHFnrzj7QRYkW?=
- =?us-ascii?Q?oHavoB5dvneERYPJEI72OFh4RA1e/1N+HlzveV8tX96AYNMhx22lpWLZ4r+8?=
- =?us-ascii?Q?I7gODI4AuHTexhRe+ewwo0ltl4L3RXol90yOJWbOVIH9M5K5TcCe8kiDeRU3?=
- =?us-ascii?Q?m0GYDI0hGVe1u0yPlbS6h21JF8fa0lNl5cKZPwo87/L2ZljBnap70o0qz/29?=
- =?us-ascii?Q?dI0a5UyuT7y0WHkmCyEGKWJL5gG8+s+QIOm/EvBRaxgzdBdz4YFBbnOIEPv6?=
- =?us-ascii?Q?Hito8jRlulUH2O4jgXl10ep//Z7MNr716Kehff6iy6DcH2KoSLHgRjhQTSug?=
- =?us-ascii?Q?tF6ydxlTAa9/uzp2kHqPuokmrqe2Vi6EW/jxtQcJTkGKEo+xwddEPN3c3eWy?=
- =?us-ascii?Q?1eskiiVVsTTsomTa3ensWVOCq/pZuWbFh64S0tbTQYeQK4vj3PhcmeDp6wMV?=
- =?us-ascii?Q?GUk673az+W1zE/QlKmlJtRC/lg1Z+xtLF/+riIFk8RaC5mo1gmhpL1EpVpzK?=
- =?us-ascii?Q?p+gth+iLAZxInOpYZ1LnKpu+IIWyJw3lWS/nQJSzhfGzUbC3+rzHcHyVXZdR?=
- =?us-ascii?Q?vAdmVVuSwBpwPAxHg3Hvcg3pC5LghtJjiK3WAyscu2Y/Fwh1E7cJLcHW/Wrr?=
- =?us-ascii?Q?MGB4tzCjj1GcdXEhZMUC62HUHsGTNmZRKMxtnRz0cH7pbrgYC+ecDPka3tp9?=
- =?us-ascii?Q?FYbLadyuF10+YLUHbltC4RD92TEecWSAiHiIkQ85T3TRzZDgAxp7JDk8nNOP?=
- =?us-ascii?Q?POIWEUXZGGntKHVcaYJCKeNckW91OkeeOYB7rir2ZQqo4PUuxhVwm/8OM0AZ?=
- =?us-ascii?Q?O7lkqfq8FZRVqIPrRiC6ZZbRgu8qmE3X3zQ/QSm8B+9exxrzPJF7MaEaUodB?=
- =?us-ascii?Q?3zZoZ4M5uep22Jj+r+SwQQtOaFNThjSsTWPpcAMKiIR2pjLMIL9J3hkSmlzZ?=
- =?us-ascii?Q?a7Mk/T15oOEQJppicZeItMnNZHliy0UCQf4uMdBQez6NdNFtQjVCSOUsy7Je?=
- =?us-ascii?Q?qb0ZK8MFNLvDWGMFA8Bv6w13zpZJ/pNSrvhSeMMmiDxqpM7PAmZRnHUrn3AC?=
- =?us-ascii?Q?BWC2D6CEGtcVHdMe4mM9XhnAJsY1XI4I8hhCdAEbp4if3flOX2b4DSReRN+5?=
- =?us-ascii?Q?O85r92YlcT1wIQkVp29M/MLumIPlbzME+DlDgZDO?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S229481AbiHaGTw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 31 Aug 2022 02:19:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9340755B0
+        for <kvm@vger.kernel.org>; Tue, 30 Aug 2022 23:19:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661926790;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=q0RL9hcvSBeKbl7mI4q8jnXwWqDmenfiCErqBoOJUqQ=;
+        b=MXTAd36DCl5hiT3MpyvZq4XFb6aDb6vbMwbAoYUengNPLZqdxJ+qTUwGrXGQ0Jz/t5C+yv
+        D7Br2ZWEexuqyQVoEzr9fA6YBCVvIuUDr3XKA9cblSvjTxEtU21kuAXOXS0gh3272YWvT+
+        CmArKFdL2IWGMDugwmqS1bd+heAdc8o=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-30-G3Vfp39vNKOo56wOZsSujQ-1; Wed, 31 Aug 2022 02:19:49 -0400
+X-MC-Unique: G3Vfp39vNKOo56wOZsSujQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B3E153C0E20E;
+        Wed, 31 Aug 2022 06:19:48 +0000 (UTC)
+Received: from starship (unknown [10.40.194.96])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 203662166B26;
+        Wed, 31 Aug 2022 06:19:46 +0000 (UTC)
+Message-ID: <dd8c92855762258d87486f719bf7e52e36169ef2.camel@redhat.com>
+Subject: Re: [PATCH 07/19] KVM: SVM: Drop buggy and redundant AVIC "single
+ logical dest" check
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Li RongQing <lirongqing@baidu.com>
+Date:   Wed, 31 Aug 2022 09:19:45 +0300
+In-Reply-To: <20220831003506.4117148-8-seanjc@google.com>
+References: <20220831003506.4117148-1-seanjc@google.com>
+         <20220831003506.4117148-8-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5f804c1e-fb9c-4613-c6f7-08da8b18211c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Aug 2022 06:14:57.7201
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: uTrvbfCwhxck7fWLwFET4dMc7FS5aCowdTiVppqyrPcGygv1WoUsGXd3Iive2URt+h5w3ppk0NfEzljW01fh5Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR1101MB2233
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -183,33 +65,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Wednesday, August 31, 2022 8:35 AM
->=20
-> On Sun, Aug 28, 2022 at 01:10:22AM +0800, Kevin Tian wrote:
->=20
-> > Kevin Tian (6):
-> >   vfio: Add helpers for unifying vfio_device life cycle
-> >   drm/i915/gvt: Use the new device life cycle helpers
-> >   vfio/platform: Use the new device life cycle helpers
-> >   vfio/amba: Use the new device life cycle helpers
-> >   vfio/ccw: Use the new device life cycle helpers
-> >   vfio: Rename vfio_device_put() and vfio_device_try_get()
-> >
-> > Yi Liu (9):
-> >   vfio/pci: Use the new device life cycle helpers
-> >   vfio/mlx5: Use the new device life cycle helpers
-> >   vfio/hisi_acc: Use the new device life cycle helpers
-> >   vfio/mdpy: Use the new device life cycle helpers
-> >   vfio/mtty: Use the new device life cycle helpers
-> >   vfio/mbochs: Use the new device life cycle helpers
-> >   vfio/ap: Use the new device life cycle helpers
-> >   vfio/fsl-mc: Use the new device life cycle helpers
-> >   vfio: Add struct device to vfio_device
->=20
-> Other than my small remarks this all looked good to me - for every patch:
->=20
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
->=20
+On Wed, 2022-08-31 at 00:34 +0000, Sean Christopherson wrote:
+> Use the already-calculated-and-sanity-checked destination bitmap when
+> processing a fast AVIC kick in logical mode, and drop the logical path's
+> flawed logic.  The intent of the check is to ensure the bitmap is a power
+> of two, whereas "icrh != (1 << avic)" effectively checks that the bitmap
+> is a power of two _and_ the target cluster is '0'.
+> 
+> Note, the flawed check isn't a functional issue, it simply means that KVM
+> will go down the slow path if the target cluster is non-zero.
+> 
+> Fixes: 8c9e639da435 ("KVM: SVM: Use target APIC ID to complete x2AVIC IRQs when possible")
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/svm/avic.c | 10 +---------
+>  1 file changed, 1 insertion(+), 9 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 3c333cd2e752..14f567550a1e 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -411,15 +411,7 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
+>  			 * Instead, calculate physical ID from logical ID in ICRH.
+>  			 */
+>  			int cluster = (icrh & 0xffff0000) >> 16;
+> -			int apic = ffs(icrh & 0xffff) - 1;
+> -
+> -			/*
+> -			 * If the x2APIC logical ID sub-field (i.e. icrh[15:0])
+> -			 * contains anything but a single bit, we cannot use the
+> -			 * fast path, because it is limited to a single vCPU.
+> -			 */
+> -			if (apic < 0 || icrh != (1 << apic))
+> -				return -EINVAL;
+> +			int apic = ffs(bitmap) - 1;
+>  
+>  			l1_physical_id = (cluster << 4) + apic;
+>  		}
 
-Thanks for the review!
+Oh, I didn't notice this bug. However isn't removing the check is wrong as well?
+
+What if we do have multiple bits set in the bitmap? After you remove this code,
+we will set IPI only to APIC which matches the 1st bit, no?
+(The fast code only sends IPI to one vCPU)
+
+Best regards,
+	Maxim Levitsky
+
