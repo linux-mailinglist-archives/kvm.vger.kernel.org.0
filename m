@@ -2,124 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E0735A7487
-	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 05:36:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4FAD5A748F
+	for <lists+kvm@lfdr.de>; Wed, 31 Aug 2022 05:42:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232288AbiHaDfz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Aug 2022 23:35:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53934 "EHLO
+        id S230011AbiHaDke (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Aug 2022 23:40:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232282AbiHaDfs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Aug 2022 23:35:48 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 555DE6AA2D;
-        Tue, 30 Aug 2022 20:35:46 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id c24so12409891pgg.11;
-        Tue, 30 Aug 2022 20:35:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc;
-        bh=aZHvtwv2XnuRZengAlGS32mVmp48gK9Mf0I2+nyLx2U=;
-        b=ozg/V1kVrSGAnHM9e5iJ5XdEDXdwPJUKf3Sb5EGVsApTZ13vLm1exUfTrb8vSa+WGX
-         V7EuIRag+z/anLgaPR4pYIMn0RkoJNJOPnxs5NcDkm4bFHgTwyKhRmE4WYWzDvnHxYys
-         ZtBZbQScDGTPs9XGNXrwgl2gW4p/gdNLBTEEVLMSnqAEQckSqzDJflE9iEqni92iS/Iu
-         WUGM/5KBotgYVUiRdB+aWnDwdO3mzvQ7e/cnR87ioDuqAUu3Rl99GoXr/2i8u5UVAV5n
-         Y1CSaT6F0Kh2lODmw78DImNoJUWEKcPvsD9OZeKF/JS0RdGJlGZh0xvzwkgl1IuVvPUz
-         uolA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=aZHvtwv2XnuRZengAlGS32mVmp48gK9Mf0I2+nyLx2U=;
-        b=xU8YTRfeGKcnHNqjpNltDvPeXhMQmb9PmGbynFdsf/vjfghu+JZbVXyuVwLCCzcbIf
-         cU4h/n+cZW3zaACBmRzoqgWfAJYzbOdNPOYXqVFh38UeaOe78Nc+D9smPXweHYNaeqNs
-         tyT8A7ODZ8hyw3/nySZRLqxNc4NikoEys0g7xxdKMcrCgJX3bm7dK7cjUjyMGLq5u8ND
-         Ba7hko8zFHJobLAsCbLswY4aTOYFv6pZXhfMNxPK7AesoJXucTKPf29+wpaGdyN3gjan
-         7eFse4A27xzpaCsah7gi5Btti0q40I0prIwaoO5n6GWBsqloPuav4BaSa3axzNF/7b8l
-         PXhA==
-X-Gm-Message-State: ACgBeo3OUwt9rjywNVo5OSqyEyaPkn/GknKJs9Z3s4J7D5PtD3vz8cWc
-        GeIqVoK+wW0J5HCijulyaTU=
-X-Google-Smtp-Source: AA6agR4bcTmeiwN76VrnVSJbzcK//92qn7CdQi9FhPqYvV4O7mvQXTQh9g5csfCI8dri5xyq/V+hVg==
-X-Received: by 2002:a05:6a00:180b:b0:536:816b:f770 with SMTP id y11-20020a056a00180b00b00536816bf770mr24652171pfa.3.1661916945757;
-        Tue, 30 Aug 2022 20:35:45 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id q63-20020a634342000000b0042bea8405a3sm2347022pga.14.2022.08.30.20.35.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Aug 2022 20:35:45 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Kan Liang <kan.liang@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "'H . Peter Anvin'" <hpa@zytor.com>,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH RESEND] perf/x86/core: Completely disable guest PEBS via guest's global_ctrl
-Date:   Wed, 31 Aug 2022 11:35:24 +0800
-Message-Id: <20220831033524.58561-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.37.3
+        with ESMTP id S229659AbiHaDkb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Aug 2022 23:40:31 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E7063D5A4;
+        Tue, 30 Aug 2022 20:40:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1661917230; x=1693453230;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=4UnPxXmSAR7BcO87OaiX5jBIE02ojL3gV8lzjgFw+ek=;
+  b=MB79ibZx1zQxGuEL+NW/UTd654ri+jGvYdvDlHFmQTaq8+yH0gWR5qtX
+   eVkT5Gd7i2JZDQR/8SlAHLA68r04qRROF37aW11DCQr5mvAsT41hhRnOi
+   q8RuLcORI3FyqInvw7UZR6SBzwOVFxSoyZTNltr+mJ0MDcm4e5nj0+WWP
+   n7M8LNwuYLFaF8e1Ml0qkIcFuMUH9hfqK5rvf7gUekQh0hmxOVq5cs60F
+   sPcP6xKF1IM2VBnXoJlW3WfMYjAK08VXByJQaxZRsM6gRkV/gGLdJpY8M
+   pRqt+/aLL3GhGkXSRHCfA/SG6F3iEEWB2HPphMV+qYKtI557IC1skjsgg
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10455"; a="292940295"
+X-IronPort-AV: E=Sophos;i="5.93,276,1654585200"; 
+   d="scan'208";a="292940295"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2022 20:40:29 -0700
+X-IronPort-AV: E=Sophos;i="5.93,276,1654585200"; 
+   d="scan'208";a="673175541"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.192.207]) ([10.249.192.207])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2022 20:40:26 -0700
+Message-ID: <37ed6be6-bfa5-e87c-9c74-e5bdacda1600@intel.com>
+Date:   Wed, 31 Aug 2022 11:40:24 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.13.0
+Subject: Re: [PATCH v8 018/103] KVM: TDX: Stub in tdx.h with structs,
+ accessors, and VMCS helpers
+Content-Language: en-US
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Binbin Wu <binbin.wu@linux.intel.com>, isaku.yamahata@intel.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sagi Shahar <sagis@google.com>
+References: <cover.1659854790.git.isaku.yamahata@intel.com>
+ <d88e0cee35b70d86493d5a71becffa4ab5c5d97c.1659854790.git.isaku.yamahata@intel.com>
+ <651c33a5-4b9b-927f-cb04-ec20b8c3d730@linux.intel.com>
+ <YwT0+DO4AuO1xL82@google.com>
+ <20220826044817.GE2538772@ls.amr.corp.intel.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20220826044817.GE2538772@ls.amr.corp.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On 8/26/2022 12:48 PM, Isaku Yamahata wrote:
+> On Tue, Aug 23, 2022 at 03:40:40PM +0000,
+> Sean Christopherson <seanjc@google.com> wrote:
+> 
+>> On Tue, Aug 23, 2022, Binbin Wu wrote:
+>>>
+>>> On 2022/8/8 6:01, isaku.yamahata@intel.com wrote:
+>>>> +static __always_inline void tdvps_vmcs_check(u32 field, u8 bits)
+>>>> +{
+>>>> +	BUILD_BUG_ON_MSG(__builtin_constant_p(field) && (field) & 0x1,
+>>>> +			 "Read/Write to TD VMCS *_HIGH fields not supported");
+>>>> +
+>>>> +	BUILD_BUG_ON(bits != 16 && bits != 32 && bits != 64);
+>>>> +
+>>>> +	BUILD_BUG_ON_MSG(bits != 64 && __builtin_constant_p(field) &&
+>>>> +			 (((field) & 0x6000) == 0x2000 ||
+>>>> +			  ((field) & 0x6000) == 0x6000),
+>>>> +			 "Invalid TD VMCS access for 64-bit field");
+>>>
+>>> if bits is 64 here, "bits != 64" is false, how could this check for "Invalid
+>>> TD VMCS access for 64-bit field"?
+>>
+>> Bits 14:13 of the encoding, which is extracted by "(field) & 0x6000", encodes the
+>> width of the VMCS field.  Bit 0 of the encoding, "(field) & 0x1" above, is a modifier
+>> that is only relevant when operating in 32-bit mode, and is disallowed because TDX is
+>> 64-bit only.
+>>
+>> This yields four possibilities for TDX:
+>>
+>>    (field) & 0x6000) == 0x0000 : 16-bit field
+>>    (field) & 0x6000) == 0x2000 : 64-bit field
+>>    (field) & 0x6000) == 0x4000 : 32-bit field
+>>    (field) & 0x6000) == 0x6000 : 64-bit field (technically "natural width", but
+>>                                                effectively 64-bit because TDX is
+>> 					      64-bit only)
+>>
+>> The assertion is that if the encoding indicates a 64-bit field (0x2000 or 0x6000),
+>> then the number of bits KVM is accessing must be '64'.  The below assertions do
+>> the same thing for 32-bit and 16-bit fields.
+> 
+> Thanks for explanation. I've updated it as follows to use symbolic value.
+> 
+> #define VMCS_ENC_ACCESS_TYPE_MASK	0x1UL
+> #define VMCS_ENC_ACCESS_TYPE_FULL	0x0UL
+> #define VMCS_ENC_ACCESS_TYPE_HIGH	0x1UL
+> #define VMCS_ENC_ACCESS_TYPE(field)	((field) & VMCS_ENC_ACCESS_TYPE_MASK)
+> 
+> 	/* TDX is 64bit only.  HIGH field isn't supported. */
+> 	BUILD_BUG_ON_MSG(__builtin_constant_p(field) &&
+> 			 VMCS_ENC_ACCESS_TYPE(field) == VMCS_ENC_ACCESS_TYPE_HIGH,
+> 			 "Read/Write to TD VMCS *_HIGH fields not supported");
+> 
+> 	BUILD_BUG_ON(bits != 16 && bits != 32 && bits != 64);
+> 
+> #define VMCS_ENC_WIDTH_MASK	GENMASK_UL(14, 13)
+> #define VMCS_ENC_WIDTH_16BIT	(0UL << 13)
+> #define VMCS_ENC_WIDTH_64BIT	(1UL << 13)
+> #define VMCS_ENC_WIDTH_32BIT	(2UL << 13)
+> #define VMCS_ENC_WIDTH_NATURAL	(3UL << 13)
+> #define VMCS_ENC_WIDTH(field)	((field) & VMCS_ENC_WIDTH_MASK)
+> 
+> 	/* TDX is 64bit only.  i.e. natural width = 64bit. */
+> 	BUILD_BUG_ON_MSG(bits != 64 && __builtin_constant_p(field) &&
+> 			 (VMCS_ENC_WIDTH(field) == VMCS_ENC_WIDTH_64BIT ||
+> 			  VMCS_ENC_WIDTH(field) == VMCS_ENC_WIDTH_NATURAL),
+> 			 "Invalid TD VMCS access for 64-bit field");
+> 	BUILD_BUG_ON_MSG(bits != 32 && __builtin_constant_p(field) &&
+> 			 VMCS_ENC_WIDTH(field) == VMCS_ENC_WIDTH_32BIT,
+> 			 "Invalid TD VMCS access for 32-bit field");
+> 	BUILD_BUG_ON_MSG(bits != 16 && __builtin_constant_p(field) &&
+> 			 VMCS_ENC_WIDTH(field) == VMCS_ENC_WIDTH_16BIT,
+> 			 "Invalid TD VMCS access for 16-bit field");
 
-When a guest PEBS counter is cross-mapped by a host counter, software
-will remove the corresponding bit in the arr[global_ctrl].guest and
-expect hardware to perform a change of state "from enable to disable"
-via the msr_slot[] switch during the vmx transaction.
+Actually, the original code is written by me that is copied from 
+vmcs_check{16/32/64/l} in arch/x86/kvm/vmx/vmx_ops.h
 
-The real world is that if user adjust the counter overflow value small
-enough, it still opens a tiny race window for the previously PEBS-enabled
-counter to write cross-mapped PEBS records into the guest's PEBS buffer,
-when arr[global_ctrl].guest has been prioritised (switch_msr_special stuff)
-to switch into the enabled state, while the arr[pebs_enable].guest has not.
-
-Close this window by clearing invalid bits in the arr[global_ctrl].guest.
-
-Cc: linux-perf-users@vger.kernel.org
-Cc: Kan Liang <kan.liang@linux.intel.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Sean Christopherson <seanjc@google.com>
-Fixes: 854250329c02 ("KVM: x86/pmu: Disable guest PEBS temporarily in two rare situations")
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/events/intel/core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index 2db93498ff71..75cdd11ab014 100644
---- a/arch/x86/events/intel/core.c
-+++ b/arch/x86/events/intel/core.c
-@@ -4052,8 +4052,9 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
- 		/* Disable guest PEBS if host PEBS is enabled. */
- 		arr[pebs_enable].guest = 0;
- 	} else {
--		/* Disable guest PEBS for cross-mapped PEBS counters. */
-+		/* Disable guest PEBS thoroughly for cross-mapped PEBS counters. */
- 		arr[pebs_enable].guest &= ~kvm_pmu->host_cross_mapped_mask;
-+		arr[global_ctrl].guest &= ~kvm_pmu->host_cross_mapped_mask;
- 		/* Set hw GLOBAL_CTRL bits for PEBS counter when it runs for guest */
- 		arr[global_ctrl].guest |= arr[pebs_enable].guest;
- 	}
--- 
-2.37.3
+If you are going to do above change, you'd better cook a patch to change 
+it for vmx_ops.h at first and see opinion from community.
 
