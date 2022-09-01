@@ -2,382 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DAA55A8DFD
-	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 08:09:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E0755A8E08
+	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 08:12:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232511AbiIAGJY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 02:09:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49744 "EHLO
+        id S232977AbiIAGMz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 02:12:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231484AbiIAGJW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 02:09:22 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87B15114C61
-        for <kvm@vger.kernel.org>; Wed, 31 Aug 2022 23:09:20 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 280C9B82452
-        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 06:09:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BEE35C433B5
-        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 06:09:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662012557;
-        bh=sOkvXxIJDLxTmvY+9W0iD6vd1xlFJXX1pZYU6n4nr5s=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=lOsmNXpqgt5OzzI6Icoo4oxpNkCIqolBQqHVrVeOYJyrS8FlQGfYcDWO0XCyf2caP
-         9SJHW93/JLoZw2Y5lch3JCgelXWZr030+gVRTtKmCJuvY3263R4oipQL2hfxumiFAQ
-         9wKyk3tf64idhTo5SVwk716XPkdOxg5/IzGbMJCbVJeQ4RgXoCa9vkfyjzoLpAw31c
-         9FEPEfSxd6ELmk7vHGPWPQvMEE0Xzh3Ah8DU7MDeEcZHuWqi2EeO+NgJaxoe2TlD0m
-         itB3vcZcNgj4hJn6tXPYgckT0FB9+IU8qGrFU+GMGgNThmA0Pmu3/mnhhRth0zGCyt
-         o2kZUMKFD2C1Q==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id AB68AC433E6; Thu,  1 Sep 2022 06:09:17 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216388] On Host, kernel errors in KVM, on guests, it shows CPU
- stalls
-Date:   Thu, 01 Sep 2022 06:09:17 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: nanook@eskimo.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216388-28872-L9iQIQTrXh@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216388-28872@https.bugzilla.kernel.org/>
-References: <bug-216388-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S233189AbiIAGMw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 02:12:52 -0400
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25F211195F8;
+        Wed, 31 Aug 2022 23:12:49 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R231e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VNxZAUn_1662012766;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VNxZAUn_1662012766)
+          by smtp.aliyun-inc.com;
+          Thu, 01 Sep 2022 14:12:47 +0800
+Message-ID: <1662012653.6443956-2-xuanzhuo@linux.alibaba.com>
+Subject: Re: [RFC v3 6/7] virtio: in order support for virtio_ring
+Date:   Thu, 1 Sep 2022 14:10:53 +0800
+From:   Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To:     Guo Zhi <qtxuning1999@sjtu.edu.cn>
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        Guo Zhi <qtxuning1999@sjtu.edu.cn>, eperezma@redhat.com,
+        jasowang@redhat.com, sgarzare@redhat.com, mst@redhat.com
+References: <20220901055434.824-1-qtxuning1999@sjtu.edu.cn>
+ <20220901055434.824-7-qtxuning1999@sjtu.edu.cn>
+In-Reply-To: <20220901055434.824-7-qtxuning1999@sjtu.edu.cn>
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216388
+On Thu,  1 Sep 2022 13:54:33 +0800, Guo Zhi <qtxuning1999@sjtu.edu.cn> wrote:
+> If in order feature negotiated, we can skip the used ring to get
+> buffer's desc id sequentially.  For skipped buffers in the batch, the
+> used ring doesn't contain the buffer length, actually there is not need
+> to get skipped buffers' length as they are tx buffer.
 
---- Comment #6 from Robert Dinse (nanook@eskimo.com) ---
-Installed 5.19.6 on a couple of machines today, still getting CPU stalls bu=
-t in
-random locations:
+As far as I know, currently virtio-net will use the buffer's length here for
+statistics. So whether virtio-net also needs to make some changes.
 
-[    6.601788] rcu: INFO: rcu_sched detected expedited stalls on CPUs/tasks=
-: {
-4-... } 3 jiffies s: 53 root: 0x10/.=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20
-[    6.601802] rcu: blocking rcu_node structures (internal RCU debug):=20=
-=20=20=20=20=20=20=20=20=20
-[    6.601806] Task dump for CPU 4:=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20
-[    6.601808] task:systemd-udevd   state:R  running task     stack:    0 p=
-id:=20
-468 ppid:   454 flags:0x0000400a=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20
-[    6.604313] Call Trace:=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604324]  <TASK>=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604326]  ? cpumask_any_but+0x35/0x50=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20
-[    6.604336]  ? x2apic_send_IPI_allbutself+0x2f/0x40=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604339]  ? do_sync_core+0x2a/0x30=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20
-[    6.604342]  ? cpumask_next+0x23/0x30=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20
-[    6.604344]  ? smp_call_function_many_cond+0xea/0x370=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604347]  ? text_poke_memset+0x20/0x20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20
-[    6.604350]  ? arch_unregister_cpu+0x50/0x50=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604352]  ? on_each_cpu_cond_mask+0x1d/0x30=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604354]  ? text_poke_bp_batch+0x1fb/0x210=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604358]  ? enter_smm.constprop.0+0x51a/0xa70 [kvm]=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604414]  ? vmx_set_cr0+0x16f0/0x16f0 [kvm_intel]=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604457]  ? enter_smm.constprop.0+0x519/0xa70 [kvm]=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604501]  ? text_poke_bp+0x49/0x70=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20
-[    6.604504]  ? __static_call_transform+0x7f/0x120=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604506]  ? arch_static_call_transform+0x87/0xa0=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604508]  ? enter_smm.constprop.0+0x519/0xa70 [kvm]=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604552]  ? __static_call_update+0x16e/0x220=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604554]  ? vmx_set_cr0+0x16f0/0x16f0 [kvm_intel]=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604567]  ? kvm_arch_hardware_setup+0x35a/0x17f0 [kvm]=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604611]  ? __kmalloc_node+0x16c/0x380=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20
-[    6.604615]  ? kvm_init+0xa2/0x400 [kvm]=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20
-[    6.604654]  ? hardware_setup+0x7e2/0x8cc [kvm_intel]=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604666]  ? vmx_init+0xf9/0x201 [kvm_intel]=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604676]  ? hardware_setup+0x8cc/0x8cc [kvm_intel]=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604685]  ? do_one_initcall+0x47/0x1e0=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20
-[    6.604689]  ? kmem_cache_alloc_trace+0x16c/0x2b0=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604692]  ? do_init_module+0x50/0x1f0=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20
-[    6.604694]  ? load_module+0x21bd/0x25e0=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20
-[    6.604696]  ? ima_post_read_file+0xd5/0x100=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604700]  ? kernel_read_file+0x23d/0x2e0=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604703]  ? __do_sys_finit_module+0xbd/0x130=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604705]  ? __do_sys_finit_module+0xbd/0x130=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604708]  ? __x64_sys_finit_module+0x18/0x20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604710]  ? do_syscall_64+0x58/0x80=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20
-[    6.604713]  ? syscall_exit_to_user_mode+0x1b/0x40=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604715]  ? do_syscall_64+0x67/0x80=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20
-[    6.604718]  ? switch_fpu_return+0x4e/0xc0=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604720]  ? exit_to_user_mode_prepare+0x184/0x1e0=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604723]  ? syscall_exit_to_user_mode+0x1b/0x40=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604725]  ? do_syscall_64+0x67/0x80=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20
-[    6.604728]  ? do_syscall_64+0x67/0x80=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20
-[    6.604730]  ? do_syscall_64+0x67/0x80=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20
-[    6.604732]  ? sysvec_call_function+0x4b/0xa0=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604735]  ? entry_SYSCALL_64_after_hwframe+0x63/0xcd=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.604739]  </TASK>=20=20=20=20=20
-[    6.697044] rcu: INFO: rcu_sched detected expedited stalls on CPUs/tasks=
-: {
-4-... } 13 jiffies s: 53 root: 0x10/.=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20
-[    6.697051] rcu: blocking rcu_node structures (internal RCU debug):=20=
-=20=20=20=20=20=20=20=20=20
-[    6.697052] Task dump for CPU 4:=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20
-[    6.697053] task:systemd-udevd   state:R  running task     stack:    0 p=
-id:=20
-468 ppid:   454 flags:0x0000400a=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20
-[    6.697057] Call Trace:=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697058]  <TASK>=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697059]  ? cpumask_any_but+0x35/0x50=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20
-[    6.697065]  ? x2apic_send_IPI_allbutself+0x2f/0x40=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697068]  ? do_sync_core+0x2a/0x30=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20
-[    6.697071]  ? cpumask_next+0x23/0x30=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20
-[    6.697072]  ? smp_call_function_many_cond+0xea/0x370=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697075]  ? text_poke_memset+0x20/0x20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20
-[    6.697077]  ? arch_unregister_cpu+0x50/0x50=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697080]  ? on_each_cpu_cond_mask+0x1d/0x30=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697081]  ? text_poke_bp_batch+0x1fb/0x210=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697084]  ? kvm_set_msr_common+0x939/0x1060 [kvm]=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697133]  ? vmx_set_efer.part.0+0x160/0x160 [kvm_intel]=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697147]  ? kvm_set_msr_common+0x938/0x1060 [kvm]=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697187]  ? text_poke_bp+0x49/0x70=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20
-[    6.697189]  ? __static_call_transform+0x7f/0x120=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697191]  ? arch_static_call_transform+0x87/0xa0=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697193]  ? kvm_set_msr_common+0x938/0x1060 [kvm]=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697234]  ? __static_call_update+0x16e/0x220=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697236]  ? vmx_set_efer.part.0+0x160/0x160 [kvm_intel]=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697246]  ? kvm_arch_hardware_setup+0x423/0x17f0 [kvm]=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697286]  ? __kmalloc_node+0x16c/0x380=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20
-[    6.697290]  ? kvm_init+0xa2/0x400 [kvm]=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20
-[    6.697326]  ? hardware_setup+0x7e2/0x8cc [kvm_intel]=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697336]  ? vmx_init+0xf9/0x201 [kvm_intel]=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697345]  ? hardware_setup+0x8cc/0x8cc [kvm_intel]=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697353]  ? do_one_initcall+0x47/0x1e0=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20
-[    6.697356]  ? kmem_cache_alloc_trace+0x16c/0x2b0=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697359]  ? do_init_module+0x50/0x1f0=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20
-[    6.697360]  ? load_module+0x21bd/0x25e0=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20
-[    6.697362]  ? ima_post_read_file+0xd5/0x100=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697365]  ? kernel_read_file+0x23d/0x2e0=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697368]  ? __do_sys_finit_module+0xbd/0x130=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697370]  ? __do_sys_finit_module+0xbd/0x130=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697372]  ? __x64_sys_finit_module+0x18/0x20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-[    6.697373]  ? do_syscall_64+0x58/0x80=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20
-[    6.697376]  ? syscall_exit_to_user_mode+0x1b/0x40
-[    6.697377]  ? do_syscall_64+0x67/0x80
-[    6.697379]  ? switch_fpu_return+0x4e/0xc0
-[    6.697382]  ? exit_to_user_mode_prepare+0x184/0x1e0
-[    6.697384]  ? syscall_exit_to_user_mode+0x1b/0x40
-[    6.697386]  ? do_syscall_64+0x67/0x80
-[    6.697387]  ? do_syscall_64+0x67/0x80
-[    6.697389]  ? do_syscall_64+0x67/0x80
-[    6.697391]  ? sysvec_call_function+0x4b/0xa0
-[    6.697393]  ? entry_SYSCALL_64_after_hwframe+0x63/0xcd
-[    6.697397]  </TASK>
+Thanks.
 
-[    6.798781] rcu: INFO: rcu_sched detected expedited stalls on CPUs/tasks=
-: {
-4-... } 23 jiffies s: 53 root: 0x10/.
-[    6.798787] rcu: blocking rcu_node structures (internal RCU debug):
-[    6.798833] Task dump for CPU 4:
-[    6.798952] task:systemd-udevd   state:R  running task     stack:    0 p=
-id:=20
-468 ppid:   454 flags:0x0000400a
-[    6.798957] Call Trace:
-[    6.798959]  <TASK>
-[    6.798960]  ? cpumask_any_but+0x35/0x50
-[    6.798967]  ? x2apic_send_IPI_allbutself+0x2f/0x40
-[    6.798969]  ? do_sync_core+0x2a/0x30
-[    6.800010]  ? cpumask_next+0x23/0x30
-[    6.800014]  ? smp_call_function_many_cond+0xea/0x370
-[    6.800017]  ? text_poke_memset+0x20/0x20
-[    6.800019]  ? arch_unregister_cpu+0x50/0x50
-[    6.800024]  ? __SCT__kvm_x86_set_rflags+0x8/0x8 [kvm]
-[    6.800096]  ? vmx_get_rflags+0x130/0x130 [kvm_intel]
-[    6.800109]  ? on_each_cpu_cond_mask+0x1d/0x30
-[    6.800110]  ? text_poke_bp_batch+0xaf/0x210
-[    6.800113]  ? vmx_get_rflags+0x130/0x130 [kvm_intel]
-[    6.800121]  ? __SCT__kvm_x86_set_rflags+0x8/0x8 [kvm]
-[    6.800172]  ? vmx_get_rflags+0x130/0x130 [kvm_intel]
-[    6.800180]  ? text_poke_bp+0x49/0x70
-[    6.800182]  ? __static_call_transform+0x7f/0x120
-[    6.800183]  ? arch_static_call_transform+0x58/0xa0
-[    6.800185]  ? __SCT__kvm_x86_set_rflags+0x8/0x8 [kvm]
-[    6.800233]  ? __static_call_update+0x62/0x220
-[    6.800235]  ? vmx_get_rflags+0x130/0x130 [kvm_intel]
-[    6.800243]  ? kvm_arch_hardware_setup+0x581/0x17f0 [kvm]
-[    6.800284]  ? __kmalloc_node+0x16c/0x380
-[    6.800288]  ? kvm_init+0xa2/0x400 [kvm]
-[    6.800324]  ? hardware_setup+0x7e2/0x8cc [kvm_intel]
-[    6.800334]  ? vmx_init+0xf9/0x201 [kvm_intel]
-[    6.800342]  ? hardware_setup+0x8cc/0x8cc [kvm_intel]
-[    6.800350]  ? do_one_initcall+0x47/0x1e0
-[    6.800352]  ? kmem_cache_alloc_trace+0x16c/0x2b0
-[    6.800355]  ? do_init_module+0x50/0x1f0
-[    6.800357]  ? load_module+0x21bd/0x25e0
-[    6.800358]  ? ima_post_read_file+0xd5/0x100
-[    6.800361]  ? kernel_read_file+0x23d/0x2e0
-[    6.800364]  ? __do_sys_finit_module+0xbd/0x130
-[    6.800365]  ? __do_sys_finit_module+0xbd/0x130
-[    6.800368]  ? __x64_sys_finit_module+0x18/0x20
-[    6.800369]  ? do_syscall_64+0x58/0x80
-[    6.800371]  ? syscall_exit_to_user_mode+0x1b/0x40
-[    6.800373]  ? do_syscall_64+0x67/0x80
-[    6.800375]  ? switch_fpu_return+0x4e/0xc0
-[    6.800377]  ? exit_to_user_mode_prepare+0x184/0x1e0
-[    6.800379]  ? syscall_exit_to_user_mode+0x1b/0x40
-[    6.800380]  ? do_syscall_64+0x67/0x80
-[    6.800382]  ? do_syscall_64+0x67/0x80
-[    6.800384]  ? do_syscall_64+0x67/0x80
-[    6.800385]  ? sysvec_call_function+0x4b/0xa0
-[    6.800387]  ? entry_SYSCALL_64_after_hwframe+0x63/0xcd
-[    6.800391]  </TASK>
-
-     Are these related or should I open a new ticket?  These occurred right
-after boot.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+>
+> Signed-off-by: Guo Zhi <qtxuning1999@sjtu.edu.cn>
+> ---
+>  drivers/virtio/virtio_ring.c | 74 +++++++++++++++++++++++++++++++-----
+>  1 file changed, 64 insertions(+), 10 deletions(-)
+>
+> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> index 00aa4b7a49c2..d52624179b43 100644
+> --- a/drivers/virtio/virtio_ring.c
+> +++ b/drivers/virtio/virtio_ring.c
+> @@ -103,6 +103,9 @@ struct vring_virtqueue {
+>  	/* Host supports indirect buffers */
+>  	bool indirect;
+>
+> +	/* Host supports in order feature */
+> +	bool in_order;
+> +
+>  	/* Host publishes avail event idx */
+>  	bool event;
+>
+> @@ -144,6 +147,19 @@ struct vring_virtqueue {
+>  			/* DMA address and size information */
+>  			dma_addr_t queue_dma_addr;
+>  			size_t queue_size_in_bytes;
+> +
+> +			/* If in_order feature is negotiated, here is the next head to consume */
+> +			u16 next_desc_begin;
+> +			/*
+> +			 * If in_order feature is negotiated,
+> +			 * here is the last descriptor's id in the batch
+> +			 */
+> +			u16 last_desc_in_batch;
+> +			/*
+> +			 * If in_order feature is negotiated,
+> +			 * buffers except last buffer in the batch are skipped buffer
+> +			 */
+> +			bool is_skipped_buffer;
+>  		} split;
+>
+>  		/* Available for packed ring */
+> @@ -584,8 +600,6 @@ static inline int virtqueue_add_split(struct virtqueue *_vq,
+>  					 total_sg * sizeof(struct vring_desc),
+>  					 VRING_DESC_F_INDIRECT,
+>  					 false);
+> -		vq->split.desc_extra[head & (vq->split.vring.num - 1)].flags &=
+> -			~VRING_DESC_F_NEXT;
+>  	}
+>
+>  	/* We're using some buffers from the free list. */
+> @@ -701,8 +715,16 @@ static void detach_buf_split(struct vring_virtqueue *vq, unsigned int head,
+>  	}
+>
+>  	vring_unmap_one_split(vq, i);
+> -	vq->split.desc_extra[i].next = vq->free_head;
+> -	vq->free_head = head;
+> +	/*
+> +	 * If in_order feature is negotiated,
+> +	 * the descriptors are made available in order.
+> +	 * Since the free_head is already a circular list,
+> +	 * it must consume it sequentially.
+> +	 */
+> +	if (!vq->in_order) {
+> +		vq->split.desc_extra[i].next = vq->free_head;
+> +		vq->free_head = head;
+> +	}
+>
+>  	/* Plus final descriptor */
+>  	vq->vq.num_free++;
+> @@ -744,7 +766,7 @@ static void *virtqueue_get_buf_ctx_split(struct virtqueue *_vq,
+>  {
+>  	struct vring_virtqueue *vq = to_vvq(_vq);
+>  	void *ret;
+> -	unsigned int i;
+> +	unsigned int i, j;
+>  	u16 last_used;
+>
+>  	START_USE(vq);
+> @@ -763,11 +785,38 @@ static void *virtqueue_get_buf_ctx_split(struct virtqueue *_vq,
+>  	/* Only get used array entries after they have been exposed by host. */
+>  	virtio_rmb(vq->weak_barriers);
+>
+> -	last_used = (vq->last_used_idx & (vq->split.vring.num - 1));
+> -	i = virtio32_to_cpu(_vq->vdev,
+> -			vq->split.vring.used->ring[last_used].id);
+> -	*len = virtio32_to_cpu(_vq->vdev,
+> -			vq->split.vring.used->ring[last_used].len);
+> +	if (vq->in_order) {
+> +		last_used = (vq->last_used_idx & (vq->split.vring.num - 1));
+> +		if (!vq->split.is_skipped_buffer) {
+> +			vq->split.last_desc_in_batch =
+> +				virtio32_to_cpu(_vq->vdev,
+> +						vq->split.vring.used->ring[last_used].id);
+> +			vq->split.is_skipped_buffer = true;
+> +		}
+> +		/* For skipped buffers in batch, we can ignore the len info, simply set len as 0 */
+> +		if (vq->split.next_desc_begin != vq->split.last_desc_in_batch) {
+> +			*len = 0;
+> +		} else {
+> +			*len = virtio32_to_cpu(_vq->vdev,
+> +					       vq->split.vring.used->ring[last_used].len);
+> +			vq->split.is_skipped_buffer = false;
+> +		}
+> +		i = vq->split.next_desc_begin;
+> +		j = i;
+> +		/* Indirect only takes one descriptor in descriptor table */
+> +		while (!vq->indirect && (vq->split.desc_extra[j].flags & VRING_DESC_F_NEXT))
+> +			j = (j + 1) & (vq->split.vring.num - 1);
+> +		/* move to next */
+> +		j = (j + 1) % vq->split.vring.num;
+> +		/* Next buffer will use this descriptor in order */
+> +		vq->split.next_desc_begin = j;
+> +	} else {
+> +		last_used = (vq->last_used_idx & (vq->split.vring.num - 1));
+> +		i = virtio32_to_cpu(_vq->vdev,
+> +				    vq->split.vring.used->ring[last_used].id);
+> +		*len = virtio32_to_cpu(_vq->vdev,
+> +				       vq->split.vring.used->ring[last_used].len);
+> +	}
+>
+>  	if (unlikely(i >= vq->split.vring.num)) {
+>  		BAD_RING(vq, "id %u out of range\n", i);
+> @@ -2223,6 +2272,7 @@ struct virtqueue *__vring_new_virtqueue(unsigned int index,
+>
+>  	vq->indirect = virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_DESC) &&
+>  		!context;
+> +	vq->in_order = virtio_has_feature(vdev, VIRTIO_F_IN_ORDER);
+>  	vq->event = virtio_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX);
+>
+>  	if (virtio_has_feature(vdev, VIRTIO_F_ORDER_PLATFORM))
+> @@ -2235,6 +2285,10 @@ struct virtqueue *__vring_new_virtqueue(unsigned int index,
+>  	vq->split.avail_flags_shadow = 0;
+>  	vq->split.avail_idx_shadow = 0;
+>
+> +	vq->split.next_desc_begin = 0;
+> +	vq->split.last_desc_in_batch = 0;
+> +	vq->split.is_skipped_buffer = false;
+> +
+>  	/* No callback?  Tell other side not to bother us. */
+>  	if (!callback) {
+>  		vq->split.avail_flags_shadow |= VRING_AVAIL_F_NO_INTERRUPT;
+> --
+> 2.17.1
+>
