@@ -2,127 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 25D355A9150
-	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 09:55:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 89D225A8F9B
+	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 09:17:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233480AbiIAHz0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 03:55:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36008 "EHLO
+        id S233548AbiIAHRg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 03:17:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232943AbiIAHzY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 03:55:24 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 900C325EAD;
-        Thu,  1 Sep 2022 00:55:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TzGi1YkmJo6K2bY2Y0Vm9jMOK5gOrOIwrMHvMctWmMGXbFSZ2zPE62A9nNm/oV+c0M272wE/6B/+UwXFG2NyKQdDeSECYSAPOG69WclQrKlc5QetCcReGxlfhCJUV8JiZk+QfszJqQVivY7Kh9nC0od90EpHxcxJFrHVsb+JB8tGYrNuUw+F3DPgMKgc2B1QsPuke5tc8eHXomRUBJgL60m3hOMekcPJlHB4SaCC5lmxDU0C6fXOtc5gwVatrABb1+dNmI8kDMalBpWcv3QoFjbvHr9pLRc3edZopPjHSrfTkq+PeXEeOKsvPIbBBCLxxyA6iAVZ7GUS1RZPBUln+Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dtdrEsDsacIsMCW+kPLeHjwTwU29aC6k77pV8dJme78=;
- b=GfCQkqfUbv6NObv0iMt9NCAQ0riL0a5zrOEPkpLBZ+jmGIMG6n2bLpinyWMXxDX/qvpmAlZV/ue4wNSvcNiMsb/TIhtg0iDllUd4MVfI24/kA4kH4YYEvaCTNUVSpOKszpl9Xj3cxFmUX8boFABPIkD/fCPkHZHA3v44Fbee5lzaiqO2VpqUpPbT9jNo7w0pFRIf/36iMXKg6rrWJsDLTwtV2J2l0uZJyViZzFHueR3YvdaoZlyqVz5znBWrtej0iTYMpnn2BMGgVw72F0mUYKGSCnSxvdUnYgV097kYyqm8Qihh32khG0r0VN4HCSh2Kw2q8Zp4K82fzUmq1qy3vQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dtdrEsDsacIsMCW+kPLeHjwTwU29aC6k77pV8dJme78=;
- b=14AveDDtorHnh3UY6IhHWLBbq3D9zBQnbbm9lw8i6pR2qJudBVdGqJlsrRaQTyjT+MixspMMy9N6ie/MGlU92q9VCARGnw73AbckrmzghCJwa33WXwZOPPxcHvOlQ1FXrqp8hPseXZ+6fxBUFhuGT+1qIUCNW7MClT8n9Ha8PxA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BN8PR12MB3587.namprd12.prod.outlook.com (2603:10b6:408:43::13)
- by DM6PR12MB4268.namprd12.prod.outlook.com (2603:10b6:5:223::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.15; Thu, 1 Sep
- 2022 07:55:14 +0000
-Received: from BN8PR12MB3587.namprd12.prod.outlook.com
- ([fe80::4524:eda6:873a:8f94]) by BN8PR12MB3587.namprd12.prod.outlook.com
- ([fe80::4524:eda6:873a:8f94%7]) with mapi id 15.20.5588.012; Thu, 1 Sep 2022
- 07:55:14 +0000
-Message-ID: <18b3dd75-7995-a2a8-372b-1fd5838dfe1d@amd.com>
-Date:   Thu, 1 Sep 2022 09:55:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v2 1/4] dma-buf: Add dma_buf_try_get()
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>,
+        with ESMTP id S232562AbiIAHRf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 03:17:35 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63A65124847;
+        Thu,  1 Sep 2022 00:17:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662016654; x=1693552654;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=/oWozjlSYSNeOLAebOKD/bZQo3WvQOnbYJ2YF9ryPU4=;
+  b=BDtUxsYB3+SUBZFugfUuAzh1tm4VThi66OehwHL/D7EyxOYUgVi/n68N
+   4vyrQGNoKCAYhYV6mX8TngeMyyN/blfHVtRS9P7B5xMGtrut9s5XV82Y3
+   t8F1IaxXxcDP4VyJbrYTUNXahzJ+EB1M1xWUAbb0hkw6xok6/rm481T+c
+   xHAltlJhdVpOjUjtnqZfRSc9XjZxC8ND/FPWYqvKQKItgyfBHNwWj1W1i
+   Am/9+Fo8Nc7BgN+49qrV1GKYjayvSX9MQ4FcL3lRqqf3kBCqM6/CYuG0O
+   kgDn2gDDInxaA9p1SXcje3Z2z8lA+4FObXvuvm22C+RIP9SfmH5Lt1zKc
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10456"; a="294378000"
+X-IronPort-AV: E=Sophos;i="5.93,280,1654585200"; 
+   d="scan'208";a="294378000"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 00:17:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,280,1654585200"; 
+   d="scan'208";a="673719782"
+Received: from sqa-gate.sh.intel.com (HELO michael.clx.dev.tsp.org) ([10.239.48.212])
+  by fmsmga008.fm.intel.com with ESMTP; 01 Sep 2022 00:17:25 -0700
+From:   Kevin Tian <kevin.tian@intel.com>
+To:     Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Eric Farman <farman@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
         Alex Williamson <alex.williamson@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linaro-mm-sig@lists.linaro.org, linux-media@vger.kernel.org,
-        Sumit Semwal <sumit.semwal@linaro.org>
-Cc:     Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
-        Maor Gottlieb <maorg@nvidia.com>,
-        Oded Gabbay <ogabbay@kernel.org>
-References: <1-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
-From:   =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>
-In-Reply-To: <1-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR0P281CA0096.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a9::9) To BN8PR12MB3587.namprd12.prod.outlook.com
- (2603:10b6:408:43::13)
+        Longfang Liu <liulongfang@huawei.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Yi Liu <yi.l.liu@intel.com>
+Subject: [PATCH v2 00/15] Tidy up vfio_device life cycle
+Date:   Thu,  1 Sep 2022 22:37:32 +0800
+Message-Id: <20220901143747.32858-1-kevin.tian@intel.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 51b1847f-e04c-4d55-98a5-08da8bef4d6c
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4268:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: B32TyWLE8BH7Qv2uSblS2IxuO5xUKZz5dFoFa2hs5OGlSuM8JrFQHh/bYbdZt4AhIUI7F0xrWPuF9nfUHdi2rsBXxEyuTZoHsiLsbUdNclsQ9+a3mWS+2FQsyIVtcM+smjnCuKIUsxFyV0iVXd7N/YWYq3zhvl/W66YO24K2ESbP+M4UrnWgrNK6EgHhOzDSjBiKiHf5pSC6jFeDCHrASnsRGUQIqMLaUVWfoRHPLB31O2OUIq50yjJ7vb64+OSuXVUI+7HEIywOwEpDEHkz/43R07IUZdYgJs8KkmhOj4eESCDQwVLDkQLwax9lp7uNwzYSgi0JdK+hjy+ddMuMb1iv5NbzDGzKV396Rr7wnxymny1IoONIlY/QfxyInMWdxUmZGc1zkCaSSSeGcecs9tkTX8pFBhRshN0MfY3/OpJvBhNC2yWncacktirNcYwirtxIFHKTn5r9ppSPVYmvQ1ffqJLObttGpUsBL6wjXmgL2dvDUevrxMKM2adBaTJNfhsU71NlTpRD1X/FkfRZjsZvCbBoooO3YTsokrkd7y/IIhGuQaTrGrz0ZYZIDVsLhlWweFlmrAnjDKGtKxt+XVOMujAft8RAJVR/UkausBw5QPIB+o86MRQiFVaDQxown7zbYoX4Lcc/xlEjMyqB/zs4Ebv2NQ3899BpbpHjLOkX+pldmTakynWS2kQY/VNF6DPxSTFT6gvDqNgSCAeJh60++/IGfG5Qe7PS/ms7ASpaF/FtqPmgnFQpBfj6LfECjbKjTxdHAK8pvwvH5qF5qL4xKLGh6FcZjNm2WJ9W/uM=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR12MB3587.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(396003)(376002)(136003)(346002)(39860400002)(31696002)(83380400001)(66946007)(38100700002)(2616005)(66476007)(8676002)(4326008)(66556008)(110136005)(54906003)(316002)(2906002)(8936002)(7416002)(5660300002)(6506007)(26005)(186003)(6512007)(41300700001)(6666004)(478600001)(6486002)(86362001)(31686004)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SmhHV1NKQ3F2eXIydUkrUFA3SFF2eVkraEhKWTVDTG1vNFJBWEU5OUpNUXNn?=
- =?utf-8?B?YzRHYXQzNkFXelNNaUZMcE02SEVKU2RvMnUxamdkTkZqeEI5RHhRTk5jQlZ5?=
- =?utf-8?B?TGZLSFJXWHExUG9Edy95d211ZXZHM05uVGNBdXd6emJhazIyemtkZmNpRFNW?=
- =?utf-8?B?MGhWZFJXeWRBZFhYNzNzSENnYWtQakZ3VVIvK0JCQ0wvSzJzYlJJS0xCOVRz?=
- =?utf-8?B?ZHZFL29QazJUa2pNR1ZweW5VNzhHRTA1M2VZZFRUVFdlSUgxS3Z5Ly80ZUwx?=
- =?utf-8?B?MStoMXlnUlFsYzhuMUg1SW5DdmFGOFJ5RFJlSFJSc0EvKzBwaitsVmFsb2Jy?=
- =?utf-8?B?dm5vb0Y5YTFqdW5aM3NyM20vQlltU3pzdlY5am81ejd1dHBFR3dPelVJTVJl?=
- =?utf-8?B?MUFEOHFxSHljNXVyMGZPaGZ5N09INFZnYnlMalBaQTVRQXI3UkRrb3hzb3ZB?=
- =?utf-8?B?S09MVjV5SUx5SEoyNHRrTThraG5jMVdheUorc3ZDc243dUlITEJRcVdPcERZ?=
- =?utf-8?B?bXlHNXlmVkNrZG10U0hWN2J3QnRwWVJ3L2F4bnpEQ3pmbUlNMFlqTXo5Qkpl?=
- =?utf-8?B?aUtIalNNV1F3NERUZ0g0cjFacUhSYXJzeFBFelZnc3hFMFFINzdUdHV2bWdh?=
- =?utf-8?B?bVV4QURzYmREZmNsL0hvMmZFdmVweXk0bk0wQWJvOUUxMmZQeDlLbFNTM2Qr?=
- =?utf-8?B?WVdKRmxZdGhjTzlVd1pBYjdiYmErL2ZkRllEV3VROGlDYnlPL2JUK1gyK3E1?=
- =?utf-8?B?RFVKdVFIQytqRUxzc2FzbWI1djRUMzl4QWRPa0FMbDg1QWcraW13Zm41dDdV?=
- =?utf-8?B?V2dTeTBybGw0dU5OdS9vb1VTMDFDR3FaVXVhaEIvVzNDSU5CWWxxTGJNUWZp?=
- =?utf-8?B?Y1JQMHpILzJ6ZmpCWUwvVnFYN0dnVktlaUVTT3VxdVc0ZUFRWXZEVmhWM1ky?=
- =?utf-8?B?SEhTZlRuRWdTRWJ2MUM1anpqRFVwd2drdkl0YVdGZ2dYanVtRC9ncUgvVVNM?=
- =?utf-8?B?dmlQME1CUHRhN2lNbjBEa3dmWEplVmlxS2cwVFlpbHh6aUROZUJWVWFHblZi?=
- =?utf-8?B?ZWdaR3JmbG1CSDBaSjRFcXFtMUJqRmttU25rcVVoMzRjejVNN1JTUGdkWnl3?=
- =?utf-8?B?aVdJOFQ2VitRWmhBdlhIV0ZHQThiVFJobVNpOWV1N09DU2NZQjIwK08xdlI5?=
- =?utf-8?B?aEUwQVRTMUJRSWZhcDRhNXBnKzFBR0xna05DY2I2S3ViU3BmZC9EL1N2YkxE?=
- =?utf-8?B?MjF5TU9LWm5namRQNEpDQkJvWXBFUHlVaEZ2TVMvWTF1ZUVQSDZwZGUyQnNz?=
- =?utf-8?B?dkk1d25mTnJudW9tdUZEMTUzT2o1cGhrdnBqY0pkUkVrUi8xeUV4TnJ6L2pV?=
- =?utf-8?B?UEdON0dvckhVTC9PcU1vakQzYXdlaUFIYkZjbjhSVTUvRjgvMkFReFRsMGtN?=
- =?utf-8?B?Z3FEa1hQTXlsWW1PWEpGc1RqV09nZlVON2xGbkhDS3VRcWxoRkFaSHlySTha?=
- =?utf-8?B?MlZldlUxeVFxQ0NGZEF2OHN1eWJsTk9zWGlCQ0R4TGR1bVZQVTlhSGphSmRB?=
- =?utf-8?B?SnJDMzFOWmdiaTl0VEhuL2M3UW80LzRCT1JJNE9vRXpOSlhMSDgxQzdmV1FQ?=
- =?utf-8?B?ek5iSDA0bjNwMU00ZWx5Sk5jQVU0bE5TaW40SUVwRUZOa3V0aFl6TnZPUFlH?=
- =?utf-8?B?V2g0Yjl3TEt5QXlOSXZBM3RHcktOVVZJS1JlWFlDeVFNRlZoWGpXUDZFSU03?=
- =?utf-8?B?VmdIU0hVWVB2Mi9NVzhGNmZ3djg3QkxyZWRyb1V1VHBOTWI2VjNNTHhFK2g2?=
- =?utf-8?B?OUFRMHFuSk5sTU1nYlNzN0NPR1NDeWk4ZVlaWkkza0xMSVM0M0hKbkplMEo5?=
- =?utf-8?B?YXZGN1ZXU1RCWTArck5JMVJHYnBnQkoyNXVkRU9lelZ4bGoydC9rWVZUb0tv?=
- =?utf-8?B?aGlFTEFHeWlDMDJLOVdqcE1ZUjlMVDYwNjhCUTVZTEwybEk0cmtFUzhPeldS?=
- =?utf-8?B?Z1poYi8rdGFNeXY3Wmhad2lMRnF5a09lMDZXVTNHYUxCc3k5YmRmOTh5VWhh?=
- =?utf-8?B?WmNwajRtRGsxWWtValk4SWVremFtRHRDR294V2E4ZkNMRnpjZGh1aG1PbzVo?=
- =?utf-8?Q?99LOt9lSr8D4PWskZs5O/Y/Qh?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 51b1847f-e04c-4d55-98a5-08da8bef4d6c
-X-MS-Exchange-CrossTenant-AuthSource: BN8PR12MB3587.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2022 07:55:14.6253
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: oR4Y1MhJuB9SUFS9JlZKhXG9lKO8OWUCLE8YsgxSgUnbrdsufdIOLgusvV1vwTTs
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4268
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_06_12,
+        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -130,51 +92,116 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 01.09.22 um 01:12 schrieb Jason Gunthorpe:
-> Used to increment the refcount of the dma buf's struct file, only if the
-> refcount is not zero. Useful to allow the struct file's lifetime to
-> control the lifetime of the dmabuf while still letting the driver to keep
-> track of created dmabufs.
->
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->   include/linux/dma-buf.h | 13 +++++++++++++
->   1 file changed, 13 insertions(+)
->
-> diff --git a/include/linux/dma-buf.h b/include/linux/dma-buf.h
-> index 71731796c8c3a8..a35f1554f2fb36 100644
-> --- a/include/linux/dma-buf.h
-> +++ b/include/linux/dma-buf.h
-> @@ -618,6 +618,19 @@ int dma_buf_fd(struct dma_buf *dmabuf, int flags);
->   struct dma_buf *dma_buf_get(int fd);
->   void dma_buf_put(struct dma_buf *dmabuf);
->   
-> +/**
-> + * dma_buf_try_get - try to get a reference on a dmabuf
-> + * @dmabuf - the dmabuf to get
-> + *
-> + * Returns true if a reference was successfully obtained. The caller must
-> + * interlock with the dmabuf's release function in some way, such as RCU, to
-> + * ensure that this is not called on freed memory.
+The idea is to let vfio core manage the vfio_device life cycle instead
+of duplicating the logic cross drivers. Besides cleaner code in driver
+side this also allows adding struct device to vfio_device as the first
+step toward adding cdev uAPI in the future. Another benefit is that
+user can now look at sysfs to decide whether a device is bound to
+vfio [1], e.g.:
 
-I still have a bad feeling about this, but I also see that we can only 
-choose between evils here.
+	/sys/devices/pci0000\:6f/0000\:6f\:01.0/vfio-dev/vfio0
 
-Could you just call get_file_rcu() from the exporter with a comment 
-explaining why this works instead?
+Though most drivers can fit the new model naturally:
 
-That would at least not give importers the opportunity to abuse this.
+ - vfio_alloc_device() to allocate and initialize vfio_device
+ - vfio_put_device() to release vfio_device
+ - dev_ops->init() for driver private initialization
+ - dev_ops->release() for driver private cleanup
 
-Thanks,
-Christian.
+vfio-ccw is the only exception due to a life cycle mess that its private
+structure mixes both parent and mdev info hence must be alloc/freed
+outside of the life cycle of vfio device.
 
-> + */
-> +static inline bool dma_buf_try_get(struct dma_buf *dmabuf)
-> +{
-> +	return get_file_rcu(dmabuf->file);
-> +}
-> +
->   struct sg_table *dma_buf_map_attachment(struct dma_buf_attachment *,
->   					enum dma_data_direction);
->   void dma_buf_unmap_attachment(struct dma_buf_attachment *, struct sg_table *,
+Per prior discussions this won't be fixed in short term by IBM folks [2].
 
+Instead of waiting this series introduces a few tricks to move forward:
+
+ - vfio_init_device() to initialize a pre-allocated device structure;
+
+ - require *EVERY* driver to implement @release and free vfio_device
+   inside. Then vfio-ccw can use a completion mechanism to delay the
+   free to css driver;
+
+The second trick is not a real burden to other drivers because they
+all require a @release for private cleanup anyay. Later once the ccw
+mess is fixed a simple cleanup can be done by moving free from @release
+to vfio core.
+
+v2:
+ - rebase to 6.0-rc3
+ - fix build warnings (lkp)
+ - patch1: remove unnecessary forward reference (Jason)
+ - patch10: leave device_set released by vfio core (Jason)
+ - patch13: add Suggested-by
+ - patch15: add ABI file sysfs-devices-vfio-dev (Alex)
+ - patch15: rename 'vfio' to 'vfio_group' in procfs (Jason)
+v1: https://lore.kernel.org/lkml/20220827171037.30297-1-kevin.tian@intel.com/
+
+--
+@Alex, before knowing your merging preference this is only rebased to
+6.0-rc3.
+
+There is no conflict with:
+
+ - Remove private items from linux/vfio_pci_core.h
+ - Break up ioctl dispatch functions to one function per ioctl
+
+But conflict exists with Jason's two series:
+
+ - Allow MMIO regions to be exported through dma-buf
+ - vfio: Split the container code into a clean layer and dedicated file
+
+Thanks
+Kevin
+
+[1] https://listman.redhat.com/archives/libvir-list/2022-August/233482.html
+[2] https://lore.kernel.org/all/0ee29bd6583f17f0ee4ec0769fa50e8ea6703623.camel@linux.ibm.com/
+
+Kevin Tian (6):
+  vfio: Add helpers for unifying vfio_device life cycle
+  drm/i915/gvt: Use the new device life cycle helpers
+  vfio/platform: Use the new device life cycle helpers
+  vfio/amba: Use the new device life cycle helpers
+  vfio/ccw: Use the new device life cycle helpers
+  vfio: Rename vfio_device_put() and vfio_device_try_get()
+
+Yi Liu (9):
+  vfio/pci: Use the new device life cycle helpers
+  vfio/mlx5: Use the new device life cycle helpers
+  vfio/hisi_acc: Use the new device life cycle helpers
+  vfio/mdpy: Use the new device life cycle helpers
+  vfio/mtty: Use the new device life cycle helpers
+  vfio/mbochs: Use the new device life cycle helpers
+  vfio/ap: Use the new device life cycle helpers
+  vfio/fsl-mc: Use the new device life cycle helpers
+  vfio: Add struct device to vfio_device
+
+ .../ABI/testing/sysfs-devices-vfio-dev        |   8 +
+ drivers/gpu/drm/i915/gvt/gvt.h                |   5 +-
+ drivers/gpu/drm/i915/gvt/kvmgt.c              |  52 ++++--
+ drivers/gpu/drm/i915/gvt/vgpu.c               |  33 ++--
+ drivers/s390/cio/vfio_ccw_ops.c               |  52 +++++-
+ drivers/s390/cio/vfio_ccw_private.h           |   3 +
+ drivers/s390/crypto/vfio_ap_ops.c             |  50 +++---
+ drivers/vfio/fsl-mc/vfio_fsl_mc.c             |  85 +++++----
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    |  80 ++++-----
+ drivers/vfio/pci/mlx5/main.c                  |  49 +++--
+ drivers/vfio/pci/vfio_pci.c                   |  20 +--
+ drivers/vfio/pci/vfio_pci_core.c              |  23 ++-
+ drivers/vfio/platform/vfio_amba.c             |  72 ++++++--
+ drivers/vfio/platform/vfio_platform.c         |  66 +++++--
+ drivers/vfio/platform/vfio_platform_common.c  |  71 +++-----
+ drivers/vfio/platform/vfio_platform_private.h |  18 +-
+ drivers/vfio/vfio_main.c                      | 167 +++++++++++++++---
+ include/linux/vfio.h                          |  28 ++-
+ include/linux/vfio_pci_core.h                 |   6 +-
+ samples/vfio-mdev/mbochs.c                    |  73 +++++---
+ samples/vfio-mdev/mdpy.c                      |  81 +++++----
+ samples/vfio-mdev/mtty.c                      |  67 ++++---
+ 22 files changed, 729 insertions(+), 380 deletions(-)
+ create mode 100644 Documentation/ABI/testing/sysfs-devices-vfio-dev
+
+
+base-commit: b90cb1053190353cc30f0fef0ef1f378ccc063c5
+-- 
+2.21.3
