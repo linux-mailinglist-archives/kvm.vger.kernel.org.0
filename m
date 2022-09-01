@@ -2,66 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A5B0F5A9D81
-	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 18:50:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C769F5A9D84
+	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 18:53:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234256AbiIAQuo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 12:50:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35300 "EHLO
+        id S234444AbiIAQwo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 12:52:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233996AbiIAQuk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 12:50:40 -0400
-Received: from mail-oa1-x35.google.com (mail-oa1-x35.google.com [IPv6:2001:4860:4864:20::35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 096645E56B
-        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 09:50:37 -0700 (PDT)
-Received: by mail-oa1-x35.google.com with SMTP id 586e51a60fabf-11f34610d4aso22173384fac.9
-        for <kvm@vger.kernel.org>; Thu, 01 Sep 2022 09:50:37 -0700 (PDT)
+        with ESMTP id S231133AbiIAQwn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 12:52:43 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7452C979F5;
+        Thu,  1 Sep 2022 09:52:42 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id w88-20020a17090a6be100b001fbb0f0b013so3238972pjj.5;
+        Thu, 01 Sep 2022 09:52:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=TmAVIGCxkXwVO7ChCEmtXTeEcWuZVHFSmie/Vk4DZ0o=;
-        b=omPCDQTtFdF1Pp9rmOPhl+BpfMCCG8gc4fqP7jMSkdATi+5x9Iaf5ivx4PiI+Uz8On
-         FzpKKebiTzQEYifsrMmTptA/jSgGOo5udB90Gc4/cqEhObV92ziHF+iNY6ZLFtvdD6P6
-         kYwS2lGssQs7F2SU7bZYIA8aABx/D+75oFaYz4HDXJTGz0CqPVMduf+nc/c0FcQkmlul
-         6yMGheXZOCy8YzNRjJiFZfRikc5k01zQOxNPsZcIifAOhqLC02KgKUKvvdElzRZ3KHOI
-         ffoTXB92JQrqrxph3S+tf5I/IqnXPraVcGjsTT27mEOhn9cz8t+z9QR+FvdA6ePj3H52
-         LR0A==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc;
+        bh=EyYzuAJICZEJkeXJX1j7tTOYHHP3WGLUevJ1ub5HhfA=;
+        b=bJYn0c4dA5o6LdUBFOu/jowBMOlO1js31IW99n1CfFxdw/+1+TLvhTiuB1Qhv7Mo9y
+         WRums3uISzLpDmLGIn23q+DxIrCeQa1xSNKNlHo+VFq417Slm+uxi4y+hGuFYaj05Jug
+         yylzuj47la/WnOnr64saKhbbW2MkmcMaPhXFSdAs3YIlCZkrdn2sKVBt7OFO5US37ShH
+         5ZqJp9tXHLvU9e6YGH6mCqgzDbeb6TCY+MTLLn0oWO/pjw1E/dXgiO4dNBdup3W4O3hz
+         dQLNmbBonzIA4BhH5zUNDf4xqi7ZCMD3DkqzsIMizLfYy15YPzXFUKW9PthwwU3qB8ot
+         sR1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=TmAVIGCxkXwVO7ChCEmtXTeEcWuZVHFSmie/Vk4DZ0o=;
-        b=FbCjuHOpTLrWMTM2eDfn480uuCLxoXP1/VkzCmmk84iX4MkjLyoIzmv9t5rwk3J+TD
-         +JfD747WApitLJXFu+SploDXbSh5MylbjqpMMsgjthD7OlJ2CdBgMvLUjyxuIU22ALAz
-         R7IAZG4OdU9EFdjFPJnXXQWYVwbF2BP9hnET8+1CW6cr5WWS/Ru5g9/JjFK/GDKGTURg
-         6HrPIRTYYANSnVcw5mSItRNPFa5yt5fs0NqiKj9rHDYzMVoIXvLed8hre4rs2RE2lAF2
-         NzfmzD3GrQDk2UMgY85RrfEhSSh1dXIgr87pFuTnqK/3k2QyQZ9igVE5rGaWNke1qmW+
-         ydMg==
-X-Gm-Message-State: ACgBeo123Bp25GKzXKCIL+r9Mb3p4XiOk07ENtrHPOC38IH1pmbM7O+V
-        hcD/NQCe1sDOANHlBEAVvkNoTpvpbZgSPTQ/LJ3tkw==
-X-Google-Smtp-Source: AA6agR51wUW2Y3wpErwfy495QJV9+d/YUYuAjevPe91xmTBTaUBdhwV99NFOSBeKXlOBnVhS+N/qlmUJhxYKB8X6K9M=
-X-Received: by 2002:a05:6808:656:b0:343:2783:7e62 with SMTP id
- z22-20020a056808065600b0034327837e62mr6728oih.297.1662051036136; Thu, 01 Sep
- 2022 09:50:36 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=EyYzuAJICZEJkeXJX1j7tTOYHHP3WGLUevJ1ub5HhfA=;
+        b=ryQbcJCN1odW/kaLn7TjaO3RsijW5YFnbjDDCTTFp5UAqzo7yv9wrw2cceXEZCrc4u
+         6lueAJZ6xJNPCYz/sS8IQXIZhpkniXx1+ZD/RXBgz9Aas+gbLTfwuhkmP2OthbmSr28y
+         btmCPHLwLSlamE5NuGOcLpe6aAeRpz0YQTFvnTM05ViDfhOWWAGMMzyiXSlzCanq0Dkq
+         lqVkkEeEnjmxTxT3za+AtYckNog38BW7BBp9Z7K9YK0C+kazpv7s1xQgPzbsoskBRcuE
+         BIhUeXMBZ7XE1ElLRTew67LoHEU+cs5IdgA/OF2x2YnSVE4rblq4u0cgNrCJCsJxvAVG
+         fYvQ==
+X-Gm-Message-State: ACgBeo0pbo8MlG8JgddtrwVhGXCENwoAeoVL8vMnRMVoP4lTXuksJFfT
+        Tzbm03J163+k/JfLS48p198=
+X-Google-Smtp-Source: AA6agR67jmgSj2wsMKqv5E1HqgxQ3iSX+z5Id4efYN9RgT1LfhGxXwSgcEzKspAbxSmw7jMWpykDWQ==
+X-Received: by 2002:a17:903:244f:b0:175:34d6:97a8 with SMTP id l15-20020a170903244f00b0017534d697a8mr11727714pls.100.1662051161743;
+        Thu, 01 Sep 2022 09:52:41 -0700 (PDT)
+Received: from localhost ([192.55.55.51])
+        by smtp.gmail.com with ESMTPSA id s3-20020a170902ea0300b00174c5fb500dsm9301380plg.116.2022.09.01.09.52.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Sep 2022 09:52:41 -0700 (PDT)
+Date:   Thu, 1 Sep 2022 09:52:40 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "Gao, Chao" <chao.gao@intel.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        "will@kernel.org" <will@kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>
+Subject: Re: [PATCH v2 05/19] KVM: Rename and move CPUHP_AP_KVM_STARTING to
+ ONLINE section
+Message-ID: <20220901165240.GG2711697@ls.amr.corp.intel.com>
+References: <cover.1661860550.git.isaku.yamahata@intel.com>
+ <d2c8815a56be1712e189ddcbea16c8b6cbc53e4a.1661860550.git.isaku.yamahata@intel.com>
+ <YxBOoWckyP1wvzMZ@gao-cwp>
+ <933858c97f69bcf6fb00ea5dcb2ec9fa368eced3.camel@intel.com>
 MIME-Version: 1.0
-References: <20220826231227.4096391-1-dmatlack@google.com> <20220826231227.4096391-9-dmatlack@google.com>
- <20220830235708.GB2711697@ls.amr.corp.intel.com>
-In-Reply-To: <20220830235708.GB2711697@ls.amr.corp.intel.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Thu, 1 Sep 2022 09:50:10 -0700
-Message-ID: <CALzav=fg8xonNUkbFcep6kcVcBGtsp2RRW0_NKUL8DhdbQbRPA@mail.gmail.com>
-Subject: Re: [PATCH v2 08/10] KVM: x86/mmu: Split out TDP MMU page fault handling
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Kai Huang <kai.huang@intel.com>, Peter Xu <peterx@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <933858c97f69bcf6fb00ea5dcb2ec9fa368eced3.camel@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,142 +80,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 30, 2022 at 4:57 PM Isaku Yamahata <isaku.yamahata@gmail.com> wrote:
->
-> On Fri, Aug 26, 2022 at 04:12:25PM -0700,
-> David Matlack <dmatlack@google.com> wrote:
->
-> > Split out the page fault handling for the TDP MMU to a separate
-> > function.  This creates some duplicate code, but makes the TDP MMU fault
-> > handler simpler to read by eliminating branches and will enable future
-> > cleanups by allowing the TDP MMU and non-TDP MMU fault paths to diverge.
-> >
-> > Only compile in the TDP MMU fault handler for 64-bit builds since
-> > kvm_tdp_mmu_map() does not exist in 32-bit builds.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: David Matlack <dmatlack@google.com>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c | 62 ++++++++++++++++++++++++++++++++----------
-> >  1 file changed, 48 insertions(+), 14 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index a185599f4d1d..8f124a23ab4c 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -4242,7 +4242,6 @@ static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
-> >
-> >  static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> >  {
-> > -     bool is_tdp_mmu_fault = is_tdp_mmu(vcpu->arch.mmu);
-> >       int r;
-> >
-> >       if (page_fault_handle_page_track(vcpu, fault))
-> > @@ -4261,11 +4260,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
-> >               return r;
-> >
-> >       r = RET_PF_RETRY;
-> > -
-> > -     if (is_tdp_mmu_fault)
-> > -             read_lock(&vcpu->kvm->mmu_lock);
-> > -     else
-> > -             write_lock(&vcpu->kvm->mmu_lock);
-> > +     write_lock(&vcpu->kvm->mmu_lock);
-> >
-> >       if (is_page_fault_stale(vcpu, fault))
-> >               goto out_unlock;
-> > @@ -4274,16 +4269,10 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
-> >       if (r)
-> >               goto out_unlock;
-> >
-> > -     if (is_tdp_mmu_fault)
-> > -             r = kvm_tdp_mmu_map(vcpu, fault);
-> > -     else
-> > -             r = __direct_map(vcpu, fault);
-> > +     r = __direct_map(vcpu, fault);
-> >
-> >  out_unlock:
-> > -     if (is_tdp_mmu_fault)
-> > -             read_unlock(&vcpu->kvm->mmu_lock);
-> > -     else
-> > -             write_unlock(&vcpu->kvm->mmu_lock);
-> > +     write_unlock(&vcpu->kvm->mmu_lock);
-> >       kvm_release_pfn_clean(fault->pfn);
-> >       return r;
-> >  }
-> > @@ -4331,6 +4320,46 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
-> >  }
-> >  EXPORT_SYMBOL_GPL(kvm_handle_page_fault);
-> >
-> > +#ifdef CONFIG_X86_64
-> > +int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu,
-> > +                        struct kvm_page_fault *fault)
->
-> nitpick: static
+On Thu, Sep 01, 2022 at 10:58:04AM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
-Will do.
+> On Thu, 2022-09-01 at 14:18 +0800, Gao, Chao wrote:
+> > On Tue, Aug 30, 2022 at 05:01:20AM -0700, isaku.yamahata@intel.com wrote:
+> > > From: Chao Gao <chao.gao@intel.com>
+> > > 
+> > > The CPU STARTING section doesn't allow callbacks to fail. Move KVM's
+> > > hotplug callback to ONLINE section so that it can abort onlining a CPU in
+> > > certain cases to avoid potentially breaking VMs running on existing CPUs.
+> > > For example, when kvm fails to enable hardware virtualization on the
+> > > hotplugged CPU.
+> > > 
+> > > Place KVM's hotplug state before CPUHP_AP_SCHED_WAIT_EMPTY as it ensures
+> > > when offlining a CPU, all user tasks and non-pinned kernel tasks have left
+> > > the CPU, i.e. there cannot be a vCPU task around. So, it is safe for KVM's
+> > > CPU offline callback to disable hardware virtualization at that point.
+> > > Likewise, KVM's online callback can enable hardware virtualization before
+> > > any vCPU task gets a chance to run on hotplugged CPUs.
+> > > 
+> > > KVM's CPU hotplug callbacks are renamed as well.
+> > > 
+> > > Suggested-by: Thomas Gleixner <tglx@linutronix.de>
+> > > Signed-off-by: Chao Gao <chao.gao@intel.com>
+> > 
+> > Isaku, your signed-off-by is missing.
+> > 
+> > > Link: https://lore.kernel.org/r/20220216031528.92558-6-chao.gao@intel.com
+> > > ---
+> > > include/linux/cpuhotplug.h |  2 +-
+> > > virt/kvm/kvm_main.c        | 30 ++++++++++++++++++++++--------
+> > > 2 files changed, 23 insertions(+), 9 deletions(-)
+> > > 
+> > > diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
+> > > index f61447913db9..7972bd63e0cb 100644
+> > > --- a/include/linux/cpuhotplug.h
+> > > +++ b/include/linux/cpuhotplug.h
+> > > @@ -185,7 +185,6 @@ enum cpuhp_state {
+> > > 	CPUHP_AP_CSKY_TIMER_STARTING,
+> > > 	CPUHP_AP_TI_GP_TIMER_STARTING,
+> > > 	CPUHP_AP_HYPERV_TIMER_STARTING,
+> > > -	CPUHP_AP_KVM_STARTING,
+> > > 	CPUHP_AP_KVM_ARM_VGIC_INIT_STARTING,
+> > > 	CPUHP_AP_KVM_ARM_VGIC_STARTING,
+> > > 	CPUHP_AP_KVM_ARM_TIMER_STARTING,
+> > 
+> > The movement of CPUHP_AP_KVM_STARTING changes the ordering between
+> > CPUHP_AP_KVM_STARTING and CPUHP_AP_KVM_ARM_* above [1]. We need
+> > the patch [2] from Marc to avoid breaking ARM.
+> > 
+> > [1] https://lore.kernel.org/lkml/87sfsq4xy8.wl-maz@kernel.org/
+> > [2] https://lore.kernel.org/lkml/20220216031528.92558-5-chao.gao@intel.com/
+> 
+> How about Isaku just to take your series directly (+his SoB) and add additional
+> patches?
 
->
-> > +{
-> > +     int r;
-> > +
-> > +     if (page_fault_handle_page_track(vcpu, fault))
-> > +             return RET_PF_EMULATE;
-> > +
-> > +     r = fast_page_fault(vcpu, fault);
-> > +     if (r != RET_PF_INVALID)
-> > +             return r;
-> > +
-> > +     r = mmu_topup_memory_caches(vcpu, false);
-> > +     if (r)
-> > +             return r;
-> > +
-> > +     r = kvm_faultin_pfn(vcpu, fault, ACC_ALL);
-> > +     if (r != RET_PF_CONTINUE)
-> > +             return r;
-> > +
-> > +     r = RET_PF_RETRY;
-> > +     read_lock(&vcpu->kvm->mmu_lock);
-> > +
-> > +     if (is_page_fault_stale(vcpu, fault))
-> > +             goto out_unlock;
-> > +
-> > +     r = make_mmu_pages_available(vcpu);
-> > +     if (r)
-> > +             goto out_unlock;
-> > +
-> > +     r = kvm_tdp_mmu_map(vcpu, fault);
-> > +
-> > +out_unlock:
-> > +     read_unlock(&vcpu->kvm->mmu_lock);
-> > +     kvm_release_pfn_clean(fault->pfn);
-> > +     return r;
-> > +}
-> > +#endif
-> > +
-> >  int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> >  {
-> >       /*
-> > @@ -4355,6 +4384,11 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> >               }
-> >       }
-> >
-> > +#ifdef CONFIG_X86_64
-> > +     if (tdp_mmu_enabled)
-> > +             return kvm_tdp_mmu_page_fault(vcpu, fault);
-> > +#endif
-> > +
-> >       return direct_page_fault(vcpu, fault);
-> >  }
->
-> Now we mostly duplicated page_fault method.  We can go one step further.
-> kvm->arch.mmu.page_fault can be set for each case.  Maybe we can do it later
-> if necessary.
-
-Hm, interesting idea. We would have to refactor the MTRR max_level
-code in kvm_tdp_page_fault() into a helper function, but otherwise
-that idea would work. I will give it a try in the next version.
-
-> --
-> Isaku Yamahata <isaku.yamahata@gmail.com>
+Ok will do.  Although I hoped to slim it down, I've ended up to take most of it.
+four out of six.  Now why not two more.
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
