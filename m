@@ -2,128 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 48A425A9BB3
-	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 17:30:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 023F35A9BCE
+	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 17:37:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234674AbiIAPa0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 11:30:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42410 "EHLO
+        id S234069AbiIAPhW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 11:37:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234617AbiIAPaD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 11:30:03 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 995612607
-        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 08:29:52 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id w88-20020a17090a6be100b001fbb0f0b013so2969261pjj.5
-        for <kvm@vger.kernel.org>; Thu, 01 Sep 2022 08:29:52 -0700 (PDT)
+        with ESMTP id S233646AbiIAPhU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 11:37:20 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B5E1792D8
+        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 08:37:19 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id bh13so16731317pgb.4
+        for <kvm@vger.kernel.org>; Thu, 01 Sep 2022 08:37:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=uEj+Y7Y/+YOHMSskQFWNi+2HHQDrIeW3yFZoL+MzmCA=;
-        b=XnJ2wsCxF8tcfraG5sEl0nCNjGP9Bilt7of9qMjRKEcLdnCtKg/Y/70LxLSz5b/LQW
-         HB7FwbLhalHN/C3kOLN1pB2v/LJyTHSucRh85pppfXgfAzvejP4gPJFlfiU8Q+KnCQmU
-         yPdk/503lGXLXQ71TW81D1UxFpAE9siiVke4rKqb/jPQ2gGYMfU6ln/flqL9VNl+PH3C
-         0Fv+RojMJYsoBEaBN7p0QfRr4O/7KG5Ylhr9ReSQf80+DUFAXTVV5+CiTRkMurXAdzAk
-         lZRuywlOuVc01HdjcAYq125MKpHz8Zmk3KfemiIY9iKxSPCbb/hwFo07lNSf8jt/YxaF
-         1i3w==
+        bh=YDVYQsuU6s5buwUKaoSyW52HU9Fi2XFtlERumB7twbo=;
+        b=KGMOWmXOe9YjIfL0P64s9lFGHXuwn6yFmDKdS6PIMG++a9Z5mLZRtVjeAnEFWOcsbs
+         e1826Z3KC6WjicbpfIvpiXYvI/KLqGTvH7IUl6AVRH3HbX92gJWKsFS0ynvE3SuUnZDZ
+         9Jm5aJVgrUjBwA4PVUoEuPLiD+gPSv9wUkwEKqEHxl5gzC8fOt7fWEOnpN7yyDvd0WgN
+         B1P8PFDzGw7IOS5nteeN3AB7/9A/sQCtHMxzz23OabfcYWLlrjdynO7XQS1giPoGOYDM
+         ddJeeJnyB+5oYgQd557BiHjEtvkMch4Gi4FgusEThqZ8eHEOOhTIdfa6LEoEUhMkl/7W
+         +QXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=uEj+Y7Y/+YOHMSskQFWNi+2HHQDrIeW3yFZoL+MzmCA=;
-        b=AcxVlS+e3GjD8BZfVr96kvQzXo9Vt4Ixxr0vnmRrK/U9sJ6KBh+sxsETVwd7cckalu
-         YlkSfY6Pzcbs5dOl8z39m2r7BJvrjdEnL0UI+RHpeq9COF/4UfW+WoOvRN3aOFzvJ2Sb
-         nIOnLgBlTWM2TJA/N+mTaDp+sPIHa3B+jfMqFzFyjcOYFK6fqCdF6BmZ3JZGmyVdZhgR
-         FFacqwUN0OeS1tk1TclNmc4VHoNFO7+tY1gTQzXTK0arVa/xFQgud76T3DMArPRRBpcZ
-         w8O92/+y+kNfr0w8x3vNs+Lh1G1WRrPuD+oBxyQQFs235FnMiLIEJWINSH1IozCWgsTD
-         LTUA==
-X-Gm-Message-State: ACgBeo2WAG2w9l952tOJnnZ0Wl9pC5O4L7NtVGlzSrIaIBEroef0MzR1
-        y0i6tDgMDtk3Ska6Gg9y2Z0caw==
-X-Google-Smtp-Source: AA6agR6g/blRPHq0d3n7aMFn6OtHPk3vvVO7+7+iZmO5GTldkf85RNK960XEeC83SwKhjZRzxu+kdA==
-X-Received: by 2002:a17:90b:1d0f:b0:1fe:4171:6e6f with SMTP id on15-20020a17090b1d0f00b001fe41716e6fmr5633707pjb.206.1662046191185;
-        Thu, 01 Sep 2022 08:29:51 -0700 (PDT)
+        bh=YDVYQsuU6s5buwUKaoSyW52HU9Fi2XFtlERumB7twbo=;
+        b=USFtkewHw79hH/nmKP1zHCXJXzSFjill/E74PVVZ3/98W513aAtaYwGjDsG+zX2uWJ
+         HDgB0FHHgAmRCzfQNKLYNwK445bGDCOfert41KFtUFY0FyFnhvcSVz3oW+78I2mPIBRf
+         wB1Rfwiw0MY2E78QjNZkBSQTbg6LiD117MPeJmbWZxxfgw7/+LS32SF8i+nNC0CzPurN
+         5ZeG/5VnE88bNl2snVdyAMMoCtfiNuExmbtzZw7LIjCOIczyTn4NvHhWMP0WSzlLn/ch
+         yswzsqfCED3r1sNcSysh2hBHz541ocakpXtrZwmIshAeJ1g2h7xeQ8IT9JjcCpidTW6f
+         9wlA==
+X-Gm-Message-State: ACgBeo01JfTPEzy+nfXDeD9V/jFMIG7sPmmDy3fN9DmZgBs47cH6Mwt8
+        kscCaIYqi+i7Cw7vxgT1IhNxfQ==
+X-Google-Smtp-Source: AA6agR4Q1iERWrDzRCPXOpgw719iTo4GnEe1MELTduwlobtAUHlRvqlwucUS5iHfDldQaVGmbIbP5A==
+X-Received: by 2002:a65:6216:0:b0:41d:8248:3d05 with SMTP id d22-20020a656216000000b0041d82483d05mr27501504pgv.36.1662046638926;
+        Thu, 01 Sep 2022 08:37:18 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id r21-20020a170902ea5500b001708c4ebbaesm13590277plg.309.2022.09.01.08.29.49
+        by smtp.gmail.com with ESMTPSA id ij8-20020a170902ab4800b00172e19c5f8bsm6194235plb.168.2022.09.01.08.37.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Sep 2022 08:29:50 -0700 (PDT)
-Date:   Thu, 1 Sep 2022 15:29:46 +0000
+        Thu, 01 Sep 2022 08:37:18 -0700 (PDT)
+Date:   Thu, 1 Sep 2022 15:37:14 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Kyle Huey <me@kylehuey.com>
-Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+To:     Uros Bizjak <ubizjak@gmail.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Robert O'Callahan <robert@ocallahan.org>,
-        David Manouchehri <david.manouchehri@riseup.net>,
-        Borislav Petkov <bp@suse.de>, stable@vger.kernel.org
-Subject: Re: [PATCH v6 1/2] x86/fpu: Allow PKRU to be (once again) written by
- ptrace.
-Message-ID: <YxDP6jie4cwzZIHp@google.com>
-References: <20220829194905.81713-1-khuey@kylehuey.com>
+        Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH] KVM/VMX: Do not declare vmread_error asmlinkage
+Message-ID: <YxDRquTx2piSX66J@google.com>
+References: <20220817144045.3206-1-ubizjak@gmail.com>
+ <Yv0QFZUdePurfjKh@google.com>
+ <CAFULd4bVQ73Cur85Oj=oXHiMRvfrxkAVy=V4TfHcbtNWbqOQzw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220829194905.81713-1-khuey@kylehuey.com>
+In-Reply-To: <CAFULd4bVQ73Cur85Oj=oXHiMRvfrxkAVy=V4TfHcbtNWbqOQzw@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 29, 2022, Kyle Huey wrote:
-> @@ -1246,6 +1246,21 @@ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
->  		}
->  	}
->  
-> +	/*
-> +	 * Update the user protection key storage. Allow KVM to
-> +	 * pass in a NULL pkru pointer if the mask bit is unset
-> +	 * for its legacy ABI behavior.
-> +	 */
-> +	if (pkru)
-> +		*pkru = 0;
-> +
-> +	if (hdr.xfeatures & XFEATURE_MASK_PKRU) {
-> +		struct pkru_state *xpkru;
-> +
-> +		xpkru = __raw_xsave_addr(xsave, XFEATURE_PKRU);
-> +		*pkru = xpkru->pkru;
-> +	}
+On Wed, Aug 31, 2022, Uros Bizjak wrote:
+> On Wed, Aug 17, 2022 at 5:58 PM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > +PeterZ
+> >
+> > On Wed, Aug 17, 2022, Uros Bizjak wrote:
+> > > There is no need to declare vmread_error asmlinkage, its arguments
+> > > can be passed via registers for both, 32-bit and 64-bit targets.
+> > > Function argument registers are considered call-clobbered registers,
+> > > they are saved in the trampoline just before the function call and
+> > > restored afterwards.
+> >
+> > I'm officially confused.  What's the purpose of asmlinkage when used in the kernel?
+> > Is it some historical wart that's no longer truly necessary and only causes pain?
+> >
+> > When I wrote this code, I thought that the intent was that it should be applied to
+> > any and all asm => C function calls.  But that's obviously not required as there
+> > are multiple instances of asm code calling C functions without annotations of any
+> > kind.
+> 
+> It is the other way around. As written in coding-style.rst:
+> 
+> Large, non-trivial assembly functions should go in .S files, with corresponding
+> C prototypes defined in C header files.  The C prototypes for assembly
+> functions should use ``asmlinkage``.
+> 
+> So, prototypes for *assembly functions* should use asmlinkage.
 
-What about writing this as:
+I gotta imagine that documentation is stale.  I don't understand why asmlinkage
+would be a one-way thing.
 
-	if (hdr.xfeatures & XFEATURE_MASK_PKRU) {
-		...
+> That said, asmlinkage for i386 just switches ABI to the default
+> stack-passing ABI. However, we are calling assembly files, so the
+> argument handling in the callee is totally under our control and there
+> is no need to switch ABIs. It looks to me that besides syscalls,
+> asmlinkage is and should be used only for a large imported body of asm
+> functions that use standard stack-passing ABI (e.g. x86 crypto and
+> math-emu functions), otherwise it is just a burden to push and pop
+> registers to/from stack for no apparent benefit.
 
-		*pkru = xpkru->pkru;
-	} else if (pkru) {
-		*pkru = 0;
-	}
+Yeah, this is what I'm confused about.  Unless there's something we're missing,
+we should update the docs to clarify when asmlinkage is actually needed.
 
-to make it slightly more obvious that @pkru must be non-NULL if the feature flag
-is enabled?
+> > And vmread_error() isn't the only case where asmlinkage appears to be a burden, e.g.
+> > schedule_tail_wrapper() => schedule_tail() seems to exist purely to deal with the
+> > side affect of asmlinkage generating -regparm=0 on 32-bit kernels.
+> 
+> schedule_tail is external to the x86 arch directory, and for some
+> reason marked asmlinkage. So, the call from asm must follow asmlinkage
+> ABI.
 
-Or we could be paranoid, though I'm not sure this is worthwhile.
+Ahhh, it's a common helper that's called from assembly on other architectures.
+That makes sense.
 
-	if ((hdr.xfeatures & XFEATURE_MASK_PKRU) &&
-	    !WARN_ON_ONCE(!pkru)) {
-		...
-
-		*pkru = xpkru->pkru;
-	} else if (pkru) {
-		*pkru = 0;
-	}
-
-
-Otherwise, looks good from a KVM perspective.  Thanks!
+Thanks much!
