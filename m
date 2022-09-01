@@ -2,155 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 49DD25AA18A
-	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 23:37:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF4035AA34A
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 00:46:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233250AbiIAVhH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 17:37:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59124 "EHLO
+        id S233846AbiIAWq1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 18:46:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231443AbiIAVhF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 17:37:05 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5239C7331E
-        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 14:37:04 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 15FC3B825A0
-        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 21:37:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C82CAC433C1
-        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 21:37:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662068221;
-        bh=kwmnhsSsmL3Bpyz3SJyjA2AzvuLb2cnC2QInrpvSmSs=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=TO54/Jr0zbNAv7jU0IPNMu5V8/lhxvNZKAXHCU0K2WQIaK2vp0v7eyKYrO8145dSb
-         stYDq8yr6smMKLkWP9J1+QMICCFJkfjHbCqy/NjWv7MRIhossIcRvO67r1YDY0V3xi
-         m/iPjKWTD0Tff4qp1QkyDSGNESNdoimA5JJpHBR8Q4/2iQg9Dxw1qUhrLljIhkB2xy
-         wAbOXrj4wPXMAdiy68Z8kr7YmqZUbQsK/Fyqq/ue2XF8pL7SvAAG0gia0lNTdwu8+p
-         1tAV/rWqudeCxH9pH/yF3Cue2uwdYtx4GTpIhWoK1SRrfYr3YWkN9qjiboHNd9aHkd
-         j8wN9y8aupKRA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id AE1F4C433E4; Thu,  1 Sep 2022 21:37:01 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216388] On Host, kernel errors in KVM, on guests, it shows CPU
- stalls
-Date:   Thu, 01 Sep 2022 21:37:01 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: nanook@eskimo.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216388-28872-Gyj0r7lnsG@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216388-28872@https.bugzilla.kernel.org/>
-References: <bug-216388-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S229584AbiIAWqY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 18:46:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B05BC66114
+        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 15:46:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662072382;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EMTDS8DnyN2eeNSyxyOGmR/0rHhtMQj+1Wvt/dXWAYc=;
+        b=ZXCwPmdLA9CSxz9+SStZmL8OiCOd67cqHg8k38kRbRNalKmKAfePj6dIKSpJ1rksLOkCEG
+        0x7/a6OtTg2IopmNragn32v7reag5z87rUNBrnKUFjK2ISNsRm47fAXOySzfYcTCZDhI9J
+        i5X/3QJGwbs14ruE9rHndJ5YIFq6eSY=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-641-gFC0xFqPPVWn-neBWb4ZBw-1; Thu, 01 Sep 2022 18:46:19 -0400
+X-MC-Unique: gFC0xFqPPVWn-neBWb4ZBw-1
+Received: by mail-ej1-f69.google.com with SMTP id ho13-20020a1709070e8d00b00730a655e173so85665ejc.8
+        for <kvm@vger.kernel.org>; Thu, 01 Sep 2022 15:46:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=EMTDS8DnyN2eeNSyxyOGmR/0rHhtMQj+1Wvt/dXWAYc=;
+        b=AKzxxGo3MnNzGUNDeA0+BUgtQzPurnZTZY/1aHA1ZMzw/EBMj+y+dbSIRLOiL7XuFA
+         qyl1aS74uygMfHLtTFBA48Ftze12Jjng2jKIR5FR7h35MGIAssWWhP1X2qaM18AAsT/n
+         dw8AcvFSjQ7Mb+BSflFFTZqmRYFjWd65bM0HqJkDYuyTZ8bQpIq3EXtlN4cww2KtiawP
+         ePjwFICXW2qsdrUbUVPPi83e7dK8q4gFcAX39br9yP+fM/iEBn+SCTkCgtGaZwGD8cFt
+         ZWPAnACswqJ8gRx9MnmBRRM701tTapj9cDgzCdrS4L8EhjubAvxzMbbtl1L0A4lp/xjm
+         XnMw==
+X-Gm-Message-State: ACgBeo35AAwx8oih5BJfBUPRPx+k5Oqr/4To+fEC85MYXzcX6qBTOmyW
+        Ik9XDyEf5FclmAB/mNYNsmUx/VuZPeXlDnPkEp8nibUafLx+TflnU1YCpqDDiYCcOBzerBp8Pxt
+        ecsuny67oCYTr
+X-Received: by 2002:a17:907:2c78:b0:741:4b9b:8d40 with SMTP id ib24-20020a1709072c7800b007414b9b8d40mr18232035ejc.553.1662072378518;
+        Thu, 01 Sep 2022 15:46:18 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7BPR8Reg8rAqyX9sNVbrSev7DRGLWHt44hmiQrv62/iZjx9Eji9KfHXDyeB55d0ZJ2hKuMtQ==
+X-Received: by 2002:a17:907:2c78:b0:741:4b9b:8d40 with SMTP id ib24-20020a1709072c7800b007414b9b8d40mr18232027ejc.553.1662072378308;
+        Thu, 01 Sep 2022 15:46:18 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id z11-20020aa7d40b000000b00445b5874249sm231232edq.62.2022.09.01.15.46.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Sep 2022 15:46:17 -0700 (PDT)
+Message-ID: <c218bef6-bbc1-931e-64cc-5328c0966365@redhat.com>
+Date:   Fri, 2 Sep 2022 00:46:16 +0200
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [GIT PULL] KVM/riscv fixes for 6.0, take #1
+To:     Anup Patel <anup@brainfault.org>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        KVM General <kvm@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
+        <kvm-riscv@lists.infradead.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>
+References: <CAAhSdy2oDoytypnjNFodEY7q_E0OVmrh=GkihQE_K5MnPcK_Sg@mail.gmail.com>
+Content-Language: en-US
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <CAAhSdy2oDoytypnjNFodEY7q_E0OVmrh=GkihQE_K5MnPcK_Sg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216388
+On 8/20/22 10:01, Anup Patel wrote:
+>    https://github.com/kvm-riscv/linux.git  tags/kvm-riscv-fixes-6.0-1
 
---- Comment #9 from Robert Dinse (nanook@eskimo.com) ---
-I spent some time digging through web server logs, these are the logs from =
-the
-machine that produced the last three CPU stall messages, but this time the
-stall occurred on apache2, this is cool because that is something I can rea=
-dily
-test.  Here is the stall message:
+Pulled, thanks; sorry for the delay.
 
-Sep  1 14:26:53 ftp kernel: [   18.819394][  T298] rcu: INFO: rcu_sched
-detected expedited stalls on CPUs/tasks: { 3-... } 4 jiffies s: 441 root: 0=
-x8/.
-Sep  1 14:26:53 ftp kernel: [   18.819413][  T298] rcu: blocking rcu_node
-structures (internal RCU debug):
-Sep  1 14:26:53 ftp kernel: [   18.819417][  T298] Task dump for CPU 3:
-Sep  1 14:26:53 ftp kernel: [   18.819418][  T298] task:httpd           sta=
-te:R
- running task     stack:    0 pid: 2798 ppid:  2460 flags:0x0000400a
-Sep  1 14:26:53 ftp kernel: [   18.819424][  T298] Call Trace:
-Sep  1 14:26:53 ftp kernel: [   18.819428][  T298]  <TASK>
-Sep  1 14:26:53 ftp kernel: [   18.819437][  T298]  ? alloc_pages+0x90/0x1a0
-Sep  1 14:26:53 ftp kernel: [   18.819443][  T298]  ? allocate_slab+0x274/0=
-x460
-Sep  1 14:26:53 ftp kernel: [   18.819445][  T298]  ? xa_load+0xa6/0xc0
-Sep  1 14:26:53 ftp kernel: [   18.819448][  T298]  ?
-___slab_alloc.constprop.0+0x50b/0x5f0
-Sep  1 14:26:53 ftp kernel: [   18.819451][  T298]  ?
-kmem_cache_alloc_lru+0x297/0x360
-Sep  1 14:26:53 ftp kernel: [   18.819456][  T298]  ? nfs_find_actor+0x90/0=
-x90
-[nfs]
-Sep  1 14:26:53 ftp kernel: [   18.819504][  T298]  ? nfs_alloc_inode+0x21/=
-0x60
-[nfs]
-Sep  1 14:26:53 ftp kernel: [   18.819519][  T298]  ? alloc_inode+0x23/0xc0
-Sep  1 14:26:53 ftp kernel: [   18.819526][  T298]  ?
-nfs_alloc_fhandle+0x30/0x30 [nfs]
-Sep  1 14:26:53 ftp kernel: [   18.819541][  T298]  ? iget5_locked+0x53/0xa0
-Sep  1 14:26:53 ftp kernel: [   18.819543][  T298]  ? list_lru_add+0x13f/0x=
-190
-Sep  1 14:26:53 ftp kernel: [   18.819547][  T298]  ? nfs_fhget+0xd2/0x6d0
-[nfs]
-Sep  1 14:26:53 ftp kernel: [   18.819570][  T298]  ?
-nfs_readdir_entry_decode+0x31e/0x440 [nfs]
-Sep  1 14:26:53 ftp kernel: [   18.819581][  T298]  ?
-nfs_readdir_page_filler+0x10d/0x4f0 [nfs]
-Sep  1 14:26:53 ftp kernel: [   18.819592][  T298]  ?
-nfs_readdir_xdr_to_array+0x45e/0x4a0 [nfs]
-Sep  1 14:26:53 ftp kernel: [   18.819602][  T298]  ? nfs_readdir+0x2e6/0xe=
-a0
-[nfs]
-Sep  1 14:26:53 ftp kernel: [   18.819613][  T298]  ? iterate_dir+0x9b/0x1d0
-Sep  1 14:26:53 ftp kernel: [   18.819615][  T298]  ?
-__x64_sys_getdents64+0x84/0x120
-Sep  1 14:26:53 ftp kernel: [   18.819616][  T298]  ?
-__ia32_sys_getdents64+0x120/0x120
-Sep  1 14:26:53 ftp kernel: [   18.819618][  T298]  ? do_syscall_64+0x5b/0x=
-80
-Sep  1 14:26:53 ftp kernel: [   18.819620][  T298]  ?
-do_user_addr_fault+0x1c1/0x620
-Sep  1 14:26:53 ftp kernel: [   18.819622][  T298]  ?
-exit_to_user_mode_prepare+0x41/0x1e0
-Sep  1 14:26:53 ftp kernel: [   18.819625][  T298]  ?
-irqentry_exit_to_user_mode+0x9/0x30
-Sep  1 14:26:53 ftp kernel: [   18.819626][  T298]  ? irqentry_exit+0x1d/0x=
-30
-Sep  1 14:26:53 ftp kernel: [   18.819627][  T298]  ? exc_page_fault+0x86/0=
-x160
-Sep  1 14:26:53 ftp kernel: [   18.819628][  T298]  ?
-entry_SYSCALL_64_after_hwframe+0x63/0xcd
-Sep  1 14:26:53 ftp kernel: [   18.819631][  T298]  </TASK>
+Paolo
 
-     Now that process is gone, but the parent process is still running and
-Apache still seems to be responding fine.  Checking the error log, there we=
-re
-no errors with that PID.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
