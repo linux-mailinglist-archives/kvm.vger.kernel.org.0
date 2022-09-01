@@ -2,80 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C3E495A95EA
-	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 13:48:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 783995A966C
+	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 14:12:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232813AbiIALsN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 07:48:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58110 "EHLO
+        id S230064AbiIAMMq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 08:12:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232357AbiIALsL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 07:48:11 -0400
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1B931616B1
-        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 04:48:08 -0700 (PDT)
-Received: by mail-ot1-x336.google.com with SMTP id t11-20020a05683014cb00b0063734a2a786so12173612otq.11
-        for <kvm@vger.kernel.org>; Thu, 01 Sep 2022 04:48:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=gs2edPsujnl7CWNh7HlhsQUZIDEP93wl7jDr/MStIUw=;
-        b=p4Jy2v4kA4G083K2jvV8paFTLopfZmvrFFiJVDXHA2CLiAiMQbvzaI+6xtM8fy/ioG
-         q6v7h070g3jpHvc4zgWyn3PlpTVoAJgBTO2vVRqQ3EqVA8c08gieh25/eEkREYxnvqky
-         TXkIBKV0x1PI2gdqV0XGCVMXGEeDH6C6muFw/yupvnl6MjMyjVVbFbPShk3Jp824gz71
-         N7Rba0BKxgepKwaUOE+wXqFZ3V32Gshk2fFTQE/vAu0GyhiDDfyyUOytBQkvw7WZ40UR
-         sh7VZ6I3eovXnP5i1aVdjY/A1mrIEVM/6RFgdxOsTWqH4+36C6UQ89MrljrPBnuhgQKp
-         7dUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=gs2edPsujnl7CWNh7HlhsQUZIDEP93wl7jDr/MStIUw=;
-        b=3g+YGrUWPntgFydAJubt+FZxgmHuY3mdQXBQPX7u0g4jk609/eMOM4JcXti0bXvzqE
-         ybWMA4Q0eRGs83GAD56ouBliEvPt6XIvM/QsFJV37zv+Bk5rLQ0m4VajbLo3Ij0RlVFM
-         qGBwF74zRnbBQw+dtasTQIISeqxJWVdawp9TGTo4vALO51dK9QXiJHWvzeVwcOJe8zxm
-         GTlfZFKdC7ausPqR96ryEvxku3aaRdWxcKoKXMYBwK/gG/8URNfYVXpQY5tSnAjAT3L+
-         ACR/IJJAKl5p2docImz4k3C5I6OhVI5qPn7vfRzFuguNxlewmbJ/moeusIAH2GB/49Jr
-         9yGQ==
-X-Gm-Message-State: ACgBeo3HSc5BiKiLBjji9V2VXCpkhXzsFabODIYg/JNWrAv+zv570KAp
-        Izd09BCdQiOjppOS1ds0SIae7IUoG4KycXOWoLdHWg==
-X-Google-Smtp-Source: AA6agR6hJTVkzRjg9Zp0GaEGFRl4JLkQUdmzHa2xCc6eISLwJhjaURVIMa4Ntc6+O/EMeYoeT/5memUCEXVJ+lrAETU=
-X-Received: by 2002:a05:6830:2a8e:b0:638:c41c:d5a1 with SMTP id
- s14-20020a0568302a8e00b00638c41cd5a1mr12801248otu.367.1662032887714; Thu, 01
- Sep 2022 04:48:07 -0700 (PDT)
+        with ESMTP id S229498AbiIAMMp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 08:12:45 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 989C797507;
+        Thu,  1 Sep 2022 05:12:43 -0700 (PDT)
+Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1oTj3o-0000jP-Dm; Thu, 01 Sep 2022 14:12:40 +0200
+Message-ID: <04ce8956-3285-345a-4ce5-b78500729e42@leemhuis.info>
+Date:   Thu, 1 Sep 2022 14:12:39 +0200
 MIME-Version: 1.0
-References: <20220831003506.4117148-1-seanjc@google.com> <20220831003506.4117148-4-seanjc@google.com>
- <17e776dccf01e03bce1356beb8db0741e2a13d9a.camel@redhat.com>
- <84c2e836d6ba4eae9fa20329bcbc1d19f8134b0f.camel@redhat.com>
- <Yw+MYLyVXvxmbIRY@google.com> <59206c01da236c836c58ff96c5b4123d18a28b2b.camel@redhat.com>
- <Yw+yjo4TMDYnyAt+@google.com> <c6e9a565d60fb602a9f4fc48f2ce635bf658f1ea.camel@redhat.com>
-In-Reply-To: <c6e9a565d60fb602a9f4fc48f2ce635bf658f1ea.camel@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 1 Sep 2022 04:47:56 -0700
-Message-ID: <CALMp9eQWHADOoQsocSWwwhyyxk-5oT=GzsGJSj1H=Lsfo=fuEQ@mail.gmail.com>
-Subject: Re: [PATCH 03/19] Revert "KVM: SVM: Introduce hybrid-AVIC mode"
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Li RongQing <lirongqing@baidu.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Content-Language: en-US, de-DE
+To:     kernel test robot <oliver.sang@intel.com>
+Cc:     Kai Huang <kai.huang@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        lkp@lists.01.org, lkp@intel.com, regressions@lists.linux.dev
+References: <YvpZYGa1Z1M38YcR@xsang-OptiPlex-9020>
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+Subject: Re: [KVM] c3e0c8c2e8: leaking-addresses.proc..data..ro_after_init.
+In-Reply-To: <YvpZYGa1Z1M38YcR@xsang-OptiPlex-9020>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1662034363;299e0616;
+X-HE-SMSGID: 1oTj3o-0000jP-Dm
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 1, 2022 at 3:26 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+Hi, this is your Linux kernel regression tracker.
 
-> I just know that nothing is absolute, in some rare cases (like different APIC base per cpu),
-> it is just not feasable to support the spec.
+On 15.08.22 16:34, kernel test robot wrote:
+> Greeting,
+> 
+> FYI, we noticed the following commit (built with gcc-11):
+> 
+> commit: c3e0c8c2e8b17bae30d5978bc2decdd4098f0f99 ("KVM: x86/mmu: Fully re-evaluate MMIO caching when SPTE masks change")
+> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
+> 
+> in testcase: leaking-addresses
+> version: leaking-addresses-x86_64-4f19048-1_20220518
+> with following parameters:
+> 
+> 	ucode: 0x28
+> 
+> 
+> 
+> on test machine: 8 threads 1 sockets Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz with 16G memory
+> 
+> caused below changes (please refer to attached dmesg/kmsg for entire log/backtrace):
+> 
+> If you fix the issue, kindly add following tag
+> Reported-by: kernel test robot <oliver.sang@intel.com>
+>
+> [...]
+>
+> #regzbot introduced: c3e0c8c2e8
 
-Why isn't this feasible? We supported it when I was at VMware.
+Removing this from the list of tracked regressions:
+
+#regzbot invalid: report from the kernel test report that was ignored by
+developers, so I assume it's not something bad
+
+To explain: Yeah, maybe tracking regressions found by CI systems in
+regzbot might be a good idea now or in the long run. If you are from
+Intel and would like to discuss how to do this, please get in touch (I
+tried recently, but got no answer[1]).
+
+But I'm not sure if it's a good idea right now to get regzbot involved
+by default (especially as long as the reports are not telling developers
+to add proper "Link:" tags that would allow regzbot to notice when fixes
+for the problem are posted or merged; see [1] and [2]), as it looks like
+developers ignore quite a few (many?) reports like the one partly quoted
+above.
+
+I guess there are various reasons why developers do so (too many false
+positives? issues unlikely to happen in practice? already fixed?).
+Normally I'd say "this is a regression and I should try to find out and
+prod developers to get it fixed". And I'll do that if the issue
+obviously looks important to a Linux kernel generalist like me.
+
+But that doesn't appear to be the case here (please correct me if I
+misjudged!). I hence chose to ignore this report, as there are quite a
+few other reports that are waiting for my attention, too. :-/
+
+Ciao, Thorsten
+
+[1]
+https://lore.kernel.org/all/384393c2-6155-9a07-ebd4-c2c410cbe947@leemhuis.info/
+
+
+[2] https://docs.kernel.org/process/handling-regressions.html
