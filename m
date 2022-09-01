@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 741945A8FA2
-	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 09:17:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2A625A8FAB
+	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 09:18:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233707AbiIAHRt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 03:17:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60240 "EHLO
+        id S233640AbiIAHSG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 03:18:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233629AbiIAHRp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 03:17:45 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0177125E8A;
-        Thu,  1 Sep 2022 00:17:42 -0700 (PDT)
+        with ESMTP id S233586AbiIAHRx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 03:17:53 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E455112537A;
+        Thu,  1 Sep 2022 00:17:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662016662; x=1693552662;
+  t=1662016671; x=1693552671;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=e83uQmoLWDUcDyfr3MZBIiqrTNzpPSs5GIlAGpeBrhE=;
-  b=k8dkzCAzKD7IP3avJNXrYx3tvBS6ps4ZONwUQ6m4i9B2dkKIsKsopyiA
-   mltv6Ce2a4rk0aDRaIlmh19K80PnQPhhQbeyOhZTJPwb0giMlQBSsKRnA
-   LjS7JYnH3CLJN4pOUtXpzBAKrZaCivQc7pX5niqcQAUOpxJOIZdiQEJAI
-   eT1Ek8rpFhoBOjQ1981UpG1vh6qNXW0/xxIrhkaTkojuWDTRn8ZpuSy4z
-   IJFd8k0JCYe+FD9nQaCqzcvgW99yahxYasn6x6nDkw7dPReDVoli6CSsa
-   fS1eR/kInTjDcZCa1sQjby/8Z02RkqsNMsXWWqjt38GManoF4so7VEBrA
+  bh=jGTUjhPCvzJ9QdTm5I51HBIMaR4fq+kRXdGH4c8lm4k=;
+  b=hfmumWktpdizdqk3xgunRAvqOzHOZrCocb5KvxFQgwv6PkaV2szaBydu
+   hRpPrVKh7NzuhCvkFCUNfs/b7k9HTIgQpSmpPZPd5gMcHA5n7c9AdSGBH
+   gYwnAg62DdbHbCNo1r2B/tcrfgc/Uw1Z6hlq85zyP5Ua7VC/G2V0m99Jh
+   e0DO27Lhs6IJANXEIkg0smAp8DecTmMQg47OSONmNPEqtqOMxMN2JuHGu
+   Py4xssc5gYFNU5Jc4JNfncrSIlAB0MM7RS2vhV2lvkDyFlzMxX7keZsvS
+   hEw/kzIRmpxVsvYlekPGrFrRXApLH0TCujUaOekxiy/pkjJ6n4hsJFebO
    w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10456"; a="276039173"
+X-IronPort-AV: E=McAfee;i="6500,9779,10456"; a="278655514"
 X-IronPort-AV: E=Sophos;i="5.93,280,1654585200"; 
-   d="scan'208";a="276039173"
+   d="scan'208";a="278655514"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 00:17:42 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 00:17:51 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.93,280,1654585200"; 
-   d="scan'208";a="673719836"
+   d="scan'208";a="673719876"
 Received: from sqa-gate.sh.intel.com (HELO michael.clx.dev.tsp.org) ([10.239.48.212])
-  by fmsmga008.fm.intel.com with ESMTP; 01 Sep 2022 00:17:34 -0700
+  by fmsmga008.fm.intel.com with ESMTP; 01 Sep 2022 00:17:42 -0700
 From:   Kevin Tian <kevin.tian@intel.com>
 To:     Zhenyu Wang <zhenyuw@linux.intel.com>,
         Zhi Wang <zhi.a.wang@intel.com>,
@@ -76,232 +76,150 @@ To:     Zhenyu Wang <zhenyuw@linux.intel.com>,
         linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org
 Cc:     Yi Liu <yi.l.liu@intel.com>
-Subject: [PATCH v2 01/15] vfio: Add helpers for unifying vfio_device life cycle
-Date:   Thu,  1 Sep 2022 22:37:33 +0800
-Message-Id: <20220901143747.32858-2-kevin.tian@intel.com>
+Subject: [PATCH v2 02/15] vfio/pci: Use the new device life cycle helpers
+Date:   Thu,  1 Sep 2022 22:37:34 +0800
+Message-Id: <20220901143747.32858-3-kevin.tian@intel.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20220901143747.32858-1-kevin.tian@intel.com>
 References: <20220901143747.32858-1-kevin.tian@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_06_12,
+X-Spam-Status: No, score=-0.2 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_06_12,
         DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The idea is to let vfio core manage the vfio_device life cycle instead
-of duplicating the logic cross drivers. This is also a preparatory
-step for adding struct device into vfio_device.
+From: Yi Liu <yi.l.liu@intel.com>
 
-New pair of helpers together with a kref in vfio_device:
+Also introduce two pci core helpers as @init/@release for pci drivers:
 
- - vfio_alloc_device()
- - vfio_put_device()
+ - vfio_pci_core_init_dev()
+ - vfio_pci_core_release_dev()
 
-Drivers can register @init/@release callbacks to manage any priviate
-state wrapping the vfio_device.
-
-However vfio-ccw doesn't fit this model due to a life cycle mess
-that its private structure mixes both parent and mdev info hence must
-be allocated/freed outside of the life cycle of vfio device.
-
-Per prior discussions this won't be fixed in short term by IBM folks.
-
-Instead of waiting introduce another helper vfio_init_device() so ccw
-can call it to initialize a pre-allocated vfio_device.
-
-Further implication of the ccw trick is that vfio_device cannot be
-freed uniformly in vfio core. Instead, require *EVERY* driver to
-implement @release and free vfio_device inside. Then ccw can choose
-to delay the free at its own discretion.
-
-Another trick down the road is that kvzalloc() is used to accommodate
-the need of gvt which uses vzalloc() while all others use kzalloc().
-So drivers should call a helper vfio_free_device() to free the
-vfio_device instead of assuming that kfree() or vfree() is appliable.
-
-Later once the ccw mess is fixed we can remove those tricks and
-fully handle structure alloc/free in vfio core.
-
-Existing vfio_{un}init_group_dev() will be deprecated after all
-existing usages are converted to the new model.
-
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-Co-developed-by: Yi Liu <yi.l.liu@intel.com>
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 Signed-off-by: Kevin Tian <kevin.tian@intel.com>
-Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 ---
- drivers/vfio/vfio_main.c | 92 ++++++++++++++++++++++++++++++++++++++++
- include/linux/vfio.h     | 25 ++++++++++-
- 2 files changed, 116 insertions(+), 1 deletion(-)
+ drivers/vfio/pci/vfio_pci.c      | 20 +++++++++---------
+ drivers/vfio/pci/vfio_pci_core.c | 35 ++++++++++++++++++++++++++++++++
+ include/linux/vfio_pci_core.h    |  2 ++
+ 3 files changed, 47 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 7cb56c382c97..c9d982131265 100644
---- a/drivers/vfio/vfio_main.c
-+++ b/drivers/vfio/vfio_main.c
-@@ -496,6 +496,98 @@ void vfio_uninit_group_dev(struct vfio_device *device)
- }
- EXPORT_SYMBOL_GPL(vfio_uninit_group_dev);
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 4d1a97415a27..c1223c458615 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -127,6 +127,8 @@ static int vfio_pci_open_device(struct vfio_device *core_vdev)
  
-+/* Release helper called by vfio_put_device() */
-+void vfio_device_release(struct kref *kref)
+ static const struct vfio_device_ops vfio_pci_ops = {
+ 	.name		= "vfio-pci",
++	.init		= vfio_pci_core_init_dev,
++	.release	= vfio_pci_core_release_dev,
+ 	.open_device	= vfio_pci_open_device,
+ 	.close_device	= vfio_pci_core_close_device,
+ 	.ioctl		= vfio_pci_core_ioctl,
+@@ -146,20 +148,19 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	if (vfio_pci_is_denylisted(pdev))
+ 		return -EINVAL;
+ 
+-	vdev = kzalloc(sizeof(*vdev), GFP_KERNEL);
+-	if (!vdev)
+-		return -ENOMEM;
+-	vfio_pci_core_init_device(vdev, pdev, &vfio_pci_ops);
++	vdev = vfio_alloc_device(vfio_pci_core_device, vdev, &pdev->dev,
++				 &vfio_pci_ops);
++	if (IS_ERR(vdev))
++		return PTR_ERR(vdev);
+ 
+ 	dev_set_drvdata(&pdev->dev, vdev);
+ 	ret = vfio_pci_core_register_device(vdev);
+ 	if (ret)
+-		goto out_free;
++		goto out_put_vdev;
+ 	return 0;
+ 
+-out_free:
+-	vfio_pci_core_uninit_device(vdev);
+-	kfree(vdev);
++out_put_vdev:
++	vfio_put_device(&vdev->vdev);
+ 	return ret;
+ }
+ 
+@@ -168,8 +169,7 @@ static void vfio_pci_remove(struct pci_dev *pdev)
+ 	struct vfio_pci_core_device *vdev = dev_get_drvdata(&pdev->dev);
+ 
+ 	vfio_pci_core_unregister_device(vdev);
+-	vfio_pci_core_uninit_device(vdev);
+-	kfree(vdev);
++	vfio_put_device(&vdev->vdev);
+ }
+ 
+ static int vfio_pci_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index c8d3b0450fb3..708b61d1b364 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -1825,6 +1825,41 @@ static void vfio_pci_vga_uninit(struct vfio_pci_core_device *vdev)
+ 					      VGA_RSRC_LEGACY_MEM);
+ }
+ 
++int vfio_pci_core_init_dev(struct vfio_device *core_vdev)
 +{
-+	struct vfio_device *device =
-+			container_of(kref, struct vfio_device, kref);
++	struct vfio_pci_core_device *vdev =
++		container_of(core_vdev, struct vfio_pci_core_device, vdev);
 +
-+	vfio_uninit_group_dev(device);
++	vdev->pdev = to_pci_dev(core_vdev->dev);
++	vdev->irq_type = VFIO_PCI_NUM_IRQS;
++	mutex_init(&vdev->igate);
++	spin_lock_init(&vdev->irqlock);
++	mutex_init(&vdev->ioeventfds_lock);
++	INIT_LIST_HEAD(&vdev->dummy_resources_list);
++	INIT_LIST_HEAD(&vdev->ioeventfds_list);
++	mutex_init(&vdev->vma_lock);
++	INIT_LIST_HEAD(&vdev->vma_list);
++	INIT_LIST_HEAD(&vdev->sriov_pfs_item);
++	init_rwsem(&vdev->memory_lock);
 +
-+	/*
-+	 * kvfree() cannot be done here due to a life cycle mess in
-+	 * vfio-ccw. Before the ccw part is fixed all drivers are
-+	 * required to support @release and call vfio_free_device()
-+	 * from there.
-+	 */
-+	device->ops->release(device);
-+}
-+EXPORT_SYMBOL_GPL(vfio_device_release);
-+
-+/*
-+ * Alloc and initialize vfio_device so it can be registered to vfio
-+ * core.
-+ *
-+ * Drivers should use the wrapper vfio_alloc_device() for allocation.
-+ * @size is the size of the structure to be allocated, including any
-+ * private data used by the driver.
-+ *
-+ * Driver may provide an @init callback to cover device private data.
-+ *
-+ * Use vfio_put_device() to release the structure after success return.
-+ */
-+struct vfio_device *_vfio_alloc_device(size_t size, struct device *dev,
-+				       const struct vfio_device_ops *ops)
-+{
-+	struct vfio_device *device;
-+	int ret;
-+
-+	if (WARN_ON(size < sizeof(struct vfio_device)))
-+		return ERR_PTR(-EINVAL);
-+
-+	device = kvzalloc(size, GFP_KERNEL);
-+	if (!device)
-+		return ERR_PTR(-ENOMEM);
-+
-+	ret = vfio_init_device(device, dev, ops);
-+	if (ret)
-+		goto out_free;
-+	return device;
-+
-+out_free:
-+	kvfree(device);
-+	return ERR_PTR(ret);
-+}
-+EXPORT_SYMBOL_GPL(_vfio_alloc_device);
-+
-+/*
-+ * Initialize a vfio_device so it can be registered to vfio core.
-+ *
-+ * Only vfio-ccw driver should call this interface.
-+ */
-+int vfio_init_device(struct vfio_device *device, struct device *dev,
-+		     const struct vfio_device_ops *ops)
-+{
-+	int ret;
-+
-+	vfio_init_group_dev(device, dev, ops);
-+
-+	if (ops->init) {
-+		ret = ops->init(device);
-+		if (ret)
-+			goto out_uninit;
-+	}
-+
-+	kref_init(&device->kref);
 +	return 0;
-+
-+out_uninit:
-+	vfio_uninit_group_dev(device);
-+	return ret;
 +}
-+EXPORT_SYMBOL_GPL(vfio_init_device);
++EXPORT_SYMBOL_GPL(vfio_pci_core_init_dev);
 +
-+/*
-+ * The helper called by driver @release callback to free the device
-+ * structure. Drivers which don't have private data to clean can
-+ * simply use this helper as its @release.
-+ */
-+void vfio_free_device(struct vfio_device *device)
++void vfio_pci_core_release_dev(struct vfio_device *core_vdev)
 +{
-+	kvfree(device);
++	struct vfio_pci_core_device *vdev =
++		container_of(core_vdev, struct vfio_pci_core_device, vdev);
++
++	mutex_destroy(&vdev->igate);
++	mutex_destroy(&vdev->ioeventfds_lock);
++	mutex_destroy(&vdev->vma_lock);
++	kfree(vdev->region);
++	kfree(vdev->pm_save);
++	vfio_free_device(core_vdev);
 +}
-+EXPORT_SYMBOL_GPL(vfio_free_device);
++EXPORT_SYMBOL_GPL(vfio_pci_core_release_dev);
 +
- static struct vfio_group *vfio_noiommu_group_alloc(struct device *dev,
- 		enum vfio_group_type type)
- {
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index e05ddc6fe6a5..e1e9e8352903 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -45,7 +45,8 @@ struct vfio_device {
- 	struct kvm *kvm;
- 
- 	/* Members below here are private, not for driver use */
--	refcount_t refcount;
-+	struct kref kref;	/* object life cycle */
-+	refcount_t refcount;	/* user count on registered device*/
- 	unsigned int open_count;
- 	struct completion comp;
- 	struct list_head group_next;
-@@ -55,6 +56,8 @@ struct vfio_device {
- /**
-  * struct vfio_device_ops - VFIO bus driver device callbacks
-  *
-+ * @init: initialize private fields in device structure
-+ * @release: Reclaim private fields in device structure
-  * @open_device: Called when the first file descriptor is opened for this device
-  * @close_device: Opposite of open_device
-  * @read: Perform read(2) on device file descriptor
-@@ -72,6 +75,8 @@ struct vfio_device {
-  */
- struct vfio_device_ops {
- 	char	*name;
-+	int	(*init)(struct vfio_device *vdev);
-+	void	(*release)(struct vfio_device *vdev);
- 	int	(*open_device)(struct vfio_device *vdev);
- 	void	(*close_device)(struct vfio_device *vdev);
- 	ssize_t	(*read)(struct vfio_device *vdev, char __user *buf,
-@@ -137,6 +142,24 @@ static inline int vfio_check_feature(u32 flags, size_t argsz, u32 supported_ops,
- 	return 1;
- }
- 
-+struct vfio_device *_vfio_alloc_device(size_t size, struct device *dev,
-+				       const struct vfio_device_ops *ops);
-+#define vfio_alloc_device(dev_struct, member, dev, ops)				\
-+	container_of(_vfio_alloc_device(sizeof(struct dev_struct) +		\
-+					BUILD_BUG_ON_ZERO(offsetof(		\
-+						struct dev_struct, member)),	\
-+					dev, ops),				\
-+		     struct dev_struct, member)
-+
-+int vfio_init_device(struct vfio_device *device, struct device *dev,
-+		     const struct vfio_device_ops *ops);
-+void vfio_free_device(struct vfio_device *device);
-+void vfio_device_release(struct kref *kref);
-+static inline void vfio_put_device(struct vfio_device *device)
-+{
-+	kref_put(&device->kref, vfio_device_release);
-+}
-+
- void vfio_init_group_dev(struct vfio_device *device, struct device *dev,
- 			 const struct vfio_device_ops *ops);
- void vfio_uninit_group_dev(struct vfio_device *device);
+ void vfio_pci_core_init_device(struct vfio_pci_core_device *vdev,
+ 			       struct pci_dev *pdev,
+ 			       const struct vfio_device_ops *vfio_pci_ops)
+diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+index 5579ece4347b..98c8c66e2400 100644
+--- a/include/linux/vfio_pci_core.h
++++ b/include/linux/vfio_pci_core.h
+@@ -233,6 +233,8 @@ void vfio_pci_core_close_device(struct vfio_device *core_vdev);
+ void vfio_pci_core_init_device(struct vfio_pci_core_device *vdev,
+ 			       struct pci_dev *pdev,
+ 			       const struct vfio_device_ops *vfio_pci_ops);
++int vfio_pci_core_init_dev(struct vfio_device *core_vdev);
++void vfio_pci_core_release_dev(struct vfio_device *core_vdev);
+ int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev);
+ void vfio_pci_core_uninit_device(struct vfio_pci_core_device *vdev);
+ void vfio_pci_core_unregister_device(struct vfio_pci_core_device *vdev);
 -- 
 2.21.3
 
