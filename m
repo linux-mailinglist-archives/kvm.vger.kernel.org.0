@@ -2,65 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52CC25A9485
-	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 12:26:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B82E5A9533
+	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 12:58:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234232AbiIAK0F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 06:26:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52712 "EHLO
+        id S234194AbiIAK6L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 06:58:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234194AbiIAKZq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 06:25:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9A518A7EF
-        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 03:25:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662027936;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qDrOsD6Wwv4PgT16+SBFbOvFu2rnqTQe673mAyHGej0=;
-        b=JtuYJsyyw5z9p+RS9nUWqWpeMg5S0IOb3NuLsOVGlXM1DgAR3dYrOF6E/Tts63deCU+gmB
-        AvFjQVPjPJVMUzFbEDhDw4GG1gfTL+aq0mZb6WKp27mDJIN6vmdXb/pVtp3Il0iivyIa5Y
-        nFddjPY46gIOj0uvC2ylCIWXJ926l8M=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-50-les2uJSyMnOhEu_aUQMJoA-1; Thu, 01 Sep 2022 06:25:33 -0400
-X-MC-Unique: les2uJSyMnOhEu_aUQMJoA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3800A1C0CE65;
-        Thu,  1 Sep 2022 10:25:33 +0000 (UTC)
-Received: from starship (unknown [10.40.194.96])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 885EB492C3B;
-        Thu,  1 Sep 2022 10:25:31 +0000 (UTC)
-Message-ID: <c6e9a565d60fb602a9f4fc48f2ce635bf658f1ea.camel@redhat.com>
-Subject: Re: [PATCH 03/19] Revert "KVM: SVM: Introduce hybrid-AVIC mode"
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Li RongQing <lirongqing@baidu.com>
-Date:   Thu, 01 Sep 2022 13:25:30 +0300
-In-Reply-To: <Yw+yjo4TMDYnyAt+@google.com>
-References: <20220831003506.4117148-1-seanjc@google.com>
-         <20220831003506.4117148-4-seanjc@google.com>
-         <17e776dccf01e03bce1356beb8db0741e2a13d9a.camel@redhat.com>
-         <84c2e836d6ba4eae9fa20329bcbc1d19f8134b0f.camel@redhat.com>
-         <Yw+MYLyVXvxmbIRY@google.com>
-         <59206c01da236c836c58ff96c5b4123d18a28b2b.camel@redhat.com>
-         <Yw+yjo4TMDYnyAt+@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S233328AbiIAK6J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 06:58:09 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF66625A;
+        Thu,  1 Sep 2022 03:58:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662029888; x=1693565888;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=R7CVUFZhotieug1pagbmSvJ3+IS3sAu4KPbxk1sNb5A=;
+  b=I+P3UIiThzieLhwGFO3skKawH9UuD5qbJdGBmJTo9lIJ60OXzRGtQ7QQ
+   V/wRza83QkW6fEaTh7/zBg7bBzywNJG5RYxutS0Rky6fy642XCTG5+pdv
+   UoV3ZDPl6IFLuoCCjSS790VrIMx0r8W89i7zi/1NZhbj9SLTaaXFmyp0D
+   KOMJzpuFXWCXclR6+Am9gOEoNNvpAZnV/0psY6ZkNjclu/EH51w7oFsav
+   SWe/ClPuFW22ZJAa22WpgxTtrncxZg/+dLBxapiyTwu/lg5uSIetSsmkO
+   4pLY0QuiVSF2qm034GmEkJhFjr3heXUeK1Ghau46OgYSDo/16ZMxVYgLX
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10456"; a="296966659"
+X-IronPort-AV: E=Sophos;i="5.93,280,1654585200"; 
+   d="scan'208";a="296966659"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 03:58:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,280,1654585200"; 
+   d="scan'208";a="615298277"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmsmga007.fm.intel.com with ESMTP; 01 Sep 2022 03:58:07 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 1 Sep 2022 03:58:07 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Thu, 1 Sep 2022 03:58:07 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.175)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Thu, 1 Sep 2022 03:58:07 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GsreJPFdh/jv9GMlnbHDQigKVFtdGDOQjTXITy6MffDSrZPCUzbOLJhl0qgvmd4R942WbT03D/ruN5/3aN8Vfyq0pDExGGcm+s3JTryY6a3m0AT172G9SeaE58Xd5NwpYPPkBNP72i9lG6OKn4TBs2tNKka7yKQZwlFYZD1+tJYxmoAfGmuX4SK19icmRyWZQPhwpznIjNZiXvMLhSv80mY1firL5CiIkCuvaArUZcefS/9wb17066tVgAl7BIHOuHKD8nEIuMOjX+3FsTza6ryIvUhuRUbcs1Y3ziMv2H10k+6Dliqp1ykcqFrx1Kvlw2MzHyEQXm+0fH+zw5ihDA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=R7CVUFZhotieug1pagbmSvJ3+IS3sAu4KPbxk1sNb5A=;
+ b=RinkbLF5Rb5mWnmlWKDhcfJie2iGufuSMjwGJn4Rqj37FZMp3DL1DCSccY4wfpZKa4gXOvtMAKabOhNszVQg4SX/Nve2c+jUDexiiiv+2rHCVBAeq/YDhxI6+JjgxHyE1xr8gUhGHLi01i5jHyq2N2Vft1yLsbi1/xCXzCTHn8tjdTQ2bqYD5uix+cPgVlJU7CNAk/U+jsDj1xMqYFAJOgXLR84bJ2pod3CJB8tXWeXXOY/oBtltU2DKKbiajUeCzjqb9Y5QkQ+FPokWCkrDBjqC19g7eAmkoDxDaP3LnWR9t40Da/st9toatEiQDSueFZWPrzU9DWqh9X1EdGtKfw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by MWHPR11MB0014.namprd11.prod.outlook.com (2603:10b6:301:64::31) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.21; Thu, 1 Sep
+ 2022 10:58:05 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::fce1:b229:d351:a708]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::fce1:b229:d351:a708%8]) with mapi id 15.20.5588.010; Thu, 1 Sep 2022
+ 10:58:05 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "Gao, Chao" <chao.gao@intel.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>
+CC:     "tglx@linutronix.de" <tglx@linutronix.de>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        "will@kernel.org" <will@kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>
+Subject: Re: [PATCH v2 05/19] KVM: Rename and move CPUHP_AP_KVM_STARTING to
+ ONLINE section
+Thread-Topic: [PATCH v2 05/19] KVM: Rename and move CPUHP_AP_KVM_STARTING to
+ ONLINE section
+Thread-Index: AQHYvGhTeepRWiEV1UiUjOzgaPZBxa3KHGWAgABONIA=
+Date:   Thu, 1 Sep 2022 10:58:04 +0000
+Message-ID: <933858c97f69bcf6fb00ea5dcb2ec9fa368eced3.camel@intel.com>
+References: <cover.1661860550.git.isaku.yamahata@intel.com>
+         <d2c8815a56be1712e189ddcbea16c8b6cbc53e4a.1661860550.git.isaku.yamahata@intel.com>
+         <YxBOoWckyP1wvzMZ@gao-cwp>
+In-Reply-To: <YxBOoWckyP1wvzMZ@gao-cwp>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.44.4 (3.44.4-1.fc36) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 44d335db-fc1f-47e3-e2b7-08da8c08d8be
+x-ms-traffictypediagnostic: MWHPR11MB0014:EE_
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: +VirdgfGf9n4IftXnUUm2T28Bajb5rKj3NNu7MnMK3kGX5MEQ/0h2UPWPko/721bMqzojkeR3okAOLEk64sSOI50774qAciHsHwrpokTkFVaMQQf3rLipmPqgKqanTGJwRdJEio0XpX1pvDjbLCiWBFyVPLhlZZJhnVucjRoOO6Gn5PDsr2hAEG1A1yR4rVdg5+Edw2Oi6xSr6gkbFWFY77p2Gf9u1BjPq4g/Y/S7+stNSWAJOPIvSwRnh6pUyKy4iK08gKW92frzQunP08UuPPMx/OpRJCVEKtXrKt1/U1WrcGe1xyEx+PzLP0lI6iDKzZ9XFvOpxVfJI7+fRaQYCICNh1q98TYDzVzxXAY7XdlwGhw3/LHRnGUdhdISjhNGFzupoqmpEcRyGzwv2CV+heWsr+IoR8dNcgdcMiIfMUS+8Z96fd1JDUgQ5BSMpVOQFYtzR+zJO9pYSF+4qKDC+anSVOUYByM9CmIzbLWOGjunItR15k7pq46Qr+PllPQ3uw4x2drRHIrJPElw04Z8DZUcZ2+EcUSuYYho6jiXubGGAw/bTZPger1dl7S6p8R2F04g6CJL7McTyQ3fUpz1lvVWjNA9M4d2CSUWD9k+Gt9sH0fw/LisqrvyadmgdeLuRAp2codbIO31LC38mUVpRUTAWExQZ0UOphJ0J6PKboD5dcCMw0NTcpUKK1+8jc/8b/HAuCyyTWzaXv9J3yC9Nl17ReMveUl87w3DmICBKKhefrnUB6KsLljIz0xVuO3uLUenHBrx9UniG3vUymKo8sVO6AzozqMPxJDdHGmn5ahFGKfCmXAmsaD70kyvsmy2x+NIGnTnwMgROatSlMnrg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(136003)(396003)(376002)(39860400002)(366004)(346002)(66946007)(66556008)(6506007)(186003)(2616005)(38100700002)(36756003)(2906002)(83380400001)(71200400001)(122000001)(316002)(82960400001)(26005)(5660300002)(6636002)(6486002)(478600001)(54906003)(8936002)(91956017)(6512007)(110136005)(86362001)(38070700005)(41300700001)(66446008)(66476007)(76116006)(4326008)(8676002)(966005)(64756008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?dk1OSElBWGRSNzJqWURmaG1wa0ljK2lxYUdrQzJFZ1FwNFJjZElxS2hRLzZ3?=
+ =?utf-8?B?TFFicGVEaWFlZzYxSlRHVHpiNktCN09lWUxOUzBwYlk4YzdQMFBMRjBLczhs?=
+ =?utf-8?B?NVFZTENQM0dqTzZZQklwTFdaTU11WTdKY3RVYU1pNTFjUEVLQUZuMjVDblBK?=
+ =?utf-8?B?b09oYlQva2pkWWhnWEVsenFxd2ZBQWg0VWwrbGhPYmhRcE5BQ2pPckpxZVRi?=
+ =?utf-8?B?VzMvSlRSTi9iQlM3MFgwZ2ZUckpSYVRsTDdHaEFDMlZSbEhOd1dheThCekRw?=
+ =?utf-8?B?SlNQcW9zR2l2UDd5R2dwRUpYcDdFeWhTeFVFV0ZEOXVUM3lBRUFBckxoUlFh?=
+ =?utf-8?B?em1yNU9EOCs1ZFBoMzVOUVJJRmMvK3pVYmtQYnBDUHNWWkpzcG9GS2xNaTAv?=
+ =?utf-8?B?ZkdvdmxrZzN1QWt4ZW9LYUtacnJpWWRyZmFLSWFtWUw5QjNZa3BhM0s3Rkdr?=
+ =?utf-8?B?WUY1TEJHY05nU1hhekVPamF1MFZ5QzJIclhQSW5OVlZuci8wdFFIOXhnajJ6?=
+ =?utf-8?B?UDhTRVN3dnlUeHdHZ1hzNjZJSVFqMVlZc282VTg4bWZUbG94eEQ5WWVzTlJo?=
+ =?utf-8?B?OStDRmRFeW9iWFE0cVlUTkZScFV5UHY3NHRGaEhDLzRXMjhBeGV0Q1V1a05N?=
+ =?utf-8?B?YWJ5ektIbDU3WktXRjhJK082S1M4ZHpRL1hPc09PZDl6cjVIZUZOcFg3bU45?=
+ =?utf-8?B?TXloeTd3ODJJM2haYy9uSS9CZlFCdkRRenlsY0RMRE9jNTB6a0pxcXN5NHpk?=
+ =?utf-8?B?UzNoNjY4RTZGTiszSnJMS2Q4blp1VTVzVGljUzR6L3lZbXN1M3VDTzVvVWZs?=
+ =?utf-8?B?R05xSDk5TjQvV1FTREdQRGhnOUdNLzFhb2h6MlY5WFBWbjdKS3JhTmZ6dVdX?=
+ =?utf-8?B?NUFNWUZQdzBmWDVRdmJBRlJnaXpGWFVjSTljNjlhMFRjMTJiMVNwVGVvZXFu?=
+ =?utf-8?B?d0piUWY1YS9yQ1Q2SVRVVWNxN1AyVVAvNmwxTUt2cnhWT1lJMTk5Q0RwOXNM?=
+ =?utf-8?B?UVJBSFZyQzlPemE3QmhBVkxIZzNENWJFT0dYS1dOZXBXdHduMnl4anQ0TDFt?=
+ =?utf-8?B?WElYanpNWFBKVDdzMUxDcnVmL2VaUmdyTjBKbDdyS3J3TU9FK2RGakJQZ2lK?=
+ =?utf-8?B?S1I2cnRYY2JUeml3RU5PYmwvTWxWcGdHS2ZtYVdNekRRRUpGejFobmlGUGJX?=
+ =?utf-8?B?TzQ4TEdSNW54QUUvWnZWbEtTVU9GbUw4RlpzYkYrUVdOalp0S04wVXBVWGQ3?=
+ =?utf-8?B?bngwQWY0RFROVTh3TmFVQWI3L2hIVmxXQldzMHdPZUk3Qm90bWdHWUkra3cv?=
+ =?utf-8?B?ZUhWMHhTN0JJNTRGNzJKRFVacmN4WlhmT0RnY1Q0ZmhYendLMlJTSkdnR29k?=
+ =?utf-8?B?bzJ5Yk96K21xMWl0U0k1MGFCU1g1ajBZUFhVQ3lYM1NDKzZibHpwZ01JUGNO?=
+ =?utf-8?B?dmh2TlVGb2psQkxtTFVTaDVTRzFhbWhMR1lqZ2VVV00yZmxVODRaQTFjTkxB?=
+ =?utf-8?B?dFE3VDFDcTRmRmlWczZhbmQ3aE9PQ2JIeGh2QTYrdDhRMS9uQ3dLblVKOUNR?=
+ =?utf-8?B?MHA4ZzVjek5LQjlRLzVKdWdsanNSbzVtSmg0WXJucWFpTy9xRzN4b2h0SkJo?=
+ =?utf-8?B?dkYzc2dXL2gxYSs0SXJiM3NSRCtUTzhmVmE1OFlRcUpkT3lSWitkZTY0bGhx?=
+ =?utf-8?B?c2tmRVZjVXRXY3p2WlBtUU1zdVdYZ0drWkRDNVRCQlk3YzR2bFlBaHRZKzho?=
+ =?utf-8?B?ZFgzcWlscHpObDJPTmIzWFZXZHJJWnY2WkFrSTd6SEtOZmNYN2IrNU1peW83?=
+ =?utf-8?B?QkFJZEVQMDJPQVgyWWNYRzEvTzdrcVIxakNncEdtUnVvOFB1dTJ6NDVBMjNa?=
+ =?utf-8?B?TG4ybmhWSHdEMkJsaldDUHdibUJHYitZSExPN2FmbjJPMFlkd3NBVlRsckQ0?=
+ =?utf-8?B?cUxFUGZlcGl3MXpRem9Hd21ZQ1JNbWwrclNHTU83d3JjTTV5WEsyMWdqZ2Y2?=
+ =?utf-8?B?NHRwdEVuNkFFbWFMeHpRVjB5QWtIRmttc1lGMEk0SW0vNFZ1Q0R0N01oSXh1?=
+ =?utf-8?B?N3k3NVI4TmxWYytMUXJVMDRKY2djVGNWWVJVSUc5cGtGK0g1Y3dETTFuYWtY?=
+ =?utf-8?B?MFVGWm1DL2oxWFhaMmV4M0ljK1hGMHg5cTdyWHVRZTBMWFRYaHpmZnMwUUM1?=
+ =?utf-8?B?bGc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <6E3FD5B6EDEB134CBAE02A2F5A0D4004@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 44d335db-fc1f-47e3-e2b7-08da8c08d8be
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Sep 2022 10:58:05.0049
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: j9u1W9P5kkXm8iOj6zqSxDTPpAtzkqbBD0dTIkPTUuWk/UmArF/bfD1SIuPF7EQL+CWG3w5KZ7wqAR7g9PTgBA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB0014
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -69,197 +169,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-08-31 at 19:12 +0000, Sean Christopherson wrote:
-> On Wed, Aug 31, 2022, Maxim Levitsky wrote:
-> > On Wed, 2022-08-31 at 16:29 +0000, Sean Christopherson wrote:
-> > > On Wed, Aug 31, 2022, Maxim Levitsky wrote:
-> > > > Leaving AVIC on, when vCPU is in x2apic mode cannot trigger extra MMIO emulation,
-> > > > in fact the opposite - because AVIC is on, writes to 0xFEE00xxx might *not* trigger
-> > > > MMIO emulation and instead be emulated by AVIC.
-> > > 
-> > > That's even worse, because KVM is allowing the guest to exercise hardware logic
-> > > that I highly doubt AMD has thoroughly tested.
-> > 
-> > Harware logic is exactly the same regarless of if KVM uses x2apic mode or not,
-> > and it is better to be prepared for all kind of garbage coming from the guest.
-> 
-> Right, I got twisted around and was thinking x2APIC enabling of the guest was
-> reflected in hardware, but it's purely emulated in this mode.
-
-BTW, I don't know why I didn't thought about it before - it is trivial to plug the possible
-emulation bugs in hybrid AVIC mode, assuming that AVIC mmio is still exposed to the guest - 
-all we need to do is to refuse to do anything on each of the two AVIC vmexits if the 
-AVIC is in this mode, because in this mode, the guest should never touch the MMIO.
-
-So basically just stick teh below code in start of  
-
-'avic_unaccelerated_access_interception()' and in 'avic_incomplete_ipi_interception()'
-
-
-if (apic_x2apic_mode(vcpu->arch.apic) && avic_mode != AVIC_MODE_X2)
-	return 1;
-
-> 
-> > Software logic, I can understand you, there could be registers that trap differently
-> > in avic and x2avic mode, but it should be *very* easy to deal with it, the list
-> > of registers that trap is very short.
-> > 
-> > > > Yes, some of these writes can trigger AVIC specific emulation vm exits, but they
-> > > > are literaly the same as those used by x2avic, and it is really hard to see
-> > > > why this would be dangerous (assuming that x2avic code works, and avic code
-> > > > is aware of this 'hybrid' mode).
-> > > 
-> > > The APIC_RRR thing triggered the KVM_BUG_ON() in kvm_apic_write_nodecode()
-> > > precisely because of the AVIC trap.  At best, this gives a way for the guest to
-> > > trigger a WARN_ON_ONCE() and thus panic the host if panic_on_warn=1.  I fixed
-> > > the APIC_RRR case because that will be problematic for x2AVIC, but there are
-> > > other APIC registers that are unsupported in x2APIC that can trigger the KVM_BUG_ON().
-> > > > From the guest point of view, unless the guest pokes at random MMIO area,
-> > > > the only case when this matters is if the guest maps RAM over the 0xFEE00xxx
-> > > > (which it of course can, the spec explictly state as you say that when x2apic
-> > > > is enabled, the mmio is disabled), and then instead of functioning as RAM,
-> > > > the range will still function as APIC.
-> > > 
-> > > There is no wiggle room here though, KVM is blatantly breaking the architectural
-> > > specification.  When x2APIC is enabled, the xAPIC MMIO does not exist.
-> > 
-> > In this case I say that there is no wiggle room for KVM to not allow
-> > different APIC bases on each CPU - the spec 100% allows it, but in KVM it is
-> > broken.
-> 
-> The difference is that KVM is consistent with respect to itself in that case.
-> KVM doesn't support APIC base relocation, and never has supported APIC base
-> relocation.
-> 
-> This hybrid AVIC mode means that the resulting KVM behavior will vary depending
-> on whether or not AVIC is supported and enabled, whether or not x2AVIC is supported,
-> and also on internal KVM state.  And we even have tests for this!  E.g. run the APIC
-> unit test with AVIC disabled and it passes, run it with AVIC enabled and it fails.
-> 
-> > If you are really hell bent on not having that MMIO exposed, then I say we
-> > can just disable the AVIC memslot, and keep AVIC enabled in this case - this
-> > should make us both happy.
-> 
-> I don't think that will work though, as I don't think it's possible to tell hardware
-> not to accelerate AVIC accesses.  I.e. KVM can squash the unaccelerated traps, but
-> anything that is handled by hardware will still go through.
-
-Nope! Remember why do we have that APIC private memslot? It is because APIC's mmio
-is accelerated by AVIC/APICv only when both conditions are true 
-	1. AVIC/APICv is enabled and is in xapic mode
-	2. the MMIO is mapped as read/write in the NPT/EPT (and yes, AVIC/APICv requires NPT/EPT).
-
-For the (2) we have a private memslot that we map there and we enable it when
-AVIC/APICv is enabled.
-
-
-
-To refresh our memory, we did a hack (I have nothing against it), that we
-no longer remove that memslot when AVIC/APICv is inhibited, but instead we zap
-its SPTE, and next time the guest tries to access it, despite having a memslot there
-we don't re-install the SPTE and instead jump to emulation.
-
-So technically the memslot is always enabled, but the guest can't use it when AVIC/APICv is
-inhibited.
-
-However when APIC mode changes to x2apic, I don't think that we zap that SPTE.
-
-This means that when the hardware APIC acceleration is in x2apic mode (e.g x2avic is active),
-the hardware doesn't intercept the MMIO anymore, and thus if guest accesses it,
-it will access read/write our private APIC memslot, since its SPTE is there, which is wrong
-because the userspace didn't map memory there, not to mention that this 'extra' memory won't survive migration.
-
-
-Thus regardless of avic hybrid mode we need to ensure that if one of vCPUs is in x2apic mode,
-that our private memslot SPTE is zapped, and that also the page fault handler won't re-install it.
-
-
-A side efect of this will be that AVIC in hybrid mode will just work and be 100% to the spec.
-
-> 
-> > This discussion really makes me feel that you want just to force your opinion
-> > on others, and its not the first time this happens. It is really frustrating
-> > to work like that.  It might sound harsh but this is how I feel. Hopefully I
-> > am wrong.
-> 
-> Yes and no.  I am most definitely trying to steer KVM in a direction that I feel
-> will allow KVM to scale in terms of developers, users, and workloads.  Part of
-> that direction is to change people's mindset from "good enough" to "implement to
-> the spec".
-
-Sean, don't understand me wrong - I agree with you mostly.
-
-In fact I implemented support for PDPTR migration to be 100% to the spec,
-although I kind of regret it, since PDPTRs looks like not preserved over SMM entries
-in hardware thus, it is really not possible to rely on them to be unsync.
-Also NPT doesn't support them either.
-
-I also was actually first to notice the exception merging issue, and I actually
-worked on fixing it and posted patches upstream. 
-
-It is also a very corner case, and yet I wanted to fix it, just to be 100% up the spec.
-
-I also reviewed the EVENTINJ injection of software interrupts (INTn) when there
-is not INTn instruction in the guest, also something that nobody in reality uses,
-but I warmely welcomed it and helped with review.
-
-I also fixed many bugs in !NPT, and !EPT cases, also just to make KVM work to the spec.
-
-Etc, etc, etc.
-
-I just know that nothing is absolute, in some rare cases (like different APIC base per cpu),
-it is just not feasable to support the spec.
-
-In fact remember that patch series about maximum VMCS field number?
-https://lore.kernel.org/kvm/YPmI8x2Qu3ZSS5Bc@google.com/
-
-There was actually a patch series that was fixing it, but you said, just like me,
-that it is not worth it, better to have an errata in KVM, since guest should not use
-this info anyway. I didn't object to it, and neither I do now, but as you see,
-you also sometimes agree that going 100% to the spec is not worth it.
-
-
-I hope you understand me.
-
-TL;DR - in this case actually the most correct solution is to disable the private apic
-memslot that we install over the APIC mmio, when one of the APICs is in x2apic mode.
-
-
-That will not only make AVIC hybrid mode just work, but also make sure that if the
-guest accesses the APIC MMIO anyway it will see no memory there.
-
-
-Best regards,
-	Maxim Levitsky
-
-
-> 
-> KVM's historic "good enough" approach largely worked when KVM had a relatively
-> small and stable development community, and when KVM was being used to run a
-> relatively limited set of workloads.  But KVM is being used to run an ever increasing
-> variety of workloads, and the development community is larger (and I hope that we
-> can grow it even further).  And there is inevitably attrition, which means that
-> unless we are extremely diligent in documenting KVM's quirks/errata, knowledge of
-> KVM's "good enough" shortcuts will eventually be lost.
-> 
-> E.g. it took me literally days to understand KVM's hack for forcing #PF=>#PF=>VM-Exit
-> instead of #PF=>#PF=>#DF.  That mess would have been avoided if KVM had implemented
-> to the spec and actually done the right thing back when the bug was first encountered.
-> Ditto for the x2APIC ID hotplug hack; I stared at that code on at least three
-> different occassions before I finally understood the full impact of the hack.
-> 
-> And getting KVM to implement to the spec means not deviating from that path when
-> it's inconvenient to follow, thus the hard line I am drawing.  I am sure we'll
-> encounter scenarios/features where it's simply impossible for KVM to do the right
-> thing, e.g. I believe virtualizing VMX's posted interrupts falls into this category.
-> But IMO those should be very, very rare exceptions.
-
-
-> 
-> So, "yes" in the sense that I am openly trying to drag people into alignment with
-> my "implement to the spec" vision.  But "no" in the sense that I don't think it's
-> fair to say I am forcing my opinion on others.  I am not saying "NAK" and ending
-> the discussion.
-> 
-
-
+T24gVGh1LCAyMDIyLTA5LTAxIGF0IDE0OjE4ICswODAwLCBHYW8sIENoYW8gd3JvdGU6DQo+IE9u
+IFR1ZSwgQXVnIDMwLCAyMDIyIGF0IDA1OjAxOjIwQU0gLTA3MDAsIGlzYWt1LnlhbWFoYXRhQGlu
+dGVsLmNvbSB3cm90ZToNCj4gPiBGcm9tOiBDaGFvIEdhbyA8Y2hhby5nYW9AaW50ZWwuY29tPg0K
+PiA+IA0KPiA+IFRoZSBDUFUgU1RBUlRJTkcgc2VjdGlvbiBkb2Vzbid0IGFsbG93IGNhbGxiYWNr
+cyB0byBmYWlsLiBNb3ZlIEtWTSdzDQo+ID4gaG90cGx1ZyBjYWxsYmFjayB0byBPTkxJTkUgc2Vj
+dGlvbiBzbyB0aGF0IGl0IGNhbiBhYm9ydCBvbmxpbmluZyBhIENQVSBpbg0KPiA+IGNlcnRhaW4g
+Y2FzZXMgdG8gYXZvaWQgcG90ZW50aWFsbHkgYnJlYWtpbmcgVk1zIHJ1bm5pbmcgb24gZXhpc3Rp
+bmcgQ1BVcy4NCj4gPiBGb3IgZXhhbXBsZSwgd2hlbiBrdm0gZmFpbHMgdG8gZW5hYmxlIGhhcmR3
+YXJlIHZpcnR1YWxpemF0aW9uIG9uIHRoZQ0KPiA+IGhvdHBsdWdnZWQgQ1BVLg0KPiA+IA0KPiA+
+IFBsYWNlIEtWTSdzIGhvdHBsdWcgc3RhdGUgYmVmb3JlIENQVUhQX0FQX1NDSEVEX1dBSVRfRU1Q
+VFkgYXMgaXQgZW5zdXJlcw0KPiA+IHdoZW4gb2ZmbGluaW5nIGEgQ1BVLCBhbGwgdXNlciB0YXNr
+cyBhbmQgbm9uLXBpbm5lZCBrZXJuZWwgdGFza3MgaGF2ZSBsZWZ0DQo+ID4gdGhlIENQVSwgaS5l
+LiB0aGVyZSBjYW5ub3QgYmUgYSB2Q1BVIHRhc2sgYXJvdW5kLiBTbywgaXQgaXMgc2FmZSBmb3Ig
+S1ZNJ3MNCj4gPiBDUFUgb2ZmbGluZSBjYWxsYmFjayB0byBkaXNhYmxlIGhhcmR3YXJlIHZpcnR1
+YWxpemF0aW9uIGF0IHRoYXQgcG9pbnQuDQo+ID4gTGlrZXdpc2UsIEtWTSdzIG9ubGluZSBjYWxs
+YmFjayBjYW4gZW5hYmxlIGhhcmR3YXJlIHZpcnR1YWxpemF0aW9uIGJlZm9yZQ0KPiA+IGFueSB2
+Q1BVIHRhc2sgZ2V0cyBhIGNoYW5jZSB0byBydW4gb24gaG90cGx1Z2dlZCBDUFVzLg0KPiA+IA0K
+PiA+IEtWTSdzIENQVSBob3RwbHVnIGNhbGxiYWNrcyBhcmUgcmVuYW1lZCBhcyB3ZWxsLg0KPiA+
+IA0KPiA+IFN1Z2dlc3RlZC1ieTogVGhvbWFzIEdsZWl4bmVyIDx0Z2x4QGxpbnV0cm9uaXguZGU+
+DQo+ID4gU2lnbmVkLW9mZi1ieTogQ2hhbyBHYW8gPGNoYW8uZ2FvQGludGVsLmNvbT4NCj4gDQo+
+IElzYWt1LCB5b3VyIHNpZ25lZC1vZmYtYnkgaXMgbWlzc2luZy4NCj4gDQo+ID4gTGluazogaHR0
+cHM6Ly9sb3JlLmtlcm5lbC5vcmcvci8yMDIyMDIxNjAzMTUyOC45MjU1OC02LWNoYW8uZ2FvQGlu
+dGVsLmNvbQ0KPiA+IC0tLQ0KPiA+IGluY2x1ZGUvbGludXgvY3B1aG90cGx1Zy5oIHwgIDIgKy0N
+Cj4gPiB2aXJ0L2t2bS9rdm1fbWFpbi5jICAgICAgICB8IDMwICsrKysrKysrKysrKysrKysrKysr
+KystLS0tLS0tLQ0KPiA+IDIgZmlsZXMgY2hhbmdlZCwgMjMgaW5zZXJ0aW9ucygrKSwgOSBkZWxl
+dGlvbnMoLSkNCj4gPiANCj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9jcHVob3RwbHVn
+LmggYi9pbmNsdWRlL2xpbnV4L2NwdWhvdHBsdWcuaA0KPiA+IGluZGV4IGY2MTQ0NzkxM2RiOS4u
+Nzk3MmJkNjNlMGNiIDEwMDY0NA0KPiA+IC0tLSBhL2luY2x1ZGUvbGludXgvY3B1aG90cGx1Zy5o
+DQo+ID4gKysrIGIvaW5jbHVkZS9saW51eC9jcHVob3RwbHVnLmgNCj4gPiBAQCAtMTg1LDcgKzE4
+NSw2IEBAIGVudW0gY3B1aHBfc3RhdGUgew0KPiA+IAlDUFVIUF9BUF9DU0tZX1RJTUVSX1NUQVJU
+SU5HLA0KPiA+IAlDUFVIUF9BUF9USV9HUF9USU1FUl9TVEFSVElORywNCj4gPiAJQ1BVSFBfQVBf
+SFlQRVJWX1RJTUVSX1NUQVJUSU5HLA0KPiA+IC0JQ1BVSFBfQVBfS1ZNX1NUQVJUSU5HLA0KPiA+
+IAlDUFVIUF9BUF9LVk1fQVJNX1ZHSUNfSU5JVF9TVEFSVElORywNCj4gPiAJQ1BVSFBfQVBfS1ZN
+X0FSTV9WR0lDX1NUQVJUSU5HLA0KPiA+IAlDUFVIUF9BUF9LVk1fQVJNX1RJTUVSX1NUQVJUSU5H
+LA0KPiANCj4gVGhlIG1vdmVtZW50IG9mIENQVUhQX0FQX0tWTV9TVEFSVElORyBjaGFuZ2VzIHRo
+ZSBvcmRlcmluZyBiZXR3ZWVuDQo+IENQVUhQX0FQX0tWTV9TVEFSVElORyBhbmQgQ1BVSFBfQVBf
+S1ZNX0FSTV8qIGFib3ZlIFsxXS4gV2UgbmVlZA0KPiB0aGUgcGF0Y2ggWzJdIGZyb20gTWFyYyB0
+byBhdm9pZCBicmVha2luZyBBUk0uDQo+IA0KPiBbMV0gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcv
+bGttbC84N3Nmc3E0eHk4LndsLW1hekBrZXJuZWwub3JnLw0KPiBbMl0gaHR0cHM6Ly9sb3JlLmtl
+cm5lbC5vcmcvbGttbC8yMDIyMDIxNjAzMTUyOC45MjU1OC01LWNoYW8uZ2FvQGludGVsLmNvbS8N
+Cg0KSG93IGFib3V0IElzYWt1IGp1c3QgdG8gdGFrZSB5b3VyIHNlcmllcyBkaXJlY3RseSAoK2hp
+cyBTb0IpIGFuZCBhZGQgYWRkaXRpb25hbA0KcGF0Y2hlcz8NCg0KLS0gDQpUaGFua3MsDQotS2Fp
+DQoNCg0K
