@@ -2,125 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA6EF5A9C9C
-	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 18:09:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA9F15A9CEE
+	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 18:18:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232507AbiIAQIe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 12:08:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36186 "EHLO
+        id S234995AbiIAQRv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 12:17:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234873AbiIAQI1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 12:08:27 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3737390C61;
-        Thu,  1 Sep 2022 09:08:26 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 281FQRHG027904;
-        Thu, 1 Sep 2022 16:08:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=Dils1zlfD+18lr9a0ceKjhxPZS6LnPxli3egH1u8tC8=;
- b=NxuPGOzytuh/a2WjV6Z2eliW5DxwzqgLRvw6iNdfVUazysV/2IVfZjnpRhXLqfRVPx++
- R2b+XpTJdTwyq5ZYHQpdvNtqoOvMJcFwJsXYwiQatcqF9Sv95AvmVabxEr5xcBnPCIEz
- xPdzn+M84Q3G7DD7uQbnte2TtDDivCnEXAsEbEehNURISD1wKZbNHT/uw9wy16QkBxTg
- aEeb/Ec3ROtul0MAaYjK8HfZ6qTAP0LO1NdE5CYZt4i7MScHjGMrFhd7RSFiEJoxnjp2
- sSVBiyfJ0VUsymnyFqRgxCqDeEz64Qb0KhWZUXuu69LSG46gUpXq12gxRoZR8JQ5PPw1 rQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jax0meurq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Sep 2022 16:08:25 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 281FwOMj002484;
-        Thu, 1 Sep 2022 16:08:24 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jax0meupw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Sep 2022 16:08:24 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 281Fp7o0026195;
-        Thu, 1 Sep 2022 16:08:21 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03fra.de.ibm.com with ESMTP id 3j7aw8w46t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Sep 2022 16:08:21 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 281G50Uf38732110
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 1 Sep 2022 16:05:00 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DE4D54203F;
-        Thu,  1 Sep 2022 16:08:17 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8D3D442041;
-        Thu,  1 Sep 2022 16:08:17 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.52.204])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  1 Sep 2022 16:08:17 +0000 (GMT)
-Message-ID: <03cdbf24b5c5d7024b1108d65c2c478073dab515.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v6 2/2] s390x: Test specification
- exceptions during transaction
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Date:   Thu, 01 Sep 2022 18:08:17 +0200
-In-Reply-To: <166204436392.25136.10832970166586747913@t14-nrb>
-References: <20220826161112.3786131-1-scgl@linux.ibm.com>
-         <20220826161112.3786131-3-scgl@linux.ibm.com>
-         <166204436392.25136.10832970166586747913@t14-nrb>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        with ESMTP id S234975AbiIAQRu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 12:17:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2E489411B
+        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 09:17:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662049068;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hedP1nanSg0nfEVRoW3l9wkxR5Nom5Xm3VIc4gzSbyI=;
+        b=PqEioV2veOw0bFOtJchtrNJzCiZ7/32szNZkpDsK9wVdOV1NBh1PyZlWGbV9cHlqiD7nEc
+        5sMH6KVgUHp72VBa4Md3mUa3Jg6nUDOuFL+i7D89yqqUSoQCPnakiyaOQHqehjPjeC2vUP
+        ktE898XMFr23kNwZPfT+vDOrOsbmDBo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-471-XbIq98NtP9KElR6TTclKsA-1; Thu, 01 Sep 2022 12:17:45 -0400
+X-MC-Unique: XbIq98NtP9KElR6TTclKsA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3AF30811E80;
+        Thu,  1 Sep 2022 16:17:43 +0000 (UTC)
+Received: from sirius.home.kraxel.org (unknown [10.39.195.70])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E662840CF8F2;
+        Thu,  1 Sep 2022 16:17:42 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+        id A29AF18003AA; Thu,  1 Sep 2022 18:17:41 +0200 (CEST)
+Date:   Thu, 1 Sep 2022 18:17:41 +0200
+From:   Gerd Hoffmann <kraxel@redhat.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Sergio Lopez <slp@redhat.com>
+Subject: Re: [PATCH 0/2] expose host-phys-bits to guest
+Message-ID: <20220901161741.dadmguwv25sk4h6i@sirius.home.kraxel.org>
+References: <20220831125059.170032-1-kraxel@redhat.com>
+ <957f0cc5-6887-3861-2b80-69a8c7cdd098@intel.com>
+ <20220901135810.6dicz4grhz7ye2u7@sirius.home.kraxel.org>
+ <f7a56158-9920-e753-4d21-e1bcc3573e27@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 6RsK7vaNDnRLhDhyPv5cAPdePiVUqFvC
-X-Proofpoint-ORIG-GUID: futAFD7VXT72iFjEfSQnozRRg_K1pebi
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-09-01_10,2022-08-31_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- bulkscore=0 clxscore=1015 adultscore=0 spamscore=0 mlxlogscore=999
- phishscore=0 malwarescore=0 priorityscore=1501 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2209010071
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f7a56158-9920-e753-4d21-e1bcc3573e27@intel.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-09-01 at 16:59 +0200, Nico Boehr wrote:
-> Quoting Janis Schoetterl-Glausch (2022-08-26 18:11:12)
-> > diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
-> > index 68469e4b..56f26564 100644
-> [...]
-> > +#define TRANSACTION_COMPLETED 4
-> > +#define TRANSACTION_MAX_RETRIES 5
-> > +
-> > +/*
-> > + * NULL must be passed to __builtin_tbegin via constant, forbid diagnose from
-> > + * being NULL to keep things simple
-> > + */
+On Thu, Sep 01, 2022 at 10:36:19PM +0800, Xiaoyao Li wrote:
+> On 9/1/2022 9:58 PM, Gerd Hoffmann wrote:
 > 
-> For some reason, it took me a while to get this, because the context was not clear to me. Maybe rephrase it a tiny bit:
+> > > Anyway, IMO, guest including guest firmware, should always consult from
+> > > CPUID leaf 0x80000008 for physical address length.
+> > 
+> > It simply can't for the reason outlined above.  Even if we fix qemu
+> > today that doesn't solve the problem for the firmware because we want
+> > backward compatibility with older qemu versions.  Thats why I want the
+> > extra bit which essentially says "CPUID leaf 0x80000008 actually works".
 > 
-> If diagnose should be NULL, it must be passed to __builtin_tbegin via constant, so forbid NULL to keep things simple
-> 
-> [...]
-> > +static void test_spec_ex_trans(struct args *args, const struct spec_ex_trigger *trigger)
-> > +{
-> [...]
-> > +       case TRANSACTION_MAX_RETRIES:
-> > +               report_skip("Transaction retried %lu times with transient failures, giving up",
-> > +                           args->max_retries);
-> 
-> Hmhm, I am unsure whether a skip is the right thing here. On one hand, it might hide bugs, on the other hand, it might cause spurious failures. Why did you decide for the skip?
+> I don't understand how it backward compatible with older qemu version. Old
+> QEMU won't set the extra bit you introduced in this series, and all the
+> guest created with old QEMU will become untrusted on CPUID leaf 0x80000008 ?
 
-Yeah, it's a toss-up. Claudio asked me to change it in v4.
+Correct, on old qemu firmware will not trust CPUID leaf 0x80000008.
+That is not worse than the situation we have today, currently the
+firmware never trusts CPUID leaf 0x80000008.
+
+So the patches will improves the situation for new qemu only, but I
+don't see a way around that.
+
+take care,
+  Gerd
+
