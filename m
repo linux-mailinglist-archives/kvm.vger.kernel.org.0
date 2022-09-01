@@ -2,228 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BEB65AA0F8
-	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 22:36:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EFD875AA162
+	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 23:13:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233644AbiIAUgh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 16:36:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51490 "EHLO
+        id S234011AbiIAVNg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 17:13:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232874AbiIAUgg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 16:36:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED0A872FD5
-        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 13:36:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662064593;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KAlQhkA8oZVAtUjKMimmRFck4zP8R2Z4c1q1RUzZKkc=;
-        b=Zf8uTJEy88tl0FzSO+rsURWRMzj4q7FTI4ZiOmyTwbp3K8AQxNxuZTxi4CSFOn9OeQerv4
-        DSJAOz2e4OV/Vax2v5+oZRGnEzhhr564yKxB+DOzZPXmV/hjQCoreVlM5mWt07VTSZ4wj4
-        CkE5Wye+PwhOm0XfPDOCSs5AR6MYfDo=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-76-AR8OrWY-MbGUJtWU8i404g-1; Thu, 01 Sep 2022 16:36:33 -0400
-X-MC-Unique: AR8OrWY-MbGUJtWU8i404g-1
-Received: by mail-io1-f72.google.com with SMTP id y1-20020a056602200100b006893cd97da9so39097iod.1
-        for <kvm@vger.kernel.org>; Thu, 01 Sep 2022 13:36:32 -0700 (PDT)
+        with ESMTP id S234623AbiIAVNd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 17:13:33 -0400
+Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7ABA8E4C1
+        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 14:13:32 -0700 (PDT)
+Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-11e9a7135easo320297fac.6
+        for <kvm@vger.kernel.org>; Thu, 01 Sep 2022 14:13:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=s3YP/G49fM/Y7AAkh3BQLrT9w+DYN0rWK2mog9WKUQI=;
+        b=seTbvoadCOx8zLoFZ3UlN7zO9Qd2nQyjqfN6FbJRoAPWKoBxFfK99LZK2nESbZvQm4
+         E1AyX7vSDbRY3+wZWnpuhh4Jfjq4ft3MGlymzc+PvFvDxev8cNYHKShpkFo/CIQVXPcL
+         3gBGs33hTZngFpD1iYGlwsZUP+r98NPI5ZSXaVwGRCkmJabnjIldQgecxdcIRROPJYFd
+         K2qIn8nm0Zg17/dCyXbtcVlNCVlyGhs5BgCw1ds/xUw0qwAa9Rq7kWatfb1izk1yjSAm
+         NleTPRdgUEgFyOL2qpqZtbkVkXtfWymW78YkYUHWzATBuvwWBJtX53bFYxOtHnx3az4/
+         p7UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=KAlQhkA8oZVAtUjKMimmRFck4zP8R2Z4c1q1RUzZKkc=;
-        b=0+lBQNWSsvSAWu9gkJDh8mZSGbdCkh6J2ai7oDHTtXAXl1dw0/haSjtKCW6Hp5xatA
-         +1IjolacGZDkNcpkl6Xh3UdP8R7jo5qe3y6m1g5pJGMXl3SbdOq2EF7tGIXZzpDM3cK3
-         o8MdlwgbQpZn/+u7E8LqRgP3NKz0sQAm30YWyAdROYHFq1zb/4+Hg7x+drVNe9t3zH2J
-         ZfelVRgxcbwTXdRYMOTFnYL1Ypo1OHuxVoOLd13Daj6Kw+Orxs3HtOxM8W01y2xMlnX6
-         xW+/W6z+7McrAL0Qd2/3zg9MwEyYb4qdXXk51Oe9g0RUAZ/mqhMr6pZmYg6jxpLrHxhC
-         nSIQ==
-X-Gm-Message-State: ACgBeo0R3uo4JpOox1Dv5ZQ74BHhaaJ5P+gMCOw+fP80VOCTlY/3JRPZ
-        UUyTlQQ2+dHBABcexH7YX4zACBNTZq8TOqw8FovlLh0szttrfwLyXptfLewkmRSOf7k1xXsTJIc
-        fv5vuI9xaOCMX
-X-Received: by 2002:a02:b383:0:b0:34c:e89:bd54 with SMTP id p3-20020a02b383000000b0034c0e89bd54mr4894433jan.290.1662064592200;
-        Thu, 01 Sep 2022 13:36:32 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR7LXo9d5a4G1Y1TjUodIAyqy9fvJQjo2moRcKMgTDEwM9dowocrU7kxQd5lUILaT/qDH2Ihdg==
-X-Received: by 2002:a02:b383:0:b0:34c:e89:bd54 with SMTP id p3-20020a02b383000000b0034c0e89bd54mr4894420jan.290.1662064591916;
-        Thu, 01 Sep 2022 13:36:31 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id b24-20020a05663801b800b00349deda465asm58914jaq.39.2022.09.01.13.36.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Sep 2022 13:36:29 -0700 (PDT)
-Date:   Thu, 1 Sep 2022 14:36:25 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     joao.m.martins@oracle.com
-Cc:     Yishai Hadas <yishaih@nvidia.com>, jgg@nvidia.com,
-        saeedm@nvidia.com, kvm@vger.kernel.org, netdev@vger.kernel.org,
-        kuba@kernel.org, kevin.tian@intel.com, leonro@nvidia.com,
-        maorg@nvidia.com, cohuck@redhat.com
-Subject: Re: [PATCH V5 vfio 04/10] vfio: Add an IOVA bitmap support
-Message-ID: <20220901143625.4cbd3394.alex.williamson@redhat.com>
-In-Reply-To: <b3916258-bd64-5cc8-7cbe-f7338a96bf58@oracle.com>
-References: <20220901093853.60194-1-yishaih@nvidia.com>
-        <20220901093853.60194-5-yishaih@nvidia.com>
-        <20220901124742.35648bd5.alex.williamson@redhat.com>
-        <b3916258-bd64-5cc8-7cbe-f7338a96bf58@oracle.com>
-Organization: Red Hat
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=s3YP/G49fM/Y7AAkh3BQLrT9w+DYN0rWK2mog9WKUQI=;
+        b=rRwe23wSZoX5r9guOFED+FZHmYDMBxLQa42TEAc43IRekOK+VET9iP1XL9BrlYBOLE
+         raL98ho/HEgpg7RlGU/Fq7f+oTD1KhzfN0hMJZC2lXfTCxawFfFo2UoSh+wPVayWiAE0
+         Ea2l4jWA5LQH5v2K13zaVY45GSJCrpl3/UD1e9wanvRfNpM1u05WOBrz9z0TlGLo6NQT
+         8DFEid8lDw+In1yXcBk0utKHQhBZMyKpfsayhGK1/MNNmMfLVO43Fw1/VcajxkCHmqZ1
+         yoBR5oMHgjklxtZ+PbmadDR2AlWZNzEB2p4R507IM4sisMVfRUNzPd2rjYYq1dZtmhHL
+         Bieg==
+X-Gm-Message-State: ACgBeo32NmLpVv7O+s1cufDxzAMatStRaJKK/mKZhzRJ2w9vjlvX4svz
+        j+pwOR6svGXRSaksYYgtqMOvBTCbWDjRv5GXtGVZRw==
+X-Google-Smtp-Source: AA6agR7rI+mWvl/3lX7XXDOjn4pDkkVMOXENRZAXKurcVmgUPXFO3foZFRrFHQD7xMtM/oBbXhq4dO48ZF6cxIy9CpU=
+X-Received: by 2002:a05:6870:5a5:b0:122:5662:bee6 with SMTP id
+ m37-20020a05687005a500b001225662bee6mr579105oap.181.1662066811990; Thu, 01
+ Sep 2022 14:13:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220831211810.2575536-1-jmattson@google.com> <YxDfZwKAlH6KBhoH@google.com>
+In-Reply-To: <YxDfZwKAlH6KBhoH@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 1 Sep 2022 14:13:21 -0700
+Message-ID: <CALMp9eQo9zYjh8xqtMp_JWOSMCd1cBuqbCo2KAPTLWaroB8MWw@mail.gmail.com>
+Subject: Re: [PATCH v2] x86/cpufeatures: Add macros for Intel's new fast rep
+ string features
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 1 Sep 2022 20:39:40 +0100
-joao.m.martins@oracle.com wrote:
-
-> On 01/09/2022 19:47, Alex Williamson wrote:
-> > On Thu, 1 Sep 2022 12:38:47 +0300
-> > Yishai Hadas <yishaih@nvidia.com> wrote:
-> >> + * An example of the APIs on how to use/iterate over the IOVA bitmap:
-> >> + *
-> >> + *   bitmap = iova_bitmap_alloc(iova, length, page_size, data);
-> >> + *   if (IS_ERR(bitmap))
-> >> + *       return PTR_ERR(bitmap);
-> >> + *
-> >> + *   ret = iova_bitmap_for_each(bitmap, arg, dirty_reporter_fn);
-> >> + *
-> >> + *   iova_bitmap_free(bitmap);
-> >> + *
-> >> + * An implementation of the lower end (referred to above as
-> >> + * dirty_reporter_fn to exemplify), that is tracking dirty bits would mark
-> >> + * an IOVA as dirty as following:
-> >> + *     iova_bitmap_set(bitmap, iova, page_size);
-> >> + * Or a contiguous range (example two pages):
-> >> + *     iova_bitmap_set(bitmap, iova, 2 * page_size);  
-> > 
-> > This seems like it implies a stronger correlation to the
-> > iova_bitmap_alloc() page_size than actually exists.  The implementation
-> > of the dirty_reporter_fn() may not know the reporting page_size.  The
-> > value here is just a size_t and iova_bitmap handles the rest, right?
-> >   
-> Correct. 
-> 
-> The intent was to show an example of what the different usage have
-> an effect in the end bitmap data (1 page and then 2 pages). An alternative
-> would be:
-> 
-> 	An implementation of the lower end (referred to above as
-> 	dirty_reporter_fn to exemplify), that is tracking dirty bits would mark
-> 	an IOVA range spanning @iova_length as dirty, using the configured
-> 	@page_size:
-> 
->   	  iova_bitmap_set(bitmap, iova, iova_length)
-> 
-> But with a different length variable (i.e. iova_length) to avoid being confused with
-> the length in iova_bitmap_alloc right before this paragraph. But the example in the
-> patch looks a bit more clear on the outcomes to me personally.
-
-How about:
-
-  Each iteration of the dirty_reporter_fn is called with a unique @iova
-  and @length argument, indicating the current range available through
-  the iova_bitmap.  The dirty_reporter_fn uses iova_bitmap_set() to
-  mark dirty areas within that provided range
-
-?
-
-...
-> >> +/**
-> >> + * iova_bitmap_for_each() - Iterates over the bitmap
-> >> + * @bitmap: IOVA bitmap to iterate
-> >> + * @opaque: Additional argument to pass to the callback
-> >> + * @fn: Function that gets called for each IOVA range
-> >> + *
-> >> + * Helper function to iterate over bitmap data representing a portion of IOVA
-> >> + * space. It hides the complexity of iterating bitmaps and translating the
-> >> + * mapped bitmap user pages into IOVA ranges to process.
-> >> + *
-> >> + * Return: 0 on success, and an error on failure either upon
-> >> + * iteration or when the callback returns an error.
-> >> + */
-> >> +int iova_bitmap_for_each(struct iova_bitmap *bitmap, void *opaque,
-> >> +			 int (*fn)(struct iova_bitmap *bitmap,
-> >> +				   unsigned long iova, size_t length,
-> >> +				   void *opaque))  
-> > 
-> > It might make sense to typedef an iova_bitmap_fn_t in the header to use
-> > here.
-> >  
-> OK, will do. I wasn't sure which style was preferred so went with simplest on
-> first take.
-
-It looks like it would be a little cleaner, but yeah, probably largely
-style.
-
-> >> +{
-> >> +	int ret = 0;
-> >> +
-> >> +	for (; !iova_bitmap_done(bitmap) && !ret;
-> >> +	     ret = iova_bitmap_advance(bitmap)) {
-> >> +		ret = fn(bitmap, iova_bitmap_mapped_iova(bitmap),
-> >> +			 iova_bitmap_mapped_length(bitmap), opaque);
-> >> +		if (ret)
-> >> +			break;
-> >> +	}
-> >> +
-> >> +	return ret;
-> >> +}
-> >> +
-> >> +/**
-> >> + * iova_bitmap_set() - Records an IOVA range in bitmap
-> >> + * @bitmap: IOVA bitmap
-> >> + * @iova: IOVA to start
-> >> + * @length: IOVA range length
-> >> + *
-> >> + * Set the bits corresponding to the range [iova .. iova+length-1] in
-> >> + * the user bitmap.
-> >> + *
-> >> + * Return: The number of bits set.  
-> > 
-> > Is this relevant to the caller?
-> >   
-> The thinking that number of bits was a way for caller to validate that
-> 'some bits' was set, i.e. sort of error return value. But none of the callers
-> use it today, it's true. Suppose I should remove it, following bitmap_set()
-> returning void too.
-
-I think 0/-errno are sufficient if we need an error path, otherwise
-void is fine.  As above, the reporter fn isn't strongly tied to the
-page size of the bitmap, so number of bits just didn't make sense to me.
-
-> >> + */
-> >> +unsigned long iova_bitmap_set(struct iova_bitmap *bitmap,
-> >> +			      unsigned long iova, size_t length)
-> >> +{
-> >> +	struct iova_bitmap_map *mapped = &bitmap->mapped;
-> >> +	unsigned long nbits = max(1UL, length >> mapped->pgshift), set = nbits;
-> >> +	unsigned long offset = (iova - mapped->iova) >> mapped->pgshift;  
-> > 
-> > There's no sanity testing here that the caller provided an iova within
-> > the mapped ranged.  Thanks,
-> >   
-> 
-> Much of the bitmap helpers don't check that the offset is within the range
-> of the passed ulong array. So I followed the same thinking and the
-> caller is /provided/ with the range that the IOVA bitmap covers. The intention
-> was minimizing the number of operations given that this function sits on the
-> hot path. I can add this extra check.
-
-Maybe Jason can quote a standard here, audit the callers vs sanitize
-the input.  It'd certainly be fair even if the test were a BUG_ON since
-it violates the defined calling conventions and we're not taking
-arbitrary input, but it could also pretty easily and quietly go into
-the weeds if we do nothing.  Thanks,
-
-Alex
-
+On Thu, Sep 1, 2022 at 9:36 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Wed, Aug 31, 2022, Jim Mattson wrote:
+> > KVM_GET_SUPPORTED_CPUID should reflect these host CPUID bits. The bits
+>
+> Why not provide the KVM support in the same patch/series?
+>
+Coming up.
