@@ -2,392 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A59C05A9B47
-	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 17:10:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48A425A9BB3
+	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 17:30:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234009AbiIAPKO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 11:10:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36648 "EHLO
+        id S234674AbiIAPa0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 11:30:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232557AbiIAPKJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 11:10:09 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D5FB19281
-        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 08:10:04 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 281EZ2Lx019287
-        for <kvm@vger.kernel.org>; Thu, 1 Sep 2022 15:10:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=z3WjtSp8cZwfyhVgIoM48cJ0kpIpHcW3rWv74xhDG7k=;
- b=gYQ4DcniNPR+a+tbpVw8sFy2TkWAJdnFuW50TJLuqpl0TOgPfoepgYRlAohDYPxIHYa1
- hbjUEfKpD8r2KflXjOYYD+eIm1y9eEjyzKxAVReWdbZx2TApHYTmunSCMz0DWNyegv+y
- aJeK0A9sYJrGCfs3kpC5DkDbSA29uUvU8UMbXBBb7HUvEMjlrCeKQoE5vnVxYonUCfXz
- qHipiqIhFYNytMWXWyZZe8cLNqOWKYy3QaLnxeO+kTysHq+rR+wI4GbPQy3e21A2S/jG
- D2hxDqghSlBSyMavDMK3TkxQ8tLved2BjqVi/nHd7TvBkcwyyx1JYc93XgAHeKF1Iuaq oQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jax0mcnda-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 01 Sep 2022 15:10:03 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 281F5mOl010690
-        for <kvm@vger.kernel.org>; Thu, 1 Sep 2022 15:10:03 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jax0mcnb6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Sep 2022 15:10:02 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 281F60kE014124;
-        Thu, 1 Sep 2022 15:10:00 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3j8hkabwyw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Sep 2022 15:10:00 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 281FAJV435652094
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 1 Sep 2022 15:10:19 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 16056AE045;
-        Thu,  1 Sep 2022 15:09:57 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CE710AE053;
-        Thu,  1 Sep 2022 15:09:56 +0000 (GMT)
-Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  1 Sep 2022 15:09:56 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v2 2/2] s390x: add exittime tests
-Date:   Thu,  1 Sep 2022 17:09:56 +0200
-Message-Id: <20220901150956.1075828-3-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220901150956.1075828-1-nrb@linux.ibm.com>
-References: <20220901150956.1075828-1-nrb@linux.ibm.com>
+        with ESMTP id S234617AbiIAPaD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 11:30:03 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 995612607
+        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 08:29:52 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id w88-20020a17090a6be100b001fbb0f0b013so2969261pjj.5
+        for <kvm@vger.kernel.org>; Thu, 01 Sep 2022 08:29:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=uEj+Y7Y/+YOHMSskQFWNi+2HHQDrIeW3yFZoL+MzmCA=;
+        b=XnJ2wsCxF8tcfraG5sEl0nCNjGP9Bilt7of9qMjRKEcLdnCtKg/Y/70LxLSz5b/LQW
+         HB7FwbLhalHN/C3kOLN1pB2v/LJyTHSucRh85pppfXgfAzvejP4gPJFlfiU8Q+KnCQmU
+         yPdk/503lGXLXQ71TW81D1UxFpAE9siiVke4rKqb/jPQ2gGYMfU6ln/flqL9VNl+PH3C
+         0Fv+RojMJYsoBEaBN7p0QfRr4O/7KG5Ylhr9ReSQf80+DUFAXTVV5+CiTRkMurXAdzAk
+         lZRuywlOuVc01HdjcAYq125MKpHz8Zmk3KfemiIY9iKxSPCbb/hwFo07lNSf8jt/YxaF
+         1i3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=uEj+Y7Y/+YOHMSskQFWNi+2HHQDrIeW3yFZoL+MzmCA=;
+        b=AcxVlS+e3GjD8BZfVr96kvQzXo9Vt4Ixxr0vnmRrK/U9sJ6KBh+sxsETVwd7cckalu
+         YlkSfY6Pzcbs5dOl8z39m2r7BJvrjdEnL0UI+RHpeq9COF/4UfW+WoOvRN3aOFzvJ2Sb
+         nIOnLgBlTWM2TJA/N+mTaDp+sPIHa3B+jfMqFzFyjcOYFK6fqCdF6BmZ3JZGmyVdZhgR
+         FFacqwUN0OeS1tk1TclNmc4VHoNFO7+tY1gTQzXTK0arVa/xFQgud76T3DMArPRRBpcZ
+         w8O92/+y+kNfr0w8x3vNs+Lh1G1WRrPuD+oBxyQQFs235FnMiLIEJWINSH1IozCWgsTD
+         LTUA==
+X-Gm-Message-State: ACgBeo2WAG2w9l952tOJnnZ0Wl9pC5O4L7NtVGlzSrIaIBEroef0MzR1
+        y0i6tDgMDtk3Ska6Gg9y2Z0caw==
+X-Google-Smtp-Source: AA6agR6g/blRPHq0d3n7aMFn6OtHPk3vvVO7+7+iZmO5GTldkf85RNK960XEeC83SwKhjZRzxu+kdA==
+X-Received: by 2002:a17:90b:1d0f:b0:1fe:4171:6e6f with SMTP id on15-20020a17090b1d0f00b001fe41716e6fmr5633707pjb.206.1662046191185;
+        Thu, 01 Sep 2022 08:29:51 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id r21-20020a170902ea5500b001708c4ebbaesm13590277plg.309.2022.09.01.08.29.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Sep 2022 08:29:50 -0700 (PDT)
+Date:   Thu, 1 Sep 2022 15:29:46 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Kyle Huey <me@kylehuey.com>
+Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        Robert O'Callahan <robert@ocallahan.org>,
+        David Manouchehri <david.manouchehri@riseup.net>,
+        Borislav Petkov <bp@suse.de>, stable@vger.kernel.org
+Subject: Re: [PATCH v6 1/2] x86/fpu: Allow PKRU to be (once again) written by
+ ptrace.
+Message-ID: <YxDP6jie4cwzZIHp@google.com>
+References: <20220829194905.81713-1-khuey@kylehuey.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: HB60kxOIWa8bIgCIKPXlGYG1M3jgZTGD
-X-Proofpoint-ORIG-GUID: qz8ZVNbcUTyFlEWx7ThECqYz6du4tidE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-09-01_10,2022-08-31_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- bulkscore=0 clxscore=1015 adultscore=0 spamscore=0 mlxlogscore=954
- phishscore=0 malwarescore=0 priorityscore=1501 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2209010068
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220829194905.81713-1-khuey@kylehuey.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a test to measure the execution time of several instructions. This
-can be helpful in finding performance regressions in hypervisor code.
+On Mon, Aug 29, 2022, Kyle Huey wrote:
+> @@ -1246,6 +1246,21 @@ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
+>  		}
+>  	}
+>  
+> +	/*
+> +	 * Update the user protection key storage. Allow KVM to
+> +	 * pass in a NULL pkru pointer if the mask bit is unset
+> +	 * for its legacy ABI behavior.
+> +	 */
+> +	if (pkru)
+> +		*pkru = 0;
+> +
+> +	if (hdr.xfeatures & XFEATURE_MASK_PKRU) {
+> +		struct pkru_state *xpkru;
+> +
+> +		xpkru = __raw_xsave_addr(xsave, XFEATURE_PKRU);
+> +		*pkru = xpkru->pkru;
+> +	}
 
-All tests are currently reported as PASS, since the baseline for their
-execution time depends on the respective environment and since needs to
-be determined on a case-by-case basis.
+What about writing this as:
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
----
- s390x/Makefile      |   1 +
- s390x/exittime.c    | 255 ++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |   4 +
- 3 files changed, 260 insertions(+)
- create mode 100644 s390x/exittime.c
+	if (hdr.xfeatures & XFEATURE_MASK_PKRU) {
+		...
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index efd5e0c13102..5dcac244767f 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -34,6 +34,7 @@ tests += $(TEST_DIR)/migration.elf
- tests += $(TEST_DIR)/pv-attest.elf
- tests += $(TEST_DIR)/migration-cmm.elf
- tests += $(TEST_DIR)/migration-skey.elf
-+tests += $(TEST_DIR)/exittime.elf
- 
- pv-tests += $(TEST_DIR)/pv-diags.elf
- 
-diff --git a/s390x/exittime.c b/s390x/exittime.c
-new file mode 100644
-index 000000000000..543c82ff3906
---- /dev/null
-+++ b/s390x/exittime.c
-@@ -0,0 +1,255 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Measure run time of various instructions. Can be used to find runtime
-+ * regressions of instructions which cause exits.
-+ *
-+ * Copyright IBM Corp. 2022
-+ *
-+ * Authors:
-+ *  Nico Boehr <nrb@linux.ibm.com>
-+ */
-+#include <libcflat.h>
-+#include <smp.h>
-+#include <sclp.h>
-+#include <asm/time.h>
-+#include <asm/sigp.h>
-+#include <asm/interrupt.h>
-+#include <asm/page.h>
-+
-+char pagebuf[PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
-+
-+static void test_sigp_sense_running(long destcpu)
-+{
-+	smp_sigp(destcpu, SIGP_SENSE_RUNNING, 0, NULL);
-+}
-+
-+static void test_nop(long ignore)
-+{
-+	/* nops don't trap into the hypervisor, so let's test them for reference */
-+	asm volatile("nop" : : : "memory");
-+}
-+
-+static void test_diag9c(long destcpu)
-+{
-+	asm volatile("diag %[destcpu],0,0x9c"
-+		:
-+		: [destcpu] "d" (destcpu)
-+		:
-+	);
-+}
-+
-+static long setup_get_this_cpuaddr(long ignore)
-+{
-+	return stap();
-+}
-+
-+static void test_diag44(long ignore)
-+{
-+	asm volatile("diag 0,0,0x44");
-+}
-+
-+static void test_stnsm(long ignore)
-+{
-+	int out;
-+
-+	asm volatile(
-+		"stnsm %[out],0xff"
-+		: [out] "=Q" (out)
-+		:
-+	);
-+}
-+
-+static void test_stosm(long ignore)
-+{
-+	int out;
-+
-+	asm volatile(
-+		"stosm %[out],0"
-+		: [out] "=Q" (out)
-+		:
-+	);
-+}
-+
-+static long setup_ssm(long ignore)
-+{
-+	long system_mask = 0;
-+
-+	asm volatile(
-+		"stosm %[system_mask],0"
-+		: [system_mask] "=Q" (system_mask)
-+		:
-+		:
-+	);
-+
-+	return system_mask;
-+}
-+
-+static void test_ssm(long old_system_mask)
-+{
-+	asm volatile(
-+		"ssm %[old_system_mask]"
-+		:
-+		: [old_system_mask] "Q" (old_system_mask)
-+		:
-+	);
-+}
-+
-+static long setup_lctl4(long ignore)
-+{
-+	long ctl4_orig = 0;
-+
-+	asm volatile(
-+		"stctg 4,4,%[ctl4_orig]"
-+		: [ctl4_orig] "=S" (ctl4_orig)
-+		:
-+		:
-+	);
-+
-+	return ctl4_orig;
-+}
-+
-+static void test_lctl4(long ctl4_orig)
-+{
-+	asm volatile(
-+		"lctlg 4,4,%[ctl4_orig]"
-+		:
-+		: [ctl4_orig] "S" (ctl4_orig)
-+		:
-+	);
-+}
-+
-+static void test_stpx(long ignore)
-+{
-+	unsigned int prefix;
-+
-+	asm volatile(
-+		"stpx %[prefix]"
-+		: [prefix] "=Q" (prefix)
-+	);
-+}
-+
-+static void test_stfl(long ignore)
-+{
-+	asm volatile(
-+		"stfl 0" : : : "memory"
-+	);
-+}
-+
-+static void test_epsw(long ignore)
-+{
-+	long r1, r2;
-+
-+	asm volatile(
-+		"epsw %[r1], %[r2]"
-+		: [r1] "=d" (r1), [r2] "=d" (r2)
-+		:
-+		:
-+	);
-+}
-+
-+static void test_illegal(long ignore)
-+{
-+	expect_pgm_int();
-+	asm volatile(
-+		".word 0"
-+		:
-+		:
-+		:
-+	);
-+	clear_pgm_int();
-+}
-+
-+static long setup_servc(long arg)
-+{
-+	memset(pagebuf, 0, PAGE_SIZE);
-+	return arg;
-+}
-+
-+static void test_servc(long ignore)
-+{
-+	SCCB *sccb = (SCCB *) pagebuf;
-+
-+	sccb->h.length = 8;
-+	servc(0, (unsigned long) sccb);
-+}
-+
-+static void test_stsi(long fc)
-+{
-+	stsi(pagebuf, fc, 2, 2);
-+}
-+
-+struct test {
-+	const char *name;
-+	/*
-+	 * When non-null, will be called once before running the test loop.
-+	 * Its return value will be given as argument to testfunc.
-+	 */
-+	long (*setupfunc)(long arg);
-+	void (*testfunc)(long arg);
-+	long arg;
-+	long iters;
-+} const exittime_tests[] = {
-+	{"nop",                   NULL,                   test_nop,                0, 200000 },
-+	{"sigp sense running(0)", NULL,                   test_sigp_sense_running, 0, 20000 },
-+	{"sigp sense running(1)", NULL,                   test_sigp_sense_running, 1, 20000 },
-+	{"diag9c(self)",          setup_get_this_cpuaddr, test_diag9c,             0, 2000 },
-+	{"diag9c(0)",             NULL,                   test_diag9c,             0, 2000 },
-+	{"diag9c(1)",             NULL,                   test_diag9c,             1, 2000 },
-+	{"diag44",                NULL,                   test_diag44,             0, 2000 },
-+	{"stnsm",                 NULL,                   test_stnsm,              0, 200000 },
-+	{"stosm",                 NULL,                   test_stosm,              0, 200000 },
-+	{"ssm",                   setup_ssm,              test_ssm,                0, 200000 },
-+	{"lctl4",                 setup_lctl4,            test_lctl4,              0, 20000 },
-+	{"stpx",                  NULL,                   test_stpx,               0, 2000 },
-+	{"stfl",                  NULL,                   test_stfl,               0, 2000 },
-+	{"epsw",                  NULL,                   test_epsw,               0, 20000 },
-+	{"illegal",               NULL,                   test_illegal,            0, 2000 },
-+	{"servc",                 setup_servc,            test_servc,              0, 2000 },
-+	{"stsi122",               NULL,                   test_stsi,               1, 200 },
-+	{"stsi222",               NULL,                   test_stsi,               2, 200 },
-+	{"stsi322",               NULL,                   test_stsi,               3, 200 },
-+};
-+
-+static uint64_t tod_to_us(uint64_t tod)
-+{
-+	return tod >> STCK_SHIFT_US;
-+}
-+
-+int main(void)
-+{
-+	int i, j, k, testfunc_arg;
-+	const int outer_iters = 100;
-+	struct test const *current_test;
-+	uint64_t start, end, elapsed, worst, best, total;
-+
-+	report_prefix_push("exittime");
-+	report_pass("reporting total/best/worst of %d outer iterations", outer_iters);
-+
-+	for (i = 0; i < ARRAY_SIZE(exittime_tests); i++) {
-+		current_test = &exittime_tests[i];
-+		total = 0;
-+		worst = 0;
-+		best = -1;
-+		report_prefix_pushf("%s", current_test->name);
-+
-+		testfunc_arg = current_test->arg;
-+		if (current_test->setupfunc)
-+			testfunc_arg = current_test->setupfunc(testfunc_arg);
-+
-+		for (j = 0; j < outer_iters; j++) {
-+			start = get_clock_fast();
-+			for (k = 0; k < current_test->iters; k++)
-+				current_test->testfunc(testfunc_arg);
-+			end = get_clock_fast();
-+			elapsed = end - start;
-+			best = MIN(best, elapsed);
-+			worst = MAX(worst, elapsed);
-+			total += elapsed;
-+		}
-+		report_pass("iters/total/best/worst %lu/%lu/%lu/%lu us", current_test->iters, tod_to_us(total), tod_to_us(best), tod_to_us(worst));
-+		report_prefix_pop();
-+	}
-+
-+	report_prefix_pop();
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index f7b1fc3dbca1..c11d1d987c82 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -185,3 +185,7 @@ groups = migration
- [migration-skey]
- file = migration-skey.elf
- groups = migration
-+
-+[exittime]
-+file = exittime.elf
-+smp = 2
--- 
-2.36.1
+		*pkru = xpkru->pkru;
+	} else if (pkru) {
+		*pkru = 0;
+	}
 
+to make it slightly more obvious that @pkru must be non-NULL if the feature flag
+is enabled?
+
+Or we could be paranoid, though I'm not sure this is worthwhile.
+
+	if ((hdr.xfeatures & XFEATURE_MASK_PKRU) &&
+	    !WARN_ON_ONCE(!pkru)) {
+		...
+
+		*pkru = xpkru->pkru;
+	} else if (pkru) {
+		*pkru = 0;
+	}
+
+
+Otherwise, looks good from a KVM perspective.  Thanks!
