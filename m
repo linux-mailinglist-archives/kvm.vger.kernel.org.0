@@ -2,79 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 150E05AA39A
-	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 01:18:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D86D5AA3A6
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 01:21:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235193AbiIAXSF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 19:18:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41956 "EHLO
+        id S233595AbiIAXVS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 19:21:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235045AbiIAXRr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 19:17:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65DE29D100
-        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 16:17:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662074248;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Up7P4fQPv3QO96X8W5CWpvLvhg+1IhrQIUpviyNAatM=;
-        b=Q6bk1gMk0hTPlFkqZgmXIMfxJRQSr12koxwsCaOVCuJJ1fLXevvxEXGWzH7PgXdpi84ffb
-        xo+3zKyYJgxSbrYFHkVsfXaJBZioP5Gxnx6qzyVqU0F0R4Q3B82iaxU0BZ3r2QksMLPJPG
-        kFoiTk7ucG/MkkSOYFPgsgq2gpk77yU=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-288-EbrFdIXENUOvsa7eq9tYjA-1; Thu, 01 Sep 2022 19:17:27 -0400
-X-MC-Unique: EbrFdIXENUOvsa7eq9tYjA-1
-Received: by mail-ej1-f69.google.com with SMTP id qa35-20020a17090786a300b0073d4026a97dso113546ejc.9
-        for <kvm@vger.kernel.org>; Thu, 01 Sep 2022 16:17:27 -0700 (PDT)
+        with ESMTP id S233131AbiIAXVN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 19:21:13 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E0409E89D
+        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 16:21:12 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id j9-20020a17090a3e0900b001fd9568b117so512813pjc.3
+        for <kvm@vger.kernel.org>; Thu, 01 Sep 2022 16:21:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=4WHDLqttfF+EoF52mCrZf4boyFiM0BT/dfZZLnC9DCY=;
+        b=lB8ojeh/+EaeLl+eJ9d1FhOJI7q7heqy4wGRR0YXouOvwILiz4PbKEeVrF7s/Cwwu+
+         rRkYnl5tzoLnPRSGQRJaSLd6r5u1wsfjNtAqH4865nL0lqIDtJT3cb6NASp4PSts7cfk
+         7DAyXA3I6HNgJVhQY9dc+QiUvTUZf860wXaPSzQJjvvdnvJjWKTbPvzaFnvcgGIpoEHC
+         MFsWxfAdBfCddPZUR66GOhR/FHeJ1gfAzFYE4iyvLAM+nu2dxq8MoBKYPXVsbNoKsPAW
+         bG+4Yj4olQmGOKD7HQasEv+0lWENnFJrw4kJ6kzlmmizUNCUeowM9Uw++CyC0NuU6165
+         8tzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=Up7P4fQPv3QO96X8W5CWpvLvhg+1IhrQIUpviyNAatM=;
-        b=I32jckTALhevcv04ybjsMeV+epa37E6el2FiXMK8jIpSc74WOneHduowoI9wR56TCC
-         zMSH6kKsPC/nFDHce4XyA+xBCO8+Wjqkb3WAfUEFyMoimWRoyQP9pSgIwMLpsF58/tog
-         mF53ilfb3zspIlLsLi+YCulUi51wc/FoqSyfZUJ7HEX3o9J4HEwQUNt09FACSgBninqG
-         SWt8BcTMeVHBzRqGeqRPl2vZJ0D2WIVvwrqs0PcGWMFrMWfpFTigny8EU9JIt7eiLphV
-         gLTWE5kkjd9hfvEB7nGH7tAxiMaK/esRZlLSMVLFq38dbn5hxuumK34OtjYjLVNVEVxb
-         ZC9w==
-X-Gm-Message-State: ACgBeo0FPPRztR/eoTRmYwfN8nhNBX+bqZ41t4BFNR1gPNiOzQfIwfeK
-        ts+weJHcq2RYI8a+oJsylCxrE2grjEdNAvaqqRiMg7kJbhqmEJGWe14terC3xdp+4cYFDddIDLg
-        xl9Kzx5qcsx4L
-X-Received: by 2002:a17:907:6d16:b0:731:17b5:699 with SMTP id sa22-20020a1709076d1600b0073117b50699mr27462596ejc.23.1662074246837;
-        Thu, 01 Sep 2022 16:17:26 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6y4K1beuBiz4jt6PFGYmDzMiS8qZdf7rIE6G6RXdSmbOqLz+3jUKKZmGZUaP7ftlVLFR0z2A==
-X-Received: by 2002:a17:907:6d16:b0:731:17b5:699 with SMTP id sa22-20020a1709076d1600b0073117b50699mr27462584ejc.23.1662074246676;
-        Thu, 01 Sep 2022 16:17:26 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id h6-20020a170906828600b0073d6234ceebsm286510ejx.160.2022.09.01.16.17.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Sep 2022 16:17:26 -0700 (PDT)
-Message-ID: <5f15a3a0-446f-59a4-6bef-8be0e5630f5b@redhat.com>
-Date:   Fri, 2 Sep 2022 01:17:21 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=4WHDLqttfF+EoF52mCrZf4boyFiM0BT/dfZZLnC9DCY=;
+        b=h7WkCmCyujwYhGS5+u2yLzB6FNe/UZKWOSzTm7/0n054nK+ZRNfgAF6B/5Ja9xH9lt
+         xk/vrMRnFZ6mpVRxBVkUx5j+xOI9vwm7eoy2GXOveUHpnCbpS5TTSI/IDr8khvb1vwnv
+         pInCuDzzbdYd4873zukSrBoCsdDohSG9+Hd5ca78XfOFjnHdYKf/0nVAmuLvQq9LQy3T
+         s7kVbvxBWtOGsFwqmbGVpz8l5Hpqf3jmEdlJOC2L5Fx9FHeSasXbDRb4nKeLha47Fe6L
+         sqNvDxZmE+xsYhMcXn91BXVVkmpdDYL6a/KskcNBFjw1NKDHqytVTcOe01gglUNXDIwl
+         YbOg==
+X-Gm-Message-State: ACgBeo1rUKdNLR7vEDO+JTsgJoiikP6LvY4aj0lOg8KXtsBWOotaA/Nc
+        9p4wVbXTyAhAu8u6DJZ1PXaE/w==
+X-Google-Smtp-Source: AA6agR7CeHu7YH7JW/sDAsmMwzaor5vIm3hXXsQc316o6UKgIUwL4xz/ML8U96xZVGMTQlcLegLqKg==
+X-Received: by 2002:a17:902:8c93:b0:172:bb10:214c with SMTP id t19-20020a1709028c9300b00172bb10214cmr33027929plo.135.1662074471777;
+        Thu, 01 Sep 2022 16:21:11 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id m3-20020a63f603000000b0041a6638b357sm69851pgh.72.2022.09.01.16.21.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Sep 2022 16:21:11 -0700 (PDT)
+Date:   Thu, 1 Sep 2022 23:21:07 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Miaohe Lin <linmiaohe@huawei.com>, vkuznets@redhat.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH] KVM: fix memoryleak in kvm_init()
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Miaohe Lin <linmiaohe@huawei.com>
-Cc:     vkuznets@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+Message-ID: <YxE+Y1ZDaPgChrrS@google.com>
 References: <20220823063414.59778-1-linmiaohe@huawei.com>
  <Yw6C+tBZrbP5IX+e@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Yw6C+tBZrbP5IX+e@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+ <5f15a3a0-446f-59a4-6bef-8be0e5630f5b@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5f15a3a0-446f-59a4-6bef-8be0e5630f5b@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,26 +72,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/30/22 23:36, Sean Christopherson wrote:
-> On Tue, Aug 23, 2022, Miaohe Lin wrote:
->> When alloc_cpumask_var_node() fails for a certain cpu, there might be some
->> allocated cpumasks for percpu cpu_kick_mask. We should free these cpumasks
->> or memoryleak will occur.
->>
->> Fixes: baff59ccdc65 ("KVM: Pre-allocate cpumasks for kvm_make_all_cpus_request_except()")
->> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
->> ---
+On Fri, Sep 02, 2022, Paolo Bonzini wrote:
+> On 8/30/22 23:36, Sean Christopherson wrote:
+> > On Tue, Aug 23, 2022, Miaohe Lin wrote:
+> > > When alloc_cpumask_var_node() fails for a certain cpu, there might be some
+> > > allocated cpumasks for percpu cpu_kick_mask. We should free these cpumasks
+> > > or memoryleak will occur.
+> > > 
+> > > Fixes: baff59ccdc65 ("KVM: Pre-allocate cpumasks for kvm_make_all_cpus_request_except()")
+> > > Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+> > > ---
+> > 
+> > Pushed to branch `for_paolo/6.1` at:
+> > 
+> >      https://github.com/sean-jc/linux.git
+> > 
+> > Unless you hear otherwise, it will make its way to kvm/queue "soon".
+> > 
+> > Note, the commit IDs are not guaranteed to be stable.
 > 
-> Pushed to branch `for_paolo/6.1` at:
-> 
->      https://github.com/sean-jc/linux.git
-> 
-> Unless you hear otherwise, it will make its way to kvm/queue "soon".
-> 
-> Note, the commit IDs are not guaranteed to be stable.
+> Hmm, I was going to merge these memory leak fixes for 6.0, but no big deal
+> since they're mostly theoretical anyway.
 
-Hmm, I was going to merge these memory leak fixes for 6.0, but no big 
-deal since they're mostly theoretical anyway.
-
-Paolo
-
+Take them, I wasn't sure and was anticipating possibly dropping them anyways.  I
+can easily adjust, and was deliberately a little greedy for these technically-a-bug
+memory leaks so that we would't miss them by thinking the other would grab 'em.
