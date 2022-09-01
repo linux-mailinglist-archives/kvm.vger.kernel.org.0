@@ -2,98 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A49E5A996F
-	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 15:53:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B07F5A9990
+	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 15:58:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233967AbiIANxf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 09:53:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46016 "EHLO
+        id S233909AbiIAN6a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 09:58:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233431AbiIANxe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 09:53:34 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB4832B1
-        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 06:53:32 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id p8-20020a17090ad30800b001fdfc8c7567so5567468pju.1
-        for <kvm@vger.kernel.org>; Thu, 01 Sep 2022 06:53:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=ErJ0HYTeWtEwPWkKjxUMjvfOzkq3x7pnzQs4DfaztQI=;
-        b=gVBhlXo+kWUOUAdPW/8QSC/spoR7aDlJ+7CKxJMA9X4LfDMCbY0jOUYmO6zAh3erUc
-         oDX28M1zm7XifH6YMEdep0LvM0DAR1RzZHK1dKgbF41FQwrbtMpSsXNHw8GmdWQmPLoR
-         feQD2gsEzTxU2EY8Nh9t0hdI4ycnocSPLPo1OcTMrlIpjH6dPDOFTlzq+GCed9ZkdD7O
-         2QH4VVZY1+/PuOV8c/EZxWWqQTLedlbdpCU4hEVh2OKSofLAKmn/mCoi53a+yjT8c/Kj
-         z+FG2shz1RwkAqnaACpuZdnx6ThYZcxNI1PMQxDakoPYcFYBvOhi+ZLBfGSZ+ygoClXr
-         2mHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=ErJ0HYTeWtEwPWkKjxUMjvfOzkq3x7pnzQs4DfaztQI=;
-        b=ea9Ss2Y1VKIWmVC/6Z3G+hkal6kkJhJ1Qn319hjOl3WcbvvPfuBZ3ShwUKW2AMssvU
-         ttNgoe/Anygfp9HCpxkiaivQe3Rq7wv6z4thN5rO4T1rKcYNg7vUfh/DKCNJHqNnvPHZ
-         Ba3skDLMXGClPojsvDjC0hwpcvTHQbq+yKIRJ1wl8QSLxB1K3nTrKpTMFjT7+25Ym3U/
-         yuItCMhmdOp9r0D1rhb6vERWEy90su8a9Ky9vZ16+1DaLQ61hCPTGY/owFkigEo0rUBz
-         y3j/soI1yMADPw402KGMb6upS8u9E3sU/4Ko1oHixO8mCfp1ZntNHXdSEMUPDY7CNY0p
-         7XbQ==
-X-Gm-Message-State: ACgBeo3Llxi6gQJUpXcwZUnaZ6ayradK6lhEZGpqzEOnSNTSmj7Ch4oj
-        tjnZ3LlZ4n0gVZz3nHUBJrXnBw==
-X-Google-Smtp-Source: AA6agR4Z7Z7RmmgguQab7+M3a9D+IP8AxhQm8Xs9dhC8dxIBwXv55n3Xcy8OAa6q4QCV1g5i38p46g==
-X-Received: by 2002:a17:902:7845:b0:16e:d647:a66c with SMTP id e5-20020a170902784500b0016ed647a66cmr29779570pln.64.1662040412275;
-        Thu, 01 Sep 2022 06:53:32 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id k88-20020a17090a3ee100b001fd86f8dc03sm3359852pjc.8.2022.09.01.06.53.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Sep 2022 06:53:31 -0700 (PDT)
-Date:   Thu, 1 Sep 2022 13:53:28 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Li RongQing <lirongqing@baidu.com>
-Subject: Re: [PATCH 03/19] Revert "KVM: SVM: Introduce hybrid-AVIC mode"
-Message-ID: <YxC5WI9BW+dVyXw/@google.com>
-References: <20220831003506.4117148-1-seanjc@google.com>
- <20220831003506.4117148-4-seanjc@google.com>
- <17e776dccf01e03bce1356beb8db0741e2a13d9a.camel@redhat.com>
- <84c2e836d6ba4eae9fa20329bcbc1d19f8134b0f.camel@redhat.com>
- <Yw+MYLyVXvxmbIRY@google.com>
- <59206c01da236c836c58ff96c5b4123d18a28b2b.camel@redhat.com>
- <Yw+yjo4TMDYnyAt+@google.com>
- <c6e9a565d60fb602a9f4fc48f2ce635bf658f1ea.camel@redhat.com>
+        with ESMTP id S234181AbiIAN6T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 09:58:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E6512AE18
+        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 06:58:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662040697;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=WiIx364gIjS2z7dRJE0nKaQQ0mHqcrR06/I23IKZLlc=;
+        b=jPxq5Ni2FC3MxMz4Pn+MP/sDYRAc5DUpIAX8p66a1olhamw+Mjot0AcnrB3k/0NS8gYWkJ
+        R+UdrttXHKHBrpaysGBFHDMY1RsWeA7Q/HSYYm2IMfGChmQpmCp6x86kIiCRi33aqm8tFQ
+        kJdBSmU+6N1L2rlO+ZBOSbIZQCtCE8E=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-479-9a07oUgfMoKlFcVWOgok8g-1; Thu, 01 Sep 2022 09:58:13 -0400
+X-MC-Unique: 9a07oUgfMoKlFcVWOgok8g-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A6A1E1C004E4;
+        Thu,  1 Sep 2022 13:58:12 +0000 (UTC)
+Received: from sirius.home.kraxel.org (unknown [10.39.195.70])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 68A10492C3B;
+        Thu,  1 Sep 2022 13:58:12 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+        id B9E6518003AA; Thu,  1 Sep 2022 15:58:10 +0200 (CEST)
+Date:   Thu, 1 Sep 2022 15:58:10 +0200
+From:   Gerd Hoffmann <kraxel@redhat.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Sergio Lopez <slp@redhat.com>
+Subject: Re: [PATCH 0/2] expose host-phys-bits to guest
+Message-ID: <20220901135810.6dicz4grhz7ye2u7@sirius.home.kraxel.org>
+References: <20220831125059.170032-1-kraxel@redhat.com>
+ <957f0cc5-6887-3861-2b80-69a8c7cdd098@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c6e9a565d60fb602a9f4fc48f2ce635bf658f1ea.camel@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <957f0cc5-6887-3861-2b80-69a8c7cdd098@intel.com>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 01, 2022, Maxim Levitsky wrote:
-> There was actually a patch series that was fixing it, but you said, just like me,
-> that it is not worth it, better to have an errata in KVM, since guest should not use
-> this info anyway. I didn't object to it, and neither I do now, but as you see,
-> you also sometimes agree that going 100% to the spec is not worth it.
-> 
-> 
-> I hope you understand me.
+  Hi,
 
-Yep.
+> I think the problem is for all the named CPU model, that they don't have
+> phys_bits defined. Thus they all have "cpu->phys-bits == 0", which leads to
+> cpu->phys_bits = TCG_PHYS_ADDR_BITS (36 for 32-bits build and 40 for 64-bits
+> build)
 
-And rereading what I wrote...  I didn't intend to imply that you personally aren't
-operating in "good faith" or whatever is the right terminology.  What I was trying
-to explain is why I sometimes speak in absolutes.  When there is a bug/regression
-and KVM is clearly violating spec, it's not a matter of opinion; KVM is broken and
-needs to be fixed.
+Exactly.  And if you run on hardware with phys-bits being 36 or 39
+(common for intel desktop processors) things explode when the guest
+tries to use the whole range.
 
-Of course, one could argue that that's an opinion in and of itself...
+> Anyway, IMO, guest including guest firmware, should always consult from
+> CPUID leaf 0x80000008 for physical address length.
+
+It simply can't for the reason outlined above.  Even if we fix qemu
+today that doesn't solve the problem for the firmware because we want
+backward compatibility with older qemu versions.  Thats why I want the
+extra bit which essentially says "CPUID leaf 0x80000008 actually works".
+
+take care,
+  Gerd
+
