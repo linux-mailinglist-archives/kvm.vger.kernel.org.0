@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C2A625A8FAB
-	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 09:18:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 358B45A8FB5
+	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 09:18:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233640AbiIAHSG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 03:18:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60288 "EHLO
+        id S233722AbiIAHSY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 03:18:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233586AbiIAHRx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 03:17:53 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E455112537A;
-        Thu,  1 Sep 2022 00:17:51 -0700 (PDT)
+        with ESMTP id S233719AbiIAHSK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 03:18:10 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F017125E88;
+        Thu,  1 Sep 2022 00:18:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662016671; x=1693552671;
+  t=1662016686; x=1693552686;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=jGTUjhPCvzJ9QdTm5I51HBIMaR4fq+kRXdGH4c8lm4k=;
-  b=hfmumWktpdizdqk3xgunRAvqOzHOZrCocb5KvxFQgwv6PkaV2szaBydu
-   hRpPrVKh7NzuhCvkFCUNfs/b7k9HTIgQpSmpPZPd5gMcHA5n7c9AdSGBH
-   gYwnAg62DdbHbCNo1r2B/tcrfgc/Uw1Z6hlq85zyP5Ua7VC/G2V0m99Jh
-   e0DO27Lhs6IJANXEIkg0smAp8DecTmMQg47OSONmNPEqtqOMxMN2JuHGu
-   Py4xssc5gYFNU5Jc4JNfncrSIlAB0MM7RS2vhV2lvkDyFlzMxX7keZsvS
-   hEw/kzIRmpxVsvYlekPGrFrRXApLH0TCujUaOekxiy/pkjJ6n4hsJFebO
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10456"; a="278655514"
+  bh=MsDuuOfl+qc/+Vk8JeCf6fPZpgm3fSx5fNf5Rw0jDMw=;
+  b=XbVWkwnZg8kgfT5qPnTNWyEFFypXqXL3aeRMv5plJtQLyLzq3L+HZyq/
+   mtDHOWXQRbZnkalktGJXEugSKCKo4rTxAcnD+nAPWGqswi476C68WsQYM
+   v0l68Vxc7tLterY8bNKZdetcPyGlRIOgjaCItBATS6LERifvK/dKXan9F
+   Bx5ayW1AXPlFWJVCW8dwNZAx4n8hdeKaoOyHqHdozbV1bQfyVNk1Gfg00
+   tqWmTgep996rQxDb/l5Mr5cPi9kD/XxLF/Sp1CjiKSHWS+RlOdku9Nnbq
+   ABKiiSYyFyKcCGcASJRy4TvWWvJaXlyTcqSKPQ7zyXCd5tAx6fF4A79wy
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10456"; a="321782976"
 X-IronPort-AV: E=Sophos;i="5.93,280,1654585200"; 
-   d="scan'208";a="278655514"
+   d="scan'208";a="321782976"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 00:17:51 -0700
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 00:18:05 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.93,280,1654585200"; 
-   d="scan'208";a="673719876"
+   d="scan'208";a="673719941"
 Received: from sqa-gate.sh.intel.com (HELO michael.clx.dev.tsp.org) ([10.239.48.212])
-  by fmsmga008.fm.intel.com with ESMTP; 01 Sep 2022 00:17:42 -0700
+  by fmsmga008.fm.intel.com with ESMTP; 01 Sep 2022 00:17:51 -0700
 From:   Kevin Tian <kevin.tian@intel.com>
 To:     Zhenyu Wang <zhenyuw@linux.intel.com>,
         Zhi Wang <zhi.a.wang@intel.com>,
@@ -76,18 +76,19 @@ To:     Zhenyu Wang <zhenyuw@linux.intel.com>,
         linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
         kvm@vger.kernel.org
 Cc:     Yi Liu <yi.l.liu@intel.com>
-Subject: [PATCH v2 02/15] vfio/pci: Use the new device life cycle helpers
-Date:   Thu,  1 Sep 2022 22:37:34 +0800
-Message-Id: <20220901143747.32858-3-kevin.tian@intel.com>
+Subject: [PATCH v2 03/15] vfio/mlx5: Use the new device life cycle helpers
+Date:   Thu,  1 Sep 2022 22:37:35 +0800
+Message-Id: <20220901143747.32858-4-kevin.tian@intel.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20220901143747.32858-1-kevin.tian@intel.com>
 References: <20220901143747.32858-1-kevin.tian@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-0.2 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_06_12,
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_06_12,
         DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -96,130 +97,96 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Yi Liu <yi.l.liu@intel.com>
 
-Also introduce two pci core helpers as @init/@release for pci drivers:
-
- - vfio_pci_core_init_dev()
- - vfio_pci_core_release_dev()
+mlx5 has its own @init/@release for handling migration cap.
 
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 Signed-off-by: Kevin Tian <kevin.tian@intel.com>
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 ---
- drivers/vfio/pci/vfio_pci.c      | 20 +++++++++---------
- drivers/vfio/pci/vfio_pci_core.c | 35 ++++++++++++++++++++++++++++++++
- include/linux/vfio_pci_core.h    |  2 ++
- 3 files changed, 47 insertions(+), 10 deletions(-)
+ drivers/vfio/pci/mlx5/main.c | 49 ++++++++++++++++++++++++++----------
+ 1 file changed, 36 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 4d1a97415a27..c1223c458615 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -127,6 +127,8 @@ static int vfio_pci_open_device(struct vfio_device *core_vdev)
+diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
+index a9b63d15c5d3..168c1133e337 100644
+--- a/drivers/vfio/pci/mlx5/main.c
++++ b/drivers/vfio/pci/mlx5/main.c
+@@ -579,8 +579,35 @@ static const struct vfio_migration_ops mlx5vf_pci_mig_ops = {
+ 	.migration_get_state = mlx5vf_pci_get_device_state,
+ };
  
- static const struct vfio_device_ops vfio_pci_ops = {
- 	.name		= "vfio-pci",
-+	.init		= vfio_pci_core_init_dev,
-+	.release	= vfio_pci_core_release_dev,
- 	.open_device	= vfio_pci_open_device,
- 	.close_device	= vfio_pci_core_close_device,
- 	.ioctl		= vfio_pci_core_ioctl,
-@@ -146,20 +148,19 @@ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	if (vfio_pci_is_denylisted(pdev))
- 		return -EINVAL;
++static int mlx5vf_pci_init_dev(struct vfio_device *core_vdev)
++{
++	struct mlx5vf_pci_core_device *mvdev = container_of(core_vdev,
++			struct mlx5vf_pci_core_device, core_device.vdev);
++	int ret;
++
++	ret = vfio_pci_core_init_dev(core_vdev);
++	if (ret)
++		return ret;
++
++	mlx5vf_cmd_set_migratable(mvdev, &mlx5vf_pci_mig_ops);
++
++	return 0;
++
++}
++
++static void mlx5vf_pci_release_dev(struct vfio_device *core_vdev)
++{
++	struct mlx5vf_pci_core_device *mvdev = container_of(core_vdev,
++			struct mlx5vf_pci_core_device, core_device.vdev);
++
++	mlx5vf_cmd_remove_migratable(mvdev);
++	vfio_pci_core_release_dev(core_vdev);
++}
++
+ static const struct vfio_device_ops mlx5vf_pci_ops = {
+ 	.name = "mlx5-vfio-pci",
++	.init = mlx5vf_pci_init_dev,
++	.release = mlx5vf_pci_release_dev,
+ 	.open_device = mlx5vf_pci_open_device,
+ 	.close_device = mlx5vf_pci_close_device,
+ 	.ioctl = vfio_pci_core_ioctl,
+@@ -598,21 +625,19 @@ static int mlx5vf_pci_probe(struct pci_dev *pdev,
+ 	struct mlx5vf_pci_core_device *mvdev;
+ 	int ret;
  
--	vdev = kzalloc(sizeof(*vdev), GFP_KERNEL);
--	if (!vdev)
+-	mvdev = kzalloc(sizeof(*mvdev), GFP_KERNEL);
+-	if (!mvdev)
 -		return -ENOMEM;
--	vfio_pci_core_init_device(vdev, pdev, &vfio_pci_ops);
-+	vdev = vfio_alloc_device(vfio_pci_core_device, vdev, &pdev->dev,
-+				 &vfio_pci_ops);
-+	if (IS_ERR(vdev))
-+		return PTR_ERR(vdev);
- 
- 	dev_set_drvdata(&pdev->dev, vdev);
- 	ret = vfio_pci_core_register_device(vdev);
+-	vfio_pci_core_init_device(&mvdev->core_device, pdev, &mlx5vf_pci_ops);
+-	mlx5vf_cmd_set_migratable(mvdev, &mlx5vf_pci_mig_ops);
++	mvdev = vfio_alloc_device(mlx5vf_pci_core_device, core_device.vdev,
++				  &pdev->dev, &mlx5vf_pci_ops);
++	if (IS_ERR(mvdev))
++		return PTR_ERR(mvdev);
++
+ 	dev_set_drvdata(&pdev->dev, &mvdev->core_device);
+ 	ret = vfio_pci_core_register_device(&mvdev->core_device);
  	if (ret)
 -		goto out_free;
 +		goto out_put_vdev;
  	return 0;
  
 -out_free:
--	vfio_pci_core_uninit_device(vdev);
--	kfree(vdev);
+-	mlx5vf_cmd_remove_migratable(mvdev);
+-	vfio_pci_core_uninit_device(&mvdev->core_device);
+-	kfree(mvdev);
 +out_put_vdev:
-+	vfio_put_device(&vdev->vdev);
++	vfio_put_device(&mvdev->core_device.vdev);
  	return ret;
  }
  
-@@ -168,8 +169,7 @@ static void vfio_pci_remove(struct pci_dev *pdev)
- 	struct vfio_pci_core_device *vdev = dev_get_drvdata(&pdev->dev);
+@@ -621,9 +646,7 @@ static void mlx5vf_pci_remove(struct pci_dev *pdev)
+ 	struct mlx5vf_pci_core_device *mvdev = mlx5vf_drvdata(pdev);
  
- 	vfio_pci_core_unregister_device(vdev);
--	vfio_pci_core_uninit_device(vdev);
--	kfree(vdev);
-+	vfio_put_device(&vdev->vdev);
+ 	vfio_pci_core_unregister_device(&mvdev->core_device);
+-	mlx5vf_cmd_remove_migratable(mvdev);
+-	vfio_pci_core_uninit_device(&mvdev->core_device);
+-	kfree(mvdev);
++	vfio_put_device(&mvdev->core_device.vdev);
  }
  
- static int vfio_pci_sriov_configure(struct pci_dev *pdev, int nr_virtfn)
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index c8d3b0450fb3..708b61d1b364 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -1825,6 +1825,41 @@ static void vfio_pci_vga_uninit(struct vfio_pci_core_device *vdev)
- 					      VGA_RSRC_LEGACY_MEM);
- }
- 
-+int vfio_pci_core_init_dev(struct vfio_device *core_vdev)
-+{
-+	struct vfio_pci_core_device *vdev =
-+		container_of(core_vdev, struct vfio_pci_core_device, vdev);
-+
-+	vdev->pdev = to_pci_dev(core_vdev->dev);
-+	vdev->irq_type = VFIO_PCI_NUM_IRQS;
-+	mutex_init(&vdev->igate);
-+	spin_lock_init(&vdev->irqlock);
-+	mutex_init(&vdev->ioeventfds_lock);
-+	INIT_LIST_HEAD(&vdev->dummy_resources_list);
-+	INIT_LIST_HEAD(&vdev->ioeventfds_list);
-+	mutex_init(&vdev->vma_lock);
-+	INIT_LIST_HEAD(&vdev->vma_list);
-+	INIT_LIST_HEAD(&vdev->sriov_pfs_item);
-+	init_rwsem(&vdev->memory_lock);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(vfio_pci_core_init_dev);
-+
-+void vfio_pci_core_release_dev(struct vfio_device *core_vdev)
-+{
-+	struct vfio_pci_core_device *vdev =
-+		container_of(core_vdev, struct vfio_pci_core_device, vdev);
-+
-+	mutex_destroy(&vdev->igate);
-+	mutex_destroy(&vdev->ioeventfds_lock);
-+	mutex_destroy(&vdev->vma_lock);
-+	kfree(vdev->region);
-+	kfree(vdev->pm_save);
-+	vfio_free_device(core_vdev);
-+}
-+EXPORT_SYMBOL_GPL(vfio_pci_core_release_dev);
-+
- void vfio_pci_core_init_device(struct vfio_pci_core_device *vdev,
- 			       struct pci_dev *pdev,
- 			       const struct vfio_device_ops *vfio_pci_ops)
-diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-index 5579ece4347b..98c8c66e2400 100644
---- a/include/linux/vfio_pci_core.h
-+++ b/include/linux/vfio_pci_core.h
-@@ -233,6 +233,8 @@ void vfio_pci_core_close_device(struct vfio_device *core_vdev);
- void vfio_pci_core_init_device(struct vfio_pci_core_device *vdev,
- 			       struct pci_dev *pdev,
- 			       const struct vfio_device_ops *vfio_pci_ops);
-+int vfio_pci_core_init_dev(struct vfio_device *core_vdev);
-+void vfio_pci_core_release_dev(struct vfio_device *core_vdev);
- int vfio_pci_core_register_device(struct vfio_pci_core_device *vdev);
- void vfio_pci_core_uninit_device(struct vfio_pci_core_device *vdev);
- void vfio_pci_core_unregister_device(struct vfio_pci_core_device *vdev);
+ static const struct pci_device_id mlx5vf_pci_table[] = {
 -- 
 2.21.3
 
