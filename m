@@ -2,155 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1319B5A95D8
-	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 13:38:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3E495A95EA
+	for <lists+kvm@lfdr.de>; Thu,  1 Sep 2022 13:48:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232757AbiIALiD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 07:38:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45748 "EHLO
+        id S232813AbiIALsN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 07:48:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232730AbiIALiB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 07:38:01 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA46B139D60
-        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 04:38:00 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 281BHiC4009467
-        for <kvm@vger.kernel.org>; Thu, 1 Sep 2022 11:38:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : to :
- subject : from : cc : message-id : date; s=pp1;
- bh=o7lrsfxQHIYVm97THchRzxII+7pokNlbs9+xOcTJwSk=;
- b=C5TS2xy6jJFUPeU2DZMseXv2VGl0ma1D5c1F71ksjEFoWmML79ZgdrbndoYnnozKenDw
- RyFVmgQPFVj6QRqBm0/HL9ILy2VlXaceXBgoLaqwvs9jS5INVmD/yjRf6E1IMSJsYBLs
- zqGvkmQRwWpOe7QtPoGD9AqQXSx60N1IS3jt8feuuUK1PblTnRId+NtGYTuhGMnJ/iNW
- h4UnCIkVOJksb8ayiZW7VnKjvCEUMoYfxWK973QCNJfZrYO6MADfXWSaR9lLCDGK7LIZ
- 0LV8J9+T++ih87dKZhd5Bb3ImWtrLvwy2FF6PFkVsCRXHrqto186llKdZGBAyvLSZY2F 8A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jaur3gkqh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 01 Sep 2022 11:37:59 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 281BIKbZ013269
-        for <kvm@vger.kernel.org>; Thu, 1 Sep 2022 11:37:59 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jaur3gkpt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Sep 2022 11:37:59 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 281Ba2M9008092;
-        Thu, 1 Sep 2022 11:37:57 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3j7aw96pbq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 01 Sep 2022 11:37:57 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 281BbsOX42467630
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 1 Sep 2022 11:37:54 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5A5BFA4054;
-        Thu,  1 Sep 2022 11:37:54 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3C220A405B;
-        Thu,  1 Sep 2022 11:37:54 +0000 (GMT)
-Received: from t14-nrb (unknown [9.155.203.253])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  1 Sep 2022 11:37:54 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S232357AbiIALsL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 07:48:11 -0400
+Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1B931616B1
+        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 04:48:08 -0700 (PDT)
+Received: by mail-ot1-x336.google.com with SMTP id t11-20020a05683014cb00b0063734a2a786so12173612otq.11
+        for <kvm@vger.kernel.org>; Thu, 01 Sep 2022 04:48:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=gs2edPsujnl7CWNh7HlhsQUZIDEP93wl7jDr/MStIUw=;
+        b=p4Jy2v4kA4G083K2jvV8paFTLopfZmvrFFiJVDXHA2CLiAiMQbvzaI+6xtM8fy/ioG
+         q6v7h070g3jpHvc4zgWyn3PlpTVoAJgBTO2vVRqQ3EqVA8c08gieh25/eEkREYxnvqky
+         TXkIBKV0x1PI2gdqV0XGCVMXGEeDH6C6muFw/yupvnl6MjMyjVVbFbPShk3Jp824gz71
+         N7Rba0BKxgepKwaUOE+wXqFZ3V32Gshk2fFTQE/vAu0GyhiDDfyyUOytBQkvw7WZ40UR
+         sh7VZ6I3eovXnP5i1aVdjY/A1mrIEVM/6RFgdxOsTWqH4+36C6UQ89MrljrPBnuhgQKp
+         7dUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=gs2edPsujnl7CWNh7HlhsQUZIDEP93wl7jDr/MStIUw=;
+        b=3g+YGrUWPntgFydAJubt+FZxgmHuY3mdQXBQPX7u0g4jk609/eMOM4JcXti0bXvzqE
+         ybWMA4Q0eRGs83GAD56ouBliEvPt6XIvM/QsFJV37zv+Bk5rLQ0m4VajbLo3Ij0RlVFM
+         qGBwF74zRnbBQw+dtasTQIISeqxJWVdawp9TGTo4vALO51dK9QXiJHWvzeVwcOJe8zxm
+         GTlfZFKdC7ausPqR96ryEvxku3aaRdWxcKoKXMYBwK/gG/8URNfYVXpQY5tSnAjAT3L+
+         ACR/IJJAKl5p2docImz4k3C5I6OhVI5qPn7vfRzFuguNxlewmbJ/moeusIAH2GB/49Jr
+         9yGQ==
+X-Gm-Message-State: ACgBeo3HSc5BiKiLBjji9V2VXCpkhXzsFabODIYg/JNWrAv+zv570KAp
+        Izd09BCdQiOjppOS1ds0SIae7IUoG4KycXOWoLdHWg==
+X-Google-Smtp-Source: AA6agR6hJTVkzRjg9Zp0GaEGFRl4JLkQUdmzHa2xCc6eISLwJhjaURVIMa4Ntc6+O/EMeYoeT/5memUCEXVJ+lrAETU=
+X-Received: by 2002:a05:6830:2a8e:b0:638:c41c:d5a1 with SMTP id
+ s14-20020a0568302a8e00b00638c41cd5a1mr12801248otu.367.1662032887714; Thu, 01
+ Sep 2022 04:48:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <47fe3036-3566-0118-ac0c-86f4a0d1c838@redhat.com>
-References: <20220830115623.515981-1-nrb@linux.ibm.com> <20220830115623.515981-3-nrb@linux.ibm.com> <47fe3036-3566-0118-ac0c-86f4a0d1c838@redhat.com>
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v1 2/2] s390x: add exittime tests
-From:   Nico Boehr <nrb@linux.ibm.com>
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com
-Message-ID: <166203227401.25136.16046934415525346231@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Thu, 01 Sep 2022 13:37:54 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Z3qlbDnXlGd-Z5kJx0N3rowFcBVyEubd
-X-Proofpoint-ORIG-GUID: yGMtW1dYcbjvFSv9dF7RRjEqcHa6oSY8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-09-01_08,2022-08-31_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- malwarescore=0 suspectscore=0 priorityscore=1501 adultscore=0 mlxscore=0
- clxscore=1015 spamscore=0 lowpriorityscore=0 mlxlogscore=999 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2209010052
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220831003506.4117148-1-seanjc@google.com> <20220831003506.4117148-4-seanjc@google.com>
+ <17e776dccf01e03bce1356beb8db0741e2a13d9a.camel@redhat.com>
+ <84c2e836d6ba4eae9fa20329bcbc1d19f8134b0f.camel@redhat.com>
+ <Yw+MYLyVXvxmbIRY@google.com> <59206c01da236c836c58ff96c5b4123d18a28b2b.camel@redhat.com>
+ <Yw+yjo4TMDYnyAt+@google.com> <c6e9a565d60fb602a9f4fc48f2ce635bf658f1ea.camel@redhat.com>
+In-Reply-To: <c6e9a565d60fb602a9f4fc48f2ce635bf658f1ea.camel@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 1 Sep 2022 04:47:56 -0700
+Message-ID: <CALMp9eQWHADOoQsocSWwwhyyxk-5oT=GzsGJSj1H=Lsfo=fuEQ@mail.gmail.com>
+Subject: Re: [PATCH 03/19] Revert "KVM: SVM: Introduce hybrid-AVIC mode"
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Li RongQing <lirongqing@baidu.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Thomas Huth (2022-08-30 14:52:14)
-> > diff --git a/s390x/exittime.c b/s390x/exittime.c
-> > new file mode 100644
-[...]
-> > +static void test_nop(long ignore)
-> > +{
-> > +     asm volatile("nop" : : : "memory");
-> > +}
->=20
-> What's the purpose of testing "nop"? ... it does not trap to the=20
-> hypervisor... ? Is it just for reference? Then a comment might be helpful=
- here.
+On Thu, Sep 1, 2022 at 3:26 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
 
-Yes, the idea is to have some reference for a non-trapping instruction. Add=
-ed a comment.
+> I just know that nothing is absolute, in some rare cases (like different APIC base per cpu),
+> it is just not feasable to support the spec.
 
-[...]
-> > +static void test_diag44(long ignore)
-> > +{
-> > +     asm volatile("diag 0,0,0x44" : : : );
->=20
-> Drop the " : : : " please.
-
-OK
-
-> > +static void test_stnsm(long ignore)
-> > +{
-> > +     int out;
-> > +
-> > +     asm volatile(
-> > +             "stnsm %[out],0xff"
-> > +             : [out] "=3DQ" (out)
-> > +             :
-> > +             : "memory"
->=20
-> I don't think you need the "memory" clobber here, do you?
-
-Uhm, yes, right. Good thing we have reviews. :-)
-
-[...]
-> > +static void test_stpx(long ignore)
-> > +{
-> > +     unsigned int prefix;
-> > +
-> > +     asm volatile(
-> > +             "stpx %[prefix]"
-> > +             : [prefix] "=3DS" (prefix)
->=20
-> STPX seems to have only a short displacement, so it should have "=3DQ" in=
-stead=20
-> of "=3DS" ?
-
-Yes, right, fixed. Also the memory clobber is unneeded. I think I will do t=
-hrough all the clobbers and constraint once more, seems like I messed up a =
-bit there.
-
-[...]
-> > +struct test {
-> > +     char name[100];
->=20
-> "const char *name" instead of using an array here, please. Otherwise this=
-=20
-> wastes a lot of space in the binary.
-
-Makes sense, thanks.
+Why isn't this feasible? We supported it when I was at VMware.
