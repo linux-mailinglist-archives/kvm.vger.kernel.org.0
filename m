@@ -2,143 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC5C75AADD9
-	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 13:46:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57B155AAF55
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 14:36:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235485AbiIBLq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Sep 2022 07:46:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47706 "EHLO
+        id S236962AbiIBMgd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Sep 2022 08:36:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234778AbiIBLq0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Sep 2022 07:46:26 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10hn2240.outbound.protection.outlook.com [52.100.156.240])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB70BACA22;
-        Fri,  2 Sep 2022 04:46:22 -0700 (PDT)
+        with ESMTP id S236959AbiIBMfg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Sep 2022 08:35:36 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D41C8E0FF9;
+        Fri,  2 Sep 2022 05:28:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662121731; x=1693657731;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=qT4KlYsAq8MJRKNqsN8cReTQdvwAA76NXJM/7mzZ7c4=;
+  b=Tc2yydCdKdMQqN4e71VPT5BRifIW8SgFLYVTDqf4EW9joEJNXsYqD8IQ
+   HxpgdZvuzldgL7ujnJrQL5SJI11UdNcQPLFKLq2+K94lflv6NG7mBOyZ4
+   /kaQ4vnF2x8qfKOiuoq+2LjltwPI3/nXv199Xj9d6gFQOfRfOa/cEAtCL
+   8xXFC7lhbGYtbZkXLoQ9PTq5oogr7rxNzMxPJ7K6XpAWWXrbs4nlq7NgY
+   52EztOwIxeaqYHENoUPP05y4m7wqCnvPzYni0xPwMkEtaruiE4nVitLlv
+   XxZF2YQ/NPIuHBFX6XTMYWnNxrQcy632K5d+XMbAdTapPfhXKEfQn7DBZ
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10457"; a="278985069"
+X-IronPort-AV: E=Sophos;i="5.93,283,1654585200"; 
+   d="scan'208";a="278985069"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2022 05:26:23 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,283,1654585200"; 
+   d="scan'208";a="563948438"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga003.jf.intel.com with ESMTP; 02 Sep 2022 05:26:23 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 2 Sep 2022 05:26:23 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Fri, 2 Sep 2022 05:26:22 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Fri, 2 Sep 2022 05:26:22 -0700
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.40) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Fri, 2 Sep 2022 05:26:22 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=S3YHPTADOwpnthNvVQujTEPJV0pkwfbOR1Ekob9suyk4gr3nVOplijct3IENBctv7z1dMecEViZ/261r7UPRH7Hq3KcCff26Lur44gWaN1diB0+uch/nflIXmkUHt+hM0NdJIaQCcwUWpSz+cW6NsGjmXLGnNQiN4xu/pmXqC0nA4bzE37KhGd18hFbq/w0TxNy3OmCmq28FXWxc9Xqb3zUaA2jHR6iz9Qbs6Slq/xPvZm5M82TWfPjq5obUwNdRGTY9cZwM5UKCgBkyQQjx1yj1FV+QYrW7uTIhnZwktRR8Myy/wrWDQ0coMGd/vkz6iMP0Iju8NVJ+Mw/pSi+P4A==
+ b=K5xFV8L7m1yDJBHwIgl2e3Yb7wrDz55id0cKOsovwbN9y0qvupDeWGuslV6e9bpfc8aWMQtmdCXf3A/AaDRhhC6tjCOD3sldrznfzXhrtwJ1edXOFlwXIy1euoere79FTSec4RWObRELjD5owu7BBMk13qZKd3E4e1j9/jFQKmTB9eXJOCvi6xuihIg94Y31m5QoGOMW8uwd30OdY+4EE+EnsbJe0/1eF+qWhGDRa4x1q2h9Apu4hUOnNMo/AR0S4kLANTuu1KibJC/WGXUbim4DDJ1whDTZlrahR1RTwqFMnGgrwf2TC1iIDYSnMeFCOrfI2Z00xl24LvwjJO3Kog==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kCssVa4sV/8Z1CMABgbFZBN9N0JD7ix8RO/klxBPpv8=;
- b=N8CPlq5zsOpWaQQwRGcBcuCmJwmZN7BeHd8zB6NuT5mXrvyY/q4qPO0m4K4VyI0OV4/pQz67vEr/WxfexX1kp1hTfeNlC7SQOXGfUTIpqJuoQtcfPehAYpp35sn7siqquY6grOA1HVWHV8cbcivxGwJDzyvEzJdM1B4mmwZaQzZRO5Jiw7yBOwdRa8LgvlaMCdjHGq+/Mn8h3yHO7lIgL1Qp9ofeFQq3cZNHBse9NsHU+DzLNYkUUpYxAVxEawmsBMvmGPcAdO/xkngrw54sGEqxGQM+NEsaWYnyEwLin8M6Jhab/WmVrs4CzE4PJjOJUfLQI2DxN4ouCOm7ImN50w==
+ bh=AF4Qc5oFsJHCwSYBPvAcsuqDeC/BhQmPs0HU3qbdleM=;
+ b=N+843pGAyvB5A/pgTlzEaCDnqkG3BGUl9RhysC57c0yMqVFE9ARgTtAfh5+9drc03+jdGM6n5WDidIF3U25Yz2mtHkkq+m2mycUR9YFLPuVqQIy2OYuVTxoYErHjFukuYa6engXOsOUT1UyS4hk+r5SDl5w69Ci/AQEfQLL+fRKlBOUiIOD8p5BWgNWDEzNYJFUjCtZKhslS7FFiW6e9WVoDNlISZtpjTp+Wz/KWRtsrefA5gr3l82UR29WInfpAjucNn8k5UPi30FMSE8gjjv9fm2qG7wI9nO5AVWX7E4Y/DoVspwLl4DCeLeeMIh3GSPXIwo3lDm33jHswFYBk9w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kCssVa4sV/8Z1CMABgbFZBN9N0JD7ix8RO/klxBPpv8=;
- b=M2gNa/TSR/pDxR9eRWzq5AK3ao/e40GaUGW03LBy1dCEuiM2to2Dnh9BQGU7Vr67i962YxqujkWNoc0O4vUgvJpRiw2/EYGMh6pLrkPp5E7wCgwS0xdIWExxuryvyZvEkD53RyO9VtQaQwMTYzwidwAkXyZrV8tWsNYDWrrYqKP65ICoJ0mRo9SUnIEDzPncpQ/QDFJsAl5F+5qnbU7tfrRHN/Sem+/fXXmp1J9ifwfU99vCqmNKNMoE35+J5Sob8hdDa+2wvrvkQMuylWiju5PpBYh5j86JPp7AwF3+TMSipaQQ62enh3jTCl/ir4oplSBEYlTfJA1vJpy5kKm+vg==
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH2PR12MB4181.namprd12.prod.outlook.com (2603:10b6:610:a8::16)
- by MW4PR12MB6873.namprd12.prod.outlook.com (2603:10b6:303:20c::17) with
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL0PR11MB2995.namprd11.prod.outlook.com (2603:10b6:208:7a::28)
+ by BYAPR11MB2821.namprd11.prod.outlook.com (2603:10b6:a02:c9::29) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.14; Fri, 2 Sep
- 2022 11:46:20 +0000
-Received: from CH2PR12MB4181.namprd12.prod.outlook.com
- ([fe80::3d9f:c18a:7310:ae46]) by CH2PR12MB4181.namprd12.prod.outlook.com
- ([fe80::3d9f:c18a:7310:ae46%8]) with mapi id 15.20.5588.014; Fri, 2 Sep 2022
- 11:46:20 +0000
-Date:   Fri, 2 Sep 2022 08:46:19 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, Deming Wang <wangdeming@inspur.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        Fabiano Rosas <farosas@linux.ibm.com>,
-        Murilo Opsfelder Araujo <muriloo@linux.ibm.com>,
-        Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH kernel 0/3] powerpc/iommu: Add iommu_ops to report
- capabilities and allow blocking domains
-Message-ID: <YxHtC5xw9KBZ6hSc@nvidia.com>
-References: <20220714081822.3717693-1-aik@ozlabs.ru>
- <YxFMWs3c+m/rubVk@nvidia.com>
- <87tu5qtelx.fsf@mpe.ellerman.id.au>
-Content-Type: text/plain; charset=us-ascii
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.10; Fri, 2 Sep
+ 2022 12:26:20 +0000
+Received: from BL0PR11MB2995.namprd11.prod.outlook.com
+ ([fe80::5482:e4d0:c7d9:e8be]) by BL0PR11MB2995.namprd11.prod.outlook.com
+ ([fe80::5482:e4d0:c7d9:e8be%4]) with mapi id 15.20.5588.014; Fri, 2 Sep 2022
+ 12:26:20 +0000
+Date:   Fri, 2 Sep 2022 20:26:07 +0800
+From:   Philip Li <philip.li@intel.com>
+To:     Thorsten Leemhuis <regressions@leemhuis.info>
+CC:     kernel test robot <oliver.sang@intel.com>,
+        Kai Huang <kai.huang@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <lkp@lists.01.org>, <lkp@intel.com>, <regressions@lists.linux.dev>
+Subject: Re: [LKP] Re: [KVM] c3e0c8c2e8:
+ leaking-addresses.proc..data..ro_after_init.
+Message-ID: <YxH2X8gMWyJeKPRa@rli9-MOBL1.ccr.corp.intel.com>
+References: <YvpZYGa1Z1M38YcR@xsang-OptiPlex-9020>
+ <04ce8956-3285-345a-4ce5-b78500729e42@leemhuis.info>
+ <YxCyhTES9Nk+S94y@rli9-MOBL1.ccr.corp.intel.com>
+ <57c596f7-014f-1833-3173-af3bad2ca45d@leemhuis.info>
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <87tu5qtelx.fsf@mpe.ellerman.id.au>
-X-ClientProxiedBy: MN2PR20CA0038.namprd20.prod.outlook.com
- (2603:10b6:208:235::7) To CH2PR12MB4181.namprd12.prod.outlook.com
- (2603:10b6:610:a8::16)
+In-Reply-To: <57c596f7-014f-1833-3173-af3bad2ca45d@leemhuis.info>
+X-ClientProxiedBy: SG2PR04CA0163.apcprd04.prod.outlook.com (2603:1096:4::25)
+ To BL0PR11MB2995.namprd11.prod.outlook.com (2603:10b6:208:7a::28)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 57813666-c0a3-4db3-6be7-08da8cd8c0d7
-X-MS-TrafficTypeDiagnostic: MW4PR12MB6873:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2a58acb4-2350-4e39-1c04-08da8cde5710
+X-MS-TrafficTypeDiagnostic: BYAPR11MB2821:EE_
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?461vzl8KvrKF+6BKqi/PhJ5/sVeTirDs2+amQyzyfPWVUXx0k23k1JZ2ap8L?=
- =?us-ascii?Q?3cLYgaOCCgFhqrzPFc6Boq3cf8AX6B2NMjfscqV3guKBP/gYycLDi/c6sPWy?=
- =?us-ascii?Q?aeMm9PLmGr6Up7sOUMVO9hD0BHvc4BlmC7poo5I3eAD1WdzSe0c43nH3g5zC?=
- =?us-ascii?Q?ko99igrUFmrD4W4nz7IFmGn7UQdCxe47buVU+s+swhQTkaZFOJaINOuR7xfR?=
- =?us-ascii?Q?K1fdl8VImgh8/GeGYytL7rVF98E7/iGect0ytKYtuwEudKNPi8tk/tkANANE?=
- =?us-ascii?Q?jcOdkw7+iVozOhkojk9t61hso0f0mnmG87Wmh30HbffMcTUXMs4gUOoOaK1N?=
- =?us-ascii?Q?yqSrARbJ24ZyyKRDAsTF5w1e40wbx/hlPeWq/a9rMZxPr/50Q1m63t/EbmR+?=
- =?us-ascii?Q?R+fSP93l7RC+duKjUyzM7NUHd15xqq7vqdautSi7IAxzRhKsPFj6o8zW8mFj?=
- =?us-ascii?Q?he5Jb+H2xGGM7jgCAp8qgBrd+dly+qwQTgNZ1EmTEFsfFCKLaHIrjB0GbiAj?=
- =?us-ascii?Q?gqyR4YgTev6v35QBF2L6+rDnKqKpH1TDduB4R19IlxCOyFy06EbzH6LJiCoP?=
- =?us-ascii?Q?jMWcRs5iM+rgvRrlGt+sEdl4O/YHL3cmVQEeIs1xQZCEnqna7IJzc9XUtKB+?=
- =?us-ascii?Q?Bc4D4VcRfcxbcVtzJYlN4uCJOzFEDVu/9vqGkSGS+v6aOBMxJ82aRYpUn4NO?=
- =?us-ascii?Q?rVHoRAyt6CzqOtm1GZPr50lvN3SAh5ekcyHT0SPnQUZRj08sQKE2W8JAr33f?=
- =?us-ascii?Q?CslttoU2v97QJr42U9WasthHdUv6YUHeY01S4oLrOI4V6hNgUKgMFPYJ0Hru?=
- =?us-ascii?Q?hHAVUMoo39dT6kJYkSNC1/syMIZJikr236d7MI0Gviy7OAO5nfE95de09RZ3?=
- =?us-ascii?Q?Z7PyB1GJGl1QMgLA+/3CzeSOhrD0znGFmLPfhxjEUwRQMeoWCMqP4q4Q4fK6?=
- =?us-ascii?Q?6JHLVVxwRJgIrhO6ikeJiuOqTlBJMMS9t0I5yRxqCOP6coY3DhAtsbkjXa05?=
- =?us-ascii?Q?BdrbmEYmSotU5ZcN6jISGT0pyNZ6pqVD2G5EnSx6zTynQo3dDbNLnHYqxQyw?=
- =?us-ascii?Q?egw1Lr5HJMLwghnSdu95SJaAeP9w4V+njorIuH+sKTrTesiizl57rog46H7S?=
- =?us-ascii?Q?S44WlVEOsYP8pBAckbdcqlC1HKlKt9GOqC3VwGbyO0mo1JcWOyLiT0Qvmbhp?=
- =?us-ascii?Q?gBQd0JTtuTIJyxMyZrVCMpTuNhIdz3pvxse3v7USxOzflN2GvKbZKBVH81b8?=
- =?us-ascii?Q?sPRuGe/lSd1fwi5KwsPk+vseG7Tal43ScEVyFPFQK3GplwpBqfI3bGdaph7x?=
- =?us-ascii?Q?K1qRRAMLKar8BhTqIh2TL+b5s5vNHjmbCGwVes3QgoKWS+ucrItjtaGbLXSA?=
- =?us-ascii?Q?C8YL2LHZAVyvAuB+x5o62LPZLxOa9WxtktufrXc2baUDRd05fQ=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:9;SRV:;IPV:NLI;SFV:SPM;H:CH2PR12MB4181.namprd12.prod.outlook.com;PTR:;CAT:OSPM;SFS:(13230016)(4636009)(366004)(396003)(346002)(39860400002)(376002)(136003)(66476007)(478600001)(41300700001)(26005)(6506007)(54906003)(6512007)(2906002)(36756003)(316002)(86362001)(6916009)(966005)(6486002)(38100700002)(66556008)(2616005)(186003)(7416002)(8936002)(5660300002)(8676002)(4326008)(66946007)(83380400001);DIR:OUT;SFP:1501;
+X-Microsoft-Antispam-Message-Info: JwzwId5yDV2zZhbcu+60SZRelHcDwCu2BMETSrmVJCiDjZacX3xhLlbXWEuAk+ob0IHLmuHEZHV2Mw2vHIvbKtREinfbv2qipt/KbOacFEge+tW9bjI5P6CBFYp3wuvOU+aiSrXy2mFHCOXj/scOoAoKdliMh+MLC5FyDGthXFF+DzDJsq2GBOcxVwSsoRTjOs7YOgxwZUxDJblzuPxZoTzHR9C1OyFsI/KAkkyI0FF3aTv2RFXaOl+Tul6nEb9ekCoijD7CPGlABPIm/Db3IXCaRp5D/cpOXjkF3klYrpbPZIO9JYb5iynsA+GHVYF2XofdHdPYsNjSXgqGHIM2y0s8379sSor87ToE3rCpdglmsr1d4Diiza5QJSlsS74bW/jQ1MqRYTrau2Lr96rt6fmzIt2MsMgL8UWNJm+QIh0PUmyihnQUB59HHnMOiIjU5J5iuEANCUP+LXaDeFfNbOX2vgQRtyLB2R3kNY/2xsGTq3LcSTE5GnLUarWGmHzEKAptPanZ0SnTNvPUt7epgRQLD0/yfhVtSAm1c6aaOPElulijvJRWZmmOKiuGr01tfIHyWR0smFojrqw7ovwOtyqviamgzWoDueb7rpWKfx1vFLYj2Bq2xC/tnvxH1KBDNjxJusuD01oR51QNIvDfEeDk8qoOOQyNXrVdnujzPbMdJM/SHIF3WJarcTj1l/3WmbJsnHJKtcQs5/Z6rfO4V95FUltjVDKyeZfnSVRJsNCmDYWcbuho+Ly/dsIdJnhgegMI93H9yFFlaoKbMwVZ1X6wB2nTjJgtF9pp/skrchs=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB2995.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(376002)(366004)(39860400002)(396003)(346002)(136003)(82960400001)(6916009)(86362001)(38100700002)(54906003)(316002)(2906002)(5660300002)(44832011)(8676002)(66556008)(66946007)(66476007)(8936002)(186003)(4326008)(41300700001)(83380400001)(966005)(6486002)(6666004)(6506007)(53546011)(6512007)(26005)(478600001)(101420200003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?T/SAlWyBAopDAiZNI+zXPG5bfHFR+6uUin1t0+u+VX+IW2zleclQ41+xYosM?=
- =?us-ascii?Q?41f9iCwQ1KCoJyYaZD0ZS/tPhMEdHgI7iwgUV+6GWPAXSIT+Fbw6RFecpjtD?=
- =?us-ascii?Q?CqbjZDj2wdI4Ajcpy5lle2amKO9JNzRjxt8y5FG39xNZHmNGljzHmBUSaoan?=
- =?us-ascii?Q?M4/9D6yTbLrjJUxwJ7GHzyO78M1fQuKqPPURYyjFqhDQZ3ilMTtWdbZLXUAs?=
- =?us-ascii?Q?l/QigKoGLjLJ3e75xheSiz5uZa2G1IxQKLY0Wi3nsqmASyD2P9faum4jZm68?=
- =?us-ascii?Q?EoCXmfUN10X2RZAO6lhZARWandF+6yEwrpRPod4q5HJidTTJ04wH1NZ19XAc?=
- =?us-ascii?Q?tBmxtgzZhrO9FtofGAaFO00poobLOI2C/DqME4YaWEW3BEamAqevMQk/BVNW?=
- =?us-ascii?Q?CcZnPFPXrqj+jaS8mnkCaq2Lvcb9bur1M+m7GUU0byEFmDmg2B7q2/XHgAsK?=
- =?us-ascii?Q?fIUrOe863MNClSLaLuqt+a7w8TR9gAnwxzllgTpwrn9RUsMOew8iyew3GcZm?=
- =?us-ascii?Q?ESRIVx2LyTU3N07/s2yZEnRWqROvS+wBmQ4W16PYWXSy1SHje4U42VCm+pxy?=
- =?us-ascii?Q?s47YBPb5l8xWwW3LFvk66rGqr4fj2IpgN3UWDPQs/HjFFYbS4DAHX5i89wJP?=
- =?us-ascii?Q?QgBiKTletjHfam6NiK/0U8cIwPo31CmCIXxun24RNsQUIn9rDaAoowh81Ke3?=
- =?us-ascii?Q?dY+TArOEZR3mTYa0HrJKRp7l063ky0PkapgVhDgKSpJsyWHwyIR30lhRk61P?=
- =?us-ascii?Q?Yrxnx+BHvlZnI158fe+TDuT26MqLnxRPXJ6Iv29A4SY4VN2nwe6u0cfH1PgF?=
- =?us-ascii?Q?9WVx2AbevLLR5/Hc0Vpp+dtUg+dAnJCMShL9ysvTJ+RJN3a9+vyVQBpOK7iI?=
- =?us-ascii?Q?yomS+41Zj0hOCXzVgD2licgAQZEzST49qxGz7m13d0AmSgL2JC2XopuYw8wd?=
- =?us-ascii?Q?XTyOJ/hWD5g0t39toCRq4mHXlFHO4UE3NAH5wwz8MRX1CTc4mghB7Y2yRCsO?=
- =?us-ascii?Q?mei7AhQL3LzzmkLYPjLjGcoj7HdeJ9hN5TN1r4KutvVbDigvOGx65u2RYajS?=
- =?us-ascii?Q?NOwU+2PSEBlL6DdE7iPBe52m/QJybLCzgBJBFiiMGkkb67VMd2Qv+lx9QCmY?=
- =?us-ascii?Q?DQot/3ZtQFN8LV77CixXGGoc5VKCkyXL1d76c9qGAnN3B40uYT16eVcG43+z?=
- =?us-ascii?Q?IszEknwY3qipehV5SMQvK1RoThpdFLVXaGbaYJSErlJpcbeKjFNZTEkHjgbB?=
- =?us-ascii?Q?fN0m5OttPsVaWhbLNGiRzHSCA6v6/lvtKS1IYsaEFkdfjaOssNArKZ4Ki0ae?=
- =?us-ascii?Q?dep6zmVgGkXt6/+AVBvDyB8KqeNMHk8fXm1lzgnEPDgvHnl4yL9PFRNApkbD?=
- =?us-ascii?Q?+Tu/7sXHDcV0J/1fbOPIOB3jyJ9ldr6TMLbN1TJcfhBaibNsuZScqnSsAaX4?=
- =?us-ascii?Q?c1wRcOX3O6aKzKsHEaFwJYnWf44QF/TCYB7L6qNcQdlcJYt3tgqA7AhKcP4+?=
- =?us-ascii?Q?VKUcVJn8XNeINg2z46EYnZhqzqbhGnlbNRF3Pvg05PGGpn76aOSh+eWXwRgo?=
- =?us-ascii?Q?FgofSyfZWah6Rc1kP3Jrooj8cW8xLOJUQbH251LN?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 57813666-c0a3-4db3-6be7-08da8cd8c0d7
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4181.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?u4UUO9AbvR5TNpg00KfItzufcx7VQubY3VkGHdOJX1fUFDn7PNdJ3czvnC03?=
+ =?us-ascii?Q?PmXOGwzIlxbocT55b/vxa8uuf4xqfUp4LN58IS6ettvs4VWA6oaP1DymjJRt?=
+ =?us-ascii?Q?p/iV4EIIJO9XQ1lCis+RfU625x7JJiImEwTiS23s/P2e3QPAX2AWNA9M39Oi?=
+ =?us-ascii?Q?MW57T1v7a8aI8CHNDCsvgGgW9BCJoT0lvLt2vx2Xzpo0zMHlEO7RomkwU1rI?=
+ =?us-ascii?Q?NQN+AoSjln07BPQ+R5L/F6jjMl8FFwXNBBMVsMD360gpStnpv8RWfNHnz6tu?=
+ =?us-ascii?Q?xX85aXUO76OnxbHfVCUZSFr5eWJwVGI7eExFSt+juoOUSNrpYwhnuGjMTLqQ?=
+ =?us-ascii?Q?P5gh37qKsiGE/wFQaRZc3DKGhy63BdOXzAiFN51uco6qQLqm/4lwOFvLG91M?=
+ =?us-ascii?Q?F84dUKiyT5a8EbxA5ArxKcmJlKzdnND72fCm9efWpN1cY503ApcXV7dKGENQ?=
+ =?us-ascii?Q?Yjl2DG2KAt6wg8+xb3oYxbUkf6IxQSWSUFTn/Nto38Z5trkAy3TzXHOIbmHy?=
+ =?us-ascii?Q?sVGcsIPPneIsbdgXbpHavMKtm3RtlpwQZPFCRIqXR7rFx8NCJ+l0VPggCkvF?=
+ =?us-ascii?Q?CRItMmllRbL0VcI3DoWiagzY3Dz52GrjQPs84Q1eto0LyQArPe+V05dESfGa?=
+ =?us-ascii?Q?PYnnCTbAQa08gYbyttw99HVowzF25Vqwq2Ci/kEbCqipbTSD95Gux7dOX1B3?=
+ =?us-ascii?Q?TQbhE0boSL8TX+q9MGygK+geKvTSDn96eYEqPgGa3XiPVGZE0FxQLO9nvLXG?=
+ =?us-ascii?Q?ifoSuMXuBQfRnx8+6seMnMoDSlZunJeXj6OqDtdYeA7gFEgEEdGMz15uQ/sc?=
+ =?us-ascii?Q?K/t1uUDeMQYTuIjyhm4IbQg3+5v87NU2eI6c1U17f4jikzDaoax3I+/bCeKe?=
+ =?us-ascii?Q?20eKvyRdUYRmB/qsz5bsEOYjF0PkXKbV/DlfHP3U4pBsoDiqNTTfxbcMkhX1?=
+ =?us-ascii?Q?Zbzz6y4eH6xIJcr4OGGv4KojOb0LyigDmRMlV+FpZTBFt0LDEtVaA4qQryYF?=
+ =?us-ascii?Q?ezoKl93G+VKPU++AClDDvyi8KYDIlz1K3hEFKG9tFPAf14KnVCv9CQQGYg7/?=
+ =?us-ascii?Q?Mfcysnhxtij+dR6HOcyHUon5XFJQ8Se2QDLdI1/YgkEsHzr7mzQ/4QqFDC1f?=
+ =?us-ascii?Q?JIeBHEIwiHdTAFjhUL5DvriMh67DaijjyaA96UGOfpdLwLQKjiaRGVUE8Vyv?=
+ =?us-ascii?Q?eVqVWRMQ/qE7t4OHTa/X24Newzd8SSHx5BJUYtvE2c3p2y7C14gelasmaa+Z?=
+ =?us-ascii?Q?j1UXnDCvXDhKEv5jluCYFbUWAp+2swnNdtSQTuHvOfQA1CI74ue7U2qreXPM?=
+ =?us-ascii?Q?ZsreyuxxAglTxVDBKItXXf10ldgEjmdCPIzOuUSwES+M6ONbTSYEkOUheryV?=
+ =?us-ascii?Q?95nIFPxOu0hurhnH4+ZEQwSMtbtb7hid4o5JuBOgo4kLCDefZfpSThJc6dg+?=
+ =?us-ascii?Q?2vVWBJ5seU9ogdLXHKFjyxLUH9QpLFR6uWM/oOByO8a24dh+MU+QeuD0FcaG?=
+ =?us-ascii?Q?/jF1w9B7CzqRcOOIiNd8AiuA3xRePxY8I+FDiGZ6DyQndojwM+b6/Xx3V35z?=
+ =?us-ascii?Q?x7ruaUKLmWiXemakRWfmEiKnfsVgbtaK7zoGdeRTOBDTAVlT+xaf4ruAH25h?=
+ =?us-ascii?Q?gA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2a58acb4-2350-4e39-1c04-08da8cde5710
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB2995.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2022 11:46:20.4545
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2022 12:26:20.0929
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CVo6vid+1klUASjEx3KuID21rhLdfE7MvIsWFx9nBFs0qzR97SuzlEM4AL69wf3A
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6873
-X-Spam-Status: No, score=0.3 required=5.0 tests=AXB_X_FF_SEZ_S,BAYES_00,
-        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        FORGED_SPF_HELO,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8LdwhCBpMmBxsC00kppXCx28f5YEZXO9pXfhZIgwOJwrT69Voj3jl9Fzm855Cly6B8cmTWDTPrGI+pzs8Ai0jA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR11MB2821
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -146,43 +153,149 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 02, 2022 at 05:33:30PM +1000, Michael Ellerman wrote:
-> Jason Gunthorpe <jgg@nvidia.com> writes:
-> > On Thu, Jul 14, 2022 at 06:18:19PM +1000, Alexey Kardashevskiy wrote:
-> >> Here is another take on iommu_ops on POWER to make VFIO work
-> >> again on POWERPC64.
-> >> 
-> >> The tree with all prerequisites is here:
-> >> https://github.com/aik/linux/tree/kvm-fixes-wip
-> >> 
-> >> The previous discussion is here:
-> >> https://patchwork.ozlabs.org/project/linuxppc-dev/patch/20220707135552.3688927-1-aik@ozlabs.ru/
-> >> https://patchwork.ozlabs.org/project/kvm-ppc/patch/20220701061751.1955857-1-aik@ozlabs.ru/
-> >> 
-> >> Please comment. Thanks.
+On Fri, Sep 02, 2022 at 12:54:05PM +0200, Thorsten Leemhuis wrote:
+> On 01.09.22 15:24, Philip Li wrote:
+> > On Thu, Sep 01, 2022 at 02:12:39PM +0200, Thorsten Leemhuis wrote:
+> >> Hi, this is your Linux kernel regression tracker.
 > >>
-> >> 
-> >> 
-> >> Alexey Kardashevskiy (3):
-> >>   powerpc/iommu: Add "borrowing" iommu_table_group_ops
-> >>   powerpc/pci_64: Init pcibios subsys a bit later
-> >>   powerpc/iommu: Add iommu_ops to report capabilities and allow blocking
-> >>     domains
-> >
-> > It has been a little while - and I think this series is still badly
-> > needed by powerpc, right?
+> >> On 15.08.22 16:34, kernel test robot wrote:
+> >>> Greeting,
+> >>>
+> >>> FYI, we noticed the following commit (built with gcc-11):
+> >>>
+> >>> commit: c3e0c8c2e8b17bae30d5978bc2decdd4098f0f99 ("KVM: x86/mmu: Fully re-evaluate MMIO caching when SPTE masks change")
+> >>> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
+> >>>
+> >>> in testcase: leaking-addresses
+> >>> version: leaking-addresses-x86_64-4f19048-1_20220518
+> >>> with following parameters:
+> >>>
+> >>> 	ucode: 0x28
+> >>>
+> >>> on test machine: 8 threads 1 sockets Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz with 16G memory
+> >>>
+> >>> caused below changes (please refer to attached dmesg/kmsg for entire log/backtrace):
+> >>>
+> >>> If you fix the issue, kindly add following tag
+> >>> Reported-by: kernel test robot <oliver.sang@intel.com>
+> >>>
+> >>> [...]
+> >>>
+> >>> #regzbot introduced: c3e0c8c2e8
+> >>
+> >> Removing this from the list of tracked regressions:
+> >>
+> >> #regzbot invalid: report from the kernel test report that was ignored by
+> >> developers, so I assume it's not something bad
+> >>
+> >> To explain: Yeah, maybe tracking regressions found by CI systems in
+> >> regzbot might be a good idea now or in the long run. If you are from
+> >> Intel and would like to discuss how to do this, please get in touch (I
+> >> tried recently, but got no answer[1]).
+> > 
+> > Sorry, this was a mistake that we missed [1] to provide our reply. I will
+> > reply to the questions in that one soon.
 > 
-> Your comments on patch 3 left me with the impression it needed a respin,
-> but maybe I misread that.
+> Thx!
+> 
+> >> But I'm not sure if it's a good idea right now to get regzbot involved
+> >> by default (especially as long as the reports are not telling developers
+> >> to add proper "Link:" tags that would allow regzbot to notice when fixes
+> >
+> > Apologize again that we started to track mainline regression we found before
+> > we fully understand [2], which probably not the effective usage. Especially
+> > we missed the initial touch and led to more improper usage.
+> 
+> No worries, as maybe it's a good thing to have the 0day reports in
+> there, even if some of its reports don't get any traction. But having
+> them in the list of tracked regressions gives them some more visibility
+> for a while -- and at least one more set of eyes (mine) that take a look
+> at it. And it's not that much work for me or anybody else to close the
+> issue in regzbot (say after a week or two) if no developer acts on it
+> because it's irrelevant from their point of view. But would still be
+> better if they'd state that publicly themselves; in that case they even
+> could tell regzbot to ignore the issue; your report's could tell people
+> how to do that (e.g. "#regzbot invalid some_reason").
 
-It would be nice, but I understand Alexey will not work on it anymore,
-so I wouldn't object to as-is
+Thanks for the encouragement :-) The flow/process is very helpful. We will follow
+up a few things before we resuming the tracking
 
-> Alexey's reply that it needed testing also made me think it wasn't
-> ready to pick up.
+1) Add Link tag
 
-Well, if so, someone still needs to finish this work. But I think he
-tested it, he fixed things that could have only been found by
-testing..
+2) Do internal judgement of mainline regression we found for whether it is
+important, so we do some filtering at initial period to avoid bringing noise to the list.
 
-Jason
+3) Add the hint as you suggested here, so it can be easily invalidate by developer.
+
+Also some thinking below.
+
+> 
+> >> for the problem are posted or merged; see [1] and [2]), as it looks like
+> >> developers ignore quite a few (many?) reports like the one partly quoted
+> >> above.
+> >>
+> >> I guess there are various reasons why developers do so (too many false
+> >> positives? issues unlikely to happen in practice? already fixed?).
+> > 
+> > agree, not all reports we send out got response even it was reported on
+> > mainline (0day does wide range testing include the repos from developer,
+> > so the reports are against these repos and mainline/next).
+> > 
+> > Usuaally, we also ping/discuss with developer when an issue enters
+> > mainline if there's no response. This is one reason we tries to connect
+> > with regzbot to track the issue on mainline, but we missed the point that
+> > you mention below (it need look important).
+> 
+> I just want to prevent the list of tracked regressions becoming too long
+> (and thus obscure) due to many issues that are not worth tracking, as I
+> fear people will then start to ignore regzbot and its reports. :-/
+
+got it, we will be very careful to selectly tracking. Maybe we don't need
+track the issue if it is responsed by developer quickly and can be solved
+directly.
+
+But only track the one that is valuable, while it need more discussion, extra
+testing, investigation and so one, that such problem can't be straight forward
+to solve in short time. For such case, the tracking helps us to get back to this
+even when there's a pause, like developer is blocked by testing or need switch
+to other effort. This is just my thinking.
+
+> 
+> >> Normally I'd say "this is a regression and I should try to find out and
+> >> prod developers to get it fixed". And I'll do that if the issue
+> >> obviously looks important to a Linux kernel generalist like me.
+> > 
+> > got it, thanks for the info, i found earlier you tracked a bug from kernel
+> > test robot, which should be the case that you thought it was important.
+> 
+> Yeah, some of the reports are valuable, that's why I guess it makes
+> sense to track at least some of them. The question is, how to filter the
+> bad ones out or how to pick just the valuable ones...
+
+Currently what in my mind is we will consider performance regression like
+around or larger than 10% for certain test case, or some general tests such
+as kselftests, or serious boot issue.
+
+Or if you considers certain reports are valuable and track them, we will also
+learn from this to get better understanding of what worth tracking now.
+
+> 
+> Are you or someone from the 0day team an LPC? Then we could discuss this
+> in person there.
+
+We will join 2 MC (Rust, Testing) but all virtually, thus not able to discuss in
+person :-( But we are glad to join any further discussion or follow the suggested
+rule if you have some discussion with other CI and reporters.
+
+> 
+> >> But that doesn't appear to be the case here (please correct me if I
+> >> misjudged!). I hence chose to ignore this report, as there are quite a
+> >> few other reports that are waiting for my attention, too. :-/
+> > 
+> > Thanks, we will revisit our process and consult you before we do any actual
+> > action, and sorry for causing you extra effort to do cleanup.
+> 
+> No need to be sorry, everything is fine, up to some point I liked what
+> you did. :-D
+> 
+> Ciao, Thorsten
