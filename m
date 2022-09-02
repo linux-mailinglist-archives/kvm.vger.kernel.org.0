@@ -2,117 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 396385AAA71
-	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 10:46:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F07A5AAAD0
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 11:03:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235961AbiIBIp6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Sep 2022 04:45:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58180 "EHLO
+        id S235920AbiIBJD2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Sep 2022 05:03:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235973AbiIBIpd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Sep 2022 04:45:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1076C7BAD
-        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 01:44:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662108266;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jNOpLflP/Pm8NxANPGyXgCPBwfLtNpzAYQv+Of4HoFw=;
-        b=NEldhBVPm3JEES+NxwcwEAJcyn9I9njGXWFQlHuvkBcZgJjP8ZYy2BZ8e5atysqQ1SRLRb
-        WXeKSPbv/Cqe51Fj+jwX4R3qtgqN/69ontbrbMYC0v7En2yHKS4S6QtAXMl628gMAHp3fI
-        8KNjG3PbJimhQgYPyeFcGumCkAuv8RE=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-611-NFwmjWPkOs25c1W8bDAVKA-1; Fri, 02 Sep 2022 04:44:22 -0400
-X-MC-Unique: NFwmjWPkOs25c1W8bDAVKA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EC6803C0ED64;
-        Fri,  2 Sep 2022 08:44:21 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.195.70])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A3FCB2166B26;
-        Fri,  2 Sep 2022 08:44:21 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id 0B73218003AA; Fri,  2 Sep 2022 10:44:20 +0200 (CEST)
-Date:   Fri, 2 Sep 2022 10:44:20 +0200
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
+        with ESMTP id S235223AbiIBJDX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Sep 2022 05:03:23 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4587A1D19;
+        Fri,  2 Sep 2022 02:03:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662109401; x=1693645401;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=PjiMaqOiXtXbGzUpzVo9H2Dd8g2N0f0rVIBAjHIDQGA=;
+  b=E4375lV7v5aEjfaq4B3VayAVpltVObOpY2KkvIy1+T+q/wuTKMie+xOG
+   GXBZC4z/cy208K0QpNAnXu7rcu1WbScZFWFA06OA3L94n95kvecLg7ISU
+   LxUhuNtbncmXDhQiAtvSEPmrYISLvW7069g7epQcG9Emv0CEhkdPOWiq5
+   gz/OTiTJNlFU+mE47WvkRw9c80aEKZ/WdhAObSBYO2eA2B0pLIRU21U3K
+   T97M8QFSf654TKAcv+xHPcoEWLZ4JidqSoPi5IszJYO9HlUBY0t1xkIfM
+   Q+bk2a4kWAFqeEpOWaOxsU4O/ePgWIVglXauApagBYIkX06vtwwnP8Sv9
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10457"; a="296721082"
+X-IronPort-AV: E=Sophos;i="5.93,283,1654585200"; 
+   d="scan'208";a="296721082"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2022 02:03:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,283,1654585200"; 
+   d="scan'208";a="941218617"
+Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.132])
+  by fmsmga005.fm.intel.com with ESMTP; 02 Sep 2022 02:03:17 -0700
+From:   Zhao Liu <zhao1.liu@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Sergio Lopez <slp@redhat.com>
-Subject: Re: [PATCH 0/2] expose host-phys-bits to guest
-Message-ID: <20220902084420.noroojfcy5hnngya@sirius.home.kraxel.org>
-References: <20220831125059.170032-1-kraxel@redhat.com>
- <957f0cc5-6887-3861-2b80-69a8c7cdd098@intel.com>
- <20220901135810.6dicz4grhz7ye2u7@sirius.home.kraxel.org>
- <f7a56158-9920-e753-4d21-e1bcc3573e27@intel.com>
- <20220901161741.dadmguwv25sk4h6i@sirius.home.kraxel.org>
- <34be4132-53f4-8779-1ada-68aa554e0eac@intel.com>
- <20220902060720.xruqoxc2iuszkror@sirius.home.kraxel.org>
- <20220902021628-mutt-send-email-mst@kernel.org>
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Ira Weiny <ira.weiny@intel.com>,
+        "Fabio M . De Francesco" <fmdefrancesco@gmail.com>,
+        Zhenyu Wang <zhenyu.z.wang@intel.com>,
+        Zhao Liu <zhao1.liu@intel.com>
+Subject: [PATCH] KVM: SVM: Replace kmap_atomic() with kmap_local_page()
+Date:   Fri,  2 Sep 2022 17:08:11 +0800
+Message-Id: <20220902090811.2430228-1-zhao1.liu@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220902021628-mutt-send-email-mst@kernel.org>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-  Hi,
+From: Zhao Liu <zhao1.liu@intel.com>
+
+The use of kmap_atomic() is being deprecated in favor of
+kmap_local_page()[1].
+
+In arch/x86/kvm/svm/sev.c, the function sev_clflush_pages() doesn't
+need to disable pagefaults and preemption in kmap_atomic(). It can
+simply use kmap_local_page() / kunmap_local() that can instead do the
+mapping / unmapping regardless of the context.
+
+With kmap_local_page(), the mapping is per thread, CPU local and not
+globally visible. Therefore, sev_clflush_pages() is a function where
+the use of kmap_local_page() in place of kmap_atomic() is correctly
+suited.
+
+Convert the calls of kmap_atomic() / kunmap_atomic() to
+kmap_local_page() / kunmap_local().
+
+[1]: https://lore.kernel.org/all/20220813220034.806698-1-ira.weiny@intel.com
+
+Suggested-by: Ira Weiny <ira.weiny@intel.com>
+Suggested-by: Fabio M. De Francesco <fmdefrancesco@gmail.com>
+Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+---
+Suggested by credits.
+        Ira: Referred to his task document and review comments.
+        Fabio: Referred to his boiler plate commit message.
+---
+ arch/x86/kvm/svm/sev.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 28064060413a..12747c7bda4e 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -465,9 +465,9 @@ static void sev_clflush_pages(struct page *pages[], unsigned long npages)
+ 		return;
  
-> I feel there are three major sources of controversy here
-> 
-> 0. the cover letter and subject don't do such a good job
->    explaining that what we are doing is just telling guest
->    CPUID is not broken. we are not exposing anything new
->    and not exposing host capability to guest, for example,
->    if cpuid phys address is smaller than host things also
->    work fine.
-> 
-> 1. really the naming.  We need to be more explicit that it's just a bugfix.
-
-Yep, I'll go improve that for v2.
-
-> 2. down the road we will want to switch the default when no PV. however,
->    some hosts might still want conservative firmware for compatibility
->    reasons, so I think we need a way to tell firmware
->    "ignore phys address width in CPUID like you did in the past".
->    let's add a flag for that?
->    and if none are set firmware should print a warning, though I
->    do not know how many people will see that. Maybe some ;)
-
-> /*
->  * Force firmware to be very conservative in its use of physical
->  * addresses, ignoring phys address width in CPUID.
->  * Helpful for migration between hosts with different capabilities.
->  */
-> #define KVM_BUG_PHYS_ADDRESS_WIDTH_BROKEN 2
-
-I don't see a need for that.  Live migration compatibility can be
-handled just fine today using
-	'host-phys-bits=on,host-phys-bits-limit=<xx>'
-
-Which is simliar to 'phys-bits=<xx>'.
-
-The important difference is that phys-bits allows pretty much anything
-whereas host-phys-bits-limit applies sanity checks against the host
-supported phys bits and throws error on invalid values.
-
-take care,
-  Gerd
+ 	for (i = 0; i < npages; i++) {
+-		page_virtual = kmap_atomic(pages[i]);
++		page_virtual = kmap_local_page(pages[i]);
+ 		clflush_cache_range(page_virtual, PAGE_SIZE);
+-		kunmap_atomic(page_virtual);
++		kunmap_local(page_virtual);
+ 		cond_resched();
+ 	}
+ }
+-- 
+2.34.1
 
