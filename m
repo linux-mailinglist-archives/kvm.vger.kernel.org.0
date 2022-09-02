@@ -2,101 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB0105AB8E6
-	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 21:35:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C8655AB8EF
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 21:45:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230325AbiIBTf3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Sep 2022 15:35:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58434 "EHLO
+        id S229800AbiIBTpy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Sep 2022 15:45:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbiIBTf1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Sep 2022 15:35:27 -0400
-Received: from mail-oa1-x32.google.com (mail-oa1-x32.google.com [IPv6:2001:4860:4864:20::32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BDF785A9D
-        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 12:35:25 -0700 (PDT)
-Received: by mail-oa1-x32.google.com with SMTP id 586e51a60fabf-1225219ee46so7260594fac.2
-        for <kvm@vger.kernel.org>; Fri, 02 Sep 2022 12:35:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=dwSqW+EES0kZUKahPvUQsT2romYUFeGN5IYICq6KYkA=;
-        b=LzRUaZ8D2IVgsndue4ORGdjpjHnVj0lRMSAujokM4ES2FfcX/n8sbdZdglQjlzqC/6
-         0gSvzZqQVcZrDGZzHK95GAz7I0oExhKRzZxFa8sGb0q6PBFS1i8UmK2xOvmEFKysssaz
-         ArABswb+XeHMGsPPFxu6F8slc1uzMUjyKTst/NCXJ66kMqrFXeo5r4mfiSLgwPJItkPP
-         3Ms1Zth/K/iC+Q4MNLh/WxzCcBNFCKwUbPAxjdWc/PWK6dK4hjRTgbVOHPp/J2NzrbaP
-         qqMBt6xfeYwAmRHWr0gAwEFntIpq6QlAwOecfHu+5OvccORtyvh1SWjO8Qlc3KC7g9Ku
-         jVHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=dwSqW+EES0kZUKahPvUQsT2romYUFeGN5IYICq6KYkA=;
-        b=iPjrLd8tE3xiDriieorTzjNzxTANBCemDWZAEjzE4QvfZsZvZxFhrT9jYAAm/R5ON6
-         RV+vd7aTVFtjsTWfcxghZ8NMjUEgSK36c1I2uRDBBvlFz1wgZOsKn35ymqsOsH6ziZU3
-         9s47QETMmNIHWyDK3jvX7XhY7npLxc7IXxUYQdeeoKsNBMRva0GJq3q0uVNVpnOwhs/Z
-         bPDG6d+IgqVbdYSzY259u7Q3Q6xSJHtiFJ4ZvZEKFdEs/85yKLUALtXkfWezbtZf5pL+
-         dR48dv7NVPJzmA2CQx4uD55TzashmpYkiKtohu4cTKrPyTl8HxSiEfFduYnSJk4Sf7N+
-         ptNw==
-X-Gm-Message-State: ACgBeo2sNb9AFXRCTGTxO5Kgj8ySJtlSaTlgVyi1xaAV/32cx1B6QyfM
-        M2X41TIlyBUw8wULRF/88EKGlRYc6KoMCXHkUyiYqQ==
-X-Google-Smtp-Source: AA6agR5ecKSwMzDI2RN5dwUdXI/C2ZUxIO8z02GK/PsD5Jd/9AnsJDNtO2qsJxcjdwC6JDHLQCcn5NJYCegcNLRGiko=
-X-Received: by 2002:a05:6808:150f:b0:343:3202:91cf with SMTP id
- u15-20020a056808150f00b00343320291cfmr2543211oiw.112.1662147324591; Fri, 02
- Sep 2022 12:35:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <CALMp9eRp-cH6=trNby3EY6+ynD6F-AWiThBHiSF8_sgL2UWnkA@mail.gmail.com>
- <Yw8aK9O2C+38ShCC@gao-cwp> <20220901174606.x2ml5tve266or5ap@desk>
- <CALMp9eRaq_p2PusavHy8a4YEx2fQrxESdpPQ_8bySqrv61ub=Q@mail.gmail.com> <20220902191441.bbjfvniy5cpefg3a@desk>
-In-Reply-To: <20220902191441.bbjfvniy5cpefg3a@desk>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 2 Sep 2022 12:35:13 -0700
-Message-ID: <CALMp9eTAedQDHe8FQN1TvQgSxO4+2Sb-fB6FDCBh3gKMUe449A@mail.gmail.com>
-Subject: Re: BHB-clearing on VM-exit
-To:     Pawan Gupta <pawan.kumar.gupta@intel.com>
-Cc:     Chao Gao <chao.gao@intel.com>, chen.zhang@intel.com,
-        kvm list <kvm@vger.kernel.org>
+        with ESMTP id S229496AbiIBTpx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Sep 2022 15:45:53 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7461520BEB
+        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 12:45:52 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0FFE860DF0
+        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 19:45:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 65550C433B5
+        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 19:45:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662147951;
+        bh=Vt+QriF83MpjCDYqtGrRkemhyCmqLBhedr1iheC8iSw=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=GXD29kb9Ez5r1Wu5F1Pd8GuFzvBqIyhb8ZlLS26jFcveCnxDZbq9R2AODeUMvYZhI
+         WKrVUtZoCTzt8hFcNbT3dRX0Mu1tBHNYcPdl/VFiDs3qye0p2ZIBHghjKNoIhuK8kF
+         lA2KUZwP02CyVUIs/6K4BSIPzAINHx73dcsHmihB0pu714wZGCd1HmkUv24oUoD8Bl
+         0P89hH7IHdLu9J+Gwy7a+ALvGke6RYMdii9uJqWN9KaeuIBRfYcyqg8S7E1c89PeG5
+         F43hu418K+umKaboLJjiRpiAxTwBWrPOpYZQ2dQ+EM9dP/qJsxxNuq5eTfAJ7q5lLu
+         mr30CbMd3wYYg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 52177C433E9; Fri,  2 Sep 2022 19:45:51 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 216033] KVM VMX nested virtualization: VMXON does not check
+ guest CR0 against IA32_VMX_CR0_FIXED0
+Date:   Fri, 02 Sep 2022 19:45:51 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: ercli@ucdavis.edu
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-216033-28872-qeghcQUm21@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216033-28872@https.bugzilla.kernel.org/>
+References: <bug-216033-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 2, 2022 at 12:14 PM Pawan Gupta <pawan.kumar.gupta@intel.com> wrote:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216033
 
-> It may be possible to use shared BHB to influence the choice of indirect
-> targets, but there are other requirements that needs to be satisfied
-> such as:
->  - Finding a disclosure gadget.
+--- Comment #4 from Eric Li (ercli@ucdavis.edu) ---
+>       if (!nested_host_cr0_valid(vcpu, kvm_read_cr0(vcpu)) ||
+>           !nested_host_cr4_valid(vcpu, kvm_read_cr4(vcpu))) {
+>               kvm_queue_exception(vcpu, UD_VECTOR);
+>               return 1;
+>       }
 
-Gadgets abound, and there are tools to find them, if the attacker has
-the victim binary.
+Thanks for the reply. I think there is still a typo. Do you mean the follow=
+ing?
 
->  - Controlling register inputs to the gadget.
+        if (!nested_host_cr0_valid(vcpu, kvm_read_cr0(vcpu)) ||
+            !nested_host_cr4_valid(vcpu, kvm_read_cr4(vcpu))) {
+                kvm_queue_exception_e(vcpu, GP_VECTOR, 0);
+                return 1;
+        }
 
-This is non-trivial, since kvm clears GPRs on VM-exit. However, an
-attacker can look for calls to kvm_read_register() or similar places
-where kvm loads elements of guest state. The instruction emulator and
-local APIC emulation both seem like promising targets.
+Or maybe:
 
->  - Injecting the disclosure gadget in the predictors before it can be
->    transiently executed.
+        if (!nested_host_cr0_valid(vcpu, kvm_read_cr0(vcpu)) ||
+            !nested_host_cr4_valid(vcpu, kvm_read_cr4(vcpu))) {
+                kvm_inject_gp(vcpu, 0);
+                return 1;
+        }
 
-IIUC, the gadget has to already be an indirect branch target that can
-be exercised by some guest action (e.g. writing to a specific x2APIC
-MSR). Is that correct?
+I am not familiar with KVM code so not sure which one should be used. Thanks
+again!
 
->  - Finding an appropriate indirect-branch site after VM-exit, and before
->    BHB is overwritten.
+--=20
+You may reply to this email to add a comment.
 
-Is it the case that the RIP of the victim indirect branch has to alias
-to the RIP of the "training branch" above in the predictors?
-
-Presumably, guest influence diminishes after every branch, even before
-the BHB is completely overwritten.
+You are receiving this mail because:
+You are watching the assignee of the bug.=
