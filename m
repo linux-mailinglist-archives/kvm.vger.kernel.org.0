@@ -2,69 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D86D5AA3A6
-	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 01:21:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67B1E5AA41A
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 02:10:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233595AbiIAXVS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 19:21:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49936 "EHLO
+        id S234693AbiIBAKJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 20:10:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233131AbiIAXVN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 19:21:13 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E0409E89D
-        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 16:21:12 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id j9-20020a17090a3e0900b001fd9568b117so512813pjc.3
-        for <kvm@vger.kernel.org>; Thu, 01 Sep 2022 16:21:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=4WHDLqttfF+EoF52mCrZf4boyFiM0BT/dfZZLnC9DCY=;
-        b=lB8ojeh/+EaeLl+eJ9d1FhOJI7q7heqy4wGRR0YXouOvwILiz4PbKEeVrF7s/Cwwu+
-         rRkYnl5tzoLnPRSGQRJaSLd6r5u1wsfjNtAqH4865nL0lqIDtJT3cb6NASp4PSts7cfk
-         7DAyXA3I6HNgJVhQY9dc+QiUvTUZf860wXaPSzQJjvvdnvJjWKTbPvzaFnvcgGIpoEHC
-         MFsWxfAdBfCddPZUR66GOhR/FHeJ1gfAzFYE4iyvLAM+nu2dxq8MoBKYPXVsbNoKsPAW
-         bG+4Yj4olQmGOKD7HQasEv+0lWENnFJrw4kJ6kzlmmizUNCUeowM9Uw++CyC0NuU6165
-         8tzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=4WHDLqttfF+EoF52mCrZf4boyFiM0BT/dfZZLnC9DCY=;
-        b=h7WkCmCyujwYhGS5+u2yLzB6FNe/UZKWOSzTm7/0n054nK+ZRNfgAF6B/5Ja9xH9lt
-         xk/vrMRnFZ6mpVRxBVkUx5j+xOI9vwm7eoy2GXOveUHpnCbpS5TTSI/IDr8khvb1vwnv
-         pInCuDzzbdYd4873zukSrBoCsdDohSG9+Hd5ca78XfOFjnHdYKf/0nVAmuLvQq9LQy3T
-         s7kVbvxBWtOGsFwqmbGVpz8l5Hpqf3jmEdlJOC2L5Fx9FHeSasXbDRb4nKeLha47Fe6L
-         sqNvDxZmE+xsYhMcXn91BXVVkmpdDYL6a/KskcNBFjw1NKDHqytVTcOe01gglUNXDIwl
-         YbOg==
-X-Gm-Message-State: ACgBeo1rUKdNLR7vEDO+JTsgJoiikP6LvY4aj0lOg8KXtsBWOotaA/Nc
-        9p4wVbXTyAhAu8u6DJZ1PXaE/w==
-X-Google-Smtp-Source: AA6agR7CeHu7YH7JW/sDAsmMwzaor5vIm3hXXsQc316o6UKgIUwL4xz/ML8U96xZVGMTQlcLegLqKg==
-X-Received: by 2002:a17:902:8c93:b0:172:bb10:214c with SMTP id t19-20020a1709028c9300b00172bb10214cmr33027929plo.135.1662074471777;
-        Thu, 01 Sep 2022 16:21:11 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id m3-20020a63f603000000b0041a6638b357sm69851pgh.72.2022.09.01.16.21.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Sep 2022 16:21:11 -0700 (PDT)
-Date:   Thu, 1 Sep 2022 23:21:07 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Miaohe Lin <linmiaohe@huawei.com>, vkuznets@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: fix memoryleak in kvm_init()
-Message-ID: <YxE+Y1ZDaPgChrrS@google.com>
-References: <20220823063414.59778-1-linmiaohe@huawei.com>
- <Yw6C+tBZrbP5IX+e@google.com>
- <5f15a3a0-446f-59a4-6bef-8be0e5630f5b@redhat.com>
+        with ESMTP id S234064AbiIBAKH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 20:10:07 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 888391A3A4
+        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 17:10:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662077406; x=1693613406;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=lnu+YfjA5BVODcb7RD0uVkm1klwexqKt6aaFHvIhwl4=;
+  b=Xrl0tr0yTWn9UAK39RTi9n7AI+BIOUVgzSQfaoOVQnVgAWh0JBHbmxG/
+   8t/BzysoGyu+ZBf1xDX23K3F/FmKz9JYD0NNPqkvDaIztjDt98X9SfcIV
+   gbvlKEr/MkJPTbYOqaIGubfvyUwEvc8F6tN4izdidHMKYxYsUUBqTFkYA
+   PClnjTzVk7OniK2S87Ax+qDPG1MMoVraEDl7wQ7+OKbEqMk74lIOqM6JQ
+   5RQWPNhSjTX4rfF9g21T7D05ax6cpsx5eZDYmXW1fM97LUJIxXcuT8lso
+   upVPwwQc/ieW2N5eLrg9e3dWuAULANM7NM4dXZzGC5nuSA4n/cvrQy34H
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10457"; a="296639034"
+X-IronPort-AV: E=Sophos;i="5.93,281,1654585200"; 
+   d="scan'208";a="296639034"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 17:10:06 -0700
+X-IronPort-AV: E=Sophos;i="5.93,281,1654585200"; 
+   d="scan'208";a="642612565"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.171.28]) ([10.249.171.28])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 17:10:03 -0700
+Message-ID: <34be4132-53f4-8779-1ada-68aa554e0eac@intel.com>
+Date:   Fri, 2 Sep 2022 08:10:00 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5f15a3a0-446f-59a4-6bef-8be0e5630f5b@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.13.0
+Subject: Re: [PATCH 0/2] expose host-phys-bits to guest
+Content-Language: en-US
+To:     Gerd Hoffmann <kraxel@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Sergio Lopez <slp@redhat.com>
+References: <20220831125059.170032-1-kraxel@redhat.com>
+ <957f0cc5-6887-3861-2b80-69a8c7cdd098@intel.com>
+ <20220901135810.6dicz4grhz7ye2u7@sirius.home.kraxel.org>
+ <f7a56158-9920-e753-4d21-e1bcc3573e27@intel.com>
+ <20220901161741.dadmguwv25sk4h6i@sirius.home.kraxel.org>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20220901161741.dadmguwv25sk4h6i@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,28 +72,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 02, 2022, Paolo Bonzini wrote:
-> On 8/30/22 23:36, Sean Christopherson wrote:
-> > On Tue, Aug 23, 2022, Miaohe Lin wrote:
-> > > When alloc_cpumask_var_node() fails for a certain cpu, there might be some
-> > > allocated cpumasks for percpu cpu_kick_mask. We should free these cpumasks
-> > > or memoryleak will occur.
-> > > 
-> > > Fixes: baff59ccdc65 ("KVM: Pre-allocate cpumasks for kvm_make_all_cpus_request_except()")
-> > > Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
-> > > ---
-> > 
-> > Pushed to branch `for_paolo/6.1` at:
-> > 
-> >      https://github.com/sean-jc/linux.git
-> > 
-> > Unless you hear otherwise, it will make its way to kvm/queue "soon".
-> > 
-> > Note, the commit IDs are not guaranteed to be stable.
+On 9/2/2022 12:17 AM, Gerd Hoffmann wrote:
+> On Thu, Sep 01, 2022 at 10:36:19PM +0800, Xiaoyao Li wrote:
+>> On 9/1/2022 9:58 PM, Gerd Hoffmann wrote:
+>>
+>>>> Anyway, IMO, guest including guest firmware, should always consult from
+>>>> CPUID leaf 0x80000008 for physical address length.
+>>>
+>>> It simply can't for the reason outlined above.  Even if we fix qemu
+>>> today that doesn't solve the problem for the firmware because we want
+>>> backward compatibility with older qemu versions.  Thats why I want the
+>>> extra bit which essentially says "CPUID leaf 0x80000008 actually works".
+>>
+>> I don't understand how it backward compatible with older qemu version. Old
+>> QEMU won't set the extra bit you introduced in this series, and all the
+>> guest created with old QEMU will become untrusted on CPUID leaf 0x80000008 ?
 > 
-> Hmm, I was going to merge these memory leak fixes for 6.0, but no big deal
-> since they're mostly theoretical anyway.
+> Correct, on old qemu firmware will not trust CPUID leaf 0x80000008.
+> That is not worse than the situation we have today, currently the
+> firmware never trusts CPUID leaf 0x80000008.
+> 
+> So the patches will improves the situation for new qemu only, but I
+> don't see a way around that.
+> 
 
-Take them, I wasn't sure and was anticipating possibly dropping them anyways.  I
-can easily adjust, and was deliberately a little greedy for these technically-a-bug
-memory leaks so that we would't miss them by thinking the other would grab 'em.
+I see.
+
+But IMHO, I don't think it's good that guest firmware workaround the 
+issue on its own. Instead, it's better to just trust CPUID leaf 
+0x80000008 and fail if the given physical address length cannot be 
+virtualized/supported.
+
+It's just the bug of VMM to virtualize the physical address length. The 
+correction direction is to fix the bug not the workaround to hide the bug.
+
