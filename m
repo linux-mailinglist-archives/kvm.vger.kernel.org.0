@@ -2,68 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F23585AB80F
-	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 20:16:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 97C8D5AB86A
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 20:39:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229636AbiIBSQN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Sep 2022 14:16:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49538 "EHLO
+        id S229896AbiIBSjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Sep 2022 14:39:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229630AbiIBSQL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Sep 2022 14:16:11 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3243E42D1;
-        Fri,  2 Sep 2022 11:16:09 -0700 (PDT)
+        with ESMTP id S229819AbiIBSjS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Sep 2022 14:39:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93C8F10F0AB
+        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 11:39:16 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9998FB82D01;
-        Fri,  2 Sep 2022 18:16:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67757C433C1;
-        Fri,  2 Sep 2022 18:16:04 +0000 (UTC)
-Date:   Fri, 2 Sep 2022 19:16:00 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     joro@8bytes.org, will@kernel.org, jean-philippe@linaro.org,
-        inki.dae@samsung.com, sw0312.kim@samsung.com,
-        kyungmin.park@samsung.com, tglx@linutronix.de, maz@kernel.org,
-        alex.williamson@redhat.com, cohuck@redhat.com,
-        iommu@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-acpi@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 2/3] iommu/dma: Move public interfaces to linux/iommu.h
-Message-ID: <YxJIYD8gjP7yAXb2@arm.com>
-References: <cover.1660668998.git.robin.murphy@arm.com>
- <9cd99738f52094e6bed44bfee03fa4f288d20695.1660668998.git.robin.murphy@arm.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D999862281
+        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 18:39:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3FD25C433D6
+        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 18:39:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662143955;
+        bh=32bT2p3J0EE6RW+UilhXK4/NQQF1IEjl8/l3QZgrieI=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=hqFxunLIrMcvOLK57hlOAYBej46ueUkLWXQ2GrKpO9bbkQTeGndc+yErnI0sohwFZ
+         JsfwVGJkoqiZvhi/wCEtKVR2rHTfm0Py3izQxOU3zHltCufhB2pJwKELaLxnXnsBsj
+         40xDSdckniJCt4XA/7Ik5Vyjj76VIwDBd2fVlt4I7QuwGRfOwMN9UQLQtXkfhvCRQ8
+         2g/4mHIvU/TWWdlZvkCuQadGkW2iLPwNFckonRRl/V+0MVzAiGHpR5KZdl5iCRC5gy
+         m7FoLJcF4FlqykKOhZhYvlDF//FoicLV9NWTbxVmtB0izaAeXbojrnlR7cBCnLAPBv
+         nnbyimeRkIUfQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 2594FC433E6; Fri,  2 Sep 2022 18:39:15 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 216033] KVM VMX nested virtualization: VMXON does not check
+ guest CR0 against IA32_VMX_CR0_FIXED0
+Date:   Fri, 02 Sep 2022 18:39:14 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: ercli@ucdavis.edu
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-216033-28872-5Jrf2lrP4A@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216033-28872@https.bugzilla.kernel.org/>
+References: <bug-216033-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9cd99738f52094e6bed44bfee03fa4f288d20695.1660668998.git.robin.murphy@arm.com>
-X-Spam-Status: No, score=-6.7 required=5.0 tests=BAYES_00,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 16, 2022 at 06:28:04PM +0100, Robin Murphy wrote:
-> The iommu-dma layer is now mostly encapsulated by iommu_dma_ops, with
-> only a couple more public interfaces left pertaining to MSI integration.
-> Since these depend on the main IOMMU API header anyway, move their
-> declarations there, taking the opportunity to update the half-baked
-> comments to proper kerneldoc along the way.
-> 
-> Signed-off-by: Robin Murphy <robin.murphy@arm.com>
-> ---
-> 
-> Note that iommu_setup_dma_ops() should also become internal in a future
-> phase of the great IOMMU API upheaval - for now as the last bit of true
-> arch code glue I consider it more "necessarily exposed" than "public".
-> 
->  arch/arm64/mm/dma-mapping.c       |  2 +-
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216033
 
-And here:
+--- Comment #2 from Eric Li (ercli@ucdavis.edu) ---
+@Sean Christopherson Thanks for submitting the fix to this bug in
+https://lore.kernel.org/lkml/20220607213604.3346000-4-seanjc@google.com/ .
+However, I recently tested this fix and the behavior is not as expected.
 
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+According to Intel's SDM, VMXON may generate 2 types of exceptions:
+
+    IF (register operand) or (CR0.PE =3D 0) or (CR4.VMXE =3D 0) or ...
+        THEN #UD;
+    ELSIF not in VMX operation
+        THEN
+            IF (CPL > 0) or (in A20M mode) or
+            (the values of CR0 and CR4 are not supported in VMX operation .=
+..
+                THEN #GP(0);
+
+For example, when CR4 value is incorrect, different exceptions may be gener=
+ated
+depending on which bit is incorrect. If CR4.VMXE =3D 0, #UD should be gener=
+ated.
+Otherwise, #GP(0) should be generated. However, after the fix, #UD is always
+generated.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
