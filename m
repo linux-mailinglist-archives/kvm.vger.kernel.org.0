@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED8FC5AB919
-	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 22:00:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BFA95AB91A
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 22:00:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230424AbiIBT7x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Sep 2022 15:59:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36298 "EHLO
+        id S230429AbiIBT7z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Sep 2022 15:59:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230401AbiIBT7n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230394AbiIBT7n (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 2 Sep 2022 15:59:43 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2062.outbound.protection.outlook.com [40.107.94.62])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DF0F25E86
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2075.outbound.protection.outlook.com [40.107.237.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E35BE27DFB
         for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 12:59:40 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mDQERX0FqGmL7XblRaDKO/xVVoowsysHrpweMa8AtrrWEiIyOMSMfoKc0jhqxcBM5cgBeSlJ5GeeRhOFLj8KH4jpg4reL36F1qcRfiEC/Er2UuuaFS/N2zPr/pW0I65Q5ivevnhfiAnC/GlwADFyXphhuD0SomppG25yf8P+WPwBLsbVuDy6ScAtergQf3oguY9uedbKyX/B9X4C8iuQw10YmW/i5uEpSa7AO3sM6WcEkAivwcdhhXvgyChYL+RYNlOOY0eEMaVmcvu9tQlwhbRt8c0wyFFfESaFxC+abFAAFvShfdlsIqvUjE2vek/t5IP+RD2VyFEH5fEiTvdhRQ==
+ b=bcOaQVaBY/7fVcgNjVsC+YV91d2M8hobkYgR1vOI5FfxlQVCy1Ong2NOdOMHhvNbcqENIaC83UbLpaXejiIePhjBiQPnyRem2/r0G3S3B751HwuV3XExgIMd0MfHqOgEu3SMMRhk8IMEZMxGL/DcVPe3Zu+X7KxP0hapnYd4sF7ADLgAKxur+gR9/Mx55znWWK4w99Q35kJrkh2SZ7Sew6nxMPXLPBWVR4qF9N+Azb++luH+h2ewYhwK+pP7ls74h3tEDmFp1a6+/6DQotyxawUNK3Vt3DzXmw+/h2ks8wDe9YWlSqRgsFQS4nU3r9ctSJ4jgu96CWCzwXJzzS6gnA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zlEZ9xDiN0NLuQX4qVrdmSDfmM2aDrq8j4z5PRwlSH0=;
- b=l1LrGVceFAqKF6KIWoWA8zg6kPJKdpWeoiq9sIneZy4iJeQFrnuZlw07y5LSfMgYXYyokKav1ZgM6kIoBvkPU16Y+6jSjQLx497LBrSq1e09FyzNrWwSTOch1XU8iA3KrIaDrgLlqbAbmv2O0mkbXvUTRc/99/VmlR5WHaPUy3aD5iMFnC5j9E0KP5gCxkDv/AvE/1lOb+diAUXtcv31fXVV9lbUpY9Lb0I9ARJGi5LYj8Yq/aZKglVaJoISJvG7RyroRKYJqT+S1UzLG/DOYFfMB1GcyTLrusVPchYur0qnVnpbpiRso2ZKRDwGr909Bzg2wRw6vfoXsL8twEc1+Q==
+ bh=BqScPx5CK4+ZsgI60IkeKemGw3h250JtVuHRFSgNE7k=;
+ b=YakMTYDx2nCyGHEP85leN5imBChZTc0wFC+XG+xf5KL/5DvBzrWeungzsTdJvefHq92SERXbGqz2ygKnymDRDoTiBNW0AAxkXWeuhvVvKbBGaNLO2vxDUQStBko/x+IsEpk3icH5JsrnBwwKd00ND/PbRpSjZfvEJ1tU0DWV14/woE3g5P+xSzecQKN7Fbw1/D3fkRknV79Ti8i63B+lQWZpoEYEyFoguWdDVOMZgf30k8uXr4pw3S7+dYXpTGh0EO+JYM7xRN2diH3z3+gnm+utoIn5gj71LOMbu+YEJ9xqYNmSaUA9j4WHGSu6Mo2Up7OYi3nTdAG9LQtXqWJ20Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zlEZ9xDiN0NLuQX4qVrdmSDfmM2aDrq8j4z5PRwlSH0=;
- b=TKXnoOiD1TZNIlJa0M7HMF0B+8HgnuXhpMu0nDhVqDL/jlY27Q8Roi7/FCjDvVszUogBqMojCTMOEIFQ7ArcojUWAR5sQ+IXcFIFyk+BszEzxjV9FUJlCuwICaD1JozY7vImdziOshJDIpxZYIYOP8wvFmLw8MvmIoFiPxoB2YO/kFAyLIM76Q1x8jXM9jqrvjeWH40P7y0MeoiA9aqx4PP9LzUUk5LKPXPN17hAo9hEwrfuHeUIQPiA5O2gH/wYdSzhA3qzxQnHoMzto6osl2mLmSXVpM7ypMrYFPoWzLq4zNNe6o0EHwldFvtUQDfT9BYrROhF43vRN1kUsmrWbw==
+ bh=BqScPx5CK4+ZsgI60IkeKemGw3h250JtVuHRFSgNE7k=;
+ b=AlR4LTG9woGK7Yh6hfY7+9cWv3NIJCCfyPtd6aiXmc/kmbepgY5hQEv0/bxt4+SWFu0dpQ7n3jWFpd8G9a6ImOG5OODQDls7/A5rgCHQJOhRgZvlXSAEfWdKwOw2ee5rQqVaMlKv8ggU/xBwU7kfa/XNWo4u420Hnlgn57amAQHlnz07pdo1jbdeWrJUY2kziI35En0DSOtbRRkyl92sM+AZ9oRdX7ZLu422KZCT0xexh5vw2PFqdItyVfELghwRmn9T7RAe71vNttJwH6APY3ykqJpyu+oRCfSDpehG8edHMUB8Btu75NpJgpBZgPHKFZY2KRJ6N86LhuAnFpfFoA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by PH7PR12MB6883.namprd12.prod.outlook.com (2603:10b6:510:1b9::15) with
+ by DM4PR12MB6566.namprd12.prod.outlook.com (2603:10b6:8:8d::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.10; Fri, 2 Sep
- 2022 19:59:35 +0000
+ 2022 19:59:32 +0000
 Received: from MN2PR12MB4192.namprd12.prod.outlook.com
  ([fe80::462:7fe:f04f:d0d5]) by MN2PR12MB4192.namprd12.prod.outlook.com
  ([fe80::462:7fe:f04f:d0d5%7]) with mapi id 15.20.5588.016; Fri, 2 Sep 2022
- 19:59:34 +0000
+ 19:59:32 +0000
 From:   Jason Gunthorpe <jgg@nvidia.com>
 Cc:     Alex Williamson <alex.williamson@redhat.com>,
         Lu Baolu <baolu.lu@linux.intel.com>,
@@ -60,64 +60,63 @@ Cc:     Alex Williamson <alex.williamson@redhat.com>,
         Shameerali Kolothum Thodi 
         <shameerali.kolothum.thodi@huawei.com>,
         Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-Subject: [PATCH RFC v2 07/13] iommufd: Data structure to provide IOVA to PFN mapping
-Date:   Fri,  2 Sep 2022 16:59:23 -0300
-Message-Id: <7-v2-f9436d0bde78+4bb-iommufd_jgg@nvidia.com>
+Subject: [PATCH RFC v2 08/13] iommufd: IOCTLs for the io_pagetable
+Date:   Fri,  2 Sep 2022 16:59:24 -0300
+Message-Id: <8-v2-f9436d0bde78+4bb-iommufd_jgg@nvidia.com>
 In-Reply-To: <0-v2-f9436d0bde78+4bb-iommufd_jgg@nvidia.com>
 References: 
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: BLAPR03CA0097.namprd03.prod.outlook.com
- (2603:10b6:208:32a::12) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+X-ClientProxiedBy: BL0PR01CA0002.prod.exchangelabs.com (2603:10b6:208:71::15)
+ To MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cf2a4fee-cc29-4104-1023-08da8d1da674
-X-MS-TrafficTypeDiagnostic: PH7PR12MB6883:EE_
+X-MS-Office365-Filtering-Correlation-Id: c4e105a0-231f-4bd1-fbb2-08da8d1da5fe
+X-MS-TrafficTypeDiagnostic: DM4PR12MB6566:EE_
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: A3bBwTmfcYG8d0sMkrsDMwDByxwDkwpcRsscuOnzG3YxTBJhR93jQvJY9a9V46mPH77AHuWublaJS8gGmu426waqyuEjPDvUZNOlnqQGgzRqttRYg7lVn8L7Y8qta904TMksdx7tOB5/YOGQQ3tlPAWOHIAK8tL4PgJq1BFUHS0qfYQO2e5NMTCBeL2HvXJJ/i6qyJrY6q1WR9eP3i0c8hwRQP1zInJWsP+2yBXDsDCDXVbt4FBiSbKhpQYcMto9M0ns1nKUZb8m1khdBPDk3V3TEdMsm/xat2i+uHUHHPpp+VfkE7FONssoZUxy2nZv1nRGISBswYtter8wghr54oANqe/BPr48JaaZnKRgdyBW1Y2DzFeXU5cxNI9f05c/w6N+MKqDaluz5Z4W9PZrLNk3IlhCgOvb+LGiiXKC6BkPRmv4iz/NthLlBR4KkLjZNwG6G4jMcPIpI7vJBRyEpKwDhI3cj/6+XxDBGlCXkl9PnVmDsuv/dO4DHU3hGWab+xhp17wRif4o4ml0LE3Prg6hvlZbC8v41nzcwlJI+ZwkXuYet23rw8OWFLyai9pjtscoOhwcZFgNY9fyxnAG6p8IbwIXb+NuLQb23v0vvoRNk3owM1M54QitHW+JmZWAsjcPiGduk7ehvXqhjw5PRWUlQIZ9YvbGXj7uGR9dsbCGdmCWTtu4L8cJy7IRZOAayQ0v3ZVDi8HiRvD6EEz3h5AoQ5PdQe7mLwpt1MuPUKh3lKlPcDken91kR4ntqKL2Lka9ep0tIY54QBzlCNPLcQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(39860400002)(376002)(346002)(366004)(136003)(6666004)(4326008)(30864003)(66946007)(66476007)(66556008)(316002)(7416002)(54906003)(6506007)(26005)(478600001)(109986005)(6512007)(41300700001)(6486002)(38100700002)(86362001)(8676002)(186003)(2616005)(2906002)(5660300002)(8936002)(36756003)(83380400001)(4216001)(266003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: B434539r0kPpt/K0kDqMB4MUTnEcMOWc4Ph2YgF2SdEd6To8K30oeszKTHDyIXUVCpGsowBgLgxiSapPkJUMCRF3vmmwbo/hZnFmuuaF3jQtXmCDjFEwDeWWKy7cJQH15ugHAfdgvp9vpu1Ta0JDKyHfIQDYnw/giu49M/MS9zPFCRDqj5LofAGmjXSfGKvv3yj/uWRcrlcSZqD1C5Rf5Lf65kywwPn3YkQonT2mUFII+tRMV30K1mTX5t+yGz6XcWgujjP9jIwhVNyuqzGjC+IX3Wm7Tx1SLMxCrKM4ywXGI7Bq2t6FFxQXBskuODRYWs6RjlUqzflThEqb80/VAtx1ZMvpFMN7ML+owOtQwRAa0oqdRibfmX1VFE6JoTjhQjk7DKSJS9mTIsNozmThyQbgrQLS4ZqrtTuW+yQqDVhvVmWSHlZrvEmnnhsovaTB5IwDfQoFfiNR+s9VCdOrEGdNrIYtx6Z52PCv4CYvGOJpvVyMvKz0EIy0jMoa5aj3II/XmWTFyEB9PdDYbY+4UVktWlDUh29RrVEHks5PV84LX2K3LlGoHUNLHQHnuxgTR0XK48mLDIHY5aHPK2iX4ujG6uqm4cvWmI0tgJSgEB3kpfYrgzXM54Y4LA57oW80yOYMTtW8IDhYysWN0Inh9C3JPDjZID0S4kCobp1U86QHR6wL8QFTZTCGvHjogSFSsbOmj7OPfGbiIoEqqe8D8H+9cP+FGaBH5Gbyn/KR1E416iOptXWGD5wUH3UYtXo20yd4gERbFo/2vQ5W7gWiWA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(136003)(376002)(346002)(39860400002)(366004)(30864003)(5660300002)(109986005)(6506007)(36756003)(83380400001)(41300700001)(8936002)(6666004)(6486002)(478600001)(2906002)(38100700002)(66476007)(8676002)(66946007)(66556008)(4326008)(86362001)(54906003)(7416002)(26005)(6512007)(186003)(2616005)(316002)(4216001)(266003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?NmmXhN1rs+E7s9Jdx5L9kUUiJ8kDl2E/7XM+LgrWribKnp6tAy34B4f9gBrf?=
- =?us-ascii?Q?jX0/GI06rqD3Bmj3lxI1oCnNSne3z2iKmlQZIwe1LnoARzVwq6gmA789OToc?=
- =?us-ascii?Q?zBTt0iGSV3+W/9f61ivw8OG+evzj2xqcpnmjdDHdMjRynO8L9eRAUv59++r9?=
- =?us-ascii?Q?6slFFMt/2hnhUA2U713Mwi13ErK4ONXYIbxTIug59U5m2ZrnUzgySFZx5OIG?=
- =?us-ascii?Q?pIp6u+z/HLzwOd/EuzIpDygGk+t/nrl12B+dt3FMxvvXzWW2LU1/H7D9x3xB?=
- =?us-ascii?Q?pMYP96gNRUSTTcehgbF8U/NhIptFEZEqheH+7MyrpYQmH0mX2+k/F7VT8K3/?=
- =?us-ascii?Q?Ibz4fTUGH0NXeGd+d8RV1B838O6wNE2WdOF3W8DNLF2MGvv0vHrNvluZDoc6?=
- =?us-ascii?Q?vSa15wCk1T2lyqsg7P1VshpblB/DLYzd7pW/1gso4ls0wH/iDxlVs5dZxDMM?=
- =?us-ascii?Q?dF+PD5yAMJu5LHfYFeioRbXzJHb0DvUj7BkS7Bd3SFKw0OpqQTm6dnyjyJFQ?=
- =?us-ascii?Q?W/snjalPqnlJsj1auEWh1mwWVjYhimLlnjgOmLKNuQ4z6ueHx+Q6yegxFgXA?=
- =?us-ascii?Q?ScI2JrIzggLx5jPT3jX2ZnZHnmjKie/v3kyvIt0UqqwhR96FW6TL0Od+EL7G?=
- =?us-ascii?Q?7UTu+ljtjI//Y3gJQnJbOR4zwyWPj04v7jVGksSRKQ8vsEiN+SE2L0bUctEF?=
- =?us-ascii?Q?I7bfz8DfPAUQRgfv56ccENy2yahMM/uN32LqgiIuKppCvNGQl9DzlZ2taQC7?=
- =?us-ascii?Q?G8dp1LYXeeLzIo+b9qIVvMQehivgH4lGyk1yxyecPJqrmfANCSsYvKRPp2BR?=
- =?us-ascii?Q?oWi8jIgnLq00R1nmEEvMknC0uqpZUYJnOaYDPYanoP3CAw0QIMjdsATRA5o9?=
- =?us-ascii?Q?9OO7FzY5eM729W3bcPRO3M8oANJlVgwYetAY/W3++yhzG2QhQ7CxxwU7/qOt?=
- =?us-ascii?Q?U2Wps0GWpQgJvfhXo6W9/UihYilrdsumNPjePvhUzS899SN5fWmM5S/qKqMz?=
- =?us-ascii?Q?WW9yzYeiiidZYgdhdHg2RKz4Kl1Gkqzd+Ir/7WhU9s6BuhOWjwFwwxx7ucun?=
- =?us-ascii?Q?Y1dpqvx42Akj1S/FYHsFNct82/Fc1YOz3tKVTs/j2ozlNyoBdxiRfEqx8v5d?=
- =?us-ascii?Q?dxrHkN8ov1wNRhaVqyRn4hTLDHvrxLB14RUgk4bwSJ9nrHkOqQRYM/qb1u0q?=
- =?us-ascii?Q?FFikg1zEGAfIvxzgWk3keSnPyLDp7zGMATjXhSLjQdCQPdNJON3JLFuVLqAF?=
- =?us-ascii?Q?mplAs541sZaGmgXtDltqaNlJi2KHiarv8VoyrntcfPvlnLreo85UVthHIc2v?=
- =?us-ascii?Q?vA4ZnpfS2UDA9eFPRA91el2v6O1oIo6LcZYm0VkQdtWqjHj+jygwDk4xfvbS?=
- =?us-ascii?Q?TX9WpFPrYtShj06Wft8IgXQAwh+C7QD+eoMQhXczetqXQDCIoSYDciMkNhwJ?=
- =?us-ascii?Q?uqZkjbYkgeZKPspLxaya+d8lObHOC6XLMFn8DvQa4X/9zZ8Gw+uI2EV2VQP0?=
- =?us-ascii?Q?auiVEGR77nlmze5wF346gsPcvr664AKCGH9gc6Hwh0/SvU3QQh4J2tWRJmrr?=
- =?us-ascii?Q?wsKTAAo2jfl6d8ireUXsO/GstIj2p8J60hHiXcrT?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?YLSnxWLIy2YYFLYzpyVEAlFti07hN5l7vM2CwP3kv2TYbltR6zZSuQGpdDfH?=
+ =?us-ascii?Q?p6ORcfNG+aYOBZprdvEnaDRFObXe7P0CcdbegKKB88sfR5ydMNAG95/zOFVw?=
+ =?us-ascii?Q?qabhDvJ0EBSc4C2NHW/K44aMRCreHjHjVImHumpI3VV1biSHYq5RssD5DNNC?=
+ =?us-ascii?Q?ab7OCh9FU5HPxc/CJyxR6pAXtfAulGygL+9aeaRg3VEFVhzdvj2ogp6SkFZ+?=
+ =?us-ascii?Q?3eVy5tM4nimeO1iypOzXXz5Ll2hTRRR8m2cY09MAPrUbpOB3H6xVUV4Rw1Yx?=
+ =?us-ascii?Q?v3NGi8+PEeNAIGHjK4iVn0yMxk0Yt2GxEDnfM/p+hTOdnJp2RT9lIsvuuLhU?=
+ =?us-ascii?Q?3P+AX6SM1cpKA9+3D9h41POanZV7WkJA3NgRjemiY0qB6boqmkJQ5tqnPC+3?=
+ =?us-ascii?Q?cyX7/1wsiukbsCGb+s/fiEzJKZXz4ejGs0PvUbaqyedoYUhDIf5WGF9RYCnI?=
+ =?us-ascii?Q?JMpejaV7whZ9uxq9DYVZga+x6Y6RRX0uHBUyW3Z00VqUZB/OgdXjmvqJBcZM?=
+ =?us-ascii?Q?eKoOn8GepjTKub21rpeJ/yHcjXB+f0B8fi3awW44LpSubRz1+H17jKJnoTF4?=
+ =?us-ascii?Q?6gE8gZhcQqa3lrnYGL6aa8vXpUJrkaw9ROGrssGyZU4+QWGUF7gVUymLm7r0?=
+ =?us-ascii?Q?sR00EIUQV6JL0z6aSQFtWtEbj4XpH+HAUTVWwF5di75P9rT1YKvJMkxnyp6O?=
+ =?us-ascii?Q?7mHl+Je5ilpkcpGgb/agapAI6Mnsu5VQXOAZaHzbQh1UBoiV+bTQgkVPAx4l?=
+ =?us-ascii?Q?RZwt0RSMlxD0J3ljD5Dgmqa3rRBDNkiEV4kfIWo7UIikWov6HRsqcwwGnjpP?=
+ =?us-ascii?Q?LRZkz+kq8h6tjGwGytsZuGWTob8F5S3IPLv6vj8yX2XGTGVQcVwOE1bF+wum?=
+ =?us-ascii?Q?rSH3DSV2BOepzoif1GYfZ3M6gGkWqKp92a3IZi6yjM2JfhLlq9Ye9bL7BNpP?=
+ =?us-ascii?Q?wNmXrYLsQ37Zb1x5Ry7hE8kHQi36gQ7MuVTObj/LkgUGfICxf1F1009vcGlP?=
+ =?us-ascii?Q?lRb4/faeiXLarPnkics5BUVJ0NTbGcp2x0hTlyxeeLKFrNUZJ1Bz2Zqb720K?=
+ =?us-ascii?Q?KJ4QIW4BllHhpaQlD2q3e1ToO011r/DuAUcnR3soZ/gZb7XN3/hjk6i/dM9r?=
+ =?us-ascii?Q?RCgm3ajaz9bZEimIqI7Eha5MZZ0/uR1MEoNyMLp0Vp6dus+yfzpg9KSUPjsl?=
+ =?us-ascii?Q?y36BOIz6FeuY3s5LSdE3WkEstZc2x2VjsfEB1zym/VnGidSA1J36rKVpfcpj?=
+ =?us-ascii?Q?bMH4I/DE0LMq5B6NbDzFzMbsFtg4ygUcsgwQk/G/pc6Jx/t/so/Q1me9ee1V?=
+ =?us-ascii?Q?aconiJ+rIAHyepXzTzZ5laJA4YWvp2RbUwYBECi6IYCl4niluQkFnSYIQbN5?=
+ =?us-ascii?Q?p9Fios4l/kFFnlOcDpiJHuHOkdnCijuTKx4vKz10UGB/y+vDIfkrDG3uTLGM?=
+ =?us-ascii?Q?NvSbdGhbVbi+NNZqEqVBqWzfMlbIdzZ42CGeALNEub8H+rPgr8UUzz+aWocT?=
+ =?us-ascii?Q?P3N/DIiNrSnRHPMPxI6HJd2cwezSCEYUOWqp/ikJhq5Yc11uyuRwxk36RsIJ?=
+ =?us-ascii?Q?8dEy3hvuasFocT/L2MTK9watHnbs8quxN2rxXd5l?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cf2a4fee-cc29-4104-1023-08da8d1da674
+X-MS-Exchange-CrossTenant-Network-Message-Id: c4e105a0-231f-4bd1-fbb2-08da8d1da5fe
 X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2022 19:59:31.4882
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2022 19:59:30.7052
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mdOXfhT4U1fz/lw8fufecT6Ww1w0jEhFJ29O0oHq7eaFJxU+8HxmG6fK6eIxhLX7
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6883
+X-MS-Exchange-CrossTenant-UserPrincipalName: dOkUrS/WxdOyRtNa6Jw5aAr0/3fk646tirtmgcvZJ/oXdYkrk/R+AAhJqVXhtePT
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6566
 X-Spam-Status: No, score=1.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SORTED_RECIPS,SPF_HELO_PASS,
@@ -131,1152 +130,662 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is the remainder of the IOAS data structure. Provide an object called
-an io_pagetable that is composed of iopt_areas pointing at iopt_pages,
-along with a list of iommu_domains that mirror the IOVA to PFN map.
+Connect the IOAS to its IOCTL interface. This exposes most of the
+functionality in the io_pagetable to userspace.
 
-At the top this is a simple interval tree of iopt_areas indicating the map
-of IOVA to iopt_pages. An xarray keeps track of a list of domains. Based
-on the attached domains there is a minimum alignment for areas (which may
-be smaller than PAGE_SIZE), an interval tree of reserved IOVA that can't
-be mapped and an IOVA of allowed IOVA that can always be mappable.
+This is intended to be the core of the generic interface that IOMMUFD will
+provide. Every IOMMU driver should be able to implement an iommu_domain
+that is compatible with this generic mechanism.
 
-The concept of a 'user' refers to something like a VFIO mdev that is
-accessing the IOVA and using a 'struct page *' for CPU based access.
+It is also designed to be easy to use for simple non virtual machine
+monitor users, like DPDK:
+ - Universal simple support for all IOMMUs (no PPC special path)
+ - An IOVA allocator that considers the aperture and the allowed/reserved
+   ranges
+ - io_pagetable allows any number of iommu_domains to be connected to the
+   IOAS
 
-Externally an API is provided that matches the requirements of the IOCTL
-interface for map/unmap and domain attachment.
-
-The API provides a 'copy' primitive to establish a new IOVA map in a
-different IOAS from an existing mapping.
-
-This is designed to support a pre-registration flow where userspace would
-setup an dummy IOAS with no domains, map in memory and then establish a
-user to pin all PFNs into the xarray.
-
-Copy can then be used to create new IOVA mappings in a different IOAS,
-with iommu_domains attached. Upon copy the PFNs will be read out of the
-xarray and mapped into the iommu_domains, avoiding any pin_user_pages()
-overheads.
+Along with room in the design to add non-generic features to cater to
+specific HW functionality.
 
 Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
 ---
  drivers/iommu/iommufd/Makefile          |   1 +
- drivers/iommu/iommufd/io_pagetable.c    | 981 ++++++++++++++++++++++++
- drivers/iommu/iommufd/io_pagetable.h    |  12 +
- drivers/iommu/iommufd/iommufd_private.h |  33 +
- include/linux/iommufd.h                 |   8 +
- 5 files changed, 1035 insertions(+)
- create mode 100644 drivers/iommu/iommufd/io_pagetable.c
+ drivers/iommu/iommufd/ioas.c            | 316 ++++++++++++++++++++++++
+ drivers/iommu/iommufd/iommufd_private.h |  28 +++
+ drivers/iommu/iommufd/main.c            |  20 ++
+ include/uapi/linux/iommufd.h            | 188 ++++++++++++++
+ 5 files changed, 553 insertions(+)
+ create mode 100644 drivers/iommu/iommufd/ioas.c
 
 diff --git a/drivers/iommu/iommufd/Makefile b/drivers/iommu/iommufd/Makefile
-index 05a0e91e30afad..b66a8c47ff55ec 100644
+index b66a8c47ff55ec..2b4f36f1b72f9d 100644
 --- a/drivers/iommu/iommufd/Makefile
 +++ b/drivers/iommu/iommufd/Makefile
-@@ -1,5 +1,6 @@
+@@ -1,6 +1,7 @@
  # SPDX-License-Identifier: GPL-2.0-only
  iommufd-y := \
-+	io_pagetable.o \
+ 	io_pagetable.o \
++	ioas.o \
  	main.o \
  	pages.o
  
-diff --git a/drivers/iommu/iommufd/io_pagetable.c b/drivers/iommu/iommufd/io_pagetable.c
+diff --git a/drivers/iommu/iommufd/ioas.c b/drivers/iommu/iommufd/ioas.c
 new file mode 100644
-index 00000000000000..7434bc8b393bbd
+index 00000000000000..f9f545158a4891
 --- /dev/null
-+++ b/drivers/iommu/iommufd/io_pagetable.c
-@@ -0,0 +1,981 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES.
-+ *
-+ * The io_pagetable is the top of datastructure that maps IOVA's to PFNs. The
-+ * PFNs can be placed into an iommu_domain, or returned to the caller as a page
-+ * list for access by an in-kernel user.
-+ *
-+ * The datastructure uses the iopt_pages to optimize the storage of the PFNs
-+ * between the domains and xarray.
++++ b/drivers/iommu/iommufd/ioas.c
+@@ -0,0 +1,316 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES
 + */
++#include <linux/interval_tree.h>
 +#include <linux/iommufd.h>
-+#include <linux/lockdep.h>
 +#include <linux/iommu.h>
-+#include <linux/sched/mm.h>
-+#include <linux/err.h>
-+#include <linux/slab.h>
-+#include <linux/errno.h>
++#include <uapi/linux/iommufd.h>
 +
 +#include "io_pagetable.h"
 +
-+static unsigned long iopt_area_iova_to_index(struct iopt_area *area,
-+					     unsigned long iova)
++void iommufd_ioas_destroy(struct iommufd_object *obj)
 +{
-+	if (IS_ENABLED(CONFIG_IOMMUFD_TEST))
-+		WARN_ON(iova < iopt_area_iova(area) ||
-+			iova > iopt_area_last_iova(area));
-+	return (iova - (iopt_area_iova(area) - area->page_offset)) / PAGE_SIZE;
-+}
-+
-+static struct iopt_area *iopt_find_exact_area(struct io_pagetable *iopt,
-+					      unsigned long iova,
-+					      unsigned long last_iova)
-+{
-+	struct iopt_area *area;
-+
-+	area = iopt_area_iter_first(iopt, iova, last_iova);
-+	if (!area || !area->pages || iopt_area_iova(area) != iova ||
-+	    iopt_area_last_iova(area) != last_iova)
-+		return NULL;
-+	return area;
-+}
-+
-+static bool __alloc_iova_check_hole(struct interval_tree_span_iter *span,
-+				    unsigned long length,
-+				    unsigned long iova_alignment,
-+				    unsigned long page_offset)
-+{
-+	if (!span->is_hole || span->last_hole - span->start_hole < length - 1)
-+		return false;
-+
-+	span->start_hole = ALIGN(span->start_hole, iova_alignment) |
-+			   page_offset;
-+	if (span->start_hole > span->last_hole ||
-+	    span->last_hole - span->start_hole < length - 1)
-+		return false;
-+	return true;
-+}
-+
-+static bool __alloc_iova_check_used(struct interval_tree_span_iter *span,
-+				    unsigned long length,
-+				    unsigned long iova_alignment,
-+				    unsigned long page_offset)
-+{
-+	if (span->is_hole || span->last_used - span->start_used < length - 1)
-+		return false;
-+
-+	span->start_used = ALIGN(span->start_used, iova_alignment) |
-+			   page_offset;
-+	if (span->start_used > span->last_used ||
-+	    span->last_used - span->start_used < length - 1)
-+		return false;
-+	return true;
-+}
-+
-+/*
-+ * Automatically find a block of IOVA that is not being used and not reserved.
-+ * Does not return a 0 IOVA even if it is valid.
-+ */
-+static int iopt_alloc_iova(struct io_pagetable *iopt, unsigned long *iova,
-+			   unsigned long uptr, unsigned long length)
-+{
-+	struct interval_tree_span_iter reserved_span;
-+	unsigned long page_offset = uptr % PAGE_SIZE;
-+	struct interval_tree_span_iter allowed_span;
-+	struct interval_tree_span_iter area_span;
-+	unsigned long iova_alignment;
-+
-+	lockdep_assert_held(&iopt->iova_rwsem);
-+
-+	/* Protect roundup_pow-of_two() from overflow */
-+	if (length == 0 || length >= ULONG_MAX / 2)
-+		return -EOVERFLOW;
-+
-+	/*
-+	 * Keep alignment present in the uptr when building the IOVA, this
-+	 * increases the chance we can map a THP.
-+	 */
-+	if (!uptr)
-+		iova_alignment = roundup_pow_of_two(length);
-+	else
-+		iova_alignment =
-+			min_t(unsigned long, roundup_pow_of_two(length),
-+			      1UL << __ffs64(uptr));
-+
-+	if (iova_alignment < iopt->iova_alignment)
-+		return -EINVAL;
-+
-+	interval_tree_for_each_span(&allowed_span, &iopt->allowed_itree,
-+				    PAGE_SIZE, ULONG_MAX - PAGE_SIZE) {
-+		if (RB_EMPTY_ROOT(&iopt->allowed_itree.rb_root)) {
-+			allowed_span.start_used = PAGE_SIZE;
-+			allowed_span.last_used = ULONG_MAX - PAGE_SIZE;
-+			allowed_span.is_hole = false;
-+		}
-+
-+		if (!__alloc_iova_check_used(&allowed_span, length,
-+					     iova_alignment, page_offset))
-+			continue;
-+
-+		interval_tree_for_each_span(&area_span, &iopt->area_itree,
-+					    allowed_span.start_used,
-+					    allowed_span.last_used) {
-+			if (!__alloc_iova_check_hole(&area_span, length,
-+						     iova_alignment,
-+						     page_offset))
-+				continue;
-+
-+			interval_tree_for_each_span(&reserved_span,
-+						    &iopt->reserved_itree,
-+						    area_span.start_used,
-+						    area_span.last_used) {
-+				if (!__alloc_iova_check_hole(
-+					    &reserved_span, length,
-+					    iova_alignment, page_offset))
-+					continue;
-+
-+				*iova = reserved_span.start_hole;
-+				return 0;
-+			}
-+		}
-+	}
-+	return -ENOSPC;
-+}
-+
-+/*
-+ * The area takes a slice of the pages from start_bytes to start_byte + length
-+ */
-+static struct iopt_area *
-+iopt_alloc_area(struct io_pagetable *iopt, struct iopt_pages *pages,
-+		unsigned long iova, unsigned long start_byte,
-+		unsigned long length, int iommu_prot, unsigned int flags)
-+{
-+	struct iopt_area *area;
++	struct iommufd_ioas *ioas = container_of(obj, struct iommufd_ioas, obj);
 +	int rc;
 +
-+	area = kzalloc(sizeof(*area), GFP_KERNEL_ACCOUNT);
-+	if (!area)
-+		return ERR_PTR(-ENOMEM);
++	rc = iopt_unmap_all(&ioas->iopt, NULL);
++	WARN_ON(rc && rc != -ENOENT);
++	iopt_destroy_table(&ioas->iopt);
++}
 +
-+	area->iopt = iopt;
-+	area->iommu_prot = iommu_prot;
-+	area->page_offset = start_byte % PAGE_SIZE;
-+	area->pages_node.start = start_byte / PAGE_SIZE;
-+	if (check_add_overflow(start_byte, length - 1,
-+			       &area->pages_node.last)) {
-+		rc = -EOVERFLOW;
-+		goto out_free;
-+	}
-+	area->pages_node.last = area->pages_node.last / PAGE_SIZE;
-+	if (WARN_ON(area->pages_node.last >= pages->npages)) {
-+		rc = -EOVERFLOW;
-+		goto out_free;
-+	}
++struct iommufd_ioas *iommufd_ioas_alloc(struct iommufd_ctx *ictx)
++{
++	struct iommufd_ioas *ioas;
++	int rc;
 +
-+	down_write(&iopt->iova_rwsem);
-+	if (flags & IOPT_ALLOC_IOVA) {
-+		rc = iopt_alloc_iova(iopt, &iova,
-+				     (uintptr_t)pages->uptr + start_byte,
-+				     length);
-+		if (rc)
-+			goto out_unlock;
-+	}
++	ioas = iommufd_object_alloc(ictx, ioas, IOMMUFD_OBJ_IOAS);
++	if (IS_ERR(ioas))
++		return ioas;
 +
-+	if (check_add_overflow(iova, length - 1, &area->node.last)) {
-+		rc = -EOVERFLOW;
-+		goto out_unlock;
-+	}
++	rc = iopt_init_table(&ioas->iopt);
++	if (rc)
++		goto out_abort;
++	return ioas;
 +
-+	if (!(flags & IOPT_ALLOC_IOVA)) {
-+		if ((iova & (iopt->iova_alignment - 1)) ||
-+		    (length & (iopt->iova_alignment - 1)) || !length) {
-+			rc = -EINVAL;
-+			goto out_unlock;
-+		}
-+
-+		/* No reserved IOVA intersects the range */
-+		if (iopt_reserved_iter_first(iopt, iova, area->node.last)) {
-+			rc = -ENOENT;
-+			goto out_unlock;
-+		}
-+
-+		/* Check that there is not already a mapping in the range */
-+		if (iopt_area_iter_first(iopt, iova, area->node.last)) {
-+			rc = -EADDRINUSE;
-+			goto out_unlock;
-+		}
-+	}
-+
-+	/*
-+	 * The area is inserted with a NULL pages indicating it is not fully
-+	 * initialized yet.
-+	 */
-+	area->node.start = iova;
-+	interval_tree_insert(&area->node, &area->iopt->area_itree);
-+	up_write(&iopt->iova_rwsem);
-+	return area;
-+
-+out_unlock:
-+	up_write(&iopt->iova_rwsem);
-+out_free:
-+	kfree(area);
++out_abort:
++	iommufd_object_abort(ictx, &ioas->obj);
 +	return ERR_PTR(rc);
 +}
 +
-+static void iopt_abort_area(struct iopt_area *area)
++int iommufd_ioas_alloc_ioctl(struct iommufd_ucmd *ucmd)
 +{
-+	down_write(&area->iopt->iova_rwsem);
-+	interval_tree_remove(&area->node, &area->iopt->area_itree);
-+	up_write(&area->iopt->iova_rwsem);
-+	kfree(area);
-+}
-+
-+static int iopt_finalize_area(struct iopt_area *area, struct iopt_pages *pages)
-+{
++	struct iommu_ioas_alloc *cmd = ucmd->cmd;
++	struct iommufd_ioas *ioas;
 +	int rc;
 +
-+	down_read(&area->iopt->domains_rwsem);
-+	rc = iopt_area_fill_domains(area, pages);
-+	if (!rc) {
-+		/*
-+		 * area->pages must be set inside the domains_rwsem to ensure
-+		 * any newly added domains will get filled. Moves the reference
-+		 * in from the caller
-+		 */
-+		down_write(&area->iopt->iova_rwsem);
-+		area->pages = pages;
-+		up_write(&area->iopt->iova_rwsem);
-+	}
-+	up_read(&area->iopt->domains_rwsem);
++	if (cmd->flags)
++		return -EOPNOTSUPP;
++
++	ioas = iommufd_ioas_alloc(ucmd->ictx);
++	if (IS_ERR(ioas))
++		return PTR_ERR(ioas);
++
++	cmd->out_ioas_id = ioas->obj.id;
++	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
++	if (rc)
++		goto out_table;
++	iommufd_object_finalize(ucmd->ictx, &ioas->obj);
++	return 0;
++
++out_table:
++	iommufd_ioas_destroy(&ioas->obj);
 +	return rc;
 +}
 +
-+int iopt_map_pages(struct io_pagetable *iopt, struct iopt_pages *pages,
-+		   unsigned long *dst_iova, unsigned long start_bytes,
-+		   unsigned long length, int iommu_prot, unsigned int flags)
++int iommufd_ioas_iova_ranges(struct iommufd_ucmd *ucmd)
 +{
-+	struct iopt_area *area;
++	struct iommu_ioas_iova_ranges __user *uptr = ucmd->ubuffer;
++	struct iommu_ioas_iova_ranges *cmd = ucmd->cmd;
++	struct iommufd_ioas *ioas;
++	struct interval_tree_span_iter span;
++	u32 max_iovas;
 +	int rc;
 +
-+	if ((iommu_prot & IOMMU_WRITE) && !pages->writable)
-+		return -EPERM;
++	if (cmd->__reserved)
++		return -EOPNOTSUPP;
 +
-+	area = iopt_alloc_area(iopt, pages, *dst_iova, start_bytes, length,
-+			       iommu_prot, flags);
-+	if (IS_ERR(area))
-+		return PTR_ERR(area);
-+	*dst_iova = iopt_area_iova(area);
++	max_iovas = cmd->size - sizeof(*cmd);
++	if (max_iovas % sizeof(cmd->out_valid_iovas[0]))
++		return -EINVAL;
++	max_iovas /= sizeof(cmd->out_valid_iovas[0]);
 +
-+	rc = iopt_finalize_area(area, pages);
-+	if (rc) {
-+		iopt_abort_area(area);
-+		return rc;
++	ioas = iommufd_get_ioas(ucmd, cmd->ioas_id);
++	if (IS_ERR(ioas))
++		return PTR_ERR(ioas);
++
++	down_read(&ioas->iopt.iova_rwsem);
++	cmd->out_num_iovas = 0;
++	interval_tree_for_each_span (&span, &ioas->iopt.reserved_itree,
++				     0, ULONG_MAX) {
++		if (!span.is_hole)
++			continue;
++		if (cmd->out_num_iovas < max_iovas) {
++			rc = put_user((u64)span.start_hole,
++				      &uptr->out_valid_iovas[cmd->out_num_iovas]
++					       .start);
++			if (rc)
++				goto out_put;
++			rc = put_user(
++				(u64)span.last_hole,
++				&uptr->out_valid_iovas[cmd->out_num_iovas].last);
++			if (rc)
++				goto out_put;
++		}
++		cmd->out_num_iovas++;
++	}
++	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
++	if (rc)
++		goto out_put;
++	if (cmd->out_num_iovas > max_iovas)
++		rc = -EMSGSIZE;
++out_put:
++	up_read(&ioas->iopt.iova_rwsem);
++	iommufd_put_object(&ioas->obj);
++	return rc;
++}
++
++static int iommufd_ioas_load_iovas(struct rb_root_cached *itree,
++				   struct iommu_iova_range __user *ranges,
++				   u32 num)
++{
++	u32 i;
++
++	for (i = 0; i != num; i++) {
++		struct iommu_iova_range range;
++		struct iopt_allowed *allowed;
++
++		if (copy_from_user(&range, ranges + i, sizeof(range)))
++			return -EFAULT;
++
++		if (range.start >= range.last)
++			return -EINVAL;
++
++		if (interval_tree_iter_first(itree, range.start, range.last))
++			return -EINVAL;
++
++		allowed = kzalloc(sizeof(*allowed), GFP_KERNEL_ACCOUNT);
++		if (!allowed)
++			return -ENOMEM;
++		allowed->node.start = range.start;
++		allowed->node.last = range.last;
++
++		interval_tree_insert(&allowed->node, itree);
 +	}
 +	return 0;
 +}
 +
-+/**
-+ * iopt_map_user_pages() - Map a user VA to an iova in the io page table
-+ * @iopt: io_pagetable to act on
-+ * @iova: If IOPT_ALLOC_IOVA is set this is unused on input and contains
-+ *        the chosen iova on output. Otherwise is the iova to map to on input
-+ * @uptr: User VA to map
-+ * @length: Number of bytes to map
-+ * @iommu_prot: Combination of IOMMU_READ/WRITE/etc bits for the mapping
-+ * @flags: IOPT_ALLOC_IOVA or zero
-+ *
-+ * iova, uptr, and length must be aligned to iova_alignment. For domain backed
-+ * page tables this will pin the pages and load them into the domain at iova.
-+ * For non-domain page tables this will only setup a lazy reference and the
-+ * caller must use iopt_access_pages() to touch them.
-+ *
-+ * iopt_unmap_iova() must be called to undo this before the io_pagetable can be
-+ * destroyed.
-+ */
-+int iopt_map_user_pages(struct io_pagetable *iopt, unsigned long *iova,
-+			void __user *uptr, unsigned long length, int iommu_prot,
-+			unsigned int flags)
++int iommufd_ioas_allow_iovas(struct iommufd_ucmd *ucmd)
 +{
-+	struct iopt_pages *pages;
++	struct iommu_ioas_allow_iovas *cmd = ucmd->cmd;
++	struct rb_root_cached allowed_iova = RB_ROOT_CACHED;
++	struct interval_tree_node *node;
++	struct iommufd_ioas *ioas;
++	struct io_pagetable *iopt;
++	int rc = 0;
++
++	ioas = iommufd_get_ioas(ucmd, cmd->ioas_id);
++	if (IS_ERR(ioas))
++		return PTR_ERR(ioas);
++	iopt = &ioas->iopt;
++
++	rc = iommufd_ioas_load_iovas(&allowed_iova,
++				      u64_to_user_ptr(cmd->allowed_iovas),
++				      cmd->num_iovas);
++	if (rc)
++		goto out_free;
++
++	rc = iopt_set_allow_iova(iopt, &allowed_iova);
++out_free:
++	while ((node = interval_tree_iter_first(&allowed_iova, 0, ULONG_MAX))) {
++		interval_tree_remove(node, &allowed_iova);
++		kfree(container_of(node, struct iopt_allowed, node));
++	}
++	iommufd_put_object(&ioas->obj);
++	return rc;
++}
++
++static int conv_iommu_prot(u32 map_flags)
++{
++	int iommu_prot;
++
++	/*
++	 * We provide no manual cache coherency ioctls to userspace and most
++	 * architectures make the CPU ops for cache flushing privileged.
++	 * Therefore we require the underlying IOMMU to support CPU coherent
++	 * operation. Support for IOMMU_CACHE is enforced by the
++	 * dev_is_dma_coherent() test during bind.
++	 */
++	iommu_prot = IOMMU_CACHE;
++	if (map_flags & IOMMU_IOAS_MAP_WRITEABLE)
++		iommu_prot |= IOMMU_WRITE;
++	if (map_flags & IOMMU_IOAS_MAP_READABLE)
++		iommu_prot |= IOMMU_READ;
++	return iommu_prot;
++}
++
++int iommufd_ioas_map(struct iommufd_ucmd *ucmd)
++{
++	struct iommu_ioas_map *cmd = ucmd->cmd;
++	struct iommufd_ioas *ioas;
++	unsigned int flags = 0;
++	unsigned long iova;
 +	int rc;
 +
-+	pages = iopt_alloc_pages(uptr, length, iommu_prot & IOMMU_WRITE);
++	if ((cmd->flags &
++	     ~(IOMMU_IOAS_MAP_FIXED_IOVA | IOMMU_IOAS_MAP_WRITEABLE |
++	       IOMMU_IOAS_MAP_READABLE)) ||
++	    cmd->__reserved)
++		return -EOPNOTSUPP;
++	if (cmd->iova >= ULONG_MAX || cmd->length >= ULONG_MAX)
++		return -EOVERFLOW;
++
++	ioas = iommufd_get_ioas(ucmd, cmd->ioas_id);
++	if (IS_ERR(ioas))
++		return PTR_ERR(ioas);
++
++	if (!(cmd->flags & IOMMU_IOAS_MAP_FIXED_IOVA))
++		flags = IOPT_ALLOC_IOVA;
++	iova = cmd->iova;
++	rc = iopt_map_user_pages(&ioas->iopt, &iova,
++				 u64_to_user_ptr(cmd->user_va), cmd->length,
++				 conv_iommu_prot(cmd->flags), flags);
++	if (rc)
++		goto out_put;
++
++	cmd->iova = iova;
++	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
++out_put:
++	iommufd_put_object(&ioas->obj);
++	return rc;
++}
++
++int iommufd_ioas_copy(struct iommufd_ucmd *ucmd)
++{
++	struct iommu_ioas_copy *cmd = ucmd->cmd;
++	struct iommufd_ioas *src_ioas;
++	struct iommufd_ioas *dst_ioas;
++	struct iopt_pages *pages;
++	unsigned int flags = 0;
++	unsigned long iova;
++	unsigned long start_byte;
++	int rc;
++
++	if ((cmd->flags &
++	     ~(IOMMU_IOAS_MAP_FIXED_IOVA | IOMMU_IOAS_MAP_WRITEABLE |
++	       IOMMU_IOAS_MAP_READABLE)))
++		return -EOPNOTSUPP;
++	if (cmd->length >= ULONG_MAX)
++		return -EOVERFLOW;
++
++	src_ioas = iommufd_get_ioas(ucmd, cmd->src_ioas_id);
++	if (IS_ERR(src_ioas))
++		return PTR_ERR(src_ioas);
++	/* FIXME: copy is not limited to an exact match anymore */
++	pages = iopt_get_pages(&src_ioas->iopt, cmd->src_iova, &start_byte,
++			       cmd->length);
++	iommufd_put_object(&src_ioas->obj);
 +	if (IS_ERR(pages))
 +		return PTR_ERR(pages);
 +
-+	rc = iopt_map_pages(iopt, pages, iova, uptr - pages->uptr, length,
-+			    iommu_prot, flags);
++	dst_ioas = iommufd_get_ioas(ucmd, cmd->dst_ioas_id);
++	if (IS_ERR(dst_ioas)) {
++		iopt_put_pages(pages);
++		return PTR_ERR(dst_ioas);
++	}
++
++	if (!(cmd->flags & IOMMU_IOAS_MAP_FIXED_IOVA))
++		flags = IOPT_ALLOC_IOVA;
++	iova = cmd->dst_iova;
++	rc = iopt_map_pages(&dst_ioas->iopt, pages, &iova, start_byte,
++			    cmd->length, conv_iommu_prot(cmd->flags), flags);
 +	if (rc) {
 +		iopt_put_pages(pages);
-+		return rc;
++		goto out_put_dst;
 +	}
-+	return 0;
-+}
 +
-+struct iopt_pages *iopt_get_pages(struct io_pagetable *iopt, unsigned long iova,
-+				  unsigned long *start_byte,
-+				  unsigned long length)
-+{
-+	unsigned long iova_end;
-+	struct iopt_pages *pages;
-+	struct iopt_area *area;
-+
-+	if (check_add_overflow(iova, length - 1, &iova_end))
-+		return ERR_PTR(-EOVERFLOW);
-+
-+	down_read(&iopt->iova_rwsem);
-+	area = iopt_find_exact_area(iopt, iova, iova_end);
-+	if (!area) {
-+		up_read(&iopt->iova_rwsem);
-+		return ERR_PTR(-ENOENT);
-+	}
-+	pages = area->pages;
-+	*start_byte = area->page_offset + iopt_area_index(area) * PAGE_SIZE;
-+	kref_get(&pages->kref);
-+	up_read(&iopt->iova_rwsem);
-+
-+	return pages;
-+}
-+
-+static int iopt_unmap_iova_range(struct io_pagetable *iopt, unsigned long start,
-+				 unsigned long end, unsigned long *unmapped)
-+{
-+	struct iopt_area *area;
-+	unsigned long unmapped_bytes = 0;
-+	int rc = -ENOENT;
-+
-+	/*
-+	 * The domains_rwsem must be held in read mode any time any area->pages
-+	 * is NULL. This prevents domain attach/detatch from running
-+	 * concurrently with cleaning up the area.
-+	 */
-+	down_read(&iopt->domains_rwsem);
-+	down_write(&iopt->iova_rwsem);
-+	while ((area = iopt_area_iter_first(iopt, start, end))) {
-+		unsigned long area_last = iopt_area_last_iova(area);
-+		unsigned long area_first = iopt_area_iova(area);
-+		struct iopt_pages *pages;
-+
-+		/* Userspace should not race map/unmap's of the same area */
-+		if (!area->pages) {
-+			rc = -EBUSY;
-+			goto out_unlock_iova;
-+		}
-+
-+		if (area_first < start || area_last > end) {
-+			rc = -ENOENT;
-+			goto out_unlock_iova;
-+		}
-+
-+		/*
-+		 * num_users writers must hold the iova_rwsem too, so we can
-+		 * safely read it under the write side of the iovam_rwsem
-+		 * without the pages->mutex.
-+		 */
-+		if (area->num_users) {
-+			start = area_first;
-+			area->prevent_users = true;
-+			up_write(&iopt->iova_rwsem);
-+			up_read(&iopt->domains_rwsem);
-+			/* Later patch calls back to drivers to unmap */
-+			return -EBUSY;
-+		}
-+
-+		pages = area->pages;
-+		area->pages = NULL;
-+		up_write(&iopt->iova_rwsem);
-+
-+		iopt_area_unfill_domains(area, pages);
-+		iopt_abort_area(area);
-+		iopt_put_pages(pages);
-+
-+		unmapped_bytes += area_last - area_first + 1;
-+
-+		down_write(&iopt->iova_rwsem);
-+	}
-+	if (unmapped_bytes)
-+		rc = 0;
-+
-+out_unlock_iova:
-+	up_write(&iopt->iova_rwsem);
-+	up_read(&iopt->domains_rwsem);
-+	if (unmapped)
-+		*unmapped = unmapped_bytes;
++	cmd->dst_iova = iova;
++	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
++out_put_dst:
++	iommufd_put_object(&dst_ioas->obj);
 +	return rc;
 +}
 +
-+/**
-+ * iopt_unmap_iova() - Remove a range of iova
-+ * @iopt: io_pagetable to act on
-+ * @iova: Starting iova to unmap
-+ * @length: Number of bytes to unmap
-+ * @unmapped: Return number of bytes unmapped
-+ *
-+ * The requested range must be a superset of existing ranges.
-+ * Splitting/truncating IOVA mappings is not allowed.
-+ */
-+int iopt_unmap_iova(struct io_pagetable *iopt, unsigned long iova,
-+		    unsigned long length, unsigned long *unmapped)
++int iommufd_ioas_unmap(struct iommufd_ucmd *ucmd)
 +{
-+	unsigned long iova_end;
-+
-+	if (!length)
-+		return -EINVAL;
-+
-+	if (check_add_overflow(iova, length - 1, &iova_end))
-+		return -EOVERFLOW;
-+
-+	return iopt_unmap_iova_range(iopt, iova, iova_end, unmapped);
-+}
-+
-+int iopt_unmap_all(struct io_pagetable *iopt, unsigned long *unmapped)
-+{
-+	return iopt_unmap_iova_range(iopt, 0, ULONG_MAX, unmapped);
-+}
-+
-+/**
-+ * iopt_access_pages() - Return a list of pages under the iova
-+ * @iopt: io_pagetable to act on
-+ * @iova: Starting IOVA
-+ * @length: Number of bytes to access
-+ * @out_pages: Output page list
-+ * @write: True if access is for writing
-+ *
-+ * Reads @length bytes starting at iova and returns the struct page * pointers.
-+ * These can be kmap'd by the caller for CPU access.
-+ *
-+ * The caller must perform iopt_unaccess_pages() when done to balance this.
-+ *
-+ * iova can be unaligned from PAGE_SIZE. The first returned byte starts at
-+ * page_to_phys(out_pages[0]) + (iova % PAGE_SIZE). The caller promises not to
-+ * touch memory outside the requested iova slice.
-+ */
-+int iopt_access_pages(struct io_pagetable *iopt, unsigned long iova,
-+		      unsigned long length, struct page **out_pages, bool write)
-+{
-+	unsigned long cur_iova = iova;
-+	unsigned long last_iova;
-+	struct iopt_area *area;
++	struct iommu_ioas_unmap *cmd = ucmd->cmd;
++	struct iommufd_ioas *ioas;
++	unsigned long unmapped = 0;
 +	int rc;
 +
-+	if (!length)
-+		return -EINVAL;
-+	if (check_add_overflow(iova, length - 1, &last_iova))
-+		return -EOVERFLOW;
++	ioas = iommufd_get_ioas(ucmd, cmd->ioas_id);
++	if (IS_ERR(ioas))
++		return PTR_ERR(ioas);
 +
-+	down_read(&iopt->iova_rwsem);
-+	for (area = iopt_area_iter_first(iopt, iova, last_iova); area;
-+	     area = iopt_area_iter_next(area, iova, last_iova)) {
-+		unsigned long last = min(last_iova, iopt_area_last_iova(area));
-+		unsigned long last_index;
-+		unsigned long index;
-+
-+		/* Need contiguous areas in the access */
-+		if (iopt_area_iova(area) > cur_iova || !area->pages ||
-+		    area->prevent_users) {
-+			rc = -EINVAL;
-+			goto out_remove;
++	if (cmd->iova == 0 && cmd->length == U64_MAX) {
++		rc = iopt_unmap_all(&ioas->iopt, &unmapped);
++		if (rc)
++			goto out_put;
++	} else {
++		if (cmd->iova >= ULONG_MAX || cmd->length >= ULONG_MAX) {
++			rc = -EOVERFLOW;
++			goto out_put;
 +		}
-+
-+		index = iopt_area_iova_to_index(area, cur_iova);
-+		last_index = iopt_area_iova_to_index(area, last);
-+
-+		/*
-+		 * The API can only return aligned pages, so the starting point
-+		 * must be at a page boundary.
-+		 */
-+		if ((cur_iova - (iopt_area_iova(area) - area->page_offset)) %
-+		    PAGE_SIZE) {
-+			rc = -EINVAL;
-+			goto out_remove;
-+		}
-+
-+		/*
-+		 * and an interior ending point must be at a page boundary
-+		 */
-+		if (last != last_iova &&
-+		    (iopt_area_last_iova(area) - cur_iova + 1) % PAGE_SIZE) {
-+			rc = -EINVAL;
-+			goto out_remove;
-+		}
-+
-+		mutex_lock(&area->pages->mutex);
-+		rc = iopt_pages_add_user(area->pages, index, last_index,
-+					 out_pages, write);
-+		if (rc) {
-+			mutex_unlock(&area->pages->mutex);
-+			goto out_remove;
-+		}
-+		area->num_users++;
-+		mutex_unlock(&area->pages->mutex);
-+		if (last == last_iova)
-+			break;
-+		cur_iova = last + 1;
-+		out_pages += last_index - index;
++		rc = iopt_unmap_iova(&ioas->iopt, cmd->iova, cmd->length,
++				     &unmapped);
++		if (rc)
++			goto out_put;
 +	}
-+	if (cur_iova != last_iova)
-+		goto out_remove;
 +
-+	up_read(&iopt->iova_rwsem);
-+	return 0;
++	cmd->length = unmapped;
++	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
 +
-+out_remove:
-+	if (cur_iova != iova)
-+		iopt_unaccess_pages(iopt, iova, cur_iova - iova);
-+	up_read(&iopt->iova_rwsem);
++out_put:
++	iommufd_put_object(&ioas->obj);
 +	return rc;
 +}
-+EXPORT_SYMBOL_GPL(iopt_access_pages);
-+
-+/**
-+ * iopt_unaccess_pages() - Undo iopt_access_pages
-+ * @iopt: io_pagetable to act on
-+ * @iova: Starting IOVA
-+ * @length:- Number of bytes to access
-+ *
-+ * Return the struct page's. The caller must stop accessing them before calling
-+ * this. The iova/length must exactly match the one provided to access_pages.
-+ */
-+void iopt_unaccess_pages(struct io_pagetable *iopt, unsigned long iova,
-+			 unsigned long length)
-+{
-+	unsigned long cur_iova = iova;
-+	unsigned long last_iova;
-+	struct iopt_area *area;
-+
-+	if (WARN_ON(!length) ||
-+	    WARN_ON(check_add_overflow(iova, length - 1, &last_iova)))
-+		return;
-+
-+	down_read(&iopt->iova_rwsem);
-+	for (area = iopt_area_iter_first(iopt, iova, last_iova); area;
-+	     area = iopt_area_iter_next(area, iova, last_iova)) {
-+		unsigned long last = min(last_iova, iopt_area_last_iova(area));
-+
-+		iopt_pages_remove_user(area,
-+				       iopt_area_iova_to_index(area, cur_iova),
-+				       iopt_area_iova_to_index(area, last));
-+		if (last == last_iova)
-+			break;
-+		cur_iova = last + 1;
-+	}
-+	up_read(&iopt->iova_rwsem);
-+}
-+EXPORT_SYMBOL_GPL(iopt_unaccess_pages);
-+
-+/* The caller must always free all the nodes in the allowed_iova rb_root. */
-+int iopt_set_allow_iova(struct io_pagetable *iopt,
-+			struct rb_root_cached *allowed_iova)
-+{
-+	struct iopt_allowed *allowed;
-+
-+	down_write(&iopt->iova_rwsem);
-+	swap(*allowed_iova, iopt->allowed_itree);
-+
-+	for (allowed = iopt_allowed_iter_first(iopt, 0, ULONG_MAX); allowed;
-+	     allowed = iopt_allowed_iter_next(allowed, 0, ULONG_MAX)) {
-+		if (iopt_reserved_iter_first(iopt, allowed->node.start,
-+					     allowed->node.last)) {
-+			swap(*allowed_iova, iopt->allowed_itree);
-+			up_write(&iopt->iova_rwsem);
-+			return -EADDRINUSE;
-+		}
-+	}
-+	up_write(&iopt->iova_rwsem);
-+	return 0;
-+}
-+
-+int iopt_reserve_iova(struct io_pagetable *iopt, unsigned long start,
-+		      unsigned long last, void *owner)
-+{
-+	struct iopt_reserved *reserved;
-+
-+	lockdep_assert_held_write(&iopt->iova_rwsem);
-+
-+	if (iopt_area_iter_first(iopt, start, last) ||
-+	    iopt_allowed_iter_first(iopt, start, last))
-+		return -EADDRINUSE;
-+
-+	reserved = kzalloc(sizeof(*reserved), GFP_KERNEL_ACCOUNT);
-+	if (!reserved)
-+		return -ENOMEM;
-+	reserved->node.start = start;
-+	reserved->node.last = last;
-+	reserved->owner = owner;
-+	interval_tree_insert(&reserved->node, &iopt->reserved_itree);
-+	return 0;
-+}
-+
-+static void __iopt_remove_reserved_iova(struct io_pagetable *iopt, void *owner)
-+{
-+	struct iopt_reserved *reserved, *next;
-+
-+	lockdep_assert_held_write(&iopt->iova_rwsem);
-+
-+	for (reserved = iopt_reserved_iter_first(iopt, 0, ULONG_MAX);
-+	     reserved; reserved = next) {
-+		next = iopt_reserved_iter_next(reserved, 0, ULONG_MAX);
-+
-+		if (reserved->owner == owner) {
-+			interval_tree_remove(&reserved->node,
-+					     &iopt->reserved_itree);
-+			kfree(reserved);
-+		}
-+	}
-+}
-+
-+void iopt_remove_reserved_iova(struct io_pagetable *iopt, void *owner)
-+{
-+	down_write(&iopt->iova_rwsem);
-+	__iopt_remove_reserved_iova(iopt, owner);
-+	up_write(&iopt->iova_rwsem);
-+}
-+
-+int iopt_init_table(struct io_pagetable *iopt)
-+{
-+	init_rwsem(&iopt->iova_rwsem);
-+	init_rwsem(&iopt->domains_rwsem);
-+	iopt->area_itree = RB_ROOT_CACHED;
-+	iopt->allowed_itree = RB_ROOT_CACHED;
-+	iopt->reserved_itree = RB_ROOT_CACHED;
-+	xa_init_flags(&iopt->domains, XA_FLAGS_ACCOUNT);
-+
-+	/*
-+	 * iopt's start as SW tables that can use the entire size_t IOVA space
-+	 * due to the use of size_t in the APIs. They have no alignment
-+	 * restriction.
-+	 */
-+	iopt->iova_alignment = 1;
-+
-+	return 0;
-+}
-+
-+void iopt_destroy_table(struct io_pagetable *iopt)
-+{
-+	struct interval_tree_node *node;
-+
-+	if (IS_ENABLED(CONFIG_IOMMUFD_TEST))
-+		iopt_remove_reserved_iova(iopt, NULL);
-+
-+	while ((node = interval_tree_iter_first(&iopt->allowed_itree, 0,
-+						ULONG_MAX))) {
-+		interval_tree_remove(node, &iopt->allowed_itree);
-+		kfree(container_of(node, struct iopt_allowed, node));
-+	}
-+
-+	WARN_ON(!RB_EMPTY_ROOT(&iopt->reserved_itree.rb_root));
-+	WARN_ON(!xa_empty(&iopt->domains));
-+	WARN_ON(!RB_EMPTY_ROOT(&iopt->area_itree.rb_root));
-+}
-+
-+/**
-+ * iopt_unfill_domain() - Unfill a domain with PFNs
-+ * @iopt: io_pagetable to act on
-+ * @domain: domain to unfill
-+ *
-+ * This is used when removing a domain from the iopt. Every area in the iopt
-+ * will be unmapped from the domain. The domain must already be removed from the
-+ * domains xarray.
-+ */
-+static void iopt_unfill_domain(struct io_pagetable *iopt,
-+			       struct iommu_domain *domain)
-+{
-+	struct iopt_area *area;
-+
-+	lockdep_assert_held(&iopt->iova_rwsem);
-+	lockdep_assert_held_write(&iopt->domains_rwsem);
-+
-+	/*
-+	 * Some other domain is holding all the pfns still, rapidly unmap this
-+	 * domain.
-+	 */
-+	if (iopt->next_domain_id != 0) {
-+		/* Pick an arbitrary remaining domain to act as storage */
-+		struct iommu_domain *storage_domain =
-+			xa_load(&iopt->domains, 0);
-+
-+		for (area = iopt_area_iter_first(iopt, 0, ULONG_MAX); area;
-+		     area = iopt_area_iter_next(area, 0, ULONG_MAX)) {
-+			struct iopt_pages *pages = area->pages;
-+
-+			if (!pages)
-+				continue;
-+
-+			mutex_lock(&pages->mutex);
-+			if (area->storage_domain != domain) {
-+				mutex_unlock(&pages->mutex);
-+				continue;
-+			}
-+			area->storage_domain = storage_domain;
-+			mutex_unlock(&pages->mutex);
-+		}
-+
-+
-+		iopt_unmap_domain(iopt, domain);
-+		return;
-+	}
-+
-+	for (area = iopt_area_iter_first(iopt, 0, ULONG_MAX); area;
-+	     area = iopt_area_iter_next(area, 0, ULONG_MAX)) {
-+		struct iopt_pages *pages = area->pages;
-+
-+		if (!pages)
-+			continue;
-+
-+		mutex_lock(&pages->mutex);
-+		interval_tree_remove(&area->pages_node,
-+				     &pages->domains_itree);
-+		WARN_ON(area->storage_domain != domain);
-+		area->storage_domain = NULL;
-+		iopt_area_unfill_domain(area, pages, domain);
-+		mutex_unlock(&pages->mutex);
-+	}
-+}
-+
-+/**
-+ * iopt_fill_domain() - Fill a domain with PFNs
-+ * @iopt: io_pagetable to act on
-+ * @domain: domain to fill
-+ *
-+ * Fill the domain with PFNs from every area in the iopt. On failure the domain
-+ * is left unchanged.
-+ */
-+static int iopt_fill_domain(struct io_pagetable *iopt,
-+			    struct iommu_domain *domain)
-+{
-+	struct iopt_area *end_area;
-+	struct iopt_area *area;
-+	int rc;
-+
-+	lockdep_assert_held(&iopt->iova_rwsem);
-+	lockdep_assert_held_write(&iopt->domains_rwsem);
-+
-+	for (area = iopt_area_iter_first(iopt, 0, ULONG_MAX); area;
-+	     area = iopt_area_iter_next(area, 0, ULONG_MAX)) {
-+		struct iopt_pages *pages = area->pages;
-+
-+		if (!pages)
-+			continue;
-+
-+		mutex_lock(&pages->mutex);
-+		rc = iopt_area_fill_domain(area, domain);
-+		if (rc) {
-+			mutex_unlock(&pages->mutex);
-+			goto out_unfill;
-+		}
-+		if (!area->storage_domain) {
-+			WARN_ON(iopt->next_domain_id != 0);
-+			area->storage_domain = domain;
-+			interval_tree_insert(&area->pages_node,
-+					     &pages->domains_itree);
-+		}
-+		mutex_unlock(&pages->mutex);
-+	}
-+	return 0;
-+
-+out_unfill:
-+	end_area = area;
-+	for (area = iopt_area_iter_first(iopt, 0, ULONG_MAX); area;
-+	     area = iopt_area_iter_next(area, 0, ULONG_MAX)) {
-+		struct iopt_pages *pages = area->pages;
-+
-+		if (area == end_area)
-+			break;
-+		if (!pages)
-+			continue;
-+		mutex_lock(&pages->mutex);
-+		if (iopt->next_domain_id == 0) {
-+			interval_tree_remove(&area->pages_node,
-+					     &pages->domains_itree);
-+			area->storage_domain = NULL;
-+		}
-+		iopt_area_unfill_domain(area, pages, domain);
-+		mutex_unlock(&pages->mutex);
-+	}
-+	return rc;
-+}
-+
-+/* All existing area's conform to an increased page size */
-+static int iopt_check_iova_alignment(struct io_pagetable *iopt,
-+				     unsigned long new_iova_alignment)
-+{
-+	struct iopt_area *area;
-+
-+	lockdep_assert_held(&iopt->iova_rwsem);
-+
-+	for (area = iopt_area_iter_first(iopt, 0, ULONG_MAX); area;
-+	     area = iopt_area_iter_next(area, 0, ULONG_MAX))
-+		if ((iopt_area_iova(area) % new_iova_alignment) ||
-+		    (iopt_area_length(area) % new_iova_alignment))
-+			return -EADDRINUSE;
-+	return 0;
-+}
-+
-+int iopt_table_add_domain(struct io_pagetable *iopt,
-+			  struct iommu_domain *domain)
-+{
-+	const struct iommu_domain_geometry *geometry = &domain->geometry;
-+	struct iommu_domain *iter_domain;
-+	unsigned int new_iova_alignment;
-+	unsigned long index;
-+	int rc;
-+
-+	down_write(&iopt->domains_rwsem);
-+	down_write(&iopt->iova_rwsem);
-+
-+	xa_for_each (&iopt->domains, index, iter_domain) {
-+		if (WARN_ON(iter_domain == domain)) {
-+			rc = -EEXIST;
-+			goto out_unlock;
-+		}
-+	}
-+
-+	/*
-+	 * The io page size drives the iova_alignment. Internally the iopt_pages
-+	 * works in PAGE_SIZE units and we adjust when mapping sub-PAGE_SIZE
-+	 * objects into the iommu_domain.
-+	 *
-+	 * A iommu_domain must always be able to accept PAGE_SIZE to be
-+	 * compatible as we can't guarantee higher contiguity.
-+	 */
-+	new_iova_alignment =
-+		max_t(unsigned long, 1UL << __ffs(domain->pgsize_bitmap),
-+		      iopt->iova_alignment);
-+	if (new_iova_alignment > PAGE_SIZE) {
-+		rc = -EINVAL;
-+		goto out_unlock;
-+	}
-+	if (new_iova_alignment != iopt->iova_alignment) {
-+		rc = iopt_check_iova_alignment(iopt, new_iova_alignment);
-+		if (rc)
-+			goto out_unlock;
-+	}
-+
-+	/* No area exists that is outside the allowed domain aperture */
-+	if (geometry->aperture_start != 0) {
-+		rc = iopt_reserve_iova(iopt, 0, geometry->aperture_start - 1,
-+				       domain);
-+		if (rc)
-+			goto out_reserved;
-+	}
-+	if (geometry->aperture_end != ULONG_MAX) {
-+		rc = iopt_reserve_iova(iopt, geometry->aperture_end + 1,
-+				       ULONG_MAX, domain);
-+		if (rc)
-+			goto out_reserved;
-+	}
-+
-+	rc = xa_reserve(&iopt->domains, iopt->next_domain_id, GFP_KERNEL);
-+	if (rc)
-+		goto out_reserved;
-+
-+	rc = iopt_fill_domain(iopt, domain);
-+	if (rc)
-+		goto out_release;
-+
-+	iopt->iova_alignment = new_iova_alignment;
-+	xa_store(&iopt->domains, iopt->next_domain_id, domain, GFP_KERNEL);
-+	iopt->next_domain_id++;
-+	up_write(&iopt->iova_rwsem);
-+	up_write(&iopt->domains_rwsem);
-+	return 0;
-+out_release:
-+	xa_release(&iopt->domains, iopt->next_domain_id);
-+out_reserved:
-+	__iopt_remove_reserved_iova(iopt, domain);
-+out_unlock:
-+	up_write(&iopt->iova_rwsem);
-+	up_write(&iopt->domains_rwsem);
-+	return rc;
-+}
-+
-+void iopt_table_remove_domain(struct io_pagetable *iopt,
-+			      struct iommu_domain *domain)
-+{
-+	struct iommu_domain *iter_domain = NULL;
-+	unsigned long new_iova_alignment;
-+	unsigned long index;
-+
-+	down_write(&iopt->domains_rwsem);
-+	down_write(&iopt->iova_rwsem);
-+
-+	xa_for_each (&iopt->domains, index, iter_domain)
-+		if (iter_domain == domain)
-+			break;
-+	if (WARN_ON(iter_domain != domain) || index >= iopt->next_domain_id)
-+		goto out_unlock;
-+
-+	/*
-+	 * Compress the xarray to keep it linear by swapping the entry to erase
-+	 * with the tail entry and shrinking the tail.
-+	 */
-+	iopt->next_domain_id--;
-+	iter_domain = xa_erase(&iopt->domains, iopt->next_domain_id);
-+	if (index != iopt->next_domain_id)
-+		xa_store(&iopt->domains, index, iter_domain, GFP_KERNEL);
-+
-+	iopt_unfill_domain(iopt, domain);
-+	__iopt_remove_reserved_iova(iopt, domain);
-+
-+	/* Recalculate the iova alignment without the domain */
-+	new_iova_alignment = 1;
-+	xa_for_each (&iopt->domains, index, iter_domain)
-+		new_iova_alignment = max_t(unsigned long,
-+					   1UL << __ffs(domain->pgsize_bitmap),
-+					   new_iova_alignment);
-+	if (!WARN_ON(new_iova_alignment > iopt->iova_alignment))
-+		iopt->iova_alignment = new_iova_alignment;
-+
-+out_unlock:
-+	up_write(&iopt->iova_rwsem);
-+	up_write(&iopt->domains_rwsem);
-+}
-+
-+/* Narrow the valid_iova_itree to include reserved ranges from a group. */
-+int iopt_table_enforce_group_resv_regions(struct io_pagetable *iopt,
-+					  struct iommu_group *group,
-+					  phys_addr_t *sw_msi_start)
-+{
-+	struct iommu_resv_region *resv;
-+	struct iommu_resv_region *tmp;
-+	LIST_HEAD(group_resv_regions);
-+	int rc;
-+
-+	down_write(&iopt->iova_rwsem);
-+	rc = iommu_get_group_resv_regions(group, &group_resv_regions);
-+	if (rc)
-+		goto out_unlock;
-+
-+	list_for_each_entry (resv, &group_resv_regions, list) {
-+		if (resv->type == IOMMU_RESV_DIRECT_RELAXABLE)
-+			continue;
-+
-+		/*
-+		 * The presence of any 'real' MSI regions should take precedence
-+		 * over the software-managed one if the IOMMU driver happens to
-+		 * advertise both types.
-+		 */
-+		if (sw_msi_start && resv->type == IOMMU_RESV_MSI) {
-+			*sw_msi_start = 0;
-+			sw_msi_start = NULL;
-+		}
-+		if (sw_msi_start && resv->type == IOMMU_RESV_SW_MSI)
-+			*sw_msi_start = resv->start;
-+
-+		rc = iopt_reserve_iova(iopt, resv->start,
-+				       resv->length - 1 + resv->start, group);
-+		if (rc)
-+			goto out_reserved;
-+	}
-+	rc = 0;
-+	goto out_free_resv;
-+
-+out_reserved:
-+	__iopt_remove_reserved_iova(iopt, group);
-+out_free_resv:
-+	list_for_each_entry_safe (resv, tmp, &group_resv_regions, list)
-+		kfree(resv);
-+out_unlock:
-+	up_write(&iopt->iova_rwsem);
-+	return rc;
-+}
-diff --git a/drivers/iommu/iommufd/io_pagetable.h b/drivers/iommu/iommufd/io_pagetable.h
-index fe3be8dd38240e..7fe5a700239012 100644
---- a/drivers/iommu/iommufd/io_pagetable.h
-+++ b/drivers/iommu/iommufd/io_pagetable.h
-@@ -46,9 +46,19 @@ struct iopt_area {
- 	unsigned int page_offset;
- 	/* IOMMU_READ, IOMMU_WRITE, etc */
- 	int iommu_prot;
-+	bool prevent_users : 1;
- 	unsigned int num_users;
- };
- 
-+struct iopt_allowed {
-+	struct interval_tree_node node;
-+};
-+
-+struct iopt_reserved {
-+	struct interval_tree_node node;
-+	void *owner;
-+};
-+
- int iopt_area_fill_domains(struct iopt_area *area, struct iopt_pages *pages);
- void iopt_area_unfill_domains(struct iopt_area *area, struct iopt_pages *pages);
- 
-@@ -109,6 +119,8 @@ static inline size_t iopt_area_length(struct iopt_area *area)
- 	}
- 
- __make_iopt_iter(area)
-+__make_iopt_iter(allowed)
-+__make_iopt_iter(reserved)
- 
- /*
-  * This holds a pinned page list for multiple areas of IO address space. The
 diff --git a/drivers/iommu/iommufd/iommufd_private.h b/drivers/iommu/iommufd/iommufd_private.h
-index 47a824897bc222..560ab06fbc3366 100644
+index 560ab06fbc3366..0ef6b9bf4916eb 100644
 --- a/drivers/iommu/iommufd/iommufd_private.h
 +++ b/drivers/iommu/iommufd/iommufd_private.h
-@@ -9,6 +9,9 @@
- #include <linux/refcount.h>
- #include <linux/uaccess.h>
- 
-+struct iommu_domain;
-+struct iommu_group;
-+
- /*
-  * The IOVA to PFN map. The mapper automatically copies the PFNs into multiple
-  * domains and permits sharing of PFNs between io_pagetable instances. This
-@@ -30,8 +33,38 @@ struct io_pagetable {
- 	struct rb_root_cached allowed_itree;
- 	/* IOVA that cannot be allocated, struct iopt_reserved */
- 	struct rb_root_cached reserved_itree;
-+	unsigned long iova_alignment;
+@@ -92,6 +92,7 @@ static inline int iommufd_ucmd_respond(struct iommufd_ucmd *ucmd,
+ enum iommufd_object_type {
+ 	IOMMUFD_OBJ_NONE,
+ 	IOMMUFD_OBJ_ANY = IOMMUFD_OBJ_NONE,
++	IOMMUFD_OBJ_IOAS,
  };
  
-+int iopt_init_table(struct io_pagetable *iopt);
-+void iopt_destroy_table(struct io_pagetable *iopt);
-+struct iopt_pages *iopt_get_pages(struct io_pagetable *iopt, unsigned long iova,
-+				  unsigned long *start_byte,
-+				  unsigned long length);
-+enum { IOPT_ALLOC_IOVA = 1 << 0 };
-+int iopt_map_user_pages(struct io_pagetable *iopt, unsigned long *iova,
-+			void __user *uptr, unsigned long length, int iommu_prot,
-+			unsigned int flags);
-+int iopt_map_pages(struct io_pagetable *iopt, struct iopt_pages *pages,
-+		   unsigned long *dst_iova, unsigned long start_byte,
-+		   unsigned long length, int iommu_prot, unsigned int flags);
-+int iopt_unmap_iova(struct io_pagetable *iopt, unsigned long iova,
-+		    unsigned long length, unsigned long *unmapped);
-+int iopt_unmap_all(struct io_pagetable *iopt, unsigned long *unmapped);
-+
-+int iopt_table_add_domain(struct io_pagetable *iopt,
-+			  struct iommu_domain *domain);
-+void iopt_table_remove_domain(struct io_pagetable *iopt,
-+			      struct iommu_domain *domain);
-+int iopt_table_enforce_group_resv_regions(struct io_pagetable *iopt,
-+					  struct iommu_group *group,
-+					  phys_addr_t *sw_msi_start);
-+int iopt_set_allow_iova(struct io_pagetable *iopt,
-+			struct rb_root_cached *allowed_iova);
-+int iopt_reserve_iova(struct io_pagetable *iopt, unsigned long start,
-+		      unsigned long last, void *owner);
-+void iopt_remove_reserved_iova(struct io_pagetable *iopt, void *owner);
-+
- struct iommufd_ctx {
- 	struct file *file;
- 	struct xarray objects;
-diff --git a/include/linux/iommufd.h b/include/linux/iommufd.h
-index c8bbed542e923c..9c6ec4d66b4a92 100644
---- a/include/linux/iommufd.h
-+++ b/include/linux/iommufd.h
-@@ -10,9 +10,17 @@
- #include <linux/errno.h>
- #include <linux/err.h>
+ /* Base struct for all objects with a userspace ID handle. */
+@@ -163,4 +164,31 @@ struct iommufd_object *_iommufd_object_alloc(struct iommufd_ctx *ictx,
+ 			     type),                                            \
+ 		     typeof(*(ptr)), obj)
  
-+struct page;
- struct iommufd_ctx;
-+struct io_pagetable;
- struct file;
- 
-+int iopt_access_pages(struct io_pagetable *iopt, unsigned long iova,
-+		      unsigned long length, struct page **out_pages,
-+		      bool write);
-+void iopt_unaccess_pages(struct io_pagetable *iopt, unsigned long iova,
-+			 unsigned long length);
++/*
++ * The IO Address Space (IOAS) pagetable is a virtual page table backed by the
++ * io_pagetable object. It is a user controlled mapping of IOVA -> PFNs. The
++ * mapping is copied into all of the associated domains and made available to
++ * in-kernel users.
++ */
++struct iommufd_ioas {
++	struct iommufd_object obj;
++	struct io_pagetable iopt;
++};
 +
- void iommufd_ctx_get(struct iommufd_ctx *ictx);
++static inline struct iommufd_ioas *iommufd_get_ioas(struct iommufd_ucmd *ucmd,
++						    u32 id)
++{
++	return container_of(iommufd_get_object(ucmd->ictx, id,
++					       IOMMUFD_OBJ_IOAS),
++			    struct iommufd_ioas, obj);
++}
++
++struct iommufd_ioas *iommufd_ioas_alloc(struct iommufd_ctx *ictx);
++int iommufd_ioas_alloc_ioctl(struct iommufd_ucmd *ucmd);
++void iommufd_ioas_destroy(struct iommufd_object *obj);
++int iommufd_ioas_iova_ranges(struct iommufd_ucmd *ucmd);
++int iommufd_ioas_allow_iovas(struct iommufd_ucmd *ucmd);
++int iommufd_ioas_map(struct iommufd_ucmd *ucmd);
++int iommufd_ioas_copy(struct iommufd_ucmd *ucmd);
++int iommufd_ioas_unmap(struct iommufd_ucmd *ucmd);
+ #endif
+diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.c
+index a5b1e2302ba59d..55b42eeb141b20 100644
+--- a/drivers/iommu/iommufd/main.c
++++ b/drivers/iommu/iommufd/main.c
+@@ -204,6 +204,11 @@ static int iommufd_fops_release(struct inode *inode, struct file *filp)
  
- #if IS_ENABLED(CONFIG_IOMMUFD)
+ union ucmd_buffer {
+ 	struct iommu_destroy destroy;
++	struct iommu_ioas_alloc alloc;
++	struct iommu_ioas_allow_iovas allow_iovas;
++	struct iommu_ioas_iova_ranges iova_ranges;
++	struct iommu_ioas_map map;
++	struct iommu_ioas_unmap unmap;
+ };
+ 
+ struct iommufd_ioctl_op {
+@@ -224,6 +229,18 @@ struct iommufd_ioctl_op {
+ 	}
+ static struct iommufd_ioctl_op iommufd_ioctl_ops[] = {
+ 	IOCTL_OP(IOMMU_DESTROY, iommufd_destroy, struct iommu_destroy, id),
++	IOCTL_OP(IOMMU_IOAS_ALLOC, iommufd_ioas_alloc_ioctl,
++		 struct iommu_ioas_alloc, out_ioas_id),
++	IOCTL_OP(IOMMU_IOAS_ALLOW_IOVAS, iommufd_ioas_allow_iovas,
++		 struct iommu_ioas_allow_iovas, allowed_iovas),
++	IOCTL_OP(IOMMU_IOAS_COPY, iommufd_ioas_copy, struct iommu_ioas_copy,
++		 src_iova),
++	IOCTL_OP(IOMMU_IOAS_IOVA_RANGES, iommufd_ioas_iova_ranges,
++		 struct iommu_ioas_iova_ranges, __reserved),
++	IOCTL_OP(IOMMU_IOAS_MAP, iommufd_ioas_map, struct iommu_ioas_map,
++		 __reserved),
++	IOCTL_OP(IOMMU_IOAS_UNMAP, iommufd_ioas_unmap, struct iommu_ioas_unmap,
++		 length),
+ };
+ 
+ static long iommufd_fops_ioctl(struct file *filp, unsigned int cmd,
+@@ -310,6 +327,9 @@ void iommufd_ctx_put(struct iommufd_ctx *ictx)
+ EXPORT_SYMBOL_GPL(iommufd_ctx_put);
+ 
+ static struct iommufd_object_ops iommufd_object_ops[] = {
++	[IOMMUFD_OBJ_IOAS] = {
++		.destroy = iommufd_ioas_destroy,
++	},
+ };
+ 
+ static struct miscdevice iommu_misc_dev = {
+diff --git a/include/uapi/linux/iommufd.h b/include/uapi/linux/iommufd.h
+index 2f7f76ec6db4cb..b7b0ac4016bb70 100644
+--- a/include/uapi/linux/iommufd.h
++++ b/include/uapi/linux/iommufd.h
+@@ -37,6 +37,12 @@
+ enum {
+ 	IOMMUFD_CMD_BASE = 0x80,
+ 	IOMMUFD_CMD_DESTROY = IOMMUFD_CMD_BASE,
++	IOMMUFD_CMD_IOAS_ALLOC,
++	IOMMUFD_CMD_IOAS_ALLOW_IOVAS,
++	IOMMUFD_CMD_IOAS_COPY,
++	IOMMUFD_CMD_IOAS_IOVA_RANGES,
++	IOMMUFD_CMD_IOAS_MAP,
++	IOMMUFD_CMD_IOAS_UNMAP,
+ };
+ 
+ /**
+@@ -52,4 +58,186 @@ struct iommu_destroy {
+ };
+ #define IOMMU_DESTROY _IO(IOMMUFD_TYPE, IOMMUFD_CMD_DESTROY)
+ 
++/**
++ * struct iommu_ioas_alloc - ioctl(IOMMU_IOAS_ALLOC)
++ * @size: sizeof(struct iommu_ioas_alloc)
++ * @flags: Must be 0
++ * @out_ioas_id: Output IOAS ID for the allocated object
++ *
++ * Allocate an IO Address Space (IOAS) which holds an IO Virtual Address (IOVA)
++ * to memory mapping.
++ */
++struct iommu_ioas_alloc {
++	__u32 size;
++	__u32 flags;
++	__u32 out_ioas_id;
++};
++#define IOMMU_IOAS_ALLOC _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_ALLOC)
++
++/**
++ * struct iommu_iova_range
++ * @start: First IOVA
++ * @last: Inclusive last IOVA
++ *
++ * An interval in IOVA space.
++ */
++struct iommu_iova_range {
++	__aligned_u64 start;
++	__aligned_u64 last;
++};
++
++/**
++ * struct iommu_ioas_iova_ranges - ioctl(IOMMU_IOAS_IOVA_RANGES)
++ * @size: sizeof(struct iommu_ioas_iova_ranges)
++ * @ioas_id: IOAS ID to read ranges from
++ * @out_num_iovas: Output total number of ranges in the IOAS
++ * @__reserved: Must be 0
++ * @out_valid_iovas: Array of valid IOVA ranges. The array length is the smaller
++ *                   of out_num_iovas or the length implied by size.
++ * @out_valid_iovas.start: First IOVA in the allowed range
++ * @out_valid_iovas.last: Inclusive last IOVA in the allowed range
++ *
++ * Query an IOAS for ranges of allowed IOVAs. Mapping IOVA outside these ranges
++ * is not allowed. out_num_iovas will be set to the total number of iovas and
++ * the out_valid_iovas[] will be filled in as space permits. size should include
++ * the allocated flex array.
++ *
++ * The allowed ranges are dependent on the HW path the DMA operation takes, and
++ * can change during the lifetime of the IOAS. A fresh empty IOAS will have a
++ * full range, and each attached device will narrow the ranges based on that
++ * devices HW restrictions. Detatching a device can widen the ranges. Userspace
++ * should query ranges after every attach/detatch to know what IOVAs are valid
++ * for mapping.
++ */
++struct iommu_ioas_iova_ranges {
++	__u32 size;
++	__u32 ioas_id;
++	__u32 out_num_iovas;
++	__u32 __reserved;
++	struct iommu_valid_iovas {
++		__aligned_u64 start;
++		__aligned_u64 last;
++	} out_valid_iovas[];
++};
++#define IOMMU_IOAS_IOVA_RANGES _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_IOVA_RANGES)
++
++/**
++ * struct iommu_ioas_allow_iovas - ioctl(IOMMU_IOAS_ALLOW_IOVAS)
++ * @size: sizeof(struct iommu_ioas_allow_iovas)
++ * @ioas_id: IOAS ID to allow IOVAs from
++ * @allowed_iovas: Pointer to array of struct iommu_iova_range
++ *
++ * Ensure a range of IOVAs are always available for allocation. If this call
++ * succeeds then IOMMU_IOAS_IOVA_RANGES will never return a list of IOVA ranges
++ * that are narrower than the ranges provided here. This call will fail if
++ * IOMMU_IOAS_IOVA_RANGES is currently narrower than the given ranges.
++ *
++ * When an IOAS is first created the IOVA_RANGES will be maximally sized, and as
++ * devices are attached the IOVA will narrow based on the device restrictions.
++ * When an allowed range is specified any narrowing will be refused, ie device
++ * attachment can fail if the device requires limiting within the allowed range.
++ *
++ * Automatic IOVA allocation is also impacted by this call, it MAP will allocate
++ * within the allowed IOVAs if they are present.
++ *
++ * This call replaces the entire allowed list with the given list.
++ */
++struct iommu_ioas_allow_iovas {
++	__u32 size;
++	__u32 ioas_id;
++	__u32 num_iovas;
++	__u32 __reserved;
++	__aligned_u64 allowed_iovas;
++};
++#define IOMMU_IOAS_ALLOW_IOVAS _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_ALLOW_IOVAS)
++
++/**
++ * enum iommufd_ioas_map_flags - Flags for map and copy
++ * @IOMMU_IOAS_MAP_FIXED_IOVA: If clear the kernel will compute an appropriate
++ *                             IOVA to place the mapping at
++ * @IOMMU_IOAS_MAP_WRITEABLE: DMA is allowed to write to this mapping
++ * @IOMMU_IOAS_MAP_READABLE: DMA is allowed to read from this mapping
++ */
++enum iommufd_ioas_map_flags {
++	IOMMU_IOAS_MAP_FIXED_IOVA = 1 << 0,
++	IOMMU_IOAS_MAP_WRITEABLE = 1 << 1,
++	IOMMU_IOAS_MAP_READABLE = 1 << 2,
++};
++
++/**
++ * struct iommu_ioas_map - ioctl(IOMMU_IOAS_MAP)
++ * @size: sizeof(struct iommu_ioas_map)
++ * @flags: Combination of enum iommufd_ioas_map_flags
++ * @ioas_id: IOAS ID to change the mapping of
++ * @__reserved: Must be 0
++ * @user_va: Userspace pointer to start mapping from
++ * @length: Number of bytes to map
++ * @iova: IOVA the mapping was placed at. If IOMMU_IOAS_MAP_FIXED_IOVA is set
++ *        then this must be provided as input.
++ *
++ * Set an IOVA mapping from a user pointer. If FIXED_IOVA is specified then the
++ * mapping will be established at iova, otherwise a suitable location will be
++ * automatically selected and returned in iova.
++ */
++struct iommu_ioas_map {
++	__u32 size;
++	__u32 flags;
++	__u32 ioas_id;
++	__u32 __reserved;
++	__aligned_u64 user_va;
++	__aligned_u64 length;
++	__aligned_u64 iova;
++};
++#define IOMMU_IOAS_MAP _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_MAP)
++
++/**
++ * struct iommu_ioas_copy - ioctl(IOMMU_IOAS_COPY)
++ * @size: sizeof(struct iommu_ioas_copy)
++ * @flags: Combination of enum iommufd_ioas_map_flags
++ * @dst_ioas_id: IOAS ID to change the mapping of
++ * @src_ioas_id: IOAS ID to copy from
++ * @length: Number of bytes to copy and map
++ * @dst_iova: IOVA the mapping was placed at. If IOMMU_IOAS_MAP_FIXED_IOVA is
++ *            set then this must be provided as input.
++ * @src_iova: IOVA to start the copy
++ *
++ * Copy an already existing mapping from src_ioas_id and establish it in
++ * dst_ioas_id. The src iova/length must exactly match a range used with
++ * IOMMU_IOAS_MAP.
++ *
++ * This may be used to efficiently clone a subset of an IOAS to another, or as a
++ * kind of 'cache' to speed up mapping. Copy has an effciency advantage over
++ * establishing equivilant new mappings, as internal resources are shared, and
++ * the kernel will pin the user memory only once.
++ */
++struct iommu_ioas_copy {
++	__u32 size;
++	__u32 flags;
++	__u32 dst_ioas_id;
++	__u32 src_ioas_id;
++	__aligned_u64 length;
++	__aligned_u64 dst_iova;
++	__aligned_u64 src_iova;
++};
++#define IOMMU_IOAS_COPY _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_COPY)
++
++/**
++ * struct iommu_ioas_unmap - ioctl(IOMMU_IOAS_UNMAP)
++ * @size: sizeof(struct iommu_ioas_copy)
++ * @ioas_id: IOAS ID to change the mapping of
++ * @iova: IOVA to start the unmapping at
++ * @length: Number of bytes to unmap, and return back the bytes unmapped
++ *
++ * Unmap an IOVA range. The iova/length must be a superset of a previously
++ * mapped range used with IOMMU_IOAS_PAGETABLE_MAP or COPY. Splitting or
++ * truncating ranges is not allowed. The values 0 to U64_MAX will unmap
++ * everything.
++ */
++struct iommu_ioas_unmap {
++	__u32 size;
++	__u32 ioas_id;
++	__aligned_u64 iova;
++	__aligned_u64 length;
++};
++#define IOMMU_IOAS_UNMAP _IO(IOMMUFD_TYPE, IOMMUFD_CMD_IOAS_UNMAP)
+ #endif
 -- 
 2.37.3
 
