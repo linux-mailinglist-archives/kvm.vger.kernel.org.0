@@ -2,132 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A119F5AAC52
-	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 12:24:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D4635AAC59
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 12:26:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235839AbiIBKYF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Sep 2022 06:24:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32798 "EHLO
+        id S235551AbiIBK0h (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Sep 2022 06:26:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235774AbiIBKYA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Sep 2022 06:24:00 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 906EEA59BB;
-        Fri,  2 Sep 2022 03:23:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662114239; x=1693650239;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=Hmx1025FThlE9cx1UE6O8SOkWc9A3kuNYU7VIFp8RZU=;
-  b=XR6Jo7eI3TzsF+IKEmbfQSCLKck4Va6LEtBgyhUMbLFoNshpbJiSwMP9
-   VFkNlhMpCdVqqXxekXgm8ThCF0Aq09DU/ZkxlNOEEG5TWyptfRBUM1j8N
-   E/6zGz+F4umYT+B2GSKud+KLz03kNp6WNpXKkDdP9SFATzzms3Py4IZ3o
-   UiCrMvyUnkIFRfRHSBR5n8AvJQTZp2wurRSD83Gg04mId+CCSORv87rAB
-   zXBf+jLuVvGyMVf64L2MwIyqVVhFmXnCAxxbdDKkqiizgX91MmqAV4BmW
-   wh4fEtGVdAbGvk2M0/LfQbwSz/DnUVEurh7Csmm6g8GV0cKx/EuPq0xka
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10457"; a="322109916"
-X-IronPort-AV: E=Sophos;i="5.93,283,1654585200"; 
-   d="scan'208";a="322109916"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2022 03:23:59 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,283,1654585200"; 
-   d="scan'208";a="608943940"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by orsmga007.jf.intel.com with ESMTP; 02 Sep 2022 03:23:46 -0700
-Date:   Fri, 2 Sep 2022 18:19:05 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Fuad Tabba <tabba@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        with ESMTP id S234985AbiIBK0e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Sep 2022 06:26:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D7B4A897A
+        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 03:26:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662114393;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/3Op2YuEkkBOG1RJWqT1GBeAbr2w0wiiubsVaWhZ/YI=;
+        b=X/Ywp6NzAM8QF82n6Woui/2x3/wE+2aWMe//EHHN73SpbONndk2inyc1W+dHYIVZEfcb/b
+        boW5vqdPgVkWU2xMHOEfDhk2R+D0D8GU2UsebZoZRJZc0sBPizNxJPo5ASB9IF7rwkiN7p
+        8JmknLtFG1jv+RqO7E882u6mC/3Yk3s=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-607-hZDcB34nPOuFTpVlcDXXzg-1; Fri, 02 Sep 2022 06:26:28 -0400
+X-MC-Unique: hZDcB34nPOuFTpVlcDXXzg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6DA41811130;
+        Fri,  2 Sep 2022 10:26:27 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 121CCC15BC0;
+        Fri,  2 Sep 2022 10:26:26 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Peter Collingbourne <pcc@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Evgenii Stepanov <eugenis@google.com>, kvm@vger.kernel.org,
         Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <20220902101905.GA1712673@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <CA+EHjTy6NF=BkCqK0vhXLdtKZMahp55JUMSfxN96-NT3YiMXYQ@mail.gmail.com>
- <20220829151756.GB1586678@chaop.bj.intel.com>
- <CA+EHjTxgKJ=9UP=DWtNsSgD2FtvBMYrUbcS=9h5j8Tmk57WqxQ@mail.gmail.com>
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Peter Collingbourne <pcc@google.com>
+Subject: Re: [PATCH v3 1/7] arm64: mte: Fix/clarify the PG_mte_tagged semantics
+In-Reply-To: <20220810193033.1090251-2-pcc@google.com>
+Organization: Red Hat GmbH
+References: <20220810193033.1090251-1-pcc@google.com>
+ <20220810193033.1090251-2-pcc@google.com>
+User-Agent: Notmuch/0.36 (https://notmuchmail.org)
+Date:   Fri, 02 Sep 2022 12:26:25 +0200
+Message-ID: <87k06mdqcu.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=gb2312
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+EHjTxgKJ=9UP=DWtNsSgD2FtvBMYrUbcS=9h5j8Tmk57WqxQ@mail.gmail.com>
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 31, 2022 at 10:12:12AM +0100, Fuad Tabba wrote:
-> > > Moreover, something which was discussed here before [3], is the
-> > > ability to share in-place. For pKVM/arm64, the conversion between
-> > > shared and private involves only changes to the stage-2 page tables,
-> > > which are controlled by the hypervisor. Android supports this in-place
-> > > conversion already, and I think that the cost of copying for many
-> > > use-cases that would involve large amounts of data would be big. We
-> > > will measure the relative costs in due course, but in the meantime
-> > > we¡¯re nervous about adopting a new user ABI which doesn¡¯t appear to
-> > > cater for in-place conversion; having just the fd would simplify that
-> > > somewhat
-> >
-> > I understand there is difficulty to achieve that with the current
-> > private_fd + userspace_addr (they basically in two separate fds), but is
-> > it possible for pKVM to extend this? Brainstorming for example, pKVM can
-> > ignore userspace_addr and only use private_fd to cover both shared and
-> > private memory, or pKVM introduce new KVM memslot flag?
-> 
-> It's not that there's anything blocking pKVM from doing that. It's
-> that the disconnect of using a memory address for the shared memory,
-> and a file descriptor for the private memory doesn't really make sense
-> for pKVM. I see how it makes sense for TDX and the Intel-specific
-> implementation. It just seems that this is baking in an
-> implementation-specific aspect as a part of the KVM general api, and
-> the worry is that this might have some unintended consequences in the
-> future.
+On Wed, Aug 10 2022, Peter Collingbourne <pcc@google.com> wrote:
 
-It's true this API originates from supporting TDX and probably other
-similar confidential computing(CC) technologies. But if we ever get
-chance to make it more common to cover more usages like pKVM, I would
-also like to. The challenge on this point is pKVM diverges a lot from CC
-usages, putting both shared and private memory in the same fd
-complicates CC usages. If two things are different enough, I'm also
-thinking implementation-specific may not be that bad.
+> From: Catalin Marinas <catalin.marinas@arm.com>
+>
+> Currently the PG_mte_tagged page flag mostly means the page contains
+> valid tags and it should be set after the tags have been cleared or
+> restored. However, in mte_sync_tags() it is set before setting the tags
+> to avoid, in theory, a race with concurrent mprotect(PROT_MTE) for
+> shared pages. However, a concurrent mprotect(PROT_MTE) with a copy on
+> write in another thread can cause the new page to have stale tags.
+> Similarly, tag reading via ptrace() can read stale tags of the
 
-Chao
+s/of/if/
+
+> PG_mte_tagged flag is set before actually clearing/restoring the tags.
+>
+> Fix the PG_mte_tagged semantics so that it is only set after the tags
+> have been cleared or restored. This is safe for swap restoring into a
+> MAP_SHARED or CoW page since the core code takes the page lock. Add two
+> functions to test and set the PG_mte_tagged flag with acquire and
+> release semantics. The downside is that concurrent mprotect(PROT_MTE) on
+> a MAP_SHARED page may cause tag loss. This is already the case for KVM
+> guests if a VMM changes the page protection while the guest triggers a
+> user_mem_abort().
+>
+> Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will@kernel.org>
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Steven Price <steven.price@arm.com>
+> Cc: Peter Collingbourne <pcc@google.com>
+> ---
+> v3:
+> - fix build with CONFIG_ARM64_MTE disabled
+>
+>  arch/arm64/include/asm/mte.h     | 30 ++++++++++++++++++++++++++++++
+>  arch/arm64/include/asm/pgtable.h |  2 +-
+>  arch/arm64/kernel/cpufeature.c   |  4 +++-
+>  arch/arm64/kernel/elfcore.c      |  2 +-
+>  arch/arm64/kernel/hibernate.c    |  2 +-
+>  arch/arm64/kernel/mte.c          | 12 +++++++-----
+>  arch/arm64/kvm/guest.c           |  4 ++--
+>  arch/arm64/kvm/mmu.c             |  4 ++--
+>  arch/arm64/mm/copypage.c         |  4 ++--
+>  arch/arm64/mm/fault.c            |  2 +-
+>  arch/arm64/mm/mteswap.c          |  2 +-
+>  11 files changed, 51 insertions(+), 17 deletions(-)
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+
