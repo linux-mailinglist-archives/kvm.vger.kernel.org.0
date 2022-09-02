@@ -2,92 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ADE5D5AA75F
-	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 07:47:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D32D85AA760
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 07:48:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235209AbiIBFq4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Sep 2022 01:46:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38648 "EHLO
+        id S235164AbiIBFso (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Sep 2022 01:48:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235127AbiIBFqx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Sep 2022 01:46:53 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 727B7B6D68
-        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 22:46:49 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        with ESMTP id S232913AbiIBFsc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Sep 2022 01:48:32 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87B21B7ECD;
+        Thu,  1 Sep 2022 22:48:31 -0700 (PDT)
+Received: from nazgul.tnic (dynamic-089-204-154-243.89.204.154.pool.telefonica.de [89.204.154.243])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1AA0661FC7
-        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 05:46:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 80A8CC433C1
-        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 05:46:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662097608;
-        bh=bxzZUIeCVOuvbmGySzJK8mXWDB89zrXykldD1a7RKto=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=p+dCmiWwlhx6BgB97gLvRVNEuTUu+XpcWCz8/C3/TFhFr0RINVFnXucQrw1zGfiUx
-         8JX9S5CGZPCuo+0tMM0pEOgx8cy6H59t06E3fezsksiKy7zUq9CcFCkDVA8wb91TPR
-         RxA888CKCMjnlqbFyq2EwLXzLdoI7AArDznPKwXGOgWPZy2OtRl2dH6jxynVyDt5aP
-         TIFDoJGQVMJr8eowGxjIyl+jAvlV+lDCx9JJbprqkMFUWj17qBjDsxqftUXaAx8c7B
-         TLF12k4LtGE+hniUjyXcygjDwl5UATTBNpYPTRLnwcgIjFsjv2GFGIH5HS3m3jOy5v
-         AZ3A4CHjEuPJQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 6860DC433E9; Fri,  2 Sep 2022 05:46:48 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216388] On Host, kernel errors in KVM, on guests, it shows CPU
- stalls
-Date:   Fri, 02 Sep 2022 05:46:48 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: nanook@eskimo.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216388-28872-tk14vk80D8@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216388-28872@https.bugzilla.kernel.org/>
-References: <bug-216388-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id CFC051EC0666;
+        Fri,  2 Sep 2022 07:48:25 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1662097706;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=/LU3di8KsXx6XUa2Nf3vVOJOBGN0ZW7PQ2Lfq5dneO8=;
+        b=QweYvVfFE9i4n3wMR98UUdjyMdkKxjcgRZvoqNIX9fmLm0qp14E36M+FjfMRBW7lI+jslO
+        pxs/x8MMOiD3TeEuBDEVcMLijLo+RAJwOCzuyZwvK51JrI9cRCalLAfIeKaV+9ChxuV4bu
+        lay5NDvgz0lf2ZNv0ehx2WveB1c0kIQ=
+Date:   Fri, 2 Sep 2022 07:48:31 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     "H. Peter Anvin" <hpa@zytor.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Babu Moger <babu.moger@amd.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Wyes Karny <wyes.karny@amd.com>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>,
+        "open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)" 
+        <kvm@vger.kernel.org>
+Subject: Re: [PATCH v3 1/2] x86/cpufeatures: Add macros for Intel's new fast
+ rep string features
+Message-ID: <YxGZH7aOXQF7Pu5q@nazgul.tnic>
+References: <20220901211811.2883855-1-jmattson@google.com>
+ <f956753b-1aae-37c9-9c9d-88e1550dd541@zytor.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f956753b-1aae-37c9-9c9d-88e1550dd541@zytor.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216388
+On Thu, Sep 01, 2022 at 09:14:24PM -0700, H. Peter Anvin wrote:
+> Any reason why these bits are hidden from /proc/cpuinfo?
 
---- Comment #10 from Robert Dinse (nanook@eskimo.com) ---
-This >MAY< be a compiler issue.  I was wondering why I seem to be the only =
-one
-having this problem.  Given how frequently it occurs to me, I would expect a
-gazillion me too's, but so far none.
+Yes, we aim to hide such purely CPUID bits from /proc/cpuinfo because it
+becomes a dumping ground for "enablement" of new features. But
 
-I know very few seem to be using gcc 12.1.0, which I was using, because I s=
-eem
-to be the only person who had problems compiling 5.18 with it.
+1. those features are not really used - most userspace like binutils and
+gcc, etc do their own detection. (Yes, yes, I'd like to have ubiquitous
+CPUID faulting).
 
-Since gcc 12.2.0 was out, I built it today and rebuilt a kernel using it, so
-far that kernel has not produced any cpu-stall reports.
+2. /proc/cpuinfo is an ABI so we have to carry *all* those gazillion
+flags for no good reason
 
---=20
-You may reply to this email to add a comment.
+So we have tools/arch/x86/kcpuid/ which we control and we can extend
+with all the CPUID querying needs we have.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+These kvm enablement things are kinda needed because guest userspace
+gets an emulated CPUID so in order to detect features on its own, it
+needs them. And kvm has tied features to x86's X86_FEATURE stuff and
+there are sometimes weird interactions with it too but that's another
+topic...
+
+Oh and we still do add visible flags to /proc/cpuinfo but only when
+they're features which need and have received non-trivial kernel
+enablement like TDX or SNP or so.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
