@@ -2,129 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6730C5AA5A3
-	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 04:23:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 066055AA5EE
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 04:33:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235306AbiIBCTI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 22:19:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59604 "EHLO
+        id S230411AbiIBCdU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 22:33:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235121AbiIBCSg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 22:18:36 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1A09AB063;
-        Thu,  1 Sep 2022 19:18:22 -0700 (PDT)
+        with ESMTP id S229602AbiIBCdT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 22:33:19 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B0164BD0A
+        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 19:33:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662085102; x=1693621102;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=57ttahtbdOqHQIPSI7KxaFSjGG8TYsYsmPLjXygJNGg=;
-  b=DvjvnbmUYipU8AY9GSjzx1+4IPPyJWWYVf9/ZjzczTODBX7ZxQzRKBBs
-   isAcrx3NI/feFQsG54kcluVBV1LWgcPj1HlFCyZJNiQ6RbZiBdRG7clj7
-   rRc4vLCS3XJrCIGWfa51W8olk37QPCfEwvGkbzGl1vUM0cUpdiqXt4w0A
-   aBKnv7NKeBIIFoQIDsXXQ3pQEfvm0hrjjDXgyoPXK1hx6WENKRA5CQ7Co
-   zoQ/iOb3JK+hgVFLwozNy4Gyxbt+6FH9h70LWNJLh5slL9W3lM6aLnEI1
-   YoD064jIKVVH/WyTQb7F0w4+ng3YC3MHozP/t6nt86iDsrTXgwBO1ujmo
+  t=1662085998; x=1693621998;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=r8zeg1tyZGMcF3UMzs+ZwZWbgreiiSaM+r6CEBdUuzU=;
+  b=VE30bOt1ja9GQ+BWCay8Bt0Kql46QdoBfkN9ci4WlVMIhFwhbMSf+0EI
+   EX+Zpk+gYjh8oH1P4nJSkabpZj07NsjOi5XH8iT0sr9yXiYjONJG9zb0q
+   Jmq4U7mnr6vb0cvrNoO9obQAj6W4DgokiVNhdB9r8F/hohNOPS/i6b92w
+   RSMqdlnt8IPFyrFol3I1wj4+86kF/KJBXK0/E8gjezPwQJIVA8zIqfNWz
+   wqBqYnQ0VMsQZIPvNxBrAYFck0wNoAXrVi1Sc6JxBiwwDhbs1JojYIbkk
+   /x6hvyBzcjwFWgPrX65JNkoB8jCqCaaJYvLUinzM3JNdIHPUVVhbhUILH
    A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10457"; a="297157869"
+X-IronPort-AV: E=McAfee;i="6500,9779,10457"; a="282862058"
 X-IronPort-AV: E=Sophos;i="5.93,281,1654585200"; 
-   d="scan'208";a="297157869"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 19:18:22 -0700
+   d="scan'208";a="282862058"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 19:33:17 -0700
 X-IronPort-AV: E=Sophos;i="5.93,281,1654585200"; 
-   d="scan'208";a="608835683"
-Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 19:18:22 -0700
-From:   isaku.yamahata@intel.com
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
-Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
-        Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Shaokun Zhang <zhangshaokun@hisilicon.com>,
-        Qi Liu <liuqi115@huawei.com>,
-        John Garry <john.garry@huawei.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>
-Subject: [PATCH v3 22/22] RFC: KVM: Remove cpus_hardware_enabled and related sanity check
-Date:   Thu,  1 Sep 2022 19:17:57 -0700
-Message-Id: <b4fa9880c9d6001e1fb600c2e182750c28dc1162.1662084396.git.isaku.yamahata@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1662084396.git.isaku.yamahata@intel.com>
-References: <cover.1662084396.git.isaku.yamahata@intel.com>
+   d="scan'208";a="642698192"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.171.28]) ([10.249.171.28])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 19:33:12 -0700
+Message-ID: <a700a0c6-7f25-dc45-4c49-f61709808f29@intel.com>
+Date:   Fri, 2 Sep 2022 10:33:09 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.13.0
+Subject: Re: [PATCH v1 15/40] i386/tdx: Add property sept-ve-disable for
+ tdx-guest object
+Content-Language: en-US
+To:     Gerd Hoffmann <kraxel@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Isaku Yamahata <isaku.yamahata@gmail.com>,
+        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Laszlo Ersek <lersek@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
+References: <20220802074750.2581308-1-xiaoyao.li@intel.com>
+ <20220802074750.2581308-16-xiaoyao.li@intel.com>
+ <20220825113636.qlqmflxcxemh2lmf@sirius.home.kraxel.org>
+ <389a2212-56b8-938b-22e5-24ae2bc73235@intel.com>
+ <20220826055711.vbw2oovti2qevzzx@sirius.home.kraxel.org>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20220826055711.vbw2oovti2qevzzx@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+On 8/26/2022 1:57 PM, Gerd Hoffmann wrote:
+>    Hi,
+>   
+>> For TD guest kernel, it has its own reason to turn SEPT_VE on or off. E.g.,
+>> linux TD guest requires SEPT_VE to be disabled to avoid #VE on syscall gap
+>> [1].
+> 
+> Why is that a problem for a TD guest kernel?  Installing exception
+> handlers is done quite early in the boot process, certainly before any
+> userspace code runs.  So I think we should never see a syscall without
+> a #VE handler being installed.  /me is confused.
+> 
+> Or do you want tell me linux has no #VE handler?
 
-cpus_hardware_enabled mask seems incomplete protection against other kernel
-component using CPU virtualization feature.  Because it's obscure and
-incomplete, remove the check.
+The problem is not "no #VE handler" and Linux does have #VE handler. The 
+problem is Linux doesn't want any (or certain) exception occurrence in 
+syscall gap, it's not specific to #VE. Frankly, I don't understand the 
+reason clearly, it's something related to IST used in x86 Linux kernel.
 
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- virt/kvm/kvm_arch.c | 15 +--------------
- 1 file changed, 1 insertion(+), 14 deletions(-)
-
-diff --git a/virt/kvm/kvm_arch.c b/virt/kvm/kvm_arch.c
-index bcd82b75fa17..4142f2cb1922 100644
---- a/virt/kvm/kvm_arch.c
-+++ b/virt/kvm/kvm_arch.c
-@@ -12,23 +12,16 @@
- 
- #include <linux/kvm_host.h>
- 
--static cpumask_t cpus_hardware_enabled = CPU_MASK_NONE;
--
- static int __hardware_enable(void *caller_name)
- {
--	int cpu = raw_smp_processor_id();
- 	int r;
- 
- 	WARN_ON_ONCE(preemptible());
- 
--	if (cpumask_test_cpu(cpu, &cpus_hardware_enabled))
--		return 0;
- 	r = kvm_arch_hardware_enable();
- 	if (r)
- 		pr_warn("kvm: enabling virtualization on CPU%d failed during %s()\n",
--			cpu, (const char *)caller_name);
--	else
--		cpumask_set_cpu(cpu, &cpus_hardware_enabled);
-+			smp_processor_id(), (const char *)caller_name);
- 	return r;
- }
- 
-@@ -42,13 +35,7 @@ static void hardware_enable(void *arg)
- 
- static void hardware_disable(void *junk)
- {
--	int cpu = raw_smp_processor_id();
--
- 	WARN_ON_ONCE(preemptible());
--
--	if (!cpumask_test_cpu(cpu, &cpus_hardware_enabled))
--		return;
--	cpumask_clear_cpu(cpu, &cpus_hardware_enabled);
- 	kvm_arch_hardware_disable();
- }
- 
--- 
-2.25.1
+>> Frankly speaking, this bit is better to be configured by TD guest
+>> kernel, however current TDX architecture makes the design to let VMM
+>> configure.
+> 
+> Indeed.  Requiring users to know guest kernel capabilities and manually
+> configuring the vmm accordingly looks fragile to me.
+> 
+> Even better would be to not have that bit in the first place and require
+> TD guests properly handle #VE exceptions.
+> 
+>> This can cause problems with the "system call gap": a malicious
+>> hypervisor might trigger a #VE for example on the system call entry
+>> code, and when a user process does a system call it would trigger a
+>> and SYSCALL relies on the kernel code to switch to the kernel stack,
+>> this would lead to kernel code running on the ring 3 stack.
+> 
+> Hmm?  Exceptions switch to kernel context too ...
+> 
+> take care,
+>    Gerd
+> 
 
