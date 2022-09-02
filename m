@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 785415AA586
+	by mail.lfdr.de (Postfix) with ESMTP id 2FD0B5AA585
 	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 04:18:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234698AbiIBCSN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 22:18:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59386 "EHLO
+        id S234758AbiIBCSP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 22:18:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233716AbiIBCSL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 22:18:11 -0400
+        with ESMTP id S234228AbiIBCSM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 22:18:12 -0400
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9824E6CF59;
-        Thu,  1 Sep 2022 19:18:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0D3C6B14C;
+        Thu,  1 Sep 2022 19:18:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662085090; x=1693621090;
+  t=1662085091; x=1693621091;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=OO1o5r/T4RF67a3AbNWLuZYBR8DPzBnzS2JrwtFCDRk=;
-  b=i2NQuDNXZUAazBeWJHDY2t6YaEq0QC+TJYV3Dk5z7oethZnUFgxWxoG/
-   ddxs+CMDjgYPCDD2LpkeaOUwqWGSrsvvvKxvCnJWNHVy3LHwvgJpM1xf3
-   GzlsbI7NpZ0Th5QfOs2ixzRe7y1/cjA/FkA7kDdOYVOAQ7Lp4jdg51juy
-   63FqPOAkgeslydAh1S0kH5c+Gy4EiaJifQQdIvN3mdJoUG2lWw0blHnb1
-   wIGtPLsSoBC+nLTqLyxve1tQKXrCYFgV6JZIz9gqLQK5vGkzCs3ynFKsm
-   xIm2vhq9pjjbGy3a07Sd8MV1QkWFzR35LKylMn7ot5ZsiwNQ9w4FDCOAN
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10457"; a="297157827"
+  bh=noUaIZ3soaduEstLkK+Ml9b6NVQAPMhbyX9lzIyugYY=;
+  b=GDUzIrVRZDf1ItACipa/vyt9xH3ugJjk955HW1yTY75gE6Q2ChnFJJyl
+   /hGaSQ5xn4Wg1Mv7k+gtOklcrOtaU9O0EAJDIS57QelDwXzDaMCwQQIUF
+   IMG6HktZDcpHgqXF8w21lQBvZ5n9DlwS9JdwLjpNJLBt5EAVXUBS8eJZ0
+   m2Q5l1JvLJANJVR+kHmiUu98CcXXz5SLv2GIPsOPbCHRMHYzgaA+b3Udf
+   5GADh0BFvS2HbV+VSC47glTdSHjQHOxVrXwitsUSkw5rqLd452pubuqYa
+   melC2zjNHFFzA8QJMII3oW19CjoiLkXUFt3HFaPAhu0SXfAu3v/IHhDHQ
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10457"; a="297157829"
 X-IronPort-AV: E=Sophos;i="5.93,281,1654585200"; 
-   d="scan'208";a="297157827"
+   d="scan'208";a="297157829"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
   by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 19:18:10 -0700
 X-IronPort-AV: E=Sophos;i="5.93,281,1654585200"; 
-   d="scan'208";a="608835585"
+   d="scan'208";a="608835592"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 19:18:09 -0700
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 19:18:10 -0700
 From:   isaku.yamahata@intel.com
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -53,9 +53,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Huacai Chen <chenhuacai@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Borislav Petkov <bp@alien8.de>
-Subject: [PATCH v3 01/22] KVM: x86: Drop kvm_user_return_msr_cpu_online()
-Date:   Thu,  1 Sep 2022 19:17:36 -0700
-Message-Id: <25ff8d1bbf41de4bcf93a184826bd57e140a465b.1662084396.git.isaku.yamahata@intel.com>
+Subject: [PATCH v3 02/22] KVM: x86: Use this_cpu_ptr() instead of per_cpu_ptr(smp_processor_id())
+Date:   Thu,  1 Sep 2022 19:17:37 -0700
+Message-Id: <aadde2a7309b6267ab44cb205a00ba51f4ccdde7.1662084396.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1662084396.git.isaku.yamahata@intel.com>
 References: <cover.1662084396.git.isaku.yamahata@intel.com>
@@ -71,91 +71,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-KVM/X86 uses user return notifier to switch MSR for guest or user space.
-Snapshot host values on CPU online, change MSR values for guest, and
-restore them on returning to user space.  The current code abuses
-kvm_arch_hardware_enable() which is called on kvm module initialization or
-CPU online.
+convert per_cpu_ptr(smp_processor_id()) to this_cpu_ptr() as trivial
+cleanup.
 
-Remove such the abuse of kvm_arch_hardware_enable() by capturing the host
-value on the first change of the MSR value to guest VM instead of CPU
-online.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Chao Gao <chao.gao@intel.com>
 ---
- arch/x86/kvm/x86.c | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+ arch/x86/kvm/x86.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 205ebdc2b11b..0e200fe44b35 100644
+index 0e200fe44b35..fd021581ca60 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -196,6 +196,7 @@ module_param(eager_page_split, bool, 0644);
+@@ -428,8 +428,7 @@ static void kvm_user_return_msr_init_cpu(struct kvm_user_return_msrs *msrs)
  
- struct kvm_user_return_msrs {
- 	struct user_return_notifier urn;
-+	bool initialized;
- 	bool registered;
- 	struct kvm_user_return_msr_values {
- 		u64 host;
-@@ -409,18 +410,20 @@ int kvm_find_user_return_msr(u32 msr)
- }
- EXPORT_SYMBOL_GPL(kvm_find_user_return_msr);
- 
--static void kvm_user_return_msr_cpu_online(void)
-+static void kvm_user_return_msr_init_cpu(struct kvm_user_return_msrs *msrs)
+ int kvm_set_user_return_msr(unsigned slot, u64 value, u64 mask)
  {
 -	unsigned int cpu = smp_processor_id();
 -	struct kvm_user_return_msrs *msrs = per_cpu_ptr(user_return_msrs, cpu);
- 	u64 value;
- 	int i;
- 
-+	if (msrs->initialized)
-+		return;
-+
- 	for (i = 0; i < kvm_nr_uret_msrs; ++i) {
- 		rdmsrl_safe(kvm_uret_msrs_list[i], &value);
- 		msrs->values[i].host = value;
- 		msrs->values[i].curr = value;
- 	}
-+	msrs->initialized = true;
- }
- 
- int kvm_set_user_return_msr(unsigned slot, u64 value, u64 mask)
-@@ -429,6 +432,8 @@ int kvm_set_user_return_msr(unsigned slot, u64 value, u64 mask)
- 	struct kvm_user_return_msrs *msrs = per_cpu_ptr(user_return_msrs, cpu);
++	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
  	int err;
  
-+	kvm_user_return_msr_init_cpu(msrs);
-+
- 	value = (value & mask) | (msrs->values[slot].host & ~mask);
- 	if (value == msrs->values[slot].curr)
- 		return 0;
-@@ -9212,7 +9217,12 @@ int kvm_arch_init(void *opaque)
- 		return -ENOMEM;
- 	}
+ 	kvm_user_return_msr_init_cpu(msrs);
+@@ -453,8 +452,7 @@ EXPORT_SYMBOL_GPL(kvm_set_user_return_msr);
  
--	user_return_msrs = alloc_percpu(struct kvm_user_return_msrs);
-+	/*
-+	 * __GFP_ZERO to ensure user_return_msrs.values[].initialized = false.
-+	 * See kvm_user_return_msr_init_cpu().
-+	 */
-+	user_return_msrs = alloc_percpu_gfp(struct kvm_user_return_msrs,
-+					    GFP_KERNEL | __GFP_ZERO);
- 	if (!user_return_msrs) {
- 		printk(KERN_ERR "kvm: failed to allocate percpu kvm_user_return_msrs\n");
- 		r = -ENOMEM;
-@@ -11836,7 +11846,6 @@ int kvm_arch_hardware_enable(void)
- 	u64 max_tsc = 0;
- 	bool stable, backwards_tsc = false;
+ static void drop_user_return_notifiers(void)
+ {
+-	unsigned int cpu = smp_processor_id();
+-	struct kvm_user_return_msrs *msrs = per_cpu_ptr(user_return_msrs, cpu);
++	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
  
--	kvm_user_return_msr_cpu_online();
- 	ret = static_call(kvm_x86_hardware_enable)();
- 	if (ret != 0)
- 		return ret;
+ 	if (msrs->registered)
+ 		kvm_on_user_return(&msrs->urn);
 -- 
 2.25.1
 
