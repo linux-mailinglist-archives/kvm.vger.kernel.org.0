@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CCD7A5AB77D
-	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 19:28:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B6F7A5AB782
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 19:28:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236814AbiIBR2I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Sep 2022 13:28:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48454 "EHLO
+        id S236336AbiIBR2P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Sep 2022 13:28:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236273AbiIBR14 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Sep 2022 13:27:56 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F2BF6DAF1
-        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 10:27:54 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 282GpRcp015760;
-        Fri, 2 Sep 2022 17:27:49 GMT
+        with ESMTP id S236489AbiIBR15 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Sep 2022 13:27:57 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEB687C52E
+        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 10:27:55 -0700 (PDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 282HDiPr005315;
+        Fri, 2 Sep 2022 17:27:51 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=7d/7PUZwvqe5QnIPe807KU4gzRGXCj84vdEhAouycno=;
- b=tpI6Pjs5LG5LrruxSGarE+NDAcjsYE28SaRYbJ5jpAQQpjT7G9WT4CWxbgVanGqEJHYQ
- VdjAJU/34eRtHDmhGzm0dCbflFSRgJBlpFdcNebunH0W+YivOmVNox5WFrUmxH8KVLkk
- e7eOarO7hFj1oO7D95zDRC6gooDTEy+mgMGgbA6y1CXLZlKXzW0gretzeDPMh4FlgRQ6
- n+yLoreVTdGCqO6lGY+lSEqTSP3NlPfiTEexf2DvjO41Gp4hklM59g5zzZ2b5g27g/nu
- 2s7IK7kQGErFLR9siiGZdvV3NGb5dMnj9C8KxGbxUSXAJlvxrQLwfH27mYZpEX+B3XSD aA== 
+ bh=jgveCAnwhqDUN07hL/AAS+Yc71Ib7lo3A1M9LGI+6AE=;
+ b=r1biScS9Uw+gM0T+2WhBW9RP6na3IDUXYghlMwtyHPOrdnl9Ms9MqP0Z/XcQRwW+gn9p
+ 2bvFaLi8MG9+SDZvpnFAN3eVNjaGk9SExnQjY2pCCCZiQtjJuiWsd65aj+6MkAzHAPPM
+ bvDNupYZ0Iy1n7L1Bq5ZEDW57KGVSgRl0vTDioC0mNkc0ICAR7AVfm2TOKpe/0qfOVoC
+ EmZfzWvnAEUD8kZmg+dcNvU/tWS7mhoZqTa4XbguExeYCSxqPvZSpCKXCHEmVjVvoBNK
+ mu80L9QjpUMTM00UabPZ+d5ufs5ECoI0tvOirBSrOHMPeoiDTWG9fA1MPXf99heoxxB6 +w== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jbnqj8w9q-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jbp218ab4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 02 Sep 2022 17:27:51 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 282HEM3n009099;
+        Fri, 2 Sep 2022 17:27:51 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jbp218aah-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 02 Sep 2022 17:27:51 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 282HLAYo019245;
+        Fri, 2 Sep 2022 17:27:50 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma01dal.us.ibm.com with ESMTP id 3j7awakkmt-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 02 Sep 2022 17:27:49 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 282HLQwV021624;
-        Fri, 2 Sep 2022 17:27:49 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jbnqj8w9d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Sep 2022 17:27:48 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 282HKbDg009337;
-        Fri, 2 Sep 2022 17:27:48 GMT
-Received: from b03cxnp07028.gho.boulder.ibm.com (b03cxnp07028.gho.boulder.ibm.com [9.17.130.15])
-        by ppma02wdc.us.ibm.com with ESMTP id 3j7awa1ax3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Sep 2022 17:27:48 +0000
 Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
-        by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 282HRl8B39453094
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 282HRmGS10945182
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 2 Sep 2022 17:27:47 GMT
+        Fri, 2 Sep 2022 17:27:48 GMT
 Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 08F1D6E050;
+        by IMSVA (Postfix) with ESMTP id 6C6206E04E;
+        Fri,  2 Sep 2022 17:27:48 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2A0386E053;
         Fri,  2 Sep 2022 17:27:47 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B7D956E04E;
-        Fri,  2 Sep 2022 17:27:45 +0000 (GMT)
 Received: from li-2311da4c-2e09-11b2-a85c-c003041e9174.ibm.com.com (unknown [9.160.86.252])
         by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri,  2 Sep 2022 17:27:45 +0000 (GMT)
+        Fri,  2 Sep 2022 17:27:47 +0000 (GMT)
 From:   Matthew Rosato <mjrosato@linux.ibm.com>
 To:     qemu-s390x@nongnu.org
 Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
@@ -65,25 +65,25 @@ Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
         david@redhat.com, pasic@linux.ibm.com, borntraeger@linux.ibm.com,
         mst@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org,
         kvm@vger.kernel.org
-Subject: [PATCH v8 5/8] s390x/pci: enable adapter event notification for interpreted devices
-Date:   Fri,  2 Sep 2022 13:27:34 -0400
-Message-Id: <20220902172737.170349-6-mjrosato@linux.ibm.com>
+Subject: [PATCH v8 6/8] s390x/pci: let intercept devices have separate PCI groups
+Date:   Fri,  2 Sep 2022 13:27:35 -0400
+Message-Id: <20220902172737.170349-7-mjrosato@linux.ibm.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20220902172737.170349-1-mjrosato@linux.ibm.com>
 References: <20220902172737.170349-1-mjrosato@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: VgbPyfB0DZ-D05zandWiDuD1SwQqy9wM
-X-Proofpoint-ORIG-GUID: ODH8r9MbUDL4uPnGFs90K6YjhthGyyQX
+X-Proofpoint-ORIG-GUID: kIEcGySR52GBxcngnKXJ5LQJeq6UzE4D
+X-Proofpoint-GUID: wKPUZvtmGvCIyUHjhrXPazeULZjsqr99
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
  definitions=2022-09-02_04,2022-08-31_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- mlxlogscore=999 malwarescore=0 spamscore=0 clxscore=1015 adultscore=0
- impostorscore=0 priorityscore=1501 mlxscore=0 bulkscore=0 phishscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2209020080
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=999
+ bulkscore=0 clxscore=1015 impostorscore=0 mlxscore=0 priorityscore=1501
+ adultscore=0 malwarescore=0 phishscore=0 lowpriorityscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2207270000
+ definitions=main-2209020080
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
@@ -93,246 +93,174 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the associated kvm ioctl operation to enable adapter event notification
-and forwarding for devices when requested.  This feature will be set up
-with or without firmware assist based upon the 'forwarding_assist' setting.
+Let's use the reserved pool of simulated PCI groups to allow intercept
+devices to have separate groups from interpreted devices as some group
+values may be different. If we run out of simulated PCI groups, subsequent
+intercept devices just get the default group.
+Furthermore, if we encounter any PCI groups from hostdevs that are marked
+as simulated, let's just assign them to the default group to avoid
+conflicts between host simulated groups and our own simulated groups.
 
+Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
 Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 ---
- hw/s390x/s390-pci-bus.c         | 20 ++++++++++++++---
- hw/s390x/s390-pci-inst.c        | 40 +++++++++++++++++++++++++++++++--
- hw/s390x/s390-pci-kvm.c         | 30 +++++++++++++++++++++++++
- include/hw/s390x/s390-pci-bus.h |  1 +
- include/hw/s390x/s390-pci-kvm.h | 14 ++++++++++++
- 5 files changed, 100 insertions(+), 5 deletions(-)
+ hw/s390x/s390-pci-bus.c         | 19 ++++++++++++++--
+ hw/s390x/s390-pci-vfio.c        | 40 ++++++++++++++++++++++++++++++---
+ include/hw/s390x/s390-pci-bus.h |  6 ++++-
+ 3 files changed, 59 insertions(+), 6 deletions(-)
 
 diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 816d17af99..e66a0dfbef 100644
+index e66a0dfbef..5342f7899f 100644
 --- a/hw/s390x/s390-pci-bus.c
 +++ b/hw/s390x/s390-pci-bus.c
-@@ -190,7 +190,10 @@ void s390_pci_sclp_deconfigure(SCCB *sccb)
-         rc = SCLP_RC_NO_ACTION_REQUIRED;
-         break;
-     default:
--        if (pbdev->summary_ind) {
-+        if (pbdev->interp && (pbdev->fh & FH_MASK_ENABLE)) {
-+            /* Interpreted devices were using interrupt forwarding */
-+            s390_pci_kvm_aif_disable(pbdev);
-+        } else if (pbdev->summary_ind) {
-             pci_dereg_irqs(pbdev);
-         }
-         if (pbdev->iommu->enabled) {
-@@ -1082,6 +1085,7 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                 } else {
-                     DPRINTF("zPCI interpretation facilities missing.\n");
-                     pbdev->interp = false;
-+                    pbdev->forwarding_assist = false;
-                 }
-             }
-             pbdev->iommu->dma_limit = s390_pci_start_dma_count(s, pbdev);
-@@ -1090,11 +1094,13 @@ static void s390_pcihost_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-             if (!pbdev->interp) {
-                 /* Do vfio passthrough but intercept for I/O */
-                 pbdev->fh |= FH_SHM_VFIO;
-+                pbdev->forwarding_assist = false;
-             }
-         } else {
-             pbdev->fh |= FH_SHM_EMUL;
-             /* Always intercept emulated devices */
-             pbdev->interp = false;
-+            pbdev->forwarding_assist = false;
-         }
- 
-         if (s390_pci_msix_init(pbdev) && !pbdev->interp) {
-@@ -1244,7 +1250,10 @@ static void s390_pcihost_reset(DeviceState *dev)
-     /* Process all pending unplug requests */
-     QTAILQ_FOREACH_SAFE(pbdev, &s->zpci_devs, link, next) {
-         if (pbdev->unplug_requested) {
--            if (pbdev->summary_ind) {
-+            if (pbdev->interp && (pbdev->fh & FH_MASK_ENABLE)) {
-+                /* Interpreted devices were using interrupt forwarding */
-+                s390_pci_kvm_aif_disable(pbdev);
-+            } else if (pbdev->summary_ind) {
-                 pci_dereg_irqs(pbdev);
-             }
-             if (pbdev->iommu->enabled) {
-@@ -1382,7 +1391,10 @@ static void s390_pci_device_reset(DeviceState *dev)
-         break;
-     }
- 
--    if (pbdev->summary_ind) {
-+    if (pbdev->interp && (pbdev->fh & FH_MASK_ENABLE)) {
-+        /* Interpreted devices were using interrupt forwarding */
-+        s390_pci_kvm_aif_disable(pbdev);
-+    } else if (pbdev->summary_ind) {
-         pci_dereg_irqs(pbdev);
-     }
-     if (pbdev->iommu->enabled) {
-@@ -1428,6 +1440,8 @@ static Property s390_pci_device_properties[] = {
-     DEFINE_PROP_S390_PCI_FID("fid", S390PCIBusDevice, fid),
-     DEFINE_PROP_STRING("target", S390PCIBusDevice, target),
-     DEFINE_PROP_BOOL("interpret", S390PCIBusDevice, interp, true),
-+    DEFINE_PROP_BOOL("forwarding_assist", S390PCIBusDevice, forwarding_assist,
-+                     true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index 651ec38635..20a9bcc7af 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -1066,6 +1066,32 @@ static void fmb_update(void *opaque)
-     timer_mod(pbdev->fmb_timer, t + pbdev->pci_group->zpci_group.mui);
+@@ -748,13 +748,14 @@ static void s390_pci_iommu_free(S390pciState *s, PCIBus *bus, int32_t devfn)
+     object_unref(OBJECT(iommu));
  }
  
-+static int mpcifc_reg_int_interp(S390PCIBusDevice *pbdev, ZpciFib *fib)
-+{
-+    int rc;
-+
-+    rc = s390_pci_kvm_aif_enable(pbdev, fib, pbdev->forwarding_assist);
-+    if (rc) {
-+        DPRINTF("Failed to enable interrupt forwarding\n");
-+        return rc;
-+    }
-+
-+    return 0;
-+}
-+
-+static int mpcifc_dereg_int_interp(S390PCIBusDevice *pbdev, ZpciFib *fib)
-+{
-+    int rc;
-+
-+    rc = s390_pci_kvm_aif_disable(pbdev);
-+    if (rc) {
-+        DPRINTF("Failed to disable interrupt forwarding\n");
-+        return rc;
-+    }
-+
-+    return 0;
-+}
-+
- int mpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar,
-                         uintptr_t ra)
+-S390PCIGroup *s390_group_create(int id)
++S390PCIGroup *s390_group_create(int id, int host_id)
  {
-@@ -1120,7 +1146,12 @@ int mpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar,
+     S390PCIGroup *group;
+     S390pciState *s = s390_get_phb();
  
-     switch (oc) {
-     case ZPCI_MOD_FC_REG_INT:
--        if (pbdev->summary_ind) {
-+        if (pbdev->interp) {
-+            if (mpcifc_reg_int_interp(pbdev, &fib)) {
-+                cc = ZPCI_PCI_LS_ERR;
-+                s390_set_status_code(env, r1, ZPCI_MOD_ST_SEQUENCE);
-+            }
-+        } else if (pbdev->summary_ind) {
-             cc = ZPCI_PCI_LS_ERR;
-             s390_set_status_code(env, r1, ZPCI_MOD_ST_SEQUENCE);
-         } else if (reg_irqs(env, pbdev, fib)) {
-@@ -1129,7 +1160,12 @@ int mpcifc_service_call(S390CPU *cpu, uint8_t r1, uint64_t fiba, uint8_t ar,
-         }
-         break;
-     case ZPCI_MOD_FC_DEREG_INT:
--        if (!pbdev->summary_ind) {
-+        if (pbdev->interp) {
-+            if (mpcifc_dereg_int_interp(pbdev, &fib)) {
-+                cc = ZPCI_PCI_LS_ERR;
-+                s390_set_status_code(env, r1, ZPCI_MOD_ST_SEQUENCE);
-+            }
-+        } else if (!pbdev->summary_ind) {
-             cc = ZPCI_PCI_LS_ERR;
-             s390_set_status_code(env, r1, ZPCI_MOD_ST_SEQUENCE);
-         } else {
-diff --git a/hw/s390x/s390-pci-kvm.c b/hw/s390x/s390-pci-kvm.c
-index 0f16104a74..9134fe185f 100644
---- a/hw/s390x/s390-pci-kvm.c
-+++ b/hw/s390x/s390-pci-kvm.c
-@@ -11,12 +11,42 @@
- 
- #include "qemu/osdep.h"
- 
-+#include <linux/kvm.h>
-+
- #include "kvm/kvm_s390x.h"
- #include "hw/s390x/pv.h"
-+#include "hw/s390x/s390-pci-bus.h"
- #include "hw/s390x/s390-pci-kvm.h"
-+#include "hw/s390x/s390-pci-inst.h"
- #include "cpu_models.h"
- 
- bool s390_pci_kvm_interp_allowed(void)
- {
-     return kvm_s390_get_zpci_op() && !s390_is_pv();
+     group = g_new0(S390PCIGroup, 1);
+     group->id = id;
++    group->host_id = host_id;
+     QTAILQ_INSERT_TAIL(&s->zpci_groups, group, link);
+     return group;
  }
-+
-+int s390_pci_kvm_aif_enable(S390PCIBusDevice *pbdev, ZpciFib *fib, bool assist)
+@@ -772,12 +773,25 @@ S390PCIGroup *s390_group_find(int id)
+     return NULL;
+ }
+ 
++S390PCIGroup *s390_group_find_host_sim(int host_id)
 +{
-+    struct kvm_s390_zpci_op args = {
-+        .fh = pbdev->fh,
-+        .op = KVM_S390_ZPCIOP_REG_AEN,
-+        .u.reg_aen.ibv = fib->aibv,
-+        .u.reg_aen.sb = fib->aisb,
-+        .u.reg_aen.noi = FIB_DATA_NOI(fib->data),
-+        .u.reg_aen.isc = FIB_DATA_ISC(fib->data),
-+        .u.reg_aen.sbo = FIB_DATA_AISBO(fib->data),
-+        .u.reg_aen.flags = (assist) ? 0 : KVM_S390_ZPCIOP_REGAEN_HOST
-+    };
++    S390PCIGroup *group;
++    S390pciState *s = s390_get_phb();
 +
-+    return kvm_vm_ioctl(kvm_state, KVM_S390_ZPCI_OP, &args);
++    QTAILQ_FOREACH(group, &s->zpci_groups, link) {
++        if (group->id >= ZPCI_SIM_GRP_START && group->host_id == host_id) {
++            return group;
++        }
++    }
++    return NULL;
 +}
 +
-+int s390_pci_kvm_aif_disable(S390PCIBusDevice *pbdev)
-+{
-+    struct kvm_s390_zpci_op args = {
-+        .fh = pbdev->fh,
-+        .op = KVM_S390_ZPCIOP_DEREG_AEN
-+    };
+ static void s390_pci_init_default_group(void)
+ {
+     S390PCIGroup *group;
+     ClpRspQueryPciGrp *resgrp;
+ 
+-    group = s390_group_create(ZPCI_DEFAULT_FN_GRP);
++    group = s390_group_create(ZPCI_DEFAULT_FN_GRP, ZPCI_DEFAULT_FN_GRP);
+     resgrp = &group->zpci_group;
+     resgrp->fr = 1;
+     resgrp->dasm = 0;
+@@ -825,6 +839,7 @@ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
+                                            NULL, g_free);
+     s->zpci_table = g_hash_table_new_full(g_int_hash, g_int_equal, NULL, NULL);
+     s->bus_no = 0;
++    s->next_sim_grp = ZPCI_SIM_GRP_START;
+     QTAILQ_INIT(&s->pending_sei);
+     QTAILQ_INIT(&s->zpci_devs);
+     QTAILQ_INIT(&s->zpci_dma_limit);
+diff --git a/hw/s390x/s390-pci-vfio.c b/hw/s390x/s390-pci-vfio.c
+index 4bf0a7e22d..985980f021 100644
+--- a/hw/s390x/s390-pci-vfio.c
++++ b/hw/s390x/s390-pci-vfio.c
+@@ -150,13 +150,18 @@ static void s390_pci_read_group(S390PCIBusDevice *pbdev,
+ {
+     struct vfio_info_cap_header *hdr;
+     struct vfio_device_info_cap_zpci_group *cap;
++    S390pciState *s = s390_get_phb();
+     ClpRspQueryPciGrp *resgrp;
+     VFIOPCIDevice *vpci =  container_of(pbdev->pdev, VFIOPCIDevice, pdev);
++    uint8_t start_gid = pbdev->zpci_fn.pfgid;
+ 
+     hdr = vfio_get_device_info_cap(info, VFIO_DEVICE_INFO_CAP_ZPCI_GROUP);
+ 
+-    /* If capability not provided, just use the default group */
+-    if (hdr == NULL) {
++    /*
++     * If capability not provided or the underlying hostdev is simulated, just
++     * use the default group.
++     */
++    if (hdr == NULL || pbdev->zpci_fn.pfgid >= ZPCI_SIM_GRP_START) {
+         trace_s390_pci_clp_cap(vpci->vbasedev.name,
+                                VFIO_DEVICE_INFO_CAP_ZPCI_GROUP);
+         pbdev->zpci_fn.pfgid = ZPCI_DEFAULT_FN_GRP;
+@@ -165,11 +170,40 @@ static void s390_pci_read_group(S390PCIBusDevice *pbdev,
+     }
+     cap = (void *) hdr;
+ 
++    /*
++     * For an intercept device, let's use an existing simulated group if one
++     * one was already created for other intercept devices in this group.
++     * If not, create a new simulated group if any are still available.
++     * If all else fails, just fall back on the default group.
++     */
++    if (!pbdev->interp) {
++        pbdev->pci_group = s390_group_find_host_sim(pbdev->zpci_fn.pfgid);
++        if (pbdev->pci_group) {
++            /* Use existing simulated group */
++            pbdev->zpci_fn.pfgid = pbdev->pci_group->id;
++            return;
++        } else {
++            if (s->next_sim_grp == ZPCI_DEFAULT_FN_GRP) {
++                /* All out of simulated groups, use default */
++                trace_s390_pci_clp_cap(vpci->vbasedev.name,
++                                       VFIO_DEVICE_INFO_CAP_ZPCI_GROUP);
++                pbdev->zpci_fn.pfgid = ZPCI_DEFAULT_FN_GRP;
++                pbdev->pci_group = s390_group_find(ZPCI_DEFAULT_FN_GRP);
++                return;
++            } else {
++                /* We can assign a new simulated group */
++                pbdev->zpci_fn.pfgid = s->next_sim_grp;
++                s->next_sim_grp++;
++                /* Fall through to create the new sim group using CLP info */
++            }
++        }
++    }
 +
-+    return kvm_vm_ioctl(kvm_state, KVM_S390_ZPCI_OP, &args);
-+}
+     /* See if the PCI group is already defined, create if not */
+     pbdev->pci_group = s390_group_find(pbdev->zpci_fn.pfgid);
+ 
+     if (!pbdev->pci_group) {
+-        pbdev->pci_group = s390_group_create(pbdev->zpci_fn.pfgid);
++        pbdev->pci_group = s390_group_create(pbdev->zpci_fn.pfgid, start_gid);
+ 
+         resgrp = &pbdev->pci_group->zpci_group;
+         if (cap->flags & VFIO_DEVICE_INFO_ZPCI_FLAG_REFRESH) {
 diff --git a/include/hw/s390x/s390-pci-bus.h b/include/hw/s390x/s390-pci-bus.h
-index a9843dfe97..5b09f0cf2f 100644
+index 5b09f0cf2f..0605fcea24 100644
 --- a/include/hw/s390x/s390-pci-bus.h
 +++ b/include/hw/s390x/s390-pci-bus.h
-@@ -351,6 +351,7 @@ struct S390PCIBusDevice {
-     bool pci_unplug_request_processed;
-     bool unplug_requested;
-     bool interp;
-+    bool forwarding_assist;
-     QTAILQ_ENTRY(S390PCIBusDevice) link;
+@@ -315,13 +315,16 @@ typedef struct ZpciFmb {
+ QEMU_BUILD_BUG_MSG(offsetof(ZpciFmb, fmt0) != 48, "padding in ZpciFmb");
+ 
+ #define ZPCI_DEFAULT_FN_GRP 0xFF
++#define ZPCI_SIM_GRP_START 0xF0
+ typedef struct S390PCIGroup {
+     ClpRspQueryPciGrp zpci_group;
+     int id;
++    int host_id;
+     QTAILQ_ENTRY(S390PCIGroup) link;
+ } S390PCIGroup;
+-S390PCIGroup *s390_group_create(int id);
++S390PCIGroup *s390_group_create(int id, int host_id);
+ S390PCIGroup *s390_group_find(int id);
++S390PCIGroup *s390_group_find_host_sim(int host_id);
+ 
+ struct S390PCIBusDevice {
+     DeviceState qdev;
+@@ -370,6 +373,7 @@ struct S390pciState {
+     QTAILQ_HEAD(, S390PCIBusDevice) zpci_devs;
+     QTAILQ_HEAD(, S390PCIDMACount) zpci_dma_limit;
+     QTAILQ_HEAD(, S390PCIGroup) zpci_groups;
++    uint8_t next_sim_grp;
  };
  
-diff --git a/include/hw/s390x/s390-pci-kvm.h b/include/hw/s390x/s390-pci-kvm.h
-index 80a2e7d0ca..933814a402 100644
---- a/include/hw/s390x/s390-pci-kvm.h
-+++ b/include/hw/s390x/s390-pci-kvm.h
-@@ -12,13 +12,27 @@
- #ifndef HW_S390_PCI_KVM_H
- #define HW_S390_PCI_KVM_H
- 
-+#include "hw/s390x/s390-pci-bus.h"
-+#include "hw/s390x/s390-pci-inst.h"
-+
- #ifdef CONFIG_KVM
- bool s390_pci_kvm_interp_allowed(void);
-+int s390_pci_kvm_aif_enable(S390PCIBusDevice *pbdev, ZpciFib *fib, bool assist);
-+int s390_pci_kvm_aif_disable(S390PCIBusDevice *pbdev);
- #else
- static inline bool s390_pci_kvm_interp_allowed(void)
- {
-     return false;
- }
-+static inline int s390_pci_kvm_aif_enable(S390PCIBusDevice *pbdev, ZpciFib *fib,
-+                                          bool assist)
-+{
-+    return -EINVAL;
-+}
-+static inline int s390_pci_kvm_aif_disable(S390PCIBusDevice *pbdev)
-+{
-+    return -EINVAL;
-+}
- #endif
- 
- #endif
+ S390pciState *s390_get_phb(void);
 -- 
 2.37.2
 
