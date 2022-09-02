@@ -2,123 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A67455AA60F
-	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 04:52:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 943095AA610
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 04:54:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233250AbiIBCwe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 22:52:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41248 "EHLO
+        id S233501AbiIBCxz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 22:53:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232291AbiIBCwd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 22:52:33 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF2409E0FC
-        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 19:52:31 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id h188so770925pgc.12
-        for <kvm@vger.kernel.org>; Thu, 01 Sep 2022 19:52:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=s3rQHrfdU8nh1CYoZCYjP5wlsTj0Ig8apoM3bdaeWY8=;
-        b=l4FgH77M91Dsls606bKNlqhKmTFLRa/6fmGLQbKN6rvA6plI7wuVKSRNRV71nGeR/Z
-         KLBLKI+eemZyQR2Q8R6rVbcBwlfkEimagzhqvfc3koYgWDKiuRV471WFwJhj6JCwWs0/
-         JBzaPFZki8wRW+Wqq+oH8hLnLzY0xDr12g1JzJqbf7tEWEWRneMbzYUC5nqmk9yNDcXh
-         jT7qOCR7UqboOKaJ9NFja9CP0c4k5OJ7ZooYNWAy4tBZXthITMnpq6LGqPvhwBZajbHA
-         fIq/96Y3+oBhlr4d3S0Z9PAdV0UhWhErY5fwpSDAppvhzdwi07IuE4Y2XUrScqR5REng
-         FPdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=s3rQHrfdU8nh1CYoZCYjP5wlsTj0Ig8apoM3bdaeWY8=;
-        b=tj5C7WNwHfD3xchDgSfJp1u8AkefiFvJ0IQgzsscNoiNZFBpWISWCIDbrO1obK5Xgy
-         W7CNQIen9aIqXwTvUftqqj4TNKRcfVaAlVJCejdrF+7UPPTjX7NSJukdmwgvkdMiAFrM
-         zjIEOxXkyN2RFUyRsgr5Nm8rZEr/l5y62QuB2Hk+jsmetNCtxcO7P0OcqCOGKqZgNiTh
-         8+U7eMu41rAznX/ywaDn2Gp0zR1izkd4G4+sxa/HSXk7bL6hL103Yi/VXwDlqN3bnyow
-         2qAxXVpWAEtTweopnaokvkRQ/V+HX0Pxml6418Jo/sM4r889jkEK0oWO5snMw5Mn8jHJ
-         2MHQ==
-X-Gm-Message-State: ACgBeo3dd12Ub/NuWXMBrsVmNUgAbhP916Vj5+WaMAYSNfb6aEMssX12
-        /+ZllaxqAQ4ZrS22zY/K2Ui6cA==
-X-Google-Smtp-Source: AA6agR5wb5tUcLrahc75HLtJ2gcPpyN2b0NPDyuE0cW5TEZAXhSqlUwzlKq9UWuKaZGoThkMAFTA+w==
-X-Received: by 2002:a05:6a00:4147:b0:52d:fe84:2614 with SMTP id bv7-20020a056a00414700b0052dfe842614mr34947193pfb.10.1662087151065;
-        Thu, 01 Sep 2022 19:52:31 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id m15-20020a17090a34cf00b001fb35e4044bsm4019628pjf.40.2022.09.01.19.52.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Sep 2022 19:52:29 -0700 (PDT)
-Date:   Fri, 2 Sep 2022 02:52:25 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Gerd Hoffmann <kraxel@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org
-Subject: Re: [PATCH v1 15/40] i386/tdx: Add property sept-ve-disable for
- tdx-guest object
-Message-ID: <YxFv6RglTOY3Pevj@google.com>
-References: <20220802074750.2581308-1-xiaoyao.li@intel.com>
- <20220802074750.2581308-16-xiaoyao.li@intel.com>
- <20220825113636.qlqmflxcxemh2lmf@sirius.home.kraxel.org>
- <389a2212-56b8-938b-22e5-24ae2bc73235@intel.com>
- <20220826055711.vbw2oovti2qevzzx@sirius.home.kraxel.org>
- <a700a0c6-7f25-dc45-4c49-f61709808f29@intel.com>
+        with ESMTP id S232291AbiIBCxx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 22:53:53 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAF81A6C5A;
+        Thu,  1 Sep 2022 19:53:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662087232; x=1693623232;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=FwyR9hMdl684ayilMVL+6KHSWkdMFizQTJkDzfzj/G4=;
+  b=OkiFNcblbOr30eaIwfPYtRC/gCAKyrXCx1CEV4xFD0Xl//H//M8QKPxF
+   9elB9hqww0JxWQObQv+jJaQ/0uL+Bwf8y2nKp/0OE5rfpPot/jMH16tWk
+   TOgfNsYQsnj3R8Q6xLvaAPsJHDJ++pxtaVVn2e/Yehg+fO9KxHcojRHz2
+   BWUXo49d2FfDq6eg18FU/QAok0dytf8SVYuMqudYTs+3Fd3GcYSOvFxem
+   iLRhTWpccPn7AjxS2rFHbzSdHdb7HKI0paBO3bZaBx20jnrtbf3kerOMo
+   9KTlhIrTXqir2ppjMkKiz0xDc4H8LgljqdjsKb530S9taS80uPbvOi3Ny
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10457"; a="322033562"
+X-IronPort-AV: E=Sophos;i="5.93,281,1654585200"; 
+   d="scan'208";a="322033562"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 19:53:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,281,1654585200"; 
+   d="scan'208";a="642702707"
+Received: from lkp-server02.sh.intel.com (HELO fccc941c3034) ([10.239.97.151])
+  by orsmga008.jf.intel.com with ESMTP; 01 Sep 2022 19:53:48 -0700
+Received: from kbuild by fccc941c3034 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oTwoW-000035-0j;
+        Fri, 02 Sep 2022 02:53:48 +0000
+Date:   Fri, 2 Sep 2022 10:53:26 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Like Xu <like.xu.linux@gmail.com>
+Subject: Re: [PATCH v4 1/5] perf/x86/core: Remove unnecessary stubs provided
+ for KVM-only helpers
+Message-ID: <202209021033.bPC3ttgM-lkp@intel.com>
+References: <20220901173258.925729-2-seanjc@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a700a0c6-7f25-dc45-4c49-f61709808f29@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220901173258.925729-2-seanjc@google.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 02, 2022, Xiaoyao Li wrote:
-> On 8/26/2022 1:57 PM, Gerd Hoffmann wrote:
-> >    Hi,
-> > > For TD guest kernel, it has its own reason to turn SEPT_VE on or off. E.g.,
-> > > linux TD guest requires SEPT_VE to be disabled to avoid #VE on syscall gap
-> > > [1].
-> > 
-> > Why is that a problem for a TD guest kernel?  Installing exception
-> > handlers is done quite early in the boot process, certainly before any
-> > userspace code runs.  So I think we should never see a syscall without
-> > a #VE handler being installed.  /me is confused.
-> > 
-> > Or do you want tell me linux has no #VE handler?
-> 
-> The problem is not "no #VE handler" and Linux does have #VE handler. The
-> problem is Linux doesn't want any (or certain) exception occurrence in
-> syscall gap, it's not specific to #VE. Frankly, I don't understand the
-> reason clearly, it's something related to IST used in x86 Linux kernel.
+Hi Sean,
 
-The SYSCALL gap issue is that because SYSCALL doesn't load RSP, the first instruction
-at the SYSCALL entry point runs with a userspaced-controlled RSP.  With TDX, a
-malicious hypervisor can induce a #VE on the SYSCALL page and thus get the kernel
-to run the #VE handler with a userspace stack.
+I love your patch! Perhaps something to improve:
 
-The "fix" is to use an IST for #VE so that a kernel-controlled RSP is loaded on #VE,
-but ISTs are terrible because they don't play nice with re-entrancy (among other
-reasons).  The RSP used for IST-based handlers is hardcoded, and so if a #VE
-handler triggers another #VE at any point before IRET, the second #VE will clobber
-the stack and hose the kernel.
+[auto build test WARNING on 372d07084593dc7a399bf9bee815711b1fb1bcf2]
 
-It's possible to workaround this, e.g. change the IST entry at the very beginning
-of the handler, but it's a maintenance burden.  Since the only reason to use an IST
-is to guard against a malicious hypervisor, Linux decided it would be just as easy
-and more beneficial to avoid unexpected #VEs due to unaccepted private pages entirely.
+url:    https://github.com/intel-lab-lkp/linux/commits/Sean-Christopherson/KVM-x86-Intel-LBR-related-perf-cleanups/20220902-013352
+base:   372d07084593dc7a399bf9bee815711b1fb1bcf2
+config: x86_64-randconfig-a012 (https://download.01.org/0day-ci/archive/20220902/202209021033.bPC3ttgM-lkp@intel.com/config)
+compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project f28c006a5895fc0e329fe15fead81e37457cb1d1)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/b1f1d2f5eb44253f5d059757c03e7fd413b2e306
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Sean-Christopherson/KVM-x86-Intel-LBR-related-perf-cleanups/20220902-013352
+        git checkout b1f1d2f5eb44253f5d059757c03e7fd413b2e306
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash arch/x86/events/
+
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+>> arch/x86/events/core.c:696:31: warning: no previous prototype for function 'perf_guest_get_msrs' [-Wmissing-prototypes]
+   struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr, void *data)
+                                 ^
+   arch/x86/events/core.c:696:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr, void *data)
+   ^
+   static 
+   1 warning generated.
+
+
+vim +/perf_guest_get_msrs +696 arch/x86/events/core.c
+
+f87ad35d37fa54 arch/x86/kernel/cpu/perf_counter.c Jaswinder Singh Rajput 2009-02-27  695  
+39a4d779546a99 arch/x86/events/core.c             Like Xu                2022-04-11 @696  struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr, void *data)
+abd562df94d19d arch/x86/events/core.c             Like Xu                2021-01-25  697  {
+39a4d779546a99 arch/x86/events/core.c             Like Xu                2022-04-11  698  	return static_call(x86_pmu_guest_get_msrs)(nr, data);
+abd562df94d19d arch/x86/events/core.c             Like Xu                2021-01-25  699  }
+abd562df94d19d arch/x86/events/core.c             Like Xu                2021-01-25  700  EXPORT_SYMBOL_GPL(perf_guest_get_msrs);
+abd562df94d19d arch/x86/events/core.c             Like Xu                2021-01-25  701  
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
