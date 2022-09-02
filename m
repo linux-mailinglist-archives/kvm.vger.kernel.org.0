@@ -2,68 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E12B85AB8AA
-	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 21:01:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 83AD25AB8E7
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 21:35:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230175AbiIBTBE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Sep 2022 15:01:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57290 "EHLO
+        id S230334AbiIBTfw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Sep 2022 15:35:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230195AbiIBTAx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Sep 2022 15:00:53 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A141C792DC
-        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 12:00:15 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4C216B82D27
-        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 19:00:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F218CC433B5
-        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 19:00:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662145213;
-        bh=NvE7EpngvgCHOYLk4nel5oW+94+0683fRmV1xEdhBcg=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=sXVvxFDACNhlbupPSuCuyZNF74pX6ljwZPwt3lPE2yznEzEubH0E/RsWZRL3OdSTx
-         5pNN9EuQViXmt4sG/Ti9UNU/AL+5c70DVEF4y9sCuUpMJOw/NsV8fzEXK/TbkS6WyC
-         ZTMr0wVlV6UFctWwqZgs6y89o6tG6NYF2c/iwWRSTpDraX5D+MdxLP3SbMqQIs1Of0
-         jPVMYdwP9yPi5vX4gB4PhSbgITCcKgLJUuoaQil/XeAu/nFnQBVmED/zrZqyVRlD/h
-         4T9oaxRymErc6uE+bdJrB9rsetudJ+ISfAbDF7OuJGck8VQYypz67f+2yPbhkQmKzZ
-         /VDWu5oB5mjOg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id DBFF4C04231; Fri,  2 Sep 2022 19:00:12 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216033] KVM VMX nested virtualization: VMXON does not check
- guest CR0 against IA32_VMX_CR0_FIXED0
-Date:   Fri, 02 Sep 2022 19:00:12 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: seanjc@google.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216033-28872-hPMAGWd52K@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216033-28872@https.bugzilla.kernel.org/>
-References: <bug-216033-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S229548AbiIBTfu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Sep 2022 15:35:50 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9F5DD51E8
+        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 12:35:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662147348; x=1693683348;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=hZWH/c+7BOnYYOn9UIijMKnvzfGH6y7LXz9UN2s/SLU=;
+  b=fPcd4Zfc3sNc8X1ikGImPtQaI5S8qGFJG6Ffvu2y7saMf7nmvvYevGn8
+   UM0SdkpzXJbKdKwqXmdZdl1tmzwGDvRFJEDZiXyHhJTjfMZhtYs8y/oCa
+   q6AAb9QdFGsOP5cYkQLtHUapkptVE17xD9dVc6nSjAL/C3na+hVSOsx3l
+   WEbWty+0qBmTTzTFJGrAis2jVmbcWJy6redqbEtoFoAcN60Yy7LsAiJnK
+   gZ+rsRcgsPcESssL3zT0xGwj42MXXGgIyylKgDhzO02k63wzwuuRJ21Ll
+   qR2qhFtaEGDvVyQ8rpjrbK4AJTzNpwzCxBOnsacQ3oWCmY14XrzYzPcVf
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10458"; a="294806292"
+X-IronPort-AV: E=Sophos;i="5.93,285,1654585200"; 
+   d="scan'208";a="294806292"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2022 12:14:43 -0700
+X-IronPort-AV: E=Sophos;i="5.93,285,1654585200"; 
+   d="scan'208";a="738968095"
+Received: from tjulien-mobl2.amr.corp.intel.com (HELO desk) ([10.212.29.154])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2022 12:14:42 -0700
+Date:   Fri, 2 Sep 2022 12:14:41 -0700
+From:   Pawan Gupta <pawan.kumar.gupta@intel.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Chao Gao <chao.gao@intel.com>, chen.zhang@intel.com,
+        kvm list <kvm@vger.kernel.org>
+Subject: Re: BHB-clearing on VM-exit
+Message-ID: <20220902191441.bbjfvniy5cpefg3a@desk>
+References: <CALMp9eRp-cH6=trNby3EY6+ynD6F-AWiThBHiSF8_sgL2UWnkA@mail.gmail.com>
+ <Yw8aK9O2C+38ShCC@gao-cwp>
+ <20220901174606.x2ml5tve266or5ap@desk>
+ <CALMp9eRaq_p2PusavHy8a4YEx2fQrxESdpPQ_8bySqrv61ub=Q@mail.gmail.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALMp9eRaq_p2PusavHy8a4YEx2fQrxESdpPQ_8bySqrv61ub=Q@mail.gmail.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,109 +61,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216033
+On Thu, Sep 01, 2022 at 11:35:10AM -0700, Jim Mattson wrote:
+> On Thu, Sep 1, 2022 at 10:46 AM Pawan Gupta <pawan.kumar.gupta@intel.com> wrote:
+> >
+> > On Wed, Aug 31, 2022 at 04:22:03PM +0800, Chao Gao wrote:
+> > > On Tue, Aug 30, 2022 at 04:42:19PM -0700, Jim Mattson wrote:
+> > > >Don't we need a software BHB-clearing sequence on VM-exit for Intel
+> > > >parts that don't report IA32_ARCH_CAPABILITIES.BHI_NO? What am I
+> > > >missing?
+> > >
+> > > I think we need the software mitigation on parts that don't support/enable
+> > > BHI_DIS_S of IA32_SPEC_CTRL MSR and don't enumerate BHI_NO.
+> > >
+> > > Pawan, any idea?
+> >
+> > Intel doesn't recommend any BHI mitigation on VM exit. The guest can't
+> > make risky system calls (e.g. unprivileged eBPF) in the host, so the
+> > previously proposed attacks aren't viable, and in general the exposed
+> > attack surface to a guest is much smaller (with no syscalls). If
+> > defense-in-depth paranoia is desired, the BHB-clearing sequence could be
+> > an alternative in the absence of BHI_DIS_S/BHI_NO.
+> 
+> Just for clarity, are you saying that it is not possible for a guest
+> to use the shared BHB to mount a successful attack on the host when
+> eIBRS is enabled or IBRS is applied after VM-exit?
 
---- Comment #3 from Sean Christopherson (seanjc@google.com) ---
-On Fri, Sep 02, 2022, bugzilla-daemon@kernel.org wrote:
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D216033
->=20
-> --- Comment #2 from Eric Li (ercli@ucdavis.edu) ---
-> @Sean Christopherson Thanks for submitting the fix to this bug in
-> https://lore.kernel.org/lkml/20220607213604.3346000-4-seanjc@google.com/ .
-> However, I recently tested this fix and the behavior is not as expected.
->=20
-> According to Intel's SDM, VMXON may generate 2 types of exceptions:
->=20
->     IF (register operand) or (CR0.PE =3D 0) or (CR4.VMXE =3D 0) or ...
->         THEN #UD;
->     ELSIF not in VMX operation
->         THEN
->             IF (CPL > 0) or (in A20M mode) or
->             (the values of CR0 and CR4 are not supported in VMX operation=
- ...
->                 THEN #GP(0);
->=20
-> For example, when CR4 value is incorrect, different exceptions may be
-> generated
-> depending on which bit is incorrect. If CR4.VMXE =3D 0, #UD should be
-> generated.
-> Otherwise, #GP(0) should be generated. However, after the fix, #UD is alw=
-ays
-> generated.
+It may be possible to use shared BHB to influence the choice of indirect
+targets, but there are other requirements that needs to be satisfied
+such as:
+ - Finding a disclosure gadget.
+ - Controlling register inputs to the gadget.
+ - Injecting the disclosure gadget in the predictors before it can be
+   transiently executed.
+ - Finding an appropriate indirect-branch site after VM-exit, and before
+   BHB is overwritten.
 
-/facepalm
+IFAIK, other than gadgets based on unprivileged eBPF (which is disabled
+by default), previous research hasn't concluded on the exploitability of
+any other gadgets. Also factors stated above makes it hard for a guest
+to exploit BHI. If that changes or if defense-in-depth is desired,
+BHB-clearing sequence is the appropriate thing to do.
 
-All that and I overlooked that the other CR0/CR4 checks take a #GP.
-
-On the bright side, it does mean I can blame Jim at least a little bit for
-commit
-70f3aac964ae ("kvm: nVMX: Remove superfluous VMX instruction fault checks").
-
-Untested, but this should do the trick.
-
----
- arch/x86/kvm/vmx/nested.c | 23 +++++++++++++++--------
- 1 file changed, 15 insertions(+), 8 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index ddd4367d4826..86ee2ab8a497 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -4936,25 +4936,32 @@ static int handle_vmxon(struct kvm_vcpu *vcpu)
-                | FEAT_CTL_VMX_ENABLED_OUTSIDE_SMX;
-
-        /*
--        * Note, KVM cannot rely on hardware to perform the CR0/CR4 #UD che=
-cks
--        * that have higher priority than VM-Exit (see Intel SDM's pseudoco=
-de
--        * for VMXON), as KVM must load valid CR0/CR4 values into hardware
-while
--        * running the guest, i.e. KVM needs to check the _guest_ values.
-+        * Note, KVM cannot rely on hardware to perform the CR0.PE and CR4.=
-VMXE
-+        * #UD checks that have higher priority than VM-Exit (see Intel SDM=
-'s
-+        * pseudocode for VMXON), as KVM must load valid CR0/CR4 values into
-+        * hardware while running the guest, i.e. KVM needs to check the
-_guest_
-+        * values.
-         *
-         * Rely on hardware for the other two pre-VM-Exit checks, !VM86 and
-         * !COMPATIBILITY modes.  KVM may run the guest in VM86 to emulate =
-Real
-         * Mode, but KVM will never take the guest out of those modes.
-         */
-+       if (!kvm_read_cr4_bits(vcpu, X86_CR4_VMXE) ||
-+           !kvm_read_cr0_bits(vcpu, X86_CR0_PE)) {
-+               kvm_queue_exception(vcpu, UD_VECTOR);
-+               return 1;
-+       }
-+
-+       /*
-+        * All other checks that are lower priority than VM-Exit must be
-+        * checked manually, including the other CR0/CR4 reserved bit check=
-s.
-+        */
-        if (!nested_host_cr0_valid(vcpu, kvm_read_cr0(vcpu)) ||
-            !nested_host_cr4_valid(vcpu, kvm_read_cr4(vcpu))) {
-                kvm_queue_exception(vcpu, UD_VECTOR);
-                return 1;
-        }
-
--       /*
--        * CPL=3D0 and all other checks that are lower priority than VM-Exi=
-t must
--        * be checked manually.
--        */
-        if (vmx_get_cpl(vcpu)) {
-                kvm_inject_gp(vcpu, 0);
-                return 1;
-
-base-commit: 476d5fb78ea6438941559af4814a2795849cb8f0
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Thanks,
+Pawan
