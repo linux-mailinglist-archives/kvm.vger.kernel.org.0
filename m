@@ -2,68 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DFDAE5AB875
-	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 20:43:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A42B75AB87B
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 20:43:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230018AbiIBSnK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Sep 2022 14:43:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49404 "EHLO
+        id S229968AbiIBSnW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Sep 2022 14:43:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229991AbiIBSnH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Sep 2022 14:43:07 -0400
+        with ESMTP id S230053AbiIBSnR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Sep 2022 14:43:17 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54D6C112EF1
-        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 11:43:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 597EC1144F9
+        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 11:43:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662144184;
+        s=mimecast20190719; t=1662144195;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1nd4P68uBzLxzSF6eGPfN8amzg0r15taaZBfhWhybWk=;
-        b=AXENKOoEBxMS0VYcLVDk9HHRLzYAsOfs6cSvBTATuqhkMc7mtYdZKrJ30ckm+vIY2YHx9a
-        GDrEoY6b5CZxrujxYfC4MgPbddRZ3KFEJuDizWKKAjIKqQoTYQHHc5tMkm+OWx7MMPD+Nz
-        IuLUzsY33TJuosasvPdKHdv01hURRjI=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=rzZlvwELvY+KaMQ7WTtmZ1RMOwQTWfipcFncJI6AIlc=;
+        b=CI/CchxS0wATfjOQpfC5mC7Y33X6l3i2sDtr0dJmTwFid0wxvQMEe0YgS+OWoz/KShZDwL
+        ZEVnr0/wHx3r8V7dzESfuqgBwjS7iMintPejsnxk4UnoOG2M114GLirV1PYu4+mmJRMCft
+        HzYW1eJy7sskj/THglm7zj37NMf/jdA=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-625-3ONy5ynBNbK7Irg0hnDTbA-1; Fri, 02 Sep 2022 14:43:03 -0400
-X-MC-Unique: 3ONy5ynBNbK7Irg0hnDTbA-1
-Received: by mail-il1-f199.google.com with SMTP id o2-20020a056e0214c200b002eb8acbd27cso2370824ilk.22
-        for <kvm@vger.kernel.org>; Fri, 02 Sep 2022 11:43:03 -0700 (PDT)
+ us-mta-465-qWSdMH7XOi6wbjMOChzlyw-1; Fri, 02 Sep 2022 14:43:06 -0400
+X-MC-Unique: qWSdMH7XOi6wbjMOChzlyw-1
+Received: by mail-il1-f198.google.com with SMTP id d18-20020a056e020c1200b002eaea8e6081so2367547ile.6
+        for <kvm@vger.kernel.org>; Fri, 02 Sep 2022 11:43:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:organization:references
          :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
          :from:to:cc:subject:date;
-        bh=1nd4P68uBzLxzSF6eGPfN8amzg0r15taaZBfhWhybWk=;
-        b=V3c1y/c9V4WEvHvrUOLCMBAZA1Z/quemDSzr+u+KupHmlWS81OHcrdfFwkb4An0h3u
-         NHjRwC794mWojAPox7DbFZE+5Dfo+2P+XRoX8A4ridey591XfcZZdNM3NQyNFWRjhQLa
-         MPmrkNyVXXDzHz0i2xYoAdrqE1KPQws76WOvyV6py4paCVITmXokR2QBRs9kYpPolWbe
-         EbgVeCRAjAOwBokxzLJGP+59ldNgG6v4nrmM1bfX17nF2Z+cqBnxsByOu5GKiDAgP5YN
-         /glACq2jpmaSBJ3HkGPp7hBoGPsHW8NYrwgdkTZux83n73sOL2/mMP0Y2CGp1C9c+gBo
-         WwOw==
-X-Gm-Message-State: ACgBeo1p3oG7dsHqZBjGWiMmIQPu2YHIKAbdwOE+U9gfJXiMTdTPLjO5
-        WAjUkoSyoKiyF+cri6bGzXqbb+mJMQlkPjTqVTI0TmfXwChLUsz4DBsCJZz+aV0QU8rZCfdcNaN
-        UMuVqriox9sij
-X-Received: by 2002:a02:c014:0:b0:34c:dec:1e10 with SMTP id y20-20020a02c014000000b0034c0dec1e10mr7344932jai.99.1662144182700;
-        Fri, 02 Sep 2022 11:43:02 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR65teln+MSqeLxq5ZwVuLQUgTCZQYYRkVzx9NixYTzTJQaDUYxUmsamBNnsQIuMukAj7e3hCA==
-X-Received: by 2002:a02:c014:0:b0:34c:dec:1e10 with SMTP id y20-20020a02c014000000b0034c0dec1e10mr7344926jai.99.1662144182541;
-        Fri, 02 Sep 2022 11:43:02 -0700 (PDT)
+        bh=rzZlvwELvY+KaMQ7WTtmZ1RMOwQTWfipcFncJI6AIlc=;
+        b=JbpVTmO7179a8WMWZCPsw3GKFjszf0/JYHwyPggUf6M35fFAcbwN1Qp2dnNWrbmOwl
+         df5ZTGN1sj6Fme5fYrzR5zW0CSIjfdqHL4t4sOgugQTMMtvtVQZMsyPC8yvdXfXf0rgX
+         7z3rgvW5yt8p9AkfvC6ccamlCnz1IEhY6MSQUffFWyQIjVvUbrIHW7rbw/C9wzHEDqEp
+         oIghh2y59AdJhMp1nUOoFxUxusnBLVL2UOPrGF3WKa9VRTYqcNLh8U9tbyyllpmJWNyC
+         lp2BC2NUjvdiYsNCEHsdu80oPAL+Vxoph42knEYQ5tHWjRuKpfYFKkb406iQXxlCsldi
+         ZkVw==
+X-Gm-Message-State: ACgBeo3hY8XbvKWh9SUKywtKWftueA/5/AZpoHe+Fh3VxYAso9dLmii2
+        Ub6l8qeEXi0B9SQezmqB8EAnGgjZkLsPR9AtwpT/kFsnorkh5mLcq8Veg5I8v/jgswZ+EtvPqbb
+        QbLPmTJ4lGU+I
+X-Received: by 2002:a05:6602:4191:b0:68a:144c:82dd with SMTP id bx17-20020a056602419100b0068a144c82ddmr18376480iob.33.1662144186354;
+        Fri, 02 Sep 2022 11:43:06 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR6YWf8nBccEN7BBYVFRVsQ/ifFo1eDb2o/b2Bl/zs4U+TFMt0cEmOPtWEOE6znqyuuUPaiqbA==
+X-Received: by 2002:a05:6602:4191:b0:68a:144c:82dd with SMTP id bx17-20020a056602419100b0068a144c82ddmr18376470iob.33.1662144186142;
+        Fri, 02 Sep 2022 11:43:06 -0700 (PDT)
 Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id x6-20020a056602160600b0067b7a057ee8sm1126680iow.25.2022.09.02.11.43.01
+        by smtp.gmail.com with ESMTPSA id x6-20020a056602160600b0067b7a057ee8sm1126680iow.25.2022.09.02.11.43.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Sep 2022 11:43:02 -0700 (PDT)
-Date:   Fri, 2 Sep 2022 12:42:35 -0600
+        Fri, 02 Sep 2022 11:43:05 -0700 (PDT)
+Date:   Fri, 2 Sep 2022 12:42:36 -0600
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Yi Liu <yi.l.liu@intel.com>
-Subject: Re: [PATCH v2] vfio: Remove vfio_group dev_counter
-Message-ID: <20220902124235.46794868.alex.williamson@redhat.com>
-In-Reply-To: <0-v2-d4374a7bf0c9+c4-vfio_dev_counter_jgg@nvidia.com>
-References: <0-v2-d4374a7bf0c9+c4-vfio_dev_counter_jgg@nvidia.com>
+To:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc:     <kvm@vger.kernel.org>, <jgg@nvidia.com>, <kevin.tian@intel.com>,
+        <liulongfang@huawei.com>, <linuxarm@huawei.com>
+Subject: Re: [PATCH] hisi_acc_vfio_pci: Correct the function prefix for
+ hssi_acc_drvdata()
+Message-ID: <20220902124236.2363e982.alex.williamson@redhat.com>
+In-Reply-To: <20220831085943.993-1-shameerali.kolothum.thodi@huawei.com>
+References: <20220831085943.993-1-shameerali.kolothum.thodi@huawei.com>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -78,28 +79,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 16 Aug 2022 16:13:04 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Wed, 31 Aug 2022 09:59:43 +0100
+Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
 
-> This counts the number of devices attached to a vfio_group, ie the number
-> of items in the group->device_list.
+> Commit 91be0bd6c6cf("vfio/pci: Have all VFIO PCI drivers store the
+> vfio_pci_core_device in drvdata") introduced a helper function to
+> retrieve the drvdata but used "hssi" instead of "hisi" for the
+> function prefix. Correct that and also while at it, moved the
+> function a bit down so that it's close to other hisi_ prefixed
+> functions.
 > 
-> It is only read in vfio_pin_pages(), as some kind of protection against
-> limitations in type1.
+> No functional changes.
 > 
-> However, with all the code cleanups in this area, now that
-> vfio_pin_pages() accepts a vfio_device directly it is redundant.  All
-> drivers are already calling vfio_register_emulated_iommu_dev() which
-> directly creates a group specifically for the device and thus it is
-> guaranteed that there is a singleton group.
-> 
-> Leave a note in the comment about this requirement and remove the logic.
-> 
-> Reviewed-by: Yi Liu <yi.l.liu@intel.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Fixes: 91be0bd6c6cf("vfio/pci: Have all VFIO PCI drivers store the vfio_pci_core_device in drvdata")
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 > ---
->  drivers/vfio/vfio_main.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
+>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 20 +++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
 
 Applied to vfio next branch for v6.1.  Thanks,
 
