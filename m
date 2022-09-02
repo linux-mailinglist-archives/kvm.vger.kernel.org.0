@@ -2,200 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D7BEC5AA932
-	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 09:56:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 23ECF5AA954
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 10:00:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235352AbiIBH4S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Sep 2022 03:56:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49188 "EHLO
+        id S235573AbiIBIAt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Sep 2022 04:00:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235518AbiIBH4G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Sep 2022 03:56:06 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E52E5E32F
-        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 00:55:54 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2827VmqW012162;
-        Fri, 2 Sep 2022 07:55:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=+IWiVjvMv3xCNsfnJjzrKOprtnCXnRUJuvZF+ft0qyU=;
- b=cUA6IkVqrYYi4Yk7F+rlAQei9plYMSrwGQv6GfO3Ot3FYcqHcY2ZeKx63RE1LHMTCs5m
- J4nQjTNe7ArKq2VKT20sRjlkw5skj5WwUvgI7QzOSyyBpLmlXV4eO2S6uVwz4C7V8uHZ
- OiHMQJ6OaIlDgS8BQarvhqRozER3FE62wpNwvGfFQLtsIRAUUbeVCd7hTiT5+tIk39UZ
- 1nR4ZRpBJPf5IvpNiypYJ/8BR7fjbaCORQq8VEOf+fpW2CekV7zwmXDGlDVgztpx+L5y
- 4lwB3YvzmlFWXuzKF0RAliwro7ZuXa/TJKT+y8nJAumcKNZ8YvA/Z6wi7YypG02k8Dy9 YA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jbbrnmuwn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Sep 2022 07:55:48 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2826UNRd025400;
-        Fri, 2 Sep 2022 07:55:47 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jbbrnmuw5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Sep 2022 07:55:47 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2827pb9s027648;
-        Fri, 2 Sep 2022 07:55:45 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma02fra.de.ibm.com with ESMTP id 3j7aw8wqwv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 02 Sep 2022 07:55:45 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2827u5F839387640
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 2 Sep 2022 07:56:05 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 69B7211C04A;
-        Fri,  2 Sep 2022 07:55:42 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9A92111C04C;
-        Fri,  2 Sep 2022 07:55:41 +0000 (GMT)
-Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.69.137])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  2 Sep 2022 07:55:41 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
-Subject: [PATCH v9 10/10] docs/s390x: document s390x cpu topology
-Date:   Fri,  2 Sep 2022 09:55:31 +0200
-Message-Id: <20220902075531.188916-11-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220902075531.188916-1-pmorel@linux.ibm.com>
-References: <20220902075531.188916-1-pmorel@linux.ibm.com>
+        with ESMTP id S234651AbiIBIAr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Sep 2022 04:00:47 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2086.outbound.protection.outlook.com [40.107.220.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C879E2B630;
+        Fri,  2 Sep 2022 01:00:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=D7EJrOJ/2rN6OAUjMxKryp2HLFQNvgvwhsOXRE7igjKBbMkO9KMgbytbhRzIsDF6EvM9GB6KMs29q54W5ToXDvv8oHQXhvHjzgUnHZAPV5XsDVPjsV7OCvf6BXHPtSkjLMTn+Y8UITROqG6X4Gg8tXF3yDOIl/OiGL5AxBmuQOjZvE0hIIA4fM+dMpCJex6hBhkA59rImGs1gr4Nsy7yrHV8cNh3/RroTJiloidPolIsI4RSi0WUXUlqnnZLbhKLg5f+0Uk8yHTXaSZBZtAkbGVj7yWux3xI7dEHoHUvla0K1I+ajbYitAsLeS1vaLZ+P/6WxoCGCBFU1/7ZixBoqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vAc6NoHIe4TRTh85s+UNR60FCk1XGkxBElH4xgyDXOA=;
+ b=ADfvoJ8T9/Fi3wWAypBSl5lFa+QQo15vdMGL6npCvk0QsYvd5lpAWckK4MHoqaO/j/bmqNSwnDn6cFGw2BfucZX3C2b0pYygUjk6vWcGuL30Q//bh4+W5qMzBepXSMNYRiICOCQ8eC/WBUb21/H/KTfYZg93RjieG8uQZC2uB7zDk+KJr2nk5k1bW2WFI4mTGzm89Un0DqYQkXzE6rw037LCFU3Jvn1jOeLGEgSRn64xozexC9jla1OUTH7VcHaR6MpkRJpbEwXPiPTYvysupAZGaBgXBAVPIlqmvQ76Huv2RizjJJ2RiZwRtiuvuOTrI+l5M86hUMJKXae2NwYy5A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vAc6NoHIe4TRTh85s+UNR60FCk1XGkxBElH4xgyDXOA=;
+ b=n3d8nLAm08aH8U8wSsfKXeeHyChAvVEcAZWs+ObsJfY2qabgApp4n03fZBz74TBvTD+5y/04b+3XzrQ3qfudJcgzuuJpbUGLt2Ngo1/l+EB4y1SoucSwA1/Fo7RRyyIDxHDvJmrUi+y8Ye/yWUgALD/zMQm+dVHXWqfxm6Zmby8U62oRaPSi710qGK4WcffjxUM61W+FURVTWrwKRcTaWWRle1bbZ7lgM+wKBBOyx6uWF1/GkwjbCT/88xzFlTwvf9aHUoMqFNHd156XrwEaUHfaq3MCwC/0Wmq39Hla/4BYXfF2camGrWitpXIXofhUhJkCbxGa5Y9VY2FK+80+pw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BL1PR12MB5304.namprd12.prod.outlook.com (2603:10b6:208:314::13)
+ by CH2PR12MB4875.namprd12.prod.outlook.com (2603:10b6:610:35::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.10; Fri, 2 Sep
+ 2022 08:00:45 +0000
+Received: from BL1PR12MB5304.namprd12.prod.outlook.com
+ ([fe80::753c:8885:3057:b0a1]) by BL1PR12MB5304.namprd12.prod.outlook.com
+ ([fe80::753c:8885:3057:b0a1%3]) with mapi id 15.20.5588.012; Fri, 2 Sep 2022
+ 08:00:44 +0000
+Message-ID: <43807bc4-5206-2c1d-99c6-3fc566655748@nvidia.com>
+Date:   Fri, 2 Sep 2022 13:30:32 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH v7 0/5] vfio/pci: power management changes
+Content-Language: en-US
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        "Rafael J . Wysocki" <rafael@kernel.org>
+Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-pci@vger.kernel.org
+References: <20220829114850.4341-1-abhsahu@nvidia.com>
+From:   Abhishek Sahu <abhsahu@nvidia.com>
+X-Nvconfidentiality: public
+In-Reply-To: <20220829114850.4341-1-abhsahu@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MA0PR01CA0067.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a01:ad::13) To BL1PR12MB5304.namprd12.prod.outlook.com
+ (2603:10b6:208:314::13)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: x2LUgSHHP-1QddOS7LzjJVLZZ2zVUwv7
-X-Proofpoint-ORIG-GUID: Ah9qK5dsGwHKrbKCyWIxcKLGrBtAVUsM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-09-01_12,2022-08-31_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- priorityscore=1501 lowpriorityscore=0 bulkscore=0 impostorscore=0
- mlxlogscore=999 phishscore=0 suspectscore=0 clxscore=1015 mlxscore=0
- spamscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2209020034
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 9121202e-5f59-4f08-2943-08da8cb93ce5
+X-MS-TrafficTypeDiagnostic: CH2PR12MB4875:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Df/XDKM6MpLV7nDdlEqUAgQveFEsALhewBHM0A/z9Jsh5q/FABe3lVOpc5gKon85KS2yiwyVfRxCxERD5qnmA1xoIa1Nm2SYvvFp5L0ADnbuTG1fj007EZlhk3lfJ2XyPU6ygLh2y/X7wBNJWxnKtuv032w/zhq7PUPqktIQLJVNf3tWDCntjYu5X9NaaM/Plv1GSvPiwOWYFHA7GqABXoXN/+BSQANvxEwNWoLCsxc1XMijNuinvYPXQj+TaOvDRhaM+ZQ/+RdvfOR3bFF9tO/vOemgCZ1RlhPkaZjNSrIRdFa9dFJ22JJd8lHuwDD9YZ0i5EWxs1dgCXqlQWK0n6JVbwykJch3U9us4KwMLs+rW0Po9EXcytKkcCYt8+ESaxXwRRuCePQYA8RnM3UTUMt3PSYoCQ9CtAHF0rrXZuOCkKqS3V8a5SANVxqcBQuBh9p4WUaVwSWdwMUzThnkyMlJWGCus0meyg4zBrIaiWRbU5p5jaOKpmho85O33g3Ra9oZ43El8wXgtnbrIFLDrN79ZLQt52TyXRd89jAijEmKLaFcnnaaqkW3tj+UodXBoyYzge634VymgPo8ZKFYx4l8DCvDtuVDZo1FhOo1vyMuqFIDvZAVzzQ0iQBSxLrBE97pPIWbqnjxC7MraKeXyQl4tljFDOJkiE0OwKc4crGIjdxdPSMgEExf6qTlM7/+vjvKVorGPoBYDqxMBVbxkKNaZHrz/fPIFVZlKnX9LhDqpouD/0C/8hxgUl//YJfrLBeX0AGlil4atqpdLUboKTB8UcztNmWLzlFey8MTapJWi4fkw1uXGYp2vXcjhlcz4/Yu+cUVmPxSBgDY/GWq616ipaJl6bnUd85Axy7OwlnB4CGRIDGHel2GhoGt/S4JPP4rTJ1HJ80f1CeTCqk6FfJAFVKcLp8V4fowMkFIg/U=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5304.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(376002)(366004)(39860400002)(136003)(346002)(83380400001)(31696002)(38100700002)(66946007)(66556008)(66476007)(8676002)(4326008)(110136005)(54906003)(316002)(2906002)(4744005)(7416002)(8936002)(5660300002)(55236004)(6506007)(6512007)(26005)(186003)(2616005)(966005)(41300700001)(478600001)(6486002)(86362001)(6666004)(36756003)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?THR3Qldwa09yT1hLSUhoMzM4SFdJdVVDUVU2UmNDR3YrSTRmZFlwK2lJTFlw?=
+ =?utf-8?B?cDFnNEo5YkhYQ21aNW9GVUxRR1pYQUpPL0ZRa1diSXRhRkd5dkdIQVh2RjJG?=
+ =?utf-8?B?VjFYd0NmZEhsN2pQNW9iSS9wWWN0OTVuM285YVkxeEt2bnlEM2toUlIwc0Ny?=
+ =?utf-8?B?MFl6MGZyRTJBY1JRL0J0c3oyV0xuZG9LbzBmeXMxUjZ3c3dTQnBwd3JHZ005?=
+ =?utf-8?B?ODl3YWRXSUlDQWJhL2Fzc0lwTGJsbTIreXpFREFXOFRiOE0yRk5GVS9NaGZn?=
+ =?utf-8?B?M1pLcDVYS2p2eGJwQnNxK3ByaCtpZXRaUUJ3MXBxdmp1Vi9XTEd0VDdtOEpw?=
+ =?utf-8?B?ZVk4bzJ2eSswQUhjVmcxL3BvWnBRN3ZMMXVuS0JXbTdNMEpPY0phTXZTQjBE?=
+ =?utf-8?B?R05US3pyTUtXYko2eUQ1YVZ1K3hNT3FjSjNNVUVxM08xQlFRSEE4VGJRZDBS?=
+ =?utf-8?B?aFJoMHNDM2Vjd2oxMVlPTEttZE42QjRVWEtrelhmWGNvTTV3R2FMZ2pPRHVp?=
+ =?utf-8?B?dW1weDhWYXFuYkhWQTFZVDhhT3RmaUdpd09NdVYxZkNkZnNZanZNMnVIeHEv?=
+ =?utf-8?B?aUtJYWJFeEJ1SWNDTHhVK1I0SHZMUTJWL042Rm1YTCtsdVVrMXcyVGgrRVcw?=
+ =?utf-8?B?MjVwaE5zRTg2bjI5UnJFdlhldTlIZU9jbHBOYTF0QjZWTHd0ZXFLOHpUb3Vq?=
+ =?utf-8?B?MzlxYUFHNzhUSmp6ZUlmd3N0OXNQdGg1L2g2Uy9hTnM2eFRKUmxwaGIrY2Qv?=
+ =?utf-8?B?NzlRWDRtbkZ2STFrRjVhOCt1UTg3Q3d3MVg3c3ZmN3Q4MjQzRm01Z1J5UTZX?=
+ =?utf-8?B?Rm9nSVYrZEFzeTErRDVoSkJlY25NU1hrRCswQ3dJV3pGaEU2dHVTQlVxbnho?=
+ =?utf-8?B?MWJzc2hFSVk0Y0tkUzR0YXZjQXZhWk0rcm9TQjFlTzNpU29vT0N5OFNrY3hU?=
+ =?utf-8?B?cHJua3hUb01CZm5IczZJNmMzWnIzZzhsdGY2SDVMWmdRa1RabjVWYW92RDND?=
+ =?utf-8?B?MGVlZmQzUUdWd2pwZzIyNHUxYytzeDhQb2FTSzdCUEJDQkpTcGhxNGFHa2N2?=
+ =?utf-8?B?UmVkTEorMm01bk9HbmxIbUh4ZXp6S2RMU3ZqRnJORElTbVZPRUxFay9LMk9z?=
+ =?utf-8?B?aytBNVdTek5VZ1lud1hSZzJWYktCVXU3YmxMRm4vQW0zVFVTZS92VHFFKy95?=
+ =?utf-8?B?YzJuQU1qc0RPbDhTaHUvQXAwN1BVN2JkNEQvSlJSaUM4VmNiakp6QUx2Q0Q0?=
+ =?utf-8?B?dFM1dlR4YklSRmpQZjhvaHJUcWZyQWdPTDVhR0tOMGFXUXpYV3dkS1IzanpV?=
+ =?utf-8?B?dVZ1Zk1JV2xQWndENSs2RENGcVhmLzhKR1NHQWplNW9sS3BaNXRpb0hKZmFv?=
+ =?utf-8?B?QllmWFlqdTYxNzFmMDJXS1ZJTG1yMHVFUjduVEdvZkRjcHR5ZzZrR2kzeE9p?=
+ =?utf-8?B?bGZ4TjY2emhNZiszK3FsdDFocEJUaDVLSlZKemxnWXVFaXMyK253cS9waENI?=
+ =?utf-8?B?MTdKRE5ESG9ocUltWVZsNk90d1pBZWxvQWx4RjJzV2RsVU9KZXVJK1F5U2Ru?=
+ =?utf-8?B?cnltYlJ1ZEhJd3hsaXNrLyttak5yTmc3K2M1VFdsQU05NzZOWUQrdFc3bjNt?=
+ =?utf-8?B?NDZ0YjJMeHhSUG4zY2xSK0ZlTkRCYkFPdmdFbGQ1a2w1Mjc5VkFYUlgreHh5?=
+ =?utf-8?B?dzQ1Skt6clFSdkNTTFJhR3pUNGdHc3VwajZ1NHhySUFUL2xNQ25ocXZWVXY4?=
+ =?utf-8?B?dElybVRmeGVOdS9lUkx6RzBJMFJ0ekN0YTRkWmI3NmZibmovTjdSZEFWci91?=
+ =?utf-8?B?UUVVNGxuSVVIVk1QZHJnUkRYSE9PU2h4NnE1YXZ2bWxKTkJpSGpITFpheCtK?=
+ =?utf-8?B?S1RXT3pLNTJnWEo0b1pxNFRQVW93enZ6RWJQR0pXcFpxdTRYL3k4dDBXQ2pT?=
+ =?utf-8?B?QVlhUHJwYnBlR052SXVZV3d6djYwVTBYbnZXL1JHa2c0TGxVbWZEM2o0bHhP?=
+ =?utf-8?B?L3orMlk4M0V3OTdCSW84eENWNS9jNFZveTFnTS9INHlEZ0RtUjN3a1ZYUm9o?=
+ =?utf-8?B?MlBacGt4MGp1SDlzbFp5c3hyTVdGNmtWaXh0UGtFc2pubkRtYkdHdlAyYllC?=
+ =?utf-8?Q?i0p3gWqcsA1dzawk3PvaFcvrW?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9121202e-5f59-4f08-2943-08da8cb93ce5
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5304.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2022 08:00:44.8115
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hQjFCA2pDQ6x+pzdcbwpdodUZm2RNA94ICqWGgveXYpLK21uX4/o/5WkkEJkhc6bpUt3jxayOH4El+lzweH+pA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4875
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add some basic examples for the definition of cpu topology
-in s390x.
+> * Changes in v7
+> 
+> - Rebased patches over the following patch series
+>   https://lore.kernel.org/all/0-v2-1bd95d72f298+e0e-vfio_pci_priv_jgg@nvidia.com
+>   https://lore.kernel.org/all/0-v1-11d8272dc65a+4bd-vfio_ioctl_split_jgg@nvidia.com
+> 
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- docs/system/s390x/cpu_topology.rst | 88 ++++++++++++++++++++++++++++++
- 1 file changed, 88 insertions(+)
- create mode 100644 docs/system/s390x/cpu_topology.rst
+ This patch series is getting applied cleanly on top of Jason updated patch
+ series as well. 
 
-diff --git a/docs/system/s390x/cpu_topology.rst b/docs/system/s390x/cpu_topology.rst
-new file mode 100644
-index 0000000000..00977d4319
---- /dev/null
-+++ b/docs/system/s390x/cpu_topology.rst
-@@ -0,0 +1,88 @@
-+CPU Topology on s390x
-+=====================
-+
-+CPU Topology on S390x provides up to 4 levels of topology containers:
-+drawers, books, sockets and CPUs.
-+While the three higher level containers, Containers Topology List Entries,
-+(Containers TLE) define a tree hierarchy, the lowest level of topology
-+definition, the CPU Topology List Entry (CPU TLE), provides the placement
-+of the CPUs inside the last container.
-+
-+Prerequisites
-+-------------
-+
-+To use CPU Topology a Linux QEMU/KVM machine providing the CPU Topology facility
-+(STFLE bit 11) is required.
-+
-+However, since this facility has been enabled by default in an early version,
-+the capability ``KVM_CAP_S390_CPU_TOPOLOGY`` is needed to indicate to KVM
-+that QEMU support CPU Topology.
-+
-+Indicating the CPU topology to the Virtual Machine
-+--------------------------------------------------
-+
-+The CPU Topology, number of drawers, number of books per drawers, number of
-+sockets per book and number of cores per sockets is specified with the
-+``-smp`` qemu command arguments.
-+
-+Like in :
-+
-+.. code-block:: sh
-+    -smp cpus=1,drawers=3,books=4,sockets=2,cores=8,maxcpus=192
-+
-+If drawers or books are not specified, their default to 1.
-+
-+New CPUs can be plugged using the device_add hmp command like in:
-+
-+.. code-block:: sh
-+   (qemu) device_add host-s390x-cpu,core-id=9
-+
-+The core-id defines the placement of the core in the topology by
-+starting with core 0 in socket 0, book 0 and drawer 0 up to the maximum
-+core number of the last socket of the last book in the last drawer.
-+
-+In the example above:
-+
-+* the core with ID 9 will be placed in container (0,0,1), as core 9
-+  of CPU TLE 0 of socket 1 in book 0 from drawer 0.
-+* the core ID 0 is defined by the -smp cpus=1 command and will be
-+  placed as core 0 in CPU TLE 0 of container (0,0,0)
-+
-+Note that the core ID is machine wide and the CPU TLE masks provided
-+by the STSI instruction will be:
-+
-+* in socket 0: 0x80000000 (core id 0)
-+* in socket 1: 0x00400000 (core id 9)
-+
-+Indicating the CPU topology to the Guest
-+----------------------------------------
-+
-+The guest can query for topology changes using the PTF instruction.
-+In case of a topology change it can request the new topology by issuing
-+STSI instructions specifying the level of detail required, drawer with
-+STSI(15.1.4) or books STSI(15.1.3).
-+
-+The virtual machine will fill the provided buffer with the count of
-+drawers (MAG4), books per drawer (MAG3), sockets per book (MAG2) and
-+cores per socket (MAG1).
-+
-+Note that the STSI(15.1.2) is special in two ways:
-+
-+* When the firmware detect a change in the values calculated for STSI(15.1.2)
-+  it will trigger the report of the topology change for the PTF instruction.
-+
-+Migration
-+---------
-+
-+For virtio-ccw machines older than s390-virtio-ccw-7.2, CPU Topoogy is
-+by default disabled.
-+
-+CPU Topoogy is by default enabled for s390-virtio-ccw-7.2 and newer machines.
-+
-+Enabling the CPU topology on older Machine is done by setting the global
-+option ''topology-disable'' to false before enabling cpu topology with the
-+cpu feature "ctop" like in:
-+
-+.. code-block:: sh
-+   -machine s390-ccw-virtio-3.0,accel=kvm,topology-disable=false
-+   -cpu z14,ctop=on
--- 
-2.31.1
+ https://lore.kernel.org/all/0-v2-0f9e632d54fb+d6-vfio_ioctl_split_jgg@nvidia.com/
+
+ Thanks,
+ Abhishek
+
+> - Since is_intx() is now static function, so open coded the same
+>   (s/is_intx()/vdev->irq_type == VFIO_PCI_INTX_IRQ_INDEX) and
+>   updated the commit message for the same.
+> - Replaced 'void __user *arg' with
+>   'struct vfio_device_low_power_entry_with_wakeup __user *arg'
+> - Added new device features in sorted order in
+>   vfio_pci_core_ioctl_feature().
 
