@@ -2,92 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D8B65AB4D6
-	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 17:16:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D2855AB4FA
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 17:23:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236572AbiIBPQN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Sep 2022 11:16:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37340 "EHLO
+        id S236413AbiIBPXR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Sep 2022 11:23:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235781AbiIBPPs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Sep 2022 11:15:48 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1ECFC80516
-        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 07:47:44 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1342FED1;
-        Fri,  2 Sep 2022 07:47:50 -0700 (PDT)
-Received: from [10.57.45.3] (unknown [10.57.45.3])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D383F3FA27;
-        Fri,  2 Sep 2022 07:47:41 -0700 (PDT)
-Message-ID: <5413e00f-251f-9d48-9cbb-07742feec87f@arm.com>
-Date:   Fri, 2 Sep 2022 15:47:40 +0100
+        with ESMTP id S235999AbiIBPWv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Sep 2022 11:22:51 -0400
+Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72B11105B42
+        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 07:56:06 -0700 (PDT)
+Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-344fc86d87cso4786347b3.3
+        for <kvm@vger.kernel.org>; Fri, 02 Sep 2022 07:56:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kylehuey.com; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=5puXSXyNPgfcUFe4Jn/d6QN/HZApr6oHFwTb8VmTKrQ=;
+        b=EbhB96vaJrIXiSpbfhJQW1pMsRKRpMrQXkU2bUK86oMObNxFJCfUYPDW4HWXgsgD2C
+         rN4uQJiT23YX9Gzh4baN9GBIt9Pza8RVfgvHzauMvhZGalpH1ognoJ/lCYZmVgnehjuh
+         0fxJT3w01yO7/VqrDXfehzbN9sq3xU80EsKDqFIndwq4ai0JqfaY/yHxDHcMZc2BukqH
+         VaqEERfgEa4oHAWOuZIaWZaOF57M3iZ9Z43JtzdII5yR3wWka11BGSUzHvmrZAD3aa/e
+         c0n/bP/mE1LLkD9DAY6X99BaJFWgJJ5CBhOWKvZ1aqm1kWptB1k7VYZ/rNNm9tC6DtWF
+         oFPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=5puXSXyNPgfcUFe4Jn/d6QN/HZApr6oHFwTb8VmTKrQ=;
+        b=2yqNjjgMuo/s25nFLXIDWm8MTlbreApR4EmicSrQbXkG20SHiVP8uDpPzTQ8M5aH8q
+         2gb0wAPNAsS9CnjNHKrijeSCgVDdkjg9qjlyhDGiGVB/VNnXnXWu0/Etmu/OGF7MoDKd
+         pFqEf28+kYHjwxjzYtL45iv7xdUwV9XE1ALOrUoLuNMjYxxM9/fCAOWhFxzUKL8UMtkd
+         iQLYhOZAflr6qpzd0qddTm+pooHRG9XFV9aTYRe5bTWsbzbl8rENYs7o+I1bFrJgthdG
+         EoXujBfhqicFEsmV2V6M8V2m17SbGU0/kMaRBduFBRp0uajZvjpg3XwTD7D+JucMoyBx
+         E6/w==
+X-Gm-Message-State: ACgBeo1jzLdL5mEzg7ijjxcvM8gfAqZ07p3ohX5w1WAhMXNZd74oe9aH
+        d/YtFzVv0yUaEqWYgJSFiG6q5ODoBes5tpi+N3jkcg==
+X-Google-Smtp-Source: AA6agR7fOH5Hb21ZbPQEF1JrLyxAT8BpwnpyXkscqlvOhS0EBSwiDPA0q3CexQ4xX2zSzVdgSUAh6Z8aFDQPx2zG5Go=
+X-Received: by 2002:a81:1492:0:b0:33d:a446:808f with SMTP id
+ 140-20020a811492000000b0033da446808fmr29480466ywu.159.1662130565590; Fri, 02
+ Sep 2022 07:56:05 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v3 6/7] KVM: arm64: permit all VM_MTE_ALLOWED mappings
- with MTE enabled
-Content-Language: en-GB
-To:     Catalin Marinas <catalin.marinas@arm.com>,
-        Peter Collingbourne <pcc@google.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        Cornelia Huck <cohuck@redhat.com>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Evgenii Stepanov <eugenis@google.com>, kvm@vger.kernel.org,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>
-References: <20220810193033.1090251-1-pcc@google.com>
- <20220810193033.1090251-7-pcc@google.com> <YxII905jjQz0FH4D@arm.com>
-From:   Steven Price <steven.price@arm.com>
-In-Reply-To: <YxII905jjQz0FH4D@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20220829194905.81713-1-khuey@kylehuey.com> <YxDP6jie4cwzZIHp@google.com>
+In-Reply-To: <YxDP6jie4cwzZIHp@google.com>
+From:   Kyle Huey <me@kylehuey.com>
+Date:   Fri, 2 Sep 2022 07:55:51 -0700
+Message-ID: <CAP045Aqc7T8in-MQz0hj4dOZ7TU6oAKuBNFtH57KttZ8Ueng-g@mail.gmail.com>
+Subject: Re: [PATCH v6 1/2] x86/fpu: Allow PKRU to be (once again) written by ptrace.
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Dave Hansen <dave.hansen@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org,
+        "Robert O'Callahan" <robert@ocallahan.org>,
+        David Manouchehri <david.manouchehri@riseup.net>,
+        Borislav Petkov <bp@suse.de>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/09/2022 14:45, Catalin Marinas wrote:
-> On Wed, Aug 10, 2022 at 12:30:32PM -0700, Peter Collingbourne wrote:
->> Certain VMMs such as crosvm have features (e.g. sandboxing) that depend
->> on being able to map guest memory as MAP_SHARED. The current restriction
->> on sharing MAP_SHARED pages with the guest is preventing the use of
->> those features with MTE. Now that the races between tasks concurrently
->> clearing tags on the same page have been fixed, remove this restriction.
->>
->> Signed-off-by: Peter Collingbourne <pcc@google.com>
->> ---
->>  arch/arm64/kvm/mmu.c | 8 --------
->>  1 file changed, 8 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->> index d54be80e31dd..fc65dc20655d 100644
->> --- a/arch/arm64/kvm/mmu.c
->> +++ b/arch/arm64/kvm/mmu.c
->> @@ -1075,14 +1075,6 @@ static void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
->>  
->>  static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
->>  {
->> -	/*
->> -	 * VM_SHARED mappings are not allowed with MTE to avoid races
->> -	 * when updating the PG_mte_tagged page flag, see
->> -	 * sanitise_mte_tags for more details.
->> -	 */
->> -	if (vma->vm_flags & VM_SHARED)
->> -		return false;
-> 
-> I think this is fine with the locking in place (BTW, it may be worth
-> mentioning in the commit message that it's a relaxation of the ABI). I'd
-> like Steven to have a look as well when he gets the time, in case we
-> missed anything on the KVM+MTE side.
-> 
-> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+On Thu, Sep 1, 2022 at 8:29 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Aug 29, 2022, Kyle Huey wrote:
+> > @@ -1246,6 +1246,21 @@ static int copy_uabi_to_xstate(struct fpstate *fpstate, const void *kbuf,
+> >               }
+> >       }
+> >
+> > +     /*
+> > +      * Update the user protection key storage. Allow KVM to
+> > +      * pass in a NULL pkru pointer if the mask bit is unset
+> > +      * for its legacy ABI behavior.
+> > +      */
+> > +     if (pkru)
+> > +             *pkru = 0;
+> > +
+> > +     if (hdr.xfeatures & XFEATURE_MASK_PKRU) {
+> > +             struct pkru_state *xpkru;
+> > +
+> > +             xpkru = __raw_xsave_addr(xsave, XFEATURE_PKRU);
+> > +             *pkru = xpkru->pkru;
+> > +     }
+>
+> What about writing this as:
+>
+>         if (hdr.xfeatures & XFEATURE_MASK_PKRU) {
+>                 ...
+>
+>                 *pkru = xpkru->pkru;
+>         } else if (pkru) {
+>                 *pkru = 0;
+>         }
+>
+> to make it slightly more obvious that @pkru must be non-NULL if the feature flag
+> is enabled?
 
-Looks fine to me, and thanks for doing the work: I was never very
-pleased with the !VM_SHARED restriction, but I couldn't figure a good
-way of getting the locking to work.
+tglx didn't seem to like the branchiness before but maybe he'll change
+his mind since we have to have the `if (pkru)` now anyways.
 
-Reviewed-by: Steven Price <steven.price@arm.com>
+> Or we could be paranoid, though I'm not sure this is worthwhile.
+>
+>         if ((hdr.xfeatures & XFEATURE_MASK_PKRU) &&
+>             !WARN_ON_ONCE(!pkru)) {
+>                 ...
+>
+>                 *pkru = xpkru->pkru;
+>         } else if (pkru) {
+>                 *pkru = 0;
+>         }
+
+I don't feel strongly about this.
+
+> Otherwise, looks good from a KVM perspective.  Thanks!
+
+Great.
+
+- Kyle
