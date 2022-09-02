@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 943095AA610
-	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 04:54:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24DDD5AA613
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 04:56:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233501AbiIBCxz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 22:53:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41892 "EHLO
+        id S234343AbiIBCzA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 22:55:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232291AbiIBCxx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 22:53:53 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAF81A6C5A;
-        Thu,  1 Sep 2022 19:53:52 -0700 (PDT)
+        with ESMTP id S232291AbiIBCy7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 22:54:59 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA76B62FA;
+        Thu,  1 Sep 2022 19:54:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662087232; x=1693623232;
+  t=1662087294; x=1693623294;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=FwyR9hMdl684ayilMVL+6KHSWkdMFizQTJkDzfzj/G4=;
-  b=OkiFNcblbOr30eaIwfPYtRC/gCAKyrXCx1CEV4xFD0Xl//H//M8QKPxF
-   9elB9hqww0JxWQObQv+jJaQ/0uL+Bwf8y2nKp/0OE5rfpPot/jMH16tWk
-   TOgfNsYQsnj3R8Q6xLvaAPsJHDJ++pxtaVVn2e/Yehg+fO9KxHcojRHz2
-   BWUXo49d2FfDq6eg18FU/QAok0dytf8SVYuMqudYTs+3Fd3GcYSOvFxem
-   iLRhTWpccPn7AjxS2rFHbzSdHdb7HKI0paBO3bZaBx20jnrtbf3kerOMo
-   9KTlhIrTXqir2ppjMkKiz0xDc4H8LgljqdjsKb530S9taS80uPbvOi3Ny
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10457"; a="322033562"
+  bh=9V5Af5NNhmEKlxmFRt2MBjjPZeFM+QzghrlRJN9oHkU=;
+  b=YYyqsqfFSjDw7aLVvGd28oEE+qwe9w0vURr18g5iJKbYnwVMNHiXd2cp
+   1JIwed+8I4bQRiy3NKe/YbeEZQeSCxgb068hnQc1kkY2w1EJeZPoLCIYR
+   RFQW5HOc0j4vMhIwBBq7pYsO/7HgHVfUqG/YJa3bxmMqG4IHnCKKnEwCA
+   VT9npGCJx/nL47JrL8dIHMGssUGyZ28+sEb8N4RVF4uzM17bAB2j+uU5Z
+   LRvyW0qKLXCKG2e2HRzCKkyCljRwUwmUi8PdxaLISxvt+IfN5dzcWjB5T
+   FwnRPx5DRcbcppCb3RmlvGmSZRTvHEtLC/crHV4svh6aWBYwSp93Sqm1F
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10457"; a="382178262"
 X-IronPort-AV: E=Sophos;i="5.93,281,1654585200"; 
-   d="scan'208";a="322033562"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 19:53:52 -0700
+   d="scan'208";a="382178262"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 19:54:53 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.93,281,1654585200"; 
-   d="scan'208";a="642702707"
+   d="scan'208";a="589844411"
 Received: from lkp-server02.sh.intel.com (HELO fccc941c3034) ([10.239.97.151])
-  by orsmga008.jf.intel.com with ESMTP; 01 Sep 2022 19:53:48 -0700
+  by orsmga006.jf.intel.com with ESMTP; 01 Sep 2022 19:54:49 -0700
 Received: from kbuild by fccc941c3034 with local (Exim 4.96)
         (envelope-from <lkp@intel.com>)
-        id 1oTwoW-000035-0j;
-        Fri, 02 Sep 2022 02:53:48 +0000
-Date:   Fri, 2 Sep 2022 10:53:26 +0800
+        id 1oTwpU-00003L-1E;
+        Fri, 02 Sep 2022 02:54:48 +0000
+Date:   Fri, 2 Sep 2022 10:54:16 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Ingo Molnar <mingo@redhat.com>,
@@ -56,16 +56,16 @@ Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
         kvm@vger.kernel.org, Like Xu <like.xu.linux@gmail.com>
 Subject: Re: [PATCH v4 1/5] perf/x86/core: Remove unnecessary stubs provided
  for KVM-only helpers
-Message-ID: <202209021033.bPC3ttgM-lkp@intel.com>
+Message-ID: <202209021001.ubosxpCd-lkp@intel.com>
 References: <20220901173258.925729-2-seanjc@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20220901173258.925729-2-seanjc@google.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -80,7 +80,7 @@ I love your patch! Perhaps something to improve:
 
 url:    https://github.com/intel-lab-lkp/linux/commits/Sean-Christopherson/KVM-x86-Intel-LBR-related-perf-cleanups/20220902-013352
 base:   372d07084593dc7a399bf9bee815711b1fb1bcf2
-config: x86_64-randconfig-a012 (https://download.01.org/0day-ci/archive/20220902/202209021033.bPC3ttgM-lkp@intel.com/config)
+config: x86_64-randconfig-a001 (https://download.01.org/0day-ci/archive/20220902/202209021001.ubosxpCd-lkp@intel.com/config)
 compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project f28c006a5895fc0e329fe15fead81e37457cb1d1)
 reproduce (this is a W=1 build):
         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
