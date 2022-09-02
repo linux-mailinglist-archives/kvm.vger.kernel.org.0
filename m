@@ -2,120 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 066055AA5EE
-	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 04:33:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 888015AA5F8
+	for <lists+kvm@lfdr.de>; Fri,  2 Sep 2022 04:44:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230411AbiIBCdU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 1 Sep 2022 22:33:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37982 "EHLO
+        id S235231AbiIBClM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 1 Sep 2022 22:41:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229602AbiIBCdT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 1 Sep 2022 22:33:19 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B0164BD0A
-        for <kvm@vger.kernel.org>; Thu,  1 Sep 2022 19:33:18 -0700 (PDT)
+        with ESMTP id S234836AbiIBCk6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 1 Sep 2022 22:40:58 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9E6278BE1;
+        Thu,  1 Sep 2022 19:40:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662085998; x=1693621998;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=r8zeg1tyZGMcF3UMzs+ZwZWbgreiiSaM+r6CEBdUuzU=;
-  b=VE30bOt1ja9GQ+BWCay8Bt0Kql46QdoBfkN9ci4WlVMIhFwhbMSf+0EI
-   EX+Zpk+gYjh8oH1P4nJSkabpZj07NsjOi5XH8iT0sr9yXiYjONJG9zb0q
-   Jmq4U7mnr6vb0cvrNoO9obQAj6W4DgokiVNhdB9r8F/hohNOPS/i6b92w
-   RSMqdlnt8IPFyrFol3I1wj4+86kF/KJBXK0/E8gjezPwQJIVA8zIqfNWz
-   wqBqYnQ0VMsQZIPvNxBrAYFck0wNoAXrVi1Sc6JxBiwwDhbs1JojYIbkk
-   /x6hvyBzcjwFWgPrX65JNkoB8jCqCaaJYvLUinzM3JNdIHPUVVhbhUILH
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10457"; a="282862058"
+  t=1662086455; x=1693622455;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=PjoNQgEOAKhe4BaRmT8CU4V28Ymn0nWV4aYU8zY1myk=;
+  b=IkfgfOjAVpaM+aEL+1iEhDS6jYHW6XDTJMwf4zM0KAjuwoHpjv/x2Srs
+   CKB2YRgyh6U732+NMmk/MsWklUlCh8RolLYJU7IsQbY8YKBS9AXofbQGz
+   cuBy8+imPQZtLAOB5s6MUHex+wevQYNvzrVFQmPhkBxcFcePiqPLvtaxs
+   CbP9pdxidcsTodTGUtFdRjZgmSiakjkBwTrDYNzOAHvH5bL5sZSsYzE/Y
+   LT00cNf63pem6u6WXEgVryg7/8TBy8nhLeC0gmwCSAMTr800gLOnrVb9G
+   afMgxVGqDyaN2+CLImMtKtpdId+9Jpo7Hdl5jZp+nf2bJBR5x8G2XOBPa
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10457"; a="322032248"
 X-IronPort-AV: E=Sophos;i="5.93,281,1654585200"; 
-   d="scan'208";a="282862058"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 19:33:17 -0700
+   d="scan'208";a="322032248"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 19:40:55 -0700
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.93,281,1654585200"; 
-   d="scan'208";a="642698192"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.171.28]) ([10.249.171.28])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 19:33:12 -0700
-Message-ID: <a700a0c6-7f25-dc45-4c49-f61709808f29@intel.com>
-Date:   Fri, 2 Sep 2022 10:33:09 +0800
+   d="scan'208";a="755092656"
+Received: from lkp-server02.sh.intel.com (HELO fccc941c3034) ([10.239.97.151])
+  by fmsmga001.fm.intel.com with ESMTP; 01 Sep 2022 19:40:52 -0700
+Received: from kbuild by fccc941c3034 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oTwbv-00001h-0c;
+        Fri, 02 Sep 2022 02:40:47 +0000
+Date:   Fri, 2 Sep 2022 10:39:59 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kbuild-all@lists.01.org, Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Like Xu <like.xu.linux@gmail.com>
+Subject: Re: [PATCH v4 1/5] perf/x86/core: Remove unnecessary stubs provided
+ for KVM-only helpers
+Message-ID: <202209021042.UcDPO3lL-lkp@intel.com>
+References: <20220901173258.925729-2-seanjc@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.13.0
-Subject: Re: [PATCH v1 15/40] i386/tdx: Add property sept-ve-disable for
- tdx-guest object
-Content-Language: en-US
-To:     Gerd Hoffmann <kraxel@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Laszlo Ersek <lersek@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Connor Kuehl <ckuehl@redhat.com>, erdemaktas@google.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org, seanjc@google.com
-References: <20220802074750.2581308-1-xiaoyao.li@intel.com>
- <20220802074750.2581308-16-xiaoyao.li@intel.com>
- <20220825113636.qlqmflxcxemh2lmf@sirius.home.kraxel.org>
- <389a2212-56b8-938b-22e5-24ae2bc73235@intel.com>
- <20220826055711.vbw2oovti2qevzzx@sirius.home.kraxel.org>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20220826055711.vbw2oovti2qevzzx@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220901173258.925729-2-seanjc@google.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/26/2022 1:57 PM, Gerd Hoffmann wrote:
->    Hi,
->   
->> For TD guest kernel, it has its own reason to turn SEPT_VE on or off. E.g.,
->> linux TD guest requires SEPT_VE to be disabled to avoid #VE on syscall gap
->> [1].
-> 
-> Why is that a problem for a TD guest kernel?  Installing exception
-> handlers is done quite early in the boot process, certainly before any
-> userspace code runs.  So I think we should never see a syscall without
-> a #VE handler being installed.  /me is confused.
-> 
-> Or do you want tell me linux has no #VE handler?
+Hi Sean,
 
-The problem is not "no #VE handler" and Linux does have #VE handler. The 
-problem is Linux doesn't want any (or certain) exception occurrence in 
-syscall gap, it's not specific to #VE. Frankly, I don't understand the 
-reason clearly, it's something related to IST used in x86 Linux kernel.
+I love your patch! Perhaps something to improve:
 
->> Frankly speaking, this bit is better to be configured by TD guest
->> kernel, however current TDX architecture makes the design to let VMM
->> configure.
-> 
-> Indeed.  Requiring users to know guest kernel capabilities and manually
-> configuring the vmm accordingly looks fragile to me.
-> 
-> Even better would be to not have that bit in the first place and require
-> TD guests properly handle #VE exceptions.
-> 
->> This can cause problems with the "system call gap": a malicious
->> hypervisor might trigger a #VE for example on the system call entry
->> code, and when a user process does a system call it would trigger a
->> and SYSCALL relies on the kernel code to switch to the kernel stack,
->> this would lead to kernel code running on the ring 3 stack.
-> 
-> Hmm?  Exceptions switch to kernel context too ...
-> 
-> take care,
->    Gerd
-> 
+[auto build test WARNING on 372d07084593dc7a399bf9bee815711b1fb1bcf2]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Sean-Christopherson/KVM-x86-Intel-LBR-related-perf-cleanups/20220902-013352
+base:   372d07084593dc7a399bf9bee815711b1fb1bcf2
+config: i386-randconfig-m021 (https://download.01.org/0day-ci/archive/20220902/202209021042.UcDPO3lL-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-5) 11.3.0
+reproduce (this is a W=1 build):
+        # https://github.com/intel-lab-lkp/linux/commit/b1f1d2f5eb44253f5d059757c03e7fd413b2e306
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Sean-Christopherson/KVM-x86-Intel-LBR-related-perf-cleanups/20220902-013352
+        git checkout b1f1d2f5eb44253f5d059757c03e7fd413b2e306
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash arch/x86/events/
+
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+>> arch/x86/events/core.c:696:31: warning: no previous prototype for 'perf_guest_get_msrs' [-Wmissing-prototypes]
+     696 | struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr, void *data)
+         |                               ^~~~~~~~~~~~~~~~~~~
+
+
+vim +/perf_guest_get_msrs +696 arch/x86/events/core.c
+
+f87ad35d37fa54 arch/x86/kernel/cpu/perf_counter.c Jaswinder Singh Rajput 2009-02-27  695  
+39a4d779546a99 arch/x86/events/core.c             Like Xu                2022-04-11 @696  struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr, void *data)
+abd562df94d19d arch/x86/events/core.c             Like Xu                2021-01-25  697  {
+39a4d779546a99 arch/x86/events/core.c             Like Xu                2022-04-11  698  	return static_call(x86_pmu_guest_get_msrs)(nr, data);
+abd562df94d19d arch/x86/events/core.c             Like Xu                2021-01-25  699  }
+abd562df94d19d arch/x86/events/core.c             Like Xu                2021-01-25  700  EXPORT_SYMBOL_GPL(perf_guest_get_msrs);
+abd562df94d19d arch/x86/events/core.c             Like Xu                2021-01-25  701  
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
