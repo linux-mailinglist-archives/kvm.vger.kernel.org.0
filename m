@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 05DF65ABD3D
-	for <lists+kvm@lfdr.de>; Sat,  3 Sep 2022 07:32:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D9535ABD40
+	for <lists+kvm@lfdr.de>; Sat,  3 Sep 2022 07:38:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231865AbiICFb6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 3 Sep 2022 01:31:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34122 "EHLO
+        id S232106AbiICFiF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 3 Sep 2022 01:38:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231760AbiICFb5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 3 Sep 2022 01:31:57 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB9B342AC3
-        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 22:31:52 -0700 (PDT)
+        with ESMTP id S231535AbiICFiD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 3 Sep 2022 01:38:03 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E36533ECDD
+        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 22:38:02 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 634A7B82E86
-        for <kvm@vger.kernel.org>; Sat,  3 Sep 2022 05:31:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E246CC433C1
-        for <kvm@vger.kernel.org>; Sat,  3 Sep 2022 05:31:49 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 74989B82E50
+        for <kvm@vger.kernel.org>; Sat,  3 Sep 2022 05:38:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 29E4CC433C1
+        for <kvm@vger.kernel.org>; Sat,  3 Sep 2022 05:38:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662183109;
-        bh=qwQuSRSrk8hXY/zVfFODhVss+MAOFE2GU10Cae6il+4=;
+        s=k20201202; t=1662183480;
+        bh=RR+9EiLdHHYDdbfTvMXkw/XmNY/N+okc+UWg+dFtBDw=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=X+PPvdYUp0rkEB7/GQfGCwN0JF6XWViX6VfXzt9D7iBRvrPqZLtT6zGTxTr4Yc5Nv
-         VdeRyqZVvY2QUac+ILekS9+Vx2NJl94+LMgxRmGo3kdRDhaZKYNwlAUH68V9FgwIg7
-         5ITOH7vutx4mZzskmPhqkHvMj30+3zUdMAxALY7iyfkAK9wskVRX+Nons6PHFZN6ES
-         dRrExl01n+0E/trYuM0tFc64Es/7xexAHxY92XvKB5lfSVrG1AvjR9ast85uX2/tG9
-         htGjvtez431OibM6otdDQstdPPPx4U5WHAbEIMbwZlPWNP1nQO4VkNbAbgSu8CUKGI
-         dda+doX2zhaHg==
+        b=dqeSbF4nM5eobkuwMfY4BsX9oSQrM2Zixe0mSYEovxBGdwnWwjatGs6qJopcqflUS
+         gRt/wQ6u5YRQDyLlnfEjaQFUXqdGwC/4x4ahs71Sr56SB7krujexiLxcYThYEJhPIZ
+         N3Pb/Fgld+6M8GSWS+mNpwGFyXHpsTHRcMklaEx4z68QEozq8f83K2fQMXrH0ZVZES
+         0kLb1/CyC+wv91tfOTE+vx7cvQmOYbtpRS/YRWXkKtqYEVigWQLoGurKUXUj48iGLo
+         qpsXC3RT9ER+8gZt2xSqsKcE37mmJPFpvRVdKRfVJgbCinqIDZalOaHxi6uklzowzi
+         QzAbVgdv4n5Mg==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id CB698C433E9; Sat,  3 Sep 2022 05:31:49 +0000 (UTC)
+        id 13DA8C433E9; Sat,  3 Sep 2022 05:38:00 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     kvm@vger.kernel.org
 Subject: [Bug 216388] On Host, kernel errors in KVM, on guests, it shows CPU
  stalls
-Date:   Sat, 03 Sep 2022 05:31:49 +0000
+Date:   Sat, 03 Sep 2022 05:37:59 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -53,7 +53,7 @@ X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216388-28872-upGr2JMvDG@https.bugzilla.kernel.org/>
+Message-ID: <bug-216388-28872-i1w5cFfw4N@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-216388-28872@https.bugzilla.kernel.org/>
 References: <bug-216388-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -73,10 +73,16 @@ X-Mailing-List: kvm@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D216388
 
---- Comment #14 from Robert Dinse (nanook@eskimo.com) ---
-Ok, with 5.18.19 no rcu sched detected expedited stalls so this is definite=
-ly
-something that broke between 5.18.19 and 5.19.0.
+--- Comment #15 from Robert Dinse (nanook@eskimo.com) ---
+Please forgive my lack of knowledge regarding git, but is there a way to ge=
+t a
+patch that took the kernel from 5.18.19 to 5.19.0 now that earlier releases=
+ of
+5.19.x are not on the kernel.org site?  I know there is a patch that goes f=
+rom
+5.18.19 to 5.19.6 and one that goes 5.19.5 to 5.19.6 but I just want to loo=
+k at
+the changes between 5.18.19 and 5.19.0.
 
 --=20
 You may reply to this email to add a comment.
