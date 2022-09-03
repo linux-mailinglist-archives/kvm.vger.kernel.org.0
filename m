@@ -2,60 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BE2D5ABC3B
-	for <lists+kvm@lfdr.de>; Sat,  3 Sep 2022 04:09:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E81E5ABCFF
+	for <lists+kvm@lfdr.de>; Sat,  3 Sep 2022 06:25:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230497AbiICCIz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Sep 2022 22:08:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51732 "EHLO
+        id S231771AbiICEZo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 3 Sep 2022 00:25:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229586AbiICCIy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Sep 2022 22:08:54 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14D18DDA95
-        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 19:08:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662170933; x=1693706933;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=6xtOLqXqd8GvWxixUYw/zzoGXEOLCX2SAkKJ5n5Xwaw=;
-  b=FuQVkMKNy+pC2Bp9RzudeSS4IR/rKYeFJJjNSVCnNekGTPI6e7daxcEN
-   rhfrWgbPBYq5xl4iAfL1xGTi9BCCSvMpqNYVEtI1nYgzSGPTpb5SGslgF
-   ztZWiLXnIf0B72+ek6AB0UP86HWMGVfs3GnpzeWP3T6YAaA3xKyWrBPNT
-   PNqdwFJMnGCUlaZChK0XqmjVvd+JYlyW92NCFS2Y+KBGuQ1hjJJlcgFwf
-   awMN22EGYZ0SIOxSRaWx3QRGCt3WVOez4XEgy02e8vHIn1bS0yqRYhLOw
-   i5uH+R6uwhgBfVZOESedNSzZt/wxrbh2g9COLvLrGAedLGk3hyLIpxMRW
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10458"; a="283110154"
-X-IronPort-AV: E=Sophos;i="5.93,286,1654585200"; 
-   d="scan'208";a="283110154"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2022 19:08:52 -0700
-X-IronPort-AV: E=Sophos;i="5.93,286,1654585200"; 
-   d="scan'208";a="674584065"
-Received: from tjulien-mobl2.amr.corp.intel.com (HELO desk) ([10.212.29.154])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2022 19:08:51 -0700
-Date:   Fri, 2 Sep 2022 19:08:48 -0700
-From:   Pawan Gupta <pawan.kumar.gupta@intel.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Chao Gao <chao.gao@intel.com>, chen.zhang@intel.com,
-        kvm list <kvm@vger.kernel.org>
-Subject: Re: BHB-clearing on VM-exit
-Message-ID: <20220903020848.dianw7rfiit6s2hn@desk>
-References: <CALMp9eRp-cH6=trNby3EY6+ynD6F-AWiThBHiSF8_sgL2UWnkA@mail.gmail.com>
- <Yw8aK9O2C+38ShCC@gao-cwp>
- <20220901174606.x2ml5tve266or5ap@desk>
- <CALMp9eRaq_p2PusavHy8a4YEx2fQrxESdpPQ_8bySqrv61ub=Q@mail.gmail.com>
- <20220902191441.bbjfvniy5cpefg3a@desk>
- <CALMp9eTAedQDHe8FQN1TvQgSxO4+2Sb-fB6FDCBh3gKMUe449A@mail.gmail.com>
+        with ESMTP id S231379AbiICEZk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 3 Sep 2022 00:25:40 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DD965A839;
+        Fri,  2 Sep 2022 21:25:35 -0700 (PDT)
+Received: from nazgul.tnic (unknown [84.201.196.28])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C01E61EC068C;
+        Sat,  3 Sep 2022 06:25:29 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1662179130;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=cILi3ulN4h0esV4R0edMz4d5K0tcHaTNQdqgVhyueKM=;
+        b=WXud4SwwHkgdUyiAqC/b9msDoRNUkhsyOUo3N56q5FJ98v5KT631TCoPJkTr3eLY5eh4Up
+        FUv42ZFn1PLxV42bfm+scUQFbWFC0VhZuEvVKUTyBJq/lMlLWJTIMlmJvACBkVLnpMF5W2
+        RV2UNgUzUubifiPlvLexG1fAzluNPBQ=
+Date:   Sat, 3 Sep 2022 06:25:36 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
+Cc:     "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "jroedel@suse.de" <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "slp@redhat.com" <slp@redhat.com>,
+        "pgonda@google.com" <pgonda@google.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "srinivas.pandruvada@linux.intel.com" 
+        <srinivas.pandruvada@linux.intel.com>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
+        "tobin@ibm.com" <tobin@ibm.com>,
+        "Roth, Michael" <Michael.Roth@amd.com>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "marcorr@google.com" <marcorr@google.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "alpergun@google.com" <alpergun@google.com>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>
+Subject: Re: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
+ fault for user address
+Message-ID: <YxLXJk36EKxldC1S@nazgul.tnic>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
+ <YvKRjxgipxLSNCLe@zn.tnic>
+ <SN6PR12MB2767322F8C573EDFA1C20AD78E659@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <YvN9bKQ0XtUVJE7z@zn.tnic>
+ <SN6PR12MB2767A87F12B8E704EB80CC458E659@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <SN6PR12MB27672B74D1A6A6E920F364A78E7B9@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <YxGoBzOFT+sfwr4w@nazgul.tnic>
+ <SN6PR12MB2767E95BA3A99A6263F1F9AE8E7A9@SN6PR12MB2767.namprd12.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CALMp9eTAedQDHe8FQN1TvQgSxO4+2Sb-fB6FDCBh3gKMUe449A@mail.gmail.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+In-Reply-To: <SN6PR12MB2767E95BA3A99A6263F1F9AE8E7A9@SN6PR12MB2767.namprd12.prod.outlook.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -63,51 +93,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 02, 2022 at 12:35:13PM -0700, Jim Mattson wrote:
-> On Fri, Sep 2, 2022 at 12:14 PM Pawan Gupta <pawan.kumar.gupta@intel.com> wrote:
-> 
-> > It may be possible to use shared BHB to influence the choice of indirect
-> > targets, but there are other requirements that needs to be satisfied
-> > such as:
-> >  - Finding a disclosure gadget.
-> 
-> Gadgets abound, and there are tools to find them, if the attacker has
-> the victim binary.
+On Fri, Sep 02, 2022 at 03:33:20PM +0000, Kalra, Ashish wrote:
+> Yes we want to map the faulting address to a RMP entry, but hugepage
+> entries in RMP table are basically subpage 4K entries. So it is a 4K
+> entry when the page is a 2M one and also a 4K entry when the page is a
+> 1G one.
 
-Agree.
+Wait, what?!
 
-> >  - Controlling register inputs to the gadget.
-> 
-> This is non-trivial, since kvm clears GPRs on VM-exit. However, an
-> attacker can look for calls to kvm_read_register() or similar places
-> where kvm loads elements of guest state. The instruction emulator and
-> local APIC emulation both seem like promising targets.
+APM v2 section "15.36.11 Large Page Management" and PSMASH are then for
+what exactly?
 
-Those "elements of guest state" needs to also survive till the desired
-indirect-branch site, it could be possible.
+> That's why the computation to get a 4K page index within a 2M/1G
+> hugepage mapping is required.
 
-> >  - Injecting the disclosure gadget in the predictors before it can be
-> >    transiently executed.
-> 
-> IIUC, the gadget has to already be an indirect branch target that can
-> be exercised by some guest action (e.g. writing to a specific x2APIC
-> MSR). Is that correct?
+What if a guest RMP-faults on a 2M page and there's a corresponding 2M
+RMP entry? What do you need the 4K entry then for?
 
-That is correct.
+Hell, __snp_lookup_rmpentry() even tries to return the proper page
+level...
 
-> >  - Finding an appropriate indirect-branch site after VM-exit, and before
-> >    BHB is overwritten.
-> 
-> Is it the case that the RIP of the victim indirect branch has to alias
-> to the RIP of the "training branch" above in the predictors?
+/me looks in disbelief in your direction...
 
-No, its due to collision in history based predictors that account for
-branch history + RIP.
+Thx.
 
-> Presumably, guest influence diminishes after every branch, even before
-> the BHB is completely overwritten.
+-- 
+Regards/Gruss,
+    Boris.
 
-That is true, with every taken-branch the guest control diminishes.
-
-Thanks,
-Pawan
+https://people.kernel.org/tglx/notes-about-netiquette
