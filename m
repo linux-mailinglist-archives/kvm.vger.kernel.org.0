@@ -2,104 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 329E75ABBC5
-	for <lists+kvm@lfdr.de>; Sat,  3 Sep 2022 02:33:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F00F15ABC0A
+	for <lists+kvm@lfdr.de>; Sat,  3 Sep 2022 03:29:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231646AbiICAZn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Sep 2022 20:25:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54202 "EHLO
+        id S230515AbiICB3J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Sep 2022 21:29:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231690AbiICAZB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Sep 2022 20:25:01 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2443B112EC8
-        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 17:23:58 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id h12-20020a170902f54c00b0016f8858ce9bso2108776plf.9
-        for <kvm@vger.kernel.org>; Fri, 02 Sep 2022 17:23:58 -0700 (PDT)
+        with ESMTP id S230325AbiICB3I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Sep 2022 21:29:08 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0892AEF01D
+        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 18:29:07 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id by13-20020a056a00400d00b0052ec5a1cd4dso1782830pfb.21
+        for <kvm@vger.kernel.org>; Fri, 02 Sep 2022 18:29:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date;
-        bh=yq8rKHnlAx/4DWABYX1mFX9uFU/+PCTlIPB312439UQ=;
-        b=TKFhg3LAJMrV16A/4dAGF27lXzJUSFetR+f3A80VfApjg2+P9tJXoDm6Z4U9IUeY30
-         8jYY5yBOQWSFVC4BZ8MG9yoVBTSaBi7zNiArYlzrQLsEVTNjAzJVGoZr1Jl4sRa/1U/9
-         +VTq3+oQ/it6ZH+V3BCoPWC+XRGMG2N7F7hTW+vz6yq0GaP5GcqC+Io0VDVELUt/ntC7
-         MFlXLZEQpFQuO1akDGR9LdSbdY/5kt4hqBh6wmak0PO0cNrqVz1wyIsuPlvI7rwQX8oF
-         KNf3vHYei0aZVGJgxZer2NGpWwoFt4lToHld1QfOSsl48RHmZpkn5Ho8BnKridvsT9d5
-         zxHQ==
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date;
+        bh=zLFYPEVszfNpW6dCutbkzHT/LYTZJZBJHTuaDoaj/cE=;
+        b=jduT6xdjGBEpUaZZI4/ZP9lwMs8afG7T8AbeScf86NEDtTl3FPIPdc5ZefkA3jIrDj
+         Bwb3/DP5hlGZY0WU3YZpC5AglW3nbor5Zb/S961uBOb3PUmk7Udw1GQ54mX1dNwk2jPI
+         noQNbXLcB4uoecphVEXOx8qyF64OLSPdkp5kRKQ40qZtBN9TNL8jJOLNR5Qj1qWQf22C
+         VZf2Oer2GQYEIYNZQgsTsx8MKpiIT0bwQfRO4eB4SchDYHhXAng2I65osVf2BG7qAN7I
+         PaEOhkYpuXWewR8O1cB7p9EM3Jjvlow8cWj5mMfdLwCu8QGWMEC+jR2eMfeJ2zXg6bmN
+         VquQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date;
-        bh=yq8rKHnlAx/4DWABYX1mFX9uFU/+PCTlIPB312439UQ=;
-        b=FqQDVSLjz5WXjVD3vX80yRleGnivaOH0PksdKW11lAWBRW1HBfL+s5YnEpq1ASkfIc
-         tZXJE0sh2VARxEbPFoDTqXn/Aca5l6er36ssiqfr7VtUFCIF/VXcslC12KjVRT9iDrpf
-         pfiXvpFJBKH39WafzCOMHQOJ9CUvNwZacXDfvru+VXwOtN1GG1q8xlo0LIBX0wxc3IA4
-         xVPY/7UvfdfZut3WnHUTtia74pAdYLIKQVJiayAaYiNbHrUWJA9JJrwT4AIlb3k8+YRz
-         /Bft5rLs2JkJiJ3FtWKXt1oufRIYJSeZc4HC5+PflU3Y08QsuY+eI419g/Uz/bxXlKCq
-         RFAQ==
-X-Gm-Message-State: ACgBeo2dNoaT+4bBUzeRR4Jp3b0blgrP/lmddACIdJrFegWXagEqwCuG
-        kKksA224TAplgQHy9owgcRpkHSloZWE=
-X-Google-Smtp-Source: AA6agR4Bc9TlcFnkBSJ7Ifwme04Amv5NR4xxJxrKUpqAqHbGDTd3OghEmb9cnpUzT3+MkQMR6v4nBPcxnmk=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:150e:b0:537:e2f5:dc87 with SMTP id
- q14-20020a056a00150e00b00537e2f5dc87mr34332719pfu.44.1662164617809; Fri, 02
- Sep 2022 17:23:37 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat,  3 Sep 2022 00:22:54 +0000
-In-Reply-To: <20220903002254.2411750-1-seanjc@google.com>
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=zLFYPEVszfNpW6dCutbkzHT/LYTZJZBJHTuaDoaj/cE=;
+        b=A2ypETp5KyAIdHyKhfV/lGWjXsT23AhjHx7mj7wxx3/rgg6YxM95zk2GEKZPpJTHDM
+         O0w4To/cX/nKiiROmAx1L6G/5uXM/ywm12BaBcPqAGmvyoTT/k6JSkzHJM3XnzH0ybvU
+         8+29JYGSQXX8ZTl/9qNKD0hiLj/eczG1WDxAWZazbmu5Xm4vB8masbkCIxlyFDVfcs6z
+         vKxhzaLwBTMpEb5U8Y78GCrrjlg10FNczVo66lDbX22hm7Dem4w0rlyS1TsgoVKH9p0k
+         h6pTKuqwvUHzHQYAtzFTC3hKo17zCGaEmuZQghioDsnNtOSSm+2dlLOjOeQgh+YUZa7/
+         9Rdg==
+X-Gm-Message-State: ACgBeo1MiOz14U0A/ezJqsbQa4gmo3WbaG5f460svMD5OY3rlQV6VS0X
+        KWifsit5HNTmZriB2JE/OWOV4hQg2zuPCteY
+X-Google-Smtp-Source: AA6agR66rzFlSrfpXOBJSYUMRES0YBW3NRHNhBL90Jx4+4OKfXFQ2RxhLBsioUbgHaLkY0WBRQnAVizY/BrawuDR
+X-Received: from vannapurve2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:41f8])
+ (user=vannapurve job=sendgmr) by 2002:a62:27c1:0:b0:536:32d2:d098 with SMTP
+ id n184-20020a6227c1000000b0053632d2d098mr39234197pfn.63.1662168546414; Fri,
+ 02 Sep 2022 18:29:06 -0700 (PDT)
+Date:   Sat,  3 Sep 2022 01:28:44 +0000
 Mime-Version: 1.0
-References: <20220903002254.2411750-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.2.789.g6183377224-goog
-Message-ID: <20220903002254.2411750-24-seanjc@google.com>
-Subject: [PATCH v2 23/23] Revert "KVM: SVM: Do not throw warning when calling
- avic_vcpu_load on a running vcpu"
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Li RongQing <lirongqing@baidu.com>
+Message-ID: <20220903012849.938069-1-vannapurve@google.com>
+Subject: [V1 PATCH 0/5] Execute hypercalls from guests according to cpu type
+From:   Vishal Annapurve <vannapurve@google.com>
+To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     pbonzini@redhat.com, shuah@kernel.org, bgardon@google.com,
+        seanjc@google.com, oupton@google.com, peterx@redhat.com,
+        vkuznets@redhat.com, drjones@redhat.com, dmatlack@google.com,
+        Vishal Annapurve <vannapurve@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Turns out that some warnings exist for good reasons.  Restore the warning
-in avic_vcpu_load() that guards against calling avic_vcpu_load() on a
-running vCPU now that KVM avoids doing so when switching between x2APIC
-and xAPIC.  The entire point of the WARN is to highlight that KVM should
-not be reloading an AVIC.
+This series is posted in context of the discussion at:
+https://lore.kernel.org/lkml/Ywa9T+jKUpaHLu%2Fl@google.com/
 
-Opportunistically convert the WARN_ON() to WARN_ON_ONCE() to avoid
-spamming the kernel if it does fire.
+Major changes:
+1) Move common startup logic to a single common main function in
+kvm_util.c
+2) Introduce following APIs:
+	kvm_arch_main: to perform arch specific common startup.
+	kvm_post_vm_load: to update the guest memory state to convey
+		common information to guests.
+3) For x86, capture cpu type at startup and pass on the cpu type to
+guest after guest elf is loaded.
+4) Execute hypercall instruction from within guest VMs according to the
+cpu type. This will help prevent an extra kvm exit during hypercall
+execution.
 
-This reverts commit c0caeee65af3944b7b8abbf566e7cc1fae15c775.
+Vishal Annapurve (5):
+  selftests: kvm: move common startup logic to kvm_util.c
+  selftests: kvm: Introduce kvm_arch_main and helpers
+  selftests: kvm: x86: Execute vmcall/vmmcall according to CPU type
+  selftests: kvm: delete svm_vmcall_test
+  selftests: kvm: Execute vmcall/vmmcall as per cpu type
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/avic.c | 1 +
- 1 file changed, 1 insertion(+)
+ tools/testing/selftests/kvm/.gitignore        |  1 -
+ .../selftests/kvm/aarch64/arch_timer.c        |  5 +-
+ .../selftests/kvm/aarch64/debug-exceptions.c  |  2 +-
+ .../selftests/kvm/aarch64/get-reg-list.c      |  2 +-
+ .../selftests/kvm/aarch64/hypercalls.c        |  4 +-
+ .../testing/selftests/kvm/aarch64/psci_test.c |  2 +-
+ .../selftests/kvm/aarch64/vcpu_width_config.c |  2 +-
+ .../testing/selftests/kvm/aarch64/vgic_init.c |  2 +-
+ .../testing/selftests/kvm/aarch64/vgic_irq.c  |  5 +-
+ .../selftests/kvm/access_tracking_perf_test.c |  4 +-
+ .../selftests/kvm/demand_paging_test.c        |  7 +-
+ .../selftests/kvm/dirty_log_perf_test.c       |  4 +-
+ tools/testing/selftests/kvm/dirty_log_test.c  |  4 +-
+ .../selftests/kvm/hardware_disable_test.c     |  2 +-
+ .../selftests/kvm/include/kvm_util_base.h     | 15 ++++
+ .../selftests/kvm/include/x86_64/processor.h  | 10 +++
+ .../selftests/kvm/include/x86_64/vmx.h        |  9 ---
+ .../selftests/kvm/kvm_binary_stats_test.c     |  3 +-
+ .../selftests/kvm/kvm_create_max_vcpus.c      |  4 +-
+ .../selftests/kvm/kvm_page_table_test.c       |  4 +-
+ .../selftests/kvm/lib/aarch64/processor.c     |  8 ++
+ tools/testing/selftests/kvm/lib/elf.c         |  2 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 12 +++
+ .../selftests/kvm/lib/riscv/processor.c       |  8 ++
+ .../selftests/kvm/lib/s390x/processor.c       |  8 ++
+ tools/testing/selftests/kvm/lib/sparsebit.c   |  2 +-
+ .../selftests/kvm/lib/x86_64/perf_test_util.c |  2 +-
+ .../selftests/kvm/lib/x86_64/processor.c      | 38 +++++++++-
+ .../selftests/kvm/max_guest_memory_test.c     |  2 +-
+ .../kvm/memslot_modification_stress_test.c    |  4 +-
+ .../testing/selftests/kvm/memslot_perf_test.c |  9 +--
+ tools/testing/selftests/kvm/rseq_test.c       |  7 +-
+ tools/testing/selftests/kvm/s390x/memop.c     |  4 +-
+ tools/testing/selftests/kvm/s390x/resets.c    |  4 +-
+ .../selftests/kvm/s390x/sync_regs_test.c      |  5 +-
+ tools/testing/selftests/kvm/s390x/tprot.c     |  2 +-
+ .../selftests/kvm/set_memory_region_test.c    |  7 +-
+ tools/testing/selftests/kvm/steal_time.c      |  4 +-
+ .../kvm/system_counter_offset_test.c          |  2 +-
+ tools/testing/selftests/kvm/x86_64/amx_test.c |  2 +-
+ .../testing/selftests/kvm/x86_64/cpuid_test.c |  2 +-
+ .../kvm/x86_64/cr4_cpuid_sync_test.c          |  6 +-
+ .../testing/selftests/kvm/x86_64/debug_regs.c |  4 +-
+ .../kvm/x86_64/emulator_error_test.c          |  7 +-
+ .../testing/selftests/kvm/x86_64/evmcs_test.c |  2 +-
+ .../selftests/kvm/x86_64/fix_hypercall_test.c |  2 +-
+ .../kvm/x86_64/get_msr_index_features.c       |  2 +-
+ .../selftests/kvm/x86_64/hyperv_clock.c       |  2 +-
+ .../selftests/kvm/x86_64/hyperv_cpuid.c       |  7 +-
+ .../selftests/kvm/x86_64/hyperv_features.c    |  2 +-
+ .../selftests/kvm/x86_64/hyperv_svm_test.c    |  2 +-
+ .../selftests/kvm/x86_64/kvm_clock_test.c     |  2 +-
+ .../selftests/kvm/x86_64/kvm_pv_test.c        |  2 +-
+ .../kvm/x86_64/max_vcpuid_cap_test.c          |  3 +-
+ .../selftests/kvm/x86_64/mmio_warning_test.c  |  4 +-
+ .../selftests/kvm/x86_64/monitor_mwait_test.c |  3 +-
+ .../selftests/kvm/x86_64/nx_huge_pages_test.c |  4 +-
+ .../selftests/kvm/x86_64/platform_info_test.c |  7 +-
+ .../kvm/x86_64/pmu_event_filter_test.c        |  7 +-
+ .../selftests/kvm/x86_64/set_boot_cpu_id.c    |  2 +-
+ .../selftests/kvm/x86_64/set_sregs_test.c     |  7 +-
+ .../selftests/kvm/x86_64/sev_migrate_tests.c  |  3 +-
+ tools/testing/selftests/kvm/x86_64/smm_test.c |  4 +-
+ .../testing/selftests/kvm/x86_64/state_test.c | 10 +--
+ .../selftests/kvm/x86_64/svm_int_ctl_test.c   |  3 +-
+ .../kvm/x86_64/svm_nested_soft_inject_test.c  |  7 +-
+ .../selftests/kvm/x86_64/svm_vmcall_test.c    | 74 -------------------
+ .../selftests/kvm/x86_64/sync_regs_test.c     |  7 +-
+ .../kvm/x86_64/triple_fault_event_test.c      |  2 +-
+ .../selftests/kvm/x86_64/tsc_msrs_test.c      |  4 +-
+ .../selftests/kvm/x86_64/tsc_scaling_sync.c   |  3 +-
+ .../kvm/x86_64/ucna_injection_test.c          |  2 +-
+ .../selftests/kvm/x86_64/userspace_io_test.c  |  6 +-
+ .../kvm/x86_64/userspace_msr_exit_test.c      |  7 +-
+ .../kvm/x86_64/vmx_apic_access_test.c         |  5 +-
+ .../kvm/x86_64/vmx_close_while_nested_test.c  |  2 +-
+ .../selftests/kvm/x86_64/vmx_dirty_log_test.c |  4 +-
+ .../vmx_exception_with_invalid_guest_state.c  |  2 +-
+ .../x86_64/vmx_invalid_nested_guest_state.c   |  2 +-
+ .../selftests/kvm/x86_64/vmx_msrs_test.c      |  2 +-
+ .../kvm/x86_64/vmx_nested_tsc_scaling_test.c  |  5 +-
+ .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  |  2 +-
+ .../kvm/x86_64/vmx_preemption_timer_test.c    |  4 +-
+ .../kvm/x86_64/vmx_set_nested_state_test.c    |  3 +-
+ .../kvm/x86_64/vmx_tsc_adjust_test.c          |  5 +-
+ .../selftests/kvm/x86_64/xapic_ipi_test.c     |  4 +-
+ .../selftests/kvm/x86_64/xapic_state_test.c   |  2 +-
+ .../selftests/kvm/x86_64/xen_shinfo_test.c    | 67 +++++++----------
+ .../selftests/kvm/x86_64/xen_vmcall_test.c    | 17 +++--
+ .../selftests/kvm/x86_64/xss_msr_test.c       |  2 +-
+ 90 files changed, 223 insertions(+), 339 deletions(-)
+ delete mode 100644 tools/testing/selftests/kvm/x86_64/svm_vmcall_test.c
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 17c78051f3ea..a13279205df3 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -1064,6 +1064,7 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 		return;
- 
- 	entry = READ_ONCE(*(svm->avic_physical_id_cache));
-+	WARN_ON_ONCE(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK);
- 
- 	entry &= ~AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK;
- 	entry |= (h_physical_id & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK);
 -- 
 2.37.2.789.g6183377224-goog
 
