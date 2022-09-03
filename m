@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 61C145ABBB2
-	for <lists+kvm@lfdr.de>; Sat,  3 Sep 2022 02:33:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C066A5ABBBA
+	for <lists+kvm@lfdr.de>; Sat,  3 Sep 2022 02:33:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231238AbiICAXE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 2 Sep 2022 20:23:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53520 "EHLO
+        id S231280AbiICAXH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 2 Sep 2022 20:23:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231217AbiICAXC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 2 Sep 2022 20:23:02 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5370FF63D1
-        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 17:23:01 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id r13-20020a17090a454d00b001f04dfc6195so1709981pjm.2
-        for <kvm@vger.kernel.org>; Fri, 02 Sep 2022 17:23:01 -0700 (PDT)
+        with ESMTP id S230163AbiICAXD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 2 Sep 2022 20:23:03 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25477F63D7
+        for <kvm@vger.kernel.org>; Fri,  2 Sep 2022 17:23:03 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id q7-20020a63e947000000b004297f1e1f86so1876787pgj.12
+        for <kvm@vger.kernel.org>; Fri, 02 Sep 2022 17:23:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date;
-        bh=H/HByp3PJRruswmtBIPALL6gkH9l79nKV7vcOC9XVxY=;
-        b=XOeXnIfKKWrhWxYJPMhiMqXpVXJ3ObDoI8TdggVIQBpsN4K7qSeFXajmY9O2iBTx1w
-         L8lWlNa1T4AhcE1QV5rKSkfbco2RA0SYCndpTR1CCAteGce251GlAlOPWA2fPHK5ogyR
-         okE4b7f9Eo6DSsCJn5+UyZj3wed8oBAZDnoKGRPKNb/bETmW0pGFie/2OwPvhtME++nG
-         qO61P75YrK5vzJBnTWfQoEcpCJoh2NksjeHN7m9yY3gzIuAbB05/9jv8+Uz79cOZucZj
-         qzW8frIU5J/ReHS6by3eUjEGUQNxkSco1HrwZH33OE8hAtce9untgMSPH6eUq4TXhYTR
-         BxGA==
+        bh=PIDwOUCtBewPHDMb4tVnQLyazdcuUyhDknKis4oP5e8=;
+        b=b26qyh04/+cVHoGaCuXAqwfdfxKioKFeVh+lEW/sxDvmCTO3oJmQMLOMgwljALZBsD
+         FkreDci/td/b1kRcO0MrT91dOY0G2C7HdUrjl3OuGNSQNupfaqWxDJ1yqXRCs7ZSrQMK
+         0pJc/1N94lJJtFkXyrDq5C5+VgB/hFB3pyO2vh6Ke/KEijK7zzdp/upEqeBhKF56MwKE
+         NZoLhOnkS1Uk2aT34zv2+SYjCHz4SPgYrJfFkrmrRT/SX9Lnp5aAt0vN7/pAukCI/sMW
+         GvtL2RswZWw+4y3y55nOthTlNDXetxJviFpHoNwQkcO5cLiocnE6UYkq08ei5lETSpTa
+         UzEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date;
-        bh=H/HByp3PJRruswmtBIPALL6gkH9l79nKV7vcOC9XVxY=;
-        b=AeIBDudiePhnt2ttE4Tuu/edF+yOuoRA0LxpcRvW8cq2gNbrW7ytrftDE900u4rpUb
-         xPoNNftdB3ITG2+mprNZRcbnV/9Zg0j+iUbgJbWkPKx1Q6g9hTS1zm3OaaK7+PuMt3Hz
-         JjQW4GR7jzWUz3velCSwZVQgvD02bvLYaVAnhZRjlT4itm3kxy7gABworLrz++NnaVjx
-         t/AtdWRI5zt4QBsjAFn7HcNKY4NMPj3dxJJnfGrMM0nOLQ0vB99rUqzuBVXTdPWJb08a
-         8lkz3eqBkjnfIlrGkMna6CjIwMcPRRtLbMgWnpyvULuRx7YwAsX7ryVWMTGy2cG88azs
-         jIvQ==
-X-Gm-Message-State: ACgBeo3EYNDTBDdSOyYbxb9R2Rzxirqscnpzgl0rFRRf25Qq4EuHOD1Q
-        a5aJVNcrXzcMaJetYNudFHjk+GK33ZI=
-X-Google-Smtp-Source: AA6agR6tsfbR4JIT0tPkHJv92x9iGIm8/9fcY4kKjNcPaJLqPI9czTbJYO3Y65Jvu7K4ZPdA3Iv08+oKkp8=
+        bh=PIDwOUCtBewPHDMb4tVnQLyazdcuUyhDknKis4oP5e8=;
+        b=pXVWIVHvZyRhb/YAUbV0wEJ5LDBKMbDL+56ts9qZR4QD7kfWXkE20xZfr4yY3gHEeE
+         vDrlTx2o+KwU0Nhyp8XeoSctZlxLv7vnuiFAQM9Lrl5Hq1a0X+Z2OcC5IAR8BGDto5lB
+         rGA2HOwlVwps8/DdfWRXRfo5aGhOq7rL2M16mev4hmLpoJ9N10uVYU/cgcIZZkZLPXSh
+         VdlordlAICoKqfEmgtJELVu71A33JHC/KNrnQBV5d/jpBZJb5p+bxtQWAEHPPnbzjV3b
+         0YQiB49qdWjNemvWzYvmBV2Xx1Ilcmv9oWIzdWt7LoG3dARFPzcnmQNDJuaGw+GjIF8R
+         wHTw==
+X-Gm-Message-State: ACgBeo3pOQU8YZJTCNFup2c30WJvWKU5u6+nH/MJezaDL5FuKiSJ1UPI
+        RVRB+2z3MXEaKqApGpF41OZBOtzVakw=
+X-Google-Smtp-Source: AA6agR6zXdocaWASgpB6k/UriiG0R/4kTiatkYonZzlVvfDKIy93ifjp7qYZTXf0H124KMizSG68UQdKvQg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:2003:b0:175:24eb:62b0 with SMTP id
- s3-20020a170903200300b0017524eb62b0mr19360164pla.60.1662164580907; Fri, 02
- Sep 2022 17:23:00 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a62:b519:0:b0:537:9723:5cf2 with SMTP id
+ y25-20020a62b519000000b0053797235cf2mr39060596pfe.15.1662164582631; Fri, 02
+ Sep 2022 17:23:02 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat,  3 Sep 2022 00:22:32 +0000
+Date:   Sat,  3 Sep 2022 00:22:33 +0000
 In-Reply-To: <20220903002254.2411750-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220903002254.2411750-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.2.789.g6183377224-goog
-Message-ID: <20220903002254.2411750-2-seanjc@google.com>
-Subject: [PATCH v2 01/23] KVM: x86: Purge "highest ISR" cache when updating
- APICv state
+Message-ID: <20220903002254.2411750-3-seanjc@google.com>
+Subject: [PATCH v2 02/23] KVM: SVM: Flush the "current" TLB when activating AVIC
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -65,59 +64,44 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Purge the "highest ISR" cache when updating APICv state on a vCPU.  The
-cache must not be used when APICv is active as hardware may emulate EOIs
-(and other operations) without exiting to KVM.
+Flush the TLB when activating AVIC as the CPU can insert into the TLB
+while AVIC is "locally" disabled.  KVM doesn't treat "APIC hardware
+disabled" as VM-wide AVIC inhibition, and so when a vCPU has its APIC
+hardware disabled, AVIC is not guaranteed to be inhibited.  As a result,
+KVM may create a valid NPT mapping for the APIC base, which the CPU can
+cache as a non-AVIC translation.
 
-This fixes a bug where KVM will effectively block IRQs in perpetuity due
-to the "highest ISR" never getting reset if APICv is activated on a vCPU
-while an IRQ is in-service.  Hardware emulates the EOI and KVM never gets
-a chance to update its cache.
+Note, Intel handles this in vmx_set_virtual_apic_mode().
 
-Fixes: b26a695a1d78 ("kvm: lapic: Introduce APICv update helper function")
-Cc: stable@vger.kernel.org
-Cc: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/lapic.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ arch/x86/kvm/svm/avic.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 9dda989a1cf0..38e9b8e5278c 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2429,6 +2429,7 @@ void kvm_apic_update_apicv(struct kvm_vcpu *vcpu)
- 		 */
- 		apic->isr_count = count_vectors(apic->regs + APIC_ISR);
- 	}
-+	apic->highest_isr_cache = -1;
- }
- EXPORT_SYMBOL_GPL(kvm_apic_update_apicv);
- 
-@@ -2485,7 +2486,6 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
- 		kvm_lapic_set_reg(apic, APIC_TMR + 0x10 * i, 0);
- 	}
- 	kvm_apic_update_apicv(vcpu);
--	apic->highest_isr_cache = -1;
- 	update_divide_count(apic);
- 	atomic_set(&apic->lapic_timer.pending, 0);
- 
-@@ -2772,7 +2772,6 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
- 	__start_apic_timer(apic, APIC_TMCCT);
- 	kvm_lapic_set_reg(apic, APIC_TMCCT, 0);
- 	kvm_apic_update_apicv(vcpu);
--	apic->highest_isr_cache = -1;
- 	if (apic->apicv_active) {
- 		static_call_cond(kvm_x86_apicv_post_state_restore)(vcpu);
- 		static_call_cond(kvm_x86_hwapic_irr_update)(vcpu, apic_find_highest_irr(apic));
+diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+index 6919dee69f18..4fbef2af1efc 100644
+--- a/arch/x86/kvm/svm/avic.c
++++ b/arch/x86/kvm/svm/avic.c
+@@ -86,6 +86,12 @@ static void avic_activate_vmcb(struct vcpu_svm *svm)
+ 		/* Disabling MSR intercept for x2APIC registers */
+ 		svm_set_x2apic_msr_interception(svm, false);
+ 	} else {
++		/*
++		 * Flush the TLB, the guest may have inserted a non-APIC
++		 * mappings into the TLB while AVIC was disabled.
++		 */
++		kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, &svm->vcpu);
++
+ 		/* For xAVIC and hybrid-xAVIC modes */
+ 		vmcb->control.avic_physical_id |= AVIC_MAX_PHYSICAL_ID;
+ 		/* Enabling MSR intercept for x2APIC registers */
 -- 
 2.37.2.789.g6183377224-goog
 
