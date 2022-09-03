@@ -2,67 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F2BA35ABDB2
-	for <lists+kvm@lfdr.de>; Sat,  3 Sep 2022 09:39:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA1DB5ABDD8
+	for <lists+kvm@lfdr.de>; Sat,  3 Sep 2022 10:31:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232313AbiICHjM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 3 Sep 2022 03:39:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44782 "EHLO
+        id S232014AbiICIbY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 3 Sep 2022 04:31:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229626AbiICHjL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 3 Sep 2022 03:39:11 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A817D6F549;
-        Sat,  3 Sep 2022 00:39:09 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id 145so3988756pfw.4;
-        Sat, 03 Sep 2022 00:39:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=ROgdEwGTwKSezP6yTg8Bn5b9HWITXNuPp4Q731RWP+M=;
-        b=aDZMg+5Gm5Z4KOXdcDeuVimJyU0uVQjdAQwcQwrupA3dK9GcXnOTJ1Go03nMO5UyIi
-         FeAOY3WR4t3d4kBYiXdbh/karp3nWeMzIKPNe1GjSRWstX3jcBW+G6NKSbCfW5u/Tvg+
-         5kRi8bZBQvV92jv9FWMu5Yq7yXg9X4fnz00+Ywyb6vEMoDYl10D7q2ZMToCtXPL1C0xe
-         i4S4ZxWiI/RjCU6JKkX3JksmRs7gdmwWGLazYwyeHMTJ+bEBxJ/2TGUQ54iwSfdrxgCu
-         kBsyEt+iDL7CP3ZUpk+gRIWGP1ZYIPLIuV5DjlxubDNmsPUdBKT/6Sl9T0UFhfL9BGe0
-         FuDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=ROgdEwGTwKSezP6yTg8Bn5b9HWITXNuPp4Q731RWP+M=;
-        b=zbppJsQ4vf362KGbMZDmEkp44estlEpz1+13ReSLKdCTW20Q05Ehy2Gnwwfy3HElyY
-         jDkG7bILRR6y6u6eFAvLtnHFknEy702kPv4VW39PTaieDSPVUDwOdLO4UQd8IE2LzmiF
-         I8YW/NGdfb/wKpaB3BuaSBRHePXmbyMc2LszJAFQ8oI/2dvNf1sa8hJkRQEbp5/ouLvs
-         YJ5fmtTRuwSTxJrGOrUb46YdQGR9IDnI6l+cK+Y5pCFW8hSQKr/tU09Hk5ay2yCw9gU4
-         j9lM4JsnMcYemKj2DPm7y8Af40CsRCC4N91sTbT0bZBo+Mnr8Sy0WcFnufDNP1MpezCE
-         3EJg==
-X-Gm-Message-State: ACgBeo1MqZfOIuwjWyj2tmMpFH7eGVYDnKEAxgd/vThS1261e+XJXFI+
-        vDJIWeKWW4DvUZxdkrMV/vw=
-X-Google-Smtp-Source: AA6agR57jxS7L9aa+NHczXrLUs5tGLCFmC508F1B/uwdaU5GBjHzXDuYk1MADtsscXoIC3Xfvhxabw==
-X-Received: by 2002:a05:6a02:104:b0:430:93ec:776f with SMTP id bg4-20020a056a02010400b0043093ec776fmr8025194pgb.544.1662190749090;
-        Sat, 03 Sep 2022 00:39:09 -0700 (PDT)
-Received: from biggie.. ([103.230.148.184])
-        by smtp.gmail.com with ESMTPSA id h14-20020a17090adb8e00b001fd6066284dsm2738133pjv.6.2022.09.03.00.39.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Sep 2022 00:39:08 -0700 (PDT)
-From:   Gautam Menghani <gautammenghani201@gmail.com>
-To:     pbonzini@redhat.com, shuah@kernel.org
-Cc:     Gautam Menghani <gautammenghani201@gmail.com>, seanjc@google.com,
-        guang.zeng@intel.com, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        skhan@linuxfoundation.org,
-        linux-kernel-mentees@lists.linuxfoundation.org
-Subject: [PATCH] selftests/kvm: Use num_vcpus when testing ICR in the xapic_state_test
-Date:   Sat,  3 Sep 2022 13:09:01 +0530
-Message-Id: <20220903073901.73862-1-gautammenghani201@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S229515AbiICIbX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 3 Sep 2022 04:31:23 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7BBE101DD;
+        Sat,  3 Sep 2022 01:31:19 -0700 (PDT)
+Received: from [127.0.0.1] (dynamic-002-247-242-004.2.247.pool.telefonica.de [2.247.242.4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 09E311EC06EE;
+        Sat,  3 Sep 2022 10:31:14 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1662193874;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dHXOkzxgjsBtZM539cRCQ2oOl4G/USWxuxSAXY3DyOs=;
+        b=Gs6Qlvxs8gNpEUHeMBASMK9yQo6Y7FspgcI4jU/TDL4PyDkxNsQfAH1Paj6VGlvA4fTxXc
+        rP1bxXy5M8rQhgmB6LUcaejLkEo6203LQUbYX892e1hz0XVqmaDIgGDePeuwjxC+1N/d/j
+        TivrvEgG+eKbx+fbHeDorEmyY6hdGcU=
+Date:   Sat, 03 Sep 2022 08:31:09 +0000
+From:   Boris Petkov <bp@alien8.de>
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
+CC:     "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "rientjes@google.com" <rientjes@google.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "slp@redhat.com" <slp@redhat.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "alpergun@google.com" <alpergun@google.com>,
+        "jroedel@suse.de" <jroedel@suse.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "pgonda@google.com" <pgonda@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "srinivas.pandruvada@linux.intel.com" 
+        <srinivas.pandruvada@linux.intel.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
+        "tobin@ibm.com" <tobin@ibm.com>,
+        "Roth, Michael" <Michael.Roth@amd.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "dgilbert@redhat.com" <dgilbert@redhat.com>,
+        "marcorr@google.com" <marcorr@google.com>,
+        "jarkko@kernel.org" <jarkko@kernel.org>
+Subject: =?US-ASCII?Q?RE=3A_=5BPATCH_Part2_v6_09/49=5D_x86/fault=3A_Add_sup?= =?US-ASCII?Q?port_to_handle_the_RMP_fault_for_user_address?=
+In-Reply-To: <SN6PR12MB2767074DEB38477356A3C0F98E7D9@SN6PR12MB2767.namprd12.prod.outlook.com>
+References: <cover.1655761627.git.ashish.kalra@amd.com> <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com> <YvKRjxgipxLSNCLe@zn.tnic> <SN6PR12MB2767322F8C573EDFA1C20AD78E659@SN6PR12MB2767.namprd12.prod.outlook.com> <YvN9bKQ0XtUVJE7z@zn.tnic> <SN6PR12MB2767A87F12B8E704EB80CC458E659@SN6PR12MB2767.namprd12.prod.outlook.com> <SN6PR12MB27672B74D1A6A6E920F364A78E7B9@SN6PR12MB2767.namprd12.prod.outlook.com> <YxGoBzOFT+sfwr4w@nazgul.tnic> <SN6PR12MB2767E95BA3A99A6263F1F9AE8E7A9@SN6PR12MB2767.namprd12.prod.outlook.com> <YxLXJk36EKxldC1S@nazgul.tnic> <SN6PR12MB276767FDF3528BC1849EEA0A8E7D9@SN6PR12MB2767.namprd12.prod.outlook.com> <SN6PR12MB2767074DEB38477356A3C0F98E7D9@SN6PR12MB2767.namprd12.prod.outlook.com>
+Message-ID: <BC747219-7808-4C39-A17C-A76B35DD6CB3@alien8.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,68 +86,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A TODO in xapic_state_test asks to use number of vCPUs instead of
-vcpu.id + 1 in test_icr(). This patch adds support to get the number 
-of vCPUs from the VM created and use it.
+On September 3, 2022 6:57:51 AM UTC, "Kalra, Ashish" <Ashish=2EKalra@amd=2E=
+com> wrote:
+>[AMD Official Use Only - General]
+>
+>So essentially we want to map the faulting address to a RMP entry, consid=
+ering the fact that a 2M host hugepage can be mapped as=20
+>4K RMP table entries and 1G host hugepage can be mapped as 2M RMP table e=
+ntries=2E
 
-Signed-off-by: Gautam Menghani <gautammenghani201@gmail.com>
----
- .../selftests/kvm/x86_64/xapic_state_test.c     | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+So something's seriously confusing or missing here because if you fault on=
+ a 2M host page and the underlying RMP entries are 4K then you can use pte_=
+index()=2E
 
-diff --git a/tools/testing/selftests/kvm/x86_64/xapic_state_test.c b/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
-index 6f7a5ef66718..de934e8e5e41 100644
---- a/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
-@@ -96,9 +96,8 @@ static void __test_icr(struct xapic_vcpu *x, uint64_t val)
- 	____test_icr(x, val & ~(u64)APIC_ICR_BUSY);
- }
- 
--static void test_icr(struct xapic_vcpu *x)
-+static void test_icr(struct xapic_vcpu *x, int num_vcpus)
- {
--	struct kvm_vcpu *vcpu = x->vcpu;
- 	uint64_t icr, i, j;
- 
- 	icr = APIC_DEST_SELF | APIC_INT_ASSERT | APIC_DM_FIXED;
-@@ -110,11 +109,11 @@ static void test_icr(struct xapic_vcpu *x)
- 		__test_icr(x, icr | i);
- 
- 	/*
--	 * Send all flavors of IPIs to non-existent vCPUs.  TODO: use number of
--	 * vCPUs, not vcpu.id + 1.  Arbitrarily use vector 0xff.
-+	 * Send all flavors of IPIs to non-existent vCPUs. Arbitrarily use vector 0xff.
- 	 */
-+
- 	icr = APIC_INT_ASSERT | 0xff;
--	for (i = vcpu->id + 1; i < 0xff; i++) {
-+	for (i = num_vcpus; i < 0xff; i++) {
- 		for (j = 0; j < 8; j++)
- 			__test_icr(x, i << (32 + 24) | icr | (j << 8));
- 	}
-@@ -137,9 +136,13 @@ int main(int argc, char *argv[])
- 		.is_x2apic = true,
- 	};
- 	struct kvm_vm *vm;
-+	struct list_head *iter;
-+	int nr_vcpus_created = 0;
- 
- 	vm = vm_create_with_one_vcpu(&x.vcpu, x2apic_guest_code);
--	test_icr(&x);
-+	list_for_each(iter, &vm->vcpus)
-+		nr_vcpus_created++;
-+	test_icr(&x, nr_vcpus_created);
- 	kvm_vm_free(vm);
- 
- 	/*
-@@ -153,6 +156,6 @@ int main(int argc, char *argv[])
- 	vcpu_clear_cpuid_feature(x.vcpu, X86_FEATURE_X2APIC);
- 
- 	virt_pg_map(vm, APIC_DEFAULT_GPA, APIC_DEFAULT_GPA);
--	test_icr(&x);
-+	test_icr(&x, nr_vcpus_created);
- 	kvm_vm_free(vm);
- }
--- 
-2.34.1
+If the host page is 1G and the underlying RMP entries are 2M, pmd_index() =
+should work here too=2E
 
+But this piecemeal back'n'forth doesn't seem to resolve this so I'd like t=
+o ask you pls to sit down, take your time and give a detailed example of th=
+e two possible cases and what the difference is between pte_/pmd_index and =
+your way=2E Feel free to add actual debug output and paste it here=2E
+
+Thanks=2E
+
+--=20
+Sent from a small device: formatting sux and brevity is inevitable=2E 
