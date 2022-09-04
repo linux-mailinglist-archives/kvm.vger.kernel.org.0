@@ -2,93 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B5B9A5AC22A
-	for <lists+kvm@lfdr.de>; Sun,  4 Sep 2022 05:55:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18D115AC246
+	for <lists+kvm@lfdr.de>; Sun,  4 Sep 2022 06:17:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229537AbiIDDzU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 3 Sep 2022 23:55:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46696 "EHLO
+        id S230007AbiIDERT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 4 Sep 2022 00:17:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229475AbiIDDzS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 3 Sep 2022 23:55:18 -0400
-Received: from mail-oa1-x2b.google.com (mail-oa1-x2b.google.com [IPv6:2001:4860:4864:20::2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E5A3220EA
-        for <kvm@vger.kernel.org>; Sat,  3 Sep 2022 20:55:17 -0700 (PDT)
-Received: by mail-oa1-x2b.google.com with SMTP id 586e51a60fabf-11f11d932a8so14528642fac.3
-        for <kvm@vger.kernel.org>; Sat, 03 Sep 2022 20:55:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=fSeaghmzLkeAaPv9VENyUcy/Zxo9VrVvOErKCJv6U5o=;
-        b=mQ4i3livPfHmUFHRri/hWRtAoHMRA6LQkD6yC9cdAln4psFUf4alvy2TIJ+WnMhngq
-         q/CWr/zhAG/K/m3lgsv6CqP7g//mradyacpoRQEvJGitqTOrRx+tAjFNEQt8ED6ySzsY
-         DWy4jR4yioSRLY0sjB9yLx5nDnul8RichNVzmoByKfIgyOYylyscdjYJeM+p98sGinMA
-         +ajmaeAeb3aTNLjC0w2gUErlxcYPRmA7ljY8nN3X3HQIQbxAS3dCwjCe0gUDbpyqAGmg
-         ZDzUadkaUQIdUSq+hWaOd6t+9eCi3QtLuAuitiV1X3ardCJA3D0SNC/TApMwdJY/p3V/
-         WZNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=fSeaghmzLkeAaPv9VENyUcy/Zxo9VrVvOErKCJv6U5o=;
-        b=MUoTaaXOL9NZrWG+CMmh5ieFqjzwQ1i5xPBcdPk+xYpPHbYAEyC+yl8VPkivKzby5H
-         IKkqSOX36p6enGOXVqu8D7TON3+768M9KArtpTqvQUMmLDlvXR3qpII72ZBbql+EXb3c
-         bqiRIKMBzwPG6ud46F4IVYHM8TinudHlw7NJE4em2e86PzhGyIQMbq2zXAZtyr1onDoH
-         b48a2hPlqF/CSpWRPQrd2lQQ/v9Rw70NaJWKTfvIc9TI2jpl4GGwqp0I6H/B1wyoUYk6
-         BlYKZbdddSf1e3cTt8uyKCX3OBabdyJ/IF2ahUvHZManr3+xq4QXCrnKCMPZczLSvAKG
-         K5jw==
-X-Gm-Message-State: ACgBeo0MS02oojogn0gmSVQW1tDQf2sB03vwZQ/NOmmG21gPXJq96NR9
-        MWuGjsrlL1Nyz3CzrY7usDy90V/D8NyIBkEzff/arQLyEJ4j5g==
-X-Google-Smtp-Source: AA6agR69kcPAeiavFxtpfagxlGYNGpm17hq61sWw1ItA9kOPplNxGfhtYE4Y6+dDRGodIRhb/T8WMwLCwXcu70vptcY=
-X-Received: by 2002:a05:6870:41d0:b0:126:5d06:28a5 with SMTP id
- z16-20020a05687041d000b001265d0628a5mr1867608oac.181.1662263715163; Sat, 03
- Sep 2022 20:55:15 -0700 (PDT)
-MIME-Version: 1.0
-References: <CALMp9eRkuPPtkv7LadDDMT6DuKhvscJX0Fjyf2h05ijoxkYaoQ@mail.gmail.com>
- <20220903235013.xy275dp7zy2gkocv@treble> <CALMp9eR+sRARi8Y2=ZEmChSxXF1LEah3fjg57Mg7ZVM_=+_3Lw@mail.gmail.com>
-In-Reply-To: <CALMp9eR+sRARi8Y2=ZEmChSxXF1LEah3fjg57Mg7ZVM_=+_3Lw@mail.gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Sat, 3 Sep 2022 20:55:04 -0700
-Message-ID: <CALMp9eT2mSjW3jpS4fGmCYorQ-9+YxHn61AZGc=azSEmgDziyA@mail.gmail.com>
-Subject: Re: Guest IA32_SPEC_CTRL on AMD hosts without X86_FEATURE_V_SPEC_CTRL
-To:     Josh Poimboeuf <jpoimboe@kernel.org>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Moger, Babu" <Babu.Moger@amd.com>
+        with ESMTP id S229564AbiIDERR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 4 Sep 2022 00:17:17 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 450B5286D7
+        for <kvm@vger.kernel.org>; Sat,  3 Sep 2022 21:17:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D6A0C60EA6
+        for <kvm@vger.kernel.org>; Sun,  4 Sep 2022 04:17:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 44A35C43141
+        for <kvm@vger.kernel.org>; Sun,  4 Sep 2022 04:17:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662265036;
+        bh=KIOTtDNaMiGS/S2iKGXicF9/RrOxBjMP+sUMO8+FXac=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=EryBVAA4xOy46+VMzjw4JPuh1Q4LJ3kP0MahUwY+p9PpmV1HSP0gUFTeG0WYF12iH
+         vdvJDDIGBt/lnzrC0lipp9zY8zOQhuF7L1EY+OtqWh4gfwqV1TAfLZe51C1KLl5cgO
+         zxCJzA9ibn7bA61BunUzQGTvRR++zkjPC1BoTW7ScebbV971M2gFPgh/uFVtFLQsvX
+         k1gM4HEmo+q2GVUerKDsSXkpXi5kuuZgq4jXRKELFUtwDvJm7qagM4LQgOkWMr+jHt
+         Lqa24gTtHmUblkPCqccLBJboyspXntbBb3sGoageVqat1YFgNvCK5xY14ozZdck7Uw
+         eUugjhGHCpJbg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 338D2C433E9; Sun,  4 Sep 2022 04:17:16 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 216388] On Host, kernel errors in KVM, on guests, it shows CPU
+ stalls
+Date:   Sun, 04 Sep 2022 04:17:15 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: nanook@eskimo.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-216388-28872-iOeDvp6RDu@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216388-28872@https.bugzilla.kernel.org/>
+References: <bug-216388-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Sep 3, 2022 at 8:30 PM Jim Mattson <jmattson@google.com> wrote:
->
-> On Sat, Sep 3, 2022 at 4:50 PM Josh Poimboeuf <jpoimboe@kernel.org> wrote:
->
-> > [*] Not 100% true - if STIBP gets disabled by the guest, there's a small
-> >     window of opportunity where the SMT sibling can help force a
-> >     retbleed attack on a RET between the MSR write and the vmrun.  But
-> >     that's really unrealistic IMO.
->
-> That was my concern. How big does that window have to be before a
-> cross-thread attack becomes realistic, and how do we ensure that the
-> window never gets that large?
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216388
 
-Per https://developer.amd.com/wp-content/resources/111006-B_AMD64TechnologyIndirectBranchControlExtenstion_WP_7-18Update_FNL.pdf:
+--- Comment #16 from Robert Dinse (nanook@eskimo.com) ---
+*** Bug 216399 has been marked as a duplicate of this bug. ***
 
-When this bit is set in processors that share branch prediction
-information, indirect branch predictions from sibling threads cannot
-influence the predictions of other sibling threads.
+--=20
+You may reply to this email to add a comment.
 
-It does not say that upon clearing IA32_SPEC_CTRL.STIBP, that only
-*future* branch prediction information will be shared.
-
-If all existing branch prediction information is shared when
-IA32_SPEC_CTRL.STIBP is clear, then there is no window.
+You are receiving this mail because:
+You are watching the assignee of the bug.=
