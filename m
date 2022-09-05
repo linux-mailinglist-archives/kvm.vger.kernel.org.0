@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 367E55AD811
-	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 19:09:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 598FC5AD814
+	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 19:09:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237796AbiIERHS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Sep 2022 13:07:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59870 "EHLO
+        id S230479AbiIERI3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Sep 2022 13:08:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237660AbiIERHQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Sep 2022 13:07:16 -0400
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BEEB4BD00;
-        Mon,  5 Sep 2022 10:07:15 -0700 (PDT)
-Received: by mail-wr1-f45.google.com with SMTP id bp20so11651906wrb.9;
-        Mon, 05 Sep 2022 10:07:15 -0700 (PDT)
+        with ESMTP id S230447AbiIERI1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Sep 2022 13:08:27 -0400
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 451505E652;
+        Mon,  5 Sep 2022 10:08:26 -0700 (PDT)
+Received: by mail-wr1-f42.google.com with SMTP id bz13so8722360wrb.2;
+        Mon, 05 Sep 2022 10:08:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=b4juj7B2UONec9DN5R9H+S5J6rQPs3/+0cM2WjUaO5k=;
-        b=iFovOR/Wfh1IQeXRIxmdXPrwAhHTKj6ANR+tbCVF6tOoIO+5WWLxzFcbQJEA6ae7iG
-         j2bAzv+RS3H65Q2vSIfslGEc7pFaMBEBSoB4gNYi4vfa1mqAqk9n4jnJiNwVZTeJ3CwQ
-         rmOcdQocNxHTTv3h4tQuNrT777A4fpGoYrRaT/hx2u+XoFDoCaGGvD8qEXAONOouQ4Dc
-         qaQ+jNS2JM3Rb2VAfusoPJ2LxojYuUlbMgzNFFii65oFTYp5r5Yqwd+fghwUjqSh1/YK
-         UdWe8qpcsD1HGGP9QKZKdOQwscZRvbOnqjvvdLyQM558WSB4+HZfUYU59MOKT3uzD9tR
-         xBiA==
-X-Gm-Message-State: ACgBeo1H6VCBes4DG6EQEvevn8qXRkLvupHzD8fyby3tAGvIKdjsebF5
-        5B72i59tgXN0Hl+MRThXKPk/1TSGGB4=
-X-Google-Smtp-Source: AA6agR54pyDETu2sUWvvNJ9LGzrJCmE5taGD4owhWNoFpkTFhjbzyeLvcU3XR9YDt94/RKUzsbwUZw==
-X-Received: by 2002:adf:de01:0:b0:228:62ae:78bc with SMTP id b1-20020adfde01000000b0022862ae78bcmr5547587wrm.41.1662397633989;
-        Mon, 05 Sep 2022 10:07:13 -0700 (PDT)
+        bh=/ciryf8KmN21qOu4f8QcUm2dMJRaMEjVT+du8U+TPyQ=;
+        b=zpXWbHCEl3RCUl6ec2eei06NDuKUHZtz9+ApiSa0/thTlfGVJyZDo4Wb+4Jx/MWO2t
+         db8vPYDMMsC8RXjavtSZBjWN6fcTD0BAB4vSiPk2KEH5SQ07B+6ICdPn/P9MPDbp0LCQ
+         pEatOvv3NAQLjmK4o4vebtaQp0r/TlUoZ7wQqwA2mi4d0tedGZC+bXqyv7IWXV+cNIMZ
+         ClskvXU2aB+5HXcnVRLN6av//YEoi2JxPhDDL0Y6CGoMgtKzZWiiceQ0SdB8Acr8BcmO
+         M6vzhq72fmzehkJg8AGLdsgJnrvXXumxp8Juob455/DD0VNGS8ciIy30RIF+NkgCMs1T
+         tDDw==
+X-Gm-Message-State: ACgBeo3E36nRrnDK8rb7tWV6rQbexV3QDcQRx3S66uTpKcf6MhUpiTwF
+        08tJgqGZzoR2TqOlQEqhSSo=
+X-Google-Smtp-Source: AA6agR5HVWdK8tKcRbiNCcmb3AW06ynUo8cFY3mVxiuLC8hMFA/JDzXQmgW3FnlETt28s4SDYB9dKQ==
+X-Received: by 2002:adf:f642:0:b0:226:d4b1:8502 with SMTP id x2-20020adff642000000b00226d4b18502mr23753732wrp.553.1662397704895;
+        Mon, 05 Sep 2022 10:08:24 -0700 (PDT)
 Received: from liuwe-devbox-debian-v2 ([51.145.34.42])
-        by smtp.gmail.com with ESMTPSA id bp8-20020a5d5a88000000b002252e5a6841sm9412547wrb.57.2022.09.05.10.07.13
+        by smtp.gmail.com with ESMTPSA id m18-20020adff392000000b00228b3ff1f5dsm2787331wro.117.2022.09.05.10.08.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Sep 2022 10:07:13 -0700 (PDT)
-Date:   Mon, 5 Sep 2022 17:07:09 +0000
+        Mon, 05 Sep 2022 10:08:24 -0700 (PDT)
+Date:   Mon, 5 Sep 2022 17:08:20 +0000
 From:   Wei Liu <wei.liu@kernel.org>
 To:     Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -48,15 +48,15 @@ Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
         Wei Liu <wei.liu@kernel.org>
-Subject: Re: [PATCH v6 03/33] KVM: x86: Zero out entire Hyper-V CPUID cache
- before processing entries
-Message-ID: <20220905170709.dn5zp6wq5vo4cq2c@liuwe-devbox-debian-v2>
+Subject: Re: [PATCH v6 04/33] KVM: x86: Check for existing Hyper-V vCPU in
+ kvm_hv_vcpu_init()
+Message-ID: <20220905170820.yivhrivabsixj3ca@liuwe-devbox-debian-v2>
 References: <20220830133737.1539624-1-vkuznets@redhat.com>
- <20220830133737.1539624-4-vkuznets@redhat.com>
+ <20220830133737.1539624-5-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220830133737.1539624-4-vkuznets@redhat.com>
+In-Reply-To: <20220830133737.1539624-5-vkuznets@redhat.com>
 X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
         FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
@@ -67,15 +67,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 30, 2022 at 03:37:07PM +0200, Vitaly Kuznetsov wrote:
-> Wipe the whole 'hv_vcpu->cpuid_cache' with memset() instead of having to
-> zero each particular member when the corresponding CPUID entry was not
-> found.
+On Tue, Aug 30, 2022 at 03:37:08PM +0200, Vitaly Kuznetsov wrote:
+> From: Sean Christopherson <seanjc@google.com>
+> 
+> When potentially allocating/initializing the Hyper-V vCPU struct, check
+> for an existing instance in kvm_hv_vcpu_init() instead of requiring
+> callers to perform the check.  Relying on callers to do the check is
+> risky as it's all too easy for KVM to overwrite vcpu->arch.hyperv and
+> leak memory, and it adds additional burden on callers without much
+> benefit.
 > 
 > No functional change intended.
 > 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> [sean: split to separate patch]
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
 Reviewed-by: Wei Liu <wei.liu@kernel.org>
