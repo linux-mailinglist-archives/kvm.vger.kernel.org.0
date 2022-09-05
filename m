@@ -2,114 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FE645AD800
-	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 19:02:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C622A5AD80F
+	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 19:06:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237734AbiIERCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Sep 2022 13:02:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52570 "EHLO
+        id S237605AbiIERG4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Sep 2022 13:06:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237574AbiIERCF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Sep 2022 13:02:05 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 159FD5E554
-        for <kvm@vger.kernel.org>; Mon,  5 Sep 2022 10:02:04 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id CA9C0B81249
-        for <kvm@vger.kernel.org>; Mon,  5 Sep 2022 17:02:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EA15C433D6;
-        Mon,  5 Sep 2022 17:01:59 +0000 (UTC)
-Date:   Mon, 5 Sep 2022 18:01:55 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     kernel test robot <lkp@intel.com>
-Cc:     Peter Collingbourne <pcc@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kbuild-all@lists.01.org, Cornelia Huck <cohuck@redhat.com>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Evgenii Stepanov <eugenis@google.com>, kvm@vger.kernel.org,
-        Steven Price <steven.price@arm.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>
-Subject: Re: [PATCH v3 3/7] mm: Add PG_arch_3 page flag
-Message-ID: <YxYrgyybBMUqFswq@arm.com>
-References: <20220810193033.1090251-4-pcc@google.com>
- <202208111500.62e0Bl2l-lkp@intel.com>
- <YxDy+zFasbAP7Yrq@arm.com>
+        with ESMTP id S236472AbiIERGy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Sep 2022 13:06:54 -0400
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC82A4BA6A;
+        Mon,  5 Sep 2022 10:06:53 -0700 (PDT)
+Received: by mail-wm1-f49.google.com with SMTP id d5so5549693wms.5;
+        Mon, 05 Sep 2022 10:06:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=d9TAneKl/IB22ze9RSEc+xm4pxhpst3mt3s1A5vkCeA=;
+        b=5bIMzqJEYi475D5LBMMSqSYZWu1Bs/zkU1jfD505MiGk4fqeB1VkGY9sdD86iLI79S
+         Wpnedj9yDrJ441+76qhlXHrFFSy5gGv0ry0u9VrZFZKEkuKrMhc3WnRRf/AZ45uX/YK9
+         C8h4nGFpkwemI+mP4TQ9D54VqtS1np4deg7aKNubr2chOeM8DFXeSiPpiMks9NWoMtWi
+         IQC/vZ16wUmFo8OAqgSNwzUe8Z5HH//Bhzb473vl47koR+3s+i8rCOt0jeLqhjDMH8fh
+         kUhVvjFFHv/pwI/b0MuG7Q24njc84kh6MSnwfZE6ZlX7HVSVBxshpItLKqg/jHrpVUkY
+         T4TQ==
+X-Gm-Message-State: ACgBeo3GtLCoicLLBw0VCnD7ry0sDZvGuCbNDLNme7+A6/e5Y76SNiqb
+        OsVfT8PNwUQBSBPnvqgXG8E=
+X-Google-Smtp-Source: AA6agR4mUT7QMGWlmzBNULt1v9DXiqnE7dEUFFbmulPE92yzI9zmusmbR48eyfmub91fdHoYvnOCqQ==
+X-Received: by 2002:a1c:3584:0:b0:3a5:fb0e:102e with SMTP id c126-20020a1c3584000000b003a5fb0e102emr11618897wma.105.1662397612187;
+        Mon, 05 Sep 2022 10:06:52 -0700 (PDT)
+Received: from liuwe-devbox-debian-v2 ([51.145.34.42])
+        by smtp.gmail.com with ESMTPSA id h6-20020a05600c350600b003a541d893desm12386483wmq.38.2022.09.05.10.06.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Sep 2022 10:06:51 -0700 (PDT)
+Date:   Mon, 5 Sep 2022 17:06:47 +0000
+From:   Wei Liu <wei.liu@kernel.org>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Yuan Yao <yuan.yao@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Wei Liu <wei.liu@kernel.org>
+Subject: Re: [PATCH v6 02/33] x86/hyperv: Update 'struct hv_enlightened_vmcs'
+ definition
+Message-ID: <20220905170647.ky7rf5ypmqwxb7wx@liuwe-devbox-debian-v2>
+References: <20220830133737.1539624-1-vkuznets@redhat.com>
+ <20220830133737.1539624-3-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YxDy+zFasbAP7Yrq@arm.com>
-X-Spam-Status: No, score=-6.7 required=5.0 tests=BAYES_00,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220830133737.1539624-3-vkuznets@redhat.com>
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 01, 2022 at 06:59:23PM +0100, Catalin Marinas wrote:
-> On Thu, Aug 11, 2022 at 03:16:08PM +0800, kernel test robot wrote:
-> > Thank you for the patch! Perhaps something to improve:
-> > 
-> > [auto build test WARNING on arm64/for-next/core]
-> > [also build test WARNING on linus/master next-20220811]
-> > [cannot apply to kvmarm/next arm/for-next soc/for-next xilinx-xlnx/master v5.19]
-> > [If your patch is applied to the wrong git tree, kindly drop us a note.
-> > And when submitting patch, we suggest to use '--base' as documented in
-> > https://git-scm.com/docs/git-format-patch#_base_tree_information]
-> > 
-> > url:    https://github.com/intel-lab-lkp/linux/commits/Peter-Collingbourne/KVM-arm64-permit-MAP_SHARED-mappings-with-MTE-enabled/20220811-033310
-> > base:   https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-next/core
-> > config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20220811/202208111500.62e0Bl2l-lkp@intel.com/config)
-> > compiler: loongarch64-linux-gcc (GCC) 12.1.0
-> > reproduce (this is a W=1 build):
-> >         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-> >         chmod +x ~/bin/make.cross
-> >         # https://github.com/intel-lab-lkp/linux/commit/1a400517d8428df0ec9f86f8d303b2227ee9702f
-> >         git remote add linux-review https://github.com/intel-lab-lkp/linux
-> >         git fetch --no-tags linux-review Peter-Collingbourne/KVM-arm64-permit-MAP_SHARED-mappings-with-MTE-enabled/20220811-033310
-> >         git checkout 1a400517d8428df0ec9f86f8d303b2227ee9702f
-> >         # save the config file
-> >         mkdir build_dir && cp config build_dir/.config
-> >         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=loongarch SHELL=/bin/bash
-> > 
-> > If you fix the issue, kindly add following tag where applicable
-> > Reported-by: kernel test robot <lkp@intel.com>
-> > 
-> > All warnings (new ones prefixed by >>):
-> > 
-> > >> mm/memory.c:92:2: warning: #warning Unfortunate NUMA and NUMA Balancing config, growing page-frame for last_cpupid. [-Wcpp]
-> >       92 | #warning Unfortunate NUMA and NUMA Balancing config, growing page-frame for last_cpupid.
-> >          |  ^~~~~~~
-> > 
-> > 
-> > vim +92 mm/memory.c
-> > 
-> > 42b7772812d15b Jan Beulich    2008-07-23  90  
-> > af27d9403f5b80 Arnd Bergmann  2018-02-16  91  #if defined(LAST_CPUPID_NOT_IN_PAGE_FLAGS) && !defined(CONFIG_COMPILE_TEST)
-> > 90572890d20252 Peter Zijlstra 2013-10-07 @92  #warning Unfortunate NUMA and NUMA Balancing config, growing page-frame for last_cpupid.
-> > 75980e97daccfc Peter Zijlstra 2013-02-22  93  #endif
-> > 75980e97daccfc Peter Zijlstra 2013-02-22  94  
+On Tue, Aug 30, 2022 at 03:37:06PM +0200, Vitaly Kuznetsov wrote:
+> Updated Hyper-V Enlightened VMCS specification lists several new
+> fields for the following features:
 > 
-> It looks like ith CONFIG_NUMA_BALANCING=y on loongarch we run out of
-> spare bits in page->flags to fit last_cpupid. The reason we don't see it
-> on arm64 is that we select SPARSEMEM_VMEMMAP and SECTIONS_WIDTH becomes
-> 0. On loongarch SECTIONS_WIDTH takes 19 bits (48 - 29) in page->flags.
+> - PerfGlobalCtrl
+> - EnclsExitingBitmap
+> - Tsc Scaling
+> - GuestLbrCtl
+> - CET
+> - SSP
 > 
-> I think instead of always defining PG_arch_{2,3} if CONFIG_64BIT, we
-> could add a CONFIG_ARCH_WANTS_PG_ARCH_23 option and only select it on
-> arm64 for the time being.
+> Update the definition.
+> 
+> Note, the updated spec also provides an additional CPUID feature flag,
+> CPUIDD.0x4000000A.EBX BIT(0), for PerfGlobalCtrl to workaround a Windows
+> 11 quirk.  Despite what the TLFS says:
+> 
+>   Indicates support for the GuestPerfGlobalCtrl and HostPerfGlobalCtrl
+>   fields in the enlightened VMCS.
+> 
+> guests can safely use the fields if they are enumerated in the
+> architectural VMX MSRs.  I.e. KVM-on-HyperV doesn't need to check the
+> CPUID bit, but KVM-as-HyperV must ensure the bit is set if PerfGlobalCtrl
+> fields are exposed to L1.
+> 
+> https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/tlfs
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> [sean: tweak CPUID name to make it PerfGlobalCtrl only]
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-I pushed a patch as the first one on the arm64 devel/mte-pg-flags
-branch. Also updated the last patch on this branch following Steven's
-comments.
-
-Peter, please let me know if you want to pick this series up together
-with your other KVM patches. Otherwise I can post it separately, it's
-worth merging it on its own as it clarifies the page flag vs tag setting
-ordering.
-
--- 
-Catalin
+Acked-by: Wei Liu <wei.liu@kernel.org>
