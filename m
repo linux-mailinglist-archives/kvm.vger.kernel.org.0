@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E12E5AC9D2
-	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 07:43:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A4BFA5AC9E6
+	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 07:51:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235759AbiIEFnI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Sep 2022 01:43:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57316 "EHLO
+        id S235911AbiIEFsV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Sep 2022 01:48:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231744AbiIEFnF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Sep 2022 01:43:05 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 816502D1E6;
-        Sun,  4 Sep 2022 22:43:04 -0700 (PDT)
+        with ESMTP id S235865AbiIEFsQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Sep 2022 01:48:16 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F3A72FFC5;
+        Sun,  4 Sep 2022 22:48:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662356584; x=1693892584;
+  t=1662356891; x=1693892891;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=FfaurS8Eqj1F9kuGI61H90o+/5niy1dzQ3FNUYnyU6M=;
-  b=hpdjKovCjw7FB6xthJyWbJueiYLnR0AB6RDQok9zHnjgxG9r22v3/ii9
-   q2j+16xBYNDRH9OFzv7lG5owZ3J971sfjLBUg3umlWXISqt0WZucu86W8
-   iBRXZbxu9aqv4jv0oWpkUNrOniS7+PjM+LPiprOdyh6teAIDTr+vNmx6X
-   7+j46p9CySJ5m2l0WDGribSvm9A1C1ZZKTD5OYF2u/4aFND94hPzOB/Uq
-   xO01cOAm50o3c5KP2S+W6ZMw35tc66EuJk0hG4Pf7w7ZymdB29dQVSCqr
-   ssxT3OO9qK1mdi2Alu76bTnQD2gjgswg3sviGtViu78E1QTjRISL1SYzR
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10460"; a="322476004"
+  bh=fTe8CDyhScv9KyvqN2vhwn8+FsEj93tIn1+Tv7eoqqE=;
+  b=eCsR+zdVUBvaNKgw5eZmCqKRC2gz2tdqGZGYbPRaRm3DXvhLzNB0GnFc
+   DgSUjSpImGp/JOcPoG9KoFFGAN2uuSQYdXMnAAOEkS1nz23c8f+15oTdi
+   epcSUj3Tu16/U2NEFiJBFEje8AqOoSl++OZBNSwURAsO2bIjxzH88Ntj6
+   +P4bu2nsg9TDTW2hxeTXOcvOUAfvvnZcpIRq7jhVHb5ycuIvsV4OCZrHE
+   o3rCQxbj7oCPDs0H+IvzQiPS6hNl5q32b2aluvpdEKYJvbNuGlLS6h+ez
+   ozgnWqOtnDWUpG094Bo6Kep0lZ5DOfhalHVD3HL9X0UJ/l84VBMHYDzcn
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10460"; a="360265627"
 X-IronPort-AV: E=Sophos;i="5.93,290,1654585200"; 
-   d="scan'208";a="322476004"
+   d="scan'208";a="360265627"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2022 22:43:03 -0700
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2022 22:48:10 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.93,290,1654585200"; 
-   d="scan'208";a="675134595"
+   d="scan'208";a="675136231"
 Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by fmsmga008.fm.intel.com with ESMTP; 04 Sep 2022 22:42:57 -0700
-Date:   Mon, 5 Sep 2022 13:42:57 +0800
+  by fmsmga008.fm.intel.com with ESMTP; 04 Sep 2022 22:48:04 -0700
+Date:   Mon, 5 Sep 2022 13:48:04 +0800
 From:   Yuan Yao <yuan.yao@linux.intel.com>
 To:     isaku.yamahata@intel.com
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -55,195 +55,196 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Huang Ying <ying.huang@intel.com>,
         Huacai Chen <chenhuacai@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v3 03/22] KVM: x86: Move check_processor_compatibility
- from init ops to runtime ops
-Message-ID: <20220905054257.swzn4r4rrz762lxc@yy-desk-7060>
+        Borislav Petkov <bp@alien8.de>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Anup Patel <anup@brainfault.org>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Subject: Re: [PATCH v3 04/22] Partially revert "KVM: Pass kvm_init()'s opaque
+ param to additional arch funcs"
+Message-ID: <20220905054804.5yvmkhp2jgg5br3w@yy-desk-7060>
 References: <cover.1662084396.git.isaku.yamahata@intel.com>
- <aadf5be7c89994792c3efe853328f6a08dd68919.1662084396.git.isaku.yamahata@intel.com>
+ <dc34f52f5177156e4755ae3feb78b661386b1677.1662084396.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aadf5be7c89994792c3efe853328f6a08dd68919.1662084396.git.isaku.yamahata@intel.com>
+In-Reply-To: <dc34f52f5177156e4755ae3feb78b661386b1677.1662084396.git.isaku.yamahata@intel.com>
 User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 01, 2022 at 07:17:38PM -0700, isaku.yamahata@intel.com wrote:
+On Thu, Sep 01, 2022 at 07:17:39PM -0700, isaku.yamahata@intel.com wrote:
 > From: Chao Gao <chao.gao@intel.com>
 >
-> so that KVM can do compatibility checks on hotplugged CPUs. Drop __init
-> from check_processor_compatibility() and its callees.
+> This partially reverts commit b99040853738 ("KVM: Pass kvm_init()'s opaque
+> param to additional arch funcs") remove opaque from
+> kvm_arch_check_processor_compat because no one uses this opaque now.
+> Address conflicts for ARM (due to file movement) and manually handle RISC-V
+> which comes after the commit.
 >
-> use a static_call() to invoke .check_processor_compatibility.
->
-> Opportunistically rename {svm,vmx}_check_processor_compat to conform
-> to the naming convention of fields of kvm_x86_ops.
+> And changes about kvm_arch_hardware_setup() in original commit are still
+> needed so they are not reverted.
 >
 > Signed-off-by: Chao Gao <chao.gao@intel.com>
 > Reviewed-by: Sean Christopherson <seanjc@google.com>
-> Link: https://lore.kernel.org/r/20220216031528.92558-2-chao.gao@intel.com
+> Reviewed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Acked-by: Anup Patel <anup@brainfault.org>
+> Acked-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Link: https://lore.kernel.org/r/20220216031528.92558-3-chao.gao@intel.com
 > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Reviewed-by: Kai Huang <kai.huang@intel.com>
 
 Reviewed-by: Yuan Yao <yuan.yao@intel.com>
 
 > ---
->  arch/x86/include/asm/kvm-x86-ops.h |  1 +
->  arch/x86/include/asm/kvm_host.h    |  2 +-
->  arch/x86/kvm/svm/svm.c             |  4 ++--
->  arch/x86/kvm/vmx/vmx.c             | 14 +++++++-------
->  arch/x86/kvm/x86.c                 |  3 +--
->  5 files changed, 12 insertions(+), 12 deletions(-)
+>  arch/arm64/kvm/arm.c       |  2 +-
+>  arch/mips/kvm/mips.c       |  2 +-
+>  arch/powerpc/kvm/powerpc.c |  2 +-
+>  arch/riscv/kvm/main.c      |  2 +-
+>  arch/s390/kvm/kvm-s390.c   |  2 +-
+>  arch/x86/kvm/x86.c         |  2 +-
+>  include/linux/kvm_host.h   |  2 +-
+>  virt/kvm/kvm_main.c        | 16 +++-------------
+>  8 files changed, 10 insertions(+), 20 deletions(-)
 >
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index 51f777071584..3bc45932e2d1 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -129,6 +129,7 @@ KVM_X86_OP(msr_filter_changed)
->  KVM_X86_OP(complete_emulated_msr)
->  KVM_X86_OP(vcpu_deliver_sipi_vector)
->  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
-> +KVM_X86_OP(check_processor_compatibility)
->
->  #undef KVM_X86_OP
->  #undef KVM_X86_OP_OPTIONAL
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 2c96c43c313a..5df5d88d345f 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1445,6 +1445,7 @@ static inline u16 kvm_lapic_irq_dest_mode(bool dest_mode_logical)
->  struct kvm_x86_ops {
->  	const char *name;
->
-> +	int (*check_processor_compatibility)(void);
->  	int (*hardware_enable)(void);
->  	void (*hardware_disable)(void);
->  	void (*hardware_unsetup)(void);
-> @@ -1655,7 +1656,6 @@ struct kvm_x86_nested_ops {
->  struct kvm_x86_init_ops {
->  	int (*cpu_has_kvm_support)(void);
->  	int (*disabled_by_bios)(void);
-> -	int (*check_processor_compatibility)(void);
->  	int (*hardware_setup)(void);
->  	unsigned int (*handle_intel_pt_intr)(void);
->
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index f3813dbacb9f..371300f03f55 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4134,7 +4134,7 @@ svm_patch_hypercall(struct kvm_vcpu *vcpu, unsigned char *hypercall)
->  	hypercall[2] = 0xd9;
->  }
->
-> -static int __init svm_check_processor_compat(void)
-> +static int svm_check_processor_compatibility(void)
->  {
->  	return 0;
->  }
-> @@ -4740,6 +4740,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.name = "kvm_amd",
->
->  	.hardware_unsetup = svm_hardware_unsetup,
-> +	.check_processor_compatibility = svm_check_processor_compatibility,
->  	.hardware_enable = svm_hardware_enable,
->  	.hardware_disable = svm_hardware_disable,
->  	.has_emulated_msr = svm_has_emulated_msr,
-> @@ -5122,7 +5123,6 @@ static struct kvm_x86_init_ops svm_init_ops __initdata = {
->  	.cpu_has_kvm_support = has_svm,
->  	.disabled_by_bios = is_disabled,
->  	.hardware_setup = svm_hardware_setup,
-> -	.check_processor_compatibility = svm_check_processor_compat,
->
->  	.runtime_ops = &svm_x86_ops,
->  	.pmu_ops = &amd_pmu_ops,
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index d7f8331d6f7e..3cf7f18a4115 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2495,8 +2495,8 @@ static bool cpu_has_sgx(void)
->  	return cpuid_eax(0) >= 0x12 && (cpuid_eax(0x12) & BIT(0));
->  }
->
-> -static __init int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
-> -				      u32 msr, u32 *result)
-> +static int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
-> +			       u32 msr, u32 *result)
->  {
->  	u32 vmx_msr_low, vmx_msr_high;
->  	u32 ctl = ctl_min | ctl_opt;
-> @@ -2514,7 +2514,7 @@ static __init int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 2ff0ef62abad..3385fb57c11a 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -68,7 +68,7 @@ int kvm_arch_hardware_setup(void *opaque)
 >  	return 0;
 >  }
 >
-> -static __init u64 adjust_vmx_controls64(u64 ctl_opt, u32 msr)
-> +static u64 adjust_vmx_controls64(u64 ctl_opt, u32 msr)
+> -int kvm_arch_check_processor_compat(void *opaque)
+> +int kvm_arch_check_processor_compat(void)
 >  {
->  	u64 allowed;
->
-> @@ -2523,8 +2523,8 @@ static __init u64 adjust_vmx_controls64(u64 ctl_opt, u32 msr)
->  	return  ctl_opt & allowed;
+>  	return 0;
 >  }
->
-> -static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
-> -				    struct vmx_capability *vmx_cap)
-> +static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
-> +			     struct vmx_capability *vmx_cap)
->  {
->  	u32 vmx_msr_low, vmx_msr_high;
->  	u32 min, opt, min2, opt2;
-> @@ -7417,7 +7417,7 @@ static int vmx_vm_init(struct kvm *kvm)
+> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> index a25e0b73ee70..092d09fb6a7e 100644
+> --- a/arch/mips/kvm/mips.c
+> +++ b/arch/mips/kvm/mips.c
+> @@ -140,7 +140,7 @@ int kvm_arch_hardware_setup(void *opaque)
 >  	return 0;
 >  }
 >
-> -static int __init vmx_check_processor_compat(void)
-> +static int vmx_check_processor_compatibility(void)
+> -int kvm_arch_check_processor_compat(void *opaque)
+> +int kvm_arch_check_processor_compat(void)
 >  {
->  	struct vmcs_config vmcs_conf;
->  	struct vmx_capability vmx_cap;
-> @@ -8015,6 +8015,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+>  	return 0;
+>  }
+> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+> index fb1490761c87..7b56d6ccfdfb 100644
+> --- a/arch/powerpc/kvm/powerpc.c
+> +++ b/arch/powerpc/kvm/powerpc.c
+> @@ -447,7 +447,7 @@ int kvm_arch_hardware_setup(void *opaque)
+>  	return 0;
+>  }
 >
->  	.hardware_unsetup = vmx_hardware_unsetup,
+> -int kvm_arch_check_processor_compat(void *opaque)
+> +int kvm_arch_check_processor_compat(void)
+>  {
+>  	return kvmppc_core_check_processor_compat();
+>  }
+> diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
+> index 1549205fe5fe..f8d6372d208f 100644
+> --- a/arch/riscv/kvm/main.c
+> +++ b/arch/riscv/kvm/main.c
+> @@ -20,7 +20,7 @@ long kvm_arch_dev_ioctl(struct file *filp,
+>  	return -EINVAL;
+>  }
 >
-> +	.check_processor_compatibility = vmx_check_processor_compatibility,
->  	.hardware_enable = vmx_hardware_enable,
->  	.hardware_disable = vmx_hardware_disable,
->  	.has_emulated_msr = vmx_has_emulated_msr,
-> @@ -8404,7 +8405,6 @@ static __init int hardware_setup(void)
->  static struct kvm_x86_init_ops vmx_init_ops __initdata = {
->  	.cpu_has_kvm_support = cpu_has_kvm_support,
->  	.disabled_by_bios = vmx_disabled_by_bios,
-> -	.check_processor_compatibility = vmx_check_processor_compat,
->  	.hardware_setup = hardware_setup,
->  	.handle_intel_pt_intr = NULL,
+> -int kvm_arch_check_processor_compat(void *opaque)
+> +int kvm_arch_check_processor_compat(void)
+>  {
+>  	return 0;
+>  }
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index edfd4bbd0cba..e26d4dd85668 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -254,7 +254,7 @@ int kvm_arch_hardware_enable(void)
+>  	return 0;
+>  }
 >
+> -int kvm_arch_check_processor_compat(void *opaque)
+> +int kvm_arch_check_processor_compat(void)
+>  {
+>  	return 0;
+>  }
 > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index fd021581ca60..5f12a7ed6f94 100644
+> index 5f12a7ed6f94..53c8ee677f16 100644
 > --- a/arch/x86/kvm/x86.c
 > +++ b/arch/x86/kvm/x86.c
-> @@ -12001,7 +12001,6 @@ void kvm_arch_hardware_unsetup(void)
->  int kvm_arch_check_processor_compat(void *opaque)
->  {
->  	struct cpuinfo_x86 *c = &cpu_data(smp_processor_id());
-> -	struct kvm_x86_init_ops *ops = opaque;
->
->  	WARN_ON(!irqs_disabled());
->
-> @@ -12009,7 +12008,7 @@ int kvm_arch_check_processor_compat(void *opaque)
->  	    __cr4_reserved_bits(cpu_has, &boot_cpu_data))
->  		return -EIO;
->
-> -	return ops->check_processor_compatibility();
-> +	return static_call(kvm_x86_check_processor_compatibility)();
+> @@ -11998,7 +11998,7 @@ void kvm_arch_hardware_unsetup(void)
+>  	static_call(kvm_x86_hardware_unsetup)();
 >  }
 >
->  bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
+> -int kvm_arch_check_processor_compat(void *opaque)
+> +int kvm_arch_check_processor_compat(void)
+>  {
+>  	struct cpuinfo_x86 *c = &cpu_data(smp_processor_id());
+>
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index f4519d3689e1..eab352902de7 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1438,7 +1438,7 @@ int kvm_arch_hardware_enable(void);
+>  void kvm_arch_hardware_disable(void);
+>  int kvm_arch_hardware_setup(void *opaque);
+>  void kvm_arch_hardware_unsetup(void);
+> -int kvm_arch_check_processor_compat(void *opaque);
+> +int kvm_arch_check_processor_compat(void);
+>  int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu);
+>  bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu);
+>  int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 584a5bab3af3..4243a9541543 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -5799,22 +5799,14 @@ void kvm_unregister_perf_callbacks(void)
+>  }
+>  #endif
+>
+> -struct kvm_cpu_compat_check {
+> -	void *opaque;
+> -	int *ret;
+> -};
+> -
+> -static void check_processor_compat(void *data)
+> +static void check_processor_compat(void *rtn)
+>  {
+> -	struct kvm_cpu_compat_check *c = data;
+> -
+> -	*c->ret = kvm_arch_check_processor_compat(c->opaque);
+> +	*(int *)rtn = kvm_arch_check_processor_compat();
+>  }
+>
+>  int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+>  		  struct module *module)
+>  {
+> -	struct kvm_cpu_compat_check c;
+>  	int r;
+>  	int cpu;
+>
+> @@ -5842,10 +5834,8 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+>  	if (r < 0)
+>  		goto out_free_1;
+>
+> -	c.ret = &r;
+> -	c.opaque = opaque;
+>  	for_each_online_cpu(cpu) {
+> -		smp_call_function_single(cpu, check_processor_compat, &c, 1);
+> +		smp_call_function_single(cpu, check_processor_compat, &r, 1);
+>  		if (r < 0)
+>  			goto out_free_2;
+>  	}
 > --
 > 2.25.1
 >
