@@ -2,132 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A82A75AD784
-	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 18:33:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FE645AD800
+	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 19:02:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232053AbiIEQc5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Sep 2022 12:32:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39430 "EHLO
+        id S237734AbiIERCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Sep 2022 13:02:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231593AbiIEQcu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Sep 2022 12:32:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 604042FFE2
-        for <kvm@vger.kernel.org>; Mon,  5 Sep 2022 09:32:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662395568;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Nq/yrAoY/S8Xm7ZtUA1bcp3k0IAyIFeAXHDNpfXqDek=;
-        b=IXHOLSKjW3jzQvSuaJh5cjXqImf+B4kQKWQYjNDK0J6zgwafiOIlIQFnb/tx7L1uSebm/h
-        x5GXGlr04z4t5qPNqal/Jm7JoTZiAp461lrIU+5b+v6a2Sj1HXSWMdCQvQFJBF92yzGaKw
-        8nyYbACaGS+ziBy6oiDGkm0OeQeC3OU=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-648-oI5QDtjKMI6nOOu-V3NRPQ-1; Mon, 05 Sep 2022 12:32:32 -0400
-X-MC-Unique: oI5QDtjKMI6nOOu-V3NRPQ-1
-Received: by mail-wm1-f71.google.com with SMTP id h133-20020a1c218b000000b003a5fa79008bso7634855wmh.5
-        for <kvm@vger.kernel.org>; Mon, 05 Sep 2022 09:32:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:organization:from
-         :references:cc:to:content-language:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=Nq/yrAoY/S8Xm7ZtUA1bcp3k0IAyIFeAXHDNpfXqDek=;
-        b=kef8YcmKYjoZpbUDw+Q6CZIzAB3rnx+yIAC27MzRruXH45akVyeC8qTl+7mQOnsf/s
-         NfE1QhmHsSQuwZGJVMu58EYC61OiRKqu+id4Hea1gU6qbfPTDojqL3DatSCMkuOsIvGG
-         gQ9wWan1AjqPFGRBwU+HgzsO0Npnlme+nGRDlrd+uwNP4RQGdkW3wvygHYM824Bv3My8
-         NlXgsvFAzGQHPMyzL0iCkxLkHaxiJ141t2TATwaH3Lk4jBhXcudcA3gBWiAQajln3bHl
-         IpTMCqQhkF221fQSr4Jb7jPeGwJIe/UTH6fZKT+lJUC1D//eG6jSN5fdf1mu4+14inl8
-         tmYg==
-X-Gm-Message-State: ACgBeo2iLOpu9PPnlMDFREYAuR+FttgUbU8YIrP2iCAmAxYbb7+BqJpf
-        7HQWnpwVpMtT1PatXBqaZ4dOkz0lOT54LyqLw2M0GHOhkvUlhp9J0C136dL6f2xbp1QCMF7IqzA
-        kX46qLfJMcT/x
-X-Received: by 2002:a05:600c:410c:b0:3ab:ac5:c126 with SMTP id j12-20020a05600c410c00b003ab0ac5c126mr10014968wmi.158.1662395551505;
-        Mon, 05 Sep 2022 09:32:31 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR7UaTlgCWrird/WwC6iciEBOOSvADvM81ZF6WYU89A5DSeixda30BJUGqKXUQGmLy6BKMHOWQ==
-X-Received: by 2002:a05:600c:410c:b0:3ab:ac5:c126 with SMTP id j12-20020a05600c410c00b003ab0ac5c126mr10014954wmi.158.1662395551253;
-        Mon, 05 Sep 2022 09:32:31 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f0d:ba00:c951:31d7:b2b0:8ba0? (p200300d82f0dba00c95131d7b2b08ba0.dip0.t-ipconnect.de. [2003:d8:2f0d:ba00:c951:31d7:b2b0:8ba0])
-        by smtp.gmail.com with ESMTPSA id bd7-20020a05600c1f0700b003a331c6bffdsm11341158wmb.47.2022.09.05.09.32.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Sep 2022 09:32:30 -0700 (PDT)
-Message-ID: <08c54ddd-b74e-9f6c-f5eb-13e994530ad6@redhat.com>
-Date:   Mon, 5 Sep 2022 18:32:29 +0200
+        with ESMTP id S237574AbiIERCF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Sep 2022 13:02:05 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 159FD5E554
+        for <kvm@vger.kernel.org>; Mon,  5 Sep 2022 10:02:04 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CA9C0B81249
+        for <kvm@vger.kernel.org>; Mon,  5 Sep 2022 17:02:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EA15C433D6;
+        Mon,  5 Sep 2022 17:01:59 +0000 (UTC)
+Date:   Mon, 5 Sep 2022 18:01:55 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     kernel test robot <lkp@intel.com>
+Cc:     Peter Collingbourne <pcc@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kbuild-all@lists.01.org, Cornelia Huck <cohuck@redhat.com>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Evgenii Stepanov <eugenis@google.com>, kvm@vger.kernel.org,
+        Steven Price <steven.price@arm.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>
+Subject: Re: [PATCH v3 3/7] mm: Add PG_arch_3 page flag
+Message-ID: <YxYrgyybBMUqFswq@arm.com>
+References: <20220810193033.1090251-4-pcc@google.com>
+ <202208111500.62e0Bl2l-lkp@intel.com>
+ <YxDy+zFasbAP7Yrq@arm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, svens@linux.ibm.com
-References: <20220905084148.234821-1-pmorel@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: [PATCH] KVM: s390: vsie: fix crycb virtual vs physical usage
-In-Reply-To: <20220905084148.234821-1-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YxDy+zFasbAP7Yrq@arm.com>
+X-Spam-Status: No, score=-6.7 required=5.0 tests=BAYES_00,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05.09.22 10:41, Pierre Morel wrote:
-> Prepare VSIE for architectural changes where lowmem kernel real and
-> kernel virtual address are different.
-
-Bear with me, it used to be
-
-	crycb = (struct kvm_s390_crypto_cb *) (unsigned long)crycb_o;
-	apcb_o = (unsigned long) &crycb->apcb0;
-
-and now it's
-
-	apcb_o = crycb_o + offsetof(struct kvm_s390_crypto_cb, apcb0);
-
-
-So the real issue seems to be
-
-	crycb = (struct kvm_s390_crypto_cb *) (unsigned long)crycb_o;
-
-because crycb_o actually is a guest address and not a host address.
-
-
-But now I'm confused, because I would have thought that the result 
-produced by both code would be identical (I completely agree that the 
-new variant is better).
-
-How does this interact with "lowmem kernel real and kernel virtual 
-address are different." -- I would have thought that &crycb->apcb0 
-doesn't actually access any memory and only performs arithmetical 
-operations?
-
+On Thu, Sep 01, 2022 at 06:59:23PM +0100, Catalin Marinas wrote:
+> On Thu, Aug 11, 2022 at 03:16:08PM +0800, kernel test robot wrote:
+> > Thank you for the patch! Perhaps something to improve:
+> > 
+> > [auto build test WARNING on arm64/for-next/core]
+> > [also build test WARNING on linus/master next-20220811]
+> > [cannot apply to kvmarm/next arm/for-next soc/for-next xilinx-xlnx/master v5.19]
+> > [If your patch is applied to the wrong git tree, kindly drop us a note.
+> > And when submitting patch, we suggest to use '--base' as documented in
+> > https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> > 
+> > url:    https://github.com/intel-lab-lkp/linux/commits/Peter-Collingbourne/KVM-arm64-permit-MAP_SHARED-mappings-with-MTE-enabled/20220811-033310
+> > base:   https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-next/core
+> > config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20220811/202208111500.62e0Bl2l-lkp@intel.com/config)
+> > compiler: loongarch64-linux-gcc (GCC) 12.1.0
+> > reproduce (this is a W=1 build):
+> >         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+> >         chmod +x ~/bin/make.cross
+> >         # https://github.com/intel-lab-lkp/linux/commit/1a400517d8428df0ec9f86f8d303b2227ee9702f
+> >         git remote add linux-review https://github.com/intel-lab-lkp/linux
+> >         git fetch --no-tags linux-review Peter-Collingbourne/KVM-arm64-permit-MAP_SHARED-mappings-with-MTE-enabled/20220811-033310
+> >         git checkout 1a400517d8428df0ec9f86f8d303b2227ee9702f
+> >         # save the config file
+> >         mkdir build_dir && cp config build_dir/.config
+> >         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=loongarch SHELL=/bin/bash
+> > 
+> > If you fix the issue, kindly add following tag where applicable
+> > Reported-by: kernel test robot <lkp@intel.com>
+> > 
+> > All warnings (new ones prefixed by >>):
+> > 
+> > >> mm/memory.c:92:2: warning: #warning Unfortunate NUMA and NUMA Balancing config, growing page-frame for last_cpupid. [-Wcpp]
+> >       92 | #warning Unfortunate NUMA and NUMA Balancing config, growing page-frame for last_cpupid.
+> >          |  ^~~~~~~
+> > 
+> > 
+> > vim +92 mm/memory.c
+> > 
+> > 42b7772812d15b Jan Beulich    2008-07-23  90  
+> > af27d9403f5b80 Arnd Bergmann  2018-02-16  91  #if defined(LAST_CPUPID_NOT_IN_PAGE_FLAGS) && !defined(CONFIG_COMPILE_TEST)
+> > 90572890d20252 Peter Zijlstra 2013-10-07 @92  #warning Unfortunate NUMA and NUMA Balancing config, growing page-frame for last_cpupid.
+> > 75980e97daccfc Peter Zijlstra 2013-02-22  93  #endif
+> > 75980e97daccfc Peter Zijlstra 2013-02-22  94  
 > 
-> When we get the original crycb from the guest crycb we can use the
-> phys_to_virt transformation, which will use the host transformations,
-> but we must use an offset to calculate the guest real address apcb
-> and give it to read_guest_real().
+> It looks like ith CONFIG_NUMA_BALANCING=y on loongarch we run out of
+> spare bits in page->flags to fit last_cpupid. The reason we don't see it
+> on arm64 is that we select SPARSEMEM_VMEMMAP and SECTIONS_WIDTH becomes
+> 0. On loongarch SECTIONS_WIDTH takes 19 bits (48 - 29) in page->flags.
+> 
+> I think instead of always defining PG_arch_{2,3} if CONFIG_64BIT, we
+> could add a CONFIG_ARCH_WANTS_PG_ARCH_23 option and only select it on
+> arm64 for the time being.
 
-Can you elaborate where phys_to_virt() comes into play?
+I pushed a patch as the first one on the arm64 devel/mte-pg-flags
+branch. Also updated the last patch on this branch following Steven's
+comments.
 
-If this is an actual fix (as indicated in the patch subject), should 
-this carry a
-
-	Fixes: 56019f9aca22 ("KVM: s390: vsie: Allow CRYCB FORMAT-2")
+Peter, please let me know if you want to pick this series up together
+with your other KVM patches. Otherwise I can post it separately, it's
+worth merging it on its own as it clarifies the page flag vs tag setting
+ordering.
 
 -- 
-Thanks,
-
-David / dhildenb
-
+Catalin
