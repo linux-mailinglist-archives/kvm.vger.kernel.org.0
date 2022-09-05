@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E95B5AD85F
-	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 19:27:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D98BC5AD871
+	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 19:37:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231466AbiIER1B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Sep 2022 13:27:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60300 "EHLO
+        id S237446AbiIERhF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Sep 2022 13:37:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229744AbiIER07 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Sep 2022 13:26:59 -0400
-Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00F295D117
-        for <kvm@vger.kernel.org>; Mon,  5 Sep 2022 10:26:57 -0700 (PDT)
-Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-11f11d932a8so22792265fac.3
-        for <kvm@vger.kernel.org>; Mon, 05 Sep 2022 10:26:57 -0700 (PDT)
+        with ESMTP id S230035AbiIERhD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Sep 2022 13:37:03 -0400
+Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED8B25E668
+        for <kvm@vger.kernel.org>; Mon,  5 Sep 2022 10:37:02 -0700 (PDT)
+Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-1279948d93dso3015152fac.10
+        for <kvm@vger.kernel.org>; Mon, 05 Sep 2022 10:37:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date;
-        bh=wiTlUO4bKJB5mIc5pzysFouMdeYXvcZN+PGCeIOyA9o=;
-        b=gCr1hfUa+/WK1fmjnuj9/t4ayZdVUpXZDUtVROQ/WEHgZNLC7IGzx+3LKMtCELUT0H
-         plL3SC4s9Srr1XFrojvRjmQ3DOwIg7ZnG3TfJu1jMo8FOm16+xUdb3G5SEN8Zb4X6yux
-         BROrfWmDpVdP8goNUaOSq6OH/BfRGtUGfEmCDm4qoqFwuvLguU8ztSr6mZrdLQ8lbADW
-         Fc3PTDN9BbZ2GktdGTg7lTthBwKxsvhBkXLmlD3Qmd1u9gFL3qgvgEbXw8X1/8AGH1bM
-         ZYfX4QOHjr0tjNsaNehA+CjRO1qkrAwsmGJVT1LliFYKCmTe6dbmtjaAqynMg3M7SbHy
-         cN3w==
+        bh=a1Wl5OOBM+OdiCqwjpRNbQVvWBi9SOkRJQ7j+gqJGAI=;
+        b=omXxCPqBgDlAxdUX5U3YmgblCVqUcKpbsoTO+4DUk94Iq8Ti9QLdiueFbqZ+DgSlp1
+         V8iuStpxP2j4Ww3tI5mVwdlgs1zcuRT7t7INHg1D0a7/IAnd9sXOCdqgra40rPUE8wD0
+         cg4U3zqiRno6i+kIK7wfyr0jwxRhlU3xtFU/jTVDRYdedLsMRBHOcbn1RUKJY2Unmeeb
+         4iCsdLOAZ4xhRkAWzbOtmAMh4Fj2HMXy2Og0EuTF0lq0EjrIGgbFcqz+I3BrU271nVeH
+         fzkUWc7H43GObS8fzc6AQAbWhMpWmlJsPGwVRHukT8vRkg/NL9sNpwmkJRLBvILW1I/Q
+         3qpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=wiTlUO4bKJB5mIc5pzysFouMdeYXvcZN+PGCeIOyA9o=;
-        b=PV9+K7etshC5Rrha/M3FKgvE8+TLe1OOenqPDmbECRfZ921tEOslFoc0kUted75/G9
-         HtWasxKCM0KHat4/Ipy8I49Ymz4pJBtn50kK0YJOzgAurqx5NAUXZ+1gxFXJ0jxacjWF
-         J1Vi6EWyX4H9Cc62I9tiQYY2j/ScGNqM1kzGJbhojHhQ2OlOvvscer2DUXMVRBkFvmaN
-         JOSCoCRWhlZYVEu3XYHt0x/sCbLJMdVNcdielPY5qWMNQcCIG5TWk42xVKBKgnG+fnNE
-         ULh3TOzsSUGrzH9ZBp7E9PtT9a3NccFpFW/GSrLvLVm1JrQ3IXkXLGMcGiVYppdyDd4u
-         vaRQ==
-X-Gm-Message-State: ACgBeo2cABeD5qGaNr409kA42VVdAhEFdubmWq+K+afaF4YnbyrfFpXG
-        LtS8VY43abpOM4SrGJym+T1irVhrroeTnO0OdkaD3A==
-X-Google-Smtp-Source: AA6agR4Q4NmpbQLP9rhwXPUZUIYyMJksRer3zYTGX6tLakGrrlUJx6aeIIeJ1UogkUFjMJlVPnZRdG1x5PfYYNy2lhA=
-X-Received: by 2002:a05:6870:41d0:b0:126:5d06:28a5 with SMTP id
- z16-20020a05687041d000b001265d0628a5mr5632497oac.181.1662398817061; Mon, 05
- Sep 2022 10:26:57 -0700 (PDT)
+        bh=a1Wl5OOBM+OdiCqwjpRNbQVvWBi9SOkRJQ7j+gqJGAI=;
+        b=yO8r/8yPaKUdwsU5zLnFmcIBwLPPrBqgw0yOKuobIQ7rNsRuCY2+pvXsPX4o5Esg2Q
+         L0rVvx3oX5YUCnzjQnuf5V0cnQWNGegKE6DFhuXBWunPFSHObMw+5dNK3bZnkmAWuDLz
+         YoTZJBLOX5NJw/H/ieAxJUHreZYeEdY1GfLJgAYovRLfZJKXs6FnSSMGsa6j58gCkkt/
+         rrVd8NX/pmOtdofhMzUalVAaKfeiPCujYKAfJXlDoW4nzvceDW+JbRpXVTQBt6at0GoF
+         29yA2sogVscyypMgSefyMurptUOcMICeqC3J3rwJpv54DRD7CgZGv52v59ueHQ1606Mp
+         GPpg==
+X-Gm-Message-State: ACgBeo2VS/sbQFE3EwR3ldQtqzmOajycDBJNWPtQgQd9r+d4QMXju0+0
+        Dp00VObfoqRCQL5oyNdDB1Lq7so+3FoP2tyhPJdt4Q==
+X-Google-Smtp-Source: AA6agR5aL8W3+sousDudZxT+/nLQAmWyTAA2BbxmIIkDasYIK+tFHEa7u4ZnJLfSCaHD7jyPJkRRUB/yg6ndTpAc0Jk=
+X-Received: by 2002:a05:6808:150f:b0:343:3202:91cf with SMTP id
+ u15-20020a056808150f00b00343320291cfmr8032565oiw.112.1662399422082; Mon, 05
+ Sep 2022 10:37:02 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220905123946.95223-1-likexu@tencent.com> <20220905123946.95223-2-likexu@tencent.com>
-In-Reply-To: <20220905123946.95223-2-likexu@tencent.com>
+References: <20220905123946.95223-1-likexu@tencent.com> <20220905123946.95223-5-likexu@tencent.com>
+In-Reply-To: <20220905123946.95223-5-likexu@tencent.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 5 Sep 2022 10:26:45 -0700
-Message-ID: <CALMp9eR3qSVvVgCVq9qsZkFOxa1mHWaAhZimOd14j30_3fXsZg@mail.gmail.com>
-Subject: Re: [PATCH 1/4] KVM: x86/svm/pmu: Limit the maximum number of
- supported GP counters
+Date:   Mon, 5 Sep 2022 10:36:51 -0700
+Message-ID: <CALMp9eQtjZ-iRiW5Jusa+NF-P0sdHtcoR8fPiBSKtNXKgstgVA@mail.gmail.com>
+Subject: Re: [PATCH 4/4] KVM: x86/cpuid: Add AMD CPUID ExtPerfMonAndDbg leaf 0x80000022
 To:     Like Xu <like.xu.linux@gmail.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -71,89 +70,94 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, Sep 5, 2022 at 5:45 AM Like Xu <like.xu.linux@gmail.com> wrote:
 >
-> From: Like Xu <likexu@tencent.com>
+> From: Sandipan Das <sandipan.das@amd.com>
 >
-> The AMD PerfMonV2 specification allows for a maximum of 16 GP counters,
-> which is clearly not supported with zero code effort in the current KVM.
+> CPUID leaf 0x80000022 i.e. ExtPerfMonAndDbg advertises some
+> new performance monitoring features for AMD processors.
 >
-> A local macro (named like INTEL_PMC_MAX_GENERIC) is introduced to
-> take back control of this virt capability, which also makes it easier to
-> statically partition all available counters between hosts and guests.
+> Bit 0 of EAX indicates support for Performance Monitoring
+> Version 2 (PerfMonV2) features. If found to be set during
+> PMU initialization, the EBX bits of the same CPUID function
+> can be used to determine the number of available PMCs for
+> different PMU types.
 >
+> Expose the relevant bits via KVM_GET_SUPPORTED_CPUID so
+> that guests can make use of the PerfMonV2 features.
+>
+> Co-developed-by: Like Xu <likexu@tencent.com>
 > Signed-off-by: Like Xu <likexu@tencent.com>
+> Signed-off-by: Sandipan Das <sandipan.das@amd.com>
 > ---
->  arch/x86/kvm/pmu.h     | 2 ++
->  arch/x86/kvm/svm/pmu.c | 7 ++++---
->  arch/x86/kvm/x86.c     | 2 ++
->  3 files changed, 8 insertions(+), 3 deletions(-)
+>  arch/x86/include/asm/perf_event.h |  8 ++++++++
+>  arch/x86/kvm/cpuid.c              | 21 ++++++++++++++++++++-
+>  2 files changed, 28 insertions(+), 1 deletion(-)
 >
-> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-> index 847e7112a5d3..e3a3813b6a38 100644
-> --- a/arch/x86/kvm/pmu.h
-> +++ b/arch/x86/kvm/pmu.h
-> @@ -18,6 +18,8 @@
->  #define VMWARE_BACKDOOR_PMC_REAL_TIME          0x10001
->  #define VMWARE_BACKDOOR_PMC_APPARENT_TIME      0x10002
+> diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
+> index f6fc8dd51ef4..c848f504e467 100644
+> --- a/arch/x86/include/asm/perf_event.h
+> +++ b/arch/x86/include/asm/perf_event.h
+> @@ -214,6 +214,14 @@ union cpuid_0x80000022_ebx {
+>         unsigned int            full;
+>  };
 >
-> +#define KVM_AMD_PMC_MAX_GENERIC        AMD64_NUM_COUNTERS_CORE
+> +union cpuid_0x80000022_eax {
+> +       struct {
+> +               /* Performance Monitoring Version 2 Supported */
+> +               unsigned int    perfmon_v2:1;
+> +       } split;
+> +       unsigned int            full;
+> +};
 > +
->  struct kvm_event_hw_type_mapping {
->         u8 eventsel;
->         u8 unit_mask;
-> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-> index 2ec420b85d6a..f99f2c869664 100644
-> --- a/arch/x86/kvm/svm/pmu.c
-> +++ b/arch/x86/kvm/svm/pmu.c
-> @@ -192,9 +192,10 @@ static void amd_pmu_init(struct kvm_vcpu *vcpu)
->         struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->         int i;
+>  struct x86_pmu_capability {
+>         int             version;
+>         int             num_counters_gp;
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 75dcf7a72605..08a29ab096d2 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -1094,7 +1094,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>                 entry->edx = 0;
+>                 break;
+>         case 0x80000000:
+> -               entry->eax = min(entry->eax, 0x80000021);
+> +               entry->eax = min(entry->eax, 0x80000022);
+>                 /*
+>                  * Serializing LFENCE is reported in a multitude of ways, and
+>                  * NullSegClearsBase is not reported in CPUID on Zen2; help
+> @@ -1203,6 +1203,25 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>                 if (!static_cpu_has_bug(X86_BUG_NULL_SEG))
+>                         entry->eax |= BIT(6);
+>                 break;
+> +       /* AMD Extended Performance Monitoring and Debug */
+> +       case 0x80000022: {
+> +               union cpuid_0x80000022_eax eax;
+> +               union cpuid_0x80000022_ebx ebx;
+> +
+> +               entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
+> +               if (!enable_pmu)
+> +                       break;
+> +
+> +               if (kvm_pmu_cap.version > 1) {
+> +                       /* AMD PerfMon is only supported up to V2 in the KVM. */
+> +                       eax.split.perfmon_v2 = 1;
+> +                       ebx.split.num_core_pmc = min(kvm_pmu_cap.num_counters_gp,
+> +                                                    KVM_AMD_PMC_MAX_GENERIC);
+
+Note that the number of core PMCs has to be at least 6 if
+guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE). I suppose this leaf
+could claim fewer, but the first 6 PMCs must work, per the v1 PMU
+spec. That is, software that knows about PERFCTR_CORE, but not about
+PMU v2, can rightfully expect 6 PMCs.
+
+
+> +               }
+> +               entry->eax = eax.full;
+> +               entry->ebx = ebx.full;
+> +               break;
+> +       }
+>         /*Add support for Centaur's CPUID instruction*/
+>         case 0xC0000000:
+>                 /*Just support up to 0xC0000004 now*/
+> --
+> 2.37.3
 >
-> -       BUILD_BUG_ON(AMD64_NUM_COUNTERS_CORE > INTEL_PMC_MAX_GENERIC);
-> +       BUILD_BUG_ON(AMD64_NUM_COUNTERS_CORE > KVM_AMD_PMC_MAX_GENERIC);
-> +       BUILD_BUG_ON(KVM_AMD_PMC_MAX_GENERIC > INTEL_PMC_MAX_GENERIC);
->
-> -       for (i = 0; i < AMD64_NUM_COUNTERS_CORE ; i++) {
-> +       for (i = 0; i < KVM_AMD_PMC_MAX_GENERIC ; i++) {
->                 pmu->gp_counters[i].type = KVM_PMC_GP;
->                 pmu->gp_counters[i].vcpu = vcpu;
->                 pmu->gp_counters[i].idx = i;
-> @@ -207,7 +208,7 @@ static void amd_pmu_reset(struct kvm_vcpu *vcpu)
->         struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->         int i;
->
-> -       for (i = 0; i < AMD64_NUM_COUNTERS_CORE; i++) {
-> +       for (i = 0; i < KVM_AMD_PMC_MAX_GENERIC; i++) {
->                 struct kvm_pmc *pmc = &pmu->gp_counters[i];
->
->                 pmc_stop_counter(pmc);
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 43a6a7efc6ec..b9738efd8425 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1444,12 +1444,14 @@ static const u32 msrs_to_save_all[] = {
->         MSR_ARCH_PERFMON_EVENTSEL0 + 16, MSR_ARCH_PERFMON_EVENTSEL0 + 17,
-
-IIRC, the effective maximum on the Intel side is 18, despite what
-INTEL_PMC_MAX_GENERIC says, due to collisions with other existing MSR
-indices. That's why the Intel list stops here. Should we introduce a
-KVM_INTEL_PMC_MAX_GENERIC as well?
-
->         MSR_IA32_PEBS_ENABLE, MSR_IA32_DS_AREA, MSR_PEBS_DATA_CFG,
->
-> +       /* This part of MSRs should match KVM_AMD_PMC_MAX_GENERIC. */
-
-Perhaps the comment above should be moved down two lines, since the
-next two lines deal with the legacy counters.
-
->         MSR_K7_EVNTSEL0, MSR_K7_EVNTSEL1, MSR_K7_EVNTSEL2, MSR_K7_EVNTSEL3,
->         MSR_K7_PERFCTR0, MSR_K7_PERFCTR1, MSR_K7_PERFCTR2, MSR_K7_PERFCTR3,
->         MSR_F15H_PERF_CTL0, MSR_F15H_PERF_CTL1, MSR_F15H_PERF_CTL2,
->         MSR_F15H_PERF_CTL3, MSR_F15H_PERF_CTL4, MSR_F15H_PERF_CTL5,
->         MSR_F15H_PERF_CTR0, MSR_F15H_PERF_CTR1, MSR_F15H_PERF_CTR2,
->         MSR_F15H_PERF_CTR3, MSR_F15H_PERF_CTR4, MSR_F15H_PERF_CTR5,
-
-At some point, we may want to consider populating the PMU MSR list
-dynamically, rather than statically enumerating all of them (for both
-AMD and Intel).
-
-Reviewed-by: Jim Mattson <jmattson@google.com>
