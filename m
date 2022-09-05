@@ -2,119 +2,242 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E4D535AD698
-	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 17:32:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D93E65AD6AF
+	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 17:39:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238981AbiIEPcH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Sep 2022 11:32:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42768 "EHLO
+        id S237925AbiIEPiu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Sep 2022 11:38:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238975AbiIEPbt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Sep 2022 11:31:49 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9D536173C
-        for <kvm@vger.kernel.org>; Mon,  5 Sep 2022 08:30:13 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 285F31j4031882;
-        Mon, 5 Sep 2022 15:30:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=j9LcXrbPdt03AgWXUjW7bxocRRURAlvokntiJTbus4k=;
- b=C/ed0Cz93RqbvbDQ/6k6jQjs62QTrzssi7y5Ovof+bgaFW1ocgSYKmiN4F3uinJ06PWk
- 5X1Vx9EEjPyebmdr6YEGWK39VA7hjoPvpfmZpQXi7mThQk782hTqQ/MMIcv5T9PNmNFs
- 7gUYsM2lRZ8yumd/gIV+yy1ikkX2Eg8h8idOMY67q74tYfOVFHTiFZeYGoJmwYNrQUST
- o/C8GK0EUvKz4ExlH67omw2o4G1qsyW1QIW0ulBR4P/HtbOR50jJrPCQJcPPK2icPnjP
- UZJFbIndsjmMbGEVuWIgvmqrtFgQyvefrQZVIPXeynfh6t4YHVEBbIZOA1PZAvaEzuJc bg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jdkdpgnau-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Sep 2022 15:30:06 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 285FM31x011997;
-        Mon, 5 Sep 2022 15:30:06 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jdkdpgn9q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Sep 2022 15:30:06 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 285FMcCX012914;
-        Mon, 5 Sep 2022 15:30:04 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 3jbxj8tm16-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 05 Sep 2022 15:30:04 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 285FU1u429294868
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 5 Sep 2022 15:30:01 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EDAE05204E;
-        Mon,  5 Sep 2022 15:30:00 +0000 (GMT)
-Received: from [9.171.61.194] (unknown [9.171.61.194])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id E1B645204F;
-        Mon,  5 Sep 2022 15:29:58 +0000 (GMT)
-Message-ID: <d32b462c-00f9-20e3-c901-f040d54f2fec@linux.ibm.com>
-Date:   Mon, 5 Sep 2022 17:29:56 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v9 09/10] s390x/cpu_topology: activating CPU topology
-Content-Language: en-US
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
-References: <20220902075531.188916-1-pmorel@linux.ibm.com>
- <20220902075531.188916-10-pmorel@linux.ibm.com>
-In-Reply-To: <20220902075531.188916-10-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: NyUho0IlnbOJiKR_GC9xZQLdcwTFEyv3
-X-Proofpoint-ORIG-GUID: XSgfZyM4tYllbpGxRH3HWO_ACh_SA6jo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-05_09,2022-09-05_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- impostorscore=0 phishscore=0 mlxlogscore=736 clxscore=1015 adultscore=0
- bulkscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2207270000
- definitions=main-2209050072
-X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S239035AbiIEPiq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Sep 2022 11:38:46 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E485640E11;
+        Mon,  5 Sep 2022 08:38:44 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 78AA3B811F0;
+        Mon,  5 Sep 2022 15:38:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B671C433C1;
+        Mon,  5 Sep 2022 15:38:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662392322;
+        bh=mnbQ4LQki0oGNRbOw3qBGCOFYGhJfzPcJRy55oW3Afo=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=XJLnUxEFvylm7wrZfcsYjvym60RAg6HFwdm4lXYpiAQWJGMZrG/b3FIr2buarWis/
+         EYg2CDO8Mwsyv2+C7GY4qX9ptFXQJihS4tgL0ZxwA6SxAe7gcZVfiiL2XZ3ztaXrgx
+         OdktzM2+kPPfHRNYDVLWYqPt98FK2/Km8fJSPzQNx4uDdNlwLrut2wXSfw34QXuSF2
+         GnardonQpM+qjQh+uXgoP5X0Q3uFPZtIp0X9nNxrORvBw1GX7QrL7m0UzKOmh+dtRH
+         Lz2FUahGXj77GVLWvmkIk8KTxKMI7ZfTj8rPEIBCF3IjbvGT2/ePAmUyEXZKQd1Afl
+         /oi3zpO84L3Xg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oVEBL-00875U-SV;
+        Mon, 05 Sep 2022 16:38:39 +0100
+Date:   Mon, 05 Sep 2022 16:38:39 +0100
+Message-ID: <87tu5lvnk0.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     isaku.yamahata@intel.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Will Deacon <will@kernel.org>, isaku.yamahata@gmail.com,
+        Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Shaokun Zhang <zhangshaokun@hisilicon.com>,
+        John Garry <john.garry@huawei.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v3 00/22] KVM: hardware enable/disable reorganize
+In-Reply-To: <cover.1662084396.git.isaku.yamahata@intel.com>
+References: <cover.1662084396.git.isaku.yamahata@intel.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: isaku.yamahata@intel.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com, tglx@linutronix.de, will@kernel.org, isaku.yamahata@gmail.com, kai.huang@intel.com, chao.gao@intel.com, atishp@atishpatra.org, zhangshaokun@hisilicon.com, john.garry@huawei.com, daniel.lezcano@linaro.org, ying.huang@intel.com, chenhuacai@kernel.org, dave.hansen@linux.intel.com, bp@alien8.de
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 9/2/22 09:55, Pierre Morel wrote:
-> Starting with a new machine, s390-virtio-ccw-7.2, the machine
-> property topology-disable is set to false while it is kept to
-> true for older machine.
-> This allows migrating older machine without disabling the ctop
-> CPU feature for older machine, thus keeping existing start scripts.
+On Fri, 02 Sep 2022 03:17:35 +0100,
+isaku.yamahata@intel.com wrote:
 > 
-> The KVM capability, KVM_CAP_S390_CPU_TOPOLOGY is used to
-> activate the S390_FEAT_CONFIGURATION_TOPOLOGY feature and
-> the topology facility for the guest in the case the topology
-> is not disabled.
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
+> Changes from v2:
+> - Replace the first patch("KVM: x86: Drop kvm_user_return_msr_cpu_online()")
+>   with Sean's implementation
+> - Included all patches of "Improve KVM's interaction with CPU hotplug" [2]
+>   Until v2, Tried to cherry-pick the least patches of it. It turned out that
+>   all the patches are desirable.
+> 
+> This patch series is to implement the suggestion by Sean Christopherson [1]
+> to reorganize enable/disable cpu virtualization feature by replacing
+> the arch-generic current enable/disable logic with PM related hooks. And
+> convert kvm/x86 to use new hooks.
 
-Sorry, forget this patch I made a stupid rebase error and lost half of 
-the code.
+This series totally breaks on arm64 when playing with CPU hotplug. It
+very much looks like preemption is now enabled in situations where we
+don't expect it to (see below for the full-blown horror show). And
+given the way it shows up in common code, I strongly suspect this
+affects other architectures too.
+
+Note that if I only take patch #6 (with the subsequent fix that I
+posted this morning), the system is perfectly happy with CPUs being
+hotplugged on/off ad-nauseam.
+
+Thanks,
+
+	M.
+
+[  108.213362] WARNING: CPU: 1 PID: 18 at arch/arm64/kvm/../../../virt/kvm/kvm_arch.c:38 hardware_disable+0x40/0x5c
+[  108.222403] Modules linked in: macvtap(E) macvlan(E) tap(E) nls_ascii(E) nls_cp437(E) vfat(E) fat(E) hci_uart(E) btqca(E) btrtl(E) aes_ce_blk(E) btbcm(E) btintel(E) aes_ce_cipher(E) ghash_ce(E) gf128mul(E) sha2_ce(E) sha256_arm64(E) bluetooth(E) sha1_ce(E) meson_saradc(E) panfrost(E) ecdh_generic(E) ecc(E) gpu_sched(E) rfkill(E) drm_shmem_helper(E) industrialio(E) meson_drm(E) meson_rng(E) rng_core(E) meson_dw_hdmi(E) dw_hdmi(E) drm_display_helper(E) meson_canvas(E) cec(E) display_connector(E) drm_cma_helper(E) pwm_meson(E) efi_pstore(E) drm_kms_helper(E) leds_gpio(E) cpufreq_dt(E) fuse(E) drm(E) configfs(E) efivarfs(E) ip_tables(E) x_tables(E) autofs4(E) xhci_plat_hcd(E) meson_gxl(E) realtek(E) dwmac_generic(E) dwc3(E) dwc2(E) ulpi(E) udc_core(E) rtc_hym8563(E) nvme(E) dwmac_meson8b(E) stmmac_platform(E) nvme_core(E) t10_pi(E) mdio_mux_meson_g12a(E) dwc3_meson_g12a(E) i2c_meson(E) mdio_mux(E) meson_gx_mmc(E) stmmac(E) pcs_xpcs(E) phylink(E) of_mdio(E) crc64_rocksoft(E) crc64(E)
+[  108.222572]  fixed_phy(E) fwnode_mdio(E) libphy(E) pwm_regulator(E)
+[  108.314691] CPU: 1 PID: 18 Comm: cpuhp/1 Tainted: G            E      6.0.0-rc4-00024-g202b793c12e7 #125
+[  108.324090] Hardware name:  , BIOS 2021.01-rc2-00012-gde865f7ee1 11/16/2020
+[  108.330992] pstate: a0400009 (NzCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[  108.337890] pc : hardware_disable+0x40/0x5c
+[  108.342031] lr : kvm_arch_offline_cpu+0x2c/0x40
+[  108.346515] sp : ffff8000080cbd20
+[  108.349793] x29: ffff8000080cbd20 x28: 0000000000000001 x27: ffff909c1f1d9000
+[  108.356865] x26: 0000000000000000 x25: 0000000000000000 x24: ffff418c3f985768
+[  108.363938] x23: ffffb0f0207ac768 x22: ffffb0f01f33e180 x21: 00000000000002f3
+[  108.371010] x20: 0000000000000001 x19: ffffb0f020d09598 x18: 0000000000000000
+[  108.378083] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
+[  108.385155] x14: 0000000000000032 x13: 0000000000000000 x12: 0000000000000000
+[  108.392228] x11: ffff418bc0503f50 x10: 0000000000000bc0 x9 : ffffb0f01f34b55c
+[  108.399300] x8 : ffff418bc029bce0 x7 : ffff418bc7a1a098 x6 : ffffb0f020d0f3a8
+[  108.406373] x5 : ffffb0f020cfd000 x4 : 0000000000000000 x3 : ffffb0f020d09598
+[  108.413445] x2 : ffff418bc029b0c0 x1 : 0000000000000000 x0 : 0000000000000000
+[  108.420519] Call trace:
+[  108.422933]  hardware_disable+0x40/0x5c
+[  108.426729]  kvm_arch_offline_cpu+0x2c/0x40
+[  108.430868]  kvm_offline_cpu+0x40/0x60
+[  108.434577]  cpuhp_invoke_callback+0x16c/0x5b0
+[  108.438976]  cpuhp_thread_fun+0xdc/0x194
+[  108.442857]  smpboot_thread_fn+0x244/0x270
+[  108.446911]  kthread+0xf8/0x100
+[  108.450015]  ret_from_fork+0x10/0x20
+[  108.453554] ---[ end trace 0000000000000000 ]---
+[  108.458406] IRQ24: set affinity failed(-22).
+[  108.458424] IRQ29: set affinity failed(-22).
+[  108.458911] psci: CPU1 killed (polled 0 ms)
+[  109.533677] Detected VIPT I-cache on CPU1
+[  109.533817] CPU1: Booted secondary processor 0x0000000100 [0x411fd050]
+[  109.533886] ------------[ cut here ]------------
+[  109.543308] WARNING: CPU: 1 PID: 18 at arch/arm64/kvm/../../../virt/kvm/kvm_arch.c:19 __hardware_enable+0x54/0x80
+[  109.553482] Modules linked in: macvtap(E) macvlan(E) tap(E) nls_ascii(E) nls_cp437(E) vfat(E) fat(E) hci_uart(E) btqca(E) btrtl(E) aes_ce_blk(E) btbcm(E) btintel(E) aes_ce_cipher(E) ghash_ce(E) gf128mul(E) sha2_ce(E) sha256_arm64(E) bluetooth(E) sha1_ce(E) meson_saradc(E) panfrost(E) ecdh_generic(E) ecc(E) gpu_sched(E) rfkill(E) drm_shmem_helper(E) industrialio(E) meson_drm(E) meson_rng(E) rng_core(E) meson_dw_hdmi(E) dw_hdmi(E) drm_display_helper(E) meson_canvas(E) cec(E) display_connector(E) drm_cma_helper(E) pwm_meson(E) efi_pstore(E) drm_kms_helper(E) leds_gpio(E) cpufreq_dt(E) fuse(E) drm(E) configfs(E) efivarfs(E) ip_tables(E) x_tables(E) autofs4(E) xhci_plat_hcd(E) meson_gxl(E) realtek(E) dwmac_generic(E) dwc3(E) dwc2(E) ulpi(E) udc_core(E) rtc_hym8563(E) nvme(E) dwmac_meson8b(E) stmmac_platform(E) nvme_core(E) t10_pi(E) mdio_mux_meson_g12a(E) dwc3_meson_g12a(E) i2c_meson(E) mdio_mux(E) meson_gx_mmc(E) stmmac(E) pcs_xpcs(E) phylink(E) of_mdio(E) crc64_rocksoft(E) crc64(E)
+[  109.553657]  fixed_phy(E) fwnode_mdio(E) libphy(E) pwm_regulator(E)
+[  109.645771] CPU: 1 PID: 18 Comm: cpuhp/1 Tainted: G        W   E      6.0.0-rc4-00024-g202b793c12e7 #125
+[  109.655170] Hardware name:  , BIOS 2021.01-rc2-00012-gde865f7ee1 11/16/2020
+[  109.662071] pstate: a0400009 (NzCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[  109.668970] pc : __hardware_enable+0x54/0x80
+[  109.673196] lr : kvm_arch_online_cpu+0x4c/0x5c
+[  109.677594] sp : ffff8000080cbd00
+[  109.680872] x29: ffff8000080cbd00 x28: 0000000000000001 x27: ffff909c1f1d9000
+[  109.687944] x26: 0000000000000000 x25: 0000000000000000 x24: ffff418c3f985768
+[  109.695016] x23: ffffb0f0207ac768 x22: ffffb0f01f33e1e0 x21: 00000000000002f3
+[  109.702089] x20: ffffb0f01ffdc700 x19: 0000000000000001 x18: 0000000000000000
+[  109.709161] x17: 000000006a7316ce x16: 00000000dee945dd x15: 0000000000000030
+[  109.716234] x14: 0000000000000001 x13: 5d30353064663131 x12: 3478305b20303031
+[  109.723306] x11: 3030303030303078 x10: 0000000000000bc0 x9 : ffffb0f01f34b520
+[  109.730379] x8 : ffff418bc029bce0 x7 : 0000000000000003 x6 : ffffb0f020d0f3a8
+[  109.737452] x5 : ffffb0f020cfd000 x4 : 0000000000000000 x3 : ffffb0f020d09598
+[  109.744524] x2 : ffff418bc029b0c0 x1 : 0000000000000000 x0 : 0000000000000000
+[  109.751598] Call trace:
+[  109.754012]  __hardware_enable+0x54/0x80
+[  109.757894]  kvm_arch_online_cpu+0x4c/0x5c
+[  109.761947]  kvm_online_cpu+0x40/0x60
+[  109.765569]  cpuhp_invoke_callback+0x16c/0x5b0
+[  109.769968]  cpuhp_thread_fun+0xdc/0x194
+[  109.773849]  smpboot_thread_fn+0x244/0x270
+[  109.777903]  kthread+0xf8/0x100
+[  109.781009]  ret_from_fork+0x10/0x20
+[  109.784545] ---[ end trace 0000000000000000 ]---
+[  109.789178] ------------[ cut here ]------------
+[  109.793694] kernel BUG at arch/arm64/kvm/vgic/vgic-init.c:507!
+[  109.799467] Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
+[  109.804901] Modules linked in: macvtap(E) macvlan(E) tap(E) nls_ascii(E) nls_cp437(E) vfat(E) fat(E) hci_uart(E) btqca(E) btrtl(E) aes_ce_blk(E) btbcm(E) btintel(E) aes_ce_cipher(E) ghash_ce(E) gf128mul(E) sha2_ce(E) sha256_arm64(E) bluetooth(E) sha1_ce(E) meson_saradc(E) panfrost(E) ecdh_generic(E) ecc(E) gpu_sched(E) rfkill(E) drm_shmem_helper(E) industrialio(E) meson_drm(E) meson_rng(E) rng_core(E) meson_dw_hdmi(E) dw_hdmi(E) drm_display_helper(E) meson_canvas(E) cec(E) display_connector(E) drm_cma_helper(E) pwm_meson(E) efi_pstore(E) drm_kms_helper(E) leds_gpio(E) cpufreq_dt(E) fuse(E) drm(E) configfs(E) efivarfs(E) ip_tables(E) x_tables(E) autofs4(E) xhci_plat_hcd(E) meson_gxl(E) realtek(E) dwmac_generic(E) dwc3(E) dwc2(E) ulpi(E) udc_core(E) rtc_hym8563(E) nvme(E) dwmac_meson8b(E) stmmac_platform(E) nvme_core(E) t10_pi(E) mdio_mux_meson_g12a(E) dwc3_meson_g12a(E) i2c_meson(E) mdio_mux(E) meson_gx_mmc(E) stmmac(E) pcs_xpcs(E) phylink(E) of_mdio(E) crc64_rocksoft(E) crc64(E)
+[  109.805056]  fixed_phy(E) fwnode_mdio(E) libphy(E) pwm_regulator(E)
+[  109.897189] CPU: 1 PID: 18 Comm: cpuhp/1 Tainted: G        W   E      6.0.0-rc4-00024-g202b793c12e7 #125
+[  109.906588] Hardware name:  , BIOS 2021.01-rc2-00012-gde865f7ee1 11/16/2020
+[  109.913490] pstate: 60400009 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[  109.920388] pc : kvm_vgic_init_cpu_hardware+0x94/0xa0
+[  109.925391] lr : _kvm_arch_hardware_enable+0xa0/0xb0
+[  109.930307] sp : ffff8000080cbcc0
+[  109.933584] x29: ffff8000080cbcc0 x28: 0000000000000001 x27: ffff909c1f1d9000
+[  109.940657] x26: 0000000000000000 x25: 0000000000000000 x24: ffff418c3f985768
+[  109.947729] x23: ffffb0f0207ac768 x22: ffffb0f01f33e1e0 x21: 00000000000002f3
+[  109.954802] x20: ffffb0f01ffdc700 x19: ffffb0f0207ab8b8 x18: 0000000000000000
+[  109.961874] x17: 000000006a7316ce x16: 00000000dee945dd x15: 0000000000000030
+[  109.968947] x14: 0000000000000001 x13: 5d30353064663131 x12: 3478305b20303031
+[  109.976019] x11: 3030303030303078 x10: 0000000000000bc0 x9 : ffffb0f01f350c30
+[  109.983092] x8 : ffff418bc029bce0 x7 : 0000000000000003 x6 : ffffb0f020d0f3a8
+[  109.990164] x5 : ffffb0f020cfd000 x4 : ffff909c1f1d9000 x3 : ffffb0f020d09598
+[  109.997237] x2 : ffffb0f0207ab8c8 x1 : 0000000000000000 x0 : 0000000000000000
+[  110.004311] Call trace:
+[  110.006725]  kvm_vgic_init_cpu_hardware+0x94/0xa0
+[  110.011384]  kvm_arch_hardware_enable+0x38/0x70
+[  110.015867]  __hardware_enable+0x2c/0x80
+[  110.019748]  kvm_arch_online_cpu+0x4c/0x5c
+[  110.023802]  kvm_online_cpu+0x40/0x60
+[  110.027424]  cpuhp_invoke_callback+0x16c/0x5b0
+[  110.031823]  cpuhp_thread_fun+0xdc/0x194
+[  110.035704]  smpboot_thread_fn+0x244/0x270
+[  110.039758]  kthread+0xf8/0x100
+[  110.042864]  ret_from_fork+0x10/0x20
+[  110.046406] Code: 17fffff2 d53b4221 12190020 35fffc40 (d4210000) 
+[  110.052440] ---[ end trace 0000000000000000 ]---
+[  110.057009] note: cpuhp/1[18] exited with preempt_count 1
+[  110.062537] ------------[ cut here ]------------
+[  110.066932] WARNING: CPU: 1 PID: 0 at kernel/context_tracking.c:128 ct_kernel_exit.constprop.0+0x98/0xa0
+[  110.076330] Modules linked in: macvtap(E) macvlan(E) tap(E) nls_ascii(E) nls_cp437(E) vfat(E) fat(E) hci_uart(E) btqca(E) btrtl(E) aes_ce_blk(E) btbcm(E) btintel(E) aes_ce_cipher(E) ghash_ce(E) gf128mul(E) sha2_ce(E) sha256_arm64(E) bluetooth(E) sha1_ce(E) meson_saradc(E) panfrost(E) ecdh_generic(E) ecc(E) gpu_sched(E) rfkill(E) drm_shmem_helper(E) industrialio(E) meson_drm(E) meson_rng(E) rng_core(E) meson_dw_hdmi(E) dw_hdmi(E) drm_display_helper(E) meson_canvas(E) cec(E) display_connector(E) drm_cma_helper(E) pwm_meson(E) efi_pstore(E) drm_kms_helper(E) leds_gpio(E) cpufreq_dt(E) fuse(E) drm(E) configfs(E) efivarfs(E) ip_tables(E) x_tables(E) autofs4(E) xhci_plat_hcd(E) meson_gxl(E) realtek(E) dwmac_generic(E) dwc3(E) dwc2(E) ulpi(E) udc_core(E) rtc_hym8563(E) nvme(E) dwmac_meson8b(E) stmmac_platform(E) nvme_core(E) t10_pi(E) mdio_mux_meson_g12a(E) dwc3_meson_g12a(E) i2c_meson(E) mdio_mux(E) meson_gx_mmc(E) stmmac(E) pcs_xpcs(E) phylink(E) of_mdio(E) crc64_rocksoft(E) crc64(E)
+[  110.076588]  fixed_phy(E) fwnode_mdio(E) libphy(E) pwm_regulator(E)
+[  110.168618] CPU: 1 PID: 0 Comm: swapper/1 Tainted: G      D W   E      6.0.0-rc4-00024-g202b793c12e7 #125
+[  110.178103] Hardware name:  , BIOS 2021.01-rc2-00012-gde865f7ee1 11/16/2020
+[  110.185005] pstate: 204003c9 (nzCv DAIF +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[  110.191904] pc : ct_kernel_exit.constprop.0+0x98/0xa0
+[  110.196906] lr : ct_idle_enter+0x10/0x20
+[  110.200787] sp : ffff8000080abda0
+[  110.204064] x29: ffff8000080abda0 x28: 0000000000000000 x27: 0000000000000000
+[  110.211137] x26: 0000000000000000 x25: 0000000000000000 x24: 0000000000000000
+[  110.218209] x23: 0000000000000000 x22: ffff909c1f1d9000 x21: ffff418bc029d140
+[  110.225281] x20: ffffb0f0207aa008 x19: ffff418c3f992b78 x18: 0000000000000001
+[  110.232354] x17: 3030303030303030 x16: 3030303030303020 x15: 0000000000000030
+[  110.239426] x14: 0000000000000012 x13: 0000000000000000 x12: 0000000000000000
+[  110.246499] x11: ffff418bc0449e60 x10: 0000000000000bc0 x9 : ffffb0f01f3eb3c0
+[  110.253572] x8 : ffff418bc029dd60 x7 : 0000000000000025 x6 : 00000000ac17d5b7
+[  110.260644] x5 : 00ffffffffffffff x4 : 4000000000000002 x3 : ffff8000080abda0
+[  110.267716] x2 : 4000000000000000 x1 : ffffb0f0207b9b78 x0 : ffffb0f0207b9b78
+[  110.274790] Call trace:
+[  110.277205]  ct_kernel_exit.constprop.0+0x98/0xa0
+[  110.281863]  ct_idle_enter+0x10/0x20
+[  110.285398]  default_idle_call+0x58/0x198
+[  110.289366]  cpuidle_idle_call+0x170/0x1c0
+[  110.293420]  do_idle+0xb4/0x110
+[  110.296525]  cpu_startup_entry+0x30/0x40
+[  110.300405]  secondary_start_kernel+0xf0/0x144
+[  110.304805]  __secondary_switched+0xb0/0xb4
+[  110.308946] ---[ end trace 0000000000000000 ]---
+
 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+Without deviation from the norm, progress is not possible.
