@@ -2,213 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B271D5AD8B1
-	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 20:00:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B5B985AD8E4
+	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 20:12:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231979AbiIESAx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Sep 2022 14:00:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39866 "EHLO
+        id S231403AbiIESMF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Sep 2022 14:12:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231779AbiIESAu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Sep 2022 14:00:50 -0400
-Received: from mail-oa1-x32.google.com (mail-oa1-x32.google.com [IPv6:2001:4860:4864:20::32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB803204D
-        for <kvm@vger.kernel.org>; Mon,  5 Sep 2022 11:00:48 -0700 (PDT)
-Received: by mail-oa1-x32.google.com with SMTP id 586e51a60fabf-1278624b7c4so4695218fac.5
-        for <kvm@vger.kernel.org>; Mon, 05 Sep 2022 11:00:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=vo/ZXNY6mxg/MesOYZ4vVl7X/uP2QTxbLQziPj/OqxE=;
-        b=rMv0DtePu6GBRQ+5zF37wclZvMbnuRyvUsbLfibOgM2rLG/0qWO8DUQQuJxTxV4KdC
-         4tXlqAAlBNUgH7UlT3O5s0qaBdGZcDwz0anyOs8TYfb0xDPVIYd2c+l2O0JAeA9yv0Nc
-         9u7pp7oAhKistRCgPmREfoYDaaJGVFUn+Ic+Ikp5gNnHIML4TLWoYQK31uFsWgreQrCI
-         ByvYLMhc5P153A+bWjbKaOm8se5Zop4W5Im4mh7LY+QEcgnbiMpU9BGQHkgC5ULz22HI
-         PnWo4mBnB6cahsuVo7RxeYAm5FRQ/XeMzg9dwGlV3IlXNk4nMVhcfYCaxMrcsLRGw4w9
-         CvOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=vo/ZXNY6mxg/MesOYZ4vVl7X/uP2QTxbLQziPj/OqxE=;
-        b=P8yL5ulZmievpt387xMsl7ycqZdOkUPBPqGJopZ1pKsKoVTQ4LKI86PR0jiiY3WbC0
-         SEorRmlmVXsfTmwUE4thbkch1lJbGh+C6adx6MInyqCAKPVIyrHqTtKXkKXJEePiSSZW
-         CjYgPM7jj8GFMFXhvbZzX8NTlu4BQV9kILRAsIw/fN0XPNDRcdpWGNaFdcYyyz/aJwJh
-         rqMfSChas3sZChaZyJ1U/HIcQ1Qp6Rxs9vNCssIYgDr7+Le4Z6gWvC9AlpGdymvhK9o2
-         7Gi76bWq5TeJVPpUk45t5IcGwUqfsvKwsxHyDyR1Gdx7OovYBX7xA9BQMaQAGV5e+RLp
-         RLpQ==
-X-Gm-Message-State: ACgBeo1/jn9oMzCtHdc6frf5V2dKujSO7lWuijCMc4TxasG5jj7pb7DK
-        Q1ZIIL3Ciu/40N13lAduqqTuJejeRuHbT8EiJsGPmPwPLw7FzQ==
-X-Google-Smtp-Source: AA6agR5mpDMS6nAWKTerbWQmoi0LXpDu9Ci5i4IEEe1AN4NwOZzpoVhvKNAfwCslLcpvNNgEsybf7M5v5FTE0yg2XZ4=
-X-Received: by 2002:a05:6808:150f:b0:343:3202:91cf with SMTP id
- u15-20020a056808150f00b00343320291cfmr8067243oiw.112.1662400848028; Mon, 05
- Sep 2022 11:00:48 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220905123946.95223-1-likexu@tencent.com> <20220905123946.95223-4-likexu@tencent.com>
-In-Reply-To: <20220905123946.95223-4-likexu@tencent.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 5 Sep 2022 11:00:36 -0700
-Message-ID: <CALMp9eSBK3xVKoqrk4j2yNqk+Jh0z-Nk-rwCTaTE0Dca5DQoPA@mail.gmail.com>
-Subject: Re: [PATCH 3/4] KVM: x86/svm/pmu: Add AMD PerfMonV2 support
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sandipan Das <sandipan.das@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+        with ESMTP id S229643AbiIESMD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Sep 2022 14:12:03 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80D955B79B
+        for <kvm@vger.kernel.org>; Mon,  5 Sep 2022 11:12:01 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 285Hs8ld031962;
+        Mon, 5 Sep 2022 18:11:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=5Sn5DLRkJI/ejM3FYUqA6pKiiZDixmjvdk9MJhVvPjk=;
+ b=OQvWRrKLyqS7vuk++ha2oP73S9p13wOdwlsDXhfzmNVvNmqszmhhcBl//yy8zFWnhs/8
+ L9mYSMScebTEjplHBX+aR4yOArkZm0KsYuNuIHZm+Kj6+wI/sCB8ukdhHlF8l4BhKS/C
+ tou1rhF9buV5TFGm5+cymp3QK6jB1cdyrbSSomFrwAEwhvcLhgcpK7eOeo3rETbkgkP+
+ ddv4hMjBHAP7HCKdpVNsDbF2psgfL50L6lP5jsVXzutanrbcC+HmFQfwmyykufJdNrpw
+ 6xvTliMCpd7i7wlTivzUE7UeJIyXRonATcoljBQwrd8gBE7omoy1uE6HPSI1lm0H7g6B Dg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jdnwy0gkb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Sep 2022 18:11:55 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 285HxNdT018024;
+        Mon, 5 Sep 2022 18:11:54 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jdnwy0gj4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Sep 2022 18:11:54 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 285I6OQJ025279;
+        Mon, 5 Sep 2022 18:11:52 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma05fra.de.ibm.com with ESMTP id 3jbxj8t1st-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 05 Sep 2022 18:11:52 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 285ICCpW37355960
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 5 Sep 2022 18:12:12 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9386211C04C;
+        Mon,  5 Sep 2022 18:11:48 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D12D011C04A;
+        Mon,  5 Sep 2022 18:11:47 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.44.172])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  5 Sep 2022 18:11:47 +0000 (GMT)
+Message-ID: <bac31c028a713c32130b397189552f17b43a9485.camel@linux.ibm.com>
+Subject: Re: [PATCH v9 02/10] s390x/cpu topology: core_id sets s390x CPU
+ topology
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
+Date:   Mon, 05 Sep 2022 20:11:47 +0200
+In-Reply-To: <20220902075531.188916-3-pmorel@linux.ibm.com>
+References: <20220902075531.188916-1-pmorel@linux.ibm.com>
+         <20220902075531.188916-3-pmorel@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: qMScA2TnKkuDy6OsHohpjipYX7in9fzM
+X-Proofpoint-ORIG-GUID: YQvcNrW1hq7r9HOBMSE2GMaMsL4Ajq6p
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-09-05_13,2022-09-05_03,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 malwarescore=0 spamscore=0 phishscore=0 suspectscore=0
+ mlxlogscore=999 clxscore=1015 adultscore=0 bulkscore=0 priorityscore=1501
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2209050088
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 5, 2022 at 5:44 AM Like Xu <like.xu.linux@gmail.com> wrote:
->
-> From: Like Xu <likexu@tencent.com>
->
-> If AMD Performance Monitoring Version 2 (PerfMonV2) is detected
-> by the guest, it can use a new scheme to manage the Core PMCs using
-> the new global control and status registers.
->
-> In addition to benefiting from the PerfMonV2 functionality in the same
-> way as the host (higher precision), the guest also can reduce the number
-> of vm-exits by lowering the total number of MSRs accesses.
->
-> In terms of implementation details, amd_is_valid_msr() is resurrected
-> since three newly added MSRs could not be mapped to one vPMC.
-> The possibility of emulating PerfMonV2 on the mainframe has also
-> been eliminated for reasons of precision.
->
-> Co-developed-by: Sandipan Das <sandipan.das@amd.com>
-> Signed-off-by: Sandipan Das <sandipan.das@amd.com>
-> Signed-off-by: Like Xu <likexu@tencent.com>
+On Fri, 2022-09-02 at 09:55 +0200, Pierre Morel wrote:
+> In the S390x CPU topology the core_id specifies the CPU address
+> and the position of the core withing the topology.
+> 
+> Let's build the topology based on the core_id.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->  arch/x86/kvm/pmu.c     |  6 +++++
->  arch/x86/kvm/svm/pmu.c | 50 +++++++++++++++++++++++++++++++++---------
->  arch/x86/kvm/x86.c     | 11 ++++++++++
->  3 files changed, 57 insertions(+), 10 deletions(-)
->
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index 7002e1b74108..56b4f898a246 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -455,12 +455,15 @@ int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->
->         switch (msr) {
->         case MSR_CORE_PERF_GLOBAL_STATUS:
-> +       case MSR_AMD64_PERF_CNTR_GLOBAL_STATUS:
->                 msr_info->data = pmu->global_status;
->                 return 0;
->         case MSR_CORE_PERF_GLOBAL_CTRL:
-> +       case MSR_AMD64_PERF_CNTR_GLOBAL_CTL:
->                 msr_info->data = pmu->global_ctrl;
->                 return 0;
->         case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
-> +       case MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR:
->                 msr_info->data = 0;
->                 return 0;
->         default:
-> @@ -479,12 +482,14 @@ int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->
->         switch (msr) {
->         case MSR_CORE_PERF_GLOBAL_STATUS:
-> +       case MSR_AMD64_PERF_CNTR_GLOBAL_STATUS:
->                 if (msr_info->host_initiated) {
->                         pmu->global_status = data;
->                         return 0;
->                 }
->                 break; /* RO MSR */
->         case MSR_CORE_PERF_GLOBAL_CTRL:
-> +       case MSR_AMD64_PERF_CNTR_GLOBAL_CTL:
->                 if (pmu->global_ctrl == data)
->                         return 0;
->                 if (kvm_valid_perf_global_ctrl(pmu, data)) {
-> @@ -495,6 +500,7 @@ int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->                 }
->                 break;
->         case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
-> +       case MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR:
->                 if (!(data & pmu->global_ovf_ctrl_mask)) {
->                         if (!msr_info->host_initiated)
->                                 pmu->global_status &= ~data;
-> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-> index 3a20972e9f1a..4c7d408e3caa 100644
-> --- a/arch/x86/kvm/svm/pmu.c
-> +++ b/arch/x86/kvm/svm/pmu.c
-> @@ -92,12 +92,6 @@ static struct kvm_pmc *amd_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
->         return amd_pmc_idx_to_pmc(vcpu_to_pmu(vcpu), idx & ~(3u << 30));
->  }
->
-> -static bool amd_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
-> -{
-> -       /* All MSRs refer to exactly one PMC, so msr_idx_to_pmc is enough.  */
-> -       return false;
-> -}
-> -
->  static struct kvm_pmc *amd_msr_idx_to_pmc(struct kvm_vcpu *vcpu, u32 msr)
->  {
->         struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> @@ -109,6 +103,29 @@ static struct kvm_pmc *amd_msr_idx_to_pmc(struct kvm_vcpu *vcpu, u32 msr)
->         return pmc;
->  }
->
-> +static bool amd_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+>  hw/s390x/cpu-topology.c         | 135 ++++++++++++++++++++++++++++++++
+>  hw/s390x/meson.build            |   1 +
+>  hw/s390x/s390-virtio-ccw.c      |  10 +++
+>  include/hw/s390x/cpu-topology.h |  42 ++++++++++
+>  4 files changed, 188 insertions(+)
+>  create mode 100644 hw/s390x/cpu-topology.c
+>  create mode 100644 include/hw/s390x/cpu-topology.h
+> 
+> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+> 
+[...]
+
+> +/**
+> + * s390_topology_realize:
+> + * @dev: the device state
+> + * @errp: the error pointer (not used)
+> + *
+> + * During realize the machine CPU topology is initialized with the
+> + * QEMU -smp parameters.
+> + * The maximum count of CPU TLE in the all Topology can not be greater
+> + * than the maximum CPUs.
+> + */
+> +static void s390_topology_realize(DeviceState *dev, Error **errp)
 > +{
-> +       struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> +    MachineState *ms = MACHINE(qdev_get_machine());
+> +    S390Topology *topo = S390_CPU_TOPOLOGY(dev);
+> +    int n;
 > +
-> +       switch (msr) {
-> +       case MSR_K7_EVNTSEL0 ... MSR_K7_PERFCTR3:
-> +               return pmu->version > 0;
-> +       case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
-> +               return guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE);
-> +       case MSR_AMD64_PERF_CNTR_GLOBAL_STATUS:
-> +       case MSR_AMD64_PERF_CNTR_GLOBAL_CTL:
-> +       case MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR:
-> +               return pmu->version > 1;
-> +       default:
-> +               if (msr > MSR_F15H_PERF_CTR5 &&
-> +                   msr < MSR_F15H_PERF_CTL0 + 2 * KVM_AMD_PMC_MAX_GENERIC)
-> +                       return pmu->version > 1;
-
-Should this be bounded by guest CPUID.80000022H:EBX[NumCorePmc]
-(unless host-initiated)?
-
-> +               break;
-> +       }
+> +    topo->sockets = ms->smp.sockets;
+> +    topo->cores = ms->smp.cores;
+> +    topo->tles = ms->smp.max_cpus;
 > +
-> +       return amd_msr_idx_to_pmc(vcpu, msr);
-> +}
-> +
->  static int amd_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  {
->         struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> @@ -162,20 +179,31 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
->  {
->         struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> +       struct kvm_cpuid_entry2 *entry;
-> +       union cpuid_0x80000022_ebx ebx;
->
-> -       if (guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE))
-> +       pmu->version = 1;
-> +       entry = kvm_find_cpuid_entry_index(vcpu, 0x80000022, 0);
-> +       if (kvm_pmu_cap.version > 1 && entry && (entry->eax & BIT(0))) {
-> +               pmu->version = 2;
-> +               ebx.full = entry->ebx;
-> +               pmu->nr_arch_gp_counters = min3((unsigned int)ebx.split.num_core_pmc,
-> +                                               (unsigned int)kvm_pmu_cap.num_counters_gp,
-> +                                               (unsigned int)KVM_AMD_PMC_MAX_GENERIC);
-> +               pmu->global_ctrl_mask = ~((1ull << pmu->nr_arch_gp_counters) - 1);
-> +               pmu->global_ovf_ctrl_mask = pmu->global_ctrl_mask;
-> +       } else if (guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE)) {
->                 pmu->nr_arch_gp_counters = AMD64_NUM_COUNTERS_CORE;
+> +    n = topo->sockets;
+> +    topo->socket = g_malloc0(n * sizeof(S390TopoContainer));
+> +    topo->tle = g_malloc0(topo->tles * sizeof(S390TopoTLE));
 
-The logic above doesn't seem quite right, since guest_cpuid_has(vcpu,
-X86_FEATURE_PERFCTR_CORE) promises 6 PMCs, regardless of what
-CPUID.80000022 says.
+Seems like a good use case for g_new0.
+
+[...]
+> 
+> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
+> new file mode 100644
+> index 0000000000..6911f975f4
+> --- /dev/null
+> +++ b/include/hw/s390x/cpu-topology.h
+> @@ -0,0 +1,42 @@
+> +/*
+> + * CPU Topology
+> + *
+> + * Copyright 2022 IBM Corp.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +#ifndef HW_S390X_CPU_TOPOLOGY_H
+> +#define HW_S390X_CPU_TOPOLOGY_H
+
+Is there a reason this is before the includes?
+> +
+> +typedef struct S390TopoContainer {
+> +    int active_count;
+> +} S390TopoContainer;
+> +
+> +#define S390_TOPOLOGY_MAX_ORIGIN (1 + S390_MAX_CPUS / 64)
+
+This is correct because cpu_id == core_id for s390, right?
+So the cpu limit also applies to the core id.
+You could do ((S390_MAX_CPUS + 63) / 64) instead.
+But if you chose this for simplicity's sake, I'm fine with it.
+
+> +typedef struct S390TopoTLE {
+> +    int active_count;
+
+Do you use (read) this field somewhere?
+Is this in anticipation of there being multiple TLE arrays, for
+different polarizations, etc? If so I would defer this for later.
+
+> +    uint64_t mask[S390_TOPOLOGY_MAX_ORIGIN];
+> +} S390TopoTLE;
+> +
+> +#include "hw/qdev-core.h"
+> +#include "qom/object.h"
+> +
+> +struct S390Topology {
+> +    SysBusDevice parent_obj;
+> +    int sockets;
+> +    int cores;
+
+These are just cached values from machine_state.smp, right?
+Not sure if I like the redundancy, it doesn't aid in comprehension.
+
+> +    int tles;
+> +    S390TopoContainer *socket;
+> +    S390TopoTLE *tle;
+> +};
+> +typedef struct S390Topology S390Topology;
+
+The DECLARE macro takes care of this typedef.
+
+> +
+> +#define TYPE_S390_CPU_TOPOLOGY "s390-topology"
+> +OBJECT_DECLARE_SIMPLE_TYPE(S390Topology, S390_CPU_TOPOLOGY)
+> +
+> +S390Topology *s390_get_topology(void);
+> +void s390_topology_new_cpu(int core_id);
+> +
+> +#endif
+
