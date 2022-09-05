@@ -2,162 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 119775ACDA9
-	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 10:34:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F32CE5ACE1D
+	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 10:55:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237440AbiIEIeS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Sep 2022 04:34:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38356 "EHLO
+        id S237892AbiIEIg2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Sep 2022 04:36:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238031AbiIEIdz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Sep 2022 04:33:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F6FE45F6B
-        for <kvm@vger.kernel.org>; Mon,  5 Sep 2022 01:32:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662366748;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=S4JK4m0m3+hN9/NjyD45TlkaSX2pzOEl0JORrLG6mzs=;
-        b=YeNjLLR3zUg8fQLeuW3wzkjIYVPWu4bcvr3wuT8gAb6KWLq8FMTavfAwWO+9EVWdTxc8ZS
-        LVtuXXy7WsmeGy6TZVScwC/HW7zxM1/P/B91oyIOENBFWctT+EtMdfEu8OEiuMIWq0x2Ix
-        MdhMofBotyuQ/Sx8gBuLoW02BgZ8QOU=
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
- [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-316-RKecAdHeO0ymijZ5cjnDcg-1; Mon, 05 Sep 2022 04:32:27 -0400
-X-MC-Unique: RKecAdHeO0ymijZ5cjnDcg-1
-Received: by mail-pl1-f197.google.com with SMTP id n1-20020a170902d2c100b0017520dd4a0eso5701863plc.8
-        for <kvm@vger.kernel.org>; Mon, 05 Sep 2022 01:32:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=S4JK4m0m3+hN9/NjyD45TlkaSX2pzOEl0JORrLG6mzs=;
-        b=AZp8qdF/RspCjuP2DooB+ymXvi773ZHPH72X0te+/G7O6jimNU9HeYjwmKiASnN51t
-         xQLDyS1nvEOhwnOmr/J7nHKErowIT1jd+8N45EDkeMP1qHe7p5Jhp+hyINfFgenrNfkf
-         zjy7RokuANZw9EKDY8DijClqOrrlYzZU/rg1MkzsmlhyUgzsBlKCcmnSSXEg18arcWVM
-         tmqZ61tzXqXkOYD+zf3LhoLZclXnDUn9pR+IKiD+Pqkxbsaz1mnwHmjwRexAgoQ2alEV
-         +LoB/M4kZGfz59OS/rwE7OLteMW3PuNPFR2AxK8a47bXfJIucPS+h879o66bRYX8VfDi
-         /y6A==
-X-Gm-Message-State: ACgBeo0rADvD7YPRDbBisTD78NpgMMqfw1jvtw1a1GNoXMUCWVGpbj+0
-        yN889FEC2y9HSXbedbU29K6RSDR34A+v3weBHT8+p76scAKN8ZtRy4KGSh3g4x+pwviwK+tJzYs
-        ZlYG5QkZvuP7E
-X-Received: by 2002:a17:90b:1d8b:b0:200:5367:5ecd with SMTP id pf11-20020a17090b1d8b00b0020053675ecdmr5847729pjb.165.1662366745420;
-        Mon, 05 Sep 2022 01:32:25 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR55K+TMI7e0v4Qj3djAA88LyYePDornUMNHcPRaFDkQVGBJ3mgtkBq2b8FE5Hf5q95howCsPg==
-X-Received: by 2002:a17:90b:1d8b:b0:200:5367:5ecd with SMTP id pf11-20020a17090b1d8b00b0020053675ecdmr5847703pjb.165.1662366745129;
-        Mon, 05 Sep 2022 01:32:25 -0700 (PDT)
-Received: from [10.72.13.239] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id o20-20020aa79794000000b0052c7ff2ac74sm7345483pfp.17.2022.09.05.01.32.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Sep 2022 01:32:24 -0700 (PDT)
-Message-ID: <10630d99-e0bd-c067-8766-19266b38d2fe@redhat.com>
-Date:   Mon, 5 Sep 2022 16:32:19 +0800
+        with ESMTP id S237886AbiIEIgF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Sep 2022 04:36:05 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 518CA11821;
+        Mon,  5 Sep 2022 01:34:09 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1CE6261183;
+        Mon,  5 Sep 2022 08:34:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B817C43470;
+        Mon,  5 Sep 2022 08:34:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662366847;
+        bh=MFwr+ylrLqHsUdJos34a0n+CwOKCUfeTFHhIzjgR+eQ=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=j36VktyFiKHbg5ZEF7eYwQw14//bO1WbHu8aKGzTeWRY2j1Zt0QCjLlOkiP9s+DYN
+         56x38j43KsQwIm5I5734SyOvrRGvbdcy3709mYXgngkHE0GznBxnPOO0Pb6I5QV6gL
+         k6eraIABCQjLDq4W3clDn29nde1Lcb5JehshdjtMlSukBy6CUtdsHopsJ+df1pzB0S
+         leqQ1MkQ9MSzmQ82nHEidJ5l5tKuPVJxKfw6SCnFA3V77X4kTg5YTUM2IE3aMAyVb1
+         pzDYNpFf9Ar+yJ++X+4jR5k1kJkl1AdRkUNRq7N+0lV4qBpkoOHIBMNsGcarMxIIq4
+         1ZSsrLC67d8CA==
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-1274ec87ad5so5011351fac.0;
+        Mon, 05 Sep 2022 01:34:07 -0700 (PDT)
+X-Gm-Message-State: ACgBeo3WP6pGCQK+AHttfilcGZBtW5QTsobY87WtXZGDXDDXbM9bHXOU
+        sb76jl0Yfrm7A7NTwKRuF2LYWkSayuZlvn6nYNM=
+X-Google-Smtp-Source: AA6agR5IglQGOyI7jNiRY0ei+A9SaaYr4Yxhd7s10i4P669D16mJGNnghE8P/xcvEucKgIbX3phIaTViycxWEFtW7D0=
+X-Received: by 2002:a05:6870:7092:b0:11e:ff3a:d984 with SMTP id
+ v18-20020a056870709200b0011eff3ad984mr8071019oae.19.1662366846586; Mon, 05
+ Sep 2022 01:34:06 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.13.0
-Subject: Re: [PATCH] vhost-net: support VIRTIO_F_RING_RESET
-Content-Language: en-US
-To:     Kangjie Xu <kangjie.xu@linux.alibaba.com>,
-        virtualization@lists.linux-foundation.org
-Cc:     mst@redhat.com, kvm@vger.kernel.org, netdev@vger.kernel.org,
-        bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
-        hengqi@linux.alibaba.com, xuanzhuo@linux.alibaba.com
-References: <20220825085610.80315-1-kangjie.xu@linux.alibaba.com>
-From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <20220825085610.80315-1-kangjie.xu@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20220831175920.2806-1-jszhang@kernel.org> <20220831175920.2806-5-jszhang@kernel.org>
+ <CAJF2gTQMM50TZZ95XOY+Rgvm2hZ3nLxkYfaSW_2MvPiJeqTtJw@mail.gmail.com> <YxWYh5C5swlyobi2@linutronix.de>
+In-Reply-To: <YxWYh5C5swlyobi2@linutronix.de>
+From:   Guo Ren <guoren@kernel.org>
+Date:   Mon, 5 Sep 2022 16:33:54 +0800
+X-Gmail-Original-Message-ID: <CAJF2gTR=Cmcox5JrX2bB12MdmurY3vexSA6vw1cdXXbCNB8tXw@mail.gmail.com>
+Message-ID: <CAJF2gTR=Cmcox5JrX2bB12MdmurY3vexSA6vw1cdXXbCNB8tXw@mail.gmail.com>
+Subject: Re: [PATCH v2 4/5] riscv: add lazy preempt support
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     Jisheng Zhang <jszhang@kernel.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Sep 5, 2022 at 2:34 PM Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
+>
+> On 2022-09-04 23:16:12 [+0800], Guo Ren wrote:
+> > > diff --git a/arch/riscv/kernel/entry.S b/arch/riscv/kernel/entry.S
+> > > index b9eda3fcbd6d..595100a4c2c7 100644
+> > > --- a/arch/riscv/kernel/entry.S
+> > > +++ b/arch/riscv/kernel/entry.S
+> > > @@ -361,9 +361,14 @@ restore_all:
+> > >  resume_kernel:
+> > >         REG_L s0, TASK_TI_PREEMPT_COUNT(tp)
+> > >         bnez s0, restore_all
+> > > -       REG_L s0, TASK_TI_FLAGS(tp)
+> > > -       andi s0, s0, _TIF_NEED_RESCHED
+> > > +       REG_L s1, TASK_TI_FLAGS(tp)
+> > > +       andi s0, s1, _TIF_NEED_RESCHED
+> > > +       bnez s0, 1f
+> > > +       REG_L s0, TASK_TI_PREEMPT_LAZY_COUNT(tp)
+> > > +       bnez s0, restore_all
+> > > +       andi s0, s1, _TIF_NEED_RESCHED_LAZY
+> > Can you tell me, who increased/decreased the PREEMPT_LAZY_COUNT? And
+> > who set NEED_RESCHED_LAZY?
+>
+> There is "generic" code in the PREEMPT_RT patch doing that. The counter
+> is incremented/ decremented via preempt_lazy_enable()/disable() and one
+> of the user is migrate_disable()/enable().
+> Basically if a task is task_is_realtime() then NEED_RESCHED is set for
+> the wakeup. For the remaining states (SCHED_OTHER, =E2=80=A6) NEED_RESCHE=
+D_LAZY
+> is set for the wakeup. This can be delayed if the task is in a "preempt
+> disable lazy" section (similar to a preempt_disable() section) but a
+> task_is_realtime() can still be scheduled if needed.
+Okay, It should be [PATCH RT]. RISC-V would also move to GENERIC_ENTRY
+[1], so above assembly code would be replaced by generic one, right?
 
-在 2022/8/25 16:56, Kangjie Xu 写道:
-> Add VIRTIO_F_RING_RESET, which indicates that the driver can reset a
-> queue individually.
->
-> VIRTIO_F_RING_RESET feature is added to virtio-spec 1.2. The relevant
-> information is in
->      oasis-tcs/virtio-spec#124
->      oasis-tcs/virtio-spec#139
->
-> The implementation only adds the feature bit in supported features. It
-> does not require any other changes because we reuse the existing vhost
-> protocol.
->
-> The virtqueue reset process can be concluded as two parts:
-> 1. The driver can reset a virtqueue. When it is triggered, we use the
-> set_backend to disable the virtqueue.
-> 2. After the virtqueue is disabled, the driver may optionally re-enable
-> it. The process is basically similar to when the device is started,
-> except that the restart process does not need to set features and set
-> mem table since they do not change. QEMU will send messages containing
-> size, base, addr, kickfd and callfd of the virtqueue in order.
-> Specifically, the host kernel will receive these messages in order:
->      a. VHOST_SET_VRING_NUM
->      b. VHOST_SET_VRING_BASE
->      c. VHOST_SET_VRING_ADDR
->      d. VHOST_SET_VRING_KICK
->      e. VHOST_SET_VRING_CALL
->      f. VHOST_NET_SET_BACKEND
-> Finally, after we use set_backend to attach the virtqueue, the virtqueue
-> will be enabled and start to work.
->
-> Signed-off-by: Kangjie Xu <kangjie.xu@linux.alibaba.com>
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+[1]: https://lore.kernel.org/linux-riscv/20220904072637.8619-3-guoren@kerne=
+l.org/T/#u
 
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+> See details at
+>         https://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel=
+.git/plain/patches/sched__Add_support_for_lazy_preemption.patch?h=3Dlinux-6=
+.0.y-rt-patches
 
 
-> ---
 >
-> Test environment and method:
->      Host: 5.19.0-rc3
->      Qemu: QEMU emulator version 7.0.50 (With vq rset support)
->      Guest: 5.19.0-rc3 (With vq reset support)
->      Test Cmd: ethtool -g eth1; ethtool -G eth1 rx $1 tx $2; ethtool -g eth1;
->
->      The drvier can resize the virtio queue, then virtio queue reset function should
->      be triggered.
->
->      The default is split mode, modify Qemu virtio-net to add PACKED feature to
->      test packed mode.
->
-> Guest Kernel Patch:
->      https://lore.kernel.org/bpf/20220801063902.129329-1-xuanzhuo@linux.alibaba.com/
->
-> QEMU Patch:
->      https://lore.kernel.org/qemu-devel/cover.1661414345.git.kangjie.xu@linux.alibaba.com/
->
-> Looking forward to your review and comments. Thanks.
->
->   drivers/vhost/net.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index 68e4ecd1cc0e..8a34928d4fef 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -73,7 +73,8 @@ enum {
->   	VHOST_NET_FEATURES = VHOST_FEATURES |
->   			 (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
->   			 (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-> -			 (1ULL << VIRTIO_F_ACCESS_PLATFORM)
-> +			 (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
-> +			 (1ULL << VIRTIO_F_RING_RESET)
->   };
->   
->   enum {
+> Sebastian
 
+
+
+--=20
+Best Regards
+ Guo Ren
