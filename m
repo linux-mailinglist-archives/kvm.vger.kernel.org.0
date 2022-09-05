@@ -2,100 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B97B5ACCF5
-	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 09:45:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A7DEC5ACD26
+	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 09:52:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236805AbiIEHjI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Sep 2022 03:39:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57708 "EHLO
+        id S236788AbiIEHqR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Sep 2022 03:46:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235537AbiIEHjH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Sep 2022 03:39:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7100213FB1
-        for <kvm@vger.kernel.org>; Mon,  5 Sep 2022 00:39:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662363545;
+        with ESMTP id S236608AbiIEHqQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Sep 2022 03:46:16 -0400
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37FC42D1CD;
+        Mon,  5 Sep 2022 00:46:13 -0700 (PDT)
+Date:   Mon, 5 Sep 2022 09:46:09 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1662363971;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=3ZbIUECdII8tK9BhsRycVKJJqNBhWBSkf3Xay6/B6wA=;
-        b=NsS1vErQ5RlG5Ix/Pjb6PqaRrZ3VswUAE0VfPyjtJ6V+g64oYKPcYxU1TteNEZMPFxrhF+
-        Zd3Z2Fs5qdHBjc49IbCMbaHNmEArjvBZ9tBpj0NoSIwTTJl/ODXPb3Pm8e0DyiMlm1wA3/
-        TXYdKjB7aZFyW21D7u2eajKyA+kWEWg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-614-f-N6yZOnME6gkjQDPveccQ-1; Mon, 05 Sep 2022 03:39:04 -0400
-X-MC-Unique: f-N6yZOnME6gkjQDPveccQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C6ED73810D23;
-        Mon,  5 Sep 2022 07:39:03 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.195.70])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7A1439458A;
-        Mon,  5 Sep 2022 07:39:03 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id DE10618007A4; Mon,  5 Sep 2022 09:39:01 +0200 (CEST)
-Date:   Mon, 5 Sep 2022 09:39:01 +0200
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Xiaoyao Li <xiaoyao.li@intel.com>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Sergio Lopez <slp@redhat.com>
-Subject: Re: [PATCH 0/2] expose host-phys-bits to guest
-Message-ID: <20220905073901.t4xattq23y2mawjy@sirius.home.kraxel.org>
-References: <20220831125059.170032-1-kraxel@redhat.com>
- <957f0cc5-6887-3861-2b80-69a8c7cdd098@intel.com>
- <20220901135810.6dicz4grhz7ye2u7@sirius.home.kraxel.org>
- <f7a56158-9920-e753-4d21-e1bcc3573e27@intel.com>
- <20220901161741.dadmguwv25sk4h6i@sirius.home.kraxel.org>
- <34be4132-53f4-8779-1ada-68aa554e0eac@intel.com>
- <20220902060720.xruqoxc2iuszkror@sirius.home.kraxel.org>
- <20220902021628-mutt-send-email-mst@kernel.org>
- <20220902084420.noroojfcy5hnngya@sirius.home.kraxel.org>
- <20220904163609-mutt-send-email-mst@kernel.org>
+        bh=SCEfhooTBrQaT9LKoePqlJT/fiUrAZsQiPWsoYqSYtk=;
+        b=RPVVe0Y+85TmCoLEQG4BCaTU0RINvvI0Rw/FiOm9gGlSwnPxpKwoLeRaknGpYL/QRORWmY
+        iKugJUSvU/wnr9ycH2SI/Wdt5wHZs/4ZByM1c0wMKZrtr6slZ+rnn56/MvjxCWewEhHYPY
+        ogZDO0Cw7F1j/5shF8Vky8jItHYHH+k=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Andrew Jones <andrew.jones@linux.dev>
+To:     Vishal Annapurve <vannapurve@google.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
+        shuah@kernel.org, bgardon@google.com, seanjc@google.com,
+        oupton@google.com, peterx@redhat.com, vkuznets@redhat.com,
+        drjones@redhat.com, dmatlack@google.com
+Subject: Re: [V1 PATCH 2/5] selftests: kvm: Introduce kvm_arch_main and
+ helpers
+Message-ID: <20220905074609.ga4tnpuxpcgppx4r@kamzik>
+References: <20220903012849.938069-1-vannapurve@google.com>
+ <20220903012849.938069-3-vannapurve@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220904163609-mutt-send-email-mst@kernel.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220903012849.938069-3-vannapurve@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-  Hi,
+On Sat, Sep 03, 2022 at 01:28:46AM +0000, Vishal Annapurve wrote:
+> Introduce following APIs:
+> 1) kvm_arch_main : to be called at the startup of each test.
 
-> > I don't see a need for that.  Live migration compatibility can be
-> > handled just fine today using
-> > 	'host-phys-bits=on,host-phys-bits-limit=<xx>'
-> > 
-> > Which is simliar to 'phys-bits=<xx>'.
+With this, AArch64 can move the content of its constructor,
+init_guest_modes(), into kvm_arch_main(). Or, instead of the
+
+ main()
+ {
+    /* common main stuff */
+    kvm_arch_main();
+    __main();
+ }
+
+approach we could have each arch provide a constructor
+
+ arch_init()
+ {
+    common_pre_main_stuff();
+    /* arch specific pre-main stuff */
+ }
+
+I personally prefer the latter.
+
+Thanks,
+drew
+
+> 2) kvm_arch_post_vm_load: called after guest elf image is loaded into
+>    memory to populate any global state in guest memory.
 > 
-> yes but what if user did not configure anything?
-
-I expect that'll be less and less common.  The phys-bits=40 default used
-by qemu becomes increasingly problematic for large guests which need
-more than that, and we see activity implementing support for that in
-libvirt.
-
-> the point of the above is so we can eventually, in X years, change the guests
-> to trust CPUID by default.
-
-Well, we can flip host-phys-bits to default to 'on' in qemu for new
-machine types (or new cpu versions).  That'll have the very same effect.
-
-take care,
-  Gerd
-
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+> ---
+>  tools/testing/selftests/kvm/include/kvm_util_base.h | 10 ++++++++++
+>  tools/testing/selftests/kvm/lib/aarch64/processor.c |  8 ++++++++
+>  tools/testing/selftests/kvm/lib/elf.c               |  2 ++
+>  tools/testing/selftests/kvm/lib/kvm_util.c          |  2 ++
+>  tools/testing/selftests/kvm/lib/riscv/processor.c   |  8 ++++++++
+>  tools/testing/selftests/kvm/lib/s390x/processor.c   |  8 ++++++++
+>  tools/testing/selftests/kvm/lib/x86_64/processor.c  |  8 ++++++++
+>  7 files changed, 46 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index 9e521d1c8afe..301bef6376a5 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -834,6 +834,16 @@ static inline int __vm_disable_nx_huge_pages(struct kvm_vm *vm)
+>  	return __vm_enable_cap(vm, KVM_CAP_VM_DISABLE_NX_HUGE_PAGES, 0);
+>  }
+>  
+> +/*
+> + * API to execute architecture specific setup before executing selftest logic.
+> + */
+> +void kvm_arch_main(void);
+> +
+> +/*
+> + * API to execute architecture specific setup after loading VMs.
+> + */
+> +void kvm_arch_post_vm_load(struct kvm_vm *vm);
+> +
+>  /*
+>   * API to be implemented by all the selftests.
+>   */
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> index 6f5551368944..a7ca1947d574 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> @@ -528,3 +528,11 @@ void smccc_hvc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
+>  		       [arg4] "r"(arg4), [arg5] "r"(arg5), [arg6] "r"(arg6)
+>  		     : "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7");
+>  }
+> +
+> +void kvm_arch_main(void)
+> +{
+> +}
+> +
+> +void kvm_arch_post_vm_load(struct kvm_vm *vm)
+> +{
+> +}
+> diff --git a/tools/testing/selftests/kvm/lib/elf.c b/tools/testing/selftests/kvm/lib/elf.c
+> index 9f54c098d9d0..f56f9279e703 100644
+> --- a/tools/testing/selftests/kvm/lib/elf.c
+> +++ b/tools/testing/selftests/kvm/lib/elf.c
+> @@ -189,4 +189,6 @@ void kvm_vm_elf_load(struct kvm_vm *vm, const char *filename)
+>  				phdr.p_filesz);
+>  		}
+>  	}
+> +
+> +	kvm_arch_post_vm_load(vm);
+>  }
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 2e611a021c6e..b778dc684e30 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -1985,6 +1985,8 @@ int main(int argc, char *argv[])
+>  	/* Tell stdout not to buffer its content */
+>  	setbuf(stdout, NULL);
+>  
+> +	kvm_arch_main();
+> +
+>  	__main(argc, argv);
+>  
+>  	return 0;
+> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
+> index 604478151212..d992ad5b5771 100644
+> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
+> @@ -362,3 +362,11 @@ void vcpu_args_set(struct kvm_vcpu *vcpu, unsigned int num, ...)
+>  void assert_on_unhandled_exception(struct kvm_vcpu *vcpu)
+>  {
+>  }
+> +
+> +void kvm_arch_main(void)
+> +{
+> +}
+> +
+> +void kvm_arch_post_vm_load(struct kvm_vm *vm)
+> +{
+> +}
+> diff --git a/tools/testing/selftests/kvm/lib/s390x/processor.c b/tools/testing/selftests/kvm/lib/s390x/processor.c
+> index 89d7340d9cbd..3a249783b3fe 100644
+> --- a/tools/testing/selftests/kvm/lib/s390x/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/s390x/processor.c
+> @@ -218,3 +218,11 @@ void vcpu_arch_dump(FILE *stream, struct kvm_vcpu *vcpu, uint8_t indent)
+>  void assert_on_unhandled_exception(struct kvm_vcpu *vcpu)
+>  {
+>  }
+> +
+> +void kvm_arch_main(void)
+> +{
+> +}
+> +
+> +void kvm_arch_post_vm_load(struct kvm_vm *vm)
+> +{
+> +}
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index 2e6e61bbe81b..e22cfc4bf284 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -1311,3 +1311,11 @@ bool vm_is_unrestricted_guest(struct kvm_vm *vm)
+>  
+>  	return val == 'Y';
+>  }
+> +
+> +void kvm_arch_main(void)
+> +{
+> +}
+> +
+> +void kvm_arch_post_vm_load(struct kvm_vm *vm)
+> +{
+> +}
+> -- 
+> 2.37.2.789.g6183377224-goog
+> 
