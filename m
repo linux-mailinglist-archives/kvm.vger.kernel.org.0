@@ -2,67 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED0605ACE31
-	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 10:55:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 724AB5ACECC
+	for <lists+kvm@lfdr.de>; Mon,  5 Sep 2022 11:29:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236800AbiIEIqu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 5 Sep 2022 04:46:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41418 "EHLO
+        id S237179AbiIEJ1T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 5 Sep 2022 05:27:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236650AbiIEIqs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 5 Sep 2022 04:46:48 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F32874D4CE;
-        Mon,  5 Sep 2022 01:46:45 -0700 (PDT)
-Date:   Mon, 5 Sep 2022 10:46:41 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1662367603;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=99mp8geWAAkeObjUx/ShqenPtDH+4Vzc9b2C8frtuew=;
-        b=3bgyMX1lfzvfLarSqLyYkBCf05nax7ELI5WVXvk1hzcHWL3HXmWCpcCxKLcmuv2gR8sRZn
-        RHdw5gXiNUuHF3/PVdkQ3fUBvKJO/cxGaKUIZWnnyTdu1MgjxLpiFtquoPvaIdp3pS2IYr
-        m3857wZ06SavUl7uqfovdfNTPCaHHOM4+mJPbkIbrg30XnJfLJN93rOP+SatK7ktzNcXfq
-        Zk5gIO5ksGB6T0LVVgVSjFY7a/Qh3BXGZTyculFX/sos0I+vjkNAiSygogFRBrYSitGIaF
-        gEvWWEpTlEDtB2C311WfB34PB4yW9jSDozAe7Rq9lzuNNKqADOD2gMJKVtFy6g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1662367603;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=99mp8geWAAkeObjUx/ShqenPtDH+4Vzc9b2C8frtuew=;
-        b=lwBLiyEYMKYIix4ELUfOpUUN1tyc5gpqkoZJfN8EeqhJcnSRXA7QFrq0gLcanRbscYXn8w
-        c10xR98CcEPnifBg==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     Guo Ren <guoren@kernel.org>
-Cc:     Jisheng Zhang <jszhang@kernel.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
+        with ESMTP id S235459AbiIEJ1R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 5 Sep 2022 05:27:17 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E33E2F674;
+        Mon,  5 Sep 2022 02:27:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662370037; x=1693906037;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=o5on7g5eU/u1Xj26JnLalnuCczll+Sh3zwqNAD3wro8=;
+  b=mSUZlriTCYUjZy7UhAVR+7NphSV6LO+Gx7N2tmHCvxMkHMDavyDIVFLb
+   4BhR2S68Z0YrO6WM2Qx1Azhr7ERYtKaWhT2Xmer+kRQtjSz/O2uP0kXs3
+   C4Sgzkv1cxYXcNq8cFxHFwqaGp5zL1/EiVSsW8xczr49zfIKV7IomYD76
+   GZP7vUFXlO8wa3wJK/C5jbgNtBOw5kHuQ/NnciDRysbqx+8VHYRwlle16
+   QgMyZ0gUbZt/nqsPhwbwmQAni9f45yrVy0+M/3Znb9X6MHSrt5XTJcWMV
+   PNjjvZaL+y9ulCRLPfFPftVYODqGof+3H9WXRYl3muy4Pi0ZZPoxD/N22
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10460"; a="276743134"
+X-IronPort-AV: E=Sophos;i="5.93,290,1654585200"; 
+   d="scan'208";a="276743134"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2022 02:27:17 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,290,1654585200"; 
+   d="scan'208";a="675213318"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by fmsmga008.fm.intel.com with ESMTP; 05 Sep 2022 02:27:13 -0700
+Date:   Mon, 5 Sep 2022 17:27:12 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     isaku.yamahata@intel.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 4/5] riscv: add lazy preempt support
-Message-ID: <YxW3cZEhEideZon2@linutronix.de>
-References: <20220831175920.2806-1-jszhang@kernel.org>
- <20220831175920.2806-5-jszhang@kernel.org>
- <CAJF2gTQMM50TZZ95XOY+Rgvm2hZ3nLxkYfaSW_2MvPiJeqTtJw@mail.gmail.com>
- <YxWYh5C5swlyobi2@linutronix.de>
- <CAJF2gTR=Cmcox5JrX2bB12MdmurY3vexSA6vw1cdXXbCNB8tXw@mail.gmail.com>
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        isaku.yamahata@gmail.com, Kai Huang <kai.huang@intel.com>,
+        Chao Gao <chao.gao@intel.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Shaokun Zhang <zhangshaokun@hisilicon.com>,
+        Qi Liu <liuqi115@huawei.com>,
+        John Garry <john.garry@huawei.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v3 09/22] KVM: Do processor compatibility check on resume
+Message-ID: <20220905092712.5mque5oajiaj7kuq@yy-desk-7060>
+References: <cover.1662084396.git.isaku.yamahata@intel.com>
+ <b5bf18656469f667d1015cc1d62e5caba2f56e96.1662084396.git.isaku.yamahata@intel.com>
+ <20220905084014.uanoazei77i3xjjo@yy-desk-7060>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <CAJF2gTR=Cmcox5JrX2bB12MdmurY3vexSA6vw1cdXXbCNB8tXw@mail.gmail.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+In-Reply-To: <20220905084014.uanoazei77i3xjjo@yy-desk-7060>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,19 +76,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-09-05 16:33:54 [+0800], Guo Ren wrote:
-> > There is "generic" code in the PREEMPT_RT patch doing that. The counter
-> > is incremented/ decremented via preempt_lazy_enable()/disable() and one
-> > of the user is migrate_disable()/enable().
-> > Basically if a task is task_is_realtime() then NEED_RESCHED is set for
-> > the wakeup. For the remaining states (SCHED_OTHER, =E2=80=A6) NEED_RESC=
-HED_LAZY
-> > is set for the wakeup. This can be delayed if the task is in a "preempt
-> > disable lazy" section (similar to a preempt_disable() section) but a
-> > task_is_realtime() can still be scheduled if needed.
-> Okay, It should be [PATCH RT]. RISC-V would also move to GENERIC_ENTRY
-> [1], so above assembly code would be replaced by generic one, right?
+On Mon, Sep 05, 2022 at 04:40:14PM +0800, Yuan Yao wrote:
+> On Thu, Sep 01, 2022 at 07:17:44PM -0700, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> >
+> > So far the processor compatibility check is not done on resume. It should
+> > be done.
+>
+> The resume happens for resuming from S3/S4, so the compatibility
+> checking is used to detecte CPU replacement, or resume from S4 on an
+> different machine ?
 
-correct.
+By did experiments, I found the resume is called once on CPU 0 before
+other CPUs come UP, so yes it's necessary to check it.
 
-Sebastian
+>
+> >
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >  virt/kvm/kvm_main.c | 7 +++++++
+> >  1 file changed, 7 insertions(+)
+> >
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 0ac00c711384..fc55447c4dba 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -5715,6 +5715,13 @@ static int kvm_suspend(void)
+> >
+> >  static void kvm_resume(void)
+> >  {
+> > +	if (kvm_arch_check_processor_compat())
+> > +		/*
+> > +		 * No warning here because kvm_arch_check_processor_compat()
+> > +		 * would have warned with more information.
+> > +		 */
+> > +		return; /* FIXME: disable KVM */
+> > +
+> >  	if (kvm_usage_count) {
+> >  		lockdep_assert_not_held(&kvm_count_lock);
+> >  		hardware_enable_nolock((void *)__func__);
+> > --
+> > 2.25.1
+> >
