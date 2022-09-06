@@ -2,64 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B8C805AE3A6
-	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 11:00:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20E9E5AE3AF
+	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 11:01:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239295AbiIFI7x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Sep 2022 04:59:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58144 "EHLO
+        id S239272AbiIFJBM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Sep 2022 05:01:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239272AbiIFI7v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Sep 2022 04:59:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D626317594
-        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 01:59:48 -0700 (PDT)
+        with ESMTP id S238620AbiIFJBL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Sep 2022 05:01:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF26440BC0
+        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 02:01:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662454787;
+        s=mimecast20190719; t=1662454867;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=upwZ6/+sWektF85qqDzioRQviQjik2FU617Bvf3EIVU=;
-        b=JWaoBTJayO7iSWlxemgQkFBldiEiQOwRyMpylfO/A5nUQ5U5Wuj7CdWVsK/baQm8ng0pzW
-        jP9BS/8TiH/BO7Ds1iiBXlVUiBEH82Ygl091K1iqd15TvxVJcY2aouDV646XwCoAvGEJeg
-        Ji7jujS/5suw3PARBgP3xvoWfAqdyC8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-363-Gs4LqpiXPGCrk2LD_XA5tg-1; Tue, 06 Sep 2022 04:59:42 -0400
-X-MC-Unique: Gs4LqpiXPGCrk2LD_XA5tg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C418F805B9A;
-        Tue,  6 Sep 2022 08:59:41 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.39.193.166])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8762F4C816;
-        Tue,  6 Sep 2022 08:59:41 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-        id 8C7DC21E6900; Tue,  6 Sep 2022 10:59:38 +0200 (CEST)
-From:   Markus Armbruster <armbru@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
-        borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
-Subject: Re: [PATCH v9 04/10] hw/core: introducing drawer and books for s390x
-References: <20220902075531.188916-1-pmorel@linux.ibm.com>
-        <20220902075531.188916-5-pmorel@linux.ibm.com>
-Date:   Tue, 06 Sep 2022 10:59:38 +0200
-In-Reply-To: <20220902075531.188916-5-pmorel@linux.ibm.com> (Pierre Morel's
-        message of "Fri, 2 Sep 2022 09:55:25 +0200")
-Message-ID: <87ilm03mkl.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
+        bh=uEYw8dkEXgcUOX7V93X65x+uXJi/wlkI4CEWgXjX+U8=;
+        b=f4WDrH2yCHdNf4gcYT4cyG1sO3xIORq+jNXNmuWeFra6DDVUVJL9QKPKKGSM+Nws1rkVd/
+        DvgYKOzgNkeVFeReq6Dl6oqgTuGCK60KMweGNi92maVlkIB65eYRqiiiU8l+23kHLDj+HU
+        rzj8oMvsbknp60BUxkl1A+TZmXKd1SY=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-452-F_94on2TPpmeNTwc0gW6Uw-1; Tue, 06 Sep 2022 05:01:06 -0400
+X-MC-Unique: F_94on2TPpmeNTwc0gW6Uw-1
+Received: by mail-qk1-f198.google.com with SMTP id az11-20020a05620a170b00b006bc374c71e8so8554038qkb.17
+        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 02:01:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=uEYw8dkEXgcUOX7V93X65x+uXJi/wlkI4CEWgXjX+U8=;
+        b=WwInA440muz9rMk4/oCqfSplteSL3/BE27LJBbRkKQHywCjIdZ1HF4jYA5FTE/39Ck
+         +cb7e67GtGyB3OpzAQySVi58aYesS/2fjnagu67EoEu1O+5+jHTgPY5Q31mx0FZkZYdj
+         M1buuxwy1pO8yV7rww78rBdEgMp3RSCOP/xGe2fL0EkCBCSdZbzPlKzE2bHIlC1Hy4WC
+         pt7PVWrjja7sx1XhQvQJ3mvJW7TL0dPyPeFEOVFWQu6SLnu+4T6EXlPgXuubF44LUpy6
+         UfCPiFQaEjBRt93fyKijCQO8kz+iC0Li/OLeCRBtuIGhR84owMkGWmn0EbGvq+OKADoY
+         qpcQ==
+X-Gm-Message-State: ACgBeo0I1RdqrZaTSi9S3+e6UvT+oynY/fvIqJ3uwe5d1KpZt0Kl344E
+        nrmavuMT0nF3DhTVIk1tbPI6Q66uveHEJLUN+QlZvVnYdkBQbTX+gFKWHEVNPmA2pGgo6PPr+zB
+        hLpn7DEE0Etcl
+X-Received: by 2002:a05:620a:4711:b0:6bb:7e1b:5f0b with SMTP id bs17-20020a05620a471100b006bb7e1b5f0bmr33657199qkb.127.1662454866187;
+        Tue, 06 Sep 2022 02:01:06 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR54SeftazVhGuQR9Denza8esCRyPUSRNGJRsOYWXZ1aLyu1Zb25CEzZerEVP/BwXWQhYQ8KcQ==
+X-Received: by 2002:a05:620a:4711:b0:6bb:7e1b:5f0b with SMTP id bs17-20020a05620a471100b006bb7e1b5f0bmr33657178qkb.127.1662454865958;
+        Tue, 06 Sep 2022 02:01:05 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-11-6-69.retail.telecomitalia.it. [87.11.6.69])
+        by smtp.gmail.com with ESMTPSA id z20-20020ac87cb4000000b0031f36cd1958sm8888786qtv.81.2022.09.06.02.01.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Sep 2022 02:01:04 -0700 (PDT)
+Date:   Tue, 6 Sep 2022 11:00:48 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@gmail.com>,
+        Bobby Eshleman <bobbyeshleman@gmail.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Cong Wang <cong.wang@bytedance.com>,
+        Jiang Wang <jiang.wang@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hyperv@vger.kernel.org
+Subject: Re: [PATCH 0/6] virtio/vsock: introduce dgrams, sk_buff, and qdisc
+Message-ID: <20220906090048.xdwdnxy3dvuos36x@sgarzare-redhat>
+References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
+ <20220817025250-mutt-send-email-mst@kernel.org>
+ <3abb1be9-b12c-e658-0391-8461e28f1b33@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <3abb1be9-b12c-e658-0391-8461e28f1b33@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -68,78 +96,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Pierre Morel <pmorel@linux.ibm.com> writes:
-
-> S390x defines two topology levels above sockets: nbooks and drawers.
-
-nbooks or books?
-
-> Let's add these two levels inside the CPU topology implementation.
+On Thu, Aug 18, 2022 at 12:28:48PM +0800, Jason Wang wrote:
 >
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
+>在 2022/8/17 14:54, Michael S. Tsirkin 写道:
+>>On Mon, Aug 15, 2022 at 10:56:03AM -0700, Bobby Eshleman wrote:
+>>>Hey everybody,
+>>>
+>>>This series introduces datagrams, packet scheduling, and sk_buff usage
+>>>to virtio vsock.
+>>>
+>>>The usage of struct sk_buff benefits users by a) preparing vsock to use
+>>>other related systems that require sk_buff, such as sockmap and qdisc,
+>>>b) supporting basic congestion control via sock_alloc_send_skb, and c)
+>>>reducing copying when delivering packets to TAP.
+>>>
+>>>The socket layer no longer forces errors to be -ENOMEM, as typically
+>>>userspace expects -EAGAIN when the sk_sndbuf threshold is reached and
+>>>messages are being sent with option MSG_DONTWAIT.
+>>>
+>>>The datagram work is based off previous patches by Jiang Wang[1].
+>>>
+>>>The introduction of datagrams creates a transport layer fairness issue
+>>>where datagrams may freely starve streams of queue access. This happens
+>>>because, unlike streams, datagrams lack the transactions necessary for
+>>>calculating credits and throttling.
+>>>
+>>>Previous proposals introduce changes to the spec to add an additional
+>>>virtqueue pair for datagrams[1]. Although this solution works, using
+>>>Linux's qdisc for packet scheduling leverages already existing systems,
+>>>avoids the need to change the virtio specification, and gives additional
+>>>capabilities. The usage of SFQ or fq_codel, for example, may solve the
+>>>transport layer starvation problem. It is easy to imagine other use
+>>>cases as well. For example, services of varying importance may be
+>>>assigned different priorities, and qdisc will apply appropriate
+>>>priority-based scheduling. By default, the system default pfifo qdisc is
+>>>used. The qdisc may be bypassed and legacy queuing is resumed by simply
+>>>setting the virtio-vsock%d network device to state DOWN. This technique
+>>>still allows vsock to work with zero-configuration.
+>>The basic question to answer then is this: with a net device qdisc
+>>etc in the picture, how is this different from virtio net then?
+>>Why do you still want to use vsock?
+>
+>
+>Or maybe it's time to revisit an old idea[1] to unify at least the 
+>driver part (e.g using virtio-net driver for vsock then we can all 
+>features that vsock is lacking now)?
 
-[...]
+Sorry for coming late to the discussion!
 
-> diff --git a/qapi/machine.json b/qapi/machine.json
-> index 6afd1936b0..bdd92e3cb1 100644
-> --- a/qapi/machine.json
-> +++ b/qapi/machine.json
-> @@ -900,13 +900,15 @@
->  # a CPU is being hotplugged.
->  #
->  # @node-id: NUMA node ID the CPU belongs to
-> -# @socket-id: socket number within node/board the CPU belongs to
-> +# @drawer-id: drawer number within node/board the CPU belongs to
-> +# @book-id: book number within drawer/node/board the CPU belongs to
-> +# @socket-id: socket number within book/node/board the CPU belongs to
->  # @die-id: die number within socket the CPU belongs to (since 4.1)
->  # @cluster-id: cluster number within die the CPU belongs to (since 7.1)
->  # @core-id: core number within cluster the CPU belongs to
->  # @thread-id: thread number within core the CPU belongs to
->  #
-> -# Note: currently there are 6 properties that could be present
-> +# Note: currently there are 7 properties that could be present
+This would be great, though, last time I had looked at it, I had found 
+it quite complicated. The main problem is trying to avoid all the 
+net-specific stuff (MTU, ethernet header, HW offloading, etc.).
 
-Should this be 8?
+Maybe we could start thinking about this idea by adding a new transport 
+to vsock (e.g. virtio-net-vsock) completely separate from what we have 
+now.
 
->  #       but management should be prepared to pass through other
->  #       properties with device_add command to allow for future
->  #       interface extension. This also requires the filed names to be kept in
-   #       sync with the properties passed to -device/device_add.
-
-Not your patch's fault, but the second sentence is less than clear.
-What are "the filed names"?  A typo perhaps?
-
-> @@ -916,6 +918,8 @@
->  ##
->  { 'struct': 'CpuInstanceProperties',
->    'data': { '*node-id': 'int',
-> +            '*drawer-id': 'int',
-> +            '*book-id': 'int',
->              '*socket-id': 'int',
->              '*die-id': 'int',
->              '*cluster-id': 'int',
-> @@ -1465,6 +1469,10 @@
->  #
->  # @cpus: number of virtual CPUs in the virtual machine
->  #
-> +# @drawers: number of drawers in the CPU topology
-> +#
-> +# @books: number of books in the CPU topology
-> +#
->  # @sockets: number of sockets in the CPU topology
->  #
->  # @dies: number of dies per socket in the CPU topology
-> @@ -1481,6 +1489,8 @@
->  ##
->  { 'struct': 'SMPConfiguration', 'data': {
->       '*cpus': 'int',
-> +     '*drawers': 'int',
-> +     '*books': 'int',
->       '*sockets': 'int',
->       '*dies': 'int',
->       '*clusters': 'int',
-
-[...]
+Thanks,
+Stefano
 
