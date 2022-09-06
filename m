@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08F165AF35B
-	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 20:10:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 406275AF35E
+	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 20:10:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229708AbiIFSKA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Sep 2022 14:10:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45794 "EHLO
+        id S229751AbiIFSKE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Sep 2022 14:10:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229707AbiIFSJy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Sep 2022 14:09:54 -0400
+        with ESMTP id S229666AbiIFSJ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Sep 2022 14:09:59 -0400
 Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A18474E3F
-        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 11:09:52 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-340ae84fb7dso95468667b3.17
-        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 11:09:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5613A7D79E
+        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 11:09:53 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-345482ec6adso41129247b3.18
+        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 11:09:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date;
-        bh=mBtx7H6gwduk2C5lu92clfmk+N0XgBE6Y3tpg2ksljk=;
-        b=QGG0BLHi5GQGVos8uny6WdfWHTEk/bM6280oHgCBBKjbu2u8vwkv+iSmF8VQv6CuLt
-         Xax2PcDtQCH34uXfFt6rUBA16uTkoe20L3yG+YWZ+k7U9hMYO08BfeFkGrviPEBwANbF
-         Km9R8uAozFZfOnC+rctZ8b0mpONPXhU8lYEiDZr8/LxC6RbR0Afy2z4hVP/QP0TWTrDt
-         y4ms4BFAjcF6rQx4LFLoc2HNbN3e7rxW9sCvRyBnxQspCmkoX53Txd94A0WFtU3pgQA3
-         5noPb3aOi19GMeC7doV+VJf9ShAkz153udeMbN4FCFos26DPEdhhUL8aIKdHX0f0aRlA
-         JQBw==
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date;
+        bh=brstbaPfwLwBEqf5X4HkC79QNibVf8sG0+pwhO/RLkk=;
+        b=XiFz3fvlDU4rWj5yYCmISzD2oBc3rptT2mmyAvEmrHcxdWesgY8zaBU0r+nfMvuh7p
+         QJAUeV5dLSmmnvKDFgbLnG6K5bKf4+1qZrRB/JxhPOj6SmfnEbpL64jP5fwzVYQPwYhx
+         51le4noHlglQBoVzn5yPfOoWStWCgGXpslBq62iA7x3QipGAvTP6+9vFQoS5l6NrXelC
+         ihb4yuWA8qWV6M4IB0XLXMS+Y7m1D4QKt2k88wD0vKka6xS2c/praB/POlayWKvfxxFr
+         v/ELx5Pckwylv5KKlJ8HY3moA7oUtbt5MV0Ud50ad1zlGLhdZxnK1nOsSbjfIxGtNh/W
+         PCKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date;
-        bh=mBtx7H6gwduk2C5lu92clfmk+N0XgBE6Y3tpg2ksljk=;
-        b=nAVG3u+MB5C4ykwSFdhOIjPzULJ44a69AYAeDUbXT0U1ta26VGP0h4FQHBv2vXDfsB
-         cXJdI43zw1qr1iViRvPbSR5xCJTEAdLE6CFXdF3zAVmcYaSw021HrfO0ubiEFxsBa4D/
-         yQrfsXFcpQis6XCYyL3q8X8aOo4cJ4Nbbp0MK/JSdJOhsJfEYghRKYt/hYnHV3AMs6x2
-         YADGvM+FqvcAuLaGpWumtfVduSeEmfP2/GmXSkKNyOe4jtLPccqjBOCAnNwoaEIw2lFj
-         KAnOllqbGEA0bcT4UDa+4Soh1yZ0wGw70L6iErfEx26V8mpA4ydzkvIPQgxzrevzKXRr
-         cIRA==
-X-Gm-Message-State: ACgBeo0A0bjIIphhP7W3eh8FiNkovb56y/0JaxMnlETAgigyIITG+75X
-        VYAJyE43FF+02EI78+8lzzWMmVnWtcWkXVt4r0QIqyrxm3e7vdQwqAA715XbavLM0acLwVm2074
-        VLSIVH2iEWPJD8UFoOlc42/E70S0goUWHjYi6Ov1V+JK7NZO1CLP3waBmvw8ylO8=
-X-Google-Smtp-Source: AA6agR4kv0PzDjV2w60M2r2X58B3mYrKh8mAIPqkG9zuEoIbK+EyZohvUNi+chAQbn8Dn66nq+5Wx5OoRdKAlw==
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date;
+        bh=brstbaPfwLwBEqf5X4HkC79QNibVf8sG0+pwhO/RLkk=;
+        b=abpLXaOPC6Nu2ubp7EFilt16r9Ei1DqFXMzfebq6X9H2ydN3HxbD5RntuTokE3HEAQ
+         +ODgI+4DJ4Cb71sS5l57W6dH+qepEwWHGwQzFRBU8fcb55xNPdIqA5koMoLkfs6GwehB
+         43WSzXMFhn+vy9CLIH8CQDDk8WE0ECUEHfnP7RN59/NUYtAH5XyTKjSd1xAuh1T/zP/G
+         vWWx+cekiVaPqVmd6SH3M2SZ0wS8XCm4u5s79YBx3NITy/XWdMXRbW8MzQrhkeBIpbCm
+         ynY90jEzXPZ8sg7USf9kHDTXGEd13Fsuq12Y5R/sGBwyCLVMNf/zwRRuQNWyPqojuPmr
+         iJUQ==
+X-Gm-Message-State: ACgBeo0C2Wb3eSlxifpgZgf7Gqv4nKxXUTQeUtVbCauGZ8OU4/toXZ5I
+        9sL1Up27atgS2CePI3utY05GuobKhcqFlSrMZfUWySkzSslalUJlKzmKVmyPd3Faa7tN7TPhoWA
+        8dySjBubVvVRCFHLLu+mg8DL4SubvE6KvP0IDalFQoNLfVohNn7cYpnqIKVrpD+8=
+X-Google-Smtp-Source: AA6agR5K+gnRo9biBRmbEEqtf8kG61rU3yvHtDfgELajhCOlYM+4LUaoONn4K2PvIEe5/t7mxRO/n8Z7oU9MEg==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a0d:f201:0:b0:335:4933:6683 with SMTP id
- b1-20020a0df201000000b0033549336683mr42051742ywf.23.1662487790487; Tue, 06
- Sep 2022 11:09:50 -0700 (PDT)
-Date:   Tue,  6 Sep 2022 18:09:25 +0000
+ (user=ricarkol job=sendgmr) by 2002:a25:888f:0:b0:6a8:f77c:4f96 with SMTP id
+ d15-20020a25888f000000b006a8f77c4f96mr9820699ybl.103.1662487792719; Tue, 06
+ Sep 2022 11:09:52 -0700 (PDT)
+Date:   Tue,  6 Sep 2022 18:09:26 +0000
 In-Reply-To: <20220906180930.230218-1-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20220906180930.230218-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.37.2.789.g6183377224-goog
-Message-ID: <20220906180930.230218-9-ricarkol@google.com>
-Subject: [PATCH v6 08/13] KVM: selftests: Use the right memslot for code,
- page-tables, and data allocations
+Message-ID: <20220906180930.230218-10-ricarkol@google.com>
+Subject: [PATCH v6 09/13] KVM: selftests: aarch64: Add aarch64/page_fault_test
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         andrew.jones@linux.dev
@@ -63,6 +63,7 @@ Cc:     pbonzini@redhat.com, maz@kernel.org, seanjc@google.com,
         dmatlack@google.com, axelrasmussen@google.com,
         Ricardo Koller <ricarkol@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
@@ -73,283 +74,700 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The previous commit added support for callers of ____vm_create() to specify
-what memslots to use for code, page-tables, and data allocations. Change
-them accordingly:
+Add a new test for stage 2 faults when using different combinations of
+guest accesses (e.g., write, S1PTW), backing source type (e.g., anon)
+and types of faults (e.g., read on hugetlbfs with a hole). The next
+commits will add different handling methods and more faults (e.g., uffd
+and dirty logging). This first commit starts by adding two sanity checks
+for all types of accesses: AF setting by the hw, and accessing memslots
+with holes.
 
-- stacks, code, and exception tables use the code memslot
-- page tables and the pgd use the pt memslot
-- data (anything allocated with vm_vaddr_alloc()) uses the data memslot
-
-No functional change intended. All allocators keep using memslot #0.
-
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Andrew Jones <andrew.jones@linux.dev>
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- .../selftests/kvm/include/kvm_util_base.h     |  3 +
- .../selftests/kvm/lib/aarch64/processor.c     | 11 ++--
- tools/testing/selftests/kvm/lib/elf.c         |  3 +-
- tools/testing/selftests/kvm/lib/kvm_util.c    | 57 ++++++++++++-------
- .../selftests/kvm/lib/riscv/processor.c       |  7 ++-
- .../selftests/kvm/lib/s390x/processor.c       |  7 ++-
- .../selftests/kvm/lib/x86_64/processor.c      | 13 +++--
- 7 files changed, 61 insertions(+), 40 deletions(-)
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/page_fault_test.c   | 622 ++++++++++++++++++
+ .../selftests/kvm/include/aarch64/processor.h |   8 +
+ 3 files changed, 631 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/page_fault_test.c
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index 5dbca38a512b..76a087a88efd 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -402,7 +402,10 @@ void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
- void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
- struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id);
- vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
-+vm_vaddr_t __vm_vaddr_alloc(struct kvm_vm *vm, size_t sz,
-+			    vm_vaddr_t vaddr_min, enum kvm_mem_region_type mr);
- vm_vaddr_t vm_vaddr_alloc_pages(struct kvm_vm *vm, int nr_pages);
-+vm_vaddr_t __vm_vaddr_alloc_page(struct kvm_vm *vm, enum kvm_mem_region_type mr);
- vm_vaddr_t vm_vaddr_alloc_page(struct kvm_vm *vm);
- 
- void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index 5a31dc85d054..885b893a5f40 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -79,7 +79,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
- 	if (!vm->pgd_created) {
- 		vm_paddr_t paddr = vm_phy_pages_alloc(vm,
- 			page_align(vm, ptrs_per_pgd(vm) * 8) / vm->page_size,
--			KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
-+			KVM_GUEST_PAGE_TABLE_MIN_PADDR, vm->memslots[MEM_REGION_PT]);
- 		vm->pgd = paddr;
- 		vm->pgd_created = true;
- 	}
-@@ -328,8 +328,9 @@ struct kvm_vcpu *aarch64_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
- 	size_t stack_size = vm->page_size == 4096 ?
- 					DEFAULT_STACK_PGS * vm->page_size :
- 					vm->page_size;
--	uint64_t stack_vaddr = vm_vaddr_alloc(vm, stack_size,
--					      DEFAULT_ARM64_GUEST_STACK_VADDR_MIN);
-+	uint64_t stack_vaddr = __vm_vaddr_alloc(vm, stack_size,
-+						DEFAULT_ARM64_GUEST_STACK_VADDR_MIN,
-+						MEM_REGION_CODE);
- 	struct kvm_vcpu *vcpu = __vm_vcpu_add(vm, vcpu_id);
- 
- 	aarch64_vcpu_setup(vcpu, init);
-@@ -435,8 +436,8 @@ void route_exception(struct ex_regs *regs, int vector)
- 
- void vm_init_descriptor_tables(struct kvm_vm *vm)
- {
--	vm->handlers = vm_vaddr_alloc(vm, sizeof(struct handlers),
--			vm->page_size);
-+	vm->handlers = __vm_vaddr_alloc(vm, sizeof(struct handlers),
-+					vm->page_size, MEM_REGION_CODE);
- 
- 	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
- }
-diff --git a/tools/testing/selftests/kvm/lib/elf.c b/tools/testing/selftests/kvm/lib/elf.c
-index 9f54c098d9d0..51f280c412ba 100644
---- a/tools/testing/selftests/kvm/lib/elf.c
-+++ b/tools/testing/selftests/kvm/lib/elf.c
-@@ -161,7 +161,8 @@ void kvm_vm_elf_load(struct kvm_vm *vm, const char *filename)
- 		seg_vend |= vm->page_size - 1;
- 		size_t seg_size = seg_vend - seg_vstart + 1;
- 
--		vm_vaddr_t vaddr = vm_vaddr_alloc(vm, seg_size, seg_vstart);
-+		vm_vaddr_t vaddr = __vm_vaddr_alloc(vm, seg_size, seg_vstart,
-+						    MEM_REGION_CODE);
- 		TEST_ASSERT(vaddr == seg_vstart, "Unable to allocate "
- 			"virtual memory for segment at requested min addr,\n"
- 			"  segment idx: %u\n"
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 02532bc528da..ff457af44c53 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1226,32 +1226,15 @@ static vm_vaddr_t vm_vaddr_unused_gap(struct kvm_vm *vm, size_t sz,
- 	return pgidx_start * vm->page_size;
- }
- 
--/*
-- * VM Virtual Address Allocate
-- *
-- * Input Args:
-- *   vm - Virtual Machine
-- *   sz - Size in bytes
-- *   vaddr_min - Minimum starting virtual address
-- *
-- * Output Args: None
-- *
-- * Return:
-- *   Starting guest virtual address
-- *
-- * Allocates at least sz bytes within the virtual address space of the vm
-- * given by vm.  The allocated bytes are mapped to a virtual address >=
-- * the address given by vaddr_min.  Note that each allocation uses a
-- * a unique set of pages, with the minimum real allocation being at least
-- * a page.
-- */
--vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min)
-+vm_vaddr_t __vm_vaddr_alloc(struct kvm_vm *vm, size_t sz,
-+			    vm_vaddr_t vaddr_min, enum kvm_mem_region_type mrt)
- {
- 	uint64_t pages = (sz >> vm->page_shift) + ((sz % vm->page_size) != 0);
- 
- 	virt_pgd_alloc(vm);
- 	vm_paddr_t paddr = vm_phy_pages_alloc(vm, pages,
--					      KVM_UTIL_MIN_PFN * vm->page_size, 0);
-+				KVM_UTIL_MIN_PFN * vm->page_size,
-+				vm->memslots[mrt]);
- 
- 	/*
- 	 * Find an unused range of virtual page addresses of at least
-@@ -1272,6 +1255,30 @@ vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min)
- 	return vaddr_start;
- }
- 
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests=
+/kvm/Makefile
+index 1bb471aeb103..850e317b9e82 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -149,6 +149,7 @@ TEST_GEN_PROGS_aarch64 +=3D aarch64/arch_timer
+ TEST_GEN_PROGS_aarch64 +=3D aarch64/debug-exceptions
+ TEST_GEN_PROGS_aarch64 +=3D aarch64/get-reg-list
+ TEST_GEN_PROGS_aarch64 +=3D aarch64/hypercalls
++TEST_GEN_PROGS_aarch64 +=3D aarch64/page_fault_test
+ TEST_GEN_PROGS_aarch64 +=3D aarch64/psci_test
+ TEST_GEN_PROGS_aarch64 +=3D aarch64/vcpu_width_config
+ TEST_GEN_PROGS_aarch64 +=3D aarch64/vgic_init
+diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/=
+testing/selftests/kvm/aarch64/page_fault_test.c
+new file mode 100644
+index 000000000000..1c7e02003753
+--- /dev/null
++++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+@@ -0,0 +1,622 @@
++// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * VM Virtual Address Allocate
++ * page_fault_test.c - Test stage 2 faults.
 + *
-+ * Input Args:
-+ *   vm - Virtual Machine
-+ *   sz - Size in bytes
-+ *   vaddr_min - Minimum starting virtual address
-+ *
-+ * Output Args: None
-+ *
-+ * Return:
-+ *   Starting guest virtual address
-+ *
-+ * Allocates at least sz bytes within the virtual address space of the vm
-+ * given by vm.  The allocated bytes are mapped to a virtual address >=
-+ * the address given by vaddr_min.  Note that each allocation uses a
-+ * a unique set of pages, with the minimum real allocation being at least
-+ * a page. The allocated physical space comes from the data memory region.
++ * This test tries different combinations of guest accesses (e.g., write,
++ * S1PTW), backing source type (e.g., anon) and types of faults (e.g., rea=
+d on
++ * hugetlbfs with a hole). It checks that the expected handling method is
++ * called (e.g., uffd faults with the right address and write/read flag).
 + */
-+vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min)
++
++#define _GNU_SOURCE
++#include <linux/bitmap.h>
++#include <fcntl.h>
++#include <test_util.h>
++#include <kvm_util.h>
++#include <processor.h>
++#include <asm/sysreg.h>
++#include <linux/bitfield.h>
++#include "guest_modes.h"
++#include "userfaultfd_util.h"
++
++/* Guest virtual addresses that point to the test page and its PTE. */
++#define TEST_GVA				0xc0000000
++#define TEST_EXEC_GVA				0xc0000008
++#define TEST_PTE_GVA				0xb0000000
++#define TEST_DATA				0x0123456789ABCDEF
++
++static uint64_t *guest_test_memory =3D (uint64_t *)TEST_GVA;
++
++#define CMD_NONE				(0)
++#define CMD_SKIP_TEST				(1ULL << 1)
++#define CMD_HOLE_PT				(1ULL << 2)
++#define CMD_HOLE_DATA				(1ULL << 3)
++
++#define PREPARE_FN_NR				10
++#define CHECK_FN_NR				10
++
++struct test_desc {
++	const char *name;
++	uint64_t mem_mark_cmd;
++	/* Skip the test if any prepare function returns false */
++	bool (*guest_prepare[PREPARE_FN_NR])(void);
++	void (*guest_test)(void);
++	void (*guest_test_check[CHECK_FN_NR])(void);
++	void (*dabt_handler)(struct ex_regs *regs);
++	void (*iabt_handler)(struct ex_regs *regs);
++	uint32_t pt_memslot_flags;
++	uint32_t data_memslot_flags;
++	bool skip;
++};
++
++struct test_params {
++	enum vm_mem_backing_src_type src_type;
++	struct test_desc *test_desc;
++};
++
++static inline void flush_tlb_page(uint64_t vaddr)
 +{
-+	return __vm_vaddr_alloc(vm, sz, vaddr_min, MEM_REGION_DATA);
++	uint64_t page =3D vaddr >> 12;
++
++	dsb(ishst);
++	asm volatile("tlbi vaae1is, %0" :: "r" (page));
++	dsb(ish);
++	isb();
 +}
 +
- /*
-  * VM Virtual Address Allocate Pages
-  *
-@@ -1291,6 +1298,11 @@ vm_vaddr_t vm_vaddr_alloc_pages(struct kvm_vm *vm, int nr_pages)
- 	return vm_vaddr_alloc(vm, nr_pages * getpagesize(), KVM_UTIL_MIN_VADDR);
- }
- 
-+vm_vaddr_t __vm_vaddr_alloc_page(struct kvm_vm *vm, enum kvm_mem_region_type mrt)
++static void guest_write64(void)
 +{
-+	return __vm_vaddr_alloc(vm, getpagesize(), KVM_UTIL_MIN_VADDR, mrt);
++	uint64_t val;
++
++	WRITE_ONCE(*guest_test_memory, TEST_DATA);
++	val =3D READ_ONCE(*guest_test_memory);
++	GUEST_ASSERT_EQ(val, TEST_DATA);
 +}
 +
- /*
-  * VM Virtual Address Allocate Page
-  *
-@@ -1856,7 +1868,8 @@ vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
- 
- vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm)
- {
--	return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
-+	return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
-+				 vm->memslots[MEM_REGION_PT]);
- }
- 
- /*
-diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
-index 604478151212..26c8d3dffb9a 100644
---- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-+++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-@@ -58,7 +58,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
- 	if (!vm->pgd_created) {
- 		vm_paddr_t paddr = vm_phy_pages_alloc(vm,
- 			page_align(vm, ptrs_per_pte(vm) * 8) / vm->page_size,
--			KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
-+			KVM_GUEST_PAGE_TABLE_MIN_PADDR, vm->memslots[MEM_REGION_PT]);
- 		vm->pgd = paddr;
- 		vm->pgd_created = true;
- 	}
-@@ -282,8 +282,9 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
- 	size_t stack_size = vm->page_size == 4096 ?
- 					DEFAULT_STACK_PGS * vm->page_size :
- 					vm->page_size;
--	unsigned long stack_vaddr = vm_vaddr_alloc(vm, stack_size,
--					DEFAULT_RISCV_GUEST_STACK_VADDR_MIN);
-+	unsigned long stack_vaddr = __vm_vaddr_alloc(vm, stack_size,
-+					DEFAULT_RISCV_GUEST_STACK_VADDR_MIN,
-+					MEM_REGION_CODE);
- 	unsigned long current_gp = 0;
- 	struct kvm_mp_state mps;
- 	struct kvm_vcpu *vcpu;
-diff --git a/tools/testing/selftests/kvm/lib/s390x/processor.c b/tools/testing/selftests/kvm/lib/s390x/processor.c
-index 89d7340d9cbd..410ae2b59847 100644
---- a/tools/testing/selftests/kvm/lib/s390x/processor.c
-+++ b/tools/testing/selftests/kvm/lib/s390x/processor.c
-@@ -21,7 +21,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
- 		return;
- 
- 	paddr = vm_phy_pages_alloc(vm, PAGES_PER_REGION,
--				   KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
-+			KVM_GUEST_PAGE_TABLE_MIN_PADDR, vm->memslots[MEM_REGION_PT]);
- 	memset(addr_gpa2hva(vm, paddr), 0xff, PAGES_PER_REGION * vm->page_size);
- 
- 	vm->pgd = paddr;
-@@ -167,8 +167,9 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
- 	TEST_ASSERT(vm->page_size == 4096, "Unsupported page size: 0x%x",
- 		    vm->page_size);
- 
--	stack_vaddr = vm_vaddr_alloc(vm, stack_size,
--				     DEFAULT_GUEST_STACK_VADDR_MIN);
-+	stack_vaddr = __vm_vaddr_alloc(vm, stack_size,
-+				       DEFAULT_GUEST_STACK_VADDR_MIN,
-+				       MEM_REGION_CODE);
- 
- 	vcpu = __vm_vcpu_add(vm, vcpu_id);
- 
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 2e6e61bbe81b..f7b90a6c7d19 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -525,7 +525,7 @@ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
- static void kvm_setup_gdt(struct kvm_vm *vm, struct kvm_dtable *dt)
- {
- 	if (!vm->gdt)
--		vm->gdt = vm_vaddr_alloc_page(vm);
-+		vm->gdt = __vm_vaddr_alloc_page(vm, MEM_REGION_CODE);
- 
- 	dt->base = vm->gdt;
- 	dt->limit = getpagesize();
-@@ -535,7 +535,7 @@ static void kvm_setup_tss_64bit(struct kvm_vm *vm, struct kvm_segment *segp,
- 				int selector)
- {
- 	if (!vm->tss)
--		vm->tss = vm_vaddr_alloc_page(vm);
-+		vm->tss = __vm_vaddr_alloc_page(vm, MEM_REGION_CODE);
- 
- 	memset(segp, 0, sizeof(*segp));
- 	segp->base = vm->tss;
-@@ -620,8 +620,9 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
- 	vm_vaddr_t stack_vaddr;
- 	struct kvm_vcpu *vcpu;
- 
--	stack_vaddr = vm_vaddr_alloc(vm, DEFAULT_STACK_PGS * getpagesize(),
--				     DEFAULT_GUEST_STACK_VADDR_MIN);
-+	stack_vaddr = __vm_vaddr_alloc(vm, DEFAULT_STACK_PGS * getpagesize(),
-+				       DEFAULT_GUEST_STACK_VADDR_MIN,
-+				       MEM_REGION_CODE);
- 
- 	vcpu = __vm_vcpu_add(vm, vcpu_id);
- 	vcpu_init_cpuid(vcpu, kvm_get_supported_cpuid());
-@@ -1118,8 +1119,8 @@ void vm_init_descriptor_tables(struct kvm_vm *vm)
- 	extern void *idt_handlers;
- 	int i;
- 
--	vm->idt = vm_vaddr_alloc_page(vm);
--	vm->handlers = vm_vaddr_alloc_page(vm);
-+	vm->idt = __vm_vaddr_alloc_page(vm, MEM_REGION_CODE);
-+	vm->handlers = __vm_vaddr_alloc_page(vm, MEM_REGION_CODE);
- 	/* Handlers have the same address in both address spaces.*/
- 	for (i = 0; i < NUM_INTERRUPTS; i++)
- 		set_idt_entry(vm, i, (unsigned long)(&idt_handlers)[i], 0,
--- 
++/* Check the system for atomic instructions. */
++static bool guest_check_lse(void)
++{
++	uint64_t isar0 =3D read_sysreg(id_aa64isar0_el1);
++	uint64_t atomic;
++
++	atomic =3D FIELD_GET(ARM64_FEATURE_MASK(ID_AA64ISAR0_ATOMICS), isar0);
++	return atomic >=3D 2;
++}
++
++static bool guest_check_dc_zva(void)
++{
++	uint64_t dczid =3D read_sysreg(dczid_el0);
++	uint64_t dzp =3D FIELD_GET(ARM64_FEATURE_MASK(DCZID_DZP), dczid);
++
++	return dzp =3D=3D 0;
++}
++
++/* Compare and swap instruction. */
++static void guest_cas(void)
++{
++	uint64_t val;
++
++	GUEST_ASSERT(guest_check_lse());
++	asm volatile(".arch_extension lse\n"
++		     "casal %0, %1, [%2]\n"
++			:: "r" (0), "r" (TEST_DATA), "r" (guest_test_memory));
++	val =3D READ_ONCE(*guest_test_memory);
++	GUEST_ASSERT_EQ(val, TEST_DATA);
++}
++
++static void guest_read64(void)
++{
++	uint64_t val;
++
++	val =3D READ_ONCE(*guest_test_memory);
++	GUEST_ASSERT_EQ(val, 0);
++}
++
++/* Address translation instruction */
++static void guest_at(void)
++{
++	uint64_t par;
++
++	asm volatile("at s1e1r, %0" :: "r" (guest_test_memory));
++	par =3D read_sysreg(par_el1);
++	isb();
++
++	/* Bit 1 indicates whether the AT was successful */
++	GUEST_ASSERT_EQ(par & 1, 0);
++}
++
++/*
++ * The size of the block written by "dc zva" is guaranteed to be between (=
+2 <<
++ * 0) and (2 << 9), which is safe in our case as we need the write to happ=
+en
++ * for at least a word, and not more than a page.
++ */
++static void guest_dc_zva(void)
++{
++	uint16_t val;
++
++	asm volatile("dc zva, %0" :: "r" (guest_test_memory));
++	dsb(ish);
++	val =3D READ_ONCE(*guest_test_memory);
++	GUEST_ASSERT_EQ(val, 0);
++}
++
++/*
++ * Pre-indexing loads and stores don't have a valid syndrome (ESR_EL2.ISV=
+=3D=3D0).
++ * And that's special because KVM must take special care with those: they
++ * should still count as accesses for dirty logging or user-faulting, but
++ * should be handled differently on mmio.
++ */
++static void guest_ld_preidx(void)
++{
++	uint64_t val;
++	uint64_t addr =3D TEST_GVA - 8;
++
++	/*
++	 * This ends up accessing "TEST_GVA + 8 - 8", where "TEST_GVA - 8" is
++	 * in a gap between memslots not backing by anything.
++	 */
++	asm volatile("ldr %0, [%1, #8]!"
++			: "=3Dr" (val), "+r" (addr));
++	GUEST_ASSERT_EQ(val, 0);
++	GUEST_ASSERT_EQ(addr, TEST_GVA);
++}
++
++static void guest_st_preidx(void)
++{
++	uint64_t val =3D TEST_DATA;
++	uint64_t addr =3D TEST_GVA - 8;
++
++	asm volatile("str %0, [%1, #8]!"
++			: "+r" (val), "+r" (addr));
++
++	GUEST_ASSERT_EQ(addr, TEST_GVA);
++	val =3D READ_ONCE(*guest_test_memory);
++}
++
++static bool guest_set_ha(void)
++{
++	uint64_t mmfr1 =3D read_sysreg(id_aa64mmfr1_el1);
++	uint64_t hadbs, tcr;
++
++	/* Skip if HA is not supported. */
++	hadbs =3D FIELD_GET(ARM64_FEATURE_MASK(ID_AA64MMFR1_HADBS), mmfr1);
++	if (hadbs =3D=3D 0)
++		return false;
++
++	tcr =3D read_sysreg(tcr_el1) | TCR_EL1_HA;
++	write_sysreg(tcr, tcr_el1);
++	isb();
++
++	return true;
++}
++
++static bool guest_clear_pte_af(void)
++{
++	*((uint64_t *)TEST_PTE_GVA) &=3D ~PTE_AF;
++	flush_tlb_page(TEST_GVA);
++
++	return true;
++}
++
++static void guest_check_pte_af(void)
++{
++	dsb(ish);
++	GUEST_ASSERT_EQ(*((uint64_t *)TEST_PTE_GVA) & PTE_AF, PTE_AF);
++}
++
++static void guest_exec(void)
++{
++	int (*code)(void) =3D (int (*)(void))TEST_EXEC_GVA;
++	int ret;
++
++	ret =3D code();
++	GUEST_ASSERT_EQ(ret, 0x77);
++}
++
++static bool guest_prepare(struct test_desc *test)
++{
++	bool (*prepare_fn)(void);
++	int i;
++
++	for (i =3D 0; i < PREPARE_FN_NR; i++) {
++		prepare_fn =3D test->guest_prepare[i];
++		if (prepare_fn && !prepare_fn())
++			return false;
++	}
++
++	return true;
++}
++
++static void guest_test_check(struct test_desc *test)
++{
++	void (*check_fn)(void);
++	int i;
++
++	for (i =3D 0; i < CHECK_FN_NR; i++) {
++		check_fn =3D test->guest_test_check[i];
++		if (check_fn)
++			check_fn();
++	}
++}
++
++static void guest_code(struct test_desc *test)
++{
++	if (!guest_prepare(test))
++		GUEST_SYNC(CMD_SKIP_TEST);
++
++	GUEST_SYNC(test->mem_mark_cmd);
++
++	if (test->guest_test)
++		test->guest_test();
++
++	guest_test_check(test);
++	GUEST_DONE();
++}
++
++static void no_dabt_handler(struct ex_regs *regs)
++{
++	GUEST_ASSERT_1(false, read_sysreg(far_el1));
++}
++
++static void no_iabt_handler(struct ex_regs *regs)
++{
++	GUEST_ASSERT_1(false, regs->pc);
++}
++
++/* Returns true to continue the test, and false if it should be skipped. *=
+/
++static bool punch_hole_in_memslot(struct kvm_vm *vm,
++				  struct userspace_mem_region *region)
++{
++	void *hva =3D (void *)region->region.userspace_addr;
++	uint64_t paging_size =3D region->region.memory_size;
++	int ret, fd =3D region->fd;
++
++	if (fd !=3D -1) {
++		ret =3D fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
++				0, paging_size);
++		TEST_ASSERT(ret =3D=3D 0, "fallocate failed, errno: %d\n", errno);
++	} else {
++		if (is_backing_src_hugetlb(region->backing_src_type))
++			return false;
++
++		ret =3D madvise(hva, paging_size, MADV_DONTNEED);
++		TEST_ASSERT(ret =3D=3D 0, "madvise failed, errno: %d\n", errno);
++	}
++
++	return true;
++}
++
++/* Returns true to continue the test, and false if it should be skipped. *=
+/
++static bool handle_cmd(struct kvm_vm *vm, int cmd)
++{
++	struct userspace_mem_region *data_region, *pt_region;
++	bool continue_test =3D true;
++
++	data_region =3D vm_get_mem_region(vm, MEM_REGION_DATA);
++	pt_region =3D vm_get_mem_region(vm, MEM_REGION_PT);
++
++	if (cmd =3D=3D CMD_SKIP_TEST)
++		continue_test =3D false;
++
++	if (cmd & CMD_HOLE_PT)
++		continue_test =3D punch_hole_in_memslot(vm, pt_region);
++	if (cmd & CMD_HOLE_DATA)
++		continue_test =3D punch_hole_in_memslot(vm, data_region);
++
++	return continue_test;
++}
++
++extern unsigned char __exec_test;
++
++void noinline __return_0x77(void)
++{
++	asm volatile("__exec_test: mov x0, #0x77\n"
++			"ret\n");
++}
++
++/*
++ * Note that this function runs on the host before the test VM starts: the=
+re's
++ * no need to sync the D$ and I$ caches.
++ */
++static void load_exec_code_for_test(struct kvm_vm *vm)
++{
++	uint64_t *code, *c;
++	struct userspace_mem_region *region;
++	void *hva;
++
++	region =3D vm_get_mem_region(vm, MEM_REGION_DATA);
++	hva =3D (void *)region->region.userspace_addr;
++
++	assert(TEST_EXEC_GVA - TEST_GVA);
++	code =3D hva + 8;
++
++	/*
++	 * We need the cast to be separate in order for the compiler to not
++	 * complain with: "=E2=80=98memcpy=E2=80=99 forming offset [1, 7] is out =
+of the bounds
++	 * [0, 1] of object =E2=80=98__exec_test=E2=80=99 with type =E2=80=98unsi=
+gned char=E2=80=99"
++	 */
++	c =3D (uint64_t *)&__exec_test;
++	memcpy(code, c, 8);
++}
++
++static void setup_abort_handlers(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
++		struct test_desc *test)
++{
++	vm_init_descriptor_tables(vm);
++	vcpu_init_descriptor_tables(vcpu);
++
++	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
++			ESR_EC_DABT, no_dabt_handler);
++	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
++			ESR_EC_IABT, no_iabt_handler);
++}
++
++static void setup_gva_maps(struct kvm_vm *vm)
++{
++	struct userspace_mem_region *region;
++	uint64_t pte_gpa;
++
++	region =3D vm_get_mem_region(vm, MEM_REGION_DATA);
++	/* Map TEST_GVA first. This will install a new PTE. */
++	virt_pg_map(vm, TEST_GVA, region->region.guest_phys_addr);
++	/* Then map TEST_PTE_GVA to the above PTE. */
++	pte_gpa =3D addr_hva2gpa(vm, virt_get_pte_hva(vm, TEST_GVA));
++	virt_pg_map(vm, TEST_PTE_GVA, pte_gpa);
++}
++
++unsigned long get_max_gfn(enum vm_guest_mode mode)
++{
++	unsigned int pa_bits =3D vm_guest_mode_params[mode].pa_bits;
++	unsigned int page_shift =3D vm_guest_mode_params[mode].page_shift;
++
++	return ((1ULL << pa_bits) >> page_shift) - 1;
++}
++
++/* Create a code memslot at pfn=3D0, and data and PT ones at max_gfn. */
++static struct kvm_vm_mem_params setup_memslots(enum vm_guest_mode mode,
++					       struct test_params *p)
++{
++	uint64_t backing_src_pagesz =3D get_backing_src_pagesz(p->src_type);
++	uint64_t guest_page_size =3D vm_guest_mode_params[mode].page_size;
++	uint64_t max_gfn =3D get_max_gfn(mode);
++	/* Enough for 2M of code when using 4K guest pages. */
++	uint64_t code_npages =3D 512;
++	uint64_t pt_size, data_size, data_gpa;
++
++	/*
++	 * This test requires 1 pgd, 2 pud, 4 pmd, and 6 pte pages when using
++	 * VM_MODE_P48V48_4K. Note that the .text takes ~1.6MBs.  That's 13
++	 * pages. VM_MODE_P48V48_4K is the mode with most PT pages; let's use
++	 * twice that just in case.
++	 */
++	pt_size =3D 26 * guest_page_size;
++
++	/* memslot sizes and gpa's must be aligned to the backing page size */
++	pt_size =3D align_up(pt_size, backing_src_pagesz);
++	data_size =3D align_up(guest_page_size, backing_src_pagesz);
++	data_gpa =3D (max_gfn * guest_page_size) - data_size;
++	data_gpa =3D align_down(data_gpa, backing_src_pagesz);
++
++	struct kvm_vm_mem_params mem_params =3D {
++		.region[0] =3D {
++			.src_type =3D VM_MEM_SRC_ANONYMOUS,
++			.guest_paddr =3D 0,
++			.slot =3D 0,
++			.npages =3D code_npages,
++			.flags =3D 0,
++			.enabled =3D true,
++		},
++		.region[1] =3D {
++			.src_type =3D p->src_type,
++			.guest_paddr =3D data_gpa - pt_size,
++			.slot =3D 1,
++			.npages =3D pt_size / guest_page_size,
++			.flags =3D p->test_desc->pt_memslot_flags,
++			.enabled =3D true,
++		},
++		.region[2] =3D {
++			.src_type =3D p->src_type,
++			.guest_paddr =3D data_gpa,
++			.slot =3D 2,
++			.npages =3D data_size / guest_page_size,
++			.flags =3D p->test_desc->data_memslot_flags,
++			.enabled =3D true,
++		},
++		.region_idx[MEM_REGION_CODE] =3D 0,
++		.region_idx[MEM_REGION_PT] =3D 1,
++		.region_idx[MEM_REGION_DATA] =3D 2,
++		.mode =3D mode,
++	};
++
++	return mem_params;
++}
++
++static void print_test_banner(enum vm_guest_mode mode, struct test_params =
+*p)
++{
++	struct test_desc *test =3D p->test_desc;
++
++	pr_debug("Test: %s\n", test->name);
++	pr_debug("Testing guest mode: %s\n", vm_guest_mode_string(mode));
++	pr_debug("Testing memory backing src type: %s\n",
++			vm_mem_backing_src_alias(p->src_type)->name);
++}
++
++/*
++ * This function either succeeds, skips the test (after setting test->skip=
+), or
++ * fails with a TEST_FAIL that aborts all tests.
++ */
++static void vcpu_run_loop(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
++			  struct test_desc *test)
++{
++	struct ucall uc;
++
++	for (;;) {
++		vcpu_run(vcpu);
++
++		switch (get_ucall(vcpu, &uc)) {
++		case UCALL_SYNC:
++			if (!handle_cmd(vm, uc.args[1])) {
++				test->skip =3D true;
++				goto done;
++			}
++			break;
++		case UCALL_ABORT:
++			REPORT_GUEST_ASSERT_2(uc, "values: %#lx, %#lx");
++			break;
++		case UCALL_DONE:
++			goto done;
++		default:
++			TEST_FAIL("Unknown ucall %lu", uc.cmd);
++		}
++	}
++
++done:
++	pr_debug(test->skip ? "Skipped.\n" : "Done.\n");
++	return;
++}
++
++static void run_test(enum vm_guest_mode mode, void *arg)
++{
++	struct test_params *p =3D (struct test_params *)arg;
++	struct test_desc *test =3D p->test_desc;
++	struct kvm_vm *vm;
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm_mem_params mem_params;
++
++	print_test_banner(mode, p);
++
++	mem_params =3D setup_memslots(mode, p);
++	vm =3D ____vm_create(&mem_params);
++	kvm_vm_elf_load(vm, program_invocation_name);
++	vcpu =3D vm_vcpu_add(vm, 0, guest_code);
++
++	setup_gva_maps(vm);
++
++	ucall_init(vm, NULL);
++
++	load_exec_code_for_test(vm);
++	setup_abort_handlers(vm, vcpu, test);
++	vcpu_args_set(vcpu, 1, test);
++
++	vcpu_run_loop(vm, vcpu, test);
++
++	ucall_uninit(vm);
++	kvm_vm_free(vm);
++}
++
++static void help(char *name)
++{
++	puts("");
++	printf("usage: %s [-h] [-s mem-type]\n", name);
++	puts("");
++	guest_modes_help();
++	backing_src_help("-s");
++	puts("");
++}
++
++#define SNAME(s)			#s
++#define SCAT2(a, b)			SNAME(a ## _ ## b)
++#define SCAT3(a, b, c)			SCAT2(a, SCAT2(b, c))
++
++#define _CHECK(_test)			_CHECK_##_test
++#define _PREPARE(_test)			_PREPARE_##_test
++#define _PREPARE_guest_read64		NULL
++#define _PREPARE_guest_ld_preidx	NULL
++#define _PREPARE_guest_write64		NULL
++#define _PREPARE_guest_st_preidx	NULL
++#define _PREPARE_guest_exec		NULL
++#define _PREPARE_guest_at		NULL
++#define _PREPARE_guest_dc_zva		guest_check_dc_zva
++#define _PREPARE_guest_cas		guest_check_lse
++
++/* With or without access flag checks */
++#define _PREPARE_with_af		guest_set_ha, guest_clear_pte_af
++#define _PREPARE_no_af			NULL
++#define _CHECK_with_af			guest_check_pte_af
++#define _CHECK_no_af			NULL
++
++/* Performs an access and checks that no faults were triggered. */
++#define TEST_ACCESS(_access, _with_af, _mark_cmd)				\
++{										\
++	.name			=3D SCAT3(_access, _with_af, #_mark_cmd),		\
++	.guest_prepare		=3D { _PREPARE(_with_af),				\
++				    _PREPARE(_access) },			\
++	.mem_mark_cmd		=3D _mark_cmd,					\
++	.guest_test		=3D _access,					\
++	.guest_test_check	=3D { _CHECK(_with_af) },				\
++}
++
++static struct test_desc tests[] =3D {
++
++	/* Check that HW is setting the Access Flag (AF) (sanity checks). */
++	TEST_ACCESS(guest_read64, with_af, CMD_NONE),
++	TEST_ACCESS(guest_ld_preidx, with_af, CMD_NONE),
++	TEST_ACCESS(guest_cas, with_af, CMD_NONE),
++	TEST_ACCESS(guest_write64, with_af, CMD_NONE),
++	TEST_ACCESS(guest_st_preidx, with_af, CMD_NONE),
++	TEST_ACCESS(guest_dc_zva, with_af, CMD_NONE),
++	TEST_ACCESS(guest_exec, with_af, CMD_NONE),
++
++	/*
++	 * Accessing a hole in the data memslot (punched with fallocate or
++	 * madvise) shouldn't fault (more sanity checks).
++	 */
++	TEST_ACCESS(guest_read64, no_af, CMD_HOLE_DATA),
++	TEST_ACCESS(guest_cas, no_af, CMD_HOLE_DATA),
++	TEST_ACCESS(guest_ld_preidx, no_af, CMD_HOLE_DATA),
++	TEST_ACCESS(guest_write64, no_af, CMD_HOLE_DATA),
++	TEST_ACCESS(guest_st_preidx, no_af, CMD_HOLE_DATA),
++	TEST_ACCESS(guest_at, no_af, CMD_HOLE_DATA),
++	TEST_ACCESS(guest_dc_zva, no_af, CMD_HOLE_DATA),
++
++	{ 0 }
++};
++
++static void for_each_test_and_guest_mode(
++		void (*func)(enum vm_guest_mode m, void *a),
++		enum vm_mem_backing_src_type src_type)
++{
++	struct test_desc *t;
++
++	for (t =3D &tests[0]; t->name; t++) {
++		if (t->skip)
++			continue;
++
++		struct test_params p =3D {
++			.src_type =3D src_type,
++			.test_desc =3D t,
++		};
++
++		for_each_guest_mode(run_test, &p);
++	}
++}
++
++int main(int argc, char *argv[])
++{
++	enum vm_mem_backing_src_type src_type;
++	int opt;
++
++	setbuf(stdout, NULL);
++
++	src_type =3D DEFAULT_VM_MEM_SRC;
++
++	guest_modes_append_default();
++
++	while ((opt =3D getopt(argc, argv, "hm:s:")) !=3D -1) {
++		switch (opt) {
++		case 'm':
++			guest_modes_cmdline(optarg);
++			break;
++		case 's':
++			src_type =3D parse_backing_src_type(optarg);
++			break;
++		case 'h':
++		default:
++			help(argv[0]);
++			exit(0);
++		}
++	}
++
++	for_each_test_and_guest_mode(run_test, src_type);
++	return 0;
++}
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tool=
+s/testing/selftests/kvm/include/aarch64/processor.h
+index c1ddca8db225..5f977528e09c 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -105,11 +105,19 @@ enum {
+ #define ESR_EC_MASK		(ESR_EC_NUM - 1)
+=20
+ #define ESR_EC_SVC64		0x15
++#define ESR_EC_IABT		0x21
++#define ESR_EC_DABT		0x25
+ #define ESR_EC_HW_BP_CURRENT	0x31
+ #define ESR_EC_SSTEP_CURRENT	0x33
+ #define ESR_EC_WP_CURRENT	0x35
+ #define ESR_EC_BRK_INS		0x3c
+=20
++/* Access flag */
++#define PTE_AF			(1ULL << 10)
++
++/* Access flag update enable/disable */
++#define TCR_EL1_HA		(1ULL << 39)
++
+ void aarch64_get_supported_page_sizes(uint32_t ipa,
+ 				      bool *ps4k, bool *ps16k, bool *ps64k);
+=20
+--=20
 2.37.2.789.g6183377224-goog
 
