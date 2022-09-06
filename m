@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ADF515AF34C
-	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 20:09:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8CF45AF351
+	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 20:09:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229608AbiIFSJn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Sep 2022 14:09:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45374 "EHLO
+        id S229526AbiIFSJt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Sep 2022 14:09:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbiIFSJl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Sep 2022 14:09:41 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0696521E31
-        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 11:09:41 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-3451e7b0234so58682737b3.23
-        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 11:09:40 -0700 (PDT)
+        with ESMTP id S229611AbiIFSJr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Sep 2022 14:09:47 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3F232CDC7
+        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 11:09:43 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-34577a9799dso25549457b3.6
+        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 11:09:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date;
-        bh=Y+OPxQ5AWFMtnU0dHjjR3+DOg2GIHj7/VBS3FzZlKj0=;
-        b=kN8zzv7uiZEn8zwiQPHFwI8t63lHXUuE8j8u79e7MDqO/PYCyCdjx3uq2JwQT2YMA8
-         vr49Vw4PR1tiDGjrfMp4SuYE+8PyKDoO2sWdl3Tbs/mZ683Ox6Q812fCImU83PN2B1QT
-         PqQ9w7fXuY/VzfpM1hvi4JJ98op2j7fPdVVbzVj2OoufLWSXyYhu+F2bcuaebYVVLqCI
-         R/b7rIa/UhFWjIQqoMxxookySHSMoDfE7Xy0tJpke5tQQy2AnSEQyu+mAwEmwmGTtN4j
-         YtFumVaGUpvJY48IJL/HMethavHUcah9UExsZ41xwaJXxOxNysutwu7qz1d11SS05KUR
-         9mQg==
+        bh=WT2R6z6Lj/wGUMYzxUUXh6/WyMLsyb+mHF2mn3pQS0A=;
+        b=Hpd5SISjcMrCHf9JGChu9s9F77ftmvQgJ0eeVwHgoh+jmH8F1saN/GiAHzrJkOyH4a
+         iN6WTYT7UVvEuvarYM60NPIkdylI6USs8tojmkKw77K+FzJsBDpeS6tRdMmQaJ90Yqj0
+         ZJptnNxxyoNksHntqPxpLUfqAYcJyBFpG+lpFu5PKIHClFsH9axeaw3Irj+zAzHR1Wfo
+         7Rp+ZrH8BINtd+Ovld090w5P713yDfv9HryiEhwngEjv8zWXNGhM2yH+RuBBofiX+EhY
+         flQGGu0JTrWNMppeNXJADO1ooRWl7S4HeZJmmlUGmaEgOGwDpImEYqEqW8UOFK/Rk65u
+         aT+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date;
-        bh=Y+OPxQ5AWFMtnU0dHjjR3+DOg2GIHj7/VBS3FzZlKj0=;
-        b=qHHlylzHzYw4fMNn7KLGXlEuGGIVz63htH8g7C06Hhe3KJIqwAls2qhJtwkp0forbI
-         Ze0j7CFtmD/dZfvRx6t51GDZogChzcEPf9Rm0xEwJhAeO400EIB4Fd+hyJdotQcf9aTS
-         WUBb4JGpicTpPG7OczUoZF4eUEZv9lVnO6ZcQ95Bmltf372DCIlLgiCdmajAr9hcXQZm
-         chH7xi1LLp4JJmpDqVeMdPL568nBFvuQoFzZ2ZIoF3vGoVeQee7ellL88oQQ+DUsE9p2
-         uW0NSz6SYzag9SrJow7HpSk90RTqf3Vf2aSr/L+eqasLgx1x0L7aV1SJ2FbQoyGPuIHx
-         cafg==
-X-Gm-Message-State: ACgBeo2t521UcE0JFXEXWjeQ3qJ3dcxn+J/PShPZNlyZ70iFsyOB34G4
-        j2hDNZPwIrLYGwxIvc/Ym/8adtNjw5JuagYTIurZQqc72joFVp4ba/5DnzBhbGjrzDd5ZZNu9eG
-        iHUINt6V/lJKsX/9AR4qzvsnIhf5VhHAFlbDWdXHJ0nsdZL1EGK9LlEFZuWwiZBs=
-X-Google-Smtp-Source: AA6agR4ySKWHnI41ZN/mG2ne0AGMDwf5L2OJtYAPLM0Rb3A+J+MVOfmECZFXwRPRqhGuYpuf0MM5DeqYIehqpw==
+        bh=WT2R6z6Lj/wGUMYzxUUXh6/WyMLsyb+mHF2mn3pQS0A=;
+        b=yidv248pmHZ4BVRY6tudJAOQyOqrjWUcmlZNYJHpBg6zMJTFPW99USuHhrbUsK6J4P
+         HPUJ+sWFxzcv7P370o/QkiKZZDiE5GR9LvttFx1U79UiklnkCd83omAd4tYdCrAvBJAS
+         YIQt2JISvSvhTTu0NE4SwwIANyF/1UBXAZr+XrKI/CBEIkKBucQUHZlIJyB/3fwLRxvq
+         P/hLap7mGGQRq6LXESxG2lrcGNn4ch1eFEOjwuH+Ittf5+o1k0xm71K7ZvWU0yhZ86qt
+         WJmihmCfrtiVRYrSyiAU7RutdIOrWEnrfob0ox2yeJXHj5+mhAB/mL9MvJG5fC3ztciI
+         w6wQ==
+X-Gm-Message-State: ACgBeo1DxJZgbYgedd2jETd6BdLHNhhetJh81FE5KnBudoYldpN53LMs
+        AHqEvx2CKvElO41Bl86B6JAWKbBZDj1SN+NG/+WPUVPn1Ui72Ui6igFwmwO89+o/NjsFnIEGrKw
+        FdbtoHEn5t2erbE0lUCLON0Zcp1LNJX/7/oQCZu67o4nI5sIOq5B/nMPnpPgQMb4=
+X-Google-Smtp-Source: AA6agR5HZOlR46dlOCLVnDPm04bTiVUX60QtegJVypIVw2VNqy4drQBeKd/JOH3/A4EZV6bHfN4lbEVmHNvhtg==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a0d:c986:0:b0:325:1b81:9f77 with SMTP id
- l128-20020a0dc986000000b003251b819f77mr41841979ywd.182.1662487780294; Tue, 06
- Sep 2022 11:09:40 -0700 (PDT)
-Date:   Tue,  6 Sep 2022 18:09:20 +0000
+ (user=ricarkol job=sendgmr) by 2002:a05:6902:10c5:b0:671:7158:cf2c with SMTP
+ id w5-20020a05690210c500b006717158cf2cmr39837170ybu.314.1662487782395; Tue,
+ 06 Sep 2022 11:09:42 -0700 (PDT)
+Date:   Tue,  6 Sep 2022 18:09:21 +0000
 In-Reply-To: <20220906180930.230218-1-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20220906180930.230218-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.37.2.789.g6183377224-goog
-Message-ID: <20220906180930.230218-4-ricarkol@google.com>
-Subject: [PATCH v6 03/13] KVM: selftests: Add missing close and munmap in __vm_mem_region_delete()
+Message-ID: <20220906180930.230218-5-ricarkol@google.com>
+Subject: [PATCH v6 04/13] KVM: selftests: aarch64: Construct DEFAULT_MAIR_EL1
+ using sysreg.h macros
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         andrew.jones@linux.dev
@@ -72,34 +73,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Deleting a memslot (when freeing a VM) is not closing the backing fd,
-nor it's unmapping the alias mapping. Fix by adding the missing close
-and munmap.
+Define macros for memory type indexes and construct DEFAULT_MAIR_EL1
+with macros from asm/sysreg.h.  The index macros can then be used when
+constructing PTEs (instead of using raw numbers).
 
 Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 Reviewed-by: Oliver Upton <oupton@google.com>
-Reviewed-by: Ben Gardon <bgardon@google.com>
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- tools/testing/selftests/kvm/lib/kvm_util.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ .../selftests/kvm/include/aarch64/processor.h | 25 ++++++++++++++-----
+ .../selftests/kvm/lib/aarch64/processor.c     |  2 +-
+ 2 files changed, 20 insertions(+), 7 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 9889fe0d8919..9dd03eda2eb9 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -544,6 +544,12 @@ static void __vm_mem_region_delete(struct kvm_vm *vm,
- 	sparsebit_free(&region->unused_phy_pages);
- 	ret = munmap(region->mmap_start, region->mmap_size);
- 	TEST_ASSERT(!ret, __KVM_SYSCALL_ERROR("munmap()", ret));
-+	if (region->fd >= 0) {
-+		/* There's an extra map when using shared memory. */
-+		ret = munmap(region->mmap_alias, region->mmap_size);
-+		TEST_ASSERT(!ret, __KVM_SYSCALL_ERROR("munmap()", ret));
-+		close(region->fd);
-+	}
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index df4bfac69551..c1ddca8db225 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -38,12 +38,25 @@
+  * NORMAL             4     1111:1111
+  * NORMAL_WT          5     1011:1011
+  */
+-#define DEFAULT_MAIR_EL1 ((0x00ul << (0 * 8)) | \
+-			  (0x04ul << (1 * 8)) | \
+-			  (0x0cul << (2 * 8)) | \
+-			  (0x44ul << (3 * 8)) | \
+-			  (0xfful << (4 * 8)) | \
+-			  (0xbbul << (5 * 8)))
++
++/* Linux doesn't use these memory types, so let's define them. */
++#define MAIR_ATTR_DEVICE_GRE	UL(0x0c)
++#define MAIR_ATTR_NORMAL_WT	UL(0xbb)
++
++#define MT_DEVICE_nGnRnE	0
++#define MT_DEVICE_nGnRE		1
++#define MT_DEVICE_GRE		2
++#define MT_NORMAL_NC		3
++#define MT_NORMAL		4
++#define MT_NORMAL_WT		5
++
++#define DEFAULT_MAIR_EL1							\
++	(MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRnE, MT_DEVICE_nGnRnE) |		\
++	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRE, MT_DEVICE_nGnRE) |		\
++	 MAIR_ATTRIDX(MAIR_ATTR_DEVICE_GRE, MT_DEVICE_GRE) |			\
++	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_NC, MT_NORMAL_NC) |			\
++	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL, MT_NORMAL) |				\
++	 MAIR_ATTRIDX(MAIR_ATTR_NORMAL_WT, MT_NORMAL_WT))
  
- 	free(region);
+ #define MPIDR_HWID_BITMASK (0xff00fffffful)
+ 
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+index 63ef3c78e55e..26f0eccff6fe 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+@@ -133,7 +133,7 @@ static void _virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+ 
+ void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+ {
+-	uint64_t attr_idx = 4; /* NORMAL (See DEFAULT_MAIR_EL1) */
++	uint64_t attr_idx = MT_NORMAL;
+ 
+ 	_virt_pg_map(vm, vaddr, paddr, attr_idx);
  }
 -- 
 2.37.2.789.g6183377224-goog
