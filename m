@@ -2,86 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 223345AEFEF
-	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 18:09:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F1975AEFF3
+	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 18:10:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238945AbiIFQIJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Sep 2022 12:08:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46100 "EHLO
+        id S237450AbiIFQJz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Sep 2022 12:09:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234716AbiIFQHh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Sep 2022 12:07:37 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EC9E9A69E
-        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 08:31:33 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 286FBlmo028588
-        for <kvm@vger.kernel.org>; Tue, 6 Sep 2022 15:31:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : to :
- from : cc : subject : message-id : date; s=pp1;
- bh=SEQjtyC/iLrjycHTLrmQ9IGv2qPqHNKn9LTJxhoJ5qQ=;
- b=Zk4I0OgYD5HI4SR/g5aZjcpwwTqjRkoLoV14ZAJLgjqH/C+BEObp84qtwHjpo9/RRAG4
- pZxYUmOYB3XCiN6dNH01kThr2axIe/HlUsu3mD9Y2TXHoI8YfxnJe2+iUho/eztE9ftl
- GGgFyqc+pPjcoGvpL+OAEH+VkdRWxdsN8Rfphm7tBkwaHDI7tnlgdfgrEfHsLZ9Iik5a
- bRIzIF49JD0o8HPUvzyTDdgMVfzslxgeFqQT+XjzFwX7LNfcVwaTH3GuketHDyA7qtXo
- mDHblnJzZx59WBg+xPkZMGfULI+PDUE/IqaiwLX6Gx5AJkpSH0UEC4FCDcCFpoCHH2Ph dA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3je8ms8sxw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 15:31:32 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 286FBpTJ028829
-        for <kvm@vger.kernel.org>; Tue, 6 Sep 2022 15:31:32 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3je8ms8swh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Sep 2022 15:31:32 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 286FM1Hs010090;
-        Tue, 6 Sep 2022 15:31:30 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma02fra.de.ibm.com with ESMTP id 3jbxj8twr1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Sep 2022 15:31:30 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 286FRwtS40239454
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 6 Sep 2022 15:27:58 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3C984A4060;
-        Tue,  6 Sep 2022 15:31:27 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2186AA405C;
-        Tue,  6 Sep 2022 15:31:27 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.61.54])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  6 Sep 2022 15:31:27 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S239584AbiIFQJJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Sep 2022 12:09:09 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CE1EC6C;
+        Tue,  6 Sep 2022 08:34:23 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id fv3so5578792pjb.0;
+        Tue, 06 Sep 2022 08:34:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date;
+        bh=BB/cT8EaSOA65ryWbpq1Ye2k8Voy1w5k067SZ+8vfRM=;
+        b=DB5Ds/qjABXtHcuWxaGeXLuE1KMGDnw6i9Cior2g7S4ipp9iY5w0I0BUYgoIzVnFpQ
+         LtLiNjIv7xoQc/yY3pxfUDT1LhN62zXL8UenHXvKWThjeSDahPFEqm4dmFnEmjBYFact
+         vFrOYdEO7V6yZ4bwFW3K7r/XmZBri9IGmjkaU4Fk8b74CWEZCc2GNcggI4jUmLCTVpkL
+         87L29KL3jNawtNJqq9yDwHokBrpKjgO1nTKOr3xyeL0cUydSOsTmNVR4I2QTXTV4DyoP
+         4j/6lxJu2aePKlGIoxjzRpRTrJ1l9PhJyr9CW0Q3CIIyUoqCXLePyHd42qn4P+RDWelY
+         1mAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=BB/cT8EaSOA65ryWbpq1Ye2k8Voy1w5k067SZ+8vfRM=;
+        b=hOtZrUPmucVk+aVp4gWBkTz/E6nOYw1BPOKJ1gk/yTKEf7XAekWlgDtuoRrJthKCyp
+         c8KX7lu0piezZ/H2XSLrAhO2VXkgtgdQuNHii4UlxcNH4bvoFpEyFGUJAU3JjbM8yMaW
+         BcOzNXm8+a64vditb6stpIPZuNFtAh+DhyrDR8FW/Mi4CbG03Mzmji4EJxLU7py1fJ6P
+         PI3JZWtX1uz7xy2aBbrCRs9uLHINdMv9VJbZD8WW8txfmQ5G9BaP/LzDUWLifpX1m65j
+         eFeBp0/ZKQv8t0bj2wO1mvBMnTpciyHmQD7QO1RNMVWTV0tBXrARD1nuJmYiMYHHUrqJ
+         +y9g==
+X-Gm-Message-State: ACgBeo1G5RzeUfnyw9tBLhV4zFeA+j1p+CksV6fcQl1Q7gGQWE0GUIqb
+        1pSdlUpKkHnxqIQ7RbY7G/CKDnrE0y54XMFg
+X-Google-Smtp-Source: AA6agR4bWp+CSGZ41R2NcxY8MN9vJx95VCZBS9JHD/fIiqiKRlxbl/DXxesk3GJ0sY9VruQ3jqfl7w==
+X-Received: by 2002:a17:902:8498:b0:172:a201:5c12 with SMTP id c24-20020a170902849800b00172a2015c12mr54346567plo.166.1662478463136;
+        Tue, 06 Sep 2022 08:34:23 -0700 (PDT)
+Received: from localhost.localdomain ([47.241.28.43])
+        by smtp.gmail.com with ESMTPSA id q18-20020a170902bd9200b00174fa8cbf3dsm9882425pls.157.2022.09.06.08.34.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Sep 2022 08:34:22 -0700 (PDT)
+From:   Liam Ni <zhiguangni01@gmail.com>
+X-Google-Original-From: Liam Ni <zhiguangni01@zhaoxin.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
+        dave.hansen@linux.intel.com, zhiguangni01@gmail.com
+Subject: [PATCH] KVM: Reduce the execution of one instruction
+Date:   Tue,  6 Sep 2022 23:33:57 +0800
+Message-Id: <20220906153357.1362555-1-zhiguangni01@zhaoxin.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <d12c0927-fa06-4f27-606e-25971d11e2aa@linux.ibm.com>
-References: <20220825131600.115920-1-nrb@linux.ibm.com> <20220825131600.115920-3-nrb@linux.ibm.com> <d12c0927-fa06-4f27-606e-25971d11e2aa@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-From:   Nico Boehr <nrb@linux.ibm.com>
-Cc:     imbrenda@linux.ibm.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 2/2] s390x: create persistent comm-key
-Message-ID: <166247828688.90129.7620152734606584325@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Tue, 06 Sep 2022 17:31:26 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: CVxHAuuCKW5tZTmcIea8GO5K5I5YwNGM
-X-Proofpoint-ORIG-GUID: UrTf3EcV7bYg40YApySZ8YX8npUDO_64
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-06_07,2022-09-06_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- priorityscore=1501 bulkscore=0 mlxlogscore=999 lowpriorityscore=0
- malwarescore=0 impostorscore=0 phishscore=0 suspectscore=0 clxscore=1015
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2209060072
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,17 +68,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Janosch Frank (2022-09-06 11:50:46)
-> Hmmmmmmm(TM)
->=20
-> My first thought was that I'd be pretty angry if the CCK changes on a=20
-> distclean. But the only scenario where this would matter is when the=20
-> tests are provided to another system.
->=20
-> I'm still a bit torn about deleting the CCK especially as there will=20
-> always be a CCK in the SE header no matter if we specify one or not.
+From: Liam Ni <zhiguangni01@gmail.com>
 
-I really don't have a strong opinion about this. I think it makes sense to =
-clean
-up stuff a Makefile has left behind. But I am honestly just as fine with
-removing this.
+If the condition is met, reduce the execution of one instruction.
+
+Signed-off-by: Liam Ni <zhiguangni01@gmail.com>
+---
+ arch/x86/kvm/emulate.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index f8382abe22ff..ebb95f3f9862 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -1139,10 +1139,12 @@ static int em_fnstsw(struct x86_emulate_ctxt *ctxt)
+ static void decode_register_operand(struct x86_emulate_ctxt *ctxt,
+ 				    struct operand *op)
+ {
+-	unsigned reg = ctxt->modrm_reg;
++	unsigned int reg;
+ 
+ 	if (!(ctxt->d & ModRM))
+ 		reg = (ctxt->b & 7) | ((ctxt->rex_prefix & 1) << 3);
++	else
++		reg = ctxt->modrm_reg;
+ 
+ 	if (ctxt->d & Sse) {
+ 		op->type = OP_XMM;
+-- 
+2.25.1
+
