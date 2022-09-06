@@ -2,55 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D12A05AF87D
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 01:47:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE5195AF8AB
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 01:53:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229584AbiIFXri (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Sep 2022 19:47:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57102 "EHLO
+        id S229526AbiIFXxa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Sep 2022 19:53:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbiIFXrh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Sep 2022 19:47:37 -0400
-Received: from mail-io1-xd49.google.com (mail-io1-xd49.google.com [IPv6:2607:f8b0:4864:20::d49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 499CB91085
-        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 16:47:37 -0700 (PDT)
-Received: by mail-io1-xd49.google.com with SMTP id y1-20020a056602200100b006893cd97da9so7916936iod.1
-        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 16:47:37 -0700 (PDT)
+        with ESMTP id S229500AbiIFXx2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Sep 2022 19:53:28 -0400
+Received: from mail-ot1-x34a.google.com (mail-ot1-x34a.google.com [IPv6:2607:f8b0:4864:20::34a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7EBD98A40
+        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 16:53:17 -0700 (PDT)
+Received: by mail-ot1-x34a.google.com with SMTP id 14-20020a9d048e000000b0063936a5db40so7289530otm.23
+        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 16:53:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
          :cc:subject:date;
-        bh=osNBQ7ONotxsEV0KyodnFKn08qq/4vRcVukED3XI+B4=;
-        b=R2DR+vffmoiCBriFCS/D/crQhPLJjONtm+BVK/vB3slzh+qWZNC4KwaCYHWPGpe66H
-         oaThfrkncprqmc7tNBaYcrmZrH+00GBdHeFtayu5lrz1ohWXFwRvacShRQkGnP5tk7MD
-         G2tRv41uEufv539QAjZeLfNu/j01Z1Ceq0OAqC0xfYde1YnqSHADvZx6kzEx7QL6j2Wh
-         0up/pM9FnhvgRE1bL4BG49lEVMnvc+2akFsgzT+Tbp+WagMAbrX0VPy4orogzPCuppHV
-         lVHA9F5/CwSx2dhj6uH+X1AP7qMPGvDdJp5f4eFNliZrsjgLH0O5C0EUn8/uQOF+3zJG
-         ZA7A==
+        bh=1U1xnd8X+CegYA1dQ4+qC8F2xFIOm1ilUZdquyiy5yU=;
+        b=EMznTkpTJ1tYkIU9PgB5H2R0SPNBuUKX0+V3sDMyLAFsuCtbQlGWZgoZxDhXs+mk8Y
+         EP2bCwFn2MZBFYXNuiXEO+Ma+0wOmknFCKOG/zQdkZUPVgmJG0i/c7xXXGRROMjCDFCq
+         rJRjlBpkriuQwAqsbb3a/EVXoTSuPuodLLCC7A4SV39vWJyticYG51AQ/C7vGguABkSa
+         Gvpj4gaqVwSXzG2DzlRh3zb6J75E5tGFlR/exOdkE3PXjGKydxMhD1F1/f5PAi9PI85j
+         UOrdsins53at0CsziBQ5UDS+yEiaPfykTkKwgh6opFuDnX1uLAh3DM4A4LdLawpnQeWx
+         fQFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=osNBQ7ONotxsEV0KyodnFKn08qq/4vRcVukED3XI+B4=;
-        b=Bh4xdhuS0L4T914F2SxfLWMeJhQ9LSSrX/Bok+2eLSeocOMYZ03GBPm4qn3LtvHfpb
-         gZCsW5Wg/YXUwonaFA7pAgBf3kvH6ITk+wJRoHwd74R4HzQ/VCEyNYTQ3UUTK3cWP7Df
-         aefc/IRHVfBKy6A0yBFD9Bq/XgjecuUpSSZOxnWyJw+tNI/Vgek0bXa6/JJDEWdfTXWs
-         ltiHWS/U4mkNLMQcAPCdP4nw5J/n72KeyVpV2LCFQodL96FNGh/ieb5yhcH7pv2Hs9hz
-         lVBKuwR6QuvxRuBwrNAK4w2qk6AN6Nk7MijzwTFQJPGmEQG+BopOx1r48+U1iFS2Fe+6
-         jr2Q==
-X-Gm-Message-State: ACgBeo1499L/xxQgQyPzRfH4a8tPF1OIiEMd2tRZjAWQxlOUer0f1Pub
-        Tw/8lE8vm+RNMBgM0p3eogdDGJo6D5KbKWKJDw==
-X-Google-Smtp-Source: AA6agR56eaLHeY8lK5RuvuWYvDuZkO5WrgbRdX4Pks55x+Cwuyzk4fNchvutAJB1AhuDInDBvDVaW8tZlvqr9oMSMw==
+        bh=1U1xnd8X+CegYA1dQ4+qC8F2xFIOm1ilUZdquyiy5yU=;
+        b=i/dbz9Iw++VQuCooinpgE03D9DZ9DxMhDMesdzPiKwY9eJjEPuXMv5TBeiIDb0NhMn
+         ZxlWFMn3NHYHpkN+MZ7mkX3jOt+5wOzCfo19Thrf+1DeATFpTpxMjEM6QQacMuHjw9nN
+         RDGkSFXOLw15lRddmkmHzGKlHWuQprFzD1A519toToQOmXNZ2G8hVtaQ5OmfMHjRMzLC
+         LWu1ZpMPQDaicrefP9rSNs+aicnjd0lb/oeJ3eSv+8gS7Hto2cpSnUJjvHd26UbOV7xP
+         KiaFEwlNA+8ykivJdnPAhb0tVLBVZnzfgVmpsWquciklKnkeI63e6T07JY3keDlhugvx
+         XxyQ==
+X-Gm-Message-State: ACgBeo3gGrI+Dbh6yEWSTD8Tra1bJtL344J9nbKWFSBZYTrVybR33SRj
+        e+Xv34M6vL18vT7K02cz85mGlMCAM+e3JHtC1A==
+X-Google-Smtp-Source: AA6agR6hqqU4laLu3xqp+uhueyKbV/jTUTaEZFYa0zuGqDyFWfExlejgawYMrgn4+0E9+NOUeElbHCN5cQ8WlYQr9w==
 X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6602:1343:b0:67c:aa4c:2b79 with
- SMTP id i3-20020a056602134300b0067caa4c2b79mr485253iov.172.1662508056611;
- Tue, 06 Sep 2022 16:47:36 -0700 (PDT)
-Date:   Tue, 06 Sep 2022 23:47:35 +0000
-In-Reply-To: <YxeaxaxGS5dsp3hl@google.com> (message from Ricardo Koller on
- Tue, 6 Sep 2022 12:08:53 -0700)
+ (user=coltonlewis job=sendgmr) by 2002:a05:6808:130a:b0:344:efcd:8d47 with
+ SMTP id y10-20020a056808130a00b00344efcd8d47mr376137oiv.227.1662508397088;
+ Tue, 06 Sep 2022 16:53:17 -0700 (PDT)
+Date:   Tue, 06 Sep 2022 23:53:16 +0000
+In-Reply-To: <YxeZCwxmS5z5Msjy@google.com> (message from Ricardo Koller on
+ Tue, 6 Sep 2022 12:01:31 -0700)
 Mime-Version: 1.0
-Message-ID: <gsntv8q0oyjs.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v3 3/3] KVM: selftests: Randomize page access order.
+Message-ID: <gsntsfl4oyab.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v3 1/3] KVM: selftests: Implement random number generation
+ for guest code.
 From:   Colton Lewis <coltonlewis@google.com>
 To:     Ricardo Koller <ricarkol@google.com>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
@@ -68,16 +69,18 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Ricardo Koller <ricarkol@google.com> writes:
 
->> +void perf_test_set_random_access(struct kvm_vm *vm, bool random_access)
+> On Thu, Sep 01, 2022 at 07:52:35PM +0000, Colton Lewis wrote:
+>> +
+>> +/* Park-Miller LCG using standard constants */
+>> +static uint32_t perf_test_random(uint32_t seed)
 >> +{
->> +	perf_test_args.random_access = random_access;
->> +	sync_global_to_guest(vm, perf_test_args);
+>> +	return (uint64_t)seed * 48271 % ((uint32_t)(1 << 31) - 1);
 >> +}
 
-> This can be merged onto the sync_global_to_guest() done for the seed.
+> Nit: I would prefer moving this to include/kvm_test_util.h, maybe
+> something like: get_next_random(seed). There could be other users of
+> this.
 
 
-That seems like a micro optimization. I'd prefer every perf_test_set*
-function have consistent behavior.
-
-If needed, sync_global_to_guest should work on the individual field.
+Agree this might be useful elsewhere. Whoever needs it can move it to
+the common header then.
