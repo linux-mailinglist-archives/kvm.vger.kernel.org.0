@@ -2,144 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58F885AE0D6
-	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 09:20:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 70D085AE0D9
+	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 09:20:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238859AbiIFHUM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Sep 2022 03:20:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37000 "EHLO
+        id S238892AbiIFHUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Sep 2022 03:20:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238846AbiIFHUF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Sep 2022 03:20:05 -0400
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2045.outbound.protection.outlook.com [40.107.96.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF3B81C924
-        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 00:20:03 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YCg/icET3dINwI6Esl7rGu9p0/jNVSqLANDlCHjmkvW+RJqcQbuIs4HSSzytFGxwyLCF0zAJFJGgeaSZ55JhwCCc5PRBzDCZFLw9eo/zPSMR0Wjf4mVQXwr9TXCeublg2Fc0x/HiedfnavrUxQ3MBBRMDxTzwMxcckIpWo8Uz4XIjwXhjMqVL0ZP73yMzZx83XTmq2mrY0nK8exbSkEWHsKTGzksJhTs1kUX4j5+0D/i1yPwoCy+fDF+Dvv5gYXXlYb+YTLngv7Gsru28Zp2J2UU7kpXa3zzW3gfAYqel0Ufoen18M2u4fbUo41mUd5uAj5+n7CFgoDID+bpVxthrA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YPBxnJlMscwMHSv0IkhLMhZRdjoceZZZU/zHzAgcaiM=;
- b=VblajvnM/T5NNS90KDEVmhAg6kY/eNj9E7elWkzpeVzpvZ3yQGrAKHeQWtsFOEZdQCn1tFppYp2iILKa/4ZodjMzejE325cLlIGh4b+UwUhFqBnFnrAaqumx6o75ldccFFdas4CoK6jS/hTO/mNZUli7snYm+bqKK1asbHMcpuZjov4kl3IYzCqm7cwqzp77uDrTMiV/fA/pU7aSytXjTHiibiBbx+fbHmstNR0lq7R9HzYSw23/RgxdZaxy04W90lg4o7F41oGj9hBpm7g1wEhpoOBftRjBOK7U7TIYd4dH3UUkV3V+gAD3uiz7cFkTpBgWg1bW7aB1Ad3Skuy14g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YPBxnJlMscwMHSv0IkhLMhZRdjoceZZZU/zHzAgcaiM=;
- b=za4eQUKW17E71oNqKdhtlXcSfVxXXl2kz1lPQl/7Q4kQl+nZDGjlgScWtHxGmAnslI0bFBVYiNKFY/Y7HLJF7wi/Eqf/c6Gwf09hGxeyr3Ten8/pzbIWU+J5bwXxqtjDzUvpkg1hUq5EYTYRnTqbl/uF5a3ybvFWOBGQnc8FEsk=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB5712.namprd12.prod.outlook.com (2603:10b6:510:1e3::13)
- by SA1PR12MB7343.namprd12.prod.outlook.com (2603:10b6:806:2b5::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.10; Tue, 6 Sep
- 2022 07:20:01 +0000
-Received: from PH7PR12MB5712.namprd12.prod.outlook.com
- ([fe80::e459:32ff:cdfc:fc8b]) by PH7PR12MB5712.namprd12.prod.outlook.com
- ([fe80::e459:32ff:cdfc:fc8b%8]) with mapi id 15.20.5588.016; Tue, 6 Sep 2022
- 07:20:01 +0000
-Message-ID: <22a179fe-cc9b-d325-9931-7dd3dda2209d@amd.com>
-Date:   Tue, 6 Sep 2022 12:49:50 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+        with ESMTP id S238443AbiIFHUv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Sep 2022 03:20:51 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEFD84E84E
+        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 00:20:49 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id bt10so16046046lfb.1
+        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 00:20:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=5SiZzQ3jsxp5inXo69JQyki2t9Pq/3JOTXDE+sx+9Mo=;
+        b=sPzvD7Hy6bAykcdTBo8dqmF2y4Dzh6E4HA5SmL+5yiUvW3yQzSnd/yPYaJPgMXLGpA
+         xQUw1HkSdbqLkoYlUQtEo3pEFFCP539FpvxP6NOVVS2E+o3W4p2ZQes/x4p8iXs6cM+h
+         CDUYJ0a1XXkNV0YMko/CYuB2sB5nL9bIABKfqvxM3MILYsPdTs0uLmULyFHeB1BKrc83
+         OtMaSfzLFiXJ0SsWRs54CtcUfe8d0URDskOVBIKxvIRvl9zN2rSmaSLiOirmCEWs5y4N
+         5tl++9bJf5M7xQ0/nvE2veVNUfUvNH3IS6e5FBW44EGo2gK/bzoBL6K37A2UyKL0L3uQ
+         cMTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=5SiZzQ3jsxp5inXo69JQyki2t9Pq/3JOTXDE+sx+9Mo=;
+        b=kUMw8dSXL8Yf/mNNIZTK1mhFAmOdAHUygtvTeEZEBFPDPx70cIypceylRndrfZxK6H
+         eRLE++hEtBbZxxl2u7jWOuYK6JqJt67K8FvdQLm3H1EVqhiuN3Kum8sJFFSqFrv+Fblr
+         kKxTfdKPTLyZIfe5doAdqf7mLXtPA5Ha6Er3oO9sBKzZK/aA5xhTH6I9OJPqhjbi5MwC
+         MOBCbovUKAIMtRGVrAsgrkI9ZWNHL8+9Mvm1rMHU1O4cAWFrXnP/lBy92Lsur644hbuZ
+         i3zqHA/VkTSYTd+/q3sSlJ1nVgVCA+uy2JxCFPrCMsfI+XzGiSYbjvk0cWyzSdrTFspa
+         RPVw==
+X-Gm-Message-State: ACgBeo3fucDHqkw2x89uwyst3TCFysZVPf0iZm3jN6zNkL2rnpf4gJCb
+        wEl8VKD3y0bDUktVFZej5eWvtQ==
+X-Google-Smtp-Source: AA6agR6ii0gwUVUWsZmlqNu0o8/iYY3SOGZORmJ8unVFiOExBClnZ/qQSXqCJsY4kKGElWZLfuTPDw==
+X-Received: by 2002:a05:6512:ba2:b0:494:6d93:e9ee with SMTP id b34-20020a0565120ba200b004946d93e9eemr12674578lfv.378.1662448848104;
+        Tue, 06 Sep 2022 00:20:48 -0700 (PDT)
+Received: from [192.168.0.21] (78-11-189-27.static.ip.netia.com.pl. [78.11.189.27])
+        by smtp.gmail.com with ESMTPSA id d14-20020a196b0e000000b0048d1101d0d6sm1550002lfa.121.2022.09.06.00.20.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Sep 2022 00:20:47 -0700 (PDT)
+Message-ID: <5b0317d9-16d8-bf86-3f5a-602489c9831c@linaro.org>
+Date:   Tue, 6 Sep 2022 09:20:44 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.13.0
-Subject: Re: [kvm-unit-tests PATCH v3 12/13] x86/pmu: Add assignment framework
- for Intel-specific HW resources
+Subject: Re: [RFC PATCH v2 1/6] Documentation: DT: Add entry for CDX
+ controller
 Content-Language: en-US
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20220819110939.78013-1-likexu@tencent.com>
- <20220819110939.78013-13-likexu@tencent.com>
-From:   Sandipan Das <sandipan.das@amd.com>
-In-Reply-To: <20220819110939.78013-13-likexu@tencent.com>
+To:     "Gupta, Nipun" <Nipun.Gupta@amd.com>,
+        "robh+dt@kernel.org" <robh+dt@kernel.org>,
+        "krzysztof.kozlowski+dt@linaro.org" 
+        <krzysztof.kozlowski+dt@linaro.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "Gupta, Puneet (DCG-ENG)" <puneet.gupta@amd.com>,
+        "song.bao.hua@hisilicon.com" <song.bao.hua@hisilicon.com>,
+        "mchehab+huawei@kernel.org" <mchehab+huawei@kernel.org>,
+        "maz@kernel.org" <maz@kernel.org>,
+        "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
+        "jeffrey.l.hugo@gmail.com" <jeffrey.l.hugo@gmail.com>,
+        "saravanak@google.com" <saravanak@google.com>,
+        "Michael.Srba@seznam.cz" <Michael.Srba@seznam.cz>,
+        "mani@kernel.org" <mani@kernel.org>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "jgg@ziepe.ca" <jgg@ziepe.ca>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc:     "okaya@kernel.org" <okaya@kernel.org>,
+        "Anand, Harpreet" <harpreet.anand@amd.com>,
+        "Agarwal, Nikhil" <nikhil.agarwal@amd.com>,
+        "Simek, Michal" <michal.simek@amd.com>,
+        "git (AMD-Xilinx)" <git@amd.com>
+References: <20220803122655.100254-1-nipun.gupta@amd.com>
+ <20220817150542.483291-1-nipun.gupta@amd.com>
+ <20220817150542.483291-2-nipun.gupta@amd.com>
+ <93f080cd-e586-112f-bac8-fa2a7f69efb3@linaro.org>
+ <DM6PR12MB308211F26296F3B816F3F005E87F9@DM6PR12MB3082.namprd12.prod.outlook.com>
+ <8712e2ff-80e1-02e9-974a-c9ffcf83ffab@linaro.org>
+ <DM6PR12MB3082867B1BDCBBC9C25F560EE87E9@DM6PR12MB3082.namprd12.prod.outlook.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <DM6PR12MB3082867B1BDCBBC9C25F560EE87E9@DM6PR12MB3082.namprd12.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0142.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:bf::20) To PH7PR12MB5712.namprd12.prod.outlook.com
- (2603:10b6:510:1e3::13)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 108a22dc-53a5-4b19-405b-08da8fd8363e
-X-MS-TrafficTypeDiagnostic: SA1PR12MB7343:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: M+fe1XK8VYC/9str6HRufxJ0r0yP/iN7nItxUrRsFjIt1UArQju2NaiAy5XHnE6z6hmz6IxxaCfd3+oJWeJ5Uit5nbzGStRQMJ+TGT5XnwFS/svsCIfnAZ3k7wuGYA2jaURPV+7IZRvo+svp5fkt+3VPVnMMeYXMA4u5ttg0lQpCz7buWB0T0BNqE1edWWjOLW6XB83QM6yZ3Wt3rulpnDddTf+qTeg5FRBAygvMaQRp0L7UJ2f1fmDK12xBVhL9ucUcGlYN7t+8Qr7Xi71z8+61hWTrLUqGRcWpLfumiHrBrFpD6L12G/dg2gQstibegVtkDONnJcjyadkUYJxSI0i7n9T2mwJmfWpp1p1oSOZeCd0x0+NF2ahq0un1Z2faFxhoXwxg2QwVIRXZTx3yaQFEOUnKKxYczhKX+2No4ja9uOirsUo5SaUTX8NFnMd6HmHn6SXagwiP1dJjuKOWVvi5oPszwrR/R/cKkNsp78aQTCkpd8eksRkKwppFeJ9WqCrPHaRSsegtWq0NZ1p9o83IYpZ3D98558vj7mTfWaWt11A/BS/doTf9cFLBKFnDn2UmE2Y6yXTZIdkXgADGMQ0ePf458UYs5w6POKniftQZ7J/zt1YHMeq4Z0oI0h8TQr1xoUBbSLV6lcKCg04OwDPEjHXe0jo0YGjUCdpm78wyZ13DYSODnJtW8zy0NMj/Y1ijae+OVoXkxAld2LUPrVotQ8ZXkL4KazGulctniyCkw6INGUG22RYnWgNJnQ78p4zUfeh/bQlUxiRqOYAB5A9fqq3neujjtxsXb3sfuG4=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5712.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(376002)(136003)(396003)(39860400002)(366004)(346002)(186003)(38100700002)(2616005)(26005)(86362001)(2906002)(6512007)(6506007)(53546011)(83380400001)(31696002)(66476007)(66556008)(66946007)(31686004)(316002)(5660300002)(8936002)(8676002)(4326008)(6916009)(54906003)(6486002)(36756003)(41300700001)(478600001)(4744005)(44832011)(6666004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?b1pKQXluNW5NcGV4NmFyU2FnRXBNZmlCdzRpSzlWcUdGVW5XMlB4a0hsWUVO?=
- =?utf-8?B?L3d5bGl3bmxNY0FMNFZ3UGJIYmNSMFl4amxnTXF2eFNRYmt5WDJjUGVBd1V2?=
- =?utf-8?B?cjVRajZ0bDNLNmxBVUNGWm9hV0lEdzZMdXlLYXErYTQ0TS9XbFdsUUNpYng2?=
- =?utf-8?B?NHNkZG5waExOMG0xTTMrc1hlUHJwdWFUR04rbGY5cC8xQ0EzeWxDd1R0YkF4?=
- =?utf-8?B?bzRheFNDaXEwa2ZxYUVCUks0clZGRnpaQzNyeFF2UTlBUi9jSXYyZlF0Sk9w?=
- =?utf-8?B?YWpmWk5UN0tSeVljbllpS29iTFM0eGM5SG14OXBCRjF2S1lyQSsxaEVCMjJT?=
- =?utf-8?B?c3NScURvMERqWjJNQjlXNnE5Z2o5eHBxUklBcTlCMi9QTnZPME85Q1BXYlZp?=
- =?utf-8?B?MmpYcnh2VDlta0JUNWNvNW1oc1gxeG00TXBkQzc4Z0o0UmY3c3BMQnVhNzlI?=
- =?utf-8?B?dUpueUFaaWdYckcwMm1oVGVxbkVraE9YWUxQUUxBSVVKR2VnQ3NDU2NDclJk?=
- =?utf-8?B?RDhjUGh2ZW14emh6UktDc1NtSEVxQm84bWNLT29UYlBKQ0RzTWhQSVFld1kx?=
- =?utf-8?B?V0hRTzJVcEVVc21GQ1RsaDFjZUNkQWlOR3JENnd1MXF0Z3BleHJDaGZZaWha?=
- =?utf-8?B?aEdMY3JGcUlzM3hra0dOVHBubFdwd01rZjJBN3dvVGNBMGlUMC9OR2dwN05i?=
- =?utf-8?B?UGJia0dIdmx0SSsrY0VjUnFXVmgwcnlEV1krOHlpcVQ3bERJZm5zR3dwbElw?=
- =?utf-8?B?bC81K1EzTkRXaHkxbktkREN2ckZwMUV2RmVlNnExMlk2T3RndkdxSFZlMlI4?=
- =?utf-8?B?RUJEanJVUENjTXNLa0x0c2lVRjV6RFZKbDNtMzYyYWFSdm82UVJMUkk0dUF0?=
- =?utf-8?B?QSsxTTBkNiswSTJzc1M3V0RqLzRmbWZHU2xzYS91dkVqdnlhcHplY2IzMC9j?=
- =?utf-8?B?N21QUnhqZDlGY0NCdFdJVVNlLzBzb3l0NXdPeDJnaGlZbmFpb0hCNDRIS0FC?=
- =?utf-8?B?RU9YNGdJUkNhYzNaZ2pjTlAzWVU4d2E5aW5wZC9QQUR4c3dTL0N3WDVpSGFQ?=
- =?utf-8?B?N0ltb1hCNHloUGVLNE5WTGVlQ2M0bE0yeVdCQWVlVzB5UU9yWXFkc3FNU3Ju?=
- =?utf-8?B?RGhwdGNXZkRWVFEwanBSQ2VxNlI0WkF6YkN0TEd3c1JySUlQNGZUNjdlZGIz?=
- =?utf-8?B?QTNCdDJhTlBuZHpIRmtKMzRLai9pdDJKbnZTSlFKNTNhNndNQTczM1YwQmYw?=
- =?utf-8?B?cG9tYzZZQisxc2lkazNHQTg0MWg3d1l0Q2VBRFprNG5HRVdmR3VvbXgwZjdH?=
- =?utf-8?B?cC9BNjZqN3VlWmp4SWdsZ1NHeTQrbjhUYVgzVUczU1hDamdzc3d2UytDT2Yw?=
- =?utf-8?B?eklUQ01NMWgxR041N1kvblhnc2JxTzVtcCthYXlUMzk1NDVnV2lqaTVCNDln?=
- =?utf-8?B?Z1d2OEg1OGxDNjdOdjArT0g1ZlZIOWNQL2JkMVZWQUtPMDdsR0NxaWVJSG1y?=
- =?utf-8?B?Rmp5SC8yNlFIOGwzb0Jpc0dRd2NURWNLMkFKV3QySnNmWkYzZm1zL2RyWGNt?=
- =?utf-8?B?WFAzSWgwSjhaczZQL2NudFpVNG0vS0t6ZUpSejFqbmpJS3c2T3J4aXY0VzAz?=
- =?utf-8?B?MlFoakN0QzY1QnVGd0c1L1BkZ3B6WVU0RXhVaTR5MTl1K251bllsY3gxUlVm?=
- =?utf-8?B?YzVzM1UvTzVKMDhkMFJIcFlhUjJsLzVJWnpOUFFMd2hyZ0licFlOSnh4b0tE?=
- =?utf-8?B?dkhmL1p3UmM5MXVhTnp0T0NULzlNb0Z5dzRKOWpBR2FWc280eEJ4Z1dwbFBp?=
- =?utf-8?B?VU5OTVpOelRPdFdJVlVrUXRsb1dYT2R4MDQ2dlkwUkZJTUtvUEpuVHNYTWlY?=
- =?utf-8?B?VVIwWXU2TFJpR2k4NHlIVHVGK0t6a0ZTWVFOOXpoTFdRWjRDaW9IUjloQ0xB?=
- =?utf-8?B?czNud1BpWTduV0ZyT1ZOQ0Zkb0JjdE1WcEFYMWtpTjhNaE55U1ZoY2lsY1d2?=
- =?utf-8?B?VnN3aDMzN3RlUVo4TzBDcEVtYlZ6MG0zaGthU0JGd01OOExOWmFmbTR0d09o?=
- =?utf-8?B?U0xlQ0VWc0ZIV1MyTEZKa2xVRXh4a1JYOVYwSjI2Zi9ZQXlMU005T2htRWxS?=
- =?utf-8?Q?ISzGS0EwJrkp3IZ3Z87TvoRmi?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 108a22dc-53a5-4b19-405b-08da8fd8363e
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5712.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2022 07:20:01.5540
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dVkFKd5VV2K26G00wYDwiDktTMlKQvirfgDBuxQI8S+1ruKPWPgr0altnTxbXjSqZpbXK8GunfPnN/DmP4E+yg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7343
 X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/19/2022 4:39 PM, Like Xu wrote:
-> From: Like Xu <likexu@tencent.com>
+On 06/09/2022 09:03, Gupta, Nipun wrote:
+>> On 05/09/2022 16:05, Gupta, Nipun wrote:
+>>>>> +
+>>>>> +    cdxbus: cdxbus@@4000000 {
+>>>>
+>>>> Node names should be generic, so "cdx"
+>>>
+>>> Would be using bus: cdxbus@4000000.
+>>> Kindly correct me if this does not seem to be correct.
+>>
+>> I don't understand it. I asked to change cdxbus to cdx, but you said you
+>> will be using "bus" and "cdxbus"? So what exactly are you going to use?
+>> And how does it match generic node name recommendation?
 > 
-> This is a pre-requisite operation for adding AMD PMU tests.
+> I was also confused with the name suggestion as in one of the mail you
+> sent out later, you mentioned:
+> " Eh, too fast typing, obviously the other part of the name... node names
+> should be generic, so just "bus"."
 > 
-> AMD and Intel PMU are different in counter registers, event selection
-> registers, number of generic registers and generic hardware events.
-> By introducing a set of global variables to facilitate assigning
-> different values on different platforms.
-> 
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> ---
->  x86/pmu.c | 99 ++++++++++++++++++++++++++++++++-----------------------
->  1 file changed, 58 insertions(+), 41 deletions(-)
-> 
-> 
-Reviewed-by: Sandipan Das <sandipan.das@amd.com>
+> That is why needed to confirm. To me now "cdx: cdx@4000000" makes sense.
+> Hope this seems correct?
 
+If cdx is a name of some standard bus or interface (just like i2c, pci,
+can), then feel free to use "cdx". If on the other hand it is just name
+of your devices (specific to Xilinx), then more appropriate feels "bus",
+because cdx would be specific. Anyway one of these two.
+
+Best regards,
+Krzysztof
