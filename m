@@ -2,141 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EAF05AF04D
-	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 18:24:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 278415AF0A8
+	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 18:39:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233825AbiIFQYV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Sep 2022 12:24:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43720 "EHLO
+        id S230148AbiIFQh5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Sep 2022 12:37:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238789AbiIFQXg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Sep 2022 12:23:36 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB55A81688
-        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 08:52:55 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7BB8BB81920
-        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 15:52:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 29645C433B5
-        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 15:52:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662479573;
-        bh=1dnneNf5SkiwBvmKcIMxL4sbV/QVFOXHZW+2QJoch6A=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=vE/sopaSg/KgQIqYGnpgZJr1xLq+fQ6DhZwUy8dD7+zKFz0WPXAwZvFmvmrhOmsTu
-         XBv95iZqd1l8EZsTpztsCtYsXzLOcaxsFJfzLDNZqwlSHbV69lJUxHzZ0MLMZ3Nqsj
-         Gw6q2L3ttSULUT3FQNyF9+tUSzCfJ0Q5Drl/r5dPgJVoTQTxdnOV5Yr8V+a/owFR1z
-         W3geTYpDzgprEXYu7pQH0Kjk9yXsJcSYCab8w22GttXGYwpc+NSUH8v2b/JLw34Fjw
-         nHgiBFO/8E4tqTyhsoJ2D1++j7PcYXVMGRZ3UPhMDEvzLLcB8BnU3fnRa38mJwuICo
-         364pInP7h/MlQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 138D6C433EA; Tue,  6 Sep 2022 15:52:53 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216388] On Host, kernel errors in KVM, on guests, it shows CPU
- stalls
-Date:   Tue, 06 Sep 2022 15:52:52 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: seanjc@google.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216388-28872-21xuO7cPxy@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216388-28872@https.bugzilla.kernel.org/>
-References: <bug-216388-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S238265AbiIFQhJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Sep 2022 12:37:09 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 672E9D128
+        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 09:14:29 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id fs14so7022591pjb.5
+        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 09:14:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=7CXDoix81nCcuywXft6Y3RRt0+1RNNcCmY7zulk0U7c=;
+        b=OFjpfysVV1/z6c6F7Tl1V0DukI72KYzDhLdtoOZgHLzGCHihgIKAFQlVhWam6SBvJu
+         P4gYQceuv8uTFhEriQ7a805oEkTCwl0CPwvPS4JQwwLLJlpkE/PhT3bGFarXT71ZV/zC
+         /L8MQaIBhK/L/Po1d7BYMfDSuuRR6Z0DhvvBCC7yYh0gFL0q/I/ftbzNgIeFeZlzx+8p
+         NmFZ+3aoiy/3LAUn12pFdTBuXQeiLIugcKhnbIBCsvAekEexbA37sYwcgyOTd5kJHssD
+         zpYogs2kEJ7sq2XIPm4cDWVV5N5waUI10efONdoWWFJehxlK8XTO2y7LZlTji0FpOh7c
+         6yVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=7CXDoix81nCcuywXft6Y3RRt0+1RNNcCmY7zulk0U7c=;
+        b=KY04opwN9MFJGZ7A+eEcfHFznZJ7MmQ5DI/rGy5nook/xkxZYceSc0E6FpQ9RSUNFj
+         GWNrCGIl9oJ7wwB+edHoho7SoQIF9vuxmx7i2yEmO2C85OarRIwy980snna880+YGHel
+         ndCYo5I+59ZXOQ4OujZ8ZFRqaMYHYWIyj9VlQ6AzpxJJdMBAuApmJ9N19G+1S0xKVpab
+         YCJPRyLvRhGUwgAOEWd2sT6oU1j6J1xzpBp4vq3YzozYViBVv9p8TX3nOQ8UXET8kc+E
+         UrfgZxYEvhQKLFWhgZ9DI/sLY+FXtjH8KmfXNIn2+1FmKdg6a+irNkWboHTqG8cNjal7
+         7ltA==
+X-Gm-Message-State: ACgBeo2sGmIVFME+LArXovSrs5i22v8hKfmGIzIVH59UN2tkEtuCxLam
+        x0f8HasvMRHEZanP4Uycy+DlKQ==
+X-Google-Smtp-Source: AA6agR5flBH1H6qZt6yqi1YACzYjOurpqqJC2Z48B/RK4btE8X1zqj9xN+EaD6QhovkgkPr16hq/9g==
+X-Received: by 2002:a17:90b:1e0c:b0:1f5:4e52:4866 with SMTP id pg12-20020a17090b1e0c00b001f54e524866mr26225036pjb.230.1662480868029;
+        Tue, 06 Sep 2022 09:14:28 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id bi10-20020a170902bf0a00b00174e5fe9ce1sm1858226plb.159.2022.09.06.09.14.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Sep 2022 09:14:27 -0700 (PDT)
+Date:   Tue, 6 Sep 2022 16:14:23 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Liam Ni <zhiguangni01@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        pbonzini@redhat.com, tglx@linutronix.de,
+        dave.hansen@linux.intel.com
+Subject: Re: [PATCH] KVM: Reduce the execution of one instruction
+Message-ID: <Yxdx36BHlClCq52J@google.com>
+References: <20220906153357.1362555-1-zhiguangni01@zhaoxin.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220906153357.1362555-1-zhiguangni01@zhaoxin.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216388
+"KVM: x86:" for the shortlog.
 
---- Comment #19 from Sean Christopherson (seanjc@google.com) ---
-On Sat, Sep 03, 2022, bugzilla-daemon@kernel.org wrote:
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D216388
->=20
-> --- Comment #15 from Robert Dinse (nanook@eskimo.com) ---
-> Please forgive my lack of knowledge regarding git, but is there a way to =
-get
-> a
-> patch that took the kernel from 5.18.19 to 5.19.0 now that earlier releas=
-es
-> of
-> 5.19.x are not on the kernel.org site?
+On Tue, Sep 06, 2022, Liam Ni wrote:
+> From: Liam Ni <zhiguangni01@gmail.com>
+> 
+> If the condition is met,
 
-Strictly speaking, no.  Stable branches, i.e. v5.18.x in this case, are
-effectively
-forks.  After v5.18.0, everything that goes into v5.18.y is a unique commit,
-even
-if bug fixes are based on an upstream (master branch) commit.
+Please describe this specific code change, "If the condition is met" is extremely
+generic and doesn't help the reader understand what change is being made.
 
-Visually, it's something like this.
+> reduce the execution of one instruction.
 
-v5.18.0 --> v5.18.1 --> v5.18.2 --> v5.18.y
-\
- -> ... -> v5.19.0 -> v5.19.1
-           \
-            -> ... -> v5.20
+This is highly speculative, e.g. clang will generate identical output since it's
+trivial for the compiler to observe that ctxt->modrm_reg doesn't need to be read.
 
+And similar to the above "If the condition is met", the shortlog is too generic
+even if it were 100% accurate.
 
-IIUC, in this situation v5.18.0 isn't stable enough to test on its own, but=
- the
-v5.18.19 candidate is fully healthy.  In that case, if you wanted to bisect
-between
-v5.18.0 and v5.19.0 to figure out what broke in v5.19, the least awful appr=
-oach
-would be to first find what commit(s) between v5.18.0 and v5.18.19 fixed the
-unrelated
-instability in v5.18.0, and then manually apply that commit(s) at every sta=
-ge
-when
-bisecting between v5.18.0 and v5.19.0 to identify the buggy commit that
-introduced
-the CPU/RCU stalls.
+I do think this change is a net positive, but it's beneficial only in making the
+code easier to read.  Shaving a single cheap instruction in a relatively slow path
+isn't sufficient justification even if the compiler isn't clever enough to optimize
+away the load in the first place.
 
-> I know there is a patch that goes from 5.18.19 to 5.19.6
+E.g. something like:
 
-I assume you mean v5.18.19 =3D> v5.18.20?
+  KVM: x86: Clean up ModR/M "reg" initialization in reg op decoding
 
-> and one that goes 5.19.5 to 5.19.6 but I just want to look at the changes
-> between 5.18.19 and 5.19.0.
+  Refactor decode_register_operand() to get the ModR/M register if and
+  only if the instruction uses a ModR/M encoding to make it more obvious
+  how the register operand is retrieved.
 
-If you just want to look at the changes, you can always do
+> Signed-off-by: Liam Ni <zhiguangni01@gmail.com>
+> ---
+>  arch/x86/kvm/emulate.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index f8382abe22ff..ebb95f3f9862 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -1139,10 +1139,12 @@ static int em_fnstsw(struct x86_emulate_ctxt *ctxt)
+>  static void decode_register_operand(struct x86_emulate_ctxt *ctxt,
+>  				    struct operand *op)
+>  {
+> -	unsigned reg = ctxt->modrm_reg;
+> +	unsigned int reg;
+>  
+>  	if (!(ctxt->d & ModRM))
+>  		reg = (ctxt->b & 7) | ((ctxt->rex_prefix & 1) << 3);
+> +	else
+> +		reg = ctxt->modrm_reg;
 
-        git diff <commit A>..<commit B>
+I'd prefer to write this as:
 
-e.g.
+	unsigned int reg;
 
-        git diff v5.18.18..v5.19
+	if (ctxt->d & ModRM)
+		reg = ctxt->modrm_reg;
+	else
+		reg = (ctxt->b & 7) | ((ctxt->rex_prefix & 1) << 3);
 
-but that's going to show _all_ changes in a single diff, i.e. pinpointing
-exactly
-what change broke/fixed something is extremely difficult.
+so that "is ModRM" check is immediately followed by "get ModRM".
 
---=20
-You may reply to this email to add a comment.
+>  
+>  	if (ctxt->d & Sse) {
+>  		op->type = OP_XMM;
+> -- 
+> 2.25.1
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+> 
