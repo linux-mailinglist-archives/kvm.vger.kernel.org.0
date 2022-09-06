@@ -2,202 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 81AFB5AEF83
-	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 17:55:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 223345AEFEF
+	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 18:09:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234654AbiIFPzg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Sep 2022 11:55:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52066 "EHLO
+        id S238945AbiIFQIJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Sep 2022 12:08:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238265AbiIFPzN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Sep 2022 11:55:13 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1088C8D3DA
-        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 08:13:17 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id s14-20020a17090a6e4e00b0020057c70943so6062605pjm.1
-        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 08:13:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=4qWRg0pj2vBJoOh7qGaSZ5h4bkObiV59g0dITseF1n0=;
-        b=KH7IZDJD7Y8b3uEKowAoMS8Pgvs4QXX0NKTxI9TaaUhs7uVP5Bj5TamunKFEA0TQ4O
-         5mPwZMYKSdGrKlbbUz70Uk3uZpfTZXnpEnNSlQQgnLHw4gT08k8BSzbIkTUzpMQQRqUx
-         RB3/4s1o4qCU5xSRHgxYCc6BVLwv6ImjNlMYrq8szmymAduxvRh8dQzEpmd91TKEfhQ2
-         G3ynoaj1HRj7InuUUrWBwvxp1fOMxB83X2B2cLjEX0V0YqO+yms9w/E+HN/cniSQQ+4O
-         hSXwFMGurgNR8aDcQeoUFFFTojFcRHLuQ4QEDQvkYx/UBetpqDbACf1iTwKB6iOFWbfV
-         YdGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=4qWRg0pj2vBJoOh7qGaSZ5h4bkObiV59g0dITseF1n0=;
-        b=DMSu8lPiryUYIRNqxtZj2yYHlZHKaF8nH8QWk0GG1hewwHgAdO4075F7LFD+JbccdG
-         qm2aq4TwHfMVmAOnJRK+BtvAh/E1EotozD3WTU0c+YHNP3VZ9ZXI6ls8Bf384KMOC5q1
-         ZA3GFadZtvgeOH1zmMr9sWCzz+pnKzJqmePYzyl1Sq1LwoiKyx596M6C9/8/YAE87dET
-         uRMmBygW1GqIQkkGjfPQHbHphkA2wutwgB7b9QQu1lNyYZaZpvL++RgL5Vyvvwkoi39C
-         iKVGp6iED6evwUWjARVEX+RW3u4kFWr+/WkCP7r6FLN0vAOAUeQC1cgZzeTKOu4HuH8g
-         LT3w==
-X-Gm-Message-State: ACgBeo0KY4Qt1ZN+TPpD3X1rFNLeuI8jTL5JgOEf8ZWd8hwbLlkBThxL
-        cM6FBrLocMNzP47kGiR4O68MrC8aT0jVXA==
-X-Google-Smtp-Source: AA6agR6olQ2PMxoDYdSDVBVtrzpxzp/U6DDWqd82S3Z03OAgq6QfbVrOAcQZG7VjcS4//eIPfGIAjg==
-X-Received: by 2002:a17:902:b194:b0:176:d229:83bd with SMTP id s20-20020a170902b19400b00176d22983bdmr3241229plr.174.1662477196446;
-        Tue, 06 Sep 2022 08:13:16 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id e7-20020a17090ab38700b001f1acb6c3ebsm8847767pjr.34.2022.09.06.08.13.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Sep 2022 08:13:15 -0700 (PDT)
-Date:   Tue, 6 Sep 2022 15:13:12 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, suravee.suthikulpanit@amd.com,
-        mlevitsk@redhat.com, joao.m.martins@oracle.com
-Subject: Re: [PATCH 1/1] KVM: x86: Allow emulation of EOI writes with AVIC
- enabled
-Message-ID: <YxdjiNsWBPOoX2w1@google.com>
-References: <20220903200557.1719-1-alejandro.j.jimenez@oracle.com>
+        with ESMTP id S234716AbiIFQHh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Sep 2022 12:07:37 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EC9E9A69E
+        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 08:31:33 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 286FBlmo028588
+        for <kvm@vger.kernel.org>; Tue, 6 Sep 2022 15:31:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : to :
+ from : cc : subject : message-id : date; s=pp1;
+ bh=SEQjtyC/iLrjycHTLrmQ9IGv2qPqHNKn9LTJxhoJ5qQ=;
+ b=Zk4I0OgYD5HI4SR/g5aZjcpwwTqjRkoLoV14ZAJLgjqH/C+BEObp84qtwHjpo9/RRAG4
+ pZxYUmOYB3XCiN6dNH01kThr2axIe/HlUsu3mD9Y2TXHoI8YfxnJe2+iUho/eztE9ftl
+ GGgFyqc+pPjcoGvpL+OAEH+VkdRWxdsN8Rfphm7tBkwaHDI7tnlgdfgrEfHsLZ9Iik5a
+ bRIzIF49JD0o8HPUvzyTDdgMVfzslxgeFqQT+XjzFwX7LNfcVwaTH3GuketHDyA7qtXo
+ mDHblnJzZx59WBg+xPkZMGfULI+PDUE/IqaiwLX6Gx5AJkpSH0UEC4FCDcCFpoCHH2Ph dA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3je8ms8sxw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 15:31:32 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 286FBpTJ028829
+        for <kvm@vger.kernel.org>; Tue, 6 Sep 2022 15:31:32 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3je8ms8swh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Sep 2022 15:31:32 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 286FM1Hs010090;
+        Tue, 6 Sep 2022 15:31:30 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma02fra.de.ibm.com with ESMTP id 3jbxj8twr1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Sep 2022 15:31:30 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 286FRwtS40239454
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 6 Sep 2022 15:27:58 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3C984A4060;
+        Tue,  6 Sep 2022 15:31:27 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2186AA405C;
+        Tue,  6 Sep 2022 15:31:27 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.61.54])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  6 Sep 2022 15:31:27 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220903200557.1719-1-alejandro.j.jimenez@oracle.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <d12c0927-fa06-4f27-606e-25971d11e2aa@linux.ibm.com>
+References: <20220825131600.115920-1-nrb@linux.ibm.com> <20220825131600.115920-3-nrb@linux.ibm.com> <d12c0927-fa06-4f27-606e-25971d11e2aa@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+From:   Nico Boehr <nrb@linux.ibm.com>
+Cc:     imbrenda@linux.ibm.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 2/2] s390x: create persistent comm-key
+Message-ID: <166247828688.90129.7620152734606584325@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Tue, 06 Sep 2022 17:31:26 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: CVxHAuuCKW5tZTmcIea8GO5K5I5YwNGM
+X-Proofpoint-ORIG-GUID: UrTf3EcV7bYg40YApySZ8YX8npUDO_64
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-09-06_07,2022-09-06_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ priorityscore=1501 bulkscore=0 mlxlogscore=999 lowpriorityscore=0
+ malwarescore=0 impostorscore=0 phishscore=0 suspectscore=0 clxscore=1015
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2209060072
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Sep 03, 2022, Alejandro Jimenez wrote:
-> According to section 15.29.9.2 - AVIC Access to un-accelerated vAPIC register
-> of the AMD APM [1]:
-> 
-> "A guest access to an APIC register that is not accelerated by AVIC results in
-> a #VMEXIT with the exit code of AVIC_NOACCEL. This fault is also generated if
-> an EOI is attempted when the highest priority in-service interrupt is set for
-> level-triggered mode."
-> 
-> This is also stated in Table 15-22 - Guest vAPIC Register Access Behavior,
-> confirming that AVIC hardware traps on EOI writes for level triggered
-> interrupts, and leading to the following call stack:
-> 
-> avic_unaccelerated_access_interception()
-> -> avic_unaccel_trap_write()
->   -> kvm_apic_write_nodecode()
->     -> kvm_lapic_msr_read()
->       -> kvm_lapic_reg_read()
-> 
-> In kvm_lapic_reg_read(), the APIC_EOI offset (0xb0) is not allowed as valid, so
-> the error returned triggers the assertion introduced by 'commit 70c8327c11c6
-> ("KVM: x86: Bug the VM if an accelerated x2APIC trap occurs on a "bad" reg")'
-> and kills the VM.
-> 
-> Add APIC_EOI offset to the valid mask in kvm_lapic_reg_read() to allow the
-> emulation of EOI behavior for level triggered interrupts.
-> 
-> [1] https://www.amd.com/system/files/TechDocs/24593.pdf
-> 
-> Fixes: 0105d1a52640 ("KVM: x2apic interface to lapic")
-> Signed-off-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
-> Cc: stable@vger.kernel.org
-> ---
-> 
-> I am unsure as to the proper commit to use for the Fixes: tag. Technically the
-> issue was introduced by the initial SVM AVIC commits in 2016, since they failed
-> to add the EOI offset to the valid mask.
-> 
-> To be safe, I used the commit that introduces the valid mask, but that is
-> somewhat misleading since at the time AVIC was not available, and I believe that
-> Intel posted interrupts implementation does not require access to EOI offset in
-> this code.
-> 
-> Please correct Fixes: tag if necessary.
-> ---
->  arch/x86/kvm/lapic.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 9dda989a1cf0..61041fecfa89 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1452,6 +1452,7 @@ static int kvm_lapic_reg_read(struct kvm_lapic *apic, u32 offset, int len,
->  		APIC_REG_MASK(APIC_LVR) |
->  		APIC_REG_MASK(APIC_TASKPRI) |
->  		APIC_REG_MASK(APIC_PROCPRI) |
-> +		APIC_REG_MASK(APIC_EOI) |
+Quoting Janosch Frank (2022-09-06 11:50:46)
+> Hmmmmmmm(TM)
+>=20
+> My first thought was that I'd be pretty angry if the CCK changes on a=20
+> distclean. But the only scenario where this would matter is when the=20
+> tests are provided to another system.
+>=20
+> I'm still a bit torn about deleting the CCK especially as there will=20
+> always be a CCK in the SE header no matter if we specify one or not.
 
-EOI is write-only for x2APIC, reads are supposed to #GP.  So unfortunately, simply
-adding it to the set of allowed registers won't work.
-
-EOI is also write-only for xAPIC on Intel, but apparently AMD allows reads.
-
-I'm leaning towards this as a fix.  The only reason KVM uses kvm_lapic_msr_read()
-is to play nice with the 64-bit ICR in x2APIC.  I don't love that the x2APIC details
-bleed further into kvm_apic_write_nodecode(), but odds are good that if there's ever
-another 64-bit register, it'll need to be special cased here anyways, same as ICR. 
-
---
-From: Sean Christopherson <seanjc@google.com>
-Date: Tue, 6 Sep 2022 07:52:41 -0700
-Subject: [PATCH] KVM: x86: Blindly get current x2APIC reg value on "nodecode
- write" traps
-
-When emulating a x2APIC write in response to an APICv/AVIC trap, get the
-the written value from the vAPIC page without checking that reads are
-allowed for the target register.  AVIC can generate trap-like VM-Exits on
-writes to EOI, and so KVM needs to get the written value from the backing
-page without running afoul of EOI's write-only behavior.
-
-Alternatively, EOI could be special cased to always write '0', e.g. so
-that the sanity check could be preserved, but x2APIC on AMD is actually
-supposed to disallow non-zero writes (not emulated by KVM), and the
-sanity check was a byproduct of how the KVM code was written, i.e. wasn't
-added to guard against anything in particular.
-
-Fixes: 70c8327c11c6 ("KVM: x86: Bug the VM if an accelerated x2APIC trap occurs on a "bad" reg")
-Fixes: 1bd9dfec9fd4 ("KVM: x86: Do not block APIC write for non ICR registers")
-Reported-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/lapic.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 4cebbdd3431b..76a19bf1eb55 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2349,23 +2349,18 @@ void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
- 	struct kvm_lapic *apic = vcpu->arch.apic;
- 	u64 val;
- 
--	if (apic_x2apic_mode(apic)) {
--		if (KVM_BUG_ON(kvm_lapic_msr_read(apic, offset, &val), vcpu->kvm))
--			return;
--	} else {
--		val = kvm_lapic_get_reg(apic, offset);
--	}
--
- 	/*
- 	 * ICR is a single 64-bit register when x2APIC is enabled.  For legacy
- 	 * xAPIC, ICR writes need to go down the common (slightly slower) path
- 	 * to get the upper half from ICR2.
- 	 */
- 	if (apic_x2apic_mode(apic) && offset == APIC_ICR) {
-+		val = kvm_lapic_get_reg64(apic, APIC_ICR);
- 		kvm_apic_send_ipi(apic, (u32)val, (u32)(val >> 32));
- 		trace_kvm_apic_write(APIC_ICR, val);
- 	} else {
- 		/* TODO: optimize to just emulate side effect w/o one more write */
-+		val = kvm_lapic_get_reg(apic, offset);
- 		kvm_lapic_reg_write(apic, offset, (u32)val);
- 	}
- }
-
-base-commit: 476d5fb78ea6438941559af4814a2795849cb8f0
--- 
-
+I really don't have a strong opinion about this. I think it makes sense to =
+clean
+up stuff a Makefile has left behind. But I am honestly just as fine with
+removing this.
