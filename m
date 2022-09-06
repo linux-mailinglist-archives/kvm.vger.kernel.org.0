@@ -2,91 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 911F95ADF40
-	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 07:58:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B2FEA5ADFB8
+	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 08:25:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231913AbiIFF6P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Sep 2022 01:58:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34240 "EHLO
+        id S232521AbiIFGZM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Sep 2022 02:25:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229755AbiIFF6N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Sep 2022 01:58:13 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D1776B177
-        for <kvm@vger.kernel.org>; Mon,  5 Sep 2022 22:58:12 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2864RS5s010297;
-        Tue, 6 Sep 2022 05:58:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references :
- subject : cc : to : from : message-id : date; s=pp1;
- bh=x8bT+iRNWOKoFk5GRto+QTB5F19l+E+Eeb7i8WQ7+wM=;
- b=TEwqzupOjr3OEq/ZeW6h1Aevs4q01a6xvw+jHjJ7av7XgCu+rRWfrdh6f4+uyaAocoPX
- G0TgBodIiQrg34Aa7tTstXHgYLFWRxv2mKGog18LtUSviCtWEWvGF+2SiGmrz4nEo7K3
- +qrfL0HEMHwYE2YJxyxumqweU4xXIwSa2mtOwsFOn52xuQhCoCWYMhRjRfbkYlQ3abNR
- 80jrk6R8qHluSXLdiAcERI1BlkJk/cDEenul4RVY2+HxKTYnw2o188PejCQ8EJorlhCl
- H4+dkWYkaxEUWPBd9G9kAiiojCRRQMVxl/+iS1jy7y9JZAREthHCplwQtXNI02/79f+x hQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jdy6s2bqf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Sep 2022 05:58:07 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2865RKZE033771;
-        Tue, 6 Sep 2022 05:58:06 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jdy6s2bpw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Sep 2022 05:58:06 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2865qiFP029630;
-        Tue, 6 Sep 2022 05:58:04 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06fra.de.ibm.com with ESMTP id 3jbx6htdvh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 06 Sep 2022 05:58:04 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2865w1Eg35521000
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 6 Sep 2022 05:58:01 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 23DB7AE04D;
-        Tue,  6 Sep 2022 05:58:01 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F134DAE045;
-        Tue,  6 Sep 2022 05:58:00 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.22.126])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  6 Sep 2022 05:58:00 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S231887AbiIFGZK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Sep 2022 02:25:10 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4408748CA0;
+        Mon,  5 Sep 2022 23:25:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662445508; x=1693981508;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=353raL80awxDlgmu10YKemTNIBIW1838Ug9w266GnMg=;
+  b=WLJgVMhRUQvGtBpoc2nhflcAI5othoqNWWrSlhFUJZ7PP23gcQKNc4nu
+   p50LY7QiDa8IWRrZu8xQstVv9wpl/OoKnaRqEUwvC2k5HtrKUkPY8mbPS
+   uYAG7UsTTYV1T6ZES/afJdujj970VwdYaa/oi2ctW/lJ+R76Lk7oNZd2c
+   H148H5wsiX/jUKeNcjm8lJGz6cJ8aL5yyGodN54AGD58DoXb6kSmcbsJe
+   5lgACXrXtULsSYVGcmHRoU16nQTjIEP3oJqRBJuacUrAVhsXRxIpne/sb
+   thBrdnAd0PSfYGyuY1uft+PZnOCQA1he7VpM0aPz5pzW389Bx+ovHu2ox
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10461"; a="279529400"
+X-IronPort-AV: E=Sophos;i="5.93,293,1654585200"; 
+   d="scan'208";a="279529400"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2022 23:25:07 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,293,1654585200"; 
+   d="scan'208";a="675547498"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by fmsmga008.fm.intel.com with ESMTP; 05 Sep 2022 23:25:03 -0700
+Date:   Tue, 6 Sep 2022 14:25:02 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     isaku.yamahata@intel.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        isaku.yamahata@gmail.com, Kai Huang <kai.huang@intel.com>,
+        Chao Gao <chao.gao@intel.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Shaokun Zhang <zhangshaokun@hisilicon.com>,
+        Qi Liu <liuqi115@huawei.com>,
+        John Garry <john.garry@huawei.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v3 11/22] KVM: Add arch hooks for PM events with empty
+ stub
+Message-ID: <20220906062502.5rx6n5auoct7t3ei@yy-desk-7060>
+References: <cover.1662084396.git.isaku.yamahata@intel.com>
+ <22e86b718ae434e52957d5af9b4c7dd26b2a74ca.1662084396.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20220902075531.188916-3-pmorel@linux.ibm.com>
-References: <20220902075531.188916-1-pmorel@linux.ibm.com> <20220902075531.188916-3-pmorel@linux.ibm.com>
-Subject: Re: [PATCH v9 02/10] s390x/cpu topology: core_id sets s390x CPU topology
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, frankja@linux.ibm.com
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-From:   Nico Boehr <nrb@linux.ibm.com>
-Message-ID: <166244388074.53359.17766769465682688178@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Tue, 06 Sep 2022 07:58:00 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: dsZngDqZwNsWv2W0YP08WgfIH7vLR79a
-X-Proofpoint-ORIG-GUID: vKaFRTcCAEBS-yYK1j7a30SCGAMkJqnu
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-06_02,2022-09-05_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- adultscore=0 mlxscore=0 malwarescore=0 spamscore=0 mlxlogscore=999
- priorityscore=1501 phishscore=0 bulkscore=0 impostorscore=0 clxscore=1015
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2209060025
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <22e86b718ae434e52957d5af9b4c7dd26b2a74ca.1662084396.git.isaku.yamahata@intel.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE,
         T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -94,54 +75,246 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Pierre Morel (2022-09-02 09:55:23)
-[...]
-> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+On Thu, Sep 01, 2022 at 07:17:46PM -0700, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>
+> Add arch hooks for reboot, suspend, resume, and CPU-online/offline events
+> with empty stub functions.
+>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  include/linux/kvm_host.h |  6 +++++
+>  virt/kvm/Makefile.kvm    |  2 +-
+>  virt/kvm/kvm_arch.c      | 44 +++++++++++++++++++++++++++++++++++
+>  virt/kvm/kvm_main.c      | 50 +++++++++++++++++++++++++---------------
+>  4 files changed, 82 insertions(+), 20 deletions(-)
+>  create mode 100644 virt/kvm/kvm_arch.c
+>
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index eab352902de7..dd2a6d98d4de 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1448,6 +1448,12 @@ int kvm_arch_post_init_vm(struct kvm *kvm);
+>  void kvm_arch_pre_destroy_vm(struct kvm *kvm);
+>  int kvm_arch_create_vm_debugfs(struct kvm *kvm);
+>
+> +int kvm_arch_suspend(int usage_count);
+> +void kvm_arch_resume(int usage_count);
+> +int kvm_arch_reboot(int val);
+> +int kvm_arch_online_cpu(unsigned int cpu, int usage_count);
+> +int kvm_arch_offline_cpu(unsigned int cpu, int usage_count);
+> +
+>  #ifndef __KVM_HAVE_ARCH_VM_ALLOC
+>  /*
+>   * All architectures that want to use vzalloc currently also
+> diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
+> index 2c27d5d0c367..c4210acabd35 100644
+> --- a/virt/kvm/Makefile.kvm
+> +++ b/virt/kvm/Makefile.kvm
+> @@ -5,7 +5,7 @@
+>
+>  KVM ?= ../../../virt/kvm
+>
+> -kvm-y := $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
+> +kvm-y := $(KVM)/kvm_main.o $(KVM)/kvm_arch.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
+>  kvm-$(CONFIG_KVM_VFIO) += $(KVM)/vfio.o
+>  kvm-$(CONFIG_KVM_MMIO) += $(KVM)/coalesced_mmio.o
+>  kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/async_pf.o
+> diff --git a/virt/kvm/kvm_arch.c b/virt/kvm/kvm_arch.c
 > new file mode 100644
-> index 0000000000..a6ca006ec5
+> index 000000000000..4748a76bcb03
 > --- /dev/null
-> +++ b/hw/s390x/cpu-topology.c
-[...]
-> +void s390_topology_new_cpu(int core_id)
+> +++ b/virt/kvm/kvm_arch.c
+> @@ -0,0 +1,44 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * kvm_arch.c: kvm default arch hooks for hardware enabling/disabling
+> + * Copyright (c) 2022 Intel Corporation.
+> + *
+> + * Author:
+> + *   Isaku Yamahata <isaku.yamahata@intel.com>
+> + *                  <isaku.yamahata@gmail.com>
+> + */
+> +
+> +#include <linux/kvm_host.h>
+> +
+> +/*
+> + * Called after the VM is otherwise initialized, but just before adding it to
+> + * the vm_list.
+> + */
+> +__weak int kvm_arch_post_init_vm(struct kvm *kvm)
 > +{
-[...]
-> +    socket_id =3D core_id / topo->cores;
-
-The comment below is essential for understanding all of this. Move it befor=
-e this line.
-
+> +	return 0;
+> +}
 > +
-> +    bit =3D core_id;
-> +    origin =3D bit / 64;
-> +    bit %=3D 64;
-> +    bit =3D 63 - bit;
+> +__weak int kvm_arch_online_cpu(unsigned int cpu, int usage_count)
+> +{
+> +	return 0;
+> +}
 > +
-> +    /*
-> +     * At the core level, each CPU is represented by a bit in a 64bit
-> +     * unsigned long. Set on plug and clear on unplug of a CPU.
+> +__weak int kvm_arch_offline_cpu(unsigned int cpu, int usage_count)
+> +{
+> +	return 0;
+> +}
+> +
+> +__weak int kvm_arch_reboot(int val)
+> +{
+> +	return NOTIFY_OK;
+> +}
+> +
+> +__weak int kvm_arch_suspend(int usage_count)
+> +{
+> +	return 0;
+> +}
+> +
+> +__weak void kvm_arch_resume(int usage_count)
+> +{
+> +}
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 082d5dbc8d7f..e62240fb8474 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -144,6 +144,7 @@ static int kvm_no_compat_open(struct inode *inode, struct file *file)
+>  #endif
+>  static int hardware_enable_all(void);
+>  static void hardware_disable_all(void);
+> +static void hardware_disable_nolock(void *junk);
+>
+>  static void kvm_io_bus_destroy(struct kvm_io_bus *bus);
+>
+> @@ -1097,15 +1098,6 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, const char *fdname)
+>  	return ret;
+>  }
+>
+> -/*
+> - * Called after the VM is otherwise initialized, but just before adding it to
+> - * the vm_list.
+> - */
+> -int __weak kvm_arch_post_init_vm(struct kvm *kvm)
+> -{
+> -	return 0;
+> -}
+> -
+>  /*
+>   * Called just after removing the VM from the vm_list, but before doing any
+>   * other destruction.
+> @@ -5033,6 +5025,10 @@ static int kvm_online_cpu(unsigned int cpu)
+>  		if (atomic_read(&hardware_enable_failed)) {
+>  			atomic_set(&hardware_enable_failed, 0);
+>  			ret = -EIO;
+> +		} else {
+> +			ret = kvm_arch_online_cpu(cpu, kvm_usage_count);
+> +			if (ret)
+> +				hardware_disable_nolock(NULL);
+>  		}
+>  	}
+>  	mutex_unlock(&kvm_lock);
+> @@ -5053,11 +5049,19 @@ static void hardware_disable_nolock(void *junk)
+>
+>  static int kvm_offline_cpu(unsigned int cpu)
+>  {
+> +	int ret = 0;
+> +
+>  	mutex_lock(&kvm_lock);
+> -	if (kvm_usage_count)
+> +	if (kvm_usage_count) {
+>  		hardware_disable_nolock(NULL);
+> +		ret = kvm_arch_offline_cpu(cpu, kvm_usage_count);
+> +		if (ret) {
+> +			(void)hardware_enable_nolock(NULL);
+> +			atomic_set(&hardware_enable_failed, 0);
+> +		}
+> +	}
+>  	mutex_unlock(&kvm_lock);
+> -	return 0;
+> +	return ret;
+>  }
+>
+>  static void hardware_disable_all_nolock(void)
+> @@ -5115,6 +5119,8 @@ static int hardware_enable_all(void)
+>  static int kvm_reboot(struct notifier_block *notifier, unsigned long val,
+>  		      void *v)
+>  {
+> +	int r;
+> +
+>  	/*
+>  	 * Some (well, at least mine) BIOSes hang on reboot if
+>  	 * in vmx root mode.
+> @@ -5123,8 +5129,15 @@ static int kvm_reboot(struct notifier_block *notifier, unsigned long val,
+>  	 */
+>  	pr_info("kvm: exiting hardware virtualization\n");
+>  	kvm_rebooting = true;
+> +
+> +	/* This hook is called without cpuhotplug disabled.  */
+> +	cpus_read_lock();
+> +	mutex_lock(&kvm_lock);
+>  	on_each_cpu(hardware_disable_nolock, NULL, 1);
+> -	return NOTIFY_OK;
+> +	r = kvm_arch_reboot(val);
+> +	mutex_unlock(&kvm_lock);
+> +	cpus_read_unlock();
+> +	return r;
+>  }
+>
+>  static struct notifier_block kvm_reboot_notifier = {
+> @@ -5718,11 +5731,10 @@ static int kvm_suspend(void)
+>  	 * cpu_hotplug_disable() and other CPUs are offlined.  No need for
+>  	 * locking.
+>  	 */
+> -	if (kvm_usage_count) {
+> -		lockdep_assert_not_held(&kvm_lock);
+> +	lockdep_assert_not_held(&kvm_lock);
+> +	if (kvm_usage_count)
+>  		hardware_disable_nolock(NULL);
+> -	}
+> -	return 0;
+> +	return kvm_arch_suspend(kvm_usage_count);
+>  }
+>
+e  static void kvm_resume(void)
+> @@ -5734,10 +5746,10 @@ static void kvm_resume(void)
+>  		 */
+>  		return; /* FIXME: disable KVM */
+>
+> -	if (kvm_usage_count) {
+> -		lockdep_assert_not_held(&kvm_lock);
+> +	lockdep_assert_not_held(&kvm_lock);
+> +	kvm_arch_resume(kvm_usage_count);
+> +	if (kvm_usage_count)
+>  		hardware_enable_nolock((void *)__func__);
 
-cleared                                  ^
+Is single kvm_arch_{suspend,resume} enough?
 
-[...]
-> +     * In that case the origin field, representing the offset of the fir=
-st CPU
-> +     * in the CPU container allows to represent up to the maximal number=
- of
-> +     * CPU inside several CPU containers inside the socket container.
+The sequence is:
 
-How about:
-"In that case the origin variable represents the offset of the first CPU in=
- the
-CPU container. More than 64 CPUs per socket are represented in several CPU
-containers inside the socket container."
+kvm_arch_resume()
+hardware_enable_nolock()
 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index b5ca154e2f..15cefd104b 100644
-[...]
-> @@ -247,6 +248,12 @@ static void ccw_init(MachineState *machine)
->      /* init memory + setup max page size. Required for the CPU model */
->      s390_memory_init(machine->ram);
-> =20
-> +    /* Adding the topology must be done before CPU intialization*/
+But in patch 12 I see below code in x86's kvm_arch_resume():
+...
+if (!usage_count)
+        return;
+if (kvm_arch_hardware_enable())
+        return;
+...
 
-space                                                              ^
+So kvm_arch_resume() may depend on hardware enable, and it checks the
+usage_count again, how about call kvm_arch_resume(bool
+hardware_enabled) before/after the hardware_enable_nolock() (or even
+give different functions with _before/_after suffix) for better
+flexibility since it's common code for all architectures, e.g.
+
+if (kvm_usage_count) {
+   kvm_arch_resume(false);
+   hardware_enable_nolock(__func__);
+   kvm_arch_resumt(true);
+}
+
+> -	}
+>  }
+>
+>  static struct syscore_ops kvm_syscore_ops = {
+> --
+> 2.25.1
+>
