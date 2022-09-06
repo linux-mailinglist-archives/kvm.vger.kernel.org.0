@@ -2,179 +2,416 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2BE7C5AE6DD
-	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 13:48:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D33C5AE6E0
+	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 13:49:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233864AbiIFLsi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Sep 2022 07:48:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40300 "EHLO
+        id S233488AbiIFLtr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Sep 2022 07:49:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233563AbiIFLsc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Sep 2022 07:48:32 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2076.outbound.protection.outlook.com [40.107.93.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 094E049B40;
-        Tue,  6 Sep 2022 04:48:31 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SqleM8Mo/w8HkWYjURRFvaS5lAoMIRSGzXeD9QIhhvR25G/X+yT0RfJ/xAXRbiwREGW1rEZsAgCeVVcgOk3EEdDS5s3mo5P3HCRozrJSB0NBFerWKMdK75opu0qeZ6YTtZBjy4GoBvd/+fxsYYL5Udbhyuk5a/Is9Y/yUDeYJ6JOn+QEwoQ1ubKeioGNeACqOrgV8G9cU1xksM++2LsBTQS/H4LFM61Qzu3bWqocJF7qUtWfRZmDRGPI94SNbUGClUY8afkKrMXGcvXVUH6J42jswBrvDa3J6Tl6SromH9TMS6Aa1FEM9KMP1i1cw7qlL1TlEdirsoYIYI0qX2J8MA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/Kaab+IU4zR/2FW3e4OHfcOsvDM6daHjs+EeIqoEeWI=;
- b=BaOzeg+DWkoFFcDJrurJUy+mD4OVFEDe2US/vOdY01+wOlo3tEcUzimXcVgF0/IjJHXbB7HCt1lQgW9kqV2lAxw6EKM4wAJwA5soV/iZJe1kLW7DeA+lbLJqw1fWGIci9H/k9IalPF4POAe7J9fHg2m156+ETOvYL4TGJXx6f0URFnOahME0wZ/i5wIgH03Bd2jIIr+8Taqzi41UYsItMv31dpeb6QlNqdJqDhvQUwpUdd9XRLvObrqES7RKH0toosaKZcNnv2ixDbSnCqTspHOsv7q46TsRzgwtrEPqCNSiQF/xDWpFsw8w7CgAPEekEXIr7r1hkY4gXKNhoIiPnQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/Kaab+IU4zR/2FW3e4OHfcOsvDM6daHjs+EeIqoEeWI=;
- b=iOGoRIPZG2Gkh7/MCZBvI4O8YAA0ZUk/GKPaS8Aot+xyV5+e6Fjn4/0MLxHkInYuk8c5j4m2yZL36wAxvENT+goWS7bfVeZm0vgfbyXL8Btl0ZS7Crxjufdk2mddXuBr2Wd4DspGKUQVnxcfJADCF1NnMiYjsLayunU4abNnac4CX+7fO6cHCR0Bqc7IZiuUfCHJkxNDCCmUpUJyhexVx8UAk1f9VDeclmCKepp9LszmwqpX3df+jnT27aJxw4NzuyDORsAJz9ahbcWlsmYM8ElPsgs9Hp1BxK5q8PZ8pb9bT6Hiebm1ud7PDuqKupWxKpkQg+yByaoJlDPC3nAuww==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by DS7PR12MB6238.namprd12.prod.outlook.com (2603:10b6:8:96::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.10; Tue, 6 Sep
- 2022 11:48:29 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::462:7fe:f04f:d0d5]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::462:7fe:f04f:d0d5%7]) with mapi id 15.20.5588.018; Tue, 6 Sep 2022
- 11:48:29 +0000
-Date:   Tue, 6 Sep 2022 08:48:28 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linaro-mm-sig@lists.linaro.org, linux-media@vger.kernel.org,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
-        Maor Gottlieb <maorg@nvidia.com>,
-        Oded Gabbay <ogabbay@kernel.org>
-Subject: Re: [PATCH v2 4/4] vfio/pci: Allow MMIO regions to be exported
- through dma-buf
-Message-ID: <YxczjNIloP7TWcf2@nvidia.com>
-References: <0-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
- <4-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
- <YxcYGzPv022G2vLm@infradead.org>
- <b6b5d236-c089-7428-4cc9-a08fe4f6b4a3@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b6b5d236-c089-7428-4cc9-a08fe4f6b4a3@amd.com>
-X-ClientProxiedBy: MN2PR11CA0010.namprd11.prod.outlook.com
- (2603:10b6:208:23b::15) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S230215AbiIFLtp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Sep 2022 07:49:45 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40454E089
+        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 04:49:43 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 286AkT87020342;
+        Tue, 6 Sep 2022 11:49:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=Gy2Cab+a5r0gkMrM2JJ5gAKISUTpycmGsQ4quQuVh+g=;
+ b=D2hcb6TW6k+nEqzfbAWxN4mKEZ9clkWS5cP2Cjlkkk3QxLJowIwm0VYOZ+wViL8SbNgu
+ zIC6cxKtkn94BTQPI9hkWSz36Pamk8usBbt9CROddSZzgekNRGmZ5ZykN3mpQ80a52+0
+ JpqIgXJcqyaj5gLyHnDp5/BVWu9BGwEtkO+/l5ZwBFbgKmeGBi8xeHlhrvzR69Z7rMBu
+ mlrTeB/y/NwpByiNsdgR0aBT+ytDBCCuiN9GeWuQUWvl7zo2N97K/O7qtJUvGQwgi8Ku
+ slLveDEYa7yxlNVtInoouO+YoMD6VffOBKQa6Qo7Nu/xuJkUxb/nXKBVQ6FBHDP/CZFT 6A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3je4r6hvdx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Sep 2022 11:49:34 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 286BbxCc022217;
+        Tue, 6 Sep 2022 11:49:33 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3je4r6hvd5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Sep 2022 11:49:33 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 286BaD4e011107;
+        Tue, 6 Sep 2022 11:49:31 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03ams.nl.ibm.com with ESMTP id 3jbxj8uqe8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 06 Sep 2022 11:49:31 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 286BnS5X35651918
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 6 Sep 2022 11:49:28 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8735242042;
+        Tue,  6 Sep 2022 11:49:28 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C869B42041;
+        Tue,  6 Sep 2022 11:49:27 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.59.224])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  6 Sep 2022 11:49:27 +0000 (GMT)
+Message-ID: <e2e5e8dc27ee12981c6df4e5f6b208362bd3671a.camel@linux.ibm.com>
+Subject: Re: [PATCH v9 03/10] s390x/cpu topology: reporting the CPU topology
+ to the guest
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
+Date:   Tue, 06 Sep 2022 13:49:27 +0200
+In-Reply-To: <20220902075531.188916-4-pmorel@linux.ibm.com>
+References: <20220902075531.188916-1-pmorel@linux.ibm.com>
+         <20220902075531.188916-4-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c5ed7a3d-a94f-4658-cd83-08da8ffdb75c
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6238:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: AO+QR0/XPbH4nPUZj0bFetOeSDA50FWFEnCy2ipKGW6VCf9cGfCFh/hecuoKwvrFACO0oUBtN/rp01H02+1g+M7JGi7BdiwDZAFDOqC3etPdS85PBllSlQ/ipiY0N/jE24HImC1gQOS1DW/xlD38TKQOu56snn+zJkXo8OkhUr1Wfok58/0XVg5+MFPcY54+CVCitNKe95uny6keHv0uRnkqEwU0URSddcKEIc3ySrlAfuHlEKO0P4BIELN7qwxQQek1jyWRF2294qxv/f+cwTPbO0uQ+bEmmXkx/EzeZYMYZjk50MTOsAjEm0pJD+jL/gYJD4zxNdu+bZiT3FsClOa9OoD20uHJYfhxLh7//MQCB7dUmQYX6RHW6Doh+zdK/1sc+Tp47VMONFzHHqakU9yy19FQpIR5DwNiWghmgGluv7PJhBEcefhPWosYGTSBIVWf3gbNFzwedLtrEi6EHGafLgX4X/f/sx4/vUFIk/p4kdyzUDeeNHJAtru3FrsDt7IDVADb+gV3OERCP+cdQugjWCyEWKHGJ+pWar3JAkOrie5AhJJDns/0KOrlM/M9QMc1HxC1/tTNprWG4ln9kadsAuqGZbr6T17Sd5OekrmQwnKWdhhpODh17ZndXgASox9hX83OIYVtPU2KtwhXjQzYyQsDJNOpL3VQnfFXq7P3eWkBFhv/ohAtQ9Aj+6gAavIjQKTtHtv2MBDWIGisQQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(376002)(396003)(39860400002)(346002)(366004)(136003)(186003)(5660300002)(7416002)(36756003)(66574015)(2616005)(6512007)(66946007)(66556008)(4326008)(2906002)(8936002)(66476007)(8676002)(316002)(54906003)(478600001)(6916009)(41300700001)(26005)(6506007)(86362001)(38100700002)(6486002)(83380400001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?M3M2ZjlEN1FjZ3M5Q21DcHg1VDNWa3lXSS9idXIzUGNFM01OL1Jnb2pyMnRn?=
- =?utf-8?B?b1FJazAwOEV1bEloemFVL1gwc2swVmNKajlDK2xycUs4YTBQNHVuZW1UTFVQ?=
- =?utf-8?B?djArS2k5cmwvNndjakhwcHRqeHhjazdRL1B2eFZwMjJvT2kyWWFTN21rV2FW?=
- =?utf-8?B?dW5LSTJsS3d5Z1RydkVPMUEvVzErVFhYa3V6MDJvaVdpWDEwYlJtd05pdmZx?=
- =?utf-8?B?UzNNU2p4QnV1SmNQWUdDa1d3ZTFrM092SVBtVUFOYWxVeDE3VnZkTGVOMnhJ?=
- =?utf-8?B?WHVHQVYzU0VyRU5iYU5ld1BZMFB6RWVHbUQrR0J6d3l6Ny9MWUY2ZkRHak5y?=
- =?utf-8?B?UFhoNEVmNTFmb1c0Z3VGckN4WXV6UkZFRENmeGtKQys4aG9ZMy83NENwSXdt?=
- =?utf-8?B?S1c2TVViYkVmbGVTSGp6U1dWNkVmU2pzTWUvWUxRNFVINGg5YjhpZ2lZMHlk?=
- =?utf-8?B?c0szOWJXeGNsa0xSUytNUVNyZGd4eUdyVllhbjVBd1NLUW5QcnFWcGVyWmtr?=
- =?utf-8?B?VGhhS01icEdCWWxZMjl3TWorNzg1ZFQ5czZWeVFyNkM1UXJuZkNJMGpJc1ht?=
- =?utf-8?B?TGkxOUM4SHdTWHN1WFBpa1AveHA5MGdmUjNxc2ZTNmQwMXQ4dzZlOW03alhm?=
- =?utf-8?B?bUgrQkJLVkMrOXQ5YXhyazdidHhNRm41UEFWMXR1Vm1vZkMyZTFrTDBaNUZ6?=
- =?utf-8?B?bGQ2ZnRUUUZRbG5ybFYrQzdjZk95NnhvbG93L29qQ3l4YXE1SlJPaUJMUk93?=
- =?utf-8?B?NXdwUzFqdHJvVGI1bEFxVUovRVBJc0llTHAvdDNtejlHbXFudDhBTEE1c2lL?=
- =?utf-8?B?WERTZkdNSTB3SzZGNlNEaDI5Q0V3Yi9pMkxQUkJhZG1JU1g4eTBuTytqNmR2?=
- =?utf-8?B?MTNXTlpXM3ZkdEJabGZVNXBQK0VBTC80RVpUNjEyUE1pdHBCbythVkl3bTIr?=
- =?utf-8?B?ajI5MzVybXg5YlVTWEtJbHZwUnpRVjR4bzdoL2w3NXFQdlI1U0NWOHRxOUlp?=
- =?utf-8?B?RU5OUVVMdHoyQVIvNEY4YWRwWXE2a1NIcFdXN3NwOTJCMktkaWROakxPOVFa?=
- =?utf-8?B?Q2RiNTVHcStORS9oVWloc0lqa2NyeUttVVRIQzU3V2pZaTAyUWFWZmtrUnNJ?=
- =?utf-8?B?dXp1SWtiZEV1VHUzbWRmR001akI4TGVOMUxxWldFeXErRUdIOGtob2kvY0w5?=
- =?utf-8?B?UTZMOENmY0Y3dHc4QlV1Qm0vRG1rRzRUSkpsZld5dVRQaC9EZHl4TS9kelFL?=
- =?utf-8?B?Q0xTZFBqUG5hYnN3TU5SSEc3V2NNbmRjZzNMRnZUelB1VU12bGtZaGdKZncv?=
- =?utf-8?B?Nk5zU1NsQTNYcmlISjlhOUhVRU51WWZad1RLOTZhOVl3OWo1d0llY2dMQmov?=
- =?utf-8?B?QTk3UE1RUnVNblNtMHBWTnVla0Fxd0c2amswZ29qQnY1Q1pJbUkya09wb1Rn?=
- =?utf-8?B?OEw2QWdWNWdLMTRJdEp4UytzRzhIdjNwWndUR2tVb1B1MmdscjZGbmdsMGFG?=
- =?utf-8?B?b3ZJNHNsVXdJQVhBeTNtRGpYZWlpOHFNNFRLN2l4R3I2WTE5SGNNYit0RzRL?=
- =?utf-8?B?SkViNEc5bmtKYXlvMitsOVJnd01ycmdaZWFVeEpHNDJrcGllR3BpMGp0cE9v?=
- =?utf-8?B?YkVMUThwVlZHK0pQNUVjRThWckk2eFlETzN4b0VYbzZTeVhNb1VZZ0drMGM2?=
- =?utf-8?B?UHlxMXhEVW51azJURDJZQ0VGSXZUSTIrQmNCdlVMazFaR3lSSTJZUC9ndmZ1?=
- =?utf-8?B?TnJhdjR2cUtIUmRkaW5rSWtZa3NsYlRhM0pZc21WYVZJeWJnZmZ2QzM2ZUdC?=
- =?utf-8?B?U0FoRWZzeU5tQUxOcnV2anU4dWRGa3pVL1lUNzM0WUdtdUcxRWhXTFZVVEkr?=
- =?utf-8?B?WkNieHR5ZHFaNWFYSHdrTHg1dE1paUFvbzZ3aVZqKzUyVGs4cUNiQzFKTWZH?=
- =?utf-8?B?V0ZScWxERnYvNlB4ZjNhaHhMYXpMQlZlYUwzZjZSdGhhNGJnbmJNVS9nWEF3?=
- =?utf-8?B?ZUZLMjlHeFQ2TTFPa1hYUVZpN1U5eUZONlVDY0tSSEpxWUZTbUtkTlJqdDJL?=
- =?utf-8?B?MnpVSjQ1MXFFU1JWT3RuQ3JOc3JrU2hKYTRFQ1Z2d1JKMzNJcWtmV2FlTW9S?=
- =?utf-8?Q?SM2NPBplj57c0LBsZvNYCz2Xa?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c5ed7a3d-a94f-4658-cd83-08da8ffdb75c
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2022 11:48:29.3562
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GRbX6Xa36RBlaeOutU8NjhD0pUrWwQ23XHiq854LHGmYnk5wANvHImlJJOD6ZZuo
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6238
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ciBaJbb8USuW_s7Ma5Wf1EZVaXaab7i_
+X-Proofpoint-GUID: ZXLNsx56aReAS-JMXP9Of-dnqR_qCR8f
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-09-06_05,2022-09-06_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 bulkscore=0 malwarescore=0 lowpriorityscore=0
+ impostorscore=0 mlxscore=0 spamscore=0 phishscore=0 clxscore=1011
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2207270000 definitions=main-2209060055
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 06, 2022 at 12:38:44PM +0200, Christian König wrote:
-> Am 06.09.22 um 11:51 schrieb Christoph Hellwig:
-> > > +{
-> > > +	struct vfio_pci_dma_buf *priv = dmabuf->priv;
-> > > +	int rc;
-> > > +
-> > > +	rc = pci_p2pdma_distance_many(priv->vdev->pdev, &attachment->dev, 1,
-> > > +				      true);
-> > This should just use pci_p2pdma_distance.
-
-OK
-
-> > > +	/*
-> > > +	 * Since the memory being mapped is a device memory it could never be in
-> > > +	 * CPU caches.
-> > > +	 */
-> > DMA_ATTR_SKIP_CPU_SYNC doesn't even apply to dma_map_resource, not sure
-> > where this wisdom comes from.
-
-Habana driver
-
-> > > +	dma_addr = dma_map_resource(
-> > > +		attachment->dev,
-> > > +		pci_resource_start(priv->vdev->pdev, priv->index) +
-> > > +			priv->offset,
-> > > +		priv->dmabuf->size, dir, DMA_ATTR_SKIP_CPU_SYNC);
-> > This is not how P2P addresses are mapped.  You need to use
-> > dma_map_sgtable and have the proper pgmap for it.
+On Fri, 2022-09-02 at 09:55 +0200, Pierre Morel wrote:
+> The guest can use the STSI instruction to get a buffer filled
+> with the CPU topology description.
 > 
-> The problem is once more that this is MMIO space, in other words register
-> BARs which needs to be exported/imported.
+> Let us implement the STSI instruction for the basis CPU topology
+> level, level 2.
 > 
-> Adding struct pages for it generally sounds like the wrong approach here.
-> You can't even access this with the CPU or would trigger potentially
-> unwanted hardware actions.
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  hw/s390x/cpu-topology.c         |   4 ++
+>  include/hw/s390x/cpu-topology.h |   5 ++
+>  target/s390x/cpu.h              |  49 +++++++++++++++
+>  target/s390x/cpu_topology.c     | 108 ++++++++++++++++++++++++++++++++
+>  target/s390x/kvm/kvm.c          |   6 +-
+>  target/s390x/meson.build        |   1 +
+>  6 files changed, 172 insertions(+), 1 deletion(-)
+>  create mode 100644 target/s390x/cpu_topology.c
+> 
+> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+> index a6ca006ec5..e2fd5c7e44 100644
+> --- a/hw/s390x/cpu-topology.c
+> +++ b/hw/s390x/cpu-topology.c
+> @@ -76,9 +76,11 @@ void s390_topology_new_cpu(int core_id)
+>       * in the CPU container allows to represent up to the maximal number of
+>       * CPU inside several CPU containers inside the socket container.
+>       */
+> +    qemu_mutex_lock(&topo->topo_mutex);
 
-Right, this whole thing is the "standard" that dmabuf has adopted
-instead of the struct pages. Once the AMD GPU driver started doing
-this some time ago other drivers followed.
+You could use a reader writer lock for this, if qemu has that (I didn't
+find any tho).
 
-Now we have struct pages, almost, but I'm not sure if their limits are
-compatible with VFIO? This has to work for small bars as well.
+>      topo->socket[socket_id].active_count++;
+>      topo->tle[socket_id].active_count++;
+>      set_bit(bit, &topo->tle[socket_id].mask[origin]);
+> +    qemu_mutex_unlock(&topo->topo_mutex);
+>  }
+>  
+>  /**
+> @@ -104,6 +106,8 @@ static void s390_topology_realize(DeviceState *dev, Error **errp)
+>      n = topo->sockets;
+>      topo->socket = g_malloc0(n * sizeof(S390TopoContainer));
+>      topo->tle = g_malloc0(topo->tles * sizeof(S390TopoTLE));
+> +
+> +    qemu_mutex_init(&topo->topo_mutex);
+>  }
+>  
+>  /**
+> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
+> index 6911f975f4..0b7f3d10b2 100644
+> --- a/include/hw/s390x/cpu-topology.h
+> +++ b/include/hw/s390x/cpu-topology.h
+> @@ -10,6 +10,10 @@
+>  #ifndef HW_S390X_CPU_TOPOLOGY_H
+>  #define HW_S390X_CPU_TOPOLOGY_H
+>  
+> +#define S390_TOPOLOGY_CPU_TYPE    0x03
 
-Jason
+IMO you should add the name of cpu type 0x03 to the name of the
+constant, even if there is only one right now.
+You did the same for the polarity after all.
+
+> +
+> +#define S390_TOPOLOGY_POLARITY_H  0x00
+> +
+>  typedef struct S390TopoContainer {
+>      int active_count;
+>  } S390TopoContainer;
+> @@ -30,6 +34,7 @@ struct S390Topology {
+>      int tles;
+>      S390TopoContainer *socket;
+>      S390TopoTLE *tle;
+> +    QemuMutex topo_mutex;
+>  };
+>  typedef struct S390Topology S390Topology;
+>  
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index 7d6d01325b..c61fe9b563 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -565,6 +565,53 @@ typedef union SysIB {
+>  } SysIB;
+>  QEMU_BUILD_BUG_ON(sizeof(SysIB) != 4096);
+>  
+> +/* CPU type Topology List Entry */
+> +typedef struct SysIBTl_cpu {
+> +        uint8_t nl;
+> +        uint8_t reserved0[3];
+> +        uint8_t reserved1:5;
+> +        uint8_t dedicated:1;
+> +        uint8_t polarity:2;
+> +        uint8_t type;
+> +        uint16_t origin;
+> +        uint64_t mask;
+> +} SysIBTl_cpu;
+> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_cpu) != 16);
+> +
+> +/* Container type Topology List Entry */
+> +typedef struct SysIBTl_container {
+> +        uint8_t nl;
+> +        uint8_t reserved[6];
+> +        uint8_t id;
+> +} QEMU_PACKED SysIBTl_container;
+> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_container) != 8);
+> +
+> +/* Generic Topology List Entry */
+> +typedef union SysIBTl_entry {
+> +        uint8_t nl;
+> +        SysIBTl_container container;
+> +        SysIBTl_cpu cpu;
+> +} SysIBTl_entry;
+
+This isn't used for anything but the declaration in SysIB_151x, is it?
+> +
+> +#define TOPOLOGY_NR_MAG  6
+> +#define TOPOLOGY_NR_MAG6 0
+> +#define TOPOLOGY_NR_MAG5 1
+> +#define TOPOLOGY_NR_MAG4 2
+> +#define TOPOLOGY_NR_MAG3 3
+> +#define TOPOLOGY_NR_MAG2 4
+> +#define TOPOLOGY_NR_MAG1 5
+> +/* Configuration topology */
+> +typedef struct SysIB_151x {
+> +    uint8_t  reserved0[2];
+> +    uint16_t length;
+> +    uint8_t  mag[TOPOLOGY_NR_MAG];
+> +    uint8_t  reserved1;
+> +    uint8_t  mnest;
+> +    uint32_t reserved2;
+> +    SysIBTl_entry tle[0];
+
+I would just use uint64_t[0] as type or uint64_t[] whichever is qemu
+style.
+
+> +} SysIB_151x;
+> +QEMU_BUILD_BUG_ON(sizeof(SysIB_151x) != 16);
+> +
+>  /* MMU defines */
+>  #define ASCE_ORIGIN           (~0xfffULL) /* segment table origin             */
+>  #define ASCE_SUBSPACE         0x200       /* subspace group control           */
+> @@ -843,4 +890,6 @@ S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
+>  
+>  #include "exec/cpu-all.h"
+>  
+> +void insert_stsi_15_1_x(S390CPU *cpu, int sel2, __u64 addr, uint8_t ar);
+> +
+>  #endif
+> diff --git a/target/s390x/cpu_topology.c b/target/s390x/cpu_topology.c
+> new file mode 100644
+> index 0000000000..56865dafc6
+> --- /dev/null
+> +++ b/target/s390x/cpu_topology.c
+> @@ -0,0 +1,108 @@
+> +/*
+> + * QEMU S390x CPU Topology
+> + *
+> + * Copyright IBM Corp. 2022
+> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "cpu.h"
+> +#include "hw/s390x/pv.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/s390x/cpu-topology.h"
+> +#include "hw/s390x/sclp.h"
+> +
+> +static char *fill_container(char *p, int level, int id)
+> +{
+> +    SysIBTl_container *tle = (SysIBTl_container *)p;
+> +
+> +    tle->nl = level;
+> +    tle->id = id;
+> +    return p + sizeof(*tle);
+> +}
+> +
+> +static char *fill_tle_cpu(char *p, uint64_t mask, int origin)
+> +{
+> +    SysIBTl_cpu *tle = (SysIBTl_cpu *)p;
+> +
+> +    tle->nl = 0;
+> +    tle->dedicated = 1;
+> +    tle->polarity = S390_TOPOLOGY_POLARITY_H;
+> +    tle->type = S390_TOPOLOGY_CPU_TYPE;
+> +    tle->origin = origin * 64;
+> +    tle->mask = be64_to_cpu(mask);
+
+You convert endianess for mask here...
+
+> +    return p + sizeof(*tle);
+> +}
+> +
+> +static char *s390_top_set_level2(S390Topology *topo, char *p)
+> +{
+> +    int i, origin;
+> +
+> +    for (i = 0; i < topo->sockets; i++) {
+> +        if (!topo->socket[i].active_count) {
+> +            continue;
+> +        }
+> +        p = fill_container(p, 1, i);
+> +        for (origin = 0; origin < S390_TOPOLOGY_MAX_ORIGIN; origin++) {
+> +            uint64_t mask = 0L;
+> +
+> +            mask = be64_to_cpu(topo->tle[i].mask[origin]);
+
+...and here. So one has to go, I guess this one.
+Also using cpu_to_be64 seems more intuitive to me.
+
+> +            if (mask) {
+> +                p = fill_tle_cpu(p, mask, origin);
+> +            }
+> +        }
+> +    }
+> +    return p;
+> +}
+> +
+> +static int setup_stsi(SysIB_151x *sysib, int level)
+> +{
+> +    S390Topology *topo = s390_get_topology();
+> +    char *p = (char *)sysib->tle;
+> +
+> +    qemu_mutex_lock(&topo->topo_mutex);
+> +
+> +    sysib->mnest = level;
+> +    switch (level) {
+> +    case 2:
+> +        sysib->mag[TOPOLOGY_NR_MAG2] = topo->sockets;
+> +        sysib->mag[TOPOLOGY_NR_MAG1] = topo->cores;
+> +        p = s390_top_set_level2(topo, p);
+> +        break;
+> +    }
+> +
+> +    qemu_mutex_unlock(&topo->topo_mutex);
+> +
+> +    return p - (char *)sysib->tle;
+> +}
+> +
+> +#define S390_TOPOLOGY_MAX_MNEST 2
+> +void insert_stsi_15_1_x(S390CPU *cpu, int sel2, __u64 addr, uint8_t ar)
+> +{
+> +    SysIB_151x *sysib;
+> +    int len = sizeof(*sysib);
+> +
+> +    if (s390_is_pv() || sel2 < 2 || sel2 > S390_TOPOLOGY_MAX_MNEST) {
+> +        setcc(cpu, 3);
+> +        return;
+> +    }
+> +
+> +    sysib = g_malloc0(TARGET_PAGE_SIZE);
+
+What made you decide against stack allocating this?
+
+> +
+> +    len += setup_stsi(sysib, sel2);
+> +    if (len > TARGET_PAGE_SIZE) {
+
+If you do the check here it's too late.
+
+> +        setcc(cpu, 3);
+> +        goto out_free;
+> +    }
+> +
+> +    sysib->length = be16_to_cpu(len);
+> +    s390_cpu_virt_mem_write(cpu, addr, ar, sysib, len);
+
+If the return value of this is <0 it's an error condition.
+If you ignore the value we'll keep running.
+
+> +    setcc(cpu, 0);
+
+Is it correct to set the cc value even if s390_cpu_virt_mem_write
+causes an exception?
+> +
+> +out_free:
+> +    g_free(sysib);
+> +}
+> +
+> diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
+> index 6a8dbadf7e..f96630440b 100644
+> --- a/target/s390x/kvm/kvm.c
+> +++ b/target/s390x/kvm/kvm.c
+> @@ -51,6 +51,7 @@
+>  #include "hw/s390x/s390-virtio-ccw.h"
+>  #include "hw/s390x/s390-virtio-hcall.h"
+>  #include "hw/s390x/pv.h"
+> +#include "hw/s390x/cpu-topology.h"
+>  
+>  #ifndef DEBUG_KVM
+>  #define DEBUG_KVM  0
+> @@ -1917,9 +1918,12 @@ static int handle_stsi(S390CPU *cpu)
+>          if (run->s390_stsi.sel1 != 2 || run->s390_stsi.sel2 != 2) {
+>              return 0;
+>          }
+> -        /* Only sysib 3.2.2 needs post-handling for now. */
+>          insert_stsi_3_2_2(cpu, run->s390_stsi.addr, run->s390_stsi.ar);
+>          return 0;
+> +    case 15:
+> +        insert_stsi_15_1_x(cpu, run->s390_stsi.sel2, run->s390_stsi.addr,
+> +                           run->s390_stsi.ar);
+> +        return 0;
+>      default:
+>          return 0;
+>      }
+> diff --git a/target/s390x/meson.build b/target/s390x/meson.build
+> index 84c1402a6a..890ccfa789 100644
+> --- a/target/s390x/meson.build
+> +++ b/target/s390x/meson.build
+> @@ -29,6 +29,7 @@ s390x_softmmu_ss.add(files(
+>    'sigp.c',
+>    'cpu-sysemu.c',
+>    'cpu_models_sysemu.c',
+> +  'cpu_topology.c',
+>  ))
+>  
+>  s390x_user_ss = ss.source_set()
+
