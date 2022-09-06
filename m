@@ -2,160 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D97DC5AF01E
-	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 18:17:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF4CA5AF04F
+	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 18:24:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238555AbiIFQQw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Sep 2022 12:16:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34542 "EHLO
+        id S234098AbiIFQY0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Sep 2022 12:24:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235624AbiIFQQX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Sep 2022 12:16:23 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E1EDB488;
-        Tue,  6 Sep 2022 08:44:32 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A59B5B818C2;
-        Tue,  6 Sep 2022 15:44:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0043C433C1;
-        Tue,  6 Sep 2022 15:44:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662479069;
-        bh=qFOk6Wp6NGa1Ej+qcHbPtJExBc58ed/Pmqdo5YRCPig=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=eiXfYf3T/gGNUT6915A9D2Q7+AAUG7dPXv1inXwV2KRquc0Vpy4fQCmWfAWv6UIZy
-         ul38C7L5QFDgOxcWixx9aHE1JYPngBP/l4hUN0nYK5LFncG4J7ZntKF5Q4nMN0bfvR
-         4T7yMDDVsh3onuYzC7zOwFIO2zOXeCkWo6afLSpKltK625RM14d5F5UJREXOnMEo/S
-         6gn768eCIJpQYeZJwrnIeha0S7hBYdm+NA5O2cVozNlrW4ugs06hKXsXLyu6VFwu3p
-         b63o4MrKg0ZvzPEarvd5tTxFX1h/U36VOonPRQqiasczJtjjmLCqlt2XK4Dx5h90Aw
-         7zcaaSu+b5NiA==
-Date:   Tue, 6 Sep 2022 18:44:23 +0300
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-Cc:     Marc Orr <marcorr@google.com>, Borislav Petkov <bp@alien8.de>,
-        x86 <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Alper Gun <alpergun@google.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
- fault for user address
-Message-ID: <Yxdq1yQw9f54aw4+@kernel.org>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
- <YvKRjxgipxLSNCLe@zn.tnic>
- <YxcgAk7AHWZVnSCJ@kernel.org>
- <CAA03e5FgiLoixmqpKtfNOXM_0P5Y7LQzr3_oQe+2Z=GJ6kw32g@mail.gmail.com>
- <SN6PR12MB2767ABA4CEFE4591F87968AD8E7E9@SN6PR12MB2767.namprd12.prod.outlook.com>
+        with ESMTP id S233857AbiIFQXc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Sep 2022 12:23:32 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 177D980E82
+        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 08:52:50 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id x1-20020a17090ab00100b001fda21bbc90so15402229pjq.3
+        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 08:52:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=+OcePk/Bv09ExjAP7BHAcxsu7OpjeROhvqTIml1fT1Q=;
+        b=DjcbpAh8RRFnKssWVF75sciVELyuzsZgECOFtvs17ZeuEbCl4DZ0FmZA/pp48+iYgR
+         wyA23ZUkj6bzoi7UcH+ssP3okgktA20bZZ6RZ/TvIvr0qn+SwSJbRkLXXyrmidOHHB6E
+         /h4tBE35eWUWVYDuLmQloK5k8P84GCdb+Z2oO64toEY1qMx7TP/R6xqR8lz01mKV9VCJ
+         cc9RGA9HYRCSnegXVXBRmidy6X5bFMxE1emdqrs8unnmPF5hamPMVA3tC9qLr5FQ1uJl
+         VKfTACwnJ0VfI1m05ai9IucgBPIzYDPwrVCFSsakQ/2nTfdpmNxrrSQ0482EJmgL6TME
+         mYgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=+OcePk/Bv09ExjAP7BHAcxsu7OpjeROhvqTIml1fT1Q=;
+        b=bzeUi/4YKrKWig4zSSEkVQwV72YBN0EnIy3OYtr2JwgCAPlpiar1mu2SMZxGrHscJy
+         KQRa/3hakvHVcvb8VbfDqxGqYYAn3/Yf7R/qU5EqpLf1pjUqirivwyUvNuHyJMUSbCVK
+         EUTtaQAsnqJuKlSGbUhICfhSPmPBsKt+ELJAzqCtBRIwxaJ8bVZo54F+9X+Xm66HpVAm
+         PxSlvYD2P3FmWdsnJaEXqcHo0iAoR/e7BuYkPvcCxXs9noWQQYfPvHZb3Mxub+ADGqYx
+         UM+Zmfi5/K2L5Icg+U8rMhNUNWjQtJvr34Qs8HKR9aM3xvlQIfUejTYln5Jurl+gq6+j
+         FdYw==
+X-Gm-Message-State: ACgBeo338iAcXmuRK3jNw3ifCt2+jRmV6fIIIcg/rpFl7hpW48cQBSf9
+        0LWn++kTUR88b8SyXLblL4aVmw==
+X-Google-Smtp-Source: AA6agR5fECWXXnuZZ7taMZF75MjeXn8RkjNbQlCotJv1KPuOGQJYHNa8bx4D8cdRVQ1z792IfFnc4w==
+X-Received: by 2002:a17:90a:940d:b0:1fe:39c5:4ce1 with SMTP id r13-20020a17090a940d00b001fe39c54ce1mr26182503pjo.74.1662479569463;
+        Tue, 06 Sep 2022 08:52:49 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id v28-20020aa799dc000000b00536531536adsm10430038pfi.47.2022.09.06.08.52.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Sep 2022 08:52:48 -0700 (PDT)
+Date:   Tue, 6 Sep 2022 15:52:45 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     bugzilla-daemon@kernel.org
+Cc:     kvm@vger.kernel.org
+Subject: Re: [Bug 216388] On Host, kernel errors in KVM, on guests, it shows
+ CPU stalls
+Message-ID: <YxdszchEjprmJVwX@google.com>
+References: <bug-216388-28872@https.bugzilla.kernel.org/>
+ <bug-216388-28872-i1w5cFfw4N@https.bugzilla.kernel.org/>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SN6PR12MB2767ABA4CEFE4591F87968AD8E7E9@SN6PR12MB2767.namprd12.prod.outlook.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <bug-216388-28872-i1w5cFfw4N@https.bugzilla.kernel.org/>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 06, 2022 at 02:17:15PM +0000, Kalra, Ashish wrote:
-> [AMD Official Use Only - General]
+On Sat, Sep 03, 2022, bugzilla-daemon@kernel.org wrote:
+> https://bugzilla.kernel.org/show_bug.cgi?id=216388
 > 
-> >> On Tue, Aug 09, 2022 at 06:55:43PM +0200, Borislav Petkov wrote:
-> >> > On Mon, Jun 20, 2022 at 11:03:43PM +0000, Ashish Kalra wrote:
-> >> > > +   pfn = pte_pfn(*pte);
-> >> > > +
-> >> > > +   /* If its large page then calculte the fault pfn */
-> >> > > +   if (level > PG_LEVEL_4K) {
-> >> > > +           unsigned long mask;
-> >> > > +
-> >> > > +           mask = pages_per_hpage(level) - pages_per_hpage(level - 1);
-> >> > > +           pfn |= (address >> PAGE_SHIFT) & mask;
-> >> >
-> >> > Oh boy, this is unnecessarily complicated. Isn't this
-> >> >
-> >> >       pfn |= pud_index(address);
-> >> >
-> >> > or
-> >> >       pfn |= pmd_index(address);
-> >>
-> >> I played with this a bit and ended up with
-> >>
-> >>         pfn = pte_pfn(*pte) | PFN_DOWN(address & page_level_mask(level 
-> >> - 1));
-> >>
-> >> Unless I got something terribly wrong, this should do the same (see 
-> >> the attached patch) as the existing calculations.
-> 
-> >Actually, I don't think they're the same. I think Jarkko's version is correct. Specifically:
-> >- For level = PG_LEVEL_2M they're the same.
-> >- For level = PG_LEVEL_1G:
-> >The current code calculates a garbage mask:
-> >mask = pages_per_hpage(level) - pages_per_hpage(level - 1); translates to:
-> >>> hex(262144 - 512)
-> >'0x3fe00'
-> 
-> No actually this is not a garbage mask, as I explained in earlier responses we need to capture the address bits 
-> to get to the correct 4K index into the RMP table.
-> Therefore, for level = PG_LEVEL_1G:
-> mask = pages_per_hpage(level) - pages_per_hpage(level - 1) => 0x3fe00 (which is the correct mask).
-> 
-> >But I believe Jarkko's version calculates the correct mask (below), incorporating all 18 offset bits into the 1G page.
-> >>> hex(262144 -1)
-> >'0x3ffff'
-> 
-> We can get this simply by doing (page_per_hpage(level)-1), but as I mentioned above this is not what we need.
+> --- Comment #15 from Robert Dinse (nanook@eskimo.com) ---
+> Please forgive my lack of knowledge regarding git, but is there a way to get a
+> patch that took the kernel from 5.18.19 to 5.19.0 now that earlier releases of
+> 5.19.x are not on the kernel.org site?
 
-I think you're correct, so I'll retry:
+Strictly speaking, no.  Stable branches, i.e. v5.18.x in this case, are effectively
+forks.  After v5.18.0, everything that goes into v5.18.y is a unique commit, even
+if bug fixes are based on an upstream (master branch) commit.
 
-(address / PAGE_SIZE) & (pages_per_hpage(level) - pages_per_hpage(level - 1)) =
+Visually, it's something like this.
 
-(address / PAGE_SIZE) & ((page_level_size(level) / PAGE_SIZE) - (page_level_size(level - 1) / PAGE_SIZE)) =
+v5.18.0 --> v5.18.1 --> v5.18.2 --> v5.18.y
+\
+ -> ... -> v5.19.0 -> v5.19.1
+           \
+            -> ... -> v5.20
 
-[ factor out 1 / PAGE_SIZE ]
 
-(address & (page_level_size(level) - page_level_size(level - 1))) / PAGE_SIZE  =
+IIUC, in this situation v5.18.0 isn't stable enough to test on its own, but the
+v5.18.19 candidate is fully healthy.  In that case, if you wanted to bisect between
+v5.18.0 and v5.19.0 to figure out what broke in v5.19, the least awful approach
+would be to first find what commit(s) between v5.18.0 and v5.18.19 fixed the unrelated
+instability in v5.18.0, and then manually apply that commit(s) at every stage when
+bisecting between v5.18.0 and v5.19.0 to identify the buggy commit that introduced
+the CPU/RCU stalls.
 
-[ Substitute with PFN_DOWN() ] 
+> I know there is a patch that goes from 5.18.19 to 5.19.6
 
-PFN_DOWN(address & (page_level_size(level) - page_level_size(level - 1)))
+I assume you mean v5.18.19 => v5.18.20?
 
-So you can just:
+> and one that goes 5.19.5 to 5.19.6 but I just want to look at the changes
+> between 5.18.19 and 5.19.0.
 
-pfn = pte_pfn(*pte) | PFN_DOWN(address & (page_level_size(level) - page_level_size(level - 1)));
+If you just want to look at the changes, you can always do
 
-Which is IMHO way better still what it is now because no branching
-and no ad-hoc helpers (the current is essentially just page_level_size
-wrapper).
+	git diff <commit A>..<commit B>
 
-BR, Jarkko
+e.g.
+
+	git diff v5.18.18..v5.19
+
+but that's going to show _all_ changes in a single diff, i.e. pinpointing exactly
+what change broke/fixed something is extremely difficult.
