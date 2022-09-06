@@ -2,219 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF03F5AE079
-	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 09:03:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FE685AE091
+	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 09:09:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238757AbiIFHDP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Sep 2022 03:03:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38432 "EHLO
+        id S233444AbiIFHJS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Sep 2022 03:09:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238751AbiIFHDO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Sep 2022 03:03:14 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2076.outbound.protection.outlook.com [40.107.223.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53A166F268;
-        Tue,  6 Sep 2022 00:03:09 -0700 (PDT)
+        with ESMTP id S232675AbiIFHJP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Sep 2022 03:09:15 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2075.outbound.protection.outlook.com [40.107.94.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0297565663;
+        Tue,  6 Sep 2022 00:09:14 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Hnd+jUjNST8mQM3WTkjR5nCj1y7IQ5pIo1G6TJp47ORhn8F0Llc6pD8HnCviUNhhHdP/jeWcXGcnRY8bMi40sCYHGRmIm5+xOP8jgrvK87a6HXarGYfdTl6BbQClRgLmaEvP+upFDFRVqtfUy5TSNDJBrd09V52g3VCPLYmK/rYxk1y3kKh+LRaWN85uNh8Qq8NZs3qy6Ri9znUsA/jDp96x7RhFQn3fVAxAUeSIXWaWJbiO3AlqXWcVYkui0IsCawA/SaCWpVtGFLdL2PczOQ4LiMy0Qdtq4T55/FbdM1D1LgPn0tqRycd7w3yxoEFRFON4jyZeMiphh6/ShQu+Wg==
+ b=dY1wPXHnrMEnxZciiGfS4XSgRUh/IXWahcmOFtN/+OdybMsqd+W9x/lxWaIUsqZoTHsH4rsItI3kf/WVJyG9N4L1/3650PE0b5ekY7q7/TkyYk1kaFTRV71pcqZg0cYrsNOH50wqJfo+3oaq1+hLEdabZ+g0ZXt8ot9tZR/4nLnlzrX7nNcByzU06t59VYkKLaeR5Ca7notRErd3djgctnEd0RhZjM82yjSahbJ+wXD8lh6GP3XvVrWWQZ0NK6ie5ynRxZ4jtoffE5znaOCBXc1E5adrXc9H20HBkP+h+M2P4AsoPbXJZVz0STnp89ZuoKucMcF56QktfLboXeanuA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uQV5kGZj8QJZ0e/+gKJHnT0JsiVa7ikPTapm0OXVQBs=;
- b=XBbz6oIJis0ISWnvcSJODYgLeCystyhf08L4lNc6gyxJ1oODkL1hcOEruEWnFc5l1nCzHd7QgmwssvaINKxSJCoQ2RBxuDrurMsSbSWQ20kv/zYPpDpGvvJ91KYMsfe9aWZogQRc92GZdLaamnugdoy/EnwA4cCjmaBJeUT1lOdAdJjPjdzp1l68DIF8GQgFZZe+CVhP9P80P8Tt2sP9ZiptdglklJfu9HgGbndNV7/yoTiTAZ2h2u2UN980qyzq2GcDiXHEZ9UobUbp68zLEiH2L0wgsNdlbau8LOmD58XwWiUHJ6tnte297a7MmPsZqNphOn+4Zf0h7YBBOpu38A==
+ bh=tVqjBGkFgXrs31AA2OHw7MU01gBpvRs6t5y6CM6f2Tg=;
+ b=lOjDBVufiEWaMCHFThqVBpo69/Ca31qNmAVV5ydA1N/za1AnL70f597eaeTUBLXh7c5GOQ8Cx1iP3NgeHOT/gpLn9pkmeyCzmcVRxIDxq3GRLtBeaYyTT+bQZt4vVfZGcjnMHn5XMX5nisIerqCYxNqztaQBm686q3OA1EwFNuEh4Uo0fxQoJN1wvBrLQcVSnIaEJZLsd+aYS94sZ8qLcjGPPwAKg/8L83hf9DmRz+kTHdVJEaVbrIdJxk9/TIuA21lA8Db30Mp7jWNW0m40fbeWAT4dB4iZbyzWe270UXcfEKsTJfKpSGMP7n8rD821EzIvoB4/5Vw7pE3xM0srww==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
+ dkim=pass header.d=vmware.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uQV5kGZj8QJZ0e/+gKJHnT0JsiVa7ikPTapm0OXVQBs=;
- b=41UFS8b3PqI54tGuC1eChxZ2qfl2L2oyAoemrBhF9qaxNVMYdCQOvfi4fM79yurg8EPTX8OVGwkDs7da+vLXu+v9qr+QBTe9kex5e9SGqX+Ad+Ew5dvgxhOZ8wonQSm+nsavrA8+XDAINHBLJHk3vDOCr6bZ/u7j9DIkvR437RA=
-Received: from DM6PR12MB3082.namprd12.prod.outlook.com (2603:10b6:5:11b::12)
- by DM4PR12MB5357.namprd12.prod.outlook.com (2603:10b6:5:39b::24) with
+ bh=tVqjBGkFgXrs31AA2OHw7MU01gBpvRs6t5y6CM6f2Tg=;
+ b=zn+MsRJlDS55rB9koppwTf9JIKLqRyfwc9/3fsa+EyQq1LsG/Ej88qKLWxqlQ9HMBg9TQdzHm5bHYB8dNb5HZ77UVn+5BWw2vEp6rM6MeB/yDVsMEcgd9VZRx+u8GRb4FhMwPCoBW+1jbfjxu8akK3rfxsEI3r68Bek3vxInxPI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vmware.com;
+Received: from PH0PR05MB8703.namprd05.prod.outlook.com (2603:10b6:510:bd::5)
+ by DM6PR05MB4970.namprd05.prod.outlook.com (2603:10b6:5:31::16) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.10; Tue, 6 Sep
- 2022 07:03:07 +0000
-Received: from DM6PR12MB3082.namprd12.prod.outlook.com
- ([fe80::4c82:abe6:13a6:ac74]) by DM6PR12MB3082.namprd12.prod.outlook.com
- ([fe80::4c82:abe6:13a6:ac74%3]) with mapi id 15.20.5588.014; Tue, 6 Sep 2022
- 07:03:07 +0000
-From:   "Gupta, Nipun" <Nipun.Gupta@amd.com>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "krzysztof.kozlowski+dt@linaro.org" 
-        <krzysztof.kozlowski+dt@linaro.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "Gupta, Puneet (DCG-ENG)" <puneet.gupta@amd.com>,
-        "song.bao.hua@hisilicon.com" <song.bao.hua@hisilicon.com>,
-        "mchehab+huawei@kernel.org" <mchehab+huawei@kernel.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-        "jeffrey.l.hugo@gmail.com" <jeffrey.l.hugo@gmail.com>,
-        "saravanak@google.com" <saravanak@google.com>,
-        "Michael.Srba@seznam.cz" <Michael.Srba@seznam.cz>,
-        "mani@kernel.org" <mani@kernel.org>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "jgg@ziepe.ca" <jgg@ziepe.ca>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "okaya@kernel.org" <okaya@kernel.org>,
-        "Anand, Harpreet" <harpreet.anand@amd.com>,
-        "Agarwal, Nikhil" <nikhil.agarwal@amd.com>,
-        "Simek, Michal" <michal.simek@amd.com>,
-        "git (AMD-Xilinx)" <git@amd.com>
-Subject: RE: [RFC PATCH v2 1/6] Documentation: DT: Add entry for CDX
- controller
-Thread-Topic: [RFC PATCH v2 1/6] Documentation: DT: Add entry for CDX
- controller
-Thread-Index: AQHYskrtUUKhcm3XXUSWCYusxie1ua20bGaAgByNxZCAARx/gIAAAaFg
-Date:   Tue, 6 Sep 2022 07:03:07 +0000
-Message-ID: <DM6PR12MB3082867B1BDCBBC9C25F560EE87E9@DM6PR12MB3082.namprd12.prod.outlook.com>
-References: <20220803122655.100254-1-nipun.gupta@amd.com>
- <20220817150542.483291-1-nipun.gupta@amd.com>
- <20220817150542.483291-2-nipun.gupta@amd.com>
- <93f080cd-e586-112f-bac8-fa2a7f69efb3@linaro.org>
- <DM6PR12MB308211F26296F3B816F3F005E87F9@DM6PR12MB3082.namprd12.prod.outlook.com>
- <8712e2ff-80e1-02e9-974a-c9ffcf83ffab@linaro.org>
-In-Reply-To: <8712e2ff-80e1-02e9-974a-c9ffcf83ffab@linaro.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-09-06T07:05:11Z;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=a1f18f02-81d2-429d-b1a0-100936abca65;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: d0124825-8abd-4561-3788-08da8fd5d9ee
-x-ms-traffictypediagnostic: DM4PR12MB5357:EE_
-x-ld-processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 6CkodrXiA6GTYuEv6DaeOzjisKpYliu1rMb9nN9UYp8m1LekdMr4h8nqKiySnLtUCjqMTquCGVnrhUMxzcNKq+axCrdDGGBLDskG//5yPEs3PXsBACU8xHq7Hl4AeCMgxSjCISsPznpSPu5Qu/txwI0MQm47h0rnAEVscux81TrPKmxVTJQrPF5P8gyGxXK8OQ2wn0iC5dxKrUA29fuc8I3g7/CZURhtwoKQ9lwDLHk3y9ieo+I8j7h06Soi1tUPb0PAghO/GU3hSqpjaApfhbgzfGeeCcUQ5JD/PcaB5HmOHqN/EN41un5kVW2XO71jaVmLBaPcJ364IWwwYHLxCSHOBIU1+Lso3CGbCty7semNR7UWJZjqbNATIDNMkLE9IedTyHDWSIkFehTo6hHuHNYzd6+zhkFDNomeVPqvqcbUzBiD1GJnJ1AxVEOAsbCApRvCMO2OqFlVVMjqo6lP89GmUUfwtbH7OrVS8LBN9cyrbT+ApXFm1UG1i+Qh4YfPlDjAkrRasDkp2nROBQr/9mYQHVVRMRwVmK5s2ItlXz+0FweGMTZu/vLg4CdW+cOXl8zeBA77vwFw6rntDLw5BnKgH2yGesB+RQKlOspDWTQAKeCl8owtK5QdrY3aSeub39sp8vlh/EgOdFUymBdvqP7JCRpF/xTQErXJX9z4Jn7xrxTeIL9u3H0KyTENb/86b6juI/5KANtEZoYGslDHPIBlCts8+gfD9Ur4ti8Nf9ajWl/LGs3Lb4bzqlo3/7IuOatFBOm0+ARIkS3sjUTuRHBpdO10Q5XvPG9oRIe4SOQVZ+lPM/qQy7+TulawODrQ
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3082.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(39860400002)(366004)(396003)(136003)(376002)(38070700005)(921005)(122000001)(66946007)(64756008)(66476007)(316002)(66556008)(8676002)(4326008)(66446008)(76116006)(2906002)(54906003)(45080400002)(38100700002)(110136005)(83380400001)(55016003)(52536014)(26005)(7416002)(5660300002)(8936002)(53546011)(9686003)(186003)(966005)(41300700001)(6506007)(478600001)(7696005)(71200400001)(86362001)(33656002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?M7sk7SjtqFgAEFnHRIJ8X9L3KGANQnbK8a75WUPmNpsAtbvSuldaguGVIlVX?=
- =?us-ascii?Q?JuPnZmJknzEo8T2FjS0bCse9OwMUZ+IgmVU64567ZSkri711Ci4DoaVgYdAq?=
- =?us-ascii?Q?OGbs1YfLnAu76emcsbkp3YASGIgQho/rE9YavIGARJNnIRiEavOEp2HtlaGD?=
- =?us-ascii?Q?lpbfXbsrRebjQeu2PmWWJzvNyx8xvVLeVeYnfXK9smQoneY6fR1cujyO6KD8?=
- =?us-ascii?Q?hc/RUqauz+/Qa3/MC5BZcXMw8pV0zHddQzqsMMJDQiQGQbbc3vJ012Y6AdBu?=
- =?us-ascii?Q?U2ZAe990RdbIsE5AV/MHLtMq41Mvi1pysDKEvonNY58zkh4CmANRkr+oAcA+?=
- =?us-ascii?Q?MNHJXLxnYq4YUUJ22mpXHmryMkWbEZlQ6E77suwiqh8UZcdYNiKkpX6ZvD9k?=
- =?us-ascii?Q?yt6hlNV2k5tBXKUjtk3jG1Yfx6sRLs5S7epCpbfEmVRjByPVsgVqqo074FBH?=
- =?us-ascii?Q?xF9vnlHCj60XlPWVM2mpEvdD8dcr58qENfvMAHC4VzD3Ut+6aLHC7BJP6QgJ?=
- =?us-ascii?Q?odT1XWNOZQbMUwvyOlJj2xE1vrOb3OHJ6NKUyZHQQgfGHTqF43IwCbZDa+yB?=
- =?us-ascii?Q?3UHUEtQEYZWoUNL8AMybRswRo77oV00H+acgsY04j58rBCNWvupN1iYjlSbO?=
- =?us-ascii?Q?4l/6V/bFVFgNVVYEvC/5gcZal/mNLZeVo7VZHy741dTZQLWKQ1VUH059VAZ8?=
- =?us-ascii?Q?ANMPdjY2j4aa1B9xplyJer/H2uJiOeinNNRn0cMZxpAwufyB21GP+0yoISai?=
- =?us-ascii?Q?KW4Hi5Jkqyce0m563lP0x0Udhz114X1MQdHrVDlXXjNQk/1L4kdzaLRk9Ses?=
- =?us-ascii?Q?DB2ITUakR9OkiqF6cLtYGePuVV6uEQGIfi+f/tiK4Em3+kogzMXBUm3KOFBO?=
- =?us-ascii?Q?dAdRcwFFZjWD/sFKMa932vWCsZpVLva59Bmhnfq+na30HKVWpfs+I52sYlif?=
- =?us-ascii?Q?TrW1nrDQ5DFvloaiOsP/WvEPtfSTmUcbj/w82rbDPjWSCh/ks0SsfOgc62Hl?=
- =?us-ascii?Q?XSKzksEzFJXl9MUBQ+k1K1RSx4CnyaQk2yifcDNLO1lS8E6xNQsonhaz8JYW?=
- =?us-ascii?Q?0uo7VYMEoqv2OFDQzdbIAbQ466H2vtxFoSUpx0CLes9cpAfZdPXFmVeSJdtx?=
- =?us-ascii?Q?8U3+nksRluFjT1WC5Qnis31ZKMLyXGcZ95ZVx+Ex+MZBwyaMA3a59mGwK1wv?=
- =?us-ascii?Q?oI24frb4h1x7x75zr5ucIvAkzxDIRsBV1VK9AWokT2MHJETOrj7jThhnBHj8?=
- =?us-ascii?Q?kEPP/mh6egyOvpkEbFqFN2rPbre314/sEkGhP99YlObOdnTbPQv8RYxfwQhw?=
- =?us-ascii?Q?FDOB75+AMLJtAeYbOuth7gnC8EcFzjnNNNVrGek1BN0Xn3FRexz4J+n9nkkZ?=
- =?us-ascii?Q?Ftr0vY4ByzcphjVNcfvkBlrv4fJBxQ9N2xKpO9PY7BsiT4l5eLD2QX3/kHJM?=
- =?us-ascii?Q?ZAgFXwgslOlYU/tcuZY/DFgmNxRpTxaJvlIkbe3FOWxE2T8vgmHhQcm6hiQg?=
- =?us-ascii?Q?xIo76C3nJ/nCaiyYZCqAnHDLaGdFtpd00+B1nbx12MqO8v+8SDoVUMH3rMZQ?=
- =?us-ascii?Q?+/5rT78jQNw72BgHMg8=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5612.5; Tue, 6 Sep
+ 2022 07:09:11 +0000
+Received: from PH0PR05MB8703.namprd05.prod.outlook.com
+ ([fe80::95af:33a4:b350:c335]) by PH0PR05MB8703.namprd05.prod.outlook.com
+ ([fe80::95af:33a4:b350:c335%8]) with mapi id 15.20.5612.012; Tue, 6 Sep 2022
+ 07:09:11 +0000
+From:   Ajay Kaher <akaher@vmware.com>
+To:     helgaas@kernel.org, bhelgaas@google.com, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com
+Cc:     x86@kernel.org, hpa@zytor.com, linux-pci@vger.kernel.org,
+        linux-kernel@vger.kernel.org, rostedt@goodmis.org,
+        srivatsab@vmware.com, srivatsa@csail.mit.edu, amakhalov@vmware.com,
+        vsirnapalli@vmware.com, er.ajay.kaher@gmail.com,
+        willy@infradead.org, namit@vmware.com,
+        linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
+        jailhouse-dev@googlegroups.com, xen-devel@lists.xenproject.org,
+        acrn-dev@lists.projectacrn.org
+Subject: [PATCH v2] x86/PCI: Prefer MMIO over PIO on VMware hypervisor
+Date:   Tue,  6 Sep 2022 12:38:37 +0530
+Message-Id: <1662448117-10807-1-git-send-email-akaher@vmware.com>
+X-Mailer: git-send-email 2.7.4
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BYAPR05CA0061.namprd05.prod.outlook.com
+ (2603:10b6:a03:74::38) To PH0PR05MB8703.namprd05.prod.outlook.com
+ (2603:10b6:510:bd::5)
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3082.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d0124825-8abd-4561-3788-08da8fd5d9ee
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Sep 2022 07:03:07.2795
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: KX/gC0KlGUc/51IaGaoZ8zTrvQ4qwXT18J8Q87ChD7WsxW2Fhm9O4VVQqE6ByReV
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5357
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR05MB8703:EE_|DM6PR05MB4970:EE_
+X-MS-Office365-Filtering-Correlation-Id: 361688ab-6f30-4422-58aa-08da8fd6b2f1
+X-LD-Processed: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: rpEmG/ZTZD41ci8rzga319nfcfWs6F4whtCEkJI1igtHShj/5o1VLFdArTGqtjMdJUQ3j1333o5vV/Px1O0GG2Uj3zj4cq7EBbEGguwtuYnG5WIzK014XG1a0SNRRgHxy+QGhgx78DPW/4hP/rPKdkm46Fq32f/JlnYXfu9fAgz3YWw6gWVRZ1uLE9Wk41ANTglPoqfvyd1FcExNpN3JePJe4sH7NLghX6okgRdiytGbNtziY91ftsvWi29UMKDMINRi6zUmWJZpuv5MPmedTsHEu0m1L1QttboRINoi06f0XUdZXfLYw5MTbIsktHtLW33/6Y46vb4nt2jCe269qOC9cXOy4nQHmZTBL7j4jq4mYUEtRuiKN51HVsLHxts5DVJxTmG3pK/89SJKCisLEDJ6zIC/ib/p3bZ2vvQyJKUfxzcfkErOwElh4SEXu5yJ7swQ8PiEghfIm0g2kc8nFLG3skw8+p01cV3BkoKkxArc7qtWQUDYczpG+TJEs+gZXNp2TfgFvX69zGcuhV16L05T83k9fi5MHBweme39oWZYLD1PXSJ4DBHvkTEXmMrK+OPt6NjIbuCdWOty8rltMwG+zYD4+ZaCzZobICxj/++mWLqADs7AixCOHeN9sNIplsC374NGmwCnH1vmWGSVj29LORst5AuIwRxWUKbF92Q4ee4VRAjEGZOlb+Qd5wTOhuAtFMiJrTWcvOMzkK/VbE/ocOYSloUCw7SUZd4AUcgfrKYFhnkJgpTdnwMIh3oVz6eR6dz2TT9zucNl6YOmTGKhfQFshJnL4y0VEi1NzK3XWey4TwqPevATsZhAuBHb
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR05MB8703.namprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(346002)(366004)(376002)(136003)(396003)(38350700002)(38100700002)(4326008)(8676002)(66946007)(66556008)(66476007)(316002)(2906002)(7416002)(26005)(5660300002)(8936002)(6512007)(52116002)(83380400001)(2616005)(186003)(6666004)(41300700001)(6486002)(6506007)(86362001)(36756003)(478600001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cmthdHdLNFUwaVhQU08zS2ZzaUQwd3ppUUpKM3BFeVVnTDZYTzRjZGQ5NHcy?=
+ =?utf-8?B?Y0kyRWhmVkY3dTZyd1VnWVEyNkNBM3VnU1ZvZE1ZMmFTWDM5Q2l0dGs1WWk0?=
+ =?utf-8?B?UU5zWTVGMU1ianJsdldkNHk2elk0K0xHcEZEWXNrQndlZFV1cmhyeHhVcGhR?=
+ =?utf-8?B?NjRjQnh2MUhkKzRFSThZT093M0U1MUR3OVZhUkFTWmdaSTg1SmUrT3EzYWpz?=
+ =?utf-8?B?cE9oaUdJWjZtb2IrZ1h6SERzSDI2Ni9oaGVaNHBIS1RRNC9YNHAyamNSSjIw?=
+ =?utf-8?B?cHpNaXpsU25RaFJBY0lZcGFkS2JIU2xDNFdvSHpWTjJVcVJsMmZURHBNSWJU?=
+ =?utf-8?B?NjI0NVFSS0NyOGFBdWdBU1pQRTB6eDZZdG1HbzRUdjZQZWVFWExxVlBaMklB?=
+ =?utf-8?B?L3gyNDc5a1ZoczAraXc5d1E4ZDNPYkJhOG1FejNXMFBieEcrVG1zQzg3RkxZ?=
+ =?utf-8?B?VWYxNFM3QnN2QkZTZEg4WWJuUXRrUHJYdTZwYy9GM2JjL1pLNTdtcW5JaVZn?=
+ =?utf-8?B?RkRPTnQ0a1ptKzhuTDdldUhXWk9XNFdXSVpYTWpJSW8rdHBQcno5MEg0MzVX?=
+ =?utf-8?B?bzk3RTBCazl1eFpyTGl0WHFvcnFTaGVqS1pSOUFGWE1KNm9CVWY4Y1hpRVJ3?=
+ =?utf-8?B?VVoxZ1ZzaHliR0VNWW4xTGk3VHRLZnV0djVjVnJTRUUvUmJXNnVUZnpBNGQv?=
+ =?utf-8?B?bEY5QWZQNzRYc2JRdzhQUDNYY2xyVHhJQWsyb1o0QzQ2YlBma3JWUy8rZzdu?=
+ =?utf-8?B?ZGMycC9YRjZTTGsrKzVaTGVaRmIvRlNiaVl0SGVrckRoY2R5cndpVjFoZ2k1?=
+ =?utf-8?B?N3RSQmFBSEpNR2s4QnoySVNOdGFFR0VnOEFTOTB6Q01tZWF4bFRwRTZwaFdv?=
+ =?utf-8?B?Zkl1ZzRNZXZiNS8rSHFESmpZMSt1bUEzUExKUUtPRFpQUzNkaWFQaDUvQnFE?=
+ =?utf-8?B?WXNJa1ZGcndETUkzTmgxem1QUlJWMDhOb2k1R0xTNytwWmh4cXo5d0xvcW9k?=
+ =?utf-8?B?enVhVFFPcndROGliRHlOaXMzdUZiSmFyNFZ3dVptbW82dWg1Q0N6NFNXeHFx?=
+ =?utf-8?B?NHFMazJuSHR5QU8xNXUrNThURTQxV2YzcHFJMWhSN2w5TlV6RklscVVQSTBX?=
+ =?utf-8?B?bUN0aytXbjV4cnpSWDkweXhNOW02UTNMdHZSSFJxN1Z4QmFyQ3FnMFo4bU1i?=
+ =?utf-8?B?c2NVeEp5NlBJR2xlemJ0U2xtUUl1S3RUOG90VUgxck1OeGU4RVZHL2RXL3hJ?=
+ =?utf-8?B?T2duVnJOTWE0Wmt5aUNEYlhWZ1A0Sm4yL3JXdWFiYU9VVGhTUU5iQ2hORUVG?=
+ =?utf-8?B?QWNueGlEVGZsOHpwVnU1cTZQRTZET3l4Z2VaY3VKQy8vRE9Hd2gxaU1HYzIr?=
+ =?utf-8?B?OGMrNHhVOTJETkFxUkpyT2hlSEZqT1ZFeHpFTGxpb0pkSG9tWXA0cHpxcEIv?=
+ =?utf-8?B?NmFiZzVYaWYxM212L01YRFJVR1NiZVNaaTFrOUlUcjk1ZDgzRE00ZWRKazVm?=
+ =?utf-8?B?TTBHeFBqb1ArMEMzSHNOWUlHYmxPM3Z0TlRLUGxoNDNkd3BjWjc1M1NrN2U0?=
+ =?utf-8?B?VjFuK1JYQWt4ZWphSU90TWxIYmhLVGpoWTlpSlhrbWNrWjVWSWllemIzMVF0?=
+ =?utf-8?B?ZnFqcVJ6alFhWVhvVE1DUlE5TmJYWndzc3l2cW1VNVJQSVNhZXNlR3FkVW9k?=
+ =?utf-8?B?WnY2aTRjbWNiZmdVNWlvS3dMdXhndVZxYU13ZEQvc2hLSDFnWG9sZXpDTVB0?=
+ =?utf-8?B?V1FtUHBTcy9RNHRNbzBkSWlENk9CWGFoUjVYWXRWa2hzWkdCeEtnNFhKSjJ2?=
+ =?utf-8?B?VEMxT0Z3QXEySTBjZmppRTBOVlpHQjhKL2VEd3lSY2I2SmpyejRRRElOKzR4?=
+ =?utf-8?B?eHRRZWwwZG1zcHRobDhOVkNIL3dEWGtUSlZ5ZDhEQXFlRG9rY05BR2NhYjVM?=
+ =?utf-8?B?WWpQbUlsckhyb1NZRGxrVXlhTHBzYktvQTVzeWc0MG9JMUg3QzBFVW9qaTJ3?=
+ =?utf-8?B?eTVOUVZjQnI1VmJwQjZIQ1M2YVpVTVA3MW9GWnM2eW1MZ0p0dmUzSzFmZzY1?=
+ =?utf-8?B?ckdBY0FibkhWUHVydFFZVFhtTDZLZDV6emQ0SE5UZVBRVFFBSHdWRDV5ZDh0?=
+ =?utf-8?Q?3d+euH4uv/iBa1JTsHAqiuoX8?=
+X-OriginatorOrg: vmware.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR05MB4970
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[AMD Official Use Only - General]
+During boot-time there are many PCI config reads, these could be performed
+either using Port IO instructions (PIO) or memory mapped I/O (MMIO).
 
+PIO are less efficient than MMIO, they require twice as many PCI accesses
+and PIO instructions are serializing. As a result, MMIO should be preferred
+when possible over PIO.
 
+Virtual Machine test result using VMware hypervisor
+1 hundred thousand reads using raw_pci_read() took:
+PIO: 12.809 seconds
+MMIO: 8.517 seconds (~33.5% faster then PIO)
 
-> -----Original Message-----
-> From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> Sent: Tuesday, September 6, 2022 12:25 PM
-> To: Gupta, Nipun <Nipun.Gupta@amd.com>; robh+dt@kernel.org;
-> krzysztof.kozlowski+dt@linaro.org; gregkh@linuxfoundation.org;
-> rafael@kernel.org; eric.auger@redhat.com; alex.williamson@redhat.com;
-> cohuck@redhat.com; Gupta, Puneet (DCG-ENG)
-> <puneet.gupta@amd.com>; song.bao.hua@hisilicon.com;
-> mchehab+huawei@kernel.org; maz@kernel.org; f.fainelli@gmail.com;
-> jeffrey.l.hugo@gmail.com; saravanak@google.com;
-> Michael.Srba@seznam.cz; mani@kernel.org; yishaih@nvidia.com;
-> jgg@ziepe.ca; linux-kernel@vger.kernel.org; devicetree@vger.kernel.org;
-> kvm@vger.kernel.org
-> Cc: okaya@kernel.org; Anand, Harpreet <harpreet.anand@amd.com>;
-> Agarwal, Nikhil <nikhil.agarwal@amd.com>; Simek, Michal
-> <michal.simek@amd.com>; git (AMD-Xilinx) <git@amd.com>
-> Subject: Re: [RFC PATCH v2 1/6] Documentation: DT: Add entry for CDX
-> controller
->=20
-> [CAUTION: External Email]
->=20
-> On 05/09/2022 16:05, Gupta, Nipun wrote:
-> >>> +
-> >>> +    cdxbus: cdxbus@@4000000 {
-> >>
-> >> Node names should be generic, so "cdx"
-> >
-> > Would be using bus: cdxbus@4000000.
-> > Kindly correct me if this does not seem to be correct.
->=20
-> I don't understand it. I asked to change cdxbus to cdx, but you said you
-> will be using "bus" and "cdxbus"? So what exactly are you going to use?
-> And how does it match generic node name recommendation?
+Currently, when these reads are performed by a virtual machine, they all
+cause a VM-exit, and therefore each one of them induces a considerable
+overhead.
 
-I was also confused with the name suggestion as in one of the mail you
-sent out later, you mentioned:
-" Eh, too fast typing, obviously the other part of the name... node names
-should be generic, so just "bus"."
+This overhead can be further improved, by mapping MMIO region of virtual
+machine to memory area that holds the values that the “emulated hardware”
+is supposed to return. The memory region is mapped as "read-only” in the
+NPT/EPT, so reads from these regions would be treated as regular memory
+reads. Writes would still be trapped and emulated by the hypervisor.
 
-That is why needed to confirm. To me now "cdx: cdx@4000000" makes sense.
-Hope this seems correct?
+Virtual Machine test result with above changes in VMware hypervisor
+1 hundred thousand read using raw_pci_read() took:
+PIO: 12.809 seconds
+MMIO: 0.010 seconds
 
-Regards,
-Nipun
+This helps to reduce virtual machine PCI scan and initialization time by
+~65%. In our case it reduced to ~18 mSec from ~55 mSec.
 
->=20
-> https://nam11.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fdevi
-> cetree-specification.readthedocs.io%2Fen%2Flatest%2Fchapter2-
-> devicetree-basics.html%23generic-names-
-> recommendation&amp;data=3D05%7C01%7CNipun.Gupta%40amd.com%7C4a
-> e1b96c542949574f3a08da8fd4c64d%7C3dd8961fe4884e608e11a82d994e183d
-> %7C0%7C0%7C637980441269905225%7CUnknown%7CTWFpbGZsb3d8eyJWIj
-> oiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3
-> 000%7C%7C%7C&amp;sdata=3DpA0kWXNJGQw9y5zLNNXpfRMjH1i2QRM%2FK
-> YsNk0C%2FCQM%3D&amp;reserved=3D0
->=20
-> Do you see any other buses named "xxxbus"?
->=20
-> Best regards,
-> Krzysztof
+MMIO is also faster than PIO on bare-metal systems, but due to some bugs
+with legacy hardware and the smaller gains on bare-metal, it seems prudent
+not to change bare-metal behavior.
+
+Signed-off-by: Ajay Kaher <akaher@vmware.com>
+---
+v1 -> v2:
+Limit changes to apply only to VMs [Matthew W.]
+---
+ arch/x86/pci/common.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
+
+diff --git a/arch/x86/pci/common.c b/arch/x86/pci/common.c
+index ddb7986..1e5a8f7 100644
+--- a/arch/x86/pci/common.c
++++ b/arch/x86/pci/common.c
+@@ -20,6 +20,7 @@
+ #include <asm/pci_x86.h>
+ #include <asm/setup.h>
+ #include <asm/irqdomain.h>
++#include <asm/hypervisor.h>
+ 
+ unsigned int pci_probe = PCI_PROBE_BIOS | PCI_PROBE_CONF1 | PCI_PROBE_CONF2 |
+ 				PCI_PROBE_MMCONF;
+@@ -57,14 +58,58 @@ int raw_pci_write(unsigned int domain, unsigned int bus, unsigned int devfn,
+ 	return -EINVAL;
+ }
+ 
++#ifdef CONFIG_HYPERVISOR_GUEST
++static int vm_raw_pci_read(unsigned int domain, unsigned int bus, unsigned int devfn,
++						int reg, int len, u32 *val)
++{
++	if (raw_pci_ext_ops)
++		return raw_pci_ext_ops->read(domain, bus, devfn, reg, len, val);
++	if (domain == 0 && reg < 256 && raw_pci_ops)
++		return raw_pci_ops->read(domain, bus, devfn, reg, len, val);
++	return -EINVAL;
++}
++
++static int vm_raw_pci_write(unsigned int domain, unsigned int bus, unsigned int devfn,
++						int reg, int len, u32 val)
++{
++	if (raw_pci_ext_ops)
++		return raw_pci_ext_ops->write(domain, bus, devfn, reg, len, val);
++	if (domain == 0 && reg < 256 && raw_pci_ops)
++		return raw_pci_ops->write(domain, bus, devfn, reg, len, val);
++	return -EINVAL;
++}
++#endif /* CONFIG_HYPERVISOR_GUEST */
++
+ static int pci_read(struct pci_bus *bus, unsigned int devfn, int where, int size, u32 *value)
+ {
++#ifdef CONFIG_HYPERVISOR_GUEST
++	/*
++	 * MMIO is faster than PIO, but due to some bugs with legacy
++	 * hardware, it seems prudent to prefer MMIO for VMs and PIO
++	 * for bare-metal.
++	 */
++	if (!hypervisor_is_type(X86_HYPER_NATIVE))
++		return vm_raw_pci_read(pci_domain_nr(bus), bus->number,
++					 devfn, where, size, value);
++#endif /* CONFIG_HYPERVISOR_GUEST */
++
+ 	return raw_pci_read(pci_domain_nr(bus), bus->number,
+ 				 devfn, where, size, value);
+ }
+ 
+ static int pci_write(struct pci_bus *bus, unsigned int devfn, int where, int size, u32 value)
+ {
++#ifdef CONFIG_HYPERVISOR_GUEST
++	/*
++	 * MMIO is faster than PIO, but due to some bugs with legacy
++	 * hardware, it seems prudent to prefer MMIO for VMs and PIO
++	 * for bare-metal.
++	 */
++	if (!hypervisor_is_type(X86_HYPER_NATIVE))
++		return vm_raw_pci_write(pci_domain_nr(bus), bus->number,
++					  devfn, where, size, value);
++#endif /* CONFIG_HYPERVISOR_GUEST */
++
+ 	return raw_pci_write(pci_domain_nr(bus), bus->number,
+ 				  devfn, where, size, value);
+ }
+-- 
+2.7.4
+
