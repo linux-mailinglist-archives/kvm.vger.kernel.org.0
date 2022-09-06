@@ -2,89 +2,246 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0680B5AE4CD
-	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 11:51:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A69D5AE4EB
+	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 12:00:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233147AbiIFJvj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Sep 2022 05:51:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48052 "EHLO
+        id S239411AbiIFKAc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Sep 2022 06:00:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239192AbiIFJvc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Sep 2022 05:51:32 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17856DFAD;
-        Tue,  6 Sep 2022 02:51:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=8/NrZAK5q7MnGYfTuWbWU8dghg9PZc1WBiUJ2nOuaC4=; b=IAyCiQiRvm+ndIADZzUDg2ER2+
-        8Kz7YGsP3iYQq/EykkXdB+9anNfClC1OCd4udP7exSyBmsfShITgu4AW/cekmSy00tpbcV6w4Z3ZZ
-        CTMbiYiO7uLS00CKzrENWw+PQGegQwk90oJdjBXZmHwsjYekKt9L6qB7xjRqB8yDzIrx9UJL2ta09
-        9Cz4KilqnGfnvm3x2ffIqJ9TDiR0OTwKzgUuzbHyespz4Z5GO5DTrsxW6DHKFoR9/VyJfyCj3vTwx
-        ++lwBFxBrxfqK99GFdt/TfVWWYD9+Lw5yNmEk+PUrQtcDxl8AOZh3hu+Djvhp+LkaWj2Ifs4NGa/j
-        bvHemi+w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oVVEq-00C5Pm-08; Tue, 06 Sep 2022 09:51:24 +0000
-Date:   Tue, 6 Sep 2022 02:51:23 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linaro-mm-sig@lists.linaro.org, linux-media@vger.kernel.org,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
-        Maor Gottlieb <maorg@nvidia.com>,
-        Oded Gabbay <ogabbay@kernel.org>
-Subject: Re: [PATCH v2 4/4] vfio/pci: Allow MMIO regions to be exported
- through dma-buf
-Message-ID: <YxcYGzPv022G2vLm@infradead.org>
-References: <0-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
- <4-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+        with ESMTP id S239126AbiIFKAV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Sep 2022 06:00:21 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFB0C42AD5
+        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 03:00:18 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A80EA61447
+        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 10:00:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E646FC433D6;
+        Tue,  6 Sep 2022 10:00:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662458417;
+        bh=FGC0gg2/3N95/mopR7sTj6hVKyEwvjTVslJxrV2J9LU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=eRrRxY93erprZlPCnG10FzKYnG9c6jW1FSFFaFd+tP+d/FLXmZwAmmVNBlUEBJ9t0
+         Sw69c0y/awBY/3kqU2/HjSA+9B8LJTX1GNZHb+/qTzQis2TWCSfn4hnEpEnSfBEs8g
+         yUMWY2PzIMJPgybP/jqggNnUavUNn8DJlcMLJAJFyecgDtQtEU7cT1GMjkJaGTvKlL
+         uYPGKsEZmm2eyu87LiNvC7b2ByFYdEqL5TXFHHIdpgF08WzrUtTgu5Miy4HN0toa+6
+         rUG4HRKFU6r4hwtdCfn/GipIyz/ZHivuL/TMLZCZ4sa4E4sK3o3++Qge4XCLWN+AuX
+         VwSfcImwyEchw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oVVNL-008Hvt-2f;
+        Tue, 06 Sep 2022 11:00:11 +0100
+Date:   Tue, 06 Sep 2022 11:00:09 +0100
+Message-ID: <87o7vsvn4m.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Gavin Shan <gshan@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 00/14] KVM: arm64: Parallel stage-2 fault handling
+In-Reply-To: <20220830194132.962932-1-oliver.upton@linux.dev>
+References: <20220830194132.962932-1-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, qperret@google.com, ricarkol@google.com, reijiw@google.com, dmatlack@google.com, bgardon@google.com, pbonzini@redhat.com, gshan@redhat.com, peterx@redhat.com, seanjc@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> +{
-> +	struct vfio_pci_dma_buf *priv = dmabuf->priv;
-> +	int rc;
-> +
-> +	rc = pci_p2pdma_distance_many(priv->vdev->pdev, &attachment->dev, 1,
-> +				      true);
+On Tue, 30 Aug 2022 20:41:18 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Presently KVM only takes a read lock for stage 2 faults if it believes
+> the fault can be fixed by relaxing permissions on a PTE (write unprotect
+> for dirty logging). Otherwise, stage 2 faults grab the write lock, which
+> predictably can pile up all the vCPUs in a sufficiently large VM.
+> 
+> Like the TDP MMU for x86, this series loosens the locking around
+> manipulations of the stage 2 page tables to allow parallel faults. RCU
+> and atomics are exploited to safely build/destroy the stage 2 page
+> tables in light of multiple software observers.
+> 
+> Patches 1-2 are a cleanup to the way we collapse page tables, with the
+> added benefit of narrowing the window of time a range of memory is
+> unmapped.
+> 
+> Patches 3-7 are minor cleanups and refactorings to the way KVM reads
+> PTEs and traverses the stage 2 page tables to make it amenable to
+> concurrent modification.
+> 
+> Patches 8-9 use RCU to punt page table cleanup out of the vCPU fault
+> path, which should also improve fault latency a bit.
+> 
+> Patches 10-14 implement the meat of this series, extending the
+> 'break-before-make' sequence with atomics to realize locking on PTEs.
+> Effectively a cmpxchg() is used to 'break' a PTE, thereby serializing
+> changes to a given PTE.
+> 
+> Finally, patch 15 flips the switch on all the new code and starts
+> grabbing the read side of the MMU lock for stage 2 faults.
+> 
+> Applies to 6.0-rc3. Tested with KVM selftests and benchmarked with
+> dirty_log_perf_test, scaling from 1 to 48 vCPUs with 4GB of memory per
+> vCPU backed by THP.
+> 
+>   ./dirty_log_perf_test -s anonymous_thp -m 2 -b 4G -v ${NR_VCPUS}
+> 
+> Time to dirty memory:
+> 
+>         +-------+---------+------------------+
+>         | vCPUs | 6.0-rc3 | 6.0-rc3 + series |
+>         +-------+---------+------------------+
+>         |     1 | 0.89s   | 0.92s            |
+>         |     2 | 1.13s   | 1.18s            |
+>         |     4 | 2.42s   | 1.25s            |
+>         |     8 | 5.03s   | 1.36s            |
+>         |    16 | 8.84s   | 2.09s            |
+>         |    32 | 19.60s  | 4.47s            |
+>         |    48 | 31.39s  | 6.22s            |
+>         +-------+---------+------------------+
+> 
+> It is also worth mentioning that the time to populate memory has
+> improved:
+> 
+>         +-------+---------+------------------+
+>         | vCPUs | 6.0-rc3 | 6.0-rc3 + series |
+>         +-------+---------+------------------+
+>         |     1 | 0.19s   | 0.18s            |
+>         |     2 | 0.25s   | 0.21s            |
+>         |     4 | 0.38s   | 0.32s            |
+>         |     8 | 0.64s   | 0.40s            |
+>         |    16 | 1.22s   | 0.54s            |
+>         |    32 | 2.50s   | 1.03s            |
+>         |    48 | 3.88s   | 1.52s            |
+>         +-------+---------+------------------+
+> 
+> RFC: https://lore.kernel.org/kvmarm/20220415215901.1737897-1-oupton@google.com/
+> 
+> RFC -> v1:
+>  - Factored out page table teardown from kvm_pgtable_stage2_map()
+>  - Use the RCU callback to tear down a subtree, instead of scheduling a
+>    callback for every individual table page.
+>  - Reorganized series to (hopefully) avoid intermediate breakage.
+>  - Dropped the use of page headers, instead stuffing KVM metadata into
+>    page::private directly
+> 
+> Oliver Upton (14):
+>   KVM: arm64: Add a helper to tear down unlinked stage-2 subtrees
+>   KVM: arm64: Tear down unlinked stage-2 subtree after break-before-make
+>   KVM: arm64: Directly read owner id field in stage2_pte_is_counted()
+>   KVM: arm64: Read the PTE once per visit
+>   KVM: arm64: Split init and set for table PTE
+>   KVM: arm64: Return next table from map callbacks
+>   KVM: arm64: Document behavior of pgtable visitor callback
+>   KVM: arm64: Protect page table traversal with RCU
+>   KVM: arm64: Free removed stage-2 tables in RCU callback
+>   KVM: arm64: Atomically update stage 2 leaf attributes in parallel
+>     walks
+>   KVM: arm64: Make changes block->table to leaf PTEs parallel-aware
+>   KVM: arm64: Make leaf->leaf PTE changes parallel-aware
+>   KVM: arm64: Make table->block changes parallel-aware
+>   KVM: arm64: Handle stage-2 faults in parallel
+> 
+>  arch/arm64/include/asm/kvm_pgtable.h  |  59 ++++-
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c |   7 +-
+>  arch/arm64/kvm/hyp/nvhe/setup.c       |   4 +-
+>  arch/arm64/kvm/hyp/pgtable.c          | 360 ++++++++++++++++----------
+>  arch/arm64/kvm/mmu.c                  |  65 +++--
+>  5 files changed, 325 insertions(+), 170 deletions(-)
 
-This should just use pci_p2pdma_distance.
+This fails to build on -rc4:
 
-> +	/*
-> +	 * Since the memory being mapped is a device memory it could never be in
-> +	 * CPU caches.
-> +	 */
+  MODPOST vmlinux.symvers
+  MODINFO modules.builtin.modinfo
+  GEN     modules.builtin
+  CC      .vmlinux.export.o
+  LD      .tmp_vmlinux.kallsyms1
+ld: Unexpected GOT/PLT entries detected!
+ld: Unexpected run-time procedure linkages detected!
+ld: ID map text too big or misaligned
+ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__kvm_nvhe_kvm_pgtable_walk':
+(.hyp.text+0xdc0c): undefined reference to `__kvm_nvhe___rcu_read_lock'
+ld: (.hyp.text+0xdc1c): undefined reference to `__kvm_nvhe___rcu_read_unlock'
+ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__kvm_nvhe_kvm_pgtable_get_leaf':
+(.hyp.text+0xdc80): undefined reference to `__kvm_nvhe___rcu_read_lock'
+ld: (.hyp.text+0xdc90): undefined reference to `__kvm_nvhe___rcu_read_unlock'
+ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__kvm_nvhe_kvm_pgtable_hyp_map':
+(.hyp.text+0xddb0): undefined reference to `__kvm_nvhe___rcu_read_lock'
+ld: (.hyp.text+0xddc0): undefined reference to `__kvm_nvhe___rcu_read_unlock'
+ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__kvm_nvhe_kvm_pgtable_hyp_unmap':
+(.hyp.text+0xde44): undefined reference to `__kvm_nvhe___rcu_read_lock'
+ld: (.hyp.text+0xde50): undefined reference to `__kvm_nvhe___rcu_read_unlock'
+ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__kvm_nvhe_kvm_pgtable_hyp_destroy':
+(.hyp.text+0xdf40): undefined reference to `__kvm_nvhe___rcu_read_lock'
+ld: (.hyp.text+0xdf50): undefined reference to `__kvm_nvhe___rcu_read_unlock'
+ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__kvm_nvhe_kvm_pgtable_stage2_map':
+(.hyp.text+0xe16c): undefined reference to `__kvm_nvhe___rcu_read_lock'
+ld: (.hyp.text+0xe17c): undefined reference to `__kvm_nvhe___rcu_read_unlock'
+ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__kvm_nvhe_kvm_pgtable_stage2_set_owner':
+(.hyp.text+0xe264): undefined reference to `__kvm_nvhe___rcu_read_lock'
+ld: (.hyp.text+0xe274): undefined reference to `__kvm_nvhe___rcu_read_unlock'
+ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__kvm_nvhe_kvm_pgtable_stage2_unmap':
+(.hyp.text+0xe2d4): undefined reference to `__kvm_nvhe___rcu_read_lock'
+ld: (.hyp.text+0xe2e4): undefined reference to `__kvm_nvhe___rcu_read_unlock'
+ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__kvm_nvhe_kvm_pgtable_stage2_flush':
+(.hyp.text+0xe5b4): undefined reference to `__kvm_nvhe___rcu_read_lock'
+ld: (.hyp.text+0xe5c4): undefined reference to `__kvm_nvhe___rcu_read_unlock'
+ld: arch/arm64/kvm/hyp/nvhe/kvm_nvhe.o: in function `__kvm_nvhe_kvm_pgtable_stage2_destroy':
+(.hyp.text+0xe6f0): undefined reference to `__kvm_nvhe___rcu_read_lock'
+ld: (.hyp.text+0xe700): undefined reference to `__kvm_nvhe___rcu_read_unlock'
+make[3]: *** [Makefile:1169: vmlinux] Error 1
+make[2]: *** [debian/rules:7: build-arch] Error 2
 
-DMA_ATTR_SKIP_CPU_SYNC doesn't even apply to dma_map_resource, not sure
-where this wisdom comes from.
+as this drags the RCU read-lock into EL2, and that's not going to
+work... The following fixes it, but I wonder how you tested it.
 
-> +	dma_addr = dma_map_resource(
-> +		attachment->dev,
-> +		pci_resource_start(priv->vdev->pdev, priv->index) +
-> +			priv->offset,
-> +		priv->dmabuf->size, dir, DMA_ATTR_SKIP_CPU_SYNC);
+Thanks,
 
-This is not how P2P addresses are mapped.  You need to use
-dma_map_sgtable and have the proper pgmap for it.
+	M.
 
-The above is just a badly implemented version of the dma-direct
-PCI_P2PDMA_MAP_BUS_ADDR case, ignoring mappings through the host
-bridge or dma-map-ops interactions.
+diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+index dc839db86a1a..adf170122daf 100644
+--- a/arch/arm64/include/asm/kvm_pgtable.h
++++ b/arch/arm64/include/asm/kvm_pgtable.h
+@@ -580,7 +580,7 @@ enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(kvm_pte_t pte);
+  */
+ enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
+ 
+-#if defined(__KVM_NVHE_HYPERVISOR___)
++#if defined(__KVM_NVHE_HYPERVISOR__)
+ 
+ static inline void kvm_pgtable_walk_begin(void) {}
+ static inline void kvm_pgtable_walk_end(void) {}
+
+-- 
+Without deviation from the norm, progress is not possible.
