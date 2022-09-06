@@ -2,134 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B41FA5AF304
-	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 19:47:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 480E25AF326
+	for <lists+kvm@lfdr.de>; Tue,  6 Sep 2022 19:52:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229559AbiIFRrB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Sep 2022 13:47:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36698 "EHLO
+        id S229702AbiIFRwZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Sep 2022 13:52:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbiIFRqz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Sep 2022 13:46:55 -0400
-Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83C506E2DC;
-        Tue,  6 Sep 2022 10:46:47 -0700 (PDT)
-Received: by mail-oo1-f43.google.com with SMTP id n11-20020a4aa7cb000000b0044b3583d373so2054317oom.2;
-        Tue, 06 Sep 2022 10:46:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=message-id:date:subject:references:in-reply-to:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=uiew6NbFXf44Z/IbImQfdvjEizUYy8izei1Fpy5Vg/0=;
-        b=f/12ZMIwCsEBCbNRwz1Fakq+guxaXrntYNpzGu3FRDTBoIyqGbwNC7+FYBfmwnZgB+
-         20vpS7Fis2pV5N6kfbliarW/fZTDyUPgagRIAUZW1HbTVyS/k78kmfwlvxNXYG9h0Y0d
-         gwEqNEMTJdmS2QWmlP8StQHS99yJuXC7oc6J3MlJkIuVWH6wwFtYqA+laCt74Xi37LqS
-         MJsgVz/vKbb/Ys6Pzbije0CjIUaMlFuJelehYivGUI1ML7p+MeHdvmvcowF7toyeXKxS
-         qw9oPd2pWx0kdKvYjOuAsvJd2a+OABFvp4j6P9IBvFK+HpZfG1GWXX8cg6t1s0hDprXh
-         kurg==
-X-Gm-Message-State: ACgBeo33n0oODw677HDSyTzyeVaXJcXZguGpYWeGt1vBKeNVG9Y6NpeQ
-        xiA9rYj5pXgqc4PZokR0mg==
-X-Google-Smtp-Source: AA6agR5bj+5NJ3XNxjU5HfDtqr6HRIQ7mmileSv2rYw50aB+2a5kFqg1A4SznszpVYY8bgrNu8YWNw==
-X-Received: by 2002:a4a:e1ad:0:b0:448:b28c:5fe3 with SMTP id 13-20020a4ae1ad000000b00448b28c5fe3mr18839646ooy.21.1662486405944;
-        Tue, 06 Sep 2022 10:46:45 -0700 (PDT)
-Received: from robh.at.kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id p4-20020a0568301d4400b006339b36127dsm6158688oth.3.2022.09.06.10.46.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Sep 2022 10:46:45 -0700 (PDT)
-Received: (nullmailer pid 780026 invoked by uid 1000);
-        Tue, 06 Sep 2022 17:46:42 -0000
-From:   Rob Herring <robh@kernel.org>
-To:     Nipun Gupta <nipun.gupta@amd.com>
-Cc:     gregkh@linuxfoundation.org, eric.auger@redhat.com,
-        devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org,
-        jeffrey.l.hugo@gmail.com, maz@kernel.org, puneet.gupta@amd.com,
-        Michael.Srba@seznam.cz, cohuck@redhat.com, will@kernel.org,
-        masahiroy@kernel.org, mchehab+huawei@kernel.org, joro@8bytes.org,
-        okaya@kernel.org, alex.williamson@redhat.com,
-        song.bao.hua@hisilicon.com, jgg@nvidia.com, mani@kernel.org,
-        linux-kernel@vger.kernel.org, robin.murphy@arm.com,
-        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-        rafael@kernel.org, f.fainelli@gmail.com, jgg@ziepe.ca,
-        kvm@vger.kernel.org, nikhil.agarwal@amd.com,
-        harpreet.anand@amd.com, yishaih@nvidia.com,
-        linux-arm-kernel@lists.infradead.org, git@amd.com,
-        saravanak@google.com, aleksandar.radovanovic@amd.com,
-        michal.simek@amd.com, ndesaulniers@google.com
-In-Reply-To: <20220906134801.4079497-2-nipun.gupta@amd.com>
-References: <20220803122655.100254-1-nipun.gupta@amd.com> <20220906134801.4079497-1-nipun.gupta@amd.com> <20220906134801.4079497-2-nipun.gupta@amd.com>
-Subject: Re: [RFC PATCH v3 1/7] dt-bindings: bus: add CDX bus device tree bindings
-Date:   Tue, 06 Sep 2022 12:46:42 -0500
-Message-Id: <1662486402.681939.780022.nullmailer@robh.at.kernel.org>
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
-        FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S229481AbiIFRwX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Sep 2022 13:52:23 -0400
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2082.outbound.protection.outlook.com [40.107.100.82])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 796A697D4A;
+        Tue,  6 Sep 2022 10:52:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=B3JR84OI0nyKYJSMQEmQjKGxJowwXsOpE6OdQkTP45uoxUJdaKHF0DKqxfJvDKrZ92rlrmAYU9eRA3MekB6OfVvZxNi4/U7pzWBjvh+BTzsCrDz/hPzaMJHzlRrYLO08JEx7K1rvphA9kGP1kt9/cBIKqIG2+/hwHyqQVZhzZimHDBqgKESyTVBU9sQl77VgNO8F6SNr4ALueh2HiPfKDbc7+haFcQdF0GPr5XMNtmt9SvlvpsiPbPvEsKqb6Pbt2BIxUTVENpZYW6RK61eckHNZPjouJwh7elpXUgLts8FvMOUN/rczVUWman4Zzujyn2SKV6IsspfGv7xJZi+W6A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Dw/ZtvChJNfBcOxE8GjM/WXySKf5NjRI8gX73oWCScE=;
+ b=j2Su9MWHKGLZ0w5vBhEudRFhJiq2We4iTfUT9nXtssvXzum5DmyN3AfesYOFwi4aNUTt73Ww3VAi+p9gtFDsYm5yZivF5BxrKOqBeKgEwgVECqzsBXw8XoWOm5x+RByMTbxMvOpEWqNtefzvduGnctyvnvc8c7jGB1XfHi1YLI0/jDn+wovCv1hKvxk/hi5VGPccAXgN1IzqvnwudunuKizdIR+XCUrW06y2JWyYUgsUo9ngapRl/cFY+43QZuLoiqJ1b2wcKxRWJY4ALdFqyH88F5xRhaZwmT0sfbkDT8plsgp8DCmuSzr/FxlF1mOutSFqXRJxoOMCCXXbxdKk6A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Dw/ZtvChJNfBcOxE8GjM/WXySKf5NjRI8gX73oWCScE=;
+ b=xm+6URIMlgOyLlj/PEwUCyPN9lV6cbKojc8PLBL+bVK/pT6zXgOBGbB6Yf2mv493Ak8XtiDWD6fv4kLmKnTo180lf8wzwo6U1wuAbp1mKY1L7svWId1afzYc/hDdPljVY/2zdXy+zTJdzlAhwY3GEJt1SjPPda2ContEdCUExhs=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BYAPR12MB3589.namprd12.prod.outlook.com (2603:10b6:a03:df::29)
+ by BY5PR12MB4081.namprd12.prod.outlook.com (2603:10b6:a03:20e::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.10; Tue, 6 Sep
+ 2022 17:52:12 +0000
+Received: from BYAPR12MB3589.namprd12.prod.outlook.com
+ ([fe80::a997:c7f:aea0:764a]) by BYAPR12MB3589.namprd12.prod.outlook.com
+ ([fe80::a997:c7f:aea0:764a%4]) with mapi id 15.20.5588.018; Tue, 6 Sep 2022
+ 17:52:12 +0000
+Message-ID: <cfbea503-10a3-5cf2-1657-e0c849d194a0@amd.com>
+Date:   Tue, 6 Sep 2022 19:52:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v2 1/4] dma-buf: Add dma_buf_try_get()
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linaro-mm-sig@lists.linaro.org, linux-media@vger.kernel.org,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
+        Maor Gottlieb <maorg@nvidia.com>,
+        Oded Gabbay <ogabbay@kernel.org>
+References: <1-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
+ <18b3dd75-7995-a2a8-372b-1fd5838dfe1d@amd.com> <Yxd42anepRnmFJwe@nvidia.com>
+From:   =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>
+In-Reply-To: <Yxd42anepRnmFJwe@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR3P281CA0045.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:4a::16) To BYAPR12MB3589.namprd12.prod.outlook.com
+ (2603:10b6:a03:df::29)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 348a38bd-beb7-47ba-dbb4-08da903086dc
+X-MS-TrafficTypeDiagnostic: BY5PR12MB4081:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 7Smbmm05fINUdZzYr01IVIwaAaoSwbXsMEITm5uV8LS2KgEeyMrrBup7DGM5Q2sBVxnLbr8uhqKBs5ZNq75P77kgJp2TPHt6DwBQ4PgdEvPzY2Jz3h1YUZ6wdi9jJ7vaECgm63p6LGTB6++Sh/0ia9UNvpwuZXPxiBTtjYKvGxNu4YMzAU33LJ/NF9th3bxCRaD0d+VRkN5spMyO7EbS4TJrYR+YR4bzIBAn3sadUzsvmIYBCoONvB5hX2o3dVaYKipu3UiDBYV0NxUlyE/FSUP1KejUsPErQwQU381xPpYfwjACkT2uOGTU+CerssFFzfBnGVp3/uS2V7WjiPsuvg+7/CetQoAT1sINTkwxh2kB1pIYTvJBNrMtxKzthCkBrIEW/+B5Gl2DtPtUDexGq5KRvzRcYP7RoCK44XYnCf0WWJeE8zu0qm8UqN896qdssQMKVNnJtLKcoEYhphZVivyH3kc1w1o3P3nd1hTXLk1NDqb3RP0WjCBoBLR1mGlqTgJkP1pmcpAx9Tab5sZK+FMC20XzzdU8t7axxy3JxolMC45SI0e5WeKCpxPXLtG06BV3XV1zefBkXtB0cAA8qzPFR6z+6eZyIusla+HLQ6R655cvAWMe7X4nxQQDSGnO1WfaUk7AM4TDtaNbOlqSywK9Et1tJRqAHtcJU/LXOglMDldrPAEJmVM779ZPAszo3204RFogaudQKnGufoKbQP/AXfjF9z5PcoXmAjgEIDfbH8zTIbC18FgmvZDDHrurFfXJhYlXBwXyKKJlFvx8G7W5fsD3h3IJw0ufufs3XP8=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB3589.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(366004)(376002)(396003)(39860400002)(346002)(83380400001)(6512007)(6506007)(66574015)(2906002)(31696002)(86362001)(186003)(2616005)(38100700002)(66556008)(5660300002)(66476007)(8676002)(66946007)(4326008)(31686004)(6486002)(36756003)(41300700001)(316002)(478600001)(6916009)(54906003)(8936002)(7416002)(6666004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y2RTTEpsVmNhSmdLK2RMVlRqcDlUVGF2THFxaEp2dnY5TUYyZFFJY2E5T1p4?=
+ =?utf-8?B?UWNYUnRYZXdiRnVHR2RNSGJCT0hFeVBZcTZHd3h6cHp5RnFiNUlxUlJJWFV1?=
+ =?utf-8?B?ZWNmNnJodGVUdzhwMTNkUFNvMml5WjhXbEZCQ0h1YVVmeHpjZXdwbFdSbDUy?=
+ =?utf-8?B?cHBlc083WVVlQW1yaDFNREx5cGRLZDBsdFRxSUl0aXlvWUc4eHNraFVlVlhh?=
+ =?utf-8?B?NnRpM3U1WnZzeit6cUt5V2h6U3J2cVVnRkIvK29jS0d2bTNCbTVhU29Hb3V4?=
+ =?utf-8?B?WkFHVlhaSE1JS0dJRGthSVVvUzdQVTdRU2RMWURGd1htV3RwUzNTcWsrNU5X?=
+ =?utf-8?B?SlNzc1U1WlVoMkdyQklyVDhWVVlwNklZMDNWQW5PdTVlNjFKVXBheG9KTUJ4?=
+ =?utf-8?B?OXQ4T3NBVTdSNWpvbXYxVnhqYjUwYlFmWG8zbUEveXBUeUxjdFRodGIvNDBQ?=
+ =?utf-8?B?bmx3bStpR1JFSkNHY1M2K3FoL2xEdUp1eFhhaHJiWVpPRW4yZm92ci9jemgw?=
+ =?utf-8?B?TFJZT0NJVnNSTGQvZHlwSFRwZ1d1aFR5UGR3NDFQZTJ0MzJIRXNVZjY2bXk1?=
+ =?utf-8?B?L3FPMDd3RklKaFEwT01xenlWRUFKMFQvOVQ5bmVVZWxQN2xSSWhuYWhrdVFm?=
+ =?utf-8?B?cWx0UzlGY1I0K2YwTHdsZnRJRGtXSzkvREJUcnhFanhxb2k0RHJSamhWRVpC?=
+ =?utf-8?B?T2Iwbk04andaQ1IvQUFJd0Y0UWNIbDRSYVUzRDZMM1BEZ3Jtc1k2QUFSTDc0?=
+ =?utf-8?B?LzRUdEVSK2F2SWNEV0pHVC83VmFKTDZsMWk1dkxpaGg5QmdoOFZxNlB4dm9r?=
+ =?utf-8?B?Qll2VVd5ZXNSdzdFU2llVzRJTmFLVmhkWVdqMms2QnFiVDVsNUsyUk5zSHBZ?=
+ =?utf-8?B?ZTN5aUNTd0QyNEFzaGpUd0NBeUxwYXJ4TGxxY2NuYnk5QzZiRUNpbTRlSm04?=
+ =?utf-8?B?VXp5OVA3SnNoVFlkU2lsZ1VLaDkxaEQrUUJFelFFMXFydGNQK29ialorM3JY?=
+ =?utf-8?B?SUM0M3Q4RWhpUGpMcWdZSWNoRXVDSDhGY0tSSDdDb1ZITkhpZVVvWmZaT1Fv?=
+ =?utf-8?B?S3lleFZhNE5uOFNSMHVKZkRiV3Zoei9xZkJRQkpGV0c1VXVDMDFkS1A3SVp5?=
+ =?utf-8?B?ek9sa3g2cnNMb1dEdEJ2NUlJcG4wWk50ZUdIbkFiZGFEYWJSVWhPRXI2QWRL?=
+ =?utf-8?B?ejRaQTF3Z2h3dU9pNVJGRElPaG9lNmVpai9sUks2bndjMDgySURnS1kxdkhj?=
+ =?utf-8?B?b3h2cUYvTUZPbnZHbFJkaVh6dGJGOEdOK0N0S0c3MmFOY2l3V3c0Y0IzZnJs?=
+ =?utf-8?B?ck9pbERwVThTM3NqL0lOb1M5VjhSMkYyVkQ5UnBwNk9QS0NiKzVGTE4wcEMw?=
+ =?utf-8?B?bHdLc3BaWkRwZUc5Uk8rcUNuaDBPdlQ1YTZVdlZVZjBFY1JkMVpWR0ttUlJj?=
+ =?utf-8?B?MlFDUTlqdDVCbVI0MlJ0d0ZEYXZ0cGhGNy94U3hjd2tRSitiQjVZc2t3bnBr?=
+ =?utf-8?B?dEF2cVFVUXVlMjNHanlsejNrUFQ5UytJVkEvY2Zsa2dZMU51VTlGM0pkTy95?=
+ =?utf-8?B?aHllKzhsaXk1OGdFZUJFNTNLckZKNm9DZkxyYSttRFN6eVRhb0dVemp1cEQy?=
+ =?utf-8?B?ZG9ib3R3TFJ2dTUzRFVaQllNcmxLZ3h4MXF3UlVLQUpubjdxNnNEUVVCY2Vo?=
+ =?utf-8?B?VFlnazYzSG53N0M0Z2M5RUttY3B5dXdCSzAvSWFMM3NLL1R4TXhDdlIxNVQx?=
+ =?utf-8?B?QWJZc1M5VStJbVVxcEFJZVUzQnpTbjVDZVk1OC9PWkxSU1Z1Q3JYVENuMUUy?=
+ =?utf-8?B?MmpveFFVZksyUFo2T05GY3B1eGxJTnVldFUvMUh1bVhuQTFFOTZuQ2dtUm1Q?=
+ =?utf-8?B?SnUxcWNFM1NncXFzL2NGTzdjQTh1c21hK0R0VTRJZ3d3THhqamVseDhSM0pH?=
+ =?utf-8?B?N2t0MWhmNkdWVDl3NCtKdlR0UWhDM2dQVTRYTkQ4RWhzVXJrM2NSRFNQV3pq?=
+ =?utf-8?B?YURkQW12UVFRdzZuL2kwc09JQkwxa0Q2M1hSQ0V0cVZYWHVxYk9WNlhMbDJ2?=
+ =?utf-8?B?aHV6SHFHZldnTGRSR0pDMGM3c25RQklyVUNyNk82NzN6YkE4T0xZeTI0T0cy?=
+ =?utf-8?B?WFNTMDBkT3IvaUhwREg1V0dhcmQzOTNaNDRyOEdRcng3ZDZXVWlxSTVzNHNq?=
+ =?utf-8?Q?qwmAcdRZEiihD6HfN6xLFPPUDlTF485JDQvbiB074682?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 348a38bd-beb7-47ba-dbb4-08da903086dc
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB3589.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2022 17:52:12.3516
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kWjaQMdeiXC7jj2FhGgAHfraWi5CxZBBrfRRx3C8RmEHwObONlkI/4gk+hzxAXz/
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4081
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 06 Sep 2022 19:17:55 +0530, Nipun Gupta wrote:
-> This patch adds a devicetree binding documentation for CDX
-> bus.
-> 
-> CDX bus controller dynamically detects CDX bus and the
-> devices on these bus using CDX firmware.
-> 
-> Signed-off-by: Nipun Gupta <nipun.gupta@amd.com>
-> ---
->  .../devicetree/bindings/bus/xlnx,cdx.yaml     | 75 +++++++++++++++++++
->  MAINTAINERS                                   |  6 ++
->  2 files changed, 81 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/bus/xlnx,cdx.yaml
-> 
+Am 06.09.22 um 18:44 schrieb Jason Gunthorpe:
+> On Thu, Sep 01, 2022 at 09:55:08AM +0200, Christian König wrote:
+>> Am 01.09.22 um 01:12 schrieb Jason Gunthorpe:
+>>> Used to increment the refcount of the dma buf's struct file, only if the
+>>> refcount is not zero. Useful to allow the struct file's lifetime to
+>>> control the lifetime of the dmabuf while still letting the driver to keep
+>>> track of created dmabufs.
+>>>
+>>> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+>>> ---
+>>>    include/linux/dma-buf.h | 13 +++++++++++++
+>>>    1 file changed, 13 insertions(+)
+>>>
+>>> diff --git a/include/linux/dma-buf.h b/include/linux/dma-buf.h
+>>> index 71731796c8c3a8..a35f1554f2fb36 100644
+>>> --- a/include/linux/dma-buf.h
+>>> +++ b/include/linux/dma-buf.h
+>>> @@ -618,6 +618,19 @@ int dma_buf_fd(struct dma_buf *dmabuf, int flags);
+>>>    struct dma_buf *dma_buf_get(int fd);
+>>>    void dma_buf_put(struct dma_buf *dmabuf);
+>>> +/**
+>>> + * dma_buf_try_get - try to get a reference on a dmabuf
+>>> + * @dmabuf - the dmabuf to get
+>>> + *
+>>> + * Returns true if a reference was successfully obtained. The caller must
+>>> + * interlock with the dmabuf's release function in some way, such as RCU, to
+>>> + * ensure that this is not called on freed memory.
+>> I still have a bad feeling about this, but I also see that we can only
+>> choose between evils here.
+>>
+>> Could you just call get_file_rcu() from the exporter with a comment
+>> explaining why this works instead?
+> I guess, are you sure? It seems very hacky.
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+Yes, it's still better than exposing a dma_buf_try_get() interface to 
+everyone.
 
-yamllint warnings/errors:
+Keep in mind that those functions here are mostly supposed to be used by 
+the importer and not the exporter.
 
-dtschema/dtc warnings/errors:
-Documentation/devicetree/bindings/bus/xlnx,cdx.example.dts:18.23-21.11: Warning (unit_address_vs_reg): /example-0/smmu@ec000000: node has a unit name, but no reg or ranges property
-Documentation/devicetree/bindings/bus/xlnx,cdx.example.dts:23.22-30.11: Warning (unit_address_vs_reg): /example-0/gic@e2000000: node has a unit name, but no reg or ranges property
-Documentation/devicetree/bindings/bus/xlnx,cdx.example.dts:26.35-29.15: Warning (unit_address_vs_reg): /example-0/gic@e2000000/gic-its@e2040000: node has a unit name, but no reg or ranges property
-/builds/robherring/linux-dt-review/Documentation/devicetree/bindings/bus/xlnx,cdx.example.dtb: smmu@ec000000: $nodename:0: 'smmu@ec000000' does not match '^iommu@[0-9a-f]*'
-	From schema: /builds/robherring/linux-dt-review/Documentation/devicetree/bindings/iommu/arm,smmu-v3.yaml
-/builds/robherring/linux-dt-review/Documentation/devicetree/bindings/bus/xlnx,cdx.example.dtb: smmu@ec000000: 'reg' is a required property
-	From schema: /builds/robherring/linux-dt-review/Documentation/devicetree/bindings/iommu/arm,smmu-v3.yaml
-/builds/robherring/linux-dt-review/Documentation/devicetree/bindings/bus/xlnx,cdx.example.dtb: gic@e2000000: $nodename:0: 'gic@e2000000' does not match '^interrupt-controller(@[0-9a-f,]+)*$'
-	From schema: /builds/robherring/linux-dt-review/Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.yaml
-/builds/robherring/linux-dt-review/Documentation/devicetree/bindings/bus/xlnx,cdx.example.dtb: gic@e2000000: '#interrupt-cells' is a dependency of 'interrupt-controller'
-	From schema: /builds/robherring/linux-dt-review/Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.yaml
-/builds/robherring/linux-dt-review/Documentation/devicetree/bindings/bus/xlnx,cdx.example.dtb: gic@e2000000: 'reg' is a required property
-	From schema: /builds/robherring/linux-dt-review/Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.yaml
-/builds/robherring/linux-dt-review/Documentation/devicetree/bindings/bus/xlnx,cdx.example.dtb: gic@e2000000: gic-its@e2040000: False schema does not allow {'compatible': ['arm,gic-v3-its'], 'msi-controller': True, 'phandle': [[1]]}
-	From schema: /builds/robherring/linux-dt-review/Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.yaml
-/builds/robherring/linux-dt-review/Documentation/devicetree/bindings/bus/xlnx,cdx.example.dtb: gic@e2000000: gic-its@e2040000: '#msi-cells' is a required property
-	From schema: /builds/robherring/linux-dt-review/Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.yaml
-/builds/robherring/linux-dt-review/Documentation/devicetree/bindings/bus/xlnx,cdx.example.dtb: gic@e2000000: gic-its@e2040000: 'reg' is a required property
-	From schema: /builds/robherring/linux-dt-review/Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.yaml
-/builds/robherring/linux-dt-review/Documentation/devicetree/bindings/bus/xlnx,cdx.example.dtb: gic@e2000000: 'oneOf' conditional failed, one must be fixed:
-	'interrupts' is a required property
-	'interrupts-extended' is a required property
-	From schema: /builds/robherring/linux-dt-review/Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.yaml
-/builds/robherring/linux-dt-review/Documentation/devicetree/bindings/bus/xlnx,cdx.example.dtb: cdx@4000000: reg: [[0, 67108864], [0, 4096]] is too long
-	From schema: /builds/robherring/linux-dt-review/Documentation/devicetree/bindings/bus/xlnx,cdx.yaml
+Christian.
 
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/patch/
-
-This check can fail if there are any dependencies. The base for a patch
-series is generally the most recent rc1.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit.
+>
+> Jason
 
