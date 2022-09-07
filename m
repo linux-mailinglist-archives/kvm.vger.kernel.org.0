@@ -2,174 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 54D745B0D64
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 21:41:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 165A75B0D8A
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 21:56:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229812AbiIGTli (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 15:41:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37038 "EHLO
+        id S229884AbiIGTz5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 15:55:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbiIGTlg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 15:41:36 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 26615639D;
-        Wed,  7 Sep 2022 12:41:34 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 913CA106F;
-        Wed,  7 Sep 2022 12:41:40 -0700 (PDT)
-Received: from [10.57.15.197] (unknown [10.57.15.197])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A19FF3F7B4;
-        Wed,  7 Sep 2022 12:41:20 -0700 (PDT)
-Message-ID: <0b466705-3a17-1bbc-7ef2-5adadc22d1ae@arm.com>
-Date:   Wed, 7 Sep 2022 20:41:13 +0100
+        with ESMTP id S229506AbiIGTz4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 15:55:56 -0400
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FC95A5C54
+        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 12:55:53 -0700 (PDT)
+Received: by mail-qt1-x82e.google.com with SMTP id cr9so11283479qtb.13
+        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 12:55:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=reg182tBPdMyHHqhIyhd0PReinakkrLNe0xqHZC9tHU=;
+        b=HGsl5LOrvfdnuyNEVcB+B1VQp1UuGBIOQoUWByoYPBAOyvlWj9vIrmlIosnh0QOvjp
+         9t1pLdGWzfwvo7PTNeeXZpHQeCZDCMAbxR4j6DpbkpqAtHiJ1boF9wUSCWFLMrBlcaHp
+         YoTv+kHo4THsJ/Mc63JM+YKqeESn3s2WG47rnSxevKm9v0SgRfxj/b/FSTqHN+FVbbdE
+         YRUwQy1C4ktcAsIQk6ZxdocxEK3yR01eWqg2vLczmE6Ww5bfdd1+Dl8taxY2Tf/9XWTX
+         2SLCSM/ki21AbuD+egy3jf01r8hYIK/sKWh+WkDXR3hVVPW6f8vUKxGd138OM1Q+9SRg
+         KRIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=reg182tBPdMyHHqhIyhd0PReinakkrLNe0xqHZC9tHU=;
+        b=IAdJm3n178EcbDrQxkdsmBemwl8zdEBFd/J1uFxYghJMO1oxc/UlJ7kX8Cd0K22Nsd
+         fbCAgeY6ehUOVckkvOdzTZ5MQtE2r3/WH6rhzftuJg66ON3A+maih0ZnJmbR9E1AH98Y
+         83zU5qcXSpUWTM7YP3JZLRxbiVMllBciiIs4RmB1QpIEobBRLGN0wHenQLR4Ur3Fb3bT
+         weLU9tfKojjg5d/uncuWvELFb31nPARCvrvgmWxmSV13Hl0LA5HmoEClpUzcv4zJPb5x
+         VlDz3euuEXQb3IuP35A9MxI2Yfn96jqZ4i9jGVUBctSyI9E7j23BjlCQMHFQZ9gA8iql
+         2Uig==
+X-Gm-Message-State: ACgBeo1wcGTLDkEtkijKG2v4Opy+fB+ypTxS1hxaBmDpvFGjJAFCu4ss
+        JWkKwuDZXl+X06lYj+6YADzZCQ==
+X-Google-Smtp-Source: AA6agR71wy1OO/ymcMptPhtEDcay7FQ+pBe7sqv5WOFog+U5XySjMiaLOl4gJ+FO5Lod2IyxAWvAbA==
+X-Received: by 2002:a05:622a:15c7:b0:344:5321:5874 with SMTP id d7-20020a05622a15c700b0034453215874mr4917567qty.506.1662580552067;
+        Wed, 07 Sep 2022 12:55:52 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id m8-20020ac866c8000000b003445d06a622sm12968811qtp.86.2022.09.07.12.55.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Sep 2022 12:55:51 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1oW19K-008kzP-5v;
+        Wed, 07 Sep 2022 16:55:50 -0300
+Date:   Wed, 7 Sep 2022 16:55:50 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "lpivarc@redhat.com" <lpivarc@redhat.com>,
+        "Liu, Jingqi" <jingqi.liu@intel.com>,
+        "Lu, Baolu" <baolu.lu@intel.com>
+Subject: Re: [PATCH] vfio/type1: Unpin zero pages
+Message-ID: <Yxj3Ri8pfqM1SxWe@ziepe.ca>
+References: <166182871735.3518559.8884121293045337358.stgit@omen>
+ <BN9PR11MB527655973E2603E73F280DF48C7A9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <d71160d1-5a41-eae0-6405-898fe0a28696@redhat.com>
+ <YxfX+kpajVY4vWTL@ziepe.ca>
+ <b365f30b-da58-39c0-08e9-c622cc506afa@redhat.com>
+ <YxiTOyGqXHFkR/DY@ziepe.ca>
+ <20220907095552.336c8f34.alex.williamson@redhat.com>
+ <YxjJlM5A0OLhaA7K@ziepe.ca>
+ <20220907125627.0579e592.alex.williamson@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH v6 1/5] iommu: Return -EMEDIUMTYPE for incompatible domain
- and device/group
-Content-Language: en-GB
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Joerg Roedel <joro@8bytes.org>, Nicolin Chen <nicolinc@nvidia.com>,
-        will@kernel.org, alex.williamson@redhat.com,
-        suravee.suthikulpanit@amd.com, marcan@marcan.st,
-        sven@svenpeter.dev, alyssa@rosenzweig.io, robdclark@gmail.com,
-        dwmw2@infradead.org, baolu.lu@linux.intel.com,
-        mjrosato@linux.ibm.com, gerald.schaefer@linux.ibm.com,
-        orsonzhai@gmail.com, baolin.wang@linux.alibaba.com,
-        zhang.lyra@gmail.com, thierry.reding@gmail.com, vdumpa@nvidia.com,
-        jonathanh@nvidia.com, jean-philippe@linaro.org, cohuck@redhat.com,
-        tglx@linutronix.de, shameerali.kolothum.thodi@huawei.com,
-        thunder.leizhen@huawei.com, christophe.jaillet@wanadoo.fr,
-        yangyingliang@huawei.com, jon@solid-run.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, asahi@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-tegra@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        kevin.tian@intel.com
-References: <20220815181437.28127-1-nicolinc@nvidia.com>
- <20220815181437.28127-2-nicolinc@nvidia.com> <YxiRkm7qgQ4k+PIG@8bytes.org>
- <Yxig+zfA2Pr4vk6K@nvidia.com> <9f91f187-2767-13f9-68a2-a5458b888f00@arm.com>
- <YxjOPo5FFqu2vE/g@nvidia.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <YxjOPo5FFqu2vE/g@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-11.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220907125627.0579e592.alex.williamson@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-09-07 18:00, Jason Gunthorpe wrote:
-> On Wed, Sep 07, 2022 at 03:23:09PM +0100, Robin Murphy wrote:
->> On 2022-09-07 14:47, Jason Gunthorpe wrote:
->>> On Wed, Sep 07, 2022 at 02:41:54PM +0200, Joerg Roedel wrote:
->>>> On Mon, Aug 15, 2022 at 11:14:33AM -0700, Nicolin Chen wrote:
->>>>> Provide a dedicated errno from the IOMMU driver during attach that the
->>>>> reason attached failed is because of domain incompatability. EMEDIUMTYPE
->>>>> is chosen because it is never used within the iommu subsystem today and
->>>>> evokes a sense that the 'medium' aka the domain is incompatible.
->>>>
->>>> I am not a fan of re-using EMEDIUMTYPE or any other special value. What
->>>> is needed here in EINVAL, but with a way to tell the caller which of the
->>>> function parameters is actually invalid.
->>>
->>> Using errnos to indicate the nature of failure is a well established
->>> unix practice, it is why we have hundreds of error codes and don't
->>> just return -EINVAL for everything.
->>>
->>> What don't you like about it?
->>>
->>> Would you be happier if we wrote it like
->>>
->>>    #define IOMMU_EINCOMPATIBLE_DEVICE xx
->>>
->>> Which tells "which of the function parameters is actually invalid" ?
->>
->> FWIW, we're now very close to being able to validate dev->iommu against
->> where the domain came from in core code, and so short-circuit ->attach_dev
->> entirely if they don't match.
-> 
-> I don't think this is a long term direction. We have systems now with
-> a number of SMMU blocks and we really are going to see a need that
-> they share the iommu_domains so we don't have unncessary overheads
-> from duplicated io page table memory.
-> 
-> So ultimately I'd expect to pass the iommu_domain to the driver and
-> the driver will decide if the page table memory it represents is
-> compatible or not. Restricting to only the same iommu instance isn't
-> good..
+On Wed, Sep 07, 2022 at 12:56:27PM -0600, Alex Williamson wrote:
 
-Who said IOMMU instance? As a reminder, the patch I currently have[1] is 
-matching the driver (via the device ops), which happens to be entirely 
-compatible with drivers supporting cross-instance domains. Mostly 
-because we already have drivers that support cross-instance domains and 
-callers that use them.
+> I thought we'd already agreed that we were stuck with locked_vm for
+> type1 and any compatibility mode of type1 due to this.  Native iommufd
+> support can do the right thing since userspace will need to account for
+> various new usage models anyway.
 
->> At that point -EINVAL at the driver callback level could be assumed
->> to refer to the domain argument, while anything else could be taken
->> as something going unexpectedly wrong when the attach may otherwise
->> have worked. I've forgotten if we actually had a valid case anywhere
->> for "this is my device but even if you retry with a different domain
->> it's still never going to work", but I think we wouldn't actually
->> need that anyway - it should be clear enough to a caller that if
->> attaching to an existing domain fails, then allocating a fresh
->> domain and attaching also fails, that's the point to give up.
-> 
-> The point was to have clear error handling, we either have permenent
-> errors or 'this domain will never work with this device error'.
-> 
-> If we treat all error as temporary and just retry randomly it can
-> create a mess. For instance we might fail to attach to a perfectly
-> compatible domain due to ENOMEM or something and then go on to
-> successfully a create a new 2nd domain, just due to races.
-> 
-> We can certainly code the try everything then allocate scheme, it is
-> just much more fragile than having definitive error codes.
+We did, that was for the iommufd situation (which will also hit the
+same zeropage issue, sigh) - this discussion is about fixing a bug in
+vfio and what many consider a bug in GUP.
 
-Again, not what I was suggesting. In fact the nature of 
-iommu_attach_group() already rules out bogus devices getting this far, 
-so all a driver currently has to worry about is compatibility of a 
-device that it definitely probed with a domain that it definitely 
-allocated. Therefore, from a caller's point of view, if attaching to an 
-existing domain returns -EINVAL, try another domain; multiple different 
-existing domains can be tried, and may also return -EINVAL for the same 
-or different reasons; the final attempt is to allocate a fresh domain 
-and attach to that, which should always be nominally valid and *never* 
-return -EINVAL. If any attempt returns any other error, bail out down 
-the usual "this should have worked but something went wrong" path. Even 
-if any driver did have a nonsensical "nothing went wrong, I just can't 
-attach my device to any of my domains" case, I don't think it would 
-really need distinguishing from any other general error anyway.
+My point is I'm still not convinced we can really consider these
+limits as ABI because it opens a pandoras box of kernel limitations.
 
-Once multiple drivers are in play, the only addition is that the 
-"gatekeeper" check inside iommu_attach_group() may also return -EINVAL 
-if the device is managed by a different driver, since that still fits 
-the same "try again with a different domain" message to the caller.
+> I've raised the issue with David for the zero page accounting, but I
+> don't know what the solution is.  libvirt automatically adds a 1GB
+> fudge factor to the VM locked memory limits to account for things like
+> ROM mappings, or at least the non-zeropage backed portion of those
+> ROMs.  I think that most management tools have adopted similar, so the
+> majority of users shouldn't notice.  However this won't cover all
+> users, so we certainly risk breaking userspace if we introduce hard
+> page accounting of zero pages.
 
-It's actually quite neat - basically the exact same thing we've tried to 
-do with -EMEDIUMTYPE here, but more self-explanatory, since the fact is 
-that a domain itself should never be invalid for attaching to via its 
-own ops, and a group should never be inherently invalid for attaching to 
-a suitable domain, it is only ever a particular combination of group (or 
-device at the internal level) and domain that may not be valid together. 
-Thus as long as we can maintain that basic guarantee that attaching a 
-group to a newly allocated domain can only ever fail for resource 
-allocation reasons and not some spurious "incompatibility", then we 
-don't need any obscure trickery, and a single, clear, error code is in 
-fact enough to say all that needs to be said.
+It sounds like things will be fine. 1GB fudge is pretty big.
 
-Whether iommu_attach_device() should also join the party and start 
-rejecting non-singleton-group devices with a different error, or 
-maintain its current behaviour since its legacy users already have their 
-expectations set, is another matter in its own right.
+For things like this ABI compat is not about absolute compatability in
+the face of any userspace, but a real-world compatibility "does
+something that actually exists break?"
 
-Cheers,
-Robin.
+So I would be happier if we had an actual deployed thing that breaks..
+I would be inclined to go with the simple fix and rely on the
+fudge. If someone does come with an actual break then lets do one of
+the work arounds.
 
-[1] 
-https://gitlab.arm.com/linux-arm/linux-rm/-/commit/683cdff1b2d4ae11f56e38d93b37e66e8c939fc9
+Given the whole thing is obstensibly for security it is better to keep
+it simple and sane then to poke it full of holes.
+
+> module parameter defined limit.  We might also consider whether we
+> could just ignore zero page mappings, maybe with a optional "strict"
+> mode module option to generate an errno on such mappings.  Thanks,
+
+Once GUP is fixed vfio won't see the zero pages anymore :( That really
+limits the choices for a work around :(
+
+Jason 
