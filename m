@@ -2,519 +2,237 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FFAB5B0501
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 15:18:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 249EF5B0505
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 15:18:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229816AbiIGNSf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 09:18:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55140 "EHLO
+        id S229689AbiIGNS5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 09:18:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229751AbiIGNSd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 09:18:33 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B36E417AAA;
-        Wed,  7 Sep 2022 06:18:31 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3DAA16190C;
-        Wed,  7 Sep 2022 13:18:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 425ADC433D7;
-        Wed,  7 Sep 2022 13:18:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662556710;
-        bh=vfGds+IHhiq5Jfaq54EwwCVAb4B+ErClkegWiHk+7UQ=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=MG9l7KiTqdxYExU+toJC8MSzf5EAzXbdQLiHk9BwAd5zmRxrQv6bCvSLfx4zxVL/S
-         XNwlv+5E3b7qHzpgDuQ1gYxk4OwbCQc3qouzcTRrFvC9Z3F9dMu0YLQgMOuRmAJNaY
-         gIRwnApYUy6K7Q8SYzHTRg3L4tyQFpPR8AmWG45n8vLBfduRJ9ILU963bBWOTEr7or
-         ORWYekYBuddCabPssufALWr5++hvRCrY9ZKCa6/8aKJFiPDDkxx/g5TeE0hDNi6mLP
-         YgeIHoAYsSxEeWTvMpVbuF4ttl42ZA3qciIUf3R2Nq0ZWfDgbZt4wtPGGUzRJSLddE
-         XimGqmLoqr9JA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1oVuwl-008eKg-VP;
-        Wed, 07 Sep 2022 14:18:28 +0100
-Date:   Wed, 07 Sep 2022 14:18:27 +0100
-Message-ID: <87h71juxuk.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Nipun Gupta <nipun.gupta@amd.com>
-Cc:     <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-        <gregkh@linuxfoundation.org>, <rafael@kernel.org>,
-        <eric.auger@redhat.com>, <alex.williamson@redhat.com>,
-        <cohuck@redhat.com>, <puneet.gupta@amd.com>,
-        <song.bao.hua@hisilicon.com>, <mchehab+huawei@kernel.org>,
-        <f.fainelli@gmail.com>, <jeffrey.l.hugo@gmail.com>,
-        <saravanak@google.com>, <Michael.Srba@seznam.cz>,
-        <mani@kernel.org>, <yishaih@nvidia.com>, <jgg@ziepe.ca>,
-        <jgg@nvidia.com>, <robin.murphy@arm.com>, <will@kernel.org>,
-        <joro@8bytes.org>, <masahiroy@kernel.org>,
-        <ndesaulniers@google.com>, <linux-arm-kernel@lists.infradead.org>,
-        <linux-kbuild@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <okaya@kernel.org>, <harpreet.anand@amd.com>,
-        <nikhil.agarwal@amd.com>, <michal.simek@amd.com>,
-        <aleksandar.radovanovic@amd.com>, <git@amd.com>
-Subject: Re: [RFC PATCH v3 4/7] bus/cdx: add cdx-MSI domain with gic-its domain as parent
-In-Reply-To: <20220906134801.4079497-5-nipun.gupta@amd.com>
+        with ESMTP id S229472AbiIGNS4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 09:18:56 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2081.outbound.protection.outlook.com [40.107.93.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF7B9786C5;
+        Wed,  7 Sep 2022 06:18:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iS13yijLhK+g0aKemc5ZVmXkoxK72NhxncMUT8QiKiYCdyHPVDze3AIsKDzJTqPz0oVAmKYMqtVAq2ks3vM7CZxaS/DLbWBaoPU4wDEzFOArvvep7yYr5WEooPL7mcjMh1rvOervcRqLMJDk5eBymeddRAqEyvW+wl+lJgZBIdR46lBzFMOk3CTPzPNmwlunql6Sw/delXyBS/vdg67sBePhGf/CLhkdK23ttYjGc9qwxwLGdJ0qqH4BG0C1I1NnCaAKVnpngfJpHPNItH+hjoiOrUOAm++dinPDK3bMrscgEevHsiF4tDfruO0myzBKr4strdsbAX6NJSEgFPyfeQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+AtMuImqSw8WpCFh4Dgxqr36LOvtP9/i9i8V6YG5Gs0=;
+ b=T24WsEGWvA8+kfIRkTciDvh33P07hSEh+tuWzutRMiLeYPRFdtapV5PO9HfoOYW446HIHhElBXrdDE4d9LyATiPy/09XxIyFMzHbodRuXTaFViaamFUyJqHnJ/+gg7IGTCyvtCHYcjpNsdH+cqNIFmwxoFm18dbSDYCSut1JRR2c9SkqELYVizUXuQT9+TwYi56LArH/7ZxfLG/SaOFl+4m+TGwdgorRkmp30CG+i7sAuLfCeTNx5+UiuyhFrpV2/yK/WrmQa081IQWu/mhP6ngPUXVy9X8vZTeudNE2u2e10mShSkpkw7a/k5Z7HWqM3/ZdkbDuXnFFqmDOfmoCog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+AtMuImqSw8WpCFh4Dgxqr36LOvtP9/i9i8V6YG5Gs0=;
+ b=ypa/nLmfMUTg20Rb5M+K/Pj1VCQgpI1AEYuwvWAKP82Vibejm08VoS2JlhBwK0ekOt7auOFDsB3aE1NrajD4LfUMX4T92H19Er3qpKtIlmcQgNnUi/r3kwNPlIu4dv9FVR9WRR6A+sz1vaT0bzN7BJZobeVfaa2o8rbvMwyZgJU=
+Received: from MN2PR12MB4358.namprd12.prod.outlook.com (2603:10b6:208:24f::12)
+ by DM4PR12MB6326.namprd12.prod.outlook.com (2603:10b6:8:a3::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.17; Wed, 7 Sep
+ 2022 13:18:52 +0000
+Received: from MN2PR12MB4358.namprd12.prod.outlook.com
+ ([fe80::e166:fa63:f50:5634]) by MN2PR12MB4358.namprd12.prod.outlook.com
+ ([fe80::e166:fa63:f50:5634%9]) with mapi id 15.20.5588.018; Wed, 7 Sep 2022
+ 13:18:52 +0000
+From:   "Radovanovic, Aleksandar" <aleksandar.radovanovic@amd.com>
+To:     Marc Zyngier <maz@kernel.org>
+CC:     Jason Gunthorpe <jgg@nvidia.com>,
+        "Gupta, Nipun" <Nipun.Gupta@amd.com>,
+        "robh+dt@kernel.org" <robh+dt@kernel.org>,
+        "krzysztof.kozlowski+dt@linaro.org" 
+        <krzysztof.kozlowski+dt@linaro.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "Gupta, Puneet (DCG-ENG)" <puneet.gupta@amd.com>,
+        "song.bao.hua@hisilicon.com" <song.bao.hua@hisilicon.com>,
+        "mchehab+huawei@kernel.org" <mchehab+huawei@kernel.org>,
+        "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
+        "jeffrey.l.hugo@gmail.com" <jeffrey.l.hugo@gmail.com>,
+        "saravanak@google.com" <saravanak@google.com>,
+        "Michael.Srba@seznam.cz" <Michael.Srba@seznam.cz>,
+        "mani@kernel.org" <mani@kernel.org>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "will@kernel.org" <will@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "masahiroy@kernel.org" <masahiroy@kernel.org>,
+        "ndesaulniers@google.com" <ndesaulniers@google.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "okaya@kernel.org" <okaya@kernel.org>,
+        "Anand, Harpreet" <harpreet.anand@amd.com>,
+        "Agarwal, Nikhil" <nikhil.agarwal@amd.com>,
+        "Simek, Michal" <michal.simek@amd.com>,
+        "git (AMD-Xilinx)" <git@amd.com>
+Subject: RE: [RFC PATCH v3 4/7] bus/cdx: add cdx-MSI domain with gic-its
+ domain as parent
+Thread-Topic: [RFC PATCH v3 4/7] bus/cdx: add cdx-MSI domain with gic-its
+ domain as parent
+Thread-Index: AQHYwfdzMPgE56itm0GRwc9i4G18eq3SpZoAgAEtSgCAAADFEIAAFD2AgAAHh6A=
+Date:   Wed, 7 Sep 2022 13:18:52 +0000
+Message-ID: <MN2PR12MB43581495197F603E901BBACA89419@MN2PR12MB4358.namprd12.prod.outlook.com>
 References: <20220803122655.100254-1-nipun.gupta@amd.com>
         <20220906134801.4079497-1-nipun.gupta@amd.com>
-        <20220906134801.4079497-5-nipun.gupta@amd.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: nipun.gupta@amd.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, gregkh@linuxfoundation.org, rafael@kernel.org, eric.auger@redhat.com, alex.williamson@redhat.com, cohuck@redhat.com, puneet.gupta@amd.com, song.bao.hua@hisilicon.com, mchehab+huawei@kernel.org, f.fainelli@gmail.com, jeffrey.l.hugo@gmail.com, saravanak@google.com, Michael.Srba@seznam.cz, mani@kernel.org, yishaih@nvidia.com, jgg@ziepe.ca, jgg@nvidia.com, robin.murphy@arm.com, will@kernel.org, joro@8bytes.org, masahiroy@kernel.org, ndesaulniers@google.com, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, kvm@vger.kernel.org, okaya@kernel.org, harpreet.anand@amd.com, nikhil.agarwal@amd.com, michal.simek@amd.com, aleksandar.radovanovic@amd.com, git@amd.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        <20220906134801.4079497-5-nipun.gupta@amd.com>  <YxeBCsA32jnwMjSj@nvidia.com>
+        <87leqvv3g7.wl-maz@kernel.org>
+        <MN2PR12MB4358E3CFD2E3ECECC14471F489419@MN2PR12MB4358.namprd12.prod.outlook.com>
+ <87illzuzyw.wl-maz@kernel.org>
+In-Reply-To: <87illzuzyw.wl-maz@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-09-07T13:18:50Z;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=f7863230-3444-4841-91b7-4ecbd6d2e29e;
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 2a489df9-6fdc-45c5-ae37-08da90d3821b
+x-ms-traffictypediagnostic: DM4PR12MB6326:EE_
+x-ld-processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: nlp7sQDP1JJIDaNxsDUYuT/it/lEZ6E0tpXDNBvWNdmuYUuNJhMILdm/lWP8hkIgMuQr42IZKQ8plSSab31KlTPqWfvgnxHKfMzgIHxyqee2OocvTSpGfs+XwTGiVX1M/CXQZS/JGMSQmBerCRWRGOG4To1NtP4K/7y3iIRIdk9FBJsNZnWHpUbFQgr1q57IbjLPGKNfAuiNE+jn0c6xyOMngCAc8HH8i9lyFUOhVplq2PF11InYfbwvLJNIQ5ueFIdRGkss4EaPs1rGYpIt9X0rewqhKY4B0c4QRpXBI/HWwVhRAAEMVOEtlxQk6X/zKLC41wEjxX0rSh89ymFvT/vt+Vi99ekvDyZZfpj8SM+wj+Dxpb2/YBBoVcMIwTlQwRU6cCHxfhXsr0IjiCcYJqjL5f8To1fBT/phpilTeYLNKxj6AnNERZ/3cVz2ZgrtmPNI4X4Ra1rd6WvTatSNwbqlIICJCfnLLoBKdp+ce2jA/mYdSSdVu1e4/IbmN+NiRsXfCz6XGDLhLxFme2B5Le87CcI80tlMoQcaRH43VOWX9uXeNBaoyjpI/vplxGhlbd0zGC7CB9nmJ9uoU825dq3q/4W1uu8PqZeDNsjBeRGpW3LhGW7DQs/xPAGHu2yoWHkA+9sMK/Mx2RNxMTThQyHaE2mYLY6RiNbP7T3CqXZWxYpp9hihx3Nhn27rIfAKVXS9DTOJAPZ/3crxW2ylUwfKaoiqwxrJyl5bK0lCNO1b78/T39kKVOYqS7w9ICGHyCkstbszc9Y0TulhWW6IbQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4358.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(376002)(136003)(39860400002)(366004)(396003)(4326008)(478600001)(7696005)(122000001)(53546011)(86362001)(6506007)(9686003)(2906002)(66946007)(76116006)(38100700002)(66556008)(7416002)(66446008)(64756008)(66476007)(55016003)(8676002)(5660300002)(38070700005)(6916009)(41300700001)(52536014)(71200400001)(83380400001)(54906003)(33656002)(8936002)(316002)(186003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?dxiRD95yXKJ6BY6THlHMdoiFaZmAaZkMV66cydP9uo4p8bd/242817RmqAUh?=
+ =?us-ascii?Q?jaVTLwZtIymjZ3fwGOjiTjk61s93KvG41hsqjfDeAPHQmg4ttDXxFnev3omh?=
+ =?us-ascii?Q?sSkdkn0UMG04U+3qt1/G02cb4w36B5uj5qm/rTOXKgpKXnlK1WdK6V41LLx5?=
+ =?us-ascii?Q?sbQH6qibRwKLTblvfQ6If3xMb7FoRbPdpA6RLLBm+y5c8Mjs81OO9SBM+kXR?=
+ =?us-ascii?Q?wc6vnY4w1VAq0N/eGp0Tb7JyxLOrsouuJj9XVpMzjUNBy9yTnL6ZCdB7gxXl?=
+ =?us-ascii?Q?3QavMXHgq0liNV1U9cSXVgMblT3S3h7yiR0qfrK+JpiGkdVXZwx+eOP+KRtP?=
+ =?us-ascii?Q?RPC6yLZa+1p1kpVF/wNXhRLysqB3AyUgyDNfE6NYockvgXRFCzSVqJaS52oJ?=
+ =?us-ascii?Q?n0AUcLa6nc7VIaMZ4m0voSZSusmtaaiXJ2GqNmvV2ZLkbToCKQfS/lWNkABw?=
+ =?us-ascii?Q?JoW2Mwq2RuV2yPXTSq+HkY+VaWzGz/O84UH6hiKPC7DOPg9Ya+f4Swyk4u6/?=
+ =?us-ascii?Q?YNOvz3/pfvg9f4CFBVXIur3zooCU+a5J5/3b4Gpo2Fe/mVabvW1m1dYLZwsQ?=
+ =?us-ascii?Q?zNRz6WiY/tmZXNZSVjxyJnpXmnYZd1YE7AZ28x++7DJxW6/RPIOAYnf7Fp8N?=
+ =?us-ascii?Q?rtNmwpymn9krUHppdaNx8JODd0CU8okplAgegeOznsQXlIDdY57YD5A4lbKV?=
+ =?us-ascii?Q?spH3J/pr189c0DELjreuKDwZlhdeDhdMqJXFNgOem1FWUp0cxb/cI5hJaBhI?=
+ =?us-ascii?Q?OwdyKHdusITxjwBf21FXo5tOhaRLjVFpIUArU7Qpmsc1Kfa6TVe9mOVLl8ni?=
+ =?us-ascii?Q?3Zh/Q3e6D6ye4gyGxi3lEQqA0FgVAyn5j/hWQOYNYk0SuRcjmxSf7Taeu0CJ?=
+ =?us-ascii?Q?dRjGedaax48BwDW8xkWEpNnq0jMp0/KTua/dUH9mGYM3KZ3zfYGexvXf/X4d?=
+ =?us-ascii?Q?jUbeAvCRxpAjMXJ7sjzjL3UdjWgR9zBJDYiord6L/5Hqd+aoak5mD1jLCph2?=
+ =?us-ascii?Q?fcRzfmGGw6pnQ5DUMTXZRXrdGdOKoaPtF/wWN2FjrZv9JJ0DhogYKJ0unQ1s?=
+ =?us-ascii?Q?VISLTy5MwpOqQqGHD3mwxIYRND43JqYyU4FGKYD9IPwQAcIFp+JeBrHB28Ws?=
+ =?us-ascii?Q?XL3tx/dqnJofpEoaXcB+i7zo5YSqvWoef4O6v1KEz+byuxm30OFfE7hnja1s?=
+ =?us-ascii?Q?pPTj+GyVfNpwVGn34aJYhkShTRMAzfqKIxlU3dNx9IWD/aNje3wjNIvGbZq2?=
+ =?us-ascii?Q?6h13UTEvT1FbGVqp5IyHMwmp1/BbeDhiUdqWnsYPeAYPK9CL/bswYzT0OnD2?=
+ =?us-ascii?Q?OTZy/XjE2o/1EvRQ0Ob1u9nWXvy/mF4y/Kb7RDdF3WyA0Kt8JO2gAFBRpiT0?=
+ =?us-ascii?Q?nq4QgL/pWpi8Z1XBwQnQ8eRnYooeFaMWFsCIigbaOejmtgAfsjKgj4vABg2Q?=
+ =?us-ascii?Q?h0sEjCs57F5DPr2QAwJkq4lbQ6cik2KxL4ZYc/ZgKbwm2X3Wx51tBKYC94C7?=
+ =?us-ascii?Q?06GGYFNK+krAorTQ63B7mCiL/9ZqSx+bRYcCnMEHTcNRx75rW66m2f34H7t1?=
+ =?us-ascii?Q?g5X2UZoXGMGYYOhJg8dlK21OiiAsuhoFiM5N9K7glzd6gDVITESsEGZakud0?=
+ =?us-ascii?Q?2CA+If7dlWvLIURjV69sCu8=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4358.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2a489df9-6fdc-45c5-ae37-08da90d3821b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Sep 2022 13:18:52.1385
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zKGWiy3kLvyjtmKhfHyzUdfgIA9i/g8yl24QB8eAaSaaYo8KTa5m8FdaD9ILGMHsyBNhEqNQv4EQm1SHzjDRmg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6326
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 06 Sep 2022 14:47:58 +0100,
-Nipun Gupta <nipun.gupta@amd.com> wrote:
-> 
-> Devices on cdx bus are dynamically detected and registered using
-> platform_device_register API. As these devices are not linked to
-> of node they need a separate MSI domain for handling device ID
-> to be provided to the GIC ITS domain.
-> 
-> This also introduces APIs to alloc and free IRQs for CDX domain.
-> 
-> Signed-off-by: Nipun Gupta <nipun.gupta@amd.com>
-> Signed-off-by: Nikhil Agarwal <nikhil.agarwal@amd.com>
-> ---
->  drivers/bus/cdx/cdx.c        |  18 +++
->  drivers/bus/cdx/cdx.h        |  19 +++
->  drivers/bus/cdx/cdx_msi.c    | 236 +++++++++++++++++++++++++++++++++++
->  drivers/bus/cdx/mcdi_stubs.c |   1 +
->  include/linux/cdx/cdx_bus.h  |  19 +++
->  5 files changed, 293 insertions(+)
->  create mode 100644 drivers/bus/cdx/cdx_msi.c
-> 
-> diff --git a/drivers/bus/cdx/cdx.c b/drivers/bus/cdx/cdx.c
-> index fc417c32c59b..02ececce1c84 100644
-> --- a/drivers/bus/cdx/cdx.c
-> +++ b/drivers/bus/cdx/cdx.c
-> @@ -17,6 +17,7 @@
->  #include <linux/dma-map-ops.h>
->  #include <linux/property.h>
->  #include <linux/iommu.h>
-> +#include <linux/msi.h>
->  #include <linux/cdx/cdx_bus.h>
->  
->  #include "cdx.h"
-> @@ -236,6 +237,7 @@ static int cdx_device_add(struct device *parent,
->  			  struct cdx_dev_params_t *dev_params)
->  {
->  	struct cdx_device *cdx_dev;
-> +	struct irq_domain *cdx_msi_domain;
->  	int ret;
->  
->  	cdx_dev = kzalloc(sizeof(*cdx_dev), GFP_KERNEL);
-> @@ -252,6 +254,7 @@ static int cdx_device_add(struct device *parent,
->  
->  	/* Populate CDX dev params */
->  	cdx_dev->req_id = dev_params->req_id;
-> +	cdx_dev->num_msi = dev_params->num_msi;
->  	cdx_dev->vendor = dev_params->vendor;
->  	cdx_dev->device = dev_params->device;
->  	cdx_dev->bus_id = dev_params->bus_id;
-> @@ -269,6 +272,21 @@ static int cdx_device_add(struct device *parent,
->  	dev_set_name(&cdx_dev->dev, "cdx-%02x:%02x", cdx_dev->bus_id,
->  			cdx_dev->func_id);
->  
-> +	/* If CDX MSI domain is not created, create one. */
-> +	cdx_msi_domain = cdx_find_msi_domain(parent);
+[AMD Official Use Only - General]
 
-Why do we need such a wrapper around find_host_domain()?
 
-> +	if (!cdx_msi_domain) {
-> +		cdx_msi_domain = cdx_msi_domain_init(parent);
 
-This is racy. If device are populated in parallel, bad things will
-happen.
+> -----Original Message-----
+> From: Marc Zyngier <maz@kernel.org>
+> Sent: 07 September 2022 13:33
+> To: Radovanovic, Aleksandar <aleksandar.radovanovic@amd.com>
+> Cc: Jason Gunthorpe <jgg@nvidia.com>; Gupta, Nipun
+> <Nipun.Gupta@amd.com>; robh+dt@kernel.org;
+> krzysztof.kozlowski+dt@linaro.org; gregkh@linuxfoundation.org;
+> rafael@kernel.org; eric.auger@redhat.com; alex.williamson@redhat.com;
+> cohuck@redhat.com; Gupta, Puneet (DCG-ENG)
+> <puneet.gupta@amd.com>; song.bao.hua@hisilicon.com;
+> mchehab+huawei@kernel.org; f.fainelli@gmail.com;
+> jeffrey.l.hugo@gmail.com; saravanak@google.com;
+> Michael.Srba@seznam.cz; mani@kernel.org; yishaih@nvidia.com;
+> robin.murphy@arm.com; will@kernel.org; joro@8bytes.org;
+> masahiroy@kernel.org; ndesaulniers@google.com; linux-arm-
+> kernel@lists.infradead.org; linux-kbuild@vger.kernel.org; linux-
+> kernel@vger.kernel.org; devicetree@vger.kernel.org; kvm@vger.kernel.org;
+> okaya@kernel.org; Anand, Harpreet <harpreet.anand@amd.com>; Agarwal,
+> Nikhil <nikhil.agarwal@amd.com>; Simek, Michal <michal.simek@amd.com>;
+> git (AMD-Xilinx) <git@amd.com>
+> Subject: Re: [RFC PATCH v3 4/7] bus/cdx: add cdx-MSI domain with gic-its
+> domain as parent
+>=20
+> [CAUTION: External Email]
+>=20
+> > As Marc mentions, CDX
+> > MSI writes are downstream of the SMMU and, if SMMU does not provide
+> > identity mapping for GITS_TRANSLATER, then we have a problem and may
+> > need to allow the OS to write the address part. However, even if we
+> > did, the CDX hardware is limited in that it can only take one
+> > GITS_TRANSLATER register target address per system, not per CDX
+> > device, nor per MSI vector.
+>=20
+> If the MSI generation is downstream of the SMMU, why should the SMMU
+> provide a 1:1 mapping for GITS_TRANSLATER? I don't think it should provid=
+e a
+> mapping at all in this case. But it looks like I don't really understand =
+how
+> these things are placed relative to each other... :-/
+>=20
 
-> +		if (!cdx_msi_domain) {
-> +			dev_err(&cdx_dev->dev,
-> +				"cdx_msi_domain_init() failed: %d", ret);
-> +			kfree(cdx_dev);
-> +			return -1;
+Apologies, I got my streams confused. It is _upstream_ of the SMMU, it does=
+ go through SMMU mapping.
 
-Use standard error codes.
+> >
+> > As for the data part (EventID in GIC parlance), this is always going
+> > to be the CDX device-relative vector number - I believe this can't be
+> > changed, it is a hardware limitation (but I need to double-check).
+> > That should be OK, though, as I believe this is exactly what Linux
+> > would write anyway, as each CDX device should be in its own IRQ domain
+> > (i.e. have its own ITS device table).
+>=20
+> But that's really the worse part. You have hardcoded what is the
+> *current* Linux behaviour. Things change. And baking SW behaviour into a
+> piece of HW looks incredibly shortsighted...
 
-> +		}
-> +	}
-> +
-> +	/* Set the MSI domain */
-> +	dev_set_msi_domain(&cdx_dev->dev, cdx_msi_domain);
-> +
->  	ret = device_add(&cdx_dev->dev);
->  	if (ret != 0) {
->  		dev_err(&cdx_dev->dev,
-> diff --git a/drivers/bus/cdx/cdx.h b/drivers/bus/cdx/cdx.h
-> index db0569431c10..95df440ebd73 100644
-> --- a/drivers/bus/cdx/cdx.h
-> +++ b/drivers/bus/cdx/cdx.h
-> @@ -20,6 +20,7 @@
->   * @res: array of MMIO region entries
->   * @res_count: number of valid MMIO regions
->   * @req_id: Requestor ID associated with CDX device
-> + * @num_msi: Number of MSI's supported by the device
->   */
->  struct cdx_dev_params_t {
->  	u16 vendor;
-> @@ -29,6 +30,24 @@ struct cdx_dev_params_t {
->  	struct resource res[MAX_CDX_DEV_RESOURCES];
->  	u8 res_count;
->  	u32 req_id;
-> +	u32 num_msi;
->  };
->  
-> +/**
-> + * cdx_msi_domain_init - Init the CDX bus MSI domain.
-> + * @dev: Device of the CDX bus controller
-> + *
-> + * Return CDX MSI domain, NULL on failure
-> + */
-> +struct irq_domain *cdx_msi_domain_init(struct device *dev);
-> +
-> +/**
-> + * cdx_find_msi_domain - Get the CDX-MSI domain.
-> + * @dev: CDX controller generic device
-> + *
-> + * Return CDX MSI domain, NULL on error or if CDX-MSI domain is
-> + *   not yet created.
-> + */
-> +struct irq_domain *cdx_find_msi_domain(struct device *parent);
-> +
->  #endif /* _CDX_H_ */
-> diff --git a/drivers/bus/cdx/cdx_msi.c b/drivers/bus/cdx/cdx_msi.c
-> new file mode 100644
-> index 000000000000..2fb7bac18393
-> --- /dev/null
-> +++ b/drivers/bus/cdx/cdx_msi.c
-> @@ -0,0 +1,236 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * AMD CDX bus driver MSI support
-> + *
-> + * Copyright (C) 2022, Advanced Micro Devices, Inc.
-> + *
-> + */
-> +
-> +#include <linux/of.h>
-> +#include <linux/of_device.h>
-> +#include <linux/of_address.h>
-> +#include <linux/of_irq.h>
-> +#include <linux/irq.h>
-> +#include <linux/irqdomain.h>
-> +#include <linux/msi.h>
-> +#include <linux/cdx/cdx_bus.h>
-> +
-> +#include "cdx.h"
-> +
-> +#ifdef GENERIC_MSI_DOMAIN_OPS
-> +/*
-> + * Generate a unique ID identifying the interrupt (only used within the MSI
-> + * irqdomain.  Combine the req_id with the interrupt index.
-> + */
-> +static irq_hw_number_t cdx_domain_calc_hwirq(struct cdx_device *dev,
-> +					     struct msi_desc *desc)
-> +{
-> +	/*
-> +	 * Make the base hwirq value for req_id*10000 so it is readable
-> +	 * as a decimal value in /proc/interrupts.
-> +	 */
-> +	return (irq_hw_number_t)(desc->msi_index + (dev->req_id * 10000));
+For posterity, I'm not an RTL designer/architect, so share your sentiment t=
+o a certain extent. That said, I expect the decision was not based on Linux=
+ or any other SW behaviour, but because it is the most straightforward and =
+least expensive way to do it. Having an EventID register for each and every=
+ MSI source just so you can program it in any random order costs flops and =
+all the associated complexity of extra RTL logic (think timing closure, etc=
+.), so trade-offs are made. The fact that it matches current Linux behaviou=
+r means we just got lucky...=20
 
-No, please. Use shifts, and use a script if decimal conversion fails
-you. We're not playing these games. And the cast is pointless.
+Anyway, I'm straying off topic here, I'll check with the system architects =
+if there's anything that can be done here. But I'm not feeling hopeful.
 
-Yes, you have lifted it from the FSL code, bad move. /me makes a note
-to go and clean-up this crap.
-
-> +}
-> +
-> +static void cdx_msi_set_desc(msi_alloc_info_t *arg,
-> +			     struct msi_desc *desc)
-> +{
-> +	arg->desc = desc;
-> +	arg->hwirq = cdx_domain_calc_hwirq(to_cdx_device(desc->dev), desc);
-> +}
-> +#else
-> +#define cdx_msi_set_desc NULL
-
-Why the ifdefery? This should *only* be supported with
-GENERIC_MSI_DOMAIN_OPS.
-
-> +#endif
-> +
-> +static void cdx_msi_update_dom_ops(struct msi_domain_info *info)
-> +{
-> +	struct msi_domain_ops *ops = info->ops;
-> +
-> +	if (!ops)
-> +		return;
-> +
-> +	/* set_desc should not be set by the caller */
-> +	if (!ops->set_desc)
-> +		ops->set_desc = cdx_msi_set_desc;
-
-Then why are you allowing this to be overridden?
-
-> +}
-> +
-> +static void cdx_msi_write_msg(struct irq_data *irq_data,
-> +			      struct msi_msg *msg)
-> +{
-> +	/*
-> +	 * Do nothing as CDX devices have these pre-populated
-> +	 * in the hardware itself.
-> +	 */
-
-We talked about this in a separate thread. This is a major problem.
-
-> +}
-> +
-> +static void cdx_msi_update_chip_ops(struct msi_domain_info *info)
-> +{
-> +	struct irq_chip *chip = info->chip;
-> +
-> +	if (!chip)
-> +		return;
-> +
-> +	/*
-> +	 * irq_write_msi_msg should not be set by the caller
-> +	 */
-> +	if (!chip->irq_write_msi_msg)
-> +		chip->irq_write_msi_msg = cdx_msi_write_msg;
-
-Then why the check?
-
-> +}
-> +/**
-> + * cdx_msi_create_irq_domain - Create a CDX MSI interrupt domain
-> + * @fwnode:	Optional firmware node of the interrupt controller
-> + * @info:	MSI domain info
-> + * @parent:	Parent irq domain
-> + *
-> + * Updates the domain and chip ops and creates a CDX MSI
-> + * interrupt domain.
-> + *
-> + * Returns:
-> + * A domain pointer or NULL in case of failure.
-> + */
-> +static struct irq_domain *cdx_msi_create_irq_domain(struct fwnode_handle *fwnode,
-> +						    struct msi_domain_info *info,
-> +						    struct irq_domain *parent)
-> +{
-> +	if (WARN_ON((info->flags & MSI_FLAG_LEVEL_CAPABLE)))
-> +		info->flags &= ~MSI_FLAG_LEVEL_CAPABLE;
-
-No. Just fail the domain creation. We shouldn't paper over these things.
-
-> +	if (info->flags & MSI_FLAG_USE_DEF_DOM_OPS)
-> +		cdx_msi_update_dom_ops(info);
-> +	if (info->flags & MSI_FLAG_USE_DEF_CHIP_OPS)
-> +		cdx_msi_update_chip_ops(info);
-
-Under what circumstances would the default ops not be used? The only
-caller is in this file and has pre-computed values.
-
-This looks like a copy/paste from platform-msi.c.
-
-> +	info->flags |= MSI_FLAG_ALLOC_SIMPLE_MSI_DESCS | MSI_FLAG_FREE_MSI_DESCS;
-> +
-> +	return msi_create_irq_domain(fwnode, info, parent);
-
-This whole function makes no sense. You should move everything to the
-relevant structures, and simply call msi_create_irq_domain() from the
-sole caller of this function.
-
-> +}
-> +
-> +int cdx_msi_domain_alloc_irqs(struct device *dev, unsigned int irq_count)
-> +{
-> +	struct irq_domain *msi_domain;
-> +	int ret;
-> +
-> +	msi_domain = dev_get_msi_domain(dev);
-> +	if (!msi_domain) {
-
-How can that happen?
-
-> +		dev_err(dev, "msi domain get failed\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	ret = msi_setup_device_data(dev);
-> +	if (ret) {
-> +		dev_err(dev, "msi setup device failed: %d\n", ret);
-> +		return ret;
-> +	}
-> +
-> +	msi_lock_descs(dev);
-> +	if (msi_first_desc(dev, MSI_DESC_ALL))
-> +		ret = -EINVAL;
-> +	msi_unlock_descs(dev);
-> +	if (ret) {
-> +		dev_err(dev, "msi setup device failed: %d\n", ret);
-
-Same message twice, not very useful. Consider grouping these things at
-the end of the function and make use of a (oh Gawd) goto...
-
-> +		return ret;
-> +	}
-> +
-> +	ret = msi_domain_alloc_irqs(msi_domain, dev, irq_count);
-> +	if (ret)
-> +		dev_err(dev, "Failed to allocate IRQs\n");
-> +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL(cdx_msi_domain_alloc_irqs);
-
-EXPORT_SYMBOL_GPL(), please, for all the exports.
-
-> +
-> +void cdx_msi_domain_free_irqs(struct device *dev)
-> +{
-> +	struct irq_domain *msi_domain;
-> +
-> +	msi_domain = dev_get_msi_domain(dev);
-> +	if (!msi_domain)
-
-Again, how can that happen?
-
-> +		return;
-> +
-> +	msi_domain_free_irqs(msi_domain, dev);
-> +}
-> +EXPORT_SYMBOL(cdx_msi_domain_free_irqs);
-
-This feels like a very pointless helper, and again a copy/paste from
-the FSL code. I'd rather you change msi_domain_free_irqs() to only
-take a device and use the implicit MSI domain.
-
-> +
-> +static struct irq_chip cdx_msi_irq_chip = {
-> +	.name = "CDX-MSI",
-> +	.irq_mask = irq_chip_mask_parent,
-> +	.irq_unmask = irq_chip_unmask_parent,
-> +	.irq_eoi = irq_chip_eoi_parent,
-> +	.irq_set_affinity = msi_domain_set_affinity
-
-nit: please align things vertically.
-
-> +};
-> +
-> +static int cdx_msi_prepare(struct irq_domain *msi_domain,
-> +			   struct device *dev,
-> +			   int nvec, msi_alloc_info_t *info)
-> +{
-> +	struct cdx_device *cdx_dev = to_cdx_device(dev);
-> +	struct msi_domain_info *msi_info;
-> +	struct device *parent = dev->parent;
-> +	u32 dev_id;
-> +	int ret;
-> +
-> +	/* Retrieve device ID from requestor ID using parent device */
-> +	ret = of_map_id(parent->of_node, cdx_dev->req_id, "msi-map",
-> +			"msi-map-mask",	NULL, &dev_id);
-> +	if (ret) {
-> +		dev_err(dev, "of_map_id failed for MSI: %d\n", ret);
-> +		return ret;
-> +	}
-> +
-> +	/* Set the device Id to be passed to the GIC-ITS */
-> +	info->scratchpad[0].ul = dev_id;
-> +
-> +	msi_info = msi_get_domain_info(msi_domain->parent);
-> +
-> +	/* Allocate at least 32 MSIs, and always as a power of 2 */
-
-Where is this requirement coming from?
-
-> +	nvec = max_t(int, 32, roundup_pow_of_two(nvec));
-> +	return msi_info->ops->msi_prepare(msi_domain->parent, dev, nvec, info);
-> +}
-> +
-> +static struct msi_domain_ops cdx_msi_ops __ro_after_init = {
-> +	.msi_prepare = cdx_msi_prepare,
-> +};
-> +
-> +static struct msi_domain_info cdx_msi_domain_info = {
-> +	.flags	= (MSI_FLAG_USE_DEF_DOM_OPS | MSI_FLAG_USE_DEF_CHIP_OPS),
-> +	.ops	= &cdx_msi_ops,
-> +	.chip	= &cdx_msi_irq_chip,
-> +};
-> +
-> +struct irq_domain *cdx_msi_domain_init(struct device *dev)
-> +{
-> +	struct irq_domain *parent;
-> +	struct irq_domain *cdx_msi_domain;
-> +	struct fwnode_handle *fwnode_handle;
-> +	struct device_node *parent_node;
-> +	struct device_node *np = dev->of_node;
-> +
-> +	fwnode_handle = of_node_to_fwnode(np);
-> +
-> +	parent_node = of_parse_phandle(np, "msi-map", 1);
-
-Huh. This only works because you are stuck with a single ITS per system.
-
-> +	if (!parent_node) {
-> +		dev_err(dev, "msi-map not present on cdx controller\n");
-> +		return NULL;
-> +	}
-> +
-> +	parent = irq_find_matching_fwnode(of_node_to_fwnode(parent_node),
-> +			DOMAIN_BUS_NEXUS);
-> +	if (!parent || !msi_get_domain_info(parent)) {
-> +		dev_err(dev, "unable to locate ITS domain\n");
-> +		return NULL;
-> +	}
-> +
-> +	cdx_msi_domain = cdx_msi_create_irq_domain(fwnode_handle,
-> +				&cdx_msi_domain_info, parent);
-> +	if (!cdx_msi_domain) {
-> +		dev_err(dev, "unable to create CDX-MSI domain\n");
-> +		return NULL;
-> +	}
-> +
-> +	dev_dbg(dev, "CDX-MSI domain created\n");
-> +
-> +	return cdx_msi_domain;
-> +}
-> +
-> +struct irq_domain *cdx_find_msi_domain(struct device *parent)
-> +{
-> +	return irq_find_host(parent->of_node);
-> +}
-> diff --git a/drivers/bus/cdx/mcdi_stubs.c b/drivers/bus/cdx/mcdi_stubs.c
-> index cc9d30fa02f8..2c8db1f5a057 100644
-> --- a/drivers/bus/cdx/mcdi_stubs.c
-> +++ b/drivers/bus/cdx/mcdi_stubs.c
-> @@ -45,6 +45,7 @@ int cdx_mcdi_get_func_config(struct cdx_mcdi_t *cdx_mcdi,
->  	dev_params->res_count = 2;
->  
->  	dev_params->req_id = 0x250;
-> +	dev_params->num_msi = 4;
-
-Why the hardcoded 4? Is that part of the firmware emulation stuff?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Aleksandar
