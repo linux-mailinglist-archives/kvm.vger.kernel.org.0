@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A51965B0F2D
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 23:32:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 708E05B0F6C
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 23:47:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230173AbiIGVcj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 17:32:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36992 "EHLO
+        id S230320AbiIGVrT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 17:47:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229632AbiIGVch (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 17:32:37 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A69D4B774D
-        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 14:32:36 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id z187so15874190pfb.12
-        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 14:32:36 -0700 (PDT)
+        with ESMTP id S230313AbiIGVrR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 17:47:17 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68516BADA9
+        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 14:47:16 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id pj10so5395483pjb.2
+        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 14:47:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=7na4QT6yvyqzijLFE24Wbx46oe0wPXj14j8P2u6pP1w=;
-        b=UzP2VbnLuTjsou56LGJV0IVy5dUZ5ia4mREFcUwJvUKzdU8EDsewlGPEqnX1NiOp41
-         0AEOCI8E6a9AH/bp0M9AkwM4K6pi18gbxaa9FQHA025LecN9vHkWk0yr6itCVz1d1Sip
-         1hCbbLMb+pp9LQqwQoKnGLrTRuEJZNa1YXODMatGENOmG6TlEBYYj8PYxGXt6CEutDx+
-         IV+B0IBRq8uMk2z0ZxrVuQ+GHrRdb+ZEWwt0rLSohMESgquu3gLQECLXi22E0+Z7e7gm
-         nwGEqq/ifhlOgAjjcm4c9omWSxvG9GV/r3l3r275GllZjalkTy0cWgw6P9peAzfM5qZx
-         LHtA==
+        bh=a0onBmXPphYT3RuqfDE1tfHpBM48udC3uDDfIPbNeqQ=;
+        b=qz8qKS17YDB74dB3eVq/ImHb/1panXWt9MKNv77sjzlXj8cL3XwLCX/xz8ZQn9FJSc
+         pkuvn/eM3SPKQUCBDgtCZu6rnvnlsgeB696oCeiPN8LzQIFq4odPuYBB/o7hizZaRcRP
+         tH7JasNxHZyEVsUyfz0V/dL1r9OPMoCaBwGTkGjH1jd/RD5/uG56v/Pc1g6Dr4EGnH6r
+         hr+0E5wBEw/x3ik8lSEvklHAQ6eORvUgxri4N5u/Sr7xvTrdNUpSsXg71MROLD6JhtYd
+         nyD3JCmVLfqxQWXd75Tk6Z+u4KPOxj45s6/oI+dRFkvHvvGKtM9qmtSw3qCoO59EWNNk
+         GKXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=7na4QT6yvyqzijLFE24Wbx46oe0wPXj14j8P2u6pP1w=;
-        b=BsonAavN0xObq5Rne135yc0vQ2wChEt1NUlKEtUYBRcGbyYveydsEihosv3uXrUouw
-         7YuUQif0AbDzvi/5xriI19iCjscy1fOY6vWXBmdYslhUKpxZJ+dIWfIz+7d/CQkTFWuI
-         DFwHJsUYLMb8E3Qe+vPWWhieU20iWA6LWGZ8/DlbqB5wB9IhliPKbUCtSEGcuME1qzhe
-         VRqCPD0wSNYXRzYwB6NmKqQTCuKYPDDNbGxrH/RoTiXnefkAIntkyR3ypBAXFPTPJSlA
-         E4aGsoh1EC+bMtlnzrXoimCZvCFkPC8+tYQM14OMra2S0fibyr534YUCLvoIiU/tM+PJ
-         05zw==
-X-Gm-Message-State: ACgBeo3lFBJodINapiZ2LqfZXxjaqaC6kD8pqz04Jd9ton3YNPlO1k4u
-        v2rUI+E5iCef02/MAiGd0Urn5A==
-X-Google-Smtp-Source: AA6agR7Q4eHfCORqq/GdxHWoHptDop8lLgJyVx3iDY9vFGg98YhF6AsRZ4mhtYSuJiPSkfoyXtLNow==
-X-Received: by 2002:a63:6c01:0:b0:429:ea6e:486d with SMTP id h1-20020a636c01000000b00429ea6e486dmr4993947pgc.247.1662586355791;
-        Wed, 07 Sep 2022 14:32:35 -0700 (PDT)
+        bh=a0onBmXPphYT3RuqfDE1tfHpBM48udC3uDDfIPbNeqQ=;
+        b=Xhjx8etBWvkvVxv/yP9qZMe44zD+PuR7lv/5dU/c/oer0mbq8CwxT0Df/Zu+SxHrb/
+         9DO264FQr2pypU0CC6q7jExhOM3U00mCllNQK4iMUH1EXmma/iFN+krOrQkJZ5I2Dp3w
+         moc8BbAc+lEt/SCPGtxz2l+nUf0amdF9CKLyMZR4oQs3P1cebAOGWDhzNexX/MprFnwM
+         gNusb8/qNDktTDTOWp1OSzTjNQSgHWndE6PRQAAS8vt6Auj+wbPfW1Zxb/eZuqY3+PD8
+         gE+7kCuWc6ZGACHk3ydMFv4qAsiN65EtUbrj3V7KVyIKX/d9brgmc5YNlFXxOKxNxA1u
+         PdNA==
+X-Gm-Message-State: ACgBeo1fCgr2SWsM95VbEzGKnKXXJkcyrb1LPTfDgeDi/I2tNV89eKo9
+        DFLK3j67pF2HOdAyY5TMIyrlSw==
+X-Google-Smtp-Source: AA6agR7u55ulppnpFE92xnBEjpQea4OXXBFThe+B3Pt6YcvMkX+Mwtq2DlhDFlWJGj73EGApy3OVsw==
+X-Received: by 2002:a17:902:6b4c:b0:171:38ab:e762 with SMTP id g12-20020a1709026b4c00b0017138abe762mr5635735plt.42.1662587235722;
+        Wed, 07 Sep 2022 14:47:15 -0700 (PDT)
 Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id j3-20020a170902da8300b001752216ca51sm13034032plx.39.2022.09.07.14.32.33
+        by smtp.gmail.com with ESMTPSA id n6-20020a170902e54600b00173cfaed233sm659052plf.62.2022.09.07.14.47.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Sep 2022 14:32:34 -0700 (PDT)
-Date:   Wed, 7 Sep 2022 14:32:29 -0700
+        Wed, 07 Sep 2022 14:47:14 -0700 (PDT)
+Date:   Wed, 7 Sep 2022 14:47:08 -0700
 From:   David Matlack <dmatlack@google.com>
 To:     Oliver Upton <oliver.upton@linux.dev>
 Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
@@ -64,110 +64,101 @@ Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
         Sean Christopherson <seanjc@google.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 06/14] KVM: arm64: Return next table from map callbacks
-Message-ID: <YxkN7XmHiU3ddknR@google.com>
+Subject: Re: [PATCH 08/14] KVM: arm64: Protect page table traversal with RCU
+Message-ID: <YxkRXLsLuhjBNanT@google.com>
 References: <20220830194132.962932-1-oliver.upton@linux.dev>
- <20220830194132.962932-7-oliver.upton@linux.dev>
+ <20220830194132.962932-9-oliver.upton@linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220830194132.962932-7-oliver.upton@linux.dev>
+In-Reply-To: <20220830194132.962932-9-oliver.upton@linux.dev>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 30, 2022 at 07:41:24PM +0000, Oliver Upton wrote:
-> The map walkers install new page tables during their traversal. Return
-> the newly-installed table PTE from the map callbacks to point the walker
-> at the new table w/o rereading the ptep.
+On Tue, Aug 30, 2022 at 07:41:26PM +0000, Oliver Upton wrote:
+> The use of RCU is necessary to change the paging structures in parallel.
+> Acquire and release an RCU read lock when traversing the page tables.
 > 
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/kvm/hyp/pgtable.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
+>  arch/arm64/include/asm/kvm_pgtable.h | 19 ++++++++++++++++++-
+>  arch/arm64/kvm/hyp/pgtable.c         |  7 ++++++-
+>  2 files changed, 24 insertions(+), 2 deletions(-)
 > 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 78fbb7be1af6..7d2de0a98ccb 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -578,9 +578,26 @@ enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(kvm_pte_t pte);
+>   */
+>  enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
+>  
+> +#if defined(__KVM_NVHE_HYPERVISOR___)
+> +
+
+Future readers will wonder why NVHE stubs out RCU support and how that
+is even correct. Some comments here would be useful explain it.
+
+> +static inline void kvm_pgtable_walk_begin(void) {}
+> +static inline void kvm_pgtable_walk_end(void) {}
+> +
+> +#define kvm_dereference_ptep rcu_dereference_raw
+
+How does NVHE have access rcu_dereference_raw()?
+
+> +
+> +#else	/* !defined(__KVM_NVHE_HYPERVISOR__) */
+> +
+> +#define kvm_pgtable_walk_begin	rcu_read_lock
+> +#define kvm_pgtable_walk_end	rcu_read_unlock
+> +#define kvm_dereference_ptep	rcu_dereference
+> +
+> +#endif	/* defined(__KVM_NVHE_HYPERVISOR__) */
+> +
+>  static inline kvm_pte_t kvm_pte_read(kvm_pte_t *ptep)
+>  {
+> -	return READ_ONCE(*ptep);
+> +	kvm_pte_t __rcu *p = (kvm_pte_t __rcu *)ptep;
+> +
+> +	return READ_ONCE(*kvm_dereference_ptep(p));
+
+What about all the other places where page table memory is accessed?
+
+If RCU is going to be used to protect page table memory, then all
+accesses have to go under an RCU critical section. This means that page
+table memory should only be accessed through __rcu annotated pointers
+and dereferenced with rcu_dereference().
+
+>  }
+>  
+>  #endif	/* __ARM64_KVM_PGTABLE_H__ */
 > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 331f6e3b2c20..f911509e6512 100644
+> index f911509e6512..215a14c434ed 100644
 > --- a/arch/arm64/kvm/hyp/pgtable.c
 > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -202,13 +202,12 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
->  	if (!table && (flags & KVM_PGTABLE_WALK_LEAF)) {
->  		ret = kvm_pgtable_visitor_cb(data, addr, level, ptep, &pte,
->  					     KVM_PGTABLE_WALK_LEAF);
-> -		pte = *ptep;
-> -		table = kvm_pte_table(pte, level);
->  	}
+> @@ -284,8 +284,13 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
+>  		.end	= PAGE_ALIGN(walk_data.addr + size),
+>  		.walker	= walker,
+>  	};
+> +	int r;
 >  
->  	if (ret)
->  		goto out;
-
-Rather than passing a pointer to the local variable pte and requiring
-all downstream code to update it (and deal with dereferencing to read
-the old pte), wouldn't it be simpler to just re-read the PTE here? e.g.
-
-        /*
-         * Explicitly re-read the PTE since it may have been modified
-         * during the TABLE_PRE or LEAF callback.
-         */
-        pte = kvm_pte_read(ptep);
-
-This should also result in better behavior once parallelization is
-introduced, because it will prevent the walker from traversing down and
-doing a bunch of work on page tables that are in the process of being
-freed by some other thread.
-
->  
-> +	table = kvm_pte_table(pte, level);
->  	if (!table) {
-
-nit: Technically there's no reason to set @table again. e.g. This could
-just be:
-
-        if (!kvm_pte_table(pte, level)) {
-
->  		data->addr = ALIGN_DOWN(data->addr, kvm_granule_size(level));
->  		data->addr += kvm_granule_size(level);
-> @@ -427,6 +426,7 @@ static int hyp_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep, kvm_pte
->  	new = kvm_init_table_pte(childp, mm_ops);
->  	mm_ops->get_page(ptep);
->  	smp_store_release(ptep, new);
-> +	*old = new;
->  
->  	return 0;
->  }
-> @@ -768,7 +768,7 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
+> -	return _kvm_pgtable_walk(&walk_data);
+> +	kvm_pgtable_walk_begin();
+> +	r = _kvm_pgtable_walk(&walk_data);
+> +	kvm_pgtable_walk_end();
+> +
+> +	return r;
 >  }
 >  
->  static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> -				struct stage2_map_data *data);
-> +				kvm_pte_t *old, struct stage2_map_data *data);
->  
->  static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
->  				     kvm_pte_t *ptep, kvm_pte_t *old,
-> @@ -791,7 +791,7 @@ static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
->  	 */
->  	kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
->  
-> -	ret = stage2_map_walk_leaf(addr, end, level, ptep, data);
-> +	ret = stage2_map_walk_leaf(addr, end, level, ptep, old, data);
->  
->  	mm_ops->put_page(ptep);
->  	mm_ops->free_removed_table(childp, level + 1, pgt);
-> @@ -832,6 +832,7 @@ static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
->  	new = kvm_init_table_pte(childp, mm_ops);
->  	mm_ops->get_page(ptep);
->  	smp_store_release(ptep, new);
-> +	*old = new;
->  
->  	return 0;
->  }
+>  struct leaf_walk_data {
 > -- 
 > 2.37.2.672.g94769d06f0-goog
 > 
