@@ -2,58 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8976A5B0A21
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 18:31:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AE8F5B0A2B
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 18:33:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229902AbiIGQbV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 12:31:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56760 "EHLO
+        id S230020AbiIGQd1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 12:33:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229563AbiIGQbV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 12:31:21 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B539D80501;
-        Wed,  7 Sep 2022 09:31:19 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A88EC143D;
-        Wed,  7 Sep 2022 09:31:25 -0700 (PDT)
-Received: from [10.57.15.197] (unknown [10.57.15.197])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 425123F71A;
-        Wed,  7 Sep 2022 09:31:16 -0700 (PDT)
-Message-ID: <6a42a8bc-4e2e-4502-3e7b-1a616dfee351@arm.com>
-Date:   Wed, 7 Sep 2022 17:31:14 +0100
+        with ESMTP id S229526AbiIGQdZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 12:33:25 -0400
+Received: from mail-oa1-x2e.google.com (mail-oa1-x2e.google.com [IPv6:2001:4860:4864:20::2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCC99A74C3
+        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 09:33:24 -0700 (PDT)
+Received: by mail-oa1-x2e.google.com with SMTP id 586e51a60fabf-11eab59db71so37276620fac.11
+        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 09:33:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=EmmUroBnQkKtzSpVrUefA2RMcw7wGhyCwtTDIpKDhrk=;
+        b=PknB9Wzlt1y0TbVGAQBs/L0GjuCa+I/M92/+1rXq+zMC0AfruyxAtxyXEcTrEW3Vir
+         cA9HDVdlT3akhMsuiWIl4IkuaARR47abE+oak4c84rqaZ6Wqm954cE3zE5Dt/cB169lY
+         d0+OfeBlFYvDD9SMqAnejNpB/yNOlyzgUkk2vdcPPpLVh8hRhYmWS3Hgc+MvxSVKawT2
+         vcTRd/hlqclFLK+91YwLOBcYjJ8WQiIkc9b5GDImrPRgLDTWzvuLrvyhXtsdHMta1RxV
+         x6pnLBQUEkh0tTGjcjzOnB15ruIEkZDQPywrjHEsfW1sajwj/lIre/0Vr2JJ5CaiCpE5
+         nodg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=EmmUroBnQkKtzSpVrUefA2RMcw7wGhyCwtTDIpKDhrk=;
+        b=YRo4Ht5/55TUUBzMNZe12j3MR06m+YGdPzkeeG4RgBXgv+AnKiEJ+ulXR0BbQPkPgQ
+         itMvLP99h4X3KXBpcn+U7GLTPbOa6W9RRpmuycrmj1leUqlE5q6EvGvH0Z3ttXmfdUiz
+         FOv/nM9ZNzJ/4Bnk6OR63X10jrTphpd08ADk6viA2D0rvQQ5b6yrNeFdgofYIvV7lRRN
+         vPMpCVaoNRkoJ5S7GdzIkqGygkza2M+3GpT8gd+ZgXkWO5hcT/LVTukVOCMGa3qPP/ss
+         ggLj24Oj9gJvB1N9M6H0RIukbFujMTek9EnIMCLzIzWDuzzOgezvmHXMYG+kz4MI4jML
+         joGQ==
+X-Gm-Message-State: ACgBeo2afqtX9d8TO0Y9XB1YTjFyJP04hH650B8GMIsYC7/7HOucVIfk
+        qaBV+rDO3JqhYFJaFN5ahMp/YAeZ5FhSbwb2BoQNkA==
+X-Google-Smtp-Source: AA6agR4kzdBfcMicmpDRKNagmkro3jVBoG3aMKLRx/kY02XEbylzC5Z20E/hkkos05UKSPVjscEoWuqIuFX1v8fHD9I=
+X-Received: by 2002:a05:6870:41d0:b0:126:5d06:28a5 with SMTP id
+ z16-20020a05687041d000b001265d0628a5mr2299318oac.181.1662568403992; Wed, 07
+ Sep 2022 09:33:23 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH v2 4/4] vfio/pci: Allow MMIO regions to be exported
- through dma-buf
-Content-Language: en-GB
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     Leon Romanovsky <leon@kernel.org>, kvm@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Oded Gabbay <ogabbay@kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        dri-devel@lists.freedesktop.org,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        linaro-mm-sig@lists.linaro.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Maor Gottlieb <maorg@nvidia.com>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        linux-media@vger.kernel.org
-References: <0-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
- <4-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
- <YxcYGzPv022G2vLm@infradead.org>
- <b6b5d236-c089-7428-4cc9-a08fe4f6b4a3@amd.com> <YxczjNIloP7TWcf2@nvidia.com>
- <YxiJJYtWgh1l0wxg@infradead.org> <YxiPh4u/92chN02C@nvidia.com>
- <Yxiq5sjf/qA7xS8A@infradead.org> <Yxi3cFfs0SA4XWJw@nvidia.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <Yxi3cFfs0SA4XWJw@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-11.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+References: <20220907104838.8424-1-likexu@tencent.com>
+In-Reply-To: <20220907104838.8424-1-likexu@tencent.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 7 Sep 2022 09:33:13 -0700
+Message-ID: <CALMp9eSPfxPunKW-K6LLPxsXdaeezKU=2G9Sdh7FS6VGb3goFA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] KVM: x86/pmu: Stop adding speculative Intel GP
+ PMCs that don't exist yet
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -61,45 +69,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-09-07 16:23, Jason Gunthorpe wrote:
-> On Wed, Sep 07, 2022 at 07:29:58AM -0700, Christoph Hellwig wrote:
->> On Wed, Sep 07, 2022 at 09:33:11AM -0300, Jason Gunthorpe wrote:
->>> Yes, you said that, and I said that when the AMD driver first merged
->>> it - but it went in anyhow and now people are using it in a bunch of
->>> places.
->>
->> drm folks made up their own weird rules, if they internally stick
->> to it they have to listen to it given that they ignore review comments,
->> but it violates the scatterlist API and has not business anywhere
->> else in the kernel.  And yes, there probably is a reason or two why
->> the drm code is unusually error prone.
-> 
-> That may be, but it is creating problems if DRM gets to do X crazy
-> thing and nobody else can..
-> 
-> So, we have two issues here
-> 
->   1) DMABUF abuses the scatter list, but this is very constrainted we have
->      this weird special "DMABUF scatterlist" that is only touched by DMABUF
->      importers. The imports signal that they understand the format with
->      a flag. This is ugly and would be nice to clean to a dma mapped
->      address list of some sort.
-> 
->      I spent alot of time a few years ago removing driver touches of
->      the SGL and preparing the RDMA stack to do this kind of change, at
->      least.
-> 
->   2) DMABUF abuses dma_map_resource() for P2P and thus doesn't work in
->      certain special cases.
+On Wed, Sep 7, 2022 at 3:48 AM Like Xu <like.xu.linux@gmail.com> wrote:
+>
+> From: Like Xu <likexu@tencent.com>
+>
+> The Intel April 2022 SDM - Table 2-2. IA-32 Architectural MSRs adds
+> a new architectural IA32_OVERCLOCKING_STATUS msr (0x195), plus the
+> presence of IA32_CORE_CAPABILITIES (0xCF), the theoretical effective
+> maximum value of the Intel GP PMCs is 14 (0xCF - 0xC1) instead of 18.
+>
+> But the conclusion of this speculation "14" is very fragile and can
+> easily be overturned once Intel declares another meaningful arch msr
+> in the above reserved range, and even worse, Intel probably put PMCs
+> 8-15 in a completely different range of MSR indices.
 
-FWIW, dma_map_resource() *is* for P2P in general. The classic case of 
-one device poking at another's registers that was the original 
-motivation is a standalone DMA engine reading/writing a peripheral 
-device's FIFO, so the very similar inter-device doorbell signal is 
-absolutely in scope too; VRAM might be a slightly greyer area, but if 
-it's still not page-backed kernel memory then I reckon that's fair game.
+The last clause is just conjecture.
 
-The only trouble is that it's not geared for *PCI* P2P when that may or 
-may not happen entirely upstream of IOMMU translation.
+> A conservative proposal would be to stop at the maximum number of Intel
+> GP PMCs supported today. Also subsequent changes would limit both AMD
+> and Intel on the number of GP counter supported by KVM.
+>
+> There are some boxes like Intel P4 may indeed have 18 counters, but
+> those counters are in a completely different msr address range and do
+> not strictly adhere to the Intel Arch PMU specification, and will not
+> be supported by KVM in the near future.
 
-Robin.
+The P4 PMU isn't virtualized by KVM today, is it?
+
+>
+> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Suggested-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Like Xu <likexu@tencent.com>
+
+Please put the "Fixes" tag back. You convinced me that it should be there.
+
+Reviewed-by: Jim Mattson <jmattson@google.com>
