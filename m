@@ -2,114 +2,257 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 756BC5AFBCB
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 07:35:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35E405AFBCF
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 07:38:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229729AbiIGFfa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 01:35:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36708 "EHLO
+        id S229739AbiIGFiT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 01:38:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbiIGFf1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 01:35:27 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 298124B49D;
-        Tue,  6 Sep 2022 22:35:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662528926; x=1694064926;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=s/ws2IVLLDd2yoBtML6C/t5SDZcAcQIo3h0hl+fCkPk=;
-  b=AMDxu4eOgCDPC3ZRPKuvt0Pmx+XVEdlXHEQ/UtPxcixdaYSnbpNTo3B8
-   4nNHhPgGLUt/+hLGxEBsKaTq8HSa3QRX5mGdj2q9nrY15TXpRUUCImA3W
-   5GNzqg/fuOTH3BAh9+C43/qKoLi68aRD0pGBvsxiaFZ64hwdc0Xb/3p4S
-   mRefITf0v1wqziI/x2keKun5J8WT4J5lt575JKVOxvAkOive7z0N+E1E+
-   YccovW4k10OI3hPmIqxFlO8gkn3AVKVQ6IigFG3Eg2bSbUQEYsxvh3AFa
-   XBIkyWdOpEp0tDZFnjQoVVNe+80oHtpQwmTZpb40e7z+1OMe813+6RfMl
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10462"; a="277177789"
-X-IronPort-AV: E=Sophos;i="5.93,295,1654585200"; 
-   d="scan'208";a="277177789"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2022 22:35:26 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,295,1654585200"; 
-   d="scan'208";a="676020466"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by fmsmga008.fm.intel.com with ESMTP; 06 Sep 2022 22:35:24 -0700
-Date:   Wed, 7 Sep 2022 13:35:23 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     Mingwei Zhang <mizhang@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Oliver Upton <oupton@google.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v2 1/4] KVM: x86: move the event handling of
- KVM_REQ_GET_VMCS12_PAGES into a common function
-Message-ID: <20220907053523.qb7qsbqfgcg2d2vx@yy-desk-7060>
-References: <20220828222544.1964917-1-mizhang@google.com>
- <20220828222544.1964917-2-mizhang@google.com>
- <YwzkvfT0AiwaojTx@google.com>
- <20220907025042.hvfww56wskwhsjwk@yy-desk-7060>
- <CAL715WJK1WwXFfbUiMjngV8Z-0jyu_9JeZaK4qvvdJfYvtQEYg@mail.gmail.com>
+        with ESMTP id S229549AbiIGFiR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 01:38:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0606081B17
+        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 22:38:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662529094;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=z/ijoziX1JqP00j9yW5u7IZw3l7uhHHBn3IFfumff2g=;
+        b=M2oSYAtLYc55YIZB/fqd17UJuxdEKFrKSmZGnOammzPBMj0SKdFtA8/xdKeI5t/oQqLJnY
+        SXs/D58910xTY8Flyji5xTD4OU//Hqve9IFkJ+pJ5pf1HJ8wjGj9sAblTNI9mZWSU0WCZu
+        Ha8jzG/51bOFiO6dezYWU8+q4n4TVc4=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-650-DpPC2iEVM1K53Le7JGi05Q-1; Wed, 07 Sep 2022 01:38:13 -0400
+X-MC-Unique: DpPC2iEVM1K53Le7JGi05Q-1
+Received: by mail-pg1-f197.google.com with SMTP id 15-20020a63020f000000b0041b578f43f9so6980670pgc.11
+        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 22:38:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=z/ijoziX1JqP00j9yW5u7IZw3l7uhHHBn3IFfumff2g=;
+        b=ecpdluYg1nF+11Z0P9w6VErpPz2wyrwJJEBpmVI6zKuabUJ8VBTDDMVrVuTnysz5fW
+         tNn+4q1+qWbvPxv2CxN0FYdjX3jCe9662zkFQIJtdg/j0Ve1CsNWHyGvAv6kx1Pp3TcF
+         xprUMDyBAgpk2OFqwEK3jZ0/EGm9CUOsFqjdASkUrL4LoT0xV7S+2smh3hL0j75/zv6L
+         JE/pEUq6eK+E7dCweatLp6YZ7rpXFQ/dGc0qcz+BqvhY5+06Yyuz5Kx2djwgqefrV5Cr
+         DZJi3P1stEbzinnHuGHLr0NYdhuOSCNLPzUApmxIFYzpuSp+8pE4vEdg9NJs0jnC6a/L
+         jCXw==
+X-Gm-Message-State: ACgBeo3ls0sw/DJ1joA85hMxBGVUnczIDdw1Jwo/jdUhb2Jb9NIBb/7H
+        e+u9USrHTW7AdUJ9DzqQA7zpmV4tegjAJeuY9x/p/pR7DiGp4WNYcMSEpDRWu/assLRLm1wHhU1
+        jmGTlXJsmmDA/
+X-Received: by 2002:a17:902:ef50:b0:171:516d:d2ce with SMTP id e16-20020a170902ef5000b00171516dd2cemr2150676plx.171.1662529092678;
+        Tue, 06 Sep 2022 22:38:12 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR5xHIuO0ckPVo1IAdDm+QtW6wb3fUCt/3CAknqurpy5/WVdwoP6vH+j2dzlabcwVg6m63ayGA==
+X-Received: by 2002:a17:902:ef50:b0:171:516d:d2ce with SMTP id e16-20020a170902ef5000b00171516dd2cemr2150649plx.171.1662529092367;
+        Tue, 06 Sep 2022 22:38:12 -0700 (PDT)
+Received: from [10.72.13.171] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9-20020a170902654900b00172ba718ed4sm6142087pln.138.2022.09.06.22.38.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Sep 2022 22:38:11 -0700 (PDT)
+Message-ID: <b1a7c454-860d-6a40-9da1-2a06f30ff1be@redhat.com>
+Date:   Wed, 7 Sep 2022 13:38:03 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAL715WJK1WwXFfbUiMjngV8Z-0jyu_9JeZaK4qvvdJfYvtQEYg@mail.gmail.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.13.0
+Subject: Re: [RFC v3 6/7] virtio: in order support for virtio_ring
+Content-Language: en-US
+To:     Guo Zhi <qtxuning1999@sjtu.edu.cn>, eperezma@redhat.com,
+        sgarzare@redhat.com, mst@redhat.com
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+References: <20220901055434.824-1-qtxuning1999@sjtu.edu.cn>
+ <20220901055434.824-7-qtxuning1999@sjtu.edu.cn>
+From:   Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20220901055434.824-7-qtxuning1999@sjtu.edu.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 06, 2022 at 09:26:33PM -0700, Mingwei Zhang wrote:
-> > > @@ -10700,6 +10706,12 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
-> > >               if (kvm_cpu_has_pending_timer(vcpu))
-> > >                       kvm_inject_pending_timer_irqs(vcpu);
-> > >
-> > > +             if (vcpu->arch.nested_get_pages_pending) {
-> > > +                     r = kvm_get_nested_state_pages(vcpu);
-> > > +                     if (r <= 0)
-> > > +                             break;
-> > > +             }
-> > > +
-> >
-> > Will this leads to skip the get_nested_state_pages for L2 first time
-> > vmentry in every L2 running iteration ? Because with above changes
-> > KVM_REQ_GET_NESTED_STATE_PAGES is not set in
-> > nested_vmx_enter_non_root_mode() and
-> > vcpu->arch.nested_get_pages_pending is not checked in
-> > vcpu_enter_guest().
-> >
-> Good catch. I think the diff won't work when vcpu is runnable. It only
-> tries to catch the vcpu block case. Even for the vcpu block case,  the
-> check of KVM_REQ_UNBLOCK is way too late. Ah, kvm_vcpu_check_block()
-> is called by kvm_vcpu_block() which is called by vcpu_block(). The
-> warning is triggered at the very beginning of vcpu_block(), i.e.,
-> within kvm_arch_vcpu_runnable(). So, please ignore the trace in my
-> previous email.
->
-> In addition, my minor push back for that is
-> vcpu->arch.nested_get_pages_pending seems to be another
-> KVM_REQ_GET_NESTED_STATE_PAGES.
 
-Yeah, but in concept level it's not a REQ mask lives in the
-vcpu->requests which can be cached by e.g. kvm_request_pending().
-It's necessary to check vcpu->arch.nested_get_pages_pending in
-vcpu_enter_guest() if Sean's idea is to replace
-KVM_REQ_GET_NESTED_STATE_PAGES with nested_get_pages_pending.
+在 2022/9/1 13:54, Guo Zhi 写道:
+> If in order feature negotiated, we can skip the used ring to get
+> buffer's desc id sequentially.  For skipped buffers in the batch, the
+> used ring doesn't contain the buffer length, actually there is not need
+> to get skipped buffers' length as they are tx buffer.
+>
+> Signed-off-by: Guo Zhi <qtxuning1999@sjtu.edu.cn>
+> ---
+>   drivers/virtio/virtio_ring.c | 74 +++++++++++++++++++++++++++++++-----
+>   1 file changed, 64 insertions(+), 10 deletions(-)
+>
+> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> index 00aa4b7a49c2..d52624179b43 100644
+> --- a/drivers/virtio/virtio_ring.c
+> +++ b/drivers/virtio/virtio_ring.c
+> @@ -103,6 +103,9 @@ struct vring_virtqueue {
+>   	/* Host supports indirect buffers */
+>   	bool indirect;
+>   
+> +	/* Host supports in order feature */
+> +	bool in_order;
+> +
+>   	/* Host publishes avail event idx */
+>   	bool event;
+>   
+> @@ -144,6 +147,19 @@ struct vring_virtqueue {
+>   			/* DMA address and size information */
+>   			dma_addr_t queue_dma_addr;
+>   			size_t queue_size_in_bytes;
+> +
+> +			/* If in_order feature is negotiated, here is the next head to consume */
+> +			u16 next_desc_begin;
+> +			/*
+> +			 * If in_order feature is negotiated,
+> +			 * here is the last descriptor's id in the batch
+> +			 */
+> +			u16 last_desc_in_batch;
+> +			/*
+> +			 * If in_order feature is negotiated,
+> +			 * buffers except last buffer in the batch are skipped buffer
+> +			 */
+> +			bool is_skipped_buffer;
+>   		} split;
+>   
+>   		/* Available for packed ring */
+> @@ -584,8 +600,6 @@ static inline int virtqueue_add_split(struct virtqueue *_vq,
+>   					 total_sg * sizeof(struct vring_desc),
+>   					 VRING_DESC_F_INDIRECT,
+>   					 false);
+> -		vq->split.desc_extra[head & (vq->split.vring.num - 1)].flags &=
+> -			~VRING_DESC_F_NEXT;
 
->
-> Thanks.
-> -Mingwei
->
->
-> -Mingwei
+
+This seems irrelevant.
+
+
+>   	}
+>   
+>   	/* We're using some buffers from the free list. */
+> @@ -701,8 +715,16 @@ static void detach_buf_split(struct vring_virtqueue *vq, unsigned int head,
+>   	}
+>   
+>   	vring_unmap_one_split(vq, i);
+> -	vq->split.desc_extra[i].next = vq->free_head;
+> -	vq->free_head = head;
+> +	/*
+> +	 * If in_order feature is negotiated,
+> +	 * the descriptors are made available in order.
+> +	 * Since the free_head is already a circular list,
+> +	 * it must consume it sequentially.
+> +	 */
+> +	if (!vq->in_order) {
+> +		vq->split.desc_extra[i].next = vq->free_head;
+> +		vq->free_head = head;
+> +	}
+>   
+>   	/* Plus final descriptor */
+>   	vq->vq.num_free++;
+> @@ -744,7 +766,7 @@ static void *virtqueue_get_buf_ctx_split(struct virtqueue *_vq,
+>   {
+>   	struct vring_virtqueue *vq = to_vvq(_vq);
+>   	void *ret;
+> -	unsigned int i;
+> +	unsigned int i, j;
+>   	u16 last_used;
+>   
+>   	START_USE(vq);
+> @@ -763,11 +785,38 @@ static void *virtqueue_get_buf_ctx_split(struct virtqueue *_vq,
+>   	/* Only get used array entries after they have been exposed by host. */
+>   	virtio_rmb(vq->weak_barriers);
+>   
+> -	last_used = (vq->last_used_idx & (vq->split.vring.num - 1));
+> -	i = virtio32_to_cpu(_vq->vdev,
+> -			vq->split.vring.used->ring[last_used].id);
+> -	*len = virtio32_to_cpu(_vq->vdev,
+> -			vq->split.vring.used->ring[last_used].len);
+> +	if (vq->in_order) {
+> +		last_used = (vq->last_used_idx & (vq->split.vring.num - 1));
+
+
+Let's move this beyond the in_order check.
+
+
+> +		if (!vq->split.is_skipped_buffer) {
+> +			vq->split.last_desc_in_batch =
+> +				virtio32_to_cpu(_vq->vdev,
+> +						vq->split.vring.used->ring[last_used].id);
+> +			vq->split.is_skipped_buffer = true;
+> +		}
+> +		/* For skipped buffers in batch, we can ignore the len info, simply set len as 0 */
+
+
+This seems to break the caller that depends on a correct len.
+
+
+> +		if (vq->split.next_desc_begin != vq->split.last_desc_in_batch) {
+> +			*len = 0;
+> +		} else {
+> +			*len = virtio32_to_cpu(_vq->vdev,
+> +					       vq->split.vring.used->ring[last_used].len);
+> +			vq->split.is_skipped_buffer = false;
+> +		}
+> +		i = vq->split.next_desc_begin;
+> +		j = i;
+> +		/* Indirect only takes one descriptor in descriptor table */
+> +		while (!vq->indirect && (vq->split.desc_extra[j].flags & VRING_DESC_F_NEXT))
+> +			j = (j + 1) & (vq->split.vring.num - 1);
+
+
+Any reason indirect descriptors can't be chained?
+
+
+> +		/* move to next */
+> +		j = (j + 1) % vq->split.vring.num;
+> +		/* Next buffer will use this descriptor in order */
+> +		vq->split.next_desc_begin = j;
+
+
+Is it more efficient to poke the available ring?
+
+Thanks
+
+
+> +	} else {
+> +		last_used = (vq->last_used_idx & (vq->split.vring.num - 1));
+> +		i = virtio32_to_cpu(_vq->vdev,
+> +				    vq->split.vring.used->ring[last_used].id);
+> +		*len = virtio32_to_cpu(_vq->vdev,
+> +				       vq->split.vring.used->ring[last_used].len);
+> +	}
+>   
+>   	if (unlikely(i >= vq->split.vring.num)) {
+>   		BAD_RING(vq, "id %u out of range\n", i);
+> @@ -2223,6 +2272,7 @@ struct virtqueue *__vring_new_virtqueue(unsigned int index,
+>   
+>   	vq->indirect = virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_DESC) &&
+>   		!context;
+> +	vq->in_order = virtio_has_feature(vdev, VIRTIO_F_IN_ORDER);
+>   	vq->event = virtio_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX);
+>   
+>   	if (virtio_has_feature(vdev, VIRTIO_F_ORDER_PLATFORM))
+> @@ -2235,6 +2285,10 @@ struct virtqueue *__vring_new_virtqueue(unsigned int index,
+>   	vq->split.avail_flags_shadow = 0;
+>   	vq->split.avail_idx_shadow = 0;
+>   
+> +	vq->split.next_desc_begin = 0;
+> +	vq->split.last_desc_in_batch = 0;
+> +	vq->split.is_skipped_buffer = false;
+> +
+>   	/* No callback?  Tell other side not to bother us. */
+>   	if (!callback) {
+>   		vq->split.avail_flags_shadow |= VRING_AVAIL_F_NO_INTERRUPT;
+
