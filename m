@@ -2,208 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD03D5AFC0E
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 07:57:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FEC25AFC4D
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 08:24:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229754AbiIGF5G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 01:57:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39684 "EHLO
+        id S229649AbiIGGYp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 02:24:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiIGF5F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 01:57:05 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9623F5AA;
-        Tue,  6 Sep 2022 22:57:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662530224; x=1694066224;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=FQwr62FuVekKIlqBYg9De+gonUS/CJ7o29zGWn8LlDY=;
-  b=UzMQxKpIsdYgl8Y5Ink4u6fAM850/V7vD3o8tJdMQnb623HV1Cudalq0
-   nlO9o19JmjuYH12MRBGtma28MVjBGItTHO58rwER+3sZFUnyquubfxydJ
-   +HCvQV+/VIZyfrWL1OMNO/m4PrXTKSqsUrRvIuBKqk5qtRF1PaANXyUqM
-   Sngl4mRDHAp2oztv93jfmOFova0my/GHQOJA/JA6XNsE4Pcx4zDqAWhl2
-   DfwxvsslJJC3Dg2BUWS5Q2INjs2oR6Vcq439gw1JBG+77hwuGR2pE5yLt
-   p6TDppT9Jr1dnNe5G2X/+BwG2vp46+4MnfdFdMtwHOm3sXq9jzct+FsSv
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10462"; a="322970320"
-X-IronPort-AV: E=Sophos;i="5.93,295,1654585200"; 
-   d="scan'208";a="322970320"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2022 22:57:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,295,1654585200"; 
-   d="scan'208";a="644474482"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by orsmga008.jf.intel.com with ESMTP; 06 Sep 2022 22:56:58 -0700
-Date:   Wed, 7 Sep 2022 13:56:57 +0800
-From:   Yuan Yao <yuan.yao@linux.intel.com>
-To:     isaku.yamahata@intel.com
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        isaku.yamahata@gmail.com, Kai Huang <kai.huang@intel.com>,
-        Chao Gao <chao.gao@intel.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Shaokun Zhang <zhangshaokun@hisilicon.com>,
-        Qi Liu <liuqi115@huawei.com>,
-        John Garry <john.garry@huawei.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v3 16/22] KVM: kvm_arch.c: Remove a global variable,
- hardware_enable_failed
-Message-ID: <20220907055657.y7dcseig2qvjue6t@yy-desk-7060>
-References: <cover.1662084396.git.isaku.yamahata@intel.com>
- <91715ddc16f001bf2b76f68b57ebd59092b40591.1662084396.git.isaku.yamahata@intel.com>
+        with ESMTP id S229558AbiIGGYn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 02:24:43 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8D641F2F6
+        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 23:24:41 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2875k4Kx019568
+        for <kvm@vger.kernel.org>; Wed, 7 Sep 2022 06:24:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=/d5LBd3L0/tuuXV9BUf/X53O756LdgsPuSfLKyN4qNg=;
+ b=PcidvcuXYctTcFSoa55q7gmFGUYFcNPOtnGQEzB1OyaFit+oNPKnPEo7g7yueXophT/C
+ udxKNE6gJ00fwpa3FkA11DoHDuWs1noZ2DSL5MlIcXyJlMph8fHlt7syvJ2L9iTjTvEe
+ kdPkeINuCLTXebV3AXokGa23o2KF3lgMBXOc22ztJgcQ1jGbnlgkphK9KbjBkza1haXT
+ zyfOd49czVJu89cK3oMb9kNBUj328dNGgO1JArBXYzrqqqo55JkeGcktAPxEW6p/Gvp4
+ Dhqzm9lNe8qYCyA88IWF8EfYXYmlW5J5VojJpU9pbH/w3QAoKbPhN1vqL6VJwgLqJVlF qQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3jenej0xby-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 06:24:40 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2875maJ2029117
+        for <kvm@vger.kernel.org>; Wed, 7 Sep 2022 06:24:40 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3jenej0xbn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 07 Sep 2022 06:24:40 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2876K7EF001998;
+        Wed, 7 Sep 2022 06:24:38 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04ams.nl.ibm.com with ESMTP id 3jbxj8vput-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 07 Sep 2022 06:24:38 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2876L5dP41419106
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 7 Sep 2022 06:21:05 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A90305204F;
+        Wed,  7 Sep 2022 06:24:35 +0000 (GMT)
+Received: from [9.145.149.189] (unknown [9.145.149.189])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 6A3595204E;
+        Wed,  7 Sep 2022 06:24:35 +0000 (GMT)
+Message-ID: <ba67f05e-647c-1333-85f5-b05ee44cba74@linux.ibm.com>
+Date:   Wed, 7 Sep 2022 08:24:34 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <91715ddc16f001bf2b76f68b57ebd59092b40591.1662084396.git.isaku.yamahata@intel.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [kvm-unit-tests PATCH v2 2/2] s390x: create persistent comm-key
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     imbrenda@linux.ibm.com, thuth@redhat.com
+References: <20220825131600.115920-1-nrb@linux.ibm.com>
+ <20220825131600.115920-3-nrb@linux.ibm.com>
+ <d12c0927-fa06-4f27-606e-25971d11e2aa@linux.ibm.com>
+ <166247828688.90129.7620152734606584325@t14-nrb>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <166247828688.90129.7620152734606584325@t14-nrb>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: W7NmitlphvLGzokQDVZz7pkBpFlsTDh4
+X-Proofpoint-ORIG-GUID: a9X_BdKLDFdY5s0d12DRbFCt6p3N6uni
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-09-07_03,2022-09-06_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
+ phishscore=0 impostorscore=0 mlxlogscore=999 priorityscore=1501
+ spamscore=0 malwarescore=0 lowpriorityscore=0 bulkscore=0 clxscore=1015
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2209070023
+X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 01, 2022 at 07:17:51PM -0700, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> A global variable hardware_enable_failed in kvm_arch.c is used only by
-> kvm_arch_add_vm() and hardware_enable().  It doesn't have to be a global
-> variable.  Make it function local.
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  virt/kvm/kvm_arch.c | 49 +++++++++++++++++++++------------------------
->  1 file changed, 23 insertions(+), 26 deletions(-)
->
-> diff --git a/virt/kvm/kvm_arch.c b/virt/kvm/kvm_arch.c
-> index de39d0127584..f7dcde842eb5 100644
-> --- a/virt/kvm/kvm_arch.c
-> +++ b/virt/kvm/kvm_arch.c
-> @@ -13,14 +13,13 @@
->  #include <linux/kvm_host.h>
->
->  static cpumask_t cpus_hardware_enabled = CPU_MASK_NONE;
-> -static atomic_t hardware_enable_failed;
->
->  __weak int kvm_arch_post_init_vm(struct kvm *kvm)
->  {
->  	return 0;
->  }
->
-> -static void hardware_enable(void *caller_name)
-> +static int __hardware_enable(void *caller_name)
->  {
->  	int cpu = raw_smp_processor_id();
->  	int r;
-> @@ -28,18 +27,22 @@ static void hardware_enable(void *caller_name)
->  	WARN_ON_ONCE(preemptible());
->
->  	if (cpumask_test_cpu(cpu, &cpus_hardware_enabled))
-> -		return;
-> -
-> -	cpumask_set_cpu(cpu, &cpus_hardware_enabled);
-> -
-> +		return 0;
->  	r = kvm_arch_hardware_enable();
-> -
-> -	if (r) {
-> -		cpumask_clear_cpu(cpu, &cpus_hardware_enabled);
-> -		atomic_inc(&hardware_enable_failed);
-> +	if (r)
->  		pr_warn("kvm: enabling virtualization on CPU%d failed during %s()\n",
->  			cpu, (const char *)caller_name);
-> -	}
-> +	else
-> +		cpumask_set_cpu(cpu, &cpus_hardware_enabled);
-> +	return r;
-> +}
-> +
-> +static void hardware_enable(void *arg)
-> +{
-> +	atomic_t *failed = arg;
-> +
-> +	if (__hardware_enable((void *)__func__))
-> +		atomic_inc(failed);
->  }
+On 9/6/22 17:31, Nico Boehr wrote:
+> Quoting Janosch Frank (2022-09-06 11:50:46)
+>> Hmmmmmmm(TM)
+>>
+>> My first thought was that I'd be pretty angry if the CCK changes on a
+>> distclean. But the only scenario where this would matter is when the
+>> tests are provided to another system.
+>>
+>> I'm still a bit torn about deleting the CCK especially as there will
+>> always be a CCK in the SE header no matter if we specify one or not.
+> 
+> I really don't have a strong opinion about this. I think it makes sense to clean
+> up stuff a Makefile has left behind. But I am honestly just as fine with
+> removing this.
 
-A side effect: The actual caller_name information introduced in Patch
-3 for hardware_enable() is lost. I tend to keep the information, but
-depends on you and other guys. :-)
-
->
->  static void hardware_disable(void *junk)
-> @@ -65,15 +68,16 @@ __weak void kvm_arch_pre_hardware_unsetup(void)
->   */
->  __weak int kvm_arch_add_vm(struct kvm *kvm, int usage_count)
->  {
-> +	atomic_t failed;
->  	int r = 0;
->
->  	if (usage_count != 1)
->  		return 0;
->
-> -	atomic_set(&hardware_enable_failed, 0);
-> -	on_each_cpu(hardware_enable, (void *)__func__, 1);
-> +	atomic_set(&failed, 0);
-> +	on_each_cpu(hardware_enable, &failed, 1);
->
-> -	if (atomic_read(&hardware_enable_failed)) {
-> +	if (atomic_read(&failed)) {
->  		r = -EBUSY;
->  		goto err;
->  	}
-> @@ -96,27 +100,20 @@ __weak int kvm_arch_del_vm(int usage_count)
->
->  __weak int kvm_arch_online_cpu(unsigned int cpu, int usage_count)
->  {
-> -	int ret = 0;
-> +	int ret;
->
->  	ret = kvm_arch_check_processor_compat();
->  	if (ret)
->  		return ret;
->
-> +	if (!usage_count)
-> +		return 0;
->  	/*
->  	 * Abort the CPU online process if hardware virtualization cannot
->  	 * be enabled. Otherwise running VMs would encounter unrecoverable
->  	 * errors when scheduled to this CPU.
->  	 */
-> -	if (usage_count) {
-> -		WARN_ON_ONCE(atomic_read(&hardware_enable_failed));
-> -
-> -		hardware_enable((void *)__func__);
-> -		if (atomic_read(&hardware_enable_failed)) {
-> -			atomic_set(&hardware_enable_failed, 0);
-> -			ret = -EIO;
-> -		}
-> -	}
-> -	return ret;
-> +	return __hardware_enable((void *)__func__);
->  }
->
->  __weak int kvm_arch_offline_cpu(unsigned int cpu, int usage_count)
-> @@ -149,5 +146,5 @@ __weak void kvm_arch_resume(int usage_count)
->  		return; /* FIXME: disable KVM */
->
->  	if (usage_count)
-> -		hardware_enable((void *)__func__);
-> +		(void)__hardware_enable((void *)__func__);
->  }
-> --
-> 2.25.1
->
+Keep it as is, we can still change it when we get complaints. :)
