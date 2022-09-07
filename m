@@ -2,77 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 870715B03B9
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 14:15:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 244605B03F5
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 14:33:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229974AbiIGMPB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 08:15:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50024 "EHLO
+        id S229598AbiIGMdH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 08:33:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229517AbiIGMO7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 08:14:59 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F8BE27FD8;
-        Wed,  7 Sep 2022 05:14:58 -0700 (PDT)
+        with ESMTP id S229461AbiIGMdA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 08:33:00 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10A29A7ABF;
+        Wed,  7 Sep 2022 05:33:00 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D1186618B8;
-        Wed,  7 Sep 2022 12:14:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E6B2C433D6;
-        Wed,  7 Sep 2022 12:14:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662552897;
-        bh=aZ2WeP3U336s63udprictr4067p8RlQvpxaoMNPC+So=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=hzFdNkFe7FXDKMFLXF3Ak1yGqDSjqHDYM1cgeHmZyvL3wRZhLI+o5x/fppba/nQXr
-         BmzuvTkpIOpwukz1ple0VUnSDKKXXHuR8cL0hOt1dZYUjuS040Pjx4DdG6cEXM+Ess
-         yUG4iczoGb/1Mj0OaaQXTFseDLpSpKVBT/lHieKa6DHojxysT7iLAp/A2I0IjLJWPV
-         kl1kBGyeIsdrCNqIVdzFcORbNp4E7HfCT2qi2+cKy9wwjWUN21FKPvd3ECXaeax6Yv
-         aZEuaYpYRO9RmBTKVf93H2OychjIDjn9OKs3abmlWxE5mKD0xw/84ji/zbOGohq+/h
-         Hf9/1INmx37mw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1oVtxG-008dZY-V5;
-        Wed, 07 Sep 2022 13:14:55 +0100
-Date:   Wed, 07 Sep 2022 13:14:54 +0100
-Message-ID: <87k06fv0sh.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Nipun Gupta <nipun.gupta@amd.com>, robh+dt@kernel.org,
-        krzysztof.kozlowski+dt@linaro.org, gregkh@linuxfoundation.org,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8D5AD618D6;
+        Wed,  7 Sep 2022 12:32:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CB53C433D7;
+        Wed,  7 Sep 2022 12:32:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1662553979;
+        bh=+oPcnp8Ehqf+5v9MwAdEHVeVY7vbOQ3ajdywYWvVyKE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=PbGVjNGQFIBeQlyORikeOGZ023BSRIg/LCmLoOXl+RupSx7yVXJLKwNpNNghwaQx+
+         2c9cCoL8ZSLzwG0PPsta9NsFSI7VhSRiZUKu/xlOutzwnV+Ah2Y8wgQ5qbq+KtKClF
+         zbh1++1nCbXnBG+42FRlhocM2eMzPFB2yI/vtpfk=
+Date:   Wed, 7 Sep 2022 14:32:56 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Nipun Gupta <nipun.gupta@amd.com>
+Cc:     robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
         rafael@kernel.org, eric.auger@redhat.com,
         alex.williamson@redhat.com, cohuck@redhat.com,
         puneet.gupta@amd.com, song.bao.hua@hisilicon.com,
-        mchehab+huawei@kernel.org, f.fainelli@gmail.com,
+        mchehab+huawei@kernel.org, maz@kernel.org, f.fainelli@gmail.com,
         jeffrey.l.hugo@gmail.com, saravanak@google.com,
         Michael.Srba@seznam.cz, mani@kernel.org, yishaih@nvidia.com,
+        jgg@ziepe.ca, jgg@nvidia.com, robin.murphy@arm.com,
         will@kernel.org, joro@8bytes.org, masahiroy@kernel.org,
         ndesaulniers@google.com, linux-arm-kernel@lists.infradead.org,
         linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
         devicetree@vger.kernel.org, kvm@vger.kernel.org, okaya@kernel.org,
         harpreet.anand@amd.com, nikhil.agarwal@amd.com,
         michal.simek@amd.com, aleksandar.radovanovic@amd.com, git@amd.com
-Subject: Re: [RFC PATCH v3 4/7] bus/cdx: add cdx-MSI domain with gic-its domain as parent
-In-Reply-To: <4ca6383e-bd21-59bf-cc4e-cf3313164957@arm.com>
+Subject: Re: [RFC PATCH v3 2/7] bus/cdx: add the cdx bus driver
+Message-ID: <YxiPeOwo5tWrQuSE@kroah.com>
 References: <20220803122655.100254-1-nipun.gupta@amd.com>
-        <20220906134801.4079497-1-nipun.gupta@amd.com>
-        <20220906134801.4079497-5-nipun.gupta@amd.com>
-        <YxeBCsA32jnwMjSj@nvidia.com>
-        <87leqvv3g7.wl-maz@kernel.org>
-        <4ca6383e-bd21-59bf-cc4e-cf3313164957@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: robin.murphy@arm.com, jgg@nvidia.com, nipun.gupta@amd.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, gregkh@linuxfoundation.org, rafael@kernel.org, eric.auger@redhat.com, alex.williamson@redhat.com, cohuck@redhat.com, puneet.gupta@amd.com, song.bao.hua@hisilicon.com, mchehab+huawei@kernel.org, f.fainelli@gmail.com, jeffrey.l.hugo@gmail.com, saravanak@google.com, Michael.Srba@seznam.cz, mani@kernel.org, yishaih@nvidia.com, will@kernel.org, joro@8bytes.org, masahiroy@kernel.org, ndesaulniers@google.com, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, kvm@vger.kernel.org, okaya@kernel.org, harpreet.anand@amd.com, nikhil.agarwal@amd.com, michal.simek@amd.com, aleksandar.radovanovic@amd.com, git@amd.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+ <20220906134801.4079497-1-nipun.gupta@amd.com>
+ <20220906134801.4079497-3-nipun.gupta@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220906134801.4079497-3-nipun.gupta@amd.com>
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
@@ -83,68 +64,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 07 Sep 2022 12:33:12 +0100,
-Robin Murphy <robin.murphy@arm.com> wrote:
+On Tue, Sep 06, 2022 at 07:17:56PM +0530, Nipun Gupta wrote:
+> CDX bus supports the scanning and probing of FPGA based
+> devices. These devices are registers as CDX devices.
 > 
-> On 2022-09-07 12:17, Marc Zyngier wrote:
-> > On Tue, 06 Sep 2022 18:19:06 +0100,
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >> 
-> >> On Tue, Sep 06, 2022 at 07:17:58PM +0530, Nipun Gupta wrote:
-> >> 
-> >>> +static void cdx_msi_write_msg(struct irq_data *irq_data,
-> >>> +			      struct msi_msg *msg)
-> >>> +{
-> >>> +	/*
-> >>> +	 * Do nothing as CDX devices have these pre-populated
-> >>> +	 * in the hardware itself.
-> >>> +	 */
-> >>> +}
-> >> 
-> >> Huh?
-> >> 
-> >> There is no way it can be pre-populated, the addr/data pair,
-> >> especially on ARM, is completely under SW control.
-> > 
-> > There is nothing in the GIC spec that says that.
-> > 
-> >> There is some commonly used IOVA base in Linux for the ITS page, but
-> >> no HW should hardwire that.
-> > 
-> > That's not strictly true. It really depends on how this block is
-> > integrated, and there is a number of existing blocks that know *in HW*
-> > how to signal an LPI.
-> > 
-> > See, as the canonical example, how the mbigen driver doesn't need to
-> > know about the address of GITS_TRANSLATER.
-> > 
-> > Yes, this messes with translation (the access is downstream of the
-> > SMMU) if you relied on it to have some isolation, and it has a "black
-> > hole" effect as nobody can have an IOVA that overlaps with the
-> > physical address of the GITS_TRANSLATER register.
-> > 
-> > But is it illegal as per the architecture? No. It's just stupid.
+> The bus driver sets up the basic infrastructure and fetches
+> the device related information from the firmware.
 > 
-> If that were the case, then we'd also need a platform quirk so the
-> SMMU driver knows about it. Yuck.
+> CDX bus is capable of scanning devices dynamically,
+> supporting rescanning of dynamically added, removed or
+> updated devices.
 
-Yup. As I said, this is stupid.
+Really?  Then why is the platform driver mess still in here?
 
-> But even then, are you suggesting there is some way to convince the
-> ITS driver to allocate a specific predetermined EventID when a driver
-> requests an MSI? Asking for a friend...
 
-Of course not. Whoever did that has decided to hardcode the Linux
-behaviour into the HW, because it is well known that SW behaviour
-never changes. Nononono.
+> --- /dev/null
+> +++ b/drivers/bus/cdx/cdx.c
+> @@ -0,0 +1,437 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Platform driver for CDX bus.
 
-I am >this< tempted to sneak a change into the allocation scheme to
-start at 5 or 13 (alternatively), and to map LPIs top-down. That
-should get people thinking.
+Again, this should not be a platform driver.
 
-Cheers,
+Now you can have a CDX "bus" driver, that is a platform driver, but that
+needs to be in a separate file and as a separate module and totally
+independant of the CDX bus code entirely.
 
-	M.
+Otherwise this is a mess to try to sift through and determine what is,
+and is not, going on.  Please split that up and get rid of all of the
+platform driver stuff here and put it in a separate patch that happens
+after the CDX bus logic is added.
 
--- 
-Without deviation from the norm, progress is not possible.
+thanks,
+
+greg k-h
