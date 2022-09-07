@@ -2,137 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B8FD5B097C
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 18:01:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED5CD5B0980
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 18:01:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230235AbiIGQBK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 12:01:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51760 "EHLO
+        id S230320AbiIGQBa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 12:01:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229864AbiIGQAf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 12:00:35 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EE02101D5;
-        Wed,  7 Sep 2022 09:00:03 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 287EsBCv004572;
-        Wed, 7 Sep 2022 15:59:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=5X3aRCOkL9BSkw+8LikzyOEbYt4MrZ08eGFD34yvfyc=;
- b=my1D00BhYjpsx1Lb4CpWQ3hty7mGOFTp/TyixBj/Jl4lA+TTsH5yuiTANa1/kqnJjrQe
- bKTjDy79Ppu5nIQ58SwTylZ4tRzR+bG5lZ5f+11M8wvDRKbRbcoaMEnABlnvNtU0to4j
- yGKDC0rSr5gMfVGDtphFLU3lR3IWwpDwjxmhnu/OLAzPkaGXzNdCqVtL4T9rqWq+DXkV
- jrWFAdch+hjQV/Rk9NEzDFohtfe69p0poXT8lIelQZjFWwNqGMBoxoQyV32JpMBkmBCZ
- lLkKAbXbK/pn6haMyy+547agLDuZngb+qh/7jOJ97i065VnE6WSQ55+PtdcGBAr+huIM Uw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jewfmj96n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Sep 2022 15:59:56 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 287FtYm6031318;
-        Wed, 7 Sep 2022 15:59:55 GMT
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jewfmj966-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Sep 2022 15:59:55 +0000
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 287FpZd6012879;
-        Wed, 7 Sep 2022 15:59:55 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma04dal.us.ibm.com with ESMTP id 3jbxja1cqw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Sep 2022 15:59:55 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 287FxsRn57868562
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 7 Sep 2022 15:59:54 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E9847124058;
-        Wed,  7 Sep 2022 15:59:53 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 35CF7124055;
-        Wed,  7 Sep 2022 15:59:53 +0000 (GMT)
-Received: from li-2311da4c-2e09-11b2-a85c-c003041e9174.ibm.com.com (unknown [9.160.65.175])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed,  7 Sep 2022 15:59:53 +0000 (GMT)
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-To:     linux-s390@vger.kernel.org
-Cc:     nrb@linux.ibm.com, pmorel@linux.ibm.com, schnelle@linux.ibm.com,
-        farman@linux.ibm.com, borntraeger@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, agordeev@linux.ibm.com, svens@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: s390: pci: fix GAIT physical vs virtual pointers usage
-Date:   Wed,  7 Sep 2022 11:59:52 -0400
-Message-Id: <20220907155952.87356-1-mjrosato@linux.ibm.com>
-X-Mailer: git-send-email 2.37.3
+        with ESMTP id S230110AbiIGQAj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 12:00:39 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C037598369
+        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 09:00:10 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id m3so4398872pjo.1
+        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 09:00:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=PL/6JU5/S/Tf9t3nW0OZ+zGEXKtZtWIWZJ+MGwDWvKo=;
+        b=s5UCZOMsmd5CJ/0ibgGJoBMIhIOKHPfxUqfLFaw0BrWFbR/vCSFUO4H2XJfXJ0RC1E
+         6mrliQVV4WgBaaMwtK+qAeQA2v5jWr6H145fYBtxg9M+pCbQRWCjufsGfAsZIiblZWQb
+         2stqcyKY70rBuZrftxCGmMLFAO9ookNLT4cdrLKnQjVkeMHuRO+VnM4RUTLrZfraQg4A
+         GoBJzRZUs4G9ARpJvd8mnJFunPi0NMNhk/XZeJmFkdrf75jyz8x/iNMFa7hoFFEJTDqF
+         vWNpPFpA3HYTUMwtmcaYsHv6PUL66X+kvzvjKFUz1REJ9DxARePelhu+KA89fJJ+Drsc
+         p2Dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=PL/6JU5/S/Tf9t3nW0OZ+zGEXKtZtWIWZJ+MGwDWvKo=;
+        b=U5MYs3TiRzKNSN5sRHhMJYgISmkXx/J8T6ltI3zl6Rxe57eroRKyyCwq5yfIFKSbGp
+         KsJoliBUo5K2hkeh+b+WcILLAiG2m0GPgtVG5a5pb2l1Dv1Hq4T79v/iT0eniPeCiIWi
+         RoTeYaYj2597K+rj1oXze7OtahhDhX/qc7y/uBs8hx5E4AnfVjKD/sA5qCL/mPG0MKX1
+         nNN76hu/Ftn1IrF+0RhOYqmDzxBf3xCnCyL/0ITmkjcUo/+S9Y4BgFsTC3A2byDzqGEY
+         fRyL/MfI+qQLHTNYN7BXERBzeJBFkzwgyxgJK7YAKWYUiPoawR0/MFUkcCsHLevUpQJx
+         9uvw==
+X-Gm-Message-State: ACgBeo2yZBIbb5PzlY2QP0trVBBAxf8jf8Afn3y/m72oVKIt7rUZWB+K
+        5HCDg7AWcWO+eVmRVDO6CJR9BQ==
+X-Google-Smtp-Source: AA6agR56CQhwCqSpoZP4Zph0Vr2bsCdeyy0cU2fY/92R2g5nd3RRETckjU1gFJlsT743h83Hf+KK0w==
+X-Received: by 2002:a17:902:d2cd:b0:177:4940:cc03 with SMTP id n13-20020a170902d2cd00b001774940cc03mr2886666plc.98.1662566408299;
+        Wed, 07 Sep 2022 09:00:08 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id a16-20020a621a10000000b00537a6b81bb7sm13147646pfa.148.2022.09.07.09.00.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Sep 2022 09:00:07 -0700 (PDT)
+Date:   Wed, 7 Sep 2022 16:00:04 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Liam Merwick <liam.merwick@oracle.com>
+Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        pbonzini@redhat.com, gshan@redhat.com, oliver.upton@linux.dev,
+        andrew.jones@linux.dev
+Subject: Re: [PATCH] KVM: selftests: Make rseq compatible with versions prior
+ to glibc-2.30
+Message-ID: <YxjABH3Fw7W+NE8J@google.com>
+References: <20220907155510.968666-1-liam.merwick@oracle.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: j2ySYFaNaB5Leo0cwvcFOsx0Ni99hsvk
-X-Proofpoint-ORIG-GUID: Va6FO4WzJjbfXVymrPaL6HVYSB6C8po1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-07_08,2022-09-07_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- mlxlogscore=999 phishscore=0 priorityscore=1501 impostorscore=0
- malwarescore=0 bulkscore=0 lowpriorityscore=0 adultscore=0 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2209070060
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220907155510.968666-1-liam.merwick@oracle.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The GAIT and all of its entries must be represented by physical
-addresses as this structure is shared with underlying firmware.
-We can keep a virtual address of the GAIT origin in order to
-handle processing in the kernel, but when traversing the entries
-we must again convert the physical AISB stored in that GAIT entry
-into a virtual address in order to process it.
+On Wed, Sep 07, 2022, Liam Merwick wrote:
+> The fix for commit e923b0537d28 ("KVM: selftests: Fix target thread to be migrated in rseq_test")
+> added a call to gettid() which was only added to glibc-2.30 and fails to
+> compile with older glibc versions.
+> 
+> rseq_test.c: In function 'main':
+> rseq_test.c:230:33: warning: implicit declaration of function 'gettid'; did you mean 'getgid'? [-Wimplicit-function-declaration]
+>           (void *)(unsigned long)gettid());
+>                                  ^~~~~~
+>                                  getgid
+> 
+> Switch the call to syscall(SYS_gettid) which was the original advice in the
+> gettid(2) NOTES section and which works with both new and older glibc versions.
+> 
+> Fixes: e923b0537d28 ("KVM: selftests: Fix target thread to be migrated in rseq_test")
+> Cc: stable@vger.kernel.org # v5.15
+> Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
+> ---
+> 
+> Verified with glibc-2.28 and glibc-2.34 and ensured test case from e923b0537d28 still passes.
+> 
+>  tools/testing/selftests/kvm/rseq_test.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
+> index fac248a43666..6f88da7e60be 100644
+> --- a/tools/testing/selftests/kvm/rseq_test.c
+> +++ b/tools/testing/selftests/kvm/rseq_test.c
+> @@ -227,7 +227,7 @@ int main(int argc, char *argv[])
+>  	ucall_init(vm, NULL);
+>  
+>  	pthread_create(&migration_thread, NULL, migration_worker,
+> -		       (void *)(unsigned long)gettid());
+> +		       (void *)(unsigned long)syscall(SYS_gettid));
 
-Note: this currently doesn't fix a real bug, since virtual addresses
-are indentical to physical ones.
+This exact fix was already posted[*], but we rat-holed a bit on coming up with an
+elegant solution and the patch never got applied.  I'll poke that thread to see if
+Paolo wants to take it for 6.0.
 
-Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
-Acked-by: Nico Boehr <nrb@linux.ibm.com>
-Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
----
- arch/s390/kvm/interrupt.c | 2 +-
- arch/s390/kvm/pci.c       | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-index b9c944b262c7..ab569faf0df2 100644
---- a/arch/s390/kvm/interrupt.c
-+++ b/arch/s390/kvm/interrupt.c
-@@ -3324,7 +3324,7 @@ static void aen_host_forward(unsigned long si)
- 	if (gaite->count == 0)
- 		return;
- 	if (gaite->aisb != 0)
--		set_bit_inv(gaite->aisbo, (unsigned long *)gaite->aisb);
-+		set_bit_inv(gaite->aisbo, phys_to_virt(gaite->aisb));
- 
- 	kvm = kvm_s390_pci_si_to_kvm(aift, si);
- 	if (!kvm)
-diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
-index bb8c335d17b9..8cfa0b03ebbb 100644
---- a/arch/s390/kvm/pci.c
-+++ b/arch/s390/kvm/pci.c
-@@ -71,7 +71,7 @@ static int zpci_setup_aipb(u8 nisc)
- 		rc = -ENOMEM;
- 		goto free_sbv;
- 	}
--	aift->gait = (struct zpci_gaite *)page_to_phys(page);
-+	aift->gait = (struct zpci_gaite *)page_to_virt(page);
- 
- 	zpci_aipb->aipb.faisb = virt_to_phys(aift->sbv->vector);
- 	zpci_aipb->aipb.gait = virt_to_phys(aift->gait);
--- 
-2.37.3
-
+[*] https://lore.kernel.org/all/20220802071240.84626-1-cloudliang@tencent.com
