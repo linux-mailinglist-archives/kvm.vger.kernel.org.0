@@ -2,136 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E214A5AF96E
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 03:44:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F2BD5AF8CD
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 02:03:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229748AbiIGBoU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 6 Sep 2022 21:44:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33886 "EHLO
+        id S229739AbiIGACH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 6 Sep 2022 20:02:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229480AbiIGBoT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 6 Sep 2022 21:44:19 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD21A7FFAC;
-        Tue,  6 Sep 2022 18:44:17 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id q15-20020a17090a304f00b002002ac83485so9323758pjl.0;
-        Tue, 06 Sep 2022 18:44:17 -0700 (PDT)
+        with ESMTP id S229531AbiIGACF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 6 Sep 2022 20:02:05 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F2E082F94
+        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 17:02:05 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id y136so8014593pfb.3
+        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 17:02:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=BvyWfUoKFedS2O3cuEWewtWgL/+UsS4AV/bMppR9YBY=;
-        b=QwssDy6i5gOjaJYF0wf9BVXVDSjLOzIQRMaSA5lTCd+pQJypukFNAATJgcu4+qBveH
-         Rmv1dnZbUFRwg9hfKk9T0q1WMSfFbDqn+zjplt7l/MRVTV6cv7nKW+SH/0Xaa+PRxrex
-         zs621Zjtz6jvPJFV7hOGyTlEFgaTLgqw6KEjyrXGVtUnue/nciEOcnEFkFmcpKLzxHuw
-         E7VMXGHWPkth38v+npm+H2yxT5dsEfkh4HdsVgS2I3VGeS9xvDLTBDcJltVVAU2ld3XU
-         yrjMpsk7wTzF5lrR03LJZpGScJvuV/DxMXck1+MY0J5+BrNTvT+KLudtwevmDOWGu0S7
-         F/Pw==
+        bh=1L8zL0o7hTZtMzz6sR/DF9E7wPl56tqPy/lCxtqOjSo=;
+        b=Wg3tZwZz4PCbUKY7fMW64CU6pz20UFcs401F35uqUB7HUNUddlTNKPvTGNWIzMssRG
+         ajegWZM4om0Vg/U1dG8KWj/6eF6Nxv5CafceHgbSrvtshepiKIerXO/FccT2/LzYdB7A
+         /rNKAwqkVAsEAHjDHFzj0t6m3XfHidf4Fdghj8NrPWYbBpmsVqq6teBEKDBN4GoP94oR
+         Q+jpJA8VnpRK9/lTFGuYRveUNnjimQ8Ty3tvQ8Rp8FbhH1vwpUZ7CkZ0Vsyh7jdbLeke
+         TLrXcBCfvzRxbMJkq+BRV7L3OINhM8dk8rUQZwNQwyJaSEWIOpcL93UKrkx4Ij2xFBFz
+         PqnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=BvyWfUoKFedS2O3cuEWewtWgL/+UsS4AV/bMppR9YBY=;
-        b=pi6vAt1lvTMyMeZGVpQebvwrd5+f5jKtP0MSKpuGMdH4zqGyxgO+EUTXU/PRdAR3bv
-         ZOonnQAvZMMNoy1TZtm/6UU5jCr6j5kzB8OJr68JhLNo+E4roEhKnG7OsR7IfUyUHfEf
-         lT/20Gu34NoVSVKDfqIrX1KyB9LhdFqsZr+VmZwJdV5jIGuIyWSmtqzefMb7mS0mXdub
-         Uin0zY9a+PJ5/gsTjrdPn6JOnEpICcp/w9NcSTUCsIPGKTCpFjb6FRo+ula+HUD4P76h
-         tWM29lPYzcVDPHKHMXeH4nW9RgezPN4jnD5vTE3CVO0auaTfs6e11SAgipM4t/AQTgFi
-         wLGQ==
-X-Gm-Message-State: ACgBeo2Fk54g9IVEMN8Xw5ooHzge5Hb/jbuaO8x/yTZMB99PSW8kQYsw
-        uQDXdL7c8BGJiJU8Yv1ox6A=
-X-Google-Smtp-Source: AA6agR7iTgTbHnCw9ar66lt9Q7u+yBE+eq3kHUld5PUljWZFXkSpFPVy2E7fHubXuGcSxTspNf7Xjg==
-X-Received: by 2002:a17:90b:4a02:b0:1fe:1391:314d with SMTP id kk2-20020a17090b4a0200b001fe1391314dmr28380891pjb.216.1662515057196;
-        Tue, 06 Sep 2022 18:44:17 -0700 (PDT)
-Received: from localhost (ec2-13-57-97-131.us-west-1.compute.amazonaws.com. [13.57.97.131])
-        by smtp.gmail.com with ESMTPSA id i11-20020a056a00004b00b0053ba52b49a3sm7275713pfk.25.2022.09.06.18.44.16
+        bh=1L8zL0o7hTZtMzz6sR/DF9E7wPl56tqPy/lCxtqOjSo=;
+        b=qu4BEx3Ki+SPj1GlDXXNf+1CZbspxgbFn2TgXvsRzpcz/0ZCeoIfbYVIrE+Tr/pBDh
+         pX5cN2H7Uh7chyT89HEPhu2we1XbSTOFv7HI4rdr+CGvAWePvcf2TJ9KgD9xK5qbBdxv
+         JnaVwLMYDZYdglIS4YW9HpnRnmRcZE4JWOUP40VxKoXKBM7K0i4vxbMgwIZBzR5eZ4Wc
+         Rp/5V4esNnieSLpnuASct3wgwcYtgMw04IjZGDozxCfNpMjUBwXMWWJ0mdCDEJXH+6ro
+         yusuFACeDuW+p7k/zGdpoZwcxPIJjqaLBndLhQybHykCnC9GJJ/tzoTV20qeZgzauG3f
+         nhtw==
+X-Gm-Message-State: ACgBeo0qjqXLnDHyaU89Lf7hBXnWUeJIVLZbjeJXuUL9Hs9iy2h7qLPj
+        VCblBX54VtSqgvFSKXW2vphGzA==
+X-Google-Smtp-Source: AA6agR4wPzrSFCcW5dYDC3uCWk2IudY5waEIswutRI9pzVOkZebH02YEovOmpOfw5alWlivIHqkAKw==
+X-Received: by 2002:a63:81c1:0:b0:434:aeab:7b42 with SMTP id t184-20020a6381c1000000b00434aeab7b42mr979234pgd.619.1662508924385;
+        Tue, 06 Sep 2022 17:02:04 -0700 (PDT)
+Received: from google.com (33.5.83.34.bc.googleusercontent.com. [34.83.5.33])
+        by smtp.gmail.com with ESMTPSA id p3-20020a170902e74300b0017680faa1a8sm8562628plf.112.2022.09.06.17.02.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Sep 2022 18:44:16 -0700 (PDT)
-Date:   Thu, 18 Aug 2022 14:20:06 +0000
-From:   Bobby Eshleman <bobbyeshleman@gmail.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Bobby Eshleman <bobby.eshleman@gmail.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Cong Wang <cong.wang@bytedance.com>,
-        Jiang Wang <jiang.wang@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/6] vsock: add netdev to vhost/virtio vsock
-Message-ID: <Yv5KVHgUtcpHgWML@bullseye>
-References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
- <5a93c5aad99d79f028d349cb7e3c128c65d5d7e2.1660362668.git.bobby.eshleman@bytedance.com>
- <20220906065523-mutt-send-email-mst@kernel.org>
+        Tue, 06 Sep 2022 17:02:03 -0700 (PDT)
+Date:   Wed, 7 Sep 2022 00:02:00 +0000
+From:   Mingwei Zhang <mizhang@google.com>
+To:     Sean Christopherson <seanjc@google.com>, y@google.com
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v2 3/4] KVM: selftests: Add support for posted interrupt
+ handling in L2
+Message-ID: <YxffeH1AltmmWM8u@google.com>
+References: <20220828222544.1964917-1-mizhang@google.com>
+ <20220828222544.1964917-4-mizhang@google.com>
+ <YwznLAqRb2i4lHiH@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220906065523-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=1.3 required=5.0 tests=BAYES_00,DATE_IN_PAST_96_XX,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: *
+In-Reply-To: <YwznLAqRb2i4lHiH@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 06, 2022 at 06:58:32AM -0400, Michael S. Tsirkin wrote:
-> On Mon, Aug 15, 2022 at 10:56:06AM -0700, Bobby Eshleman wrote:
-> > In order to support usage of qdisc on vsock traffic, this commit
-> > introduces a struct net_device to vhost and virtio vsock.
+On Mon, Aug 29, 2022, Sean Christopherson wrote:
+> On Sun, Aug 28, 2022, Mingwei Zhang wrote:
+> > Add support for posted interrupt handling in L2. This is done by adding
+> > needed data structures in vmx_pages and APIs to allow an L2 receive posted
+> > interrupts.
 > > 
-> > Two new devices are created, vhost-vsock for vhost and virtio-vsock
-> > for virtio. The devices are attached to the respective transports.
+> > Cc: Jim Mattson <jmattson@google.com>
+> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> > ---
+> >  tools/testing/selftests/kvm/include/x86_64/vmx.h | 10 ++++++++++
+> >  tools/testing/selftests/kvm/lib/x86_64/vmx.c     | 14 ++++++++++++++
+> >  2 files changed, 24 insertions(+)
 > > 
-> > To bypass the usage of the device, the user may "down" the associated
-> > network interface using common tools. For example, "ip link set dev
-> > virtio-vsock down" lets vsock bypass the net_device and qdisc entirely,
-> > simply using the FIFO logic of the prior implementation.
-> > 
-> > For both hosts and guests, there is one device for all G2H vsock sockets
-> > and one device for all H2G vsock sockets. This makes sense for guests
-> > because the driver only supports a single vsock channel (one pair of
-> > TX/RX virtqueues), so one device and qdisc fits. For hosts, this may not
-> > seem ideal for some workloads. However, it is possible to use a
-> > multi-queue qdisc, where a given queue is responsible for a range of
-> > sockets. This seems to be a better solution than having one device per
-> > socket, which may yield a very large number of devices and qdiscs, all
-> > of which are dynamically being created and destroyed. Because of this
-> > dynamism, it would also require a complex policy management daemon, as
-> > devices would constantly be spun up and down as sockets were created and
-> > destroyed. To avoid this, one device and qdisc also applies to all H2G
-> > sockets.
-> > 
-> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> > diff --git a/tools/testing/selftests/kvm/include/x86_64/vmx.h b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+> > index 99fa1410964c..69784fc71bce 100644
+> > --- a/tools/testing/selftests/kvm/include/x86_64/vmx.h
+> > +++ b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+> > @@ -577,6 +577,14 @@ struct vmx_pages {
+> >  	void *apic_access_hva;
+> >  	uint64_t apic_access_gpa;
+> >  	void *apic_access;
+> > +
+> > +	void *virtual_apic_hva;
+> > +	uint64_t virtual_apic_gpa;
+> > +	void *virtual_apic;
+> > +
+> > +	void *posted_intr_desc_hva;
+> > +	uint64_t posted_intr_desc_gpa;
+> > +	void *posted_intr_desc;
 > 
+> Can you add a prep patch to dedup the absurd amount of copy-paste code related to
+> vmx_pages?
 > 
-> I've been thinking about this generally. vsock currently
-> assumes reliability, but with qdisc can't we get
-> packet drops e.g. depending on the queueing?
-> 
-> What prevents user from configuring such a discipline?
-> One thing people like about vsock is that it's very hard
-> to break H2G communication even with misconfigured
-> networking.
-> 
+> I.e. take this and give all the other triplets the same treatment.
 
-If qdisc decides to discard a packet, it returns NET_XMIT_CN via
-dev_queue_xmit(). This v1 allows this quietly, but v2 could return
-an error to the user (-ENOMEM or maybe -ENOBUFS) when this happens, similar
-to when vsock is unable to enqueue a packet currently.
+Will do.
 
-The user could still, for example, choose the noop qdisc. Assuming the
-v2 change mentioned above, their sendmsg() calls will return errors.
-Similar to how if they choose the wrong CID they will get an error when
-connecting a socket.
-
-Best,
-Bobby
+> 
+> ---
+>  tools/testing/selftests/kvm/include/x86_64/vmx.h | 10 +++++++---
+>  tools/testing/selftests/kvm/lib/x86_64/vmx.c     | 15 ++++++++++-----
+>  2 files changed, 17 insertions(+), 8 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/vmx.h b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+> index 99fa1410964c..ecc66d65acc1 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/vmx.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+> @@ -537,10 +537,14 @@ static inline uint32_t vmcs_revision(void)
+>  	return rdmsr(MSR_IA32_VMX_BASIC);
+>  }
+> 
+> +struct vmx_page {
+> +	void *gva;
+> +	uint64_t gpa;
+> +	void *hva;
+> +};
+> +
+>  struct vmx_pages {
+> -	void *vmxon_hva;
+> -	uint64_t vmxon_gpa;
+> -	void *vmxon;
+> +	struct vmx_page vmxon;
+> 
+>  	void *vmcs_hva;
+>  	uint64_t vmcs_gpa;
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/vmx.c b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
+> index 80a568c439b8..e4eeab85741a 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/vmx.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
+> @@ -58,6 +58,13 @@ int vcpu_enable_evmcs(struct kvm_vcpu *vcpu)
+>  	return evmcs_ver;
+>  }
+> 
+> +static void vcpu_alloc_vmx_page(struct kvm_vm *vm, struct vmx_page *page)
+> +{
+> +	page->gva = (void *)vm_vaddr_alloc_page(vm);
+> +	page->hva = addr_gva2hva(vm, (uintptr_t)page->gva);
+> +	page->gpa = addr_gva2gpa(vm, (uintptr_t)page->gva);
+> +}
+> +
+>  /* Allocate memory regions for nested VMX tests.
+>   *
+>   * Input Args:
+> @@ -76,9 +83,7 @@ vcpu_alloc_vmx(struct kvm_vm *vm, vm_vaddr_t *p_vmx_gva)
+>  	struct vmx_pages *vmx = addr_gva2hva(vm, vmx_gva);
+> 
+>  	/* Setup of a region of guest memory for the vmxon region. */
+> -	vmx->vmxon = (void *)vm_vaddr_alloc_page(vm);
+> -	vmx->vmxon_hva = addr_gva2hva(vm, (uintptr_t)vmx->vmxon);
+> -	vmx->vmxon_gpa = addr_gva2gpa(vm, (uintptr_t)vmx->vmxon);
+> +	vcpu_alloc_vmx_page(vm, &vmx->vmxon);
+> 
+>  	/* Setup of a region of guest memory for a vmcs. */
+>  	vmx->vmcs = (void *)vm_vaddr_alloc_page(vm);
+> @@ -160,8 +165,8 @@ bool prepare_for_vmx_operation(struct vmx_pages *vmx)
+>  		wrmsr(MSR_IA32_FEAT_CTL, feature_control | required);
+> 
+>  	/* Enter VMX root operation. */
+> -	*(uint32_t *)(vmx->vmxon) = vmcs_revision();
+> -	if (vmxon(vmx->vmxon_gpa))
+> +	*(uint32_t *)(vmx->vmxon.gva) = vmcs_revision();
+> +	if (vmxon(vmx->vmxon.gpa))
+>  		return false;
+> 
+>  	return true;
+> 
+> base-commit: 372d07084593dc7a399bf9bee815711b1fb1bcf2
+> --
+> 
