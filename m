@@ -2,81 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 238845B0E4B
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 22:40:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 40FAF5B0EAF
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 22:57:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230007AbiIGUkn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 16:40:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38736 "EHLO
+        id S229812AbiIGU5b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 16:57:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbiIGUkm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 16:40:42 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F11C1BCC33;
-        Wed,  7 Sep 2022 13:40:40 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F3EEF106F;
-        Wed,  7 Sep 2022 13:40:46 -0700 (PDT)
-Received: from [10.57.15.197] (unknown [10.57.15.197])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5CF203F7B4;
-        Wed,  7 Sep 2022 13:40:28 -0700 (PDT)
-Message-ID: <9e537066-525f-4a8c-ffc1-926ac130c6e6@arm.com>
-Date:   Wed, 7 Sep 2022 21:40:21 +0100
+        with ESMTP id S229777AbiIGU50 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 16:57:26 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BC94AD9B9
+        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 13:57:25 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id m3so5116704pjo.1
+        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 13:57:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=D3RjQ0ycHa7B/7TKXUqNYyCf5lxoaaHEC6kuhsk3puQ=;
+        b=idXPP15TJ7IS7iOdTlcgO/fcRqVHkI5cBChgxzLuZESpPUM6XsRZaDDRlyZt5BL5jA
+         NnDWTztN/R3V3J5Z1YZuFWvgmRdivTwGx7C0YTX8U3GFYFDSyYNpSXVfEvPcf6DA88z9
+         8kLgdpa7Q4m7CU2vRCW6SLTrKfYckFsVNWOY2H42ZOxS7KeLUcJ7gnpWeG5GGIX+7+U1
+         TFWxa2aATU45JtkYWSOrYquLa9hMQdzhjn7oTetBNz+hF31OaKxN3BgxaWlaxzW2WqmT
+         wPPWvIoyABeiowfiSdUX1HROmgtTeBq4Kjy6fIipWcmDCYtgsG9s9yt5yytaexuEMaX1
+         PSJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=D3RjQ0ycHa7B/7TKXUqNYyCf5lxoaaHEC6kuhsk3puQ=;
+        b=0oN6212weivh8ibuuE24iU60A2o+aHldcN8f/6T1P3TBHetuGDKX+adL2pmmxpjfEN
+         tbGA99oybCRHQla6dQXdLgrlyVtHjyRtRdhUc3ZpQeTeI0OhNsJgTQdddRKoZb2oWI+U
+         U9/9mo5OaGDrW+j8m4hdVpiAmGLn/mMWFShtAPxidoc6jb6yvGvSLZQ+MCQjtRGH8fCi
+         Z+WrYYaqaWgoCaQep+j4F8FBFrrxaHCHc48OvT6nDtvYBthmWE4xqe7iRafYFJiSMkjK
+         cbpEiSO+WJ3FuqTghvn20iGNFOe57f6XuzE5qHOJceiVLrATVkCgUsyMp8ZC6woiYtH6
+         kONw==
+X-Gm-Message-State: ACgBeo3ZgpYbtmzp5vz822NZmBFcLs4VHy9k6WdA4jsdNgZGoTxK7deO
+        oAC6cel5vyHKAoonZ8GQiMPzVA==
+X-Google-Smtp-Source: AA6agR4y0YI6Do787IPnCmL86e80gRfI6CK4dTypbO17kG+PMFuHSAWq0jEGksDH17TMqhJ3tnUYKg==
+X-Received: by 2002:a17:90b:33c9:b0:200:a0ca:e6c8 with SMTP id lk9-20020a17090b33c900b00200a0cae6c8mr357636pjb.147.1662584244248;
+        Wed, 07 Sep 2022 13:57:24 -0700 (PDT)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id v6-20020a1709029a0600b00176a47e5840sm8258330plp.298.2022.09.07.13.57.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Sep 2022 13:57:22 -0700 (PDT)
+Date:   Wed, 7 Sep 2022 13:57:17 -0700
+From:   David Matlack <dmatlack@google.com>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Gavin Shan <gshan@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 02/14] KVM: arm64: Tear down unlinked stage-2 subtree
+ after break-before-make
+Message-ID: <YxkFrSmSKdBFEoZp@google.com>
+References: <20220830194132.962932-1-oliver.upton@linux.dev>
+ <20220830194132.962932-3-oliver.upton@linux.dev>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [RFC PATCH v3 3/7] iommu/arm-smmu-v3: support ops registration
- for CDX bus
-Content-Language: en-GB
-To:     Saravana Kannan <saravanak@google.com>
-Cc:     "Gupta, Nipun" <Nipun.Gupta@amd.com>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "krzysztof.kozlowski+dt@linaro.org" 
-        <krzysztof.kozlowski+dt@linaro.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "Gupta, Puneet (DCG-ENG)" <puneet.gupta@amd.com>,
-        "song.bao.hua@hisilicon.com" <song.bao.hua@hisilicon.com>,
-        "mchehab+huawei@kernel.org" <mchehab+huawei@kernel.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-        "jeffrey.l.hugo@gmail.com" <jeffrey.l.hugo@gmail.com>,
-        "Michael.Srba@seznam.cz" <Michael.Srba@seznam.cz>,
-        "mani@kernel.org" <mani@kernel.org>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "jgg@ziepe.ca" <jgg@ziepe.ca>, "jgg@nvidia.com" <jgg@nvidia.com>,
-        "will@kernel.org" <will@kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "masahiroy@kernel.org" <masahiroy@kernel.org>,
-        "ndesaulniers@google.com" <ndesaulniers@google.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "okaya@kernel.org" <okaya@kernel.org>,
-        "Anand, Harpreet" <harpreet.anand@amd.com>,
-        "Agarwal, Nikhil" <nikhil.agarwal@amd.com>,
-        "Simek, Michal" <michal.simek@amd.com>,
-        "Radovanovic, Aleksandar" <aleksandar.radovanovic@amd.com>,
-        "git (AMD-Xilinx)" <git@amd.com>
-References: <20220803122655.100254-1-nipun.gupta@amd.com>
- <20220906134801.4079497-1-nipun.gupta@amd.com>
- <20220906134801.4079497-4-nipun.gupta@amd.com>
- <CAGETcx_W8QVe+CdpocN2rHjp08TwsW22FaJgrYW=0JNge_N6KQ@mail.gmail.com>
- <DM6PR12MB30829DDDC62B36B17F87B204E8419@DM6PR12MB3082.namprd12.prod.outlook.com>
- <f5cf7bd7-4cd9-ef9c-7f25-f814b2f1e41f@arm.com>
- <CAGETcx9LE=E2focmbEsdQV3s2NR4-9H35ODkgSxZY5_7SEJ1Qw@mail.gmail.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <CAGETcx9LE=E2focmbEsdQV3s2NR4-9H35ODkgSxZY5_7SEJ1Qw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-11.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220830194132.962932-3-oliver.upton@linux.dev>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,105 +84,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-09-07 19:24, Saravana Kannan wrote:
-> On Wed, Sep 7, 2022 at 1:27 AM Robin Murphy <robin.murphy@arm.com> wrote:
->>
->> On 2022-09-07 04:17, Gupta, Nipun wrote:
->>> [AMD Official Use Only - General]
->>>
->>>
->>>
->>>> -----Original Message-----
->>>> From: Saravana Kannan <saravanak@google.com>
->>>> Sent: Wednesday, September 7, 2022 5:41 AM
->>>> To: Gupta, Nipun <Nipun.Gupta@amd.com>
->>>> Cc: robh+dt@kernel.org; krzysztof.kozlowski+dt@linaro.org;
->>>> gregkh@linuxfoundation.org; rafael@kernel.org; eric.auger@redhat.com;
->>>> alex.williamson@redhat.com; cohuck@redhat.com; Gupta, Puneet (DCG-ENG)
->>>> <puneet.gupta@amd.com>; song.bao.hua@hisilicon.com;
->>>> mchehab+huawei@kernel.org; maz@kernel.org; f.fainelli@gmail.com;
->>>> jeffrey.l.hugo@gmail.com; Michael.Srba@seznam.cz; mani@kernel.org;
->>>> yishaih@nvidia.com; jgg@ziepe.ca; jgg@nvidia.com; robin.murphy@arm.com;
->>>> will@kernel.org; joro@8bytes.org; masahiroy@kernel.org;
->>>> ndesaulniers@google.com; linux-arm-kernel@lists.infradead.org; linux-
->>>> kbuild@vger.kernel.org; linux-kernel@vger.kernel.org;
->>>> devicetree@vger.kernel.org; kvm@vger.kernel.org; okaya@kernel.org; Anand,
->>>> Harpreet <harpreet.anand@amd.com>; Agarwal, Nikhil
->>>> <nikhil.agarwal@amd.com>; Simek, Michal <michal.simek@amd.com>;
->>>> Radovanovic, Aleksandar <aleksandar.radovanovic@amd.com>; git (AMD-Xilinx)
->>>> <git@amd.com>
->>>> Subject: Re: [RFC PATCH v3 3/7] iommu/arm-smmu-v3: support ops registration
->>>> for CDX bus
->>>>
->>>> [CAUTION: External Email]
->>>>
->>>> On Tue, Sep 6, 2022 at 6:48 AM Nipun Gupta <nipun.gupta@amd.com> wrote:
->>>>>
->>>>> With new CDX bus supported for AMD FPGA devices on ARM
->>>>> platform, the bus requires registration for the SMMU v3
->>>>> driver.
->>>>>
->>>>> Signed-off-by: Nipun Gupta <nipun.gupta@amd.com>
->>>>> ---
->>>>>    drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 16 ++++++++++++++--
->>>>>    1 file changed, 14 insertions(+), 2 deletions(-)
->>>>>
->>>>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>>> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>>>> index d32b02336411..8ec9f2baf12d 100644
->>>>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>>>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>>>> @@ -29,6 +29,7 @@
->>>>>    #include <linux/platform_device.h>
->>>>>
->>>>>    #include <linux/amba/bus.h>
->>>>> +#include <linux/cdx/cdx_bus.h>
->>>>>
->>>>>    #include "arm-smmu-v3.h"
->>>>>    #include "../../iommu-sva-lib.h"
->>>>> @@ -3690,16 +3691,27 @@ static int arm_smmu_set_bus_ops(struct
->>>> iommu_ops *ops)
->>>>>                   if (err)
->>>>>                           goto err_reset_pci_ops;
->>>>>           }
->>>>> +#endif
->>>>> +#ifdef CONFIG_CDX_BUS
->>>>> +       if (cdx_bus_type.iommu_ops != ops) {
->>>>> +               err = bus_set_iommu(&cdx_bus_type, ops);
->>>>> +               if (err)
->>>>> +                       goto err_reset_amba_ops;
->>>>> +       }
->>>>
->>>> I'm not an expert on IOMMUs, so apologies if the question is stupid.
->>>>
->>>> Why does the CDX bus need special treatment here (like PCI) when there
->>>> are so many other busses (eg: I2C, SPI, etc) that don't need any
->>>> changes here?
->>>
->>> AFAIU, the devices on I2C/SPI does not use SMMU. Apart from PCI/AMBA,
->>> FSL-MC is another similar bus (on SMMUv2) which uses SMMU ops.
->>>
->>> The devices here are behind SMMU. Robin can kindly correct or add
->>> more here from SMMU perspective.
->>
->> Indeed, there is no need to describe and handle how DMA may or may not
->> be translated for I2C/SPI/USB/etc. because they are not DMA-capable
->> buses (in those cases the relevant bus *controller* often does DMA, but
->> it does that for itself as the platform/PCI/etc. device it is).
-> 
-> Ok this is what I was guessing was the reason, but didn't want to make
-> that assumption.
-> 
-> So if there are other cases like AMBA, FSL-MC where the devices can do
-> direct DMA, why do those buses not need a #ifdef section in this
-> function like CDX? Or put another way, why does CDX need special treatment?
+On Tue, Aug 30, 2022 at 07:41:20PM +0000, Oliver Upton wrote:
+[...]
+>  
+> +static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> +				struct stage2_map_data *data);
+> +
+>  static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
+>  				     kvm_pte_t *ptep,
+>  				     struct stage2_map_data *data)
+>  {
+> -	if (data->anchor)
 
-Er, it doesn't? The only non-optional bus here is platform, since the 
-others *can* be configured out and *are* #ifdefed accordingly. This 
-patch is fine for the kernel it was based on, it'll just want rewriting 
-now that I've cleaned all this horrible driver boilerplate up. And 
-according to the thread on patch #4 there might need to be additional 
-changes for CDX to express a reserved MSI region for SMMU support to 
-actually work properly.
+Should @anchor and @childp be removed from struct stage2_map_data? This
+commit removes the only remaining references to them.
 
-Robin.
+> -		return 0;
+> +	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
+> +	kvm_pte_t *childp = kvm_pte_follow(*ptep, mm_ops);
+> +	struct kvm_pgtable *pgt = data->mmu->pgt;
+> +	int ret;
+>  
+>  	if (!stage2_leaf_mapping_allowed(addr, end, level, data))
+>  		return 0;
+>  
+> -	data->childp = kvm_pte_follow(*ptep, data->mm_ops);
+>  	kvm_clear_pte(ptep);
+>  
+>  	/*
+[...]
+>  static int stage2_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  			     enum kvm_pgtable_walk_flags flag, void * const arg)
+> @@ -883,11 +849,9 @@ static int stage2_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+>  		return stage2_map_walk_table_pre(addr, end, level, ptep, data);
+>  	case KVM_PGTABLE_WALK_LEAF:
+>  		return stage2_map_walk_leaf(addr, end, level, ptep, data);
+> -	case KVM_PGTABLE_WALK_TABLE_POST:
+> -		return stage2_map_walk_table_post(addr, end, level, ptep, data);
+
+kvm_pgtable_stage2_set_owner() still uses stage2_map_walker() with
+KVM_PGTABLE_WALK_TABLE_POST.
