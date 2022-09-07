@@ -2,179 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A4B4D5B0CF3
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 21:15:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ABCC05B0D1C
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 21:21:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229768AbiIGTPC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 15:15:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51342 "EHLO
+        id S229686AbiIGTV0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 15:21:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbiIGTPA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 15:15:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AC871707B
-        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 12:14:59 -0700 (PDT)
+        with ESMTP id S229476AbiIGTVZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 15:21:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D1CEBFC7E
+        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 12:21:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662578098;
+        s=mimecast20190719; t=1662578482;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=F2hl65/5BHZV+h8ft7hHxLgHBBHzGCSnWLOyF+9Pr+8=;
-        b=U3NwU6PSfplSlk43GsylcPwMz//4YVhFZoPxSiVvV1Y4hhtYDayBkFieYq0bwk6P0SmEtw
-        nXYy8dkRSeLi9CQ0clqq3+7LzCFjgrFJ/1LWIn1Xal9ooLfwjWD82phZdRS62BmJ8+Hbwi
-        TcTkFPQqolDfYK5D2P/Doaro4WTQZjQ=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=acYYGDic5ZvUP/P7Wj3EoypZhdavjGHx3YAqaWmNtf4=;
+        b=Co67kG5sA0Nlss2/j95tLI3KnxyxVWc6hRpZHUA73hwWqD9h0YMSTUw1egET4PeVHnQiG0
+        XsVLPKqKC9FicoOj7VDmHOnN5jdEwkBER7iUP8H1vdHtjUmKlbUcLDExUvnLhy1Dq7UOdk
+        VbTYcitU0/vdFPYC9TtqaKP8o2Aaf5o=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-226-uLzUV2OHPTeGje98XqM-xg-1; Wed, 07 Sep 2022 15:14:57 -0400
-X-MC-Unique: uLzUV2OHPTeGje98XqM-xg-1
-Received: by mail-wr1-f71.google.com with SMTP id h2-20020adfa4c2000000b00228db7822cbso2122509wrb.19
-        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 12:14:57 -0700 (PDT)
+ us-mta-161-qewFydfNM1mQ0VrR1T1WAA-1; Wed, 07 Sep 2022 15:21:21 -0400
+X-MC-Unique: qewFydfNM1mQ0VrR1T1WAA-1
+Received: by mail-io1-f70.google.com with SMTP id y1-20020a056602200100b006893cd97da9so9747373iod.1
+        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 12:21:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=F2hl65/5BHZV+h8ft7hHxLgHBBHzGCSnWLOyF+9Pr+8=;
-        b=cuKrEJ/AgFgwRT6QRZzwxv3aQPps39jq0zFnCaXbEm9c1oXWQgfpZ7iYyO1z1qXzzR
-         CeFF5hY+NHIXzTOFUM2kYodRI8e0pv5loMffG4au8tWK1muDX17JIz9+o6LiFSaA5Xy/
-         zxcbOIBwxD0oLSgTIgAU5Y8R7azMqq4F2eeHpm2nZ82W2IjkSu2g+AK3piuv4UDmavGd
-         KYnTDqxNh33j22uW8yTpW6skLFVsSTkes/FHkfvIBJEmV+6p1QgOJiOb7wS86sOxSJE1
-         bqaAx35n1DydLtLWDsyKHfOLD7yci4F/2U+rnfdG/JIAaZCRapmTfHJXVpPyc8jqAVHB
-         qo3A==
-X-Gm-Message-State: ACgBeo3Lj+P7KfTOqDZpMfz9DzknP6/jFYaERAHhwDiAPW8V+24WnkRT
-        a1wcfo28O+nfhV0IEX1Osk5u8ayDUMxeYYBNgLludSAskEjM8jW1eQFPxzjCGeG9cO+8E44QmMh
-        RQ/CPfUbwDFjX
-X-Received: by 2002:a05:6000:cf:b0:228:e37b:361b with SMTP id q15-20020a05600000cf00b00228e37b361bmr2599743wrx.374.1662578096102;
-        Wed, 07 Sep 2022 12:14:56 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR5Mej1JLF8Idc5qNLyIzkfO5zK2VWFm2c7LZq5/eJiJrZnnv9hvkXiOQaSwnEjKeK//Gm5oog==
-X-Received: by 2002:a05:6000:cf:b0:228:e37b:361b with SMTP id q15-20020a05600000cf00b00228e37b361bmr2599728wrx.374.1662578095776;
-        Wed, 07 Sep 2022 12:14:55 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f0d:ba00:c951:31d7:b2b0:8ba0? (p200300d82f0dba00c95131d7b2b08ba0.dip0.t-ipconnect.de. [2003:d8:2f0d:ba00:c951:31d7:b2b0:8ba0])
-        by smtp.gmail.com with ESMTPSA id m18-20020adff392000000b00228b3ff1f5dsm13553530wro.117.2022.09.07.12.14.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Sep 2022 12:14:54 -0700 (PDT)
-Message-ID: <7ed97088-b4f0-e36f-c935-87cd1e94c574@redhat.com>
-Date:   Wed, 7 Sep 2022 21:14:54 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH] vfio/type1: Unpin zero pages
-Content-Language: en-US
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "lpivarc@redhat.com" <lpivarc@redhat.com>,
-        "Liu, Jingqi" <jingqi.liu@intel.com>,
-        "Lu, Baolu" <baolu.lu@intel.com>
-References: <166182871735.3518559.8884121293045337358.stgit@omen>
- <BN9PR11MB527655973E2603E73F280DF48C7A9@BN9PR11MB5276.namprd11.prod.outlook.com>
- <d71160d1-5a41-eae0-6405-898fe0a28696@redhat.com> <YxfX+kpajVY4vWTL@ziepe.ca>
- <b365f30b-da58-39c0-08e9-c622cc506afa@redhat.com> <YxiTOyGqXHFkR/DY@ziepe.ca>
- <20220907095552.336c8f34.alex.williamson@redhat.com>
- <YxjJlM5A0OLhaA7K@ziepe.ca>
- <20220907125627.0579e592.alex.williamson@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=acYYGDic5ZvUP/P7Wj3EoypZhdavjGHx3YAqaWmNtf4=;
+        b=sgAfrEYa6arLpZdwg8c32E15Ib76TWR2R3b6QcQ0vrSDy1GyyLUT9LicjcgYORDn3V
+         EvktiZSrG3yt0cRQbSExgc408/zVPK16WBrfEkPnky4KZr5hW4WKLEjCgO0gkbcO0gak
+         u3fmOmBlvaoWie1RQNQ32g2u/5Gtk2ZAxO/KRlSGQFOkyEMcLUE6onuUgCkGyF4Cr8s4
+         TrdMjrn7t0zgVooCZhdKaVoRFegFNHaXoVLPzK5GaKcEKsKoh33oYbx67vbawc9ywJX/
+         e2NncZQEik3XAHHWi8hjVR+4Zol9289ID2XfNiSMArSvMbuiOWj6XjEypzdc/HnW5xX6
+         7KKg==
+X-Gm-Message-State: ACgBeo0pI4e7Ttsy4CzesdCZsAsWxmGK6J8vuBo+AEmYI6F0pbNMR8QW
+        j79BMJffVrLjbQV1Lj+BQspVyzuk1QCxRqR2AdxlhvNvsrx63IWB5VHQ0cD1pn0oGxTu8hndEUW
+        bEvGmKnBLY5WC
+X-Received: by 2002:a05:6638:16c2:b0:351:f0d0:b68b with SMTP id g2-20020a05663816c200b00351f0d0b68bmr2904794jat.60.1662578480805;
+        Wed, 07 Sep 2022 12:21:20 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR6VZ3L6PHOchZCgz1yg93wzLUDlo0CbIRpxVXJ618s/3KmRyaPz8bQXK+QtAeJh32mXlEvNSw==
+X-Received: by 2002:a05:6638:16c2:b0:351:f0d0:b68b with SMTP id g2-20020a05663816c200b00351f0d0b68bmr2904781jat.60.1662578480535;
+        Wed, 07 Sep 2022 12:21:20 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id m6-20020a056e021c2600b002df2d6769b3sm88947ilh.45.2022.09.07.12.21.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Sep 2022 12:21:20 -0700 (PDT)
+Date:   Wed, 7 Sep 2022 13:21:19 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Leon Romanovsky <leon@kernel.org>
+Cc:     saeedm@nvidia.com, kvm@vger.kernel.org, netdev@vger.kernel.org,
+        kuba@kernel.org, kevin.tian@intel.com, joao.m.martins@oracle.com,
+        leonro@nvidia.com, yishaih@nvidia.com, maorg@nvidia.com,
+        cohuck@redhat.com
+Subject: Re: [GIT PULL] Please pull mlx5 vfio changes
+Message-ID: <20220907132119.447b9219.alex.williamson@redhat.com>
+In-Reply-To: <20220907094344.381661-1-leon@kernel.org>
+References: <20220907094344.381661-1-leon@kernel.org>
 Organization: Red Hat
-In-Reply-To: <20220907125627.0579e592.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 07.09.22 20:56, Alex Williamson wrote:
-> On Wed, 7 Sep 2022 13:40:52 -0300
-> Jason Gunthorpe <jgg@ziepe.ca> wrote:
+On Wed,  7 Sep 2022 12:43:44 +0300
+Leon Romanovsky <leon@kernel.org> wrote:
+
+> Hi Alex,
 > 
->> On Wed, Sep 07, 2022 at 09:55:52AM -0600, Alex Williamson wrote:
->>
->>>> So, if we go back far enough in the git history we will find a case
->>>> where PUP is returning something for the zero page, and that something
->>>> caused is_invalid_reserved_pfn() == false since VFIO did work at some
->>>> point.
->>>
->>> Can we assume that?  It takes a while for a refcount leak on the zero
->>> page to cause an overflow.  My assumption is that it's never worked, we
->>> pin zero pages, don't account them against the locked memory limits
->>> because our is_invalid_reserved_pfn() test returns true, and therefore
->>> we don't unpin them.
->>
->> Oh, you think it has been buggy forever? That is not great..
->>   
->>>> IHMO we should simply go back to the historical behavior - make
->>>> is_invalid_reserved_pfn() check for the zero_pfn and return
->>>> false. Meaning that PUP returned it.
->>>
->>> We've never explicitly tested for zero_pfn and as David notes,
->>> accounting the zero page against the user's locked memory limits has
->>> user visible consequences.  VMs that worked with a specific locked
->>> memory limit may no longer work.
->>
->> Yes, but the question is if that is a strict ABI we have to preserve,
->> because if you take that view it also means because VFIO has this
->> historical bug that David can't fix the FOLL_FORCE issue either.
->>
->> If the view holds for memlock then it should hold for cgroups
->> also. This means the kernel can never change anything about
->> GFP_KERNEL_ACCOUNT allocations because it might impact userspace
->> having set a tight limit there.
->>
->> It means we can't fix the bug that VFIO is using the wrong storage for
->> memlock.
->>
->> It means qemu can't change anything about how it sets up this memory,
->> ie Kevin's idea to change the ordering.
->>
->> On the other hand the "abi break" we are talking about is that a user
->> might have to increase a configured limit in a config file after a
->> kernel upgrade.
->>
->> IDK what consensus exists here, I've never heard of anyone saying
->> these limits are a strict ABI like this.. I think at least for cgroup
->> that would be so invasive as to immediately be off the table.
+> This series is based on clean 6.0-rc4 as such it causes to two small merge
+> conficts whis vfio-next. One is in thrird patch where you should take whole
+> chunk for include/uapi/linux/vfio.h as is. Another is in vfio_main.c around
+> header includes, which you should take too.
+
+Is there any reason you can't provide a topic branch for the two
+net/mlx5 patches and the remainder are rebased and committed through
+the vfio tree?  I don't see this as an exceptional case that requires
+resolving conflicts in merge commits.  Thanks,
+
+Alex
+
+
+> ----------------------------------------------------------------
+> The following changes since commit 7e18e42e4b280c85b76967a9106a13ca61c16179:
 > 
-> I thought we'd already agreed that we were stuck with locked_vm for
-> type1 and any compatibility mode of type1 due to this.  Native iommufd
-> support can do the right thing since userspace will need to account for
-> various new usage models anyway.
+>   Linux 6.0-rc4 (2022-09-04 13:10:01 -0700)
 > 
-> I've raised the issue with David for the zero page accounting, but I
-> don't know what the solution is.  libvirt automatically adds a 1GB
-> fudge factor to the VM locked memory limits to account for things like
-> ROM mappings, or at least the non-zeropage backed portion of those
-> ROMs.  I think that most management tools have adopted similar, so the
-> majority of users shouldn't notice.  However this won't cover all
-> users, so we certainly risk breaking userspace if we introduce hard
-> page accounting of zero pages.
+> are available in the Git repository at:
 > 
-> I think David suggested possibly allowing some degree of exceeding
-> locked memory limits for zero page COWs.  Potentially type1 could do
-> this as well; special case handling with some heuristically determined,
-> module parameter defined limit.  We might also consider whether we
-> could just ignore zero page mappings, maybe with a optional "strict"
-> mode module option to generate an errno on such mappings.  Thanks,
-
-So far I played with the ideas
-
-a) allow slightly exceeding the limit and warn
-
-b) weird vfio kernel parameter to control the zeropage behavior (old vs.
-    new)
-
-I certainly have in mind that we might need some toggle for vfio.
-
--- 
-Thanks,
-
-David / dhildenb
+>   https://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git tags/mlx5-dma-logging
+> 
+> for you to fetch changes up to 7f5dc74155a9de8bf6adc86d84e26c5a1e762431:
+> 
+>   vfio/mlx5: Set the driver DMA logging callbacks (2022-09-07 12:11:22 +0300)
+> 
+> ----------------------------------------------------------------
+> Add device DMA logging support for mlx5 driver
+> 
+> From Yishai:
+> 
+> This series adds device DMA logging uAPIs and their implementation as
+> part of mlx5 driver.
+> 
+> DMA logging allows a device to internally record what DMAs the device is
+> initiating and report them back to userspace. It is part of the VFIO
+> migration infrastructure that allows implementing dirty page tracking
+> during the pre copy phase of live migration. Only DMA WRITEs are logged,
+> and this API is not connected to VFIO_DEVICE_FEATURE_MIG_DEVICE_STATE.
+> 
+> The uAPIs are based on the FEATURE ioctl as were introduced earlier by
+> the below RFC [1] and follows the notes that were discussed in the
+> mailing list.
+> 
+> It includes:
+> - A PROBE option to detect if the device supports DMA logging.
+> - A SET option to start device DMA logging in given IOVAs ranges.
+> - A GET option to read back and clear the device DMA log.
+> - A SET option to stop device DMA logging that was previously started.
+> 
+> Extra details exist as part of relevant patches in the series.
+> 
+> In addition, the series adds some infrastructure support for managing an
+> IOVA bitmap done by Joao Martins.
+> 
+> It abstracts how an IOVA range is represented in a bitmap that is
+> granulated by a given page_size. So it translates all the lifting of
+> dealing with user pointers into its corresponding kernel addresses.
+> This new functionality abstracts the complexity of user/kernel bitmap
+> pointer usage and finally enables an API to set some bits.
+> 
+> This functionality will be used as part of IOMMUFD series for the system
+> IOMMU tracking.
+> 
+> Finally, we come with mlx5 implementation based on its device
+> specification for the DMA logging APIs.
+> 
+> The matching qemu changes can be previewed here [2].
+> They come on top of the v2 migration protocol patches that were sent
+> already to the mailing list.
+> 
+> Note:
+> - As this series touched mlx5_core parts we may need to send the
+>   net/mlx5 patches as a pull request format to VFIO to avoid conflicts
+>   before acceptance.
+> 
+> [1] https://lore.kernel.org/all/20220501123301.127279-1-yishaih@nvidia.com/T/
+> [2] https://github.com/avihai1122/qemu/commits/device_dirty_tracking
+> 
+> Link: https://lore.kernel.org/all/20220905105852.26398-1-yishaih@nvidia.com/
+> Signed-of-by: Leon Romanovsky <leon@kernel.org>
+> 
+> ----------------------------------------------------------------
+> Joao Martins (1):
+>       vfio: Add an IOVA bitmap support
+> 
+> Yishai Hadas (9):
+>       net/mlx5: Introduce ifc bits for page tracker
+>       net/mlx5: Query ADV_VIRTUALIZATION capabilities
+>       vfio: Introduce DMA logging uAPIs
+>       vfio: Introduce the DMA logging feature support
+>       vfio/mlx5: Init QP based resources for dirty tracking
+>       vfio/mlx5: Create and destroy page tracker object
+>       vfio/mlx5: Report dirty pages from tracker
+>       vfio/mlx5: Manage error scenarios on tracker
+>       vfio/mlx5: Set the driver DMA logging callbacks
+> 
+>  drivers/net/ethernet/mellanox/mlx5/core/fw.c   |   6 +
+>  drivers/net/ethernet/mellanox/mlx5/core/main.c |   1 +
+>  drivers/vfio/Kconfig                           |   1 +
+>  drivers/vfio/Makefile                          |   6 +-
+>  drivers/vfio/iova_bitmap.c                     | 422 +++++++++++
+>  drivers/vfio/pci/mlx5/cmd.c                    | 995 ++++++++++++++++++++++++-
+>  drivers/vfio/pci/mlx5/cmd.h                    |  63 +-
+>  drivers/vfio/pci/mlx5/main.c                   |   9 +-
+>  drivers/vfio/pci/vfio_pci_core.c               |   5 +
+>  drivers/vfio/vfio_main.c                       | 175 +++++
+>  include/linux/iova_bitmap.h                    |  26 +
+>  include/linux/mlx5/device.h                    |   9 +
+>  include/linux/mlx5/mlx5_ifc.h                  |  83 ++-
+>  include/linux/vfio.h                           |  28 +-
+>  include/uapi/linux/vfio.h                      |  86 +++
+>  15 files changed, 1895 insertions(+), 20 deletions(-)
+>  create mode 100644 drivers/vfio/iova_bitmap.c
+>  create mode 100644 include/linux/iova_bitmap.h
+> 
 
