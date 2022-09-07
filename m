@@ -2,158 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C77D75B0A38
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 18:36:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C62435B0A16
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 18:29:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229987AbiIGQgO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 12:36:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35858 "EHLO
+        id S229437AbiIGQ3r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 12:29:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230145AbiIGQgK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 12:36:10 -0400
-X-Greylist: delayed 601 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 07 Sep 2022 09:36:06 PDT
-Received: from wnew2-smtp.messagingengine.com (wnew2-smtp.messagingengine.com [64.147.123.27])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97FED4BA61;
-        Wed,  7 Sep 2022 09:36:06 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailnew.west.internal (Postfix) with ESMTP id 865F22B05B86;
-        Wed,  7 Sep 2022 12:18:35 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Wed, 07 Sep 2022 12:18:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
-         h=cc:cc:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm3; t=1662567515; x=1662574715; bh=5D
-        ZtFrVdqR12nN7HSUlbgO9Phu3Lj4gHCeI3MI0eXEs=; b=gKjMSLcGKU47Bpx6uQ
-        gZ+Ahn/J6pmAu6Fk54tOUPmkt4ySG4YQ4tNtCsXNooyXqDQdnB0p/CITTV1m34mq
-        s+LAYPRNp7umaA0DS2tD6Bl9cL2UPuUH1NnFqt+Hujshubfu6tpdqxXryN7Jif7b
-        wFcbM6hQx1KAluzks24vm6vt401JXycrXk/U1TxhftI2k9a3Qr1m/7eQrpEGaUoY
-        dMxR1PpNXaxHCUiB+IzNfCTcZdKp74OQaJyZNKu9NNG2Kd9Cty0VZ7c37OqmpmGx
-        91qSQwwUWpUuKrGDcjIKulD3bI5YIyxjctZu6ma29GlM+OIwXDzKYX0fO8UNhgKu
-        Ok5g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm2; t=1662567515; x=1662574715; bh=5DZtFrVdqR12nN7HSUlbgO9Phu3L
-        j4gHCeI3MI0eXEs=; b=OZJQAUW2is2zfDT/Ce2aXyZmrMSXobT3OZMp5q6fVpQ/
-        iVRiwH1zHSZcVtLQ2DkHlpUlqbEffGM1fAmWod1B2oWsgEDoe///wEj9f9lghrAo
-        QmF2m0YsiHOKiN8AKnZz/6f5uUQMq/9NAYeyhYKiSfFb9Dz+qoavKwdvW7oRiyhC
-        EATCi/71d3py5lcq99u7ST/c6PkyOa3KHXiwFRYH2JEiXVa1izqMZLW3QFlYIdsy
-        XqD1Q0zUyBwkxx7SuUl6U3WVue4FTTdJB8uWCgJhcTDbXLhEkyIR5uYLz6VpaFwh
-        96XgrgE3i0bQPirExWJbzFosbfLoZt7t6DTe9rF30A==
-X-ME-Sender: <xms:V8QYYw_o5DzFzVn-nsNBEVd-FS_D_oEsE0Ni1kSDm-EDmUqf7t5RYw>
-    <xme:V8QYY4tkvs0qarp3milgqkj-QnUfLwCvr9jPsDhMl_JVoMp1Uawemvudn2tTZjoFP
-    RKollyj_THPCycU494>
-X-ME-Received: <xmr:V8QYY2AJ6tnceeMtt6ze-9Y21GxOCHjfGO0Uaic1_Z0sgkplNSGu4E0Lv93m0HLV2ntwuQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfedttddgleelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdttddttddtvdenucfhrhhomhepfdfmihhr
-    ihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilhhlsehshhhuthgvmhhovhdrnh
-    grmhgvqeenucggtffrrghtthgvrhhnpeelgffhfeetlefhveffleevfffgtefffeelfedu
-    udfhjeduteeggfeiheefteehjeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuve
-    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepkhhirhhilhhl
-    sehshhhuthgvmhhovhdrnhgrmhgv
-X-ME-Proxy: <xmx:V8QYYweqdTZRL4Hql-Il9ILHjXYOl5I2TLxUmx4tUf2irEd7UWrODA>
-    <xmx:V8QYY1Nzk_PUNIp2LKA55MR0G9GVC8m4bLDpu3YSj4OFMB6ygSASzg>
-    <xmx:V8QYY6lIz_r5CyIgsFG97LMd1GcuCvwSFmdupTCv8XNGm0jAThrJpw>
-    <xmx:W8QYYyKr-0dAl_rNZ4o-w_sGm3XfXyNXiJWuDL3a0JOCCopTLRQCg_cdsds>
-Feedback-ID: ie3994620:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 7 Sep 2022 12:18:31 -0400 (EDT)
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id CAD3C103799; Wed,  7 Sep 2022 19:18:27 +0300 (+03)
-Date:   Wed, 7 Sep 2022 19:18:27 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>
-Subject: Re: [PATCH v7 05/14] mm/memfd: Introduce MFD_INACCESSIBLE flag
-Message-ID: <20220907161827.klbscalq5lk66rco@box.shutemov.name>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <20220706082016.2603916-6-chao.p.peng@linux.intel.com>
- <203c752f-9439-b5ae-056c-27b2631dcb81@redhat.com>
+        with ESMTP id S229965AbiIGQ3o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 12:29:44 -0400
+Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 763226351
+        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 09:29:41 -0700 (PDT)
+Received: by mail-ot1-x32e.google.com with SMTP id q39-20020a056830442700b0063889adc0ddso10642886otv.1
+        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 09:29:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=WjwdWxOWRjfQGqAqpcnj4pX2zdc5HoKExq2c695W4a8=;
+        b=Wfub1DCPZNR7R9EN206ywv+e0F5aZjPNKrGchA3lDYiSZpytW4G5WbKw0oho4pVavI
+         QdWIxFUGv6r4Gb44syKGmg9p0mRwjzAhmmw0YzWNYWUUfTzxBQPOXT/SEt19rFkPYbtL
+         ScbR3CH/ohuxUF6Auh17ODk6cI4gZuyUfThlbuW6zPRRaH0FhrYXHwIdcAQJdciXOCpR
+         p9gkidxuPfnLHTOzIx47aZziWoQ66xgalL7X6Y+6ruJgIJm6XzxKLf094JiyJzzKSnD6
+         Unu5k//45ofyctD+y9kE19LTqxeNJJanYlFoJi8oXXPGy9CNvWi0Bsj3EkhasTNrvgNQ
+         4yqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=WjwdWxOWRjfQGqAqpcnj4pX2zdc5HoKExq2c695W4a8=;
+        b=Jmkwu3f2AxBYzWk+6R514UNfth9iU6x61z/qbmyMghKBoBMdkV+hd2OQ46iL0HVSca
+         sAViDVK8hwKGQGQXQ4F/0R8aiWps/fExIZaZvP1BUbILCsbW1HYo0VYup5DLjR7ieVdB
+         oB6W+ezT3m1aPOg8rLH5IoFDf3LR3emnM2iv32o296/wav8XZRK6z42Ebh2kmoxEz7x7
+         WRemuZThndzWB8Ek2hOoSh/ynzYNtzVx+8KlbnVW+ZuClcEQYi3+Nldkq9p9ow5Otxz2
+         T9mt47s9uXiSWLtd08bsX7pTLbGIzJ4ldQEuT00tr6on98yYuignPV9ooxpICV53k5l4
+         5zBw==
+X-Gm-Message-State: ACgBeo3WMZzNsiWF65tMCu07BPwMRUMdssL97O8MCypvpjU7K2dAZKlC
+        c0j71Sy5TpHIF7lyqYPjnYQFz2tHbu17gyDZjkNNbBJj6xw=
+X-Google-Smtp-Source: AA6agR4e7h9mwhkVcXUQ0zJTayfYABVbgQEn1AaGs5Y+5rpa31E7kDI3hDfchQP/hsws/JupffSf3HpzxTfCGAli3wE=
+X-Received: by 2002:a05:6830:14d4:b0:63f:3cce:ff5e with SMTP id
+ t20-20020a05683014d400b0063f3cceff5emr1862874otq.367.1662568180813; Wed, 07
+ Sep 2022 09:29:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <203c752f-9439-b5ae-056c-27b2631dcb81@redhat.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+References: <20220907104838.8424-1-likexu@tencent.com> <20220907104838.8424-2-likexu@tencent.com>
+In-Reply-To: <20220907104838.8424-2-likexu@tencent.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 7 Sep 2022 09:29:29 -0700
+Message-ID: <CALMp9eQ_zk=H=q9A8qu_7TUEBjnKXPWtXygmdDpyQCrRDkLF9w@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] KVM: x86/pmu: Limit the maximum number of
+ supported Intel GP counters
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 05, 2022 at 03:28:50PM +0200, David Hildenbrand wrote:
-> On 06.07.22 10:20, Chao Peng wrote:
-> > Introduce a new memfd_create() flag indicating the content of the
-> > created memfd is inaccessible from userspace through ordinary MMU
-> > access (e.g., read/write/mmap). However, the file content can be
-> > accessed via a different mechanism (e.g. KVM MMU) indirectly.
-> > 
-> > It provides semantics required for KVM guest private memory support
-> > that a file descriptor with this flag set is going to be used as the
-> > source of guest memory in confidential computing environments such
-> > as Intel TDX/AMD SEV but may not be accessible from host userspace.
-> > 
-> > The flag can not coexist with MFD_ALLOW_SEALING, future sealing is
-> > also impossible for a memfd created with this flag.
-> 
-> It's kind of weird to have it that way. Why should the user have to
-> care? It's the notifier requirement to have that, no?
-> 
-> Why can't we handle that when register a notifier? If anything is
-> already mapped, fail registering the notifier if the notifier has these
-> demands. If registering succeeds, block it internally.
-> 
-> Or what am I missing? We might not need the memfile set flag semantics
-> eventually and would not have to expose such a flag to user space.
+On Wed, Sep 7, 2022 at 3:49 AM Like Xu <like.xu.linux@gmail.com> wrote:
+>
+> From: Like Xu <likexu@tencent.com>
+>
+> The Intel Architectural IA32_PMCx MSRs addresses range allows for
+> a maximum of 8 GP counters. A local macro (named KVM_INTEL_PMC_MAX_GENERIC)
+> is introduced to take back control of this virtual capability to avoid
+> errors introduced by the out-of-bound counter emulations.
+>
+> Suggested-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Like Xu <likexu@tencent.com>
 
-Well, with the new shim-based[1] implementation the approach without uAPI
-does not work.
-
-We now have two struct file, one is a normal accessible memfd and the
-other one is wrapper around that hides the memfd from userspace and
-filters allowed operations. If we first create an accessible memfd that
-userspace see it would be hard to hide it as by the time userspace may
-have multiple fds in different processes that point to the same struct
-file.
-
-[1] https://lore.kernel.org/all/20220831142439.65q2gi4g2d2z4ofh@box.shutemov.name
-
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+Reviewed-by: Jim Mattson <jmattson@google.com>
