@@ -2,112 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E4BF15B03AD
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 14:11:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 870715B03B9
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 14:15:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229903AbiIGMLk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 08:11:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43856 "EHLO
+        id S229974AbiIGMPB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 08:15:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229842AbiIGMLi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 08:11:38 -0400
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E9DB86C1A
-        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 05:11:36 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id g16so10235997qkl.11
-        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 05:11:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=WIB8a4RMKIbsQgzbAFRigZUlzKpMzaK/mPjLu18jivg=;
-        b=HP3rDaJjD8dZmYIHrjdNkoDnmUw7g9uCc4vHBTmXsOrDzTaDzvVkGROQU4JiMIG6SF
-         qudhCqJZhmdnGxt9Qchu2u/Kb1AzirulrNQKlif2VVN775xzycYMvQlIejXeuRl9FUCV
-         B3sY2DzX6HPglZ4Tt6xcS2UP6H2y+QTtsv8hPxcu7qACinqcAbBEosQlGwToao3GbIXm
-         9n3zqjh8c5lL3+Pt3dwF6hwztXdonsbyY8QaXeKX/rwCr1nuqyp6n1gg8cgYPm+00Q2X
-         HA4OSsdsbupGMsvkpLpJhuXakDbiiPMBOk6rzxqSUV5A1n0+hK7OQ2N2NVdOzCqW+cgi
-         GP2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=WIB8a4RMKIbsQgzbAFRigZUlzKpMzaK/mPjLu18jivg=;
-        b=HChiApTjVKe8nA4x5rXorxRf9NCrV5lZu5N+TiIk176fOoIBV7hNmy08sG8Q9/Xw2k
-         E30SvyOBSa+jROyDPVLMSCOFSb2udBTjAmCvzPgWTQwTLaMkH5hE0DtD5OmrokNK0PUD
-         otaxwoAjKHPst/YAzoOw29zrrJS1ZOqn7EeE8oeWPyZMbZ328+Io+ZBjGxYTON7vMyTO
-         IQEeo51AfDHd3GWFRFSI8tFDUL/+Ql/tfp9hNUj11dHscqtOtSDXmFrtsQAAtswP5cht
-         HxBVD2WU73jNpNIh+WEzP3c1BC6aidtJYd9HkeWFB6d/JlDezO7R1NO4ZOlrkIBD/JIJ
-         qbxw==
-X-Gm-Message-State: ACgBeo3iIbP1OlV7KT6mKbUTajxafZyZqGTLkoFsJJyy97w7UO7h927G
-        ZVbltP2gMJ9OrAiU73jtdc8rmg==
-X-Google-Smtp-Source: AA6agR6Aqb9OjhZTxuJwTHCrpwMtc8lM+if3ZhE4tHVst9Nj0UDP4AirE5WpW+co8I96BvAuRRT3Qw==
-X-Received: by 2002:a05:620a:1402:b0:6bc:2055:6da0 with SMTP id d2-20020a05620a140200b006bc20556da0mr2302837qkj.534.1662552695680;
-        Wed, 07 Sep 2022 05:11:35 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id n3-20020a05620a294300b006b953a7929csm14765165qkp.73.2022.09.07.05.11.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Sep 2022 05:11:34 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1oVtu2-008YHj-0u;
-        Wed, 07 Sep 2022 09:11:34 -0300
-Date:   Wed, 7 Sep 2022 09:11:34 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        David Airlie <airlied@linux.ie>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Longfang Liu <liulongfang@huawei.com>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Leon Romanovsky <leon@kernel.org>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        "Vivi, Rodrigo" <rodrigo.vivi@intel.com>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Abhishek Sahu <abhsahu@nvidia.com>
-Subject: Re: [PATCH v2 01/15] vfio: Add helpers for unifying vfio_device life
- cycle
-Message-ID: <YxiKdh6EDBZnTAGH@ziepe.ca>
-References: <20220901143747.32858-1-kevin.tian@intel.com>
- <20220901143747.32858-2-kevin.tian@intel.com>
- <YxcV05AVN4kqdPX6@infradead.org>
- <BN9PR11MB5276EE6209C1E3D4662368DC8C419@BN9PR11MB5276.namprd11.prod.outlook.com>
- <YxiGpryRNrxvEoiY@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YxiGpryRNrxvEoiY@infradead.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        with ESMTP id S229517AbiIGMO7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 08:14:59 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F8BE27FD8;
+        Wed,  7 Sep 2022 05:14:58 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D1186618B8;
+        Wed,  7 Sep 2022 12:14:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E6B2C433D6;
+        Wed,  7 Sep 2022 12:14:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662552897;
+        bh=aZ2WeP3U336s63udprictr4067p8RlQvpxaoMNPC+So=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=hzFdNkFe7FXDKMFLXF3Ak1yGqDSjqHDYM1cgeHmZyvL3wRZhLI+o5x/fppba/nQXr
+         BmzuvTkpIOpwukz1ple0VUnSDKKXXHuR8cL0hOt1dZYUjuS040Pjx4DdG6cEXM+Ess
+         yUG4iczoGb/1Mj0OaaQXTFseDLpSpKVBT/lHieKa6DHojxysT7iLAp/A2I0IjLJWPV
+         kl1kBGyeIsdrCNqIVdzFcORbNp4E7HfCT2qi2+cKy9wwjWUN21FKPvd3ECXaeax6Yv
+         aZEuaYpYRO9RmBTKVf93H2OychjIDjn9OKs3abmlWxE5mKD0xw/84ji/zbOGohq+/h
+         Hf9/1INmx37mw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oVtxG-008dZY-V5;
+        Wed, 07 Sep 2022 13:14:55 +0100
+Date:   Wed, 07 Sep 2022 13:14:54 +0100
+Message-ID: <87k06fv0sh.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Robin Murphy <robin.murphy@arm.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Nipun Gupta <nipun.gupta@amd.com>, robh+dt@kernel.org,
+        krzysztof.kozlowski+dt@linaro.org, gregkh@linuxfoundation.org,
+        rafael@kernel.org, eric.auger@redhat.com,
+        alex.williamson@redhat.com, cohuck@redhat.com,
+        puneet.gupta@amd.com, song.bao.hua@hisilicon.com,
+        mchehab+huawei@kernel.org, f.fainelli@gmail.com,
+        jeffrey.l.hugo@gmail.com, saravanak@google.com,
+        Michael.Srba@seznam.cz, mani@kernel.org, yishaih@nvidia.com,
+        will@kernel.org, joro@8bytes.org, masahiroy@kernel.org,
+        ndesaulniers@google.com, linux-arm-kernel@lists.infradead.org,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        devicetree@vger.kernel.org, kvm@vger.kernel.org, okaya@kernel.org,
+        harpreet.anand@amd.com, nikhil.agarwal@amd.com,
+        michal.simek@amd.com, aleksandar.radovanovic@amd.com, git@amd.com
+Subject: Re: [RFC PATCH v3 4/7] bus/cdx: add cdx-MSI domain with gic-its domain as parent
+In-Reply-To: <4ca6383e-bd21-59bf-cc4e-cf3313164957@arm.com>
+References: <20220803122655.100254-1-nipun.gupta@amd.com>
+        <20220906134801.4079497-1-nipun.gupta@amd.com>
+        <20220906134801.4079497-5-nipun.gupta@amd.com>
+        <YxeBCsA32jnwMjSj@nvidia.com>
+        <87leqvv3g7.wl-maz@kernel.org>
+        <4ca6383e-bd21-59bf-cc4e-cf3313164957@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: robin.murphy@arm.com, jgg@nvidia.com, nipun.gupta@amd.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, gregkh@linuxfoundation.org, rafael@kernel.org, eric.auger@redhat.com, alex.williamson@redhat.com, cohuck@redhat.com, puneet.gupta@amd.com, song.bao.hua@hisilicon.com, mchehab+huawei@kernel.org, f.fainelli@gmail.com, jeffrey.l.hugo@gmail.com, saravanak@google.com, Michael.Srba@seznam.cz, mani@kernel.org, yishaih@nvidia.com, will@kernel.org, joro@8bytes.org, masahiroy@kernel.org, ndesaulniers@google.com, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, kvm@vger.kernel.org, okaya@kernel.org, harpreet.anand@amd.com, nikhil.agarwal@amd.com, michal.simek@amd.com, aleksandar.radovanovic@amd.com, git@amd.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -116,53 +83,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 07, 2022 at 04:55:18AM -0700, Christoph Hellwig wrote:
-> On Wed, Sep 07, 2022 at 12:43:30AM +0000, Tian, Kevin wrote:
-> > > From: Christoph Hellwig
-> > > Sent: Tuesday, September 6, 2022 5:42 PM
-> > > 
-> > > What is the point?  This adds indirect calls, and actually creates
-> > > more boilerplate code in the drivers.  i.g. when using this code there
-> > > is more, and harder to read code.
-> > 
-> > The point is to align with struct device life cycle when it's introduced
-> > to vfio_device. The object is released via put_device() then what would
-> > be the alternative if the driver doesn't provide a @release callback?
-> > 
-> > and with @release then naturally @init is also expected.
+On Wed, 07 Sep 2022 12:33:12 +0100,
+Robin Murphy <robin.murphy@arm.com> wrote:
 > 
-> No, with a release no @init is expected.  The init method is one
-> of the major obsfucations here, only topped by the weird
-> vfio_alloc_device macro.  Yes, that saves about 4 lines of code
-> in every driver, but places a burden on the struct layout and
-> very much obsfucated things.  Without vfio_alloc_device and
-> the init method I think much of this would make a lot more sense.
+> On 2022-09-07 12:17, Marc Zyngier wrote:
+> > On Tue, 06 Sep 2022 18:19:06 +0100,
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >> 
+> >> On Tue, Sep 06, 2022 at 07:17:58PM +0530, Nipun Gupta wrote:
+> >> 
+> >>> +static void cdx_msi_write_msg(struct irq_data *irq_data,
+> >>> +			      struct msi_msg *msg)
+> >>> +{
+> >>> +	/*
+> >>> +	 * Do nothing as CDX devices have these pre-populated
+> >>> +	 * in the hardware itself.
+> >>> +	 */
+> >>> +}
+> >> 
+> >> Huh?
+> >> 
+> >> There is no way it can be pre-populated, the addr/data pair,
+> >> especially on ARM, is completely under SW control.
+> > 
+> > There is nothing in the GIC spec that says that.
+> > 
+> >> There is some commonly used IOVA base in Linux for the ITS page, but
+> >> no HW should hardwire that.
+> > 
+> > That's not strictly true. It really depends on how this block is
+> > integrated, and there is a number of existing blocks that know *in HW*
+> > how to signal an LPI.
+> > 
+> > See, as the canonical example, how the mbigen driver doesn't need to
+> > know about the address of GITS_TRANSLATER.
+> > 
+> > Yes, this messes with translation (the access is downstream of the
+> > SMMU) if you relied on it to have some isolation, and it has a "black
+> > hole" effect as nobody can have an IOVA that overlaps with the
+> > physical address of the GITS_TRANSLATER register.
+> > 
+> > But is it illegal as per the architecture? No. It's just stupid.
 > 
-> See the patch below that goes on top of this series to show how
-> undoing these two would look on mbochs.  It it a slight reduction
-> lines of code, but more readable and much less churn compared
-> to the status before this series.
+> If that were the case, then we'd also need a platform quirk so the
+> SMMU driver knows about it. Yuck.
 
-I've seen alot of error handling bugs caused by open-coding patterns
-like this. People get confused about what the lifecycle is and botch
-the error unwinds, almost 100% of the time :\ They call kfree when
-they should call put_device, they call put_device before initing
-enough stuff that the release callback doesn't crash, double free
-stuff by calling put_device at the wrong point, and so on.
+Yup. As I said, this is stupid.
 
-The advantage of init/release is the strict pairing and the core code
-helping get the error unwind right, by not calling release until init
-succeeds.
+> But even then, are you suggesting there is some way to convince the
+> ITS driver to allocate a specific predetermined EventID when a driver
+> requests an MSI? Asking for a friend...
 
-The advantage of the vfio_alloc_device() is not saving 4 lines, it is
-giving the drivers a simple/sane error handling strategy. Goto unwind
-inside init, release undoes everything init does and the probe path
-only calls put_device(). It is simple and logical to implement and
-hard to make subtle bugs.
+Of course not. Whoever did that has decided to hardcode the Linux
+behaviour into the HW, because it is well known that SW behaviour
+never changes. Nononono.
 
-Specifically it eliminates the open coded transition of kfree to
-put_device that seems so difficult for people to get right.
+I am >this< tempted to sneak a change into the allocation scheme to
+start at 5 or 13 (alternatively), and to map LPIs top-down. That
+should get people thinking.
 
-netdev has done a version of this, so has rdma, and it works well.
+Cheers,
 
-Jason
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
