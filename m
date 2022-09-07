@@ -2,102 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 721FF5B0B58
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 19:19:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E1CD65B0B9D
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 19:40:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230105AbiIGRTw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 13:19:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39506 "EHLO
+        id S229808AbiIGRk1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 13:40:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbiIGRTu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 13:19:50 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D0C314D20;
-        Wed,  7 Sep 2022 10:19:41 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 287GDhH6029287;
-        Wed, 7 Sep 2022 17:19:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=F0xc+5czV2UbnFYrYqCz4AcqHKW1n16n1PSM0a8NBNY=;
- b=ITvxJALMvJlYZDe/y8bDGf1RZz93VqgGeGp4afenKNBAAc81PKiLQtHdr9yIE+pTTgPi
- AHaOoETTqnb/I15q4V4+Iqrdu0RnnyjSZveVhv9mFFr2WN1qlnWtflaTwvyaIEChRZ+D
- vYYkKwBzxNL+u/zSrtxEaxGRRg6Yumh9y1JFjxxY4I6YQBmi3nOlY3yzqlsfDveGbIl4
- l/z00g1y340x1PasOronXiLGmIrMpG08Vkt4HHYdSytK5q11LbVA7mXOvXY+fzvTat5s
- ZLsX0FaOXf+AI9r2JYXeYrwCVT08RYg7dABJ9MO4HteBj24pWghhAIzcJajAPltk5SVi 7w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3jexmtt5um-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Sep 2022 17:19:40 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 287GoKoq024102;
-        Wed, 7 Sep 2022 17:19:40 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3jexmtt5u1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Sep 2022 17:19:40 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 287H66rX031656;
-        Wed, 7 Sep 2022 17:19:38 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06ams.nl.ibm.com with ESMTP id 3jbx6hngbb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 07 Sep 2022 17:19:38 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 287HJYVB26870260
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 7 Sep 2022 17:19:34 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A35A34C040;
-        Wed,  7 Sep 2022 17:19:34 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 172104C044;
-        Wed,  7 Sep 2022 17:19:34 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.145.188.40])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  7 Sep 2022 17:19:34 +0000 (GMT)
-Date:   Wed, 7 Sep 2022 19:19:23 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Anthony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH v3 0/2] s390/vfio-ap: fix two problems discovered in the
- vfio_ap driver
-Message-ID: <20220907191923.57e2d624.pasic@linux.ibm.com>
-In-Reply-To: <33b8a9f4-ebe8-d836-807e-7c495c190536@linux.ibm.com>
-References: <20220823150643.427737-1-akrowiak@linux.ibm.com>
-        <33b8a9f4-ebe8-d836-807e-7c495c190536@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        with ESMTP id S229490AbiIGRkZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 13:40:25 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD5E74CA26
+        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 10:40:22 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id q15-20020a17090a304f00b002002ac83485so11650302pjl.0
+        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 10:40:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=ivGeHU+iK+QNj39TtA8dNEWOqgS/ClEDHBRwSPl15bc=;
+        b=OUZN0rztVa7Vg8juOl5Mff6QvYKUvRAXTpGQihy/IBMHctfrM0gYKRkQMc3+lk+nLO
+         OfYh/KOYX3pt5q+l8rUE2e/waLHNUnY3D0J5xjFWjKd8UHnTYSUaAqMM5LQ4rj9i1PN4
+         yc+e/71TQnn/f8lD1IWCLm20uvfx8+17KqCQ63JtBKEocOHmwiKiRNKU/mhdtifZ6osA
+         SVsPznJNvqAwWWnYz0a0OT2oFQC0hcH9qpaEAkj2ZEuqfhnPUliEhoDcUG3D23PWsc/q
+         awLGawm9LeilIwg6pExOylRwho474qqus+30pTkKtPWWjQ6bBDpPc6HNH9XUUTfU4oqD
+         FKTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=ivGeHU+iK+QNj39TtA8dNEWOqgS/ClEDHBRwSPl15bc=;
+        b=aRn7mGSoKtunmBl31uhw/NFRgKRfhOIBWG/ZSUtIb6WbxgP0tHTyuEc8GZFj+PD3Rp
+         qUbsr0jhTVEQcsZXdP2sTSULbttowoA8jfocCEW6I0e4orzhfOL07NlJFWN/k5neoFXa
+         ezgIXIXanyCq0xkl2J+QAb37z20hOAQqNPAnH9QyuwcCM4YuonklJWD56yTp9dQ1CGcP
+         hR60MpQxYxRXJfexSzmkKGM9sOsUjlOxc+Sus9Z3kQIkVHafqQfyrNRow6rAqHgLSRTZ
+         6yz/2aJaFiRoTamaK+F1HncSBLVZ9HsqpKQL7vMqQeM3isLTqzQt+r+e8rINs0cArfEx
+         vI5A==
+X-Gm-Message-State: ACgBeo1V8lJS/gXT3XqpoH4LZ8NL2kSd8eJwwsnxSSJBmmXo2F97La9p
+        2A8fzN3RwKOE5hmjD4qJMVpong==
+X-Google-Smtp-Source: AA6agR4wN5Gt3TbzrAwzSMzOr8h3mRywpT3dUMj/hLLm+oMehhz/AuxoGmbm6pW2Bnh4CBo/nvtpEQ==
+X-Received: by 2002:a17:902:9887:b0:172:7090:6485 with SMTP id s7-20020a170902988700b0017270906485mr5133597plp.63.1662572422171;
+        Wed, 07 Sep 2022 10:40:22 -0700 (PDT)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id d9-20020a170902654900b00172ba718ed4sm7687631pln.138.2022.09.07.10.40.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Sep 2022 10:40:20 -0700 (PDT)
+Date:   Wed, 7 Sep 2022 10:40:16 -0700
+From:   David Matlack <dmatlack@google.com>
+To:     Hou Wenlong <houwenlong.hwl@antgroup.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 6/6] KVM: x86/mmu: Use 1 as the size of gfn range for
+ tlb flushing in FNAME(invlpg)()
+Message-ID: <YxjXgERSNIk4ZaN+@google.com>
+References: <cover.1661331396.git.houwenlong.hwl@antgroup.com>
+ <8baa40dad8496abb2adb1096e0cf50dcc5f66802.1661331396.git.houwenlong.hwl@antgroup.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: PruSYUulfmdlO4hY4yOFYDUYwiAeDDjy
-X-Proofpoint-ORIG-GUID: b-_UUcdNlJ1x72Am3-ny8Al7ALjq3tNU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-07_08,2022-09-07_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- clxscore=1015 phishscore=0 impostorscore=0 spamscore=0 mlxlogscore=723
- suspectscore=0 adultscore=0 priorityscore=1501 bulkscore=0 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2209070066
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8baa40dad8496abb2adb1096e0cf50dcc5f66802.1661331396.git.houwenlong.hwl@antgroup.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 6 Sep 2022 19:17:50 -0400
-Anthony Krowiak <akrowiak@linux.ibm.com> wrote:
+On Wed, Aug 24, 2022 at 05:29:23PM +0800, Hou Wenlong wrote:
+> Only SP with PG_LEVLE_4K level could be unsync, so the size of gfn range
+> must be 1.
+> 
+> Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
+> ---
+>  arch/x86/kvm/mmu/paging_tmpl.h | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index 04149c704d5b..486a3163b1e4 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -937,7 +937,8 @@ static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
+>  
+>  			mmu_page_zap_pte(vcpu->kvm, sp, sptep, NULL);
+>  			if (is_shadow_present_pte(old_spte))
+> -				kvm_flush_remote_tlbs_sptep(vcpu->kvm, sptep);
+> +				kvm_flush_remote_tlbs_gfn(vcpu->kvm,
+> +					kvm_mmu_page_get_gfn(sp, sptep - sp->spt), 1);
 
-> PING?
+The third argument to kvm_flush_remote_tlbs_gfn() is the level, not the
+number of pages. But that aside, I don't understand why this patch is
+necessary. kvm_flush_remote_tlbs_sptep() should already do the right
+thing.
 
-I'm looking at the series. Expect results soon :D
+>  
+>  			if (!rmap_can_add(vcpu))
+>  				break;
+> -- 
+> 2.31.1
+> 
