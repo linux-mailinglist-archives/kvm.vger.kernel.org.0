@@ -2,81 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A24D5AFCA7
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 08:40:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 239725AFCD4
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 08:50:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229910AbiIGGko (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 02:40:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60752 "EHLO
+        id S229668AbiIGGt7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 02:49:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229967AbiIGGkk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 02:40:40 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83AF31114B;
-        Tue,  6 Sep 2022 23:40:28 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id iw17so6895804plb.0;
-        Tue, 06 Sep 2022 23:40:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=eJHfMK2TZ079rqYIsHEdtV+dP7nwUQN6QV5MYbiH+v4=;
-        b=YbpVNHu1ln26JbFLzrkZIoZavABkdHT6wnJEvRT9tUbYIskzkVdccXrkwXFPzH+ZI2
-         YE/3jR/74Sj0xhKQkzBp/0KkN6zEun669WPVVPQl2oTIQX1OxH+ABLTnBpZDdWwyRYB/
-         nmEeoTTetFfW8S4HV/F1Wm6rqvuICDX153ydxHDlLN29h/ffDvJAWS+V6JLbvtOHUzkV
-         UG5072B3hxyXAzYf3PesHIuq3zJ4P/3UPvDu5e15J5jyrL+LkTPLo9HEqjC7/PRjBn19
-         DJWQuXD6gDKCZSe5SaapvoXDA3/PdJpq2IjOtoi26WiovKoGI4OL/BEUfoU23JJCElJL
-         sBuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=eJHfMK2TZ079rqYIsHEdtV+dP7nwUQN6QV5MYbiH+v4=;
-        b=zpnz3Nq38qe6pff2qUhZb9geX8Fsm9NgjVZ/wt85R7eusFOKoIYCL5/n6QY1mfgAuo
-         pggRNEQH7OoXmGTdJQlwDgmWOopEUaayxkPkldPxyaw8Wx+PEihnNSrHUmL058lTgBD8
-         Td8AAzjNczVeXPs/P377545EbkWSiNflpQ20nbUmkV6zREeavpQnuvzvHzR1tBAdndAl
-         R/Uc0QhU7aXEIHtB4aAVML5VJk9CTT0ZbU2UNp8xpHN/kjaB2E+6MurKDTPgIjDaYHyU
-         cJ3VZrhnV7TlyR/LzfSIHZf+JnWIcxT0jzPeJwKtUl7nW6pOpzuSCGCgVNeKuqsDOxKR
-         yw5g==
-X-Gm-Message-State: ACgBeo3E4QMueEag/Mvt7rc2mEGQutL+eC4OUjta4Ve3p8NMESJtpRLj
-        HIToMg6ezEVkcDOlFGkR4BhsPESTLe8nAw==
-X-Google-Smtp-Source: AA6agR6xZLTRUVcCdJ95y02rGHS1PPJmcT1vkCLAm+VsgT9FCJUZguurXJ2iH46GrM4VYqFZe1PiSw==
-X-Received: by 2002:a17:902:cf43:b0:172:86f3:586a with SMTP id e3-20020a170902cf4300b0017286f3586amr2444836plg.71.1662532766218;
-        Tue, 06 Sep 2022 23:39:26 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id b9-20020a170902d50900b0016c0b0fe1c6sm11297767plg.73.2022.09.06.23.39.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Sep 2022 23:39:25 -0700 (PDT)
-Message-ID: <c6559d3e-38ec-9a2c-7698-995eb9f265c6@gmail.com>
-Date:   Wed, 7 Sep 2022 14:39:16 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.13.0
-Subject: Re: [PATCH 4/4] KVM: x86/cpuid: Add AMD CPUID ExtPerfMonAndDbg leaf
- 0x80000022
+        with ESMTP id S230091AbiIGGtw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 02:49:52 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2066.outbound.protection.outlook.com [40.107.223.66])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D75C325FE;
+        Tue,  6 Sep 2022 23:49:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Z9eK5hloTta1wp36YOxf95tNfWOxPQwYCpmcF4I2j6r6DAtQNvMFD51OKOkIb2Ade2qqXB/IFqawzBMdJcdw2bq4Qs2Xzj2q487dzm2RqIzdlaKqi6nb28CkfWixsfNKF+4V9PrN/NQAWmya1ZW4q+8JZgM+3Hv7W//BtURz5b0eEBB+blUayxLkQfjzid+q4MkawOUiZkrNQYbU+BXgCyWyWI7tYAy5TKcV88fpS/wdIHGK+xN9FYD0LmigS4eAEtxVhADY153jjCO1sm/ZHEWfzW/5tfpRggiz8AvAI3VvjSfXNnEZTSRbnNU4HoCW80+JjI4Q0dA4S/2g27n/sA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1WHcKTERWrh9XOL/K5EoOzApFETCUCkt9hA2+DPhc3c=;
+ b=ck6f0jzp5XeUcb3dLbR/7cilsbCYjhuPaNRd9HdFD3kR0BQnBNoIw/zdQA+gitAzR3O+F2uKV/A2zKIPMmYmv8gFRN9lFaJrwDHDzSKUoYSvu8z057k1wy2SgJAfbd+WOZD/Vc4H+9NDsXyFbRNWgFOu8j1UV3AN+rT4MBxEwKofJ6EU+AVXQ/lY7+8Xb+PQREhzRmRGjhHUXXW4yARsDcSaZnPN1shccLrrPXU/mpxrh1pb9fZMIlWqyqa1q9PHyAmSMwkIoWJ2uTtgtU4aTPIAUDSwHH7XC+UciadfKwpBRSLfJVtaFOyV6ESIMbGewwPKjnlbqLwXip6B5J0YWA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1WHcKTERWrh9XOL/K5EoOzApFETCUCkt9hA2+DPhc3c=;
+ b=IDsH7lw6M2CA+vKo9VCd6qfE5ZzzvEjBpKvB1CRAWHLCRyZVM/mc/8XpeTVmZn0j0W+dEMhSpzRRKlogAGGApkEuyBYJQADp7N6roVbheRQ9xsSA38jgA6caFapnxxA3OejvQCUP7WbYwuRXu/20jDCRAL+StbHcZbhK3qP1nZs=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BN8PR12MB3587.namprd12.prod.outlook.com (2603:10b6:408:43::13)
+ by BL1PR12MB5125.namprd12.prod.outlook.com (2603:10b6:208:309::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5612.12; Wed, 7 Sep
+ 2022 06:49:30 +0000
+Received: from BN8PR12MB3587.namprd12.prod.outlook.com
+ ([fe80::653f:e59b:3f40:8fed]) by BN8PR12MB3587.namprd12.prod.outlook.com
+ ([fe80::653f:e59b:3f40:8fed%6]) with mapi id 15.20.5612.012; Wed, 7 Sep 2022
+ 06:49:30 +0000
+Message-ID: <e4b016b1-169b-5e62-ab0b-029ebc26fbb3@amd.com>
+Date:   Wed, 7 Sep 2022 08:48:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v1] drm/ttm: Refcount allocated tail pages
 Content-Language: en-US
-To:     Sandipan Das <sandipan.das@amd.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220905123946.95223-1-likexu@tencent.com>
- <20220905123946.95223-5-likexu@tencent.com>
- <CALMp9eQtjZ-iRiW5Jusa+NF-P0sdHtcoR8fPiBSKtNXKgstgVA@mail.gmail.com>
- <0e0f773b-0dde-2282-c2d0-fad2311f59a7@gmail.com>
- <CALMp9eQQe-XDUZmNtg5Z+Vv8hMu_R_fuTv2+-ZfuRwzNUmW0fA@mail.gmail.com>
- <d63e79d8-fcbc-9def-4a90-e7a4614493bb@gmail.com>
- <CALMp9eSXTpkKpmqJiS=0NuQOjCFKDeOqjN3wWfyPCBhx-H=Vsw@mail.gmail.com>
- <c07eb8bf-67fc-c645-18f2-cd1623c7a093@amd.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <c07eb8bf-67fc-c645-18f2-cd1623c7a093@amd.com>
+To:     Dmitry Osipenko <dmitry.osipenko@collabora.com>,
+        David Airlie <airlied@linux.ie>, Huang Rui <ray.huang@amd.com>,
+        Trigger Huang <Trigger.Huang@gmail.com>,
+        Gert Wollny <gert.wollny@collabora.com>,
+        Antonio Caggiano <antonio.caggiano@collabora.com>,
+        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        Dmitry Osipenko <digetx@gmail.com>, kvm@vger.kernel.org,
+        kernel@collabora.com, virtualization@lists.linux-foundation.org
+References: <20220815095423.11131-1-dmitry.osipenko@collabora.com>
+ <8230a356-be38-f228-4a8e-95124e8e8db6@amd.com>
+ <YxenK8xZHC6Q4Eu4@phenom.ffwll.local> <YxeoEr6xAtlZ+IrU@phenom.ffwll.local>
+From:   =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>
+In-Reply-To: <YxeoEr6xAtlZ+IrU@phenom.ffwll.local>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AS9PR06CA0231.eurprd06.prod.outlook.com
+ (2603:10a6:20b:45e::28) To BN8PR12MB3587.namprd12.prod.outlook.com
+ (2603:10b6:408:43::13)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8PR12MB3587:EE_|BL1PR12MB5125:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1a15cded-a3fe-4c42-17cd-08da909d1d54
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ZTKD38tvPBubZulcOLnuSoh19Qlo12y5rAyJFrFsl7nim68X6gcMDEnpSBUM4o52Up3RhzJZmJR5/uEQ0HiOoprFnMNHM+YMHqVzjMv3hGNLXHCl5DWLAnzJDRj8EIfSSez+m6arBP/YA5l430fsOlRk8vrBUvJ6KLNhg0+5GinXHRCrzAqDCicESBsUo72NbLP+jTSBGgtxGz7mK92tl72ABoCJ+lsDRDkHFF8RQxCHaCTfy9z9Pun6plV/hUnaVNlECTms6olwEuCL+wRhWgzydvGkx51mwiRhUEpFL20qc6w2jwg0WM8qNDZGY8VIiRn9fw6DZoPVvzNRGwnHp7ffMNiQEdO7TC+z3VUAh1JuTp5G/Bn/MoBxKlfy7mZuDjn4IpbOtC0mQk2Yf50Z1a+i3pW5CmGECDZznrWl+15JQmD8KHua0ePGYgxRtgNDaZcG56Ue9y/LmQzb+zfGHBwadMmtkVN/M7xcF2b4/DjbYszvM3tRmNhfQCT4lSSTDZGNVG+U/8m83bj5lFY+GlvE//QmmHj1+oYSXMjRwwqe3eAsXZJVI6JI6PWIlumG4QNKDFbUdxXJRxafKkbmGI1h7IE5pWmr95tRPyFrD33+R+DbC3sCvpCj+q68HZjwg7YPG4HLFtSqSGQpsVZnHrevDh7n1t3QIhBuKMLOOx/xH4zgN0o1/o5B7b97P70RNiigfHK0YSja6hInCY76lZDenx9nABqgJeTcR1k308Ee48NDINaToGxR2OKlRI2H8FzBQUlVSv8ybyrchaJrpXspdAq/51XFBecfKJec6rHV5eDtGYOUOu3C8vmamd7q4kT6F7YdcxZeqAQ+iaSkVJ0zJbdujk9w4wGRo5mgs58=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR12MB3587.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(136003)(366004)(346002)(376002)(396003)(39860400002)(45080400002)(31686004)(38100700002)(41300700001)(316002)(36756003)(921005)(110136005)(31696002)(66946007)(66556008)(6506007)(478600001)(83380400001)(8676002)(6486002)(966005)(66476007)(186003)(66574015)(86362001)(8936002)(2616005)(7416002)(5660300002)(2906002)(26005)(6512007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WHdoZ3RJOUk2bHh5TUNUcU9vWUJvVFlzWGNwVWVsc3RIakQyeXh2bk5oeUpi?=
+ =?utf-8?B?UU5vZnIrelNBYXFhWEVYaXBxRVk0STJVVEM4ZzlZZWlrLzBnQTBZWnNDMUVS?=
+ =?utf-8?B?dzVXdlRHUnRzK2E5cEM5UXVPeGdjcXh3YUV3R1gwSlN3Tkp3eG92akZsWXo1?=
+ =?utf-8?B?dWZEeVJQWWx3Wk1wVm5iTDN1MmZEWFNVeHFKZUxrUlJoRnRURzRVNk8yYkZW?=
+ =?utf-8?B?NFRsTVduUHJNVXkrSVRDa2RyZjJGRE1YcnpzL3l4NjJCVXl1cU04eThiYzFW?=
+ =?utf-8?B?S3NUYVNVYW1IMk9ocDlOUGxLUkRoTzdjV0pITS9WSHFQNE1NdVVMYkFoU2h4?=
+ =?utf-8?B?Vjk0cFdZdnZRdkczbVVvMUwzeWN0ZmxJSVpWSFZ2T1lDMCtaU3JLVDJJcVVK?=
+ =?utf-8?B?bDFPb2RBeE5ZdmVQdFk1TGFwc2hhcysyQllpVHlqYWJTY2htZm1vSDYyTUFY?=
+ =?utf-8?B?S3IyRUowTjlWa2NnS2V4MGMzZjhqQW1FTFdPc0RLdFpHaEpRRkNGTGJ2OExQ?=
+ =?utf-8?B?RVVRVjUxTm0rOExvMEU2VjZCYnBXSEtXOC9QSnBabkphbVhveStQd3BkMGo3?=
+ =?utf-8?B?bklkMU1pdGFGM1ZSVklYWlQxS3c0RDh4MzliNjJsd3JFWTI2VzhCMXdNVWtI?=
+ =?utf-8?B?c2xVQVIwNjFEd1ViZCtrVWZFMnhudUJlNFVVTDZ5c2Y2ZGNnQ1lKZ20wQzZk?=
+ =?utf-8?B?ZzF3NVpDdzA4US9QcTNxYjlCcnRYczJCb09hd05NdU9zb1huTHM1dHhvUzJn?=
+ =?utf-8?B?dXlSaThrb01MUy9NV2Zsc21WdWZLQ3V5bVhoTnlBbS91S1F3ZUdZRGx6dk1N?=
+ =?utf-8?B?VlYzNTIvajE0YlJuNFRybVRYakUrcFR6b3FiU1JLSnhzemlrWkdvRDV6TGZN?=
+ =?utf-8?B?dllhaVlXMm4valFDcDFFNEovdzMxOUNPNTM2THV0Z3ppS0Q2VmQyUllPdnVL?=
+ =?utf-8?B?Y3gxOTVQd1drSnlzYjkzSUhqQWROQzlwY1pnNFZ4V2ZUV2psbEZkQnBUd01l?=
+ =?utf-8?B?Z0ZwcForWEl2WEhFZ2RXK0lNUHhCQ09RWWhSVnFMaFBuRmswdDJXeC9hcDVy?=
+ =?utf-8?B?MThzb2VOaHN5dkdpc3o1a0cxT1lOa05Fb0xkdUdiR3NGcHl6ZGVzYm41U2Nt?=
+ =?utf-8?B?R3FzWjEvS2U3VzErdkJtdmFIRU9qOFZQWmhFTkNuVWppWm1Da1NWczNWSW9i?=
+ =?utf-8?B?a3FhaU43aXUzS1N3Tlp6V080VVRhQ2YxYmV4dnVQU256a1FNOE1sdmkvWVJ3?=
+ =?utf-8?B?MnlCQ3dmM2NPN2dYakZUL284cGx2dmZReUp4YWZzaGJKNjFTNnpBN1ZFTkJW?=
+ =?utf-8?B?NTZ3b1VseTlzTHBjMEs1VmlJS3NySkFQK280b2lmZ2EySzhMNzFJSTZaZlpv?=
+ =?utf-8?B?b1JZUDhVKzRhSUhZSmR5R29MeGRpMlpJd0RiNVQvSUoyV2s4bFpGazNYVnVN?=
+ =?utf-8?B?ZitZd0tZbnFIZjJxcmJkTDlISThqODlaQS9WUXpmcFkwcW9YQ1dydVZyZW9C?=
+ =?utf-8?B?bFU5bDNEODdvSXd1SDhQeVBKSi92NzhNTEVRcmx5MWpPMmlUTW5JZEk3bTQw?=
+ =?utf-8?B?T0RzSE5ZOU1Rbnl0cmNTdDRaVkhhUkQ2dmt4WUxwRFVudmdJdVpNWW5UckZs?=
+ =?utf-8?B?ckkvWFg1ZGtkS3BCWGdRd2JlUDh4c3VJR0p6RDlXMFVwbkpmTjRXbXJEdExt?=
+ =?utf-8?B?QkZJWG5INnExUDFCN2VPdGF2N09oZXptdWdsdUwvN0Z0ZFVGWUFkN0gxckZq?=
+ =?utf-8?B?bkYrSlU5TnhvVERFNFViQlFKY0VESXNlT1FjcW5JM0l0UEo0akVCTFZZZndP?=
+ =?utf-8?B?OUdUZGtPWlFPVWt3NFErZTlhRHEvODRDSm1teGpyKytJYnVpbkZNWnJST0Qz?=
+ =?utf-8?B?QzBvelE1UGNjRTFDU25CTDMvMUU1SnNLVVIxMnhaVnlNZUZuM3A4MFM4dlV4?=
+ =?utf-8?B?V1d3N3czaVhCR1dUQllpSDd3anJ5c2IzbDc5Q3ZnODlSU2Z4ZzQxdGVnQWNy?=
+ =?utf-8?B?cDB0a0taSzZnUENLTGo2WWM4Qkx5Zm9sRW5iTjFoZVpOYVh2Yk14MWFlSVJw?=
+ =?utf-8?B?c2M2d05iSFdlTUtiZUltdW9zVWkxOW1xM3lWOExFTjd0bEFzdGxVMmZwVjQ1?=
+ =?utf-8?Q?XzhleFf6c9AhkerYmFT99RmjI?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1a15cded-a3fe-4c42-17cd-08da909d1d54
+X-MS-Exchange-CrossTenant-AuthSource: BN8PR12MB3587.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2022 06:49:30.4849
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: epol+vKQuw/TwnFN9oslkMqY5iolbaSKns7ypQZPNCDAoL+iB77dMd8FATb07QjB
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5125
 X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,119 +130,132 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/9/2022 1:52 pm, Sandipan Das wrote:
-> On 9/7/2022 9:41 AM, Jim Mattson wrote:
->> On Tue, Sep 6, 2022 at 8:59 PM Like Xu <like.xu.linux@gmail.com> wrote:
->> [...]
->>>>>>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
->>>>>>> index 75dcf7a72605..08a29ab096d2 100644
->>>>>>> --- a/arch/x86/kvm/cpuid.c
->>>>>>> +++ b/arch/x86/kvm/cpuid.c
->>>>>>> @@ -1094,7 +1094,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->>>>>>>                    entry->edx = 0;
->>>>>>>                    break;
->>>>>>>            case 0x80000000:
->>>>>>> -               entry->eax = min(entry->eax, 0x80000021);
->>>>>>> +               entry->eax = min(entry->eax, 0x80000022);
->>>>>>>                    /*
->>>>>>>                     * Serializing LFENCE is reported in a multitude of ways, and
->>>>>>>                     * NullSegClearsBase is not reported in CPUID on Zen2; help
->>>>>>> @@ -1203,6 +1203,25 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->>>>>>>                    if (!static_cpu_has_bug(X86_BUG_NULL_SEG))
->>>>>>>                            entry->eax |= BIT(6);
->>>>>>>                    break;
->>>>>>> +       /* AMD Extended Performance Monitoring and Debug */
->>>>>>> +       case 0x80000022: {
->>>>>>> +               union cpuid_0x80000022_eax eax;
->>>>>>> +               union cpuid_0x80000022_ebx ebx;
->>>>>>> +
->>>>>>> +               entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
->>>>>>> +               if (!enable_pmu)
->>>>>>> +                       break;
->>>>>>> +
->>>>>>> +               if (kvm_pmu_cap.version > 1) {
->>>>>>> +                       /* AMD PerfMon is only supported up to V2 in the KVM. */
->>>>>>> +                       eax.split.perfmon_v2 = 1;
->>>>>>> +                       ebx.split.num_core_pmc = min(kvm_pmu_cap.num_counters_gp,
->>>>>>> +                                                    KVM_AMD_PMC_MAX_GENERIC);
->>>>>>
->>>>>> Note that the number of core PMCs has to be at least 6 if
->>>>>> guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE). I suppose this leaf
->>>>>> could claim fewer, but the first 6 PMCs must work, per the v1 PMU
->>>>>> spec. That is, software that knows about PERFCTR_CORE, but not about
->>>>>> PMU v2, can rightfully expect 6 PMCs.
->>>>>
->>>>> I thought the NumCorePmc number would only make sense if
->>>>> CPUID.80000022.eax.perfmon_v2
->>>>> bit was present, but considering that the user space is perfectly fine with just
->>>>> configuring the
->>>>> NumCorePmc number without setting perfmon_v2 bit at all, so how about:
+Am 06.09.22 um 22:05 schrieb Daniel Vetter:
+> On Tue, Sep 06, 2022 at 10:01:47PM +0200, Daniel Vetter wrote:
+>> On Mon, Aug 15, 2022 at 12:05:19PM +0200, Christian König wrote:
+>>> Am 15.08.22 um 11:54 schrieb Dmitry Osipenko:
+>>>> Higher order pages allocated using alloc_pages() aren't refcounted and they
+>>>> need to be refcounted, otherwise it's impossible to map them by KVM. This
+>>>> patch sets the refcount of the tail pages and fixes the KVM memory mapping
+>>>> faults.
 >>>>
->>>> CPUID.80000022H might only make sense if X86_FEATURE_PERFCTR_CORE is
->>>> present. It's hard to know in the absence of documentation.
+>>>> Without this change guest virgl driver can't map host buffers into guest
+>>>> and can't provide OpenGL 4.5 profile support to the guest. The host
+>>>> mappings are also needed for enabling the Venus driver using host GPU
+>>>> drivers that are utilizing TTM.
+>>>>
+>>>> Based on a patch proposed by Trigger Huang.
+>>> Well I can't count how often I have repeated this: This is an absolutely
+>>> clear NAK!
 >>>
->>> Whenever this happens, we may always leave the definition of behavior to the
->>> hypervisor.
->>
->> I disagree. If CPUID.0H reports "AuthenticAMD," then AMD is the sole
->> authority on behavior.
-
-The real world isn't like that, because even AMD has multiple implementations in 
-cases
-where the hardware specs aren't explicitly stated, and sometimes they're 
-intentionally vague.
-And the hypervisor can't do nothing, it prefers one over the other and maintains 
-maximum compatibility with the legacy user space.
-
->>
-> 
-> I understand that official documentation is not out yet. However, for Zen 4
-> models, it is expected that both the PerfMonV2 bit of CPUID.80000022H EAX and
-> the PerfCtrExtCore bit of CPUID.80000001H ECX will be set.
-
-Is PerfCtrExtCore a PerfMonV2 or PerfMonV3+ precondition ?
-Is PerfCtrExtCore a CPUID.80000022 precondition ?
-
-Should we always expect CPUID_Fn80000022_EBX.NumCorePmc to reflect the real
-Number of Core Performance Counters regardless of whether PerfMonV2 is set ?
-
-> 
->>>>
->>>>>           /* AMD Extended Performance Monitoring and Debug */
->>>>>           case 0x80000022: {
->>>>>                   union cpuid_0x80000022_eax eax;
->>>>>                   union cpuid_0x80000022_ebx ebx;
->>>>>                   bool perfctr_core;
->>>>>
->>>>>                   entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
->>>>>                   if (!enable_pmu)
->>>>>                           break;
->>>>>
->>>>>                   perfctr_core = kvm_cpu_cap_has(X86_FEATURE_PERFCTR_CORE);
->>>>>                   if (!perfctr_core)
->>>>>                           ebx.split.num_core_pmc = AMD64_NUM_COUNTERS;
->>>>>                   if (kvm_pmu_cap.version > 1) {
->>>>>                           /* AMD PerfMon is only supported up to V2 in the KVM. */
->>>>>                           eax.split.perfmon_v2 = 1;
->>>>>                           ebx.split.num_core_pmc = min(kvm_pmu_cap.num_counters_gp,
->>>>>                                                        KVM_AMD_PMC_MAX_GENERIC);
->>>>>                   }
->>>>>                   if (perfctr_core) {
->>>>>                           ebx.split.num_core_pmc = max(ebx.split.num_core_pmc,
->>>>>                                                        AMD64_NUM_COUNTERS_CORE);
->>>>>                   }
->>>>
->>>> This still isn't quite right. All AMD CPUs must support a minimum of 4 PMCs.
+>>> TTM pages are not reference counted in the first place and because of this
+>>> giving them to virgl is illegal.
 >>>
->>> K7 at least. I could not confirm that all antique AMD CPUs have 4 counters w/o
->>> perfctr_core.
+>>> Please immediately stop this completely broken approach. We have discussed
+>>> this multiple times now.
+>> Yeah we need to get this stuff closed for real by tagging them all with
+>> VM_IO or VM_PFNMAP asap.
+> For a bit more context: Anything mapping a bo should be VM_SPECIAL. And I
+> think we should add the checks to the gem and dma-buf mmap functions to
+> validate for that, and fix all the fallout.
+>
+> Otherwise this dragon keeps resurrecting ...
+>
+> VM_SPECIAL _will_ block get_user_pages, which will block everyone from
+> even trying to refcount this stuff.
+>
+> Minimally we need to fix this for all ttm drivers, and it sounds like
+> that's still not yet the case :-( Iirc last time around some funky amdkfd
+> userspace was the hold-up because regressions?
+
+My recollection is that Felix and I fixed this with a KFD specific 
+workaround. But I can double check with Felix on Monday.
+
+Christian.
+
+> -Daniel
+>
+>> It seems ot be a recurring amount of fun that people try to mmap dma-buf
+>> and then call get_user_pages on them.
 >>
->> The APM says, "All implementations support the base set of four
->> performance counter / event-select pairs." That is unequivocal.
+>> Which just doesn't work. I guess this is also why Rob Clark send out that
+>> dma-buf patch to expos mapping information (i.e. wc vs wb vs uncached).
 >>
-> 
-> That is true. The same can be inferred from amd_core_pmu_init() in
-> arch/x86/events/amd/core.c. If PERFCTR_CORE is not detected, it assumes
-> that the four legacy counters are always available.
-> 
-> - Sandipan
+>> There seems to be some serious bonghits going on :-/
+>> -Daniel
+>>
+>>> Regards,
+>>> Christian.
+>>>
+>>>> Cc: stable@vger.kernel.org
+>>>> Cc: Trigger Huang <Trigger.Huang@gmail.com>
+>>>> Link: https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwww.collabora.com%2Fnews-and-blog%2Fblog%2F2021%2F11%2F26%2Fvenus-on-qemu-enabling-new-virtual-vulkan-driver%2F%23qcom1343&amp;data=05%7C01%7Cchristian.koenig%40amd.com%7C37a7d9b0f91249da415b08da90432d3a%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637980915471280078%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=XN6wFiWc6Jljekmst0aOCPSTsFLlmkUjD9F%2Fl9nluAs%3D&amp;reserved=0
+>>>> Tested-by: Dmitry Osipenko <dmitry.osipenko@collabora.com> # AMDGPU (Qemu and crosvm)
+>>>> Signed-off-by: Dmitry Osipenko <dmitry.osipenko@collabora.com>
+>>>> ---
+>>>>    drivers/gpu/drm/ttm/ttm_pool.c | 25 ++++++++++++++++++++++++-
+>>>>    1 file changed, 24 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/drivers/gpu/drm/ttm/ttm_pool.c b/drivers/gpu/drm/ttm/ttm_pool.c
+>>>> index 21b61631f73a..11e92bb149c9 100644
+>>>> --- a/drivers/gpu/drm/ttm/ttm_pool.c
+>>>> +++ b/drivers/gpu/drm/ttm/ttm_pool.c
+>>>> @@ -81,6 +81,7 @@ static struct page *ttm_pool_alloc_page(struct ttm_pool *pool, gfp_t gfp_flags,
+>>>>    	unsigned long attr = DMA_ATTR_FORCE_CONTIGUOUS;
+>>>>    	struct ttm_pool_dma *dma;
+>>>>    	struct page *p;
+>>>> +	unsigned int i;
+>>>>    	void *vaddr;
+>>>>    	/* Don't set the __GFP_COMP flag for higher order allocations.
+>>>> @@ -93,8 +94,10 @@ static struct page *ttm_pool_alloc_page(struct ttm_pool *pool, gfp_t gfp_flags,
+>>>>    	if (!pool->use_dma_alloc) {
+>>>>    		p = alloc_pages(gfp_flags, order);
+>>>> -		if (p)
+>>>> +		if (p) {
+>>>>    			p->private = order;
+>>>> +			goto ref_tail_pages;
+>>>> +		}
+>>>>    		return p;
+>>>>    	}
+>>>> @@ -120,6 +123,23 @@ static struct page *ttm_pool_alloc_page(struct ttm_pool *pool, gfp_t gfp_flags,
+>>>>    	dma->vaddr = (unsigned long)vaddr | order;
+>>>>    	p->private = (unsigned long)dma;
+>>>> +
+>>>> +ref_tail_pages:
+>>>> +	/*
+>>>> +	 * KVM requires mapped tail pages to be refcounted because put_page()
+>>>> +	 * is invoked on them in the end of the page fault handling, and thus,
+>>>> +	 * tail pages need to be protected from the premature releasing.
+>>>> +	 * In fact, KVM page fault handler refuses to map tail pages to guest
+>>>> +	 * if they aren't refcounted because hva_to_pfn_remapped() checks the
+>>>> +	 * refcount specifically for this case.
+>>>> +	 *
+>>>> +	 * In particular, unreferenced tail pages result in a KVM "Bad address"
+>>>> +	 * failure for VMMs that use VirtIO-GPU when guest's Mesa VirGL driver
+>>>> +	 * accesses mapped host TTM buffer that contains tail pages.
+>>>> +	 */
+>>>> +	for (i = 1; i < 1 << order; i++)
+>>>> +		page_ref_inc(p + i);
+>>>> +
+>>>>    	return p;
+>>>>    error_free:
+>>>> @@ -133,6 +153,7 @@ static void ttm_pool_free_page(struct ttm_pool *pool, enum ttm_caching caching,
+>>>>    {
+>>>>    	unsigned long attr = DMA_ATTR_FORCE_CONTIGUOUS;
+>>>>    	struct ttm_pool_dma *dma;
+>>>> +	unsigned int i;
+>>>>    	void *vaddr;
+>>>>    #ifdef CONFIG_X86
+>>>> @@ -142,6 +163,8 @@ static void ttm_pool_free_page(struct ttm_pool *pool, enum ttm_caching caching,
+>>>>    	if (caching != ttm_cached && !PageHighMem(p))
+>>>>    		set_pages_wb(p, 1 << order);
+>>>>    #endif
+>>>> +	for (i = 1; i < 1 << order; i++)
+>>>> +		page_ref_dec(p + i);
+>>>>    	if (!pool || !pool->use_dma_alloc) {
+>>>>    		__free_pages(p, order);
+>> -- 
+>> Daniel Vetter
+>> Software Engineer, Intel Corporation
+>> https://nam11.safelinks.protection.outlook.com/?url=http%3A%2F%2Fblog.ffwll.ch%2F&amp;data=05%7C01%7Cchristian.koenig%40amd.com%7C37a7d9b0f91249da415b08da90432d3a%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637980915471280078%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=bGZ1OAxL%2Fd99Nqu49soWZVqvvUKjuD6n6BKkAhMv4fs%3D&amp;reserved=0
+
