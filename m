@@ -2,132 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CAAA5B0BB3
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 19:44:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F3625B0BBE
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 19:46:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229919AbiIGRoG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 13:44:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46230 "EHLO
+        id S230026AbiIGRpr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 13:45:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229968AbiIGRoE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 13:44:04 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 132E1B14DA
-        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 10:44:01 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id t6-20020a17090a950600b0020063f8f964so1741889pjo.0
-        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 10:44:01 -0700 (PDT)
+        with ESMTP id S230010AbiIGRpn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 13:45:43 -0400
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77CF39BB78
+        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 10:45:40 -0700 (PDT)
+Received: by mail-io1-xd2c.google.com with SMTP id v128so1046460ioe.12
+        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 10:45:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=b81zlqF5ysM4kpc1s037FlTMUfnuY8dmKnhbffyhccc=;
-        b=W5b19ldWBf/f/FgPMapegVS3BCm+xIEUzedVudlupZbPvwM/9eKgw/P8X8fwNE6ss1
-         6AEbbCbdwZ8TnpsBJBKSxSBqPdEw55ANnmK7T/8a+w8U/xaaj3XUvQTrxtlAZqgbEUUb
-         ABWeg+nOWxDglmTTqOJ9SGMY6dMrEKqcCbFRZ6uQGaX0dLipr+Ti5dkfuRcv0TrZTZ+l
-         3AXVFQs5To4p2ZsyelXlhguuENGbJPhqks+joShTtYqk13zhu5aPot0AXPz39tMH8nPB
-         nD/PKg3I9T0CToftr2flpbv+miFfotTTyfCLGaOsZobm597m7TAAgqp+4aYRN+LAvPCb
-         ZlCw==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=S/oonIaSgU5+P+xzaVg+rVuKI8oFDrUKwNm4xv6c2Yw=;
+        b=jTRq4KN+MFLm8CxxBQM492Nbg+eiBsIkRudHUkBxz64Hp3RNe28+MUJYyF8LTDk+4q
+         7k8MA7jbsmfrmus7ejcfugn6Be8my2hjvTMScdCFh7JG45Ttul5ZH6Ez5A5xZzgjsYfe
+         tHBvhe4bHR16VgXBomHHGEx/0b5G0H8Uhktbde6vK4Q+5yq7916uNMoiE2mNXscadES/
+         GtYFpc9IZDlJGozKkFfe6axLKweAM41WjDa0srIjc0c1lzNMeRD8CmegySAxKXm5KN0w
+         SyNr23Zv/pUEdGG2EF11c+pRATnJx7OB7VcfwYOTezE9VI3/LEPVMFaxInFWkvkABxAO
+         CeHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=b81zlqF5ysM4kpc1s037FlTMUfnuY8dmKnhbffyhccc=;
-        b=Ng5kvuSIw9UoVDtyhXDam0eGcDU9dNopqr21refJNARsgHMcW7/RnBfguzZXJ+NZy0
-         HFhmsC8d2P3QjIGgUUG2PivTRbo2/0dr8sd+CoCxrO6PQ5U/qMAirL3cWI+meV+I8mnd
-         uQKr42ll0/qBy70bjbnaoyIpt4ZIo7Rd8Iea3AbaGgAIqWrLN9tnYLiXdZZBGYiGfu4O
-         3emnYkwcmid3GqdzHRKW+TGeIn52/b1YP/XmdD88ix0Q1XgIYPjao4/d+CSeGifTpM5f
-         f65PBoUTY4+PPFZsi5WUIbgU69qnzb54Z/2YJYO4xwSdhl3sxsHP6T4D681S4zjwGIeE
-         +FRg==
-X-Gm-Message-State: ACgBeo2BLSLFIvUi84D65wUNa+/bGQ7ZvtRrlUQD9NZ15CbZLE9vR1oY
-        0pQEBYv1nq5hjYq0Su0YSNaJqg==
-X-Google-Smtp-Source: AA6agR5sAZjjMfqycbPQ1M4IStTczWMsH9myfWV6H4TmRp7CMiAoULAhnfiVQiir/BlwUDaak5nlmA==
-X-Received: by 2002:a17:903:228a:b0:176:cd0b:8c9f with SMTP id b10-20020a170903228a00b00176cd0b8c9fmr4774908plh.120.1662572640337;
-        Wed, 07 Sep 2022 10:44:00 -0700 (PDT)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id p8-20020a1709027ec800b001768db880c4sm9911288plb.275.2022.09.07.10.43.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Sep 2022 10:43:59 -0700 (PDT)
-Date:   Wed, 7 Sep 2022 10:43:54 -0700
-From:   David Matlack <dmatlack@google.com>
-To:     Hou Wenlong <houwenlong.hwl@antgroup.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Lan Tianyu <Tianyu.Lan@microsoft.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/6] KVM: x86/mmu: Fix wrong gfn range of tlb flushing
- in validate_direct_spte()
-Message-ID: <YxjYWtgLZMxFBrjl@google.com>
-References: <cover.1661331396.git.houwenlong.hwl@antgroup.com>
- <c0ee12e44f2d218a0857a5e05628d05462b32bf9.1661331396.git.houwenlong.hwl@antgroup.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=S/oonIaSgU5+P+xzaVg+rVuKI8oFDrUKwNm4xv6c2Yw=;
+        b=XcV9ajO/E5IV0/l3qGS3r/R8KWNQudv0gQBCxhXFSv0ZwKSXw4HP3NRebYwx5BMxfG
+         R2geu1j+Z33uFLFvhQmSgsz8rjc1NIFXxl5SaPcMaPA3YLLCpOKfjMlw8woYdklmMsQ1
+         hSWtdMANQ9VGfp+4zWDJ5hxf0YwOZ4/GGi0G3Jv8UMkaOt3qvW9MnGymI4BTNRyRlHIn
+         FyIkl6Nm9MveyhJaQH35F8+cqqhSBP+H+lpPxYnz85H8pDDai5EJwmZTaCORS3COX2Z3
+         f3yrsd4BKgiKEeb1U46RrI9UGjF5p971M+tN5CImjlmU+GCXwUkae5LPjT73iu3tkqRM
+         BC0A==
+X-Gm-Message-State: ACgBeo3m/1yTPMtaZc0N5gcfwFMDKxjiS76ccYzhjut5OyZxz5oBPRSD
+        IMZE4RsoWmqQdUt7tyLZooxCaIk94VV3MKvAtDtWuw==
+X-Google-Smtp-Source: AA6agR7OhLGMem1qhjuMVUdxb6YLpofj4pnp6ALJAfN+/AJK9FZfXj9IAHFzMkxEStSbHnAdeJ+Y3a++RqzhD6XSTyc=
+X-Received: by 2002:a02:cbb4:0:b0:34c:d42:ac34 with SMTP id
+ v20-20020a02cbb4000000b0034c0d42ac34mr2694474jap.249.1662572739595; Wed, 07
+ Sep 2022 10:45:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c0ee12e44f2d218a0857a5e05628d05462b32bf9.1661331396.git.houwenlong.hwl@antgroup.com>
+References: <cover.1655761627.git.ashish.kalra@amd.com> <9151e79d4f5af888242b9589c0a106a49a97837c.1655761627.git.ashish.kalra@amd.com>
+In-Reply-To: <9151e79d4f5af888242b9589c0a106a49a97837c.1655761627.git.ashish.kalra@amd.com>
+From:   Alper Gun <alpergun@google.com>
+Date:   Wed, 7 Sep 2022 10:45:28 -0700
+Message-ID: <CABpDEunmzbzm-Hwi9iwWmCokfMde9yEZ+aSCrF7LPjqMvMvNeg@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 31/49] KVM: x86: Introduce kvm_mmu_get_tdp_walk()
+ for SEV-SNP use
+To:     Ashish Kalra <Ashish.Kalra@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        bp@alien8.de, michael.roth@amd.com, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 24, 2022 at 05:29:18PM +0800, Hou Wenlong wrote:
-> The spte pointing to the children SP is dropped, so the
-> whole gfn range covered by the children SP should be flushed.
-> Although, Hyper-V may treat a 1-page flush the same if the
-> address points to a huge page, it still would be better
-> to use the correct size of huge page. Also introduce
-> a helper function to do range-based flushing when a direct
-> SP is dropped, which would help prevent future buggy use
-> of kvm_flush_remote_tlbs_with_address() in such case.
-> 
-> Fixes: c3134ce240eed ("KVM: Replace old tlb flush function with new one to flush a specified range.")
-> Suggested-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
+On Mon, Jun 20, 2022 at 4:09 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+>
+> From: Brijesh Singh <brijesh.singh@amd.com>
+>
+> The SEV-SNP VMs may call the page state change VMGEXIT to add the GPA
+> as private or shared in the RMP table. The page state change VMGEXIT
+> will contain the RMP page level to be used in the RMP entry. If the
+> page level between the TDP and RMP does not match then, it will result
+> in nested-page-fault (RMP violation).
+>
+> The SEV-SNP VMGEXIT handler will use the kvm_mmu_get_tdp_walk() to get
+> the current page-level in the TDP for the given GPA and calculate a
+> workable page level. If a GPA is mapped as a 4K-page in the TDP, but
+> the guest requested to add the GPA as a 2M in the RMP entry then the
+> 2M request will be broken into 4K-pages to keep the RMP and TDP
+> page-levels in sync.
+>
+> TDP SPTEs are RCU protected so need to put kvm_mmu_get_tdp_walk() in RCU
+> read-side critical section by using walk_shadow_page_lockless_begin() and
+> walk_lockless_shadow_page_lockless_end(). This fixes the
+> "suspicious RCU usage" message seen with lockdep kernel build.
+>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off by: Ashish Kalra <ashish.kalra@amd.com>
 > ---
->  arch/x86/kvm/mmu/mmu.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
-> 
+>  arch/x86/kvm/mmu.h     |  2 ++
+>  arch/x86/kvm/mmu/mmu.c | 33 +++++++++++++++++++++++++++++++++
+>  2 files changed, 35 insertions(+)
+>
+> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> index c99b15e97a0a..d55b5166389a 100644
+> --- a/arch/x86/kvm/mmu.h
+> +++ b/arch/x86/kvm/mmu.h
+> @@ -178,6 +178,8 @@ static inline bool is_nx_huge_page_enabled(void)
+>         return READ_ONCE(nx_huge_pages);
+>  }
+>
+> +bool kvm_mmu_get_tdp_walk(struct kvm_vcpu *vcpu, gpa_t gpa, kvm_pfn_t *pfn, int *level);
+> +
+>  static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>                                         u32 err, bool prefetch)
+>  {
 > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index e418ef3ecfcb..a3578abd8bbc 100644
+> index 569021af349a..c1ac486e096e 100644
 > --- a/arch/x86/kvm/mmu/mmu.c
 > +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -260,6 +260,14 @@ void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
->  	kvm_flush_remote_tlbs_with_range(kvm, &range);
+> @@ -4151,6 +4151,39 @@ kvm_pfn_t kvm_mmu_map_tdp_page(struct kvm_vcpu *vcpu, gpa_t gpa,
 >  }
->  
-> +/* Flush all memory mapped by the given direct SP. */
-> +static void kvm_flush_remote_tlbs_direct_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+>  EXPORT_SYMBOL_GPL(kvm_mmu_map_tdp_page);
+>
+> +bool kvm_mmu_get_tdp_walk(struct kvm_vcpu *vcpu, gpa_t gpa, kvm_pfn_t *pfn, int *level)
 > +{
-> +	WARN_ON_ONCE(!sp->role.direct);
-> +	kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
-> +					   KVM_PAGES_PER_HPAGE(sp->role.level + 1));
-
-nit: I think it would make sense to introduce
-kvm_flush_remote_tlbs_gfn() in this patch since you are going to
-eventually use it here anyway.
-
-> +}
+> +       u64 sptes[PT64_ROOT_MAX_LEVEL + 1];
+> +       int leaf, root;
 > +
->  static void mark_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, u64 gfn,
->  			   unsigned int access)
+> +       walk_shadow_page_lockless_begin(vcpu);
+> +
+> +       if (is_tdp_mmu(vcpu->arch.mmu))
+> +               leaf = kvm_tdp_mmu_get_walk(vcpu, gpa, sptes, &root);
+> +       else
+> +               leaf = get_walk(vcpu, gpa, sptes, &root);
+> +
+> +       walk_shadow_page_lockless_end(vcpu);
+> +
+> +       if (unlikely(leaf < 0))
+> +               return false;
+> +
+> +       /* Check if the leaf SPTE is present */
+> +       if (!is_shadow_present_pte(sptes[leaf]))
+> +               return false;
+> +
+> +       *pfn = spte_to_pfn(sptes[leaf]);
+> +       if (leaf > PG_LEVEL_4K) {
+> +               u64 page_mask = KVM_PAGES_PER_HPAGE(leaf) - KVM_PAGES_PER_HPAGE(leaf - 1);
+> +               *pfn |= (gpa_to_gfn(gpa) & page_mask);
+
+Similar to the discussion in the other patch, I believe you should
+apply the same fix here as well.
+It should be
+u64 page_mask = KVM_PAGES_PER_HPAGE(leaf) - 1;
+
+> +       }
+> +
+> +       *level = leaf;
+> +
+> +       return true;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_mmu_get_tdp_walk);
+> +
+>  static void nonpaging_init_context(struct kvm_mmu *context)
 >  {
-> @@ -2341,7 +2349,7 @@ static void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
->  			return;
->  
->  		drop_parent_pte(child, sptep);
-> -		kvm_flush_remote_tlbs_with_address(vcpu->kvm, child->gfn, 1);
-> +		kvm_flush_remote_tlbs_direct_sp(vcpu->kvm, child);
->  	}
->  }
->  
-> -- 
-> 2.31.1
-> 
+>         context->page_fault = nonpaging_page_fault;
+> --
+> 2.25.1
+>
