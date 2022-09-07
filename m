@@ -2,69 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 655A55B0802
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 17:08:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E88A35B080A
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 17:08:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229568AbiIGPI0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 11:08:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39784 "EHLO
+        id S230248AbiIGPI5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 11:08:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbiIGPIX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 11:08:23 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 829F3B5167
-        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 08:08:19 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id c198so5063640pfc.13
-        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 08:08:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date;
-        bh=Sijq7jei1YFFEUTbO1jB6ms6P8qMwH8jdC+A+CFVOjg=;
-        b=B/INToqfY8tuYhNZRrTEVfnye7JEYPP3h5k4X0eJmGKbHEkEvX3r2743efN+9in3wj
-         oHupkruNSOyZJS0ZeuwCrgBEIMWfCPaTor7FNKcu3eiZHtAXiXacL9x6Wg8Vp7v4cUIh
-         I1W7SOVjJJjSgvq/nmg2lQ0XgyMjw0pzACDNanRO9uUt52bbTp9XEG/AdB34cnDBRd4y
-         kezCiRB3PJQ0iSdG1e3Tj3a1Ud8/d3oFF0IVT9xJ4lpHXbUg6hHuXNPKPQw4V0M07cP7
-         3oMAoDg/3p9+gSSv4ciEsmL0Y40+x0w3S5guVwdwy6/6EOKYlyUk/bXdfj7jqP4m/0YA
-         vRFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=Sijq7jei1YFFEUTbO1jB6ms6P8qMwH8jdC+A+CFVOjg=;
-        b=wEyGpNMkABWoYn/xhjUb4WGtmLhYACL5UUyd7UAOYW+3+aKfVdkKjpQF/uWB9UtifG
-         2zIaIOreiYjJRbCGnSy4Sn7NFip4YBuGeRylARyXo6/S0i9ZHLsMXMZEGgqJ0HzYHmZN
-         tH8C5mSOAicht5UKmu9SNiqbijKpj2SpQYOtHCUAci49qLQi4iq0tdh43vOV8XPhABj6
-         6fQS5CA312ayB5v6tzL5FVClQSu3tbFNbZ2Glc4foq+LlmsDov6aa3AF02AqXmyzSceL
-         NI7MNga1bFY1JFr43vjDDU+3nVtfbb+40f9VT310KFEpfUkQUCemX/VL7q6jhe1jBWfW
-         /J2A==
-X-Gm-Message-State: ACgBeo2jkc42eoIWTSgUTKZ4tVOPvfZylE64f5uDZ/7s55RwZsCIu2fq
-        JVuU0somfZOWxOQ8E+ju76hV86GNU4yL4w==
-X-Google-Smtp-Source: AA6agR5K9YxJ5HIgMMmPVoVd2PO6kO/CM7uljd/vM8bVWHluY2MZsFgdwdjE6A3Hjy90HNtPgF96aA==
-X-Received: by 2002:a63:87:0:b0:42e:16f2:7a40 with SMTP id 129-20020a630087000000b0042e16f27a40mr3733607pga.302.1662563298829;
-        Wed, 07 Sep 2022 08:08:18 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id d2-20020a170902b70200b0017685f53537sm10043977pls.186.2022.09.07.08.08.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Sep 2022 08:08:18 -0700 (PDT)
-Date:   Wed, 7 Sep 2022 15:08:14 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     =?utf-8?B?RnJhbnRpxaFlayDFoHVtxaFhbA==?= <frantisek@sumsal.cz>
-Cc:     kvm@vger.kernel.org
-Subject: Re: BUG: soft lockup - CPU#0 stuck for 26s! with nested KVM on 5.19.x
-Message-ID: <Yxiz3giU/WEftPp6@google.com>
-References: <a861d348-b3fd-fd1d-2427-0a89ae139948@sumsal.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+        with ESMTP id S229865AbiIGPIx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 11:08:53 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2080.outbound.protection.outlook.com [40.107.244.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6DFDB5335;
+        Wed,  7 Sep 2022 08:08:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LTfjjxeuMuvLV+RDG4x/1PjRODP3tfgOSDQJ+uJYaWDBeYX/3lQVvgG8pOMqpqdCLT8JV7giFCSTpFZ3hHUKibxTW7u4OcDMixd/iYPsO9nKQkyyWOUGyRce+IM8lnt4ui13G2riBmU6VA26f6baJWKEI1T6yzdQyB5SMhiJgf/PZRaOHzl1JYo5OPBWiov+0XEWRl53DauH1i1fM4PuFEUDUZvfM2viJeeHd01OJYOaNoT1KAT9a5ozN1jDrsaHnDLNYVEyggg73a/RiogMesfuJGrl1ezCN5ryBdHqtuFOBQ33AFc+D2MI8WgRMP4A9LT9NvWO9Di1erOcclvH8w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+GJ0NrNS7IWfMOgArniTiYOZGgGBWzBOv7k9ZKNKP7Y=;
+ b=Yn7aa8bqGBwxnuIpnJR8QtmmHGisNfWPiBSU39/n+NQcegRjl5t0oflRZn7o1s0VFSdIaKFMCQ6i+Qiverad/W2OtK8MX2FVpjjevVpesljlm86bysX3rkZ9sJALv2AC0aaSxQzq61zn4novahjO+68Cbb8Ehn2gVV8/utscaqFrd2yIN+0apSlJHCY44tG9EbCtUWL71Wwz12jgcGs1C1SL1TeUrsTtUw29cuOwsXTzXBlCRH9YubS8n2NU6pESV0hGL5852Dj1UEevHxnPgXGv9JerdVqH/zBRyfgRa7dK7d1qT9fIHiS3fvl1Vn+e/yk7TWs71gZFMOnjc1pAwg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+GJ0NrNS7IWfMOgArniTiYOZGgGBWzBOv7k9ZKNKP7Y=;
+ b=o+acLCaksTuufk18931PdXED00Jbu/DRYwEOCesp2mjtmPh+bytr7hpXVGKwKpt9cJEH9VHEMa8fgH3Ngf6eAOz1CENjHvGnVtU1XBsTb21OezdR5KeXahtefpEDERSL7llGqqhWNrBW/79Po7POVOClqCC9BUTPfByGqPUtGEY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BN8PR12MB3587.namprd12.prod.outlook.com (2603:10b6:408:43::13)
+ by CH2PR12MB4149.namprd12.prod.outlook.com (2603:10b6:610:7c::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.11; Wed, 7 Sep
+ 2022 15:08:49 +0000
+Received: from BN8PR12MB3587.namprd12.prod.outlook.com
+ ([fe80::653f:e59b:3f40:8fed]) by BN8PR12MB3587.namprd12.prod.outlook.com
+ ([fe80::653f:e59b:3f40:8fed%6]) with mapi id 15.20.5612.015; Wed, 7 Sep 2022
+ 15:08:46 +0000
+Message-ID: <58d6e892-82df-7aa7-4798-9e5da7c634ad@amd.com>
+Date:   Wed, 7 Sep 2022 17:08:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v2 4/4] vfio/pci: Allow MMIO regions to be exported
+ through dma-buf
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linaro-mm-sig@lists.linaro.org, linux-media@vger.kernel.org,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
+        Maor Gottlieb <maorg@nvidia.com>,
+        Oded Gabbay <ogabbay@kernel.org>
+References: <0-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
+ <4-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
+ <YxcYGzPv022G2vLm@infradead.org>
+ <b6b5d236-c089-7428-4cc9-a08fe4f6b4a3@amd.com>
+ <YxiIkh/yeWQkZ54x@infradead.org>
+From:   =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>
+In-Reply-To: <YxiIkh/yeWQkZ54x@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <a861d348-b3fd-fd1d-2427-0a89ae139948@sumsal.cz>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-ClientProxiedBy: AM6P193CA0128.EURP193.PROD.OUTLOOK.COM
+ (2603:10a6:209:85::33) To BN8PR12MB3587.namprd12.prod.outlook.com
+ (2603:10b6:408:43::13)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8PR12MB3587:EE_|CH2PR12MB4149:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7e0fed92-ab80-40b5-6879-08da90e2dc7c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: NajZBkGm6v6sLe+mQl1Z6QgpYQDh/94sNQjDTGN2dW33ll6EmunsAOpKAcJqOUejUg/LSpMiMZYxsifAB8H453vtnPPpAHL2cedsiCdlMsg/mKpPb7HXpzgupKHy24mm7z2oiZfjns1ZoiXJWejowHoLHkBrBywJHXCuX6fkt0Xwo4QxDVGOCYHwSrsGrH7cNLA/v/JxNL6v1qmf2+XEeSmkfU9dusrWZVJLd6e+jzxKMB98yv0UrdAAnsdsQBKUouoKi2o4Rq2uO3OTHJ2DitQiQmU6NFOlfx1dGzy9VMexxmau0G+I9+B2ETfUebKeN7WFc1aOhlNwA/wOvlbzrqqyu/zuP2AhIrPG7IaQ3TppuM5IqsZUgQZVewGlxhdcTT1xzZwyC8dB9H7lNLU6fofe1xKHlHU9uToxX+gYrP8mEdtGJPlpOkPDoefm7ic5Uw95F6LjhPrXaRg6rfwxUPxHE7P9nEclkBhuSlLomMb2x/lr62mUJBl6+IOiZSmWUiWMJvtOevC2PDX600WvWodUjCJ6RaXnAwkKvYgFSi5Ltp8AttQzJBsavLq8ialb2I5ZB4kL2nTsgcWvkvy9GDpAWEe5O6qXchyij4WFTVQVFne1UIdijlthz53VdKqf2S2Wv5Hc671ZIcAADpsRZ8Z9VSU/Z7mv013NdX0Tb0+PCxhyw8yg2Js3jI5Z+zj+7NXIgrIk7p9SK8fH2wnwxi2H/NZNMyoxiFMV+ZRTRrWA2+E8o2s3EawuljXE4gxjMTOOb9JHA+1QZw+u3PdtPfLpJTG/rWz2Fd7oaM34rLI=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR12MB3587.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(396003)(376002)(39860400002)(366004)(136003)(36756003)(31686004)(6916009)(316002)(31696002)(38100700002)(86362001)(2906002)(6512007)(5660300002)(7416002)(83380400001)(66556008)(8936002)(54906003)(8676002)(66946007)(66574015)(6486002)(4326008)(2616005)(41300700001)(186003)(6666004)(6506007)(66476007)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZGlPZncyOEJqbklCRkdvQkRWZnFORFdJUWxZV2RvYzFOYlBlQnpDb2FqQTNG?=
+ =?utf-8?B?QUVyRWNmRjlsSjQ0U2QxdjNUQTViUnRBRHVJbzZKUDZub0dHaVpkSkhLS3VE?=
+ =?utf-8?B?dkdEVjNXZ05ENTNvRHFPWWhXRkdzR1NNaHRkQVNWNzBlQldyT1g5VFY0S21B?=
+ =?utf-8?B?SGRod21yN0RQcjRBcXAvM3o2Zm1GSUJFd2NZOUQwM0tlbGhYVFQ3Vld0U1lm?=
+ =?utf-8?B?ZWxBRm8vR1BXd1UvaVBWNmZRVGlSa2hxV1pYNWNYMjJ0REp6bnNhS0FHeno1?=
+ =?utf-8?B?a1pycjVySXA4Tk5MazFTTXdmSmIzWWdGTjFXa2M3V25oY2hxcGN0OWJRMFpH?=
+ =?utf-8?B?STd5N3ZaZEphcDY1VFdXbHFaZ2FtUFh4RnNaVndFcEkvcUp5YWVPdXQyUDFO?=
+ =?utf-8?B?SUl5ZDhPV2cwZ0pjNVZmZkxVUkN0Z0d3cEVzdnc5ZzZERGxZUmxOS0lkTjcz?=
+ =?utf-8?B?NzJ5dWhYNEpMRndWRzgvZ21uMWpzVWRHTjZ6M09PYmNLZEV2UU9YdnJDN3RR?=
+ =?utf-8?B?ekdnakN1d29BVUNpY2pnYW5sdHdRQjFlUGVYWndzdVpVV0pqTGQyU1pmaFYx?=
+ =?utf-8?B?cGZZWkRac3Y1dUt4c2hSc2x6dVpneEQ5c1oySWlDTU9ZMWtRM0V3dk9sK1A2?=
+ =?utf-8?B?eWNBcmNGYmtySUxEK3FmNTdLZjVhOEZkRkhndVNXQndnOS9uSHVoYU1oVElY?=
+ =?utf-8?B?T0JMMTZZdXpvbVhZMndqWDUxV09vcTV4ak03bk81WTFyS1ErRU4rMU5qWjlO?=
+ =?utf-8?B?VkZ3NU1ZdEdXcjYzVXpaREtKZlI0Mk1sUWJLQkRLK3lrUnU5dWkwWEFUYXFU?=
+ =?utf-8?B?YlE0Z2REbVZXVTdUUnBJUHpxQTdDN3g2UkRDdXJpOHBRNys0YlFrVjg3enRa?=
+ =?utf-8?B?NmQxODVCbDBZckZObDhZUXRDcTkyQlplOXNLSTVOdWovaEZvTW5tL1hrd1Mw?=
+ =?utf-8?B?bzc3M0E3d0h4U2hoRENMdFJUODZKVElPcFR0RFNDNVBMeWlLZ1RmV1cxRjE4?=
+ =?utf-8?B?NlBFZmphRW9xUEI1VlllSUVCb0tHS3FWRlVHenNzSmhVYkxOR0VWK1lhOHZ5?=
+ =?utf-8?B?ZVlacWttWlRGdUNQT2E3VzBuUWhxSVdkdC95UWVTL0ZZd0Z4eGVWdkpTNWtV?=
+ =?utf-8?B?WjB2M1NvK2dvb2NPMVVvaFE3eE5FZlR2cVdoY0tiRklSYVQ4NEw1L3BZZFJm?=
+ =?utf-8?B?dmlIMisvMjk3b1NXRDhMREVBSGtuZGFyMC9EN2RqbkpnZ2dkTGY5b0VCNnRK?=
+ =?utf-8?B?em56aHFZUFA0UnZjVitZdUFiL2h0RjFGTEppd0p2azlJb095bWtPYkZnY2ZV?=
+ =?utf-8?B?K01OWFhGSHhpZVFhZ0RmNTY5cDJaajE1b2V0d096VkwwcHIwb084UlUwZ3FX?=
+ =?utf-8?B?b2pURnFtV3NNdVNKekJRMFlEbU1Za21zTTVOQWticzNRZ2JockZwVnF4b3BW?=
+ =?utf-8?B?S2VXeGRNOVlSM29qODFQeDlFeGdOc1Jqa2FBcExVK2pMNmxJSGlDWFN3ekRh?=
+ =?utf-8?B?NnJ0OXMvNHp2a0ErWU5RSHRENjhmRnBIUWl2dVB1eUVnbStYU0FWNjYwMEdq?=
+ =?utf-8?B?YkJ2cUI4Tk9ydzBWczJGSytOVy9SRmEvRlJJZzlOaVNTSE5xcEgrSGYwdFVE?=
+ =?utf-8?B?M2J5S2dWdWZSMTkxUXZvSElvNVVteCtabXFsSUJ6dnlON0RKdlBFUEZDSDhO?=
+ =?utf-8?B?NzJnL2s4by93d3VTWnBmL2piT2FXQ0l0bTcvSWZuTVoxNmYzUTFTWGpOR0xq?=
+ =?utf-8?B?bzlJdytTWllvZWUzcUxWTEFkQ05YZGVlNWJGWkcrUmlFY3U4U2k1QkJLTlN1?=
+ =?utf-8?B?aEowenpMQm5vUVU5UStLSmI1ZWNHcUU0VkErM2tUZEFKN3VnNFFsRGtEdFdQ?=
+ =?utf-8?B?VGMzYUg1bHBZUFd0R2lFZFhMekQzTXprYmZmWVhQTkk1NzY4QStHT1p5ZDli?=
+ =?utf-8?B?djcxakVZTXJsRkhHQkJwcjhlOWdrZGZXa2dPcDJPekJxdmJLVkF5MXpBeno2?=
+ =?utf-8?B?bXBxbWhvUjU2VHZHdko5Mm9keXl5Um9kcHkxUUt0amtRdVY0WG1SSlRtU0xw?=
+ =?utf-8?B?TGFRNEdQenk2Z21OL3NkU1QwcHNMQ0JLWkcrRkhYQzNlSlNZQUMrQTNFeXhn?=
+ =?utf-8?B?ZzI2c2U0ak9veXAvMHNVOXNmOGVDV1RzcVpkVlVOWlB1L1NTQXNFK1gwVE0z?=
+ =?utf-8?Q?AioUMDh+hrjVg9J08oTxpZ7jzfkc9ba1fW8s1fjU6CYI?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7e0fed92-ab80-40b5-6879-08da90e2dc7c
+X-MS-Exchange-CrossTenant-AuthSource: BN8PR12MB3587.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2022 15:08:46.3902
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QV47T9OAiJtw7mQ7JzddFVQeTdQ2eFxwWDwSg2+es0YbMK7V2BC76R7aPRiGO4eZ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4149
+X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,39 +137,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 07, 2022, František Šumšal wrote:
-> Hello!
-> 
-> In our Arch Linux part of the upstream systemd CI I recently noticed an
-> uptrend in CPU soft lockups when running one of our tests. This test runs
-> several systemd-nspawn containers in succession and sometimes the underlying
-> VM locks up due to a CPU soft lockup
+Am 07.09.22 um 14:03 schrieb Christoph Hellwig:
+> On Tue, Sep 06, 2022 at 12:38:44PM +0200, Christian König wrote:
+>> The problem is once more that this is MMIO space, in other words register
+>> BARs which needs to be exported/imported.
+> Everything used for P2P is bar space.
+>
+>> Adding struct pages for it generally sounds like the wrong approach here.
+>> You can't even access this with the CPU or would trigger potentially
+>> unwanted hardware actions.
+> How would an access from the CPU vs anther device make any difference?
 
-By "underlying VM", do you mean L1 or L2?  Where
+The key point is that you can't do any CPU fallback with this as long as 
+the CPU wouldn't do exactly the same thing as the original hardware 
+device. E.g. not write combine nor do any fully page copies etc...
 
-    L0 == Bare Metal
-    L1 == Arch Linux (KVM, 5.19.5-arch1-1/5.19.7-arch1-1)
-    L2 == Arch Linux (nested KVM or QEMU TCG, 5.19.5-arch1-1/5.19.7-arch1-1)
+See what happens here is not really P2P DMA transfer, but rather P2P 
+signaling of events.
 
-> (just to clarify, the topology is: CentOS Stream 8 (baremetal,
-> 4.18.0-305.3.1.el8) -> Arch Linux (KVM, 5.19.5-arch1-1/5.19.7-arch1-1) ->
-> Arch Linux (nested KVM or QEMU TCG, happens with both,
-> 5.19.5-arch1-1/5.19.7-arch1-1) -> nspawn containers).
+For a simple example think of a camera and a video codec. The camera is 
+pumping video data into system memory the video codec should encode into 
+an H264 stream.
 
-Since this repros with TCG, that rules out nested KVM as the cuplrit.
+So after every frame the camera hardware issues a P2P write into the BAR 
+of the video codec to signal that the frame is completed and it can 
+start decoding.
 
-> I did some further testing, and it reproduces even when the baremetal is my
-> local Fedora 36 machine (5.17.12-300.fc36.x86_64).
-> 
-> Unfortunately, I can't provide a simple and reliable reproducer, as I can
-> reproduce it only with that particular test and not reliably (sometimes it's
-> the first iteration, sometimes it takes an hour or more to reproduce).
-> However, I'd be more than glad to collect more information from one such
-> machine, if possible.
+This is not even a memory write, but rather just some trigger event. 
+That's essentially the background why I think having struct pages and 
+sg_tables doesn't make any sense at all for this use case.
 
-...
+>> Would you mind if I start to tackle this problem?
+> Yes, I've been waiting forever for someone to tacke how the scatterlist
+> is abused in dma-buf..
 
-> Also, in one instance, the machine died with:
+How about we separate the scatterlist into page and DMA address container?
 
-Probably unrelated, but same question as above: which layer does "the machine"
-refer to?
+Regards,
+Christian.
