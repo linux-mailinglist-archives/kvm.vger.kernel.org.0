@@ -2,64 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 44C1A5AFB70
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 06:53:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E3A75AFB89
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 07:06:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229559AbiIGExN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 00:53:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58838 "EHLO
+        id S229697AbiIGFGe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 01:06:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229472AbiIGExM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 00:53:12 -0400
-Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49BB58035E
-        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 21:53:10 -0700 (PDT)
-Received: by mail-vs1-xe30.google.com with SMTP id c3so13745672vsc.6
-        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 21:53:10 -0700 (PDT)
+        with ESMTP id S229605AbiIGFGc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 01:06:32 -0400
+Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 039589C221
+        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 22:06:31 -0700 (PDT)
+Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-12803ac8113so83746fac.8
+        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 22:06:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date;
-        bh=IB8D7t/VEzk35ELr98MItPXiflxE6OsuKH8uCTmfVu0=;
-        b=N1hXa/JWneN7X9IKmS2ao6iy9YLDaictBmMhbFg9cxBE0NkduKrzAFcYl/y/xmoyzt
-         3xH52+Rrdxv1/XQHNpBESXIuZb04hiO8kTyT5HpGbf32y40cBBgBt72l7BapgBjNFcx4
-         zS/Ng4Kpxj1EsZ9Umceh5gRXPh2dfwTZ3IN3pc46taHI4yt8KPpEz3UMHC8sFRmcJ4XB
-         LaWRtRKHYlXpNuRfvtU8CSlYXws1Yfxg9QQxhizldcDJgXvUC00ImExcNMF6UMhuHW1B
-         adGT/aC3XvK7X45UkNBLfAM5f6lPc59hCxPJh/Li/4DwqzGSDk9ihVf/C0ZcVmCBFcAp
-         Y8GQ==
+        bh=PuiKfvs0LWAFr8O4tXDEiRE5L2gc12ma++oYFMovvEU=;
+        b=HiAdJ/axcwhcheeTKmxwxPlJ3kkpkpWVXXbMlfVAxshrVHB3RXTsEPc76wdtNg++Ul
+         hs4GW0KDXPNwRfjyV1Vx9TSn/VpKF56LdGj0hygoXLfkabTG4kCC47aNL7OS+anUL8NU
+         SHAGzhw4jhbjLjoGYRQVK8ly5/zLCX8nWH1MMTGJ2E9d93z2ozA455tVTjdP/fVASAG7
+         Eml7f5DqE2LL6uCi7afSC2RvsH1Yo7W+fYTLrXxh386gXmQNCgX/nHjAZ0uje/zGU3tH
+         3Hwh38WZoY+WSAuFEzxl0oOniXN6S1jtzddhoUCscPpQUsBy0JhbZJ/u9AnkRN/9XnLu
+         Sjrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=IB8D7t/VEzk35ELr98MItPXiflxE6OsuKH8uCTmfVu0=;
-        b=hvk9hUHUBRg2yu8hYUn7SI1YDiRdFr5u5qQ4dITjlOm9kYL5PGl2JgwUIUpiYOiZXQ
-         gaX8PIwummBWAmeDciEWoUCWrlJaS1uYqLPsbgupmCM4wco6WN+1YyedXzI1gYw/R/6t
-         MQUhbl6dWPgIC6rdFgm6t6AsE33agXb1i8Fxz2DUiWxo+b455hLpHor5EGN/xHoGlKE5
-         BcJQKYAua+xQk/VuyLg23oQU8A863SGp8R0110W2luGg0pnGZS0QVjDyJF4alQs8lFEq
-         R6z7RVMVTahNYcEUT40dPlNrunFXREmlMaQn5mQsQ0RzQCE8/ODk4iQAP+HGPhzqCsN3
-         +spA==
-X-Gm-Message-State: ACgBeo0BgaSenDYsSpOiLpfOGmYZiJOZgwNZ+Z7QOTLnnb1YQYIVD71P
-        kpnGyZRBxDF8X1qVIugwP/WbXyw6YMt0yIXA7c9BxQ==
-X-Google-Smtp-Source: AA6agR4rCcd4O9978QvJHzO0pfaEsiyK7hjVqXjHxCjrcSZ0IqTMgr7I9V1ZuIniIvotAbRsX7V2bCI8HVlzNIUociw=
-X-Received: by 2002:a67:b009:0:b0:38a:e0f2:4108 with SMTP id
- z9-20020a67b009000000b0038ae0f24108mr514173vse.9.1662526389280; Tue, 06 Sep
- 2022 21:53:09 -0700 (PDT)
+        bh=PuiKfvs0LWAFr8O4tXDEiRE5L2gc12ma++oYFMovvEU=;
+        b=1dUmFBgRghbtyKtzAX6dFl7AmgETe2DpJQCKNyjgzyxoCHs+5D89VXuBnC1SfASS3N
+         MS08NXvlfKxQyReD8PrzXxYALBCnQk25y/F9SdmPJ+bmlWnDG68mZSpcEC30QF9mzohB
+         1iZXnuDosoQhDJZsiIks0oh8+IDJSTLJeIDWFCQBMWPlD27gXs4rGUazkNczg7unWx5I
+         aSRT/Y0FiuZCEkrMrBdeOM4VTSeXC1OKtfmk3I2musr2P/hiSL1BSgq6wMTWw6sG/fEE
+         TioCkxdo/DGcEEr8gTNjBhdkdEM0ol4Pcc102j0p+hAjLeU9PjnE4BAyAK6Pof37Xhf6
+         Gb5g==
+X-Gm-Message-State: ACgBeo1pEY3Miodi12sSeYKYo0HVwI7mf14eXQwBJCu6Pf+UhpJEgqtM
+        yHZuPOkyr4KZiNKG/kjSmMWZS3VF28VKZDOK87WwNw==
+X-Google-Smtp-Source: AA6agR68KEmYYa6UEG7EGujrK2R8QAdI92tuwkfI6jdcPL7421NRztQt6frx3ojGnuI2XSq/LIK2lBPgUVyLYIJYg9Y=
+X-Received: by 2002:a05:6870:41d0:b0:126:5d06:28a5 with SMTP id
+ z16-20020a05687041d000b001265d0628a5mr895080oac.181.1662527189600; Tue, 06
+ Sep 2022 22:06:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220902154804.1939819-1-oliver.upton@linux.dev> <20220902154804.1939819-7-oliver.upton@linux.dev>
-In-Reply-To: <20220902154804.1939819-7-oliver.upton@linux.dev>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Tue, 6 Sep 2022 21:52:53 -0700
-Message-ID: <CAAeT=FxARdyXJyDgh_E4L-w0azuCY+47WgoM9MheBwyS8SdX1Q@mail.gmail.com>
-Subject: Re: [PATCH v2 6/7] KVM: arm64: Treat 32bit ID registers as RAZ/WI on
- 64bit-only system
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+References: <20220906081604.24035-1-likexu@tencent.com> <CALMp9eSQYp-BC_hERH0jzqY1gKU3HLV2YnJDjaAoR7DxRQu=fQ@mail.gmail.com>
+ <2c9c1e8a-7ab5-8052-3e99-b4ebfd61edde@gmail.com>
+In-Reply-To: <2c9c1e8a-7ab5-8052-3e99-b4ebfd61edde@gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 6 Sep 2022 22:06:18 -0700
+Message-ID: <CALMp9eRzmKAs5SvTjrG7+het7zfJqk2bFuU1fdqf8pFB2+0qvw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/pmu: omit "impossible" Intel counter MSRs from
+ MSR list
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
@@ -73,129 +71,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Oliver,
+On Tue, Sep 6, 2022 at 8:25 PM Like Xu <like.xu.linux@gmail.com> wrote:
+>
+> On 7/9/2022 8:37 am, Jim Mattson wrote:
+> > On Tue, Sep 6, 2022 at 1:16 AM Like Xu <like.xu.linux@gmail.com> wrote:
+> >>
+> >> From: Like Xu <likexu@tencent.com>
+> >>
+> >> According to Intel April 2022 SDM - Table 2-2. IA-32 Architectural MSRs,
+> >> combined with the address reservation ranges of PERFCTRx, EVENTSELy, and
+> >> MSR_IA32_PMCz, the theoretical effective maximum value of the Intel GP
+> >> counters is 14, instead of 18:
+> >>
+> >>    14 = 0xE = min (
+> >>      0xE = IA32_CORE_CAPABILITIES (0xCF) - IA32_PMC0 (0xC1),
+> >>      0xF = IA32_OVERCLOCKING_STATUS (0x195) - IA32_PERFEVTSEL0 (0x186),
+> >>      0xF = IA32_MCG_EXT_CTL (0x4D0) - IA32_A_PMC0 (0x4C1)
+> >>    )
+> >>
+> >> the source of the incorrect number may be:
+> >>    18 = 0x12 = IA32_PERF_STATUS (0x198) - IA32_PERFEVTSEL0 (0x186)
+> >> but the range covers IA32_OVERCLOCKING_STATUS, which is also architectural.
+> >> Cut the list to 14 entries to avoid false positives.
+> >>
+> >> Cc: Kan Liang <kan.liang@linux.intel.com>
+> >> Cc: Jim Mattson <jamttson@google.com>
+> >
+> > That should be 'jmattson.'
+>
+> Oops, my fault.
+>
+> >
+> >> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> >> Fixes: cf05a67b68b8 ("KVM: x86: omit "impossible" pmu MSRs from MSR list")
+> >
+> > I'm not sure I completely agree with the "Fixes," since
+> > IA32_OVERCLOCKING_STATUS didn't exist back then. However, Paolo did
+> > make the incorrect assumption that Intel wouldn't cut the range even
+> > further with the introduction of new MSRs.
+>
+> This new msr is added in April 2022.
+>
+> Driver-like software had to keep up with real hardware changes and
+> speculatively with potential predictable hardware changes until failure.
+>
+> >
+> > To that point, aren't you setting yourself up for a future "Fixes"
+> > referencing this change?
+>
+> (1) We have precedents like be4f3b3f8227;
+> (2) Fixes tags is introduced to help stable trees' maintainers (and their robot
+> selectors)
+> absorb suitable patches like this one. We can expect similar issues with stable
+> trees running
+> on new hardware without this fix.
+> (3) Fixing the tags does not feather the developer's nest, on the contrary the
+> upstream code
+> itself as a vehicle for our group knowledge, is reinforced.
+> >
+> > We should probably stop at the maximum number of GP PMCs supported
+> > today (8, I think).
+>
+> I actually thought that at first, until I saw the speculative offset +17 :D.
 
-On Fri, Sep 2, 2022 at 8:48 AM Oliver Upton <oliver.upton@linux.dev> wrote:
->
-> One of the oddities of the architecture is that the AArch64 views of the
-> AArch32 ID registers are UNKNOWN if AArch32 isn't implemented at any EL.
-> Nonetheless, KVM exposes these registers to userspace for the sake of
-> save/restore. It is possible that the UNKNOWN value could differ between
-> systems, leading to a rejected write from userspace.
->
-> Avoid the issue altogether by handling the AArch32 ID registers as
-> RAZ/WI when on an AArch64-only system.
->
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/sys_regs.c | 63 ++++++++++++++++++++++++++-------------
->  1 file changed, 43 insertions(+), 20 deletions(-)
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 6d0511247df4..9569772cf09a 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1144,6 +1144,20 @@ static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
->         return 0;
->  }
->
-> +static unsigned int aa32_id_visibility(const struct kvm_vcpu *vcpu,
-> +                                      const struct sys_reg_desc *r)
-> +{
-> +       /*
-> +        * AArch32 ID registers are UNKNOWN if AArch32 isn't implemented at any
-> +        * EL. Promote to RAZ/WI in order to guarantee consistency between
-> +        * systems.
-> +        */
-> +       if (!kvm_supports_32bit_el0())
-> +               return REG_RAZ | REG_USER_WI;
-> +
-> +       return id_visibility(vcpu, r);
-> +}
-> +
->  static unsigned int raz_visibility(const struct kvm_vcpu *vcpu,
->                                    const struct sys_reg_desc *r)
->  {
-> @@ -1331,6 +1345,15 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
->         .visibility = id_visibility,            \
->  }
->
-> +/* sys_reg_desc initialiser for known cpufeature ID registers */
-> +#define AA32_ID_SANITISED(name) {              \
-> +       SYS_DESC(SYS_##name),                   \
-> +       .access = access_id_reg,                \
-> +       .get_user = get_id_reg,                 \
-> +       .set_user = set_id_reg,                 \
-> +       .visibility = aa32_id_visibility,       \
-> +}
-> +
->  /*
->   * sys_reg_desc initialiser for architecturally unallocated cpufeature ID
->   * register with encoding Op0=3, Op1=0, CRn=0, CRm=crm, Op2=op2
-> @@ -1418,33 +1441,33 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->
->         /* AArch64 mappings of the AArch32 ID registers */
->         /* CRm=1 */
-> -       ID_SANITISED(ID_PFR0_EL1),
-> -       ID_SANITISED(ID_PFR1_EL1),
-> -       ID_SANITISED(ID_DFR0_EL1),
-> +       AA32_ID_SANITISED(ID_PFR0_EL1),
-> +       AA32_ID_SANITISED(ID_PFR1_EL1),
-> +       AA32_ID_SANITISED(ID_DFR0_EL1),
->         ID_HIDDEN(ID_AFR0_EL1),
-> -       ID_SANITISED(ID_MMFR0_EL1),
-> -       ID_SANITISED(ID_MMFR1_EL1),
-> -       ID_SANITISED(ID_MMFR2_EL1),
-> -       ID_SANITISED(ID_MMFR3_EL1),
-> +       AA32_ID_SANITISED(ID_MMFR0_EL1),
-> +       AA32_ID_SANITISED(ID_MMFR1_EL1),
-> +       AA32_ID_SANITISED(ID_MMFR2_EL1),
-> +       AA32_ID_SANITISED(ID_MMFR3_EL1),
->
->         /* CRm=2 */
-> -       ID_SANITISED(ID_ISAR0_EL1),
-> -       ID_SANITISED(ID_ISAR1_EL1),
-> -       ID_SANITISED(ID_ISAR2_EL1),
-> -       ID_SANITISED(ID_ISAR3_EL1),
-> -       ID_SANITISED(ID_ISAR4_EL1),
-> -       ID_SANITISED(ID_ISAR5_EL1),
-> -       ID_SANITISED(ID_MMFR4_EL1),
-> -       ID_SANITISED(ID_ISAR6_EL1),
-> +       AA32_ID_SANITISED(ID_ISAR0_EL1),
-> +       AA32_ID_SANITISED(ID_ISAR1_EL1),
-> +       AA32_ID_SANITISED(ID_ISAR2_EL1),
-> +       AA32_ID_SANITISED(ID_ISAR3_EL1),
-> +       AA32_ID_SANITISED(ID_ISAR4_EL1),
-> +       AA32_ID_SANITISED(ID_ISAR5_EL1),
-> +       AA32_ID_SANITISED(ID_MMFR4_EL1),
-> +       AA32_ID_SANITISED(ID_ISAR6_EL1),
->
->         /* CRm=3 */
-> -       ID_SANITISED(MVFR0_EL1),
-> -       ID_SANITISED(MVFR1_EL1),
-> -       ID_SANITISED(MVFR2_EL1),
-> +       AA32_ID_SANITISED(MVFR0_EL1),
-> +       AA32_ID_SANITISED(MVFR1_EL1),
-> +       AA32_ID_SANITISED(MVFR2_EL1),
->         ID_UNALLOCATED(3,3),
-> -       ID_SANITISED(ID_PFR2_EL1),
-> +       AA32_ID_SANITISED(ID_PFR2_EL1),
->         ID_HIDDEN(ID_DFR1_EL1),
+The root cause of all of this pain is commit a072738e04f0 ("perf, x86:
+Implement initial P4 PMU driver"). It bumped X86_PMC_MAX_GENERIC from
+8 to 32. That eventually mutated into INTEL_PMC_MAX_GENERIC, which is
+what I consulted when I originally added the Intel PMU MSRs to
+msrs_to_save[] in
+commit e2ada66ec418 ("kvm: x86: Add Intel PMU MSRs to
+msrs_to_save[]"). My bad for just assuming that I knew what
+INTEL_PMC_MAX_GENERIC meant, based solely on its name!
 
-Perhaps it might be better to handle ID_AFR0_EL1 and ID_DFR1_EL1
-in the same way as the other AArch32 ID registers for consistency ?
-(i.e. treat them RAZ/USER_WI instead of RAZ if kvm_supports_32bit_el0()
- is false instead of RAZ)
+Paolo fixed my commit by reducing the list to 18 PMCs, because of the
+known conflict at the time. (Note that the SDM says that there are
+actually only 18 PMCs on the P4, but I don't think Paolo factored this
+into his change.)
 
-Thank you,
-Reiji
-
-
-> -       ID_SANITISED(ID_MMFR5_EL1),
-> +       AA32_ID_SANITISED(ID_MMFR5_EL1),
->         ID_UNALLOCATED(3,7),
->
->         /* AArch64 ID registers */
-> --
-> 2.37.2.789.g6183377224-goog
->
+This is all the more reason *not* to put a static list of PMU MSRs
+into msrs_to_save[], but to dynamically add the PMU MSRs supported on
+the host. If you're on a P4, there will be 18 of them, but they range
+from 0x300 to 0x311.
