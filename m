@@ -2,232 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AAA2F5AFAFA
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 06:12:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 367AA5AFB00
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 06:13:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229677AbiIGEMJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 00:12:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32998 "EHLO
+        id S229723AbiIGENq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 00:13:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229627AbiIGEMH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 00:12:07 -0400
-Received: from mail-oa1-x2b.google.com (mail-oa1-x2b.google.com [IPv6:2001:4860:4864:20::2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEC267FE5E
-        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 21:12:03 -0700 (PDT)
-Received: by mail-oa1-x2b.google.com with SMTP id 586e51a60fabf-1278a61bd57so14638348fac.7
-        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 21:12:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=BFj3mGZHr9XxUQGoHBeMyU6gWYy0BtRLXs5VJDlq6ME=;
-        b=AKBHTlrWuDM+vsfTYx+NFKyB1uAN3NBrNCbUvm0gP5zXeoaVuC4tPEXVhLeWtTRSnZ
-         28UFqDwSZHMf3bC6PD+TRWpUEWJDjth6stOsfNfeTwSH3jM/hVhtx2SkB24qZiphCazG
-         p9NPil0P1n+kxzMi+Mg9PPSHrrK4lS3+/8QAJVCGy7a3GjHaNgwO4PsqqN1KI3ht7h1p
-         6lsrdQO7UQChV2Pr26lnlatyCL4h7OclwUIK1Bz1ABt4TML2XtGWdmFfbAyNzzf5Zhti
-         Qdsjq3Uwe1XvCIzwgELILk+8t6o5m811brP1EhZ7Tif2KYWfxCoJJR+orXPuPH2YTWW4
-         cQSw==
+        with ESMTP id S229682AbiIGENp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 00:13:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ADEA80F44
+        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 21:13:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662524023;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QAjDz4sR+CkkuN65TaxyzVYEg4bR36wJx58FYQ4lykw=;
+        b=VPhVXT1i2843BdHopm5pbxzFyuHlZ7JA5/Z4WjhypaKbbWmL5luVlufY19gpHj0NiKSAq4
+        PfCF/PSv2spAvweabpii3d2NOJoqFv8/vvvoUVcsHEVDOinDvTIN3cXvxptQMjWKq2L+XR
+        JcmMyoJiVHeQKkj0OQou0fYo9eIySMo=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-119-wRpo_TfwOiakh1PHgccodQ-1; Wed, 07 Sep 2022 00:13:41 -0400
+X-MC-Unique: wRpo_TfwOiakh1PHgccodQ-1
+Received: by mail-pj1-f71.google.com with SMTP id z8-20020a17090a014800b001fac4204c7eso5895961pje.8
+        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 21:13:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=BFj3mGZHr9XxUQGoHBeMyU6gWYy0BtRLXs5VJDlq6ME=;
-        b=nzx1kP/1zFicotY0gdEXkXkG2PDA0z3celNiIfq4eLruUOt/r241DN9BFuqYVePhHi
-         1SgSIwEc/x4UGOnuLsJTxvDGxH/zzzCjqCcJuDzrzw+1IN8/J/X/hD4OraBrmRy6HbLO
-         FVwb0lkrMjSCCGnV/c7Oc9jVIPn2GPH43gaWW9QLgzrCy7wA55TCQ5IlZo1jFKsPZwXs
-         YCXcWH1XTh/TWhoKbRvqhy+6VpiKbVTWHlmwmMkI4HYHQWkAO8bWV7/6p5XG1tRQePeN
-         aA+h/xKt6mKwIuh2cYBjfFGq2k8r5dFfv5N51USjUzLb6h5zg9MTmGfEq+gvOBjgFzPL
-         CHdQ==
-X-Gm-Message-State: ACgBeo18b1kJl99+ZYuOklOh6MAXFBcj447rNMzxGRN90QBoR4sj7+VK
-        oFegYCWM+q+CQAXlbTkwbi28/BGRg+yzm4xDxdBT+w==
-X-Google-Smtp-Source: AA6agR4AuHpv2JvDK8XjYcOaeWAO/x49CJx1chwFnDGTHGVuPDZkW52fw6IOt3HL14grS9kper+4uhTB0NyzGfQ7JHo=
-X-Received: by 2002:a05:6870:41d0:b0:126:5d06:28a5 with SMTP id
- z16-20020a05687041d000b001265d0628a5mr821542oac.181.1662523923026; Tue, 06
- Sep 2022 21:12:03 -0700 (PDT)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=QAjDz4sR+CkkuN65TaxyzVYEg4bR36wJx58FYQ4lykw=;
+        b=pFaYdSJ5UAqWwrGFF7uvCxyiqwZOv0jLwYw/+nam3sDgIJQU9VlgTt9yC8GU1TDzi9
+         bdnE7xc161tQRMBjunRcW/nPS0tluwJKExbq+frsYgQiMfr7aKzDAS3gglxdr78k0cxe
+         nX5yp5N1poTqrTaYjihoY3Ib3jXNuwR58/vZb8ENaWsDEm8BCpGHZnOSzKna4Lgvf/V+
+         1OUbCAwxfj2GlOibOaHUb+CqJNLSH3SN4sM7Rwa2HQ6Kc0g+B/sbsjIa38Hwu0UUyCIY
+         qKZ4FZJdru7C4MvNbXQqgSUtYa6OS71Q6DrWs7nB2t6yuX8H9VobwsBw93MJhe6mtpg6
+         1yGA==
+X-Gm-Message-State: ACgBeo1XE/xEoh5tIDDy8ih0pRWBodzwHxHIAHjDGg8t6fxfruS4rasC
+        7Za+tsRy/jEVtI2Jol/5m0JC3VIl/ugqYG49xNwVfAfnCJMkWWFwTA2+f6oA8iMcJoy7AXcUWWq
+        qmMdRsBUwlxVv
+X-Received: by 2002:a17:90b:164f:b0:1f5:4ced:ed81 with SMTP id il15-20020a17090b164f00b001f54ceded81mr27894929pjb.122.1662524020662;
+        Tue, 06 Sep 2022 21:13:40 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR6tb2znMua0rzcLRn+uEQoCxTA59Ra17knzBtFeDBJjJ2A8wstPFAsHDWkW6ISWVk/3jYZOcA==
+X-Received: by 2002:a17:90b:164f:b0:1f5:4ced:ed81 with SMTP id il15-20020a17090b164f00b001f54ceded81mr27894912pjb.122.1662524020456;
+        Tue, 06 Sep 2022 21:13:40 -0700 (PDT)
+Received: from [10.72.13.171] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id w13-20020a1709027b8d00b0016c0eb202a5sm10856284pll.225.2022.09.06.21.13.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Sep 2022 21:13:40 -0700 (PDT)
+Message-ID: <f02e4c7a-3cbe-20dd-fdea-77dfcae7b67e@redhat.com>
+Date:   Wed, 7 Sep 2022 12:13:32 +0800
 MIME-Version: 1.0
-References: <20220905123946.95223-1-likexu@tencent.com> <20220905123946.95223-5-likexu@tencent.com>
- <CALMp9eQtjZ-iRiW5Jusa+NF-P0sdHtcoR8fPiBSKtNXKgstgVA@mail.gmail.com>
- <0e0f773b-0dde-2282-c2d0-fad2311f59a7@gmail.com> <CALMp9eQQe-XDUZmNtg5Z+Vv8hMu_R_fuTv2+-ZfuRwzNUmW0fA@mail.gmail.com>
- <d63e79d8-fcbc-9def-4a90-e7a4614493bb@gmail.com>
-In-Reply-To: <d63e79d8-fcbc-9def-4a90-e7a4614493bb@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 6 Sep 2022 21:11:51 -0700
-Message-ID: <CALMp9eSXTpkKpmqJiS=0NuQOjCFKDeOqjN3wWfyPCBhx-H=Vsw@mail.gmail.com>
-Subject: Re: [PATCH 4/4] KVM: x86/cpuid: Add AMD CPUID ExtPerfMonAndDbg leaf 0x80000022
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sandipan Das <sandipan.das@amd.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.13.0
+Subject: Re: [RFC v3 0/7] In order support for virtio_ring, vhost and vsock.
+Content-Language: en-US
+To:     Guo Zhi <qtxuning1999@sjtu.edu.cn>, eperezma@redhat.com,
+        sgarzare@redhat.com, mst@redhat.com
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+References: <20220901055434.824-1-qtxuning1999@sjtu.edu.cn>
+From:   Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20220901055434.824-1-qtxuning1999@sjtu.edu.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 6, 2022 at 8:59 PM Like Xu <like.xu.linux@gmail.com> wrote:
+
+在 2022/9/1 13:54, Guo Zhi 写道:
+> In virtio-spec 1.1, new feature bit VIRTIO_F_IN_ORDER was introduced.
+> When this feature has been negotiated, virtio driver will use
+> descriptors in ring order: starting from offset 0 in the table, and
+> wrapping around at the end of the table. Vhost devices will always use
+> descriptors in the same order in which they have been made available.
+> This can reduce virtio accesses to used ring.
 >
-> On 7/9/2022 4:08 am, Jim Mattson wrote:
-> > On Tue, Sep 6, 2022 at 5:53 AM Like Xu <like.xu.linux@gmail.com> wrote:
-> >>
-> >> On 6/9/2022 1:36 am, Jim Mattson wrote:
-> >>> On Mon, Sep 5, 2022 at 5:45 AM Like Xu <like.xu.linux@gmail.com> wrote:
-> >>>>
-> >>>> From: Sandipan Das <sandipan.das@amd.com>
-> >>>>
-> >>>> CPUID leaf 0x80000022 i.e. ExtPerfMonAndDbg advertises some
-> >>>> new performance monitoring features for AMD processors.
-> >>>>
-> >>>> Bit 0 of EAX indicates support for Performance Monitoring
-> >>>> Version 2 (PerfMonV2) features. If found to be set during
-> >>>> PMU initialization, the EBX bits of the same CPUID function
-> >>>> can be used to determine the number of available PMCs for
-> >>>> different PMU types.
-> >>>>
-> >>>> Expose the relevant bits via KVM_GET_SUPPORTED_CPUID so
-> >>>> that guests can make use of the PerfMonV2 features.
-> >>>>
-> >>>> Co-developed-by: Like Xu <likexu@tencent.com>
-> >>>> Signed-off-by: Like Xu <likexu@tencent.com>
-> >>>> Signed-off-by: Sandipan Das <sandipan.das@amd.com>
-> >>>> ---
-> >>>>    arch/x86/include/asm/perf_event.h |  8 ++++++++
-> >>>>    arch/x86/kvm/cpuid.c              | 21 ++++++++++++++++++++-
-> >>>>    2 files changed, 28 insertions(+), 1 deletion(-)
-> >>>>
-> >>>> diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
-> >>>> index f6fc8dd51ef4..c848f504e467 100644
-> >>>> --- a/arch/x86/include/asm/perf_event.h
-> >>>> +++ b/arch/x86/include/asm/perf_event.h
-> >>>> @@ -214,6 +214,14 @@ union cpuid_0x80000022_ebx {
-> >>>>           unsigned int            full;
-> >>>>    };
-> >>>>
-> >>>> +union cpuid_0x80000022_eax {
-> >>>> +       struct {
-> >>>> +               /* Performance Monitoring Version 2 Supported */
-> >>>> +               unsigned int    perfmon_v2:1;
-> >>>> +       } split;
-> >>>> +       unsigned int            full;
-> >>>> +};
-> >>>> +
-> >>>>    struct x86_pmu_capability {
-> >>>>           int             version;
-> >>>>           int             num_counters_gp;
-> >>>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> >>>> index 75dcf7a72605..08a29ab096d2 100644
-> >>>> --- a/arch/x86/kvm/cpuid.c
-> >>>> +++ b/arch/x86/kvm/cpuid.c
-> >>>> @@ -1094,7 +1094,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
-> >>>>                   entry->edx = 0;
-> >>>>                   break;
-> >>>>           case 0x80000000:
-> >>>> -               entry->eax = min(entry->eax, 0x80000021);
-> >>>> +               entry->eax = min(entry->eax, 0x80000022);
-> >>>>                   /*
-> >>>>                    * Serializing LFENCE is reported in a multitude of ways, and
-> >>>>                    * NullSegClearsBase is not reported in CPUID on Zen2; help
-> >>>> @@ -1203,6 +1203,25 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
-> >>>>                   if (!static_cpu_has_bug(X86_BUG_NULL_SEG))
-> >>>>                           entry->eax |= BIT(6);
-> >>>>                   break;
-> >>>> +       /* AMD Extended Performance Monitoring and Debug */
-> >>>> +       case 0x80000022: {
-> >>>> +               union cpuid_0x80000022_eax eax;
-> >>>> +               union cpuid_0x80000022_ebx ebx;
-> >>>> +
-> >>>> +               entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
-> >>>> +               if (!enable_pmu)
-> >>>> +                       break;
-> >>>> +
-> >>>> +               if (kvm_pmu_cap.version > 1) {
-> >>>> +                       /* AMD PerfMon is only supported up to V2 in the KVM. */
-> >>>> +                       eax.split.perfmon_v2 = 1;
-> >>>> +                       ebx.split.num_core_pmc = min(kvm_pmu_cap.num_counters_gp,
-> >>>> +                                                    KVM_AMD_PMC_MAX_GENERIC);
-> >>>
-> >>> Note that the number of core PMCs has to be at least 6 if
-> >>> guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE). I suppose this leaf
-> >>> could claim fewer, but the first 6 PMCs must work, per the v1 PMU
-> >>> spec. That is, software that knows about PERFCTR_CORE, but not about
-> >>> PMU v2, can rightfully expect 6 PMCs.
-> >>
-> >> I thought the NumCorePmc number would only make sense if
-> >> CPUID.80000022.eax.perfmon_v2
-> >> bit was present, but considering that the user space is perfectly fine with just
-> >> configuring the
-> >> NumCorePmc number without setting perfmon_v2 bit at all, so how about:
-> >
-> > CPUID.80000022H might only make sense if X86_FEATURE_PERFCTR_CORE is
-> > present. It's hard to know in the absence of documentation.
+> Based on updated virtio-spec, this series realized IN_ORDER prototype in virtio
+> driver and vhost. Currently IN_ORDER feature supported devices are *vhost_test*
+> and *vsock* in vhost and virtio-net in QEMU. IN_ORDER feature works well
+> combined with INDIRECT feature in this patch series.
+
+
+As stated in the previous versions, I'd like to see performance numbers. 
+We need to prove that the feature actually help for the performance.
+
+And it would be even better if we do the in-order in this order (vhost 
+side):
+
+1) enable in-order but without batching used
+2) enable in-order with batching used
+
+Then we can see how:
+
+1) in-order helps
+2) batching helps
+
+Thanks
+
+
 >
-> Whenever this happens, we may always leave the definition of behavior to the
-> hypervisor.
-
-I disagree. If CPUID.0H reports "AuthenticAMD," then AMD is the sole
-authority on behavior.
-
-> >
-> >>          /* AMD Extended Performance Monitoring and Debug */
-> >>          case 0x80000022: {
-> >>                  union cpuid_0x80000022_eax eax;
-> >>                  union cpuid_0x80000022_ebx ebx;
-> >>                  bool perfctr_core;
-> >>
-> >>                  entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
-> >>                  if (!enable_pmu)
-> >>                          break;
-> >>
-> >>                  perfctr_core = kvm_cpu_cap_has(X86_FEATURE_PERFCTR_CORE);
-> >>                  if (!perfctr_core)
-> >>                          ebx.split.num_core_pmc = AMD64_NUM_COUNTERS;
-> >>                  if (kvm_pmu_cap.version > 1) {
-> >>                          /* AMD PerfMon is only supported up to V2 in the KVM. */
-> >>                          eax.split.perfmon_v2 = 1;
-> >>                          ebx.split.num_core_pmc = min(kvm_pmu_cap.num_counters_gp,
-> >>                                                       KVM_AMD_PMC_MAX_GENERIC);
-> >>                  }
-> >>                  if (perfctr_core) {
-> >>                          ebx.split.num_core_pmc = max(ebx.split.num_core_pmc,
-> >>                                                       AMD64_NUM_COUNTERS_CORE);
-> >>                  }
-> >
-> > This still isn't quite right. All AMD CPUs must support a minimum of 4 PMCs.
+> Virtio driver in_order support for packed vq hasn't been done in this patch
+> series now.
 >
-> K7 at least. I could not confirm that all antique AMD CPUs have 4 counters w/o
-> perfctr_core.
+> Guo Zhi (7):
+>    vhost: expose used buffers
+>    vhost_test: batch used buffer
+>    vsock: batch buffers in tx
+>    vsock: announce VIRTIO_F_IN_ORDER in vsock
+>    virtio: unmask F_NEXT flag in desc_extra
+>    virtio: in order support for virtio_ring
+>    virtio: announce VIRTIO_F_IN_ORDER support
+>
+>   drivers/vhost/test.c         | 16 ++++++--
+>   drivers/vhost/vhost.c        | 16 ++++++--
+>   drivers/vhost/vsock.c        | 13 +++++-
+>   drivers/virtio/virtio_ring.c | 79 +++++++++++++++++++++++++++++++-----
+>   4 files changed, 104 insertions(+), 20 deletions(-)
+>
 
-The APM says, "All implementations support the base set of four
-performance counter / event-select pairs." That is unequivocal.
-
-> >
-> >>
-> >>                  entry->eax = eax.full;
-> >>                  entry->ebx = ebx.full;
-> >>                  break;
-> >>          }
-> >>
-> >> ?
-> >>
-> >> Once 0x80000022 appears, ebx.split.num_core_pmc will report only
-> >> the real "Number of Core Performance Counters" regardless of perfmon_v2.
-> >>
-> >>>
-> >>>
-> >>>> +               }
-> >>>> +               entry->eax = eax.full;
-> >>>> +               entry->ebx = ebx.full;
-> >>>> +               break;
-> >>>> +       }
-> >>>>           /*Add support for Centaur's CPUID instruction*/
-> >>>>           case 0xC0000000:
-> >>>>                   /*Just support up to 0xC0000004 now*/
-> >>>> --
-> >>>> 2.37.3
-> >>>>
