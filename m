@@ -2,133 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF45A5B0A44
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 18:41:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 986755B0A9F
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 18:48:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230155AbiIGQk6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 12:40:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43590 "EHLO
+        id S230451AbiIGQsT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 12:48:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbiIGQk4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 12:40:56 -0400
-Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3AC26EF28
-        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 09:40:54 -0700 (PDT)
-Received: by mail-qv1-xf2c.google.com with SMTP id m9so8476571qvv.7
-        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 09:40:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=oOtsIfLgo+dpW6bJd1WimKnWJ8hG0+yd1C7QnZJgzys=;
-        b=NLEjy+firPpiQwLoDTWKF2YlJU06b7+MpQCjV9boLFcGlndFOsSeLn4xVITIO7j1VY
-         3oYDGu/QrFrJp0lH7j5JnP43Q0ozPiidOwZiERCRViBoXL+ySmscfO84ZNklVxkzSstF
-         3z1XYaEmSgAWcdrqm0P9e/9I87jTUM2Ktdxc8OihgL204wniUGX9uooTHatLhmYtFYp6
-         NdGaE88tHGNEt514DJNVD55o6v3qLlrVmnRGTkVhWmLW5LzRlZds9toqv82dmQh5FHDv
-         65GriHVlpGkKAWAWHDojF8N+ad5NPHupswjGtn0ujB3Ap3k3VVTv6S+XsBCh1TD43pdA
-         uq/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=oOtsIfLgo+dpW6bJd1WimKnWJ8hG0+yd1C7QnZJgzys=;
-        b=gcUBlA4FddoNC2/NhLa8m1dBhApGMVP4oFVR9vlA56btgymwgcLqQkOcVbCIMHmmFZ
-         jtZnJAiKcCOUGdIiLEaQq6BVUqnQJKsXuvIDcviUZQyZeHaoLv5aR1OxYIyzYJHIwoKJ
-         d77nV/zMcV7/y56cXujtBGTP9xNnIo1AHsypM6hneEiFYzL1CdP7LWNy6dgVv0DUxmEJ
-         /g/gI5Hwwo2jvB3sqZLOoGaF0bZq+qXz1qb0VaYU/U6q1KFMhP07EwbqoTglEFwvD80W
-         jwN2f7dNeVtMeAP4gGLv4fArtpNyijo/ZKwYOU6qs5A5y9V5QCluzkJig6RcFmwc+hHq
-         ciqQ==
-X-Gm-Message-State: ACgBeo3cx0X2J0ml6tLM/NGS2juA7bY6IWIluJJAwYXbsBKYxVg8AonP
-        5YSBcRYQfhetTrg5xENUbPi0dw==
-X-Google-Smtp-Source: AA6agR5aqyqDQj8p4rDj/DRP4aqjwXj4zv8D3N4lHGDYenpdWlbkDHCrOsWAlxztCdbeU0pA3oV2wQ==
-X-Received: by 2002:a05:6214:27e4:b0:476:be6a:91c1 with SMTP id jt4-20020a05621427e400b00476be6a91c1mr3810500qvb.39.1662568854158;
-        Wed, 07 Sep 2022 09:40:54 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id x11-20020ac87ecb000000b0031ee918e9f9sm12833581qtj.39.2022.09.07.09.40.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Sep 2022 09:40:53 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1oVy6e-008gbP-Tw;
-        Wed, 07 Sep 2022 13:40:52 -0300
-Date:   Wed, 7 Sep 2022 13:40:52 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "lpivarc@redhat.com" <lpivarc@redhat.com>,
-        "Liu, Jingqi" <jingqi.liu@intel.com>,
-        "Lu, Baolu" <baolu.lu@intel.com>
-Subject: Re: [PATCH] vfio/type1: Unpin zero pages
-Message-ID: <YxjJlM5A0OLhaA7K@ziepe.ca>
-References: <166182871735.3518559.8884121293045337358.stgit@omen>
- <BN9PR11MB527655973E2603E73F280DF48C7A9@BN9PR11MB5276.namprd11.prod.outlook.com>
- <d71160d1-5a41-eae0-6405-898fe0a28696@redhat.com>
- <YxfX+kpajVY4vWTL@ziepe.ca>
- <b365f30b-da58-39c0-08e9-c622cc506afa@redhat.com>
- <YxiTOyGqXHFkR/DY@ziepe.ca>
- <20220907095552.336c8f34.alex.williamson@redhat.com>
-MIME-Version: 1.0
+        with ESMTP id S230391AbiIGQrq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 12:47:46 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2068.outbound.protection.outlook.com [40.107.94.68])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE1AFBD177;
+        Wed,  7 Sep 2022 09:47:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XoUZB923Eu2yMGfhFiDaKw1AK+aSV+AL9iTDoNQqlB38+tjNWWqgAqb6dx+2bNqZYY56BJXHqXf0e3wnfGBZ1YrIzGgHd4lI6Hv/BorL7u8uTBHf4AU/2nHi+AB5MseHbqDACgqWGQKztV3vq56twTWyr5JtjrGwLYAwEFZ8ORuI2XNnQfQVjxVjv/Ei6LH3mkH0RtY1zWEIT5UZv8eLH3nB89RSHNL/14fQu9m47KyLQGlQWQjMsizOWsci8CEY++2/igXtdAbjyS1IVT0A6VD4p4Jr8sFoGt1BjRMJyRCq2CnE3xsnO3pubN/KCnZhC2CVRkoYQkJKXrTZ/Xr0vA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Vdcod2Z9Jf31G3PE3RHoyoVDpCoDWuFSRz7PqnFKB9Y=;
+ b=kRD9o1zaVqv0UxjakaMLsIJZWIWWV6AOJgi8+bH5Btteiqt8xpXmVWvVl1jLHBJpKpx/AHCyuxNwTvveSqV2rkpGxYCxFjcvEcDlRZAvf1Zr3c2H9NixTe4CjFXT/rB3oNFCFW3Nk+OCnV9sxY90dok7ocMG8RFFXBAmRd3VX+u19zDyeveR+g0WYNlnCy+QRXIQRbsIwd6QhNN45rXhGHYgpX7AhPnBX5gNY9J7nka2AxLwqGKxBDfJnFScEXt8tJTgoV2UtBU471cFg2hBo7i9O0swRzE4bBMxPaYQ31xe6xTvxCIPENEFCF97L5iusvARmPbFfFOWI/D7LMKNxQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Vdcod2Z9Jf31G3PE3RHoyoVDpCoDWuFSRz7PqnFKB9Y=;
+ b=WueT0NL30khrYkJ/377+GYO30mU7uzjkMZo+zmDN7pVPLxdAzhf4tc6AJwB+tGlOO6vL/3I+MY8Lmc+KLruQcBirI4+bchET0V8JbPTxOH+VPhmi+yqS/ZjqvCWCz+W1VehTvUxJyS1F/jcUYzSCM2NcAOwPVSmNtCkbY9xD2e++P9IBhPT3SYPNp53STyJvbz8NegK1DcIz56E094tNFfsO/fgc6glQKkWHYB4eoZP+QPHpCz13vYJEPitjhVchN25sI/tTmWa4z65cBdf1eLHR1FrKUa/iiu+5j08GWgmY7GqyhKmLrRuTTnx8PC5DuzCtpt48meROQ+pzZFyPHQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by SJ0PR12MB6781.namprd12.prod.outlook.com (2603:10b6:a03:44b::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5612.12; Wed, 7 Sep
+ 2022 16:47:25 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5%7]) with mapi id 15.20.5588.018; Wed, 7 Sep 2022
+ 16:47:25 +0000
+Date:   Wed, 7 Sep 2022 13:47:24 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Robin Murphy <robin.murphy@arm.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Leon Romanovsky <leon@kernel.org>, kvm@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Oded Gabbay <ogabbay@kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        dri-devel@lists.freedesktop.org,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        linaro-mm-sig@lists.linaro.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Maor Gottlieb <maorg@nvidia.com>,
+        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+        linux-media@vger.kernel.org
+Subject: Re: [PATCH v2 4/4] vfio/pci: Allow MMIO regions to be exported
+ through dma-buf
+Message-ID: <YxjLHAw6rAcS/ax6@nvidia.com>
+References: <0-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
+ <4-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
+ <YxcYGzPv022G2vLm@infradead.org>
+ <b6b5d236-c089-7428-4cc9-a08fe4f6b4a3@amd.com>
+ <YxczjNIloP7TWcf2@nvidia.com>
+ <YxiJJYtWgh1l0wxg@infradead.org>
+ <YxiPh4u/92chN02C@nvidia.com>
+ <Yxiq5sjf/qA7xS8A@infradead.org>
+ <Yxi3cFfs0SA4XWJw@nvidia.com>
+ <6a42a8bc-4e2e-4502-3e7b-1a616dfee351@arm.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220907095552.336c8f34.alex.williamson@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <6a42a8bc-4e2e-4502-3e7b-1a616dfee351@arm.com>
+X-ClientProxiedBy: BL0PR1501CA0011.namprd15.prod.outlook.com
+ (2603:10b6:207:17::24) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ddbcb250-cc03-4284-b104-08da90f0a441
+X-MS-TrafficTypeDiagnostic: SJ0PR12MB6781:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fQSZS9wr5PdfIAaC6l+QowKGqlf9/JgjmY7w4YpGhKN60mI5Ab+URSz82a+j3YGxsuo4g9RSFWSOjEJ1GM9hZyYZ+olMzOWum+0un57rHoCcglMHMwCllvIhCc2tEn5Zt1A5HbzxawEX26jq0Hne7txWtvdmV29ERHiuWAAE470KrWfojAtoqoMCcLqZmuceDbmUkCHa4duq+BZv2KsW9pTvvWUrwwhoh0knL71LKVhhY9ZJpRz0PmPYx/PrTZ1nTURBDzHXv20Pn1ZPMEObYXcKJrh2YYBr8zcV26MVQAIL5HSpsVuNGcQkQk0eCFLwfV0UI7J+QZMv10iHYrGxZ7bOuU22/XhJqxi+bUsO2naZU4Xn2dzdKERMcPD/a1kCrztgHb8VQdHyKIjereNXGjmzr/xoirQe69OO5O49DtZEh6PpCc2M0sCLjs0zuVCAUz/Tqp81JSO+LHL89FABHCqSp+b/OYd4cZiJcCPft/KfG1PWprcI//eJEhRoTchOy3L3c/pm5t1rtZTWELLVJXOIot+ZinxsVotsKf/SJQxIZPIhZ8tKZ0ykqBMZsnD6RFpJw9W2YLUQunP3+kVRaoFiG1x4NFIiUyLU0Bv84k19KIMyxCxXx/FZRYaH+i3YFjHgj/YjFVyjFfgHiltlXSWJLusaMfbZBuA0n64d5zXeuOeBduGC6GrWpY8jXcCl1rQNMGDV782SD/u7Fi1frg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(376002)(39860400002)(366004)(136003)(346002)(41300700001)(86362001)(54906003)(6916009)(316002)(26005)(478600001)(6486002)(6512007)(2616005)(6506007)(186003)(8936002)(2906002)(4744005)(66476007)(8676002)(36756003)(66556008)(4326008)(5660300002)(38100700002)(66946007)(7416002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2f+y9KGuC/ViakE8e3FozVPKVWpAUDudfjRXI69MUi+snDtSAHz2MRHwjb6s?=
+ =?us-ascii?Q?bH6pcjwlvFgl+owVWSt1MUc3usufVxRUuGFYq5hDFszrmhFE/a8klMUpIwQp?=
+ =?us-ascii?Q?mnOB722H/wVg0rP/lvh2mlCH4DWueuEKgRM40lonruG/rZuF120YPVWzJkno?=
+ =?us-ascii?Q?IiDAx8W7zt+xdqMKg2L/EeVRra6DjOFmCDHM7VdG6rkkF24qSN1A6PLRsK4+?=
+ =?us-ascii?Q?szTY+Xps5xucClRQI/KMN9PaBtgE+duauDr3f1Thqgacr/jooEJd/mgH9LVn?=
+ =?us-ascii?Q?eInHUFdBpoCV+rpTMjRMSGWI/pI/noi06weMgmNfZEHBhto7coyJP+eWXBzQ?=
+ =?us-ascii?Q?1kcybpB2fc6UpBHu6TNDxCn+K9cvrOcfzVNOFBUv+50AStPK/bexHQ5Zgz4Z?=
+ =?us-ascii?Q?vjYc0FM1ZBKEvhemsENcrcWdJY4xO2mGfT2UypV9S7Jn2fOVLlvECjVn/CYH?=
+ =?us-ascii?Q?wYNiaVdZZ3J5LFED45Z7maMoo3PKYNEggJy3AS3UHqZ1LnxEJ0nfoJheV21L?=
+ =?us-ascii?Q?RZcsIoCJOOcX4wW1VRehZo7wDzG/AAEJo+N0bUopbN+wDl/Gm5Mh7HZn4230?=
+ =?us-ascii?Q?nrMj/InfAAExdZ3KCJBMDZsSZHilAFeKSvNOO7x0P+jniRkYokbEnf/zSyOZ?=
+ =?us-ascii?Q?CiHOYC1Jj9OyxIaIvMdDypJLcvBKWvz9h727GAvdgMTsqjetYA7oNDfEPx6J?=
+ =?us-ascii?Q?fHM9TOeujm0BzzhdrmomqpnH2+UdW3NmS7BIWUj43yW9hy7WcqD7+xlx8ewn?=
+ =?us-ascii?Q?sRpHSY2ugjj3VjAuAeImeSJoa31Tiyaeu+ZM4sTxBbDt3i6/8p2HnmPq4Ye1?=
+ =?us-ascii?Q?SeNuQYU5teVF560fC1EBueB9zrZnk2bZWFn1GGC3QM4AfUGVloOf8eRwAh/r?=
+ =?us-ascii?Q?RIm5N5hjsaGNXwl0+l2ON7eo9Jslv1ERbqOHXKPBGg3FB5daHKzK1PTbCU6w?=
+ =?us-ascii?Q?3cpmPMcxGhLxhxfDs7xkTIXYXPv9BgHbFYbl3LMecYEyS1PY0y3taWxpRN8h?=
+ =?us-ascii?Q?BIoxG8F4KSC+vsPareqPjPf+WQmCJ0nW8KsMYVEE+fiFeecAG9xxEoBBkWDI?=
+ =?us-ascii?Q?u7n4K0VWRHbdjIDJDGxHSESgJtF1Yvo//fkgqW5Nz6Q/OjNUa+VKbKhJV+lD?=
+ =?us-ascii?Q?lnrVfKq37Z5QYlBlzSdP77Ii3k24n7tPP8Dpwg4j566fjhV5XVRZ+/vc2nzR?=
+ =?us-ascii?Q?FiYd4vkaDdGqECiDgtShFJoli1CSeD0otX5pAB6yonn3dEANFq1wLgQfLK7Z?=
+ =?us-ascii?Q?VTG2WrnpNjFEhxR/4x4SMs0dJUJeju00pmi9R0IwXK03duYeRxnX98Gptdl7?=
+ =?us-ascii?Q?RgZpkyRmBA3V9I7G28BXHCjJL7uImCkbvP4H94ujHgduU5alUX5ceWvz4EkE?=
+ =?us-ascii?Q?YIsh36Jme9ECfTeHgTISD2g+8inCS3aWknaRXGPt2xoFEglLKSAousNq9wUO?=
+ =?us-ascii?Q?xtz9ztY/5LCjlR1FWE+eD6AEO10T3Eiyk326pZPx8ry3ewO9EigdmimSFM9d?=
+ =?us-ascii?Q?6K9/q3lqD80NRBS7WpneOhfz26rlvaDWymm8ndynIrX+T/xYq6KcSjJnfmPu?=
+ =?us-ascii?Q?qzLUVvui22I1td0Lol5BUkJDZIvbNjlK5HLaoLF7?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ddbcb250-cc03-4284-b104-08da90f0a441
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2022 16:47:25.0072
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FjY8SEi+nD24r7GryHw/U/El1uRnqIOJa/esnz6HClGUUXJEB4IFB1U7ECZ5ElAq
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6781
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 07, 2022 at 09:55:52AM -0600, Alex Williamson wrote:
+On Wed, Sep 07, 2022 at 05:31:14PM +0100, Robin Murphy wrote:
 
-> > So, if we go back far enough in the git history we will find a case
-> > where PUP is returning something for the zero page, and that something
-> > caused is_invalid_reserved_pfn() == false since VFIO did work at some
-> > point.
-> 
-> Can we assume that?  It takes a while for a refcount leak on the zero
-> page to cause an overflow.  My assumption is that it's never worked, we
-> pin zero pages, don't account them against the locked memory limits
-> because our is_invalid_reserved_pfn() test returns true, and therefore
-> we don't unpin them.
+> The only trouble is that it's not geared for *PCI* P2P when that may or may
+> not happen entirely upstream of IOMMU translation.
 
-Oh, you think it has been buggy forever? That is not great..
- 
-> > IHMO we should simply go back to the historical behavior - make
-> > is_invalid_reserved_pfn() check for the zero_pfn and return
-> > false. Meaning that PUP returned it.
-> 
-> We've never explicitly tested for zero_pfn and as David notes,
-> accounting the zero page against the user's locked memory limits has
-> user visible consequences.  VMs that worked with a specific locked
-> memory limit may no longer work.  
+This is why PCI users have to call the pci_distance stuff before using
+dma_map_resource(), it ensures the PCI fabric is setup in a way that
+is consistent with the iommu. eg if we have IOMMU turned on then the
+fabric must have ACS/etc to ensure that all TLPs are translated.
 
-Yes, but the question is if that is a strict ABI we have to preserve,
-because if you take that view it also means because VFIO has this
-historical bug that David can't fix the FOLL_FORCE issue either.
+PCI P2P is very complicated and fragile, sadly.
 
-If the view holds for memlock then it should hold for cgroups
-also. This means the kernel can never change anything about
-GFP_KERNEL_ACCOUNT allocations because it might impact userspace
-having set a tight limit there.
-
-It means we can't fix the bug that VFIO is using the wrong storage for
-memlock.
-
-It means qemu can't change anything about how it sets up this memory,
-ie Kevin's idea to change the ordering.
-
-On the other hand the "abi break" we are talking about is that a user
-might have to increase a configured limit in a config file after a
-kernel upgrade.
-
-IDK what consensus exists here, I've never heard of anyone saying
-these limits are a strict ABI like this.. I think at least for cgroup
-that would be so invasive as to immediately be off the table.
-
+Thanks,
 Jason
