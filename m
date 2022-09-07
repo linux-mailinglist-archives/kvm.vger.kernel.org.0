@@ -2,176 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E88A35B080A
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 17:08:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D54FF5B0822
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 17:12:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230248AbiIGPI5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 11:08:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40110 "EHLO
+        id S230371AbiIGPMD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 11:12:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229865AbiIGPIx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 11:08:53 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2080.outbound.protection.outlook.com [40.107.244.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6DFDB5335;
-        Wed,  7 Sep 2022 08:08:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LTfjjxeuMuvLV+RDG4x/1PjRODP3tfgOSDQJ+uJYaWDBeYX/3lQVvgG8pOMqpqdCLT8JV7giFCSTpFZ3hHUKibxTW7u4OcDMixd/iYPsO9nKQkyyWOUGyRce+IM8lnt4ui13G2riBmU6VA26f6baJWKEI1T6yzdQyB5SMhiJgf/PZRaOHzl1JYo5OPBWiov+0XEWRl53DauH1i1fM4PuFEUDUZvfM2viJeeHd01OJYOaNoT1KAT9a5ozN1jDrsaHnDLNYVEyggg73a/RiogMesfuJGrl1ezCN5ryBdHqtuFOBQ33AFc+D2MI8WgRMP4A9LT9NvWO9Di1erOcclvH8w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+GJ0NrNS7IWfMOgArniTiYOZGgGBWzBOv7k9ZKNKP7Y=;
- b=Yn7aa8bqGBwxnuIpnJR8QtmmHGisNfWPiBSU39/n+NQcegRjl5t0oflRZn7o1s0VFSdIaKFMCQ6i+Qiverad/W2OtK8MX2FVpjjevVpesljlm86bysX3rkZ9sJALv2AC0aaSxQzq61zn4novahjO+68Cbb8Ehn2gVV8/utscaqFrd2yIN+0apSlJHCY44tG9EbCtUWL71Wwz12jgcGs1C1SL1TeUrsTtUw29cuOwsXTzXBlCRH9YubS8n2NU6pESV0hGL5852Dj1UEevHxnPgXGv9JerdVqH/zBRyfgRa7dK7d1qT9fIHiS3fvl1Vn+e/yk7TWs71gZFMOnjc1pAwg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+GJ0NrNS7IWfMOgArniTiYOZGgGBWzBOv7k9ZKNKP7Y=;
- b=o+acLCaksTuufk18931PdXED00Jbu/DRYwEOCesp2mjtmPh+bytr7hpXVGKwKpt9cJEH9VHEMa8fgH3Ngf6eAOz1CENjHvGnVtU1XBsTb21OezdR5KeXahtefpEDERSL7llGqqhWNrBW/79Po7POVOClqCC9BUTPfByGqPUtGEY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BN8PR12MB3587.namprd12.prod.outlook.com (2603:10b6:408:43::13)
- by CH2PR12MB4149.namprd12.prod.outlook.com (2603:10b6:610:7c::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.11; Wed, 7 Sep
- 2022 15:08:49 +0000
-Received: from BN8PR12MB3587.namprd12.prod.outlook.com
- ([fe80::653f:e59b:3f40:8fed]) by BN8PR12MB3587.namprd12.prod.outlook.com
- ([fe80::653f:e59b:3f40:8fed%6]) with mapi id 15.20.5612.015; Wed, 7 Sep 2022
- 15:08:46 +0000
-Message-ID: <58d6e892-82df-7aa7-4798-9e5da7c634ad@amd.com>
-Date:   Wed, 7 Sep 2022 17:08:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v2 4/4] vfio/pci: Allow MMIO regions to be exported
- through dma-buf
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
-        linaro-mm-sig@lists.linaro.org, linux-media@vger.kernel.org,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
-        Maor Gottlieb <maorg@nvidia.com>,
-        Oded Gabbay <ogabbay@kernel.org>
-References: <0-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
- <4-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
- <YxcYGzPv022G2vLm@infradead.org>
- <b6b5d236-c089-7428-4cc9-a08fe4f6b4a3@amd.com>
- <YxiIkh/yeWQkZ54x@infradead.org>
-From:   =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>
-In-Reply-To: <YxiIkh/yeWQkZ54x@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM6P193CA0128.EURP193.PROD.OUTLOOK.COM
- (2603:10a6:209:85::33) To BN8PR12MB3587.namprd12.prod.outlook.com
- (2603:10b6:408:43::13)
+        with ESMTP id S230152AbiIGPMA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 11:12:00 -0400
+Received: from littlepip.sumsal.cz (littlepip.sumsal.cz [IPv6:2a02:2b88:6:1f8a::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B1D34DF2F
+        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 08:11:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sumsal.cz;
+        s=20140915; h=Content-Type:In-Reply-To:Subject:From:References:Cc:To:
+        MIME-Version:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=lwvPNekQHUTxrNisTtEU9cGSeBrujY7Uew4Kk1ixWXE=; b=KOM7aCFL+GoAG4irHf8WsiLLb2
+        nxZviGDWlwR0XvmHb9dy7ZcudVyfuQ8nnnLUU/GNThZz8l+ClmjndztZCi2a6w5oDE7mra6hUxY4Y
+        VXt/zTRoaVWi82x7mUMbaTQUplybmLvlq6/Jl4B3KlONK2wANWCBZod+QV1FiHBmCNxeKJtjRasRr
+        Tn8HQqHa0Herz6fpA5by66xmY65tuOg+bThVU7cKQ4SqBY4DWOG1XNJAIdDQac23zI0nDUhHNyeuA
+        YsDgDrYZ/6+gTUHZLD5dI/a+BYe8ALRhQi/OIk2m1x9mnwoMypcGwzOioFiHTCj8DBHIPAz6rXgqY
+        IRpFKrlA==;
+Received: from [176.74.150.102] (helo=[192.168.0.107])
+        by littlepip.sumsal.cz with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <frantisek@sumsal.cz>)
+        id 1oVwiZ-00CZm2-Tk; Wed, 07 Sep 2022 17:11:56 +0200
+Message-ID: <a8fc728c-073c-2ff5-2436-40c84c3c62e1@sumsal.cz>
+Date:   Wed, 7 Sep 2022 17:11:55 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8PR12MB3587:EE_|CH2PR12MB4149:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7e0fed92-ab80-40b5-6879-08da90e2dc7c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: NajZBkGm6v6sLe+mQl1Z6QgpYQDh/94sNQjDTGN2dW33ll6EmunsAOpKAcJqOUejUg/LSpMiMZYxsifAB8H453vtnPPpAHL2cedsiCdlMsg/mKpPb7HXpzgupKHy24mm7z2oiZfjns1ZoiXJWejowHoLHkBrBywJHXCuX6fkt0Xwo4QxDVGOCYHwSrsGrH7cNLA/v/JxNL6v1qmf2+XEeSmkfU9dusrWZVJLd6e+jzxKMB98yv0UrdAAnsdsQBKUouoKi2o4Rq2uO3OTHJ2DitQiQmU6NFOlfx1dGzy9VMexxmau0G+I9+B2ETfUebKeN7WFc1aOhlNwA/wOvlbzrqqyu/zuP2AhIrPG7IaQ3TppuM5IqsZUgQZVewGlxhdcTT1xzZwyC8dB9H7lNLU6fofe1xKHlHU9uToxX+gYrP8mEdtGJPlpOkPDoefm7ic5Uw95F6LjhPrXaRg6rfwxUPxHE7P9nEclkBhuSlLomMb2x/lr62mUJBl6+IOiZSmWUiWMJvtOevC2PDX600WvWodUjCJ6RaXnAwkKvYgFSi5Ltp8AttQzJBsavLq8ialb2I5ZB4kL2nTsgcWvkvy9GDpAWEe5O6qXchyij4WFTVQVFne1UIdijlthz53VdKqf2S2Wv5Hc671ZIcAADpsRZ8Z9VSU/Z7mv013NdX0Tb0+PCxhyw8yg2Js3jI5Z+zj+7NXIgrIk7p9SK8fH2wnwxi2H/NZNMyoxiFMV+ZRTRrWA2+E8o2s3EawuljXE4gxjMTOOb9JHA+1QZw+u3PdtPfLpJTG/rWz2Fd7oaM34rLI=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR12MB3587.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(396003)(376002)(39860400002)(366004)(136003)(36756003)(31686004)(6916009)(316002)(31696002)(38100700002)(86362001)(2906002)(6512007)(5660300002)(7416002)(83380400001)(66556008)(8936002)(54906003)(8676002)(66946007)(66574015)(6486002)(4326008)(2616005)(41300700001)(186003)(6666004)(6506007)(66476007)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZGlPZncyOEJqbklCRkdvQkRWZnFORFdJUWxZV2RvYzFOYlBlQnpDb2FqQTNG?=
- =?utf-8?B?QUVyRWNmRjlsSjQ0U2QxdjNUQTViUnRBRHVJbzZKUDZub0dHaVpkSkhLS3VE?=
- =?utf-8?B?dkdEVjNXZ05ENTNvRHFPWWhXRkdzR1NNaHRkQVNWNzBlQldyT1g5VFY0S21B?=
- =?utf-8?B?SGRod21yN0RQcjRBcXAvM3o2Zm1GSUJFd2NZOUQwM0tlbGhYVFQ3Vld0U1lm?=
- =?utf-8?B?ZWxBRm8vR1BXd1UvaVBWNmZRVGlSa2hxV1pYNWNYMjJ0REp6bnNhS0FHeno1?=
- =?utf-8?B?a1pycjVySXA4Tk5MazFTTXdmSmIzWWdGTjFXa2M3V25oY2hxcGN0OWJRMFpH?=
- =?utf-8?B?STd5N3ZaZEphcDY1VFdXbHFaZ2FtUFh4RnNaVndFcEkvcUp5YWVPdXQyUDFO?=
- =?utf-8?B?SUl5ZDhPV2cwZ0pjNVZmZkxVUkN0Z0d3cEVzdnc5ZzZERGxZUmxOS0lkTjcz?=
- =?utf-8?B?NzJ5dWhYNEpMRndWRzgvZ21uMWpzVWRHTjZ6M09PYmNLZEV2UU9YdnJDN3RR?=
- =?utf-8?B?ekdnakN1d29BVUNpY2pnYW5sdHdRQjFlUGVYWndzdVpVV0pqTGQyU1pmaFYx?=
- =?utf-8?B?cGZZWkRac3Y1dUt4c2hSc2x6dVpneEQ5c1oySWlDTU9ZMWtRM0V3dk9sK1A2?=
- =?utf-8?B?eWNBcmNGYmtySUxEK3FmNTdLZjVhOEZkRkhndVNXQndnOS9uSHVoYU1oVElY?=
- =?utf-8?B?T0JMMTZZdXpvbVhZMndqWDUxV09vcTV4ak03bk81WTFyS1ErRU4rMU5qWjlO?=
- =?utf-8?B?VkZ3NU1ZdEdXcjYzVXpaREtKZlI0Mk1sUWJLQkRLK3lrUnU5dWkwWEFUYXFU?=
- =?utf-8?B?YlE0Z2REbVZXVTdUUnBJUHpxQTdDN3g2UkRDdXJpOHBRNys0YlFrVjg3enRa?=
- =?utf-8?B?NmQxODVCbDBZckZObDhZUXRDcTkyQlplOXNLSTVOdWovaEZvTW5tL1hrd1Mw?=
- =?utf-8?B?bzc3M0E3d0h4U2hoRENMdFJUODZKVElPcFR0RFNDNVBMeWlLZ1RmV1cxRjE4?=
- =?utf-8?B?NlBFZmphRW9xUEI1VlllSUVCb0tHS3FWRlVHenNzSmhVYkxOR0VWK1lhOHZ5?=
- =?utf-8?B?ZVlacWttWlRGdUNQT2E3VzBuUWhxSVdkdC95UWVTL0ZZd0Z4eGVWdkpTNWtV?=
- =?utf-8?B?WjB2M1NvK2dvb2NPMVVvaFE3eE5FZlR2cVdoY0tiRklSYVQ4NEw1L3BZZFJm?=
- =?utf-8?B?dmlIMisvMjk3b1NXRDhMREVBSGtuZGFyMC9EN2RqbkpnZ2dkTGY5b0VCNnRK?=
- =?utf-8?B?em56aHFZUFA0UnZjVitZdUFiL2h0RjFGTEppd0p2azlJb095bWtPYkZnY2ZV?=
- =?utf-8?B?K01OWFhGSHhpZVFhZ0RmNTY5cDJaajE1b2V0d096VkwwcHIwb084UlUwZ3FX?=
- =?utf-8?B?b2pURnFtV3NNdVNKekJRMFlEbU1Za21zTTVOQWticzNRZ2JockZwVnF4b3BW?=
- =?utf-8?B?S2VXeGRNOVlSM29qODFQeDlFeGdOc1Jqa2FBcExVK2pMNmxJSGlDWFN3ekRh?=
- =?utf-8?B?NnJ0OXMvNHp2a0ErWU5RSHRENjhmRnBIUWl2dVB1eUVnbStYU0FWNjYwMEdq?=
- =?utf-8?B?YkJ2cUI4Tk9ydzBWczJGSytOVy9SRmEvRlJJZzlOaVNTSE5xcEgrSGYwdFVE?=
- =?utf-8?B?M2J5S2dWdWZSMTkxUXZvSElvNVVteCtabXFsSUJ6dnlON0RKdlBFUEZDSDhO?=
- =?utf-8?B?NzJnL2s4by93d3VTWnBmL2piT2FXQ0l0bTcvSWZuTVoxNmYzUTFTWGpOR0xq?=
- =?utf-8?B?bzlJdytTWllvZWUzcUxWTEFkQ05YZGVlNWJGWkcrUmlFY3U4U2k1QkJLTlN1?=
- =?utf-8?B?aEowenpMQm5vUVU5UStLSmI1ZWNHcUU0VkErM2tUZEFKN3VnNFFsRGtEdFdQ?=
- =?utf-8?B?VGMzYUg1bHBZUFd0R2lFZFhMekQzTXprYmZmWVhQTkk1NzY4QStHT1p5ZDli?=
- =?utf-8?B?djcxakVZTXJsRkhHQkJwcjhlOWdrZGZXa2dPcDJPekJxdmJLVkF5MXpBeno2?=
- =?utf-8?B?bXBxbWhvUjU2VHZHdko5Mm9keXl5Um9kcHkxUUt0amtRdVY0WG1SSlRtU0xw?=
- =?utf-8?B?TGFRNEdQenk2Z21OL3NkU1QwcHNMQ0JLWkcrRkhYQzNlSlNZQUMrQTNFeXhn?=
- =?utf-8?B?ZzI2c2U0ak9veXAvMHNVOXNmOGVDV1RzcVpkVlVOWlB1L1NTQXNFK1gwVE0z?=
- =?utf-8?Q?AioUMDh+hrjVg9J08oTxpZ7jzfkc9ba1fW8s1fjU6CYI?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7e0fed92-ab80-40b5-6879-08da90e2dc7c
-X-MS-Exchange-CrossTenant-AuthSource: BN8PR12MB3587.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2022 15:08:46.3902
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QV47T9OAiJtw7mQ7JzddFVQeTdQ2eFxwWDwSg2+es0YbMK7V2BC76R7aPRiGO4eZ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4149
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org
+References: <a861d348-b3fd-fd1d-2427-0a89ae139948@sumsal.cz>
+ <Yxiz3giU/WEftPp6@google.com>
+From:   =?UTF-8?B?RnJhbnRpxaFlayDFoHVtxaFhbA==?= <frantisek@sumsal.cz>
+Subject: Re: BUG: soft lockup - CPU#0 stuck for 26s! with nested KVM on 5.19.x
+In-Reply-To: <Yxiz3giU/WEftPp6@google.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------4QYIU5mY0l0YdJTh45k6Ka2P"
+X-Spam-Score: -104.7 (---------------------------------------------------) #
 X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 07.09.22 um 14:03 schrieb Christoph Hellwig:
-> On Tue, Sep 06, 2022 at 12:38:44PM +0200, Christian König wrote:
->> The problem is once more that this is MMIO space, in other words register
->> BARs which needs to be exported/imported.
-> Everything used for P2P is bar space.
->
->> Adding struct pages for it generally sounds like the wrong approach here.
->> You can't even access this with the CPU or would trigger potentially
->> unwanted hardware actions.
-> How would an access from the CPU vs anther device make any difference?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------4QYIU5mY0l0YdJTh45k6Ka2P
+Content-Type: multipart/mixed; boundary="------------ZgivT5N8vq45pBZkpXb0yQGW";
+ protected-headers="v1"
+From: =?UTF-8?B?RnJhbnRpxaFlayDFoHVtxaFhbA==?= <frantisek@sumsal.cz>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org
+Message-ID: <a8fc728c-073c-2ff5-2436-40c84c3c62e1@sumsal.cz>
+Subject: Re: BUG: soft lockup - CPU#0 stuck for 26s! with nested KVM on 5.19.x
+References: <a861d348-b3fd-fd1d-2427-0a89ae139948@sumsal.cz>
+ <Yxiz3giU/WEftPp6@google.com>
+In-Reply-To: <Yxiz3giU/WEftPp6@google.com>
 
-The key point is that you can't do any CPU fallback with this as long as 
-the CPU wouldn't do exactly the same thing as the original hardware 
-device. E.g. not write combine nor do any fully page copies etc...
+--------------ZgivT5N8vq45pBZkpXb0yQGW
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-See what happens here is not really P2P DMA transfer, but rather P2P 
-signaling of events.
+T24gOS83LzIyIDE3OjA4LCBTZWFuIENocmlzdG9waGVyc29uIHdyb3RlOg0KPiBPbiBXZWQs
+IFNlcCAwNywgMjAyMiwgRnJhbnRpxaFlayDFoHVtxaFhbCB3cm90ZToNCj4+IEhlbGxvIQ0K
+Pj4NCj4+IEluIG91ciBBcmNoIExpbnV4IHBhcnQgb2YgdGhlIHVwc3RyZWFtIHN5c3RlbWQg
+Q0kgSSByZWNlbnRseSBub3RpY2VkIGFuDQo+PiB1cHRyZW5kIGluIENQVSBzb2Z0IGxvY2t1
+cHMgd2hlbiBydW5uaW5nIG9uZSBvZiBvdXIgdGVzdHMuIFRoaXMgdGVzdCBydW5zDQo+PiBz
+ZXZlcmFsIHN5c3RlbWQtbnNwYXduIGNvbnRhaW5lcnMgaW4gc3VjY2Vzc2lvbiBhbmQgc29t
+ZXRpbWVzIHRoZSB1bmRlcmx5aW5nDQo+PiBWTSBsb2NrcyB1cCBkdWUgdG8gYSBDUFUgc29m
+dCBsb2NrdXANCj4gDQo+IEJ5ICJ1bmRlcmx5aW5nIFZNIiwgZG8geW91IG1lYW4gTDEgb3Ig
+TDI/ICBXaGVyZQ0KPiANCj4gICAgICBMMCA9PSBCYXJlIE1ldGFsDQo+ICAgICAgTDEgPT0g
+QXJjaCBMaW51eCAoS1ZNLCA1LjE5LjUtYXJjaDEtMS81LjE5LjctYXJjaDEtMSkNCj4gICAg
+ICBMMiA9PSBBcmNoIExpbnV4IChuZXN0ZWQgS1ZNIG9yIFFFTVUgVENHLCA1LjE5LjUtYXJj
+aDEtMS81LjE5LjctYXJjaDEtMSkNCg0KSSBtZWFuIEwyLg0KDQo+IA0KPj4gKGp1c3QgdG8g
+Y2xhcmlmeSwgdGhlIHRvcG9sb2d5IGlzOiBDZW50T1MgU3RyZWFtIDggKGJhcmVtZXRhbCwN
+Cj4+IDQuMTguMC0zMDUuMy4xLmVsOCkgLT4gQXJjaCBMaW51eCAoS1ZNLCA1LjE5LjUtYXJj
+aDEtMS81LjE5LjctYXJjaDEtMSkgLT4NCj4+IEFyY2ggTGludXggKG5lc3RlZCBLVk0gb3Ig
+UUVNVSBUQ0csIGhhcHBlbnMgd2l0aCBib3RoLA0KPj4gNS4xOS41LWFyY2gxLTEvNS4xOS43
+LWFyY2gxLTEpIC0+IG5zcGF3biBjb250YWluZXJzKS4NCj4gDQo+IFNpbmNlIHRoaXMgcmVw
+cm9zIHdpdGggVENHLCB0aGF0IHJ1bGVzIG91dCBuZXN0ZWQgS1ZNIGFzIHRoZSBjdXBscml0
+LlwNCg0KQWgsIHRoYXQncyBhIGdvb2QgcG9pbnQsIHRoYW5rcy4NCg0KPiANCj4+IEkgZGlk
+IHNvbWUgZnVydGhlciB0ZXN0aW5nLCBhbmQgaXQgcmVwcm9kdWNlcyBldmVuIHdoZW4gdGhl
+IGJhcmVtZXRhbCBpcyBteQ0KPj4gbG9jYWwgRmVkb3JhIDM2IG1hY2hpbmUgKDUuMTcuMTIt
+MzAwLmZjMzYueDg2XzY0KS4NCj4+DQo+PiBVbmZvcnR1bmF0ZWx5LCBJIGNhbid0IHByb3Zp
+ZGUgYSBzaW1wbGUgYW5kIHJlbGlhYmxlIHJlcHJvZHVjZXIsIGFzIEkgY2FuDQo+PiByZXBy
+b2R1Y2UgaXQgb25seSB3aXRoIHRoYXQgcGFydGljdWxhciB0ZXN0IGFuZCBub3QgcmVsaWFi
+bHkgKHNvbWV0aW1lcyBpdCdzDQo+PiB0aGUgZmlyc3QgaXRlcmF0aW9uLCBzb21ldGltZXMg
+aXQgdGFrZXMgYW4gaG91ciBvciBtb3JlIHRvIHJlcHJvZHVjZSkuDQo+PiBIb3dldmVyLCBJ
+J2QgYmUgbW9yZSB0aGFuIGdsYWQgdG8gY29sbGVjdCBtb3JlIGluZm9ybWF0aW9uIGZyb20g
+b25lIHN1Y2gNCj4+IG1hY2hpbmUsIGlmIHBvc3NpYmxlLg0KPiANCj4gLi4uDQo+IA0KPj4g
+QWxzbywgaW4gb25lIGluc3RhbmNlLCB0aGUgbWFjaGluZSBkaWVkIHdpdGg6DQo+IA0KPiBQ
+cm9iYWJseSB1bnJlbGF0ZWQsIGJ1dCBzYW1lIHF1ZXN0aW9uIGFzIGFib3ZlOiB3aGljaCBs
+YXllciBkb2VzICJ0aGUgbWFjaGluZSINCj4gcmVmZXIgdG8/DQoNCg0KU2FtZSBhcyBpbiB0
+aGUgcHJldmlvdXMgY2FzZSAtIGl0J3MgdGhlIEwyLg0KDQoNCi0tIA0KUEdQIEtleSBJRDog
+MHhGQjczOENFMjdCNjM0RTRCDQo=
 
-For a simple example think of a camera and a video codec. The camera is 
-pumping video data into system memory the video codec should encode into 
-an H264 stream.
+--------------ZgivT5N8vq45pBZkpXb0yQGW--
 
-So after every frame the camera hardware issues a P2P write into the BAR 
-of the video codec to signal that the frame is completed and it can 
-start decoding.
+--------------4QYIU5mY0l0YdJTh45k6Ka2P
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
 
-This is not even a memory write, but rather just some trigger event. 
-That's essentially the background why I think having struct pages and 
-sg_tables doesn't make any sense at all for this use case.
+-----BEGIN PGP SIGNATURE-----
 
->> Would you mind if I start to tackle this problem?
-> Yes, I've been waiting forever for someone to tacke how the scatterlist
-> is abused in dma-buf..
+wsF5BAABCAAjFiEEp1toToNDDZVvO4js+3OM4ntjTksFAmMYtLsFAwAAAAAACgkQ+3OM4ntjTktd
+Rw//Qq8jz/0TBSLBuKC36X58CPzdm1TRV4aoNaehxR3aTN61J2DfjTas+KPa6pYQRSWA0N0Tb3Vd
+2LrZFP2Rh/jg3VyST48+81yOJeJZeDo1lSiSYm3wOFlhKFmoqC1DKPLDwj3vXk5kmFOiet9/EtfT
+MqCyHoigap1z31XUhIR0IfigW8Qv6TDn/zI7kC51wWgTAiQ47sGbDrzXwnHVKZgw2PY/AWr5RIc+
+jsam2YPvvChRVHUZForooiPCNKXI66zJVNl/kov9fqLAsXvb7QzCeGTQ7+EMP45hMan7iSOrDpT2
+zaMaX3OaO3HrYUU8tMF1GnS0lTa3NYOKWr67o3jPEZpdJMBF854c1rf3eRSX9Hblrl5lkFxnlXKJ
+3TN240gHk0/n1go4/GPVvJ9Bc2Y4u0i4Zpt9+2NfgzyvTrHEdegVHPkecuxUdNI3axksxVcN9dn7
+GPiWa3zHtFwZRWQSxPybERAU7yx5Iru3XHxDHubtvHt0uuvkjvy1hdu2SBvthkT2j1CMSzRo4gEg
+UJjM2rcI6zNKOGHJb+EygTWfpEd80HQ7Y/rKtxwdwZebYO8yCH5iEGXy/Piot0tzyDRYO/YWhuxz
+13UvwNtz61pOr8p6ZrzF0EN9D7gZDWlYIdJwV8gTYbKYrC/wtuH4RlCZQfhnzA+6D2nHR3bsNDMy
+hvY=
+=KdUz
+-----END PGP SIGNATURE-----
 
-How about we separate the scatterlist into page and DMA address container?
-
-Regards,
-Christian.
+--------------4QYIU5mY0l0YdJTh45k6Ka2P--
