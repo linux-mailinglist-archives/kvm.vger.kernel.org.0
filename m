@@ -2,155 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2383E5B0924
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 17:48:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F2AB5B0949
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 17:55:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229807AbiIGPs3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 11:48:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53420 "EHLO
+        id S229517AbiIGPzp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 11:55:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229796AbiIGPs0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 11:48:26 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63E1ABB002
-        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 08:48:23 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id s14so5406426plr.4
-        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 08:48:23 -0700 (PDT)
+        with ESMTP id S229866AbiIGPze (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 11:55:34 -0400
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7783E75383;
+        Wed,  7 Sep 2022 08:55:31 -0700 (PDT)
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 287EnGdU004998;
+        Wed, 7 Sep 2022 15:55:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : content-transfer-encoding : content-type :
+ mime-version; s=corp-2022-7-12;
+ bh=uAvPlJ9cB7dtFK1LQ0CENoW5hqcEKSxgY+MBzM0s/uE=;
+ b=YoT3dmTJDrBa3z3QOZnLGjCqYrr+3vRtrB581XYPGjQo3a3r5T8ggR8HyM9zzEb1Q/iJ
+ IWXq86SIY/rGtTu5NkvqL/iwycCACeFpRXWT5xKGq9LhbVE4WSnvknKWtInmq0HeMoxC
+ zUcoj8x0QkSy7Xp/pULhJMbkHC9INCpZo9q2an1sfTMElTNAkj49CwuNQF+jgC9JjkQN
+ VrLTDFbWxGE9ev3qB2XNvuo0HF5tbMbLoBDJWVfGVr4MnLYcbYDMGgG/qeRzA6hhCENk
+ uEMV0ImqMJppvtrBAq8UeWkliMyREqPbcUEQU2Mflxu/VjF73iOADQIHtuYopcgfPhL1 uA== 
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3jbwh1hba3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 07 Sep 2022 15:55:23 +0000
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 287E26wX035064;
+        Wed, 7 Sep 2022 15:55:22 GMT
+Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam02lp2044.outbound.protection.outlook.com [104.47.56.44])
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3jbwc49w5k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 07 Sep 2022 15:55:22 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TVGYL4dpG+FNhui+g0D0KriMFZsgom7CDROb2Zd1omRrT1bqJBdHT4/guhl3xUrQ+1za0yXpi8h1oIRLHG/WH80KFuUkgAPXdsaXLCIByORS6Rwu+737V+fHmCkCILXhH5BPP+Zr9/TtMOSGl2bfei5LYxSqy9FR4y0moEzhk0KHQ2KslNyn2xRjeJqNTu2F7EaaqDXLv8jCGoNMp7ZGfnUGeRmJC5r/Ss/BpiPf45LTObHFtIX5LkON3p9Qv+lBlrPf+5JgmLNFPDPDiyyW1zC2onyrbSzRC976HeE9hK/jTLjZEmngrpg13dNtaTqKLz3wC3MPvZsvFqOlIx7D3Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uAvPlJ9cB7dtFK1LQ0CENoW5hqcEKSxgY+MBzM0s/uE=;
+ b=hAur3xj/tHMFy4//118OKwWoInegOb8ZbsmjOSvLEvJi852nRr6D1pmSd2aM7wzICCcf+RR70RXTGIPFySe/R3GenAJ43LQz6H0AEl6AVQuM2pIyMhw1AUxI63sDnCntqM1g4U9/kEjE7lPQn6BcacuYGoudXlWc+Gjl2K/ZNzm2MuX3Wofi/mTUvuHJgQOfgcg5UAzN68NYJiic4HqC0e0UEXa9cgZVxWUdDDnzP3Vcy4/VhZhDvAbwLy4NYKqf9dDCEIFYCV/R1q7Tu0xgb6u02qvFvXFkpvL73r/XMJoVKsh9PiDpZCSX07bx3CKX7wHtGv3p+once9a6pNMaIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=/kPSWel6mobLfUIPD82aMK7TVuiyZeYuc3xqvzKcSuE=;
-        b=qmCNpHSx7oMT5E8bHSuoHnFgMqmTqMzbeDgsLX9BkR1z+KMoW5hzZIHMaBfZJsaOxJ
-         Yl0l9/C9Jcn9iWO7FfYmZ+ANS+1i0aT5v2LKHY24Mr4s/W/ut3YHwIcn6Osg4NwrRv6b
-         UNEYvl0Q0f80fy8D5hzdNQ5KHLjUTFB0a46NTc3/TKXHcQV6CuZAiDZ4DPbHpQwiJuYH
-         5zYYPdU9lpAx9qb4krs1P+LMZxujdCMMNGYiZnsen11pdaHZm1PkN4m96QrxEzGUWBxy
-         pR884dXngnJjjQdlfXxIjIvx90AUO08BWUpuHP77sLHfLk236EFxqC+xBDeKssn2xTJH
-         AKSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=/kPSWel6mobLfUIPD82aMK7TVuiyZeYuc3xqvzKcSuE=;
-        b=Jx4Yr0h8yS+hgvnatUoO42gbK47qstP3IeVWEerAaXkkuLDkGTyLLMu00BYaOfa7M8
-         m4Q83Tub9YtkXWrSGkw56K8niVj2XAKSIukzc24icJzsVupwwU8wb1SvdZP4I/pbnFOE
-         hkgi6r0WXb8SWZFS8KMq33iFVRBZdeCU7ySUy17wbptIbhyG63KG46azvXtOA38EWPwd
-         NxL6P9plQg6EMU6yC/eNrjTTMe3VQW7/+jTBJ/gu0jGzk36dzyyYHWUPK7l/UT+wtmuA
-         1Oq5EWmQTFQUVpBMX2Er6sHN4BHPT9hkY0o4jZtR1DmUo6B/uU+n/dhp+Y4Tqb30O6C3
-         Kmzg==
-X-Gm-Message-State: ACgBeo1YUOSwwKMFPTZwHd7p5gLvhYi6FQ1VTnAEQu/NmGLkSFG1abcc
-        wHXztLcSuoP5I/tBsUO03vge/UfY45Lxyg==
-X-Google-Smtp-Source: AA6agR5eOWOiHyn0TqvZYrl0cXhsJg64L8mJ6VV4UNfFTV1WWSN+P6AoiStBDmSZ1E28ipnZV8eUBw==
-X-Received: by 2002:a17:90b:4a8e:b0:1fe:1df3:bb11 with SMTP id lp14-20020a17090b4a8e00b001fe1df3bb11mr4599947pjb.22.1662565702390;
-        Wed, 07 Sep 2022 08:48:22 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id y1-20020a17090264c100b00172b87d97cbsm4487356pli.67.2022.09.07.08.48.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Sep 2022 08:48:21 -0700 (PDT)
-Date:   Wed, 7 Sep 2022 15:48:17 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yuan Yao <yuan.yao@linux.intel.com>
-Cc:     Mingwei Zhang <mizhang@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Oliver Upton <oupton@google.com>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v2 1/4] KVM: x86: move the event handling of
- KVM_REQ_GET_VMCS12_PAGES into a common function
-Message-ID: <Yxi9QRziGl2YhNuB@google.com>
-References: <20220828222544.1964917-1-mizhang@google.com>
- <20220828222544.1964917-2-mizhang@google.com>
- <YwzkvfT0AiwaojTx@google.com>
- <20220907025042.hvfww56wskwhsjwk@yy-desk-7060>
- <CAL715WJK1WwXFfbUiMjngV8Z-0jyu_9JeZaK4qvvdJfYvtQEYg@mail.gmail.com>
- <20220907053523.qb7qsbqfgcg2d2vx@yy-desk-7060>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uAvPlJ9cB7dtFK1LQ0CENoW5hqcEKSxgY+MBzM0s/uE=;
+ b=PWeCRkRcq18u1DMLzyGhIwhDsMrVMPl59IlomgKdCJQppNZ005uSPuApd7YSxzuLQgKu8lHIO5kVxLOJeaX4B149yFuQ1dWdp7xW5yxTcEh25rEbQNo8oXeEp0NA2mla8OxdvwefoZXSRQRXz2FwJJe+LqarAmkOzFCf/cnBSM4=
+Received: from BN0PR10MB5030.namprd10.prod.outlook.com (2603:10b6:408:12a::18)
+ by DS7PR10MB5085.namprd10.prod.outlook.com (2603:10b6:5:38c::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.14; Wed, 7 Sep
+ 2022 15:55:20 +0000
+Received: from BN0PR10MB5030.namprd10.prod.outlook.com
+ ([fe80::9034:820:1811:4ca0]) by BN0PR10MB5030.namprd10.prod.outlook.com
+ ([fe80::9034:820:1811:4ca0%5]) with mapi id 15.20.5612.014; Wed, 7 Sep 2022
+ 15:55:20 +0000
+From:   Liam Merwick <liam.merwick@oracle.com>
+To:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc:     liam.merwick@oracle.com, pbonzini@redhat.com, gshan@redhat.com,
+        oliver.upton@linux.dev, andrew.jones@linux.dev, seanjc@google.com
+Subject: [PATCH] KVM: selftests: Make rseq compatible with versions prior to glibc-2.30
+Date:   Wed,  7 Sep 2022 15:55:10 +0000
+Message-Id: <20220907155510.968666-1-liam.merwick@oracle.com>
+X-Mailer: git-send-email 2.31.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: DM6PR02CA0107.namprd02.prod.outlook.com
+ (2603:10b6:5:1f4::48) To BN0PR10MB5030.namprd10.prod.outlook.com
+ (2603:10b6:408:12a::18)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220907053523.qb7qsbqfgcg2d2vx@yy-desk-7060>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN0PR10MB5030:EE_|DS7PR10MB5085:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5cfdab1a-0470-44c1-bed5-08da90e95e03
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: +w54Hb4YEDIuzkkCCPxFVQ8z4niVjanBnKdQKzcAIpzQzafT5QWUV8PGRF8UTkSDA30EUJnIwohM+FMV+ApEfe0U+96P6P1LL3po5KFQBOYxHaVtBEYn7CpUKWOeVxDgAVMVt0U1Jsm1XQwYnMD//LHpqJFxHQScR4aYEeAcKFCGRh45kj5wQFj4qBaPy3AZGc3VNb2LVzGynv/oGanZzxIYO19dVcjKmsH1qI/a6K/O8hUX4k/0OLBu+NzrW9RWdjQiK5R1Zpwc0+JVUYvcBpM7Z7xLtByzXOrgh1Q237B9UTSCvNypW95TesO4kmGvAqLHSB64yXM/J4UEJft9X/nUjbZQsPcnj0tn0fu5qeZmuAeEFrmDoibhPEH+AbisE21O5Cp6Zq+PjJDH6AKp1rpJEBF4Uqsry9lyAnEmQn6aMozpyMuuszoxNxhAdwKmYOp29FBeTIglKAGZrv67WT5znVEN4fkWETY1Woyz9cULtl7ERjrGoZdl+WOzinVUfbc8NcL/3fPvIawLhuaEOf7lwXZcIhj8jwN9d7B671ntOQ8XmijclJyKONg1CY7HSNbFdkGPGGm6HN17maxqBI2jH0uo70OKOUEHpBSTAqphSSiyyBCj1nrIazR8zJ55Lzvw+eIdVxbNbMEMb+IYaiEvX/f9qJftMwRV43OE23TecSoYc2najXL0aH+NFcBh
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5030.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(396003)(346002)(366004)(376002)(136003)(39860400002)(41300700001)(6506007)(1076003)(186003)(8936002)(83380400001)(2616005)(2906002)(5660300002)(44832011)(86362001)(6512007)(36756003)(478600001)(26005)(6666004)(6486002)(38100700002)(8676002)(4326008)(66556008)(66946007)(316002)(66476007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?eojvggWdCSGg6qIFoMPId+A4GbchFdAGxW6q3vY733nGkREqqegD+nYK/OfT?=
+ =?us-ascii?Q?sTjxOdWtHxYljpR8EEp7m/P2DrPMrx13xAsodCBR7H/dk4lODyZ+MPVUXqto?=
+ =?us-ascii?Q?w3dkl/RYZFDk+amqQdApQFUdf/lFs//B3DqagLiYHYP3tdvr0VYtRWyArebT?=
+ =?us-ascii?Q?BcTMXZn67mvZ3ElQDUNQByYTHC67Oxd0Trx2BOjQJBvLYE3a5EqUVhsbQ9El?=
+ =?us-ascii?Q?0MWYeTexTxlfr/kWE10N+rMGbkSdPHoFXHCu5UIxr0S68UrmRpfSg2/mcJC/?=
+ =?us-ascii?Q?qZFaNzvAVK3kNURE7H45V8eMtweL+tFNehDGgpslNqA3GpT93QNNbNHaLRyD?=
+ =?us-ascii?Q?kxWlylLHZNpsZFbEpUS6/RkLyzYUCKh6YF6KPBC4Vic0WKLHGoWQP4ca3E/D?=
+ =?us-ascii?Q?hRN5IGq1/CPibhdoT4/YLaFh+3DtF6uXGfFe3nflqg966SO7P5w7NfOcERMf?=
+ =?us-ascii?Q?0eQ7CHJaZ4Gfc8nh9RzSYKY7sF7gRBcCKvhLGaGAjJ39BQpp3lWIcf01PF/5?=
+ =?us-ascii?Q?iKxcHtvXtBlDqaQ2w+0deMz1acjFZvFaxy85VGn24IvBETUm8UKMA48dwf+a?=
+ =?us-ascii?Q?SJTabHvLnmH9Lu9I+ijYzB1zmFCfEI9xnMR4g2ptZOz/NW4ueHzoA2XTlUXg?=
+ =?us-ascii?Q?sxr8hrJdyvDLdNCA1Xf6SHRc1tYuFQ8etSkyqd50oo4TMQqc+d2MDtWEuyeF?=
+ =?us-ascii?Q?NNFv+iZ/tP3jzz0rz4lUgl4wu0nwoGlJhzkMYhPeR4+BJq1SeWmE49PdGwlj?=
+ =?us-ascii?Q?rqylbjQeSmP1KGlreWl4m1pLAS90XQ2/psBD7EXiNcRYlcHv1pLE8cUNPM9M?=
+ =?us-ascii?Q?GBUM5nfMy9FPrj/ths95KEwQIMRNJNEGm0VD42zFKsIE69nCCcxhiHodSNYf?=
+ =?us-ascii?Q?21neLBpIgGFpYqXp2mJxha1gftzNlnZhRSzn0mnTOH8EFhAkkl5pgVdU/JHD?=
+ =?us-ascii?Q?AOF93aczc2sgUpdfzN/cjOzILPfOG1tbvH4TN1rSd5TYAdGaz1GygCiLz2L0?=
+ =?us-ascii?Q?gNfw8FevCDbX49ztDf7NDdcZeXl3CZxecc3RyJZXjy71IYJ5285Qxk5RKxDd?=
+ =?us-ascii?Q?jA7l1HuIH34HLJAzHY78hDibJZ1GQmOph2Opqbk3SnFnW4NbUQyFSF5qoWPD?=
+ =?us-ascii?Q?r9rlqWTixPPB0aY1LgGlx1nPjNnuORwqgLXk+Yp3BGYuhs6bYGT3DGWNKdnH?=
+ =?us-ascii?Q?BEyD2oGSjo+nfoLnu+GJsi+/3bHqoSrueVc2EjJ7auxUrOHgn9bX2KDw0a48?=
+ =?us-ascii?Q?mAFg/OmTzSYh7Mq7FiqGCdTj+28fsTEL2W+R4XLcfgypF8gwWcS55w3A1lK9?=
+ =?us-ascii?Q?a0ZBhf19ECfZwq9wdFEydMylzGZX9S9RNkD+nN+vrkDuCgNxOnw9pVeWueHj?=
+ =?us-ascii?Q?y48kRnQackPc4VV1kMZ90kIcX3KLUkIDOhHX+fNt/WfxWwXwmkwQX4A0aSpD?=
+ =?us-ascii?Q?U+4w0XP0AKvxJx+FXh2y0aN7IP7P1zSeWHzvPw/GbAXL9sFXgYsrYCptoHiz?=
+ =?us-ascii?Q?wefp6D6vaa1CZpvcjArXQWlLMW/8Ra9VxuLP6QIu42nzpWSv2JavZ5kLCw7l?=
+ =?us-ascii?Q?CjXS8za2bEESVGeKjfRmRuk09amtNgXfXB5Nr1zY?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5cfdab1a-0470-44c1-bed5-08da90e95e03
+X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5030.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2022 15:55:20.6367
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: oqZ1U94U4Esk9O4AvIWrIsxMutnHGuTtxiQ6hOC9URDqwbRAlJPOJj0cu7Tz6k38EnGKbLCZZzxxFuvAHf37pw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB5085
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-09-07_08,2022-09-07_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 mlxscore=0
+ suspectscore=0 mlxlogscore=999 phishscore=0 adultscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2207270000
+ definitions=main-2209070062
+X-Proofpoint-GUID: tL3J5HAAF5S3zrJR1lnbdPG4_5Q78CtT
+X-Proofpoint-ORIG-GUID: tL3J5HAAF5S3zrJR1lnbdPG4_5Q78CtT
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 07, 2022, Yuan Yao wrote:
-> On Tue, Sep 06, 2022 at 09:26:33PM -0700, Mingwei Zhang wrote:
-> > > > @@ -10700,6 +10706,12 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
-> > > >               if (kvm_cpu_has_pending_timer(vcpu))
-> > > >                       kvm_inject_pending_timer_irqs(vcpu);
-> > > >
-> > > > +             if (vcpu->arch.nested_get_pages_pending) {
-> > > > +                     r = kvm_get_nested_state_pages(vcpu);
-> > > > +                     if (r <= 0)
-> > > > +                             break;
-> > > > +             }
-> > > > +
-> > >
-> > > Will this leads to skip the get_nested_state_pages for L2 first time
-> > > vmentry in every L2 running iteration ? Because with above changes
-> > > KVM_REQ_GET_NESTED_STATE_PAGES is not set in
-> > > nested_vmx_enter_non_root_mode() and
-> > > vcpu->arch.nested_get_pages_pending is not checked in
-> > > vcpu_enter_guest().
-> > >
-> > Good catch. I think the diff won't work when vcpu is runnable.
+The fix for commit e923b0537d28 ("KVM: selftests: Fix target thread to be migrated in rseq_test")
+added a call to gettid() which was only added to glibc-2.30 and fails to
+compile with older glibc versions.
 
-It works, but it's inefficient if the request comes from KVM_SET_NESTED_STATE.
-The pending KVM_REQ_UNBLOCK that comes with the flag will prevent actually running
-the guest.  Specifically, this chunk of code will detect the pending request and
-bail out of vcpu_enter_guest().
+rseq_test.c: In function 'main':
+rseq_test.c:230:33: warning: implicit declaration of function 'gettid'; did you mean 'getgid'? [-Wimplicit-function-declaration]
+          (void *)(unsigned long)gettid());
+                                 ^~~~~~
+                                 getgid
 
-	if (kvm_vcpu_exit_request(vcpu)) {
-		vcpu->mode = OUTSIDE_GUEST_MODE;
-		smp_wmb();
-		local_irq_enable();
-		preempt_enable();
-		kvm_vcpu_srcu_read_lock(vcpu);
-		r = 1;
-		goto cancel_injection;
-	}
+Switch the call to syscall(SYS_gettid) which was the original advice in the
+gettid(2) NOTES section and which works with both new and older glibc versions.
 
-But the inefficiency is a non-issue since "true" emulation of VM-Enter will flow
-through this path (the VMRESUME/VMLAUNCH/VMRUN exit handler runs at the end of
-vcpu_enter_guest().
+Fixes: e923b0537d28 ("KVM: selftests: Fix target thread to be migrated in rseq_test")
+Cc: stable@vger.kernel.org # v5.15
+Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
+---
 
-> > It only tries to catch the vcpu block case. Even for the vcpu block case,
-> > the check of KVM_REQ_UNBLOCK is way too late. Ah, kvm_vcpu_check_block() is
-> > called by kvm_vcpu_block() which is called by vcpu_block(). The warning is
-> > triggered at the very beginning of vcpu_block(), i.e., within
-> > kvm_arch_vcpu_runnable(). So, please ignore the trace in my previous email.
-> >
-> > In addition, my minor push back for that is
-> > vcpu->arch.nested_get_pages_pending seems to be another
-> > KVM_REQ_GET_NESTED_STATE_PAGES.
-> 
-> Yeah, but in concept level it's not a REQ mask lives in the
-> vcpu->requests which can be cached by e.g. kvm_request_pending().
-> It's necessary to check vcpu->arch.nested_get_pages_pending in
-> vcpu_enter_guest() if Sean's idea is to replace
-> KVM_REQ_GET_NESTED_STATE_PAGES with nested_get_pages_pending.
+Verified with glibc-2.28 and glibc-2.34 and ensured test case from e923b0537d28 still passes.
 
-Yes, they key is that it's not a request.  Requests have implicit properties:
-e.g. as above, effectively prevent running the vCPU until the request goes away,
-they can be pended from other vCPUs, etc...  And the property that is most relevant
-to this bug: except for special cases, requests only need to be serviced before
-running vCPU.
+ tools/testing/selftests/kvm/rseq_test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-And the number of requests is limited due to them being stored in a bitmap.  x86
-still has plenty of room due to kvm_vcpu.requests being a u64, but it's still
-preferable to avoid using a request unless absolutely necessary.
+diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
+index fac248a43666..6f88da7e60be 100644
+--- a/tools/testing/selftests/kvm/rseq_test.c
++++ b/tools/testing/selftests/kvm/rseq_test.c
+@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
+ 	ucall_init(vm, NULL);
+ 
+ 	pthread_create(&migration_thread, NULL, migration_worker,
+-		       (void *)(unsigned long)gettid());
++		       (void *)(unsigned long)syscall(SYS_gettid));
+ 
+ 	for (i = 0; !done; i++) {
+ 		vcpu_run(vcpu);
+-- 
+2.31.1
 
-For this case, since using a request isn't strictly needed and using a request
-would require special casing that request, my strong preference is to not use a
-request.
-
-So yes, my idea is to "just" replace the request with a flag, but there are subtly
-quite a few impliciations in not using a request.
