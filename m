@@ -2,126 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E007D5AFB92
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 07:14:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 756BC5AFBCB
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 07:35:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229531AbiIGFO1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 01:14:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58050 "EHLO
+        id S229729AbiIGFfa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 01:35:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbiIGFOZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 01:14:25 -0400
-Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F09BB3C
-        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 22:14:22 -0700 (PDT)
-Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-3454e58fe53so59693567b3.2
-        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 22:14:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=XvX4d4lHGdhmKH0oBQwXf1eY3JxPJlcnylOzEMhTpjw=;
-        b=HDlMGE1Dtzvgl4sx6psOG95eCP5fJubOQx5rXOyJx1TDazhk2aqRufACacOJcEYT0r
-         osZ3Lo1Z8fPPZoaylkaghbAM0BQaZlBz1gP+hMcBo5QZ8uGeCzStYKrifJmkD25k/DiH
-         lr7m3LWSVEvxQsKpef0k4kDU4xiwqz9lTMxviETiwgfIWuISK2zTacUHozdB4J3nXS9e
-         F9TMLHMGlC1abNichKH/KwH+iUF/G7XgcKsT6byuUtzTCS35n5mgoqQHWBIs3qPwr01+
-         aBahQ5C+5fH4hUaf2XYXq92ziiDceVipoSwAWu2HLa44wmTacL94ihW+OhBWGzAAfqfC
-         QwxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=XvX4d4lHGdhmKH0oBQwXf1eY3JxPJlcnylOzEMhTpjw=;
-        b=yOy8UgCLalu96tKLKDvMJSKQf/8YhM+PNuHEpuaps2uNfzlt1ZT3ZP6oOMR615yOB8
-         +9yzDMMdkFU1qwRR8HFKPT+KLZBdpkhrd5jeUXlqC35h/j/K4oUW+QbzZVzFcBn3rLUn
-         7vmQNADrD4LRfPeCRiQh/llb9e1MulFsvb3b9Mlga44XDQyx+2TgGczuz0y3XxR7iNjr
-         siZzFADjPw4r48EqxTV2TkqzbAk+cD3USfKVo7Nckk5kJUZEhDJ2UnpPT19gb2LwMiKj
-         gp3t5llcO67PDatqI6DVJT5wbiAmu7AjwIQIouJSeTHL6AY9R/BGACu/xTaaXSnrDnPg
-         PyTQ==
-X-Gm-Message-State: ACgBeo1rRi+DT3PhWMS4CpzuziPFIV+90jrK2iBH8P+WlNG3HzVH3G5k
-        durqWGiN8/lJbLlkMuaCUlJ+XGt65gz0u83lYdowKw==
-X-Google-Smtp-Source: AA6agR4QILULoRsfdqtrSc/wO0dJ6FfgSjfGPULmGUF02/SC0+lfUh/gUzPfZ6OXZMwCh+VWaeeVJ4k7hm0bh5AhRgc=
-X-Received: by 2002:a81:66c5:0:b0:345:3b1c:26 with SMTP id a188-20020a8166c5000000b003453b1c0026mr1857526ywc.156.1662527661285;
- Tue, 06 Sep 2022 22:14:21 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1655761627.git.ashish.kalra@amd.com> <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
- <YvKRjxgipxLSNCLe@zn.tnic> <YxcgAk7AHWZVnSCJ@kernel.org> <CAA03e5FgiLoixmqpKtfNOXM_0P5Y7LQzr3_oQe+2Z=GJ6kw32g@mail.gmail.com>
- <SN6PR12MB2767ABA4CEFE4591F87968AD8E7E9@SN6PR12MB2767.namprd12.prod.outlook.com>
- <20220906150635.mhfvtl2xgdbzr7a5@amd.com> <SN6PR12MB276774A14FEBFF4E98AC07238E7E9@SN6PR12MB2767.namprd12.prod.outlook.com>
-In-Reply-To: <SN6PR12MB276774A14FEBFF4E98AC07238E7E9@SN6PR12MB2767.namprd12.prod.outlook.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Tue, 6 Sep 2022 22:14:10 -0700
-Message-ID: <CAA03e5ETjW-apRwDa-27YrcLUPy_QxJXu9zDKWOBHa1ZVJUfwg@mail.gmail.com>
-Subject: Re: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
- fault for user address
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-Cc:     "Roth, Michael" <Michael.Roth@amd.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Borislav Petkov <bp@alien8.de>, x86 <x86@kernel.org>,
+        with ESMTP id S229582AbiIGFf1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 01:35:27 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 298124B49D;
+        Tue,  6 Sep 2022 22:35:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662528926; x=1694064926;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=s/ws2IVLLDd2yoBtML6C/t5SDZcAcQIo3h0hl+fCkPk=;
+  b=AMDxu4eOgCDPC3ZRPKuvt0Pmx+XVEdlXHEQ/UtPxcixdaYSnbpNTo3B8
+   4nNHhPgGLUt/+hLGxEBsKaTq8HSa3QRX5mGdj2q9nrY15TXpRUUCImA3W
+   5GNzqg/fuOTH3BAh9+C43/qKoLi68aRD0pGBvsxiaFZ64hwdc0Xb/3p4S
+   mRefITf0v1wqziI/x2keKun5J8WT4J5lt575JKVOxvAkOive7z0N+E1E+
+   YccovW4k10OI3hPmIqxFlO8gkn3AVKVQ6IigFG3Eg2bSbUQEYsxvh3AFa
+   XBIkyWdOpEp0tDZFnjQoVVNe+80oHtpQwmTZpb40e7z+1OMe813+6RfMl
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10462"; a="277177789"
+X-IronPort-AV: E=Sophos;i="5.93,295,1654585200"; 
+   d="scan'208";a="277177789"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2022 22:35:26 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,295,1654585200"; 
+   d="scan'208";a="676020466"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by fmsmga008.fm.intel.com with ESMTP; 06 Sep 2022 22:35:24 -0700
+Date:   Wed, 7 Sep 2022 13:35:23 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     Mingwei Zhang <mizhang@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        Alper Gun <alpergun@google.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        Oliver Upton <oupton@google.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v2 1/4] KVM: x86: move the event handling of
+ KVM_REQ_GET_VMCS12_PAGES into a common function
+Message-ID: <20220907053523.qb7qsbqfgcg2d2vx@yy-desk-7060>
+References: <20220828222544.1964917-1-mizhang@google.com>
+ <20220828222544.1964917-2-mizhang@google.com>
+ <YwzkvfT0AiwaojTx@google.com>
+ <20220907025042.hvfww56wskwhsjwk@yy-desk-7060>
+ <CAL715WJK1WwXFfbUiMjngV8Z-0jyu_9JeZaK4qvvdJfYvtQEYg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAL715WJK1WwXFfbUiMjngV8Z-0jyu_9JeZaK4qvvdJfYvtQEYg@mail.gmail.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> >> >But I believe Jarkko's version calculates the correct mask (below), incorporating all 18 offset bits into the 1G page.
-> >> >>> hex(262144 -1)
-> >> >'0x3ffff'
-> >>
-> >> We can get this simply by doing (page_per_hpage(level)-1), but as I mentioned above this is not what we need.
+On Tue, Sep 06, 2022 at 09:26:33PM -0700, Mingwei Zhang wrote:
+> > > @@ -10700,6 +10706,12 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
+> > >               if (kvm_cpu_has_pending_timer(vcpu))
+> > >                       kvm_inject_pending_timer_irqs(vcpu);
+> > >
+> > > +             if (vcpu->arch.nested_get_pages_pending) {
+> > > +                     r = kvm_get_nested_state_pages(vcpu);
+> > > +                     if (r <= 0)
+> > > +                             break;
+> > > +             }
+> > > +
+> >
+> > Will this leads to skip the get_nested_state_pages for L2 first time
+> > vmentry in every L2 running iteration ? Because with above changes
+> > KVM_REQ_GET_NESTED_STATE_PAGES is not set in
+> > nested_vmx_enter_non_root_mode() and
+> > vcpu->arch.nested_get_pages_pending is not checked in
+> > vcpu_enter_guest().
+> >
+> Good catch. I think the diff won't work when vcpu is runnable. It only
+> tries to catch the vcpu block case. Even for the vcpu block case,  the
+> check of KVM_REQ_UNBLOCK is way too late. Ah, kvm_vcpu_check_block()
+> is called by kvm_vcpu_block() which is called by vcpu_block(). The
+> warning is triggered at the very beginning of vcpu_block(), i.e.,
+> within kvm_arch_vcpu_runnable(). So, please ignore the trace in my
+> previous email.
 >
-> >If we actually want the 4K page, I think we would want to use the 0x3ffff mask as Marc suggested to get to the specific 4K RMP entry, which I don't think the current code is trying to do. But maybe that *should* be what we should be doing.
+> In addition, my minor push back for that is
+> vcpu->arch.nested_get_pages_pending seems to be another
+> KVM_REQ_GET_NESTED_STATE_PAGES.
+
+Yeah, but in concept level it's not a REQ mask lives in the
+vcpu->requests which can be cached by e.g. kvm_request_pending().
+It's necessary to check vcpu->arch.nested_get_pages_pending in
+vcpu_enter_guest() if Sean's idea is to replace
+KVM_REQ_GET_NESTED_STATE_PAGES with nested_get_pages_pending.
+
 >
-> Ok, I agree to get to the specific 4K RMP entry.
-
-Thanks, Michael, for a thorough and complete reply! I have to admit,
-there was some nuance I missed in my earlier reply. But after reading
-through what you wrote, I agree, always going to the 4k-entry to get
-the "assigned" bit and also leveraging the implementation of
-snp_lookup_rmpentry() to lookup the size bit in the 2M-aligned entry
-seems like an elegant way to code this up. Assuming this suggestion
-becomes the consensus, we might consider a comment in the source code
-to capture this discussion. Otherwise, I think I'll forget all of this
-the next time I'm reading this code :-). Something like:
-
-/*
- * The guest-assigned bit is always propagated to the paddr's respective 4k RMP
- * entry -- regardless of the actual RMP page size. In contrast, the RMP page
- * size, handled in snp_lookup_rmpentry(), is indicated by the 2M-aligned RMP
- * entry.
- */
+> Thanks.
+> -Mingwei
+>
+>
+> -Mingwei
