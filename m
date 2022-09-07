@@ -2,63 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E3A75AFB89
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 07:06:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E007D5AFB92
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 07:14:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229697AbiIGFGe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 01:06:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50740 "EHLO
+        id S229531AbiIGFO1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 01:14:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229605AbiIGFGc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 01:06:32 -0400
-Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 039589C221
-        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 22:06:31 -0700 (PDT)
-Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-12803ac8113so83746fac.8
-        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 22:06:30 -0700 (PDT)
+        with ESMTP id S229487AbiIGFOZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 01:14:25 -0400
+Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F09BB3C
+        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 22:14:22 -0700 (PDT)
+Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-3454e58fe53so59693567b3.2
+        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 22:14:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date;
-        bh=PuiKfvs0LWAFr8O4tXDEiRE5L2gc12ma++oYFMovvEU=;
-        b=HiAdJ/axcwhcheeTKmxwxPlJ3kkpkpWVXXbMlfVAxshrVHB3RXTsEPc76wdtNg++Ul
-         hs4GW0KDXPNwRfjyV1Vx9TSn/VpKF56LdGj0hygoXLfkabTG4kCC47aNL7OS+anUL8NU
-         SHAGzhw4jhbjLjoGYRQVK8ly5/zLCX8nWH1MMTGJ2E9d93z2ozA455tVTjdP/fVASAG7
-         Eml7f5DqE2LL6uCi7afSC2RvsH1Yo7W+fYTLrXxh386gXmQNCgX/nHjAZ0uje/zGU3tH
-         3Hwh38WZoY+WSAuFEzxl0oOniXN6S1jtzddhoUCscPpQUsBy0JhbZJ/u9AnkRN/9XnLu
-         Sjrw==
+        bh=XvX4d4lHGdhmKH0oBQwXf1eY3JxPJlcnylOzEMhTpjw=;
+        b=HDlMGE1Dtzvgl4sx6psOG95eCP5fJubOQx5rXOyJx1TDazhk2aqRufACacOJcEYT0r
+         osZ3Lo1Z8fPPZoaylkaghbAM0BQaZlBz1gP+hMcBo5QZ8uGeCzStYKrifJmkD25k/DiH
+         lr7m3LWSVEvxQsKpef0k4kDU4xiwqz9lTMxviETiwgfIWuISK2zTacUHozdB4J3nXS9e
+         F9TMLHMGlC1abNichKH/KwH+iUF/G7XgcKsT6byuUtzTCS35n5mgoqQHWBIs3qPwr01+
+         aBahQ5C+5fH4hUaf2XYXq92ziiDceVipoSwAWu2HLa44wmTacL94ihW+OhBWGzAAfqfC
+         QwxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=PuiKfvs0LWAFr8O4tXDEiRE5L2gc12ma++oYFMovvEU=;
-        b=1dUmFBgRghbtyKtzAX6dFl7AmgETe2DpJQCKNyjgzyxoCHs+5D89VXuBnC1SfASS3N
-         MS08NXvlfKxQyReD8PrzXxYALBCnQk25y/F9SdmPJ+bmlWnDG68mZSpcEC30QF9mzohB
-         1iZXnuDosoQhDJZsiIks0oh8+IDJSTLJeIDWFCQBMWPlD27gXs4rGUazkNczg7unWx5I
-         aSRT/Y0FiuZCEkrMrBdeOM4VTSeXC1OKtfmk3I2musr2P/hiSL1BSgq6wMTWw6sG/fEE
-         TioCkxdo/DGcEEr8gTNjBhdkdEM0ol4Pcc102j0p+hAjLeU9PjnE4BAyAK6Pof37Xhf6
-         Gb5g==
-X-Gm-Message-State: ACgBeo1pEY3Miodi12sSeYKYo0HVwI7mf14eXQwBJCu6Pf+UhpJEgqtM
-        yHZuPOkyr4KZiNKG/kjSmMWZS3VF28VKZDOK87WwNw==
-X-Google-Smtp-Source: AA6agR68KEmYYa6UEG7EGujrK2R8QAdI92tuwkfI6jdcPL7421NRztQt6frx3ojGnuI2XSq/LIK2lBPgUVyLYIJYg9Y=
-X-Received: by 2002:a05:6870:41d0:b0:126:5d06:28a5 with SMTP id
- z16-20020a05687041d000b001265d0628a5mr895080oac.181.1662527189600; Tue, 06
- Sep 2022 22:06:29 -0700 (PDT)
+        bh=XvX4d4lHGdhmKH0oBQwXf1eY3JxPJlcnylOzEMhTpjw=;
+        b=yOy8UgCLalu96tKLKDvMJSKQf/8YhM+PNuHEpuaps2uNfzlt1ZT3ZP6oOMR615yOB8
+         +9yzDMMdkFU1qwRR8HFKPT+KLZBdpkhrd5jeUXlqC35h/j/K4oUW+QbzZVzFcBn3rLUn
+         7vmQNADrD4LRfPeCRiQh/llb9e1MulFsvb3b9Mlga44XDQyx+2TgGczuz0y3XxR7iNjr
+         siZzFADjPw4r48EqxTV2TkqzbAk+cD3USfKVo7Nckk5kJUZEhDJ2UnpPT19gb2LwMiKj
+         gp3t5llcO67PDatqI6DVJT5wbiAmu7AjwIQIouJSeTHL6AY9R/BGACu/xTaaXSnrDnPg
+         PyTQ==
+X-Gm-Message-State: ACgBeo1rRi+DT3PhWMS4CpzuziPFIV+90jrK2iBH8P+WlNG3HzVH3G5k
+        durqWGiN8/lJbLlkMuaCUlJ+XGt65gz0u83lYdowKw==
+X-Google-Smtp-Source: AA6agR4QILULoRsfdqtrSc/wO0dJ6FfgSjfGPULmGUF02/SC0+lfUh/gUzPfZ6OXZMwCh+VWaeeVJ4k7hm0bh5AhRgc=
+X-Received: by 2002:a81:66c5:0:b0:345:3b1c:26 with SMTP id a188-20020a8166c5000000b003453b1c0026mr1857526ywc.156.1662527661285;
+ Tue, 06 Sep 2022 22:14:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220906081604.24035-1-likexu@tencent.com> <CALMp9eSQYp-BC_hERH0jzqY1gKU3HLV2YnJDjaAoR7DxRQu=fQ@mail.gmail.com>
- <2c9c1e8a-7ab5-8052-3e99-b4ebfd61edde@gmail.com>
-In-Reply-To: <2c9c1e8a-7ab5-8052-3e99-b4ebfd61edde@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 6 Sep 2022 22:06:18 -0700
-Message-ID: <CALMp9eRzmKAs5SvTjrG7+het7zfJqk2bFuU1fdqf8pFB2+0qvw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/pmu: omit "impossible" Intel counter MSRs from
- MSR list
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+References: <cover.1655761627.git.ashish.kalra@amd.com> <0ecb0a4781be933fcadeb56a85070818ef3566e7.1655761627.git.ashish.kalra@amd.com>
+ <YvKRjxgipxLSNCLe@zn.tnic> <YxcgAk7AHWZVnSCJ@kernel.org> <CAA03e5FgiLoixmqpKtfNOXM_0P5Y7LQzr3_oQe+2Z=GJ6kw32g@mail.gmail.com>
+ <SN6PR12MB2767ABA4CEFE4591F87968AD8E7E9@SN6PR12MB2767.namprd12.prod.outlook.com>
+ <20220906150635.mhfvtl2xgdbzr7a5@amd.com> <SN6PR12MB276774A14FEBFF4E98AC07238E7E9@SN6PR12MB2767.namprd12.prod.outlook.com>
+In-Reply-To: <SN6PR12MB276774A14FEBFF4E98AC07238E7E9@SN6PR12MB2767.namprd12.prod.outlook.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Tue, 6 Sep 2022 22:14:10 -0700
+Message-ID: <CAA03e5ETjW-apRwDa-27YrcLUPy_QxJXu9zDKWOBHa1ZVJUfwg@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 09/49] x86/fault: Add support to handle the RMP
+ fault for user address
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
+Cc:     "Roth, Michael" <Michael.Roth@amd.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Borislav Petkov <bp@alien8.de>, x86 <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Kan Liang <kan.liang@linux.intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Alper Gun <alpergun@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -71,84 +99,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 6, 2022 at 8:25 PM Like Xu <like.xu.linux@gmail.com> wrote:
->
-> On 7/9/2022 8:37 am, Jim Mattson wrote:
-> > On Tue, Sep 6, 2022 at 1:16 AM Like Xu <like.xu.linux@gmail.com> wrote:
+> >> >But I believe Jarkko's version calculates the correct mask (below), incorporating all 18 offset bits into the 1G page.
+> >> >>> hex(262144 -1)
+> >> >'0x3ffff'
 > >>
-> >> From: Like Xu <likexu@tencent.com>
-> >>
-> >> According to Intel April 2022 SDM - Table 2-2. IA-32 Architectural MSRs,
-> >> combined with the address reservation ranges of PERFCTRx, EVENTSELy, and
-> >> MSR_IA32_PMCz, the theoretical effective maximum value of the Intel GP
-> >> counters is 14, instead of 18:
-> >>
-> >>    14 = 0xE = min (
-> >>      0xE = IA32_CORE_CAPABILITIES (0xCF) - IA32_PMC0 (0xC1),
-> >>      0xF = IA32_OVERCLOCKING_STATUS (0x195) - IA32_PERFEVTSEL0 (0x186),
-> >>      0xF = IA32_MCG_EXT_CTL (0x4D0) - IA32_A_PMC0 (0x4C1)
-> >>    )
-> >>
-> >> the source of the incorrect number may be:
-> >>    18 = 0x12 = IA32_PERF_STATUS (0x198) - IA32_PERFEVTSEL0 (0x186)
-> >> but the range covers IA32_OVERCLOCKING_STATUS, which is also architectural.
-> >> Cut the list to 14 entries to avoid false positives.
-> >>
-> >> Cc: Kan Liang <kan.liang@linux.intel.com>
-> >> Cc: Jim Mattson <jamttson@google.com>
-> >
-> > That should be 'jmattson.'
+> >> We can get this simply by doing (page_per_hpage(level)-1), but as I mentioned above this is not what we need.
 >
-> Oops, my fault.
+> >If we actually want the 4K page, I think we would want to use the 0x3ffff mask as Marc suggested to get to the specific 4K RMP entry, which I don't think the current code is trying to do. But maybe that *should* be what we should be doing.
 >
-> >
-> >> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> >> Fixes: cf05a67b68b8 ("KVM: x86: omit "impossible" pmu MSRs from MSR list")
-> >
-> > I'm not sure I completely agree with the "Fixes," since
-> > IA32_OVERCLOCKING_STATUS didn't exist back then. However, Paolo did
-> > make the incorrect assumption that Intel wouldn't cut the range even
-> > further with the introduction of new MSRs.
->
-> This new msr is added in April 2022.
->
-> Driver-like software had to keep up with real hardware changes and
-> speculatively with potential predictable hardware changes until failure.
->
-> >
-> > To that point, aren't you setting yourself up for a future "Fixes"
-> > referencing this change?
->
-> (1) We have precedents like be4f3b3f8227;
-> (2) Fixes tags is introduced to help stable trees' maintainers (and their robot
-> selectors)
-> absorb suitable patches like this one. We can expect similar issues with stable
-> trees running
-> on new hardware without this fix.
-> (3) Fixing the tags does not feather the developer's nest, on the contrary the
-> upstream code
-> itself as a vehicle for our group knowledge, is reinforced.
-> >
-> > We should probably stop at the maximum number of GP PMCs supported
-> > today (8, I think).
->
-> I actually thought that at first, until I saw the speculative offset +17 :D.
+> Ok, I agree to get to the specific 4K RMP entry.
 
-The root cause of all of this pain is commit a072738e04f0 ("perf, x86:
-Implement initial P4 PMU driver"). It bumped X86_PMC_MAX_GENERIC from
-8 to 32. That eventually mutated into INTEL_PMC_MAX_GENERIC, which is
-what I consulted when I originally added the Intel PMU MSRs to
-msrs_to_save[] in
-commit e2ada66ec418 ("kvm: x86: Add Intel PMU MSRs to
-msrs_to_save[]"). My bad for just assuming that I knew what
-INTEL_PMC_MAX_GENERIC meant, based solely on its name!
+Thanks, Michael, for a thorough and complete reply! I have to admit,
+there was some nuance I missed in my earlier reply. But after reading
+through what you wrote, I agree, always going to the 4k-entry to get
+the "assigned" bit and also leveraging the implementation of
+snp_lookup_rmpentry() to lookup the size bit in the 2M-aligned entry
+seems like an elegant way to code this up. Assuming this suggestion
+becomes the consensus, we might consider a comment in the source code
+to capture this discussion. Otherwise, I think I'll forget all of this
+the next time I'm reading this code :-). Something like:
 
-Paolo fixed my commit by reducing the list to 18 PMCs, because of the
-known conflict at the time. (Note that the SDM says that there are
-actually only 18 PMCs on the P4, but I don't think Paolo factored this
-into his change.)
-
-This is all the more reason *not* to put a static list of PMU MSRs
-into msrs_to_save[], but to dynamically add the PMU MSRs supported on
-the host. If you're on a P4, there will be 18 of them, but they range
-from 0x300 to 0x311.
+/*
+ * The guest-assigned bit is always propagated to the paddr's respective 4k RMP
+ * entry -- regardless of the actual RMP page size. In contrast, the RMP page
+ * size, handled in snp_lookup_rmpentry(), is indicated by the 2M-aligned RMP
+ * entry.
+ */
