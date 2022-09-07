@@ -2,173 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E1B555B094A
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 17:56:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A314A5B094D
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 17:56:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229904AbiIGP4B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 11:56:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43752 "EHLO
+        id S229985AbiIGP4S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 11:56:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229616AbiIGPz6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 11:55:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C9C17C753
-        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 08:55:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662566156;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=U000y4AlzxnDukLNUBVaMd74Em033gIiv2WJaxIzryc=;
-        b=EC9fQ3iWUouCpAIS/nvmIrROb5ct85SHEeWMR+DLD43OHHCUQ/aWrr3JCVl2kPn0vC3SAh
-        JvQ7gmIcMlN5P66FDt6oZ0jRFUeuxsmDa5MF0QdlwBTU6oduQ4tDhfEZqwpanbyx0r/f3Y
-        nM7dz+kHJd797BB9/OTnHTIiML0mIFI=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-654-_QyNwgLgMGa7NWDQLxysew-1; Wed, 07 Sep 2022 11:55:55 -0400
-X-MC-Unique: _QyNwgLgMGa7NWDQLxysew-1
-Received: by mail-io1-f69.google.com with SMTP id l205-20020a6b3ed6000000b0068b49dd0a61so9449049ioa.14
-        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 08:55:55 -0700 (PDT)
+        with ESMTP id S229549AbiIGP4Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 11:56:16 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA3CA83042
+        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 08:56:11 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id v1so1676302plo.9
+        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 08:56:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=gu51tTeubGA4NmbCnkGTbmAG64OE9zjLhtK0FhQe950=;
+        b=Pr86m6G98JqU1Urcvo1EUkEDGK9pfiks9+WPDL8jR4YkN8/2gldaS0vRK1P+XSnPxe
+         MlJCY/ltfWaGduF+UUkYT1iLlFjv9NpjpJI8kbEk7vBBQj6qQBAypwpr/KEKvAe1zcE+
+         Qlpod8JfhDYhxWEpQhrv/Vv/0kQkn1lJJvgNeBD9k+jwdx8Jzpa3d3RBOdWVJ9mTitme
+         pmtUpeXH29obpufNv5uP7nHMZAxksBoaarLwO2xLzGiiVxRdg0wWKvIDlxuc6R5DQzKy
+         t611VsGsQ0HcT2kDuxf12Tc3PymfZwevBZttehAKFwNA4s59+DwFD7dEk3oLG07yujdM
+         20Kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=U000y4AlzxnDukLNUBVaMd74Em033gIiv2WJaxIzryc=;
-        b=ykbN4F08puCF8TxmdxtsmSCUlUXG7o04y+EUaJSBC+gx668Rde4f272GcFo+C6MjEO
-         7SHVt+GTA/mUJk/fXr65oP1wvdyJUV/1AMsFK0v/5am7q/sEsxoxxJSziHEgaLRKo5Wg
-         RXgVTU0BcivMBqA26k4fi9swFP3W1QJv2JtW73Lfg9fnUccaUo/TdKwnm1DODB1zff/M
-         4/Xfm2vn9B8FJ4Be73QWNlzREPvnWUe1qnNLHPtPI7mybT7F/BM7LbfYNNcWGYIobOkd
-         A3xNtSpCHPyIYD74olSQttz5ESUf/OdaBaHnDUIwiICokfT/QE6512GlPrbJ0nXuF+le
-         1xyw==
-X-Gm-Message-State: ACgBeo1KPupp0z9jnXsgdbjQFrCJEDTEftUCkogXTGopf0DBxNsqChnB
-        j3EqaxVMsK9hMd/FQx2kgQWs13qzPUr4EgnFexUAk6D0QRUjY47vQvkGPggyMFzLXWMgcNT1MBB
-        4kv96bgQopRsB
-X-Received: by 2002:a05:6638:22d1:b0:34f:5d31:5fe with SMTP id j17-20020a05663822d100b0034f5d3105femr2606499jat.185.1662566154720;
-        Wed, 07 Sep 2022 08:55:54 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6D7qKm1upNIe82yM19qyluZ0T+1qSlkLSi1fOw3wRUvT4Mi/b72egvqphU/nT0DgOhWBcbfQ==
-X-Received: by 2002:a05:6638:22d1:b0:34f:5d31:5fe with SMTP id j17-20020a05663822d100b0034f5d3105femr2606485jat.185.1662566154471;
-        Wed, 07 Sep 2022 08:55:54 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id c44-20020a02962f000000b00349cee4ef4asm7424975jai.62.2022.09.07.08.55.53
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=gu51tTeubGA4NmbCnkGTbmAG64OE9zjLhtK0FhQe950=;
+        b=UQWLRuicG5ezfpECjEbjHvruaq5/Bd6na8USV4tOFUsdzTIOhc3Oy96W3DeTjJ2Vs+
+         ypGs0nGRWaCmrUY0IkzADAA8vsrG6G63td0FL23pmBbRq8SdMKBrP6Wcg7to+Q0JBbHE
+         Mcu9Cil0vfxAERW9bfr6xFg5XcYL8fMmu9P9Nc+OdNwRp6az4av12NDL0IQ2adlpoY8G
+         vU4Ffo7VjHlxpHdw8k+S1hogneI3coP0chFkGlNI2VMulU5k9fT+FDMie4vzsrkrOmeV
+         1qc0QFbJXw0zGgF2g3lr+dSWAkCQ2KVygI+GadALCYGLrMKtonmkztt71u06xpF1Wg+o
+         jdZQ==
+X-Gm-Message-State: ACgBeo11sN0uIfoRl8I6B+f83pohKsW+1QXkJr92zgz0MPa6ZUvVEsSp
+        N+3x/Ubw1VjpKk4JnXvZeDKxCg==
+X-Google-Smtp-Source: AA6agR6xxiOhtnIeeQp07O1eOAr/mOul3MWxVgcuf8Zja3cq9J5XPPCqN+pz/3w8sPPqSivkOuap0Q==
+X-Received: by 2002:a17:90b:1e47:b0:200:b9b4:ba1e with SMTP id pi7-20020a17090b1e4700b00200b9b4ba1emr4321382pjb.172.1662566171350;
+        Wed, 07 Sep 2022 08:56:11 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id s2-20020aa78bc2000000b0053e0d6f353esm4858065pfd.27.2022.09.07.08.56.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Sep 2022 08:55:54 -0700 (PDT)
-Date:   Wed, 7 Sep 2022 09:55:52 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     David Hildenbrand <david@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "lpivarc@redhat.com" <lpivarc@redhat.com>,
-        "Liu, Jingqi" <jingqi.liu@intel.com>,
-        "Lu, Baolu" <baolu.lu@intel.com>
-Subject: Re: [PATCH] vfio/type1: Unpin zero pages
-Message-ID: <20220907095552.336c8f34.alex.williamson@redhat.com>
-In-Reply-To: <YxiTOyGqXHFkR/DY@ziepe.ca>
-References: <166182871735.3518559.8884121293045337358.stgit@omen>
-        <BN9PR11MB527655973E2603E73F280DF48C7A9@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <d71160d1-5a41-eae0-6405-898fe0a28696@redhat.com>
-        <YxfX+kpajVY4vWTL@ziepe.ca>
-        <b365f30b-da58-39c0-08e9-c622cc506afa@redhat.com>
-        <YxiTOyGqXHFkR/DY@ziepe.ca>
-Organization: Red Hat
+        Wed, 07 Sep 2022 08:56:10 -0700 (PDT)
+Date:   Wed, 7 Sep 2022 15:56:07 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yuan Yao <yuan.yao@linux.intel.com>
+Cc:     Mingwei Zhang <mizhang@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Oliver Upton <oupton@google.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH v2 1/4] KVM: x86: move the event handling of
+ KVM_REQ_GET_VMCS12_PAGES into a common function
+Message-ID: <Yxi/F7BjiYTWnABh@google.com>
+References: <20220828222544.1964917-1-mizhang@google.com>
+ <20220828222544.1964917-2-mizhang@google.com>
+ <YwzkvfT0AiwaojTx@google.com>
+ <20220907025042.hvfww56wskwhsjwk@yy-desk-7060>
+ <CAL715WJK1WwXFfbUiMjngV8Z-0jyu_9JeZaK4qvvdJfYvtQEYg@mail.gmail.com>
+ <20220907053523.qb7qsbqfgcg2d2vx@yy-desk-7060>
+ <Yxi9QRziGl2YhNuB@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yxi9QRziGl2YhNuB@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 7 Sep 2022 09:48:59 -0300
-Jason Gunthorpe <jgg@ziepe.ca> wrote:
-
-> On Wed, Sep 07, 2022 at 11:00:21AM +0200, David Hildenbrand wrote:
-> > > > I do wonder if that's a real issue, though. One approach would be to
-> > > > warn the VFIO users and allow for slightly exceeding the MEMLOCK limit
-> > > > for a while. Of course, that only works if we assume that such pinned
-> > > > zeropages are only extremely rarely longterm-pinned for a single VM
-> > > > instance by VFIO.  
-> > > 
-> > > I'm confused, doesn't vfio increment the memlock for every page of VA
-> > > it pins? Why would it matter if the page was COW'd or not? It is
-> > > already accounted for today as though it was a unique page.
-> > > 
-> > > IOW if we add FOLL_FORCE it won't change the value of the memlock.  
-> > 
-> > I only briefly skimmed over the code Alex might be able to provide more
-> > details and correct me if I'm wrong:
-> > 
-> > vfio_pin_pages_remote() contains a comment:
-> > 
-> > "Reserved pages aren't counted against the user, externally pinned pages are
-> > already counted against the user."
-> > 
-> > is_invalid_reserved_pfn() should return "true" for the shared zeropage and
-> > prevent us from accounting it via vfio_lock_acct(). Otherwise,
-> > vfio_find_vpfn() seems to be in place to avoid double-accounting pages.  
+On Wed, Sep 07, 2022, Sean Christopherson wrote:
+> On Wed, Sep 07, 2022, Yuan Yao wrote:
+> > On Tue, Sep 06, 2022 at 09:26:33PM -0700, Mingwei Zhang wrote:
+> > > > > @@ -10700,6 +10706,12 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
+> > > > >               if (kvm_cpu_has_pending_timer(vcpu))
+> > > > >                       kvm_inject_pending_timer_irqs(vcpu);
+> > > > >
+> > > > > +             if (vcpu->arch.nested_get_pages_pending) {
+> > > > > +                     r = kvm_get_nested_state_pages(vcpu);
+> > > > > +                     if (r <= 0)
+> > > > > +                             break;
+> > > > > +             }
+> > > > > +
+> > > >
+> > > > Will this leads to skip the get_nested_state_pages for L2 first time
+> > > > vmentry in every L2 running iteration ? Because with above changes
+> > > > KVM_REQ_GET_NESTED_STATE_PAGES is not set in
+> > > > nested_vmx_enter_non_root_mode() and
+> > > > vcpu->arch.nested_get_pages_pending is not checked in
+> > > > vcpu_enter_guest().
+> > > >
+> > > Good catch. I think the diff won't work when vcpu is runnable.
 > 
-> is_invalid_reserved_pfn() is supposed to return 'true' for PFNs that
-> cannot be returned from pin_user_pages():
+> It works, but it's inefficient if the request comes from KVM_SET_NESTED_STATE.
+> The pending KVM_REQ_UNBLOCK that comes with the flag will prevent actually running
+> the guest.  Specifically, this chunk of code will detect the pending request and
+> bail out of vcpu_enter_guest().
 > 
-> /*
->  * Some mappings aren't backed by a struct page, for example an mmap'd
->  * MMIO range for our own or another device.  These use a different
->  * pfn conversion and shouldn't be tracked as locked pages.
->  * For compound pages, any driver that sets the reserved bit in head
->  * page needs to set the reserved bit in all subpages to be safe.
->  */
-> static bool is_invalid_reserved_pfn(unsigned long pfn)
+> 	if (kvm_vcpu_exit_request(vcpu)) {
+> 		vcpu->mode = OUTSIDE_GUEST_MODE;
+> 		smp_wmb();
+> 		local_irq_enable();
+> 		preempt_enable();
+> 		kvm_vcpu_srcu_read_lock(vcpu);
+> 		r = 1;
+> 		goto cancel_injection;
+> 	}
 > 
-> What it is talking about by 'different pfn conversion' is the
-> follow_fault_pfn() path, not the PUP path.
-> 
-> So, it is some way for VFIO to keep track of when a pfn was returned
-> by PUP vs follow_fault_pfn(), because it treats those two paths quite
-> differently.
-> 
-> I lost track of what the original cause of this bug is - however AFAIK
-> pin_user_pages() used to succeed when the zero page is mapped.
+> But the inefficiency is a non-issue since "true" emulation of VM-Enter will flow
+> through this path (the VMRESUME/VMLAUNCH/VMRUN exit handler runs at the end of
+> vcpu_enter_guest().
 
-It does currently, modulo getting broken occasionally.
-
-> No other PUP user call this follow_fault_pfn() hacky path, and we
-> expect things like O_DIRECT to work properly even when reading from VA
-> that has the zero page mapped.
-
-zero page shouldn't take that path, we get the pages via PUP.
-
-> So, if we go back far enough in the git history we will find a case
-> where PUP is returning something for the zero page, and that something
-> caused is_invalid_reserved_pfn() == false since VFIO did work at some
-> point.
-
-Can we assume that?  It takes a while for a refcount leak on the zero
-page to cause an overflow.  My assumption is that it's never worked, we
-pin zero pages, don't account them against the locked memory limits
-because our is_invalid_reserved_pfn() test returns true, and therefore
-we don't unpin them.
-
-> IHMO we should simply go back to the historical behavior - make
-> is_invalid_reserved_pfn() check for the zero_pfn and return
-> false. Meaning that PUP returned it.
-
-We've never explicitly tested for zero_pfn and as David notes,
-accounting the zero page against the user's locked memory limits has
-user visible consequences.  VMs that worked with a specific locked
-memory limit may no longer work.  Logically, this seems to be the one
-case of duplicate accounting that we get right relative to the user's
-locked memory limit and the current implementation of pinning the zero
-page.  We're not locking any resources that aren't effectively already
-locked.  Thanks,
-
-Alex
-
+Actually, nested VM-Enter doesn't use this path at all.  The above holds true for
+emulated RSM, but that's largely a moot point since RSM isn't exactly a hot path.
