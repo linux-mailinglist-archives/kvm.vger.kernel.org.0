@@ -2,91 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AA95D5B0687
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 16:28:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52ACD5B069F
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 16:30:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230206AbiIGO2U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 10:28:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36656 "EHLO
+        id S230336AbiIGOar (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 10:30:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230223AbiIGO2R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 10:28:17 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0124A5FAC
-        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 07:27:53 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id c2so14736146plo.3
-        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 07:27:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=9XYS+Kgfb1igJPu9ypOIGlz79nZqVIH51hI/0E5X5eM=;
-        b=Bv3u2O5q2uJVe3HgYKCpkwW3hIjKkeJnM85rvsLdQhPO4kzJKsS9ham5jES+6lG9td
-         gfZTWjCH/qAqSa/tqaQb0OgjHGOrc531I5mAGHtbGRAavJjsweH8RmfDycY9cyKLX3mi
-         Tz+Dw0CBx5MoMq+fIGFMbRB4Lc3E8G9I7Oa5hmiUGMwRk7nakoNIhy+NKV2ZADTH7NP/
-         oi2FsUDJWn8JUZuk3Pa1R6ozwniM48YqAv9Khd+Q5o94178YHFzvvX0FkvZH46dNofGA
-         EWzHAk2tPugmr4DjqSBo3GcPjNpGAozoBqHiZZieYDxyfbeho8CKNYUa7rir8gjGfxIh
-         VQzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=9XYS+Kgfb1igJPu9ypOIGlz79nZqVIH51hI/0E5X5eM=;
-        b=2wesY5yiQQ8IKi4unjnCMogVvGZzR4uKmBfatTMbteHaEKmCWo9or9ic7h085RWqlU
-         95BkZW6nk9T2IJN2BDypisLe62gFn3iZufzDj0cOtOoMguBziMkrMJWGzqBNQa+duic/
-         cUWlfLCCQeRVLpXdEAo5qlvdyNcLUtWcPzxFGL1qWsRIW/Zoi5KmhWw+1qjfWH0xnfHU
-         plFxohO9WqYwoo4hkBg75WkDaNheJmbHPEZGmZb4GuzCZmXhuhywJMSqX6AxwjAItkNk
-         HuSGBc8FeSIhqKLcLnn6iv0VIzo38Oymvyf5A9g6qIWOc+aqhnVnlyJfBD7xEDhr59Xp
-         wfnA==
-X-Gm-Message-State: ACgBeo1Dy+eW4aJtq037fSRfnuUJrkBYFfh2Hmtalo9iMblCzFDxL981
-        xBPpz3qMYzA8T/LBxtJoOw1jpQ==
-X-Google-Smtp-Source: AA6agR7c6O5T5fX9brggCj/jzZQi8hBuMiaraeBpsDLiQih1cZLOe/O5Rs1LqPfhJa/psb1gkAYOHw==
-X-Received: by 2002:a17:902:bc44:b0:176:909f:f636 with SMTP id t4-20020a170902bc4400b00176909ff636mr3883717plz.21.1662560821442;
-        Wed, 07 Sep 2022 07:27:01 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id a3-20020a621a03000000b0053e7495a395sm1721141pfa.122.2022.09.07.07.27.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Sep 2022 07:27:01 -0700 (PDT)
-Date:   Wed, 7 Sep 2022 14:26:57 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Miaohe Lin <linmiaohe@huawei.com>
-Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86/mmu: add missing update to max_mmu_rmap_size
-Message-ID: <YxiqMbQlZJqxzu2q@google.com>
-References: <20220907080657.42898-1-linmiaohe@huawei.com>
+        with ESMTP id S230251AbiIGOaX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 10:30:23 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1E502A73D;
+        Wed,  7 Sep 2022 07:30:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=2l7eopzr/mSNZZDgV9tkZ0XntKy0XuXzIO3nOXotg4k=; b=mphsyxJhKDUVK5RBxhAHtdvWi2
+        jNXtUct8LS44ITwnw64hqzo5kmIoDqPPUfWhWRMMO9OVboa7RdnB/GgkKGPxIMze414KcEXmOK3YN
+        YxA8NSddMLrJckJZPfmTtDmRgHm/roVjbPbxC2t5VRr1H/0IgHUqVEZzkohOgjihNHiuofn/2bGAl
+        UcAznerDMMF+UDGBUALmm7NCuygA/ThL9g/gWRrjk9RfqBtvZpIsloJ++xyq2uKLzjfYrjeLGM+Th
+        WvVI1AEZNBUmFfnKZMkimlU2X7IX14CSGkaTMPpOHytqtoyJn6BOtRHBv8VXuHM3jsAXU67bb0rxL
+        zXAGAdUA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oVw3y-006tuK-Vl; Wed, 07 Sep 2022 14:29:58 +0000
+Date:   Wed, 7 Sep 2022 07:29:58 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linaro-mm-sig@lists.linaro.org, linux-media@vger.kernel.org,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
+        Maor Gottlieb <maorg@nvidia.com>,
+        Oded Gabbay <ogabbay@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>
+Subject: Re: [PATCH v2 4/4] vfio/pci: Allow MMIO regions to be exported
+ through dma-buf
+Message-ID: <Yxiq5sjf/qA7xS8A@infradead.org>
+References: <0-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
+ <4-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
+ <YxcYGzPv022G2vLm@infradead.org>
+ <b6b5d236-c089-7428-4cc9-a08fe4f6b4a3@amd.com>
+ <YxczjNIloP7TWcf2@nvidia.com>
+ <YxiJJYtWgh1l0wxg@infradead.org>
+ <YxiPh4u/92chN02C@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220907080657.42898-1-linmiaohe@huawei.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <YxiPh4u/92chN02C@nvidia.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 07, 2022, Miaohe Lin wrote:
-> The update to statistic max_mmu_rmap_size is unintentionally removed by
-> commit 4293ddb788c1 ("KVM: x86/mmu: Remove redundant spte present check
-> in mmu_set_spte"). Add missing update to it or max_mmu_rmap_size will
-> always be nonsensical 0.
+On Wed, Sep 07, 2022 at 09:33:11AM -0300, Jason Gunthorpe wrote:
+> Yes, you said that, and I said that when the AMD driver first merged
+> it - but it went in anyhow and now people are using it in a bunch of
+> places.
+
+drm folks made up their own weird rules, if they internally stick
+to it they have to listen to it given that they ignore review comments,
+but it violates the scatterlist API and has not business anywhere
+else in the kernel.  And yes, there probably is a reason or two why
+the drm code is unusually error prone.
+
+> > Why would small BARs be problematic for the pages?  The pages are more
+> > a problem for gigantic BARs do the memory overhead.
 > 
-> Fixes: 4293ddb788c1 ("KVM: x86/mmu: Remove redundant spte present check in mmu_set_spte")
+> How do I get a struct page * for a 4k BAR in vfio?
 
-For anyone else wondering "how did so many reviewers miss this obvious bug?", the
-answer is that the reviews were collected for v3 and earlier, and the mishandled
-merge conflict only showed up in v4.
+I guess we have different definitions of small then :)
 
-> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
-> ---
+But unless my understanding of the code is out out of data,
+memremap_pages just requires the (virtual) start address to be 2MB
+aligned, not the size.  Adding Dan for comments.
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
-
-
-Paolo, do you want to grab this for 6.0?
+That being said, what is the point of mapping say a 4k BAR for p2p?
+You're not going to save a measurable amount of CPU overhead if that
+is the only place you transfer to.
