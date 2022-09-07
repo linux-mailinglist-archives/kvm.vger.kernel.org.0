@@ -2,177 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D99CB5B0C79
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 20:25:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DBC45B0CBF
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 20:56:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230251AbiIGSZ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 14:25:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42430 "EHLO
+        id S229880AbiIGS4g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 14:56:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230075AbiIGSZ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 14:25:57 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1877BBA5A
-        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 11:25:54 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id x1-20020a17090ab00100b001fda21bbc90so19181105pjq.3
-        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 11:25:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=q7D/Z6Bs3er9DCMl6VMbOrWC19uTlXD8Te0jKVH9bfE=;
-        b=oEUPqMTgXvhPFGYkREmEGnA+cIUBdzLpeeB2EGvEBY/domNHzeMzopXURXDLL+lPQU
-         mnBrOQYPObPumTDgYrxh7R+LKc56pigw0Jy/d/d13NkXLLd1JQa4gLEnZjse340yTMBQ
-         ImH3amq6bw8NG9OFghDi3OCl6mEzN6gtN0WYinqHTBG3TcWwSgZmsxBLksFEQCJ1KvWZ
-         3fqGJEiwsHmnkcEnEUhwrmzkZelFstFffk8jM5eVeZ8xiDErq7aKQ9mTib6WV7ZudExb
-         +vOefT+tfOco/x2ol+vDidKUoAKF7ZXfEtNK+mWwaIwDA87rCNUbaXn88wmmp3g40wZI
-         tu0w==
+        with ESMTP id S229593AbiIGS4e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 14:56:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1F3085FB2
+        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 11:56:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662576991;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5YJaq4uQt8YTpG3CQacvvUHsHF+mngH79gUDPmqckto=;
+        b=I3XQexzloRl+rd/M4olYE5v9JcZPbY6FtwWWT05gNu8ZVrGY5m/ZsYRK7+2WCqZXsw2Mv7
+        sqbRIToBaWtBH7PiQJX1bNgcgt32fEg9u+5XkU3/BZfEhN6uB0crSbsdaY2QUcFLXVAD8o
+        IXE8K/cDIGbYx7fX1aXzukS5aKZTNoc=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-160-g0a3KtxxMiSWF4Ukl2ociw-1; Wed, 07 Sep 2022 14:56:31 -0400
+X-MC-Unique: g0a3KtxxMiSWF4Ukl2ociw-1
+Received: by mail-io1-f72.google.com with SMTP id n23-20020a056602341700b00689fc6dbfd6so9695567ioz.8
+        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 11:56:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=q7D/Z6Bs3er9DCMl6VMbOrWC19uTlXD8Te0jKVH9bfE=;
-        b=vSTS5H+hAg2k18ulahuPWMWgp28/atZF7oy0tUCGgi1brKRl9PYu+bRyOHWyKEp3Ry
-         IP5pRS95eNxbbd7DG+temujVE0slwfjcS/tNKoP0ABIMuxANiMTUhNyFSB0uHVA5ysh0
-         2mPypBB9cr9Bb+wBD5H2ZnSX8i7YhwoPi8cLucm6ptbV5JcA1MN2DGU7g35sKgjRWAf7
-         aJKbjg3OOXD96+arAd1fuoBKQMy5i8LSdGmgeOw4w50zawN9dbLERyd8gP7mtR6hoNvL
-         iJkyS4c9r9x+xrOlwk0iApjBb6WZ/x+1biLm7S8Hq5hNGT/W7OX4eg6H6MTk2GE3M6nh
-         kTug==
-X-Gm-Message-State: ACgBeo2jkzhIEjQ8ViF5ZRZjfpiua/ngt42+EKrmNBtO55ybIL5Y+vex
-        FxXoHK2xr08W7YHBLlourFro47KX/19rZw==
-X-Google-Smtp-Source: AA6agR4pRVPppRuzcj+NVbAvfCFcI2n8qoerzcQ+aPYA85pnNIsTXu5xd3ZpSYRSzBaLPxuZkCMfjA==
-X-Received: by 2002:a17:90a:9907:b0:1f5:2318:ea6d with SMTP id b7-20020a17090a990700b001f52318ea6dmr5425613pjp.163.1662575153632;
-        Wed, 07 Sep 2022 11:25:53 -0700 (PDT)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id 8-20020a17090a000800b001fd77933fb3sm11401627pja.17.2022.09.07.11.25.46
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=5YJaq4uQt8YTpG3CQacvvUHsHF+mngH79gUDPmqckto=;
+        b=Ybdi5Vs43omi4EJfCZY9L6+cWvdnjc8Ldr402B6jMeO69S99MwfIjVm2rG/NEtY7N7
+         nr9Bts4WOTBtsf5yNb1/xe9XlyEzaR9vOWKwgnAsLevMQz5tWIrR7P0teYQkTakF+Glj
+         KjW4PQE4taxc6wWS+Zno+nfgGPEuPW0zN0LzSyfdpXbkWaavrYo9vuYDYbeHmNky1K2d
+         f+bd3whAAiudgmFRvNKgW3ivgN/Cb1KVgKWOtXEwbh2MouJPYX5kBYkhTzIhvdK6HxQh
+         NP8trMyaiXhAZXwl9LEblw8YRMk1db9QD03iY470P+psl+ul6LKRdXI3bJZm1HkSJvfd
+         BDqw==
+X-Gm-Message-State: ACgBeo07vgaZcyyQsiUrU8nQEUUg0axizY59P6+vjNJ1Ct+rwkFoMA0E
+        7dVBenx2kzH0xjy39h6chqhyMiQt5lNCMjJnTpojct3oow+KcJuL93LNDzAQlcqLj+aOtyDfjwq
+        U4mDiDXJZFzTD
+X-Received: by 2002:a05:6638:480d:b0:351:afa0:c0d4 with SMTP id cp13-20020a056638480d00b00351afa0c0d4mr2907977jab.224.1662576990136;
+        Wed, 07 Sep 2022 11:56:30 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR5/9wDhADVEi2ig72bDIEuDrX41uZ4Uvmvy7hzrtllkWwtnVqlqgakvbyE2mrVz+pxdDiij1w==
+X-Received: by 2002:a05:6638:480d:b0:351:afa0:c0d4 with SMTP id cp13-20020a056638480d00b00351afa0c0d4mr2907970jab.224.1662576989922;
+        Wed, 07 Sep 2022 11:56:29 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id i133-20020a6bb88b000000b00689257fef39sm119339iof.4.2022.09.07.11.56.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Sep 2022 11:25:53 -0700 (PDT)
-Date:   Wed, 7 Sep 2022 11:25:42 -0700
-From:   David Matlack <dmatlack@google.com>
-To:     Hou Wenlong <houwenlong.hwl@antgroup.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Lan Tianyu <Tianyu.Lan@microsoft.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 4/6] KVM: x86/mmu: Fix wrong start gfn of tlb flushing
- with range
-Message-ID: <YxjiJougYfG1seBT@google.com>
-References: <cover.1661331396.git.houwenlong.hwl@antgroup.com>
- <888399c78eab9d965657c5983f8096c707664c30.1661331396.git.houwenlong.hwl@antgroup.com>
+        Wed, 07 Sep 2022 11:56:29 -0700 (PDT)
+Date:   Wed, 7 Sep 2022 12:56:27 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     David Hildenbrand <david@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "lpivarc@redhat.com" <lpivarc@redhat.com>,
+        "Liu, Jingqi" <jingqi.liu@intel.com>,
+        "Lu, Baolu" <baolu.lu@intel.com>
+Subject: Re: [PATCH] vfio/type1: Unpin zero pages
+Message-ID: <20220907125627.0579e592.alex.williamson@redhat.com>
+In-Reply-To: <YxjJlM5A0OLhaA7K@ziepe.ca>
+References: <166182871735.3518559.8884121293045337358.stgit@omen>
+        <BN9PR11MB527655973E2603E73F280DF48C7A9@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <d71160d1-5a41-eae0-6405-898fe0a28696@redhat.com>
+        <YxfX+kpajVY4vWTL@ziepe.ca>
+        <b365f30b-da58-39c0-08e9-c622cc506afa@redhat.com>
+        <YxiTOyGqXHFkR/DY@ziepe.ca>
+        <20220907095552.336c8f34.alex.williamson@redhat.com>
+        <YxjJlM5A0OLhaA7K@ziepe.ca>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <888399c78eab9d965657c5983f8096c707664c30.1661331396.git.houwenlong.hwl@antgroup.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 24, 2022 at 05:29:21PM +0800, Hou Wenlong wrote:
-> When a spte is dropped, the start gfn of tlb flushing should
-> be the gfn of spte not the base gfn of SP which contains the
-> spte. Also introduce a helper function to do range-based
-> flushing when a spte is dropped, which would help prevent
-> future buggy use of kvm_flush_remote_tlbs_with_address() in
-> such case.
+On Wed, 7 Sep 2022 13:40:52 -0300
+Jason Gunthorpe <jgg@ziepe.ca> wrote:
+
+> On Wed, Sep 07, 2022 at 09:55:52AM -0600, Alex Williamson wrote:
 > 
-> Fixes: c3134ce240eed ("KVM: Replace old tlb flush function with new one to flush a specified range.")
-> Suggested-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c         | 20 +++++++++++++++-----
->  arch/x86/kvm/mmu/paging_tmpl.h |  3 +--
->  2 files changed, 16 insertions(+), 7 deletions(-)
+> > > So, if we go back far enough in the git history we will find a case
+> > > where PUP is returning something for the zero page, and that something
+> > > caused is_invalid_reserved_pfn() == false since VFIO did work at some
+> > > point.  
+> > 
+> > Can we assume that?  It takes a while for a refcount leak on the zero
+> > page to cause an overflow.  My assumption is that it's never worked, we
+> > pin zero pages, don't account them against the locked memory limits
+> > because our is_invalid_reserved_pfn() test returns true, and therefore
+> > we don't unpin them.  
 > 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 3bcff56df109..e0b9432b9491 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -260,6 +260,18 @@ void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
->  	kvm_flush_remote_tlbs_with_range(kvm, &range);
->  }
+> Oh, you think it has been buggy forever? That is not great..
 >  
-> +static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index);
-> +
-> +/* Flush the range of guest memory mapped by the given SPTE. */
-> +static void kvm_flush_remote_tlbs_sptep(struct kvm *kvm, u64 *sptep)
-> +{
-> +	struct kvm_mmu_page *sp = sptep_to_sp(sptep);
-> +	gfn_t gfn = kvm_mmu_page_get_gfn(sp, spte_index(sptep));
-> +
-> +	kvm_flush_remote_tlbs_with_address(kvm, gfn,
-> +					   KVM_PAGES_PER_HPAGE(sp->role.level));
-
-How is the range-based TLB flushing supposed to work with indirect MMUs?
-When KVM is using shadow paging, the gfn here is not part of the actual
-translation.
-
-For example, when TDP is disabled, KVM's shadow page tables translate
-GVA to HPA. When Nested Virtualization is in use and running L2, KVM's
-shadow page tables translate nGPA to HPA.
-
-Ah, I see x86_ops.tlb_remote_flush_with_range is only set when running
-on Hyper-V and TDP is enabled (VMX checks enable_ept and SVM checks
-npt_enabled). But it looks like the nested case might still be broken?
-
-> +}
-> +
->  /* Flush all memory mapped by the given direct SP. */
->  static void kvm_flush_remote_tlbs_direct_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
->  {
-> @@ -1156,8 +1168,7 @@ static void drop_large_spte(struct kvm *kvm, u64 *sptep, bool flush)
->  	drop_spte(kvm, sptep);
->  
->  	if (flush)
-> -		kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
-> -			KVM_PAGES_PER_HPAGE(sp->role.level));
-> +		kvm_flush_remote_tlbs_sptep(kvm, sptep);
->  }
->  
->  /*
-> @@ -1608,7 +1619,7 @@ static void __rmap_add(struct kvm *kvm,
->  	if (rmap_count > RMAP_RECYCLE_THRESHOLD) {
->  		kvm_zap_all_rmap_sptes(kvm, rmap_head);
->  		kvm_flush_remote_tlbs_with_address(
-> -				kvm, sp->gfn, KVM_PAGES_PER_HPAGE(sp->role.level));
-> +				kvm, gfn, KVM_PAGES_PER_HPAGE(sp->role.level));
->  	}
->  }
->  
-> @@ -6402,8 +6413,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
->  			kvm_zap_one_rmap_spte(kvm, rmap_head, sptep);
->  
->  			if (kvm_available_flush_tlb_with_range())
-> -				kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
-> -					KVM_PAGES_PER_HPAGE(sp->role.level));
-> +				kvm_flush_remote_tlbs_sptep(kvm, sptep);
->  			else
->  				need_tlb_flush = 1;
->  
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index 39e0205e7300..04149c704d5b 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -937,8 +937,7 @@ static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
->  
->  			mmu_page_zap_pte(vcpu->kvm, sp, sptep, NULL);
->  			if (is_shadow_present_pte(old_spte))
-> -				kvm_flush_remote_tlbs_with_address(vcpu->kvm,
-> -					sp->gfn, KVM_PAGES_PER_HPAGE(sp->role.level));
-> +				kvm_flush_remote_tlbs_sptep(vcpu->kvm, sptep);
->  
->  			if (!rmap_can_add(vcpu))
->  				break;
-> -- 
-> 2.31.1
+> > > IHMO we should simply go back to the historical behavior - make
+> > > is_invalid_reserved_pfn() check for the zero_pfn and return
+> > > false. Meaning that PUP returned it.  
+> > 
+> > We've never explicitly tested for zero_pfn and as David notes,
+> > accounting the zero page against the user's locked memory limits has
+> > user visible consequences.  VMs that worked with a specific locked
+> > memory limit may no longer work.    
 > 
+> Yes, but the question is if that is a strict ABI we have to preserve,
+> because if you take that view it also means because VFIO has this
+> historical bug that David can't fix the FOLL_FORCE issue either.
+> 
+> If the view holds for memlock then it should hold for cgroups
+> also. This means the kernel can never change anything about
+> GFP_KERNEL_ACCOUNT allocations because it might impact userspace
+> having set a tight limit there.
+> 
+> It means we can't fix the bug that VFIO is using the wrong storage for
+> memlock.
+> 
+> It means qemu can't change anything about how it sets up this memory,
+> ie Kevin's idea to change the ordering.
+> 
+> On the other hand the "abi break" we are talking about is that a user
+> might have to increase a configured limit in a config file after a
+> kernel upgrade.
+> 
+> IDK what consensus exists here, I've never heard of anyone saying
+> these limits are a strict ABI like this.. I think at least for cgroup
+> that would be so invasive as to immediately be off the table.
+
+I thought we'd already agreed that we were stuck with locked_vm for
+type1 and any compatibility mode of type1 due to this.  Native iommufd
+support can do the right thing since userspace will need to account for
+various new usage models anyway.
+
+I've raised the issue with David for the zero page accounting, but I
+don't know what the solution is.  libvirt automatically adds a 1GB
+fudge factor to the VM locked memory limits to account for things like
+ROM mappings, or at least the non-zeropage backed portion of those
+ROMs.  I think that most management tools have adopted similar, so the
+majority of users shouldn't notice.  However this won't cover all
+users, so we certainly risk breaking userspace if we introduce hard
+page accounting of zero pages.
+
+I think David suggested possibly allowing some degree of exceeding
+locked memory limits for zero page COWs.  Potentially type1 could do
+this as well; special case handling with some heuristically determined,
+module parameter defined limit.  We might also consider whether we
+could just ignore zero page mappings, maybe with a optional "strict"
+mode module option to generate an errno on such mappings.  Thanks,
+
+Alex
+
