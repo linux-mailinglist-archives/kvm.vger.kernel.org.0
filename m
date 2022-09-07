@@ -2,107 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB3E15B0989
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 18:03:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C6995B09A8
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 18:05:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229652AbiIGQDm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 12:03:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51308 "EHLO
+        id S230401AbiIGQFd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 12:05:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbiIGQDU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 12:03:20 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE70EBD139
-        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 09:01:53 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id h188so13995065pgc.12
-        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 09:01:53 -0700 (PDT)
+        with ESMTP id S230087AbiIGQFH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 12:05:07 -0400
+Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96AF0BD0A8;
+        Wed,  7 Sep 2022 09:03:38 -0700 (PDT)
+Received: by mail-yb1-xb30.google.com with SMTP id b136so1556651yba.2;
+        Wed, 07 Sep 2022 09:03:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date;
-        bh=9KRnzPYLXFBo8deCdwkWdxXfiCPHIvAWarLP6/mjRfI=;
-        b=RICBO0Cf7lNCidLiQFP61ZEw/gLkbT1IfOF8uo8Fn6mPoUAWcsIc1DSV6PWdMmzp9s
-         hKhGPwEW0oy6s+FAr1nPJ8pVQGdoqSAOTRaPAlt6LLTBq3GwXurgZcGBO7gqRVuKsbnF
-         3KdbGqfrikBf/zbfJempULa3z5ofASZx27yDCP4/KGJERxJO7m3fVbE1rEPdnSjiTiHe
-         gBUY80jTwbWjhXDj/kJ/TUycRhMg6W0yBwRx0mG70DVcGW8YA/AOY2gVD1k4jsGKqO3a
-         eqNQg/6F8uiUrWqUKA8bpdKPWje571fetOz9ktUtLH05tBNt7Uhxj0BbHWgO4Wbg59SM
-         FK6A==
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=yF8Rt8ulk7W0JkE/TCCmFvph/zoFHn4xY7O3voIDGAs=;
+        b=O+JiMy+OEvVNjM0SVwSeiPMUmtqNFabE88IKd7ei2chRVskDiANSjiud9wi7D8p5wt
+         HwXZmYkWBHgMo4nzPyCFxCoStq/e/+XdA/LygUQYK9Vd0IoKufi2DEOgMWNoUaxc5kfo
+         p0UZ3I5BJnF+esWyM9/pD4uMHeNM/7x5pvjOeeZtP5NUQbfu5wZT4PoFpJ90oNk7KxRY
+         9LX/rwXYB1xLWDNNV89L2X3fVvxvxQUcGN7YMnnCGaFiTZvO1YvEnfDzE/i5s582sWUf
+         9oOkYPe8cMl7hN5tJw350ey3IdUk5iqhDdLPZJaENGj78yBYKlBD2gvQvbjMxgafAK6s
+         yvkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=9KRnzPYLXFBo8deCdwkWdxXfiCPHIvAWarLP6/mjRfI=;
-        b=QGquhm7pK8smsBhLknjMZP4EiVo1Ut+PLurCMPUrlCwL1wl704JvotPWBCF8CsxaIn
-         rNGD59yglFgppXGMatvzHcLgQGynJPtLk9BKN9m0XpI9zN3ampy409AEdQM8TH03CikH
-         AolJVi499kgSodjKp6aGS8WnGIXHvh63F9lONxlByv8Oyb68rC5N9ctmqvadrfd1kRtx
-         YLZhn0saRSpJrUBBF0KbKBT15b05afZ8mKmfT9EWa5WjhlyPNr53aJbeJrm+6mOs6UVR
-         wJDkwxPCXr7m850JBkpAgyN0LJiXtOivkj/EAFuIuuyk41Ks92qOsgbCAkn/h+zw6c3F
-         AyzA==
-X-Gm-Message-State: ACgBeo279WwBhiJB/d1bQMtOdRHQvnGLEnlsX86hrRvCfsQ6W4IoPAm5
-        59Xhn2UT6XBO0xX71KJ4jK3fXw==
-X-Google-Smtp-Source: AA6agR42QGbCPYeSwzUFTzvX3lJhhFP3T5eSJNzWl9Y6r0NmQ1eBHZNAONmviQHhEOZp3CJ1KAF32w==
-X-Received: by 2002:a63:5818:0:b0:430:a25d:e728 with SMTP id m24-20020a635818000000b00430a25de728mr3902575pgb.264.1662566504471;
-        Wed, 07 Sep 2022 09:01:44 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u1-20020a632341000000b0042a6dde1d66sm9245576pgm.43.2022.09.07.09.01.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Sep 2022 09:01:44 -0700 (PDT)
-Date:   Wed, 7 Sep 2022 16:01:40 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jinrong Liang <ljr.kernel@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] selftests: kvm: Fix a compile error in
- selftests/kvm/rseq_test.c
-Message-ID: <YxjAZOGF9uSE2+AT@google.com>
-References: <20220802071240.84626-1-cloudliang@tencent.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=yF8Rt8ulk7W0JkE/TCCmFvph/zoFHn4xY7O3voIDGAs=;
+        b=zRfTH4njPd1a3bupS/Rp56pHh4Pa7/eTDDwrIoOqSJkhIujjbsyFXilhwwD1v0bAby
+         9ks3QTxrBHFvMUg8zVA5CnEW+rVnQuGemQ3qA5xbmKD1PcaSgp+isfW2t6fIgARPFS60
+         uLaDrY0+JYQuwQ4DTo+84a7CmSGkNzosBeQPoDwiYyYE37nfUGdW308ZpSaa2Lb/8jfM
+         1YSBVjzRQ6sEE6y+ntNlkwrexwFDln794kwvVa/szKYnmbGUl2jivqnm7R8ZnSIyXYS9
+         /toB4K4bwTQ+cKxrFu1p/OJzCRwOkK1/r02GAAZUf2ka0odGwaBiFh6nUQ68dUywYzuk
+         24hQ==
+X-Gm-Message-State: ACgBeo1Hys03sR0P2adsvD6R7pCa599QOhnfqti/YF1eyxf58fB7tk8K
+        Mj3x9N4RKvBM9WaYihzYDxyhm78WUsVNnA8jAcotQQ/GQwY=
+X-Google-Smtp-Source: AA6agR6vgqesxVxzRqaG1ffp+FJUfyIfrXyUwxPU4OwFMOvBwZyItTOsnTuIYtQ0DfAFjU0vGIaNZL3WPSDG0b5A8XI=
+X-Received: by 2002:a05:6902:102f:b0:699:a7b9:d4ed with SMTP id
+ x15-20020a056902102f00b00699a7b9d4edmr3478737ybt.393.1662566617821; Wed, 07
+ Sep 2022 09:03:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220802071240.84626-1-cloudliang@tencent.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20220906153357.1362555-1-zhiguangni01@zhaoxin.com> <Yxdx36BHlClCq52J@google.com>
+In-Reply-To: <Yxdx36BHlClCq52J@google.com>
+From:   Liam Ni <zhiguangni01@gmail.com>
+Date:   Thu, 8 Sep 2022 00:03:26 +0800
+Message-ID: <CACZJ9cUdbk_9UtsX=BZpqNgBshHDLy3=C5E4591STGsxtZwiSA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: Reduce the execution of one instruction
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        pbonzini@redhat.com, tglx@linutronix.de,
+        dave.hansen@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 02, 2022, Jinrong Liang wrote:
-> From: Jinrong Liang <cloudliang@tencent.com>
-> 
-> The following warning appears when executing:
-> 	make -C tools/testing/selftests/kvm
-> 
-> rseq_test.c: In function ‘main’:
-> rseq_test.c:237:33: warning: implicit declaration of function ‘gettid’; did you mean ‘getgid’? [-Wimplicit-function-declaration]
->           (void *)(unsigned long)gettid());
->                                  ^~~~~~
->                                  getgid
-> /usr/bin/ld: /tmp/ccr5mMko.o: in function `main':
-> ../kvm/tools/testing/selftests/kvm/rseq_test.c:237: undefined reference to `gettid'
-> collect2: error: ld returned 1 exit status
-> make: *** [../lib.mk:173: ../kvm/tools/testing/selftests/kvm/rseq_test] Error 1
-> 
-> Use the more compatible syscall(SYS_gettid) instead of gettid() to fix it.
-> More subsequent reuse may cause it to be wrapped in a lib file.
-> 
-> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
-> ---
+On Wed, 7 Sept 2022 at 00:14, Sean Christopherson <seanjc@google.com> wrote:
+>
+> "KVM: x86:" for the shortlog.
+>
+> On Tue, Sep 06, 2022, Liam Ni wrote:
+> > From: Liam Ni <zhiguangni01@gmail.com>
+> >
+> > If the condition is met,
+>
+> Please describe this specific code change, "If the condition is met" is extremely
+> generic and doesn't help the reader understand what change is being made.
+>
+> > reduce the execution of one instruction.
+>
+> This is highly speculative, e.g. clang will generate identical output since it's
+> trivial for the compiler to observe that ctxt->modrm_reg doesn't need to be read.
+>
+> And similar to the above "If the condition is met", the shortlog is too generic
+> even if it were 100% accurate.
+>
+> I do think this change is a net positive, but it's beneficial only in making the
+> code easier to read.  Shaving a single cheap instruction in a relatively slow path
+> isn't sufficient justification even if the compiler isn't clever enough to optimize
+> away the load in the first place.
+>
+> E.g. something like:
+>
+>   KVM: x86: Clean up ModR/M "reg" initialization in reg op decoding
+>
+>   Refactor decode_register_operand() to get the ModR/M register if and
+>   only if the instruction uses a ModR/M encoding to make it more obvious
+>   how the register operand is retrieved.
+>
+> > Signed-off-by: Liam Ni <zhiguangni01@gmail.com>
+> > ---
+> >  arch/x86/kvm/emulate.c | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> > index f8382abe22ff..ebb95f3f9862 100644
+> > --- a/arch/x86/kvm/emulate.c
+> > +++ b/arch/x86/kvm/emulate.c
+> > @@ -1139,10 +1139,12 @@ static int em_fnstsw(struct x86_emulate_ctxt *ctxt)
+> >  static void decode_register_operand(struct x86_emulate_ctxt *ctxt,
+> >                                   struct operand *op)
+> >  {
+> > -     unsigned reg = ctxt->modrm_reg;
+> > +     unsigned int reg;
+> >
+> >       if (!(ctxt->d & ModRM))
+> >               reg = (ctxt->b & 7) | ((ctxt->rex_prefix & 1) << 3);
+> > +     else
+> > +             reg = ctxt->modrm_reg;
+>
+> I'd prefer to write this as:
+>
+>         unsigned int reg;
+>
+>         if (ctxt->d & ModRM)
+>                 reg = ctxt->modrm_reg;
+>         else
+>                 reg = (ctxt->b & 7) | ((ctxt->rex_prefix & 1) << 3);
+>
+> so that "is ModRM" check is immediately followed by "get ModRM".
+>
+> >
+> >       if (ctxt->d & Sse) {
+> >               op->type = OP_XMM;
+> > --
+> > 2.25.1
+>
+> >
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
-
-
-Paolo, do you want to grab this for 6.0?  It doesn't look like we're going to have
-a more elegant solution anytime soon...
+Thanks for the suggestion, I will submit a new patch V2.
