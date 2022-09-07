@@ -2,45 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F82F5B02B5
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 13:17:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E03225B02F4
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 13:33:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230139AbiIGLRh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 07:17:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37060 "EHLO
+        id S230037AbiIGLd3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 07:33:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229731AbiIGLRf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 07:17:35 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AE4C82751;
-        Wed,  7 Sep 2022 04:17:34 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C3C8EB81BB9;
-        Wed,  7 Sep 2022 11:17:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80D5AC433C1;
-        Wed,  7 Sep 2022 11:17:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662549451;
-        bh=FDZATRR6hD4/oumv1UZdmL/xvD/IkK/Y0Be7tHMnhk8=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=NdB9ShtwPJRa+2uOE2L89i6+B+Xb+kZTURs3h1ZIwYfrdOz9ZOSDvy8lINShqXMFg
-         oZBTGTcRvDOkS6h4U3l7aGVjxxqjtBlAdw0Ekz7lPF32Iuz0X5ZZCPekCqUo6bEYzT
-         +mnGjpO0MeyB2q4oS/0skrPAfOWT1dKwLfp44cH1XPqCD1qxqD+Cjie3enm77MYGlg
-         C4mATqYgqPTsjiBrU5HnvM10BFIOHKaZPjSGu/5llFInL9TehF9qyyTsoXyVFU3/Si
-         ooiocizR+Dvt1lgcNHG44qfy1Mgr8jEPPzx+3s8Ah2olCj5mVr5ST+wpEctb/Ri+yY
-         rNyoxQNyqiyoQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1oVt3h-008con-84;
-        Wed, 07 Sep 2022 12:17:29 +0100
-Date:   Wed, 07 Sep 2022 12:17:28 +0100
-Message-ID: <87leqvv3g7.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Jason Gunthorpe <jgg@nvidia.com>
+        with ESMTP id S230003AbiIGLd1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 07:33:27 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AF3DBB69F0;
+        Wed,  7 Sep 2022 04:33:25 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A8A4E1042;
+        Wed,  7 Sep 2022 04:33:31 -0700 (PDT)
+Received: from [10.57.15.197] (unknown [10.57.15.197])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 63EA73F7B4;
+        Wed,  7 Sep 2022 04:33:20 -0700 (PDT)
+Message-ID: <4ca6383e-bd21-59bf-cc4e-cf3313164957@arm.com>
+Date:   Wed, 7 Sep 2022 12:33:12 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [RFC PATCH v3 4/7] bus/cdx: add cdx-MSI domain with gic-its
+ domain as parent
+Content-Language: en-GB
+To:     Marc Zyngier <maz@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>
 Cc:     Nipun Gupta <nipun.gupta@amd.com>, robh+dt@kernel.org,
         krzysztof.kozlowski+dt@linaro.org, gregkh@linuxfoundation.org,
         rafael@kernel.org, eric.auger@redhat.com,
@@ -49,77 +37,74 @@ Cc:     Nipun Gupta <nipun.gupta@amd.com>, robh+dt@kernel.org,
         mchehab+huawei@kernel.org, f.fainelli@gmail.com,
         jeffrey.l.hugo@gmail.com, saravanak@google.com,
         Michael.Srba@seznam.cz, mani@kernel.org, yishaih@nvidia.com,
-        robin.murphy@arm.com, will@kernel.org, joro@8bytes.org,
-        masahiroy@kernel.org, ndesaulniers@google.com,
-        linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org,
-        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-        kvm@vger.kernel.org, okaya@kernel.org, harpreet.anand@amd.com,
-        nikhil.agarwal@amd.com, michal.simek@amd.com,
-        aleksandar.radovanovic@amd.com, git@amd.com
-Subject: Re: [RFC PATCH v3 4/7] bus/cdx: add cdx-MSI domain with gic-its domain as parent
-In-Reply-To: <YxeBCsA32jnwMjSj@nvidia.com>
+        will@kernel.org, joro@8bytes.org, masahiroy@kernel.org,
+        ndesaulniers@google.com, linux-arm-kernel@lists.infradead.org,
+        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
+        devicetree@vger.kernel.org, kvm@vger.kernel.org, okaya@kernel.org,
+        harpreet.anand@amd.com, nikhil.agarwal@amd.com,
+        michal.simek@amd.com, aleksandar.radovanovic@amd.com, git@amd.com
 References: <20220803122655.100254-1-nipun.gupta@amd.com>
-        <20220906134801.4079497-1-nipun.gupta@amd.com>
-        <20220906134801.4079497-5-nipun.gupta@amd.com>
-        <YxeBCsA32jnwMjSj@nvidia.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jgg@nvidia.com, nipun.gupta@amd.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, gregkh@linuxfoundation.org, rafael@kernel.org, eric.auger@redhat.com, alex.williamson@redhat.com, cohuck@redhat.com, puneet.gupta@amd.com, song.bao.hua@hisilicon.com, mchehab+huawei@kernel.org, f.fainelli@gmail.com, jeffrey.l.hugo@gmail.com, saravanak@google.com, Michael.Srba@seznam.cz, mani@kernel.org, yishaih@nvidia.com, robin.murphy@arm.com, will@kernel.org, joro@8bytes.org, masahiroy@kernel.org, ndesaulniers@google.com, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, kvm@vger.kernel.org, okaya@kernel.org, harpreet.anand@amd.com, nikhil.agarwal@amd.com, michal.simek@amd.com, aleksandar.radovanovic@amd.com, git@amd.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+ <20220906134801.4079497-1-nipun.gupta@amd.com>
+ <20220906134801.4079497-5-nipun.gupta@amd.com> <YxeBCsA32jnwMjSj@nvidia.com>
+ <87leqvv3g7.wl-maz@kernel.org>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <87leqvv3g7.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-11.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 06 Sep 2022 18:19:06 +0100,
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On 2022-09-07 12:17, Marc Zyngier wrote:
+> On Tue, 06 Sep 2022 18:19:06 +0100,
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>>
+>> On Tue, Sep 06, 2022 at 07:17:58PM +0530, Nipun Gupta wrote:
+>>
+>>> +static void cdx_msi_write_msg(struct irq_data *irq_data,
+>>> +			      struct msi_msg *msg)
+>>> +{
+>>> +	/*
+>>> +	 * Do nothing as CDX devices have these pre-populated
+>>> +	 * in the hardware itself.
+>>> +	 */
+>>> +}
+>>
+>> Huh?
+>>
+>> There is no way it can be pre-populated, the addr/data pair,
+>> especially on ARM, is completely under SW control.
 > 
-> On Tue, Sep 06, 2022 at 07:17:58PM +0530, Nipun Gupta wrote:
+> There is nothing in the GIC spec that says that.
 > 
-> > +static void cdx_msi_write_msg(struct irq_data *irq_data,
-> > +			      struct msi_msg *msg)
-> > +{
-> > +	/*
-> > +	 * Do nothing as CDX devices have these pre-populated
-> > +	 * in the hardware itself.
-> > +	 */
-> > +}
+>> There is some commonly used IOVA base in Linux for the ITS page, but
+>> no HW should hardwire that.
 > 
-> Huh?
+> That's not strictly true. It really depends on how this block is
+> integrated, and there is a number of existing blocks that know *in HW*
+> how to signal an LPI.
 > 
-> There is no way it can be pre-populated, the addr/data pair,
-> especially on ARM, is completely under SW control.
+> See, as the canonical example, how the mbigen driver doesn't need to
+> know about the address of GITS_TRANSLATER.
+> 
+> Yes, this messes with translation (the access is downstream of the
+> SMMU) if you relied on it to have some isolation, and it has a "black
+> hole" effect as nobody can have an IOVA that overlaps with the
+> physical address of the GITS_TRANSLATER register.
+> 
+> But is it illegal as per the architecture? No. It's just stupid.
 
-There is nothing in the GIC spec that says that.
+If that were the case, then we'd also need a platform quirk so the SMMU 
+driver knows about it. Yuck.
 
-> There is some commonly used IOVA base in Linux for the ITS page, but
-> no HW should hardwire that.
+But even then, are you suggesting there is some way to convince the ITS 
+driver to allocate a specific predetermined EventID when a driver 
+requests an MSI? Asking for a friend...
 
-That's not strictly true. It really depends on how this block is
-integrated, and there is a number of existing blocks that know *in HW*
-how to signal an LPI.
-
-See, as the canonical example, how the mbigen driver doesn't need to
-know about the address of GITS_TRANSLATER.
-
-Yes, this messes with translation (the access is downstream of the
-SMMU) if you relied on it to have some isolation, and it has a "black
-hole" effect as nobody can have an IOVA that overlaps with the
-physical address of the GITS_TRANSLATER register.
-
-But is it illegal as per the architecture? No. It's just stupid.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Cheers,
+Robin.
