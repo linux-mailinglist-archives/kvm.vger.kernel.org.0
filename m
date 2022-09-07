@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 708E05B0F6C
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 23:47:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D83E35B0FA1
+	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 00:00:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230320AbiIGVrT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 17:47:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36364 "EHLO
+        id S230119AbiIGWA1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 18:00:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230313AbiIGVrR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 17:47:17 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68516BADA9
-        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 14:47:16 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id pj10so5395483pjb.2
-        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 14:47:16 -0700 (PDT)
+        with ESMTP id S229574AbiIGWA0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 18:00:26 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D941657A
+        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 15:00:25 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id v4so14830523pgi.10
+        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 15:00:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=a0onBmXPphYT3RuqfDE1tfHpBM48udC3uDDfIPbNeqQ=;
-        b=qz8qKS17YDB74dB3eVq/ImHb/1panXWt9MKNv77sjzlXj8cL3XwLCX/xz8ZQn9FJSc
-         pkuvn/eM3SPKQUCBDgtCZu6rnvnlsgeB696oCeiPN8LzQIFq4odPuYBB/o7hizZaRcRP
-         tH7JasNxHZyEVsUyfz0V/dL1r9OPMoCaBwGTkGjH1jd/RD5/uG56v/Pc1g6Dr4EGnH6r
-         hr+0E5wBEw/x3ik8lSEvklHAQ6eORvUgxri4N5u/Sr7xvTrdNUpSsXg71MROLD6JhtYd
-         nyD3JCmVLfqxQWXd75Tk6Z+u4KPOxj45s6/oI+dRFkvHvvGKtM9qmtSw3qCoO59EWNNk
-         GKXg==
+        bh=Z6i7/OEeMp+vclfvU0ocYeg3hscpfsRzRk3osMten/8=;
+        b=e3Fe+rheW8Na/BXBO0bEG/1zt5AvIyqOPccGgeldHQDysW4dhlQDvScdWW2jF/ykJ0
+         1KZwGAcihDgrTllUZHJJCNthA+tnI5/MKxfV98sxO2gZdnNqtwz4ehAALW8HWWs42K4u
+         ocGtMwQOJbi17zrV7TwAfsFGcApOG5pyrSRoymiKtunKPdiNxC47IKTkRNH5I0iklGS7
+         4o7kfFBEXIsl9Q3af05OVupBoJddnUB5PVwkMSqoL+yMs33XpMb06Gf/XqiqKdeZ+ZhV
+         Hi7J8tFb62JxGs/zwwIUjqJqcKSQ9HcUYGQgsRwMCfp8L3VnL/MyK/wxFVZnjlAnT6dN
+         a/Nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=a0onBmXPphYT3RuqfDE1tfHpBM48udC3uDDfIPbNeqQ=;
-        b=Xhjx8etBWvkvVxv/yP9qZMe44zD+PuR7lv/5dU/c/oer0mbq8CwxT0Df/Zu+SxHrb/
-         9DO264FQr2pypU0CC6q7jExhOM3U00mCllNQK4iMUH1EXmma/iFN+krOrQkJZ5I2Dp3w
-         moc8BbAc+lEt/SCPGtxz2l+nUf0amdF9CKLyMZR4oQs3P1cebAOGWDhzNexX/MprFnwM
-         gNusb8/qNDktTDTOWp1OSzTjNQSgHWndE6PRQAAS8vt6Auj+wbPfW1Zxb/eZuqY3+PD8
-         gE+7kCuWc6ZGACHk3ydMFv4qAsiN65EtUbrj3V7KVyIKX/d9brgmc5YNlFXxOKxNxA1u
-         PdNA==
-X-Gm-Message-State: ACgBeo1fCgr2SWsM95VbEzGKnKXXJkcyrb1LPTfDgeDi/I2tNV89eKo9
-        DFLK3j67pF2HOdAyY5TMIyrlSw==
-X-Google-Smtp-Source: AA6agR7u55ulppnpFE92xnBEjpQea4OXXBFThe+B3Pt6YcvMkX+Mwtq2DlhDFlWJGj73EGApy3OVsw==
-X-Received: by 2002:a17:902:6b4c:b0:171:38ab:e762 with SMTP id g12-20020a1709026b4c00b0017138abe762mr5635735plt.42.1662587235722;
-        Wed, 07 Sep 2022 14:47:15 -0700 (PDT)
+        bh=Z6i7/OEeMp+vclfvU0ocYeg3hscpfsRzRk3osMten/8=;
+        b=WXnNoRC8dxiI9309RVhGF3MDB0l9jAv5kHl8sSeJ3HxH+n8nXZkwiocC2hvby1Mzw9
+         8KW2pRTIO45yx18L/BahLwwmgk6TdL4FEyYhP09Ro5i4efwb3x8YP+A7MyqXL7USKQHl
+         YYL2MnKFVTFeyTANU7ZGNlHFGWbxSBhYEih/C5GX20sjs8eygnyZs68WekerNqOADFb5
+         HIVDzJXLqEyRPTJcSeGVv3VgtGP9b/KTDxx7/VbOO7QYjAnqq0jDJ3ro4ZFaoTQ/zfh8
+         mGswYXtpR18yLl6jMvLlUkb942gJZg3G5k4Xrumwdc6l/Adi+rU+IvV1jN0e5Wzmmijd
+         DyTw==
+X-Gm-Message-State: ACgBeo0mMLB1BIFOXA294ENzVnG4JXRG/dFiUFn6+LGrcNn2EvHVyk5w
+        YD5lhS9QZ6f3a+ivQ76MLsYznw==
+X-Google-Smtp-Source: AA6agR42gCnxTLUemS9/D7J6YQAzvwNbNyEIYR546Fz93K8ats2Z1wyfCNCKWhEadwoFVmBAFIejcg==
+X-Received: by 2002:a63:84c1:0:b0:434:fd55:e213 with SMTP id k184-20020a6384c1000000b00434fd55e213mr3190251pgd.10.1662588024651;
+        Wed, 07 Sep 2022 15:00:24 -0700 (PDT)
 Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id n6-20020a170902e54600b00173cfaed233sm659052plf.62.2022.09.07.14.47.13
+        by smtp.gmail.com with ESMTPSA id i15-20020aa796ef000000b0053e62b6fd22sm2762187pfq.126.2022.09.07.15.00.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Sep 2022 14:47:14 -0700 (PDT)
-Date:   Wed, 7 Sep 2022 14:47:08 -0700
+        Wed, 07 Sep 2022 15:00:23 -0700 (PDT)
+Date:   Wed, 7 Sep 2022 15:00:18 -0700
 From:   David Matlack <dmatlack@google.com>
 To:     Oliver Upton <oliver.upton@linux.dev>
 Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
@@ -64,14 +64,15 @@ Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
         Sean Christopherson <seanjc@google.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 08/14] KVM: arm64: Protect page table traversal with RCU
-Message-ID: <YxkRXLsLuhjBNanT@google.com>
+Subject: Re: [PATCH 09/14] KVM: arm64: Free removed stage-2 tables in RCU
+ callback
+Message-ID: <YxkUciuwLFvByLOu@google.com>
 References: <20220830194132.962932-1-oliver.upton@linux.dev>
- <20220830194132.962932-9-oliver.upton@linux.dev>
+ <20220830194132.962932-10-oliver.upton@linux.dev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220830194132.962932-9-oliver.upton@linux.dev>
+In-Reply-To: <20220830194132.962932-10-oliver.upton@linux.dev>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -83,82 +84,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 30, 2022 at 07:41:26PM +0000, Oliver Upton wrote:
-> The use of RCU is necessary to change the paging structures in parallel.
-> Acquire and release an RCU read lock when traversing the page tables.
+On Tue, Aug 30, 2022 at 07:41:27PM +0000, Oliver Upton wrote:
+> There is no real urgency to free a stage-2 subtree that was pruned.
+> Nonetheless, KVM does the tear down in the stage-2 fault path while
+> holding the MMU lock.
+> 
+> Free removed stage-2 subtrees after an RCU grace period. To guarantee
+> all stage-2 table pages are freed before killing a VM, add an
+> rcu_barrier() to the flush path.
 > 
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/include/asm/kvm_pgtable.h | 19 ++++++++++++++++++-
->  arch/arm64/kvm/hyp/pgtable.c         |  7 ++++++-
->  2 files changed, 24 insertions(+), 2 deletions(-)
+>  arch/arm64/kvm/mmu.c | 35 ++++++++++++++++++++++++++++++++++-
+>  1 file changed, 34 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 78fbb7be1af6..7d2de0a98ccb 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -578,9 +578,26 @@ enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(kvm_pte_t pte);
->   */
->  enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 91521f4aab97..265951c05879 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -97,6 +97,38 @@ static void *stage2_memcache_zalloc_page(void *arg)
+>  	return kvm_mmu_memory_cache_alloc(mc);
+>  }
 >  
-> +#if defined(__KVM_NVHE_HYPERVISOR___)
+> +#define STAGE2_PAGE_PRIVATE_LEVEL_MASK	GENMASK_ULL(2, 0)
 > +
-
-Future readers will wonder why NVHE stubs out RCU support and how that
-is even correct. Some comments here would be useful explain it.
-
-> +static inline void kvm_pgtable_walk_begin(void) {}
-> +static inline void kvm_pgtable_walk_end(void) {}
+> +static inline unsigned long stage2_page_private(u32 level, void *arg)
+> +{
+> +	unsigned long pvt = (unsigned long)arg;
 > +
-> +#define kvm_dereference_ptep rcu_dereference_raw
-
-How does NVHE have access rcu_dereference_raw()?
-
+> +	BUILD_BUG_ON(KVM_PGTABLE_MAX_LEVELS > STAGE2_PAGE_PRIVATE_LEVEL_MASK);
+> +	WARN_ON_ONCE(pvt & STAGE2_PAGE_PRIVATE_LEVEL_MASK);
 > +
-> +#else	/* !defined(__KVM_NVHE_HYPERVISOR__) */
+> +	return pvt | level;
+> +}
 > +
-> +#define kvm_pgtable_walk_begin	rcu_read_lock
-> +#define kvm_pgtable_walk_end	rcu_read_unlock
-> +#define kvm_dereference_ptep	rcu_dereference
+> +static void stage2_free_removed_table_rcu_cb(struct rcu_head *head)
+> +{
+> +	struct page *page = container_of(head, struct page, rcu_head);
+> +	unsigned long pvt = page_private(page);
+> +	void *arg = (void *)(pvt & ~STAGE2_PAGE_PRIVATE_LEVEL_MASK);
+> +	u32 level = (u32)(pvt & STAGE2_PAGE_PRIVATE_LEVEL_MASK);
+> +	void *pgtable = page_to_virt(page);
 > +
-> +#endif	/* defined(__KVM_NVHE_HYPERVISOR__) */
+> +	kvm_pgtable_stage2_free_removed(pgtable, level, arg);
+> +}
 > +
->  static inline kvm_pte_t kvm_pte_read(kvm_pte_t *ptep)
+> +static void stage2_free_removed_table(void *pgtable, u32 level, void *arg)
+> +{
+> +	unsigned long pvt = stage2_page_private(level, arg);
+> +	struct page *page = virt_to_page(pgtable);
+> +
+> +	set_page_private(page, (unsigned long)pvt);
+> +	call_rcu(&page->rcu_head, stage2_free_removed_table_rcu_cb);
+> +}
+> +
+>  static void *kvm_host_zalloc_pages_exact(size_t size)
 >  {
-> -	return READ_ONCE(*ptep);
-> +	kvm_pte_t __rcu *p = (kvm_pte_t __rcu *)ptep;
-> +
-> +	return READ_ONCE(*kvm_dereference_ptep(p));
+>  	return alloc_pages_exact(size, GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> @@ -627,7 +659,7 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
+>  	.zalloc_page		= stage2_memcache_zalloc_page,
+>  	.zalloc_pages_exact	= kvm_host_zalloc_pages_exact,
+>  	.free_pages_exact	= free_pages_exact,
+> -	.free_removed_table	= kvm_pgtable_stage2_free_removed,
+> +	.free_removed_table	= stage2_free_removed_table,
+>  	.get_page		= kvm_host_get_page,
+>  	.put_page		= kvm_host_put_page,
+>  	.page_count		= kvm_host_page_count,
+> @@ -770,6 +802,7 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
+>  	if (pgt) {
+>  		kvm_pgtable_stage2_destroy(pgt);
+>  		kfree(pgt);
+> +		rcu_barrier();
 
-What about all the other places where page table memory is accessed?
+A comment here would be useful to document the behavior. e.g.
 
-If RCU is going to be used to protect page table memory, then all
-accesses have to go under an RCU critical section. This means that page
-table memory should only be accessed through __rcu annotated pointers
-and dereferenced with rcu_dereference().
+        /*
+         * Wait for all stage-2 page tables that are being freed
+         * asynchronously via RCU callback because ...
+         */
 
+Speaking of, what's the reason for this rcu_barrier()? Is there any
+reason why KVM can't let in-flight stage-2 freeing RCU callbacks run at
+the end of the next grace period?
+
+>  	}
 >  }
 >  
->  #endif	/* __ARM64_KVM_PGTABLE_H__ */
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index f911509e6512..215a14c434ed 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -284,8 +284,13 @@ int kvm_pgtable_walk(struct kvm_pgtable *pgt, u64 addr, u64 size,
->  		.end	= PAGE_ALIGN(walk_data.addr + size),
->  		.walker	= walker,
->  	};
-> +	int r;
->  
-> -	return _kvm_pgtable_walk(&walk_data);
-> +	kvm_pgtable_walk_begin();
-> +	r = _kvm_pgtable_walk(&walk_data);
-> +	kvm_pgtable_walk_end();
-> +
-> +	return r;
->  }
->  
->  struct leaf_walk_data {
 > -- 
 > 2.37.2.672.g94769d06f0-goog
 > 
