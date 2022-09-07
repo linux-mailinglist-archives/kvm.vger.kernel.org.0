@@ -2,204 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 48CD45AFEF3
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 10:28:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ABC8C5AFFC2
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 11:00:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230142AbiIGI2C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 04:28:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41074 "EHLO
+        id S230084AbiIGJAd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 05:00:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230035AbiIGI1c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 04:27:32 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9B482ABD75;
-        Wed,  7 Sep 2022 01:27:28 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4BE24D6E;
-        Wed,  7 Sep 2022 01:27:34 -0700 (PDT)
-Received: from [10.57.15.197] (unknown [10.57.15.197])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A58783F534;
-        Wed,  7 Sep 2022 01:27:48 -0700 (PDT)
-Message-ID: <f5cf7bd7-4cd9-ef9c-7f25-f814b2f1e41f@arm.com>
-Date:   Wed, 7 Sep 2022 09:27:14 +0100
+        with ESMTP id S229891AbiIGJA3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 05:00:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DFD96D56A
+        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 02:00:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662541225;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wAp9Zrtj3C+q+e8Cw9C0lVMs/In1/6qMij53jvIUwa8=;
+        b=hMRYsSzXhj/N2FO5dJE7jz5qKOimAUjxMJ67Sl5SeBmMcZb3CpLqgAidibxdcWEaqOif5b
+        5PHxgAmZv4qtCC56uNa+6caBIpKNzmJep+4Q29SbgBUZwy0bwLYmCdhYtSZeP+c9phrRpS
+        ZeZPCiKfH14g5KiVnU5o1QIbC7t97sE=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-65-GlVNzAXTNwKVYXZGGgSnqA-1; Wed, 07 Sep 2022 05:00:24 -0400
+X-MC-Unique: GlVNzAXTNwKVYXZGGgSnqA-1
+Received: by mail-wm1-f71.google.com with SMTP id c5-20020a7bc005000000b003a63a3570f2so2355676wmb.8
+        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 02:00:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:subject:organization:from
+         :references:cc:to:content-language:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date;
+        bh=wAp9Zrtj3C+q+e8Cw9C0lVMs/In1/6qMij53jvIUwa8=;
+        b=lHksdfKjjrv1OuocyNlg0Vc/8bAarNvY1H9wmt50Owsbh9wS2tkJitAlB9F2nxUfF6
+         77NPE2Hza2XFTzNkR1k7qDw4XaqltTJyakNKylnIbWQKSpC+hFChggnXnTQkT+EBaRZ+
+         r7Lk6weqYyyR8OjsRjrVcmJZIhO4ERQL4CGW1qnh8Mx43fY4hCVrhpWEPz81Vuu80wX5
+         d+iquOe2hOXq7uMupCHRmCTnAQkiRwl0AyZHSa44FcZ2GauA0QyNQx4Cw50Pqx+WM/SB
+         X0S4Ztv0nm3qdLdi7aGFXLg4X6WNuu5KJZBDRW5MkXQcUd3nmCqN/pHB7HLm16RAxObP
+         ci3w==
+X-Gm-Message-State: ACgBeo28w6x2jG2ONZxYAZDC0A645oFOeftI4TRGr6l+NvT9A6gGhemo
+        PDsKL4Or61h5aMV8pKcVNqZpZJfaYOBwsOIjx03Ay5tSVn4b2uUs/q9k1gkYJoecQV7YyBfSS/Q
+        QQF90g2LmIrmf
+X-Received: by 2002:a05:6000:186f:b0:228:e1ab:673 with SMTP id d15-20020a056000186f00b00228e1ab0673mr1186797wri.324.1662541222911;
+        Wed, 07 Sep 2022 02:00:22 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR6dfkdI1JyDQpeuz0ufGUcxELkr0R/MjUIxyjerN/R+v+eB/JC8G8PfsVAjm2diZCZyXKbxPQ==
+X-Received: by 2002:a05:6000:186f:b0:228:e1ab:673 with SMTP id d15-20020a056000186f00b00228e1ab0673mr1186785wri.324.1662541222653;
+        Wed, 07 Sep 2022 02:00:22 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f0d:ba00:c951:31d7:b2b0:8ba0? (p200300d82f0dba00c95131d7b2b08ba0.dip0.t-ipconnect.de. [2003:d8:2f0d:ba00:c951:31d7:b2b0:8ba0])
+        by smtp.gmail.com with ESMTPSA id p7-20020a05600c358700b003a8418ee646sm27197500wmq.12.2022.09.07.02.00.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Sep 2022 02:00:22 -0700 (PDT)
+Message-ID: <b365f30b-da58-39c0-08e9-c622cc506afa@redhat.com>
+Date:   Wed, 7 Sep 2022 11:00:21 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [RFC PATCH v3 3/7] iommu/arm-smmu-v3: support ops registration
- for CDX bus
-Content-Language: en-GB
-To:     "Gupta, Nipun" <Nipun.Gupta@amd.com>,
-        Saravana Kannan <saravanak@google.com>
-Cc:     "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "krzysztof.kozlowski+dt@linaro.org" 
-        <krzysztof.kozlowski+dt@linaro.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "Gupta, Puneet (DCG-ENG)" <puneet.gupta@amd.com>,
-        "song.bao.hua@hisilicon.com" <song.bao.hua@hisilicon.com>,
-        "mchehab+huawei@kernel.org" <mchehab+huawei@kernel.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-        "jeffrey.l.hugo@gmail.com" <jeffrey.l.hugo@gmail.com>,
-        "Michael.Srba@seznam.cz" <Michael.Srba@seznam.cz>,
-        "mani@kernel.org" <mani@kernel.org>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "jgg@ziepe.ca" <jgg@ziepe.ca>, "jgg@nvidia.com" <jgg@nvidia.com>,
-        "will@kernel.org" <will@kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "masahiroy@kernel.org" <masahiroy@kernel.org>,
-        "ndesaulniers@google.com" <ndesaulniers@google.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "okaya@kernel.org" <okaya@kernel.org>,
-        "Anand, Harpreet" <harpreet.anand@amd.com>,
-        "Agarwal, Nikhil" <nikhil.agarwal@amd.com>,
-        "Simek, Michal" <michal.simek@amd.com>,
-        "Radovanovic, Aleksandar" <aleksandar.radovanovic@amd.com>,
-        "git (AMD-Xilinx)" <git@amd.com>
-References: <20220803122655.100254-1-nipun.gupta@amd.com>
- <20220906134801.4079497-1-nipun.gupta@amd.com>
- <20220906134801.4079497-4-nipun.gupta@amd.com>
- <CAGETcx_W8QVe+CdpocN2rHjp08TwsW22FaJgrYW=0JNge_N6KQ@mail.gmail.com>
- <DM6PR12MB30829DDDC62B36B17F87B204E8419@DM6PR12MB3082.namprd12.prod.outlook.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <DM6PR12MB30829DDDC62B36B17F87B204E8419@DM6PR12MB3082.namprd12.prod.outlook.com>
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "lpivarc@redhat.com" <lpivarc@redhat.com>,
+        "Liu, Jingqi" <jingqi.liu@intel.com>,
+        "Lu, Baolu" <baolu.lu@intel.com>
+References: <166182871735.3518559.8884121293045337358.stgit@omen>
+ <BN9PR11MB527655973E2603E73F280DF48C7A9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <d71160d1-5a41-eae0-6405-898fe0a28696@redhat.com> <YxfX+kpajVY4vWTL@ziepe.ca>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [PATCH] vfio/type1: Unpin zero pages
+In-Reply-To: <YxfX+kpajVY4vWTL@ziepe.ca>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-11.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-09-07 04:17, Gupta, Nipun wrote:
-> [AMD Official Use Only - General]
+On 07.09.22 01:30, Jason Gunthorpe wrote:
+> On Fri, Sep 02, 2022 at 10:32:01AM +0200, David Hildenbrand wrote:
 > 
-> 
-> 
->> -----Original Message-----
->> From: Saravana Kannan <saravanak@google.com>
->> Sent: Wednesday, September 7, 2022 5:41 AM
->> To: Gupta, Nipun <Nipun.Gupta@amd.com>
->> Cc: robh+dt@kernel.org; krzysztof.kozlowski+dt@linaro.org;
->> gregkh@linuxfoundation.org; rafael@kernel.org; eric.auger@redhat.com;
->> alex.williamson@redhat.com; cohuck@redhat.com; Gupta, Puneet (DCG-ENG)
->> <puneet.gupta@amd.com>; song.bao.hua@hisilicon.com;
->> mchehab+huawei@kernel.org; maz@kernel.org; f.fainelli@gmail.com;
->> jeffrey.l.hugo@gmail.com; Michael.Srba@seznam.cz; mani@kernel.org;
->> yishaih@nvidia.com; jgg@ziepe.ca; jgg@nvidia.com; robin.murphy@arm.com;
->> will@kernel.org; joro@8bytes.org; masahiroy@kernel.org;
->> ndesaulniers@google.com; linux-arm-kernel@lists.infradead.org; linux-
->> kbuild@vger.kernel.org; linux-kernel@vger.kernel.org;
->> devicetree@vger.kernel.org; kvm@vger.kernel.org; okaya@kernel.org; Anand,
->> Harpreet <harpreet.anand@amd.com>; Agarwal, Nikhil
->> <nikhil.agarwal@amd.com>; Simek, Michal <michal.simek@amd.com>;
->> Radovanovic, Aleksandar <aleksandar.radovanovic@amd.com>; git (AMD-Xilinx)
->> <git@amd.com>
->> Subject: Re: [RFC PATCH v3 3/7] iommu/arm-smmu-v3: support ops registration
->> for CDX bus
+>>> So I wonder instead of continuing to fix trickiness around the zero
+>>> page whether it is a better idea to pursue allocating a normal
+>>> page from the beginning for pinned RO mappings?
 >>
->> [CAUTION: External Email]
->>
->> On Tue, Sep 6, 2022 at 6:48 AM Nipun Gupta <nipun.gupta@amd.com> wrote:
->>>
->>> With new CDX bus supported for AMD FPGA devices on ARM
->>> platform, the bus requires registration for the SMMU v3
->>> driver.
->>>
->>> Signed-off-by: Nipun Gupta <nipun.gupta@amd.com>
->>> ---
->>>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 16 ++++++++++++++--
->>>   1 file changed, 14 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>> index d32b02336411..8ec9f2baf12d 100644
->>> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
->>> @@ -29,6 +29,7 @@
->>>   #include <linux/platform_device.h>
->>>
->>>   #include <linux/amba/bus.h>
->>> +#include <linux/cdx/cdx_bus.h>
->>>
->>>   #include "arm-smmu-v3.h"
->>>   #include "../../iommu-sva-lib.h"
->>> @@ -3690,16 +3691,27 @@ static int arm_smmu_set_bus_ops(struct
->> iommu_ops *ops)
->>>                  if (err)
->>>                          goto err_reset_pci_ops;
->>>          }
->>> +#endif
->>> +#ifdef CONFIG_CDX_BUS
->>> +       if (cdx_bus_type.iommu_ops != ops) {
->>> +               err = bus_set_iommu(&cdx_bus_type, ops);
->>> +               if (err)
->>> +                       goto err_reset_amba_ops;
->>> +       }
->>
->> I'm not an expert on IOMMUs, so apologies if the question is stupid.
->>
->> Why does the CDX bus need special treatment here (like PCI) when there
->> are so many other busses (eg: I2C, SPI, etc) that don't need any
->> changes here?
+>> That's precisely what I am working. For example, that's required to get
+>> rid of FOLL_FORCE|FOLL_WRITE for taking a R/O pin as done by RDMA:
 > 
-> AFAIU, the devices on I2C/SPI does not use SMMU. Apart from PCI/AMBA,
-> FSL-MC is another similar bus (on SMMUv2) which uses SMMU ops.
-> 
-> The devices here are behind SMMU. Robin can kindly correct or add
-> more here from SMMU perspective.
+> And all these issues are exactly why RDMA uses FOLL_FORCE and it is,
+> IMHO, a simple bug that VFIO does not.
 
-Indeed, there is no need to describe and handle how DMA may or may not 
-be translated for I2C/SPI/USB/etc. because they are not DMA-capable 
-buses (in those cases the relevant bus *controller* often does DMA, but 
-it does that for itself as the platform/PCI/etc. device it is).
+I consider the BUG that our longterm page pinning behaves the way it 
+currently does, not that we're not using the FOLL_FORCE flag here.
 
-Note that I have a series pending[1] that will make this patch a whole 
-lot simpler.
+But it doesn't matter, I'm working on fixing/cleaning it up.
 
+> 
+>> I do wonder if that's a real issue, though. One approach would be to
+>> warn the VFIO users and allow for slightly exceeding the MEMLOCK limit
+>> for a while. Of course, that only works if we assume that such pinned
+>> zeropages are only extremely rarely longterm-pinned for a single VM
+>> instance by VFIO.
+> 
+> I'm confused, doesn't vfio increment the memlock for every page of VA
+> it pins? Why would it matter if the page was COW'd or not? It is
+> already accounted for today as though it was a unique page.
+> 
+> IOW if we add FOLL_FORCE it won't change the value of the memlock.
+
+I only briefly skimmed over the code Alex might be able to provide more 
+details and correct me if I'm wrong:
+
+vfio_pin_pages_remote() contains a comment:
+
+"Reserved pages aren't counted against the user, externally pinned pages 
+are already counted against the user."
+
+is_invalid_reserved_pfn() should return "true" for the shared zeropage 
+and prevent us from accounting it via vfio_lock_acct(). Otherwise, 
+vfio_find_vpfn() seems to be in place to avoid double-accounting pages.
+
+-- 
 Thanks,
-Robin.
 
-[1] 
-https://lore.kernel.org/linux-iommu/cover.1660572783.git.robin.murphy@arm.com/T/#t
+David / dhildenb
 
-> 
-> Thanks,
-> Nipun
-> 
->>
->> -Saravana
->>
->>>   #endif
->>>          if (platform_bus_type.iommu_ops != ops) {
->>>                  err = bus_set_iommu(&platform_bus_type, ops);
->>>                  if (err)
->>> -                       goto err_reset_amba_ops;
->>> +                       goto err_reset_cdx_ops;
->>>          }
->>>
->>>          return 0;
->>>
->>> -err_reset_amba_ops:
->>> +err_reset_cdx_ops:
->>> +#ifdef CONFIG_CDX_BUS
->>> +       bus_set_iommu(&cdx_bus_type, NULL);
->>> +#endif
->>> +err_reset_amba_ops: __maybe_unused;
->>>   #ifdef CONFIG_ARM_AMBA
->>>          bus_set_iommu(&amba_bustype, NULL);
->>>   #endif
->>> --
->>> 2.25.1
->>>
