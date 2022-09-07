@@ -2,105 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AE8F5B0A2B
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 18:33:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF45A5B0A44
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 18:41:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230020AbiIGQd1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 12:33:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58420 "EHLO
+        id S230155AbiIGQk6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 12:40:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229526AbiIGQdZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 12:33:25 -0400
-Received: from mail-oa1-x2e.google.com (mail-oa1-x2e.google.com [IPv6:2001:4860:4864:20::2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCC99A74C3
-        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 09:33:24 -0700 (PDT)
-Received: by mail-oa1-x2e.google.com with SMTP id 586e51a60fabf-11eab59db71so37276620fac.11
-        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 09:33:24 -0700 (PDT)
+        with ESMTP id S229437AbiIGQk4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 12:40:56 -0400
+Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3AC26EF28
+        for <kvm@vger.kernel.org>; Wed,  7 Sep 2022 09:40:54 -0700 (PDT)
+Received: by mail-qv1-xf2c.google.com with SMTP id m9so8476571qvv.7
+        for <kvm@vger.kernel.org>; Wed, 07 Sep 2022 09:40:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=EmmUroBnQkKtzSpVrUefA2RMcw7wGhyCwtTDIpKDhrk=;
-        b=PknB9Wzlt1y0TbVGAQBs/L0GjuCa+I/M92/+1rXq+zMC0AfruyxAtxyXEcTrEW3Vir
-         cA9HDVdlT3akhMsuiWIl4IkuaARR47abE+oak4c84rqaZ6Wqm954cE3zE5Dt/cB169lY
-         d0+OfeBlFYvDD9SMqAnejNpB/yNOlyzgUkk2vdcPPpLVh8hRhYmWS3Hgc+MvxSVKawT2
-         vcTRd/hlqclFLK+91YwLOBcYjJ8WQiIkc9b5GDImrPRgLDTWzvuLrvyhXtsdHMta1RxV
-         x6pnLBQUEkh0tTGjcjzOnB15ruIEkZDQPywrjHEsfW1sajwj/lIre/0Vr2JJ5CaiCpE5
-         nodg==
+        d=ziepe.ca; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=oOtsIfLgo+dpW6bJd1WimKnWJ8hG0+yd1C7QnZJgzys=;
+        b=NLEjy+firPpiQwLoDTWKF2YlJU06b7+MpQCjV9boLFcGlndFOsSeLn4xVITIO7j1VY
+         3oYDGu/QrFrJp0lH7j5JnP43Q0ozPiidOwZiERCRViBoXL+ySmscfO84ZNklVxkzSstF
+         3z1XYaEmSgAWcdrqm0P9e/9I87jTUM2Ktdxc8OihgL204wniUGX9uooTHatLhmYtFYp6
+         NdGaE88tHGNEt514DJNVD55o6v3qLlrVmnRGTkVhWmLW5LzRlZds9toqv82dmQh5FHDv
+         65GriHVlpGkKAWAWHDojF8N+ad5NPHupswjGtn0ujB3Ap3k3VVTv6S+XsBCh1TD43pdA
+         uq/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=EmmUroBnQkKtzSpVrUefA2RMcw7wGhyCwtTDIpKDhrk=;
-        b=YRo4Ht5/55TUUBzMNZe12j3MR06m+YGdPzkeeG4RgBXgv+AnKiEJ+ulXR0BbQPkPgQ
-         itMvLP99h4X3KXBpcn+U7GLTPbOa6W9RRpmuycrmj1leUqlE5q6EvGvH0Z3ttXmfdUiz
-         FOv/nM9ZNzJ/4Bnk6OR63X10jrTphpd08ADk6viA2D0rvQQ5b6yrNeFdgofYIvV7lRRN
-         vPMpCVaoNRkoJ5S7GdzIkqGygkza2M+3GpT8gd+ZgXkWO5hcT/LVTukVOCMGa3qPP/ss
-         ggLj24Oj9gJvB1N9M6H0RIukbFujMTek9EnIMCLzIzWDuzzOgezvmHXMYG+kz4MI4jML
-         joGQ==
-X-Gm-Message-State: ACgBeo2afqtX9d8TO0Y9XB1YTjFyJP04hH650B8GMIsYC7/7HOucVIfk
-        qaBV+rDO3JqhYFJaFN5ahMp/YAeZ5FhSbwb2BoQNkA==
-X-Google-Smtp-Source: AA6agR4kzdBfcMicmpDRKNagmkro3jVBoG3aMKLRx/kY02XEbylzC5Z20E/hkkos05UKSPVjscEoWuqIuFX1v8fHD9I=
-X-Received: by 2002:a05:6870:41d0:b0:126:5d06:28a5 with SMTP id
- z16-20020a05687041d000b001265d0628a5mr2299318oac.181.1662568403992; Wed, 07
- Sep 2022 09:33:23 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=oOtsIfLgo+dpW6bJd1WimKnWJ8hG0+yd1C7QnZJgzys=;
+        b=gcUBlA4FddoNC2/NhLa8m1dBhApGMVP4oFVR9vlA56btgymwgcLqQkOcVbCIMHmmFZ
+         jtZnJAiKcCOUGdIiLEaQq6BVUqnQJKsXuvIDcviUZQyZeHaoLv5aR1OxYIyzYJHIwoKJ
+         d77nV/zMcV7/y56cXujtBGTP9xNnIo1AHsypM6hneEiFYzL1CdP7LWNy6dgVv0DUxmEJ
+         /g/gI5Hwwo2jvB3sqZLOoGaF0bZq+qXz1qb0VaYU/U6q1KFMhP07EwbqoTglEFwvD80W
+         jwN2f7dNeVtMeAP4gGLv4fArtpNyijo/ZKwYOU6qs5A5y9V5QCluzkJig6RcFmwc+hHq
+         ciqQ==
+X-Gm-Message-State: ACgBeo3cx0X2J0ml6tLM/NGS2juA7bY6IWIluJJAwYXbsBKYxVg8AonP
+        5YSBcRYQfhetTrg5xENUbPi0dw==
+X-Google-Smtp-Source: AA6agR5aqyqDQj8p4rDj/DRP4aqjwXj4zv8D3N4lHGDYenpdWlbkDHCrOsWAlxztCdbeU0pA3oV2wQ==
+X-Received: by 2002:a05:6214:27e4:b0:476:be6a:91c1 with SMTP id jt4-20020a05621427e400b00476be6a91c1mr3810500qvb.39.1662568854158;
+        Wed, 07 Sep 2022 09:40:54 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id x11-20020ac87ecb000000b0031ee918e9f9sm12833581qtj.39.2022.09.07.09.40.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Sep 2022 09:40:53 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1oVy6e-008gbP-Tw;
+        Wed, 07 Sep 2022 13:40:52 -0300
+Date:   Wed, 7 Sep 2022 13:40:52 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "lpivarc@redhat.com" <lpivarc@redhat.com>,
+        "Liu, Jingqi" <jingqi.liu@intel.com>,
+        "Lu, Baolu" <baolu.lu@intel.com>
+Subject: Re: [PATCH] vfio/type1: Unpin zero pages
+Message-ID: <YxjJlM5A0OLhaA7K@ziepe.ca>
+References: <166182871735.3518559.8884121293045337358.stgit@omen>
+ <BN9PR11MB527655973E2603E73F280DF48C7A9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <d71160d1-5a41-eae0-6405-898fe0a28696@redhat.com>
+ <YxfX+kpajVY4vWTL@ziepe.ca>
+ <b365f30b-da58-39c0-08e9-c622cc506afa@redhat.com>
+ <YxiTOyGqXHFkR/DY@ziepe.ca>
+ <20220907095552.336c8f34.alex.williamson@redhat.com>
 MIME-Version: 1.0
-References: <20220907104838.8424-1-likexu@tencent.com>
-In-Reply-To: <20220907104838.8424-1-likexu@tencent.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 7 Sep 2022 09:33:13 -0700
-Message-ID: <CALMp9eSPfxPunKW-K6LLPxsXdaeezKU=2G9Sdh7FS6VGb3goFA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] KVM: x86/pmu: Stop adding speculative Intel GP
- PMCs that don't exist yet
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220907095552.336c8f34.alex.williamson@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 7, 2022 at 3:48 AM Like Xu <like.xu.linux@gmail.com> wrote:
->
-> From: Like Xu <likexu@tencent.com>
->
-> The Intel April 2022 SDM - Table 2-2. IA-32 Architectural MSRs adds
-> a new architectural IA32_OVERCLOCKING_STATUS msr (0x195), plus the
-> presence of IA32_CORE_CAPABILITIES (0xCF), the theoretical effective
-> maximum value of the Intel GP PMCs is 14 (0xCF - 0xC1) instead of 18.
->
-> But the conclusion of this speculation "14" is very fragile and can
-> easily be overturned once Intel declares another meaningful arch msr
-> in the above reserved range, and even worse, Intel probably put PMCs
-> 8-15 in a completely different range of MSR indices.
+On Wed, Sep 07, 2022 at 09:55:52AM -0600, Alex Williamson wrote:
 
-The last clause is just conjecture.
+> > So, if we go back far enough in the git history we will find a case
+> > where PUP is returning something for the zero page, and that something
+> > caused is_invalid_reserved_pfn() == false since VFIO did work at some
+> > point.
+> 
+> Can we assume that?  It takes a while for a refcount leak on the zero
+> page to cause an overflow.  My assumption is that it's never worked, we
+> pin zero pages, don't account them against the locked memory limits
+> because our is_invalid_reserved_pfn() test returns true, and therefore
+> we don't unpin them.
 
-> A conservative proposal would be to stop at the maximum number of Intel
-> GP PMCs supported today. Also subsequent changes would limit both AMD
-> and Intel on the number of GP counter supported by KVM.
->
-> There are some boxes like Intel P4 may indeed have 18 counters, but
-> those counters are in a completely different msr address range and do
-> not strictly adhere to the Intel Arch PMU specification, and will not
-> be supported by KVM in the near future.
+Oh, you think it has been buggy forever? That is not great..
+ 
+> > IHMO we should simply go back to the historical behavior - make
+> > is_invalid_reserved_pfn() check for the zero_pfn and return
+> > false. Meaning that PUP returned it.
+> 
+> We've never explicitly tested for zero_pfn and as David notes,
+> accounting the zero page against the user's locked memory limits has
+> user visible consequences.  VMs that worked with a specific locked
+> memory limit may no longer work.  
 
-The P4 PMU isn't virtualized by KVM today, is it?
+Yes, but the question is if that is a strict ABI we have to preserve,
+because if you take that view it also means because VFIO has this
+historical bug that David can't fix the FOLL_FORCE issue either.
 
->
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Suggested-by: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Like Xu <likexu@tencent.com>
+If the view holds for memlock then it should hold for cgroups
+also. This means the kernel can never change anything about
+GFP_KERNEL_ACCOUNT allocations because it might impact userspace
+having set a tight limit there.
 
-Please put the "Fixes" tag back. You convinced me that it should be there.
+It means we can't fix the bug that VFIO is using the wrong storage for
+memlock.
 
-Reviewed-by: Jim Mattson <jmattson@google.com>
+It means qemu can't change anything about how it sets up this memory,
+ie Kevin's idea to change the ordering.
+
+On the other hand the "abi break" we are talking about is that a user
+might have to increase a configured limit in a config file after a
+kernel upgrade.
+
+IDK what consensus exists here, I've never heard of anyone saying
+these limits are a strict ABI like this.. I think at least for cgroup
+that would be so invasive as to immediately be off the table.
+
+Jason
