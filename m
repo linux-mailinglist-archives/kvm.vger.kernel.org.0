@@ -2,109 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E6905AFB44
-	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 06:26:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 462835AFB4E
+	for <lists+kvm@lfdr.de>; Wed,  7 Sep 2022 06:28:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229659AbiIGE0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Sep 2022 00:26:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54676 "EHLO
+        id S229730AbiIGE2K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Sep 2022 00:28:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbiIGE0q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Sep 2022 00:26:46 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6716A857C2
-        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 21:26:45 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id fs14so8527822pjb.5
-        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 21:26:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=Xk596ZpOvHHkq2UiD2w1TnlOJagQ1pzq8bsWaxJ5evc=;
-        b=VbR6vuGnznGRwapx4XKG8MzL2UPiYiuvGWBZahrJX3pQG7wZK3QEGvBHy05Q9XSrFX
-         Gqku4FyamLpTWKoxpRWTkimb8j1+ztDOoZuhTOOV9zI5lku4AIreHrpGAABm0Sx3AtQd
-         i61If1vZrlrtZd2t+kq/kKZqMG6tiyVIEo+m9J27nMv8o0RSB29DLnn6qe2nSQzCrujL
-         k/YP098v2Rs3EySkVJQbZuDeP3ZB8CRSw/lKqBRgomPHommMZKIw0C8HBkkHUTiTWuaN
-         7hkm3gSV57EHXRiuZyCh1gMHuOshbR/rwIm20WNJZ9Pib9I/IT8AmL4FAX/n/jhe0khm
-         JBtg==
+        with ESMTP id S229757AbiIGE2E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Sep 2022 00:28:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DC7B8C005
+        for <kvm@vger.kernel.org>; Tue,  6 Sep 2022 21:28:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662524882;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4j6Q+BCgruPfdfNoIE3/wZJYX17HQyjtjOota9ARPcM=;
+        b=Mq/iGyDvDlXkg4a2ZVvdV4zhUEarHJedJBmOZKDuerSfKsGj+zazn3yKNHqjoqxwLGXFbA
+        TMNjY3oMWXloZGL53AhoFEtRvYr18DIQdwrYzpjNGAoTW6ursLeSZBDVMnRoxx3wy4OAYW
+        wwn6m4pQqKUFu/1EsW8Nbq8bhCuz0nA=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-625-n0twa3vDP2uWlxm-XCE-Ng-1; Wed, 07 Sep 2022 00:27:55 -0400
+X-MC-Unique: n0twa3vDP2uWlxm-XCE-Ng-1
+Received: by mail-pf1-f199.google.com with SMTP id x25-20020aa79199000000b005358eeebf49so6910849pfa.17
+        for <kvm@vger.kernel.org>; Tue, 06 Sep 2022 21:27:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=Xk596ZpOvHHkq2UiD2w1TnlOJagQ1pzq8bsWaxJ5evc=;
-        b=w0URrUrX4xvXYrAhWardMGgF8qxzp8sYQU4dFb3/9foUVOrDZ11bXVz4gDUTYm13FG
-         gmefu01Ty5Kj9At5EKBI31dufobEYcUX/MaQgUBykeFTd39xZ72xohTVjOqj1Zsk5Znt
-         aGMgBbzIOnxvQrt16JigHCuXAw1IF20kHF/Nn7Fo0e3toL12/6kpt3lKJm7TQj8df0yh
-         6PwdAGdU7al9oraXPY/S0LIuPnaQpUTluV0fawoRajHgvYmyIGBQxo+bzybebdz0dR/M
-         XOpA3Lr1xj2qQRg1ukUiDvG3lYbfjLVx5YhEZ/jlDZ1+D2GhMpc9MslTIKbIlWvPaTB/
-         rErg==
-X-Gm-Message-State: ACgBeo21JnemqT6UTEXPL9pMwlcbxtsSgbsDzeM+5EcZFYJynTm6y3L7
-        95MrGcWn2FcdZylKc3oRg314FrC2LQ99LC4D5/rnMw==
-X-Google-Smtp-Source: AA6agR4lOu0DWSpSqBcbjPLr4h/HKp50l+dW5WqUWFIHWuJ0VUOU2A6Gf5R0eX5bKoCUXti76ds2fABJR3PkVaEThno=
-X-Received: by 2002:a17:90b:384f:b0:1f4:ee87:9523 with SMTP id
- nl15-20020a17090b384f00b001f4ee879523mr1873078pjb.100.1662524804735; Tue, 06
- Sep 2022 21:26:44 -0700 (PDT)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=4j6Q+BCgruPfdfNoIE3/wZJYX17HQyjtjOota9ARPcM=;
+        b=gmiO6CpNgqFA8ncu7CQd6Mngn799oSPIEyPYkXCbfqzVmM/TYRQ1wbunHW1EfjAHw3
+         RJ4k/orwO9QRqzHgSMoY24MoHU9Fn02JiUJxmR+UNiT6Upcq9Q8yEY/0N3BDGe5mzyFm
+         aj6k6NINdix62kIV0M7aKcsKyRFQ/dhr1UzRrnH2oDztZP+3v7n4RfIsIUP3ANTF6P0i
+         Ppy6Y55Pmu9lzR1AMIQyDYrzGWX5Ws3RK0AEV2MRerBfgqAV9VQuKvwr31R/10jZdcdp
+         87I5Y6ZFjiBfL+mqJS7e18a+Ayb4SRK6vfHPkm/hacmOCKTEWOSXAVZOQfftwJ5BzYtJ
+         yJJw==
+X-Gm-Message-State: ACgBeo2wMi2iNadJOFKS67WJFkfBLBMNQFJyw9gqIrOrWZYMuKshSmab
+        4//1hqvahZPhYQ/k+Fd8/oX2HujwtfiudOD5NQ9ygSP/MwVi6fJVEBUQLt1xVXiH0ENDaU/B4Gb
+        xtglCRjEoGL0k
+X-Received: by 2002:a05:6a00:ad1:b0:530:2cb7:84de with SMTP id c17-20020a056a000ad100b005302cb784demr1905276pfl.3.1662524874247;
+        Tue, 06 Sep 2022 21:27:54 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7P5ZyRAOSvxlEfTBlfyhp+ATcHkzoRBcyq3eWnpZwM/6/JJA/8FKFnJZ8VB0LxM3ySljdcsQ==
+X-Received: by 2002:a05:6a00:ad1:b0:530:2cb7:84de with SMTP id c17-20020a056a000ad100b005302cb784demr1905253pfl.3.1662524873918;
+        Tue, 06 Sep 2022 21:27:53 -0700 (PDT)
+Received: from [10.72.13.171] ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id u1-20020a632341000000b0042a6dde1d66sm7922152pgm.43.2022.09.06.21.27.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Sep 2022 21:27:53 -0700 (PDT)
+Message-ID: <ff96c12e-95cb-be57-9b5b-2da08b0630c6@redhat.com>
+Date:   Wed, 7 Sep 2022 12:27:40 +0800
 MIME-Version: 1.0
-References: <20220828222544.1964917-1-mizhang@google.com> <20220828222544.1964917-2-mizhang@google.com>
- <YwzkvfT0AiwaojTx@google.com> <20220907025042.hvfww56wskwhsjwk@yy-desk-7060>
-In-Reply-To: <20220907025042.hvfww56wskwhsjwk@yy-desk-7060>
-From:   Mingwei Zhang <mizhang@google.com>
-Date:   Tue, 6 Sep 2022 21:26:33 -0700
-Message-ID: <CAL715WJK1WwXFfbUiMjngV8Z-0jyu_9JeZaK4qvvdJfYvtQEYg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/4] KVM: x86: move the event handling of
- KVM_REQ_GET_VMCS12_PAGES into a common function
-To:     Yuan Yao <yuan.yao@linux.intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Oliver Upton <oupton@google.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.13.0
+Subject: Re: [RFC v3 3/7] vsock: batch buffers in tx
+Content-Language: en-US
+To:     Guo Zhi <qtxuning1999@sjtu.edu.cn>, eperezma@redhat.com,
+        sgarzare@redhat.com, mst@redhat.com
+Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+References: <20220901055434.824-1-qtxuning1999@sjtu.edu.cn>
+ <20220901055434.824-4-qtxuning1999@sjtu.edu.cn>
+From:   Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20220901055434.824-4-qtxuning1999@sjtu.edu.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > @@ -10700,6 +10706,12 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
-> >               if (kvm_cpu_has_pending_timer(vcpu))
-> >                       kvm_inject_pending_timer_irqs(vcpu);
-> >
-> > +             if (vcpu->arch.nested_get_pages_pending) {
-> > +                     r = kvm_get_nested_state_pages(vcpu);
-> > +                     if (r <= 0)
-> > +                             break;
-> > +             }
-> > +
+
+在 2022/9/1 13:54, Guo Zhi 写道:
+> Vsock uses buffers in order, and for tx driver doesn't have to
+> know the length of the buffer. So we can do a batch for vsock if
+> in order negotiated, only write one used ring for a batch of buffers
 >
-> Will this leads to skip the get_nested_state_pages for L2 first time
-> vmentry in every L2 running iteration ? Because with above changes
-> KVM_REQ_GET_NESTED_STATE_PAGES is not set in
-> nested_vmx_enter_non_root_mode() and
-> vcpu->arch.nested_get_pages_pending is not checked in
-> vcpu_enter_guest().
+> Signed-off-by: Guo Zhi <qtxuning1999@sjtu.edu.cn>
+> ---
+>   drivers/vhost/vsock.c | 12 ++++++++++--
+>   1 file changed, 10 insertions(+), 2 deletions(-)
 >
-Good catch. I think the diff won't work when vcpu is runnable. It only
-tries to catch the vcpu block case. Even for the vcpu block case,  the
-check of KVM_REQ_UNBLOCK is way too late. Ah, kvm_vcpu_check_block()
-is called by kvm_vcpu_block() which is called by vcpu_block(). The
-warning is triggered at the very beginning of vcpu_block(), i.e.,
-within kvm_arch_vcpu_runnable(). So, please ignore the trace in my
-previous email.
+> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> index 368330417bde..e08fbbb5439e 100644
+> --- a/drivers/vhost/vsock.c
+> +++ b/drivers/vhost/vsock.c
+> @@ -497,7 +497,7 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
+>   	struct vhost_vsock *vsock = container_of(vq->dev, struct vhost_vsock,
+>   						 dev);
+>   	struct virtio_vsock_pkt *pkt;
+> -	int head, pkts = 0, total_len = 0;
+> +	int head, pkts = 0, total_len = 0, add = 0;
+>   	unsigned int out, in;
+>   	bool added = false;
+>   
+> @@ -551,10 +551,18 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
+>   		else
+>   			virtio_transport_free_pkt(pkt);
+>   
+> -		vhost_add_used(vq, head, 0);
+> +		if (!vhost_has_feature(vq, VIRTIO_F_IN_ORDER)) {
+> +			vhost_add_used(vq, head, 0);
 
-In addition, my minor push back for that is
-vcpu->arch.nested_get_pages_pending seems to be another
-KVM_REQ_GET_NESTED_STATE_PAGES.
 
-Thanks.
--Mingwei
+I'd do this step by step.
+
+1) switch to use vhost_add_used_n() for vsock, less copy_to_user() 
+better performance
+2) do in-order on top
 
 
--Mingwei
+> +		} else {
+> +			vq->heads[add].id = head;
+> +			vq->heads[add++].len = 0;
+
+
+How can we guarantee that we are in the boundary of the heads array?
+
+Btw in the case of in-order we don't need to record the heads, instead 
+we just need to know the head of the last buffer, it reduces the stress 
+on the cache.
+
+Thanks
+
+
+> +		}
+>   		added = true;
+>   	} while(likely(!vhost_exceeds_weight(vq, ++pkts, total_len)));
+>   
+> +	/* If in order feature negotiaged, we can do a batch to increase performance */
+> +	if (vhost_has_feature(vq, VIRTIO_F_IN_ORDER) && added)
+> +		vhost_add_used_n(vq, vq->heads, add);
+>   no_more_replies:
+>   	if (added)
+>   		vhost_signal(&vsock->dev, vq);
+
