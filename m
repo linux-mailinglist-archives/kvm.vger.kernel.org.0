@@ -2,170 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77D755B2358
-	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 18:15:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1B5B5B23BC
+	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 18:40:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231944AbiIHQPG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Sep 2022 12:15:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36946 "EHLO
+        id S230313AbiIHQk0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Sep 2022 12:40:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231963AbiIHQOw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Sep 2022 12:14:52 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC7974D249;
-        Thu,  8 Sep 2022 09:14:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iRFufvCZUeUDOQJRnxng9G3ynBf9d5LmYDnyRj+4X3sbvRGlmFEA/WVx/vOEtUabvovxNpZooT57GrKK/yfD1oGI6Uhh2gSp3fvCMD+vriCHmHAPvre22nmfmFfCgH73sDw5W5ZkFgApnLFMTUgupwLbkzeinleOWsB+LBSjy1fnTNnk6p6nH7sP2XS6tWy8+8aVbPBcFU5LuMWJ54/vBx4W5lBBE/tAx0y3UURhZe08kVWrZy0aE0kaFUxNkq+64m/mBtcF9qwru7K/NtE/EYusxHzHLSRW9wiFmF7kucXrh7YTRpCRT8DKIlxiCcnS50ah1RMUyvgKHOAQLaXo3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yJF2EmhiFTi6X5MwBd2ldmxkE6wrBxgYe+fji5XwIS0=;
- b=FCgjNrN/jdCB6mexx2ALaQzVfwZoFxw0YQjIBc8fzAv0s+rRE7YvszcyQ10EfuUecMr86CWNid3v9zu9blDe8svRZoCVCF6Xy0KnD8LC69inrH7yHgV5+cY7mjPSg/mnLvaramLtTjz78nmQR5K7WWGIElmBe28KoVxB+tsG6nB0/gNu55h+KguY9gU82nx6Ji0SEZfICzifH+g+AJxRkx5jmw5D6s6V4SeF585V536uWESrmkDGGEKFA+pPDcYj9r9VmF+1YsUiZcU5oMevvbar9JT+KS5dD7/MHl+AqNQYefbVhEgmcd1FMAiufFLzBfrIwdTKhemGhtAeGiznKg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yJF2EmhiFTi6X5MwBd2ldmxkE6wrBxgYe+fji5XwIS0=;
- b=Ssp9+comEwxraWD6+6lCCAOeHQ/xCw+7ezoEkPVzzAEVEHeWLnv/udJ7ebeUpeAmuNeTX3LizuGXnFT8DwR700vWRfB9gxfVmTEk/dUE9ZrIMsJd9LxnD0Lfatntz4Nh8GIP95rghxw+3HRTlnUK112RQWlwXtwZqdIDUZdVz4lL1N5MH45PkrPe4J6ZqTPqY37I5M7ScdqlFl9LthVb1npZQAAUlsL0VjYJZ+cpoodoi+jywsKv8Bk+Dvwpz4vkaMqHmXC4xuoqDxtEXnKUGxd6iYgebS2nn/tBFwWhR3/wXj0W8COYFYjr3W9wVlC+sWQPf9uNhf7m5FurmyP8Nw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by LV2PR12MB5943.namprd12.prod.outlook.com (2603:10b6:408:170::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5612.16; Thu, 8 Sep
- 2022 16:14:43 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::462:7fe:f04f:d0d5]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::462:7fe:f04f:d0d5%7]) with mapi id 15.20.5612.019; Thu, 8 Sep 2022
- 16:14:43 +0000
-Date:   Thu, 8 Sep 2022 13:14:42 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Joerg Roedel <joro@8bytes.org>
-Cc:     Nicolin Chen <nicolinc@nvidia.com>, will@kernel.org,
-        robin.murphy@arm.com, alex.williamson@redhat.com,
-        suravee.suthikulpanit@amd.com, marcan@marcan.st,
-        sven@svenpeter.dev, alyssa@rosenzweig.io, robdclark@gmail.com,
-        dwmw2@infradead.org, baolu.lu@linux.intel.com,
-        mjrosato@linux.ibm.com, gerald.schaefer@linux.ibm.com,
-        orsonzhai@gmail.com, baolin.wang@linux.alibaba.com,
-        zhang.lyra@gmail.com, thierry.reding@gmail.com, vdumpa@nvidia.com,
-        jonathanh@nvidia.com, jean-philippe@linaro.org, cohuck@redhat.com,
-        tglx@linutronix.de, shameerali.kolothum.thodi@huawei.com,
-        thunder.leizhen@huawei.com, christophe.jaillet@wanadoo.fr,
-        yangyingliang@huawei.com, jon@solid-run.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, asahi@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-tegra@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        kevin.tian@intel.com
-Subject: Re: [PATCH v6 1/5] iommu: Return -EMEDIUMTYPE for incompatible
- domain and device/group
-Message-ID: <YxoU8lw+qIw9woRL@nvidia.com>
-References: <20220815181437.28127-1-nicolinc@nvidia.com>
- <20220815181437.28127-2-nicolinc@nvidia.com>
- <YxiRkm7qgQ4k+PIG@8bytes.org>
- <Yxig+zfA2Pr4vk6K@nvidia.com>
- <YxilZbRL0WBR97oi@8bytes.org>
- <YxjQiVnpU0dr7SHC@nvidia.com>
- <Yxnt9uQTmbqul5lf@8bytes.org>
+        with ESMTP id S229667AbiIHQkY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Sep 2022 12:40:24 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FD68E22A2
+        for <kvm@vger.kernel.org>; Thu,  8 Sep 2022 09:40:22 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id j12so6043382pfi.11
+        for <kvm@vger.kernel.org>; Thu, 08 Sep 2022 09:40:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=TfyRq0jlvH8eDPYzNpB9Vr+eTdHW9JBmU8SwAEh+UbI=;
+        b=bS0esx3pFAUj+EVbeFPV9u5vwPsNdXvXeji2Zssg31MV+d5VzLH4+TJjKI22EYvrwx
+         BjYrNN08JHqW+5MxLXUPwD5R/I2pUYI99rdq+rVCleYFh5VxBVClyeQsUqDgzxGcea6c
+         bxb3BWOKNS91V7cVo8SJh22quzbb8UmURWu5sZSd/Dyd5+SJhalc6LM0mkKE7y6h568V
+         mCftnGBr5zao3amDZ4QrLN1tGp+g+8rPaCPJjpGO+Z/kEDvhWrLKxLX948aBj4f5BRks
+         g2jFaEEUWieIrj/FlAFSvMCfsMOT/CmjnniPRuYmrYg34+KrUFfmYWVNZa0TPZTQk1Ii
+         z6Aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=TfyRq0jlvH8eDPYzNpB9Vr+eTdHW9JBmU8SwAEh+UbI=;
+        b=N5qMRdBnuW+RBuyKIIbbXQYZ7FqN33NepuyZI0mlUj+i3jbydTTw2U9LrBUDGhInjM
+         xd4E49hKXuAsey/gHz7FYQswQGkWMMSj5+u14fadjMK3H09Z3ZimF5OpspR2Rc6aO96E
+         IepF1wR60FZe6kEVbFkfX3pq1BUjL6Rctc5VnC3DCCyi5mQy933PX60lTGls58U3vCIb
+         mgJ1RgnBMadCQwa4N5Hu7KwHmSIgn2U7HcY8ECIXoLij6ZbdamPh+qqbZNTPSubyjhpk
+         FAKqLUQJfzYpoLLymv/uozMVcHDJyCtuRXVjQzEyhzGUucBNCxzJelnF96Bd6Rz0ZwdU
+         1rug==
+X-Gm-Message-State: ACgBeo2vzdIVUNw4WsnU2a0+KbrYF86A1+rPMivx2NzXo2KGo2rEcMc+
+        j6ObTCJxS3U4uuFuW6MBM5l0mg==
+X-Google-Smtp-Source: AA6agR7ChjM3guR8LuRlEvQHMnqFM6CMxasWsQoVOG5xIoP2XS2Abkp6caJMLnhG1o+8tNqOrJf9xQ==
+X-Received: by 2002:a63:4ca:0:b0:434:b550:2115 with SMTP id 193-20020a6304ca000000b00434b5502115mr8445482pge.203.1662655221642;
+        Thu, 08 Sep 2022 09:40:21 -0700 (PDT)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
+        by smtp.gmail.com with ESMTPSA id kx6-20020a17090b228600b001fffbad35f6sm1949910pjb.44.2022.09.08.09.40.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Sep 2022 09:40:19 -0700 (PDT)
+Date:   Thu, 8 Sep 2022 09:40:15 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        dmatlack@google.com, seanjc@google.com, oupton@google.com
+Subject: Re: [PATCH v3 2/3] KVM: selftests: Randomize which pages are written
+ vs read.
+Message-ID: <Yxoa78p2QTXXgZej@google.com>
+References: <20220901195237.2152238-1-coltonlewis@google.com>
+ <20220901195237.2152238-3-coltonlewis@google.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yxnt9uQTmbqul5lf@8bytes.org>
-X-ClientProxiedBy: MN2PR04CA0014.namprd04.prod.outlook.com
- (2603:10b6:208:d4::27) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR12MB4192:EE_|LV2PR12MB5943:EE_
-X-MS-Office365-Filtering-Correlation-Id: f4d7caab-751a-4bb2-77c3-08da91b53d6f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /zD05OSIEdRUR4IkCWRwkgl8BMPaJIl9ErhfUPpSjqBDvEwzhxCgdSj6f2lOwdusVXu+zoF3GjjpcqVte5jsblUzqNk0ifCKFZUdniPgbYBD2pmAn8oniGMUXdCa+cwXdzilCT9ucfBS+AZctw2Pe/cb2E1uuUuFY0ZOMY/yg9Oe/RhoTsXa1s775ha0FIW9qWAi9Cd5Vic7TENvAdCXNI6VY9NgalCDXXvAzQ2aFw7PXGAcuXqDWHPk3iRDY1W5ecfYhVtfysT5g2NbxN8QZliV/5LG9LTFqoLrydrPA2izokmM7BrrEViGK2qosQc0js47O67HDwibk6Cin2T11HmWOoj07EB6Hmj/MraDzeZeMN9bPgFfK+XsvO8rqLtDGCBs2fkKE2GcnAQyNfp5T1aGeWVUd+3gNlFjhxu1H1ivokNJLU2ekj3ZEnkvgzlfRMfhPRyiWN7SRYHFgCHB+XoKmHSOT46JWrP/oOTEGUMQCHoIfVwlmS+fOaMSE+n5TPTItqXpRgGTD6qDKQ8q3PoOXuc7Kv2x8uO2fXrfUr/A7L158cPB8yFluK2qxv5QcMB+Iwbt8W2Vq2WcTdQLs+Qkd3A6sSZuCudbwuhPO35Ti2miXMoGim/dgLgY1/TwDlexmYHMoMfu/DcQKeajQcrR/5F8T67flC8dCB03p212flUQBFM526CcmVr6QECZQipZ/RjdjjoI1Uws+Q4VZVfccD/uK18R85xoRHCLqf3OTaIlObbK4TfawWsorZDt
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(376002)(136003)(39860400002)(346002)(366004)(396003)(86362001)(83380400001)(6506007)(6916009)(8676002)(316002)(478600001)(41300700001)(6486002)(186003)(2616005)(6512007)(26005)(7406005)(4326008)(7416002)(36756003)(5660300002)(2906002)(38100700002)(66476007)(66556008)(66946007)(8936002)(67856001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rgHdQNvKytT8KAjagVLrkQzSXmc557KiaR+7oeg/yK6pqghbhQxw2c2txssU?=
- =?us-ascii?Q?3+VLiAnjLtudsMQGahypFfA2gzFqNL5wvfknWF7g+oNS5SSgOQ+oGC2b0IFp?=
- =?us-ascii?Q?JtKFhJVkDdNnlMG9ECrO036HYhtakKrHDx2Z/L86Doc8imhGv4ZXUFCZF1hd?=
- =?us-ascii?Q?oZwmuLmivheuSjx1QFW3wb03Ns0KLUmLcpAHj/UXMyGON4ZwDarBdCBQjrB4?=
- =?us-ascii?Q?OXHjbfub6x+KvTyaNymyVSU2HZF/Vw5tGV1s8s8CktIhDaufzCUl13aR9xnh?=
- =?us-ascii?Q?1rFxO8zHaPlhKf6ZslxoVUoapVV8EGJAolCTTrVL+f0xzhAzXGgloiaFLz7U?=
- =?us-ascii?Q?V+CbTfdEk3XIWecvhALALdA707ptW2aXgnJVvJZPU1dZ/JGA/QU67FhTgpY4?=
- =?us-ascii?Q?Uy35aSaCbDDhLNaVASGPWdjV1dRCEiRSkHKcpievWmisHzF05mIbrAwZ9sGm?=
- =?us-ascii?Q?bu30UTsMwdvMqFGUYO35hwPcpPRGqPRP6HUJqe6aE6gw7HQ2HhreroU49tjL?=
- =?us-ascii?Q?HEssdJzeunJXRDRkOvM7UJ86WUELcu53T6XlCKyvj3ihNpD4lhFwzVktakSv?=
- =?us-ascii?Q?i0uxjrw8nj0OAxe0bFiNDEMLEApw60FwWnXIa2of5t1gMHt1ik3uN4gJBIKj?=
- =?us-ascii?Q?4mEaQa79VTlNqtapv3zM6374VdkvwDSptlai3txGLZB17DSBOoeYMT21zHr/?=
- =?us-ascii?Q?fU/tAOLunEOzcV9crso6vbiVz/HVy5bnA7lnos15xRTqEaaXe6cMPK34vqrs?=
- =?us-ascii?Q?tqPBBrQNwhwlMcA6LrRzIL1Tzgyg5mg8FbTU7uxCi1Xsi2/QwEz8ciVln3CK?=
- =?us-ascii?Q?xwX4E1HpkovP73Wb7QqKBSC+ZVx0igzK9gkvIYI5CNy3ikt/DP5p5NTefwz9?=
- =?us-ascii?Q?LmEy7MouknWYjkZ+jJCwxvzfUxpfTmr7zZNwXoydWwiGFOtqKJVHGX88I5Az?=
- =?us-ascii?Q?VJX2Mlstn4GMALkVU7wpMwIG9CQTUc3iU0/IqN8ZCn+//Wn+OkTxgcwAzIen?=
- =?us-ascii?Q?bQ6kk7L7CG815H80d0lz3yRn124PxVaVTGF22dM1qzIikO/IqlR7amJ6tWTf?=
- =?us-ascii?Q?jahu7FKa2mJ1sULvdZHESpEvQQQcLjVwN/lI0ILfWdsagv7p79j+fzt+l6EF?=
- =?us-ascii?Q?KkjjHffys/FGPjj3VY6/ypEpKh2HyHjVKbqnXW4CIuuZIuAeLnRP4sLOHlDr?=
- =?us-ascii?Q?hUpIy/8LcFmaA4IC0kcRCu6IYBDJ0IDidtlyJMDu35dXUSdbCwdYyPbkdJ14?=
- =?us-ascii?Q?bdFkXiYIm3/AMrzkHFOLrojoPkoSa4zOKdT7qPzKmtD+QHJk5XOTHpB0XPML?=
- =?us-ascii?Q?+UHzUKhXS9bJjdusSti1GlY1JmF+S9Rg5MCDTowo6+TzQarcSmZO/+RCBadh?=
- =?us-ascii?Q?EJuMQ11InmWSvEB2QyXbee4kgKeY/PbBrIVmKNMvj4stC3eSL7RozelVJoVo?=
- =?us-ascii?Q?44XFIjdeEZnzdb09qPNGi/njjKZMs5NwMWb7/P9cYCbh5HE/YdByp81sZO4R?=
- =?us-ascii?Q?XGP/SPYdsYe0NC1ckgCqwSjODinCei388QaHjjfPvUUuCCL1mti4yw3Oyxit?=
- =?us-ascii?Q?05ioUHbQNV0+Gdtj0X7l0FouBL3t1B27UkTjPN6q?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f4d7caab-751a-4bb2-77c3-08da91b53d6f
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Sep 2022 16:14:43.4200
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hov2lXuRoI9HiQ5O5iBgBzBu+ifG5c+sRk5XINO5fJejfnzolvke5urr8RtE47as
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5943
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20220901195237.2152238-3-coltonlewis@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 08, 2022 at 03:28:22PM +0200, Joerg Roedel wrote:
-> > It has been 3 months since EMEDIUMTYPE was first proposed and 6
-> > iterations of the series, don't you think it is a bit late in the game
-> > to try to experiment with rust error handling idioms?
+On Thu, Sep 01, 2022 at 07:52:36PM +0000, Colton Lewis wrote:
+> Randomize which pages are written vs read using the random number
+> generator.
+nit:       ^ I haven't seen this style before (the period at the end)
+
 > 
-> If I am not mistaken, I am the person who gets blamed when crappy IOMMU
-> code is sent upstream. So it is also up to me to decide in which state
-> and how close to merging a given patch series is an whether it is
-> already 'late in the game'.
-
-I don't think the maintainer is the one who gets blamed. The community
-is responsible as a collective group for it's decisions. The
-maintainer is the leader of the community, responsible to foster it,
-and contributes their guidance, but doesn't bare an unlimited
-responsibility for what is merged.
-
-In a case like this I am the advocate, Nicolin wrote the patches,
-Kevin reviewed, Alex ack'd them - we as a group are ultimately
-responsible to repair, defend, or whatever is needed.
-
-> I am wondering if this can be solved by better defining what the return
-> codes mean and adjust the call-back functions to match the definition.
-> Something like:
+> Change the variable wr_fract and associated function calls to
+> write_percent that now operates as a percentage from 0 to 100 where X
+> means each page has an X% chance of being written. Change the -f
+> argument to -w to reflect the new variable semantics. Keep the same
+> default of 100 percent writes.
 > 
-> 	-ENODEV : Device not mapped my an IOMMU
-> 	-EBUSY  : Device attached and domain can not be changed
-> 	-EINVAL : Device and domain are incompatible
-> 	...
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> ---
+>  .../selftests/kvm/access_tracking_perf_test.c |  2 +-
+>  .../selftests/kvm/dirty_log_perf_test.c       | 28 ++++++++++---------
+>  .../selftests/kvm/include/perf_test_util.h    |  4 +--
+>  .../selftests/kvm/lib/perf_test_util.c        | 10 +++----
+>  4 files changed, 23 insertions(+), 21 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> index d8909032317a..d86046ef3a0b 100644
+> --- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> +++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> @@ -274,7 +274,7 @@ static void run_iteration(struct kvm_vm *vm, int vcpus, const char *description)
+>  static void access_memory(struct kvm_vm *vm, int vcpus, enum access_type access,
+>  			  const char *description)
+>  {
+> -	perf_test_set_wr_fract(vm, (access == ACCESS_READ) ? INT_MAX : 1);
+> +	perf_test_set_write_percent(vm, (access == ACCESS_READ) ? 0 : 100);
+>  	iteration_work = ITERATION_ACCESS_MEMORY;
+>  	run_iteration(vm, vcpus, description);
+>  }
+> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> index 2f91acd94130..c9441f8354be 100644
+> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> @@ -122,10 +122,10 @@ static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
+>  struct test_params {
+>  	unsigned long iterations;
+>  	uint64_t phys_offset;
+> -	int wr_fract;
+>  	bool partition_vcpu_memory_access;
+>  	enum vm_mem_backing_src_type backing_src;
+>  	int slots;
+> +	uint32_t write_percent;
 
-Yes, this was gone over in a side thread the pros/cons, so lets do
-it. Nicolin will come with something along these lines.
+nit: make it an int to match perf_test_args.write_percent
 
-Thanks,
-Jason
+>  	uint32_t random_seed;
+>  };
+>  
+> @@ -223,7 +223,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  
+>  	pr_info("Random seed: %u\n", p->random_seed);
+>  	perf_test_set_random_seed(vm, p->random_seed);
+> -	perf_test_set_wr_fract(vm, p->wr_fract);
+> +	perf_test_set_write_percent(vm, p->write_percent);
+>  
+>  	guest_num_pages = (nr_vcpus * guest_percpu_mem_size) >> vm_get_page_shift(vm);
+>  	guest_num_pages = vm_adjust_num_guest_pages(mode, guest_num_pages);
+> @@ -341,7 +341,7 @@ static void help(char *name)
+>  	puts("");
+>  	printf("usage: %s [-h] [-i iterations] [-p offset] [-g] "
+>  	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-r random seed ] [-s mem type]"
+> -	       "[-x memslots]\n", name);
+> +	       "[-x memslots] [-w percentage]\n", name);
+>  	puts("");
+>  	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
+>  	       TEST_HOST_LOOP_N);
+> @@ -358,10 +358,6 @@ static void help(char *name)
+>  	printf(" -b: specify the size of the memory region which should be\n"
+>  	       "     dirtied by each vCPU. e.g. 10M or 3G.\n"
+>  	       "     (default: 1G)\n");
+> -	printf(" -f: specify the fraction of pages which should be written to\n"
+> -	       "     as opposed to simply read, in the form\n"
+> -	       "     1/<fraction of pages to write>.\n"
+> -	       "     (default: 1 i.e. all pages are written to.)\n");
+>  	printf(" -v: specify the number of vCPUs to run.\n");
+>  	printf(" -o: Overlap guest memory accesses instead of partitioning\n"
+>  	       "     them into a separate region of memory for each vCPU.\n");
+> @@ -369,6 +365,11 @@ static void help(char *name)
+>  	backing_src_help("-s");
+>  	printf(" -x: Split the memory region into this number of memslots.\n"
+>  	       "     (default: 1)\n");
+> +	printf(" -w: specify the percentage of pages which should be written to\n"
+> +	       "     as an integer from 0-100 inclusive. This is probabalistic,\n"
+> +	       "     so -w X means each page has an X%% chance of writing\n"
+> +	       "     and a (100-X)%% chance of reading.\n"
+> +	       "     (default: 100 i.e. all pages are written to.)\n");
+>  	puts("");
+>  	exit(0);
+>  }
+> @@ -378,10 +379,10 @@ int main(int argc, char *argv[])
+>  	int max_vcpus = kvm_check_cap(KVM_CAP_MAX_VCPUS);
+>  	struct test_params p = {
+>  		.iterations = TEST_HOST_LOOP_N,
+> -		.wr_fract = 1,
+>  		.partition_vcpu_memory_access = true,
+>  		.backing_src = DEFAULT_VM_MEM_SRC,
+>  		.slots = 1,
+> +		.write_percent = 100,
+>  		.random_seed = time(NULL),
+>  	};
+>  	int opt;
+> @@ -393,7 +394,7 @@ int main(int argc, char *argv[])
+>  
+>  	guest_modes_append_default();
+>  
+> -	while ((opt = getopt(argc, argv, "ghi:p:m:nb:f:v:or:s:x:")) != -1) {
+> +	while ((opt = getopt(argc, argv, "ghi:p:m:nb:v:or:s:x:w:")) != -1) {
+>  		switch (opt) {
+>  		case 'g':
+>  			dirty_log_manual_caps = 0;
+> @@ -413,10 +414,11 @@ int main(int argc, char *argv[])
+>  		case 'b':
+>  			guest_percpu_mem_size = parse_size(optarg);
+>  			break;
+> -		case 'f':
+> -			p.wr_fract = atoi(optarg);
+> -			TEST_ASSERT(p.wr_fract >= 1,
+> -				    "Write fraction cannot be less than one");
+> +		case 'w':
+> +			perf_test_args.write_percent = atoi(optarg);
+
+I'm a bit confused, where is p.write_percent being set? I later see
+
+	perf_test_set_write_percent(vm, p->write_percent);
+
+that rewrites perf_test_args.write_percent with whatever was in
+p->write_percent.
+
+> +			TEST_ASSERT(perf_test_args.write_percent >= 0
+> +				    && perf_test_args.write_percent <= 100,
+> +				    "Write percentage must be between 0 and 100");
+>  			break;
+>  		case 'v':
+>  			nr_vcpus = atoi(optarg);
+> diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
+> index f18530984b42..52c450eb6b9b 100644
+> --- a/tools/testing/selftests/kvm/include/perf_test_util.h
+> +++ b/tools/testing/selftests/kvm/include/perf_test_util.h
+> @@ -35,7 +35,7 @@ struct perf_test_args {
+>  	uint64_t size;
+>  	uint64_t guest_page_size;
+>  	uint32_t random_seed;
+> -	int wr_fract;
+> +	int write_percent;
+>  
+>  	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
+>  	bool nested;
+> @@ -51,7 +51,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
+>  				   bool partition_vcpu_memory_access);
+>  void perf_test_destroy_vm(struct kvm_vm *vm);
+>  
+> -void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract);
+> +void perf_test_set_write_percent(struct kvm_vm *vm, uint32_t write_percent);
+>  void perf_test_set_random_seed(struct kvm_vm *vm, uint32_t random_seed);
+>  
+>  void perf_test_start_vcpu_threads(int vcpus, void (*vcpu_fn)(struct perf_test_vcpu_args *));
+> diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> index 1292ed7d1193..be6176faaf8e 100644
+> --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
+> +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> @@ -64,10 +64,10 @@ void perf_test_guest_code(uint32_t vcpu_id)
+>  
+>  	while (true) {
+>  		for (i = 0; i < pages; i++) {
+> -			rand = perf_test_random(rand);
+>  			uint64_t addr = gva + (i * pta->guest_page_size);
+> +			rand = perf_test_random(rand);
+>  
+> -			if (i % pta->wr_fract == 0)
+> +			if (rand % 100 < pta->write_percent)
+>  				*(uint64_t *)addr = 0x0123456789ABCDEF;
+>  			else
+>  				READ_ONCE(*(uint64_t *)addr);
+> @@ -125,7 +125,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
+>  	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
+>  
+>  	/* Set perf_test_args defaults. */
+> -	pta->wr_fract = 1;
+> +	pta->write_percent = 100;
+>  	pta->random_seed = time(NULL);
+>  
+>  	/*
+> @@ -228,9 +228,9 @@ void perf_test_destroy_vm(struct kvm_vm *vm)
+>  	kvm_vm_free(vm);
+>  }
+>  
+> -void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract)
+> +void perf_test_set_write_percent(struct kvm_vm *vm, uint32_t write_percent)
+>  {
+> -	perf_test_args.wr_fract = wr_fract;
+> +	perf_test_args.write_percent = write_percent;
+>  	sync_global_to_guest(vm, perf_test_args);
+>  }
+>  
+> -- 
+> 2.37.2.789.g6183377224-goog
+> 
