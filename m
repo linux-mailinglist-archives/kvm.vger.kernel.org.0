@@ -2,176 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A556A5B19E7
-	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 12:26:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 08B595B19F8
+	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 12:29:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230526AbiIHK0L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Sep 2022 06:26:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50920 "EHLO
+        id S230234AbiIHK34 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Sep 2022 06:29:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230430AbiIHK0J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Sep 2022 06:26:09 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9C9968A7D0;
-        Thu,  8 Sep 2022 03:26:08 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 94A8D14BF;
-        Thu,  8 Sep 2022 03:26:14 -0700 (PDT)
-Received: from [10.57.15.197] (unknown [10.57.15.197])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D059C3F71A;
-        Thu,  8 Sep 2022 03:25:52 -0700 (PDT)
-Message-ID: <7ef259b2-121e-643e-49c2-0b65923d392d@arm.com>
-Date:   Thu, 8 Sep 2022 11:25:46 +0100
+        with ESMTP id S230091AbiIHK3z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Sep 2022 06:29:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 021144E857
+        for <kvm@vger.kernel.org>; Thu,  8 Sep 2022 03:29:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662632993;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=aGJyUcumRyL68D4wXJ59Cgk5pIgcqtVYT24TVj/aRJU=;
+        b=W6MbleMSbQvZOXCSDkcVhZwnXO0gdve4cP3T2BWWPmZBpkhF+tKR4PgAjStETbg8B8Glpx
+        xRYUTlXyeVM6hR3ldM60c0pTwIrVkUc4l8wLkR5qrf0wwMnNq+9QfLMyeDKZ1/vNW2zQts
+        GTMIqUwHQuRUm4/OCx0Ew3fGnkN2/Vg=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-164-vdxa0sMiOrGMtnDRxoLxTA-1; Thu, 08 Sep 2022 06:29:48 -0400
+X-MC-Unique: vdxa0sMiOrGMtnDRxoLxTA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8461B1C04B48;
+        Thu,  8 Sep 2022 10:29:47 +0000 (UTC)
+Received: from localhost (unknown [10.39.194.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2941140CF8F0;
+        Thu,  8 Sep 2022 10:29:47 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v3] vfio/fsl-mc: Fix a typo in a message
+In-Reply-To: <a7c1394346725b7435792628c8d4c06a0a745e0b.1662134821.git.christophe.jaillet@wanadoo.fr>
+Organization: Red Hat GmbH
+References: <a7c1394346725b7435792628c8d4c06a0a745e0b.1662134821.git.christophe.jaillet@wanadoo.fr>
+User-Agent: Notmuch/0.37 (https://notmuchmail.org)
+Date:   Thu, 08 Sep 2022 12:29:44 +0200
+Message-ID: <87pmg6rwfb.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH v6 1/5] iommu: Return -EMEDIUMTYPE for incompatible domain
- and device/group
-Content-Language: en-GB
-To:     Jason Gunthorpe <jgg@nvidia.com>, Joerg Roedel <joro@8bytes.org>
-Cc:     Nicolin Chen <nicolinc@nvidia.com>, will@kernel.org,
-        alex.williamson@redhat.com, suravee.suthikulpanit@amd.com,
-        marcan@marcan.st, sven@svenpeter.dev, alyssa@rosenzweig.io,
-        robdclark@gmail.com, dwmw2@infradead.org, baolu.lu@linux.intel.com,
-        mjrosato@linux.ibm.com, gerald.schaefer@linux.ibm.com,
-        orsonzhai@gmail.com, baolin.wang@linux.alibaba.com,
-        zhang.lyra@gmail.com, thierry.reding@gmail.com, vdumpa@nvidia.com,
-        jonathanh@nvidia.com, jean-philippe@linaro.org, cohuck@redhat.com,
-        tglx@linutronix.de, shameerali.kolothum.thodi@huawei.com,
-        thunder.leizhen@huawei.com, christophe.jaillet@wanadoo.fr,
-        yangyingliang@huawei.com, jon@solid-run.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, asahi@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-tegra@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        kevin.tian@intel.com
-References: <20220815181437.28127-1-nicolinc@nvidia.com>
- <20220815181437.28127-2-nicolinc@nvidia.com> <YxiRkm7qgQ4k+PIG@8bytes.org>
- <Yxig+zfA2Pr4vk6K@nvidia.com> <9f91f187-2767-13f9-68a2-a5458b888f00@arm.com>
- <YxjOPo5FFqu2vE/g@nvidia.com> <0b466705-3a17-1bbc-7ef2-5adadc22d1ae@arm.com>
- <Yxk6sR4JiAAn3Jf5@nvidia.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <Yxk6sR4JiAAn3Jf5@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-10.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-09-08 01:43, Jason Gunthorpe wrote:
-> On Wed, Sep 07, 2022 at 08:41:13PM +0100, Robin Murphy wrote:
-> 
->>>> FWIW, we're now very close to being able to validate dev->iommu against
->>>> where the domain came from in core code, and so short-circuit ->attach_dev
->>>> entirely if they don't match.
->>>
->>> I don't think this is a long term direction. We have systems now with
->>> a number of SMMU blocks and we really are going to see a need that
->>> they share the iommu_domains so we don't have unncessary overheads
->>> from duplicated io page table memory.
->>>
->>> So ultimately I'd expect to pass the iommu_domain to the driver and
->>> the driver will decide if the page table memory it represents is
->>> compatible or not. Restricting to only the same iommu instance isn't
->>> good..
->>
->> Who said IOMMU instance?
-> 
-> Ah, I completely misunderstood what 'dev->iommu' was referring too, OK
-> I see.
-> 
->> Again, not what I was suggesting. In fact the nature of iommu_attach_group()
->> already rules out bogus devices getting this far, so all a driver currently
->> has to worry about is compatibility of a device that it definitely probed
->> with a domain that it definitely allocated. Therefore, from a caller's point
->> of view, if attaching to an existing domain returns -EINVAL, try another
->> domain; multiple different existing domains can be tried, and may also
->> return -EINVAL for the same or different reasons; the final attempt is to
->> allocate a fresh domain and attach to that, which should always be nominally
->> valid and *never* return -EINVAL. If any attempt returns any other error,
->> bail out down the usual "this should have worked but something went wrong"
->> path. Even if any driver did have a nonsensical "nothing went wrong, I just
->> can't attach my device to any of my domains" case, I don't think it would
->> really need distinguishing from any other general error anyway.
-> 
-> The algorithm you described is exactly what this series does, it just
-> used EMEDIUMTYPE instead of EINVAL. Changing it to EINVAL is not a
-> fundamental problem, just a bit more work.
-> 
-> Looking at Nicolin's series there is a bunch of existing errnos that
-> would still need converting, ie EXDEV, EBUSY, EOPNOTSUPP, EFAULT, and
-> ENXIO are all returned as codes for 'domain incompatible with device'
-> in various drivers. So the patch would still look much the same, just
-> changing them to EINVAL instead of EMEDIUMTYPE.
-> 
-> That leaves the question of the remaining EINVAL's that Nicolin did
-> not convert to EMEDIUMTYPE.
-> 
-> eg in the AMD driver:
-> 
-> 	if (!check_device(dev))
-> 		return -EINVAL;
-> 
-> 	iommu = rlookup_amd_iommu(dev);
-> 	if (!iommu)
-> 		return -EINVAL;
-> 
-> These are all cases of 'something is really wrong with the device or
-> iommu, everything will fail'. Other drivers are using ENODEV for this
-> already, so we'd probably have an additional patch changing various
-> places like that to ENODEV.
-> 
-> This mixture of error codes is the basic reason why a new code was
-> used, because none of the existing codes are used with any
-> consistency.
-> 
-> But OK, I'm on board, lets use more common errnos with specific
-> meaning, that can be documented in a comment someplace:
->   ENOMEM - out of memory
->   ENODEV - no domain can attach, device or iommu is messed up
->   EINVAL - the domain is incompatible with the device
->   <others> - Same behavior as ENODEV, use is discouraged.
-> 
-> I think achieving consistency of error codes is a generally desirable
-> goal, it makes the error code actually useful.
-> 
-> Joerg this is a good bit of work, will you be OK with it?
-> 
->> Thus as long as we can maintain that basic guarantee that attaching
->> a group to a newly allocated domain can only ever fail for resource
->> allocation reasons and not some spurious "incompatibility", then we
->> don't need any obscure trickery, and a single, clear, error code is
->> in fact enough to say all that needs to be said.
-> 
-> As above, this is not the case, drivers do seem to have error paths
-> that are unconditional on the domain. Perhaps they are just protective
-> assertions and never happen.
+On Fri, Sep 02 2022, Christophe JAILLET <christophe.jaillet@wanadoo.fr> wrote:
 
-Right, that's the gist of what I was getting at - I think it's worth 
-putting in the effort to audit and fix the drivers so that that *can* be 
-the case, then we can have a meaningful error API with standard codes 
-effectively for free, rather than just sighing at the existing mess and 
-building a slightly esoteric special case on top.
+> L and S are swapped in the message.
+> s/VFIO_FLS_MC/VFIO_FSL_MC/
+>
+> Also use 'ret' instead of 'WARN_ON(ret)' to avoid a duplicated message.
+>
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> ---
+> Changes in v3:
+>   * Remove WARN_ON() and WARN() and only keep dev_warn()   [Diana Madalina Craciun <diana.craciun@oss.nxp.com>]
+>
+> Changes in v2:
+>   * s/comment/message/ in the subject   [Cornelia Huck <cohuck@redhat.com>]
+>   * use WARN instead of WARN_ON+dev_warn   [Jason Gunthorpe <jgg@ziepe.ca>]
+>   https://lore.kernel.org/all/3d2aa8434393ee8d2aa23a620e59ce1059c9d7ad.1660663440.git.christophe.jaillet@wanadoo.fr/
+>
+> v1:
+>   https://lore.kernel.org/all/2b65bf8d2b4d940cafbafcede07c23c35f042f5a.1659815764.git.christophe.jaillet@wanadoo
+> ---
+>  drivers/vfio/fsl-mc/vfio_fsl_mc.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Case in point, the AMD checks quoted above are pointless, since it 
-checks the same things in ->probe_device, and if that fails then the 
-device won't get a group so there's no way for it to even reach 
-->attach_dev any more. I'm sure there's a *lot* of cruft that can be 
-cleared out now that per-device and per-domain ops give us this kind of 
-inherent robustness.
+Acked-by: Cornelia Huck <cohuck@redhat.com>
 
-Cheers,
-Robin.
-
-> Regardless, it doesn't matter. If they return ENODEV or EINVAL the
-> VFIO side algorithm will continue to work fine, it just does alot more
-> work if EINVAL is permanently returned.
-> 
-> Thanks,
-> Jason
