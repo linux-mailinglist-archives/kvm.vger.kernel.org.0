@@ -2,79 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BADB5B1F87
-	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 15:45:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DAF7F5B2037
+	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 16:12:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231660AbiIHNpl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Sep 2022 09:45:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38272 "EHLO
+        id S232392AbiIHOMi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Sep 2022 10:12:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230451AbiIHNpk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Sep 2022 09:45:40 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4ACB5C956;
-        Thu,  8 Sep 2022 06:45:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=twY36YI+Be9YAlDEXSHaceHAZcOE50tyeV0xFsPeMQc=; b=mcWsEqKY9fToo/d5WOKSIiaU/+
-        c9m1nn0Fjz+ycqPz886l04XsEVOmCTHE1uwdgKBF+9EB+HMm9Ar5BBeoZAmEy3jfZIq+6OiRa8niy
-        xCUGSjrKAvkrah8NZ4IlpBM3qJICx2aqX3mO1dYKSE5ithkYarsrw8bu7x/XY1O6OLsLV8ld7lSF5
-        sHmWirU5ndTkGSI3Gh4mu/cVsRe2/J+p5xyhvicoYAH909H1sGYd+7LQsXUFRG/ahT443YElt3zDP
-        kc+bKPTRRXKq4d5hgpcS9R+kzluYZkbg76nqb3nnVHI1ZuPPXtv5GeaZoJzZyUn3NnSGZ4mA0mK9I
-        OYNfTfrw==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oWHqM-00AkJb-5L; Thu, 08 Sep 2022 13:45:22 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id BC7AE30013F;
-        Thu,  8 Sep 2022 15:45:20 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 918BB207AB808; Thu,  8 Sep 2022 15:45:20 +0200 (CEST)
-Date:   Thu, 8 Sep 2022 15:45:20 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Like Xu <like.xu.linux@gmail.com>
-Subject: Re: [PATCH v4 0/5]  KVM: x86: Intel LBR related perf cleanups
-Message-ID: <Yxnx8InRcF94zi0n@hirez.programming.kicks-ass.net>
-References: <20220901173258.925729-1-seanjc@google.com>
+        with ESMTP id S232383AbiIHOMe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Sep 2022 10:12:34 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29FBBB07F1;
+        Thu,  8 Sep 2022 07:12:31 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id b144so13267964pfb.7;
+        Thu, 08 Sep 2022 07:12:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date;
+        bh=U02/Kmp4vnmickAmHlzFNy/q3NuNhMIS7lgkXtU4VOU=;
+        b=SwSn7mWt1tAlkjM+c/m1mTBqnxBjHqO+qaL07ivWbm+aLV04x3e8DgySIniKjjnYlN
+         iddJzvPllYbIxPd7jMX9WwOCpEtzmOc5XZYkCpkiOgHb8JQjuJrXLSGLjNm3zo3TSG2x
+         uDB8XMdbwZzlDz/X/PQNW9i25wqXm2YTsx9HXAQHKQ6bL/0Im8mWn4sqbIVqypVmEIG+
+         NML5fUFJ63Zqm7896hm2jJaEtLgANyNmSDH129os+3+QY35DSFg0hViXQNjnJgM+P2uw
+         1pwWei6lwAIEE21/syLV0Zr6ZxHRfC584oNWfjFPah6kRDjj4+tolEHZhzcqWHgOjRuV
+         yabA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=U02/Kmp4vnmickAmHlzFNy/q3NuNhMIS7lgkXtU4VOU=;
+        b=QtZF/Z9U9ChTs2bbMnd3lsr84AKPv4ql7O36nyniPQbH9Xlyls8DBOZDjJQSTTilGH
+         zBz7L9vmIHgCvy2NP0EsM4K9oIUlwyS/rfKG1aiFfKyU2fguI6uTupcr2fkf3fzx5SUu
+         eF57Kv8+E0Tvtft4+V4yLrhX0WEk7ApUmFmcYsNQVkaJgos+cYIQou1c8D+ZUjFNroOk
+         V/AvXPL2oWhmp38IYt5nUrNThJTC8GsjRE1txz7p2vvvLImetI2rWlJHPXEq7Fjanoxe
+         3333izVH+41ZqNrmGNKZIL6/3qJyscziyyV74wJjpqkhvNTru4mZAaXQF0xWxxI2o5yO
+         mEfA==
+X-Gm-Message-State: ACgBeo1NRmwCAosewIt14WqoS3TBExU1U7V7SMTYD0bgR2J+hn6Ce9HT
+        O4qrPsGIeVPnzcx8XEXqc8oXIp1BeozS5rQ4
+X-Google-Smtp-Source: AA6agR5mV0eJROcbPOno07CsR89QBYMUu7nwSsuDw1ye8mrYzQsS3lBIeoLhp32Gu27XM5FGlcpEJQ==
+X-Received: by 2002:a63:e516:0:b0:434:9462:69cd with SMTP id r22-20020a63e516000000b00434946269cdmr7528101pgh.503.1662646350500;
+        Thu, 08 Sep 2022 07:12:30 -0700 (PDT)
+Received: from localhost.localdomain ([47.241.28.43])
+        by smtp.gmail.com with ESMTPSA id m16-20020a170902db1000b001725d542190sm14771697plx.181.2022.09.08.07.12.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Sep 2022 07:12:30 -0700 (PDT)
+From:   Liam Ni <zhiguangni01@gmail.com>
+X-Google-Original-From: Liam Ni <zhiguangni01@zhaoxin.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
+Cc:     pbonzini@redhat.com, tglx@linutronix.de,
+        dave.hansen@linux.intel.com, seanjc@google.com,
+        zhiguangni01@gmail.com
+Subject: [PATCH v2] KVM:x86: Clean up ModR/M "reg" initialization in reg op decoding
+Date:   Thu,  8 Sep 2022 22:12:10 +0800
+Message-Id: <20220908141210.1375828-1-zhiguangni01@zhaoxin.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220901173258.925729-1-seanjc@google.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 01, 2022 at 05:32:53PM +0000, Sean Christopherson wrote:
+From: Liam Ni <zhiguangni01@gmail.com>
 
-> Sean Christopherson (5):
->   perf/x86/core: Remove unnecessary stubs provided for KVM-only helpers
->   perf/x86/core: Drop the unnecessary return value from
->     x86_perf_get_lbr()
->   KVM: VMX: Move vmx_get_perf_capabilities() definition to vmx.c
->   KVM: VMX: Fold vmx_supported_debugctl() into vcpu_supported_debugctl()
->   KVM: VMX: Advertise PMU LBRs if and only if perf supports LBRs
+Refactor decode_register_operand() to get the ModR/M register if and
+only if the instruction uses a ModR/M encoding to make it more obvious
+how the register operand is retrieved.
 
-These look good to me; how do you want this routed, if through the KVM
-tree:
+Signed-off-by: Liam Ni <zhiguangni01@gmail.com>
+---
+ arch/x86/kvm/emulate.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index f092c54d1a2f..879b52af763a 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -1137,9 +1137,11 @@ static int em_fnstsw(struct x86_emulate_ctxt *ctxt)
+ static void decode_register_operand(struct x86_emulate_ctxt *ctxt,
+ 				    struct operand *op)
+ {
+-	unsigned reg = ctxt->modrm_reg;
++	unsigned int reg;
+ 
+-	if (!(ctxt->d & ModRM))
++	if ((ctxt->d & ModRM))
++		reg = ctxt->modrm_reg;
++	else
+ 		reg = (ctxt->b & 7) | ((ctxt->rex_prefix & 1) << 3);
+ 
+ 	if (ctxt->d & Sse) {
+-- 
+2.34.1
+
