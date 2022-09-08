@@ -2,128 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C457F5B2A5B
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 01:28:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D6865B2A6A
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 01:34:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230483AbiIHX2a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Sep 2022 19:28:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44744 "EHLO
+        id S229512AbiIHXea (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Sep 2022 19:34:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230262AbiIHX1a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Sep 2022 19:27:30 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66D0512BFB6;
-        Thu,  8 Sep 2022 16:26:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662679596; x=1694215596;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=uTlu+lHOAwTFFFIR0Z5wSVQO4elx9U+QQnE27PbJEgI=;
-  b=fmDXdacA3LOgbxkfXNzvL34Zi04ynPF3nvJlalXApcstUup+IhxArG2L
-   6ll1bf/hFXo2MDc3GXMhrIJ/lE4zhU+BQPBSTEPIJK6b0AZgwCWehYgdx
-   JwFolvDcRv3WHoeXBBkTVwGXEXaNL24P7oUPSMhA777szxL4zx8QBb81w
-   6XCKTL8GLLVcdSq4Rw6AaKNu5XTN+b2jYe1J9MO2cJJ97SFUswTOH436R
-   t0Q/tJI3TQJDR8pPG92zmr0y/a+c0FxDPp3snLhEvBgNngkpA2Zw1XIRr
-   mpqxeGAGJ++uM4i0ZmRnwCj9gc1dzUAC57LhlfHudi9PN/TpIRMbVtcWT
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10464"; a="298687060"
-X-IronPort-AV: E=Sophos;i="5.93,300,1654585200"; 
-   d="scan'208";a="298687060"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2022 16:26:17 -0700
-X-IronPort-AV: E=Sophos;i="5.93,300,1654585200"; 
-   d="scan'208";a="610863298"
-Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2022 16:26:17 -0700
-From:   isaku.yamahata@intel.com
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        Yuan Yao <yuan.yao@linux.intel.com>
-Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
-        Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
+        with ESMTP id S231319AbiIHXd7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Sep 2022 19:33:59 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 828FC10D703
+        for <kvm@vger.kernel.org>; Thu,  8 Sep 2022 16:31:40 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id m5-20020a170902f64500b0016d313f3ce7so112139plg.23
+        for <kvm@vger.kernel.org>; Thu, 08 Sep 2022 16:31:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date;
+        bh=JKmSonQmRzAcZ2JyL8gtNHIBqDCeLYTwlzg2gSIdvM0=;
+        b=GUJlgXLHsr6D8omv7M3cD1H16BPrGusKkNgNtDezDYjBMZPmiFdjj+ZItVy3yoOCMO
+         ajWuHPMCJqfchqiRHIC79a7ISuzd2WF7/9OCDsigF1DV2NiZFDjmbfrexbMOwJ+XqT0r
+         J1rMrJZDU/r9fZQ1iICWEaZoP3zrAqfB72v2vMbiA7rPyeVfbrfdnJF+hB58Mf61IXQI
+         KF+tLXBaKRtqy2fbeFMcyXL0ai/T8gtPQxxxuv7jYGGaN8uMXlSxGlpBlnqh1QcoQrOa
+         IwwOg4eaEYso0GIZSFZz0JKd7frbq0hXwp29EYXByg20nGKKa6He/7u2dZoyMw9G1Ra3
+         lr1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=JKmSonQmRzAcZ2JyL8gtNHIBqDCeLYTwlzg2gSIdvM0=;
+        b=ao1pPl2PezxtO1GK/ueg/xZqkijDzfq8pxi9AF6rS+xdbAtGz0TYnSElHzbklO+NV4
+         2LVAwHOfrKWGCzkFwPSRDhReaapIb7R425NKqk9MgdWBrOJezziyv2+v1f9ioUjvaIHO
+         ZitZ9xjpziQmQNyxj0Hezl443dSTmVGPBVu04ssW8gBoAKoSTiT3M+mdxdDssReCLqJX
+         cAnP202fGV3uTRLbyDedDTEEVVAWzLZ9wuTnn7ERciTGFvYJtX/8H0tGcr3RzKjYajns
+         UEazOQyvumjkiqKNLTDJfTFrCssoc/yg/BEtluv3cOsjY7KLCuTuBqBv76j83Bqi8C06
+         /hBg==
+X-Gm-Message-State: ACgBeo1uekiixfYgLmOJM2x5CBNeHvGN5JRwCWBIDBmAGEJN7pzxh9T3
+        Ndw+k9tjSydEJTJknEMnnYi4SlWWaUA=
+X-Google-Smtp-Source: AA6agR595BqUn7XSJx8WoBTd5F0VJTT47Upv3fJDl++hnlnXKL88yujnE3ju9NbIO+chawyTNugQJ/vBy1Q=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:22c7:b0:539:efbb:a9f2 with SMTP id
+ f7-20020a056a0022c700b00539efbba9f2mr11388082pfj.54.1662679899238; Thu, 08
+ Sep 2022 16:31:39 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu,  8 Sep 2022 23:31:29 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.2.789.g6183377224-goog
+Message-ID: <20220908233134.3523339-1-seanjc@google.com>
+Subject: [PATCH 0/5] KVM: selftests: Fix "fix hypercall test" build errors
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Andrew Jones <andrew.jones@linux.dev>,
+        Anup Patel <anup@brainfault.org>,
         Atish Patra <atishp@atishpatra.org>,
-        Shaokun Zhang <zhangshaokun@hisilicon.com>,
-        Qi Liu <liuqi115@huawei.com>,
-        John Garry <john.garry@huawei.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Huacai Chen <chenhuacai@kernel.org>
-Subject: [PATCH v4 26/26] RFC: KVM: Remove cpus_hardware_enabled and related sanity check
-Date:   Thu,  8 Sep 2022 16:25:42 -0700
-Message-Id: <76ddec4c5fa3d84d422d3b90739c6a09d13d4bbc.1662679124.git.isaku.yamahata@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1662679124.git.isaku.yamahata@intel.com>
-References: <cover.1662679124.git.isaku.yamahata@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+After a toolchain upgrade (I think), the x86 fix_hypercall_test started
+throwing warnings due to -Werror=array-bounds rightly complaining that
+the test is generating an out-of-bounds array access.
 
-cpus_hardware_enabled mask seems incomplete protection against other kernel
-component using CPU virtualization feature.  Because it's obscure and
-incomplete, remove the check.
+The "obvious" fix is to replace the memcpy() with a memcmp() and compare
+only the exact size of the hypercall instruction.  That worked, until I
+fiddled with the code a bit more and suddenly the test started jumping into
+the weeds due to gcc generating a call to the external memcmp() through the
+PLT, which isn't supported in the selftests.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- virt/kvm/kvm_arch.c | 15 +--------------
- 1 file changed, 1 insertion(+), 14 deletions(-)
+To fix that mess, which has been a pitfall for quite some time, provide
+implementations of memcmp(), memcpy(), and memset() to effectively override
+the compiler built-ins.  My thought is to start with the helpers that are
+most likely to be used in guest code, and then add more as needed.
 
-diff --git a/virt/kvm/kvm_arch.c b/virt/kvm/kvm_arch.c
-index 68fb679d71f2..383b0065ecb0 100644
---- a/virt/kvm/kvm_arch.c
-+++ b/virt/kvm/kvm_arch.c
-@@ -12,23 +12,16 @@
- 
- #include <linux/kvm_host.h>
- 
--static cpumask_t cpus_hardware_enabled = CPU_MASK_NONE;
--
- static int __hardware_enable(void *caller_name)
- {
--	int cpu = raw_smp_processor_id();
- 	int r;
- 
- 	WARN_ON_ONCE(preemptible());
- 
--	if (cpumask_test_cpu(cpu, &cpus_hardware_enabled))
--		return 0;
- 	r = kvm_arch_hardware_enable();
- 	if (r)
- 		pr_warn("kvm: enabling virtualization on CPU%d failed during %s()\n",
--			cpu, (const char *)caller_name);
--	else
--		cpumask_set_cpu(cpu, &cpus_hardware_enabled);
-+			smp_processor_id(), (const char *)caller_name);
- 	return r;
- }
- 
-@@ -42,13 +35,7 @@ static void hardware_enable(void *arg)
- 
- static void hardware_disable(void *junk)
- {
--	int cpu = raw_smp_processor_id();
--
- 	WARN_ON_ONCE(preemptible());
--
--	if (!cpumask_test_cpu(cpu, &cpus_hardware_enabled))
--		return;
--	cpumask_clear_cpu(cpu, &cpus_hardware_enabled);
- 	kvm_arch_hardware_disable();
- }
- 
+Tested on x86 and ARM, compile tested on RISC-V and s390.  Full testing on
+RISC-V and s390 would be welcome, the seemingly benign addition of memxxx()
+helpers managed to break ARM due to gcc generating an infinite loop for
+memset() (see patch 1 for details).
+
+Sean Christopherson (5):
+  KVM: selftests: Implement memcmp(), memcpy(), and memset() for guest
+    use
+  KVM: selftests: Compare insn opcodes directly in fix_hypercall_test
+  KVM: selftests: Remove unnecessary register shuffling in
+    fix_hypercall_test
+  KVM: selftests: Explicitly verify KVM doesn't patch hypercall if
+    quirk==off
+  KVM: selftests: Dedup subtests of fix_hypercall_test
+
+ tools/testing/selftests/kvm/Makefile          |   8 +-
+ .../selftests/kvm/include/kvm_util_base.h     |  10 ++
+ tools/testing/selftests/kvm/lib/kvm_string.c  |  33 +++++
+ .../selftests/kvm/x86_64/fix_hypercall_test.c | 124 ++++++++----------
+ 4 files changed, 107 insertions(+), 68 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/lib/kvm_string.c
+
+
+base-commit: 29250ba51bc1cbe8a87e923f76978b87c3247a8c
 -- 
-2.25.1
+2.37.2.789.g6183377224-goog
 
