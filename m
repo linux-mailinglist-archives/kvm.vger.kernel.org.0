@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1904D5B2A29
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 01:26:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FDDD5B2A2E
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 01:26:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229885AbiIHX0I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Sep 2022 19:26:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43258 "EHLO
+        id S229978AbiIHX0L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Sep 2022 19:26:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229771AbiIHX0H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229817AbiIHX0H (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 8 Sep 2022 19:26:07 -0400
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1AEAE3D77;
-        Thu,  8 Sep 2022 16:26:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76246C167C;
+        Thu,  8 Sep 2022 16:26:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662679564; x=1694215564;
+  t=1662679565; x=1694215565;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Q5um5aONO7+CjLGrGHvgwAkBekvzLE2bkGPRvzcCfEc=;
-  b=Q39K/vKEvmoLdphyj5URhVrc7L6IN3NR2ZaSHlcy5nMlEcip1OK6rrOD
-   PZhMCzEd6E8NwPDe8lbWEvtyK/U3Fk3HhYUk7ehg8jdDrEPcQ3kr9ZaKJ
-   MV3ZtRDIEjCvpUEHjafPgPxL5BV8HtxdcNRFgSidqAHJcZ2GbImO5WiKp
-   oUSvDeLYUe55e9kUvZNFUIs3puNmqmyz+T5ly9NwjP8rHf23PYlZn64hu
-   kqsgsA9sijWdHoP7GVy0lzWPrj+NHmLohywhqFJsFgUkqv0UENA5laWli
-   apAHA6QudqTxL0XUATQKBUBqxAhNDg8e9wHB9IohqwA5dTO5+B+yAJogY
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10464"; a="298686973"
+  bh=wfRlIdF7igCLq7ULumpJnznD7PdyklLJuoeH8ATvUgc=;
+  b=jMPcBaz3Mh8yJMjxqNo64joZbz0Cs1OcqeiEweV88XmMLUCQnmOZGXMU
+   Y7riw6j1NvZxJEi4zSzkwG95F9sEUDruCqSpnbZgmdUNAEV/rXZJJsa0h
+   H7XAHpBe7mhZnlqGlHm6ixM0GgUdVWDxGP/ETXcc7EKHItgN248kUF5eJ
+   lqy6W/+/wZefeBLRWkZRinQDmQBgpnqg/dXsOQvHwakJReZxK/P6u4cYA
+   yoVk9ghrOfIb5abgovM4WOt1ILAFI2jQQK8IRsvhsUqCmSSN8OjIhLD7q
+   XyBsjE1RDQpSP47+RZHDoczyAE6MmDpU9pa2shHrRuraUA3JLdhqzj7R7
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10464"; a="298686975"
 X-IronPort-AV: E=Sophos;i="5.93,300,1654585200"; 
-   d="scan'208";a="298686973"
+   d="scan'208";a="298686975"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2022 16:26:03 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2022 16:26:04 -0700
 X-IronPort-AV: E=Sophos;i="5.93,300,1654585200"; 
-   d="scan'208";a="610863144"
+   d="scan'208";a="610863151"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2022 16:26:03 -0700
 From:   isaku.yamahata@intel.com
@@ -52,9 +52,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Huang Ying <ying.huang@intel.com>,
         Huacai Chen <chenhuacai@kernel.org>,
         Yuan Yao <yuan.yao@intel.com>
-Subject: [PATCH v4 02/26] KVM: x86: Use this_cpu_ptr() instead of per_cpu_ptr(smp_processor_id())
-Date:   Thu,  8 Sep 2022 16:25:18 -0700
-Message-Id: <199c87dbdb8d3ec10e650c4919709257e887ba1c.1662679124.git.isaku.yamahata@intel.com>
+Subject: [PATCH v4 03/26] KVM: x86: Move check_processor_compatibility from init ops to runtime ops
+Date:   Thu,  8 Sep 2022 16:25:19 -0700
+Message-Id: <6b43a79970d886877f87a357e2a152464fe5dde2.1662679124.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1662679124.git.isaku.yamahata@intel.com>
 References: <cover.1662679124.git.isaku.yamahata@intel.com>
@@ -70,42 +70,171 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Chao Gao <chao.gao@intel.com>
 
-convert per_cpu_ptr(smp_processor_id()) to this_cpu_ptr() as trivial
-cleanup.
+so that KVM can do compatibility checks on hotplugged CPUs. Drop __init
+from check_processor_compatibility() and its callees.
 
+use a static_call() to invoke .check_processor_compatibility.
+
+Opportunistically rename {svm,vmx}_check_processor_compat to conform
+to the naming convention of fields of kvm_x86_ops.
+
+Signed-off-by: Chao Gao <chao.gao@intel.com>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+Link: https://lore.kernel.org/r/20220216031528.92558-2-chao.gao@intel.com
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Reviewed-by: Chao Gao <chao.gao@intel.com>
 Reviewed-by: Yuan Yao <yuan.yao@intel.com>
 ---
- arch/x86/kvm/x86.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  2 +-
+ arch/x86/kvm/svm/svm.c             |  4 ++--
+ arch/x86/kvm/vmx/vmx.c             | 14 +++++++-------
+ arch/x86/kvm/x86.c                 |  3 +--
+ 5 files changed, 12 insertions(+), 12 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 51f777071584..3bc45932e2d1 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -129,6 +129,7 @@ KVM_X86_OP(msr_filter_changed)
+ KVM_X86_OP(complete_emulated_msr)
+ KVM_X86_OP(vcpu_deliver_sipi_vector)
+ KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
++KVM_X86_OP(check_processor_compatibility)
+ 
+ #undef KVM_X86_OP
+ #undef KVM_X86_OP_OPTIONAL
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 2c96c43c313a..5df5d88d345f 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1445,6 +1445,7 @@ static inline u16 kvm_lapic_irq_dest_mode(bool dest_mode_logical)
+ struct kvm_x86_ops {
+ 	const char *name;
+ 
++	int (*check_processor_compatibility)(void);
+ 	int (*hardware_enable)(void);
+ 	void (*hardware_disable)(void);
+ 	void (*hardware_unsetup)(void);
+@@ -1655,7 +1656,6 @@ struct kvm_x86_nested_ops {
+ struct kvm_x86_init_ops {
+ 	int (*cpu_has_kvm_support)(void);
+ 	int (*disabled_by_bios)(void);
+-	int (*check_processor_compatibility)(void);
+ 	int (*hardware_setup)(void);
+ 	unsigned int (*handle_intel_pt_intr)(void);
+ 
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index f3813dbacb9f..371300f03f55 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4134,7 +4134,7 @@ svm_patch_hypercall(struct kvm_vcpu *vcpu, unsigned char *hypercall)
+ 	hypercall[2] = 0xd9;
+ }
+ 
+-static int __init svm_check_processor_compat(void)
++static int svm_check_processor_compatibility(void)
+ {
+ 	return 0;
+ }
+@@ -4740,6 +4740,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.name = "kvm_amd",
+ 
+ 	.hardware_unsetup = svm_hardware_unsetup,
++	.check_processor_compatibility = svm_check_processor_compatibility,
+ 	.hardware_enable = svm_hardware_enable,
+ 	.hardware_disable = svm_hardware_disable,
+ 	.has_emulated_msr = svm_has_emulated_msr,
+@@ -5122,7 +5123,6 @@ static struct kvm_x86_init_ops svm_init_ops __initdata = {
+ 	.cpu_has_kvm_support = has_svm,
+ 	.disabled_by_bios = is_disabled,
+ 	.hardware_setup = svm_hardware_setup,
+-	.check_processor_compatibility = svm_check_processor_compat,
+ 
+ 	.runtime_ops = &svm_x86_ops,
+ 	.pmu_ops = &amd_pmu_ops,
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index d7f8331d6f7e..3cf7f18a4115 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2495,8 +2495,8 @@ static bool cpu_has_sgx(void)
+ 	return cpuid_eax(0) >= 0x12 && (cpuid_eax(0x12) & BIT(0));
+ }
+ 
+-static __init int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
+-				      u32 msr, u32 *result)
++static int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
++			       u32 msr, u32 *result)
+ {
+ 	u32 vmx_msr_low, vmx_msr_high;
+ 	u32 ctl = ctl_min | ctl_opt;
+@@ -2514,7 +2514,7 @@ static __init int adjust_vmx_controls(u32 ctl_min, u32 ctl_opt,
+ 	return 0;
+ }
+ 
+-static __init u64 adjust_vmx_controls64(u64 ctl_opt, u32 msr)
++static u64 adjust_vmx_controls64(u64 ctl_opt, u32 msr)
+ {
+ 	u64 allowed;
+ 
+@@ -2523,8 +2523,8 @@ static __init u64 adjust_vmx_controls64(u64 ctl_opt, u32 msr)
+ 	return  ctl_opt & allowed;
+ }
+ 
+-static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
+-				    struct vmx_capability *vmx_cap)
++static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
++			     struct vmx_capability *vmx_cap)
+ {
+ 	u32 vmx_msr_low, vmx_msr_high;
+ 	u32 min, opt, min2, opt2;
+@@ -7417,7 +7417,7 @@ static int vmx_vm_init(struct kvm *kvm)
+ 	return 0;
+ }
+ 
+-static int __init vmx_check_processor_compat(void)
++static int vmx_check_processor_compatibility(void)
+ {
+ 	struct vmcs_config vmcs_conf;
+ 	struct vmx_capability vmx_cap;
+@@ -8015,6 +8015,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 
+ 	.hardware_unsetup = vmx_hardware_unsetup,
+ 
++	.check_processor_compatibility = vmx_check_processor_compatibility,
+ 	.hardware_enable = vmx_hardware_enable,
+ 	.hardware_disable = vmx_hardware_disable,
+ 	.has_emulated_msr = vmx_has_emulated_msr,
+@@ -8404,7 +8405,6 @@ static __init int hardware_setup(void)
+ static struct kvm_x86_init_ops vmx_init_ops __initdata = {
+ 	.cpu_has_kvm_support = cpu_has_kvm_support,
+ 	.disabled_by_bios = vmx_disabled_by_bios,
+-	.check_processor_compatibility = vmx_check_processor_compat,
+ 	.hardware_setup = hardware_setup,
+ 	.handle_intel_pt_intr = NULL,
+ 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 73dccc952dd1..0368eab6a7b5 100644
+index 0368eab6a7b5..a7fa55ba344d 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -428,8 +428,7 @@ static void kvm_user_return_msr_init_cpu(struct kvm_user_return_msrs *msrs)
- 
- int kvm_set_user_return_msr(unsigned slot, u64 value, u64 mask)
+@@ -12001,7 +12001,6 @@ void kvm_arch_hardware_unsetup(void)
+ int kvm_arch_check_processor_compat(void *opaque)
  {
--	unsigned int cpu = smp_processor_id();
--	struct kvm_user_return_msrs *msrs = per_cpu_ptr(user_return_msrs, cpu);
-+	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
- 	int err;
+ 	struct cpuinfo_x86 *c = &cpu_data(smp_processor_id());
+-	struct kvm_x86_init_ops *ops = opaque;
  
- 	kvm_user_return_msr_init_cpu(msrs);
-@@ -453,8 +452,7 @@ EXPORT_SYMBOL_GPL(kvm_set_user_return_msr);
+ 	WARN_ON(!irqs_disabled());
  
- static void drop_user_return_notifiers(void)
- {
--	unsigned int cpu = smp_processor_id();
--	struct kvm_user_return_msrs *msrs = per_cpu_ptr(user_return_msrs, cpu);
-+	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
+@@ -12009,7 +12008,7 @@ int kvm_arch_check_processor_compat(void *opaque)
+ 	    __cr4_reserved_bits(cpu_has, &boot_cpu_data))
+ 		return -EIO;
  
- 	if (msrs->registered)
- 		kvm_on_user_return(&msrs->urn);
+-	return ops->check_processor_compatibility();
++	return static_call(kvm_x86_check_processor_compatibility)();
+ }
+ 
+ bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
 -- 
 2.25.1
 
