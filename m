@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1102C5B2A31
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 01:26:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 325275B2A33
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 01:26:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230128AbiIHX03 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Sep 2022 19:26:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43372 "EHLO
+        id S230100AbiIHX0b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Sep 2022 19:26:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229946AbiIHX0J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229950AbiIHX0J (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 8 Sep 2022 19:26:09 -0400
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88495D5733;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA9E5E72FF;
         Thu,  8 Sep 2022 16:26:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1662679567; x=1694215567;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=vFOBWrFX4i3pHDYScV9XRS4KfXUFySOBs3tEXCYSPH4=;
-  b=J2A/aA7BFtIZd0Ey2gkNWkqbik5SDDIl+2qFjKWXhFdlsxcqUIRUuIJk
-   EaxjOwFKC8fX+awIDw45sb8cmaXgpNjuvMV2cZXjLeEl3eayceBZeE/QS
-   QXMrMfHz7NqxXcjV/OTFP7B/hCRGi4VFWR9UpLuhkCVL6ILfJFuLxwhv/
-   uxF3Jm5cZmA/YjutBqekPb9w4TWNHKDMk2/uIgcZMZHjKCh8W6kpC5t/Q
-   c8AJLaT5jVznVz12AkFT9NZ9CerQqB3jf1npVqhRXEEjFW13nuK2UWnCU
-   3meQAV4YtSKNLO1q0Mo7IHohHB1kFiRnG9ZxBikYS0n39omG1ILQI44HO
+  bh=bjjM/7k9H5/EDjEZ2WY39fcLYpzeVRwTDof3/tbSHpk=;
+  b=IXTAtLe4dySUGgYhICka1Zd0CYknqP/g3qCnkg6L7Q73Osa3oElQWqNW
+   D4C/ASiord0eeNIohsrtgXsfruPWbfstQK6EmLDuHoZHpPDQ0GMoSPUct
+   DNe9+277v54ePSkuMcg4le9XWlNl9nsxp8dP2hDbu4t/BfQP+XpRIlNPh
+   vHO0yvQPRfO19CAyxJ+Ghj4yyVIgkn4nRAV/5sn8ODVviZdFhrGsdctR6
+   lIN6g2GuXE5kmQRViNaSuAEhA4YEtottCrrJTTXQHFRF6+ch8+tIpt20k
+   RjgV2KXKK3wXEg7dbeKniPnpk8CYav0N0DXf6ooc54j+wWUTo6XWqu/cz
    A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10464"; a="298686989"
+X-IronPort-AV: E=McAfee;i="6500,9779,10464"; a="298686991"
 X-IronPort-AV: E=Sophos;i="5.93,300,1654585200"; 
-   d="scan'208";a="298686989"
+   d="scan'208";a="298686991"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
   by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2022 16:26:06 -0700
 X-IronPort-AV: E=Sophos;i="5.93,300,1654585200"; 
-   d="scan'208";a="610863171"
+   d="scan'208";a="610863180"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2022 16:26:05 -0700
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2022 16:26:06 -0700
 From:   isaku.yamahata@intel.com
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -50,10 +50,12 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         John Garry <john.garry@huawei.com>,
         Daniel Lezcano <daniel.lezcano@linaro.org>,
         Huang Ying <ying.huang@intel.com>,
-        Huacai Chen <chenhuacai@kernel.org>
-Subject: [PATCH v4 06/26] KVM: arm64: Simplify the CPUHP logic
-Date:   Thu,  8 Sep 2022 16:25:22 -0700
-Message-Id: <2b74ba0aa514e3e86c4513d12614664002996067.1662679124.git.isaku.yamahata@intel.com>
+        Huacai Chen <chenhuacai@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Yuan Yao <yuan.yao@intel.com>
+Subject: [PATCH v4 07/26] KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section
+Date:   Thu,  8 Sep 2022 16:25:23 -0700
+Message-Id: <1d7b1068e05e4fbbeeac009fe1795c4c0170db21.1662679124.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1662679124.git.isaku.yamahata@intel.com>
 References: <cover.1662679124.git.isaku.yamahata@intel.com>
@@ -69,201 +71,127 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Marc Zyngier <maz@kernel.org>
+From: Chao Gao <chao.gao@intel.com>
 
-For a number of historical reasons, the KVM/arm64 hotplug setup is pretty
-complicated, and we have two extra CPUHP notifiers for vGIC and timers.
+The CPU STARTING section doesn't allow callbacks to fail. Move KVM's
+hotplug callback to ONLINE section so that it can abort onlining a CPU in
+certain cases to avoid potentially breaking VMs running on existing CPUs.
+For example, when kvm fails to enable hardware virtualization on the
+hotplugged CPU.
 
-It looks pretty pointless, and gets in the way of further changes.
-So let's just expose some helpers that can be called from the core
-CPUHP callback, and get rid of everything else.
+Place KVM's hotplug state before CPUHP_AP_SCHED_WAIT_EMPTY as it ensures
+when offlining a CPU, all user tasks and non-pinned kernel tasks have left
+the CPU, i.e. there cannot be a vCPU task around. So, it is safe for KVM's
+CPU offline callback to disable hardware virtualization at that point.
+Likewise, KVM's online callback can enable hardware virtualization before
+any vCPU task gets a chance to run on hotplugged CPUs.
 
-This gives us the opportunity to drop a useless notifier entry,
-as well as tidy-up the timer enable/disable, which was a bit odd.
+KVM's CPU hotplug callbacks are renamed as well.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+Suggested-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Chao Gao <chao.gao@intel.com>
-Link: https://lore.kernel.org/r/20220216031528.92558-5-chao.gao@intel.com
+Link: https://lore.kernel.org/r/20220216031528.92558-6-chao.gao@intel.com
+Reviewed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Yuan Yao <yuan.yao@intel.com>
 ---
- arch/arm64/kvm/arch_timer.c     | 27 ++++++++++-----------------
- arch/arm64/kvm/arm.c            | 13 +++++++++++++
- arch/arm64/kvm/vgic/vgic-init.c | 19 ++-----------------
- include/kvm/arm_arch_timer.h    |  4 ++++
- include/kvm/arm_vgic.h          |  4 ++++
- include/linux/cpuhotplug.h      |  3 ---
- 6 files changed, 33 insertions(+), 37 deletions(-)
+ include/linux/cpuhotplug.h |  2 +-
+ virt/kvm/kvm_main.c        | 30 ++++++++++++++++++++++--------
+ 2 files changed, 23 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index bb24a76b4224..33fca1a691a5 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -811,10 +811,18 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- 	ptimer->host_timer_irq_flags = host_ptimer_irq_flags;
- }
- 
--static void kvm_timer_init_interrupt(void *info)
-+void kvm_timer_cpu_up(void)
- {
- 	enable_percpu_irq(host_vtimer_irq, host_vtimer_irq_flags);
--	enable_percpu_irq(host_ptimer_irq, host_ptimer_irq_flags);
-+	if (host_ptimer_irq)
-+		enable_percpu_irq(host_ptimer_irq, host_ptimer_irq_flags);
-+}
-+
-+void kvm_timer_cpu_down(void)
-+{
-+	disable_percpu_irq(host_vtimer_irq);
-+	if (host_ptimer_irq)
-+		disable_percpu_irq(host_ptimer_irq);
- }
- 
- int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
-@@ -976,18 +984,6 @@ void kvm_arm_timer_write_sysreg(struct kvm_vcpu *vcpu,
- 	preempt_enable();
- }
- 
--static int kvm_timer_starting_cpu(unsigned int cpu)
--{
--	kvm_timer_init_interrupt(NULL);
--	return 0;
--}
--
--static int kvm_timer_dying_cpu(unsigned int cpu)
--{
--	disable_percpu_irq(host_vtimer_irq);
--	return 0;
--}
--
- static int timer_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu)
- {
- 	if (vcpu)
-@@ -1185,9 +1181,6 @@ int kvm_timer_hyp_init(bool has_gic)
- 		goto out_free_irq;
- 	}
- 
--	cpuhp_setup_state(CPUHP_AP_KVM_ARM_TIMER_STARTING,
--			  "kvm/arm/timer:starting", kvm_timer_starting_cpu,
--			  kvm_timer_dying_cpu);
- 	return 0;
- out_free_irq:
- 	free_percpu_irq(host_vtimer_irq, kvm_get_running_vcpus());
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 3385fb57c11a..7e83498b83aa 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1676,7 +1676,15 @@ static void _kvm_arch_hardware_enable(void *discard)
- 
- int kvm_arch_hardware_enable(void)
- {
-+	int was_enabled = __this_cpu_read(kvm_arm_hardware_enabled);
-+
- 	_kvm_arch_hardware_enable(NULL);
-+
-+	if (!was_enabled) {
-+		kvm_vgic_cpu_up();
-+		kvm_timer_cpu_up();
-+	}
-+
- 	return 0;
- }
- 
-@@ -1690,6 +1698,11 @@ static void _kvm_arch_hardware_disable(void *discard)
- 
- void kvm_arch_hardware_disable(void)
- {
-+	if (__this_cpu_read(kvm_arm_hardware_enabled)) {
-+		kvm_timer_cpu_down();
-+		kvm_vgic_cpu_down();
-+	}
-+
- 	if (!is_protected_kvm_enabled())
- 		_kvm_arch_hardware_disable(NULL);
- }
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index f6d4f4052555..6c7f6ae21ec0 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -465,17 +465,15 @@ int kvm_vgic_map_resources(struct kvm *kvm)
- 
- /* GENERIC PROBE */
- 
--static int vgic_init_cpu_starting(unsigned int cpu)
-+void kvm_vgic_cpu_up(void)
- {
- 	enable_percpu_irq(kvm_vgic_global_state.maint_irq, 0);
--	return 0;
- }
- 
- 
--static int vgic_init_cpu_dying(unsigned int cpu)
-+void kvm_vgic_cpu_down(void)
- {
- 	disable_percpu_irq(kvm_vgic_global_state.maint_irq);
--	return 0;
- }
- 
- static irqreturn_t vgic_maintenance_handler(int irq, void *data)
-@@ -584,19 +582,6 @@ int kvm_vgic_hyp_init(void)
- 		return ret;
- 	}
- 
--	ret = cpuhp_setup_state(CPUHP_AP_KVM_ARM_VGIC_INIT_STARTING,
--				"kvm/arm/vgic:starting",
--				vgic_init_cpu_starting, vgic_init_cpu_dying);
--	if (ret) {
--		kvm_err("Cannot register vgic CPU notifier\n");
--		goto out_free_irq;
--	}
--
- 	kvm_info("vgic interrupt IRQ%d\n", kvm_vgic_global_state.maint_irq);
- 	return 0;
--
--out_free_irq:
--	free_percpu_irq(kvm_vgic_global_state.maint_irq,
--			kvm_get_running_vcpus());
--	return ret;
- }
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index cd6d8f260eab..1638418f72dd 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -104,4 +104,8 @@ void kvm_arm_timer_write_sysreg(struct kvm_vcpu *vcpu,
- u32 timer_get_ctl(struct arch_timer_context *ctxt);
- u64 timer_get_cval(struct arch_timer_context *ctxt);
- 
-+/* CPU HP callbacks */
-+void kvm_timer_cpu_up(void);
-+void kvm_timer_cpu_down(void);
-+
- #endif
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 4df9e73a8bb5..fc4acc91ba06 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -431,4 +431,8 @@ int vgic_v4_load(struct kvm_vcpu *vcpu);
- void vgic_v4_commit(struct kvm_vcpu *vcpu);
- int vgic_v4_put(struct kvm_vcpu *vcpu, bool need_db);
- 
-+/* CPU HP callbacks */
-+void kvm_vgic_cpu_up(void);
-+void kvm_vgic_cpu_down(void);
-+
- #endif /* __KVM_ARM_VGIC_H */
 diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-index f61447913db9..7337414e4947 100644
+index 7337414e4947..de45be38dd27 100644
 --- a/include/linux/cpuhotplug.h
 +++ b/include/linux/cpuhotplug.h
-@@ -186,9 +186,6 @@ enum cpuhp_state {
+@@ -185,7 +185,6 @@ enum cpuhp_state {
+ 	CPUHP_AP_CSKY_TIMER_STARTING,
  	CPUHP_AP_TI_GP_TIMER_STARTING,
  	CPUHP_AP_HYPERV_TIMER_STARTING,
- 	CPUHP_AP_KVM_STARTING,
--	CPUHP_AP_KVM_ARM_VGIC_INIT_STARTING,
--	CPUHP_AP_KVM_ARM_VGIC_STARTING,
--	CPUHP_AP_KVM_ARM_TIMER_STARTING,
+-	CPUHP_AP_KVM_STARTING,
  	/* Must be the last timer callback */
  	CPUHP_AP_DUMMY_TIMER_STARTING,
  	CPUHP_AP_ARM_XEN_STARTING,
+@@ -200,6 +199,7 @@ enum cpuhp_state {
+ 
+ 	/* Online section invoked on the hotplugged CPU from the hotplug thread */
+ 	CPUHP_AP_ONLINE_IDLE,
++	CPUHP_AP_KVM_ONLINE,
+ 	CPUHP_AP_SCHED_WAIT_EMPTY,
+ 	CPUHP_AP_SMPBOOT_THREADS,
+ 	CPUHP_AP_X86_VDSO_VMA_ONLINE,
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 278eb6cc7cbe..db1303e2abc9 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -5011,13 +5011,27 @@ static void hardware_enable_nolock(void *caller_name)
+ 	}
+ }
+ 
+-static int kvm_starting_cpu(unsigned int cpu)
++static int kvm_online_cpu(unsigned int cpu)
+ {
++	int ret = 0;
++
+ 	raw_spin_lock(&kvm_count_lock);
+-	if (kvm_usage_count)
++	/*
++	 * Abort the CPU online process if hardware virtualization cannot
++	 * be enabled. Otherwise running VMs would encounter unrecoverable
++	 * errors when scheduled to this CPU.
++	 */
++	if (kvm_usage_count) {
++		WARN_ON_ONCE(atomic_read(&hardware_enable_failed));
++
+ 		hardware_enable_nolock((void *)__func__);
++		if (atomic_read(&hardware_enable_failed)) {
++			atomic_set(&hardware_enable_failed, 0);
++			ret = -EIO;
++		}
++	}
+ 	raw_spin_unlock(&kvm_count_lock);
+-	return 0;
++	return ret;
+ }
+ 
+ static void hardware_disable_nolock(void *junk)
+@@ -5030,7 +5044,7 @@ static void hardware_disable_nolock(void *junk)
+ 	kvm_arch_hardware_disable();
+ }
+ 
+-static int kvm_dying_cpu(unsigned int cpu)
++static int kvm_offline_cpu(unsigned int cpu)
+ {
+ 	raw_spin_lock(&kvm_count_lock);
+ 	if (kvm_usage_count)
+@@ -5841,8 +5855,8 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+ 			goto out_free_2;
+ 	}
+ 
+-	r = cpuhp_setup_state_nocalls(CPUHP_AP_KVM_STARTING, "kvm/cpu:starting",
+-				      kvm_starting_cpu, kvm_dying_cpu);
++	r = cpuhp_setup_state_nocalls(CPUHP_AP_KVM_ONLINE, "kvm/cpu:online",
++				      kvm_online_cpu, kvm_offline_cpu);
+ 	if (r)
+ 		goto out_free_2;
+ 	register_reboot_notifier(&kvm_reboot_notifier);
+@@ -5903,7 +5917,7 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+ 	kmem_cache_destroy(kvm_vcpu_cache);
+ out_free_3:
+ 	unregister_reboot_notifier(&kvm_reboot_notifier);
+-	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_STARTING);
++	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_ONLINE);
+ out_free_2:
+ 	kvm_arch_hardware_unsetup();
+ out_free_1:
+@@ -5929,7 +5943,7 @@ void kvm_exit(void)
+ 	kvm_async_pf_deinit();
+ 	unregister_syscore_ops(&kvm_syscore_ops);
+ 	unregister_reboot_notifier(&kvm_reboot_notifier);
+-	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_STARTING);
++	cpuhp_remove_state_nocalls(CPUHP_AP_KVM_ONLINE);
+ 	on_each_cpu(hardware_disable_nolock, NULL, 1);
+ 	kvm_arch_hardware_unsetup();
+ 	kvm_arch_exit();
 -- 
 2.25.1
 
