@@ -2,137 +2,248 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34BC65B2875
-	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 23:22:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2DC25B2885
+	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 23:27:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229903AbiIHVWH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Sep 2022 17:22:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49440 "EHLO
+        id S229778AbiIHV1V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Sep 2022 17:27:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230012AbiIHVWD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Sep 2022 17:22:03 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 370201197BF
-        for <kvm@vger.kernel.org>; Thu,  8 Sep 2022 14:21:59 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id q3so19006942pjg.3
-        for <kvm@vger.kernel.org>; Thu, 08 Sep 2022 14:21:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=iRCxAqW31No4R523yMeowHDDm6ZPMY3cVOG5h+SWhss=;
-        b=ekRV5++2oqlgPM6t48Xr8iBpXq4/1mPod6LtzGovgAgMeYZ3yGdFCD1C+jzu/CDrmT
-         +iy4VkigNiuTT/IAJEQnHvet8I9oYkHFruxWZof7W/MXKkguDIjcOhxUHJC3SUOCjoXy
-         Ju/+fzoI0xmojvDXeTmm78Mnsk5Vrkfyi6LLVVT/tE1WeQ7WTKZWBxC2jl8kmx4otO/k
-         l+WtBhqvSqxbNsla0R81wZmhQ+fl60W9WaHvkJcXEI6NbELqWwfnd9L/X7hTEdBx4kDh
-         HFZHAP00FAK1kYtrJdU3oMqnZouRV7Js3DCRqyDMVZ7c+u/mH4wZ7ycD2IzvClduU32z
-         hiPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=iRCxAqW31No4R523yMeowHDDm6ZPMY3cVOG5h+SWhss=;
-        b=pmM5qkfsVh3rRKSALg+ZMhz2oZY+LZrU710Vh2EuPmlI7Ttdk/ealPk3RkIR/5lbBI
-         O1MxkXsqR13eMPDtfhrV/22zM4axoYNk2FdFEKx0fBi0JTM2DN8KAhPpXO8BMpuxSBIK
-         ZCMjUH/TBL+stMBXQHctsLEjyFCsosSxe/YD2KVEMAEdfiXgE6PeIuDiOVpe0pokDwyn
-         F4wC/mvrUaZloc/ytVDMWPPFX97lQlOJZN4Nz9MOkun8wU+bSbfna+Rx6EkOZkNzh4DH
-         uzFX1pxJZ0UVrZeKiX8ZKR3b95IpAX+7V5Bqy+ZVXr7dlZhJNrvuQphjanZhg1+42usN
-         SBsA==
-X-Gm-Message-State: ACgBeo3lDBD0fi5b9X9aImln1gAkWQxI6ulOLYd+rUAgDbYrXwH3BcMY
-        7fNoZhhIr/qCh+6QAzYazRez3w==
-X-Google-Smtp-Source: AA6agR48kO9V03khtYOuaO5emQ3zVXXDHHKXaSE9s9WsyqXbAsszqoXX/UCR9xGQJwmGhYbPGMK1aQ==
-X-Received: by 2002:a17:90b:1803:b0:1fb:45e2:5d85 with SMTP id lw3-20020a17090b180300b001fb45e25d85mr6225074pjb.163.1662672118552;
-        Thu, 08 Sep 2022 14:21:58 -0700 (PDT)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id x15-20020a170902ec8f00b00177ff4019d9sm671365plg.274.2022.09.08.14.21.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Sep 2022 14:21:57 -0700 (PDT)
-Date:   Thu, 8 Sep 2022 14:21:52 -0700
-From:   David Matlack <dmatlack@google.com>
-To:     Vishal Annapurve <vannapurve@google.com>
-Cc:     Andrew Jones <andrew.jones@linux.dev>, x86 <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>, shuah <shuah@kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        Sean Christopherson <seanjc@google.com>, oupton@google.com,
-        peterx@redhat.com, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        drjones@redhat.com
-Subject: Re: [V1 PATCH 2/5] selftests: kvm: Introduce kvm_arch_main and
- helpers
-Message-ID: <Yxpc8NDdtdOl9wpH@google.com>
-References: <20220903012849.938069-1-vannapurve@google.com>
- <20220903012849.938069-3-vannapurve@google.com>
- <20220905074609.ga4tnpuxpcgppx4r@kamzik>
- <CAGtprH9Kaemwupgoo_kgM-Ci2cnN2kpXa+ZwEymSnYNFhS9Fsg@mail.gmail.com>
+        with ESMTP id S229658AbiIHV1U (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Sep 2022 17:27:20 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8FDAD12755A
+        for <kvm@vger.kernel.org>; Thu,  8 Sep 2022 14:27:18 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9DC72153B;
+        Thu,  8 Sep 2022 14:27:24 -0700 (PDT)
+Received: from [10.57.15.197] (unknown [10.57.15.197])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 89D483F7B4;
+        Thu,  8 Sep 2022 14:27:12 -0700 (PDT)
+Message-ID: <ada74e00-77e1-770b-f0b7-a4c43a86c06f@arm.com>
+Date:   Thu, 8 Sep 2022 22:27:06 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAGtprH9Kaemwupgoo_kgM-Ci2cnN2kpXa+ZwEymSnYNFhS9Fsg@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH 4/4] iommu: Fix ordering of iommu_release_device()
+Content-Language: en-GB
+From:   Robin Murphy <robin.murphy@arm.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Will Deacon <will@kernel.org>
+Cc:     Qian Cai <cai@lca.pw>, Joerg Roedel <jroedel@suse.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>
+References: <4-v1-ef00ffecea52+2cb-iommu_group_lifetime_jgg@nvidia.com>
+ <87b7041e-bc8d-500c-7167-04190e3795a9@arm.com>
+In-Reply-To: <87b7041e-bc8d-500c-7167-04190e3795a9@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-10.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 06, 2022 at 03:46:20PM -0700, Vishal Annapurve wrote:
-> On Mon, Sep 5, 2022 at 12:46 AM Andrew Jones <andrew.jones@linux.dev> wrote:
-> >
-> > On Sat, Sep 03, 2022 at 01:28:46AM +0000, Vishal Annapurve wrote:
-> > > Introduce following APIs:
-> > > 1) kvm_arch_main : to be called at the startup of each test.
-> >
-> > With this, AArch64 can move the content of its constructor,
-> > init_guest_modes(), into kvm_arch_main(). Or, instead of the
-> >
-> >  main()
-> >  {
-> >     /* common main stuff */
-> >     kvm_arch_main();
-> >     __main();
-> >  }
-> >
-> > approach we could have each arch provide a constructor
-> >
-> >  arch_init()
-> >  {
-> >     common_pre_main_stuff();
-> >     /* arch specific pre-main stuff */
-> >  }
-> >
-> > I personally prefer the latter.
-> >
+On 2022-09-08 22:05, Robin Murphy wrote:
+> On 2022-09-08 19:45, Jason Gunthorpe wrote:
+>> default domains created a situation where the device is always connected
+>> to a domain of some kind. When the device is idle it is connected to one
+>> of the two pre-existing domains in the group, blocking_domain or
+>> default_domain. In this way we have a continuous assertion of what state
+>> the transation is in.
+>>
+>> When this is all destructed then we need to remove all the devices from
+>> their domains via the ops->release_device() call before the domain can be
+>> freed. This is the bug recognized in commit 9ac8545199a1 ("iommu: Fix
+>> use-after-free in iommu_release_device").
+>>
+>> However, we must also stop any concurrent access to the iommu driver for
+>> this device before we destroy it. This is done by:
+>>
+>>   1) Drivers only using the iommu API while they have a device driver
+>>      attached to the device. This directly prevents release from 
+>> happening.
+>>
+>>   2) Removing the device from the group list so any lingering group
+>>      references no longer refer to the device. This is done by
+>>      iommu_group_remove_device()
+>>
+>> Since iommu_group_remove_device() has been moved this breaks #2 and
+>> triggers an WARN when VFIO races group activities with the release of the
+>> device:
+>>
+>>     iommu driver failed to attach the default/blocking domain
+>>     WARNING: CPU: 0 PID: 5082 at drivers/iommu/iommu.c:1961 
+>> iommu_detach_group+0x6c/0x80
+>>     Modules linked in: macvtap macvlan tap vfio_pci vfio_pci_core 
+>> irqbypass vfio_virqfd kvm nft_fib_inet nft_fib_ipv4 nft_fib_ipv6>
+>>     CPU: 0 PID: 5082 Comm: qemu-system-s39 Tainted: G        
+>> W          6.0.0-rc3 #5
+>>     Hardware name: IBM 3931 A01 782 (LPAR)
+>>     Krnl PSW : 0704c00180000000 000000095bb10d28 
+>> (iommu_detach_group+0x70/0x80)
+>>           R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 CC:0 PM:0 RI:0 EA:3
+>>     Krnl GPRS: 0000000000000001 0000000900000027 0000000000000039 
+>> 000000095c97ffe0
+>>           00000000fffeffff 00000009fc290000 00000000af1fda50 
+>> 00000000af590b58
+>>           00000000af1fdaf0 0000000135c7a320 0000000135e52258 
+>> 0000000135e52200
+>>           00000000a29e8000 00000000af590b40 000000095bb10d24 
+>> 0000038004b13c98
+>>     Krnl Code: 000000095bb10d18: c020003d56fc        larl    
+>> %r2,000000095c2bbb10
+>>               000000095bb10d1e: c0e50019d901        brasl   
+>> %r14,000000095be4bf20
+>>              #000000095bb10d24: af000000            mc      0,0
+>>              >000000095bb10d28: b904002a            lgr     %r2,%r10
+>>               000000095bb10d2c: ebaff0a00004        lmg     
+>> %r10,%r15,160(%r15)
+>>               000000095bb10d32: c0f4001aa867        brcl    
+>> 15,000000095be65e00
+>>               000000095bb10d38: c004002168e0        brcl    
+>> 0,000000095bf3def8
+>>               000000095bb10d3e: eb6ff0480024        stmg    
+>> %r6,%r15,72(%r15)
+>>     Call Trace:
+>>      [<000000095bb10d28>] iommu_detach_group+0x70/0x80
+>>     ([<000000095bb10d24>] iommu_detach_group+0x6c/0x80)
+>>      [<000003ff80243b0e>] vfio_iommu_type1_detach_group+0x136/0x6c8 
+>> [vfio_iommu_type1]
+>>      [<000003ff80137780>] __vfio_group_unset_container+0x58/0x158 [vfio]
+>>      [<000003ff80138a16>] vfio_group_fops_unl_ioctl+0x1b6/0x210 [vfio]
+>>     pci 0004:00:00.0: Removing from iommu group 4
+>>      [<000000095b5b62e8>] __s390x_sys_ioctl+0xc0/0x100
+>>      [<000000095be5d3b4>] __do_syscall+0x1d4/0x200
+>>      [<000000095be6c072>] system_call+0x82/0xb0
+>>     Last Breaking-Event-Address:
+>>      [<000000095be4bf80>] __warn_printk+0x60/0x68
+>>
+>> So, put things in the right order:
+>>   - Remove the device from the group's list
+>>   - Release the device from the iommu driver to drop all domain 
+>> references
+>>   - Free the domains
+>>
+>> This is done by splitting out the kobject_put(), which triggers
+>> iommu_group_release(), from the rest of iommu_group_remove_device() and
+>> placing it after release is called.
 > 
-> I agree with your suggestion of using constructors here. This will
-> help avoid changes in all the selftests.
-> Maybe I can add a common constructor that can invoke arch specific
-> init. I will add this change in the next series.
+> So simple... now how did I fail to think of that? :)
 
-In case anyone else is confused like me: "constructor" refers to
-__attribute__ ((constructor)), which causes the function to run before
-main().
+Oh, because s390 is using iommu_get_domain_for_dev() in its 
+release_device callback, which needs to dereference the group to work, 
+and the current domain may also be a non-default one which we can't 
+prevent from disappearing racily, that was why :(
 
-I have a slight preference for having as few constructors as possible,
-since they are somewhat subtle. So how about one constructor for all
-selftests, e.g.:
+I think we may be back to looking at s390 having to keep track of 
+domains internally like SMMUv3 does, and both drivers synchronising 
+between their domain_free and release_device to to do their internal 
+detach from either place... unless possibly the core code starts 
+refcounting domains as well?
 
-void __attribute__ ((constructor)) kvm_selftest_init(void)
-{
-        /* Tell stdout not to buffer its content. */
-        setbuf(stdout, NULL);
+Robin.
 
-        kvm_selftest_arch_init();
-}
-
-Per-arch:
-
-void kvm_selftest_arch_init(void)
-{
-        /* arch-specific pre-main stuff */
-}
+>> Fixes: 9ac8545199a1 ("iommu: Fix use-after-free in iommu_release_device")
+>> Reported-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>> Cc: Robin Murphy <robin.murphy@arm.com>
+>> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+>> ---
+>>   drivers/iommu/iommu.c | 36 +++++++++++++++++++++++++++---------
+>>   1 file changed, 27 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>> index 780fb70715770d..c451bf715182ac 100644
+>> --- a/drivers/iommu/iommu.c
+>> +++ b/drivers/iommu/iommu.c
+>> @@ -90,6 +90,7 @@ static int 
+>> iommu_create_device_direct_mappings(struct iommu_group *group,
+>>   static struct iommu_group *iommu_group_get_for_dev(struct device *dev);
+>>   static ssize_t iommu_group_store_type(struct iommu_group *group,
+>>                         const char *buf, size_t count);
+>> +static void __iommu_group_remove_device(struct device *dev);
+>>   #define IOMMU_GROUP_ATTR(_name, _mode, _show, _store)        \
+>>   struct iommu_group_attribute iommu_group_attr_##_name =        \
+>> @@ -330,6 +331,7 @@ int iommu_probe_device(struct device *dev)
+>>   void iommu_release_device(struct device *dev)
+>>   {
+>> +    struct iommu_group *group = dev->iommu_group;
+>>       const struct iommu_ops *ops;
+>>       if (!dev->iommu)
+>> @@ -337,11 +339,20 @@ void iommu_release_device(struct device *dev)
+>>       iommu_device_unlink(dev->iommu->iommu_dev, dev);
+> 
+> In fact, now that you've made it obvious, could we not simply do an 
+> extra kobject_get() here before calling regular 
+> iommu_group_remove_device(), and avoid having to split that up at all? 
+> That should delay any default domain teardown just as definitively as 
+> holding the original reference for longer, no?
+> 
+> Thanks,
+> Robin.
+> 
+>> +    __iommu_group_remove_device(dev);
+>>       ops = dev_iommu_ops(dev);
+>>       if (ops->release_device)
+>>           ops->release_device(dev);
+>> -    iommu_group_remove_device(dev);
+>> +    /*
+>> +     * This will eventually call iommu_group_release() which will 
+>> free the
+>> +     * iommu_domains. Up until the release_device() above the 
+>> iommu_domains
+>> +     * may still have been associated with the device, and we cannot 
+>> free
+>> +     * them until the have been detached. release_device() is 
+>> expected to
+>> +     * detach all domains connected to the dev.
+>> +     */
+>> +    kobject_put(group->devices_kobj);
+>> +
+>>       module_put(ops->owner);
+>>       dev_iommu_free(dev);
+>>   }
+>> @@ -939,14 +950,7 @@ int iommu_group_add_device(struct iommu_group 
+>> *group, struct device *dev)
+>>   }
+>>   EXPORT_SYMBOL_GPL(iommu_group_add_device);
+>> -/**
+>> - * iommu_group_remove_device - remove a device from it's current group
+>> - * @dev: device to be removed
+>> - *
+>> - * This function is called by an iommu driver to remove the device from
+>> - * it's current group.  This decrements the iommu group reference count.
+>> - */
+>> -void iommu_group_remove_device(struct device *dev)
+>> +static void __iommu_group_remove_device(struct device *dev)
+>>   {
+>>       struct iommu_group *group = dev->iommu_group;
+>>       struct group_device *tmp_device, *device = NULL;
+>> @@ -977,6 +981,20 @@ void iommu_group_remove_device(struct device *dev)
+>>       kfree(device->name);
+>>       kfree(device);
+>>       dev->iommu_group = NULL;
+>> +}
+>> +
+>> +/**
+>> + * iommu_group_remove_device - remove a device from it's current group
+>> + * @dev: device to be removed
+>> + *
+>> + * This function is called by an iommu driver to remove the device from
+>> + * it's current group.  This decrements the iommu group reference count.
+>> + */
+>> +void iommu_group_remove_device(struct device *dev)
+>> +{
+>> +    struct iommu_group *group = dev->iommu_group;
+>> +
+>> +    __iommu_group_remove_device(dev);
+>>       kobject_put(group->devices_kobj);
+>>   }
+>>   EXPORT_SYMBOL_GPL(iommu_group_remove_device);
+> 
