@@ -2,121 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 90C345B215B
-	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 16:56:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AA355B219B
+	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 17:08:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232292AbiIHO4K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Sep 2022 10:56:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44080 "EHLO
+        id S231810AbiIHPI4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Sep 2022 11:08:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232630AbiIHO4H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Sep 2022 10:56:07 -0400
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8176DE2911
-        for <kvm@vger.kernel.org>; Thu,  8 Sep 2022 07:56:03 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id 186-20020a1c02c3000000b003b26feb5c6bso1879245wmc.5
-        for <kvm@vger.kernel.org>; Thu, 08 Sep 2022 07:56:03 -0700 (PDT)
+        with ESMTP id S230507AbiIHPIx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Sep 2022 11:08:53 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CD78E3D73
+        for <kvm@vger.kernel.org>; Thu,  8 Sep 2022 08:08:51 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id h188so17012522pgc.12
+        for <kvm@vger.kernel.org>; Thu, 08 Sep 2022 08:08:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=profian-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=ryNqK5MU3hvexcP0lqXzZYDdmqazm1TBDaWSc1Bec88=;
-        b=A+h3uk/z3zVLJRHckmNM4YxWpnH5mOtpniwEZgYBiShH8dX2ke8mlhluujBLTZaei9
-         rjyudPZLRVKoqa/kHk9XhTDRWTKV43CDnaG0QLijNIyvSfrtjtiEVrj0kxDbfaY+ExKT
-         S5DCBpVsRIsn3n7OmhoxhBZ2HYrO2tv189HgUJWmO7wCJcpLLgs+TXtdnwB89i7oREl+
-         bVaCOFRUFvKec6ZZ+32wyYO5lcjci9ktt29wYfSloA1IuJ9BrNjvCjoFwkZh/k/OZ9rQ
-         TWACHfJtoez2REps42w6sKBP7786aGnvKGae62AysmEoW9BUPSijQNuBTaWxzHhysHeb
-         AAdA==
+        d=google.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date;
+        bh=HhVnH4+z3AjTuUR+xIrmszssYSTaTlD0QO6jVjhm5Yo=;
+        b=e6SzDiP6UdIlPwp5cxYJdJhDqfc9Wo8WBi56M80mcphP9cBr9BahrfHePMxA5TZ3ei
+         rURV7t9tOev7gHE1N4MHUu2EAXSdFLkPShEqRrkTbeeIU8c6HK3vGY2Li3Z3ClOC9CT+
+         2Ei4j4AqpYCu3D48jYHXj6aYaRdxLwuOBguarGtCMuCLRGWs/Qm4mKLmRBqwGrwphHk4
+         yg5bkWSJIl1Z8afpLdLrHBEXBD0rXoLhnDQKA3yajHDRN8V1R8OLtZZ03841pk5E0hy0
+         iqm5XHtK2T2yeIXGVXVzZXFz0Gpq+wM5HYTE0/ilGev/2f2y+/MDhsh9kVTkaIOR4Gx0
+         6KfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=ryNqK5MU3hvexcP0lqXzZYDdmqazm1TBDaWSc1Bec88=;
-        b=VcU8aaim0urhp87+MHmVLO7TzWehdF40Kl+wvIdlCGWM/DD1f0p/s1qq/daZANJDe2
-         IhAXRg06Kouc0w2Iku4wK5Ya8tHgyF+5BFAVotGtNlgaIzzRk2dLc+To4gcNgbKJL3yT
-         JQH2rUZ9lXhjJbqIzScSkiddJaTZsHdbEf5tkrKiKPaFn1U6DR/5sD5bdhB3d9nD54b9
-         nIdeL1ZaoL4atqEQakWg8Y4k5tnWIygzEHPB67xA85tl02LOeIQW0x/rCsNTEFIkfwJY
-         Yb61Q5Gy9mVglTrIlJaF66uNmPVChznrf5CfLvuxjvH7l9UMLrQSJSYH+WWFqsRPPEfe
-         5IoQ==
-X-Gm-Message-State: ACgBeo3ao8GugAazkRxF5gQiDiOvpjb/HmlR4QQbI5Bt9fePQG8RrD9r
-        5ZqAK6RWv74wcFZuTkCKyjC3Sg==
-X-Google-Smtp-Source: AA6agR60ZmA7z2Rw4x/+vVZJ8ouM6ug3aiG0VoToRr4xXb6X+ui1JU9//Z03osUcjGe8LanO+R1DlA==
-X-Received: by 2002:a05:600c:1d1e:b0:3a5:4f8d:743f with SMTP id l30-20020a05600c1d1e00b003a54f8d743fmr2501614wms.121.1662648961741;
-        Thu, 08 Sep 2022 07:56:01 -0700 (PDT)
-Received: from fedora.fritz.box (p200300c1c7162d00e01b57df2fb57c15.dip0.t-ipconnect.de. [2003:c1:c716:2d00:e01b:57df:2fb5:7c15])
-        by smtp.gmail.com with ESMTPSA id fc15-20020a05600c524f00b003a5260b8392sm3440304wmb.23.2022.09.08.07.56.00
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=HhVnH4+z3AjTuUR+xIrmszssYSTaTlD0QO6jVjhm5Yo=;
+        b=iTOv1AcCxHxEhPP4RymY1h9TOnt2F8dDiIay5JsUuOGez4I1qECokcTowAWkve//p9
+         nwKqjJTmO3QIJUbHB6V39bTlm4q22HYEICGi77/D8Yxr8d7aJQoN/WSB5TMiK78FFURR
+         VPGjSaXIo7TSDjiUWPiyDORTtnB8TRJ4oeokMP8gvqUckcya7hMPa6I01JmLV/W4WvR+
+         W1KtnuPFE1Fc83gSr+25AeBaT1i3LABAyuEk6g905oQy2dGJtU28WitwEudpJCCissmI
+         r11ulYUJJfx5O9Nne8SuTs9AYHelvhmxXIOCH6JKZEoExBhVvIbb6/nYM7eG7Hz+aGtV
+         FISg==
+X-Gm-Message-State: ACgBeo1okqJELkutZAhqZDLIA9MLx4hc0AaqTuYzYlHzsmJSfQV0vG6B
+        LKThidIAUkdT12G48wzdTq3Wxg==
+X-Google-Smtp-Source: AA6agR78MmoHmn7oi8NTo5aukMMugHzYKl4SbXvV7iRYRfMP6WuxJQI4X4n0rtX/cvXSWBm4DACpKg==
+X-Received: by 2002:a05:6a00:1aca:b0:52f:55f8:c3ec with SMTP id f10-20020a056a001aca00b0052f55f8c3ecmr9338524pfv.25.1662649730854;
+        Thu, 08 Sep 2022 08:08:50 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id jf22-20020a170903269600b001768b6f9a97sm4155191plb.147.2022.09.08.08.08.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Sep 2022 07:56:01 -0700 (PDT)
-From:   Harald Hoyer <harald@profian.com>
-To:     ashish.kalra@amd.com
-Cc:     ak@linux.intel.com, alpergun@google.com, ardb@kernel.org,
-        bp@alien8.de, dave.hansen@linux.intel.com, dgilbert@redhat.com,
-        dovmurik@linux.ibm.com, hpa@zytor.com, jarkko@kernel.org,
-        jmattson@google.com, jroedel@suse.de, kirill@shutemov.name,
-        kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, luto@kernel.org, marcorr@google.com,
-        michael.roth@amd.com, mingo@redhat.com, pbonzini@redhat.com,
-        peterz@infradead.org, pgonda@google.com, rientjes@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, seanjc@google.com,
-        slp@redhat.com, srinivas.pandruvada@linux.intel.com,
-        tglx@linutronix.de, thomas.lendacky@amd.com, tobin@ibm.com,
-        tony.luck@intel.com, vbabka@suse.cz, vkuznets@redhat.com,
-        x86@kernel.org, Harald Hoyer <harald@profian.com>
-Subject: [[PATCH for v6]] KVM: SEV: fix snp_launch_finish
-Date:   Thu,  8 Sep 2022 16:55:57 +0200
-Message-Id: <20220908145557.1912158-1-harald@profian.com>
-X-Mailer: git-send-email 2.37.1
-In-Reply-To: <6a513cf79bf71c479dbd72165faf1d804d77b3af.1655761627.git.ashish.kalra@amd.com>
-References: <6a513cf79bf71c479dbd72165faf1d804d77b3af.1655761627.git.ashish.kalra@amd.com>
+        Thu, 08 Sep 2022 08:08:50 -0700 (PDT)
+Date:   Thu, 8 Sep 2022 15:08:47 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     =?utf-8?B?RnJhbnRpxaFlayDFoHVtxaFhbA==?= <frantisek@sumsal.cz>
+Cc:     kvm@vger.kernel.org
+Subject: Re: BUG: soft lockup - CPU#0 stuck for 26s! with nested KVM on 5.19.x
+Message-ID: <YxoFf1LZfru5cmDO@google.com>
+References: <a861d348-b3fd-fd1d-2427-0a89ae139948@sumsal.cz>
+ <Yxiz3giU/WEftPp6@google.com>
+ <a8fc728c-073c-2ff5-2436-40c84c3c62e1@sumsal.cz>
+ <Yxi3cj6xKBlJ3IJV@google.com>
+ <afbd5927-413b-f876-8146-c3f4deb763e1@sumsal.cz>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <afbd5927-413b-f876-8146-c3f4deb763e1@sumsal.cz>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The `params.auth_key_en` indicator does _not_ specify, whether an
-ID_AUTH struct should be sent or not, but, wheter the ID_AUTH struct
-contains an author key or not. The firmware always expects an ID_AUTH block.
+On Thu, Sep 08, 2022, František Šumšal wrote:
+> On 9/7/22 17:23, Sean Christopherson wrote:
+> > On Wed, Sep 07, 2022, František Šumšal wrote:
+> > > On 9/7/22 17:08, Sean Christopherson wrote:
+> > > > On Wed, Sep 07, 2022, František Šumšal wrote:
+> > > > > Hello!
+> > > > > 
+> > > > > In our Arch Linux part of the upstream systemd CI I recently noticed an
+> > > > > uptrend in CPU soft lockups when running one of our tests. This test runs
+> > > > > several systemd-nspawn containers in succession and sometimes the underlying
+> > > > > VM locks up due to a CPU soft lockup
+> > > > 
+> > > > By "underlying VM", do you mean L1 or L2?  Where
+> > > > 
+> > > >       L0 == Bare Metal
+> > > >       L1 == Arch Linux (KVM, 5.19.5-arch1-1/5.19.7-arch1-1)
+> > > >       L2 == Arch Linux (nested KVM or QEMU TCG, 5.19.5-arch1-1/5.19.7-arch1-1)
+> > > 
+> > > I mean L2.
+> > 
+> > Is there anything interesting in the L1 or L0 logs?  A failure in a lower level
+> > can manifest as a soft lockup and/or stall in the VM, e.g. because a vCPU isn't
+> > run by the host for whatever reason.
+> 
+> There's nothing (quite literally) in the L0 logs, the host is silent when running the VM/tests.
+> As for L1, there doesn't seem to be anything interesting as well. Here are the L1 and L2 logs
+> for reference: https://mrc0mmand.fedorapeople.org/kernel-kvm-soft-lockup/2022-09-07-logs/
+> 
+> > 
+> > Does the bug repro with an older version of QEMU?  If it's difficult to roll back
+> > the QEMU version, then we can punt on this question for now.
+> 
+> > 
+> > Is it possible to run the nspawn tests in L1?  If the bug repros there, that would
+> > greatly shrink the size of the haystack.
+> 
+> I've fiddled around with the test and managed to trim it down enough so it's easy to run in both
+> L1 and L2, and after couple of hours I managed to reproduce it in both layers. That also somewhat
+> answers the QEMU question, since L0 uses QEMU 6.2.0 to run L1, and L1 uses QEMU 7.0.0 to run L2.
+> In both cases I used TCG emulation, since with it the issue appears to reproduce slightly more
+> often (or maybe I was just unlucky with KVM).
+> 
+> https://mrc0mmand.fedorapeople.org/kernel-kvm-soft-lockup/2022-09-07-logs-no-L2/L1_console.log
+> 
+> As in the previous case, there's nothing of interest in the L0 logs.
+> 
+> This also raises a question - is this issue still KVM-related, since in the last case there's
+> just L0 baremetal and L1 QEMU/TCG without KVM involved?
 
-Link: https://lore.kernel.org/all/cover.1655761627.git.ashish.kalra@amd.com/
-Signed-off-by: Harald Hoyer <harald@profian.com>
----
- arch/x86/kvm/svm/sev.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Ya, unless there's a latent bug in KVM that's present in your L0 kernel, which is
+extremely unlikely given that the bug repros with 4.18 and 5.17 as the bare metal
+kernel, this isn't a KVM problem.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 85357dc4d231..5cf4be6a33ba 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2242,17 +2242,18 @@ static int snp_launch_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 
- 		data->id_block_en = 1;
- 		data->id_block_paddr = __sme_pa(id_block);
--	}
- 
--	if (params.auth_key_en) {
- 		id_auth = psp_copy_user_blob(params.id_auth_uaddr, KVM_SEV_SNP_ID_AUTH_SIZE);
- 		if (IS_ERR(id_auth)) {
- 			ret = PTR_ERR(id_auth);
- 			goto e_free_id_block;
- 		}
- 
--		data->auth_key_en = 1;
- 		data->id_auth_paddr = __sme_pa(id_auth);
-+
-+		if (params.auth_key_en) {
-+			data->auth_key_en = 1;
-+		}
- 	}
- 
- 	data->gctx_paddr = __psp_pa(sev->snp_context);
--- 
-2.37.1
+The mm, ext4, and scheduler subsystems are all likely candidates.  I'm not familiar
+enough with their gory details to point fingers though.
 
+Do you think it's possible to bisect the L1 kernel using the QEMU/TCG configuration?
+That'd probably be the least awful way to get a root cause.
