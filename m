@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 616535B2A4B
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 01:27:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 33C075B2A44
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 01:27:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230395AbiIHX11 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Sep 2022 19:27:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44978 "EHLO
+        id S230333AbiIHX1C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Sep 2022 19:27:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230159AbiIHX0n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Sep 2022 19:26:43 -0400
+        with ESMTP id S230199AbiIHX0h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Sep 2022 19:26:37 -0400
 Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DB1FE7F8B;
-        Thu,  8 Sep 2022 16:26:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14B9E10E851;
+        Thu,  8 Sep 2022 16:26:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662679577; x=1694215577;
+  t=1662679579; x=1694215579;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=UEVrSJBp6rdD40rMz/X3mQD/s7hSMW7ttIkeZZoCFOA=;
-  b=kNCTQVuMEWnu1eX4oy/GT+z8B5aIo/5N3d5B8C2SVj2Ase7uLl/ElYAE
-   pQt9Yu97hSqhJvqvNbw9GfPuvgkcrLjChqCKE+hZIYsaCmwQWjKW1EzLR
-   XHe3LlKEGn02tVn3Ts82YxhRDmu7KTGye8aET/YnBHKTyi4jAaxrInuJX
-   n3WDzB4WXR0AHVLbR7tS5+7Z+3IT0BUBgdJcp9N7viuLnaQDceSmRMGGe
-   n7N0+dW3uJGpfrIBcGVR93nmJwWE+CDABbFiiZRazaPTeyW0NQOT7oF1A
-   X6wrLjn416OZ3E5akbnFJJt4JBFPPDRHsdBvrQY0TY6DmEi9EG5dqRCJg
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10464"; a="298687027"
+  bh=5pQ3z02clD0r79Hqc0yHbGrlWpRrN1AcMCo979U69FA=;
+  b=KEuQHnJFa03XK7DzjYwCUHJTlpnuFnx+gmJgjEUkANnBtmxVVs7qCd98
+   s2TacyLvfRtt3zIl9ViNfr4w7YRU4Hqo2u22rz154NL6jz/wrtneQ1+xs
+   bjFX69wUR5nv8fzoSXJasK5ha5KyZtq2rbZTnM0gkVnnTsA2ar0s88Tfa
+   gtBRFCihuKW1IfW0XgTZ87WUBqDaF71bArcBspQ8NWPW6OgY8bYm7wwgZ
+   o2PHKELLvwd1DcmAcI6aUVbWHP6OCP3V384uRef0lC0/f7K83Wbp9EhDE
+   G3FO/h+1hLjrtEuI9Tdcqtyt78T3u/UHnoxBNUDNXaMLSX18HE5X+e0dL
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10464"; a="298687030"
 X-IronPort-AV: E=Sophos;i="5.93,300,1654585200"; 
-   d="scan'208";a="298687027"
+   d="scan'208";a="298687030"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2022 16:26:13 -0700
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2022 16:26:14 -0700
 X-IronPort-AV: E=Sophos;i="5.93,300,1654585200"; 
-   d="scan'208";a="610863260"
+   d="scan'208";a="610863266"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2022 16:26:13 -0700
 From:   isaku.yamahata@intel.com
@@ -51,9 +51,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Daniel Lezcano <daniel.lezcano@linaro.org>,
         Huang Ying <ying.huang@intel.com>,
         Huacai Chen <chenhuacai@kernel.org>
-Subject: [PATCH v4 19/26] KVM: Eliminate kvm_arch_post_init_vm()
-Date:   Thu,  8 Sep 2022 16:25:35 -0700
-Message-Id: <7bbbbda4f6eacf76a3c664613d5db0558e1f94c9.1662679124.git.isaku.yamahata@intel.com>
+Subject: [PATCH v4 20/26] KVM: Add config to not compile kvm_arch.c
+Date:   Thu,  8 Sep 2022 16:25:36 -0700
+Message-Id: <67780bc1160e6a6ff27a7d9c9374f19fc4b57a5d.1662679124.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1662679124.git.isaku.yamahata@intel.com>
 References: <cover.1662679124.git.isaku.yamahata@intel.com>
@@ -71,86 +71,75 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Now kvm_arch_post_init_vm() is used only by x86 kvm_arch_add_vm().  Other
-arch doesn't define it. Merge x86 kvm_arch_post_init_vm() into x86
-kvm_arch_add_vm() and eliminate kvm_arch_post_init_vm().
+So that kvm_arch_hardware_enable/disable() aren't required.
+
+Once the conversion of all KVM archs is done, this config and kvm_arch.c
+should be removed.
 
 Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/x86.c       |  7 +------
- include/linux/kvm_host.h |  1 -
- virt/kvm/kvm_arch.c      | 12 +-----------
- 3 files changed, 2 insertions(+), 18 deletions(-)
+ arch/x86/kvm/Kconfig     | 1 +
+ include/linux/kvm_host.h | 3 +++
+ virt/kvm/Kconfig         | 3 +++
+ virt/kvm/Makefile.kvm    | 5 ++++-
+ 4 files changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index feee7739219e..6dcc6ed90421 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11847,11 +11847,6 @@ void kvm_arch_hardware_disable(void)
- 
- static cpumask_t cpus_hardware_enabled = CPU_MASK_NONE;
- 
--int kvm_arch_post_init_vm(struct kvm *kvm)
--{
--	return kvm_mmu_post_init_vm(kvm);
--}
--
- static int __hardware_enable(void *caller_name)
- {
- 	int cpu = raw_smp_processor_id();
-@@ -11915,7 +11910,7 @@ int kvm_arch_add_vm(struct kvm *kvm, int usage_count)
- 		goto err;
- 	}
- 
--	r = kvm_arch_post_init_vm(kvm);
-+	r = kvm_mmu_post_init_vm(kvm);
- err:
- 	if (r)
- 		on_each_cpu(hardware_disable, NULL, 1);
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index e3cbd7706136..e2e16205425d 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -25,6 +25,7 @@ config KVM
+ 	depends on X86_LOCAL_APIC
+ 	select PREEMPT_NOTIFIERS
+ 	select MMU_NOTIFIER
++	select HAVE_KVM_OVERRIDE_HARDWARE_ENABLE
+ 	select HAVE_KVM_IRQCHIP
+ 	select HAVE_KVM_PFNCACHE
+ 	select HAVE_KVM_IRQFD
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 74cae99fbf09..d0b5fdb084f4 100644
+index d0b5fdb084f4..f538fc3356a9 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -1446,7 +1446,6 @@ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu);
- int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
- bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu);
- bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu);
--int kvm_arch_post_init_vm(struct kvm *kvm);
- int kvm_arch_add_vm(struct kvm *kvm, int usage_count);
- int kvm_arch_del_vm(int usage_count);
- void kvm_arch_pre_destroy_vm(struct kvm *kvm);
-diff --git a/virt/kvm/kvm_arch.c b/virt/kvm/kvm_arch.c
-index 9476c500d571..9bf7b3920c44 100644
---- a/virt/kvm/kvm_arch.c
-+++ b/virt/kvm/kvm_arch.c
-@@ -14,11 +14,6 @@
+@@ -1434,8 +1434,11 @@ void kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu, struct dentry *debugfs_
+ static inline void kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu) {}
+ #endif
  
- static cpumask_t cpus_hardware_enabled = CPU_MASK_NONE;
++#ifndef CONFIG_HAVE_KVM_OVERRIDE_HARDWARE_ENABLE
+ int kvm_arch_hardware_enable(void);
+ void kvm_arch_hardware_disable(void);
++#endif
++
+ int kvm_arch_hardware_setup(void *opaque);
+ void kvm_arch_pre_hardware_unsetup(void);
+ void kvm_arch_hardware_unsetup(void);
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index a8c5c9f06b3c..917314a87696 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -72,3 +72,6 @@ config KVM_XFER_TO_GUEST_WORK
  
--__weak int kvm_arch_post_init_vm(struct kvm *kvm)
--{
--	return 0;
--}
--
- static int __hardware_enable(void *caller_name)
- {
- 	int cpu = raw_smp_processor_id();
-@@ -79,13 +74,8 @@ __weak int kvm_arch_add_vm(struct kvm *kvm, int usage_count)
+ config HAVE_KVM_PM_NOTIFIER
+        bool
++
++config HAVE_KVM_OVERRIDE_HARDWARE_ENABLE
++	def_bool n
+diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
+index c4210acabd35..c0187ec4f83c 100644
+--- a/virt/kvm/Makefile.kvm
++++ b/virt/kvm/Makefile.kvm
+@@ -5,7 +5,10 @@
  
- 	if (atomic_read(&failed)) {
- 		r = -EBUSY;
--		goto err;
--	}
--
--	r = kvm_arch_post_init_vm(kvm);
--err:
--	if (r)
- 		on_each_cpu(hardware_disable, NULL, 1);
-+	}
- 	return r;
- }
+ KVM ?= ../../../virt/kvm
  
+-kvm-y := $(KVM)/kvm_main.o $(KVM)/kvm_arch.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
++kvm-y := $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
++ifneq ($(CONFIG_HAVE_KVM_OVERRIDE_HARDWARE_ENABLE), y)
++kvm-y += $(KVM)/kvm_arch.o
++endif
+ kvm-$(CONFIG_KVM_VFIO) += $(KVM)/vfio.o
+ kvm-$(CONFIG_KVM_MMIO) += $(KVM)/coalesced_mmio.o
+ kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/async_pf.o
 -- 
 2.25.1
 
