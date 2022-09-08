@@ -2,183 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8896A5B210F
-	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 16:45:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A56B45B2149
+	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 16:53:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232701AbiIHOpY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Sep 2022 10:45:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46060 "EHLO
+        id S231981AbiIHOw7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Sep 2022 10:52:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232689AbiIHOpS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Sep 2022 10:45:18 -0400
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 436724507E
-        for <kvm@vger.kernel.org>; Thu,  8 Sep 2022 07:45:14 -0700 (PDT)
-Received: by mail-wr1-x42c.google.com with SMTP id t14so19207653wrx.8
-        for <kvm@vger.kernel.org>; Thu, 08 Sep 2022 07:45:14 -0700 (PDT)
+        with ESMTP id S230433AbiIHOwn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Sep 2022 10:52:43 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5925A114A51
+        for <kvm@vger.kernel.org>; Thu,  8 Sep 2022 07:52:41 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id v1so4788853plo.9
+        for <kvm@vger.kernel.org>; Thu, 08 Sep 2022 07:52:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=iMuilEfj7jmAhWTDHVQA9P0ytfSJpQXdBND+Mw+wnUs=;
-        b=QhDfTLSmlT6Er/AcE2lm1ek1w/nfCIXI7PLQZ/RidNtUB8INYpJi81izlFhBD3rGq7
-         2qQifdGmiKiNSD4YIR4y1b+0SetPZecK9IaU13z2oHw+Ug3OJlUGqEVg3Z6+9CI83vzX
-         2OKMDilyfzSmXNKeOzee2HcxgsRvXaTMME1NKCmLCN1EXqwCnbBWUWJdgTq1CLYYcjaJ
-         W3yGOe6vi9Hzm1vmKMNoFFQQWLpt58k+0Wz6WhurCakf6ctJGLTmk2vag3Yxq3zykrgZ
-         FOxhtucfZxknoBq7WKWxOfak0n/nApWXusFzJ4+H3AZTaHyNMJaaKC4qLMK/9dMSceNn
-         XtIA==
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=MSOIR1a3zpSQbiZ6BxPUkenjZWqqxMNPgXiYxLKVulI=;
+        b=RLVPcDpNX2GnFwnSbFL5yGt59wXXkRKxKVNl72IL/oZLJCNR/eLAAMRNdr73flqdKd
+         SqVbnNaPqH+Vm/EZCMTsTZZKDX5rVxdhvCEeKgQy7PL36Ij6SeeW4nugFiu8VtvcjH0Y
+         pR2xGndeDBoAd4gpmj4z6+3ysMZLV+Du1vm7FjGTD58Pr1tEGtuPdFYgHoJ5yUTEHbeg
+         pJCRO2WCx6v86IuCkjbimtYkg2IocCaaxFb3DSj9rHku3XGDiFCT1NOk8xuRWm8HZp63
+         +CHd6T/DKvwrt8ayn69Ll7D9iQ45VETFtSa1jdamPPiINe+d+sLlRHc31r4Eny22F6i/
+         JE7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=iMuilEfj7jmAhWTDHVQA9P0ytfSJpQXdBND+Mw+wnUs=;
-        b=4eDW8mLefMTKyEAE0EgfmHlyKQ4H9Oop2a305sqfKbU2ebArFQSg53i6LJNCjnKP6Y
-         uc2NTHoPDavm08B7fmnKBjBysPgwGfsy58fILpvwS6FDoQ3y0sHkkn3kOWZBRlnNUNY+
-         aXQsgwo+aiHk/Sw2m2IBYVuRJisukv6YdDbmnoQJXOjqDwONDlZaRKvXtjMZSQC+ZGBg
-         8gfd5YpxnlG844zRSo20sNMUJa5b+RLy6IdnsNvJXaqM+NCViRrk81XtgI7GpDUg16oQ
-         S9pwp5KkM3dBuDwfpuv2mSX74r8JJe32PJkHF9gKN7O1iZu7Eh5AQ9Jal0IV8efno/Xy
-         4SLQ==
-X-Gm-Message-State: ACgBeo15nQPX5CgJCdwdVVd/S7eSkpaUiaYXdqebJtrf7zmLyffzeiNc
-        bEtesF4MIdASBYTQAMu8zcaeTA==
-X-Google-Smtp-Source: AA6agR5uToV9+w4kOPRwRn+8oIToj/KlyuicDcPemRWRFszslpl/K2FkLQE5QkuG4CxkDAf1rEParA==
-X-Received: by 2002:adf:eb84:0:b0:226:dc6e:7dd4 with SMTP id t4-20020adfeb84000000b00226dc6e7dd4mr5614305wrn.196.1662648313274;
-        Thu, 08 Sep 2022 07:45:13 -0700 (PDT)
-Received: from localhost.localdomain (cpc92880-cmbg19-2-0-cust679.5-4.cable.virginm.net. [82.27.106.168])
-        by smtp.gmail.com with ESMTPSA id x12-20020a05600c2d0c00b003a4efb794d7sm2969287wmf.36.2022.09.08.07.45.11
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=MSOIR1a3zpSQbiZ6BxPUkenjZWqqxMNPgXiYxLKVulI=;
+        b=lku9ms+qRXj0nRMftqdRwo4nTZ0ZHIzy3uPZB95nAE4sWBY5xSfmq/DVzFW109F9NG
+         JHaSN8DtUMgwdSCl9KIGHDOVWe8w5ZjH/erzVT7Lq1l9Oy2Yaso4Zt4ojsRMLnC7hrV8
+         on2+Kx1iy/fLKrWuSgwD4SqJ8ETyZuzrX/WbR5cybBMnGd6y1Fg6adHtxjB0LBwfQhdI
+         0cQJdwh94cmE4umNzRvSgVeyR8c7UwLzHMgFtbnUWQ40fWNM4ZAl8NWqQnAz0gLzIt28
+         xbcpo+DQftpZXls9087iWgqYtuwtpXT2C8MFSjc/3rpTCHa8chJd0jl89CAeKp3MvpUw
+         Vrxw==
+X-Gm-Message-State: ACgBeo3TyoCSVjaCu3n6dR49YQ0JWYJqpKBLJ9tuDJhFn20fKcMFEZAK
+        aYrxrZydHK9+UXibxPdeLnU3mw==
+X-Google-Smtp-Source: AA6agR5pAPjlU4QMW3Yf7UfXUukfPnrbXzt5ySBoXQZbL5vKiH5NLEwPnDBy79QFCjmCnxNF8tQU3w==
+X-Received: by 2002:a17:902:ce11:b0:172:6f2c:a910 with SMTP id k17-20020a170902ce1100b001726f2ca910mr9281976plg.156.1662648760765;
+        Thu, 08 Sep 2022 07:52:40 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id j4-20020a63fc04000000b0040caab35e5bsm12880736pgi.89.2022.09.08.07.52.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Sep 2022 07:45:12 -0700 (PDT)
-From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
-To:     will@kernel.org
-Cc:     andre.przywara@arm.com, alexandru.elisei@arm.com,
-        kvm@vger.kernel.org,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Pierre Gondois <pierre.gondois@arm.com>
-Subject: [PATCH kvmtool] pci: Disable writes to Status register
-Date:   Thu,  8 Sep 2022 15:42:09 +0100
-Message-Id: <20220908144208.231272-1-jean-philippe@linaro.org>
-X-Mailer: git-send-email 2.37.3
+        Thu, 08 Sep 2022 07:52:40 -0700 (PDT)
+Date:   Thu, 8 Sep 2022 14:52:36 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Gerd Hoffmann <kraxel@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] kvm/x86: reserve bit
+ KVM_HINTS_PHYS_ADDRESS_SIZE_DATA_VALID
+Message-ID: <YxoBtD+3sgEEiaFF@google.com>
+References: <20220908114146.473630-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220908114146.473630-1-kraxel@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Although the PCI Status register only contains read-only and
-write-1-to-clear bits, we currently keep anything written there, which
-can confuse a guest.
+On Thu, Sep 08, 2022, Gerd Hoffmann wrote:
+> The KVM_HINTS_PHYS_ADDRESS_SIZE_DATA_VALID bit hints to the guest
+> that the size of the physical address space as advertised by CPUID
+> leaf 0x80000008 is actually valid and can be used.
+> 
+> Unfortunately this is not the case today with qemu.  Default behavior is
+> to advertise 40 address bits (which I think comes from the very first x64
+> opteron processors).  There are lots of intel desktop processors around
+> which support less than that (36 or 39 depending on age), and when trying
+> to use the full 40 bit address space on those things go south quickly.
+> 
+> This renders the physical address size information effectively useless
+> for guests.  This patch paves the way to fix that by adding a hint for
+> the guest so it knows whenever the physical address size is usable or
+> not.
+> 
+> The plan for qemu is to set the bit when the physical address size is
+> valid.  That is the case when qemu is started with the host-phys-bits=on
+> option set for the cpu.  Eventually qemu can also flip the default for
+> that option from off to on, unfortunately that isn't easy for backward
+> compatibility reasons.
+> 
+> The plan for the firmware is to check that bit and when it is set just
+> query and use the available physical address space.  When the bit is not
+> set be conservative and try not exceed 36 bits (aka 64G) address space.
+> The latter is what the firmware does today unconditionally.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  arch/x86/include/uapi/asm/kvm_para.h | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
+> index 6e64b27b2c1e..115bb34413cf 100644
+> --- a/arch/x86/include/uapi/asm/kvm_para.h
+> +++ b/arch/x86/include/uapi/asm/kvm_para.h
+> @@ -37,7 +37,8 @@
+>  #define KVM_FEATURE_HC_MAP_GPA_RANGE	16
+>  #define KVM_FEATURE_MIGRATION_CONTROL	17
+>  
+> -#define KVM_HINTS_REALTIME      0
+> +#define KVM_HINTS_REALTIME                      0
+> +#define KVM_HINTS_PHYS_ADDRESS_SIZE_DATA_VALID  1
 
-The problem was highlighted by recent Linux commit 6cd514e58f12 ("PCI:
-Clear PCI_STATUS when setting up device"), which unconditionally writes
-0xffff to the Status register in order to clear pending errors. Then the
-EDAC driver sees the parity status bits set and attempts to clear them
-by writing 0xc100, which in turn clears the Capabilities List bit.
-Later on, when the virtio-pci driver starts probing, it assumes due to
-missing capabilities that the device is using the legacy transport, and
-fails to setup the device because of mismatched protocol.
+Why does KVM need to get involved?  This is purely a userspace problem.  E.g. why
+not use QEMU's fw_cfg to communicate this information to the guest?
 
-Filter writes to the config space, keeping only those to writable
-fields. Tighten the access size check while we're at it, to prevent
-overflow. This is only a small step in the right direction, not a
-foolproof solution, because a guest could still write both Command and
-Status registers using a single 32-bit write. More work is needed for:
-* Supporting arbitrary sized writes.
-* Sanitizing accesses to capabilities, which are device-specific.
-* Fine-grained filtering of the Command register, where only some bits
-  are writable.
-
-Also remove the old hack that filtered accesses. It was wrong and not
-properly explained in the git history, but whatever it was guarding
-against should be prevented by these new checks.
-
-Reported-by: Pierre Gondois <pierre.gondois@arm.com>
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
----
-Note that the issue described here only shows up during ACPI boot for
-me, because edac_init() happens after PCI enumeration. With DT boot,
-edac_pci_clear_parity_errors() runs earlier and doesn't find any device.
----
- pci.c | 41 ++++++++++++++++++++++++++++++++---------
- 1 file changed, 32 insertions(+), 9 deletions(-)
-
-diff --git a/pci.c b/pci.c
-index a769ae27..84dc7d1d 100644
---- a/pci.c
-+++ b/pci.c
-@@ -350,6 +350,24 @@ static void pci_config_bar_wr(struct kvm *kvm,
- 	pci_activate_bar_regions(kvm, old_addr, bar_size);
- }
- 
-+/*
-+ * Bits that are writable in the config space header.
-+ * Write-1-to-clear Status bits are missing since we never set them.
-+ */
-+static const u8 pci_config_writable[PCI_STD_HEADER_SIZEOF] = {
-+	[PCI_COMMAND] =
-+		PCI_COMMAND_IO |
-+		PCI_COMMAND_MEMORY |
-+		PCI_COMMAND_MASTER |
-+		PCI_COMMAND_PARITY,
-+	[PCI_COMMAND + 1] =
-+		(PCI_COMMAND_SERR |
-+		 PCI_COMMAND_INTX_DISABLE) >> 8,
-+	[PCI_INTERRUPT_LINE] = 0xff,
-+	[PCI_BASE_ADDRESS_0 ... PCI_BASE_ADDRESS_5 + 3] = 0xff,
-+	[PCI_CACHE_LINE_SIZE] = 0xff,
-+};
-+
- void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data, int size)
- {
- 	void *base;
-@@ -357,7 +375,7 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
- 	u16 offset;
- 	struct pci_device_header *pci_hdr;
- 	u8 dev_num = addr.device_number;
--	u32 value = 0;
-+	u32 value = 0, mask = 0;
- 
- 	if (!pci_device_exists(addr.bus_number, dev_num, 0))
- 		return;
-@@ -368,12 +386,12 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
- 	if (pci_hdr->cfg_ops.write)
- 		pci_hdr->cfg_ops.write(kvm, pci_hdr, offset, data, size);
- 
--	/*
--	 * legacy hack: ignore writes to uninitialized regions (e.g. ROM BAR).
--	 * Not very nice but has been working so far.
--	 */
--	if (*(u32 *)(base + offset) == 0)
--		return;
-+	/* We don't sanity-check capabilities for the moment */
-+	if (offset < PCI_STD_HEADER_SIZEOF) {
-+		memcpy(&mask, pci_config_writable + offset, size);
-+		if (!mask)
-+			return;
-+	}
- 
- 	if (offset == PCI_COMMAND) {
- 		memcpy(&value, data, size);
-@@ -419,8 +437,13 @@ static void pci_config_mmio_access(struct kvm_cpu *vcpu, u64 addr, u8 *data,
- 	cfg_addr.w		= (u32)addr;
- 	cfg_addr.enable_bit	= 1;
- 
--	if (len > 4)
--		len = 4;
-+	/*
-+	 * "Root Complex implementations are not required to support the
-+	 * generation of Configuration Requests from accesses that cross DW
-+	 * [4 bytes] boundaries."
-+	 */
-+	if ((addr & 3) + len > 4)
-+		return;
- 
- 	if (is_write)
- 		pci__config_wr(kvm, cfg_addr, data, len);
--- 
-2.37.3
-
+Defining this flag arguably breaks backwards compatibility for VMMs that already
+accurately advertise MAXPHYADDR.  The absence of the flag would imply that MAXPHYADDR
+is invalid, which is not the case.
