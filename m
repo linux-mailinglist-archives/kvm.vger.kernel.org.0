@@ -2,126 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 229F15B257D
-	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 20:18:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41F4A5B2587
+	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 20:21:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229796AbiIHSSI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Sep 2022 14:18:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50514 "EHLO
+        id S231816AbiIHSVZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Sep 2022 14:21:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231574AbiIHSSF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Sep 2022 14:18:05 -0400
-Received: from mail-oa1-x49.google.com (mail-oa1-x49.google.com [IPv6:2001:4860:4864:20::49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EB8DF1F22
-        for <kvm@vger.kernel.org>; Thu,  8 Sep 2022 11:18:03 -0700 (PDT)
-Received: by mail-oa1-x49.google.com with SMTP id 586e51a60fabf-1275c2d65feso6777477fac.4
-        for <kvm@vger.kernel.org>; Thu, 08 Sep 2022 11:18:03 -0700 (PDT)
+        with ESMTP id S229505AbiIHSVW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Sep 2022 14:21:22 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC487E6B84;
+        Thu,  8 Sep 2022 11:21:21 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id b21so5811960plz.7;
+        Thu, 08 Sep 2022 11:21:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date;
-        bh=Ao/oO1ci/4vtHJ0QANtxpP7WSXi8ShDFQ+MjbHPJ47I=;
-        b=Jxl56kd0YaqvhEwU4v5DrIoZ24M/fYQXNiHDZhicbixjOwGTfGLRUf7kqY2HVx7PKQ
-         E5jHMCyf+R6L2PCdck3AnxAJ+YTSDFYkVIyDr9t6Ijsmvbrg8+D95xRMMBexo/+z6X9O
-         xe6r5JKvLPfgTOWREzYkqhv4b7aPMCmbrpe0tfrXSUdiYQaBg9kTz4KsB3GQSHC/vr5Q
-         kX7vmjfwAfmHCZO1fZynlgbTY7ySwDgul9L0JHuR633+mv2JovRoXC7gxGEthIM1WBl8
-         vkmOBw9RTjRunBLvVLayl6xKVlfv92pLyHAEUB6+88XBfQ3VSTe3PS/gPW+r2xhulUzc
-         kFGw==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=okUBJLXHbCVSBkroQZFDOrOTjmtVmUpB5jI9jfOC3/Y=;
+        b=b7ih9pm4fO55T6Bv8NR5HfeUOZi+8KkI9j8EEUapjGNaX0raRmJyv8yKOBaMTJMqX/
+         nwLj9YFdh2ZDmJuHmvNjQLNhY8GErTArfX3iPbFO3XPxemxlVZ5SAT20+jZK7q3Ztr9I
+         L4s3KPn8KDuq+laGNvPtKEgWKF2yDC105h22TtSqydVjWb0PfDHk6YKOuPznitGdqt9o
+         GuN8YH+Nt286VHdbK/QvDWMUWOxrI0MnTRkAAyeM7cpF9W344w3qEH27Uvbb6weJfvUU
+         wxWecM81VxPtsETlQEIgUeWfx9Uo77zdiG0R5VX8jGhAu3Ed0s5UlZRE/nB3EjNPojev
+         AF8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=Ao/oO1ci/4vtHJ0QANtxpP7WSXi8ShDFQ+MjbHPJ47I=;
-        b=UGOPWE6gVHm7w0G/3A45h50gnUiLga4ZeV/XPprX1G2T4Zc3bKPjsm2u7FIvYPH4EC
-         qHQcYNv6kN28XqTbpqogNW4PmeSYwgd3ZyphcDgXxhJ92LZ6j5iMFCnJfQuu8Tsw9o4V
-         IMciS1mH9obJKwapeiysu9ajcTG06ggEeADpqq8POZhMzZZMmqhKr9QBVdPA685sn19B
-         st9gKW5/ZjEvdsmrrKPLUUx3wWODzKXtpyFuJYnndisv1rn9wEqY+Djz3ZRd4RXz51ZV
-         zqbwi1SN+RPACW8BEb10w2SiMwn2jU8w3t4NuyUIhAGabx7+9d3UzsWM1FVLOz4D56yM
-         yPhQ==
-X-Gm-Message-State: ACgBeo0xtDjn2iVgyHLfYAXK7TtZish/sK37ASQaji1Xx+dyCt1hghPO
-        NnWq91n+DOGcZQiVXf75tPTo43WLA1u+4F2mYA==
-X-Google-Smtp-Source: AA6agR6CHWrebShVQmjcMMGeluex+O/dFuJdWVkrFGFZmDDaI74Q610uFXyP31/SH0EgFJGt7kvbNPPflb6a4Awa9g==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6808:8db:b0:344:fb71:2159 with
- SMTP id k27-20020a05680808db00b00344fb712159mr2038974oij.34.1662661082624;
- Thu, 08 Sep 2022 11:18:02 -0700 (PDT)
-Date:   Thu, 08 Sep 2022 18:18:01 +0000
-In-Reply-To: <Yxoa78p2QTXXgZej@google.com> (message from Ricardo Koller on
- Thu, 8 Sep 2022 09:40:15 -0700)
-Mime-Version: 1.0
-Message-ID: <gsntpmg5pw6e.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v3 2/3] KVM: selftests: Randomize which pages are written
- vs read.
-From:   Colton Lewis <coltonlewis@google.com>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
-        dmatlack@google.com, seanjc@google.com, oupton@google.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=okUBJLXHbCVSBkroQZFDOrOTjmtVmUpB5jI9jfOC3/Y=;
+        b=WdW8zVSr6zOoqTKehXoUWXVLApeqAo7mpEMfRsMrIPi05Fp28/b/BSfkpyxTDbMNvr
+         H95ikigpUumTf554TiRO4gUViISaEj1oVz+ANsV9l9KUf/IB2XoA8si3lmDHTYsx0BGt
+         u/7m/+G91SY4F5c1us0C0CLmnLDgWPXwEj8A5Kt2OUXw5uYmOHkqPU30vkBSwc14EMEi
+         epJvnOeZ+s6Jc2/wX/3jzeMfvogtpilARwb/tEdRiGlRENHTeXM7oaB9U1g150R8bg5N
+         2zCRKfc/DX9NYlwwOdyd990iyXbr4/JHe5R5qNp4ZVKq17F0PY9X1f2s/WR3iBy0I7Q7
+         Tb7w==
+X-Gm-Message-State: ACgBeo3io0rb8z+cBG6uFZFgArjibPeQIokok9XYpgC0PrVrookla1/C
+        Lf3rNsAgGue0tfQyf8xwfuo=
+X-Google-Smtp-Source: AA6agR6uzQdJkEBK6v5j0UzVnYVImYScSKk+ctwwjMcR93s7t6qwU1wiZczwMwTttih1BpL0YxIx2w==
+X-Received: by 2002:a17:903:124f:b0:171:4c36:a6bf with SMTP id u15-20020a170903124f00b001714c36a6bfmr10144836plh.0.1662661281017;
+        Thu, 08 Sep 2022 11:21:21 -0700 (PDT)
+Received: from localhost ([192.55.55.51])
+        by smtp.gmail.com with ESMTPSA id jc3-20020a17090325c300b00174abcb02d6sm10463866plb.235.2022.09.08.11.21.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Sep 2022 11:21:20 -0700 (PDT)
+Date:   Thu, 8 Sep 2022 11:21:19 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Yuan Yao <yuan.yao@linux.intel.com>
+Cc:     isaku.yamahata@intel.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        isaku.yamahata@gmail.com, Kai Huang <kai.huang@intel.com>,
+        Chao Gao <chao.gao@intel.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Shaokun Zhang <zhangshaokun@hisilicon.com>,
+        Qi Liu <liuqi115@huawei.com>,
+        John Garry <john.garry@huawei.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v3 09/22] KVM: Do processor compatibility check on resume
+Message-ID: <20220908182119.GA470011@ls.amr.corp.intel.com>
+References: <cover.1662084396.git.isaku.yamahata@intel.com>
+ <b5bf18656469f667d1015cc1d62e5caba2f56e96.1662084396.git.isaku.yamahata@intel.com>
+ <20220905084014.uanoazei77i3xjjo@yy-desk-7060>
+ <20220905092712.5mque5oajiaj7kuq@yy-desk-7060>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20220905092712.5mque5oajiaj7kuq@yy-desk-7060>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ricardo Koller <ricarkol@google.com> writes:
+On Mon, Sep 05, 2022 at 05:27:12PM +0800,
+Yuan Yao <yuan.yao@linux.intel.com> wrote:
 
-> On Thu, Sep 01, 2022 at 07:52:36PM +0000, Colton Lewis wrote:
->> Randomize which pages are written vs read using the random number
->> generator.
-> nit:       ^ I haven't seen this style before (the period at the end)
+> On Mon, Sep 05, 2022 at 04:40:14PM +0800, Yuan Yao wrote:
+> > On Thu, Sep 01, 2022 at 07:17:44PM -0700, isaku.yamahata@intel.com wrote:
+> > > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > >
+> > > So far the processor compatibility check is not done on resume. It should
+> > > be done.
+> >
+> > The resume happens for resuming from S3/S4, so the compatibility
+> > checking is used to detecte CPU replacement, or resume from S4 on an
+> > different machine ?
+> 
+> By did experiments, I found the resume is called once on CPU 0 before
+> other CPUs come UP, so yes it's necessary to check it.
 
+I've added the commit message.
 
-I will change style in future patches, but checkpatch doesn't complain
-and there are many examples in git history.
+    KVM: Do processor compatibility check on resume
+    
+    So far the processor compatibility check is not done on resume. It should
+    be done.  The resume is called for resuming from S3/S4.  CPUs can be
+    replaced or the kernel can resume from S4 on a different machine.  So
+    compatibility check is desirable.
 
-$ git log --oneline | grep '\.$' | wc -l
-   43812
-
->> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c  
->> b/tools/testing/selftests/kvm/dirty_log_perf_test.c
->> index 2f91acd94130..c9441f8354be 100644
->> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
->> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
->> @@ -122,10 +122,10 @@ static void vcpu_worker(struct perf_test_vcpu_args  
->> *vcpu_args)
->>   struct test_params {
->>   	unsigned long iterations;
->>   	uint64_t phys_offset;
->> -	int wr_fract;
->>   	bool partition_vcpu_memory_access;
->>   	enum vm_mem_backing_src_type backing_src;
->>   	int slots;
->> +	uint32_t write_percent;
-
-> nit: make it an int to match perf_test_args.write_percent
-
-
-That inconsistency bothers me. I'll make perf_test_args.write_percent a
-uint32 instead since that's what most of the code uses. Will take care
-of your other nits while I'm at it.
-
->> @@ -413,10 +414,11 @@ int main(int argc, char *argv[])
->>   		case 'b':
->>   			guest_percpu_mem_size = parse_size(optarg);
->>   			break;
->> -		case 'f':
->> -			p.wr_fract = atoi(optarg);
->> -			TEST_ASSERT(p.wr_fract >= 1,
->> -				    "Write fraction cannot be less than one");
->> +		case 'w':
->> +			perf_test_args.write_percent = atoi(optarg);
-
-> I'm a bit confused, where is p.write_percent being set? I later see
-
-> 	perf_test_set_write_percent(vm, p->write_percent);
-
-> that rewrites perf_test_args.write_percent with whatever was in
-> p->write_percent.
-
-
-Hmm. Thought I fixed that mistake before. Should be p.write_percent
-there.
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
