@@ -2,100 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C87F5B249B
-	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 19:28:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1ADA45B24A5
+	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 19:31:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232310AbiIHR1R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Sep 2022 13:27:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60994 "EHLO
+        id S230090AbiIHRbp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Sep 2022 13:31:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232253AbiIHR0T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Sep 2022 13:26:19 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79333EE534
-        for <kvm@vger.kernel.org>; Thu,  8 Sep 2022 10:25:32 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id q9so17392538pgq.6
-        for <kvm@vger.kernel.org>; Thu, 08 Sep 2022 10:25:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=7IqgCAbBltCgwXLRh/YGIeJJalN5os7YVeD7L2fO/30=;
-        b=PQfW0BWqmSmYQkMR4MEBAgJeHxrnoQWDet2shcfdkN9DYclMzFsIMWu8BDMV9FcV0Y
-         mbCaRLcfR8qfuM4pOX6bV/naG6eDMb/1XCxOLiZkD658wnF6xVtRkrywFaMVmkIFisJW
-         FDM9H84/VjUH/TRTYVHq43wC54n/Q39N/aspB2cDdYhBJOukomNXpvuHoccq1ZTf7Rj5
-         ZGCrNuR0hLsCL9sePunVJcAZUVVT9El8dkF4d78JhRcFq28BwwXwYP95mD1HeC6garQw
-         wIHT+/jGOAf/HA1XpxbiV69AEULYFwyUtgChFti/xpDb/xJq3601LA26BJJ2e74j0OKq
-         YN0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=7IqgCAbBltCgwXLRh/YGIeJJalN5os7YVeD7L2fO/30=;
-        b=xIzV51MUiGrAtOSEFpeMEKWugJyGgp/VSu8cjV47bKS4S9y/S9bZlmoNkqD3UQlJvz
-         Gu/QREdDMuqI5cbfQfVLKfJWIJe8WGSyHFW+16eh8vCebusMnCssQn7nH+Z6rT/XwFrK
-         jgm0TwNNXfbYW8npMwlvg4110HKSxSucLabZPV8m4CXP0Ih0W79A8KwMygRoX8DiqQIT
-         nRg3LoWTZK9CJyU9O9umNH4DzHuGP9v6JeCyZ+GJigOVgV6wydtIvdg5KZMdFXi8jUwf
-         gCN0Jh4KQov29BNV2NFdE3aHXFLCSFKqZQLF9wOmmfaV4Lo93jlewad9kxFMY0htQpMY
-         MysQ==
-X-Gm-Message-State: ACgBeo0U58RpZ0mV3OwlHFs0iaknnsDs0g8BlYwLrLZE+eRY07nCIDuI
-        MdRSJQDE7uVjfB2q1dhyJpVHaw==
-X-Google-Smtp-Source: AA6agR7jDw1++R0RS0tvY4MCiKwZ1yRMzWCXkmjqDMTya/Z9SYJ1nLYVD2hrsj4IFfb5LK+GdZGiaA==
-X-Received: by 2002:a05:6a00:23c1:b0:52e:28f5:4e13 with SMTP id g1-20020a056a0023c100b0052e28f54e13mr9941256pfc.20.1662657931234;
-        Thu, 08 Sep 2022 10:25:31 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id l13-20020a170902f68d00b0016f196209c9sm14816331plg.123.2022.09.08.10.25.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Sep 2022 10:25:30 -0700 (PDT)
-Date:   Thu, 8 Sep 2022 17:25:27 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Uros Bizjak <ubizjak@gmail.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM/VMX: Do not declare vmread_error asmlinkage
-Message-ID: <Yxolh+QhLocER0oY@google.com>
-References: <20220817144045.3206-1-ubizjak@gmail.com>
+        with ESMTP id S230129AbiIHRbo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Sep 2022 13:31:44 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1416B9A6A9;
+        Thu,  8 Sep 2022 10:31:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FO1Ylo5QsENT8r4vHAimcRrgoTK5kv7aT7Y4O76ANJqGYlaJMHQNboidoamK18EZIN/8AC/dRiy5SIboUDCliFCp+9C54b9UR2hTTWPt3MRG8X5P8Ln4a+Uvh2xdk91W6+b8LKeGIjfa/2A4N/pmHWQX3/0bkchIFxDI6DHvhO5yYi29Nm88RxuxoerBHCKnzXJwse1zlnt4mgxbtY8oLUKOKqXyeJAfuey6+JBJz1LJf4NkF94zQRmocFP1aaE1Q5wFxofXA13S8vwUAb9dBm4CzMf9x4jaV1UHnmIlAzos0C0ZzKBSu868xdbYYSWNjHvIImSaRUZZdjcc7aGsZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CHS8NN/QCCRkF6n+Ry2epkdBZVTjteE89MZRb+nFFMk=;
+ b=R7frQSU9AcloaPp7mXmoIq2IcRUF3UslYDk5twBzo4SXOlbtQdIiuq5oCNlfdhKoMiDwVtX2oQmUtzBO7VFzasj5KgPBvnU2zmWEF/hx9qUBUmMhis0aHgdjMAovxbLsjEiAocSmczoppNSdzQYargfYa1HsoxzNNYehgU9QgPTCL0+TWrgg6s1DLfGFBCi0WRgLhEeeKfyCx/EQSJ3F9aP0cBb6SufMk8291GEiJeDpWFVFtLnfzQyzEMlqApQ/sHFSEJOnzomzVHr27B24p84zzNopNb4NNxFyy5D+BV4xdBg97ncO/JF3wbg9khwtxQWEr0tKx0TLgHA+jvImOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.238) smtp.rcpttodomain=oracle.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CHS8NN/QCCRkF6n+Ry2epkdBZVTjteE89MZRb+nFFMk=;
+ b=hWMPDM7tOC3Dqt08yG+ZuFij1iDacgIkCeFaHuY4RlpJTbHjeJj/hsM6CkpnYUMdLW+08dFqco/TS6wmHwXLM2xqxL1fR7E0jTxmQ4BbNp7QxYDJblZJmEW/svBANN2FLBNB5wJR8tTEgK2yyQZY20b1dvpozFHNr/0Hibc7ZfuagvQiqXbAGVGZp7XqjpYy8s1ohIdbqijBpSbFxae3dG+01EdZrmM72Fr/RuWSHGmDsfLe5oIbA/r8yB1IE2H8zUvFdTHzZ1KX3Fd69Oj/y1fXZ0q4lx0/ioeYXlHKuwikEfia+SqEE9QT8zxUvwGXRsN3j5RUnuYrf/aS3fWaaA==
+Received: from MW4P220CA0020.NAMP220.PROD.OUTLOOK.COM (2603:10b6:303:115::25)
+ by CH2PR12MB5004.namprd12.prod.outlook.com (2603:10b6:610:62::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.15; Thu, 8 Sep
+ 2022 17:31:41 +0000
+Received: from CO1NAM11FT022.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:115:cafe::33) by MW4P220CA0020.outlook.office365.com
+ (2603:10b6:303:115::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5612.19 via Frontend
+ Transport; Thu, 8 Sep 2022 17:31:41 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.238)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.238 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.238; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (12.22.5.238) by
+ CO1NAM11FT022.mail.protection.outlook.com (10.13.175.199) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.5612.13 via Frontend Transport; Thu, 8 Sep 2022 17:31:41 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by DRHQMAIL105.nvidia.com
+ (10.27.9.14) with Microsoft SMTP Server (TLS) id 15.0.1497.38; Thu, 8 Sep
+ 2022 17:31:40 +0000
+Received: from [172.27.0.38] (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29; Thu, 8 Sep 2022
+ 10:31:36 -0700
+Message-ID: <83fe2fa1-7f49-35f5-ba4b-5662175bbe31@nvidia.com>
+Date:   Thu, 8 Sep 2022 20:31:35 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220817144045.3206-1-ubizjak@gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [GIT PULL] Please pull mlx5 vfio changes
+Content-Language: en-US
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <saeedm@nvidia.com>, <kvm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <kuba@kernel.org>,
+        <kevin.tian@intel.com>, <joao.m.martins@oracle.com>,
+        <maorg@nvidia.com>, <cohuck@redhat.com>,
+        Leon Romanovsky <leon@kernel.org>
+References: <20220907094344.381661-1-leon@kernel.org>
+ <20220907132119.447b9219.alex.williamson@redhat.com>
+ <YxmMMR3u1VRedWdK@unreal>
+ <20220908105345.28da7c98.alex.williamson@redhat.com>
+From:   Yishai Hadas <yishaih@nvidia.com>
+In-Reply-To: <20220908105345.28da7c98.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT022:EE_|CH2PR12MB5004:EE_
+X-MS-Office365-Filtering-Correlation-Id: 422b76bb-fd93-47b3-0e02-08da91bffdf5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ao0Q9dAK+HtVRhsfzZvKwB4gj8GhdxBARTd2qH1QfY2czwnsIytlZgq5Ir/v3UPteuxoLjLodv5rQVaWT5icbvhjqN1yChvt1nkSi53N/kT5nW16Ps5O6pURlrpGiDrRG/tGe+TsvRkKsWaNL2V7JzYe3ZzjQUTjnuOqUdx3PDXz28zjjK24LsU++sqbK7Lj4cBReMwdJQeUaJF1HlVYmI/iHE4WZsn9awj2G1jNo7XT1KSHiri3SQenrOVKIQoClqBXqIsikmyqwUH7KfFzTNh9TOxT/4ECYvcv99KATBbzkJFiVkfNedfJnK1yHQWS7sW1CcRPxYe4nnQq3WQIwnLwNRpKFKQKv8mja00mc/xFpZoAuS9gDT7POSdR77MnSB9JowjKX3FxVaFUDSZf+GAn+0rggRP5mp4ghWk9SrVFbH9kCj7tGz3NffPcmb0Ap213/CJusXBaSydDvRbJpgCL4OkF6BhX87zLbYmWsisReYrzNkRGOyQ9zqr8krbAT0l4+JvEm3L3Hpk6svIsLC157rJgjLlca7v/CcJ7mAXkNd4xsOqBRs3QM4V2aUDphQRiaJgRA9PZW6UijQty0eh688lHanVKSnBT8IlGDqas+zEpPO1i8OCNIgeu8jiPsJlkJsHXTbmQLOAD9AAYEJRf5FOxYJjnoIEkUrjcYMSP7ycDqz56loTMvsdsQvkj6aEMlofXnQeNsOwu5OyZ7IrZUcjhXsNqo4MyOEugZszB6Azv4h4XmwOnCCNSJYoyabNh2e26uMO4nxSwXm9jXGSk4cQteJWGljo09XTL10ViMKhtFCPyCjyFBKRLuRDvjyv3d4UYxHduFrbkd5IZBxbNuzi2eGx/CjHINR6wuWWa1JUDrd+vJLrKNHepij6dYgx444cLjZUGQVAMENfoZQ==
+X-Forefront-Antispam-Report: CIP:12.22.5.238;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(136003)(346002)(376002)(396003)(39860400002)(36840700001)(46966006)(40470700004)(16576012)(70206006)(47076005)(2616005)(966005)(54906003)(8676002)(478600001)(53546011)(70586007)(40480700001)(36756003)(16526019)(336012)(6916009)(2906002)(186003)(426003)(83380400001)(31686004)(316002)(81166007)(86362001)(4326008)(356005)(26005)(41300700001)(82740400003)(5660300002)(36860700001)(82310400005)(8936002)(40460700003)(31696002)(43740500002)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Sep 2022 17:31:41.0729
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 422b76bb-fd93-47b3-0e02-08da91bffdf5
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.238];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT022.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB5004
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 17, 2022, Uros Bizjak wrote:
-> There is no need to declare vmread_error asmlinkage, its arguments
-> can be passed via registers for both, 32-bit and 64-bit targets.
-> Function argument registers are considered call-clobbered registers,
-> they are saved in the trampoline just before the function call and
-> restored afterwards.
-> 
-> Note that asmlinkage and __attribute__((regparm(0))) have no effect
-> on 64-bit targets. The trampoline is called from the assembler glue
-> code that implements its own stack-passing function calling convention,
-> so the attribute on the trampoline declaration does not change anything
-> for 64-bit as well as 32-bit targets. We can declare it asmlinkage for
-> documentation purposes.
-> 
-> The patch unifies trampoline function argument handling between 32-bit
-> and 64-bit targets and improves generated code for 32-bit targets.
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-> ---
+On 08/09/2022 19:53, Alex Williamson wrote:
+> On Thu, 8 Sep 2022 09:31:13 +0300
+> Leon Romanovsky <leon@kernel.org> wrote:
+>
+>> On Wed, Sep 07, 2022 at 01:21:19PM -0600, Alex Williamson wrote:
+>>> On Wed,  7 Sep 2022 12:43:44 +0300
+>>> Leon Romanovsky <leon@kernel.org> wrote:
+>>>    
+>>>> Hi Alex,
+>>>>
+>>>> This series is based on clean 6.0-rc4 as such it causes to two small merge
+>>>> conficts whis vfio-next. One is in thrird patch where you should take whole
+>>>> chunk for include/uapi/linux/vfio.h as is. Another is in vfio_main.c around
+>>>> header includes, which you should take too.
+>>> Is there any reason you can't provide a topic branch for the two
+>>> net/mlx5 patches and the remainder are rebased and committed through
+>>> the vfio tree?
+>> You added your Acked-by to vfio/mlx5 patches and for me it is a sign to
+>> prepare clean PR with whole series.
+>>
+>> I reset mlx5-vfio topic to have only two net/mlx5 commits without
+>> special tag.
+>>
+>> https://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git topic/mlx5-vfio
+>> Everything else can go directly to your tree without my intervention.
+> Sorry, I knew the intention initially was to send a PR and I didn't
+> think about the conflicts we'd have versus the base you'd use.  Thanks
+> for splitting this out, I think it'll make for a cleaner upstream path
+> given the clear code split.
+>
+> Yishai, can you post a v7 rebased on the vfio next branch?
 
-Minus the vmread_error_trampoline() change, pushed to branch `for_paolo/6.1` at:
 
-    https://github.com/sean-jc/linux.git
+Sure
 
-Unless you hear otherwise, it will make its way to kvm/queue "soon".
+Do you want me to include in V7 the two net/mlx5 patches that are part 
+of the PR or that you'll take them first from the PR, publish your 
+vfio/next tree and I'll drop them from V7 ?
 
-Note, the commit IDs are not guaranteed to be stable.
+> The comment
+> I requested is now ephemeral since it only existed in the commits Leon
+> dropped.  Also feel free to drop my Acks since I'll add new Sign-offs.
+> Thanks,
+
+OK, will drop them.
+
+>
+> Alex
+>
+
