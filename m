@@ -2,71 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 174DA5B26B9
-	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 21:30:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F6205B2714
+	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 21:47:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232177AbiIHTaq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Sep 2022 15:30:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48388 "EHLO
+        id S229703AbiIHTrD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Sep 2022 15:47:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232011AbiIHTan (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Sep 2022 15:30:43 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC2CEB0B03
-        for <kvm@vger.kernel.org>; Thu,  8 Sep 2022 12:30:42 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id n65-20020a17090a5ac700b001fbb4fad865so3511477pji.1
-        for <kvm@vger.kernel.org>; Thu, 08 Sep 2022 12:30:42 -0700 (PDT)
+        with ESMTP id S229677AbiIHTqq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Sep 2022 15:46:46 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D841F2968
+        for <kvm@vger.kernel.org>; Thu,  8 Sep 2022 12:46:45 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-32a115757b6so153479847b3.13
+        for <kvm@vger.kernel.org>; Thu, 08 Sep 2022 12:46:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=fcvRd1O2Y/KANTtdyoesNTyIloFS4ke6vSyrx2yWl+0=;
-        b=YZWQ3QL3kleCKGMOKPcZQTTSOUua7HgbvIaUm6127LKrx8FnGho8+fbe38fUZ3mXus
-         I4+fZ22MlG2yyE/oHGF3F7xAoKg2jdpx1aF4TYRsQa3Rja6efqPFjUgHN06TJkCkS8so
-         iMlrhf6QBFO7zAuWJjsL24NyPBEf9MAKVCDaWC8PZIwQJ422MXTan7yye+wc5RmpiX5M
-         0Vn0k85hbArBGbbbuz917aMPyEmtjONANCEjBjKG6Safq26tq8Kxt2+v4SEsCK+mGr/v
-         GzuwuLx9ZnUI4cccxfqxehBPd5pghz7iF9a0nfj3tFNumCpapuaL6O5UMyGyviCf7A8c
-         9lxw==
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date;
+        bh=BwMaAHPQSq+Wa0RYapafyYYY5QCLaYZSELDbulLZdJM=;
+        b=r0TmBIPME0tjb8WFKLcPHZJxmBLTq/TdlIWsA+xcj61Y3moaZ7zjsTG73K5nDDG0PX
+         0VUgefhx9PVoqGsdJcC5Y1ud63W/XjYJ+12PdX/6Ec+OU2xLoVcxZYMBIIVPRBxhOxD+
+         FuyOVyZ8zpRp02uBNK6FZeZoOGhC22L7GfWNFxggqtXFOp8M47vplnCSAO5m1QnYOdgY
+         F/rfD30Eyp3+8weeCy1EaWyMaEnzSxsJa/9iDzKXSb7Q1y9ev0eHm8JkBdH9PhlV6DUn
+         Dv8iJMgL04rUZNa2k01HhHFaxlocE97xQb3I0Sk5qgX/Cawoym3mC50pF5uHrCIwW6ui
+         c18A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=fcvRd1O2Y/KANTtdyoesNTyIloFS4ke6vSyrx2yWl+0=;
-        b=jiV79ywAGy3FYcXoRR+CtAHbQ334DhsehVT7Iegbd75AJzzJrowfNFIVNpZ4yDpaAO
-         mwse/rDPgzMizWplA7cv6rh/ObD4q7gk/p3EzoSa1KusjCt6MxV6aX2EAKn1AsybSD13
-         4r3RohvcaGiEGZX0djY3eEhHS1Oy08rkEK2ji5ZXdY2Wp0oxufI0NtUA1/fMpP+tMxFa
-         R2EvdmsSvES+G2cGjbiVvMczj2bLXPO2VDWvahuxxc47LQPY/UHP1wH2Efx/bTTzRKei
-         WjuprYyIwXri0OGEPS7PWodwOpN3A91VkHj4stjRx4GNua8v+jixYytR+6r6rFUlXJJ4
-         6Y2A==
-X-Gm-Message-State: ACgBeo2Cr34IRjN7jgJOBXERfkgWsBw1tgA2g6nwKr/mDF2fPwv3e+z0
-        ePvjgSo71i+9BFhIpAAZkNQNjA==
-X-Google-Smtp-Source: AA6agR7ATXILOLdSeMbYHQrC9oRCW+o2hRJZi32md31J4D4ms4v7fm8u6BpLJxaQZdloLRtUuEzgDg==
-X-Received: by 2002:a17:90b:2398:b0:200:a861:2e86 with SMTP id mr24-20020a17090b239800b00200a8612e86mr5685302pjb.233.1662665442033;
-        Thu, 08 Sep 2022 12:30:42 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id 15-20020a63184f000000b00434abd19eeasm6086737pgy.78.2022.09.08.12.30.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Sep 2022 12:30:41 -0700 (PDT)
-Date:   Thu, 8 Sep 2022 19:30:37 +0000
-From:   Sean Christopherson <seanjc@google.com>
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=BwMaAHPQSq+Wa0RYapafyYYY5QCLaYZSELDbulLZdJM=;
+        b=Bu+MnnWUzKjiTMP7KGkxhaYZ7oCa5fuBWoeuG2Es+1dXylGfgzTPI74ZXw9sfSlSsc
+         KuYCudTN1msajAnnULv9U+RLEIU7XgT5JIBafDvtYFpP4I+WIIljZ9hHwZ8fe4g7Op15
+         ZI0cnMPOuE14ngE0aObjwNZv7sZXy2pyWNWZDewGPiHMECtX+kbnUObzDvlxoQp+EYN4
+         Lvr/znyH8fzCzAbB6s321Y1qnMA+8VLLTr2UeNLVcH+PYhkrPaIhhWdQJofvMdpJ/jWg
+         YSHpzQzW5Ob3jNHY5/CFoaIdOcEA5BaguGwgdkFExpQ7rGomt7tBeD1aWLz52z9wWdke
+         jkxQ==
+X-Gm-Message-State: ACgBeo1UYBFWR47Gv8O29R3OTWDJrHaPJEsN0veKXT+1tqcdL2IyClRu
+        fVVsbkwjRskmSvFk4x9UAcn/s9ml6vKEwBdm6g==
+X-Google-Smtp-Source: AA6agR7HDhZRaErxg3Sv90RNlp2UCRnJMnsm+MgYyUzZRdgja4iGjR3KBfGxMGIUpbf1NxmcoQBgEczqf/h9egBw4g==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a25:9d8d:0:b0:676:a71d:edad with SMTP
+ id v13-20020a259d8d000000b00676a71dedadmr8374263ybp.94.1662666404785; Thu, 08
+ Sep 2022 12:46:44 -0700 (PDT)
+Date:   Thu, 08 Sep 2022 19:46:44 +0000
+In-Reply-To: <Yxo5lFuCRgbn+svL@google.com> (message from David Matlack on Thu,
+ 8 Sep 2022 11:51:00 -0700)
+Mime-Version: 1.0
+Message-ID: <gsntmtb9ps2j.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v2 2/3] KVM: selftests: Randomize which pages are written
+ vs read.
+From:   Colton Lewis <coltonlewis@google.com>
 To:     David Matlack <dmatlack@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH] KVM: selftests: Use TEST_REQUIRE() in nx_huge_pages_test
-Message-ID: <YxpC3du18wybv3OH@google.com>
-References: <20220812175301.3915004-1-oliver.upton@linux.dev>
- <YvaWKUs+/gLPjOOT@google.com>
- <YvanIQoL3Y3TlxPB@google.com>
- <YvrVKbRAoS1TyO44@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YvrVKbRAoS1TyO44@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        seanjc@google.com, oupton@google.com, ricarkol@google.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,76 +67,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 15, 2022, David Matlack wrote:
-> On Fri, Aug 12, 2022 at 07:16:49PM +0000, Oliver Upton wrote:
-> > On Fri, Aug 12, 2022 at 11:04:25AM -0700, David Matlack wrote:
-> > > On Fri, Aug 12, 2022 at 05:53:01PM +0000, Oliver Upton wrote:
-> > > > Avoid boilerplate for checking test preconditions by using
-> > > > TEST_REQUIRE(). While at it, add a precondition for
-> > > > KVM_CAP_VM_DISABLE_NX_HUGE_PAGES to skip (instead of silently pass) on
-> > > > older kernels.
+David Matlack <dmatlack@google.com> writes:
 
-...
+> On Tue, Aug 30, 2022 at 07:02:10PM +0000, Colton Lewis wrote:
+>> David Matlack <dmatlack@google.com> writes:
 
-> > > > +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_VM_DISABLE_NX_HUGE_PAGES));
-> > > 
-> > > This cap is only needed for run_test(..., true, ...) below so I don't think we should require it for the entire test.
-> > 
-> > It has always seemed that the test preconditions are a way to pretty-print
-> > a failure/skip instead of having some random ioctl fail deeper in the
-> > test.
-> > 
-> > If we really see value in adding predicates for individual test cases
-> > then IMO it deserves first-class support in our framework. Otherwise
-> > the next test that comes along is bound to open-code the same thing.
-> 
-> Fair point.
-> 
-> > 
-> > Can't folks just update their kernel? :-)
-> 
-> Consider my suggestion optional. If anyone is backporting this test to
-> their kernel they'll also probably backport
-> KVM_CAP_VM_DISABLE_NX_HUGE_PAGES ;). So I don't think there will be a
-> huge benefit of making the test more flexible.
+>> > On Wed, Aug 17, 2022 at 09:41:45PM +0000, Colton Lewis wrote:
+>> > > Randomize which tables are written vs read using the random number
+>> > > arrays. Change the variable wr_fract and associated function calls to
+>> > > write_percent that now operates as a percentage from 0 to 100 where X
+>> > > means each page has an X% chance of being written. Change the -f
+>> > > argument to -w to reflect the new variable semantics. Keep the same
+>> > > default of 100 percent writes.
 
-Yeah, I'm somewhat ambivalent as well.  All things considered, I think it makes
-sense to skip the entire test.  Like Oliver said, without first-class support,
-this will become a mess.  And I'm not convinced that adding first-class support
-is a good idea, as that will inevitably lead to tests ballooning to include a big
-pile of subtests, a la KUT's VMX test.  I would much rather steer selftests in a
-"one test per binary" direction; IMO it's easier to do filtering via scripts, and
-it also minimizes the chances of creating subtle dependencies between (sub)tests.
+>> > Doesn't the new option cause like a 1000x slowdown in "Dirty memory
+>> > time"?  I don't think we should merge this until that is understood and
+>> > addressed (and it should be at least called out here so that reviewers
+>> > can be made aware).
 
-So, pushed to branch `for_paolo/6.1` at:
 
-    https://github.com/sean-jc/linux.git
+>> I'm guessing you got that from my internally posted tests. This option
+>> itself does not cause the slowdown. If this option is set to 0% or 100%
+>> (the default), there is no slowdown at all. The slowdown I measured was
+>> at 50%, probably because that makes branch prediction impossible because
+>> it has an equal chance of doing a read or a write each time. This is a
+>> good thing. It's much more realistic than predictably alternating read
+>> and write.
 
-but with a rewritten shortlog+changelog to capture this conversation.  And that's
-a good lesson for the future as well: when piggybacking a patch, making functional
-changes as the "opportunistic cleanup" is rarely the right thing to do.
+> I found it hard to believe that branch prediction could affect
+> performance by 1000x (and why wouldn't random access order show the same
+> effect?) so I looked into it further.
 
-This is what I ended up with, holler if anything about it bothers you.
+> The cause of the slowdown is actually MMU lock contention:
 
-    KVM: selftests: Require DISABLE_NX_HUGE_PAGES cap for NX hugepage test
-    
-    Require KVM_CAP_VM_DISABLE_NX_HUGE_PAGES for the entire NX hugepage test
-    instead of skipping the "disable" subtest if the capability isn't
-    supported by the host kernel.  While the "enable" subtest does provide
-    value when the capability isn't supported, silently providing only half
-    the promised coveraged is undesirable, i.e. it's better to skip the test
-    so that the user knows something.
-    
-    Alternatively, the test could print something to alert the user instead
-    of silently skipping the subtest, but that would encourage other tests
-    to follow suit, and it's not clear that it's desirable to take selftests
-    in that direction.  And if selftests do head down the path of skipping
-    subtests, such behavior needs first-class support in the framework.
-    
-    Opportunistically convert other test preconditions to TEST_REQUIRE().
-    
-    Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-    Reviewed-by: David Matlack <dmatlack@google.com>
-    Link: https://lore.kernel.org/r/20220812175301.3915004-1-oliver.upton@linux.dev
-    [sean: rewrote changelog to capture discussion about skipping the test]
-    Signed-off-by: Sean Christopherson <seanjc@google.com>
+> -   82.62%  [k] queued_spin_lock_slowpath
+>     - 82.09% queued_spin_lock_slowpath
+>        - 48.36% queued_write_lock_slowpath
+>           - _raw_write_lock
+>              - 22.18% kvm_mmu_notifier_invalidate_range_start
+>                   __mmu_notifier_invalidate_range_start
+>                   wp_page_copy
+>                   do_wp_page
+>                   __handle_mm_fault
+>                   handle_mm_fault
+>                   __get_user_pages
+>                   get_user_pages_unlocked
+>                   hva_to_pfn
+>                   __gfn_to_pfn_memslot
+>                   kvm_faultin_pfn
+>                   direct_page_fault
+>                   kvm_tdp_page_fault
+>                   kvm_mmu_page_fault
+>                   handle_ept_violation
+
+> I think the bug is due to the following:
+
+>   1. Randomized reads/writes were being applied to the Populate phase,
+>      which (when using anonymous memory) results in the guest memory being
+>      mapped to the Zero Page.
+>   2. The random access order changed across each iteration (Population
+>      phase included) which means that some pages were written to during  
+> each
+>      iteration for the first time. Those pages resulted in a copy-on-write
+>      in the host MM fault handler, which invokes the invalidate range
+>      notifier and acquires the MMU lock in write-mode.
+>   3. All vCPUs are doing this in parallel which results in a ton of lock
+>      contention.
+
+> Your internal test results also showed that performance got better
+> during each iteration. That's because more and more of the guest memory
+> has been faulted in during each iteration (less and less copy-on-write
+> faults that need to acquire the MMU lock in write-mode).
+
+
+Thanks for the analysis David. I had wondered about the effects of
+randomized reads/writes during the populate phase.
+
+> The proper fix for v4 would be to set write-percent to 100 during the
+> populate phase so all memory actually gets populated. Then only use the
+> provided write-percent for testing dirty logging.
+
+
+Will do that.
