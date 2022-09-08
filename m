@@ -2,121 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AEB5D5B2405
-	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 18:56:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EEA7F5B2459
+	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 19:24:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231685AbiIHQ4C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Sep 2022 12:56:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51780 "EHLO
+        id S231366AbiIHRX4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Sep 2022 13:23:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230177AbiIHQze (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Sep 2022 12:55:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B65FEEA612
-        for <kvm@vger.kernel.org>; Thu,  8 Sep 2022 09:54:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662656029;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jM/4652ZU+ilVOa2VHytxd0Y/6mr00fBnuvbs8bYj04=;
-        b=N0aOXGfqg3S0hTNZAmU/RDZ08+tSlbFs8zkGWndRcaJ126Dg756kLwS4sNvo0EZMPd3paf
-        7aCH0P7neweC8YU/vPL1RlI5ZbzuyWVlV5z96tRTYC6msoX9ohWSOJZmjqQSJ1Z/IfRGN2
-        UwHjI1lqlsXPszvhKNheqlNcFbg/eSA=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-437-9M-Lj376OQW-Rg4qXbaPwg-1; Thu, 08 Sep 2022 12:53:48 -0400
-X-MC-Unique: 9M-Lj376OQW-Rg4qXbaPwg-1
-Received: by mail-io1-f71.google.com with SMTP id y10-20020a5d914a000000b00688fa7b2252so11734334ioq.0
-        for <kvm@vger.kernel.org>; Thu, 08 Sep 2022 09:53:47 -0700 (PDT)
+        with ESMTP id S231131AbiIHRXx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Sep 2022 13:23:53 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB4E6EB87E
+        for <kvm@vger.kernel.org>; Thu,  8 Sep 2022 10:23:51 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id i15-20020a17090a4b8f00b0020073b4ac27so3165053pjh.3
+        for <kvm@vger.kernel.org>; Thu, 08 Sep 2022 10:23:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date;
+        bh=0RNd0xzxjuuqcXZ1VJEa1kbSJZUe0y9yps+WlJN0nCg=;
+        b=AStEFPv3MsxwGRwF6reOs3E+AdAfGuwDLh3caMiejk1AmBHiCn4VVhxqlp/ipyPW+d
+         EPhoNhRoA4JdlYbMqQ0UGdAgtGVg2UsQKmzZVzpjN+lTIP0NlfHdQ2yGQ9DrAMMZ30SX
+         uVZn2PHOdKJH++hE5CJ9+N3tFc2EL55mtTCFyhMMJ/ZJXJxHJJq1slFtGD0R6hQJv/75
+         G9q2wrKRrF0ZC4YJlHGPxq7hI2S05U46l/XA4fssLZKW3eieAVQXjbGZ8At1MpgD8cAn
+         d6f8yXUmqBASFtgYVVdQbPKpy6PUJjv4u0x36I0pllO7F8dpz3qXfLyOqsnYn9L52vcV
+         SaPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=jM/4652ZU+ilVOa2VHytxd0Y/6mr00fBnuvbs8bYj04=;
-        b=57ghbo8EyiV9jJGHR1wtTW1RdzkZYMMiB0T9PEXdOmvq/YQV4LafGAzTy5XER5egVO
-         +NH8f87U/iWRPTf36AIVklqpMLTJGaQ7+QN+mQA88o19N7um9iMbvAuJuLu4tnakZURE
-         0nN/69fvwPdRakU9jyVF21s+/wk/W0mPDzWTL8MCawxTgB6mCWo4shYuFu8pTlydOzfz
-         Cai5gimJFURIzQx/pS6bxgt572mw0HMliR4w5Ei8r7AJPMmwJ6epoXkIQHuvYJJNQ5nH
-         yBk13QORsdLhkqgddsu9eE9XF4R5dWBNaoiM8uo0g3Hx/uXYJD+JI2XhTI04QGDSJkOP
-         6kvA==
-X-Gm-Message-State: ACgBeo19k8/SicAWaN3DlFmLx0FbnOK5Ic4xTc8CVs8B6Ihr7dAU+3nh
-        VAu3Bn0CCo6ewwAATeIKQJk+lTPttL7uhxf7lRKKaue7wJygr7ZXpy3GknZncGIp4n+jZCnwLym
-        Ia93VVxow19IV
-X-Received: by 2002:a05:6602:2c95:b0:689:e4e2:2c02 with SMTP id i21-20020a0566022c9500b00689e4e22c02mr4502054iow.94.1662656027339;
-        Thu, 08 Sep 2022 09:53:47 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR4C0Z1a3e1j36Z0x3OLIC8ipRTXLsZlmpzmGPoLTlCAR7z8o7PJmPC/zPVvPBR23LI13B82fg==
-X-Received: by 2002:a05:6602:2c95:b0:689:e4e2:2c02 with SMTP id i21-20020a0566022c9500b00689e4e22c02mr4502042iow.94.1662656027114;
-        Thu, 08 Sep 2022 09:53:47 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id g8-20020a92d7c8000000b002e67267b4bfsm1025299ilq.70.2022.09.08.09.53.46
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=0RNd0xzxjuuqcXZ1VJEa1kbSJZUe0y9yps+WlJN0nCg=;
+        b=UPREW2pWqVhV8IZGn+NmUeCK2F5xgytFTTGLxhzl1nhmkwByrmsNjvzhzszZB7vYya
+         AP3auWWQIb3ZPQlVd4gW9bTOlISZ03tCiqZ70oOOm3iKp6yL/glc0z0+7RaHQJr6U+Rw
+         HgCK/DrxFo5GTx7YT4Oi3GqXDjez+AwpOnNhEMgHr9nbI2DGTkssLY/Hbr4LJJB2icq7
+         OYcfSUa/+rMvywd0xWhJEjRrJgTQFUs6g+vPuVVa62j0adTpSv+of1P6I4Kg58y6GiE3
+         xQCAuHd3R24zsJ3Zhytro6sft24JnKrwT2UA+ciCN0PYInhj4W0lAgAkm1Ios50TUPub
+         WmQQ==
+X-Gm-Message-State: ACgBeo3caX/owVJ3jNFdXPjkIPOy9Q+2vuVzz261agk3PHzZG8R+vh2d
+        eSE93ZcKorKdnrcNyVtbNEVop2eBK4EPfg==
+X-Google-Smtp-Source: AA6agR5F50kewz5m2ZSHQ7DFQHRcr0K1iO6dsHody3ESwzgSbB/84P12G79GhGBm3Z71Gvuxpfg94Q==
+X-Received: by 2002:a17:902:be01:b0:176:8bc3:b379 with SMTP id r1-20020a170902be0100b001768bc3b379mr10154520pls.109.1662657831302;
+        Thu, 08 Sep 2022 10:23:51 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id d6-20020a170902654600b00172dc6e1916sm9901814pln.220.2022.09.08.10.23.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Sep 2022 09:53:46 -0700 (PDT)
-Date:   Thu, 8 Sep 2022 10:53:45 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Leon Romanovsky <leon@kernel.org>
-Cc:     saeedm@nvidia.com, kvm@vger.kernel.org, netdev@vger.kernel.org,
-        kuba@kernel.org, kevin.tian@intel.com, joao.m.martins@oracle.com,
-        yishaih@nvidia.com, maorg@nvidia.com, cohuck@redhat.com
-Subject: Re: [GIT PULL] Please pull mlx5 vfio changes
-Message-ID: <20220908105345.28da7c98.alex.williamson@redhat.com>
-In-Reply-To: <YxmMMR3u1VRedWdK@unreal>
-References: <20220907094344.381661-1-leon@kernel.org>
-        <20220907132119.447b9219.alex.williamson@redhat.com>
-        <YxmMMR3u1VRedWdK@unreal>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        Thu, 08 Sep 2022 10:23:50 -0700 (PDT)
+Date:   Thu, 8 Sep 2022 17:23:47 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Uros Bizjak <ubizjak@gmail.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] KVM/VMX: Do not declare vmread_error asmlinkage
+Message-ID: <YxolI46A4Vvh1gW2@google.com>
+References: <20220817144045.3206-1-ubizjak@gmail.com>
+ <YxDSTU+pWBdZgs/Q@google.com>
+ <CAFULd4aQvHczwv1rZz6QJ6wEfjd0ORB_3rQdmP-PtfasNxe3rw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFULd4aQvHczwv1rZz6QJ6wEfjd0ORB_3rQdmP-PtfasNxe3rw@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 8 Sep 2022 09:31:13 +0300
-Leon Romanovsky <leon@kernel.org> wrote:
-
-> On Wed, Sep 07, 2022 at 01:21:19PM -0600, Alex Williamson wrote:
-> > On Wed,  7 Sep 2022 12:43:44 +0300
-> > Leon Romanovsky <leon@kernel.org> wrote:
-> >   
-> > > Hi Alex,
-> > > 
-> > > This series is based on clean 6.0-rc4 as such it causes to two small merge
-> > > conficts whis vfio-next. One is in thrird patch where you should take whole
-> > > chunk for include/uapi/linux/vfio.h as is. Another is in vfio_main.c around
-> > > header includes, which you should take too.  
-> > 
-> > Is there any reason you can't provide a topic branch for the two
-> > net/mlx5 patches and the remainder are rebased and committed through
-> > the vfio tree?    
+On Thu, Sep 01, 2022, Uros Bizjak wrote:
+> On Thu, Sep 1, 2022 at 5:40 PM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Wed, Aug 17, 2022, Uros Bizjak wrote:
+> > > There is no need to declare vmread_error asmlinkage, its arguments
+> > > can be passed via registers for both, 32-bit and 64-bit targets.
+> > > Function argument registers are considered call-clobbered registers,
+> > > they are saved in the trampoline just before the function call and
+> > > restored afterwards.
+> > >
+> > > Note that asmlinkage and __attribute__((regparm(0))) have no effect
+> > > on 64-bit targets. The trampoline is called from the assembler glue
+> > > code that implements its own stack-passing function calling convention,
+> > > so the attribute on the trampoline declaration does not change anything
+> > > for 64-bit as well as 32-bit targets. We can declare it asmlinkage for
+> > > documentation purposes.
+> >
+> > ...
+> >
+> > > diff --git a/arch/x86/kvm/vmx/vmx_ops.h b/arch/x86/kvm/vmx/vmx_ops.h
+> > > index 5cfc49ddb1b4..550a89394d9f 100644
+> > > --- a/arch/x86/kvm/vmx/vmx_ops.h
+> > > +++ b/arch/x86/kvm/vmx/vmx_ops.h
+> > > @@ -10,9 +10,9 @@
+> > >  #include "vmcs.h"
+> > >  #include "../x86.h"
+> > >
+> > > -asmlinkage void vmread_error(unsigned long field, bool fault);
+> > > -__attribute__((regparm(0))) void vmread_error_trampoline(unsigned long field,
+> > > -                                                      bool fault);
+> > > +void vmread_error(unsigned long field, bool fault);
+> > > +asmlinkage void vmread_error_trampoline(unsigned long field,
+> > > +                                     bool fault);
+> > >  void vmwrite_error(unsigned long field, unsigned long value);
+> > >  void vmclear_error(struct vmcs *vmcs, u64 phys_addr);
+> > >  void vmptrld_error(struct vmcs *vmcs, u64 phys_addr);
+> >
+> > If it's ok with you, I'll split this into two patches.  One to drop asmlinkage
+> > from vmread_error(), and one to convert the open coded regparm to asmlinkage.
 > 
-> You added your Acked-by to vfio/mlx5 patches and for me it is a sign to
-> prepare clean PR with whole series.
-> 
-> I reset mlx5-vfio topic to have only two net/mlx5 commits without
-> special tag.
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git topic/mlx5-vfio
-> Everything else can go directly to your tree without my intervention.
+> Sure, please go ahead.
 
-Sorry, I knew the intention initially was to send a PR and I didn't
-think about the conflicts we'd have versus the base you'd use.  Thanks
-for splitting this out, I think it'll make for a cleaner upstream path
-given the clear code split.
+On second thought, even though "__attribute__((regparm(0)))" doesn't actually do
+anything for 64-bit targets, I'd prefer to keep the open coded weirdness _because_
+the whole thing is open coded weirdness.  The attribute isn't strictly necessary
+for 32-bit targets either since the CALL is emitted from inline assembly.  
 
-Yishai, can you post a v7 rebased on the vfio next branch?  The comment
-I requested is now ephemeral since it only existed in the commits Leon
-dropped.  Also feel free to drop my Acks since I'll add new Sign-offs.
-Thanks,
+I now remember that I added the explicit regparm(0) to try and document that
+vmread_error_trampoline() _always_ passes params on the stack, even for 64-bit
+targets, i.e. even if "asmlinkage" is a nop.
 
-Alex
+Alternatively, given that the trampoline exists purely to support inline asm, i.e.
+should never be called from C code in any circumstance, what about turning the
+function declaration into an opaque symbol and then writing a proper comment.
+
+That way, attempting to invoke vmread_error_trampoline() from C yields:
+
+arch/x86/kernel/../kvm/vmx/vmx_ops.h: In function ‘__vmcs_readl’:
+arch/x86/kernel/../kvm/vmx/vmx_ops.h:113:2: error: called object ‘vmread_error_trampoline’ is not a function or function pointer
+  113 |  vmread_error_trampoline(field, false);
+      |  ^~~~~~~~~~~~~~~~~~~~~~~
+arch/x86/kernel/../kvm/vmx/vmx_ops.h:33:22: note: declared here
+   33 | extern unsigned long vmread_error_trampoline;
+      |                      ^~~~~~~~~~~~~~~~~~~~~~~
+---
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 8 Sep 2022 10:17:40 -0700
+Subject: [PATCH] KVM: VMX: Make vmread_error_trampoline() uncallable from C
+ code
+
+Declare vmread_error_trampoline() as an opaque symbol so that it cannot
+be called from C code, at least not without some serious fudging.  The
+trampoline always passes parameters on the stack so that the inline
+VMREAD sequence doesn't need to clobber registers.  regparm(0) was
+originally added to document the stack behavior, but it ended up being
+confusing because regparm(0) is a nop for 64-bit targets.
+
+Opportunustically wrap the trampoline and its declaration in #ifdeffery
+to make it even harder to invoke incorrectly, to document why it exists,
+and so that it's not left behind if/when CONFIG_CC_HAS_ASM_GOTO_OUTPUT
+is true for all supported toolchains.
+
+No functional change intended.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/vmx/vmenter.S |  2 ++
+ arch/x86/kvm/vmx/vmx_ops.h | 18 ++++++++++++++++--
+ 2 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+index 8477d8bdd69c..24c54577ac84 100644
+--- a/arch/x86/kvm/vmx/vmenter.S
++++ b/arch/x86/kvm/vmx/vmenter.S
+@@ -269,6 +269,7 @@ SYM_FUNC_END(__vmx_vcpu_run)
+ 
+ .section .text, "ax"
+ 
++#ifndef CONFIG_CC_HAS_ASM_GOTO_OUTPUT
+ /**
+  * vmread_error_trampoline - Trampoline from inline asm to vmread_error()
+  * @field:	VMCS field encoding that failed
+@@ -317,6 +318,7 @@ SYM_FUNC_START(vmread_error_trampoline)
+ 
+ 	RET
+ SYM_FUNC_END(vmread_error_trampoline)
++#endif
+ 
+ SYM_FUNC_START(vmx_do_interrupt_nmi_irqoff)
+ 	/*
+diff --git a/arch/x86/kvm/vmx/vmx_ops.h b/arch/x86/kvm/vmx/vmx_ops.h
+index ec268df83ed6..7ea99e6b4908 100644
+--- a/arch/x86/kvm/vmx/vmx_ops.h
++++ b/arch/x86/kvm/vmx/vmx_ops.h
+@@ -11,14 +11,28 @@
+ #include "../x86.h"
+ 
+ void vmread_error(unsigned long field, bool fault);
+-__attribute__((regparm(0))) void vmread_error_trampoline(unsigned long field,
+-							 bool fault);
+ void vmwrite_error(unsigned long field, unsigned long value);
+ void vmclear_error(struct vmcs *vmcs, u64 phys_addr);
+ void vmptrld_error(struct vmcs *vmcs, u64 phys_addr);
+ void invvpid_error(unsigned long ext, u16 vpid, gva_t gva);
+ void invept_error(unsigned long ext, u64 eptp, gpa_t gpa);
+ 
++#ifndef CONFIG_CC_HAS_ASM_GOTO_OUTPUT
++/*
++ * The VMREAD error trampoline _always_ uses the stack to pass parameters, even
++ * for 64-bit targets.  Preserving all registers allows the VMREAD inline asm
++ * blob to avoid clobbering GPRs, which in turn allows the compiler to better
++ * optimize sequences of VMREADs.
++ *
++ * Declare trampoline as an opaque label as it's not safe to call from C code;
++ * there is no way to tell the compiler to pass params on the stack for 64-bit
++ * targets.
++ *
++ * void vmread_error_trampoline(unsigned long field, bool fault);
++ */
++extern unsigned long vmread_error_trampoline;
++#endif
++
+ static __always_inline void vmcs_check16(unsigned long field)
+ {
+ 	BUILD_BUG_ON_MSG(__builtin_constant_p(field) && ((field) & 0x6001) == 0x2000,
+
+base-commit: d2a22504d86e106c63236e4d6a085c2ac91bfa73
+-- 
 
