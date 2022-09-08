@@ -2,130 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A56B45B2149
-	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 16:53:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 90C345B215B
+	for <lists+kvm@lfdr.de>; Thu,  8 Sep 2022 16:56:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231981AbiIHOw7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Sep 2022 10:52:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34364 "EHLO
+        id S232292AbiIHO4K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Sep 2022 10:56:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230433AbiIHOwn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Sep 2022 10:52:43 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5925A114A51
-        for <kvm@vger.kernel.org>; Thu,  8 Sep 2022 07:52:41 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id v1so4788853plo.9
-        for <kvm@vger.kernel.org>; Thu, 08 Sep 2022 07:52:41 -0700 (PDT)
+        with ESMTP id S232630AbiIHO4H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Sep 2022 10:56:07 -0400
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8176DE2911
+        for <kvm@vger.kernel.org>; Thu,  8 Sep 2022 07:56:03 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 186-20020a1c02c3000000b003b26feb5c6bso1879245wmc.5
+        for <kvm@vger.kernel.org>; Thu, 08 Sep 2022 07:56:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=MSOIR1a3zpSQbiZ6BxPUkenjZWqqxMNPgXiYxLKVulI=;
-        b=RLVPcDpNX2GnFwnSbFL5yGt59wXXkRKxKVNl72IL/oZLJCNR/eLAAMRNdr73flqdKd
-         SqVbnNaPqH+Vm/EZCMTsTZZKDX5rVxdhvCEeKgQy7PL36Ij6SeeW4nugFiu8VtvcjH0Y
-         pR2xGndeDBoAd4gpmj4z6+3ysMZLV+Du1vm7FjGTD58Pr1tEGtuPdFYgHoJ5yUTEHbeg
-         pJCRO2WCx6v86IuCkjbimtYkg2IocCaaxFb3DSj9rHku3XGDiFCT1NOk8xuRWm8HZp63
-         +CHd6T/DKvwrt8ayn69Ll7D9iQ45VETFtSa1jdamPPiINe+d+sLlRHc31r4Eny22F6i/
-         JE7w==
+        d=profian-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
+        bh=ryNqK5MU3hvexcP0lqXzZYDdmqazm1TBDaWSc1Bec88=;
+        b=A+h3uk/z3zVLJRHckmNM4YxWpnH5mOtpniwEZgYBiShH8dX2ke8mlhluujBLTZaei9
+         rjyudPZLRVKoqa/kHk9XhTDRWTKV43CDnaG0QLijNIyvSfrtjtiEVrj0kxDbfaY+ExKT
+         S5DCBpVsRIsn3n7OmhoxhBZ2HYrO2tv189HgUJWmO7wCJcpLLgs+TXtdnwB89i7oREl+
+         bVaCOFRUFvKec6ZZ+32wyYO5lcjci9ktt29wYfSloA1IuJ9BrNjvCjoFwkZh/k/OZ9rQ
+         TWACHfJtoez2REps42w6sKBP7786aGnvKGae62AysmEoW9BUPSijQNuBTaWxzHhysHeb
+         AAdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=MSOIR1a3zpSQbiZ6BxPUkenjZWqqxMNPgXiYxLKVulI=;
-        b=lku9ms+qRXj0nRMftqdRwo4nTZ0ZHIzy3uPZB95nAE4sWBY5xSfmq/DVzFW109F9NG
-         JHaSN8DtUMgwdSCl9KIGHDOVWe8w5ZjH/erzVT7Lq1l9Oy2Yaso4Zt4ojsRMLnC7hrV8
-         on2+Kx1iy/fLKrWuSgwD4SqJ8ETyZuzrX/WbR5cybBMnGd6y1Fg6adHtxjB0LBwfQhdI
-         0cQJdwh94cmE4umNzRvSgVeyR8c7UwLzHMgFtbnUWQ40fWNM4ZAl8NWqQnAz0gLzIt28
-         xbcpo+DQftpZXls9087iWgqYtuwtpXT2C8MFSjc/3rpTCHa8chJd0jl89CAeKp3MvpUw
-         Vrxw==
-X-Gm-Message-State: ACgBeo3TyoCSVjaCu3n6dR49YQ0JWYJqpKBLJ9tuDJhFn20fKcMFEZAK
-        aYrxrZydHK9+UXibxPdeLnU3mw==
-X-Google-Smtp-Source: AA6agR5pAPjlU4QMW3Yf7UfXUukfPnrbXzt5ySBoXQZbL5vKiH5NLEwPnDBy79QFCjmCnxNF8tQU3w==
-X-Received: by 2002:a17:902:ce11:b0:172:6f2c:a910 with SMTP id k17-20020a170902ce1100b001726f2ca910mr9281976plg.156.1662648760765;
-        Thu, 08 Sep 2022 07:52:40 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id j4-20020a63fc04000000b0040caab35e5bsm12880736pgi.89.2022.09.08.07.52.40
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=ryNqK5MU3hvexcP0lqXzZYDdmqazm1TBDaWSc1Bec88=;
+        b=VcU8aaim0urhp87+MHmVLO7TzWehdF40Kl+wvIdlCGWM/DD1f0p/s1qq/daZANJDe2
+         IhAXRg06Kouc0w2Iku4wK5Ya8tHgyF+5BFAVotGtNlgaIzzRk2dLc+To4gcNgbKJL3yT
+         JQH2rUZ9lXhjJbqIzScSkiddJaTZsHdbEf5tkrKiKPaFn1U6DR/5sD5bdhB3d9nD54b9
+         nIdeL1ZaoL4atqEQakWg8Y4k5tnWIygzEHPB67xA85tl02LOeIQW0x/rCsNTEFIkfwJY
+         Yb61Q5Gy9mVglTrIlJaF66uNmPVChznrf5CfLvuxjvH7l9UMLrQSJSYH+WWFqsRPPEfe
+         5IoQ==
+X-Gm-Message-State: ACgBeo3ao8GugAazkRxF5gQiDiOvpjb/HmlR4QQbI5Bt9fePQG8RrD9r
+        5ZqAK6RWv74wcFZuTkCKyjC3Sg==
+X-Google-Smtp-Source: AA6agR60ZmA7z2Rw4x/+vVZJ8ouM6ug3aiG0VoToRr4xXb6X+ui1JU9//Z03osUcjGe8LanO+R1DlA==
+X-Received: by 2002:a05:600c:1d1e:b0:3a5:4f8d:743f with SMTP id l30-20020a05600c1d1e00b003a54f8d743fmr2501614wms.121.1662648961741;
+        Thu, 08 Sep 2022 07:56:01 -0700 (PDT)
+Received: from fedora.fritz.box (p200300c1c7162d00e01b57df2fb57c15.dip0.t-ipconnect.de. [2003:c1:c716:2d00:e01b:57df:2fb5:7c15])
+        by smtp.gmail.com with ESMTPSA id fc15-20020a05600c524f00b003a5260b8392sm3440304wmb.23.2022.09.08.07.56.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Sep 2022 07:52:40 -0700 (PDT)
-Date:   Thu, 8 Sep 2022 14:52:36 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Gerd Hoffmann <kraxel@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] kvm/x86: reserve bit
- KVM_HINTS_PHYS_ADDRESS_SIZE_DATA_VALID
-Message-ID: <YxoBtD+3sgEEiaFF@google.com>
-References: <20220908114146.473630-1-kraxel@redhat.com>
+        Thu, 08 Sep 2022 07:56:01 -0700 (PDT)
+From:   Harald Hoyer <harald@profian.com>
+To:     ashish.kalra@amd.com
+Cc:     ak@linux.intel.com, alpergun@google.com, ardb@kernel.org,
+        bp@alien8.de, dave.hansen@linux.intel.com, dgilbert@redhat.com,
+        dovmurik@linux.ibm.com, hpa@zytor.com, jarkko@kernel.org,
+        jmattson@google.com, jroedel@suse.de, kirill@shutemov.name,
+        kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, luto@kernel.org, marcorr@google.com,
+        michael.roth@amd.com, mingo@redhat.com, pbonzini@redhat.com,
+        peterz@infradead.org, pgonda@google.com, rientjes@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, seanjc@google.com,
+        slp@redhat.com, srinivas.pandruvada@linux.intel.com,
+        tglx@linutronix.de, thomas.lendacky@amd.com, tobin@ibm.com,
+        tony.luck@intel.com, vbabka@suse.cz, vkuznets@redhat.com,
+        x86@kernel.org, Harald Hoyer <harald@profian.com>
+Subject: [[PATCH for v6]] KVM: SEV: fix snp_launch_finish
+Date:   Thu,  8 Sep 2022 16:55:57 +0200
+Message-Id: <20220908145557.1912158-1-harald@profian.com>
+X-Mailer: git-send-email 2.37.1
+In-Reply-To: <6a513cf79bf71c479dbd72165faf1d804d77b3af.1655761627.git.ashish.kalra@amd.com>
+References: <6a513cf79bf71c479dbd72165faf1d804d77b3af.1655761627.git.ashish.kalra@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220908114146.473630-1-kraxel@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 08, 2022, Gerd Hoffmann wrote:
-> The KVM_HINTS_PHYS_ADDRESS_SIZE_DATA_VALID bit hints to the guest
-> that the size of the physical address space as advertised by CPUID
-> leaf 0x80000008 is actually valid and can be used.
-> 
-> Unfortunately this is not the case today with qemu.  Default behavior is
-> to advertise 40 address bits (which I think comes from the very first x64
-> opteron processors).  There are lots of intel desktop processors around
-> which support less than that (36 or 39 depending on age), and when trying
-> to use the full 40 bit address space on those things go south quickly.
-> 
-> This renders the physical address size information effectively useless
-> for guests.  This patch paves the way to fix that by adding a hint for
-> the guest so it knows whenever the physical address size is usable or
-> not.
-> 
-> The plan for qemu is to set the bit when the physical address size is
-> valid.  That is the case when qemu is started with the host-phys-bits=on
-> option set for the cpu.  Eventually qemu can also flip the default for
-> that option from off to on, unfortunately that isn't easy for backward
-> compatibility reasons.
-> 
-> The plan for the firmware is to check that bit and when it is set just
-> query and use the available physical address space.  When the bit is not
-> set be conservative and try not exceed 36 bits (aka 64G) address space.
-> The latter is what the firmware does today unconditionally.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  arch/x86/include/uapi/asm/kvm_para.h | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/include/uapi/asm/kvm_para.h b/arch/x86/include/uapi/asm/kvm_para.h
-> index 6e64b27b2c1e..115bb34413cf 100644
-> --- a/arch/x86/include/uapi/asm/kvm_para.h
-> +++ b/arch/x86/include/uapi/asm/kvm_para.h
-> @@ -37,7 +37,8 @@
->  #define KVM_FEATURE_HC_MAP_GPA_RANGE	16
->  #define KVM_FEATURE_MIGRATION_CONTROL	17
->  
-> -#define KVM_HINTS_REALTIME      0
-> +#define KVM_HINTS_REALTIME                      0
-> +#define KVM_HINTS_PHYS_ADDRESS_SIZE_DATA_VALID  1
+The `params.auth_key_en` indicator does _not_ specify, whether an
+ID_AUTH struct should be sent or not, but, wheter the ID_AUTH struct
+contains an author key or not. The firmware always expects an ID_AUTH block.
 
-Why does KVM need to get involved?  This is purely a userspace problem.  E.g. why
-not use QEMU's fw_cfg to communicate this information to the guest?
+Link: https://lore.kernel.org/all/cover.1655761627.git.ashish.kalra@amd.com/
+Signed-off-by: Harald Hoyer <harald@profian.com>
+---
+ arch/x86/kvm/svm/sev.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Defining this flag arguably breaks backwards compatibility for VMMs that already
-accurately advertise MAXPHYADDR.  The absence of the flag would imply that MAXPHYADDR
-is invalid, which is not the case.
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 85357dc4d231..5cf4be6a33ba 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2242,17 +2242,18 @@ static int snp_launch_finish(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 
+ 		data->id_block_en = 1;
+ 		data->id_block_paddr = __sme_pa(id_block);
+-	}
+ 
+-	if (params.auth_key_en) {
+ 		id_auth = psp_copy_user_blob(params.id_auth_uaddr, KVM_SEV_SNP_ID_AUTH_SIZE);
+ 		if (IS_ERR(id_auth)) {
+ 			ret = PTR_ERR(id_auth);
+ 			goto e_free_id_block;
+ 		}
+ 
+-		data->auth_key_en = 1;
+ 		data->id_auth_paddr = __sme_pa(id_auth);
++
++		if (params.auth_key_en) {
++			data->auth_key_en = 1;
++		}
+ 	}
+ 
+ 	data->gctx_paddr = __psp_pa(sev->snp_context);
+-- 
+2.37.1
+
