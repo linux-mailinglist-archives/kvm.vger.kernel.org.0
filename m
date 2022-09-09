@@ -2,164 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8542E5B3796
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 14:23:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 344785B380F
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 14:44:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229788AbiIIMTD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 08:19:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44820 "EHLO
+        id S230235AbiIIMlc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 08:41:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231535AbiIIMSd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 08:18:33 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2788140532
-        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 05:15:33 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 289C8brY036758
-        for <kvm@vger.kernel.org>; Fri, 9 Sep 2022 12:15:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=M58L4znoDSn0AMCV7ZMPG6x8EIuyXMbM468Kw0/zs6A=;
- b=kWegfeioW++xvlYjEpunaveR90do8FLvyJzAqkbtYNx3vRwZN5ifT1EnvlN8RoALFC2x
- nwaJetUhW9ul+i9tWs/rG7aC9RUvTPg5egPlrjfv65J7pdEOEirjJo2D74T0C8xs4HRR
- o2Kqj/PsIbn/Cfh7BkI4gT8cJXHvXfNOZKUtLOYBia1BBlG+pSTfjkp/SirtNsSdQayp
- MbFUMn9g4Yn8qfax6zSaVUVPg2m+M2Il6pvJ9VcJ6dG8j53qZDHGOavkPikByCW3Rbak
- tQmX+ehCcWxHWUrP/Fv7p/VNQuioWAk2KjWWiCLo77gzEr/4EqT3jIb+yTdMXun/ogBG 5g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jg2ttmkew-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 09 Sep 2022 12:15:00 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 289C9DYk000852
-        for <kvm@vger.kernel.org>; Fri, 9 Sep 2022 12:15:00 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jg2ttmke8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Sep 2022 12:14:59 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 289C6Tqh001308;
-        Fri, 9 Sep 2022 12:14:58 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04fra.de.ibm.com with ESMTP id 3jbxj8nvvx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Sep 2022 12:14:57 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 289CEsmQ41353548
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 9 Sep 2022 12:14:55 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DFB8542041;
-        Fri,  9 Sep 2022 12:14:54 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id ADE8B42042;
-        Fri,  9 Sep 2022 12:14:54 +0000 (GMT)
-Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  9 Sep 2022 12:14:54 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v3 2/2] s390x: create persistent comm-key
-Date:   Fri,  9 Sep 2022 14:14:53 +0200
-Message-Id: <20220909121453.202548-3-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220909121453.202548-1-nrb@linux.ibm.com>
-References: <20220909121453.202548-1-nrb@linux.ibm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: p_pt4Iz-lo6P0dL0XJDydXWD3xvHlE5J
-X-Proofpoint-GUID: 9rNb2u2OUBC6d70_1pHPYZOGsr681U-N
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-09_06,2022-09-09_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
- malwarescore=0 suspectscore=0 bulkscore=0 clxscore=1015 lowpriorityscore=0
- adultscore=0 mlxlogscore=999 impostorscore=0 priorityscore=1501
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2209090042
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229789AbiIIMlb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 08:41:31 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D81C1E3D44
+        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 05:41:28 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2D1A261D0E
+        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 12:41:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BB0EC433D6;
+        Fri,  9 Sep 2022 12:41:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662727287;
+        bh=CLH7ZAjFywwJOIlljcX2EP88lBse8oQ2fMjAzTCF1yk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=LZ3wjBZRidQBor81kcrDhinncaY29SFDVDQ3PzjIlLQ6mFWpYjSJF+5qWZL+Qhy7w
+         ugcS9lxO866hiuPdRIUH+zI7+C9d1hOZM0AAzGCMNBZuwgSK5r+OjJbRZ8ilX7jQdM
+         /3grJNdunCYsCKsMA6NgsxkQna9EB3b580gEgv05Fx3UwLB2SVSvcA50PvMM7LSNIs
+         GC6gyBHwev7AbzyslXk6zn3U6Qx0fM85kjI0b6nEEkbXuvHFZxCW8D+UVrPjJ5iL+P
+         sWOQGG2+wSv7ScPcPW7WcWGrp5IKgwXAXw2DLZNmTFDV1KlN6iZ0qU7BgJjKXYwW1Y
+         Wa6f+sj20S3sw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oWdK1-009BPp-AH;
+        Fri, 09 Sep 2022 13:41:25 +0100
+Date:   Fri, 09 Sep 2022 13:41:24 +0100
+Message-ID: <87bkrora8b.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: Don't set PSTATE.SS when Software Step state is Active-pending
+In-Reply-To: <20220909044636.1997755-2-reijiw@google.com>
+References: <20220909044636.1997755-1-reijiw@google.com>
+        <20220909044636.1997755-2-reijiw@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, ricarkol@google.com, oliver.upton@linux.dev, jingzhangos@google.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To decrypt the dump of a PV guest, the comm-key (CCK) is required. Until
-now, no comm-key was provided to genprotimg, therefore decrypting the
-dump of a kvm-unit-test under PV was not possible.
+Hi Reiji,
 
-This patch makes sure that we create a random CCK if there's no
-$(TEST_DIR)/comm.key file.
+On Fri, 09 Sep 2022 05:46:34 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> Currently, PSTATE.SS is set on every guest entry if single-step is
+> enabled for the vCPU by userspace.  However, it could cause extra
+> single-step execution without returning to userspace, which shouldn't
+> be performed, if the Software Step state at the last guest exit was
+> Active-pending (i.e. the last exit was not triggered by Software Step
+> exception, but by an asynchronous exception after the single-step
+> execution is performed).
 
-Also allow dumping of PV tests by passing the appropriate PCF to
-genprotimg (bit 34). --x-pcf is used to be compatible with older
-genprotimg versions, which don't support --enable-dump. 0xe0 is the
-default PCF value and only bit 34 is added.
+For my own enlightenment, could you describe a sequence of events that
+leads to this issue?
 
-Unfortunately, recent versions of genprotimg removed the --x-comm-key
-argument which was used by older versions to specify the CCK. To support
-these versions, we need to parse the genprotimg help output and decide
-which argument to use.
+> 
+> Fix this by not setting PSTATE.SS on guest entry if the Software
+> Step state at the last exit was Active-pending.
+> 
+> Fixes: 337b99bf7edf ("KVM: arm64: guest debug, add support for single-step")
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  3 +++
+>  arch/arm64/kvm/debug.c            | 19 ++++++++++++++++++-
+>  arch/arm64/kvm/guest.c            |  1 +
+>  arch/arm64/kvm/handle_exit.c      |  2 ++
+>  4 files changed, 24 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index e9c9388ccc02..4cf6eef02565 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -535,6 +535,9 @@ struct kvm_vcpu_arch {
+>  #define IN_WFIT			__vcpu_single_flag(sflags, BIT(3))
+>  /* vcpu system registers loaded on physical CPU */
+>  #define SYSREGS_ON_CPU		__vcpu_single_flag(sflags, BIT(4))
+> +/* Software step state is Active-pending */
+> +#define DBG_SS_ACTIVE_PENDING	__vcpu_single_flag(sflags, BIT(5))
+> +
+>  
+>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+>  #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index 0b28d7db7c76..125cfb94b4ad 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -188,7 +188,16 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>  		 * debugging the system.
+>  		 */
+>  		if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
+> -			*vcpu_cpsr(vcpu) |=  DBG_SPSR_SS;
+> +			/*
+> +			 * If the software step state at the last guest exit
+> +			 * was Active-pending, we don't set DBG_SPSR_SS so
+> +			 * that the state is maintained (to not run another
+> +			 * single-step until the pending Software Step
+> +			 * exception is taken).
+> +			 */
+> +			if (!vcpu_get_flag(vcpu, DBG_SS_ACTIVE_PENDING))
+> +				*vcpu_cpsr(vcpu) |= DBG_SPSR_SS;
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
----
- s390x/Makefile | 26 ++++++++++++++++++++++----
- 1 file changed, 22 insertions(+), 4 deletions(-)
+I guess my confusion stems from my (probably wrong) interpretation if
+the SS state is A+P, there is no harm in making it pending again
+(setting the SS bit in PSTATE).
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index d17055ebe6a8..d1a7bf6004a1 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -162,15 +162,33 @@ $(SNIPPET_DIR)/c/%.hdr: $(SNIPPET_DIR)/c/%.gbin $(HOST_KEY_DOCUMENT)
- 	$(RM) $(@:.elf=.aux.o)
- 	@chmod a-x $@
- 
-+# Secure Execution Customer Communication Key file
-+# 32 bytes of key material, uses existing one if available
-+comm-key = $(TEST_DIR)/comm.key
-+$(comm-key):
-+	dd if=/dev/urandom of=$@ bs=32 count=1 status=none
-+
- %.bin: %.elf
- 	$(OBJCOPY) -O binary  $< $@
- 
--genprotimg_args = --host-key-document $(HOST_KEY_DOCUMENT) --no-verify
-+# The genprotimg arguments for the cck changed over time so we need to
-+# figure out which argument to use in order to set the cck
-+GENPROTIMG_HAS_COMM_KEY = $(shell $(GENPROTIMG) --help | grep -q -- --comm-key && echo yes)
-+ifeq ($(GENPROTIMG_HAS_COMM_KEY),yes)
-+	GENPROTIMG_COMM_KEY = --comm-key $(comm-key)
-+else
-+	GENPROTIMG_COMM_KEY = --x-comm-key $(comm-key)
-+endif
-+
-+# use x-pcf to be compatible with old genprotimg versions
-+# allow dumping + PCKMO
-+genprotimg_pcf = 0x200000e0
-+genprotimg_args = --host-key-document $(HOST_KEY_DOCUMENT) --no-verify $(GENPROTIMG_COMM_KEY) --x-pcf $(genprotimg_pcf)
- 
--%selftest.pv.bin: %selftest.bin $(HOST_KEY_DOCUMENT) $(patsubst %.pv.bin,%.parmfile,$@)
-+%selftest.pv.bin: %selftest.bin $(HOST_KEY_DOCUMENT) $(patsubst %.pv.bin,%.parmfile,$@) $(comm-key)
- 	$(GENPROTIMG) $(genprotimg_args) --parmfile $(patsubst %.pv.bin,%.parmfile,$@) --image $< -o $@
- 
--%.pv.bin: %.bin $(HOST_KEY_DOCUMENT)
-+%.pv.bin: %.bin $(HOST_KEY_DOCUMENT) $(comm-key)
- 	$(GENPROTIMG) $(genprotimg_args) --image $< -o $@
- 
- $(snippet_asmlib): $$(patsubst %.o,%.S,$$@) $(asm-offsets)
-@@ -178,7 +196,7 @@ $(snippet_asmlib): $$(patsubst %.o,%.S,$$@) $(asm-offsets)
- 
- 
- arch_clean: asm_offsets_clean
--	$(RM) $(TEST_DIR)/*.{o,elf,bin} $(SNIPPET_DIR)/*/*.{o,elf,*bin,*obj,hdr} $(SNIPPET_DIR)/asm/.*.d $(TEST_DIR)/.*.d lib/s390x/.*.d
-+	$(RM) $(TEST_DIR)/*.{o,elf,bin} $(SNIPPET_DIR)/*/*.{o,elf,*bin,*obj,hdr} $(SNIPPET_DIR)/asm/.*.d $(TEST_DIR)/.*.d lib/s390x/.*.d $(comm-key)
- 
- generated-files = $(asm-offsets)
- $(tests:.elf=.o) $(asmlib) $(cflatobjs): $(generated-files)
+> +
+>  			mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
+>  			mdscr |= DBG_MDSCR_SS;
+
+But it looks like the *pending* state is actually stored in MDSCR
+instead? The spec only mentions this for the A+P state, so this is
+quite likely a bug indeed.
+
+Now, where does the asynchronous exception comes into play? I found
+this intriguing remark in the ARM ARM:
+
+<quote>
+The Software Step exception has higher priority than all other types
+of synchronous exception. However, the prioritization of this
+exception with respect to any unmasked pending asynchronous exception
+is not defined by the architecture.
+</quote>
+
+Is this what you were referring to in the commit message? I think you
+need to spell it out for us, as I don't fully understand what you are
+fixing nor do I understand the gory details of single-stepping...
+
+Thanks,
+
+	M.
+
 -- 
-2.36.1
-
+Without deviation from the norm, progress is not possible.
