@@ -2,268 +2,275 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CD0515B2F0F
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 08:33:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 517285B2F4D
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 08:54:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230518AbiIIGdC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 02:33:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34644 "EHLO
+        id S230342AbiIIGyR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 02:54:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231206AbiIIGc7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 02:32:59 -0400
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2051.outbound.protection.outlook.com [40.107.101.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A325612FBA3;
-        Thu,  8 Sep 2022 23:32:42 -0700 (PDT)
+        with ESMTP id S229550AbiIIGyP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 02:54:15 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86DDB130878;
+        Thu,  8 Sep 2022 23:54:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662706454; x=1694242454;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=ntdSXbuwNzppL2dPta51O5KloWO51GN+zOglJ9/G4so=;
+  b=V0sMe+4UFMpps+WsvV5Qr3wXmK7hAn6DCsBt11tEMouEnJR7WHEcD9/h
+   C5aCuY6Q96jGDsaohZWYts1fT49FYbrPOtn76Odz54zqMp2wVWLcdWi7W
+   +QMbyMmUt3p5MU5J1BOxhw7/AXjdEzkNkMOub2s2sfbaqBtozZjAU3nni
+   hVl+YVxAGYxK5YQPyu1w3ENNjCp288cP+L6cGGCWACuP0YNZAUI3jKwj8
+   I6d5GR75E4gz1kbWRcFKY7eBu4kXNxdFd3XfNLXxXoNMO0/eJMOyZvg55
+   GDsKd5LFC9jSepU9bvSGWknd1iCI8NJ7Tk3gHxo9nqSgYkLgWEnSNs0cR
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10464"; a="277800809"
+X-IronPort-AV: E=Sophos;i="5.93,302,1654585200"; 
+   d="scan'208";a="277800809"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2022 23:54:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,302,1654585200"; 
+   d="scan'208";a="860316109"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga006.fm.intel.com with ESMTP; 08 Sep 2022 23:54:13 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 8 Sep 2022 23:54:13 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 8 Sep 2022 23:54:13 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Thu, 8 Sep 2022 23:54:13 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.49) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Thu, 8 Sep 2022 23:54:13 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PJLuKmyA+8xHTWdPbVforSAJLxAUJTRgnBwzUQVzb9q4sK+WJKKjaL4JBytln/8oc6qt3A9hjLhZ5jmhUsBu4F6X8ZQvxyHQAuNPE5GPwQovEoyGWMFBBFImv+tYYPkg2MMJKPgi7QsYl/qck5ux70J3dnYjjKg9M8kOTDJB7FkK1CFyu6HsC1d1DXuvsBbJ510K06leJydj7U572IM0AlnCtt3nSc9WSlQXgjtDQSrD9zOMvs/0WLxaBzJdDCAXyXa+jsYYFYGpqpXGY6ZeC73GELtCu8D5/BU48vAzfzMyMCBYsrEiSjHZUo0MIh8NIcjb1+T6vv69IVpzuooPjQ==
+ b=XWn+NZiquY0OEcqgIgPRPy4TCOhshgUQ8+Tj8qOvBl1k4j/9CqqgoQ7j7gQ9DMrtT4QLh1Ok7RVTxp0G69gHMyD8kIS0Tzt6U+uUMOgtKEAoxpRJN+jhQEIyoZ/7gX9NAU40cgtL9/ouBPYCwWZghABOApYk81qyromqdepxOrrrn7sXaEO/fzA6ORz2a/sTPRCNhtmmBbGMzlQfLUOJJzfvfdd0Ns1HH6ej5babSnUBiT4OqlvSvsq7IqGtIAdGEGQ/ckS0Gc9im13zQl65ValJ55oPBnzpJPblSN26NF7zU90l2o4uySv+XCA84qxD2SXbpNWOPsgq54YNqaUL1A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QSRQKWmzEX8KUN0inT0jtl6hfMmA7GEiRMsBBu3qpOc=;
- b=izcZWcPm+sYZv3yH+sqJ7shkFOuQU1cSNMRTw9me8aMc7RTxWU88SnJL8YOp5TpR9T89D0KqaHxDgdVUPS5QBnWb+8060c9+PoZKNpBqDIs+AFXqHyc3ZPwTMJH/bjVVS/kwHwSjTWSav5ndgEa7rS1jlK2bTI9TQYD5eYp0Kn5dlYg6DwNfkEdXK90imEqEJzn1b9rjuEi+nuIKugyvD12Ke8HUluiNy6Ys6jUVapeD5hg1DsTvW2KNCTav6H3SCUBPZ/70vAVyNfMEQN/C0o0jZDpO+Wdpvx4s54AlnLV/N7eNzuRsc/z8W1jQTbEkrontmDqqSuGddAXnagHyrQ==
+ bh=+lCWymx+Z5D+nqwiU3GGOLeezpKuePx62vTunfgfpB0=;
+ b=FzHingQG6zoxCWkLAqlchOJkCDT5Y/DgfkvHDUvudOIOovojCAa5YYJGnO6yDRrUK6lE0uIGp8c3pwhiRxGCpluhbiWGOFUtaP6ILjWgtfW5A18Y5SDaWi31VA9ZtYaS+preIu0UTIaTv7yxJmpzJmBI0z+F4PPjcpiFihpESE7ra6cTNdWdkzufBhdHz0PQbv5cXlxl36L72Fg8HDS6dSiERa5BqzUafRBmP7ETy/f/xZ7ehK/84YwVPeXp9UZyhg5ye2krD8iMVry41QzJLIFvw34F/PHML5bydfVl0HJF29gwS2Km0cRdv9B/nsfUKG5pia6gRHw/BBLmPHylpA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QSRQKWmzEX8KUN0inT0jtl6hfMmA7GEiRMsBBu3qpOc=;
- b=s6VRxgw4RBBDeL5S5x7k/8damgyubWEuRk1Ck/Y9kxjGb7z5ULeu529O/dhSn0wwKQC1+Oe5gOKdUaqIQDEithsMU6ytuNxshQZn6s6+VmNFCexRtzz1rp+1PLJm+ylTgwPKlq+4w/c+1bsgaeNsVfcLlrQh8N90Zz3+E3hzykk=
-Received: from DM6PR12MB3082.namprd12.prod.outlook.com (2603:10b6:5:11b::12)
- by CH0PR12MB5265.namprd12.prod.outlook.com (2603:10b6:610:d0::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5612.14; Fri, 9 Sep
- 2022 06:32:39 +0000
-Received: from DM6PR12MB3082.namprd12.prod.outlook.com
- ([fe80::4c82:abe6:13a6:ac74]) by DM6PR12MB3082.namprd12.prod.outlook.com
- ([fe80::4c82:abe6:13a6:ac74%3]) with mapi id 15.20.5612.019; Fri, 9 Sep 2022
- 06:32:39 +0000
-From:   "Gupta, Nipun" <Nipun.Gupta@amd.com>
-To:     Marc Zyngier <maz@kernel.org>
-CC:     "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "krzysztof.kozlowski+dt@linaro.org" 
-        <krzysztof.kozlowski+dt@linaro.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "Gupta, Puneet (DCG-ENG)" <puneet.gupta@amd.com>,
-        "song.bao.hua@hisilicon.com" <song.bao.hua@hisilicon.com>,
-        "mchehab+huawei@kernel.org" <mchehab+huawei@kernel.org>,
-        "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-        "jeffrey.l.hugo@gmail.com" <jeffrey.l.hugo@gmail.com>,
-        "saravanak@google.com" <saravanak@google.com>,
-        "Michael.Srba@seznam.cz" <Michael.Srba@seznam.cz>,
-        "mani@kernel.org" <mani@kernel.org>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "jgg@ziepe.ca" <jgg@ziepe.ca>, "jgg@nvidia.com" <jgg@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "will@kernel.org" <will@kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "masahiroy@kernel.org" <masahiroy@kernel.org>,
-        "ndesaulniers@google.com" <ndesaulniers@google.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "okaya@kernel.org" <okaya@kernel.org>,
-        "Anand, Harpreet" <harpreet.anand@amd.com>,
-        "Agarwal, Nikhil" <nikhil.agarwal@amd.com>,
-        "Simek, Michal" <michal.simek@amd.com>,
-        "Radovanovic, Aleksandar" <aleksandar.radovanovic@amd.com>,
-        "git (AMD-Xilinx)" <git@amd.com>
-Subject: RE: [RFC PATCH v3 4/7] bus/cdx: add cdx-MSI domain with gic-its
- domain as parent
-Thread-Topic: [RFC PATCH v3 4/7] bus/cdx: add cdx-MSI domain with gic-its
- domain as parent
-Thread-Index: AQHYwfd0JTWjzcxYd0KhDb1ncGWS4a3T9LKAgAFC20CAAGNkAIAA5oJA
-Date:   Fri, 9 Sep 2022 06:32:39 +0000
-Message-ID: <DM6PR12MB3082C642F8948236AE42E07DE8439@DM6PR12MB3082.namprd12.prod.outlook.com>
-References: <20220803122655.100254-1-nipun.gupta@amd.com>
-        <20220906134801.4079497-1-nipun.gupta@amd.com>
-        <20220906134801.4079497-5-nipun.gupta@amd.com>  <87h71juxuk.wl-maz@kernel.org>
-        <DM6PR12MB30821367EC37FDE33DC47A25E8409@DM6PR12MB3082.namprd12.prod.outlook.com>
- <87a67aueg7.wl-maz@kernel.org>
-In-Reply-To: <87a67aueg7.wl-maz@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-09-09T06:32:36Z;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=5ceb8ef2-e88b-4a36-b3aa-702033e716cc;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR12MB3082:EE_|CH0PR12MB5265:EE_
-x-ms-office365-filtering-correlation-id: 2f8b207a-50cb-4792-930b-08da922d1781
-x-ld-processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: JB0Ps8ajz5tqpC2paoFXlej0p1JmJjSI+D3cB9c4OfbrVxSu8VouUI76jqSYJUqsz3eTSFWIS0wQiuYETmH9U4GSdXjwltrHu2qPWcAlbkzWLCeP8SGy0TIwjiLKzr6RdwAgIg5GUjXiYLp1/iX+OtR8GimYQAQSDcJbkyVlCkwWH4kVZzS5uSeHLkUAWoRToKDKSLNr5Zg2AxC/HpsqevahytWwrd8EJjd8nuSu139dk1yyMw9MCpG2R3tZesFEAObeat0F92C7RlxC4I7B3UTJa/4dM6M0yBDPxXfMmhX3HpIFyWgacQUYUI2c1M0qA1Q3koEWeDn0CAIJnhX4rF7FbWQoSEenzZPHTsOiw2utYnFDEXbCZdLsMAeSg+eB4zjvKXLXWtgKUpLHKDenOVetVohQOnflDr5YxAvCnEjsFr6YECNY1+Jj1iJQ06CA2tXtr/25HJWvds0/BacE146NrEmbj3M9GVHAtweuT5Viy8FbK6HPcTJq4g4TNhlOeLdl1g/1HcTmwOm5aG63/yHyuL4prSSo84mvBbcH/tOaLiPTpJDlM3CIK/NvS6GOLOrvJFbvDcGLDFiaEShkucP4hq+KFbil+Ap+2Z6fQ5XSKYUfS53KtS8WkH1TYsZCGAmP99n5Nq4DgkctuZ7gLkJMXJEOOGf5SmndwQ1/2bgI525XxVQA+RKfWV9FvvxUgT+mzu1m7c38uMgkfzY67mH3dRtQVb1YiBw0mV6PUYWv87EulZ8ML2PyH9ZoY2XNMxGQblABxZXc4rSc0msbcQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3082.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(346002)(376002)(366004)(39860400002)(396003)(136003)(76116006)(66946007)(66556008)(66476007)(66446008)(64756008)(8676002)(4326008)(86362001)(7406005)(41300700001)(52536014)(8936002)(7416002)(5660300002)(26005)(53546011)(9686003)(7696005)(2906002)(6506007)(478600001)(54906003)(6916009)(316002)(71200400001)(38100700002)(186003)(83380400001)(55016003)(122000001)(38070700005)(33656002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?ue4CsNqLkAjjQfNtkQT2ccBZAX+W0Scgxil/IesuEcJTCg2Jir0Eh/kv2NTQ?=
- =?us-ascii?Q?jOQp1YSNM82Q2/IQRtaGFL8H6bEqMeuL6hrqWd1YVTSUto4St6hdjalx0HO3?=
- =?us-ascii?Q?vfKR/oWWSyMZkXe2YUP+nkWQpTjgEtDMKgL8DhzUVQEUuefZKcp7pE1E/ZTw?=
- =?us-ascii?Q?AYJng9W4ZBVe3FPM9uQd/jdJrCZBmCWh1hZjVvLWNa08rybEuRh7E/QY/lTU?=
- =?us-ascii?Q?vRT/6MV2YFX3njbFEwzkfbLoXuey4/DHbEJBiM8VVuSZkX0GQIkGm2ob4+e4?=
- =?us-ascii?Q?lpmzNykfFBA+pXgXBszfVBHvxIXPz3u1X0kJv96bY3Hy0AaLIclqxqt6aom2?=
- =?us-ascii?Q?WkDlyJU0vYeo/S0hxnVwkvwcc7pZ9hjknXaiwEkNV9T9jlCWUehfJ/kwfzi6?=
- =?us-ascii?Q?I+crG6gZ94XmhsduQ372PglvdqEt6IWSF/nweLI4zasXBedOZzTOMlEGV58l?=
- =?us-ascii?Q?EQWTGDeZqJHfD9DhAzjTcRHgIbYBJc37ATwLeHDrEcaydO13OuBpBd33Ziie?=
- =?us-ascii?Q?g4NGTyLU39RHE+lyvd4QHhP8/5JQ73B1ljsNSFKYvu68RuhIQDiJFLZziUVn?=
- =?us-ascii?Q?tKUn3fqviAua2YyICjkhwrsOxtrltmrqEDg3DZ3tVVLaddOry5Ol+Dnm73JM?=
- =?us-ascii?Q?+HYqV8gxF4VOrsq/FbQh7yOoG2uUL1hzjcSf66VmD13lNHCv9lFF6LX8ZM5R?=
- =?us-ascii?Q?yWpTNzZ7IP3LxUWrm0XHUSFx5xLjzn9e+zUJS8X6wfTjkEJslp4e3HgcGVh3?=
- =?us-ascii?Q?W7MUBKDXP9G7lnhsPuu+3tuntlmmJtntzPjyk6/s8hWU/rYV5np8f5nAdXum?=
- =?us-ascii?Q?hpp4LDYwuDk0cZT/Dm0sEOlxRZDh055dgeDOX1cVgp2d9zlJfgi2A6ibznKK?=
- =?us-ascii?Q?BtWxnYRab4iSwWSuPCxC4n1vZzhpdFr53PiapwiYAbjApR99WNZsfLPOyDn3?=
- =?us-ascii?Q?yuJ7xgdcFxreDjAbn9H7V3H2HqI/OJil3wv1mg/a3iIsJuHqCEiEhpZmB8gG?=
- =?us-ascii?Q?7qP87LYQXDrHWIcjZsYTAaKSTb+OWsjjBNUSDlY8o3DZ9JFuHlHXd2Ax+gt9?=
- =?us-ascii?Q?9UeHFim119jE1UlB15J6qak62foNvZY03tXSuhog3xGb0kAy3RZfLEIqBtl0?=
- =?us-ascii?Q?n9SsjOZrc9EAOU8dr5L1Bu0gsNZfWj37tJM6A+TPobVI2JdCSN1vR8M1ulDg?=
- =?us-ascii?Q?JWeXRJZi9eCiaEqxfy8wKl4NnUf9Dqiim58va1Y3kGFZL6UlePBVmgLcBCZn?=
- =?us-ascii?Q?BOmiKKHcyqjdng5fzuWj27+zTBkdUGoPVI32lQC8Cvz2/UTcHASRXDsk43QY?=
- =?us-ascii?Q?Sy9Zz3tMHUqwWnKyLE+KryzL4XnkgCoHDwIWC+iGHjTQ4OqFvF9eeowWnSUl?=
- =?us-ascii?Q?R9uXuOwa5XGbjwxiwi4jKt50E8GTL+iV9c2EtOrizrLpIHTVPsjmzsJRZXZI?=
- =?us-ascii?Q?GX2sZOziNOFhMribAOYqdgqNfd+J911LqDCaixySlzyJial3X1TQ1oLeIo0w?=
- =?us-ascii?Q?IlcghXrWIcyxNHSWKP3o6EprkUvzhE7I75x526wejr5rQRlbfqMq3zBB0dya?=
- =?us-ascii?Q?34zhSgrN9g1CuZ5XdLE=3D?=
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MWHPR1101MB2221.namprd11.prod.outlook.com
+ (2603:10b6:301:53::18) by BL3PR11MB6362.namprd11.prod.outlook.com
+ (2603:10b6:208:3b5::8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5546.18; Fri, 9 Sep
+ 2022 06:54:10 +0000
+Received: from MWHPR1101MB2221.namprd11.prod.outlook.com
+ ([fe80::e9a3:201:f95c:891e]) by MWHPR1101MB2221.namprd11.prod.outlook.com
+ ([fe80::e9a3:201:f95c:891e%7]) with mapi id 15.20.5612.019; Fri, 9 Sep 2022
+ 06:54:10 +0000
+Date:   Fri, 9 Sep 2022 14:54:05 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     <isaku.yamahata@intel.com>
+CC:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        Yuan Yao <yuan.yao@linux.intel.com>,
+        <isaku.yamahata@gmail.com>, Kai Huang <kai.huang@intel.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Shaokun Zhang <zhangshaokun@hisilicon.com>,
+        Qi Liu <liuqi115@huawei.com>,
+        John Garry <john.garry@huawei.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        "Huang Ying" <ying.huang@intel.com>,
+        Huacai Chen <chenhuacai@kernel.org>
+Subject: Re: [PATCH v4 16/26] KVM: kvm_arch.c: Remove a global variable,
+ hardware_enable_failed
+Message-ID: <YxrjDdn5xCxrJYUT@gao-cwp>
+References: <cover.1662679124.git.isaku.yamahata@intel.com>
+ <60ca73d7d931ec8046ac50b20f05723a97ef643b.1662679124.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+In-Reply-To: <60ca73d7d931ec8046ac50b20f05723a97ef643b.1662679124.git.isaku.yamahata@intel.com>
+X-ClientProxiedBy: SG2PR02CA0002.apcprd02.prod.outlook.com
+ (2603:1096:3:17::14) To MWHPR1101MB2221.namprd11.prod.outlook.com
+ (2603:10b6:301:53::18)
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWHPR1101MB2221:EE_|BL3PR11MB6362:EE_
+X-MS-Office365-Filtering-Correlation-Id: 443a93c2-6b03-4943-13b0-08da92301931
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: kG1b3cScdBhgA56TPu9bCYOKsZTuecHNhZ1QwWJ+y4h7fCq2VGVZ8Yq9WPoClSkLzQ0CHRFZH8rAIb5dYj0RSy6Uzt+Fq/fAeoU5xdkU1DmrjuuGnIGOa5pPzdIDE1+ZHCJ0f3YrLiNxgg9SdJr0YzGtU1OROnTfmwuma76I5QPySVzbIKSJTW8qHcTk/BtX7fYyoSNaVCxsa1Y7O2qVjO3+hiCtsaKMavDnbQLFndyhIcZCEHFDQiXid+YrWzHCZNvZwuKB67V1qa3goa/8HKVZGyIV5Xw6plhlybnTr4k9kd/md6DMP6R2xAcvo5X88+r936cXWESTxAKC5U3EtGemM5sD0aWm8APU08yzHIxXvpwDWr3fiob5Mj/PBu1WFGoatTu+XIVrrjZ+LpVXcw1kFycxl814Nea93gqjZxr7/QXtXM9tS9rzgMZOF3fatj34v1sUoNesqtyPv9A6pxO9Iq7ayCBuwrj2CatKsgV2a3KBR8CyD2MLGqnP07RTaZiaGAw08MB0JGtqbCuQc9ktQy7BXZKJ4TsciTBYOwgvhTyiV6F9AtUDkZHP7+QqfhM3sf8qmtK9M04j2HPSp3bFX3PYWsK3cImcRDL6GoNShY2EJ71SoQvpHpFyO0tCfE9vhxxfp7ZxyQrXmTJgSfEADu2I0NqNBw8ZIgBB7vmjHcS6oXCznC67ObEgMzdKTTrV95WGcjOsSA2eQJbxYA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1101MB2221.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(7916004)(366004)(39860400002)(346002)(136003)(396003)(376002)(9686003)(6512007)(41300700001)(33716001)(26005)(6666004)(6506007)(7416002)(34206002)(83380400001)(8676002)(5660300002)(66946007)(44832011)(66476007)(66556008)(8936002)(4326008)(186003)(6486002)(6636002)(54906003)(316002)(82960400001)(478600001)(86362001)(2906002)(38100700002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?OEtpOXcOBKWpoqnNc4T5yLU4EOlGyyJIUVhfWGTuS1yMi+XViFdYDR++g2eG?=
+ =?us-ascii?Q?cjDd27WXgpfFFP93bhD5J615Wt9tfZS/1LyAthzcj+cOrnFv3BA7q+WvEbKZ?=
+ =?us-ascii?Q?oaRTKFfWuHID/C3UZRpYiYiFqZ6qcgcqobwRqd1G3EZAgkiFpuwUSChFzze7?=
+ =?us-ascii?Q?VcsoaOA95QDwhhXApBCtBtt1JkCB/NgqjGqXnvDQkGsy25qaR+I0oydX41U/?=
+ =?us-ascii?Q?9qcleGW+BdeyZDWbG1Jv2blV0Y1ITNmGQm/ZyAXUURLVeEFySD/3XYMCeA19?=
+ =?us-ascii?Q?EqgLcEwm1rnebdrZUu5aeKVc4S24EnDFAq6kKtF/AGiDM3VF/bGjDi3EIEO7?=
+ =?us-ascii?Q?T22cJWfniQFMkx6U24SeFCopa5aq/MTAW9RHAhoTcdJpU/r5rrvT38QwdBkU?=
+ =?us-ascii?Q?piaiYisM0JKdcDC/3km0Klt3Shpf3QT83byvVAzdR42jjq8y1SOG+VvVMXXK?=
+ =?us-ascii?Q?/UT83Aht665aT0wHrtAICq3VswnNkveGcy1JxeVNcaMdI3akcZZNOv0CFOmH?=
+ =?us-ascii?Q?DXCdf/kd8k5OXzWiYQTZwxOEM2zg0UtJrDWDhV2sgczCprLUEKbbJCfN+NUL?=
+ =?us-ascii?Q?nzRYzDWRy8GJM6cS84p2/4c2lUmZJcw03rmE6K984JpPj5bQuCxtOHZhspVe?=
+ =?us-ascii?Q?48iPUm/JUZZYw4DQRcVfEKu1Da3LVtGzqVxir2NX8VtP19FqNUQM1g/t+EOf?=
+ =?us-ascii?Q?CLuF3u3/ySPUsVJb8NdRE+lC1hzTKpSZ9wK/gN5avh7yR1i3L7KB2O1i3j8N?=
+ =?us-ascii?Q?fyRu5cLaOWSffSX2qtefFR9FEe8iapm3piYeDAW7K7t+oDQykdDw1idRKd0w?=
+ =?us-ascii?Q?a6kbRTnYAqf469pQZfQ3v/ry1yWho+mmuSQVxlEQqUjT7yYxZVbCDjhxMydX?=
+ =?us-ascii?Q?GKiZQ03/l7Jlx0/2eKK+9mRdusffYUeUMuwWdQEvDFYkj0CZOWLfehh7pfq/?=
+ =?us-ascii?Q?Ax9MopEXhLw7GsDTCQLC0O1Y02yMAAN6lJCfRwBQqGEd0GGQsA9FX38Yhti2?=
+ =?us-ascii?Q?cTtbR/6XpKcZx1AKb62wIjU8JZP8MOYMsGiEGXNP+ZIQvUBq2XvyEaEK1iUd?=
+ =?us-ascii?Q?5vIM52mrhZfh+r9hZ+CUyTwGb6Z0ilWHJTjTYxsamRQx4OYK9243GQai7KO/?=
+ =?us-ascii?Q?EC/0+grY0UEj5/sgp7IlTaPpxiZOnavOOtnXdFtENdqGegtUSdHKeMi/PI4m?=
+ =?us-ascii?Q?0XAcCe3gTWIbL4AmgDMPp027BPPPrQf3SdK6J8ZlteGrJ+Qwk9ax0ViEUMFs?=
+ =?us-ascii?Q?tx6li/sekMJpzDvQODz/fZK8be6dwPBHoAwl/cRdFR0+IfdDun8GQTtjq8+5?=
+ =?us-ascii?Q?+F3GyxPhCAxf8er+z4e2AuEVatvQDzprExfblhQR+Vfam99T7i/SkIaP1Qze?=
+ =?us-ascii?Q?Ui8qTEjaavteuUvocgt4AER5hm+69p04KPIfKFnKKgJYw1Jc/97axhlJKpWI?=
+ =?us-ascii?Q?uD2A6HZNFLS1mwTXeYELJ/i69QI+LLK1reETZnHvUzIwWXFTEjTLjIrrgfSS?=
+ =?us-ascii?Q?jWgRfqzi18dlHtvwxRBIgL/lAbSC2K0B2scXEmdEp2j/gTs8PXt3jixKD4jE?=
+ =?us-ascii?Q?1uAAEn7Gxzj0rhkr23km6dw7VCW1S2GzpDLiRPaw?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 443a93c2-6b03-4943-13b0-08da92301931
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR1101MB2221.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3082.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f8b207a-50cb-4792-930b-08da922d1781
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Sep 2022 06:32:39.1585
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2022 06:54:10.6328
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 74hsKhiHTqZaIBHNgHe2MkCByXIlSZWnvs9Cmg1Atb4YwW5wU6Pw9GVkW1XITtpq
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5265
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SwgyLMM9yetI0l84GIKldNT0x6wfRu+wYlKjH4MwNATLzSY4Wvt7RJFjiB9Lc9t0Wavq/rDA4oV6o7vj6s/zng==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6362
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[AMD Official Use Only - General]
+On Thu, Sep 08, 2022 at 04:25:32PM -0700, isaku.yamahata@intel.com wrote:
+>From: Isaku Yamahata <isaku.yamahata@intel.com>
+>
+>A global variable hardware_enable_failed in kvm_arch.c is used only by
+>kvm_arch_add_vm() and hardware_enable().  It doesn't have to be a global
+>variable.  Make it function local.
+>
+>Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 
+Reviewed-by: Chao Gao <chao.gao@intel.com>
 
+>---
+> virt/kvm/kvm_arch.c | 62 ++++++++++++++++++++++-----------------------
+> 1 file changed, 31 insertions(+), 31 deletions(-)
+>
+>diff --git a/virt/kvm/kvm_arch.c b/virt/kvm/kvm_arch.c
+>index 4fe16e8ef2e5..ad23537ebe3b 100644
+>--- a/virt/kvm/kvm_arch.c
+>+++ b/virt/kvm/kvm_arch.c
+>@@ -13,14 +13,13 @@
+> #include <linux/kvm_host.h>
+> 
+> static cpumask_t cpus_hardware_enabled = CPU_MASK_NONE;
+>-static atomic_t hardware_enable_failed;
+> 
+> __weak int kvm_arch_post_init_vm(struct kvm *kvm)
+> {
+> 	return 0;
+> }
+> 
+>-static void hardware_enable(void *caller_name)
+>+static int __hardware_enable(void *caller_name)
 
-> -----Original Message-----
-> From: Marc Zyngier <maz@kernel.org>
-> Sent: Thursday, September 8, 2022 8:00 PM
-> To: Gupta, Nipun <Nipun.Gupta@amd.com>
-> Cc: robh+dt@kernel.org; krzysztof.kozlowski+dt@linaro.org;
-> gregkh@linuxfoundation.org; rafael@kernel.org; eric.auger@redhat.com;
-> alex.williamson@redhat.com; cohuck@redhat.com; Gupta, Puneet (DCG-ENG)
-> <puneet.gupta@amd.com>; song.bao.hua@hisilicon.com;
-> mchehab+huawei@kernel.org; f.fainelli@gmail.com; jeffrey.l.hugo@gmail.com=
-;
-> saravanak@google.com; Michael.Srba@seznam.cz; mani@kernel.org;
-> yishaih@nvidia.com; jgg@ziepe.ca; jgg@nvidia.com; robin.murphy@arm.com;
-> will@kernel.org; joro@8bytes.org; masahiroy@kernel.org;
-> ndesaulniers@google.com; linux-arm-kernel@lists.infradead.org; linux-
-> kbuild@vger.kernel.org; linux-kernel@vger.kernel.org;
-> devicetree@vger.kernel.org; kvm@vger.kernel.org; okaya@kernel.org; Anand,
-> Harpreet <harpreet.anand@amd.com>; Agarwal, Nikhil
-> <nikhil.agarwal@amd.com>; Simek, Michal <michal.simek@amd.com>;
-> Radovanovic, Aleksandar <aleksandar.radovanovic@amd.com>; git (AMD-Xilinx=
-)
-> <git@amd.com>
-> Subject: Re: [RFC PATCH v3 4/7] bus/cdx: add cdx-MSI domain with gic-its
-> domain as parent
->=20
-> [CAUTION: External Email]
->=20
-> On Thu, 08 Sep 2022 15:13:31 +0100,
-> "Gupta, Nipun" <Nipun.Gupta@amd.com> wrote:
-> >
-> >
-> > > > +             return;
-> > > > +
-> > > > +     msi_domain_free_irqs(msi_domain, dev);
-> > > > +}
-> > > > +EXPORT_SYMBOL(cdx_msi_domain_free_irqs);
-> > >
-> > > This feels like a very pointless helper, and again a copy/paste from
-> > > the FSL code. I'd rather you change msi_domain_free_irqs() to only
-> > > take a device and use the implicit MSI domain.
-> >
-> > I agree with other comments except this one.
-> >
-> > In current implementation we have an API "cdx_msi_domain_alloc_irqs()",
-> > so having "cdx_msi_domain_free_irqs()" seems legitimate, as the caller
-> > would allocate and free MSI's using a similar APIs (cdx_msi_domain*).
->=20
-> Why would that be a problem? Using generic functions when they apply
-> should be the default, and "specialised" helpers are only here as a
-> reminder that our MSI API still needs serious improvement.
+nit: caller_name can be dropped and use __builtin_return_address(0) instead.
 
-We can remove the wrapper API, rather have a #define to provide same name
-convention for alloc and free IRQ APIs for CDX drivers. But both ways if we=
- use
-#define or direct use of msi_domain_free_irqs() API, we need
-msi_domain_free_irqs() symbol exported I hope having export symbol to this
-API would not be a problem.
+> {
+> 	int cpu = raw_smp_processor_id();
+> 	int r;
+>@@ -28,18 +27,22 @@ static void hardware_enable(void *caller_name)
+> 	WARN_ON_ONCE(preemptible());
+> 
+> 	if (cpumask_test_cpu(cpu, &cpus_hardware_enabled))
+>-		return;
+>-
+>-	cpumask_set_cpu(cpu, &cpus_hardware_enabled);
+>-
+>+		return 0;
+> 	r = kvm_arch_hardware_enable();
+>-
+>-	if (r) {
+>-		cpumask_clear_cpu(cpu, &cpus_hardware_enabled);
+>-		atomic_inc(&hardware_enable_failed);
+>+	if (r)
+> 		pr_warn("kvm: enabling virtualization on CPU%d failed during %s()\n",
+> 			cpu, (const char *)caller_name);
+>-	}
+>+	else
+>+		cpumask_set_cpu(cpu, &cpus_hardware_enabled);
+>+	return r;
+>+}
+>+
+>+static void hardware_enable(void *arg)
+>+{
+>+	atomic_t *failed = arg;
+>+
+>+	if (__hardware_enable((void *)__func__))
+>+		atomic_inc(failed);
+> }
+> 
+> static void hardware_disable(void *junk)
+>@@ -65,15 +68,16 @@ __weak void kvm_arch_pre_hardware_unsetup(void)
+>  */
+> __weak int kvm_arch_add_vm(struct kvm *kvm, int usage_count)
+> {
+>+	atomic_t failed;
 
->=20
-> > Changing msi_domain_free_irqs() to use implicit msi domain in case
-> > msi_domain is not provided by the caller seems appropriate, Ill change =
-the
-> > same for "msi_domain_alloc_irqs()" too.
->=20
-> What I'm asking is that there is no explicit msi_domain anymore. We
-> always use the one referenced by the device. And if that can be done
-> on the allocation path too, great.
+nit:
+	atomic_t failed = ATOMIC_INIT(0);
 
-I think it can be removed from both the APIs. Also, API's
-msi_domain_alloc_irqs_descs_locked() and msi_domain_free_irqs_descs_locked(=
-)
-can have similar change.
+then you can drop the atomic_set() below.
 
->=20
-> > <..>
-> >
-> > > > diff --git a/drivers/bus/cdx/mcdi_stubs.c b/drivers/bus/cdx/mcdi_st=
-ubs.c
-> > > > index cc9d30fa02f8..2c8db1f5a057 100644
-> > > > --- a/drivers/bus/cdx/mcdi_stubs.c
-> > > > +++ b/drivers/bus/cdx/mcdi_stubs.c
-> > > > @@ -45,6 +45,7 @@ int cdx_mcdi_get_func_config(struct cdx_mcdi_t
-> > > *cdx_mcdi,
-> > > >       dev_params->res_count =3D 2;
-> > > >
-> > > >       dev_params->req_id =3D 0x250;
-> > > > +     dev_params->num_msi =3D 4;
-> > >
-> > > Why the hardcoded 4? Is that part of the firmware emulation stuff?
-> >
-> > Yes, this is currently part of emulation, and would change with proper
-> > emulation support.
->=20
-> What "proper emulation support"? I expect no emulation at all, but
-> instead a well defined probing method.
+> 	int r = 0;
+> 
+> 	if (usage_count != 1)
+> 		return 0;
+> 
+>-	atomic_set(&hardware_enable_failed, 0);
+>-	on_each_cpu(hardware_enable, (void *)__func__, 1);
+>+	atomic_set(&failed, 0);
+>+	on_each_cpu(hardware_enable, &failed, 1);
+> 
+>-	if (atomic_read(&hardware_enable_failed)) {
+>+	if (atomic_read(&failed)) {
+> 		r = -EBUSY;
+> 		goto err;
+> 	}
+>@@ -96,33 +100,29 @@ __weak int kvm_arch_del_vm(int usage_count)
+> 
+> __weak int kvm_arch_online_cpu(unsigned int cpu, int usage_count)
+> {
+>-	int ret = 0;
+>+	int ret;
+> 
+> 	ret = kvm_arch_check_processor_compat();
+> 	if (ret)
+> 		return ret;
+> 
+>+	if (!usage_count)
+>+		return 0;
+>+
+>+	/*
+>+	 * arch callback kvm_arch_hardware_eanble() assumes that
 
-I meant proper firmware interfacing support for probing.
-
->=20
->         M.
->=20
-> --
-> Without deviation from the norm, progress is not possible.
+						^ enable
