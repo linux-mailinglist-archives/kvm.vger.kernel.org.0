@@ -2,55 +2,49 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CBB3A5B34D2
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 12:09:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC5315B34FD
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 12:17:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230046AbiIIKIW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 06:08:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52250 "EHLO
+        id S230235AbiIIKP5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 06:15:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230374AbiIIKIP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 06:08:15 -0400
-Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4824EA611;
-        Fri,  9 Sep 2022 03:08:11 -0700 (PDT)
-Date:   Fri, 9 Sep 2022 11:07:59 +0100
+        with ESMTP id S229862AbiIIKP4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 06:15:56 -0400
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0D60129C6C;
+        Fri,  9 Sep 2022 03:15:55 -0700 (PDT)
+Date:   Fri, 9 Sep 2022 11:15:47 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1662718090;
+        t=1662718554;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=gNzaPZG1mLQyJyRsZVtVFOttl8uuZk01rBnRTGZpE+s=;
-        b=uk4H9WhHFnTUkmuLpAFALPIaa+FU2UKVZ2XPdSwdnhtmtIobV8lxEqLkVO7Y7jbn01QNbB
-        1IXt1sYeBb3Il0++CysKXgK+Hj0N/NTHW8+zOLFKdpKtjUJ+HWy/8ou2g7YtsfTllff+lu
-        2L610rpZepsKnUQVPIxZalH6CRJXp8U=
+        bh=UWf75u93hFnHokSkmXHPMg8FKyuqd4msKp/yEz7C7Ao=;
+        b=MTo2cIazKhJL+OTHp3ysffg8vodSCAed8X2h3DOACc71oK2aqbBLC8NVrUh6Y96fLISHKg
+        RHr3qPWaAmutt9oyx7mVi3or4pcgVp1Ros6ZN4U6x/7bf6jP/xluVrOBnUw1XFK9aJt0ce
+        1VVctsUI4WfaWLRjrfom8jZgC+S/zdk=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From:   Oliver Upton <oliver.upton@linux.dev>
-To:     David Matlack <dmatlack@google.com>
+To:     Reiji Watanabe <reijiw@google.com>
 Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Catalin Marinas <catalin.marinas@arm.com>,
         Will Deacon <will@kernel.org>,
-        Quentin Perret <qperret@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Gavin Shan <gshan@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 02/14] KVM: arm64: Tear down unlinked stage-2 subtree
- after break-before-make
-Message-ID: <YxsQfwJ++izBQuEi@google.com>
-References: <20220830194132.962932-1-oliver.upton@linux.dev>
- <20220830194132.962932-3-oliver.upton@linux.dev>
- <YxkFrSmSKdBFEoZp@google.com>
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 6/7] KVM: arm64: Treat 32bit ID registers as RAZ/WI on
+ 64bit-only system
+Message-ID: <YxsSU2Rwdc2sO3IJ@google.com>
+References: <20220902154804.1939819-1-oliver.upton@linux.dev>
+ <20220902154804.1939819-7-oliver.upton@linux.dev>
+ <CAAeT=FxARdyXJyDgh_E4L-w0azuCY+47WgoM9MheBwyS8SdX1Q@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YxkFrSmSKdBFEoZp@google.com>
+In-Reply-To: <CAAeT=FxARdyXJyDgh_E4L-w0azuCY+47WgoM9MheBwyS8SdX1Q@mail.gmail.com>
 X-Migadu-Flow: FLOW_OUT
 X-Migadu-Auth-User: linux.dev
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -63,53 +57,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 07, 2022 at 01:57:17PM -0700, David Matlack wrote:
-> On Tue, Aug 30, 2022 at 07:41:20PM +0000, Oliver Upton wrote:
-> [...]
-> >  
-> > +static int stage2_map_walk_leaf(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> > +				struct stage2_map_data *data);
-> > +
-> >  static int stage2_map_walk_table_pre(u64 addr, u64 end, u32 level,
-> >  				     kvm_pte_t *ptep,
-> >  				     struct stage2_map_data *data)
-> >  {
-> > -	if (data->anchor)
+Hi Reiji,
+
+On Tue, Sep 06, 2022 at 09:52:53PM -0700, Reiji Watanabe wrote:
+
+[...]
+
+> >         /* CRm=3 */
+> > -       ID_SANITISED(MVFR0_EL1),
+> > -       ID_SANITISED(MVFR1_EL1),
+> > -       ID_SANITISED(MVFR2_EL1),
+> > +       AA32_ID_SANITISED(MVFR0_EL1),
+> > +       AA32_ID_SANITISED(MVFR1_EL1),
+> > +       AA32_ID_SANITISED(MVFR2_EL1),
+> >         ID_UNALLOCATED(3,3),
+> > -       ID_SANITISED(ID_PFR2_EL1),
+> > +       AA32_ID_SANITISED(ID_PFR2_EL1),
+> >         ID_HIDDEN(ID_DFR1_EL1),
 > 
-> Should @anchor and @childp be removed from struct stage2_map_data? This
-> commit removes the only remaining references to them.
+> Perhaps it might be better to handle ID_AFR0_EL1 and ID_DFR1_EL1
+> in the same way as the other AArch32 ID registers for consistency ?
+> (i.e. treat them RAZ/USER_WI instead of RAZ if kvm_supports_32bit_el0()
+>  is false instead of RAZ)
 
-Yup, I'll toss those in the next spin.
+Thanks for having a look. I stopped short of treating these registers as
+RAZ/USER_WI since an attempted nonzero write to either of these
+registers is a userspace bug (KVM always advertised 0).
 
-> > -		return 0;
-> > +	struct kvm_pgtable_mm_ops *mm_ops = data->mm_ops;
-> > +	kvm_pte_t *childp = kvm_pte_follow(*ptep, mm_ops);
-> > +	struct kvm_pgtable *pgt = data->mmu->pgt;
-> > +	int ret;
-> >  
-> >  	if (!stage2_leaf_mapping_allowed(addr, end, level, data))
-> >  		return 0;
-> >  
-> > -	data->childp = kvm_pte_follow(*ptep, data->mm_ops);
-> >  	kvm_clear_pte(ptep);
-> >  
-> >  	/*
-> [...]
-> >  static int stage2_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> >  			     enum kvm_pgtable_walk_flags flag, void * const arg)
-> > @@ -883,11 +849,9 @@ static int stage2_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> >  		return stage2_map_walk_table_pre(addr, end, level, ptep, data);
-> >  	case KVM_PGTABLE_WALK_LEAF:
-> >  		return stage2_map_walk_leaf(addr, end, level, ptep, data);
-> > -	case KVM_PGTABLE_WALK_TABLE_POST:
-> > -		return stage2_map_walk_table_post(addr, end, level, ptep, data);
-> 
-> kvm_pgtable_stage2_set_owner() still uses stage2_map_walker() with
-> KVM_PGTABLE_WALK_TABLE_POST.
-
-Good catch, I'll drop the TABLE_POST flag there as well.
-
-Appreciate the reviews on the series.
+As the ABI isn't busted for these registers I'd prefer to leave it in
+place. Having said that, I'm not too strongly motivated in either
+direction.
 
 --
 Thanks,
