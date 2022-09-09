@@ -2,97 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 901555B382D
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 14:52:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CBB75B38E0
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 15:24:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229502AbiIIMuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 08:50:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37162 "EHLO
+        id S230427AbiIINYo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 09:24:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229572AbiIIMuH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 08:50:07 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C44645757D
-        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 05:50:05 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 289Cg6wb027443;
-        Fri, 9 Sep 2022 12:49:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=zjj65OqKhotopLjAkLfbs1w4hoRX5Zb4/pyBQbnUohw=;
- b=MreDbMX7AB4ND1EBuzMJH5LHgQefur7xB/aLA0iZ1Sw+kCTrNizD9vbMLMdB40wcEKCS
- rK7PfuoByQuR3YRMB8zVrBpxaLKBm0XTiYHL3wXcQ4wQJBfaM3ZFk9Hl49B9hGt3my83
- VmI1VhKvSMdLEoerMdnTXWYuTY7A/z5JsC3+R7Ziv6M9aOGraU8s5qVbMWwkstnSIsbC
- ij+bf8eqosAph3ideZ57j6mRjq08QgpT8+KwfraUGNhVdOqFrFfO0mQO0UIpDgKma4sw
- h2wgC9IW7j54aG74U06uB8kY696YD5c0TwjP3J/XLex26mz0ZPm0r8Poybrb5MMHE8Wh Cg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jg5qcg839-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Sep 2022 12:49:44 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 289Ch3ja001197;
-        Fri, 9 Sep 2022 12:49:44 GMT
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jg5qcg82f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Sep 2022 12:49:44 +0000
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 289CKRot029638;
-        Fri, 9 Sep 2022 12:49:42 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
-        by ppma05wdc.us.ibm.com with ESMTP id 3jbxjaevev-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Sep 2022 12:49:42 +0000
-Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 289Cnfvh42467596
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 9 Sep 2022 12:49:41 GMT
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A873C6E056;
-        Fri,  9 Sep 2022 12:49:41 +0000 (GMT)
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 90CB56E04E;
-        Fri,  9 Sep 2022 12:49:40 +0000 (GMT)
-Received: from [9.160.125.58] (unknown [9.160.125.58])
-        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri,  9 Sep 2022 12:49:40 +0000 (GMT)
-Message-ID: <28f45073-0047-3f8a-c79f-6dd6cc1d4117@linux.ibm.com>
-Date:   Fri, 9 Sep 2022 08:49:40 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH 0/4] Fix splats releated to using the iommu_group after
- destroying devices
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>,
+        with ESMTP id S229631AbiIINYl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 09:24:41 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 352D118375;
+        Fri,  9 Sep 2022 06:24:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=iY0w1kh/xK+MCzo1rcnqvZqdmGxlHyuGkIUEG2fe/n0=; b=3wAl0TxsoTvU4WSk/aqxa6e9u/
+        30XUqAlq7pk+SKpG5MSQFbT0MoWDiD1aYo7F1FJ3DrSUU/9qFFxdzWUyN2J66hZuW72TG3hUIDZdP
+        P42VoYLJin+mebeMH4p6hwbaQ6n3DWx4lhsetBocd6lS+lVM+d40I3KLyzVAXt3CokaWpej/0paac
+        cqzPcUqf/5srbDXkPIK36whHP4DZUpnSRlHspglNS5p77kTiy4b9zZUMLF3IIgBjcz6Br2jRoxYX+
+        vWGuxJBluz3V6oi4VjQPpmc7mmu3iWRQ00Aie4He+c8ZFXrNNAodqvzzBHDQ6SOErfZj+lNQgw+to
+        rptERk0w==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1oWdzn-00GJ4H-M7; Fri, 09 Sep 2022 13:24:35 +0000
+Date:   Fri, 9 Sep 2022 06:24:35 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
         Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Will Deacon <will@kernel.org>
-Cc:     Qian Cai <cai@lca.pw>, Joerg Roedel <jroedel@suse.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Robin Murphy <robin.murphy@arm.com>
-References: <0-v1-ef00ffecea52+2cb-iommu_group_lifetime_jgg@nvidia.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <0-v1-ef00ffecea52+2cb-iommu_group_lifetime_jgg@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: bsxPznhpLKbKUh_qqVtx_sOqa5xr7DpS
-X-Proofpoint-GUID: RKYwAk6a2-p0o09e7kIVDamCgg1sh1mV
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        Cornelia Huck <cohuck@redhat.com>,
+        dri-devel@lists.freedesktop.org, kvm@vger.kernel.org,
+        linaro-mm-sig@lists.linaro.org, linux-media@vger.kernel.org,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
+        Maor Gottlieb <maorg@nvidia.com>,
+        Oded Gabbay <ogabbay@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>
+Subject: Re: [PATCH v2 4/4] vfio/pci: Allow MMIO regions to be exported
+ through dma-buf
+Message-ID: <Yxs+k6psNfBLDqdv@infradead.org>
+References: <4-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com>
+ <YxcYGzPv022G2vLm@infradead.org>
+ <b6b5d236-c089-7428-4cc9-a08fe4f6b4a3@amd.com>
+ <YxczjNIloP7TWcf2@nvidia.com>
+ <YxiJJYtWgh1l0wxg@infradead.org>
+ <YxiPh4u/92chN02C@nvidia.com>
+ <Yxiq5sjf/qA7xS8A@infradead.org>
+ <Yxi3cFfs0SA4XWJw@nvidia.com>
+ <Yxi5h09JAzIo4Kh8@infradead.org>
+ <YxjDBOIavc79ZByZ@nvidia.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-09_06,2022-09-09_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- suspectscore=0 phishscore=0 spamscore=0 clxscore=1011 lowpriorityscore=0
- adultscore=0 malwarescore=0 mlxlogscore=999 priorityscore=1501 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2207270000
- definitions=main-2209090043
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YxjDBOIavc79ZByZ@nvidia.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -100,42 +69,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/8/22 2:44 PM, Jason Gunthorpe wrote:
-> The basic issue is that the iommu_group is being used by VFIO after all
-> the device drivers have been removed.
-> 
-> In part this is caused by bad logic inside the iommu core that doesn't
-> sequence removing the device from the group properly, and in another part
-> this is bad logic in VFIO continuing to use device->iommu_group after all
-> VFIO device drivers have been removed.
-> 
-> Fix both situations. Either fix alone should fix the bug reported, but
-> both together bring a nice robust design to this area.
-> 
-> This is a followup from this thread:
-> 
-> https://lore.kernel.org/kvm/20220831201236.77595-1-mjrosato@linux.ibm.com/
-> 
-> Matthew confirmed an earlier version of the series solved the issue, it
-> would be best if he would test this as well to confirm the various changes
-> are still OK.
+On Wed, Sep 07, 2022 at 01:12:52PM -0300, Jason Gunthorpe wrote:
+> The PCI offset is some embedded thing - I've never seen it in a server
+> platform.
 
-FYI I've been running this series (+ the incremental to patch 4 you mentioned) against my original repro scenario in a loop overnight, looks good.
+That's not actually true, e.g. some power system definitively had it,
+althiugh I don't know if the current ones do.
+
+But that's not that point.  The offset is a configuration fully
+supported by Linux, and someone that just works by using the proper
+APIs.  Doing some handwaiving about embedded only or bad design doesn't
+matter.  There is a reason why we have these proper APIs and no one
+has any business bypassing them.
+
+> I also seem to remember that iommu and PCI offset don't play nice
+> together - so for the VFIO use case where the iommu is present I'm
+> pretty sure we can very safely assume 0 offset. That seems confirmed
+> by the fact that VFIO has never handled PCI offset in its own P2P path
+> and P2P works fine in VMs across a wide range of platforms.
+
+I think the offset is one of the reasons why IOVA windows can be
+reserved (and maybe also why ppc is so weird).
+
+> So, would you be OK with this series if I try to make a dma_map_p2p()
+> that resolves the offset issue?
+
+Well, if it also solves the other issue of invalid scatterlists leaking
+outside of drm we can think about it.
 
 > 
-> The iommu patch is independent of the other patches, it can go through the
-> iommu rc tree.
+> > Last but not least I don't really see how the code would even work
+> > when an IOMMU is used, as dma_map_resource will return an IOVA that
+> > is only understood by the IOMMU itself, and not the other endpoint.
 > 
-> Jason Gunthorpe (4):
->   vfio: Simplify vfio_create_group()
->   vfio: Move the sanity check of the group to vfio_create_group()
->   vfio: Follow a strict lifetime for struct iommu_group *
->   iommu: Fix ordering of iommu_release_device()
+> I don't understand this.
 > 
->  drivers/iommu/iommu.c    |  36 ++++++--
->  drivers/vfio/vfio_main.c | 172 +++++++++++++++++++++------------------
->  2 files changed, 120 insertions(+), 88 deletions(-)
-> 
-> 
-> base-commit: 245898eb9275ce31942cff95d0bdc7412ad3d589
+> __iommu_dma_map() will put the given phys into the iommu_domain
+> associated with 'dev' and return the IOVA it picked.
 
+Yes, __iommu_dma_map creates an IOVA for the mapped remote BAR.  That
+is the right thing if the I/O goes through the host bridge, but it is
+the wrong thing if the I/O goes through the switch - in that case the
+IOVA generated is not something that the endpoint that owns the BAR
+can even understand.
+
+Take a look at iommu_dma_map_sg and pci_p2pdma_map_segment to see how
+this is handled.
