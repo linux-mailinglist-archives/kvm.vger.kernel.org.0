@@ -2,333 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 519695B3AB7
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 16:31:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 25F785B3ABE
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 16:33:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231140AbiIIOba (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 10:31:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44732 "EHLO
+        id S231467AbiIIOdS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 10:33:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230314AbiIIOb3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 10:31:29 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 36FB4D21C3
-        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 07:31:28 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5136E165C;
-        Fri,  9 Sep 2022 07:31:34 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6EF3C3F93E;
-        Fri,  9 Sep 2022 07:31:26 -0700 (PDT)
-Date:   Fri, 9 Sep 2022 15:32:18 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Nikita Venkatesh <Nikita.Venkatesh@arm.com>
-Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "thuth@redhat.com" <thuth@redhat.com>,
-        "andrew.jones@linux.dev" <andrew.jones@linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        Suzuki Poulose <Suzuki.Poulose@arm.com>,
-        "maz@kernel.org" <maz@kernel.org>, nd <nd@arm.com>
-Subject: Re: [PATCH] arm:Add PSCI_CPU_OFF testscase to  arm/psci testsuite.
-Message-ID: <YxtOchZQO4bUdKf/@monolith.localdoman>
-References: <20220805132601.461751-1-Nikita.Venkatesh@arm.com>
+        with ESMTP id S229876AbiIIOdO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 10:33:14 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3743FEB2D0;
+        Fri,  9 Sep 2022 07:33:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662733993; x=1694269993;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=gVTNsSyIBrhcPs2gtAOglD6dY69wve4jHFwcbsEjqEg=;
+  b=YCNEJkUgYMvWX8Ca4SiKVEusdseonO3G0U4IIfFgagOuXhrp5ATI+xoL
+   clsCmxL2VpJTPd8Jf0S73lg35hTTeVQYfs0DE1DC4/9o3RdFew1Bb8Cfi
+   r5Q1b8+O2G0OGmf1wDRoO123R9/AQAOzdjs8u8pQERZUwTZKIqEMBBN/N
+   3TLwrT++bDZY5bamSYL1XJhPdx028iyckiaOCjp/a+A1NPHa32X7gnLaM
+   pBj0zjJPdsbItTxwtdxJ1wE0fd8JqPDsYqnrXwcaGZdFjui792kJezeH8
+   A5x2o6EI425Iui/OnAFkyq57g5wWuWugeHhU3LEeSUxbhUsJDqEu54izA
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10465"; a="295068205"
+X-IronPort-AV: E=Sophos;i="5.93,303,1654585200"; 
+   d="scan'208";a="295068205"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2022 07:32:48 -0700
+X-IronPort-AV: E=Sophos;i="5.93,303,1654585200"; 
+   d="scan'208";a="757619409"
+Received: from sumitdes-mobl3.gar.corp.intel.com (HELO box.shutemov.name) ([10.249.45.93])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2022 07:32:39 -0700
+Received: by box.shutemov.name (Postfix, from userid 1000)
+        id ED94B1037A2; Fri,  9 Sep 2022 17:32:36 +0300 (+03)
+Date:   Fri, 9 Sep 2022 17:32:36 +0300
+From:   "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     "Kirill A. Shutemov" <kirill@shutemov.name>,
+        Hugh Dickins <hughd@google.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>, jun.nakajima@intel.com,
+        dave.hansen@intel.com, ak@linux.intel.com, david@redhat.com,
+        aarcange@redhat.com, ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>,
+        "Gupta, Pankaj" <pankaj.gupta@amd.com>
+Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
+ guest private memory
+Message-ID: <20220909143236.sznwzkpedldrlnn5@box.shutemov.name>
+References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
+ <ff5c5b97-acdf-9745-ebe5-c6609dd6322e@google.com>
+ <20220818132421.6xmjqduempmxnnu2@box>
+ <c6ccbb96-5849-2e2f-3b49-4ea711af525d@google.com>
+ <20220820002700.6yflrxklmpsavdzi@box.shutemov.name>
+ <95bd287b-d17f-fda8-58c9-20700b1e0c72@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220805132601.461751-1-Nikita.Venkatesh@arm.com>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <95bd287b-d17f-fda8-58c9-20700b1e0c72@kernel.org>
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-
-The patch doesn't apply on top of master (commit 7362976db651 ("x86/pmu:
-Run the "emulation" test iff forced emulation is available")). I think it
-doesn't apply correctly because you've used an email client which converts
-tabs to spaces.
-
-Another thing that I spotted while trying to figure out what is wrong is
-that the encoding is iso-8859-1 (Content-Type: text/plain; charset="iso-8859-1")
-instead of us-ascii or utf-8 as per the submitting patches documentation in
-the Linux kernel [1]. That's also a good guide to make your email client
-play nicely with the mailing lit.
-
-Also, the subject should be in this format:
-
-[kvm-unit-tests PATCH] arm: Add PSCI_CPU_OFF testcase to arm/psci testsuite
-
-Notice the "kvm-unit-tests" prefix (and the missing and added spaces, and
-the removed period "." at the end). The prefix should be there as per the
-README file. Not a big deal, but it helps with sorting the emails. And it
-definitely helps with getting people to notice the patch.
-
-[1] https://github.com/torvalds/linux/blob/master/Documentation/process/email-clients.rst
-
-On Fri, Aug 05, 2022 at 02:26:11PM +0100, Nikita Venkatesh wrote:
-> The test uses the following method.
+On Thu, Sep 08, 2022 at 09:48:35PM -0700, Andy Lutomirski wrote:
+> On 8/19/22 17:27, Kirill A. Shutemov wrote:
+> > On Thu, Aug 18, 2022 at 08:00:41PM -0700, Hugh Dickins wrote:
+> > > On Thu, 18 Aug 2022, Kirill A . Shutemov wrote:
+> > > > On Wed, Aug 17, 2022 at 10:40:12PM -0700, Hugh Dickins wrote:
+> > > > > 
+> > > > > If your memory could be swapped, that would be enough of a good reason
+> > > > > to make use of shmem.c: but it cannot be swapped; and although there
+> > > > > are some references in the mailthreads to it perhaps being swappable
+> > > > > in future, I get the impression that will not happen soon if ever.
+> > > > > 
+> > > > > If your memory could be migrated, that would be some reason to use
+> > > > > filesystem page cache (because page migration happens to understand
+> > > > > that type of memory): but it cannot be migrated.
+> > > > 
+> > > > Migration support is in pipeline. It is part of TDX 1.5 [1]. And swapping
+> > > > theoretically possible, but I'm not aware of any plans as of now.
+> > > > 
+> > > > [1] https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html
+> > > 
+> > > I always forget, migration means different things to different audiences.
+> > > As an mm person, I was meaning page migration, whereas a virtualization
+> > > person thinks VM live migration (which that reference appears to be about),
+> > > a scheduler person task migration, an ornithologist bird migration, etc.
+> > > 
+> > > But you're an mm person too: you may have cited that reference in the
+> > > knowledge that TDX 1.5 Live Migration will entail page migration of the
+> > > kind I'm thinking of.  (Anyway, it's not important to clarify that here.)
+> > 
+> > TDX 1.5 brings both.
+> > 
+> > In TDX speak, mm migration called relocation. See TDH.MEM.PAGE.RELOCATE.
+> > 
 > 
-> The primary CPU brings up all the secondary CPUs, which are held in a wait
-> loop. Once the primary releases the CPUs, each of the secondary CPUs
-> proceed to issue PSCI_CPU_OFF. This is indicated by a cpumask and also
-> the status of the call is updated by the secondary CPU in cpu_off_done[].
-> 
-> The primary CPU waits for all the secondary CPUs to update the cpumask
-> and then proceeds to check for the status of the individual CPU CPU_OFF
-> request. There is a chance that some CPUs might fail at the CPU_OFF
-> request and come back and update the status once the primary CPU has
-> finished the scan. There is no fool proof method to handle this. As of
-> now, we add a 1sec delay between the cpumask check and the scan for the
-> status.
-> 
-> The test can be triggered by "cpu-off" command line argument.
+> This seems to be a pretty bad fit for the way that the core mm migrates
+> pages.  The core mm unmaps the page, then moves (in software) the contents
+> to a new address, then faults it in.  TDH.MEM.PAGE.RELOCATE doesn't fit into
+> that workflow very well.  I'm not saying it can't be done, but it won't just
+> work.
 
-The logic of the test looks correct to me, and the comments below are all
-cosmetic.
+Hm. From what I see we have all necessary infrastructure in place.
 
-What looks rather awkward is that we do the CPU_OFF test separate from the
-CPU_ON test. The CPU_ON test already brings online all of the CPUs, doing
-that again and as a separate test feels awkward.
+Unmaping is NOP for inaccessible pages as it is never mapped and we have
+mapping->a_ops->migrate_folio() callback that allows to replace software
+copying with whatever is needed, like TDH.MEM.PAGE.RELOCATE.
 
-I've sent a patch [2] which leaves all the secondary CPUs in do_idle(),
-ready to execute another function. You can rework this patch on top of that
-one, and have the regular PSCI test do CPU_OFF for all CPUs after the
-existing CPU_ON test, which makes more sense to me.
+What do I miss?
 
-I'm talking about something like this (some parts omitted for brevity):
-
-[..]
-+static void secondary_entry_stub (void *unused)
-+{
-+}
-+
- static bool psci_cpu_off_test(void)
- {
-        bool failed = false;
-@@ -168,7 +172,7 @@ static bool psci_cpu_off_test(void)
-        for_each_present_cpu(cpu) {
-                if (cpu < 1)
-                        continue;
--               smp_boot_secondary(cpu, cpu_off_secondary_test);
-+               on_cpu_async(cpu, cpu_off_secondary_test, NULL);
-        }
-
-        cpumask_set_cpu(0, &cpu_off_done);
-
-[..]
-@@ -221,15 +213,18 @@ int main(int argc, char **argv)
-        }
-
-        report_info("PSCI version %d.%d", PSCI_VERSION_MAJOR(ver),
--                       PSCI_VERSION_MINOR(ver));
--       if (argc < 2) {
--               run_default_psci_tests();
--       } else if (strcmp(argv[1], "cpu-off") == 0) {
--               report(psci_cpu_off_test(), "cpu-off");
-+                   PSCI_VERSION_MINOR(ver));
-+
-+       report(psci_invalid_function(), "invalid-function");
-+       report(psci_affinity_info_on(), "affinity-info-on");
-+       report(psci_affinity_info_off(), "affinity-info-off");
-+       if (ERRATA(6c7a5dce22b3)){
-+               report(psci_cpu_on_test(), "cpu-on");
-        } else {
--               printf("Unknown subtest\n");
--               abort();
-+               report_skip("Skipping unsafe cpu-on test. Set ERRATA_6c7a5dce22b3=y to enable.");
-+               on_cpus(secondary_entry_stub, NULL);
-        }
-+       report(psci_cpu_off_test(), "cpu-off");
-
- done:
- #if 0
-
-[2] https://lore.kernel.org/kvm/20220909142925.52198-1-alexandru.elisei@arm.com/
-
-> 
-> Signed-off-by: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
-> ---
->  arm/psci.c        | 87 +++++++++++++++++++++++++++++++++++++++++------
->  arm/unittests.cfg |  6 ++++
->  2 files changed, 83 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arm/psci.c b/arm/psci.c
-> index efa0722..5485718 100644
-> --- a/arm/psci.c
-> +++ b/arm/psci.c
-> @@ -12,6 +12,9 @@
->  #include <asm/processor.h>
->  #include <asm/smp.h>
->  #include <asm/psci.h>
-> +#include <asm/delay.h>
-> +
-> +#define CPU_OFF_TEST_WAIT_TIME 1000
-> 
->  static bool invalid_function_exception;
-> 
-> @@ -69,8 +72,10 @@ static bool psci_affinity_info_off(void)
->  }
-> 
->  static int cpu_on_ret[NR_CPUS];
-> -static cpumask_t cpu_on_ready, cpu_on_done;
-> +static bool cpu_off_success[NR_CPUS];
-> +static cpumask_t cpu_on_ready, cpu_on_done, cpu_off_done;
->  static volatile int cpu_on_start;
-> +static volatile int cpu_off_start;
-> 
->  static void cpu_on_secondary_entry(void)
->  {
-> @@ -83,6 +88,19 @@ static void cpu_on_secondary_entry(void)
->         cpumask_set_cpu(cpu, &cpu_on_done);
->  }
-> 
-> +static void cpu_off_secondary_test(void)
-
-cpu_off_secondary_entry?
-
-> +{
-> +       int cpu = smp_processor_id();
-
-The coding style followed by this file has a newline after local variable
-declaration(s).
-
-> +       while (!cpu_off_start)
-> +               cpu_relax();
-> +       /* On to the CPU off test */
-> +       cpu_off_success[cpu] = true;
-> +       cpumask_set_cpu(cpu, &cpu_off_done);
-> +       cpu_psci_cpu_die();
-> +       /* The CPU shouldn't execute the next steps. */
-> +       cpu_off_success[cpu] = false;
-> +}
-> +
->  static bool psci_cpu_on_test(void)
->  {
->         bool failed = false;
-> @@ -130,7 +148,56 @@ static bool psci_cpu_on_test(void)
->         return !failed;
->  }
-> 
-> -int main(void)
-> +static bool psci_cpu_off_test(void)
-> +{
-> +       bool failed = false;
-> +       int cpu;
-> +
-> +       for_each_present_cpu(cpu) {
-> +               if (cpu < 1)
-
-I would prefer the test to be if (cpu == 0), as it makes it clear that the
-boot CPU is expected to be CPU 0. It also matches the way you express this
-test below, in the for loop.
-
-> +                       continue;
-> +               smp_boot_secondary(cpu, cpu_off_secondary_test);
-> +       }
-> +
-> +       cpumask_set_cpu(0, &cpu_off_done);
-> +
-> +       report_info("PSCI OFF Test");
-
-This is not strictly necessary, the psci_cpu_on_tests doesn't have it and
-it clutters the output by displaying redundant information. I guess it can
-be helpful because the test is rather long (at least 1 second because of
-the delay) and we don't want the user to get the impression that the
-hanged. How about changing it to
-report_info("starting CPU_OFF test..."), which looks similar to what
-kvm-unit-tests does for the timer test, which has also has a similar delay?
-Up to you really, as this is a matter of taste.
-
-> +
-> +       /* Release the CPUs */
-> +       cpu_off_start = 1;
-> +
-> +       /* Wait until all are done */
-> +       while (!cpumask_full(&cpu_off_done))
-> +               cpu_relax();
-> +
-> +       /* Allow all the other CPUs to complete the operation */
-> +       mdelay(CPU_OFF_TEST_WAIT_TIME);
-> +
-> +       for_each_present_cpu(cpu) {
-> +               if (cpu == 0)
-> +                       continue;
-> +
-> +               if (!cpu_off_success[cpu]) {
-> +                       report_info("CPU%d could not be turned off", cpu);
-> +                       failed = true;
-> +               }
-> +       }
-> +       return !failed;
-> +}
-> +
-> +static void run_default_psci_tests(void)
-> +{
-> +       report(psci_invalid_function(), "invalid-function");
-> +       report(psci_affinity_info_on(), "affinity-info-on");
-> +       report(psci_affinity_info_off(), "affinity-info-off");
-> +       if (ERRATA(6c7a5dce22b3)){
-> +               report(psci_cpu_on_test(), "cpu-on");
-> +       } else {
-> +               report_skip("Skipping unsafe cpu-on test. Set ERRATA_6c7a5dce22b3=y to enable.");
-> +       }
-> +}
-> +
-> +int main(int argc, char **argv)
->  {
->         int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
-> 
-> @@ -143,15 +210,15 @@ int main(void)
-> 
->         report_info("PSCI version %d.%d", PSCI_VERSION_MAJOR(ver),
->                                           PSCI_VERSION_MINOR(ver));
-> -       report(psci_invalid_function(), "invalid-function");
-> -       report(psci_affinity_info_on(), "affinity-info-on");
-> -       report(psci_affinity_info_off(), "affinity-info-off");
-> -
-> -       if (ERRATA(6c7a5dce22b3))
-> -               report(psci_cpu_on_test(), "cpu-on");
-> -       else
-> -               report_skip("Skipping unsafe cpu-on test. Set ERRATA_6c7a5dce22b3=y to enable.");
-> 
-> +       if (argc < 2) {
-> +               run_default_psci_tests();
-> +       } else if (strcmp(argv[1], "cpu-off") == 0) {
-> +               report(psci_cpu_off_test(), "cpu-off");
-> +       } else {
-> +               printf("Unknown subtest\n");
-> +               abort();
-> +       }
-
-There should be a newline here, as it previously was.
-
-Thanks,
-Alex
-
->  done:
->  #if 0
->         report_summary();
-> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> index 5e67b55..02ffbcd 100644
-> --- a/arm/unittests.cfg
-> +++ b/arm/unittests.cfg
-> @@ -218,6 +218,12 @@ file = psci.flat
->  smp = $MAX_SMP
->  groups = psci
-> 
-> +[psci-cpu-off]
-> +file = psci.flat
-> +groups = psci
-> +smp = $MAX_SMP
-> +extra_params = -append 'cpu-off'
-> +
->  # Timer tests
->  [timer]
->  file = timer.flat
-> --
-> 2.25.1
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
