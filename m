@@ -2,92 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC5315B34FD
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 12:17:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ECB035B356D
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 12:45:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230235AbiIIKP5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 06:15:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42840 "EHLO
+        id S231161AbiIIKpV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 06:45:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229862AbiIIKP4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 06:15:56 -0400
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0D60129C6C;
-        Fri,  9 Sep 2022 03:15:55 -0700 (PDT)
-Date:   Fri, 9 Sep 2022 11:15:47 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1662718554;
+        with ESMTP id S230468AbiIIKpR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 06:45:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEBDB4BA7E
+        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 03:45:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662720313;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=UWf75u93hFnHokSkmXHPMg8FKyuqd4msKp/yEz7C7Ao=;
-        b=MTo2cIazKhJL+OTHp3ysffg8vodSCAed8X2h3DOACc71oK2aqbBLC8NVrUh6Y96fLISHKg
-        RHr3qPWaAmutt9oyx7mVi3or4pcgVp1Ros6ZN4U6x/7bf6jP/xluVrOBnUw1XFK9aJt0ce
-        1VVctsUI4WfaWLRjrfom8jZgC+S/zdk=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 6/7] KVM: arm64: Treat 32bit ID registers as RAZ/WI on
- 64bit-only system
-Message-ID: <YxsSU2Rwdc2sO3IJ@google.com>
-References: <20220902154804.1939819-1-oliver.upton@linux.dev>
- <20220902154804.1939819-7-oliver.upton@linux.dev>
- <CAAeT=FxARdyXJyDgh_E4L-w0azuCY+47WgoM9MheBwyS8SdX1Q@mail.gmail.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=GS6z751jOS17P5KjjAKA6XFU5o/FNq7ECC/sWEiv1wc=;
+        b=e5jg4GsEbWZyjBtV1RtUCxlb+FhUYxqPo6iW2oRE5HDC5VrDgT8FtGxcUaaUTWR3dMUrIh
+        B97D+KyGEeGnT8nlUmu1ZK2yiZUdsbzmraFNMlKQJ/wYmyHqYet/qnZlyNFDuHgsUlJdhC
+        BJxWEmJ35r8R7zTCo432eaTZhJncmQw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-582-V6wIM2X6MCqAcYvkPXZmGw-1; Fri, 09 Sep 2022 06:45:09 -0400
+X-MC-Unique: V6wIM2X6MCqAcYvkPXZmGw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 386D4101A56D;
+        Fri,  9 Sep 2022 10:45:09 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1907840D2830;
+        Fri,  9 Sep 2022 10:45:08 +0000 (UTC)
+From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Subject: [RFC PATCH 0/9] kvm: implement atomic memslot updates
+Date:   Fri,  9 Sep 2022 06:44:57 -0400
+Message-Id: <20220909104506.738478-1-eesposit@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeT=FxARdyXJyDgh_E4L-w0azuCY+47WgoM9MheBwyS8SdX1Q@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
+KVM is currently capable of receiving a single memslot update through
+the KVM_SET_USER_MEMORY_REGION ioctl.
+The problem arises when we want to atomically perform multiple updates,
+so that readers of memslot active list avoid seeing incomplete states.
 
-On Tue, Sep 06, 2022 at 09:52:53PM -0700, Reiji Watanabe wrote:
+For example, in RHBZ https://bugzilla.redhat.com/show_bug.cgi?id=1979276
+we see how non atomic updates cause boot failure, because vcpus
+will se a partial update (old memslot delete, new one not yet created)
+and will crash.
 
-[...]
+In this series we introduce KVM_SET_USER_MEMORY_REGION_LIST, a new ioctl
+that takes a kvm_userspace_memory_region_list, a list of memslot updates,
+and performs them atomically.
+"atomically" in KVM words just means "apply all modifications to the
+inactive memslot list, and then perform a single swap to replace the
+active list with the inactive".
+It is slightly more complicated that that, since DELETE and MOVE operations
+require 2 swaps, but the main idea is the above.
 
-> >         /* CRm=3 */
-> > -       ID_SANITISED(MVFR0_EL1),
-> > -       ID_SANITISED(MVFR1_EL1),
-> > -       ID_SANITISED(MVFR2_EL1),
-> > +       AA32_ID_SANITISED(MVFR0_EL1),
-> > +       AA32_ID_SANITISED(MVFR1_EL1),
-> > +       AA32_ID_SANITISED(MVFR2_EL1),
-> >         ID_UNALLOCATED(3,3),
-> > -       ID_SANITISED(ID_PFR2_EL1),
-> > +       AA32_ID_SANITISED(ID_PFR2_EL1),
-> >         ID_HIDDEN(ID_DFR1_EL1),
-> 
-> Perhaps it might be better to handle ID_AFR0_EL1 and ID_DFR1_EL1
-> in the same way as the other AArch32 ID registers for consistency ?
-> (i.e. treat them RAZ/USER_WI instead of RAZ if kvm_supports_32bit_el0()
->  is false instead of RAZ)
+Patch 1-6 are just code movements, in preparation for the following patches.
+Patch 7 allows the invalid slot to be in both inactive and active memslot lists.
+Patch 8 allows searching for the existing memslot (old) in the inactive list,
+and not the active, allowing to perform multiple memslot updates without swapping.
+Patch 9 implements IOCTL logic.
 
-Thanks for having a look. I stopped short of treating these registers as
-RAZ/USER_WI since an attempted nonzero write to either of these
-registers is a userspace bug (KVM always advertised 0).
+QEMU userspace logic in preparation for the IOCTL is here:
+https://patchew.org/QEMU/20220909081150.709060-1-eesposit@redhat.com/
+"[RFC PATCH v2 0/3] accel/kvm: extend kvm memory listener to support"
 
-As the ABI isn't busted for these registers I'd prefer to leave it in
-place. Having said that, I'm not too strongly motivated in either
-direction.
+TODOs and ideas:
+- limit the size of the ioctl arguments. Right now it is unbounded
+- try to reduce the amount of swaps necessary? ie every DELETE/MOVE
+  requires an additional swap
+- add selftests
+- add documentation
 
---
-Thanks,
-Oliver
+Emanuele Giuseppe Esposito (9):
+  kvm_main.c: move slot check in kvm_set_memory_region
+  kvm.h: introduce KVM_SET_USER_MEMORY_REGION_LIST ioctl
+  kvm_main.c: introduce kvm_internal_memory_region_list
+  kvm_main.c: split logic in kvm_set_memslots
+  kvm_main.c: split __kvm_set_memory_region logic in kvm_check_mem and
+    kvm_prepare_batch
+  kvm_main.c: simplify change-specific callbacks
+  kvm_main.c: duplicate invalid memslot also in inactive list
+  kvm_main.c: find memslots from the inactive memslot list
+  kvm_main.c: handle atomic memslot update
+
+ arch/x86/kvm/x86.c       |   3 +-
+ include/linux/kvm_host.h |  21 +-
+ include/uapi/linux/kvm.h |  21 +-
+ virt/kvm/kvm_main.c      | 420 +++++++++++++++++++++++++++++++--------
+ 4 files changed, 377 insertions(+), 88 deletions(-)
+
+-- 
+2.31.1
+
