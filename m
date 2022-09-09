@@ -2,219 +2,281 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AA535B42BB
-	for <lists+kvm@lfdr.de>; Sat, 10 Sep 2022 01:02:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B7915B432E
+	for <lists+kvm@lfdr.de>; Sat, 10 Sep 2022 01:46:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231183AbiIIXCP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 19:02:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40616 "EHLO
+        id S230269AbiIIXqD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 19:46:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229464AbiIIXCN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 19:02:13 -0400
-Received: from new3-smtp.messagingengine.com (new3-smtp.messagingengine.com [66.111.4.229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18959D4BD4;
-        Fri,  9 Sep 2022 16:02:12 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 7A8C95806ED;
-        Fri,  9 Sep 2022 19:02:09 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Fri, 09 Sep 2022 19:02:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
-         h=cc:cc:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm3; t=1662764529; x=1662771729; bh=LZ
-        qIYAsRBDLHzzFlN7g+AhI2hMyU/ynXCZmSXJx2o4o=; b=Fd9GWSBue9IWHe503e
-        u6NjmzZkClyF2iQ1lgniAHchY/0TuAinaS2NWLg6kXBU39151pE1ovKNVS25Z/eq
-        IFGfoDCZdfi9vsheNiozUhWQhBFe09NjS0fOO3MHFGf7ZJIdFE7URE2+4T8ry1tP
-        Nbg2/Rj0tE3Ek4flC4ACTOcql6PzwfFTME2lnOV+B3N/lL/hnKnCQ6GH5+XhazC2
-        Nmlg33RcE4W1FIQN8y/vZurktFXXaUv+E4bgIUTmtxklpt0y22GN9mlaZnVA1HvP
-        jkswfdiKSGu/tJLd7oZD/eoKEIjjf2SfU40zdSq1rOcMST2//OkJ9MhjZ2EdQs+x
-        twzA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm2; t=1662764529; x=1662771729; bh=LZqIYAsRBDLHzzFlN7g+AhI2hMyU
-        /ynXCZmSXJx2o4o=; b=R0rm0u9Q8CX9dbZ2DhuKZkJyLwqDkiL/bcQEMyyhRDy3
-        DKn59ZmnL3PU6DmHyrEOtbWOQxV0Jvh3Grnr7NnwLKmBBu1OqZr7MHMw5AF8nOc3
-        yZwD78eLbs+PQ7ZV3R0sH3zp40EzNkJRkYIFQoQD0TzJshF7fsO77EIAhb/np+v5
-        fD3+R4uPoMhtBl6YFx1Id+vdQVHvRNN3JNjDEgZx0z97eg2UtW70uB3fK3NPtcQq
-        YXJKLKjalf08E+dU2zl2hDz2uNpIpr6InQLeo3pXVpi6p5g0dYXSjFu2qp7lvcHO
-        z/6UG76BNmJ0JLKn+JDTKA1iOr5MetWJtzkldsMOKw==
-X-ME-Sender: <xms:7sUbY3rI1KJg6T2GIL1QERVjHifgXO5lm0MnxXu08ZpG7b3CagZfXw>
-    <xme:7sUbYxoUJWW56KV29pr_aHSFZMDTg3SRysBUXhQlGa9zL3CR6D-tSmooacFF6F7T4
-    vngwaKGwj26JDXPHtA>
-X-ME-Received: <xmr:7sUbY0NDMWxhzD2mgtmpwtlR72xtvAmgXhoiiyjc53F64CGLIQNkCJkgvMmlVTESiy-95w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfedtiedgudekucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdttddttddtvdenucfhrhhomhepfdfmihhr
-    ihhllhcutecurdcuufhhuhhtvghmohhvfdcuoehkihhrihhllhesshhhuhhtvghmohhvrd
-    hnrghmvgeqnecuggftrfgrthhtvghrnhepvdekkeelteduteduledtgfevledtgeekjeeu
-    ieehgeeltdduteeuueekhffhledvnecuffhomhgrihhnpehinhhtvghlrdgtohhmpdhmvg
-    hmrdhprghgvgenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhr
-    ohhmpehkihhrihhllhesshhhuhhtvghmohhvrdhnrghmvg
-X-ME-Proxy: <xmx:7sUbY65BD7T0lBkv38MIfA5C7WIcBVzxQYY2iqyB0VQfm1zOuugzwQ>
-    <xmx:7sUbY24PLQzdG8vOj0k1OQ385SW1ySugRFGwv36hbK-YXtzdMEgHpA>
-    <xmx:7sUbYygCW8klPbx4kDGz3VpnpXvXc5mSI7G4ZJw8EFDOAiv-qLQgWA>
-    <xmx:8cUbY7VMkXPqPikJg5h1mEfMk_BDtkjgyhUL44T0t1A43JkcVR9sBQ>
-Feedback-ID: ie3994620:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 9 Sep 2022 19:02:06 -0400 (EDT)
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id 2DAF3104A9B; Sat, 10 Sep 2022 02:02:03 +0300 (+03)
-Date:   Sat, 10 Sep 2022 02:02:03 +0300
-From:   "Kirill A . Shutemov" <kirill@shutemov.name>
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Hugh Dickins <hughd@google.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Michal Hocko <mhocko@suse.com>,
-        Muchun Song <songmuchun@bytedance.com>,
-        "Gupta, Pankaj" <pankaj.gupta@amd.com>
-Subject: Re: [PATCH v7 00/14] KVM: mm: fd-based approach for supporting KVM
- guest private memory
-Message-ID: <20220909230203.czdpronokk3lxses@box.shutemov.name>
-References: <20220706082016.2603916-1-chao.p.peng@linux.intel.com>
- <ff5c5b97-acdf-9745-ebe5-c6609dd6322e@google.com>
- <20220818132421.6xmjqduempmxnnu2@box>
- <c6ccbb96-5849-2e2f-3b49-4ea711af525d@google.com>
- <20220820002700.6yflrxklmpsavdzi@box.shutemov.name>
- <95bd287b-d17f-fda8-58c9-20700b1e0c72@kernel.org>
- <20220909143236.sznwzkpedldrlnn5@box.shutemov.name>
- <762581e4-a6bf-41d1-b0d3-72543153ffb1@www.fastmail.com>
-MIME-Version: 1.0
+        with ESMTP id S230495AbiIIXqB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 19:46:01 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2058.outbound.protection.outlook.com [40.107.244.58])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3256EC7B9A
+        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 16:46:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=i9LuirkcYbG9bxWbvC607mIBVfiFhT2TkzCuScJsL9XFkpKTCVI8iJxew/dfA402lNPaD5F8cZXXd11at49RQo9FRNhXLDDKnsmzcAaSdeCeqC9/Scmgz1ebzLp+lFYQsjwgCzK/YZXCUevrzN5TKLO3B5pBVb2qwFg+J11ibfN5firEXiLisP2DPKHjGz/GDfUfuZ0Qgh11r3oKIvJKsMshOl6wmF9OCP05XzhFyxFdP5UiXKBCIa31R1KFFPHueHA3JG9G9o47gIs6s6I29io6SKe9PWJGYnx5iiVPV0iTImM6FBv3rWW5DjWuS54TkrpcXsJkLr5M7vz2JISslA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FLMVyY6iJWo/HxpZpXpfvGQzSWakI5hku1C9uvqEX6I=;
+ b=PqkxPPDozSlT61BUvxe5MXTeUOWZy2nEYynaUMyPdXO/856mvvG2B2131KN3tcY6VvIokCJkKqIOzQ8KCzmC1SZPer3/xqlMokP+Qc4ZpqpUDwSNyRB9gLwelfSJ/kUjkb/KCJJygI3DotviEotLsj0ana4mOaXYkrvpJU/gQ1ePx5jUoiRdGrBt92DIaCz/5f2q1iM2rq/z+b4N/BwQuwK7IW1loAk+RHuPkN2LbI0Q63FuHiDS59gYE9zavsEB/ZlEaZtVV22etT5EeZXnhoL0nQxlmANe9MN32eyRrXQFk6LrDO9ZawIufWkvruUUms6kNpRyrQ4TVpNprxe1Kg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FLMVyY6iJWo/HxpZpXpfvGQzSWakI5hku1C9uvqEX6I=;
+ b=tPC1/6RmktaR5C2w+bdIBMcTD5cj3et1NY5SCRMqKM9XwC5lP897CCxTXLeC5F6pbLuOMCpYLKJQdPqvWDyYFxRiCRXTkGR8KHF59cCVweM2WXjrWGzxneKgxlCnQrDkIR31t1AkKizU8ejoQpHAHJJ+PNxsLv/K327gs1SZF413K6Ah6gDjhRzY2vdao05BgcpGqoZ5BMN4P65Ct+5DjKpn4BKyqFM1qM9/gzJ8BZzCCJRnEUZWe6ZN1+gFjUEtNgPHglfDUgMKqwcSRbNKMpNs5E8o6j7FH042+Y9ceriZR2jSb9cxxNB+R6rAnd9hrBN4Kn6hKpN8oPsN3/yH6g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by CY5PR12MB6549.namprd12.prod.outlook.com (2603:10b6:930:43::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.15; Fri, 9 Sep
+ 2022 23:45:58 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5%7]) with mapi id 15.20.5612.019; Fri, 9 Sep 2022
+ 23:45:58 +0000
+Date:   Fri, 9 Sep 2022 20:45:57 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Robin Murphy <robin.murphy@arm.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Will Deacon <will@kernel.org>, Qian Cai <cai@lca.pw>,
+        Joerg Roedel <jroedel@suse.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>
+Subject: Re: [PATCH 4/4] iommu: Fix ordering of iommu_release_device()
+Message-ID: <YxvQNTD1U4bs5TZD@nvidia.com>
+References: <4-v1-ef00ffecea52+2cb-iommu_group_lifetime_jgg@nvidia.com>
+ <87b7041e-bc8d-500c-7167-04190e3795a9@arm.com>
+ <ada74e00-77e1-770b-f0b7-a4c43a86c06f@arm.com>
+ <YxpiBEbGHECGGq5Q@nvidia.com>
+ <38bac59a-808d-5e91-227a-a3a06633c091@arm.com>
+ <Yxs+1s+MPENLTUpG@nvidia.com>
+ <e0ff6dc1-91b3-2e41-212c-c83a2bf2b3a8@arm.com>
+ <YxuGQDCzDsvKV2W8@nvidia.com>
+ <b753aecb-ee2a-2cd0-1df2-0c3e977b4cb9@arm.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <762581e4-a6bf-41d1-b0d3-72543153ffb1@www.fastmail.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+In-Reply-To: <b753aecb-ee2a-2cd0-1df2-0c3e977b4cb9@arm.com>
+X-ClientProxiedBy: MN2PR16CA0054.namprd16.prod.outlook.com
+ (2603:10b6:208:234::23) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4192:EE_|CY5PR12MB6549:EE_
+X-MS-Office365-Filtering-Correlation-Id: 138977a7-5ee7-40ac-daee-08da92bd71be
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bPJ1D3umR4jIGJLwixx33RkxxvJHzJ3r77HDb3yOQqQzCoL4mn+iuCx7BWW9RNnQM9WUi9zhbgVe5G4zm3s8VmnQ8CaHRu8ycdlp9K+ecRjHpy/9K/usQQeS4nPnMDNLLAsiK//AZQztcVMLYCfcD5VcbSUy1t8BnN3qcLbEKvt4Nwvh2JWiFdIx2/0XA/HWqlDHjoZ+llBFXXs/t1naDzfsORNU4xS1DdBzbuYk+OpDmRQO5KdeWFM3lKUtpKZxuwKlnVe1BoKi9kpEl2rMlDOUVCVPIpxD1nzPqWq/u5/PC3dWqMsluECK6YZuoji0AwteXz26Se2HAIOzQoPI9UCKgNkfhaSQxRzwheuJLYgsTd70krHP0EHXHg+2aIQ7cZ2dJ6fmNXAqZ50xN+YfWBqg4PoOz1D7hyKHfW1Cd5yxAIIHrslTYIFi+/h5VmAtQpfHPR5UpODyXfFl3V/sY2Y1GIo8CIOx+YdlTzhA9qhdE1ahuWuaoB0LJ2fzrOlgAesyKX5cuka3qPS4t4AZKRy1xj3R9jLbEqYXVWhM7sKaJ5E03OSYeiXDQbhh1LgrlqhCcErPxXmdXwJqKe8VVDR3fDAquzjPsGiToC3iF7rW6au6GCa3B4xEoueJBFIAwJys6hbB/AcZHsYxbE0ucSP2Zehs2MLBXWZ9y5ApZS9bWDNALCCDpq2/8JUmtPHugPnv6PY6lZ80VnX8XOTDWA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(396003)(39860400002)(366004)(346002)(136003)(376002)(316002)(54906003)(83380400001)(6916009)(8676002)(4326008)(66556008)(38100700002)(66476007)(66946007)(2906002)(2616005)(6506007)(186003)(5660300002)(7416002)(8936002)(36756003)(6512007)(26005)(41300700001)(6486002)(478600001)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?C6WBFEq+aHnYcYsukL1MXA29Z9yhxFKyFqPn3XrIgZvGX0EH2AOKZzGM0oEh?=
+ =?us-ascii?Q?NW1U7/zPLtV9IQbaRot8xkLoJ1TXDv9GwGYart1rNgoRHJDUjzUngcUZqPJ5?=
+ =?us-ascii?Q?26Ro/Nr3Km40MWubhRAc+8N2Jyar9t2buIAqsJ5mXPtU9Re6iYv7twDIJUPu?=
+ =?us-ascii?Q?qC9HqdXGD+92WpMpxMma6D4w62LkxeyH7X3YnsQfxl4p5KQQu1PbfxemblAe?=
+ =?us-ascii?Q?IklGA/KiJhh+ssXOH5wfLX9Kp+f7vFfwWUHeNFxilydmJXRW5RFKZHtdcLN8?=
+ =?us-ascii?Q?dF3v4ipKcgr6zJXKuH7UjqfvX5Rs7qC4qxpAt5mFA6yugwTGTj9hF5G/FDVD?=
+ =?us-ascii?Q?m39Vwux1S5iCIMLuj/tyTn6S5khz2watoGJE90wgbWQui0Ssosga8UEDx5ik?=
+ =?us-ascii?Q?EMcjJpNRWVvYbPL+O08xsexJFmxwGGwfXPywM8LEqUApvTLhnVgBH3ky+svo?=
+ =?us-ascii?Q?3X338PG/1oNMm+7BtO4XDskrPy/R5CgRfzCOIvxqBz/oUfiooNyp+cKhOjZZ?=
+ =?us-ascii?Q?SBIp1xdXP5FYSBhxEi30NVdajmwJgZEghvSpxZSxdqApXTDrqimfcoGo/M9M?=
+ =?us-ascii?Q?bVIdSaKqaGf/W6Vsvpx4U7RknHuuWhU0P6oPBvED0gobWG21nZahssDwBE5F?=
+ =?us-ascii?Q?/ya3yYYZDdHmis4KrOXIFDiPuCBlgnMFM4NoWgKr4Mwi1eV5karMIqtTKU2I?=
+ =?us-ascii?Q?TSSawV34/ZuE6xJtBTTFFm8SRl5vUZTVMafUt9N44uYBDYMUE1UpVvmu9nTt?=
+ =?us-ascii?Q?5LGBOTR8KMfbx9/qfZSTFf8Tr55SzJrLje6PNZ9iH3AsridtwAvTHVwpyMrV?=
+ =?us-ascii?Q?dLHcj96yBpaWbS2Pxk8HibA7nXsyAuXriTcUAhAu70w8xqxBTLW64dThNf9a?=
+ =?us-ascii?Q?xUNL4Ia5IYOc0GpPIct30SrIgg51XBOyc2GDU3GbxLsi9VtO3OuJ/VM5fRKn?=
+ =?us-ascii?Q?pbH1hpZj+mvMfBsWiwq7y5/YGLgTAbX87kiv/rYL3Qdiv6ZIF4T/lZk5HTWU?=
+ =?us-ascii?Q?ML8N0Apq9ZTIqVQa/rLPlHFQWzdtqU3I1D1SktW614eIfqihICouMZ8kEeml?=
+ =?us-ascii?Q?yrVK9DJXP/SAEgpwYw1zLf1LLa8BFT1U6PgJRe3UYN/aNMwLAZ/C25MyTw2O?=
+ =?us-ascii?Q?qyHijpJu76sx85gj6olqpnQ49s4+Z1kp9eXJkjCkuEFHWj1xXzD/F+JhwXmN?=
+ =?us-ascii?Q?U8kwMFHNcCpmnhP0zNrOtY7TuDP3zhWrTAt3Tkwq1ZFIFRVFfN0esY8VjPaZ?=
+ =?us-ascii?Q?3xzHlhEtQduHD5by/Aich2FSSD3NC8GoILik0ITVgGD2Tgg+0dFTWAtpz0AR?=
+ =?us-ascii?Q?g+Oxe+XQOpwMV1vZ4ZlpnlSyHBhPfb7DBAJKXfMQCgCMD9JzJu5V15ztHCNw?=
+ =?us-ascii?Q?VNltqsS+8YlhgKfIplRaWNWwLjGhRlaNuqEvjUrnIjJb5seFJKRKPWUPaLX8?=
+ =?us-ascii?Q?9RuDaEHz7lU8gMiwWtbA1DHoeFNyw8N7WvIXMpzo/jgrr0JF9SW4n4TfN0Q4?=
+ =?us-ascii?Q?DBqKiML7wq9KTCK39qViWMWRT8XFH2Z2Fx4j7eU2CIIJAbOkIiLml5tXECOQ?=
+ =?us-ascii?Q?eP3QhyDXwIofJO3Ma9JM85OAYE1V1sNdLu8F0OLu?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 138977a7-5ee7-40ac-daee-08da92bd71be
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2022 23:45:58.3028
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Pvwb2Dl7+uKM0HmUR5GAg5cRt4UjcPct2lYgP/f73KMiU4eRxiIsDmefyvRrK3RU
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6549
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 09, 2022 at 12:11:05PM -0700, Andy Lutomirski wrote:
+On Fri, Sep 09, 2022 at 08:55:07PM +0100, Robin Murphy wrote:
+
+> > Isn't this every driver though? Like every single driver implementing
+> > an UNMANAGED/DMA/DMA_FQ domain has a hidden reference to the
+> > iommu_domain - minimally to point the HW to the IOPTEs it stores.
 > 
+> Um, no? Domain ops get the domain passed in as an argument, which is far
+> from hidden, and if any driver implemented them to ignore that argument and
+> operate on something else it would be stupid and broken. Note I said
+> "per-device reference", meaning things like s390's zpci_dev->s390_domain and
+> SMMUv3's dev->iommu->priv->domain. It's only those references that are
+> reachable from release_device - outside the normal domain lifecycle - which
+> are problematic.
+
+If the plan is to make the domain refcounted and then allow a 'put' on
+it before we reach release_device() then it means every driver needs
+to hold a 'get' on the domain while it is programmed into the HW.
+
+Because the hw will still be touching memory that could be freed by an
+iommu_domain_free(). By "hidden" reference I mean the HW walkers are
+touching memory that would be freed - ie kasn won't see it.
+
+> > Do you know a reason not to hold the group mutex across
+> > release_device? I think that is the most straightforward and
+> > future proof.
 > 
-> On Fri, Sep 9, 2022, at 7:32 AM, Kirill A . Shutemov wrote:
-> > On Thu, Sep 08, 2022 at 09:48:35PM -0700, Andy Lutomirski wrote:
-> >> On 8/19/22 17:27, Kirill A. Shutemov wrote:
-> >> > On Thu, Aug 18, 2022 at 08:00:41PM -0700, Hugh Dickins wrote:
-> >> > > On Thu, 18 Aug 2022, Kirill A . Shutemov wrote:
-> >> > > > On Wed, Aug 17, 2022 at 10:40:12PM -0700, Hugh Dickins wrote:
-> >> > > > > 
-> >> > > > > If your memory could be swapped, that would be enough of a good reason
-> >> > > > > to make use of shmem.c: but it cannot be swapped; and although there
-> >> > > > > are some references in the mailthreads to it perhaps being swappable
-> >> > > > > in future, I get the impression that will not happen soon if ever.
-> >> > > > > 
-> >> > > > > If your memory could be migrated, that would be some reason to use
-> >> > > > > filesystem page cache (because page migration happens to understand
-> >> > > > > that type of memory): but it cannot be migrated.
-> >> > > > 
-> >> > > > Migration support is in pipeline. It is part of TDX 1.5 [1]. And swapping
-> >> > > > theoretically possible, but I'm not aware of any plans as of now.
-> >> > > > 
-> >> > > > [1] https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html
-> >> > > 
-> >> > > I always forget, migration means different things to different audiences.
-> >> > > As an mm person, I was meaning page migration, whereas a virtualization
-> >> > > person thinks VM live migration (which that reference appears to be about),
-> >> > > a scheduler person task migration, an ornithologist bird migration, etc.
-> >> > > 
-> >> > > But you're an mm person too: you may have cited that reference in the
-> >> > > knowledge that TDX 1.5 Live Migration will entail page migration of the
-> >> > > kind I'm thinking of.  (Anyway, it's not important to clarify that here.)
-> >> > 
-> >> > TDX 1.5 brings both.
-> >> > 
-> >> > In TDX speak, mm migration called relocation. See TDH.MEM.PAGE.RELOCATE.
-> >> > 
-> >> 
-> >> This seems to be a pretty bad fit for the way that the core mm migrates
-> >> pages.  The core mm unmaps the page, then moves (in software) the contents
-> >> to a new address, then faults it in.  TDH.MEM.PAGE.RELOCATE doesn't fit into
-> >> that workflow very well.  I'm not saying it can't be done, but it won't just
-> >> work.
-> >
-> > Hm. From what I see we have all necessary infrastructure in place.
-> >
-> > Unmaping is NOP for inaccessible pages as it is never mapped and we have
-> > mapping->a_ops->migrate_folio() callback that allows to replace software
-> > copying with whatever is needed, like TDH.MEM.PAGE.RELOCATE.
-> >
-> > What do I miss?
+> Yes, the ones documented in the code and already discussed here. The current
+> functional ones aren't particularly *good* reasons, but unless and until
+> they can all be cleaned up they are what they are.
+
+Uh, I feel like I missed part of the conversation - I don't know what
+this list is..
+
+I did look. I'm looking for a call chain that goes from
+release_device() into a core function that grabs the group->mutex.
+
+There is a comment in iommu_group_store_type() that suggest there is a
+recursion but doesn't say what it is. It was an Intel person who wrote
+the comment so I more carefully checked the intel driver and didn't
+find a call path, but it is big and complicated..
+
+There is a commment in iommu_change_dev_def_domain() about recursion
+on probe_finalize(), not relevant here, AFAICT.
+
+So, I did two approaches, one I checked quickly through every
+release_device looking for something.
+
+Then I looked across the entire exported driver facing API and focused
+on callchains going back toward the core from APIs that might be
+trouble and audited them almost completely.
+
+These APIs do not take the lock, so completely safe:
+ iommu_group_alloc
+ iommu_group_set_iommudata
+ iommu_group_set_name
+ iommu_group_get
+ iommu_group_ref_get
+ iommu_group_put
+ iommu_get_domain_for_dev
+ iommu_fwspec_free
+ iommu_fwspec_init
+ iommu_fwspec_add_ids
+ iommu_put_resv_regions (called from release_device)
+
+Does take the lock. Checked all of these in all the drivers, didn't
+find an obvious path to release_device:
+ iommu_group_remove_device
+ iommu_group_for_each_dev
+ iommu_attach_device
+ iommu_detach_device
+ iommu_attach_group
+ iommu_detach_group
+ bus_set_iommu
+
+Can't tell if these take lock due to driver callbacks, but couldn't
+find them in release, and doesn't make sense they would be there:
+ iommu_device_register
+ iommu_device_unregister
+ iommu_domain_alloc
+ iommu_domain_free
+
+Rest of the exported interface touching the drivers - didn't carefully
+check if they are using the lock - however by name seems unlikely
+these are in release_device():
+ iommu_register_device_fault_handler
+ iommu_unregister_device_fault_handler
+ iommu_report_device_fault
+ iommu_page_response
+ report_iommu_fault
+ iommu_iova_to_phys
+ iommu_map
+ iommu_unmap
+ iommu_alloc_resv_region
+ iommu_present
+ iommu_capable
+ iommu_default_passthrough
+
+It is big and complicated, so I wouldn't stake my life on it, but it
+seems worth investigating further.
+
+Could the recursion have been cleaned up already?
+
+> > > @@ -1022,6 +1030,14 @@ void iommu_group_remove_device(struct device *dev)
+> > >   	dev_info(dev, "Removing from iommu group %d\n", group->id);
+> > >   	mutex_lock(&group->mutex);
+> > > +	if (WARN_ON(group->domain != group->default_domain &&
+> > > +		    group->domain != group->blocking_domain)) {
+> > 
+> > This will false trigger, if there are two VFIO devices then the group
+> > will remained owned when we unplug one just of them, but the group's domain
+> > will be a VFIO owned domain.
 > 
-> Hmm, maybe this isn't as bad as I thought.
+> As opposed to currently, where most drivers' release_device will blindly
+> detach/disable the RID in some fashion so the other device would suddenly
+> blow up anyway? 
+
+Er, I think it is OK today, in the non-shared case. If the RID isn't
+shared then each device in the group is independent, so most drivers,
+most of the time, should only effect the RID release_device() is
+called on, while this warning will always trigger for any multi-device
+group.
+
+> (It *will* actually work on SMMUv2 because SMMUv2 comprehensively handles
+> StreamID-level aliasing beyond what pci_device_group() covers, which I
+> remain rather proud of)
+
+This is why I prefered not to explicitly change the domain, because at
+least if someone did write a non-buggy driver it doesn't get wrecked -
+and making a non-buggy driver is at least allowed by the API.
+
+> > And it misses the logic to WARN_ON if a domain is set and an external
+> > entity wrongly uses iommu_group_remove_device()..
 > 
-> Right now, unless I've missed something, the migration workflow is to
-> unmap (via try_to_migrate) all mappings, then migrate the backing store
-> (with ->migrate_folio(), although it seems like most callers expect the
-> actual copy to happen outside of ->migrate_folio(),
+> Huh? An external fake group couldn't have a default domain or blocking
+> domain, thus any non-NULL domain will not compare equal to either, so if
+> that could happen it will warn, and then most likely crash. I did think
+> briefly about trying to make it not crash, but then I remembered that fake
+> groups from external callers also aren't backed by IOMMU API drivers so have
+> no way to allocate or attach domains either, so in fact it cannot happen at
+> all under any circumstances that are worth reasoning about.
 
-Most? I guess you are talking about MIGRATE_SYNC_NO_COPY, right? AFAICS,
-it is HMM thing and not a common thing.
+I mean specificaly thing like FSL is doing where it is a real driver
+calling this API and the test of 'group->domain == NULL' is the more
+robust precondition.
 
-> and then make new
-> mappings.  With the *current* (vma-based, not fd-based) model for KVM
-> memory, this won't work -- we can't unmap before calling
-> TDH.MEM.PAGE.RELOCATE.
+So, IDK, I would perfer to understand where we hit a group mutex
+recursion before rejecting that path... If you know specifics please
+share, otherwise maybe we should stick in a lockdep check there and
+see if anything hits?
 
-We don't need to unmap. The page is not mapped from core-mm PoV.
+But I'm off to LPC so I probably won't write anything more thoughtful
+on this for a while.
 
-> But maybe it's actually okay with some care or maybe mild modifications
-> with the fd-based model.  We don't have any mmaps, per se, to unmap for
-> secret / INACCESSIBLE memory.  So maybe we can get all the way to
-> ->migrate_folio() without zapping anything in the secure EPT and just
-> call TDH-MEM.PAGE.RELOCATE from inside migrate_folio().  And there will
-> be nothing to fault back in.  From the core code's perspective, it's
-> like migrating a memfd that doesn't happen to have my mappings at the
-> time.
-
-Modifications needed if we want to initiate migation from userspace. IIRC,
-we don't have any API that can initiate page migration for file ranges,
-without mapping the file.
-
-But kernel can do it fine for own housekeeping, like compaction doesn't
-need any VMA. And we need compaction working for long term stability of
-the system.
-
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+Thanks,
+Jason
