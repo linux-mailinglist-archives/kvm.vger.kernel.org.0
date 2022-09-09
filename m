@@ -2,115 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 31EFF5B3424
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 11:39:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CCE1C5B3496
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 11:55:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231500AbiIIJim (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 05:38:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36384 "EHLO
+        id S230408AbiIIJvj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 05:51:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232177AbiIIJif (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 05:38:35 -0400
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F36859E89D;
-        Fri,  9 Sep 2022 02:38:33 -0700 (PDT)
-Date:   Fri, 9 Sep 2022 10:38:23 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1662716312;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sbjsJsmK8eNNPB1/qbrlalcNvip2GURuJ8l1XpwCdtA=;
-        b=w5aYW3X82xa4eYEqN9xPSlbdWVdlzhVTNhVkxtP9f3wiaVyoildIroHN4Zy7CmcTTPA9wN
-        SoANTcLFct9zHRFs4lgnTLNq94CjWzDWlcEX4gscm56lXU4biERICyRPbokXJYe5ydUMBs
-        el+dRzkfzb1LVpFUKALFGbST86619Q8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Quentin Perret <qperret@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Gavin Shan <gshan@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 06/14] KVM: arm64: Return next table from map callbacks
-Message-ID: <YxsJj3ojGyhNw5Jn@google.com>
-References: <20220830194132.962932-1-oliver.upton@linux.dev>
- <20220830194132.962932-7-oliver.upton@linux.dev>
- <YxkN7XmHiU3ddknR@google.com>
+        with ESMTP id S230382AbiIIJvX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 05:51:23 -0400
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AC5545F7C
+        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 02:50:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazon201209; t=1662717030; x=1694253030;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=VJBe3MZXHTcJss0IBb9fwg0kY5Z/ouM9RWdqt6S3lOE=;
+  b=VuJyGsLNQK4GJRmLubx6PvRP9c9trVbM95RUP2oLvKGuQD8yk96Y6r/m
+   1q69CibJBIXnhHGQ/tkaJWYCvOKU2WMoTTuJ8gitQr6unDCDbt9Rc74Vv
+   kZp/FFkk31m70uFGDJu391WLgB4vxV3rSDuoxrphN1Slo6y6ugy4PMA2I
+   8=;
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1e-26daedd8.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2022 09:50:17 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+        by email-inbound-relay-iad-1e-26daedd8.us-east-1.amazon.com (Postfix) with ESMTPS id 358CEE1240;
+        Fri,  9 Sep 2022 09:50:14 +0000 (UTC)
+Received: from EX19D008UEA001.ant.amazon.com (10.252.134.62) by
+ EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.38; Fri, 9 Sep 2022 09:50:14 +0000
+Received: from EX13MTAUEA001.ant.amazon.com (10.43.61.82) by
+ EX19D008UEA001.ant.amazon.com (10.252.134.62) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.12;
+ Fri, 9 Sep 2022 09:50:14 +0000
+Received: from dev-dsk-metikaya-1c-d447d167.eu-west-1.amazon.com
+ (10.13.250.103) by mail-relay.amazon.com (10.43.61.243) with Microsoft SMTP
+ Server (TLS) id 15.0.1497.38 via Frontend Transport; Fri, 9 Sep 2022 09:50:13
+ +0000
+From:   Metin Kaya <metikaya@amazon.co.uk>
+To:     <kvm@vger.kernel.org>, <pbonzini@redhat.com>
+CC:     <x86@kernel.org>, <bp@alien8.de>, <dwmw@amazon.co.uk>,
+        <seanjc@google.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
+        <dave.hansen@linux.intel.com>, <joao.m.martins@oracle.com>,
+        Metin Kaya <metikaya@amazon.co.uk>
+Subject: [PATCH 1/2] KVM: x86/xen: Remove redundant NULL check
+Date:   Fri, 9 Sep 2022 09:50:05 +0000
+Message-ID: <20220909095006.65440-1-metikaya@amazon.co.uk>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YxkN7XmHiU3ddknR@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Spam-Status: No, score=-11.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi David,
+'kvm' cannot be NULL if we are at that point.
 
-On Wed, Sep 07, 2022 at 02:32:29PM -0700, David Matlack wrote:
-> On Tue, Aug 30, 2022 at 07:41:24PM +0000, Oliver Upton wrote:
-> > The map walkers install new page tables during their traversal. Return
-> > the newly-installed table PTE from the map callbacks to point the walker
-> > at the new table w/o rereading the ptep.
-> > 
-> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > ---
-> >  arch/arm64/kvm/hyp/pgtable.c | 9 +++++----
-> >  1 file changed, 5 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 331f6e3b2c20..f911509e6512 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -202,13 +202,12 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
-> >  	if (!table && (flags & KVM_PGTABLE_WALK_LEAF)) {
-> >  		ret = kvm_pgtable_visitor_cb(data, addr, level, ptep, &pte,
-> >  					     KVM_PGTABLE_WALK_LEAF);
-> > -		pte = *ptep;
-> > -		table = kvm_pte_table(pte, level);
-> >  	}
-> >  
-> >  	if (ret)
-> >  		goto out;
-> 
-> Rather than passing a pointer to the local variable pte and requiring
-> all downstream code to update it (and deal with dereferencing to read
-> the old pte), wouldn't it be simpler to just re-read the PTE here?
+This bug was discovered and resolved using Coverity Static Analysis
+Security Testing (SAST) by Synopsys, Inc.
 
-Yeah, you're right. I had some odd rationalization about this, but
-there's no need to force a walker to descend into the new table level as
-it is wasted work if another thread unlinks it.
+Fixes: 2fd6df2f2b47 ("KVM: x86/xen: intercept EVTCHNOP_send from
+guests")
 
-[...]
+Signed-off-by: Metin Kaya <metikaya@amazon.co.uk>
+---
+ arch/x86/kvm/xen.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-> >  
-> > +	table = kvm_pte_table(pte, level);
-> >  	if (!table) {
-> 
-> nit: Technically there's no reason to set @table again. e.g. This could
-> just be:
-> 
->         if (!kvm_pte_table(pte, level)) {
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 280cb5dc7341..f2e09481f633 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -1734,8 +1734,7 @@ static int kvm_xen_eventfd_deassign(struct kvm *kvm, u32 port)
+ 	if (!evtchnfd)
+ 		return -ENOENT;
+ 
+-	if (kvm)
+-		synchronize_srcu(&kvm->srcu);
++	synchronize_srcu(&kvm->srcu);
+ 	if (!evtchnfd->deliver.port.port)
+ 		eventfd_ctx_put(evtchnfd->deliver.eventfd.ctx);
+ 	kfree(evtchnfd);
+-- 
+2.37.1
 
-Sure, I'll squish these lines together.
-
---
-Thanks,
-Oliver
