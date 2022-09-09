@@ -2,49 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 29C625B3E6E
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 20:00:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 357DD5B3E9D
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 20:14:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230064AbiIISAE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 14:00:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33682 "EHLO
+        id S229514AbiIISNx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 14:13:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230114AbiIIR7o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 13:59:44 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D28181449E7
-        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 10:58:11 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DE84615DB;
-        Fri,  9 Sep 2022 10:58:15 -0700 (PDT)
-Received: from [10.57.15.197] (unknown [10.57.15.197])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 60E333F73D;
-        Fri,  9 Sep 2022 10:58:07 -0700 (PDT)
-Message-ID: <e0ff6dc1-91b3-2e41-212c-c83a2bf2b3a8@arm.com>
-Date:   Fri, 9 Sep 2022 18:57:59 +0100
+        with ESMTP id S231826AbiIISNo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 14:13:44 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E59DDFF4B;
+        Fri,  9 Sep 2022 11:13:43 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id v1so2518038plo.9;
+        Fri, 09 Sep 2022 11:13:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=2rBWOVv3s+/BgGo/HoYIVzLUNrlvQyzpwbNtQsvWT2I=;
+        b=U0OPC7Mybv9nOmzkVZ0q7GdbU6DFYu/oD8m83e0oJa97abKroHSB2iIGEEiSDIcR4H
+         6lteeo0bBVNtmM8aK90o2FGhEbxQgVcJQUnx9ADdfUmgYuDYpWupqxNRqDCTFZoigLuh
+         DYf3JqdYTwYiPvDN4ex+2XEJLfeKns1FWGLRuLCUB0yspf5KOQaTIUcf95BxaCdCoR94
+         o6q4D2n2tPNMYEM09cMyKGDUNRn3fXrhHXzsiDitg1XYIISGpRp2ZkrU5xIcBCv7v+lh
+         9vCG5/ArewR1H8ZpXUbMn9Pad4i7P8zqfF4Re2bZbEs++Y6I+oe3j4ITF2FU1R1u5Vol
+         eTJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=2rBWOVv3s+/BgGo/HoYIVzLUNrlvQyzpwbNtQsvWT2I=;
+        b=WDX0tDyCC7jD3JlXmZHAPnFAsqsxV4EZDscjbGJfhHWrQcf0zGOb6zxIJgpgBHgt7A
+         RkNcQSeLctjQp8WmU7pz7J+IFFbkWtO6YlAzxoJoV+Kb8Uy2Eutt8I0mYX1/N+nJUgmF
+         GnkAkPK/mqqZmldg9J4hwqqozIymh5pVqBxdP4SxCVPgidZuv5zuf34zJwT+A5EcB4a1
+         sWypo1bG49htW5fJw9uBGGSrwIZn4KTqTr6AdC99eOmV1Ep2WBjHvtkg0GkKURi+Pbxw
+         +1SJDK7xZfiB8k4nHnvaG//5DJa9vtmtQHlCr52YX6kKNzFFClPp35Clte1Br7ZUdiAu
+         Y9DQ==
+X-Gm-Message-State: ACgBeo2io/kkorCR3/cH+UkehAlGVC9XLDaUtPrLakNzZyR+0CGfU3Is
+        8D6/qcZtWVXh4lAg3dSAUYw=
+X-Google-Smtp-Source: AA6agR5nPtj/Vphsk/4jmNa1U1Db4c4Gob5akLfQ/k0i0pA3yyn7H9N4iy3dQpAVK4lGKrHgWUINyg==
+X-Received: by 2002:a17:903:2104:b0:176:a9ef:418b with SMTP id o4-20020a170903210400b00176a9ef418bmr14719928ple.134.1662747222905;
+        Fri, 09 Sep 2022 11:13:42 -0700 (PDT)
+Received: from localhost ([208.71.200.116])
+        by smtp.gmail.com with ESMTPSA id i10-20020a170902c94a00b001768517f99esm745300pla.244.2022.09.09.11.13.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Sep 2022 11:13:42 -0700 (PDT)
+Date:   Fri, 9 Sep 2022 18:13:41 +0000
+From:   Bobby Eshleman <bobbyeshleman@gmail.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     Dexuan Cui <decui@microsoft.com>, Bryan Tan <bryantan@vmware.com>,
+        Vishnu Dasa <vdasa@vmware.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@gmail.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Cong Wang <cong.wang@bytedance.com>,
+        Jiang Wang <jiang.wang@bytedance.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org
+Subject: Re: Call to discuss vsock netdev/sk_buff [was Re: [PATCH 0/6]
+ virtio/vsock: introduce dgrams, sk_buff, and qdisc]
+Message-ID: <YxuCVfFcRdWHeeh8@bullseye>
+References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
+ <YxdKiUzlfpHs3h3q@fedora>
+ <Yv5PFz1YrSk8jxzY@bullseye>
+ <20220908143652.tfyjjx2z6in6v66c@sgarzare-redhat>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH 4/4] iommu: Fix ordering of iommu_release_device()
-Content-Language: en-GB
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Will Deacon <will@kernel.org>, Qian Cai <cai@lca.pw>,
-        Joerg Roedel <jroedel@suse.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>
-References: <4-v1-ef00ffecea52+2cb-iommu_group_lifetime_jgg@nvidia.com>
- <87b7041e-bc8d-500c-7167-04190e3795a9@arm.com>
- <ada74e00-77e1-770b-f0b7-a4c43a86c06f@arm.com> <YxpiBEbGHECGGq5Q@nvidia.com>
- <38bac59a-808d-5e91-227a-a3a06633c091@arm.com> <Yxs+1s+MPENLTUpG@nvidia.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <Yxs+1s+MPENLTUpG@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-9.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220908143652.tfyjjx2z6in6v66c@sgarzare-redhat>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -52,152 +90,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-09-09 14:25, Jason Gunthorpe wrote:
-> On Fri, Sep 09, 2022 at 10:05:58AM +0100, Robin Murphy wrote:
->> On 2022-09-08 22:43, Jason Gunthorpe wrote:
->>> On Thu, Sep 08, 2022 at 10:27:06PM +0100, Robin Murphy wrote:
->>>
->>>> Oh, because s390 is using iommu_get_domain_for_dev() in its release_device
->>>> callback, which needs to dereference the group to work, and the current
->>>> domain may also be a non-default one which we can't prevent from
->>>> disappearing racily, that was why :(
->>>
->>> Hum, the issue there is the use of device->iommu_group - but that just
->>> means I didn't split properly. How about this incremental:
->>
->> That did cross my mind, but it's a bit grim.
-> 
-> Actually, also in my morning, I think it may not even be necessary.
-> 
-> Keep in mind the start of the series fixes VFIO.
-> 
-> The bug that S390 is trying to fix is that VFIO didn't put back the
-> group ownership, it just left its own iommu_domain attached and called
-> release().
-> 
-> But now, at least for single device groups, VFIO will put owenership
-> back and zdev->s390_domain == NULL when we get to release_device()
-> 
->> That then only leaves the issue that that domain may still become
->> invalid at any point after the group mutex has been dropped.
-> 
-> So that is this race:
-> 
->          CPU0                         CPU1
->     iommu_release_device(a)
->        __iommu_group_remove_device(a)
-> 			         iommu_device_use_default_domain(b)
->                                   iommu_domain_free(domain)
->                                   iommu_release_device(b)
->                                        ops->release_device(b)
->        ops->release_device(a)
->          // Boom, a is still attached to domain :(
-> 
-> I can't think of how to solve this other than holding the group mutex
-> across release_device. See below.
+Hey Stefano, thanks for sending this out.
 
-I see a few possibilities:
-
-- Backtrack slightly on its removal, and instead repurpose detach_dev
-into a specialised domain cleanup callback, called before or during
-iommu_group_remove_device(), with the group mutex held.
-
-- Drivers that hold any kind of internal per-device references to
-domains - which is generally the root of this issue in the first place -
-can implement proper reference counting, so even if a domain is "freed"
-with a device still attached as above, it doesn't actually go away until
-release_device(a) cleans up the final dangling reference. I suggested
-the core doing this generically, but on reflection I think it's actually
-a lot more straightforward as a driver-internal thing.
-
-- Drivers that basically just keep a list of devices in the domain and
-need to do a list_del() in release_device, can also list_del_init() any
-still-attached devices in domain_free, with a simple per-instance or
-global lock to serialise the two.
-
->>> And to your other question, the reason I split the function is because
->>> I couldn't really say WTF iommu_group_remove_device() was supposed to
->>> do. The __ version make ssense as part of the remove_device, due to
->>> the sequencing with ops->release()
->>>
->>> But the other one doesn't have that. So I want to put in a:
->>>
->>>      WARN_ON(group->blocking_domain || group->default_domain);
->>>
->>> Because calling it after those domains are allocated looks broken to
->>> me.
->>
->> I might be misunderstanding, but that sounds backwards - if a real device is
->> being hotplugged out, we absolutely expect that to happen *after* its
->> default domain has been set up.
+On Thu, Sep 08, 2022 at 04:36:52PM +0200, Stefano Garzarella wrote:
 > 
-> See below for what I mean
+> Looking better at the KVM forum sched, I found 1h slot for Sep 15 at 16:30
+> UTC.
 > 
-> iommu_group_remove_device() doesn't work as an API because it has no
-> way to tell the device to stop using the domain we are about to free.
-> 
-> So it should assert that there is no domain to worry about. For the
-> vfio and power case there is no domain because they don't use iommu
-> drivers
+> Could this work for you?
 
-Ah, I see it now - if we think it's a usage error for any current API
-user to allow a device to be removed while still attached to a non-
-default domain, then we can just throw our hands up at that, and
-mitigate for the default domain case that we *can* control. I'm not 100%
-convinced there might not be some niche non-uAPI case for skipping a
-detach because you know you're tearing down your device and domain at the
-same time, but I'm inclined to agree that we can worry about that if and
-when it does ever come up.
+Unfortunately, I can't make this time slot.
 
-If so, I reckon it should be about as as easy as this (untested).
+My schedule also opens up a lot the week of the 26th, especially between
+16:00 and 19:00 UTC, as well as after 22:00 UTC.
 
-Cheers,
-Robin.
-
------>8-----
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 9fbe5d067473..760d9bd3ad66 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -396,17 +396,25 @@ int iommu_probe_device(struct device *dev)
-  void iommu_release_device(struct device *dev)
-  {
-  	const struct iommu_ops *ops;
-+	struct iommu_group *group;
-  
-  	if (!dev->iommu)
-  		return;
-  
-  	iommu_device_unlink(dev->iommu->iommu_dev, dev);
-  
-+	/*
-+	 * Some drivers track a device's current domain internally and may
-+	 * dereference it to clean up in release_device. If a default domain
-+	 * exists, hold a reference to ensure it stays around long enough.
-+	 */
-+	group = iommu_group_get(dev);
-+	iommu_group_remove_device(dev);
-  	ops = dev_iommu_ops(dev);
-  	if (ops->release_device)
-  		ops->release_device(dev);
-  
--	iommu_group_remove_device(dev);
-+	iommu_group_put(group);
-  	module_put(ops->owner);
-  	dev_iommu_free(dev);
-  }
-@@ -1022,6 +1030,14 @@ void iommu_group_remove_device(struct device *dev)
-  	dev_info(dev, "Removing from iommu group %d\n", group->id);
-  
-  	mutex_lock(&group->mutex);
-+	if (WARN_ON(group->domain != group->default_domain &&
-+		    group->domain != group->blocking_domain)) {
-+		if (group->default_domain)
-+			__iommu_attach_device(group->default_domain, dev);
-+		else
-+			__iommu_detach_device(group->domain, dev);
-+	}
-+
-  	list_for_each_entry(tmp_device, &group->devices, list) {
-  		if (tmp_device->dev == dev) {
-  			device = tmp_device;
+Best,
+Bobby
