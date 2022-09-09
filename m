@@ -2,130 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C7B1C5B3306
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 11:13:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31EFF5B3424
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 11:39:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232113AbiIIJGu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 05:06:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37152 "EHLO
+        id S231500AbiIIJim (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 05:38:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232055AbiIIJGM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 05:06:12 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 60BD3578A4
-        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 02:06:06 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2DEAA15DB;
-        Fri,  9 Sep 2022 02:06:12 -0700 (PDT)
-Received: from [10.57.15.197] (unknown [10.57.15.197])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C8D503F73D;
-        Fri,  9 Sep 2022 02:06:03 -0700 (PDT)
-Message-ID: <38bac59a-808d-5e91-227a-a3a06633c091@arm.com>
-Date:   Fri, 9 Sep 2022 10:05:58 +0100
+        with ESMTP id S232177AbiIIJif (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 05:38:35 -0400
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F36859E89D;
+        Fri,  9 Sep 2022 02:38:33 -0700 (PDT)
+Date:   Fri, 9 Sep 2022 10:38:23 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1662716312;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sbjsJsmK8eNNPB1/qbrlalcNvip2GURuJ8l1XpwCdtA=;
+        b=w5aYW3X82xa4eYEqN9xPSlbdWVdlzhVTNhVkxtP9f3wiaVyoildIroHN4Zy7CmcTTPA9wN
+        SoANTcLFct9zHRFs4lgnTLNq94CjWzDWlcEX4gscm56lXU4biERICyRPbokXJYe5ydUMBs
+        el+dRzkfzb1LVpFUKALFGbST86619Q8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Gavin Shan <gshan@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 06/14] KVM: arm64: Return next table from map callbacks
+Message-ID: <YxsJj3ojGyhNw5Jn@google.com>
+References: <20220830194132.962932-1-oliver.upton@linux.dev>
+ <20220830194132.962932-7-oliver.upton@linux.dev>
+ <YxkN7XmHiU3ddknR@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH 4/4] iommu: Fix ordering of iommu_release_device()
-Content-Language: en-GB
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Will Deacon <will@kernel.org>, Qian Cai <cai@lca.pw>,
-        Joerg Roedel <jroedel@suse.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>
-References: <4-v1-ef00ffecea52+2cb-iommu_group_lifetime_jgg@nvidia.com>
- <87b7041e-bc8d-500c-7167-04190e3795a9@arm.com>
- <ada74e00-77e1-770b-f0b7-a4c43a86c06f@arm.com> <YxpiBEbGHECGGq5Q@nvidia.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <YxpiBEbGHECGGq5Q@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-9.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YxkN7XmHiU3ddknR@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-09-08 22:43, Jason Gunthorpe wrote:
-> On Thu, Sep 08, 2022 at 10:27:06PM +0100, Robin Murphy wrote:
-> 
->> Oh, because s390 is using iommu_get_domain_for_dev() in its release_device
->> callback, which needs to dereference the group to work, and the current
->> domain may also be a non-default one which we can't prevent from
->> disappearing racily, that was why :(
-> 
-> Hum, the issue there is the use of device->iommu_group - but that just
-> means I didn't split properly. How about this incremental:
+Hi David,
 
-That did cross my mind, but it's a bit grim. In the light of the 
-morning, I'm not sure s390 actually *needs* the group anyway - AFAICS if 
-iommu_group_remove_device() has been processed first, that will have 
-synchronised against any concurrent attach/detach, so zdev->s390_domain 
-can be assumed to be up to date and used directly without the round trip 
-through iommu_get_domain_for_dev(). That then only leaves the issue that 
-that domain may still become invalid at any point after the group mutex 
-has been dropped.
-
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index c451bf715182ac..99ef799f3fe6b5 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -351,6 +351,7 @@ void iommu_release_device(struct device *dev)
->   	 * them until the have been detached. release_device() is expected to
->   	 * detach all domains connected to the dev.
->   	 */
-> +	dev->iommu_group = NULL;
->   	kobject_put(group->devices_kobj);
->   
->   	module_put(ops->owner);
-> @@ -980,7 +981,6 @@ static void __iommu_group_remove_device(struct device *dev)
->   
->   	kfree(device->name);
->   	kfree(device);
-> -	dev->iommu_group = NULL;
->   }
->   
->   /**
-> @@ -995,6 +995,7 @@ void iommu_group_remove_device(struct device *dev)
->   	struct iommu_group *group = dev->iommu_group;
->   
->   	__iommu_group_remove_device(dev);
-> +	dev->iommu_group = NULL;
->   	kobject_put(group->devices_kobj);
->   }
->   EXPORT_SYMBOL_GPL(iommu_group_remove_device);
+On Wed, Sep 07, 2022 at 02:32:29PM -0700, David Matlack wrote:
+> On Tue, Aug 30, 2022 at 07:41:24PM +0000, Oliver Upton wrote:
+> > The map walkers install new page tables during their traversal. Return
+> > the newly-installed table PTE from the map callbacks to point the walker
+> > at the new table w/o rereading the ptep.
+> > 
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >  arch/arm64/kvm/hyp/pgtable.c | 9 +++++----
+> >  1 file changed, 5 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index 331f6e3b2c20..f911509e6512 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -202,13 +202,12 @@ static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+> >  	if (!table && (flags & KVM_PGTABLE_WALK_LEAF)) {
+> >  		ret = kvm_pgtable_visitor_cb(data, addr, level, ptep, &pte,
+> >  					     KVM_PGTABLE_WALK_LEAF);
+> > -		pte = *ptep;
+> > -		table = kvm_pte_table(pte, level);
+> >  	}
+> >  
+> >  	if (ret)
+> >  		goto out;
 > 
-> To me it makes sense that the driver should be able to continue to
-> query the iommu_group during release anyhow..
+> Rather than passing a pointer to the local variable pte and requiring
+> all downstream code to update it (and deal with dereferencing to read
+> the old pte), wouldn't it be simpler to just re-read the PTE here?
 
-I'm not so sure, release shouldn't be depending on a group since there 
-may never have been one anyway. Perhaps the answer is an extra 
-pre-release step to balance probe_finalize?
+Yeah, you're right. I had some odd rationalization about this, but
+there's no need to force a walker to descend into the new table level as
+it is wasted work if another thread unlinks it.
 
-> And to your other question, the reason I split the function is because
-> I couldn't really say WTF iommu_group_remove_device() was supposed to
-> do. The __ version make ssense as part of the remove_device, due to
-> the sequencing with ops->release()
+[...]
+
+> >  
+> > +	table = kvm_pte_table(pte, level);
+> >  	if (!table) {
 > 
-> But the other one doesn't have that. So I want to put in a:
+> nit: Technically there's no reason to set @table again. e.g. This could
+> just be:
 > 
->     WARN_ON(group->blocking_domain || group->default_domain);
-> 
-> Because calling it after those domains are allocated looks broken to
-> me.
+>         if (!kvm_pte_table(pte, level)) {
 
-I might be misunderstanding, but that sounds backwards - if a real 
-device is being hotplugged out, we absolutely expect that to happen 
-*after* its default domain has been set up. The external callers are 
-using fake groups where default domains aren't relevant, and I have no 
-idea what PAMU is doing but it's been doing it for long enough that it 
-most likely isn't a problem. Thus wherever that check would be it would 
-seem either wrong or unnecessary.
+Sure, I'll squish these lines together.
 
+--
 Thanks,
-Robin.
+Oliver
