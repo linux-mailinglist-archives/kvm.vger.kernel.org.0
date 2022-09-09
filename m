@@ -2,169 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 400B25B2CD5
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 05:17:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EFF15B2C8D
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 05:07:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230072AbiIIDRd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Sep 2022 23:17:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42746 "EHLO
+        id S230132AbiIIDEk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Sep 2022 23:04:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229599AbiIIDRb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Sep 2022 23:17:31 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2066.outbound.protection.outlook.com [40.107.93.66])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EED8265F;
-        Thu,  8 Sep 2022 20:17:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YcVaHVn+DMuS+GQpcw0YEoKQnB/sJkf8kTrJ9ebXL2KNF1hLlRK1CkiJwBonfY6gAMG8HI+WffH5KxMbkWYLTdA8oo5QBbmV0YRm1kgW7kF5bSPyWwifsetin6xfyyAON7jVome8VjbM/hNfVzkhdIhTNp1NBNg/3bgJFSjGF0mhC4U8inHbbgre8WtpBk0wwDR3vQC0MP3GEhbKEbbPKLMspoZBGmGkrT6cqTtbUMKmtSkoEbbNEYEraB39ZDm2EEWoghi5wSfovVn/G8H6i+rucNL7PdX6F+SXrvfOD+fCVJaqJxgd/8wIxUJXnJLlPM8vqtSENupN0L2Pf7SW0w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cWi81IMdZwicw2LJEyRXdtA41SF9WN6zcwiHFsu0pD8=;
- b=Xmgo0zR1WbCVhvU4pgAA52g93AAvbuxK3Wr61VFF0wyAP9LriCrXCtuMYLDCl6++Lg5DLkV39U5X+m9kz3oD8EHJKcjTcwBz2vwh60+csf1x0QQwamJ+GKVrRGXfzNyTgH+QnEByzqbsjU6Mo0gsoWkf5TDK19YTKiwK6CUdtf/JssqpKyZrZXgrdprA8nrVPFzSw6io7J1lsmDw/xWTLFUvT0jY2DQsUuvNGs4QUduEHbLEh7meJ4sZqORa+9D9PP1eC57okFGx+G1TfJ57Yp6QZeifsRsBz7oQ+1zPfToZfXCWhAgc8SSdbcRJn3w7P5BLVCF5YsZRW0cPC+1TmA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.234) smtp.rcpttodomain=svenpeter.dev smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cWi81IMdZwicw2LJEyRXdtA41SF9WN6zcwiHFsu0pD8=;
- b=WGBGQ4+X6CBSSNxM4LEt46hpfdBPOnMr1IV/+HGwFUHY/uWJMNtRPYtmEuVWHuHo/xNhzUY5DiBASlibrIchBoj/jtKexYCpicpQjhHocIL35NFwwXIVpJVPCa1wxBLE9jtvVZpc+04BUd/pipKfU6wQtB/euUVBH0eGfOI+0WUs377ZPxhwxk9jK2C0miM7pkTlZRGS1JVBesDN/8PrAetkmsp7PP1fXPRpVtfSBWIc9Ck6Oec1yxMOOrv/3eSiYv/Be72ZsjzHdPC1SyR2gyUW2rPz+e1UDeMzg0QqMu1ADuGZm0rstzOqRwuvcO9xmrHSOMKYQcqYVLXVVolOCw==
-Received: from MW4PR03CA0032.namprd03.prod.outlook.com (2603:10b6:303:8e::7)
- by SJ1PR12MB6265.namprd12.prod.outlook.com (2603:10b6:a03:458::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.14; Fri, 9 Sep
- 2022 03:17:28 +0000
-Received: from CO1NAM11FT101.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:8e:cafe::f9) by MW4PR03CA0032.outlook.office365.com
- (2603:10b6:303:8e::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.14 via Frontend
- Transport; Fri, 9 Sep 2022 03:17:28 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.234)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.234 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.234; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (12.22.5.234) by
- CO1NAM11FT101.mail.protection.outlook.com (10.13.175.164) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.5612.13 via Frontend Transport; Fri, 9 Sep 2022 03:17:28 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by DRHQMAIL101.nvidia.com
- (10.27.9.10) with Microsoft SMTP Server (TLS) id 15.0.1497.38; Fri, 9 Sep
- 2022 03:17:27 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29; Thu, 8 Sep 2022
- 20:17:27 -0700
-Received: from Asurada-Nvidia (10.127.8.10) by mail.nvidia.com (10.129.68.6)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29 via Frontend
- Transport; Thu, 8 Sep 2022 20:17:24 -0700
-Date:   Thu, 8 Sep 2022 20:17:23 -0700
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Joerg Roedel <joro@8bytes.org>, Jason Gunthorpe <jgg@nvidia.com>
-CC:     <will@kernel.org>, <robin.murphy@arm.com>,
-        <alex.williamson@redhat.com>, <suravee.suthikulpanit@amd.com>,
-        <marcan@marcan.st>, <sven@svenpeter.dev>, <alyssa@rosenzweig.io>,
-        <robdclark@gmail.com>, <dwmw2@infradead.org>,
-        <baolu.lu@linux.intel.com>, <mjrosato@linux.ibm.com>,
-        <gerald.schaefer@linux.ibm.com>, <orsonzhai@gmail.com>,
-        <baolin.wang@linux.alibaba.com>, <zhang.lyra@gmail.com>,
-        <thierry.reding@gmail.com>, <vdumpa@nvidia.com>,
-        <jonathanh@nvidia.com>, <jean-philippe@linaro.org>,
-        <cohuck@redhat.com>, <tglx@linutronix.de>,
-        <shameerali.kolothum.thodi@huawei.com>,
-        <thunder.leizhen@huawei.com>, <christophe.jaillet@wanadoo.fr>,
-        <yangyingliang@huawei.com>, <jon@solid-run.com>,
-        <iommu@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
-        <asahi@lists.linux.dev>, <linux-arm-kernel@lists.infradead.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-        <linux-tegra@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>, <kvm@vger.kernel.org>,
-        <kevin.tian@intel.com>
-Subject: Re: [PATCH v6 1/5] iommu: Return -EMEDIUMTYPE for incompatible
- domain and device/group
-Message-ID: <YxqwQ+3OICPdEtk0@Asurada-Nvidia>
-References: <20220815181437.28127-1-nicolinc@nvidia.com>
- <20220815181437.28127-2-nicolinc@nvidia.com>
- <YxiRkm7qgQ4k+PIG@8bytes.org>
- <Yxig+zfA2Pr4vk6K@nvidia.com>
- <YxilZbRL0WBR97oi@8bytes.org>
- <YxjQiVnpU0dr7SHC@nvidia.com>
- <Yxnt9uQTmbqul5lf@8bytes.org>
- <YxoU8lw+qIw9woRL@nvidia.com>
+        with ESMTP id S229529AbiIIDEe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Sep 2022 23:04:34 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74625C08;
+        Thu,  8 Sep 2022 20:04:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662692663; x=1694228663;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=P+CRhjjxG8elyohg8uAXljHfLC1jEqw8D5rpZVMXHkg=;
+  b=hkedW7eADiTwcBB2yUQS3YK/USPc+nVVSnHNn8uUNbpb3YpHcRdv4NT0
+   tqP5QNJsLQHVAC1deLo1CI49JLTZfJmfQTpAOGIHp4JHXo25H2IAwtBCf
+   zrWeIjaOd7QTFORTcA0qXagojV0bOSp99/QR8JG1niS0N5sI9QMuIv9aE
+   aHNy2Ah5KSYVIXaX71Zvxz395CNlHqxvvGmNG/Xn+Jm9Ncf0U1h0gophD
+   HlZVFO0vIeKnk0/wsKeCvxCFXsTe08b+qPyItBZg5C/ZifF+/nHw+Vyev
+   lKr44f/cK4Pf4TE+0QaqZ9o44e+G2Cq2hBXTILK35QKE+8LUZcEadE7hP
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10464"; a="277771734"
+X-IronPort-AV: E=Sophos;i="5.93,300,1654585200"; 
+   d="scan'208";a="277771734"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2022 20:03:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,300,1654585200"; 
+   d="scan'208";a="740908460"
+Received: from sqa-gate.sh.intel.com (HELO michael.clx.dev.tsp.org) ([10.239.48.212])
+  by orsmga004.jf.intel.com with ESMTP; 08 Sep 2022 20:03:27 -0700
+From:   Kevin Tian <kevin.tian@intel.com>
+To:     Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Eric Farman <farman@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Longfang Liu <liulongfang@huawei.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     Yi Liu <yi.l.liu@intel.com>
+Subject: [PATCH v3 00/15] Tidy up vfio_device life cycle
+Date:   Fri,  9 Sep 2022 18:22:32 +0800
+Message-Id: <20220909102247.67324-1-kevin.tian@intel.com>
+X-Mailer: git-send-email 2.21.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <YxoU8lw+qIw9woRL@nvidia.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT101:EE_|SJ1PR12MB6265:EE_
-X-MS-Office365-Filtering-Correlation-Id: c011eca3-74e5-48d5-ea39-08da9211d333
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sHXN/KKHM1XqDv2azSzqcajRY297pTWIwlt21Oi+lOQCQiDUPNdS563UqSg4J16qQzfA/PAU3YuWHfSFROcJdbqM8kkCdpJgNqu9tNKc2Kb+OBRYBujk94qzcEcpRxjYdjUPVXGnnlsA/6lj7TD9TjlOZd9bOjRYQ9yi5qsrL3pyFBe5YI/i+MKbIepvsyh7tXba7rkBcNJGfVmZlwIBDyv4n4MQmfBnAPLJuPL1a66AMQpMgS+T+pzkZhi9R1prURmGLTAjEue/mF9f4t3BWI4KapBTjNxE3l+7uoBwaWl5UQfJh6fFLi5b624ZK+darjRg4fEgKeB1tATIbunOVdlUqtfkG3RNSf3NGqEsiX8bBTXGjhkeE/6Hpgo2U4u6NSxeRR6A1UZUivPgO+iv9WEZaxwXDOELG552xAbOHhft+NEJxRq7jGnPJgebz6w5zRwHOLBc8rhjpARThNLBcsJQ1XKKp1TlxAIaqvp/1ClRNX/uKsKwGVgVyB0XvuVgfTSAfcepAYNcfcwdN5WGCs475qGVZxDs1wL+iG2IObD06i0WpTOopysA9GLo2Vb2HgED2D8kz5SDTFz0pIS7xFpbNnx3+gS8sQxm+Tj/9urE7dqQO1hoNI2M4iAcVn+c/xZ5JzyPUOtCkx7ribuE/f+tpYopVhEav2VP+IpFO/fCpvHuDGHRJJBYJ1KU1oVQlUfQg345Hh7zwLxITDtEd+zjOr0BwamW3f7yZWju4tBE470JvzWdHVIVbc7fZkz9x4KoCvEeTi7d5FwCSkHJb7kTxndx8obj0bcR9EXB1P28p/nS7QmIHNhro8tR20+9RtaSdOuvc0Bxy5S09Y8eCQ==
-X-Forefront-Antispam-Report: CIP:12.22.5.234;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(346002)(396003)(376002)(136003)(46966006)(40470700004)(36840700001)(40480700001)(336012)(81166007)(426003)(356005)(47076005)(26005)(8676002)(36860700001)(82310400005)(33716001)(478600001)(70586007)(82740400003)(40460700003)(70206006)(86362001)(55016003)(4326008)(41300700001)(6636002)(8936002)(110136005)(54906003)(316002)(5660300002)(186003)(7406005)(9686003)(2906002)(7416002)(67856001)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2022 03:17:28.0590
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c011eca3-74e5-48d5-ea39-08da9211d333
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.234];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT101.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6265
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_06_12,
+        DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 08, 2022 at 01:14:42PM -0300, Jason Gunthorpe wrote:
+The idea is to let vfio core manage the vfio_device life cycle instead
+of duplicating the logic cross drivers. Besides cleaner code in driver
+side this also allows adding struct device to vfio_device as the first
+step toward adding cdev uAPI in the future. Another benefit is that
+user can now look at sysfs to decide whether a device is bound to
+vfio [1], e.g.:
 
-> > I am wondering if this can be solved by better defining what the return
-> > codes mean and adjust the call-back functions to match the definition.
-> > Something like:
-> > 
-> > 	-ENODEV : Device not mapped my an IOMMU
-> > 	-EBUSY  : Device attached and domain can not be changed
-> > 	-EINVAL : Device and domain are incompatible
-> > 	...
-> 
-> Yes, this was gone over in a side thread the pros/cons, so lets do
-> it. Nicolin will come with something along these lines.
+	/sys/devices/pci0000\:6f/0000\:6f\:01.0/vfio-dev/vfio0
 
-I have started this effort by combining this list and the one from
-the side thread:
+Though most drivers can fit the new model naturally:
 
-@@ -266,6 +266,13 @@ struct iommu_ops {
- /**
-  * struct iommu_domain_ops - domain specific operations
-  * @attach_dev: attach an iommu domain to a device
-+ *              Rules of its return errno:
-+ *               ENOMEM  - Out of memory
-+ *               EINVAL  - Device and domain are incompatible
-+ *               EBUSY   - Device is attached to a domain and cannot be changed
-+ *               ENODEV  - Device or domain is messed up: device is not mapped
-+ *                         to an IOMMU, no domain can attach, and etc.
-+ *              <others> - Same behavior as ENODEV, use is discouraged
-  * @detach_dev: detach an iommu domain from a device
-  * @map: map a physically contiguous memory region to an iommu domain
-  * @map_pages: map a physically contiguous set of pages of the same size to
+ - vfio_alloc_device() to allocate and initialize vfio_device
+ - vfio_put_device() to release vfio_device
+ - dev_ops->init() for driver private initialization
+ - dev_ops->release() for driver private cleanup
 
-I am now going through every single return value of ->attach_dev to
-make sure the list above applies. And I will also incorporate things
-like Robin's comments at the AMD IOMMU driver.
+vfio-ccw is the only exception due to a life cycle mess that its private
+structure mixes both parent and mdev info hence must be alloc/freed
+outside of the life cycle of vfio device.
 
-And if the change occurs to be bigger, I guess that separating it to
-be an IOMMU series from this VFIO one might be better.
+Per prior discussions this won't be fixed in short term by IBM folks [2].
+
+Instead of waiting this series introduces a few tricks to move forward:
+
+ - vfio_init_device() to initialize a pre-allocated device structure;
+
+ - require *EVERY* driver to implement @release and free vfio_device
+   inside. Then vfio-ccw can use a completion mechanism to delay the
+   free to css driver;
+
+The second trick is not a real burden to other drivers because they
+all require a @release for private cleanup anyay. Later once the ccw
+mess is fixed a simple cleanup can be done by moving free from @release
+to vfio core.
 
 Thanks
-Nic
+Kevin
+
+[1] https://listman.redhat.com/archives/libvir-list/2022-August/233482.html
+[2] https://lore.kernel.org/all/0ee29bd6583f17f0ee4ec0769fa50e8ea6703623.camel@linux.ibm.com/
+
+v3:
+ - rebase to vfio-next after resolving conflicts with Yishai's series
+ - add missing fixes for two checkpatch errors
+ - fix grammar issues (Eric Auger)
+ - add more r-b's
+
+v2:
+ - https://lore.kernel.org/lkml/20220901143747.32858-1-kevin.tian@intel.com/
+ - rebase to 6.0-rc3
+ - fix build warnings (lkp)
+ - patch1: remove unnecessary forward reference (Jason)
+ - patch10: leave device_set released by vfio core (Jason)
+ - patch13: add Suggested-by
+ - patch15: add ABI file sysfs-devices-vfio-dev (Alex)
+ - patch15: rename 'vfio' to 'vfio_group' in procfs (Jason)
+
+v1: https://lore.kernel.org/lkml/20220827171037.30297-1-kevin.tian@intel.com/
+
+Kevin Tian (6):
+  vfio: Add helpers for unifying vfio_device life cycle
+  drm/i915/gvt: Use the new device life cycle helpers
+  vfio/platform: Use the new device life cycle helpers
+  vfio/amba: Use the new device life cycle helpers
+  vfio/ccw: Use the new device life cycle helpers
+  vfio: Rename vfio_device_put() and vfio_device_try_get()
+
+Yi Liu (9):
+  vfio/pci: Use the new device life cycle helpers
+  vfio/mlx5: Use the new device life cycle helpers
+  vfio/hisi_acc: Use the new device life cycle helpers
+  vfio/mdpy: Use the new device life cycle helpers
+  vfio/mtty: Use the new device life cycle helpers
+  vfio/mbochs: Use the new device life cycle helpers
+  vfio/ap: Use the new device life cycle helpers
+  vfio/fsl-mc: Use the new device life cycle helpers
+  vfio: Add struct device to vfio_device
+
+ .../ABI/testing/sysfs-devices-vfio-dev        |   8 +
+ MAINTAINERS                                   |   1 +
+ drivers/gpu/drm/i915/gvt/gvt.h                |   5 +-
+ drivers/gpu/drm/i915/gvt/kvmgt.c              |  52 ++++--
+ drivers/gpu/drm/i915/gvt/vgpu.c               |  33 ++--
+ drivers/s390/cio/vfio_ccw_ops.c               |  52 +++++-
+ drivers/s390/cio/vfio_ccw_private.h           |   3 +
+ drivers/s390/crypto/vfio_ap_ops.c             |  50 +++---
+ drivers/vfio/fsl-mc/vfio_fsl_mc.c             |  85 +++++----
+ .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    |  80 ++++-----
+ drivers/vfio/pci/mlx5/main.c                  |  50 ++++--
+ drivers/vfio/pci/vfio_pci.c                   |  20 +--
+ drivers/vfio/pci/vfio_pci_core.c              |  23 ++-
+ drivers/vfio/platform/vfio_amba.c             |  72 ++++++--
+ drivers/vfio/platform/vfio_platform.c         |  66 +++++--
+ drivers/vfio/platform/vfio_platform_common.c  |  71 +++-----
+ drivers/vfio/platform/vfio_platform_private.h |  18 +-
+ drivers/vfio/vfio_main.c                      | 167 +++++++++++++++---
+ include/linux/vfio.h                          |  28 ++-
+ include/linux/vfio_pci_core.h                 |   6 +-
+ samples/vfio-mdev/mbochs.c                    |  73 +++++---
+ samples/vfio-mdev/mdpy.c                      |  81 +++++----
+ samples/vfio-mdev/mtty.c                      |  67 ++++---
+ 23 files changed, 730 insertions(+), 381 deletions(-)
+ create mode 100644 Documentation/ABI/testing/sysfs-devices-vfio-dev
+
+
+base-commit: f39856aacb078c1c93acef011a37121b17d54fe0
+-- 
+2.21.3
+
