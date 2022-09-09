@@ -2,65 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 433CA5B3AD6
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 16:39:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B4CF5B3B01
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 16:47:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231951AbiIIOjU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 10:39:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59320 "EHLO
+        id S232161AbiIIOq5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 10:46:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232003AbiIIOjP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 10:39:15 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E97913206E
-        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 07:39:10 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id l10so1969454plb.10
-        for <kvm@vger.kernel.org>; Fri, 09 Sep 2022 07:39:10 -0700 (PDT)
+        with ESMTP id S231875AbiIIOqy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 10:46:54 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85EDCA7A92
+        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 07:46:53 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id 202so1769872pgc.8
+        for <kvm@vger.kernel.org>; Fri, 09 Sep 2022 07:46:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=U5FTkv+asckv29sSKVU9VhH/lr2YF5aAU9B1yR0VWoQ=;
-        b=SNLfz/BPCXqSkdAhvq4GvU5u/Z5tt8TxclpvUbaUFBxgnciVbFLAYtpmiFIAmek+wY
-         gDXkF2dLCUmZcB3iBfaaeM0ZwAnC/axC9ionABVBgsLlm5K+mSfs3RyMyDUT86Tko+e4
-         I1njM8j6MCm6VrBUJ+5PK6qcJCPC7maQKUUa2mZbmhG3LkW80dXIviWFmJ+EjIXUB2Ce
-         xkUexljYzo90MGx4K9xrTPz5QWMG97Uq4QBRPDXCqWK+Hgcg5sWPReCOLQtQkTODKzAj
-         PLOIy2ZMeqBeMmC4R+AwHW/erasfzTc+KAlmAFEOQj3lv+Um5vK+Li9Go0rAkGpbXxEn
-         Mnaw==
+        bh=aeqcyjlRiIXcpcrwXwZh2ZdaG5blqERrWAC3psmQb1s=;
+        b=mpAf3lqFV0vqYRF+Ziw7QpTF1QkgGeDYzVFCcwX2aXURg9iMkptuJC+tVzuX18ffHE
+         8lSjGw3zWTst/OkfYDu213446yGt9hZm7IJreBYO/kCrJjeGcup2HgKlskGm71YK9jur
+         wHhqFAiwI4Pexu4ELT0vMn4HQ/LGVb3hnttzJDLpZUEeCtfQ8fu27bgkkJqtQGS/x7wR
+         3LXNtcNUW8X2+xIFHWur0kRt+igZ52XV6yFe32c9KkbFUDLaxI0WGaFDbwi4yVKf44+V
+         NkNfBHVGN74vPJLUWpmq3JNVaaMubYbmXJkWs/kDISEPCn+GllhcUeNUQ8baGWnjpNhi
+         RQVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=U5FTkv+asckv29sSKVU9VhH/lr2YF5aAU9B1yR0VWoQ=;
-        b=T5TSjJtQ0JULgIjPG3Uom9r7LkndHeT0X84wTjEHtdtBl9ACJpg5iVxKXGtTA4ptlx
-         taBtycjEhjoIW13lGShhdhoXD93O0hmy79MJBa34R0onMdoXdW7j91EufW95dmJCeTDB
-         VcZAdxQuMG0l0scrGUm/ATfTKlQEveEE9za+NiPAZQPCV0HYRQGbzoz8M3WVIFppaFhY
-         duAta3qZlBHllLL73q3OC49tT0Z3b/XRFhSeq/ksmYNSwnWfeY3MIwFkyIvUrQnIfZxi
-         0mPFkZ+6euzhVAX1q1fJUP600+glgAo01Asfj/X21P79ReXnSEy3qM3eybzkzvCUUEBg
-         crDA==
-X-Gm-Message-State: ACgBeo2Wtq09cuS2y+lwMNpLuhGIZMxh+z1oo12j73zANwKIAXu/wg5c
-        MHpwSM0SWVh4lSc2uL/SCVHwqw==
-X-Google-Smtp-Source: AA6agR77AFUEIRdT9FJnK1ce2cvfJZqiSLVtJZ68JjdPp1h0NVmgzqTpF0raI7zxen4ZdJ50qNggnQ==
-X-Received: by 2002:a17:902:e80f:b0:178:fee:c5fe with SMTP id u15-20020a170902e80f00b001780feec5femr1765435plg.85.1662734349476;
-        Fri, 09 Sep 2022 07:39:09 -0700 (PDT)
+        bh=aeqcyjlRiIXcpcrwXwZh2ZdaG5blqERrWAC3psmQb1s=;
+        b=qqn1t0vkOzS6KvVs1PtrU8zOEhqO1ymDKmYnf5iyJmPAg1mDPjrYRYWXRmCnmne+y5
+         XKLLtKzOnRfFoI6y8SxOEYjfoca8hhs88yfkciwFMVQetHHC3Bnvb6A8CzIHF63a11lv
+         vc/DgMrX1hc4JQRlV4yV/V1+biTpJLq/bdzkZB+MjIPbYOGnFM1qtVWOplLCGdRplmh1
+         +fSQIsl5o/8YsU6R4RwEv/AS6tt8liNRpgwnHowoEtVEByUHQgmOLsS7eeJATBHyW9kt
+         rM8nXZIHGVtXChb2r3GmJbkdFZKYTGiy6Yt+BfuSoxZMDFj8rqTNVx/Kqj+jJuNJsH1J
+         Zj6g==
+X-Gm-Message-State: ACgBeo1prgOmAs6uANKKqphB5uTroVZF7kceGO3+MVRhSTPaMwkDpDlG
+        W/m4/wY8eO9VfU59tnNW8kmN4A==
+X-Google-Smtp-Source: AA6agR5ExI+5K3A7i6xFj5RwfI/4TAEa9km1rXWtOM/65/KkiOtwax2q08TPjxCFLCqN2EwdiTOZGw==
+X-Received: by 2002:aa7:888d:0:b0:538:328b:2ffb with SMTP id z13-20020aa7888d000000b00538328b2ffbmr14584320pfe.82.1662734812439;
+        Fri, 09 Sep 2022 07:46:52 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id mn22-20020a17090b189600b00200a85fa777sm566013pjb.1.2022.09.09.07.39.09
+        by smtp.gmail.com with ESMTPSA id t4-20020a17090340c400b00172973d3cd9sm606043pld.55.2022.09.09.07.46.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Sep 2022 07:39:09 -0700 (PDT)
-Date:   Fri, 9 Sep 2022 14:39:05 +0000
+        Fri, 09 Sep 2022 07:46:52 -0700 (PDT)
+Date:   Fri, 9 Sep 2022 14:46:48 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Metin Kaya <metikaya@amazon.co.uk>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, x86@kernel.org,
         bp@alien8.de, dwmw@amazon.co.uk, tglx@linutronix.de,
         mingo@redhat.com, dave.hansen@linux.intel.com,
         joao.m.martins@oracle.com
-Subject: Re: [PATCH 1/2] KVM: x86/xen: Remove redundant NULL check
-Message-ID: <YxtQCUJjZDhYpz0p@google.com>
+Subject: Re: [PATCH 2/2] KVM: x86: Introduce kvm_gfn_to_hva_cache_valid()
+Message-ID: <YxtR2J7CmTElfQNS@google.com>
 References: <20220909095006.65440-1-metikaya@amazon.co.uk>
+ <20220909095006.65440-2-metikaya@amazon.co.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220909095006.65440-1-metikaya@amazon.co.uk>
+In-Reply-To: <20220909095006.65440-2-metikaya@amazon.co.uk>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -72,55 +73,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Channeling Jim, s/redundant/superfluous.  Redundant would imply there's a !NULL
-check in close proximity.
-
 On Fri, Sep 09, 2022, Metin Kaya wrote:
-> 'kvm' cannot be NULL if we are at that point.
+> It simplifies validation of gfn_to_hva_cache to make it less error prone
 
-Please make the changelog a standalone thing, i.e. don't rely on the shortlog to
-provide context.  Some subsystems prefer making the changelog a continuation of
-the shortlog, but IMO it makes life unnecessarily painful for reviewers and
-archaeologists, e.g. I don't even see the subject/shortlog right now.
+Avoid pronouns as they're ambiguous, e.g. does "it" mean the helper or the patch?
+Obviously not a big deal in this case, but avoid pronouns is a good habit to get
+into.
 
-Please elaborate on what guarantees that this in the changelog.  It's trivial to
-see from the code, but the fact that it's trivial to document is all the more
-reason to provide a one-liner.
+> per the discussion at
+> https://lore.kernel.org/all/4e29402770a7a254a1ea8ca8165af641ed0832ed.camel@infradead.org.
 
-E.g.
-
-  Remove a superfluous check that @kvm is non-NULL in
-  kvm_xen_eventfd_deassign(), the pointer has already been dereferenced
-  multiple times before the check, and the sole caller unconditionally
-  passes in a valid pointer.
-
-> This bug was discovered and resolved using Coverity Static Analysis
-> Security Testing (SAST) by Synopsys, Inc.
-> 
-> Fixes: 2fd6df2f2b47 ("KVM: x86/xen: intercept EVTCHNOP_send from
-> guests")
-
-Don't wrap fixes tags.
+Please write a proper changelog.  Providing a link to the discussion is wonderful,
+but it's a supplement to a good changelog, not a substitution.
 
 > Signed-off-by: Metin Kaya <metikaya@amazon.co.uk>
 > ---
->  arch/x86/kvm/xen.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  arch/x86/kvm/x86.c | 26 ++++++++++++++------------
+>  1 file changed, 14 insertions(+), 12 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> index 280cb5dc7341..f2e09481f633 100644
-> --- a/arch/x86/kvm/xen.c
-> +++ b/arch/x86/kvm/xen.c
-> @@ -1734,8 +1734,7 @@ static int kvm_xen_eventfd_deassign(struct kvm *kvm, u32 port)
->  	if (!evtchnfd)
->  		return -ENOENT;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 43a6a7efc6ec..07d368dc69ad 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3425,11 +3425,22 @@ void kvm_service_local_tlb_flush_requests(struct kvm_vcpu *vcpu)
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_service_local_tlb_flush_requests);
 >  
-> -	if (kvm)
-> -		synchronize_srcu(&kvm->srcu);
-> +	synchronize_srcu(&kvm->srcu);
->  	if (!evtchnfd->deliver.port.port)
->  		eventfd_ctx_put(evtchnfd->deliver.eventfd.ctx);
->  	kfree(evtchnfd);
-> -- 
-> 2.37.1
-> 
+> +static inline bool kvm_gfn_to_hva_cache_valid(struct kvm *kvm,
+
+Don't add inline to local static functions, let the compiler make those decisions.
+
+> +					      struct gfn_to_hva_cache *ghc,
+> +					      gpa_t gpa)
+> +{
+> +	struct kvm_memslots *slots = kvm_memslots(kvm);
+> +
+> +	return !unlikely(slots->generation != ghc->generation ||
+
+I don't I don't think the unlikely should be here, it's the context in which the
+helper is used that determines whether or not the outcome is unlikely.
+
+> +			 gpa != ghc->gpa ||
+> +			 kvm_is_error_hva(ghc->hva) ||
+> +			 !ghc->memslot);
+
+Might be worth opportunistically reordering the checks to avoid grabbing memslots
+when something else is invalid, e.g.
+
+	return gpa != ghc->gpa || kvm_is_error_hva(ghc->hva) || !ghc->memslot ||
+	       kvm_memslots(kvm)->generation != ghc->generation);
+
+> +}
+> +
