@@ -2,208 +2,281 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BDAE5B3D77
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 18:51:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 27CD65B3DA5
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 19:07:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229786AbiIIQvt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 12:51:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36028 "EHLO
+        id S229917AbiIIRHv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 13:07:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231650AbiIIQvS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 12:51:18 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60A06754BA
-        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 09:51:02 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 289GCAKo031349;
-        Fri, 9 Sep 2022 16:50:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=EkO1msDF8ztyhJLP3X7JSKrUX+hGt8vpaQh1n2V0HFE=;
- b=EMlrUBt37HHaoNGLQJ7+CuSXP0sCziNz2nypC5Y2ygN+ujmhc7XQ9+gT4nBG1TIzSQLZ
- B4SlB3XP2DQEXQPboeH4nSjnmVsw8vy4FDweVsyAQo3FYoGMt16DQDQXgxopBUBQBWWC
- GwGoMSRi1kiha1ErBqjidw/soWy+ogzqwuZCThFq/0RGLVYQTUfErH/ChKOaYFmQn61T
- vTfeprr23wEy8r5x3Zs2M77HDGFGpAf0iI4cxh4EEK4OqsnrtDoFQ32xoS/zvK8+AIVM
- dxCrRgDXVwUTbvDX9+xhnxAmoMrzmExwa3FntBBteqUUJY5M9JSqbyegvANf9K7uuM+u BA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jg8sx15fb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Sep 2022 16:50:50 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 289GDhVR006955;
-        Fri, 9 Sep 2022 16:50:50 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jg8sx15ea-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Sep 2022 16:50:49 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 289GolUb003001;
-        Fri, 9 Sep 2022 16:50:47 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06fra.de.ibm.com with ESMTP id 3jbx6hx4va-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Sep 2022 16:50:47 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 289Gl8CG30081424
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 9 Sep 2022 16:47:08 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C25CEA405B;
-        Fri,  9 Sep 2022 16:50:43 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 14570A4054;
-        Fri,  9 Sep 2022 16:50:43 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.11.120])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  9 Sep 2022 16:50:43 +0000 (GMT)
-Message-ID: <b7a70243ccf9ec74525b10452bcbd2f6b9f5f050.camel@linux.ibm.com>
-Subject: Re: [PATCH v9 08/10] target/s390x: interception of PTF instruction
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
-Date:   Fri, 09 Sep 2022 18:50:42 +0200
-In-Reply-To: <20220902075531.188916-9-pmorel@linux.ibm.com>
-References: <20220902075531.188916-1-pmorel@linux.ibm.com>
-         <20220902075531.188916-9-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        with ESMTP id S229770AbiIIRHt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 13:07:49 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DF9411FCA2
+        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 10:07:48 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id s14-20020a17090a6e4e00b0020057c70943so5953758pjm.1
+        for <kvm@vger.kernel.org>; Fri, 09 Sep 2022 10:07:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=MZ3sDMkbiEZWPlGyzFHvdCY6WQ7i55ad1d6PzsAM2PU=;
+        b=snyqiU7TTqLXAInlrQHmLZxO/aJkkQVLXiLGVCGuPxF+NcxBabtxRfCuWLDl7FarZn
+         H27bwf+P1QsaAgCzmwgXk6Y5aTBWyPtQWayqF+P22uchE/ZhHBs81SlHyDV4iVfDdTpX
+         Py3tlgrSrI4q48ixTv/JVJ2pYVPDRAjoduokfFNWVTPA1N51OtXFj9LiuW924xDdtgL2
+         99uDpcqeTozimqgTJLUS/d6z9gb+diY9SVb5fWbtDrMMkweIXD2rE2mH9/c0i4Va6czf
+         vx6DTHNdwpNHY3Oiu7zcCbEt74kLaNB0Zes+BFK/Tcj/P10fftxECWuCVPvr7htKo+MU
+         iByw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=MZ3sDMkbiEZWPlGyzFHvdCY6WQ7i55ad1d6PzsAM2PU=;
+        b=ECs0bnibwEz4/CnMYNbGM//hTJ00XymQaBydC+G9c97KMhQ3mAxd8azR3Tx4ay4Ju6
+         Ff3zvPJfYK4FEgyQLi9sq+Og1iQfURgsaujqIfeWbDSrDO7I4RHyuVmUbZs0cD6nW1bR
+         8Npn/W5yvg+QNjWbOQKfkTUo0W8nRuNqRP3hkpYZGSvgKeA51/sMLf1WjUjQtZrYT4Iq
+         G9y1drRxNRMuNmc5+BKmRRjBIBfdUiI23XvVts4y7koWkyoM0qqWO2Rc6gzHPJsMqD0d
+         klMovkfvYCjE7jDLMnB7zh0mRPUTXnxzYr+JmK8g5rdr3zX+t3HryfR6X6bQdoBdx1yi
+         4RYQ==
+X-Gm-Message-State: ACgBeo0b+YV67IWphqP/b5X8Rwqouju/eYYbhUyPtFX8/b0DJl7Hns4V
+        HHbtUVEa6ELUy6bP7PenzqPyx2FQdweWiw==
+X-Google-Smtp-Source: AA6agR6lJIjMsFG47A+thncjjPyoTGnt42RPQ/ip5o4BH7Uv6H9frsjjy2XyeW3N4tcqhXnx9+McaQ==
+X-Received: by 2002:a17:90b:1894:b0:200:b12e:9db0 with SMTP id mn20-20020a17090b189400b00200b12e9db0mr10425845pjb.219.1662743267782;
+        Fri, 09 Sep 2022 10:07:47 -0700 (PDT)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
+        by smtp.gmail.com with ESMTPSA id e7-20020a056a0000c700b0052e6d5ee183sm777997pfj.129.2022.09.09.10.07.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Sep 2022 10:07:45 -0700 (PDT)
+Date:   Fri, 9 Sep 2022 10:07:41 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        dmatlack@google.com, seanjc@google.com, oupton@google.com,
+        andrew.jones@linux.dev
+Subject: Re: [PATCH v5 2/3] KVM: selftests: randomize which pages are written
+ vs read
+Message-ID: <Yxty3YqzibTjoS2u@google.com>
+References: <20220909124300.3409187-1-coltonlewis@google.com>
+ <20220909124300.3409187-3-coltonlewis@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: imb7SlEZvMFbh2qLZvkTWOsfKIDJoGli
-X-Proofpoint-ORIG-GUID: 4neh8vHYtHaANETWQ4iEWjbdvJ2Ppz82
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-09_08,2022-09-09_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
- lowpriorityscore=0 suspectscore=0 bulkscore=0 impostorscore=0 mlxscore=0
- clxscore=1015 priorityscore=1501 malwarescore=0 adultscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2207270000
- definitions=main-2209090057
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220909124300.3409187-3-coltonlewis@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-09-02 at 09:55 +0200, Pierre Morel wrote:
-> When the host supports the CPU topology facility, the PTF
-> instruction with function code 2 is interpreted by the SIE,
-> provided that the userland hypervizor activates the interpretation
-> by using the KVM_CAP_S390_CPU_TOPOLOGY KVM extension.
+On Fri, Sep 09, 2022 at 12:42:59PM +0000, Colton Lewis wrote:
+> Randomize which pages are written vs read using the random number
+> generator.
 > 
-> The PTF instructions with function code 0 and 1 are intercepted
-> and must be emulated by the userland hypervizor.
+> Change the variable wr_fract and associated function calls to
+> write_percent that now operates as a percentage from 0 to 100 where X
+> means each page has an X% chance of being written. Change the -f
+> argument to -w to reflect the new variable semantics. Keep the same
+> default of 100% writes.
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Population always uses 100% writes.
+>
 
-Reviewed-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Reviewed-by: Ricardo Koller <ricarkol@google.com>
 
-See note below.
+> Signed-off-by: Colton Lewis <coltonlewis@google.com>
 > ---
->  hw/s390x/cpu-topology.c            | 52 ++++++++++++++++++++++++++++++
->  include/hw/s390x/s390-virtio-ccw.h |  6 ++++
->  target/s390x/kvm/kvm.c             | 13 ++++++++
->  3 files changed, 71 insertions(+)
+>  .../selftests/kvm/access_tracking_perf_test.c |  2 +-
+>  .../selftests/kvm/dirty_log_perf_test.c       | 30 +++++++++++--------
+>  .../selftests/kvm/include/perf_test_util.h    |  4 +--
+>  .../selftests/kvm/lib/perf_test_util.c        | 10 +++----
+>  4 files changed, 25 insertions(+), 21 deletions(-)
 > 
-> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
-> index b6bf839e40..7dcaa28ca3 100644
-> --- a/hw/s390x/cpu-topology.c
-> +++ b/hw/s390x/cpu-topology.c
-> @@ -20,6 +20,58 @@
->  #include "hw/s390x/s390-virtio-ccw.h"
->  #include "hw/s390x/cpu-topology.h"
->  #include "migration/vmstate.h"
-> +#include "target/s390x/cpu.h"
-> +#include "hw/s390x/s390-virtio-ccw.h"
-> +
-> +/*
-> + * s390_handle_ptf:
-> + *
-> + * @register 1: contains the function code
-> + *
-> + * Function codes 0 and 1 handle the CPU polarization.
-> + * We assume an horizontal topology, the only one supported currently
-> + * by Linux, consequently we answer to function code 0, requesting
-> + * horizontal polarization that it is already the current polarization
-> + * and reject vertical polarization request without further explanation.
-> + *
-> + * Function code 2 is handling topology changes and is interpreted
-> + * by the SIE.
-> + */
-> +void s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra)
-> +{
-> +    CPUS390XState *env = &cpu->env;
-> +    uint64_t reg = env->regs[r1];
-> +    uint8_t fc = reg & S390_TOPO_FC_MASK;
-> +
-> +    if (!s390_has_feat(S390_FEAT_CONFIGURATION_TOPOLOGY)) {
-> +        s390_program_interrupt(env, PGM_OPERATION, ra);
-> +        return;
-
-I'm either expecting this function to return -1 here...
-> +    }
-> +
-> +    if (env->psw.mask & PSW_MASK_PSTATE) {
-> +        s390_program_interrupt(env, PGM_PRIVILEGED, ra);
-> +        return;
-> +    }
-> +
-> +    if (reg & ~S390_TOPO_FC_MASK) {
-> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
-> +        return;
-> +    }
-> +
-> +    switch (fc) {
-> +    case 0:    /* Horizontal polarization is already set */
-> +        env->regs[r1] |= S390_PTF_REASON_DONE;
-> +        setcc(cpu, 2);
-> +        break;
-> +    case 1:    /* Vertical polarization is not supported */
-> +        env->regs[r1] |= S390_PTF_REASON_NONE;
-> +        setcc(cpu, 2);
-> +        break;
-> +    default:
-> +        /* Note that fc == 2 is interpreted by the SIE */
-> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
-> +    }
-> +}
-
-[...]
->  
-> +static int kvm_handle_ptf(S390CPU *cpu, struct kvm_run *run)
-> +{
-> +    uint8_t r1 = (run->s390_sieic.ipb >> 20) & 0x0f;
-> +
-> +    s390_handle_ptf(cpu, r1, RA_IGNORED);
-
-... and this being returned here...
-> +
-> +    return 0;
-
-... or this function being void.
-> +}
-> +
->  static int handle_b9(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
+> diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> index d8909032317a..d86046ef3a0b 100644
+> --- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> +++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> @@ -274,7 +274,7 @@ static void run_iteration(struct kvm_vm *vm, int vcpus, const char *description)
+>  static void access_memory(struct kvm_vm *vm, int vcpus, enum access_type access,
+>  			  const char *description)
 >  {
->      int r = 0;
-> @@ -1480,6 +1490,9 @@ static int handle_b9(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
->      case PRIV_B9_RPCIT:
->          r = kvm_rpcit_service_call(cpu, run);
->          break;
-> +    case PRIV_B9_PTF:
-> +        r = kvm_handle_ptf(cpu, run);
-> +        break;
->      case PRIV_B9_EQBS:
->          /* just inject exception */
->          r = -1;
-
+> -	perf_test_set_wr_fract(vm, (access == ACCESS_READ) ? INT_MAX : 1);
+> +	perf_test_set_write_percent(vm, (access == ACCESS_READ) ? 0 : 100);
+>  	iteration_work = ITERATION_ACCESS_MEMORY;
+>  	run_iteration(vm, vcpus, description);
+>  }
+> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> index 2f91acd94130..c2ad299b3760 100644
+> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> @@ -122,10 +122,10 @@ static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
+>  struct test_params {
+>  	unsigned long iterations;
+>  	uint64_t phys_offset;
+> -	int wr_fract;
+>  	bool partition_vcpu_memory_access;
+>  	enum vm_mem_backing_src_type backing_src;
+>  	int slots;
+> +	uint32_t write_percent;
+>  	uint32_t random_seed;
+>  };
+>  
+> @@ -223,7 +223,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  
+>  	pr_info("Random seed: %u\n", p->random_seed);
+>  	perf_test_set_random_seed(vm, p->random_seed);
+> -	perf_test_set_wr_fract(vm, p->wr_fract);
+>  
+>  	guest_num_pages = (nr_vcpus * guest_percpu_mem_size) >> vm_get_page_shift(vm);
+>  	guest_num_pages = vm_adjust_num_guest_pages(mode, guest_num_pages);
+> @@ -248,6 +247,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++)
+>  		vcpu_last_completed_iteration[vcpu_id] = -1;
+>  
+> +	perf_test_set_write_percent(vm, 100);
+>  	perf_test_start_vcpu_threads(nr_vcpus, vcpu_worker);
+>  
+>  	/* Allow the vCPUs to populate memory */
+> @@ -269,6 +269,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  	pr_info("Enabling dirty logging time: %ld.%.9lds\n\n",
+>  		ts_diff.tv_sec, ts_diff.tv_nsec);
+>  
+> +	perf_test_set_write_percent(vm, p->write_percent);
+> +
+>  	while (iteration < p->iterations) {
+>  		/*
+>  		 * Incrementing the iteration number will start the vCPUs
+> @@ -341,7 +343,7 @@ static void help(char *name)
+>  	puts("");
+>  	printf("usage: %s [-h] [-i iterations] [-p offset] [-g] "
+>  	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-r random seed ] [-s mem type]"
+> -	       "[-x memslots]\n", name);
+> +	       "[-x memslots] [-w percentage]\n", name);
+>  	puts("");
+>  	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
+>  	       TEST_HOST_LOOP_N);
+> @@ -358,10 +360,6 @@ static void help(char *name)
+>  	printf(" -b: specify the size of the memory region which should be\n"
+>  	       "     dirtied by each vCPU. e.g. 10M or 3G.\n"
+>  	       "     (default: 1G)\n");
+> -	printf(" -f: specify the fraction of pages which should be written to\n"
+> -	       "     as opposed to simply read, in the form\n"
+> -	       "     1/<fraction of pages to write>.\n"
+> -	       "     (default: 1 i.e. all pages are written to.)\n");
+>  	printf(" -v: specify the number of vCPUs to run.\n");
+>  	printf(" -o: Overlap guest memory accesses instead of partitioning\n"
+>  	       "     them into a separate region of memory for each vCPU.\n");
+> @@ -369,6 +367,11 @@ static void help(char *name)
+>  	backing_src_help("-s");
+>  	printf(" -x: Split the memory region into this number of memslots.\n"
+>  	       "     (default: 1)\n");
+> +	printf(" -w: specify the percentage of pages which should be written to\n"
+> +	       "     as an integer from 0-100 inclusive. This is probabalistic,\n"
+> +	       "     so -w X means each page has an X%% chance of writing\n"
+> +	       "     and a (100-X)%% chance of reading.\n"
+> +	       "     (default: 100 i.e. all pages are written to.)\n");
+>  	puts("");
+>  	exit(0);
+>  }
+> @@ -378,10 +381,10 @@ int main(int argc, char *argv[])
+>  	int max_vcpus = kvm_check_cap(KVM_CAP_MAX_VCPUS);
+>  	struct test_params p = {
+>  		.iterations = TEST_HOST_LOOP_N,
+> -		.wr_fract = 1,
+>  		.partition_vcpu_memory_access = true,
+>  		.backing_src = DEFAULT_VM_MEM_SRC,
+>  		.slots = 1,
+> +		.write_percent = 100,
+>  		.random_seed = time(NULL),
+>  	};
+>  	int opt;
+> @@ -393,7 +396,7 @@ int main(int argc, char *argv[])
+>  
+>  	guest_modes_append_default();
+>  
+> -	while ((opt = getopt(argc, argv, "ghi:p:m:nb:f:v:or:s:x:")) != -1) {
+> +	while ((opt = getopt(argc, argv, "ghi:p:m:nb:v:or:s:x:w:")) != -1) {
+>  		switch (opt) {
+>  		case 'g':
+>  			dirty_log_manual_caps = 0;
+> @@ -413,10 +416,11 @@ int main(int argc, char *argv[])
+>  		case 'b':
+>  			guest_percpu_mem_size = parse_size(optarg);
+>  			break;
+> -		case 'f':
+> -			p.wr_fract = atoi(optarg);
+> -			TEST_ASSERT(p.wr_fract >= 1,
+> -				    "Write fraction cannot be less than one");
+> +		case 'w':
+> +			p.write_percent = atoi(optarg);
+> +			TEST_ASSERT(p.write_percent >= 0
+> +				    && p.write_percent <= 100,
+> +				    "Write percentage must be between 0 and 100");
+>  			break;
+>  		case 'v':
+>  			nr_vcpus = atoi(optarg);
+> diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
+> index f18530984b42..f93f2ea7c6a3 100644
+> --- a/tools/testing/selftests/kvm/include/perf_test_util.h
+> +++ b/tools/testing/selftests/kvm/include/perf_test_util.h
+> @@ -35,7 +35,7 @@ struct perf_test_args {
+>  	uint64_t size;
+>  	uint64_t guest_page_size;
+>  	uint32_t random_seed;
+> -	int wr_fract;
+> +	uint32_t write_percent;
+>  
+>  	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
+>  	bool nested;
+> @@ -51,7 +51,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
+>  				   bool partition_vcpu_memory_access);
+>  void perf_test_destroy_vm(struct kvm_vm *vm);
+>  
+> -void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract);
+> +void perf_test_set_write_percent(struct kvm_vm *vm, uint32_t write_percent);
+>  void perf_test_set_random_seed(struct kvm_vm *vm, uint32_t random_seed);
+>  
+>  void perf_test_start_vcpu_threads(int vcpus, void (*vcpu_fn)(struct perf_test_vcpu_args *));
+> diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> index 4d9c7d7693d9..12a3597be1f9 100644
+> --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
+> +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> @@ -60,7 +60,7 @@ void perf_test_guest_code(uint32_t vcpu_id)
+>  			uint64_t addr = gva + (i * pta->guest_page_size);
+>  			guest_random(&rand);
+>  
+> -			if (i % pta->wr_fract == 0)
+> +			if (rand % 100 < pta->write_percent)
+>  				*(uint64_t *)addr = 0x0123456789ABCDEF;
+>  			else
+>  				READ_ONCE(*(uint64_t *)addr);
+> @@ -118,7 +118,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
+>  	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
+>  
+>  	/* Set perf_test_args defaults. */
+> -	pta->wr_fract = 1;
+> +	pta->write_percent = 100;
+>  	pta->random_seed = time(NULL);
+>  
+>  	/*
+> @@ -221,10 +221,10 @@ void perf_test_destroy_vm(struct kvm_vm *vm)
+>  	kvm_vm_free(vm);
+>  }
+>  
+> -void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract)
+> +void perf_test_set_write_percent(struct kvm_vm *vm, uint32_t write_percent)
+>  {
+> -	perf_test_args.wr_fract = wr_fract;
+> -	sync_global_to_guest(vm, perf_test_args);
+> +	perf_test_args.write_percent = write_percent;
+> +	sync_global_to_guest(vm, perf_test_args.write_percent);
+>  }
+>  
+>  void perf_test_set_random_seed(struct kvm_vm *vm, uint32_t random_seed)
+> -- 
+> 2.37.2.789.g6183377224-goog
+> 
