@@ -2,71 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DFBFE5B35AD
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 12:52:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AD2A5B35F5
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 13:02:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230085AbiIIKwk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 06:52:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58686 "EHLO
+        id S230348AbiIILCJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 07:02:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230115AbiIIKwi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 06:52:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E08CA138822
-        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 03:52:36 -0700 (PDT)
+        with ESMTP id S229655AbiIILBr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 07:01:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EFD1139AF7
+        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 04:01:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662720755;
+        s=mimecast20190719; t=1662721259;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding;
-        bh=bBeJNEcuYYhVR/b07R8rp8a2HzeiOk4AQkZ+y0hkJsU=;
-        b=LuMVp3WqyWboryfp2/fNhfAxNUuxNni7VY0Z7zs7JtYO6d6iqFibmZmn4jk8l63fLgY0jm
-        i5qPPxpq/A5DUOatbFAnRrxSTNZjp9xJrndSoQiavhlC8n21xxREv+zHSwBMCTPFXB133h
-        n0KsSRri4EKCun0rkcXX5weG8woFhaQ=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-461-qagsANDmN4SM31u6dv5ZAQ-1; Fri, 09 Sep 2022 06:52:29 -0400
-X-MC-Unique: qagsANDmN4SM31u6dv5ZAQ-1
-Received: by mail-il1-f197.google.com with SMTP id h5-20020a056e021d8500b002eb09a4f7e6so944172ila.14
-        for <kvm@vger.kernel.org>; Fri, 09 Sep 2022 03:52:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:organization:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=bBeJNEcuYYhVR/b07R8rp8a2HzeiOk4AQkZ+y0hkJsU=;
-        b=Qceo2EYQiQvFbnPBpwAnYRTzio35OeoZ0dvrFJM8K8kjgbOR9aLnQloH3iVbRezG5H
-         jT31/lWHmdzd6p+AeLwmIP9DaqIAsIZvYGG93vfCabpglX9JB5IdTdJWwM5ANSf1Va0/
-         f4E4ByOmC+1GrymHVPxL30rcFKeX7w2hQUOvz+KLviPycIcyvJaoZXrJF6O0rrvOPG+Z
-         AfExGq+EerhXQTLTa/ye8iMyWPo/TizJ9MKQaVewwoZJ1mlWcOMRdITcg0CJn5Gcudqi
-         xh4gh6wY41dl18U55K8bZidb4hf+vg2CzXkxEC2GC2VZNvqXQMCuST7hnh9v43evOfxC
-         uE2A==
-X-Gm-Message-State: ACgBeo1lgNu0Q6m5zhsSLB34hlRRUzggLUcRxeET/71Wec5+TjtyCb3+
-        B9ikmlNuxRs8JaCYSc/J/LEvOHs436jPs2K+dlsixpHTu3GanyA1vjdmAfj7vzlT6Hfj8g9GRQh
-        jMi+OHb02SIVg
-X-Received: by 2002:a02:cccd:0:b0:346:e38b:1c5e with SMTP id k13-20020a02cccd000000b00346e38b1c5emr6868278jaq.47.1662720748418;
-        Fri, 09 Sep 2022 03:52:28 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR5Lg7DnuAhs7L17ED1EB+S3tJ6SrMy4bUyNEMRtD8p5j3U6L7hn9ScEGS8pxZqNLkDcEF7aKw==
-X-Received: by 2002:a02:cccd:0:b0:346:e38b:1c5e with SMTP id k13-20020a02cccd000000b00346e38b1c5emr6868266jaq.47.1662720748090;
-        Fri, 09 Sep 2022 03:52:28 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id ay27-20020a056638411b00b00356636349c5sm66176jab.157.2022.09.09.03.52.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Sep 2022 03:52:27 -0700 (PDT)
-Date:   Fri, 9 Sep 2022 04:52:25 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [GIT PULL] VFIO fix for v6.0-rc5
-Message-ID: <20220909045225.3a572a57.alex.williamson@redhat.com>
-Organization: Red Hat
+        bh=s7r37HYigu2X97YLwHEdM4f5sKBhrEueO8Ol64hNJ+U=;
+        b=dKS7BBj3eoYjUCtURRsXNewYH8jwDUzH3C8IOJHBvssIx080kefY/z/Lomr96/bYWplFXM
+        f+kpO5S4AJbPNAi1zIqfm2mtHjEPkwhGqCR4ANZHPqCE7f4sDpT0BynGNooopmj8vWHMBL
+        Xu4Kc56UQkylVkwz8QRWrfCagzS37nE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-532-NDDohuehOk2qew61_7ZepA-1; Fri, 09 Sep 2022 07:00:56 -0400
+X-MC-Unique: NDDohuehOk2qew61_7ZepA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 030A185A58C;
+        Fri,  9 Sep 2022 11:00:56 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CA08F2166B26;
+        Fri,  9 Sep 2022 11:00:36 +0000 (UTC)
+From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Subject: [RFC PATCH 0/1] accel/kvm: implement KVM_SET_USER_MEMORY_REGION_LIST
+Date:   Fri,  9 Sep 2022 07:00:33 -0400
+Message-Id: <20220909110034.740282-1-eesposit@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,29 +60,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Linus,
+Use the new KVM ioctl KVM_SET_USER_MEMORY_REGION_LIST.
+Based on my QEMU serie "[RFC PATCH v2 0/3] accel/kvm: extend kvm memory listener to support".
 
-The following changes since commit b90cb1053190353cc30f0fef0ef1f378ccc063c5:
+Based-on: 20220909081150.709060-1-eesposit@redhat.com
 
-  Linux 6.0-rc3 (2022-08-28 15:05:29 -0700)
+Requires my KVM serie "[RFC PATCH 0/9] kvm: implement atomic memslot updates"
+https://lkml.org/lkml/2022/9/9/533
 
-are available in the Git repository at:
+Emanuele Giuseppe Esposito (1):
+  kvm/kvm-all.c: implement KVM_SET_USER_MEMORY_REGION_LIST ioctl
 
-  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.0-rc5
+ accel/kvm/kvm-all.c | 25 ++++++++++---------------
+ 1 file changed, 10 insertions(+), 15 deletions(-)
 
-for you to fetch changes up to 873aefb376bbc0ed1dd2381ea1d6ec88106fdbd4:
-
-  vfio/type1: Unpin zero pages (2022-08-31 08:57:30 -0600)
-
-----------------------------------------------------------------
-VFIO fix for v6.0-rc5
-
- - Fix zero page refcount leak (Alex Williamson)
-
-----------------------------------------------------------------
-Alex Williamson (1):
-      vfio/type1: Unpin zero pages
-
- drivers/vfio/vfio_iommu_type1.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+-- 
+2.31.1
 
