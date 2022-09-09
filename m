@@ -2,200 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D48205B380B
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 14:44:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 901555B382D
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 14:52:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231631AbiIIMnK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 08:43:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51216 "EHLO
+        id S229502AbiIIMuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 08:50:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231590AbiIIMnG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 08:43:06 -0400
-Received: from mail-il1-x14a.google.com (mail-il1-x14a.google.com [IPv6:2607:f8b0:4864:20::14a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C69F109D3F
-        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 05:43:05 -0700 (PDT)
-Received: by mail-il1-x14a.google.com with SMTP id a12-20020a92c54c000000b002f146fd423dso1108041ilj.19
-        for <kvm@vger.kernel.org>; Fri, 09 Sep 2022 05:43:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date;
-        bh=MGTz4V3aYmu5Ny1o3UC5sIQZoHtez2zS7W5OlREpVM8=;
-        b=RFMJxwY+77Tb5oFy19vNK3wYlIEkTdfGVACeb1W/t2UfDzpyOpXwITCJxcjqSMJSvx
-         1aTj9gAIUNVhqzq49Aqkpznd1WJsvEt66zx0WuICQsbajGYOPav0at6R2eZHRzchuFuq
-         n3bX10/Q3rA4r4OTNbWLbfllXvDbUp/0/3DF1reu2jEAPS6T6IWGLpz75S6vTvAr7fq1
-         BBLWICI+R+QV6tSHhDMYPwAwMxhpyO0ZYoo9YDnWI6MmvrORUPFDZlYSuXkt2Ft3DQfW
-         h7pNsFwbhN0DWUHkr/4neGkDWz45IFCJOtJ9vEnoUlFKKtp+kTFkN+EUM4cBLVPDcsrX
-         g6/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date;
-        bh=MGTz4V3aYmu5Ny1o3UC5sIQZoHtez2zS7W5OlREpVM8=;
-        b=vS/VQwjHtYSktuT2hST7H6nHaFLQWdjupPR75OLHnDvnoxtUqlSUWjawlW3c3bzE9R
-         Rkg9WqrnMuyytEsXcNxH1sUwL76JQw0uTqOxTynv6QdMzBQVpi6jpAQ6Kh+b/TK/0z50
-         Ki4N5lHX72aBI7VEUKsHJWYgJatScWUSdIRrpcRHUNLCYP8jZxIEhdLa0Mu585yyeHoO
-         rkFUjYVyGk2blgqZKYk80rVQmqTUrG0ZJ7SpMQXxpOT5VOxqYVbR6cuE3DRiuE2cjPMv
-         IIumydTLVpndvkLNN+RUMW22jpsbIR28jtY4Cf4mzPJFvHna9j37f9xDt6lFK4CMqoUo
-         mefg==
-X-Gm-Message-State: ACgBeo1La/D7cuT5hMHXrIxM4GXaA3P5qorl1klknRdLnhi7kd7JIgCz
-        qAeBT7/TLIRGrMdFyUsrzdiuISKZfm6Y1x/vxEVyqB6l6NIxnx651JGklJf3l91MuSEft6pmQhb
-        CKEmZ/sUMFOSYxs0dDaf3UwkWAzVBR7+PQZvgZJ9uKRnxhjSgY0NvkvfwdNRLEaDBtOsigB8=
-X-Google-Smtp-Source: AA6agR7kKIEDaBNgC++hs12/nX8lBcS0Tw+PO9/sfW+49RkJ0oMv2sWBMuRF1X3IIuIFFApEdH5FwFr5dNES+oR1tw==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6602:2f09:b0:689:8993:6052 with
- SMTP id q9-20020a0566022f0900b0068989936052mr6825747iow.114.1662727384465;
- Fri, 09 Sep 2022 05:43:04 -0700 (PDT)
-Date:   Fri,  9 Sep 2022 12:43:00 +0000
-In-Reply-To: <20220909124300.3409187-1-coltonlewis@google.com>
-Mime-Version: 1.0
-References: <20220909124300.3409187-1-coltonlewis@google.com>
-X-Mailer: git-send-email 2.37.2.789.g6183377224-goog
-Message-ID: <20220909124300.3409187-4-coltonlewis@google.com>
-Subject: [PATCH v5 3/3] KVM: selftests: randomize page access order
-From:   Colton Lewis <coltonlewis@google.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, maz@kernel.org, dmatlack@google.com,
-        seanjc@google.com, oupton@google.com, ricarkol@google.com,
-        andrew.jones@linux.dev, Colton Lewis <coltonlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229572AbiIIMuH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 08:50:07 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C44645757D
+        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 05:50:05 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 289Cg6wb027443;
+        Fri, 9 Sep 2022 12:49:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=zjj65OqKhotopLjAkLfbs1w4hoRX5Zb4/pyBQbnUohw=;
+ b=MreDbMX7AB4ND1EBuzMJH5LHgQefur7xB/aLA0iZ1Sw+kCTrNizD9vbMLMdB40wcEKCS
+ rK7PfuoByQuR3YRMB8zVrBpxaLKBm0XTiYHL3wXcQ4wQJBfaM3ZFk9Hl49B9hGt3my83
+ VmI1VhKvSMdLEoerMdnTXWYuTY7A/z5JsC3+R7Ziv6M9aOGraU8s5qVbMWwkstnSIsbC
+ ij+bf8eqosAph3ideZ57j6mRjq08QgpT8+KwfraUGNhVdOqFrFfO0mQO0UIpDgKma4sw
+ h2wgC9IW7j54aG74U06uB8kY696YD5c0TwjP3J/XLex26mz0ZPm0r8Poybrb5MMHE8Wh Cg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jg5qcg839-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 09 Sep 2022 12:49:44 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 289Ch3ja001197;
+        Fri, 9 Sep 2022 12:49:44 GMT
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jg5qcg82f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 09 Sep 2022 12:49:44 +0000
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 289CKRot029638;
+        Fri, 9 Sep 2022 12:49:42 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+        by ppma05wdc.us.ibm.com with ESMTP id 3jbxjaevev-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 09 Sep 2022 12:49:42 +0000
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 289Cnfvh42467596
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 9 Sep 2022 12:49:41 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A873C6E056;
+        Fri,  9 Sep 2022 12:49:41 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 90CB56E04E;
+        Fri,  9 Sep 2022 12:49:40 +0000 (GMT)
+Received: from [9.160.125.58] (unknown [9.160.125.58])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri,  9 Sep 2022 12:49:40 +0000 (GMT)
+Message-ID: <28f45073-0047-3f8a-c79f-6dd6cc1d4117@linux.ibm.com>
+Date:   Fri, 9 Sep 2022 08:49:40 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [PATCH 0/4] Fix splats releated to using the iommu_group after
+ destroying devices
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Will Deacon <will@kernel.org>
+Cc:     Qian Cai <cai@lca.pw>, Joerg Roedel <jroedel@suse.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Robin Murphy <robin.murphy@arm.com>
+References: <0-v1-ef00ffecea52+2cb-iommu_group_lifetime_jgg@nvidia.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <0-v1-ef00ffecea52+2cb-iommu_group_lifetime_jgg@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: bsxPznhpLKbKUh_qqVtx_sOqa5xr7DpS
+X-Proofpoint-GUID: RKYwAk6a2-p0o09e7kIVDamCgg1sh1mV
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-09-09_06,2022-09-09_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ suspectscore=0 phishscore=0 spamscore=0 clxscore=1011 lowpriorityscore=0
+ adultscore=0 malwarescore=0 mlxlogscore=999 priorityscore=1501 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2207270000
+ definitions=main-2209090043
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Create the ability to randomize page access order with the -a
-argument, including the possibility that the same pages may be hit
-multiple times during an iteration or not at all.
+On 9/8/22 2:44 PM, Jason Gunthorpe wrote:
+> The basic issue is that the iommu_group is being used by VFIO after all
+> the device drivers have been removed.
+> 
+> In part this is caused by bad logic inside the iommu core that doesn't
+> sequence removing the device from the group properly, and in another part
+> this is bad logic in VFIO continuing to use device->iommu_group after all
+> VFIO device drivers have been removed.
+> 
+> Fix both situations. Either fix alone should fix the bug reported, but
+> both together bring a nice robust design to this area.
+> 
+> This is a followup from this thread:
+> 
+> https://lore.kernel.org/kvm/20220831201236.77595-1-mjrosato@linux.ibm.com/
+> 
+> Matthew confirmed an earlier version of the series solved the issue, it
+> would be best if he would test this as well to confirm the various changes
+> are still OK.
 
-Population sets random access to false.
+FYI I've been running this series (+ the incremental to patch 4 you mentioned) against my original repro scenario in a loop overnight, looks good.
 
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
- tools/testing/selftests/kvm/dirty_log_perf_test.c | 11 +++++++++--
- .../selftests/kvm/include/perf_test_util.h        |  2 ++
- tools/testing/selftests/kvm/lib/perf_test_util.c  | 15 ++++++++++++++-
- 3 files changed, 25 insertions(+), 3 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index c2ad299b3760..3639d5f95033 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -127,6 +127,7 @@ struct test_params {
- 	int slots;
- 	uint32_t write_percent;
- 	uint32_t random_seed;
-+	bool random_access;
- };
- 
- static void toggle_dirty_logging(struct kvm_vm *vm, int slots, bool enable)
-@@ -248,6 +249,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 		vcpu_last_completed_iteration[vcpu_id] = -1;
- 
- 	perf_test_set_write_percent(vm, 100);
-+	perf_test_set_random_access(vm, false);
- 	perf_test_start_vcpu_threads(nr_vcpus, vcpu_worker);
- 
- 	/* Allow the vCPUs to populate memory */
-@@ -270,6 +272,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 		ts_diff.tv_sec, ts_diff.tv_nsec);
- 
- 	perf_test_set_write_percent(vm, p->write_percent);
-+	perf_test_set_random_access(vm, p->random_access);
- 
- 	while (iteration < p->iterations) {
- 		/*
-@@ -341,10 +344,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- static void help(char *name)
- {
- 	puts("");
--	printf("usage: %s [-h] [-i iterations] [-p offset] [-g] "
-+	printf("usage: %s [-h] [-a] [-i iterations] [-p offset] [-g] "
- 	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-r random seed ] [-s mem type]"
- 	       "[-x memslots] [-w percentage]\n", name);
- 	puts("");
-+	printf(" -a: access memory randomly rather than in order.\n");
- 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
- 	       TEST_HOST_LOOP_N);
- 	printf(" -g: Do not enable KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2. This\n"
-@@ -396,8 +400,11 @@ int main(int argc, char *argv[])
- 
- 	guest_modes_append_default();
- 
--	while ((opt = getopt(argc, argv, "ghi:p:m:nb:v:or:s:x:w:")) != -1) {
-+	while ((opt = getopt(argc, argv, "aghi:p:m:nb:v:or:s:x:w:")) != -1) {
- 		switch (opt) {
-+		case 'a':
-+			p.random_access = true;
-+			break;
- 		case 'g':
- 			dirty_log_manual_caps = 0;
- 			break;
-diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-index f93f2ea7c6a3..d9664a31e01c 100644
---- a/tools/testing/selftests/kvm/include/perf_test_util.h
-+++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-@@ -39,6 +39,7 @@ struct perf_test_args {
- 
- 	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
- 	bool nested;
-+	bool random_access;
- 
- 	struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
- };
-@@ -53,6 +54,7 @@ void perf_test_destroy_vm(struct kvm_vm *vm);
- 
- void perf_test_set_write_percent(struct kvm_vm *vm, uint32_t write_percent);
- void perf_test_set_random_seed(struct kvm_vm *vm, uint32_t random_seed);
-+void perf_test_set_random_access(struct kvm_vm *vm, bool random_access);
- 
- void perf_test_start_vcpu_threads(int vcpus, void (*vcpu_fn)(struct perf_test_vcpu_args *));
- void perf_test_join_vcpu_threads(int vcpus);
-diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-index 12a3597be1f9..ce657fa92f05 100644
---- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-+++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-@@ -46,6 +46,7 @@ void perf_test_guest_code(uint32_t vcpu_id)
- 	struct perf_test_vcpu_args *vcpu_args = &pta->vcpu_args[vcpu_id];
- 	uint64_t gva;
- 	uint64_t pages;
-+	uint64_t addr;
- 	int i;
- 	uint32_t rand = pta->random_seed + vcpu_id;
- 
-@@ -57,7 +58,13 @@ void perf_test_guest_code(uint32_t vcpu_id)
- 
- 	while (true) {
- 		for (i = 0; i < pages; i++) {
--			uint64_t addr = gva + (i * pta->guest_page_size);
-+			guest_random(&rand);
-+
-+			if (pta->random_access)
-+				addr = gva + ((rand % pages) * pta->guest_page_size);
-+			else
-+				addr = gva + (i * pta->guest_page_size);
-+
- 			guest_random(&rand);
- 
- 			if (rand % 100 < pta->write_percent)
-@@ -233,6 +240,12 @@ void perf_test_set_random_seed(struct kvm_vm *vm, uint32_t random_seed)
- 	sync_global_to_guest(vm, perf_test_args.random_seed);
- }
- 
-+void perf_test_set_random_access(struct kvm_vm *vm, bool random_access)
-+{
-+	perf_test_args.random_access = random_access;
-+	sync_global_to_guest(vm, perf_test_args.random_access);
-+}
-+
- uint64_t __weak perf_test_nested_pages(int nr_vcpus)
- {
- 	return 0;
--- 
-2.37.2.789.g6183377224-goog
+> 
+> The iommu patch is independent of the other patches, it can go through the
+> iommu rc tree.
+> 
+> Jason Gunthorpe (4):
+>   vfio: Simplify vfio_create_group()
+>   vfio: Move the sanity check of the group to vfio_create_group()
+>   vfio: Follow a strict lifetime for struct iommu_group *
+>   iommu: Fix ordering of iommu_release_device()
+> 
+>  drivers/iommu/iommu.c    |  36 ++++++--
+>  drivers/vfio/vfio_main.c | 172 +++++++++++++++++++++------------------
+>  2 files changed, 120 insertions(+), 88 deletions(-)
+> 
+> 
+> base-commit: 245898eb9275ce31942cff95d0bdc7412ad3d589
 
