@@ -2,66 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 704E25B3DA6
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 19:08:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C1095B3DD0
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 19:17:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229862AbiIIRIn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 13:08:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50662 "EHLO
+        id S231467AbiIIRRR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 13:17:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230291AbiIIRIm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 13:08:42 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D605167C7
-        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 10:08:39 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id 65so2273594pfx.0
-        for <kvm@vger.kernel.org>; Fri, 09 Sep 2022 10:08:39 -0700 (PDT)
+        with ESMTP id S231229AbiIIRRO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 13:17:14 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1E371269F8
+        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 10:17:12 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id u22so2373951plq.12
+        for <kvm@vger.kernel.org>; Fri, 09 Sep 2022 10:17:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=Kof9aPY5yigPY3DCgD1OndAAoW+AwfLSgN8DavIgLv4=;
-        b=rk0ScoEROFaCl0/7J8OOifdqDTeJxLR+4IKp70wZTPlLVO+eP0Tp5hNrOLnuFTYrXr
-         jOgsa9AqnfdGQ7seeyqBUK9/h4cN8ADg30XhcpXfyYwYGVMe5waRZoS8vbNmSVwEUppV
-         BomgzVtVcq76yUAkXzQmeYATtMIPd6lZl/+bgVj2l4papq0Iq5+YEQTtnE/v3kbOePHC
-         BA7ZWcmW5AAWGAQ00YlCA/feAkfgJWgE24IV9i62u32R+EyICI0gM5CitzYg8zxWxQtx
-         o5XjXkk7JFzXdlBEgaYrGXNlovc+LvXtLJFOur1yRJiVCa81cSklVR0ppin5IUK79PiL
-         NRqw==
+        bh=NLHgkXbfAutAhbtkBYMVkNlbY3+WKdVIOSTZpcdN8vY=;
+        b=QFfz/1Vb0uZZhqURyK8Xt396v3M0j7MJfCHW5q6x1F54e+xiSjyEogENKQXIuvQGTn
+         n6FFPV/xP+0UxoqTiWzNTK3LptutpwaQ4h2JzhPh3yi9Q/hyaXCzB/2I2T4p5fvffAG1
+         s9qhRRyyN4aK9Lcs/DULeIRB/MVoISI8om7iOGf9f7XBzwIYWfWokAunT8pPJKENw85C
+         2t0p0d4xyAES4EUJSbq16Ce65DyxrVN/zHskGBSkGysjZvGJPcRZrt4upa9O5edUZTsU
+         o877fM6LPLS8T5VMHVRbFuEGLC3/39NWJtP9H9x0C8fmDPmIO/l1GDYuLsFyoE4Ad5AC
+         Hxlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=Kof9aPY5yigPY3DCgD1OndAAoW+AwfLSgN8DavIgLv4=;
-        b=Nw+e2SfcezkD5B6TrvLfuyVtVznoMeGkCXbGnTFhu9CaKj3j9vYLIfFE421a/44IHI
-         Tx69F+sMcLuwsUQculyofwOgY9F68SJjF67daGjjXC9pcxCmeyTqkt5aIyM1PGZYj0Jp
-         2QZty8JVnylPK/eHqNhKy4pba9KkCnrdBfMR041aQBGc9ANkMiKVjPPppR0N0HkMVMwY
-         7+APbE+1Vrbalk2uPOHSqRM4p7iCr7Rnkpv827T4ZqSy1Vh5kh5W4H27ZkXPdhbArCtd
-         +HcSMzpN1BcgRO6nyPM9SI9T33VjqZnLQ5Me934vB6foCyYNErSmxIYVEjXnnKZAXQFm
-         q87g==
-X-Gm-Message-State: ACgBeo3LiyMIXUD4xCw310kpiCvUkO/7g8TAAsNIFMTXNOYNTF88UgBb
-        44OJzI6qRudDwnpLUXUHIeyj+Q==
-X-Google-Smtp-Source: AA6agR7mv9XyCVEaoah8tk+lRLpVb8G2V39pwZbxRl4oteVZd/l0voAebO1HY6hx3HsF6WZi3sa5Qg==
-X-Received: by 2002:a65:6e4a:0:b0:438:874c:53fd with SMTP id be10-20020a656e4a000000b00438874c53fdmr3814771pgb.355.1662743318692;
-        Fri, 09 Sep 2022 10:08:38 -0700 (PDT)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id a30-20020a631a5e000000b0042b2311f749sm747604pgm.19.2022.09.09.10.08.37
+        bh=NLHgkXbfAutAhbtkBYMVkNlbY3+WKdVIOSTZpcdN8vY=;
+        b=aQ1UK54dsawgmdRsXM+j2uQF5Bro5znpulilOBqh5ZcaCdVlItHAf8Se8YMyWIYC5x
+         M95lVGJFc8tBM7zzEXkWBF2CMq4hO2vBJLB8Wbzf0DK3ILgwmBfDDAjyclk29XAT7KcB
+         eovp8g5po8HcubJs6Ju8uN16qC6d+tze15lP7AulfajP/9t5pJvB71QK5TuuQmKyTmbk
+         awT2+sVZ6WKCmJvA3aw/cgNoQVA+wXHXFHTGwV679UW8F6O/75u9A7uBM9OYTeRLgY+q
+         MnraeOcQSgwQGi+L3CM3cpPAabuCH6RsUDM8swtOsxB846vEGZ9HOeZFa3tCS+OxPZTG
+         nO3Q==
+X-Gm-Message-State: ACgBeo0oC1tCp+JjKBcNyoeO+2QaHiYxcuEQjkIUm7TeVYVcMiT/gNUB
+        erwNvyqXZBgNpZIcypx7cOchIQ==
+X-Google-Smtp-Source: AA6agR439tgX1GMcMzD81Rr9yRZXzK24zRB0hn0V3bAqarVtoeGO4xP5dkhj22Tg7mfX7u9ZBcr+mw==
+X-Received: by 2002:a17:90b:3889:b0:200:8255:f0e5 with SMTP id mu9-20020a17090b388900b002008255f0e5mr10924885pjb.51.1662743831397;
+        Fri, 09 Sep 2022 10:17:11 -0700 (PDT)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
+        by smtp.gmail.com with ESMTPSA id n4-20020a170903110400b00176675adbe1sm704557plh.208.2022.09.09.10.17.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Sep 2022 10:08:37 -0700 (PDT)
-Date:   Fri, 9 Sep 2022 10:08:32 -0700
-From:   David Matlack <dmatlack@google.com>
+        Fri, 09 Sep 2022 10:17:09 -0700 (PDT)
+Date:   Fri, 9 Sep 2022 10:17:05 -0700
+From:   Ricardo Koller <ricarkol@google.com>
 To:     Colton Lewis <coltonlewis@google.com>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
-        seanjc@google.com, oupton@google.com, ricarkol@google.com,
+        dmatlack@google.com, seanjc@google.com, oupton@google.com,
         andrew.jones@linux.dev
-Subject: Re: [PATCH v5 1/3] KVM: selftests: implement random number
- generation for guest code
-Message-ID: <YxtzEJ9HMLPqMqN4@google.com>
+Subject: Re: [PATCH v5 3/3] KVM: selftests: randomize page access order
+Message-ID: <Yxt1EWRxxCxXziJ2@google.com>
 References: <20220909124300.3409187-1-coltonlewis@google.com>
- <20220909124300.3409187-2-coltonlewis@google.com>
+ <20220909124300.3409187-4-coltonlewis@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220909124300.3409187-2-coltonlewis@google.com>
+In-Reply-To: <20220909124300.3409187-4-coltonlewis@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,98 +72,137 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 09, 2022 at 12:42:58PM +0000, Colton Lewis wrote:
-> Implement random number generation for guest code to randomize parts
-> of the test, making it less predictable and a more accurate reflection
-> of reality.
+On Fri, Sep 09, 2022 at 12:43:00PM +0000, Colton Lewis wrote:
+> Create the ability to randomize page access order with the -a
+> argument, including the possibility that the same pages may be hit
+> multiple times during an iteration or not at all.
 > 
-> Create a -r argument to specify a random seed. If no argument is
-> provided, the seed defaults to the current Unix timestamp. The random
-> seed is set with perf_test_set_random_seed() and must be set before
-> guest_code runs to apply.
-> 
-> The random number generator chosen is the Park-Miller Linear
-> Congruential Generator, a fancy name for a basic and well-understood
-> random number generator entirely sufficient for this purpose. Each
-> vCPU calculates its own seed by adding its index to the seed provided.
+> Population sets random access to false.
+>
 
-Great commit message!
+Reviewed-by: Ricardo Koller <ricarkol@google.com>
 
-> 
 > Signed-off-by: Colton Lewis <coltonlewis@google.com>
 > ---
->  tools/testing/selftests/kvm/dirty_log_perf_test.c    | 12 ++++++++++--
->  tools/testing/selftests/kvm/include/perf_test_util.h |  2 ++
->  tools/testing/selftests/kvm/include/test_util.h      |  2 ++
->  tools/testing/selftests/kvm/lib/perf_test_util.c     | 11 ++++++++++-
->  tools/testing/selftests/kvm/lib/test_util.c          |  9 +++++++++
->  5 files changed, 33 insertions(+), 3 deletions(-)
+>  tools/testing/selftests/kvm/dirty_log_perf_test.c | 11 +++++++++--
+>  .../selftests/kvm/include/perf_test_util.h        |  2 ++
+>  tools/testing/selftests/kvm/lib/perf_test_util.c  | 15 ++++++++++++++-
+>  3 files changed, 25 insertions(+), 3 deletions(-)
 > 
 > diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> index d60a34cdfaee..2f91acd94130 100644
+> index c2ad299b3760..3639d5f95033 100644
 > --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
 > +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> @@ -126,6 +126,7 @@ struct test_params {
->  	bool partition_vcpu_memory_access;
->  	enum vm_mem_backing_src_type backing_src;
+> @@ -127,6 +127,7 @@ struct test_params {
 >  	int slots;
-> +	uint32_t random_seed;
+>  	uint32_t write_percent;
+>  	uint32_t random_seed;
+> +	bool random_access;
 >  };
 >  
 >  static void toggle_dirty_logging(struct kvm_vm *vm, int slots, bool enable)
-> @@ -220,6 +221,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  				 p->slots, p->backing_src,
->  				 p->partition_vcpu_memory_access);
+> @@ -248,6 +249,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  		vcpu_last_completed_iteration[vcpu_id] = -1;
 >  
-> +	pr_info("Random seed: %u\n", p->random_seed);
-> +	perf_test_set_random_seed(vm, p->random_seed);
->  	perf_test_set_wr_fract(vm, p->wr_fract);
+>  	perf_test_set_write_percent(vm, 100);
+> +	perf_test_set_random_access(vm, false);
+>  	perf_test_start_vcpu_threads(nr_vcpus, vcpu_worker);
 >  
->  	guest_num_pages = (nr_vcpus * guest_percpu_mem_size) >> vm_get_page_shift(vm);
-> @@ -337,7 +340,7 @@ static void help(char *name)
+>  	/* Allow the vCPUs to populate memory */
+> @@ -270,6 +272,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  		ts_diff.tv_sec, ts_diff.tv_nsec);
+>  
+>  	perf_test_set_write_percent(vm, p->write_percent);
+> +	perf_test_set_random_access(vm, p->random_access);
+>  
+>  	while (iteration < p->iterations) {
+>  		/*
+> @@ -341,10 +344,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  static void help(char *name)
 >  {
 >  	puts("");
->  	printf("usage: %s [-h] [-i iterations] [-p offset] [-g] "
-> -	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-s mem type]"
-> +	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-r random seed ] [-s mem type]"
->  	       "[-x memslots]\n", name);
+> -	printf("usage: %s [-h] [-i iterations] [-p offset] [-g] "
+> +	printf("usage: %s [-h] [-a] [-i iterations] [-p offset] [-g] "
+>  	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-r random seed ] [-s mem type]"
+>  	       "[-x memslots] [-w percentage]\n", name);
 >  	puts("");
+> +	printf(" -a: access memory randomly rather than in order.\n");
 >  	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
-> @@ -362,6 +365,7 @@ static void help(char *name)
->  	printf(" -v: specify the number of vCPUs to run.\n");
->  	printf(" -o: Overlap guest memory accesses instead of partitioning\n"
->  	       "     them into a separate region of memory for each vCPU.\n");
-> +	printf(" -r: specify the starting random seed.\n");
->  	backing_src_help("-s");
->  	printf(" -x: Split the memory region into this number of memslots.\n"
->  	       "     (default: 1)\n");
-> @@ -378,6 +382,7 @@ int main(int argc, char *argv[])
->  		.partition_vcpu_memory_access = true,
->  		.backing_src = DEFAULT_VM_MEM_SRC,
->  		.slots = 1,
-> +		.random_seed = time(NULL),
-
-It's a bad code smell that the random seed gets default initialized to
-time(NULL) twice (here and in perf_test_create_vm()).
-
-I also still think it would be better if the default random seed was
-consistent across runs. Most use-cases of dirty_log_perf_test is for A/B
-testing, so consistency is key. For example, running dirty_log_perf_test
-at every commit to find regressions, or running dirty_log_perf_test to
-study the performance effects of some change. In other words, I think
-most use-cases will want a consistent seed across runs, so the default
-behavior should match that. Otherwise I forsee myself (and automated
-tools) having to pass in -r to every test runs to get consistent,
-comparable, behavior.
-
-What do you think about killing 2 birds with one stone here and make the
-default random_seed 0. That requires no initialization and ensures
-consistent random behavior across runs.
-
-And then optionally... I would even recommend dropping the -r parameter
-until someone wants to run dirty_log_perf_test with different seeds.
-That would simplify the code even more. I have a feeling there won't be
-much interest in different seeds since, at the end of the day, it will
-always be the same rough distribution of accesses. More interesting than
-different seeds will be adding support for different types of access
-patterns.
+>  	       TEST_HOST_LOOP_N);
+>  	printf(" -g: Do not enable KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2. This\n"
+> @@ -396,8 +400,11 @@ int main(int argc, char *argv[])
+>  
+>  	guest_modes_append_default();
+>  
+> -	while ((opt = getopt(argc, argv, "ghi:p:m:nb:v:or:s:x:w:")) != -1) {
+> +	while ((opt = getopt(argc, argv, "aghi:p:m:nb:v:or:s:x:w:")) != -1) {
+>  		switch (opt) {
+> +		case 'a':
+> +			p.random_access = true;
+> +			break;
+>  		case 'g':
+>  			dirty_log_manual_caps = 0;
+>  			break;
+> diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
+> index f93f2ea7c6a3..d9664a31e01c 100644
+> --- a/tools/testing/selftests/kvm/include/perf_test_util.h
+> +++ b/tools/testing/selftests/kvm/include/perf_test_util.h
+> @@ -39,6 +39,7 @@ struct perf_test_args {
+>  
+>  	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
+>  	bool nested;
+> +	bool random_access;
+>  
+>  	struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
+>  };
+> @@ -53,6 +54,7 @@ void perf_test_destroy_vm(struct kvm_vm *vm);
+>  
+>  void perf_test_set_write_percent(struct kvm_vm *vm, uint32_t write_percent);
+>  void perf_test_set_random_seed(struct kvm_vm *vm, uint32_t random_seed);
+> +void perf_test_set_random_access(struct kvm_vm *vm, bool random_access);
+>  
+>  void perf_test_start_vcpu_threads(int vcpus, void (*vcpu_fn)(struct perf_test_vcpu_args *));
+>  void perf_test_join_vcpu_threads(int vcpus);
+> diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> index 12a3597be1f9..ce657fa92f05 100644
+> --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
+> +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> @@ -46,6 +46,7 @@ void perf_test_guest_code(uint32_t vcpu_id)
+>  	struct perf_test_vcpu_args *vcpu_args = &pta->vcpu_args[vcpu_id];
+>  	uint64_t gva;
+>  	uint64_t pages;
+> +	uint64_t addr;
+>  	int i;
+>  	uint32_t rand = pta->random_seed + vcpu_id;
+>  
+> @@ -57,7 +58,13 @@ void perf_test_guest_code(uint32_t vcpu_id)
+>  
+>  	while (true) {
+>  		for (i = 0; i < pages; i++) {
+> -			uint64_t addr = gva + (i * pta->guest_page_size);
+> +			guest_random(&rand);
+> +
+> +			if (pta->random_access)
+> +				addr = gva + ((rand % pages) * pta->guest_page_size);
+> +			else
+> +				addr = gva + (i * pta->guest_page_size);
+> +
+>  			guest_random(&rand);
+>  
+>  			if (rand % 100 < pta->write_percent)
+> @@ -233,6 +240,12 @@ void perf_test_set_random_seed(struct kvm_vm *vm, uint32_t random_seed)
+>  	sync_global_to_guest(vm, perf_test_args.random_seed);
+>  }
+>  
+> +void perf_test_set_random_access(struct kvm_vm *vm, bool random_access)
+> +{
+> +	perf_test_args.random_access = random_access;
+> +	sync_global_to_guest(vm, perf_test_args.random_access);
+> +}
+> +
+>  uint64_t __weak perf_test_nested_pages(int nr_vcpus)
+>  {
+>  	return 0;
+> -- 
+> 2.37.2.789.g6183377224-goog
+> 
