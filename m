@@ -2,123 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A56F15B3CF1
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 18:26:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 485225B3D33
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 18:41:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231556AbiIIQZ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 12:25:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48296 "EHLO
+        id S231348AbiIIQlX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 12:41:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230338AbiIIQZp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 12:25:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 966BA136CF3
-        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 09:25:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662740743;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=iqg92T6+DIsD3HEOljmpjoovmZlRQMOWaRSmystH/zs=;
-        b=I5fQt2oKz0/QVi/LbpWpWocJ8PBIeTLuekBJ6OiS8Om0PHfHiqDbhx/zS5ze2HF71MHajF
-        jo1/eXsqsB3HJvBzX6isHEkBzKY+cZzDhzKNq0CoEfTc+3T1nexS3W+ZeWPI3ftzKhAF3a
-        BScjXBHOpobkXE5RZX+FQpycWmL0M3M=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-144-5rBM4QFLNAO2H8JpJOsh1w-1; Fri, 09 Sep 2022 12:25:42 -0400
-X-MC-Unique: 5rBM4QFLNAO2H8JpJOsh1w-1
-Received: by mail-qk1-f200.google.com with SMTP id h8-20020a05620a284800b006b5c98f09fbso1873409qkp.21
-        for <kvm@vger.kernel.org>; Fri, 09 Sep 2022 09:25:42 -0700 (PDT)
+        with ESMTP id S231154AbiIIQlP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 12:41:15 -0400
+Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72B8214343E
+        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 09:41:13 -0700 (PDT)
+Received: by mail-yb1-xb2b.google.com with SMTP id p200so3532479yba.1
+        for <kvm@vger.kernel.org>; Fri, 09 Sep 2022 09:41:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date;
+        bh=bgGnDvZe+c8LuII7vL8lyuG/HfKB3YZ9q2O3O8JNa6Y=;
+        b=DGcrrQqrVINJyiEP0Wl1JfOTeQHBaNjexSS35VrnO9NKAqhpRDgqmW11Fp8ua/e3fs
+         T0fAKYpaARKFY8Mi8E88PIw7iEe11mDmrDTEBdC6EH6EMItLFdPIf00rMQimKY4bicj/
+         hMXIWYi6FIkD+kKrdW1n/lJcKIO5Zm+ap2E4dfNm/ajcfuxCq2H8z9HOPyJ9bb8gjpm6
+         ZEtggAswTJqd9WVea4GLMuOgKQNkiS5GYKGBSbaA4323FCZjf7g3VBrEhEcMKAXpHFaj
+         MBL3X9L/fi6cGsTmub0sbBUAcRZuuZESQF1FW5KcLbGtFnelsoRR0eC8zFOQmiEvlUuy
+         gLXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=iqg92T6+DIsD3HEOljmpjoovmZlRQMOWaRSmystH/zs=;
-        b=QTIlb8+7hOzd1xoeXU+T2PqNswlMlhkX6LMAP6kqKTRAr36ilcav0RfYbnKCt8OZ+6
-         21YOr4KLkYCI2IPB+tdnsPOjbyz8XFRgIOJgvnYOqqePe+9oGITn/qjDkxC2qdboRXal
-         4DKHXNF1FuIDkAxGoYtau38M+x68FmypRh/eLH2SI4S+Cy/leAl0BRr//gHncvY3mZAJ
-         YdKwl6xquRBjAdrjpjwqMxaySOG5n1BNvAjJWUujZp2k2fiSFy+0GwivxykwFdOOeh+W
-         wPTFbP4PI7AGjEq8AZc30B0qkiDHCfWqsQ+Eeqxm62DeXC1VSifMTceJG3J0f98bh1R/
-         3eAQ==
-X-Gm-Message-State: ACgBeo3/ZZmcyTQO/F3z5P8APzySX6iWLDkPN3QAKKjUKBF2A/ZmZHkT
-        PTbPJqrmYY3qAQL+lufPZCimyEnIzMvimMEInVAOTuxrlGFjufeWflXrBMi2it4EPkO+J41sFPM
-        L7zwS3aLfP9KP
-X-Received: by 2002:a05:620a:172b:b0:6bb:3dea:1fd with SMTP id az43-20020a05620a172b00b006bb3dea01fdmr10375446qkb.683.1662740742148;
-        Fri, 09 Sep 2022 09:25:42 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6n2O7RQP3m3YHIPv2uiMg0nXQxbZoxEAbEDGoaL6WVD66pXUnx5xegwqJGTCORAEgZyyyzOw==
-X-Received: by 2002:a05:620a:172b:b0:6bb:3dea:1fd with SMTP id az43-20020a05620a172b00b006bb3dea01fdmr10375433qkb.683.1662740741925;
-        Fri, 09 Sep 2022 09:25:41 -0700 (PDT)
-Received: from xz-m1.local (bras-base-aurron9127w-grc-35-70-27-3-10.dsl.bell.ca. [70.27.3.10])
-        by smtp.gmail.com with ESMTPSA id d14-20020a05620a240e00b006cc190f627bsm884222qkn.63.2022.09.09.09.25.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Sep 2022 09:25:41 -0700 (PDT)
-Date:   Fri, 9 Sep 2022 12:25:40 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Chenyi Qiang <chenyi.qiang@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Xiaoyao Li <xiaoyao.li@intel.com>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v5 3/3] i386: Add notify VM exit support
-Message-ID: <YxtpBMZmrDK3cghT@xz-m1.local>
-References: <20220817020845.21855-1-chenyi.qiang@intel.com>
- <20220817020845.21855-4-chenyi.qiang@intel.com>
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=bgGnDvZe+c8LuII7vL8lyuG/HfKB3YZ9q2O3O8JNa6Y=;
+        b=MNvNI/tXfy92l9ivuw/W8ik4XYnMah7uaNRI/J0rdch0IjLEmQVyhq0NVVqj+6Q/Jh
+         1RYsjDLrHZbftgx3gStrPMJ/hkcAslsSktWBjCWGwGalZHW8O3fg+/9WnBE+hK8pZ04q
+         E3an2/Cre1nEOosG0PCuln3hJJNhfzx51qQXO/zDEEfrLQtHvO3Q+2JWE+ILLotQs30+
+         14xwNc4XZZsZWBcminRkyYIgiyM6mXWzmhrZCFiRXQICg28fhQMnSvoQt43/DPkZhop1
+         LMS5s7Z85DGS7ThWrHgzp1CYPMrgLgkk8+ZKri5O08b/THJTx9PYxGD5tClXWamJUoAO
+         T9Mw==
+X-Gm-Message-State: ACgBeo3Ejm/pa3Vt1n165bDYC0wBYgsybvZjhTvL0JE/RoShBTf3eE2L
+        vOKBPYG8vFOJCKxBla4GQEFMmki5v2JE2KNrmlU=
+X-Google-Smtp-Source: AA6agR5RY/2oQd4lrulLn2+rBTZfgXRkdV7rpoL5+RfvohZSehc3cwvtLvUW+qJcvu50DqJQC2ZMLGbHNaoL0JSkFXM=
+X-Received: by 2002:a25:af41:0:b0:6a9:3f9c:b84e with SMTP id
+ c1-20020a25af41000000b006a93f9cb84emr12650243ybj.537.1662741672707; Fri, 09
+ Sep 2022 09:41:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220817020845.21855-4-chenyi.qiang@intel.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+Date:   Fri, 9 Sep 2022 12:41:01 -0400
+Message-ID: <CAJSP0QUn5wianZaCu8Ka=eu2uuwtwTnTLD-P9pkb+PxFd=1Mzg@mail.gmail.com>
+Subject: Call for Outreachy Dec-Mar internship project ideas
+To:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, Warner Losh <imp@bsdimp.com>,
+        =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+        Fabiano Rosas <farosas@linux.ibm.com>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        Frank Chang <frank.chang@sifive.com>,
+        Matheus Ferst <matheus.ferst@eldorado.org.br>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 17, 2022 at 10:08:45AM +0800, Chenyi Qiang wrote:
-> There are cases that malicious virtual machine can cause CPU stuck (due
-> to event windows don't open up), e.g., infinite loop in microcode when
-> nested #AC (CVE-2015-5307). No event window means no event (NMI, SMI and
-> IRQ) can be delivered. It leads the CPU to be unavailable to host or
-> other VMs. Notify VM exit is introduced to mitigate such kind of
-> attacks, which will generate a VM exit if no event window occurs in VM
-> non-root mode for a specified amount of time (notify window).
-> 
-> A new KVM capability KVM_CAP_X86_NOTIFY_VMEXIT is exposed to user space
-> so that the user can query the capability and set the expected notify
-> window when creating VMs. The format of the argument when enabling this
-> capability is as follows:
->   Bit 63:32 - notify window specified in qemu command
->   Bit 31:0  - some flags (e.g. KVM_X86_NOTIFY_VMEXIT_ENABLED is set to
->               enable the feature.)
-> 
-> Because there are some concerns, e.g. a notify VM exit may happen with
-> VM_CONTEXT_INVALID set in exit qualification (no cases are anticipated
-> that would set this bit), which means VM context is corrupted. To avoid
-> the false positive and a well-behaved guest gets killed, make this
-> feature disabled by default. Users can enable the feature by a new
-> machine property:
->     qemu -machine notify_vmexit=on,notify_window=0 ...
+Dear QEMU & KVM community,
+The Outreachy open source internship program
+(https://www.outreachy.org/) is running again from December-March. If
+you have a project idea you'd like to mentor and are a regular
+contributor to QEMU or KVM, please reply to this email by September
+22nd.
 
-The patch looks sane to me; I only read the KVM interface, though.  Worth
-add a section to qemu-options.hx?  It'll also be worthwhile to mention the
-valid range of notify_window and meaning of zero (IIUC that's also a valid
-input, just use the hardware default window size).
+I have CCed active contributors based on git-log(1) but you don't need
+to be CCed to become a mentor.
 
-Thanks,
+Mentoring an intern is a great way to give back for the support you
+received along the way of your open source journey. You'll get
+experience with interviewing and running projects. And most of all,
+it's fun to work with talented contributors excited about open source!
 
-> 
-> A new KVM exit reason KVM_EXIT_NOTIFY is defined for notify VM exit. If
-> it happens with VM_INVALID_CONTEXT, hypervisor exits to user space to
-> inform the fatal case. Then user space can inject a SHUTDOWN event to
-> the target vcpu. This is implemented by injecting a sythesized triple
-> fault event.
+You must be willing to commit around 5 hours per week during the
+application phase and coding period.
 
--- 
-Peter Xu
+Project ideas should be:
+- 12 weeks of full-time work for a competent programmer without prior
+exposure to the code base.
+- Well-defined: scope is clear.
+- Self-contained: has few dependencies.
+- Uncontroversial: acceptable to the community.
+- Incremental: produces deliverables along the way.
 
+Project description template:
+ === TITLE ===
+ '''Summary:''' Short description of the project
+
+ Detailed description of the project for someone who is not familiar
+with the code base.
+
+ '''Links:'''
+ * Wiki links to relevant material
+ * External links to mailing lists or web sites
+
+ '''Details:'''
+ * Skill level: beginner or intermediate or advanced
+ * Language: C/Rust/Python
+ * Mentors: Email address and IRC nick
+
+Thank you,
+Stefan
