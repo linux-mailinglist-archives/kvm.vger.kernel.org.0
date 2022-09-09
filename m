@@ -2,142 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2893D5B3483
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 11:54:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 103295B34A7
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 11:57:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231243AbiIIJvl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 05:51:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39212 "EHLO
+        id S229761AbiIIJ4r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 05:56:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231572AbiIIJvZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 05:51:25 -0400
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ED67C59E7
-        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 02:50:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1662717037; x=1694253037;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=9UeS6jOOBLEZxNcIS4bLIOSsYgu3lQHgS+uKe/NBl1A=;
-  b=h/tGEGGvawrZ3GwYRqLUlGYKerdPGiDcS28N74Y0kNbJYWpLcvIQoixN
-   bc4CEbkmZQbR+JLBqkQh4SgaFdVeCfvpojKJ6f5bGYKQc7XfiZr4RJNqi
-   LCUmsDsKhG+xNVISU3z1k5j+7ahX2UB0poh0dldQ9BJ8TFzYAIYZceTJb
-   g=;
-X-IronPort-AV: E=Sophos;i="5.93,302,1654560000"; 
-   d="scan'208";a="128419224"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-26daedd8.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2022 09:50:19 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-        by email-inbound-relay-iad-1e-26daedd8.us-east-1.amazon.com (Postfix) with ESMTPS id 4CAE6E1275;
-        Fri,  9 Sep 2022 09:50:18 +0000 (UTC)
-Received: from EX19D008UEA002.ant.amazon.com (10.252.134.125) by
- EX13MTAUEA001.ant.amazon.com (10.43.61.82) with Microsoft SMTP Server (TLS)
- id 15.0.1497.38; Fri, 9 Sep 2022 09:50:17 +0000
-Received: from EX13MTAUEA001.ant.amazon.com (10.43.61.82) by
- EX19D008UEA002.ant.amazon.com (10.252.134.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.12;
- Fri, 9 Sep 2022 09:50:17 +0000
-Received: from dev-dsk-metikaya-1c-d447d167.eu-west-1.amazon.com
- (10.13.250.103) by mail-relay.amazon.com (10.43.61.243) with Microsoft SMTP
- Server (TLS) id 15.0.1497.38 via Frontend Transport; Fri, 9 Sep 2022 09:50:16
- +0000
-From:   Metin Kaya <metikaya@amazon.co.uk>
-To:     <kvm@vger.kernel.org>, <pbonzini@redhat.com>
-CC:     <x86@kernel.org>, <bp@alien8.de>, <dwmw@amazon.co.uk>,
-        <seanjc@google.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
-        <dave.hansen@linux.intel.com>, <joao.m.martins@oracle.com>,
-        Metin Kaya <metikaya@amazon.co.uk>
-Subject: [PATCH 2/2] KVM: x86: Introduce kvm_gfn_to_hva_cache_valid()
-Date:   Fri, 9 Sep 2022 09:50:06 +0000
-Message-ID: <20220909095006.65440-2-metikaya@amazon.co.uk>
-X-Mailer: git-send-email 2.37.1
-In-Reply-To: <20220909095006.65440-1-metikaya@amazon.co.uk>
-References: <20220909095006.65440-1-metikaya@amazon.co.uk>
+        with ESMTP id S229821AbiIIJ4f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 05:56:35 -0400
+Received: from out1.migadu.com (out1.migadu.com [IPv6:2001:41d0:2:863f::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE5C112D19E;
+        Fri,  9 Sep 2022 02:56:10 -0700 (PDT)
+Date:   Fri, 9 Sep 2022 10:55:59 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1662717368;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=lDpC67NopcBY3WkfHCdst9Y40eb0+fWa3aZaj8C1P74=;
+        b=LVUcgLVEKlJeyJh274QBbSm2SunUsd/+Fnhi8Oa83s4LnsBzI0E2D1UEwYFcXtQEulUU+W
+        LVnoIby+wN2xFlyIPs/26HCtShwG9QsGAppu7ff2QUan911DOy14slnZlOYJWqyTLNYjZD
+        NI3YBiakBpwSB/KZjauRUKa3/8sbkjE=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Gavin Shan <gshan@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 08/14] KVM: arm64: Protect page table traversal with RCU
+Message-ID: <YxsNr+79UUm5Go9x@google.com>
+References: <20220830194132.962932-1-oliver.upton@linux.dev>
+ <20220830194132.962932-9-oliver.upton@linux.dev>
+ <YxkRXLsLuhjBNanT@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Spam-Status: No, score=-11.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YxkRXLsLuhjBNanT@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It simplifies validation of gfn_to_hva_cache to make it less error prone
-per the discussion at
-https://lore.kernel.org/all/4e29402770a7a254a1ea8ca8165af641ed0832ed.camel@infradead.org.
+On Wed, Sep 07, 2022 at 02:47:08PM -0700, David Matlack wrote:
+> On Tue, Aug 30, 2022 at 07:41:26PM +0000, Oliver Upton wrote:
+> > The use of RCU is necessary to change the paging structures in parallel.
+> > Acquire and release an RCU read lock when traversing the page tables.
+> > 
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >  arch/arm64/include/asm/kvm_pgtable.h | 19 ++++++++++++++++++-
+> >  arch/arm64/kvm/hyp/pgtable.c         |  7 ++++++-
+> >  2 files changed, 24 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index 78fbb7be1af6..7d2de0a98ccb 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -578,9 +578,26 @@ enum kvm_pgtable_prot kvm_pgtable_stage2_pte_prot(kvm_pte_t pte);
+> >   */
+> >  enum kvm_pgtable_prot kvm_pgtable_hyp_pte_prot(kvm_pte_t pte);
+> >  
+> > +#if defined(__KVM_NVHE_HYPERVISOR___)
+> > +
+> 
+> Future readers will wonder why NVHE stubs out RCU support and how that
+> is even correct. Some comments here would be useful explain it.
 
-Signed-off-by: Metin Kaya <metikaya@amazon.co.uk>
----
- arch/x86/kvm/x86.c | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+Good point.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 43a6a7efc6ec..07d368dc69ad 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3425,11 +3425,22 @@ void kvm_service_local_tlb_flush_requests(struct kvm_vcpu *vcpu)
- }
- EXPORT_SYMBOL_GPL(kvm_service_local_tlb_flush_requests);
- 
-+static inline bool kvm_gfn_to_hva_cache_valid(struct kvm *kvm,
-+					      struct gfn_to_hva_cache *ghc,
-+					      gpa_t gpa)
-+{
-+	struct kvm_memslots *slots = kvm_memslots(kvm);
-+
-+	return !unlikely(slots->generation != ghc->generation ||
-+			 gpa != ghc->gpa ||
-+			 kvm_is_error_hva(ghc->hva) ||
-+			 !ghc->memslot);
-+}
-+
- static void record_steal_time(struct kvm_vcpu *vcpu)
- {
- 	struct gfn_to_hva_cache *ghc = &vcpu->arch.st.cache;
- 	struct kvm_steal_time __user *st;
--	struct kvm_memslots *slots;
- 	gpa_t gpa = vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS;
- 	u64 steal;
- 	u32 version;
-@@ -3445,11 +3456,7 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
- 	if (WARN_ON_ONCE(current->mm != vcpu->kvm->mm))
- 		return;
- 
--	slots = kvm_memslots(vcpu->kvm);
--
--	if (unlikely(slots->generation != ghc->generation ||
--		     gpa != ghc->gpa ||
--		     kvm_is_error_hva(ghc->hva) || !ghc->memslot)) {
-+	if (!kvm_gfn_to_hva_cache_valid(vcpu->kvm, ghc, gpa)) {
- 		/* We rely on the fact that it fits in a single page. */
- 		BUILD_BUG_ON((sizeof(*st) - 1) & KVM_STEAL_VALID_BITS);
- 
-@@ -4729,7 +4736,6 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
- {
- 	struct gfn_to_hva_cache *ghc = &vcpu->arch.st.cache;
- 	struct kvm_steal_time __user *st;
--	struct kvm_memslots *slots;
- 	static const u8 preempted = KVM_VCPU_PREEMPTED;
- 	gpa_t gpa = vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS;
- 
-@@ -4756,11 +4762,7 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
- 	if (unlikely(current->mm != vcpu->kvm->mm))
- 		return;
- 
--	slots = kvm_memslots(vcpu->kvm);
--
--	if (unlikely(slots->generation != ghc->generation ||
--		     gpa != ghc->gpa ||
--		     kvm_is_error_hva(ghc->hva) || !ghc->memslot))
-+	if (!kvm_gfn_to_hva_cache_valid(vcpu->kvm, ghc, gpa))
- 		return;
- 
- 	st = (struct kvm_steal_time __user *)ghc->hva;
--- 
-2.37.1
+> > +static inline void kvm_pgtable_walk_begin(void) {}
+> > +static inline void kvm_pgtable_walk_end(void) {}
+> > +
+> > +#define kvm_dereference_ptep rcu_dereference_raw
+> 
+> How does NVHE have access rcu_dereference_raw()?
 
+rcu_dereference_raw() is inlined and simply recasts the pointer into the
+kernel address space.
+
+Perhaps it is less confusing to template this on kvm_pte_read() to avoid
+polluting nVHE with an otherwise benign reference to RCU.
+
+> > +
+> > +#else	/* !defined(__KVM_NVHE_HYPERVISOR__) */
+> > +
+> > +#define kvm_pgtable_walk_begin	rcu_read_lock
+> > +#define kvm_pgtable_walk_end	rcu_read_unlock
+> > +#define kvm_dereference_ptep	rcu_dereference
+> > +
+> > +#endif	/* defined(__KVM_NVHE_HYPERVISOR__) */
+> > +
+> >  static inline kvm_pte_t kvm_pte_read(kvm_pte_t *ptep)
+> >  {
+> > -	return READ_ONCE(*ptep);
+> > +	kvm_pte_t __rcu *p = (kvm_pte_t __rcu *)ptep;
+> > +
+> > +	return READ_ONCE(*kvm_dereference_ptep(p));
+> 
+> What about all the other places where page table memory is accessed?
+> 
+> If RCU is going to be used to protect page table memory, then all
+> accesses have to go under an RCU critical section. This means that page
+> table memory should only be accessed through __rcu annotated pointers
+> and dereferenced with rcu_dereference().
+
+Let me play around with this a bit, as the annoying part is trying to
+sprinkle in RCU annotations w/o messing with nVHE. 
+
+--
+Thanks,
+Oliver
