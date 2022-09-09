@@ -2,84 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 56BA55B314B
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 10:04:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41C785B3148
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 10:04:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229491AbiIIICY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 04:02:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58738 "EHLO
+        id S229819AbiIIICv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 04:02:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229960AbiIIICW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 04:02:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC3DA103047
-        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 01:02:20 -0700 (PDT)
+        with ESMTP id S229774AbiIIICr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 04:02:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D4CB915C3
+        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 01:02:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662710540;
+        s=mimecast20190719; t=1662710565;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=L4aiCv3DQffhho4nhLvtJMFC0s173+oyNkH3+TzK2R0=;
-        b=TmYiMivkm6IGUzem1pfChbdtTOGLM2gC0N5ys2EvUAyiKgsAMh8mnioL2LgEv5bmQdg566
-        E2fk3idEk6Il+zxVq45MRNGQtvWcqKTCVB/Coo+etxdFZ6PvuybbtNOkTGrhBcHExAQF10
-        mGUpLasVhVRSVMonrxBIMFqCqJ1F4PQ=
+        bh=yzEprpmYDxZoU/iLdscba5yKn41f2daHNxZoCNCbLwo=;
+        b=B3TlE6MIu6iSHO5pZPYOuzxtuXZR0QtPW6KUgC+qIzxvP8JmpJxWZsGuPllenSXQw08/K2
+        pdhdDFqxio/bM+5oDAbPCEAgPehBLbeRWjTpq01ZFF9DFe/WutF4rS18DFIP4pkjN95MQG
+        M6oqCp0eT/31iykwBAq9La875o21tmQ=
 Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
  [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-232-ga1R_IZgOk-Jx0nFA0wDvA-1; Fri, 09 Sep 2022 04:02:19 -0400
-X-MC-Unique: ga1R_IZgOk-Jx0nFA0wDvA-1
-Received: by mail-qt1-f198.google.com with SMTP id cf25-20020a05622a401900b0035a6ef450e9so906984qtb.9
-        for <kvm@vger.kernel.org>; Fri, 09 Sep 2022 01:02:19 -0700 (PDT)
+ us-mta-571-zXer8nFVPEuUfjyN3U6U3Q-1; Fri, 09 Sep 2022 04:02:44 -0400
+X-MC-Unique: zXer8nFVPEuUfjyN3U6U3Q-1
+Received: by mail-qt1-f198.google.com with SMTP id bz20-20020a05622a1e9400b003436a76c6e6so925547qtb.1
+        for <kvm@vger.kernel.org>; Fri, 09 Sep 2022 01:02:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=L4aiCv3DQffhho4nhLvtJMFC0s173+oyNkH3+TzK2R0=;
-        b=hkTdA0qs+Sa41NSMDpgGXDUdJlCgepKIxwhBerOHhjTb4uXEDNDaXjJbuRb0eJEHUA
-         n+wUHNJ9XQ2V0wB2IBIJsXLnHzFBhWW2anCSLUp4Wk/pBQ0bWKdr/tc/EQguRIUF6jlA
-         AI0qufSX9kbpJQNNmpB1zbdchzY8vAGvC9LSpa6d3HDuSUqCBk6cvwp11Z7vDXrh0eIy
-         SsN/QI/NhdqI6G7/YiYclGz9ei0dGGbIeQK35Gtwro4ykFE4IaO6lD0HSbdBKg+zZphB
-         xa2CUPY/SUp/u1sFopz1KKILd+A9/hNik0s6bzYechBKQVTua1/6Dp9ydBs56x7ghWd3
-         ydvw==
-X-Gm-Message-State: ACgBeo2u7oBVUlOaP0EWm8gtGZ6rSvQi0OFP3FIUbGg6NppD7Amev8wW
-        rcn6GzDNRtp5H7jbLLpNI0gU9wIp8uEItk4AA25MJTZucPCFAzf6Z6a6p2xWZZY3bK+9E0ECYWd
-        8fKLcSelY4Dla
-X-Received: by 2002:ac8:5e4f:0:b0:345:391:cee6 with SMTP id i15-20020ac85e4f000000b003450391cee6mr11144035qtx.255.1662710538665;
-        Fri, 09 Sep 2022 01:02:18 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6PUhWbboaAJvfMcvsjnLKVPMEpnYD1kR0kHKKQKLGf3kZn/jivKqv+dqTnrFEu/OG/msZC1w==
-X-Received: by 2002:ac8:5e4f:0:b0:345:391:cee6 with SMTP id i15-20020ac85e4f000000b003450391cee6mr11144022qtx.255.1662710538485;
-        Fri, 09 Sep 2022 01:02:18 -0700 (PDT)
+        bh=yzEprpmYDxZoU/iLdscba5yKn41f2daHNxZoCNCbLwo=;
+        b=4tYloq5HIyAx+iEFSDF5+c/aeu4ruhH3fGkuODCS7qAW9X1zlEkhU+XtvSkP6Sh4aE
+         OdlGVS2+slgLYtA+jJrnqqz6dookATMIrJ/u7Ckf7sBYhnebdn2wV06RwWQ6XzlGxi7P
+         MhKv22sRB7SJqO4iNzy8YRSHoQd+ixPgyinS/iPgKkQ2juXF6Vld5vnNqXyu3ZWkYVxr
+         wuXueX6m6qEt1+MDYCf8o5RDU4aEe4KCKLLpqzrDDdTa0RmcCLERUYAxVNPPoKhOpQOr
+         wkD9Jhl2LT6UV0YdVb1g9lphGxPjqOJiUnWYnfmlj2NiBn9QogvBlVZ0epfShDESik5a
+         mdTA==
+X-Gm-Message-State: ACgBeo1BHM5eF7zgntGxwFwo2LfR0Uiha/snOizOaI87XXew7kTRdhZS
+        iVqS4fxrylC1x++kV38huddPXMGTwBVyK5eQrBISy1uicTOyj/qoiwT5gYWJl/IQrfWRVbEZReF
+        +RUpponXFZHRn
+X-Received: by 2002:a05:620a:192a:b0:6bc:5bb:ffe6 with SMTP id bj42-20020a05620a192a00b006bc05bbffe6mr9337377qkb.268.1662710563626;
+        Fri, 09 Sep 2022 01:02:43 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR4iEFAhLPrQKHexiJaIz+0O/BxP+mb3Uf6thTAzqXRTKL23hztrcJ82I1vFiM2v0zkIdQqdCQ==
+X-Received: by 2002:a05:620a:192a:b0:6bc:5bb:ffe6 with SMTP id bj42-20020a05620a192a00b006bc05bbffe6mr9337364qkb.268.1662710563425;
+        Fri, 09 Sep 2022 01:02:43 -0700 (PDT)
 Received: from ?IPV6:2a04:ee41:4:31cb:e591:1e1e:abde:a8f1? ([2a04:ee41:4:31cb:e591:1e1e:abde:a8f1])
-        by smtp.gmail.com with ESMTPSA id fw12-20020a05622a4a8c00b00344b807bb95sm1032388qtb.74.2022.09.09.01.02.16
+        by smtp.gmail.com with ESMTPSA id s5-20020a05620a254500b006bb9e4b96e6sm934946qko.24.2022.09.09.01.02.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Sep 2022 01:02:17 -0700 (PDT)
-Message-ID: <66ed2e5b-b6a8-d9f7-3fe4-43c974dc0ecd@redhat.com>
-Date:   Fri, 9 Sep 2022 10:02:15 +0200
+        Fri, 09 Sep 2022 01:02:42 -0700 (PDT)
+Message-ID: <ce712ede-5d9a-5675-321a-afa402cd1d61@redhat.com>
+Date:   Fri, 9 Sep 2022 10:02:40 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
-Subject: Re: [RFC PATCH 2/2] kvm/kvm-all.c: listener should delay kvm_vm_ioctl
- to the commit phase
+Subject: Re: [RFC PATCH 1/2] softmmu/memory: add missing begin/commit callback
+ calls
 Content-Language: en-US
-To:     David Hildenbrand <david@redhat.com>, Peter Xu <peterx@redhat.com>
-Cc:     Leonardo Bras Soares Passos <lsoaresp@redhat.com>,
-        qemu-devel <qemu-devel@nongnu.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+To:     Peter Xu <peterx@redhat.com>
+Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
         =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
         Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
 References: <20220816101250.1715523-1-eesposit@redhat.com>
- <20220816101250.1715523-3-eesposit@redhat.com> <Yv6baJoNikyuZ38R@xz-m1.local>
- <CAJ6HWG6maoPjbP8T5qo=iXCbNeHu4dq3wHLKtRLahYKuJmMY-g@mail.gmail.com>
- <YwOOcC72KKABKgU+@xz-m1.local>
- <d4601180-4c95-a952-2b40-d40fa8e55005@redhat.com>
- <YwqFfyZ1fMA9knnK@xz-m1.local>
- <d02d6a6e-637e-48f9-9acc-811344712cd3@redhat.com>
+ <20220816101250.1715523-2-eesposit@redhat.com> <Yv6UVMMX/hHFkGoM@xz-m1.local>
+ <e5935ba7-dd60-b914-3b1d-fff4f8c01da3@redhat.com>
+ <YwjVG+MR8ORLngjd@xz-m1.local> <YwqGtHrcsFrgzLzg@xz-m1.local>
 From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-In-Reply-To: <d02d6a6e-637e-48f9-9acc-811344712cd3@redhat.com>
+In-Reply-To: <YwqGtHrcsFrgzLzg@xz-m1.local>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -93,29 +89,33 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
->> One thing I forgot to ask: iirc we used to have a workaround to kick all
->> vcpus out, update memory slots, then continue all vcpus.  Would that work
->> for us too for the problem you're working on?
-> 
-> As reference, here is one such approach for region resizes only:
-> 
-> https://lore.kernel.org/qemu-devel/20200312161217.3590-1-david@redhat.com/
-> 
-> which notes:
-> 
-> "Instead of inhibiting during the region_resize(), we could inhibit for
-> the hole memory transaction (from begin() to commit()). This could be
-> nice, because also splitting of memory regions would be atomic (I
-> remember there was a BUG report regarding that), however, I am not sure
-> if that might impact any RT users."
-> 
-> 
-I read:
 
-"Using pause_all_vcpus()/resume_all_vcpus() is not possible, as it will
-temporarily drop the BQL - something most callers can't handle (esp.
-when called from vcpu context e.g., in virtio code)."
+Am 27/08/2022 um 23:03 schrieb Peter Xu:
+> On Fri, Aug 26, 2022 at 10:13:47AM -0400, Peter Xu wrote:
+>> On Fri, Aug 26, 2022 at 03:53:09PM +0200, Emanuele Giuseppe Esposito wrote:
+>>> What do you mean "will empty all regions with those listeners"?
+>>> But yes theoretically vhost-vdpa and physmem have commit callbacks that
+>>> are independent from whether region_add or other callbacks have been called.
+>>> For kvm and probably vhost it would be no problem, since there won't be
+>>> any list to iterate on.
+>>
+>> Right, begin()/commit() is for address space update, so it should be fine
+>> to have nothing to commit, sorry.
+> 
+> Hold on..
+> 
+> When I was replying to your patch 2 and reading the code around, I fount
+> that this patch does affect vhost..  see region_nop() hook and also vhost's
+> version of vhost_region_addnop().  I think vhost will sync its memory
+> layout for each of the commit(), and any newly created AS could emptify
+> vhost memory list even if registered on address_space_memory.
+> 
+> The other thing is address_space_update_topology() seems to be only used by
+> address_space_init().  It means I don't think there should have any
+> listener registered to this AS anyway.. :) So iiuc this patch (even if
+> converting to loop over per-as memory listeners) is not needed.
+> 
+Agree, dropping this patch :)
 
-Thank you,
 Emanuele
 
