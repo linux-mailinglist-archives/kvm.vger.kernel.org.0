@@ -2,124 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C5DD45B35FB
+	by mail.lfdr.de (Postfix) with ESMTP id 7EE075B35FA
 	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 13:03:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229456AbiIILCp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 07:02:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46074 "EHLO
+        id S229658AbiIILCu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 07:02:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229658AbiIILC1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 07:02:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBA2B13D7BE
-        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 04:01:44 -0700 (PDT)
+        with ESMTP id S230345AbiIILCc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 07:02:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAA94139C1C
+        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 04:02:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662721303;
+        s=mimecast20190719; t=1662721330;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QZ7cp/F9ZhuoBQSl9KZ5nLiwALh3iP/kh0uBnlYquJs=;
-        b=NJllSD2fLUvt50Qy5YrX+LKyCxl7xn7IMQ54fOAvcRecET7M5V5KvLT/cikR5G+uEnW+rs
-        qOizQ7oms0NhJo43/xaW69tu56wx5HEetNBX+Xvvy2dJbKFiSr1vsBBC9rIL6bjHU1cHgm
-        RCPOlZGSCyasF5cNFli8Tff0g6490a8=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-649-YxD6is4vPkuhfgtaIIw0EQ-1; Fri, 09 Sep 2022 07:01:37 -0400
-X-MC-Unique: YxD6is4vPkuhfgtaIIw0EQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 86AE61C068D3;
-        Fri,  9 Sep 2022 11:01:36 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 804962166B26;
-        Fri,  9 Sep 2022 11:01:28 +0000 (UTC)
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Subject: [RFC PATCH 1/1] kvm/kvm-all.c: implement KVM_SET_USER_MEMORY_REGION_LIST ioctl
-Date:   Fri,  9 Sep 2022 07:00:34 -0400
-Message-Id: <20220909110034.740282-2-eesposit@redhat.com>
-In-Reply-To: <20220909110034.740282-1-eesposit@redhat.com>
-References: <20220909110034.740282-1-eesposit@redhat.com>
+        bh=552oMY7StYxcNv74FqiwwC+bER9EAS86HhvPvxTkRvE=;
+        b=Znr4EI9zy9h83Qs30eeAJpt/ZhugP5rKvctult060GB8WSeuFMjVtTNhuE/oEojdJ5N4gg
+        L2R9rOIcVkphZ0kmEHYmxZsVh0bePXV2XnFDgtBayUwpT26mcGjTdauher+w9oDZYM3YTH
+        ZXq52HLSYlhKO6/RhcrV5HdR4rIqCdI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-46-J0EBfaH2O9Sc9gqcXe-YWA-1; Fri, 09 Sep 2022 07:02:08 -0400
+X-MC-Unique: J0EBfaH2O9Sc9gqcXe-YWA-1
+Received: by mail-wr1-f70.google.com with SMTP id t12-20020adfa2cc000000b00224f577fad1so270048wra.4
+        for <kvm@vger.kernel.org>; Fri, 09 Sep 2022 04:02:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date;
+        bh=552oMY7StYxcNv74FqiwwC+bER9EAS86HhvPvxTkRvE=;
+        b=SwncPHWFLA0MQfrOhbK/t4SQZ5a3mS/7sEvoREgRq7bNqKAT+pgtAA91nTr5oh9Lly
+         AccCQCoETCJVN9Rxvahxb8GDozwFd2ZQqwY4SDZCqfOlFyYvWrPdKHskMMKYYjcSnYfC
+         MmOXi4IIO1gH8Dv7xHbUuuDDU5FZ1FJUG6tSniZonteB4RG62xVqfQuQjHWwrs4DCWRk
+         tZmcqHFT8DkBaCI2YuUIODVhAjvYrRyDmgcahmYboAK11LuCPBZVYHGtIf/HW/lK+6hZ
+         Kqe2oadRVoI2nZCGEQg6vnW+U8zygrRS1Zj4kvNmTytzRxmhkhuNhBVttUj7V9GrIkNE
+         UPeA==
+X-Gm-Message-State: ACgBeo3Oqm2i0LDI1LclwE3IBL+HQlWTX2UUKXMPx6nPeYgxwaW03Nmq
+        YEncHPBALpE7grSev6nsc07/br62+1Ow1P/FD2vOpADgx0zXThKm9DvcBUi58wiuTb5/u6rtvUf
+        YmkdVSLkjoCyB
+X-Received: by 2002:adf:edc9:0:b0:228:60de:1d4b with SMTP id v9-20020adfedc9000000b0022860de1d4bmr7840947wro.306.1662721327697;
+        Fri, 09 Sep 2022 04:02:07 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR6XrE6BUCNUNrNXlO+Yq7s10DLek+7dAPopvXjQd5tznH4HCs4Zzv6Wb4RjFhFEk1Hz/MJ9mg==
+X-Received: by 2002:adf:edc9:0:b0:228:60de:1d4b with SMTP id v9-20020adfedc9000000b0022860de1d4bmr7840932wro.306.1662721327450;
+        Fri, 09 Sep 2022 04:02:07 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c704:6300:1fe0:42e1:62c5:91b6? (p200300cbc70463001fe042e162c591b6.dip0.t-ipconnect.de. [2003:cb:c704:6300:1fe0:42e1:62c5:91b6])
+        by smtp.gmail.com with ESMTPSA id z5-20020a05600c0a0500b003a540fef440sm449486wmp.1.2022.09.09.04.02.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 09 Sep 2022 04:02:06 -0700 (PDT)
+Message-ID: <36a9dc69-d045-7ca4-a0a8-995c63951a9f@redhat.com>
+Date:   Fri, 9 Sep 2022 13:02:06 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [RFC PATCH 2/2] kvm/kvm-all.c: listener should delay kvm_vm_ioctl
+ to the commit phase
+Content-Language: en-US
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Peter Xu <peterx@redhat.com>
+Cc:     Leonardo Bras Soares Passos <lsoaresp@redhat.com>,
+        qemu-devel <qemu-devel@nongnu.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+References: <20220816101250.1715523-1-eesposit@redhat.com>
+ <20220816101250.1715523-3-eesposit@redhat.com> <Yv6baJoNikyuZ38R@xz-m1.local>
+ <CAJ6HWG6maoPjbP8T5qo=iXCbNeHu4dq3wHLKtRLahYKuJmMY-g@mail.gmail.com>
+ <YwOOcC72KKABKgU+@xz-m1.local>
+ <d4601180-4c95-a952-2b40-d40fa8e55005@redhat.com>
+ <YwqFfyZ1fMA9knnK@xz-m1.local>
+ <d02d6a6e-637e-48f9-9acc-811344712cd3@redhat.com>
+ <66ed2e5b-b6a8-d9f7-3fe4-43c974dc0ecd@redhat.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <66ed2e5b-b6a8-d9f7-3fe4-43c974dc0ecd@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Instead of sending memslot updates in each callback, kvm listener
-already takes care of sending them in the commit phase, as multiple
-ioctls.
+On 09.09.22 10:02, Emanuele Giuseppe Esposito wrote:
+> 
+>>> One thing I forgot to ask: iirc we used to have a workaround to kick all
+>>> vcpus out, update memory slots, then continue all vcpus.  Would that work
+>>> for us too for the problem you're working on?
+>>
+>> As reference, here is one such approach for region resizes only:
+>>
+>> https://lore.kernel.org/qemu-devel/20200312161217.3590-1-david@redhat.com/
+>>
+>> which notes:
+>>
+>> "Instead of inhibiting during the region_resize(), we could inhibit for
+>> the hole memory transaction (from begin() to commit()). This could be
+>> nice, because also splitting of memory regions would be atomic (I
+>> remember there was a BUG report regarding that), however, I am not sure
+>> if that might impact any RT users."
+>>
+>>
+> I read:
+> 
+> "Using pause_all_vcpus()/resume_all_vcpus() is not possible, as it will
+> temporarily drop the BQL - something most callers can't handle (esp.
+> when called from vcpu context e.g., in virtio code)."
 
-Using the new KVM_SET_USER_MEMORY_REGION_LIST, we just need a single
-call containing all memory regions to update.
+... that's why the patch takes a different approach? :)
 
-Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
----
- accel/kvm/kvm-all.c | 25 ++++++++++---------------
- 1 file changed, 10 insertions(+), 15 deletions(-)
-
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 9780f3d2da..6a7f7b4567 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -1547,30 +1547,25 @@ static void kvm_commit(MemoryListener *listener)
-     KVMMemoryListener *kml = container_of(listener, KVMMemoryListener,
-                                           listener);
-     KVMState *s = kvm_state;
--    int i;
-+    int i, ret;
- 
-     for (i = 0; i < kml->mem_array.list->nent; i++) {
-         struct kvm_userspace_memory_region_entry *mem;
--        int ret;
- 
-         mem = &kml->mem_array.list->entries[i];
- 
--        /*
--         * Note that mem is struct kvm_userspace_memory_region_entry, while the
--         * kernel expects a kvm_userspace_memory_region, so it will currently
--         * ignore mem->invalidate_slot and mem->padding.
--         */
--        ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, mem);
--
-         trace_kvm_set_user_memory(mem->slot, mem->flags, mem->guest_phys_addr,
-                                   mem->memory_size, mem->userspace_addr, 0);
-+    }
- 
--        if (ret < 0) {
--            error_report("%s: KVM_SET_USER_MEMORY_REGION failed, slot=%d,"
--                         " start=0x%" PRIx64 ": %s",
--                         __func__, mem->slot,
--                         (uint64_t)mem->memory_size, strerror(errno));
--        }
-+    ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION_LIST, kml->mem_array.list);
-+
-+    if (ret < 0) {
-+        error_report("%s: KVM_SET_USER_MEMORY_REGION_LIST failed, size=0x%"
-+                     PRIx64 " flags=0x%" PRIx64 ": %s",
-+                     __func__, (uint64_t)kml->mem_array.list->nent,
-+                     (uint64_t)kml->mem_array.list->flags,
-+                     strerror(errno));
-     }
- 
-     kml->mem_array.list->nent = 0;
 -- 
-2.31.1
+Thanks,
+
+David / dhildenb
 
