@@ -2,40 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ECB035B356D
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 12:45:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 40DD85B356E
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 12:45:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231161AbiIIKpV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 06:45:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39926 "EHLO
+        id S231238AbiIIKp0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 06:45:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230468AbiIIKpR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 06:45:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEBDB4BA7E
-        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 03:45:14 -0700 (PDT)
+        with ESMTP id S231148AbiIIKpS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 06:45:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 603DF41983
+        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 03:45:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1662720313;
+        s=mimecast20190719; t=1662720314;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=GS6z751jOS17P5KjjAKA6XFU5o/FNq7ECC/sWEiv1wc=;
-        b=e5jg4GsEbWZyjBtV1RtUCxlb+FhUYxqPo6iW2oRE5HDC5VrDgT8FtGxcUaaUTWR3dMUrIh
-        B97D+KyGEeGnT8nlUmu1ZK2yiZUdsbzmraFNMlKQJ/wYmyHqYet/qnZlyNFDuHgsUlJdhC
-        BJxWEmJ35r8R7zTCo432eaTZhJncmQw=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5USZdofT3b7rr0YzPxgVn0M8YXPxXCyJIOd7HvwaYnU=;
+        b=Iaodoauu/qntVzYUZmQkXu5bAGEtV1pSZQ39SJy6H7fkh7lYcnlJHXe1gx3NjUaVtJQ+5d
+        2ju/eQZwryDlGxcbylM1Q4PR72mq2t82RBDOJG/pN1hsA5nx/Zrwy9Fs4n3ofbTjJ2m49c
+        U+p47aqI0fqnDZbE9RGLGfE340z1cmk=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-582-V6wIM2X6MCqAcYvkPXZmGw-1; Fri, 09 Sep 2022 06:45:09 -0400
-X-MC-Unique: V6wIM2X6MCqAcYvkPXZmGw-1
+ us-mta-537-3yjYgqGqN4ePcQJ31JTu2w-1; Fri, 09 Sep 2022 06:45:10 -0400
+X-MC-Unique: 3yjYgqGqN4ePcQJ31JTu2w-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 386D4101A56D;
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A3A09811E81;
         Fri,  9 Sep 2022 10:45:09 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1907840D2830;
-        Fri,  9 Sep 2022 10:45:08 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4111F40D282E;
+        Fri,  9 Sep 2022 10:45:09 +0000 (UTC)
 From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -51,9 +52,11 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Maxim Levitsky <mlevitsk@redhat.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
         Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Subject: [RFC PATCH 0/9] kvm: implement atomic memslot updates
-Date:   Fri,  9 Sep 2022 06:44:57 -0400
-Message-Id: <20220909104506.738478-1-eesposit@redhat.com>
+Subject: [RFC PATCH 1/9] kvm_main.c: move slot check in kvm_set_memory_region
+Date:   Fri,  9 Sep 2022 06:44:58 -0400
+Message-Id: <20220909104506.738478-2-eesposit@redhat.com>
+In-Reply-To: <20220909104506.738478-1-eesposit@redhat.com>
+References: <20220909104506.738478-1-eesposit@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
@@ -67,60 +70,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM is currently capable of receiving a single memslot update through
-the KVM_SET_USER_MEMORY_REGION ioctl.
-The problem arises when we want to atomically perform multiple updates,
-so that readers of memslot active list avoid seeing incomplete states.
+And make kvm_set_memory_region static, since it is not used outside
+kvm_main.c
 
-For example, in RHBZ https://bugzilla.redhat.com/show_bug.cgi?id=1979276
-we see how non atomic updates cause boot failure, because vcpus
-will se a partial update (old memslot delete, new one not yet created)
-and will crash.
+Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+---
+ include/linux/kvm_host.h |  2 --
+ virt/kvm/kvm_main.c      | 11 +++++------
+ 2 files changed, 5 insertions(+), 8 deletions(-)
 
-In this series we introduce KVM_SET_USER_MEMORY_REGION_LIST, a new ioctl
-that takes a kvm_userspace_memory_region_list, a list of memslot updates,
-and performs them atomically.
-"atomically" in KVM words just means "apply all modifications to the
-inactive memslot list, and then perform a single swap to replace the
-active list with the inactive".
-It is slightly more complicated that that, since DELETE and MOVE operations
-require 2 swaps, but the main idea is the above.
-
-Patch 1-6 are just code movements, in preparation for the following patches.
-Patch 7 allows the invalid slot to be in both inactive and active memslot lists.
-Patch 8 allows searching for the existing memslot (old) in the inactive list,
-and not the active, allowing to perform multiple memslot updates without swapping.
-Patch 9 implements IOCTL logic.
-
-QEMU userspace logic in preparation for the IOCTL is here:
-https://patchew.org/QEMU/20220909081150.709060-1-eesposit@redhat.com/
-"[RFC PATCH v2 0/3] accel/kvm: extend kvm memory listener to support"
-
-TODOs and ideas:
-- limit the size of the ioctl arguments. Right now it is unbounded
-- try to reduce the amount of swaps necessary? ie every DELETE/MOVE
-  requires an additional swap
-- add selftests
-- add documentation
-
-Emanuele Giuseppe Esposito (9):
-  kvm_main.c: move slot check in kvm_set_memory_region
-  kvm.h: introduce KVM_SET_USER_MEMORY_REGION_LIST ioctl
-  kvm_main.c: introduce kvm_internal_memory_region_list
-  kvm_main.c: split logic in kvm_set_memslots
-  kvm_main.c: split __kvm_set_memory_region logic in kvm_check_mem and
-    kvm_prepare_batch
-  kvm_main.c: simplify change-specific callbacks
-  kvm_main.c: duplicate invalid memslot also in inactive list
-  kvm_main.c: find memslots from the inactive memslot list
-  kvm_main.c: handle atomic memslot update
-
- arch/x86/kvm/x86.c       |   3 +-
- include/linux/kvm_host.h |  21 +-
- include/uapi/linux/kvm.h |  21 +-
- virt/kvm/kvm_main.c      | 420 +++++++++++++++++++++++++++++++--------
- 4 files changed, 377 insertions(+), 88 deletions(-)
-
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 3b40f8d68fbb..1c5b7b2e35dd 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1108,8 +1108,6 @@ enum kvm_mr_change {
+ 	KVM_MR_FLAGS_ONLY,
+ };
+ 
+-int kvm_set_memory_region(struct kvm *kvm,
+-			  const struct kvm_userspace_memory_region *mem);
+ int __kvm_set_memory_region(struct kvm *kvm,
+ 			    const struct kvm_userspace_memory_region *mem);
+ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index da263c370d00..339de0ed4557 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2007,24 +2007,23 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ }
+ EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
+ 
+-int kvm_set_memory_region(struct kvm *kvm,
+-			  const struct kvm_userspace_memory_region *mem)
++static int kvm_set_memory_region(struct kvm *kvm,
++				 const struct kvm_userspace_memory_region *mem)
+ {
+ 	int r;
+ 
++	if ((u16)mem->slot >= KVM_USER_MEM_SLOTS)
++		return -EINVAL;
++
+ 	mutex_lock(&kvm->slots_lock);
+ 	r = __kvm_set_memory_region(kvm, mem);
+ 	mutex_unlock(&kvm->slots_lock);
+ 	return r;
+ }
+-EXPORT_SYMBOL_GPL(kvm_set_memory_region);
+ 
+ static int kvm_vm_ioctl_set_memory_region(struct kvm *kvm,
+ 					  struct kvm_userspace_memory_region *mem)
+ {
+-	if ((u16)mem->slot >= KVM_USER_MEM_SLOTS)
+-		return -EINVAL;
+-
+ 	return kvm_set_memory_region(kvm, mem);
+ }
+ 
 -- 
 2.31.1
 
