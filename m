@@ -2,340 +2,315 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5680C5B3198
-	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 10:24:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 99A945B31C7
+	for <lists+kvm@lfdr.de>; Fri,  9 Sep 2022 10:33:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231513AbiIIIYJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Sep 2022 04:24:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45648 "EHLO
+        id S231365AbiIIIdq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Sep 2022 04:33:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229639AbiIIIYG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Sep 2022 04:24:06 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24F66A3D34;
-        Fri,  9 Sep 2022 01:24:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662711845; x=1694247845;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=oWD4I45PZXvaIHzh6ejY621NZtky91cQ/10cKp7MpsQ=;
-  b=jBTcUxDK6tKz2sz6DUFUD1Wjs5ltmmjU0HK8efneFPIvnAOQwX/Dhpbt
-   acURquAu8MZh3q2QwbhUPwQFITkRsJIhTH4F9uAS0O2tYZ3sizjDyYr3M
-   zm7AV5dlNRaWQHMp6FpTVg/sdjB8XCC0jn5yY1B9o7RLn5ZnKDaRsZOsv
-   IO1QuiAmMitlYNaAlwqxWVjZChXs7gE0IzdYJlYz62lmZcw44FhfA5qpp
-   DNXzBc297BHAV2DVOCYmm8PVbYG7jj2/fHIPWlUltWNTbrVKHPl67IzQa
-   Ngo0TXTS6aTiYQH/zgQuFOWvOJWelZY7Libjgs410Gupb3emmE/HQtjWc
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10464"; a="298229386"
-X-IronPort-AV: E=Sophos;i="5.93,302,1654585200"; 
-   d="scan'208";a="298229386"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2022 01:24:04 -0700
-X-IronPort-AV: E=Sophos;i="5.93,302,1654585200"; 
-   d="scan'208";a="943690485"
-Received: from zhaohaif-mobl1.ccr.corp.intel.com (HELO [10.254.210.127]) ([10.254.210.127])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2022 01:23:55 -0700
-Message-ID: <acbaf0f2-91d4-3eae-5716-244893ca34c7@linux.intel.com>
-Date:   Fri, 9 Sep 2022 16:23:53 +0800
+        with ESMTP id S229747AbiIIIdo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Sep 2022 04:33:44 -0400
+Received: from littlepip.sumsal.cz (littlepip.sumsal.cz [IPv6:2a02:2b88:6:1f8a::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDD7D9836C
+        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 01:33:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sumsal.cz;
+        s=20140915; h=Content-Type:In-Reply-To:Subject:References:Cc:To:From:
+        MIME-Version:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=QW5u5yziR771kYAvqct6/+ybRcmFXWKS4rZ5i1+vdkQ=; b=EOg7HbM8O2l6zx7yTDkuYIfkPx
+        BbbrieHY+XgaNt6WYBIJ7usGgXmv4VjA0PpZ6hz8Zo2GBNGBNK2B+Srwp82myTrxu/zrYFvNrvEu4
+        zjN6vKZYn7qpHvS8FWiiJZ2VUmAFH0nN7fNXRq0urOrTjCcrsRQB0r11J961hRzJAbRma+ebHpr7D
+        tkJr+c2jOsP0gv27YGmR8T7CCVT+uLZ4T6gRF1mTI/37unfzgvXL+9Zn8WQdgEidk2bWN9MmnlDHA
+        7iwlOimZsmVpL5LiXsBNGfmZuT8lAK0DGvRfknB7NA8/g/ZJffr360AIQbkpVzCD9ws2xGnSlMoqY
+        hmw8FXaQ==;
+Received: from [176.74.150.102] (helo=[192.168.0.107])
+        by littlepip.sumsal.cz with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <frantisek@sumsal.cz>)
+        id 1oWZSF-00Ce4l-DY; Fri, 09 Sep 2022 10:33:40 +0200
+Message-ID: <11225819-ef85-b367-f238-e248e30e1168@sumsal.cz>
+Date:   Fri, 9 Sep 2022 10:33:39 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH v3 01/15] vfio: Add helpers for unifying vfio_device life
- cycle
-To:     Kevin Tian <kevin.tian@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Longfang Liu <liulongfang@huawei.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Abhishek Sahu <abhsahu@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Yi Liu <yi.l.liu@intel.com>
-References: <20220909102247.67324-1-kevin.tian@intel.com>
- <20220909102247.67324-2-kevin.tian@intel.com>
-From:   Ethan Zhao <haifeng.zhao@linux.intel.com>
-In-Reply-To: <20220909102247.67324-2-kevin.tian@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Content-Language: en-US
+From:   =?UTF-8?B?RnJhbnRpxaFlayDFoHVtxaFhbA==?= <frantisek@sumsal.cz>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org
+References: <a861d348-b3fd-fd1d-2427-0a89ae139948@sumsal.cz>
+ <Yxiz3giU/WEftPp6@google.com>
+ <a8fc728c-073c-2ff5-2436-40c84c3c62e1@sumsal.cz>
+ <Yxi3cj6xKBlJ3IJV@google.com>
+ <afbd5927-413b-f876-8146-c3f4deb763e1@sumsal.cz>
+ <YxoFf1LZfru5cmDO@google.com>
+ <5453c441-ae4e-00ce-a6c8-de591a4871bb@sumsal.cz>
+Subject: Re: BUG: soft lockup - CPU#0 stuck for 26s! with nested KVM on 5.19.x
+In-Reply-To: <5453c441-ae4e-00ce-a6c8-de591a4871bb@sumsal.cz>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------ZqF0L0yuCG59vZjil5z64as2"
+X-Spam-Score: -106.1 (---------------------------------------------------) #
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi, Kevin,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------ZqF0L0yuCG59vZjil5z64as2
+Content-Type: multipart/mixed; boundary="------------hfbZGe3eh7qDVaqOonVstRQx";
+ protected-headers="v1"
+From: =?UTF-8?B?RnJhbnRpxaFlayDFoHVtxaFhbA==?= <frantisek@sumsal.cz>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org
+Message-ID: <11225819-ef85-b367-f238-e248e30e1168@sumsal.cz>
+Subject: Re: BUG: soft lockup - CPU#0 stuck for 26s! with nested KVM on 5.19.x
+References: <a861d348-b3fd-fd1d-2427-0a89ae139948@sumsal.cz>
+ <Yxiz3giU/WEftPp6@google.com>
+ <a8fc728c-073c-2ff5-2436-40c84c3c62e1@sumsal.cz>
+ <Yxi3cj6xKBlJ3IJV@google.com>
+ <afbd5927-413b-f876-8146-c3f4deb763e1@sumsal.cz>
+ <YxoFf1LZfru5cmDO@google.com>
+ <5453c441-ae4e-00ce-a6c8-de591a4871bb@sumsal.cz>
+In-Reply-To: <5453c441-ae4e-00ce-a6c8-de591a4871bb@sumsal.cz>
 
-在 2022/9/9 18:22, Kevin Tian 写道:
-> The idea is to let vfio core manage the vfio_device life cycle instead
-> of duplicating the logic cross drivers. This is also a preparatory
-> step for adding struct device into vfio_device.
->
-> New pair of helpers together with a kref in vfio_device:
->
->   - vfio_alloc_device()
->   - vfio_put_device()
+--------------hfbZGe3eh7qDVaqOonVstRQx
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-To be honest, this pair of functions make me confusing to understand their
+T24gOS84LzIyIDE3OjI0LCBGcmFudGnFoWVrIMWgdW3FoWFsIHdyb3RlOg0KPHNuaXAuPg0K
+Pj4NCj4+IFlhLCB1bmxlc3MgdGhlcmUncyBhIGxhdGVudCBidWcgaW4gS1ZNIHRoYXQncyBw
+cmVzZW50IGluIHlvdXIgTDAga2VybmVsLCB3aGljaCBpcw0KPj4gZXh0cmVtZWx5IHVubGlr
+ZWx5IGdpdmVuIHRoYXQgdGhlIGJ1ZyByZXByb3Mgd2l0aCA0LjE4IGFuZCA1LjE3IGFzIHRo
+ZSBiYXJlIG1ldGFsDQo+PiBrZXJuZWwsIHRoaXMgaXNuJ3QgYSBLVk0gcHJvYmxlbS4NCj4+
+DQo+PiBUaGUgbW0sIGV4dDQsIGFuZCBzY2hlZHVsZXIgc3Vic3lzdGVtcyBhcmUgYWxsIGxp
+a2VseSBjYW5kaWRhdGVzLsKgIEknbSBub3QgZmFtaWxpYXINCj4+IGVub3VnaCB3aXRoIHRo
+ZWlyIGdvcnkgZGV0YWlscyB0byBwb2ludCBmaW5nZXJzIHRob3VnaC4NCj4+DQo+PiBEbyB5
+b3UgdGhpbmsgaXQncyBwb3NzaWJsZSB0byBiaXNlY3QgdGhlIEwxIGtlcm5lbCB1c2luZyB0
+aGUgUUVNVS9UQ0cgY29uZmlndXJhdGlvbj8NCj4+IFRoYXQnZCBwcm9iYWJseSBiZSB0aGUg
+bGVhc3QgYXdmdWwgd2F5IHRvIGdldCBhIHJvb3QgY2F1c2UuDQo+IA0KPiBZZWFoLCBJIGNh
+biB0cnksIGJ1dCBpdCBtaWdodCB0YWtlIHNvbWUgdGltZS4gTmV2ZXJ0aGVsZXNzLCBpdCBz
+b3VuZHMgbGlrZSB0aGUgbGVhc3QgYXdmdWwgd2F5DQo+IGhvdyB0byBkZWJ1ZyB0aGlzIGZ1
+cnRoZXIsIGFzIHlvdSBzYWlkLiBJJ2xsIHJlcG9ydCBiYWNrIGlmL3doZW4gSSBmaW5kIHNv
+bWV0aGluZyBpbnRlcmVzdGluZy4NCj4gDQo+IFRoYW5rcyBmb3IgdGhlIHRpcHMhDQo+IA0K
+DQpPdXQgb2YgY3VyaW9zaXR5IEkgdHJpZWQgdG8gcmVwcm9kdWNlIGl0IG9uIEZlZG9yYSBS
+YXdoaWRlIChhcyBib3RoIEwwIGFuZCBMMSB3aXRoIFFFTVUvVENHKSwgd2hpY2gNCmN1cnJl
+bnRseSBoYXMgNi4wLjAtMC5yYzQuMjAyMjA5MDZnaXQ1M2U5OWRjZmY2MWUuMzIuZmMzOC54
+ODZfNjQsIGFuZCBoaXQgYW5vdGhlciBzb2Z0IGxvY2t1cCBkdXJpbmcgYm9vdDoNCg0KYGBg
+DQpbICAyMjguMzExNTYxXSB3YXRjaGRvZzogQlVHOiBzb2Z0IGxvY2t1cCAtIENQVSMwIHN0
+dWNrIGZvciAzOXMhIFt6cmFtLWdlbmVyYXRvcjo2MTRdDQpbICAyMjguMzEyMzA3XSBNb2R1
+bGVzIGxpbmtlZCBpbjogZnVzZSB6cmFtIGlwX3RhYmxlcyBjcmN0MTBkaWZfcGNsbXVsIGNy
+YzMyX3BjbG11bCBjcmMzMmNfaW50ZWwgZ2hhc2hfY2xtdWxuaV9pbnRlbCB2aXJ0aW9fYmxr
+IHNlcmlvX3JhdyBhdGFfZ2VuZXJpYyBwYXRhX2FjcGkgcWVtdV9md19jZmcNClsgIDIyOC4z
+MTIzMDddIGlycSBldmVudCBzdGFtcDogMTc4ODgNClsgIDIyOC4zMjQyNTZdIGhhcmRpcnFz
+IGxhc3QgIGVuYWJsZWQgYXQgKDE3ODg3KTogWzxmZmZmZmZmZjk1MDAwZjI2Pl0gYXNtX3N5
+c3ZlY19jYWxsX2Z1bmN0aW9uX3NpbmdsZSsweDE2LzB4MjANClsgIDIyOC4zMjQ2MTldIGhh
+cmRpcnFzIGxhc3QgZGlzYWJsZWQgYXQgKDE3ODg4KTogWzxmZmZmZmZmZjk0ZjE4MGNhPl0g
+c3lzdmVjX2FwaWNfdGltZXJfaW50ZXJydXB0KzB4YS8weGMwDQpbICAyMjguMzMzNzYzXSBz
+b2Z0aXJxcyBsYXN0ICBlbmFibGVkIGF0ICgxNzg3OCk6IFs8ZmZmZmZmZmY5NDBmZjc0OT5d
+IF9faXJxX2V4aXRfcmN1KzB4ZjkvMHgxNzANClsgIDIyOC4zMzQ0NDZdIHNvZnRpcnFzIGxh
+c3QgZGlzYWJsZWQgYXQgKDE3ODY3KTogWzxmZmZmZmZmZjk0MGZmNzQ5Pl0gX19pcnFfZXhp
+dF9yY3UrMHhmOS8weDE3MA0KWyAgMjI4LjMzNzc4NV0gQ1BVOiAwIFBJRDogNjE0IENvbW06
+IHpyYW0tZ2VuZXJhdG9yIE5vdCB0YWludGVkIDYuMC4wLTAucmM0LjIwMjIwOTA2Z2l0NTNl
+OTlkY2ZmNjFlLjMyLmZjMzgueDg2XzY0ICMxDQpbICAyMjguMzQ4NjM0XSBIYXJkd2FyZSBu
+YW1lOiBRRU1VIFN0YW5kYXJkIFBDIChpNDQwRlggKyBQSUlYLCAxOTk2KSwgQklPUyAxLjE2
+LjAtMi5mYzM3IDA0LzAxLzIwMTQNClsgIDIyOC4zNDkzNTldIFJJUDogMDAxMDpfcmF3X3Nw
+aW5fdW5sb2NrX2lycXJlc3RvcmUrMHgzNi8weDYwDQpbICAyMjguMzU2MjQ5XSBDb2RlOiA3
+NCAyNCAxMCA0OCA4OSBmYiA0OCA4MyBjNyAxOCBlOCBiNSAwZCAyNSBmZiA0OCA4OSBkZiBl
+OCA4ZCA0YyAyNSBmZiBmNyBjNSAwMCAwMiAwMCAwMCA3NCAwYiBlOCBhMCBlZiAzMiBmZiBm
+YiAwZiAxZiA0NCAwMCAwMCA8YmY+IDAxIDAwIDAwIDAwIGU4IGEwIDVmIDIwIGZmIDY1IDhi
+IDA1IDc5IDQzIDBmIDZiIDg1IGMwIDc0IDA3IDViDQpbICAyMjguMzYzOTE1XSBSU1A6IDAw
+MTg6ZmY3M2ZmZWY0MTQwM2MyOCBFRkxBR1M6IDAwMDAwMjA2DQpbICAyMjguMzY2OTY2XSBS
+QVg6IDAwMDAwMDAwMDAwMDQ1ZGIgUkJYOiBmZjIwM2I5YWIyZGZlMTQwIFJDWDogMDAwMDAw
+MDAwMDAwMDAwNg0KWyAgMjI4LjM2NzMzNF0gUkRYOiAwMDAwMDAwMDAwMDAwMDAwIFJTSTog
+ZmZmZmZmZmY5NTk3ZTU0NyBSREk6IGZmZmZmZmZmOTU4ZWFkMTYNClsgIDIyOC4zNjczMzRd
+IFJCUDogMDAwMDAwMDAwMDAwMDI4MiBSMDg6IDAwMDAwMDAwMDAwMDAwMDEgUjA5OiAwMDAw
+MDAwMDAwMDAwMDAxDQpbICAyMjguMzY3MzM0XSBSMTA6IDAwMDAwMDAwMDAwMDAwMDEgUjEx
+OiAwMDAwMDAwMDAwMDAwMDAwIFIxMjogZmYyMDNiOWFiMmRmZTE0MA0KWyAgMjI4LjM2NzMz
+NF0gUjEzOiAwMDAwMDAwMDAwMDAwMDY0IFIxNDogZmYyMDNiOWFiMmRmZTE5OCBSMTU6IGZm
+YmZjNmZiMDQyNzQ4ODgNClsgIDIyOC4zODQ3NzddIEZTOiAgMDAwMDdmOGM0NjNhZjc4MCgw
+MDAwKSBHUzpmZjIwM2I5YWIyYzAwMDAwKDAwMDApIGtubEdTOjAwMDAwMDAwMDAwMDAwMDAN
+ClsgIDIyOC4zODQ3NzddIENTOiAgMDAxMCBEUzogMDAwMCBFUzogMDAwMCBDUjA6IDAwMDAw
+MDAwODAwNTAwMzMNClsgIDIyOC4zODQ3NzddIENSMjogMDAwMDU1NmQ1YzE4YTA5OCBDUjM6
+IDAwMDAwMDAxMGJlZDYwMDAgQ1I0OiAwMDAwMDAwMDAwNzUxZWYwDQpbICAyMjguMzg0Nzc3
+XSBQS1JVOiA1NTU1NTU1NA0KWyAgMjI4LjM4NDc3N10gQ2FsbCBUcmFjZToNClsgIDIyOC4z
+ODQ3NzddICA8VEFTSz4NClsgIDIyOC4zODQ3NzddICBfX2FsbG9jX3BhZ2VzX2J1bGsrMHgz
+Y2IvMHg3MzANClsgIDIyOC4zODQ3NzddICBfX3ZtYWxsb2Nfbm9kZV9yYW5nZSsweDI1My8w
+eDgyMA0KWyAgMjI4LjM4NDc3N10gIF9fdm1hbGxvY19ub2RlKzB4NGEvMHg2MA0KWyAgMjI4
+LjM4NDc3N10gID8gZGlza3NpemVfc3RvcmUrMHg3YS8weDE0MCBbenJhbV0NClsgIDIyOC4z
+ODQ3NzddICBkaXNrc2l6ZV9zdG9yZSsweDdhLzB4MTQwIFt6cmFtXQ0KWyAgMjI4LjM4NDc3
+N10gIGtlcm5mc19mb3Bfd3JpdGVfaXRlcisweDE2MS8weDIxMA0KWyAgMjI4LjM4NDc3N10g
+IHZmc193cml0ZSsweDIyYi8weDRiMA0KWyAgMjI4LjM4NDc3N10gIGtzeXNfd3JpdGUrMHg1
+Yy8weGUwDQpbICAyMjguMzg0Nzc3XSAgZG9fc3lzY2FsbF82NCsweDViLzB4ODANClsgIDIy
+OC4zODQ3NzddICA/IGFzbV9zeXN2ZWNfYXBpY190aW1lcl9pbnRlcnJ1cHQrMHgxNi8weDIw
+DQpbICAyMjguMzg0Nzc3XSAgPyBsb2NrZGVwX2hhcmRpcnFzX29uKzB4N2QvMHgxMDANClsg
+IDIyOC4zODQ3NzddICBlbnRyeV9TWVNDQUxMXzY0X2FmdGVyX2h3ZnJhbWUrMHg2My8weGNk
+DQpbICAyMjguMzg0Nzc3XSBSSVA6IDAwMzM6MHg3ZjhjNDY1YTkxZjQNClsgIDIyOC4zODQ3
+NzddDQpbICAyMjguMzg0Nzc3XSA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQ0K
+WyAgMjI4LjM4NDc3N10gV0FSTklORzogaW5jb25zaXN0ZW50IGxvY2sgc3RhdGUNClsgIDIy
+OC4zODQ3NzddIDYuMC4wLTAucmM0LjIwMjIwOTA2Z2l0NTNlOTlkY2ZmNjFlLjMyLmZjMzgu
+eDg2XzY0ICMxIE5vdCB0YWludGVkDQpbICAyMjguMzg0Nzc3XSAtLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLQ0KWyAgMjI4LjM4NDc3N10gaW5jb25zaXN0ZW50IHtIQVJESVJR
+LU9OLVd9IC0+IHtJTi1IQVJESVJRLVd9IHVzYWdlLg0KWyAgMjI4LjM4NDc3N10genJhbS1n
+ZW5lcmF0b3IvNjE0IFtIQzFbMV06U0MwWzBdOkhFMDpTRTFdIHRha2VzOg0KWyAgMjI4LjM4
+NDc3N10gZmZmZmZmZmY5NjI2ZjVkOCAodm1hcF9hcmVhX2xvY2spez8uKy59LXsyOjJ9LCBh
+dDogZmluZF92bWFwX2FyZWErMHgxNi8weDYwDQpbICAyMjguMzg0Nzc3XSB7SEFSRElSUS1P
+Ti1XfSBzdGF0ZSB3YXMgcmVnaXN0ZXJlZCBhdDoNClsgIDIyOC4zODQ3NzddICAgbG9ja19h
+Y3F1aXJlKzB4Y2UvMHgyZDANClsgIDIyOC4zODQ3NzddICAgX3Jhd19zcGluX2xvY2srMHgz
+My8weDgwDQpbICAyMjguMzg0Nzc3XSAgIGFsbG9jX3ZtYXBfYXJlYSsweDNlNi8weDg5MA0K
+WyAgMjI4LjM4NDc3N10gICBfX2dldF92bV9hcmVhX25vZGUrMHhiMS8weDE1MA0KWyAgMjI4
+LjM4NDc3N10gICBnZXRfdm1fYXJlYV9jYWxsZXIrMHgzYS8weDUwDQpbICAyMjguMzg0Nzc3
+XSAgIF9faW9yZW1hcF9jYWxsZXIrMHgxNDUvMHgzMjANClsgIDIyOC4zODQ3NzddICAgYWNw
+aV9vc19tYXBfaW9tZW0rMHgxYzkvMHgxZTANClsgIDIyOC4zODQ3NzddICAgYWNwaV90Yl9h
+Y3F1aXJlX3RhYmxlKzB4MzkvMHg2Mg0KWyAgMjI4LjM4NDc3N10gICBhY3BpX3RiX3ZhbGlk
+YXRlX3RhYmxlKzB4NDQvMHg3Yw0KWyAgMjI4LjM4NDc3N10gICBhY3BpX3RiX3ZlcmlmeV90
+ZW1wX3RhYmxlKzB4NDIvMHgzMGENClsgIDIyOC4zODQ3NzddICAgYWNwaV9yZWFsbG9jYXRl
+X3Jvb3RfdGFibGUrMHgxMjkvMHgxNDMNClsgIDIyOC4zODQ3NzddICAgYWNwaV9lYXJseV9p
+bml0KzB4NGIvMHhkZQ0KWyAgMjI4LjM4NDc3N10gICBzdGFydF9rZXJuZWwrMHg4ZGEvMHg5
+OTgNClsgIDIyOC4zODQ3NzddICAgc2Vjb25kYXJ5X3N0YXJ0dXBfNjRfbm9fdmVyaWZ5KzB4
+ZTUvMHhlYg0KWyAgMjI4LjM4NDc3N10gaXJxIGV2ZW50IHN0YW1wOiAxNzg4OA0KWyAgMjI4
+LjM4NDc3N10gaGFyZGlycXMgbGFzdCAgZW5hYmxlZCBhdCAoMTc4ODcpOiBbPGZmZmZmZmZm
+OTUwMDBmMjY+XSBhc21fc3lzdmVjX2NhbGxfZnVuY3Rpb25fc2luZ2xlKzB4MTYvMHgyMA0K
+WyAgMjI4LjM4NDc3N10gaGFyZGlycXMgbGFzdCBkaXNhYmxlZCBhdCAoMTc4ODgpOiBbPGZm
+ZmZmZmZmOTRmMTgwY2E+XSBzeXN2ZWNfYXBpY190aW1lcl9pbnRlcnJ1cHQrMHhhLzB4YzAN
+ClsgIDIyOC4zODQ3NzddIHNvZnRpcnFzIGxhc3QgIGVuYWJsZWQgYXQgKDE3ODc4KTogWzxm
+ZmZmZmZmZjk0MGZmNzQ5Pl0gX19pcnFfZXhpdF9yY3UrMHhmOS8weDE3MA0KWyAgMjI4LjM4
+NDc3N10gc29mdGlycXMgbGFzdCBkaXNhYmxlZCBhdCAoMTc4NjcpOiBbPGZmZmZmZmZmOTQw
+ZmY3NDk+XSBfX2lycV9leGl0X3JjdSsweGY5LzB4MTcwDQpbICAyMjguMzg0Nzc3XQ0KWyAg
+MjI4LjM4NDc3N10gb3RoZXIgaW5mbyB0aGF0IG1pZ2h0IGhlbHAgdXMgZGVidWcgdGhpczoN
+ClsgIDIyOC4zODQ3NzddICBQb3NzaWJsZSB1bnNhZmUgbG9ja2luZyBzY2VuYXJpbzoNClsg
+IDIyOC4zODQ3NzddDQpbICAyMjguMzg0Nzc3XSAgICAgICAgQ1BVMA0KWyAgMjI4LjM4NDc3
+N10gICAgICAgIC0tLS0NClsgIDIyOC4zODQ3NzddICAgbG9jayh2bWFwX2FyZWFfbG9jayk7
+DQpbICAyMjguMzg0Nzc3XSAgIDxJbnRlcnJ1cHQ+DQpbICAyMjguMzg0Nzc3XSAgICAgbG9j
+ayh2bWFwX2FyZWFfbG9jayk7DQpbICAyMjguMzg0Nzc3XQ0KWyAgMjI4LjM4NDc3N10gICoq
+KiBERUFETE9DSyAqKioNClsgIDIyOC4zODQ3NzddDQpbICAyMjguMzg0Nzc3XSA0IGxvY2tz
+IGhlbGQgYnkgenJhbS1nZW5lcmF0b3IvNjE0Og0KWyAgMjI4LjM4NDc3N10gICMwOiBmZjIw
+M2I5ODg1ZDMwNDk4IChzYl93cml0ZXJzIzQpey4rLit9LXswOjB9LCBhdDoga3N5c193cml0
+ZSsweDVjLzB4ZTANClsgIDIyOC4zODQ3NzddICAjMTogZmYyMDNiOTg4MzlhOTg5MCAoJm9m
+LT5tdXRleCl7Ky4rLn0tezM6M30sIGF0OiBrZXJuZnNfZm9wX3dyaXRlX2l0ZXIrMHgxMTQv
+MHgyMTANClsgIDIyOC4zODQ3NzddICAjMjogZmYyMDNiOTg4YmU0MGE1OCAoa24tPmFjdGl2
+ZSM5MCl7LisuK30tezA6MH0sIGF0OiBrZXJuZnNfZm9wX3dyaXRlX2l0ZXIrMHgxMWQvMHgy
+MTANClsgIDIyOC4zODQ3NzddICAjMzogZmYyMDNiOTg4YjhhNzI5OCAoJnpyYW0tPmluaXRf
+bG9jayl7Ky4rLn0tezM6M30sIGF0OiBkaXNrc2l6ZV9zdG9yZSsweDQ5LzB4MTQwIFt6cmFt
+XQ0KWyAgMjI4LjM4NDc3N10NClsgIDIyOC4zODQ3NzddIHN0YWNrIGJhY2t0cmFjZToNClsg
+IDIyOC4zODQ3NzddIENQVTogMCBQSUQ6IDYxNCBDb21tOiB6cmFtLWdlbmVyYXRvciBOb3Qg
+dGFpbnRlZCA2LjAuMC0wLnJjNC4yMDIyMDkwNmdpdDUzZTk5ZGNmZjYxZS4zMi5mYzM4Lng4
+Nl82NCAjMQ0KWyAgMjI4LjM4NDc3N10gSGFyZHdhcmUgbmFtZTogUUVNVSBTdGFuZGFyZCBQ
+QyAoaTQ0MEZYICsgUElJWCwgMTk5NiksIEJJT1MgMS4xNi4wLTIuZmMzNyAwNC8wMS8yMDE0
+DQpbICAyMjguMzg0Nzc3XSBDYWxsIFRyYWNlOg0KWyAgMjI4LjM4NDc3N10gIDxJUlE+DQpb
+ICAyMjguMzg0Nzc3XSAgZHVtcF9zdGFja19sdmwrMHg1Yi8weDc3DQpbICAyMjguMzg0Nzc3
+XSAgbWFya19sb2NrLmNvbGQrMHg0OC8weGUxDQpbICAyMjguMzg0Nzc3XSAgPyBzY2hlZF9j
+bG9ja19sb2NhbCsweGUvMHg4MA0KWyAgMjI4LjM4NDc3N10gID8gX19sb2NrX2FjcXVpcmUr
+MHgzODgvMHgxZWYwDQpbICAyMjguMzg0Nzc3XSAgPyBzY2hlZF9jbG9ja19sb2NhbCsweGUv
+MHg4MA0KWyAgMjI4LjM4NDc3N10gIF9fbG9ja19hY3F1aXJlKzB4OTQ4LzB4MWVmMA0KWyAg
+MjI4LjM4NDc3N10gIGxvY2tfYWNxdWlyZSsweGNlLzB4MmQwDQpbICAyMjguMzg0Nzc3XSAg
+PyBmaW5kX3ZtYXBfYXJlYSsweDE2LzB4NjANClsgIDIyOC4zODQ3NzddICA/IGxvY2tfcmVs
+ZWFzZSsweDE0Zi8weDQ2MA0KWyAgMjI4LjM4NDc3N10gIF9yYXdfc3Bpbl9sb2NrKzB4MzMv
+MHg4MA0KWyAgMjI4LjM4NDc3N10gID8gZmluZF92bWFwX2FyZWErMHgxNi8weDYwDQpbICAy
+MjguMzg0Nzc3XSAgZmluZF92bWFwX2FyZWErMHgxNi8weDYwDQpbICAyMjguMzg0Nzc3XSAg
+X19jaGVja19vYmplY3Rfc2l6ZSsweDE2MS8weDI5MA0KWyAgMjI4LjM4NDc3N10gIGNvcHlf
+ZnJvbV91c2VyX25taSsweDYxLzB4OTANClsgIDIyOC4zODQ3NzddICBzaG93X29wY29kZXMr
+MHg1ZC8weGMwDQpbICAyMjguMzg0Nzc3XSAgPyBpcnFfd29ya19xdWV1ZSsweGEvMHg1MA0K
+WyAgMjI4LjM4NDc3N10gIHNob3dfaXJldF9yZWdzKzB4MTIvMHgzNw0KWyAgMjI4LjM4NDc3
+N10gIF9fc2hvd19yZWdzKzB4MjQvMHg0MA0KWyAgMjI4LjM4NDc3N10gID8gZW50cnlfU1lT
+Q0FMTF82NF9hZnRlcl9od2ZyYW1lKzB4NjMvMHhjZA0KWyAgMjI4LjM4NDc3N10gID8gdW53
+aW5kX25leHRfZnJhbWUrMHgzYTcvMHg2MjANClsgIDIyOC4zODQ3NzddICBzaG93X3RyYWNl
+X2xvZ19sdmwrMHgyZTAvMHgzMmYNClsgIDIyOC4zODQ3NzddICA/IGVudHJ5X1NZU0NBTExf
+NjRfYWZ0ZXJfaHdmcmFtZSsweDYzLzB4Y2QNClsgIDIyOC4zODQ3NzddICA/IGVudHJ5X1NZ
+U0NBTExfNjRfYWZ0ZXJfaHdmcmFtZSsweDYzLzB4Y2QNClsgIDIyOC4zODQ3NzddICB3YXRj
+aGRvZ190aW1lcl9mbisweDIyNC8weDI5MA0KWyAgMjI4LjM4NDc3N10gID8gc29mdGxvY2t1
+cF9mbisweDcwLzB4NzANClsgIDIyOC4zODQ3NzddICBfX2hydGltZXJfcnVuX3F1ZXVlcysw
+eDIxNy8weDUzMA0KWyAgMjI4LjM4NDc3N10gIGhydGltZXJfaW50ZXJydXB0KzB4ZmUvMHgy
+MjANClsgIDIyOC4zODQ3NzddICBfX3N5c3ZlY19hcGljX3RpbWVyX2ludGVycnVwdCsweGEy
+LzB4MmIwDQpbICAyMjguMzg0Nzc3XSAgc3lzdmVjX2FwaWNfdGltZXJfaW50ZXJydXB0KzB4
+OTkvMHhjMA0KWyAgMjI4LjM4NDc3N10gIDwvSVJRPg0KWyAgMjI4LjM4NDc3N10gIDxUQVNL
+Pg0KWyAgMjI4LjM4NDc3N10gIGFzbV9zeXN2ZWNfYXBpY190aW1lcl9pbnRlcnJ1cHQrMHgx
+Ni8weDIwDQpbICAyMjguMzg0Nzc3XSBSSVA6IDAwMTA6X3Jhd19zcGluX3VubG9ja19pcnFy
+ZXN0b3JlKzB4MzYvMHg2MA0KWyAgMjI4LjM4NDc3N10gQ29kZTogNzQgMjQgMTAgNDggODkg
+ZmIgNDggODMgYzcgMTggZTggYjUgMGQgMjUgZmYgNDggODkgZGYgZTggOGQgNGMgMjUgZmYg
+ZjcgYzUgMDAgMDIgMDAgMDAgNzQgMGIgZTggYTAgZWYgMzIgZmYgZmIgMGYgMWYgNDQgMDAg
+MDAgPGJmPiAwMSAwMCAwMCAwMCBlOCBhMCA1ZiAyMCBmZiA2NSA4YiAwNSA3OSA0MyAwZiA2
+YiA4NSBjMCA3NCAwNyA1Yg0KWyAgMjI4LjM4NDc3N10gUlNQOiAwMDE4OmZmNzNmZmVmNDE0
+MDNjMjggRUZMQUdTOiAwMDAwMDIwNg0KWyAgMjI4LjM4NDc3N10gUkFYOiAwMDAwMDAwMDAw
+MDA0NWRiIFJCWDogZmYyMDNiOWFiMmRmZTE0MCBSQ1g6IDAwMDAwMDAwMDAwMDAwMDYNClsg
+IDIyOC4zODQ3NzddIFJEWDogMDAwMDAwMDAwMDAwMDAwMCBSU0k6IGZmZmZmZmZmOTU5N2U1
+NDcgUkRJOiBmZmZmZmZmZjk1OGVhZDE2DQpbICAyMjguMzg0Nzc3XSBSQlA6IDAwMDAwMDAw
+MDAwMDAyODIgUjA4OiAwMDAwMDAwMDAwMDAwMDAxIFIwOTogMDAwMDAwMDAwMDAwMDAwMQ0K
+WyAgMjI4LjM4NDc3N10gUjEwOiAwMDAwMDAwMDAwMDAwMDAxIFIxMTogMDAwMDAwMDAwMDAw
+MDAwMCBSMTI6IGZmMjAzYjlhYjJkZmUxNDANClsgIDIyOC4zODQ3NzddIFIxMzogMDAwMDAw
+MDAwMDAwMDA2NCBSMTQ6IGZmMjAzYjlhYjJkZmUxOTggUjE1OiBmZmJmYzZmYjA0Mjc0ODg4
+DQpbICAyMjguMzg0Nzc3XSAgPyBfcmF3X3NwaW5fdW5sb2NrX2lycXJlc3RvcmUrMHgzMC8w
+eDYwDQpbICAyMjguMzg0Nzc3XSAgX19hbGxvY19wYWdlc19idWxrKzB4M2NiLzB4NzMwDQpb
+ICAyMjguMzg0Nzc3XSAgX192bWFsbG9jX25vZGVfcmFuZ2UrMHgyNTMvMHg4MjANClsgIDIy
+OC4zODQ3NzddICBfX3ZtYWxsb2Nfbm9kZSsweDRhLzB4NjANClsgIDIyOC4zODQ3NzddICA/
+IGRpc2tzaXplX3N0b3JlKzB4N2EvMHgxNDAgW3pyYW1dDQpbICAyMjguMzg0Nzc3XSAgZGlz
+a3NpemVfc3RvcmUrMHg3YS8weDE0MCBbenJhbV0NClsgIDIyOC4zODQ3NzddICBrZXJuZnNf
+Zm9wX3dyaXRlX2l0ZXIrMHgxNjEvMHgyMTANClsgIDIyOC4zODQ3NzddICB2ZnNfd3JpdGUr
+MHgyMmIvMHg0YjANClsgIDIyOC4zODQ3NzddICBrc3lzX3dyaXRlKzB4NWMvMHhlMA0KWyAg
+MjI4LjM4NDc3N10gIGRvX3N5c2NhbGxfNjQrMHg1Yi8weDgwDQpbICAyMjguMzg0Nzc3XSAg
+PyBhc21fc3lzdmVjX2FwaWNfdGltZXJfaW50ZXJydXB0KzB4MTYvMHgyMA0KWyAgMjI4LjM4
+NDc3N10gID8gbG9ja2RlcF9oYXJkaXJxc19vbisweDdkLzB4MTAwDQpbICAyMjguMzg0Nzc3
+XSAgZW50cnlfU1lTQ0FMTF82NF9hZnRlcl9od2ZyYW1lKzB4NjMvMHhjZA0KWyAgMjI4LjM4
+NDc3N10gUklQOiAwMDMzOjB4N2Y4YzQ2NWE5MWY0DQpbICAyMjguMzg0Nzc3XSBDb2RlOiAx
+NSAxMSA3YyAwZCAwMCBmNyBkOCA2NCA4OSAwMiA0OCBjNyBjMCBmZiBmZiBmZiBmZiBlYiBi
+NyAwZiAxZiAwMCBmMyAwZiAxZSBmYSA4MCAzZCBlZCAwMyAwZSAwMCAwMCA3NCAxMyBiOCAw
+MSAwMCAwMCAwMCAwZiAwNSA8NDg+IDNkIDAwIGYwIGZmIGZmIDc3IDU0IGMzIDBmIDFmIDAw
+IDQ4IDgzIGVjIDI4IDQ4IDg5IDU0IDI0IDE4IDQ4DQpbICAyMjguMzg0Nzc3XSBSU1A6IDAw
+MmI6MDAwMDdmZmZhMGQ0YjY1OCBFRkxBR1M6IDAwMDAwMjAyIE9SSUdfUkFYOiAwMDAwMDAw
+MDAwMDAwMDAxDQpbICAyMjguMzg0Nzc3XSBSQVg6IGZmZmZmZmZmZmZmZmZmZGEgUkJYOiAw
+MDAwMDAwMDAwMDAwMDBhIFJDWDogMDAwMDdmOGM0NjVhOTFmNA0KWyAgMjI4LjM4NDc3N10g
+UkRYOiAwMDAwMDAwMDAwMDAwMDBhIFJTSTogMDAwMDU1NmQ1YzE4NjZhMCBSREk6IDAwMDAw
+MDAwMDAwMDAwMDQNClsgIDIyOC4zODQ3NzddIFJCUDogMDAwMDAwMDAwMDAwMDAxOSBSMDg6
+IDAwMDA1NTZkNWMxODU0ZDAgUjA5OiBmZWZlZmVmZWZlZmVmZWZmDQpbICAyMjguMzg0Nzc3
+XSBSMTA6IDAwMDAwMDAwMDAwMDAxYjYgUjExOiAwMDAwMDAwMDAwMDAwMjAyIFIxMjogMDAw
+MDU1NmQ1YzE4NjZhMA0KWyAgMjI4LjM4NDc3N10gUjEzOiA3ZmZmZmZmZmZmZmZmZmZmIFIx
+NDogMDAwMDAwMDAwMDAwMDAwNCBSMTU6IDAwMDA3ZjhjNDY1YTkxZTANClsgIDIyOC4zODQ3
+NzddICA8L1RBU0s+DQpbICAyMjguMzg0Nzc3XSBDb2RlOiAxNSAxMSA3YyAwZCAwMCBmNyBk
+OCA2NCA4OSAwMiA0OCBjNyBjMCBmZiBmZiBmZiBmZiBlYiBiNyAwZiAxZiAwMCBmMyAwZiAx
+ZSBmYSA4MCAzZCBlZCAwMyAwZSAwMCAwMCA3NCAxMyBiOCAwMSAwMCAwMCAwMCAwZiAwNSA8
+NDg+IDNkIDAwIGYwIGZmIGZmIDc3IDU0IGMzIDBmIDFmIDAwIDQ4IDgzIGVjIDI4IDQ4IDg5
+IDU0IDI0IDE4IDQ4DQpbICAyMjguMzg0Nzc3XSBSU1A6IDAwMmI6MDAwMDdmZmZhMGQ0YjY1
+OCBFRkxBR1M6IDAwMDAwMjAyIE9SSUdfUkFYOiAwMDAwMDAwMDAwMDAwMDAxDQpbICAyMjgu
+Mzg0Nzc3XSBSQVg6IGZmZmZmZmZmZmZmZmZmZGEgUkJYOiAwMDAwMDAwMDAwMDAwMDBhIFJD
+WDogMDAwMDdmOGM0NjVhOTFmNA0KWyAgMjI4LjM4NDc3N10gUkRYOiAwMDAwMDAwMDAwMDAw
+MDBhIFJTSTogMDAwMDU1NmQ1YzE4NjZhMCBSREk6IDAwMDAwMDAwMDAwMDAwMDQNClsgIDIy
+OC4zODQ3NzddIFJCUDogMDAwMDAwMDAwMDAwMDAxOSBSMDg6IDAwMDA1NTZkNWMxODU0ZDAg
+UjA5OiBmZWZlZmVmZWZlZmVmZWZmDQpbICAyMjguMzg0Nzc3XSBSMTA6IDAwMDAwMDAwMDAw
+MDAxYjYgUjExOiAwMDAwMDAwMDAwMDAwMjAyIFIxMjogMDAwMDU1NmQ1YzE4NjZhMA0KWyAg
+MjI4LjM4NDc3N10gUjEzOiA3ZmZmZmZmZmZmZmZmZmZmIFIxNDogMDAwMDAwMDAwMDAwMDAw
+NCBSMTU6IDAwMDA3ZjhjNDY1YTkxZTANCmBgYA0KDQpVbmZvcnR1bmF0ZWx5LCBnaXZlbiB0
+aGUgc3RhY2sgdHJhY2UgSSBkb24ndCB0aGluayBpdCdzIHJlbGF0ZWQgdG8gdGhlIG9yaWdp
+bmFsIGlzc3VlLA0Kc28gdGhlIHNlYXJjaCBjb250aW51ZXMuDQoNCi0tIA0KUEdQIEtleSBJ
+RDogMHhGQjczOENFMjdCNjM0RTRCDQo=
 
-behaviour from wording point of view:
+--------------hfbZGe3eh7qDVaqOonVstRQx--
 
-- vfio_alloc_device(),  Okay, it allocates the vfio device, no reference
-  count thing. but,
-- vfio_put_device()
-  seems it will decrease reference count and then if it is zero, free it.
-  so they are not of one *pair* about wording.
+--------------ZqF0L0yuCG59vZjil5z64as2
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
 
-How about
-  
-- vfio_alloc_device() / - vfio_free_device()
-or
-- vfio_get_device() / - vfio_put_device(), perhaps not match their behviour
-in following code.
+-----BEGIN PGP SIGNATURE-----
 
-  
+wsF5BAABCAAjFiEEp1toToNDDZVvO4js+3OM4ntjTksFAmMa+mMFAwAAAAAACgkQ+3OM4ntjTkvS
+sw//T47WHfXrw2tJPF3f1J2sZTd8iPBYvuCnivrlvO3ZsBSZGZUgwZru+5dSf/Q2dlW7xTwi6cNA
+nnrLhjH4kda0fsEKn5xkCxMkhxcMk6Lo207/9iil19/Xa50LdxX/+QDbckrDCVb387o/S+Aa8dIH
+9yaaqPJxNy7uRi4OLu1jx/9YFmgUq47RFnMDpT63sfUcjcSMAtbzwWJASVKMMUHlyBOw01Po4V2d
+txQ8hzqPGMfjtUUHuuS158O4xO3YKeIhXfgoYLzmw5MtGJ3AjrFTXclFvsIUhpR4C8RDNHMdA/L5
+wh/VdCmrWtsxGO7UVIyvjCgSkJ5pW5IxOlHlGLfRvPHeh+ZOYhdr22nsmjGS3SSwA2CbX9hHYakU
+stDly7QIHkMV7aIhekHzfL8OGCXz+s8opw9qkI0ZE5m9g1XGIOCO7Mb/rtukMB1j9B8So2tOkezy
+hj8q909SdC9CFRMFa6DFnakArBDX6QacLtID+KC8M1aQQkXarMx72NYRBgOqdSqHVFE3hGEvfPE7
+MPbDFnpThGFyQxi4MhUUVK2gxC7KdvviZ8NrAwVJdso9RbOLbNcvYI7XlBYwq0CHQGLBpzDlLc5Q
+hQlMA8ffKMhzkyBHfPIQYTZD3GqtoLrO8uKfM2dFQLj0YcP0ljSU06zX9LeFiUhBAn0nwnS8jga/
+67E=
+=sctR
+-----END PGP SIGNATURE-----
 
-Thanks,
-Ethan
-  
-
->
-> Drivers can register @init/@release callbacks to manage any private
-> state wrapping the vfio_device.
->
-> However vfio-ccw doesn't fit this model due to a life cycle mess
-> that its private structure mixes both parent and mdev info hence must
-> be allocated/freed outside of the life cycle of vfio device.
->
-> Per prior discussions this won't be fixed in short term by IBM folks.
->
-> Instead of waiting for those modifications introduce another helper
-> vfio_init_device() so ccw can call it to initialize a pre-allocated
-> vfio_device.
->
-> Further implication of the ccw trick is that vfio_device cannot be
-> freed uniformly in vfio core. Instead, require *EVERY* driver to
-> implement @release and free vfio_device inside. Then ccw can choose
-> to delay the free at its own discretion.
->
-> Another trick down the road is that kvzalloc() is used to accommodate
-> the need of gvt which uses vzalloc() while all others use kzalloc().
-> So drivers should call a helper vfio_free_device() to free the
-> vfio_device instead of assuming that kfree() or vfree() is appliable.
->
-> Later once the ccw mess is fixed we can remove those tricks and
-> fully handle structure alloc/free in vfio core.
->
-> Existing vfio_{un}init_group_dev() will be deprecated after all
-> existing usages are converted to the new model.
->
-> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-> Co-developed-by: Yi Liu <yi.l.liu@intel.com>
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
-> Signed-off-by: Kevin Tian <kevin.tian@intel.com>
-> Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> ---
->   drivers/vfio/vfio_main.c | 92 ++++++++++++++++++++++++++++++++++++++++
->   include/linux/vfio.h     | 25 ++++++++++-
->   2 files changed, 116 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index 27d9186f35d5..adc1b697bb78 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -498,6 +498,98 @@ void vfio_uninit_group_dev(struct vfio_device *device)
->   }
->   EXPORT_SYMBOL_GPL(vfio_uninit_group_dev);
->   
-> +/* Release helper called by vfio_put_device() */
-> +void vfio_device_release(struct kref *kref)
-> +{
-> +	struct vfio_device *device =
-> +			container_of(kref, struct vfio_device, kref);
-> +
-> +	vfio_uninit_group_dev(device);
-> +
-> +	/*
-> +	 * kvfree() cannot be done here due to a life cycle mess in
-> +	 * vfio-ccw. Before the ccw part is fixed all drivers are
-> +	 * required to support @release and call vfio_free_device()
-> +	 * from there.
-> +	 */
-> +	device->ops->release(device);
-> +}
-> +EXPORT_SYMBOL_GPL(vfio_device_release);
-> +
-> +/*
-> + * Alloc and initialize vfio_device so it can be registered to vfio
-> + * core.
-> + *
-> + * Drivers should use the wrapper vfio_alloc_device() for allocation.
-> + * @size is the size of the structure to be allocated, including any
-> + * private data used by the driver.
-> + *
-> + * Driver may provide an @init callback to cover device private data.
-> + *
-> + * Use vfio_put_device() to release the structure after success return.
-> + */
-> +struct vfio_device *_vfio_alloc_device(size_t size, struct device *dev,
-> +				       const struct vfio_device_ops *ops)
-> +{
-> +	struct vfio_device *device;
-> +	int ret;
-> +
-> +	if (WARN_ON(size < sizeof(struct vfio_device)))
-> +		return ERR_PTR(-EINVAL);
-> +
-> +	device = kvzalloc(size, GFP_KERNEL);
-> +	if (!device)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	ret = vfio_init_device(device, dev, ops);
-> +	if (ret)
-> +		goto out_free;
-> +	return device;
-> +
-> +out_free:
-> +	kvfree(device);
-> +	return ERR_PTR(ret);
-> +}
-> +EXPORT_SYMBOL_GPL(_vfio_alloc_device);
-> +
-> +/*
-> + * Initialize a vfio_device so it can be registered to vfio core.
-> + *
-> + * Only vfio-ccw driver should call this interface.
-> + */
-> +int vfio_init_device(struct vfio_device *device, struct device *dev,
-> +		     const struct vfio_device_ops *ops)
-> +{
-> +	int ret;
-> +
-> +	vfio_init_group_dev(device, dev, ops);
-> +
-> +	if (ops->init) {
-> +		ret = ops->init(device);
-> +		if (ret)
-> +			goto out_uninit;
-> +	}
-> +
-> +	kref_init(&device->kref);
-> +	return 0;
-> +
-> +out_uninit:
-> +	vfio_uninit_group_dev(device);
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(vfio_init_device);
-> +
-> +/*
-> + * The helper called by driver @release callback to free the device
-> + * structure. Drivers which don't have private data to clean can
-> + * simply use this helper as its @release.
-> + */
-> +void vfio_free_device(struct vfio_device *device)
-> +{
-> +	kvfree(device);
-> +}
-> +EXPORT_SYMBOL_GPL(vfio_free_device);
-> +
->   static struct vfio_group *vfio_noiommu_group_alloc(struct device *dev,
->   		enum vfio_group_type type)
->   {
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index 0e2826559091..f67cac700e6f 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -47,7 +47,8 @@ struct vfio_device {
->   	struct kvm *kvm;
->   
->   	/* Members below here are private, not for driver use */
-> -	refcount_t refcount;
-> +	struct kref kref;	/* object life cycle */
-> +	refcount_t refcount;	/* user count on registered device*/
->   	unsigned int open_count;
->   	struct completion comp;
->   	struct list_head group_next;
-> @@ -57,6 +58,8 @@ struct vfio_device {
->   /**
->    * struct vfio_device_ops - VFIO bus driver device callbacks
->    *
-> + * @init: initialize private fields in device structure
-> + * @release: Reclaim private fields in device structure
->    * @open_device: Called when the first file descriptor is opened for this device
->    * @close_device: Opposite of open_device
->    * @read: Perform read(2) on device file descriptor
-> @@ -74,6 +77,8 @@ struct vfio_device {
->    */
->   struct vfio_device_ops {
->   	char	*name;
-> +	int	(*init)(struct vfio_device *vdev);
-> +	void	(*release)(struct vfio_device *vdev);
->   	int	(*open_device)(struct vfio_device *vdev);
->   	void	(*close_device)(struct vfio_device *vdev);
->   	ssize_t	(*read)(struct vfio_device *vdev, char __user *buf,
-> @@ -161,6 +166,24 @@ static inline int vfio_check_feature(u32 flags, size_t argsz, u32 supported_ops,
->   	return 1;
->   }
->   
-> +struct vfio_device *_vfio_alloc_device(size_t size, struct device *dev,
-> +				       const struct vfio_device_ops *ops);
-> +#define vfio_alloc_device(dev_struct, member, dev, ops)				\
-> +	container_of(_vfio_alloc_device(sizeof(struct dev_struct) +		\
-> +					BUILD_BUG_ON_ZERO(offsetof(		\
-> +						struct dev_struct, member)),	\
-> +					dev, ops),				\
-> +		     struct dev_struct, member)
-> +
-> +int vfio_init_device(struct vfio_device *device, struct device *dev,
-> +		     const struct vfio_device_ops *ops);
-> +void vfio_free_device(struct vfio_device *device);
-> +void vfio_device_release(struct kref *kref);
-> +static inline void vfio_put_device(struct vfio_device *device)
-> +{
-> +	kref_put(&device->kref, vfio_device_release);
-> +}
-> +
->   void vfio_init_group_dev(struct vfio_device *device, struct device *dev,
->   			 const struct vfio_device_ops *ops);
->   void vfio_uninit_group_dev(struct vfio_device *device);
-
--- 
-"firm, enduring, strong, and long-lived"
-
+--------------ZqF0L0yuCG59vZjil5z64as2--
