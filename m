@@ -2,197 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 849CE5BAE9B
-	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 15:53:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B5B55BB109
+	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 18:18:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230213AbiIPNww (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Sep 2022 09:52:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44884 "EHLO
+        id S230124AbiIPQR7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Sep 2022 12:17:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230404AbiIPNwt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Sep 2022 09:52:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBD24AD996
-        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 06:52:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663336349;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WDtczjMwYRtrJ/8Rid2fJUsvxXpjDuh2iYjzJoY6xJE=;
-        b=Y1HjjOkuEIQgtUqHdr7wu7MX4Jetc8JJJAwTvcJt75wdL/XH3NLlghCdKGBGHbWWrBxP6F
-        mTImKaoBHb6HPGWipayjr4DNBlEPJTs101LsId0VYznuOWuVg6vDChplpTQWkaixo7l+/T
-        i/Cuxva+9Wp/utMjAabdVj4Lltifygc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-77-AWvARZipPeia9Tb5CVlz9w-1; Fri, 16 Sep 2022 09:52:27 -0400
-X-MC-Unique: AWvARZipPeia9Tb5CVlz9w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EA553886C61;
-        Fri, 16 Sep 2022 13:52:24 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.40.194.163])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D9EB42166B29;
-        Fri, 16 Sep 2022 13:52:22 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3 6/6] KVM: selftests: Test Hyper-V invariant TSC control
-Date:   Fri, 16 Sep 2022 15:52:05 +0200
-Message-Id: <20220916135205.3185973-7-vkuznets@redhat.com>
-In-Reply-To: <20220916135205.3185973-1-vkuznets@redhat.com>
-References: <20220916135205.3185973-1-vkuznets@redhat.com>
+        with ESMTP id S229458AbiIPQR5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Sep 2022 12:17:57 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CEFAB600E;
+        Fri, 16 Sep 2022 09:17:56 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id 207so12397915pgc.7;
+        Fri, 16 Sep 2022 09:17:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=u0NEQPoiZmBD9Mm9vr8JrzumZIsWiV897rA1dK7/Fsg=;
+        b=PWa9ae0U37Stk+HrwEUbWTPex9EFkXqB/Vbohl+X0KLfWQezIiLvlV68BL7T8Fd1fv
+         v0oRkZN/LelvVZBnYevCuzyVmaee9NdFGwFQoVnSUl2t5FuqE0vSeNVSZfIbFeC+/bQj
+         bN+VD76nLkXs4NpU2lPJ4VvB59meYts19LM6gFIb4Ir6W0D1o5E1FFi+EZUaJwAdKD+o
+         OWr0hqG1q6pMzzoZbrMTXHsLWp2FbAQpHkKoOIUyUHVmvLh+fQj2CW9qQ6pzDUjGf7Lu
+         sGpF1t7M+0Vg/H8iZSkmRKK2Cl5UppGjFhScgfw2mnVzr9qDe+llu2hPBQk5Og8K2i/H
+         2x7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=u0NEQPoiZmBD9Mm9vr8JrzumZIsWiV897rA1dK7/Fsg=;
+        b=r/MubXlty0MqN6dJcp2DendXMpb2tbl4ifUEMdSn5lSPMslEbJM6F3MxEcB2s/7if4
+         c0gBpNQL2GBgNR6/doHjnqZVtclU/+Owsu4AjYfbdxZs/gZhgf+xrhMrBQzh3tuRn+7l
+         N3OrrDBOvKJ7qO/3xmvKB7JEV0hoWq1jgs0JhH1vFANEu/Cm+rA9ilk0ezz0+Ijuu12J
+         nqnhIfYG5RIlhLQtIdUIHXdOhEPWK1oXxZC58XS3QK+h2FDb5YM9H+90DXFXoNCNWGHW
+         t1I7O5UA/91uKhSADiJsRdSCvEHGv3fsiMtFezSy9GPFpxq58j5tuQz9GckKJYrmjAz4
+         06hw==
+X-Gm-Message-State: ACrzQf1HXbxj86ELBo/kz+HQAx+SMmRJIW2g7jHvkyTvpx9RvCMebzGY
+        a+htoLbc35/FSprn9lYaRlM=
+X-Google-Smtp-Source: AMsMyM5OYAr6DlxPIC3SjG64fd9663YW/izpayOy4YDB0LRXC/p8+T1tw39y0qCKBvzuiGQ68tkLGQ==
+X-Received: by 2002:a65:4644:0:b0:42a:dfb6:4e80 with SMTP id k4-20020a654644000000b0042adfb64e80mr5174195pgr.262.1663345075325;
+        Fri, 16 Sep 2022 09:17:55 -0700 (PDT)
+Received: from localhost (c-73-164-155-12.hsd1.wa.comcast.net. [73.164.155.12])
+        by smtp.gmail.com with ESMTPSA id m8-20020a17090aab0800b001fda0505eaasm1692273pjq.1.2022.09.16.09.17.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Sep 2022 09:17:54 -0700 (PDT)
+Date:   Sat, 10 Sep 2022 16:29:51 +0000
+From:   Bobby Eshleman <bobbyeshleman@gmail.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     Dexuan Cui <decui@microsoft.com>, Bryan Tan <bryantan@vmware.com>,
+        Vishnu Dasa <vdasa@vmware.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Bobby Eshleman <bobby.eshleman@gmail.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Cong Wang <cong.wang@bytedance.com>,
+        Jiang Wang <jiang.wang@bytedance.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org
+Subject: Re: Call to discuss vsock netdev/sk_buff [was Re: [PATCH 0/6]
+ virtio/vsock: introduce dgrams, sk_buff, and qdisc]
+Message-ID: <Yxy7f2KYyRcDsMxm@bullseye>
+References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
+ <YxdKiUzlfpHs3h3q@fedora>
+ <Yv5PFz1YrSk8jxzY@bullseye>
+ <20220908143652.tfyjjx2z6in6v66c@sgarzare-redhat>
+ <YxuCVfFcRdWHeeh8@bullseye>
+ <CAGxU2F5HG_UouKzJNuvfeCASJ4j84qPY9-7-yFUpEtAJQSoxJg@mail.gmail.com>
+ <YxvNNd4dNTIUu6Rb@bullseye>
+ <CAGxU2F5+M2SYKwr56NJ9s2yO5h40MWQFO82t_RkSvx10VRfbVQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAGxU2F5+M2SYKwr56NJ9s2yO5h40MWQFO82t_RkSvx10VRfbVQ@mail.gmail.com>
+X-Spam-Status: No, score=1.3 required=5.0 tests=BAYES_00,DATE_IN_PAST_96_XX,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
+        autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a test for the newly introduced Hyper-V invariant TSC control feature:
-- HV_X64_MSR_TSC_INVARIANT_CONTROL is not available without
- HV_ACCESS_TSC_INVARIANT CPUID bit set and available with it.
-- BIT(0) of HV_X64_MSR_TSC_INVARIANT_CONTROL controls the filtering of
-architectural invariant TSC (CPUID.80000007H:EDX[8]) bit.
+On Fri, Sep 16, 2022 at 05:51:22AM +0200, Stefano Garzarella wrote:
+> On Mon, Sep 12, 2022 at 8:28 PM Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
+> >
+> > On Mon, Sep 12, 2022 at 08:12:58PM +0200, Stefano Garzarella wrote:
+> > > On Fri, Sep 9, 2022 at 8:13 PM Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
+> > > >
+> > > > Hey Stefano, thanks for sending this out.
+> > > >
+> > > > On Thu, Sep 08, 2022 at 04:36:52PM +0200, Stefano Garzarella wrote:
+> > > > >
+> > > > > Looking better at the KVM forum sched, I found 1h slot for Sep 15 at 16:30
+> > > > > UTC.
+> > > > >
+> > > > > Could this work for you?
+> > > >
+> > > > Unfortunately, I can't make this time slot.
+> > >
+> > > No problem at all!
+> > >
+> > > >
+> > > > My schedule also opens up a lot the week of the 26th, especially between
+> > > > 16:00 and 19:00 UTC, as well as after 22:00 UTC.
+> > >
+> > > Great, that week works for me too.
+> > > What about Sep 27 @ 16:00 UTC?
+> > >
+> >
+> > That time works for me!
+> 
+> Great! I sent you an invitation.
+> 
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- .../selftests/kvm/include/x86_64/hyperv.h     |  3 +
- .../selftests/kvm/include/x86_64/processor.h  |  1 +
- .../selftests/kvm/x86_64/hyperv_features.c    | 58 +++++++++++++++++--
- 3 files changed, 58 insertions(+), 4 deletions(-)
+Awesome, see you then!
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/hyperv.h b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-index 843748dde1ff..8368d65afbe4 100644
---- a/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-@@ -232,4 +232,7 @@
- /* hypercall options */
- #define HV_HYPERCALL_FAST_BIT		BIT(16)
- 
-+/* HV_X64_MSR_TSC_INVARIANT_CONTROL bits */
-+#define HV_INVARIANT_TSC_EXPOSED               BIT_ULL(0)
-+
- #endif /* !SELFTEST_KVM_HYPERV_H */
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 0cbc71b7af50..8d106380b0af 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -128,6 +128,7 @@ struct kvm_x86_cpu_feature {
- #define	X86_FEATURE_GBPAGES		KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 26)
- #define	X86_FEATURE_RDTSCP		KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 27)
- #define	X86_FEATURE_LM			KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 29)
-+#define	X86_FEATURE_INVTSC		KVM_X86_CPU_FEATURE(0x80000007, 0, EDX, 8)
- #define	X86_FEATURE_RDPRU		KVM_X86_CPU_FEATURE(0x80000008, 0, EBX, 4)
- #define	X86_FEATURE_AMD_IBPB		KVM_X86_CPU_FEATURE(0x80000008, 0, EBX, 12)
- #define	X86_FEATURE_NPT			KVM_X86_CPU_FEATURE(0x8000000A, 0, EDX, 0)
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-index d4bd18bc580d..18b44450dfb8 100644
---- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-@@ -46,20 +46,33 @@ struct hcall_data {
- 
- static void guest_msr(struct msr_data *msr)
- {
--	uint64_t ignored;
-+	uint64_t msr_val = 0;
- 	uint8_t vector;
- 
- 	GUEST_ASSERT(msr->idx);
- 
--	if (!msr->write)
--		vector = rdmsr_safe(msr->idx, &ignored);
--	else
-+	if (!msr->write) {
-+		vector = rdmsr_safe(msr->idx, &msr_val);
-+	} else {
- 		vector = wrmsr_safe(msr->idx, msr->write_val);
-+		if (!vector)
-+			msr_val = msr->write_val;
-+	}
- 
- 	if (msr->fault_expected)
- 		GUEST_ASSERT_2(vector == GP_VECTOR, msr->idx, vector);
- 	else
- 		GUEST_ASSERT_2(!vector, msr->idx, vector);
-+
-+	/* Invariant TSC bit appears when TSC invariant control MSR is written to */
-+	if (msr->idx == HV_X64_MSR_TSC_INVARIANT_CONTROL) {
-+		if (!this_cpu_has(HV_ACCESS_TSC_INVARIANT))
-+			GUEST_ASSERT(this_cpu_has(X86_FEATURE_INVTSC));
-+		else
-+			GUEST_ASSERT(this_cpu_has(X86_FEATURE_INVTSC) ==
-+				     !!(msr_val & HV_INVARIANT_TSC_EXPOSED));
-+	}
-+
- 	GUEST_DONE();
- }
- 
-@@ -114,6 +127,7 @@ static void guest_test_msrs_access(void)
- 	int stage = 0;
- 	vm_vaddr_t msr_gva;
- 	struct msr_data *msr;
-+	bool has_invtsc = kvm_cpu_has(X86_FEATURE_INVTSC);
- 
- 	while (true) {
- 		vm = vm_create_with_one_vcpu(&vcpu, guest_msr);
-@@ -425,6 +439,42 @@ static void guest_test_msrs_access(void)
- 			break;
- 
- 		case 44:
-+			/* MSR is not available when CPUID feature bit is unset */
-+			if (!has_invtsc)
-+				continue;
-+			msr->idx = HV_X64_MSR_TSC_INVARIANT_CONTROL;
-+			msr->write = 0;
-+			msr->fault_expected = 1;
-+			break;
-+		case 45:
-+			/* MSR is vailable when CPUID feature bit is set */
-+			if (!has_invtsc)
-+				continue;
-+			vcpu_set_cpuid_feature(vcpu, HV_ACCESS_TSC_INVARIANT);
-+			msr->idx = HV_X64_MSR_TSC_INVARIANT_CONTROL;
-+			msr->write = 0;
-+			msr->fault_expected = 0;
-+			break;
-+		case 46:
-+			/* Writing bits other than 0 is forbidden */
-+			if (!has_invtsc)
-+				continue;
-+			msr->idx = HV_X64_MSR_TSC_INVARIANT_CONTROL;
-+			msr->write = 1;
-+			msr->write_val = 0xdeadbeef;
-+			msr->fault_expected = 1;
-+			break;
-+		case 47:
-+			/* Setting bit 0 enables the feature */
-+			if (!has_invtsc)
-+				continue;
-+			msr->idx = HV_X64_MSR_TSC_INVARIANT_CONTROL;
-+			msr->write = 1;
-+			msr->write_val = 1;
-+			msr->fault_expected = 0;
-+			break;
-+
-+		default:
- 			kvm_vm_free(vm);
- 			return;
- 		}
--- 
-2.37.2
-
+Thanks,
+Bobby
