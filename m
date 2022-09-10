@@ -2,66 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DCF6B5B43F3
-	for <lists+kvm@lfdr.de>; Sat, 10 Sep 2022 06:13:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EF6A25B43F5
+	for <lists+kvm@lfdr.de>; Sat, 10 Sep 2022 06:15:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229825AbiIJENS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 10 Sep 2022 00:13:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42154 "EHLO
+        id S229760AbiIJEP4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Sep 2022 00:15:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229615AbiIJENQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 10 Sep 2022 00:13:16 -0400
-Received: from mail-vs1-xe29.google.com (mail-vs1-xe29.google.com [IPv6:2607:f8b0:4864:20::e29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A6BE13EBE
-        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 21:13:14 -0700 (PDT)
-Received: by mail-vs1-xe29.google.com with SMTP id c3so3641024vsc.6
-        for <kvm@vger.kernel.org>; Fri, 09 Sep 2022 21:13:14 -0700 (PDT)
+        with ESMTP id S229599AbiIJEPy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 10 Sep 2022 00:15:54 -0400
+Received: from mail-vs1-xe35.google.com (mail-vs1-xe35.google.com [IPv6:2607:f8b0:4864:20::e35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E69117F10E
+        for <kvm@vger.kernel.org>; Fri,  9 Sep 2022 21:15:53 -0700 (PDT)
+Received: by mail-vs1-xe35.google.com with SMTP id 129so3638656vsi.10
+        for <kvm@vger.kernel.org>; Fri, 09 Sep 2022 21:15:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date;
-        bh=bT+lvXkm6Qe6+nTGGZtBv81BtvgBawrDwZvucM+h94M=;
-        b=Yys0KwKHTO+vzTZHw3AkKTcwnUZvMyJM+/WUxQmJjsT87vwqfEWFuN3IyPDJ8gPx3a
-         NqQi0USCw1ZfeJkzhhFJqaxYFKW8KP5mvIMwBxp3xs0Ax/mlVLTnW74LrtYjlISyP6Nu
-         Qmdv71WFERQ9fnzJbq4556HnCJkVvBESHXxXk9W7J+iVMSukzqttWwGjnwoEpQ8ThYAt
-         WGwU0sCuMBPWjPYQ8EL8Ldn12lXjDxgA7dQ4g8pmMM8zi8rBiCk5PAS/RnTseO3ggzMD
-         ICjcHCnGCHRLdFBfhynEOmkL76h+RA0CoSV3nSLQ88rdhD6P/GMybofb2ADNE6Ehkpmz
-         V/GA==
+        bh=otYREk8t2WdG/NJ+ZPtuIVmKtO1jI4mWCWtGovgZifs=;
+        b=P1/zZ7bOsUX2MawfFHJAH9LBegb1zhmBN9uR6JsmYDcDZCVq8AuQpbgnXpW8iPb4GB
+         TP6FJIUZzb+d8XBBIush3ABrXqtl7/wyjLv6aKCkBCFR96Ej72dJpIhO3ezgUn/9MLYM
+         Ot0IJEUCvIDFNlMv3Wifnjb5gdhNMEn+PqszUyRDnRilMi6VdoTYkUYAP1HLkux/qd9Y
+         UO5gRN03fRRoRjEsJjH3k0g6kxnyy5bX9GYetj2MPWsi7zzaCdyN8RQiN08gM2Z+YRKJ
+         tDUvQVqiH5TC9GSDcVbekxwRALeE1CoXehCkEdesZkbbLnE7g0v+5edVCZzDIjWZtRsT
+         sK2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=bT+lvXkm6Qe6+nTGGZtBv81BtvgBawrDwZvucM+h94M=;
-        b=15S+/zM2O3h5h7hJAlvhpmfq7rdoaq3mShJ9z0jPom86GMAW85HXXLp6EMzLfrLtOP
-         679kTcycAtz/DrHiBPJRg0B3rR5CGWyQgkrKsEsMwEN5yc3DazsWYC7vdpimu6yuzsF0
-         x6pr8LT9+xR5ShYLzvYbT26wTkYnkrux6jMNbHnfbAl8zaeD8ZMVx5EzRszJxFz+RUh2
-         v7GASOY7wQS0RHPSH2dGJFV7a0Z0LSobVUu4CLSEuBpi1cjDxNNyNR8cG1a7ysTw5qSd
-         e1z+MG9PTb1P5E/j+s4fGfGf2BeeGWFrrploLwtYchN5dP+tWR2OfvlE98JPs01n3WWy
-         n+fg==
-X-Gm-Message-State: ACgBeo2mqG5eSs66OJmHkuFJamzVCyg515yDmwsyVhmXLRBKn4yFxejs
-        i/40RvYPVlt3LtUtBxp6wEMl3J797fJEtgyXm0f32Q==
-X-Google-Smtp-Source: AA6agR5RrXixyzKCzUB/EJrVm8Zhg8tpR3LDBgWYAO15rG9c2TCzDy3dx942O9xqMNTbp/kZRLU6ckHffxtUmgIfS6w=
-X-Received: by 2002:a67:c00b:0:b0:390:8e1f:594a with SMTP id
- v11-20020a67c00b000000b003908e1f594amr6206352vsi.80.1662783193547; Fri, 09
- Sep 2022 21:13:13 -0700 (PDT)
+        bh=otYREk8t2WdG/NJ+ZPtuIVmKtO1jI4mWCWtGovgZifs=;
+        b=nDng69OJH36SKewzweNXHMlC8ZcqPPie5x4/396jV1XKf00RIjwYrjT4QoaMX0Opa9
+         dStmMXPjHWryhEuPVeKz6F9N2TCkEDIft3wCuX+VGz0v96krkz+TDupmocqQp5nvXhYX
+         0cTkc3wwIay35xsu06m1DuVS93W2pMvJL3IB89vA8K+KjH4ae3WyX9IxKgSbqFV4oERv
+         927pwTyq68bci92nFCKsZItXx3uD6AnMbTKJSPaxcr74WtNik8OzI9Hgv9RWjOCCOlQe
+         kLZcAidxu+raH49CmfawhtnMvYjptKl5D1PbUz6ZizbNL/MctCS3kabOP80XiJLqkWmS
+         lB8A==
+X-Gm-Message-State: ACgBeo1l5+PR7U5d9mPcr4coeY+6Fjnsz5f1zRA8Kg3UNEnB/KFCW+MN
+        J/C/brSOCV9+cw7J3ux/atcMdy3YVcamBY+sqJsNUA==
+X-Google-Smtp-Source: AA6agR4VUM5bZTnLtDGODi754vdxpwLgswug4ZoSrk/lFyazp+e82v69j928eFB59oIJrBArMmqhtHgMHx/zOs6vvnc=
+X-Received: by 2002:a67:ea58:0:b0:38f:d89a:e4b3 with SMTP id
+ r24-20020a67ea58000000b0038fd89ae4b3mr5967895vso.51.1662783353013; Fri, 09
+ Sep 2022 21:15:53 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220909044636.1997755-1-reijiw@google.com> <20220909044636.1997755-2-reijiw@google.com>
- <87bkrora8b.wl-maz@kernel.org>
-In-Reply-To: <87bkrora8b.wl-maz@kernel.org>
+References: <20220825050846.3418868-1-reijiw@google.com> <20220825050846.3418868-4-reijiw@google.com>
+ <YxuX+ztKm/rPetql@google.com>
+In-Reply-To: <YxuX+ztKm/rPetql@google.com>
 From:   Reiji Watanabe <reijiw@google.com>
-Date:   Fri, 9 Sep 2022 21:12:57 -0700
-Message-ID: <CAAeT=Fz2hU8V8kYZsirjxr01ZH-Q2abkFOHteOac1LfRWus6Rg@mail.gmail.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: Don't set PSTATE.SS when Software Step
- state is Active-pending
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+Date:   Fri, 9 Sep 2022 21:15:37 -0700
+Message-ID: <CAAeT=Fx38tW+XkfWBvs+dgB4JU4SpVHOVzu4w-BMkAbe21+W5g@mail.gmail.com>
+Subject: Re: [PATCH 3/9] KVM: arm64: selftests: Remove the hard-coded
+ {b,w}pn#0 from debug-exceptions
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org,
         Linux ARM <linux-arm-kernel@lists.infradead.org>,
         James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
+        Andrew Jones <andrew.jones@linux.dev>,
+        Oliver Upton <oupton@google.com>,
         Jing Zhang <jingzhangos@google.com>,
         Raghavendra Rao Anata <rananta@google.com>
 Content-Type: text/plain; charset="UTF-8"
@@ -76,157 +77,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+Hi Ricardo,
 
-On Fri, Sep 9, 2022 at 5:41 AM Marc Zyngier <maz@kernel.org> wrote:
+On Fri, Sep 9, 2022 at 12:46 PM Ricardo Koller <ricarkol@google.com> wrote:
 >
-> Hi Reiji,
->
-> On Fri, 09 Sep 2022 05:46:34 +0100,
-> Reiji Watanabe <reijiw@google.com> wrote:
+> On Wed, Aug 24, 2022 at 10:08:40PM -0700, Reiji Watanabe wrote:
+> > Remove the hard-coded {break,watch}point #0 from the guest_code()
+> > in debug-exceptions to allow {break,watch}point number to be
+> > specified.  Subsequent patches will add test cases for non-zero
+> > {break,watch}points.
 > >
-> > Currently, PSTATE.SS is set on every guest entry if single-step is
-> > enabled for the vCPU by userspace.  However, it could cause extra
-> > single-step execution without returning to userspace, which shouldn't
-> > be performed, if the Software Step state at the last guest exit was
-> > Active-pending (i.e. the last exit was not triggered by Software Step
-> > exception, but by an asynchronous exception after the single-step
-> > execution is performed).
->
-> For my own enlightenment, could you describe a sequence of events that
-> leads to this issue?
-
-Here is an example of the sequences.
-
- [Usersace]
-  | - ioctl(SET_GUEST_DEBUG)
-  | - ioctl(KVM_RUN) (vCPU PC==X)
-  v
- [KVM]
-  | - *vcpu_cpsr(vcpu) |= SPSR_SS;
-  | - mdscr |= DBG_MDSCR_SS;
-  | - VM Entry
-  v
- [Guest] vCPU PC==X
-  | - Execute an instruction at PC==X.
-  |   PC is updated with X+4, and PSTATE.SS is cleared.
-  |
-  | !! Asynchronous exception !!
-  v
- [KVM] vCPU PC==X+4
-  | - The kernel processes the async exception.
-  | - handle_exit() returns 1 (don't return to userspace)
-  | - *vcpu_cpsr(vcpu) |= SPSR_SS;
-  | - mdscr |= DBG_MDSCR_SS;
-  | - VM Entry
-  v
- [Guest] vCPU PC==X+4
-  | - Execute an instruction at PC==X+4.
-  |   PC is updated with X+8, PSTATE.SS is cleared.
-  |
-  | !! Software Step Exception !!
-  v
- [KVM] vCPU PC==X+8
-  | - run->exit_reason = KVM_EXIT_DEBUG;
-  | - Return to userspace
-  v
- [Userspace]
-    - Userspace sees PC==X+8 (Userspace didn't see PC==X+4).
-
-
-> > Fix this by not setting PSTATE.SS on guest entry if the Software
-> > Step state at the last exit was Active-pending.
-> >
-> > Fixes: 337b99bf7edf ("KVM: arm64: guest debug, add support for single-step")
 > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
 > > ---
-> >  arch/arm64/include/asm/kvm_host.h |  3 +++
-> >  arch/arm64/kvm/debug.c            | 19 ++++++++++++++++++-
-> >  arch/arm64/kvm/guest.c            |  1 +
-> >  arch/arm64/kvm/handle_exit.c      |  2 ++
-> >  4 files changed, 24 insertions(+), 1 deletion(-)
+> >  .../selftests/kvm/aarch64/debug-exceptions.c  | 50 ++++++++++++-------
+> >  1 file changed, 32 insertions(+), 18 deletions(-)
 > >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index e9c9388ccc02..4cf6eef02565 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -535,6 +535,9 @@ struct kvm_vcpu_arch {
-> >  #define IN_WFIT                      __vcpu_single_flag(sflags, BIT(3))
-> >  /* vcpu system registers loaded on physical CPU */
-> >  #define SYSREGS_ON_CPU               __vcpu_single_flag(sflags, BIT(4))
-> > +/* Software step state is Active-pending */
-> > +#define DBG_SS_ACTIVE_PENDING        __vcpu_single_flag(sflags, BIT(5))
-> > +
+> > diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> > index 51047e6b8db3..183ee16acb7d 100644
+> > --- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> > +++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> > @@ -93,6 +93,9 @@ GEN_DEBUG_WRITE_REG(dbgwvr)
 > >
-> >  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-> >  #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +   \
-> > diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> > index 0b28d7db7c76..125cfb94b4ad 100644
-> > --- a/arch/arm64/kvm/debug.c
-> > +++ b/arch/arm64/kvm/debug.c
-> > @@ -188,7 +188,16 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
-> >                * debugging the system.
-> >                */
-> >               if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
-> > -                     *vcpu_cpsr(vcpu) |=  DBG_SPSR_SS;
-> > +                     /*
-> > +                      * If the software step state at the last guest exit
-> > +                      * was Active-pending, we don't set DBG_SPSR_SS so
-> > +                      * that the state is maintained (to not run another
-> > +                      * single-step until the pending Software Step
-> > +                      * exception is taken).
-> > +                      */
-> > +                     if (!vcpu_get_flag(vcpu, DBG_SS_ACTIVE_PENDING))
-> > +                             *vcpu_cpsr(vcpu) |= DBG_SPSR_SS;
->
-> I guess my confusion stems from my (probably wrong) interpretation if
-> the SS state is A+P, there is no harm in making it pending again
-> (setting the SS bit in PSTATE).
-
-Setting the SS bit in PSTATE (with MDSCR_EL1.SS=1) makes the state
-Active-not-pending (not Active-pending) if my interpretation of
-the spec is correct.
-
+> >  static void reset_debug_state(void)
+> >  {
+> > +     uint8_t brps, wrps, i;
+> > +     uint64_t dfr0;
 > > +
-> >                       mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
-> >                       mdscr |= DBG_MDSCR_SS;
+> >       asm volatile("msr daifset, #8");
+> >
+> >       write_sysreg(0, osdlr_el1);
+> > @@ -100,11 +103,20 @@ static void reset_debug_state(void)
+> >       isb();
+> >
+> >       write_sysreg(0, mdscr_el1);
+> > -     /* This test only uses the first bp and wp slot. */
+> > -     write_sysreg(0, dbgbvr0_el1);
+> > -     write_sysreg(0, dbgbcr0_el1);
+> > -     write_sysreg(0, dbgwcr0_el1);
+> > -     write_sysreg(0, dbgwvr0_el1);
+> > +
+> > +     /* Reset all bcr/bvr/wcr/wvr registers */
+> > +     dfr0 = read_sysreg(id_aa64dfr0_el1);
+> > +     brps = cpuid_get_ufield(dfr0, ID_AA64DFR0_BRPS_SHIFT);
 >
-> But it looks like the *pending* state is actually stored in MDSCR
-> instead? The spec only mentions this for the A+P state, so this is
-> quite likely a bug indeed.
-
-MDSCR_EL1.SS is set even in Active-not-pending state (not just
-Active-pending state).  (Or do you mean the state is stored in
-some other field in MDSCR ??)
-
-
-> Now, where does the asynchronous exception comes into play? I found
-> this intriguing remark in the ARM ARM:
+> I guess this might have to change to ARM64_FEATURE_GET(). In any case:
 >
-> <quote>
-> The Software Step exception has higher priority than all other types
-> of synchronous exception. However, the prioritization of this
-> exception with respect to any unmasked pending asynchronous exception
-> is not defined by the architecture.
-> </quote>
+> Reviewed-by: Ricardo Koller <ricarkol@google.com>
 >
-> Is this what you were referring to in the commit message? I think you
-> need to spell it out for us, as I don't fully understand what you are
-> fixing nor do I understand the gory details of single-stepping...
+> (also assuming it includes the commit message clarification about reset
+> clearing all registers).
 
-Yes, that is what I was referring to.
-In "Figure D2-3 Software step state machine" in Arm ARM (DDI 0487I.a),
-since KVM currently sets PSTATE.SS to 1 on every Guest Entry (when
-single-step is enabled by userspace), KVM always has the CPU in
-"Inactive" (the second inactive state from the top) transition to
-"Active-not-pending" on the Guest Entry.  With this patch, KVM
-have the CPU transitions to "Active-pending" if the state before
-"Inactive" was "Active-pending", which indicates the step completed
-but Software Step exception is not taken yet, so that Software
-Step exception is taken before further single-step is executed.
+Yes, I will fix those in V2.
 
-I'm sorry for the unclear explanation, and
-I hope my comments clarify the problem I'm trying to fix.
-
-Thank you,
+Thank you for the review!
 Reiji
