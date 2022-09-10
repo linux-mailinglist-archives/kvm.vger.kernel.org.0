@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 28DF25B45DD
-	for <lists+kvm@lfdr.de>; Sat, 10 Sep 2022 11:59:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 247EF5B45EB
+	for <lists+kvm@lfdr.de>; Sat, 10 Sep 2022 12:36:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229510AbiIJJ7H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 10 Sep 2022 05:59:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32916 "EHLO
+        id S229488AbiIJKgQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Sep 2022 06:36:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbiIJJ7G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 10 Sep 2022 05:59:06 -0400
+        with ESMTP id S229464AbiIJKgP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 10 Sep 2022 06:36:15 -0400
 Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FA4174B82
-        for <kvm@vger.kernel.org>; Sat, 10 Sep 2022 02:59:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E27857E1C
+        for <kvm@vger.kernel.org>; Sat, 10 Sep 2022 03:36:13 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 14FACCE08CB
-        for <kvm@vger.kernel.org>; Sat, 10 Sep 2022 09:59:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 280BFC433D6;
-        Sat, 10 Sep 2022 09:58:59 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id D36CECE0687
+        for <kvm@vger.kernel.org>; Sat, 10 Sep 2022 10:36:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E4E6C433D6;
+        Sat, 10 Sep 2022 10:36:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662803939;
-        bh=hXKRPt6Bl9LEQ7baOPFH3GB30UfeFbckby2U0muaeQA=;
+        s=k20201202; t=1662806168;
+        bh=JcsNXXKqzhV/1uuRQUph15OvWzE1MZ/pE5WVAyByBWY=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=i0Du6sPDtqkY0OJacqT2yH3qRZHeE/+bD06pjNBSl6jJ03FdROXmpI800clbi2Ynz
-         wHXCtmr9FoU6+vXu3TLXTpBstIB4WQupHTIpjcHp7jnM628G5MynrcDx0ydM7FK71b
-         hHgzxkhzAgfGf6JvnMS6BUQdFh9PXeigkGzL/kBdKbv1H/no6c0VXCkVM1/FXpi+I7
-         jI+0YkQeWEPpGlU0G5NhXPrZ/DwU8z12xGguuXvYz3Fikr+rgfMVAg87Zaoa6LiqVy
-         J3QJv7CQfattOe9nLVX8AXfwyRKCN6vN/wU0iP3c6M8/v8Sr0+ehL05rFB8vHEx/5e
-         wQZmrsqX9imwA==
+        b=B6koL3NK7jJp5wDsT4RHo3fSbIaKDPtS7lvpioPxRSq87vfpsEHmyb0xARzpVOtYl
+         xEEP0DPi9EQUrwofWI/WfL1LySb17HFR6roLKwbzWPwllihHsVIoLytQREwsyUWGGK
+         HAzhW/yN68QAAy209tO0eDytKCWmBsdJ7AcigG7CESu3PggrWFnD/FN566bwz/f1cQ
+         1yTezzc6zeBOa/fK2vHhXZ//x1RTeQt/FiE1A+Ed5mfrxHDevSFr8Y1IrQ1YRo21hV
+         YHWxnniB45dbEAoXgMxtpr0hri5xxEunuG9O4tNN/gaCO5E7Q31nw3AT3gFmpE7RdL
+         eL+2LSp4Jf3qg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1oWxGL-009O8U-34;
-        Sat, 10 Sep 2022 10:58:57 +0100
-Date:   Sat, 10 Sep 2022 10:58:51 +0100
-Message-ID: <877d2br1no.wl-maz@kernel.org>
+        id 1oWxqH-009OIr-O2;
+        Sat, 10 Sep 2022 11:36:05 +0100
+Date:   Sat, 10 Sep 2022 11:36:04 +0100
+Message-ID: <875yhvqzxn.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Reiji Watanabe <reijiw@google.com>
 Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-arm-kernel@lists.infradead.org,
         James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
@@ -52,11 +52,9 @@ Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         Jing Zhang <jingzhangos@google.com>,
         Raghavendra Rao Anata <rananta@google.com>
 Subject: Re: [PATCH 1/3] KVM: arm64: Don't set PSTATE.SS when Software Step state is Active-pending
-In-Reply-To: <CAAeT=Fz2hU8V8kYZsirjxr01ZH-Q2abkFOHteOac1LfRWus6Rg@mail.gmail.com>
+In-Reply-To: <20220909044636.1997755-2-reijiw@google.com>
 References: <20220909044636.1997755-1-reijiw@google.com>
         <20220909044636.1997755-2-reijiw@google.com>
-        <87bkrora8b.wl-maz@kernel.org>
-        <CAAeT=Fz2hU8V8kYZsirjxr01ZH-Q2abkFOHteOac1LfRWus6Rg@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -76,145 +74,134 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
-
-On Sat, 10 Sep 2022 05:12:57 +0100,
+On Fri, 09 Sep 2022 05:46:34 +0100,
 Reiji Watanabe <reijiw@google.com> wrote:
-> > > Currently, PSTATE.SS is set on every guest entry if single-step is
-> > > enabled for the vCPU by userspace.  However, it could cause extra
-> > > single-step execution without returning to userspace, which shouldn't
-> > > be performed, if the Software Step state at the last guest exit was
-> > > Active-pending (i.e. the last exit was not triggered by Software Step
-> > > exception, but by an asynchronous exception after the single-step
-> > > execution is performed).
-> >
-> > For my own enlightenment, could you describe a sequence of events that
-> > leads to this issue?
 > 
-> Here is an example of the sequences.
+> Currently, PSTATE.SS is set on every guest entry if single-step is
+> enabled for the vCPU by userspace.  However, it could cause extra
+> single-step execution without returning to userspace, which shouldn't
+> be performed, if the Software Step state at the last guest exit was
+> Active-pending (i.e. the last exit was not triggered by Software Step
+> exception, but by an asynchronous exception after the single-step
+> execution is performed).
 > 
->  [Usersace]
->   | - ioctl(SET_GUEST_DEBUG)
->   | - ioctl(KVM_RUN) (vCPU PC==X)
->   v
->  [KVM]
->   | - *vcpu_cpsr(vcpu) |= SPSR_SS;
->   | - mdscr |= DBG_MDSCR_SS;
->   | - VM Entry
->   v
->  [Guest] vCPU PC==X
->   | - Execute an instruction at PC==X.
->   |   PC is updated with X+4, and PSTATE.SS is cleared.
->   |
->   | !! Asynchronous exception !!
->   v
->  [KVM] vCPU PC==X+4
->   | - The kernel processes the async exception.
->   | - handle_exit() returns 1 (don't return to userspace)
->   | - *vcpu_cpsr(vcpu) |= SPSR_SS;
->   | - mdscr |= DBG_MDSCR_SS;
->   | - VM Entry
->   v
->  [Guest] vCPU PC==X+4
->   | - Execute an instruction at PC==X+4.
->   |   PC is updated with X+8, PSTATE.SS is cleared.
->   |
->   | !! Software Step Exception !!
->   v
->  [KVM] vCPU PC==X+8
->   | - run->exit_reason = KVM_EXIT_DEBUG;
->   | - Return to userspace
->   v
->  [Userspace]
->     - Userspace sees PC==X+8 (Userspace didn't see PC==X+4).
->
-
-OK, I think I get it now, and I got confused because of the naming
-which is similar to what we use for interrupts, but the semantics are
-very different (let's pretend that this is the cause of most of my
-stupid questions earlier...).
-
-The states are described as such:
-
-Active+non-Pending: MDSCR.SS=1, PSTATE.SS=1
-Active+Pending:     MDSCR.SS=1, PSTATE.SS=0
-
-and it is the inversion of PSTATE.SS that got me.
-
-The pending state describe the state of the *exception*. Before
-executing the instruction, no exception is pending. Once executed, an
-exception is pending.
-
-Of course, if we get an interrupt right after a single step (and that
-the implementation prioritises them over synchronous exceptions), we
-exit because of the interrupt, and the bug you uncovered sends us back
-to Active+non-Pending, losing the SS exception. Boo.
-
-Your fix is to not set PSTATE.SS=1 until we have actually handled a
-debug exception. In the above example, this would result in:
-
- [Guest] vCPU PC==X
-  | - Execute an instruction at PC==X.
-  |   PC is updated with X+4, and PSTATE.SS is cleared.
-  |
-  | !! Asynchronous exception !!
-  v
- [KVM] vCPU PC==X+4
-  | - The kernel processes the async exception.
-  | - handle_exit() returns 1 (don't return to userspace)
-  | - vcpu_set_flag(vcpu, DBG_SS_ACTIVE_PENDING);
-  | - mdscr |= DBG_MDSCR_SS;
-  | - VM Entry
-  v
- [Guest] vCPU PC==X+4
-  | - Pending SS exception
-  |
-  | !! Software Step Exception !!
-  v
- [KVM] vCPU PC==X+4
-  | - run->exit_reason = KVM_EXIT_DEBUG;
-  | - vcpu_clear_flag(vcpu, DBG_SS_ACTIVE_PENDING);
-  | - Return to userspace
-  v
- [Userspace]
-    - Userspace sees PC==X+4
-
-It is amusing that we never saw that one before, but I guess the
-IMPDEF nature of the exception prioritisation caught us here. Also,
-VM debugging is a relatively rare use case.
-
-> > Now, where does the asynchronous exception comes into play? I found
-> > this intriguing remark in the ARM ARM:
-> >
-> > <quote>
-> > The Software Step exception has higher priority than all other types
-> > of synchronous exception. However, the prioritization of this
-> > exception with respect to any unmasked pending asynchronous exception
-> > is not defined by the architecture.
-> > </quote>
-> >
-> > Is this what you were referring to in the commit message? I think you
-> > need to spell it out for us, as I don't fully understand what you are
-> > fixing nor do I understand the gory details of single-stepping...
+> Fix this by not setting PSTATE.SS on guest entry if the Software
+> Step state at the last exit was Active-pending.
 > 
-> Yes, that is what I was referring to.
-> In "Figure D2-3 Software step state machine" in Arm ARM (DDI 0487I.a),
-> since KVM currently sets PSTATE.SS to 1 on every Guest Entry (when
-> single-step is enabled by userspace), KVM always has the CPU in
-> "Inactive" (the second inactive state from the top) transition to
-> "Active-not-pending" on the Guest Entry.  With this patch, KVM
-> have the CPU transitions to "Active-pending" if the state before
-> "Inactive" was "Active-pending", which indicates the step completed
-> but Software Step exception is not taken yet, so that Software
-> Step exception is taken before further single-step is executed.
-> 
-> I'm sorry for the unclear explanation, and
-> I hope my comments clarify the problem I'm trying to fix.
+> Fixes: 337b99bf7edf ("KVM: arm64: guest debug, add support for single-step")
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
 
-Please do not apologise! This is excellent work, and I'm really glad
-you got to the bottom of this. It'd be good to capture some of this
-discussion in the commit message though, as I'm pretty we will all
-blissfully forget all about it shortly!
+Now that I'm a bit more clued about what the architecture actually
+mandates, I can try and review this patch.
+
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  3 +++
+>  arch/arm64/kvm/debug.c            | 19 ++++++++++++++++++-
+>  arch/arm64/kvm/guest.c            |  1 +
+>  arch/arm64/kvm/handle_exit.c      |  2 ++
+>  4 files changed, 24 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index e9c9388ccc02..4cf6eef02565 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -535,6 +535,9 @@ struct kvm_vcpu_arch {
+>  #define IN_WFIT			__vcpu_single_flag(sflags, BIT(3))
+>  /* vcpu system registers loaded on physical CPU */
+>  #define SYSREGS_ON_CPU		__vcpu_single_flag(sflags, BIT(4))
+> +/* Software step state is Active-pending */
+> +#define DBG_SS_ACTIVE_PENDING	__vcpu_single_flag(sflags, BIT(5))
+> +
+>  
+>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+>  #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +	\
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index 0b28d7db7c76..125cfb94b4ad 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -188,7 +188,16 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>  		 * debugging the system.
+>  		 */
+>  		if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
+> -			*vcpu_cpsr(vcpu) |=  DBG_SPSR_SS;
+> +			/*
+> +			 * If the software step state at the last guest exit
+> +			 * was Active-pending, we don't set DBG_SPSR_SS so
+> +			 * that the state is maintained (to not run another
+> +			 * single-step until the pending Software Step
+> +			 * exception is taken).
+> +			 */
+> +			if (!vcpu_get_flag(vcpu, DBG_SS_ACTIVE_PENDING))
+> +				*vcpu_cpsr(vcpu) |= DBG_SPSR_SS;
+> +
+>  			mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
+>  			mdscr |= DBG_MDSCR_SS;
+>  			vcpu_write_sys_reg(vcpu, mdscr, MDSCR_EL1);
+> @@ -279,6 +288,14 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
+>  						&vcpu->arch.debug_ptr->dbg_wcr[0],
+>  						&vcpu->arch.debug_ptr->dbg_wvr[0]);
+>  		}
+> +
+> +		if ((vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) &&
+> +		    !(*vcpu_cpsr(vcpu) & DBG_SPSR_SS))
+> +			/*
+> +			 * Mark the vcpu as ACTIVE_PENDING
+> +			 * until Software Step exception is confirmed.
+
+s/confirmed/taken/? This would match the comment in the previous hunk.
+
+> +			 */
+> +			vcpu_set_flag(vcpu, DBG_SS_ACTIVE_PENDING);
+>  	}
+>  }
+>  
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index f802a3b3f8db..2ff13a3f8479 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -937,6 +937,7 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+>  	} else {
+>  		/* If not enabled clear all flags */
+>  		vcpu->guest_debug = 0;
+> +		vcpu_clear_flag(vcpu, DBG_SS_ACTIVE_PENDING);
+>  	}
+>  
+>  out:
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index bbe5b393d689..8e43b2668d67 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -154,6 +154,8 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu)
+>  
+>  	if (ESR_ELx_EC(esr) == ESR_ELx_EC_WATCHPT_LOW)
+>  		run->debug.arch.far = vcpu->arch.fault.far_el2;
+> +	else if (ESR_ELx_EC(esr) == ESR_ELx_EC_SOFTSTP_LOW)
+> +		vcpu_clear_flag(vcpu, DBG_SS_ACTIVE_PENDING);
+
+Can we write this as a switch/case statement?
+
+>  
+>  	return 0;
+>  }
+
+I think we also need to do something if userspace decides to write to
+PSTATE as a result of a non-debug exit (such as a signal) when this
+DBG_SS_ACTIVE_PENDING is set. I came up with the following
+complicated, but not impossible scenario:
+
+- guest single step, PSTATE.SS=0
+- exit due to interrupt
+- DBG_SS_ACTIVE_PENDING set
+- reenter guest
+- exit again due to another interrupt
+- exit to userspace due to signal pending
+- userspace writes PSTATE.SS=1 for no good reason
+- we now have an inconsistent state between PSTATE.SS and the vcpu flags
+
+My gut feeling is that we need something like the vcpu flag being set
+to !PSTATE.SS if written while debug is enabled.
+
+Thoughts?
 
 	M.
 
