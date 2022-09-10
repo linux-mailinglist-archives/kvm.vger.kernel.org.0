@@ -2,278 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B18B25B490B
-	for <lists+kvm@lfdr.de>; Sat, 10 Sep 2022 23:16:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 747A65B4AE1
+	for <lists+kvm@lfdr.de>; Sun, 11 Sep 2022 01:36:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229708AbiIJVQj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 10 Sep 2022 17:16:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56162 "EHLO
+        id S229816AbiIJXf7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Sep 2022 19:35:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229702AbiIJVQf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 10 Sep 2022 17:16:35 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE0614BA5E;
-        Sat, 10 Sep 2022 14:16:33 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 7C0D460E1F;
-        Sat, 10 Sep 2022 21:16:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6C20C433C1;
-        Sat, 10 Sep 2022 21:16:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662844592;
-        bh=6VDrutTSKYpfo8OvPexOAvG7ppZOmpluXEPcI1IaG2M=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=E2ozGcrbx5BTwSIOpk96LeEeoj3rSBMJ5uGgDq71RJe2p1v+SPcHixf1pcL3Tbqho
-         FabwNitlXZ3oFtPhB6RoXjOYorD3A9jBU+b1ftaHNYhHIZ90CDCTbODJk29p1V/wT4
-         J5QFCFfCehdhJEp9oAJDOvuSPjsxiBvGdi/9UkOtqjFbtavEKvHjh+w8JDLLV14v1u
-         7kky1AhYMbvnkgfl4LQeltB0257DCbDTjhDwJwZRdsUGrVbIHHdRavLXTRlv/Egb5W
-         v79XKFRL1TQ/MrjLqyJRf5785EMujK5VqlGx4H4rsO1cKQo9OMtdyilGzoqPLPxF44
-         GFBDcGR3uv35Q==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Junaid Shahid <junaids@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, seanjc@google.com,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.19 06/38] kvm: x86: mmu: Always flush TLBs when enabling dirty logging
-Date:   Sat, 10 Sep 2022 17:15:51 -0400
-Message-Id: <20220910211623.69825-6-sashal@kernel.org>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220910211623.69825-1-sashal@kernel.org>
-References: <20220910211623.69825-1-sashal@kernel.org>
+        with ESMTP id S229622AbiIJXf4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 10 Sep 2022 19:35:56 -0400
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam07on2080.outbound.protection.outlook.com [40.107.212.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7903837FBB;
+        Sat, 10 Sep 2022 16:35:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dDa4rYgLtST0kgXd+0vR3h6n7voYpGSzhfOo7G0xUsiBqRSIOhk2wO6nuBRCZSg0rL/gbaSVwrPF82z4ibI0pw0Koal4r7s708yr9ZY/Oh4i7HU9zYscPtZZSIUxsidWe8igxKLmlNJP43OuivY9HPwd+3m8P+M5doocOGWm7E7YUj3YBVricb+WrHENXoiBgidRrJWDAxyjhYMHxxWNp3ZT14FEGzIrOjH77YYkEBfoJrCXzLHAf1ss/XiN3sSE/WhJ861oreNG51ChUnM4S2Ow7dCfqpDaQFJN2b2yCtPYh4vv4NNMc7Nj90RwZGqnaxzT78ZCzN1RhV+peKnpRQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IiiQ2fVCwucQ86iut+uJPfw8wrP+r+5D4oGRyrQQYdg=;
+ b=D4oTpsruGKjz8AMsv75jebtmOvu/3mVSDWWt31tm1Q1/DqqRvwLXbdHBDAO2cwbybDzEtnwuS6C/I6zkaT4FTq+csVIUdUJoWvJMsfOQwcIBtNPEgL7TrqwPaQ7cuUW5UtoGw8/v/NE2Dxj9F97knGUZXfAkFoFq6G+qfrHuxbuAv1qwFAv9td2Ep8Im8NulGTSU1qV5NUzmHhkVLgYoeYonPpPdY/TorN2uWQSgOrDxI0A2xI6FLC5C/bkdQubf3fUPSRkyyKqSpaeGAEFgwnU+3u5NPPKvIc5UKjxhzRg5iT2Iui/lp9I5etkxkd0tESRnBLtyTVLJevpkTMwiqQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 12.22.5.238) smtp.rcpttodomain=marcan.st smtp.mailfrom=nvidia.com; dmarc=pass
+ (p=reject sp=reject pct=100) action=none header.from=nvidia.com; dkim=none
+ (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IiiQ2fVCwucQ86iut+uJPfw8wrP+r+5D4oGRyrQQYdg=;
+ b=ZNcuzyU0ABh6ylZfCjzUHuaYbfVjqC1lk1x4lTSBkfqm9+Yx8va8/HKkCNxaTL3x7HAxE1U+Evk26PRrGimYf85ddxzW/HvKz0Qv3uLOkrvkSNMB/owp+Vrtv/p9dkQk3lMVsKDXyUsjOz7g1VMVdJcV8yiHQysSTCuoUBVhvP9kC8AnoAWATa/Or3NBiwigwMll3MIqFUBymhk0DV+4NphdL4t/zH+9desET29/5al9ASeC4LBsVXmOGBzg4BklYfJ3syJh3aHOicm6ayENGJyfPLt13rO4kuYgb+ahQwts68wsdzpJViNOpKITcLj48PEUqlIMvBXgeEqlwc57dA==
+Received: from DS7PR05CA0069.namprd05.prod.outlook.com (2603:10b6:8:57::21) by
+ DM4PR12MB5987.namprd12.prod.outlook.com (2603:10b6:8:6a::21) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5588.18; Sat, 10 Sep 2022 23:35:53 +0000
+Received: from DM6NAM11FT061.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:8:57:cafe::84) by DS7PR05CA0069.outlook.office365.com
+ (2603:10b6:8:57::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5632.6 via Frontend
+ Transport; Sat, 10 Sep 2022 23:35:53 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.238)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 12.22.5.238 as permitted sender) receiver=protection.outlook.com;
+ client-ip=12.22.5.238; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (12.22.5.238) by
+ DM6NAM11FT061.mail.protection.outlook.com (10.13.173.138) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.5612.13 via Frontend Transport; Sat, 10 Sep 2022 23:35:52 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ DRHQMAIL105.nvidia.com (10.27.9.14) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.38; Sat, 10 Sep 2022 23:35:51 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.29; Sat, 10 Sep 2022 16:35:51 -0700
+Received: from Asurada-Nvidia (10.127.8.10) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29 via Frontend
+ Transport; Sat, 10 Sep 2022 16:35:49 -0700
+Date:   Sat, 10 Sep 2022 16:35:48 -0700
+From:   Nicolin Chen <nicolinc@nvidia.com>
+To:     Robin Murphy <robin.murphy@arm.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+CC:     "will@kernel.org" <will@kernel.org>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
+        "marcan@marcan.st" <marcan@marcan.st>,
+        "sven@svenpeter.dev" <sven@svenpeter.dev>,
+        "alyssa@rosenzweig.io" <alyssa@rosenzweig.io>,
+        "robdclark@gmail.com" <robdclark@gmail.com>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "gerald.schaefer@linux.ibm.com" <gerald.schaefer@linux.ibm.com>,
+        "orsonzhai@gmail.com" <orsonzhai@gmail.com>,
+        "baolin.wang@linux.alibaba.com" <baolin.wang@linux.alibaba.com>,
+        "zhang.lyra@gmail.com" <zhang.lyra@gmail.com>,
+        "thierry.reding@gmail.com" <thierry.reding@gmail.com>,
+        "vdumpa@nvidia.com" <vdumpa@nvidia.com>,
+        "jonathanh@nvidia.com" <jonathanh@nvidia.com>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "shameerali.kolothum.thodi@huawei.com" 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "thunder.leizhen@huawei.com" <thunder.leizhen@huawei.com>,
+        "christophe.jaillet@wanadoo.fr" <christophe.jaillet@wanadoo.fr>,
+        "yangyingliang@huawei.com" <yangyingliang@huawei.com>,
+        "jon@solid-run.com" <jon@solid-run.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "asahi@lists.linux.dev" <asahi@lists.linux.dev>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v6 1/5] iommu: Return -EMEDIUMTYPE for incompatible
+ domain and device/group
+Message-ID: <Yx0fVJpaojM5RNR4@Asurada-Nvidia>
+References: <20220815181437.28127-1-nicolinc@nvidia.com>
+ <20220815181437.28127-2-nicolinc@nvidia.com>
+ <YxiRkm7qgQ4k+PIG@8bytes.org>
+ <Yxig+zfA2Pr4vk6K@nvidia.com>
+ <9f91f187-2767-13f9-68a2-a5458b888f00@arm.com>
+ <YxjOPo5FFqu2vE/g@nvidia.com>
+ <0b466705-3a17-1bbc-7ef2-5adadc22d1ae@arm.com>
+ <Yxk6sR4JiAAn3Jf5@nvidia.com>
+ <BN9PR11MB52763FAD3E7545CC26C0DE908C409@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <YxnbRq5vaP/OL0ra@nvidia.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <YxnbRq5vaP/OL0ra@nvidia.com>
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT061:EE_|DM4PR12MB5987:EE_
+X-MS-Office365-Filtering-Correlation-Id: 553cbae4-07a3-4aa0-d405-08da93853357
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6/WahweSY5sdyGQRdT9z37i2UuQadHcBJxLw2LBACoyPIaatKXq8lF4zy2edv5MRddN1NB2n3vrGLLApxsZJMsBmy3kR+H3NSbaxwYB74s+VGDIJ+PD1VJ343we1IaZszEo+NHhefzprIM7w4ZUsx194GALzsmrx7vL2WXN8LKziML6ElIYxRTwsf515Z+QhgJxTKzEENflUz4XJehczg42d0/yzRbWUPXuja83xwVLZit+Iowa8CQA7j3PJWsigUxygQILuZq4emv0BOmef3GsVrETDXxR+ko5FTib4OryY0UJ/TB4bRkyHWSK+xcpXBYphIw56CObbDq9ZnKd8uVrmlVD6C5x82rdvofGKM+I5gz3FAzBUKFWzDflzFiqQKtqu4rOaccQ4JvKwMtLzAZdgKHLW8zuctDbsi3nB2Xphoe/fhGxzT5tMzsABTQid4zH3mlketz6XwgHFmi2WfB5/50XeW4XjR4/kFt9/n6Q8VFjIffDvO/wpnCxH1hzlPCJ7rhMjwOAFEVcpFCBQ6DcEszqgsiwysg54hgsvMUh0tx00DE3XTOJvnOxjBeg2VvXYNTxYPVLMMJdnmu/WoU2MZ4/FNCP4vWkP/aknwdGCOlAqS6+e85snE6PNV63BKG+sSIIZhH2G3nS78tYvIzbhPBn4VdFo1Tz9cUqgTEv8+gCAeVnKwIuB52Roxf7qim4D6ZCCWpxcHbf/DigPgB6aHNw6JuVBEXEWcdNwTm8qQQ9bzBZUMqnZhG/xOL3lS10sU7S2v7uIhzuyEb89BmuOn1/uTFuemLv2QO3Sn0eL/gmW4FP8kYz61EUDPkE/
+X-Forefront-Antispam-Report: CIP:12.22.5.238;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(396003)(346002)(376002)(136003)(36840700001)(46966006)(40470700004)(26005)(54906003)(478600001)(33716001)(6636002)(316002)(110136005)(40460700003)(9686003)(55016003)(40480700001)(8936002)(5660300002)(86362001)(7406005)(2906002)(82310400005)(7416002)(4744005)(70586007)(82740400003)(356005)(36860700001)(70206006)(4326008)(8676002)(83380400001)(426003)(81166007)(186003)(41300700001)(336012)(47076005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Sep 2022 23:35:52.6423
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 553cbae4-07a3-4aa0-d405-08da93853357
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.238];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT061.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5987
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Junaid Shahid <junaids@google.com>
+On Thu, Sep 08, 2022 at 09:08:38AM -0300, Jason Gunthorpe wrote:
+> On Thu, Sep 08, 2022 at 09:30:57AM +0000, Tian, Kevin wrote:
 
-[ Upstream commit b64d740ea7ddc929d97b28de4c0665f7d5db9e2a ]
+> > There are also cases where common kAPIs are called in the attach
+> > path which may return -EINVAL and random errno, e.g.:
+> > 
+> > omap_iommu_attach_dev()
+> >   omap_iommu_attach()
+> >     iommu_enable()
+> >       pm_runtime_get_sync()
+> >         __pm_runtime_resume()
+> >           rpm_resume()
+> > 	if (dev->power.runtime_error) {
+> > 		retval = -EINVAL;
+ 
+> Yes, this is was also on my mind with choosing an unpopular return
+> code, it has a higher chance of not coming out of some other kernel
+> API
 
-When A/D bits are not available, KVM uses a software access tracking
-mechanism, which involves making the SPTEs inaccessible. However,
-the clear_young() MMU notifier does not flush TLBs. So it is possible
-that there may still be stale, potentially writable, TLB entries.
-This is usually fine, but can be problematic when enabling dirty
-logging, because it currently only does a TLB flush if any SPTEs were
-modified. But if all SPTEs are in access-tracked state, then there
-won't be a TLB flush, which means that the guest could still possibly
-write to memory and not have it reflected in the dirty bitmap.
-
-So just unconditionally flush the TLBs when enabling dirty logging.
-As an alternative, KVM could explicitly check the MMU-Writable bit when
-write-protecting SPTEs to decide if a flush is needed (instead of
-checking the Writable bit), but given that a flush almost always happens
-anyway, so just making it unconditional seems simpler.
-
-Signed-off-by: Junaid Shahid <junaids@google.com>
-Message-Id: <20220810224939.2611160-1-junaids@google.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/x86/kvm/mmu/mmu.c  | 45 +++++++----------------------------------
- arch/x86/kvm/mmu/spte.h | 14 +++++++++----
- arch/x86/kvm/x86.c      | 44 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 61 insertions(+), 42 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 356226c7ebbdc..aa1ba803659cd 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5907,47 +5907,18 @@ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
- 				      const struct kvm_memory_slot *memslot,
- 				      int start_level)
- {
--	bool flush = false;
--
- 	if (kvm_memslots_have_rmaps(kvm)) {
- 		write_lock(&kvm->mmu_lock);
--		flush = slot_handle_level(kvm, memslot, slot_rmap_write_protect,
--					  start_level, KVM_MAX_HUGEPAGE_LEVEL,
--					  false);
-+		slot_handle_level(kvm, memslot, slot_rmap_write_protect,
-+				  start_level, KVM_MAX_HUGEPAGE_LEVEL, false);
- 		write_unlock(&kvm->mmu_lock);
- 	}
- 
- 	if (is_tdp_mmu_enabled(kvm)) {
- 		read_lock(&kvm->mmu_lock);
--		flush |= kvm_tdp_mmu_wrprot_slot(kvm, memslot, start_level);
-+		kvm_tdp_mmu_wrprot_slot(kvm, memslot, start_level);
- 		read_unlock(&kvm->mmu_lock);
- 	}
--
--	/*
--	 * Flush TLBs if any SPTEs had to be write-protected to ensure that
--	 * guest writes are reflected in the dirty bitmap before the memslot
--	 * update completes, i.e. before enabling dirty logging is visible to
--	 * userspace.
--	 *
--	 * Perform the TLB flush outside the mmu_lock to reduce the amount of
--	 * time the lock is held. However, this does mean that another CPU can
--	 * now grab mmu_lock and encounter a write-protected SPTE while CPUs
--	 * still have a writable mapping for the associated GFN in their TLB.
--	 *
--	 * This is safe but requires KVM to be careful when making decisions
--	 * based on the write-protection status of an SPTE. Specifically, KVM
--	 * also write-protects SPTEs to monitor changes to guest page tables
--	 * during shadow paging, and must guarantee no CPUs can write to those
--	 * page before the lock is dropped. As mentioned in the previous
--	 * paragraph, a write-protected SPTE is no guarantee that CPU cannot
--	 * perform writes. So to determine if a TLB flush is truly required, KVM
--	 * will clear a separate software-only bit (MMU-writable) and skip the
--	 * flush if-and-only-if this bit was already clear.
--	 *
--	 * See is_writable_pte() for more details.
--	 */
--	if (flush)
--		kvm_arch_flush_remote_tlbs_memslot(kvm, memslot);
- }
- 
- /* Must be called with the mmu_lock held in write-mode. */
-@@ -6070,32 +6041,30 @@ void kvm_arch_flush_remote_tlbs_memslot(struct kvm *kvm,
- void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
- 				   const struct kvm_memory_slot *memslot)
- {
--	bool flush = false;
--
- 	if (kvm_memslots_have_rmaps(kvm)) {
- 		write_lock(&kvm->mmu_lock);
- 		/*
- 		 * Clear dirty bits only on 4k SPTEs since the legacy MMU only
- 		 * support dirty logging at a 4k granularity.
- 		 */
--		flush = slot_handle_level_4k(kvm, memslot, __rmap_clear_dirty, false);
-+		slot_handle_level_4k(kvm, memslot, __rmap_clear_dirty, false);
- 		write_unlock(&kvm->mmu_lock);
- 	}
- 
- 	if (is_tdp_mmu_enabled(kvm)) {
- 		read_lock(&kvm->mmu_lock);
--		flush |= kvm_tdp_mmu_clear_dirty_slot(kvm, memslot);
-+		kvm_tdp_mmu_clear_dirty_slot(kvm, memslot);
- 		read_unlock(&kvm->mmu_lock);
- 	}
- 
- 	/*
-+	 * The caller will flush the TLBs after this function returns.
-+	 *
- 	 * It's also safe to flush TLBs out of mmu lock here as currently this
- 	 * function is only used for dirty logging, in which case flushing TLB
- 	 * out of mmu lock also guarantees no dirty pages will be lost in
- 	 * dirty_bitmap.
- 	 */
--	if (flush)
--		kvm_arch_flush_remote_tlbs_memslot(kvm, memslot);
- }
- 
- void kvm_mmu_zap_all(struct kvm *kvm)
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index f80dbb628df57..e09bdcf1e47c5 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -326,7 +326,7 @@ static __always_inline bool is_rsvd_spte(struct rsvd_bits_validate *rsvd_check,
- }
- 
- /*
-- * An shadow-present leaf SPTE may be non-writable for 3 possible reasons:
-+ * A shadow-present leaf SPTE may be non-writable for 4 possible reasons:
-  *
-  *  1. To intercept writes for dirty logging. KVM write-protects huge pages
-  *     so that they can be split be split down into the dirty logging
-@@ -344,8 +344,13 @@ static __always_inline bool is_rsvd_spte(struct rsvd_bits_validate *rsvd_check,
-  *     read-only memslot or guest memory backed by a read-only VMA. Writes to
-  *     such pages are disallowed entirely.
-  *
-- * To keep track of why a given SPTE is write-protected, KVM uses 2
-- * software-only bits in the SPTE:
-+ *  4. To emulate the Accessed bit for SPTEs without A/D bits.  Note, in this
-+ *     case, the SPTE is access-protected, not just write-protected!
-+ *
-+ * For cases #1 and #4, KVM can safely make such SPTEs writable without taking
-+ * mmu_lock as capturing the Accessed/Dirty state doesn't require taking it.
-+ * To differentiate #1 and #4 from #2 and #3, KVM uses two software-only bits
-+ * in the SPTE:
-  *
-  *  shadow_mmu_writable_mask, aka MMU-writable -
-  *    Cleared on SPTEs that KVM is currently write-protecting for shadow paging
-@@ -374,7 +379,8 @@ static __always_inline bool is_rsvd_spte(struct rsvd_bits_validate *rsvd_check,
-  * shadow page tables between vCPUs. Write-protecting an SPTE for dirty logging
-  * (which does not clear the MMU-writable bit), does not flush TLBs before
-  * dropping the lock, as it only needs to synchronize guest writes with the
-- * dirty bitmap.
-+ * dirty bitmap. Similarly, making the SPTE inaccessible (and non-writable) for
-+ * access-tracking via the clear_young() MMU notifier also does not flush TLBs.
-  *
-  * So, there is the problem: clearing the MMU-writable bit can encounter a
-  * write-protected SPTE while CPUs still have writable mappings for that SPTE
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index bc411d19dac08..e2c3561edb3e7 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12248,6 +12248,50 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
- 		} else {
- 			kvm_mmu_slot_remove_write_access(kvm, new, PG_LEVEL_4K);
- 		}
-+
-+		/*
-+		 * Unconditionally flush the TLBs after enabling dirty logging.
-+		 * A flush is almost always going to be necessary (see below),
-+		 * and unconditionally flushing allows the helpers to omit
-+		 * the subtly complex checks when removing write access.
-+		 *
-+		 * Do the flush outside of mmu_lock to reduce the amount of
-+		 * time mmu_lock is held.  Flushing after dropping mmu_lock is
-+		 * safe as KVM only needs to guarantee the slot is fully
-+		 * write-protected before returning to userspace, i.e. before
-+		 * userspace can consume the dirty status.
-+		 *
-+		 * Flushing outside of mmu_lock requires KVM to be careful when
-+		 * making decisions based on writable status of an SPTE, e.g. a
-+		 * !writable SPTE doesn't guarantee a CPU can't perform writes.
-+		 *
-+		 * Specifically, KVM also write-protects guest page tables to
-+		 * monitor changes when using shadow paging, and must guarantee
-+		 * no CPUs can write to those page before mmu_lock is dropped.
-+		 * Because CPUs may have stale TLB entries at this point, a
-+		 * !writable SPTE doesn't guarantee CPUs can't perform writes.
-+		 *
-+		 * KVM also allows making SPTES writable outside of mmu_lock,
-+		 * e.g. to allow dirty logging without taking mmu_lock.
-+		 *
-+		 * To handle these scenarios, KVM uses a separate software-only
-+		 * bit (MMU-writable) to track if a SPTE is !writable due to
-+		 * a guest page table being write-protected (KVM clears the
-+		 * MMU-writable flag when write-protecting for shadow paging).
-+		 *
-+		 * The use of MMU-writable is also the primary motivation for
-+		 * the unconditional flush.  Because KVM must guarantee that a
-+		 * CPU doesn't contain stale, writable TLB entries for a
-+		 * !MMU-writable SPTE, KVM must flush if it encounters any
-+		 * MMU-writable SPTE regardless of whether the actual hardware
-+		 * writable bit was set.  I.e. KVM is almost guaranteed to need
-+		 * to flush, while unconditionally flushing allows the "remove
-+		 * write access" helpers to ignore MMU-writable entirely.
-+		 *
-+		 * See is_writable_pte() for more details (the case involving
-+		 * access-tracked SPTEs is particularly relevant).
-+		 */
-+		kvm_arch_flush_remote_tlbs_memslot(kvm, new);
- 	}
- }
- 
--- 
-2.35.1
-
+I wonder if it would be safe to just treat a pm_runtime_get_sync()
+failure as -ENODEV, since a PM resume() mostly occurs to the IOMMU
+that an IOMMU client/master device is behind, while an iommu_domain
+rarely intervenes.
