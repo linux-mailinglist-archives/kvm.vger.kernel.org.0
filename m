@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D8A495B47CE
-	for <lists+kvm@lfdr.de>; Sat, 10 Sep 2022 19:59:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D4F05B47E1
+	for <lists+kvm@lfdr.de>; Sat, 10 Sep 2022 20:11:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229514AbiIJR7Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 10 Sep 2022 13:59:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49070 "EHLO
+        id S229619AbiIJSLr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Sep 2022 14:11:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbiIJR7W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 10 Sep 2022 13:59:22 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12C554199A;
-        Sat, 10 Sep 2022 10:59:22 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id go6so121827pjb.2;
-        Sat, 10 Sep 2022 10:59:22 -0700 (PDT)
+        with ESMTP id S229620AbiIJSLq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 10 Sep 2022 14:11:46 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 760A04B0D4;
+        Sat, 10 Sep 2022 11:11:45 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id fs14so4318126pjb.5;
+        Sat, 10 Sep 2022 11:11:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=9LVUrGmgg5NlXwKIeiUGY0pBFtC3Dd7Xv1rjO/T4Xds=;
-        b=nnsbvU4xT1jL/likGEbVZ8DRFDzCbfse76m0FvZSSTskw6aq70/qtBkDwC8poGl/0W
-         04kWcA5DnWQN2RC+CqYP9h09n0DCCGElrI/Tp+Sd8sHXPUF50geQOzNHXDVGT41gmLmr
-         nQjSP4GQyYQnifQT2HL6seGBx2ab5K36CjBwGh8FHN0/TiPgIN+/Jx8z/RTV5tT1buL0
-         5PUXVJ0PRaY+UbR0CVbViITfXmEmn+Hxs1ZoP0biUOyAQrKQ+tWV1XKHeiZtEHL/ia3T
-         u7znD9H5y/dcC+bcl26vM8DMUJCWgGGXKsR4Z83e5oF3KjQ8vh9GbVEfsJ40rGFBwoLu
-         0Taw==
+        bh=pAWZMQ4OebAxACXO2jGPq2qtXaPGJKbsWZHu2snLesU=;
+        b=FSy5hLs/8uHSnX2eCqR/NPTOot9ONoHZuJBzGA+4ya5og1h23dEPAvZJpqsd0HzFVw
+         s05EJvefDSk4Y+lxe2qG5foA+80l4gEDw5FonWsYSzhF32TNLtCoiouych0K3VdALK+8
+         ikwTHJmcqmNY0vPhXNUhkhs+QdB7705DRzciphKZvzH18vqmcTdOxoui0o0EWb5ArYS/
+         YLV+C4eE/zH5Ux4vXJoBWfTR/s7MR3MFgUpAIPjAoftrlcHkvwOrnv3wfTUYaJcu3exQ
+         Lb2x0QxZUiOOB70dwBHlkuHejpf26QQ7e0kCfdDxfIcfpuUDLN7kQjTS4ee9FjUZSPmM
+         udWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=9LVUrGmgg5NlXwKIeiUGY0pBFtC3Dd7Xv1rjO/T4Xds=;
-        b=WLKbIOnKRHtAlP4dSYDEFVi/0iz2osVcqbrzRzztV0H5sddMikyLSqkprmKVeZkNmX
-         YsRqwkGLZCNJ6dZov0sNpULCFEPIkuXDw+UUHtPqkZESeL7Kxm/KieF+aaKGZTucxlbS
-         ndm4+s+JhIuUHN6FVUZYYJRjrPGo6U0l5JNg0kfs2GZ+r5cvafUnNQI72g3tZWQSmbF8
-         duxFcrKKpT5t/U5dGOS8g3j7V9BaBu+KLrUKlLzponzAioOLmvVxIRWclu6HADOCI5Ay
-         NvNWtMB59F7ssINoAc4Qk+xlQ5W+rh5WT3Fx3WnGONjHyTmvfMohZ2Zuwt1wYdMGtavh
-         Z8ZQ==
-X-Gm-Message-State: ACgBeo0zQe6c1Ir/bAKkQG9WtjgnIvgRAWteS8f0pWU0uTJHVobKdIBw
-        5OBmtKhH0ORW1aTP4Qr7qVs=
-X-Google-Smtp-Source: AA6agR6zuXYJLLRcg2B7OauT2NV/oypYC2K4jk3k6YC4e2wK/GYIk6d8jdXjt4kKHTZTfGc3hWMLoQ==
-X-Received: by 2002:a17:90a:d343:b0:1fd:b437:7ae9 with SMTP id i3-20020a17090ad34300b001fdb4377ae9mr16285600pjx.73.1662832761350;
-        Sat, 10 Sep 2022 10:59:21 -0700 (PDT)
+        bh=pAWZMQ4OebAxACXO2jGPq2qtXaPGJKbsWZHu2snLesU=;
+        b=e/Kddm22lRSRENjC7l2OBqMlRzgyrB2Je34rBofjHMFFgwPyU93UISPgYy+AUvwCeH
+         tqbK4V5ahFFFSMGRWreY9SBXwiggy88aC+aVbKCJysh+8zJaAF2nPnlAU3098EiWWSGr
+         Rcf7Qam+Sn48IPSpgm+gmjNpEaP/0R6m4RBj94BWtMa5at3MJFQim66UvpZPiJm/bzog
+         67GSObKz5UHkLFLk2FNNjleVvDijVY7XOFjBfNcQRPwsVEJjEcLOyZqsoxSFeoVWFXTO
+         MVvKjsoPJlAcVHlXViR59w0p98FZfSjdbW13Y6bb0YJqarxqcOLKPrayy+K3u8oPJx1x
+         XHvA==
+X-Gm-Message-State: ACgBeo1LHxB9qDMq4WlbHFnFJZjW5iIwANOmCq9V7cjAf+7YNlHUQRuT
+        Dbhy/BfrXru4MjreZHlwBkQ=
+X-Google-Smtp-Source: AA6agR6ZOHuxwi86aeOxm1Mk6kKDWGMGK8Maowlh/sa/0K73mfbj9bqRcwDM3xCcy6k+F4zK5f85Yg==
+X-Received: by 2002:a17:90b:4ac3:b0:1fd:ded0:ea80 with SMTP id mh3-20020a17090b4ac300b001fdded0ea80mr15410157pjb.142.1662833504838;
+        Sat, 10 Sep 2022 11:11:44 -0700 (PDT)
 Received: from localhost ([192.55.55.56])
-        by smtp.gmail.com with ESMTPSA id z12-20020a170903018c00b00176d4b093e1sm2635869plg.16.2022.09.10.10.59.20
+        by smtp.gmail.com with ESMTPSA id u4-20020a170902e5c400b00172fad607b3sm2565372plf.207.2022.09.10.11.11.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Sep 2022 10:59:20 -0700 (PDT)
-Date:   Sat, 10 Sep 2022 10:59:19 -0700
+        Sat, 10 Sep 2022 11:11:44 -0700 (PDT)
+Date:   Sat, 10 Sep 2022 11:11:43 -0700
 From:   Isaku Yamahata <isaku.yamahata@gmail.com>
 To:     Chao Gao <chao.gao@intel.com>
 Cc:     isaku.yamahata@intel.com, linux-kernel@vger.kernel.org,
@@ -63,15 +63,16 @@ Cc:     isaku.yamahata@intel.com, linux-kernel@vger.kernel.org,
         Daniel Lezcano <daniel.lezcano@linaro.org>,
         Huang Ying <ying.huang@intel.com>,
         Huacai Chen <chenhuacai@kernel.org>
-Subject: Re: [PATCH v4 09/26] KVM: Do processor compatibility check on resume
-Message-ID: <20220910175919.GB699006@ls.amr.corp.intel.com>
+Subject: Re: [PATCH v4 10/26] KVM: Drop kvm_count_lock and instead protect
+ kvm_usage_count with kvm_lock
+Message-ID: <20220910181143.GC699006@ls.amr.corp.intel.com>
 References: <cover.1662679124.git.isaku.yamahata@intel.com>
- <1c302387e21e689f103bf954f355cf49f73d1e82.1662679124.git.isaku.yamahata@intel.com>
- <YxqhtH2nOwfFV2zm@gao-cwp>
+ <c95e36034d7ffd67b7afed3ba790de921426e737.1662679124.git.isaku.yamahata@intel.com>
+ <YxqtfmhBGQlkhTvU@gao-cwp>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <YxqhtH2nOwfFV2zm@gao-cwp>
+In-Reply-To: <YxqtfmhBGQlkhTvU@gao-cwp>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -82,23 +83,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 09, 2022 at 10:15:16AM +0800,
+On Fri, Sep 09, 2022 at 11:05:34AM +0800,
 Chao Gao <chao.gao@intel.com> wrote:
 
-> On Thu, Sep 08, 2022 at 04:25:25PM -0700, isaku.yamahata@intel.com wrote:
-> >From: Isaku Yamahata <isaku.yamahata@intel.com>
-> >
-> >So far the processor compatibility check is not done on resume. It should
-> >be done.  The resume is called for resuming from S3/S4.  CPUs can be
-> >replaced or the kernel can resume from S4 on a different machine.  So
+> >+	 * cpu_hotplug_disable() and other CPUs are offlined.  No need for
+> >+	 * locking.
+> >+	 */
+> >+	lockdep_assert_not_held(&kvm_lock);
+> >+
+> >+	if (kvm_usage_count) {
+> >+		preempt_disable();
+> > 		hardware_disable_nolock(NULL);
+> >+		preempt_enable();
 > 
-> Are they valid cases handled by other kernel components? Trying to
-> handle them in KVM only doesn't help as kernel is likely to fail
-> somewhere else.
+> kvm_suspend() is called with interrupt disabled. So, no need to disable
+> preemption.
+> 
+> /**
+>  * syscore_suspend - Execute all the registered system core suspend callbacks.
+>  *
+>  * This function is executed with one CPU on-line and disabled interrupts.
+>  */
+> int syscore_suspend(void)
 
-I guess no.  Actually without the compatibility check, kvm_resume() tries to
-enable it by calling hardware_enable_nolock().  The real effect on error case of
-this patch is to print out (potentially) more helpful message gracefully by
-check_processor_compatibility instead of error message of haredware_enable.
+Thanks, I'll fix it with a comment.
 -- 
 Isaku Yamahata <isaku.yamahata@gmail.com>
