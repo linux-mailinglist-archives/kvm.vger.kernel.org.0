@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 639305B4B56
-	for <lists+kvm@lfdr.de>; Sun, 11 Sep 2022 04:45:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A41C85B4B5B
+	for <lists+kvm@lfdr.de>; Sun, 11 Sep 2022 04:51:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229706AbiIKCpv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 10 Sep 2022 22:45:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58738 "EHLO
+        id S229727AbiIKCvA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Sep 2022 22:51:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229589AbiIKCpt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 10 Sep 2022 22:45:49 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B359233A29;
-        Sat, 10 Sep 2022 19:45:47 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id z9-20020a17090a468900b001ffff693b27so5094983pjf.2;
-        Sat, 10 Sep 2022 19:45:47 -0700 (PDT)
+        with ESMTP id S229589AbiIKCu7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 10 Sep 2022 22:50:59 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 556F331DC1;
+        Sat, 10 Sep 2022 19:50:58 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id f24so5419230plr.1;
+        Sat, 10 Sep 2022 19:50:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=YW6q0Ug4ODiNiFnU1n7bDTn4AUEnHpnmoBlpOQHBlK4=;
-        b=lpXap2QJQyEtvavrHCYA61PbWKVZ7IC/5tX6/2oVZZHZWa6VrqtvLoPwrHXDY3T3y/
-         iD7D0qeR1mW3s4wbeARntYA7Wdbi0zhXh2eV4qJyPoI0ifOTADIcxy1iAWECoz8lnspx
-         OClbzNUQgQBLOmlhaHlVj7cnPIfeS7ZgEe1ikTwXVVpuW+ZH3jOpAApPzRoSOZR4MN7L
-         naSHKlFVRXohHyLkMGdnPY5QZOUaToUNqXKYVNM0UVUW5Mb80RMf0QlAOIAMaEsCy9AY
-         MBd2w7wXN6jkUkFR6waSkUgIOxIA4Z0+nTJxT3JdPqsmAbh7+IXeITlIyC3c5dFS8d+C
-         yDNg==
+        bh=WOfUBmdbsodFIdF1n3FF4SIyEmSqFy1s8LSqImxsRWM=;
+        b=nlJtZSZEhPJWcaLLK1L8Z+VRzHUljkNLpYXD8KRtpuPPQ6iRxm2HACBdcyt7Aq6Fkb
+         spK6H68e/roRUpgBsjulj2U5gDlC9QluMRDO4q6bx7kM2fVuIIpKGzaAfEiWpn1E+Fkw
+         XJxzkucYJW3BIxuhnxgcwxswjdInlc8/i2qgVkwK2CDyuQgu2GKFnI7LVm0jVdyXikzV
+         h4gp8GuM8Q8sj2GWGpL1YNX5zgZAL1B5HbkfCLF5Y+4ZnVrCRbTV3zm3Geg9Q5f1l10b
+         2ornV0vei5t7/vbo2yqi9BK3EfdB2EoGSflNhNFXEcm0M2SzFaZOSXX+lOhClV4hal6/
+         Kvcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=YW6q0Ug4ODiNiFnU1n7bDTn4AUEnHpnmoBlpOQHBlK4=;
-        b=7EHyu8OgwqVNeaDhyLX5SjgmPOp32GvslyPe4p47AijsrWVHN7N5zhEjE+1MWbj1HI
-         iaSRYk3+hMOW/JVGzALuzvVk5181TnUKdjym5+G4pDw4H2jaJ1nC8bWXbQr+pfT8kt4c
-         KmtOrn4BZoGhHsgRCtMgIDdxnErVfkqZM2n78L89hJnhUbg4oIjyQm86AyVi+nrkTYeJ
-         kJxERn7+DSogsU84N7jghtGvhnsj/1uPNVhvmnb62YqsMHCpqO0o99kxqRKZqxCUAQoq
-         OXa5pCQWK6MBO0kHDdY7F2Vl2Th1nq0Fgf+1jzzRNTY2+MPwhkC0ipG+d3wnq1ut8bfd
-         D4ig==
-X-Gm-Message-State: ACgBeo1OH3LgMkhcrjbWFRgTqOHyDuIYPFdW1iuau+M22UxM33uhrxzo
-        gqiekViRDBW1xDRn6Z5sKqc=
-X-Google-Smtp-Source: AA6agR5/jkTEedt2xew1xi5+unQpqfcFXWt9uqb9DY+HTiCWVSv0f8tVOoLzAgMOhuIC0D+GLiFMIg==
-X-Received: by 2002:a17:90a:bd12:b0:200:5112:3167 with SMTP id y18-20020a17090abd1200b0020051123167mr17142319pjr.109.1662864347152;
-        Sat, 10 Sep 2022 19:45:47 -0700 (PDT)
+        bh=WOfUBmdbsodFIdF1n3FF4SIyEmSqFy1s8LSqImxsRWM=;
+        b=lqL5Nn87K4+ZhmWxVzH58zJ5tWeTgHk1b6L0m4w8gS8Yj4Ncm1IITfSMeVQjsGGond
+         gVsYSwxkT0vXDI43hxmlUnH64RgctUlsK0SwZi/cSjWK+BDNMXlVGC+I1/OwpAvXZEjz
+         nudkvmp34lJmWWfbjfeR3lOy1r0jK1rGrL0f+TdTGEdG8nN8kwfIWSzBBwkk98gFHMRD
+         lmwOon844YHRL8HAlVaBjFwUBlSeEH8XNdgihVHdSYZ6WnCd5knTmpSsGXP37vKZw6xm
+         wNHHs1URuUkDsRqp5qC6yeNZoKKhMnkZdZHan81l9U9U9XbpZyeqblSYxyIaxHfAVUW3
+         0kSg==
+X-Gm-Message-State: ACgBeo1QuU8vuP0ZP7R+tpMyUoLAmKNRq46YIkMfCSpZPalb3FeAhKw+
+        ePVhOSHYJ0ZKyr/F4cezYoU=
+X-Google-Smtp-Source: AA6agR6E781URqVLZUSymEJO/4uB5VIkLpGehxnXgU9n+4dqZMrwK1j7/AMV3riCoURT0xk5HLJqqA==
+X-Received: by 2002:a17:90a:9295:b0:202:582b:1765 with SMTP id n21-20020a17090a929500b00202582b1765mr16777561pjo.99.1662864657781;
+        Sat, 10 Sep 2022 19:50:57 -0700 (PDT)
 Received: from localhost ([192.55.55.56])
-        by smtp.gmail.com with ESMTPSA id mp17-20020a17090b191100b001f94d25bfabsm2683851pjb.28.2022.09.10.19.45.46
+        by smtp.gmail.com with ESMTPSA id x5-20020a628605000000b00540d75197f2sm2493486pfd.143.2022.09.10.19.50.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Sep 2022 19:45:46 -0700 (PDT)
-Date:   Sat, 10 Sep 2022 19:45:45 -0700
+        Sat, 10 Sep 2022 19:50:57 -0700 (PDT)
+Date:   Sat, 10 Sep 2022 19:50:56 -0700
 From:   Isaku Yamahata <isaku.yamahata@gmail.com>
 To:     Chao Gao <chao.gao@intel.com>
 Cc:     isaku.yamahata@intel.com, linux-kernel@vger.kernel.org,
@@ -63,16 +63,15 @@ Cc:     isaku.yamahata@intel.com, linux-kernel@vger.kernel.org,
         Daniel Lezcano <daniel.lezcano@linaro.org>,
         Huang Ying <ying.huang@intel.com>,
         Huacai Chen <chenhuacai@kernel.org>
-Subject: Re: [PATCH v4 12/26] KVM: x86: Move TSC fixup logic to KVM arch
- resume callback
-Message-ID: <20220911024545.GE699006@ls.amr.corp.intel.com>
+Subject: Re: [PATCH v4 13/26] KVM: Add arch hook when VM is added/deleted
+Message-ID: <20220911025056.GA873583@ls.amr.corp.intel.com>
 References: <cover.1662679124.git.isaku.yamahata@intel.com>
- <a01d2507055525529b1a9c116aa1eb81f4e20b2a.1662679124.git.isaku.yamahata@intel.com>
- <YxrTsE8iT6mTCZgg@gao-cwp>
+ <acc9a44a5626fa8d64690f3f6fcca6e85f6536cb.1662679124.git.isaku.yamahata@intel.com>
+ <YxrYRKeU/AfCVJFO@gao-cwp>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <YxrTsE8iT6mTCZgg@gao-cwp>
+In-Reply-To: <YxrYRKeU/AfCVJFO@gao-cwp>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -83,27 +82,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 09, 2022 at 01:48:32PM +0800,
+On Fri, Sep 09, 2022 at 02:08:04PM +0800,
 Chao Gao <chao.gao@intel.com> wrote:
 
-> On Thu, Sep 08, 2022 at 04:25:28PM -0700, isaku.yamahata@intel.com wrote:
-> >From: Isaku Yamahata <isaku.yamahata@intel.com>
-> >
-> >commit 0dd6a6edb012 ("KVM: Dont mark TSC unstable due to S4 suspend") made
-> >use of kvm_arch_hardware_enable() callback to detect that TSC goes backward
-> >due to S4 suspend.  It has to check it only when resuming from S4. Not
-> >every time virtualization hardware ennoblement.  Move the logic to
-> >kvm_arch_resume() callback.
+> >+static void kvm_del_vm(void)
+> >+{
+> >+	cpus_read_lock();
+> >+	mutex_lock(&kvm_lock);
+> >+	kvm_arch_del_vm(kvm_usage_count);
+> >+	mutex_unlock(&kvm_lock);
+> >+	cpus_read_unlock();
 > 
-> IIUC, kvm_arch_resume() is called on the first CPU waking up from suspension.
-> But the detection was done on every CPU. Is it a problem (i.e., we fail to
-> detect TSC goes backward on some CPUs)?
+> kvm_arch_del_vm() is an empty function now. I don't understand why
+> cpus_read_lock() is needed. Maybe add the lock when you fill up
+> kvm_arch_del_vm().
 
-The problem is, TSC fixup logic is only needed once on resuming.
-The current code calls TSC fixup logic on each cpu onlining.  It's quick
-plumbing the logic to each cpu online.  Although it won't harm to call the logic,
-it's ugly and this time is good occasion to clean it up.
-
-I will clarify the commit message.
+The next patch populates it with on_each_cpu(hardware_disable_nolock, NULL, 1);
+I will move adding lock to the next one. Or revise how adding arch hooks and
+populating part.
 -- 
 Isaku Yamahata <isaku.yamahata@gmail.com>
