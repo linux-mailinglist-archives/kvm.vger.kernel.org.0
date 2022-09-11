@@ -2,173 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 747A65B4AE1
-	for <lists+kvm@lfdr.de>; Sun, 11 Sep 2022 01:36:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E56435B4B50
+	for <lists+kvm@lfdr.de>; Sun, 11 Sep 2022 04:40:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229816AbiIJXf7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 10 Sep 2022 19:35:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60828 "EHLO
+        id S229622AbiIKCjw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Sep 2022 22:39:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229622AbiIJXf4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 10 Sep 2022 19:35:56 -0400
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam07on2080.outbound.protection.outlook.com [40.107.212.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7903837FBB;
-        Sat, 10 Sep 2022 16:35:55 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dDa4rYgLtST0kgXd+0vR3h6n7voYpGSzhfOo7G0xUsiBqRSIOhk2wO6nuBRCZSg0rL/gbaSVwrPF82z4ibI0pw0Koal4r7s708yr9ZY/Oh4i7HU9zYscPtZZSIUxsidWe8igxKLmlNJP43OuivY9HPwd+3m8P+M5doocOGWm7E7YUj3YBVricb+WrHENXoiBgidRrJWDAxyjhYMHxxWNp3ZT14FEGzIrOjH77YYkEBfoJrCXzLHAf1ss/XiN3sSE/WhJ861oreNG51ChUnM4S2Ow7dCfqpDaQFJN2b2yCtPYh4vv4NNMc7Nj90RwZGqnaxzT78ZCzN1RhV+peKnpRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IiiQ2fVCwucQ86iut+uJPfw8wrP+r+5D4oGRyrQQYdg=;
- b=D4oTpsruGKjz8AMsv75jebtmOvu/3mVSDWWt31tm1Q1/DqqRvwLXbdHBDAO2cwbybDzEtnwuS6C/I6zkaT4FTq+csVIUdUJoWvJMsfOQwcIBtNPEgL7TrqwPaQ7cuUW5UtoGw8/v/NE2Dxj9F97knGUZXfAkFoFq6G+qfrHuxbuAv1qwFAv9td2Ep8Im8NulGTSU1qV5NUzmHhkVLgYoeYonPpPdY/TorN2uWQSgOrDxI0A2xI6FLC5C/bkdQubf3fUPSRkyyKqSpaeGAEFgwnU+3u5NPPKvIc5UKjxhzRg5iT2Iui/lp9I5etkxkd0tESRnBLtyTVLJevpkTMwiqQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.238) smtp.rcpttodomain=marcan.st smtp.mailfrom=nvidia.com; dmarc=pass
- (p=reject sp=reject pct=100) action=none header.from=nvidia.com; dkim=none
- (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IiiQ2fVCwucQ86iut+uJPfw8wrP+r+5D4oGRyrQQYdg=;
- b=ZNcuzyU0ABh6ylZfCjzUHuaYbfVjqC1lk1x4lTSBkfqm9+Yx8va8/HKkCNxaTL3x7HAxE1U+Evk26PRrGimYf85ddxzW/HvKz0Qv3uLOkrvkSNMB/owp+Vrtv/p9dkQk3lMVsKDXyUsjOz7g1VMVdJcV8yiHQysSTCuoUBVhvP9kC8AnoAWATa/Or3NBiwigwMll3MIqFUBymhk0DV+4NphdL4t/zH+9desET29/5al9ASeC4LBsVXmOGBzg4BklYfJ3syJh3aHOicm6ayENGJyfPLt13rO4kuYgb+ahQwts68wsdzpJViNOpKITcLj48PEUqlIMvBXgeEqlwc57dA==
-Received: from DS7PR05CA0069.namprd05.prod.outlook.com (2603:10b6:8:57::21) by
- DM4PR12MB5987.namprd12.prod.outlook.com (2603:10b6:8:6a::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5588.18; Sat, 10 Sep 2022 23:35:53 +0000
-Received: from DM6NAM11FT061.eop-nam11.prod.protection.outlook.com
- (2603:10b6:8:57:cafe::84) by DS7PR05CA0069.outlook.office365.com
- (2603:10b6:8:57::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5632.6 via Frontend
- Transport; Sat, 10 Sep 2022 23:35:53 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.238)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.238 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.238; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (12.22.5.238) by
- DM6NAM11FT061.mail.protection.outlook.com (10.13.173.138) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.5612.13 via Frontend Transport; Sat, 10 Sep 2022 23:35:52 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- DRHQMAIL105.nvidia.com (10.27.9.14) with Microsoft SMTP Server (TLS) id
- 15.0.1497.38; Sat, 10 Sep 2022 23:35:51 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by
- drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.29; Sat, 10 Sep 2022 16:35:51 -0700
-Received: from Asurada-Nvidia (10.127.8.10) by mail.nvidia.com
- (10.126.190.182) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29 via Frontend
- Transport; Sat, 10 Sep 2022 16:35:49 -0700
-Date:   Sat, 10 Sep 2022 16:35:48 -0700
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     Robin Murphy <robin.murphy@arm.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-CC:     "will@kernel.org" <will@kernel.org>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>,
-        "marcan@marcan.st" <marcan@marcan.st>,
-        "sven@svenpeter.dev" <sven@svenpeter.dev>,
-        "alyssa@rosenzweig.io" <alyssa@rosenzweig.io>,
-        "robdclark@gmail.com" <robdclark@gmail.com>,
-        "dwmw2@infradead.org" <dwmw2@infradead.org>,
-        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "gerald.schaefer@linux.ibm.com" <gerald.schaefer@linux.ibm.com>,
-        "orsonzhai@gmail.com" <orsonzhai@gmail.com>,
-        "baolin.wang@linux.alibaba.com" <baolin.wang@linux.alibaba.com>,
-        "zhang.lyra@gmail.com" <zhang.lyra@gmail.com>,
-        "thierry.reding@gmail.com" <thierry.reding@gmail.com>,
-        "vdumpa@nvidia.com" <vdumpa@nvidia.com>,
-        "jonathanh@nvidia.com" <jonathanh@nvidia.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "thunder.leizhen@huawei.com" <thunder.leizhen@huawei.com>,
-        "christophe.jaillet@wanadoo.fr" <christophe.jaillet@wanadoo.fr>,
-        "yangyingliang@huawei.com" <yangyingliang@huawei.com>,
-        "jon@solid-run.com" <jon@solid-run.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "asahi@lists.linux.dev" <asahi@lists.linux.dev>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v6 1/5] iommu: Return -EMEDIUMTYPE for incompatible
- domain and device/group
-Message-ID: <Yx0fVJpaojM5RNR4@Asurada-Nvidia>
-References: <20220815181437.28127-1-nicolinc@nvidia.com>
- <20220815181437.28127-2-nicolinc@nvidia.com>
- <YxiRkm7qgQ4k+PIG@8bytes.org>
- <Yxig+zfA2Pr4vk6K@nvidia.com>
- <9f91f187-2767-13f9-68a2-a5458b888f00@arm.com>
- <YxjOPo5FFqu2vE/g@nvidia.com>
- <0b466705-3a17-1bbc-7ef2-5adadc22d1ae@arm.com>
- <Yxk6sR4JiAAn3Jf5@nvidia.com>
- <BN9PR11MB52763FAD3E7545CC26C0DE908C409@BN9PR11MB5276.namprd11.prod.outlook.com>
- <YxnbRq5vaP/OL0ra@nvidia.com>
+        with ESMTP id S229531AbiIKCjv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 10 Sep 2022 22:39:51 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83C1A1056A;
+        Sat, 10 Sep 2022 19:39:49 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id p1-20020a17090a2d8100b0020040a3f75eso5078232pjd.4;
+        Sat, 10 Sep 2022 19:39:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=UUuq/PLXlwBkLkLIfY/mJJB+6YLD1Vf243Iys/4Xjy0=;
+        b=Ih3iCDMRR8Mb+bnWvQUIqZ8SML690b4DBTYahWeQcG2vVfkOcAYtcWzuJYojGs5yzR
+         ytJvUM/WUNMGUqQ2P5PIHfcAtJxVo3L0KZPRtmZS6q75VPL7Uo4thSyEv3Au0a4V7D9M
+         NGr1m0xUQF65pH+z+MKS04QABI6BuV403/2UQK4XLzj9xvILEoxTmdMI5+k6a5QM1lgv
+         DAv/NbDhJHOuPriEg+AwsCRI50od9pSKwXx29ysDeTviF+t3u13JJgVeg+1lmqgUFZyF
+         LsIJBrQUNAXNyhVobm55vM4yYxcNOrOOB1IQxR/Bmhg7SBwLRrCt/A/LIBTCljzkrHdJ
+         AErw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=UUuq/PLXlwBkLkLIfY/mJJB+6YLD1Vf243Iys/4Xjy0=;
+        b=vNJDOmykunjJtymPRsUgeAEAKcea1tzNj4XNn/RReU2yerhAUzJbuZu55KHHINqdKC
+         EEzADpkHJTTe6lroL6bO44b4jJme4J29QHwCsLV8zQMz4f9g1NiMPLW9/O12vNp6UkCC
+         o4gMcfFv+WkTD0UJQ6aWz4riUlbgxFCRR+aaPdaSF9226+UlCpZewzVwX5VgAp29ZOZo
+         wX2hnKnjhfKZK2D3cvgJG/0s9fG0odAia1uStOXIhdx9AQZPhKQ+SmQ0a//yjL8Ucj2/
+         971PL9150MUFu2GoPCWRwZ/BQMFiLsFnVt0NQfNaJruhubT4ipjg1FCq+MA28ObsUezN
+         UMRg==
+X-Gm-Message-State: ACgBeo10Qhd/fO66SxMcbxPxpVoAa1SJ0kk5MqTrg7rnZthmWHDHbkqg
+        wWWtPMNQ7rTaNNiwqB/MIbzsGhWIBlYpQw==
+X-Google-Smtp-Source: AA6agR73oR4cY+tqiP/fhObQllrL4Gy4HTIsrnpq33pjpGixdQnO41ABodBF1+fFBFSsjreFo56Zww==
+X-Received: by 2002:a17:90a:e7d2:b0:202:8f4b:bf6b with SMTP id kb18-20020a17090ae7d200b002028f4bbf6bmr9970404pjb.195.1662863988846;
+        Sat, 10 Sep 2022 19:39:48 -0700 (PDT)
+Received: from localhost ([192.55.55.56])
+        by smtp.gmail.com with ESMTPSA id 38-20020a631666000000b0041d95d805d6sm2854968pgw.57.2022.09.10.19.39.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 10 Sep 2022 19:39:48 -0700 (PDT)
+Date:   Sat, 10 Sep 2022 19:39:45 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     isaku.yamahata@intel.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        Yuan Yao <yuan.yao@linux.intel.com>, isaku.yamahata@gmail.com,
+        Kai Huang <kai.huang@intel.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Shaokun Zhang <zhangshaokun@hisilicon.com>,
+        Qi Liu <liuqi115@huawei.com>,
+        John Garry <john.garry@huawei.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Huacai Chen <chenhuacai@kernel.org>
+Subject: Re: [PATCH v4 11/26] KVM: Add arch hooks for PM events with empty
+ stub
+Message-ID: <20220911023945.GD699006@ls.amr.corp.intel.com>
+References: <cover.1662679124.git.isaku.yamahata@intel.com>
+ <fa7ecd7305d011940121466f094a544c6de39ea3.1662679124.git.isaku.yamahata@intel.com>
+ <YxrCX2nhOyWbbGGY@gao-cwp>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <YxnbRq5vaP/OL0ra@nvidia.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT061:EE_|DM4PR12MB5987:EE_
-X-MS-Office365-Filtering-Correlation-Id: 553cbae4-07a3-4aa0-d405-08da93853357
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6/WahweSY5sdyGQRdT9z37i2UuQadHcBJxLw2LBACoyPIaatKXq8lF4zy2edv5MRddN1NB2n3vrGLLApxsZJMsBmy3kR+H3NSbaxwYB74s+VGDIJ+PD1VJ343we1IaZszEo+NHhefzprIM7w4ZUsx194GALzsmrx7vL2WXN8LKziML6ElIYxRTwsf515Z+QhgJxTKzEENflUz4XJehczg42d0/yzRbWUPXuja83xwVLZit+Iowa8CQA7j3PJWsigUxygQILuZq4emv0BOmef3GsVrETDXxR+ko5FTib4OryY0UJ/TB4bRkyHWSK+xcpXBYphIw56CObbDq9ZnKd8uVrmlVD6C5x82rdvofGKM+I5gz3FAzBUKFWzDflzFiqQKtqu4rOaccQ4JvKwMtLzAZdgKHLW8zuctDbsi3nB2Xphoe/fhGxzT5tMzsABTQid4zH3mlketz6XwgHFmi2WfB5/50XeW4XjR4/kFt9/n6Q8VFjIffDvO/wpnCxH1hzlPCJ7rhMjwOAFEVcpFCBQ6DcEszqgsiwysg54hgsvMUh0tx00DE3XTOJvnOxjBeg2VvXYNTxYPVLMMJdnmu/WoU2MZ4/FNCP4vWkP/aknwdGCOlAqS6+e85snE6PNV63BKG+sSIIZhH2G3nS78tYvIzbhPBn4VdFo1Tz9cUqgTEv8+gCAeVnKwIuB52Roxf7qim4D6ZCCWpxcHbf/DigPgB6aHNw6JuVBEXEWcdNwTm8qQQ9bzBZUMqnZhG/xOL3lS10sU7S2v7uIhzuyEb89BmuOn1/uTFuemLv2QO3Sn0eL/gmW4FP8kYz61EUDPkE/
-X-Forefront-Antispam-Report: CIP:12.22.5.238;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230016)(4636009)(39860400002)(396003)(346002)(376002)(136003)(36840700001)(46966006)(40470700004)(26005)(54906003)(478600001)(33716001)(6636002)(316002)(110136005)(40460700003)(9686003)(55016003)(40480700001)(8936002)(5660300002)(86362001)(7406005)(2906002)(82310400005)(7416002)(4744005)(70586007)(82740400003)(356005)(36860700001)(70206006)(4326008)(8676002)(83380400001)(426003)(81166007)(186003)(41300700001)(336012)(47076005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Sep 2022 23:35:52.6423
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 553cbae4-07a3-4aa0-d405-08da93853357
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.238];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT061.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5987
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <YxrCX2nhOyWbbGGY@gao-cwp>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 08, 2022 at 09:08:38AM -0300, Jason Gunthorpe wrote:
-> On Thu, Sep 08, 2022 at 09:30:57AM +0000, Tian, Kevin wrote:
+On Fri, Sep 09, 2022 at 12:34:39PM +0800,
+Chao Gao <chao.gao@intel.com> wrote:
 
-> > There are also cases where common kAPIs are called in the attach
-> > path which may return -EINVAL and random errno, e.g.:
+> On Thu, Sep 08, 2022 at 04:25:27PM -0700, isaku.yamahata@intel.com wrote:
+> >From: Isaku Yamahata <isaku.yamahata@intel.com>
+> >
+> >Add arch hooks for reboot, suspend, resume, and CPU-online/offline events
+> >with empty stub functions.
+> >
+> >Suggested-by: Sean Christopherson <seanjc@google.com>
+> >Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> >---
+> > include/linux/kvm_host.h |  6 +++++
+> > virt/kvm/Makefile.kvm    |  2 +-
+> > virt/kvm/kvm_arch.c      | 44 ++++++++++++++++++++++++++++++
+> > virt/kvm/kvm_main.c      | 58 +++++++++++++++++++++++++---------------
+> > 4 files changed, 88 insertions(+), 22 deletions(-)
+> > create mode 100644 virt/kvm/kvm_arch.c
+> >
+> >diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> >index eab352902de7..dd2a6d98d4de 100644
+> >--- a/include/linux/kvm_host.h
+> >+++ b/include/linux/kvm_host.h
+> >@@ -1448,6 +1448,12 @@ int kvm_arch_post_init_vm(struct kvm *kvm);
+> > void kvm_arch_pre_destroy_vm(struct kvm *kvm);
+> > int kvm_arch_create_vm_debugfs(struct kvm *kvm);
 > > 
-> > omap_iommu_attach_dev()
-> >   omap_iommu_attach()
-> >     iommu_enable()
-> >       pm_runtime_get_sync()
-> >         __pm_runtime_resume()
-> >           rpm_resume()
-> > 	if (dev->power.runtime_error) {
-> > 		retval = -EINVAL;
- 
-> Yes, this is was also on my mind with choosing an unpopular return
-> code, it has a higher chance of not coming out of some other kernel
-> API
+> >+int kvm_arch_suspend(int usage_count);
+> >+void kvm_arch_resume(int usage_count);
+> >+int kvm_arch_reboot(int val);
+> >+int kvm_arch_online_cpu(unsigned int cpu, int usage_count);
+> >+int kvm_arch_offline_cpu(unsigned int cpu, int usage_count);
+> 
+> Why not extract each of them with one separate patch?
 
-I wonder if it would be safe to just treat a pm_runtime_get_sync()
-failure as -ENODEV, since a PM resume() mostly occurs to the IOMMU
-that an IOMMU client/master device is behind, while an iommu_domain
-rarely intervenes.
+Do you mean one patch for each arch callback?  They are convoluted.
+See the comment below.
+
+
+> >diff --git a/virt/kvm/kvm_arch.c b/virt/kvm/kvm_arch.c
+> >new file mode 100644
+> >index 000000000000..4748a76bcb03
+> >--- /dev/null
+> >+++ b/virt/kvm/kvm_arch.c
+> >@@ -0,0 +1,44 @@
+> >+// SPDX-License-Identifier: GPL-2.0-only
+> >+/*
+> >+ * kvm_arch.c: kvm default arch hooks for hardware enabling/disabling
+> >+ * Copyright (c) 2022 Intel Corporation.
+> >+ *
+> >+ * Author:
+> >+ *   Isaku Yamahata <isaku.yamahata@intel.com>
+> >+ *                  <isaku.yamahata@gmail.com>
+> >+ */
+> >+
+> >+#include <linux/kvm_host.h>
+> >+
+> >+/*
+> >+ * Called after the VM is otherwise initialized, but just before adding it to
+> >+ * the vm_list.
+> >+ */
+> >+__weak int kvm_arch_post_init_vm(struct kvm *kvm)
+> >+{
+> >+	return 0;
+> >+}
+> 
+> use "int __weak" to comply with kernel's convension.
+
+Will fix.
+
+> > static int kvm_offline_cpu(unsigned int cpu)
+> > {
+> >+	int ret = 0;
+> >+
+> > 	mutex_lock(&kvm_lock);
+> > 	if (kvm_usage_count) {
+> > 		/*
+> >@@ -5069,10 +5067,15 @@ static int kvm_offline_cpu(unsigned int cpu)
+> > 		 */
+> > 		preempt_disable();
+> > 		hardware_disable_nolock(NULL);
+> >+		ret = kvm_arch_offline_cpu(cpu, kvm_usage_count);
+> >+		if (ret) {
+> >+			(void)hardware_enable_nolock(NULL);
+> >+			atomic_set(&hardware_enable_failed, 0);
+> 
+> The error-handling code ignores hardware enabling failure which looks
+> weird to me. If you extract kvm_arch_offline_cpu() directly like what
+> you do in patch 14 (rather than add a stub function first and then move
+> some code to the stub function), the error-handling code isn't needed.
+
+I did it for x86 tsc fix.  It relates to suspend/resume.  I would split those
+- introduce suspend/resuem/reboot arch hooks
+- fix x86 tsc issue
+- move
+- introduce cpu online/offline arch hooks
+- move out PM hooks. probably this can be combined into the previous one.
+
+
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
