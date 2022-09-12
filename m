@@ -2,66 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D9A775B5741
-	for <lists+kvm@lfdr.de>; Mon, 12 Sep 2022 11:37:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 869C65B58C9
+	for <lists+kvm@lfdr.de>; Mon, 12 Sep 2022 12:55:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229662AbiILJhG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Sep 2022 05:37:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57378 "EHLO
+        id S229872AbiILKy7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Sep 2022 06:54:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbiILJhF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Sep 2022 05:37:05 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9EAB3336D
-        for <kvm@vger.kernel.org>; Mon, 12 Sep 2022 02:37:03 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id q62-20020a17090a17c400b00202a3497516so5264203pja.1
-        for <kvm@vger.kernel.org>; Mon, 12 Sep 2022 02:37:03 -0700 (PDT)
+        with ESMTP id S229805AbiILKy5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Sep 2022 06:54:57 -0400
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4201CE080
+        for <kvm@vger.kernel.org>; Mon, 12 Sep 2022 03:54:54 -0700 (PDT)
+Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
+        id 4MR3QN3Yrxz4xZS; Mon, 12 Sep 2022 20:54:52 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=r0Jqf0b2ze0i2sJD/MFozANH+9lzPJ4MNqut+fAakn4=;
-        b=dg/ZXPkiNBHtMUxAY4rMoJnJWo86vXaHFQRNN9WKl/aKIQ/AKAazUqE6FBlb4SJCkf
-         TDU2sOriLDQTKKMkB8zg/W6thXrFoNUOPN6XWsdbC8ID0yk8vDEbxiJFGX+3tkeeTh6J
-         wv1q1VqOpf9TfejqeGbQOLyEm857lxLgXRfOVHQZbGnM4IYeWGMLKFLS2c64k+1E0KYO
-         JpGMYECvDtsVjyvdApW/ZonHr/b0m3RQ8Ca0+uni0mRZmShW7cuGhAfXAUSYLQ02G9Hb
-         xZQ83sAOeGBuzF7gwHCwrsBd11T8YN9EJNGli3263Op+Ix/nJtyu69gM8q+kHSOgo7u7
-         yeaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=r0Jqf0b2ze0i2sJD/MFozANH+9lzPJ4MNqut+fAakn4=;
-        b=r6asl3tMyspgs2tpqI9GdirXOYKqnj40i5/oIPh66KUHNaqXai81SF1jkZBxijzh5N
-         DNjOTJ3UiW1562MVWjvB4Veztff/n8rLbMHKzIifCW3BkUp6YDTnuxpwMy/wmyis96ME
-         bgTGiDwRYU3I+1FVDeldB4dmwAPKkT6BKhjnTCIpe1muNLKkgM8sOlWk4PfKywMS1OmV
-         AHejnpRGsthWVZCJ2cSxo1ibRYK5OCEZ5Gq0bI/oXLbeLB7nvBlDDN1yGhIz0anaw6FO
-         5eNhx0hSZJFGjfYxG8O8UdcpT+DyiHlch0OxBsZKNVi4RwB1F2/XYDGv1UuKy4xzA5lG
-         A/sQ==
-X-Gm-Message-State: ACgBeo07isETsOSKrzWbCB3yYw8u3wREbLOrcPrcIx6XNd2OV8qfh2wS
-        YtZLJ3hEehvEIDrMi5piYBrlsA==
-X-Google-Smtp-Source: AA6agR4VNTBZMJ84bGEX6gNS8FSFjFu7/mwCUz97Tdh6ba1M1DJawhtV7GYcBeq58N89uaPukF72qw==
-X-Received: by 2002:a17:90b:1c82:b0:1ee:eb41:b141 with SMTP id oo2-20020a17090b1c8200b001eeeb41b141mr23427481pjb.143.1662975423267;
-        Mon, 12 Sep 2022 02:37:03 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u127-20020a626085000000b0053e80618a23sm4958694pfb.34.2022.09.12.02.37.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Sep 2022 02:37:02 -0700 (PDT)
-Date:   Mon, 12 Sep 2022 09:36:58 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Alexey Kardashevskiy <aik@amd.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH kernel] KVM: SVM: Fix function name in comment
-Message-ID: <Yx79ugW49M3FT/Zp@google.com>
-References: <20220912075219.70379-1-aik@amd.com>
+        d=gibson.dropbear.id.au; s=201602; t=1662980092;
+        bh=Jqer9Lkx5kx3CTVFQbI1gse1o6FkM2vShOdKJKllDRs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=J1PHfLhprn9Dvc2eQQbdZzdKd8ggp3Imh3NAuTzQZyJ1gkQoegSgvwFJCCchMom+H
+         cZzeVJ0FIbEdyktCH9a8Zfko9DJRMmCgA0IuKEwFRyofdPLNXy16+BgRgKHvB3ih2B
+         zdjGiPfqzEOBAbB2KzS8Y1PtCzCl5T7dQ9cKcA58=
+Date:   Mon, 12 Sep 2022 20:40:20 +1000
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>, iommu@lists.linux.dev,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH RFC v2 02/13] iommufd: Overview documentation
+Message-ID: <Yx8MlOBPz1Zxig3V@yekko>
+References: <0-v2-f9436d0bde78+4bb-iommufd_jgg@nvidia.com>
+ <2-v2-f9436d0bde78+4bb-iommufd_jgg@nvidia.com>
+ <Yxf2Z+wVa8Os02Hp@yekko>
+ <YxuLaxIRNsQRmqI5@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="yTVklgu6xyo6tvgA"
 Content-Disposition: inline
-In-Reply-To: <20220912075219.70379-1-aik@amd.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+In-Reply-To: <YxuLaxIRNsQRmqI5@nvidia.com>
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,65 +65,96 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 12, 2022, Alexey Kardashevskiy wrote:
-> A recent renaming patch missed 1 spot, fix it.
-> 
-> This should cause no behavioural change.
-> 
-> Fixes: 23e5092b6e2a ("KVM: SVM: Rename hook implementations to conform to kvm_x86_ops' names")
-> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
-> ---
->  arch/x86/kvm/svm/sev.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 28064060413a..3b99a690b60d 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -3015,7 +3015,7 @@ void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa)
->  	/*
->  	 * As an SEV-ES guest, hardware will restore the host state on VMEXIT,
->  	 * of which one step is to perform a VMLOAD.  KVM performs the
-> -	 * corresponding VMSAVE in svm_prepare_guest_switch for both
-> +	 * corresponding VMSAVE in svm_prepare_switch_to_guest for both
->  	 * traditional and SEV-ES guests.
->  	 */
 
-Rather than match the rename, what about tweaking the wording to not tie the comment
-to the function name, e.g. "VMSAVE in common SVM code".
+--yTVklgu6xyo6tvgA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Even better, This would be a good opportunity to reword this comment to make it more
-clear why SEV-ES needs a hook, and to absorb the somewhat useless comments below.
+On Fri, Sep 09, 2022 at 03:52:27PM -0300, Jason Gunthorpe wrote:
+> On Wed, Sep 07, 2022 at 11:39:51AM +1000, David Gibson wrote:
+>=20
+> > > +expected to deprecate any proprietary IOMMU logic, if existing (e.g.
+> >=20
+> > I don't thing "propietary" is an accurate description.  Maybe
+> > "existing" or "bespoke?
+>=20
+> How about "internal"
 
-Would something like this be accurate?  Please modify and/or add details as necessary.
+>  These drivers are eventually expected to deprecate any internal IOMMU
+>  logic, if existing (e.g. vfio_iommu_type1.c).
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 3b99a690b60d..c50c6851aedb 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -3013,19 +3013,14 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm)
- void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa)
- {
-        /*
--        * As an SEV-ES guest, hardware will restore the host state on VMEXIT,
--        * of which one step is to perform a VMLOAD.  KVM performs the
--        * corresponding VMSAVE in svm_prepare_switch_to_guest for both
--        * traditional and SEV-ES guests.
-+        * Manually save host state that is automatically loaded by hardware on
-+        * VM-Exit from SEV-ES guests, but that is not saved by VMSAVE (which is
-+        * performed by common SVM code).  Hardware unconditionally restores
-+        * host state, and so KVM skips manually restoring this state in common
-+        * code.
-         */
--
--       /* XCR0 is restored on VMEXIT, save the current host value */
-        hostsa->xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
--
--       /* PKRU is restored on VMEXIT, save the current host value */
-        hostsa->pkru = read_pkru();
--
--       /* MSR_IA32_XSS is restored on VMEXIT, save the currnet host value */
-        hostsa->xss = host_xss;
- }
- 
+That works.
 
+> > > +All user-visible objects are destroyed via the IOMMU_DESTROY uAPI.
+> > > +
+> > > +Linkage between user-visible objects and external kernel datastructu=
+res are
+> > > +reflected by dotted line arrows below, with numbers referring to cer=
+tain
+> >=20
+> > I'm a little bit confused by the reference to "dotted line arrows": I
+> > only see one arrow style in the diagram.
+>=20
+> I think this means all the "dashed lines with arrows"
+>=20
+> How about "by the directed lines below"
+
+Or simply "reflected by arrows below".
+
+> > > +The iopt_pages is the center of the storage and motion of PFNs. Each=
+ iopt_pages
+> > > +represents a logical linear array of full PFNs. PFNs are stored in a=
+ tiered
+> > > +scheme:
+> > > +
+> > > + 1) iopt_pages::pinned_pfns xarray
+> > > + 2) An iommu_domain
+> > > + 3) The origin of the PFNs, i.e. the userspace pointer
+> >=20
+> > I can't follow what this "tiered scheme" is describing.
+>=20
+> Hum, I'm not sure how to address this.
+>=20
+> Is this better?
+>=20
+>  1) PFNs that have been "software accessed" stored in theiopt_pages::pinn=
+ed_pfns
+>     xarray
+>  2) PFNs stored inside the IOPTEs accessed through an iommu_domain
+>  3) The origin of the PFNs, i.e. the userspace VA in a mm_struct
+
+Hmm.. only slightly.  What about:
+
+   Each opt_pages represents a logical linear array of full PFNs.  The
+   PFNs are ultimately derived from userspave VAs via an mm_struct.
+   They are cached in .. <describe the pined_pfns and iommu_domain
+   data structures>
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--yTVklgu6xyo6tvgA
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEoULxWu4/Ws0dB+XtgypY4gEwYSIFAmMfDI0ACgkQgypY4gEw
+YSJWyhAAyUb6FKzQMARiSUOon4QtVcnRZZ9t5d/Gcx6z9K4iUZByk2zbMBm4UCzp
+jbkAm5fVHdydwr5F65IphEcgpowqsy2Cz0STnWvoAGmWqSk6oel1OOXk4FggOUu4
+EJjP4S0VeMMbVdHQoE4SWOjnD1J5ILeFCIzeOK+40QIJuRmJMFWKczgkRz/vajLj
+yj8UWk/ccys8moSZyHIgZ977X1Y0J9l9G3Asg2AMchRLTzqGcemj+YV4Yfp4W9gA
+iQEQwRw62wkbgzC2V9dVIOF9Zli4GmmzQGikeRZnp/TZeWf9U5cQy9lqJG4H1n5r
+XkyNn1bjC0H/Yv6XRWDiYdLCqLurfXfcnwUK7rWbOkdjTaxTNOflLvj1WCC56+n5
+8B5AUcXVBsNgO16YGOb28btGBpLPVOFKnytv7QmE3AMam/y2Avfhv+wjIT80XIKK
+LvrFdOzjqTeDJohodefGtg+cavVGHjugl0C25dp/6HlznswgIUWNXC7cS06CI3B6
+YPrkN1IOgPfbObYS8Vyk/9DOMVqynZXSfozADHqNuBhx8W6PsGydBhTQIKGgukR4
++Iq4yzqdEB0uiuvUtIOGygyzpx8PVdqYLqJiGitbwuOYLMYnHNniNa0S8DtX5G1C
+83rN86teIVu9eJdv7Dn7ilAaCvdJUz66b3WxVf9KNtxJWZxhJHs=
+=lklv
+-----END PGP SIGNATURE-----
+
+--yTVklgu6xyo6tvgA--
