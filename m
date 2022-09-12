@@ -2,171 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 05A4C5B55AA
-	for <lists+kvm@lfdr.de>; Mon, 12 Sep 2022 10:03:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D9A775B5741
+	for <lists+kvm@lfdr.de>; Mon, 12 Sep 2022 11:37:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229925AbiILIDV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Sep 2022 04:03:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35012 "EHLO
+        id S229662AbiILJhG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Sep 2022 05:37:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbiILIDT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Sep 2022 04:03:19 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF5181F601;
-        Mon, 12 Sep 2022 01:03:18 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28C7g1pX030101;
-        Mon, 12 Sep 2022 08:03:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=cogpfbnj15ADP59OSMPVgLh4mCeiMTcqFNIAp5CsxfU=;
- b=kNKY+8H6VfFIOmstN572JZ7d++Al24EW1SJGN/Ze/ojkSTxUE17JQILZ1UHzAeqfLj12
- flZt2X1vH1PadkVMxn+Use3iK4E/q5aE20QcqEWyXskmG5ui5FulVHH8OqWzHtLj4iQc
- 4y9S7x8DqTS5hwfQn6tfPslbweFKerj+qt04PSpr99fLHPAq1YbSA6fsJbr8fT37Bh63
- 5u/zg52/0xQgPPmR7KOjxgP27h2pb6iYBv2iZbwcwHuGj2TNMdNkEjOagbz2UtcdLVmz
- tOXejs1kqxc/ABpw0n2C191iz4yP7iiI0nYg9ngdWbFnIOMjUsGomvxPw3C7UXtK0DdU eA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jj0kv8hw3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Sep 2022 08:03:18 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28C7goS9032045;
-        Mon, 12 Sep 2022 08:03:17 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jj0kv8huk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Sep 2022 08:03:17 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 28C7ojDT018285;
-        Mon, 12 Sep 2022 08:03:15 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04fra.de.ibm.com with ESMTP id 3jgj78sh63-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Sep 2022 08:03:15 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 28C83Co340501686
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 12 Sep 2022 08:03:12 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 053C142049;
-        Mon, 12 Sep 2022 08:03:12 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DC51F42045;
-        Mon, 12 Sep 2022 08:03:08 +0000 (GMT)
-Received: from [9.171.83.92] (unknown [9.171.83.92])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 12 Sep 2022 08:03:08 +0000 (GMT)
-Message-ID: <6daf3aa9-5b91-1948-0c43-b8407fe3bea2@linux.ibm.com>
-Date:   Mon, 12 Sep 2022 10:03:07 +0200
+        with ESMTP id S229536AbiILJhF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Sep 2022 05:37:05 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9EAB3336D
+        for <kvm@vger.kernel.org>; Mon, 12 Sep 2022 02:37:03 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id q62-20020a17090a17c400b00202a3497516so5264203pja.1
+        for <kvm@vger.kernel.org>; Mon, 12 Sep 2022 02:37:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=r0Jqf0b2ze0i2sJD/MFozANH+9lzPJ4MNqut+fAakn4=;
+        b=dg/ZXPkiNBHtMUxAY4rMoJnJWo86vXaHFQRNN9WKl/aKIQ/AKAazUqE6FBlb4SJCkf
+         TDU2sOriLDQTKKMkB8zg/W6thXrFoNUOPN6XWsdbC8ID0yk8vDEbxiJFGX+3tkeeTh6J
+         wv1q1VqOpf9TfejqeGbQOLyEm857lxLgXRfOVHQZbGnM4IYeWGMLKFLS2c64k+1E0KYO
+         JpGMYECvDtsVjyvdApW/ZonHr/b0m3RQ8Ca0+uni0mRZmShW7cuGhAfXAUSYLQ02G9Hb
+         xZQ83sAOeGBuzF7gwHCwrsBd11T8YN9EJNGli3263Op+Ix/nJtyu69gM8q+kHSOgo7u7
+         yeaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=r0Jqf0b2ze0i2sJD/MFozANH+9lzPJ4MNqut+fAakn4=;
+        b=r6asl3tMyspgs2tpqI9GdirXOYKqnj40i5/oIPh66KUHNaqXai81SF1jkZBxijzh5N
+         DNjOTJ3UiW1562MVWjvB4Veztff/n8rLbMHKzIifCW3BkUp6YDTnuxpwMy/wmyis96ME
+         bgTGiDwRYU3I+1FVDeldB4dmwAPKkT6BKhjnTCIpe1muNLKkgM8sOlWk4PfKywMS1OmV
+         AHejnpRGsthWVZCJ2cSxo1ibRYK5OCEZ5Gq0bI/oXLbeLB7nvBlDDN1yGhIz0anaw6FO
+         5eNhx0hSZJFGjfYxG8O8UdcpT+DyiHlch0OxBsZKNVi4RwB1F2/XYDGv1UuKy4xzA5lG
+         A/sQ==
+X-Gm-Message-State: ACgBeo07isETsOSKrzWbCB3yYw8u3wREbLOrcPrcIx6XNd2OV8qfh2wS
+        YtZLJ3hEehvEIDrMi5piYBrlsA==
+X-Google-Smtp-Source: AA6agR4VNTBZMJ84bGEX6gNS8FSFjFu7/mwCUz97Tdh6ba1M1DJawhtV7GYcBeq58N89uaPukF72qw==
+X-Received: by 2002:a17:90b:1c82:b0:1ee:eb41:b141 with SMTP id oo2-20020a17090b1c8200b001eeeb41b141mr23427481pjb.143.1662975423267;
+        Mon, 12 Sep 2022 02:37:03 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id u127-20020a626085000000b0053e80618a23sm4958694pfb.34.2022.09.12.02.37.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Sep 2022 02:37:02 -0700 (PDT)
+Date:   Mon, 12 Sep 2022 09:36:58 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Alexey Kardashevskiy <aik@amd.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH kernel] KVM: SVM: Fix function name in comment
+Message-ID: <Yx79ugW49M3FT/Zp@google.com>
+References: <20220912075219.70379-1-aik@amd.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH] KVM: s390: vsie: fix crycb virtual vs physical usage
-Content-Language: en-US
-To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, svens@linux.ibm.com
-References: <20220905084148.234821-1-pmorel@linux.ibm.com>
- <08c54ddd-b74e-9f6c-f5eb-13e994530ad6@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <08c54ddd-b74e-9f6c-f5eb-13e994530ad6@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 5NAw5mHnshwRO9qS7uVaAY2aKd9j0Fpn
-X-Proofpoint-ORIG-GUID: EQiTKXhFLZNzWf5DnUPiY-F1xjFHvjEh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-12_04,2022-09-09_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- spamscore=0 mlxlogscore=999 mlxscore=0 phishscore=0 impostorscore=0
- clxscore=1015 suspectscore=0 lowpriorityscore=0 priorityscore=1501
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2209120027
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220912075219.70379-1-aik@amd.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Sep 12, 2022, Alexey Kardashevskiy wrote:
+> A recent renaming patch missed 1 spot, fix it.
+> 
+> This should cause no behavioural change.
+> 
+> Fixes: 23e5092b6e2a ("KVM: SVM: Rename hook implementations to conform to kvm_x86_ops' names")
+> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+> ---
+>  arch/x86/kvm/svm/sev.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 28064060413a..3b99a690b60d 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -3015,7 +3015,7 @@ void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa)
+>  	/*
+>  	 * As an SEV-ES guest, hardware will restore the host state on VMEXIT,
+>  	 * of which one step is to perform a VMLOAD.  KVM performs the
+> -	 * corresponding VMSAVE in svm_prepare_guest_switch for both
+> +	 * corresponding VMSAVE in svm_prepare_switch_to_guest for both
+>  	 * traditional and SEV-ES guests.
+>  	 */
 
-Hi David,
+Rather than match the rename, what about tweaking the wording to not tie the comment
+to the function name, e.g. "VMSAVE in common SVM code".
 
-sorry for the delay, just came back from vacation.
+Even better, This would be a good opportunity to reword this comment to make it more
+clear why SEV-ES needs a hook, and to absorb the somewhat useless comments below.
 
-On 9/5/22 18:32, David Hildenbrand wrote:
-> On 05.09.22 10:41, Pierre Morel wrote:
->> Prepare VSIE for architectural changes where lowmem kernel real and
->> kernel virtual address are different.
-> 
-> Bear with me, it used to be
-> 
->      crycb = (struct kvm_s390_crypto_cb *) (unsigned long)crycb_o;
->      apcb_o = (unsigned long) &crycb->apcb0;
-> 
-> and now it's
-> 
->      apcb_o = crycb_o + offsetof(struct kvm_s390_crypto_cb, apcb0);
-> 
-> 
-> So the real issue seems to be
-> 
->      crycb = (struct kvm_s390_crypto_cb *) (unsigned long)crycb_o;
-> 
-> because crycb_o actually is a guest address and not a host address.
+Would something like this be accurate?  Please modify and/or add details as necessary.
 
-Yes, right this is the real issue, however...
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 3b99a690b60d..c50c6851aedb 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -3013,19 +3013,14 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm)
+ void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa)
+ {
+        /*
+-        * As an SEV-ES guest, hardware will restore the host state on VMEXIT,
+-        * of which one step is to perform a VMLOAD.  KVM performs the
+-        * corresponding VMSAVE in svm_prepare_switch_to_guest for both
+-        * traditional and SEV-ES guests.
++        * Manually save host state that is automatically loaded by hardware on
++        * VM-Exit from SEV-ES guests, but that is not saved by VMSAVE (which is
++        * performed by common SVM code).  Hardware unconditionally restores
++        * host state, and so KVM skips manually restoring this state in common
++        * code.
+         */
+-
+-       /* XCR0 is restored on VMEXIT, save the current host value */
+        hostsa->xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
+-
+-       /* PKRU is restored on VMEXIT, save the current host value */
+        hostsa->pkru = read_pkru();
+-
+-       /* MSR_IA32_XSS is restored on VMEXIT, save the currnet host value */
+        hostsa->xss = host_xss;
+ }
+ 
 
-> 
-> 
-> But now I'm confused, because I would have thought that the result 
-> produced by both code would be identical (I completely agree that the 
-> new variant is better).
-> 
-> How does this interact with "lowmem kernel real and kernel virtual 
-> address are different." -- I would have thought that &crycb->apcb0 
-> doesn't actually access any memory and only performs arithmetical 
-> operations?
-
-...you are right and the result is identical.
-
-
-> 
->>
->> When we get the original crycb from the guest crycb we can use the
->> phys_to_virt transformation, which will use the host transformations,
->> but we must use an offset to calculate the guest real address apcb
->> and give it to read_guest_real().
-> 
-> Can you elaborate where phys_to_virt() comes into play?
-
-No, it does not have to do with phys_to_virt(), I first started to work 
-on the line:
-- crycb = (struct kvm_s390_crypto_cb *) (unsigned long)crycb_o;
-
-and did not notice that after the simplifications the result was identical.
-So The comment is wrong and this patch is only making the code clearer.
-
-Thanks for your clarifications,
-
-Regards,
-Pierre
-
-
-> 
-> If this is an actual fix (as indicated in the patch subject), should 
-> this carry a
-> 
->      Fixes: 56019f9aca22 ("KVM: s390: vsie: Allow CRYCB FORMAT-2")
-> 
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
