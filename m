@@ -2,66 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E3A6B5B61F8
-	for <lists+kvm@lfdr.de>; Mon, 12 Sep 2022 21:58:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 717D45B62FF
+	for <lists+kvm@lfdr.de>; Mon, 12 Sep 2022 23:47:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229553AbiILT66 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Sep 2022 15:58:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53050 "EHLO
+        id S229994AbiILVrZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Sep 2022 17:47:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229698AbiILT6z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Sep 2022 15:58:55 -0400
-Received: from mail-io1-xd49.google.com (mail-io1-xd49.google.com [IPv6:2607:f8b0:4864:20::d49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F72476D8
-        for <kvm@vger.kernel.org>; Mon, 12 Sep 2022 12:58:54 -0700 (PDT)
-Received: by mail-io1-xd49.google.com with SMTP id i14-20020a5d934e000000b006892db5bcd4so6194869ioo.22
-        for <kvm@vger.kernel.org>; Mon, 12 Sep 2022 12:58:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date;
-        bh=gxBeRa2VjQQW/muLHdmZltqewhqJks5GzmP5Kl8OFNk=;
-        b=AfM/BHiqIVltm1RG/McIYJ/69vf1yTwL+texDN/60IrqHt48kB5ucZXQ+f7qo6dlhV
-         WyH/HxGN6FXqkdhqt/wn4Bk1imii/eSWbKaunDzTxGKt/09WaOhA94zuQNShj/3CrWRE
-         2UjNOxtVT1tSyIOPwVYBSi4XnUaL7VUwO/sjQRpbqaQB+9QD4pgDFRlwy6ioEJeFG1f+
-         CwHCAHtQ8lkwv1PuDDW4SdAO39D8waGYmkwaBocaxfwN7c/2EO7mWtUOoU1Xafj/zMPr
-         NtFGP8IJNdFhLCgp3oEI8Tg09o48PNoUvd2tbR7DVipruPOWcmEYgl9etzqENHhP3u4E
-         AL/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date;
-        bh=gxBeRa2VjQQW/muLHdmZltqewhqJks5GzmP5Kl8OFNk=;
-        b=umCUpFywOHj6gYOmHsM8kaoDWQD1hQVfbfbP81+ATqdrmlC/psff4397pvx1zuod//
-         rWe5f0AtRyQkHoqohDwdH1m28+1ExAjSgJW6xTMHn5VFoXajJj+qOX2p+wX2yU3e/qNX
-         xq9v0AxGGBTDIRQobpvi/NEJdCppJ2XTMjMhPRRUW50mxpsgmBHQAfhl1dVovB3a2/fj
-         7cMH5yYybJ8FOassvMpSWXkGQoQTY4rtPEvU24gYIJ3qcqx4iI2velbkMt8+IXcoGmHx
-         Feccp22WXe0v83Zty5P1ttZYwN80WSADt3E/mlWsVoETrT8lrKAQKxbtyOQMvVmJB4tH
-         ZCrw==
-X-Gm-Message-State: ACgBeo2F+RC0rQyT3wBso6UfFZ+RuJoy5tEAMB08xckJbeaUM3LD1yzn
-        LJQfevFvzBhU6cOrSAv80R/IKQTerH4AmqQRY8yd5P49RKVdgxrpykcPo/Ke9rt1Vubok/DbKQa
-        NmPCoZkJkkFUHGeOs4P8uhPE4jdSvQ+hZvznvLLKVJtv5OGbWTWxD7gigGCAoiaEvCsMs1FM=
-X-Google-Smtp-Source: AA6agR6iuH1XffI4lsNEcm+QiHZDtLOukN28JbwgZS/L5SiShfvBigS4bKdz0I04WbBh7eIvqzl9PFWIr6uNN52hLw==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6638:2388:b0:34a:e033:396b with
- SMTP id q8-20020a056638238800b0034ae033396bmr14107350jat.93.1663012734297;
- Mon, 12 Sep 2022 12:58:54 -0700 (PDT)
-Date:   Mon, 12 Sep 2022 19:58:49 +0000
-In-Reply-To: <20220912195849.3989707-1-coltonlewis@google.com>
-Mime-Version: 1.0
-References: <20220912195849.3989707-1-coltonlewis@google.com>
-X-Mailer: git-send-email 2.37.2.789.g6183377224-goog
-Message-ID: <20220912195849.3989707-4-coltonlewis@google.com>
-Subject: [PATCH v6 3/3] KVM: selftests: randomize page access order
-From:   Colton Lewis <coltonlewis@google.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, maz@kernel.org, dmatlack@google.com,
-        seanjc@google.com, oupton@google.com, ricarkol@google.com,
-        andrew.jones@linux.dev, Colton Lewis <coltonlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+        with ESMTP id S229777AbiILVrC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Sep 2022 17:47:02 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2055.outbound.protection.outlook.com [40.107.237.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79C074D838;
+        Mon, 12 Sep 2022 14:47:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oNOc0W4fe118Lq+qjNp3CFCPF9OQWg6R7dSojfG3My06nHsIxuS402XfhPc/G4YITns94EDBaUdd9IUspVmgOOPoNgIolWyPcW7wCrp3jvcoddKYt/xD45SpI3dDdXO1jpx0TLnLNLVk+gmW3sJK2BKg6XgQd0cK1exzLqBRB1/Jh1/RRhazyz70saYBIs0DqhAAGLlL8lyr4BJ9UxmeGiUHyUiWAZ/0KPYnLBcZwhFCZre0K1bMcpz5oHNXPi8YPajVwe48dgAf40zE7tYfOLouyG1oNOxysnWCz+Oy01tljW0ubFaBRhCvJgYmAMq3SKxcjVidGnXHdvvh2g/9cw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VM7E2ybbJYvJwT/it1c1P4gBvYGJJvYoQ2yKVw6Mp90=;
+ b=G5kemSnGv5rjjoogFg672/HFGirFYDhmE9d4i3Y/m2Wcgba5ReyCTPGZ0RyDSXHwHdKMdH4yEV+3zYPj7nCmh/QkiFJbWd3uPcPZNxdltUz9PJgLR7VPmdPUEBUOJwuRiKSRpOfr5KtZLNlOlf96PMyeBAOFNfWjvJtMvf2yTapnT2egyBZulX8OuFnsMAJdq+bhBvnrL28ujzFXeiresSzmC7vesO2HeEM4eQ+HdbFjPuSz3/Ndee9pEaSwIijnN39SEDu+m4nEnD6k9PHZCsiwOHYBdX5xgwuaGo6SL0s4/hR2uPbO2mI4do8NCK6IxWlP1dABMKgCcPb/6vPIDQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VM7E2ybbJYvJwT/it1c1P4gBvYGJJvYoQ2yKVw6Mp90=;
+ b=yXcdBfT3xYUZ4bTFCD0l6Yt70bn4JxquERCiB+WYpHYqCMenpKJbbCJdZdOOo+EfO/+D4YcIo7NoO/dyy+1LjmyV2YeP8whhDvia33QkPuf/3dH4IzNloLiV94OWiQYQtLzyVaTF614tI+0dVzVITKkKGN/8Nb8RNDGy+5pCaTQ=
+Received: from DM6PR11CA0014.namprd11.prod.outlook.com (2603:10b6:5:190::27)
+ by CH0PR12MB5025.namprd12.prod.outlook.com (2603:10b6:610:d5::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5612.14; Mon, 12 Sep
+ 2022 21:46:56 +0000
+Received: from DM6NAM11FT055.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:190:cafe::dc) by DM6PR11CA0014.outlook.office365.com
+ (2603:10b6:5:190::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5612.12 via Frontend
+ Transport; Mon, 12 Sep 2022 21:46:56 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT055.mail.protection.outlook.com (10.13.173.103) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5612.13 via Frontend Transport; Mon, 12 Sep 2022 21:46:56 +0000
+Received: from ruby-95f9host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Mon, 12 Sep
+ 2022 16:46:55 -0500
+From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
+CC:     <pbonzini@redhat.com>, <jon.grimm@amd.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH] KVM: SVM: Fix x2apic logical cluster mode decoding and sanity check
+Date:   Mon, 12 Sep 2022 16:46:32 -0500
+Message-ID: <20220912214632.14880-1-suravee.suthikulpanit@amd.com>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT055:EE_|CH0PR12MB5025:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4c817b3d-944f-4cce-7a35-08da9508504a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: OTGAB31oymUecwdVfget/hK4JBGuC/ef/y1kIxJXmFH72xUbt/132eUCA5aCypRowXqa5sZ8hApk+Toq/5DlIunomNrXbt7WF/4JWt2NmAQv+GY3BYtm4tUeWHlMYi8UfVPwTuuCEnsRbkaI9+uXvc1m9rSAIdsc/PEjoHGtSpPRUx4Q+OvNJsDtHVWARjcUygmBYTDCiZ3fZlmcoGYVnOB4QqLlxrsZVOsjwx9y5LwrIr1Xt18vFgsPZqRs+GGSlzQCa6d36qpOrcUF6kl7gXwKlitsTOMj1bJY/SsYz5bKvYHbXQdlJRLVAh2Me+e9Jzomppk7cQ5h5sgYpPq1v5W9JNxULcK8Edp7UFBBpEAnNKGZmtQ+1dbvBZDSsjchSfWcMuK6rKA1tw8/7ix2Ww+gpMpBpLWBO230jD3CGgA+dj4KiMNApQzbNq5foOGxOGddeLovANdYo1aY8vwz8Fyj+f/t9uEZwAJQAzN/3rYUvXoxV0K+MrbhLaRUw12K/rhzmwcxJ1u8uh5df8ngYg/FTNDD9NnwSR61mXH4vxzkdp6+qBfdwmUXxDlwUj0rbE0brxXjMYW+wDW6TZHn4Orqbr8GtQrerVz/X1kN8iTMxhHe8EHTt6nhhu9igph2xkNkIc7Htr6is901vsQTIIYRqo5HT7BbMwCbHUKFtGOkxYKp1JoZe68dSus/wMJyOtV8SgA3uh66+cg593nEWLzQECOOl1puPkK3CnCSxKTCUKWD7x+/4SCJYoXOOKWnoiZI2AmsS3zqNKmccDgJpPqTeMbftt4ivS53jfwj6kbmtkSv6KKoLTUDIEX8B0+1
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(396003)(136003)(39860400002)(376002)(346002)(451199015)(40470700004)(36840700001)(46966006)(6666004)(41300700001)(5660300002)(54906003)(70586007)(8676002)(70206006)(4326008)(2616005)(186003)(1076003)(86362001)(47076005)(82310400005)(426003)(16526019)(2906002)(8936002)(82740400003)(316002)(36860700001)(478600001)(36756003)(44832011)(7696005)(356005)(110136005)(40480700001)(26005)(83380400001)(81166007)(40460700003)(336012)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2022 21:46:56.4744
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4c817b3d-944f-4cce-7a35-08da9508504a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT055.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5025
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,140 +97,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Create the ability to randomize page access order with the -a
-argument. This includes the possibility that the same pages may be hit
-multiple times during an iteration or not at all.
+When sending IPI in the X2APIC logical cluster mode, the destination
+APIC ID is encoded as:
 
-Population has random access as false to ensure all pages will be
-touched by population and avoid page faults in late dirty memory that
-would pollute the test results.
+  * Cluster ID = ICRH[31:16]
+  * Logical ID = ICRH[15:0]
 
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
+Current logic incorrectly decode the ICRH, which causes VM running
+with x2AVIC support to fail to boot. Therefore, fix the decoding logic.
+
+The commit 603ccef42ce9 ("KVM: x86: SVM: fix avic_kick_target_vcpus_fast")
+also added a check for multiple logical destinations before using
+the fast-path. However, the same logic is already existed prior to
+the commit. Therefore, remove redundant checking logic.
+
+Fixes: 603ccef42ce9 ("KVM: x86: SVM: fix avic_kick_target_vcpus_fast")
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 ---
- .../selftests/kvm/dirty_log_perf_test.c       | 11 +++++++++--
- .../selftests/kvm/include/perf_test_util.h    |  2 ++
- .../selftests/kvm/lib/perf_test_util.c        | 19 ++++++++++++++++++-
- 3 files changed, 29 insertions(+), 3 deletions(-)
+ arch/x86/kvm/svm/avic.c | 19 ++++---------------
+ 1 file changed, 4 insertions(+), 15 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index dfa5957332b1..ccc1f571645a 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -127,6 +127,7 @@ struct test_params {
- 	int slots;
- 	uint32_t write_percent;
- 	uint32_t random_seed;
-+	bool random_access;
- };
+diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+index 6919dee69f18..45ab49d1f0b8 100644
+--- a/arch/x86/kvm/svm/avic.c
++++ b/arch/x86/kvm/svm/avic.c
+@@ -378,8 +378,8 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
  
- static void toggle_dirty_logging(struct kvm_vm *vm, int slots, bool enable)
-@@ -256,6 +257,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	 * would pollute the performance results.
- 	 */
- 	perf_test_set_write_percent(vm, 100);
-+	perf_test_set_random_access(vm, false);
- 	perf_test_start_vcpu_threads(nr_vcpus, vcpu_worker);
+ 		if (apic_x2apic_mode(source)) {
+ 			/* 16 bit dest mask, 16 bit cluster id */
+-			bitmap = dest & 0xFFFF0000;
+-			cluster = (dest >> 16) << 4;
++			bitmap = dest & 0xffff;
++			cluster = (dest & 0xffff0000) >> 16;
+ 		} else if (kvm_lapic_get_reg(source, APIC_DFR) == APIC_DFR_FLAT) {
+ 			/* 8 bit dest mask*/
+ 			bitmap = dest;
+@@ -387,7 +387,7 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
+ 		} else {
+ 			/* 4 bit desk mask, 4 bit cluster id */
+ 			bitmap = dest & 0xF;
+-			cluster = (dest >> 4) << 2;
++			cluster = (dest & 0xf0) >> 4;
+ 		}
  
- 	/* Allow the vCPUs to populate memory */
-@@ -278,6 +280,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 		ts_diff.tv_sec, ts_diff.tv_nsec);
+ 		if (unlikely(!bitmap))
+@@ -420,18 +420,7 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
+ 			 * For x2APIC logical mode, cannot leverage the index.
+ 			 * Instead, calculate physical ID from logical ID in ICRH.
+ 			 */
+-			int cluster = (icrh & 0xffff0000) >> 16;
+-			int apic = ffs(icrh & 0xffff) - 1;
+-
+-			/*
+-			 * If the x2APIC logical ID sub-field (i.e. icrh[15:0])
+-			 * contains anything but a single bit, we cannot use the
+-			 * fast path, because it is limited to a single vCPU.
+-			 */
+-			if (apic < 0 || icrh != (1 << apic))
+-				return -EINVAL;
+-
+-			l1_physical_id = (cluster << 4) + apic;
++			l1_physical_id = (cluster << 4) + (ffs(bitmap) - 1);
+ 		}
+ 	}
  
- 	perf_test_set_write_percent(vm, p->write_percent);
-+	perf_test_set_random_access(vm, p->random_access);
- 
- 	while (iteration < p->iterations) {
- 		/*
-@@ -349,10 +352,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- static void help(char *name)
- {
- 	puts("");
--	printf("usage: %s [-h] [-i iterations] [-p offset] [-g] "
-+	printf("usage: %s [-h] [-a] [-i iterations] [-p offset] [-g] "
- 	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-r random seed ] [-s mem type]"
- 	       "[-x memslots] [-w percentage]\n", name);
- 	puts("");
-+	printf(" -a: access memory randomly rather than in order.\n");
- 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
- 	       TEST_HOST_LOOP_N);
- 	printf(" -g: Do not enable KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2. This\n"
-@@ -403,8 +407,11 @@ int main(int argc, char *argv[])
- 
- 	guest_modes_append_default();
- 
--	while ((opt = getopt(argc, argv, "ghi:p:m:nb:v:or:s:x:w:")) != -1) {
-+	while ((opt = getopt(argc, argv, "aghi:p:m:nb:v:or:s:x:w:")) != -1) {
- 		switch (opt) {
-+		case 'a':
-+			p.random_access = true;
-+			break;
- 		case 'g':
- 			dirty_log_manual_caps = 0;
- 			break;
-diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-index f93f2ea7c6a3..d9664a31e01c 100644
---- a/tools/testing/selftests/kvm/include/perf_test_util.h
-+++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-@@ -39,6 +39,7 @@ struct perf_test_args {
- 
- 	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
- 	bool nested;
-+	bool random_access;
- 
- 	struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
- };
-@@ -53,6 +54,7 @@ void perf_test_destroy_vm(struct kvm_vm *vm);
- 
- void perf_test_set_write_percent(struct kvm_vm *vm, uint32_t write_percent);
- void perf_test_set_random_seed(struct kvm_vm *vm, uint32_t random_seed);
-+void perf_test_set_random_access(struct kvm_vm *vm, bool random_access);
- 
- void perf_test_start_vcpu_threads(int vcpus, void (*vcpu_fn)(struct perf_test_vcpu_args *));
- void perf_test_join_vcpu_threads(int vcpus);
-diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-index 9effd229b75d..6b196d003491 100644
---- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-+++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-@@ -46,6 +46,7 @@ void perf_test_guest_code(uint32_t vcpu_id)
- 	struct perf_test_vcpu_args *vcpu_args = &pta->vcpu_args[vcpu_id];
- 	uint64_t gva;
- 	uint64_t pages;
-+	uint64_t addr;
- 	int i;
- 	uint32_t rand = pta->random_seed + vcpu_id;
- 
-@@ -57,7 +58,17 @@ void perf_test_guest_code(uint32_t vcpu_id)
- 
- 	while (true) {
- 		for (i = 0; i < pages; i++) {
--			uint64_t addr = gva + (i * pta->guest_page_size);
-+			guest_random(&rand);
-+
-+			if (pta->random_access)
-+				addr = gva + ((rand % pages) * pta->guest_page_size);
-+			else
-+				addr = gva + (i * pta->guest_page_size);
-+
-+			/*
-+			 * Use a new random number here so read/write
-+			 * is not tied to the address used.
-+			 */
- 			guest_random(&rand);
- 
- 			if (rand % 100 < pta->write_percent)
-@@ -232,6 +243,12 @@ void perf_test_set_random_seed(struct kvm_vm *vm, uint32_t random_seed)
- 	sync_global_to_guest(vm, perf_test_args.random_seed);
- }
- 
-+void perf_test_set_random_access(struct kvm_vm *vm, bool random_access)
-+{
-+	perf_test_args.random_access = random_access;
-+	sync_global_to_guest(vm, perf_test_args.random_access);
-+}
-+
- uint64_t __weak perf_test_nested_pages(int nr_vcpus)
- {
- 	return 0;
 -- 
-2.37.2.789.g6183377224-goog
+2.34.1
 
