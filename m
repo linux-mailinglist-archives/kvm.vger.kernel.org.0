@@ -2,211 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F05595B5C57
-	for <lists+kvm@lfdr.de>; Mon, 12 Sep 2022 16:38:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 725695B5CE8
+	for <lists+kvm@lfdr.de>; Mon, 12 Sep 2022 17:07:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230202AbiILOiW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Sep 2022 10:38:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45508 "EHLO
+        id S229932AbiILPHO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Sep 2022 11:07:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229514AbiILOiT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Sep 2022 10:38:19 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85CBB2ED7B
-        for <kvm@vger.kernel.org>; Mon, 12 Sep 2022 07:38:18 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28CDsPm8003295;
-        Mon, 12 Sep 2022 14:38:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=eevU3m18bHpE3ha0pkMlGWzBztH6zEsSaYRdAuR8Vng=;
- b=NHIYxoypCL4KoGGGEPuoy37HsJUkKd/ftqH0vnkj91TF0xQ6gHbBfVg5lhIppEjDXeVe
- hxizkb4ysCeyxxyzdNdxeAMGGnKTrzMQvTc7xOMx8KkvTpFUg7YTxnGPupqVNjsR9o16
- /9DRUKJxF9Ul9vChvtHRl1/XrRsxeVbYdNkfIxr8YqkgBf5yPAGfUgZx1UEsq5ykThLZ
- L/TWSKLQkeIysIBUxxDSE32A0uSIx9bl9aOBq9MacDYPMLS6sSg+HkqNBNhcPAeBqxxM
- z0u776lZFSSlsHRb7OkvIZalHSwr898lZUmxVUEcsm+MMYHYHzFNx83bu/gapbFY/XdD yg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jj625heua-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Sep 2022 14:38:10 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28CDsuAH004879;
-        Mon, 12 Sep 2022 14:38:09 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jj625hesm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Sep 2022 14:38:09 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 28CEaU3v028857;
-        Mon, 12 Sep 2022 14:38:07 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 3jgj79thee-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Sep 2022 14:38:07 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 28CEYMpP18219450
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 12 Sep 2022 14:34:22 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CAC58A404D;
-        Mon, 12 Sep 2022 14:38:03 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 159E8A4055;
-        Mon, 12 Sep 2022 14:38:03 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.22.70])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 12 Sep 2022 14:38:03 +0000 (GMT)
-Message-ID: <d8fbb30bbc8dc3d5d512fbeac257c38effbe1dc2.camel@linux.ibm.com>
-Subject: Re: [PATCH v9 00/10] s390x: CPU Topology
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
-Date:   Mon, 12 Sep 2022 16:38:02 +0200
-In-Reply-To: <20220902075531.188916-1-pmorel@linux.ibm.com>
-References: <20220902075531.188916-1-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: HIKMAUZdXLVDT-N2D6_64Mta2c8Z-VZr
-X-Proofpoint-ORIG-GUID: 1OBtJPaPDU_NMKcrFeWzloaY7mW43Y02
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-12_10,2022-09-12_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- phishscore=0 spamscore=0 clxscore=1015 suspectscore=0 adultscore=0
- priorityscore=1501 malwarescore=0 impostorscore=0 mlxlogscore=999
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2207270000 definitions=main-2209120049
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229889AbiILPHK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Sep 2022 11:07:10 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85CA51AF20;
+        Mon, 12 Sep 2022 08:07:08 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D0B38B80DBE;
+        Mon, 12 Sep 2022 15:07:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84992C433D6;
+        Mon, 12 Sep 2022 15:07:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662995225;
+        bh=Rg7NLMuwouiEh43/lwL7/797vz3AXVpAGDi9DAV/nXk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Qm7KKsKsfKnft9z+m8x2ba258/rcheKKGMsbvPHtcAMw1sRZkUxSTUQcW/jW4d70U
+         l2vnJG/MyS/AqmGmo2OCqn4Am8OIE2yY7k51XtMykXJP0SeDWgUb5mBX8JVVb4NWr3
+         4owBowB0tbm0pEpyVMgGUBqQ2KL+fKi3lhanUx9GOwI0tjtvmPmWkTxpFeOwh6/do3
+         nS5fItI2EGs4FmsoASmDgL5WqmGJ88Z2JeZxeE724PoPw+2sa/Ndqu9BlFjkmcjIav
+         nyqzwmHW2/bWFgNFR+fvG6xfweXYHyiYxyG4p8s7CkcEpGS1Z+zdlmCj/zJPzylPqy
+         2yCAnpIJ/W+xQ==
+Received: from [89.101.193.71] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oXl1b-009ic4-7f;
+        Mon, 12 Sep 2022 16:07:03 +0100
+Date:   Mon, 12 Sep 2022 16:07:02 +0100
+Message-ID: <877d28ocmh.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     isaku.yamahata@intel.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Will Deacon <will@kernel.org>,
+        Yuan Yao <yuan.yao@linux.intel.com>, isaku.yamahata@gmail.com,
+        Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Shaokun Zhang <zhangshaokun@hisilicon.com>,
+        Qi Liu <liuqi115@huawei.com>,
+        John Garry <john.garry@huawei.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Huacai Chen <chenhuacai@kernel.org>
+Subject: Re: [PATCH v4 06/26] KVM: arm64: Simplify the CPUHP logic
+In-Reply-To: <2b74ba0aa514e3e86c4513d12614664002996067.1662679124.git.isaku.yamahata@intel.com>
+References: <cover.1662679124.git.isaku.yamahata@intel.com>
+        <2b74ba0aa514e3e86c4513d12614664002996067.1662679124.git.isaku.yamahata@intel.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 89.101.193.71
+X-SA-Exim-Rcpt-To: isaku.yamahata@intel.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com, will@kernel.org, yuan.yao@linux.intel.com, isaku.yamahata@gmail.com, kai.huang@intel.com, chao.gao@intel.com, atishp@atishpatra.org, zhangshaokun@hisilicon.com, liuqi115@huawei.com, john.garry@huawei.com, daniel.lezcano@linaro.org, ying.huang@intel.com, chenhuacai@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I found this version much easier to understand than the previous one.
+On Fri, 09 Sep 2022 00:25:22 +0100,
+isaku.yamahata@intel.com wrote:
+> 
+> From: Marc Zyngier <maz@kernel.org>
+> 
+> For a number of historical reasons, the KVM/arm64 hotplug setup is pretty
+> complicated, and we have two extra CPUHP notifiers for vGIC and timers.
+> 
+> It looks pretty pointless, and gets in the way of further changes.
+> So let's just expose some helpers that can be called from the core
+> CPUHP callback, and get rid of everything else.
+> 
+> This gives us the opportunity to drop a useless notifier entry,
+> as well as tidy-up the timer enable/disable, which was a bit odd.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> Link: https://lore.kernel.org/r/20220216031528.92558-5-chao.gao@intel.com
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 
-You could consider splitting up the series into two.
-One that introduces support for STSI, PTF, migration, etc.
-And a second one that adds support for the maximum-MNist facility and
-drawers and books.
+Since this patch is substantially different from the version pointed
+to on the list, please drop Chao's SoB and the Link: tag, as they are
+not relevant anymore.
 
-This would also make bisecting a bit nicer because it moves the feature
-enablement closer to the commits adding the support.
+Thanks,
 
-Right now, with this series, the topology is static and cannot change.
-Most of the value of making the topology visible to the guest is for it
-to mirror reality, and a static topology is a hindrance for that.
-I'm completely fine with having a static topology as a stepping stone
-to a dynamic one.
-However I think we should have a rough plan or maybe even a prototype
-for how we turn a static into a dynamic topology before we merge this
-series in order to avoid designing us into a corner.
-What do you think?
+	M.
 
-On Fri, 2022-09-02 at 09:55 +0200, Pierre Morel wrote:
-> Hi,
-> 
-> The implementation of the CPU Topology in QEMU has been drastically
-> modified since the last patch series and the number of LOCs has been
-> greatly reduced.
-> 
-> Unnecessary objects have been removed, only a single S390Topology object
-> is created to support migration and reset.
-> 
-> Also a documentation has been added to the series.
-> 
-> 
-> To use these patches, you will need Linux V6-rc1 or newer.
-> 
-> Mainline patches needed are:
-> 
-> f5ecfee94493 2022-07-20 KVM: s390: resetting the Topology-Change-Report    
-> 24fe0195bc19 2022-07-20 KVM: s390: guest support for topology function     
-> 0130337ec45b 2022-07-20 KVM: s390: Cleanup ipte lock access and SIIF fac.. 
-> 
-> Currently this code is for KVM only, I have no idea if it is interesting
-> to provide a TCG patch. If ever it will be done in another series.
-> 
-> To have a better understanding of the S390x CPU Topology and its
-> implementation in QEMU you can have a look at the documentation in the
-> last patch.
-> 
-> New in this series
-> ==================
-> 
->   s390x/cpus: Make absence of multithreading clear
-> 
-> This patch makes clear that CPU-multithreading is not supported in
-> the guest.
-> 
->   s390x/cpu topology: core_id sets s390x CPU topology
-> 
-> This patch uses the core_id to build the container topology
-> and the placement of the CPU inside the container.
-> 
->   s390x/cpu topology: reporting the CPU topology to the guest
-> 
-> This patch is based on the fact that the CPU type for guests
-> is always IFL, CPUs are always dedicated and the polarity is
-> always horizontal.
-> This may change in the future.
-> 
->   hw/core: introducing drawer and books for s390x
->   s390x/cpu: reporting drawers and books topology to the guest
-> 
-> These two patches extend the topology handling to add two
-> new containers levels above sockets: books and drawers.
-> 
-> The subject of the last patches is clear enough (I hope).
-> 
-> Regards,
-> Pierre
-> 
-> Pierre Morel (10):
->   s390x/cpus: Make absence of multithreading clear
->   s390x/cpu topology: core_id sets s390x CPU topology
->   s390x/cpu topology: reporting the CPU topology to the guest
->   hw/core: introducing drawer and books for s390x
->   s390x/cpu: reporting drawers and books topology to the guest
->   s390x/cpu_topology: resetting the Topology-Change-Report
->   s390x/cpu_topology: CPU topology migration
->   target/s390x: interception of PTF instruction
->   s390x/cpu_topology: activating CPU topology
->   docs/s390x: document s390x cpu topology
-> 
->  docs/system/s390x/cpu_topology.rst |  88 +++++++++
->  hw/core/machine-smp.c              |  48 ++++-
->  hw/core/machine.c                  |   9 +
->  hw/s390x/cpu-topology.c            | 293 +++++++++++++++++++++++++++++
->  hw/s390x/meson.build               |   1 +
->  hw/s390x/s390-virtio-ccw.c         |  61 +++++-
->  include/hw/boards.h                |  11 ++
->  include/hw/s390x/cpu-topology.h    |  53 ++++++
->  include/hw/s390x/s390-virtio-ccw.h |   7 +
->  qapi/machine.json                  |  14 +-
->  qemu-options.hx                    |   6 +-
->  softmmu/vl.c                       |   6 +
->  target/s390x/cpu-sysemu.c          |  15 ++
->  target/s390x/cpu.h                 |  51 +++++
->  target/s390x/cpu_topology.c        | 150 +++++++++++++++
->  target/s390x/kvm/kvm.c             |  56 +++++-
->  target/s390x/kvm/kvm_s390x.h       |   1 +
->  target/s390x/meson.build           |   1 +
->  18 files changed, 858 insertions(+), 13 deletions(-)
->  create mode 100644 docs/system/s390x/cpu_topology.rst
->  create mode 100644 hw/s390x/cpu-topology.c
->  create mode 100644 include/hw/s390x/cpu-topology.h
->  create mode 100644 target/s390x/cpu_topology.c
-> 
-
+-- 
+Without deviation from the norm, progress is not possible.
