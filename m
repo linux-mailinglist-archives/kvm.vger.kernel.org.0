@@ -2,169 +2,211 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 803D25B5C35
-	for <lists+kvm@lfdr.de>; Mon, 12 Sep 2022 16:29:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F05595B5C57
+	for <lists+kvm@lfdr.de>; Mon, 12 Sep 2022 16:38:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230177AbiILO3v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Sep 2022 10:29:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34560 "EHLO
+        id S230202AbiILOiW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Sep 2022 10:38:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229931AbiILO3r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Sep 2022 10:29:47 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C23906154
-        for <kvm@vger.kernel.org>; Mon, 12 Sep 2022 07:29:43 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id m3so8262626pjo.1
-        for <kvm@vger.kernel.org>; Mon, 12 Sep 2022 07:29:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=GFheNGVqLERZhSYCSZk/aU+ENoKVQ3v9+pQbZTcslEY=;
-        b=exu7ea6b5fYdoPyhBfsq0X2/RyFa0nkTMBzKAhu/TECnWWoAiZHfnnwLAwMv3264+V
-         fXHM3vi4u+FYXFDPi8lgH79yRErt5ZSm0OjEyIk4DTUOGRATDN4ye/pFZ0hOBeGwQMm+
-         W/8jR6Hn+qX+5SqgaVqIG29xbM0agMOTL1bJnT6lT2WXBzCyq/aQvqNns0j1ZNrv5Aqk
-         cZNf41l4yXFpBVe8FuZpCTTUZr0uicnZK4kOofuiYwoL7b5OBsNOiuLq6l2cZ2VKMUKz
-         E3xq9TfZ8xigxuNDAJ6vqCOa67m63/y47yzeWjZcxhPF1Csy5kfCGmBsHaF1fKg4xohQ
-         OHiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=GFheNGVqLERZhSYCSZk/aU+ENoKVQ3v9+pQbZTcslEY=;
-        b=6mKHx/CGQ3JMaECGb41tGiUNz/hw1iC0GPDoW6JAKzIawzsn3bVt3ilWceJgazZz6l
-         Z1r2jkNcoMn/bNLv00yVy7+wNcDNUT6xbL7lY7LbSMUBJh4j8avRVq+NtUj5YxmdQ2TS
-         wnFn3FyYQhwssmR5jEG4leiZygossF4M4bT2TO2hxvvxgk7rstLG8tqFQOQ1nSzVejjK
-         19Q+omP8GWu1h9jhnPUwTRmlSmrCKhfNzzof0OmTZW2ec+GrtYmPJuaHJsWxT5imWCKj
-         gFxWh053Kglbc4p+un/DyEkUKzOsntyh9aNqMkrGfW+14rysyMBbEgdt1KU3XCk9mR/p
-         InlQ==
-X-Gm-Message-State: ACgBeo3XQGQkcZ+acXTxom1l/2CjHXggUCow4fg3vCaSP6woiKzD2oVU
-        B+k9rPyA6btqe/L48vJ5qchyXA==
-X-Google-Smtp-Source: AA6agR5eQXImfKaiccrP3GiMD3RTxMTyGKrsX6U7ojJdLRpLHqDclHPP5oVBbofCP8Qq/PcjRB6U6A==
-X-Received: by 2002:a17:902:7d83:b0:170:9353:f299 with SMTP id a3-20020a1709027d8300b001709353f299mr26584625plm.41.1662992982931;
-        Mon, 12 Sep 2022 07:29:42 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id t23-20020a635f17000000b0042b5095b7b4sm5758510pgb.5.2022.09.12.07.29.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Sep 2022 07:29:42 -0700 (PDT)
-Date:   Mon, 12 Sep 2022 14:29:39 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] KVM: selftests: Test Hyper-V invariant TSC control
-Message-ID: <Yx9CU++TkHZwVfEs@google.com>
-References: <20220831085009.1627523-1-vkuznets@redhat.com>
- <20220831085009.1627523-4-vkuznets@redhat.com>
+        with ESMTP id S229514AbiILOiT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Sep 2022 10:38:19 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85CBB2ED7B
+        for <kvm@vger.kernel.org>; Mon, 12 Sep 2022 07:38:18 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28CDsPm8003295;
+        Mon, 12 Sep 2022 14:38:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=eevU3m18bHpE3ha0pkMlGWzBztH6zEsSaYRdAuR8Vng=;
+ b=NHIYxoypCL4KoGGGEPuoy37HsJUkKd/ftqH0vnkj91TF0xQ6gHbBfVg5lhIppEjDXeVe
+ hxizkb4ysCeyxxyzdNdxeAMGGnKTrzMQvTc7xOMx8KkvTpFUg7YTxnGPupqVNjsR9o16
+ /9DRUKJxF9Ul9vChvtHRl1/XrRsxeVbYdNkfIxr8YqkgBf5yPAGfUgZx1UEsq5ykThLZ
+ L/TWSKLQkeIysIBUxxDSE32A0uSIx9bl9aOBq9MacDYPMLS6sSg+HkqNBNhcPAeBqxxM
+ z0u776lZFSSlsHRb7OkvIZalHSwr898lZUmxVUEcsm+MMYHYHzFNx83bu/gapbFY/XdD yg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jj625heua-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Sep 2022 14:38:10 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28CDsuAH004879;
+        Mon, 12 Sep 2022 14:38:09 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jj625hesm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Sep 2022 14:38:09 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 28CEaU3v028857;
+        Mon, 12 Sep 2022 14:38:07 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04ams.nl.ibm.com with ESMTP id 3jgj79thee-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Sep 2022 14:38:07 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 28CEYMpP18219450
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 12 Sep 2022 14:34:22 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CAC58A404D;
+        Mon, 12 Sep 2022 14:38:03 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 159E8A4055;
+        Mon, 12 Sep 2022 14:38:03 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.22.70])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 12 Sep 2022 14:38:03 +0000 (GMT)
+Message-ID: <d8fbb30bbc8dc3d5d512fbeac257c38effbe1dc2.camel@linux.ibm.com>
+Subject: Re: [PATCH v9 00/10] s390x: CPU Topology
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
+Date:   Mon, 12 Sep 2022 16:38:02 +0200
+In-Reply-To: <20220902075531.188916-1-pmorel@linux.ibm.com>
+References: <20220902075531.188916-1-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220831085009.1627523-4-vkuznets@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: HIKMAUZdXLVDT-N2D6_64Mta2c8Z-VZr
+X-Proofpoint-ORIG-GUID: 1OBtJPaPDU_NMKcrFeWzloaY7mW43Y02
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-09-12_10,2022-09-12_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ phishscore=0 spamscore=0 clxscore=1015 suspectscore=0 adultscore=0
+ priorityscore=1501 malwarescore=0 impostorscore=0 mlxlogscore=999
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2207270000 definitions=main-2209120049
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 31, 2022, Vitaly Kuznetsov wrote:
-> Add a test for the newly introduced Hyper-V invariant TSC control feature:
-> - HV_X64_MSR_TSC_INVARIANT_CONTROL is not available without
->  HV_ACCESS_TSC_INVARIANT CPUID bit set and available with it.
-> - BIT(0) of HV_X64_MSR_TSC_INVARIANT_CONTROL controls the filtering of
-> architectural invariant TSC (CPUID.80000007H:EDX[8]) bit.
+I found this version much easier to understand than the previous one.
+
+You could consider splitting up the series into two.
+One that introduces support for STSI, PTF, migration, etc.
+And a second one that adds support for the maximum-MNist facility and
+drawers and books.
+
+This would also make bisecting a bit nicer because it moves the feature
+enablement closer to the commits adding the support.
+
+Right now, with this series, the topology is static and cannot change.
+Most of the value of making the topology visible to the guest is for it
+to mirror reality, and a static topology is a hindrance for that.
+I'm completely fine with having a static topology as a stepping stone
+to a dynamic one.
+However I think we should have a rough plan or maybe even a prototype
+for how we turn a static into a dynamic topology before we merge this
+series in order to avoid designing us into a corner.
+What do you think?
+
+On Fri, 2022-09-02 at 09:55 +0200, Pierre Morel wrote:
+> Hi,
 > 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  .../selftests/kvm/x86_64/hyperv_features.c    | 67 +++++++++++++++++++
->  1 file changed, 67 insertions(+)
+> The implementation of the CPU Topology in QEMU has been drastically
+> modified since the last patch series and the number of LOCs has been
+> greatly reduced.
 > 
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> index 4ec4776662a4..26e8c5f7677e 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> @@ -15,6 +15,9 @@
->  
->  #define LINUX_OS_ID ((u64)0x8100 << 48)
->  
-> +/* CPUID.80000007H:EDX */
-> +#define X86_FEATURE_INVTSC (1 << 8)
-> +
->  static inline uint8_t hypercall(u64 control, vm_vaddr_t input_address,
->  				vm_vaddr_t output_address, uint64_t *hv_status)
->  {
-> @@ -60,6 +63,24 @@ static void guest_msr(struct msr_data *msr)
->  		GUEST_ASSERT_2(!vector, msr->idx, vector);
->  	else
->  		GUEST_ASSERT_2(vector == GP_VECTOR, msr->idx, vector);
-> +
-> +	/* Invariant TSC bit appears when TSC invariant control MSR is written to */
-> +	if (msr->idx == HV_X64_MSR_TSC_INVARIANT_CONTROL) {
-> +		u32 eax, ebx, ecx, edx;
-> +
-> +		cpuid(0x80000007, &eax, &ebx, &ecx, &edx);
+> Unnecessary objects have been removed, only a single S390Topology object
+> is created to support migration and reset.
+> 
+> Also a documentation has been added to the series.
+> 
+> 
+> To use these patches, you will need Linux V6-rc1 or newer.
+> 
+> Mainline patches needed are:
+> 
+> f5ecfee94493 2022-07-20 KVM: s390: resetting the Topology-Change-Report    
+> 24fe0195bc19 2022-07-20 KVM: s390: guest support for topology function     
+> 0130337ec45b 2022-07-20 KVM: s390: Cleanup ipte lock access and SIIF fac.. 
+> 
+> Currently this code is for KVM only, I have no idea if it is interesting
+> to provide a TCG patch. If ever it will be done in another series.
+> 
+> To have a better understanding of the S390x CPU Topology and its
+> implementation in QEMU you can have a look at the documentation in the
+> last patch.
+> 
+> New in this series
+> ==================
+> 
+>   s390x/cpus: Make absence of multithreading clear
+> 
+> This patch makes clear that CPU-multithreading is not supported in
+> the guest.
+> 
+>   s390x/cpu topology: core_id sets s390x CPU topology
+> 
+> This patch uses the core_id to build the container topology
+> and the placement of the CPU inside the container.
+> 
+>   s390x/cpu topology: reporting the CPU topology to the guest
+> 
+> This patch is based on the fact that the CPU type for guests
+> is always IFL, CPUs are always dedicated and the polarity is
+> always horizontal.
+> This may change in the future.
+> 
+>   hw/core: introducing drawer and books for s390x
+>   s390x/cpu: reporting drawers and books topology to the guest
+> 
+> These two patches extend the topology handling to add two
+> new containers levels above sockets: books and drawers.
+> 
+> The subject of the last patches is clear enough (I hope).
+> 
+> Regards,
+> Pierre
+> 
+> Pierre Morel (10):
+>   s390x/cpus: Make absence of multithreading clear
+>   s390x/cpu topology: core_id sets s390x CPU topology
+>   s390x/cpu topology: reporting the CPU topology to the guest
+>   hw/core: introducing drawer and books for s390x
+>   s390x/cpu: reporting drawers and books topology to the guest
+>   s390x/cpu_topology: resetting the Topology-Change-Report
+>   s390x/cpu_topology: CPU topology migration
+>   target/s390x: interception of PTF instruction
+>   s390x/cpu_topology: activating CPU topology
+>   docs/s390x: document s390x cpu topology
+> 
+>  docs/system/s390x/cpu_topology.rst |  88 +++++++++
+>  hw/core/machine-smp.c              |  48 ++++-
+>  hw/core/machine.c                  |   9 +
+>  hw/s390x/cpu-topology.c            | 293 +++++++++++++++++++++++++++++
+>  hw/s390x/meson.build               |   1 +
+>  hw/s390x/s390-virtio-ccw.c         |  61 +++++-
+>  include/hw/boards.h                |  11 ++
+>  include/hw/s390x/cpu-topology.h    |  53 ++++++
+>  include/hw/s390x/s390-virtio-ccw.h |   7 +
+>  qapi/machine.json                  |  14 +-
+>  qemu-options.hx                    |   6 +-
+>  softmmu/vl.c                       |   6 +
+>  target/s390x/cpu-sysemu.c          |  15 ++
+>  target/s390x/cpu.h                 |  51 +++++
+>  target/s390x/cpu_topology.c        | 150 +++++++++++++++
+>  target/s390x/kvm/kvm.c             |  56 +++++-
+>  target/s390x/kvm/kvm_s390x.h       |   1 +
+>  target/s390x/meson.build           |   1 +
+>  18 files changed, 858 insertions(+), 13 deletions(-)
+>  create mode 100644 docs/system/s390x/cpu_topology.rst
+>  create mode 100644 hw/s390x/cpu-topology.c
+>  create mode 100644 include/hw/s390x/cpu-topology.h
+>  create mode 100644 target/s390x/cpu_topology.c
+> 
 
-Add a proper kvm_x86_cpu_feature so that this is simply
-
-		this_cpu_has(X86_FEATURE_INVTSC)
-
-> +
-> +		/*
-> +		 * TSC invariant bit is present without the feature (legacy) or
-> +		 * when the feature is present and enabled.
-> +		 */
-> +		if ((!msr->should_not_gp && !msr->write) || (msr->write && msr->write_val == 1))
-
-Relying purely on the inputs is rather nasty as it creates a subtle dependency
-on the "write 1" testcase coming last.  This function already reads the guest
-MSR value, just use that to check if INVTSC should be enabled.  And if we want
-to verify KVM "wrote" the correct value, then that can be done in the common
-path.
-
-And I think that will make this code self-documenting, e.g.
-
-	if (msr->idx == HV_X64_MSR_TSC_INVARIANT_CONTROL)
-		GUEST_ASSERT(this_cpu_has(X86_FEATURE_INVTSC) ==
-			     !!(msr_val & ...));
-
-> +			GUEST_ASSERT(edx & X86_FEATURE_INVTSC);
-> +		else
-> +			GUEST_ASSERT(!(edx & X86_FEATURE_INVTSC));
-> +	}
-> +
-> +
->  	GUEST_DONE();
->  }
->  
-> @@ -104,6 +125,15 @@ static void vcpu_reset_hv_cpuid(struct kvm_vcpu *vcpu)
->  	vcpu_clear_cpuid_entry(vcpu, HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES);
->  }
->  
-> +static bool guest_has_invtsc(void)
-> +{
-> +	const struct kvm_cpuid_entry2 *cpuid;
-> +
-> +	cpuid = kvm_get_supported_cpuid_entry(0x80000007);
-> +
-> +	return cpuid->edx & X86_FEATURE_INVTSC;
-> +}
-> +
->  static void guest_test_msrs_access(void)
->  {
->  	struct kvm_cpuid2 *prev_cpuid = NULL;
-> @@ -115,6 +145,7 @@ static void guest_test_msrs_access(void)
->  	int stage = 0;
->  	vm_vaddr_t msr_gva;
->  	struct msr_data *msr;
-> +	bool has_invtsc = guest_has_invtsc();
-
-Huh, I never added vcpu_has_cpuid_feature()?  Can you add that instead of
-open-coding the check?
