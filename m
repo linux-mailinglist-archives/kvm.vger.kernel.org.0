@@ -2,124 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C49C5B7D86
-	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 01:32:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D4C355B7DA1
+	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 01:42:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229459AbiIMXcM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Sep 2022 19:32:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50170 "EHLO
+        id S229783AbiIMXm3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Sep 2022 19:42:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229569AbiIMXcK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Sep 2022 19:32:10 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2040.outbound.protection.outlook.com [40.107.92.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 037C871BD9;
-        Tue, 13 Sep 2022 16:32:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Az7YWwFXsk0lvfzsqTJrXJqO1lI5nwt0iMwmW/yvl8RsAhCcXark1OWhy1kzBWn7VdxorOnCoRb8qkjprxBd2NpGJtwNwhkqEcskA87weNMxdO9TgCCSx0G/1vhzM+mReRcqfHScUEZMHyXGEU3liG/p4Hlsv2Quaph5Onei3mU7T+Eyu/BW5wQ+uRyQiTxe0CWRALicn9Ol9Btykorb1HkItLi/O0rpqi3fN6b2waSGvjO7B2NKXjAax35RFXwbPuPc5abwAfOUO+xVDE5rYv8SFf/DrUIh+j+t0Tq7xjpf1e0HdjmnP1GfqVRmaKQ9aYTOQfR2Ufg7Ih/3zCYKdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gq92rLT0ZEkvsc80t+Dbr36p6yXkSdXrNnryuDLAoXc=;
- b=QAriD0QHEZ1HXRlSr1OM3kVs0/eORx6gm6VwI37JWylK5AnChlgofN9po673u1ydpOs9ij+PrSaYKXdvJSBz4SoiDJRg6h8BoC/0tOmg1Ri5dpGk3jOU2TNaSGxnA/Os1EmeeVl7PgcpUKPtE8H2IDe7qXcMzFSGeKWDaUgFKbuzCtROoJDV6Ea8Ui3D8Iq64hCU1A0rQrrAFspuhonoWniD4uhWVjF1FSav1V4l5OFCuQiA8VKMvNBKc/640KsSmMNDbr4OedS8WdlVgEjz2T0xx9lIHvqRJKM0l+q1A3DVfHuyn1S4pjLUPvjqiYcqoyOXmepveh1plzYTvOjo5A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gq92rLT0ZEkvsc80t+Dbr36p6yXkSdXrNnryuDLAoXc=;
- b=g0jsK6J3XE49NzEVx+6iNEFfzNZhEwSHe6djRz7dLLHsgUH+HAswodSGEojPVoU6B7Ry5mlPG/DU0NyOwMtesCamsZS+F7UrfKvpGlnoTQqs6Rw51i9hz3jgMRyfky0iY4k5ooJLr1eEU74BDmPCX0XBuj3X0Ti0P3xSRO8JhtU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) by
- SA1PR12MB6821.namprd12.prod.outlook.com (2603:10b6:806:25c::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5612.14; Tue, 13 Sep
- 2022 23:32:06 +0000
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::2cdd:defc:a6d3:7599]) by DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::2cdd:defc:a6d3:7599%3]) with mapi id 15.20.5612.022; Tue, 13 Sep 2022
- 23:32:06 +0000
-Message-ID: <aedb7677-528a-75b7-6517-ab1865515ad4@amd.com>
-Date:   Tue, 13 Sep 2022 18:32:04 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH v2 13/23] KVM: x86: Disable APIC logical map if vCPUs are
- aliased in logical mode
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Li RongQing <lirongqing@baidu.com>
-References: <20220903002254.2411750-1-seanjc@google.com>
- <20220903002254.2411750-14-seanjc@google.com>
-From:   "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>
-In-Reply-To: <20220903002254.2411750-14-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH2PR12CA0030.namprd12.prod.outlook.com
- (2603:10b6:610:57::40) To DM8PR12MB5445.namprd12.prod.outlook.com
- (2603:10b6:8:24::7)
+        with ESMTP id S229607AbiIMXm0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Sep 2022 19:42:26 -0400
+Received: from mail-oa1-x34.google.com (mail-oa1-x34.google.com [IPv6:2001:4860:4864:20::34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00FB043E5E
+        for <kvm@vger.kernel.org>; Tue, 13 Sep 2022 16:42:24 -0700 (PDT)
+Received: by mail-oa1-x34.google.com with SMTP id 586e51a60fabf-1280590722dso36554407fac.1
+        for <kvm@vger.kernel.org>; Tue, 13 Sep 2022 16:42:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=ymOBTT9gt+5RfA+7OEYVUzIarEXqqhDX2Od7iC8wXFo=;
+        b=fDWCbKx75MTAMO9j3QRsvKgBo3jSzijY6zAqVK0AS2P8/ediVvkOEfRSYw7pixHsH4
+         KC2FqdOz6xyZSS2wybPYXn0L7mG4FCztnKaTXk0rTUf7wRU5fg81yAZVn78AGS8GJX6j
+         LlbQHXBgYMAxw6980OxKnXlXSpVPWvtBFNbKY9BrrhZyW30QJ0NiB7vQEk21dprRXQ6d
+         qHoanaNXknZDg4F1PMSfuxvLNkOHOlcbxwmOxJKyPkqvkf9R1nDMi4uIjaR4n+JhCePM
+         1Q+X4GROYfQeYmauiBzDqUMcpPBZKzuuxhtqnzFAiWmFfHzHmBZsIM0M8A64rxlaQx/b
+         9NJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=ymOBTT9gt+5RfA+7OEYVUzIarEXqqhDX2Od7iC8wXFo=;
+        b=mFSTf6HG6Xw7OcOuqcITwHIVBZvPYR7rt28Vk0vVieoBJGZev5oOvxu2fjkxrhoPQx
+         CuYPoNhsS4CMXsT/IBX/SqyA+ynOERj66au5qrow+q34tSnSnAcch746oDs9oOX5w6cs
+         iRRCOLTE8k6ct5Eru/RGghWhYuR1giRew0i6UAREfWA+3VC9GaWRd47MfITlNP7atyCi
+         uB3MTjN17d3Ngt8OFZFE0kgmouSfutPAhJJoxUyp+7nXTGFSg5xOi5CUgW+2K4rUbdj+
+         /5zKwq2r/5tNWDuiBtPqWdV/rdSiHlH+i14aZY33Ht58Md17Mtfqu4k281+eqa0VFhDh
+         8mXw==
+X-Gm-Message-State: ACgBeo3Flis5MJg8MzSMqgSV1yihKoSsE2dQZT0LidZX221AH0UqKXCd
+        823rrx6jdWPFKVht8YO8UuTSOW4aKoJkjhHWIjZNGA==
+X-Google-Smtp-Source: AA6agR7Hq1uTc9jDRtKqlEHZ2RHt5dQ5mO20NUpTJWAN2EXMUT3sVSSiDkiMAO2NrzQpBeNj1rJ3MxCf8wVNy33a7cw=
+X-Received: by 2002:a05:6870:a78e:b0:12b:542b:e5b2 with SMTP id
+ x14-20020a056870a78e00b0012b542be5b2mr895413oao.112.1663112544112; Tue, 13
+ Sep 2022 16:42:24 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM8PR12MB5445:EE_|SA1PR12MB6821:EE_
-X-MS-Office365-Filtering-Correlation-Id: 48128192-02d1-4bba-dd48-08da95e02b9b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Wyus2OGbuGIDF8sOuBBuz5SiOk+72E+jA2h9GPL80aJGVouyBEj9kdIbYUI+ezTt4yVIhp4jobjAPAujMg/ke+0PJNvhpflkRA9Nr8BECNakrA9kTMe+X39BcXOwMPEwVn1OeDg78OAmu61V+7kgGbUJt21AvDL/U6lqG9v5GINIfGehq9bmG1QpkU/DvruEhrcZtwB+axgzk7Bo3eL3uutVnSCghvCcbPiFGwduGvR44yrQjTmqmQWdBk8Qz6Ogf63rPjCCc766mNkZd5fCp7kFBcfadPNheatRGdeB80c05AAq7eqCTkgM7AnXGZcLBSwsiXy6HBetIeX60X8Q+P2r/VM2BlLSftRG/0x+5RwyFNAql+u/JJ7bfjc5u1EuNv42SqliZpM1SER8zoa9WGUKhMI8VB72DfkGc6p4e3geCZy7iQHkvKo4TWjttXa8GBdwSi9LSg19HHJpufptCbGWALCaCwKrAyAJmck8V6pZhQIpDLDtdGV+lPnThH/NS7dB4dsUHJkEiQm6YLJTx2pqVg3Mn6sO+XD4cAw+A5PU+63F/vqud/r7qZNoa9zrG1tUSUwK6GdXL/ku8vvPW57opZIhB+qCs0s50dbHIlINy+rEDE8CcVafqsP0+wbPXp1npSIwjBuwljAwjO2zmgnDX09ORXZ+lsE0F0uytSYwyEDm/S1SeUWl+ULRjBENZVQ+witEi//+hPDeD0hpRQ8SppN1apzulPZjPOMoYnXiatDmMwFeIWgjo2F6epfNkUPFvOS7bX9KAQES49ClH37IZJENsCnrLDoURqS14X0=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(39860400002)(396003)(366004)(376002)(136003)(451199015)(54906003)(26005)(31686004)(8936002)(316002)(41300700001)(2616005)(110136005)(6512007)(66476007)(83380400001)(2906002)(4326008)(53546011)(38100700002)(36756003)(6506007)(6486002)(31696002)(186003)(5660300002)(86362001)(478600001)(66556008)(8676002)(66946007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UmN6V1lKQndhbkhOaGsxMjF0WWIzU1RRQmJpM0hrckh6djY5N01OWXA1MFZa?=
- =?utf-8?B?d0FqeUJQZVJac1JsN0IrRlVmVTFuY25ySm0ycUs5VGFLQ09TSUVUVWlHbnJP?=
- =?utf-8?B?Ty9XTHNpTkRHUmNmZE9qV3dkNC91dVN2OXA5cUpzNXkrWjhTNFhjUzFzbHc5?=
- =?utf-8?B?SFV2cklDQjI1Z1VEOEZsd0NtTzIzR2l3eWlBRi8wL2ZtVUZCVkNJd1FBVDEx?=
- =?utf-8?B?Q2l6Vk5ZcGVXVmJWbFU3T0RlNnFMNHNiUFZ4aThVSTBqOHZNRXh4M0hOSE1L?=
- =?utf-8?B?aDF0MWpESEdLTlpFK0M1Q2lEZmdKRXJUVjhiS3RYYlB1NUNrYlhVLzVVc3RD?=
- =?utf-8?B?Wm53aFlPd3JtY3ptaExFVVZuVkNYT1F4SEY4WEVVMWFZMUlpem5KZ3RmK2lw?=
- =?utf-8?B?WENUSmNFV0s3M2N2a2JuUmN5SDVYTWtoaDRGNmRTTWoyTzdoVUhtSkl1c3Vt?=
- =?utf-8?B?Y3BDbWZXaDRmM2QvSmx3RjdkTVVKUVJKeVcxcFk1MXlkYUNqZG00MGRaZFpr?=
- =?utf-8?B?c1Q0UGgrVXc1WG9mVm0yTHEzSEhKSElyWVlkWWZGRytvd3ZGd3JHUUo1cG82?=
- =?utf-8?B?MlhNQ3k4c3R3TWtxWTJRWW5ZVkxTZHpoWXlDeEw0a1Y1amNhRHZKdkxxbXZ1?=
- =?utf-8?B?cHB4NlUvRjFwVkpzc0R3SUxvWURBMXY3RjVpMGltMDVGdm9mdENqbUZyOVhQ?=
- =?utf-8?B?QXR3QnROOVpUM1BVK0oyUkZBZlUrMXNJWXNWbDk0ejFRZ2RZSWRIOTZXZk0v?=
- =?utf-8?B?Vy9DM2w1QjhhOU9xYmJJRy9EQm53M3Zua1JocW95T1ZYb2JkV003RWVvSXZI?=
- =?utf-8?B?U2kyeStDcW1LMzUzQklHMkdXMGlCTmdSY2JxYjVLbm9ibHFqWG9zbVVEYjZX?=
- =?utf-8?B?WUdOeStKSlhnSldUZDNHd2d6OWZPbnZZazRCc240a0JsWVNKRUUzY3ZsdEpO?=
- =?utf-8?B?UGVXSyt4OVlpMWVZZHhjQlNJM2pMRDhKVU5FMVpGSmxkWVowV3lORWFROVJ2?=
- =?utf-8?B?RGNsUVZJY2k2a3ZOVEdWY2ZMWXJkeGN2UVZnR04zSnhYaHAwb2ZQaC8vRkx5?=
- =?utf-8?B?RStha250eDh5K3M2N0xzOXFzTmV2R0VpK0ZQNmJzcUFyaHhwaUhESlZjMkE3?=
- =?utf-8?B?ZDBpREl5cVdQdjIxWVN0NEcybU1aTXh5UnY4akF2eDI5eGVWU2RPOHFUV29L?=
- =?utf-8?B?c3oxUk9KR1ZDK1N4VjUrRXRHVkxoMmF5djhmUmtRbWNiOWdyNVFjOUtoZjNI?=
- =?utf-8?B?WWRxOHVLREdQRnMvenJEb2hFZlQ5K0c4VkFxMFlScmJ1eVJQQkFLSSs4ZnRs?=
- =?utf-8?B?NjVpeHRndUJlNm1hNmJJWUxrTlZSckJ0ejdkRWRhTDVZOWgvbFdGTnJrdnBB?=
- =?utf-8?B?Nlo1K01UZGZMdmhwZjRXUmNJc1c2SVlHOEc5TUdTczZTOWFMZ1BXVklCYWVG?=
- =?utf-8?B?TlVJVGxmeXdFNStiU3U1R2N5NU1HTU9xMkN5RFp4N0V0c0JhZVhtNUVSWEQ0?=
- =?utf-8?B?dVVBcjRteVB5Tk1TcW0wN2dLbGowRkR6NnczZEJobWMyUDN6UU0wMW1DYWlO?=
- =?utf-8?B?NGFNRWFkR3lTZmdoQVU4QmNyOVRWYVhoMGZTczcvcEZTSlJZUDc4eFZpdW92?=
- =?utf-8?B?MkhSOXUwYmFJeVlIZzYraXI3TWcxcnBWaldMTzBTVms3K0hnQmFUV2c1Mk5H?=
- =?utf-8?B?VXpFT3hRSWVNckdGRXNtd0hTc2hoaXE4TEFKVmI5THN4alQ0bW9SclVzVXZT?=
- =?utf-8?B?aUhXVHhmUmYxYmpmMGFDU0VsUCtJdmpuSTRTK1luOXlGWVR5R0VCSnQzZ1Zv?=
- =?utf-8?B?ek9hZE5HUnhWdVovU0cvbFd1MGdkbTQxZlhYcnY1c1JRbGRIUzc4YTk0UUkr?=
- =?utf-8?B?clczbjhFYUN5SE1uM1E5L2VoRXhCd1NzM2U0YzZxcFpYaXl1Q0kzTDhOWmZ3?=
- =?utf-8?B?WVlwaWRucnlSUGJUdStta0pkUEoySW52YlF5SjUrVjUyK1ZoQVRLc01QTnhP?=
- =?utf-8?B?Y0FmMDFYd2p5ZWxrMjRFVy8yeUdsMXdIdEZydnhxRTEzS1pmY2VaVnFhVHVi?=
- =?utf-8?B?THNTUVhQVHAwT1JyWXFhYk1oVDN1WmJUOVZRZTg3eHJGZ1dtS21xUWluRjRm?=
- =?utf-8?Q?7PejfRKj7zlHoyJRpUYc1WrE4?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 48128192-02d1-4bba-dd48-08da95e02b9b
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR12MB5445.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2022 23:32:06.4757
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9g9WpNy7CVOvMuNoHAOTK8OfWGu+5D3UeaU5SjwLT4kLs/fI6AaqZijOF0iMZZhv/9IMxvAgaj00tenLxGWngg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6821
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+References: <20210201051039.255478-1-like.xu@linux.intel.com>
+In-Reply-To: <20210201051039.255478-1-like.xu@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 13 Sep 2022 16:42:13 -0700
+Message-ID: <CALMp9eRC2APJgB3Y7S4MWsTs9wom3iQycd60kM2eJg39N_L4Ag@mail.gmail.com>
+Subject: Re: [PATCH v14 00/11] KVM: x86/pmu: Guest Last Branch Recording Enabling
+To:     Like Xu <likexu@tencent.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, ak@linux.intel.com,
+        wei.w.wang@intel.com, kan.liang@intel.com,
+        alex.shi@linux.alibaba.com, kvm@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -127,51 +72,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean
-
-On 9/2/2022 7:22 PM, Sean Christopherson wrote:
-> Disable the optimized APIC logical map if multiple vCPUs are aliased to
-> the same logical ID.  Architecturally, all CPUs whose logical ID matches
-> the MDA are supposed to receive the interrupt; overwriting existing map
-> entries can result in missed IPIs.
-> 
-> Fixes: 1e08ec4a130e ("KVM: optimize apic interrupt delivery")
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+On Sun, Jan 31, 2021 at 9:17 PM Like Xu <like.xu@linux.intel.com> wrote:
+>
+> Hi geniuses,
+>
+> Please help review this new version which enables the guest LBR.
+>
+> We already upstreamed the guest LBR support in the host perf, please
+> check more details in each commit and feel free to test and comment.
+>
+> QEMU part: https://lore.kernel.org/qemu-devel/20210201045453.240258-1-like.xu@linux.intel.com
+> kvm-unit-tests: https://lore.kernel.org/kvm/20210201045751.243231-1-like.xu@linux.intel.com
+>
+> v13-v14 Changelog:
+> - Rewrite crud about vcpu->arch.perf_capabilities;
+> - Add PERF_CAPABILITIES testcases to tools/testing/selftests/kvm;
+> - Add basic LBR testcases to the kvm-unit-tests (w/ QEMU patches);
+> - Apply rewritten commit log from Paolo;
+> - Queued the first patch "KVM: x86: Move common set/get handler ...";
+> - Rename 'already_passthrough' to 'msr_passthrough';
+> - Check the values of MSR_IA32_PERF_CAPABILITIES early;
+> - Call kvm_x86_ops.pmu_ops->cleanup() always and drop extra_cleanup;
+> - Use INTEL_PMC_IDX_FIXED_VLBR directly;
+> - Fix a bug in the vmx_get_perf_capabilities();
+>
+> Previous:
+> https://lore.kernel.org/kvm/20210108013704.134985-1-like.xu@linux.intel.com/
+>
 > ---
->   arch/x86/kvm/lapic.c | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 6b2f538b8fd0..75748c380ceb 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -303,12 +303,13 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
->   		if (!mask)
->   			continue;
->   
-> -		if (!is_power_of_2(mask)) {
-> +		ldr = ffs(mask) - 1;
-> +		if (!is_power_of_2(mask) || cluster[ldr]) {
+>
+> The last branch recording (LBR) is a performance monitor unit (PMU)
+> feature on Intel processors that records a running trace of the most
+> recent branches taken by the processor in the LBR stack. This patch
+> series is going to enable this feature for plenty of KVM guests.
+>
+> with this patch set, the following error will be gone forever and cloud
+> developers can better understand their programs with less profiling overhead:
+>
+>   $ perf record -b lbr ${WORKLOAD}
+>   or $ perf record --call-graph lbr ${WORKLOAD}
+>   Error:
+>   cycles: PMU Hardware doesn't support sampling/overflow-interrupts. Try 'perf stat'
+>
+> The user space could configure whether it's enabled or not for each
+> guest via MSR_IA32_PERF_CAPABILITIES msr. As a first step, a guest
+> could only enable LBR feature if its cpu model is the same as the
+> host since the LBR feature is still one of model specific features.
+>
+> If it's enabled on the guest, the guest LBR driver would accesses the
+> LBR MSR (including IA32_DEBUGCTLMSR and records MSRs) as host does.
+> The first guest access on the LBR related MSRs is always interceptible.
+> The KVM trap would create a special LBR event (called guest LBR event)
+> which enables the callstack mode and none of hardware counter is assigned.
+> The host perf would enable and schedule this event as usual.
+>
+> Guest's first access to a LBR registers gets trapped to KVM, which
+> creates a guest LBR perf event. It's a regular LBR perf event which gets
+> the LBR facility assigned from the perf subsystem. Once that succeeds,
+> the LBR stack msrs are passed through to the guest for efficient accesses.
+> However, if another host LBR event comes in and takes over the LBR
+> facility, the LBR msrs will be made interceptible, and guest following
+> accesses to the LBR msrs will be trapped and meaningless.
+>
+> Because saving/restoring tens of LBR MSRs (e.g. 32 LBR stack entries) in
+> VMX transition brings too excessive overhead to frequent vmx transition
+> itself, the guest LBR event would help save/restore the LBR stack msrs
+> during the context switching with the help of native LBR event callstack
+> mechanism, including LBR_SELECT msr.
+>
+> If the guest no longer accesses the LBR-related MSRs within a scheduling
+> time slice and the LBR enable bit is unset, vPMU would release its guest
+> LBR event as a normal event of a unused vPMC and the pass-through
+> state of the LBR stack msrs would be canceled.
 
-Should this be checking if the cluster[ldr] is pointing to the same 
-struct apic instead? For example:
-
-		if (!is_power_of_2(mask) || cluster[ldr] != apic)
-
- From my observation, the kvm_recalculate_apic_map() can be called many 
-times, and the cluster[ldr] could have already been assigned from the 
-previous invocation. So, as long as it is the same, it should be okay.
-
-Best Regards,
-Suravee
-
->   			new->mode = KVM_APIC_MODE_XAPIC_FLAT |
->   				    KVM_APIC_MODE_XAPIC_CLUSTER;
->   			continue;
->   		}
-> -		cluster[ffs(mask) - 1] = apic;
-> +		cluster[ldr] = apic;
->   	}
->   out:
->   	old = rcu_dereference_protected(kvm->arch.apic_map,
+How does live migration work? I don't see any mechanism for recording
+the current LBR MSRs on suspend or restoring them on resume.
