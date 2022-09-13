@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E290C5B6B19
+	by mail.lfdr.de (Postfix) with ESMTP id 507C65B6B17
 	for <lists+kvm@lfdr.de>; Tue, 13 Sep 2022 11:45:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231811AbiIMJpT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Sep 2022 05:45:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56228 "EHLO
+        id S231795AbiIMJpR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Sep 2022 05:45:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231781AbiIMJpL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Sep 2022 05:45:11 -0400
+        with ESMTP id S231788AbiIMJpM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Sep 2022 05:45:12 -0400
 Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3EDF11C20;
-        Tue, 13 Sep 2022 02:45:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5ACE13F4F;
+        Tue, 13 Sep 2022 02:45:10 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1663062306;
+        t=1663062309;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=RmvFSZbv6WDm9Kg3YGiCwk2o02yAhCb9+UPvPpOU+S8=;
-        b=DkPTDqiiOPttqXzR+4eHChDtDOjR5LNpIUWbIo8aRVQnKzvKsRV6w4vviLOmUR3z+59s1N
-        3Lh+CvtbDUnOFBjJIdm60gXZP7D/fZZ+2/iY6dmutpL62myR2uxC30YrUsQFWZlzSbnZVY
-        Ps4/xtJ1ba4N+1ciHC/3fSqrGpktXOM=
+        bh=V6k28kYhkcPJExhwA2MA54v72Ie/Q26hkSQ3vV9FgOU=;
+        b=beGg29Hf/sUA5sGSN1pqQ0GE7myVaqiVxbz/wzkKCdyM3qcx6zO1AnhPvR2inXI4dYcYS2
+        qfCuZjeiih5AUh/4F3EnFBmpD/m2Y2x4133fTglAHqaXGESrXhI0kYMOcgLYToaOUEFLTy
+        wZK2ymszInIgaHeT4VCBy9tAYjlb3Jg=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -36,9 +36,9 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
         Andrew Jones <andrew.jones@linux.dev>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v3 5/7] KVM: arm64: Add a visibility bit to ignore user writes
-Date:   Tue, 13 Sep 2022 09:44:38 +0000
-Message-Id: <20220913094441.3957645-6-oliver.upton@linux.dev>
+Subject: [PATCH v3 6/7] KVM: arm64: Treat 32bit ID registers as RAZ/WI on 64bit-only system
+Date:   Tue, 13 Sep 2022 09:44:39 +0000
+Message-Id: <20220913094441.3957645-7-oliver.upton@linux.dev>
 In-Reply-To: <20220913094441.3957645-1-oliver.upton@linux.dev>
 References: <20220913094441.3957645-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -55,56 +55,115 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We're about to ignore writes to AArch32 ID registers on AArch64-only
-systems. Add a bit to indicate a register is handled as write ignore
-when accessed from userspace.
+One of the oddities of the architecture is that the AArch64 views of the
+AArch32 ID registers are UNKNOWN if AArch32 isn't implemented at any EL.
+Nonetheless, KVM exposes these registers to userspace for the sake of
+save/restore. It is possible that the UNKNOWN value could differ between
+systems, leading to a rejected write from userspace.
+
+Avoid the issue altogether by handling the AArch32 ID registers as
+RAZ/WI when on an AArch64-only system.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 3 +++
- arch/arm64/kvm/sys_regs.h | 7 +++++++
- 2 files changed, 10 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 63 ++++++++++++++++++++++++++-------------
+ 1 file changed, 43 insertions(+), 20 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 0e20a311ea20..6d0511247df4 100644
+index 6d0511247df4..9569772cf09a 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2775,6 +2775,9 @@ int kvm_sys_reg_set_user(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg,
- 	if (!r)
- 		return -ENOENT;
- 
-+	if (sysreg_user_write_ignore(vcpu, r))
-+		return 0;
-+
- 	if (r->set_user) {
- 		ret = (r->set_user)(vcpu, r, val);
- 	} else {
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index e78b51059622..e4ebb3a379fd 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -86,6 +86,7 @@ struct sys_reg_desc {
- 
- #define REG_HIDDEN		(1 << 0) /* hidden from userspace and guest */
- #define REG_RAZ			(1 << 1) /* RAZ from userspace and guest */
-+#define REG_USER_WI		(1 << 2) /* WI from userspace only */
- 
- static __printf(2, 3)
- inline void print_sys_reg_msg(const struct sys_reg_params *p,
-@@ -157,6 +158,12 @@ static inline bool sysreg_visible_as_raz(const struct kvm_vcpu *vcpu,
- 	return sysreg_visibility(vcpu, r) & REG_RAZ;
+@@ -1144,6 +1144,20 @@ static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
+ 	return 0;
  }
  
-+static inline bool sysreg_user_write_ignore(const struct kvm_vcpu *vcpu,
-+					    const struct sys_reg_desc *r)
++static unsigned int aa32_id_visibility(const struct kvm_vcpu *vcpu,
++				       const struct sys_reg_desc *r)
 +{
-+	return sysreg_visibility(vcpu, r) & REG_USER_WI;
++	/*
++	 * AArch32 ID registers are UNKNOWN if AArch32 isn't implemented at any
++	 * EL. Promote to RAZ/WI in order to guarantee consistency between
++	 * systems.
++	 */
++	if (!kvm_supports_32bit_el0())
++		return REG_RAZ | REG_USER_WI;
++
++	return id_visibility(vcpu, r);
 +}
 +
- static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
- 			      const struct sys_reg_desc *i2)
+ static unsigned int raz_visibility(const struct kvm_vcpu *vcpu,
+ 				   const struct sys_reg_desc *r)
  {
+@@ -1331,6 +1345,15 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
+ 	.visibility = id_visibility,		\
+ }
+ 
++/* sys_reg_desc initialiser for known cpufeature ID registers */
++#define AA32_ID_SANITISED(name) {		\
++	SYS_DESC(SYS_##name),			\
++	.access	= access_id_reg,		\
++	.get_user = get_id_reg,			\
++	.set_user = set_id_reg,			\
++	.visibility = aa32_id_visibility,	\
++}
++
+ /*
+  * sys_reg_desc initialiser for architecturally unallocated cpufeature ID
+  * register with encoding Op0=3, Op1=0, CRn=0, CRm=crm, Op2=op2
+@@ -1418,33 +1441,33 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 
+ 	/* AArch64 mappings of the AArch32 ID registers */
+ 	/* CRm=1 */
+-	ID_SANITISED(ID_PFR0_EL1),
+-	ID_SANITISED(ID_PFR1_EL1),
+-	ID_SANITISED(ID_DFR0_EL1),
++	AA32_ID_SANITISED(ID_PFR0_EL1),
++	AA32_ID_SANITISED(ID_PFR1_EL1),
++	AA32_ID_SANITISED(ID_DFR0_EL1),
+ 	ID_HIDDEN(ID_AFR0_EL1),
+-	ID_SANITISED(ID_MMFR0_EL1),
+-	ID_SANITISED(ID_MMFR1_EL1),
+-	ID_SANITISED(ID_MMFR2_EL1),
+-	ID_SANITISED(ID_MMFR3_EL1),
++	AA32_ID_SANITISED(ID_MMFR0_EL1),
++	AA32_ID_SANITISED(ID_MMFR1_EL1),
++	AA32_ID_SANITISED(ID_MMFR2_EL1),
++	AA32_ID_SANITISED(ID_MMFR3_EL1),
+ 
+ 	/* CRm=2 */
+-	ID_SANITISED(ID_ISAR0_EL1),
+-	ID_SANITISED(ID_ISAR1_EL1),
+-	ID_SANITISED(ID_ISAR2_EL1),
+-	ID_SANITISED(ID_ISAR3_EL1),
+-	ID_SANITISED(ID_ISAR4_EL1),
+-	ID_SANITISED(ID_ISAR5_EL1),
+-	ID_SANITISED(ID_MMFR4_EL1),
+-	ID_SANITISED(ID_ISAR6_EL1),
++	AA32_ID_SANITISED(ID_ISAR0_EL1),
++	AA32_ID_SANITISED(ID_ISAR1_EL1),
++	AA32_ID_SANITISED(ID_ISAR2_EL1),
++	AA32_ID_SANITISED(ID_ISAR3_EL1),
++	AA32_ID_SANITISED(ID_ISAR4_EL1),
++	AA32_ID_SANITISED(ID_ISAR5_EL1),
++	AA32_ID_SANITISED(ID_MMFR4_EL1),
++	AA32_ID_SANITISED(ID_ISAR6_EL1),
+ 
+ 	/* CRm=3 */
+-	ID_SANITISED(MVFR0_EL1),
+-	ID_SANITISED(MVFR1_EL1),
+-	ID_SANITISED(MVFR2_EL1),
++	AA32_ID_SANITISED(MVFR0_EL1),
++	AA32_ID_SANITISED(MVFR1_EL1),
++	AA32_ID_SANITISED(MVFR2_EL1),
+ 	ID_UNALLOCATED(3,3),
+-	ID_SANITISED(ID_PFR2_EL1),
++	AA32_ID_SANITISED(ID_PFR2_EL1),
+ 	ID_HIDDEN(ID_DFR1_EL1),
+-	ID_SANITISED(ID_MMFR5_EL1),
++	AA32_ID_SANITISED(ID_MMFR5_EL1),
+ 	ID_UNALLOCATED(3,7),
+ 
+ 	/* AArch64 ID registers */
 -- 
 2.37.2.789.g6183377224-goog
 
