@@ -2,95 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77EDC5B6E6F
-	for <lists+kvm@lfdr.de>; Tue, 13 Sep 2022 15:35:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BBD775B6E9D
+	for <lists+kvm@lfdr.de>; Tue, 13 Sep 2022 15:51:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232278AbiIMNfD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Sep 2022 09:35:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40804 "EHLO
+        id S231672AbiIMNvy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Sep 2022 09:51:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231561AbiIMNfB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Sep 2022 09:35:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35A69140E8
-        for <kvm@vger.kernel.org>; Tue, 13 Sep 2022 06:34:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663076095;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vptXUYceNtwYVyKwfHyA3dKZqDg4HJHh7ydKyqgQ4H0=;
-        b=JhtAJGZD/PsBYFyq2DPbEYIemosrKMoujKr6rsqtIT9jzUPQA6ZofzmlCa/z9K3xJmvoxu
-        iriX5bc3IHg/6R/SsyaXMZ0AzQpuJtLhGsBIyyiGPI+g1UCGaLwqbgVRenqWV85z+med7R
-        3dJtDI3QYXAuxBGRAQ/lEPRe2fIpI7w=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-146-tenBlmmaPPq3vhqF76AdzA-1; Tue, 13 Sep 2022 09:34:54 -0400
-X-MC-Unique: tenBlmmaPPq3vhqF76AdzA-1
-Received: by mail-ej1-f70.google.com with SMTP id dr17-20020a170907721100b00741a1ef8a20so4565457ejc.0
-        for <kvm@vger.kernel.org>; Tue, 13 Sep 2022 06:34:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=vptXUYceNtwYVyKwfHyA3dKZqDg4HJHh7ydKyqgQ4H0=;
-        b=ClEm8Tdl3x3AvXV2Xu1Gk+d8rp2Ne+aq4FyJlNL3Q4paDBdIBk4iCcBqoWoAYdQqN+
-         f9Np5Zx8ysg1NL4kJWtpXN7pGOcxIw6vh0TS8sBBoxS3UW5OKmV4PoA0r/zVjfeDGPN7
-         wuVELd1ACjRhFd1aeFlozF33vb8fG29tqJVBzBWUxGrn/X1JmSZBAJB/SMN+PWujfgjX
-         peGrkJ1cYwHuua3RRroS3X2VotQJg7yE1RIA7Om4n6xuOEUNQQ/lMbyOR2khNgm3oj91
-         LGqEd+T7vOjbeVzQnSVXS+YKgVIWs+hrdLYp8vIOVv4BJtXltijcXvKZEv4LJNB1J64S
-         SPSQ==
-X-Gm-Message-State: ACgBeo2QPyHldcPDQ0HkMsao+lcEIbwOgwOfU+9r+zzw/dRWf5iLUEV0
-        lGM83NtrsAmIB74xRGuBgiW6ymGeHvg0xD9i03eNxPPYcgR4UI3SEW9rE09BmsGWBm++exMd+rq
-        OivhZ+b806JC8
-X-Received: by 2002:a17:907:7f91:b0:77f:c4c7:9155 with SMTP id qk17-20020a1709077f9100b0077fc4c79155mr3137421ejc.476.1663076093152;
-        Tue, 13 Sep 2022 06:34:53 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR6avRwtqutArvSmcEzg7QncTSscL/a0gwHDnK2tQKDnZWQ3sHpo7gh8eU4Pf6A1+IXk9R/ikw==
-X-Received: by 2002:a17:907:7f91:b0:77f:c4c7:9155 with SMTP id qk17-20020a1709077f9100b0077fc4c79155mr3137408ejc.476.1663076092870;
-        Tue, 13 Sep 2022 06:34:52 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id 1-20020a170906218100b00730b61d8a5esm6099500eju.61.2022.09.13.06.34.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Sep 2022 06:34:51 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Ajay Kaher <akaher@vmware.com>
-Cc:     "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "rostedt@goodmis.org" <rostedt@goodmis.org>,
-        Srivatsa Bhat <srivatsab@vmware.com>,
-        "srivatsa@csail.mit.edu" <srivatsa@csail.mit.edu>,
-        Alexey Makhalov <amakhalov@vmware.com>,
-        Vasavi Sirnapalli <vsirnapalli@vmware.com>,
-        "er.ajay.kaher@gmail.com" <er.ajay.kaher@gmail.com>,
-        "willy@infradead.org" <willy@infradead.org>,
-        Nadav Amit <namit@vmware.com>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "jailhouse-dev@googlegroups.com" <jailhouse-dev@googlegroups.com>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "acrn-dev@lists.projectacrn.org" <acrn-dev@lists.projectacrn.org>,
-        "helgaas@kernel.org" <helgaas@kernel.org>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        Alexander Graf <graf@amazon.com>
-Subject: Re: [PATCH v2] x86/PCI: Prefer MMIO over PIO on all hypervisor
-In-Reply-To: <9FEC6622-780D-41E6-B7CA-8D39EDB2C093@vmware.com>
-References: <9FEC6622-780D-41E6-B7CA-8D39EDB2C093@vmware.com>
-Date:   Tue, 13 Sep 2022 15:34:50 +0200
-Message-ID: <87zgf3pfd1.fsf@redhat.com>
+        with ESMTP id S231820AbiIMNvw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Sep 2022 09:51:52 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A62BE4F1BD
+        for <kvm@vger.kernel.org>; Tue, 13 Sep 2022 06:51:51 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C23021063;
+        Tue, 13 Sep 2022 06:51:57 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 635DD3F73B;
+        Tue, 13 Sep 2022 06:51:50 -0700 (PDT)
+Date:   Tue, 13 Sep 2022 14:52:44 +0100
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc:     will@kernel.org, andre.przywara@arm.com, kvm@vger.kernel.org,
+        Pierre Gondois <pierre.gondois@arm.com>
+Subject: Re: [PATCH kvmtool] pci: Disable writes to Status register
+Message-ID: <YyCLLLVi6AzAzW0p@monolith.localdoman>
+References: <20220908144208.231272-1-jean-philippe@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220908144208.231272-1-jean-philippe@linaro.org>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -98,148 +41,145 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ajay Kaher <akaher@vmware.com> writes:
+Hi,
 
-> Note: Corrected the Subject.
->
->> =EF=BB=BFOn 07/09/22, 8:50 PM, "Vitaly Kuznetsov" <vkuznets@redhat.com> =
-wrote:
->>
->>> diff --git a/arch/x86/pci/common.c b/arch/x86/pci/common.c
->>> index ddb7986..1e5a8f7 100644
->>> --- a/arch/x86/pci/common.c
->>> +++ b/arch/x86/pci/common.c
->>> @@ -20,6 +20,7 @@
->>>  #include <asm/pci_x86.h>
->>>  #include <asm/setup.h>
->>>  #include <asm/irqdomain.h>
->>> +#include <asm/hypervisor.h>
->>>
->>>  unsigned int pci_probe =3D PCI_PROBE_BIOS | PCI_PROBE_CONF1 | PCI_PROB=
-E_CONF2 |
->>>                               PCI_PROBE_MMCONF;
->>> @@ -57,14 +58,58 @@ int raw_pci_write(unsigned int domain, unsigned int=
- bus, unsigned int devfn,
->>>       return -EINVAL;
->>>  }
->>>
->>> +#ifdef CONFIG_HYPERVISOR_GUEST
->>> +static int vm_raw_pci_read(unsigned int domain, unsigned int bus, unsi=
-gned int devfn,
->>> +                                             int reg, int len, u32 *va=
-l)
->>> +{
->>> +     if (raw_pci_ext_ops)
->>> +             return raw_pci_ext_ops->read(domain, bus, devfn, reg, len=
-, val);
->>> +     if (domain =3D=3D 0 && reg < 256 && raw_pci_ops)
->>> +             return raw_pci_ops->read(domain, bus, devfn, reg, len, va=
-l);
->>> +     return -EINVAL;
->>> +}
->>> +
->>> +static int vm_raw_pci_write(unsigned int domain, unsigned int bus, uns=
-igned int devfn,
->>> +                                             int reg, int len, u32 val)
->>> +{
->>> +     if (raw_pci_ext_ops)
->>> +             return raw_pci_ext_ops->write(domain, bus, devfn, reg, le=
-n, val);
->>> +     if (domain =3D=3D 0 && reg < 256 && raw_pci_ops)
->>> +             return raw_pci_ops->write(domain, bus, devfn, reg, len, v=
-al);
->>> +     return -EINVAL;
->>> +}
->>
->> These look exactly like raw_pci_read()/raw_pci_write() but with inverted
->> priority. We could've added a parameter but to be more flexible, I'd
->> suggest we add a 'priority' field to 'struct pci_raw_ops' and make
->> raw_pci_read()/raw_pci_write() check it before deciding what to use
->> first. To be on the safe side, you can leave raw_pci_ops's priority
->> higher than raw_pci_ext_ops's by default and only tweak it in
->> arch/x86/kernel/cpu/vmware.c
->
-> Thanks Vitaly for your response.
->
-> 1. we have multiple objects of struct pci_raw_ops, 2. adding 'priority' f=
-ield to struct pci_raw_ops
-> doesn't seems to be appropriate as need to take decision which object of =
-struct pci_raw_ops has
-> to be used, not something with-in struct pci_raw_ops.
+On Thu, Sep 08, 2022 at 03:42:09PM +0100, Jean-Philippe Brucker wrote:
+> Although the PCI Status register only contains read-only and
+> write-1-to-clear bits, we currently keep anything written there, which
+> can confuse a guest.
+> 
+> The problem was highlighted by recent Linux commit 6cd514e58f12 ("PCI:
+> Clear PCI_STATUS when setting up device"), which unconditionally writes
+> 0xffff to the Status register in order to clear pending errors. Then the
+> EDAC driver sees the parity status bits set and attempts to clear them
+> by writing 0xc100, which in turn clears the Capabilities List bit.
+> Later on, when the virtio-pci driver starts probing, it assumes due to
+> missing capabilities that the device is using the legacy transport, and
+> fails to setup the device because of mismatched protocol.
+> 
+> Filter writes to the config space, keeping only those to writable
+> fields. Tighten the access size check while we're at it, to prevent
+> overflow. This is only a small step in the right direction, not a
+> foolproof solution, because a guest could still write both Command and
+> Status registers using a single 32-bit write. More work is needed for:
+> * Supporting arbitrary sized writes.
+> * Sanitizing accesses to capabilities, which are device-specific.
+> * Fine-grained filtering of the Command register, where only some bits
+>   are writable.
 
-I'm not sure I follow, you have two instances of 'struct pci_raw_ops'
-which are called 'raw_pci_ops' and 'raw_pci_ext_ops'. What if you do
-something like (completely untested):
+I'm confused here. Why not do value &= mask to keep only those bits that
+writable?
 
-diff --git a/arch/x86/include/asm/pci_x86.h b/arch/x86/include/asm/pci_x86.h
-index 70533fdcbf02..fb8270fa6c78 100644
---- a/arch/x86/include/asm/pci_x86.h
-+++ b/arch/x86/include/asm/pci_x86.h
-@@ -116,6 +116,7 @@ extern void (*pcibios_disable_irq)(struct pci_dev *dev);
- extern bool mp_should_keep_irq(struct device *dev);
-=20
- struct pci_raw_ops {
-+       int rating;
-        int (*read)(unsigned int domain, unsigned int bus, unsigned int dev=
-fn,
-                                                int reg, int len, u32 *val);
-        int (*write)(unsigned int domain, unsigned int bus, unsigned int de=
-vfn,
-diff --git a/arch/x86/pci/common.c b/arch/x86/pci/common.c
-index ddb798603201..e9965fd11576 100644
---- a/arch/x86/pci/common.c
-+++ b/arch/x86/pci/common.c
-@@ -40,7 +40,8 @@ const struct pci_raw_ops *__read_mostly raw_pci_ext_ops;
- int raw_pci_read(unsigned int domain, unsigned int bus, unsigned int devfn,
-                                                int reg, int len, u32 *val)
- {
--       if (domain =3D=3D 0 && reg < 256 && raw_pci_ops)
-+       if (domain =3D=3D 0 && reg < 256 && raw_pci_ops &&
-+           (!raw_pci_ext_ops || raw_pci_ext_ops->rating <=3D raw_pci_ops->=
-rating))
-                return raw_pci_ops->read(domain, bus, devfn, reg, len, val);
-        if (raw_pci_ext_ops)
-                return raw_pci_ext_ops->read(domain, bus, devfn, reg, len, =
-val);
-@@ -50,7 +51,8 @@ int raw_pci_read(unsigned int domain, unsigned int bus, u=
-nsigned int devfn,
- int raw_pci_write(unsigned int domain, unsigned int bus, unsigned int devf=
-n,
-                                                int reg, int len, u32 val)
- {
--       if (domain =3D=3D 0 && reg < 256 && raw_pci_ops)
-+       if (domain =3D=3D 0 && reg < 256 && raw_pci_ops &&
-+           (!raw_pci_ext_ops || raw_pci_ext_ops->rating <=3D raw_pci_ops->=
-rating))
-                return raw_pci_ops->write(domain, bus, devfn, reg, len, val=
-);
-        if (raw_pci_ext_ops)
-                return raw_pci_ext_ops->write(domain, bus, devfn, reg, len,=
- val);
+> 
+> Also remove the old hack that filtered accesses. It was wrong and not
+> properly explained in the git history, but whatever it was guarding
+> against should be prevented by these new checks.
 
-and then somewhere in Vmware hypervisor initialization code
-(arch/x86/kernel/cpu/vmware.c) you do
+If I remember correctly, that was guarding against the guest kernel poking
+the ROM base address register for drivers that assumed that the ROM was
+always there, I vaguely remember that was the case with GPUs. Pairs with
+the similar check in the vfio callback, vfio_pci_cfg_write().
 
- raw_pci_ext_ops->rating =3D 100;
+> 
+> Reported-by: Pierre Gondois <pierre.gondois@arm.com>
+> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> ---
+> Note that the issue described here only shows up during ACPI boot for
+> me, because edac_init() happens after PCI enumeration. With DT boot,
+> edac_pci_clear_parity_errors() runs earlier and doesn't find any device.
+> ---
+>  pci.c | 41 ++++++++++++++++++++++++++++++++---------
+>  1 file changed, 32 insertions(+), 9 deletions(-)
+> 
+> diff --git a/pci.c b/pci.c
+> index a769ae27..84dc7d1d 100644
+> --- a/pci.c
+> +++ b/pci.c
+> @@ -350,6 +350,24 @@ static void pci_config_bar_wr(struct kvm *kvm,
+>  	pci_activate_bar_regions(kvm, old_addr, bar_size);
+>  }
+>  
+> +/*
+> + * Bits that are writable in the config space header.
+> + * Write-1-to-clear Status bits are missing since we never set them.
+> + */
+> +static const u8 pci_config_writable[PCI_STD_HEADER_SIZEOF] = {
+> +	[PCI_COMMAND] =
+> +		PCI_COMMAND_IO |
+> +		PCI_COMMAND_MEMORY |
+> +		PCI_COMMAND_MASTER |
+> +		PCI_COMMAND_PARITY,
+> +	[PCI_COMMAND + 1] =
+> +		(PCI_COMMAND_SERR |
+> +		 PCI_COMMAND_INTX_DISABLE) >> 8,
+> +	[PCI_INTERRUPT_LINE] = 0xff,
+> +	[PCI_BASE_ADDRESS_0 ... PCI_BASE_ADDRESS_5 + 3] = 0xff,
+> +	[PCI_CACHE_LINE_SIZE] = 0xff,
+> +};
+> +
+>  void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data, int size)
+>  {
+>  	void *base;
+> @@ -357,7 +375,7 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
+>  	u16 offset;
+>  	struct pci_device_header *pci_hdr;
+>  	u8 dev_num = addr.device_number;
+> -	u32 value = 0;
+> +	u32 value = 0, mask = 0;
+>  
+>  	if (!pci_device_exists(addr.bus_number, dev_num, 0))
+>  		return;
+> @@ -368,12 +386,12 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
+>  	if (pci_hdr->cfg_ops.write)
+>  		pci_hdr->cfg_ops.write(kvm, pci_hdr, offset, data, size);
+>  
+> -	/*
+> -	 * legacy hack: ignore writes to uninitialized regions (e.g. ROM BAR).
+> -	 * Not very nice but has been working so far.
+> -	 */
+> -	if (*(u32 *)(base + offset) == 0)
+> -		return;
+> +	/* We don't sanity-check capabilities for the moment */
+> +	if (offset < PCI_STD_HEADER_SIZEOF) {
+> +		memcpy(&mask, pci_config_writable + offset, size);
+> +		if (!mask)
+> +			return;
 
-why wouldn't it work?=20
+Shouldn't this be performed before the VFIO callbacks?  Also, the vfio
+callbacks still do the writes to the VFIO in-kernel PCI header, but now
+kvmtool would skip those writes entirely. Shouldn't kvmtool's view of the
+configuration space be identical to that of VFIO?
 
-(diclaimer: completely untested, raw_pci_ops/raw_pci_ext_ops
-initialization has to be checked so 'rating' is not garbage).
+> +	}
+>  
+>  	if (offset == PCI_COMMAND) {
+>  		memcpy(&value, data, size);
+> @@ -419,8 +437,13 @@ static void pci_config_mmio_access(struct kvm_cpu *vcpu, u64 addr, u8 *data,
+>  	cfg_addr.w		= (u32)addr;
+>  	cfg_addr.enable_bit	= 1;
+>  
+> -	if (len > 4)
+> -		len = 4;
+> +	/*
+> +	 * "Root Complex implementations are not required to support the
+> +	 * generation of Configuration Requests from accesses that cross DW
+> +	 * [4 bytes] boundaries."
+> +	 */
+> +	if ((addr & 3) + len > 4)
+> +		return;
 
->
-> It's a generic solution for all hypervisor (sorry for earlier wrong
-> Subject), not specific to VMware. Further looking for feedback if it's
-> impacting to any hypervisor.
+Isn't that a change in behaviour? How about:
 
-That's the tricky part. We can check modern hypervisor versions, but
-what about all other versions in existence? How can we know that there's
-no QEMU/Hyper-V/... version out there where MMIO path is broken? I'd
-suggest we limit the change to Vmware hypervisor, other hypervisors may
-use the same mechanism (like the one above) later (but the person
-suggesting the patch is always responsible for the research why it is
-safe to do so).
+    len = 4 - (addr & 3);
 
---=20
-Vitaly
+Which should conform to the spec, but still allow writes like before.
 
+Thanks,
+Alex
+
+>  
+>  	if (is_write)
+>  		pci__config_wr(kvm, cfg_addr, data, len);
+> -- 
+> 2.37.3
+> 
