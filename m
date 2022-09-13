@@ -2,152 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B88EE5B675D
-	for <lists+kvm@lfdr.de>; Tue, 13 Sep 2022 07:29:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DAE25B676D
+	for <lists+kvm@lfdr.de>; Tue, 13 Sep 2022 07:39:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230062AbiIMF3n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Sep 2022 01:29:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37204 "EHLO
+        id S230070AbiIMFj4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Sep 2022 01:39:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229971AbiIMF3i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Sep 2022 01:29:38 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B35C2661
-        for <kvm@vger.kernel.org>; Mon, 12 Sep 2022 22:29:33 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id g4so10338310pgc.0
-        for <kvm@vger.kernel.org>; Mon, 12 Sep 2022 22:29:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=FH1YMcKhKiON+TEJ7L2a6u9YR2UeNnrzJpRWyHDh1M0=;
-        b=BXcPELQ9APtyZG2nT03rjKpnqegAkbVxGuGp8TmmygcXP8MrX4R3nCjZlyF0aWbhNn
-         rZ7I+cLBquf6qDmah0BkZpXgqk7y54fkjetE4BFWW8fTJk+71CjKoic6qJT5/kndEl2q
-         1DNs5RIUWJpoUvaRhlJB1/8B/s2Iv4fiR4sK6jPyRlKT5wR4VTR/j++nMkiUaHQYFHoe
-         EBasV3n0Qvd59z4NrHgnsEUZP1oNjZavn+dvzvRAoncrUEQmrd48a/bTbK7xqZKTFe+s
-         B1Gj9ZrogTk88b9e8s/xmWMqhKXl/9pZ/rhY/WZuWkFmgENo4o+RHi77BeUottPBytrx
-         5sVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=FH1YMcKhKiON+TEJ7L2a6u9YR2UeNnrzJpRWyHDh1M0=;
-        b=yepOjjV9/QF2Xoto+MoJXgRSP2IkVXT7y8jvJYxaLPIBzttSfzs4WLKh1Q2XQe9otS
-         i5oPTm2MJo2zbM10rOQAf+DLXEHpaIB7crqWNsEhoXqg1e2n3Vhf9xl9f3AUK8ojeocj
-         0KAPJZaMvhnrmMpIKK4W4HAoMcwMnV9g5BZjib8xuuxXbEmyhYPnliT6xGj54bZh+Knk
-         6dI+MOAuBSRi/JI9H+in/yPwT+WvsiuvIk22MFP0hUpZY9GYKizpyXDqYaZz9Li639qi
-         96Uej5WmB2NTEaDTNbFqz47MFz1Eaz2tDiZoFwipMmabcpcahGOQl3gWQ3G3OOjipS7Y
-         JzbA==
-X-Gm-Message-State: ACgBeo00kAOVSrK4YvKBu/DmOkb2NkPhu55TXp2eL8DGITqeuUJUWHsp
-        5AaulYLhZN6N/dMU8M4r30fETA==
-X-Google-Smtp-Source: AA6agR4WWC2jumTLCWnRmXDYaTJddL8lmdGwxWQxtqyrz2vMmMie3sFiDbaLdlyA0k2stNalF7TTbQ==
-X-Received: by 2002:a63:f713:0:b0:438:c33d:5fad with SMTP id x19-20020a63f713000000b00438c33d5fadmr11425156pgh.84.1663046972342;
-        Mon, 12 Sep 2022 22:29:32 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id x9-20020aa79a49000000b0053812f35a41sm6678938pfj.194.2022.09.12.22.29.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Sep 2022 22:29:32 -0700 (PDT)
-Date:   Tue, 13 Sep 2022 05:29:28 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com, jon.grimm@amd.com,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH] KVM: SVM: Fix x2apic logical cluster mode decoding and
- sanity check
-Message-ID: <YyAVOBXZ+O3hnU9y@google.com>
-References: <20220912214632.14880-1-suravee.suthikulpanit@amd.com>
+        with ESMTP id S230036AbiIMFjy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Sep 2022 01:39:54 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2171.outbound.protection.outlook.com [104.47.55.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 907AC13F09
+        for <kvm@vger.kernel.org>; Mon, 12 Sep 2022 22:39:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fop5Uu4PwXMUuNAz47cnhqVdj3l9w8uaE0tU+bhm6KcPkPZyY+9PDxtzrWplXB7mqY/fLlH/FRFwTZthgvhwfWPYb8EC2tPG9XlwGb2M2FF/dRgaZg6XncJPZcxY0LnrDs/pPpNz3iQATw8gM7dxGXNGmZ1CNKgZ92SpdEXutXVxs7QtgRAJzW9lMkakTljWXIMVxQ16Hb4HQtNuL+M3PCk96V40xd+UIHJKxmncvyaTSv35LODtLP57RQfeUJLOMZurJiwLDGE74+rRxBcmT0hlNbA6cjB/LgLBUyWHUICsslK8aog6MLO4QYqW7p/t3vCQRNI8gysvIGTihs/6nw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xXCYdVNWIVExOi3O9RjIIMjqCx9BBWDQEOwBjwfbQeE=;
+ b=Cek9hPZBkn353Ce/I0VUxS2f1D/aRKa8PUAru3iTWn0anosdVvuRr0ffUd0hUb9+aHylXm4uwJT3U+8Zp2FCawOLDMLWtwGas5j1VH4RfCMS8DmmeV3c0T8HyFFO3AdFY3LjF2pv8pA4tbg/bmRYIud0rpfk15iKnHbe6HQeACX9RjSGkDoYoLeZaERedIySwtIVmj2wlRkuoNJc7woBBn9reA1y5YBRJCvy4VzY5lMkDU8RfcoxWIhgDCviZotsfy/GRPn4GLHIMR4TUWD+4/0m7O4j4yeCjwM63n8ZtYPs93sUibdXcJ1/DJ7Qalf4Yr5cRenxn/kfr+Wjo5BfAQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xXCYdVNWIVExOi3O9RjIIMjqCx9BBWDQEOwBjwfbQeE=;
+ b=dIdkZLshoGNfpygFr9rjV61+XZ3lx6H0sNZ1qvLUgOoHI+g5WGRxj3zxWjV8sdDKQzSWmvBw936/N+vCqoQSIZmXeiekreo1MolEY0dzFfi0K3PLPtKD9hcFKKWngd1i5QkViTz/az/RPZmRFSSnYF1ZZp02i39x3s/D+57Ojeg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB2843.namprd12.prod.outlook.com (2603:10b6:5:48::24) by
+ CY8PR12MB7635.namprd12.prod.outlook.com (2603:10b6:930:9e::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5612.22; Tue, 13 Sep 2022 05:39:49 +0000
+Received: from DM6PR12MB2843.namprd12.prod.outlook.com
+ ([fe80::3406:3c9:8fac:5cfa]) by DM6PR12MB2843.namprd12.prod.outlook.com
+ ([fe80::3406:3c9:8fac:5cfa%6]) with mapi id 15.20.5612.022; Tue, 13 Sep 2022
+ 05:39:49 +0000
+Message-ID: <699404b6-dfa7-f286-8e66-6d9cadd10250@amd.com>
+Date:   Tue, 13 Sep 2022 15:39:40 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [PATCH kernel] KVM: SVM: Fix function name in comment
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org
+References: <20220912075219.70379-1-aik@amd.com> <Yx79ugW49M3FT/Zp@google.com>
+From:   Alexey Kardashevskiy <aik@amd.com>
+In-Reply-To: <Yx79ugW49M3FT/Zp@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SYAPR01CA0028.ausprd01.prod.outlook.com (2603:10c6:1:1::16)
+ To DM6PR12MB2843.namprd12.prod.outlook.com (2603:10b6:5:48::24)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220912214632.14880-1-suravee.suthikulpanit@amd.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2843:EE_|CY8PR12MB7635:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8977c2da-5204-4004-fea1-08da954a5fa3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: SBP6x9NbBFlqPfOvwudKnY2yoJY5WFYctz9fY2Hs5jyL3orBnQwvIjoupufR7iOk5KbLE76BKWSoKaQM+FI4tZOMljzYhvY0HxPZSJveB1x1o5mwCr4CWC5235/rqCvJ2kQE1bgQoF2xEkmAsmd7TWCWGs/8m2piTwSdpTTMVjzTHYk2cS0IYkActixDA0RkxDoEZzZEGwwLKhKuxKhMVh6wD5cg+Gwein8koZFHFZ/d/ClTSAWfpvLYCR8qaeVDftMGbDeqxWR7e2LD53x9EcmxRUuYjrDRI13A3xqEBv3lXFJ96L/f2KDXH2v/liUKmVetoAbTKdCUGOUCTZ2CJdqJkLwrxOU3a0oBN5ewEEyA078GTpDDtriNK+aBwh1fBADnU+ahx9sOA5SyAZcZhEvtbuuQGetLgRJMer9fEniKieDE8pqWehenzjsIyzYp/koVZ9indu7Rlz4uZDRsPiXKbxSxd4XaEUx8iQUqowD7dWeJQ3bTmUxr1GNdrAHSDnRbj7BCcOGCqSV4GaUwgEytXWfi+0fCuLhIC7ly4zwQFKHC7kR2bzOG0dKGSqvZTJAqE2gj+tZcFe9oWWs1192r3rp8mONj5okuRrPEOO4BDTkQUO2aLRv4J+2pnl0MCdQffgYK9IkZ4s9k02RNrlDvORIturoWE2auhT3wgOt+Eoi2/rcnJwC3sMyOIH+H7qJNXNHqLICCxysEdIDdzB7PbDFwNVGYomZya6XcQOQWN5qiwOL4AJiSPDkUakD8P2nbaHxPMeNVQd+PEpFD8upHUhrseiozXLTREwW9Ttg=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2843.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(39860400002)(346002)(376002)(136003)(396003)(451199015)(6506007)(8676002)(4326008)(66556008)(66476007)(66946007)(186003)(6916009)(26005)(31686004)(2906002)(316002)(36756003)(31696002)(41300700001)(478600001)(5660300002)(6486002)(53546011)(2616005)(6666004)(38100700002)(8936002)(6512007)(83380400001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TXd3RzU2MmVJREVwMDRZOFA0ZU96ZHBrZnBXVnljQ3RMbWRnWG1XRHBWUkow?=
+ =?utf-8?B?VituTFVJUUc5Sk9jWms3YVVGQUVPbEFnNlNrU2czbWtuczVlSDJvNVEzUXA2?=
+ =?utf-8?B?MTRjbE81M0h6Y3NXOGJEM3BEaXVsVFVqTlVaMnVrVDhWZTNTQmVyTUdkOXBk?=
+ =?utf-8?B?UWU0bFBVRWpxNW1nTUpWeVp4NW5YVTVPZ21BQ3BNOWdMNnJPVzZjNkNveVlj?=
+ =?utf-8?B?K1lmbTg2OWhYdVY4QWtVY1dSN1FHRmNqTEZtNU9kNTNOVk9TTUptK1VZTFhF?=
+ =?utf-8?B?cTZUM1F5eFJ0N0c0WUFiUWVnUXAxeHBBOVRMTmFqNllreWc4aFI1d2FFVExP?=
+ =?utf-8?B?NG1meERlVmRqWGRpbnZ0SlZ1dkZmamVKeCtvTEkxWUhRYzRYa1VkSUloMHY3?=
+ =?utf-8?B?MTRCM3Rza2Y0Sjdsb25WWTQ0WHIwVUdVK3VPM0tNQ1YxT3BNM2dRQ1Z0Y3Ex?=
+ =?utf-8?B?TGZJVjljaFVkdXhGM09ucUEwNWh1ejlNV25Kd0x3VkNsTmZlZXllV2x2NGI4?=
+ =?utf-8?B?SHNmbFk4SEtiMnR3U2h0U05TSXhiS0lrazZTZVdOWjhhNEtWeXpROUU4enJU?=
+ =?utf-8?B?US8wMS9nMGZaZzNBMmRRc2w1MFhMUnZLZTZKQ2wxQk8rQlJrV1hDR2xRU2FE?=
+ =?utf-8?B?Y3REbWN4NlhEZWo4L1ZDNlNpOGJqTGM5ZHluYnZKZjRLNUQ4SG1NWFAvSWNJ?=
+ =?utf-8?B?dDlIKy9IRnViV25OYWI1djBUdC9ma010M09OWUYzWlNQQ3hUQVVENDI2bHR2?=
+ =?utf-8?B?ODQxZGRRazMvSFhPa3ZFMkFLS0dJUFZYbnFDeXNibVpyYXRSUjBFQkJSTGg0?=
+ =?utf-8?B?SjlVSVFFdEZSaFdSVGR2TmhjbjZYaG9Ic2crenN1blI1NFJib29LVlowWE5H?=
+ =?utf-8?B?eWtjSk5jd2M3MmY2U2tqSm1oNGJZaVl6OERlQmx4VWRqdnd4VkxRTktBTVNq?=
+ =?utf-8?B?cG1rck53YUtKOURVbG9vR2FVNFovcGMramk5ckU3eUg2U3ZhZ1pHa3JNLy9z?=
+ =?utf-8?B?b3BxWUlUeW9UbVJjRFBNYStCWVIrVWJMWUUyR2lLdzJRbUNEZktVam9sOC8y?=
+ =?utf-8?B?Qy84S1NTbEFYUzVud2IvS1ozUENYY0VuQVJCRStWMkN3Qk5RN0hBZGRpb1FK?=
+ =?utf-8?B?MTJnRDk5aFBkbWg5VmpKNlZacnpiNVdoVW10WUlWWXh5azU3QnJvSk5PQlZT?=
+ =?utf-8?B?eEdPS0hrRzRMZlpibEZkV2tuWWFGZldvVnkxeXRPWmRiekVkL2hjYTQ0TnBp?=
+ =?utf-8?B?d25leEJFY0laQ2J3ZmcycDNVeVByVW1GMXJERXJsMnQyYm1XNWRxYVhlL3Yr?=
+ =?utf-8?B?a1JqV0ppWlF0eGUzditkdzlVb3NjSWtqMk1ZMmFaZ2hLa2J5ZGVlK1FrTEZ0?=
+ =?utf-8?B?a1VaYkZzZ2tZMWk1TENrdFBZc2pFcGllTTJrWFFpaVJaUVNUUndRRFZiN1dJ?=
+ =?utf-8?B?RXNhMWhxSE83T0gxK21oQ0ZBVkZzQXd2dHNxaGQzM3VZN2NnMG1uR3p6eHRt?=
+ =?utf-8?B?aFZsbUsxc3k5NVI4cFNSNE9MSmhKZklmcktURkZaL2wrWUJLdzMwZjZsNlJn?=
+ =?utf-8?B?S2I3L3AzUXcxeG4weUtyN2pvZlMzTldxSEZiYTBPcENkWG5DYU1mM3NmL29D?=
+ =?utf-8?B?UlRSQUp2em5qUldKR2l2SEVhaTNqWGYrb3FCVStuQ2kwSUJ3eFRrVTZzdVoy?=
+ =?utf-8?B?dndCWjVPdmpQMFRiMHFDSk5Sa05aMFhIQng1ais2UXZoZzdOTlU0V1pqTld2?=
+ =?utf-8?B?RHZyTkE1SEIrTlU3VTkrbUlRc2dRZlJhMHc2OEdFeGFNakM2ajNxODA1eDBL?=
+ =?utf-8?B?VkEyc1hxVjVtdVE0cEFFU1d5NWNUeEpWUUVqR25VUWNUVzJjNGY2SDlLUHkr?=
+ =?utf-8?B?SnhZVHFnV0lrQ0JpNnp3WE9JZHBNbGRrVnBMaDFHVERzRWszeHVCSDN2aDBD?=
+ =?utf-8?B?RFEwK1ZWQUx3cFdqRkVDZCtRRmYwODBsTzc1MWxsZ29ScWt2eElMSUcwaDhE?=
+ =?utf-8?B?T3l5NzhFbTJvQ2tSSXlWOUJwU1pyQjV4MEZRS0Qxa0gwSmpYQ0lTOG1kMi84?=
+ =?utf-8?B?QXZJNGU3RjBDVy9obXNZY3N3WUFHVXFsdGIxbDRkZUNIK0hPYTdmczIySUYy?=
+ =?utf-8?Q?cNDb1Wc/OAg2GECxvIXPKEvkV?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8977c2da-5204-4004-fea1-08da954a5fa3
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2843.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2022 05:39:49.4329
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Lm6j5vhXgv7fILh9VM0I7IW4kSu/FfXOnvwvfGR9/vKrwiwC3pJB17RZAns7/5X8gJUEzpAk2BlUhzrhXKcM6Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7635
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 12, 2022, Suravee Suthikulpanit wrote:
-> When sending IPI in the X2APIC logical cluster mode, the destination
-> APIC ID is encoded as:
+On 12/9/22 19:36, Sean Christopherson wrote:
+> On Mon, Sep 12, 2022, Alexey Kardashevskiy wrote:
+>> A recent renaming patch missed 1 spot, fix it.
+>>
+>> This should cause no behavioural change.
+>>
+>> Fixes: 23e5092b6e2a ("KVM: SVM: Rename hook implementations to conform to kvm_x86_ops' names")
+>> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+>> ---
+>>   arch/x86/kvm/svm/sev.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>> index 28064060413a..3b99a690b60d 100644
+>> --- a/arch/x86/kvm/svm/sev.c
+>> +++ b/arch/x86/kvm/svm/sev.c
+>> @@ -3015,7 +3015,7 @@ void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa)
+>>   	/*
+>>   	 * As an SEV-ES guest, hardware will restore the host state on VMEXIT,
+>>   	 * of which one step is to perform a VMLOAD.  KVM performs the
+>> -	 * corresponding VMSAVE in svm_prepare_guest_switch for both
+>> +	 * corresponding VMSAVE in svm_prepare_switch_to_guest for both
+>>   	 * traditional and SEV-ES guests.
+>>   	 */
 > 
->   * Cluster ID = ICRH[31:16]
->   * Logical ID = ICRH[15:0]
+> Rather than match the rename, what about tweaking the wording to not tie the comment
+> to the function name, e.g. "VMSAVE in common SVM code".
+
+Although I kinda like the pointer to the caller, it is not that useful 
+with a single caller and working cscope :)
+
+> Even better, This would be a good opportunity to reword this comment to make it more
+> clear why SEV-ES needs a hook, and to absorb the somewhat useless comments below.
 > 
-> Current logic incorrectly decode the ICRH, which causes VM running
-> with x2AVIC support to fail to boot. Therefore, fix the decoding logic.
-
-There are already patches pending[1][2] for the x2AVIC bugs.  
-
-[1] https://lore.kernel.org/all/20220903002254.2411750-9-seanjc@google.com
-[2] https://lore.kernel.org/all/20220903002254.2411750-10-seanjc@google.com
-
+> Would something like this be accurate?  Please modify and/or add details as necessary.
 > 
-> The commit 603ccef42ce9 ("KVM: x86: SVM: fix avic_kick_target_vcpus_fast")
-> also added a check for multiple logical destinations before using
-> the fast-path. However, the same logic is already existed prior to
-> the commit. Therefore, remove redundant checking logic.
-> 
-> Fixes: 603ccef42ce9 ("KVM: x86: SVM: fix avic_kick_target_vcpus_fast")
-> Cc: Maxim Levitsky <mlevitsk@redhat.com>
-> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> ---
->  arch/x86/kvm/svm/avic.c | 19 ++++---------------
->  1 file changed, 4 insertions(+), 15 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 6919dee69f18..45ab49d1f0b8 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -378,8 +378,8 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
->  
->  		if (apic_x2apic_mode(source)) {
->  			/* 16 bit dest mask, 16 bit cluster id */
-> -			bitmap = dest & 0xFFFF0000;
-> -			cluster = (dest >> 16) << 4;
-> +			bitmap = dest & 0xffff;
-> +			cluster = (dest & 0xffff0000) >> 16;
->  		} else if (kvm_lapic_get_reg(source, APIC_DFR) == APIC_DFR_FLAT) {
->  			/* 8 bit dest mask*/
->  			bitmap = dest;
-> @@ -387,7 +387,7 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
->  		} else {
->  			/* 4 bit desk mask, 4 bit cluster id */
->  			bitmap = dest & 0xF;
-> -			cluster = (dest >> 4) << 2;
-> +			cluster = (dest & 0xf0) >> 4;
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 3b99a690b60d..c50c6851aedb 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -3013,19 +3013,14 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm)
+>   void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa)
+>   {
+>          /*
+> -        * As an SEV-ES guest, hardware will restore the host state on VMEXIT,
+> -        * of which one step is to perform a VMLOAD.  KVM performs the
+> -        * corresponding VMSAVE in svm_prepare_switch_to_guest for both
+> -        * traditional and SEV-ES guests.
+> +        * Manually save host state that is automatically loaded by hardware on
+> +        * VM-Exit from SEV-ES guests, but that is not saved by VMSAVE (which is
+> +        * performed by common SVM code).  Hardware unconditionally restores
+> +        * host state, and so KVM skips manually restoring this state in common
+> +        * code.
 
-This is wrong and unrelated.  The cluster needs to be shifted back by 2, i.e. multiplied
-by 4, to leap over each cluster of 4 IDs.
+I am new to this arch so not sure :) The AMD spec calls these three 
+"Type B swaps" from the VMSA's "Table B-3. Swap Types" so may be just say:
 
->  		}
->  
->  		if (unlikely(!bitmap))
-> @@ -420,18 +420,7 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
->  			 * For x2APIC logical mode, cannot leverage the index.
->  			 * Instead, calculate physical ID from logical ID in ICRH.
->  			 */
-> -			int cluster = (icrh & 0xffff0000) >> 16;
-> -			int apic = ffs(icrh & 0xffff) - 1;
+===
+These are Type B swaps which are not saved by VMSAVE (performed by 
+common SVM code) but restored by VMEXIT unconditionally.
+===
+
+Thanks,
+
+>           */
 > -
-> -			/*
-> -			 * If the x2APIC logical ID sub-field (i.e. icrh[15:0])
-> -			 * contains anything but a single bit, we cannot use the
-> -			 * fast path, because it is limited to a single vCPU.
-> -			 */
-> -			if (apic < 0 || icrh != (1 << apic))
-> -				return -EINVAL;
+> -       /* XCR0 is restored on VMEXIT, save the current host value */
+>          hostsa->xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
 > -
-> -			l1_physical_id = (cluster << 4) + apic;
-> +			l1_physical_id = (cluster << 4) + (ffs(bitmap) - 1);
->  		}
->  	}
->  
-> -- 
-> 2.34.1
+> -       /* PKRU is restored on VMEXIT, save the current host value */
+>          hostsa->pkru = read_pkru();
+> -
+> -       /* MSR_IA32_XSS is restored on VMEXIT, save the currnet host value */
+>          hostsa->xss = host_xss;
+>   }
+>   
 > 
+
+
+-- 
+Alexey
