@@ -2,328 +2,257 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21EB75B800F
-	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 06:16:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D534A5B8169
+	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 08:13:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229631AbiINEP7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Sep 2022 00:15:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36848 "EHLO
+        id S229640AbiINGNr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Sep 2022 02:13:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbiINEP6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Sep 2022 00:15:58 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B752B3A480;
-        Tue, 13 Sep 2022 21:15:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663128956; x=1694664956;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Jkiair1baPAJtoC47+aW99/iEwDFIfwZp8PeL1RP0HU=;
-  b=RcV6dAtd4qb4reYGd/p5UqkKVCq8ArxQJ7jXmfRgldxizEZGT5qMXxQr
-   X4XQ1jk/1j4NTYcWqYQqlkeDOMlThRs5FMkk+UCUWvBEUq1imIJVhh7Cu
-   H241Dnan3BXOsUdwHiwlyiXyCUz5cIJ55Fb9nYUid+JPQdUlD70S9da+X
-   JMpeSvyUnpQ6IptkMpSwbU23+19M7NW3RVJBwSbqjCWpT5UdTbFz1TR0d
-   KxKNSmbhDpj4nPs2vAjQn5adC5HmIVdtlYWC6rodBRhn6q4KAJWgH7p0A
-   VJtiaJPUYd8COXtc0lXOi0bfjyujGO4ZWseH80i5q5iAgCm2C1hYVEoBt
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10469"; a="297059724"
-X-IronPort-AV: E=Sophos;i="5.93,313,1654585200"; 
-   d="scan'208";a="297059724"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2022 21:15:56 -0700
-X-IronPort-AV: E=Sophos;i="5.93,313,1654585200"; 
-   d="scan'208";a="647223896"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.174.4]) ([10.249.174.4])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2022 21:15:53 -0700
-Message-ID: <815586ac-1eaa-5e38-1e08-492c29d0729d@intel.com>
-Date:   Wed, 14 Sep 2022 12:15:50 +0800
+        with ESMTP id S229728AbiINGNX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Sep 2022 02:13:23 -0400
+Received: from mail-vs1-xe2a.google.com (mail-vs1-xe2a.google.com [IPv6:2607:f8b0:4864:20::e2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CD5571736
+        for <kvm@vger.kernel.org>; Tue, 13 Sep 2022 23:13:21 -0700 (PDT)
+Received: by mail-vs1-xe2a.google.com with SMTP id j7so9396557vsr.13
+        for <kvm@vger.kernel.org>; Tue, 13 Sep 2022 23:13:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=3Nj3leCSwB1mG6UETzR179fDDWSWD2vq8HNpdWGZN90=;
+        b=ehy0egZci05ylvswS7cjrgJ+nSu4gnTHEY52CE6r0WR26HvYVCShI1KLxYsxcCOvaM
+         mQ4Y0FZkqwO/CZd4uOUlj0Uw7kwq8aTs+uBuFlzkT5z+yJRa9AoQ3XsDIY4LU5mlYQCM
+         BJfDwTg7LM8gNIF5oKe0+i4yYsLMjQRhohqmpyo3uIMelUdRN3/yjRX9fLhfQcqX9DSa
+         Eqi6Te0GXWqE7MWkVFigDDcc7GHxGAv4IwSyMQN0JjsAiUuK0TlJVLDChulWHEiEE+vE
+         dpxR3XCiaVe4Uo8DhusWpZRVkPPvDSnzgBfPQ43Pf5nrv8X4CiGyLlAhl+cBw5U0vAGT
+         wDjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=3Nj3leCSwB1mG6UETzR179fDDWSWD2vq8HNpdWGZN90=;
+        b=2O0FCoYU+za8yAtSWax1PgbO004eGUorVf/MtFc5SKKvRDYqsoidtfNiElt0f7/+nK
+         FVWWSJKlvLPzdx8lX77B2sAwW9DDOe4kLpKV+BzkuD0iMcVWsA+GRdxkqOC1Oz2jBhJ1
+         IFp/ODkd2u9dghZvv9P6uoJvvrlM34cZ7Dbgzg/FYnhAIF69DGiAFwgyH+1OGKE2kRhs
+         e2DJKdk007J/rzRKUM5UjKQ46Bd9UJCLV6qjZ0u7xPyH3RCRIf1y65DaJEpjvawJP/t0
+         p1B3IbxLkGWJ80V8unGUSizOjc3N7eV5O4spnLbU6BodDUUyoUXQbfjUiBqURXs3J4L7
+         YntA==
+X-Gm-Message-State: ACgBeo3BrkUA+jLAtHoFmFjcX3ANuB2eQtD66N3HtMWKwp41mlP1a3YA
+        /kIUvZc9LWJVidZc33mWpTnQwz1HCIDlEySUf5JOqg==
+X-Google-Smtp-Source: AA6agR4JUNqOVng4uk2DdELeIypGajswDTkl+EO+sfZtKXSS7J9di0ND1TC1heExvdipyjW4oYwqFodRgI+LKKfiEgM=
+X-Received: by 2002:a67:fdd0:0:b0:397:c028:db6a with SMTP id
+ l16-20020a67fdd0000000b00397c028db6amr11548134vsq.58.1663136000321; Tue, 13
+ Sep 2022 23:13:20 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.13.0
-Subject: Re: [RFC PATCH 0/2] KVM: VMX: Fix VM entry failure on
- PT_MODE_HOST_GUEST while host is using PT
-Content-Language: en-US
-To:     "Wang, Wei W" <wei.w.wang@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     "linux-perf-users@vger.kernel.org" <linux-perf-users@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <20220825085625.867763-1-xiaoyao.li@intel.com>
- <CY5PR11MB6365897E8E6D0B590A298FA0DC769@CY5PR11MB6365.namprd11.prod.outlook.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <CY5PR11MB6365897E8E6D0B590A298FA0DC769@CY5PR11MB6365.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220909044636.1997755-1-reijiw@google.com> <20220909044636.1997755-2-reijiw@google.com>
+ <875yhvqzxn.wl-maz@kernel.org>
+In-Reply-To: <875yhvqzxn.wl-maz@kernel.org>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Tue, 13 Sep 2022 23:13:04 -0700
+Message-ID: <CAAeT=Fx5nLCqoNG+gnAZSbWvc9FotWOaQepNLqBZ2Xx_hxcxsw@mail.gmail.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: Don't set PSTATE.SS when Software Step
+ state is Active-pending
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/29/2022 3:49 PM, Wang, Wei W wrote:
-> On Thursday, August 25, 2022 4:56 PM, Xiaoyao Li wrote:
->> There is one bug in KVM that can hit vm-entry failure 100% on platform
->> supporting PT_MODE_HOST_GUEST mode following below steps:
->>
->>    1. #modprobe -r kvm_intel
->>    2. #modprobe kvm_intel pt_mode=1
->>    3. start a VM with QEMU
->>    4. on host: #perf record -e intel_pt//
->>
->> The vm-entry failure happens because it violates the requirement stated in
->> Intel SDM 26.2.1.1 VM-Execution Control Fields
->>
->>    If the logical processor is operating with Intel PT enabled (if
->>    IA32_RTIT_CTL.TraceEn = 1) at the time of VM entry, the "load
->>    IA32_RTIT_CTL" VM-entry control must be 0.
->>
->> On PT_MODE_HOST_GUEST node, PT_MODE_HOST_GUEST is always set. Thus
->> KVM needs to ensure IA32_RTIT_CTL.TraceEn is 0 before VM-entry. Currently
->> KVM manually WRMSR(IA32_RTIT_CTL) to clear TraceEn bit. However, it
->> doesn't work everytime since there is a posibility that IA32_RTIT_CTL.TraceEn
->> is re-enabled in PT PMI handler before vm-entry. This series tries to fix the
->> issue by exposing two interfaces from Intel PT driver for the purose to stop and
->> resume Intel PT on host. It prevents PT PMI handler from re-enabling PT. By the
->> way, it also fixes another issue that PT PMI touches PT MSRs whihc leads to
->> what KVM stores for host bemomes stale.
-> 
-> I'm thinking about another approach to fixing it. I think we need to have the
-> running host pt event disabled when we switch to guest and don't expect to
-> receive the host pt interrupt at this point. Also, the host pt context can be
-> save/restored by host perf core (instead of KVM) when we disable/enable
-> the event.
-> 
-> diff --git a/arch/x86/events/intel/pt.c b/arch/x86/events/intel/pt.c
-> index 82ef87e9a897..1d3e03ecaf6a 100644
-> --- a/arch/x86/events/intel/pt.c
-> +++ b/arch/x86/events/intel/pt.c
-> @@ -1575,6 +1575,7 @@ static void pt_event_start(struct perf_event *event, int mode)
-> 
->          pt_config_buffer(buf);
->          pt_config(event);
-> +       pt->event = event;
-> 
->          return;
-> 
-> @@ -1600,6 +1601,7 @@ static void pt_event_stop(struct perf_event *event, int mode)
->                  return;
-> 
->          event->hw.state = PERF_HES_STOPPED;
-> +       pt->event = NULL;
-> 
->          if (mode & PERF_EF_UPDATE) {
->                  struct pt_buffer *buf = perf_get_aux(&pt->handle);
-> @@ -1624,6 +1626,15 @@ static void pt_event_stop(struct perf_event *event, int mode)
->          }
->   }
-> 
-> +
-> +struct perf_event *pt_get_curr_event(void)
-> +{
-> +       struct pt *pt = this_cpu_ptr(&pt_ctx);
-> +
-> +       return pt->event;
-> +}
-> +EXPORT_SYMBOL_GPL(pt_get_curr_event);
-> +
->   static long pt_event_snapshot_aux(struct perf_event *event,
->                                    struct perf_output_handle *handle,
->                                    unsigned long size)
-> diff --git a/arch/x86/events/intel/pt.h b/arch/x86/events/intel/pt.h
-> index 96906a62aacd..d46a85bb06bb 100644
-> --- a/arch/x86/events/intel/pt.h
-> +++ b/arch/x86/events/intel/pt.h
-> @@ -121,6 +121,7 @@ struct pt_filters {
->    * @output_mask:       cached RTIT_OUTPUT_MASK MSR value
->    */
->   struct pt {
-> +       struct perf_event       *event;
->          struct perf_output_handle handle;
->          struct pt_filters       filters;
->          int                     handle_nmi;
-> diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
-> index f6fc8dd51ef4..be8dd24922a7 100644
-> --- a/arch/x86/include/asm/perf_event.h
-> +++ b/arch/x86/include/asm/perf_event.h
-> @@ -553,11 +553,14 @@ static inline int x86_perf_get_lbr(struct x86_pmu_lbr *lbr)
-> 
->   #ifdef CONFIG_CPU_SUP_INTEL
->    extern void intel_pt_handle_vmx(int on);
-> + extern struct perf_event *pt_get_curr_event(void);
->   #else
->   static inline void intel_pt_handle_vmx(int on)
->   {
-> 
-> +
->   }
-> +struct perf_event *pt_get_curr_event(void) { }
->   #endif
-> 
->   #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_AMD)
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index d7f8331d6f7e..195debc1bff1 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -1125,37 +1125,29 @@ static inline void pt_save_msr(struct pt_ctx *ctx, u32 addr_range)
-> 
->   static void pt_guest_enter(struct vcpu_vmx *vmx)
->   {
-> -       if (vmx_pt_mode_is_system())
-> +       struct perf_event *event;
-> +
-> +       if (vmx_pt_mode_is_system() ||
-> +           !(vmx->pt_desc.guest.ctl & RTIT_CTL_TRACEEN))
->                  return;
-> 
-> -       /*
-> -        * GUEST_IA32_RTIT_CTL is already set in the VMCS.
-> -        * Save host state before VM entry.
-> -        */
-> -       rdmsrl(MSR_IA32_RTIT_CTL, vmx->pt_desc.host.ctl);
-> -       if (vmx->pt_desc.guest.ctl & RTIT_CTL_TRACEEN) {
-> -               wrmsrl(MSR_IA32_RTIT_CTL, 0);
-> -               pt_save_msr(&vmx->pt_desc.host, vmx->pt_desc.num_address_ranges);
-> -               pt_load_msr(&vmx->pt_desc.guest, vmx->pt_desc.num_address_ranges);
-> -       }
-> +       event = pt_get_curr_event();
-> +       perf_event_disable(event);
+Hi Marc,
 
-perf_event_disable() is not allowed in preemption disabled context, since
+Thank you for the review!
 
-perf_event_disable()
--> perf_event_ctx_lock()
-    -> perf_event_ctx_lock_nested()
-       -> mutex_lock_nested()
+On Sat, Sep 10, 2022 at 3:36 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Fri, 09 Sep 2022 05:46:34 +0100,
+> Reiji Watanabe <reijiw@google.com> wrote:
+> >
+> > Currently, PSTATE.SS is set on every guest entry if single-step is
+> > enabled for the vCPU by userspace.  However, it could cause extra
+> > single-step execution without returning to userspace, which shouldn't
+> > be performed, if the Software Step state at the last guest exit was
+> > Active-pending (i.e. the last exit was not triggered by Software Step
+> > exception, but by an asynchronous exception after the single-step
+> > execution is performed).
+> >
+> > Fix this by not setting PSTATE.SS on guest entry if the Software
+> > Step state at the last exit was Active-pending.
+> >
+> > Fixes: 337b99bf7edf ("KVM: arm64: guest debug, add support for single-step")
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+>
+> Now that I'm a bit more clued about what the architecture actually
+> mandates, I can try and review this patch.
+>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h |  3 +++
+> >  arch/arm64/kvm/debug.c            | 19 ++++++++++++++++++-
+> >  arch/arm64/kvm/guest.c            |  1 +
+> >  arch/arm64/kvm/handle_exit.c      |  2 ++
+> >  4 files changed, 24 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index e9c9388ccc02..4cf6eef02565 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -535,6 +535,9 @@ struct kvm_vcpu_arch {
+> >  #define IN_WFIT                      __vcpu_single_flag(sflags, BIT(3))
+> >  /* vcpu system registers loaded on physical CPU */
+> >  #define SYSREGS_ON_CPU               __vcpu_single_flag(sflags, BIT(4))
+> > +/* Software step state is Active-pending */
+> > +#define DBG_SS_ACTIVE_PENDING        __vcpu_single_flag(sflags, BIT(5))
+> > +
+> >
+> >  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+> >  #define vcpu_sve_pffr(vcpu) (kern_hyp_va((vcpu)->arch.sve_state) +   \
+> > diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> > index 0b28d7db7c76..125cfb94b4ad 100644
+> > --- a/arch/arm64/kvm/debug.c
+> > +++ b/arch/arm64/kvm/debug.c
+> > @@ -188,7 +188,16 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+> >                * debugging the system.
+> >                */
+> >               if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
+> > -                     *vcpu_cpsr(vcpu) |=  DBG_SPSR_SS;
+> > +                     /*
+> > +                      * If the software step state at the last guest exit
+> > +                      * was Active-pending, we don't set DBG_SPSR_SS so
+> > +                      * that the state is maintained (to not run another
+> > +                      * single-step until the pending Software Step
+> > +                      * exception is taken).
+> > +                      */
+> > +                     if (!vcpu_get_flag(vcpu, DBG_SS_ACTIVE_PENDING))
+> > +                             *vcpu_cpsr(vcpu) |= DBG_SPSR_SS;
+> > +
+> >                       mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
+> >                       mdscr |= DBG_MDSCR_SS;
+> >                       vcpu_write_sys_reg(vcpu, mdscr, MDSCR_EL1);
+> > @@ -279,6 +288,14 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
+> >                                               &vcpu->arch.debug_ptr->dbg_wcr[0],
+> >                                               &vcpu->arch.debug_ptr->dbg_wvr[0]);
+> >               }
+> > +
+> > +             if ((vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) &&
+> > +                 !(*vcpu_cpsr(vcpu) & DBG_SPSR_SS))
+> > +                     /*
+> > +                      * Mark the vcpu as ACTIVE_PENDING
+> > +                      * until Software Step exception is confirmed.
+>
+> s/confirmed/taken/? This would match the comment in the previous hunk.
 
-and it causes
+Yes, I will fix that.
 
-[ 3542.164553] BUG: sleeping function called from invalid context at 
-kernel/locking/mutex.c:580
-[ 3542.165140] in_atomic(): 1, irqs_disabled(): 1, non_block: 0, pid: 
-1518, name: CPU 0/KVM
-[ 3542.165703] preempt_count: 1, expected: 0
-[ 3542.166006] RCU nest depth: 0, expected: 0
-[ 3542.166315] INFO: lockdep is turned off.
-[ 3542.166614] irq event stamp: 0
-[ 3542.166857] hardirqs last  enabled at (0): [<0000000000000000>] 0x0
-[ 3542.167304] hardirqs last disabled at (0): [<ffffffff94699ac8>] 
-copy_process+0x8e8/0x1bd0
-[ 3542.167874] softirqs last  enabled at (0): [<ffffffff94699ac8>] 
-copy_process+0x8e8/0x1bd0
-[ 3542.168443] softirqs last disabled at (0): [<0000000000000000>] 0x0
-[ 3542.168891] Preemption disabled at:
-[ 3542.168893] [<ffffffffc0c28f29>] vcpu_enter_guest+0x139/0x1350 [kvm]
-[ 3542.169674] CPU: 20 PID: 1518 Comm: CPU 0/KVM Not tainted 
-6.0.0-rc5-fix-pt-vm-entry+ #3 f2d44ed9be3fc4a510291e2989c9432fce3cb5de
-[ 3542.170457] Hardware name: Intel Corporation JACOBSVILLE/JACOBSVILLE, 
-BIOS JBVLCRB1.86B.0012.D75.1912120439 12/12/2019
-[ 3542.171188] Call Trace:
-[ 3542.171392]  <TASK>
-[ 3542.171572]  show_stack+0x52/0x5c
-[ 3542.171831]  dump_stack_lvl+0x5b/0x86
-[ 3542.172112]  dump_stack+0x10/0x16
-[ 3542.172371]  __might_resched.cold+0x135/0x15b
-[ 3542.172698]  __might_sleep+0x52/0xa0
-[ 3542.172975]  __mutex_lock+0x4e/0x4d0
-[ 3542.173251]  ? kvm_sched_in+0x4f/0x60 [kvm 
-1f4ec973e90cea60cd68c22c1431d8e7f534c92b]
-[ 3542.173839]  ? perf_event_ctx_lock_nested+0xc8/0x230
-[ 3542.174202]  ? rcu_read_lock_sched_held+0x16/0x90
-[ 3542.174551]  ? lock_acquire+0xfc/0x150
-[ 3542.174840]  ? perf_event_ctx_lock_nested+0x24/0x230
-[ 3542.175205]  mutex_lock_nested+0x1c/0x30
-[ 3542.175505]  perf_event_ctx_lock_nested+0xc8/0x230
-[ 3542.181147]  ? perf_event_ctx_lock_nested+0x24/0x230
-[ 3542.186839]  perf_event_disable+0x19/0x80
-[ 3542.192502]  vmx_vcpu_run+0x3e5/0xfe0 [kvm_intel 
-7936a7891efe9306918aa504b0eb8bc1e7ba3aa6]
-[ 3542.203771]  ? rcu_read_lock_sched_held+0x16/0x90
-[ 3542.209378]  vcpu_enter_guest+0xa96/0x1350 [kvm 
-1f4ec973e90cea60cd68c22c1431d8e7f534c92b]
-[ 3542.215218]  ? vcpu_enter_guest+0xbe1/0x1350 [kvm 
-1f4ec973e90cea60cd68c22c1431d8e7f534c92b]
-[ 3542.226292]  ? rcu_read_lock_sched_held+0x16/0x90
-[ 3542.231956]  ? rcu_read_lock_sched_held+0x16/0x90
-[ 3542.237542]  ? lock_acquire+0xfc/0x150
-[ 3542.243093]  ? __rseq_handle_notify_resume+0x3a/0x60
-[ 3542.248689]  vcpu_run+0x53/0x490 [kvm 
-1f4ec973e90cea60cd68c22c1431d8e7f534c92b]
-[ 3542.254533]  ? vcpu_run+0x35a/0x490 [kvm 
-1f4ec973e90cea60cd68c22c1431d8e7f534c92b]
-[ 3542.260567]  kvm_arch_vcpu_ioctl_run+0x162/0x680 [kvm 
-1f4ec973e90cea60cd68c22c1431d8e7f534c92b]
-[ 3542.272395]  ? kvm_arch_vcpu_ioctl_run+0x6d/0x680 [kvm 
-1f4ec973e90cea60cd68c22c1431d8e7f534c92b]
-[ 3542.284586]  kvm_vcpu_ioctl+0x2ad/0x7a0 [kvm 
-1f4ec973e90cea60cd68c22c1431d8e7f534c92b]
-[ 3542.290973]  ? lock_acquire+0xfc/0x150
-[ 3542.296990]  ? rcu_read_lock_sched_held+0x16/0x90
-[ 3542.302912]  ? lock_release+0x118/0x190
-[ 3542.308800]  ? __fget_files+0xe8/0x1c0
-[ 3542.314710]  ? __fget_files+0x5/0x1c0
-[ 3542.320591]  __x64_sys_ioctl+0x96/0xd0
-[ 3542.326500]  do_syscall_64+0x3a/0x90
-[ 3542.332426]  entry_SYSCALL_64_after_hwframe+0x5e/0xc8
+>
+> > +                      */
+> > +                     vcpu_set_flag(vcpu, DBG_SS_ACTIVE_PENDING);
+> >       }
+> >  }
+> >
+> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> > index f802a3b3f8db..2ff13a3f8479 100644
+> > --- a/arch/arm64/kvm/guest.c
+> > +++ b/arch/arm64/kvm/guest.c
+> > @@ -937,6 +937,7 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+> >       } else {
+> >               /* If not enabled clear all flags */
+> >               vcpu->guest_debug = 0;
+> > +             vcpu_clear_flag(vcpu, DBG_SS_ACTIVE_PENDING);
+> >       }
+> >
+> >  out:
+> > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> > index bbe5b393d689..8e43b2668d67 100644
+> > --- a/arch/arm64/kvm/handle_exit.c
+> > +++ b/arch/arm64/kvm/handle_exit.c
+> > @@ -154,6 +154,8 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu)
+> >
+> >       if (ESR_ELx_EC(esr) == ESR_ELx_EC_WATCHPT_LOW)
+> >               run->debug.arch.far = vcpu->arch.fault.far_el2;
+> > +     else if (ESR_ELx_EC(esr) == ESR_ELx_EC_SOFTSTP_LOW)
+> > +             vcpu_clear_flag(vcpu, DBG_SS_ACTIVE_PENDING);
+>
+> Can we write this as a switch/case statement?
+
+Sure, I will change this to switch/case statement.
 
 
-I know little about perf. It seems perf_event_disable() is not used 
-widely by other kernel component. Is there a alternative? If no, I think 
-expose disable/enable helper from pt driver like this series seems OK.
+>
+> >
+> >       return 0;
+> >  }
+>
+> I think we also need to do something if userspace decides to write to
+> PSTATE as a result of a non-debug exit (such as a signal) when this
+> DBG_SS_ACTIVE_PENDING is set. I came up with the following
+> complicated, but not impossible scenario:
+>
+> - guest single step, PSTATE.SS=0
+> - exit due to interrupt
+> - DBG_SS_ACTIVE_PENDING set
+> - reenter guest
+> - exit again due to another interrupt
+> - exit to userspace due to signal pending
+> - userspace writes PSTATE.SS=1 for no good reason
+> - we now have an inconsistent state between PSTATE.SS and the vcpu flags
+>
+> My gut feeling is that we need something like the vcpu flag being set
+> to !PSTATE.SS if written while debug is enabled.
+>
+> Thoughts?
 
-> +       vmx->pt_desc.host_event = event;
-> +       pt_load_msr(&vmx->pt_desc.guest, vmx->pt_desc.num_address_ranges);
-> }
-> 
->   static void pt_guest_exit(struct vcpu_vmx *vmx)
->   {
-> -       if (vmx_pt_mode_is_system())
-> -               return;
-> +       struct perf_event *event = vmx->pt_desc.host_event;
-> 
-> -       if (vmx->pt_desc.guest.ctl & RTIT_CTL_TRACEEN) {
-> -               pt_save_msr(&vmx->pt_desc.guest, vmx->pt_desc.num_address_ranges);
-> -               pt_load_msr(&vmx->pt_desc.host, vmx->pt_desc.num_address_ranges);
-> -       }
-> +       if (vmx_pt_mode_is_system() ||
-> +           !(vmx->pt_desc.guest.ctl & RTIT_CTL_TRACEEN))
-> +               return;
-> 
-> -       /*
-> -        * KVM requires VM_EXIT_CLEAR_IA32_RTIT_CTL to expose PT to the guest,
-> -        * i.e. RTIT_CTL is always cleared on VM-Exit.  Restore it if necessary.
-> -        */
-> -       if (vmx->pt_desc.host.ctl)
-> -               wrmsrl(MSR_IA32_RTIT_CTL, vmx->pt_desc.host.ctl);
-> +       pt_save_msr(&vmx->pt_desc.guest, vmx->pt_desc.num_address_ranges);
-> +       if (event)
-> +               perf_event_enable(event);
->   }
-> 
->   void vmx_set_host_fs_gs(struct vmcs_host_state *host, u16 fs_sel, u16 gs_sel,
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 24d58c2ffaa3..4c20bdabc85b 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -66,7 +66,7 @@ struct pt_desc {
->          u64 ctl_bitmask;
->          u32 num_address_ranges;
->          u32 caps[PT_CPUID_REGS_NUM * PT_CPUID_LEAVES];
-> -       struct pt_ctx host;
-> +       struct perf_event *host_event;
->          struct pt_ctx guest;
->   };
-> 
-> 
+Ah, that's a good point.
+Values that KVM is going to set in debug registers (e.g. MDSCR_EL1,
+dbg_bcr, etc) at guest-entry cannot be changed by userspace via
+SET_ONE_REG when debug is enabled.  I'm inclined to apply the same
+for PSTATE.SS (clear PSTATE.SS if the vcpu flag is set on guest entry,
+and set PSTATE.SS to 1 otherwise). Since  MDSCR_EL1 value that KVM is
+going to set is not visible from userspace, changing Software-step
+state when userspace updates PSTATE.SS might be a bit odd IMHO
+(something odd anyway though).
 
+Related to the above scenario, I found another bug (I think).
+After guest exits with Active-not-pending (PSTATE.SS==1) due to an
+interrupt, and then KVM exits to userspace due to signal pending,
+if userspace disables single-step, PSTATE.SS will remain 1 on
+subsequent guest entries (or it might have been originally 1, and
+KVM might clear it.  Most of the time it doesn't matter, and when the
+guest is also using single-step, things will go wrong anyway though).
+
+Considering those, I am thinking of changing the patch as follows,
+ - Change kvm_arm_setup_debug() to clear PSTATE.SS if the vcpu flag
+   (DBG_SS_ACTIVE_PENDING) is set, and set PSTATE.SS to 1 otherwise.
+ - Change save_guest_debug_regs()/restore_guest_debug_regs() to
+   save/restore the guest value of PSTATE.SS
+   (Add a new field in kvm_vcpu_arch.guest_debug_preserved to save
+    the guest value of PSTATE.SS)
+keeping the other changes in the patch below.
+ - Clear DBG_SS_ACTIVE_PENDING in kvm_handle_guest_debug()
+ - Clear DBG_SS_ACTIVE_PENDING when userspace disables single-step
+
+With this, PSTATE.SS value that KVM is going to set on guest-entry
+won't be exposed to userspace, and PSTATE.SS value that is set by
+userspace will not be used for the guest until single-step is
+disabled (similar to MDSCR_EL1).
+
+What do you think ?
+
+Thank you,
+Reiji
