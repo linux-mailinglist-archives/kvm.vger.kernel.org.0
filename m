@@ -2,64 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 362065B8686
-	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 12:42:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF7675B8692
+	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 12:48:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229874AbiINKmA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Sep 2022 06:42:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54654 "EHLO
+        id S229597AbiINKr5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Sep 2022 06:47:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229599AbiINKl7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Sep 2022 06:41:59 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B704A78BD2
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 03:41:57 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 65016B81A06
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 10:41:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15444C433D6;
-        Wed, 14 Sep 2022 10:41:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1663152115;
-        bh=qZF9xZYgF5fgg3ULL55FWObrA8P8t6PL2FkrqN2TU5M=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=SSBKh/oyI9Bwsfx7CwpRUk7rkmI5v3KMUiAH56t6QWKoP5GfnqeRfi110Z8w2Ouhc
-         VskBVB7/xoK5YsGlC4HVtrfSBup3fMSly+dtd6JajXX5Kbn7p+ajK8OJMe2C8ja+iJ
-         jDGrYyH2U8cvF53jW8eGlZIRKLymbRHB29X64+8Zafn10qGYWq9w9e7RpZLq0R3sNh
-         xUZivgtybovgcOauwhuBC4gZP26MQS7epNoD//YxChloR07RfpmKNK8ig35QNPax8K
-         8VJoSdwvYVSAJhZG7sCk/TUNeVcM078669cNweLMSxeAlHaGqzCY9ozE4/Y/dpwuPw
-         +jRfiN/V81hkA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1oYPq4-00AB2X-Oj;
-        Wed, 14 Sep 2022 11:41:52 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        James Morse <james.morse@arm.com>
-Cc:     Reiji Watanabe <reijiw@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-        Andrew Jones <andrew.jones@linux.dev>
-Subject: Re: [PATCH v3 0/7] KVM: arm64: Use visibility hook to treat ID regs as RAZ
-Date:   Wed, 14 Sep 2022 11:41:50 +0100
-Message-Id: <166315210221.2105633.12201786772874832958.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220913094441.3957645-1-oliver.upton@linux.dev>
-References: <20220913094441.3957645-1-oliver.upton@linux.dev>
+        with ESMTP id S229615AbiINKr4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Sep 2022 06:47:56 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A2D875F99C
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 03:47:54 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A3EFE1576;
+        Wed, 14 Sep 2022 03:48:00 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4545B3F71A;
+        Wed, 14 Sep 2022 03:47:53 -0700 (PDT)
+Date:   Wed, 14 Sep 2022 11:48:43 +0100
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc:     will@kernel.org, andre.przywara@arm.com, kvm@vger.kernel.org,
+        Pierre Gondois <pierre.gondois@arm.com>
+Subject: Re: [PATCH kvmtool] pci: Disable writes to Status register
+Message-ID: <YyGw0vXdEieaVNzJ@monolith.localdoman>
+References: <20220908144208.231272-1-jean-philippe@linaro.org>
+ <YyCLLLVi6AzAzW0p@monolith.localdoman>
+ <YyDOgu1gPcN1wLq1@myrica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oliver.upton@linux.dev, james.morse@arm.com, reijiw@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, andrew.jones@linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YyDOgu1gPcN1wLq1@myrica>
+X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,37 +43,192 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 13 Sep 2022 09:44:33 +0000, Oliver Upton wrote:
-> For reasons unknown, the Arm architecture defines the 64-bit views of
-> the 32-bit ID registers as UNKNOWN [1]. This combines poorly with the
-> fact that KVM unconditionally exposes these registers to userspace,
-> which could throw a wrench in migration between 64-bit only systems.
+Hi,
+
+On Tue, Sep 13, 2022 at 07:40:02PM +0100, Jean-Philippe Brucker wrote:
+> On Tue, Sep 13, 2022 at 02:52:44PM +0100, Alexandru Elisei wrote:
+> > Hi,
+> > 
+> > On Thu, Sep 08, 2022 at 03:42:09PM +0100, Jean-Philippe Brucker wrote:
+> > > Although the PCI Status register only contains read-only and
+> > > write-1-to-clear bits, we currently keep anything written there, which
+> > > can confuse a guest.
+> > > 
+> > > The problem was highlighted by recent Linux commit 6cd514e58f12 ("PCI:
+> > > Clear PCI_STATUS when setting up device"), which unconditionally writes
+> > > 0xffff to the Status register in order to clear pending errors. Then the
+> > > EDAC driver sees the parity status bits set and attempts to clear them
+> > > by writing 0xc100, which in turn clears the Capabilities List bit.
+> > > Later on, when the virtio-pci driver starts probing, it assumes due to
+> > > missing capabilities that the device is using the legacy transport, and
+> > > fails to setup the device because of mismatched protocol.
+> > > 
+> > > Filter writes to the config space, keeping only those to writable
+> > > fields. Tighten the access size check while we're at it, to prevent
+> > > overflow. This is only a small step in the right direction, not a
+> > > foolproof solution, because a guest could still write both Command and
+> > > Status registers using a single 32-bit write. More work is needed for:
+> > > * Supporting arbitrary sized writes.
+> > > * Sanitizing accesses to capabilities, which are device-specific.
+> > > * Fine-grained filtering of the Command register, where only some bits
+> > >   are writable.
+> > 
+> > I'm confused here. Why not do value &= mask to keep only those bits that
+> > writable?
 > 
-> This series reworks KVM's definition of these registers to RAZ/WI with
-> the goal of providing consistent register values across 64-bit machines.
+> Sure, I can add it
 > 
-> [...]
+> > 
+> > > 
+> > > Also remove the old hack that filtered accesses. It was wrong and not
+> > > properly explained in the git history, but whatever it was guarding
+> > > against should be prevented by these new checks.
+> > 
+> > If I remember correctly, that was guarding against the guest kernel poking
+> > the ROM base address register for drivers that assumed that the ROM was
+> > always there, I vaguely remember that was the case with GPUs. Pairs with
+> > the similar check in the vfio callback, vfio_pci_cfg_write().
+> 
+> Right, makes sense. I think that's what I assumed when rewriting
+> pci__config_wr() hence the current comment but the original commits didn't
+> say anything about it.
+> 
+> > 
+> > > 
+> > > Reported-by: Pierre Gondois <pierre.gondois@arm.com>
+> > > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> > > ---
+> > > Note that the issue described here only shows up during ACPI boot for
+> > > me, because edac_init() happens after PCI enumeration. With DT boot,
+> > > edac_pci_clear_parity_errors() runs earlier and doesn't find any device.
+> > > ---
+> > >  pci.c | 41 ++++++++++++++++++++++++++++++++---------
+> > >  1 file changed, 32 insertions(+), 9 deletions(-)
+> > > 
+> > > diff --git a/pci.c b/pci.c
+> > > index a769ae27..84dc7d1d 100644
+> > > --- a/pci.c
+> > > +++ b/pci.c
+> > > @@ -350,6 +350,24 @@ static void pci_config_bar_wr(struct kvm *kvm,
+> > >  	pci_activate_bar_regions(kvm, old_addr, bar_size);
+> > >  }
+> > >  
+> > > +/*
+> > > + * Bits that are writable in the config space header.
+> > > + * Write-1-to-clear Status bits are missing since we never set them.
+> > > + */
+> > > +static const u8 pci_config_writable[PCI_STD_HEADER_SIZEOF] = {
+> > > +	[PCI_COMMAND] =
+> > > +		PCI_COMMAND_IO |
+> > > +		PCI_COMMAND_MEMORY |
+> > > +		PCI_COMMAND_MASTER |
+> > > +		PCI_COMMAND_PARITY,
+> > > +	[PCI_COMMAND + 1] =
+> > > +		(PCI_COMMAND_SERR |
+> > > +		 PCI_COMMAND_INTX_DISABLE) >> 8,
+> > > +	[PCI_INTERRUPT_LINE] = 0xff,
+> > > +	[PCI_BASE_ADDRESS_0 ... PCI_BASE_ADDRESS_5 + 3] = 0xff,
+> > > +	[PCI_CACHE_LINE_SIZE] = 0xff,
+> > > +};
+> > > +
+> > >  void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data, int size)
+> > >  {
+> > >  	void *base;
+> > > @@ -357,7 +375,7 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
+> > >  	u16 offset;
+> > >  	struct pci_device_header *pci_hdr;
+> > >  	u8 dev_num = addr.device_number;
+> > > -	u32 value = 0;
+> > > +	u32 value = 0, mask = 0;
+> > >  
+> > >  	if (!pci_device_exists(addr.bus_number, dev_num, 0))
+> > >  		return;
+> > > @@ -368,12 +386,12 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
+> > >  	if (pci_hdr->cfg_ops.write)
+> > >  		pci_hdr->cfg_ops.write(kvm, pci_hdr, offset, data, size);
+> > >  
+> > > -	/*
+> > > -	 * legacy hack: ignore writes to uninitialized regions (e.g. ROM BAR).
+> > > -	 * Not very nice but has been working so far.
+> > > -	 */
+> > > -	if (*(u32 *)(base + offset) == 0)
+> > > -		return;
+> > > +	/* We don't sanity-check capabilities for the moment */
+> > > +	if (offset < PCI_STD_HEADER_SIZEOF) {
+> > > +		memcpy(&mask, pci_config_writable + offset, size);
+> > > +		if (!mask)
+> > > +			return;
+> > 
+> > Shouldn't this be performed before the VFIO callbacks?
+> 
+> Yes I think I can move it up
+> 
+> > Also, the vfio callbacks still do the writes to the VFIO in-kernel PCI
+> > header, but now kvmtool would skip those writes entirely. Shouldn't
+> > kvmtool's view of the configuration space be identical to that of VFIO?
+> 
+> VFIO also skips writes to read-only fields, so they should now be more in
+> sync than before :) But their views are already desynchronized, because
+> kvmtool doesn't read back the config space virtualized by VFIO after
+> writing to it. We should probably improve it, but that's also for a future
+> patch.
 
-Applied to kvm-arm64/next, thanks!
+Ah, I see now. My concern was that kvmtool was still writing to the VFIO
+config space, while ignoring those writes to its own instance of the config
+space.
 
-[1/7] KVM: arm64: Use visibility hook to treat ID regs as RAZ
-      commit: 34b4d20399e6fad2e3379b11e68dff1d1549274e
-[2/7] KVM: arm64: Remove internal accessor helpers for id regs
-      commit: 4782ccc8ef50fabb70bab9fa73186285dba6d91d
-[3/7] KVM: arm64: Drop raz parameter from read_id_reg()
-      commit: cdd5036d048ca96ef5212fb37f4f56db40cb1bc2
-[4/7] KVM: arm64: Spin off helper for calling visibility hook
-      commit: 5d9a718b64e428a40939806873ecf16f072008b3
-[5/7] KVM: arm64: Add a visibility bit to ignore user writes
-      commit: 4de06e4c1dc949c35c16e4423b4ccd735264b0a9
-[6/7] KVM: arm64: Treat 32bit ID registers as RAZ/WI on 64bit-only system
-      commit: d5efec7ed826b3b29c6847bf59383d8d07347a4e
-[7/7] KVM: selftests: Add test for AArch32 ID registers
-      commit: 797b84517c190053597e3f7e03ead15da872e04d
+> 
+> > 
+> > > +	}
+> > >  
+> > >  	if (offset == PCI_COMMAND) {
+> > >  		memcpy(&value, data, size);
+> > > @@ -419,8 +437,13 @@ static void pci_config_mmio_access(struct kvm_cpu *vcpu, u64 addr, u8 *data,
+> > >  	cfg_addr.w		= (u32)addr;
+> > >  	cfg_addr.enable_bit	= 1;
+> > >  
+> > > -	if (len > 4)
+> > > -		len = 4;
+> > > +	/*
+> > > +	 * "Root Complex implementations are not required to support the
+> > > +	 * generation of Configuration Requests from accesses that cross DW
+> > > +	 * [4 bytes] boundaries."
+> > > +	 */
+> > > +	if ((addr & 3) + len > 4)
+> > > +		return;
+> > 
+> > Isn't that a change in behaviour?
+> 
+> Yes, but it should be safe to change since it is implementation defined.
+> According to the spec 64-bit config space writes through ECAM are not
+> expected to work and I find the old behaviour, truncating the write, worse
+> than rejecting the whole thing. It looks like at least linux, freebsd,
+> u-boot and edk2 don't issue 64-bit writes.
 
-Cheers,
+Ok, great, so this change won't break existing VMs because the guest
+kernels don't do these kind of imp def writes.
 
-	M.
--- 
-Marc Zyngier <maz@kernel.org>
+Would you mind also moving this before the cfg_ops.write callback?
 
+Thanks,
+Alex
+
+> 
+> Thanks,
+> Jean
+> 
+> > How about:
+> > 
+> >     len = 4 - (addr & 3);
+> > 
+> > Which should conform to the spec, but still allow writes like before.
+> > 
+> > Thanks,
+> > Alex
+> > 
+> > >  
+> > >  	if (is_write)
+> > >  		pci__config_wr(kvm, cfg_addr, data, len);
+> > > -- 
+> > > 2.37.3
+> > > 
