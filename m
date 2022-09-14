@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BBBFC5B8EC4
-	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 20:17:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C0485B8EDB
+	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 20:25:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229667AbiINSRm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Sep 2022 14:17:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56262 "EHLO
+        id S229640AbiINSZQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Sep 2022 14:25:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiINSRj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Sep 2022 14:17:39 -0400
-Received: from mail-oa1-x33.google.com (mail-oa1-x33.google.com [IPv6:2001:4860:4864:20::33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 662625E54B
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 11:17:39 -0700 (PDT)
-Received: by mail-oa1-x33.google.com with SMTP id 586e51a60fabf-12803ac8113so43227060fac.8
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 11:17:39 -0700 (PDT)
+        with ESMTP id S229616AbiINSZO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Sep 2022 14:25:14 -0400
+Received: from mail-oa1-x2e.google.com (mail-oa1-x2e.google.com [IPv6:2001:4860:4864:20::2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7844D2B181
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 11:25:13 -0700 (PDT)
+Received: by mail-oa1-x2e.google.com with SMTP id 586e51a60fabf-1225219ee46so43328489fac.2
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 11:25:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date;
-        bh=xpFMiG3IuzsD717GyFkFquBBjnA6a11zmARxbZj0X9Q=;
-        b=PrOMROzfIar7U8kstyOdeWZDJ2ndcENGrJMozZBqRXtqsjzTtbm7jyYnSry6B6gadI
-         73KqxDrdf/tNs6DFqnej/eAxotMt9qTVCXDTrF8W8B2BZJ5TDEZRrl+DeOVdvgKA7RO0
-         FK0QIBb49pI8ZlaoElQPg8uZMWEuFPTRs4s/dyK+WHHXvkLsZK1/Hfm7+Xbie12wFDOx
-         7n/Wu8y0h77NuD4+tAp8whdwpOIz6C/36sjoAAmdEg1LTgY44rfa8KY59RFQgRRiTu07
-         LS0YASBqALrnEZ/l+gHAFlqCgVF6dAz93SpMub579k+fB0MGfhYm/WROayY0e+wFu3wr
-         GAUA==
+        bh=q71i9knIehKxFrXSNKEJylvVFNdxOdO2KjImDYesNjk=;
+        b=YadMSDP6HIXBk8vnow0zVS9H6xK7ey/QKbzqwGUlF+97LyAI/1bzBiuR2FIxEy5A1g
+         xrONcaNEeBbfBUe/o0d4r2tMSF5G05mszWksnedu2tUEL7+qw1U7Fu1yIWbkojb7HxTY
+         DTuur2/s5XxTwTJdXRWvadmD4s13JoIBt2g/Dif3VCQM8E77PIEsaMlbAZtUvBHZ+HpK
+         PeX2yHMRv8f9g8OFolL6Ust37eJ1mPlp4yYYl/l7m9CdqRZP8omY3R8JSnxY1cnRYShc
+         sbVG7fMXCQImQ8qEJ6iusPO/muqPOPfB4ygzbmBqsfxPbkTYtPOmRoox9UQNQSC8SWoi
+         NIzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=xpFMiG3IuzsD717GyFkFquBBjnA6a11zmARxbZj0X9Q=;
-        b=kgLO7BxYqniqnDICgjt9dLoROenTLXqs9xxWijgCH2TlErmSQ8vqPK1v14LZpwj9kg
-         XXjm23Y7Xzh1WsOVeILL/CyQVbY+NntWjCH0ldyfP31XtzEwZDxkqMlZGnNSSRmtsiOj
-         ReQEb2mN/YR3kxmGIEAPBMfXfD7wTGDXL9VbxvcDnufiyNr1Horm1uLRmLsjugqU41LF
-         K4vmXZYu3v/ifaOZ2VTQE0FHuNDfmuAt9xNx/BQjlHagknwbDoWpPPMoiv4KqeagzMYY
-         OIyy3Rlshb2cHwyS3I80sdFI50EnYhW054GY+jZBTxehdvpsDHjFEWDQS+DNgcg2eMTZ
-         w7Iw==
-X-Gm-Message-State: ACgBeo32CvUFtT2RAyySbMyWARlVR0AIoEpRSJjii9wSOAN1GAMLS/9p
-        4FQfatvN9Gnf1Ro+xKaFAoJuyReoW1r43TnFNwkE2GCiW68=
-X-Google-Smtp-Source: AA6agR6EKyH7OaqR4d1nt2WTkRjOv2tlxlZYC/pNlHM4XVdE4H9Aa7/mhTffgfBiwt5Fhbpw1JNo+U7mQTMZ/TTdxSI=
-X-Received: by 2002:a05:6870:9593:b0:12b:fec4:f1c1 with SMTP id
- k19-20020a056870959300b0012bfec4f1c1mr3099039oao.181.1663179458613; Wed, 14
- Sep 2022 11:17:38 -0700 (PDT)
+        bh=q71i9knIehKxFrXSNKEJylvVFNdxOdO2KjImDYesNjk=;
+        b=wMAe0KW1HpNCmlQjvhdyatZmWpxoxCi94xue7iXEMzyrDCXZvTkPz1VphH1ZpRy6ol
+         G3Xtv+hpnrOr3L8rrdhcf2ejQ68bR7Gx5rsTScBU0R5h+ZAQHdh8Lou7B5MTcapoKKRl
+         6JCXPz3ZjAyUBT13VThiCD7EyfAN0GL0jBuKloZC2/Ar0NonN8fPnzGMJi2j2oJEgOJt
+         G3+17F2bteF6Cfm9uKXUCFpW3SpwyYJ/nKzo8tJm1YnjYigky6JFWPN5HxOmW3dlXbXs
+         QAJyUHv6HbRot+c/PCYmWgsD46mRONYzdEbGvWK0Wg+VUGS6l8XkD9UUrTHA+9b3wJNp
+         yKOg==
+X-Gm-Message-State: ACgBeo1QF1qnJdKQl4RXVJoCw/wjX/Rta9446hsdvIpC6zvh3JSrWM4a
+        XaLSna9QOBqjEOTPPsO+2KK/V9XnUiq0KezjuGfaNA==
+X-Google-Smtp-Source: AA6agR5d7sJpWfAMTa5xbtOSOfTfAsdjHD3+69Y2BrBhPdI1/9pYoRiU/J/or6Daw1Pvedm12R8oFz5isbMza7387Yo=
+X-Received: by 2002:a05:6870:a78e:b0:12b:542b:e5b2 with SMTP id
+ x14-20020a056870a78e00b0012b542be5b2mr3104287oao.112.1663179912513; Wed, 14
+ Sep 2022 11:25:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220831162124.947028-1-aaronlewis@google.com> <20220831162124.947028-3-aaronlewis@google.com>
-In-Reply-To: <20220831162124.947028-3-aaronlewis@google.com>
+References: <20220831162124.947028-1-aaronlewis@google.com> <20220831162124.947028-4-aaronlewis@google.com>
+In-Reply-To: <20220831162124.947028-4-aaronlewis@google.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 14 Sep 2022 11:17:27 -0700
-Message-ID: <CALMp9eRmr2=2fvmg3eDVPTi01fNf-sQpDoJRSU48iMrcPW94JQ@mail.gmail.com>
-Subject: Re: [PATCH v4 2/7] kvm: x86/pmu: Remove invalid raw events from the
- pmu event filter
+Date:   Wed, 14 Sep 2022 11:25:01 -0700
+Message-ID: <CALMp9eTjVEcay1hYLys=dR5pO+Huhmpr8JjpiEmdng3zp7_5tg@mail.gmail.com>
+Subject: Re: [PATCH v4 3/7] kvm: x86/pmu: prepare the pmu event filter for
+ masked events
 To:     Aaron Lewis <aaronlewis@google.com>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com
 Content-Type: text/plain; charset="UTF-8"
@@ -68,10 +68,68 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Aug 31, 2022 at 9:21 AM Aaron Lewis <aaronlewis@google.com> wrote:
 >
-> If a raw event is invalid, i.e. bits set outside the event select +
-> unit mask, the event will never match the search, so it's pointless
-> to have it in the list.  Opt for a shorter list by removing invalid
-> raw events.
+> Create an internal representation for filter events to abstract the
+> events userspace uses from the events the kernel uses.  That will allow
+> the kernel to use a common event and a common code path between the
+> different types of filter events used in userspace once masked events
+> are introduced.
+>
+> No functional changes intended
 >
 > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> ---
+>  arch/x86/kvm/pmu.c | 118 ++++++++++++++++++++++++++++++++-------------
+>  arch/x86/kvm/pmu.h |  16 ++++++
+>  2 files changed, 100 insertions(+), 34 deletions(-)
+>
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index e7d94e6b7f28..50a36cc5bfd0 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -239,6 +239,19 @@ static bool pmc_resume_counter(struct kvm_pmc *pmc)
+>         return true;
+>  }
+>
+> +static inline u16 get_event_select(u64 eventsel)
+> +{
+> +       u64 e = eventsel &
+> +               static_call(kvm_x86_pmu_get_eventsel_event_mask)();
+> +
+> +       return (e & ARCH_PERFMON_EVENTSEL_EVENT) | ((e >> 24) & 0xF00ULL);
+> +}
+> +
+> +static inline u8 get_unit_mask(u64 eventsel)
+> +{
+> +       return (eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
+> +}
+> +
+>  static int cmp_u64(const void *pa, const void *pb)
+>  {
+>         u64 a = *(u64 *)pa;
+> @@ -247,53 +260,63 @@ static int cmp_u64(const void *pa, const void *pb)
+>         return (a > b) - (a < b);
+>  }
+>
+> -static inline u64 get_event_select(u64 eventsel)
+> +static u64 *find_filter_entry(struct kvm_pmu_event_filter *filter, u64 key)
+> +{
+> +       return bsearch(&key, filter->events, filter->nevents,
+> +                         sizeof(filter->events[0]), cmp_u64);
+> +}
+> +
+> +static bool filter_contains_match(struct kvm_pmu_event_filter *filter,
+> +                                 u64 eventsel)
+> +{
+> +       u16 event_select = get_event_select(eventsel);
+> +       u8 unit_mask = get_unit_mask(eventsel);
+> +       u64 key;
+> +
+> +       key = KVM_PMU_ENCODE_FILTER_ENTRY(event_select, unit_mask);
+> +       if (find_filter_entry(filter, key))
+> +               return true;
+> +       return false;
+
+Perhaps just:
+        return find_filter_entry(filter, key);
+
 Reviewed-by: Jim Mattson <jmattson@google.com>
