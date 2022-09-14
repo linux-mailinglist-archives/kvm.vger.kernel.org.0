@@ -2,57 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B00A75B8F1B
-	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 21:00:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DC555B8F26
+	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 21:09:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229617AbiINTAn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Sep 2022 15:00:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44008 "EHLO
+        id S229650AbiINTJ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Sep 2022 15:09:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbiINTAl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Sep 2022 15:00:41 -0400
-Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E5C44332D
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 12:00:40 -0700 (PDT)
-Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-12b542cb1d3so33813478fac.13
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 12:00:40 -0700 (PDT)
+        with ESMTP id S229567AbiINTJZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Sep 2022 15:09:25 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF0BF81B35
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 12:09:24 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id q15-20020a17090a304f00b002002ac83485so15366141pjl.0
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 12:09:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date;
-        bh=Nc5l1sVKFjqk11lytQCRJhzRiUhnI7GDRniUTji6oyM=;
-        b=YT1anRDElkFxzoGf0wWXXpwA7P7pjfJPmZ4vzWvji+dUQ88U7fklCbBnt5w3UmFJal
-         nbBvLPMLyo2vvzVyr6AiTTHrdxUtOjHMDHY9nvgUq9xWWqSKUSQagy/xXbyKR5ZRGkgE
-         n/4IyQ5i2fWdcFcMILhoYxQzrfI0qEeDvk5dHGnGLi1NDLS1te162G+ByhXmBljr5k5o
-         MqHLvND7sPP9C6xvfxbxPc5PjKljcDFqoFelzqa+mrewhgC+rcDixIi2G3l8XbKwTkSK
-         THm9ybgB9p9SOBvLrqa8HI24dKzmRIJZ05XgSs5D1/sSgllVXTIUC/1XA6ZePoanRSa/
-         5Erg==
+        bh=Vf0GqOOK3uEkXN9WNsKg2nCcJ7gEgVHu0tfubCGolLk=;
+        b=Ix8wQG8P2YBtgMuYLRU2gZVvgfG/KvQdltCQJtYPe3r5Nw2RASFGCYjRlBE363g4Uq
+         LBRcA+z6swJhD/p979NxWvW0gtGKcRoxyYeoVs0n9+dgeFCd10TJG4Qs+FDhubksdM4G
+         44OOmlLoTGNzjI8X53X2M4UxQlVrwxh1eYRrZW/RHfyZxu4M5YOlR4bSELZPHPlEQyCj
+         gEHni2QM+xiJzfsEK0UED68GE9ZfQoaxwt5/VnDKK2DcPzG2EKEPdvh5ZSVmAJIfkaMR
+         FaycXB4gSxuQqBflbF2VfX4e9FiWR+KmGd8I49K4txy/xTIHr3+DairQNiYpIAyZOu1g
+         lvSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=Nc5l1sVKFjqk11lytQCRJhzRiUhnI7GDRniUTji6oyM=;
-        b=QNwxThqxZRzxX3KZSez5y+n11EYr5qYCGKIeiKm8j7Nn34MHPAazrbfvwsxM2cChs0
-         MfxwVnFqaNy9GbGPuHd7fBSfifscHLNJMq6+v5cRHDAlVQgrrEvCClGWcus/IzWY7Ruu
-         YXAG9u7OwbNRz5JWCZQpL0dfHShBqmpp1rJQgO6E2WiUVOymfqCO0u/TPFRFKtfemJLR
-         70RThP6DAqsUJL++3itgDqevuzBzUuJxvJYpQmThOHlLk8zA/Bn+f7pmPx9yxPBHX5h7
-         vlXjIdsxKo4c7PjtQLWRZSjyryzui3kiKlrzQo4X38jA0tyMlDOaKTPmWf3HGO/2cPn5
-         4qNw==
-X-Gm-Message-State: ACgBeo3v9nuE0FaVfqhwHONDPgnZ+E56QpT6By8PT4SFRg8l2AArR923
-        G7vt4z8pdZyhskxCtxefXMPRt9L0ZUbYjm43PtYNlg==
-X-Google-Smtp-Source: AA6agR4fFwaEPGLZSbrZaLigcSbTA2rkHAosqwZQJGF8PYrAgOCCGlw2sgnRAJ0IxYLKe9oZWwB9GDWB2DK77WzWHlk=
-X-Received: by 2002:a05:6870:a78e:b0:12b:542b:e5b2 with SMTP id
- x14-20020a056870a78e00b0012b542be5b2mr3176948oao.112.1663182038826; Wed, 14
- Sep 2022 12:00:38 -0700 (PDT)
+        bh=Vf0GqOOK3uEkXN9WNsKg2nCcJ7gEgVHu0tfubCGolLk=;
+        b=WsSKCWGeLyBeNUn8E3bkYtXXeQrokuBla5C9mCOJtHKBw0MMxY548vvWi++4aAsOe4
+         pwIrEneH9hUePXSnpR+9gMoFtxHe/KGTL9EUxH6Z/SlsruvJMsbQX/gNXhAchKJJfhAQ
+         k05KRL8jSv6eUde5poIb08knuDar6yDGBvevE+C8EmlhAzw8PyGjXBjpo6BQ7ND+1WtK
+         MzX3PpdOfxnLOpglR9WQfq6HLwp9A/x/0B3i6WjBRg4/9rfXP33QcYO+wbVL+cua3Xy/
+         7enpNMQIQ8RV64a94DLiG8XQIDXq1RTypsJIdZ3Ewmc8I+9B3jvEq2GTC03T1GerZC0x
+         HC8g==
+X-Gm-Message-State: ACrzQf37o3FO1O0w5gmtIDwvHm79HTcRlm9WKvtqHsityRUciP8mrWOz
+        ObDjf6FNy+XYZdEJs/rE3SWGiKeqH9BuTSKH2kL//g==
+X-Google-Smtp-Source: AMsMyM4Ala40C7jBkQ2I54dEklxAZPC8zv+v2oEl63bhkLcXaIOX+9pXi8KM9ZGWLSuVRjS6+nBHZJGan+C2gOXb0UM=
+X-Received: by 2002:a17:90b:1d02:b0:203:2d73:8efb with SMTP id
+ on2-20020a17090b1d0200b002032d738efbmr766863pjb.214.1663182564226; Wed, 14
+ Sep 2022 12:09:24 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220831162124.947028-1-aaronlewis@google.com> <20220831162124.947028-7-aaronlewis@google.com>
-In-Reply-To: <20220831162124.947028-7-aaronlewis@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 14 Sep 2022 12:00:28 -0700
-Message-ID: <CALMp9eRHSD8NFkweTAT=9Tgm4UgdoKybGW4=BUwif=Hz38n1ug@mail.gmail.com>
-Subject: Re: [PATCH v4 6/7] selftests: kvm/x86: Add testing for KVM_SET_PMU_EVENT_FILTER
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com
+References: <20220903012849.938069-1-vannapurve@google.com>
+ <20220903012849.938069-2-vannapurve@google.com> <YxpaFfw4jbwwvEI6@google.com>
+In-Reply-To: <YxpaFfw4jbwwvEI6@google.com>
+From:   Vishal Annapurve <vannapurve@google.com>
+Date:   Wed, 14 Sep 2022 12:09:13 -0700
+Message-ID: <CAGtprH-3qyf4hn+J=G3RFtvYwDdH+Zd3deDnnCycobyyF1V30A@mail.gmail.com>
+Subject: Re: [V1 PATCH 1/5] selftests: kvm: move common startup logic to kvm_util.c
+To:     David Matlack <dmatlack@google.com>
+Cc:     x86 <x86@kernel.org>, kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>, shuah <shuah@kernel.org>,
+        Ben Gardon <bgardon@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Oliver Upton <oupton@google.com>, peterx@redhat.com,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, drjones@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -65,62 +73,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 31, 2022 at 9:21 AM Aaron Lewis <aaronlewis@google.com> wrote:
+On Thu, Sep 8, 2022 at 2:09 PM David Matlack <dmatlack@google.com> wrote:
 >
-> Test that masked events are not using invalid bits, and if they are,
-> ensure the pmu event filter is not accepted by KVM_SET_PMU_EVENT_FILTER.
-> The only valid bits that can be used for masked events are set when
-> using KVM_PMU_EVENT_ENCODE_MASKED_EVENT() with one exception: If any
-> of the high bits (11:8) of the event select are set when using Intel,
-> the PMU event filter will fail.
+...
+> >       print_skip("__NR_userfaultfd must be present for userfaultfd test");
+> > -     return KSFT_SKIP;
 >
-> Also, because validation was not being done prior to the introduction
-> of masked events, only expect validation to fail when masked events
-> are used.  E.g. in the first test a filter event with all it's bits set
+> exit(KSFT_SKIP) to preserve the test behavior.
 
-Nit: its
+Ack, though this change should go away in the next series with common
+selftest init using constructor attribute.
 
-> is accepted by KVM_SET_PMU_EVENT_FILTER when flags = 0.
->
-> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> ---
->  .../kvm/x86_64/pmu_event_filter_test.c        | 35 +++++++++++++++++++
->  1 file changed, 35 insertions(+)
->
-> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> index bd7054a53981..73a81262ca72 100644
-> --- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-> @@ -442,6 +442,39 @@ static bool use_amd_pmu(void)
->                  is_zen3(entry->eax));
->  }
->
-> +static int run_filter_test(struct kvm_vcpu *vcpu, const uint64_t *events,
-> +                          int nevents, uint32_t flags)
-> +{
-> +       struct kvm_pmu_event_filter *f;
-> +       int r;
-> +
-> +       f = create_pmu_event_filter(events, nevents, KVM_PMU_EVENT_ALLOW, flags);
-> +       r = __vm_ioctl(vcpu->vm, KVM_SET_PMU_EVENT_FILTER, f);
-> +       free(f);
-> +
-> +       return r;
-> +}
-> +
-> +static void test_filter_ioctl(struct kvm_vcpu *vcpu)
-> +{
-> +       uint64_t e = ~0ul;
-> +       int r;
-> +
-> +       /*
-> +        * Unfortunately having invalid bits set in event data is expected to
-> +        * pass when flags == 0 (bits other than eventsel+umask).
-> +        */
-> +       r = run_filter_test(vcpu, &e, 1, 0);
-> +       TEST_ASSERT(r == 0, "Valid PMU Event Filter is failing");
-> +
-> +       r = run_filter_test(vcpu, &e, 1, KVM_PMU_EVENT_FLAG_MASKED_EVENTS);
-
-Before using KVM_PMU_EVENT_FLAG_MASKED_EVENTS, we need to test for
-KVM_CAP_PMU_EVENT_MASKED_EVENTS.
+Regards,
+Vishal
