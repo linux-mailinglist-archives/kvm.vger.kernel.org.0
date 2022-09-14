@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B7AF5B8304
-	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 10:36:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16B005B8306
+	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 10:36:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230193AbiINIgA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Sep 2022 04:36:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36584 "EHLO
+        id S230189AbiINIgC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Sep 2022 04:36:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229928AbiINIfq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Sep 2022 04:35:46 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 978BC1C937
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 01:35:44 -0700 (PDT)
+        with ESMTP id S230188AbiINIft (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Sep 2022 04:35:49 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8EFA696E3
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 01:35:45 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B6754B81670
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 08:35:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DC8BC43470;
-        Wed, 14 Sep 2022 08:35:38 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 877196192A
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 08:35:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9CB1C43141;
+        Wed, 14 Sep 2022 08:35:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1663144541;
-        bh=WjDSl2IWwcr7W+r8QvB3Qm7fgtYs/dW3NUchy/iPukU=;
+        s=k20201202; t=1663144544;
+        bh=jj0KRwqJsGqbuaGft+eGpD/iOl0pF+Q/VTKAhx/Vl3g=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=O5yRJAWYwZmcV97CvysUfSOedMWUZ1XWAxuHan+88ij9QWZJknORjd6SckjhjvCMK
-         zF58tQqIqKtPiqhED+CYo79PLaE/j4ZnrB21SzMqZSFc9nOccEi1oVAx2K4nAYpQMC
-         GIne3wG/+U5XN3Cf7VDS5CpwWroD4oxT9J9RlojEl8sWURCmU3jEPcCH/R60evkvC3
-         O6DQlMWmAZVjChjm7ppT81FuucRsxWI5vlktpEbZFiK2xCO1DvNjK953MYJNSBKjoa
-         zGz1GUcCNREfV1lus6iqJwELVtOhol2lz+p0kE/I8iUif/nIlEMKVXpBw+FuLTlj5s
-         rn8e5Og4Y5wkw==
+        b=A9eTgKz2mtqaXuLdjw/KaFDJc+kWSV9bEBbhWl01FO/LgYlfgGSu8h3dIde/xu7EH
+         7GMhVUMeXNKBHXo1UmKzeMDF+rY79rYCDj9RR024LYoQgTe/qZZpUbx1aY77HLm3ol
+         okw5euXVBmnxwwsD/ROlZxMgkssOrr87eOaByunbgCinPu8v4tGgQtDmWjZ6jPQjls
+         p0ebENFRxss2zJA+aRAy1q9x+ijGOtTGi09vunPVx9AXTjj8/drdHsXWYlZzv8m0G+
+         dh5gOFl7HVVMX50/ljdzWs03D68mrdxV4AH43Q7T7hM7FWSzjf88mzIMRzboOr6kVh
+         UkNrYzavj/uTQ==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Will Deacon <will@kernel.org>,
@@ -47,9 +47,9 @@ Cc:     Will Deacon <will@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v3 09/25] KVM: arm64: Include asm/kvm_mmu.h in nvhe/mem_protect.h
-Date:   Wed, 14 Sep 2022 09:34:44 +0100
-Message-Id: <20220914083500.5118-10-will@kernel.org>
+Subject: [PATCH v3 10/25] KVM: arm64: Add hyp_spinlock_t static initializer
+Date:   Wed, 14 Sep 2022 09:34:45 +0100
+Message-Id: <20220914083500.5118-11-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220914083500.5118-1-will@kernel.org>
 References: <20220914083500.5118-1-will@kernel.org>
@@ -65,29 +65,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-nvhe/mem_protect.h refers to __load_stage2() in the definition of
-__load_host_stage2() but doesn't include the relevant header.
+From: Fuad Tabba <tabba@google.com>
 
-Include asm/kvm_mmu.h in nvhe/mem_protect.h so that users of the latter
-don't have to do this themselves.
+Introduce a static initializer macro for 'hyp_spinlock_t' so that it is
+straightforward to instantiate global locks at EL2. This will be later
+utilised for locking the VM table in the hypervisor.
 
+Signed-off-by: Fuad Tabba <tabba@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/kvm/hyp/include/nvhe/spinlock.h | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index 998bf165af71..3bea816296dc 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -8,6 +8,7 @@
- #define __KVM_NVHE_MEM_PROTECT__
- #include <linux/kvm_host.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
- #include <asm/kvm_pgtable.h>
- #include <asm/virt.h>
- #include <nvhe/spinlock.h>
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/spinlock.h b/arch/arm64/kvm/hyp/include/nvhe/spinlock.h
+index 4652fd04bdbe..7c7ea8c55405 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/spinlock.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/spinlock.h
+@@ -28,9 +28,17 @@ typedef union hyp_spinlock {
+ 	};
+ } hyp_spinlock_t;
+ 
++#define __HYP_SPIN_LOCK_INITIALIZER \
++	{ .__val = 0 }
++
++#define __HYP_SPIN_LOCK_UNLOCKED \
++	((hyp_spinlock_t) __HYP_SPIN_LOCK_INITIALIZER)
++
++#define DEFINE_HYP_SPINLOCK(x)	hyp_spinlock_t x = __HYP_SPIN_LOCK_UNLOCKED
++
+ #define hyp_spin_lock_init(l)						\
+ do {									\
+-	*(l) = (hyp_spinlock_t){ .__val = 0 };				\
++	*(l) = __HYP_SPIN_LOCK_UNLOCKED;				\
+ } while (0)
+ 
+ static inline void hyp_spin_lock(hyp_spinlock_t *lock)
 -- 
 2.37.2.789.g6183377224-goog
 
