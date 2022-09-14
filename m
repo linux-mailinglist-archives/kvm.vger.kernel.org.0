@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FDF45B8319
-	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 10:36:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D8485B831A
+	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 10:36:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230297AbiINIge (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Sep 2022 04:36:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37218 "EHLO
+        id S230228AbiINIgj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Sep 2022 04:36:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229987AbiINIgP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Sep 2022 04:36:15 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E86F696E0
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 01:36:14 -0700 (PDT)
+        with ESMTP id S230245AbiINIgX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Sep 2022 04:36:23 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F2EF6A4B4
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 01:36:19 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BE55E6192E
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 08:36:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29DDFC433D7;
-        Wed, 14 Sep 2022 08:36:10 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id E4598B8167C
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 08:36:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4586C43470;
+        Wed, 14 Sep 2022 08:36:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1663144573;
-        bh=+ewCsnrdNhV0AzcfOXHfzK18Mu/Wv5i811rz22Ijlkc=;
+        s=k20201202; t=1663144576;
+        bh=ubNg9OVluIpHWUzaM5PeEFYKW/9/pHn1I3EXbcq99vs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=h/jl6iKJO0TYOkHJbji70HNTepQgFfrbBPiMRCqAXVEzbRELMj0kgqc3js4Y/kbc2
-         9oWgtl5fvN5PahPQnEiVacsYMrAd6vLJb0z42HTBr7XIvqi/+/OBt3QL61qRexPrto
-         ejXftK3yxrMthTWw9nHz9CL5RYgM0PNe8hZpYOljJWWhReTxWgDEZYne0m4487ErGu
-         8azs8UFxVfh734Gl483pSi7mJjJjN6sgO8fOQc+y5QbEfOAEWybJVRxrmTk8bKRURx
-         JJolhQAfjJa4b4sS6a2Bc2aMTeaIVXHu4+XgYuzzep+4xlRSp972bxJA5oqtXJao5z
-         4bwoL0UVA1GCA==
+        b=FT1Yh7kJMUIlPN2g26Uvb8/u2+6YtmdhK3o0KdkZVJrULQa0vaT07STco+XVzcMLY
+         60ZDUQ85zQZnyMmwEaokTLQ31qv6yiGN6ALWngmHQieDdJxejLZsoyWpJd1wZFEJyC
+         8GSCEhvq3LyrcW0SpfEv2UN0W5FBMbMs9inLm+Ddv0tWPX2po8OIp5jpi8R7eHAM+v
+         5/6ljTqMnkvCGk0GbpUg1epVINIdEpMRUqqBfZ9pMmgpkuWltZ06yqL3+8K1Fjyjwi
+         e+xbRyVuKlAFkEdhTwbUs87DOJD9oJoXChnamkkk4VC46YqDHTUC9nMV+E+Z1YptMz
+         95wTzqpim/7+w==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Will Deacon <will@kernel.org>,
@@ -47,9 +47,9 @@ Cc:     Will Deacon <will@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v3 18/25] KVM: arm64: Consolidate stage-2 initialisation into a single function
-Date:   Wed, 14 Sep 2022 09:34:53 +0100
-Message-Id: <20220914083500.5118-19-will@kernel.org>
+Subject: [PATCH v3 19/25] KVM: arm64: Instantiate guest stage-2 page-tables at EL2
+Date:   Wed, 14 Sep 2022 09:34:54 +0100
+Message-Id: <20220914083500.5118-20-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220914083500.5118-1-will@kernel.org>
 References: <20220914083500.5118-1-will@kernel.org>
@@ -67,204 +67,222 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Quentin Perret <qperret@google.com>
 
-The initialisation of guest stage-2 page-tables is currently split
-across two functions: kvm_init_stage2_mmu() and kvm_arm_setup_stage2().
-That is presumably for historical reasons as kvm_arm_setup_stage2()
-originates from the (now defunct) KVM port for 32-bit Arm.
+Extend the initialisation of guest data structures within the pKVM
+hypervisor at EL2 so that we instantiate a memory pool and a full
+'struct kvm_s2_mmu' structure for each VM, with a stage-2 page-table
+entirely independent from the one managed by the host at EL1.
 
-Simplify this code path by merging both functions into one, taking care
-to map the 'struct kvm' into the hypervisor stage-1 early on in order to
-simplify the failure path.
+The 'struct kvm_pgtable_mm_ops' used by the page-table code is populated
+with a set of callbacks that can manage guest pages in the hypervisor
+without any direct intervention from the host, allocating page-table
+pages from the provided pool and returning these to the host on VM
+teardown. To keep things simple, the stage-2 MMU for the guest is
+configured identically to the host stage-2 in the VTCR register and so
+the IPA size of the guest must match the PA size of the host.
+
+For now, the new page-table is unused as there is no way for the host
+to map anything into it. Yet.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_arm.h  |  2 +-
- arch/arm64/include/asm/kvm_host.h |  2 --
- arch/arm64/include/asm/kvm_mmu.h  |  2 +-
- arch/arm64/kvm/arm.c              | 27 +++++++++++++--------------
- arch/arm64/kvm/mmu.c              | 27 ++++++++++++++++++++++++++-
- arch/arm64/kvm/reset.c            | 29 -----------------------------
- 6 files changed, 41 insertions(+), 48 deletions(-)
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h |   6 ++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c  | 125 ++++++++++++++++++++++++-
+ arch/arm64/kvm/mmu.c                   |   4 +-
+ 3 files changed, 132 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 8aa8492dafc0..89e63585dae4 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -135,7 +135,7 @@
-  * 40 bits wide (T0SZ = 24).  Systems with a PARange smaller than 40 bits are
-  * not known to exist and will break with this configuration.
-  *
-- * The VTCR_EL2 is configured per VM and is initialised in kvm_arm_setup_stage2().
-+ * The VTCR_EL2 is configured per VM and is initialised in kvm_init_stage2_mmu.
-  *
-  * Note that when using 4K pages, we concatenate two first level page tables
-  * together. With 16K pages, we concatenate 16 first level page tables.
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 1f2933f0f687..93f25231b247 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -987,8 +987,6 @@ int kvm_set_ipa_limit(void);
- #define __KVM_HAVE_ARCH_VM_ALLOC
- struct kvm *kvm_arch_alloc_vm(void);
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+index d176399dbfb5..5d456438445c 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+@@ -9,6 +9,9 @@
  
--int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
--
- static inline bool kvm_vm_is_protected(struct kvm *kvm)
- {
- 	return false;
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index b208da3bebec..b5320da8544c 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -165,7 +165,7 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
- void free_hyp_pgds(void);
+ #include <asm/kvm_pkvm.h>
  
- void stage2_unmap_vm(struct kvm *kvm);
--int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu);
-+int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long type);
- void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
- int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 			  phys_addr_t pa, unsigned long size, bool writable);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 23fa39c243eb..f5be9241479a 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -139,28 +139,24 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- {
- 	int ret;
- 
--	ret = kvm_arm_setup_stage2(kvm, type);
--	if (ret)
--		return ret;
--
--	ret = kvm_init_stage2_mmu(kvm, &kvm->arch.mmu);
--	if (ret)
--		return ret;
--
- 	ret = kvm_share_hyp(kvm, kvm + 1);
- 	if (ret)
--		goto out_free_stage2_pgd;
-+		return ret;
- 
- 	ret = pkvm_init_host_vm(kvm);
- 	if (ret)
--		goto out_free_stage2_pgd;
-+		goto err_unshare_kvm;
- 
- 	if (!zalloc_cpumask_var(&kvm->arch.supported_cpus, GFP_KERNEL)) {
- 		ret = -ENOMEM;
--		goto out_free_stage2_pgd;
-+		goto err_unshare_kvm;
- 	}
- 	cpumask_copy(kvm->arch.supported_cpus, cpu_possible_mask);
- 
-+	ret = kvm_init_stage2_mmu(kvm, &kvm->arch.mmu, type);
-+	if (ret)
-+		goto err_free_cpumask;
++#include <nvhe/gfp.h>
++#include <nvhe/spinlock.h>
 +
- 	kvm_vgic_early_init(kvm);
- 
- 	/* The maximum number of VCPUs is limited by the host's GIC model */
-@@ -169,9 +165,12 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	set_default_spectre(kvm);
- 	kvm_arm_init_hypercalls(kvm);
- 
--	return ret;
--out_free_stage2_pgd:
--	kvm_free_stage2_pgd(&kvm->arch.mmu);
-+	return 0;
-+
-+err_free_cpumask:
-+	free_cpumask_var(kvm->arch.supported_cpus);
-+err_unshare_kvm:
-+	kvm_unshare_hyp(kvm, kvm + 1);
- 	return ret;
- }
- 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 6dc658b9d75d..4b24e9e1e96b 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -640,15 +640,40 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
-  * kvm_init_stage2_mmu - Initialise a S2 MMU structure
-  * @kvm:	The pointer to the KVM structure
-  * @mmu:	The pointer to the s2 MMU structure
-+ * @type:	The machine type of the virtual machine
-  *
-  * Allocates only the stage-2 HW PGD level table(s).
-  * Note we don't need locking here as this is only called when the VM is
-  * created, which can only be done once.
+ /*
+  * Holds the relevant data for maintaining the vcpu state completely at hyp.
   */
--int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
-+int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long type)
+@@ -36,6 +39,9 @@ struct pkvm_hyp_vm {
+ 
+ 	/* The guest's stage-2 page-table managed by the hypervisor. */
+ 	struct kvm_pgtable pgt;
++	struct kvm_pgtable_mm_ops mm_ops;
++	struct hyp_pool pool;
++	hyp_spinlock_t lock;
+ 
+ 	/*
+ 	 * The number of vcpus initialized and ready to run.
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index 1c38451050e5..27b16a6b85bb 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -25,6 +25,21 @@ struct host_mmu host_mmu;
+ 
+ static struct hyp_pool host_s2_pool;
+ 
++static DEFINE_PER_CPU(struct pkvm_hyp_vm *, __current_vm);
++#define current_vm (*this_cpu_ptr(&__current_vm))
++
++static void guest_lock_component(struct pkvm_hyp_vm *vm)
++{
++	hyp_spin_lock(&vm->lock);
++	current_vm = vm;
++}
++
++static void guest_unlock_component(struct pkvm_hyp_vm *vm)
++{
++	current_vm = NULL;
++	hyp_spin_unlock(&vm->lock);
++}
++
+ static void host_lock_component(void)
  {
-+	u32 kvm_ipa_limit = get_kvm_ipa_limit();
- 	int cpu, err;
- 	struct kvm_pgtable *pgt;
-+	u64 mmfr0, mmfr1;
-+	u32 phys_shift;
-+
-+	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
-+		return -EINVAL;
-+
-+	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
-+	if (phys_shift) {
-+		if (phys_shift > kvm_ipa_limit ||
-+		    phys_shift < ARM64_MIN_PARANGE_BITS)
-+			return -EINVAL;
-+	} else {
-+		phys_shift = KVM_PHYS_SHIFT;
-+		if (phys_shift > kvm_ipa_limit) {
-+			pr_warn_once("%s using unsupported default IPA limit, upgrade your VMM\n",
-+				     current->comm);
-+			return -EINVAL;
-+		}
-+	}
-+
-+	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
-+	mmfr1 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-+	kvm->arch.vtcr = kvm_get_vtcr(mmfr0, mmfr1, phys_shift);
- 
- 	if (mmu->pgt != NULL) {
- 		kvm_err("kvm_arch already initialized?\n");
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 0e08fbe68715..1522edf71a32 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -395,32 +395,3 @@ int kvm_set_ipa_limit(void)
- 
+ 	hyp_spin_lock(&host_mmu.lock);
+@@ -140,18 +155,124 @@ int kvm_host_prepare_stage2(void *pgt_pool_base)
  	return 0;
  }
--
--int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
--{
--	u64 mmfr0, mmfr1;
--	u32 phys_shift;
--
--	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
--		return -EINVAL;
--
--	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
+ 
++static bool guest_stage2_force_pte_cb(u64 addr, u64 end,
++				      enum kvm_pgtable_prot prot)
++{
++	return true;
++}
++
++static void *guest_s2_zalloc_pages_exact(size_t size)
++{
++	void *addr = hyp_alloc_pages(&current_vm->pool, get_order(size));
++
++	WARN_ON(size != (PAGE_SIZE << get_order(size)));
++	hyp_split_page(hyp_virt_to_page(addr));
++
++	return addr;
++}
++
++static void guest_s2_free_pages_exact(void *addr, unsigned long size)
++{
++	u8 order = get_order(size);
++	unsigned int i;
++
++	for (i = 0; i < (1 << order); i++)
++		hyp_put_page(&current_vm->pool, addr + (i * PAGE_SIZE));
++}
++
++static void *guest_s2_zalloc_page(void *mc)
++{
++	struct hyp_page *p;
++	void *addr;
++
++	addr = hyp_alloc_pages(&current_vm->pool, 0);
++	if (addr)
++		return addr;
++
++	addr = pop_hyp_memcache(mc, hyp_phys_to_virt);
++	if (!addr)
++		return addr;
++
++	memset(addr, 0, PAGE_SIZE);
++	p = hyp_virt_to_page(addr);
++	memset(p, 0, sizeof(*p));
++	p->refcount = 1;
++
++	return addr;
++}
++
++static void guest_s2_get_page(void *addr)
++{
++	hyp_get_page(&current_vm->pool, addr);
++}
++
++static void guest_s2_put_page(void *addr)
++{
++	hyp_put_page(&current_vm->pool, addr);
++}
++
++static void clean_dcache_guest_page(void *va, size_t size)
++{
++	__clean_dcache_guest_page(hyp_fixmap_map(__hyp_pa(va)), size);
++	hyp_fixmap_unmap();
++}
++
++static void invalidate_icache_guest_page(void *va, size_t size)
++{
++	__invalidate_icache_guest_page(hyp_fixmap_map(__hyp_pa(va)), size);
++	hyp_fixmap_unmap();
++}
++
+ int kvm_guest_prepare_stage2(struct pkvm_hyp_vm *vm, void *pgd)
+ {
+-	vm->pgt.pgd = pgd;
++	struct kvm_s2_mmu *mmu = &vm->kvm.arch.mmu;
++	unsigned long nr_pages;
++	int ret;
++
++	nr_pages = kvm_pgtable_stage2_pgd_size(vm->kvm.arch.vtcr) >> PAGE_SHIFT;
++	ret = hyp_pool_init(&vm->pool, hyp_virt_to_pfn(pgd), nr_pages, 0);
++	if (ret)
++		return ret;
++
++	hyp_spin_lock_init(&vm->lock);
++	vm->mm_ops = (struct kvm_pgtable_mm_ops) {
++		.zalloc_pages_exact	= guest_s2_zalloc_pages_exact,
++		.free_pages_exact	= guest_s2_free_pages_exact,
++		.zalloc_page		= guest_s2_zalloc_page,
++		.phys_to_virt		= hyp_phys_to_virt,
++		.virt_to_phys		= hyp_virt_to_phys,
++		.page_count		= hyp_page_count,
++		.get_page		= guest_s2_get_page,
++		.put_page		= guest_s2_put_page,
++		.dcache_clean_inval_poc	= clean_dcache_guest_page,
++		.icache_inval_pou	= invalidate_icache_guest_page,
++	};
++
++	guest_lock_component(vm);
++	ret = __kvm_pgtable_stage2_init(mmu->pgt, mmu, &vm->mm_ops, 0,
++					guest_stage2_force_pte_cb);
++	guest_unlock_component(vm);
++	if (ret)
++		return ret;
++
++	vm->kvm.arch.mmu.pgd_phys = __hyp_pa(vm->pgt.pgd);
++
+ 	return 0;
+ }
+ 
+ void reclaim_guest_pages(struct pkvm_hyp_vm *vm)
+ {
++	void *pgd = vm->pgt.pgd;
+ 	unsigned long nr_pages;
+ 
+ 	nr_pages = kvm_pgtable_stage2_pgd_size(vm->kvm.arch.vtcr) >> PAGE_SHIFT;
+-	WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(vm->pgt.pgd), nr_pages));
++
++	guest_lock_component(vm);
++	kvm_pgtable_stage2_destroy(&vm->pgt);
++	vm->kvm.arch.mmu.pgd_phys = 0ULL;
++	guest_unlock_component(vm);
++
++	WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(pgd), nr_pages));
+ }
+ 
+ int __pkvm_prot_finalize(void)
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 4b24e9e1e96b..e500539933ca 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -658,7 +658,9 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+ 		return -EINVAL;
+ 
+ 	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
 -	if (phys_shift) {
--		if (phys_shift > kvm_ipa_limit ||
--		    phys_shift < ARM64_MIN_PARANGE_BITS)
--			return -EINVAL;
--	} else {
--		phys_shift = KVM_PHYS_SHIFT;
--		if (phys_shift > kvm_ipa_limit) {
--			pr_warn_once("%s using unsupported default IPA limit, upgrade your VMM\n",
--				     current->comm);
--			return -EINVAL;
--		}
--	}
--
--	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
--	mmfr1 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
--	kvm->arch.vtcr = kvm_get_vtcr(mmfr0, mmfr1, phys_shift);
--
--	return 0;
--}
++	if (is_protected_kvm_enabled()) {
++		phys_shift = kvm_ipa_limit;
++	} else if (phys_shift) {
+ 		if (phys_shift > kvm_ipa_limit ||
+ 		    phys_shift < ARM64_MIN_PARANGE_BITS)
+ 			return -EINVAL;
 -- 
 2.37.2.789.g6183377224-goog
 
