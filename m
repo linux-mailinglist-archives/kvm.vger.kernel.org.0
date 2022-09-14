@@ -2,96 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 327575B8D3B
-	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 18:39:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 399945B8E43
+	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 19:41:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229757AbiINQje (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Sep 2022 12:39:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35186 "EHLO
+        id S229832AbiINRlh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Sep 2022 13:41:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbiINQjc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Sep 2022 12:39:32 -0400
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA6F4D71
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 09:39:29 -0700 (PDT)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-345528ceb87so187221337b3.11
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 09:39:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=qw5c1rQO9auXlb1weto/2p+w4wwBPYYtzhiHNjVL//I=;
-        b=OAZPO49RrJRJ1iDc42pcPY8eoQOr9U6LI/jzWl/t/qHJGAwMcmrdHEHcTpZAoEhple
-         vmC5s4DomwuO1+aqLB8TMmpmXa4+GKx8HHg3AY/pPl/n26W8L7+GLOtWsIv2AVaWwP4Z
-         ZQNaQeralnxC2np7lvsaONpxNi6tvum3IDZggIXPXTJp9vOigUhfQMvo1WFRSQ0ovgeY
-         ysF+7Rn8+Te/7o66UPvqNQsZr8wJVkRGpZa/Wk186u5fYhn8lQ0jDLw/f7B7H6UMAQRs
-         exEGbIfuANJwGK8IU+YFusPFqhFGXGudweKXCFkCPqfbQuIl49QspG/wobLqsnBjfOE1
-         UjPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=qw5c1rQO9auXlb1weto/2p+w4wwBPYYtzhiHNjVL//I=;
-        b=pQ63EKzESrHSN6J4uZeRfmphZ8ogPXKam8rvgpeKYFtHtdB+As1C8y58W2MuvYvbba
-         Tp+QQN+plwmgG3Nz+EQ/qaUF8uYXl+NSy5lESHCs428GMXG7kcYtK/7BA1SghfTf6rj4
-         cpBkdJOvHJcCiaxCoMProhEoRv+VlIFsOxIgu8zbPwa9AVzLaC6aST4QKKegmJ0ACgpq
-         Mp2hbLQgr4rxttwaOs09AcLIoPNCcGQTuHXuyRI3LMdJh3rmcq7/NjlwLRNETJOO7wIX
-         OGxRmrDfsjDmKoMGpgSXMWZ28hjEUeqshFszPKZtpOyVKdYAzqEii2TWDSPW3yq7KgbW
-         9MTA==
-X-Gm-Message-State: ACgBeo1mj4rlxYaU3PBOr+nEwESFZmEQatlGPZ/XbnKCho4zvyLM8bbP
-        LIg6YfroHshHd6/yWY49YHwwbgCxI7+qOEYC2DPrqw==
-X-Google-Smtp-Source: AA6agR4ZwapujsKhSGBJ8nLTDmAGCZkhuO0sc3uJlAZUs5ydbGgLq/Slr/TreGV6Rcw8FLrJapUcRgU+ddTrKrUYAUQ=
-X-Received: by 2002:a81:c30a:0:b0:328:4a6c:bc89 with SMTP id
- r10-20020a81c30a000000b003284a6cbc89mr31170890ywk.29.1663173568737; Wed, 14
- Sep 2022 09:39:28 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210820155918.7518-1-brijesh.singh@amd.com> <20210820155918.7518-40-brijesh.singh@amd.com>
- <YWYm/Gw8PbaAKBF0@google.com> <YWc+sRwHxEmcZZxB@google.com>
- <4e41dcff-7c7b-cf36-434a-c7732e7e8ff2@amd.com> <YWm3bOFcUSlyZjNb@google.com>
- <20220908212114.sqne7awimfwfztq7@amd.com> <YyGLXXkFCmxBfu5U@google.com>
- <CAA03e5H-V+axMiXTLXi7bf+mBs8ZMvaFZTSHSfktZDTSfu=HZQ@mail.gmail.com>
- <YyH+IGpBBsjfHdDC@google.com> <CAA03e5FndJnwSXQVg9RCvEqAsx4o52h59mBAEWatkyZHzT3T2g@mail.gmail.com>
-In-Reply-To: <CAA03e5FndJnwSXQVg9RCvEqAsx4o52h59mBAEWatkyZHzT3T2g@mail.gmail.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Wed, 14 Sep 2022 17:39:18 +0100
-Message-ID: <CAA03e5EdmtXdxpy02vsGRwUKjH+Y5+BT2yKXwhu-bb=ZKELo+w@mail.gmail.com>
-Subject: Re: [PATCH Part2 v5 39/45] KVM: SVM: Introduce ops for the post gfn
- map and unmap
+        with ESMTP id S229640AbiINRlg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Sep 2022 13:41:36 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC7C985A91;
+        Wed, 14 Sep 2022 10:41:34 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Pg7wmUaId81MyET1HI3fBkbKggh+WwLYYSR9aB4T7HGrlJte3XVgE80dmJYliE1kTCVlcRUSBobMacH37Oy04kn9T957p1c+vEWq5kedFqII1wna7LAkuRRVOdGyiehE0xh0wlElJj1bRgIZUAyKf8997NLa7ERC3cKW0Pp6StlxP8jcKdHsK6+PUMHCaaBWMi4R/8OCP6C4k74CbR2rGvFy2ziMnx92+yHSMbWH9PfRhpHovIOuqSVVZ/0A0EZFsyzBnwPp3HHqsyPBmd6aL7787FWIw9GQ+E6X7UKud/RX1mIMalnPY+tQnbueakxR6+ktHDFQJ5PMB2iXWIJUpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=y7sMOhEufhTs9fpc4fYFuk8ps+yb1iftlkMw+PFFp3M=;
+ b=AqgfijdfoYsXhvHpEeDSOeT+iMVSose6mbh4VNQjC9FVhRjM3UACxzswsRgbxEQot6yqUAG7bssKaEO+BQWjgMMejkeJqAexbjQppEd2LfkGeI58POpcLPAve6fuWsLOuGt5dZWTMUnFTaGdacaKRwHGIwBDaH20sIucFz41dh/ttPrV+8lKySp/IswjU+lsWLzvbFK+IbdyEg0+iTTsNvD9a251ksLNT1FuwNfFtG0cZ7zH5zRvE2Xml8ATeaXEm6iNpOFIAUhEt/R7e3sNiUNy0GbM2GjYtAUpGskd7bPKtZ2lN61MKbXohnN5ZkDHUHKoe1FUi+Gj2WmtQgw2Jg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=y7sMOhEufhTs9fpc4fYFuk8ps+yb1iftlkMw+PFFp3M=;
+ b=utlFGPi9dyX/KVv3pr+6NfnIZ/zoOVgAetNiTa2dzBK+uuNqEKQe5w4OrFZUE+XciKQkYx5jw08MkUWbvZgI5UMJ0ikXIAscaKyQe3GC+nbw5nMod5iNxlA2yJGX8glkrI6B3ONr9U1CdF/0Gvs/b55VjT5yPSawzWXjW0NEnfI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) by
+ MN0PR12MB5714.namprd12.prod.outlook.com (2603:10b6:208:371::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5632.14; Wed, 14 Sep 2022 17:41:31 +0000
+Received: from DM8PR12MB5445.namprd12.prod.outlook.com
+ ([fe80::2cdd:defc:a6d3:7599]) by DM8PR12MB5445.namprd12.prod.outlook.com
+ ([fe80::2cdd:defc:a6d3:7599%3]) with mapi id 15.20.5612.022; Wed, 14 Sep 2022
+ 17:41:31 +0000
+Message-ID: <951f2be3-9830-ad71-0140-e5bbf4b78f96@amd.com>
+Date:   Wed, 14 Sep 2022 12:41:27 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [PATCH v2 04/23] KVM: x86: Inhibit AVIC SPTEs if any vCPU enables
+ x2APIC
+Content-Language: en-US
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Michael Roth <michael.roth@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, x86 <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>, jarkko@profian.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
+        Li RongQing <lirongqing@baidu.com>
+References: <20220903002254.2411750-1-seanjc@google.com>
+ <20220903002254.2411750-5-seanjc@google.com>
+ <b6fcb487-56fc-12ea-6f67-b14b0b156ee0@amd.com> <YyGFGXsbgr6WV0B8@google.com>
+From:   "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>
+In-Reply-To: <YyGFGXsbgr6WV0B8@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MN2PR14CA0007.namprd14.prod.outlook.com
+ (2603:10b6:208:23e::12) To DM8PR12MB5445.namprd12.prod.outlook.com
+ (2603:10b6:8:24::7)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM8PR12MB5445:EE_|MN0PR12MB5714:EE_
+X-MS-Office365-Filtering-Correlation-Id: 99eb5bec-10a9-453c-0298-08da96785be6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: D3647m0OfDS2KixytSV748Qmv81CUtiri7m3hP07XiADLCW0zj5bw3e6m+opnRZXSO6dDVudToFrQTWk8YCvSZo088nfbiHR6y2y1z0qLkxLqrtwadRVvuYYsavQiVAG8Zk7e7itKiTkccomKToe8VKozE3447r6iNcqOHr8mwFNtBnbgWKaFr9evnlx4Ee430VSg2jUTfkfu18Wl0Lr0zxk7PUz37dqqVhQ6fi0zeGrYkA/caLYe05fGIwKxErVCY8h33uXgIcVivt/rVSaPAen6Bd7066NkJYQVHhlFWhDiX4YGNchGzRP88+uTcOFRx5w/hFZzdT39S4trxJEyxJf3ph4IeQpvDwF7eFbA8AvZ/WRQWTMPcjybHoV/mMHfR61HWdXiguPyzBIamSPpKrfk6J2/RL2IRhUWw0Kn/3mBc19KxSS/OBgGqOendfV7eYeMw9ro94ow5wCyEB4Wk5rGL4mLxe0QUqWSMkOiZo91Adg632I8N/tJYq4wGuvM12rSQV9QjTYKOaSn358wZqXuRLZLDw6nQK8gvIAz5h/N503rt6dxVefBWBqPGotSXKza2qd3eyJ17A49xogKKvj7aPDYwzO57DHSNCgNvX8srjiKlCOIGNIC95kBaNek1mZjFFb2U3jI5jj6lrRgp8D1iDxAC/ON/h8uLl6Xr4W/I361QlhcExhM/Q+Ox6USY6K1pAP1y0u34eSOBK4v/MQeP4aIsSjB/HiIs9nKZS/3JDLXDTIBApL/gshYVX6jDXvXTXpmstbVDy3EciVf06mPltC0RvkBqN5c2WzeTw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(366004)(136003)(396003)(346002)(39860400002)(451199015)(54906003)(31686004)(36756003)(2906002)(6486002)(38100700002)(66476007)(8936002)(5660300002)(66556008)(66946007)(8676002)(4326008)(31696002)(316002)(6916009)(86362001)(478600001)(186003)(2616005)(26005)(6512007)(83380400001)(6506007)(6666004)(53546011)(41300700001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SFZGSHJGbVBoTDkweDlUTkVsZDJrNjh4VlU5dHBOQy9OOUdYZGpTTjBLbTdO?=
+ =?utf-8?B?V21NSkk2QWU1NStsZlJvcG9abWdZbDVMVlF3YnZOblE0Rm1XWFFVS2hqQnFE?=
+ =?utf-8?B?bUFYaGJqRzV2ZGFxOVE4cHNlTC9UL1ZaT1ZoU1h2TFdPT1VqenFCamtIOXNj?=
+ =?utf-8?B?emQrS2twRXJLQktXWUR2R0FnTUJJQWhCRHkwYVcrekhUYW16QUZ0b0xVRU1V?=
+ =?utf-8?B?NlVWU2dBdFhJdWJML0Z1dUE3cjJWK3d1UFc0UlExemNiSDZ1SEhHSC9NN1VY?=
+ =?utf-8?B?UHBIak9OcEl4NUMrZ1IyYkc0WTNJcGw1WDNrN0Y3SHVQMmpqK1hOWjIrTm1K?=
+ =?utf-8?B?VDFrYkRGOTVrK3lycEJ2R2pyYm1MRVJtek1LSEV6UEUvVkZtRjFOaWcwa3cx?=
+ =?utf-8?B?KzNtVGh1dmt1d1RPRzlwZS9SUmFLYUFqN2NuRTNnTGxnWmRhS2FHNUhRV1Zn?=
+ =?utf-8?B?OUpkVFRwelBoa0JSenJqc0ZjaWc5WXJuQW5QOXJ0bjRFcllmdjAzWGljaEdy?=
+ =?utf-8?B?Q0JrbzV5eTdnODl1WGpEcmpwNEo5VWY4WURvR1FpcWtZeHFkUWorRTVTcjRk?=
+ =?utf-8?B?ZW1CTUUxVlBFSWo2amFDWHpmME9wR1VVaE1qSlFMb0RMdWJ0ZXhzU3ZEOHhI?=
+ =?utf-8?B?M1pENTh5c0p3N2ZYZ0VhVkxLMUM3RGYwa1JkRUxNVWdpMTJjSXZ6YlJTSXU5?=
+ =?utf-8?B?WHBIMEE3L2xXSUVadW1xSkZ6dDBmT1hoOG1iWmdOSThsVGpubDI4U1JBVWMy?=
+ =?utf-8?B?YWthcys4ZjJnYUVKZ3k3YmUvc2w4NHVFWDlsUjVUcXpFL1V0dFFKY0dlSkdq?=
+ =?utf-8?B?ay9IWXRqOEo4RGhLVGpHQUc1U240anRLUHFpSkJFZ2lSOGpTS1Z6ZmRBTlhs?=
+ =?utf-8?B?aklkK3lTVC9jU09IbTc0aVRqOVB2QUltL0syYU1ONGRvV1ZKaFZVNnlLNFQx?=
+ =?utf-8?B?T3l6aEZNdGpJeFVGK1pFM2g4VzNjMG80ak90Z3lmdG1xOEd6a1ZNVlRMV2I4?=
+ =?utf-8?B?d3A2cXdCSU9jNDZzVzdROTJNbEdMY2tWK1oyQ2VVTmllajZURVhrMyt1Lzc3?=
+ =?utf-8?B?eDN2WjNmblhtcmJFeE9WTkZJa3NWRU1sdkE3ZUdHUkRPQmhScFEvbkpkdG1Y?=
+ =?utf-8?B?Q2ozNmRtQ1dPR2ZMVWN6V3VncHJoT2YrSHVvZVBjczJZVFBSVFkwL2x0YlNZ?=
+ =?utf-8?B?eVZ5Q2NyODhkYnNlR0tOZUs3cm0zekY0Q0xnS2gwZ1BFYTg0ZlBzWjJNbVA5?=
+ =?utf-8?B?eit6WlN0STdLSEdDeXZJck9LRStEK1RqcXJ6dFNNYVJjNkRScEtaT0dHN0h4?=
+ =?utf-8?B?U1VyRzNuMk5IVTFEaHIraXIxZWZiQnl0N05QZm1URzJEUDJoM0tEZkxna0Yy?=
+ =?utf-8?B?WjRMKzhnYW9WS3c2UThyRmVsaXl0YVBiRkNOZjV6VXluRWZmWmJzNEFYVVl1?=
+ =?utf-8?B?cnZ4Rll0WGZDWmpZTkl6STdmMjJzTExTZkc4V2pENGFyUm1NK09qd252RGNV?=
+ =?utf-8?B?UERxWVVnaTBSeXFqRnJHSG50a1ZrVk9jb1huOUQvYlJvM2lPWmt3UDhGYTRX?=
+ =?utf-8?B?a0xSWjZ4MVh3SEdOTUpPcVF0eGp3ZEpQZGM0ZkxLb0p2d2VBOUx3Um5ycEFR?=
+ =?utf-8?B?U2JiN1NHa1hKK1BkWnAvL1pRcUs3YThFNWJEODVoMDg1T1BGdjN5ZmFYZ0xk?=
+ =?utf-8?B?U01JeDNZM2xiOXYyMWZDSWZpcGNybGgxTHU5djJxcGhrUHVZTzZRV2Vpb0w5?=
+ =?utf-8?B?Y25RY2R3bDJFVmsvTVRGb2Zpd0FaeDFPUFpxV3luMGQ4ZlJlZ1RaTXQzMFVO?=
+ =?utf-8?B?Y2ZDTHdsQkpMNU5TeGFZSFQxcHVIWVBaQkVlMTJMeERvaUZXeXJpN3NsN2Yz?=
+ =?utf-8?B?T3dlVTZqWlc3dGU3WU9WNVZqTkxFeWRLMFlCWmpvLy9TWlhBeXlYeXZCb1Rw?=
+ =?utf-8?B?eFNuWTI4M3hzaWsvYmlKaXVZU0ZlVzEwQUVNcUh4dHpKbHdOVThiTmlVN2pF?=
+ =?utf-8?B?cW00TFBXVHJodk9QeUlwQXVFbnBaYlF4S3dXalljTFJqQ0JpdWtRbytqMDV2?=
+ =?utf-8?B?YnpGcnhZeFFCQWlzeG5OaFdQdnJlREhtSzlCOEdlVEw2L0piOWRYWm94N1ZE?=
+ =?utf-8?Q?3cosN9iw1TWwsMNuuncTWwAtX?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 99eb5bec-10a9-453c-0298-08da96785be6
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR12MB5445.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Sep 2022 17:41:31.0120
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OBY29WgaFxqqUyF6BRG+oLu97eXm0/xFK0kAVHhhQDHOzO6knzNwDAuWHapSAe+47cqhhLlpeWI+uFJi/JpJIA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5714
+X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -99,81 +126,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 14, 2022 at 5:32 PM Marc Orr <marcorr@google.com> wrote:
->
-> On Wed, Sep 14, 2022 at 5:15 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Wed, Sep 14, 2022, Marc Orr wrote:
-> > > On Wed, Sep 14, 2022 at 9:05 AM Sean Christopherson <seanjc@google.com> wrote:
-> > > >
-> > > > On Thu, Sep 08, 2022, Michael Roth wrote:
-> > > > > On Fri, Oct 15, 2021 at 05:16:28PM +0000, Sean Christopherson wrote:
-> > > > > So in the context of this interim solution, we're trying to look for a
-> > > > > solution that's simple enough that it can be used reliably, without
-> > > > > introducing too much additional complexity into KVM. There is one
-> > > > > approach that seems to fit that bill, that Brijesh attempted in an
-> > > > > earlier version of this series (I'm not sure what exactly was the
-> > > > > catalyst to changing the approach, as I wasn't really in the loop at
-> > > > > the time, but AIUI there weren't any showstoppers there, but please
-> > > > > correct me if I'm missing anything):
-> > > > >
-> > > > >  - if the host is writing to a page that it thinks is supposed to be
-> > > > >    shared, and the guest switches it to private, we get an RMP fault
-> > > > >    (actually, we will get a !PRESENT fault, since as of v5 we now
-> > > > >    remove the mapping from the directmap as part of conversion)
-> > > > >  - in the host #PF handler, if we see that the page is marked private
-> > > > >    in the RMP table, simply switch it back to shared
-> > > > >  - if this was a bug on the part of the host, then the guest will see
-> > > >
-> > > > As discussed off-list, attempting to fix up RMP violations in the host #PF handler
-> > > > is not a viable approach.  There was also extensive discussion on-list a while back:
-> > > >
-> > > > https://lore.kernel.org/all/8a244d34-2b10-4cf8-894a-1bf12b59cf92@www.fastmail.com
-> > >
-> > > I mentioned this during Mike's talk at the micro-conference: For pages
-> > > mapped in by the kernel can we disallow them to be converted to
-> > > private?
-> >
-> > In theory, yes.  Do we want to do something like this?  No.  kmap() does something
-> > vaguely similar for 32-bit PAE/PSE kernels, but that's a lot of complexity and
-> > overhead to take on.  And this issue goes far beyond a kmap(); when the kernel gup()s
-> > a page, the kernel expects the pfn to be available, no exceptions (pun intended).
-> >
-> > > Note, userspace accesses are already handled by UPM.
-> >
-> > I'm confused by the UPM comment.  Isn't the gist of this thread about the ability
-> > to merge SNP _without_ UPM?  Or am I out in left field?
->
-> I think that was the overall gist: yes. But it's not what I was trying
-> to comment on :-).
->
-> HOWEVER, thinking about this more: I was confused when I wrote out my
-> last reply. I had thought that the issue that Michael brought up
-> applied even with UPM. That is, I was thinking it was still possibly
-> for a guest to maliciously convert a page to private mapped in by the
-> kernel and assumed to be shared.
->
-> But I now realize that is not what will actually happen. To be
-> concrete, let's assume the GHCB page. What will happen is:
-> - KVM has GHCB page mapped in. GHCB is always assumed to be shared. So
-> far so good.
-> - Malicious guest converts GHCB page to private (e.g., via Page State
-> Change request)
-> - Guest exits to KVM
-> - KVM exits to userspace VMM
-> - Userspace VM allocates page in private FD.
->
-> Now, what happens here depends on how UPM works. If we allow double
-> allocation then our host kernel is safe. However, now we have the
-> "double allocation problem".
->
-> If on the other hand, we deallocate the page in the shared FD, the
-> host kernel can segfault. And now we actually do have essentially the
-> same problem Michael was describing that we have without UPM. Because
-> we'll end up in fault.c in the kernel context and likely panic the
-> host.
+Sean
 
-Thinking about this even more... Even if we deallocate in the
-userspace VMM's shared FD, the kernel has its own page tables --
-right? So maybe we are actually 100% OK under UPM then regardless of
-the userspace VMM's policy around managing the private and shared FDs.
+On 9/14/2022 2:39 AM, Sean Christopherson wrote:
+>>> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+>>> index 38e9b8e5278c..d956cd37908e 100644
+>>> --- a/arch/x86/kvm/lapic.c
+>>> +++ b/arch/x86/kvm/lapic.c
+>>> @@ -2394,8 +2394,10 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
+>>>    		}
+>>>    	}
+>>> -	if (((old_value ^ value) & X2APIC_ENABLE) && (value & X2APIC_ENABLE))
+>>> +	if (((old_value ^ value) & X2APIC_ENABLE) && (value & X2APIC_ENABLE)) {
+>>>    		kvm_apic_set_x2apic_id(apic, vcpu->vcpu_id);
+>>> +		kvm_set_apicv_inhibit(vcpu->kvm, APICV_INHIBIT_REASON_X2APIC);
+>>> +	}
+>> .... Here, since we do not want to inhibit APICV/AVIC on system that can
+>> support x2AVIC, this should be set in the vendor-specific call-back
+>> function, where appropriate checks can be made.
+> No, again the intent is to inhibit only the MMIO page.  The x2APIC inhibit is
+> ignored when determining whether or not APICv is inhibited, but is included when
+> checking if the memslot is inhibited.
+> 
+> bool kvm_apicv_memslot_activated(struct kvm *kvm)
+> {
+> 	return (READ_ONCE(kvm->arch.apicv_inhibit_reasons) == 0);
+> }
+> 
+> static unsigned long kvm_apicv_get_inhibit_reasons(struct kvm *kvm)
+> {
+> 	/*
+> 	 * x2APIC only needs to "inhibit" the MMIO region, all other aspects of
+> 	 * APICv can continue to be utilized.
+> 	 */
+> 	return READ_ONCE(kvm->arch.apicv_inhibit_reasons) & ~APICV_INHIBIT_REASON_X2APIC;
+
+Also, this should be:
+
+return READ_ONCE(kvm->arch.apicv_inhibit_reasons) & ~(1UL << 
+APICV_INHIBIT_REASON_X2APIC);
+
+Suravee
