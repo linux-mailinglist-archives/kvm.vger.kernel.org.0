@@ -2,233 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF7675B8692
-	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 12:48:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8456C5B86EC
+	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 13:02:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229597AbiINKr5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Sep 2022 06:47:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33388 "EHLO
+        id S230087AbiINLCn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Sep 2022 07:02:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229615AbiINKr4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Sep 2022 06:47:56 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A2D875F99C
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 03:47:54 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A3EFE1576;
-        Wed, 14 Sep 2022 03:48:00 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4545B3F71A;
-        Wed, 14 Sep 2022 03:47:53 -0700 (PDT)
-Date:   Wed, 14 Sep 2022 11:48:43 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
-Cc:     will@kernel.org, andre.przywara@arm.com, kvm@vger.kernel.org,
-        Pierre Gondois <pierre.gondois@arm.com>
-Subject: Re: [PATCH kvmtool] pci: Disable writes to Status register
-Message-ID: <YyGw0vXdEieaVNzJ@monolith.localdoman>
-References: <20220908144208.231272-1-jean-philippe@linaro.org>
- <YyCLLLVi6AzAzW0p@monolith.localdoman>
- <YyDOgu1gPcN1wLq1@myrica>
+        with ESMTP id S230029AbiINLCj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Sep 2022 07:02:39 -0400
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D051459A5
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 04:02:36 -0700 (PDT)
+Received: by mail-yb1-xb36.google.com with SMTP id 130so22107368ybw.8
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 04:02:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=/x00XsnVTU+kUzsYJrpklCSNRK/9eB/Ro0omNgHKcjw=;
+        b=Ac+HILwHqFFR2pInEWD80qd2Hhz+KfnP4ARhZ3KyCXTpvJHHyDr5V77NYqhoryvKQF
+         dJl70OsGI0lKszgDLTBOZms3/5pvkgfdBUsbSMNSOIBlxaFsdc7cgn5psSKITP8kpB8V
+         xOzwhPJMSYAUctwdpFGlbaEV8SCKDjuEChL+pePwijO8xIoqVkrcYcsRV3btirYx+tku
+         aJU0WUO414C/Wxp0Pun9MOzwXxccxG7OLsrzTyXTmPxK4MXbny48p17mxgOF8jpFZlSC
+         vn7QRQpNrCPXxTAfiA2XvFNUXAO+i9LMxAgMQkBRd9WFAiYeZLTuesMC0akB+54eK5HU
+         ub8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=/x00XsnVTU+kUzsYJrpklCSNRK/9eB/Ro0omNgHKcjw=;
+        b=4BDnxwXfNkLdSOqv0Dk1/CshWUeXenWdbuKoj0qplAEliPe9AG1IwcFLnYkbcXTnk2
+         H4V1cU/il+cbQBOeOZ2vBB6Tjh4GFWUixCEE0+wuHqdQ6gbgX3e6P7FujTUGCqMU1Alv
+         3f7SY1qnHwDVl0BS/ecm2h3yEOSsFiLvEEtisBFwbq+x6n1y5p0Ev8pfQIFhgARPIPDF
+         1jnrLhKQRIzdUOpy3by1m0zhGbvxLkTDb2uTAa0BkHIhcYo2M42EUw/XQZZFJL2NQ5Qo
+         0Y74Dqgq/7oqf0+BX5CE+c+ubv486BIa5McYRDzqz4SQM9t4G5lkQCjJH7zuo1zv+mVm
+         xoZA==
+X-Gm-Message-State: ACrzQf0PG33PAJCpM+XGOA+4ioDP3C7qHpW+x1YMWna/muzfD9SskR62
+        GziQvH+bG962SNLbjWONjm9Dua26j/vuk98AHxl1dg==
+X-Google-Smtp-Source: AMsMyM6fR7f9+1MEXCI5QuGuGovnipYhYRAJTAwDI0qsEJj/bJnJPP8LwBKgS1imITQ25V5RZaRZfc6YC0GybpIkiZM=
+X-Received: by 2002:a25:720b:0:b0:6b0:4b3:c121 with SMTP id
+ n11-20020a25720b000000b006b004b3c121mr1725545ybc.473.1663153355073; Wed, 14
+ Sep 2022 04:02:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YyDOgu1gPcN1wLq1@myrica>
-X-Spam-Status: No, score=-6.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20210820155918.7518-1-brijesh.singh@amd.com> <20210820155918.7518-40-brijesh.singh@amd.com>
+ <YWYm/Gw8PbaAKBF0@google.com> <YWc+sRwHxEmcZZxB@google.com>
+ <4e41dcff-7c7b-cf36-434a-c7732e7e8ff2@amd.com> <YWm3bOFcUSlyZjNb@google.com>
+ <20220908212114.sqne7awimfwfztq7@amd.com> <YyGLXXkFCmxBfu5U@google.com>
+In-Reply-To: <YyGLXXkFCmxBfu5U@google.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Wed, 14 Sep 2022 12:02:24 +0100
+Message-ID: <CAA03e5H-V+axMiXTLXi7bf+mBs8ZMvaFZTSHSfktZDTSfu=HZQ@mail.gmail.com>
+Subject: Re: [PATCH Part2 v5 39/45] KVM: SVM: Introduce ops for the post gfn
+ map and unmap
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Michael Roth <michael.roth@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86 <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>, jarkko@profian.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Wed, Sep 14, 2022 at 9:05 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Sep 08, 2022, Michael Roth wrote:
+> > On Fri, Oct 15, 2021 at 05:16:28PM +0000, Sean Christopherson wrote:
+> > So in the context of this interim solution, we're trying to look for a
+> > solution that's simple enough that it can be used reliably, without
+> > introducing too much additional complexity into KVM. There is one
+> > approach that seems to fit that bill, that Brijesh attempted in an
+> > earlier version of this series (I'm not sure what exactly was the
+> > catalyst to changing the approach, as I wasn't really in the loop at
+> > the time, but AIUI there weren't any showstoppers there, but please
+> > correct me if I'm missing anything):
+> >
+> >  - if the host is writing to a page that it thinks is supposed to be
+> >    shared, and the guest switches it to private, we get an RMP fault
+> >    (actually, we will get a !PRESENT fault, since as of v5 we now
+> >    remove the mapping from the directmap as part of conversion)
+> >  - in the host #PF handler, if we see that the page is marked private
+> >    in the RMP table, simply switch it back to shared
+> >  - if this was a bug on the part of the host, then the guest will see
+>
+> As discussed off-list, attempting to fix up RMP violations in the host #PF handler
+> is not a viable approach.  There was also extensive discussion on-list a while back:
+>
+> https://lore.kernel.org/all/8a244d34-2b10-4cf8-894a-1bf12b59cf92@www.fastmail.com
 
-On Tue, Sep 13, 2022 at 07:40:02PM +0100, Jean-Philippe Brucker wrote:
-> On Tue, Sep 13, 2022 at 02:52:44PM +0100, Alexandru Elisei wrote:
-> > Hi,
-> > 
-> > On Thu, Sep 08, 2022 at 03:42:09PM +0100, Jean-Philippe Brucker wrote:
-> > > Although the PCI Status register only contains read-only and
-> > > write-1-to-clear bits, we currently keep anything written there, which
-> > > can confuse a guest.
-> > > 
-> > > The problem was highlighted by recent Linux commit 6cd514e58f12 ("PCI:
-> > > Clear PCI_STATUS when setting up device"), which unconditionally writes
-> > > 0xffff to the Status register in order to clear pending errors. Then the
-> > > EDAC driver sees the parity status bits set and attempts to clear them
-> > > by writing 0xc100, which in turn clears the Capabilities List bit.
-> > > Later on, when the virtio-pci driver starts probing, it assumes due to
-> > > missing capabilities that the device is using the legacy transport, and
-> > > fails to setup the device because of mismatched protocol.
-> > > 
-> > > Filter writes to the config space, keeping only those to writable
-> > > fields. Tighten the access size check while we're at it, to prevent
-> > > overflow. This is only a small step in the right direction, not a
-> > > foolproof solution, because a guest could still write both Command and
-> > > Status registers using a single 32-bit write. More work is needed for:
-> > > * Supporting arbitrary sized writes.
-> > > * Sanitizing accesses to capabilities, which are device-specific.
-> > > * Fine-grained filtering of the Command register, where only some bits
-> > >   are writable.
-> > 
-> > I'm confused here. Why not do value &= mask to keep only those bits that
-> > writable?
-> 
-> Sure, I can add it
-> 
-> > 
-> > > 
-> > > Also remove the old hack that filtered accesses. It was wrong and not
-> > > properly explained in the git history, but whatever it was guarding
-> > > against should be prevented by these new checks.
-> > 
-> > If I remember correctly, that was guarding against the guest kernel poking
-> > the ROM base address register for drivers that assumed that the ROM was
-> > always there, I vaguely remember that was the case with GPUs. Pairs with
-> > the similar check in the vfio callback, vfio_pci_cfg_write().
-> 
-> Right, makes sense. I think that's what I assumed when rewriting
-> pci__config_wr() hence the current comment but the original commits didn't
-> say anything about it.
-> 
-> > 
-> > > 
-> > > Reported-by: Pierre Gondois <pierre.gondois@arm.com>
-> > > Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
-> > > ---
-> > > Note that the issue described here only shows up during ACPI boot for
-> > > me, because edac_init() happens after PCI enumeration. With DT boot,
-> > > edac_pci_clear_parity_errors() runs earlier and doesn't find any device.
-> > > ---
-> > >  pci.c | 41 ++++++++++++++++++++++++++++++++---------
-> > >  1 file changed, 32 insertions(+), 9 deletions(-)
-> > > 
-> > > diff --git a/pci.c b/pci.c
-> > > index a769ae27..84dc7d1d 100644
-> > > --- a/pci.c
-> > > +++ b/pci.c
-> > > @@ -350,6 +350,24 @@ static void pci_config_bar_wr(struct kvm *kvm,
-> > >  	pci_activate_bar_regions(kvm, old_addr, bar_size);
-> > >  }
-> > >  
-> > > +/*
-> > > + * Bits that are writable in the config space header.
-> > > + * Write-1-to-clear Status bits are missing since we never set them.
-> > > + */
-> > > +static const u8 pci_config_writable[PCI_STD_HEADER_SIZEOF] = {
-> > > +	[PCI_COMMAND] =
-> > > +		PCI_COMMAND_IO |
-> > > +		PCI_COMMAND_MEMORY |
-> > > +		PCI_COMMAND_MASTER |
-> > > +		PCI_COMMAND_PARITY,
-> > > +	[PCI_COMMAND + 1] =
-> > > +		(PCI_COMMAND_SERR |
-> > > +		 PCI_COMMAND_INTX_DISABLE) >> 8,
-> > > +	[PCI_INTERRUPT_LINE] = 0xff,
-> > > +	[PCI_BASE_ADDRESS_0 ... PCI_BASE_ADDRESS_5 + 3] = 0xff,
-> > > +	[PCI_CACHE_LINE_SIZE] = 0xff,
-> > > +};
-> > > +
-> > >  void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data, int size)
-> > >  {
-> > >  	void *base;
-> > > @@ -357,7 +375,7 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
-> > >  	u16 offset;
-> > >  	struct pci_device_header *pci_hdr;
-> > >  	u8 dev_num = addr.device_number;
-> > > -	u32 value = 0;
-> > > +	u32 value = 0, mask = 0;
-> > >  
-> > >  	if (!pci_device_exists(addr.bus_number, dev_num, 0))
-> > >  		return;
-> > > @@ -368,12 +386,12 @@ void pci__config_wr(struct kvm *kvm, union pci_config_address addr, void *data,
-> > >  	if (pci_hdr->cfg_ops.write)
-> > >  		pci_hdr->cfg_ops.write(kvm, pci_hdr, offset, data, size);
-> > >  
-> > > -	/*
-> > > -	 * legacy hack: ignore writes to uninitialized regions (e.g. ROM BAR).
-> > > -	 * Not very nice but has been working so far.
-> > > -	 */
-> > > -	if (*(u32 *)(base + offset) == 0)
-> > > -		return;
-> > > +	/* We don't sanity-check capabilities for the moment */
-> > > +	if (offset < PCI_STD_HEADER_SIZEOF) {
-> > > +		memcpy(&mask, pci_config_writable + offset, size);
-> > > +		if (!mask)
-> > > +			return;
-> > 
-> > Shouldn't this be performed before the VFIO callbacks?
-> 
-> Yes I think I can move it up
-> 
-> > Also, the vfio callbacks still do the writes to the VFIO in-kernel PCI
-> > header, but now kvmtool would skip those writes entirely. Shouldn't
-> > kvmtool's view of the configuration space be identical to that of VFIO?
-> 
-> VFIO also skips writes to read-only fields, so they should now be more in
-> sync than before :) But their views are already desynchronized, because
-> kvmtool doesn't read back the config space virtualized by VFIO after
-> writing to it. We should probably improve it, but that's also for a future
-> patch.
+I mentioned this during Mike's talk at the micro-conference: For pages
+mapped in by the kernel can we disallow them to be converted to
+private? Note, userspace accesses are already handled by UPM.
 
-Ah, I see now. My concern was that kvmtool was still writing to the VFIO
-config space, while ignoring those writes to its own instance of the config
-space.
+In pseudo-code, I'm thinking something like this:
 
-> 
-> > 
-> > > +	}
-> > >  
-> > >  	if (offset == PCI_COMMAND) {
-> > >  		memcpy(&value, data, size);
-> > > @@ -419,8 +437,13 @@ static void pci_config_mmio_access(struct kvm_cpu *vcpu, u64 addr, u8 *data,
-> > >  	cfg_addr.w		= (u32)addr;
-> > >  	cfg_addr.enable_bit	= 1;
-> > >  
-> > > -	if (len > 4)
-> > > -		len = 4;
-> > > +	/*
-> > > +	 * "Root Complex implementations are not required to support the
-> > > +	 * generation of Configuration Requests from accesses that cross DW
-> > > +	 * [4 bytes] boundaries."
-> > > +	 */
-> > > +	if ((addr & 3) + len > 4)
-> > > +		return;
-> > 
-> > Isn't that a change in behaviour?
-> 
-> Yes, but it should be safe to change since it is implementation defined.
-> According to the spec 64-bit config space writes through ECAM are not
-> expected to work and I find the old behaviour, truncating the write, worse
-> than rejecting the whole thing. It looks like at least linux, freebsd,
-> u-boot and edk2 don't issue 64-bit writes.
+kmap_helper() {
+  // And all other interfaces where the kernel can map a GPA
+  // into the kernel page tables
+  mapped_into_kernel_mem_set[hpa] = true;
+}
 
-Ok, great, so this change won't break existing VMs because the guest
-kernels don't do these kind of imp def writes.
+kunmap_helper() {
+  // And all other interfaces where the kernel can unmap a GPA
+  // into the kernel page tables
+  mapped_into_kernel_mem_set[hpa] = false;
 
-Would you mind also moving this before the cfg_ops.write callback?
+  // Except it's not this simple because we probably need ref counting
+  // for multiple mappings. Sigh. But you get the idea.
+}
 
-Thanks,
-Alex
-
-> 
-> Thanks,
-> Jean
-> 
-> > How about:
-> > 
-> >     len = 4 - (addr & 3);
-> > 
-> > Which should conform to the spec, but still allow writes like before.
-> > 
-> > Thanks,
-> > Alex
-> > 
-> > >  
-> > >  	if (is_write)
-> > >  		pci__config_wr(kvm, cfg_addr, data, len);
-> > > -- 
-> > > 2.37.3
-> > > 
+rmpupdate_helper() {
+  if (conversion = SHARED_TO_PRIVATE && mapped_into_kernel_mem_set[hpa])
+    return -EINVAL;  // Or whatever the appropriate error code here is.
+}
