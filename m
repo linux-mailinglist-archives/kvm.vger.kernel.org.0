@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DC555B8F26
-	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 21:09:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA8BC5B8F2E
+	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 21:12:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229650AbiINTJ1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Sep 2022 15:09:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48772 "EHLO
+        id S229597AbiINTMb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Sep 2022 15:12:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229567AbiINTJZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Sep 2022 15:09:25 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF0BF81B35
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 12:09:24 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id q15-20020a17090a304f00b002002ac83485so15366141pjl.0
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 12:09:24 -0700 (PDT)
+        with ESMTP id S229459AbiINTM2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Sep 2022 15:12:28 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECA7D82765
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 12:12:27 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id s14-20020a17090a6e4e00b0020057c70943so20038777pjm.1
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 12:12:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date;
-        bh=Vf0GqOOK3uEkXN9WNsKg2nCcJ7gEgVHu0tfubCGolLk=;
-        b=Ix8wQG8P2YBtgMuYLRU2gZVvgfG/KvQdltCQJtYPe3r5Nw2RASFGCYjRlBE363g4Uq
-         LBRcA+z6swJhD/p979NxWvW0gtGKcRoxyYeoVs0n9+dgeFCd10TJG4Qs+FDhubksdM4G
-         44OOmlLoTGNzjI8X53X2M4UxQlVrwxh1eYRrZW/RHfyZxu4M5YOlR4bSELZPHPlEQyCj
-         gEHni2QM+xiJzfsEK0UED68GE9ZfQoaxwt5/VnDKK2DcPzG2EKEPdvh5ZSVmAJIfkaMR
-         FaycXB4gSxuQqBflbF2VfX4e9FiWR+KmGd8I49K4txy/xTIHr3+DairQNiYpIAyZOu1g
-         lvSA==
+        bh=jQp1+Ka6WRFxpjSfTMZnhetzciGUJa6yU4O7NscoajA=;
+        b=IeN0Cl+mtGiGg7nrtyNfnplaI4CYtE6C8gQqNLIiK2oJypSmlW93xSxiISSQU4d2MF
+         MZ0F9ce+eGGyfWONcZEQ85D7ZRb0Hj9ZUPAvnhzyXj7Kmj/cNJlRXAtLp3Nbh1/OAfE3
+         5/VC7tFS32WVWK8E/wGcLAxti3h9HmfRl0a3NLgJOyNVq75XSy9pL8U95YHS5CaPdaNz
+         Hlc71gyQT2zomO/d6mQQ3km5/Ce2Z/C0JDwE2L6ty1vw97w+T9yu3Ukw79ErOq4VCNJz
+         y7HaRofdUWUDnZwe3qz80Tr7xF2O2c05miWK1B7EkB9TbkD+aeFZt8S2cJOos2EEni8y
+         xkIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=Vf0GqOOK3uEkXN9WNsKg2nCcJ7gEgVHu0tfubCGolLk=;
-        b=WsSKCWGeLyBeNUn8E3bkYtXXeQrokuBla5C9mCOJtHKBw0MMxY548vvWi++4aAsOe4
-         pwIrEneH9hUePXSnpR+9gMoFtxHe/KGTL9EUxH6Z/SlsruvJMsbQX/gNXhAchKJJfhAQ
-         k05KRL8jSv6eUde5poIb08knuDar6yDGBvevE+C8EmlhAzw8PyGjXBjpo6BQ7ND+1WtK
-         MzX3PpdOfxnLOpglR9WQfq6HLwp9A/x/0B3i6WjBRg4/9rfXP33QcYO+wbVL+cua3Xy/
-         7enpNMQIQ8RV64a94DLiG8XQIDXq1RTypsJIdZ3Ewmc8I+9B3jvEq2GTC03T1GerZC0x
-         HC8g==
-X-Gm-Message-State: ACrzQf37o3FO1O0w5gmtIDwvHm79HTcRlm9WKvtqHsityRUciP8mrWOz
-        ObDjf6FNy+XYZdEJs/rE3SWGiKeqH9BuTSKH2kL//g==
-X-Google-Smtp-Source: AMsMyM4Ala40C7jBkQ2I54dEklxAZPC8zv+v2oEl63bhkLcXaIOX+9pXi8KM9ZGWLSuVRjS6+nBHZJGan+C2gOXb0UM=
-X-Received: by 2002:a17:90b:1d02:b0:203:2d73:8efb with SMTP id
- on2-20020a17090b1d0200b002032d738efbmr766863pjb.214.1663182564226; Wed, 14
- Sep 2022 12:09:24 -0700 (PDT)
+        bh=jQp1+Ka6WRFxpjSfTMZnhetzciGUJa6yU4O7NscoajA=;
+        b=J5LUdA/j2+Jjq8aSJXaIWIllInUsHZWMBezXWavJs7u0iyZcB9I7JS2vHamJtW0UwE
+         pVOU+zRNzI4+MQ/u3v8aoMmh4LgQBCFeihANTOSTEsdpjyQdtpT3ty+cT+7KuslF7JHT
+         1peF5An9G/pmaFD+XNKDuCgnLJAPqfINcyEdFKzoSa1NMXfA9ksoIp26nF6kwP8eHDsO
+         XPHqX9ibvNaPNVEdiFze/o3bQBf31uGrMt3TDHq4TkmCqmcx7KOAS/IbEfI1Tudh0tDX
+         f0EH7cC1eAJsJc8CY0UOEAuH6lZMG7ogEeqA8G9UHU6b5qfGBpY3gVJU8zoLHs2cwoGz
+         p0iQ==
+X-Gm-Message-State: ACrzQf2ll+pnxX6D9TzIxgkDZpTdd6mItq5cso+kRyQeKOX/jawAf8M2
+        26EjdTOnt+kicYtGMS+8JW4pWuYlFnMU8IUSQM+Apg==
+X-Google-Smtp-Source: AMsMyM6Yh8x46EoMi+PJvPwLgN4UgEvtPjKTPDk5ffiYP9Avu9XXVxjLuzXfnDqVS2xslQdgz+nJGkA5jHEZQRvn2J8=
+X-Received: by 2002:a17:902:e74f:b0:178:3af4:fb13 with SMTP id
+ p15-20020a170902e74f00b001783af4fb13mr449762plf.19.1663182747200; Wed, 14 Sep
+ 2022 12:12:27 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220903012849.938069-1-vannapurve@google.com>
- <20220903012849.938069-2-vannapurve@google.com> <YxpaFfw4jbwwvEI6@google.com>
-In-Reply-To: <YxpaFfw4jbwwvEI6@google.com>
+ <20220903012849.938069-4-vannapurve@google.com> <YxpysbHZb2G56K+f@google.com>
+In-Reply-To: <YxpysbHZb2G56K+f@google.com>
 From:   Vishal Annapurve <vannapurve@google.com>
-Date:   Wed, 14 Sep 2022 12:09:13 -0700
-Message-ID: <CAGtprH-3qyf4hn+J=G3RFtvYwDdH+Zd3deDnnCycobyyF1V30A@mail.gmail.com>
-Subject: Re: [V1 PATCH 1/5] selftests: kvm: move common startup logic to kvm_util.c
+Date:   Wed, 14 Sep 2022 12:12:16 -0700
+Message-ID: <CAGtprH9C9qTSBC8zB+q0K7ZgT=gs6hHy=i=1AQ80cD0U1vg7nA@mail.gmail.com>
+Subject: Re: [V1 PATCH 3/5] selftests: kvm: x86: Execute vmcall/vmmcall
+ according to CPU type
 To:     David Matlack <dmatlack@google.com>
 Cc:     x86 <x86@kernel.org>, kvm list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
@@ -66,23 +67,61 @@ X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
         T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 8, 2022 at 2:09 PM David Matlack <dmatlack@google.com> wrote:
+On Thu, Sep 8, 2022 at 3:54 PM David Matlack <dmatlack@google.com> wrote:
 >
-...
-> >       print_skip("__NR_userfaultfd must be present for userfaultfd test");
-> > -     return KSFT_SKIP;
+> Please use "KVM: selftest: ..." for the shortlog.
 >
-> exit(KSFT_SKIP) to preserve the test behavior.
 
-Ack, though this change should go away in the next series with common
-selftest init using constructor attribute.
+Ack.
+
+> On Sat, Sep 03, 2022 at 01:28:47AM +0000, Vishal Annapurve wrote:
+> > Modify following APIs for x86 implementation:
+> > 1) kvm_arch_main : Query the cpu vendor and cache the value in advance.
+> > 2) kvm_arch_post_vm_load: Populate cpu type in the guest memory so that
+> >       guest doesn't need to execute cpuid instruction again.
+>
+> This commit message only describes a subset of the changes in this
+> commit, and does not provide any context on why the changes are being
+> made (other than a clue about avoiding CPUID).
+>
+> I also think this could be split up into 2 separate commits.
+>
+
+Ack, will add more details to the commit log. Though since
+is_amd_cpu/is_intel_cpu is used by both selftest VMM and selftest
+guest logic, I would prefer to not split this change into two. For
+now, I will upload the series with this change being a single patch.
+We can discuss again if this split is really needed.
 
 Regards,
 Vishal
+
+> I would suggest first patch changes is_{intel,amd}_cpu() to return a cached
+> result. e.g.
+>
+>   KVM: selftests: Precompute the result for is_{intel,amd}_cpu()
+>
+>   Cache the vendor CPU type in a global variable so that multiple calls
+>   to is_intel_cpu() do not need to re-execute CPUID. This will be useful
+>   in a follow-up commit to check if running on AMD or Intel from within
+>   a selftest guest where executing CPUID requires a VM-exit.
+>
+> Then add support for AMD to kvm_hypercall():
+>
+>   KVM: selftests: Add AMD support to kvm_hypercall()
+>
+>   Add support for AMD hypercalls to kvm_hypercall() so that it can be
+>   used in selftests running on Intel or AMD hosts. This will be used in
+>   a follow up commit to ...
+>
+>   As part of this change, sync the global variable is_cpu_amd into the
+>   guest so the guest can determine which hypercall instruction to use
+>   without needing to re-execute CPUID for every hypercall.
+>
