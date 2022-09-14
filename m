@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D8485B831A
-	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 10:36:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 813535B831D
+	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 10:36:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230228AbiINIgj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Sep 2022 04:36:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36536 "EHLO
+        id S230257AbiINIgq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Sep 2022 04:36:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230245AbiINIgX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Sep 2022 04:36:23 -0400
+        with ESMTP id S230127AbiINIg1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Sep 2022 04:36:27 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F2EF6A4B4
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 01:36:19 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12CD267C90
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 01:36:22 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E4598B8167C
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 08:36:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4586C43470;
-        Wed, 14 Sep 2022 08:36:13 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 6A110B81681
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 08:36:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B057C4347C;
+        Wed, 14 Sep 2022 08:36:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1663144576;
-        bh=ubNg9OVluIpHWUzaM5PeEFYKW/9/pHn1I3EXbcq99vs=;
+        s=k20201202; t=1663144580;
+        bh=MTvQFSZG4vCk/H/YW0N6L6nwP5YUiWUxFHraR/uYdFw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=FT1Yh7kJMUIlPN2g26Uvb8/u2+6YtmdhK3o0KdkZVJrULQa0vaT07STco+XVzcMLY
-         60ZDUQ85zQZnyMmwEaokTLQ31qv6yiGN6ALWngmHQieDdJxejLZsoyWpJd1wZFEJyC
-         8GSCEhvq3LyrcW0SpfEv2UN0W5FBMbMs9inLm+Ddv0tWPX2po8OIp5jpi8R7eHAM+v
-         5/6ljTqMnkvCGk0GbpUg1epVINIdEpMRUqqBfZ9pMmgpkuWltZ06yqL3+8K1Fjyjwi
-         e+xbRyVuKlAFkEdhTwbUs87DOJD9oJoXChnamkkk4VC46YqDHTUC9nMV+E+Z1YptMz
-         95wTzqpim/7+w==
+        b=XEvdyst9lDq77hhSi7TMv2GqCwunp0NUX7th58GNsjaDevVrDYdt45aj+HYJvzoFB
+         KwScNa1RN9OY3NfoDK6dL5DSB4P3WwcdiQZ72MXnxt/aPRgLNTge59ywyC4vr7UaDj
+         VWT2Rpw3NVjGJf8+u/Km+SUPdvc1SgZ4USdaEqirCp4XnNyqyI346kOhXNd5iKTeTe
+         O5V1TQD1PQvtkJ7rdtmsR+ET1tCVJ11IaTbJ6s16f3GIvvQvDhIx31z653AyfnBc+9
+         xQZOSjq2lO8pKwTt6RhW453fKa19LJGeS8fgXZNXC3h3xA90nxgtDNZ2tzR0swJmxj
+         0sBL2hsMmdAfA==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     Will Deacon <will@kernel.org>,
@@ -47,9 +47,9 @@ Cc:     Will Deacon <will@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v3 19/25] KVM: arm64: Instantiate guest stage-2 page-tables at EL2
-Date:   Wed, 14 Sep 2022 09:34:54 +0100
-Message-Id: <20220914083500.5118-20-will@kernel.org>
+Subject: [PATCH v3 20/25] KVM: arm64: Return guest memory from EL2 via dedicated teardown memcache
+Date:   Wed, 14 Sep 2022 09:34:55 +0100
+Message-Id: <20220914083500.5118-21-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220914083500.5118-1-will@kernel.org>
 References: <20220914083500.5118-1-will@kernel.org>
@@ -67,222 +67,200 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Quentin Perret <qperret@google.com>
 
-Extend the initialisation of guest data structures within the pKVM
-hypervisor at EL2 so that we instantiate a memory pool and a full
-'struct kvm_s2_mmu' structure for each VM, with a stage-2 page-table
-entirely independent from the one managed by the host at EL1.
-
-The 'struct kvm_pgtable_mm_ops' used by the page-table code is populated
-with a set of callbacks that can manage guest pages in the hypervisor
-without any direct intervention from the host, allocating page-table
-pages from the provided pool and returning these to the host on VM
-teardown. To keep things simple, the stage-2 MMU for the guest is
-configured identically to the host stage-2 in the VTCR register and so
-the IPA size of the guest must match the PA size of the host.
-
-For now, the new page-table is unused as there is no way for the host
-to map anything into it. Yet.
+Rather than relying on the host to free the previously-donated pKVM
+hypervisor VM pages explicitly on teardown, introduce a dedicated
+teardown memcache which allows the host to reclaim guest memory
+resources without having to keep track of all of the allocations made by
+the pKVM hypervisor at EL2.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |   6 ++
- arch/arm64/kvm/hyp/nvhe/mem_protect.c  | 125 ++++++++++++++++++++++++-
- arch/arm64/kvm/mmu.c                   |   4 +-
- 3 files changed, 132 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_host.h             |  7 +----
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 17 ++++++----
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                | 20 ++++++++++--
+ arch/arm64/kvm/pkvm.c                         | 31 ++++---------------
+ 5 files changed, 36 insertions(+), 41 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index d176399dbfb5..5d456438445c 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -9,6 +9,9 @@
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 93f25231b247..362fe3073970 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -177,12 +177,7 @@ typedef unsigned int pkvm_handle_t;
+ struct kvm_protected_vm {
+ 	pkvm_handle_t handle;
+ 	struct mutex vm_lock;
+-
+-	struct {
+-		void *pgd;
+-		void *vm;
+-		void *vcpus[KVM_MAX_VCPUS];
+-	} hyp_donations;
++	struct kvm_hyp_memcache teardown_mc;
+ };
  
- #include <asm/kvm_pkvm.h>
+ struct kvm_arch {
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+index 420b87e755a4..b7bdbe63deed 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+@@ -76,7 +76,7 @@ void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt);
  
-+#include <nvhe/gfp.h>
-+#include <nvhe/spinlock.h>
-+
- /*
-  * Holds the relevant data for maintaining the vcpu state completely at hyp.
-  */
-@@ -36,6 +39,9 @@ struct pkvm_hyp_vm {
+ int hyp_pin_shared_mem(void *from, void *to);
+ void hyp_unpin_shared_mem(void *from, void *to);
+-void reclaim_guest_pages(struct pkvm_hyp_vm *vm);
++void reclaim_guest_pages(struct pkvm_hyp_vm *vm, struct kvm_hyp_memcache *mc);
+ int refill_memcache(struct kvm_hyp_memcache *mc, unsigned long min_pages,
+ 		    struct kvm_hyp_memcache *host_mc);
  
- 	/* The guest's stage-2 page-table managed by the hypervisor. */
- 	struct kvm_pgtable pgt;
-+	struct kvm_pgtable_mm_ops mm_ops;
-+	struct hyp_pool pool;
-+	hyp_spinlock_t lock;
- 
- 	/*
- 	 * The number of vcpus initialized and ready to run.
 diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 1c38451050e5..27b16a6b85bb 100644
+index 27b16a6b85bb..ffa56a89acdb 100644
 --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
 +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -25,6 +25,21 @@ struct host_mmu host_mmu;
- 
- static struct hyp_pool host_s2_pool;
- 
-+static DEFINE_PER_CPU(struct pkvm_hyp_vm *, __current_vm);
-+#define current_vm (*this_cpu_ptr(&__current_vm))
-+
-+static void guest_lock_component(struct pkvm_hyp_vm *vm)
-+{
-+	hyp_spin_lock(&vm->lock);
-+	current_vm = vm;
-+}
-+
-+static void guest_unlock_component(struct pkvm_hyp_vm *vm)
-+{
-+	current_vm = NULL;
-+	hyp_spin_unlock(&vm->lock);
-+}
-+
- static void host_lock_component(void)
- {
- 	hyp_spin_lock(&host_mmu.lock);
-@@ -140,18 +155,124 @@ int kvm_host_prepare_stage2(void *pgt_pool_base)
+@@ -260,19 +260,24 @@ int kvm_guest_prepare_stage2(struct pkvm_hyp_vm *vm, void *pgd)
  	return 0;
  }
  
-+static bool guest_stage2_force_pte_cb(u64 addr, u64 end,
-+				      enum kvm_pgtable_prot prot)
-+{
-+	return true;
-+}
-+
-+static void *guest_s2_zalloc_pages_exact(size_t size)
-+{
-+	void *addr = hyp_alloc_pages(&current_vm->pool, get_order(size));
-+
-+	WARN_ON(size != (PAGE_SIZE << get_order(size)));
-+	hyp_split_page(hyp_virt_to_page(addr));
-+
-+	return addr;
-+}
-+
-+static void guest_s2_free_pages_exact(void *addr, unsigned long size)
-+{
-+	u8 order = get_order(size);
-+	unsigned int i;
-+
-+	for (i = 0; i < (1 << order); i++)
-+		hyp_put_page(&current_vm->pool, addr + (i * PAGE_SIZE));
-+}
-+
-+static void *guest_s2_zalloc_page(void *mc)
-+{
-+	struct hyp_page *p;
+-void reclaim_guest_pages(struct pkvm_hyp_vm *vm)
++void reclaim_guest_pages(struct pkvm_hyp_vm *vm, struct kvm_hyp_memcache *mc)
+ {
+-	void *pgd = vm->pgt.pgd;
+-	unsigned long nr_pages;
+-
+-	nr_pages = kvm_pgtable_stage2_pgd_size(vm->kvm.arch.vtcr) >> PAGE_SHIFT;
 +	void *addr;
-+
-+	addr = hyp_alloc_pages(&current_vm->pool, 0);
-+	if (addr)
-+		return addr;
-+
-+	addr = pop_hyp_memcache(mc, hyp_phys_to_virt);
-+	if (!addr)
-+		return addr;
-+
-+	memset(addr, 0, PAGE_SIZE);
-+	p = hyp_virt_to_page(addr);
-+	memset(p, 0, sizeof(*p));
-+	p->refcount = 1;
-+
-+	return addr;
-+}
-+
-+static void guest_s2_get_page(void *addr)
-+{
-+	hyp_get_page(&current_vm->pool, addr);
-+}
-+
-+static void guest_s2_put_page(void *addr)
-+{
-+	hyp_put_page(&current_vm->pool, addr);
-+}
-+
-+static void clean_dcache_guest_page(void *va, size_t size)
-+{
-+	__clean_dcache_guest_page(hyp_fixmap_map(__hyp_pa(va)), size);
-+	hyp_fixmap_unmap();
-+}
-+
-+static void invalidate_icache_guest_page(void *va, size_t size)
-+{
-+	__invalidate_icache_guest_page(hyp_fixmap_map(__hyp_pa(va)), size);
-+	hyp_fixmap_unmap();
-+}
-+
- int kvm_guest_prepare_stage2(struct pkvm_hyp_vm *vm, void *pgd)
- {
--	vm->pgt.pgd = pgd;
-+	struct kvm_s2_mmu *mmu = &vm->kvm.arch.mmu;
-+	unsigned long nr_pages;
-+	int ret;
-+
-+	nr_pages = kvm_pgtable_stage2_pgd_size(vm->kvm.arch.vtcr) >> PAGE_SHIFT;
-+	ret = hyp_pool_init(&vm->pool, hyp_virt_to_pfn(pgd), nr_pages, 0);
-+	if (ret)
-+		return ret;
-+
-+	hyp_spin_lock_init(&vm->lock);
-+	vm->mm_ops = (struct kvm_pgtable_mm_ops) {
-+		.zalloc_pages_exact	= guest_s2_zalloc_pages_exact,
-+		.free_pages_exact	= guest_s2_free_pages_exact,
-+		.zalloc_page		= guest_s2_zalloc_page,
-+		.phys_to_virt		= hyp_phys_to_virt,
-+		.virt_to_phys		= hyp_virt_to_phys,
-+		.page_count		= hyp_page_count,
-+		.get_page		= guest_s2_get_page,
-+		.put_page		= guest_s2_put_page,
-+		.dcache_clean_inval_poc	= clean_dcache_guest_page,
-+		.icache_inval_pou	= invalidate_icache_guest_page,
-+	};
-+
-+	guest_lock_component(vm);
-+	ret = __kvm_pgtable_stage2_init(mmu->pgt, mmu, &vm->mm_ops, 0,
-+					guest_stage2_force_pte_cb);
-+	guest_unlock_component(vm);
-+	if (ret)
-+		return ret;
-+
-+	vm->kvm.arch.mmu.pgd_phys = __hyp_pa(vm->pgt.pgd);
-+
- 	return 0;
- }
  
- void reclaim_guest_pages(struct pkvm_hyp_vm *vm)
- {
-+	void *pgd = vm->pgt.pgd;
- 	unsigned long nr_pages;
++	/* Dump all pgtable pages in the hyp_pool */
+ 	guest_lock_component(vm);
+ 	kvm_pgtable_stage2_destroy(&vm->pgt);
+ 	vm->kvm.arch.mmu.pgd_phys = 0ULL;
+ 	guest_unlock_component(vm);
  
- 	nr_pages = kvm_pgtable_stage2_pgd_size(vm->kvm.arch.vtcr) >> PAGE_SHIFT;
--	WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(vm->pgt.pgd), nr_pages));
-+
-+	guest_lock_component(vm);
-+	kvm_pgtable_stage2_destroy(&vm->pgt);
-+	vm->kvm.arch.mmu.pgd_phys = 0ULL;
-+	guest_unlock_component(vm);
-+
-+	WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(pgd), nr_pages));
+-	WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(pgd), nr_pages));
++	/* Drain the hyp_pool into the memcache */
++	addr = hyp_alloc_pages(&vm->pool, 0);
++	while (addr) {
++		memset(hyp_virt_to_page(addr), 0, sizeof(struct hyp_page));
++		push_hyp_memcache(mc, addr, hyp_virt_to_phys);
++		WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(addr), 1));
++		addr = hyp_alloc_pages(&vm->pool, 0);
++	}
  }
  
  int __pkvm_prot_finalize(void)
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 4b24e9e1e96b..e500539933ca 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -658,7 +658,9 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
- 		return -EINVAL;
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index 6ff78118a140..09e221ea6184 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -539,8 +539,21 @@ int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
+ 	return ret;
+ }
  
- 	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
--	if (phys_shift) {
-+	if (is_protected_kvm_enabled()) {
-+		phys_shift = kvm_ipa_limit;
-+	} else if (phys_shift) {
- 		if (phys_shift > kvm_ipa_limit ||
- 		    phys_shift < ARM64_MIN_PARANGE_BITS)
- 			return -EINVAL;
++static void
++teardown_donated_memory(struct kvm_hyp_memcache *mc, void *addr, size_t size)
++{
++	size = PAGE_ALIGN(size);
++	memset(addr, 0, size);
++
++	for (void *start = addr; start < addr + size; start += PAGE_SIZE)
++		push_hyp_memcache(mc, start, hyp_virt_to_phys);
++
++	unmap_donated_memory_noclear(addr, size);
++}
++
+ int __pkvm_teardown_vm(pkvm_handle_t handle)
+ {
++	struct kvm_hyp_memcache *mc;
+ 	struct pkvm_hyp_vm *hyp_vm;
+ 	unsigned int idx;
+ 	int err;
+@@ -563,7 +576,8 @@ int __pkvm_teardown_vm(pkvm_handle_t handle)
+ 	hyp_spin_unlock(&vm_table_lock);
+ 
+ 	/* Reclaim guest pages (including page-table pages) */
+-	reclaim_guest_pages(hyp_vm);
++	mc = &hyp_vm->host_kvm->arch.pkvm.teardown_mc;
++	reclaim_guest_pages(hyp_vm, mc);
+ 	unpin_host_vcpus(hyp_vm->vcpus, hyp_vm->nr_vcpus);
+ 
+ 	/* Push the metadata pages to the teardown memcache */
+@@ -572,10 +586,10 @@ int __pkvm_teardown_vm(pkvm_handle_t handle)
+ 	for (idx = 0; idx < hyp_vm->nr_vcpus; ++idx) {
+ 		struct pkvm_hyp_vcpu *hyp_vcpu = hyp_vm->vcpus[idx];
+ 
+-		unmap_donated_memory(hyp_vcpu, sizeof(*hyp_vcpu));
++		teardown_donated_memory(mc, hyp_vcpu, sizeof(*hyp_vcpu));
+ 	}
+ 
+-	unmap_donated_memory(hyp_vm, hyp_vm->donated_memory_size);
++	teardown_donated_memory(mc, hyp_vm, hyp_vm->donated_memory_size);
+ 	return 0;
+ 
+ err_unlock:
+diff --git a/arch/arm64/kvm/pkvm.c b/arch/arm64/kvm/pkvm.c
+index 754632a608e3..a9953db08592 100644
+--- a/arch/arm64/kvm/pkvm.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -147,8 +147,6 @@ static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
+ 	handle = ret;
+ 
+ 	host_kvm->arch.pkvm.handle = handle;
+-	host_kvm->arch.pkvm.hyp_donations.pgd = pgd;
+-	host_kvm->arch.pkvm.hyp_donations.vm = hyp_vm;
+ 
+ 	/* Donate memory for the vcpus at hyp and initialize it. */
+ 	hyp_vcpu_sz = PAGE_ALIGN(PKVM_HYP_VCPU_SIZE);
+@@ -167,12 +165,12 @@ static int __pkvm_create_hyp_vm(struct kvm *host_kvm)
+ 			goto destroy_vm;
+ 		}
+ 
+-		host_kvm->arch.pkvm.hyp_donations.vcpus[idx] = hyp_vcpu;
+-
+ 		ret = kvm_call_hyp_nvhe(__pkvm_init_vcpu, handle, host_vcpu,
+ 					hyp_vcpu);
+-		if (ret)
++		if (ret) {
++			free_pages_exact(hyp_vcpu, hyp_vcpu_sz);
+ 			goto destroy_vm;
++		}
+ 	}
+ 
+ 	return 0;
+@@ -201,30 +199,13 @@ int pkvm_create_hyp_vm(struct kvm *host_kvm)
+ 
+ void pkvm_destroy_hyp_vm(struct kvm *host_kvm)
+ {
+-	unsigned long idx, nr_vcpus = host_kvm->created_vcpus;
+-	size_t pgd_sz, hyp_vm_sz;
+-
+-	if (host_kvm->arch.pkvm.handle)
++	if (host_kvm->arch.pkvm.handle) {
+ 		WARN_ON(kvm_call_hyp_nvhe(__pkvm_teardown_vm,
+ 					  host_kvm->arch.pkvm.handle));
+-
+-	host_kvm->arch.pkvm.handle = 0;
+-
+-	for (idx = 0; idx < nr_vcpus; ++idx) {
+-		void *hyp_vcpu = host_kvm->arch.pkvm.hyp_donations.vcpus[idx];
+-
+-		if (!hyp_vcpu)
+-			break;
+-
+-		free_pages_exact(hyp_vcpu, PAGE_ALIGN(PKVM_HYP_VCPU_SIZE));
+ 	}
+ 
+-	hyp_vm_sz = PAGE_ALIGN(size_add(PKVM_HYP_VM_SIZE,
+-					size_mul(sizeof(void *), nr_vcpus)));
+-	pgd_sz = kvm_pgtable_stage2_pgd_size(host_kvm->arch.vtcr);
+-
+-	free_pages_exact(host_kvm->arch.pkvm.hyp_donations.vm, hyp_vm_sz);
+-	free_pages_exact(host_kvm->arch.pkvm.hyp_donations.pgd, pgd_sz);
++	host_kvm->arch.pkvm.handle = 0;
++	free_hyp_memcache(&host_kvm->arch.pkvm.teardown_mc);
+ }
+ 
+ int pkvm_init_host_vm(struct kvm *host_kvm)
 -- 
 2.37.2.789.g6183377224-goog
 
