@@ -2,149 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8456C5B86EC
-	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 13:02:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9618F5B8960
+	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 15:44:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230087AbiINLCn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Sep 2022 07:02:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58940 "EHLO
+        id S229538AbiINNoj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Sep 2022 09:44:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230029AbiINLCj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Sep 2022 07:02:39 -0400
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D051459A5
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 04:02:36 -0700 (PDT)
-Received: by mail-yb1-xb36.google.com with SMTP id 130so22107368ybw.8
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 04:02:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=/x00XsnVTU+kUzsYJrpklCSNRK/9eB/Ro0omNgHKcjw=;
-        b=Ac+HILwHqFFR2pInEWD80qd2Hhz+KfnP4ARhZ3KyCXTpvJHHyDr5V77NYqhoryvKQF
-         dJl70OsGI0lKszgDLTBOZms3/5pvkgfdBUsbSMNSOIBlxaFsdc7cgn5psSKITP8kpB8V
-         xOzwhPJMSYAUctwdpFGlbaEV8SCKDjuEChL+pePwijO8xIoqVkrcYcsRV3btirYx+tku
-         aJU0WUO414C/Wxp0Pun9MOzwXxccxG7OLsrzTyXTmPxK4MXbny48p17mxgOF8jpFZlSC
-         vn7QRQpNrCPXxTAfiA2XvFNUXAO+i9LMxAgMQkBRd9WFAiYeZLTuesMC0akB+54eK5HU
-         ub8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=/x00XsnVTU+kUzsYJrpklCSNRK/9eB/Ro0omNgHKcjw=;
-        b=4BDnxwXfNkLdSOqv0Dk1/CshWUeXenWdbuKoj0qplAEliPe9AG1IwcFLnYkbcXTnk2
-         H4V1cU/il+cbQBOeOZ2vBB6Tjh4GFWUixCEE0+wuHqdQ6gbgX3e6P7FujTUGCqMU1Alv
-         3f7SY1qnHwDVl0BS/ecm2h3yEOSsFiLvEEtisBFwbq+x6n1y5p0Ev8pfQIFhgARPIPDF
-         1jnrLhKQRIzdUOpy3by1m0zhGbvxLkTDb2uTAa0BkHIhcYo2M42EUw/XQZZFJL2NQ5Qo
-         0Y74Dqgq/7oqf0+BX5CE+c+ubv486BIa5McYRDzqz4SQM9t4G5lkQCjJH7zuo1zv+mVm
-         xoZA==
-X-Gm-Message-State: ACrzQf0PG33PAJCpM+XGOA+4ioDP3C7qHpW+x1YMWna/muzfD9SskR62
-        GziQvH+bG962SNLbjWONjm9Dua26j/vuk98AHxl1dg==
-X-Google-Smtp-Source: AMsMyM6fR7f9+1MEXCI5QuGuGovnipYhYRAJTAwDI0qsEJj/bJnJPP8LwBKgS1imITQ25V5RZaRZfc6YC0GybpIkiZM=
-X-Received: by 2002:a25:720b:0:b0:6b0:4b3:c121 with SMTP id
- n11-20020a25720b000000b006b004b3c121mr1725545ybc.473.1663153355073; Wed, 14
- Sep 2022 04:02:35 -0700 (PDT)
+        with ESMTP id S229511AbiINNog (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Sep 2022 09:44:36 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFD1965CA
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 06:44:33 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28EDIxiD029321
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 13:44:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=8Jy9l9ygwARtfuhuKdCGJbAudXQeAEtsmYNJsyIRE/0=;
+ b=SB5aKj2xGaOuBdL6lTdkZvn2zAMxvelR9EQ1MXs/t+kkkNFe5Bnww4mA4ZxDXsteBtS5
+ ih4byOlGzYGcGIHj/rwdAUm+ZAIgJ/G7m3lG4gdgsP949SDdTsy74BcTnAsGp7wkVdAw
+ KX9amEb+QyFKh6X0gVnj0p9e9naMucLCU/qKaAmNhrT89xUxwky9c6Pt7Ewi5x+N30bX
+ UiGUtUzLvWgLHRrNPsL9Po8Luu8O/1En5sQIESPdPRvsbCE+9ijspcdbs+BbV6JWdFwp
+ F48+0igEbmq1DiD8lfxL+4HeZT4JpNbODjb28lO761XEuDWgbzaCKWAdZVwJGH/srioS KQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jkfqys38q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 13:44:33 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28EDKDqg003014
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 13:44:33 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jkfqys37v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 14 Sep 2022 13:44:33 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 28EDfI6p012481;
+        Wed, 14 Sep 2022 13:44:30 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma01fra.de.ibm.com with ESMTP id 3jjy2j8tnn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 14 Sep 2022 13:44:30 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 28EDefBF28639742
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 14 Sep 2022 13:40:41 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 792164C04A;
+        Wed, 14 Sep 2022 13:44:27 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3321A4C044;
+        Wed, 14 Sep 2022 13:44:27 +0000 (GMT)
+Received: from [9.171.23.48] (unknown [9.171.23.48])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 14 Sep 2022 13:44:27 +0000 (GMT)
+Message-ID: <f361e962-3fcf-1330-0efe-1d38e89a5d51@linux.ibm.com>
+Date:   Wed, 14 Sep 2022 15:44:26 +0200
 MIME-Version: 1.0
-References: <20210820155918.7518-1-brijesh.singh@amd.com> <20210820155918.7518-40-brijesh.singh@amd.com>
- <YWYm/Gw8PbaAKBF0@google.com> <YWc+sRwHxEmcZZxB@google.com>
- <4e41dcff-7c7b-cf36-434a-c7732e7e8ff2@amd.com> <YWm3bOFcUSlyZjNb@google.com>
- <20220908212114.sqne7awimfwfztq7@amd.com> <YyGLXXkFCmxBfu5U@google.com>
-In-Reply-To: <YyGLXXkFCmxBfu5U@google.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Wed, 14 Sep 2022 12:02:24 +0100
-Message-ID: <CAA03e5H-V+axMiXTLXi7bf+mBs8ZMvaFZTSHSfktZDTSfu=HZQ@mail.gmail.com>
-Subject: Re: [PATCH Part2 v5 39/45] KVM: SVM: Introduce ops for the post gfn
- map and unmap
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Michael Roth <michael.roth@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, x86 <x86@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>, jarkko@profian.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [kvm-unit-tests PATCH v3 0/2] s390x: dump support for PV tests
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     imbrenda@linux.ibm.com, thuth@redhat.com
+References: <20220909121453.202548-1-nrb@linux.ibm.com>
+Content-Language: en-US
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20220909121453.202548-1-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 7AqfhdMfFk2KqA_en9DG0cw6wEeWAkv6
+X-Proofpoint-ORIG-GUID: gmKlOzoLViz2_viEvhgVDGnAyPvzjOhD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-09-14_05,2022-09-14_04,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ lowpriorityscore=0 suspectscore=0 mlxscore=0 mlxlogscore=785 spamscore=0
+ priorityscore=1501 bulkscore=0 adultscore=0 malwarescore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2208220000
+ definitions=main-2209140066
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 14, 2022 at 9:05 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Sep 08, 2022, Michael Roth wrote:
-> > On Fri, Oct 15, 2021 at 05:16:28PM +0000, Sean Christopherson wrote:
-> > So in the context of this interim solution, we're trying to look for a
-> > solution that's simple enough that it can be used reliably, without
-> > introducing too much additional complexity into KVM. There is one
-> > approach that seems to fit that bill, that Brijesh attempted in an
-> > earlier version of this series (I'm not sure what exactly was the
-> > catalyst to changing the approach, as I wasn't really in the loop at
-> > the time, but AIUI there weren't any showstoppers there, but please
-> > correct me if I'm missing anything):
-> >
-> >  - if the host is writing to a page that it thinks is supposed to be
-> >    shared, and the guest switches it to private, we get an RMP fault
-> >    (actually, we will get a !PRESENT fault, since as of v5 we now
-> >    remove the mapping from the directmap as part of conversion)
-> >  - in the host #PF handler, if we see that the page is marked private
-> >    in the RMP table, simply switch it back to shared
-> >  - if this was a bug on the part of the host, then the guest will see
->
-> As discussed off-list, attempting to fix up RMP violations in the host #PF handler
-> is not a viable approach.  There was also extensive discussion on-list a while back:
->
-> https://lore.kernel.org/all/8a244d34-2b10-4cf8-894a-1bf12b59cf92@www.fastmail.com
+On 9/9/22 14:14, Nico Boehr wrote:
+> v2->v3:
+> ---
+> - add some comments and newlines (thanks Janosch)
+> 
+> v1->v2:
+> ---
+> - add newline after genprotimg_args (thanks Janosch)
+> - add a comment explaining what the CCK is (thanks Janosch)
+> 
+> With the upcoming possibility to dump PV guests under s390x, we should
+> be able to dump kvm-unit-tests for debugging, too.
+> 
+> Add the necessary flags to genprotimg to allow dumping.
+> 
+> Nico Boehr (2):
+>    s390x: factor out common args for genprotimg
+>    s390x: create persistent comm-key
+> 
+>   s390x/Makefile | 30 +++++++++++++++++++++++++-----
+>   1 file changed, 25 insertions(+), 5 deletions(-)
+> 
 
-I mentioned this during Mike's talk at the micro-conference: For pages
-mapped in by the kernel can we disallow them to be converted to
-private? Note, userspace accesses are already handled by UPM.
-
-In pseudo-code, I'm thinking something like this:
-
-kmap_helper() {
-  // And all other interfaces where the kernel can map a GPA
-  // into the kernel page tables
-  mapped_into_kernel_mem_set[hpa] = true;
-}
-
-kunmap_helper() {
-  // And all other interfaces where the kernel can unmap a GPA
-  // into the kernel page tables
-  mapped_into_kernel_mem_set[hpa] = false;
-
-  // Except it's not this simple because we probably need ref counting
-  // for multiple mappings. Sigh. But you get the idea.
-}
-
-rmpupdate_helper() {
-  if (conversion = SHARED_TO_PRIVATE && mapped_into_kernel_mem_set[hpa])
-    return -EINVAL;  // Or whatever the appropriate error code here is.
-}
+Thanks, picked
