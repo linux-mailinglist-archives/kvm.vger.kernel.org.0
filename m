@@ -2,153 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D911A5B9690
-	for <lists+kvm@lfdr.de>; Thu, 15 Sep 2022 10:46:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA9075B974F
+	for <lists+kvm@lfdr.de>; Thu, 15 Sep 2022 11:22:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229682AbiIOIqP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Sep 2022 04:46:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37046 "EHLO
+        id S229750AbiIOJWN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Sep 2022 05:22:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbiIOIqN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Sep 2022 04:46:13 -0400
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDAC597ED2;
-        Thu, 15 Sep 2022 01:46:12 -0700 (PDT)
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28F5mvG5013826;
-        Thu, 15 Sep 2022 08:45:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=n7MG+DVVpKBkqQl59cxQlyiMIMlHdrLNPnjubEpTa+E=;
- b=A9x/F7qnIaMikDRtpjww8Bu0nT+vEr8c3VIKnyhQ50xogN1AdxxANsZPERqFi+dzbcv/
- vzZKTF04frAKd7yR/Z6hJd+cjegw2nvNnsEvAM/DdHGHmBizJlB0juYiVpFONvauIEka
- 7RY1gY5W53/ppi7kndu7jNFHAUU/53AXQPzLjNEF0JpuisWo1HtEQmsvxAVcdB23MpdI
- r1A4dlfky1A6TYxj0VPAR3TyvqJ7lk5/7ZChUD5lW6UfFNxJ8Dq3GiyIu2ummz7ZSrht
- 8DKphet8T8pWZVxvKDC4jm01YhGsnPAbNq7xmV6+7CG50Vb8FMyj5FYOdCB7jSp5vNlq Jw== 
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3jkqm1hm4s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Sep 2022 08:45:59 +0000
-Received: from pps.filterd (NASANPPMTA03.qualcomm.com [127.0.0.1])
-        by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 28F8Tu8Y018524;
-        Thu, 15 Sep 2022 08:40:58 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by NASANPPMTA03.qualcomm.com (PPS) with ESMTPS id 3jkb9b0dhk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Sep 2022 08:40:58 +0000
-Received: from NASANPPMTA03.qualcomm.com (NASANPPMTA03.qualcomm.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28F8ewFa004512;
-        Thu, 15 Sep 2022 08:40:58 GMT
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-        by NASANPPMTA03.qualcomm.com (PPS) with ESMTPS id 28F8ewdE004508
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Sep 2022 08:40:58 +0000
-Received: from [10.216.25.163] (10.80.80.8) by nasanex01c.na.qualcomm.com
- (10.45.79.139) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29; Thu, 15 Sep
- 2022 01:40:53 -0700
-Message-ID: <92770899-d56b-8bcd-f613-32d7b7ddd30b@quicinc.com>
-Date:   Thu, 15 Sep 2022 14:10:43 +0530
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH -next] rcu: remove unused 'cpu' in
- rcu_virt_note_context_switch
-Content-Language: en-US
-To:     Zeng Heng <zengheng4@huawei.com>, <pbonzini@redhat.com>,
-        <paulmck@kernel.org>, <frederic@kernel.org>,
-        <quic_neeraju@quicinc.com>, <josh@joshtriplett.org>,
-        <rostedt@goodmis.org>, <mathieu.desnoyers@efficios.com>,
-        <jiangshanlai@gmail.com>, <joel@joelfernandes.org>
-CC:     <kvm@vger.kernel.org>, <rcu@vger.kernel.org>, <liwei391@huawei.com>
-References: <20220915083824.766645-1-zengheng4@huawei.com>
-From:   Mukesh Ojha <quic_mojha@quicinc.com>
-In-Reply-To: <20220915083824.766645-1-zengheng4@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01c.na.qualcomm.com (10.45.79.139)
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: cDjpdiCTdnyqr5l7asjedC7hzZ29TDfe
-X-Proofpoint-GUID: cDjpdiCTdnyqr5l7asjedC7hzZ29TDfe
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-15_04,2022-09-14_04,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
- suspectscore=0 mlxlogscore=999 adultscore=0 lowpriorityscore=0
- priorityscore=1501 spamscore=0 bulkscore=0 mlxscore=0 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2208220000 definitions=main-2209150047
-X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229542AbiIOJWL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Sep 2022 05:22:11 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7419889926
+        for <kvm@vger.kernel.org>; Thu, 15 Sep 2022 02:22:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1663233730; x=1694769730;
+  h=from:to:cc:subject:date:message-id;
+  bh=SkR324RLMMkIUWiv3hw1YvNe88zTRhG2iEk5umz+KYg=;
+  b=JUOh4p6u8ddA/c03S2s7vUAV4ft9F7k3juxOvbhQ7Q785HtiMKQuxPwE
+   icE41tgR7ffrEoF8riYiqzMbrRs/wP+Sqqa+RVckWeE3EWv/NcLuY0GyF
+   TVFN/gSbmwuruoSndAH5SfDIlrURT71Cr8iMqsW4yuriY3C6rseVnoBWs
+   B9cktgtQwiLtiJg4miCNVLKgDVNxsmighrl0mvlYd/2Nj1ml4DEIuxndz
+   sLppY0sTML7Aji+1StxdGPkw6ageSCJ0WgmCGgCsD2FL2jnBDY8z3TeIN
+   rntEGetAtXunTcniaSzkftU2s5RHTMiH7yWqmR8IxAnWyHBDRUZ3Tac+V
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10470"; a="299475267"
+X-IronPort-AV: E=Sophos;i="5.93,317,1654585200"; 
+   d="scan'208";a="299475267"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2022 02:21:52 -0700
+X-IronPort-AV: E=Sophos;i="5.93,317,1654585200"; 
+   d="scan'208";a="759563761"
+Received: from chenyi-pc.sh.intel.com ([10.239.159.73])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2022 02:21:50 -0700
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Peter Xu <peterx@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Chenyi Qiang <chenyi.qiang@intel.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org
+Subject: [PATCH v6 0/2] Enable notify VM exit
+Date:   Thu, 15 Sep 2022 17:28:37 +0800
+Message-Id: <20220915092839.5518-1-chenyi.qiang@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Notify VM exit is introduced to mitigate the potential DOS attach from
+malicious VM. This series is the userspace part to enable this feature
+through a new KVM capability KVM_CAP_X86_NOTIFY_VMEXIT. The detailed
+info can be seen in Patch 3.
 
-On 9/15/2022 2:08 PM, Zeng Heng wrote:
-> Remove unused function argument, and there is
-> no logic changes.
-> 
-> Signed-off-by: Zeng Heng <zengheng4@huawei.com>
-> ---
->   include/linux/kvm_host.h | 2 +-
->   include/linux/rcutiny.h  | 2 +-
->   include/linux/rcutree.h  | 2 +-
->   3 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index f4519d3689e1..9cf0c503daf5 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -417,7 +417,7 @@ static __always_inline void guest_context_enter_irqoff(void)
->   	 */
->   	if (!context_tracking_guest_enter()) {
->   		instrumentation_begin();
-> -		rcu_virt_note_context_switch(smp_processor_id());
-> +		rcu_virt_note_context_switch();
->   		instrumentation_end();
->   	}
->   }
-> diff --git a/include/linux/rcutiny.h b/include/linux/rcutiny.h
-> index 768196a5f39d..9bc025aa79a3 100644
-> --- a/include/linux/rcutiny.h
-> +++ b/include/linux/rcutiny.h
-> @@ -142,7 +142,7 @@ static inline int rcu_needs_cpu(void)
->    * Take advantage of the fact that there is only one CPU, which
->    * allows us to ignore virtualization-based context switches.
->    */
-> -static inline void rcu_virt_note_context_switch(int cpu) { }
-> +static inline void rcu_virt_note_context_switch(void) { }
->   static inline void rcu_cpu_stall_reset(void) { }
->   static inline int rcu_jiffies_till_stall_check(void) { return 21 * HZ; }
->   static inline void rcu_irq_exit_check_preempt(void) { }
-> diff --git a/include/linux/rcutree.h b/include/linux/rcutree.h
-> index 5efb51486e8a..70795386b9ff 100644
-> --- a/include/linux/rcutree.h
-> +++ b/include/linux/rcutree.h
-> @@ -27,7 +27,7 @@ void rcu_cpu_stall_reset(void);
->    * wrapper around rcu_note_context_switch(), which allows TINY_RCU
->    * to save a few bytes. The caller must have disabled interrupts.
->    */
-> -static inline void rcu_virt_note_context_switch(int cpu)
-> +static inline void rcu_virt_note_context_switch(void)
->   {
->   	rcu_note_context_switch(false);
->   }
+The corresponding KVM support can be found in linux 6.0-rc1:
+(2f4073e08f4c KVM: VMX: Enable Notify VM exit)
 
-Good catch.
+This patch set depends on some definition which can be updated from
+scripts/update-linux-headers.sh. A separate patch set is sent out at
+https://lists.gnu.org/archive/html/qemu-devel/2022-09/msg02102.html
 
-Acked-by: Mukesh Ojha <quic_mojha@quicinc.com>
+---
+Change logs:
+v5 -> v6
+- Add some info related to the valid range of notify_window in patch 2. (Peter Xu)
+- Add the doc in qemu-options.hx. (Peter Xu)
+- v5: https://lore.kernel.org/qemu-devel/20220817020845.21855-1-chenyi.qiang@intel.com/
 
--Mukesh
+v4 -> v5
+- Remove the assert check to avoid the nop in NDEBUG case. (Yuan)
+- v4: https://lore.kernel.org/qemu-devel/20220524140302.23272-1-chenyi.qiang@intel.com/
+
+v3 -> v4
+- Add a new KVM cap KVM_CAP_TRIPLE_FAULT_EVENT to guard the extension of triple fault
+  event save&restore.
+- v3: https://lore.kernel.org/qemu-devel/20220421074028.18196-1-chenyi.qiang@intel.com/
+
+v2 -> v3
+- Extend the argument to include both the notify window and some flags
+  when enabling KVM_CAP_X86_BUS_LOCK_EXIT CAP.
+- Change to use KVM_VCPUEVENTS_VALID_TRIPLE_FAULT in flags field and add
+  pending_triple_fault field in struct kvm_vcpu_events.
+- v2: https://lore.kernel.org/qemu-devel/20220318082934.25030-1-chenyi.qiang@intel.com/
+
+v1 -> v2
+- Add some commit message to explain why we disable Notify VM exit by default.
+- Rename KVM_VCPUEVENT_SHUTDOWN to KVM_VCPUEVENT_TRIPLE_FAULT.
+- Do the corresponding change to use the KVM_VCPUEVENTS_TRIPLE_FAULT
+  to save/restore the triple fault event to avoid lose some synthesized
+  triple fault from KVM.
+- v1: https://lore.kernel.org/qemu-devel/20220310090205.10645-1-chenyi.qiang@intel.com/
+
+---
+
+Chenyi Qiang (2):
+  i386: kvm: extend kvm_{get, put}_vcpu_events to support pending triple
+    fault
+  i386: Add notify VM exit support
+
+ hw/i386/x86.c         | 45 ++++++++++++++++++++++++++++++++++++++++
+ include/hw/i386/x86.h |  5 +++++
+ qemu-options.hx       | 10 ++++++++-
+ target/i386/cpu.c     |  1 +
+ target/i386/cpu.h     |  1 +
+ target/i386/kvm/kvm.c | 48 +++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 109 insertions(+), 1 deletion(-)
+
+-- 
+2.17.1
 
