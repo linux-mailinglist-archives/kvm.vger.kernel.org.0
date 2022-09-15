@@ -2,94 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DB3A5B9BC8
-	for <lists+kvm@lfdr.de>; Thu, 15 Sep 2022 15:24:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AA7005B9C63
+	for <lists+kvm@lfdr.de>; Thu, 15 Sep 2022 15:55:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229592AbiIONYf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Sep 2022 09:24:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33644 "EHLO
+        id S229941AbiIONzA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Sep 2022 09:55:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229539AbiIONYc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Sep 2022 09:24:32 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D18FE239
-        for <kvm@vger.kernel.org>; Thu, 15 Sep 2022 06:24:27 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28FDCbBH004948;
-        Thu, 15 Sep 2022 13:24:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=tPPaogyK0l9Tbf9cNkEQ+PD3sWSA0nM6AuoD52aeYZg=;
- b=C754EcwrCk2UL8FWSgymPe9YX6B0hWdBZStE8v0KPPGYbJA7gunAjs5XLB85Bz+MbJWX
- Mixqk1SU99wfP2lLMm5Jh5abr0hXJXqlu1EORvf7XqhY+i9KjpWUsdBeT+U1k/9x5c9V
- MbgfPi934szzM/rM7ktz15ejyZvDVzP9Q0WHYyBvdFcqhQ40kG7g4ZZuqoev1MCSRcH3
- DbCGpV09ssZEyeet8vj7XuMEG1u51qn3dyZCG1ht4TeFy1F8rnhuBkuvpTUW7ehWcVR8
- qZbBCC9boJnyj5W0TB0VSRNQYsdhmDUI55FN/ITpT2srZXhw904CxNDra+Za9DD/ikFo SA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jm4qr0dv1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Sep 2022 13:24:21 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28FDGI00029201;
-        Thu, 15 Sep 2022 13:24:19 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jm4qr0dtr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Sep 2022 13:24:19 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 28FDKcaj020566;
-        Thu, 15 Sep 2022 13:24:17 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 3jjytx2dwq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Sep 2022 13:24:16 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 28FDOEu742533300
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 15 Sep 2022 13:24:14 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BBC454C046;
-        Thu, 15 Sep 2022 13:24:14 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 39E854C044;
-        Thu, 15 Sep 2022 13:24:14 +0000 (GMT)
-Received: from [9.171.87.36] (unknown [9.171.87.36])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 15 Sep 2022 13:24:14 +0000 (GMT)
-Message-ID: <7f0ffc04-40bf-b8fe-55f5-405c6485b1df@linux.ibm.com>
-Date:   Thu, 15 Sep 2022 15:24:13 +0200
+        with ESMTP id S229706AbiIONy6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Sep 2022 09:54:58 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23D8DB7C7;
+        Thu, 15 Sep 2022 06:54:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1663250097; x=1694786097;
+  h=message-id:date:mime-version:to:cc:references:from:
+   subject:in-reply-to:content-transfer-encoding;
+  bh=kSLBIJMFHgAMOK1rpfvr5xW32NUCiVRz+7cGdfCp+vQ=;
+  b=n7jrXBCy/JBo2T3D+7g41rPVXH37BAdlUKrcBBPJjnadg2ihKcPq/rKP
+   WbWheXc5PUs6zotBJKzTAM5mJDmGuGfxHTGrpr58hfvQMXUnDnH5jL3Cl
+   VinZZ27hr3rOUbPitQsnqrs+gLGtF92puKZTF4Z4oHOHXFglD+E83z7+M
+   Uh4izpZZdNBjZq9sYOlexwwa4iUUwUe9SR28N8XeWSaQMb5HxDqNKFDO/
+   sP+gdCU2HOza65xcnen9BxI5QhhZQz6ytkmgT3OA37ftydog8+HKilrYU
+   8/dd/txMNEazijdzuOX7lUyrz9xSzDtgeI3uxrOmcojEvVEmwAgjEO9Hj
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10470"; a="360455457"
+X-IronPort-AV: E=Sophos;i="5.93,318,1654585200"; 
+   d="scan'208";a="360455457"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2022 06:54:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,318,1654585200"; 
+   d="scan'208";a="721005868"
+Received: from linux.intel.com ([10.54.29.200])
+  by fmsmga002.fm.intel.com with ESMTP; 15 Sep 2022 06:54:56 -0700
+Received: from [10.252.210.17] (kliang2-mobl1.ccr.corp.intel.com [10.252.210.17])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by linux.intel.com (Postfix) with ESMTPS id 29E75580801;
+        Thu, 15 Sep 2022 06:54:54 -0700 (PDT)
+Message-ID: <ef391316-cde5-3cda-ff0d-980e8ecc9aef@linux.intel.com>
+Date:   Thu, 15 Sep 2022 09:54:52 -0400
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH v6 4/5] KVM: s390x: Dirty quota-based throttling of vcpus
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+To:     "Wang, Wei W" <wei.w.wang@intel.com>,
+        "Li, Xiaoyao" <xiaoyao.li@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Liang, Kan" <kan.liang@intel.com>,
+        "Kleen, Andi" <andi.kleen@intel.com>
+Cc:     "linux-perf-users@vger.kernel.org" <linux-perf-users@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+References: <20220825085625.867763-1-xiaoyao.li@intel.com>
+ <CY5PR11MB6365897E8E6D0B590A298FA0DC769@CY5PR11MB6365.namprd11.prod.outlook.com>
+ <815586ac-1eaa-5e38-1e08-492c29d0729d@intel.com>
+ <CY5PR11MB63659EBEAEA0E64812E96111DC469@CY5PR11MB6365.namprd11.prod.outlook.com>
+ <f7cfb391-c38b-84d2-b2fe-5e289d82862c@linux.intel.com>
+ <CY5PR11MB6365676799EBF86B3931D336DC499@CY5PR11MB6365.namprd11.prod.outlook.com>
 Content-Language: en-US
-To:     Shivam Kumar <shivam.kumar1@nutanix.com>, pbonzini@redhat.com,
-        seanjc@google.com, maz@kernel.org, james.morse@arm.com,
-        david@redhat.com
-Cc:     kvm@vger.kernel.org, Shaju Abraham <shaju.abraham@nutanix.com>,
-        Manish Mishra <manish.mishra@nutanix.com>,
-        Anurag Madnawat <anurag.madnawat@nutanix.com>
-References: <20220915101049.187325-1-shivam.kumar1@nutanix.com>
- <20220915101049.187325-5-shivam.kumar1@nutanix.com>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20220915101049.187325-5-shivam.kumar1@nutanix.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: bmNM4YtNeJHl_sVDtvOGmjQU-BNaqWm0
-X-Proofpoint-ORIG-GUID: 3wq_zTQuALYdef6fwN1o24uzo_IWmdfP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-15_06,2022-09-14_04,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- adultscore=0 malwarescore=0 phishscore=0 clxscore=1015 priorityscore=1501
- mlxlogscore=999 impostorscore=0 mlxscore=0 lowpriorityscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2208220000
- definitions=main-2209150074
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+From:   "Liang, Kan" <kan.liang@linux.intel.com>
+Subject: Re: [RFC PATCH 0/2] KVM: VMX: Fix VM entry failure on
+ PT_MODE_HOST_GUEST while host is using PT
+In-Reply-To: <CY5PR11MB6365676799EBF86B3931D336DC499@CY5PR11MB6365.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-6.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -98,43 +86,61 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-Am 15.09.22 um 12:10 schrieb Shivam Kumar:
-> Exit to userspace whenever the dirty quota is exhausted (i.e. dirty count
-> equals/exceeds dirty quota) to request more dirty quota.
+On 2022-09-14 10:46 p.m., Wang, Wei W wrote:
+> On Thursday, September 15, 2022 4:26 AM, Liang, Kan wrote:
+>> The perf_event_disable() eventually invokes the intel_pt_stop().
+>> We already expose the intel_pt_stop()/cpu_emergency_stop_pt() to other
+>> modules. I don't think we have to use the perf_event_disable(). Also, the
+>> perf_event_disable() requires extra codes.
+>>
+>> I went through the discussions. I agree with Sean's suggestion.
+>> We should only put the logic in the KVM but all the MSR access details into the PT
+>> driver. 
 > 
-> Suggested-by: Shaju Abraham <shaju.abraham@nutanix.com>
-> Suggested-by: Manish Mishra <manish.mishra@nutanix.com>
-> Co-developed-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
-> Signed-off-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
-> Signed-off-by: Shivam Kumar <shivam.kumar1@nutanix.com>
-> ---
->   arch/s390/kvm/kvm-s390.c | 9 +++++++++
->   1 file changed, 9 insertions(+)
+> Even the driver itself doesn’t drive the save/restore of the MSRs, it is drived by perf.
+
+It through perf_event, not driven by perf_event. The perf_event generic
+code never knows when should invokes each driver to save/restore
+information. It should be driven by the other subsystem e.g., scheduler.
+
+For this case, KVM should drive the save/restore, and the PT driver
+eventually does all the MSR access details.
+
+> 1. If we make KVM a user of perf, we should do this via perf_event_disable/enable_*.
+> 2. If we make KVM an alternative to perf (i.e. have direct control over PMU HW),
+> we can do this via driver interfaces like perf.
+> Per my experience, we should go for 1. Probably need Peter's opinions on this.
+>
+
+For 1, the perf_event_disable/enable_* are not enough. They don't
+save/restore MSRs. If we go to this way, we have to introduce a new
+generic interface to ask each driver to save/restore their MSRs when the
+guest is entering/exiting. We'd better combine the new interface with
+the existing perf_guest_get_msrs() of the core driver.
+I think that's an ideal solution, but requires big changes in the code.
+
+2 is the current KVM implementation. See pt_save_msr()/pt_load_msr(). I
+don't think it's a right way. We'd better fix it.
+
+The suggestion should be 3. The KVM notify the PT driver via the
+interface provided by PT. The PT driver save/restore all the registers.
+I think it's an acceptable solution with small code changes.
+
+So I prefer 3.
+
+Thanks,
+Kan
+
+>> But I prefer a more generic and straightforward function name, e.g.,
+>> intel_pt_stop_save()/intel_pt_start_load(), in case other modules may want to
+>> save/restore the PT information in their context switch later.
+>>
+>> Thanks,
+>> Kan
+>>
+>>>
+>>>> It seems perf_event_disable() is not used widely by other kernel
+>>>> component. 
 > 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index edfd4bbd0cba..2fe2933a7064 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -4343,6 +4343,15 @@ static int kvm_s390_handle_requests(struct kvm_vcpu *vcpu)
->   		goto retry;
->   	}
->   
-> +	if (kvm_check_request(KVM_REQ_DIRTY_QUOTA_EXIT, vcpu)) {
-> +		struct kvm_run *run = vcpu->run;
-> +
-> +		run->exit_reason = KVM_EXIT_DIRTY_QUOTA_EXHAUSTED;
-> +		run->dirty_quota_exit.count = vcpu->stat.generic.pages_dirtied;
-> +		run->dirty_quota_exit.quota = vcpu->dirty_quota;
-> +		return 1;
-> +	}
-
-Please use
-return -EREMOTE;
-
-We use this in s390 code to indicate "we need exit to userspace" and
-kvm_arch_vcpu_ioctl_run will change -EREMOTE to 0.
-
-> +
->   	/* nothing to do, just clear the request */
->   	kvm_clear_request(KVM_REQ_UNHALT, vcpu);
->   	/* we left the vsie handler, nothing to do, just clear the request */
+> Because there are not lots of kernel users.
+> You can check another user, watchdog_hld.c, perf_event_enable/disable are used there.
