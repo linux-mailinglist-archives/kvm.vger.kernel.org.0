@@ -2,188 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D3165BA2F6
-	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 00:47:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 738AF5BA316
+	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 01:20:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229562AbiIOWrh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Sep 2022 18:47:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59192 "EHLO
+        id S229820AbiIOXUP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Sep 2022 19:20:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229545AbiIOWrf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Sep 2022 18:47:35 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2080.outbound.protection.outlook.com [40.107.223.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A07D82D10;
-        Thu, 15 Sep 2022 15:47:34 -0700 (PDT)
+        with ESMTP id S229771AbiIOXUN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Sep 2022 19:20:13 -0400
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01hn2219.outbound.protection.outlook.com [52.100.0.219])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 934FF27FF2;
+        Thu, 15 Sep 2022 16:20:11 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LVmXdoiVNz0B/3axowlyrPfdunUsv123zFNSQiYHeweuxmHzvKUTbeHw9e5vdu/9qiC417HZtRy4/43AtO/GKwcesYTXgH5Uyf0JHeZiHa7CZzSF+7jyZuWZg96T249IZTdRc8GUSabsDPzPIlHKA3Ok0pzdzdjrZpYWOzZ6bPL2IASLdPl5uDWc/BOOi4gjFeiKGOzaiHulec9MVykAyFv/Vs2E183eR0EwmlaMJUzlSSy69L5XD+MrHB+n4TxwckQeiF0pFd6hcTxdAVyFhtenwlwsrXwTyyfWErgO0pSx45uFQSuSwx7CbzImA94nkd66fZGgCCeOKwVUyYF1UA==
+ b=AU8WWQHdkxjKnLCOMOSJjTTQuH1MkVhroDAM9J8+9f6eCA5zt4DU6HRxVPBQ1dqoLZgFUjNqm0AOdPAvv26HfKdoGZAQxdD05siChzufCTawQm8LoxJzPSIUH91oqeJKyUkmS5EuwkZorDK0oGzp4K5v0VBUbwawwINFkikS7iUtrouStCx8MMyZWOlzjcDZ7NDV76neIUEI+azJ4c+/WeUN60YvKXnwphETtE5mXZbIalcidqM5j3ujfYQp+ALDHdvRr1G+rIgEXpAt/WD0s97Z8zOiJz5paNsbRM8qo1nxGXe8OC+iFrjDfotKGKceEZ1wlL0gxTk7hTNWrtRwOQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3u9I/gsU6cWU0F6LGg70tTsUnPkNf8wBWEq5Vf0BQLs=;
- b=DjoYE4idwOuth16N6BQ0VXzN9OGfsFcTT429uytXGSfZhs6AQtiXqSD3AI8fMdMTnj/jNXdJ9CaBBzNm2U4NsuEN3lAHPMCQayL30J+i775uUCkXczkXI2JxgNiMzVfYPT95nJKQY2lAcgZD8LPAaMMNr1izmQdYUe+leajSzJZ0kR17mLafDswacrFbVfEYuanVQctFE1zR+CO6gzLj6dKSSRn8Iqw97FWCZQmLsDOOzKXqW+izsZZQ4zjRjDXq36fZpMc3tasrOLZd/gMlXFkw9NAGw/5nSOjNzesq06qUTf1EOkqcZ7aAPni4R32F7PzR/VHIJFYhs9kFUIfbyg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3u9I/gsU6cWU0F6LGg70tTsUnPkNf8wBWEq5Vf0BQLs=;
- b=X5VGvDzq8+NRqtff9LYaHtNXqhortcZusRCUgUpRZP+rb3tyLYEvYArJbWeLo6jlkh9pXbg3Qs0/MMo7iFFn3X9VyCFRUltV9H4rkcjivxPkkdepfBt3U6IrwaNjRSfstTrinzKZ3pLd+P0au2S2/dw1kjJD9Kwie00i+Ktv2vE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) by
- DM6PR12MB4531.namprd12.prod.outlook.com (2603:10b6:5:2a4::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5632.15; Thu, 15 Sep 2022 22:47:29 +0000
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::2cdd:defc:a6d3:7599]) by DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::2cdd:defc:a6d3:7599%3]) with mapi id 15.20.5612.022; Thu, 15 Sep 2022
- 22:47:29 +0000
-Message-ID: <7c43a6f2-ec11-5af2-6574-68a32eb7fd41@amd.com>
-Date:   Thu, 15 Sep 2022 17:47:26 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH] KVM: SVM: Fix x2apic logical cluster mode decoding and
- sanity check
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        pbonzini@redhat.com, jon.grimm@amd.com,
-        Maxim Levitsky <mlevitsk@redhat.com>
-References: <20220912214632.14880-1-suravee.suthikulpanit@amd.com>
- <YyAVOBXZ+O3hnU9y@google.com>
-From:   "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>
-In-Reply-To: <YyAVOBXZ+O3hnU9y@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MN2PR05CA0057.namprd05.prod.outlook.com
- (2603:10b6:208:236::26) To DM8PR12MB5445.namprd12.prod.outlook.com
- (2603:10b6:8:24::7)
+ bh=Bs10Md+15nMnyayKLyd22Uv+/ZH79IcFcpzuzGLq1Fg=;
+ b=GsrwQ7stBNO/t/CFIywnzZt2nha2hrt3FE+/rLp+bK06+BYl26wQceKS/8GjUOWPoQsrr8i831fSxxxM3ZYvBzhxct6U9sOCrItvcLPLvRMtTwaZvw7HudZGxK2OawRyZz1v/6Vo93x/PN1R4vcVLlKOyb3v7+noXmd0vUjZhnI+AuARNEUhbUd+sWK+8hfEWupMLiM8/yDeBTKUN26cj7Cag6sJqWFEBlV7crHlYROcD7ohaLnN5pYVo9bfgABvJfXolyNwqwtj4MLB04cjysWsy3eRW18PUFVlkMrIyrTDouLqP5gU43dl7WMX6jlNs5Nfo8MrwGql1jTWHWwRmg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 45.14.71.5) smtp.rcpttodomain=vdk.de smtp.mailfrom=t4.cims.jp;
+ dmarc=bestguesspass action=none header.from=t4.cims.jp; dkim=none (message
+ not signed); arc=none (0)
+Received: from SG2PR02CA0043.apcprd02.prod.outlook.com (2603:1096:3:18::31) by
+ TYUPR04MB6741.apcprd04.prod.outlook.com (2603:1096:400:351::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5612.22; Thu, 15 Sep
+ 2022 23:20:09 +0000
+Received: from SG2APC01FT0037.eop-APC01.prod.protection.outlook.com
+ (2603:1096:3:18:cafe::b7) by SG2PR02CA0043.outlook.office365.com
+ (2603:1096:3:18::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5632.16 via Frontend
+ Transport; Thu, 15 Sep 2022 23:20:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 45.14.71.5)
+ smtp.mailfrom=t4.cims.jp; dkim=none (message not signed)
+ header.d=none;dmarc=bestguesspass action=none header.from=t4.cims.jp;
+Received-SPF: Pass (protection.outlook.com: domain of t4.cims.jp designates
+ 45.14.71.5 as permitted sender) receiver=protection.outlook.com;
+ client-ip=45.14.71.5; helo=User; pr=M
+Received: from mail.prasarana.com.my (58.26.8.158) by
+ SG2APC01FT0037.mail.protection.outlook.com (10.13.36.190) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5632.12 via Frontend Transport; Thu, 15 Sep 2022 23:20:08 +0000
+Received: from MRL-EXH-02.prasarana.com.my (10.128.66.101) by
+ MRL-EXH-01.prasarana.com.my (10.128.66.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.14; Fri, 16 Sep 2022 07:19:28 +0800
+Received: from User (45.14.71.5) by MRL-EXH-02.prasarana.com.my
+ (10.128.66.101) with Microsoft SMTP Server id 15.1.2176.14 via Frontend
+ Transport; Fri, 16 Sep 2022 07:18:10 +0800
+Reply-To: <rhashimi202222@kakao.com>
+From:   Consultant Swift Capital Loans Ltd <info@t4.cims.jp>
+Subject: I hope you are doing well, and business is great!
+Date:   Fri, 16 Sep 2022 07:19:40 +0800
 MIME-Version: 1.0
+Content-Type: text/plain; charset="Windows-1251"
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Outlook Express 6.00.2600.0000
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2600.0000
+Message-ID: <134c2800-ac73-4df4-aa47-d5b66a469a96@MRL-EXH-02.prasarana.com.my>
+To:     Undisclosed recipients:;
+X-EOPAttributedMessage: 0
+X-MS-Exchange-SkipListedInternetSender: ip=[45.14.71.5];domain=User
+X-MS-Exchange-ExternalOriginalInternetSender: ip=[45.14.71.5];domain=User
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM8PR12MB5445:EE_|DM6PR12MB4531:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2b5f8b9a-54ae-4b7b-46ac-08da976c44e9
-X-MS-Exchange-SenderADCheck: 1
+X-MS-TrafficTypeDiagnostic: SG2APC01FT0037:EE_|TYUPR04MB6741:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1664c3f4-8158-4f67-b04b-08da9770d483
+X-MS-Exchange-AtpMessageProperties: SA|SL
+X-MS-Exchange-SenderADCheck: 0
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Z43arpnwPaXk0GcuJi1Q638G7uXQhuneLcO+Pey2ZK5X8K2DylZu84Rfv6yRmst8EUvmzA0BGr6Kq5+TYGLCl9zl5WY3k7lXQMJZprcUB3ztr289/b6xJaoci6fTTD08ejq+Ht58lbwxGmFBebKUPxhtioxbsJ/XauF/AYrtn2EZYWO0Vi2pbKHQA9ZA20SNEIQetVSxvYQXlaPAnj3gTcKl1f/CwUs5z4Ij21PcK5vkROuZhGoxc9oeoAtjUiT5Qz4ez+LS0MBi0tWvdRwj/sxCV0/tOF3eMID8rP34DgK6FZXvZbNFpY3bRKZQU6keqyUND8UdVDELgmslyaZOn6Z2FEbN91UM4OBrUVanRSIrZYTALAp9W6SDxR1nsISrw04uQJCikRkaw0vdAF3guO8HyHoE3UFV1oTMdfcnQCPs3hKfLRgjmHVX8A2PZ9XZdab9960zRBqFCbl3tKK1gVRLT5n3Py8bF2sgWAYCIATVvfIbQB8i1V/F/LDuq/xNInbr+QqYwLGrxGyrF1T+eIb+ATCycAoveFpE6pl8GRRv7PdBAb5uKy1yBLs3cSAP56tyTcZJ9xUBUxQUPW7tJJW4bhH51P9AIG/nH5kjY0ycmGxYti+p279AdZbgDcL7EfsQz3nnikDPEEmANyonR4eCU4QSEyrQZbp3CYL+vFrPLFgLojjolvk6qQNy+5TCDWVYIq54IBHNrfjvGlwyCni9GelzmfPtQZYe0lVOa2BI7e0dsCuLCwGLKOwGSzE+hTgvxzTaTAZj0oWH2TdunGnAQ2S46V1kmjzZvDP5lQjIBwPrDtgcoG5vDaumOlbL3J8YcD8fcmA9GyNP9iB1UiAvrB0HtE+6tZ/57krFzbY/n9059ASco6x0CrucJ47W
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(396003)(39860400002)(366004)(376002)(136003)(451199015)(31696002)(8676002)(66556008)(6666004)(66946007)(2906002)(4326008)(6506007)(5660300002)(6512007)(2616005)(86362001)(66476007)(8936002)(53546011)(26005)(38100700002)(36756003)(186003)(41300700001)(83380400001)(966005)(6916009)(478600001)(31686004)(6486002)(316002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NDJVaktJWFphWHNsYlR0MkVYczFCcDRLc1dpcjBOY3VZSG85OENHdHVuYjd0?=
- =?utf-8?B?MjhOdVZ1Wmg0RVdyMEJZb3Y4dnBDd2UvODRNM25TTTUrMUltTEdxNnZ4K1I3?=
- =?utf-8?B?WFN3bkdOVlVnWVVFMy9UYllBZHl3dnd6WnBld2FKdDJkOUh0cW44cHk2UUw1?=
- =?utf-8?B?Mmowb3R1cDVCaWF0SDdoYlFvSFJXbmFrc2hDUHhldlBzUjBnRExhelo4bVdI?=
- =?utf-8?B?c05LL1I1eVVGYXE0cU9CbmFES3ppUDdWanpNcmFqSHY3bHNTUStNa2Ztay9W?=
- =?utf-8?B?VU1DQVpaYkM5NUVPOHpwcUZUNFM0OGdjejN3cjliY0xJbGdCeFk0L0pyZmJj?=
- =?utf-8?B?K2xIK3B4OTdmSGZvM1FNTTNrRStNWWNhMkZMS1ZxRDU0eU0zOEp5RENuSjh0?=
- =?utf-8?B?YnNPTnNSRTBUUytsaitMMEZTeFJUU3RoQ2N2RWk0bWVLWDlGbWpmdkFydWZ3?=
- =?utf-8?B?cWx5cjRBQTlCakMrbUNrRlRjUS93eXdsRHMyZVYrM0JHOTU2U3hqL2NyVmRj?=
- =?utf-8?B?Rlc2cGZ4RDM4V0xxdGZWV3NiaXFLdUJLcFVNb2pOcU9kNVdSSHFCczdrOWFL?=
- =?utf-8?B?amROeU13MVp0dUs2SmkwZUxSV0pMVit0aWd6NkRVVXkwQyttNFp0M2tIWHpm?=
- =?utf-8?B?RFFSWXp4TXFnNGxQQnFwRGZ0ZzM0c25YUldCaTViU3A1TEVIUE9wdjBnQW01?=
- =?utf-8?B?M0crUG94cGhPWHZTaFdTbkFkTytsd0NieS9zVnlzN0g5ZzJSUlVKWFZNWVZ0?=
- =?utf-8?B?SjBSaFlXVzJGNjhoekVYaUFoQ29OdGVkMmRPU0F1Mi9KMnVvNlFKdk4rVTJS?=
- =?utf-8?B?aElPVTU5ZGwxM0o2eGRDQnd5aFBiR3JYSnR5Rk5SaXNsT0RyMEY2ai8yYlRh?=
- =?utf-8?B?OExBaGJzL2F0a1lndE9sbDJpbzRoYW1EQ1JDY2YvdzIyWTdEcGFHWU9oVEFQ?=
- =?utf-8?B?WWF5cTI1TXdiSUpqNk5XUWZkTXZ0c0xPQXNIamlKMHorbDdTQkNmRGJKOTdu?=
- =?utf-8?B?T3REVUtzVmFXaWZlVC8xeEUvMlA1MllRNmxQcU9lMkpWeW9LQU1EUDZ1REZz?=
- =?utf-8?B?d3poTFp5V0tqTm0vMm94OVR0cVoySFA2RHRVMTZzY3MxYnRQM0NDMUw0dHEw?=
- =?utf-8?B?NjN3bU9iYnZjaWwwMitURTlpS0ExeG5hTHhSVmRCbnBzcDhrR1JlbTIvRCtS?=
- =?utf-8?B?VC9ybUhjdmpyNm5hd1lkbnJoeTFab1FLYkpJZGVwU3VBbkNJWEVpbmdMUmVL?=
- =?utf-8?B?c3hsbFZ4N0JOZ3NNYm5KNksyZ04wN1lBRFpUVE55TGpLd1dPazBWZmZlcEFX?=
- =?utf-8?B?RTB4VWxDVHJqSGN6YWJUYU1VeUJyV3hyN1EzdXFxOVY3S0NLNlQ3Rmg5S1k0?=
- =?utf-8?B?Z3VqZ2VqMFArbC9RbFdtTWZ6VlNlWDRESGNQdUlwdUxCU3RESGJxcjQ0dVFs?=
- =?utf-8?B?MFBLVnRXeUVuZ1MxSGF0azNKRGx3Zzh1Y3BsYUdqeTBkSnF5eHlkakdrRjhJ?=
- =?utf-8?B?MFhLZngyRFZSalcvQUhpcitPQjdvNEtYWjJMbW1mL3I4bUc3S0hvT0NkSjY1?=
- =?utf-8?B?OGhtakhRVk9NNlo3Q0dYUXlhTlRsODlxenJQRGMrVjFqdlhhelRzbStUaWpt?=
- =?utf-8?B?TllBYUFyZ1M2VU5keEFja3JZMFVjaVg5ZnJZMlR6UXJad0tERmZpWlI3VEZ2?=
- =?utf-8?B?bmFmdzFoVFlrVjJlc1dBcUN2KzZ2c1FtWjlyTmFwekJqeitEODF2MVNVOWJF?=
- =?utf-8?B?aXpIRHp6S2hWUDJlM0pTMDlwZWhQQXJhaVVFTDdqWFFjRDVjRmJzS1E2aTVv?=
- =?utf-8?B?YS9vZDVGSEhPNjgzOVJldExUY25hVTFVVitmRXUyOXZSV3pFaXFXa2NjbnhU?=
- =?utf-8?B?NkRjOC9DNHhWZlE5ajNDMVlpV3JhL0ljQzFDMHViTTVBOENiOG9aSGJ6SVlM?=
- =?utf-8?B?bHhVWWJSMWdWb2lheFRib0drYVJsK2pMNWdhMHllN202b0N5MUhodTdNQ3l3?=
- =?utf-8?B?QVRPbW9jN2NCYUJpcERzNkNrWFA2Um9BdXZjbFRuajZmKzFYRDQwd2tmQnNJ?=
- =?utf-8?B?eE1oQytPUkxtWXBrODg3TEtsdkRtLzZrZDZjNThsck1CbEI1dFN6NTVLUHZW?=
- =?utf-8?Q?R6U85E4OxWXkATOwbOTcIrD5V?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2b5f8b9a-54ae-4b7b-46ac-08da976c44e9
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR12MB5445.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2022 22:47:29.8821
+X-Microsoft-Antispam-Message-Info: =?windows-1251?Q?dc3OPyhIdtfWYOH220tKiz9inY/NmvTb7QRS2HOewJ6hSvlyS0Nkjzs+?=
+ =?windows-1251?Q?jiNNWaCetk8R1rNFcj30naNnm+hDYWCAxUMkIPw+MdlM859H8+bKYaxL?=
+ =?windows-1251?Q?IdL98hRsHmzzMCQNeeVJJ+WeXK3CP/VYrCB8oe9nvRF9KZiDIff5McRk?=
+ =?windows-1251?Q?u3AJIGLmiKSc1DcCwgYmUy5MC/6U3XJwYMeKiLQNYSxCWcYLNBxNqt/j?=
+ =?windows-1251?Q?DzMzA+lbhpgTwzOMSgIpnUKuv9etBaXW1NPQq0Nin59f1FaNCCyDrZNz?=
+ =?windows-1251?Q?ZQgolkiiyYNS0oJUsXS1+yO520ClKbI+VvCCDQWLD0YEiKtpoQ6O7oVI?=
+ =?windows-1251?Q?hBMxyE3XwbVCV2tpnsEqoJQRPc85hiamX4BWhVMhgj76KESpdO9xMx/l?=
+ =?windows-1251?Q?4QHnHxy3CT9RQ4gr4hFQ/O4FLjr4uk+84wlbxMZtrFTgszeZv2XLafeY?=
+ =?windows-1251?Q?wAfsDT4yxhv0PHEWk04kY9xAObuzpZ3enGfZui4BxyyHon3Z+14evVcb?=
+ =?windows-1251?Q?kPsdTGH4jjGAd0HIRQyQywIiKcjABSdZ+53V3bb5YyWhkIoXspd5H7oA?=
+ =?windows-1251?Q?9o1jg+bJxH2n5oQH4Eij5PhMStsGMgKaXr8LG7BLDb2CmNCWzMWC15XH?=
+ =?windows-1251?Q?ayW60GzVuzWOLQezQsgwn0zE7hTkzRYjTWnrhXPa3uDzJvXDPRSSfilg?=
+ =?windows-1251?Q?obkppea+Tz0rT+CTiUA130QNB+hBDU2BxBH8WAb9jKy8+8RuAydRS7ap?=
+ =?windows-1251?Q?ww+42jMkthgf77466QWxb1lva2aGJ8Q4UAsBLDKbJbHMXZUwWJRRnW7E?=
+ =?windows-1251?Q?jMrzcRkXlEFxW5rjA4D1S/MJQHjB0mM17Mg5JudQ5uOtMU4EwkCPTvbP?=
+ =?windows-1251?Q?LOvxuGDCvCcm/ZC2Aj7Bpyow6Dmed1OBovT80czvkBJacTq6Skl9IS8c?=
+ =?windows-1251?Q?qmr+sUtD5rr2JvK5xDS5a3ImVZ1CRZGQrUqDt8cuA0iJMoisQlw6rbON?=
+ =?windows-1251?Q?xPwrebH5JkKTOhZfpmxD9Qn6tRGNkWnxuSKmPQIpuAgEw1xLiRa96idR?=
+ =?windows-1251?Q?eLLZHvNddj7bgU9xiVy1hyn+Gg7bO8VKRt4Oe9Ut8SF7qCS+cpx2477+?=
+ =?windows-1251?Q?HxJjcvnuqjheTlM2TQpFy754Fe8Z0KllUlRX+68b8K2LCj2bWLm5og4N?=
+ =?windows-1251?Q?A75bLTFx1lQ0KEtJ9oOgXqDeeBctuhaTMqUTmB6N0LBqXsG7Sfex4XA9?=
+ =?windows-1251?Q?ikCXu/7FBQpb327QZ+D0KIdW6b6+rHssbQ5pyWUs8XfwFbpFFLtQUj/Z?=
+ =?windows-1251?Q?Silika48cJqPUKZDrhJON2QjVMZi/eVlPBtv9CSxhVskVFww?=
+X-Forefront-Antispam-Report: CIP:58.26.8.158;CTRY:JP;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:User;PTR:45.14.71.5.static.xtom.com;CAT:OSPM;SFS:(13230022)(4636009)(396003)(136003)(376002)(346002)(39860400002)(451199015)(40470700004)(70586007)(70206006)(31686004)(36906005)(35950700001)(316002)(8676002)(7416002)(2906002)(156005)(82310400005)(7366002)(8936002)(32850700003)(4744005)(498600001)(86362001)(31696002)(41300700001)(5660300002)(6666004)(40480700001)(40460700003)(336012)(109986005)(7406005)(26005)(9686003)(32650700002)(956004)(82740400003)(66899012)(81166007)(2700400008);DIR:OUT;SFP:1501;
+X-OriginatorOrg: myprasarana.onmicrosoft.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2022 23:20:08.3253
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cg/qtNIW75poibgbdBQfNWh3Y9t/6Dr74SDUJI4DEJzTyRM1TQcX4UiVQyAQmVdZCH9afEYsq3zzOMqD4DobCQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4531
-X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1664c3f4-8158-4f67-b04b-08da9770d483
+X-MS-Exchange-CrossTenant-Id: 3cbb2ff2-27fb-4993-aecf-bf16995e64c0
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3cbb2ff2-27fb-4993-aecf-bf16995e64c0;Ip=[58.26.8.158];Helo=[mail.prasarana.com.my]
+X-MS-Exchange-CrossTenant-AuthSource: SG2APC01FT0037.eop-APC01.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYUPR04MB6741
+X-Spam-Status: Yes, score=6.2 required=5.0 tests=AXB_XMAILER_MIMEOLE_OL_024C2,
+        AXB_X_FF_SEZ_S,BAYES_50,FORGED_MUA_OUTLOOK,FSL_CTYPE_WIN1251,
+        FSL_NEW_HELO_USER,HEADER_FROM_DIFFERENT_DOMAINS,NSL_RCVD_FROM_USER,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
+        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
+        *      https://www.dnswl.org/, no trust
+        *      [52.100.0.219 listed in list.dnswl.org]
+        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.5024]
+        *  0.0 NSL_RCVD_FROM_USER Received from User
+        *  0.0 FSL_CTYPE_WIN1251 Content-Type only seen in 419 spam
+        *  3.2 AXB_X_FF_SEZ_S Forefront sez this is spam
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        * -0.0 RCVD_IN_MSPIKE_H2 RBL: Average reputation (+2)
+        *      [52.100.0.219 listed in wl.mailspike.net]
+        * -0.0 SPF_HELO_PASS SPF: HELO matches SPF record
+        *  0.2 HEADER_FROM_DIFFERENT_DOMAINS From and EnvelopeFrom 2nd level
+        *      mail domains are different
+        *  0.0 AXB_XMAILER_MIMEOLE_OL_024C2 Yet another X header trait
+        *  0.0 FSL_NEW_HELO_USER Spam's using Helo and User
+        *  1.9 FORGED_MUA_OUTLOOK Forged mail pretending to be from MS Outlook
+X-Spam-Level: ******
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hello,
 
+I hope you are doing well, and business is great!
+However, if you need working capital to further grow and expand your business, we may be a perfect fit for you. I am Ms. Kaori Ichikawa Swift Capital Loans Ltd Consultant, Our loans are NOT based on your personal credit, and NO collateral is required.
 
-On 9/13/2022 12:29 AM, Sean Christopherson wrote:
-> On Mon, Sep 12, 2022, Suravee Suthikulpanit wrote:
->> When sending IPI in the X2APIC logical cluster mode, the destination
->> APIC ID is encoded as:
->>
->>    * Cluster ID = ICRH[31:16]
->>    * Logical ID = ICRH[15:0]
->>
->> Current logic incorrectly decode the ICRH, which causes VM running
->> with x2AVIC support to fail to boot. Therefore, fix the decoding logic.
-> 
-> There are already patches pending[1][2] for the x2AVIC bugs.
-> 
-> [1] https://lore.kernel.org/all/20220903002254.2411750-9-seanjc@xxxxxxxxxx
-> [2] https://lore.kernel.org/all/20220903002254.2411750-10-seanjc@xxxxxxxxxx
+We are a Direct Lender who can approve your loan today, and fund as Early as Tomorrow.
 
-Ok. Thanks for the pointer.
+Once your reply I will send you the official website to complete your application
 
->>
->> The commit 603ccef42ce9 ("KVM: x86: SVM: fix avic_kick_target_vcpus_fast")
->> also added a check for multiple logical destinations before using
->> the fast-path. However, the same logic is already existed prior to
->> the commit. Therefore, remove redundant checking logic.
->>
->> Fixes: 603ccef42ce9 ("KVM: x86: SVM: fix avic_kick_target_vcpus_fast")
->> Cc: Maxim Levitsky <mlevitsk@redhat.com>
->> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
->> ---
->>   arch/x86/kvm/svm/avic.c | 19 ++++---------------
->>   1 file changed, 4 insertions(+), 15 deletions(-)
->>
->> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
->> index 6919dee69f18..45ab49d1f0b8 100644
->> --- a/arch/x86/kvm/svm/avic.c
->> +++ b/arch/x86/kvm/svm/avic.c
->> @@ -378,8 +378,8 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
->>   
->>   		if (apic_x2apic_mode(source)) {
->>   			/* 16 bit dest mask, 16 bit cluster id */
->> -			bitmap = dest & 0xFFFF0000;
->> -			cluster = (dest >> 16) << 4;
->> +			bitmap = dest & 0xffff;
->> +			cluster = (dest & 0xffff0000) >> 16;
->>   		} else if (kvm_lapic_get_reg(source, APIC_DFR) == APIC_DFR_FLAT) {
->>   			/* 8 bit dest mask*/
->>   			bitmap = dest;
->> @@ -387,7 +387,7 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
->>   		} else {
->>   			/* 4 bit desk mask, 4 bit cluster id */
->>   			bitmap = dest & 0xF;
->> -			cluster = (dest >> 4) << 2;
->> +			cluster = (dest & 0xf0) >> 4;
-> 
-> This is wrong and unrelated.  The cluster needs to be shifted back by 2, i.e. multiplied
-> by 4, to leap over each cluster of 4 IDs.
+Waiting for your reply.
 
-Ah, I missed the logic that was using the _cluster_ value below.
-
-Thanks,
-Suravee
+Regards
+Ms. Kaori Ichikawa
+Consultant Swift Capital Loans Ltd
