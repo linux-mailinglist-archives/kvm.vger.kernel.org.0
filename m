@@ -2,62 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 259495B902C
-	for <lists+kvm@lfdr.de>; Wed, 14 Sep 2022 23:46:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A24415B9164
+	for <lists+kvm@lfdr.de>; Thu, 15 Sep 2022 02:04:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229473AbiINVqd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Sep 2022 17:46:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46954 "EHLO
+        id S229705AbiIOAE4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Sep 2022 20:04:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229479AbiINVqa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Sep 2022 17:46:30 -0400
-Received: from mail-oa1-x2f.google.com (mail-oa1-x2f.google.com [IPv6:2001:4860:4864:20::2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42E8580E84
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 14:46:29 -0700 (PDT)
-Received: by mail-oa1-x2f.google.com with SMTP id 586e51a60fabf-1278a61bd57so44686247fac.7
-        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 14:46:29 -0700 (PDT)
+        with ESMTP id S229521AbiIOAEy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Sep 2022 20:04:54 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67E6FAE67
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 17:04:51 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id z6-20020aa78886000000b005470014dc57so2728643pfe.1
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 17:04:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=EzEx6lfTQnhv0AgnCCoqoCsDj6wiEILd1WznFoZclbg=;
-        b=dMLNpwdsischAJInPbWwXevVFs7LQULXimj5XE3XZbfLwfP84vUbduSF7YkeVz9KAS
-         UByPQNRGz/5RnuTSrVuceU1Sb3x4K1PR4fXyKEzKu92n/YrhQ1htEd5EZpybPUSSlrs5
-         CxJRng3OKwnSgv2DXV4EAyKvNcXE9W2nSAi2ZRV2hkUe/l9YNypkyNaPgzo7U14hLHta
-         PYn7j+VFojFxUHhsCS6400PatuZljhwXH7P7D00KH5PwVA6dncTuBZgWSMtYZWD3Kgov
-         c+ghdEQobT3qz7kyJOCiuEGsrxzvDNh4msdIYxHKyHEei2pvyRbjuyWa6SNcsePgoYJF
-         7FqQ==
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date;
+        bh=q3GD4NwlYUx8gdey9sVlOvilOE2N0wjdZ+RZokGXIPk=;
+        b=ptOjhF7RAuYFIrc21q9YMD99UfLwglHnRBYUx2py1KYcThN9CU/C4yYf28D+VvHsIJ
+         DeG3/ZbIfDRAJv37U7foDlw4KVhM8Su7Bi5hzto9KpO8AymXg3jejexjVANsFbx1PuLM
+         rrcjorBXqt4sbozTIc9ercFwsuauJPRUSWuf2JxjRGQwpyScZFYGeJovw3MTBBiAeP9J
+         jMNHpDUeZRryQrDvfhti7EVvExFZ9R9coGQd3Uqk1s9TFDGnrrP1G50AJaU8ZRia+grF
+         z9Hm3jRgpflSsg2AV9UtfIX0YZsKhW7+LPYeDe6EJpLxvHwIjiYlR+GhvPArtBtJZNnY
+         ZaLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=EzEx6lfTQnhv0AgnCCoqoCsDj6wiEILd1WznFoZclbg=;
-        b=iTT5V/6WV+S+qsfKq7cS1grVKRLadw95A09cY7gAeqOMAe1Q7NVeTee6ArVA4C9O4+
-         vu8/w0HtqX4yIEQd64QDwEvlTi17/3fB2/Bd3NG9Jm/YvmkvZMnK0yyeEXi0d1mLvuSd
-         3nS/iQKPiwjidb8no/dP/DEaiM0dXBnO9poeu70q7YCYovYLRahPvcatZHLbAmgRqNXT
-         wkeZrryX84t2omllYiuax+vSWH7RyR2rJAWV3FwuI0C/ymdfB1n9E05njXBQ8L84OVVe
-         730+A4c9HDjnuki9QMPFpJ7pnc2FOhqamE4BPzWJ8T83G4FTA8y5pkvFZxRpRC4ky8Yf
-         WEGg==
-X-Gm-Message-State: ACgBeo1wHNLL12XEF/M1L1KWFI+Ojy7F5IYfFb/DhwoqV8UIN6HFuvCB
-        ddtpD243quxNTSEEcu2J8IQOqRFILcr6dCf/pUedGw==
-X-Google-Smtp-Source: AA6agR5rZhIXArGNHvQZC2+tQzNwvpKg5dXZXlSW/9Nb8/5qJK4v6N2Q9RKjhngvv22DvXgLUpRLGamt/wBAm47vh5Q=
-X-Received: by 2002:a05:6808:151f:b0:350:1b5e:2380 with SMTP id
- u31-20020a056808151f00b003501b5e2380mr1698266oiw.112.1663191988444; Wed, 14
- Sep 2022 14:46:28 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220525173933.1611076-1-venkateshs@chromium.org>
-In-Reply-To: <20220525173933.1611076-1-venkateshs@chromium.org>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 14 Sep 2022 14:46:17 -0700
-Message-ID: <CALMp9eSTg+FQAk+LX9qspOLZ9bt0ou=1U-fymcK9FVmSwBautg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] KVM: Inject #GP on invalid write to APIC_SELF_IPI register
-To:     Venkatesh Srinivas <venkateshs@chromium.org>
-Cc:     kvm@vger.kernel.org, seanjc@google.com, marcorr@google.com
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=q3GD4NwlYUx8gdey9sVlOvilOE2N0wjdZ+RZokGXIPk=;
+        b=rOCu9IlyspjCcQAI98AP1VWFufqtJSqNBF1CGon61Cgqr2G7yPoZs4Z7XSb5OLzR3q
+         Fy9XgOGdA7dnK8r0bJZYLFGJKk5A92IW/aNQGGdFN08OF8IH0DU9Q/gKbroV3q01FdQw
+         mL8F9FtmvmWqQ7enYLGIWwQl2tTzAecudxol7sW3iQ+Ky7Di/W2mYDesEP1CPQKYKuHY
+         C4Jp3B+tcKen2OGs1hsshguvWwz6p0T5mKJ4BvWmyuWhO1hh996HNh06Mxtcb95qFzgB
+         aq0vVUAo1e3ACFHFiCjx74FKGpAgbcYvMyCrWSVT2BTFElZxpDaFbwjK24nmouJStWeF
+         FD+g==
+X-Gm-Message-State: ACrzQf2+A/wkZJUNF7IXS4Z0ROzxsc+XGxgmRpKUaPAor7ma/YTZjxVz
+        T6Jz5jUQ5uIYDlKIIECwnsbNWvow6ZOUMxLw
+X-Google-Smtp-Source: AMsMyM51rYBali47oquei1QQzpoYjbSCTo1142oz9rhffNt+VP5FbcWjjAwhQozvf3hlJqGVJ1OB387FELZgYN1i
+X-Received: from vannapurve2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:41f8])
+ (user=vannapurve job=sendgmr) by 2002:a17:902:ab8e:b0:174:11d5:b2ec with SMTP
+ id f14-20020a170902ab8e00b0017411d5b2ecmr1544268plr.18.1663200290870; Wed, 14
+ Sep 2022 17:04:50 -0700 (PDT)
+Date:   Thu, 15 Sep 2022 00:04:40 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.2.789.g6183377224-goog
+Message-ID: <20220915000448.1674802-1-vannapurve@google.com>
+Subject: [V2 PATCH 0/8] Execute hypercalls from guests according to cpu type
+From:   Vishal Annapurve <vannapurve@google.com>
+To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     pbonzini@redhat.com, shuah@kernel.org, bgardon@google.com,
+        seanjc@google.com, oupton@google.com, peterx@redhat.com,
+        vkuznets@redhat.com, dmatlack@google.com,
+        Vishal Annapurve <vannapurve@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,49 +68,79 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, May 25, 2022 at 10:40 AM Venkatesh Srinivas
-<venkateshs@chromium.org> wrote:
->
-> From: Marc Orr <marcorr@google.com>
->
-> From: Venkatesh Srinivas <venkateshs@chromium.org>
->
-> The upper bytes of the x2APIC APIC_SELF_IPI register are reserved.
-> Inject a #GP into the guest if any of these reserved bits are set.
->
-> Signed-off-by: Marc Orr <marcorr@google.com>
-> Signed-off-by: Venkatesh Srinivas <venkateshs@chromium.org>
-> ---
->  arch/x86/kvm/lapic.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 21ab69db689b..6f8522e8c492 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -2169,10 +2169,16 @@ static int kvm_lapic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
->                 break;
->
->         case APIC_SELF_IPI:
-> -               if (apic_x2apic_mode(apic))
-> -                       kvm_apic_send_ipi(apic, APIC_DEST_SELF | (val & APIC_VECTOR_MASK), 0);
-> -               else
-> +               /*
-> +                * Self-IPI exists only when x2APIC is enabled.  Bits 7:0 hold
-> +                * the vector, everything else is reserved.
-> +                */
-> +               if (!apic_x2apic_mode(apic) || (val & ~APIC_VECTOR_MASK)) {
->                         ret = 1;
-> +                       break;
-> +               }
-> +               kvm_lapic_reg_write(apic, APIC_ICR,
-> +                                   APIC_DEST_SELF | (val & APIC_VECTOR_MASK));
+This series is posted in context of the discussion at:
+https://lore.kernel.org/lkml/Ywa9T+jKUpaHLu%2Fl@google.com/
 
-Masking off the high bytes of 'val' is redundant here.
+Changes in v2:
+* Addressed comments from Andrew and David
+  * Common function with constructor attribute used to setup initial state
+  * Changes are split in more logical granules as per feedback
 
->                 break;
->         default:
->                 ret = 1;
-> --
-> 2.36.1.124.g0e6072fb45-goog
->
+Major changes:
+1) Move common startup logic to a single function in kvm_util.c
+2) Introduce following APIs:
+	kvm_selftest_arch_init: to perform arch specific common startup.
+	kvm_arch_post_vm_elf_load: to update the guest memory state to convey
+		common information to guests.
+3) For x86, capture cpu type at startup and pass on the cpu type to
+guest after guest elf is loaded.
+4) Execute hypercall instruction from within guest VMs according to the
+cpu type. This will help prevent an extra kvm exit during hypercall
+execution.
+
+Vishal Annapurve (8):
+  KVM: selftests: move common startup logic to kvm_util.c
+  KVM: selftests: Add arch specific initialization
+  KVM: selftests: Add arch specific post vm load setup
+  KVM: selftests: x86: Precompute the result for is_{intel,amd}_cpu()
+  KVM: selftests: x86: delete svm_vmcall_test
+  KVM: selftests: x86: Execute cpu specific hypercall from nested guests
+  Kvm: selftests: x86: Execute cpu specific vmcall instruction
+  KVM: selftests: x86: xen: Execute cpu specific vmcall instruction
+
+ tools/testing/selftests/kvm/.gitignore        |  1 -
+ .../selftests/kvm/aarch64/arch_timer.c        |  3 -
+ .../selftests/kvm/aarch64/hypercalls.c        |  2 -
+ .../testing/selftests/kvm/aarch64/vgic_irq.c  |  3 -
+ .../selftests/kvm/include/kvm_util_base.h     |  9 +++
+ .../selftests/kvm/include/x86_64/processor.h  | 10 +++
+ .../selftests/kvm/include/x86_64/vmx.h        |  9 ---
+ .../selftests/kvm/lib/aarch64/processor.c     | 22 +++---
+ tools/testing/selftests/kvm/lib/elf.c         |  2 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  8 ++
+ .../selftests/kvm/lib/riscv/processor.c       |  8 ++
+ .../selftests/kvm/lib/s390x/processor.c       |  8 ++
+ .../selftests/kvm/lib/x86_64/perf_test_util.c |  2 +-
+ .../selftests/kvm/lib/x86_64/processor.c      | 38 +++++++++-
+ .../testing/selftests/kvm/memslot_perf_test.c |  3 -
+ tools/testing/selftests/kvm/rseq_test.c       |  3 -
+ tools/testing/selftests/kvm/s390x/memop.c     |  2 -
+ tools/testing/selftests/kvm/s390x/resets.c    |  2 -
+ .../selftests/kvm/s390x/sync_regs_test.c      |  3 -
+ .../selftests/kvm/set_memory_region_test.c    |  3 -
+ .../kvm/x86_64/cr4_cpuid_sync_test.c          |  3 -
+ .../kvm/x86_64/emulator_error_test.c          |  3 -
+ .../selftests/kvm/x86_64/hyperv_cpuid.c       |  3 -
+ .../selftests/kvm/x86_64/platform_info_test.c |  3 -
+ .../kvm/x86_64/pmu_event_filter_test.c        |  3 -
+ .../selftests/kvm/x86_64/set_sregs_test.c     |  3 -
+ tools/testing/selftests/kvm/x86_64/smm_test.c |  2 +-
+ .../testing/selftests/kvm/x86_64/state_test.c |  8 +-
+ .../kvm/x86_64/svm_nested_soft_inject_test.c  |  3 -
+ .../selftests/kvm/x86_64/svm_vmcall_test.c    | 74 -------------------
+ .../selftests/kvm/x86_64/sync_regs_test.c     |  3 -
+ .../selftests/kvm/x86_64/userspace_io_test.c  |  3 -
+ .../kvm/x86_64/userspace_msr_exit_test.c      |  3 -
+ .../kvm/x86_64/vmx_apic_access_test.c         |  2 +-
+ .../selftests/kvm/x86_64/vmx_dirty_log_test.c |  2 +-
+ .../kvm/x86_64/vmx_nested_tsc_scaling_test.c  |  2 +-
+ .../kvm/x86_64/vmx_preemption_timer_test.c    |  2 +-
+ .../kvm/x86_64/vmx_tsc_adjust_test.c          |  2 +-
+ .../selftests/kvm/x86_64/xen_shinfo_test.c    | 64 ++++++----------
+ .../selftests/kvm/x86_64/xen_vmcall_test.c    | 14 +++-
+ 40 files changed, 138 insertions(+), 205 deletions(-)
+ delete mode 100644 tools/testing/selftests/kvm/x86_64/svm_vmcall_test.c
+
+-- 
+2.37.2.789.g6183377224-goog
+
