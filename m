@@ -2,210 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E8535B92D6
-	for <lists+kvm@lfdr.de>; Thu, 15 Sep 2022 05:00:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 206BB5B930F
+	for <lists+kvm@lfdr.de>; Thu, 15 Sep 2022 05:28:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229603AbiIODAf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Sep 2022 23:00:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36442 "EHLO
+        id S229972AbiIOD2q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Sep 2022 23:28:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229608AbiIODAa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Sep 2022 23:00:30 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6E887E006;
-        Wed, 14 Sep 2022 20:00:27 -0700 (PDT)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28F2UAaA031229;
-        Thu, 15 Sep 2022 03:00:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=8FxWTYvr9dyzYd240WhgjgTB7nYf9NQFy9fUf5lu17Y=;
- b=WKnFXzCfpMI0yg0rLpz69kw2byi+vTLNqK8vCo7DRiJjFuR8fblpjrflrImdjnmzDb5x
- s/GHPuo81qLreS3xtmukj5P6fOm4861C7D8xO0PXLznnXkEG5fVTQ5fVYVUa/w/6qbRq
- wvYThwHdy5wQ4gpmvFzBXFYTgK7oPkgWU7jMPZWaf+88Y0YCbAn/d7b1eCOw2KN0YD8f
- a3cnNTdapu6pUA02wTZSurO6GQIh4FUUEodXPkTfsBvt+skmrz1RDtowCp/EZ3vCsJY3
- z4HwmG4oYqGpuXAGY1wy1YgiUQQ6h98cUJ7jGzgd5dEOPY9ES1znIBX9wpfEEudWLFJz Pw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jkuakgkt3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Sep 2022 03:00:27 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28F2lnkr032462;
-        Thu, 15 Sep 2022 03:00:26 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jkuakgks2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Sep 2022 03:00:26 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 28F2pB0p029995;
-        Thu, 15 Sep 2022 03:00:24 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03ams.nl.ibm.com with ESMTP id 3jjy95srec-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Sep 2022 03:00:24 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 28F30LjU27984342
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 15 Sep 2022 03:00:21 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 27733AE04D;
-        Thu, 15 Sep 2022 03:00:21 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 96266AE05A;
-        Thu, 15 Sep 2022 03:00:20 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.145.64.223])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 15 Sep 2022 03:00:20 +0000 (GMT)
-Date:   Thu, 15 Sep 2022 05:00:18 +0200
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Tony Krowiak <akrowiak@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, stable@vger.kernel.org,
-        Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH v3 1/2] s390/vfio-ap: bypass unnecessary processing of
- AP resources
-Message-ID: <20220915050018.37d21083.pasic@linux.ibm.com>
-In-Reply-To: <20220823150643.427737-2-akrowiak@linux.ibm.com>
-References: <20220823150643.427737-1-akrowiak@linux.ibm.com>
-        <20220823150643.427737-2-akrowiak@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        with ESMTP id S229539AbiIOD2l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Sep 2022 23:28:41 -0400
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85F714C61A
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 20:28:38 -0700 (PDT)
+Received: by mail-ej1-x643.google.com with SMTP id gh9so39155106ejc.8
+        for <kvm@vger.kernel.org>; Wed, 14 Sep 2022 20:28:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:reply-to:mime-version:from:to:cc
+         :subject:date;
+        bh=aDnRL1ZmQxOMFMNGZoJPqBH20uB7idv9vdFa8r24GwU=;
+        b=b7UMAOiYFA3XPKWS1pOuso+8+d2lCGa5GGPLyxhKCOnpmXs12m0FJWpqqX4YE6q29C
+         WCjnqRX9JYrYBNPJQrUYfXSUrCxvkFEsxT+QR8zASMwThcCaxkvRkeTsDZKGVpkoYuuF
+         juimCVmJWWpbIWIHGQUMe2w+o9X6Gkpzx90ITGDpol2BzG6zKm7FSo46bjFy4Tzt23ec
+         rnkKMusvPRGrP4oIQupGtUfU5ZsUpTM58a1kVPS4TiX0m4rXQNdDzKI7SIdLufuX2L/r
+         MA7Y/237k8vrGihOrfmDwt6ixZNyFGbv2PlGKWEepvT1wNcYO+OXXpua6s6UFdLCeGcS
+         5LiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:subject:message-id:date:from:reply-to:mime-version
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=aDnRL1ZmQxOMFMNGZoJPqBH20uB7idv9vdFa8r24GwU=;
+        b=NSpH6ksT02s8wo+qn+CSzepbzhOOLU29LxKJ7F6R5n00Zi9I9zlB4f/Q9PPqTmxgjs
+         NKz8a/1uzAX+Mtv62sQcd4s12v8iMACbFfvZ2SC63ZAbTgFlpy3HuqlXTJMh450d8APK
+         e0dxfiPO0wUJyrX/A7/+i8pB3CAnnO7RpXtRTsS1q/evCBIhoU3I7bkDqRV2lkAnIlrn
+         TW2MkesE7A1c722lmi5T2Bj9rTy469fbVVcOCfMZH+6QyHyHlCTl1gIjwvqUl0qyVFef
+         QhF9zI349i/XyOQDmA7KE4E1f6NbpZwvtGK3aZjYYDl4EW7ZBPs1NgtXLmZaODArn9hX
+         WZbg==
+X-Gm-Message-State: ACgBeo1IQocEx6N2mF2Bt/RUObWkDmXh2nJ14pbfd3HW1iLjAnw4rifL
+        8NxJFfJc6OFJl7NeCsM7kiM2c9V2K9VHZkEH0Bo=
+X-Google-Smtp-Source: AA6agR6BaL1u7vgR/+BWVC/gVEIT9o1iTF2gIhV8hICCFlfG9MyJyaYgmY5QO0ZyFTw1eV4LkAWWDtbZ4LtNlyY+gTE=
+X-Received: by 2002:a17:907:75d4:b0:77a:fcb7:a2cc with SMTP id
+ jl20-20020a17090775d400b0077afcb7a2ccmr17387083ejc.480.1663212517121; Wed, 14
+ Sep 2022 20:28:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: s22ckWZDcNMmMJgBhKcfY7XFzDJzkSXQ
-X-Proofpoint-GUID: 5gq95nZ4QaBYc3_mmCBpqDKZltwu4BnK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-14_11,2022-09-14_04,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- bulkscore=0 adultscore=0 mlxlogscore=999 impostorscore=0 suspectscore=0
- priorityscore=1501 phishscore=0 malwarescore=0 clxscore=1015
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2208220000 definitions=main-2209150011
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Received: by 2002:a05:6f02:a053:b0:24:3aff:af78 with HTTP; Wed, 14 Sep 2022
+ 20:28:36 -0700 (PDT)
+Reply-To: ninacoulibaly04@hotmail.com
+From:   nina coulibaly <coulibalynina107@gmail.com>
+Date:   Thu, 15 Sep 2022 03:28:36 +0000
+Message-ID: <CA+4vKa=wX6kH7wWHm1kY5WFDmdqBoUMOryGju8aF_uJ8eyTAcA@mail.gmail.com>
+Subject: from nina coulibaly
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: Yes, score=5.2 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+        UNDISC_FREEM autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
+        *      https://www.dnswl.org/, no trust
+        *      [2a00:1450:4864:20:0:0:0:643 listed in]
+        [list.dnswl.org]
+        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.5033]
+        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
+        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
+        *       in digit
+        *      [coulibalynina107[at]gmail.com]
+        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
+        *      provider
+        *      [coulibalynina107[at]gmail.com]
+        *  0.2 FREEMAIL_REPLYTO_END_DIGIT Reply-To freemail username ends in
+        *      digit
+        *      [ninacoulibaly04[at]hotmail.com]
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
+        *       valid
+        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
+        *      envelope-from domain
+        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
+        *      author's domain
+        * -0.0 T_SCC_BODY_TEXT_LINE No description available.
+        *  3.1 UNDISC_FREEM Undisclosed recipients + freemail reply-to
+        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
+        *      different freemails
+X-Spam-Level: *****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 23 Aug 2022 11:06:42 -0400
-Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+-- 
+Dear,
 
-> It is not necessary to go through the process of validation, linking of
-> queues to mdev and vice versa and filtering the APQNs assigned to the
-> matrix mdev to build an AP configuration for a guest if an adapter or
-> domain being assigned is already assigned to the matrix mdev. Likewise, it
-> is not necessary to proceed through the process the unassignment of an
-> adapter, domain or control domain if it is not assigned to the matrix mdev.
-> 
-> Since it is not necessary to process assignment of a resource resource
-> already assigned or process unassignment of a resource that is been assigned,
-> this patch will bypass all assignment/unassignment operations for an adapter,
-> domain or control domain under these circumstances.
-> 
-> Not only is assignment of a duplicate adapter or domain unnecessary, it
-> will also cause a hang situation when removing the matrix mdev to which it is
-> assigned. The reason is because the same vfio_ap_queue objects with an
-> APQN containing the APID of the adapter or APQI of the domain being
-> assigned will get added multiple times to the hashtable that holds them.
-> This results in the pprev and next pointers of the hlist_node (mdev_qnode
-> field in the vfio_ap_queue object) pointing to the queue object itself
-> resulting in an interminable loop when the mdev is removed and the queue
-> table is iterated to reset the queues.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 11cb2419fafe ("s390/vfio-ap: manage link between queue struct and matrix mdev")
-> Reported-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+Please grant me the permission to share important discussion with you.
+I am looking forward to hearing from you at your earliest convenience.
 
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+Best Regards.
 
-> ---
->  drivers/s390/crypto/vfio_ap_ops.c | 30 ++++++++++++++++++++++++++++++
->  1 file changed, 30 insertions(+)
-> 
-> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
-> index 6c8c41fac4e1..ee82207b4e60 100644
-> --- a/drivers/s390/crypto/vfio_ap_ops.c
-> +++ b/drivers/s390/crypto/vfio_ap_ops.c
-> @@ -984,6 +984,11 @@ static ssize_t assign_adapter_store(struct device *dev,
->  		goto done;
->  	}
->  
-> +	if (test_bit_inv(apid, matrix_mdev->matrix.apm)) {
-> +		ret = count;
-> +		goto done;
-> +	}
-> +
->  	set_bit_inv(apid, matrix_mdev->matrix.apm);
->  
->  	ret = vfio_ap_mdev_validate_masks(matrix_mdev);
-> @@ -1109,6 +1114,11 @@ static ssize_t unassign_adapter_store(struct device *dev,
->  		goto done;
->  	}
->  
-> +	if (!test_bit_inv(apid, matrix_mdev->matrix.apm)) {
-> +		ret = count;
-> +		goto done;
-> +	}
-> +
->  	clear_bit_inv((unsigned long)apid, matrix_mdev->matrix.apm);
->  	vfio_ap_mdev_hot_unplug_adapter(matrix_mdev, apid);
->  	ret = count;
-> @@ -1183,6 +1193,11 @@ static ssize_t assign_domain_store(struct device *dev,
->  		goto done;
->  	}
->  
-> +	if (test_bit_inv(apqi, matrix_mdev->matrix.aqm)) {
-> +		ret = count;
-> +		goto done;
-> +	}
-> +
->  	set_bit_inv(apqi, matrix_mdev->matrix.aqm);
->  
->  	ret = vfio_ap_mdev_validate_masks(matrix_mdev);
-> @@ -1286,6 +1301,11 @@ static ssize_t unassign_domain_store(struct device *dev,
->  		goto done;
->  	}
->  
-> +	if (!test_bit_inv(apqi, matrix_mdev->matrix.aqm)) {
-> +		ret = count;
-> +		goto done;
-> +	}
-> +
->  	clear_bit_inv((unsigned long)apqi, matrix_mdev->matrix.aqm);
->  	vfio_ap_mdev_hot_unplug_domain(matrix_mdev, apqi);
->  	ret = count;
-> @@ -1329,6 +1349,11 @@ static ssize_t assign_control_domain_store(struct device *dev,
->  		goto done;
->  	}
->  
-> +	if (test_bit_inv(id, matrix_mdev->matrix.adm)) {
-> +		ret = count;
-> +		goto done;
-> +	}
-> +
->  	/* Set the bit in the ADM (bitmask) corresponding to the AP control
->  	 * domain number (id). The bits in the mask, from most significant to
->  	 * least significant, correspond to IDs 0 up to the one less than the
-> @@ -1378,6 +1403,11 @@ static ssize_t unassign_control_domain_store(struct device *dev,
->  		goto done;
->  	}
->  
-> +	if (!test_bit_inv(domid, matrix_mdev->matrix.adm)) {
-> +		ret = count;
-> +		goto done;
-> +	}
-> +
->  	clear_bit_inv(domid, matrix_mdev->matrix.adm);
->  
->  	if (test_bit_inv(domid, matrix_mdev->shadow_apcb.adm)) {
-
+Mrs. Nina Coulibaly
