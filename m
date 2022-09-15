@@ -2,201 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67DAC5B92B9
-	for <lists+kvm@lfdr.de>; Thu, 15 Sep 2022 04:46:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E8535B92D6
+	for <lists+kvm@lfdr.de>; Thu, 15 Sep 2022 05:00:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230230AbiIOCqV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Sep 2022 22:46:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49092 "EHLO
+        id S229603AbiIODAf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Sep 2022 23:00:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229669AbiIOCqT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Sep 2022 22:46:19 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3F068C038;
-        Wed, 14 Sep 2022 19:46:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663209978; x=1694745978;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=+wrk+e3vpu9L/5mkEMfP2FQpmp2GK3f88Q+lDZ7RIRs=;
-  b=fflYz3Fa+AgZCnbgCeXD5JOn829MGV7ABaU0anUV2O7CIp31BsgTwmVy
-   M3B2Wr56hQ49iJ1Q/CfmG1xkHAzalAvDmKBYSAPAr+bgX+zaQD4lnuVSH
-   xolTBT0Xvn9JPVZbtmpO7v5jiEJPg5VlkpxL04Wggn6zKZ+1aVYahl6Jr
-   hsJVuxmzQP2VbEu7t2BEPJkMGJNTwzU6nNhvYgTBEr7fanui6AvEj3FFw
-   VW4xr1xXD84tZUY0YVSQpiTE5Op3/uIvMZb5cBM/RYZbzrL9T3bfyHUg5
-   svubDH+5MIaJUQJJAvzUXUClmzTsea3nUsHGbsvbzQ9/jCsnCaFvvn/l+
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10470"; a="362556550"
-X-IronPort-AV: E=Sophos;i="5.93,316,1654585200"; 
-   d="scan'208";a="362556550"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2022 19:46:18 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,316,1654585200"; 
-   d="scan'208";a="792536192"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga005.jf.intel.com with ESMTP; 14 Sep 2022 19:46:18 -0700
-Received: from orsmsx608.amr.corp.intel.com (10.22.229.21) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Wed, 14 Sep 2022 19:46:17 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx608.amr.corp.intel.com (10.22.229.21) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31 via Frontend Transport; Wed, 14 Sep 2022 19:46:17 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.107)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.31; Wed, 14 Sep 2022 19:46:17 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=V1f5c80ZwDOtEKeB+oVCfiQfQ/e3m4tIkfdNvYzf9byHAyRJCRqtTatnlJH2huzon+XoihUsJTRJUNWY5wIOkMr+rFz8vgKzknO+RYrRIZujw+kb397tFrddJP6RIXTenI0UGua7S0FdjokZ3qMRTxPbChIMT/h3W+t1kJriWBwT0Zv//sablOYBRzd7xL5qZSgbLTs6dW/1/GxNOqdqW1L8I2NcrKJMSVivCKQMaVwlH6UB7Hp5noW+hd8rcofVdF2eyNeJuclf5IG8wgQaiZ99TVNekx41E+i6eRxQQvczOAhHcqxUS7P/pWMpJaa3m7kfxpyPwnFDo6I5GnRRbA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+wrk+e3vpu9L/5mkEMfP2FQpmp2GK3f88Q+lDZ7RIRs=;
- b=Mzspg3NPp7DP901TBrsxgynQPnT6VtpBGtXCgfR8gwlik+EziPoYRWXAPVNPnVcz2MNZ2zkXi5ZaaHsR9bjkBP/nV3fuBwuU4AM0m68AJ/gflwNsj0W05qwQGTJ1GNSp4qoyS2r/TXhc6PFw1kAGKFsr5yDLOJXQ5j7uRFHfz0+tnHFO3H4uUzZZgzLW/nadpVuFNoD50pfp1f7qskpp3oOcHFgd8neo+R3GadlhlpBofGZtWyYijKyy5lbT48TGIOU2Bg/wSFocT9Hz/Gnla7QHZ2AHJIAU8t0B3Fyglv+hywgUddvfEd/uIqktjEHhqUPA1BA85hDaMscY4VooSA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CY5PR11MB6365.namprd11.prod.outlook.com (2603:10b6:930:3b::5)
- by BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5612.22; Thu, 15 Sep
- 2022 02:46:14 +0000
-Received: from CY5PR11MB6365.namprd11.prod.outlook.com
- ([fe80::990c:fb7c:d6ab:3b18]) by CY5PR11MB6365.namprd11.prod.outlook.com
- ([fe80::990c:fb7c:d6ab:3b18%4]) with mapi id 15.20.5612.022; Thu, 15 Sep 2022
- 02:46:14 +0000
-From:   "Wang, Wei W" <wei.w.wang@intel.com>
-To:     "Liang, Kan" <kan.liang@linux.intel.com>,
-        "Li, Xiaoyao" <xiaoyao.li@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "Arnaldo Carvalho de Melo" <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Liang, Kan" <kan.liang@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>
-CC:     "linux-perf-users@vger.kernel.org" <linux-perf-users@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [RFC PATCH 0/2] KVM: VMX: Fix VM entry failure on
- PT_MODE_HOST_GUEST while host is using PT
-Thread-Topic: [RFC PATCH 0/2] KVM: VMX: Fix VM entry failure on
- PT_MODE_HOST_GUEST while host is using PT
-Thread-Index: AQHYuGCfKwYxaXR4306din/WULaC4K3Fff5wgBjymACAABFugIAA/X4AgABj1pA=
-Date:   Thu, 15 Sep 2022 02:46:14 +0000
-Message-ID: <CY5PR11MB6365676799EBF86B3931D336DC499@CY5PR11MB6365.namprd11.prod.outlook.com>
-References: <20220825085625.867763-1-xiaoyao.li@intel.com>
- <CY5PR11MB6365897E8E6D0B590A298FA0DC769@CY5PR11MB6365.namprd11.prod.outlook.com>
- <815586ac-1eaa-5e38-1e08-492c29d0729d@intel.com>
- <CY5PR11MB63659EBEAEA0E64812E96111DC469@CY5PR11MB6365.namprd11.prod.outlook.com>
- <f7cfb391-c38b-84d2-b2fe-5e289d82862c@linux.intel.com>
-In-Reply-To: <f7cfb391-c38b-84d2-b2fe-5e289d82862c@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-dlp-version: 11.6.500.17
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY5PR11MB6365:EE_|BL1PR11MB5978:EE_
-x-ms-office365-filtering-correlation-id: 782bfa90-6862-490a-298f-08da96c474b5
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: mqKFi1bIZuQj8+r6Uex0MNLQc67xxTPTqBxWIYJVg0IUWBlM+UG2feQ3PP58DGGlhef2xeptzxlJT38xvkQNjC1wnljwbIwYp3C7G73q3F85MLnkG9WST1lT3Da0w57/smH+DYUesAKi2ebQ71tz4ig2PjHIusMBntsQ60WW3aN6X+4PL/JGcAFiXIwwGD+h3SXW3Z14QmphHn2KL5/bTmbLOCaDFVpdzdrOlSOhsnXIk7f3IwKH3q1kJjD4gaE0BQzySaP5FhctqmoYgMln2rj1AC6lXviUu7yIUD0Zf7Ex7q1bQF9ZMNsVB8mSWidbXUieTOZ7lLllht6zmxK/bFQkQ/0QDhSN/qZ/3cMp70zGhfojMUZ/tF1JzFa3KQp2yiA5uIjcMbU4jLX8nnXOy1IIioxfCLgbrqVrf9QvQVrtMBs8xppNO4FgyhhHtFFK1k5Pa/pTvmnfTXhmCQbehOyz+kXimC8ZxME/x95zRVwEZrDcW8+9AsL7MruqmncUOtGqOHPDm/44uQHD0oXz/pkmRGSD2kCmdT3lcqMLZKqT3s5M3B6IBBY1FmuluA9KS8bTWih75U3wWmRpqLXy2S/6t6Wl0qQvluQwZJMl9m30RPI8Mv9tH87CQavFGkmJyf+J2M5ryrNKl02PaVHy4XrDA+FCZr/2ym6/5CyKwrS3izFxzGk2E8qiZXb2/6wx1HBcwdZ2s93bT/66lXaGamSJfyifFBqZuenYbcTDb3g8M1vGOye7/x4ONp8my9TG+QQp7T6i6cabUx0ZL2tYTLu5SRfH9TK811oPaRH2kto=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6365.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(396003)(366004)(376002)(346002)(136003)(39860400002)(451199015)(921005)(26005)(66476007)(33656002)(38070700005)(55016003)(41300700001)(6636002)(76116006)(5660300002)(9686003)(38100700002)(2906002)(122000001)(316002)(66556008)(71200400001)(110136005)(7416002)(8676002)(478600001)(52536014)(6506007)(82960400001)(83380400001)(7696005)(53546011)(66446008)(64756008)(8936002)(66946007)(86362001)(54906003)(4326008)(186003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?aG5Qczl2ckdEcklUL2QxWWxPdlBKL1FGd0VaMldHYmE3UGNFbG1LODNXMUNU?=
- =?utf-8?B?Wlp4QlBMOGQyaisxRzFpcGVwQlU0M3hseWN4NUtFOGc5Q1o4YTdhcXhxUUJV?=
- =?utf-8?B?YVhNR0ZOSjFwK0JGOVRwb1pITmtMK2JWbHZFZ2QyWE5HWXZYd3lVUnR0QjN2?=
- =?utf-8?B?aERpSjZrK2k3YXh0cWZOYlFsMUdrRW5YSXNvSlF3b3c2blRyaGR5WGd4M2Zq?=
- =?utf-8?B?TTJFZERNOUV5MG1NVWJNWDZOSC9YVS9aV1VKeHJ6KzFZNFV3MmJ3MWFsc1Iv?=
- =?utf-8?B?enpDMGZhWDU1RkkwV0R5Y0ZldFlXWnRIZ09lVkpxalVVSTc0RkRwdDMvbEt3?=
- =?utf-8?B?V2ZrRlNlejhacUR4U1dlMlZmRng0YmFqTnFhbExBV2QxVnZjL3Z4dVdqN25G?=
- =?utf-8?B?alNoTUhRdHBiT200dDczcUZvNVpZZlBZeEo4c1FMOXF2WDRnTHFPdzVxS3Jj?=
- =?utf-8?B?MGxKKzJMWEhCT05EM0hKREhEVlhDQmxlSW50TlRQU0YzTzhIMkVhRE1vdnA3?=
- =?utf-8?B?ZVdvYVp4Q3BZM3FXd1ZjUzhSMWhXUDBHTUhSNjlYOTBBSEpYNUJWWHVWMTZo?=
- =?utf-8?B?cXpHd0F3YW5BRXdwbGNCZ0Z6dHRHQXVYNVpZN2p4L2xPRWZSKzJuc3NidUhh?=
- =?utf-8?B?d1ZXR1RUNWRxYjJwRDZDYkhsRGVhTU5aRHZUbnVkRXdPNnYwSzVYOUx3QjNP?=
- =?utf-8?B?ZkNNVy9SSTFUY2JuMXlwQWcyaXE1QVl0VkdEU2Q5L1RMSUZaU29rcU9Edlo2?=
- =?utf-8?B?SWplRlBUTmN5S084SWJKMHFYdXRaaFFTOUg3ZUZleXZsOU9CS3NSRjR1SHlq?=
- =?utf-8?B?VUNFNEIybUtqNE83WER2YUlpZklLOEs3RXdnb2p6YXN1SEFpaWlwWmdxdWtG?=
- =?utf-8?B?VktNV3hHK3lsLzN2aDc1K0szd0tCUTJGTFFXRXg0Ykg1K0syRHJNdmovUDZN?=
- =?utf-8?B?UWxFaitUTXVVa2JyVGZCOURLbm5LTFR5eHpIbmdKSHNFQzBqMTEwOVlCYTAy?=
- =?utf-8?B?NDk3Ly8yeW5sYXVObUxucGNwMTRCUWowc2Q5TmxKN1YreTFGMXJXYzV1VERQ?=
- =?utf-8?B?Ymh6OVNxWjY1dUdVL21YdzdnMmc0aG15eVExN3dwLzdPY2dtTVBoL1FnS1RF?=
- =?utf-8?B?UWlXN0d4R2FJSmYrMjN5UUJ2RDFUTXJoOXhkVWVqd3lXUSszRE9SYW9qME1Z?=
- =?utf-8?B?TUd2NnBtU0FxQVRCUEQ1aktiUmxiY3lJMDExazAwT0dHR2VsQ1FMUjR3clJm?=
- =?utf-8?B?VUxSc2RHclEvajZIbGVMSHd5MklBV1Y1a29PUHhLWG1INU5rcDNCdFNOdHhr?=
- =?utf-8?B?MUtPWTdWL1c3RmhNd2sybXhHWlg2KzJVRWQ1ZVdtdXdUMkt2a2VwSlFrZkFr?=
- =?utf-8?B?dFM2Tm5VdFZSVXQzTjdWY3VYZjlJSGl6ZU02YkwreUt4dWYzTlV5SDhMRlc0?=
- =?utf-8?B?ZXJpUWRjOTV4MmFPYjl5V3BNYXluc1ZQQThkYWI1NVV6ckF4Y2pHRzRhWDNv?=
- =?utf-8?B?Z2pTU1BCQWhkL1h2ZmZHSkFYWGIwRUUwUGd1VDhWZGNVdHFqbkpkcmsyN002?=
- =?utf-8?B?TlU4cVZMTWNoREN5QjdubFJDcWNtY1ZrNDg0WjY4K1FaOGVzVlN6M2NXRG9M?=
- =?utf-8?B?V1FJdldWQlhlQURGZmhFdEJzWnMyMzMvdURvRHFTamtGYjZuaWdlNDlLNm9B?=
- =?utf-8?B?SWhkYkdrUXFPTE9xWXRCZTJOVkM5UGlxOHI5VFVtL3hrS3AzNHNERVFUMVdZ?=
- =?utf-8?B?elhTenZkMWtsQU9YbVN4K2h4STUwVGZYb0NjTUlSUlVoK21Nb0FPVTM4NVpZ?=
- =?utf-8?B?ZE5mR0grSVVEdmpMcUZobFdIcVg0dTBqZjVLc3dKbFZnYVA1bnFkL1lidFVp?=
- =?utf-8?B?TW1iMlorTEhUSHhOWjhZeE9NWWhZbWNOOFVXWE54YWdjNFpqRXV2L2NXZ2Rh?=
- =?utf-8?B?bVpnUGlmN3lpSmNPdEtoM2VaU1ViMUZhTU8zeWZWV0xDR090N2oxNXFER2xy?=
- =?utf-8?B?b05BYjVSTFF0Qzl2NWRwK1I2cTNLREJFQXdqTThUNlppVldTYTZCK3RiL09z?=
- =?utf-8?B?M3RLdFMxSzZ4YVh3VXhlWWkxMllvM3pXbE9MelZPZE9tTVcvSEZlNGdDeTU4?=
- =?utf-8?Q?fO3MUBcsP95DOpfCoK6kuk5Jv?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S229608AbiIODAa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Sep 2022 23:00:30 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6E887E006;
+        Wed, 14 Sep 2022 20:00:27 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28F2UAaA031229;
+        Thu, 15 Sep 2022 03:00:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=8FxWTYvr9dyzYd240WhgjgTB7nYf9NQFy9fUf5lu17Y=;
+ b=WKnFXzCfpMI0yg0rLpz69kw2byi+vTLNqK8vCo7DRiJjFuR8fblpjrflrImdjnmzDb5x
+ s/GHPuo81qLreS3xtmukj5P6fOm4861C7D8xO0PXLznnXkEG5fVTQ5fVYVUa/w/6qbRq
+ wvYThwHdy5wQ4gpmvFzBXFYTgK7oPkgWU7jMPZWaf+88Y0YCbAn/d7b1eCOw2KN0YD8f
+ a3cnNTdapu6pUA02wTZSurO6GQIh4FUUEodXPkTfsBvt+skmrz1RDtowCp/EZ3vCsJY3
+ z4HwmG4oYqGpuXAGY1wy1YgiUQQ6h98cUJ7jGzgd5dEOPY9ES1znIBX9wpfEEudWLFJz Pw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jkuakgkt3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Sep 2022 03:00:27 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28F2lnkr032462;
+        Thu, 15 Sep 2022 03:00:26 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jkuakgks2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Sep 2022 03:00:26 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 28F2pB0p029995;
+        Thu, 15 Sep 2022 03:00:24 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03ams.nl.ibm.com with ESMTP id 3jjy95srec-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Sep 2022 03:00:24 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 28F30LjU27984342
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 15 Sep 2022 03:00:21 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 27733AE04D;
+        Thu, 15 Sep 2022 03:00:21 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 96266AE05A;
+        Thu, 15 Sep 2022 03:00:20 +0000 (GMT)
+Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.145.64.223])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 15 Sep 2022 03:00:20 +0000 (GMT)
+Date:   Thu, 15 Sep 2022 05:00:18 +0200
+From:   Halil Pasic <pasic@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, stable@vger.kernel.org,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH v3 1/2] s390/vfio-ap: bypass unnecessary processing of
+ AP resources
+Message-ID: <20220915050018.37d21083.pasic@linux.ibm.com>
+In-Reply-To: <20220823150643.427737-2-akrowiak@linux.ibm.com>
+References: <20220823150643.427737-1-akrowiak@linux.ibm.com>
+        <20220823150643.427737-2-akrowiak@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6365.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 782bfa90-6862-490a-298f-08da96c474b5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Sep 2022 02:46:14.1820
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: g+peadIxqmvXYX1gSsPA1AM7Oyf42t0KSnbx1fvGgLVHW/CFRi2wLgkKwZ9bvHCVNSJh+8gh0sybtl40mUo3SA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5978
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: s22ckWZDcNMmMJgBhKcfY7XFzDJzkSXQ
+X-Proofpoint-GUID: 5gq95nZ4QaBYc3_mmCBpqDKZltwu4BnK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-09-14_11,2022-09-14_04,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
+ bulkscore=0 adultscore=0 mlxlogscore=999 impostorscore=0 suspectscore=0
+ priorityscore=1501 phishscore=0 malwarescore=0 clxscore=1015
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2208220000 definitions=main-2209150011
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gVGh1cnNkYXksIFNlcHRlbWJlciAxNSwgMjAyMiA0OjI2IEFNLCBMaWFuZywgS2FuIHdyb3Rl
-Og0KPiBUaGUgcGVyZl9ldmVudF9kaXNhYmxlKCkgZXZlbnR1YWxseSBpbnZva2VzIHRoZSBpbnRl
-bF9wdF9zdG9wKCkuDQo+IFdlIGFscmVhZHkgZXhwb3NlIHRoZSBpbnRlbF9wdF9zdG9wKCkvY3B1
-X2VtZXJnZW5jeV9zdG9wX3B0KCkgdG8gb3RoZXINCj4gbW9kdWxlcy4gSSBkb24ndCB0aGluayB3
-ZSBoYXZlIHRvIHVzZSB0aGUgcGVyZl9ldmVudF9kaXNhYmxlKCkuIEFsc28sIHRoZQ0KPiBwZXJm
-X2V2ZW50X2Rpc2FibGUoKSByZXF1aXJlcyBleHRyYSBjb2Rlcy4NCj4gDQo+IEkgd2VudCB0aHJv
-dWdoIHRoZSBkaXNjdXNzaW9ucy4gSSBhZ3JlZSB3aXRoIFNlYW4ncyBzdWdnZXN0aW9uLg0KPiBX
-ZSBzaG91bGQgb25seSBwdXQgdGhlIGxvZ2ljIGluIHRoZSBLVk0gYnV0IGFsbCB0aGUgTVNSIGFj
-Y2VzcyBkZXRhaWxzIGludG8gdGhlIFBUDQo+IGRyaXZlci4gDQoNCkV2ZW4gdGhlIGRyaXZlciBp
-dHNlbGYgZG9lc27igJl0IGRyaXZlIHRoZSBzYXZlL3Jlc3RvcmUgb2YgdGhlIE1TUnMsIGl0IGlz
-IGRyaXZlZCBieSBwZXJmLg0KMS4gSWYgd2UgbWFrZSBLVk0gYSB1c2VyIG9mIHBlcmYsIHdlIHNo
-b3VsZCBkbyB0aGlzIHZpYSBwZXJmX2V2ZW50X2Rpc2FibGUvZW5hYmxlXyouDQoyLiBJZiB3ZSBt
-YWtlIEtWTSBhbiBhbHRlcm5hdGl2ZSB0byBwZXJmIChpLmUuIGhhdmUgZGlyZWN0IGNvbnRyb2wg
-b3ZlciBQTVUgSFcpLA0Kd2UgY2FuIGRvIHRoaXMgdmlhIGRyaXZlciBpbnRlcmZhY2VzIGxpa2Ug
-cGVyZi4NClBlciBteSBleHBlcmllbmNlLCB3ZSBzaG91bGQgZ28gZm9yIDEuIFByb2JhYmx5IG5l
-ZWQgUGV0ZXIncyBvcGluaW9ucyBvbiB0aGlzLg0KDQo+IEJ1dCBJIHByZWZlciBhIG1vcmUgZ2Vu
-ZXJpYyBhbmQgc3RyYWlnaHRmb3J3YXJkIGZ1bmN0aW9uIG5hbWUsIGUuZy4sDQo+IGludGVsX3B0
-X3N0b3Bfc2F2ZSgpL2ludGVsX3B0X3N0YXJ0X2xvYWQoKSwgaW4gY2FzZSBvdGhlciBtb2R1bGVz
-IG1heSB3YW50IHRvDQo+IHNhdmUvcmVzdG9yZSB0aGUgUFQgaW5mb3JtYXRpb24gaW4gdGhlaXIg
-Y29udGV4dCBzd2l0Y2ggbGF0ZXIuDQo+IA0KPiBUaGFua3MsDQo+IEthbg0KPiANCj4gPg0KPiA+
-PiBJdCBzZWVtcyBwZXJmX2V2ZW50X2Rpc2FibGUoKSBpcyBub3QgdXNlZCB3aWRlbHkgYnkgb3Ro
-ZXIga2VybmVsDQo+ID4+IGNvbXBvbmVudC4gDQoNCkJlY2F1c2UgdGhlcmUgYXJlIG5vdCBsb3Rz
-IG9mIGtlcm5lbCB1c2Vycy4NCllvdSBjYW4gY2hlY2sgYW5vdGhlciB1c2VyLCB3YXRjaGRvZ19o
-bGQuYywgcGVyZl9ldmVudF9lbmFibGUvZGlzYWJsZSBhcmUgdXNlZCB0aGVyZS4NCg==
+On Tue, 23 Aug 2022 11:06:42 -0400
+Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+
+> It is not necessary to go through the process of validation, linking of
+> queues to mdev and vice versa and filtering the APQNs assigned to the
+> matrix mdev to build an AP configuration for a guest if an adapter or
+> domain being assigned is already assigned to the matrix mdev. Likewise, it
+> is not necessary to proceed through the process the unassignment of an
+> adapter, domain or control domain if it is not assigned to the matrix mdev.
+> 
+> Since it is not necessary to process assignment of a resource resource
+> already assigned or process unassignment of a resource that is been assigned,
+> this patch will bypass all assignment/unassignment operations for an adapter,
+> domain or control domain under these circumstances.
+> 
+> Not only is assignment of a duplicate adapter or domain unnecessary, it
+> will also cause a hang situation when removing the matrix mdev to which it is
+> assigned. The reason is because the same vfio_ap_queue objects with an
+> APQN containing the APID of the adapter or APQI of the domain being
+> assigned will get added multiple times to the hashtable that holds them.
+> This results in the pprev and next pointers of the hlist_node (mdev_qnode
+> field in the vfio_ap_queue object) pointing to the queue object itself
+> resulting in an interminable loop when the mdev is removed and the queue
+> table is iterated to reset the queues.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 11cb2419fafe ("s390/vfio-ap: manage link between queue struct and matrix mdev")
+> Reported-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+
+Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+
+> ---
+>  drivers/s390/crypto/vfio_ap_ops.c | 30 ++++++++++++++++++++++++++++++
+>  1 file changed, 30 insertions(+)
+> 
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+> index 6c8c41fac4e1..ee82207b4e60 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -984,6 +984,11 @@ static ssize_t assign_adapter_store(struct device *dev,
+>  		goto done;
+>  	}
+>  
+> +	if (test_bit_inv(apid, matrix_mdev->matrix.apm)) {
+> +		ret = count;
+> +		goto done;
+> +	}
+> +
+>  	set_bit_inv(apid, matrix_mdev->matrix.apm);
+>  
+>  	ret = vfio_ap_mdev_validate_masks(matrix_mdev);
+> @@ -1109,6 +1114,11 @@ static ssize_t unassign_adapter_store(struct device *dev,
+>  		goto done;
+>  	}
+>  
+> +	if (!test_bit_inv(apid, matrix_mdev->matrix.apm)) {
+> +		ret = count;
+> +		goto done;
+> +	}
+> +
+>  	clear_bit_inv((unsigned long)apid, matrix_mdev->matrix.apm);
+>  	vfio_ap_mdev_hot_unplug_adapter(matrix_mdev, apid);
+>  	ret = count;
+> @@ -1183,6 +1193,11 @@ static ssize_t assign_domain_store(struct device *dev,
+>  		goto done;
+>  	}
+>  
+> +	if (test_bit_inv(apqi, matrix_mdev->matrix.aqm)) {
+> +		ret = count;
+> +		goto done;
+> +	}
+> +
+>  	set_bit_inv(apqi, matrix_mdev->matrix.aqm);
+>  
+>  	ret = vfio_ap_mdev_validate_masks(matrix_mdev);
+> @@ -1286,6 +1301,11 @@ static ssize_t unassign_domain_store(struct device *dev,
+>  		goto done;
+>  	}
+>  
+> +	if (!test_bit_inv(apqi, matrix_mdev->matrix.aqm)) {
+> +		ret = count;
+> +		goto done;
+> +	}
+> +
+>  	clear_bit_inv((unsigned long)apqi, matrix_mdev->matrix.aqm);
+>  	vfio_ap_mdev_hot_unplug_domain(matrix_mdev, apqi);
+>  	ret = count;
+> @@ -1329,6 +1349,11 @@ static ssize_t assign_control_domain_store(struct device *dev,
+>  		goto done;
+>  	}
+>  
+> +	if (test_bit_inv(id, matrix_mdev->matrix.adm)) {
+> +		ret = count;
+> +		goto done;
+> +	}
+> +
+>  	/* Set the bit in the ADM (bitmask) corresponding to the AP control
+>  	 * domain number (id). The bits in the mask, from most significant to
+>  	 * least significant, correspond to IDs 0 up to the one less than the
+> @@ -1378,6 +1403,11 @@ static ssize_t unassign_control_domain_store(struct device *dev,
+>  		goto done;
+>  	}
+>  
+> +	if (!test_bit_inv(domid, matrix_mdev->matrix.adm)) {
+> +		ret = count;
+> +		goto done;
+> +	}
+> +
+>  	clear_bit_inv(domid, matrix_mdev->matrix.adm);
+>  
+>  	if (test_bit_inv(domid, matrix_mdev->shadow_apcb.adm)) {
+
