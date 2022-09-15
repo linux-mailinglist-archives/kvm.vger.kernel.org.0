@@ -2,329 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 687F55B9D6F
-	for <lists+kvm@lfdr.de>; Thu, 15 Sep 2022 16:37:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 27D085B9D4B
+	for <lists+kvm@lfdr.de>; Thu, 15 Sep 2022 16:35:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230154AbiIOOhL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Sep 2022 10:37:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49438 "EHLO
+        id S230281AbiIOOfd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Sep 2022 10:35:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230284AbiIOOgL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Sep 2022 10:36:11 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 173E18E99E;
-        Thu, 15 Sep 2022 07:35:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663252522; x=1694788522;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=vo7O6JJ0Mt3TYlCfYDqCaXE1DrArKMV3xwA8EiMd43o=;
-  b=OLX6Axf8QPt+uSHKOshOu9SvVvcsS0lIs6kvvOx+1phxunBhOuT1hcqv
-   7RO6Bvf8KSWsNCqBa0W9nLTGu9udBxT0bKQ2DIPvTtRaZ+obko/ZIcXl1
-   WbH8TBjHN8fmYFmtZf/hyo7o8P9lZdOQGnhKoTowvIyK4+0whn3Noy3C/
-   brhn3Zcu2WxUm0wGKXmVzuuQrapHyqdo8EVA5xcHl4gs4wvkQVb4xw2jT
-   MrAe6HZqPeTOS1oo6o3YcuTA7ueuWN+AXgZ6GJOkgMJ3IenJhRamvL0kp
-   CzN0Se/IeHA3gLvA6X5ALVAnX68AqE+qrcXIO3mCHp/yjEFlK1w8KOBYd
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10470"; a="324992275"
-X-IronPort-AV: E=Sophos;i="5.93,318,1654585200"; 
-   d="scan'208";a="324992275"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2022 07:35:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,318,1654585200"; 
-   d="scan'208";a="945977274"
-Received: from chaop.bj.intel.com ([10.240.193.75])
-  by fmsmga005.fm.intel.com with ESMTP; 15 Sep 2022 07:35:11 -0700
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: [PATCH v8 8/8] KVM: Enable and expose KVM_MEM_PRIVATE
-Date:   Thu, 15 Sep 2022 22:29:13 +0800
-Message-Id: <20220915142913.2213336-9-chao.p.peng@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
-References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+        with ESMTP id S230219AbiIOOeo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Sep 2022 10:34:44 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B77AC12
+        for <kvm@vger.kernel.org>; Thu, 15 Sep 2022 07:34:31 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28FEUiXu032090;
+        Thu, 15 Sep 2022 14:34:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=SE2RqYex9gNtgdv47oPjhN7yiQ+BHCUr98X/0llR0B0=;
+ b=QXYiIV4YuiJkzsEKHOQ+feEr6NI2NJZ7X4KiEnU2LjPK7tV4cwNucpdMMHphca9BlfH5
+ N9o+FZpsN6f3/jtpBx5dpKqtxOD+NANW4r9d1lpEvIepjp7KFm3Ia7L4HIq1Q0BuYCTt
+ wXmBlZMoUnoGLqhw3GEUd7r0bwk+Tr6N6ibsMeaS7cvmUX7SPJwp6wQNk0P+nbrFIpyu
+ 65N4aW6JM7g14flmTqc3Br7cWyTUnqGEu/hlDUmL4asteulYF58s2VYGAeKtPrtyBkKw
+ 1mqDUq8jRwxXLYkxhKPSjJspsFJp2BkkWrZEAqH+H2ZfvpZz476OOB9ktxxBv8/PT4Aw Iw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jm4rhk3x4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Sep 2022 14:34:19 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28FDFsuh008765;
+        Thu, 15 Sep 2022 14:34:19 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jm4rhk3w2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Sep 2022 14:34:18 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 28FEL87U019582;
+        Thu, 15 Sep 2022 14:34:17 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma05fra.de.ibm.com with ESMTP id 3jjy9a1w1g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Sep 2022 14:34:17 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 28FEUQpH33292756
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 15 Sep 2022 14:30:26 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 08632A4051;
+        Thu, 15 Sep 2022 14:34:14 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 575D2A4040;
+        Thu, 15 Sep 2022 14:34:13 +0000 (GMT)
+Received: from [9.171.87.36] (unknown [9.171.87.36])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 15 Sep 2022 14:34:13 +0000 (GMT)
+Message-ID: <52ad1240-1201-259a-80d0-6e05da561a7f@linux.ibm.com>
+Date:   Thu, 15 Sep 2022 16:34:13 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH v6 1/5] KVM: Implement dirty quota-based throttling of
+ vcpus
+Content-Language: en-US
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>, pbonzini@redhat.com,
+        seanjc@google.com, maz@kernel.org, james.morse@arm.com,
+        david@redhat.com, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+References: <20220915101049.187325-1-shivam.kumar1@nutanix.com>
+ <20220915101049.187325-2-shivam.kumar1@nutanix.com>
+ <a63becdf-18d7-25f1-9070-209dbc008add@linux.ibm.com>
+In-Reply-To: <a63becdf-18d7-25f1-9070-209dbc008add@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: bONXm89ApjwsQQv9RIZTHMDoEHcOYSPJ
+X-Proofpoint-ORIG-GUID: JFjnXhLHsUNoQQHK7PK_or_VeRxVl6_F
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-09-15_08,2022-09-14_04,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
+ lowpriorityscore=0 malwarescore=0 mlxlogscore=814 impostorscore=0
+ suspectscore=0 priorityscore=1501 mlxscore=0 spamscore=0 adultscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2208220000 definitions=main-2209150085
+X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Expose KVM_MEM_PRIVATE and memslot fields private_fd/offset to
-userspace. KVM will register/unregister private memslot to fd-based
-memory backing store and response to invalidation event from
-inaccessible_notifier to zap the existing memory mappings in the
-secondary page table.
+Am 15.09.22 um 15:21 schrieb Christian Borntraeger:
+> 
+> 
+> Am 15.09.22 um 12:10 schrieb Shivam Kumar:
+>> Define variables to track and throttle memory dirtying for every vcpu.
+>>
+>> dirty_count:    Number of pages the vcpu has dirtied since its creation,
+>>                  while dirty logging is enabled.
+>> dirty_quota:    Number of pages the vcpu is allowed to dirty. To dirty
+>>                  more, it needs to request more quota by exiting to
+>>                  userspace.
+>>
+>> Implement the flow for throttling based on dirty quota.
+>>
+>> i) Increment dirty_count for the vcpu whenever it dirties a page.
+>> ii) Exit to userspace whenever the dirty quota is exhausted (i.e. dirty
+>> count equals/exceeds dirty quota) to request more dirty quota.
+>>
+>> Suggested-by: Shaju Abraham <shaju.abraham@nutanix.com>
+>> Suggested-by: Manish Mishra <manish.mishra@nutanix.com>
+>> Co-developed-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
+>> Signed-off-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
+>> Signed-off-by: Shivam Kumar <shivam.kumar1@nutanix.com>
+> [...]
+> 
+> I am wondering if this will work on s390. On s390  we only call
+> mark_page_dirty_in_slot for the kvm_read/write functions but not
+> for those done by the guest on fault. We do account those lazily in
+> kvm_arch_sync_dirty_log (like x96 in the past).
+> 
 
-Whether KVM_MEM_PRIVATE is actually exposed to userspace is determined
-by architecture code which can turn on it by overriding the default
-kvm_arch_has_private_mem().
+I think we need to rework the page fault handling on s390 to actually make
+use of this. This has to happen anyway somewhen (as indicated by the guest
+enter/exit rework from Mark). Right now we handle KVM page faults directly
+in the normal system fault handler. It seems we need to make a side turn
+into KVM for page faults on guests in the long run.
 
-A 'kvm' reference is added in memslot structure since in
-inaccessible_notifier callback we can only obtain a memslot reference
-but 'kvm' is needed to do the zapping.
-
-Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
----
- include/linux/kvm_host.h |   1 +
- virt/kvm/kvm_main.c      | 116 +++++++++++++++++++++++++++++++++++++--
- 2 files changed, 111 insertions(+), 6 deletions(-)
-
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index b9906cdf468b..cb4eefac709c 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -589,6 +589,7 @@ struct kvm_memory_slot {
- 	struct file *private_file;
- 	loff_t private_offset;
- 	struct inaccessible_notifier notifier;
-+	struct kvm *kvm;
- };
- 
- static inline bool kvm_slot_can_be_private(const struct kvm_memory_slot *slot)
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 97d893f7482c..87e239d35b96 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -983,6 +983,57 @@ static int kvm_vm_ioctl_set_mem_attr(struct kvm *kvm, gpa_t gpa, gpa_t size,
- 		xa_erase(&kvm->mem_attr_array, index);
- 	return r;
- }
-+
-+static void kvm_private_notifier_invalidate(struct inaccessible_notifier *notifier,
-+					    pgoff_t start, pgoff_t end)
-+{
-+	struct kvm_memory_slot *slot = container_of(notifier,
-+						    struct kvm_memory_slot,
-+						    notifier);
-+	unsigned long base_pgoff = slot->private_offset >> PAGE_SHIFT;
-+	gfn_t start_gfn = slot->base_gfn;
-+	gfn_t end_gfn = slot->base_gfn + slot->npages;
-+
-+
-+	if (start > base_pgoff)
-+		start_gfn = slot->base_gfn + start - base_pgoff;
-+
-+	if (end < base_pgoff + slot->npages)
-+		end_gfn = slot->base_gfn + end - base_pgoff;
-+
-+	if (start_gfn >= end_gfn)
-+		return;
-+
-+	kvm_zap_gfn_range(slot->kvm, start_gfn, end_gfn);
-+}
-+
-+static struct inaccessible_notifier_ops kvm_private_notifier_ops = {
-+	.invalidate = kvm_private_notifier_invalidate,
-+};
-+
-+static inline void kvm_private_mem_register(struct kvm_memory_slot *slot)
-+{
-+	slot->notifier.ops = &kvm_private_notifier_ops;
-+	inaccessible_register_notifier(slot->private_file, &slot->notifier);
-+}
-+
-+static inline void kvm_private_mem_unregister(struct kvm_memory_slot *slot)
-+{
-+	inaccessible_unregister_notifier(slot->private_file, &slot->notifier);
-+}
-+
-+#else /* !CONFIG_HAVE_KVM_PRIVATE_MEM */
-+
-+static inline void kvm_private_mem_register(struct kvm_memory_slot *slot)
-+{
-+	WARN_ON_ONCE(1);
-+}
-+
-+static inline void kvm_private_mem_unregister(struct kvm_memory_slot *slot)
-+{
-+	WARN_ON_ONCE(1);
-+}
-+
- #endif /* CONFIG_HAVE_KVM_PRIVATE_MEM */
- 
- #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
-@@ -1029,6 +1080,11 @@ static void kvm_destroy_dirty_bitmap(struct kvm_memory_slot *memslot)
- /* This does not remove the slot from struct kvm_memslots data structures */
- static void kvm_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
- {
-+	if (slot->flags & KVM_MEM_PRIVATE) {
-+		kvm_private_mem_unregister(slot);
-+		fput(slot->private_file);
-+	}
-+
- 	kvm_destroy_dirty_bitmap(slot);
- 
- 	kvm_arch_free_memslot(kvm, slot);
-@@ -1600,10 +1656,16 @@ bool __weak kvm_arch_has_private_mem(struct kvm *kvm)
- 	return false;
- }
- 
--static int check_memory_region_flags(const struct kvm_user_mem_region *mem)
-+static int check_memory_region_flags(struct kvm *kvm,
-+				     const struct kvm_user_mem_region *mem)
- {
- 	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
- 
-+#ifdef CONFIG_HAVE_KVM_PRIVATE_MEM
-+	if (kvm_arch_has_private_mem(kvm))
-+		valid_flags |= KVM_MEM_PRIVATE;
-+#endif
-+
- #ifdef __KVM_HAVE_READONLY_MEM
- 	valid_flags |= KVM_MEM_READONLY;
- #endif
-@@ -1679,6 +1741,9 @@ static int kvm_prepare_memory_region(struct kvm *kvm,
- {
- 	int r;
- 
-+	if (change == KVM_MR_CREATE && new->flags & KVM_MEM_PRIVATE)
-+		kvm_private_mem_register(new);
-+
- 	/*
- 	 * If dirty logging is disabled, nullify the bitmap; the old bitmap
- 	 * will be freed on "commit".  If logging is enabled in both old and
-@@ -1707,6 +1772,9 @@ static int kvm_prepare_memory_region(struct kvm *kvm,
- 	if (r && new && new->dirty_bitmap && (!old || !old->dirty_bitmap))
- 		kvm_destroy_dirty_bitmap(new);
- 
-+	if (r && change == KVM_MR_CREATE && new->flags & KVM_MEM_PRIVATE)
-+		kvm_private_mem_unregister(new);
-+
- 	return r;
- }
- 
-@@ -2004,7 +2072,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 	int as_id, id;
- 	int r;
- 
--	r = check_memory_region_flags(mem);
-+	r = check_memory_region_flags(kvm, mem);
- 	if (r)
- 		return r;
- 
-@@ -2023,6 +2091,10 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 	     !access_ok((void __user *)(unsigned long)mem->userspace_addr,
- 			mem->memory_size))
- 		return -EINVAL;
-+	if (mem->flags & KVM_MEM_PRIVATE &&
-+		(mem->private_offset & (PAGE_SIZE - 1) ||
-+		 mem->private_offset > U64_MAX - mem->memory_size))
-+		return -EINVAL;
- 	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_MEM_SLOTS_NUM)
- 		return -EINVAL;
- 	if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
-@@ -2061,6 +2133,9 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 		if ((kvm->nr_memslot_pages + npages) < kvm->nr_memslot_pages)
- 			return -EINVAL;
- 	} else { /* Modify an existing slot. */
-+		/* Private memslots are immutable, they can only be deleted. */
-+		if (mem->flags & KVM_MEM_PRIVATE)
-+			return -EINVAL;
- 		if ((mem->userspace_addr != old->userspace_addr) ||
- 		    (npages != old->npages) ||
- 		    ((mem->flags ^ old->flags) & KVM_MEM_READONLY))
-@@ -2089,10 +2164,27 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 	new->npages = npages;
- 	new->flags = mem->flags;
- 	new->userspace_addr = mem->userspace_addr;
-+	if (mem->flags & KVM_MEM_PRIVATE) {
-+		new->private_file = fget(mem->private_fd);
-+		if (!new->private_file) {
-+			r = -EINVAL;
-+			goto out;
-+		}
-+		new->private_offset = mem->private_offset;
-+	}
-+
-+	new->kvm = kvm;
- 
- 	r = kvm_set_memslot(kvm, old, new, change);
- 	if (r)
--		kfree(new);
-+		goto out;
-+
-+	return 0;
-+
-+out:
-+	if (new->private_file)
-+		fput(new->private_file);
-+	kfree(new);
- 	return r;
- }
- EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
-@@ -4747,16 +4839,28 @@ static long kvm_vm_ioctl(struct file *filp,
- 	}
- 	case KVM_SET_USER_MEMORY_REGION: {
- 		struct kvm_user_mem_region mem;
--		unsigned long size = sizeof(struct kvm_userspace_memory_region);
-+		unsigned int flags_offset = offsetof(typeof(mem), flags);
-+		unsigned long size;
-+		u32 flags;
- 
- 		kvm_sanity_check_user_mem_region_alias();
- 
-+		memset(&mem, 0, sizeof(mem));
-+
- 		r = -EFAULT;
--		if (copy_from_user(&mem, argp, size);
-+		if (get_user(flags, (u32 __user *)(argp + flags_offset)))
-+			goto out;
-+
-+		if (flags & KVM_MEM_PRIVATE)
-+			size = sizeof(struct kvm_userspace_memory_region_ext);
-+		else
-+			size = sizeof(struct kvm_userspace_memory_region);
-+
-+		if (copy_from_user(&mem, argp, size))
- 			goto out;
- 
- 		r = -EINVAL;
--		if (mem.flags & KVM_MEM_PRIVATE)
-+		if ((flags ^ mem.flags) & KVM_MEM_PRIVATE)
- 			goto out;
- 
- 		r = kvm_vm_ioctl_set_memory_region(kvm, &mem);
--- 
-2.25.1
-
+Until this is done the dirty logging is really not per CPU on s390 so we
+need to defer this feature for now. CC other s390 maintainers.
+The other use case for a page fault handler rework was Mark Rutlands
+"kvm: fix latent guest entry/exit bugs" series which did not work on s390.
