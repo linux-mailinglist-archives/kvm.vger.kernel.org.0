@@ -2,156 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DA355BA61F
-	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 06:53:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7078D5BA625
+	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 06:58:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229962AbiIPExN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Sep 2022 00:53:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48560 "EHLO
+        id S229696AbiIPE6z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Sep 2022 00:58:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229889AbiIPEwp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Sep 2022 00:52:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 751A3A1D6B
-        for <kvm@vger.kernel.org>; Thu, 15 Sep 2022 21:52:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663303951;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dsE8NdyhX5qef8QVsrNnndpCLaTRMlO/gHKVyL+LIsw=;
-        b=WyHAxwI5wTJmQ2ZMIjeCcmBzH/f6MbEGBC7Re+PCnDE+apDob+ZOYegbdSsYnJqsnv35+P
-        uFDmlPW5M99NcRGNs1qx07lxlNhVliPux/cbsmBynT0W+L26C0Pqps+nPq6vpFyL4Y0mEY
-        1qVphPG1vopie5zgMqlEf1rnQuvWhq8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-475-OvCHZnSlO5Ct-YwtnDc50w-1; Fri, 16 Sep 2022 00:52:25 -0400
-X-MC-Unique: OvCHZnSlO5Ct-YwtnDc50w-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B7CED85A59D;
-        Fri, 16 Sep 2022 04:52:24 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-126.bne.redhat.com [10.64.54.126])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 903BE140EBF3;
-        Fri, 16 Sep 2022 04:52:18 +0000 (UTC)
-From:   Gavin Shan <gshan@redhat.com>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        catalin.marinas@arm.com, linux-kselftest@vger.kernel.org,
-        bgardon@google.com, shuah@kernel.org, corbet@lwn.net,
-        maz@kernel.org, drjones@redhat.com, will@kernel.org,
-        zhenyzha@redhat.com, dmatlack@google.com,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, peterx@redhat.com, oliver.upton@linux.dev,
-        shan.gavin@gmail.com
-Subject: [PATCH v2 5/5] KVM: selftests: Automate choosing dirty ring size in dirty_log_test
-Date:   Fri, 16 Sep 2022 12:51:35 +0800
-Message-Id: <20220916045135.154505-6-gshan@redhat.com>
-In-Reply-To: <20220916045135.154505-1-gshan@redhat.com>
-References: <20220916045135.154505-1-gshan@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        with ESMTP id S229613AbiIPE6x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Sep 2022 00:58:53 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF172A1D02
+        for <kvm@vger.kernel.org>; Thu, 15 Sep 2022 21:58:52 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id p12-20020a259e8c000000b006958480b858so17837963ybq.12
+        for <kvm@vger.kernel.org>; Thu, 15 Sep 2022 21:58:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date;
+        bh=FfGEH82Goix2SWCi/zuywSATdy3fBWTr6hkvcyAr5AE=;
+        b=SaTCaJ0WrTR2A06woxfLg28wNkvqb43/YLMZaOcg0UMlHIJE+zrKK9a9YQ9Wpt7A+R
+         9Ow9HZtCjL5HyK1Lfrv7RAqVqHe9rRRmBQN9C1tuAJToZaK1uptkXli3R6wOf7a6FbcX
+         VJiTkPSEGVyFZ0ovxouTzOSXlKSvv1X/IVBcIn/ZAmG6i52/kvc2Khp30cEBmPdfsdbc
+         x73ILiVAQazDQUEGfoMFmhFk4xO4Go2SacKC4WfIDYJZU+CmhdoF9T/2DflpN9LKxTaN
+         8PWCncwWtFDY04ZkWI/nNcaV3v1Y1Vd0LGuG8I/QxXhmTHXHsbAVN1Qhx91xUc9fL1NC
+         +2OQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=FfGEH82Goix2SWCi/zuywSATdy3fBWTr6hkvcyAr5AE=;
+        b=OmsmyCuTkPMNx+ogFvxb6qin8ZblnzQmP5FiyUp0xqsh4okyO7lQx/KkMEoFxAdUpA
+         u5xZUMcA3GjeEgJgjmFmLxyvgd+wrEjEotggxTRMqaJTCKr8OKc5l340K6rE7emrAuF2
+         C7HxnjVpnUvINosYOR51WHaogaKjJcIKEJLb6YPAOxMk5sAVC0kyF5gARLYRT+rrPLoy
+         lkSoYRos2sdhWMe2UnopHCWH9bbjybc52zDz7oFkYFO1K+REeNMz/96hmTEw+7rDmsH1
+         LFqVLHe8rtnEErKk755qSENMrmtTdEo48o2TzdFj2e9hSsxgH1BtRcCi4v7tkg+NWsb1
+         iXjg==
+X-Gm-Message-State: ACrzQf0huZtZnXEB+wH+mV+q9HbK5AOXB4QBq3GcvB0v4H2MvP40jEhs
+        9ocb0J33rYDGyblPOrzOkFYJq8JHUCF7jA==
+X-Google-Smtp-Source: AMsMyM6rqUNrVNeqWPjgWxenHtSFFiSUeMHOzcEuilRyiGdPgLAEJ+K0BjENaD2mdrxoxRcqzK/7736w4gAJxg==
+X-Received: from loggerhead.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:29a])
+ (user=jmattson job=sendgmr) by 2002:a05:6902:120f:b0:668:2228:9627 with SMTP
+ id s15-20020a056902120f00b0066822289627mr3101150ybu.134.1663304331955; Thu,
+ 15 Sep 2022 21:58:51 -0700 (PDT)
+Date:   Thu, 15 Sep 2022 21:58:27 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
+Message-ID: <20220916045832.461395-1-jmattson@google.com>
+Subject: [PATCH 0/5] KVM: EFER.LMSLE cleanup
+From:   Jim Mattson <jmattson@google.com>
+To:     Avi Kivity <avi@redhat.com>, Babu Moger <babu.moger@amd.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Joerg Roedel <joerg.roedel@amd.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Wyes Karny <wyes.karny@amd.com>, x86@kernel.org
+Cc:     Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In the dirty ring case, we rely on vcpu exit due to full dirty ring
-state. On ARM64 system, there are 4096 host pages when the host
-page size is 64KB. In this case, the vcpu never exits due to the
-full dirty ring state. The similar case is 4KB page size on host
-and 64KB page size on guest. The vcpu corrupts same set of host
-pages, but the dirty page information isn't collected in the main
-thread. This leads to infinite loop as the following log shows.
+KVM has never properly virtualized EFER.LMSLE. However, when the
+"nested" module parameter is set, KVM lets the guest set EFER.LMSLE.
+Ostensibly, this is so that SLES11 Xen 4.0 will boot as a nested
+hypervisor.
 
-  # ./dirty_log_test -M dirty-ring -c 65536 -m 5
-  Setting log mode to: 'dirty-ring'
-  Test iterations: 32, interval: 10 (ms)
-  Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
-  guest physical test memory offset: 0xffbffe0000
-  vcpu stops because vcpu is kicked out...
-  Notifying vcpu to continue
-  vcpu continues now.
-  Iteration 1 collected 576 pages
-  <No more output afterwards>
+KVM passes EFER.LMSLE to the hardware through the VMCB, so
+the setting works most of the time, but the KVM instruction emulator
+completely ignores the bit, so incorrect guest behavior is almost
+certainly assured.
 
-Fix the issue by automatically choosing the best dirty ring size,
-to ensure vcpu exit due to full dirty ring state. The option '-c'
-becomes a hint to the dirty ring count, instead of the value of it.
+With Zen3, AMD has abandoned EFER.LMSLE. KVM still allows it, though, as
+long as "nested" is set. However, since the hardware doesn't support it,
+the next VMRUN after the emulated WRMSR will fail with "invalid VMCB."
 
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- tools/testing/selftests/kvm/dirty_log_test.c | 26 +++++++++++++++++---
- 1 file changed, 22 insertions(+), 4 deletions(-)
+My preference would be to simply scrub all references to LMSLE from the
+Linux kernel, but I don't want to break any guests that rely in it (on
+hardware that supports it).
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index 7d91df7e036f..47ac2c719ade 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -23,6 +23,9 @@
- #include "guest_modes.h"
- #include "processor.h"
- 
-+#define DIRTY_MEM_BITS 30 /* 1G */
-+#define PAGE_SHIFT_4K  12
-+
- /* The memory slot index to track dirty pages */
- #define TEST_MEM_SLOT_INDEX		1
- 
-@@ -271,6 +274,24 @@ static bool dirty_ring_supported(void)
- 
- static void dirty_ring_create_vm_done(struct kvm_vm *vm)
- {
-+	uint64_t pages;
-+	uint32_t limit;
-+
-+	/*
-+	 * We rely on vcpu exit due to full dirty ring state. Adjust
-+	 * the ring buffer size to ensure we're able to reach the
-+	 * full dirty ring state.
-+	 */
-+	pages = (1ul << (DIRTY_MEM_BITS - vm->page_shift)) + 3;
-+	pages = vm_adjust_num_guest_pages(vm->mode, pages);
-+	if (vm->page_size < getpagesize())
-+		pages = vm_num_host_pages(vm->mode, pages);
-+
-+	limit = 1 << (31 - __builtin_clz(pages));
-+	test_dirty_ring_count = 1 << (31 - __builtin_clz(test_dirty_ring_count));
-+	test_dirty_ring_count = min(limit, test_dirty_ring_count);
-+	pr_info("dirty ring count: 0x%x\n", test_dirty_ring_count);
-+
- 	/*
- 	 * Switch to dirty ring mode after VM creation but before any
- 	 * of the vcpu creation.
-@@ -683,9 +704,6 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, struct kvm_vcpu **vcpu,
- 	return vm;
- }
- 
--#define DIRTY_MEM_BITS 30 /* 1G */
--#define PAGE_SHIFT_4K  12
--
- struct test_params {
- 	unsigned long iterations;
- 	unsigned long interval;
-@@ -828,7 +846,7 @@ static void help(char *name)
- 	printf("usage: %s [-h] [-i iterations] [-I interval] "
- 	       "[-p offset] [-m mode]\n", name);
- 	puts("");
--	printf(" -c: specify dirty ring size, in number of entries\n");
-+	printf(" -c: hint to dirty ring size, in number of entries\n");
- 	printf("     (only useful for dirty-ring test; default: %"PRIu32")\n",
- 	       TEST_DIRTY_RING_COUNT);
- 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
+So, here's a series to clean things up.
+
+I have not been successful in getting new macros into cpufeatures.h in
+the past, but I'm going to try again, because I am a glutton for
+punishment.
+
+Jim Mattson (5):
+  x86/cpufeatures: Introduce X86_FEATURE_NO_LMSLE
+  KVM: svm: Disallow EFER.LMSLE on hardware that doesn't support it
+  KVM: x86: Report host's X86_FEATURE_NO_LMSLE in
+    KVM_GET_SUPPORTED_CPUID
+  KVM: x86: Enforce X86_FEATURE_NO_LMSLE in guest cpuid
+  KVM: svm: Set X86_FEATURE_NO_LMSLE when !nested
+
+ arch/x86/include/asm/cpufeatures.h | 1 +
+ arch/x86/kvm/cpuid.c               | 2 +-
+ arch/x86/kvm/svm/svm.c             | 6 +++++-
+ arch/x86/kvm/x86.c                 | 3 +++
+ 4 files changed, 10 insertions(+), 2 deletions(-)
+
 -- 
-2.23.0
+2.37.3.968.ga6b4b080e4-goog
 
