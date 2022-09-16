@@ -2,122 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 496AF5BB1C0
-	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 19:48:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8939D5BB1DA
+	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 20:10:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229824AbiIPRsC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Sep 2022 13:48:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51044 "EHLO
+        id S229951AbiIPSKC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Sep 2022 14:10:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229596AbiIPRsA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Sep 2022 13:48:00 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87313A5C5B
-        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 10:47:59 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id w13so6462544plp.1
-        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 10:47:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=QeuYamDYnD5m6TH4g/LNmXO9ta0c1WTylvYdfTPhYgI=;
-        b=tFBhaF47yyJ13jIQPOKC8f9ISlg70H4BRvxVo5K/HlXpB5mUgy6P2O1Nj6DOvGtuOS
-         ypGCdP703M+zRFaQ5ejtCBF7TiO8GUWplzZRDw8kAjRZFSX8nQXfiaHNHd4jFJcKXCVu
-         uekb442kjq6FFUxnrIb683RecGs3MDZv88mezEjZhYmVeVURBI4tctydJpfUazTwv4ET
-         7ILABWLFPG56AUh1BSwZglOYrwfjraBAp0Gnszvj3xdsITaH7AoTvd6a5QLj6MtXr6Et
-         nOL1+d67QF5XZVG74R0+AEbqNw2yEBcqmGjHYjuAxlQds84+8T0y6ALM1+C5XVPIRBA5
-         kL/Q==
+        with ESMTP id S229714AbiIPSKA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Sep 2022 14:10:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB708275F4
+        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 11:09:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663351796;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=dGo9IIHnzVXPXPzRwNLgG2J2p1J5QcMOec8HOITKZNg=;
+        b=L+nDd7drQ18V/4o+P3iWlEwbGCTApKViDUYJSuQiyuYGZvXm8ZoeFu9zf7M0agV5Afg8Es
+        ASqGEL7SAI5ROEiWOJhW1QYhZyQY5gkw60kg9knoPc+BhNLgD8iDkP27vtIUr3URpIZe0z
+        NkwzgdT52RXTrK92Fv1TJ7sQ/SqCrhc=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-480-KKaMIp5dO56Ue-3_hMT5rA-1; Fri, 16 Sep 2022 14:09:55 -0400
+X-MC-Unique: KKaMIp5dO56Ue-3_hMT5rA-1
+Received: by mail-qk1-f199.google.com with SMTP id u6-20020a05620a430600b006ce769b7150so9722887qko.0
+        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 11:09:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=QeuYamDYnD5m6TH4g/LNmXO9ta0c1WTylvYdfTPhYgI=;
-        b=55z2uKUzxzitVQC/Bso4u9XBfULm7HBccFsI8rfIwCNJUwo1TFg7qN05G59rSxk2/u
-         MLYJ27TebqpepJD8UuyUcMYBMtAaR5I1bF/rXuulEGJyR4WLjkl7+bpA5iUKbT3w+Eoz
-         U6viSqyQb1sQrllQs4rQ5ZjPlCv45ktWwKnh7XVJmHUwr4NPgUw3ElAzvgFo8eAs3jPR
-         4Um9e7B7X8zqr42X4ZvPcvC8j8Bak6Pg7UyI5mEvcQ6bloLvQcG79KKoU3P09KHVJK8g
-         q6fQboEf1FdyOBabpzdrrVnBPrxFcNluJi6J9opz6ByxC2eOWAZzM/iPEv67zVIrfkK4
-         /fbg==
-X-Gm-Message-State: ACrzQf2QcQfuIDqkMRCLJnCrmKJeiHTBLgqAuGFcyqqRJz7IS0kBJDa8
-        vFytZaEo4QOkfeOd+cV6wDxmIA==
-X-Google-Smtp-Source: AMsMyM51WIC7HrsXbizobMo/xE001myS1egr1Iv5FnVeKoLcLESyICbSVyzZzQVWukz5E93A8QBK+Q==
-X-Received: by 2002:a17:902:ccc9:b0:174:de2b:b19a with SMTP id z9-20020a170902ccc900b00174de2bb19amr972872ple.100.1663350478964;
-        Fri, 16 Sep 2022 10:47:58 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id 75-20020a62174e000000b0054223a0185asm13398742pfx.161.2022.09.16.10.47.58
+        bh=dGo9IIHnzVXPXPzRwNLgG2J2p1J5QcMOec8HOITKZNg=;
+        b=fRPWDwQKni7+o/yZ/YFC+PfDmVUy9qQyhz7EBx8XQzDVr4C95UL9Yz9k+fSearIL8K
+         pPNQ7K0DBj2W+KjEykrWcKP23VoXl4wIpMieeO5wo2yGM5rExXQzqUe7FXCO6hWn1tNi
+         IYpzpZ5nms26kSUt8J/YxzHuhUMzN96K5fv+nnBkAyuz2K8tzFzewQ3LUB3PP9cnH8fA
+         DVZ/pZgH5k/sM5zLFqG2jZ3slGsKxPzsum1E92/fybLNW/doVvBPh48VJZ4x4ErT4ilr
+         zA/krUpocIV/qswv0l4N0Nj4pvmla2ExdMGtzU9pVqXA71v501DFwnR4y7IH1WAfNuiX
+         unbQ==
+X-Gm-Message-State: ACrzQf3j3sThd/GNW7aqDF3Q/qV6uLkYPlGAWBnqaknVbAQKNOBgtyTl
+        zMcN5GINItooXOKFkj2v3vuOYKqdrhSIev3lsIkbznuWu9dLMxxyL4m1GqalhfWPsBfTTIoPmqR
+        tUo+1Fp6lgt8s
+X-Received: by 2002:ac8:5f4d:0:b0:35b:ba2e:ce1 with SMTP id y13-20020ac85f4d000000b0035bba2e0ce1mr5516863qta.26.1663351795090;
+        Fri, 16 Sep 2022 11:09:55 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM5Eq8nutd1y8SgkrtcXFUsUl9UMHM0MnxQbGXx8ngkMtdvW9XgFJl7Id6By2Z5c1AZ7GoPT7w==
+X-Received: by 2002:ac8:5f4d:0:b0:35b:ba2e:ce1 with SMTP id y13-20020ac85f4d000000b0035bba2e0ce1mr5516842qta.26.1663351794880;
+        Fri, 16 Sep 2022 11:09:54 -0700 (PDT)
+Received: from xz-m1.local (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca. [70.31.27.79])
+        by smtp.gmail.com with ESMTPSA id l19-20020a05620a28d300b006b60d5a7205sm7398453qkp.51.2022.09.16.11.09.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Sep 2022 10:47:58 -0700 (PDT)
-Date:   Fri, 16 Sep 2022 17:47:54 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
-        Li RongQing <lirongqing@baidu.com>
-Subject: Re: [PATCH v2 04/23] KVM: x86: Inhibit AVIC SPTEs if any vCPU
- enables x2APIC
-Message-ID: <YyS2ymYa+yojnYGp@google.com>
-References: <20220903002254.2411750-1-seanjc@google.com>
- <20220903002254.2411750-5-seanjc@google.com>
- <b6fcb487-56fc-12ea-6f67-b14b0b156ee0@amd.com>
- <YyGFGXsbgr6WV0B8@google.com>
- <951f2be3-9830-ad71-0140-e5bbf4b78f96@amd.com>
+        Fri, 16 Sep 2022 11:09:54 -0700 (PDT)
+Date:   Fri, 16 Sep 2022 14:09:52 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, catalin.marinas@arm.com,
+        linux-kselftest@vger.kernel.org, bgardon@google.com,
+        shuah@kernel.org, corbet@lwn.net, maz@kernel.org,
+        drjones@redhat.com, will@kernel.org, zhenyzha@redhat.com,
+        dmatlack@google.com, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        oliver.upton@linux.dev, shan.gavin@gmail.com
+Subject: Re: [PATCH v2 1/5] KVM: x86: Introduce KVM_REQ_RING_SOFT_FULL
+Message-ID: <YyS78BqsQxKkLOiW@xz-m1.local>
+References: <20220916045135.154505-1-gshan@redhat.com>
+ <20220916045135.154505-2-gshan@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <951f2be3-9830-ad71-0140-e5bbf4b78f96@amd.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220916045135.154505-2-gshan@redhat.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 14, 2022, Suthikulpanit, Suravee wrote:
-> Sean
+On Fri, Sep 16, 2022 at 12:51:31PM +0800, Gavin Shan wrote:
+> This adds KVM_REQ_RING_SOFT_FULL, which is raised when the dirty
+> ring of the specific VCPU becomes softly full in kvm_dirty_ring_push().
+> The VCPU is enforced to exit when the request is raised and its
+> dirty ring is softly full on its entrance.
 > 
-> On 9/14/2022 2:39 AM, Sean Christopherson wrote:
-> > > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > > > index 38e9b8e5278c..d956cd37908e 100644
-> > > > --- a/arch/x86/kvm/lapic.c
-> > > > +++ b/arch/x86/kvm/lapic.c
-> > > > @@ -2394,8 +2394,10 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
-> > > >    		}
-> > > >    	}
-> > > > -	if (((old_value ^ value) & X2APIC_ENABLE) && (value & X2APIC_ENABLE))
-> > > > +	if (((old_value ^ value) & X2APIC_ENABLE) && (value & X2APIC_ENABLE)) {
-> > > >    		kvm_apic_set_x2apic_id(apic, vcpu->vcpu_id);
-> > > > +		kvm_set_apicv_inhibit(vcpu->kvm, APICV_INHIBIT_REASON_X2APIC);
-> > > > +	}
-> > > .... Here, since we do not want to inhibit APICV/AVIC on system that can
-> > > support x2AVIC, this should be set in the vendor-specific call-back
-> > > function, where appropriate checks can be made.
-> > No, again the intent is to inhibit only the MMIO page.  The x2APIC inhibit is
-> > ignored when determining whether or not APICv is inhibited, but is included when
-> > checking if the memslot is inhibited.
-> > 
-> > bool kvm_apicv_memslot_activated(struct kvm *kvm)
-> > {
-> > 	return (READ_ONCE(kvm->arch.apicv_inhibit_reasons) == 0);
-> > }
-> > 
-> > static unsigned long kvm_apicv_get_inhibit_reasons(struct kvm *kvm)
-> > {
-> > 	/*
-> > 	 * x2APIC only needs to "inhibit" the MMIO region, all other aspects of
-> > 	 * APICv can continue to be utilized.
-> > 	 */
-> > 	return READ_ONCE(kvm->arch.apicv_inhibit_reasons) & ~APICV_INHIBIT_REASON_X2APIC;
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> ---
+>  arch/x86/kvm/x86.c       | 5 +++--
+>  include/linux/kvm_host.h | 1 +
+>  virt/kvm/dirty_ring.c    | 4 ++++
+>  3 files changed, 8 insertions(+), 2 deletions(-)
 > 
-> Also, this should be:
-> 
-> return READ_ONCE(kvm->arch.apicv_inhibit_reasons) & ~(1UL <<
-> APICV_INHIBIT_REASON_X2APIC);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 43a6a7efc6ec..7f368f59f033 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10265,8 +10265,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  	bool req_immediate_exit = false;
+>  
+>  	/* Forbid vmenter if vcpu dirty ring is soft-full */
+> -	if (unlikely(vcpu->kvm->dirty_ring_size &&
+> -		     kvm_dirty_ring_soft_full(&vcpu->dirty_ring))) {
+> +	if (kvm_check_request(KVM_REQ_RING_SOFT_FULL, vcpu) &&
+> +	    kvm_dirty_ring_soft_full(&vcpu->dirty_ring)) {
+> +		kvm_make_request(KVM_REQ_RING_SOFT_FULL, vcpu);
+>  		vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
+>  		trace_kvm_dirty_ring_exit(vcpu);
+>  		r = 0;
 
-Ugh, I found and fixed this locally when testing, but lost the change when shuffling
-code between systems.
+As commented previously - can we use kvm_test_request() instead? because we
+don't want to unconditionally clear the bit.  Instead of making the request
+again, we can clear request only if !full.
 
-Thanks!
+We can also safely move this into the block of below kvm_request_pending()
+as Marc used to suggest.
+
+To explicitly use kvm_clear_request(), we may need to be careful on the
+memory barriers.  I'm wondering whether we should have moved
+smp_mb__after_atomic() into kvm_clear_request() because kvm_clear_request()
+is used outside kvm_check_request() and IIUC all the call sites should
+better have that barrier too to be safe.
+
+Side note: when I read the code around I also see some mis-use of clear
+request where it can be omitted, e.g.:
+
+		if (kvm_check_request(KVM_REQ_UNHALT, vcpu)) {
+			kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+			vcpu->run->exit_reason = KVM_EXIT_IRQ_WINDOW_OPEN;
+		}
+
+Maybe it's a sign of bad naming, so we should renamed kvm_check_request()
+to kvm_test_clear_request() too to show that clearing after that is not
+needed?
+
+Thanks,
+
+-- 
+Peter Xu
+
