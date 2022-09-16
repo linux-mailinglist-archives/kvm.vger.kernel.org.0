@@ -2,153 +2,274 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 738AF5BA316
-	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 01:20:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 216A15BA39F
+	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 02:56:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229820AbiIOXUP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Sep 2022 19:20:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33840 "EHLO
+        id S229497AbiIPA4f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Sep 2022 20:56:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229771AbiIOXUN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Sep 2022 19:20:13 -0400
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01hn2219.outbound.protection.outlook.com [52.100.0.219])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 934FF27FF2;
-        Thu, 15 Sep 2022 16:20:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AU8WWQHdkxjKnLCOMOSJjTTQuH1MkVhroDAM9J8+9f6eCA5zt4DU6HRxVPBQ1dqoLZgFUjNqm0AOdPAvv26HfKdoGZAQxdD05siChzufCTawQm8LoxJzPSIUH91oqeJKyUkmS5EuwkZorDK0oGzp4K5v0VBUbwawwINFkikS7iUtrouStCx8MMyZWOlzjcDZ7NDV76neIUEI+azJ4c+/WeUN60YvKXnwphETtE5mXZbIalcidqM5j3ujfYQp+ALDHdvRr1G+rIgEXpAt/WD0s97Z8zOiJz5paNsbRM8qo1nxGXe8OC+iFrjDfotKGKceEZ1wlL0gxTk7hTNWrtRwOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Bs10Md+15nMnyayKLyd22Uv+/ZH79IcFcpzuzGLq1Fg=;
- b=GsrwQ7stBNO/t/CFIywnzZt2nha2hrt3FE+/rLp+bK06+BYl26wQceKS/8GjUOWPoQsrr8i831fSxxxM3ZYvBzhxct6U9sOCrItvcLPLvRMtTwaZvw7HudZGxK2OawRyZz1v/6Vo93x/PN1R4vcVLlKOyb3v7+noXmd0vUjZhnI+AuARNEUhbUd+sWK+8hfEWupMLiM8/yDeBTKUN26cj7Cag6sJqWFEBlV7crHlYROcD7ohaLnN5pYVo9bfgABvJfXolyNwqwtj4MLB04cjysWsy3eRW18PUFVlkMrIyrTDouLqP5gU43dl7WMX6jlNs5Nfo8MrwGql1jTWHWwRmg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 45.14.71.5) smtp.rcpttodomain=vdk.de smtp.mailfrom=t4.cims.jp;
- dmarc=bestguesspass action=none header.from=t4.cims.jp; dkim=none (message
- not signed); arc=none (0)
-Received: from SG2PR02CA0043.apcprd02.prod.outlook.com (2603:1096:3:18::31) by
- TYUPR04MB6741.apcprd04.prod.outlook.com (2603:1096:400:351::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5612.22; Thu, 15 Sep
- 2022 23:20:09 +0000
-Received: from SG2APC01FT0037.eop-APC01.prod.protection.outlook.com
- (2603:1096:3:18:cafe::b7) by SG2PR02CA0043.outlook.office365.com
- (2603:1096:3:18::31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5632.16 via Frontend
- Transport; Thu, 15 Sep 2022 23:20:08 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 45.14.71.5)
- smtp.mailfrom=t4.cims.jp; dkim=none (message not signed)
- header.d=none;dmarc=bestguesspass action=none header.from=t4.cims.jp;
-Received-SPF: Pass (protection.outlook.com: domain of t4.cims.jp designates
- 45.14.71.5 as permitted sender) receiver=protection.outlook.com;
- client-ip=45.14.71.5; helo=User; pr=M
-Received: from mail.prasarana.com.my (58.26.8.158) by
- SG2APC01FT0037.mail.protection.outlook.com (10.13.36.190) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5632.12 via Frontend Transport; Thu, 15 Sep 2022 23:20:08 +0000
-Received: from MRL-EXH-02.prasarana.com.my (10.128.66.101) by
- MRL-EXH-01.prasarana.com.my (10.128.66.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.14; Fri, 16 Sep 2022 07:19:28 +0800
-Received: from User (45.14.71.5) by MRL-EXH-02.prasarana.com.my
- (10.128.66.101) with Microsoft SMTP Server id 15.1.2176.14 via Frontend
- Transport; Fri, 16 Sep 2022 07:18:10 +0800
-Reply-To: <rhashimi202222@kakao.com>
-From:   Consultant Swift Capital Loans Ltd <info@t4.cims.jp>
-Subject: I hope you are doing well, and business is great!
-Date:   Fri, 16 Sep 2022 07:19:40 +0800
+        with ESMTP id S229501AbiIPA4e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Sep 2022 20:56:34 -0400
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [IPv6:2a0c:5a00:149::26])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C0BF399F4
+        for <kvm@vger.kernel.org>; Thu, 15 Sep 2022 17:56:31 -0700 (PDT)
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+        by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1oYzee-002MZx-9Z; Fri, 16 Sep 2022 02:56:28 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector2; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject
+        :Cc:To:From; bh=49J4uYjRuY4Q0suvxBomJDcMP4eg6stJ0Cp1naysTbk=; b=1Kaa8WqEp5ixY
+        jUA8C9IUJ+2CD9OyAos+s7VXpdYHy0bkWZP31FwPEV/0rvrmycxrkVeR7TV39dTMTZFyTMB5MdpSb
+        eVCnMNNR62Fi/pYUBb7sRMiRZdteDO7kxfco0Qz1UXN4EfAjB4H5+anND+mdeltDl7i2/rm+VOtlh
+        u52WHFXnINtNT/T4c2nfwY4BMDQK2fsqbuyj5ce5NA0YjJCVyPzMVSvz6+9p3fsnDBNOkRa9FbNJV
+        8xszopokylT0pfhXMOsiV2+lnyJDKcCMyqoxNPX+sanZrCmddJkfZnHM7IetXxvneEC8Mpk4u38Ba
+        NjzqvPPAiaulWg0yGxEYQ==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1oYzed-00080w-Qq; Fri, 16 Sep 2022 02:56:28 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1oYzeJ-0000xy-HL; Fri, 16 Sep 2022 02:56:07 +0200
+From:   Michal Luczaj <mhal@rbox.co>
+To:     kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, shuah@kernel.org,
+        Michal Luczaj <mhal@rbox.co>
+Subject: [RFC PATCH 0/4] KVM: x86/xen: shinfo cache lock corruption
+Date:   Fri, 16 Sep 2022 02:54:01 +0200
+Message-Id: <20220916005405.2362180-1-mhal@rbox.co>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="Windows-1251"
-Content-Transfer-Encoding: 7bit
-X-Priority: 3
-X-MSMail-Priority: Normal
-X-Mailer: Microsoft Outlook Express 6.00.2600.0000
-X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2600.0000
-Message-ID: <134c2800-ac73-4df4-aa47-d5b66a469a96@MRL-EXH-02.prasarana.com.my>
-To:     Undisclosed recipients:;
-X-EOPAttributedMessage: 0
-X-MS-Exchange-SkipListedInternetSender: ip=[45.14.71.5];domain=User
-X-MS-Exchange-ExternalOriginalInternetSender: ip=[45.14.71.5];domain=User
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SG2APC01FT0037:EE_|TYUPR04MB6741:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1664c3f4-8158-4f67-b04b-08da9770d483
-X-MS-Exchange-AtpMessageProperties: SA|SL
-X-MS-Exchange-SenderADCheck: 0
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: =?windows-1251?Q?dc3OPyhIdtfWYOH220tKiz9inY/NmvTb7QRS2HOewJ6hSvlyS0Nkjzs+?=
- =?windows-1251?Q?jiNNWaCetk8R1rNFcj30naNnm+hDYWCAxUMkIPw+MdlM859H8+bKYaxL?=
- =?windows-1251?Q?IdL98hRsHmzzMCQNeeVJJ+WeXK3CP/VYrCB8oe9nvRF9KZiDIff5McRk?=
- =?windows-1251?Q?u3AJIGLmiKSc1DcCwgYmUy5MC/6U3XJwYMeKiLQNYSxCWcYLNBxNqt/j?=
- =?windows-1251?Q?DzMzA+lbhpgTwzOMSgIpnUKuv9etBaXW1NPQq0Nin59f1FaNCCyDrZNz?=
- =?windows-1251?Q?ZQgolkiiyYNS0oJUsXS1+yO520ClKbI+VvCCDQWLD0YEiKtpoQ6O7oVI?=
- =?windows-1251?Q?hBMxyE3XwbVCV2tpnsEqoJQRPc85hiamX4BWhVMhgj76KESpdO9xMx/l?=
- =?windows-1251?Q?4QHnHxy3CT9RQ4gr4hFQ/O4FLjr4uk+84wlbxMZtrFTgszeZv2XLafeY?=
- =?windows-1251?Q?wAfsDT4yxhv0PHEWk04kY9xAObuzpZ3enGfZui4BxyyHon3Z+14evVcb?=
- =?windows-1251?Q?kPsdTGH4jjGAd0HIRQyQywIiKcjABSdZ+53V3bb5YyWhkIoXspd5H7oA?=
- =?windows-1251?Q?9o1jg+bJxH2n5oQH4Eij5PhMStsGMgKaXr8LG7BLDb2CmNCWzMWC15XH?=
- =?windows-1251?Q?ayW60GzVuzWOLQezQsgwn0zE7hTkzRYjTWnrhXPa3uDzJvXDPRSSfilg?=
- =?windows-1251?Q?obkppea+Tz0rT+CTiUA130QNB+hBDU2BxBH8WAb9jKy8+8RuAydRS7ap?=
- =?windows-1251?Q?ww+42jMkthgf77466QWxb1lva2aGJ8Q4UAsBLDKbJbHMXZUwWJRRnW7E?=
- =?windows-1251?Q?jMrzcRkXlEFxW5rjA4D1S/MJQHjB0mM17Mg5JudQ5uOtMU4EwkCPTvbP?=
- =?windows-1251?Q?LOvxuGDCvCcm/ZC2Aj7Bpyow6Dmed1OBovT80czvkBJacTq6Skl9IS8c?=
- =?windows-1251?Q?qmr+sUtD5rr2JvK5xDS5a3ImVZ1CRZGQrUqDt8cuA0iJMoisQlw6rbON?=
- =?windows-1251?Q?xPwrebH5JkKTOhZfpmxD9Qn6tRGNkWnxuSKmPQIpuAgEw1xLiRa96idR?=
- =?windows-1251?Q?eLLZHvNddj7bgU9xiVy1hyn+Gg7bO8VKRt4Oe9Ut8SF7qCS+cpx2477+?=
- =?windows-1251?Q?HxJjcvnuqjheTlM2TQpFy754Fe8Z0KllUlRX+68b8K2LCj2bWLm5og4N?=
- =?windows-1251?Q?A75bLTFx1lQ0KEtJ9oOgXqDeeBctuhaTMqUTmB6N0LBqXsG7Sfex4XA9?=
- =?windows-1251?Q?ikCXu/7FBQpb327QZ+D0KIdW6b6+rHssbQ5pyWUs8XfwFbpFFLtQUj/Z?=
- =?windows-1251?Q?Silika48cJqPUKZDrhJON2QjVMZi/eVlPBtv9CSxhVskVFww?=
-X-Forefront-Antispam-Report: CIP:58.26.8.158;CTRY:JP;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:User;PTR:45.14.71.5.static.xtom.com;CAT:OSPM;SFS:(13230022)(4636009)(396003)(136003)(376002)(346002)(39860400002)(451199015)(40470700004)(70586007)(70206006)(31686004)(36906005)(35950700001)(316002)(8676002)(7416002)(2906002)(156005)(82310400005)(7366002)(8936002)(32850700003)(4744005)(498600001)(86362001)(31696002)(41300700001)(5660300002)(6666004)(40480700001)(40460700003)(336012)(109986005)(7406005)(26005)(9686003)(32650700002)(956004)(82740400003)(66899012)(81166007)(2700400008);DIR:OUT;SFP:1501;
-X-OriginatorOrg: myprasarana.onmicrosoft.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Sep 2022 23:20:08.3253
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1664c3f4-8158-4f67-b04b-08da9770d483
-X-MS-Exchange-CrossTenant-Id: 3cbb2ff2-27fb-4993-aecf-bf16995e64c0
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3cbb2ff2-27fb-4993-aecf-bf16995e64c0;Ip=[58.26.8.158];Helo=[mail.prasarana.com.my]
-X-MS-Exchange-CrossTenant-AuthSource: SG2APC01FT0037.eop-APC01.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYUPR04MB6741
-X-Spam-Status: Yes, score=6.2 required=5.0 tests=AXB_XMAILER_MIMEOLE_OL_024C2,
-        AXB_X_FF_SEZ_S,BAYES_50,FORGED_MUA_OUTLOOK,FSL_CTYPE_WIN1251,
-        FSL_NEW_HELO_USER,HEADER_FROM_DIFFERENT_DOMAINS,NSL_RCVD_FROM_USER,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
-        autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [52.100.0.219 listed in list.dnswl.org]
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.5024]
-        *  0.0 NSL_RCVD_FROM_USER Received from User
-        *  0.0 FSL_CTYPE_WIN1251 Content-Type only seen in 419 spam
-        *  3.2 AXB_X_FF_SEZ_S Forefront sez this is spam
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        * -0.0 RCVD_IN_MSPIKE_H2 RBL: Average reputation (+2)
-        *      [52.100.0.219 listed in wl.mailspike.net]
-        * -0.0 SPF_HELO_PASS SPF: HELO matches SPF record
-        *  0.2 HEADER_FROM_DIFFERENT_DOMAINS From and EnvelopeFrom 2nd level
-        *      mail domains are different
-        *  0.0 AXB_XMAILER_MIMEOLE_OL_024C2 Yet another X header trait
-        *  0.0 FSL_NEW_HELO_USER Spam's using Helo and User
-        *  1.9 FORGED_MUA_OUTLOOK Forged mail pretending to be from MS Outlook
-X-Spam-Level: ******
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+There seem to be two problems with the way arch.xen.shinfo_cache
+instance of gfn_to_pfn_cache is treated.
 
-I hope you are doing well, and business is great!
-However, if you need working capital to further grow and expand your business, we may be a perfect fit for you. I am Ms. Kaori Ichikawa Swift Capital Loans Ltd Consultant, Our loans are NOT based on your personal credit, and NO collateral is required.
+1. gpc->lock is taken without checking if it was actually initialized.
+   e.g. kvm_xen_set_evtchn_fast():
 
-We are a Direct Lender who can approve your loan today, and fund as Early as Tomorrow.
+	read_lock_irqsave(&gpc->lock, flags);
+	if (!kvm_gfn_to_pfn_cache_check(kvm, gpc, gpc->gpa, PAGE_SIZE))
+		goto out_rcu;
 
-Once your reply I will send you the official website to complete your application
+INFO: trying to register non-static key.
+The code is fine but needs lockdep annotation, or maybe
+you didn't initialize this object before use?
+turning off the locking correctness validator.
+CPU: 2 PID: 959 Comm: xenirq Not tainted 6.0.0-rc5 #12
+Call Trace:
+ dump_stack_lvl+0x5b/0x77
+ register_lock_class+0x46d/0x480
+ __lock_acquire+0x64/0x1fa0
+ lock_acquire+0xbf/0x2b0
+ ? kvm_xen_set_evtchn_fast+0xc7/0x400 [kvm]
+ ? lock_acquire+0xcf/0x2b0
+ ? _raw_read_lock_irqsave+0x99/0xa0
+ _raw_read_lock_irqsave+0x81/0xa0
+ ? kvm_xen_set_evtchn_fast+0xc7/0x400 [kvm]
+ kvm_xen_set_evtchn_fast+0xc7/0x400 [kvm]
+ ? kvm_xen_set_evtchn_fast+0x7e/0x400 [kvm]
+ ? find_held_lock+0x2b/0x80
+ kvm_xen_hvm_evtchn_send+0x4b/0x90 [kvm]
+ kvm_arch_vm_ioctl+0x4de/0xca0 [kvm]
+ ? vmx_vcpu_put+0x18/0x1e0 [kvm_intel]
+ ? kvm_arch_vcpu_put+0x1db/0x250 [kvm]
+ ? vcpu_put+0x46/0x70 [kvm]
+ ? kvm_arch_vcpu_ioctl+0xd0/0x1710 [kvm]
+ kvm_vm_ioctl+0x4e4/0xdd0 [kvm]
+ ? lock_is_held_type+0xe3/0x140
+ __x64_sys_ioctl+0x8d/0xd0
+ do_syscall_64+0x58/0x80
+ ? __do_fast_syscall_32+0xeb/0xf0
+ ? lockdep_hardirqs_on+0x7d/0x100
+ ? lock_is_held_type+0xe3/0x140
+ ? do_syscall_64+0x67/0x80
+ ? lockdep_hardirqs_on+0x7d/0x100
+ ? do_syscall_64+0x67/0x80
+ ? lockdep_hardirqs_on+0x7d/0x100
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
-Waiting for your reply.
+2. kvm_gfn_to_pfn_cache_init() allows for gpc->lock reinitialization.
+   This can lead to situation where a lock that is already taken gets
+   reinitialized in another thread (and becomes corrupted).
 
-Regards
-Ms. Kaori Ichikawa
-Consultant Swift Capital Loans Ltd
+   For example: a race between ioctl(KVM_XEN_HVM_EVTCHN_SEND) and
+   kvm_gfn_to_pfn_cache_init():
+
+                  (thread 1)                |           (thread 2)
+                                            |
+   kvm_xen_set_evtchn_fast                  |
+    read_lock_irqsave(&gpc->lock, ...)      |
+                                            | kvm_gfn_to_pfn_cache_init
+                                            |  rwlock_init(&gpc->lock)
+    read_unlock_irqrestore(&gpc->lock, ...) |
+
+Testing shinfo lock corruption (KVM_XEN_HVM_EVTCHN_SEND)
+rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: { 1-...D
+ } 26610 jiffies s: 265 root: 0x2/.
+rcu: blocking rcu_node structures (internal RCU debug):
+Task dump for CPU 1:
+task:xen_shinfo_test state:R  running task     stack:    0 pid:  952
+ppid:   867 flags:0x00000008
+Call Trace:
+ ? exc_page_fault+0x121/0x2b0
+ ? rcu_read_lock_sched_held+0x10/0x80
+ ? entry_SYSCALL_64_after_hwframe+0x63/0xcd
+rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+rcu: 	1-...0: (5 ticks this GP) idle=6b94/1/0x4000000000000000
+softirq=5929/5931 fqs=15261
+	(detected by 0, t=65002 jiffies, g=5465, q=100 ncpus=4)
+Sending NMI from CPU 0 to CPUs 1:
+NMI backtrace for cpu 1
+CPU: 1 PID: 952 Comm: xen_shinfo_test Not tainted 6.0.0-rc5 #12
+RIP: 0010:queued_write_lock_slowpath+0x68/0x90
+Call Trace:
+ do_raw_write_lock+0xad/0xb0
+ kvm_gfn_to_pfn_cache_refresh+0x2a5/0x630 [kvm]
+ kvm_xen_hvm_set_attr+0x19d/0x5e0 [kvm]
+ kvm_arch_vm_ioctl+0x8ca/0xca0 [kvm]
+ ? rcu_read_lock_sched_held+0x10/0x80
+ kvm_vm_ioctl+0x4e4/0xdd0 [kvm]
+ ? rcu_read_lock_sched_held+0x10/0x80
+ ? do_raw_write_trylock+0x29/0x40
+ ? rcu_read_lock_sched_held+0x10/0x80
+ ? lock_release+0x1ef/0x2d0
+ ? lock_release+0x1ef/0x2d0
+ __x64_sys_ioctl+0x8d/0xd0
+ do_syscall_64+0x58/0x80
+ ? exc_page_fault+0x121/0x2b0
+ ? rcu_read_lock_sched_held+0x10/0x80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Testing shinfo lock corruption (KVM_XEN_HVM_EVTCHN_SEND)
+BUG: kernel NULL pointer dereference, address: 0000000000000800
+#PF: supervisor write access in kernel mode
+#PF: error_code(0x0002) - not-present page
+PGD 1049cf067 P4D 1049cf067 PUD 104ba0067 PMD 0
+Oops: 0002 [#1] PREEMPT SMP NOPTI
+CPU: 0 PID: 955 Comm: xen_shinfo_test Not tainted 6.0.0-rc5 #12
+RIP: 0010:kvm_xen_set_evtchn_fast+0x10f/0x400 [kvm]
+Call Trace:
+ kvm_xen_hvm_evtchn_send+0x4b/0x90 [kvm]
+ kvm_arch_vm_ioctl+0x4de/0xca0 [kvm]
+ ? kvm_xen_hvm_evtchn_send+0x6e/0x90 [kvm]
+ ? kvm_arch_vm_ioctl+0x4de/0xca0 [kvm]
+ kvm_vm_ioctl+0x4e4/0xdd0 [kvm]
+ ? kvm_vm_ioctl+0x4e4/0xdd0 [kvm]
+ ? rcu_read_lock_sched_held+0x10/0x80
+ ? lock_release+0x1ef/0x2d0
+ __x64_sys_ioctl+0x8d/0xd0
+ do_syscall_64+0x58/0x80
+ ? rcu_read_lock_sched_held+0x10/0x80
+ ? trace_hardirqs_on_prepare+0x55/0xe0
+ ? do_syscall_64+0x67/0x80
+ ? rcu_read_lock_sched_held+0x10/0x80
+ ? trace_hardirqs_on_prepare+0x55/0xe0
+ ? do_syscall_64+0x67/0x80
+ ? do_syscall_64+0x67/0x80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+   Similar story with the handling of hypercall SCHEDOP_poll in
+   wait_pending_event():
+
+Testing shinfo lock corruption (SCHEDOP_poll)
+rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+rcu: 	1-...0: (12 ticks this GP) idle=0a5c/1/0x4000000000000000
+softirq=6640/6640 fqs=12988
+rcu: 	2-...0: (10 ticks this GP) idle=66e4/1/0x4000000000000000
+softirq=5526/5527 fqs=12988
+	(detected by 0, t=65003 jiffies, g=7437, q=732 ncpus=4)
+Sending NMI from CPU 0 to CPUs 1:
+NMI backtrace for cpu 1 skipped: idling at native_halt+0xa/0x10
+Sending NMI from CPU 0 to CPUs 2:
+NMI backtrace for cpu 2
+CPU: 2 PID: 970 Comm: xen_shinfo_test Not tainted 6.0.0-rc5 #12
+RIP: 0010:queued_write_lock_slowpath+0x66/0x90
+Call Trace:
+ do_raw_write_lock+0xad/0xb0
+ kvm_gfn_to_pfn_cache_refresh+0x8a/0x630 [kvm]
+ ? kvm_gfn_to_pfn_cache_init+0x122/0x130 [kvm]
+ kvm_xen_hvm_set_attr+0x19d/0x5e0 [kvm]
+ kvm_arch_vm_ioctl+0x8ca/0xca0 [kvm]
+ ? __lock_acquire+0x3a4/0x1fa0
+ ? __lock_acquire+0x3a4/0x1fa0
+ kvm_vm_ioctl+0x4e4/0xdd0 [kvm]
+ ? lock_is_held_type+0xe3/0x140
+ ? lock_release+0x135/0x2d0
+ __x64_sys_ioctl+0x8d/0xd0
+ do_syscall_64+0x58/0x80
+ ? lockdep_hardirqs_on+0x7d/0x100
+ ? do_syscall_64+0x67/0x80
+ ? do_syscall_64+0x67/0x80
+ ? do_syscall_64+0x67/0x80
+ ? do_syscall_64+0x67/0x80
+ ? do_syscall_64+0x67/0x80
+ ? do_syscall_64+0x67/0x80
+ ? do_syscall_64+0x67/0x80
+ ? lockdep_hardirqs_on+0x7d/0x100
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Testing shinfo lock corruption (SCHEDOP_poll)
+watchdog: BUG: soft lockup - CPU#1 stuck for 23s! [kworker/1:2:260]
+irq event stamp: 6990
+hardirqs last  enabled at (6989): [<ffffffff81e5c964>]
+_raw_spin_unlock_irq+0x24/0x50
+hardirqs last disabled at (6990): [<ffffffff81e53e51>]
+__schedule+0xd41/0x1620
+softirqs last  enabled at (5790): [<ffffffff81766e78>]
+rht_deferred_worker+0x708/0xbe0
+softirqs last disabled at (5788): [<ffffffff81766967>]
+rht_deferred_worker+0x1f7/0xbe0
+CPU: 1 PID: 260 Comm: kworker/1:2 Not tainted 6.0.0-rc5 #12
+Workqueue: rcu_gp wait_rcu_exp_gp
+RIP: 0010:smp_call_function_single+0x11a/0x160
+Call Trace:
+ ? trace_hardirqs_on+0x2b/0xd0
+ __sync_rcu_exp_select_node_cpus+0x267/0x460
+ sync_rcu_exp_select_cpus+0x1ec/0x3e0
+ wait_rcu_exp_gp+0xf/0x20
+ process_one_work+0x254/0x560
+ worker_thread+0x4f/0x390
+ ? _raw_spin_unlock_irqrestore+0x40/0x60
+ ? process_one_work+0x560/0x560
+ kthread+0xe6/0x110
+ ? kthread_complete_and_exit+0x20/0x20
+ ret_from_fork+0x1f/0x30
+
+I'm providing a set of patches: check if shinfo lock was initialized,
+disallow lock reinitialization.  Along with crudely made testcases.
+
+Note: as I understand, kvm->lock mutex cannot be used to protect from
+those races because of kvm_xen_set_evtchn_fast() being called from
+kvm_arch_set_irq_inatomic()?
+
+I'm sending this as a RFC as I have doubts if explicitly disallowing
+reinitialization this way is the most elegant solution.  Especially as
+the problem appears to affect only the shinfo gfn_to_pfn_cache.
+
+Michal Luczaj (4):
+  KVM: x86/xen: Ensure kvm_xen_set_evtchn_fast() can use shinfo_cache
+  KVM: x86/xen: Ensure kvm_xen_schedop_poll() can use shinfo_cache
+  KVM: x86/xen: Disallow gpc locks reinitialization
+  KVM: x86/xen: Test shinfo_cache lock races
+
+ arch/x86/kvm/xen.c                            |   5 +-
+ include/linux/kvm_types.h                     |   1 +
+ .../selftests/kvm/x86_64/xen_shinfo_test.c    | 100 ++++++++++++++++++
+ virt/kvm/pfncache.c                           |   7 +-
+ 4 files changed, 110 insertions(+), 3 deletions(-)
+
+-- 
+2.37.2
+
