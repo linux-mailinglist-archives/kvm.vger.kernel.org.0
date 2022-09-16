@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5751D5BA3A3
-	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 02:56:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BC075BA3A4
+	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 02:56:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229711AbiIPA44 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Sep 2022 20:56:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40424 "EHLO
+        id S229612AbiIPA46 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Sep 2022 20:56:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229647AbiIPA4v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229658AbiIPA4v (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 15 Sep 2022 20:56:51 -0400
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E532D8708D
-        for <kvm@vger.kernel.org>; Thu, 15 Sep 2022 17:56:48 -0700 (PDT)
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [IPv6:2a0c:5a00:149::26])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9353A87093
+        for <kvm@vger.kernel.org>; Thu, 15 Sep 2022 17:56:49 -0700 (PDT)
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+        by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
         (Exim 4.93)
         (envelope-from <mhal@rbox.co>)
-        id 1oYzew-002Bn9-H3; Fri, 16 Sep 2022 02:56:46 +0200
+        id 1oYzex-002MaJ-Fj; Fri, 16 Sep 2022 02:56:47 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
         s=selector2; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
         Message-Id:Date:Subject:Cc:To:From;
-        bh=Nbx0qEJbmE3wkbMudVTcZbk3+sR5wz9lz41Vcj7v81w=; b=LXlfqLH5OR7LL1WGfyOqz7HFe5
-        bSKErtLPQRCkZSSaS664wJLX5dgl9RStkuTBtoJ59LK1UlfcBPdh2r3ijv6N17s69CCbyJyjmeM9o
-        dclxU4TWXIxS5UUQfWfFmxDw9JGlJx3tus2frmXlCo14qTXboYL2AshzXQVrUYcaBSZSYvFnC467c
-        aI2umWzikIpo81xEmYDKkH2RhlGBKb/be4kskyVJB2lYm+X8/IjXmHRuroXL+QIfkU3WpIp0/U5QL
-        Ajn8VoS1N/rL9nYdWOzC311fdLKgRkfcWwxYlmP275VquDDbZx1QjC94LlsHWeblINi6cl/Mt7Vsy
-        g17AAdJg==;
+        bh=pVzXpaXDSDHEEaUsmfZGNgJPHujvG8xpnGs717iqlTg=; b=W8wILLDWuf1Egok34vV8uGzPkF
+        PIxL5OxKH8augv4P20QEQOOV7UJKCL+wP/ed9EuRJS7Zowvv93cf4a26PwJMLYVKOOpt1PUP8i5xo
+        /vnhVnD2kXAAinshFkEArgOGOBIKo+tjEhN19D/ockd+JGUQEv73XGk6MQ8T/0eqO54kJYZV5VZSY
+        M4w9SkNxeTxJhAyJ0gKkyMdzhJuM93VD3uaE3gmthreneRMK2JSnB/qW0blqYv0WZWer25ARKU5s3
+        321B4mbjGnLTukLq6t+ZRbelRjB/96vHdB9C6JG4/E7A60FXt7QGgOmrnhmnooTKlNa581Aolt2a4
+        qo6b8Nzw==;
 Received: from [10.9.9.73] (helo=submission02.runbox)
-        by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
         (envelope-from <mhal@rbox.co>)
-        id 1oYzew-00028L-61; Fri, 16 Sep 2022 02:56:46 +0200
+        id 1oYzex-00081N-7W; Fri, 16 Sep 2022 02:56:47 +0200
 Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.90_1)
-        id 1oYzel-0000xy-1Y; Fri, 16 Sep 2022 02:56:35 +0200
+        id 1oYzel-0000xy-Cr; Fri, 16 Sep 2022 02:56:35 +0200
 From:   Michal Luczaj <mhal@rbox.co>
 To:     kvm@vger.kernel.org
 Cc:     seanjc@google.com, pbonzini@redhat.com, shuah@kernel.org,
         Michal Luczaj <mhal@rbox.co>
-Subject: [RFC PATCH 3/4] KVM: x86/xen: Disallow gpc locks reinitialization
-Date:   Fri, 16 Sep 2022 02:54:04 +0200
-Message-Id: <20220916005405.2362180-4-mhal@rbox.co>
+Subject: [RFC PATCH 4/4] KVM: x86/xen: Test shinfo_cache lock races
+Date:   Fri, 16 Sep 2022 02:54:05 +0200
+Message-Id: <20220916005405.2362180-5-mhal@rbox.co>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20220916005405.2362180-1-mhal@rbox.co>
 References: <20220916005405.2362180-1-mhal@rbox.co>
@@ -56,58 +56,162 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There are race conditions possible due to kvm_gfn_to_pfn_cache_init()'s
-ability to _re_initialize gfn_to_pfn_cache.lock.
-
-For example: a race between ioctl(KVM_XEN_HVM_EVTCHN_SEND) and
-kvm_gfn_to_pfn_cache_init() leads to a corrupted shinfo gpc lock.
-
-                (thread 1)                |           (thread 2)
-                                          |
- kvm_xen_set_evtchn_fast                  |
-  read_lock_irqsave(&gpc->lock, ...)      |
-                                          | kvm_gfn_to_pfn_cache_init
-                                          |  rwlock_init(&gpc->lock)
-  read_unlock_irqrestore(&gpc->lock, ...) |
-
-Introduce bool locks_initialized.
+Tests for races between shinfo_cache initialization/destruction
+(causing lock reinitialization) and hypercall/ioctl processing
+(acquiring uninitialized lock, holding soon-to-be-corrupted lock).
 
 Signed-off-by: Michal Luczaj <mhal@rbox.co>
 ---
- include/linux/kvm_types.h | 1 +
- virt/kvm/pfncache.c       | 7 +++++--
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ .../selftests/kvm/x86_64/xen_shinfo_test.c    | 100 ++++++++++++++++++
+ 1 file changed, 100 insertions(+)
 
-diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-index 3ca3db020e0e..7e7b7667cd9e 100644
---- a/include/linux/kvm_types.h
-+++ b/include/linux/kvm_types.h
-@@ -74,6 +74,7 @@ struct gfn_to_pfn_cache {
- 	void *khva;
- 	kvm_pfn_t pfn;
- 	enum pfn_cache_usage usage;
-+	bool locks_initialized;
- 	bool active;
- 	bool valid;
- };
-diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-index 68ff41d39545..564607e10586 100644
---- a/virt/kvm/pfncache.c
-+++ b/virt/kvm/pfncache.c
-@@ -354,8 +354,11 @@ int kvm_gfn_to_pfn_cache_init(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
- 	WARN_ON_ONCE(!usage || (usage & KVM_GUEST_AND_HOST_USE_PFN) != usage);
+diff --git a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
+index 8a5cb800f50e..8e251b2bfa62 100644
+--- a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
++++ b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
+@@ -15,9 +15,13 @@
+ #include <time.h>
+ #include <sched.h>
+ #include <signal.h>
++#include <pthread.h>
  
- 	if (!gpc->active) {
--		rwlock_init(&gpc->lock);
--		mutex_init(&gpc->refresh_lock);
-+		if (!gpc->locks_initialized) {
-+			rwlock_init(&gpc->lock);
-+			mutex_init(&gpc->refresh_lock);
-+			gpc->locks_initialized = true;
-+		}
+ #include <sys/eventfd.h>
  
- 		gpc->khva = NULL;
- 		gpc->pfn = KVM_PFN_ERR_FAULT;
++/* Defined in include/linux/kvm_types.h */
++#define GPA_INVALID		(~(ulong)0)
++
+ #define SHINFO_REGION_GVA	0xc0000000ULL
+ #define SHINFO_REGION_GPA	0xc0000000ULL
+ #define SHINFO_REGION_SLOT	10
+@@ -44,6 +48,8 @@
+ 
+ #define MIN_STEAL_TIME		50000
+ 
++#define SHINFO_RACE_TIMEOUT	2	/* seconds */
++
+ #define __HYPERVISOR_set_timer_op	15
+ #define __HYPERVISOR_sched_op		29
+ #define __HYPERVISOR_event_channel_op	32
+@@ -325,6 +331,32 @@ static void guest_code(void)
+ 	guest_wait_for_irq();
+ 
+ 	GUEST_SYNC(21);
++	/* Racing host ioctls */
++
++	guest_wait_for_irq();
++
++	GUEST_SYNC(22);
++	/* Racing vmcall against host ioctl */
++
++	ports[0] = 0;
++
++	p = (struct sched_poll) {
++		.ports = ports,
++		.nr_ports = 1,
++		.timeout = 0
++	};
++
++	do {
++		asm volatile("vmcall"
++			     : "=a" (rax)
++			     : "a" (__HYPERVISOR_sched_op),
++			       "D" (SCHEDOP_poll),
++			       "S" (&p)
++			     : "memory");
++	} while (!guest_saw_irq);
++	guest_saw_irq = false;
++
++	GUEST_SYNC(23);
+ }
+ 
+ static int cmp_timespec(struct timespec *a, struct timespec *b)
+@@ -352,11 +384,36 @@ static void handle_alrm(int sig)
+ 	TEST_FAIL("IRQ delivery timed out");
+ }
+ 
++static void *juggle_shinfo_state(void *arg)
++{
++	struct kvm_vm *vm = (struct kvm_vm *)arg;
++
++	struct kvm_xen_hvm_attr cache_init = {
++		.type = KVM_XEN_ATTR_TYPE_SHARED_INFO,
++		.u.shared_info.gfn = SHINFO_REGION_GPA / PAGE_SIZE
++	};
++
++	struct kvm_xen_hvm_attr cache_destroy = {
++		.type = KVM_XEN_ATTR_TYPE_SHARED_INFO,
++		.u.shared_info.gfn = GPA_INVALID
++	};
++
++	for (;;) {
++		__vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &cache_init);
++		__vm_ioctl(vm, KVM_XEN_HVM_SET_ATTR, &cache_destroy);
++		pthread_testcancel();
++	};
++
++	return NULL;
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	struct timespec min_ts, max_ts, vm_ts;
+ 	struct kvm_vm *vm;
++	pthread_t thread;
+ 	bool verbose;
++	int ret;
+ 
+ 	verbose = argc > 1 && (!strncmp(argv[1], "-v", 3) ||
+ 			       !strncmp(argv[1], "--verbose", 10));
+@@ -785,6 +842,49 @@ int main(int argc, char *argv[])
+ 			case 21:
+ 				TEST_ASSERT(!evtchn_irq_expected,
+ 					    "Expected event channel IRQ but it didn't happen");
++				alarm(0);
++
++				if (verbose)
++					printf("Testing shinfo lock corruption (KVM_XEN_HVM_EVTCHN_SEND)\n");
++
++				ret = pthread_create(&thread, NULL, &juggle_shinfo_state, (void *)vm);
++				TEST_ASSERT(ret == 0, "pthread_create() failed: %s", strerror(ret));
++
++				struct kvm_irq_routing_xen_evtchn uxe = {
++					.port = 1,
++					.vcpu = vcpu->id,
++					.priority = KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL
++				};
++
++				evtchn_irq_expected = true;
++				for (time_t t = time(NULL) + SHINFO_RACE_TIMEOUT; time(NULL) < t;)
++					__vm_ioctl(vm, KVM_XEN_HVM_EVTCHN_SEND, &uxe);
++				break;
++
++			case 22:
++				TEST_ASSERT(!evtchn_irq_expected,
++					    "Expected event channel IRQ but it didn't happen");
++
++				if (verbose)
++					printf("Testing shinfo lock corruption (SCHEDOP_poll)\n");
++
++				shinfo->evtchn_pending[0] = 1;
++
++				evtchn_irq_expected = true;
++				tmr.u.timer.expires_ns = rs->state_entry_time +
++							 SHINFO_RACE_TIMEOUT * 1000000000ULL;
++				vcpu_ioctl(vcpu, KVM_XEN_VCPU_SET_ATTR, &tmr);
++				break;
++
++			case 23:
++				TEST_ASSERT(!evtchn_irq_expected,
++					    "Expected event channel IRQ but it didn't happen");
++
++				ret = pthread_cancel(thread);
++				TEST_ASSERT(ret == 0, "pthread_cancel() failed: %s", strerror(ret));
++
++				ret = pthread_join(thread, 0);
++				TEST_ASSERT(ret == 0, "pthread_join() failed: %s", strerror(ret));
+ 				goto done;
+ 
+ 			case 0x20:
 -- 
 2.37.2
 
