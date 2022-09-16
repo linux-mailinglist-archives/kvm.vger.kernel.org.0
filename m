@@ -2,125 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 618C95BA812
-	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 10:21:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC47C5BA936
+	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 11:19:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230026AbiIPIVi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Sep 2022 04:21:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44764 "EHLO
+        id S231244AbiIPJRh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Sep 2022 05:17:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230134AbiIPIVf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Sep 2022 04:21:35 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A91EAA4B2C
-        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 01:21:32 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id az6so15621590wmb.4
-        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 01:21:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=U5I+bc12n8BGkk2E5D3c0qwHx95JDDEzRcPbk+P9bY4=;
-        b=YpDAeCzTxHE6gP4ppmKgIw8Aqvv0medsJZKNSnN7ZVWkYoJWitm7t2kVSSlQ6Wrzq1
-         UnRqmfqAfJ1QGuX/dIq165IAc9aZmXPel/eia+fZ1XDoXqWerWbwzeZh7nypQ1JdDHiB
-         yDdIWD5c2TB0qm3q13jhZH9QBPFJn/gP4ImA0SfL7CCdu3h1E+XUfgIDy8/2J2S/1fXt
-         OAdUwZVNbgNa3qz94ndBVAEsQSjgJajDl5QwLTKpevyQJ93O3jnA85mdVr1BHgB3B5ti
-         shmRRizxEM4PgdWDKR3q4xwRmMTTr5kmU84hCjoBfaVcgOHw8JvoVpqEOwkIkzaYeY4I
-         d1EA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=U5I+bc12n8BGkk2E5D3c0qwHx95JDDEzRcPbk+P9bY4=;
-        b=wJCYDWKl4q07m/jKTiqSy+j6ZNj5yoWiYOQb1TUN8w1U605U00SMq5JeXHZnlyaXKg
-         U3rzgDzIQw0FBJ8evBGw6pVmbC+yjj/ztOe/X0djvBiLNLmahACvTzTGWp7My2MGPPG1
-         quFhhfSx/peBXbkOWQQqoVq1lmyiUqnCa8V2BG4l6DbqMV4fmBa4tsMTRpQOhW4AsmR2
-         jAqhGUhCIy34U13vHzIMMjqVn4DBM3hlWXPNpZch2rMcMbjJEh0DBB+zRfv36ShL7KbW
-         xkdNU5TSi7XplDsX0WlP2NHdxDPJivecYnSAQACWmQFJEfE043Oq5bJiTh9KqhzohP7L
-         /YZg==
-X-Gm-Message-State: ACgBeo3dx44ovr8Smz2siBPf7PSHtapKULIzSyWZgnfIoSzWMxK1wl8m
-        ju7mju8QyzsI8yWhkAEE3J6NTA==
-X-Google-Smtp-Source: AA6agR72Nl9/emEDqNYzCTiKeb4Wolsd3lgVkwv7Xl+/oakOkGtTLsqidNd+hGlZQI6wGFy7WR3+GA==
-X-Received: by 2002:a05:600c:3d17:b0:3b4:adc7:976c with SMTP id bh23-20020a05600c3d1700b003b4adc7976cmr4498496wmb.108.1663316491187;
-        Fri, 16 Sep 2022 01:21:31 -0700 (PDT)
-Received: from localhost (cst2-173-61.cust.vodafone.cz. [31.30.173.61])
-        by smtp.gmail.com with ESMTPSA id b13-20020a056000054d00b0022abc6ded45sm4424179wrf.13.2022.09.16.01.21.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Sep 2022 01:21:30 -0700 (PDT)
-Date:   Fri, 16 Sep 2022 10:21:29 +0200
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Mayuresh Chitale <mchitale@ventanamicro.com>
-Cc:     Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        kvm@vger.kernel.org, Anup Patel <anup@brainfault.org>
-Subject: Re: [PATCH kvmtool 1/1] riscv: Add zihintpause extension support
-Message-ID: <20220916082129.rkvmldh5n5a3we3e@kamzik>
-References: <20220916064324.28229-1-mchitale@ventanamicro.com>
- <20220916064324.28229-2-mchitale@ventanamicro.com>
+        with ESMTP id S231312AbiIPJRM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Sep 2022 05:17:12 -0400
+X-Greylist: delayed 927 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 16 Sep 2022 02:16:28 PDT
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41C5CA59A9;
+        Fri, 16 Sep 2022 02:16:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=misterjones.org; s=dkim20211231; h=Content-Transfer-Encoding:Content-Type:
+        Message-ID:References:In-Reply-To:Subject:Cc:To:From:Date:MIME-Version:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=WpOIYPFmZvX+Hf2mD/HENyssqGqbLDXFAm0gYQobp9o=; b=vw30vGqbyjYmaM3nKnskMxB/y+
+        lw/jA0e/qsYeOLKWeB+M9pBy79w1bxVNFdGPnj1q7bDvJSGbFGE9g/6/s3WogeA7TOX1YXUyGg1x0
+        pTlP11nDz1yB2tnWgOoUfZONTyL1unFVmhgDysLveBpkJ7DtJcohL8NqRL+bFBB7z/KUIt+Jg8S7L
+        /g0VlHBwX0VvkVE6n9reRzOGt0hMoehxgxc6H3FCI/q3fovs9/b6nZbmWJpwad6zQ2KeRKuGadLzE
+        9DCBQxYnOHWwYY4Gvcv0wEak1BiL7zsNN0+ZPOQ2niZSKo3HdGerEmF7aAZ8QPwNPdyuKP+AkoKqD
+        y63NDfkw==;
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@misterjones.org>)
+        id 1oZ7DJ-00AZwo-Lg;
+        Fri, 16 Sep 2022 10:00:45 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220916064324.28229-2-mchitale@ventanamicro.com>
+Date:   Fri, 16 Sep 2022 10:00:45 +0100
+From:   Marc Zyngier <maz@misterjones.org>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc:     kvm-ppc@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, Fabiano Rosas <farosas@linux.ibm.com>,
+        x86@kernel.org, linux-mips@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        kvm-riscv@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>,
+        linux-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH kernel] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE platform
+ dependent
+In-Reply-To: <59dfb450-5a91-f27b-6edf-0adfa89729b7@ozlabs.ru>
+References: <20220504074807.3616813-1-aik@ozlabs.ru>
+ <0d4bb0fa-10c6-3f5a-34c8-293144b3fdbb@ozlabs.ru>
+ <59dfb450-5a91-f27b-6edf-0adfa89729b7@ozlabs.ru>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <4884805567a0288ab1dbefb8aec819a2@misterjones.org>
+X-Sender: maz@misterjones.org
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: aik@ozlabs.ru, kvm-ppc@vger.kernel.org, linux-s390@vger.kernel.org, kvm@vger.kernel.org, farosas@linux.ibm.com, x86@kernel.org, linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, kvm-riscv@lists.infradead.org, pbonzini@redhat.com, linux-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@misterjones.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 16, 2022 at 12:13:24PM +0530, Mayuresh Chitale wrote:
-> The zihintpause extension allows software to use the PAUSE instruction to
-> reduce energy consumption while executing spin-wait code sequences. Add the
-> zihintpause extension to the device tree if it is supported by the host.
+On 2022-09-13 13:50, Alexey Kardashevskiy wrote:
+> Ping? It's been a while and probably got lost :-/
 > 
-> Signed-off-by: Mayuresh Chitale <mchitale@ventanamicro.com>
-> ---
->  riscv/fdt.c             | 2 ++
->  riscv/include/asm/kvm.h | 1 +
->  2 files changed, 3 insertions(+)
-> 
-> diff --git a/riscv/fdt.c b/riscv/fdt.c
-> index e3d7717..7997edc 100644
-> --- a/riscv/fdt.c
-> +++ b/riscv/fdt.c
-> @@ -19,6 +19,8 @@ struct isa_ext_info {
->  struct isa_ext_info isa_info_arr[] = {
->  	{"svpbmt", KVM_RISCV_ISA_EXT_SVPBMT},
->  	{"sstc", KVM_RISCV_ISA_EXT_SSTC},
-> +	{"Zihintpause", KVM_RISCV_ISA_EXT_ZIHINTPAUSE},
+> On 18/05/2022 16:27, Alexey Kardashevskiy wrote:
+>> 
+>> 
+>> On 5/4/22 17:48, Alexey Kardashevskiy wrote:
+>>> When introduced, IRQFD resampling worked on POWER8 with XICS. However
+>>> KVM on POWER9 has never implemented it - the compatibility mode code
+>>> ("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the 
+>>> native
+>>> XIVE mode does not handle INTx in KVM at all.
+>>> 
+>>> This moved the capability support advertising to platforms and stops
+>>> advertising it on XIVE, i.e. POWER9 and later.
+>>> 
+>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>> ---
+>>> 
+>>> 
+>>> Or I could move this one together with KVM_CAP_IRQFD. Thoughts?
+>> 
+>> 
+>> Ping?
+>> 
+>>> 
+>>> ---
+>>>   arch/arm64/kvm/arm.c       | 3 +++
+>>>   arch/mips/kvm/mips.c       | 3 +++
+>>>   arch/powerpc/kvm/powerpc.c | 6 ++++++
+>>>   arch/riscv/kvm/vm.c        | 3 +++
+>>>   arch/s390/kvm/kvm-s390.c   | 3 +++
+>>>   arch/x86/kvm/x86.c         | 3 +++
+>>>   virt/kvm/kvm_main.c        | 1 -
+>>>   7 files changed, 21 insertions(+), 1 deletion(-)
+>>> 
+>>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>>> index 523bc934fe2f..092f0614bae3 100644
+>>> --- a/arch/arm64/kvm/arm.c
+>>> +++ b/arch/arm64/kvm/arm.c
+>>> @@ -210,6 +210,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
+>>> long ext)
+>>>       case KVM_CAP_SET_GUEST_DEBUG:
+>>>       case KVM_CAP_VCPU_ATTRIBUTES:
+>>>       case KVM_CAP_PTP_KVM:
+>>> +#ifdef CONFIG_HAVE_KVM_IRQFD
+>>> +    case KVM_CAP_IRQFD_RESAMPLE:
+>>> +#endif
 
-We don't capitalize the first S in 'Sstc' above, so I don't think we want
-to capitalize this Z either.
+I don't mind moving this around, but I object to the #ifdefery.
 
-> +
-
-extra blank line
-
->  };
->  
->  static void dump_fdt(const char *dtb_file, void *fdt)
-> diff --git a/riscv/include/asm/kvm.h b/riscv/include/asm/kvm.h
-> index 7351417..f6f7963 100644
-> --- a/riscv/include/asm/kvm.h
-> +++ b/riscv/include/asm/kvm.h
-> @@ -98,6 +98,7 @@ enum KVM_RISCV_ISA_EXT_ID {
->  	KVM_RISCV_ISA_EXT_M,
->  	KVM_RISCV_ISA_EXT_SVPBMT,
->  	KVM_RISCV_ISA_EXT_SSTC,
-> +	KVM_RISCV_ISA_EXT_ZIHINTPAUSE,
-
-This should be updated with a uapi header update using
-util/update_headers.sh
-
-
->  	KVM_RISCV_ISA_EXT_MAX,
->  };
->  
-> -- 
-> 2.34.1
->
+This option is always selected on arm64, so it can safely be added
+to the list without any condition.
 
 Thanks,
-drew
+
+         M.
+-- 
+Who you jivin' with that Cosmik Debris?
