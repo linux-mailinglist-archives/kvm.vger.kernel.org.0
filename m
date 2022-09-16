@@ -2,56 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8B7E5BA933
-	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 11:19:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 208B55BA9D2
+	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 12:00:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230225AbiIPJS3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Sep 2022 05:18:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36758 "EHLO
+        id S230231AbiIPJ6n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Sep 2022 05:58:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231262AbiIPJSE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Sep 2022 05:18:04 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF242A99EF;
-        Fri, 16 Sep 2022 02:17:51 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id b23so20639161pfp.9;
-        Fri, 16 Sep 2022 02:17:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=RFJvLC3oyKntFrzTiQRhGZVyVO6GPmrCQg8gZcgZyFw=;
-        b=Si6vfDs3bb2P2LS+f46ihWdK3HAyZdel6Ti1Rl2uXqTyVhhM+fRPVv2zmQ4d/VKab8
-         E4MWbu0mTcGqAAdPVQlX+SSKfU7KNUsJrnxmoBrVPgeHoXCdIBpGm9c0rMYAv+TCkITP
-         CrEQiNGzUycaWOLkBp7E1yPKzvFAgYuY/fZAO8XH1XVhBx+LMLqnJpoTapoE/PeMwBdh
-         gR1mmMH6iNh/WBmaizEX2KFNP64aO1OPWnEsFQYWCLpTltBTj52KfzB4SBNaMVGNxlZc
-         4uKj2M4qd/vGEsuKn8Qx6qonwZz8cdIn9MQSREeaVvRUXI8uhZafFWRTbUHEkdBASLVc
-         boHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=RFJvLC3oyKntFrzTiQRhGZVyVO6GPmrCQg8gZcgZyFw=;
-        b=54A3nWdRxuXxlksECDGwjlzlODPqF1IEKd8vY4oQFFAhn3dJAEkw9SRmtp9FRw5yR6
-         HTq3y3IP98sxStjDVjwXHKBtkvukVQ3OFB5UbJxL22j6XKvHMAVCTtW5ZOrgeaMvBFJs
-         XkzGxjEpbGcK0ABWAAgGSIWp338yAiznQIn96McKcA0XHZ744Ynym+Zdooa1pp7CMPJ9
-         ILwPhaZWOTFywC/+ZqEhchIyE7Jlfp5G1X/y05GwDDq7gtERdW5PxuHikQ7qLKgZ9Zlp
-         r8YxTYhRkkDmKx73Zs5yj+bEQrDqGRrN3Th1sKKWAOgOjoPrSr1/uS7+zGDV1IPKzrC0
-         sM2w==
-X-Gm-Message-State: ACrzQf1Vv97mG5H9HRamlmbqq5rj6UtDlAOTqAD0s5RtOFFRKSVG7XSI
-        OSkBFvMspXXTI0pWhmIdPMQ=
-X-Google-Smtp-Source: AMsMyM6PMf1pTSKPrEToM1vu4+OPBqOTXE35gLiVtkoVeVNAu/wJ9Awn1DLWt6lUQ0y1S1KgHHMDJw==
-X-Received: by 2002:a63:77c4:0:b0:435:4224:98b6 with SMTP id s187-20020a6377c4000000b00435422498b6mr3751652pgc.94.1663319871288;
-        Fri, 16 Sep 2022 02:17:51 -0700 (PDT)
-Received: from debian.me (subs32-116-206-28-32.three.co.id. [116.206.28.32])
-        by smtp.gmail.com with ESMTPSA id q7-20020a17090311c700b00174f7d10a03sm14635852plh.86.2022.09.16.02.17.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Sep 2022 02:17:50 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-        id 5800510322A; Fri, 16 Sep 2022 16:17:48 +0700 (WIB)
-Date:   Fri, 16 Sep 2022 16:17:48 +0700
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
+        with ESMTP id S230128AbiIPJ6d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Sep 2022 05:58:33 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D1E8AA4DF;
+        Fri, 16 Sep 2022 02:58:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1663322311; x=1694858311;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=12OZBcnGODAmYZ+AQhyX6U0d1a9s5HIpAjq3AWPtWJs=;
+  b=hK7Z2muPoe51t+mAtm3DCPxAFrwHkUH4KdVddLvWyC5NdgoSi7SJwMAm
+   7QXpD1QkARfIZ8SBmQ27HRCShf8Iflxv6Q/7/5dad5GaXbZR6W+ojV8F1
+   aWGG3mBJ9KH8/8Eb2e3cecxO76Px9lQUkvwrPchRKOGpzcu5rjpZ/oG4X
+   jPRBQ+0d+ZNec65VmYnU6KvNtpUI0tMjcyUnEPT0wjaFxM9YYQM0vF1xB
+   c8rZ9NXL+FxLcDFfLvxQNbD8yk1KYTQNeUNrXNCgS8FzfynSdyfh2ymfj
+   brlycSVwwLc7dJ7biIByg8EJoBkCSN/AL/yTWn6hnbvP6EUePyPFmaeNU
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10471"; a="298950578"
+X-IronPort-AV: E=Sophos;i="5.93,320,1654585200"; 
+   d="scan'208";a="298950578"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2022 02:58:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,320,1654585200"; 
+   d="scan'208";a="620036603"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by fmsmga007.fm.intel.com with ESMTP; 16 Sep 2022 02:58:21 -0700
+Date:   Fri, 16 Sep 2022 17:53:42 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Bagas Sanjaya <bagasdotme@gmail.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
         linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
@@ -82,53 +70,116 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Quentin Perret <qperret@google.com>,
         Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
         Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: Re: [PATCH v8 3/8] KVM: Add KVM_EXIT_MEMORY_FAULT exit
-Message-ID: <YyQ/PHZHkDSgjH/v@debian.me>
+Subject: Re: [PATCH v8 2/8] KVM: Extend the memslot to support fd-based
+ private memory
+Message-ID: <20220916095342.GA2261402@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
 References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
- <20220915142913.2213336-4-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-3-chao.p.peng@linux.intel.com>
+ <YyQ+dQT9/V5e62/u@debian.me>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="y7c2sZGFbG3OyuxM"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220915142913.2213336-4-chao.p.peng@linux.intel.com>
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <YyQ+dQT9/V5e62/u@debian.me>
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Sep 16, 2022 at 04:14:29PM +0700, Bagas Sanjaya wrote:
+> On Thu, Sep 15, 2022 at 10:29:07PM +0800, Chao Peng wrote:
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index abd7c32126ce..c1fac1e9f820 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -1319,7 +1319,7 @@ yet and must be cleared on entry.
+> >  :Capability: KVM_CAP_USER_MEMORY
+> >  :Architectures: all
+> >  :Type: vm ioctl
+> > -:Parameters: struct kvm_userspace_memory_region (in)
+> > +:Parameters: struct kvm_userspace_memory_region(_ext) (in)
+> >  :Returns: 0 on success, -1 on error
+> >  
+> >  ::
+> > @@ -1332,9 +1332,18 @@ yet and must be cleared on entry.
+> >  	__u64 userspace_addr; /* start of the userspace allocated memory */
+> >    };
+> >  
+> > +  struct kvm_userspace_memory_region_ext {
+> > +	struct kvm_userspace_memory_region region;
+> > +	__u64 private_offset;
+> > +	__u32 private_fd;
+> > +	__u32 pad1;
+> > +	__u64 pad2[14];
+> > +  };
+> > +
+> >    /* for kvm_memory_region::flags */
+> >    #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
+> >    #define KVM_MEM_READONLY	(1UL << 1)
+> > +  #define KVM_MEM_PRIVATE		(1UL << 2)
+> >  
+> >  This ioctl allows the user to create, modify or delete a guest physical
+> >  memory slot.  Bits 0-15 of "slot" specify the slot id and this value
+> > @@ -1365,12 +1374,27 @@ It is recommended that the lower 21 bits of guest_phys_addr and userspace_addr
+> >  be identical.  This allows large pages in the guest to be backed by large
+> >  pages in the host.
+> >  
+> > -The flags field supports two flags: KVM_MEM_LOG_DIRTY_PAGES and
+> > -KVM_MEM_READONLY.  The former can be set to instruct KVM to keep track of
+> > -writes to memory within the slot.  See KVM_GET_DIRTY_LOG ioctl to know how to
+> > -use it.  The latter can be set, if KVM_CAP_READONLY_MEM capability allows it,
+> > -to make a new slot read-only.  In this case, writes to this memory will be
+> > -posted to userspace as KVM_EXIT_MMIO exits.
+> > +kvm_userspace_memory_region_ext includes all the kvm_userspace_memory_region
+> > +fields. It also includes additional fields for some specific features. See
+> > +below description of flags field for more information. It's recommended to use
+> > +kvm_userspace_memory_region_ext in new userspace code.
+> 
+> Better say "kvm_userspace_memory_region_ext includes all fields of
+> kvm_userspace_memory_region struct, while also adds additional fields ..."
+> 
+> > +
+> > +The flags field supports below flags:
+> 
+> s/below/following/
+> 
+> > +
+> > +- KVM_MEM_LOG_DIRTY_PAGES can be set to instruct KVM to keep track of writes to
+> > +  memory within the slot.  See KVM_GET_DIRTY_LOG ioctl to know how to use it.
+> > +
+> 
+> Better say "... For more details, see KVM_GET_DIRTY_LOG."
+> 
+> > +- KVM_MEM_READONLY can be set, if KVM_CAP_READONLY_MEM capability allows it, to
+> > +  make a new slot read-only.  In this case, writes to this memory will be posted
+> > +  to userspace as KVM_EXIT_MMIO exits.
+> > +
+> 
+> Better say "if KVM_CAP_READONLY_MEM allows, KVM_MEM_READONLY makes a new
+> slot read-only ..."
+> 
+> > +- KVM_MEM_PRIVATE can be set to indicate a new slot has private memory backed by
+> > +  a file descirptor(fd) and the content of the private memory is invisible to
+> > +  userspace. In this case, userspace should use private_fd/private_offset in
+> > +  kvm_userspace_memory_region_ext to instruct KVM to provide private memory to
+> > +  guest. Userspace should guarantee not to map the same pfn indicated by
+> > +  private_fd/private_offset to different gfns with multiple memslots. Failed to
+> > +  do this may result undefined behavior.
+> >  
+> 
+> For the lists above,
+> s/can be set/
 
---y7c2sZGFbG3OyuxM
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+It all looks good, thanks!
 
-On Thu, Sep 15, 2022 at 10:29:08PM +0800, Chao Peng wrote:
-> + - KVM_MEMORY_EXIT_FLAG_PRIVATE - indicates the memory error is caused by
-> +   private memory access when the bit is set otherwise the memory error =
-is
-> +   caused by shared memory access when the bit is clear.
+> 
+> Thanks. 
+> 
+> -- 
+> An old man doll... just what I always wanted! - Clara
 
-s/set otherwise/set. Otherwise,
 
-Thanks.
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---y7c2sZGFbG3OyuxM
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCYyQ/PAAKCRD2uYlJVVFO
-o+4BAQDezOCiD0NOTihbyDi8bMxnDsZat5ohcP3Z6qp+0VEjSAD+PZb6ujbn8gYi
-c4AOBSOQzNSdKZVaTt8s86rxM84+4gk=
-=Ns2r
------END PGP SIGNATURE-----
-
---y7c2sZGFbG3OyuxM--
