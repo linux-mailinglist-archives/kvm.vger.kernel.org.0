@@ -2,70 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E800D5BB28F
-	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 20:58:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E9215BB2A3
+	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 21:10:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230300AbiIPS6d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Sep 2022 14:58:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33928 "EHLO
+        id S230081AbiIPTKO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Sep 2022 15:10:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbiIPS6c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Sep 2022 14:58:32 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60AFEA6C24
-        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 11:58:31 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id ge9so10398035pjb.1
-        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 11:58:31 -0700 (PDT)
+        with ESMTP id S229484AbiIPTKM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Sep 2022 15:10:12 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D03073BC57
+        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 12:10:10 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id w20so10235095ply.12
+        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 12:10:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=PlHo0xyLGdLqEdXMFRBU/X5JCw5pNM4+UDTsxBu4468=;
-        b=VQ4dg1YxvysrbEiXhKx3kUTs2ResK/Th4k8uStRpIrcw2YAdDz9ysKkDpvgXkG0qO6
-         SnMlQ0DIXcmNDrboi37sHDEB6Q7YgrhnOF50oQfgdZP08LmsRpQFgCpzw6JExAZ8z4RD
-         nneOHDQzMuxP1bQCRFBFXmHV6dV11KLkkn4WaN0fnr6JL1xaqe6x6j6GNcwNjw4n7gT2
-         oKF9HjxH1PdqsnFozSFKCAERUptQEbIm2cqJbmlekO7IkSaj+D8o358ABvRn2GknYqIt
-         ekpM+Yml78Ul2hZD5mberY0lSz+zQ71PmkiOV39m46DU3+Dio+M682zm0ULFWxVms6bm
-         FSZA==
+        bh=druj11/35rpfBxm8kTiVsKQPWDTGtSwSDdBVz4fOVXo=;
+        b=NEV8YR3GFSS9vYj4hr6SZRswGyP83saRLOq7HgABqp8izJDxNEme2glKeYHCVmDVFJ
+         4zLN2PWPLvAq0l9i6qS3PPndrpeKaHzdjCmCm2giAS2Lkxmto7q/03JxTo0qYQUuoBiY
+         3GYMv3L4G1fZ3SRxFNfVrmxS4HQSe/WSU8gxvLVWaTq6hyrXIid0Oetmt4K3gTHJsLz9
+         Ixq0y8lmuSDNqIyiOHHOcrLvIJGvZKBhDbApGFUT9at5Myljg+vf7YjI8kuh6ALjmGWZ
+         opOLZBULTAOkJuP2q0ta+UoPx+qBrGPCnXThoe1PHaSVNpMAGA0JB5l72XYSccY772n/
+         H05g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=PlHo0xyLGdLqEdXMFRBU/X5JCw5pNM4+UDTsxBu4468=;
-        b=q0UOejDOzK2GE6Uqniu/JUJy544wCnI/P0qVmg5kfTEVmKOjI8UuBvP9Mhd9mclzGe
-         Gt9aAisRqrXjyFD6GF3ONvtFwNAIqqMeOaBjmD6RpgU4JKEUEq3yua/vM+MO+ThMp68s
-         eT2g5qdAyyhWSXpkn+yQ0uMefJJUaYiulZUorblJcWb4iG6CrUO3iKvCS537v/yVpAUD
-         xr0rrYVfcQbaw8NuK6rWm3Y+Rl78igyv5w5pzj9Hq/Jc1LqYqsK5S3ZwAh5BZ2gmFuOv
-         oUUOF5TmOxxg42iHZBMitjG6gxULZxOY8/hNPefOpyQslyqGG5JmBpL5UHWDkSaivcqh
-         RX2w==
-X-Gm-Message-State: ACrzQf32PZF3aztRRecCgcFraGPb9k9kiC5yQVIbKXoghGdUIDPqFVlj
-        12cYk5oIa5F4ma6n9wsKYi3ALA==
-X-Google-Smtp-Source: AMsMyM48WpsycIcHQPeZT1Ca5HCtL2TPyz+mMky2ox1cpnkMjfe8ZFxaLJnR5wRxEwsKoUnS+UEM2Q==
-X-Received: by 2002:a17:903:2406:b0:174:f1c8:76bc with SMTP id e6-20020a170903240600b00174f1c876bcmr1230326plo.168.1663354710804;
-        Fri, 16 Sep 2022 11:58:30 -0700 (PDT)
+        bh=druj11/35rpfBxm8kTiVsKQPWDTGtSwSDdBVz4fOVXo=;
+        b=4MScfOv1YhX5+2xzRicnotWlncQ2ArgxczMIb0ux2zrGKkYNUHtt8M8IGSQMRMjPRJ
+         D4RJ64MDOFC8CCxRc3y+fKeF5edwbla5P3LYyekDxHQJNjzKBEqfapRklbCHdDiYHHQ0
+         H4FKQUiDKHUso5oEygB4h3psDIjVIe9S+AR7AtqZm/KhspuhC9mMQfpv2JMfWOxPj7kF
+         PkixM9/JAV87BlOErdi5z9X+E3vPkBtsUIPtMvnU3Cs5eCYCTF4yKMK6JsFpNV3HaZUU
+         oqNo9PWUpl3xLcvMH+8TM+GV+H++Uz7FyPwkw0dsXTvCWWgzLLSjZTDebIngOchoIurm
+         Uyjw==
+X-Gm-Message-State: ACrzQf2w8GUvgyS9Q+8sGtyDjTqFbixdFIGu5kasDEBQXQIdMQ3y6pDc
+        cfRr7IhUAjd+pnKLXt/1VKHB8w==
+X-Google-Smtp-Source: AMsMyM4/j4MgwN2dnCEJICPnQWJLFxoUzjVi8eFplySAjsdenR1va5ntv2Kq5rqmJyEx5yCGHz+JRQ==
+X-Received: by 2002:a17:902:f547:b0:178:39fe:5b14 with SMTP id h7-20020a170902f54700b0017839fe5b14mr1279515plf.100.1663355410273;
+        Fri, 16 Sep 2022 12:10:10 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id j3-20020a170902da8300b001714e7608fdsm15374333plx.256.2022.09.16.11.58.30
+        by smtp.gmail.com with ESMTPSA id c13-20020a170903234d00b0016f85feae65sm15488102plh.87.2022.09.16.12.10.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Sep 2022 11:58:30 -0700 (PDT)
-Date:   Fri, 16 Sep 2022 18:58:26 +0000
+        Fri, 16 Sep 2022 12:10:09 -0700 (PDT)
+Date:   Fri, 16 Sep 2022 19:10:06 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
+To:     "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
         Li RongQing <lirongqing@baidu.com>
-Subject: Re: [PATCH 16/19] KVM: x86: Explicitly track all possibilities for
- APIC map's logical modes
-Message-ID: <YyTHUi3BXrOo4OpU@google.com>
-References: <20220831003506.4117148-1-seanjc@google.com>
- <20220831003506.4117148-17-seanjc@google.com>
- <8d3569a8b2d1563eb3ff665118ffc5c8d7e1e2f2.camel@redhat.com>
- <Yw+Sz+5rB+QNP2Z9@google.com>
- <510a641f6393ff11c00277df58c1d2a7b6e9a696.camel@redhat.com>
+Subject: Re: [PATCH v2 04/23] KVM: x86: Inhibit AVIC SPTEs if any vCPU
+ enables x2APIC
+Message-ID: <YyTKDl04BQviLGW6@google.com>
+References: <20220903002254.2411750-1-seanjc@google.com>
+ <20220903002254.2411750-5-seanjc@google.com>
+ <b6fcb487-56fc-12ea-6f67-b14b0b156ee0@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <510a641f6393ff11c00277df58c1d2a7b6e9a696.camel@redhat.com>
+In-Reply-To: <b6fcb487-56fc-12ea-6f67-b14b0b156ee0@amd.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,32 +74,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Aug 31, 2022, Maxim Levitsky wrote:
-> On Wed, 2022-08-31 at 16:56 +0000, Sean Christopherson wrote:
-> > On Wed, Aug 31, 2022, Maxim Levitsky wrote:
-> > > > @@ -993,7 +1011,7 @@ static bool kvm_apic_is_broadcast_dest(struct kvm *kvm, struct kvm_lapic **src,
-> > > >  {
-> > > >  	if (kvm->arch.x2apic_broadcast_quirk_disabled) {
-> > > >  		if ((irq->dest_id == APIC_BROADCAST &&
-> > > > -				map->mode != KVM_APIC_MODE_X2APIC))
-> > > > +		     map->logical_mode != KVM_APIC_MODE_X2APIC))
-> > > >  			return true;
-> > > >  		if (irq->dest_id == X2APIC_BROADCAST)
-> > > >  			return true;
-> > > 
-> > > To be honest I would put that patch first, and then do all the other patches,
-> > > this way you would avoid all of the hacks they do and removed here.
-> > 
-> > I did it this way so that I could test this patch for correctness.  Without the
-> > bug fixes in place it's not really possible to verify this patch is 100% correct.
-> > 
-> > I completely agree that it would be a lot easier to read/understand/review if
-> > this came first, but I'd rather not sacrifice the ability to easily test this patch.
-> > 
+On Tue, Sep 13, 2022, Suthikulpanit, Suravee wrote:
+> > @@ -10122,7 +10136,15 @@ void __kvm_set_or_clear_apicv_inhibit(struct kvm *kvm,
+> >   	set_or_clear_apicv_inhibit(&new, reason, set);
+> > -	if (!!old != !!new) {
+> > +	/*
+> > +	 * If the overall "is APICv activated" status is unchanged, simply add
+> > +	 * or remove the inihbit from the pile.  x2APIC is an exception, as it
+> > +	 * is a partial inhibit (only blocks SPTEs for the APIC access page).
+> > +	 * If x2APIC is the only inhibit in either the old or the new set, then
+> > +	 * vCPUs need to be kicked to transition between partially-inhibited
+> > +	 * and fully-inhibited.
+> > +	 */
+> > +	if ((!!old != !!new) || old == X2APIC_ENABLE || new == X2APIC_ENABLE) {
 > 
-> I am not 100% sure about this, but I won't argue about it, let it be.
+> Why are we comparing APICV inhibit reasons (old, new) with X2APIC_ENABLE
+> here? Do you mean to compare with APICV_INHIBIT_REASON_X2APIC?
 
-Whelp, so much for my argument.  I'm going to bite the bullet and move this patch
-first so that the fix for logical x2APIC mode[*] doesn't need to pile on the hacks.
-
-[*] https://lore.kernel.org/all/YyTF7SsMjm+pClqh@google.com
+Heh, the truly hilarious part about this is that the code actually works, because
+by pure coincidence, X2APIC_ENABLE == BIT(APICV_INHIBIT_REASON_X2APIC).  Obviously
+still needs to be changed, just found it amusing.
