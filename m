@@ -2,108 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F2525BA9DC
-	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 12:00:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63C065BA9E0
+	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 12:03:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230307AbiIPJ7T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Sep 2022 05:59:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45908 "EHLO
+        id S230355AbiIPKDC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Sep 2022 06:03:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230238AbiIPJ7P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Sep 2022 05:59:15 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC0D8AA4D9;
-        Fri, 16 Sep 2022 02:59:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663322353; x=1694858353;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=+GGngsOt+mHhqh1Zhh4O/6JETM5+xIHPKtlncj1KbqA=;
-  b=jCk6G/BbCxqBSmqRYtWMEGvZ3X4Rcvi2rc7Rc1TuMfkOZBoLIuAQYXjd
-   pj9VK+SQ197Gqm+34E4mB2lBeJxWnI4kVyAOaluo3qcFVZ+zGgVVJPtwx
-   2WbXyXeVSxs5aRB8YY96VBintdJkvDPw3+HWTd3DLMzEUKTkd+Ezu8Dbj
-   g6+S3k0G+1wkn+Rv6JUAHW9NOjEvestgc11oK8Y/r+/Au3IrWOsNCSNFp
-   g8P/K7UDQ6m78sDkJHdhzVNl5uzBfRWGrzH7c4WBPRmilWSGmtilC88Ne
-   35GKh+OgpgRM+wRQt1XHC6m5NxaFmiOhNsW5/NsbTggKPpXIxErJl91hn
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10471"; a="325230069"
-X-IronPort-AV: E=Sophos;i="5.93,320,1654585200"; 
-   d="scan'208";a="325230069"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2022 02:59:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,320,1654585200"; 
-   d="scan'208";a="620036737"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by fmsmga007.fm.intel.com with ESMTP; 16 Sep 2022 02:59:03 -0700
-Date:   Fri, 16 Sep 2022 17:54:24 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Bagas Sanjaya <bagasdotme@gmail.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        with ESMTP id S230322AbiIPKDA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Sep 2022 06:03:00 -0400
+Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1CF4AB068;
+        Fri, 16 Sep 2022 03:02:59 -0700 (PDT)
+Received: by mail-pj1-x1043.google.com with SMTP id bu5-20020a17090aee4500b00202e9ca2182so1379154pjb.0;
+        Fri, 16 Sep 2022 03:02:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date;
+        bh=0kJO6sKHhZWzWtdjnIjVe92KBA3BK4LC3Mn37i7AeX8=;
+        b=p5dgLW1X5KELWDXXhAUsrm4m15zadrqj1lyXqbaHgTHEBaqIdsDIec/ASw4PWaCLzl
+         mRjUyPTXf9AwsWy7oc5NgLkSWi6Dd3HtNffTrp7d5AliYRbkhLcw0VhDwwVLpAEWpXhy
+         iDjvoyKXUkLoE22LpTkZAjFSO+uKgW0r6Q/qAVrCZ3tcnDowlFuNnj+mj4Dldy6u5Qbq
+         L1G8HUVCFy7D4Ns/7lnc2iRPilklPtqB1G7czENDScgqa/OdvWBAaaA1QHq0Dm81TKpg
+         mxXD0gAKH66fFzTIuniSjdogWnFvMC5fwBxwFJZjDzlQy8s6NBTvc2uEUwA+1QT/SzBs
+         NzjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date;
+        bh=0kJO6sKHhZWzWtdjnIjVe92KBA3BK4LC3Mn37i7AeX8=;
+        b=A8U+CYaODHKnhfEG3rfseHhPi76od6TP276qBtI1YBsvZ7d5TdxYhu14bW1XTfM7T+
+         ovJX2BlH7LE8Ztb1Tk8FoW1zdTqqpahOSRgBbDkuluAB01kyQ0IDf+DoInlnuUR0tjkF
+         iVcNyQ/4OZIbFMCw1lXTqPqtkbjFu7Z60H0Ewfj1Z8D8XFv3J9eXYHzgrz+lXhHci3dq
+         2B36vatFsMzLrbwrAErjSciXPxTzKnMqnEN5W33n2edWtUicExhxJ1Wo1Z0hbuJ00kEX
+         2I/T5KBjvF5Bj/wXjdaogMG7CXsIQQVXSVDOM0K8+AP90BnNNObJhRZXnVRIGA2oGJ8w
+         4eVg==
+X-Gm-Message-State: ACrzQf1GZ0dFuHZTBGMwWh1HzutSf+kCC2haXDBpWOuHaYBFLDhavJuB
+        QOBZJhlFWeA+nVxRYNPIjlU=
+X-Google-Smtp-Source: AMsMyM7k8Y3tBuvK67O01/8DM9XrV7JgALu+SPeEXJUUjRgAjamHbiu7z9m6S031Kj6gZJHX3OmfKA==
+X-Received: by 2002:a17:90b:2496:b0:1ef:a94:7048 with SMTP id nt22-20020a17090b249600b001ef0a947048mr4688475pjb.244.1663322579130;
+        Fri, 16 Sep 2022 03:02:59 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id y1-20020aa79421000000b00537daf64e8esm14094571pfo.188.2022.09.16.03.02.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Sep 2022 03:02:58 -0700 (PDT)
+Message-ID: <08cd7add-b2a5-da3f-1d2c-efa0e7c80511@gmail.com>
+Date:   Fri, 16 Sep 2022 18:02:48 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.2.2
+Subject: Re: [PATCH] selftests: kvm: Fix a compile error in
+ selftests/kvm/rseq_test.c
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Liam Merwick <liam.merwick@oracle.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: Re: [PATCH v8 3/8] KVM: Add KVM_EXIT_MEMORY_FAULT exit
-Message-ID: <20220916095424.GB2261402@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
- <20220915142913.2213336-4-chao.p.peng@linux.intel.com>
- <YyQ/PHZHkDSgjH/v@debian.me>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YyQ/PHZHkDSgjH/v@debian.me>
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        Jinrong Liang <cloudliang@tencent.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220802071240.84626-1-cloudliang@tencent.com>
+ <YxjAZOGF9uSE2+AT@google.com>
+ <fdfb143a-45c4-aaff-aa95-d20c076ff555@oracle.com>
+From:   JinrongLiang <ljr.kernel@gmail.com>
+In-Reply-To: <fdfb143a-45c4-aaff-aa95-d20c076ff555@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 16, 2022 at 04:17:48PM +0700, Bagas Sanjaya wrote:
-> On Thu, Sep 15, 2022 at 10:29:08PM +0800, Chao Peng wrote:
-> > + - KVM_MEMORY_EXIT_FLAG_PRIVATE - indicates the memory error is caused by
-> > +   private memory access when the bit is set otherwise the memory error is
-> > +   caused by shared memory access when the bit is clear.
+
+
+On 2022/9/8 00:54, Liam Merwick wrote:
+> On 07/09/2022 17:01, Sean Christopherson wrote:
+>> On Tue, Aug 02, 2022, Jinrong Liang wrote:
+>>> From: Jinrong Liang <cloudliang@tencent.com>
+>>>
+>>> The following warning appears when executing:
+>>>     make -C tools/testing/selftests/kvm
+>>>
+>>> rseq_test.c: In function ‘main’:
+>>> rseq_test.c:237:33: warning: implicit declaration of function 
+>>> ‘gettid’; did you mean ‘getgid’? [-Wimplicit-function-declaration]
+>>>            (void *)(unsigned long)gettid());
+>>>                                   ^~~~~~
+>>>                                   getgid
+>>> /usr/bin/ld: /tmp/ccr5mMko.o: in function `main':
+>>> ../kvm/tools/testing/selftests/kvm/rseq_test.c:237: undefined 
+>>> reference to `gettid'
+>>> collect2: error: ld returned 1 exit status
+>>> make: *** [../lib.mk:173: 
+>>> ../kvm/tools/testing/selftests/kvm/rseq_test] Error 1
+>>>
+>>> Use the more compatible syscall(SYS_gettid) instead of gettid() to 
+>>> fix it.
+>>> More subsequent reuse may cause it to be wrapped in a lib file.
+>>>
+>>> Signed-off-by: Jinrong Liang <cloudliang@tencent.com>
+>>> ---
+>>
+>> Reviewed-by: Sean Christopherson <seanjc@google.com>
+>>
 > 
-> s/set otherwise/set. Otherwise,
-
-Thanks.
-
+> Can a 'Cc: stable@vger.kernel.org' be added also as e923b0537d28 got 
+> backported to v5.15.58
 > 
-> Thanks.
+> Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
 > 
-> -- 
-> An old man doll... just what I always wanted! - Clara
-
-
+> 
+>>
+>> Paolo, do you want to grab this for 6.0?  It doesn't look like we're 
+>> going to have
+>> a more elegant solution anytime soon...
+> 
+Ping?
