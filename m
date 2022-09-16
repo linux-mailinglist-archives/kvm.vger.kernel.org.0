@@ -2,109 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C74F05BA6F5
-	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 08:43:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DBF95BA755
+	for <lists+kvm@lfdr.de>; Fri, 16 Sep 2022 09:18:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230038AbiIPGnp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Sep 2022 02:43:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54968 "EHLO
+        id S229812AbiIPHSQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Sep 2022 03:18:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229915AbiIPGno (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Sep 2022 02:43:44 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70E5EA2D88
-        for <kvm@vger.kernel.org>; Thu, 15 Sep 2022 23:43:43 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id o70-20020a17090a0a4c00b00202f898fa86so10023635pjo.2
-        for <kvm@vger.kernel.org>; Thu, 15 Sep 2022 23:43:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=XafrQyV1Y8bilPnzIvj7YCctN4S0mQCoBp5K3q3Hq6I=;
-        b=EAlsYtP0KasPGOytwKFV6O5CquVzTo7QRBtT0F9wTkJgFbhHmTXF9mHkuoiF3UJtBI
-         imyOMALyT3iPmVwPIpPTcHWwRka+TRPpLd/NXyFAHy5FmuEBrF9fOOOQ0X0b858kFYs8
-         Fjm+HYATR8D6me9coHOPcfM/RTWhRGArVjhUe0BuavtjP3EpCERi7Zqbkx3iqfnMB0uQ
-         no1WSBy5t7t5tmJfXwz79whqYF1wn3nrJKcA1RVdDI/YPDMH/g0rckdqfIG9NHX/wpN0
-         A6djnTVJoegqDk1ONijMPo0pteuoEsn76LI6rnOKbIKpU1fyYqItzqyzrgdid1+u2af+
-         3MZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=XafrQyV1Y8bilPnzIvj7YCctN4S0mQCoBp5K3q3Hq6I=;
-        b=uYZiYaj2CVK2G7ANDcsWt/xFfeMjkDRkEdJNkCA7gDoLKMBfUdrBJsxWG9JjiNfqeN
-         xvdbtuiEA6Lb/8r1SVD6oC/6wrQNFV8H88PK5DveFIz29tfq96SoQBP/dQFEmzT+4vuh
-         apcKrly47zPHtV4LE+Fa1KZ6y86ZAaRR4HozmQdYJkvRLy5P8uhSndWIahEM2tksIO3W
-         NNPnYnUgR9QPDnJFmRqkWiVysuPZNwwDOjEYaVbKXFVXwTOi3ylhkKcCojtwuy/BViXj
-         LDArdYB8nNX6bd9xvwR7XKMqr6r7UZHotyiGgb07FcFLTC4I6EbpcKbirZcNBPs3N8/r
-         mLUg==
-X-Gm-Message-State: ACrzQf0Cogo2btv7MdaF5+TrSPNfV0VsO9a53yf5nEvAv0nd1iFdvI+J
-        sxF93r6C2voFHG7ua5hHEgqdyA==
-X-Google-Smtp-Source: AMsMyM7cVJjO5hXpd9uJ6kurm9SpzSp4DpC+0Gpjd7g1HRdik9EjITEzUUx/nF+Ul6IfwHBhfvUJIA==
-X-Received: by 2002:a17:903:2015:b0:178:8022:ff1 with SMTP id s21-20020a170903201500b0017880220ff1mr2332456pla.18.1663310622963;
-        Thu, 15 Sep 2022 23:43:42 -0700 (PDT)
-Received: from ThinkPad-T490.dc1.ventanamicro.com ([182.70.62.242])
-        by smtp.googlemail.com with ESMTPSA id p4-20020aa79e84000000b0053ea0e55574sm13501724pfq.187.2022.09.15.23.43.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Sep 2022 23:43:42 -0700 (PDT)
-From:   Mayuresh Chitale <mchitale@ventanamicro.com>
-To:     Will Deacon <will@kernel.org>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>
-Cc:     Mayuresh Chitale <mchitale@ventanamicro.com>, kvm@vger.kernel.org,
-        Anup Patel <anup@brainfault.org>
-Subject: [PATCH kvmtool 1/1] riscv: Add zihintpause extension support
-Date:   Fri, 16 Sep 2022 12:13:24 +0530
-Message-Id: <20220916064324.28229-2-mchitale@ventanamicro.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220916064324.28229-1-mchitale@ventanamicro.com>
-References: <20220916064324.28229-1-mchitale@ventanamicro.com>
+        with ESMTP id S229628AbiIPHSP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Sep 2022 03:18:15 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3973B98586;
+        Fri, 16 Sep 2022 00:18:14 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28G6XKn6025906;
+        Fri, 16 Sep 2022 07:18:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=SHBUOa70oMvvGpW1BYealjIEIY2eeRNxpO4BE1zm22M=;
+ b=fmPnqqdtIIE1Di6/WUpix4JWgx5700Sa3PQ47McYDPAN2QDyBCIhHWOKYkYzGaUyymDg
+ Pb4zpcei6uyXw+p7i9owxOnOhHGMFhcYPhdk7qczXUYP1q0sWSGkRl2vg7aWkJsXvhGl
+ 1TapRLmiMLwjw/B2tAMsbh2H0avTvmZIT7ZxQD8zrq5+SEu9eSQN/Uq+gC+yp8kGFDSo
+ wOvBO/rMqmMIj/wHFMC0xD65SV39x7viTlLjSCU6PtA0iJ9x8yHu9bsjW3nD4pYtFEWw
+ o8Fc+MkJEyNe6LwwUk4AGPdjcrRdaqZ4ST+S2VaAH1IuPDfVxKm2stakvfEoTbNs/5+9 wA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3jmkyu18d2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 16 Sep 2022 07:18:07 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28G6Z4dQ001373;
+        Fri, 16 Sep 2022 07:18:07 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3jmkyu18cc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 16 Sep 2022 07:18:07 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 28G76g9P007429;
+        Fri, 16 Sep 2022 07:18:05 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3jm9218mf8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 16 Sep 2022 07:18:05 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 28G7I2rs36569500
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 16 Sep 2022 07:18:02 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 38C1C5204E;
+        Fri, 16 Sep 2022 07:18:02 +0000 (GMT)
+Received: from [9.171.38.23] (unknown [9.171.38.23])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 9509F52050;
+        Fri, 16 Sep 2022 07:18:01 +0000 (GMT)
+Message-ID: <7a469c6e-2a90-e351-702d-b7c9552de515@linux.ibm.com>
+Date:   Fri, 16 Sep 2022 09:18:01 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH v2] KVM: s390: pci: fix plain integer as NULL pointer
+ warnings
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     farman@linux.ibm.com, schnelle@linux.ibm.com, pmorel@linux.ibm.com,
+        frankja@linux.ibm.com, imbrenda@linux.ibm.com, david@redhat.com,
+        hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+        svens@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, lkp@intel.com
+References: <20220915175514.167899-1-mjrosato@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20220915175514.167899-1-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: m9MOq3LipSH_Jup1wO2LN06WY92VK7Nk
+X-Proofpoint-ORIG-GUID: iS7dka_7-D_-Jc-uge95jmFx6LZBbX02
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-09-16_02,2022-09-14_04,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 spamscore=0 clxscore=1015 impostorscore=0 phishscore=0
+ mlxscore=0 mlxlogscore=975 bulkscore=0 adultscore=0 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2209160051
+X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The zihintpause extension allows software to use the PAUSE instruction to
-reduce energy consumption while executing spin-wait code sequences. Add the
-zihintpause extension to the device tree if it is supported by the host.
 
-Signed-off-by: Mayuresh Chitale <mchitale@ventanamicro.com>
----
- riscv/fdt.c             | 2 ++
- riscv/include/asm/kvm.h | 1 +
- 2 files changed, 3 insertions(+)
 
-diff --git a/riscv/fdt.c b/riscv/fdt.c
-index e3d7717..7997edc 100644
---- a/riscv/fdt.c
-+++ b/riscv/fdt.c
-@@ -19,6 +19,8 @@ struct isa_ext_info {
- struct isa_ext_info isa_info_arr[] = {
- 	{"svpbmt", KVM_RISCV_ISA_EXT_SVPBMT},
- 	{"sstc", KVM_RISCV_ISA_EXT_SSTC},
-+	{"Zihintpause", KVM_RISCV_ISA_EXT_ZIHINTPAUSE},
-+
- };
- 
- static void dump_fdt(const char *dtb_file, void *fdt)
-diff --git a/riscv/include/asm/kvm.h b/riscv/include/asm/kvm.h
-index 7351417..f6f7963 100644
---- a/riscv/include/asm/kvm.h
-+++ b/riscv/include/asm/kvm.h
-@@ -98,6 +98,7 @@ enum KVM_RISCV_ISA_EXT_ID {
- 	KVM_RISCV_ISA_EXT_M,
- 	KVM_RISCV_ISA_EXT_SVPBMT,
- 	KVM_RISCV_ISA_EXT_SSTC,
-+	KVM_RISCV_ISA_EXT_ZIHINTPAUSE,
- 	KVM_RISCV_ISA_EXT_MAX,
- };
- 
--- 
-2.34.1
+Am 15.09.22 um 19:55 schrieb Matthew Rosato:
+> Fix some sparse warnings that a plain integer 0 is being used instead of
+> NULL.
+> 
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 
+Thanks  applied and queued.
