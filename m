@@ -2,65 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 686695BB528
-	for <lists+kvm@lfdr.de>; Sat, 17 Sep 2022 03:03:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CF52B5BB52B
+	for <lists+kvm@lfdr.de>; Sat, 17 Sep 2022 03:05:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229703AbiIQBDF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Sep 2022 21:03:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58542 "EHLO
+        id S229639AbiIQBFr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Sep 2022 21:05:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229492AbiIQBDE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Sep 2022 21:03:04 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BB462CC8A
-        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 18:03:04 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id d64-20020a17090a6f4600b00202ce056566so1334056pjk.4
-        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 18:03:04 -0700 (PDT)
+        with ESMTP id S229487AbiIQBFp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Sep 2022 21:05:45 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 318D99E886
+        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 18:05:44 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id q15-20020a17090a304f00b002002ac83485so1145247pjl.0
+        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 18:05:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=PyoFRYpyiLA2IWYuOc5AKxILn6uN9ogs3pnz/FQllOg=;
-        b=h0XEg7OsxTMAj6+5qiE4a2ORlViR5bBJ8WhbnnxtYQ/yUxcvYJACxmiXx4AgjHNBHH
-         nGGMMWwXoczMjZqnvrhTiKiYoHgJVP6H8jhcAI2X3jPUAQSLnRD5oaZMRPuqssC6Fc8b
-         kmBZ2UGDPo5nbXF3FTQHDH6essi0luzyQDFAHNBsNQ/jgu1a10Gk4CFurm8ap8mdrYI8
-         VJzEkEBX7KjEfaL7G6X/uRqkvYaBxB0zvtbKv9Es+0S6SvrJFGdCdoDeGTCwVJtKK38o
-         1fdlT7qg4CrKxBeeQGKHaEBpLkfBfoEXP2jjBdPzX3rbV4GTXS9IkQRVcoSd2YsmjplQ
-         eB0A==
+        bh=Ms7nUAHZlOrFk0AT6URL26jPlCSp0+EaZtlB5XtXTac=;
+        b=MdPgXvkJHjv61QnOF0rlU2IGMQrERLFIYrhARKY87N6z3503c1B/CnL4gzoDJIy3gm
+         Jp+3rGZles/4JlQqLWf95s8astDt9vgOWmtcLw7bJbrUxuRPjCf1vWwwGKHfhxBtQdFg
+         Gamv9jPOQlsFt8QFu96OGdhFPFwwpE97UeZpl4uzDQdKci7HXhcNLoY5EJYgZMj4MPHf
+         8hS4YcTPB3C+ajYgM53qRKyJYM9a7H+wky3q4em1MN1pK6CEX+BIGsGTGOjSc/vCtOYI
+         Z9ofnoGy3zA4mvMGobLjtiO/O3bdaaKEpIfAeYVuZdKZCU6Fn+YKOOOp3zZODs4J5VLf
+         yVZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=PyoFRYpyiLA2IWYuOc5AKxILn6uN9ogs3pnz/FQllOg=;
-        b=Tx5NoIb0dmQBRtvDs7w1EZEl/W4bG092RPPS0Euef9epEkeQ8DD1qNaaljmPb+FRHE
-         E88pX8KwKgvT2U0fEP6ia9JBDTHULQXU9YrQXDolPkkN1amQ1AQHXkP8je4QEayHQ5mu
-         ewcWzm3Te1Bohwg/wRYnI44QuQZqFklVOEr2isdbUiLg5XH1qStWsGqcC4sBo8yo0/oH
-         XmfBvOthDgc9bkzeTAbfLOMaWPWfoVJY8TqQvPN4/umfbrrJAr6cttb2FtM4C9Tx9Ta5
-         wmi1jvpMKBhmPvU5GaPsPk4lN1waqjcXe0mjgCQuSJLQyzrkdwQCJDC1HGeAIXk7Byu0
-         VPoQ==
-X-Gm-Message-State: ACrzQf0p4oWGZkQMuD6K7qF/Tguvu9/gAz1T53C/fF8NsY5Ku5rF0eNA
-        TLl2KgfAuYKJAdXzx4vHzK2hSQ==
-X-Google-Smtp-Source: AMsMyM476AUgH8ZUOlqN0Pd+hJdnW3q3heEXNyqjJCgA/fWYAmvRyslqEw3I0qzUlS+xLycQo5kcQQ==
-X-Received: by 2002:a17:902:da8f:b0:178:399b:89bb with SMTP id j15-20020a170902da8f00b00178399b89bbmr2464261plx.57.1663376583458;
-        Fri, 16 Sep 2022 18:03:03 -0700 (PDT)
+        bh=Ms7nUAHZlOrFk0AT6URL26jPlCSp0+EaZtlB5XtXTac=;
+        b=i1E5mPFKtoIJ3YJKoWCITAq3Yl4OtOyLHwZGCGzkyOUZS5gv5s6PcJaUg0M9TMwebF
+         fFJ/MvMb5fRKp3HoPAIbcwyfC/vAfgM4vX8cQLxngl09Iz8ZMuTMeT4RR6RbQeG9IdsZ
+         /vWpk931ERvte3t6xvaKpwoP+A2HVSe/0Anq1S312XMqAUPBl9oPGgt5d7ee0b9L4+Nd
+         p6e39WfQJf3b+LKZS4fIOWNbSfU9vB5Kx845qmmA80suNvrQYizAbJN4Q3zK1H34FbL9
+         bsxgiTdKJMFQmYUCwA5bjl4X5IaGXq2gZZrNuGrBjDTMsTArlNs7FPPmXxH6lmRMaUj4
+         Miuw==
+X-Gm-Message-State: ACrzQf0jxEKJhbCkOe1cRPBe79atV6gzF3V5eC6easzT3FZSLlw44b/v
+        fSsnxO7exIGxp37XFAk5TLIk3XqICkDFmQ==
+X-Google-Smtp-Source: AMsMyM6OR2py8Li2mImtpqmauxL1OntNskkntg1zia7heScQCSXzmm8qZyu4Kr5Q+gXDXwAIVCkWPg==
+X-Received: by 2002:a17:903:1c1:b0:178:1c92:e35 with SMTP id e1-20020a17090301c100b001781c920e35mr2326957plh.151.1663376743592;
+        Fri, 16 Sep 2022 18:05:43 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id j15-20020a170903024f00b00176d6ad3cd4sm15038944plh.100.2022.09.16.18.03.02
+        by smtp.gmail.com with ESMTPSA id n10-20020a170903404a00b00172d9f6e22bsm15289975pla.15.2022.09.16.18.05.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Sep 2022 18:03:03 -0700 (PDT)
-Date:   Sat, 17 Sep 2022 01:02:59 +0000
+        Fri, 16 Sep 2022 18:05:42 -0700 (PDT)
+Date:   Sat, 17 Sep 2022 01:05:39 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        mlevitsk@redhat.com
-Subject: Re: [PATCH v3 0/7] KVM: x86: never write to memory from
- kvm_vcpu_check_block
-Message-ID: <YyUcw49208H3jgMi@google.com>
-References: <20220822170659.2527086-1-pbonzini@redhat.com>
- <YxoMCp+rMV1ZmRlU@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Yuan Yao <yuan.yao@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 00/33] KVM: VMX: Support updated eVMCSv1 revision +
+ use vmcs_config for L1 VMX MSRs
+Message-ID: <YyUdYziyOfMGxf17@google.com>
+References: <20220830133737.1539624-1-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YxoMCp+rMV1ZmRlU@google.com>
+In-Reply-To: <20220830133737.1539624-1-vkuznets@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -72,49 +76,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 08, 2022, Sean Christopherson wrote:
-> On Mon, Aug 22, 2022, Paolo Bonzini wrote:
-> > The following backtrace:
-> > Paolo Bonzini (6):
-> >   KVM: x86: check validity of argument to KVM_SET_MP_STATE
-> 
-> Skipping this one since it's already in 6.0 and AFAICT isn't strictly necessary
-> for the rest of the series (shouldn't matter anyways?).
-> 
-> >   KVM: x86: make vendor code check for all nested events
-> >   KVM: x86: lapic does not have to process INIT if it is blocked
-> >   KVM: x86: never write to memory from kvm_vcpu_check_block
-> >   KVM: mips, x86: do not rely on KVM_REQ_UNHALT
-> >   KVM: remove KVM_REQ_UNHALT
-> > 
-> > Sean Christopherson (1):
-> >   KVM: nVMX: Make an event request when pending an MTF nested VM-Exit
-> 
-> Pushed to branch `for_paolo/6.1` at:
-> 
->     https://github.com/sean-jc/linux.git
-> 
-> with a cosmetic cleanup to kvm_apic_has_events() and the MTF migration fix squashed
-> in.
+On Tue, Aug 30, 2022, Vitaly Kuznetsov wrote:
+> Changes since "[RFC PATCH v6 00/36] KVM: x86: eVMCS rework":
+> - Drop the most controversial TSC_SCALING enablement for Hyper-V on KVM:
+>   - "KVM: nVMX: Enforce unsupported eVMCS in VMX MSRs for host accesses" patch dropped.
+>   - "KVM: nVMX: Support TSC scaling with enlightened VMCS" patch dropped.
+>   - "KVM: selftests: Enable TSC scaling in evmcs selftest" patch dropped.
 
-Oh the irony about complaining that people waste maintainers' time by not running
-existing tests :-)  I suppose it's not technically ironic since I was the one doing
-the actual complaining, but it's still hilarious.
+Pushed to branch `for_paolo/6.1` at:
 
-The eponymous patch breaks handling of INITs (and SIPIs) that are "latched"[1]
-and later become unblocked, e.g. due to entering VMX non-root mode or because SVM's
-GIF is set.  vmx_init_signal_test fails because KVM fails to re-evaluate pending
-events after entering guest/non-root.  It passes now because KVM always checks
-nested events in the outer run loop.
+    https://github.com/sean-jc/linux.git
 
-I have fixes, I'll (temporarily) drop this from the queue and post a new version of
-this series on Monday.  As a reward to myself for bisecting and debugging, I'm going
-to tweak "KVM: x86: lapic does not have to process INIT if it is blocked" to incorporate
-my suggestions[2] from v2 so that the VMX and SVM code can check only for pending
-INIT/SIPI and not include the blocking check to align with related checks that also
-trigger KVM_REQ_EVENT (and because the resulting SVM GIF code would be quite fragile
-if the blocking were incorporated).
+Unless you hear otherwise, it will make its way to kvm/queue "soon".
 
-[1] It annoys me to no end that KVM uses different terminology for INIT/SIPI versus
-    everything else.
-[2] https://lore.kernel.org/all/YvwxJzHC5xYnc7CJ@google.com
+Note, the commit IDs are not guaranteed to be stable, and in fact they are guaranteed
+to not be stable right now as I need to do some surgery.
