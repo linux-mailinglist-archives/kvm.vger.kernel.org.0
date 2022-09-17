@@ -2,73 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF52B5BB52B
-	for <lists+kvm@lfdr.de>; Sat, 17 Sep 2022 03:05:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 370FD5BB52F
+	for <lists+kvm@lfdr.de>; Sat, 17 Sep 2022 03:06:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229639AbiIQBFr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Sep 2022 21:05:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34598 "EHLO
+        id S229591AbiIQBGO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Sep 2022 21:06:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbiIQBFp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Sep 2022 21:05:45 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 318D99E886
-        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 18:05:44 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id q15-20020a17090a304f00b002002ac83485so1145247pjl.0
-        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 18:05:44 -0700 (PDT)
+        with ESMTP id S229564AbiIQBGM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Sep 2022 21:06:12 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05150A3D06
+        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 18:06:12 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id n85-20020a254058000000b006b0148d96f7so8258191yba.2
+        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 18:06:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=Ms7nUAHZlOrFk0AT6URL26jPlCSp0+EaZtlB5XtXTac=;
-        b=MdPgXvkJHjv61QnOF0rlU2IGMQrERLFIYrhARKY87N6z3503c1B/CnL4gzoDJIy3gm
-         Jp+3rGZles/4JlQqLWf95s8astDt9vgOWmtcLw7bJbrUxuRPjCf1vWwwGKHfhxBtQdFg
-         Gamv9jPOQlsFt8QFu96OGdhFPFwwpE97UeZpl4uzDQdKci7HXhcNLoY5EJYgZMj4MPHf
-         8hS4YcTPB3C+ajYgM53qRKyJYM9a7H+wky3q4em1MN1pK6CEX+BIGsGTGOjSc/vCtOYI
-         Z9ofnoGy3zA4mvMGobLjtiO/O3bdaaKEpIfAeYVuZdKZCU6Fn+YKOOOp3zZODs4J5VLf
-         yVZg==
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date;
+        bh=FPmIZ20vcTUeBFUMKdaLzmUVq8vMch7/heQIwOJWf6I=;
+        b=tAFTWGiHh8oW2k7UJWEM5Y3bG6bkwLfnpOBuOdCuxk+rZNbmhhM1l8IU4cBn4WFKrb
+         f+bB///QmF1d/7+xnOluIe6aNNzsU/lygE9MKZ4u5pHcwCw01d1aCJb/eoO1IAQizUT1
+         6U32afXpbaY8kj719kzrUygp/nfRYIjZ49AaIQimpwnLpBydSoAhrYNGHWF7BDK+beNY
+         3wc+w1VqMEwZgog2px86mTYdBFIMt91uyhZLoqfnUawrlKGjR6xLgPAUPmuK2glEmm3u
+         zEij4qYIZUMQyO+6hI7HsBWaQ/MSXHMgD1vc6NGkoxA3wz4TLKzIJUoeMbADXFusTCs1
+         u5lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=Ms7nUAHZlOrFk0AT6URL26jPlCSp0+EaZtlB5XtXTac=;
-        b=i1E5mPFKtoIJ3YJKoWCITAq3Yl4OtOyLHwZGCGzkyOUZS5gv5s6PcJaUg0M9TMwebF
-         fFJ/MvMb5fRKp3HoPAIbcwyfC/vAfgM4vX8cQLxngl09Iz8ZMuTMeT4RR6RbQeG9IdsZ
-         /vWpk931ERvte3t6xvaKpwoP+A2HVSe/0Anq1S312XMqAUPBl9oPGgt5d7ee0b9L4+Nd
-         p6e39WfQJf3b+LKZS4fIOWNbSfU9vB5Kx845qmmA80suNvrQYizAbJN4Q3zK1H34FbL9
-         bsxgiTdKJMFQmYUCwA5bjl4X5IaGXq2gZZrNuGrBjDTMsTArlNs7FPPmXxH6lmRMaUj4
-         Miuw==
-X-Gm-Message-State: ACrzQf0jxEKJhbCkOe1cRPBe79atV6gzF3V5eC6easzT3FZSLlw44b/v
-        fSsnxO7exIGxp37XFAk5TLIk3XqICkDFmQ==
-X-Google-Smtp-Source: AMsMyM6OR2py8Li2mImtpqmauxL1OntNskkntg1zia7heScQCSXzmm8qZyu4Kr5Q+gXDXwAIVCkWPg==
-X-Received: by 2002:a17:903:1c1:b0:178:1c92:e35 with SMTP id e1-20020a17090301c100b001781c920e35mr2326957plh.151.1663376743592;
-        Fri, 16 Sep 2022 18:05:43 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id n10-20020a170903404a00b00172d9f6e22bsm15289975pla.15.2022.09.16.18.05.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Sep 2022 18:05:42 -0700 (PDT)
-Date:   Sat, 17 Sep 2022 01:05:39 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 00/33] KVM: VMX: Support updated eVMCSv1 revision +
- use vmcs_config for L1 VMX MSRs
-Message-ID: <YyUdYziyOfMGxf17@google.com>
-References: <20220830133737.1539624-1-vkuznets@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220830133737.1539624-1-vkuznets@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=FPmIZ20vcTUeBFUMKdaLzmUVq8vMch7/heQIwOJWf6I=;
+        b=SKIWKZU3HdfGY5nm0cLqq7tnbTaflUQL3wdBoyjK7afRTtXHSt7zXcmPIicHKRkrMK
+         CvYPb1hilzwmBbY215Jdnudy9718N2PszfjzcYyQ48K6Kaomj59PMWRKsFT/ji4c4Zsh
+         y662bxlRf9AMMqa4u4XtBVzQH/v9IwyqoqQONnhRR2VvBx4KZJ/zflIww5sI6viCxUih
+         t2Ql91JSN2YaUTaL44/icEAzAxxm8pRri9M0KGQ1Rb/C2AzSbNK39ziRK9VYI3XSFNIn
+         8sQKEM+a1SOB0OL3uTiy41m70GSr5KTvDywrcqFdaQ3CVnlL2/MsnzrKfPCiJfGeuMkK
+         pS5g==
+X-Gm-Message-State: ACrzQf1HOBK3mktzp+KjAxLeOmZMiAIac0s6IWjHzRbQ8qCElewsP4Xf
+        e29oCwrsFyoiAlh2hTPGtITa5oYDcfA=
+X-Google-Smtp-Source: AMsMyM7+y1N9+gTgvFSbs1C1oHCJr2OfSIB0qnRQXA92Ps+jtzT3rtMrAlli+ZateJjndneNoW56QwXzWzI=
+X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
+ (user=reijiw job=sendgmr) by 2002:a25:8c07:0:b0:6af:ef09:be31 with SMTP id
+ k7-20020a258c07000000b006afef09be31mr6435316ybl.285.1663376770905; Fri, 16
+ Sep 2022 18:06:10 -0700 (PDT)
+Date:   Fri, 16 Sep 2022 18:05:56 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
+Message-ID: <20220917010600.532642-1-reijiw@google.com>
+Subject: [PATCH v2 0/4] KVM: arm64: Fix bugs of single-step execution enabled
+ by userspace
+From:   Reiji Watanabe <reijiw@google.com>
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        Reiji Watanabe <reijiw@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,18 +74,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 30, 2022, Vitaly Kuznetsov wrote:
-> Changes since "[RFC PATCH v6 00/36] KVM: x86: eVMCS rework":
-> - Drop the most controversial TSC_SCALING enablement for Hyper-V on KVM:
->   - "KVM: nVMX: Enforce unsupported eVMCS in VMX MSRs for host accesses" patch dropped.
->   - "KVM: nVMX: Support TSC scaling with enlightened VMCS" patch dropped.
->   - "KVM: selftests: Enable TSC scaling in evmcs selftest" patch dropped.
+This series fixes two bugs of single-step execution enabled by
+userspace, and add a test case for KVM_GUESTDBG_SINGLESTEP to
+the debug-exception test to verify the single-step behavior.
 
-Pushed to branch `for_paolo/6.1` at:
+Patch 1 fixes a bug that KVM might unintentionally change PSTATE.SS
+for the guest when single-step execution is enabled for the vCPU by
+userspace.
 
-    https://github.com/sean-jc/linux.git
+Patch 2 fixes a bug that KVM could erroneously perform an extra
+single step (without returning to userspace) due to setting PSTATE.SS
+to 1 on every guest entry, when single-step execution is enabled for
+the vCPU by userspace.
 
-Unless you hear otherwise, it will make its way to kvm/queue "soon".
+Patch 3-4 adds a test for KVM_GUESTDBG_SINGLESTEP to the
+debug-exception test to verify the single-step behavior.
 
-Note, the commit IDs are not guaranteed to be stable, and in fact they are guaranteed
-to not be stable right now as I need to do some surgery.
+The series is based on 6.0-rc5.
+
+v2:
+ - Change kvm_handle_guest_debug() to use switch/case statement [Marc]
+ - Clear PSTATE.SS on guest entry if the Software step state at the
+   last guest exit was "Active-pending" to make DBG_SS_ACTIVE_PENDING
+   and PSTATE.SS consistent [Marc]
+ - Add a fix to preserve PSTATE.SS for the guest.
+
+v1: https://lore.kernel.org/all/20220909044636.1997755-1-reijiw@google.com/
+
+Reiji Watanabe (4):
+  KVM: arm64: Preserve PSTATE.SS for the guest while single-step is
+    enabled
+  KVM: arm64: Clear PSTATE.SS when the Software Step state was
+    Active-pending
+  KVM: arm64: selftests: Refactor debug-exceptions to make it amenable
+    to new test cases
+  KVM: arm64: selftests: Add a test case for KVM_GUESTDBG_SINGLESTEP
+
+ arch/arm64/include/asm/kvm_host.h             |   4 +
+ arch/arm64/kvm/debug.c                        |  34 +++-
+ arch/arm64/kvm/guest.c                        |   1 +
+ arch/arm64/kvm/handle_exit.c                  |   8 +-
+ .../selftests/kvm/aarch64/debug-exceptions.c  | 149 +++++++++++++++++-
+ 5 files changed, 190 insertions(+), 6 deletions(-)
+
+
+base-commit: 80e78fcce86de0288793a0ef0f6acf37656ee4cf
+-- 
+2.37.3.968.ga6b4b080e4-goog
+
