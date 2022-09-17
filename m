@@ -2,66 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A4D555BB4F7
-	for <lists+kvm@lfdr.de>; Sat, 17 Sep 2022 02:25:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 686695BB528
+	for <lists+kvm@lfdr.de>; Sat, 17 Sep 2022 03:03:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229623AbiIQAZn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Sep 2022 20:25:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49172 "EHLO
+        id S229703AbiIQBDF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Sep 2022 21:03:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbiIQAZb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Sep 2022 20:25:31 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D0D5A896D
-        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 17:25:30 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id g4so21820456pgc.0
-        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 17:25:30 -0700 (PDT)
+        with ESMTP id S229492AbiIQBDE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Sep 2022 21:03:04 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BB462CC8A
+        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 18:03:04 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id d64-20020a17090a6f4600b00202ce056566so1334056pjk.4
+        for <kvm@vger.kernel.org>; Fri, 16 Sep 2022 18:03:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=lOQrTxUJm567glNqAFTRqQtEy/E3imFjc2nOGw55170=;
-        b=SF+Zl7Pa8nRhFiriwc4wIzb0VcUTTjyh5OID729CqM/dHQs+bQbzhukAN2MiIyNWth
-         3Tsj4CVSGyTpIUxKMyUJZftQVNurQOhgV5dMJWhjot6vF6DeVTrWUh3Tyt7DGTKE0WHO
-         PBvUZekVIIelJR0+2FNry8iQBy49uqe60f25ragByeT/YwOWcnaPjiQSgcHx7bUNuPvq
-         T2r8qaUKQdbbhvfhxA6+9sD3Krm/fcfRDM7OUCJIII9xQumlOJp1RJyt95tKTUpNfJw5
-         9/tFzz9yPaRsW1WOYk2Cay4IrGY7zZQYTLdRmVDdmjnAgkSwAnvR93aDZRqqdGZiAt7s
-         Y70A==
+        bh=PyoFRYpyiLA2IWYuOc5AKxILn6uN9ogs3pnz/FQllOg=;
+        b=h0XEg7OsxTMAj6+5qiE4a2ORlViR5bBJ8WhbnnxtYQ/yUxcvYJACxmiXx4AgjHNBHH
+         nGGMMWwXoczMjZqnvrhTiKiYoHgJVP6H8jhcAI2X3jPUAQSLnRD5oaZMRPuqssC6Fc8b
+         kmBZ2UGDPo5nbXF3FTQHDH6essi0luzyQDFAHNBsNQ/jgu1a10Gk4CFurm8ap8mdrYI8
+         VJzEkEBX7KjEfaL7G6X/uRqkvYaBxB0zvtbKv9Es+0S6SvrJFGdCdoDeGTCwVJtKK38o
+         1fdlT7qg4CrKxBeeQGKHaEBpLkfBfoEXP2jjBdPzX3rbV4GTXS9IkQRVcoSd2YsmjplQ
+         eB0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=lOQrTxUJm567glNqAFTRqQtEy/E3imFjc2nOGw55170=;
-        b=Ah9pTlJtCTgcCQH4UfgrJsjPH/T4/YYVyid6YLejG9d/ZryqmMMkyry51cS9EuuqEa
-         Ekrk0gB3Ioba3X08MJxfWPy3l1i4Y6EPQljjL5t8n2d4PIOIKl4feuwVgtpE6NyyZm1o
-         G+P95AliIwF5uCZB3RWY2UiK4Y5ll1vAlNRUD+Vrj4Yc3JSWQYyf8uRsWP8Xz3i0oN3q
-         1Y1Y/6IYcrwGMjmGjjPMFSadNSExJ2AcayaZZYrEzCQwSL3KDgFmb13zmboXcJ5T/LIB
-         NwzTnoXT7CDMAqUM9aVaBpPzMIldHVcn1XlNCahmrGBypEMAa8i56nDW5+wI/cFYw2wr
-         DBUw==
-X-Gm-Message-State: ACrzQf3Dw8T83N0uvFbPvpJUBxrs6ark18BL1i1e/xEsZW6PO3vRHZRq
-        MhY43IwYjSlHOS5V4T4q1iQiUA==
-X-Google-Smtp-Source: AMsMyM6vXPW7iIcNRztvUQH3bZ1oS9Epfo2bsKO8twLXhNtmfPfvVLzQa0EhOo9mvl0g0T41mFaZWQ==
-X-Received: by 2002:a05:6a00:1484:b0:547:89e:272c with SMTP id v4-20020a056a00148400b00547089e272cmr7491601pfu.0.1663374329907;
-        Fri, 16 Sep 2022 17:25:29 -0700 (PDT)
+        bh=PyoFRYpyiLA2IWYuOc5AKxILn6uN9ogs3pnz/FQllOg=;
+        b=Tx5NoIb0dmQBRtvDs7w1EZEl/W4bG092RPPS0Euef9epEkeQ8DD1qNaaljmPb+FRHE
+         E88pX8KwKgvT2U0fEP6ia9JBDTHULQXU9YrQXDolPkkN1amQ1AQHXkP8je4QEayHQ5mu
+         ewcWzm3Te1Bohwg/wRYnI44QuQZqFklVOEr2isdbUiLg5XH1qStWsGqcC4sBo8yo0/oH
+         XmfBvOthDgc9bkzeTAbfLOMaWPWfoVJY8TqQvPN4/umfbrrJAr6cttb2FtM4C9Tx9Ta5
+         wmi1jvpMKBhmPvU5GaPsPk4lN1waqjcXe0mjgCQuSJLQyzrkdwQCJDC1HGeAIXk7Byu0
+         VPoQ==
+X-Gm-Message-State: ACrzQf0p4oWGZkQMuD6K7qF/Tguvu9/gAz1T53C/fF8NsY5Ku5rF0eNA
+        TLl2KgfAuYKJAdXzx4vHzK2hSQ==
+X-Google-Smtp-Source: AMsMyM476AUgH8ZUOlqN0Pd+hJdnW3q3heEXNyqjJCgA/fWYAmvRyslqEw3I0qzUlS+xLycQo5kcQQ==
+X-Received: by 2002:a17:902:da8f:b0:178:399b:89bb with SMTP id j15-20020a170902da8f00b00178399b89bbmr2464261plx.57.1663376583458;
+        Fri, 16 Sep 2022 18:03:03 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id b2-20020a170902d50200b0017315b11bb8sm15672322plg.213.2022.09.16.17.25.29
+        by smtp.gmail.com with ESMTPSA id j15-20020a170903024f00b00176d6ad3cd4sm15038944plh.100.2022.09.16.18.03.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Sep 2022 17:25:29 -0700 (PDT)
-Date:   Sat, 17 Sep 2022 00:25:25 +0000
+        Fri, 16 Sep 2022 18:03:03 -0700 (PDT)
+Date:   Sat, 17 Sep 2022 01:02:59 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     "Chang S. Bae" <chang.seok.bae@intel.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, avagin@gmail.com, kvm@vger.kernel.org
-Subject: Re: [PATCH 3/4] x86/fpu: Clarify the XSTATE clearing only for
- extended components
-Message-ID: <YyUT9VlEuXWMfsrP@google.com>
-References: <20220916201158.8072-1-chang.seok.bae@intel.com>
- <20220916201158.8072-4-chang.seok.bae@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        mlevitsk@redhat.com
+Subject: Re: [PATCH v3 0/7] KVM: x86: never write to memory from
+ kvm_vcpu_check_block
+Message-ID: <YyUcw49208H3jgMi@google.com>
+References: <20220822170659.2527086-1-pbonzini@redhat.com>
+ <YxoMCp+rMV1ZmRlU@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220916201158.8072-4-chang.seok.bae@intel.com>
+In-Reply-To: <YxoMCp+rMV1ZmRlU@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,90 +72,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 16, 2022, Chang S. Bae wrote:
-> Commit 087df48c298c ("x86/fpu: Replace KVMs xstate component clearing")
-> refactored the MPX state clearing code.
+On Thu, Sep 08, 2022, Sean Christopherson wrote:
+> On Mon, Aug 22, 2022, Paolo Bonzini wrote:
+> > The following backtrace:
+> > Paolo Bonzini (6):
+> >   KVM: x86: check validity of argument to KVM_SET_MP_STATE
 > 
-> But, legacy states are not warranted in this routine.
-
-Why not?  I could probably figure it out eventually, but that info should be
-provided in the changelog.
-
-> Rename the function to clarify that only extended components are acceptable.
-
-The function rename isn't the interesting part of the patch, explicitly disallowing
-"legacy" states is what's interesting.  The shortlog+changelog should reflect that.
-
-> Signed-off-by: Chang S. Bae <chang.seok.bae@intel.com>
-> Cc: x86@kernel.org
-> Cc: kvm@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> ---
->  arch/x86/include/asm/fpu/api.h | 2 +-
->  arch/x86/kernel/fpu/xstate.c   | 7 +++++--
->  arch/x86/kvm/x86.c             | 4 ++--
->  3 files changed, 8 insertions(+), 5 deletions(-)
+> Skipping this one since it's already in 6.0 and AFAICT isn't strictly necessary
+> for the rest of the series (shouldn't matter anyways?).
 > 
-> diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
-> index 503a577814b2..c9d5dc85ca06 100644
-> --- a/arch/x86/include/asm/fpu/api.h
-> +++ b/arch/x86/include/asm/fpu/api.h
-> @@ -130,7 +130,7 @@ static inline void fpstate_free(struct fpu *fpu) { }
->  #endif
->  
->  /* fpstate-related functions which are exported to KVM */
-> -extern void fpstate_clear_xstate_component(struct fpstate *fps, unsigned int xfeature);
-> +extern void fpstate_clear_extended_xstate(struct fpstate *fps, unsigned int xfeature);
->  
->  extern u64 xstate_get_guest_group_perm(void);
->  
-> diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-> index d7676cfc32eb..a35f91360e3f 100644
-> --- a/arch/x86/kernel/fpu/xstate.c
-> +++ b/arch/x86/kernel/fpu/xstate.c
-> @@ -1371,14 +1371,17 @@ void xrstors(struct xregs_state *xstate, u64 mask)
->  }
->  
->  #if IS_ENABLED(CONFIG_KVM)
-> -void fpstate_clear_xstate_component(struct fpstate *fps, unsigned int xfeature)
-> +void fpstate_clear_extended_xstate(struct fpstate *fps, unsigned int xfeature)
->  {
->  	void *addr = get_xsave_addr(&fps->regs.xsave, xfeature);
->  
-> +	if (xfeature <= XFEATURE_SSE)
+> >   KVM: x86: make vendor code check for all nested events
+> >   KVM: x86: lapic does not have to process INIT if it is blocked
+> >   KVM: x86: never write to memory from kvm_vcpu_check_block
+> >   KVM: mips, x86: do not rely on KVM_REQ_UNHALT
+> >   KVM: remove KVM_REQ_UNHALT
+> > 
+> > Sean Christopherson (1):
+> >   KVM: nVMX: Make an event request when pending an MTF nested VM-Exit
+> 
+> Pushed to branch `for_paolo/6.1` at:
+> 
+>     https://github.com/sean-jc/linux.git
+> 
+> with a cosmetic cleanup to kvm_apic_has_events() and the MTF migration fix squashed
+> in.
 
-This should WARN_ON_ONCE(), silently doing nothing in the presence of buggy code
-isn't much better than clobbering state.
+Oh the irony about complaining that people waste maintainers' time by not running
+existing tests :-)  I suppose it's not technically ironic since I was the one doing
+the actual complaining, but it's still hilarious.
 
-> +		return;
-> +
->  	if (addr)
->  		memset(addr, 0, xstate_sizes[xfeature]);
->  }
-> -EXPORT_SYMBOL_GPL(fpstate_clear_xstate_component);
-> +EXPORT_SYMBOL_GPL(fpstate_clear_extended_xstate);
->  #endif
->  
->  #ifdef CONFIG_X86_64
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 43a6a7efc6ec..82ab270ea734 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -11760,8 +11760,8 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->  		if (init_event)
->  			kvm_put_guest_fpu(vcpu);
->  
-> -		fpstate_clear_xstate_component(fpstate, XFEATURE_BNDREGS);
-> -		fpstate_clear_xstate_component(fpstate, XFEATURE_BNDCSR);
-> +		fpstate_clear_extended_xstate(fpstate, XFEATURE_BNDREGS);
-> +		fpstate_clear_extended_xstate(fpstate, XFEATURE_BNDCSR);
+The eponymous patch breaks handling of INITs (and SIPIs) that are "latched"[1]
+and later become unblocked, e.g. due to entering VMX non-root mode or because SVM's
+GIF is set.  vmx_init_signal_test fails because KVM fails to re-evaluate pending
+events after entering guest/non-root.  It passes now because KVM always checks
+nested events in the outer run loop.
 
-From a KVM perspective, I strongly prefer the existing name.  The "component"
-part makes it very clear that the helper clears a single component, whereas it's
-not obvious at first glances that the version without "component" only affects
-the specified feature.
+I have fixes, I'll (temporarily) drop this from the queue and post a new version of
+this series on Monday.  As a reward to myself for bisecting and debugging, I'm going
+to tweak "KVM: x86: lapic does not have to process INIT if it is blocked" to incorporate
+my suggestions[2] from v2 so that the VMX and SVM code can check only for pending
+INIT/SIPI and not include the blocking check to align with related checks that also
+trigger KVM_REQ_EVENT (and because the resulting SVM GIF code would be quite fragile
+if the blocking were incorporated).
 
-The obvious alternative is something like fpstate_clear_extended_xstate_component(),
-but I don't really see the point.  "xstate" is "extended state" after all, which
-is partly why I find fpstate_clear_extended_xstate() confusing; it makes me think
-the helper is for some fancy "extended extended state".
+[1] It annoys me to no end that KVM uses different terminology for INIT/SIPI versus
+    everything else.
+[2] https://lore.kernel.org/all/YvwxJzHC5xYnc7CJ@google.com
