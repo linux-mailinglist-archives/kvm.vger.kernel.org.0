@@ -2,82 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B8485BBF75
-	for <lists+kvm@lfdr.de>; Sun, 18 Sep 2022 21:04:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B4C0D5BC07F
+	for <lists+kvm@lfdr.de>; Mon, 19 Sep 2022 01:13:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229602AbiIRTEb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 18 Sep 2022 15:04:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50490 "EHLO
+        id S229689AbiIRXNj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 18 Sep 2022 19:13:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229577AbiIRTE3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 18 Sep 2022 15:04:29 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E0A42A5;
-        Sun, 18 Sep 2022 12:04:26 -0700 (PDT)
-Received: from zn.tnic (p200300ea9733e7d5329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e7d5:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3BF0D1EC02F2;
-        Sun, 18 Sep 2022 21:04:21 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1663527861;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=EWdwI+9F6KbF5P7EBjHLyJIqBo8SY/a75JkGfnay0dI=;
-        b=U00QM7wSHikbt8CJZUY9HK8HpzlQnvUC7Msxf6QTULbZ/Qo651n+VVa/uZc/BJ+Vwn8cgi
-        Kg+6Qi6TqSsIqXXSO95iiOFmeW/OusCe7Ar0JwQJNz2kEXGHTlcH44hJTDvCtnvHcR8JN6
-        szhpScE/k56x/NxjnCXUvgaOC6uvYVM=
-Date:   Sun, 18 Sep 2022 21:04:16 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Jim Mattson <jmattson@google.com>, Avi Kivity <avi@redhat.com>,
-        Babu Moger <babu.moger@amd.com>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Joerg Roedel <joerg.roedel@amd.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Wyes Karny <wyes.karny@amd.com>, x86@kernel.org
-Subject: Re: [PATCH 2/5] KVM: svm: Disallow EFER.LMSLE on hardware that
- doesn't support it
-Message-ID: <YydrsMjAF5zjqTGK@zn.tnic>
-References: <20220916045832.461395-1-jmattson@google.com>
- <20220916045832.461395-3-jmattson@google.com>
- <YyTZFzaDOufASxqd@google.com>
- <CALMp9eQXroxQYiWUCejd0Cj7kD5g5navWY_E2O_vzbVAQjLyNg@mail.gmail.com>
- <YyT0G9y0RRyBDiPD@zn.tnic>
- <YyT5uW8bjXae2c4l@google.com>
+        with ESMTP id S229678AbiIRXNi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 18 Sep 2022 19:13:38 -0400
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACF3114D2C
+        for <kvm@vger.kernel.org>; Sun, 18 Sep 2022 16:13:36 -0700 (PDT)
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1oa3Th-009FFS-Dr; Mon, 19 Sep 2022 01:13:33 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+        bh=AE99YbHbKOSdlJSs6IzB7w17FA5Zftb2AELywf85VFg=; b=cxBDgAHUOP5DinjZl9v3ej9LDj
+        UgvkyQUpU3PfuVG2r4sQL5mpi3imppvRUUBX6zNfHQyXu+KvnJxYTPsQq1vTJThQUXJ0UW85PMVEC
+        KanvSfBJgaWcPfdNQkK9nTxB010ohw/S8GSdxGRpsvUsbd4vQGz/nUZUKSmgX+7IH8OaWFySCLbQ6
+        0FTAB8Nfnbhqwk18ruIH2ssXszBOTJnZkvjoCH+TLSJ+w1cBiR3rtkcMlJC33fb68X6x2VKOvIpX/
+        S1Ck48JnR57G1/XxHMuQTma8qQqQmi48wIhxfPO0EszYug0tgn1JopfzfXxXInuMOx6D+nd/MuoTK
+        2ldU/N+A==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1oa3Th-00052M-2q; Mon, 19 Sep 2022 01:13:33 +0200
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1oa3TR-00032p-SR; Mon, 19 Sep 2022 01:13:17 +0200
+Message-ID: <bd4274cd-57c0-ed9d-97e1-580387e96b41@rbox.co>
+Date:   Mon, 19 Sep 2022 01:13:16 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <YyT5uW8bjXae2c4l@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Thunderbird
+Subject: Re: [RFC PATCH 3/4] KVM: x86/xen: Disallow gpc locks reinitialization
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org
+References: <20220916005405.2362180-1-mhal@rbox.co>
+ <20220916005405.2362180-4-mhal@rbox.co> <YySujDJN2Wm3ivi/@google.com>
+Content-Language: pl-PL, en-GB
+From:   Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <YySujDJN2Wm3ivi/@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 16, 2022 at 10:33:29PM +0000, Sean Christopherson wrote:
-> ...
-> Either way, KVM appears to be carrying a half-baked "fix" for a buggy guest that's
-> long since gone.  So like we did in commit 8805875aa473 ("Revert "KVM: nVMX: Do not
-> expose MPX VMX controls when guest MPX disabled""), I think we should just revert
-> the "fix".
+On 9/16/22 19:12, Sean Christopherson wrote:
+> On Fri, Sep 16, 2022, Michal Luczaj wrote:
+>> For example: a race between ioctl(KVM_XEN_HVM_EVTCHN_SEND) and
+>> kvm_gfn_to_pfn_cache_init() leads to a corrupted shinfo gpc lock.
+>>
+>>                 (thread 1)                |           (thread 2)
+>>                                           |
+>>  kvm_xen_set_evtchn_fast                  |
+>>   read_lock_irqsave(&gpc->lock, ...)      |
+>>                                           | kvm_gfn_to_pfn_cache_init
+>>                                           |  rwlock_init(&gpc->lock)
+>>   read_unlock_irqrestore(&gpc->lock, ...) |
+>>
+> 
+> Please explicitly include a sample call stack for reaching kvm_gfn_to_pfn_cache_init().
+> Without that, it's difficult to understand if this is a bug in the gfn_to_pfn_cache
+> code, or if it's a bug in the caller.
 
-If, as message 0/5 says, setting this bit so that SLE11 Xen 4.0 boots as
-a nested hypervisor is the use case, then sure, unconditional NO_LSMLE
-and we all should go on with our lives.
+OK, I'll try to be more specific.
 
--- 
-Regards/Gruss,
-    Boris.
+> Rather than add another flag, (...)
+> Let me know if yout want to take on the above cleanups, if not I'll add them to
+> my todo list.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Sure, I'll do it.
+
+Thanks for all the suggestions,
+Michal
+
