@@ -2,66 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 55D9A5BBAD3
-	for <lists+kvm@lfdr.de>; Sun, 18 Sep 2022 00:17:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BE595BBC9E
+	for <lists+kvm@lfdr.de>; Sun, 18 Sep 2022 11:00:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229557AbiIQWRI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 17 Sep 2022 18:17:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57050 "EHLO
+        id S229447AbiIRJAm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 18 Sep 2022 05:00:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbiIQWRG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 17 Sep 2022 18:17:06 -0400
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDEB12A951
-        for <kvm@vger.kernel.org>; Sat, 17 Sep 2022 15:17:05 -0700 (PDT)
-Date:   Sat, 17 Sep 2022 22:17:00 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1663453024;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rj/6CKELmx8vxHervBV7XvLj7YZJrJGD0FTLGMcPyQo=;
-        b=D/jORQXVDWWJMhTHaHw3mS0GzFVH+mrtMtFNOmhdi3DDAgviqbmqn0xi9TvfWQDK/Y0jNe
-        hNhwCLCKl+aJ59Mk/4YrXMsBYm7Ao8GVQjHapBAPURUQ41FV4D7EuE/+1fVeba0806w5QH
-        7aP35Q9D3Ft/5N0ketutLlXUh/9cHf4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        andrew.jones@linux.dev, pbonzini@redhat.com, maz@kernel.org,
-        seanjc@google.com, alexandru.elisei@arm.com, eric.auger@redhat.com,
-        reijiw@google.com, rananta@google.com, bgardon@google.com,
-        dmatlack@google.com, axelrasmussen@google.com
-Subject: Re: [PATCH v6 06/13] KVM: selftests: Stash backing_src_type in
- struct userspace_mem_region
-Message-ID: <YyZHXOYOmGFm6MKu@google.com>
-References: <20220906180930.230218-1-ricarkol@google.com>
- <20220906180930.230218-7-ricarkol@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220906180930.230218-7-ricarkol@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229495AbiIRJAj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 18 Sep 2022 05:00:39 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE0F9165A0;
+        Sun, 18 Sep 2022 02:00:28 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 249B2612CD;
+        Sun, 18 Sep 2022 09:00:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7290FC433D6;
+        Sun, 18 Sep 2022 09:00:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1663491627;
+        bh=2B1WDY5MwSCkTnY6CG0jmqILeM/7+0Zk+GBKB+Flch0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=aK6o2OsusHqQ1de5M1c2CTP3HXuq2U3lIxs1wUIpDaUhxltNxsQ4ZJStYD3z3qEOY
+         gxUy5Zz0eOU8CjN4piXskxvUtEWpRngVd4tLYQg20suPxqOz+RKBbOWIxyDztjPpQH
+         WfpqtFDVJxFms+cgTEAnSxkP/07w3VmsjppCnGrmK/O07Q1MKV/Qbwe6Tjc6/el7YU
+         FnfakjdYd7B4IRK/6R8tnJKh68XS9zKgW5GaUkjW7LaVrEpC3uFHSBnDK3zLwZ242z
+         nt1Xoaf06wB6iJtBlvJB/y9TZ3wtezyi7Q6nUEKJ2XRDFLAAl6dYyRmrIMJN/MtUVr
+         D1LnDt+oedelA==
+Received: from 185-176-101-241.host.sccbroadband.ie ([185.176.101.241] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oZqA4-00As5P-5h;
+        Sun, 18 Sep 2022 10:00:24 +0100
+Date:   Sun, 18 Sep 2022 10:00:21 +0100
+Message-ID: <87illlkqfu.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Gavin Shan <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        catalin.marinas@arm.com, linux-kselftest@vger.kernel.org,
+        bgardon@google.com, shuah@kernel.org, corbet@lwn.net,
+        drjones@redhat.com, will@kernel.org, zhenyzha@redhat.com,
+        dmatlack@google.com, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        oliver.upton@linux.dev, shan.gavin@gmail.com
+Subject: Re: [PATCH v2 1/5] KVM: x86: Introduce KVM_REQ_RING_SOFT_FULL
+In-Reply-To: <YyS78BqsQxKkLOiW@xz-m1.local>
+References: <20220916045135.154505-1-gshan@redhat.com>
+        <20220916045135.154505-2-gshan@redhat.com>
+        <YyS78BqsQxKkLOiW@xz-m1.local>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.176.101.241
+X-SA-Exim-Rcpt-To: peterx@redhat.com, gshan@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-doc@vger.kernel.org, catalin.marinas@arm.com, linux-kselftest@vger.kernel.org, bgardon@google.com, shuah@kernel.org, corbet@lwn.net, drjones@redhat.com, will@kernel.org, zhenyzha@redhat.com, dmatlack@google.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, oliver.upton@linux.dev, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 06, 2022 at 06:09:23PM +0000, Ricardo Koller wrote:
-> Add the backing_src_type into struct userspace_mem_region. This struct already
-> stores a lot of info about memory regions, except the backing source type.
-> This info will be used by a future commit in order to determine the method for
-> punching a hole.
+On Fri, 16 Sep 2022 19:09:52 +0100,
+Peter Xu <peterx@redhat.com> wrote:
 > 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> On Fri, Sep 16, 2022 at 12:51:31PM +0800, Gavin Shan wrote:
+> > This adds KVM_REQ_RING_SOFT_FULL, which is raised when the dirty
+> > ring of the specific VCPU becomes softly full in kvm_dirty_ring_push().
+> > The VCPU is enforced to exit when the request is raised and its
+> > dirty ring is softly full on its entrance.
+> > 
+> > Suggested-by: Marc Zyngier <maz@kernel.org>
+> > Signed-off-by: Gavin Shan <gshan@redhat.com>
+> > ---
+> >  arch/x86/kvm/x86.c       | 5 +++--
+> >  include/linux/kvm_host.h | 1 +
+> >  virt/kvm/dirty_ring.c    | 4 ++++
+> >  3 files changed, 8 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 43a6a7efc6ec..7f368f59f033 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -10265,8 +10265,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+> >  	bool req_immediate_exit = false;
+> >  
+> >  	/* Forbid vmenter if vcpu dirty ring is soft-full */
+> > -	if (unlikely(vcpu->kvm->dirty_ring_size &&
+> > -		     kvm_dirty_ring_soft_full(&vcpu->dirty_ring))) {
+> > +	if (kvm_check_request(KVM_REQ_RING_SOFT_FULL, vcpu) &&
+> > +	    kvm_dirty_ring_soft_full(&vcpu->dirty_ring)) {
+> > +		kvm_make_request(KVM_REQ_RING_SOFT_FULL, vcpu);
+> >  		vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
+> >  		trace_kvm_dirty_ring_exit(vcpu);
+> >  		r = 0;
+> 
+> As commented previously - can we use kvm_test_request() instead? because we
+> don't want to unconditionally clear the bit.  Instead of making the request
+> again, we can clear request only if !full.
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+I have the feeling that this is a micro-optimisation that won't lead
+to much benefit in practice. You already have the cache line, just not
+in exclusive mode, and given that this is per-vcpu, you'd only see the
+cost if someone else is setting a request to this vcpu while
+evaluating the local requests.
 
---
+And now you need extra barriers...
+
+Also, can we please refrain from changing things without data showing
+that this actually is worse than what we had before? The point below
+makes me think that this is actually beneficial as is.
+
+> We can also safely move this into the block of below kvm_request_pending()
+> as Marc used to suggest.
+
+This, on the other hand, makes sure that we share the cost across all
+requests. Requests should be extremely rare anyway (and if they
+aren't, you have a whole lot of performance issues on your hands
+anyway).
+
+> 
+> To explicitly use kvm_clear_request(), we may need to be careful on the
+> memory barriers.  I'm wondering whether we should have moved
+> smp_mb__after_atomic() into kvm_clear_request() because kvm_clear_request()
+> is used outside kvm_check_request() and IIUC all the call sites should
+> better have that barrier too to be safe.
+>
+> Side note: when I read the code around I also see some mis-use of clear
+> request where it can be omitted, e.g.:
+> 
+> 		if (kvm_check_request(KVM_REQ_UNHALT, vcpu)) {
+> 			kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+> 			vcpu->run->exit_reason = KVM_EXIT_IRQ_WINDOW_OPEN;
+> 		}
+> 
+> Maybe it's a sign of bad naming, so we should renamed kvm_check_request()
+> to kvm_test_clear_request() too to show that clearing after that is not
+> needed?
+
+Yeah, this kvm_clear_request() is superfluous. But this is rather well
+documented, for once, and I don't think we should repaint it based on
+a sample of one.
+
 Thanks,
-Oliver
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
