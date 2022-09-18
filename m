@@ -2,69 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 326D45BBE6E
-	for <lists+kvm@lfdr.de>; Sun, 18 Sep 2022 16:36:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1643C5BBEE4
+	for <lists+kvm@lfdr.de>; Sun, 18 Sep 2022 18:13:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229702AbiIROga (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 18 Sep 2022 10:36:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49660 "EHLO
+        id S229718AbiIRQNn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 18 Sep 2022 12:13:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229675AbiIROg1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 18 Sep 2022 10:36:27 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E912220ED;
-        Sun, 18 Sep 2022 07:36:27 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id t65so24622841pgt.2;
-        Sun, 18 Sep 2022 07:36:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=XMOsXthWhrmjLtejUJ/4n1w+SFC2fUyvrhVzdIwCMn4=;
-        b=P96W9eY9xHRrhDWOkhcV5ZyhlFagu7vWgx1mVAuu1WXvSoaNv9S+uC0Y9Ri3gau7j9
-         CTbbhHcB4ih9tEMc8X/RUsZLCRx7Cy3IZ/CoiuDNCToJHgPqtNXG/p+ol+U+WIPaIo+f
-         M7NiyPUbPBi4ZZszvV2uAWbhMk9O8d8J4T52rqzkQ+tSjwHJgbNJXPVZiILFWuKj0qx3
-         +C3t8E/yFQF+ZsYRjGP5+GfWe5I2IQ/O2Wsh6a0KCZWyMVoDJ6RncbVi8rVuTTuRflXP
-         wt8aDv3jmczjdpDvDETGpSPce2h1GxY6F63/FinzIKBKy65Ii0vaeoNsT5QkBh7LGLyj
-         MCsQ==
+        with ESMTP id S229612AbiIRQNl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 18 Sep 2022 12:13:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0F24193CD
+        for <kvm@vger.kernel.org>; Sun, 18 Sep 2022 09:13:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663517618;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y+8agvNBGUyGIAQ5pKg2At+vWnr16zzpuv2mjJP9dWI=;
+        b=bqMP8z8ERcqsYA8pbpK6VX3dN55l6Lgh/IDUyFlxKFyfHHTQISVfeOpadlJNs99lNuj1XH
+        XWhTTGrM0ck3PNclCUbcqzrjXjBhzkxe0P3MoeHfDd9qTbD44liFiQNC5iERPiw6AhBy8A
+        84FAAN7llLFjDdJHZkhxsIKZhE9qFdU=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-343-OK3RwbNPOQy9z9bNJcF7dw-1; Sun, 18 Sep 2022 12:13:37 -0400
+X-MC-Unique: OK3RwbNPOQy9z9bNJcF7dw-1
+Received: by mail-qv1-f69.google.com with SMTP id f9-20020ad442c9000000b004ac7f4fde18so18184834qvr.14
+        for <kvm@vger.kernel.org>; Sun, 18 Sep 2022 09:13:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=XMOsXthWhrmjLtejUJ/4n1w+SFC2fUyvrhVzdIwCMn4=;
-        b=oB9ux5zh9VHL7mmDIiXtO2huwfdNHKpQn4QwHdX/ietPnliOkK8MJQavvHePgABdQi
-         QtGMeRWO/0EncSj4pY7IjYDcMo/dAZwq5lSXdVpUHZ4DltZpgK0f9GGFdp/r39SipElS
-         7FrCapUoAfDUxAqVg8ntcVVg9GaW2Q8TOeytkQqI7JoN6npd05xeGqOQ0eaYJOosGXrN
-         OVEIi0Bvq+07deMcEfgfe4mNYS9ebrg2JVl0ZPKcAqyt9p/iiEP1HT5Uu2ck/75tW5U+
-         oqjymFN7jfba81Jur/H7CcuwCFzdmM/bjcr305fbaunBoLcppuwsobhRg5YgQoX6Ulbf
-         MV9A==
-X-Gm-Message-State: ACrzQf1rVVJpQcRvo/cCrMKn6+pJAgRsQ4GkV75H1wn++bd59mYyD/ZV
-        rfWPwVTDwaTj6LROZYc6g315SbIX1dQ=
-X-Google-Smtp-Source: AMsMyM51IzYJWpLhR8hIiPoEHk2FErqom4TQnm8VzJ/+KxHioh5NTs8x4jcgjo0SBPbRnIcbon9drA==
-X-Received: by 2002:a05:6a00:1f13:b0:546:7b39:83da with SMTP id be19-20020a056a001f1300b005467b3983damr14907333pfb.0.1663511786874;
-        Sun, 18 Sep 2022 07:36:26 -0700 (PDT)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id i128-20020a626d86000000b0054a15345162sm6512820pfc.207.2022.09.18.07.36.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Sep 2022 07:36:26 -0700 (PDT)
-From:   cgel.zte@gmail.com
-X-Google-Original-From: xu.panda@zte.com.cn
-To:     mjrosato@linux.ibm.com
-Cc:     farman@linux.ibm.com, borntraeger@linux.ibm.com,
-        frankja@linux.ibm.com, imbrenda@linux.ibm.com, david@redhat.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
-        svens@linux.ibm.com, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Xu Panda <xu.panda@zte.com.cn>, Zeal Robot <zealci@zte.com.cn>
-Subject: [PATCH linux-next] KVM: s390: pci: fix comparing pointer to 0
-Date:   Sun, 18 Sep 2022 14:36:04 +0000
-Message-Id: <20220918143603.209974-1-xu.panda@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=Y+8agvNBGUyGIAQ5pKg2At+vWnr16zzpuv2mjJP9dWI=;
+        b=lsw+JNU3bWuuMlJA9gCDuZ22JKl2ADvL+4LXeEeQ5EG/B+JFWvp9ryyq6J7WpDqVau
+         1KqSoMPcF0VOqNFbMkklemok/1vCOLOW6euD58dLJbEX1lWFVkJ/Terwc9AbRUnfNvKq
+         skfEZOKLg/UxGAyp+OfYg9nqUcw8bhWyxCMM8Fu4dWYfIP/MKMOd1PAFwcHy1zZN7wGD
+         B+kVER7rQarkW0WcTGOJuWgQOJepriOpbHXBkGFiKdWnjYZQ8+H7SdyeAn/yKtDl6jWv
+         HbZakNcFPesgnKTFG6sXDZ75QDyBBkN5wP48WDPk6SAOpFNSIouXIcyumIb3TIVcJFDI
+         z4Iw==
+X-Gm-Message-State: ACrzQf3E1W3VNtO2JNlLUBISn/tGuqu6oEpiE69sQjpaNCLI65LWDHrk
+        4h9t8br99q2vGhxJpbPmTm4JGYnAwCOmEUi822W2yqCGSvBsH7v4Fx/1JfBLgn2qK2ZFYynUUog
+        d6ammXkRqEpmB
+X-Received: by 2002:a05:622a:1484:b0:35c:db7a:1699 with SMTP id t4-20020a05622a148400b0035cdb7a1699mr6235414qtx.555.1663517617041;
+        Sun, 18 Sep 2022 09:13:37 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7kyh4KRdjnIbqm4q/+cp4TkJc5By0D9c8Em/cv9lQoWU2Xxze9PuD30wUYDvtZt8f/vSYfRQ==
+X-Received: by 2002:a05:622a:1484:b0:35c:db7a:1699 with SMTP id t4-20020a05622a148400b0035cdb7a1699mr6235395qtx.555.1663517616816;
+        Sun, 18 Sep 2022 09:13:36 -0700 (PDT)
+Received: from ?IPV6:2a04:ee41:4:31cb:e591:1e1e:abde:a8f1? ([2a04:ee41:4:31cb:e591:1e1e:abde:a8f1])
+        by smtp.gmail.com with ESMTPSA id w14-20020ac84d0e000000b003436103df40sm8762874qtv.8.2022.09.18.09.13.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 18 Sep 2022 09:13:36 -0700 (PDT)
+Message-ID: <5f0345d2-d4d1-f4fe-86ba-6e22561cb6bd@redhat.com>
+Date:   Sun, 18 Sep 2022 18:13:31 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [RFC PATCH 0/9] kvm: implement atomic memslot updates
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+References: <20220909104506.738478-1-eesposit@redhat.com>
+ <YxtOEgJhe4EcAJsE@google.com>
+From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
+In-Reply-To: <YxtOEgJhe4EcAJsE@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,31 +90,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Xu Panda <xu.panda@zte.com.cn>
 
-Comparing pointer whith NULL instead of comparing pointer to 0.
 
-Reported-by: Zeal Robot <zealci@zte.com.cn>
-Signed-off-by: Xu Panda <xu.panda@zte.com.cn>
----
- arch/s390/kvm/pci.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Am 09/09/2022 um 16:30 schrieb Sean Christopherson:
+> On Fri, Sep 09, 2022, Emanuele Giuseppe Esposito wrote:
+>> KVM is currently capable of receiving a single memslot update through
+>> the KVM_SET_USER_MEMORY_REGION ioctl.
+>> The problem arises when we want to atomically perform multiple updates,
+>> so that readers of memslot active list avoid seeing incomplete states.
+>>
+>> For example, in RHBZ https://bugzilla.redhat.com/show_bug.cgi?id=1979276
+> 
+> I don't have access.  Can you provide a TL;DR?
 
-diff --git a/arch/s390/kvm/pci.h b/arch/s390/kvm/pci.h
-index 3a3606c3a0fe..aadafa2e03d1 100644
---- a/arch/s390/kvm/pci.h
-+++ b/arch/s390/kvm/pci.h
-@@ -46,8 +46,8 @@ extern struct zpci_aift *aift;
- static inline struct kvm *kvm_s390_pci_si_to_kvm(struct zpci_aift *aift,
-                                                 unsigned long si)
- {
--       if (!IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM) || aift->kzdev == 0 ||
--           aift->kzdev[si] == 0)
-+       if (!IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM) || aift->kzdev == NULL ||
-+           aift->kzdev[si] == NULL)
-                return 0;
-        return aift->kzdev[si]->kvm;
- };
--- 
-2.15.2
+You should be able to have access to it now.
+
+> 
+>> we see how non atomic updates cause boot failure, because vcpus
+>> will se a partial update (old memslot delete, new one not yet created)
+>> and will crash.
+> 
+> Why not simply pause vCPUs in this scenario?  This is an awful lot of a complexity
+> to take on for something that appears to be solvable in userspace. 
+> 
+
+I think it is not that easy to solve in userspace: see
+https://lore.kernel.org/qemu-devel/20200312161217.3590-1-david@redhat.com/
+
+
+"Using pause_all_vcpus()/resume_all_vcpus() is not possible, as it will
+temporarily drop the BQL - something most callers can't handle (esp.
+when called from vcpu context e.g., in virtio code)."
+
+Probably @Paolo and @Maxim can add more to this.
+
+Thank you,
+Emanuele
 
