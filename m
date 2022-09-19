@@ -2,144 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3041E5BD17B
-	for <lists+kvm@lfdr.de>; Mon, 19 Sep 2022 17:55:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6ED375BD1FF
+	for <lists+kvm@lfdr.de>; Mon, 19 Sep 2022 18:17:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230333AbiISPzY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Sep 2022 11:55:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43800 "EHLO
+        id S229473AbiISQRQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Sep 2022 12:17:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230185AbiISPzV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Sep 2022 11:55:21 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 905B5E0F6;
-        Mon, 19 Sep 2022 08:55:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663602919; x=1695138919;
-  h=message-id:date:mime-version:to:cc:references:from:
-   subject:in-reply-to:content-transfer-encoding;
-  bh=/RZXgUps2cAXRsr5swlx+LTN2mlpIuZ511tKlfnJhwY=;
-  b=NoTAIBv+JqnfSaNRAUaIw/xl3n0lMdoGU5AZApiGfUenb6dWaJIgdkFb
-   7WWa3CTGClogFeZRVMIHw5BDrh/n3u2xFoQDLUxRegs972cJG89WMUWcA
-   5IdJezvtYfAhlIUWqmE41CVZlFhfhw2lBkVfoSMVC7djEhapthPiAwWdb
-   fsk/E5mrIkBiwkcJ74NaKJP4MqI8dQRfp58b/5uwruyRk18YI/1UWtiTu
-   X5iCFJadOGkrQ60R8EkJdzP32tPX3XOyWMtpeW0JaELK/dPplXEu1yVtY
-   BSpGaa7GnK9MFsBrBJM2wC8fuv0+xZYF3+04ywZ6ezneUvacx35DNuGS3
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10475"; a="385725817"
-X-IronPort-AV: E=Sophos;i="5.93,328,1654585200"; 
-   d="scan'208";a="385725817"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2022 08:55:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,328,1654585200"; 
-   d="scan'208";a="651727338"
-Received: from linux.intel.com ([10.54.29.200])
-  by orsmga001.jf.intel.com with ESMTP; 19 Sep 2022 08:55:18 -0700
-Received: from [10.252.210.144] (kliang2-mobl1.ccr.corp.intel.com [10.252.210.144])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by linux.intel.com (Postfix) with ESMTPS id 430BB580A31;
-        Mon, 19 Sep 2022 08:55:17 -0700 (PDT)
-Message-ID: <0a5fdd6d-2207-d44f-2854-ec5882d557e7@linux.intel.com>
-Date:   Mon, 19 Sep 2022 11:55:16 -0400
+        with ESMTP id S229548AbiISQRL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Sep 2022 12:17:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D608D13F77
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 09:17:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663604229;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Xn5fnqKtyryYA5w5sfE3wIiUTcmcdDi6qpfcSbkJ4Lw=;
+        b=gvS/LdR0maZ69qRF+LRVo4hBcSsZrKehnRsKkVWPbxPgh8zoi3Xa8s4Nf6vkAkw6aFZecj
+        8nntOrwh46jfZKmUDMYdGKYCcWKumUUTP+ioXnSUXr+5XDNeWRPAYNZylQO9zZPeVu0MP0
+        jNhQBDFSQkW7w8DoH34QcU1C4k6z2Yg=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-500-MPojx1UyOWeUhUX2DVBJHg-1; Mon, 19 Sep 2022 12:17:06 -0400
+X-MC-Unique: MPojx1UyOWeUhUX2DVBJHg-1
+Received: by mail-qk1-f197.google.com with SMTP id br14-20020a05620a460e00b006cec4af5a2fso7476322qkb.2
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 09:17:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=Xn5fnqKtyryYA5w5sfE3wIiUTcmcdDi6qpfcSbkJ4Lw=;
+        b=N/mYZqQRmgOeoPjM9gztc0I6kL64nOhWYYxKvCBmqVGOO4bKWJDbASucmK1pnrv1ir
+         4lQW69Jx1uOZR7qvfRFV66UYeZgOxddpW6FwBtg6VPMlc4r4Uu8udbeUBjd6FyCg7kPx
+         QtDR/jnybX4+smL5xw0h6c7+HIDx1qhGXzkej8fskXMHjcioNuF2RdmdeWFlLsb12EvV
+         0p/tZdyPPc2e2ZmbNsg8VGY0zkrPl+z/oEOdnOg6L3bLRwi9UX2DbgC/7081UcyZEQw+
+         o1zVGO2e8j0h95kYvMkL5inMhzXJ8+RNnFFeOtPHbiBKUrufGm01DJVKMadL+hM5axjv
+         VjlQ==
+X-Gm-Message-State: ACrzQf1I/fZgleJbU4jpqpQrm6dkbfXQFGYBUUz4zv8jq1+cBV6vjd6B
+        XilDv3xpWk+n78s4EAv3rDPa8qjHO+SDAGiok5vJb/fO7Fvdg7fye1kVFNyF3UeX6N2HkmdPgoN
+        lILYDGL8w63L6
+X-Received: by 2002:ac8:5e0a:0:b0:35c:e8d8:6c19 with SMTP id h10-20020ac85e0a000000b0035ce8d86c19mr5068658qtx.178.1663604225349;
+        Mon, 19 Sep 2022 09:17:05 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM51+LmYDmB5JjErlr4hYbacMbbiBwggTg81wkAjJVlWGP8agHsUu4S5cY7WS6QJw0cvQ6qJIg==
+X-Received: by 2002:ac8:5e0a:0:b0:35c:e8d8:6c19 with SMTP id h10-20020ac85e0a000000b0035ce8d86c19mr5068640qtx.178.1663604225144;
+        Mon, 19 Sep 2022 09:17:05 -0700 (PDT)
+Received: from xz-m1.local (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca. [70.31.27.79])
+        by smtp.gmail.com with ESMTPSA id bv12-20020a05622a0a0c00b0035cf2995ad8sm826570qtb.51.2022.09.19.09.17.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Sep 2022 09:17:04 -0700 (PDT)
+Date:   Mon, 19 Sep 2022 12:17:02 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        catalin.marinas@arm.com, linux-kselftest@vger.kernel.org,
+        bgardon@google.com, shuah@kernel.org, corbet@lwn.net,
+        drjones@redhat.com, will@kernel.org, zhenyzha@redhat.com,
+        dmatlack@google.com, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        oliver.upton@linux.dev, shan.gavin@gmail.com
+Subject: Re: [PATCH v2 1/5] KVM: x86: Introduce KVM_REQ_RING_SOFT_FULL
+Message-ID: <YyiV/l7O23aw5aaO@xz-m1.local>
+References: <20220916045135.154505-1-gshan@redhat.com>
+ <20220916045135.154505-2-gshan@redhat.com>
+ <YyS78BqsQxKkLOiW@xz-m1.local>
+ <87illlkqfu.wl-maz@kernel.org>
+ <a2e0b9bc-2c67-8683-d722-7298bd65058c@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Content-Language: en-US
-To:     "Wang, Wei W" <wei.w.wang@intel.com>,
-        "Li, Xiaoyao" <xiaoyao.li@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Liang, Kan" <kan.liang@intel.com>,
-        "Kleen, Andi" <andi.kleen@intel.com>
-Cc:     "linux-perf-users@vger.kernel.org" <linux-perf-users@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <20220825085625.867763-1-xiaoyao.li@intel.com>
- <CY5PR11MB6365897E8E6D0B590A298FA0DC769@CY5PR11MB6365.namprd11.prod.outlook.com>
- <815586ac-1eaa-5e38-1e08-492c29d0729d@intel.com>
- <CY5PR11MB63659EBEAEA0E64812E96111DC469@CY5PR11MB6365.namprd11.prod.outlook.com>
- <f7cfb391-c38b-84d2-b2fe-5e289d82862c@linux.intel.com>
- <CY5PR11MB6365676799EBF86B3931D336DC499@CY5PR11MB6365.namprd11.prod.outlook.com>
- <ef391316-cde5-3cda-ff0d-980e8ecc9aef@linux.intel.com>
- <CY5PR11MB636535BE57F8CC07B1B2770DDC499@CY5PR11MB6365.namprd11.prod.outlook.com>
- <4c6a5663-778e-a509-638c-92cfd5315274@linux.intel.com>
- <CY5PR11MB6365EE3B1C4BCED02A1E40D8DC489@CY5PR11MB6365.namprd11.prod.outlook.com>
- <da8fe1d8-8cce-7378-18e8-41fd7009ff8d@linux.intel.com>
- <DS0PR11MB63739F4DA17F30B3162837B9DC4D9@DS0PR11MB6373.namprd11.prod.outlook.com>
- <b3d3fd4c-b191-c4e4-ac95-c46f944c65d6@linux.intel.com>
- <DS0PR11MB6373ACD91938CE70EBADA831DC4D9@DS0PR11MB6373.namprd11.prod.outlook.com>
-From:   "Liang, Kan" <kan.liang@linux.intel.com>
-Subject: Re: [RFC PATCH 0/2] KVM: VMX: Fix VM entry failure on
- PT_MODE_HOST_GUEST while host is using PT
-In-Reply-To: <DS0PR11MB6373ACD91938CE70EBADA831DC4D9@DS0PR11MB6373.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a2e0b9bc-2c67-8683-d722-7298bd65058c@redhat.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Sep 19, 2022 at 09:58:10AM +1000, Gavin Shan wrote:
+> I think Marc's explanation makes sense. It won't make difference in terms
+> of performance. We need to explicitly handle barrier when kvm_test_request()
+> is used. So I prefer to keep the code if Peter agrees.
 
-
-On 2022-09-19 11:22 a.m., Wang, Wei W wrote:
-> On Monday, September 19, 2022 10:41 PM, Liang, Kan wrote:
->> Another fake event? We have to specially handle it in the perf code. I don't
->> think it's a clean way for perf.
-> 
-> We can check the patch later. I think it should be clean, like the LBR side.
-
-I doubt. Perf already specially handles the fake LBR event in several
-places from the core code to the LBR code. It also occupy a reserved
-bit. If there is another choice, I don't think we want to go that way.
-
-> 
->>
->>> - on VMEnter:
->>>   -- perf_disable_event_local(host_event);
->>>   -- perf_enable_event_local(guest_event);
->>> - on VMExit:
->>>   -- perf_disable_event_local(guest_event);
->>>   -- perf_enable_event_local(host_event);
->>
->> Why we cannot use the same way as the perf core driver to switch the MSRs in
->> the VMCS?
-> 
-> The current MSR switching list from VMCS isn’t fast,
-> should be the last resort when really necessary.
-> 
-
-It's a documented way in the SDM. I believe there must be some reason
-Intel introduces it. Since it's an documented (or recommended) way, I
-think we'd better use it if possible.
-
-Since both the PT and the core driver needs to switch MSRs during VMCS,
-it's better to use the same way (function) to handle them.
+No strong opinion here. I keep thinking clear+set look awkward even if it's
+unlikely path to trigger (ring should be recycled when reaching here for
+any sane user app), but if it's already 2:1 then please go ahead. :)
 
 Thanks,
-Kan
 
->>
->> You just need one generic function, perf_guest_get_msrs(), for both PT and
->> core driver. If you have to disable PT explicitly before VMCS, I think you can do
->> it in the PT specific perf_guest_get_msrs().
-> 
-> The disable is done via " Clear IA32_RTIT_CTL" VMExit control.
-> It can ensure PT disabled in time on VMExit, so no need to go through perf_guest_get_msrs.
-> 
-
-
-
+-- 
+Peter Xu
 
