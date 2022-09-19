@@ -2,51 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 91CCB5BD81B
-	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 01:19:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58F235BD81D
+	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 01:19:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229930AbiISXTT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Sep 2022 19:19:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44270 "EHLO
+        id S229774AbiISXTV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Sep 2022 19:19:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230195AbiISXSj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Sep 2022 19:18:39 -0400
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C721850716
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 16:18:18 -0700 (PDT)
-Received: by mail-ej1-x633.google.com with SMTP id y3so2237650ejc.1
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 16:18:18 -0700 (PDT)
+        with ESMTP id S230207AbiISXSl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Sep 2022 19:18:41 -0400
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02DB24DF17
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 16:18:24 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id 29so1405362edv.2
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 16:18:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=/k4I9yFOQcmiC4x/pIxNVj/VFsZVkB/VTnKtzXV6Nqg=;
-        b=HeU8zrtYBI/0x6nYhy30ykBOxV7FJFi9qix+CVX0GQ295jAdVYP99cwpVxn/2LzxCi
-         ZP5HRKIK6CCkoV8ZYaMeoxr7Er2J7tkGFzoZESbBQa3Q/GPx3mVwKz2IoZNjt/UK7KTA
-         +ihVNLs1B8kQsrWVCKS154FLqcTZ7LjxhE5wx61z1x9ykd/cnWa6+EObscXByUSrlnxu
-         2p8uLD9vwG4GAwVM6hnJqUMiO5KALvwOqjrkAiOSaB7w+Ho12rSGreEd514XIyflj9qP
-         8m6Uxp0tRrmxmCRjrG0e2Upp6UcGEKsXugZH9piZvYjMOtG1eklpjW88WsouvJFJCC5o
-         ldSw==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
+        bh=Fjo518UYX1pucjz3VPXRbua9nNVIHRhAk9ua0pzX1XA=;
+        b=lbugUhiXpcHvVHxmNQCd7XhVHqDDxchx16Djox3J75B7ePDdncyCGse6eZA2NqPqFh
+         hr1ilTebkO5lbr+2+TZ5mEGLS4PtyKRFbfCqqAv12AEVAMkQWO0zrazSj3q2ZqeRKBT/
+         NbDJbiJXOnw+DznNgyjbvAx0+B4DavYnJ8efSi50qdYGRhMcVApJ9LYs+43cIJnPnFH9
+         p7WTSOkQVMZ/TBIgKfij+g6XFoQIUWCHughrTftkcd/1hY2CNeeMm/CAqplFQVur0kCT
+         P6Vi6hDAGyycMZR5ghfx4ycMPoY3eP4zAl+AtKcz4IBZGYhSpX7tdpCvm4nrUNQHxaPV
+         fQVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=/k4I9yFOQcmiC4x/pIxNVj/VFsZVkB/VTnKtzXV6Nqg=;
-        b=bDwep0gcvPpk9SuwkEUPHtSdBOx26H71t2t8KiWIPRvVYUwLD5+DjXCdgPnLwseRwM
-         kg4S0BzmkdUd6vNbjxTs53qLISav4mHUn8oRH9UyUkkviajkANCaqR4vd64zjggcyLvp
-         HOBCi+0fO8+ow+LuVYoob5xkNiGYtTj4Xmv77Fr5TEttUKB4MAsy3N72RQFgwzRgDIze
-         bQl3WogPPF+NlsAAFRuiEuSipoC3X59O/KFgLJjMEwO9UeWVq9/LXiKrU1LW8BJ4JxYN
-         KDhQmSNmr8S2VXCGWEpJXEZ1SJ94HGuuZGhHLWK6eCeTUPRaM8X2dhhbLl6wMHjVSayN
-         UlOg==
-X-Gm-Message-State: ACrzQf1NBRITl/jo5yC3IM2mUCU7wz2s2zhOQ4sGhgOoQi+K+wqX3xFu
-        3cwR5vBZ8POAVGbGkNYETgw=
-X-Google-Smtp-Source: AMsMyM6qssf98dEArMM6jpNsUS/ykm1rQJXRhzB+Z5C5spX4oNAkXfl0aR9MWbXenJhowWfNIt1+Yg==
-X-Received: by 2002:a17:907:2c62:b0:77a:e3ce:5ef0 with SMTP id ib2-20020a1709072c6200b0077ae3ce5ef0mr15170276ejc.553.1663629496806;
-        Mon, 19 Sep 2022 16:18:16 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=Fjo518UYX1pucjz3VPXRbua9nNVIHRhAk9ua0pzX1XA=;
+        b=LIMCYERPkBiwYqvBIwRHkGEcxfWNk2EMcyB1/y680w7tjClS8tHXFb7rMlnPx6fc52
+         Ue2v1KVv2gNv843mOIGenXeJ1nL6whbOixRTaaQ2ne0gTbZhaGtahSCIV7lSpUxXRsMW
+         9bvQ4ujpXJtGeokAbd9PYqix3wddkp1g4pWOAxLf2jjF86pErkkZKPICy35LCDFr6dpn
+         9Yr+uVK3api/50TfHMala1NMZLwu8hL0tb+JZNkpChbksVlUqbf8iJcz3Av102W+NcCu
+         CYTsjOz7Vpm6gIGef0P+yFfZ11zKXhuiJAoxU5ifvt7WcrS1J8CA8f8rBC54cDrvWUzt
+         SQoA==
+X-Gm-Message-State: ACrzQf0Z+OxR0asNLvRcI/HYl32wUHPc9zPk3pbAKYIKmmTbKUDElwk7
+        ixCWgRx5KK1gY7DzclfRuHc=
+X-Google-Smtp-Source: AMsMyM59+Un1+bbndkQl90bc+w6Ku/wLNzkfWCb5H+mf7flr0JF2IyQRo4Sr55rK2P8tkNt3yzBwMA==
+X-Received: by 2002:a50:fc9a:0:b0:454:6a56:7d27 with SMTP id f26-20020a50fc9a000000b004546a567d27mr470765edq.73.1663629502405;
+        Mon, 19 Sep 2022 16:18:22 -0700 (PDT)
 Received: from localhost.localdomain (dynamic-078-054-077-055.78.54.pool.telefonica.de. [78.54.77.55])
-        by smtp.gmail.com with ESMTPSA id rn24-20020a170906d93800b00780f6071b5dsm4800926ejb.188.2022.09.19.16.18.10
+        by smtp.gmail.com with ESMTPSA id rn24-20020a170906d93800b00780f6071b5dsm4800926ejb.188.2022.09.19.16.18.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Sep 2022 16:18:16 -0700 (PDT)
+        Mon, 19 Sep 2022 16:18:22 -0700 (PDT)
 From:   Bernhard Beschow <shentey@gmail.com>
 To:     qemu-devel@nongnu.org
 Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
@@ -126,13 +127,14 @@ Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
         Alistair Francis <alistair@alistair23.me>,
         Jason Herne <jjherne@linux.ibm.com>,
         Bernhard Beschow <shentey@gmail.com>
-Subject: [PATCH 0/9] Deprecate sysbus_get_default() and get_system_memory() et. al
-Date:   Tue, 20 Sep 2022 01:17:11 +0200
-Message-Id: <20220919231720.163121-1-shentey@gmail.com>
+Subject: [PATCH 1/9] hw/riscv/sifive_e: Fix inheritance of SiFiveEState
+Date:   Tue, 20 Sep 2022 01:17:12 +0200
+Message-Id: <20220919231720.163121-2-shentey@gmail.com>
 X-Mailer: git-send-email 2.37.3
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20220919231720.163121-1-shentey@gmail.com>
+References: <20220919231720.163121-1-shentey@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -143,174 +145,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In address-spaces.h it can be read that get_system_memory() and=0D
-get_system_io() are temporary interfaces which "should only be used tempora=
-rily=0D
-until a proper bus interface is available". This statement certainly extend=
-s to=0D
-the address_space_memory and address_space_io singletons. This series attem=
-pts=0D
-to stop further proliferation of their use by turning TYPE_SYSTEM_BUS into =
-an=0D
-object-oriented, "proper bus interface" inspired by PCIBus.=0D
-=0D
-While at it, also the main_system_bus singleton is turned into an attribute=
- of=0D
-MachineState. Together, this resolves five singletons in total, making the=
-=0D
-ownership relations much more obvious which helps comprehension.=0D
-=0D
-The series is structured as follows: Patch 1 fixes a memory corruption issu=
-e=0D
-uncovered by running `make check` on the last but one patch of this series.=
-=0D
-Patches 2 and 3 turn the main_system_bus singleton into an attribute of=0D
-MachineState which provides an alternative to sysbus_get_default(). Patches=
- 4-7=0D
-resolve the address space singletons and deprecate the legacy=0D
-get_system_memory() et. al functions. Patch 8 attempts to optimize the new=
-=0D
-implementations of these legacy functions.=0D
-=0D
-Testing done:=0D
-* make check (passes without any issues)=0D
-* make check-avocado (no new issues seem to be introduced compared to maste=
-r)=0D
-=0D
-Bernhard Beschow (9):=0D
-  hw/riscv/sifive_e: Fix inheritance of SiFiveEState=0D
-  exec/hwaddr.h: Add missing include=0D
-  hw/core/sysbus: Resolve main_system_bus singleton=0D
-  hw/ppc/spapr: Fix code style problems reported by checkpatch=0D
-  exec/address-spaces: Wrap address space singletons into functions=0D
-  target/loongarch/cpu: Remove unneeded include directive=0D
-  hw/sysbus: Introduce dedicated struct SysBusState for TYPE_SYSTEM_BUS=0D
-  softmmu/physmem: Let SysBusState absorb memory region and address=0D
-    space singletons=0D
-  exec/address-spaces: Inline legacy functions=0D
-=0D
- accel/hvf/hvf-accel-ops.c            |  2 +-=0D
- accel/kvm/kvm-all.c                  | 12 +++----=0D
- hw/alpha/dp264.c                     |  4 +--=0D
- hw/alpha/typhoon.c                   |  4 +--=0D
- hw/arm/smmu-common.c                 |  4 +--=0D
- hw/arm/smmuv3.c                      | 14 ++++----=0D
- hw/arm/virt.c                        |  2 +-=0D
- hw/char/goldfish_tty.c               |  4 +--=0D
- hw/core/bus.c                        |  5 ++-=0D
- hw/core/loader.c                     |  2 +-=0D
- hw/core/machine.c                    |  3 ++=0D
- hw/core/sysbus.c                     | 24 ++++----------=0D
- hw/dma/pl330.c                       |  2 +-=0D
- hw/dma/rc4030.c                      |  2 +-=0D
- hw/dma/xlnx-zynq-devcfg.c            |  4 +--=0D
- hw/dma/xlnx_dpdma.c                  |  8 ++---=0D
- hw/hppa/machine.c                    |  4 +--=0D
- hw/hyperv/hyperv.c                   |  2 +-=0D
- hw/hyperv/vmbus.c                    |  2 +-=0D
- hw/i386/amd_iommu.c                  | 18 +++++-----=0D
- hw/i386/fw_cfg.c                     |  2 +-=0D
- hw/i386/intel_iommu.c                | 24 +++++++-------=0D
- hw/i386/microvm.c                    |  4 +--=0D
- hw/i386/pc.c                         |  2 +-=0D
- hw/i386/xen/xen-hvm.c                |  4 +--=0D
- hw/ide/ahci.c                        |  2 +-=0D
- hw/ide/macio.c                       | 10 +++---=0D
- hw/intc/apic.c                       |  2 +-=0D
- hw/intc/openpic_kvm.c                |  2 +-=0D
- hw/intc/pnv_xive.c                   |  6 ++--=0D
- hw/intc/pnv_xive2.c                  |  6 ++--=0D
- hw/intc/riscv_aplic.c                |  2 +-=0D
- hw/intc/spapr_xive.c                 |  2 +-=0D
- hw/intc/xive.c                       |  4 +--=0D
- hw/intc/xive2.c                      |  4 +--=0D
- hw/mips/jazz.c                       |  4 +--=0D
- hw/misc/lasi.c                       |  2 +-=0D
- hw/misc/macio/mac_dbdma.c            |  8 ++---=0D
- hw/net/ftgmac100.c                   | 16 ++++-----=0D
- hw/net/i82596.c                      | 24 +++++++-------=0D
- hw/net/imx_fec.c                     | 22 ++++++-------=0D
- hw/net/lasi_i82596.c                 |  2 +-=0D
- hw/net/npcm7xx_emc.c                 | 14 ++++----=0D
- hw/openrisc/boot.c                   |  2 +-=0D
- hw/pci-host/dino.c                   |  6 ++--=0D
- hw/pci-host/pnv_phb3.c               |  6 ++--=0D
- hw/pci-host/pnv_phb3_msi.c           |  6 ++--=0D
- hw/pci-host/pnv_phb4.c               | 10 +++---=0D
- hw/pci/pci.c                         |  2 +-=0D
- hw/ppc/pnv_psi.c                     |  2 +-=0D
- hw/ppc/spapr.c                       |  4 +--=0D
- hw/ppc/spapr_events.c                |  2 +-=0D
- hw/ppc/spapr_hcall.c                 |  4 +--=0D
- hw/ppc/spapr_iommu.c                 |  4 +--=0D
- hw/ppc/spapr_ovec.c                  |  8 ++---=0D
- hw/ppc/spapr_rtas.c                  |  2 +-=0D
- hw/remote/iommu.c                    |  2 +-=0D
- hw/remote/message.c                  |  4 +--=0D
- hw/remote/proxy-memory-listener.c    |  2 +-=0D
- hw/riscv/boot.c                      |  6 ++--=0D
- hw/riscv/sifive_e.c                  |  2 +-=0D
- hw/riscv/sifive_u.c                  |  2 +-=0D
- hw/riscv/virt.c                      |  2 +-=0D
- hw/s390x/css.c                       | 16 ++++-----=0D
- hw/s390x/ipl.h                       |  2 +-=0D
- hw/s390x/s390-pci-bus.c              |  4 +--=0D
- hw/s390x/s390-pci-inst.c             | 10 +++---=0D
- hw/s390x/s390-skeys.c                |  2 +-=0D
- hw/s390x/virtio-ccw.c                | 10 +++---=0D
- hw/sd/sdhci.c                        |  2 +-=0D
- hw/sh4/r2d.c                         |  4 +--=0D
- hw/sparc/sun4m.c                     |  2 +-=0D
- hw/sparc/sun4m_iommu.c               |  4 +--=0D
- hw/sparc64/sun4u_iommu.c             |  4 +--=0D
- hw/timer/hpet.c                      |  2 +-=0D
- hw/usb/hcd-ehci-pci.c                |  2 +-=0D
- hw/usb/hcd-ehci-sysbus.c             |  2 +-=0D
- hw/usb/hcd-ohci.c                    |  2 +-=0D
- hw/usb/hcd-xhci-sysbus.c             |  2 +-=0D
- hw/vfio/ap.c                         |  2 +-=0D
- hw/vfio/ccw.c                        |  2 +-=0D
- hw/vfio/common.c                     |  8 ++---=0D
- hw/vfio/platform.c                   |  2 +-=0D
- hw/virtio/vhost-vdpa.c               |  2 +-=0D
- hw/virtio/vhost.c                    |  2 +-=0D
- hw/virtio/virtio-bus.c               |  4 +--=0D
- hw/virtio/virtio-iommu.c             |  6 ++--=0D
- hw/virtio/virtio-pci.c               |  2 +-=0D
- hw/xen/xen_pt.c                      |  4 +--=0D
- include/exec/address-spaces.h        | 49 +++++++++++++++++++++++-----=0D
- include/exec/hwaddr.h                |  1 +=0D
- include/hw/boards.h                  |  2 ++=0D
- include/hw/elf_ops.h                 |  4 +--=0D
- include/hw/misc/macio/macio.h        |  2 +-=0D
- include/hw/ppc/spapr.h               |  6 ++--=0D
- include/hw/ppc/vof.h                 |  4 +--=0D
- include/hw/riscv/sifive_e.h          |  3 +-=0D
- include/hw/sysbus.h                  | 14 ++++++--=0D
- monitor/misc.c                       |  4 +--=0D
- softmmu/ioport.c                     | 12 +++----=0D
- softmmu/memory_mapping.c             |  2 +-=0D
- softmmu/physmem.c                    | 41 ++++++++---------------=0D
- target/arm/hvf/hvf.c                 |  4 +--=0D
- target/arm/kvm.c                     |  4 +--=0D
- target/avr/helper.c                  |  8 ++---=0D
- target/i386/hax/hax-all.c            |  2 +-=0D
- target/i386/hax/hax-mem.c            |  2 +-=0D
- target/i386/hvf/hvf.c                |  2 +-=0D
- target/i386/hvf/vmx.h                |  2 +-=0D
- target/i386/hvf/x86_mmu.c            |  6 ++--=0D
- target/i386/nvmm/nvmm-all.c          |  4 +--=0D
- target/i386/sev.c                    |  4 +--=0D
- target/i386/tcg/sysemu/misc_helper.c | 12 +++----=0D
- target/i386/whpx/whpx-all.c          |  4 +--=0D
- target/loongarch/cpu.h               |  1 -=0D
- target/s390x/diag.c                  |  2 +-=0D
- target/s390x/mmu_helper.c            |  2 +-=0D
- target/s390x/sigp.c                  |  2 +-=0D
- target/xtensa/dbg_helper.c           |  2 +-=0D
- tests/qtest/fuzz/generic_fuzz.c      |  4 +--=0D
- 120 files changed, 355 insertions(+), 328 deletions(-)=0D
-=0D
--- =0D
-2.37.3=0D
-=0D
+SiFiveEState inherits from SysBusDevice while it's TypeInfo claims it to
+inherit from TYPE_MACHINE. This is an inconsistency which can cause
+undefined behavior such as memory corruption.
+
+Change SiFiveEState to inherit from MachineState since it is registered
+as a machine.
+
+Signed-off-by: Bernhard Beschow <shentey@gmail.com>
+---
+ include/hw/riscv/sifive_e.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/hw/riscv/sifive_e.h b/include/hw/riscv/sifive_e.h
+index 83604da805..d738745925 100644
+--- a/include/hw/riscv/sifive_e.h
++++ b/include/hw/riscv/sifive_e.h
+@@ -22,6 +22,7 @@
+ #include "hw/riscv/riscv_hart.h"
+ #include "hw/riscv/sifive_cpu.h"
+ #include "hw/gpio/sifive_gpio.h"
++#include "hw/boards.h"
+ 
+ #define TYPE_RISCV_E_SOC "riscv.sifive.e.soc"
+ #define RISCV_E_SOC(obj) \
+@@ -41,7 +42,7 @@ typedef struct SiFiveESoCState {
+ 
+ typedef struct SiFiveEState {
+     /*< private >*/
+-    SysBusDevice parent_obj;
++    MachineState parent_obj;
+ 
+     /*< public >*/
+     SiFiveESoCState soc;
+-- 
+2.37.3
+
