@@ -2,69 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 68E295BD527
-	for <lists+kvm@lfdr.de>; Mon, 19 Sep 2022 21:21:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C7CB5BD536
+	for <lists+kvm@lfdr.de>; Mon, 19 Sep 2022 21:29:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229473AbiISTV1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Sep 2022 15:21:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50686 "EHLO
+        id S229580AbiIST3U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Sep 2022 15:29:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229551AbiISTVZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Sep 2022 15:21:25 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 763103ECDD
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 12:21:24 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id e68so578230pfe.1
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 12:21:24 -0700 (PDT)
+        with ESMTP id S229624AbiIST3T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Sep 2022 15:29:19 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62CB946222
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 12:29:18 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id fv3so720837pjb.0
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 12:29:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=+zKTufCzCk2dGKk9eVRPtRirzPeAiEqvG0llJqEDUAE=;
-        b=skU2BCmPbpEXLeou3qOCOdVl/Zxw8ziKV078rXYWNID4opIQvO2RYdgLFCE/b3c05M
-         rkF8MSULZw0QZiqV6shXe5rr+xfcSVWXwfUevacwb9kFob6vUPzGGQvxIp6kiMQ08xFi
-         R6QFHgHzPu2KRwq16uFytHj4Mu070U8gyAlWDN0BTA4FQx2743G9/tLnAM/V83DqYjRy
-         dtjYSCVORPVNC4AMnnL+fT4YNTIS4in7LZONv+ULB09/HVnpNk4HDDv4SY6c4qKGc8a3
-         rm8FIG2Q4zfbYCxhGTweBW7LAKTomPDkvyrL0JsgGQlj5HkvQOcwJ8EOf2zvrH9Iv4us
-         W0Mg==
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date;
+        bh=Dmji6WgZ7xPVoBunBQhcBqAmOM/CFg7OpLk7cNx+uc8=;
+        b=d46SJWkeiDSnWutSydUXgew9qteyyKBJCMX7dT5wUkhHj4yXZv4QSaRTIP4boV4OZS
+         mqqvUXpLbkFGFkEiK9eCv8NFZWCoTAo9PrUSCWWjDS0J9ObVikPpB8KA8INU02Fx2geN
+         4gv66dh4SsimsRuPojY+fAYWWpG3lwY4HG58utPl9/e/tqA0+l/CHvTfGY0IZc0DysFu
+         VbKS1pLZ81rhkZy7gjWxVsgKyRcU9kksvq7WFw14UIMaVQOsLb0ysekH4z9BDrzhYOZG
+         3vgc7MuKNxAdMSb9tcc1X3lI4BIDOJkleeXpa1nQdnQOctRTynfDks7LaEow+Swb+fNm
+         /NSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=+zKTufCzCk2dGKk9eVRPtRirzPeAiEqvG0llJqEDUAE=;
-        b=Ep+LbUocB8xEWnw4IXFGUhY/EU4inpTRb69ro5Dbx1p5Z31SwfGbOlCC0WW1A/khlT
-         cOSsXrW+ApOswKcQCct6HaX8tiltv3FYRq7y+e8SLpOlVkRrYSyv+A1cSLN3uosWf137
-         6bXJv0G2pwbA7PcKH+TpQX04Ps+O7c/p/TFBe/QFGLVMjzJ7E8iymSmBTf/M2IqBgjsE
-         Rs49LNMCsSPjwKx8BMM5wLiLPZfcTykNOsQli4BVoeic3R8JwLgK+y87OnIWYktKbj4E
-         y852Dxt0OB7jrYVUnn3sg8qCGNOR8q1B8gGc0ZO/dX/XTOhN/AHTYax+r4kPz9oJHRFP
-         YTnA==
-X-Gm-Message-State: ACrzQf28o/+A/AMc0X6piRRYkolPiLK5afnmNUBgeXDcFJqvapC1ryHN
-        V11ppLoSZTSMuY+Y3lVkq/y69Q==
-X-Google-Smtp-Source: AMsMyM6fhlg0EO/LevOrUAKUlsIv6YoQ5Sw5acnMyMW6J9CaGWOqAfwa7gXvoHZpMZrWWc1vqU4Arw==
-X-Received: by 2002:a62:d403:0:b0:54b:a7e4:909c with SMTP id a3-20020a62d403000000b0054ba7e4909cmr15583864pfh.61.1663615283696;
-        Mon, 19 Sep 2022 12:21:23 -0700 (PDT)
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=Dmji6WgZ7xPVoBunBQhcBqAmOM/CFg7OpLk7cNx+uc8=;
+        b=hz3twXzUG7VzL2dF1keOqLFh3xSIds5O8pdvWZRm/793uiw5eBvB7xb1CZYYM0zQIv
+         XyTuK8NK7fOdbwfpsiFJyTaEYBHRDwthfSMGUEF5xg4QDaTN5QOXbNvLLzqh6WzZXFEV
+         3ifuF8lml/X4Wff8mEhxj+DqPbx7iOl8HJyGTcI3dSvUXXhqR5RogAyqmhbMR0T+hZcr
+         QZ8Sm66+c6AmtpZynmnxqCdLLcueT1XMkNhC14uYwROuWOGk3gXUyXjquhED/fTEYc6/
+         CjKe3ItqxtXMxda83+u45O7fAb9gimXp0kJyoJ7xfv/TAg7QNZWeXJ5ANW5P96ni8Tnk
+         b3Wg==
+X-Gm-Message-State: ACrzQf3Agxa8MdjQ2LnNRAXj8LQGiiN6cMWLghY3+i5nVCGSv3rSLziI
+        fMrNgGJsNu7o7Va2Wc5MZsHOMg==
+X-Google-Smtp-Source: AMsMyM5Oqrj1KGICJ2V8qLt8Rn5ylazcb1hHMnzGoS7sR/Pu1B8N4zBf1uOM+cWrKxXEfgatHaqV0g==
+X-Received: by 2002:a17:90b:1e49:b0:203:38c:365a with SMTP id pi9-20020a17090b1e4900b00203038c365amr33037441pjb.133.1663615757758;
+        Mon, 19 Sep 2022 12:29:17 -0700 (PDT)
 Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id l63-20020a622542000000b0054b5239f7fesm7365636pfl.210.2022.09.19.12.21.22
+        by smtp.gmail.com with ESMTPSA id c199-20020a624ed0000000b0053ea0e5556esm20738942pfb.186.2022.09.19.12.29.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Sep 2022 12:21:22 -0700 (PDT)
-Date:   Mon, 19 Sep 2022 12:21:19 -0700
+        Mon, 19 Sep 2022 12:29:17 -0700 (PDT)
+Date:   Mon, 19 Sep 2022 12:29:13 -0700
 From:   Ricardo Koller <ricarkol@google.com>
-To:     Sean Christopherson <seanjc@google.com>
+To:     Oliver Upton <oliver.upton@linux.dev>
 Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         andrew.jones@linux.dev, pbonzini@redhat.com, maz@kernel.org,
-        alexandru.elisei@arm.com, eric.auger@redhat.com, oupton@google.com,
+        seanjc@google.com, alexandru.elisei@arm.com, eric.auger@redhat.com,
         reijiw@google.com, rananta@google.com, bgardon@google.com,
         dmatlack@google.com, axelrasmussen@google.com
-Subject: Re: [PATCH v6 07/13] KVM: selftests: Change ____vm_create() to take
- struct kvm_vm_mem_params
-Message-ID: <YyjBL+t1SXdRfij1@google.com>
+Subject: Re: [PATCH v6 09/13] KVM: selftests: aarch64: Add
+ aarch64/page_fault_test
+Message-ID: <YyjDCWCJ5j8c6T2h@google.com>
 References: <20220906180930.230218-1-ricarkol@google.com>
- <20220906180930.230218-8-ricarkol@google.com>
- <YyiYqjjhlB8LUVB/@google.com>
+ <20220906180930.230218-10-ricarkol@google.com>
+ <YyZDBIQsux1g97zl@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <YyiYqjjhlB8LUVB/@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YyZDBIQsux1g97zl@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -76,322 +79,102 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 19, 2022 at 04:28:26PM +0000, Sean Christopherson wrote:
-> On Tue, Sep 06, 2022, Ricardo Koller wrote:
-> > @@ -637,19 +658,45 @@ vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
-> >  			      vm_paddr_t paddr_min, uint32_t memslot);
-> >  vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm);
-> >  
-> > +struct kvm_vm_mem_params {
-> > +	enum vm_guest_mode mode;
-> > +
-> > +	struct {
-> > +		enum vm_mem_backing_src_type src_type;
-> > +		uint64_t guest_paddr;
-> > +		/*
-> > +		 * KVM region slot (same meaning as in struct
-> > +		 * kvm_userspace_memory_region).
-> > +		 */
-> > +		uint32_t slot;
-> > +		uint64_t npages;
-> > +		uint32_t flags;
-> > +		bool enabled;
+On Sat, Sep 17, 2022 at 09:58:28PM +0000, Oliver Upton wrote:
+> On Tue, Sep 06, 2022 at 06:09:26PM +0000, Ricardo Koller wrote:
+> > Add a new test for stage 2 faults when using different combinations of
+> > guest accesses (e.g., write, S1PTW), backing source type (e.g., anon)
+> > and types of faults (e.g., read on hugetlbfs with a hole). The next
+> > commits will add different handling methods and more faults (e.g., uffd
+> > and dirty logging). This first commit starts by adding two sanity checks
+> > for all types of accesses: AF setting by the hw, and accessing memslots
+> > with holes.
+> > 
+> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > 
-> "enabled" is unnecessary, just have ____vm_create() skip over regions with npages=0.
-> Likely ends up being a moot point though.
+> Hey Ricardo,
 > 
-> > +	} region[NR_MEM_REGIONS];
-> > +
-> > +	/* Each region type points to a region in the above array. */
-> > +	uint16_t region_idx[NR_MEM_REGIONS];
+> You'll need to update .gitignore for this patch. Additionally, building
+> this test throws the following compiler warning:
 > 
-> Eww.  This is going to be super confusing and it's one more thing for tests to
-> screw up.  And open coding the indices for region[] is beyond gross.
+> In function ‘load_exec_code_for_test’,
+>     inlined from ‘run_test’ at aarch64/page_fault_test.c:745:2:
+> aarch64/page_fault_test.c:545:9: warning: array subscript ‘long unsigned int[0]’ is partly outside array bounds of ‘unsigned char[1]’ [-Warray-bounds]
+>   545 |         memcpy(code, c, 8);
+>       |         ^~~~~~~~~~~~~~~~~~
 > 
-> > +};
-> > +
-> > +extern struct kvm_vm_mem_params kvm_vm_mem_default;
-> > +
-> >  /*
-> >   * ____vm_create() does KVM_CREATE_VM and little else.  __vm_create() also
-> >   * loads the test binary into guest memory and creates an IRQ chip (x86 only).
-> >   * __vm_create() does NOT create vCPUs, @nr_runnable_vcpus is used purely to
-> >   * calculate the amount of memory needed for per-vCPU data, e.g. stacks.
-> >   */
-> > -struct kvm_vm *____vm_create(enum vm_guest_mode mode, uint64_t nr_pages);
-> > +struct kvm_vm *____vm_create(struct kvm_vm_mem_params *mem_params);
-> >  struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
-> >  			   uint64_t nr_extra_pages);
-> >  
-> >  static inline struct kvm_vm *vm_create_barebones(void)
-> >  {
-> > -	return ____vm_create(VM_MODE_DEFAULT, 0);
-> > +	struct kvm_vm_mem_params params_wo_memslots = {
-> > +		.mode = kvm_vm_mem_default.mode,
-> > +	};
-> > +
-> > +	return ____vm_create(&params_wo_memslots);
-> 
-> Very related to the above complaints, this is rather ugly.  I liked the idea of
-> passing a struct to __vm_create(), but passing it to ____vm_create() feels extremely
-> forced.
-> 
-> In an ideal world, my preference would still be to modify __vm_create() to take the
-> struct so that a test that wants to utilize different memslots doesn't need to
-> manually duplicate all the other stuff in __vm_create(), but that might end up
-> being too forced as well.  For now, I'm ok punting on that so the page_fault_test
-> can get merged.
-> 
-> Looking at this with fresh eyes, there's simply no reason ____vm_create() should be
-> creating memslots.  If this series first moves the memslot creation into __vm_create()
-> where it belongs (patch below), then there's no need to force ____vm_create() to take
-> a struct.  And if we punt on refactoring __vm_create(), then there's no need to
-> add kvm_vm_mem_default and no real need to add struct kvm_vm_mem_params either.
+> I've fixed both of these in the appended diff, feel free to squash.
 
-I think I prefer option A below. And I will take the offer of punting on
-refactoring __vm_create() for after page_fault_test.
-
-Having a struct would be nice, as that will allow tests to do things
-like: run with all these combinations of (backing_src, regions, ...).
-
-Thanks for the review,
-Ricardo
+Thanks, will do that.
 
 > 
-> If/when there's a second test that wants fine-grained control over memslots then
-> we can figure out a proper API to share between page_fault_test and whatever the
-> new test is, but for now if page_fault_test is going to call ____vm_create()
-> directly, then I think it's easier to forego the common API and just have page_fault_test
-> and __vm_create() open code setting vm->memslots.
+> --
+> Thanks,
+> Oliver
 > 
-> Alternatively, if we really want a common API right away, then we can add a helper
-> to populate the memory region + vm->memslots.
-> 
-> Option A (open code):
-> 
-> struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
-> 			   uint64_t nr_extra_pages)
-> {
-> 	uint64_t nr_pages = vm_nr_pages_required(mode, nr_runnable_vcpus,
-> 						 nr_extra_pages);
-> 	struct kvm_vm *vm;
-> 	int i;
-> 
-> 	vm = ____vm_create(mode);
-> 
-> 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, 0, nr_pages, 0);
-> 
-> 	for (i = 0; i < NR_MEM_REGIONS; i++)
-> 		vm->memslots[i] = 0;
-> 
-> 	kvm_vm_elf_load(vm, program_invocation_name);
-> 
-> #ifdef __x86_64__
-> 	vm_create_irqchip(vm);
-> #endif
-> 	return vm;
-> }
-> 
-> ...
-> 
-> enum pf_test_memslots {
-> 	CODE_MEMSLOT,
-> 	PAGE_TABLE_MEMSLOT,
-> 	DATA_MEMSLOT,
-> }
-> 
-> /* Create a code memslot at pfn=0, and data and PT ones at max_gfn. */
-> static void setup_memslots(struct kvm_vm *vm, struct test_params *p)
-> {
-> 	uint64_t backing_src_pagesz = get_backing_src_pagesz(p->src_type);
-> 	uint64_t guest_page_size = vm_guest_mode_params[mode].page_size;
-> 	uint64_t max_gfn = get_max_gfn(mode);
-> 	/* Enough for 2M of code when using 4K guest pages. */
-> 	uint64_t code_npages = 512;
-> 	uint64_t pt_size, data_size, data_gpa;
-> 
-> 	/*
-> 	 * This test requires 1 pgd, 2 pud, 4 pmd, and 6 pte pages when using
-> 	 * VM_MODE_P48V48_4K. Note that the .text takes ~1.6MBs.  That's 13
-> 	 * pages. VM_MODE_P48V48_4K is the mode with most PT pages; let's use
-> 	 * twice that just in case.
-> 	 */
-> 	pt_size = 26 * guest_page_size;
-> 
-> 	/* memslot sizes and gpa's must be aligned to the backing page size */
-> 	pt_size = align_up(pt_size, backing_src_pagesz);
-> 	data_size = align_up(guest_page_size, backing_src_pagesz);
-> 	data_gpa = (max_gfn * guest_page_size) - data_size;
-> 	data_gpa = align_down(data_gpa, backing_src_pagesz);
-> 
-> 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, CODE_MEMSLOT,
-> 				    code_npages, 0);
-> 	vm->memslots[MEM_REGION_CODE] = CODE_MEMSLOT;
-> 
-> 	vm_userspace_mem_region_add(vm, p->src_type, data_gpa - pt_size,
-> 				    PAGE_TABLE_MEMSLOT, pt_size / guest_page_size,
-> 				    p->test_desc->pt_memslot_flags);
-> 	vm->memslots[MEM_REGION_PT] = PAGE_TABLE_MEMSLOT;
-> 
-> 	vm_userspace_mem_region_add(vm, p->src_type, data_gpa, DATA_MEMSLOT,
-> 				    data_size / guest_page_size,
-> 				    p->test_desc->data_memslot_flags);
-> 	vm->memslots[MEM_REGION_PT] = DATA_MEMSLOT;
-> }
-> 
-> 
-> static void run_test(enum vm_guest_mode mode, void *arg)
-> {
-> 	struct test_params *p = (struct test_params *)arg;
-> 	struct test_desc *test = p->test_desc;
-> 	struct kvm_vm *vm;
-> 	struct kvm_vcpu *vcpu;
-> 	struct uffd_desc *pt_uffd, *data_uffd;
-> 
-> 	print_test_banner(mode, p);
-> 
-> 	vm = ____vm_create(mode);
-> 	setup_memslots(vm, p);
-> 	kvm_vm_elf_load(vm, program_invocation_name);
-> 	vcpu = vm_vcpu_add(vm, 0, guest_code);
-> 
-> 	...
-> }
-> 
-> Option B (helper):
-> 
-> enum kvm_mem_region_mask {
-> 	MEM_REGION_CODE_MASK	= BIT(MEM_REGION_CODE),
-> 	MEM_REGION_PT_MASK	= BIT(MEM_REGION_PT),
-> 	MEM_REGION_DATA_MASK	= BIT(MEM_REGION_DATA),
-> 
-> 	MEM_REGION_ALL_MASK	= MEM_REGION_CODE_MASK |
-> 				  MEM_REGION_PT_MASK |
-> 				  MEM_REGION_DATA_MASK,
-> };
-> 
-> void kvm_vm_add_mem_region(struct kvm_vm *vm, enum kvm_mem_region_mask type_mask,
-> 			   enum vm_mem_backing_src_type src_type, uint32_t slot,
-> 			   uint64_t guest_paddr, uint64_t nr_pages, uint32_t flags)
-> {
-> 	int i;
-> 
-> 	vm_userspace_mem_region_add(vm, src_type, guest_paddr, slot, nr_pages, 0);
-> 
-> 	for (i = 0; i < NR_MEM_REGIONS; i++) {
-> 		if (BIT(i) & type_mask)
-> 			vm->memslots[i] = slot;
-> 	}
-> }
-> 
-> struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
-> 			   uint64_t nr_extra_pages)
-> {
-> 	uint64_t nr_pages = vm_nr_pages_required(mode, nr_runnable_vcpus,
-> 						 nr_extra_pages);
-> 	struct kvm_vm *vm;
-> 	int i;
-> 
-> 	vm = ____vm_create(mode);
-> 
-> 	kvm_vm_add_mem_region(vm, MEM_REGION_ALL_MASK, VM_MEM_SRC_ANONYMOUS, 0,
-> 			      0, nr_pages, 0);
-> 
-> 	kvm_vm_elf_load(vm, program_invocation_name);
-> 
-> #ifdef __x86_64__
-> 	vm_create_irqchip(vm);
-> #endif
-> 	return vm;
-> }
-> 
-> static void setup_memslots(struct kvm_vm *vm, struct test_params *p)
-> {
-> 	...
-> 
-> 	kvm_vm_add_mem_region(vm, MEM_REGION_CODE_MASK, VM_MEM_SRC_ANONYMOUS,
-> 			      CODE_MEMSLOT, 0, code_npages, 0);
-> 
-> 	kvm_vm_add_mem_region(vm, MEM_REGION_PT_MASK p->src_type,
-> 			      PAGE_TABLE_MEMSLOT, data_gpa - pt_size,
-> 			      pt_size / guest_page_size,
-> 			      p->test_desc->pt_memslot_flags);
-> 
-> 	kvm_vm_add_mem_region(vm, MEM_REGION_DATA_MASK, p->src_type,
-> 			      DATA_MEMSLOT, data_gpa,
-> 			      data_size / guest_page_size,
-> 			      p->test_desc->data_memslot_flags);
-> }
+> From 0a5d3710b9043ae8fe5a9d7cc48eb854d1b7b746 Mon Sep 17 00:00:00 2001
+> From: Oliver Upton <oliver.upton@linux.dev>
+> Date: Sat, 17 Sep 2022 21:38:11 +0000
+> Subject: [PATCH] fixup! KVM: selftests: aarch64: Add aarch64/page_fault_test
 > 
 > ---
->  .../testing/selftests/kvm/include/kvm_util_base.h |  4 ++--
->  tools/testing/selftests/kvm/lib/kvm_util.c        | 15 +++++++--------
->  2 files changed, 9 insertions(+), 10 deletions(-)
+>  tools/testing/selftests/kvm/.gitignore               |  1 +
+>  .../testing/selftests/kvm/aarch64/page_fault_test.c  | 12 +++---------
+>  2 files changed, 4 insertions(+), 9 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> index 24fde97f6121..107cb87908f8 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -642,13 +642,13 @@ vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm);
->   * __vm_create() does NOT create vCPUs, @nr_runnable_vcpus is used purely to
->   * calculate the amount of memory needed for per-vCPU data, e.g. stacks.
+> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> index d625a3f83780..7a9022cfa033 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -3,6 +3,7 @@
+>  /aarch64/debug-exceptions
+>  /aarch64/get-reg-list
+>  /aarch64/hypercalls
+> +/aarch64/page_fault_test
+>  /aarch64/psci_test
+>  /aarch64/vcpu_width_config
+>  /aarch64/vgic_init
+> diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> index 60a6a8a45fa4..5ef2a7b941ec 100644
+> --- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> @@ -512,7 +512,7 @@ void fail_vcpu_run_mmio_no_syndrome_handler(int ret)
+>  	events.fail_vcpu_runs += 1;
+>  }
+>  
+> -extern unsigned char __exec_test;
+> +extern uint64_t __exec_test;
+>  
+>  void noinline __return_0x77(void)
+>  {
+> @@ -526,7 +526,7 @@ void noinline __return_0x77(void)
 >   */
-> -struct kvm_vm *____vm_create(enum vm_guest_mode mode, uint64_t nr_pages);
-> +struct kvm_vm *____vm_create(enum vm_guest_mode mode);
->  struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
->  			   uint64_t nr_extra_pages);
->  
->  static inline struct kvm_vm *vm_create_barebones(void)
+>  static void load_exec_code_for_test(struct kvm_vm *vm)
 >  {
-> -	return ____vm_create(VM_MODE_DEFAULT, 0);
-> +	return ____vm_create(VM_MODE_DEFAULT);
+> -	uint64_t *code, *c;
+> +	uint64_t *code;
+>  	struct userspace_mem_region *region;
+>  	void *hva;
+>  
+> @@ -536,13 +536,7 @@ static void load_exec_code_for_test(struct kvm_vm *vm)
+>  	assert(TEST_EXEC_GVA - TEST_GVA);
+>  	code = hva + 8;
+>  
+> -	/*
+> -	 * We need the cast to be separate in order for the compiler to not
+> -	 * complain with: "‘memcpy’ forming offset [1, 7] is out of the bounds
+> -	 * [0, 1] of object ‘__exec_test’ with type ‘unsigned char’"
+> -	 */
+> -	c = (uint64_t *)&__exec_test;
+> -	memcpy(code, c, 8);
+> +	*code = __exec_test;
+
+I remember trying many ways of getting the compiler to not complain, I
+must have tried this (wonder what happened). Anyway, gcc and clang are
+happy with it.
+
 >  }
 >  
->  static inline struct kvm_vm *vm_create(uint32_t nr_runnable_vcpus)
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 9889fe0d8919..c761422faa17 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -143,13 +143,10 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
->  _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
->  	       "Missing new mode params?");
->  
-> -struct kvm_vm *____vm_create(enum vm_guest_mode mode, uint64_t nr_pages)
-> +struct kvm_vm *____vm_create(enum vm_guest_mode mode)
->  {
->  	struct kvm_vm *vm;
->  
-> -	pr_debug("%s: mode='%s' pages='%ld'\n", __func__,
-> -		 vm_guest_mode_string(mode), nr_pages);
-> -
->  	vm = calloc(1, sizeof(*vm));
->  	TEST_ASSERT(vm != NULL, "Insufficient Memory");
->  
-> @@ -245,9 +242,6 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode, uint64_t nr_pages)
->  
->  	/* Allocate and setup memory for guest. */
->  	vm->vpages_mapped = sparsebit_alloc();
-> -	if (nr_pages != 0)
-> -		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-> -					    0, 0, nr_pages, 0);
->  
->  	return vm;
->  }
-> @@ -294,7 +288,12 @@ struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
->  						 nr_extra_pages);
->  	struct kvm_vm *vm;
->  
-> -	vm = ____vm_create(mode, nr_pages);
-> +	pr_debug("%s: mode='%s' pages='%ld'\n", __func__,
-> +		 vm_guest_mode_string(mode), nr_pages);
-> +
-> +	vm = ____vm_create(mode);
-> +
-> +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, 0, nr_pages, 0);
->  
->  	kvm_vm_elf_load(vm, program_invocation_name);
->  
-> 
-> base-commit: 372d07084593dc7a399bf9bee815711b1fb1bcf2
+>  static void setup_abort_handlers(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
 > -- 
+> 2.37.3.968.ga6b4b080e4-goog
 > 
