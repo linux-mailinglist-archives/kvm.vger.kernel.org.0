@@ -2,93 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7A4045BCA34
-	for <lists+kvm@lfdr.de>; Mon, 19 Sep 2022 13:04:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B919D5BCD75
+	for <lists+kvm@lfdr.de>; Mon, 19 Sep 2022 15:43:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229725AbiISLEn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Sep 2022 07:04:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39568 "EHLO
+        id S230457AbiISNnS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Sep 2022 09:43:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229777AbiISLEk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Sep 2022 07:04:40 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0E582AC2
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 04:04:39 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S230230AbiISNnP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Sep 2022 09:43:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2833611C3A
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 06:43:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663594993;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XAQ4C8p526IwfywWHvDt2bP3t+cfJKiAuugWFxjBeBk=;
+        b=XEe3RghFCqbMNEeTEBMpfUJG7+enKiKy19z3Rnft3whJSLGy1jjbMsmasKcyTHQwm1eUot
+        zfAXVkVpA0tFUi/HjIGpsfr0ukeT+RqyCLbuqQInyl89EpwMof6PtW7u9ohBce7o65EPQI
+        iMF/pCTdgXZNdAQggT7g3Krjf+1wLLo=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-175-m7uMEVL3PEO3rwyjHKygLg-1; Mon, 19 Sep 2022 09:43:10 -0400
+X-MC-Unique: m7uMEVL3PEO3rwyjHKygLg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A26E4B811D3
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 11:04:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4D21CC43470
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 11:04:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1663585477;
-        bh=HM935FArdOaEXEuUgrKYGZ02LXGRwd+t6bwhIExoFpU=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=rOK7gmyhxR81jDWQgaZvN9RvG8g2UzG2YV9Q6eb9r4PxbeMx7px6uxkXbeNqKa154
-         nxGu6Z4RNRG4UZkmGHPbKs7ig7BguGtfk0hkp1TkJolV+EU9HWjp+sJ4U46C8/eVQo
-         nCjanNVaXCEEmReg2GnPth3Ay9uXnlBcOV3d3rrGlHFUyY+dIupMsZQbSbnutDCh7f
-         TA+guzEFTrqXqaXbe0DhsCICal6NmN5DHNKSvHQLI0zUs+z38GMyi3a4UETFhZzBHH
-         s7M6YBwm9sxCc9ARRhcybOcT6TVaexKOrQYJMVHBFW4DcBABAys44+1pZ5Ss2u+dOp
-         2b4Z7kRrLlBJQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 2837BC433EA; Mon, 19 Sep 2022 11:04:37 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216498] Can't load kvmgt anymore (works with 5.18)
-Date:   Mon, 19 Sep 2022 11:04:36 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: regressions@leemhuis.info
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-216498-28872-jgPELWIxVV@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216498-28872@https.bugzilla.kernel.org/>
-References: <bug-216498-28872@https.bugzilla.kernel.org/>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DB7301C0BC6D;
+        Mon, 19 Sep 2022 13:43:08 +0000 (UTC)
+Received: from starship (unknown [10.40.192.163])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 681AD1121314;
+        Mon, 19 Sep 2022 13:43:02 +0000 (UTC)
+Message-ID: <ec4b176036d33ad99fceb43b104cf9be8aca105a.camel@redhat.com>
+Subject: Re: [PATCH v2 0/5] x86: cpuid: improve support for broken CPUID
+ configurations
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Jane Malalane <jane.malalane@citrix.com>,
+        Kees Cook <keescook@chromium.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        linux-perf-users@vger.kernel.org,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
+Date:   Mon, 19 Sep 2022 16:43:00 +0300
+In-Reply-To: <4a327f06f6e5da6f3badb5ccf80d22a5c9e18b97.camel@redhat.com>
+References: <20220718141123.136106-1-mlevitsk@redhat.com>
+         <fad05f161cc6425d8c36fb6322de2bbaa683dcb3.camel@redhat.com>
+         <4a327f06f6e5da6f3badb5ccf80d22a5c9e18b97.camel@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216498
+On Mon, 2022-08-01 at 19:05 +0300, Maxim Levitsky wrote:
+> On Thu, 2022-07-28 at 10:30 +0300, Maxim Levitsky wrote:
+> > On Mon, 2022-07-18 at 17:11 +0300, Maxim Levitsky wrote:
+> > > This patch series aims to harden the cpuid code against the case when
+> > > the hypervisor exposes a broken CPUID configuration to the guest,
+> > > in the form of having a feature disabled but not features that depend on it.
+> > > 
+> > > This is the more generic way to fix kernel panic in aes-ni kernel driver,
+> > > which was triggered by CPUID configuration in which AVX is disabled but
+> > > not AVX2.
+> > > 
+> > > https://lore.kernel.org/all/20211103145231.GA4485@gondor.apana.org.au/T/
+> > > 
+> > > This was tested by booting a guest with AVX disabled and not AVX2,
+> > > and observing that both a warning is now printed in dmesg, and
+> > > that avx2 is gone from /proc/cpuinfo.
+> > > 
+> > > V2:
+> > > 
+> > > I hopefully addressed all the (very good) review feedback.
+> > > 
+> > > Best regards,
+> > > 	Maxim Levitsky
+> > > 
+> > > Maxim Levitsky (5):
+> > >   perf/x86/intel/lbr: use setup_clear_cpu_cap instead of clear_cpu_cap
+> > >   x86/cpuid: refactor setup_clear_cpu_cap()/clear_cpu_cap()
+> > >   x86/cpuid: move filter_cpuid_features to cpuid-deps.c
+> > >   x86/cpuid: remove 'warn' parameter from filter_cpuid_features
+> > >   x86/cpuid: check for dependencies violations in CPUID and attempt to
+> > >     fix them
+> > > 
+> > >  arch/x86/events/intel/lbr.c       |  2 +-
+> > >  arch/x86/include/asm/cpufeature.h |  1 +
+> > >  arch/x86/kernel/cpu/common.c      | 51 +-------------------
+> > >  arch/x86/kernel/cpu/cpuid-deps.c  | 80 +++++++++++++++++++++++++++----
+> > >  4 files changed, 74 insertions(+), 60 deletions(-)
+> > > 
+> > > -- 
+> > > 2.34.3
+> > > 
+> > > 
+> > A very kind ping on these patches.
+> 
+> Another kind ping on these patches.
 
-The Linux kernel's regression tracker (Thorsten Leemhuis) (regressions@leem=
-huis.info) changed:
+Another very gentle ping on these patches.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |regressions@leemhuis.info
+Best regards,
+	Maxim Levitsky
+> 
+> 
+> Best regards,
+> 	Maxim Levitsky
+> > Best regards,
+> > 	Maxim Levitsky
 
---- Comment #3 from The Linux kernel's regression tracker (Thorsten Leemhui=
-s) (regressions@leemhuis.info) ---
-Does this still happen with the latest 5.19.y version? There was a fix rece=
-ntly
-that might help:
 
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=
-=3Dlinux-5.19.y&id=3D2914e46f5b0399279ad56e3c0247a2da72fa0f21
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
