@@ -2,104 +2,253 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2EE735BC37B
-	for <lists+kvm@lfdr.de>; Mon, 19 Sep 2022 09:26:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 453BB5BC382
+	for <lists+kvm@lfdr.de>; Mon, 19 Sep 2022 09:32:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229519AbiISH0Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Sep 2022 03:26:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37950 "EHLO
+        id S229768AbiISHcS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Sep 2022 03:32:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229540AbiISH0O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Sep 2022 03:26:14 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8CD31AF3B;
-        Mon, 19 Sep 2022 00:26:13 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id e68so27251736pfe.1;
-        Mon, 19 Sep 2022 00:26:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=hXqXe6RjT90LFOD/PAYg7ZqKCrE+b+CKvrN2/qxbWPc=;
-        b=Hol1q/SA/TM1plGqmuLeVgcxKQ2264kUUm33EesYm34vxsbK7gBaYeoHckidynQvBM
-         489NG8Tpa0VyqTJ3FyVO4TNK7nMlT7MW2QVVDn7kWqNJ3EnDPwrpBXQyX+zDzjZ11Xxs
-         SKa00Trkt4OJfvDfZTS05sJGDLrBWt/r66Hwo1KWtnRWw4nG8q8OSEor446PidV13RqM
-         gjgeRt5byHSpnBs7LP5Wr9hljNzaET+Uw/HMxPmxa3HI/5HGi3Jmog7BaIUxqUsbBys1
-         z+3G25LBZLrphxKcRjGs9hHLRsInEQ61yELuW2U++XZawffT4iYeWlFvvkUClskV2ES3
-         MS8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=hXqXe6RjT90LFOD/PAYg7ZqKCrE+b+CKvrN2/qxbWPc=;
-        b=ZF5j+QxWmRf85kb4TOP5qzIqPpm5XZjiuPeRFClot3Lwdbh7Z/62eArRIYyQWWVfax
-         eeBI5YdobaSgw9K+XzuHVyUfdViHEuX3iVVPRn3cHwRBvfpfCDuCn15aIblv+/VO2v3B
-         h22p/J9wLGSLVhw07QdG6EHJrw3mKsuGkzyAXTGh77MtuQP8O+hXNqU/yHurEyKcGGKm
-         mB0Uzgghyij/+hlDt70B3L2xl7fOr32x56mPN3IU+EmKP1Gyhzl5xXks4d3QkQyk3+Xe
-         f7uYmm2hOl8rkOTRn6zs1AIVirIfinCZ4hUUTpzP8EXwGEFbZfaJY/5EwIADJja0X1lD
-         edLw==
-X-Gm-Message-State: ACrzQf2XHI3OWS69t0PIUuu8GIBB/r3D3umpu5Wni3C6PKRGsT7ZG816
-        9dXr+9SrmzlhIb86baSC4Z8=
-X-Google-Smtp-Source: AMsMyM4I1b8NQ/XCZ+Ut+hsbH8xcih23yH/JQisB8VeSGcDWkj3B0zuJfSfVjIg9Dvscd0JlXYZS6g==
-X-Received: by 2002:a63:2c2:0:b0:439:4581:d2af with SMTP id 185-20020a6302c2000000b004394581d2afmr14678385pgc.497.1663572373329;
-        Mon, 19 Sep 2022 00:26:13 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id n17-20020a170903111100b00176ca74c58bsm3909851plh.245.2022.09.19.00.26.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Sep 2022 00:26:12 -0700 (PDT)
-Message-ID: <ec0f97e9-33b7-61d8-25b8-50175544dbdd@gmail.com>
-Date:   Mon, 19 Sep 2022 15:26:01 +0800
+        with ESMTP id S229610AbiISHcQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Sep 2022 03:32:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD0801A056
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 00:32:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663572734;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=AqD4TnlhePXL3CSt/e7eMOfrupnuHzb02HehU7b1Ap4=;
+        b=GrKf+aQ4QFUKQJlQKEuB+bML3m41LEMimnIIC0ZiyMeE784nqGDN09xq6ULYuWLKab8hba
+        F/wESH4ROGlrB9kQ0TDaf2KhgoSsH8gVLZHj/5rppKbUMC3OhjXFiyDdMTV015PS6x56Hv
+        0zi4DvCbuExAibA3e2pXvMMMUEkEUJM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-230-W6HF5MMiMjSn977jQnfsiw-1; Mon, 19 Sep 2022 03:32:09 -0400
+X-MC-Unique: W6HF5MMiMjSn977jQnfsiw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1B3FA101A52A;
+        Mon, 19 Sep 2022 07:32:09 +0000 (UTC)
+Received: from starship (unknown [10.40.192.163])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7B8EA1121314;
+        Mon, 19 Sep 2022 07:32:07 +0000 (UTC)
+Message-ID: <93df5f91adc31138640e3e7c5ab037b73b8af5ff.camel@redhat.com>
+Subject: Re: [PATCH] KVM: x86: Un-inhibit APICv/AVIC when switching to
+ x2APIC mode
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        pbonzini@redhat.com, jon.grimm@amd.com
+Date:   Mon, 19 Sep 2022 10:32:06 +0300
+In-Reply-To: <YyUOb5X8yO4BbYSf@google.com>
+References: <20220909195442.7660-1-suravee.suthikulpanit@amd.com>
+         <YyUOb5X8yO4BbYSf@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.13.0
-Subject: Re: [PATCH v14 00/11] KVM: x86/pmu: Guest Last Branch Recording
- Enabling
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, ak@linux.intel.com,
-        wei.w.wang@intel.com, kan.liang@intel.com,
-        alex.shi@linux.alibaba.com, kvm@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210201051039.255478-1-like.xu@linux.intel.com>
- <CALMp9eRC2APJgB3Y7S4MWsTs9wom3iQycd60kM2eJg39N_L4Ag@mail.gmail.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <CALMp9eRC2APJgB3Y7S4MWsTs9wom3iQycd60kM2eJg39N_L4Ag@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/9/2022 7:42 am, Jim Mattson wrote:
-> How does live migration work? I don't see any mechanism for recording
-> the current LBR MSRs on suspend or restoring them on resume.
+On Sat, 2022-09-17 at 00:01 +0000, Sean Christopherson wrote:
+> On Fri, Sep 09, 2022, Suravee Suthikulpanit wrote:
+> > Currently, kvm_lapic_xapic_id_updated() checks if the xAPIC ID in
+> > the APIC_ID register differs from the vcpu ID. If so it inhibits
+> > APICv/AVIC.
+> > 
+> > However, for vcpu 256 and above, the 8-bit xAPIC ID field in the APIC_ID
+> > register cannot support 32-bit x2APIC ID causing the kvm_xapic_id()
+> > to return invalid ID and fail the comparison with the vcpu ID.
+> > This causes APICv/AVIC inhibition for VM with more than 256 vcpus
+> > due to APIVC_INHIBIT_REASON_APIC_ID_MODIFIED.
+> > 
+> > In this case, when guest switch to x2APIC mode, KVM needs to clear
+> > APIVC_INHIBIT_REASON_APIC_ID_MODIFIED.
+> > 
+> > Fixes: 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or APIC base")
+> > Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> > Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> > ---
+> >  arch/x86/kvm/lapic.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > index 9dda989a1cf0..750d385b770e 100644
+> > --- a/arch/x86/kvm/lapic.c
+> > +++ b/arch/x86/kvm/lapic.c
+> > @@ -374,6 +374,7 @@ static inline void kvm_apic_set_x2apic_id(struct kvm_lapic *apic, u32 id)
+> >  	kvm_lapic_set_reg(apic, APIC_ID, id);
+> >  	kvm_lapic_set_reg(apic, APIC_LDR, ldr);
+> >  	atomic_set_release(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
+> > +	kvm_clear_apicv_inhibit(apic->vcpu->kvm, APICV_INHIBIT_REASON_APIC_ID_MODIFIED);
+> 
+> This isn't safe as it assumes the guest will switch _all_ vCPUs to x2APIC, e.g.
+> if one vCPU switches to x2APIC before the others then weird things will happen.
+> Part of me just wants to throw in the towel, but I think we have an easy out.
+> 
+> The other funky thing to consider is KVM's x2APIC hotplug hack, where KVM
+> deliberately (and architecturally incorrectly) does not honor the aliasing behavior
+> that results when an x2APIC ID gets truncated to an xAPIC ID.  When the hack is
+> effectively enabled, KVM can actually ignore truncation because the resulting KVM
+> behavior of IPIs only getting sent to the "first" vCPU is the same as APICv/AVIC
+> behavior.  On the plus side, the existence of that godawful hack means it's extremely
+> unlikely the aliasing will break anything that anyones cares about.
+> 
+> To restore APICv support for stable kernels on systems with >255 CPUs, which people
+> do care about, it probably makes sense to split the fix into two patches.  An
+> incomplete patch to ignore the truncation case that is easy to backport, and then
+> a fix for the fix to inhibit APICv/AVIC when there is unwanted aliasing (piggybacking
+> off my patch "KVM: x86: Honor architectural behavior for aliased 8-bit APIC IDs").
+> We can even get clever and fixup the Fixes: tag when doing the final application
+> so that there's a paper trail if someone wants to backport the full fix.
+> 
+> Compile tested only at this point and lacks changelogs, but my thought is to do:
+> 
+> From: Sean Christopherson <seanjc@google.com>
+> Date: Fri, 16 Sep 2022 16:48:03 -0700
+> Subject: [PATCH] KVM: x86: Don't inhibit APICv/AVIC if xAPIC ID mismatch is
+>  due to 32-bit ID
+> 
+> Fixes: 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or APIC base")
+> Reported-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/lapic.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index adac6ca9b7dc..a02defa3f7b5 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2075,7 +2075,12 @@ static void kvm_lapic_xapic_id_updated(struct kvm_lapic *apic)
+>  	if (KVM_BUG_ON(apic_x2apic_mode(apic), kvm))
+>  		return;
+>  
+> -	if (kvm_xapic_id(apic) == apic->vcpu->vcpu_id)
+> +	/*
+> +	 * Deliberately truncate the vCPU ID when detecting a modified APIC ID
+> +	 * to avoid false positives if the vCPU ID, i.e. x2APIC ID, is a 32-bit
+> +	 * value.
+> +	 */
+> +	if (kvm_xapic_id(apic) == (u8)apic->vcpu->vcpu_id)
+>  		return;
 
-Considering that LBR is still a model specific feature, migration is less 
-valuable unless
-both LBR_FMT values of the migration side are the same, the compatibility check
-(based on cpu models) is required (gathering dust in my to-do list);
+This is the fix I had in mind for this issue, I kept it on the backlog for too much time.
+I also vote to do it this way.
 
-and there is another dusty missing piece is how to ensure that vcpu can get LBR 
-hardware in
-vmx transition when KVM lbr event fails in host lbr event competition, the 
-complexity here is
-that the host and guest may have different LBR filtering options.
+Best regards,
+	Maxim Levitsky
 
-The good news is the Architecture LBR will add save/restore support since Paolo 
-is not averse to
-putting more msr's into msrs_to_save_all[], perhaps a dynamic addition mechanism 
-is a prerequisite.
 
-Please let me know what your priority preferences are for these tasks above.
+>  
+>  	kvm_set_apicv_inhibit(apic->vcpu->kvm, APICV_INHIBIT_REASON_APIC_ID_MODIFIED);
+> 
+> base-commit: 59afc619c353e67d087dc741bd828019985ffac6
+> -- 
+> 
+> followed up by this later in the series:
+> 
+> From: Sean Christopherson <seanjc@google.com>
+> Date: Fri, 16 Sep 2022 16:54:14 -0700
+> Subject: [PATCH] KVM: x86: Inhibit APICv/AVIC if the optimized physical map is
+>  disabled
+> 
+> Fixes: TDB
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  6 ++++++
+>  arch/x86/kvm/lapic.c            | 13 ++++++++++++-
+>  arch/x86/kvm/svm/avic.c         |  1 +
+>  arch/x86/kvm/vmx/vmx.c          |  1 +
+>  4 files changed, 20 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 13dadc96d9ac..6953d1a61357 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1097,6 +1097,12 @@ enum kvm_apicv_inhibit {
+>  	 */
+>  	APICV_INHIBIT_REASON_BLOCKIRQ,
+>  
+> +	/*
+> +	 * APICv is disabled because not all vCPUs have a 1:1 mapping between
+> +	 * APIC ID and vCPU, _and_ KVM is not applying its x2APIC hotplug hack.
+> +	 */
+> +	APICV_INHIBIT_REASON_PHYSICAL_ID_ALIASED,
+> +
+>  	/*
+>  	 * For simplicity, the APIC acceleration is inhibited
+>  	 * first time either APIC ID or APIC base are changed by the guest
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 00c89ff740e5..e9ba17aa0710 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -381,6 +381,16 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+>  		cluster[ldr] = apic;
+>  	}
+>  out:
+> +	/*
+> +	 * The optimized map is effectively KVM's internal version of APICv,
+> +	 * and all unwanted aliasing that results in disabling the optimized
+> +	 * map also applies to APICv.
+> +	 */
+> +	if (!new)
+> +		kvm_set_apicv_inhibit(kvm, APICV_INHIBIT_REASON_PHYSICAL_ID_ALIASED);
+> +	else
+> +		kvm_clear_apicv_inhibit(kvm, APICV_INHIBIT_REASON_PHYSICAL_ID_ALIASED);
+> +
+>  	old = rcu_dereference_protected(kvm->arch.apic_map,
+>  			lockdep_is_held(&kvm->arch.apic_map_lock));
+>  	rcu_assign_pointer(kvm->arch.apic_map, new);
+> @@ -2150,7 +2160,8 @@ static void kvm_lapic_xapic_id_updated(struct kvm_lapic *apic)
+>  	/*
+>  	 * Deliberately truncate the vCPU ID when detecting a modified APIC ID
+>  	 * to avoid false positives if the vCPU ID, i.e. x2APIC ID, is a 32-bit
+> -	 * value.
+> +	 * value.  If the wrap/truncation results in unwatned aliasing, APICv
+> +	 * will be inhibited as part of updating KVM's optimized APIC maps.
+>  	 */
+>  	if (kvm_xapic_id(apic) == (u8)apic->vcpu->vcpu_id)
+>  		return;
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 3400046ad0b4..a1eb4e9ed3eb 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -992,6 +992,7 @@ bool avic_check_apicv_inhibit_reasons(enum kvm_apicv_inhibit reason)
+>  			  BIT(APICV_INHIBIT_REASON_PIT_REINJ) |
+>  			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |
+>  			  BIT(APICV_INHIBIT_REASON_SEV)      |
+> +			  BIT(APICV_INHIBIT_REASON_PHYSICAL_ID_ALIASED) |
+>  			  BIT(APICV_INHIBIT_REASON_APIC_ID_MODIFIED) |
+>  			  BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED) |
+>  			  BIT(APICV_INHIBIT_REASON_X2APIC);
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index c9b49a09e6b5..414485d03ee7 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7996,6 +7996,7 @@ static bool vmx_check_apicv_inhibit_reasons(enum kvm_apicv_inhibit reason)
+>  			  BIT(APICV_INHIBIT_REASON_ABSENT) |
+>  			  BIT(APICV_INHIBIT_REASON_HYPERV) |
+>  			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |
+> +			  BIT(APICV_INHIBIT_REASON_PHYSICAL_ID_ALIASED) |
+>  			  BIT(APICV_INHIBIT_REASON_APIC_ID_MODIFIED) |
+>  			  BIT(APICV_INHIBIT_REASON_APIC_BASE_MODIFIED);
+>  
+> 
+> base-commit: c8ecd2ebbc283d377188ee6c94cf3f811a4ff501
+
+
