@@ -2,94 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F84F5BD48D
-	for <lists+kvm@lfdr.de>; Mon, 19 Sep 2022 20:10:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95E955BD493
+	for <lists+kvm@lfdr.de>; Mon, 19 Sep 2022 20:13:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229563AbiISSKc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Sep 2022 14:10:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60238 "EHLO
+        id S229449AbiISSND (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Sep 2022 14:13:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229908AbiISSKE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Sep 2022 14:10:04 -0400
-Received: from mail-oa1-x2e.google.com (mail-oa1-x2e.google.com [IPv6:2001:4860:4864:20::2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12E9BBE12
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 11:09:40 -0700 (PDT)
-Received: by mail-oa1-x2e.google.com with SMTP id 586e51a60fabf-11eab59db71so525003fac.11
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 11:09:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=kinTjsTMKWd+HF2A95PNPhp0ZSHokoUBxlIlduG7fRs=;
-        b=Z9n+eNdWdh71NGqMwqlMdnGMkR+MfqHA3wiPVazUKLvvgnHURhbyz5tXcX8OndG0jF
-         URQm5pcCEx33iQRKI5zFPbEgH51JFbW9BaAXYNFjgA5EPgMkmh2V98Civxgd5idJUz4q
-         N8bx3Ufnvv5tXmdkiuZqMFqLzJ5RWk/VVEmZ/5r6upWFCH9p4MHsGu5NNqC6soqW2oB3
-         lwtV5aFIKP1Mk+gChIWcM5JW1eZiH3puViRgtakqwSp1UjXFmmBx/jq37EYsyjSMOtet
-         U0hoQISnRKXADaLvG+0m5BWoyOYnTaFmXyNvfsj2FyDAvW8FK+lchT/JgcpwM3NoIZ2G
-         iDaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=kinTjsTMKWd+HF2A95PNPhp0ZSHokoUBxlIlduG7fRs=;
-        b=jhzwrNFJ8I7GJ0HgocijNB0tye2W/GzsIc52e+XMkUHHo0/m8AXOt/rsFxqCtjxKs7
-         ly88t7WeBAfKMlUQO37i6GMPGgi/i5MHBECF5Bj1SiFzIUP/xH8W1i8dSjfVs1d4jIdr
-         /YUwjFImRi1/ddbtcETOwt6zhoBmJIYxWRjDmbBwtOV3R4pWAPtIE1BwBhX0NdzTU5mo
-         kl0e/6Th6GvJsuI3fwRBzTQZsJ/d3QKn9GYm25h9abR3AcFtYrXLtL0dFrrWZnO5qDeI
-         3kTLfTd6n1Mx77TjnPrgueXYIZct4j4x4awpG/r8BnFBGiiB+Rai+c2QLZAzsQLHdgO3
-         tkaQ==
-X-Gm-Message-State: ACgBeo00MumIcQ/p3ncLoRSDvH8FxhxauVlVhggtvg3CjRtHCg92W/kl
-        C16jTO93Zg82s7yODG5C05PZoGEp89B1/P1WUxCeBg==
-X-Google-Smtp-Source: AA6agR5DN+7DnOIoUE61op1nJjTuN8PFxR6X8cvIHEmjOifcEhIIHF7V7R8Ea8/MENkIhjW/tg4kd/FPe8WCOTlndv0=
-X-Received: by 2002:a05:6870:580c:b0:12a:f136:a8f5 with SMTP id
- r12-20020a056870580c00b0012af136a8f5mr15703777oap.269.1663610979201; Mon, 19
- Sep 2022 11:09:39 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220916045832.461395-1-jmattson@google.com> <20220916045832.461395-3-jmattson@google.com>
- <YyTZFzaDOufASxqd@google.com> <CALMp9eQXroxQYiWUCejd0Cj7kD5g5navWY_E2O_vzbVAQjLyNg@mail.gmail.com>
- <YyT0G9y0RRyBDiPD@zn.tnic> <YyT5uW8bjXae2c4l@google.com> <YydrsMjAF5zjqTGK@zn.tnic>
-In-Reply-To: <YydrsMjAF5zjqTGK@zn.tnic>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 19 Sep 2022 11:09:28 -0700
-Message-ID: <CALMp9eTmcTjJ+aAN3EPANqx3Qo3Psiafz1iuT3fKgpM4Qe0OaA@mail.gmail.com>
-Subject: Re: [PATCH 2/5] KVM: svm: Disallow EFER.LMSLE on hardware that
- doesn't support it
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Avi Kivity <avi@redhat.com>, Babu Moger <babu.moger@amd.com>,
-        "Chang S. Bae" <chang.seok.bae@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Joerg Roedel <joerg.roedel@amd.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Wyes Karny <wyes.karny@amd.com>, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229502AbiISSNB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Sep 2022 14:13:01 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 593E2402F1
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 11:13:00 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CC9F1B815CC
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 18:12:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86B2AC433D6;
+        Mon, 19 Sep 2022 18:12:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1663611177;
+        bh=aotGmVArsuGPUXjbMK5fSz2bHP43nLY4BmMcFqGhkA0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=PIti6DE+/vLrtxuf3lyhD9TkvPjirGE64SUHAt4+noudLDqN/KwiCCoP63Le3o1xe
+         8CX72L5XHFGUlLCp+TwL1xWC5ClDkY/0Fz6crMIbtpJvYey3dZDMOGgGPIH7ijUW22
+         NlI83YyNxRl/G0w46oyNPQ5Ai/N5yg6DCpmOOfs73scABtF65UwPUtrnCcqGM3H8bv
+         hEkGfi+dUR4GllyRnbBWXo+OxpTuh+Hdu3fJIDyPBK/ACE2+7bpHqwov0mK6ZXHbKX
+         HxVgFB3hsx73ofnYj90DVaPL7YKhxc92YaAHLlZZbq1i9I/nz6ld8ZcGOPtzwi2O3k
+         sQdxSD9BDCrvQ==
+Received: from 185-176-101-241.host.sccbroadband.ie ([185.176.101.241] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1oaLGJ-00BBPO-7G;
+        Mon, 19 Sep 2022 19:12:55 +0100
+Date:   Mon, 19 Sep 2022 19:12:53 +0100
+Message-ID: <878rmfkzbu.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     kernel test robot <lkp@intel.com>,
+        Peter Collingbourne <pcc@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kbuild-all@lists.01.org, Cornelia Huck <cohuck@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Evgenii Stepanov <eugenis@google.com>, kvm@vger.kernel.org,
+        Steven Price <steven.price@arm.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>
+Subject: Re: [PATCH v3 3/7] mm: Add PG_arch_3 page flag
+In-Reply-To: <YxYrgyybBMUqFswq@arm.com>
+References: <20220810193033.1090251-4-pcc@google.com>
+        <202208111500.62e0Bl2l-lkp@intel.com>
+        <YxDy+zFasbAP7Yrq@arm.com>
+        <YxYrgyybBMUqFswq@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.176.101.241
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, lkp@intel.com, pcc@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kbuild-all@lists.01.org, cohuck@redhat.com, will@kernel.org, eugenis@google.com, kvm@vger.kernel.org, steven.price@arm.com, vincenzo.frascino@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Sep 18, 2022 at 12:04 PM Borislav Petkov <bp@alien8.de> wrote:
->
-> On Fri, Sep 16, 2022 at 10:33:29PM +0000, Sean Christopherson wrote:
-> > ...
-> > Either way, KVM appears to be carrying a half-baked "fix" for a buggy guest that's
-> > long since gone.  So like we did in commit 8805875aa473 ("Revert "KVM: nVMX: Do not
-> > expose MPX VMX controls when guest MPX disabled""), I think we should just revert
-> > the "fix".
->
-> If, as message 0/5 says, setting this bit so that SLE11 Xen 4.0 boots as
-> a nested hypervisor is the use case, then sure, unconditional NO_LSMLE
-> and we all should go on with our lives.
+On Mon, 05 Sep 2022 18:01:55 +0100,
+Catalin Marinas <catalin.marinas@arm.com> wrote:
+> 
+> On Thu, Sep 01, 2022 at 06:59:23PM +0100, Catalin Marinas wrote:
+> > On Thu, Aug 11, 2022 at 03:16:08PM +0800, kernel test robot wrote:
+> > > Thank you for the patch! Perhaps something to improve:
+> > > 
+> > > [auto build test WARNING on arm64/for-next/core]
+> > > [also build test WARNING on linus/master next-20220811]
+> > > [cannot apply to kvmarm/next arm/for-next soc/for-next xilinx-xlnx/master v5.19]
+> > > [If your patch is applied to the wrong git tree, kindly drop us a note.
+> > > And when submitting patch, we suggest to use '--base' as documented in
+> > > https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> > > 
+> > > url:    https://github.com/intel-lab-lkp/linux/commits/Peter-Collingbourne/KVM-arm64-permit-MAP_SHARED-mappings-with-MTE-enabled/20220811-033310
+> > > base:   https://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-next/core
+> > > config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20220811/202208111500.62e0Bl2l-lkp@intel.com/config)
+> > > compiler: loongarch64-linux-gcc (GCC) 12.1.0
+> > > reproduce (this is a W=1 build):
+> > >         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+> > >         chmod +x ~/bin/make.cross
+> > >         # https://github.com/intel-lab-lkp/linux/commit/1a400517d8428df0ec9f86f8d303b2227ee9702f
+> > >         git remote add linux-review https://github.com/intel-lab-lkp/linux
+> > >         git fetch --no-tags linux-review Peter-Collingbourne/KVM-arm64-permit-MAP_SHARED-mappings-with-MTE-enabled/20220811-033310
+> > >         git checkout 1a400517d8428df0ec9f86f8d303b2227ee9702f
+> > >         # save the config file
+> > >         mkdir build_dir && cp config build_dir/.config
+> > >         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=loongarch SHELL=/bin/bash
+> > > 
+> > > If you fix the issue, kindly add following tag where applicable
+> > > Reported-by: kernel test robot <lkp@intel.com>
+> > > 
+> > > All warnings (new ones prefixed by >>):
+> > > 
+> > > >> mm/memory.c:92:2: warning: #warning Unfortunate NUMA and NUMA Balancing config, growing page-frame for last_cpupid. [-Wcpp]
+> > >       92 | #warning Unfortunate NUMA and NUMA Balancing config, growing page-frame for last_cpupid.
+> > >          |  ^~~~~~~
+> > > 
+> > > 
+> > > vim +92 mm/memory.c
+> > > 
+> > > 42b7772812d15b Jan Beulich    2008-07-23  90  
+> > > af27d9403f5b80 Arnd Bergmann  2018-02-16  91  #if defined(LAST_CPUPID_NOT_IN_PAGE_FLAGS) && !defined(CONFIG_COMPILE_TEST)
+> > > 90572890d20252 Peter Zijlstra 2013-10-07 @92  #warning Unfortunate NUMA and NUMA Balancing config, growing page-frame for last_cpupid.
+> > > 75980e97daccfc Peter Zijlstra 2013-02-22  93  #endif
+> > > 75980e97daccfc Peter Zijlstra 2013-02-22  94  
+> > 
+> > It looks like ith CONFIG_NUMA_BALANCING=y on loongarch we run out of
+> > spare bits in page->flags to fit last_cpupid. The reason we don't see it
+> > on arm64 is that we select SPARSEMEM_VMEMMAP and SECTIONS_WIDTH becomes
+> > 0. On loongarch SECTIONS_WIDTH takes 19 bits (48 - 29) in page->flags.
+> > 
+> > I think instead of always defining PG_arch_{2,3} if CONFIG_64BIT, we
+> > could add a CONFIG_ARCH_WANTS_PG_ARCH_23 option and only select it on
+> > arm64 for the time being.
+> 
+> I pushed a patch as the first one on the arm64 devel/mte-pg-flags
+> branch. Also updated the last patch on this branch following Steven's
+> comments.
+> 
+> Peter, please let me know if you want to pick this series up together
+> with your other KVM patches. Otherwise I can post it separately, it's
+> worth merging it on its own as it clarifies the page flag vs tag setting
+> ordering.
 
-Fantastic! That's what I'll do in V2.
+I'm looking at queuing this, but I'm confused by this comment. Do I
+need to pick this as part of the series? Or is this an independent
+thing (my hunch is that it is actually required not to break other
+architectures...).
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
