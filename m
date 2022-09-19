@@ -2,116 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1900D5BD57E
-	for <lists+kvm@lfdr.de>; Mon, 19 Sep 2022 22:01:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E9075BD634
+	for <lists+kvm@lfdr.de>; Mon, 19 Sep 2022 23:17:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229592AbiISUBX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Sep 2022 16:01:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60162 "EHLO
+        id S229723AbiISVR1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Sep 2022 17:17:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbiISUBW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Sep 2022 16:01:22 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 546274A105
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 13:01:19 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id x1so235913plv.5
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 13:01:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date;
-        bh=d2mOaXqBJ/J1NiBq+p9zZqqA3x7aa90eBHG5Ll0Tfso=;
-        b=fdaJHOO3a2pIOR/89fIgJSQloU9jbVrOA5QbPQYMMYhLs8KoKEqyaQOH63NzdC0BW5
-         +xcbWp6DgPQyD8KWK1F+0hqGEOAMaJii6EDQQ+46c4Vd6yCQMokwDddgQ8ZRmNmB2qCs
-         ulnhQ8DScLVB8wgMjAj1Ot2sozJegDbvU71kckRVcEkytQ86MIyC0t93pWLCWTc0/+FT
-         Fr2cnmgIKc5F13hwz8ScnRXqeavbLJ/pD7MdUlOTgYtEbfeVqq21kIsvObKkjYsZcA/h
-         kAWquL8pPjpQSqAdLOxChyzTrLQxPuxT1NG9TyizytbwW9o8YN5N9fj5PtmjQ/KPwAiL
-         dwTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=d2mOaXqBJ/J1NiBq+p9zZqqA3x7aa90eBHG5Ll0Tfso=;
-        b=rhTi1pBU+ofWs/6yG/SY7KfoOWNu6O0ziIUxp1bXt4Vuum2POZdfScahqgwsKXTG0y
-         /PRyb2s60+gBxDYiIGc8WzpnT8CqdYvhYVcEAjXFIywnWjKqohro5Qc8XSGrTMSLkBSQ
-         jVrGVMgF9UJ3h6EbyW7nhPmrEBN7neUBAaovTD3bxfg7KClrrf8FbL8SEKc9sNVD1TVf
-         4tpVJejF0dLP+X/1/hTpBhe1vac0014oZ9XQYJ+v3L46hGGW3gvTnZGw7RsleKUbeAdE
-         pDks1NSLLYEol6I0CAffQkfz0BRWsQphPD7msebY9rcduuUH/2kTtQ2GtU3ShUTT3kUk
-         04YQ==
-X-Gm-Message-State: ACrzQf2nRlvabRuiD3VbAgCNHatFkyOQNIm6V17V0v5OP8SrP5flTF6S
-        ejTn6STVkyU6fg2VeV+Lsu64kA==
-X-Google-Smtp-Source: AMsMyM7ekM/QpjauHVnjWvyDT4Y/ZpvdxNLs+apfRnU6iIqW4hyA8I00zbHqV8xMsYofHJnxlgrT4Q==
-X-Received: by 2002:a17:902:cec9:b0:178:1da5:1075 with SMTP id d9-20020a170902cec900b001781da51075mr1403934plg.136.1663617678958;
-        Mon, 19 Sep 2022 13:01:18 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id w1-20020a1709026f0100b00178650510f9sm10750215plk.160.2022.09.19.13.01.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Sep 2022 13:01:18 -0700 (PDT)
-Date:   Mon, 19 Sep 2022 20:01:14 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
-        pbonzini@redhat.com, maz@kernel.org, alexandru.elisei@arm.com,
-        eric.auger@redhat.com, reijiw@google.com, rananta@google.com,
-        bgardon@google.com, dmatlack@google.com, axelrasmussen@google.com
-Subject: Re: [PATCH v6 09/13] KVM: selftests: aarch64: Add
- aarch64/page_fault_test
-Message-ID: <YyjKir3OGCfFvAsy@google.com>
-References: <20220906180930.230218-1-ricarkol@google.com>
- <20220906180930.230218-10-ricarkol@google.com>
- <YyZDBIQsux1g97zl@google.com>
- <YyjDCWCJ5j8c6T2h@google.com>
+        with ESMTP id S229522AbiISVR0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Sep 2022 17:17:26 -0400
+Received: from out1.migadu.com (out1.migadu.com [91.121.223.63])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E9512B62F;
+        Mon, 19 Sep 2022 14:17:24 -0700 (PDT)
+Date:   Mon, 19 Sep 2022 21:17:11 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1663622242;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tSvK5IvdnSqXV3YZK0CrcY2MYv1YLMvmstzyS0/p/3Y=;
+        b=Zm8R2gYheUqs8kaOvIaQNFC4yqEMp2GRRNiJBpM7M5vA/WgdwqTESjDkKU0coSFz6MXhW2
+        Pxvb8ZjDE6n4so7BREdVS+vE39ju3kO3195nF4Ve50+lzh/xP3zlyBZv/kHwnMgkYK1yKX
+        Jth+sXWoVAAT0psTZjNDah/SKd1aEK0=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Andrew Jones <andrew.jones@linux.dev>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Subject: Re: [PATCH 2/5] KVM: selftests: Compare insn opcodes directly in
+ fix_hypercall_test
+Message-ID: <YyjcVydnLQzKtNC/@google.com>
+References: <20220908233134.3523339-1-seanjc@google.com>
+ <20220908233134.3523339-3-seanjc@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <YyjDCWCJ5j8c6T2h@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220908233134.3523339-3-seanjc@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 19, 2022, Ricardo Koller wrote:
-> On Sat, Sep 17, 2022 at 09:58:28PM +0000, Oliver Upton wrote:
-> > @@ -536,13 +536,7 @@ static void load_exec_code_for_test(struct kvm_vm *vm)
-> >  	assert(TEST_EXEC_GVA - TEST_GVA);
-> >  	code = hva + 8;
-> >  
-> > -	/*
-> > -	 * We need the cast to be separate in order for the compiler to not
-> > -	 * complain with: "‘memcpy’ forming offset [1, 7] is out of the bounds
-> > -	 * [0, 1] of object ‘__exec_test’ with type ‘unsigned char’"
-> > -	 */
-> > -	c = (uint64_t *)&__exec_test;
-> > -	memcpy(code, c, 8);
-> > +	*code = __exec_test;
+On Thu, Sep 08, 2022 at 11:31:31PM +0000, Sean Christopherson wrote:
+> Directly compare the expected versus observed hypercall instructions when
+> verifying that KVM patched in the native hypercall (FIX_HYPERCALL_INSN
+> quirk enabled).  gcc rightly complains that doing a 4-byte memcpy() with
+> an "unsigned char" as the source generates an out-of-bounds accesses.
 > 
-> I remember trying many ways of getting the compiler to not complain, I
-> must have tried this (wonder what happened). Anyway, gcc and clang are
-> happy with it.
+> Alternatively, "exp" and "obs" could be declared as 3-byte arrays, but
+> there's no known reason to copy locally instead of comparing directly.
 
-Alternatively, from a code documentation perspective it would be nice to capture
-that the size isn't arbitrary.  E.g.
+I was trying to print just the instruction bytes if such a comparison
+failed, but that's already a bust given that it was a 4-byte copy.
 
-  typedef uint32_t aarch64_insn_t;
+Having said that, the assertion should be clear enough.
 
-  extern aarch64_insn_t __exec_test[2];
+> In function ‘assert_hypercall_insn’,
+>     inlined from ‘guest_main’ at x86_64/fix_hypercall_test.c:91:2:
+> x86_64/fix_hypercall_test.c:63:9: error: array subscript ‘unsigned int[0]’
+>  is partly outside array bounds of ‘unsigned char[1]’ [-Werror=array-bounds]
+>    63 |         memcpy(&exp, exp_insn, sizeof(exp));
+>       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> x86_64/fix_hypercall_test.c: In function ‘guest_main’:
+> x86_64/fix_hypercall_test.c:42:22: note: object ‘vmx_hypercall_insn’ of size 1
+>    42 | extern unsigned char vmx_hypercall_insn;
+>       |                      ^~~~~~~~~~~~~~~~~~
+> x86_64/fix_hypercall_test.c:25:22: note: object ‘svm_hypercall_insn’ of size 1
+>    25 | extern unsigned char svm_hypercall_insn;
+>       |                      ^~~~~~~~~~~~~~~~~~
+> In function ‘assert_hypercall_insn’,
+>     inlined from ‘guest_main’ at x86_64/fix_hypercall_test.c:91:2:
+> x86_64/fix_hypercall_test.c:64:9: error: array subscript ‘unsigned int[0]’
+>  is partly outside array bounds of ‘unsigned char[1]’ [-Werror=array-bounds]
+>    64 |         memcpy(&obs, obs_insn, sizeof(obs));
+>       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> x86_64/fix_hypercall_test.c: In function ‘guest_main’:
+> x86_64/fix_hypercall_test.c:25:22: note: object ‘svm_hypercall_insn’ of size 1
+>    25 | extern unsigned char svm_hypercall_insn;
+>       |                      ^~~~~~~~~~~~~~~~~~
+> x86_64/fix_hypercall_test.c:42:22: note: object ‘vmx_hypercall_insn’ of size 1
+>    42 | extern unsigned char vmx_hypercall_insn;
+>       |                      ^~~~~~~~~~~~~~~~~~
+> cc1: all warnings being treated as errors
+> make: *** [../lib.mk:135: tools/testing/selftests/kvm/x86_64/fix_hypercall_test] Error 1
+> 
+> Fixes: 6c2fa8b20d0c ("selftests: KVM: Test KVM_X86_QUIRK_FIX_HYPERCALL_INSN")
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-  {
-	void *code;
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
-	memcpy(code, __exec_test, sizeof(__exec_test));
-  }
-
-Note, memcpy() is currently dangerous, but hopefully that will be remedied soonish[*]
-
-[*] https://lore.kernel.org/all/20220908233134.3523339-1-seanjc@google.com
+--
+Thanks,
+Oliver
