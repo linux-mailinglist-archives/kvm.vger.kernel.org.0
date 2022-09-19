@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58F235BD81D
-	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 01:19:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8A175BD81E
+	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 01:19:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229774AbiISXTV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Sep 2022 19:19:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44836 "EHLO
+        id S229991AbiISXTY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Sep 2022 19:19:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230207AbiISXSl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Sep 2022 19:18:41 -0400
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02DB24DF17
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 16:18:24 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id 29so1405362edv.2
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 16:18:23 -0700 (PDT)
+        with ESMTP id S230235AbiISXSo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Sep 2022 19:18:44 -0400
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C7324F6BF
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 16:18:30 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id a41so1393097edf.4
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 16:18:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=Fjo518UYX1pucjz3VPXRbua9nNVIHRhAk9ua0pzX1XA=;
-        b=lbugUhiXpcHvVHxmNQCd7XhVHqDDxchx16Djox3J75B7ePDdncyCGse6eZA2NqPqFh
-         hr1ilTebkO5lbr+2+TZ5mEGLS4PtyKRFbfCqqAv12AEVAMkQWO0zrazSj3q2ZqeRKBT/
-         NbDJbiJXOnw+DznNgyjbvAx0+B4DavYnJ8efSi50qdYGRhMcVApJ9LYs+43cIJnPnFH9
-         p7WTSOkQVMZ/TBIgKfij+g6XFoQIUWCHughrTftkcd/1hY2CNeeMm/CAqplFQVur0kCT
-         P6Vi6hDAGyycMZR5ghfx4ycMPoY3eP4zAl+AtKcz4IBZGYhSpX7tdpCvm4nrUNQHxaPV
-         fQVA==
+        bh=YuQwXC400wn1XG3lPzRkN46CWgPRCmkTZD5KrMqPnvc=;
+        b=OfOTlhHIdUYcoHKPguW/SrroW/2HH31KpnqDNx1VDOdScP9GFw+hcz6wLKt9qwYKmr
+         tUiVUE0COMOBBIwnlZk33ru5T+PAhA69FfCE40NYduQ5A2+ZLn3WJwfMhsySvcTEX8NG
+         kUvI2CGts6p4THnGkq0xeeKDTU5xPudeCwmi2+6sBCLSQZmuxjpnNtMXwBahzmJp9kZR
+         Ylpol3lEYtvuiLAmcekgtLJXtFpD/8AjmspSTSwXdjX14Lafob9CFzE0RecWT58O2Hq9
+         Vl+Tlro5icVzofsz7kyjKQ+0/Ll3mwbPbZepIT1+f4hmtu3MFNqsfZTqVJBagsK7iMxp
+         9/+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=Fjo518UYX1pucjz3VPXRbua9nNVIHRhAk9ua0pzX1XA=;
-        b=LIMCYERPkBiwYqvBIwRHkGEcxfWNk2EMcyB1/y680w7tjClS8tHXFb7rMlnPx6fc52
-         Ue2v1KVv2gNv843mOIGenXeJ1nL6whbOixRTaaQ2ne0gTbZhaGtahSCIV7lSpUxXRsMW
-         9bvQ4ujpXJtGeokAbd9PYqix3wddkp1g4pWOAxLf2jjF86pErkkZKPICy35LCDFr6dpn
-         9Yr+uVK3api/50TfHMala1NMZLwu8hL0tb+JZNkpChbksVlUqbf8iJcz3Av102W+NcCu
-         CYTsjOz7Vpm6gIGef0P+yFfZ11zKXhuiJAoxU5ifvt7WcrS1J8CA8f8rBC54cDrvWUzt
-         SQoA==
-X-Gm-Message-State: ACrzQf0Z+OxR0asNLvRcI/HYl32wUHPc9zPk3pbAKYIKmmTbKUDElwk7
-        ixCWgRx5KK1gY7DzclfRuHc=
-X-Google-Smtp-Source: AMsMyM59+Un1+bbndkQl90bc+w6Ku/wLNzkfWCb5H+mf7flr0JF2IyQRo4Sr55rK2P8tkNt3yzBwMA==
-X-Received: by 2002:a50:fc9a:0:b0:454:6a56:7d27 with SMTP id f26-20020a50fc9a000000b004546a567d27mr470765edq.73.1663629502405;
-        Mon, 19 Sep 2022 16:18:22 -0700 (PDT)
+        bh=YuQwXC400wn1XG3lPzRkN46CWgPRCmkTZD5KrMqPnvc=;
+        b=hx8TOYpX0z9pmsnGnT9w8wkLTgwZXe1xnE9LEiyagX8o+OMPujpMG3AmLipt5pFjqD
+         i5COkXrwKjiBiK5xJ/q7F4QTSEe6DE8s3/0iG/cVV1392mzRaBGXacZCOMSdOa4KRDH4
+         TRDa24OKY9mS7y7DEJ+VysEZ4vfSJ5wIUT02SZvv7q9qr+fUMBRcVP2xF+kG8g6Tza2x
+         tUlj1kM4mBXAuRxckNeB0SBJNfnkQujpB2SytLASVyv+zku+BroxU+F3nCiXN1+MAfKS
+         8A4pN6iiQAdpP8eFctRcHyeTZ5Mr/BV86vRXH4P7/xAmstPULoZVd3DRNBsYlhFt/NiI
+         3/TA==
+X-Gm-Message-State: ACrzQf1wYDdP9DZ02nPVPOinV3PgQB9cD2epCijV1VlfF/x93lS08J6U
+        +5atPjDmVzT1nPOAxWRxr8Y=
+X-Google-Smtp-Source: AMsMyM4dA5dnazvKBz2RVfKC8EJQkafmLFlSOVYf1X2uY4aMLi4DKxlHP7A25Z9KlTvDpLqBqvU2+Q==
+X-Received: by 2002:a05:6402:1b06:b0:44e:a073:1dd8 with SMTP id by6-20020a0564021b0600b0044ea0731dd8mr16910792edb.391.1663629508436;
+        Mon, 19 Sep 2022 16:18:28 -0700 (PDT)
 Received: from localhost.localdomain (dynamic-078-054-077-055.78.54.pool.telefonica.de. [78.54.77.55])
-        by smtp.gmail.com with ESMTPSA id rn24-20020a170906d93800b00780f6071b5dsm4800926ejb.188.2022.09.19.16.18.16
+        by smtp.gmail.com with ESMTPSA id rn24-20020a170906d93800b00780f6071b5dsm4800926ejb.188.2022.09.19.16.18.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Sep 2022 16:18:22 -0700 (PDT)
+        Mon, 19 Sep 2022 16:18:28 -0700 (PDT)
 From:   Bernhard Beschow <shentey@gmail.com>
 To:     qemu-devel@nongnu.org
 Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
@@ -127,9 +127,9 @@ Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
         Alistair Francis <alistair@alistair23.me>,
         Jason Herne <jjherne@linux.ibm.com>,
         Bernhard Beschow <shentey@gmail.com>
-Subject: [PATCH 1/9] hw/riscv/sifive_e: Fix inheritance of SiFiveEState
-Date:   Tue, 20 Sep 2022 01:17:12 +0200
-Message-Id: <20220919231720.163121-2-shentey@gmail.com>
+Subject: [PATCH 2/9] exec/hwaddr.h: Add missing include
+Date:   Tue, 20 Sep 2022 01:17:13 +0200
+Message-Id: <20220919231720.163121-3-shentey@gmail.com>
 X-Mailer: git-send-email 2.37.3
 In-Reply-To: <20220919231720.163121-1-shentey@gmail.com>
 References: <20220919231720.163121-1-shentey@gmail.com>
@@ -145,39 +145,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SiFiveEState inherits from SysBusDevice while it's TypeInfo claims it to
-inherit from TYPE_MACHINE. This is an inconsistency which can cause
-undefined behavior such as memory corruption.
-
-Change SiFiveEState to inherit from MachineState since it is registered
-as a machine.
+The next commit would not compile w/o the include directive.
 
 Signed-off-by: Bernhard Beschow <shentey@gmail.com>
 ---
- include/hw/riscv/sifive_e.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ include/exec/hwaddr.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/hw/riscv/sifive_e.h b/include/hw/riscv/sifive_e.h
-index 83604da805..d738745925 100644
---- a/include/hw/riscv/sifive_e.h
-+++ b/include/hw/riscv/sifive_e.h
-@@ -22,6 +22,7 @@
- #include "hw/riscv/riscv_hart.h"
- #include "hw/riscv/sifive_cpu.h"
- #include "hw/gpio/sifive_gpio.h"
-+#include "hw/boards.h"
+diff --git a/include/exec/hwaddr.h b/include/exec/hwaddr.h
+index 8f16d179a8..616255317c 100644
+--- a/include/exec/hwaddr.h
++++ b/include/exec/hwaddr.h
+@@ -3,6 +3,7 @@
+ #ifndef HWADDR_H
+ #define HWADDR_H
  
- #define TYPE_RISCV_E_SOC "riscv.sifive.e.soc"
- #define RISCV_E_SOC(obj) \
-@@ -41,7 +42,7 @@ typedef struct SiFiveESoCState {
++#include "qemu/osdep.h"
  
- typedef struct SiFiveEState {
-     /*< private >*/
--    SysBusDevice parent_obj;
-+    MachineState parent_obj;
- 
-     /*< public >*/
-     SiFiveESoCState soc;
+ #define HWADDR_BITS 64
+ /* hwaddr is the type of a physical address (its size can
 -- 
 2.37.3
 
