@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 64B405BD820
-	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 01:19:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 429605BD823
+	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 01:19:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229566AbiISXT2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Sep 2022 19:19:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44754 "EHLO
+        id S229607AbiISXTc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Sep 2022 19:19:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230301AbiISXS6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Sep 2022 19:18:58 -0400
+        with ESMTP id S230312AbiISXTD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Sep 2022 19:19:03 -0400
 Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A43751413
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 16:18:41 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id z2so1412716edi.1
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 16:18:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF624501A1
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 16:18:54 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id e17so1381478edc.5
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 16:18:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=08Zu8gSbNoVwH6SgINHBVlRGcpHDOzJ+Q2vxMgjaChc=;
-        b=LfVaavpRhFpUWtJPmOxeHcORJMDqIlM8LXxn6uYegGeyIw7Hse/ODmgBL9aKBhrBR+
-         QDDcqQqAdIZTX3WL1AetyE3jL8Z7UfxdRlbeYmgC3KxoQ1JGUO5P/z0aHKwwmXDVbECj
-         AuFfIQm7sMB0W8Fn1uWO/41uzUy2iQROSJACK1zFtCB5Ab5h3m+zMu7WKhoWQK1NOfC6
-         FGmzCigSE7vWW/M9qBClZbQwtO4eC/7gkX0vt5SaBL49Jx2Ea8iuUqxrqNunzGJXm1oE
-         JWUZFC3ZmBZazxQinxj2ElsyYVRjc4rohZ/gwlRQDOLEWPgCW/Y5CMxXPPgmtldeeeIg
-         RE6w==
+        bh=5XlQ1VpPqIV9nkbL5heHBJQIeqw1Mqo2GOdHAQq5+II=;
+        b=V1Xkq1+a6hse0yYR3fG7QmZf7eJLZ9IHXShDEimvhNxJCgJXQZEhiB7rS29v8mOpv8
+         P6Q/NgzpGGR1zjQswFV9oVsIkApjiLp/TuMLa8asbQeDVSJ9xcqsRDBMPPfvubQ/ud8M
+         6dma9SHs8xseeoX1geC075YVhTJkg5UYKK9V145qBxKkDYQso+5CEuESYbx9GpS5ITt/
+         geAPZY2mvKURWXNpdq+82LS5ePfVg2MiJ8HHMrB93gDn3YIy3WMpYdI3RCQ1Wj2jPwFe
+         D51PhycmYQXgI5PX3syysunfpaQHEnp6cVcDiO8I65JrGDV+oaRZA47creHSMX5+vVkK
+         EpTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=08Zu8gSbNoVwH6SgINHBVlRGcpHDOzJ+Q2vxMgjaChc=;
-        b=jsm+QSDjQVYJRWc6K7AshbXmbN5iOEnnSxjSWhDJqkv3yXB28OM6oQuHyR67mOynYz
-         o76g8c1lNf6se4mknGhDkfwkKk8fgK8aP13ILcEG48sNrZxqW40MBEuT1nWlkVcg7+wK
-         A/EZAY35XkS1GqQs2+Waie58PJZBgADEjmv+48Y2F07R5XlfTsRhIjcOgaeZKZrulDkr
-         V9+0gighZxqOux24q1fLjsncFR4j+wSKMlIX1DYAq6gQkdjdZD46c+WEFyhUVu+0YM2P
-         NmHt1aDbG2blUA+qQi1JCyo9lwYyztg5lrbXK4QsT+Ls8IXnLrPE49TknaRF5qJQEucZ
-         hbKw==
-X-Gm-Message-State: ACrzQf1cw15hrx1JrJLVxAAUiOYRFv1vP6b+QhdhmqSFDDyS8SiExES+
-        lw7Bref1rcek9VkzJMVujls=
-X-Google-Smtp-Source: AMsMyM6+ebOfksS7/dKAeoPOeQiFYFMU9VBsL7Wg1bKooGg4PafvZv5MknBjnq/lOyGHV8ZLR+girw==
-X-Received: by 2002:a05:6402:50ca:b0:451:a711:1389 with SMTP id h10-20020a05640250ca00b00451a7111389mr17116111edb.239.1663629520004;
-        Mon, 19 Sep 2022 16:18:40 -0700 (PDT)
+        bh=5XlQ1VpPqIV9nkbL5heHBJQIeqw1Mqo2GOdHAQq5+II=;
+        b=MunTEGyP8Y5LnVYyX9qFgGn9bOI+m+ql89nolT7EGK17E2GvNR49xR6pqj5p4GQalI
+         ybPbNOKhSsmdtzzfNVqap58fGWwfFwQ0OA3BIpwQzzCP8bZVnHuZuO1X+JsWc2Wb+VaJ
+         TB0woI9rA53b/Gtu4adrUO06eLlHwnVrGoWuLZ+p405j63bZ6g2yJpjCpkcMrlTdQkey
+         wcNPOBlZjaD6TeIfipqRm6E9Y7F30wOVMn/bdz2hWTYlGE0vhrSNwSHOk4xD/Jzt43ia
+         4sZ7RMhO6twaXT8kZGeICKbd1VOonhjrSiGSP/dRU2Co5oMfj05IJzU4oKMoCrxyj4RB
+         9OjQ==
+X-Gm-Message-State: ACrzQf3rShCU86KmdHo3dobWep+n4Qb1xpi0+3sSnqg6PYZ9C9tO0gra
+        SSEjHmle70Vvj/47h8dXAOY=
+X-Google-Smtp-Source: AMsMyM6LQ7zX0snjJOKDhu4y1VtCyR5HxEAeYDZgQV0qmXEZF7bGIa6sBksILYTX9vlQa3QJPxyguw==
+X-Received: by 2002:a05:6402:2711:b0:451:327a:365f with SMTP id y17-20020a056402271100b00451327a365fmr17131653edd.315.1663629533162;
+        Mon, 19 Sep 2022 16:18:53 -0700 (PDT)
 Received: from localhost.localdomain (dynamic-078-054-077-055.78.54.pool.telefonica.de. [78.54.77.55])
-        by smtp.gmail.com with ESMTPSA id rn24-20020a170906d93800b00780f6071b5dsm4800926ejb.188.2022.09.19.16.18.34
+        by smtp.gmail.com with ESMTPSA id rn24-20020a170906d93800b00780f6071b5dsm4800926ejb.188.2022.09.19.16.18.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Sep 2022 16:18:39 -0700 (PDT)
+        Mon, 19 Sep 2022 16:18:52 -0700 (PDT)
 From:   Bernhard Beschow <shentey@gmail.com>
 To:     qemu-devel@nongnu.org
 Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
@@ -127,9 +127,9 @@ Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
         Alistair Francis <alistair@alistair23.me>,
         Jason Herne <jjherne@linux.ibm.com>,
         Bernhard Beschow <shentey@gmail.com>
-Subject: [PATCH 4/9] hw/ppc/spapr: Fix code style problems reported by checkpatch
-Date:   Tue, 20 Sep 2022 01:17:15 +0200
-Message-Id: <20220919231720.163121-5-shentey@gmail.com>
+Subject: [PATCH 6/9] target/loongarch/cpu: Remove unneeded include directive
+Date:   Tue, 20 Sep 2022 01:17:17 +0200
+Message-Id: <20220919231720.163121-7-shentey@gmail.com>
 X-Mailer: git-send-email 2.37.3
 In-Reply-To: <20220919231720.163121-1-shentey@gmail.com>
 References: <20220919231720.163121-1-shentey@gmail.com>
@@ -145,34 +145,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The cpu is used in both user and system emulation context while sysbus.h
+is system-only. Remove it since it's not needed anyway. Furthermore, it
+would cause a compile error in the next commit.
+
 Signed-off-by: Bernhard Beschow <shentey@gmail.com>
 ---
- include/hw/ppc/spapr.h | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ target/loongarch/cpu.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 530d739b1d..04a95669ab 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -848,7 +848,8 @@ static inline uint64_t ppc64_phys_to_real(uint64_t addr)
+diff --git a/target/loongarch/cpu.h b/target/loongarch/cpu.h
+index dce999aaac..c9ed2cb3e7 100644
+--- a/target/loongarch/cpu.h
++++ b/target/loongarch/cpu.h
+@@ -13,7 +13,6 @@
+ #include "hw/registerfields.h"
+ #include "qemu/timer.h"
+ #include "exec/memory.h"
+-#include "hw/sysbus.h"
  
- static inline uint32_t rtas_ld(target_ulong phys, int n)
- {
--    return ldl_be_phys(&address_space_memory, ppc64_phys_to_real(phys + 4*n));
-+    return ldl_be_phys(&address_space_memory,
-+                       ppc64_phys_to_real(phys + 4 * n));
- }
- 
- static inline uint64_t rtas_ldq(target_ulong phys, int n)
-@@ -858,7 +859,7 @@ static inline uint64_t rtas_ldq(target_ulong phys, int n)
- 
- static inline void rtas_st(target_ulong phys, int n, uint32_t val)
- {
--    stl_be_phys(&address_space_memory, ppc64_phys_to_real(phys + 4*n), val);
-+    stl_be_phys(&address_space_memory, ppc64_phys_to_real(phys + 4 * n), val);
- }
- 
- typedef void (*spapr_rtas_fn)(PowerPCCPU *cpu, SpaprMachineState *sm,
+ #define IOCSRF_TEMP             0
+ #define IOCSRF_NODECNT          1
 -- 
 2.37.3
 
