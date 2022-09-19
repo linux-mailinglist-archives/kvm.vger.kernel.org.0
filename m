@@ -2,89 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D6A945BC3BD
-	for <lists+kvm@lfdr.de>; Mon, 19 Sep 2022 09:53:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59BB05BC4B7
+	for <lists+kvm@lfdr.de>; Mon, 19 Sep 2022 10:50:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229933AbiISHxr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Sep 2022 03:53:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59866 "EHLO
+        id S230200AbiISIuM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Sep 2022 04:50:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229938AbiISHxg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Sep 2022 03:53:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAFF31EAE6
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 00:53:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663574013;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+jF6oIsWPK5kJUJRdE/upBDeiuSKze81vSXS8eDi/Hk=;
-        b=ehjRtvaojdJPDJYbLY/CEuTxebZ2zwaXmc9HyESX6lWsShrm/jxDCVgUqUdvN1VPFgHrpF
-        zvT/tRZ8dkr2d9dreZITY/yIUr8MHFWFdaMmOrBLWjBa1AIkAhmZcMxTI45iWMCZuMWbr4
-        5/slQBLm1JYkZ5b2szape0aXfQcSve8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-226-0op1y6MYPFKqPhnUxG1Z3g-1; Mon, 19 Sep 2022 03:53:32 -0400
-X-MC-Unique: 0op1y6MYPFKqPhnUxG1Z3g-1
-Received: by mail-wm1-f70.google.com with SMTP id f25-20020a7bc8d9000000b003b4768dcd9cso2320152wml.9
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 00:53:32 -0700 (PDT)
+        with ESMTP id S230179AbiISItq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Sep 2022 04:49:46 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 119CC237EC;
+        Mon, 19 Sep 2022 01:49:22 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id bi3so99351pgb.11;
+        Mon, 19 Sep 2022 01:49:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=f4lJ3N0uKHqbaTlJ2yJchpCS7uT21SgUgyF132AXj88=;
+        b=Kvt6IxivfZ9AdelKHj+0aVmVKjmSEK59vtDHoyQlD/1I0ytsotSWHqyBD2fL6vqMQB
+         R4sM8C3e7773ITsR5x2bG3GVybnaeQjcRbeRjK1yBz2y1LEE0uA2Lr3ioFSCdbPrXhY5
+         Lz+pLENV6AedTARCPjT3lQoSC4RyuNdo3Wy0MZRlaX85qsulXcEgRLCP9xWjvHzwspZU
+         6TW3L70d35OPXjAKS4J/v0p51LHiDn3aLisTbfvWoiJAA2GDoFqhWTurroc6oCOYKilf
+         oOnt3KcxndHTbS1r77Z4pW22/qLhajoKsOb45SJlYBp98k9pT7YZh+VsRL53p2zYEC3T
+         39Cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=+jF6oIsWPK5kJUJRdE/upBDeiuSKze81vSXS8eDi/Hk=;
-        b=HK5yS0aSEEAPo45v8Loq5GVTsvH1B7sc4Duk1S3t/J0NuLwnY9i8sL6M+eV76iLjYF
-         DXRB1IlEumlqsz9Hy1bORZUXBoyKJF3YE4lIM5Vl3hqYIOqyr5EhiTNoji+g6gUgZOFv
-         0BGIjUK0xe/X0J7RSMK/FeNLIqnaRKGY/CQy6l1b6Wu+1jg9Zbfv4pwl2yO+suaGFidB
-         fARxNAhXY1nWsToySb7/yEnTRZUIbwUR3hqit8vnT3RdxUWx9vcvii1aTGbk1SY9PFTL
-         uzb0s8ex04LVa719O96YVwkEXFE9CtBCdokk790VURzvyHhMpDD/vxlv2sO2iOkIh7JS
-         EbfQ==
-X-Gm-Message-State: ACrzQf0PU5rnWcG5QYtQUsE5MHY5FsFnhKA5F1Mu6f+H5vp2Fy5M+cSz
-        uMOfcbtooEIIeWXkYVLE/mP4NjE5nsOFj8LBOOp2moV4NXU8BZeoYddJtRwDftclJVar/N4W9AB
-        XD9+VyDm95FGs
-X-Received: by 2002:a5d:64a4:0:b0:22a:85a3:55bd with SMTP id m4-20020a5d64a4000000b0022a85a355bdmr9940656wrp.340.1663574011283;
-        Mon, 19 Sep 2022 00:53:31 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM6cl/99Fb6zf0Iio6HOH0AZbm1zMjRncUlMjPbnKoJ7GvYswGK8HUjr6ToG6Z5yuJljlakZTw==
-X-Received: by 2002:a5d:64a4:0:b0:22a:85a3:55bd with SMTP id m4-20020a5d64a4000000b0022a85a355bdmr9940641wrp.340.1663574011014;
-        Mon, 19 Sep 2022 00:53:31 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c703:c100:c136:f914:345f:f5f3? (p200300cbc703c100c136f914345ff5f3.dip0.t-ipconnect.de. [2003:cb:c703:c100:c136:f914:345f:f5f3])
-        by smtp.gmail.com with ESMTPSA id k24-20020adfd238000000b0022ad393ba3csm12594453wrh.107.2022.09.19.00.53.29
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=f4lJ3N0uKHqbaTlJ2yJchpCS7uT21SgUgyF132AXj88=;
+        b=YQkmssABbvmdieD8mQjLKcj6KS+iRtcLNojBxFSL+7onslYPswLa3s0POynpH2ifrt
+         lNcqe8BYfx2kB4jlabWndILqa1O6xL9z8FYYH79wt6TkGE+HfHoEY7b5IK6ubVr4cV2L
+         zThh0SR1i8aQUqhfLXugxk3XSVwnr8TRyIZj2PEFX11Ym17u0d+Ef0TNwZ8GMBJBXLCD
+         GJKDremaUObmfUyFe6kOrHMyJOJW6TinQlbJwd4DZpwz3LUR1kHYl5f0V9Q60Y52URPX
+         fLDOGqybL7z8wvAcH/V8DK7QFvi7Gyr+89hHQz4gA+ZdrleLQd/r0uX7k+YTD3JYPFtV
+         gQuw==
+X-Gm-Message-State: ACrzQf21DQ/6ukqFpQ1Ynv6CQ6I0xWnWH7sJZq7SREylQlnVgQziQcP5
+        hUNmmIuD34sMlNiT+PuiWqk=
+X-Google-Smtp-Source: AMsMyM5WyR2QEL3sFfFzy9AA6p83zqLW8oRvtZ5YMWGujrMZH5OhGa2LxH3pz3VfAMzCjuLMU8RsAA==
+X-Received: by 2002:aa7:8058:0:b0:54f:1644:a4fd with SMTP id y24-20020aa78058000000b0054f1644a4fdmr3525961pfm.63.1663577351766;
+        Mon, 19 Sep 2022 01:49:11 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id w16-20020aa79550000000b0054555418ca4sm14692040pfq.29.2022.09.19.01.49.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Sep 2022 00:53:30 -0700 (PDT)
-Message-ID: <37b3162e-7b3a-919f-80e2-f96eca7d4b4c@redhat.com>
-Date:   Mon, 19 Sep 2022 09:53:29 +0200
+        Mon, 19 Sep 2022 01:49:11 -0700 (PDT)
+Message-ID: <f3cc0afb-f24a-9b71-1f55-db4c437cc458@gmail.com>
+Date:   Mon, 19 Sep 2022 16:49:04 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [RFC PATCH 0/9] kvm: implement atomic memslot updates
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.13.0
+Subject: Re: [PATCH v2 1/3] KVM: x86/pmu: Stop adding speculative Intel GP
+ PMCs that don't exist yet
 Content-Language: en-US
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-References: <20220909104506.738478-1-eesposit@redhat.com>
- <YxtOEgJhe4EcAJsE@google.com>
- <5f0345d2-d4d1-f4fe-86ba-6e22561cb6bd@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <5f0345d2-d4d1-f4fe-86ba-6e22561cb6bd@redhat.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20220907104838.8424-1-likexu@tencent.com>
+ <CALMp9eSPfxPunKW-K6LLPxsXdaeezKU=2G9Sdh7FS6VGb3goFA@mail.gmail.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <CALMp9eSPfxPunKW-K6LLPxsXdaeezKU=2G9Sdh7FS6VGb3goFA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -92,44 +78,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18.09.22 18:13, Emanuele Giuseppe Esposito wrote:
-> 
-> 
-> Am 09/09/2022 um 16:30 schrieb Sean Christopherson:
->> On Fri, Sep 09, 2022, Emanuele Giuseppe Esposito wrote:
->>> KVM is currently capable of receiving a single memslot update through
->>> the KVM_SET_USER_MEMORY_REGION ioctl.
->>> The problem arises when we want to atomically perform multiple updates,
->>> so that readers of memslot active list avoid seeing incomplete states.
->>>
->>> For example, in RHBZ https://bugzilla.redhat.com/show_bug.cgi?id=1979276
+On 8/9/2022 12:33 am, Jim Mattson wrote:
+> On Wed, Sep 7, 2022 at 3:48 AM Like Xu <like.xu.linux@gmail.com> wrote:
 >>
->> I don't have access.  Can you provide a TL;DR?
-> 
-> You should be able to have access to it now.
-> 
+>> From: Like Xu <likexu@tencent.com>
 >>
->>> we see how non atomic updates cause boot failure, because vcpus
->>> will se a partial update (old memslot delete, new one not yet created)
->>> and will crash.
+>> The Intel April 2022 SDM - Table 2-2. IA-32 Architectural MSRs adds
+>> a new architectural IA32_OVERCLOCKING_STATUS msr (0x195), plus the
+>> presence of IA32_CORE_CAPABILITIES (0xCF), the theoretical effective
+>> maximum value of the Intel GP PMCs is 14 (0xCF - 0xC1) instead of 18.
 >>
->> Why not simply pause vCPUs in this scenario?  This is an awful lot of a complexity
->> to take on for something that appears to be solvable in userspace.
+>> But the conclusion of this speculation "14" is very fragile and can
+>> easily be overturned once Intel declares another meaningful arch msr
+>> in the above reserved range, and even worse, Intel probably put PMCs
+>> 8-15 in a completely different range of MSR indices.
+> 
+> The last clause is just conjecture.
+> 
+>> A conservative proposal would be to stop at the maximum number of Intel
+>> GP PMCs supported today. Also subsequent changes would limit both AMD
+>> and Intel on the number of GP counter supported by KVM.
 >>
+>> There are some boxes like Intel P4 may indeed have 18 counters, but
+>> those counters are in a completely different msr address range and do
+>> not strictly adhere to the Intel Arch PMU specification, and will not
+>> be supported by KVM in the near future.
 > 
-> I think it is not that easy to solve in userspace: see
-> https://lore.kernel.org/qemu-devel/20200312161217.3590-1-david@redhat.com/
-> 
-> 
-> "Using pause_all_vcpus()/resume_all_vcpus() is not possible, as it will
-> temporarily drop the BQL - something most callers can't handle (esp.
-> when called from vcpu context e.g., in virtio code)."
+> The P4 PMU isn't virtualized by KVM today, is it?
 
-Can you please comment on the bigger picture? The patch from me works 
-around *exactly that*, and for that reason, contains that comment.
+According to [1], P4 PMU has ZERO number of Intel Architectural Events, and
+the KVM support for non Intel Arch PMUs has been dropped recently.
 
--- 
-Thanks,
+[1] 
+https://www.intel.com/content/dam/develop/external/us/en/documents/30320-nehalem-pmu-programming-guide-core.pdf
 
-David / dhildenb
+> 
+>>
+>> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+>> Suggested-by: Jim Mattson <jmattson@google.com>
+>> Signed-off-by: Like Xu <likexu@tencent.com>
+> 
+> Please put the "Fixes" tag back. You convinced me that it should be there.
+> 
+> Reviewed-by: Jim Mattson <jmattson@google.com>
 
