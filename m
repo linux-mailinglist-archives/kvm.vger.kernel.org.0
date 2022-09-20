@@ -2,147 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D4815BF104
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 01:24:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67B155BF115
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 01:31:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230112AbiITXYD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Sep 2022 19:24:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37010 "EHLO
+        id S230368AbiITXbl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Sep 2022 19:31:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230025AbiITXYB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Sep 2022 19:24:01 -0400
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68E1C753A8
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 16:24:00 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id a26so9848120ejc.4
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 16:24:00 -0700 (PDT)
+        with ESMTP id S229805AbiITXbi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Sep 2022 19:31:38 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E28C14D81C
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 16:31:37 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id p4-20020a17090a348400b00202c6d79591so2027728pjb.0
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 16:31:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=qKZPVG5iME12/xaovZM6A6+qsWvmHnon3GYaJNYHOS8=;
-        b=fCK9HNlTrRewEDKb1ki/vTFY3BFU4vzCnR5/5SporYyj2K3I0iIme7NT7sFxvxSWk3
-         umbS7mgSQHCv4vemkhsUb7I8ViXwtdzvdECA7Hg1aPJOJHkBgajnUvnzOd15ofRxvKPW
-         2NmhmYzO4jI0zH5j583BH2fYOyCqRhQagr8KEfGrHxwOvw9vpW0RHacBcO/xfLZqnbG9
-         JGQYdHCVFxtkFHNb5If1sypH5E1lsaKJVmD0Bts992LCNZLkqOhf1P9RqHOcsUAWXlWu
-         d4YWu7xGj+i6DW0je9gZb13SoS+moDDgWL9JmB1tDOJPynLYKJKZy8VNJloyV8FGfrcV
-         cuNg==
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date;
+        bh=yLvwOWuXtYmkq2gfHjtQ1MhX2AnqJW1myBmVRg299oc=;
+        b=pq7XJBM0vZ9KBqZnYoj2EMzf3D9IQDFghpRQZgnIbzKHdFWniBp/yKBOkw5BFcrgEG
+         XmMR0TP7OiMzg0S/Bl1P16+d+VyB/TQfTxI8IOQiMHCw9M7Jta1HLVQNbpyZ1x9ON4PF
+         TNyu5PyT1XzbZA9e/iPzPUXLdkZRsdWc4UVDdvx6YfGw8Pu6kvlrPpTkSr8iGQ15P1DP
+         jrdVZOkcm8/P3ClTHMk4+Me4qwUYHIvAn/bUhM3SpvIyqef5WLyOKiOjNm72fwLLlb+f
+         qSQBuJ4nh6g1593Cnnro7xFEq1Oy8hJtD2nS+MJkYwqJkf/bZSxq9DOlA8R8e9p3xfyG
+         j8KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=qKZPVG5iME12/xaovZM6A6+qsWvmHnon3GYaJNYHOS8=;
-        b=zmzGAJY2DDWrMMVBdbBfK7r7EjUzsOAjBcjMhWGxt3JnVVEYFHqQe+k3UB2BqBypaY
-         8W6pG+YpuJtsOOCMqbTyb49Rmva0LUnI4eg2KllNO1XAZj8kvKQjZ1VEGdPprXfJDVpD
-         T4kDfnzENMpOEjVbV8yfUcI1Hs60Nsifw2nZR25T3/VtdflYJ8QgPWlwYJAz0epJRlSR
-         yv44t6yOS3yMsPrdJkRY0+gARaGDVx8/quLrx7g8EgInzGSXMpeiUrE5+NXUYxymnsty
-         o3NU7YdCXdF3ssfa7g0JokUKpCRJhwbXYkL5XzhrqLCQF411ZC8RssBVETKNs1X15PvF
-         CAEg==
-X-Gm-Message-State: ACrzQf3vktzwRpXZUp2ioR1pjR8hdJumVctooTtyNFEhNniRtPHpbGuE
-        KjKBAm8s3pMyCMIVgh4ltRs=
-X-Google-Smtp-Source: AMsMyM5RM/OVc3EykNVPTfjHa4cDBJJ/DnJiA70xAhCb8RUZeIR5sVs3l/o+BP+JEU8fpdRpHUyjcA==
-X-Received: by 2002:a17:906:eec9:b0:73d:c369:690f with SMTP id wu9-20020a170906eec900b0073dc369690fmr19058158ejb.767.1663716238901;
-        Tue, 20 Sep 2022 16:23:58 -0700 (PDT)
-Received: from [127.0.0.1] (dynamic-078-054-006-055.78.54.pool.telefonica.de. [78.54.6.55])
-        by smtp.gmail.com with ESMTPSA id j22-20020a508a96000000b0044ed7a75c33sm689265edj.6.2022.09.20.16.23.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Sep 2022 16:23:58 -0700 (PDT)
-Date:   Tue, 20 Sep 2022 23:23:52 +0000
-From:   Bernhard Beschow <shentey@gmail.com>
-To:     Markus Armbruster <armbru@redhat.com>,
-        Alistair Francis <alistair23@gmail.com>,
-        Bin Meng <bin.meng@windriver.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>
-CC:     "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Magnus Damm <magnus.damm@gmail.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Bandan Das <bsd@redhat.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Xiaojuan Yang <yangxiaojuan@loongson.cn>,
-        Cameron Esfahani <dirty@apple.com>,
-        Michael Rolnik <mrolnik@gmail.com>,
-        Song Gao <gaosong@loongson.cn>,
-        Jagannathan Raman <jag.raman@oracle.com>,
-        Greg Kurz <groug@kaod.org>,
-        Kamil Rytarowski <kamil@netbsd.org>,
-        Peter Xu <peterx@redhat.com>, Joel Stanley <joel@jms.id.au>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, haxm-team@intel.com,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        =?ISO-8859-1?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        =?ISO-8859-1?Q?C=E9dric_Le_Goater?= <clg@kaod.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Qemu-block <qemu-block@nongnu.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        =?ISO-8859-1?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>,
-        "open list:New World" <qemu-ppc@nongnu.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Helge Deller <deller@gmx.de>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        =?ISO-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>,
-        "open list:RISC-V" <qemu-riscv@nongnu.org>,
-        Stafford Horne <shorne@gmail.com>, Paul Durrant <paul@xen.org>,
-        Havard Skinnemoen <hskinnemoen@google.com>,
-        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-        Alexander Graf <agraf@csgraf.de>,
-        Thomas Huth <thuth@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Wenchao Wang <wenchao.wang@intel.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        qemu-s390x <qemu-s390x@nongnu.org>,
-        =?ISO-8859-1?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        Eric Farman <farman@linux.ibm.com>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
-        Alexander Bulekov <alxndr@bu.edu>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Tyrone Ting <kfting@nuvoton.com>,
-        "open list:X86" <xen-devel@lists.xenproject.org>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        John Snow <jsnow@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Darren Kenny <darren.kenny@oracle.com>,
-        "open list:Overall" <kvm@vger.kernel.org>,
-        Qiuhao Li <Qiuhao.Li@outlook.com>,
-        John G Johnson <john.g.johnson@oracle.com>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        qemu-arm <qemu-arm@nongnu.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Artyom Tarasenko <atar4qemu@gmail.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        Jason Wang <jasowang@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Laurent Vivier <laurent@vivier.eu>,
-        Alistair Francis <alistair@alistair23.me>,
-        Jason Herne <jjherne@linux.ibm.com>
-Subject: Re: [PATCH 1/9] hw/riscv/sifive_e: Fix inheritance of SiFiveEState
-In-Reply-To: <87edw6xoog.fsf@pond.sub.org>
-References: <20220919231720.163121-1-shentey@gmail.com> <20220919231720.163121-2-shentey@gmail.com> <CAKmqyKN+V2R8PkED67tB8+pCZs9369ViiL8OZ9XhO3SdUCk5=Q@mail.gmail.com> <87edw6xoog.fsf@pond.sub.org>
-Message-ID: <0BBD7391-7B2D-44E7-9396-D1747784B9DA@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=yLvwOWuXtYmkq2gfHjtQ1MhX2AnqJW1myBmVRg299oc=;
+        b=T5tfcdRGLpqrdm1lJQpHSZXjY5xMKCzeSgR8QVswKbm6+eeIQ2iSJxm3L6aXtg9aGv
+         5I5uvP/e3fC5rDP4+kT1XQC7+DWJzGC8shlOd0V+b/j6tmzSJI8Wz7d6DWcoeSk/qxnO
+         efoy0D+QEW+SVZV5ykqaqlYo2pZteA8XEYYMuT0vRLU5czlZg5CZLOpSOsg5AhGbVgzh
+         2S1M62JcILndJiKQs5zbU8/oMIBN0/DDhoZrxdLD4BWKinWx3+/iD8yGG6rftjsU+PFO
+         QbWaOtAJYGbo31+1OrLt2CcaKWSNrLOPAKgGaxPT6Wqmr6fmYcxWlV6vI1AfKPqUCOES
+         hMKg==
+X-Gm-Message-State: ACrzQf09OOIliE7fgz05LJR/iPY4UOTCI8gXvDFiSmZoyr/E8nTxzokA
+        O0sDWBkoAims7VFTVX3ULOc3HUECxzI=
+X-Google-Smtp-Source: AMsMyM4v+iUjgkKBatNGzl5ZdWlqUnuoLW9A6Q+ClVGzUcSTXacOuBjve8AEVYyvMQuC9dbVqnkg8JXNvyw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:1942:b0:202:cf66:f37f with SMTP id
+ nk2-20020a17090b194200b00202cf66f37fmr6235484pjb.15.1663716697425; Tue, 20
+ Sep 2022 16:31:37 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue, 20 Sep 2022 23:31:06 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
+Message-ID: <20220920233134.940511-1-seanjc@google.com>
+Subject: [PATCH v3 00/28] KVM: x86: AVIC and local APIC fixes+cleanups
+From:   Sean Christopherson <seanjc@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Li RongQing <lirongqing@baidu.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -150,33 +70,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 20=2E September 2022 11:36:47 UTC schrieb Markus Armbruster <armbru@redh=
-at=2Ecom>:
->Alistair Francis <alistair23@gmail=2Ecom> writes:
->
->> On Tue, Sep 20, 2022 at 9:18 AM Bernhard Beschow <shentey@gmail=2Ecom> =
-wrote:
->>>
->>> SiFiveEState inherits from SysBusDevice while it's TypeInfo claims it =
-to
->>> inherit from TYPE_MACHINE=2E This is an inconsistency which can cause
->>> undefined behavior such as memory corruption=2E
->>>
->>> Change SiFiveEState to inherit from MachineState since it is registere=
-d
->>> as a machine=2E
->>>
->>> Signed-off-by: Bernhard Beschow <shentey@gmail=2Ecom>
->>
->> Reviewed-by: Alistair Francis <alistair=2Efrancis@wdc=2Ecom>
->
->To the SiFive maintainers: since this is a bug fix, let's merge it right
->away=2E
+TL;DR: KVM's AVIC and optimized APIC map code doesn't correctly handle
+various edge cases that are architecturally legal(ish), but are unlikely
+to occur in most real world scenarios.
 
-I could repost this particular patch with the three new tags (incl=2E Fixe=
-s) if desired=2E
+I have tested this heavily with KUT, but I haven't booted Windows and
+don't have access to x2AVIC, so additional testing would be much
+appreciated.
 
-Best regards,
-Bernhard
->
+v3:
+  - Collect reviews. [Paolo]
+  - Drop "partial" x2APIC inhibit and instead delete the memslot.
+    [Maxim, Suravee]
+  - Skip logical mode updates for x2APIC, which just reuses the
+    phys_map with some clever logic. [Suravee]
+  - Add a fix for "nodecode write" traps. [Alejandro]
+
+v2:
+  - https://lore.kernel.org/all/20220903002254.2411750-1-seanjc@google.com
+  - Collect reviews. [Li, Maxim]
+  - Disable only MMIO access when x2APIC is enabled (instead of disabling
+    all of AVIC). [Maxim]
+  - Inhibit AVIC when logical IDs are aliased. [Maxim]
+  - Tweak name of set_virtual_apic_mode() hook. [Maxim]
+  - Straight up revert logical ID fastpath mess. [Maxim]
+  - Reword changelog about skipping vCPU during logical setup. [Maxim]
+  - Fix LDR updates on AVIC. [Maxim?]
+  - Fix a nasty ISR caching bug.
+  - Flush TLB when activating AVIC.
+
+v1: https://lore.kernel.org/all/20220831003506.4117148-1-seanjc@google.com
+
+Sean Christopherson (27):
+  KVM: x86: Blindly get current x2APIC reg value on "nodecode write"
+    traps
+  KVM: x86: Purge "highest ISR" cache when updating APICv state
+  KVM: SVM: Flush the "current" TLB when activating AVIC
+  KVM: SVM: Process ICR on AVIC IPI delivery failure due to invalid
+    target
+  KVM: x86: Don't inhibit APICv/AVIC if xAPIC ID mismatch is due to
+    32-bit ID
+  KVM: x86: Move APIC access page helper to common x86 code
+  KVM: x86: Inhibit APIC memslot if x2APIC and AVIC are enabled
+  KVM: SVM: Don't put/load AVIC when setting virtual APIC mode
+  KVM: SVM: Replace "avic_mode" enum with "x2avic_enabled" boolean
+  KVM: SVM: Compute dest based on sender's x2APIC status for AVIC kick
+  Revert "KVM: SVM: Use target APIC ID to complete x2AVIC IRQs when
+    possible"
+  KVM: SVM: Document that vCPU ID == APIC ID in AVIC kick fastpatch
+  KVM: SVM: Add helper to perform final AVIC "kick" of single vCPU
+  KVM: x86: Explicitly skip optimized logical map setup if vCPU's LDR==0
+  KVM: x86: Explicitly track all possibilities for APIC map's logical
+    modes
+  KVM: x86: Skip redundant x2APIC logical mode optimized cluster setup
+  KVM: x86: Disable APIC logical map if logical ID covers multiple MDAs
+  KVM: x86: Disable APIC logical map if vCPUs are aliased in logical
+    mode
+  KVM: x86: Honor architectural behavior for aliased 8-bit APIC IDs
+  KVM: x86: Inhibit APICv/AVIC if the optimized physical map is disabled
+  KVM: SVM: Inhibit AVIC if vCPUs are aliased in logical mode
+  KVM: SVM: Always update local APIC on writes to logical dest register
+  KVM: SVM: Update svm->ldr_reg cache even if LDR is "bad"
+  KVM: SVM: Require logical ID to be power-of-2 for AVIC entry
+  KVM: SVM: Handle multiple logical targets in AVIC kick fastpath
+  KVM: SVM: Ignore writes to Remote Read Data on AVIC write traps
+  Revert "KVM: SVM: Do not throw warning when calling avic_vcpu_load on
+    a running vcpu"
+
+Suravee Suthikulpanit (1):
+  KVM: SVM: Fix x2APIC Logical ID calculation for
+    avic_kick_target_vcpus_fast
+
+ Documentation/virt/kvm/x86/errata.rst |  11 +
+ arch/x86/include/asm/kvm_host.h       |  51 +++-
+ arch/x86/kvm/lapic.c                  | 224 +++++++++++++---
+ arch/x86/kvm/lapic.h                  |   2 +
+ arch/x86/kvm/svm/avic.c               | 363 ++++++++++++--------------
+ arch/x86/kvm/svm/svm.c                |   4 +-
+ arch/x86/kvm/svm/svm.h                |  11 +-
+ arch/x86/kvm/vmx/vmx.c                |  36 +--
+ arch/x86/kvm/x86.c                    |   7 +
+ 9 files changed, 426 insertions(+), 283 deletions(-)
+
+
+base-commit: 372d07084593dc7a399bf9bee815711b1fb1bcf2
+-- 
+2.37.3.968.ga6b4b080e4-goog
 
