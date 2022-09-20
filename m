@@ -2,72 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 922D65BEC25
-	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 19:39:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A48565BEC34
+	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 19:46:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230368AbiITRj0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Sep 2022 13:39:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35646 "EHLO
+        id S231238AbiITRqa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Sep 2022 13:46:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230187AbiITRjZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Sep 2022 13:39:25 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41C1D6C764
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 10:39:24 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id c7so3355156pgt.11
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 10:39:24 -0700 (PDT)
+        with ESMTP id S230406AbiITRqN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Sep 2022 13:46:13 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECF16642E1
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 10:46:11 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id k126-20020a253d84000000b0068bb342010dso2829224yba.1
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 10:46:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=rWpDMhOTDtTlNFqC0FU+bCgE4TlD7DZUXOVCdFqtqHk=;
-        b=PRow5KNOVsY28eo7kfO2cOVUKtEv+lCi3ZX8z4TiJsOjv0FUD7vk+vFBT/KwldnYZy
-         QmGUMLx7Xt3KMnzeVnUerCkCa95gY4yxR4LoFiIf59s12Ihj93YqO5G/CZOpYVyynfMP
-         qXYS9+S/ZBUC1GOZuaKLSPqa4JBoihZzivyTOHcXWSv3+mLJSbUxFAgL7KrY5AbdXo6c
-         EfibQ2SFVtyPHUpJMsRf0OciCrgJB8hQdHVzLm5Vzhq4Y3CzXVbNZi7CAiSpvmuKuZjg
-         4CDECEq9ZZdgQ0MU2yXBcgT2hux5SfMddR0KpTmQQvJyKrLGVGVirjKII/EDtQp9MaHb
-         8A8w==
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date;
+        bh=5do7vRFgX3lapBnmpL/cqjSoiD5wQu4utGUAjAWhoRk=;
+        b=GFPrNc+AiIk5M3Xb9pQUq+U/WCdK+1ZE39LecEhg0R6RlhW0GYtuI9miElnZR4AL4g
+         faeqO8FCZrJ5NF6vfbvfFe71Jy3hOqeDExsnWCqpJbpUCBjMWTYIdZk/rX/wau+xd2AU
+         SIv4OPzrV4iteo0HzZ2F41Meq/eKnfyBnLMdFORX7JWwGLULvEm9+wAX7b0gV0LH9rjT
+         uXOiAWh/zOLP/v6sQIBaKJGtUBVCLptt1+9OYdCo9LZ3BaQ/vUxVENVT/9ZccZUJZM8k
+         8Uci0PvTvH29YxQkPG7x9Co4UdJwAI9NMKW0KT6TlKU/Ku34BA4kVvX+rX9M7qqMWBQv
+         FYGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=rWpDMhOTDtTlNFqC0FU+bCgE4TlD7DZUXOVCdFqtqHk=;
-        b=XTqLope9TDYVUmwCAbV2sAREJ9/KWJIF0+LP45zruA+prAI5aJl84a/trOzIttx9P9
-         WsMwjapEyWS4OvNUHpqq9g1jBLm8qyvPppS8zm2863fX3AfZDksg40KD6irrN983axv7
-         0//M9Jvvv/IN6iAIMEh2QIZwlBbG3rkMYbHPnm9eBhZLAnxQF5G1msf3QYHsRkwCsvPJ
-         LZfdT+K0R/ofix/u1Zjrkr3aRaVS4tYj9IIK0uULIVEqpKppcFvPY9iDQLTQCm5Pkzyh
-         prx0/zoaJaJO37ZdfxTk+kI1hqXlr+HL+TpnBZjDuCblJdaHTSsjntLsmtlHbgLdlzDb
-         DYfg==
-X-Gm-Message-State: ACrzQf3GtgPTwsme4c39NHWqVyQ6B/QtVy6dfXDw5sIh54JZAFoghEdG
-        y9OUdgbWtkdkvB1ksiD4W0/9Ng==
-X-Google-Smtp-Source: AMsMyM7YVFBVZtE00/uCv5CjoaO8irYok0FfFUmpXpjxXcb/R8kRHl4P3avVo2jOETzZf3X8iEIb+Q==
-X-Received: by 2002:a05:6a00:4c11:b0:53e:4f07:fce9 with SMTP id ea17-20020a056a004c1100b0053e4f07fce9mr25634942pfb.66.1663695563550;
-        Tue, 20 Sep 2022 10:39:23 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u5-20020a170902714500b00178957d17a4sm129916plm.286.2022.09.20.10.39.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Sep 2022 10:39:23 -0700 (PDT)
-Date:   Tue, 20 Sep 2022 17:39:19 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        andrew.jones@linux.dev, pbonzini@redhat.com, maz@kernel.org,
-        alexandru.elisei@arm.com, eric.auger@redhat.com, oupton@google.com,
-        reijiw@google.com, rananta@google.com, bgardon@google.com,
-        dmatlack@google.com, axelrasmussen@google.com
-Subject: Re: [PATCH v7 07/13] KVM: selftests: Add vm->memslots[] and enum
- kvm_mem_region_type
-Message-ID: <Yyn6x6Y8wlMgSrgZ@google.com>
-References: <20220920042551.3154283-1-ricarkol@google.com>
- <20220920042551.3154283-8-ricarkol@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220920042551.3154283-8-ricarkol@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=5do7vRFgX3lapBnmpL/cqjSoiD5wQu4utGUAjAWhoRk=;
+        b=np/oxROcHbNH1PakLgGYP9KdntW3wi+k2/1g3NWuA3Q/R/2OpZ2HYRjaIoMUCph6gJ
+         cX35KWieCGScAOGuQHETj6vffLYpCTgAMkPQdPuiEteP+iuLFWE4Tqp+orzJawdDQgBk
+         KR9G/pxxyXSTLIkyqNGIjKj4Pfw54YPvMtcdzPP7/oap+Jy5IwuC7QxaVrBW3SC/WfSs
+         SaacBfCAvrUlroMmOE52EZSazeE6+xFlPT6kHcv4yqp9ya284MwxPWm7IMN8zP7NFw+M
+         qDkgORp4TzpRiK4CWuXU1d6uGr4wOb3+goVi0Ty7iRV7NwJM79OtP4WGI5kc89ORAnZk
+         Z3uA==
+X-Gm-Message-State: ACrzQf0u8qCZxi5OHXKyQFwDvXRVCFWgEOriw6yh70WcnbyjmFOJ39ve
+        +7RauK44y3nt/ezzjM+LK/0RrymQ8DqcmzLDTPYF4nSXw2CrJ/mCL2T/NmUZ3shPm+Tb6NLunxf
+        DYRhS7Gnq3/ukMGMbbH5PxhMelZsmXPsIUKBo03onpU+mpEbW7hUAGHWGL2lkimGU7mvZ
+X-Google-Smtp-Source: AMsMyM4VwtQHBXlXpp+WWPW/y716ho84l4TtNWESMCPQHfiseHG2bNdcP529vVe2e2c7e00THxHY19ZnIGMwfMD2
+X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
+ (user=aaronlewis job=sendgmr) by 2002:a81:148c:0:b0:345:3561:8f4 with SMTP id
+ 134-20020a81148c000000b00345356108f4mr20544057ywu.76.1663695970909; Tue, 20
+ Sep 2022 10:46:10 -0700 (PDT)
+Date:   Tue, 20 Sep 2022 17:45:56 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
+Message-ID: <20220920174603.302510-1-aaronlewis@google.com>
+Subject: [PATCH v5 0/7] Introduce and test masked events
+From:   Aaron Lewis <aaronlewis@google.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
+        Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,99 +66,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 20, 2022, Ricardo Koller wrote:
-> The vm_create() helpers are hardcoded to place most page types (code,
-> page-tables, stacks, etc) in the same memslot #0, and always backed with
-> anonymous 4K.  There are a couple of issues with that.  First, tests willing to
+This series introduces the concept of masked events to the pmu event
+filter. Masked events can help reduce the number of events needed in the
+pmu event filter by allowing a more generalized matching method to be
+used for the unit mask when filtering guest events in the pmu.  With
+masked events, if an event select should be restricted from the guest,
+instead of having to add an entry to the pmu event filter for each
+event select + unit mask pair, a masked event can be added to generalize
+the unit mask values.
 
-Preferred kernel style is to wrap changelogs at ~75 chars, e.g. so that `git show`
-stays under 80 chars.
+v4 -> v5
+ - Patch #3, Simplified the return logic in filter_contains_match(). [Jim]
+ - Patch #4, Corrected documentation for errors and returns. [Jim]
+ - Patch #6, Added TEST_REQUIRE for KVM_CAP_PMU_EVENT_MASKED_EVENTS. [Jim]
+ - Patch #7,
+     - Removed TEST_REQUIRE for KVM_CAP_PMU_EVENT_MASKED_EVENTS (moved it
+       to patch #6).
+     - Changed the assert to a branch in supports_event_mem_inst_retired().
+       [Jim]
+     - Added a check to make sure 3 GP counters are available. [Jim]
 
-And in general, please incorporate checkpatch into your workflow, e.g. there's
-also a spelling mistake below.
+v3 -> v4
+ - Patch #1, Fix the mask for the guest event select used in bsearch.
+ - Patch #2, Remove invalid events from the pmu event filter.
+ - Patch #3, Create an internal/common representation for filter events.
+ - Patch #4,
+     - Use a common filter event to simplify kernel code. [Jim]
+     - s/invalid/exclude for masked events. More descriptive. [Sean]
+     - Simplified masked event layout. There was no need to complicate it.
+     - Add KVM_CAP_PMU_EVENT_MASKED_EVENTS.
+ - Patch #7, Rewrote the masked events tests using MEM_INST_RETIRED (0xd0)
+   on Intel and LS Dispatch (0x29) on AMD. They have multiple unit masks
+   each which were leveraged for improved masked events testing.
 
-  WARNING: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-  #9: 
-  anonymous 4K.  There are a couple of issues with that.  First, tests willing to
+v2 -> v3
+ - Reworked and documented the invert flag usage.  It was possible to
+   get ambiguous results when using it.  That should not be possible
+   now.
+ - Added testing for inverted masked events to validate the updated
+   implementation.
+ - Removed testing for inverted masked events from the masked events test.
+   They were meaningless with the updated implementation.  More meaning
+   tests were added separately.
 
-  WARNING: 'spreaded' may be misspelled - perhaps 'spread'?
-  #12: 
-  the hardcoded assumption of memslot #0 holding most things is spreaded
-                                                              ^^^^^^^^
+v1 -> v2
+ - Made has_invalid_event() static to fix warning.
+ - Fixed checkpatch.pl errors and warnings.
+ - Updated to account for KVM_X86_PMU_OP().
 
-  total: 0 errors, 2 warnings, 94 lines checked
+Aaron Lewis (7):
+  kvm: x86/pmu: Correct the mask used in a pmu event filter lookup
+  kvm: x86/pmu: Remove invalid raw events from the pmu event filter
+  kvm: x86/pmu: prepare the pmu event filter for masked events
+  kvm: x86/pmu: Introduce masked events to the pmu event filter
+  selftests: kvm/x86: Add flags when creating a pmu event filter
+  selftests: kvm/x86: Add testing for KVM_SET_PMU_EVENT_FILTER
+  selftests: kvm/x86: Test masked events
 
-> differ a bit, like placing page-tables in a different backing source type must
-> replicate much of what's already done by the vm_create() functions.  Second,
-> the hardcoded assumption of memslot #0 holding most things is spreaded
-> everywhere; this makes it very hard to change.
+ Documentation/virt/kvm/api.rst                |  82 +++-
+ arch/x86/include/asm/kvm-x86-pmu-ops.h        |   1 +
+ arch/x86/include/uapi/asm/kvm.h               |  28 ++
+ arch/x86/kvm/pmu.c                            | 262 ++++++++++--
+ arch/x86/kvm/pmu.h                            |  39 ++
+ arch/x86/kvm/svm/pmu.c                        |   6 +
+ arch/x86/kvm/vmx/pmu_intel.c                  |   6 +
+ arch/x86/kvm/x86.c                            |   1 +
+ include/uapi/linux/kvm.h                      |   1 +
+ .../kvm/x86_64/pmu_event_filter_test.c        | 387 +++++++++++++++++-
+ 10 files changed, 771 insertions(+), 42 deletions(-)
 
-...
+-- 
+2.37.3.968.ga6b4b080e4-goog
 
-> @@ -105,6 +119,13 @@ struct kvm_vm {
->  struct userspace_mem_region *
->  memslot2region(struct kvm_vm *vm, uint32_t memslot);
->  
-> +inline struct userspace_mem_region *
-
-Should be static inline.
-
-> +vm_get_mem_region
-
-Please don't insert newlines before the function name, it makes searching painful.
-Ignore existing patterns in KVM selfetsts, they're wrong.  ;-)  Linus has a nice
-explanation/rant on this[*].
-
-The resulting declaration will run long, but at least for me, I'll take that any
-day over putting the function name on a new line.
-
-[*] https://lore.kernel.org/all/CAHk-=wjoLAYG446ZNHfg=GhjSY6nFmuB_wA8fYd5iLBNXjo9Bw@mail.gmail.com
-
-
-> (struct kvm_vm *vm, enum kvm_mem_region_type mrt)
-
-One last nit, what about "region" or "type" instead of "mrt"?  The acronym made me
-briefly pause to figure out what "mrt" meant, which is silly because the name really
-doesn't have much meaning.
-
-> +{
-> +	assert(mrt < NR_MEM_REGIONS);
-> +	return memslot2region(vm, vm->memslots[mrt]);
-> +}
-
-...
-
-> @@ -293,8 +287,16 @@ struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
->  	uint64_t nr_pages = vm_nr_pages_required(mode, nr_runnable_vcpus,
->  						 nr_extra_pages);
->  	struct kvm_vm *vm;
-> +	int i;
-> +
-> +	pr_debug("%s: mode='%s' pages='%ld'\n", __func__,
-> +		 vm_guest_mode_string(mode), nr_pages);
-> +
-> +	vm = ____vm_create(mode);
-> +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, 0, nr_pages, 0);
-
-The spacing is weird here.  Adding the region and stuffing vm->memslots are what
-should be bundled together, not creating the VM and adding the common region.  I.e.
-
-	pr_debug("%s: mode='%s' pages='%ld'\n", __func__,
-		 vm_guest_mode_string(mode), nr_pages);
-
-	vm = ____vm_create(mode);
-
-	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, 0, nr_pages, 0);
-	for (i = 0; i < NR_MEM_REGIONS; i++)
-		vm->memslots[i] = 0;
-
->  
-> -	vm = ____vm_create(mode, nr_pages);
-> +	for (i = 0; i < NR_MEM_REGIONS; i++)
-> +		vm->memslots[i] = 0;
->  
->  	kvm_vm_elf_load(vm, program_invocation_name);
->  
-> -- 
-> 2.37.3.968.ga6b4b080e4-goog
-> 
