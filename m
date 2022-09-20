@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E49775BF11D
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 01:32:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19ACD5BF11F
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 01:32:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231167AbiITXb6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Sep 2022 19:31:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44696 "EHLO
+        id S230526AbiITXcF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Sep 2022 19:32:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230060AbiITXbp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Sep 2022 19:31:45 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 330B76CD38
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 16:31:44 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-34d2a92912dso31063047b3.14
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 16:31:44 -0700 (PDT)
+        with ESMTP id S230308AbiITXbq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Sep 2022 19:31:46 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FC5272843
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 16:31:45 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id z7-20020a170903018700b0017835863686so2649122plg.11
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 16:31:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date;
-        bh=ii5+t2J1kdVlIL2oCH8a9ZWauh1L3o8t5CyE0vSQ86k=;
-        b=X6jyBR8gbiSDrjF7c2UmvI5Mtcb5y5B97vdgUoLZpQ5be0M3KnBrz2gC5R1m9HqyVu
-         AaakNuinnj1/DuqFzzRKVqPAT0CXticUWJuipURkSnLSvd7p/HCiL8i/xZ1/yxG/Ny1Q
-         kdqDlguKfpCOEkWrBNNhQapSe85/q53mMoTVEaggmp6Rw2O8jVKdAdoY4enM0SH/te7o
-         VbhZ9WsfoE5HcHUWGeqdhV0bIU1loNWRsEbSWfd22WzuUSnkyjqSZgL0oyXdPak3JcdM
-         TNNUesUfySYM9im5kaC4LdY5UcYoc6HFHB1PcxOzGJGfa29ORiHeoDDYrc3R15dWzOp3
-         ITlQ==
+        bh=dYLN9GBGgw9bb1ictRproowJt/YAf1zd5j5g6hcPFfg=;
+        b=kNqSYhb/HAnrt536HOs7xUAP4Z2+7GGcDgLkQVMvZqfyl5tPjooDHiqOcT+hrnFN6E
+         NV+klM1GvU8zWTdvsAQPfxnB+k72U8P3S9vAPn593sWkyBbLZDqrAJIah2qCIk8MQA5B
+         BkKg+IbnGJ+iA+FRSstmyq2M2O3FKSbjt55t+bsFKCJDFGDdZ6gqnjh258gvh4GES1iP
+         LL3NjesyU1IelEuHxXvC3J5TdXwm/79ao2Z4a9goLw5SEceUmR3aJDsQovaB6mP6Y36u
+         GRPh+4hn6t9TEiGYM0/7cWKn7NzoNbjVzISOiJQvdJxAM7rW7tvReOt6UJMUrZCm0rmT
+         tKSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date;
-        bh=ii5+t2J1kdVlIL2oCH8a9ZWauh1L3o8t5CyE0vSQ86k=;
-        b=rUVMZS46gxP9UdplxFn1JJFeSB0bDg58S1BBoVyy9HN5O1y4Lt0TDj/Rpr9FnylDkH
-         Z6nNFuRbI+qpmgnkx8eXDrUlr35sgZ9Mm6s6MDJjma5Pb25L9tIZtscwUZg7lLPMSrBX
-         s/q4i1LeXvHuuH4+o65GK9U+ug8j3wri+y/u+v+Le1FuVJOeK+rAepS390DhyVY9d9yB
-         2WDAIXWwxI+lGn9QzBQxTBr7V3gy0UtWgCHZzrfQTMIvfhE91Hj/Mx/wtePfZSg/Lwfq
-         2bs8LwWcf+Gj9EdifkMb6yhp2GsMZdAKiRnrejZ156+aCiDf24xTAmuGsWl0kIJHu6BH
-         TDww==
-X-Gm-Message-State: ACrzQf04NCYtvZVCtTHsYKuq9Ngvlvtx/LOS2l4xiHIbxIa5Zh0/LiGU
-        aM7D9vFr40al6ZeAWsNkn8XaRQb/tic=
-X-Google-Smtp-Source: AMsMyM5aqFW6j2Vta21H0hUIHt8J/uBmwFMbLr8ZsZ6TK90bt9AX+Kc6P+Mp8Hrzi9XZH20nMTE5Qr8OoSE=
+        bh=dYLN9GBGgw9bb1ictRproowJt/YAf1zd5j5g6hcPFfg=;
+        b=Bn6ZzvTsdSKij+/ljra75da4Qmt/rtnNdV5nD/08BqIWuUdL5T/j58m42SaBB44fUN
+         HybLsdEY7yPrkYYyurIgbNYRJhGkfLXFOA4S0N07tEuycIcAvIC5JafcYThHgIjCmd2z
+         7XKT4f2oMkf9wfQWjDOsLNgc7rfP8c8mHM9s9FxRMl8O3Szare0y0KQYFwLMcnXPoxAC
+         th6JFjmhrF6igRzu/XI8wAVhw00aKy45csFxVFsM2I1AZ0bFTzGYAxt7HNh7m7I0hpSR
+         qYwGDg5MHs8Bjmy3P8giilWtlIdHL6BKRYvF1xfZqZPESUubzpniZ2Qb9+NU/XzoMHHX
+         vo3Q==
+X-Gm-Message-State: ACrzQf27wnQkuYKKlzQvcqA3okc6f/x2hT5JlHE6Y/3+5ToxAndJR16N
+        IWf+moUBhMFq7KBJcisRG+Ljnkv9ybQ=
+X-Google-Smtp-Source: AMsMyM68+xmkQUernGEuZHH60GWob96nzK2+b7JDn2jZj9scVDx7yQG4DjR+nvfV9+T5ZlLt3sFaV2nltFg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a5b:c4b:0:b0:6ae:ca4a:59e5 with SMTP id
- d11-20020a5b0c4b000000b006aeca4a59e5mr21501052ybr.246.1663716703528; Tue, 20
- Sep 2022 16:31:43 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:a407:b0:202:e6eb:4b7c with SMTP id
+ y7-20020a17090aa40700b00202e6eb4b7cmr6297652pjp.15.1663716705161; Tue, 20 Sep
+ 2022 16:31:45 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 20 Sep 2022 23:31:10 +0000
+Date:   Tue, 20 Sep 2022 23:31:11 +0000
 In-Reply-To: <20220920233134.940511-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220920233134.940511-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
-Message-ID: <20220920233134.940511-5-seanjc@google.com>
-Subject: [PATCH v3 04/28] KVM: SVM: Process ICR on AVIC IPI delivery failure
- due to invalid target
+Message-ID: <20220920233134.940511-6-seanjc@google.com>
+Subject: [PATCH v3 05/28] KVM: x86: Don't inhibit APICv/AVIC if xAPIC ID
+ mismatch is due to 32-bit ID
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -73,60 +73,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Emulate ICR writes on AVIC IPI failures due to invalid targets using the
-same logic as failures due to invalid types.  AVIC acceleration fails if
-_any_ of the targets are invalid, and crucially VM-Exits before sending
-IPIs to targets that _are_ valid.  In logical mode, the destination is a
-bitmap, i.e. a single IPI can target multiple logical IDs.  Doing nothing
-causes KVM to drop IPIs if at least one target is valid and at least one
-target is invalid.
+Truncate the vcpu_id, a.k.a. x2APIC ID, to an 8-bit value when comparing
+it against the xAPIC ID to avoid false positives (sort of) on systems
+with >255 CPUs, i.e. with IDs that don't fit into a u8.  The intent of
+APIC_ID_MODIFIED is to inhibit APICv/AVIC when the xAPIC is changed from
+it's original value,
 
-Fixes: 18f40c53e10f ("svm: Add VMEXIT handlers for AVIC")
-Cc: stable@vger.kernel.org
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+The mismatch isn't technically a false positive, as architecturally the
+xAPIC IDs do end up being aliased in this scenario, and neither APICv
+nor AVIC correctly handles IPI virtualization when there is aliasing.
+However, KVM already deliberately does not honor the aliasing behavior
+that results when an x2APIC ID gets truncated to an xAPIC ID.  I.e. the
+resulting APICv/AVIC behavior is aligned with KVM's existing behavior
+when KVM's x2APIC hotplug hack is effectively enabled.
+
+If/when KVM provides a way to disable the hotplug hack, APICv/AVIC can
+piggyback whatever logic disables the optimized APIC map (which is what
+provides the hotplug hack), i.e. so that KVM's optimized map and APIC
+virtualization yield the same behavior.
+
+For now, fix the immediate problem of APIC virtualization being disabled
+for large VMs, which is a much more pressing issue than ensuring KVM
+honors architectural behavior for APIC ID aliasing.
+
+Fixes: 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or APIC base")
+Reported-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/avic.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ arch/x86/kvm/lapic.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 712330b80891..3b2c88b168ba 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -502,14 +502,18 @@ int avic_incomplete_ipi_interception(struct kvm_vcpu *vcpu)
- 	trace_kvm_avic_incomplete_ipi(vcpu->vcpu_id, icrh, icrl, id, index);
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index adac6ca9b7dc..a02defa3f7b5 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2075,7 +2075,12 @@ static void kvm_lapic_xapic_id_updated(struct kvm_lapic *apic)
+ 	if (KVM_BUG_ON(apic_x2apic_mode(apic), kvm))
+ 		return;
  
- 	switch (id) {
-+	case AVIC_IPI_FAILURE_INVALID_TARGET:
- 	case AVIC_IPI_FAILURE_INVALID_INT_TYPE:
- 		/*
- 		 * Emulate IPIs that are not handled by AVIC hardware, which
--		 * only virtualizes Fixed, Edge-Triggered INTRs.  The exit is
--		 * a trap, e.g. ICR holds the correct value and RIP has been
--		 * advanced, KVM is responsible only for emulating the IPI.
--		 * Sadly, hardware may sometimes leave the BUSY flag set, in
--		 * which case KVM needs to emulate the ICR write as well in
-+		 * only virtualizes Fixed, Edge-Triggered INTRs, and falls over
-+		 * if _any_ targets are invalid, e.g. if the logical mode mask
-+		 * is a superset of running vCPUs.
-+		 *
-+		 * The exit is a trap, e.g. ICR holds the correct value and RIP
-+		 * has been advanced, KVM is responsible only for emulating the
-+		 * IPI.  Sadly, hardware may sometimes leave the BUSY flag set,
-+		 * in which case KVM needs to emulate the ICR write as well in
- 		 * order to clear the BUSY flag.
- 		 */
- 		if (icrl & APIC_ICR_BUSY)
-@@ -525,8 +529,6 @@ int avic_incomplete_ipi_interception(struct kvm_vcpu *vcpu)
- 		 */
- 		avic_kick_target_vcpus(vcpu->kvm, apic, icrl, icrh, index);
- 		break;
--	case AVIC_IPI_FAILURE_INVALID_TARGET:
--		break;
- 	case AVIC_IPI_FAILURE_INVALID_BACKING_PAGE:
- 		WARN_ONCE(1, "Invalid backing page\n");
- 		break;
+-	if (kvm_xapic_id(apic) == apic->vcpu->vcpu_id)
++	/*
++	 * Deliberately truncate the vCPU ID when detecting a modified APIC ID
++	 * to avoid false positives if the vCPU ID, i.e. x2APIC ID, is a 32-bit
++	 * value.
++	 */
++	if (kvm_xapic_id(apic) == (u8)apic->vcpu->vcpu_id)
+ 		return;
+ 
+ 	kvm_set_apicv_inhibit(apic->vcpu->kvm, APICV_INHIBIT_REASON_APIC_ID_MODIFIED);
 -- 
 2.37.3.968.ga6b4b080e4-goog
 
