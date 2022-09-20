@@ -2,106 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A1DF85BE7E9
-	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 16:04:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C145A5BE97B
+	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 16:59:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230368AbiITOEM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Sep 2022 10:04:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33096 "EHLO
+        id S231346AbiITO76 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Sep 2022 10:59:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229813AbiITOEL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Sep 2022 10:04:11 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E38232DA9;
-        Tue, 20 Sep 2022 07:04:10 -0700 (PDT)
-Received: from zn.tnic (p200300ea9733e791329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e791:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 42A471EC00F4;
-        Tue, 20 Sep 2022 16:04:04 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1663682644;
+        with ESMTP id S229885AbiITO75 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Sep 2022 10:59:57 -0400
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63FB7DF09
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 07:59:55 -0700 (PDT)
+Date:   Tue, 20 Sep 2022 16:59:52 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1663685993;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=UxdIT3N09KsqckiSbe/NvyvNSdoIMMBwrOEJCizvJpo=;
-        b=OG8msomfvFRFV9h3zLBfUDcULQo18fC9SQfmUXStEGVHnVEZfxdSTH1x+T966I7DiYxTNI
-        zqviVHAhV/iBK8leiTrSHyB1VB7J+QX88UY2i3mug6eBVVaSVnM1xzd9XIwgSSFLkOQomr
-        6qM4pMYQXH7yq+Z49OOoOIov0lQVJYA=
-Date:   Tue, 20 Sep 2022 16:04:00 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>
-Cc:     "x86@kernel.org" <x86@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "jroedel@suse.de" <jroedel@suse.de>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "slp@redhat.com" <slp@redhat.com>,
-        "pgonda@google.com" <pgonda@google.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "srinivas.pandruvada@linux.intel.com" 
-        <srinivas.pandruvada@linux.intel.com>,
-        "rientjes@google.com" <rientjes@google.com>,
-        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
-        "tobin@ibm.com" <tobin@ibm.com>,
-        "Roth, Michael" <Michael.Roth@amd.com>,
-        "vbabka@suse.cz" <vbabka@suse.cz>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "marcorr@google.com" <marcorr@google.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "alpergun@google.com" <alpergun@google.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>,
-        "jarkko@kernel.org" <jarkko@kernel.org>
-Subject: Re: [PATCH Part2 v6 11/49] crypto:ccp: Define the SEV-SNP commands
-Message-ID: <YynIUOoAxZyBi+Iu@zn.tnic>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <f5dec307d246096768afd770d16a26be25fa28b3.1655761627.git.ashish.kalra@amd.com>
- <Yym6Ob2tPYeb0Kq1@zn.tnic>
- <SN6PR12MB2767213C998077DFE8D52CAE8E4C9@SN6PR12MB2767.namprd12.prod.outlook.com>
+         in-reply-to:in-reply-to:references:references;
+        bh=2LwbccH/O2V4VvsUvgVZRkPVC+fe/T2RtwTwDrP6Vno=;
+        b=SA5a86HzBByQmS+k27ykaLjjUyf1t7gTOZXvPVagDdcsTcYJLjues4zqhV6WyMvVrcU0B8
+        G31GRl7N5MgKeT8xDVjzIDzY+9KWSZfPnMtcgO0Syqx9tsQ5x6apg9vUPfgPo4SZP814XE
+        I4MZMsJQ+JYylrWDMkRTu//hFZgI43k=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Andrew Jones <andrew.jones@linux.dev>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     pbonzini@redhat.com, thuth@redhat.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, nikos.nikoleris@arm.com
+Subject: Re: [kvm-unit-tests RFC PATCH 05/19] lib/alloc_phys: Remove locking
+Message-ID: <20220920145952.fnftt2v46daigtdt@kamzik>
+References: <20220809091558.14379-1-alexandru.elisei@arm.com>
+ <20220809091558.14379-6-alexandru.elisei@arm.com>
+ <20220920084553.734jvkqpognzgfpr@kamzik>
+ <Yym+MOMK68K7abiQ@e121798.cambridge.arm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SN6PR12MB2767213C998077DFE8D52CAE8E4C9@SN6PR12MB2767.namprd12.prod.outlook.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <Yym+MOMK68K7abiQ@e121798.cambridge.arm.com>
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 20, 2022 at 01:46:25PM +0000, Kalra, Ashish wrote:
-> These are structure definitions as per SNP Firmware API
-> specifications, and they match the SNP Firmware commands and required
-> arguments.
+On Tue, Sep 20, 2022 at 02:20:48PM +0100, Alexandru Elisei wrote:
+> Hi,
+> 
+> On Tue, Sep 20, 2022 at 10:45:53AM +0200, Andrew Jones wrote:
+> > On Tue, Aug 09, 2022 at 10:15:44AM +0100, Alexandru Elisei wrote:
+> > > With powerpc moving the page allocator, there are no architectures left
+> > > which use the physical allocator after the boot setup:  arm, arm64,
+> > > s390x and powerpc drain the physical allocator to initialize the page
+> > > allocator; and x86 calls setup_vm() to drain the allocator for each of
+> > > the tests that allocate memory.
+> > 
+> > Please put the motivation for this change in the commit message. I looked
+> > ahead at the next patch to find it, but I'm not sure I agree with it. We
+> > should be able to keep the locking even when used early, since we probably
+> > need our locking to be something we can use early elsewhere anyway.
+> 
+> You are correct, the commit message doesn't explain why locking is removed,
+> which makes the commit confusing. I will try to do a better job for the
+> next iteration (if we decide to keep this patch).
+> 
+> I removed locking because the physical allocator by the end of the series
+> will end up being used only by arm64 to create the idmap, which is done on
 
-Yes, I have the spec.
+If only arm, and no unit tests, needs the phys allocator, then it can be
+integrated with whatever arm is using it for and removed from the general
+lib.
 
-> Isn't it better to have 1:1 mapping between specification and
-> structure definitions here ?
+> the boot CPU and with the MMU off. After that, the translation table
+> allocator functions will use the page allocator, which can be used
+> concurrently.
+> 
+> Looking at the spinlock implementation, spin_lock() doesn't protect from
+> the concurrent accesses when the MMU is disabled (lock->v is
+> unconditionally set to 1). Which means that spin_lock() does not work (in
+> the sense that it doesn't protect against concurrent accesses) on the boot
+> path, which doesn't need a spinlock anyway, because no secondaries are
+> online secondaries. It also means that spinlocks don't work when
+> AUXINFO_MMU_OFF is set. So for the purpose of simplicity I preferred to
+> drop it entirely.
 
-Why would it be better if you can have a single struct serving multiple
-purposes and thus less code to stare at and deal with?
+If other architectures or unit tests have / could have uses for the
+phys allocator then we should either document that it doesn't have
+locks or keep the locks, and arm will just know that they don't work,
+but also that they don't need to for its purposes.
 
--- 
-Regards/Gruss,
-    Boris.
+Finally, if we drop the locks and arm doesn't have any other places where
+we use locks without the MMU enabled, then we can change the lock
+implementation to not have the no-mmu fallback - maybe by switching to the
+generic implementation as the other architectures have done.
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks,
+drew
