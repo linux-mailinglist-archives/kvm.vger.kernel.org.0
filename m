@@ -2,55 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A48565BEC34
+	by mail.lfdr.de (Postfix) with ESMTP id F06C45BEC35
 	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 19:46:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231238AbiITRqa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Sep 2022 13:46:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43036 "EHLO
+        id S231284AbiITRqc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Sep 2022 13:46:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230406AbiITRqN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Sep 2022 13:46:13 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECF16642E1
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 10:46:11 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id k126-20020a253d84000000b0068bb342010dso2829224yba.1
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 10:46:11 -0700 (PDT)
+        with ESMTP id S230522AbiITRqO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Sep 2022 13:46:14 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35FC361D6B
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 10:46:13 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id l2-20020a170902f68200b00177ee7e673eso2150583plg.2
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 10:46:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date;
-        bh=5do7vRFgX3lapBnmpL/cqjSoiD5wQu4utGUAjAWhoRk=;
-        b=GFPrNc+AiIk5M3Xb9pQUq+U/WCdK+1ZE39LecEhg0R6RlhW0GYtuI9miElnZR4AL4g
-         faeqO8FCZrJ5NF6vfbvfFe71Jy3hOqeDExsnWCqpJbpUCBjMWTYIdZk/rX/wau+xd2AU
-         SIv4OPzrV4iteo0HzZ2F41Meq/eKnfyBnLMdFORX7JWwGLULvEm9+wAX7b0gV0LH9rjT
-         uXOiAWh/zOLP/v6sQIBaKJGtUBVCLptt1+9OYdCo9LZ3BaQ/vUxVENVT/9ZccZUJZM8k
-         8Uci0PvTvH29YxQkPG7x9Co4UdJwAI9NMKW0KT6TlKU/Ku34BA4kVvX+rX9M7qqMWBQv
-         FYGA==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date;
+        bh=0WKAUbzNduZWcQJDezq4mULZL7u8oBPWqooVtCo8CZo=;
+        b=A4m9DEiDwnvT35knwdn96mrLfnhdr8IqH1Wz7qdVwQ6c/QFvXHnZgonGhYMP6O8X+u
+         5NPzpgdG3pQhe/5V0GspJUNuM35yTvzj03jM0sH9XjEyNfA0hVThtC0lI0yy4TxIzfmL
+         hGn9sYNeiDy8ZY0qZ2BebmkQqqkd8lZwbRufWv9do1Jcfzi9TKA3UiHmy/r0vLdm8NPP
+         /0pt4U/0ZHbKpt5Dfnn+bPHBZmWdVbwT5qj05R+Zh5jW1XsKdOc6UJz/cGFJXoNiOT6T
+         ix3M80gUwR2yOshtpISNWZkoHXtvm7RKN//klh1THIrDiPb7k1MRQKr8/yCNHvmWSWPN
+         Yo8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=5do7vRFgX3lapBnmpL/cqjSoiD5wQu4utGUAjAWhoRk=;
-        b=np/oxROcHbNH1PakLgGYP9KdntW3wi+k2/1g3NWuA3Q/R/2OpZ2HYRjaIoMUCph6gJ
-         cX35KWieCGScAOGuQHETj6vffLYpCTgAMkPQdPuiEteP+iuLFWE4Tqp+orzJawdDQgBk
-         KR9G/pxxyXSTLIkyqNGIjKj4Pfw54YPvMtcdzPP7/oap+Jy5IwuC7QxaVrBW3SC/WfSs
-         SaacBfCAvrUlroMmOE52EZSazeE6+xFlPT6kHcv4yqp9ya284MwxPWm7IMN8zP7NFw+M
-         qDkgORp4TzpRiK4CWuXU1d6uGr4wOb3+goVi0Ty7iRV7NwJM79OtP4WGI5kc89ORAnZk
-         Z3uA==
-X-Gm-Message-State: ACrzQf0u8qCZxi5OHXKyQFwDvXRVCFWgEOriw6yh70WcnbyjmFOJ39ve
-        +7RauK44y3nt/ezzjM+LK/0RrymQ8DqcmzLDTPYF4nSXw2CrJ/mCL2T/NmUZ3shPm+Tb6NLunxf
-        DYRhS7Gnq3/ukMGMbbH5PxhMelZsmXPsIUKBo03onpU+mpEbW7hUAGHWGL2lkimGU7mvZ
-X-Google-Smtp-Source: AMsMyM4VwtQHBXlXpp+WWPW/y716ho84l4TtNWESMCPQHfiseHG2bNdcP529vVe2e2c7e00THxHY19ZnIGMwfMD2
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date;
+        bh=0WKAUbzNduZWcQJDezq4mULZL7u8oBPWqooVtCo8CZo=;
+        b=OpAFBA+mAMY9E/aJYDsKNS1qmBugeP7rPro0DhP+AuKrySYhRBQ6AB2WStayH+tmHK
+         zZMHUmpYekAGdsDBk2y84tyS3Y7pszuMF3tWr5ZG+ILs+MKbW/bvV2/U4o8UeEMcB1lG
+         fmw4mECiZ3llxVwUULwkEgs7GLeFCG7iNrERnJNKmFemPfzCUzuZ9FR1xxwKo39s2yoT
+         dtkMdHTqnllM3Tvk0xzQKrHuIiuC1YBK/Ksc7la8ul/X4wNGuQDFMIgVf7rb16k3ePzg
+         X0S2PbLglxmRGlWTW96xxPLUkzs9EgeSGz6QXrpUtGARKjpbmpEv9/iK/3S0AejH7k8C
+         A3Tg==
+X-Gm-Message-State: ACrzQf34KKeBzEVySVq6w5EEwNhSIFPLujWwoCOSX08QmK1+BS2KiIqp
+        Qq3F1HXzartu77PFcUZe2A/KgASRxiXE0jUCrMlqkQKk0KboKiMxRMkKdBk2/8wSJogpsQ0Y1MD
+        1IQEDb21HbmpyUOnPWYk+fza7IeZ83Vw3ySZOTTk1qVSFcU/9FzZUtZALu+VKiHCzC5qU
+X-Google-Smtp-Source: AMsMyM69ZGC3J4oPv+AapS4/k4CR/6UMRz23k3sl6qAhn4mplsg/x4HptQai9OIunmyslzAW5g/Bv1RxTqTqoL5P
 X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
- (user=aaronlewis job=sendgmr) by 2002:a81:148c:0:b0:345:3561:8f4 with SMTP id
- 134-20020a81148c000000b00345356108f4mr20544057ywu.76.1663695970909; Tue, 20
- Sep 2022 10:46:10 -0700 (PDT)
-Date:   Tue, 20 Sep 2022 17:45:56 +0000
+ (user=aaronlewis job=sendgmr) by 2002:a63:8a4a:0:b0:439:49b3:6586 with SMTP
+ id y71-20020a638a4a000000b0043949b36586mr21140378pgd.44.1663695972606; Tue,
+ 20 Sep 2022 10:46:12 -0700 (PDT)
+Date:   Tue, 20 Sep 2022 17:45:57 +0000
+In-Reply-To: <20220920174603.302510-1-aaronlewis@google.com>
 Mime-Version: 1.0
+References: <20220920174603.302510-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
-Message-ID: <20220920174603.302510-1-aaronlewis@google.com>
-Subject: [PATCH v5 0/7] Introduce and test masked events
+Message-ID: <20220920174603.302510-2-aaronlewis@google.com>
+Subject: [PATCH v5 1/7] kvm: x86/pmu: Correct the mask used in a pmu event
+ filter lookup
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
@@ -66,75 +69,124 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series introduces the concept of masked events to the pmu event
-filter. Masked events can help reduce the number of events needed in the
-pmu event filter by allowing a more generalized matching method to be
-used for the unit mask when filtering guest events in the pmu.  With
-masked events, if an event select should be restricted from the guest,
-instead of having to add an entry to the pmu event filter for each
-event select + unit mask pair, a masked event can be added to generalize
-the unit mask values.
+When checking if a pmu event the guest is attempting to program should
+be filtered, only consider the event select + unit mask in that
+decision. Use an architecture specific mask to mask out all other bits,
+including bits 35:32 on Intel.  Those bits are not part of the event
+select and should not be considered in that decision.
 
-v4 -> v5
- - Patch #3, Simplified the return logic in filter_contains_match(). [Jim]
- - Patch #4, Corrected documentation for errors and returns. [Jim]
- - Patch #6, Added TEST_REQUIRE for KVM_CAP_PMU_EVENT_MASKED_EVENTS. [Jim]
- - Patch #7,
-     - Removed TEST_REQUIRE for KVM_CAP_PMU_EVENT_MASKED_EVENTS (moved it
-       to patch #6).
-     - Changed the assert to a branch in supports_event_mem_inst_retired().
-       [Jim]
-     - Added a check to make sure 3 GP counters are available. [Jim]
+Fixes: 66bb8a065f5a ("KVM: x86: PMU Event Filter")
+Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
+---
+ arch/x86/include/asm/kvm-x86-pmu-ops.h |  1 +
+ arch/x86/kvm/pmu.c                     | 15 ++++++++++++++-
+ arch/x86/kvm/pmu.h                     |  1 +
+ arch/x86/kvm/svm/pmu.c                 |  6 ++++++
+ arch/x86/kvm/vmx/pmu_intel.c           |  6 ++++++
+ 5 files changed, 28 insertions(+), 1 deletion(-)
 
-v3 -> v4
- - Patch #1, Fix the mask for the guest event select used in bsearch.
- - Patch #2, Remove invalid events from the pmu event filter.
- - Patch #3, Create an internal/common representation for filter events.
- - Patch #4,
-     - Use a common filter event to simplify kernel code. [Jim]
-     - s/invalid/exclude for masked events. More descriptive. [Sean]
-     - Simplified masked event layout. There was no need to complicate it.
-     - Add KVM_CAP_PMU_EVENT_MASKED_EVENTS.
- - Patch #7, Rewrote the masked events tests using MEM_INST_RETIRED (0xd0)
-   on Intel and LS Dispatch (0x29) on AMD. They have multiple unit masks
-   each which were leveraged for improved masked events testing.
-
-v2 -> v3
- - Reworked and documented the invert flag usage.  It was possible to
-   get ambiguous results when using it.  That should not be possible
-   now.
- - Added testing for inverted masked events to validate the updated
-   implementation.
- - Removed testing for inverted masked events from the masked events test.
-   They were meaningless with the updated implementation.  More meaning
-   tests were added separately.
-
-v1 -> v2
- - Made has_invalid_event() static to fix warning.
- - Fixed checkpatch.pl errors and warnings.
- - Updated to account for KVM_X86_PMU_OP().
-
-Aaron Lewis (7):
-  kvm: x86/pmu: Correct the mask used in a pmu event filter lookup
-  kvm: x86/pmu: Remove invalid raw events from the pmu event filter
-  kvm: x86/pmu: prepare the pmu event filter for masked events
-  kvm: x86/pmu: Introduce masked events to the pmu event filter
-  selftests: kvm/x86: Add flags when creating a pmu event filter
-  selftests: kvm/x86: Add testing for KVM_SET_PMU_EVENT_FILTER
-  selftests: kvm/x86: Test masked events
-
- Documentation/virt/kvm/api.rst                |  82 +++-
- arch/x86/include/asm/kvm-x86-pmu-ops.h        |   1 +
- arch/x86/include/uapi/asm/kvm.h               |  28 ++
- arch/x86/kvm/pmu.c                            | 262 ++++++++++--
- arch/x86/kvm/pmu.h                            |  39 ++
- arch/x86/kvm/svm/pmu.c                        |   6 +
- arch/x86/kvm/vmx/pmu_intel.c                  |   6 +
- arch/x86/kvm/x86.c                            |   1 +
- include/uapi/linux/kvm.h                      |   1 +
- .../kvm/x86_64/pmu_event_filter_test.c        | 387 +++++++++++++++++-
- 10 files changed, 771 insertions(+), 42 deletions(-)
-
+diff --git a/arch/x86/include/asm/kvm-x86-pmu-ops.h b/arch/x86/include/asm/kvm-x86-pmu-ops.h
+index c17e3e96fc1d..e0280cc3e6e4 100644
+--- a/arch/x86/include/asm/kvm-x86-pmu-ops.h
++++ b/arch/x86/include/asm/kvm-x86-pmu-ops.h
+@@ -24,6 +24,7 @@ KVM_X86_PMU_OP(set_msr)
+ KVM_X86_PMU_OP(refresh)
+ KVM_X86_PMU_OP(init)
+ KVM_X86_PMU_OP(reset)
++KVM_X86_PMU_OP(get_eventsel_event_mask)
+ KVM_X86_PMU_OP_OPTIONAL(deliver_pmi)
+ KVM_X86_PMU_OP_OPTIONAL(cleanup)
+ 
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 02f9e4f245bd..98f383789579 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -247,6 +247,19 @@ static int cmp_u64(const void *pa, const void *pb)
+ 	return (a > b) - (a < b);
+ }
+ 
++static inline u64 get_event_select(u64 eventsel)
++{
++	return eventsel & static_call(kvm_x86_pmu_get_eventsel_event_mask)();
++}
++
++static inline u64 get_raw_event(u64 eventsel)
++{
++	u64 event_select = get_event_select(eventsel);
++	u64 unit_mask = eventsel & ARCH_PERFMON_EVENTSEL_UMASK;
++
++	return event_select | unit_mask;
++}
++
+ static bool check_pmu_event_filter(struct kvm_pmc *pmc)
+ {
+ 	struct kvm_pmu_event_filter *filter;
+@@ -263,7 +276,7 @@ static bool check_pmu_event_filter(struct kvm_pmc *pmc)
+ 		goto out;
+ 
+ 	if (pmc_is_gp(pmc)) {
+-		key = pmc->eventsel & AMD64_RAW_EVENT_MASK_NB;
++		key = get_raw_event(pmc->eventsel);
+ 		if (bsearch(&key, filter->events, filter->nevents,
+ 			    sizeof(__u64), cmp_u64))
+ 			allow_event = filter->action == KVM_PMU_EVENT_ALLOW;
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 5cc5721f260b..4e22f9f55400 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -40,6 +40,7 @@ struct kvm_pmu_ops {
+ 	void (*reset)(struct kvm_vcpu *vcpu);
+ 	void (*deliver_pmi)(struct kvm_vcpu *vcpu);
+ 	void (*cleanup)(struct kvm_vcpu *vcpu);
++	u64 (*get_eventsel_event_mask)(void);
+ };
+ 
+ void kvm_pmu_ops_update(const struct kvm_pmu_ops *pmu_ops);
+diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+index f24613a108c5..0b35eb04aa60 100644
+--- a/arch/x86/kvm/svm/pmu.c
++++ b/arch/x86/kvm/svm/pmu.c
+@@ -294,6 +294,11 @@ static void amd_pmu_reset(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
++static u64 amd_pmu_get_eventsel_event_mask(void)
++{
++	return AMD64_EVENTSEL_EVENT;
++}
++
+ struct kvm_pmu_ops amd_pmu_ops __initdata = {
+ 	.hw_event_available = amd_hw_event_available,
+ 	.pmc_is_enabled = amd_pmc_is_enabled,
+@@ -307,4 +312,5 @@ struct kvm_pmu_ops amd_pmu_ops __initdata = {
+ 	.refresh = amd_pmu_refresh,
+ 	.init = amd_pmu_init,
+ 	.reset = amd_pmu_reset,
++	.get_eventsel_event_mask = amd_pmu_get_eventsel_event_mask,
+ };
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index c399637a3a79..0aec7576af0c 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -793,6 +793,11 @@ void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu)
+ 	}
+ }
+ 
++static u64 intel_pmu_get_eventsel_event_mask(void)
++{
++	return ARCH_PERFMON_EVENTSEL_EVENT;
++}
++
+ struct kvm_pmu_ops intel_pmu_ops __initdata = {
+ 	.hw_event_available = intel_hw_event_available,
+ 	.pmc_is_enabled = intel_pmc_is_enabled,
+@@ -808,4 +813,5 @@ struct kvm_pmu_ops intel_pmu_ops __initdata = {
+ 	.reset = intel_pmu_reset,
+ 	.deliver_pmi = intel_pmu_deliver_pmi,
+ 	.cleanup = intel_pmu_cleanup,
++	.get_eventsel_event_mask = intel_pmu_get_eventsel_event_mask,
+ };
 -- 
 2.37.3.968.ga6b4b080e4-goog
 
