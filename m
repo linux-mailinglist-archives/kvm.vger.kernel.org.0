@@ -2,141 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32C8D5BF0BE
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 00:59:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4106F5BF0C4
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 01:03:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229993AbiITW74 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Sep 2022 18:59:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44474 "EHLO
+        id S229488AbiITXDW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Sep 2022 19:03:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229881AbiITW7y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Sep 2022 18:59:54 -0400
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEDBD13D56
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 15:59:52 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id l14so9707370eja.7
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 15:59:52 -0700 (PDT)
+        with ESMTP id S229588AbiITXDV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Sep 2022 19:03:21 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BBF82B27C
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 16:03:20 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id f23so3890173plr.6
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 16:03:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=5zGDMClH44o9kBaZpfqB55k2zUqfrg9XV0PUDaOzJJI=;
-        b=fLhdMY9oJXsreiLcZGR2iqMruYR+8+TCZiJyOzjDIshhi2bT8T6q+tOne1hiOdyqXO
-         VTm+mfBfnxXUp/6y/e1nSyP1Dn84N9RSnK9nSVgTSpuwcpk871Gfn+3pte5bQrIhLcRl
-         eGbrMzV5MZcAqPSa7RkI/rIP+ODd6Bso+zAhveSvEjr2iX7tCpsYpQOzGMxKRuBrqoWv
-         +RHUpwX3uIOzr495dtL2pNiP6gCRKUw0kDX34CF8YVOy2VTong7eOTkVA+a7yHmD1cBV
-         qeJNxDhMGv21t0c0x7Yap8LkRSR3ZyVHRzCNFWE0M/lla9o40AxvSWMHge7zOl/LWLNS
-         ENnw==
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=E44LtxBb4cFW/kLPJw1A0jZf+CX5zmSzX5uonY/R+VY=;
+        b=IOM5LD7O5hlft6bVTbnyuQNGfvNbk1tT0zAkLCkQrG9RL+KlHK7IBeI07Gwz3pd1rc
+         AFWuaYGAP5lYDyCmtmovpVFnHDgtM6h3RKVwUJ5XCL+1NP8DPkdZgDvmZFFz1DKxPki1
+         0MGNCE717O6FC3c7L+2pGtFUMsuAMAvqaIQqgWKKi4O8afhI6jWTSHlA16FrwPK7Kz8z
+         0+MuM1Y1518bJMC8pF+wWcVjFXUuGlW5tyPGIQJ0uvLzlG1SM3suBQkGVzXLcyUyvQwh
+         uBdbpFIzLK3vlFbj5cj17yswtSmDTj7NnapWm4/sFacKVhEBoryWBkbDESAzmEhpO5X9
+         T7QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=5zGDMClH44o9kBaZpfqB55k2zUqfrg9XV0PUDaOzJJI=;
-        b=g+TXiLec2Il913rt18D3uSPZOmSW1MlZWROzBgL23hVUwYyMVUYWTzMI2qHHfhjML8
-         qLMoB1eZ8JUv6cKCLM2F3ORVexCl6hELgz0MHB3Ro5/5bk4Lx8yfj/SxoqluDyf995on
-         vbgcrU/OMMSVZ1tuJI5qIcFpDgIQ9rJNmDnxqhDMbEFaZ8vZCdLA1nSxlawL/0ZiEkE+
-         PPj5Op9NwQ5/cyMyqSk2P2WY2LNRwtvrY4ReowCYqwAVoTC/HvUYbzfac+zRnXzxn+4d
-         0z1Mzig6PcR5bArwKh2MNIxcjT8HFa3MpcAH4jQAFLePGpDyAlKcbDnZ/Ak7x2nEQCrm
-         /4BQ==
-X-Gm-Message-State: ACrzQf0ZAx9josxBOAvIoA1ayTHiBWpv4TBHse4kjX+XyG70roZJSC4I
-        9aM9T26Vk9cEiVpJoOTpudg=
-X-Google-Smtp-Source: AMsMyM68ho+SYOSTwNpH652r4SoJ1volg4FPzzUg+Xkd/7GxX6MGFhW5pQGNcXjCKdvhJIRWBodr2w==
-X-Received: by 2002:a17:906:8a53:b0:781:6ee9:db96 with SMTP id gx19-20020a1709068a5300b007816ee9db96mr7656219ejc.301.1663714791350;
-        Tue, 20 Sep 2022 15:59:51 -0700 (PDT)
-Received: from [127.0.0.1] (dynamic-078-054-006-055.78.54.pool.telefonica.de. [78.54.6.55])
-        by smtp.gmail.com with ESMTPSA id kw9-20020a170907770900b00781d411a63csm466007ejc.151.2022.09.20.15.59.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Sep 2022 15:59:50 -0700 (PDT)
-Date:   Tue, 20 Sep 2022 22:59:42 +0000
-From:   Bernhard Beschow <shentey@gmail.com>
-To:     Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        Peter Maydell <peter.maydell@linaro.org>
-CC:     qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        Magnus Damm <magnus.damm@gmail.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Bandan Das <bsd@redhat.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Xiaojuan Yang <yangxiaojuan@loongson.cn>,
-        Cameron Esfahani <dirty@apple.com>,
-        Michael Rolnik <mrolnik@gmail.com>,
-        Song Gao <gaosong@loongson.cn>,
-        Jagannathan Raman <jag.raman@oracle.com>,
-        Greg Kurz <groug@kaod.org>,
-        Kamil Rytarowski <kamil@netbsd.org>,
-        Peter Xu <peterx@redhat.com>, Joel Stanley <joel@jms.id.au>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, haxm-team@intel.com,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        =?ISO-8859-1?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        =?ISO-8859-1?Q?C=E9dric_Le_Goater?= <clg@kaod.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org,
-        Eduardo Habkost <eduardo@habkost.net>,
-        =?ISO-8859-1?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>,
-        qemu-ppc@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Helge Deller <deller@gmx.de>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        =?ISO-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>,
-        qemu-riscv@nongnu.org, Stafford Horne <shorne@gmail.com>,
-        Paul Durrant <paul@xen.org>,
-        Havard Skinnemoen <hskinnemoen@google.com>,
-        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-        Alexander Graf <agraf@csgraf.de>,
-        Thomas Huth <thuth@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Wenchao Wang <wenchao.wang@intel.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        qemu-s390x@nongnu.org,
-        =?ISO-8859-1?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
-        Alexander Bulekov <alxndr@bu.edu>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Tyrone Ting <kfting@nuvoton.com>,
-        xen-devel@lists.xenproject.org,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        John Snow <jsnow@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Darren Kenny <darren.kenny@oracle.com>, kvm@vger.kernel.org,
-        Qiuhao Li <Qiuhao.Li@outlook.com>,
-        John G Johnson <john.g.johnson@oracle.com>,
-        Bin Meng <bin.meng@windriver.com>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Max Filippov <jcmvbkbc@gmail.com>, qemu-arm@nongnu.org,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Artyom Tarasenko <atar4qemu@gmail.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        Jason Wang <jasowang@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Laurent Vivier <laurent@vivier.eu>,
-        Alistair Francis <alistair@alistair23.me>,
-        Jason Herne <jjherne@linux.ibm.com>
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_0/9=5D_Deprecate_sysbus=5Fget=5Fd?= =?US-ASCII?Q?efault=28=29_and_get=5Fsystem=5Fmemory=28=29_et=2E_al?=
-In-Reply-To: <49325e7d-5020-23f7-4bce-c53d8d988c95@ilande.co.uk>
-References: <20220919231720.163121-1-shentey@gmail.com> <CAFEAcA8GjXFO4WK=KybgSc8rMfqecwD9EXS0kZMKtqogNf1Tsg@mail.gmail.com> <49325e7d-5020-23f7-4bce-c53d8d988c95@ilande.co.uk>
-Message-ID: <7DBD5114-15B2-42A7-AB97-35DBF9DDA825@gmail.com>
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=E44LtxBb4cFW/kLPJw1A0jZf+CX5zmSzX5uonY/R+VY=;
+        b=mjX5uGBHNKAqr5vbv9CEizq/KQ4VbFrrg/qQ+r7k+pMyimEsiJ5QhWlmsqGrKE6vC4
+         i6vgzLsWmILX0UtpVX2GnHKzNy/3wmP6QRuH1GgCB+PqmW2EsFIqAqnlQZq1j3vcS1tu
+         ZgYWlRQmHjPYu3j+lKJn9cdJ9A0ok0jUQHrgl2ft6jHv/MKZToP0OU0yfng1gCieWriB
+         7RrVLyIVPhW8g5ywBLzIVfgsFL7Kz1M/72XrA2hcMy3NanGYBXLmh6CuX/cTPTtPG+/z
+         68GezuFBCWYThscly5ZBEmYtzX1YOPXcE9Ry8XlkqQH95RnJHIHNoWKSQ4wzv7kWJvwJ
+         Y+Xw==
+X-Gm-Message-State: ACrzQf3d/nv3ZH8mFDigsENx529Mz/QBDrgSvSORCoc48g5zu33fJwUd
+        nZZ0FI3QL2wTpgTdK36ZuY18Vw==
+X-Google-Smtp-Source: AMsMyM45dkTMa7ElEzbUnT3/VtdsrsuQn4Slxp7unEvmZyXmajo2YjikD9tCxViypUzSK++/JNqFTA==
+X-Received: by 2002:a17:90b:3ec7:b0:202:b984:8436 with SMTP id rm7-20020a17090b3ec700b00202b9848436mr6324651pjb.4.1663714999365;
+        Tue, 20 Sep 2022 16:03:19 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id j6-20020a17090276c600b001789b724712sm409491plt.232.2022.09.20.16.03.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Sep 2022 16:03:18 -0700 (PDT)
+Date:   Tue, 20 Sep 2022 23:03:15 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 3/6] KVM: x86: Hyper-V invariant TSC control
+Message-ID: <YypGs6BOX7Wvtl/H@google.com>
+References: <20220916135205.3185973-1-vkuznets@redhat.com>
+ <20220916135205.3185973-4-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220916135205.3185973-4-vkuznets@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -144,79 +75,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 20=2E September 2022 15:36:26 UTC schrieb Mark Cave-Ayland <mark=2Ecave-=
-ayland@ilande=2Eco=2Euk>:
->On 20/09/2022 10:55, Peter Maydell wrote:
->
->> On Tue, 20 Sept 2022 at 00:18, Bernhard Beschow <shentey@gmail=2Ecom> w=
-rote:
->>>=20
->>> In address-spaces=2Eh it can be read that get_system_memory() and
->>> get_system_io() are temporary interfaces which "should only be used te=
-mporarily
->>> until a proper bus interface is available"=2E This statement certainly=
- extends to
->>> the address_space_memory and address_space_io singletons=2E
->>=20
->> This is a long standing "we never really completed a cleanup"=2E=2E=2E
->>=20
->>> This series attempts
->>> to stop further proliferation of their use by turning TYPE_SYSTEM_BUS =
-into an
->>> object-oriented, "proper bus interface" inspired by PCIBus=2E
->>>=20
->>> While at it, also the main_system_bus singleton is turned into an attr=
-ibute of
->>> MachineState=2E Together, this resolves five singletons in total, maki=
-ng the
->>> ownership relations much more obvious which helps comprehension=2E
->>=20
->> =2E=2E=2Ebut I don't think this is the direction we want to go=2E
->> Overall the reason that the "system memory" and "system IO"
->> singletons are weird is that in theory they should not be necessary
->> at all -- board code should create devices and map them into an
->> entirely arbitrary MemoryRegion or set of MemoryRegions corresponding
->> to address space(s) for the CPU and for DMA-capable devices=2E But we
->> keep them around because
->>   (a) there is a ton of legacy code that assumes there's only one
->>       address space in the system and this is it
->>   (b) when modelling the kind of board where there really is only
->>       one address space, having the 'system memory' global makes
->>       the APIs for creating and connecting devices a lot simpler
->>=20
->> Retaining the whole-system singleton but shoving it into MachineState
->> doesn't really change much, IMHO=2E
->>=20
->> More generally, sysbus is rather weird because it isn't really a
->> bus=2E Every device in the system of TYPE_SYS_BUS_DEVICE is "on"
->> the unique TYPE_SYSTEM_BUS bus, but that doesn't mean they're
->> all in the same address space or that in real hardware they'd
->> all be on the same bus=2E sysbus has essentially degraded into a
->> hack for having devices get reset=2E I really really need to make
->> some time to have another look at reset handling=2E If we get that
->> right then I think it's probably possible to collapse the few
->> things TYPE_SYS_BUS_DEVICE does that TYPE_DEVICE does not down
->> into TYPE_DEVICE and get rid of sysbus altogether=2E=2E=2E
->
->Following on from one of the discussion points from Alex's KVM Forum BoF =
-session: I think longer term what we need to aim for is for QEMU machines t=
-o define their own address spaces, and then bind those address spaces conta=
-ining memory-mapped devices to one or more CPUs=2E
+On Fri, Sep 16, 2022, Vitaly Kuznetsov wrote:
+> Normally, genuine Hyper-V doesn't expose architectural invariant TSC
+> (CPUID.80000007H:EDX[8]) to its guests by default. A special PV MSR
+> (HV_X64_MSR_TSC_INVARIANT_CONTROL, 0x40000118) and corresponding CPUID
+> feature bit (CPUID.0x40000003.EAX[15]) were introduced. When bit 0 of the
+> PV MSR is set, invariant TSC bit starts to show up in CPUID. When the
+> feature is exposed to Hyper-V guests, reenlightenment becomes unneeded.
+> 
+> Add the feature to KVM. Keep CPUID output intact when the feature
+> wasn't exposed to L1 and implement the required logic for hiding
+> invariant TSC when the feature was exposed and invariant TSC control
+> MSR wasn't written to. Copy genuine Hyper-V behavior and forbid to
+> disable the feature once it was enabled.
 
-Isn't that more or less impossible with singletons?
+...
 
->
->Once this in place, as Peter notes above it just remains to solve the res=
-et problem and then it becomes possible to eliminate sysbus altogether as e=
-verything else can already be managed by qdev/QOM=2E
+> diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
+> index da2737f2a956..8be6dc3d76af 100644
+> --- a/arch/x86/kvm/hyperv.h
+> +++ b/arch/x86/kvm/hyperv.h
+> @@ -133,6 +133,21 @@ static inline bool kvm_hv_has_stimer_pending(struct kvm_vcpu *vcpu)
+>  			     HV_SYNIC_STIMER_COUNT);
+>  }
+>  
+> +/*
+> + * With HV_ACCESS_TSC_INVARIANT feature, invariant TSC (CPUID.80000007H:EDX[8])
+> + * is only observed after HV_X64_MSR_TSC_INVARIANT_CONTROL was written to.
+> + */
+> +static inline bool kvm_hv_invtsc_suppressed(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+> +
+> +	if (!hv_vcpu)
+> +		return false;
+> +
+> +	return (hv_vcpu->cpuid_cache.features_eax & HV_ACCESS_TSC_INVARIANT) &&
+> +		!(to_kvm_hv(vcpu->kvm)->hv_invtsc_control & HV_INVARIANT_TSC_EXPOSED);
 
-Also see my reply to Peter=2E
+It's still not obvious to me why KVM shouldn't do:
 
-Thanks,
-Bernhard
->
->
->ATB,
->
->Mark=2E
+	if (!hv_vcpu)
+		return false;
 
+	return !(hv_vcpu->cpuid_cache.features_eax & HV_ACCESS_TSC_INVARIANT) ||
+	       !(to_kvm_hv(vcpu->kvm)->hv_invtsc_control & HV_INVARIANT_TSC_EXPOSED);
+
+I.e. why is invariant TSC _not_ suppressed on Hyper-V by default?
