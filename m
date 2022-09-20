@@ -2,108 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC2C95BE288
-	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 11:58:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 849E85BE289
+	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 11:58:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229918AbiITJ6O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Sep 2022 05:58:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50192 "EHLO
+        id S230029AbiITJ6t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Sep 2022 05:58:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229656AbiITJ6M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Sep 2022 05:58:12 -0400
-Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAB6966104
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 02:58:11 -0700 (PDT)
-Date:   Tue, 20 Sep 2022 11:58:02 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1663667890;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=RmS0I1Pb7j64z1blqOBHHrMkL9AmD0loyLLUt+93dA8=;
-        b=imihoh1CmDd9PkJJDeULBdto46X38rhWBTw8XTT0HLWUPXYMBQCFjDVSyz+isgCE0ybwi/
-        dy1WBjEqG7om/BskvFAgpFA/zQNUmBt3DThPp323EQNFrM+OL/pkJyMsYZuK33gl+N3+Dc
-        0wsH4zi0wfLr10B/d0EMoJTQeWdfxuQ=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Andrew Jones <andrew.jones@linux.dev>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     pbonzini@redhat.com, thuth@redhat.com, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, nikos.nikoleris@arm.com
-Subject: Re: [kvm-unit-tests RFC PATCH 16/19] arm/arm64: Allocate
- secondaries' stack using the page allocator
-Message-ID: <20220920095802.bukms5w2phaxyaao@kamzik>
-References: <20220809091558.14379-1-alexandru.elisei@arm.com>
- <20220809091558.14379-17-alexandru.elisei@arm.com>
+        with ESMTP id S230438AbiITJ6j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Sep 2022 05:58:39 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97BD46F268;
+        Tue, 20 Sep 2022 02:58:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1663667918; x=1695203918;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ZdfQN94fb6a00fA5azfm26uBEbAPljxnRlrR5PaKYuk=;
+  b=nZ0JSl6QaH7Ryo/AP9dyG3XB3yBJsk+sEhZmbAOmO/LAwqcJyU2TnF8t
+   ePf6FrsGAlMdLH7xahGYKzKPX2Q2UxflAp7QR2zdRVT3kozbDcGSt+Bms
+   oJyCUdoDSSWa46Dmy7w5Xl8dJufUM1Ma07uImRgZwyWh59p+31DkuXVpb
+   JmY82FZeLtIHVBac5iI/D/QX+uMMz/MKzeQCGOQNk2N1r0LUjdoRuNPzQ
+   6BPBamE18l6FGR/FIQ9DM8W6KfuseVhbdhSBBbETtgHXTzVCW1/P46BnB
+   vTkBAOBSGY+E9MO3ISXlrZ9fNKuqoLUPW17HZ1PbrkZK3HaDhopuYzapZ
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10475"; a="298377082"
+X-IronPort-AV: E=Sophos;i="5.93,330,1654585200"; 
+   d="scan'208";a="298377082"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2022 02:58:38 -0700
+X-IronPort-AV: E=Sophos;i="5.93,330,1654585200"; 
+   d="scan'208";a="596454045"
+Received: from lingshan-mobl.ccr.corp.intel.com (HELO [10.255.30.63]) ([10.255.30.63])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2022 02:58:36 -0700
+Message-ID: <e69b65e7-516f-55bd-cb99-863d7accbd32@intel.com>
+Date:   Tue, 20 Sep 2022 17:58:33 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220809091558.14379-17-alexandru.elisei@arm.com>
-X-Migadu-Flow: FLOW_OUT
-X-Migadu-Auth-User: linux.dev
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.2.2
+Subject: Re: [PATCH 1/4] vDPA: allow userspace to query features of a vDPA
+ device
+Content-Language: en-US
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst <mst@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+References: <20220909085712.46006-1-lingshan.zhu@intel.com>
+ <20220909085712.46006-2-lingshan.zhu@intel.com>
+ <CACGkMEsq+weeO7i8KtNNAPhXGwN=cTwWt3RWfTtML-Xwj3K5Qg@mail.gmail.com>
+From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
+In-Reply-To: <CACGkMEsq+weeO7i8KtNNAPhXGwN=cTwWt3RWfTtML-Xwj3K5Qg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Aug 09, 2022 at 10:15:55AM +0100, Alexandru Elisei wrote:
-> The vmalloc allocator returns non-id mapped addresses, where the virtual
-> address is different than the physical address. This makes it impossible
-> to access the stack of the secondary CPUs while the MMU is disabled.
-> 
-> On arm, THREAD_SIZE is 16K and PAGE_SIZE is 4K, which makes THREAD_SIZE
-> a power of two multiple of PAGE_SIZE. On arm64, THREAD_SIZE is 16 when
-> PAGE_SIZE is 4K or 16K, and 64K when PAGE_SIZE is 64K. In all cases,
-> THREAD_SIZE is a power of two multiple of PAGE_SIZE. As a result, using
-> memalign_pages() for the stack won't lead to wasted memory.
-> 
-> memalign_pages() allocates memory in chunks of power of two number of
-> pages, aligned to the allocation size, which makes it a drop-in
-> replacement for vm_memalign (which is the value for alloc_ops->memalign
-> when the stack is allocated).
-> 
-> Using memalign_pages() has two distinct benefits:
-> 
-> 1. The secondary CPUs' stack can be used with the MMU off.
-> 
-> 2. The secondary CPUs' stack is identify mapped similar to the stack for
-> the primary CPU, which makes the configuration of the CPUs consistent.
-> 
-> memalign_pages_flags() has been used instead of memalign_pages() to
-> instruct the allocator not to zero the stack, as it's already zeroed in the
-> entry code.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  lib/arm/asm/thread_info.h | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/lib/arm/asm/thread_info.h b/lib/arm/asm/thread_info.h
-> index eaa72582af86..190e082cbba0 100644
-> --- a/lib/arm/asm/thread_info.h
-> +++ b/lib/arm/asm/thread_info.h
-> @@ -25,6 +25,7 @@
->  #ifndef __ASSEMBLY__
->  #include <asm/processor.h>
->  #include <alloc.h>
-> +#include <alloc_page.h>
->  
->  #ifdef __arm__
->  #include <asm/ptrace.h>
-> @@ -40,7 +41,7 @@
->  
->  static inline void *thread_stack_alloc(void)
->  {
-> -	void *sp = memalign(THREAD_ALIGNMENT, THREAD_SIZE);
-> +	void *sp = memalign_pages_flags(THREAD_ALIGNMENT, THREAD_SIZE, FLAG_DONTZERO);
->  	return sp + THREAD_START_SP;
->  }
->  
-> -- 
-> 2.37.1
->
 
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+
+On 9/20/2022 10:02 AM, Jason Wang wrote:
+> On Fri, Sep 9, 2022 at 5:05 PM Zhu Lingshan <lingshan.zhu@intel.com> wrote:
+>> This commit adds a new vDPA netlink attribution
+>> VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES. Userspace can query
+>> features of vDPA devices through this new attr.
+>>
+>> This commit invokes vdpa_config_ops.get_config() than
+>> vdpa_get_config_unlocked() to read the device config
+>> spcae, so no raeces in vdpa_set_features_unlocked()
+>>
+>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> It's better to share the userspace code as well.
+OK, will share it in V2.
+>
+>> ---
+>>   drivers/vdpa/vdpa.c       | 19 ++++++++++++++-----
+>>   include/uapi/linux/vdpa.h |  4 ++++
+>>   2 files changed, 18 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
+>> index c06c02704461..798a02c7aa94 100644
+>> --- a/drivers/vdpa/vdpa.c
+>> +++ b/drivers/vdpa/vdpa.c
+>> @@ -491,6 +491,8 @@ static int vdpa_mgmtdev_fill(const struct vdpa_mgmt_dev *mdev, struct sk_buff *m
+>>                  err = -EMSGSIZE;
+>>                  goto msg_err;
+>>          }
+>> +
+>> +       /* report features of a vDPA management device through VDPA_ATTR_DEV_SUPPORTED_FEATURES */
+> The code explains itself, there's no need for the comment.
+these comments are required in other discussions
+>
+>>          if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_SUPPORTED_FEATURES,
+>>                                mdev->supported_features, VDPA_ATTR_PAD)) {
+>>                  err = -EMSGSIZE;
+>> @@ -815,10 +817,10 @@ static int vdpa_dev_net_mq_config_fill(struct vdpa_device *vdev,
+>>   static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *msg)
+>>   {
+>>          struct virtio_net_config config = {};
+>> -       u64 features;
+>> +       u64 features_device, features_driver;
+>>          u16 val_u16;
+>>
+>> -       vdpa_get_config_unlocked(vdev, 0, &config, sizeof(config));
+>> +       vdev->config->get_config(vdev, 0, &config, sizeof(config));
+>>
+>>          if (nla_put(msg, VDPA_ATTR_DEV_NET_CFG_MACADDR, sizeof(config.mac),
+>>                      config.mac))
+>> @@ -832,12 +834,19 @@ static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *ms
+>>          if (nla_put_u16(msg, VDPA_ATTR_DEV_NET_CFG_MTU, val_u16))
+>>                  return -EMSGSIZE;
+>>
+>> -       features = vdev->config->get_driver_features(vdev);
+>> -       if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features,
+>> +       features_driver = vdev->config->get_driver_features(vdev);
+>> +       if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features_driver,
+>> +                             VDPA_ATTR_PAD))
+>> +               return -EMSGSIZE;
+>> +
+>> +       features_device = vdev->config->get_device_features(vdev);
+>> +
+>> +       /* report features of a vDPA device through VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES */
+>> +       if (nla_put_u64_64bit(msg, VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES, features_device,
+>>                                VDPA_ATTR_PAD))
+>>                  return -EMSGSIZE;
+>>
+>> -       return vdpa_dev_net_mq_config_fill(vdev, msg, features, &config);
+>> +       return vdpa_dev_net_mq_config_fill(vdev, msg, features_driver, &config);
+>>   }
+>>
+>>   static int
+>> diff --git a/include/uapi/linux/vdpa.h b/include/uapi/linux/vdpa.h
+>> index 25c55cab3d7c..97531b52dcbe 100644
+>> --- a/include/uapi/linux/vdpa.h
+>> +++ b/include/uapi/linux/vdpa.h
+>> @@ -46,12 +46,16 @@ enum vdpa_attr {
+>>
+>>          VDPA_ATTR_DEV_NEGOTIATED_FEATURES,      /* u64 */
+>>          VDPA_ATTR_DEV_MGMTDEV_MAX_VQS,          /* u32 */
+>> +       /* features of a vDPA management device */
+>>          VDPA_ATTR_DEV_SUPPORTED_FEATURES,       /* u64 */
+>>
+>>          VDPA_ATTR_DEV_QUEUE_INDEX,              /* u32 */
+>>          VDPA_ATTR_DEV_VENDOR_ATTR_NAME,         /* string */
+>>          VDPA_ATTR_DEV_VENDOR_ATTR_VALUE,        /* u64 */
+>>
+>> +       /* features of a vDPA device, e.g., /dev/vhost-vdpa0 */
+>> +       VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES,  /* u64 */
+> What's the difference between this and VDPA_ATTR_DEV_SUPPORTED_FEATURES?
+This is to report a vDPA device features, and 
+VDPA_ATTR_DEV_SUPPORTED_FEATURES
+is used for reporting the management device features, we have a long 
+discussion
+on this before.
+>
+> Thanks
+>
+>> +
+>>          /* new attributes must be added above here */
+>>          VDPA_ATTR_MAX,
+>>   };
+>> --
+>> 2.31.1
+>>
+
