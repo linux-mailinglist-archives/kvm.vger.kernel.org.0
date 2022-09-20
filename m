@@ -2,70 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BEDD15BEBB3
-	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 19:16:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 922D65BEC25
+	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 19:39:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229828AbiITRQj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Sep 2022 13:16:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37002 "EHLO
+        id S230368AbiITRj0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Sep 2022 13:39:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229503AbiITRQi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Sep 2022 13:16:38 -0400
+        with ESMTP id S230187AbiITRjZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Sep 2022 13:39:25 -0400
 Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF97F4DB35
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 10:16:37 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id q9so3302068pgq.8
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 10:16:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41C1D6C764
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 10:39:24 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id c7so3355156pgt.11
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 10:39:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=Rij+pAdZG93DLyUN4lOyVYXvdWWBdU7yElR3oGxp4tI=;
-        b=CoF2DL5FVziXAZnzwH3p7raTKDhzs5MGPnXVMka+FwlJeN7fHYRF2PKliF1g0LO2p3
-         NaKA/erFgYz6ac2pqlM4ev/IhmPgHClhdeDrt1+9KbxYmigQIQ4uWeYe9NJt1mhkso2g
-         DXjBtMMm+66ZS8weTC5uErPZdONGQ/j2FiJy1EZW9BrzdcpMLzAxDr9o7x5t4H5Z+Hz+
-         d1Y8gm0vptqWpD2zmy1XVE9FAaOEl59hb8TAfn3fDMzBINfyMwCNt6bKuaKuMpMvA8ai
-         Hi0aQN2JDw7o0halw48MKMUGMwvhMaBNm3eQFS7qKFfHeS/70+Qx/DcdWhlAM+aXUVsr
-         L9wg==
+        bh=rWpDMhOTDtTlNFqC0FU+bCgE4TlD7DZUXOVCdFqtqHk=;
+        b=PRow5KNOVsY28eo7kfO2cOVUKtEv+lCi3ZX8z4TiJsOjv0FUD7vk+vFBT/KwldnYZy
+         QmGUMLx7Xt3KMnzeVnUerCkCa95gY4yxR4LoFiIf59s12Ihj93YqO5G/CZOpYVyynfMP
+         qXYS9+S/ZBUC1GOZuaKLSPqa4JBoihZzivyTOHcXWSv3+mLJSbUxFAgL7KrY5AbdXo6c
+         EfibQ2SFVtyPHUpJMsRf0OciCrgJB8hQdHVzLm5Vzhq4Y3CzXVbNZi7CAiSpvmuKuZjg
+         4CDECEq9ZZdgQ0MU2yXBcgT2hux5SfMddR0KpTmQQvJyKrLGVGVirjKII/EDtQp9MaHb
+         8A8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=Rij+pAdZG93DLyUN4lOyVYXvdWWBdU7yElR3oGxp4tI=;
-        b=H0oTMfFl6Lo2HKLc3P/BO76cL4xyOvmvoAjmqstb55rTUIyzjuS3DwlBh7D/H6rSBF
-         hS4iib4c1P8JQB+JtFeHJBcgBV21hpzzFYtkUhCVlWcItx4nHk7O1swn5aKJRmcMVbXS
-         l7iYver4EsJu+YaJoUYiavFM+Ef6VLIt1GJt3Z1aMuGfFEPM6pmII2vHSTX1iW1ThJ4D
-         Ge9eOicPaU//R/atKynZG0NenRLC9TbU87LGnBTSbEGtvW7Tw9SaEKPDg9lQVUIPM8ws
-         DaYQRuNk+zcyjPt6XR9c0QwmJM+Zoz3eQ1ORHgGeHNp/4Jjdct2f9urAXWb4sK8yl6Aq
-         kbCw==
-X-Gm-Message-State: ACrzQf1IPykAHJfDbN67ycf1t+szLMPuW5WkaDyYwU4Weejo9JQNOCZ1
-        aaYg/T84UtPyml+4YJlkEBJSah3AYygBQQ==
-X-Google-Smtp-Source: AMsMyM56Vb6dmBkRmbK7gYA61Cui0gCYhcUYRs+HAXPb9xvszvLbViNd61Un/2fYJ+/q/1qOhggfHg==
-X-Received: by 2002:a05:6a00:139b:b0:540:de3c:cf9d with SMTP id t27-20020a056a00139b00b00540de3ccf9dmr24896169pfg.54.1663694197079;
-        Tue, 20 Sep 2022 10:16:37 -0700 (PDT)
+        bh=rWpDMhOTDtTlNFqC0FU+bCgE4TlD7DZUXOVCdFqtqHk=;
+        b=XTqLope9TDYVUmwCAbV2sAREJ9/KWJIF0+LP45zruA+prAI5aJl84a/trOzIttx9P9
+         WsMwjapEyWS4OvNUHpqq9g1jBLm8qyvPppS8zm2863fX3AfZDksg40KD6irrN983axv7
+         0//M9Jvvv/IN6iAIMEh2QIZwlBbG3rkMYbHPnm9eBhZLAnxQF5G1msf3QYHsRkwCsvPJ
+         LZfdT+K0R/ofix/u1Zjrkr3aRaVS4tYj9IIK0uULIVEqpKppcFvPY9iDQLTQCm5Pkzyh
+         prx0/zoaJaJO37ZdfxTk+kI1hqXlr+HL+TpnBZjDuCblJdaHTSsjntLsmtlHbgLdlzDb
+         DYfg==
+X-Gm-Message-State: ACrzQf3GtgPTwsme4c39NHWqVyQ6B/QtVy6dfXDw5sIh54JZAFoghEdG
+        y9OUdgbWtkdkvB1ksiD4W0/9Ng==
+X-Google-Smtp-Source: AMsMyM7YVFBVZtE00/uCv5CjoaO8irYok0FfFUmpXpjxXcb/R8kRHl4P3avVo2jOETzZf3X8iEIb+Q==
+X-Received: by 2002:a05:6a00:4c11:b0:53e:4f07:fce9 with SMTP id ea17-20020a056a004c1100b0053e4f07fce9mr25634942pfb.66.1663695563550;
+        Tue, 20 Sep 2022 10:39:23 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u4-20020a170902e5c400b0016cf3f124e1sm122496plf.234.2022.09.20.10.16.36
+        by smtp.gmail.com with ESMTPSA id u5-20020a170902714500b00178957d17a4sm129916plm.286.2022.09.20.10.39.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Sep 2022 10:16:36 -0700 (PDT)
-Date:   Tue, 20 Sep 2022 17:16:32 +0000
+        Tue, 20 Sep 2022 10:39:23 -0700 (PDT)
+Date:   Tue, 20 Sep 2022 17:39:19 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     "Huang, Kai" <kai.huang@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "peterx@redhat.com" <peterx@redhat.com>
-Subject: Re: [PATCH v2 01/10] KVM: x86/mmu: Change tdp_mmu to a read-only
- parameter
-Message-ID: <Yyn1cL4dviXwTqXA@google.com>
-References: <20220826231227.4096391-1-dmatlack@google.com>
- <20220826231227.4096391-2-dmatlack@google.com>
- <2433d3dba221ade6f3f42941692f9439429e0b6b.camel@intel.com>
- <CALzav=cgqJV+k5wAymUXFaTK5Q1h6UFSVSKjZZ30akq-q0FNOg@mail.gmail.com>
- <CALzav=cuwyFTn6zz+fJqjKNs6XYx2-N61sgMQ9K5C-Z=a4STZg@mail.gmail.com>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        andrew.jones@linux.dev, pbonzini@redhat.com, maz@kernel.org,
+        alexandru.elisei@arm.com, eric.auger@redhat.com, oupton@google.com,
+        reijiw@google.com, rananta@google.com, bgardon@google.com,
+        dmatlack@google.com, axelrasmussen@google.com
+Subject: Re: [PATCH v7 07/13] KVM: selftests: Add vm->memslots[] and enum
+ kvm_mem_region_type
+Message-ID: <Yyn6x6Y8wlMgSrgZ@google.com>
+References: <20220920042551.3154283-1-ricarkol@google.com>
+ <20220920042551.3154283-8-ricarkol@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALzav=cuwyFTn6zz+fJqjKNs6XYx2-N61sgMQ9K5C-Z=a4STZg@mail.gmail.com>
+In-Reply-To: <20220920042551.3154283-8-ricarkol@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,33 +75,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 20, 2022, David Matlack wrote:
-> On Thu, Sep 1, 2022 at 9:47 AM David Matlack <dmatlack@google.com> wrote:
-> > On Tue, Aug 30, 2022 at 3:12 AM Huang, Kai <kai.huang@intel.com> wrote:
-> > > On Fri, 2022-08-26 at 16:12 -0700, David Matlack wrote:
-> [...]
-> > > > +#else
-> > > > +/* TDP MMU is not supported on 32-bit KVM. */
-> > > > +const bool tdp_mmu_enabled;
-> > > > +#endif
-> > > > +
-> > >
-> > > I am not sure by using 'const bool' the compile will always omit the function
-> > > call?  I did some experiment on my 64-bit system and it seems if we don't use
-> > > any -O option then the generated code still does function call.
-> > >
-> > > How about just (if it works):
-> > >
-> > >         #define tdp_mmu_enabled false
-> >
-> > I can give it a try. By the way, I wonder if the existing code
-> > compiles without -O. The existing code relies on a static inline
-> > function returning false on 32-bit KVM, which doesn't seem like it
-> > would be any easier for the compiler to optimize out than a const
-> > bool. But who knows.
-> 
-> Actually, how did you compile without -O and is that a supported use-case?
+On Tue, Sep 20, 2022, Ricardo Koller wrote:
+> The vm_create() helpers are hardcoded to place most page types (code,
+> page-tables, stacks, etc) in the same memslot #0, and always backed with
+> anonymous 4K.  There are a couple of issues with that.  First, tests willing to
 
-Eh, IMO whether or not an unoptimized build is supported is moot.  KVM already
-uses "#define <param> 0/false", e.g. see enable_sgx, I don't see any reason to
-employ a different method.
+Preferred kernel style is to wrap changelogs at ~75 chars, e.g. so that `git show`
+stays under 80 chars.
+
+And in general, please incorporate checkpatch into your workflow, e.g. there's
+also a spelling mistake below.
+
+  WARNING: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+  #9: 
+  anonymous 4K.  There are a couple of issues with that.  First, tests willing to
+
+  WARNING: 'spreaded' may be misspelled - perhaps 'spread'?
+  #12: 
+  the hardcoded assumption of memslot #0 holding most things is spreaded
+                                                              ^^^^^^^^
+
+  total: 0 errors, 2 warnings, 94 lines checked
+
+> differ a bit, like placing page-tables in a different backing source type must
+> replicate much of what's already done by the vm_create() functions.  Second,
+> the hardcoded assumption of memslot #0 holding most things is spreaded
+> everywhere; this makes it very hard to change.
+
+...
+
+> @@ -105,6 +119,13 @@ struct kvm_vm {
+>  struct userspace_mem_region *
+>  memslot2region(struct kvm_vm *vm, uint32_t memslot);
+>  
+> +inline struct userspace_mem_region *
+
+Should be static inline.
+
+> +vm_get_mem_region
+
+Please don't insert newlines before the function name, it makes searching painful.
+Ignore existing patterns in KVM selfetsts, they're wrong.  ;-)  Linus has a nice
+explanation/rant on this[*].
+
+The resulting declaration will run long, but at least for me, I'll take that any
+day over putting the function name on a new line.
+
+[*] https://lore.kernel.org/all/CAHk-=wjoLAYG446ZNHfg=GhjSY6nFmuB_wA8fYd5iLBNXjo9Bw@mail.gmail.com
+
+
+> (struct kvm_vm *vm, enum kvm_mem_region_type mrt)
+
+One last nit, what about "region" or "type" instead of "mrt"?  The acronym made me
+briefly pause to figure out what "mrt" meant, which is silly because the name really
+doesn't have much meaning.
+
+> +{
+> +	assert(mrt < NR_MEM_REGIONS);
+> +	return memslot2region(vm, vm->memslots[mrt]);
+> +}
+
+...
+
+> @@ -293,8 +287,16 @@ struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
+>  	uint64_t nr_pages = vm_nr_pages_required(mode, nr_runnable_vcpus,
+>  						 nr_extra_pages);
+>  	struct kvm_vm *vm;
+> +	int i;
+> +
+> +	pr_debug("%s: mode='%s' pages='%ld'\n", __func__,
+> +		 vm_guest_mode_string(mode), nr_pages);
+> +
+> +	vm = ____vm_create(mode);
+> +	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, 0, nr_pages, 0);
+
+The spacing is weird here.  Adding the region and stuffing vm->memslots are what
+should be bundled together, not creating the VM and adding the common region.  I.e.
+
+	pr_debug("%s: mode='%s' pages='%ld'\n", __func__,
+		 vm_guest_mode_string(mode), nr_pages);
+
+	vm = ____vm_create(mode);
+
+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, 0, nr_pages, 0);
+	for (i = 0; i < NR_MEM_REGIONS; i++)
+		vm->memslots[i] = 0;
+
+>  
+> -	vm = ____vm_create(mode, nr_pages);
+> +	for (i = 0; i < NR_MEM_REGIONS; i++)
+> +		vm->memslots[i] = 0;
+>  
+>  	kvm_vm_elf_load(vm, program_invocation_name);
+>  
+> -- 
+> 2.37.3.968.ga6b4b080e4-goog
+> 
