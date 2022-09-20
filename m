@@ -2,86 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08C2C5BD93C
-	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 03:16:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 460315BD9C8
+	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 04:03:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229645AbiITBQC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Sep 2022 21:16:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55426 "EHLO
+        id S230094AbiITCC7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Sep 2022 22:02:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229540AbiITBQA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Sep 2022 21:16:00 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D2C640BFD
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 18:15:59 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id v1so866080plo.9
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 18:15:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=gU6sZmicsJoaIGHDKcaeVi6YbG7f7K09FK6stSvw1oI=;
-        b=bxq3XL2/SXzRLYXzXWpmY1AzxAn850aE2sUXr91sQajALuLcinc6b1D0B5+Pw8PsYv
-         gXhMaCrTNG9RNblSopazjRVJmorDkBbafi3AzCG9fyTlzAJDwjQHgVu6bCbLe/xWmheI
-         jTfI8Fz+swp3k20Da3gKI5o8K5TM+aiATPAx6jtOTL2p2s0CERKddXDnkGHkKdDEcyeS
-         K2hErCl84FDAjRHLKz+4S7vf0O0eHT4kq5cpg13OkeoXRtw7X0H7lkO+SeD3bZJ7gPbP
-         bj4MCl6cNHjeSDRIFX4VyUU6CyONxJeo1PhKSix0Yq9+S4tiTnMJBhKkAV+eDP0h3Gq/
-         PI/g==
+        with ESMTP id S229776AbiITCC5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Sep 2022 22:02:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41ADC57209
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 19:02:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663639371;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=faCU162X+wI3VyF2nQiop7OG+mfYJ3C8OshE48krBU4=;
+        b=dAFUvV2RlyKOopgHtCjvRaAbzSM+QQA7JfwxIPO3S1Uu8ux3VCY5pO4lyon/EELLnQrTIP
+        l9Lmz9TSwclU+BtBD7S9QDRfnWZwTQb9QKUC5E1AKrvTtkM+p2q1CDwy9KWmhlKUjvjzo6
+        VPDxdsh8gR3t1nNIhNw8n2hdk5XrXr0=
+Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
+ [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-451-XeOIHh5WOO-ax00ip5W8wA-1; Mon, 19 Sep 2022 22:02:50 -0400
+X-MC-Unique: XeOIHh5WOO-ax00ip5W8wA-1
+Received: by mail-vs1-f70.google.com with SMTP id p15-20020a056102200f00b0039778c3e66cso318089vsr.5
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 19:02:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=gU6sZmicsJoaIGHDKcaeVi6YbG7f7K09FK6stSvw1oI=;
-        b=6SDhyxAqDm98Ja67ikeIQprWn2stOhRARKl4PRxj7yUWIySzyGTW+iogXFHSknGqK3
-         Fo/vmcoaFyGcmM0BvSSRtOtRJD1N3FpUpHaoOF5irrEWOnmJyBih1llf01gJmo0vwmAH
-         wuiF2s2xhzFJSNGKbaxUvCAYrCkPg36wp8tsH+iOtcKVX4rb9hVpXV7/VNSyRFcNXwNm
-         BHn7o3QYHPYgHB5L6BENUyvHOBnA/a3gRLzHMPnTnVUSZ137a/iEde6v4aL/cvP0Tr60
-         beIVRuomc18Z7nmReu67WBi7z/MqpIZfcU9+uM58Q5qs5BvmqcYXxEp5Jh4G2qPIGC61
-         32OQ==
-X-Gm-Message-State: ACrzQf3TBTDZGoRRB86RVmh0g2G/d9gXoT0kuL+cXorkfvh6Lpb4ZdoA
-        E3NSHWO8BDYKvQVJ/yRxQBSkJw==
-X-Google-Smtp-Source: AMsMyM6mCK7tZiA7l0BLrWcQRyYYvKOaVe2pjavOYvJJvwlbgcBC0O2aPwLoQXTxhFVHA7vpHbllMA==
-X-Received: by 2002:a17:902:c40b:b0:178:e34:efa9 with SMTP id k11-20020a170902c40b00b001780e34efa9mr2446911plk.10.1663636558956;
-        Mon, 19 Sep 2022 18:15:58 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id p22-20020a1709027ed600b0017837d30a8csm13393plb.254.2022.09.19.18.15.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Sep 2022 18:15:58 -0700 (PDT)
-Date:   Tue, 20 Sep 2022 01:15:54 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        mlevitsk@redhat.com
-Subject: Re: [PATCH v3 0/7] KVM: x86: never write to memory from
- kvm_vcpu_check_block
-Message-ID: <YykUSviPAOXEUouz@google.com>
-References: <20220822170659.2527086-1-pbonzini@redhat.com>
- <YxoMCp+rMV1ZmRlU@google.com>
- <YyUcw49208H3jgMi@google.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=faCU162X+wI3VyF2nQiop7OG+mfYJ3C8OshE48krBU4=;
+        b=sUVn+82AGXz6GD+DSs7R16+J89rzKxXQp5B8GQmeVUuFWT5xmSWbsC73BsQQDlPEOd
+         +sFax1S0lInnUrq1dPQr4EajYieNWWmW16pUzKZEscPR3VxU7JoCzbz+mHlbHkbbj2S1
+         TY/fPEltjs+1gnNK2HllB0yRWH1EAoRCobSS5ZLiGPOPaK0TzE/kN2JQCzGN4IWlc7H8
+         uYNZc91DtOUm4KLL7/6N1FNZH7TRGW6zY0DzYc6moLwi3EJUoiymYVwKqcDbr3QAgufa
+         rtcfs3Sov7JCodb7sT2Jhtj6aqpSNBbIb7Bj0L6QzvbgpMh6tU9JLV24lgu5sjYnhU7R
+         Dy6Q==
+X-Gm-Message-State: ACrzQf10wFQ52LRL+L4BblbjL3QzP8Q3O0qPXZrvK9paQhgd3EScp5VW
+        b/oDSzbZ2vzlql635Sj1pWBON6v5/8HdFricQ4k74akcloJEgxy0myLerOy18ECBLOFd3GFAr2X
+        IuO2P9YdI9V38h/e1J/oSR/2cjeuY
+X-Received: by 2002:a05:6102:1341:b0:398:889e:7f28 with SMTP id j1-20020a056102134100b00398889e7f28mr7912784vsl.21.1663639369328;
+        Mon, 19 Sep 2022 19:02:49 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7hWThMWApXIHlTE15FM2qB/Cbva+CwsqGmij2/DXcHfy6l4xVdBSPLV7e1pSscJ8wm1BTYnWg+1OnoMnHQnnc=
+X-Received: by 2002:a05:6102:1341:b0:398:889e:7f28 with SMTP id
+ j1-20020a056102134100b00398889e7f28mr7912778vsl.21.1663639369049; Mon, 19 Sep
+ 2022 19:02:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YyUcw49208H3jgMi@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220909085712.46006-1-lingshan.zhu@intel.com> <20220909085712.46006-2-lingshan.zhu@intel.com>
+In-Reply-To: <20220909085712.46006-2-lingshan.zhu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 20 Sep 2022 10:02:37 +0800
+Message-ID: <CACGkMEsq+weeO7i8KtNNAPhXGwN=cTwWt3RWfTtML-Xwj3K5Qg@mail.gmail.com>
+Subject: Re: [PATCH 1/4] vDPA: allow userspace to query features of a vDPA device
+To:     Zhu Lingshan <lingshan.zhu@intel.com>
+Cc:     mst <mst@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Sep 17, 2022, Sean Christopherson wrote:
-> The eponymous patch breaks handling of INITs (and SIPIs) that are "latched"[1]
-> and later become unblocked, e.g. due to entering VMX non-root mode or because SVM's
-> GIF is set.  vmx_init_signal_test fails because KVM fails to re-evaluate pending
-> events after entering guest/non-root.  It passes now because KVM always checks
-> nested events in the outer run loop.
-> 
-> I have fixes, I'll (temporarily) drop this from the queue and post a new version of
-> this series on Monday.
+On Fri, Sep 9, 2022 at 5:05 PM Zhu Lingshan <lingshan.zhu@intel.com> wrote:
+>
+> This commit adds a new vDPA netlink attribution
+> VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES. Userspace can query
+> features of vDPA devices through this new attr.
+>
+> This commit invokes vdpa_config_ops.get_config() than
+> vdpa_get_config_unlocked() to read the device config
+> spcae, so no raeces in vdpa_set_features_unlocked()
+>
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
 
-And by "Monday" I meant "Tuesday", the weird pending_events snapshot thing sent me
-down a bit of a rabbit hole.
+It's better to share the userspace code as well.
+
+> ---
+>  drivers/vdpa/vdpa.c       | 19 ++++++++++++++-----
+>  include/uapi/linux/vdpa.h |  4 ++++
+>  2 files changed, 18 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
+> index c06c02704461..798a02c7aa94 100644
+> --- a/drivers/vdpa/vdpa.c
+> +++ b/drivers/vdpa/vdpa.c
+> @@ -491,6 +491,8 @@ static int vdpa_mgmtdev_fill(const struct vdpa_mgmt_dev *mdev, struct sk_buff *m
+>                 err = -EMSGSIZE;
+>                 goto msg_err;
+>         }
+> +
+> +       /* report features of a vDPA management device through VDPA_ATTR_DEV_SUPPORTED_FEATURES */
+
+The code explains itself, there's no need for the comment.
+
+>         if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_SUPPORTED_FEATURES,
+>                               mdev->supported_features, VDPA_ATTR_PAD)) {
+>                 err = -EMSGSIZE;
+> @@ -815,10 +817,10 @@ static int vdpa_dev_net_mq_config_fill(struct vdpa_device *vdev,
+>  static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *msg)
+>  {
+>         struct virtio_net_config config = {};
+> -       u64 features;
+> +       u64 features_device, features_driver;
+>         u16 val_u16;
+>
+> -       vdpa_get_config_unlocked(vdev, 0, &config, sizeof(config));
+> +       vdev->config->get_config(vdev, 0, &config, sizeof(config));
+>
+>         if (nla_put(msg, VDPA_ATTR_DEV_NET_CFG_MACADDR, sizeof(config.mac),
+>                     config.mac))
+> @@ -832,12 +834,19 @@ static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *ms
+>         if (nla_put_u16(msg, VDPA_ATTR_DEV_NET_CFG_MTU, val_u16))
+>                 return -EMSGSIZE;
+>
+> -       features = vdev->config->get_driver_features(vdev);
+> -       if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features,
+> +       features_driver = vdev->config->get_driver_features(vdev);
+> +       if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features_driver,
+> +                             VDPA_ATTR_PAD))
+> +               return -EMSGSIZE;
+> +
+> +       features_device = vdev->config->get_device_features(vdev);
+> +
+> +       /* report features of a vDPA device through VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES */
+> +       if (nla_put_u64_64bit(msg, VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES, features_device,
+>                               VDPA_ATTR_PAD))
+>                 return -EMSGSIZE;
+>
+> -       return vdpa_dev_net_mq_config_fill(vdev, msg, features, &config);
+> +       return vdpa_dev_net_mq_config_fill(vdev, msg, features_driver, &config);
+>  }
+>
+>  static int
+> diff --git a/include/uapi/linux/vdpa.h b/include/uapi/linux/vdpa.h
+> index 25c55cab3d7c..97531b52dcbe 100644
+> --- a/include/uapi/linux/vdpa.h
+> +++ b/include/uapi/linux/vdpa.h
+> @@ -46,12 +46,16 @@ enum vdpa_attr {
+>
+>         VDPA_ATTR_DEV_NEGOTIATED_FEATURES,      /* u64 */
+>         VDPA_ATTR_DEV_MGMTDEV_MAX_VQS,          /* u32 */
+> +       /* features of a vDPA management device */
+>         VDPA_ATTR_DEV_SUPPORTED_FEATURES,       /* u64 */
+>
+>         VDPA_ATTR_DEV_QUEUE_INDEX,              /* u32 */
+>         VDPA_ATTR_DEV_VENDOR_ATTR_NAME,         /* string */
+>         VDPA_ATTR_DEV_VENDOR_ATTR_VALUE,        /* u64 */
+>
+> +       /* features of a vDPA device, e.g., /dev/vhost-vdpa0 */
+> +       VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES,  /* u64 */
+
+What's the difference between this and VDPA_ATTR_DEV_SUPPORTED_FEATURES?
+
+Thanks
+
+> +
+>         /* new attributes must be added above here */
+>         VDPA_ATTR_MAX,
+>  };
+> --
+> 2.31.1
+>
+
