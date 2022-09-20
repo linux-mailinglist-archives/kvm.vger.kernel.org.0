@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FED95BF0C6
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 01:04:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 88CA15BF0DF
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 01:13:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229813AbiITXEC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Sep 2022 19:04:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47710 "EHLO
+        id S229972AbiITXNR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Sep 2022 19:13:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229630AbiITXEA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Sep 2022 19:04:00 -0400
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3842C2B27C
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 16:03:59 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id 13so9756178ejn.3
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 16:03:59 -0700 (PDT)
+        with ESMTP id S229488AbiITXNP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Sep 2022 19:13:15 -0400
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E868F3AB06
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 16:13:13 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id q21so6072478edc.9
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 16:13:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:references
          :in-reply-to:subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=PxKeXBgXDwhU6B1ik/sUia4kvwdWE2K6hWQ95wE2Drk=;
-        b=HEjiVh9w/3uCTeKWv5xTLYFpaViWsk1vtcDV5uQGkSAxseV3doz8CMX3FWw2WdZCHR
-         RcYX/eRukcl9SLItOd8D1rCIKwttT7lhGff2RwC7ww60l1XOfWWmLKzBYHGUeV7pPFsd
-         P6QdGWOYlxu4X8tnvMr7B+LQXRg5qP3SnC1gIWLJ5g7+BYCYhv4PWiOReQpR2NqO04s6
-         ncY0vtK8AjDW/NwmHfxb2t82Lq8SPDtde4ij2gGlDjf5vewhZZg+mS1Wl6X2X+rTl900
-         QNyrUQhD4kT+8PNRDeXGczO8mxCYzv5qaZoZCd2YXXoBhhst+vNWlk3So56OtpqodqAY
-         VXQA==
+        bh=bbUnGfY0T65vpw4i+PmIv1V+pOshk83ucIJf1T2aWdo=;
+        b=ls5u4mWmzc7wWpojyA20Bt3CadigjecKwPHtS0ugar11GBW4QxG01c7I+FSv4aEXxx
+         kfudSa+UgDRMWTzRygtowcdKEHXM5GhKSjDLK0f2PLRvZIHMbf+W1SzB1+XALNHvhjW7
+         4987PFAS9fT1/Z2mRZcalcGftAZQCRnM29/Lw4ihqN+YcRt7EqKea73SSK6H/ErlqRm+
+         eRN4LIy9KlwhU/fgPV+wWQmi561yMiUm42Ec5eZg1sQnL56KUGoSxeLemHtRlxrro7fZ
+         ycbw7arvaIDn0R9vRYC3WYmTTuUO6i/iW6lP47ORjlIApektwFfB4gNxqCasGaZu8dlV
+         DKMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:references
          :in-reply-to:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date;
-        bh=PxKeXBgXDwhU6B1ik/sUia4kvwdWE2K6hWQ95wE2Drk=;
-        b=vZTQTKkLuW6e2GdEquXOaMmnOXEShhVnBAvJyrbaHA/qeB4EiKvtUraTHjxE4M1NbS
-         ThFn2EqZbQt0PG7l2AvRzHSCZary45WXUgLWmMw40sKGGOsvJoXAYGf2/WcZ/M9QSQUj
-         NpYAEnZBd+XWtNzB0mrGKMzCB7mU9QrBvAV8SXU87SmQqT6s1JXFHQemWOIY+7OkUeCm
-         Ub1wDHchXAkdJPupYUBrq9RKnfMxIag5rfQGlml5+Tratgswk+v8lHuoWzW1RaNxF/LG
-         4U+EJcRlJZB9IZwgHdyLqYXETf4GARfTyTn+maTD0MtwblOc6QpqNGkEX5DHMykhroqi
-         jpVA==
-X-Gm-Message-State: ACrzQf22LyQ9AKTnTAjcMiSUY7+ObWkV0hFf5/QD8B1fDk1hJDkHfKd9
-        3I+BwE7da+ifuVIJHVFXkCc=
-X-Google-Smtp-Source: AMsMyM6o2HZboVTIuCsGaPRZJv5x4LFAzYPhH4MOs0KGTsqesz3HK/dGZx2nOXDSIqcv/rFb4zYPxw==
-X-Received: by 2002:a17:906:6a14:b0:774:a998:d9a2 with SMTP id qw20-20020a1709066a1400b00774a998d9a2mr18208772ejc.496.1663715037704;
-        Tue, 20 Sep 2022 16:03:57 -0700 (PDT)
+        bh=bbUnGfY0T65vpw4i+PmIv1V+pOshk83ucIJf1T2aWdo=;
+        b=kuNaavWo0YYoA84Q4tHi4EF6BJn3/VgZ1tq0GcnbMExKci6htIgZCrojOoi9Ebny/5
+         fq+ASubtKkQbRDnOYyyZPJGe0gVi8mHolxjeAVmy1Q095oI9r+R2KfDRZOe/MqFAuO8g
+         qrSI7fMMsgZK+A635MIgrklcauaOlwi9pmzDvfzceFVxa/szNPYZ6r+HIbSAN8ws5UdR
+         tbwyBJOKQb5gJ7RbaJFVnmE2J7LuOjI0K2miZtytTkzRrR42tXHiUCC7ra4Ln643wvmb
+         JxaBGShBV28CwEwYY6sVbs+m+SE17Yltt6rEbmAV87xg36eTQ3CmEEIyfk0b9gRE0SxA
+         bwZg==
+X-Gm-Message-State: ACrzQf28G3UoWEck2bGyBr1tHI+lq2bWqCMcNNE+SCQAdI2z1fdDFNBv
+        16QO0wiVLsDWkwMulM8SLNk=
+X-Google-Smtp-Source: AMsMyM5MIIf9aJBnS9EdzxA+J+yQnJxRSxuHpH9qx7oUct/GFhyGI64mHGWWOkudI6DPkfOPMpThSQ==
+X-Received: by 2002:a50:ff13:0:b0:43e:76d3:63e1 with SMTP id a19-20020a50ff13000000b0043e76d363e1mr22127037edu.271.1663715592403;
+        Tue, 20 Sep 2022 16:13:12 -0700 (PDT)
 Received: from [127.0.0.1] (dynamic-078-054-006-055.78.54.pool.telefonica.de. [78.54.6.55])
-        by smtp.gmail.com with ESMTPSA id x16-20020aa7dad0000000b004548dfb895asm662307eds.34.2022.09.20.16.03.56
+        by smtp.gmail.com with ESMTPSA id s4-20020aa7d784000000b0044838efb8f8sm662810edq.25.2022.09.20.16.13.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Sep 2022 16:03:56 -0700 (PDT)
-Date:   Tue, 20 Sep 2022 23:03:49 +0000
+        Tue, 20 Sep 2022 16:13:12 -0700 (PDT)
+Date:   Tue, 20 Sep 2022 23:13:04 +0000
 From:   Bernhard Beschow <shentey@gmail.com>
-To:     =?ISO-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>,
-        qemu-devel@nongnu.org
-CC:     "Michael S. Tsirkin" <mst@redhat.com>,
+To:     BALATON Zoltan <balaton@eik.bme.hu>,
+        =?ISO-8859-1?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+CC:     qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
         Magnus Damm <magnus.damm@gmail.com>,
         Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
         Bandan Das <bsd@redhat.com>,
@@ -127,10 +127,10 @@ CC:     "Michael S. Tsirkin" <mst@redhat.com>,
         Laurent Vivier <laurent@vivier.eu>,
         Alistair Francis <alistair@alistair23.me>,
         Jason Herne <jjherne@linux.ibm.com>
-Subject: Re: [PATCH 2/9] exec/hwaddr.h: Add missing include
-In-Reply-To: <3fcb707c-47c3-7696-86ec-62048e39bfe1@amsat.org>
-References: <20220919231720.163121-1-shentey@gmail.com> <20220919231720.163121-3-shentey@gmail.com> <3fcb707c-47c3-7696-86ec-62048e39bfe1@amsat.org>
-Message-ID: <AAFF4CBF-E710-4E08-A5AE-E8DF8CB02F63@gmail.com>
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_8/9=5D_softmmu/physmem=3A_Let_SysBusState_?= =?US-ASCII?Q?absorb_memory_region_and_address_space_singletons?=
+In-Reply-To: <fcb592e-a346-2ae-47e9-8af4b9f5ba3@eik.bme.hu>
+References: <20220919231720.163121-1-shentey@gmail.com> <20220919231720.163121-9-shentey@gmail.com> <be558812-199c-0909-d2e1-d2dd6be54dec@amsat.org> <fcb592e-a346-2ae-47e9-8af4b9f5ba3@eik.bme.hu>
+Message-ID: <D64FE5B4-84EF-4E6A-8400-E9501FA8C0E9@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain;
  charset=utf-8
@@ -145,34 +145,186 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 20=2E September 2022 04:50:51 UTC schrieb "Philippe Mathieu-Daud=C3=A9" =
-<f4bug@amsat=2Eorg>:
->On 20/9/22 01:17, Bernhard Beschow wrote:
->> The next commit would not compile w/o the include directive=2E
->>=20
->> Signed-off-by: Bernhard Beschow <shentey@gmail=2Ecom>
->> ---
->>   include/exec/hwaddr=2Eh | 1 +
->>   1 file changed, 1 insertion(+)
->>=20
->> diff --git a/include/exec/hwaddr=2Eh b/include/exec/hwaddr=2Eh
->> index 8f16d179a8=2E=2E616255317c 100644
->> --- a/include/exec/hwaddr=2Eh
->> +++ b/include/exec/hwaddr=2Eh
->> @@ -3,6 +3,7 @@
->>   #ifndef HWADDR_H
->>   #define HWADDR_H
->>   +#include "qemu/osdep=2Eh"
+Am 20=2E September 2022 08:50:01 UTC schrieb BALATON Zoltan <balaton@eik=2E=
+bme=2Ehu>:
 >
->NAck: This is an anti-pattern=2E "qemu/osdep=2Eh" must not be included
->in =2Eh, only in =2Ec=2E
 >
->Isn't including "hw/qdev-core=2Eh" in "include/hw/boards=2Eh" enough in
->the next patch?
+>On Tue, 20 Sep 2022, Philippe Mathieu-Daud=C3=A9 via wrote:
+>
+>> On 20/9/22 01:17, Bernhard Beschow wrote:
+>>> These singletons are actually properties of the system bus but so far =
+it
+>>> hasn't been modelled that way=2E Fix this to make this relationship ve=
+ry
+>>> obvious=2E
+>>>=20
+>>> The idea of the patch is to restrain futher proliferation of the use o=
+f
+>>> get_system_memory() and get_system_io() which are "temprary interfaces=
+"
+>>=20
+>> "further", "temporary"
+>>=20
+>>> "until a proper bus interface is available"=2E This should now be the
+>>> case=2E
+>>>=20
+>>> Note that the new attributes are values rather than a pointers=2E This
+>>> trades pointer dereferences for pointer arithmetic=2E The idea is to
+>>> reduce cache misses - a rule of thumb says that every pointer
+>>> dereference causes a cache miss while arithmetic is basically free=2E
+>>>=20
+>>> Signed-off-by: Bernhard Beschow <shentey@gmail=2Ecom>
+>>> ---
+>>>   include/exec/address-spaces=2Eh | 19 ++++++++++++---
+>>>   include/hw/sysbus=2Eh           |  6 +++++
+>>>   softmmu/physmem=2Ec             | 46 ++++++++++++++++++-------------=
+----
+>>>   3 files changed, 45 insertions(+), 26 deletions(-)
+>>>=20
+>>> diff --git a/include/exec/address-spaces=2Eh b/include/exec/address-sp=
+aces=2Eh
+>>> index d5c8cbd718=2E=2Eb31bd8dcf0 100644
+>>> --- a/include/exec/address-spaces=2Eh
+>>> +++ b/include/exec/address-spaces=2Eh
+>>> @@ -23,17 +23,28 @@
+>>>     #ifndef CONFIG_USER_ONLY
+>>>   -/* Get the root memory region=2E  This interface should only be use=
+d temporarily
+>>> - * until a proper bus interface is available=2E
+>>> +/**
+>>> + * Get the root memory region=2E  This is a legacy function, provided=
+ for
+>>> + * compatibility=2E Prefer using SysBusState::system_memory directly=
+=2E
+>>>    */
+>>>   MemoryRegion *get_system_memory(void);
+>>=20
+>>> diff --git a/include/hw/sysbus=2Eh b/include/hw/sysbus=2Eh
+>>> index 5bb3b88501=2E=2E516e9091dc 100644
+>>> --- a/include/hw/sysbus=2Eh
+>>> +++ b/include/hw/sysbus=2Eh
+>>> @@ -17,6 +17,12 @@ struct SysBusState {
+>>>       /*< private >*/
+>>>       BusState parent_obj;
+>>>       /*< public >*/
+>>> +
+>>> +    MemoryRegion system_memory;
+>>> +    MemoryRegion system_io;
+>>> +
+>>> +    AddressSpace address_space_io;
+>>> +    AddressSpace address_space_memory;
+>>=20
+>> Alternatively (renaming doc accordingly):
+>>=20
+>>       struct {
+>>           MemoryRegion mr;
+>>           AddressSpace as;
+>>       } io, memory;
+>
+>Do we really need that? Isn't mr just the same as as=2Eroot so it would b=
+e enough to store as only? Or is caching mr and not going through as to get=
+ it saves time in accessing these?
 
-Yes, this works just fine indeed! This patch could be dropped if in the ne=
-xt iteration, if any=2E
+as=2Eroot is just a pointer=2E That's why we need mr as a value as well=2E
 
-Thanks,
+> Now we'll go through SysBusState anyway instead of accessing globals so =
+is there a performance impact?
+
+Good question=2E Since both attributes are now next to each another I'd ho=
+pe for an improvement ;-) That depends on on many things of course, such as=
+ if they are located in the same cache line=2E As written in the commit mes=
+sages I tried to minimize pointer dereferences=2E
+
+Best regards,
 Bernhard
-
+>
+>Regards,
+>BALATON Zoltan
+>
+>>>   };
+>>>     #define TYPE_SYS_BUS_DEVICE "sys-bus-device"
+>>> diff --git a/softmmu/physmem=2Ec b/softmmu/physmem=2Ec
+>>> index 0ac920d446=2E=2E07e9a9171c 100644
+>>> --- a/softmmu/physmem=2Ec
+>>> +++ b/softmmu/physmem=2Ec
+>>> @@ -86,12 +86,6 @@
+>>>    */
+>>>   RAMList ram_list =3D { =2Eblocks =3D QLIST_HEAD_INITIALIZER(ram_list=
+=2Eblocks) };
+>>>   -static MemoryRegion *system_memory;
+>>> -static MemoryRegion *system_io;
+>>> -
+>>> -static AddressSpace address_space_io;
+>>> -static AddressSpace address_space_memory;
+>>> -
+>>>   static MemoryRegion io_mem_unassigned;
+>>>     typedef struct PhysPageEntry PhysPageEntry;
+>>> @@ -146,7 +140,7 @@ typedef struct subpage_t {
+>>>   #define PHYS_SECTION_UNASSIGNED 0
+>>>     static void io_mem_init(void);
+>>> -static void memory_map_init(void);
+>>> +static void memory_map_init(SysBusState *sysbus);
+>>>   static void tcg_log_global_after_sync(MemoryListener *listener);
+>>>   static void tcg_commit(MemoryListener *listener);
+>>>   @@ -2667,37 +2661,45 @@ static void tcg_commit(MemoryListener *liste=
+ner)
+>>>       tlb_flush(cpuas->cpu);
+>>>   }
+>>>   -static void memory_map_init(void)
+>>> +static void memory_map_init(SysBusState *sysbus)
+>>>   {
+>>=20
+>> No need to pass a singleton by argument=2E
+>>=20
+>>       assert(current_machine);
+>>=20
+>> You can use get_system_memory() and get_system_io() in place :)
+>>=20
+>> LGTM otherwise, great!
+>>=20
+>>> -    system_memory =3D g_malloc(sizeof(*system_memory));
+>>> +    MemoryRegion *system_memory =3D &sysbus->system_memory;
+>>> +    MemoryRegion *system_io =3D &sysbus->system_io;
+>>>         memory_region_init(system_memory, NULL, "system", UINT64_MAX);
+>>> -    address_space_init(&address_space_memory, system_memory, "memory"=
+);
+>>> +    address_space_init(&sysbus->address_space_memory, system_memory, =
+"memory");
+>>>   -    system_io =3D g_malloc(sizeof(*system_io));
+>>>       memory_region_init_io(system_io, NULL, &unassigned_io_ops, NULL,=
+ "io",
+>>>                             65536);
+>>> -    address_space_init(&address_space_io, system_io, "I/O");
+>>> +    address_space_init(&sysbus->address_space_io, system_io, "I/O");
+>>>   }
+>>>     MemoryRegion *get_system_memory(void)
+>>>   {
+>>> -    return system_memory;
+>>> +    assert(current_machine);
+>>> +
+>>> +    return &current_machine->main_system_bus=2Esystem_memory;
+>>>   }
+>>>     MemoryRegion *get_system_io(void)
+>>>   {
+>>> -    return system_io;
+>>> +    assert(current_machine);
+>>> +
+>>> +    return &current_machine->main_system_bus=2Esystem_io;
+>>>   }
+>>>     AddressSpace *get_address_space_memory(void)
+>>>   {
+>>> -    return &address_space_memory;
+>>> +    assert(current_machine);
+>>> +
+>>> +    return &current_machine->main_system_bus=2Eaddress_space_memory;
+>>>   }
+>>>     AddressSpace *get_address_space_io(void)
+>>>   {
+>>> -    return &address_space_io;
+>>> +    assert(current_machine);
+>>> +
+>>> +    return &current_machine->main_system_bus=2Eaddress_space_io;
+>>>   }
+>>=20
+>>=20
+>>=20
