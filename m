@@ -2,100 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 797305BD9E8
-	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 04:13:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 750695BD9F6
+	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 04:17:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230057AbiITCN2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Sep 2022 22:13:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41484 "EHLO
+        id S230138AbiITCQx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Sep 2022 22:16:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229921AbiITCN0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Sep 2022 22:13:26 -0400
-Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6C7857544
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 19:13:25 -0700 (PDT)
-Received: by mail-vs1-xe2c.google.com with SMTP id c3so1569729vsc.6
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 19:13:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=LhprL2QVbzky7ZAXaXmKaCG2fZ/bG0UYXk9tOS7aXnY=;
-        b=PGCJcjWLr4SHxMv8ivTAMamCPU/lkKK0dFqBEfZy+Xoh/g4UvHR8Tjalko7fnj29cf
-         ECXwL9kH/aqs1iN4dEjp98ccsT9UZFvlEjmNb1ZOmBEMuslU7MeQ+dvTUeavKDHKQWkT
-         Q4sdG5mzJs1M66f2/yOjLYV7Mr23g9I1tPE7KgDV5IWqbQPWUM6r7hi+cwY1VQ4e6HAG
-         iYFfrDkQCOw8EuUPf0ygxePt4Cp2eXiDyNWgfI/4cE1WmmdejsR0gyunDCIeYe34a7rH
-         /0OIP5YArMqkI2DI5zSGm4n52uKi+aoQYTAKw2OM/X8C/CcDvnsTdize+LSbiPaahbN2
-         sv7A==
+        with ESMTP id S230147AbiITCQt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Sep 2022 22:16:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5BCB550B9
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 19:16:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663640207;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Zo86NMsPHctYgO0mGry59i4eN15QEnWKnYhNdcDx8JY=;
+        b=W4Yd0AxUdf8T309EmgBkFFXUCTwCL8rkzX6Q0QSpSfBxgkScBIvVeImnioEi2sZonJU5am
+        CphBlcdF/dTKxh/vlTbWLvJuElUGvUEyKxmskT8wfwZmV325P2sUQCdaVXeuZJ/a2qL4w4
+        FOp1oPioMVwDg9kAAMxt65XTuJhF61A=
+Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com
+ [209.85.217.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-354-y_3d0S5zNo2ETkKaBvN5OA-1; Mon, 19 Sep 2022 22:16:46 -0400
+X-MC-Unique: y_3d0S5zNo2ETkKaBvN5OA-1
+Received: by mail-vs1-f69.google.com with SMTP id 3-20020a671703000000b0039adf69ad53so314612vsx.21
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 19:16:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=LhprL2QVbzky7ZAXaXmKaCG2fZ/bG0UYXk9tOS7aXnY=;
-        b=yM/lMdVunsFesq+8miNd92Mk8p5ByuJI1xlmcCLcVef1A4BPp4K9McyB8INrg+1872
-         mZdXZ5g3T50dgEH2xQ0nRXmUnmqxYFS/Z/Dxijzf9hfi1KGhld2qxVE3lty+vDyrOvAD
-         S1OmmeyPVVSfRwUlccsYEP3w5howRiRpRYaLBhPLLN/a53HqPIcD/Btd5qnLVsT5MwvS
-         efp/SIqMPi3IY1mvAR58zf8xE/O8oOssAoXhjGZP6x3+ohsa4ET3EcB64LkZQ6xClA93
-         n9Ou6oY8GbsyL/137jUZkqB/bk2IiqzgnwusJiRqeedOQyO+0Ggre7/4Gjfn1tk0PLSE
-         X2Pw==
-X-Gm-Message-State: ACrzQf0uNkrpjAlMQYM24EBZwtPTww1lPZ4xJCcGs8eLMeMf0MYvRFCA
-        koBdmkXixhk9ErCJuFOEHkpeICE8i9VAcnUnAd+wcA==
-X-Google-Smtp-Source: AMsMyM7wgUY6E8j/4SMw+/72+ih55ve9ug7EcEf9GLIsdD3MXqyNwHc4oK+hZoFAn5gEb/6kdxZ6GEWk15PY0d04huI=
-X-Received: by 2002:a67:ea58:0:b0:38f:d89a:e4b3 with SMTP id
- r24-20020a67ea58000000b0038fd89ae4b3mr7517244vso.51.1663640004802; Mon, 19
- Sep 2022 19:13:24 -0700 (PDT)
+        bh=Zo86NMsPHctYgO0mGry59i4eN15QEnWKnYhNdcDx8JY=;
+        b=EWZRTZxWUmj1ERkVFydtrG2CaY7vr6vFtpYzY4DTmCUXmPzeDTUuoi7SJvs729IfJ8
+         A6bCoSURtMOq6I8qB6OLVPXYAgdNDlklieQsLfY3i2w1otVdNC8jsTKhuoNdd+GCv2cJ
+         cNPjlQNLW1bB7G9wZQH31dEtSeXzISouzMoZ8Mtp7NvyrgJmQKBSWsdiW9Pp2hnu2yeI
+         3NV6VlKzK7nU/z2Aa9Nv/RGmaZgXwCCcMczEtrgIfF+eyPh/BZ6GyQGFuv1EboQUGJ8c
+         06uNl6yE0JkdnE+49ae9r6EHuMGnIbaDysbg7atDIh/ZEBDxhWrQXf7/gAjD7vv6gHLI
+         Dp9w==
+X-Gm-Message-State: ACrzQf1893jSGTTIf7TzLlz3dne9PPShACgcXFp8qbM4+Hr502RDdXwA
+        0hOsjY87/or6fAbgiArqeXgd7rLnKZEcSf1Fr+o/Sm3MxMhkttGnOs8hx1rXnX0/WnMjVdij9eN
+        pTFYCpgr/v6DKO/NAgF4cynjdtGVn
+X-Received: by 2002:a67:e218:0:b0:398:4d8c:8037 with SMTP id g24-20020a67e218000000b003984d8c8037mr7419387vsa.4.1663640205512;
+        Mon, 19 Sep 2022 19:16:45 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7FViMHfT3HYQIWmkPbYd8yvNIQikjkhJmN/lsyJbFbvnrbHHcisI8cT5S05cjpkvJJbjMWFTxmicgwYqVdCPA=
+X-Received: by 2002:a67:e218:0:b0:398:4d8c:8037 with SMTP id
+ g24-20020a67e218000000b003984d8c8037mr7419382vsa.4.1663640205244; Mon, 19 Sep
+ 2022 19:16:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220917010600.532642-1-reijiw@google.com> <20220917010600.532642-5-reijiw@google.com>
- <87bkrbln84.wl-maz@kernel.org>
-In-Reply-To: <87bkrbln84.wl-maz@kernel.org>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Mon, 19 Sep 2022 19:13:08 -0700
-Message-ID: <CAAeT=FwN+5=1SjaHqpE2PCaa0H4_pkdz-OsTiRfd-WOzYaCNpw@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] KVM: arm64: selftests: Add a test case for KVM_GUESTDBG_SINGLESTEP
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
+References: <20220909085712.46006-1-lingshan.zhu@intel.com> <20220909085712.46006-3-lingshan.zhu@intel.com>
+In-Reply-To: <20220909085712.46006-3-lingshan.zhu@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 20 Sep 2022 10:16:33 +0800
+Message-ID: <CACGkMEsYARr3toEBTxVcwFi86JxK0D-w4OpNtvVdhCEbAnc8ZA@mail.gmail.com>
+Subject: Re: [PATCH 2/4] vDPA: only report driver features if FEATURES_OK is set
+To:     Zhu Lingshan <lingshan.zhu@intel.com>
+Cc:     mst <mst@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>, kvm <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On Mon, Sep 19, 2022 at 2:36 AM Marc Zyngier <maz@kernel.org> wrote:
+On Fri, Sep 9, 2022 at 5:05 PM Zhu Lingshan <lingshan.zhu@intel.com> wrote:
 >
-> On Sat, 17 Sep 2022 02:06:00 +0100,
-> Reiji Watanabe <reijiw@google.com> wrote:
-> >
-> > Add a test case for KVM_GUESTDBG_SINGLESTEP to the debug-exceptions test.
-> > The test enables single-step execution from userspace, and check if the
-> > exit to userspace occurs for each instruction that is stepped.
-> > Set the default number of the test iterations to a number of iterations
-> > sufficient to always reproduce the problem that the previous patch fixes
-> > on an Ampere Altra machine.
+> vdpa_dev_net_config_fill() should only report driver features
+> to userspace after features negotiation is done.
 >
-> A possibly more aggressive version of this test would be to force a
-> (short lived) timer to fire on the same CPU, forcing an exit. This
-> should hopefully result in a more predictable way to trigger the
-> issue. But that's a reasonable test as a start.
+> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> ---
+>  drivers/vdpa/vdpa.c | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
+> index 798a02c7aa94..29d7e8858e6f 100644
+> --- a/drivers/vdpa/vdpa.c
+> +++ b/drivers/vdpa/vdpa.c
+> @@ -819,6 +819,7 @@ static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *ms
+>         struct virtio_net_config config = {};
+>         u64 features_device, features_driver;
+>         u16 val_u16;
+> +       u8 status;
+>
+>         vdev->config->get_config(vdev, 0, &config, sizeof(config));
+>
+> @@ -834,10 +835,14 @@ static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *ms
+>         if (nla_put_u16(msg, VDPA_ATTR_DEV_NET_CFG_MTU, val_u16))
+>                 return -EMSGSIZE;
+>
+> -       features_driver = vdev->config->get_driver_features(vdev);
+> -       if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features_driver,
+> -                             VDPA_ATTR_PAD))
+> -               return -EMSGSIZE;
+> +       /* only read driver features after the feature negotiation is done */
+> +       status = vdev->config->get_status(vdev);
+> +       if (status & VIRTIO_CONFIG_S_FEATURES_OK) {
 
-Yes, that could result in a more predictable way to cause the specific case!
-I will consider this at a future opportunity.
+Any reason this is not checked in its caller as what it used to do before?
 
-Thank you,
-Reiji
+Thanks
+
+> +               features_driver = vdev->config->get_driver_features(vdev);
+> +               if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features_driver,
+> +                                     VDPA_ATTR_PAD))
+> +                       return -EMSGSIZE;
+> +       }
+>
+>         features_device = vdev->config->get_device_features(vdev);
+>
+> --
+> 2.31.1
+>
+
