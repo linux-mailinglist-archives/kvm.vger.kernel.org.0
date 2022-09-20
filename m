@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B5285BF137
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 01:33:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 07D105BF13B
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 01:33:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231478AbiITXcz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Sep 2022 19:32:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45204 "EHLO
+        id S231504AbiITXdI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Sep 2022 19:33:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231269AbiITXcJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231283AbiITXcJ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 20 Sep 2022 19:32:09 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 081BB4D81C
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 16:32:06 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id a33-20020a630b61000000b00429d91cc649so2443266pgl.8
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 16:32:05 -0700 (PDT)
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF0DD74E0F
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 16:32:07 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id f16-20020a17090a4a9000b001f234757bbbso2308610pjh.6
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 16:32:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date;
-        bh=BnU9R4OOCMoxOu19YfLjACcEr3TMCmK9pmle1GpcXiY=;
-        b=qkXh507ROI+ln1N42ZCLl+6rk1+yF6u0MvgZC8G61grkt4oNHATMOaF87TJHgQB2dt
-         OIl/FI2kTZRtXS3ZxXxv/+B0KdqYzMcTjzNyOLaH8vMj3Mpihq63pA5jyp7eOIlpWp7t
-         DtzeO4l78LWAX423XHA5+gOKIdrAXe1AlEEHa5oDOSWM6AWBGK/mF/OpyG00g5fnhdej
-         IJjpZgzC3Pd+IUn5G7bAAaqfA4cW5W0tWuviP4ly3WhRtPUdm3AmT0qbNZ2EMZei8lRG
-         q92ZeW2c7l3Kqpg5FSF4HV9clwc4BbPv7N7Etg2jbgLNy3fRkHXmGM8ctb4CNXa85Spg
-         Ic+Q==
+        bh=bOqaUaJyqI3z8R7EROs3ckH7IV3vf21Y4AlyOgMQUZo=;
+        b=ZZJ/8TUjBMyr2KLCj8eOdJ2dhuEEWsGbVkKnR5ZrnRuALq+3XMkFrL1FMkfwpqOi+G
+         nifNhjyeZUTdoEi+0Q6iZ2S2BJMxVg9Vkf6laqKQi8xHg4s1cYdxxRJ4fRkYAEcXYjMt
+         5J802K6stGF8zcH+b2fkwJGh6vKICdcqpiBezd7GwvkzQad+mcuIO8Z2y7R1VMThvzM1
+         R+hnnoiZPn80BpvWrhAncqwr0nzXktn7ij3jpwCjDMBiH6qnzJmg6wkcqenCOPMKhFCu
+         YmiQ7aH0LxOjvtpZ9cZ0eyKLqSgtqTLGpTH+7D2dhTgQcc0sMa/FAG3RbKSn2YoQ2uVb
+         npPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date;
-        bh=BnU9R4OOCMoxOu19YfLjACcEr3TMCmK9pmle1GpcXiY=;
-        b=U4E3lIsAyksq1ow/Q98r+6/LdrRx3SOvZ+IOtMPmswEzdTVraAfKcmKDMjLXQphGVy
-         H5TRwHDlFLaZg2gvUrGcRelMDsHBUVYC34wnWKu/7r5WKVrUZ4l0JrynXCbPPwMrWUCq
-         CA6NT40ZZSqOqkHRCvvFfmyDIRp2Qag08ZAd9klxiCKnbiaq4Ousl9Vn0hovY/AN4APV
-         0Q4LawIpMgCeQHJPacQRH1ab4dWhGKjABWYa7YTagcb5NV/Xml/fk5CGidxRQtd1c9vC
-         u+zcyT51+DpLuG+RZiO5G3UuGr0ZIGAQLbQYrnit0Y/X+o26YNvUMSNZa0P3YJDN7vZK
-         chcA==
-X-Gm-Message-State: ACrzQf0tdODRbPh8Qabd4yEjilGSwyF876afIOtKsJod4M6SHyR70uqm
-        kZg+dxZ3cKuJ8WkOzNxen0hrA2y/WsY=
-X-Google-Smtp-Source: AMsMyM7neXTpgHwVbxMnJQHoICcB5V232AiZhjbclpKaLMnonVbkV0dJGKRuGnJUgQAZiyotXAXTdFgZP1I=
+        bh=bOqaUaJyqI3z8R7EROs3ckH7IV3vf21Y4AlyOgMQUZo=;
+        b=Ixn81gb9iTvr4uAwTbErIC9TzxgpQnWarOCx28xwVqx4Ki8/mKL4Wbc5W+n9veR/tc
+         Oz/7WZr0XsPKMg/PAvTUPp6QpcgH35M+zfQzcHVLG6Y1x/wplZBEJkdZT01G0yL7Qo3g
+         g6EQy483wGRITZMMrRAs8OtDqnVzrGmg1SVmGn8EnvEqR4gdV58sQU6suqK2A82KQFSU
+         0hgjzpI3AHq4gD0vuwreneUlOGyhvyHwRsf4MviFFDayDv1V/pn87yqIbLlOsdUJ51YY
+         Xdo51HAQ7JZKKg5tbThozCtefzzYf49ZydIdZloRaL6/2IERcaRgUPxt3XERZMW28hI+
+         Tvzw==
+X-Gm-Message-State: ACrzQf0JbbRFF7csi5PyXx0tuID4B/wOyjkynC/o13Xa+q+4FzLQzKLd
+        2g2D5nOczyJx9VXD/f9EBd8mv70GUak=
+X-Google-Smtp-Source: AMsMyM4VxJpTz8og5f4YXhJR9xCeJq1cJtncTXNnCfQzORrxjVwc26sG+xw2a9l7lQFaJD5fQg5XU0fKxPs=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:1181:b0:203:ae0e:6a21 with SMTP id
- gk1-20020a17090b118100b00203ae0e6a21mr405202pjb.0.1663716725368; Tue, 20 Sep
- 2022 16:32:05 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:27a0:b0:54b:e645:d5d8 with SMTP id
+ bd32-20020a056a0027a000b0054be645d5d8mr20734835pfb.86.1663716727284; Tue, 20
+ Sep 2022 16:32:07 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 20 Sep 2022 23:31:23 +0000
+Date:   Tue, 20 Sep 2022 23:31:24 +0000
 In-Reply-To: <20220920233134.940511-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220920233134.940511-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
-Message-ID: <20220920233134.940511-18-seanjc@google.com>
-Subject: [PATCH v3 17/28] KVM: x86: Skip redundant x2APIC logical mode
- optimized cluster setup
+Message-ID: <20220920233134.940511-19-seanjc@google.com>
+Subject: [PATCH v3 18/28] KVM: x86: Disable APIC logical map if logical ID
+ covers multiple MDAs
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -65,7 +65,7 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,79 +73,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Skip the optimized cluster[] setup for x2APIC logical mode, as KVM reuses
-the optimized map's phys_map[] and doesn't actually need to insert the
-target apic into the cluster[].  The LDR is derived from the x2APIC ID,
-and both are read-only in KVM, thus the vCPU's cluster[ldr] is guaranteed
-to be the same entry as the vCPU's phys_map[x2apic_id] entry.
+Disable the optimized APIC logical map if a logical ID covers multiple
+MDAs, i.e. if a vCPU has multiple bits set in its ID.  In logical mode,
+events match if "ID & MDA != 0", i.e. creating an entry for only the
+first bit can cause interrupts to be missed.
 
-Skipping the unnecessary setup will allow a future fix for aliased xAPIC
-logical IDs to simply require that cluster[ldr] is non-NULL, i.e. won't
-have to special case x2APIC.
+Note, creating an entry for every bit is also wrong as KVM would generate
+IPIs for every matching bit.  It would be possible to teach KVM to play
+nice with this edge case, but it is very much an edge case and probably
+not used in any real world OS, i.e. it's not worth optimizing.
 
-Alternatively, the future check could allow "cluster[ldr] == apic", but
-that ends up being terribly confusing because cluster[ldr] is only set
-at the very end, i.e. it's only possible due to x2APIC's shenanigans.
-
-Another alternative would be to send x2APIC down a separate path _after_
-the calculation and then assert that all of the above, but the resulting
-code is rather messy, and it's arguably unnecessary since asserting that
-the actual LDR matches the expected LDR means that simply testing that
-interrupts are delivered correctly provides the same guarantees.
-
-Reported-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Fixes: 1e08ec4a130e ("KVM: optimize apic interrupt delivery")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/lapic.c | 22 +++++++++++++++++-----
- 1 file changed, 17 insertions(+), 5 deletions(-)
+ arch/x86/kvm/lapic.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 84b7a1c1834d..7a39d7be4cc9 100644
+index 7a39d7be4cc9..a12360fd4df6 100644
 --- a/arch/x86/kvm/lapic.c
 +++ b/arch/x86/kvm/lapic.c
-@@ -166,6 +166,11 @@ static bool kvm_use_posted_timer_interrupt(struct kvm_vcpu *vcpu)
- 	return kvm_can_post_timer_interrupt(vcpu) && vcpu->mode == IN_GUEST_MODE;
- }
- 
-+static inline u32 kvm_apic_calc_x2apic_ldr(u32 id)
-+{
-+	return ((id >> 4) << 16) | (1 << (id & 0xf));
-+}
-+
- static inline bool kvm_apic_map_get_logical_dest(struct kvm_apic_map *map,
- 		u32 dest_id, struct kvm_lapic ***cluster, u16 *mask) {
- 	switch (map->logical_mode) {
-@@ -315,6 +320,18 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+@@ -338,8 +338,14 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+ 			continue;
  		}
- 		new->logical_mode = logical_mode;
  
-+		/*
-+		 * In x2APIC mode, the LDR is read-only and derived directly
-+		 * from the x2APIC ID, thus is guaranteed to be addressable.
-+		 * KVM reuses kvm_apic_map.phys_map to optimize logical mode
-+		 * x2APIC interrupts by reversing the LDR calculation to get
-+		 * cluster of APICs, i.e. no additional work is required.
-+		 */
-+		if (apic_x2apic_mode(apic)) {
-+			WARN_ON_ONCE(ldr != kvm_apic_calc_x2apic_ldr(x2apic_id));
+-		if (mask)
+-			cluster[ffs(mask) - 1] = apic;
++		if (!mask)
++			continue;
++
++		if (!is_power_of_2(mask)) {
++			new->logical_mode = KVM_APIC_MODE_MAP_DISABLED;
 +			continue;
 +		}
-+
- 		if (WARN_ON_ONCE(!kvm_apic_map_get_logical_dest(new, ldr,
- 								&cluster, &mask))) {
- 			new->logical_mode = KVM_APIC_MODE_MAP_DISABLED;
-@@ -381,11 +398,6 @@ static inline void kvm_apic_set_dfr(struct kvm_lapic *apic, u32 val)
- 	atomic_set_release(&apic->vcpu->kvm->arch.apic_map_dirty, DIRTY);
- }
- 
--static inline u32 kvm_apic_calc_x2apic_ldr(u32 id)
--{
--	return ((id >> 4) << 16) | (1 << (id & 0xf));
--}
--
- static inline void kvm_apic_set_x2apic_id(struct kvm_lapic *apic, u32 id)
- {
- 	u32 ldr = kvm_apic_calc_x2apic_ldr(id);
++		cluster[ffs(mask) - 1] = apic;
+ 	}
+ out:
+ 	old = rcu_dereference_protected(kvm->arch.apic_map,
 -- 
 2.37.3.968.ga6b4b080e4-goog
 
