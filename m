@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 207A75BDBA1
-	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 06:26:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C5B225BDBA5
+	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 06:26:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229739AbiITE0a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Sep 2022 00:26:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38064 "EHLO
+        id S230027AbiITE0e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Sep 2022 00:26:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229799AbiITE0U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Sep 2022 00:26:20 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D67E4558F6
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 21:26:13 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-3454647ff7dso11235197b3.12
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 21:26:13 -0700 (PDT)
+        with ESMTP id S229866AbiITE0Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Sep 2022 00:26:24 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D097758B58
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 21:26:14 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id p4-20020a17090a348400b00202c6d79591so725715pjb.0
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 21:26:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date;
-        bh=3IXMWWfhtSsnWeEyyRGnY8bQzfkxRCulrm5lrBr2778=;
-        b=mDlKsGvufu24AUWZmQxjy4dDHZr0IMLom0OcsA+CPTSTZBTc55fQQZ7XvAqQYh8JQQ
-         /BZBn3awHOYByiGORNERPmq4y3FLE25ZV8D4Zc6sU9hrdN9lHiMuODYUanjtYGL9h47P
-         QH5V0rahWRonwSDW8Fb9CZBBYbtnNctCosTGsA+mLSRYPyDVxpigGouSJyehNlcOXdsv
-         VZjSyOPcK/TbHNmIqhNuoFHnaitRn1MjVH+cQifjwqk4fpep77Q2+exbXlypC0oNHoq9
-         TOxA91c8qh3oruT+UU8jeG0yRLGPuxB45vKwOkXEuAWBl97Cop30/sKwemYjpxNModLT
-         yaAg==
+        bh=MX8S263yqB0ICFX8DuXOastxTXECyhjpvmbnjSusPbc=;
+        b=Ey2Mt8Katco4sZU+Kd+ltP+GyZ4jAPbDyQqurmpkDmeqUgKBIzmZ+P1NVZ8Y9tgE/j
+         MMHuJpY6C+9puyAQ164ao+XJ2HY+VF43qXB/ROms4ToqZwTzCKvhaJ7P8X5YlccC9kJL
+         5yvgIAMZqjYhi7kTFT6/OCuW9PGidk74K/nCftdTuyK0aLNJ8BE8ApbkPhu+Y0VIbZIc
+         KQ3qbJx3fF+I1t1/EZN44hGYsuAVlZ0JboJIH6cIz/LHdnqUty8/1aC0y4L0teP4o7T/
+         7g9zm3xFBWgyVqcsPVfgeTBG6AUZSvUFEtk2SowzX3iKURmqw0ZRkvGu73FzOl4+WPGy
+         Z7hQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date;
-        bh=3IXMWWfhtSsnWeEyyRGnY8bQzfkxRCulrm5lrBr2778=;
-        b=QyV5t4wcQ44MPr6xhnR8jV3FNBoRqR4j54Uqnz4ICJL1spBvnvM46TiFQxyvjIhJJn
-         BMXwoNbujtOavjMen2Kf1Ac3rtZ/mvdblAGqp4bjbFaAG02REZCkYjdE4uKktZiZt2vA
-         HGPiMi/4zJZi7z+p4J3NJjQssLu0Fn30AuFQBtbe7lWfwvmUIxG0Xqp+VpygEGGfNWka
-         fKYyjqEXExyTu8HoLQ3Oj/R48/rqy/9Tz1MJtmPQH0kqxZV15LbYi52zcPnoIKvCOEuM
-         aI4DcZ3M4WGtYdw3+5SrkMSg8jiYb2wmG2ytEpPM9mHSs9jqk/Y7ZFwg3Td1RvghMwv0
-         XuLg==
-X-Gm-Message-State: ACrzQf1ZN5hu5MxHhC7QvupOa+zbTqzTnHUPu0/wz3goKMRs/YmYru6m
-        zrnXa4/3mas7/5IKdQoZKpqhM0fueECrB3Xn27sTyXOuKFLajLMPPrKCF2tBX6QgjP+h7484mZu
-        odNxQVWP5TXkgz0qM5gIQZLdsrv3K1i1q3Htcfmt0imnCIEboZLaRTRhvINdQQfE=
-X-Google-Smtp-Source: AMsMyM6Den55RmqFll9pcUknT6wyrAOnjPhou4r/Ws2nEoXmH8JyMap/kYjowHtq9butXPRcpdO5MbSv0HQmNQ==
+        bh=MX8S263yqB0ICFX8DuXOastxTXECyhjpvmbnjSusPbc=;
+        b=xnBpTCd+5CG0WephGTXenncNk+SicgZC0pM7Uf6WQcykp0j7sLoLXwJ5wxcErSJAY2
+         ua1/Mp36yhc4qnTJe1Q9vMx2I83S+5fZ/ZvV0VsEeZbwpVXzC7x21DtpJEOriagMA1TO
+         S+U2+uX+hyPX/32KdSbj5fnRONYgWM8ZvKJ+w3D12UUuUTve8JK0mqzyMwuxzeArVnQ7
+         XxtJhoFFrQzTF5mN6VEjYcGUa0SBHgQjVm/3E2A+iz8G1Et5eHynzgRF6UnLdEvlTa1g
+         s3ix/rFhZcRHSOLoAgEE1LXjaPU+pLry4KjDFdo1yfLEaJit7m93XSswax2FsvQyZXkW
+         +xxw==
+X-Gm-Message-State: ACrzQf3+7xg3KsJKDaJ/NITK/i/o7pYDqm9B2+sDadg2o6KFgLZI/Cez
+        nD0vsKWsNDAxzmBu7hSqS9klnVFyW0lVBlhmsQhDvnvwOSjhirSuzqvi4pmEcMKUzcIECjOFhJJ
+        yxGJrsw47sv/TsbYAYPpU1cZZLdccKpEkvORPFlolqDxITwxwb5V0Mlb8j0wlT6E=
+X-Google-Smtp-Source: AMsMyM5bhJA2W7Qq8GKI9psB9U/92wAGg7CMNjj2yagohBSTMP0DiIkVNOzczaEJJgaQWSv1pMex5mILDwMfjQ==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a81:38d:0:b0:348:b184:cedc with SMTP id
- 135-20020a81038d000000b00348b184cedcmr17380084ywd.175.1663647971983; Mon, 19
- Sep 2022 21:26:11 -0700 (PDT)
-Date:   Tue, 20 Sep 2022 04:25:50 +0000
+ (user=ricarkol job=sendgmr) by 2002:a17:90b:3a90:b0:202:d341:bf81 with SMTP
+ id om16-20020a17090b3a9000b00202d341bf81mr1752593pjb.179.1663647973759; Mon,
+ 19 Sep 2022 21:26:13 -0700 (PDT)
+Date:   Tue, 20 Sep 2022 04:25:51 +0000
 In-Reply-To: <20220920042551.3154283-1-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20220920042551.3154283-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
-Message-ID: <20220920042551.3154283-13-ricarkol@google.com>
-Subject: [PATCH v7 12/13] KVM: selftests: aarch64: Add readonly memslot tests
- into page_fault_test
+Message-ID: <20220920042551.3154283-14-ricarkol@google.com>
+Subject: [PATCH v7 13/13] KVM: selftests: aarch64: Add mix of tests into page_fault_test
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         andrew.jones@linux.dev
@@ -73,193 +72,206 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add some readonly memslot tests into page_fault_test. Mark the data
-and/or page-table memslots as readonly, perform some accesses, and check
-that the right fault is triggered when expected (e.g., a store with no
-write-back should lead to an mmio exit).
+Add some mix of tests into page_fault_test: memslots with all the
+pairwise combinations of read-only, userfaultfd, and dirty-logging.  For
+example, writing into a read-only memslot which has a hole handled with
+userfaultfd.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- .../selftests/kvm/aarch64/page_fault_test.c   | 101 +++++++++++++++++-
- 1 file changed, 100 insertions(+), 1 deletion(-)
+ .../selftests/kvm/aarch64/page_fault_test.c   | 155 ++++++++++++++++++
+ 1 file changed, 155 insertions(+)
 
 diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-index 51b2ac260db5..386c20b47723 100644
+index 386c20b47723..cf72edbd42ef 100644
 --- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
 +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-@@ -41,6 +41,8 @@ static uint64_t *guest_test_memory = (uint64_t *)TEST_GVA;
- #define CHECK_FN_NR				10
- 
- static struct event_cnt {
-+	int mmio_exits;
-+	int fail_vcpu_runs;
- 	int uffd_faults;
- 	/* uffd_faults is incremented from multiple threads. */
- 	pthread_mutex_t uffd_faults_mutex;
-@@ -57,6 +59,8 @@ struct test_desc {
- 	uffd_handler_t uffd_data_handler;
- 	void (*dabt_handler)(struct ex_regs *regs);
- 	void (*iabt_handler)(struct ex_regs *regs);
-+	void (*mmio_handler)(struct kvm_vm *vm, struct kvm_run *run);
-+	void (*fail_vcpu_run_handler)(int ret);
- 	uint32_t pt_memslot_flags;
- 	uint32_t data_memslot_flags;
- 	bool skip;
-@@ -418,6 +422,31 @@ static bool punch_hole_in_memslot(struct kvm_vm *vm,
- 	return true;
+@@ -399,6 +399,12 @@ static void free_uffd(struct test_desc *test, struct uffd_desc *pt_uffd,
+ 	free(data_args.copy);
  }
  
-+static void mmio_on_test_gpa_handler(struct kvm_vm *vm, struct kvm_run *run)
++static int uffd_no_handler(int mode, int uffd, struct uffd_msg *msg)
 +{
-+	struct userspace_mem_region *region;
-+	void *hva;
-+
-+	region = vm_get_mem_region(vm, MEM_REGION_DATA);
-+	hva = (void *)region->region.userspace_addr;
-+
-+	ASSERT_EQ(run->mmio.phys_addr, region->region.guest_phys_addr);
-+
-+	memcpy(hva, run->mmio.data, run->mmio.len);
-+	events.mmio_exits += 1;
++	TEST_FAIL("There was no UFFD fault expected.");
++	return -1;
 +}
 +
-+static void mmio_no_handler(struct kvm_vm *vm, struct kvm_run *run)
-+{
-+	uint64_t data;
-+
-+	memcpy(&data, run->mmio.data, sizeof(data));
-+	pr_debug("addr=%lld len=%d w=%d data=%lx\n",
-+			run->mmio.phys_addr, run->mmio.len,
-+			run->mmio.is_write, data);
-+	TEST_FAIL("There was no MMIO exit expected.");
-+}
-+
- static bool check_write_in_dirty_log(struct kvm_vm *vm,
- 		struct userspace_mem_region *region, uint64_t host_pg_nr)
- {
-@@ -465,6 +494,18 @@ static bool handle_cmd(struct kvm_vm *vm, int cmd)
- 	return continue_test;
- }
- 
-+void fail_vcpu_run_no_handler(int ret)
-+{
-+	TEST_FAIL("Unexpected vcpu run failure\n");
-+}
-+
-+void fail_vcpu_run_mmio_no_syndrome_handler(int ret)
-+{
-+	TEST_ASSERT(errno == ENOSYS,
-+		"The mmio handler should have returned not implemented.");
-+	events.fail_vcpu_runs += 1;
-+}
-+
- typedef uint32_t aarch64_insn_t;
- extern aarch64_insn_t __exec_test[2];
- 
-@@ -570,9 +611,20 @@ static void setup_memslots(struct kvm_vm *vm, struct test_params *p)
- 	vm->memslots[MEM_REGION_DATA] = DATA_MEMSLOT;
- }
- 
-+static void setup_default_handlers(struct test_desc *test)
-+{
-+	if (!test->mmio_handler)
-+		test->mmio_handler = mmio_no_handler;
-+
-+	if (!test->fail_vcpu_run_handler)
-+		test->fail_vcpu_run_handler = fail_vcpu_run_no_handler;
-+}
-+
- static void check_event_counts(struct test_desc *test)
- {
- 	ASSERT_EQ(test->expected_events.uffd_faults, events.uffd_faults);
-+	ASSERT_EQ(test->expected_events.mmio_exits, events.mmio_exits);
-+	ASSERT_EQ(test->expected_events.fail_vcpu_runs, events.fail_vcpu_runs);
- }
- 
- static void print_test_banner(enum vm_guest_mode mode, struct test_params *p)
-@@ -597,10 +649,18 @@ static void reset_event_counts(void)
- static void vcpu_run_loop(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
- 		struct test_desc *test)
- {
-+	struct kvm_run *run;
- 	struct ucall uc;
-+	int ret;
-+
-+	run = vcpu->run;
- 
- 	for (;;) {
--		vcpu_run(vcpu);
-+		ret = _vcpu_run(vcpu);
-+		if (ret) {
-+			test->fail_vcpu_run_handler(ret);
-+			goto done;
-+		}
- 
- 		switch (get_ucall(vcpu, &uc)) {
- 		case UCALL_SYNC:
-@@ -614,6 +674,10 @@ static void vcpu_run_loop(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
- 			break;
- 		case UCALL_DONE:
- 			goto done;
-+		case UCALL_NONE:
-+			if (run->exit_reason == KVM_EXIT_MMIO)
-+				test->mmio_handler(vm, run);
-+			break;
- 		default:
- 			TEST_FAIL("Unknown ucall %lu", uc.cmd);
- 		}
-@@ -654,6 +718,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	load_exec_code_for_test(vm);
- 	setup_uffd(vm, p, &pt_uffd, &data_uffd);
- 	setup_abort_handlers(vm, vcpu, test);
-+	setup_default_handlers(test);
- 	vcpu_args_set(vcpu, 1, test);
- 
- 	vcpu_run_loop(vm, vcpu, test);
-@@ -741,6 +806,25 @@ static void help(char *name)
+ /* Returns false if the test should be skipped. */
+ static bool punch_hole_in_memslot(struct kvm_vm *vm,
+ 				  struct userspace_mem_region *region)
+@@ -806,6 +812,22 @@ static void help(char *name)
  	.expected_events	= { 0 },					\
  }
  
-+#define TEST_RO_MEMSLOT(_access, _mmio_handler, _mmio_exits)			\
++#define TEST_UFFD_AND_DIRTY_LOG(_access, _with_af, _uffd_data_handler,		\
++				_uffd_faults, _test_check)			\
 +{										\
-+	.name			= SCAT3(ro_memslot, _access, _with_af),		\
-+	.data_memslot_flags	= KVM_MEM_READONLY,				\
-+	.guest_prepare		= { _PREPARE(_access) },			\
++	.name			= SCAT3(uffd_and_dirty_log, _access, _with_af),	\
++	.data_memslot_flags	= KVM_MEM_LOG_DIRTY_PAGES,			\
++	.pt_memslot_flags	= KVM_MEM_LOG_DIRTY_PAGES,			\
++	.guest_prepare		= { _PREPARE(_with_af),				\
++				    _PREPARE(_access) },			\
 +	.guest_test		= _access,					\
-+	.mmio_handler		= _mmio_handler,				\
-+	.expected_events	= { .mmio_exits = _mmio_exits },		\
++	.mem_mark_cmd		= CMD_HOLE_DATA | CMD_HOLE_PT,			\
++	.guest_test_check	= { _CHECK(_with_af), _test_check },		\
++	.uffd_data_handler	= _uffd_data_handler,				\
++	.uffd_pt_handler	= uffd_pt_write_handler,			\
++	.expected_events	= { .uffd_faults = _uffd_faults, },		\
 +}
 +
-+#define TEST_RO_MEMSLOT_NO_SYNDROME(_access)					\
+ #define TEST_RO_MEMSLOT(_access, _mmio_handler, _mmio_exits)			\
+ {										\
+ 	.name			= SCAT3(ro_memslot, _access, _with_af),		\
+@@ -825,6 +847,59 @@ static void help(char *name)
+ 	.expected_events	= { .fail_vcpu_runs = 1 },			\
+ }
+ 
++#define TEST_RO_MEMSLOT_AND_DIRTY_LOG(_access, _mmio_handler, _mmio_exits,	\
++				      _test_check)				\
++{										\
++	.name			= SCAT3(ro_memslot, _access, _with_af),		\
++	.data_memslot_flags	= KVM_MEM_READONLY | KVM_MEM_LOG_DIRTY_PAGES,	\
++	.pt_memslot_flags	= KVM_MEM_LOG_DIRTY_PAGES,			\
++	.guest_prepare		= { _PREPARE(_access) },			\
++	.guest_test		= _access,					\
++	.guest_test_check	= { _test_check },				\
++	.mmio_handler		= _mmio_handler,				\
++	.expected_events	= { .mmio_exits = _mmio_exits},			\
++}
++
++#define TEST_RO_MEMSLOT_NO_SYNDROME_AND_DIRTY_LOG(_access, _test_check)		\
++{										\
++	.name			= SCAT2(ro_memslot_no_syn_and_dlog, _access),	\
++	.data_memslot_flags	= KVM_MEM_READONLY | KVM_MEM_LOG_DIRTY_PAGES,	\
++	.pt_memslot_flags	= KVM_MEM_LOG_DIRTY_PAGES,			\
++	.guest_test		= _access,					\
++	.guest_test_check	= { _test_check },				\
++	.fail_vcpu_run_handler	= fail_vcpu_run_mmio_no_syndrome_handler,	\
++	.expected_events	= { .fail_vcpu_runs = 1 },			\
++}
++
++#define TEST_RO_MEMSLOT_AND_UFFD(_access, _mmio_handler, _mmio_exits,		\
++				 _uffd_data_handler, _uffd_faults)		\
++{										\
++	.name			= SCAT2(ro_memslot_uffd, _access),		\
++	.data_memslot_flags	= KVM_MEM_READONLY,				\
++	.mem_mark_cmd		= CMD_HOLE_DATA | CMD_HOLE_PT,			\
++	.guest_prepare		= { _PREPARE(_access) },			\
++	.guest_test		= _access,					\
++	.uffd_data_handler	= _uffd_data_handler,				\
++	.uffd_pt_handler	= uffd_pt_write_handler,			\
++	.mmio_handler		= _mmio_handler,				\
++	.expected_events	= { .mmio_exits = _mmio_exits,			\
++				    .uffd_faults = _uffd_faults },		\
++}
++
++#define TEST_RO_MEMSLOT_NO_SYNDROME_AND_UFFD(_access, _uffd_data_handler,	\
++					     _uffd_faults)			\
 +{										\
 +	.name			= SCAT2(ro_memslot_no_syndrome, _access),	\
 +	.data_memslot_flags	= KVM_MEM_READONLY,				\
++	.mem_mark_cmd		= CMD_HOLE_DATA | CMD_HOLE_PT,			\
 +	.guest_test		= _access,					\
++	.uffd_data_handler	= _uffd_data_handler,				\
++	.uffd_pt_handler	= uffd_pt_write_handler,			\
 +	.fail_vcpu_run_handler	= fail_vcpu_run_mmio_no_syndrome_handler,	\
-+	.expected_events	= { .fail_vcpu_runs = 1 },			\
++	.expected_events	= { .fail_vcpu_runs = 1,			\
++				    .uffd_faults = _uffd_faults },		\
 +}
 +
  static struct test_desc tests[] = {
  
  	/* Check that HW is setting the Access Flag (AF) (sanity checks). */
-@@ -809,6 +893,21 @@ static struct test_desc tests[] = {
+@@ -893,6 +968,35 @@ static struct test_desc tests[] = {
  	TEST_DIRTY_LOG(guest_dc_zva, with_af, guest_check_write_in_dirty_log),
  	TEST_DIRTY_LOG(guest_st_preidx, with_af, guest_check_write_in_dirty_log),
  
 +	/*
-+	 * Try accesses when the data memslot is marked read-only (with
-+	 * KVM_MEM_READONLY). Writes with a syndrome result in an MMIO exit,
-+	 * writes with no syndrome (e.g., CAS) result in a failed vcpu run, and
-+	 * reads/execs with and without syndroms do not fault.
++	 * Access when the data and PT memslots are both marked for dirty
++	 * logging and UFFD at the same time. The expected result is that
++	 * writes should mark the dirty log and trigger a userfaultfd write
++	 * fault.  Reads/execs should result in a read userfaultfd fault, and
++	 * nothing in the dirty log.  Any S1PTW should result in a write in the
++	 * dirty log and a userfaultfd write.
 +	 */
-+	TEST_RO_MEMSLOT(guest_read64, 0, 0),
-+	TEST_RO_MEMSLOT(guest_ld_preidx, 0, 0),
-+	TEST_RO_MEMSLOT(guest_at, 0, 0),
-+	TEST_RO_MEMSLOT(guest_exec, 0, 0),
-+	TEST_RO_MEMSLOT(guest_write64, mmio_on_test_gpa_handler, 1),
-+	TEST_RO_MEMSLOT_NO_SYNDROME(guest_dc_zva),
-+	TEST_RO_MEMSLOT_NO_SYNDROME(guest_cas),
-+	TEST_RO_MEMSLOT_NO_SYNDROME(guest_st_preidx),
++	TEST_UFFD_AND_DIRTY_LOG(guest_read64, with_af, uffd_data_read_handler, 2,
++			guest_check_no_write_in_dirty_log),
++	/* no_af should also lead to a PT write. */
++	TEST_UFFD_AND_DIRTY_LOG(guest_read64, no_af, uffd_data_read_handler, 2,
++			guest_check_no_write_in_dirty_log),
++	TEST_UFFD_AND_DIRTY_LOG(guest_ld_preidx, with_af, uffd_data_read_handler,
++			2, guest_check_no_write_in_dirty_log),
++	TEST_UFFD_AND_DIRTY_LOG(guest_at, with_af, 0, 1,
++			guest_check_no_write_in_dirty_log),
++	TEST_UFFD_AND_DIRTY_LOG(guest_exec, with_af, uffd_data_read_handler, 2,
++			guest_check_no_write_in_dirty_log),
++	TEST_UFFD_AND_DIRTY_LOG(guest_write64, with_af, uffd_data_write_handler,
++			2, guest_check_write_in_dirty_log),
++	TEST_UFFD_AND_DIRTY_LOG(guest_cas, with_af, uffd_data_read_handler, 2,
++			guest_check_write_in_dirty_log),
++	TEST_UFFD_AND_DIRTY_LOG(guest_dc_zva, with_af, uffd_data_write_handler,
++			2, guest_check_write_in_dirty_log),
++	TEST_UFFD_AND_DIRTY_LOG(guest_st_preidx, with_af,
++			uffd_data_write_handler, 2,
++			guest_check_write_in_dirty_log),
++
+ 	/*
+ 	 * Try accesses when the data memslot is marked read-only (with
+ 	 * KVM_MEM_READONLY). Writes with a syndrome result in an MMIO exit,
+@@ -908,6 +1012,57 @@ static struct test_desc tests[] = {
+ 	TEST_RO_MEMSLOT_NO_SYNDROME(guest_cas),
+ 	TEST_RO_MEMSLOT_NO_SYNDROME(guest_st_preidx),
+ 
++	/*
++	 * Access when both the data memslot is both read-only and marked for
++	 * dirty logging at the same time. The expected result is that for
++	 * writes there should be no write in the dirty log. The readonly
++	 * handling is the same as if the memslot was not marked for dirty
++	 * logging: writes with a syndrome result in an MMIO exit, and writes
++	 * with no syndrome result in a failed vcpu run.
++	 */
++	TEST_RO_MEMSLOT_AND_DIRTY_LOG(guest_read64, 0, 0,
++			guest_check_no_write_in_dirty_log),
++	TEST_RO_MEMSLOT_AND_DIRTY_LOG(guest_ld_preidx, 0, 0,
++			guest_check_no_write_in_dirty_log),
++	TEST_RO_MEMSLOT_AND_DIRTY_LOG(guest_at, 0, 0,
++			guest_check_no_write_in_dirty_log),
++	TEST_RO_MEMSLOT_AND_DIRTY_LOG(guest_exec, 0, 0,
++			guest_check_no_write_in_dirty_log),
++	TEST_RO_MEMSLOT_AND_DIRTY_LOG(guest_write64, mmio_on_test_gpa_handler,
++			1, guest_check_no_write_in_dirty_log),
++	TEST_RO_MEMSLOT_NO_SYNDROME_AND_DIRTY_LOG(guest_dc_zva,
++			guest_check_no_write_in_dirty_log),
++	TEST_RO_MEMSLOT_NO_SYNDROME_AND_DIRTY_LOG(guest_cas,
++			guest_check_no_write_in_dirty_log),
++	TEST_RO_MEMSLOT_NO_SYNDROME_AND_DIRTY_LOG(guest_st_preidx,
++			guest_check_no_write_in_dirty_log),
++
++	/*
++	 * Access when the data memslot is both read-only and punched with
++	 * holes tracked with userfaultfd.  The expected result is the union of
++	 * both userfaultfd and read-only behaviors. For example, write
++	 * accesses result in a userfaultfd write fault and an MMIO exit.
++	 * Writes with no syndrome result in a failed vcpu run and no
++	 * userfaultfd write fault. Reads result in userfaultfd getting
++	 * triggered.
++	 */
++	TEST_RO_MEMSLOT_AND_UFFD(guest_read64, 0, 0,
++			uffd_data_read_handler, 2),
++	TEST_RO_MEMSLOT_AND_UFFD(guest_ld_preidx, 0, 0,
++			uffd_data_read_handler, 2),
++	TEST_RO_MEMSLOT_AND_UFFD(guest_at, 0, 0,
++			uffd_no_handler, 1),
++	TEST_RO_MEMSLOT_AND_UFFD(guest_exec, 0, 0,
++			uffd_data_read_handler, 2),
++	TEST_RO_MEMSLOT_AND_UFFD(guest_write64, mmio_on_test_gpa_handler, 1,
++			uffd_data_write_handler, 2),
++	TEST_RO_MEMSLOT_NO_SYNDROME_AND_UFFD(guest_cas,
++			uffd_data_read_handler, 2),
++	TEST_RO_MEMSLOT_NO_SYNDROME_AND_UFFD(guest_dc_zva,
++			uffd_no_handler, 1),
++	TEST_RO_MEMSLOT_NO_SYNDROME_AND_UFFD(guest_st_preidx,
++			uffd_no_handler, 1),
 +
  	{ 0 }
  };
