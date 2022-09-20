@@ -2,69 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0F2B5BD8CE
-	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 02:33:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12D945BD8DE
+	for <lists+kvm@lfdr.de>; Tue, 20 Sep 2022 02:42:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229726AbiITAcz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Sep 2022 20:32:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36180 "EHLO
+        id S229488AbiITAmp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Sep 2022 20:42:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229678AbiITAcx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Sep 2022 20:32:53 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C39D52453
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 17:32:52 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id q9-20020a17090a178900b0020265d92ae3so9076071pja.5
-        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 17:32:52 -0700 (PDT)
+        with ESMTP id S229823AbiITAmc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Sep 2022 20:42:32 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13FF152800
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 17:42:32 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id d64-20020a17090a6f4600b00202ce056566so9104599pjk.4
+        for <kvm@vger.kernel.org>; Mon, 19 Sep 2022 17:42:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=lzSlCQ5sS4qil99odoJMLVUL5/2+gqYaJrux/DqPc6U=;
-        b=qGjH6NMOKBTCVBUGx+d/w8SQADzCr9jQk7AgXKAM7xJQENzeqOm7GWXyUt4R1s8jJZ
-         TISK+ck/YNm7d3Dr3tY9Vq2gK1hM3/k9RnyW2D0s/B5Layx8IjnkwRjt3CJd14RwQEQ7
-         yLdLjEj3pGjkAAlhzzgazIhpr9iboyHn92CgXI3F0tfCU9ouBmoVfEgh55Y6H7z4u3MC
-         1Tgmf++FpZtIoJc4eT2tJcn98n1XEOEd7duDv2ux5GjOb0BsmWl2svvMY6FoCKadgxHW
-         S8KUawuBuZ4Dlu46m31statcPB3rj1d4v1WpqAJvdTqQOLYYuGl4ixLRfwVENl8flZLQ
-         t/yw==
+        bh=QkOnJGdn7K4Qwg1F/eWvHgDBxYxWqvwUhp+5H4Y8V6g=;
+        b=gzRA65qhNIBk+r2s+Mrb7LTIEwxQNP3PN41Y6PpoFkTzUIEBs1Z0zidPjKEcQXz19P
+         G3wwap+Zc4oC2hJho0QDQftjrBmoWENhRh9mCnQhAV1mvFPufMAhy4T9vDu67yijZSFe
+         siZCUmxsakOxV9v3AWpq3MJl7YJLHAI7oihDeynO7IiMJyFVXSyU0AkgLgf/e3hKu0fr
+         +Ik/gQ6Wk3FkqRaFXi83uY2yTOWygtdvs32RwHaN/Ezj/8P06QTmGjJlQfdbznf2Wnx8
+         XMFziHRxObTvd05PrI6zv0qhhfZXZh5ULl2ugc8Wlr6ker+vvtgVE44Qq9WNSYMntFE9
+         xrbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=lzSlCQ5sS4qil99odoJMLVUL5/2+gqYaJrux/DqPc6U=;
-        b=hyo1Onu6wCwD3Kp7UfCPRafCVkwGjs5m/dkJPDdSpYNasalMAoiMAgOtF7B08pbN3g
-         dtLdKq/GzNm9CRl0nNGgCfqDGY+/iqo4LLwB+EyHgJkGmyqJRU1dLUACV9BlxoST+xFX
-         TOgxHC9Gn33qmDM/XmmXQD9UAWylvqF4GOB3zCMkXGq9D8R6HCvA3f4hDSUFP1k7oxcs
-         yaCAjpXoC76kL/y3o2g4mmuqxCGzejvC5X4Q5O3WV0qJAQbylrgKNOvrZaHljIIA6o4G
-         tWVOk8QOhastFE25baEiTy5IdPwp45gR5uyuY/gSAh3K1ncpPDNahFFkW5OeadNwhuTL
-         Irew==
-X-Gm-Message-State: ACrzQf1pK+0lcSFGf3EOslGszqWAhRZZVJhZS60AHQVH3cgoP4KRPXUH
-        ahYwp2BhW+vqkx4XMfIwtd7E4fcZi+YOew==
-X-Google-Smtp-Source: AMsMyM7AfhhUtmouHolPvCpJICIKqFteZ5daTBEaqzUS+NqDW7767dXqE7ulVe+y9lII9n9LWIqYvA==
-X-Received: by 2002:a17:90a:4688:b0:1ef:a94:7048 with SMTP id z8-20020a17090a468800b001ef0a947048mr925310pjf.244.1663633971355;
-        Mon, 19 Sep 2022 17:32:51 -0700 (PDT)
+        bh=QkOnJGdn7K4Qwg1F/eWvHgDBxYxWqvwUhp+5H4Y8V6g=;
+        b=rFyKqh/lAMa6bWAXJb2DV3c3vDSS+Fo+cilox3n8qZ1oxblBENzzUNgbXbbdRymtDQ
+         rPKmdhVFGCCg76WD6epaj29+msBG5RyzFDnncMHRL/sYj9EXxbmGINsNt5xlpavC1tLD
+         RL/FvDxSM5Is6R+Klhm7Fea7rJPB1GPgC7jIjOu5Kt7mL0kcMR9wU1UhU+4L2x+BulMK
+         l/OaoDNaer5nzRagP/JK7ZTk3kwZzGMZpiE3CayUhUlrmOsuoXmBTiBwirMD3KQXbKnm
+         Cta0bqnJTRIIw2ga7KRvUR1RQjwc50k+SVCcwunOh75BfYeWLpRNHw8EDZOD2YQKW3vW
+         fSDw==
+X-Gm-Message-State: ACrzQf17zitGIqQC3E2MlmSxOoiX5aJiwuixZFpH8881sO+YMVkgIrsh
+        oxlSoaNtKxIffL3Pus6VtfCfsqV+MknEbA==
+X-Google-Smtp-Source: AMsMyM5JxCPetBbcCQ6yAMluOOPO9UXy7QaOST+Dw1o0drbmcYOhXxooVd1ODyXbMYSNucoTnCn52g==
+X-Received: by 2002:a17:902:ec87:b0:176:d549:2f28 with SMTP id x7-20020a170902ec8700b00176d5492f28mr2397070plg.12.1663634551470;
+        Mon, 19 Sep 2022 17:42:31 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id y1-20020aa79421000000b00537daf64e8esm21008612pfo.188.2022.09.19.17.32.50
+        by smtp.gmail.com with ESMTPSA id b129-20020a62cf87000000b0053640880313sm14021pfg.46.2022.09.19.17.42.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Sep 2022 17:32:50 -0700 (PDT)
-Date:   Tue, 20 Sep 2022 00:32:47 +0000
+        Mon, 19 Sep 2022 17:42:31 -0700 (PDT)
+Date:   Tue, 20 Sep 2022 00:42:27 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         mlevitsk@redhat.com, vkuznets@redhat.com
-Subject: Re: [PATCH v2 9/9] KVM: x86: never write to memory from
- kvm_vcpu_check_block
-Message-ID: <YykKLx+EMufA+uuZ@google.com>
+Subject: Re: [PATCH v2 2/9] KVM: x86: remove return value of kvm_vcpu_block
+Message-ID: <YykMc2NDOzvG+xoy@google.com>
 References: <20220811210605.402337-1-pbonzini@redhat.com>
- <20220811210605.402337-10-pbonzini@redhat.com>
+ <20220811210605.402337-3-pbonzini@redhat.com>
+ <Yvwpb6ofD1S+Rqk1@google.com>
+ <78616cf8-2693-72cc-c2cc-5a849116ffc7@redhat.com>
+ <Yv0aHXcmuivyJDXw@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220811210605.402337-10-pbonzini@redhat.com>
+In-Reply-To: <Yv0aHXcmuivyJDXw@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,107 +74,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 11, 2022, Paolo Bonzini wrote:
-> kvm_vcpu_check_block() is called while not in TASK_RUNNING, and therefore
-> it cannot sleep.  Writing to guest memory is therefore forbidden, but it
-> can happen on AMD processors if kvm_check_nested_events() causes a vmexit.
+On Wed, Aug 17, 2022, Sean Christopherson wrote:
+> Side topic, usage of kvm_apic_accept_events() appears to be broken (though nothing
+> can trigger the bug).  If kvm_apic_accept_events() were to return an -errno, then
+> kvm_arch_vcpu_ioctl_run() would return '0' to userspace without updating
+> vcpu->run->exit_reason.  I think an easy fix is to drop the return value entirely
+> and then WARN if kvm_check_nested_events() returns something other than -EBUSY.
 > 
-> Fortunately, all events that are caught by kvm_check_nested_events() are
-> also recognized by kvm_vcpu_has_events() through vendor callbacks such as
-> kvm_x86_interrupt_allowed() or kvm_x86_ops.nested_ops->has_events(), so
-> remove the call and postpone the actual processing to vcpu_block().
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/x86.c | 14 +++++++++++---
->  1 file changed, 11 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 5e9358ea112b..9226fd536783 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10639,6 +10639,17 @@ static inline int vcpu_block(struct kvm_vcpu *vcpu)
->  			return 1;
->  	}
->  
-> +	if (is_guest_mode(vcpu)) {
-> +		/*
-> +		 * Evaluate nested events before exiting the halted state.
-> +		 * This allows the halt state to be recorded properly in
-> +		 * the VMCS12's activity state field (AMD does not have
-> +		 * a similar field and a vmexit always causes a spurious
-> +		 * wakeup from HLT).
-> +		 */
-> +		kvm_check_nested_events(vcpu);
-> +	}
-> +
->  	if (kvm_apic_accept_events(vcpu) < 0)
->  		return 0;
+> 	if (is_guest_mode(vcpu)) {
+> 		r = kvm_check_nested_events(vcpu);
+> 		if (r < 0) {
+> 			WARN_ON_ONCE(r != -EBUSY);
+> 			return;
+> 		}
 
-Oof, this ends up yielding a really confusing code sequence.  kvm_apic_accept_events()
-has its own kvm_check_nested_events(), but has code to snapshot pending INITs/SIPIs
-_before_ the call.  Unpacked, KVM ends up with:
+For posterity, I was wrong.  Way down the stack, vmx_complete_nested_posted_interrupt()
+can return -ENXIO after filling vcpu->run->exit_reason via kvm_handle_memory_failure().
+That's the entire reason why negative values from kvm_check_nested_events() and
+kvm_apic_accept_events() are morphed to '0', i.e. to "exit to userspace".
 
-	if (is_guest_mode(vcpu))
-		kvm_check_nested_events(vcpu);
-
-	/*
-	 * Read pending events before calling the check_events
-	 * callback.
-	 */
-	pe = smp_load_acquire(&apic->pending_events);
-	if (!pe)
-		return 0;
-
-	if (is_guest_mode(vcpu)) {
-		r = kvm_check_nested_events(vcpu);
-		if (r < 0)
-			return r == -EBUSY ? 0 : r;
-	}
-
-	if (kvm_vcpu_latch_init(vcpu)) {
-		WARN_ON_ONCE(vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED);
-		if (test_bit(KVM_APIC_SIPI, &pe))
-			clear_bit(KVM_APIC_SIPI, &apic->pending_events);
-		return 0;
-	}
-
-	if (test_bit(KVM_APIC_INIT, &pe)) {
-		clear_bit(KVM_APIC_INIT, &apic->pending_events);
-		kvm_vcpu_reset(vcpu, true);
-		if (kvm_vcpu_is_bsp(apic->vcpu))
-			vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-		else
-			vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
-	}
-	if (test_bit(KVM_APIC_SIPI, &pe)) {
-		clear_bit(KVM_APIC_SIPI, &apic->pending_events);
-		if (vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED) {
-			/* evaluate pending_events before reading the vector */
-			smp_rmb();
-			sipi_vector = apic->sipi_vector;
-			static_call(kvm_x86_vcpu_deliver_sipi_vector)(vcpu, sipi_vector);
-			vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-		}
-	}
-
-which on the surface makes this code look broken, e.g. if kvm_check_nested_events()
-_needs_ to be after the pending_events snapshot is taken, why is it safe to add a
-kvm_check_nested_events() call immediately before the snapshot?
-
-In reality, it's just a bunch of noise because the pending events snapshot is
-completely unnecessary and subtly relies on INIT+SIPI being blocked after VM-Exit
-on VMX (and SVM, but it's more important for VMX).
-
-In particular, testing "pe" after VM-Exit is nonsensical.  On VMX, events are consumed
-if they trigger VM-Exit, i.e. processing INIT/SIPI is flat out wrong if the INIT/SIPI
-was the direct cause of VM-Exit.  On SVM, events are left pending, so if any pending
-INIT/SIPI will still be there.
-
-The VMX code works because kvm_vcpu_latch_init(), a.k.a. "is INIT blocked", is
-always true after VM-Exit since INIT is always blocked in VMX root mode.  Ditto for
-the conditional clearing of SIPI; the CPU can't be in wait-for-SIPI immediately
-after VM-Exit and so dropping SIPIs ends up being architecturally ok.
-
-I'll add a patch to drop the snapshot code, assuming I'm not missing something even
-more subtle...
