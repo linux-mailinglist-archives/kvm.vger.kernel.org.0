@@ -2,75 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 83F2F5C045C
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 18:38:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D6335C045E
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 18:38:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229604AbiIUQiZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 12:38:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34814 "EHLO
+        id S229841AbiIUQip (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 12:38:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230172AbiIUQiI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Sep 2022 12:38:08 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82824252BC
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 09:23:16 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id v1so6168232plo.9
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 09:23:16 -0700 (PDT)
+        with ESMTP id S229963AbiIUQiW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Sep 2022 12:38:22 -0400
+Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96AC49DB50
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 09:23:52 -0700 (PDT)
+Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-1278624b7c4so9809526fac.5
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 09:23:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=TgCDquYzB+uh6PyjQ36h7MsKqShSbirTLStqH3wnxJo=;
-        b=JOnwT0e5P2QGIUMUm8nxiAb7XQN0dCUXzpEoJyGWfmcp0H9oYpBbziJ0jPhWf3pcGz
-         2twu5ZCLzDrMghoTJG52f1uQdccOfadJdZzcucfxar4LDeXZf29HvOBNAyRggX1ewfN/
-         KFKKsxyVPWrg59Dl+N9UWUdFxaeEo64sCRunkLoLi3oA7r6dGiQXqDba6UJipJVLd9XI
-         cCnmtruLS7CnIN8gKrYXO8FosqfYaA65O7QBU95OtTstsnkma2hnUgveTL3N6Mzh5iX/
-         GCN/tQ0FpVJnbuOdgqFVS8eHnZmlIA1j4ZW8Xo+9civlXvjInjMh9s9hsNuGn8Zz5Mg0
-         9piQ==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=c0RkeYzaVmPEsrZ5EMX9GaWUzmBrwnO4Ngp7mcr6270=;
+        b=mclHjr/Fs7SL8F+F1lWzX0r9UcdRoDguRRxPSp+ho6sqozHcX+AjvJ5xpr0V3e1/Q/
+         +c+WVecvKeIFAn8SIlKHOt/eEiV+zHBPoLKh+fwlCmVx7Lm4QtY1uOW1czzBfhvybyUF
+         +HoxJk/yRuTrdb2Ot8vLIw2Pyv+VmyEMNe8x8ORYb9gPlZaqR4i3mw7IBvtsQiUQ5qMl
+         zD2bNR3+acOJOi+D7XFMIEwwKFdUTK/G4gViPhJ9xLHg8rpDx8UZlaI+HyckwibnSeSh
+         r05ZMc6qgdf1jRIPWKNygBlVDuBxocBMoye/PC88Kpau/Z6Pe2cbvkw+8QITUJ9Chgt/
+         GZfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=TgCDquYzB+uh6PyjQ36h7MsKqShSbirTLStqH3wnxJo=;
-        b=oqTHi6fkHZFlMcNIgnJA+DB3suZ0h+8HoFMhVUnSdOhtSdf6bhVxq7qDig33Uh5IV6
-         XcuHISSZJueEIA/XmWl4LLsaADyCG5kG27FQPxloTd6L+8C+4G8GjeW+xy2TMD5HY9Ua
-         Tm+oabmnu6pMF7g8HcXwYKBQNgaQBt8Vaj6afBcKq9ivhIAb1bBcvyzK4xyrDCfWR8+2
-         i9q2x+IT7hUvoiR0FdRam4cvGLxZvaImJKvky3ete2zX/XwOOztTRQ0DDWyqwisfgBa8
-         8Nh8knkyYUP8f1WGBsL8agm04kFDp1NFdPrcRB5ec05gpLDg31wgzSNJ8IKPbQ+HzfFq
-         vrnA==
-X-Gm-Message-State: ACrzQf1/tSoHXDlFbe9/+wqZ47926P/UAF24+XY6+vCHg9rw0ByYIymd
-        9TRHnB+MPIpN8Q4+DwjTbaTreA==
-X-Google-Smtp-Source: AMsMyM7q3W2tJOzxQ0WF5GHYHSACr2zshovPYRCEUlaSf+y5r61u9vrpyAFgizkR1mw0AMkopm3klg==
-X-Received: by 2002:a17:90b:4f8e:b0:202:dd39:c04d with SMTP id qe14-20020a17090b4f8e00b00202dd39c04dmr10765799pjb.66.1663777395856;
-        Wed, 21 Sep 2022 09:23:15 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id jo18-20020a170903055200b00176a2d23d1asm2255751plb.56.2022.09.21.09.23.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Sep 2022 09:23:15 -0700 (PDT)
-Date:   Wed, 21 Sep 2022 16:23:11 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v10 02/39] KVM: x86: hyper-v: Resurrect dedicated
- KVM_REQ_HV_TLB_FLUSH flag
-Message-ID: <Yys6b1ZqYbw9Umyu@google.com>
-References: <20220921152436.3673454-1-vkuznets@redhat.com>
- <20220921152436.3673454-3-vkuznets@redhat.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=c0RkeYzaVmPEsrZ5EMX9GaWUzmBrwnO4Ngp7mcr6270=;
+        b=U8zzm6X75eOCf2u0dEdva9ZAxvmbjzBPKADUF5Hm8AFw1QUeoAHaG18qO9ggiGJZtH
+         a4rdsSOCujfuvLrKWm5seA+i865yF1MMiYrTka2IUgal23gYpta6d3KyFy7S7sCmVfMR
+         GIH3eaW3zrfkNsVS0sNN9xjv1gQbJ5bcMvQQEJcQbvQBpOTIZHPR7WkTd4kwPLvhPuL7
+         QbOGKGma+s7MXrcqFpksqZ+atQZzgMdzoXrUbq7d9QMraJMscIoa2LbzGVDyeydUO0G/
+         QEAp5un92Sk1Dqz0CjOvWlNubDSn/IZL1V6FK6iGVGqJA+h8JboGPTJNwzb/yhz9rWNh
+         2qdg==
+X-Gm-Message-State: ACrzQf0jnQoWH6txXkLvIHS7Tm6Fcek5L2X/6DZUWPFpbmAV0wwXx19k
+        DjapOQ5sbMgPjRGqZ4z7UfSgry83SOB1flUqmkMcuA==
+X-Google-Smtp-Source: AMsMyM6udKO0mM416CuGNqHAwIob8j7/AVRQHFn1HV+/sWmesQmURFFmLUYUAP/MZg19xYHGWdzVHZOYi3AOvF4Mwuc=
+X-Received: by 2002:a05:6870:580c:b0:12a:f136:a8f5 with SMTP id
+ r12-20020a056870580c00b0012af136a8f5mr5412294oap.269.1663777431692; Wed, 21
+ Sep 2022 09:23:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220921152436.3673454-3-vkuznets@redhat.com>
+References: <20220920205922.1564814-1-jmattson@google.com> <Yyot34LGkFR2/j5f@zn.tnic>
+ <CALMp9eQijCKS-E_OWJkxdqAur3BthciOWEtEPH5YKd0-HJiQQA@mail.gmail.com>
+ <YyrZOLq8z+lIORvP@zn.tnic> <CALMp9eRG6g-95zCxTD1NnxpZ+Vm6VMTA0_uaHV=b-hDkeOYSuA@mail.gmail.com>
+ <YysXeXKY36yXj68q@zn.tnic> <CALMp9eTuO79+NfHxLi8FnqdOpzXO7eQUntvN23EfR+shg+wg2Q@mail.gmail.com>
+ <Yys2ikzV73upzlEj@zn.tnic>
+In-Reply-To: <Yys2ikzV73upzlEj@zn.tnic>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 21 Sep 2022 09:23:40 -0700
+Message-ID: <CALMp9eQ-qkjBm8qPhOaMzZLWeHJcrwksV+XLQ9DfOQ_i1aykqQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] KVM: EFER.LMSLE cleanup
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,39 +75,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 21, 2022, Vitaly Kuznetsov wrote:
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index f62d5799fcd7..86504a8bfd9a 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3418,11 +3418,17 @@ static inline void kvm_vcpu_flush_tlb_current(struct kvm_vcpu *vcpu)
->   */
->  void kvm_service_local_tlb_flush_requests(struct kvm_vcpu *vcpu)
->  {
-> -	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
-> +	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu)) {
->  		kvm_vcpu_flush_tlb_current(vcpu);
-> +		kvm_clear_request(KVM_REQ_HV_TLB_FLUSH, vcpu);
+On Wed, Sep 21, 2022 at 9:06 AM Borislav Petkov <bp@alien8.de> wrote:
+>
+> On Wed, Sep 21, 2022 at 08:11:29AM -0700, Jim Mattson wrote:
+> > Yes, after the revert, KVM will treat the bit as reserved, and it will
+> > synthesize a #GP, *in violation of the architectural specification.*
+>
+> Architectural, schmarchitectural... Intel hasn't implemented it so meh.
+>
+> > KVM can't just decide willy nilly to reserve arbitrary bits. If it is
+> > in violation of AMD's architectural specification, the virtual CPU is
+> > defective.
+>
+> Grrr, after your revert that this bit was *only* reserved and nothing
+> else to KVM. Like every other reserved bit in EFER. Yeah, yeah, AMD
+> specified it as architectural but Intel didn't implement it so there's
+> this thing on paper and there's reality...
 
-This isn't correct, flush_tlb_current() flushes "host" TLB entries, i.e. guest-physical
-mappings in Intel terminology, where flush_tlb_guest() and (IIUC) Hyper-V's paravirt
-TLB flush both flesh "guest" TLB entries, i.e. linear and combined mappings.
-
-Amusing side topic, apparently I like arm's stage-2 terminology better than "TDP",
-because I actually typed out "stage-2" first.
-
-> +	}
->  
-> -	if (kvm_check_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu))
-> +	if (kvm_check_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu)) {
-> +		kvm_vcpu_flush_tlb_guest(vcpu);
-> +		kvm_clear_request(KVM_REQ_HV_TLB_FLUSH, vcpu);
-> +	} else if (kvm_check_request(KVM_REQ_HV_TLB_FLUSH, vcpu)) {
->  		kvm_vcpu_flush_tlb_guest(vcpu);
-> +	}
->  }
->  EXPORT_SYMBOL_GPL(kvm_service_local_tlb_flush_requests);
->  
-> -- 
-> 2.37.3
-> 
+AMD defined the 64-bit x86 extensions while Intel was distracted with
+their VLIW science fair project. In this space, Intel produces AMD64
+compatible CPUs. The definitive specification comes from AMD (which is
+sad, because AMD's documentation is abysmal).
