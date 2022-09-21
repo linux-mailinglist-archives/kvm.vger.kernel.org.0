@@ -2,63 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 285545E54A9
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 22:44:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACC005E54B9
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 22:51:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229522AbiIUUoJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 16:44:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38210 "EHLO
+        id S229546AbiIUUvI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 16:51:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229543AbiIUUoH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Sep 2022 16:44:07 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 560769DFAF
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 13:44:06 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 69-20020a630148000000b0043bbb38f75bso3253761pgb.6
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 13:44:06 -0700 (PDT)
+        with ESMTP id S229498AbiIUUvG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Sep 2022 16:51:06 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E06032C101
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 13:51:01 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id q3so7714972pjg.3
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 13:51:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date;
-        bh=F7nqEMLGrJHVFbOsAdgB6YhuZTF/EkK9GVmxjpfiIZc=;
-        b=YJ58h8qsV7Hl3/EvWmQZKGhkGtFrxPrHNaGeFpInokNkD9ZaKsmG13Y/A/OspaP1F5
-         ZdhhwM2Ea2+soxrbkEAr7xpvlNzPm/DXVjS/BMhE9SiAQa11LGAKoFqazpZyz8WgLSiG
-         9Y86fc4TpLhEIk0ItOSzre3r3LABMMOKjIx9STuSy1FGqje7aZ8z/RUVWHBScAQsiwq7
-         7xUeUQU+Jiu6aK24g+Txg45/aVakL+DytkunKP4NMojfzxLoado+GRssxamGBWtxA1Bl
-         ljBaOb8Ntnl6DfC6YaUoNc8ZmQtbRvK5/3OYMNU5oSUz476RlUHPE0OSXduqHA4gW7jq
-         2enA==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=EpFVglis/hXur8vqCFv/kcVmjP57HwC3X+RG3Se8aB0=;
+        b=LaJWe/boRhue4Y6QklLItBbLYLFPSnqap8c+FiuCAxzA7PttnG+4/3rx9O9jrOIZdm
+         z4gh92TH2x1TKT2WuZlLmvNio4bkM4YSKBoQl4WKS51J1lpPB5Wkxjl+8hkqNI7J8cL/
+         yhf1MibgLchwej915W7FoJPdJ15Ta6uT/rLs5gSf1q4W+hCMeMvPWxUuks2razJd20jV
+         0mnYz4Td/y7SX69rZbNUjkhkKw5V6w6A9QILgk7CCqU7cGuVRAgKU6frb/XbHKY/A6+Q
+         +Oo6Xnr5Kue7rDp/AMLz2Mg7toq24INuL2ieFzaAOvHPVFaCvtnhVI76OiqV+RG4guvk
+         OKPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=F7nqEMLGrJHVFbOsAdgB6YhuZTF/EkK9GVmxjpfiIZc=;
-        b=IvKPdeCRrTQw4lteaY5st7VBrF/T4Zzv6KQ2pIqHwrpwVDJjW4CoamArU6LaA7tRr0
-         VPKtlJywcpDvcZK9nod5SHSBKokM+bgckQL3g0ubkPnn28ITK2UY7K2l5tY4KgaZNkDA
-         g9k3D7MKrB0+vHWgFy8jui8hnDoXnMn9z7bjv5tsHI8zf13AjJB31zyOKrAkZfdoWENp
-         yctLBjbBKA8PVUN7Ygjs7cU016m7ATQxPq/gMz7/a1NGLNQDQktJ5A2yhe4s4Q1XxoOm
-         7/HzJwxctOI81Cpm7ao6GJaw0GzP3d2UVVuY/BaMQQSt/ucevyS9o/XSSN9sctwIo2q7
-         8cgg==
-X-Gm-Message-State: ACrzQf2fPIDImT9mSSyIulDE5wmRF4/UhQOQbFo3TzE+m3vPwfz76Ql/
-        NI8nK4ITYHpnPhshzAQ6EMEpEHEgsmACw81pnB/jV50auu41HxJMQ85wrSQsW7tT3/etD08Fw/b
-        ZtHuBaARLtvP9FgoVrZyG3K5b8F5oA9wX2Nwbc2k8zdpCz/JU5j5jpVCRR4nYvNA=
-X-Google-Smtp-Source: AMsMyM7WHGTP9sz/FS6rLZqyJM026Jf9rbfFEGfWqaguhod3BaK5XbhrCDPA7TfQIUWHPc/rFwUGQ39SsS6YTA==
-X-Received: from loggerhead.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:29a])
- (user=jmattson job=sendgmr) by 2002:a62:1dc5:0:b0:540:d8a4:a4ca with SMTP id
- d188-20020a621dc5000000b00540d8a4a4camr30753718pfd.77.1663793045727; Wed, 21
- Sep 2022 13:44:05 -0700 (PDT)
-Date:   Wed, 21 Sep 2022 13:44:02 -0700
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
-Message-ID: <20220921204402.29183-1-jmattson@google.com>
-Subject: [PATCH] Documentation: KVM: Describe guest CPUID.15H settings for
- in-kernel APIC
-From:   Jim Mattson <jmattson@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com
-Cc:     Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=EpFVglis/hXur8vqCFv/kcVmjP57HwC3X+RG3Se8aB0=;
+        b=MKD+ZhZ2/V01YbciZBPs9g9ErPzwEUBrJYHFP9vIqtjPROYcb22CrS0q6B54rlcBPT
+         r/h2fKHFiH9KDV5mwq8VpdgRS04cBiOiHaxc9CF2zwCpp+HMxEyZkwxswAItTKgqIAt5
+         U++ezb9BeLXkE0OncNXaGCBytXCo9hxgESq5wGQJJuojDl5ALJVAejV7xywXqBWPz95V
+         D/yF5fukdXB+2ak8ZV8bXCXehOG8OOjpAh4GleFDzGoy1aHk95RgKAbS3gcIr4xStbn3
+         ngWrmD5qkkp7BqbuhLnyKdfsiRjz6kbIS6pIZmB9yOlUKa/dezGPS8jhLNEIn9AtdAM9
+         DrTQ==
+X-Gm-Message-State: ACrzQf15mfA59g1PS6zMc+cwZnucHz3phEl9Vs7mB4rOzePBHjwc9FEV
+        Ljuy7lrKvpm/+SKVZfLywias4bg/xCxdlg==
+X-Google-Smtp-Source: AMsMyM5u+8ZqtRUMwpOPW2zQtWT/VHgLH9DbNZ57Xkt0W8p0Cg6tdgOsf6/nwKjEsZH/Zkujq3oLMw==
+X-Received: by 2002:a17:902:d484:b0:178:1b69:1488 with SMTP id c4-20020a170902d48400b001781b691488mr44695plg.156.1663793461187;
+        Wed, 21 Sep 2022 13:51:01 -0700 (PDT)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id rm10-20020a17090b3eca00b001fba4716f11sm2464843pjb.22.2022.09.21.13.50.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Sep 2022 13:51:00 -0700 (PDT)
+Date:   Wed, 21 Sep 2022 13:50:56 -0700
+From:   David Matlack <dmatlack@google.com>
+To:     Vishal Annapurve <vannapurve@google.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
+        shuah@kernel.org, bgardon@google.com, seanjc@google.com,
+        oupton@google.com, peterx@redhat.com, vkuznets@redhat.com
+Subject: Re: [V2 PATCH 2/8] KVM: selftests: Add arch specific initialization
+Message-ID: <Yyt5MHc1bwPfvBq/@google.com>
+References: <20220915000448.1674802-1-vannapurve@google.com>
+ <20220915000448.1674802-3-vannapurve@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220915000448.1674802-3-vannapurve@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,40 +73,125 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM_GET_SUPPORTED_CPUID must not populate guest CPUID.15H, because KVM
-has no way of knowing the base frequency of the local APIC emulated in
-userspace.
+On Thu, Sep 15, 2022 at 12:04:42AM +0000, Vishal Annapurve wrote:
+> Introduce arch specific API: kvm_selftest_arch_init to allow each arch to
+> handle initialization before running any selftest logic.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+> ---
+>  .../selftests/kvm/include/kvm_util_base.h      |  5 +++++
+>  .../selftests/kvm/lib/aarch64/processor.c      | 18 +++++++++---------
+>  tools/testing/selftests/kvm/lib/kvm_util.c     |  2 ++
+>  .../selftests/kvm/lib/riscv/processor.c        |  4 ++++
+>  .../selftests/kvm/lib/s390x/processor.c        |  4 ++++
+>  .../selftests/kvm/lib/x86_64/processor.c       |  4 ++++
+>  6 files changed, 28 insertions(+), 9 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index 24fde97f6121..98edbbda9f97 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -834,4 +834,9 @@ static inline int __vm_disable_nx_huge_pages(struct kvm_vm *vm)
+>  	return __vm_enable_cap(vm, KVM_CAP_VM_DISABLE_NX_HUGE_PAGES, 0);
+>  }
+>  
+> +/*
+> + * API to execute architecture specific setup before executing selftest logic.
 
-However, in reality, the in-kernel APIC emulation is in prevalent
-use. Document how KVM_GET_SUPPORTED_CPUID would populate CPUID.15H if
-the in-kernel APIC were the default.
+nit: s/before executing selftest logic/before main()/
 
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- Documentation/virt/kvm/api.rst | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+("selftest logic" is vague)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index abd7c32126ce..1e09ac9d48e9 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -1786,6 +1786,16 @@ support.  Instead it is reported via::
- if that returns true and you use KVM_CREATE_IRQCHIP, or if you emulate the
- feature in userspace, then you can enable the feature for KVM_SET_CPUID2.
- 
-+Similarly, CPUID leaf 0x15 always returns zeroes, because the core
-+crystal clock frequency must match the local APIC base frequency, and
-+the default configuration leaves the local APIC emulation to
-+userspace.
-+
-+If KVM_CREATE_IRQCHIP is used to enable the in-kernel local APIC
-+emulation, CPUID.15H:ECX can be set to 1000000000 (0x3b9aca00). For
-+the default guest TSC frequency, CPUID.15H:EBX can be set to tsc_khz
-+and CPUID.15H:ECX can be set to 1000000 (0xf4240).  The fraction can
-+be simplified if desired.
- 
- 4.47 KVM_PPC_GET_PVINFO
- -----------------------
--- 
-2.37.3.968.ga6b4b080e4-goog
+> + */
+> +void kvm_selftest_arch_init(void);
+> +
+>  #endif /* SELFTEST_KVM_UTIL_BASE_H */
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> index 6f5551368944..2281d6c5d02f 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> @@ -495,15 +495,6 @@ void aarch64_get_supported_page_sizes(uint32_t ipa,
+>  	close(kvm_fd);
+>  }
+>  
+> -/*
+> - * arm64 doesn't have a true default mode, so start by computing the
+> - * available IPA space and page sizes early.
+> - */
+> -void __attribute__((constructor)) init_guest_modes(void)
+> -{
+> -       guest_modes_append_default();
+> -}
+> -
+>  void smccc_hvc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
+>  	       uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5,
+>  	       uint64_t arg6, struct arm_smccc_res *res)
+> @@ -528,3 +519,12 @@ void smccc_hvc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
+>  		       [arg4] "r"(arg4), [arg5] "r"(arg5), [arg6] "r"(arg6)
+>  		     : "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7");
+>  }
+> +
+> +/*
+> + * arm64 doesn't have a true default mode, so start by computing the
+> + * available IPA space and page sizes early.
+> + */
+> +void kvm_selftest_arch_init(void)
+> +{
+> +	guest_modes_append_default();
+> +}
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 3c83838999f5..dafe4471a6c7 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -1984,4 +1984,6 @@ void __attribute((constructor)) kvm_selftest_init(void)
+>  {
+>  	/* Tell stdout not to buffer its content. */
+>  	setbuf(stdout, NULL);
+> +
+> +	kvm_selftest_arch_init();
+>  }
 
+Suggest defining a default no-op implementation of
+kvm_selftest_arch_init() using __weak since most architectures do not
+actually need an implementation.
+
+> diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
+> index 604478151212..26660dd2ba78 100644
+> --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
+> @@ -362,3 +362,7 @@ void vcpu_args_set(struct kvm_vcpu *vcpu, unsigned int num, ...)
+>  void assert_on_unhandled_exception(struct kvm_vcpu *vcpu)
+>  {
+>  }
+> +
+> +void kvm_selftest_arch_init(void)
+> +{
+> +}
+> diff --git a/tools/testing/selftests/kvm/lib/s390x/processor.c b/tools/testing/selftests/kvm/lib/s390x/processor.c
+> index 89d7340d9cbd..8654ec74009a 100644
+> --- a/tools/testing/selftests/kvm/lib/s390x/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/s390x/processor.c
+> @@ -218,3 +218,7 @@ void vcpu_arch_dump(FILE *stream, struct kvm_vcpu *vcpu, uint8_t indent)
+>  void assert_on_unhandled_exception(struct kvm_vcpu *vcpu)
+>  {
+>  }
+> +
+> +void kvm_selftest_arch_init(void)
+> +{
+> +}
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index 2e6e61bbe81b..20bf125f9363 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -1311,3 +1311,7 @@ bool vm_is_unrestricted_guest(struct kvm_vm *vm)
+>  
+>  	return val == 'Y';
+>  }
+> +
+> +void kvm_selftest_arch_init(void)
+> +{
+> +}
+> -- 
+> 2.37.2.789.g6183377224-goog
+> 
