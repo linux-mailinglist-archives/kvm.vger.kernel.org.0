@@ -2,185 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5542C5C0518
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 19:08:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CF225C0523
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 19:12:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229862AbiIURIv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 13:08:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60144 "EHLO
+        id S230424AbiIURL5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 13:11:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231458AbiIURIs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Sep 2022 13:08:48 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A93A483071;
-        Wed, 21 Sep 2022 10:08:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        with ESMTP id S229886AbiIURLy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Sep 2022 13:11:54 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF4EC9C200;
+        Wed, 21 Sep 2022 10:11:53 -0700 (PDT)
+Received: from zn.tnic (p200300ea9733e77f329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e77f:329c:23ff:fea6:a903])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 438CE6324B;
-        Wed, 21 Sep 2022 17:08:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99E3EC433D7;
-        Wed, 21 Sep 2022 17:08:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1663780126;
-        bh=hmdaMiCh0a1EdCGVaIUfBSrF9U1MEodOCxozbMGyCWA=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=cofs2GNz67wZZiPk6X8Rx/ZzWH2AgmMTgYH5tDoYzv+0gYZL0L2CobGr0+oFxHIGw
-         hBtiU2P1Ig0AScO44/L0Sn+75JiU/D0MIGjxnlvlDB1Mom1wLDpUgKnu7Y0mpqQHKY
-         UUmT5bpoO/fFTB3S4NoMkMMqIXPWp99CgB5Cii78shnE29L7mK9LebpiX9AnQyfgtb
-         V572fc+OEX4hXOA/gxfQXuKiXZg2cObVbXr2Sckm5plMrw1TBLs2d8kQmplGI3BLkh
-         PHHkg4q5aCjB061jQnGR+6z0p9a+gsNcRtQbqJ9MncTxgVSg+HmkKCOXFTNMo00lPj
-         v8H9LYR3bHpzg==
-Received: from 185-176-101-241.host.sccbroadband.ie ([185.176.101.241] helo=wait-a-minute.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1ob3DI-00Bj7t-0J;
-        Wed, 21 Sep 2022 18:08:44 +0100
-Date:   Wed, 21 Sep 2022 18:08:41 +0100
-Message-ID: <87pmfok63q.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm-riscv@lists.infradead.org,
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1E84D1EC058A;
+        Wed, 21 Sep 2022 19:11:48 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1663780308;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=zZihCniDI8tfhFO4vqwAEpD+8GtCUUxL/p4YLiWpZg8=;
+        b=UoZZutyWNC3FkK5dRPhoALhO+RzO67cnT86qzhc66sA7G0/7VcD1vBJE18zEGNgOOkgHF4
+        ekgJCTzq5m/vDM2gyqwoWg7KJd+wkJScFmkyvK2NP+o8k+fzvEwNuvF5eCekGBbAyt9+vJ
+        vBqgju55puczFtlL8EIcLy1wkptYRno=
+Date:   Wed, 21 Sep 2022 19:11:42 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Anup Patel <anup@brainfault.org>, kvm-ppc@vger.kernel.org,
-        Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH kernel v3] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support platform dependent
-In-Reply-To: <20220921044925.101802-1-aik@ozlabs.ru>
-References: <20220921044925.101802-1-aik@ozlabs.ru>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.176.101.241
-X-SA-Exim-Rcpt-To: aik@ozlabs.ru, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm-riscv@lists.infradead.org, pbonzini@redhat.com, anup@brainfault.org, kvm-ppc@vger.kernel.org, npiggin@gmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] KVM: EFER.LMSLE cleanup
+Message-ID: <YytFzvQx0BbSCT7m@zn.tnic>
+References: <20220920205922.1564814-1-jmattson@google.com>
+ <Yyot34LGkFR2/j5f@zn.tnic>
+ <CALMp9eQijCKS-E_OWJkxdqAur3BthciOWEtEPH5YKd0-HJiQQA@mail.gmail.com>
+ <YyrZOLq8z+lIORvP@zn.tnic>
+ <CALMp9eRG6g-95zCxTD1NnxpZ+Vm6VMTA0_uaHV=b-hDkeOYSuA@mail.gmail.com>
+ <YysXeXKY36yXj68q@zn.tnic>
+ <CALMp9eTuO79+NfHxLi8FnqdOpzXO7eQUntvN23EfR+shg+wg2Q@mail.gmail.com>
+ <Yys2ikzV73upzlEj@zn.tnic>
+ <CALMp9eQ-qkjBm8qPhOaMzZLWeHJcrwksV+XLQ9DfOQ_i1aykqQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CALMp9eQ-qkjBm8qPhOaMzZLWeHJcrwksV+XLQ9DfOQ_i1aykqQ@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 21 Sep 2022 05:49:25 +0100,
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-> 
-> When introduced, IRQFD resampling worked on POWER8 with XICS. However
-> KVM on POWER9 has never implemented it - the compatibility mode code
-> ("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
-> XIVE mode does not handle INTx in KVM at all.
-> 
-> This moved the capability support advertising to platforms and stops
-> advertising it on XIVE, i.e. POWER9 and later.
-> 
-> This stops advertising the capability on MIPS and RISC-V as these
-> do not select HAVE_KVM_IRQFD and do not implement IRQFD resampling
-> anyway.
+On Wed, Sep 21, 2022 at 09:23:40AM -0700, Jim Mattson wrote:
+> AMD defined the 64-bit x86 extensions while Intel was distracted with
+> their VLIW science fair project. In this space, Intel produces AMD64
+> compatible CPUs.
 
-This paragraph makes no sense. Not selecting HAVE_KVM_IRQFD, by
-definition, prevents the advertising of the capability. Hell, you are
-even removing it from a block guarded by "#ifdef CONFIG_HAVE_KVM_IRQFD".
+Almost-compatible. And maybe, just maybe, because Intel were probably
+and practically forced to implement AMD64 but then thought, oh well,
+we'll do some things differently.
 
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> Acked-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
-> Changes:
-> v3:
-> * removed all ifdeferry
-> * removed the capability for MIPS and RISCV
-> * adjusted the commit log about MIPS and RISCV
-> 
-> v2:
-> * removed ifdef for ARM64.
-> ---
->  arch/arm64/kvm/arm.c       | 1 +
->  arch/powerpc/kvm/powerpc.c | 6 ++++++
->  arch/s390/kvm/kvm-s390.c   | 1 +
->  arch/x86/kvm/x86.c         | 1 +
->  virt/kvm/kvm_main.c        | 1 -
->  5 files changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 2ff0ef62abad..d2daa4d375b5 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -218,6 +218,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_VCPU_ATTRIBUTES:
->  	case KVM_CAP_PTP_KVM:
->  	case KVM_CAP_ARM_SYSTEM_SUSPEND:
-> +	case KVM_CAP_IRQFD_RESAMPLE:
->  		r = 1;
->  		break;
->  	case KVM_CAP_SET_GUEST_DEBUG2:
-> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> index fb1490761c87..908ce8bd91c9 100644
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -593,6 +593,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  		break;
->  #endif
->  
-> +#ifdef CONFIG_HAVE_KVM_IRQFD
-> +	case KVM_CAP_IRQFD_RESAMPLE:
-> +		r = !xive_enabled();
-> +		break;
-> +#endif
-> +
->  	case KVM_CAP_PPC_ALLOC_HTAB:
->  		r = hv_enabled;
->  		break;
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index edfd4bbd0cba..7521adadb81b 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -577,6 +577,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_SET_GUEST_DEBUG:
->  	case KVM_CAP_S390_DIAG318:
->  	case KVM_CAP_S390_MEM_OP_EXTENSION:
-> +	case KVM_CAP_IRQFD_RESAMPLE:
->  		r = 1;
->  		break;
->  	case KVM_CAP_SET_GUEST_DEBUG2:
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 43a6a7efc6ec..2d6c5a8fdf14 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4395,6 +4395,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_VAPIC:
->  	case KVM_CAP_ENABLE_CAP:
->  	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
-> +	case KVM_CAP_IRQFD_RESAMPLE:
->  		r = 1;
->  		break;
->  	case KVM_CAP_EXIT_HYPERCALL:
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 584a5bab3af3..05cf94013f02 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -4447,7 +4447,6 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
->  #endif
->  #ifdef CONFIG_HAVE_KVM_IRQFD
->  	case KVM_CAP_IRQFD:
-> -	case KVM_CAP_IRQFD_RESAMPLE:
->  #endif
+> The definitive specification comes from AMD (which is sad, because
+> AMD's documentation is abysmal).
 
-Do you see what I mean?
+Just don't tell me the SDM is better...
 
->  	case KVM_CAP_IOEVENTFD_ANY_LENGTH:
->  	case KVM_CAP_CHECK_EXTENSION_VM:
+But you and I are really talking past each other: there's nothing
+definitive about a spec if, while implementing it, the other vendor is
+doing some subtle, but very software visible things differently.
 
-So, with the nonsensical paragraph removed from the commit log:
-
-Acked-by: Marc Zyngier <maz@kernel.org>
-
-	M.
+I.e., the theory vs reality point I'm trying to get across.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
