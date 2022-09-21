@@ -2,75 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E3D55E550E
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 23:16:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ECAA15E5515
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 23:19:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229499AbiIUVQq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 17:16:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46158 "EHLO
+        id S229861AbiIUVTM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 17:19:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230087AbiIUVQo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Sep 2022 17:16:44 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB6E2A00E3
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 14:16:42 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id e5so7265313pfl.2
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 14:16:42 -0700 (PDT)
+        with ESMTP id S229678AbiIUVTK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Sep 2022 17:19:10 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 531FEA5C70
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 14:19:08 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id q9-20020a17090a178900b0020265d92ae3so75707pja.5
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 14:19:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=sh4nf/tEmUd1miKJn6/kAcl9Wj3E8kd7WVZbt4jNU8o=;
-        b=ogBoxO3LrxwqQQ7SRIVuERoVZE6Gdagy1dx3mdn2ut0gBZE9tATELfzGad5xs2nkXy
-         iOis2gAR0XFaycsbSWI7J84SkuLJXjevcZwhGG+l06YQ215B0SJ4oHKY3LiMVPwdNE6e
-         8tnQgmJkM1gaEGfkkJfJiL1eOBW4HMp219Dh6GKkU0c3ltuwMqkhLiaxgRd7nHYkrLyG
-         SFeJUscRP74uqSPopi6C6W7kl8FHwpp2AHzCcRG758pCQLNNRYFYaPNO72HR9ntReZ2v
-         2GnHQX3jnhG2RMgsUI5S5rQD3k+GMsGiUGcpEp0wRWFIu78f9dNdgxsN1SnHTVVOu/Uf
-         DhAw==
+        bh=cVhxa2A/nQQB1gcuL+Q0FTqCG2B+iraWTdgWSmrMTK0=;
+        b=Rf3znSeTDbeIZxLDpXIV6tlAStO2/wDGFBCb+5L1paeNgKL4+GtfP3tWt+RYxEi26J
+         54Y21Ew2Cy7qTG2LluP1aAEfolNKlK+pq8jofBHfzN7dT+R4VjpuKgwkmQDZDGtpm2CH
+         JDHewjvm7iXkjz3N0mnpOvXOz9X+hLmgp34iyT9VJTbbFKzUzxvN7XkeTD3sQPRQEUjd
+         pPFpuQwJNgqlJSpo4J9hP6Qkbz4cKJgByP12O8N6bcbHwx/lb5Wg7wQeZ4SiIxMNumER
+         vK88Hm8gkTYzD5xOtuadZxUr+ym3H8HOM6r9/ZODOdXvYe6mg/9Bg2iUuyBhSH4wEG38
+         LVYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=sh4nf/tEmUd1miKJn6/kAcl9Wj3E8kd7WVZbt4jNU8o=;
-        b=K3n5sOUDNIHwCYaK/5F4bFCasG1sjXd6Il30pljROlynveddGdYQRTQdRzq5RphD9s
-         bTl+R9CSjzv8BGUuMJjqvFdlsj7a5Z1PRpCj9sg8bmpyn/tu9z6/pm+CtPo0L+YR4nC3
-         uK9PXM9XthbJZBx2Qf+xeJGXVH3XxQ20rowbjSXkS2hSf/lyc0+6C+k1UOJuEzLSpDXX
-         Xsjdpt+WQ+4TWl/zcflt5CB/HNGq1ktwo92mvxat+pWaqZc43nvJtbhat0iGWi6egCP2
-         8tCJ4UmEWr2oDCDkSV5aqdV91vgAqAyvJ625LI1uTKxX7j3a846iBx75mmNAeBpPZBp1
-         45Ag==
-X-Gm-Message-State: ACrzQf12iPVr0ia2EUrT5bFjaV0Mc3Uy9TmHOc7IbMMupNuwqNEJBj4j
-        3yU1SIZPbYvSIFU0sn49SGwC/g==
-X-Google-Smtp-Source: AMsMyM7gUWK7/YOwc4h5OK29M6VGYSvbsUATTBbOxYuD/sb6e6iIXhXseR+CdxxwL9TdRz+8Zk5pUA==
-X-Received: by 2002:a63:581d:0:b0:42b:399:f15a with SMTP id m29-20020a63581d000000b0042b0399f15amr106401pgb.337.1663795002163;
-        Wed, 21 Sep 2022 14:16:42 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id n2-20020a634d42000000b0042a55fb60bbsm2337315pgl.28.2022.09.21.14.16.41
+        bh=cVhxa2A/nQQB1gcuL+Q0FTqCG2B+iraWTdgWSmrMTK0=;
+        b=Op9u6XR3mZwCBmWC3zHjoxugKgVqLmPzVrXW09LvNmKVNI85k2UbW52Pw4OBqLcHjg
+         Mm+m4v/5z6Ibbsa/OXunrHPn7rdQWwJVdy7vFHYhVXz/8GrPjLLfyfpfKzBX2nyg675u
+         0gGooXen/cmevD3HlAXPtSOH4e+nEUQypCJBhUbaeOz/10sJAE2bsRmKNaqeFppk2yxJ
+         tkx6mRL8UHCl3FfFkOkvo83RkP8dMdJXNWYckIYVEDSagbSbdfq2FxyvGCb6qG8Ti40L
+         5MaJQehCfr4cdqaxxJR6xAYJQ7BR1QJMOLoBx4Cftt/i82UPQq6zSIuB0ffPDtVvVZvP
+         f1YQ==
+X-Gm-Message-State: ACrzQf3/MuBTz6Rldl+nBHbUqkfasYfjEMqHU3nyhfO3vfHs9GvzxHrG
+        8ydUNVEHMusr/+N7JaJKi6JMEQ==
+X-Google-Smtp-Source: AMsMyM6zqAY+UlJw/Jp/dmFBovhmCOG2qPta/rZnpfpDZX4Es9D2YfJuZBXqmWUT0Dm4YZLP4TsD9w==
+X-Received: by 2002:a17:902:aa46:b0:178:9ee5:c7f1 with SMTP id c6-20020a170902aa4600b001789ee5c7f1mr6877940plr.69.1663795147141;
+        Wed, 21 Sep 2022 14:19:07 -0700 (PDT)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id k17-20020a170902c41100b001750361f430sm2520669plk.155.2022.09.21.14.19.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Sep 2022 14:16:41 -0700 (PDT)
-Date:   Wed, 21 Sep 2022 21:16:38 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v10 14/39] KVM: nSVM: Keep track of Hyper-V
- hv_vm_id/hv_vp_id
-Message-ID: <Yyt/Nrh4aoLrNt11@google.com>
-References: <20220921152436.3673454-1-vkuznets@redhat.com>
- <20220921152436.3673454-15-vkuznets@redhat.com>
+        Wed, 21 Sep 2022 14:19:06 -0700 (PDT)
+Date:   Wed, 21 Sep 2022 14:19:02 -0700
+From:   David Matlack <dmatlack@google.com>
+To:     Vishal Annapurve <vannapurve@google.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
+        shuah@kernel.org, bgardon@google.com, seanjc@google.com,
+        oupton@google.com, peterx@redhat.com, vkuznets@redhat.com
+Subject: Re: [V2 PATCH 4/8] KVM: selftests: x86: Precompute the result for
+ is_{intel,amd}_cpu()
+Message-ID: <Yyt/xgPkHfbOE3vH@google.com>
+References: <20220915000448.1674802-1-vannapurve@google.com>
+ <20220915000448.1674802-5-vannapurve@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220921152436.3673454-15-vkuznets@redhat.com>
+In-Reply-To: <20220915000448.1674802-5-vannapurve@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,60 +74,107 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 21, 2022, Vitaly Kuznetsov wrote:
-> Similar to nSVM, KVM needs to know L2's VM_ID/VP_ID and Partition
-> assist page address to handle L2 TLB flush requests.
+On Thu, Sep 15, 2022 at 12:04:44AM +0000, Vishal Annapurve wrote:
+> Cache the vendor CPU type in a global variable so that multiple calls
+> to is_intel_cpu() do not need to re-execute CPUID.
 > 
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Add cpu vendor check in kvm_hypercall() so that it executes correct
+> vmcall/vmmcall instruction when running on Intel/AMD hosts. This avoids
+> exit to KVM which anyway tries to patch the instruction according to
+> the cpu type.
+
+The commit shortlog makes no mention (nor even implies) that this commit
+adds AMD support to kvm_hypercall(). Please break this commit up into 2.
+One to precompute the result of is_{intel,amd}_cpu() and one to add AMD
+support to kvm_hypercall().
+
+If you really want to keep this as one commit (I don't know what the
+benefit would be), please change the shortlog and commit message to
+focus on the kvm_hypercall() change, as that is the real goal of this
+commit. The precomputation is arguably and implementation detail. e.g.
+
+  KVM: selftest: Add support for AMD to kvm_hypercall()
+
+  Make it possible to use kvm_hypercall() on AMD by checking if running
+  on an AMD CPU and, if so, using vmmcall instead of vmcall. In order to
+  avoid executing CPUID in the guest on every call t kvm_hypercall()
+  (which would be slow), pre-compute the result of is_{intel,amd}_cpu()
+  as part of kvm_selftest_arch_init() and sync it into the guest
+  after loading the ELF image.
+
+But again, it'd be cleaner just to split it up. Caching the result of
+is_{intel,amd}_cpu() is useful in its own right, independent of the
+kvm_hypercall() change.
+
+> 
+> As part of this change, sync the global variable is_cpu_amd into the
+> guest so the guest can determine which hypercall instruction to use
+> without needing to re-execute CPUID for every hypercall.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
 > ---
->  arch/x86/kvm/svm/hyperv.h | 16 ++++++++++++++++
->  arch/x86/kvm/svm/nested.c |  2 ++
->  2 files changed, 18 insertions(+)
+>  .../testing/selftests/kvm/lib/x86_64/processor.c  | 15 ++++++++++++---
+>  1 file changed, 12 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/svm/hyperv.h b/arch/x86/kvm/svm/hyperv.h
-> index 7d6d97968fb9..8cf702fed7e5 100644
-> --- a/arch/x86/kvm/svm/hyperv.h
-> +++ b/arch/x86/kvm/svm/hyperv.h
-> @@ -9,6 +9,7 @@
->  #include <asm/mshyperv.h>
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index 25ae972f5c71..c0ae938772f6 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -19,6 +19,7 @@
+>  #define MAX_NR_CPUID_ENTRIES 100
 >  
->  #include "../hyperv.h"
-> +#include "svm.h"
+>  vm_vaddr_t exception_handlers;
+> +static bool is_cpu_amd;
+>  
+>  static void regs_dump(FILE *stream, struct kvm_regs *regs, uint8_t indent)
+>  {
+> @@ -1019,7 +1020,7 @@ static bool cpu_vendor_string_is(const char *vendor)
+>  
+>  bool is_intel_cpu(void)
+>  {
+> -	return cpu_vendor_string_is("GenuineIntel");
+> +	return (is_cpu_amd == false);
+>  }
 >  
 >  /*
->   * Hyper-V uses the software reserved 32 bytes in VMCB
-> @@ -32,4 +33,19 @@ struct hv_enlightenments {
+> @@ -1027,7 +1028,7 @@ bool is_intel_cpu(void)
 >   */
->  #define VMCB_HV_NESTED_ENLIGHTENMENTS VMCB_SW
+>  bool is_amd_cpu(void)
+>  {
+> -	return cpu_vendor_string_is("AuthenticAMD");
+> +	return (is_cpu_amd == true);
+>  }
 >  
-> +static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +	struct hv_enlightenments *hve =
-> +		(struct hv_enlightenments *)svm->nested.ctl.reserved_sw;
-
-Eww :-)
-
-I posted a small series to fix the casting[*], and as noted in the cover letter it's
-going to conflict mightily.  Ignoring merge order for the moment, looking at the
-series as a whole, if the Hyper-V definitions are moved to hyperv-tlfs.h, then I'm
-tempted to say there's no need for svm/hyperv.h.
-
-There should never be users of this stuff outside of svm/nested.c, and IMO there's
-not enough stuff to warrant a separate set of files.  nested_svm_hv_update_vp_assist()
-isn't SVM specific and fits better alongside kvm_hv_get_assist_page().
-
-That leaves three functions and ~40 lines of code, which can easily go directly
-into svm/nested.c.
-
-I'm definitely not dead set against having hyperv.{ch}, but unless there's a high
-probability of SVM+Hyper-V getting to eVMCS levels of enlightenment, my vote is
-to put these helpers in svm/nested.c and move then if/when we do end up accumulating
-more SVM+Hyper-V code.
-  
-As for merge order, I don't think there's a need for this series to take a
-dependency on the cleanup, especially if these helpers land in nested.c.  Fixing
-up the casting and s/hv_enlightenments/hv_vmcb_enlightenments is straightforward.
-
-[*] https://lore.kernel.org/all/20220921201607.3156750-1-seanjc@google.com
+>  void kvm_get_cpu_address_width(unsigned int *pa_bits, unsigned int *va_bits)
+> @@ -1182,9 +1183,15 @@ uint64_t kvm_hypercall(uint64_t nr, uint64_t a0, uint64_t a1, uint64_t a2,
+>  {
+>  	uint64_t r;
+>  
+> -	asm volatile("vmcall"
+> +	if (is_amd_cpu())
+> +		asm volatile("vmmcall"
+>  		     : "=a"(r)
+>  		     : "a"(nr), "b"(a0), "c"(a1), "d"(a2), "S"(a3));
+> +	else
+> +		asm volatile("vmcall"
+> +		     : "=a"(r)
+> +		     : "a"(nr), "b"(a0), "c"(a1), "d"(a2), "S"(a3));
+> +
+>  	return r;
+>  }
+>  
+> @@ -1314,8 +1321,10 @@ bool vm_is_unrestricted_guest(struct kvm_vm *vm)
+>  
+>  void kvm_selftest_arch_init(void)
+>  {
+> +	is_cpu_amd = cpu_vendor_string_is("AuthenticAMD");
+>  }
+>  
+>  void kvm_arch_post_vm_elf_load(struct kvm_vm *vm)
+>  {
+> +	sync_global_to_guest(vm, is_cpu_amd);
+>  }
+> -- 
+> 2.37.2.789.g6183377224-goog
+> 
