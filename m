@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 379485BF35C
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 04:15:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B8FF45BF366
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 04:18:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230217AbiIUCPB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Sep 2022 22:15:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36420 "EHLO
+        id S230104AbiIUCSO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Sep 2022 22:18:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229970AbiIUCO6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Sep 2022 22:14:58 -0400
+        with ESMTP id S230398AbiIUCSK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Sep 2022 22:18:10 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D2FB2ED47
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 19:14:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3316F45F53
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 19:18:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663726495;
+        s=mimecast20190719; t=1663726688;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=j9P+rGLJHapFEFbIQqvk7PpMo3XqXvFcVFCgGvvB/1Q=;
-        b=ieKe3MWm86we9gaMJTRqKUJXkZ3qdRSW2RdgWQQ/6GyTBn3NWA6QwqQIFo/dpUJO7sBpYw
-        kScHLsUHpjmLf08sy+MF4D2ur20rJcE/QXljPmudyFIa+1hiZrT7NxogeFd8ruj+5tPUug
-        ylPgjxz8xp4jeLYP+JnBZvTUhYDsy1Y=
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
- [209.85.167.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=/gtl07m+44fhXx6lazyZdmQ7bZDMn8Q/qijchxc3xv0=;
+        b=ixyGcwHVM/wiULqlLZQhleDom95FzpZNC5ckwNlrzHRtui0l5K4JfJVWrHutcgahtWB1lm
+        oA2ZWFBkBP/4h6tyt9YglRD4d44uFhJXkaM0KPNW6T+c/kQOfgxMqVIFQhPjuIWtv9TGm3
+        tIKmociqQU2l3RYbfE/9oW1ADb6it+k=
+Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com
+ [209.85.160.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-549-Z7vYEh2wOTaqrhOtSkExsQ-1; Tue, 20 Sep 2022 22:14:53 -0400
-X-MC-Unique: Z7vYEh2wOTaqrhOtSkExsQ-1
-Received: by mail-oi1-f197.google.com with SMTP id r199-20020acaa8d0000000b0034d86517c12so2430638oie.20
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 19:14:53 -0700 (PDT)
+ us-mta-617-yZK-axjzMlGr2ZRgwp9BRg-1; Tue, 20 Sep 2022 22:18:06 -0400
+X-MC-Unique: yZK-axjzMlGr2ZRgwp9BRg-1
+Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-12abf4afb71so2623657fac.3
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 19:18:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=j9P+rGLJHapFEFbIQqvk7PpMo3XqXvFcVFCgGvvB/1Q=;
-        b=7EYgZHyoA9ZeNpFiEbnFvH8nhkfxsT0Vx2BUHogq6ccYfIpHzMdQbyRoAdXH5Ydjjy
-         b3P5pbLKQnwdu8nIZ3Oy3Q7ktqOGbK9zCe5Wz10sFr/8JN818qSZnXJvXkj4S1A4lrqR
-         S9F254x5H3/0ctpSo5NNWVE3z3MAMnyKf7VSrPVyN/3gTsKXDKF5NsvEqkB1Sxo7kteB
-         QPmbzKxn2ZLddywJY/9vDEs+7cx3y0GMs+5RB2mThwUg439ur5AzzULtH5+A1pkpU/vB
-         Yu3FwhmFUHha8h9Ypy7rxSB+jVGejkJjESi9xDx3uxyeE1mWCh1gyvJakhpK6uYbHlBh
-         XwTQ==
-X-Gm-Message-State: ACrzQf1sGmvRHcjIIYPSIqdijYfhsQCgJvYgIvQ/Y6Emvca7T0g7ZZK7
-        E80IbiBCHpdvCDKeVU+0Is/8YSIEE5ThoFoU0DnklzVRgCh5q7mkn2dho+pqRIfaimnXK3a+zEL
-        egrIqo7NLM4/CXhcCjMIcGKSWVmhd
-X-Received: by 2002:a05:6808:1b22:b0:350:c0f6:70ff with SMTP id bx34-20020a0568081b2200b00350c0f670ffmr2863377oib.35.1663726493131;
-        Tue, 20 Sep 2022 19:14:53 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4OeG5pl5c1sj5sNO3PI4GwxWvbIOCE9z6qMMFenIcaCHhKx9wT6EV+LsxBQsF9TM10MuzNear2uxgAJeKNqAA=
-X-Received: by 2002:a05:6808:1b22:b0:350:c0f6:70ff with SMTP id
- bx34-20020a0568081b2200b00350c0f670ffmr2863373oib.35.1663726492903; Tue, 20
- Sep 2022 19:14:52 -0700 (PDT)
+        bh=/gtl07m+44fhXx6lazyZdmQ7bZDMn8Q/qijchxc3xv0=;
+        b=cnS3ghocgfPHlijJOSeMzLw1VuTqJsuCypD6mPdyeNxMCcUhFfrW+SmZN1amvQTwjV
+         crfc5rFwBkbFuxBCNl77dlKzJDms8E1jKS0QQ/lTiFlxMN3X1304LLckXnTl7E6gm+ob
+         vLBDBb6u1C68Ez/j3B0EMCHOcTxJA7odegNMjYus86wXEjO7Wh/p1J09HasIa1CHiyOq
+         1lRpP71L/XN5OIPwywg+NPZx9ZmhIaeS9ik4n88i4W2/HsxoUhMnZWGG2hmrBLI3ELL7
+         62nK6Hy5HXaI0IaOxy9E22xp/5lQF4rnI2xq3JAiMRrWQz0qUFwdYah1GOxAVDfi5OQx
+         tCBQ==
+X-Gm-Message-State: ACrzQf1N3kf7A/LfyOAWRZ2zgeBdRWHCfwi7XbJCJq+SZXdDi+lHn7DF
+        fSu4lkjcg8LoXbg5CZNg495GNIWWKGLwbn3eoSVYedmJv54UFO+eYuFIXWKAJKIpNIIwQEbZEJX
+        ERdWZ2IF9Wk7YE6U5gP98g/A6IFXD
+X-Received: by 2002:a05:6808:1304:b0:350:649b:f8a1 with SMTP id y4-20020a056808130400b00350649bf8a1mr2890625oiv.280.1663726685170;
+        Tue, 20 Sep 2022 19:18:05 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM5Sp+DzA3Bx7zu6GlOqn0yJePMZvUgNVa704D/MJlnLCmpKE8iIbo4+I9gBgpCklksgG4cc3YQtPXFcDSMfQBA=
+X-Received: by 2002:a05:6808:1304:b0:350:649b:f8a1 with SMTP id
+ y4-20020a056808130400b00350649bf8a1mr2890617oiv.280.1663726684913; Tue, 20
+ Sep 2022 19:18:04 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220909085712.46006-1-lingshan.zhu@intel.com>
- <20220909085712.46006-3-lingshan.zhu@intel.com> <CACGkMEsYARr3toEBTxVcwFi86JxK0D-w4OpNtvVdhCEbAnc8ZA@mail.gmail.com>
- <6fd1f8b3-23b1-84cc-2376-ee04f1fa8438@intel.com>
-In-Reply-To: <6fd1f8b3-23b1-84cc-2376-ee04f1fa8438@intel.com>
+ <20220909085712.46006-2-lingshan.zhu@intel.com> <CACGkMEsq+weeO7i8KtNNAPhXGwN=cTwWt3RWfTtML-Xwj3K5Qg@mail.gmail.com>
+ <e69b65e7-516f-55bd-cb99-863d7accbd32@intel.com>
+In-Reply-To: <e69b65e7-516f-55bd-cb99-863d7accbd32@intel.com>
 From:   Jason Wang <jasowang@redhat.com>
-Date:   Wed, 21 Sep 2022 10:14:41 +0800
-Message-ID: <CACGkMEuusM3EMmWW6+q8V1fZscfjM2R9n7jGefUnSY59UnZDYQ@mail.gmail.com>
-Subject: Re: [PATCH 2/4] vDPA: only report driver features if FEATURES_OK is set
+Date:   Wed, 21 Sep 2022 10:17:53 +0800
+Message-ID: <CACGkMEv0++vmfzzmX47NhsaY5JTvbO2Ro7Taf8C0dxV6OVXTKw@mail.gmail.com>
+Subject: Re: [PATCH 1/4] vDPA: allow userspace to query features of a vDPA device
 To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>
 Cc:     mst <mst@redhat.com>,
         virtualization <virtualization@lists.linux-foundation.org>,
@@ -66,73 +66,134 @@ Cc:     mst <mst@redhat.com>,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 20, 2022 at 1:46 PM Zhu, Lingshan <lingshan.zhu@intel.com> wrote:
+On Tue, Sep 20, 2022 at 5:58 PM Zhu, Lingshan <lingshan.zhu@intel.com> wrote:
 >
 >
 >
-> On 9/20/2022 10:16 AM, Jason Wang wrote:
+> On 9/20/2022 10:02 AM, Jason Wang wrote:
 > > On Fri, Sep 9, 2022 at 5:05 PM Zhu Lingshan <lingshan.zhu@intel.com> wrote:
-> >> vdpa_dev_net_config_fill() should only report driver features
-> >> to userspace after features negotiation is done.
+> >> This commit adds a new vDPA netlink attribution
+> >> VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES. Userspace can query
+> >> features of vDPA devices through this new attr.
+> >>
+> >> This commit invokes vdpa_config_ops.get_config() than
+> >> vdpa_get_config_unlocked() to read the device config
+> >> spcae, so no raeces in vdpa_set_features_unlocked()
 > >>
 > >> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> > It's better to share the userspace code as well.
+> OK, will share it in V2.
+> >
 > >> ---
-> >>   drivers/vdpa/vdpa.c | 13 +++++++++----
-> >>   1 file changed, 9 insertions(+), 4 deletions(-)
+> >>   drivers/vdpa/vdpa.c       | 19 ++++++++++++++-----
+> >>   include/uapi/linux/vdpa.h |  4 ++++
+> >>   2 files changed, 18 insertions(+), 5 deletions(-)
 > >>
 > >> diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
-> >> index 798a02c7aa94..29d7e8858e6f 100644
+> >> index c06c02704461..798a02c7aa94 100644
 > >> --- a/drivers/vdpa/vdpa.c
 > >> +++ b/drivers/vdpa/vdpa.c
-> >> @@ -819,6 +819,7 @@ static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *ms
+> >> @@ -491,6 +491,8 @@ static int vdpa_mgmtdev_fill(const struct vdpa_mgmt_dev *mdev, struct sk_buff *m
+> >>                  err = -EMSGSIZE;
+> >>                  goto msg_err;
+> >>          }
+> >> +
+> >> +       /* report features of a vDPA management device through VDPA_ATTR_DEV_SUPPORTED_FEATURES */
+> > The code explains itself, there's no need for the comment.
+> these comments are required in other discussions
+
+I think it's more than sufficient to clarify the semantic where it is defined.
+
+> >
+> >>          if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_SUPPORTED_FEATURES,
+> >>                                mdev->supported_features, VDPA_ATTR_PAD)) {
+> >>                  err = -EMSGSIZE;
+> >> @@ -815,10 +817,10 @@ static int vdpa_dev_net_mq_config_fill(struct vdpa_device *vdev,
+> >>   static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *msg)
+> >>   {
 > >>          struct virtio_net_config config = {};
-> >>          u64 features_device, features_driver;
+> >> -       u64 features;
+> >> +       u64 features_device, features_driver;
 > >>          u16 val_u16;
-> >> +       u8 status;
 > >>
-> >>          vdev->config->get_config(vdev, 0, &config, sizeof(config));
+> >> -       vdpa_get_config_unlocked(vdev, 0, &config, sizeof(config));
+> >> +       vdev->config->get_config(vdev, 0, &config, sizeof(config));
 > >>
-> >> @@ -834,10 +835,14 @@ static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *ms
+> >>          if (nla_put(msg, VDPA_ATTR_DEV_NET_CFG_MACADDR, sizeof(config.mac),
+> >>                      config.mac))
+> >> @@ -832,12 +834,19 @@ static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *ms
 > >>          if (nla_put_u16(msg, VDPA_ATTR_DEV_NET_CFG_MTU, val_u16))
 > >>                  return -EMSGSIZE;
 > >>
-> >> -       features_driver = vdev->config->get_driver_features(vdev);
-> >> -       if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features_driver,
-> >> -                             VDPA_ATTR_PAD))
-> >> -               return -EMSGSIZE;
-> >> +       /* only read driver features after the feature negotiation is done */
-> >> +       status = vdev->config->get_status(vdev);
-> >> +       if (status & VIRTIO_CONFIG_S_FEATURES_OK) {
-> > Any reason this is not checked in its caller as what it used to do before?
-> will check the existence of vdev->config->get_status before calling it in V2
+> >> -       features = vdev->config->get_driver_features(vdev);
+> >> -       if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features,
+> >> +       features_driver = vdev->config->get_driver_features(vdev);
+> >> +       if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features_driver,
+> >> +                             VDPA_ATTR_PAD))
+> >> +               return -EMSGSIZE;
+> >> +
+> >> +       features_device = vdev->config->get_device_features(vdev);
+> >> +
+> >> +       /* report features of a vDPA device through VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES */
+> >> +       if (nla_put_u64_64bit(msg, VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES, features_device,
+> >>                                VDPA_ATTR_PAD))
+> >>                  return -EMSGSIZE;
+> >>
+> >> -       return vdpa_dev_net_mq_config_fill(vdev, msg, features, &config);
+> >> +       return vdpa_dev_net_mq_config_fill(vdev, msg, features_driver, &config);
+> >>   }
+> >>
+> >>   static int
+> >> diff --git a/include/uapi/linux/vdpa.h b/include/uapi/linux/vdpa.h
+> >> index 25c55cab3d7c..97531b52dcbe 100644
+> >> --- a/include/uapi/linux/vdpa.h
+> >> +++ b/include/uapi/linux/vdpa.h
+> >> @@ -46,12 +46,16 @@ enum vdpa_attr {
+> >>
+> >>          VDPA_ATTR_DEV_NEGOTIATED_FEATURES,      /* u64 */
+> >>          VDPA_ATTR_DEV_MGMTDEV_MAX_VQS,          /* u32 */
+> >> +       /* features of a vDPA management device */
+> >>          VDPA_ATTR_DEV_SUPPORTED_FEATURES,       /* u64 */
+> >>
+> >>          VDPA_ATTR_DEV_QUEUE_INDEX,              /* u32 */
+> >>          VDPA_ATTR_DEV_VENDOR_ATTR_NAME,         /* string */
+> >>          VDPA_ATTR_DEV_VENDOR_ATTR_VALUE,        /* u64 */
+> >>
+> >> +       /* features of a vDPA device, e.g., /dev/vhost-vdpa0 */
+> >> +       VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES,  /* u64 */
+> > What's the difference between this and VDPA_ATTR_DEV_SUPPORTED_FEATURES?
+> This is to report a vDPA device features, and
+> VDPA_ATTR_DEV_SUPPORTED_FEATURES
+> is used for reporting the management device features, we have a long
+> discussion
+> on this before.
 
-Just to clarify, I meant to check FEAUTRES_OK in the caller -
-vdpa_dev_config_fill() otherwise each type needs to repeat this in
-their specific codes.
+Yes, but the comment is not clear in many ways:
+
+" features of a vDPA management device" sounds like features that is
+out of the scope of the virtio.
+
+And
+
+"/dev/vhost-vdpa0" is not a vDPA device but a vhost-vDPA device.
 
 Thanks
 
->
-> Thanks,
-> Zhu Lingshan
 > >
 > > Thanks
 > >
-> >> +               features_driver = vdev->config->get_driver_features(vdev);
-> >> +               if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features_driver,
-> >> +                                     VDPA_ATTR_PAD))
-> >> +                       return -EMSGSIZE;
-> >> +       }
-> >>
-> >>          features_device = vdev->config->get_device_features(vdev);
-> >>
+> >> +
+> >>          /* new attributes must be added above here */
+> >>          VDPA_ATTR_MAX,
+> >>   };
 > >> --
 > >> 2.31.1
 > >>
