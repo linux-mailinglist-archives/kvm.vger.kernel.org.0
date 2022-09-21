@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 35D0A5BF21B
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 02:33:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F1DCF5BF234
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 02:34:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231363AbiIUAdR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Sep 2022 20:33:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34308 "EHLO
+        id S231529AbiIUAdv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Sep 2022 20:33:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231339AbiIUAc6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Sep 2022 20:32:58 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93A587961E
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 17:32:56 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id u6-20020a17090a1f0600b002039826d478so2057335pja.4
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 17:32:56 -0700 (PDT)
+        with ESMTP id S231168AbiIUAdC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Sep 2022 20:33:02 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5756E79681
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 17:32:58 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 126-20020a630284000000b0043942ef3ac7so2541854pgc.11
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 17:32:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date;
-        bh=efA5iJVbRrRgyy7qejkmxwve22ULxnh+arH50++PU/o=;
-        b=LKQ43lhsEV6qkmBZlofrSrdl8EJ6mizwyIEMQYN4yuGNXkQj4E20I0hn2n1os/W8rc
-         FBABKu95Qjg91h2stXYOQw+qADMR7XZ6aWiaoE4AtE31UgVml4CNZ7U+iemEDcQM7Qu4
-         t9Z+X0wLCYzA/PywBX4R2TbwY4IqErPsq7pWjccSbHgqlIcJodfmwDsORX1S0hnpHOqL
-         beWZAka2S0YLzR5F93gSfrPtpqFy0vHNPuMIF2SvlDmkv6DmDFSXlrSQYeY1mlT0WWNb
-         xuXG79A1mSLbxXjRXjfR/KkQ6hWyNCiYg0/oAhyTPT5fIKU53548mJXGWrhfghBolN1K
-         JXJw==
+        bh=MbPfwZWv+I6kc3yY72JCQSO5yCJ8JCb5ELGKfLOjwok=;
+        b=grJuuh2+k9rqNemRgEr/i3C9qelUa8pmjrIwpZzOZWsob4m9BMj0id2HZJEYNqX2vk
+         IyiBqggCegoMniVIEZ7ve0Pcy1+h2jKB9+MbFtK10I6z6o71JeWojaaos6m7WE8fir0j
+         heFLVTWw3UN27mkc0NRFrTsxNKdJe5TptRVjlgbhxvmnLYxPIxj71ZtTzy+8U9psEbMq
+         /DJvRQaVwnNJl+52DMbtmS4ycyYoramkBPdq9kNpcRPXozDD2tMcpY+VTWl4f/e0cZ1u
+         xUxifAHZRm7LM+0f4tqB8q/MJPB9s8lTaVH0t++C99WkByoXTjU2cYt2Zh/7y53Gwmu9
+         hSqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date;
-        bh=efA5iJVbRrRgyy7qejkmxwve22ULxnh+arH50++PU/o=;
-        b=S3AAURjyjVdGl6vI4PUiSruf3YaELpC1RabQeAJM4ncUtPAXwwTDA3VUhPSEhhh5wQ
-         0+KZvTYWuUFuXxxSdPYIqllqlAeJzRu0YapUoneaNh4RaxggMtSjX+Rvy9TZDLA/a5aY
-         qulaCM57Sk8Njig81hDZdyV0jeXbF5F0F6VrTDuhjvtHcgYmi5Xp/7KBwDkIeAgu4cVE
-         xaprI4C039DEBswsYNkHEX8Asm6oWej4newtg+tUxZVj/3w6yBKJYjmSOPXF3Rl+iQ1P
-         nHP8DC2Lc+ZuOjQMvVK7kBIVKvfBgnIQAG7OKbeA1cb7ysbSZIaCvS4Z9PRcw4/Jp5Yv
-         L+nA==
-X-Gm-Message-State: ACrzQf11cGnTBia9ANG9tn23ixy5bcjVnTaYBstDwDfRac2cz6YlDqOR
-        z3iP5S4CRZpV64tnxxmS5oWlDWrtXZE=
-X-Google-Smtp-Source: AMsMyM4y6HKockrgOW/pRtDhYoSBz/Hgk7Jbboq2yxWPlcCYVwqDxT8mse4oLg7p1D+UQZFuX9F/d/ndT2k=
+        bh=MbPfwZWv+I6kc3yY72JCQSO5yCJ8JCb5ELGKfLOjwok=;
+        b=r2JzNNlKeZal+9rEsI0IZHPn3KgtSE4FsNLhs4iBd5yUuEggqCffN9z7GGVuUyz3GT
+         CCDngd/Do14UjCBHK42llrLFBOCNl9KjNQI2Eo8LL3A7ypwYbfnX35pE/VR1X0lyeiXS
+         jwvwXg6BEiHmHg5HxdOSTayViUGSIHHdi8DrFcdz4LR8OuFcIcKrUEfvrjaB/F7lxJk/
+         Lf7Zla8dl/dzHTVIn3N1hc8FO58t2Wzlnvwe9Oe9U7IgByUt3UI9HU59x7SBtRVZlzof
+         T1fPWe+IDn1xB5Sj+3itp6nwQGQvB2CJ78fLwXP/B2H5QD3RDt35mB71ZIOV61qBQOLA
+         i26g==
+X-Gm-Message-State: ACrzQf1826v1cA7ur4B34+U2nxjJSimI7bxnFJiS0s/qnRfo1MFRVytw
+        kT3T/ygxZWsAoitOVIMZWvEnnJYk2JI=
+X-Google-Smtp-Source: AMsMyM7f/RJC1MtdX6LkmKjLrG4mZov+EsK6V2BR+rQVSc6X+vDgdbpWXXujI7vaEWcw3mjY8BTW5lUZVRw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:be03:b0:178:6f5d:e979 with SMTP id
- r3-20020a170902be0300b001786f5de979mr2126922pls.163.1663720376093; Tue, 20
- Sep 2022 17:32:56 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:dac7:b0:178:b5e0:3627 with SMTP id
+ q7-20020a170902dac700b00178b5e03627mr2094501plx.147.1663720377687; Tue, 20
+ Sep 2022 17:32:57 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 21 Sep 2022 00:31:54 +0000
+Date:   Wed, 21 Sep 2022 00:31:55 +0000
 In-Reply-To: <20220921003201.1441511-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20220921003201.1441511-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
-Message-ID: <20220921003201.1441511-6-seanjc@google.com>
-Subject: [PATCH v4 05/12] KVM: x86: lapic does not have to process INIT if it
- is blocked
+Message-ID: <20220921003201.1441511-7-seanjc@google.com>
+Subject: [PATCH v4 06/12] KVM: SVM: Make an event request if INIT or SIPI is
+ pending when GIF is set
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
         Huacai Chen <chenhuacai@kernel.org>,
@@ -87,33 +87,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+Set KVM_REQ_EVENT if INIT or SIPI is pending when the guest enables GIF.
+INIT in particular is blocked when GIF=0 and needs to be processed when
+GIF is toggled to '1'.  This bug has been masked by (a) KVM calling
+->check_nested_events() in the core run loop and (b) hypervisors toggling
+GIF from 0=>1 only when entering guest mode (L1 entering L2).
 
-Do not return true from kvm_vcpu_has_events() if the vCPU isn' going to
-immediately process a pending INIT/SIPI.  INIT/SIPI shouldn't be treated
-as wake events if they are blocked.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-[sean: rebase onto refactored INIT/SIPI helpers, massage changelog]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 3 ++-
+ arch/x86/kvm/svm/svm.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 16a24dd28f26..dcc675d4e44b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12765,7 +12765,8 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
- 	if (!list_empty_careful(&vcpu->async_pf.done))
- 		return true;
- 
--	if (kvm_apic_has_pending_init_or_sipi(vcpu))
-+	if (kvm_apic_has_pending_init_or_sipi(vcpu) &&
-+	    kvm_apic_init_sipi_allowed(vcpu))
- 		return true;
- 
- 	if (vcpu->arch.pv.pv_unhalted)
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index dd599afc85f5..58f0077d9357 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2339,7 +2339,8 @@ void svm_set_gif(struct vcpu_svm *svm, bool value)
+ 		enable_gif(svm);
+ 		if (svm->vcpu.arch.smi_pending ||
+ 		    svm->vcpu.arch.nmi_pending ||
+-		    kvm_cpu_has_injectable_intr(&svm->vcpu))
++		    kvm_cpu_has_injectable_intr(&svm->vcpu) ||
++		    kvm_apic_has_pending_init_or_sipi(&svm->vcpu))
+ 			kvm_make_request(KVM_REQ_EVENT, &svm->vcpu);
+ 	} else {
+ 		disable_gif(svm);
 -- 
 2.37.3.968.ga6b4b080e4-goog
 
