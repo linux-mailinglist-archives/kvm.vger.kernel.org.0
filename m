@@ -2,55 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB9C95C00DE
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 17:15:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F6855C00E0
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 17:15:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229588AbiIUPPc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 11:15:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47988 "EHLO
+        id S229716AbiIUPPh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 11:15:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229590AbiIUPPa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Sep 2022 11:15:30 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4AC7844CA
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 08:15:29 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id b11-20020a170902d50b00b0017828988079so4073021plg.21
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 08:15:29 -0700 (PDT)
+        with ESMTP id S229825AbiIUPPc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Sep 2022 11:15:32 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83BC28709B
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 08:15:31 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id n85-20020a254058000000b006b0148d96f7so5482709yba.2
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 08:15:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date;
-        bh=2Z95wq2lk/XpnCodnXFtCKk4Lpt+LwWcZY4LJXGashQ=;
-        b=EvbTfodWz70eYq+Vaj6NDj6K1e8d6XIPH8a71rMw+Uz71nlxJXJyGzQ9MoRqYDh0Ah
-         jeyAE1RRQwCdTyGNlkBpdioxFBjg2B78qFJVgnOqj2WsCty3JD+8wXRWYMNN8nw09CY5
-         pUK4KFMHgUl8fye04vdd+m0xMBGyVqQbd7XwEjS3XD1Fszf2o4OYJesnjm8jImCm6gos
-         OnT+NEkSzaj3DNLQuD9qb7zofrdkjO6ANNdV7BCGA8npydfTniWZjBJRSD2o/5JRh2Ea
-         zJuR/06s+7WmGS0oTdRKARBAJN3nrARKbxGSnG9UWqemhbIg2XxMJ1e4WM9JT5P9d1wT
-         FYyQ==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date;
+        bh=AM15ozgnm9QNndhOKNzfVvo5El/vEuh9XgSZLRgqagw=;
+        b=ZUK3knhYDTN88jBE2UQJYzdMWV9TlcnC8QuEHW9pwVd2nfww003o1qt9dQafLZZv2j
+         gDCEmGvbfw7RhN3KNunZLYwE8WcTzoZ9nSr72POPqaVQu+cEpDO21+1W5WJq/3VetL//
+         Gslv91eKzgxdI6VErVbk2QVd7W7PyzqG/a1nYPu9Uvvk+tEM47KBODw4vMZG4957PuDv
+         fgUFRXtd5FY1Hi7Od139OcrQAYLZWTbUZqex9wO3MqTtNhdnzCKZvGiQAn2SCez8Goci
+         sgD+sW1tgvkiAUeRdmkPPcrcl7kzTelc8X8mdl4qHBbzkb8bnOeeOlAdxZipK1cTT0jm
+         Vpcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=2Z95wq2lk/XpnCodnXFtCKk4Lpt+LwWcZY4LJXGashQ=;
-        b=QQrh7f8YYCNegSpUA91gIhzJbehvPafSBfKgEQlfqbgcpVN8J6afX0x9lDceJaq5NP
-         JaVgxf1cqHVy+l09HeGzpCFx4BEX4zZm6473vnZfzBKU9nLS6coA8Zy8CeIqp876WYY/
-         EhN+d6Hj85L7wzqntoy0pPC25mw3LEVDyU9/MBLfRWEYg3Sdkoej4+8G9koFM+zlFpnV
-         bL0g0LPyb2yZ38WiT4Uu1qFavLVSIsHEgKSX8IGiOR2X2uAQ7/bEmmpEBZtnGL1eV4Is
-         yS5rOEpPx/yX+B2i2aqzwYh4CKsAdtohIMNDQlKnsEJU1a+qEk8NVM4g5+8X1UWVeox6
-         bgrA==
-X-Gm-Message-State: ACrzQf0d0L5EwioDFbvd5sKcjRDT5+2H8D7VaAd76oUSE4PDQEV+BD60
-        RioDPJdqK0u8o16V3lsSlXJSdxVvXMlyAu5sih79LOEkAah7V6xEp4VuxVf/rqd7wdUTt1hzpeP
-        yFPnFDH0FuQ8B8WRrsZ09m9zL793uRNkrIvAHHOpgwBJ+lhwHt9/0f4xaY3a0hWVnLg6R
-X-Google-Smtp-Source: AMsMyM57o9McCXi984bQuGZ85s7yE2AkYUAI89VH20NpPLz/yduVmpPJYLVu/wvCLNxfs2NjEXRO7kPaNpqp/uu1
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date;
+        bh=AM15ozgnm9QNndhOKNzfVvo5El/vEuh9XgSZLRgqagw=;
+        b=emVsw/yylwc+pVWcJ07OtamIUHDG6rdk/8W6e1RA7jPg6mWfFUIRiLIgl2ott+8dr1
+         NdScPzqyfNMMVN+yFx17Nw4gntRmCG76ATuK7PgCZhO32BWOpGQ8e2/INaziwxte5p4K
+         Pm8XOWgRDA9hXPhO2AZi/QMxr6maX8crjTOxhsmCz1Jo7lIPUzTujY1/Cd30MS+eL6eK
+         Emri91XlN9/M+DOuTrHCpwkh1SXQXaNc3SuuMN6R0vM2WiqKIiTFd2wWAdS3dXEkhgBv
+         BIatOV+eykHJQ0WnJRUXeFMrCcrilI0dnZcqloJdAbgXrYrReeQCJpOaADXPzpCS6FgN
+         COnw==
+X-Gm-Message-State: ACrzQf1f2I+MhxVructSHC4a6En7fApxzBqafNua11nqgPT76nPXm5WM
+        t1Ru4/u1lrLRVIluadfgFUvtw6z5xKh5kQxZHr0dzt64vlaN43nwHp15k/nWYQMs5KxgOJNZyaZ
+        m5U80caXNq/pdNdPsUqESmKw3RCmC9t/Hs5RWox588SfNPGPV2ahkUfiRyP3xUgCQ6KjF
+X-Google-Smtp-Source: AMsMyM7idMkirR35YRuojB5Y6ZutngmwG2j3tDjFibWicUzLxR9FFXgBthA/jLlNCP99hrYu+29dbebBS9twtETG
 X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
- (user=aaronlewis job=sendgmr) by 2002:a05:6a00:23d0:b0:550:d950:c03e with
- SMTP id g16-20020a056a0023d000b00550d950c03emr10669466pfc.16.1663773329129;
- Wed, 21 Sep 2022 08:15:29 -0700 (PDT)
-Date:   Wed, 21 Sep 2022 15:15:20 +0000
+ (user=aaronlewis job=sendgmr) by 2002:a25:bbcc:0:b0:6a8:e269:5eec with SMTP
+ id c12-20020a25bbcc000000b006a8e2695eecmr25496715ybk.219.1663773330757; Wed,
+ 21 Sep 2022 08:15:30 -0700 (PDT)
+Date:   Wed, 21 Sep 2022 15:15:21 +0000
+In-Reply-To: <20220921151525.904162-1-aaronlewis@google.com>
 Mime-Version: 1.0
+References: <20220921151525.904162-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
-Message-ID: <20220921151525.904162-1-aaronlewis@google.com>
-Subject: [PATCH v4 0/5] MSR filtering and MSR exiting flag clean up
+Message-ID: <20220921151525.904162-2-aaronlewis@google.com>
+Subject: [PATCH v4 1/5] KVM: x86: Disallow the use of KVM_MSR_FILTER_DEFAULT_ALLOW
+ in the kernel
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
@@ -66,44 +69,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The changes in this series were intended to be accepted at the same time as
-commit cf5029d5dd7c ("KVM: x86: Protect the unused bits in MSR exiting
-flags").  With that already accepted this series is the rest of the changes
-that evolved from the code review.  The RFC tag has been removed because
-that part of the change has already been accepted.  All that's left is the
-clean up and the selftest.
+Protect the kernel from using the flag KVM_MSR_FILTER_DEFAULT_ALLOW.
+Its value is 0, and using it incorrectly could have unintended
+consequences. E.g. prevent someone in the kernel from writing something
+like this.
 
-v3 -> v4
- - Patches 2 and 3 are new.  They were intended to be a part of commit
-   cf5029d5dd7c ("KVM: x86: Protect the unused bits in MSR exiting flags"),
-   but with that accepted it made sense to split what remained into two.
+if (filter.flags & KVM_MSR_FILTER_DEFAULT_ALLOW)
+        <allow the MSR>
 
-v2 -> v3
- - Added patch 1/4 to prevent the kernel from using the flag
-   KVM_MSR_FILTER_DEFAULT_ALLOW.
- - Cleaned up the selftest code based on feedback.
+and getting confused when it doesn't work.
 
-v1 -> v2
- - Added valid masks KVM_MSR_FILTER_VALID_MASK and
-   KVM_MSR_EXIT_REASON_VALID_MASK.
- - Added patch 2/3 to add valid mask KVM_MSR_FILTER_RANGE_VALID_MASK, and
-   use it.
- - Added testing to demonstrate flag protection when calling the ioctl for
-   KVM_X86_SET_MSR_FILTER or KVM_CAP_X86_USER_SPACE_MSR.
+It would be more ideal to remove this flag altogether, but userspace
+may already be using it, so protecting the kernel is all that can
+reasonably be done at this point.
 
-Aaron Lewis (5):
-  KVM: x86: Disallow the use of KVM_MSR_FILTER_DEFAULT_ALLOW in the kernel
-  KVM: x86: Add a VALID_MASK for the MSR exit reason flags
-  KVM: x86: Add a VALID_MASK for the flag in kvm_msr_filter
-  KVM: x86: Add a VALID_MASK for the flags in kvm_msr_filter_range
-  selftests: kvm/x86: Test the flags in MSR filtering and MSR exiting
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+---
 
- arch/x86/include/uapi/asm/kvm.h               |  5 ++
- arch/x86/kvm/x86.c                            |  8 +-
- include/uapi/linux/kvm.h                      |  3 +
- .../kvm/x86_64/userspace_msr_exit_test.c      | 85 +++++++++++++++++++
- 4 files changed, 96 insertions(+), 5 deletions(-)
+Google's VMM is already using this flag, so we *know* that dropping the
+flag entirely will break userspace.  All we can do at this point is
+prevent the kernel from using it.
 
+ arch/x86/include/uapi/asm/kvm.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index 46de10a809ec..73ad693aa653 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -222,7 +222,9 @@ struct kvm_msr_filter_range {
+ 
+ #define KVM_MSR_FILTER_MAX_RANGES 16
+ struct kvm_msr_filter {
++#ifndef __KERNEL__
+ #define KVM_MSR_FILTER_DEFAULT_ALLOW (0 << 0)
++#endif
+ #define KVM_MSR_FILTER_DEFAULT_DENY  (1 << 0)
+ 	__u32 flags;
+ 	struct kvm_msr_filter_range ranges[KVM_MSR_FILTER_MAX_RANGES];
 -- 
 2.37.3.968.ga6b4b080e4-goog
 
