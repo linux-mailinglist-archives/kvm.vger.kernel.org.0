@@ -2,65 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 115D75C04A6
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 18:51:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B5325C04A4
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 18:51:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231867AbiIUQus (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 12:50:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51000 "EHLO
+        id S231522AbiIUQum (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 12:50:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231130AbiIUQuR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231458AbiIUQuR (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 21 Sep 2022 12:50:17 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 355755301C;
-        Wed, 21 Sep 2022 09:45:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663778738; x=1695314738;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Cp1pNg+16opBPY1j2Ba8kIc+eTwZIbA4gQJJdqATjn0=;
-  b=YducHbOjYHA/w9+s+pFGMNEiT9h/1SKuqy7H0VhF1z7tpILKknYo3r5h
-   0ZjNyKtV9C2OleJnQr+pJ+ywKC55KMkHWbOEyrQX+klO6ZSmOgDkWDwUv
-   Y6bHfjDtc8pxVhLgnL0uYGxFRpxjY+RdfjT0PZ1QRPwg07wOG7SORcLEa
-   B43LXQN8DjXuEXo2BP/EygmqhQI2NUmpJk9Th14CtJcgSwvitDCHf9GSc
-   P9pn6WJ0dfvReH13iHK6UFHR2Dxw0mweuMD+zmLe5hb4e73R3XLzpghmt
-   v5qzRdG+xozhXhx0C88ZjkHF0AN8ARYttPA+XjuHwIcN+7qq+4C/Dhqh5
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10477"; a="300044986"
-X-IronPort-AV: E=Sophos;i="5.93,333,1654585200"; 
-   d="scan'208";a="300044986"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2022 09:45:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,333,1654585200"; 
-   d="scan'208";a="948227970"
-Received: from lxy-dell.sh.intel.com ([10.239.48.38])
-  by fmsmga005.fm.intel.com with ESMTP; 21 Sep 2022 09:45:33 -0700
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, wei.w.wang@intel.com,
-        kan.liang@linux.intel.com
-Cc:     xiaoyao.li@intel.com, linux-perf-users@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [RFC PATCH v2 3/3] KVM: VMX: Stop/resume host PT before/after VMX transition when PT_MODE_HOST_GUEST
-Date:   Thu, 22 Sep 2022 00:45:21 +0800
-Message-Id: <20220921164521.2858932-4-xiaoyao.li@intel.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20220921164521.2858932-1-xiaoyao.li@intel.com>
-References: <20220921164521.2858932-1-xiaoyao.li@intel.com>
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83B1C956B4
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 09:45:31 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id b23so6477838pfp.9
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 09:45:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=JZfIBMlS2x8Yy9k3gjqr0aT1iELoQxmYkxILnyXMMIU=;
+        b=QMTsI7sI0sDBmr4p1PRMig5+jVttyHA6AUnNS0PKcAkiLoVBwcc431trVt0qT6edyM
+         +dGKqMAbZYLKJvcZKYhEDS8oIEl94it51RkKYnMFiD3y+DR3sTaI+1lImTXYOskCOuvr
+         fTVNWFcW0sU/OHTVMjuZcBuhbScWU0VhNdQCSDpddFBYsat1912NiZwVydVpu5ycF+4/
+         3VPUsi5q6BCQVl/3ONDnhPpe8ja46lRaOpFmyEfTQzwyWcH63YX5E8+9lKYNj76x16PC
+         8biwyzjt4ewkLeoQmVVvWIkbQZvsqJzIHdrmGxSAoRiDvzdARR58tBw22+z3ilC01GIj
+         GBSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=JZfIBMlS2x8Yy9k3gjqr0aT1iELoQxmYkxILnyXMMIU=;
+        b=kS8TOtTbsABRsZgUpA8dUUAI9oCnsEUAl/eLfuNuGQ80UGG8XyjveUkO012SHkrHrZ
+         R+HfFULYEx7ehcMB6IFzs3RwfsC5/MOJUZPcLxOnVHf0Y+MwihvgjnDSExZbxy4kAT+o
+         s46o1LYGH9BnRab/GBHkZqk4CKk1j8IPEa4d05AxnHqd6NCVrKAQRkG3tCC+aNMFps4L
+         wk1Z3wjfrauxfMNAMzOqKmFiiLIJiKye1UNiCl9wU2zqcn6dXEX8PxB4GiaozP16UCYi
+         2cWZpqJp741/MjHUpQ0ZYZR5o9Qc0VIT7cWhBZCPB67J9llE8qsT1+ZWcdVeTF7WYzfQ
+         SWdw==
+X-Gm-Message-State: ACrzQf184sEML9H0S2XeSvUQFU+/zYAE0eimz/YezW1pxMLg3uKoItt5
+        UYEz6eSPFU69eVMXeDk5QBFEYQ==
+X-Google-Smtp-Source: AMsMyM4mABv3skhAlczhBXEuZ/6OucFGsARbNjRuiuKVL72UiLewaLH756FSmN4LJxyGTlqIi2113w==
+X-Received: by 2002:a65:6a4d:0:b0:439:a0fb:322b with SMTP id o13-20020a656a4d000000b00439a0fb322bmr25639153pgu.10.1663778730870;
+        Wed, 21 Sep 2022 09:45:30 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id u1-20020a1709026e0100b00179988ca61bsm37972plk.161.2022.09.21.09.45.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Sep 2022 09:45:30 -0700 (PDT)
+Date:   Wed, 21 Sep 2022 16:45:26 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Yuan Yao <yuan.yao@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v10 02/39] KVM: x86: hyper-v: Resurrect dedicated
+ KVM_REQ_HV_TLB_FLUSH flag
+Message-ID: <Yys/pv0d+8ywcbUy@google.com>
+References: <20220921152436.3673454-1-vkuznets@redhat.com>
+ <20220921152436.3673454-3-vkuznets@redhat.com>
+ <Yys6b1ZqYbw9Umyu@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yys6b1ZqYbw9Umyu@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,108 +79,112 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Current implementation in pt_guest_enter() has two issues when pt mode
-is PT_MODE_HOST_GUEST.
+On Wed, Sep 21, 2022, Sean Christopherson wrote:
+> On Wed, Sep 21, 2022, Vitaly Kuznetsov wrote:
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index f62d5799fcd7..86504a8bfd9a 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -3418,11 +3418,17 @@ static inline void kvm_vcpu_flush_tlb_current(struct kvm_vcpu *vcpu)
+> >   */
+> >  void kvm_service_local_tlb_flush_requests(struct kvm_vcpu *vcpu)
+> >  {
+> > -	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
+> > +	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu)) {
+> >  		kvm_vcpu_flush_tlb_current(vcpu);
+> > +		kvm_clear_request(KVM_REQ_HV_TLB_FLUSH, vcpu);
+> 
+> This isn't correct, flush_tlb_current() flushes "host" TLB entries, i.e. guest-physical
+> mappings in Intel terminology, where flush_tlb_guest() and (IIUC) Hyper-V's paravirt
+> TLB flush both flesh "guest" TLB entries, i.e. linear and combined mappings.
+> 
+> Amusing side topic, apparently I like arm's stage-2 terminology better than "TDP",
+> because I actually typed out "stage-2" first.
+> 
+> > +	}
+> >  
+> > -	if (kvm_check_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu))
+> > +	if (kvm_check_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu)) {
+> > +		kvm_vcpu_flush_tlb_guest(vcpu);
+> > +		kvm_clear_request(KVM_REQ_HV_TLB_FLUSH, vcpu);
 
-1. It relies on VM_ENTRY_LOAD_IA32_RTIT_CTL to disable host's Intel PT
-   for the case that host enables PT while guest not.
+Looking at future patches where KVM needs to reset the FIFO when doing a "guest"
+TLB flush, i.e. needs to do more than just clearing the request, what about putting
+this in kvm_vcpu_flush_tlb_guest() right away?
 
-   However, it causes VM entry failure due to violating the requirement
-   stated in SDM "VM-Execution Control Fields"
+Ah, and there's already a second caller to kvm_vcpu_flush_tlb_guest().  I doubt
+KVM's paravirt TLB flush will ever collide with Hyper-V's paravirt TLB flush,
+but logically a "guest" flush that is initiated through KVM's paravirt interface
+should also clear Hyper-V's queue/request.
 
-     If the logical processor is operating with Intel PT enabled (if
-     IA32_RTIT_CTL.TraceEn = 1) at the time of VM entry, the "load
-     IA32_RTIT_CTL" VM-entry control must be 0.
+And for consistency, slot this in before this patch:
 
-2. In the case both host and guest enable Intel PT, it disables host's
-   Intel PT by manually clearing MSR_IA32_RTIT_CTL for the purpose to
-   context switch host and guest's PT configurations.
+From: Sean Christopherson <seanjc@google.com>
+Date: Wed, 21 Sep 2022 09:35:34 -0700
+Subject: [PATCH] KVM: x86: Move clearing of TLB_FLUSH_CURRENT to
+ kvm_vcpu_flush_tlb_all()
 
-   However, PT PMI can be delivered later and before VM entry. In the PT
-   PMI handler, it will a) update the host PT MSRs which leads to what KVM
-   stores in vmx->pt_desc.host becomes stale, and b) re-enable Intel PT
-   which leads to VM entry failure as #1.
+Clear KVM_REQ_TLB_FLUSH_CURRENT in kvm_vcpu_flush_tlb_all() instead of in
+its sole caller that processes KVM_REQ_TLB_FLUSH.  Regardless of why/when
+kvm_vcpu_flush_tlb_all() is called, flushing "all" TLB entries also
+flushes "current" TLB entries.
 
-To fix the above two issues, 1) grab and store host PT perf event and
-disable/enable host PT before vm-enter/ after vm-exit. 2) drop host
-pt_ctx and the logic to save/restore host PT MSRs since host PT driver
-doesn't rely on the previous value of PT MSR, i.e., the re-enabling of PT
-event after VM-exit re-initializes all the PT MSRs that it cares.
+Ideally, there will never be another caller of kvm_vcpu_flush_tlb_all(),
+and moving the handling "requires" extra work to document the ordering
+requirement, but future Hyper-V paravirt TLB flushing support will add
+similar logic for flush "guest" (Hyper-V can flush a subset of "guest"
+entries).  And in the Hyper-V case, KVM needs to do more than just clear
+the request, the queue of GPAs to flush also needs to purged, and doing
+all only in the request path is undesirable as kvm_vcpu_flush_tlb_guest()
+does have multiple callers (though it's unlikely KVM's paravirt TLB flush
+will coincide with Hyper-V's paravirt TLB flush).
 
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Move the logic even though it adds extra "work" so that KVM will be
+consistent with how flush requests are processed when the Hyper-V support
+lands.
+
+No functional change intended.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 31 +++++++++++++------------------
- arch/x86/kvm/vmx/vmx.h |  2 +-
- 2 files changed, 14 insertions(+), 19 deletions(-)
+ arch/x86/kvm/x86.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index c9b49a09e6b5..df1a16264bb6 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1124,37 +1124,32 @@ static inline void pt_save_msr(struct pt_ctx *ctx, u32 addr_range)
- 
- static void pt_guest_enter(struct vcpu_vmx *vmx)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index f62d5799fcd7..3ea2e51a8cb5 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3383,6 +3383,9 @@ static void kvm_vcpu_flush_tlb_all(struct kvm_vcpu *vcpu)
  {
-+	struct perf_event *event;
+ 	++vcpu->stat.tlb_flush;
+ 	static_call(kvm_x86_flush_tlb_all)(vcpu);
 +
- 	if (vmx_pt_mode_is_system())
- 		return;
- 
--	/*
--	 * GUEST_IA32_RTIT_CTL is already set in the VMCS.
--	 * Save host state before VM entry.
--	 */
--	rdmsrl(MSR_IA32_RTIT_CTL, vmx->pt_desc.host.ctl);
--	if (vmx->pt_desc.guest.ctl & RTIT_CTL_TRACEEN) {
--		wrmsrl(MSR_IA32_RTIT_CTL, 0);
--		pt_save_msr(&vmx->pt_desc.host, vmx->pt_desc.num_address_ranges);
-+	event = pt_get_curr_event();
-+	if (event)
-+		perf_event_disable_local(event);
-+	vmx->pt_desc.host_event = event;
-+
-+	if (vmx->pt_desc.guest.ctl & RTIT_CTL_TRACEEN)
- 		pt_load_msr(&vmx->pt_desc.guest, vmx->pt_desc.num_address_ranges);
--	}
++	/* Flushing all ASIDs flushes the current ASID... */
++	kvm_clear_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
  }
  
- static void pt_guest_exit(struct vcpu_vmx *vmx)
- {
-+	struct perf_event *event = vmx->pt_desc.host_event;
+ static void kvm_vcpu_flush_tlb_guest(struct kvm_vcpu *vcpu)
+@@ -10462,12 +10465,14 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 			kvm_mmu_sync_roots(vcpu);
+ 		if (kvm_check_request(KVM_REQ_LOAD_MMU_PGD, vcpu))
+ 			kvm_mmu_load_pgd(vcpu);
+-		if (kvm_check_request(KVM_REQ_TLB_FLUSH, vcpu)) {
 +
- 	if (vmx_pt_mode_is_system())
- 		return;
++		/*
++		 * Note, the order matters here, as flushing "all" TLB entries
++		 * also flushes the "current" TLB entries, i.e. servicing the
++		 * flush "all" will clear any request to flush "current".
++		 */
++		if (kvm_check_request(KVM_REQ_TLB_FLUSH, vcpu))
+ 			kvm_vcpu_flush_tlb_all(vcpu);
+-
+-			/* Flushing all ASIDs flushes the current ASID... */
+-			kvm_clear_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+-		}
+ 		kvm_service_local_tlb_flush_requests(vcpu);
  
--	if (vmx->pt_desc.guest.ctl & RTIT_CTL_TRACEEN) {
-+	if (vmx->pt_desc.guest.ctl & RTIT_CTL_TRACEEN)
- 		pt_save_msr(&vmx->pt_desc.guest, vmx->pt_desc.num_address_ranges);
--		pt_load_msr(&vmx->pt_desc.host, vmx->pt_desc.num_address_ranges);
--	}
- 
--	/*
--	 * KVM requires VM_EXIT_CLEAR_IA32_RTIT_CTL to expose PT to the guest,
--	 * i.e. RTIT_CTL is always cleared on VM-Exit.  Restore it if necessary.
--	 */
--	if (vmx->pt_desc.host.ctl)
--		wrmsrl(MSR_IA32_RTIT_CTL, vmx->pt_desc.host.ctl);
-+	if (event)
-+		perf_event_enable_local(event);
- }
- 
- void vmx_set_host_fs_gs(struct vmcs_host_state *host, u16 fs_sel, u16 gs_sel,
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 24d58c2ffaa3..4c20bdabc85b 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -66,7 +66,7 @@ struct pt_desc {
- 	u64 ctl_bitmask;
- 	u32 num_address_ranges;
- 	u32 caps[PT_CPUID_REGS_NUM * PT_CPUID_LEAVES];
--	struct pt_ctx host;
-+	struct perf_event *host_event;
- 	struct pt_ctx guest;
- };
- 
+ 		if (kvm_check_request(KVM_REQ_REPORT_TPR_ACCESS, vcpu)) {
+
+base-commit: ed102fe0b59586397b362a849bd7fb32582b77d8
 -- 
-2.27.0
 
