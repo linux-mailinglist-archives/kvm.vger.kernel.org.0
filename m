@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B3CAE5BF513
+	by mail.lfdr.de (Postfix) with ESMTP id 1BBE65BF511
 	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 05:53:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231233AbiIUDxR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Sep 2022 23:53:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36890 "EHLO
+        id S231269AbiIUDxZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Sep 2022 23:53:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231158AbiIUDxK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Sep 2022 23:53:10 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFD742A72C
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 20:53:06 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-34558a60c39so41259617b3.16
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 20:53:06 -0700 (PDT)
+        with ESMTP id S231236AbiIUDxP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Sep 2022 23:53:15 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98E323E77D
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 20:53:09 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id v188-20020a252fc5000000b006b4c924afa8so107035ybv.20
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 20:53:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:from:to:cc:subject:date;
-        bh=gA2O8oSq7e+d9nyvptw2rqsk9DDWzgsNC9HG6nZ9ojk=;
-        b=XIO6ctUJSy+0azvt2pjBnryBUWNbF6hif5gqbPYYTgs6hWqcNPUhpEe9lgmOAUb5lK
-         FIEztD6adqYqFeEvBypKlXChVdd8QisgiiSfY+985vqxZPImM0ex7t6ynV1Q5O6tezgt
-         NDwiBirb38U/1dEirAo7Y3vns06/c4B8HudINdNTwx88KQNxgx1TmYWG0eQQg8lejZAZ
-         /bU52MCOnyPXF6tZePuOkxwp5FG/90ihIjaJ57kWjHQ5T3L7z6Q1dLQcob1PqehxKNrc
-         0m9GKeaaZ/knEEBovy0cI9BPTzeBrDuufHMEvKZD7vIi8VDKzbEhuAnwKtKy8Vj4b9pN
-         sirw==
+        bh=l32Gj8DFEI8fLqucJeW2Rbzgq3dj8DyhNV3q0+UkQLg=;
+        b=XuosAkkktXXWMgAJHuCQa6UGl0+k/yysrZg8b+tKU72U2p9L/09e0hmFFdbpFORH8V
+         vTILz5cc/H+dABEvWXOa0Q96/hCZZqtcjG6GDq9EnJkg1HRbHUdnGMBvgxgXxkD9eVhg
+         3mESCk3cMrCrJNyO444O2KjWFvhL+u7B8U8iyrT2z2rQsl/Atk7HTwqj22cvRTddvz5V
+         /9XStQt610oFcuHnUCacx/6zTnRV/jgFzTs0rOpnX2VLj6/BcvNplLLaWguL+DWjExP6
+         E/0WLMczgDZY2C1h/uArgrik8gj1VT8Z5HqD+l0KltnMuzSx9/uO4IE53pibPPLBUHoA
+         GLpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date;
-        bh=gA2O8oSq7e+d9nyvptw2rqsk9DDWzgsNC9HG6nZ9ojk=;
-        b=5gNhxtI/lvnJ69q3xAhTO8WGL2aYGpD/mAkUm+Kd0ZW4uImcNB9iMde4V6zgH91Fo/
-         UnIJl9csy0box2k7V2EmcygWOe1fXmkQaXrYQBFSo+mkMVZYokwSnw5YtC5YAHtzeTNr
-         9E5e6czKJbIuA30RgDMkf+XW6UA33gfbf6+B2benrz1YzRiOp8+nh7LWLhImfl1b+EF5
-         jYks3hskMomS+os/ckq8UrtsFOSn6tuALO7SM+8uDkEf9ccMTnE9vTBm4uswCILSYFJY
-         Gj3Fgu5eRrW7+ECw8lzwnYIpsTxwm+dWm79cr5jSeaCELPHrqRBwDJCbea16I+BQUC8W
-         VyGw==
-X-Gm-Message-State: ACrzQf1GFSk+w2K6idKN2qZbaSTTEaSdarRpgoG5AXM97y3LVUqo0rbo
-        4BkQ4IMXimcLQEzgWVrU0eVEOA4=
-X-Google-Smtp-Source: AMsMyM70KZGF5iTWN4vyFkxGmYL4qy9cjP2UuKMDiQgL9O5HmyDhF0srIJOhVM93rWn1O+AMl83PUqU=
+        bh=l32Gj8DFEI8fLqucJeW2Rbzgq3dj8DyhNV3q0+UkQLg=;
+        b=T/YmQqFTWAzkA+E5rvwlLUnsbpshiArR5pv1A5DsiPmkOeTrTaG+h7b20Ikgc9KiMl
+         jn6qXErMaq7Pjqev+m+rTqYfd6btNc3x8S+A8jp8+yQlyzI0ODsvLW5BoL3cSROjTfQ4
+         uf717FTPUJtwQGSjItK4j+loKz7rSQj0VjyEnxe1tQMKhN3xJNPhpsBPCGUeO8epPBAk
+         qA12+KPZts6LFe968d3AbkMUoFYxFMgRl2KSsp6BxC3giYHVr2QigNdzvh7XRqnlpNQz
+         H3I9LE9r6ffie9+onpABsoSJzbRUqHUhn4J7DD7aFgigCLjrdYRoAG9z9MDey0haDfnU
+         siIA==
+X-Gm-Message-State: ACrzQf1r0vsHD9Nu4Fuk/Qt3l0RhJUlosCS128jFWY6gMQddgxBKZQ5f
+        2b0kQFN0wYglN60ZKEF6BGttP1g=
+X-Google-Smtp-Source: AMsMyM4k2SLq+xH0pc9iLcqj7V+ZPh7OXwHnlc3w1WiBAqn/qKtC40c1YU8Rcz5OMXlTDVVr0U6HpDc=
 X-Received: from pcc-desktop.svl.corp.google.com ([2620:15c:2ce:200:1b89:96f1:d30:e3c])
- (user=pcc job=sendgmr) by 2002:a05:690c:823:b0:349:bc6c:630c with SMTP id
- by3-20020a05690c082300b00349bc6c630cmr21877503ywb.223.1663732386243; Tue, 20
- Sep 2022 20:53:06 -0700 (PDT)
-Date:   Tue, 20 Sep 2022 20:51:38 -0700
+ (user=pcc job=sendgmr) by 2002:a25:d70b:0:b0:6b4:1ed6:24b2 with SMTP id
+ o11-20020a25d70b000000b006b41ed624b2mr9467270ybg.268.1663732388240; Tue, 20
+ Sep 2022 20:53:08 -0700 (PDT)
+Date:   Tue, 20 Sep 2022 20:51:39 -0700
 In-Reply-To: <20220921035140.57513-1-pcc@google.com>
-Message-Id: <20220921035140.57513-7-pcc@google.com>
+Message-Id: <20220921035140.57513-8-pcc@google.com>
 Mime-Version: 1.0
 References: <20220921035140.57513-1-pcc@google.com>
 X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
-Subject: [PATCH v4 6/8] KVM: arm64: unify the tests for VMAs in memslots when
- MTE is enabled
+Subject: [PATCH v4 7/8] KVM: arm64: permit all VM_MTE_ALLOWED mappings with
+ MTE enabled
 From:   Peter Collingbourne <pcc@google.com>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 Cc:     Peter Collingbourne <pcc@google.com>,
@@ -73,72 +73,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Previously we allowed creating a memslot containing a private mapping that
-was not VM_MTE_ALLOWED, but would later reject KVM_RUN with -EFAULT. Now
-we reject the memory region at memslot creation time.
+Certain VMMs such as crosvm have features (e.g. sandboxing) that depend
+on being able to map guest memory as MAP_SHARED. The current restriction
+on sharing MAP_SHARED pages with the guest is preventing the use of
+those features with MTE. Now that the races between tasks concurrently
+clearing tags on the same page have been fixed, remove this restriction.
 
-Since this is a minor tweak to the ABI (a VMM that created one of
-these memslots would fail later anyway), no VMM to my knowledge has
-MTE support yet, and the hardware with the necessary features is not
-generally available, we can probably make this ABI change at this point.
+Note that this is a relaxation of the ABI.
 
 Signed-off-by: Peter Collingbourne <pcc@google.com>
 Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 Reviewed-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/kvm/mmu.c | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/mmu.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index bebfd1e0bbf0..e34fbabd8b93 100644
+index e34fbabd8b93..996ea11fb0e5 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1073,6 +1073,19 @@ static void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
- 	}
+@@ -1075,14 +1075,6 @@ static void sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
+ 
+ static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
+ {
+-	/*
+-	 * VM_SHARED mappings are not allowed with MTE to avoid races
+-	 * when updating the PG_mte_tagged page flag, see
+-	 * sanitise_mte_tags for more details.
+-	 */
+-	if (vma->vm_flags & VM_SHARED)
+-		return false;
+-
+ 	return vma->vm_flags & VM_MTE_ALLOWED;
  }
  
-+static bool kvm_vma_mte_allowed(struct vm_area_struct *vma)
-+{
-+	/*
-+	 * VM_SHARED mappings are not allowed with MTE to avoid races
-+	 * when updating the PG_mte_tagged page flag, see
-+	 * sanitise_mte_tags for more details.
-+	 */
-+	if (vma->vm_flags & VM_SHARED)
-+		return false;
-+
-+	return vma->vm_flags & VM_MTE_ALLOWED;
-+}
-+
- static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			  struct kvm_memory_slot *memslot, unsigned long hva,
- 			  unsigned long fault_status)
-@@ -1249,9 +1262,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	}
- 
- 	if (fault_status != FSC_PERM && !device && kvm_has_mte(kvm)) {
--		/* Check the VMM hasn't introduced a new VM_SHARED VMA */
--		if ((vma->vm_flags & VM_MTE_ALLOWED) &&
--		    !(vma->vm_flags & VM_SHARED)) {
-+		/* Check the VMM hasn't introduced a new disallowed VMA */
-+		if (kvm_vma_mte_allowed(vma)) {
- 			sanitise_mte_tags(kvm, pfn, vma_pagesize);
- 		} else {
- 			ret = -EFAULT;
-@@ -1695,12 +1707,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 		if (!vma)
- 			break;
- 
--		/*
--		 * VM_SHARED mappings are not allowed with MTE to avoid races
--		 * when updating the PG_mte_tagged page flag, see
--		 * sanitise_mte_tags for more details.
--		 */
--		if (kvm_has_mte(kvm) && vma->vm_flags & VM_SHARED) {
-+		if (kvm_has_mte(kvm) && !kvm_vma_mte_allowed(vma)) {
- 			ret = -EINVAL;
- 			break;
- 		}
 -- 
 2.37.3.968.ga6b4b080e4-goog
 
