@@ -2,203 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DC7E5BFBAA
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 11:51:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C015F5BFE12
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 14:39:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231593AbiIUJvg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 05:51:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59364 "EHLO
+        id S229945AbiIUMjC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 08:39:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230107AbiIUJvR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Sep 2022 05:51:17 -0400
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F6E698587
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 02:48:31 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id sd10so3957663ejc.2
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 02:48:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date;
-        bh=zW5HyKzeuivew/B/xuG63OBJVZKZHySm5uewagUHgYw=;
-        b=W0gXS6y2bMRF3jyfGKbHAJ3obFmZsrPdd8F24LXKd+lkBoXU71tcZ/8Rd6CBiOG5Gt
-         /llLewMKLhpE1fQNCYWyNUKAbaSFN2uQB2l18sr/X93nrdV3mtGgAIGRp/6TgVSMzN2Y
-         /w1fEeXGFjYnXxT23gFPn8XnRZH5aeFDoxQz9+VomJlB3nS5DQBO+52ijYrE6giLDSG/
-         2KCpT4rp+gLvUOj6dxkghXRdjweFaTc4KxK/v/ZnZUMuCbBq69W0kFT14iOV1Wlsqup3
-         dNnSUoA2MHtiNM8+w3c7h0S8ulkEzZsQykPZzRe2GSS6+09iGKn6Gbsk3SsmOBhLic69
-         qeyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=zW5HyKzeuivew/B/xuG63OBJVZKZHySm5uewagUHgYw=;
-        b=phgdCR/i9SRWnLH8sPOCscx/JxCmluFtUxZESHZ2g08zfuZGEA6o5Hw8i0S1fKAX+b
-         gLrjZKVaclUq5guKeKcO4AcmG/D0+WPUHwlMuLRtNsql6UPMMGGbYowA6l7baxBnmX9L
-         M4pi65ne36Y7XfOE2wIJVk5LILfEb+hn/vXha7OJqFYz2ziDW+5d8G1cuYDfDiXkgr/r
-         Lh+Qqovcrn7iGEnx/IvqqQnKeL7r5PNivUSeZO2Tayeuz91YvAismTXSh+7f5Zz3xU84
-         Dg/to6Yny7xjcGTYGTEJxm0PSXDoP+3MUUS9pgcSFrIZm315+x9Hl6IqPGOGjViD9uEu
-         CjhA==
-X-Gm-Message-State: ACrzQf25S6tVgHW9vDNV0Kb+1J41lCLppGMwGTay5Yh/YTtn7IeS7qPJ
-        qYbfwqQxnBpCUBkZad895hJoIJXqq/Nd0dqaM9ntew==
-X-Google-Smtp-Source: AMsMyM7XaE+m0i9UnpDDtPcon9xvHdJdJV7wVRhpBOJ+d6OIshyTTEiMluysyBi3pDZh60CQuxd4pQfbk7wQRmhLbco=
-X-Received: by 2002:a17:907:2bd5:b0:76f:591c:466b with SMTP id
- gv21-20020a1709072bd500b0076f591c466bmr19468493ejc.504.1663753689736; Wed, 21
- Sep 2022 02:48:09 -0700 (PDT)
+        with ESMTP id S229699AbiIUMjA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Sep 2022 08:39:00 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E86A47F250;
+        Wed, 21 Sep 2022 05:38:58 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28LCCKBI027419;
+        Wed, 21 Sep 2022 12:38:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=EgORz8l0ZXMSrUgjXCg/g/TtPIFGRXyMqjuE+EA8wNM=;
+ b=chSLohu9guq9ZQYz6XwH8s6VhDuzJw881g1S8Z/WWnUF5iR+LoE7iVbfPMOGmiseJPs2
+ 9xHru9AkIciYOqn1xaGarOqthPaBP0V6/NnaNw7/MxDgg3fWGi1xvQDgIYeCiPoNK2Yq
+ AMSiZglHPbN5VzVYrcZfB/LqDIpKhpwBgzaMP6aRnGUyrfNF6wWxxShjWJ5A0SbFHMlm
+ SWeHAtXhbl7oIA7FH7rGTOsuCNx4/d4ZLZq9YM1j2LnzFJu8sfDp1Vgu4RfBNrs+hOuK
+ XqjPu/iDmdhqoxx3XSM+eQmvlCpmWE0SQc6Kzxet0ooU+3UIgktVm+AAabEPKT4mTt0w 2A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jr2df8x34-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Sep 2022 12:38:58 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28LCDBGq031357;
+        Wed, 21 Sep 2022 12:38:58 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jr2df8x2d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Sep 2022 12:38:57 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 28LCZKk4010346;
+        Wed, 21 Sep 2022 12:38:55 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06ams.nl.ibm.com with ESMTP id 3jn5gj57pd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 21 Sep 2022 12:38:55 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 28LCcqS143516370
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 21 Sep 2022 12:38:52 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 57E08A405C;
+        Wed, 21 Sep 2022 12:38:52 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A7914A4054;
+        Wed, 21 Sep 2022 12:38:51 +0000 (GMT)
+Received: from [9.171.94.233] (unknown [9.171.94.233])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 21 Sep 2022 12:38:51 +0000 (GMT)
+Message-ID: <1271c956-a39c-fc2c-2c00-c1bc9d6cf8a4@linux.ibm.com>
+Date:   Wed, 21 Sep 2022 14:38:51 +0200
 MIME-Version: 1.0
-References: <20220919231720.163121-1-shentey@gmail.com> <CAFEAcA8GjXFO4WK=KybgSc8rMfqecwD9EXS0kZMKtqogNf1Tsg@mail.gmail.com>
- <AD2F1750-F579-4F3B-A9FD-F2ADDF29D9E8@gmail.com>
-In-Reply-To: <AD2F1750-F579-4F3B-A9FD-F2ADDF29D9E8@gmail.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Wed, 21 Sep 2022 10:47:58 +0100
-Message-ID: <CAFEAcA9wHy8GNH_yWkZycdZZ4KxzDdTA=YP6zmHGsRC1gk=CUw@mail.gmail.com>
-Subject: Re: [PATCH 0/9] Deprecate sysbus_get_default() and
- get_system_memory() et. al
-To:     Bernhard Beschow <shentey@gmail.com>
-Cc:     qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
-        Magnus Damm <magnus.damm@gmail.com>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
-        Bandan Das <bsd@redhat.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Xiaojuan Yang <yangxiaojuan@loongson.cn>,
-        Cameron Esfahani <dirty@apple.com>,
-        Michael Rolnik <mrolnik@gmail.com>,
-        Song Gao <gaosong@loongson.cn>,
-        Jagannathan Raman <jag.raman@oracle.com>,
-        Greg Kurz <groug@kaod.org>,
-        Kamil Rytarowski <kamil@netbsd.org>,
-        Peter Xu <peterx@redhat.com>, Joel Stanley <joel@jms.id.au>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, haxm-team@intel.com,
-        Roman Bolshakov <r.bolshakov@yadro.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org,
-        Eduardo Habkost <eduardo@habkost.net>,
-        =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
-        qemu-ppc@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Helge Deller <deller@gmx.de>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
-        qemu-riscv@nongnu.org, Stafford Horne <shorne@gmail.com>,
-        Paul Durrant <paul@xen.org>,
-        Havard Skinnemoen <hskinnemoen@google.com>,
-        Elena Ufimtseva <elena.ufimtseva@oracle.com>,
-        Alexander Graf <agraf@csgraf.de>,
-        Thomas Huth <thuth@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Wenchao Wang <wenchao.wang@intel.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        qemu-s390x@nongnu.org,
-        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-        Eric Farman <farman@linux.ibm.com>,
-        Reinoud Zandijk <reinoud@netbsd.org>,
-        Alexander Bulekov <alxndr@bu.edu>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Tyrone Ting <kfting@nuvoton.com>,
-        xen-devel@lists.xenproject.org,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        John Snow <jsnow@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Darren Kenny <darren.kenny@oracle.com>, kvm@vger.kernel.org,
-        Qiuhao Li <Qiuhao.Li@outlook.com>,
-        John G Johnson <john.g.johnson@oracle.com>,
-        Bin Meng <bin.meng@windriver.com>,
-        Sunil Muthuswamy <sunilmut@microsoft.com>,
-        Max Filippov <jcmvbkbc@gmail.com>, qemu-arm@nongnu.org,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Artyom Tarasenko <atar4qemu@gmail.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        Jason Wang <jasowang@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Laurent Vivier <laurent@vivier.eu>,
-        Alistair Francis <alistair@alistair23.me>,
-        Jason Herne <jjherne@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [PATCH] KVM: s390: pci: register pci hooks without interpretation
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     farman@linux.ibm.com, schnelle@linux.ibm.com,
+        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, david@redhat.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com, svens@linux.ibm.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220920193025.135655-1-mjrosato@linux.ibm.com>
+Content-Language: en-US
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <20220920193025.135655-1-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 7bXY6XpcY8Wj5eFDzi6CvcLbrDx8U-5y
+X-Proofpoint-GUID: tIB-Ef5IHCmuPXG5S8IOOHLGfaLc8SQl
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-09-21_06,2022-09-20_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
+ spamscore=0 impostorscore=0 mlxscore=0 bulkscore=0 phishscore=0
+ mlxlogscore=999 malwarescore=0 lowpriorityscore=0 adultscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2209210086
+X-Spam-Status: No, score=-5.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 20 Sept 2022 at 23:50, Bernhard Beschow <shentey@gmail.com> wrote:
->
-> Am 20. September 2022 09:55:37 UTC schrieb Peter Maydell <peter.maydell@l=
-inaro.org>:
-> >On Tue, 20 Sept 2022 at 00:18, Bernhard Beschow <shentey@gmail.com> wrot=
-e:
-> >>
-> >> In address-spaces.h it can be read that get_system_memory() and
-> >> get_system_io() are temporary interfaces which "should only be used te=
-mporarily
-> >> until a proper bus interface is available". This statement certainly e=
-xtends to
-> >> the address_space_memory and address_space_io singletons.
-> >
-> >This is a long standing "we never really completed a cleanup"...
-> >
-> >> This series attempts
-> >> to stop further proliferation of their use by turning TYPE_SYSTEM_BUS =
-into an
-> >> object-oriented, "proper bus interface" inspired by PCIBus.
-> >>
-> >> While at it, also the main_system_bus singleton is turned into an attr=
-ibute of
-> >> MachineState. Together, this resolves five singletons in total, making=
- the
-> >> ownership relations much more obvious which helps comprehension.
-> >
-> >...but I don't think this is the direction we want to go.
-> >Overall the reason that the "system memory" and "system IO"
-> >singletons are weird is that in theory they should not be necessary
-> >at all -- board code should create devices and map them into an
-> >entirely arbitrary MemoryRegion or set of MemoryRegions corresponding
-> >to address space(s) for the CPU and for DMA-capable devices.
->
-> My intention was to allow exactly that: By turning sytem memory and syste=
-m IO into non-singletons, one could have many of them, thus allowing boards=
- to create arbitrary mappings of memory and IO. Since QEMU currently assume=
-s one set (memory and IO) of addresses, I for now instantiated the SysBus o=
-nce in the machine class to preserve behavior.
 
-You can already create arbitrary mappings of memory and IO
-(look at the virt board for an example). The existence of the
-legacy singleton system-memory and system-io doesn't prevent that,
-and stuffing the singletons into the MachineState doesn't do
-anything to change the code that is relying on the singletons.
 
-> >Retaining the whole-system singleton but shoving it into MachineState
-> >doesn't really change much, IMHO.
-> >
-> >More generally, sysbus is rather weird because it isn't really a
-> >bus. Every device in the system of TYPE_SYS_BUS_DEVICE is "on"
-> >the unique TYPE_SYSTEM_BUS bus, but that doesn't mean they're
-> >all in the same address space or that in real hardware they'd
-> >all be on the same bus.
->
-> Again, having multiple SysBuses may solve that issue.
+On 9/20/22 21:30, Matthew Rosato wrote:
+> The kvm registration hooks must be registered even if the facilities
+> necessary for zPCI interpretation are unavailable, as vfio-pci-zdev will
+> expect to use the hooks regardless.
+> This fixes an issue where vfio-pci-zdev will fail its open function
+> because of a missing kvm_register when running on hardware that does not
+> support zPCI interpretation.
+> 
+> Fixes: ca922fecda6c ("KVM: s390: pci: Hook to access KVM lowlevel from VFIO")
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 
-We definitely don't want multiple sysbuses.
+Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
 
-thanks
--- PMM
+> ---
+>   arch/s390/kvm/kvm-s390.c |  4 ++--
+>   arch/s390/kvm/pci.c      | 14 +++++++++++---
+>   2 files changed, 13 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index e20e126944aa..5c7f5f97ea09 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -510,7 +510,7 @@ int kvm_arch_init(void *opaque)
+>   		goto out;
+>   	}
+>   
+> -	if (kvm_s390_pci_interp_allowed()) {
+> +	if (IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM)) {
+>   		rc = kvm_s390_pci_init();
+>   		if (rc) {
+>   			pr_err("Unable to allocate AIFT for PCI\n");
+> @@ -532,7 +532,7 @@ int kvm_arch_init(void *opaque)
+>   void kvm_arch_exit(void)
+>   {
+>   	kvm_s390_gib_destroy();
+> -	if (kvm_s390_pci_interp_allowed())
+> +	if (IS_ENABLED(CONFIG_VFIO_PCI_ZDEV_KVM))
+>   		kvm_s390_pci_exit();
+>   	debug_unregister(kvm_s390_dbf);
+>   	debug_unregister(kvm_s390_dbf_uv);
+> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
+> index 90aaba80696a..c50c1645c0ae 100644
+> --- a/arch/s390/kvm/pci.c
+> +++ b/arch/s390/kvm/pci.c
+> @@ -672,23 +672,31 @@ int kvm_s390_pci_zpci_op(struct kvm *kvm, struct kvm_s390_zpci_op *args)
+>   
+>   int kvm_s390_pci_init(void)
+>   {
+> +	zpci_kvm_hook.kvm_register = kvm_s390_pci_register_kvm;
+> +	zpci_kvm_hook.kvm_unregister = kvm_s390_pci_unregister_kvm;
+> +
+> +	if (!kvm_s390_pci_interp_allowed())
+> +		return 0;
+> +
+>   	aift = kzalloc(sizeof(struct zpci_aift), GFP_KERNEL);
+>   	if (!aift)
+>   		return -ENOMEM;
+>   
+>   	spin_lock_init(&aift->gait_lock);
+>   	mutex_init(&aift->aift_lock);
+> -	zpci_kvm_hook.kvm_register = kvm_s390_pci_register_kvm;
+> -	zpci_kvm_hook.kvm_unregister = kvm_s390_pci_unregister_kvm;
+>   
+>   	return 0;
+>   }
+>   
+>   void kvm_s390_pci_exit(void)
+>   {
+> -	mutex_destroy(&aift->aift_lock);
+>   	zpci_kvm_hook.kvm_register = NULL;
+>   	zpci_kvm_hook.kvm_unregister = NULL;
+>   
+> +	if (!kvm_s390_pci_interp_allowed())
+> +		return;
+> +
+> +	mutex_destroy(&aift->aift_lock);
+> +
+>   	kfree(aift);
+>   }
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
