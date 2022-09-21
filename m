@@ -2,332 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B2BF5BF232
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 02:34:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F0EB5BF24B
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 02:42:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231451AbiIUAd4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Sep 2022 20:33:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34982 "EHLO
+        id S231191AbiIUAmm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Sep 2022 20:42:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231499AbiIUAdX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Sep 2022 20:33:23 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 493AF796BD
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 17:33:08 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id u6-20020a17090a1f0600b002039826d478so2057532pja.4
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 17:33:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date;
-        bh=+E7SBXFF/pN+H28Afkv9jB+NCJ3Rw0RTn5O7MGGdbKI=;
-        b=ibjIPgLF5I6AXlmJ3Q4IemgLaT/lgMJUAXwpoRB9fgiTq3B6/S+tqOgIvoh6kKlygY
-         pbNwcmMitpR9SNqtrp9b0UlUojZe823krBUrhHPCFgS3r1WU+fsCuetavBekqQaizwyl
-         EFFZIDW9cV9dCmoIkcWn6i3gNIeueZjT/aCM8tPasnvO2YUi4h3kS4dY21ok5rgmL3AF
-         PjTT6O0p+Z0vjiTZHuvxNmTO93XcMZyv7QubeTjUc8zeBsA7+CIjxALld5d6hRcnoM5F
-         zyFZVhAqUIW6q8v1obVpB2Az4u79i9Ija4UuoEBuDNhwQsJb9x2y4tydk9zYMieq2gVf
-         YX9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date;
-        bh=+E7SBXFF/pN+H28Afkv9jB+NCJ3Rw0RTn5O7MGGdbKI=;
-        b=HLNKwdsK+JvpcziluJsHMsEdm6/n+sK5lt7fn7RCycvQ3umR98jox2pSgIHSYu+JeZ
-         4qJDEJ0nZGlX9DE2BczVsi8JFt4YwcQSEHgif0R3/mEjZm1FNuz9gO482oMYzEEq8e0Y
-         1SzwRm0keb5/lj+ufo3Yx7QGQ2OgGENwObyoe7yMTQeJWmw4I0jW5FU5juTOCcUltKvU
-         NQDb45k+dGFm9PyBJATQEl/ozxKN8tA0ey2fGkgpJfZc53qvrht371VPC6wRjTUlphTC
-         LQWeaLpip9V+m41vtSTUblQPnjZLM9a3GDGlQqwsyDdR9t6xT7GDToFqztwpAI9Sgmg6
-         MbkA==
-X-Gm-Message-State: ACrzQf2INJ/8rqxp1sopq5SQqw/BnYgAYLfxoMBx8Ak8AGagKnC0OpQH
-        9YfmTrk4/kCl3OOC9/AAyEtTZts4LSQ=
-X-Google-Smtp-Source: AMsMyM7TuLtKOESiQvzHqCTa5KhMYj9IIW+qSKhLxtvGrcIaF1YkZxOSI6ORJl97kE9caeim7Hm4LdKYiHE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:b08b:b0:178:48b6:f5a8 with SMTP id
- p11-20020a170902b08b00b0017848b6f5a8mr2132543plr.3.1663720387879; Tue, 20 Sep
- 2022 17:33:07 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 21 Sep 2022 00:32:01 +0000
-In-Reply-To: <20220921003201.1441511-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20220921003201.1441511-1-seanjc@google.com>
-X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
-Message-ID: <20220921003201.1441511-13-seanjc@google.com>
-Subject: [PATCH v4 12/12] KVM: remove KVM_REQ_UNHALT
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Atish Patra <atishp@atishpatra.org>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229599AbiIUAmk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Sep 2022 20:42:40 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2065.outbound.protection.outlook.com [40.107.237.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61E4743630
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 17:42:39 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bausAykDV/ib5wkwsxpD+Wkqw9PUUoa+xUii+rDEtICUG8FMUwrK+n4n9ba8y7tRzuNdxhx2aF9+ml3s7BR/YZmBNIojHS1MN7Qli6Kqs5kHfW+A4ZngVW07zncyuBd6dXo6iUYNl/qo/8ghoIF1cQJEMItgnizdDSi2PUnb75OgIOVmT6jfea8r5gyd37sp593ssEzmXUdS8qhWylXMc9IZ5G+VU7MY71uKYbnZp+eL/ZaFqfGs62mdH8DGduIoJKnc5HJRi79R6RwcHU1Kb9s42s6BB3IVQUQIONBGNRuyCoMicWT+2oLLWvrH99u23vhSqc3qrPTQzLdCO3nikQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZzcaZAC5R20MfK5sCFZSkBJnVnRfgWiqa4Yf/OdIBL4=;
+ b=IMIoFmgC4qkrZpT7w4TBBs2vdvSFjhP8aRyjHXkv1eevvZihZxiHck7XXxo+qDh6e7FaMwBVPEUMsV08jHWHvGjpXr7eS40fPhSo4rwOXj6pYUYOBIGbN5jnyPP4aKFfK8RLn8lt0nXReIzqLwDBzOR/VKBQrLSQDeBi1bkGVYzhQW3bAqrem0GVESNIBTCjzBqyLUGRpD8PrAeyLPq1bG0WFblWbXCaaHqfYHgcU4LhSq9IXr1QCESZ5zPmhykKiELgHvpssTtYLF+a3SWEt3Ki8mEcipU9jI950HnqOQovadViHbyx1G38hF8r0eyAXiJgjMPIUKqLvgNpDv8ylw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZzcaZAC5R20MfK5sCFZSkBJnVnRfgWiqa4Yf/OdIBL4=;
+ b=h9aW1vFr84J6XZAPEklKc4vxhYKLDwAyzSq9nFs3OsFCzjjkPOvMH5V+9OIne4zmXa8bio/dxwYQCExOVms0VsostlzrEM2t1lEyJdOh9Ojaf+Lm2B12OqbylnHl84tugzGMglXpziQhhLcCczBzjPJhFA16xgg4b4WQji88bC+K/kuVeXJrcJERPktNYu1GT4n3J/oegxobGi+8sNH8iFvntaa/ScS93OshtNnuFXQBli7+eFvAWPbQ5jxDMv8XLub3dWqn4MU+MJXSE/grviqo0Ps2tQ7nQ73ciVgXN9rbDrdzlcfo+SQ5PDCXmLY04WorG3gl5dmSz2kh4qOv6w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH2PR12MB4181.namprd12.prod.outlook.com (2603:10b6:610:a8::16)
+ by MW3PR12MB4426.namprd12.prod.outlook.com (2603:10b6:303:58::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5632.21; Wed, 21 Sep
+ 2022 00:42:37 +0000
+Received: from CH2PR12MB4181.namprd12.prod.outlook.com
+ ([fe80::3d9f:c18a:7310:ae46]) by CH2PR12MB4181.namprd12.prod.outlook.com
+ ([fe80::3d9f:c18a:7310:ae46%8]) with mapi id 15.20.5632.021; Wed, 21 Sep 2022
+ 00:42:37 +0000
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+Cc:     Kevin Tian <kevin.tian@intel.com>
+Subject: [PATCH v2 0/8] vfio: Split the container code into a clean layer and dedicated file
+Date:   Tue, 20 Sep 2022 21:42:28 -0300
+Message-Id: <0-v2-d7744ee9cf4f+33d-vfio_container_split_jgg@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MN2PR16CA0042.namprd16.prod.outlook.com
+ (2603:10b6:208:234::11) To CH2PR12MB4181.namprd12.prod.outlook.com
+ (2603:10b6:610:a8::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PR12MB4181:EE_|MW3PR12MB4426:EE_
+X-MS-Office365-Filtering-Correlation-Id: 108ff167-e3c0-47b9-ed32-08da9b6a2e5c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: UsTRPl3JhFeToLHPUGyOvPuVkEE59QqsGJ0BKWqXlae/DJ30A85Ww0xXb6Qgp8MNY90K0yKLeAcPzeex9izlnmbrPqyFqsoknjJI3C/mCbEtrKykoezo3IldFceKiW5H8MmEr3rxTPOCqRJrVYPbbpZ/jfXJAPLFn+WXJV9/rIX0uk8z0cN4ezlcvFj9DhBZ+yUyBGljs/fZXI62LBRfSwVkwfSZMLfa4kPAoL5GIArsGmrOo4OhkWgKVK/+NnSowpEEOhr4V9kHw/z4iyywqi+mhfyNBMDN4Lcxik1OQO0D8XPUZctumONRCK//uc5LdJxKySQHbg1d7Y9WFBHoWV7CMnszAGx1rExjIZ2xGqGwHzPdjVcLlNlgFlOuUu7mqsYhl/+I7ubH+EDkF2DdpHQ69rUGyIls/vW8/I9lHFE9vpV9u/zCgUMuKW6sF+22yoFeQxjuj9AMp3qh4ekbwfv+OsEFbRXhv1fqT4cG5oFH2uZTfF2pFAii1eKl/iJqll89dH0XbglbLMlkLyCahS/fZN3QmENc66EHlzB1pu306M1uo/NsGwN3toSwQxKd1H0Lo6+XCC0elPPb/3l5hFPImugxmfFTF36Hg2IJWessrX3N7CA9TaRxKcRPKxXp/Lo9/IRv/SVbj1XopyqGsJDInZT2HyqWpnaTkrNhmGYLvIefwRZnb/MMMwVE8/te1Rs0NZsNZ7iL+OACC03h8l01Ti6A6kfTDW/mkwuuRvBVg6/fyqY/YnRm0dMVI8HCUV8n0sxv3OqDqmHOrO/v92C6mT8QHWUXajvsP6HqtkyDC2jZPLMQqycCurQ4lcSo008M9x+swCjxmCGRnmI3sBFkyKjsHzH0fQHMzlzbJ9mr3F7MOZtxskzjO0NZVCa2
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB4181.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(136003)(39860400002)(376002)(396003)(346002)(451199015)(38100700002)(8676002)(6512007)(41300700001)(316002)(83380400001)(110136005)(36756003)(86362001)(478600001)(2906002)(2616005)(26005)(6486002)(966005)(6506007)(5660300002)(66556008)(8936002)(66476007)(186003)(4326008)(66946007)(6666004)(4216001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?lTqQfBz2iXB2ZhMOdqbgPkvauQ7BmHaXcKJvRBkaGexAkTvzaUqGRm9r9P6S?=
+ =?us-ascii?Q?AOFVEu48Crcn3AsNIPvssGPaMvI7y0cDKylzr2tWDhJ8/gIV4TwKpK7WM0sE?=
+ =?us-ascii?Q?HCuSkxQ+XtNY4RL1Mo85i2mLh5xaYkrGap5wAzpZGL0UtWyBDunmTgj547wX?=
+ =?us-ascii?Q?C31Ood7FXLVqdJsN5JU5O6UH2HbmgQehkqK1wItljzuYxPjTYdHHYd0rvpVH?=
+ =?us-ascii?Q?NKifMsWqhWTYec7DcABHj0427vp16E9ORyVXQi5sL3uNPuOL197RO6N2nDYN?=
+ =?us-ascii?Q?H60E7N8Du1cVkLJwhC8ohs2lu7KrICQjopvHcAxkPpvMqgMKqDvvRFtDfxhi?=
+ =?us-ascii?Q?g/v4fFGi7t3FokBLngDkwfcB6Ks6k8LTodC6Gj9p78gskxc+GBZ0Y4/gFY06?=
+ =?us-ascii?Q?/u0JHwX91Y0WMI33U3jx7yw0tEtcup+JNReuI8T9zdQvSycIqcgU6Of9P17n?=
+ =?us-ascii?Q?bbeUqLA36SHPhNXsBNbyYY513k2JAda3v+7ir7rEHlxXXAMdc7non+IlzY28?=
+ =?us-ascii?Q?DpxaqyUPjtJk/tB5D529nSGBUgbcdMbuJRQLAHQEda7+3gYadIF0l8MLaCw/?=
+ =?us-ascii?Q?j8t0lPPrrb2QdCZlJzCdmuupNczPmOl8ylatgxH0emZIny/81KB8MnPLYLSQ?=
+ =?us-ascii?Q?Byd9L8B1Om3WhHDrYU8UYM+4QXpC0HKg7IGizeWBvuJMwfb/tth7muKJN/KC?=
+ =?us-ascii?Q?GulQlUyUsamxjFiFFhJbKZaVFtBXU89OFj2+QLN+7RR69xuCZibOQdcXCJNg?=
+ =?us-ascii?Q?WYHy1DVj1qAMJjymU7TlXwtwy8Wh6sFfFHlhJ0xFIfPskK975LTT7wbuL2Xy?=
+ =?us-ascii?Q?Wzelgu74+cB8LsDkU4+m1yiGw3cmTQ050c5YteMXFWhPsqGUR00ngOO3XLaL?=
+ =?us-ascii?Q?wnv3FZwuiBDO4+L+Z6y6Fp3o3BR9iIUYdQ9clXjO4tRosSZ8YaIkYt3Peyoa?=
+ =?us-ascii?Q?L6kH43kD3LTZWzhGAsG3m4BxGcQ5RX8w+GeD3B7Voe5eBEPzkpDhxpRZZnZg?=
+ =?us-ascii?Q?d4OOpT6BnfM8IGROno/84v7CV8b5gMICx6rKmy4P6ApDktuHR3r0/t2ILDb5?=
+ =?us-ascii?Q?wsf1n0Xjg8Xln1m+NngaWuGN3Ev7nDzn1gzX4n14El8bhl9V5X0eSJjE3JGr?=
+ =?us-ascii?Q?icld0GOOVvYasXu4XakwJYFx4xWD5NqVUfjh1SKkVbzQCCu8oaFZJ44DR0xT?=
+ =?us-ascii?Q?wH1HH45ehTpjJ1XcTWmhncHgCwV0SCmXmmqUax98XtgaKTUfP3Qb19JJsDou?=
+ =?us-ascii?Q?EHmyi+cZ0UUhvmrya56tk7gdWQyFJBzbUcbtqi+rIkLxdGVVIqFkgHoINZgM?=
+ =?us-ascii?Q?j95l3GYI8A47+ZrT9KlAmAxcsn5ZDXfFrbpHFhfyjSU+E72Fs27guzjnmq4C?=
+ =?us-ascii?Q?RyCwcpRohNUog9KxGgvU8NR2HS5Yo4hj9RvKCy4BnEOKNHGhamwD7eMpitkN?=
+ =?us-ascii?Q?ptTevlQif1EuoyUhpd6POIekYKDf5Kb/N2QPOTHUtIlFpG11PT5gV96MFuMa?=
+ =?us-ascii?Q?H5C6y0tgjn3G22W2uzCV5EbdB3CfgJZI6GUDwxFKA76PMuT5RTLtwLurGRUI?=
+ =?us-ascii?Q?TfhkgwhU6hQHMw6Nl2KTH7NlTw0429D3+01bQNce?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 108ff167-e3c0-47b9-ed32-08da9b6a2e5c
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4181.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2022 00:42:37.3964
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dbDZ8x8Q/e8iUDm1snJEh4nECxbqamfZPs10fz3sgeAjzMiOICgxn4cLonVkr0KT
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4426
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+This creates an isolated layer around the container FD code and everything
+under it, including the VFIO iommu drivers. All this code is placed into
+container.c, along with the "struct vfio_container" to compartmentalize
+it.
 
-KVM_REQ_UNHALT is now unnecessary because it is replaced by the return
-value of kvm_vcpu_block/kvm_vcpu_halt.  Remove it.
+Future patches will provide an iommufd based layer that gives the same API
+as the container layer and choose which layer to go to based on how
+userspace operates.
 
-No functional change intended.
+The patches continue to split up existing functions and finally the last
+patch just moves every function that is a "container" function to the new
+file and creates the global symbols to link them together.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- Documentation/virt/kvm/vcpu-requests.rst | 28 +-----------------------
- arch/arm64/kvm/arm.c                     |  1 -
- arch/mips/kvm/emulate.c                  |  1 -
- arch/powerpc/kvm/book3s_pr.c             |  1 -
- arch/powerpc/kvm/book3s_pr_papr.c        |  1 -
- arch/powerpc/kvm/booke.c                 |  1 -
- arch/powerpc/kvm/powerpc.c               |  1 -
- arch/riscv/kvm/vcpu_insn.c               |  1 -
- arch/s390/kvm/kvm-s390.c                 |  2 --
- arch/x86/kvm/x86.c                       |  3 ---
- arch/x86/kvm/xen.c                       |  1 -
- include/linux/kvm_host.h                 |  3 +--
- virt/kvm/kvm_main.c                      |  4 +---
- 13 files changed, 3 insertions(+), 45 deletions(-)
+Cross-file container functions are prefixed with vfio_container_* for
+clarity.
 
-diff --git a/Documentation/virt/kvm/vcpu-requests.rst b/Documentation/virt/kvm/vcpu-requests.rst
-index 31f62b64e07b..87f04c1fa53d 100644
---- a/Documentation/virt/kvm/vcpu-requests.rst
-+++ b/Documentation/virt/kvm/vcpu-requests.rst
-@@ -97,7 +97,7 @@ VCPU requests are simply bit indices of the ``vcpu->requests`` bitmap.
- This means general bitops, like those documented in [atomic-ops]_ could
- also be used, e.g. ::
- 
--  clear_bit(KVM_REQ_UNHALT & KVM_REQUEST_MASK, &vcpu->requests);
-+  clear_bit(KVM_REQ_UNBLOCK & KVM_REQUEST_MASK, &vcpu->requests);
- 
- However, VCPU request users should refrain from doing so, as it would
- break the abstraction.  The first 8 bits are reserved for architecture
-@@ -126,17 +126,6 @@ KVM_REQ_UNBLOCK
-   or in order to update the interrupt routing and ensure that assigned
-   devices will wake up the vCPU.
- 
--KVM_REQ_UNHALT
--
--  This request may be made from the KVM common function kvm_vcpu_block(),
--  which is used to emulate an instruction that causes a CPU to halt until
--  one of an architectural specific set of events and/or interrupts is
--  received (determined by checking kvm_arch_vcpu_runnable()).  When that
--  event or interrupt arrives kvm_vcpu_block() makes the request.  This is
--  in contrast to when kvm_vcpu_block() returns due to any other reason,
--  such as a pending signal, which does not indicate the VCPU's halt
--  emulation should stop, and therefore does not make the request.
--
- KVM_REQ_OUTSIDE_GUEST_MODE
- 
-   This "request" ensures the target vCPU has exited guest mode prior to the
-@@ -297,21 +286,6 @@ architecture dependent.  kvm_vcpu_block() calls kvm_arch_vcpu_runnable()
- to check if it should awaken.  One reason to do so is to provide
- architectures a function where requests may be checked if necessary.
- 
--Clearing Requests
-------------------
--
--Generally it only makes sense for the receiving VCPU thread to clear a
--request.  However, in some circumstances, such as when the requesting
--thread and the receiving VCPU thread are executed serially, such as when
--they are the same thread, or when they are using some form of concurrency
--control to temporarily execute synchronously, then it's possible to know
--that the request may be cleared immediately, rather than waiting for the
--receiving VCPU thread to handle the request in VCPU RUN.  The only current
--examples of this are kvm_vcpu_block() calls made by VCPUs to block
--themselves.  A possible side-effect of that call is to make the
--KVM_REQ_UNHALT request, which may then be cleared immediately when the
--VCPU returns from the call.
--
- References
- ==========
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 2ff0ef62abad..4f949b64fdc9 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -666,7 +666,6 @@ void kvm_vcpu_wfi(struct kvm_vcpu *vcpu)
- 
- 	kvm_vcpu_halt(vcpu);
- 	vcpu_clear_flag(vcpu, IN_WFIT);
--	kvm_clear_request(KVM_REQ_UNHALT, vcpu);
- 
- 	preempt_disable();
- 	vgic_v4_load(vcpu);
-diff --git a/arch/mips/kvm/emulate.c b/arch/mips/kvm/emulate.c
-index 1d7c56defe93..edaec93a1a1f 100644
---- a/arch/mips/kvm/emulate.c
-+++ b/arch/mips/kvm/emulate.c
-@@ -958,7 +958,6 @@ enum emulation_result kvm_mips_emul_wait(struct kvm_vcpu *vcpu)
- 		 * We are runnable, then definitely go off to user space to
- 		 * check if any I/O interrupts are pending.
- 		 */
--		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
- 		if (kvm_arch_vcpu_runnable(vcpu))
- 			vcpu->run->exit_reason = KVM_EXIT_IRQ_WINDOW_OPEN;
- 	}
-diff --git a/arch/powerpc/kvm/book3s_pr.c b/arch/powerpc/kvm/book3s_pr.c
-index d6abed6e51e6..9fc4dd8f66eb 100644
---- a/arch/powerpc/kvm/book3s_pr.c
-+++ b/arch/powerpc/kvm/book3s_pr.c
-@@ -499,7 +499,6 @@ static void kvmppc_set_msr_pr(struct kvm_vcpu *vcpu, u64 msr)
- 	if (msr & MSR_POW) {
- 		if (!vcpu->arch.pending_exceptions) {
- 			kvm_vcpu_halt(vcpu);
--			kvm_clear_request(KVM_REQ_UNHALT, vcpu);
- 			vcpu->stat.generic.halt_wakeup++;
- 
- 			/* Unset POW bit after we woke up */
-diff --git a/arch/powerpc/kvm/book3s_pr_papr.c b/arch/powerpc/kvm/book3s_pr_papr.c
-index a1f2978b2a86..b2c89e850d7a 100644
---- a/arch/powerpc/kvm/book3s_pr_papr.c
-+++ b/arch/powerpc/kvm/book3s_pr_papr.c
-@@ -393,7 +393,6 @@ int kvmppc_h_pr(struct kvm_vcpu *vcpu, unsigned long cmd)
- 	case H_CEDE:
- 		kvmppc_set_msr_fast(vcpu, kvmppc_get_msr(vcpu) | MSR_EE);
- 		kvm_vcpu_halt(vcpu);
--		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
- 		vcpu->stat.generic.halt_wakeup++;
- 		return EMULATE_DONE;
- 	case H_LOGICAL_CI_LOAD:
-diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
-index 06c5830a93f9..7b4920e9fd26 100644
---- a/arch/powerpc/kvm/booke.c
-+++ b/arch/powerpc/kvm/booke.c
-@@ -719,7 +719,6 @@ int kvmppc_core_prepare_to_enter(struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.shared->msr & MSR_WE) {
- 		local_irq_enable();
- 		kvm_vcpu_halt(vcpu);
--		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
- 		hard_irq_disable();
- 
- 		kvmppc_set_exit_type(vcpu, EMULATED_MTMSRWE_EXITS);
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index fb1490761c87..ec9c1e3c2ff4 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -239,7 +239,6 @@ int kvmppc_kvm_pv(struct kvm_vcpu *vcpu)
- 	case EV_HCALL_TOKEN(EV_IDLE):
- 		r = EV_SUCCESS;
- 		kvm_vcpu_halt(vcpu);
--		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
- 		break;
- 	default:
- 		r = EV_UNIMPLEMENTED;
-diff --git a/arch/riscv/kvm/vcpu_insn.c b/arch/riscv/kvm/vcpu_insn.c
-index 7eb90a47b571..0bb52761a3f7 100644
---- a/arch/riscv/kvm/vcpu_insn.c
-+++ b/arch/riscv/kvm/vcpu_insn.c
-@@ -191,7 +191,6 @@ void kvm_riscv_vcpu_wfi(struct kvm_vcpu *vcpu)
- 		kvm_vcpu_srcu_read_unlock(vcpu);
- 		kvm_vcpu_halt(vcpu);
- 		kvm_vcpu_srcu_read_lock(vcpu);
--		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
- 	}
- }
- 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index edfd4bbd0cba..aa39ea4582bd 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -4343,8 +4343,6 @@ static int kvm_s390_handle_requests(struct kvm_vcpu *vcpu)
- 		goto retry;
- 	}
- 
--	/* nothing to do, just clear the request */
--	kvm_clear_request(KVM_REQ_UNHALT, vcpu);
- 	/* we left the vsie handler, nothing to do, just clear the request */
- 	kvm_clear_request(KVM_REQ_VSIE_RESTART, vcpu);
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8b1ff7e91ecb..8927f37a07c9 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10811,8 +10811,6 @@ static inline int vcpu_block(struct kvm_vcpu *vcpu)
- 		if (hv_timer)
- 			kvm_lapic_switch_to_hv_timer(vcpu);
- 
--		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
--
- 		/*
- 		 * If the vCPU is not runnable, a signal or another host event
- 		 * of some kind is pending; service it without changing the
-@@ -11032,7 +11030,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 			r = 0;
- 			goto out;
- 		}
--		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
- 		r = -EAGAIN;
- 		if (signal_pending(current)) {
- 			r = -EINTR;
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 280cb5dc7341..93c628d3e3a9 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -1065,7 +1065,6 @@ static bool kvm_xen_schedop_poll(struct kvm_vcpu *vcpu, bool longmode,
- 			del_timer(&vcpu->arch.xen.poll_timer);
- 
- 		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
--		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
- 	}
- 
- 	vcpu->arch.xen.poll_evtchn = 0;
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 04c7e5f2f727..32f259fa5801 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -151,12 +151,11 @@ static inline bool is_error_page(struct page *page)
- #define KVM_REQUEST_NO_ACTION      BIT(10)
- /*
-  * Architecture-independent vcpu->requests bit members
-- * Bits 4-7 are reserved for more arch-independent bits.
-+ * Bits 3-7 are reserved for more arch-independent bits.
-  */
- #define KVM_REQ_TLB_FLUSH         (0 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_VM_DEAD           (1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
- #define KVM_REQ_UNBLOCK           2
--#define KVM_REQ_UNHALT            3
- #define KVM_REQUEST_ARCH_BASE     8
- 
- /*
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index dcf47da44844..26383e63d9dd 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3409,10 +3409,8 @@ static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
- 	int ret = -EINTR;
- 	int idx = srcu_read_lock(&vcpu->kvm->srcu);
- 
--	if (kvm_arch_vcpu_runnable(vcpu)) {
--		kvm_make_request(KVM_REQ_UNHALT, vcpu);
-+	if (kvm_arch_vcpu_runnable(vcpu))
- 		goto out;
--	}
- 	if (kvm_cpu_has_pending_timer(vcpu))
- 		goto out;
- 	if (signal_pending(current))
+The last patch can be defered and queued during the merge window to manage
+conflicts. The earlier patches should be fine immediately conflicts wise.
+
+This is the last big series I have to enable basic iommufd functionality.
+As part of the iommufd series the entire container.c becomes conditionally
+compiled:
+
+https://github.com/jgunthorpe/linux/commits/vfio_iommufd
+
+v2:
+ - Rename s/vfio_container_detatch_group/vfio_group_detach_container/
+          s/vfio_container_register_device/vfio_device_container_register/
+          s/vfio_container_unregister_device/vfio_device_container_unregister/
+ - Change argument order of vfio_container_attach_group()
+ - Rebased onto merged patches
+v1: https://lore.kernel.org/r/0-v1-a805b607f1fb+17b-vfio_container_split_jgg@nvidia.com
+
+Jason Gunthorpe (8):
+  vfio: Add header guards and includes to drivers/vfio/vfio.h
+  vfio: Rename __vfio_group_unset_container()
+  vfio: Split the container logic into vfio_container_attach_group()
+  vfio: Remove #ifdefs around CONFIG_VFIO_NOIOMMU
+  vfio: Split out container code from the init/cleanup functions
+  vfio: Rename vfio_ioctl_check_extension()
+  vfio: Split the register_device ops call into functions
+  vfio: Move container code into drivers/vfio/container.c
+
+ drivers/vfio/Makefile    |   1 +
+ drivers/vfio/container.c | 680 +++++++++++++++++++++++++++++++++++++
+ drivers/vfio/vfio.h      |  56 ++++
+ drivers/vfio/vfio_main.c | 708 ++-------------------------------------
+ 4 files changed, 765 insertions(+), 680 deletions(-)
+ create mode 100644 drivers/vfio/container.c
+
+
+base-commit: 245898eb9275ce31942cff95d0bdc7412ad3d589
 -- 
-2.37.3.968.ga6b4b080e4-goog
+2.37.3
 
