@@ -2,79 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8896F5C0099
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 17:00:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8F975C00D0
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 17:11:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230241AbiIUPAr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 11:00:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46266 "EHLO
+        id S229986AbiIUPLp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 11:11:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229976AbiIUPA0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Sep 2022 11:00:26 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD70B491D9
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 08:00:08 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id e68so6210132pfe.1
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 08:00:08 -0700 (PDT)
+        with ESMTP id S229827AbiIUPLm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Sep 2022 11:11:42 -0400
+Received: from mail-oa1-x2e.google.com (mail-oa1-x2e.google.com [IPv6:2001:4860:4864:20::2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83679868BE
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 08:11:41 -0700 (PDT)
+Received: by mail-oa1-x2e.google.com with SMTP id 586e51a60fabf-127ba06d03fso9513806fac.3
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 08:11:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=ZOknaCryBKAmeWlgxRHW7gHjFXTydOeqelKEYGngjXY=;
-        b=PUy7PwdFlbjhMX+HV+EVVByukRTiTcclVk3Gh3p29DOE3kIfB0GQWHxiBypE8wQ1I2
-         Z5KsAhe1HJRtTwOCCXQgvQEzICZJtmMFMOpDNQxGCsTzN/b/f+FD0mW6fiXKpEWlRd3G
-         1hbZjt6pUwie9IkNCMPRDBPRr4YHkFKa1A1n8eqWs2/IBaB0pJ8wbZyvex1sCP9EH9l6
-         kFM+ajhQLhkRUtyScLSy4cUh4d7F40UEFDeYx/rloGyLfbI/90SvFmQ86dIlhrFt5ZrW
-         pU1sv0zA8Z0uwHPeyZFnsh8JB1kcn4F5q3BI+r644UPVJex3SCEzi3X6T7dCFHMw73hQ
-         9FCA==
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date;
+        bh=6seli6VLFqb7s/vLQoso8OmUADmAW+pE7vYAGBPbbyI=;
+        b=etjpJoNXGVkFiG4OBJic4LPqZtmTQ0n9boz4HdSEyiDdllFPXuw6S1ue1xA4TlUZJG
+         9BRy2EhSuzebayCVEbJm+s0/cFkbE1bvzWyZTx2MqIjPX1PJbEvGc+YHb2dVoPkh2/Dl
+         gFh2S4sDw25wTzzAN/pkUGhOyBZkwNsve9zNrBzyxiOZa1X/CCq9MmKTD24Tap7kwsFk
+         bVp4yYaza39DrFr/eTWqZQnDYMz8BhfekoJFIlWLliIpISSWsqLF4LsKk3SZSd6YaIOC
+         e5yMgri9SqbX27lRYPvcDR6wQues28X68ubh//td0FFnrU1EjbyEan0Y5L3A4SUUuZwC
+         g99g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=ZOknaCryBKAmeWlgxRHW7gHjFXTydOeqelKEYGngjXY=;
-        b=WbpxE6xYqijEAxBr+QwS2xPv4zuOo4P5C/0s35m7V5zmMJrURKwu/Pv0ORsAPmB/TH
-         KN5b/B0SPyfMIQSwp+uqGqzzImulmiMafwAHbK16PNJ6A3xCKr3W0pAEqOfY8WU5GV7W
-         nnVPbYOQSSwIZWtqgmnX8GdWHypk51VUWLtA9EC/it6hwmvN1G0spc52EVU7VevJw/8q
-         2oct7ZrJiyVc4jTlFwkQ+4mChdf+S5M3gPXWaib4cnX5w6eR/GlRKgSnKMXMcX4NE+k7
-         ufoQkozdYrkiexVWM5miusTGaCsfdr/KUfepjwren1gG67JrTj9K3TQ0+29WaadI6XXZ
-         VQ6g==
-X-Gm-Message-State: ACrzQf2zDJnz9xyx/m4DYsdfrPUDiNM0x5RFSKSO1JHaHZGkYiw2SLnH
-        drUH0qYaoFHUZbVUVcnUdpWfPA==
-X-Google-Smtp-Source: AMsMyM6IzBR+IPGklvkXyceN25rdGLZW+kwuaS+8kPvv30SaIVCr6t2lDehTPAThSJ/06p88g02mIw==
-X-Received: by 2002:a63:e352:0:b0:42b:dc03:cc38 with SMTP id o18-20020a63e352000000b0042bdc03cc38mr24169745pgj.545.1663772407953;
-        Wed, 21 Sep 2022 08:00:07 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id v9-20020aa799c9000000b00540d03f522fsm2304782pfi.66.2022.09.21.08.00.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Sep 2022 08:00:07 -0700 (PDT)
-Date:   Wed, 21 Sep 2022 15:00:03 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Gerd Hoffmann <kraxel@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] kvm/x86: reserve bit
- KVM_HINTS_PHYS_ADDRESS_SIZE_DATA_VALID
-Message-ID: <Yysm8/Nkt6EUI5+k@google.com>
-References: <20220908114146.473630-1-kraxel@redhat.com>
- <YxoBtD+3sgEEiaFF@google.com>
- <20220909050224.rzlt4x7tjrespw3k@sirius.home.kraxel.org>
- <20220921134246.xibospqoktp4wjie@sirius.home.kraxel.org>
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=6seli6VLFqb7s/vLQoso8OmUADmAW+pE7vYAGBPbbyI=;
+        b=Ydli+ot99jdaaKRpvLO0/AcsF++q8MN0YgOD+N2XgBec1E0h8a/W/RwInXx90444MP
+         HraBlZDkejGVnoVbJ8yjgXazA2szEeoS2QRfwQzUsPJsf4mS1gRuTnUX9sQOKrYEDrHP
+         Z3AMIuEtOvfgD8msRprbs8NAcMx1Yck8saX9QV0Fr/qGwv7v7YWCqeFcmUZFOcg1Lczt
+         5VeDEMGKZ0YXYwrHPkcTElB0+lIKeTEzcysV3FpMAYgfHa0EhvXEanu2jZF+jcieTL9y
+         tYixQknBpnEmsFrEbsfmfFZCyx+zGGH0b81KYG5CEVuXjwpqdRz1I7/2+UrbBfNHEGxJ
+         bPfg==
+X-Gm-Message-State: ACrzQf2y2EFg3G08ZGyNVv111f0zj65Mt9GnlXxcgPA+mX0TsEyZsHB9
+        jXKWmIjxnRLqYNZoD9ljE1UnHF0AFgKM/U4E3iUrjw==
+X-Google-Smtp-Source: AMsMyM6oBh2n+kuTR831V6c4Bg71RfUVnJpPesV6bfkJahpbjin8CoSac13b1yjmp7HgvXVEouGnXaa8w42JX7u3rj0=
+X-Received: by 2002:a05:6870:580c:b0:12a:f136:a8f5 with SMTP id
+ r12-20020a056870580c00b0012af136a8f5mr5207627oap.269.1663773100626; Wed, 21
+ Sep 2022 08:11:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220921134246.xibospqoktp4wjie@sirius.home.kraxel.org>
+References: <20220920205922.1564814-1-jmattson@google.com> <Yyot34LGkFR2/j5f@zn.tnic>
+ <CALMp9eQijCKS-E_OWJkxdqAur3BthciOWEtEPH5YKd0-HJiQQA@mail.gmail.com>
+ <YyrZOLq8z+lIORvP@zn.tnic> <CALMp9eRG6g-95zCxTD1NnxpZ+Vm6VMTA0_uaHV=b-hDkeOYSuA@mail.gmail.com>
+ <YysXeXKY36yXj68q@zn.tnic>
+In-Reply-To: <YysXeXKY36yXj68q@zn.tnic>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 21 Sep 2022 08:11:29 -0700
+Message-ID: <CALMp9eTuO79+NfHxLi8FnqdOpzXO7eQUntvN23EfR+shg+wg2Q@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] KVM: EFER.LMSLE cleanup
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,37 +76,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 21, 2022, Gerd Hoffmann wrote:
-> On Fri, Sep 09, 2022 at 07:02:24AM +0200, Gerd Hoffmann wrote:
-> > On Thu, Sep 08, 2022 at 02:52:36PM +0000, Sean Christopherson wrote:
-> > > On Thu, Sep 08, 2022, Gerd Hoffmann wrote:
-> > > > -#define KVM_HINTS_REALTIME      0
-> > > > +#define KVM_HINTS_REALTIME                      0
-> > > > +#define KVM_HINTS_PHYS_ADDRESS_SIZE_DATA_VALID  1
-> > > 
-> > > Why does KVM need to get involved?  This is purely a userspace problem.
-> > 
-> > It doesn't.  I only need reserve a hints bit, and the canonical source
-> > for that happens to live in the kernel.  That's why this patch doesn't
-> > touch any actual code ;)
+On Wed, Sep 21, 2022 at 6:54 AM Borislav Petkov <bp@alien8.de> wrote:
+>
+> On Wed, Sep 21, 2022 at 06:45:24AM -0700, Jim Mattson wrote:
+> > EFER.LMLSE is not a reserved bit on AMD64 CPUs, unless
+> > CPUID.80000008:EBX[20] is set (or you're running very, very old
+> > hardware).
+> >
+> > We really shouldn't just decide on a whim to treat EFER.LMSLE as
+> > reserved under KVM. The guest CPUID information represents our
+> > detailed contract with the guest software. By setting
+> > CPUID.80000008:EBX[20], we are telling the guest that if it tries to
+> > set EFER.LMSLE, we will raise a #GP.
+>
+> I understand all that. What I'm asking is, what happens in KVM *after*
+> your patch 1/3 is applied when a guest tries to set EFER.LMSLE? Does it
+> #GP or does it allow the WRMSR to succeed? I.e., does KVM check when
+> reserved bits in that MSR are being set?
+>
+> By looking at it, there's kvm_enable_efer_bits() so it looks like KVM
+> does control which bits are allowed to set and which not...?
 
-The issue is that this "hint" effectively breaks other VMMs that already provide
-an accurate guest.MAXPHYADDR.
+Yes, after the revert, KVM will treat the bit as reserved, and it will
+synthesize a #GP, *in violation of the architectural specification.*
+As I said, we could document this behavior as a KVM erratum.
 
-> > > E.g. why not use QEMU's fw_cfg to communicate this information to the
-> > > guest?
-> > 
-> > That is indeed the other obvious way to implement this.  Given this
-> > information will be needed in code paths which already do CPUID queries
-> > using CPUID to transport that information looked like the better option
-> > to me.
-> 
-> I'd like to move forward with this.
-> 
-> So, any comment further comments and opinions?
-> Is it ok to grab a hints bit given the explanation above?
-> Or should I go for the fw_cfg approach?
+> > If we don't set that bit in the guest CPUID information and we raise
+> > #GP on an attempt to set EFER.LMSLE, the virtual hardware is
+> > defective.
+>
+> See, this is what I don't get - why is it defective? After the revert,
+> that bit to KVM is reserved.
 
-My strong preference is the fw_cfg approach, or if the guest side really wants to
-use CPUID, have QEMU define it's own CPUID signature and provide QEMU-specific
-hints/quirks that way.
+KVM can't just decide willy nilly to reserve arbitrary bits. If it is
+in violation of AMD's architectural specification, the virtual CPU is
+defective.
+
+> > We could document this behavior as an erratum, but since a
+> > mechanism exists to declare that the guest can expect EFER.LMSLE to
+> > #GP, doesn't it make sense to use it?
+>
+> I don't mind all that and the X86_FEATURE bit and so on - I'm just
+> trying to ask you guys: what is KVM's behavior when the guest tries to
+> set a reserved EFER bit.
+>
+> Maybe I'm not expressing myself precisely enough...
+
+I feel the same way. :-(
+
+The two patches after the revert are to amend the contract with the
+guest (as expressed by the guest CPUID table) so that the KVM virtual
+CPU can raise a #GP on EFER.LMSLE and still conform to the
+architectural specification.
+
+From the APM, volume 2, 4.12.2 Data Limit Checks in 64-bit Mode:
+
+> Data segment limit checking in 64-bit mode is not supported by all proces=
+sor implementations and has been deprecated. If CPUID Fn8000_0008_EBX[EferL=
+mlseUnsupported](bit 20) =3D 1, 64-bit mode segment limit checking is not s=
+upported and attempting to enable this feature by setting EFER.LMSLE =3D1 w=
+ill result in a #GP exception.
