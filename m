@@ -2,71 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E57625E5460
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 22:16:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 285545E54A9
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 22:44:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231139AbiIUUQ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 16:16:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36098 "EHLO
+        id S229522AbiIUUoJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 16:44:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230496AbiIUUQT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Sep 2022 16:16:19 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42344A4B05
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 13:16:17 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id r126-20020a632b84000000b004393806c06eso3997248pgr.4
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 13:16:16 -0700 (PDT)
+        with ESMTP id S229543AbiIUUoH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Sep 2022 16:44:07 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 560769DFAF
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 13:44:06 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id 69-20020a630148000000b0043bbb38f75bso3253761pgb.6
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 13:44:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date;
-        bh=lpyPWQxXRZTNHwtFSxl2dSmKDyXDF3+wOW3rgKVQSqU=;
-        b=FZjzOxu686KYJiTxPDOZC2FoprduGFjXZkXWBmtmref8jEQABYD+cTHV1X1j/wWRWk
-         hEQjTfY5iwgk88XSmO8/WJuulmqUMG0b1kY/372bTTh7psaWGjaCV5FAm68KMWeqeprh
-         YYe0MxR2J34t4bJcatTbx0+97HHnaF2R6zAW9QQzKr6okqkMkkHmFqohMNXNy5BgY6nR
-         9TgYAfld3a60ADIeg8m/rfFi8pJwLVoExi7GgJdY8v3pqSHNqzGB1H+P8ZdJBOVlxdmT
-         2pKCEHWCpgX7FlFr325mNTY25Si/+X2Ir2lKhZEafAtvD6rw4W84QKkQ8bayeoovRnm9
-         MIVw==
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date;
+        bh=F7nqEMLGrJHVFbOsAdgB6YhuZTF/EkK9GVmxjpfiIZc=;
+        b=YJ58h8qsV7Hl3/EvWmQZKGhkGtFrxPrHNaGeFpInokNkD9ZaKsmG13Y/A/OspaP1F5
+         ZdhhwM2Ea2+soxrbkEAr7xpvlNzPm/DXVjS/BMhE9SiAQa11LGAKoFqazpZyz8WgLSiG
+         9Y86fc4TpLhEIk0ItOSzre3r3LABMMOKjIx9STuSy1FGqje7aZ8z/RUVWHBScAQsiwq7
+         7xUeUQU+Jiu6aK24g+Txg45/aVakL+DytkunKP4NMojfzxLoado+GRssxamGBWtxA1Bl
+         ljBaOb8Ntnl6DfC6YaUoNc8ZmQtbRvK5/3OYMNU5oSUz476RlUHPE0OSXduqHA4gW7jq
+         2enA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date;
-        bh=lpyPWQxXRZTNHwtFSxl2dSmKDyXDF3+wOW3rgKVQSqU=;
-        b=jUOIfmM5Zz3CcIqRjMi+mQD2XaZNZ2Zwpqt8hC4FVOBIn7bOLQTyndgpHN/N47oWqv
-         ILY6Qr3pC3+r8daWi8pQadzGRFFb8yIbJcLzzZO9ub7Yx54XgyLYC3HBH6tEBZB/gf6N
-         zmNc1CyYYs52FozZGZJ5O5uY26TaQlTHTOlZ6H0ACJC2jzxncE25zdLbp3GGFf8LHMYM
-         a+vk2hKFEm8Vb1m7cxRbSnYzhNexKm28ovP16Etqitu0sUnFOUZ6ULhhlEUQQEOQqLqV
-         ORZhESfPvpmtW8yjX34SYuCrOqMftSolnP119T7BbfbqOU6GL8OfVFMaiRL+2ajYchQR
-         ch9Q==
-X-Gm-Message-State: ACrzQf1CNiYNwt8LIfUo+hScIaZ2ugrqlWb7AUtjOQ5fc2/38A4SHo+5
-        Xuvjr0WNXnXT4K9r7vV18nBkDwPxaI4=
-X-Google-Smtp-Source: AMsMyM7sKDV6zZ24NK8ohlR4v+6+rr8Xi2VEFhgNFa6ouqqjOS4ISAUDxFK+iWxhRL/DvQOZDBQvFFt8S+k=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:3144:b0:202:e2cd:2d2a with SMTP id
- ip4-20020a17090b314400b00202e2cd2d2amr11288766pjb.39.1663791376230; Wed, 21
- Sep 2022 13:16:16 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 21 Sep 2022 20:16:07 +0000
-In-Reply-To: <20220921201607.3156750-1-seanjc@google.com>
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=F7nqEMLGrJHVFbOsAdgB6YhuZTF/EkK9GVmxjpfiIZc=;
+        b=IvKPdeCRrTQw4lteaY5st7VBrF/T4Zzv6KQ2pIqHwrpwVDJjW4CoamArU6LaA7tRr0
+         VPKtlJywcpDvcZK9nod5SHSBKokM+bgckQL3g0ubkPnn28ITK2UY7K2l5tY4KgaZNkDA
+         g9k3D7MKrB0+vHWgFy8jui8hnDoXnMn9z7bjv5tsHI8zf13AjJB31zyOKrAkZfdoWENp
+         yctLBjbBKA8PVUN7Ygjs7cU016m7ATQxPq/gMz7/a1NGLNQDQktJ5A2yhe4s4Q1XxoOm
+         7/HzJwxctOI81Cpm7ao6GJaw0GzP3d2UVVuY/BaMQQSt/ucevyS9o/XSSN9sctwIo2q7
+         8cgg==
+X-Gm-Message-State: ACrzQf2fPIDImT9mSSyIulDE5wmRF4/UhQOQbFo3TzE+m3vPwfz76Ql/
+        NI8nK4ITYHpnPhshzAQ6EMEpEHEgsmACw81pnB/jV50auu41HxJMQ85wrSQsW7tT3/etD08Fw/b
+        ZtHuBaARLtvP9FgoVrZyG3K5b8F5oA9wX2Nwbc2k8zdpCz/JU5j5jpVCRR4nYvNA=
+X-Google-Smtp-Source: AMsMyM7WHGTP9sz/FS6rLZqyJM026Jf9rbfFEGfWqaguhod3BaK5XbhrCDPA7TfQIUWHPc/rFwUGQ39SsS6YTA==
+X-Received: from loggerhead.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:29a])
+ (user=jmattson job=sendgmr) by 2002:a62:1dc5:0:b0:540:d8a4:a4ca with SMTP id
+ d188-20020a621dc5000000b00540d8a4a4camr30753718pfd.77.1663793045727; Wed, 21
+ Sep 2022 13:44:05 -0700 (PDT)
+Date:   Wed, 21 Sep 2022 13:44:02 -0700
 Mime-Version: 1.0
-References: <20220921201607.3156750-1-seanjc@google.com>
 X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
-Message-ID: <20220921201607.3156750-5-seanjc@google.com>
-Subject: [PATCH 4/4] x86/hyperv: KVM: Rename "hv_enlightenments" to "hv_vmcb_enlightenments"
-From:   Sean Christopherson <seanjc@google.com>
-To:     "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     linux-hyperv@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+Message-ID: <20220921204402.29183-1-jmattson@google.com>
+Subject: [PATCH] Documentation: KVM: Describe guest CPUID.15H settings for
+ in-kernel APIC
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com
+Cc:     Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,155 +66,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that KVM isn't littered with "struct hv_enlightenments" casts, rename
-the struct to "hv_vmcb_enlightenments" to highlight the fact that the
-struct is specifically for SVM's VMCB.
+KVM_GET_SUPPORTED_CPUID must not populate guest CPUID.15H, because KVM
+has no way of knowing the base frequency of the local APIC emulated in
+userspace.
 
-No functional change intended.
+However, in reality, the in-kernel APIC emulation is in prevalent
+use. Document how KVM_GET_SUPPORTED_CPUID would populate CPUID.15H if
+the in-kernel APIC were the default.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Jim Mattson <jmattson@google.com>
 ---
- arch/x86/include/asm/hyperv-tlfs.h                   | 2 +-
- arch/x86/include/asm/svm.h                           | 2 +-
- arch/x86/kvm/svm/nested.c                            | 2 +-
- arch/x86/kvm/svm/svm.h                               | 2 +-
- arch/x86/kvm/svm/svm_onhyperv.c                      | 2 +-
- arch/x86/kvm/svm/svm_onhyperv.h                      | 6 +++---
- tools/testing/selftests/kvm/include/x86_64/svm.h     | 4 ++--
- tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c | 2 +-
- 8 files changed, 11 insertions(+), 11 deletions(-)
+ Documentation/virt/kvm/api.rst | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
-index 4c4f81daf5a2..f7a431bcb2c3 100644
---- a/arch/x86/include/asm/hyperv-tlfs.h
-+++ b/arch/x86/include/asm/hyperv-tlfs.h
-@@ -588,7 +588,7 @@ struct hv_enlightened_vmcs {
-  * Hyper-V uses the software reserved 32 bytes in VMCB control area to expose
-  * SVM enlightenments to guests.
-  */
--struct hv_enlightenments {
-+struct hv_vmcb_enlightenments {
- 	struct __packed hv_enlightenments_control {
- 		u32 nested_flush_hypercall:1;
- 		u32 msr_bitmap:1;
-diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index 6befed2b30a6..621f064bb7cc 100644
---- a/arch/x86/include/asm/svm.h
-+++ b/arch/x86/include/asm/svm.h
-@@ -164,7 +164,7 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- 	 * for use by hypervisor/software.
- 	 */
- 	union {
--		struct hv_enlightenments hv_enlightenments;
-+		struct hv_vmcb_enlightenments hv_enlightenments;
- 		u8 reserved_sw[32];
- 	};
- };
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index a6a87d9743ce..bc9fb4dbf0ae 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -201,7 +201,7 @@ void recalc_intercepts(struct vcpu_svm *svm)
-  */
- static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
- {
--	struct hv_enlightenments *hve = &svm->nested.ctl.hv_enlightenments;
-+	struct hv_vmcb_enlightenments *hve = &svm->nested.ctl.hv_enlightenments;
- 	int i;
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index abd7c32126ce..1e09ac9d48e9 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -1786,6 +1786,16 @@ support.  Instead it is reported via::
+ if that returns true and you use KVM_CREATE_IRQCHIP, or if you emulate the
+ feature in userspace, then you can enable the feature for KVM_SET_CPUID2.
  
- 	/*
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 9eb2fc76732f..5e1178bc9a64 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -152,7 +152,7 @@ struct vmcb_ctrl_area_cached {
- 	u64 virt_ext;
- 	u32 clean;
- 	union {
--		struct hv_enlightenments hv_enlightenments;
-+		struct hv_vmcb_enlightenments hv_enlightenments;
- 		u8 reserved_sw[32];
- 	};
- };
-diff --git a/arch/x86/kvm/svm/svm_onhyperv.c b/arch/x86/kvm/svm/svm_onhyperv.c
-index 5d4036611a37..0b657c7cd21b 100644
---- a/arch/x86/kvm/svm/svm_onhyperv.c
-+++ b/arch/x86/kvm/svm/svm_onhyperv.c
-@@ -16,7 +16,7 @@
++Similarly, CPUID leaf 0x15 always returns zeroes, because the core
++crystal clock frequency must match the local APIC base frequency, and
++the default configuration leaves the local APIC emulation to
++userspace.
++
++If KVM_CREATE_IRQCHIP is used to enable the in-kernel local APIC
++emulation, CPUID.15H:ECX can be set to 1000000000 (0x3b9aca00). For
++the default guest TSC frequency, CPUID.15H:EBX can be set to tsc_khz
++and CPUID.15H:ECX can be set to 1000000 (0xf4240).  The fraction can
++be simplified if desired.
  
- int svm_hv_enable_direct_tlbflush(struct kvm_vcpu *vcpu)
- {
--	struct hv_enlightenments *hve;
-+	struct hv_vmcb_enlightenments *hve;
- 	struct hv_partition_assist_pg **p_hv_pa_pg =
- 			&to_kvm_hv(vcpu->kvm)->hv_pa_pg;
- 
-diff --git a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
-index c8f8045305be..e08cd7192559 100644
---- a/arch/x86/kvm/svm/svm_onhyperv.h
-+++ b/arch/x86/kvm/svm/svm_onhyperv.h
-@@ -18,7 +18,7 @@ int svm_hv_enable_direct_tlbflush(struct kvm_vcpu *vcpu);
- 
- static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
- {
--	struct hv_enlightenments *hve = &vmcb->control.hv_enlightenments;
-+	struct hv_vmcb_enlightenments *hve = &vmcb->control.hv_enlightenments;
- 
- 	BUILD_BUG_ON(sizeof(vmcb->control.hv_enlightenments) !=
- 		     sizeof(vmcb->control.reserved_sw));
-@@ -63,7 +63,7 @@ static inline void svm_hv_vmcb_dirty_nested_enlightenments(
- 		struct kvm_vcpu *vcpu)
- {
- 	struct vmcb *vmcb = to_svm(vcpu)->vmcb;
--	struct hv_enlightenments *hve = &vmcb->control.hv_enlightenments;
-+	struct hv_vmcb_enlightenments *hve = &vmcb->control.hv_enlightenments;
- 
- 	if (hve->hv_enlightenments_control.msr_bitmap)
- 		vmcb_mark_dirty(vmcb, VMCB_HV_NESTED_ENLIGHTENMENTS);
-@@ -71,7 +71,7 @@ static inline void svm_hv_vmcb_dirty_nested_enlightenments(
- 
- static inline void svm_hv_update_vp_id(struct vmcb *vmcb, struct kvm_vcpu *vcpu)
- {
--	struct hv_enlightenments *hve = &vmcb->control.hv_enlightenments;
-+	struct hv_vmcb_enlightenments *hve = &vmcb->control.hv_enlightenments;
- 	u32 vp_index = kvm_hv_get_vpindex(vcpu);
- 
- 	if (hve->hv_vp_id != vp_index) {
-diff --git a/tools/testing/selftests/kvm/include/x86_64/svm.h b/tools/testing/selftests/kvm/include/x86_64/svm.h
-index 0c32549c6b64..49292190c219 100644
---- a/tools/testing/selftests/kvm/include/x86_64/svm.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/svm.h
-@@ -58,7 +58,7 @@ enum {
- 	INTERCEPT_RDPRU,
- };
- 
--struct hv_enlightenments {
-+struct hv_vmcb_enlightenments {
- 	struct __packed hv_enlightenments_control {
- 		u32 nested_flush_hypercall:1;
- 		u32 msr_bitmap:1;
-@@ -124,7 +124,7 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
- 	 * for use by hypervisor/software.
- 	 */
- 	union {
--		struct hv_enlightenments hv_enlightenments;
-+		struct hv_vmcb_enlightenments hv_enlightenments;
- 		u8 reserved_sw[32];
- 	};
- };
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
-index 81b204ee509a..f8e43c798c86 100644
---- a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
-@@ -46,7 +46,7 @@ static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm)
- {
- 	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
- 	struct vmcb *vmcb = svm->vmcb;
--	struct hv_enlightenments *hve = &vmcb->control.hv_enlightenments;
-+	struct hv_vmcb_enlightenments *hve = &vmcb->control.hv_enlightenments;
- 
- 	GUEST_SYNC(1);
- 
+ 4.47 KVM_PPC_GET_PVINFO
+ -----------------------
 -- 
 2.37.3.968.ga6b4b080e4-goog
 
