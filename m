@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D106D5C015D
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 17:27:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71E375C015F
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 17:27:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231238AbiIUP1h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 11:27:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60300 "EHLO
+        id S231284AbiIUP1k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 11:27:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231258AbiIUP0v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Sep 2022 11:26:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B44287755B
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 08:25:47 -0700 (PDT)
+        with ESMTP id S229995AbiIUP0x (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Sep 2022 11:26:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E38298746
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 08:25:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663773938;
+        s=mimecast20190719; t=1663773939;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2GyyAiTZXcJIAL4UAl4iHShGvCARmYBjvKHE9EFWXTo=;
-        b=PX0wgLDijfwPtwG7YlLVNHvLz3/FSfT5NaB7YEZ5QIUcCypYJLTGRSfzcJQaiVYt7nvB7q
-        rUYEnGssEUqOG/rJLCm87AsDzKUpDdB8cldxueFzfGyu01TuNb0o1iw5EXKGjlyhm9gJow
-        fKMg65aks4uxtb1eFZIthJoJz1wvgsU=
+        bh=qai8ingZab5BKiTfBL9k+YBOBkjodH3KbTfCq9/RjfI=;
+        b=A1jV+mT7OZLqiE69aogniWi5EPyNl9g3K6MaqcgDBWF3DFYbbPHXU8C2S2U3i8hwmSkw1Z
+        M/jTst84zXyKG+oFO+5Wsx5CC8DWs7fQozu92p1vSFXn50fXMWEJwC+GhrJcHHNKkCmKoa
+        wzCuTzW7sisp4A5X1pnnZ9krGMosxAg=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-654-4p1zDNS_MGqT3kzaY9a_zA-1; Wed, 21 Sep 2022 11:25:34 -0400
-X-MC-Unique: 4p1zDNS_MGqT3kzaY9a_zA-1
+ us-mta-449-UBIVUYGQNUmfKnUj19Cjjg-1; Wed, 21 Sep 2022 11:25:36 -0400
+X-MC-Unique: UBIVUYGQNUmfKnUj19Cjjg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 81E081C0755C;
-        Wed, 21 Sep 2022 15:25:33 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 991B1296A60C;
+        Wed, 21 Sep 2022 15:25:35 +0000 (UTC)
 Received: from fedora.redhat.com (unknown [10.40.194.159])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 612112166B26;
-        Wed, 21 Sep 2022 15:25:31 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BF6602166B26;
+        Wed, 21 Sep 2022 15:25:33 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -47,9 +47,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Yuan Yao <yuan.yao@linux.intel.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v10 20/39] KVM: nVMX: hyper-v: Enable L2 TLB flush
-Date:   Wed, 21 Sep 2022 17:24:17 +0200
-Message-Id: <20220921152436.3673454-21-vkuznets@redhat.com>
+Subject: [PATCH v10 21/39] KVM: nSVM: hyper-v: Enable L2 TLB flush
+Date:   Wed, 21 Sep 2022 17:24:18 +0200
+Message-Id: <20220921152436.3673454-22-vkuznets@redhat.com>
 In-Reply-To: <20220921152436.3673454-1-vkuznets@redhat.com>
 References: <20220921152436.3673454-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -66,97 +66,113 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Enable L2 TLB flush feature on nVMX when:
-- Enlightened VMCS is in use.
-- The feature flag is enabled in eVMCS.
-- The feature flag is enabled in partition assist page.
+Implement Hyper-V L2 TLB flush for nSVM. The feature needs to be enabled
+both in extended 'nested controls' in VMCB and VP assist page.
+According to Hyper-V TLFS, synthetic vmexit to L1 is performed with
+- HV_SVM_EXITCODE_ENL exit_code.
+- HV_SVM_ENL_EXITCODE_TRAP_AFTER_FLUSH exit_info_1.
 
-Perform synthetic vmexit to L1 after processing TLB flush call upon
-request (HV_VMX_SYNTHETIC_EXIT_REASON_TRAP_AFTER_FLUSH).
-
-Note: nested_evmcs_l2_tlb_flush_enabled() uses cached VP assist page copy
-which gets updated from nested_vmx_handle_enlightened_vmptrld(). This is
-also guaranteed to happen post migration with eVMCS backed L2 running.
+Note: VP assist page is cached in 'struct kvm_vcpu_hv' so
+recalc_intercepts() doesn't need to read from guest's memory. KVM
+needs to update the case upon each VMRUN and after svm_set_nested_state
+(svm_get_nested_state_pages()) to handle the case when the guest got
+migrated while L2 was running.
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/x86/kvm/vmx/evmcs.c  | 17 +++++++++++++++++
- arch/x86/kvm/vmx/evmcs.h  | 10 ++++++++++
- arch/x86/kvm/vmx/nested.c | 22 ++++++++++++++++++++++
- 3 files changed, 49 insertions(+)
+ arch/x86/kvm/svm/hyperv.c |  7 +++++++
+ arch/x86/kvm/svm/hyperv.h | 30 ++++++++++++++++++++++++++++++
+ arch/x86/kvm/svm/nested.c | 36 ++++++++++++++++++++++++++++++++++--
+ 3 files changed, 71 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
-index 635a0c81ff1d..f7fedc3ed247 100644
---- a/arch/x86/kvm/vmx/evmcs.c
-+++ b/arch/x86/kvm/vmx/evmcs.c
-@@ -6,6 +6,7 @@
- #include "../hyperv.h"
- #include "../cpuid.h"
- #include "evmcs.h"
-+#include "nested.h"
- #include "vmcs.h"
- #include "vmx.h"
- #include "trace.h"
-@@ -501,6 +502,22 @@ int nested_enable_evmcs(struct kvm_vcpu *vcpu,
- 	return 0;
+diff --git a/arch/x86/kvm/svm/hyperv.c b/arch/x86/kvm/svm/hyperv.c
+index 911f51021af1..088f6429b24c 100644
+--- a/arch/x86/kvm/svm/hyperv.c
++++ b/arch/x86/kvm/svm/hyperv.c
+@@ -8,4 +8,11 @@
+ 
+ void svm_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu)
+ {
++	struct vcpu_svm *svm = to_svm(vcpu);
++
++	svm->vmcb->control.exit_code = HV_SVM_EXITCODE_ENL;
++	svm->vmcb->control.exit_code_hi = 0;
++	svm->vmcb->control.exit_info_1 = HV_SVM_ENL_EXITCODE_TRAP_AFTER_FLUSH;
++	svm->vmcb->control.exit_info_2 = 0;
++	nested_svm_vmexit(svm);
+ }
+diff --git a/arch/x86/kvm/svm/hyperv.h b/arch/x86/kvm/svm/hyperv.h
+index dd2e393f84a0..7b01722838bf 100644
+--- a/arch/x86/kvm/svm/hyperv.h
++++ b/arch/x86/kvm/svm/hyperv.h
+@@ -33,6 +33,9 @@ struct hv_enlightenments {
+  */
+ #define VMCB_HV_NESTED_ENLIGHTENMENTS VMCB_SW
+ 
++#define HV_SVM_EXITCODE_ENL 0xF0000000
++#define HV_SVM_ENL_EXITCODE_TRAP_AFTER_FLUSH   (1)
++
+ static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -48,6 +51,33 @@ static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu)
+ 	hv_vcpu->nested.vp_id = hve->hv_vp_id;
  }
  
-+bool nested_evmcs_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu)
++static inline bool nested_svm_hv_update_vp_assist(struct kvm_vcpu *vcpu)
 +{
-+	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	struct hv_enlightened_vmcs *evmcs = vmx->nested.hv_evmcs;
++	if (!to_hv_vcpu(vcpu))
++		return true;
 +
-+	if (!hv_vcpu || !evmcs)
++	if (!kvm_hv_assist_page_enabled(vcpu))
++		return true;
++
++	return kvm_hv_get_assist_page(vcpu);
++}
++
++static inline bool nested_svm_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++	struct hv_enlightenments *hve =
++		(struct hv_enlightenments *)svm->nested.ctl.reserved_sw;
++	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
++
++	if (!hv_vcpu)
 +		return false;
 +
-+	if (!evmcs->hv_enlightenments_control.nested_flush_hypercall)
++	if (!hve->hv_enlightenments_control.nested_flush_hypercall)
 +		return false;
 +
 +	return hv_vcpu->vp_assist_page.nested_control.features.directhypercall;
 +}
 +
- void vmx_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu)
+ void svm_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu);
+ 
+ #endif /* __ARCH_X86_KVM_SVM_HYPERV_H__ */
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index b8df2f4f880e..e0484028dc70 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -149,8 +149,12 @@ void recalc_intercepts(struct vcpu_svm *svm)
+ 		vmcb_clr_intercept(c, INTERCEPT_VINTR);
+ 	}
+ 
+-	/* We don't want to see VMMCALLs from a nested guest */
+-	vmcb_clr_intercept(c, INTERCEPT_VMMCALL);
++	/*
++	 * We want to see VMMCALLs from a nested guest only when Hyper-V L2 TLB
++	 * flush feature is enabled.
++	 */
++	if (!nested_svm_l2_tlb_flush_enabled(&svm->vcpu))
++		vmcb_clr_intercept(c, INTERCEPT_VMMCALL);
+ 
+ 	for (i = 0; i < MAX_INTERCEPT; i++)
+ 		c->intercepts[i] |= g->intercepts[i];
+@@ -473,6 +477,17 @@ static void nested_save_pending_event_to_vmcb12(struct vcpu_svm *svm,
+ 
+ static void nested_svm_transition_tlb_flush(struct kvm_vcpu *vcpu)
  {
-+	nested_vmx_vmexit(vcpu, HV_VMX_SYNTHETIC_EXIT_REASON_TRAP_AFTER_FLUSH, 0, 0);
- }
-diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
-index 7ad56fbc4b4d..dd1589336e79 100644
---- a/arch/x86/kvm/vmx/evmcs.h
-+++ b/arch/x86/kvm/vmx/evmcs.h
-@@ -63,6 +63,15 @@ DECLARE_STATIC_KEY_FALSE(enable_evmcs);
- #define EVMCS1_UNSUPPORTED_VMENTRY_CTRL (0)
- #define EVMCS1_UNSUPPORTED_VMFUNC (VMX_VMFUNC_EPTP_SWITCHING)
- 
-+/*
-+ * Note, Hyper-V isn't actually stealing bit 28 from Intel, just abusing it by
-+ * pairing it with architecturally impossible exit reasons.  Bit 28 is set only
-+ * on SMI exits to a SMI transfer monitor (STM) and if and only if a MTF VM-Exit
-+ * is pending.  I.e. it will never be set by hardware for non-SMI exits (there
-+ * are only three), nor will it ever be set unless the VMM is an STM.
-+ */
-+#define HV_VMX_SYNTHETIC_EXIT_REASON_TRAP_AFTER_FLUSH 0x10000031
-+
- struct evmcs_field {
- 	u16 offset;
- 	u16 clean_field;
-@@ -241,6 +250,7 @@ int nested_enable_evmcs(struct kvm_vcpu *vcpu,
- 			uint16_t *vmcs_version);
- void nested_evmcs_filter_control_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 *pdata);
- int nested_evmcs_check_controls(struct vmcs12 *vmcs12);
-+bool nested_evmcs_l2_tlb_flush_enabled(struct kvm_vcpu *vcpu);
- void vmx_hv_inject_synthetic_vmexit_post_tlb_flush(struct kvm_vcpu *vcpu);
- 
- #endif /* __KVM_X86_VMX_EVMCS_H */
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 0634518a6719..1451a7a2c488 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -1132,6 +1132,17 @@ static void nested_vmx_transition_tlb_flush(struct kvm_vcpu *vcpu,
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 
 +	/*
 +	 * KVM_REQ_HV_TLB_FLUSH flushes entries from either L1's VP_ID or
 +	 * L2's VP_ID upon request from the guest. Make sure we check for
@@ -169,33 +185,53 @@ index 0634518a6719..1451a7a2c488 100644
 +		kvm_make_request(KVM_REQ_HV_TLB_FLUSH, vcpu);
 +
  	/*
- 	 * If vmcs12 doesn't use VPID, L1 expects linear and combined mappings
- 	 * for *all* contexts to be flushed on VM-Enter/VM-Exit, i.e. it's a
-@@ -3267,6 +3278,12 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 	 * TODO: optimize unconditional TLB flush/MMU sync.  A partial list of
+ 	 * things to fix before this can be conditional:
+@@ -824,6 +839,12 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
+ 		return 1;
+ 	}
  
- static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
++	/* This fails when VP assist page is enabled but the supplied GPA is bogus */
++	if (!nested_svm_hv_update_vp_assist(vcpu)) {
++		kvm_inject_gp(vcpu, 0);
++		return 1;
++	}
++
+ 	vmcb12_gpa = svm->vmcb->save.rax;
+ 	ret = kvm_vcpu_map(vcpu, gpa_to_gfn(vmcb12_gpa), &map);
+ 	if (ret == -EINVAL) {
+@@ -1413,6 +1434,7 @@ static int svm_check_nested_events(struct kvm_vcpu *vcpu)
+ int nested_svm_exit_special(struct vcpu_svm *svm)
  {
-+	/*
-+	 * Note: nested_get_evmcs_page() also updates 'vp_assist_page' copy
-+	 * in 'struct kvm_vcpu_hv' in case eVMCS is in use, this is mandatory
-+	 * to make nested_evmcs_l2_tlb_flush_enabled() work correctly post
-+	 * migration.
-+	 */
- 	if (!nested_get_evmcs_page(vcpu)) {
- 		pr_debug_ratelimited("%s: enlightened vmptrld failed\n",
- 				     __func__);
-@@ -6143,6 +6160,11 @@ static bool nested_vmx_l0_wants_exit(struct kvm_vcpu *vcpu,
- 		 * Handle L2's bus locks in L0 directly.
- 		 */
- 		return true;
-+	case EXIT_REASON_VMCALL:
+ 	u32 exit_code = svm->vmcb->control.exit_code;
++	struct kvm_vcpu *vcpu = &svm->vcpu;
+ 
+ 	switch (exit_code) {
+ 	case SVM_EXIT_INTR:
+@@ -1431,6 +1453,13 @@ int nested_svm_exit_special(struct vcpu_svm *svm)
+ 			return NESTED_EXIT_HOST;
+ 		break;
+ 	}
++	case SVM_EXIT_VMMCALL:
 +		/* Hyper-V L2 TLB flush hypercall is handled by L0 */
-+		return guest_hv_cpuid_has_l2_tlb_flush(vcpu) &&
-+			nested_evmcs_l2_tlb_flush_enabled(vcpu) &&
-+			kvm_hv_is_tlb_flush_hcall(vcpu);
++		if (guest_hv_cpuid_has_l2_tlb_flush(vcpu) &&
++		    nested_svm_l2_tlb_flush_enabled(vcpu) &&
++		    kvm_hv_is_tlb_flush_hcall(vcpu))
++			return NESTED_EXIT_HOST;
++		break;
  	default:
  		break;
  	}
+@@ -1711,6 +1740,9 @@ static bool svm_get_nested_state_pages(struct kvm_vcpu *vcpu)
+ 		return false;
+ 	}
+ 
++	if (!nested_svm_hv_update_vp_assist(vcpu))
++		return false;
++
+ 	return true;
+ }
+ 
 -- 
 2.37.3
 
