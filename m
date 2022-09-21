@@ -2,153 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 965455BF69C
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 08:48:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 329725BF801
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 09:44:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230037AbiIUGsu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 02:48:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49118 "EHLO
+        id S229960AbiIUHoZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 03:44:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229566AbiIUGss (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Sep 2022 02:48:48 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7D7780F62;
-        Tue, 20 Sep 2022 23:48:47 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id q3so5445040pjg.3;
-        Tue, 20 Sep 2022 23:48:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=xurnjg6bo3Owb0E+vv7NZukh9QWZAaSruqg+66dadlY=;
-        b=pKj7d6eQ8vGfmarpTQk/mOmGqK97CL1G3DQ5G1gqqLmmreBImdCWoaC0FFEXoAQMf7
-         yANnTJgiTXKE1rSl/0b/mEkomFsdrg9L4eWTDDmXlo56hN3r75T84fA9okWrXMZshjL+
-         peCH0sXazbPml9XnuiqgAj2jRz5FA9ZJ1TKx+3aX4TFlhlQhLvJWLnGpn+xEFwNd8MgL
-         eROy97HwNxHcTvy8wfwxWJyhkCKBFzivpulX+BkpKj3BQaaYBiCaRtp93LnEZg7NxqVj
-         pRHop+cJh/BQfPncmxEhfbJs94qpI7ZADhWA7H6neCNYrm5szYnACZXPxEM1rSCmT8/y
-         OSRA==
+        with ESMTP id S230064AbiIUHoO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Sep 2022 03:44:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B57AE857D8
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 00:44:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663746252;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=86vShVgoh12B6XaEHHutbnawfEbjDkAMZ1MtTQw6pEo=;
+        b=TTkRLk9VJyyXDrdcaxlAO54VgWCTn04Nrd41Xj2Xsz9oc6meGlFzy53j1hoSmu6UA6zkSU
+        gVIOQnzLzRLR0dPZYeeqjWr111lfp8Lsx8iudmpYsEpQeAB0wBXZbf0moYe3jp0a+sUIJa
+        lxPVfk63Fk3EM59z0mM3VO/dEVHQJZw=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-441-1Nsr2On_OPylaaxhaA86xw-1; Wed, 21 Sep 2022 03:44:01 -0400
+X-MC-Unique: 1Nsr2On_OPylaaxhaA86xw-1
+Received: by mail-oi1-f199.google.com with SMTP id k4-20020a05680808c400b0034f6d529d2bso2732522oij.22
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 00:44:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=xurnjg6bo3Owb0E+vv7NZukh9QWZAaSruqg+66dadlY=;
-        b=XOan4XHJs0wiXZj4ZHaTmPU8zGRPfKnpO/VYvdxwCr4pUART7nHKYz1xlMJTFHairL
-         9uiRWsM96qxmxER9filE4CVMUiupYqHbmnKA8IYRedCGBs5zxfxEF+wUruvsvOKJmDIU
-         SC5ulPEiCZwfW8BNXjU/X284yAKqTIOKEqgzSRsnZbhuSON73ES1LfF4DivY3/9NbDBp
-         4UkjUMBITfTQdNgBf3A/nvBUvUqMw3JF3OW0A3h5yxoU+t8fBHc0PrYlEsnvF7dUO9kZ
-         pg15S7IWmTW89g1fsjlnXB4zacf2X8K8tvkPbHdbcBQV+DbqIOxqqLLVa1xvAMfJBBeb
-         IU1A==
-X-Gm-Message-State: ACrzQf2ly76cnFCwEinZxO1kGbWYp0V5TP75epfZhX0YRBNSWSTLItPK
-        03Bf8Zhro6BcP4llquYDkp0=
-X-Google-Smtp-Source: AMsMyM7mVdKvFAF5LQMcscRjuFHOXhziJthXNKphDNdpbJqDhMsIVZyYp0B+p/Avfq2LesmEkn83uQ==
-X-Received: by 2002:a17:902:c245:b0:178:3912:f1fe with SMTP id 5-20020a170902c24500b001783912f1femr3384019plg.13.1663742927300;
-        Tue, 20 Sep 2022 23:48:47 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id b15-20020a170902d50f00b00174c235e1fdsm1086625plg.199.2022.09.20.23.48.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Sep 2022 23:48:46 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Kan Liang <kan.liang@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jim Mattson <jmattson@google.com>,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: [PATCH] KVM: x86/pmu: Add PEBS support for Intel Sapphire Rapids
-Date:   Wed, 21 Sep 2022 14:48:27 +0800
-Message-Id: <20220921064827.936-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.37.3
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=86vShVgoh12B6XaEHHutbnawfEbjDkAMZ1MtTQw6pEo=;
+        b=pBEe8bqCcXW8+DkN8KgNCJF864GJDfy6/+VNnC9Cwwi6eiRkYyeAXYgnPvyvcH0UOw
+         3yiXTRt3l+XYy+63CjfB3ouXfLgZ/vsDcuaeU0rgFOQ1/wTEEPRs7cRCov8BdYxJQEOy
+         oW+AKSbd3B9BItV1pOwR7OpPtatYEfp8T++UTzz92TELyHGHit36rsHYlYdFboBlejtG
+         sFwgIi7giWm3aZmC+s0Q7Nyoot25ATRjrcYcrqFjWvmkAwkvSVdPr1+G4PXs7j0sf9wy
+         s+35xBBe7K2Eou3I30nZqddqCRujkoHzBENmm0P9gL2ZhQd3Mti720QrfLHIQIQ30Lwl
+         GbCQ==
+X-Gm-Message-State: ACrzQf1Uno2TYyrPRNwxtoqGJuRQvdcUTp5qOcNnBJNiJ29hky6Q4fqf
+        Q22lvHBkVSF8yYkikXPV0XcXHRZjmU4IloPleprjCNkrkiHx8aHiT/3NwJWCp7ngtR15Jt3Bzwg
+        +77lDkxIcbDujjXijaLECbvyF8/IA
+X-Received: by 2002:a05:6808:1304:b0:350:649b:f8a1 with SMTP id y4-20020a056808130400b00350649bf8a1mr3234466oiv.280.1663746241015;
+        Wed, 21 Sep 2022 00:44:01 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7qONZ88pXEclF6rWHrCx6zwa1UB2BpZ/Kart+KFBy/YxtaT63ZnO00Ywv2ymwreiaf+VxnSFQCuGq04KCBrEo=
+X-Received: by 2002:a05:6808:1304:b0:350:649b:f8a1 with SMTP id
+ y4-20020a056808130400b00350649bf8a1mr3234455oiv.280.1663746240793; Wed, 21
+ Sep 2022 00:44:00 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20220909085712.46006-1-lingshan.zhu@intel.com>
+ <20220909085712.46006-3-lingshan.zhu@intel.com> <CACGkMEsYARr3toEBTxVcwFi86JxK0D-w4OpNtvVdhCEbAnc8ZA@mail.gmail.com>
+ <6fd1f8b3-23b1-84cc-2376-ee04f1fa8438@intel.com> <CACGkMEuusM3EMmWW6+q8V1fZscfjM2R9n7jGefUnSY59UnZDYQ@mail.gmail.com>
+ <ed56a694-a024-23be-d4cb-7ab51c959b61@intel.com>
+In-Reply-To: <ed56a694-a024-23be-d4cb-7ab51c959b61@intel.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Wed, 21 Sep 2022 15:43:49 +0800
+Message-ID: <CACGkMEuXA6Uj7OHqUDux=Yz+XFtouKWGOVV4fk5B5XCZW5F22w@mail.gmail.com>
+Subject: Re: [PATCH 2/4] vDPA: only report driver features if FEATURES_OK is set
+To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>
+Cc:     mst <mst@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On Wed, Sep 21, 2022 at 1:39 PM Zhu, Lingshan <lingshan.zhu@intel.com> wrote:
+>
+>
+>
+> On 9/21/2022 10:14 AM, Jason Wang wrote:
+> > On Tue, Sep 20, 2022 at 1:46 PM Zhu, Lingshan <lingshan.zhu@intel.com> wrote:
+> >>
+> >>
+> >> On 9/20/2022 10:16 AM, Jason Wang wrote:
+> >>> On Fri, Sep 9, 2022 at 5:05 PM Zhu Lingshan <lingshan.zhu@intel.com> wrote:
+> >>>> vdpa_dev_net_config_fill() should only report driver features
+> >>>> to userspace after features negotiation is done.
+> >>>>
+> >>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+> >>>> ---
+> >>>>    drivers/vdpa/vdpa.c | 13 +++++++++----
+> >>>>    1 file changed, 9 insertions(+), 4 deletions(-)
+> >>>>
+> >>>> diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
+> >>>> index 798a02c7aa94..29d7e8858e6f 100644
+> >>>> --- a/drivers/vdpa/vdpa.c
+> >>>> +++ b/drivers/vdpa/vdpa.c
+> >>>> @@ -819,6 +819,7 @@ static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *ms
+> >>>>           struct virtio_net_config config = {};
+> >>>>           u64 features_device, features_driver;
+> >>>>           u16 val_u16;
+> >>>> +       u8 status;
+> >>>>
+> >>>>           vdev->config->get_config(vdev, 0, &config, sizeof(config));
+> >>>>
+> >>>> @@ -834,10 +835,14 @@ static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *ms
+> >>>>           if (nla_put_u16(msg, VDPA_ATTR_DEV_NET_CFG_MTU, val_u16))
+> >>>>                   return -EMSGSIZE;
+> >>>>
+> >>>> -       features_driver = vdev->config->get_driver_features(vdev);
+> >>>> -       if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features_driver,
+> >>>> -                             VDPA_ATTR_PAD))
+> >>>> -               return -EMSGSIZE;
+> >>>> +       /* only read driver features after the feature negotiation is done */
+> >>>> +       status = vdev->config->get_status(vdev);
+> >>>> +       if (status & VIRTIO_CONFIG_S_FEATURES_OK) {
+> >>> Any reason this is not checked in its caller as what it used to do before?
+> >> will check the existence of vdev->config->get_status before calling it in V2
+> > Just to clarify, I meant to check FEAUTRES_OK in the caller -
+> > vdpa_dev_config_fill() otherwise each type needs to repeat this in
+> > their specific codes.
+> if we check FEATURES_OK in the caller vdpa_dev_config_fill(), then
+> !FEATURES_OK will block reporting all attributions, for example
+> the device features and virtio device config space fields in this series
+> and device status.
+> Currently only driver features needs to check FEATURES_OK.
+> Or did I missed anything?
 
-Virtualization support for SPR PEBS has officially available in the
-Intel SDM (June 2022) and has been validated on late stepping machines:
+I don't see much difference, we just move the following part to the
+caller, it is not the config but the VDPA_ATTR_DEV_NEGOTIATED_FEATURES
+is blocked.
 
-Compared to Ice Lake Server, the PDIR counter available (Fixed 0) on SPR
-is unchanged, but the capability is enhanced to Instruction-Accurate PDIR
-(PDIR++), where PEBS is taken on the next instruction after the one that
-caused the overflow. Also, it introduces a new Precise Distribution (PDist)
-facility that eliminates the skid when a precise event is programmed
-on general programmable counter 0.
+Thanks
 
-For guest usage, KVM will raise attr.precise_ip to 3 in both cases
-mentioned above, requesting the correct hardware counter (PRIR++
-or PDist) from the perf sub-system on the host as usual.
-
-Cc: Kan Liang <kan.liang@linux.intel.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/events/intel/core.c |  1 +
- arch/x86/kvm/pmu.c           | 17 ++++++++++++++---
- 2 files changed, 15 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index 2db93498ff71..804540ba4599 100644
---- a/arch/x86/events/intel/core.c
-+++ b/arch/x86/events/intel/core.c
-@@ -6288,6 +6288,7 @@ __init int intel_pmu_init(void)
- 		x86_pmu.pebs_constraints = intel_spr_pebs_event_constraints;
- 		x86_pmu.extra_regs = intel_spr_extra_regs;
- 		x86_pmu.limit_period = spr_limit_period;
-+		x86_pmu.pebs_ept = 1;
- 		x86_pmu.pebs_aliases = NULL;
- 		x86_pmu.pebs_prec_dist = true;
- 		x86_pmu.pebs_block = true;
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 02f9e4f245bd..81e9d7c2332d 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -28,9 +28,18 @@
- struct x86_pmu_capability __read_mostly kvm_pmu_cap;
- EXPORT_SYMBOL_GPL(kvm_pmu_cap);
- 
--static const struct x86_cpu_id vmx_icl_pebs_cpu[] = {
-+/* Precise Distribution of Instructions Retired (PDIR) */
-+static const struct x86_cpu_id vmx_pebs_pdir_cpu[] = {
- 	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_D, NULL),
- 	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_X, NULL),
-+	/* Instruction-Accurate PDIR (PDIR++) */
-+	X86_MATCH_INTEL_FAM6_MODEL(SAPPHIRERAPIDS_X, NULL),
-+	{}
-+};
-+
-+/* Precise Distribution (PDist) */
-+static const struct x86_cpu_id vmx_pebs_pdist_cpu[] = {
-+	X86_MATCH_INTEL_FAM6_MODEL(SAPPHIRERAPIDS_X, NULL),
- 	{}
- };
- 
-@@ -181,12 +190,14 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
- 		 * the accuracy of the PEBS profiling result, because the "event IP"
- 		 * in the PEBS record is calibrated on the guest side.
- 		 *
--		 * On Icelake everything is fine. Other hardware (GLC+, TNT+) that
-+		 * On Icelake everything is fine. Other hardware (TNT+) that
- 		 * could possibly care here is unsupported and needs changes.
- 		 */
- 		attr.precise_ip = 1;
--		if (x86_match_cpu(vmx_icl_pebs_cpu) && pmc->idx == 32)
-+		if ((pmc->idx == 32 && x86_match_cpu(vmx_pebs_pdir_cpu)) ||
-+		    (pmc->idx == 0 && x86_match_cpu(vmx_pebs_pdist_cpu))) {
- 			attr.precise_ip = 3;
-+		}
- 	}
- 
- 	event = perf_event_create_kernel_counter(&attr, -1, current,
--- 
-2.37.3
+>
+> Thanks
+> >
+> > Thanks
+> >
+> >> Thanks,
+> >> Zhu Lingshan
+> >>> Thanks
+> >>>
+> >>>> +               features_driver = vdev->config->get_driver_features(vdev);
+> >>>> +               if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features_driver,
+> >>>> +                                     VDPA_ATTR_PAD))
+> >>>> +                       return -EMSGSIZE;
+> >>>> +       }
+> >>>>
+> >>>>           features_device = vdev->config->get_device_features(vdev);
+> >>>>
+> >>>> --
+> >>>> 2.31.1
+> >>>>
+>
 
