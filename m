@@ -2,139 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B10B95BF593
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 06:49:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C0A95BF5F4
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 07:38:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230481AbiIUEtt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 00:49:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55422 "EHLO
+        id S229657AbiIUFih (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 01:38:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230447AbiIUEtq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Sep 2022 00:49:46 -0400
-Received: from ozlabs.ru (ozlabs.ru [107.174.27.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4E598DF3;
-        Tue, 20 Sep 2022 21:49:31 -0700 (PDT)
-Received: from ole.1.ozlabs.ru (localhost [IPv6:::1])
-        by ozlabs.ru (Postfix) with ESMTP id 45AAB82EFA;
-        Wed, 21 Sep 2022 00:49:27 -0400 (EDT)
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     kvm@vger.kernel.org
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm-riscv@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Anup Patel <anup@brainfault.org>, kvm-ppc@vger.kernel.org,
-        Nicholas Piggin <npiggin@gmail.com>
-Subject: [PATCH kernel v3] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support platform dependent
-Date:   Wed, 21 Sep 2022 14:49:25 +1000
-Message-Id: <20220921044925.101802-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.37.3
+        with ESMTP id S229794AbiIUFif (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Sep 2022 01:38:35 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4F4A79612;
+        Tue, 20 Sep 2022 22:38:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1663738714; x=1695274714;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=CsUIMOSfr+QS1OkYOwCSXOVoK/rP5JPExwLkeyrR1rg=;
+  b=KDqFBlOvZIyRdjGJAbku1Ih8M9w3cFBrtoh24OkIXT0IkLV1Iw6JP84j
+   Vh8+jPBjfRARjw1H+87Asw+NRSX531kMStqDGD3zOjZopRdRUMJUC1FG4
+   5lGzfu+Jm7abzFofcPA0OU4bLNLYRBDa2bgJkCXPtdsURNv+tdV7rBUGA
+   6eU5i4hiU7LKesMxDj6LaF+j4pzx6yb0dEvd139kjeNOsrNROyIfVpHu4
+   vRwwpc14LShWU5KigXoTUoqq3kcMfKkCMzxATjNrBSRe+Jix+og03zK1o
+   tp+LvhsUJetgVkbEN/0eRDfSye0jEMBtv10zk0TfsOU2S10DL8M+a1TtW
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10476"; a="361661522"
+X-IronPort-AV: E=Sophos;i="5.93,332,1654585200"; 
+   d="scan'208";a="361661522"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2022 22:38:34 -0700
+X-IronPort-AV: E=Sophos;i="5.93,332,1654585200"; 
+   d="scan'208";a="681622019"
+Received: from lihaitao-mobl.ccr.corp.intel.com (HELO [10.255.29.68]) ([10.255.29.68])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2022 22:38:32 -0700
+Message-ID: <ed56a694-a024-23be-d4cb-7ab51c959b61@intel.com>
+Date:   Wed, 21 Sep 2022 13:38:31 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.2.2
+Subject: Re: [PATCH 2/4] vDPA: only report driver features if FEATURES_OK is
+ set
+Content-Language: en-US
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst <mst@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>, kvm <kvm@vger.kernel.org>
+References: <20220909085712.46006-1-lingshan.zhu@intel.com>
+ <20220909085712.46006-3-lingshan.zhu@intel.com>
+ <CACGkMEsYARr3toEBTxVcwFi86JxK0D-w4OpNtvVdhCEbAnc8ZA@mail.gmail.com>
+ <6fd1f8b3-23b1-84cc-2376-ee04f1fa8438@intel.com>
+ <CACGkMEuusM3EMmWW6+q8V1fZscfjM2R9n7jGefUnSY59UnZDYQ@mail.gmail.com>
+From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
+In-Reply-To: <CACGkMEuusM3EMmWW6+q8V1fZscfjM2R9n7jGefUnSY59UnZDYQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When introduced, IRQFD resampling worked on POWER8 with XICS. However
-KVM on POWER9 has never implemented it - the compatibility mode code
-("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
-XIVE mode does not handle INTx in KVM at all.
 
-This moved the capability support advertising to platforms and stops
-advertising it on XIVE, i.e. POWER9 and later.
 
-This stops advertising the capability on MIPS and RISC-V as these
-do not select HAVE_KVM_IRQFD and do not implement IRQFD resampling
-anyway.
+On 9/21/2022 10:14 AM, Jason Wang wrote:
+> On Tue, Sep 20, 2022 at 1:46 PM Zhu, Lingshan <lingshan.zhu@intel.com> wrote:
+>>
+>>
+>> On 9/20/2022 10:16 AM, Jason Wang wrote:
+>>> On Fri, Sep 9, 2022 at 5:05 PM Zhu Lingshan <lingshan.zhu@intel.com> wrote:
+>>>> vdpa_dev_net_config_fill() should only report driver features
+>>>> to userspace after features negotiation is done.
+>>>>
+>>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>>> ---
+>>>>    drivers/vdpa/vdpa.c | 13 +++++++++----
+>>>>    1 file changed, 9 insertions(+), 4 deletions(-)
+>>>>
+>>>> diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
+>>>> index 798a02c7aa94..29d7e8858e6f 100644
+>>>> --- a/drivers/vdpa/vdpa.c
+>>>> +++ b/drivers/vdpa/vdpa.c
+>>>> @@ -819,6 +819,7 @@ static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *ms
+>>>>           struct virtio_net_config config = {};
+>>>>           u64 features_device, features_driver;
+>>>>           u16 val_u16;
+>>>> +       u8 status;
+>>>>
+>>>>           vdev->config->get_config(vdev, 0, &config, sizeof(config));
+>>>>
+>>>> @@ -834,10 +835,14 @@ static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *ms
+>>>>           if (nla_put_u16(msg, VDPA_ATTR_DEV_NET_CFG_MTU, val_u16))
+>>>>                   return -EMSGSIZE;
+>>>>
+>>>> -       features_driver = vdev->config->get_driver_features(vdev);
+>>>> -       if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features_driver,
+>>>> -                             VDPA_ATTR_PAD))
+>>>> -               return -EMSGSIZE;
+>>>> +       /* only read driver features after the feature negotiation is done */
+>>>> +       status = vdev->config->get_status(vdev);
+>>>> +       if (status & VIRTIO_CONFIG_S_FEATURES_OK) {
+>>> Any reason this is not checked in its caller as what it used to do before?
+>> will check the existence of vdev->config->get_status before calling it in V2
+> Just to clarify, I meant to check FEAUTRES_OK in the caller -
+> vdpa_dev_config_fill() otherwise each type needs to repeat this in
+> their specific codes.
+if we check FEATURES_OK in the caller vdpa_dev_config_fill(), then
+!FEATURES_OK will block reporting all attributions, for example
+the device features and virtio device config space fields in this series 
+and device status.
+Currently only driver features needs to check FEATURES_OK.
+Or did I missed anything?
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Acked-by: Nicholas Piggin <npiggin@gmail.com>
----
-Changes:
-v3:
-* removed all ifdeferry
-* removed the capability for MIPS and RISCV
-* adjusted the commit log about MIPS and RISCV
-
-v2:
-* removed ifdef for ARM64.
----
- arch/arm64/kvm/arm.c       | 1 +
- arch/powerpc/kvm/powerpc.c | 6 ++++++
- arch/s390/kvm/kvm-s390.c   | 1 +
- arch/x86/kvm/x86.c         | 1 +
- virt/kvm/kvm_main.c        | 1 -
- 5 files changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 2ff0ef62abad..d2daa4d375b5 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -218,6 +218,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VCPU_ATTRIBUTES:
- 	case KVM_CAP_PTP_KVM:
- 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
-+	case KVM_CAP_IRQFD_RESAMPLE:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index fb1490761c87..908ce8bd91c9 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -593,6 +593,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		break;
- #endif
- 
-+#ifdef CONFIG_HAVE_KVM_IRQFD
-+	case KVM_CAP_IRQFD_RESAMPLE:
-+		r = !xive_enabled();
-+		break;
-+#endif
-+
- 	case KVM_CAP_PPC_ALLOC_HTAB:
- 		r = hv_enabled;
- 		break;
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index edfd4bbd0cba..7521adadb81b 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -577,6 +577,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 	case KVM_CAP_S390_DIAG318:
- 	case KVM_CAP_S390_MEM_OP_EXTENSION:
-+	case KVM_CAP_IRQFD_RESAMPLE:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 43a6a7efc6ec..2d6c5a8fdf14 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4395,6 +4395,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VAPIC:
- 	case KVM_CAP_ENABLE_CAP:
- 	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
-+	case KVM_CAP_IRQFD_RESAMPLE:
- 		r = 1;
- 		break;
- 	case KVM_CAP_EXIT_HYPERCALL:
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 584a5bab3af3..05cf94013f02 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4447,7 +4447,6 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- #endif
- #ifdef CONFIG_HAVE_KVM_IRQFD
- 	case KVM_CAP_IRQFD:
--	case KVM_CAP_IRQFD_RESAMPLE:
- #endif
- 	case KVM_CAP_IOEVENTFD_ANY_LENGTH:
- 	case KVM_CAP_CHECK_EXTENSION_VM:
--- 
-2.37.3
+Thanks
+>
+> Thanks
+>
+>> Thanks,
+>> Zhu Lingshan
+>>> Thanks
+>>>
+>>>> +               features_driver = vdev->config->get_driver_features(vdev);
+>>>> +               if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features_driver,
+>>>> +                                     VDPA_ATTR_PAD))
+>>>> +                       return -EMSGSIZE;
+>>>> +       }
+>>>>
+>>>>           features_device = vdev->config->get_device_features(vdev);
+>>>>
+>>>> --
+>>>> 2.31.1
+>>>>
 
