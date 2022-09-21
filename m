@@ -2,106 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B8605E564A
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 00:36:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69BF75E565C
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 00:52:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231128AbiIUWgg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 18:36:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49150 "EHLO
+        id S229785AbiIUWwq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 18:52:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230467AbiIUWgd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Sep 2022 18:36:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EEC89AFBA
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 15:36:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663799791;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pLSyYLHiY+VNwMQYaxWFu5v3xL7RsNBFdyNkMnW+s54=;
-        b=D+HtzeDPyH2GlaoZMR4CxyQZTZnS3mVV4Iyp3tbPMR+vQKpSwyF1JmjCFlwRNEeUtynsL/
-        qz6TmBU4NhPkhEw9rkd1HfGqy2lpXp0QDHtaFOeFYqwqW9v8HHS1Ys46oQfuN6hQe3GGUl
-        W5rD8rj4PNyZICMY/fk/psa23UiPoqc=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-477-rDZQprHIN0-Ta4R9AOhjPw-1; Wed, 21 Sep 2022 18:36:30 -0400
-X-MC-Unique: rDZQprHIN0-Ta4R9AOhjPw-1
-Received: by mail-qk1-f199.google.com with SMTP id j13-20020a05620a288d00b006be7b2a758fso5270648qkp.1
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 15:36:29 -0700 (PDT)
+        with ESMTP id S229471AbiIUWwn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Sep 2022 18:52:43 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCC3FA2848
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 15:52:42 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id v1so7084886plo.9
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 15:52:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=S3hwfKvotVXsthfCnxkxJbZinClhF0B7HMknMNXolO0=;
+        b=LMt/PzB+ynhMDVTJGXdJP5bVpTZg4kePhiSSgzehGwKZs1xlYsxqcHH4nsbJG1FB4L
+         lJLuYpg6kWRiUTy/ovhiLC5ZIZYW7KRTdBszisRPeoXbH3lgrFzovwH6FicYauihSi7G
+         OJB5SjOyMhJEJiOXDnuFOQaThh0ffZRegaDMWvUuN72PluWjWsL9anHFNKm4boZ4W2x0
+         vh6EyAgrCGyWUGJ7f/n0RLLhwxtJ0sDfHwoAUMP9Qt5PjRN4B+5YGs+hLRp39BmUvZ8+
+         8JhNGft43mmZl1/5Ezw6zBL0B1xV4g5TTJqBonSqClmiDOXb29qMxmbW5JMkYD/krz4Y
+         XoZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=pLSyYLHiY+VNwMQYaxWFu5v3xL7RsNBFdyNkMnW+s54=;
-        b=xuLYgqibhBdUnopG32doApCBTXgv2RExCgkZoJTnvO7KXzBZXNLCC9wSKjprjAZuDs
-         8Tiotveif80k6iYiP8q3bRpigsjkiK/eD66N9P/cdxg+QwZBl3/215CaxHPlscOoKwE3
-         fOTy818Gt2tkOZkWC5JBWXsEb1rfIbW+J1Y9KGTPbXGLDE9aVgghRGSYx/5DI1AY4ceE
-         UfWlLW2Sn8KwXFSiNpxGAPM91qQLFt54IhCr94D8OVBLY3Ev8qSTPJv/ck/9Md0nNZuN
-         qbpklEy6o+stBkXMFd1wxWAE+6ZMZmsB3tuFor6+jmD9uZjyAMZ5HetZJRX4Ym6amvFg
-         CBfA==
-X-Gm-Message-State: ACrzQf3XdrNz52l8JwTEdbrtGGoOPxKUy1Y5aHMtIK2TaShDfvSFNjTC
-        Q8Ciyv9kXaROn/6vqMBsQStB4KJ2YbO+WdnENptq1J67psHLfO871VE+BKT34qclWrjFt4ML7D0
-        BmcqcU9IaDnye
-X-Received: by 2002:a05:622a:14d4:b0:35c:db96:8d71 with SMTP id u20-20020a05622a14d400b0035cdb968d71mr530172qtx.327.1663799789464;
-        Wed, 21 Sep 2022 15:36:29 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7bXT2DDzhMBaBuiXz0t9E12+xhzSl9gqDWJ0OwwtO97MDY7PygY6XLt1S3rdo4OUToNYUKwg==
-X-Received: by 2002:a05:622a:14d4:b0:35c:db96:8d71 with SMTP id u20-20020a05622a14d400b0035cdb968d71mr530153qtx.327.1663799789162;
-        Wed, 21 Sep 2022 15:36:29 -0700 (PDT)
-Received: from ?IPV6:2600:8805:3a00:3:3b4f:6d3c:92c4:a5c7? ([2600:8805:3a00:3:3b4f:6d3c:92c4:a5c7])
-        by smtp.gmail.com with ESMTPSA id e7-20020ac80647000000b0035bb0cd479csm2249384qth.40.2022.09.21.15.36.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Sep 2022 15:36:28 -0700 (PDT)
-Message-ID: <463d5e09-202f-ca2f-ffb0-c86c8f8b75c9@redhat.com>
-Date:   Wed, 21 Sep 2022 18:36:27 -0400
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=S3hwfKvotVXsthfCnxkxJbZinClhF0B7HMknMNXolO0=;
+        b=JIGczEnXDIpaGJFpFoSWu9+hfnmojMtqoLhJIWrxelKqBscP+HLExYkmFNtbfk19No
+         sOuFuAdVhq+99ogumJo3i9DoNfzWa6MMuxjHZ+Ewvdx80P7jukzzKj/qGi0xsKFlYiZm
+         9jPvUDQdG3xODJ8hFinudb9v1x5sCH2jJ1pMJoY7tYVXpKom4Jp2F2i+llpY5RPengfO
+         HhmbChfXydMZpWi/L3d30vxdeli4VWWujzJKr6BVPWyxfTy3vUiIPhq06P22oi5jFl7q
+         SdjtbV2+WSNBjqwB/nw44UnrNmP2oPHpiQGsn3JFKRsvOj3EI6RjT12dRrjYzHX/CsJO
+         sPCQ==
+X-Gm-Message-State: ACrzQf06Y7HRltZwvxkwa77N3xoi6NhUkUXG0B2+urpL7OwnKVVbM1Ei
+        u6gTJY+42kLmnoSheNKSINQKog==
+X-Google-Smtp-Source: AMsMyM4JQyt8CDl8rUdZX0cVMhZDqQTD6flVYpXf46pDsc+IfoHNzZ2Ketv34Q5sLeWOkVDC6fXRnw==
+X-Received: by 2002:a17:902:db0f:b0:176:e70f:6277 with SMTP id m15-20020a170902db0f00b00176e70f6277mr457269plx.13.1663800762099;
+        Wed, 21 Sep 2022 15:52:42 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id r26-20020a63441a000000b0042b5095b7b4sm2501018pga.5.2022.09.21.15.52.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Sep 2022 15:52:41 -0700 (PDT)
+Date:   Wed, 21 Sep 2022 22:52:38 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Yuan Yao <yuan.yao@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v10 30/39] KVM: selftests: Hyper-V PV TLB flush selftest
+Message-ID: <YyuVtrpQwZGHs4ez@google.com>
+References: <20220921152436.3673454-1-vkuznets@redhat.com>
+ <20220921152436.3673454-31-vkuznets@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH RFC v2 00/13] IOMMUFD Generic interface
-Content-Language: en-US
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Eric Auger <eric.auger@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Rodel, Jorg" <jroedel@suse.de>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Farman <farman@linux.ibm.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Martins, Joao" <joao.m.martins@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        Steve Sistare <steven.sistare@oracle.com>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <0-v2-f9436d0bde78+4bb-iommufd_jgg@nvidia.com>
- <BN9PR11MB52762909D64C1194F4FCB4528C479@BN9PR11MB5276.namprd11.prod.outlook.com>
- <d5e33ebb-29e6-029d-aef4-af5c4478185a@redhat.com>
- <Yyoa+kAJi2+/YTYn@nvidia.com>
- <20220921120649.5d2ff778.alex.williamson@redhat.com>
-From:   Laine Stump <laine@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20220921120649.5d2ff778.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220921152436.3673454-31-vkuznets@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -109,163 +77,194 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/21/22 2:06 PM, Alex Williamson wrote:
-> [Cc+ Steve, libvirt, Daniel, Laine]
-> 
-> On Tue, 20 Sep 2022 16:56:42 -0300
-> Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
->> On Tue, Sep 13, 2022 at 09:28:18AM +0200, Eric Auger wrote:
->>> Hi,
->>>
->>> On 9/13/22 03:55, Tian, Kevin wrote:
->>>> We didn't close the open of how to get this merged in LPC due to the
->>>> audio issue. Then let's use mails.
->>>>
->>>> Overall there are three options on the table:
->>>>
->>>> 1) Require vfio-compat to be 100% compatible with vfio-type1
->>>>
->>>>     Probably not a good choice given the amount of work to fix the remaining
->>>>     gaps. And this will block support of new IOMMU features for a longer time.
->>>>
->>>> 2) Leave vfio-compat as what it is in this series
->>>>
->>>>     Treat it as a vehicle to validate the iommufd logic instead of immediately
->>>>     replacing vfio-type1. Functionally most vfio applications can work w/o
->>>>     change if putting aside the difference on locked mm accounting, p2p, etc.
->>>>
->>>>     Then work on new features and 100% vfio-type1 compat. in parallel.
->>>>
->>>> 3) Focus on iommufd native uAPI first
->>>>
->>>>     Require vfio_device cdev and adoption in Qemu. Only for new vfio app.
->>>>
->>>>     Then work on new features and vfio-compat in parallel.
->>>>
->>>> I'm fine with either 2) or 3). Per a quick chat with Alex he prefers to 3).
->>>
->>> I am also inclined to pursue 3) as this was the initial Jason's guidance
->>> and pre-requisite to integrate new features. In the past we concluded
->>> vfio-compat would mostly be used for testing purpose. Our QEMU
->>> integration fully is based on device based API.
->>
->> There are some poor chicken and egg problems here.
->>
->> I had some assumptions:
->>   a - the vfio cdev model is going to be iommufd only
->>   b - any uAPI we add as we go along should be generally useful going
->>       forward
->>   c - we should try to minimize the 'minimally viable iommufd' series
->>
->> The compat as it stands now (eg #2) is threading this needle. Since it
->> can exist without cdev it means (c) is made smaller, to two series.
->>
->> Since we add something useful to some use cases, eg DPDK is deployable
->> that way, (b) is OK.
->>
->> If we focus on a strict path with 3, and avoid adding non-useful code,
->> then we have to have two more (unwritten!) series beyond where we are
->> now - vfio group compartmentalization, and cdev integration, and the
->> initial (c) will increase.
->>
->> 3 also has us merging something that currently has no usable
->> userspace, which I also do dislike alot.
->>
->> I still think the compat gaps are small. I've realized that
->> VFIO_DMA_UNMAP_FLAG_VADDR has no implementation in qemu, and since it
->> can deadlock the kernel I propose we purge it completely.
-> 
-> Steve won't be happy to hear that, QEMU support exists but isn't yet
-> merged.
->   
->> P2P is ongoing.
->>
->> That really just leaves the accounting, and I'm still not convinced at
->> this must be a critical thing. Linus's latest remarks reported in lwn
->> at the maintainer summit on tracepoints/BPF as ABI seem to support
->> this. Let's see an actual deployed production configuration that would
->> be impacted, and we won't find that unless we move forward.
-> 
-> I'll try to summarize the proposed change so that we can get better
-> advice from libvirt folks, or potentially anyone else managing locked
-> memory limits for device assignment VMs.
-> 
-> Background: when a DMA range, ex. guest RAM, is mapped to a vfio device,
-> we use the system IOMMU to provide GPA to HPA translation for assigned
-> devices. Unlike CPU page tables, we don't generally have a means to
-> demand fault these translations, therefore the memory target of the
-> translation is pinned to prevent that it cannot be swapped or
-> relocated, ie. to guarantee the translation is always valid.
-> 
-> The issue is where we account these pinned pages, where accounting is
-> necessary such that a user cannot lock an arbitrary number of pages
-> into RAM to generate a DoS attack.  Duplicate accounting should be
-> resolved by iommufd, but is outside the scope of this discussion.
-> 
-> Currently, vfio tests against the mm_struct.locked_vm relative to
-> rlimit(RLIMIT_MEMLOCK), which reads task->signal->rlim[limit].rlim_cur,
-> where task is the current process.  This is the same limit set via the
-> setrlimit syscall used by prlimit(1) and reported via 'ulimit -l'.
-> 
-> Note that in both cases above, we're dealing with a task, or process
-> limit and both prlimit and ulimit man pages describe them as such.
-> 
-> iommufd supposes instead, and references existing kernel
-> implementations, that despite the descriptions above these limits are
-> actually meant to be user limits and therefore instead charges pinned
-> pages against user_struct.locked_vm and also marks them in
-> mm_struct.pinned_vm.
-> 
-> The proposed algorithm is to read the _task_ locked memory limit, then
-> attempt to charge the _user_ locked_vm, such that user_struct.locked_vm
-> cannot exceed the task locked memory limit.
-> 
-> This obviously has implications.  AFAICT, any management tool that
-> doesn't instantiate assigned device VMs under separate users are
-> essentially untenable.  For example, if we launch VM1 under userA and
-> set a locked memory limit of 4GB via prlimit to account for an assigned
-> device, that works fine, until we launch VM2 from userA as well.  In
-> that case we can't simply set a 4GB limit on the VM2 task because
-> there's already 4GB charged against user_struct.locked_vm for VM1.  So
-> we'd need to set the VM2 task limit to 8GB to be able to launch VM2.
-> But not only that, we'd need to go back and also set VM1's task limit
-> to 8GB or else it will fail if a DMA mapped memory region is transient
-> and needs to be re-mapped.
-> 
-> Effectively any task under the same user and requiring pinned memory
-> needs to have a locked memory limit set, and updated, to account for
-> all tasks using pinned memory by that user.
-> 
-> How does this affect known current use cases of locked memory
-> management for assigned device VMs?
-> 
-> Does qemu://system by default sandbox into per VM uids or do they all
-> use the qemu user by default.
+On Wed, Sep 21, 2022, Vitaly Kuznetsov wrote:
+> +/* 'Worker' vCPU code checking the contents of the test page */
+> +static void worker_guest_code(vm_vaddr_t test_data)
+> +{
+> +	struct test_data *data = (struct test_data *)test_data;
+> +	u32 vcpu_id = rdmsr(HV_X64_MSR_VP_INDEX);
+> +	unsigned char chr_exp1, chr_exp2, chr_cur;
 
-Unless it is told otherwise in the XML for the VMs, each qemu process 
-uses the same uid (which is usually "qemu", but can be changed in 
-systemwide config).
+Any reason for "unsigned char" over uint8_t?
 
->  I imagine qemu://session mode is pretty
-> screwed by this, but I also don't know who/where locked limits are
-> lifted for such VMs.  Boxes, who I think now supports assigned device
-> VMs, could also be affected.
+And the "chr_" prefix is rather weird, IMO it just makes the code harder to read.
 
-because qemu:///session runs an unprivileged libvirt (i.e. unable to 
-raise the limits), boxes sets the limits elsewhere  beforehand (not sure 
-where, as I'm not familiar with boxes source).
+Actually, why a single char?  E.g. why not do a uint64_t?  Oooh, because the
+offset is only by vcpu_id, not by vcpu_id * PAGE_SIZE.  Maybe add a comment about
+that somewhere?
 
->   
->> So, I still like 2 because it yields the smallest next step before we
->> can bring all the parallel work onto the list, and it makes testing
->> and converting non-qemu stuff easier even going forward.
-> 
-> If a vfio compatible interface isn't transparently compatible, then I
-> have a hard time understanding its value.  Please correct my above
-> description and implications, but I suspect these are not just
-> theoretical ABI compat issues.  Thanks,
-> 
-> Alex
-> 
+> +
+> +	x2apic_enable();
+> +	wrmsr(HV_X64_MSR_GUEST_OS_ID, HYPERV_LINUX_OS_ID);
+> +
+> +	for (;;) {
+> +		/* Read the expected char, then check what's in the test pages and then
+> +		 * check the expectation again to make sure it wasn't updated in the meantime.
 
+Please wrap at the soft limit.
+
+> +		 */
+
+Except for apparently networking, kernel preferred style for block comments is:
+
+		/*
+		 * This comment is for KVM.
+		 */
+
+> +		chr_exp1 = READ_ONCE(*(unsigned char *)
+> +				     (data->test_pages + PAGE_SIZE * NTEST_PAGES + vcpu_id));
+
+Use a local variable for the pointer, then these line lengths are much more sane.
+Hmm, and if you give them descriptive names, I think it will make the code much
+easier to follow.  E.g. I've been staring at this test for ~10 minutes and am still
+not entirely sure what shenanigans are going on.
+
+> +		asm volatile("lfence");
+
+The kernel versions of these are provided by tools/arch/x86/include/asm/barrier.h,
+which I think is available?  I forget if we can use those in the selftests mess.
+
+Regardless, this needs a comment explaining why LFENCE/rmb() is needed, and why
+the writer needs MFENCE/mb().
+
+> +		chr_cur = *(unsigned char *)data->test_pages;
+
+READ_ONCE()?
+
+> +		asm volatile("lfence");
+> +		chr_exp2 = READ_ONCE(*(unsigned char *)
+> +				     (data->test_pages + PAGE_SIZE * NTEST_PAGES + vcpu_id));
+> +		if (chr_exp1 && chr_exp1 == chr_exp2)
+
+IIUC, the "chr_exp1 != 0" check is the read side of "0 == disable".  Splitting
+that out and adding a comment would be helpful.
+
+And if a local variable is used to hold the pointer, there's no need for an "exp2"
+variable.
+
+> +			GUEST_ASSERT(chr_cur == chr_exp1);
+> +		asm volatile("nop");
+
+Use cpu_relax(), which KVM selftests provide.
+
+All in all, something like this?
+
+	for (;;) {
+		cpu_relax();
+
+		expected = READ_ONCE(*this_vcpu);
+		
+		/* ??? */
+		rmb();
+		val = READ_ONCE(*???);
+		/* ??? */
+		rmb();
+
+		/*
+		 * '0' indicates the sender is between iterations, wait until
+		 * the sender is ready for this vCPU to start checking again.
+		 */
+		if (!expected)
+			continue;
+
+		/*
+		 * Re-read the per-vCPU byte to ensure the sender didn't move
+		 * onto a new iteration.
+		 */	
+		if (expected != READ_ONCE(*this_vcpu))
+			continue;
+		
+		GUEST_ASSERT(val == expected);
+	}
+
+> +	}
+> +}
+> +
+> +/*
+> + * Write per-CPU info indicating what each 'worker' CPU is supposed to see in
+> + * test page. '0' means don't check.
+> + */
+> +static void set_expected_char(void *addr, unsigned char chr, int vcpu_id)
+> +{
+> +	asm volatile("mfence");
+
+Why MFENCE?
+
+> +	*(unsigned char *)(addr + NTEST_PAGES * PAGE_SIZE + vcpu_id) = chr;
+> +}
+> +
+> +/* Update PTEs swapping two test pages */
+> +static void swap_two_test_pages(vm_paddr_t pte_gva1, vm_paddr_t pte_gva2)
+> +{
+> +	uint64_t pte[2];
+> +
+> +	pte[0] = *(uint64_t *)pte_gva1;
+> +	pte[1] = *(uint64_t *)pte_gva2;
+> +
+> +	*(uint64_t *)pte_gva1 = pte[1];
+> +	*(uint64_t *)pte_gva2 = pte[0];
+
+xchg()?  swap()?
+
+> +}
+> +
+> +/* Delay */
+> +static inline void rep_nop(void)
+
+LOL, rep_nop() is a hilariously confusing function name.  "REP NOP" is "PAUSE",
+and for whatever reason the kernel proper use rep_nop() as the function name for
+the wrapper.  My reaction to the MFENCE+rep_nop() below was "how the hell does
+MFENCE+PAUSE guarantee a delay?!?".
+
+Anyways, why not do e.g. usleep(1)?  And if you really need a udelay() and not a
+usleep(), IMO it's worth adding exactly that instead of throwing NOPs at the CPU.
+E.g. aarch64 KVM selftests already implements udelay(), so adding an x86 variant
+would move us one step closer to being able to use it in common tests.
+
+
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < 1000000; i++)
+> +		asm volatile("nop");
+> +}
+> +	r = pthread_create(&threads[0], NULL, vcpu_thread, vcpu[1]);
+> +	TEST_ASSERT(r == 0,
+
+!r is preferred
+
+> +		    "pthread_create failed errno=%d", errno);
+
+TEST_ASSERT() already captures errno, e.g. these can be:
+
+	TEST_ASSERT(!r, "pthread_create() failed");
+
+> +
+> +	r = pthread_create(&threads[1], NULL, vcpu_thread, vcpu[2]);
+> +	TEST_ASSERT(r == 0,
+> +		    "pthread_create failed errno=%d", errno);
+> +
+> +	while (true) {
+> +		r = _vcpu_run(vcpu[0]);
+> +		exit_reason = vcpu[0]->run->exit_reason;
+> +
+> +		TEST_ASSERT(!r, "vcpu_run failed: %d\n", r);
+
+Pretty sure newlines in asserts aren't necessary, though I forget if they cause
+weirdness or just end up being ignored.
+
+> +		TEST_ASSERT(exit_reason == KVM_EXIT_IO,
+> +			    "unexpected exit reason: %u (%s)",
+> +			    exit_reason, exit_reason_str(exit_reason));
+> +
+> +		switch (get_ucall(vcpu[0], &uc)) {
+> +		case UCALL_SYNC:
+> +			TEST_ASSERT(uc.args[1] == stage,
+> +				    "Unexpected stage: %ld (%d expected)\n",
+> +				    uc.args[1], stage);
+> +			break;
+> +		case UCALL_ABORT:
+> +			TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0],
+> +				  __FILE__, uc.args[1]);
+
+			REPORT_GUEST_ASSERT(uc);
