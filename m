@@ -2,72 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D6335C045E
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 18:38:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 924985C0478
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 18:44:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229841AbiIUQip (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 12:38:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36630 "EHLO
+        id S229807AbiIUQoP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 12:44:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229963AbiIUQiW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Sep 2022 12:38:22 -0400
-Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96AC49DB50
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 09:23:52 -0700 (PDT)
-Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-1278624b7c4so9809526fac.5
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 09:23:52 -0700 (PDT)
+        with ESMTP id S231268AbiIUQnh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Sep 2022 12:43:37 -0400
+Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4341A6AE5
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 09:32:37 -0700 (PDT)
+Received: by mail-ot1-x32b.google.com with SMTP id f20-20020a9d7b54000000b006574e21f1b6so4307426oto.5
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 09:32:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date;
-        bh=c0RkeYzaVmPEsrZ5EMX9GaWUzmBrwnO4Ngp7mcr6270=;
-        b=mclHjr/Fs7SL8F+F1lWzX0r9UcdRoDguRRxPSp+ho6sqozHcX+AjvJ5xpr0V3e1/Q/
-         +c+WVecvKeIFAn8SIlKHOt/eEiV+zHBPoLKh+fwlCmVx7Lm4QtY1uOW1czzBfhvybyUF
-         +HoxJk/yRuTrdb2Ot8vLIw2Pyv+VmyEMNe8x8ORYb9gPlZaqR4i3mw7IBvtsQiUQ5qMl
-         zD2bNR3+acOJOi+D7XFMIEwwKFdUTK/G4gViPhJ9xLHg8rpDx8UZlaI+HyckwibnSeSh
-         r05ZMc6qgdf1jRIPWKNygBlVDuBxocBMoye/PC88Kpau/Z6Pe2cbvkw+8QITUJ9Chgt/
-         GZfA==
+        bh=owGl3Io+npGkA8eaNCMVOu227jlJ2Vgtm7TTFjJLRxI=;
+        b=HUjuRTVw6cNX0ZAtqowgeKvNX5zNo2mAw3inTtG6WnQ4k2Nnx1T0FdKt9PqUcyViaK
+         CTSR1g03EVMJ8g0Z4wTWhWPlsG55xlH3rBQeAK5c10p9WvWl7Ed4gBog5Z5gluklPMsO
+         +4tiXnwgTXxKkP2Ror0CdVYeMdReT8KyOg3IP6eDtJ35opJRfbAcD1eOb9CsEbvSEX+V
+         9u8Vze2he8Xe8Ho8odXn7OfulB/HNplc4G5yPCWaMLRsYGMb0R5N4Qp2ZwCd4baJ3yiz
+         qt60huPERI3Y44AzKBbpZo0FPzXQEW59JGclw4s0WHCmQv4GlepCXKNvwe8mzsIKvrPa
+         VQYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=c0RkeYzaVmPEsrZ5EMX9GaWUzmBrwnO4Ngp7mcr6270=;
-        b=U8zzm6X75eOCf2u0dEdva9ZAxvmbjzBPKADUF5Hm8AFw1QUeoAHaG18qO9ggiGJZtH
-         a4rdsSOCujfuvLrKWm5seA+i865yF1MMiYrTka2IUgal23gYpta6d3KyFy7S7sCmVfMR
-         GIH3eaW3zrfkNsVS0sNN9xjv1gQbJ5bcMvQQEJcQbvQBpOTIZHPR7WkTd4kwPLvhPuL7
-         QbOGKGma+s7MXrcqFpksqZ+atQZzgMdzoXrUbq7d9QMraJMscIoa2LbzGVDyeydUO0G/
-         QEAp5un92Sk1Dqz0CjOvWlNubDSn/IZL1V6FK6iGVGqJA+h8JboGPTJNwzb/yhz9rWNh
-         2qdg==
-X-Gm-Message-State: ACrzQf0jnQoWH6txXkLvIHS7Tm6Fcek5L2X/6DZUWPFpbmAV0wwXx19k
-        DjapOQ5sbMgPjRGqZ4z7UfSgry83SOB1flUqmkMcuA==
-X-Google-Smtp-Source: AMsMyM6udKO0mM416CuGNqHAwIob8j7/AVRQHFn1HV+/sWmesQmURFFmLUYUAP/MZg19xYHGWdzVHZOYi3AOvF4Mwuc=
-X-Received: by 2002:a05:6870:580c:b0:12a:f136:a8f5 with SMTP id
- r12-20020a056870580c00b0012af136a8f5mr5412294oap.269.1663777431692; Wed, 21
- Sep 2022 09:23:51 -0700 (PDT)
+        bh=owGl3Io+npGkA8eaNCMVOu227jlJ2Vgtm7TTFjJLRxI=;
+        b=ki1YIfObdvnlODQmkQLlxVNN7sR+t8GgFG7hl1vsFvRRu/Di+DTCpO53QKNwX/aSNR
+         wzCpagoP0kIVg2vABQy2gFht8HbrLmtZh+IuuMd6t7BYUzRmZyDBTNeQBXG4ilxFf+hY
+         qGiJTu4f6GFa9QQY39ty/SlvHn5KXo2mVrq9HtlW+lY9wVFDiBr1ore0u2Yq90RWzk1e
+         aaTurdbKBqC2N4CR/fr756Gz81/zAFOFavoTWgZpwrqW9jumefHUqR1t7bG0UuosTp2Y
+         jSA3ungc897mVvrfwVPD9hP2dvmcfaoSQZ6LDPNV9hzwep8oB3vMj2IKW0U6mFlEtv1m
+         nd7Q==
+X-Gm-Message-State: ACrzQf0vEVy6VHHO23DiRJbJ9cCS+FyqDGKVTX3jwiOG+ZUMWVElsEsM
+        +sQUweHQzxBWLAltxRMylogSsWrGNsFFvtuJ+swSUQ==
+X-Google-Smtp-Source: AMsMyM4PorEITJssr5Q8qYX2Dg72jU4UXiH+m4/+alkfdmgg42ZuaAwAPifTuaC2yMiE3fohhbyMW483+oym4qFQ4Ro=
+X-Received: by 2002:a9d:6296:0:b0:656:761:28bc with SMTP id
+ x22-20020a9d6296000000b00656076128bcmr12864376otk.14.1663777956576; Wed, 21
+ Sep 2022 09:32:36 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220920205922.1564814-1-jmattson@google.com> <Yyot34LGkFR2/j5f@zn.tnic>
- <CALMp9eQijCKS-E_OWJkxdqAur3BthciOWEtEPH5YKd0-HJiQQA@mail.gmail.com>
- <YyrZOLq8z+lIORvP@zn.tnic> <CALMp9eRG6g-95zCxTD1NnxpZ+Vm6VMTA0_uaHV=b-hDkeOYSuA@mail.gmail.com>
- <YysXeXKY36yXj68q@zn.tnic> <CALMp9eTuO79+NfHxLi8FnqdOpzXO7eQUntvN23EfR+shg+wg2Q@mail.gmail.com>
- <Yys2ikzV73upzlEj@zn.tnic>
-In-Reply-To: <Yys2ikzV73upzlEj@zn.tnic>
+References: <20220908114146.473630-1-kraxel@redhat.com> <YxoBtD+3sgEEiaFF@google.com>
+ <20220909050224.rzlt4x7tjrespw3k@sirius.home.kraxel.org> <20220921134246.xibospqoktp4wjie@sirius.home.kraxel.org>
+ <Yysm8/Nkt6EUI5+k@google.com>
+In-Reply-To: <Yysm8/Nkt6EUI5+k@google.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 21 Sep 2022 09:23:40 -0700
-Message-ID: <CALMp9eQ-qkjBm8qPhOaMzZLWeHJcrwksV+XLQ9DfOQ_i1aykqQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/3] KVM: EFER.LMSLE cleanup
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>,
+Date:   Wed, 21 Sep 2022 09:32:25 -0700
+Message-ID: <CALMp9eRkXPPWbPfm16onV9+ondg0x7_RG5ku7hCpBAODLWpSgw@mail.gmail.com>
+Subject: Re: [PATCH] kvm/x86: reserve bit KVM_HINTS_PHYS_ADDRESS_SIZE_DATA_VALID
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Gerd Hoffmann <kraxel@redhat.com>, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,24 +77,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 21, 2022 at 9:06 AM Borislav Petkov <bp@alien8.de> wrote:
+On Wed, Sep 21, 2022 at 8:00 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> On Wed, Sep 21, 2022 at 08:11:29AM -0700, Jim Mattson wrote:
-> > Yes, after the revert, KVM will treat the bit as reserved, and it will
-> > synthesize a #GP, *in violation of the architectural specification.*
+> On Wed, Sep 21, 2022, Gerd Hoffmann wrote:
+> > On Fri, Sep 09, 2022 at 07:02:24AM +0200, Gerd Hoffmann wrote:
+> > > On Thu, Sep 08, 2022 at 02:52:36PM +0000, Sean Christopherson wrote:
+> > > > On Thu, Sep 08, 2022, Gerd Hoffmann wrote:
+> > > > > -#define KVM_HINTS_REALTIME      0
+> > > > > +#define KVM_HINTS_REALTIME                      0
+> > > > > +#define KVM_HINTS_PHYS_ADDRESS_SIZE_DATA_VALID  1
+> > > >
+> > > > Why does KVM need to get involved?  This is purely a userspace problem.
+> > >
+> > > It doesn't.  I only need reserve a hints bit, and the canonical source
+> > > for that happens to live in the kernel.  That's why this patch doesn't
+> > > touch any actual code ;)
 >
-> Architectural, schmarchitectural... Intel hasn't implemented it so meh.
->
-> > KVM can't just decide willy nilly to reserve arbitrary bits. If it is
-> > in violation of AMD's architectural specification, the virtual CPU is
-> > defective.
->
-> Grrr, after your revert that this bit was *only* reserved and nothing
-> else to KVM. Like every other reserved bit in EFER. Yeah, yeah, AMD
-> specified it as architectural but Intel didn't implement it so there's
-> this thing on paper and there's reality...
+> The issue is that this "hint" effectively breaks other VMMs that already provide
+> an accurate guest.MAXPHYADDR.
 
-AMD defined the 64-bit x86 extensions while Intel was distracted with
-their VLIW science fair project. In this space, Intel produces AMD64
-compatible CPUs. The definitive specification comes from AMD (which is
-sad, because AMD's documentation is abysmal).
+Any VMM that doesn't provide an accurate guest.MAXPHYADDR is broken.
+Why do we need a "hint" that the virtual processor works?
+
+> > > > E.g. why not use QEMU's fw_cfg to communicate this information to the
+> > > > guest?
+> > >
+> > > That is indeed the other obvious way to implement this.  Given this
+> > > information will be needed in code paths which already do CPUID queries
+> > > using CPUID to transport that information looked like the better option
+> > > to me.
+> >
+> > I'd like to move forward with this.
+> >
+> > So, any comment further comments and opinions?
+> > Is it ok to grab a hints bit given the explanation above?
+> > Or should I go for the fw_cfg approach?
+>
+> My strong preference is the fw_cfg approach, or if the guest side really wants to
+> use CPUID, have QEMU define it's own CPUID signature and provide QEMU-specific
+> hints/quirks that way.
