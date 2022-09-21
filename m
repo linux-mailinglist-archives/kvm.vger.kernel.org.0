@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E1CBC5C0112
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 17:24:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0111A5C011A
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 17:25:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230293AbiIUPYv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 11:24:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58986 "EHLO
+        id S230380AbiIUPYz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 11:24:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230287AbiIUPYr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Sep 2022 11:24:47 -0400
+        with ESMTP id S230096AbiIUPYv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Sep 2022 11:24:51 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36B51571E
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 08:24:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B872167C4
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 08:24:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663773886;
+        s=mimecast20190719; t=1663773889;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=e12xfV4Do0L3cE5+gwtlan5DdoX66dEzjGVHGdGGIuY=;
-        b=cWkHJqtT/iQvDe+m/0xsQGcR2V10CwAmSdHXZBirgrz1xFvMJg2AXMPxm4kOdrUvOop7qS
-        dhZg/5COAF9KnwMtWaA30EtohX7gt5+Ujayenc3wVtOzMkvBXa0RbRk2JCTROfvcAm4IMd
-        WWkKE+ONWqG5yRsuWaBu3Weew6bUGBU=
+        bh=WeV+rOQNXnLmEdosXps+zDCA3dG8VDP0eN36L5mglC0=;
+        b=IRFnitehzEWWFAzOxnK/sGAXZ8Y41tV9sBQmPvKzdBeMa6auH/81fQrQtjKABAIkRPWIod
+        BMuvWvLdAy2ru0MxiHkfTGKM6d8in7GtMkBwg2GG9a+PNTDtaK0DVTNBWWU78aU5tN7LvI
+        ExjsgV64mvf9IhxEZmCIveHHRUOyHPU=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-338-qlHpmUs3OjOQYsZyNvvbkA-1; Wed, 21 Sep 2022 11:24:44 -0400
-X-MC-Unique: qlHpmUs3OjOQYsZyNvvbkA-1
+ us-mta-304-RnxH3FEzOn2cPeveosQ8_Q-1; Wed, 21 Sep 2022 11:24:47 -0400
+X-MC-Unique: RnxH3FEzOn2cPeveosQ8_Q-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0D783858282;
-        Wed, 21 Sep 2022 15:24:44 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 00FCB87B2A3;
+        Wed, 21 Sep 2022 15:24:47 +0000 (UTC)
 Received: from fedora.redhat.com (unknown [10.40.194.159])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C0B202166B2B;
-        Wed, 21 Sep 2022 15:24:41 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 797922166B26;
+        Wed, 21 Sep 2022 15:24:44 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -47,9 +47,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Yuan Yao <yuan.yao@linux.intel.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v10 01/39] KVM: x86: Rename 'enable_direct_tlbflush' to 'enable_l2_tlb_flush'
-Date:   Wed, 21 Sep 2022 17:23:58 +0200
-Message-Id: <20220921152436.3673454-2-vkuznets@redhat.com>
+Subject: [PATCH v10 02/39] KVM: x86: hyper-v: Resurrect dedicated KVM_REQ_HV_TLB_FLUSH flag
+Date:   Wed, 21 Sep 2022 17:23:59 +0200
+Message-Id: <20220921152436.3673454-3-vkuznets@redhat.com>
 In-Reply-To: <20220921152436.3673454-1-vkuznets@redhat.com>
 References: <20220921152436.3673454-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -65,136 +65,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To make terminology between Hyper-V-on-KVM and KVM-on-Hyper-V consistent,
-rename 'enable_direct_tlbflush' to 'enable_l2_tlb_flush'. The change
-eliminates the use of confusing 'direct' and adds the missing underscore.
+In preparation to implementing fine-grained Hyper-V TLB flush and
+L2 TLB flush, resurrect dedicated KVM_REQ_HV_TLB_FLUSH request bit. As
+KVM_REQ_TLB_FLUSH_GUEST/KVM_REQ_TLB_FLUSH_CURRENT are stronger operations,
+clear KVM_REQ_HV_TLB_FLUSH request in kvm_service_local_tlb_flush_requests()
+when any of these were also requested.
 
-No functional change.
+No (real) functional change intended.
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/x86/include/asm/kvm-x86-ops.h | 2 +-
- arch/x86/include/asm/kvm_host.h    | 2 +-
- arch/x86/kvm/svm/svm_onhyperv.c    | 2 +-
- arch/x86/kvm/svm/svm_onhyperv.h    | 6 +++---
- arch/x86/kvm/vmx/vmx.c             | 6 +++---
- arch/x86/kvm/x86.c                 | 6 +++---
- 6 files changed, 12 insertions(+), 12 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  2 ++
+ arch/x86/kvm/hyperv.c           |  4 ++--
+ arch/x86/kvm/x86.c              | 10 ++++++++--
+ 3 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index 82ba4a564e58..6033b54963a4 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -123,7 +123,7 @@ KVM_X86_OP_OPTIONAL(guest_memory_reclaimed)
- KVM_X86_OP(get_msr_feature)
- KVM_X86_OP(can_emulate_instruction)
- KVM_X86_OP(apic_init_signal_blocked)
--KVM_X86_OP_OPTIONAL(enable_direct_tlbflush)
-+KVM_X86_OP_OPTIONAL(enable_l2_tlb_flush)
- KVM_X86_OP_OPTIONAL(migrate_timers)
- KVM_X86_OP(msr_filter_changed)
- KVM_X86_OP(complete_emulated_msr)
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index b3ce723efb43..504daf473092 100644
+index 504daf473092..45c390c804f0 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1624,7 +1624,7 @@ struct kvm_x86_ops {
- 					void *insn, int insn_len);
+@@ -108,6 +108,8 @@
+ 	KVM_ARCH_REQ_FLAGS(30, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_MMU_FREE_OBSOLETE_ROOTS \
+ 	KVM_ARCH_REQ_FLAGS(31, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
++#define KVM_REQ_HV_TLB_FLUSH \
++	KVM_ARCH_REQ_FLAGS(32, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
  
- 	bool (*apic_init_signal_blocked)(struct kvm_vcpu *vcpu);
--	int (*enable_direct_tlbflush)(struct kvm_vcpu *vcpu);
-+	int (*enable_l2_tlb_flush)(struct kvm_vcpu *vcpu);
- 
- 	void (*migrate_timers)(struct kvm_vcpu *vcpu);
- 	void (*msr_filter_changed)(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/svm/svm_onhyperv.c b/arch/x86/kvm/svm/svm_onhyperv.c
-index 8cdc62c74a96..69a7014d1cef 100644
---- a/arch/x86/kvm/svm/svm_onhyperv.c
-+++ b/arch/x86/kvm/svm/svm_onhyperv.c
-@@ -14,7 +14,7 @@
- #include "kvm_onhyperv.h"
- #include "svm_onhyperv.h"
- 
--int svm_hv_enable_direct_tlbflush(struct kvm_vcpu *vcpu)
-+int svm_hv_enable_l2_tlb_flush(struct kvm_vcpu *vcpu)
- {
- 	struct hv_enlightenments *hve;
- 	struct hv_partition_assist_pg **p_hv_pa_pg =
-diff --git a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
-index e2fc59380465..d6ec4aeebedb 100644
---- a/arch/x86/kvm/svm/svm_onhyperv.h
-+++ b/arch/x86/kvm/svm/svm_onhyperv.h
-@@ -13,7 +13,7 @@
- 
- static struct kvm_x86_ops svm_x86_ops;
- 
--int svm_hv_enable_direct_tlbflush(struct kvm_vcpu *vcpu);
-+int svm_hv_enable_l2_tlb_flush(struct kvm_vcpu *vcpu);
- 
- static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
- {
-@@ -51,8 +51,8 @@ static inline void svm_hv_hardware_setup(void)
- 
- 			vp_ap->nested_control.features.directhypercall = 1;
- 		}
--		svm_x86_ops.enable_direct_tlbflush =
--				svm_hv_enable_direct_tlbflush;
-+		svm_x86_ops.enable_l2_tlb_flush =
-+				svm_hv_enable_l2_tlb_flush;
- 	}
- }
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 94c314dc2393..87ef9aefc4ac 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -526,7 +526,7 @@ static unsigned long host_idt_base;
- static bool __read_mostly enlightened_vmcs = true;
- module_param(enlightened_vmcs, bool, 0444);
- 
--static int hv_enable_direct_tlbflush(struct kvm_vcpu *vcpu)
-+static int hv_enable_l2_tlb_flush(struct kvm_vcpu *vcpu)
- {
- 	struct hv_enlightened_vmcs *evmcs;
- 	struct hv_partition_assist_pg **p_hv_pa_pg =
-@@ -8479,8 +8479,8 @@ static int __init vmx_init(void)
- 		}
- 
- 		if (ms_hyperv.nested_features & HV_X64_NESTED_DIRECT_FLUSH)
--			vmx_x86_ops.enable_direct_tlbflush
--				= hv_enable_direct_tlbflush;
-+			vmx_x86_ops.enable_l2_tlb_flush
-+				= hv_enable_l2_tlb_flush;
- 
+ #define CR0_RESERVED_BITS                                               \
+ 	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 0adf4a437e85..3c0f639f6a05 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -1870,11 +1870,11 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ 	 * analyze it here, flush TLB regardless of the specified address space.
+ 	 */
+ 	if (all_cpus) {
+-		kvm_make_all_cpus_request(kvm, KVM_REQ_TLB_FLUSH_GUEST);
++		kvm_make_all_cpus_request(kvm, KVM_REQ_HV_TLB_FLUSH);
  	} else {
- 		enlightened_vmcs = false;
+ 		sparse_set_to_vcpu_mask(kvm, sparse_banks, valid_bank_mask, vcpu_mask);
+ 
+-		kvm_make_vcpus_request_mask(kvm, KVM_REQ_TLB_FLUSH_GUEST, vcpu_mask);
++		kvm_make_vcpus_request_mask(kvm, KVM_REQ_HV_TLB_FLUSH, vcpu_mask);
+ 	}
+ 
+ ret_success:
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5b8328cb6c14..f62d5799fcd7 100644
+index f62d5799fcd7..86504a8bfd9a 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -4467,7 +4467,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 			kvm_x86_ops.nested_ops->get_state(NULL, NULL, 0) : 0;
- 		break;
- 	case KVM_CAP_HYPERV_DIRECT_TLBFLUSH:
--		r = kvm_x86_ops.enable_direct_tlbflush != NULL;
-+		r = kvm_x86_ops.enable_l2_tlb_flush != NULL;
- 		break;
- 	case KVM_CAP_HYPERV_ENLIGHTENED_VMCS:
- 		r = kvm_x86_ops.nested_ops->enable_evmcs != NULL;
-@@ -5483,10 +5483,10 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
- 		}
- 		return r;
- 	case KVM_CAP_HYPERV_DIRECT_TLBFLUSH:
--		if (!kvm_x86_ops.enable_direct_tlbflush)
-+		if (!kvm_x86_ops.enable_l2_tlb_flush)
- 			return -ENOTTY;
+@@ -3418,11 +3418,17 @@ static inline void kvm_vcpu_flush_tlb_current(struct kvm_vcpu *vcpu)
+  */
+ void kvm_service_local_tlb_flush_requests(struct kvm_vcpu *vcpu)
+ {
+-	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
++	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu)) {
+ 		kvm_vcpu_flush_tlb_current(vcpu);
++		kvm_clear_request(KVM_REQ_HV_TLB_FLUSH, vcpu);
++	}
  
--		return static_call(kvm_x86_enable_direct_tlbflush)(vcpu);
-+		return static_call(kvm_x86_enable_l2_tlb_flush)(vcpu);
+-	if (kvm_check_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu))
++	if (kvm_check_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu)) {
++		kvm_vcpu_flush_tlb_guest(vcpu);
++		kvm_clear_request(KVM_REQ_HV_TLB_FLUSH, vcpu);
++	} else if (kvm_check_request(KVM_REQ_HV_TLB_FLUSH, vcpu)) {
+ 		kvm_vcpu_flush_tlb_guest(vcpu);
++	}
+ }
+ EXPORT_SYMBOL_GPL(kvm_service_local_tlb_flush_requests);
  
- 	case KVM_CAP_HYPERV_ENFORCE_CPUID:
- 		return kvm_hv_set_enforce_cpuid(vcpu, cap->args[0]);
 -- 
 2.37.3
 
