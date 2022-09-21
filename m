@@ -2,200 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B8FF45BF366
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 04:18:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37A905BF41B
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 05:08:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230104AbiIUCSO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Sep 2022 22:18:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40674 "EHLO
+        id S230323AbiIUDI0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Sep 2022 23:08:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230398AbiIUCSK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Sep 2022 22:18:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3316F45F53
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 19:18:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663726688;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=/gtl07m+44fhXx6lazyZdmQ7bZDMn8Q/qijchxc3xv0=;
-        b=ixyGcwHVM/wiULqlLZQhleDom95FzpZNC5ckwNlrzHRtui0l5K4JfJVWrHutcgahtWB1lm
-        oA2ZWFBkBP/4h6tyt9YglRD4d44uFhJXkaM0KPNW6T+c/kQOfgxMqVIFQhPjuIWtv9TGm3
-        tIKmociqQU2l3RYbfE/9oW1ADb6it+k=
-Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com
- [209.85.160.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-617-yZK-axjzMlGr2ZRgwp9BRg-1; Tue, 20 Sep 2022 22:18:06 -0400
-X-MC-Unique: yZK-axjzMlGr2ZRgwp9BRg-1
-Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-12abf4afb71so2623657fac.3
-        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 19:18:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=/gtl07m+44fhXx6lazyZdmQ7bZDMn8Q/qijchxc3xv0=;
-        b=cnS3ghocgfPHlijJOSeMzLw1VuTqJsuCypD6mPdyeNxMCcUhFfrW+SmZN1amvQTwjV
-         crfc5rFwBkbFuxBCNl77dlKzJDms8E1jKS0QQ/lTiFlxMN3X1304LLckXnTl7E6gm+ob
-         vLBDBb6u1C68Ez/j3B0EMCHOcTxJA7odegNMjYus86wXEjO7Wh/p1J09HasIa1CHiyOq
-         1lRpP71L/XN5OIPwywg+NPZx9ZmhIaeS9ik4n88i4W2/HsxoUhMnZWGG2hmrBLI3ELL7
-         62nK6Hy5HXaI0IaOxy9E22xp/5lQF4rnI2xq3JAiMRrWQz0qUFwdYah1GOxAVDfi5OQx
-         tCBQ==
-X-Gm-Message-State: ACrzQf1N3kf7A/LfyOAWRZ2zgeBdRWHCfwi7XbJCJq+SZXdDi+lHn7DF
-        fSu4lkjcg8LoXbg5CZNg495GNIWWKGLwbn3eoSVYedmJv54UFO+eYuFIXWKAJKIpNIIwQEbZEJX
-        ERdWZ2IF9Wk7YE6U5gP98g/A6IFXD
-X-Received: by 2002:a05:6808:1304:b0:350:649b:f8a1 with SMTP id y4-20020a056808130400b00350649bf8a1mr2890625oiv.280.1663726685170;
-        Tue, 20 Sep 2022 19:18:05 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM5Sp+DzA3Bx7zu6GlOqn0yJePMZvUgNVa704D/MJlnLCmpKE8iIbo4+I9gBgpCklksgG4cc3YQtPXFcDSMfQBA=
-X-Received: by 2002:a05:6808:1304:b0:350:649b:f8a1 with SMTP id
- y4-20020a056808130400b00350649bf8a1mr2890617oiv.280.1663726684913; Tue, 20
- Sep 2022 19:18:04 -0700 (PDT)
+        with ESMTP id S231129AbiIUDIE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Sep 2022 23:08:04 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDCC77E02B
+        for <kvm@vger.kernel.org>; Tue, 20 Sep 2022 20:07:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1663729664; x=1695265664;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=IDL8vZTnp35Mro2Bd4eUR+qgMw9RrBkY3Hr4UHQU88A=;
+  b=YQl0Uvn+a76N/hmGz94sxGnnDXjDs+wstJAr0tE9ReJdOF3/NgtQ4r1S
+   bJB4U0Sh/zlOPy0TSnD1sg9whLnBr4pWK/WHaCy4j/gQNEiINCvTfV/xf
+   6+cewVxuD05Nv8vCLsH0uQic8k0EGHDFNcStGQmlK6edCWS2I2CdJjVcJ
+   45fBGtaZ3LdWEaB05yu/awPk1/2h4NCrhwujKzgYFRn6PQb58gYXpITay
+   sKRXk5oo7pcGB8yT91tBy11pM4cdCnDXYpyZg0ikydlAcgDSXWCW1aM74
+   dyIeLQ83acpHtX7jpJbKkmc2TvwZ/NN/igqVMQfA+fSvyRUQCfSQKtA10
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10476"; a="297480143"
+X-IronPort-AV: E=Sophos;i="5.93,332,1654585200"; 
+   d="scan'208";a="297480143"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2022 20:07:44 -0700
+X-IronPort-AV: E=Sophos;i="5.93,332,1654585200"; 
+   d="scan'208";a="708258326"
+Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.238.0.135]) ([10.238.0.135])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2022 20:07:42 -0700
+Message-ID: <38a4d1c0-25e6-0836-c2bc-5ae580c95715@intel.com>
+Date:   Wed, 21 Sep 2022 11:07:40 +0800
 MIME-Version: 1.0
-References: <20220909085712.46006-1-lingshan.zhu@intel.com>
- <20220909085712.46006-2-lingshan.zhu@intel.com> <CACGkMEsq+weeO7i8KtNNAPhXGwN=cTwWt3RWfTtML-Xwj3K5Qg@mail.gmail.com>
- <e69b65e7-516f-55bd-cb99-863d7accbd32@intel.com>
-In-Reply-To: <e69b65e7-516f-55bd-cb99-863d7accbd32@intel.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Wed, 21 Sep 2022 10:17:53 +0800
-Message-ID: <CACGkMEv0++vmfzzmX47NhsaY5JTvbO2Ro7Taf8C0dxV6OVXTKw@mail.gmail.com>
-Subject: Re: [PATCH 1/4] vDPA: allow userspace to query features of a vDPA device
-To:     "Zhu, Lingshan" <lingshan.zhu@intel.com>
-Cc:     mst <mst@redhat.com>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>, kvm <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.2.2
+Subject: Re: [PATCH v6 2/2] i386: Add notify VM exit support
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Xiaoyao Li <xiaoyao.li@intel.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org
+References: <20220915092839.5518-1-chenyi.qiang@intel.com>
+ <20220915092839.5518-3-chenyi.qiang@intel.com> <YyTxL7kstA20tB5a@xz-m1.local>
+ <5beb9f1c-a419-94f7-a1b9-4aeb281baa41@intel.com>
+ <YyiQeD9QmJ9/eS9F@xz-m1.local>
+ <ee855874-bb8b-3f43-cffe-425700b26918@intel.com>
+ <YynHXI+Vtrf9J/Ae@xz-m1.local>
+Content-Language: en-US
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+In-Reply-To: <YynHXI+Vtrf9J/Ae@xz-m1.local>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-9.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 20, 2022 at 5:58 PM Zhu, Lingshan <lingshan.zhu@intel.com> wrote:
->
->
->
-> On 9/20/2022 10:02 AM, Jason Wang wrote:
-> > On Fri, Sep 9, 2022 at 5:05 PM Zhu Lingshan <lingshan.zhu@intel.com> wrote:
-> >> This commit adds a new vDPA netlink attribution
-> >> VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES. Userspace can query
-> >> features of vDPA devices through this new attr.
-> >>
-> >> This commit invokes vdpa_config_ops.get_config() than
-> >> vdpa_get_config_unlocked() to read the device config
-> >> spcae, so no raeces in vdpa_set_features_unlocked()
-> >>
-> >> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-> > It's better to share the userspace code as well.
-> OK, will share it in V2.
-> >
-> >> ---
-> >>   drivers/vdpa/vdpa.c       | 19 ++++++++++++++-----
-> >>   include/uapi/linux/vdpa.h |  4 ++++
-> >>   2 files changed, 18 insertions(+), 5 deletions(-)
-> >>
-> >> diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
-> >> index c06c02704461..798a02c7aa94 100644
-> >> --- a/drivers/vdpa/vdpa.c
-> >> +++ b/drivers/vdpa/vdpa.c
-> >> @@ -491,6 +491,8 @@ static int vdpa_mgmtdev_fill(const struct vdpa_mgmt_dev *mdev, struct sk_buff *m
-> >>                  err = -EMSGSIZE;
-> >>                  goto msg_err;
-> >>          }
-> >> +
-> >> +       /* report features of a vDPA management device through VDPA_ATTR_DEV_SUPPORTED_FEATURES */
-> > The code explains itself, there's no need for the comment.
-> these comments are required in other discussions
 
-I think it's more than sufficient to clarify the semantic where it is defined.
 
-> >
-> >>          if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_SUPPORTED_FEATURES,
-> >>                                mdev->supported_features, VDPA_ATTR_PAD)) {
-> >>                  err = -EMSGSIZE;
-> >> @@ -815,10 +817,10 @@ static int vdpa_dev_net_mq_config_fill(struct vdpa_device *vdev,
-> >>   static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *msg)
-> >>   {
-> >>          struct virtio_net_config config = {};
-> >> -       u64 features;
-> >> +       u64 features_device, features_driver;
-> >>          u16 val_u16;
-> >>
-> >> -       vdpa_get_config_unlocked(vdev, 0, &config, sizeof(config));
-> >> +       vdev->config->get_config(vdev, 0, &config, sizeof(config));
-> >>
-> >>          if (nla_put(msg, VDPA_ATTR_DEV_NET_CFG_MACADDR, sizeof(config.mac),
-> >>                      config.mac))
-> >> @@ -832,12 +834,19 @@ static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *ms
-> >>          if (nla_put_u16(msg, VDPA_ATTR_DEV_NET_CFG_MTU, val_u16))
-> >>                  return -EMSGSIZE;
-> >>
-> >> -       features = vdev->config->get_driver_features(vdev);
-> >> -       if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features,
-> >> +       features_driver = vdev->config->get_driver_features(vdev);
-> >> +       if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features_driver,
-> >> +                             VDPA_ATTR_PAD))
-> >> +               return -EMSGSIZE;
-> >> +
-> >> +       features_device = vdev->config->get_device_features(vdev);
-> >> +
-> >> +       /* report features of a vDPA device through VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES */
-> >> +       if (nla_put_u64_64bit(msg, VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES, features_device,
-> >>                                VDPA_ATTR_PAD))
-> >>                  return -EMSGSIZE;
-> >>
-> >> -       return vdpa_dev_net_mq_config_fill(vdev, msg, features, &config);
-> >> +       return vdpa_dev_net_mq_config_fill(vdev, msg, features_driver, &config);
-> >>   }
-> >>
-> >>   static int
-> >> diff --git a/include/uapi/linux/vdpa.h b/include/uapi/linux/vdpa.h
-> >> index 25c55cab3d7c..97531b52dcbe 100644
-> >> --- a/include/uapi/linux/vdpa.h
-> >> +++ b/include/uapi/linux/vdpa.h
-> >> @@ -46,12 +46,16 @@ enum vdpa_attr {
-> >>
-> >>          VDPA_ATTR_DEV_NEGOTIATED_FEATURES,      /* u64 */
-> >>          VDPA_ATTR_DEV_MGMTDEV_MAX_VQS,          /* u32 */
-> >> +       /* features of a vDPA management device */
-> >>          VDPA_ATTR_DEV_SUPPORTED_FEATURES,       /* u64 */
-> >>
-> >>          VDPA_ATTR_DEV_QUEUE_INDEX,              /* u32 */
-> >>          VDPA_ATTR_DEV_VENDOR_ATTR_NAME,         /* string */
-> >>          VDPA_ATTR_DEV_VENDOR_ATTR_VALUE,        /* u64 */
-> >>
-> >> +       /* features of a vDPA device, e.g., /dev/vhost-vdpa0 */
-> >> +       VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES,  /* u64 */
-> > What's the difference between this and VDPA_ATTR_DEV_SUPPORTED_FEATURES?
-> This is to report a vDPA device features, and
-> VDPA_ATTR_DEV_SUPPORTED_FEATURES
-> is used for reporting the management device features, we have a long
-> discussion
-> on this before.
+On 9/20/2022 9:59 PM, Peter Xu wrote:
+> On Tue, Sep 20, 2022 at 01:55:20PM +0800, Chenyi Qiang wrote:
+>>>> @@ -5213,6 +5213,7 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run
+>>>> *run)
+>>>>            break;
+>>>>        case KVM_EXIT_NOTIFY:
+>>>>            ret = 0;
+>>>> +        warn_report_once("KVM: notify window was exceeded in guest");
+>>>
+>>> Is there more informative way to dump this?  If it's 99% that the guest was
+>>> doing something weird and needs attention, maybe worthwhile to point that
+>>> out directly to the admin?
+>>>
+>>
+>> Do you mean to use other method to dump the info? i.e. printing a message is
+>> not so clear. Or the output message ("KVM: notify window was exceeded in
+>> guest") is not obvious and we need other wording.
+> 
+> I meant something like:
+> 
+>    KVM received notify exit.  It means there can be possible misbehaves in
+>    the guest, please have a look.
 
-Yes, but the comment is not clear in many ways:
+Get your point. Then I can print this message behind as well.
 
-" features of a vDPA management device" sounds like features that is
-out of the scope of the virtio.
+Thanks.
 
-And
-
-"/dev/vhost-vdpa0" is not a vDPA device but a vhost-vDPA device.
-
-Thanks
-
-> >
-> > Thanks
-> >
-> >> +
-> >>          /* new attributes must be added above here */
-> >>          VDPA_ATTR_MAX,
-> >>   };
-> >> --
-> >> 2.31.1
-> >>
->
-
+> 
+> Or something similar.  What I'm worried is the admin may not understand
+> what's "notify window" and that message got simply ignored.
+> 
+> Though I am not even sure whether that's accurate in the wordings.
+> 
+>>
+>>>>            if (run->notify.flags & KVM_NOTIFY_CONTEXT_INVALID) {
+>>>>                warn_report("KVM: invalid context due to notify vmexit");
+>>>>                if (has_triple_fault_event) {
+>>>
+>>> Adding a warning looks good to me, with that (or in any better form of
+>>> wording):
+>>>
+>> If no objection, I'll follow Xiaoyao's suggestion to form the wording like:
+> 
+> No objection here.  Thanks.
+> 
