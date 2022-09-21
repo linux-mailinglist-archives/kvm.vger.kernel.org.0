@@ -2,184 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C47D5E5561
-	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 23:46:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 817695E5559
+	for <lists+kvm@lfdr.de>; Wed, 21 Sep 2022 23:43:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229624AbiIUVqf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 17:46:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49534 "EHLO
+        id S230274AbiIUVnz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 17:43:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229518AbiIUVqe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Sep 2022 17:46:34 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CDE0A0336
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 14:46:33 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id t190so7228868pgd.9
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 14:46:33 -0700 (PDT)
+        with ESMTP id S230047AbiIUVnx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Sep 2022 17:43:53 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AF95A6AD0
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 14:43:52 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id q35-20020a17090a752600b002038d8a68fbso193008pjk.0
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 14:43:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=d2FRAtCKVgQ9Y5TpjSPH0GfFjJSalodszbXO/KC34yw=;
-        b=SqB//mwo/47ysApdTgzQ+IrvUnDTUj6re2dbVZCaupyv86WbxYsQTfHGpKAf0ygC/3
-         eQyXlZ7swsfhtoATSV/TiAXCCV7uE7KJk62yVyyOIjWHOQRhaY1NKVNoc8IpuVPd33y2
-         gpSwomTb3kJy8rvXDssyaHfMLON0VK5Fl6B+YmCc2DCMUCZSTO1ycs2ucIoKgmoWOsCh
-         5ieOGz0sQ0k28Su5Yk11GG2UI8jPiw8LNgTYvI8nYQHj3ofOJQJNctGLgj/lRkkXOrSv
-         5UY9eEcvOKR0VR24IBZuBHBatGXcU37zKM+tZvFnmYcSS7uzUJVBwdnYAMGuhx1aAWCv
-         DHww==
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=rQPfZBxd1rmPHcMH/Vq6+PYGtr8fyXl02ju6wUUI8P0=;
+        b=SFBEzY4qJzxkgSWBqaGCF3vnjRKkSimLFYKk/tL2S+BUGV1AglvhDvLY3aXk8jyJK7
+         Lyqs6GxV+iPPXcyjkHXNI3mBAFpBhXHH625FgR6vJy5aE7gSG+8fujghA+9DJeqH8JmF
+         2TJW8JSKQIEQ+umxK67vay/vO5Apr1VDsMbBzbxd8yCEi66+sY8Xi4pck7x5x69Zx3XQ
+         4c5pFfeH4jcBTzY3DsDX0Yi7THI+iJdnbjKoFOPoi88wDoOUdMB2xfUia9+lMunFbVK0
+         zEeecAdaBrcGnVALB1KCml7DvvK4HNRiI3wV7exzvpSIPqAbd3mSi5AJoSs3tJkZTQY9
+         u/vQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=d2FRAtCKVgQ9Y5TpjSPH0GfFjJSalodszbXO/KC34yw=;
-        b=7G8aSivwTDxXLxDpnqB25MUr8vy5cgPkk9mVBZWrCLdnJq4cUhpNA67J65pLrkgfes
-         cK4KbTA5AE9ZAHW05Pg8xk43uW25SdUU7FTfLqqReUsaohXD2BvVcfBdIXzLH34KYEwd
-         ci/zkbZ5ExjFsTUwXIreP2l/IVKY5sH5O+ztq0z8tqJ5AaAV59GZu9/fKZkTSYT6VtzL
-         rOZS4AG/5UgdNj6J5mOxRYZ9iFOOzEO0OSw/22yvLCvwIWTHS/emuTFXUZJGIu5F5b9v
-         HzAYWUWAzVstzVqsRfNAbO7i8CG7z4DzMIEULC2gIr2sF5XfdBvJzzo1rvMbLptYRwrg
-         cFbw==
-X-Gm-Message-State: ACrzQf1Pu+wjIFPiuRcQH/A7hxIwTucZMlyEi1i3c4a6oSlSQcNn7ASF
-        skuUBkN4hAO7LTEg/ztz3AC96w==
-X-Google-Smtp-Source: AMsMyM5Qt8Pvo37QN7eXSDoRzNuC77tgBB1y5EtyGSgOU6Vhj8bk55Sf8HK9POA+9Umi2py1cO7Q4w==
-X-Received: by 2002:a63:5a05:0:b0:434:23a5:a5ca with SMTP id o5-20020a635a05000000b0043423a5a5camr190906pgb.515.1663796792969;
-        Wed, 21 Sep 2022 14:46:32 -0700 (PDT)
-Received: from stillson.ba.rivosinc.com ([66.220.2.162])
-        by smtp.gmail.com with ESMTPSA id k7-20020aa79727000000b005484d133127sm2634536pfg.129.2022.09.21.14.46.30
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=rQPfZBxd1rmPHcMH/Vq6+PYGtr8fyXl02ju6wUUI8P0=;
+        b=oFxnJuj8zlPJIqF9Ky1B6YyeErF+KGgMzs8MyfEa47S6/I+MsDtKoC6vcZVHHe5wTJ
+         hi9wKjlmIqnU33KA/DbRCi4LdCCnKBKpnuqm1gngEYoNWmnzStxCukU8gs16h2Cgu9BB
+         OEboSY0zU1Pr50Q0Lr/OSHypqT3IOHDlg7stC/CzTAXd1VEMQf4WQUVoEc2tYATHwZsm
+         g04Op7Tngdm2N5iSDDG/ffcwjyA7dyN15M8gfehIjzFoIA/Vg0aeKpACLstcjhb7hQyF
+         DCSOcSiEYfhEu1ucSU6bqcoRyUiFwyPkkOPB86ndKTLlrX7uSR5MErRjbpEqnaAfNrI7
+         GZcg==
+X-Gm-Message-State: ACrzQf1ef73x05b2ONKQOzOXR/g5HoRwO/M8d7wI9sxbD/K/FgK4pLU5
+        h/GwD1gSmYCl760xmO9WeH/r50ObU9n7dA==
+X-Google-Smtp-Source: AMsMyM4VH7AjGpJAeikzUBI/1r2K8hVaIYquj34LCfDDthukEdd8NhfmqV7KnpF6dsvE+zUcXfzZuA==
+X-Received: by 2002:a17:90b:3543:b0:202:aa2d:b87 with SMTP id lt3-20020a17090b354300b00202aa2d0b87mr204958pjb.118.1663796631514;
+        Wed, 21 Sep 2022 14:43:51 -0700 (PDT)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id p11-20020a170902e74b00b00176cdd7e4c6sm2556379plf.50.2022.09.21.14.43.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Sep 2022 14:46:32 -0700 (PDT)
-From:   Chris Stillson <stillson@rivosinc.com>
-Cc:     Greentime Hu <greentime.hu@sifive.com>,
-        Guo Ren <guoren@kernel.org>,
-        Guo Ren <guoren@linux.alibaba.com>,
-        Vincent Chen <vincent.chen@sifive.com>,
-        Palmer Dabbelt <palmer@rivosinc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Eric Biederman <ebiederm@xmission.com>,
-        Kees Cook <keescook@chromium.org>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Oleg Nesterov <oleg@redhat.com>,
-        Heinrich Schuchardt <heinrich.schuchardt@canonical.com>,
-        Arnaud Pouliquen <arnaud.pouliquen@foss.st.com>,
-        Mayuresh Chitale <mchitale@ventanamicro.com>,
-        Chris Stillson <stillson@rivosinc.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Qinglin Pan <panqinglin2020@iscas.ac.cn>,
-        Alexandre Ghiti <alexandre.ghiti@canonical.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Heiko Stuebner <heiko@sntech.de>,
-        Jisheng Zhang <jszhang@kernel.org>,
-        Dao Lu <daolu@rivosinc.com>,
-        Sunil V L <sunilvl@ventanamicro.com>,
-        Han-Kuan Chen <hankuan.chen@sifive.com>,
-        Li Zhengyu <lizhengyu3@huawei.com>,
-        Alexander Graf <graf@amazon.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Tsukasa OI <research_trasio@irq.a4lg.com>,
-        Yury Norov <yury.norov@gmail.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Nicolas Saenz Julienne <nsaenzju@redhat.com>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Changbin Du <changbin.du@intel.com>,
-        hasheddan <georgedanielmangum@gmail.com>,
-        Vitaly Wool <vitaly.wool@konsulko.com>,
-        Myrtle Shah <gatecat@ds0.me>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Alexey Dobriyan <adobriyan@gmail.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Evgenii Stepanov <eugenis@google.com>,
-        Colin Cross <ccross@google.com>,
-        Peter Collingbourne <pcc@google.com>,
-        Eugene Syromiatnikov <esyr@redhat.com>,
-        Barret Rhoden <brho@google.com>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org
-Subject: [PATCH v12 03/17] riscv: Add new csr defines related to vector extension
-Date:   Wed, 21 Sep 2022 14:43:45 -0700
-Message-Id: <20220921214439.1491510-3-stillson@rivosinc.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220921214439.1491510-1-stillson@rivosinc.com>
-References: <20220921214439.1491510-1-stillson@rivosinc.com>
+        Wed, 21 Sep 2022 14:43:51 -0700 (PDT)
+Date:   Wed, 21 Sep 2022 14:43:46 -0700
+From:   David Matlack <dmatlack@google.com>
+To:     Vishal Annapurve <vannapurve@google.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
+        shuah@kernel.org, bgardon@google.com, seanjc@google.com,
+        oupton@google.com, peterx@redhat.com, vkuznets@redhat.com
+Subject: Re: [V2 PATCH 7/8] Kvm: selftests: x86: Execute cpu specific vmcall
+ instruction
+Message-ID: <YyuFkmJRP/4ynKqD@google.com>
+References: <20220915000448.1674802-1-vannapurve@google.com>
+ <20220915000448.1674802-8-vannapurve@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220915000448.1674802-8-vannapurve@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
-To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Greentime Hu <greentime.hu@sifive.com>
+On Thu, Sep 15, 2022 at 12:04:47AM +0000, Vishal Annapurve wrote:
+> Update the vmcall instruction invocation to happen according to the cpu
+> type.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+> ---
+>  tools/testing/selftests/kvm/include/x86_64/processor.h    | 8 ++++++++
+>  tools/testing/selftests/kvm/x86_64/vmx_apic_access_test.c | 2 +-
+>  .../selftests/kvm/x86_64/vmx_nested_tsc_scaling_test.c    | 2 +-
+>  tools/testing/selftests/kvm/x86_64/vmx_tsc_adjust_test.c  | 2 +-
 
-Follow the riscv vector spec to add new csr numbers.
+What's the reason to use kvm_hypercall() for these tests? All of these
+are Intel-specific. i.e. is_amd_cpu() will always return false.
 
-[guoren@linux.alibaba.com: first porting for new vector related csr]
-Acked-by: Guo Ren <guoren@kernel.org>
-Co-developed-by: Guo Ren <guoren@linux.alibaba.com>
-Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-Co-developed-by: Vincent Chen <vincent.chen@sifive.com>
-Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
-Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
-Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
----
- arch/riscv/include/asm/csr.h | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
-index 0e571f6483d9..78a68f29c3ba 100644
---- a/arch/riscv/include/asm/csr.h
-+++ b/arch/riscv/include/asm/csr.h
-@@ -24,6 +24,12 @@
- #define SR_FS_CLEAN	_AC(0x00004000, UL)
- #define SR_FS_DIRTY	_AC(0x00006000, UL)
- 
-+#define SR_VS           _AC(0x00000600, UL) /* Vector Status */
-+#define SR_VS_OFF       _AC(0x00000000, UL)
-+#define SR_VS_INITIAL   _AC(0x00000200, UL)
-+#define SR_VS_CLEAN     _AC(0x00000400, UL)
-+#define SR_VS_DIRTY     _AC(0x00000600, UL)
-+
- #define SR_XS		_AC(0x00018000, UL) /* Extension Status */
- #define SR_XS_OFF	_AC(0x00000000, UL)
- #define SR_XS_INITIAL	_AC(0x00008000, UL)
-@@ -31,9 +37,9 @@
- #define SR_XS_DIRTY	_AC(0x00018000, UL)
- 
- #ifndef CONFIG_64BIT
--#define SR_SD		_AC(0x80000000, UL) /* FS/XS dirty */
-+#define SR_SD		_AC(0x80000000, UL) /* FS/VS/XS dirty */
- #else
--#define SR_SD		_AC(0x8000000000000000, UL) /* FS/XS dirty */
-+#define SR_SD		_AC(0x8000000000000000, UL) /* FS/VS/XS dirty */
- #endif
- 
- #ifdef CONFIG_64BIT
-@@ -297,6 +303,12 @@
- #define CSR_MIMPID		0xf13
- #define CSR_MHARTID		0xf14
- 
-+#define CSR_VSTART		0x8
-+#define CSR_VCSR		0xf
-+#define CSR_VL			0xc20
-+#define CSR_VTYPE		0xc21
-+#define CSR_VLENB		0xc22
-+
- #ifdef CONFIG_RISCV_M_MODE
- # define CSR_STATUS	CSR_MSTATUS
- # define CSR_IE		CSR_MIE
--- 
-2.25.1
-
+>  4 files changed, 11 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> index 18a8a6a2b786..74893a7a80f8 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> @@ -833,6 +833,14 @@ void vm_set_page_table_entry(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
+>  uint64_t kvm_hypercall(uint64_t nr, uint64_t a0, uint64_t a1, uint64_t a2,
+>  		       uint64_t a3);
+>  
+> +/*
+> + * Execute vmcall instruction.
+> + */
+> +static inline void vmcall(void)
+> +{
+> +	kvm_hypercall(0, 0, 0, 0, 0);
+> +}
+> +
+>  void nested_guest_vmcall(void);
+>  
+>  void __vm_xsave_require_permission(int bit, const char *name);
+> diff --git a/tools/testing/selftests/kvm/x86_64/vmx_apic_access_test.c b/tools/testing/selftests/kvm/x86_64/vmx_apic_access_test.c
+> index 5abecf06329e..8180711c8684 100644
+> --- a/tools/testing/selftests/kvm/x86_64/vmx_apic_access_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/vmx_apic_access_test.c
+> @@ -31,7 +31,7 @@
+>  static void l2_guest_code(void)
+>  {
+>  	/* Exit to L1 */
+> -	__asm__ __volatile__("vmcall");
+> +	vmcall();
+>  }
+>  
+>  static void l1_guest_code(struct vmx_pages *vmx_pages, unsigned long high_gpa)
+> diff --git a/tools/testing/selftests/kvm/x86_64/vmx_nested_tsc_scaling_test.c b/tools/testing/selftests/kvm/x86_64/vmx_nested_tsc_scaling_test.c
+> index 465a9434d61c..37da9d01d5d6 100644
+> --- a/tools/testing/selftests/kvm/x86_64/vmx_nested_tsc_scaling_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/vmx_nested_tsc_scaling_test.c
+> @@ -76,7 +76,7 @@ static void l2_guest_code(void)
+>  	check_tsc_freq(UCHECK_L2);
+>  
+>  	/* exit to L1 */
+> -	__asm__ __volatile__("vmcall");
+> +	vmcall();
+>  }
+>  
+>  static void l1_guest_code(struct vmx_pages *vmx_pages)
+> diff --git a/tools/testing/selftests/kvm/x86_64/vmx_tsc_adjust_test.c b/tools/testing/selftests/kvm/x86_64/vmx_tsc_adjust_test.c
+> index 5943187e8594..00192f564d9b 100644
+> --- a/tools/testing/selftests/kvm/x86_64/vmx_tsc_adjust_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/vmx_tsc_adjust_test.c
+> @@ -74,7 +74,7 @@ static void l2_guest_code(void)
+>  	check_ia32_tsc_adjust(-2 * TSC_ADJUST_VALUE);
+>  
+>  	/* Exit to L1 */
+> -	__asm__ __volatile__("vmcall");
+> +	vmcall();
+>  }
+>  
+>  static void l1_guest_code(struct vmx_pages *vmx_pages)
+> -- 
+> 2.37.2.789.g6183377224-goog
+> 
