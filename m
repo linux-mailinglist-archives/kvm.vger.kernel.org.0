@@ -2,239 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CFF75E5DBF
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 10:44:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 745EF5E5E0B
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 10:55:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230400AbiIVIog (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 04:44:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42988 "EHLO
+        id S231203AbiIVIzs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 04:55:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230358AbiIVIoe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 04:44:34 -0400
+        with ESMTP id S231136AbiIVIz1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 04:55:27 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70028110E
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 01:44:29 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF4E34CA1A
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 01:55:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663836269;
+        s=mimecast20190719; t=1663836924;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=VaYXNrEhF9SkCIvAw0+lUOkeDauzgEyAxcBo51EhDMk=;
-        b=QV5vrwttIR9xMCCVO3SQZ7iizPkY4BpRQiX5FBWArVOKkGI+nMOFmv3bztc/YAZ+ILjPKy
-        3MCViCFctj0aPJnRIOejIeUdAmu9Xy9y9yKFZQEEJkYexBqTP7XQ++FZrvMiv3My5YrwNV
-        KDkLLpVenTGCaAVISkEcimBdVUx50bk=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=BQUZH0l2McBt181klcXtt0pGPwD2K1dPTxk16J/dKt0=;
+        b=cZ9h1baWr+xp+8PnOhJx6kinyjg5UmtcokS8Jh3RKN/6GR5fr1B4hJDhQPV5GD9Rvt+qau
+        5zmVBK4kj2eoUIARx8/93/iW6OGUXGyAUt/Igr+1k7b9vm7LKF6ICvOP9JzWibety7j5Ch
+        Ef3aOvUUn1/wR/ggjqXhelQdoxAExcE=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-108-hzEmEHynN3-nOKdYGY7QeA-1; Thu, 22 Sep 2022 04:44:27 -0400
-X-MC-Unique: hzEmEHynN3-nOKdYGY7QeA-1
-Received: by mail-ej1-f70.google.com with SMTP id he41-20020a1709073da900b00780bff831ebso4081365ejc.6
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 01:44:27 -0700 (PDT)
+ us-mta-292-HiQkfU9lM5m-gn2dO-JW3Q-1; Thu, 22 Sep 2022 04:55:23 -0400
+X-MC-Unique: HiQkfU9lM5m-gn2dO-JW3Q-1
+Received: by mail-wm1-f72.google.com with SMTP id d5-20020a05600c34c500b003b4fb42ccdeso761797wmq.8
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 01:55:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date;
-        bh=VaYXNrEhF9SkCIvAw0+lUOkeDauzgEyAxcBo51EhDMk=;
-        b=Eu5xlWvxMhmEOudj89ARPQGEC9vndd+QZqxP7xgxnpvVLTBnkpjo6lmAFwUwDfAt0K
-         kkxZzz7+roh7ULyk69cFvf0etQH4ro5/zYUgRyPkr/l/43N2lbqIpoObh9j3e/eI1ql8
-         tUD/cjB5A13f+kNBDxPgnPMSWFJjnmFtyzgZBogyOolCs9aQYzAPeji/2/MimMmIRBXq
-         UT7u/8eFeWHeOVDQ3PCX5qFaP0VeBRmTf2GaNlfT4VAcswWjMJVK2CqosJSnziJSJYVR
-         AMXJKlXaJXbp67n7aHfQpLJAV3O7y1Q7ccVQ9UFCyRmfd2dGZZmlkyngOYvVvMSU/nrj
-         /SVg==
-X-Gm-Message-State: ACrzQf2qPGGExmC4HWlGPWlMr5kZDm79mAcwLrYB1X/TUeSm8fNAev7a
-        bCATAyD8q9bQ+PBmA5nPLl3uhNbYbarQQ1haxZ/tfZ3zPN1CNofdHjRfj5OebU504dyBcRfGUEF
-        XK2tUfsVK6V1U
-X-Received: by 2002:a05:6402:2489:b0:454:11de:7698 with SMTP id q9-20020a056402248900b0045411de7698mr2148312eda.214.1663836266309;
-        Thu, 22 Sep 2022 01:44:26 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM76AWfqa75dHov8UHe5lqSOhHZZZIH/7vxvIY4ZYiDmZ1kn4bxKpOY1qNt2GfoMjYC9JRiqUQ==
-X-Received: by 2002:a05:6402:2489:b0:454:11de:7698 with SMTP id q9-20020a056402248900b0045411de7698mr2148300eda.214.1663836266053;
-        Thu, 22 Sep 2022 01:44:26 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id b20-20020a17090630d400b007262a5e2204sm2305509ejb.153.2022.09.22.01.44.24
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=BQUZH0l2McBt181klcXtt0pGPwD2K1dPTxk16J/dKt0=;
+        b=Sj0Rkrri4bYUtJ3KaSjgyOQFVYgw0/Y/ohqkta9Hqx9yr/bWziOZ5HM3fKEi2VVmxU
+         qKqpl/4neb3rooKux9c5sSvV6TBmr7RZMePNJRfMiTJJAJCVL1sJ6M+V0hCsz3u6hfez
+         g2RfGzu6Sd7tbXBTo/QCcwCeTTlfb4pgBqnp0H7s4YCSL5QVtLUdDRZyPKdiad97P1sH
+         yQK6h7XomSQryE/Ppj3aXBE2nCwOt9y9GQAoYncoWglPQLyosXj3z7ZeSe98Ww+YAWW5
+         RsxwWONwDPqxp606SY7tmSNlSw18w3SbJN34ghZX+6SSw4gVW5znVa1plbh5F7sVLJzo
+         +NWA==
+X-Gm-Message-State: ACrzQf2oplowfDqqmEFfCMF6NKcuLszNfUP83prThO6wJmzSXu5BeaTI
+        HdJjQZcG6HJRq2MyigyHvZbboxVGmAZWUHq7jvVNla5R7I3CEXYpg7VMJPZxoGRpMnKD7hZnZnM
+        kj3iUlzTLAgl8
+X-Received: by 2002:a05:600c:2050:b0:3b4:a51a:a1f5 with SMTP id p16-20020a05600c205000b003b4a51aa1f5mr1463330wmg.177.1663836920805;
+        Thu, 22 Sep 2022 01:55:20 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM5xvz/kDCcXO3k/Qqm9fQ74sw9y3TIylqcmtcYP4XUWuSa2S1vrfGP3+Py49BTcJljmOZX+2g==
+X-Received: by 2002:a05:600c:2050:b0:3b4:a51a:a1f5 with SMTP id p16-20020a05600c205000b003b4a51aa1f5mr1463312wmg.177.1663836920533;
+        Thu, 22 Sep 2022 01:55:20 -0700 (PDT)
+Received: from redhat.com ([2.55.47.213])
+        by smtp.gmail.com with ESMTPSA id x12-20020a5d650c000000b00228cbac7a25sm4555579wru.64.2022.09.22.01.55.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Sep 2022 01:44:24 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Vipin Sharma <vipinsh@google.com>, seanjc@google.com,
-        pbonzini@redhat.com
-Cc:     jmattson@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
-Subject: Re: [PATCH v2] KVM: selftests: Check result in hyperv_features.c
- test only for successful hypercalls
-In-Reply-To: <20220922062451.2927010-1-vipinsh@google.com>
-References: <20220922062451.2927010-1-vipinsh@google.com>
-Date:   Thu, 22 Sep 2022 10:44:23 +0200
-Message-ID: <87fsgjol20.fsf@redhat.com>
+        Thu, 22 Sep 2022 01:55:20 -0700 (PDT)
+Date:   Thu, 22 Sep 2022 04:55:16 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Gerd Hoffmann <kraxel@redhat.com>
+Cc:     qemu-devel@nongnu.org, Sergio Lopez <slp@redhat.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3] x86: add etc/phys-bits fw_cfg file
+Message-ID: <20220922044906-mutt-send-email-mst@kernel.org>
+References: <20220922084356.878907-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="=-=-="
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220922084356.878907-1-kraxel@redhat.com>
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---=-=-=
-Content-Type: text/plain
+On Thu, Sep 22, 2022 at 10:43:56AM +0200, Gerd Hoffmann wrote:
+> In case phys bits are functional and can be used by the guest (aka
+> host-phys-bits=on) add a fw_cfg file carrying the value.  This can
+> be used by the guest firmware for address space configuration.
+> 
+> This is only enabled for 7.2+ machine types for live migration
+> compatibility reasons.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-Vipin Sharma <vipinsh@google.com> writes:
+I'm curious why you decided to switch from a cpuid flag to fw cfg.  I
+guess firmware reads fw cfg anyway. But would the guest kernel then need
+to load a fw cfg driver very early to detect this, too?
 
-> Commit cc5851c6be86 ("KVM: selftests: Use exception fixup for #UD/#GP
-> Hyper-V MSR/hcall tests") introduced a wrong guest assert in guest_hcall().
-> It is not checking the successful hypercall results and only checks the result
-> when a fault happens.
->
->   GUEST_ASSERT_2(!hcall->ud_expected || res == hcall->expect,
->                  hcall->expect, res);
->
-> Correct the assertion by only checking results of the successful
-> hypercalls.
->
-> This issue was observed when this test started failing after building it
-> in Clang. Above guest assert statement fails because "res" is not equal
-> to "hcall->expect" when "hcall->ud_expected" is true. "res" gets some
-> garbage value in Clang from the RAX register. In GCC, RAX is 0 because
-> it using RAX for @output_address in the asm statement and resetting it
-> to 0 before using it as output operand in the same asm statement. Clang
-> is not using RAX for @output_address.
->
-> Load RAX with some default input value so that the compiler cannot
-> modify it or use it for anything else. This makes sure that KVM is
-> correctly clearing up return value on successful hypercall and compiler cannot
-> generate any false positive.
->
-> Fixes: cc5851c6be86 ("KVM: selftests: Use exception fixup for #UD/#GP Hyper-V MSR/hcall tests")
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Reviewed-by: Jim Mattson <jmattson@google.com>
->
 > ---
->
-> Jim's Reviewed-by is only for the code change and not shortlog message
-> of v1. Also, there is one change in asm which was not present in v1 and
-> not reviewed by Jim. But I am writing his name here so that it is not missed
-> when patch is merged.
->
-> v2:
-> - Updated the shortlog message.
-> - Using RAX register in hypercall asm as input operand also and
->   initializing it with -EFAULT
->
-> v1:
-> https://lore.kernel.org/lkml/20220921231151.2321058-1-vipinsh@google.com/
->
->  tools/testing/selftests/kvm/x86_64/hyperv_features.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> index 79ab0152d281..4d55e038c2d7 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> @@ -26,7 +26,8 @@ static inline uint8_t hypercall(u64 control, vm_vaddr_t input_address,
->  		     : "=a" (*hv_status),
->  		       "+c" (control), "+d" (input_address),
->  		       KVM_ASM_SAFE_OUTPUTS(vector)
-> -		     : [output_address] "r"(output_address)
-> +		     : [output_address] "r"(output_address),
-> +		       "a" (-EFAULT)
->  		     : "cc", "memory", "r8", KVM_ASM_SAFE_CLOBBERS);
->  	return vector;
->  }
-> @@ -81,13 +82,13 @@ static void guest_hcall(vm_vaddr_t pgs_gpa, struct hcall_data *hcall)
->  	}
+>  hw/i386/fw_cfg.h     |  1 +
+>  include/hw/i386/pc.h |  1 +
+>  hw/i386/fw_cfg.c     | 12 ++++++++++++
+>  hw/i386/pc.c         |  5 +++++
+>  hw/i386/pc_piix.c    |  2 ++
+>  hw/i386/pc_q35.c     |  2 ++
+>  6 files changed, 23 insertions(+)
+> 
+> diff --git a/hw/i386/fw_cfg.h b/hw/i386/fw_cfg.h
+> index 275f15c1c5e8..6ff198a6cb85 100644
+> --- a/hw/i386/fw_cfg.h
+> +++ b/hw/i386/fw_cfg.h
+> @@ -26,5 +26,6 @@ FWCfgState *fw_cfg_arch_create(MachineState *ms,
+>  void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg);
+>  void fw_cfg_build_feature_control(MachineState *ms, FWCfgState *fw_cfg);
+>  void fw_cfg_add_acpi_dsdt(Aml *scope, FWCfgState *fw_cfg);
+> +void fw_cfg_phys_bits(FWCfgState *fw_cfg);
 >  
->  	vector = hypercall(hcall->control, input, output, &res);
-> -	if (hcall->ud_expected)
-> +	if (hcall->ud_expected) {
->  		GUEST_ASSERT_2(vector == UD_VECTOR, hcall->control, vector);
-> -	else
-> +	} else {
->  		GUEST_ASSERT_2(!vector, hcall->control, vector);
-> +		GUEST_ASSERT_2(res == hcall->expect, hcall->expect, res);
-> +	}
+>  #endif
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index c95333514ed3..bedef1ee13c1 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -119,6 +119,7 @@ struct PCMachineClass {
+>      bool enforce_aligned_dimm;
+>      bool broken_reserved_end;
+>      bool enforce_amd_1tb_hole;
+> +    bool phys_bits_in_fw_cfg;
 >  
-> -	GUEST_ASSERT_2(!hcall->ud_expected || res == hcall->expect,
-> -			hcall->expect, res);
->  	GUEST_DONE();
+>      /* generate legacy CPU hotplug AML */
+>      bool legacy_cpu_hotplug;
+> diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
+> index a283785a8de4..6a1f18925725 100644
+> --- a/hw/i386/fw_cfg.c
+> +++ b/hw/i386/fw_cfg.c
+> @@ -219,3 +219,15 @@ void fw_cfg_add_acpi_dsdt(Aml *scope, FWCfgState *fw_cfg)
+>      aml_append(dev, aml_name_decl("_CRS", crs));
+>      aml_append(scope, dev);
 >  }
+> +
+> +void fw_cfg_phys_bits(FWCfgState *fw_cfg)
+> +{
+> +    X86CPU *cpu = X86_CPU(first_cpu);
+> +    uint64_t phys_bits = cpu->phys_bits;
+> +
+> +    if (cpu->host_phys_bits) {
+> +        fw_cfg_add_file(fw_cfg, "etc/phys-bits",
+> +                        g_memdup2(&phys_bits, sizeof(phys_bits)),
+> +                        sizeof(phys_bits));
+> +    }
+> +}
 
-And this immediately discovers a problem in the test!
-
-$ ./x86_64/hyperv_features 
-Testing access to Hyper-V specific MSRs
-Testing access to Hyper-V hypercalls
-==== Test Assertion Failure ====
-  x86_64/hyperv_features.c:622: false
-  pid=3683520 tid=3683520 errno=4 - Interrupted system call
-     1	0x0000000000402832: guest_test_hcalls_access at hyperv_features.c:622
-     2	 (inlined by) main at hyperv_features.c:642
-     3	0x00007f546503feaf: ?? ??:0
-     4	0x00007f546503ff5f: ?? ??:0
-     5	0x0000000000402eb4: _start at ??:?
-  Failed guest assert: res == hcall->expect at x86_64/hyperv_features.c:89
-arg1 = 2, arg2 = 3
-
-The root cause is: we're trying to test an invalid hypercall code but we
-set 'control' wrong, i.e.:
-
-	hcall->control = 0xdeadbeef;
-	hcall->expect = HV_STATUS_INVALID_HYPERCALL_CODE;
-
-as '0xdeadbeef' contains reserved bits 27 through 31 and we're getting
-HV_STATUS_INVALID_HYPERCALL_INPUT instead.
-
-Could you please include the attached patch to your series? Thanks a bunch!
-
-For your patch:
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
+So, this allows a lot of flexibility, any phys_bits value at all can now
+be used. Do you expect a use-case for such a flexible mechanism?  If
+this ends up merely repeating CPUID at all times then we are just
+creating confusion.
+Could you add the motivation to the commit log pls?
 
 
---=-=-=
-Content-Type: text/x-patch
-Content-Disposition: inline;
- filename=0001-KVM-selftests-Do-not-set-reserved-control-bits-when-.patch
-
-From d0670e7d7ed4c4a00f46c1f0b69e1e06eae06c8f Mon Sep 17 00:00:00 2001
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-Date: Thu, 22 Sep 2022 10:39:41 +0200
-Subject: [PATCH] KVM: selftests: Do not set reserved control bits when testing
- invalid Hyper-V hypercall number
-Content-Type: text/plain
-
-Bits 27 through 31 in Hyper-V hypercall 'control' are reserved (see
-HV_HYPERCALL_RSVD0_MASK) but '0xdeadbeef' includes them. This causes
-KVM to return HV_STATUS_INVALID_HYPERCALL_INPUT instead of the expected
-HV_STATUS_INVALID_HYPERCALL_CODE.
-
-The test doesn't currently fail as the problem is masked by the wrong check
-of the hypercall return code, this is going to be fixed separately.
-
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- tools/testing/selftests/kvm/x86_64/hyperv_features.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-index 79ab0152d281..d71b5cd4b74b 100644
---- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-@@ -507,7 +507,7 @@ static void guest_test_hcalls_access(void)
- 		switch (stage) {
- 		case 0:
- 			feat->eax |= HV_MSR_HYPERCALL_AVAILABLE;
--			hcall->control = 0xdeadbeef;
-+			hcall->control = 0xbeef;
- 			hcall->expect = HV_STATUS_INVALID_HYPERCALL_CODE;
- 			break;
- 
--- 
-2.37.3
-
-
---=-=-=--
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 566accf7e60a..17ecc7fe4331 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -744,6 +744,7 @@ void pc_machine_done(Notifier *notifier, void *data)
+>  {
+>      PCMachineState *pcms = container_of(notifier,
+>                                          PCMachineState, machine_done);
+> +    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+>      X86MachineState *x86ms = X86_MACHINE(pcms);
+>  
+>      cxl_hook_up_pxb_registers(pcms->bus, &pcms->cxl_devices_state,
+> @@ -764,6 +765,9 @@ void pc_machine_done(Notifier *notifier, void *data)
+>          fw_cfg_build_feature_control(MACHINE(pcms), x86ms->fw_cfg);
+>          /* update FW_CFG_NB_CPUS to account for -device added CPUs */
+>          fw_cfg_modify_i16(x86ms->fw_cfg, FW_CFG_NB_CPUS, x86ms->boot_cpus);
+> +        if (pcmc->phys_bits_in_fw_cfg) {
+> +            fw_cfg_phys_bits(x86ms->fw_cfg);
+> +        }
+>      }
+>  }
+>  
+> @@ -1907,6 +1911,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+>      pcmc->kvmclock_enabled = true;
+>      pcmc->enforce_aligned_dimm = true;
+>      pcmc->enforce_amd_1tb_hole = true;
+> +    pcmc->phys_bits_in_fw_cfg = true;
+>      /* BIOS ACPI tables: 128K. Other BIOS datastructures: less than 4K reported
+>       * to be used at the moment, 32K should be enough for a while.  */
+>      pcmc->acpi_data_size = 0x20000 + 0x8000;
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 8043a250adf3..c6a4dbd5c0b0 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -447,9 +447,11 @@ DEFINE_I440FX_MACHINE(v7_2, "pc-i440fx-7.2", NULL,
+>  
+>  static void pc_i440fx_7_1_machine_options(MachineClass *m)
+>  {
+> +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+>      pc_i440fx_7_2_machine_options(m);
+>      m->alias = NULL;
+>      m->is_default = false;
+> +    pcmc->phys_bits_in_fw_cfg = false;
+>      compat_props_add(m->compat_props, hw_compat_7_1, hw_compat_7_1_len);
+>      compat_props_add(m->compat_props, pc_compat_7_1, pc_compat_7_1_len);
+>  }
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 53eda50e818c..c2b56daa1550 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -384,8 +384,10 @@ DEFINE_Q35_MACHINE(v7_2, "pc-q35-7.2", NULL,
+>  
+>  static void pc_q35_7_1_machine_options(MachineClass *m)
+>  {
+> +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+>      pc_q35_7_2_machine_options(m);
+>      m->alias = NULL;
+> +    pcmc->phys_bits_in_fw_cfg = false;
+>      compat_props_add(m->compat_props, hw_compat_7_1, hw_compat_7_1_len);
+>      compat_props_add(m->compat_props, pc_compat_7_1, pc_compat_7_1_len);
+>  }
+> -- 
+> 2.37.3
 
