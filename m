@@ -2,63 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E32F15E64ED
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 16:16:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA44C5E65CE
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 16:37:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231411AbiIVOQn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 10:16:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59038 "EHLO
+        id S231661AbiIVOhF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 10:37:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbiIVOQl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 10:16:41 -0400
+        with ESMTP id S231497AbiIVOhE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 10:37:04 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7F0CF08BC
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 07:16:40 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81FA9F686C
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 07:37:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663856200;
+        s=mimecast20190719; t=1663857422;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=To7IknU2bbZ2RnHxGxDzryVgmlAqYD6wSm6BToJO0kE=;
-        b=SOJe5NSQ6NdmVta7SrVK6M8TOAg7WZjo66FUjUFA2p2cibOViQtBdTb+vKTxqqJ9k3fdvE
-        2OvAI9ssN9H/P424xF5kO46D4XNEuu4vBwfAV1V8bzYr81p4Ff0pVdKK3WoSIVT05TCl3n
-        XD0lljC+cvtMF+1Xc47dOa2Ws3KPV4I=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=EHTba5sUbwuMPAyhkuX+6NFvptUjl6B5PiqYo1GVbUw=;
+        b=CCAA2gw40xDudIh2EONITesrviBZQ9Ukq8fSMju3oj9dVkjnqQgMbMj7rTA6KcZQccyksa
+        MHiViGwaM2HfG7TZsAlacLPRYrbz+KgBtDrSd1Bt35gsSRjD7FtVDlbNcwheGc7ZkWHT9l
+        xj96XfuCOzgM8nuMAhYkSRmj4/GB6uU=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-312-1vWM0UhpMHCOKhY5fzXEFw-1; Thu, 22 Sep 2022 10:16:36 -0400
-X-MC-Unique: 1vWM0UhpMHCOKhY5fzXEFw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+ us-mta-398-LVipNUU1P8-IeP79bfqv6g-1; Thu, 22 Sep 2022 10:36:59 -0400
+X-MC-Unique: LVipNUU1P8-IeP79bfqv6g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B7D743C0F67D;
-        Thu, 22 Sep 2022 14:16:35 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.192.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 722F72166B31;
-        Thu, 22 Sep 2022 14:16:35 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id BD9041800084; Thu, 22 Sep 2022 16:16:33 +0200 (CEST)
-Date:   Thu, 22 Sep 2022 16:16:33 +0200
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-        qemu-devel@nongnu.org, Sergio Lopez <slp@redhat.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v4] x86: add etc/phys-bits fw_cfg file
-Message-ID: <20220922141633.t2dk2jviw2f3i26x@sirius.home.kraxel.org>
-References: <20220922101454.1069462-1-kraxel@redhat.com>
- <YyxF2TNwnXaefT6u@redhat.com>
- <20220922122058.vesh352623uaon6e@sirius.home.kraxel.org>
- <CABgObfavcPLUbMzaLQS2Rj2=r5eAhuBuKdiHQ4wJGfgPm_=XsQ@mail.gmail.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AC6BF3C0F360;
+        Thu, 22 Sep 2022 14:36:58 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.40.194.242])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 886EC40C206B;
+        Thu, 22 Sep 2022 14:36:56 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v4 0/6] KVM: x86: Hyper-V invariant TSC control feature
+Date:   Thu, 22 Sep 2022 16:36:49 +0200
+Message-Id: <20220922143655.3721218-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABgObfavcPLUbMzaLQS2Rj2=r5eAhuBuKdiHQ4wJGfgPm_=XsQ@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
@@ -68,60 +60,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 22, 2022 at 02:38:02PM +0200, Paolo Bonzini wrote:
-> On Thu, Sep 22, 2022 at 2:21 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
-> > No.  This will basically inform the guest that host-phys-bits has been
-> > enabled (and pass the number of bits).  So the firmware can make use of
-> > the available address space instead of trying to be as conservative as
-> > possible to avoid going beyond the (unknown) limit.
-> 
-> Intel processors that are not extremely old have host-phys-bits equal
-> to 39, 46 or 52. Older processors that had 36, in all likelihood,
-> didn't have IOMMUs (so no big 64-bit BARs).
+Changes since v3:
+- Use cpuid_entry_override() for the newly introduces CPUID_8000_0007_EDX
+  leaf in __do_cpuid_func(). [Sean]
+- Add comments and reshuffle check in kvm_hv_invtsc_suppressed() [Sean]
 
-Well, I happen to have a intel box with 36 physbits + iommu.
+Original description:
 
-> 1) set host-phys-bits to true on new machine types when not using TCG
-> (i.e. KVM / HVF / WHPX)
+Normally, genuine Hyper-V doesn't expose architectural invariant TSC
+(CPUID.80000007H:EDX[8]) to its guests by default. A special PV MSR
+(HV_X64_MSR_TSC_INVARIANT_CONTROL, 0x40000118) and corresponding CPUID
+feature bit (CPUID.0x40000003.EAX[15]) were introduced. When bit 0 of the
+PV MSR is set, invariant TSC bit starts to show up in CPUID. When the 
+feature is exposed to Hyper-V guests, reenlightenment becomes unneeded.
 
-That is probably a good idea, but an independent problem.
+Note: strictly speaking, KVM doesn't have to have the feature as exposing
+raw invariant TSC bit (CPUID.80000007H:EDX[8]) also seems to work for
+modern Windows versions. The feature is, however, tiny and straitforward
+and gives additional flexibility so why not.
 
-Has live migration problems (when hosts have different phys bits),
-which is IIRC the reason this hasn't happen yet.  Maybe that is solved
-meanwhile the one way or another, I've seen some phys-bits changes in
-libvirt recently ...
+Vitaly Kuznetsov (6):
+  x86/hyperv: Add HV_INVARIANT_TSC_EXPOSED define
+  KVM: x86: Introduce CPUID_8000_0007_EDX 'scattered' leaf
+  KVM: x86: Hyper-V invariant TSC control
+  KVM: selftests: Rename 'msr->availble' to 'msr->fault_exepected' in
+    hyperv_features test
+  KVM: selftests: Convert hyperv_features test to using
+    KVM_X86_CPU_FEATURE()
+  KVM: selftests: Test Hyper-V invariant TSC control
 
-> 2) in the firmware treat 40 as if it were 39, to support old machine
-> types?
+ arch/x86/include/asm/hyperv-tlfs.h            |   3 +
+ arch/x86/include/asm/kvm_host.h               |   1 +
+ arch/x86/kernel/cpu/mshyperv.c                |   2 +-
+ arch/x86/kvm/cpuid.c                          |  11 +-
+ arch/x86/kvm/hyperv.c                         |  19 ++
+ arch/x86/kvm/hyperv.h                         |  27 +++
+ arch/x86/kvm/reverse_cpuid.h                  |   9 +-
+ arch/x86/kvm/x86.c                            |   4 +-
+ .../selftests/kvm/include/x86_64/hyperv.h     | 144 ++++++++----
+ .../selftests/kvm/include/x86_64/processor.h  |   1 +
+ .../selftests/kvm/x86_64/hyperv_features.c    | 212 +++++++++++-------
+ 11 files changed, 295 insertions(+), 138 deletions(-)
 
-The background of all this is that devices need more and more memory,
-and the very conservative edk2 defaults are becoming increasingly
-problematic.  So what I want do is scale things up with the address
-space size.  Use 1/4 or 1/8 of the physical address space as 64bit
-pci mmio window.  Likewise scale up the default pcie root port window
-sizes, to have more room for hotplug.
-
-For that to work the firmware obviously needs to know how much it
-actually has, which is not the case.
-
-Yes, the problematic cases are intel machines with 36 or 39.
-
-Treating 40 as if it were 39 will explode with 36 cpus.
-
-Treating 40 as if it were 36 will mostly work.  Will leave a big
-chunk of address space unused.  Will cause regressions on guests
-with > 32G of RAM.
-
-Treating 40 as invalid and continue to use the current conservative
-heuristic, otherwise treat phys-bits as valid might work.  Obvious
-corner case is that it'll not catch broken manual configurations
-(host-phys-bits=off,phys-bits=<larger-than-host>), only the broken
-default.  Not sure how much of a problem that is in practice, maybe
-it isn't.
-
-I think I still prefer to explicitly communicate a reliable phys-bits
-value to the guest somehow.
-
-take care,
-  Gerd
+-- 
+2.37.3
 
