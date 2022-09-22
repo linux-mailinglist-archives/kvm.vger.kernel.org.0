@@ -2,121 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8927B5E6B32
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 20:45:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BCCA05E6B8B
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 21:11:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231193AbiIVSp1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 14:45:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50820 "EHLO
+        id S232525AbiIVTLB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 15:11:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229649AbiIVSpZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 14:45:25 -0400
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66AD9D01DA
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 11:45:24 -0700 (PDT)
-Received: by mail-il1-x133.google.com with SMTP id d14so4305808ilf.2
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 11:45:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=Sckvs0FTvGyjC/ju9lFywFrSTF78gTiQEzpAFikyqII=;
-        b=grnT8CgZ1gQuEDOPJTlzBomCgI4eVGDOtVSRW4oxEgOy/f2NoelS/Ta7NvlEk6LbRX
-         gzhUDV71pkz1woX43jN0dWObCEw9lU8dWhiRfx15iMSrLhUu5GH4dwwtQCLgugTvX1z2
-         8AU9g2XA10kmW48eSrBKewQqFDDowhwFDMlFo=
+        with ESMTP id S232524AbiIVTK6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 15:10:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34AE5EB114
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 12:10:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663873854;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cnhWouSde45ALHbYWXdy8WS/vwDNaUoNBSEjHAFskkU=;
+        b=WHyqXmbHL6boLMgIvrfDjZs6lCkPxpaLBjEsPgn2RIcGu+oYQuvgqOYi80PEsKDci2w/i8
+        V/EAVUq8Ta/kDTHzMrCvBIn2/uJxgj7EHlmBbxCWFA6zWGKs89tU9qbf+KZQWAL4SyXW6V
+        Nj1dMG2nN1btRe/9qsNLoo24rhWQwuM=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-586-ajLP06e1Py-MIb6xERa1QA-1; Thu, 22 Sep 2022 15:10:53 -0400
+X-MC-Unique: ajLP06e1Py-MIb6xERa1QA-1
+Received: by mail-io1-f70.google.com with SMTP id y187-20020a6bc8c4000000b006a4014e192fso1218717iof.21
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 12:10:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=Sckvs0FTvGyjC/ju9lFywFrSTF78gTiQEzpAFikyqII=;
-        b=XnRtGfDC/RyAH1mNMe5XtgiUNaGWRygJdzzGNdp16/2fGX5uCqyD5VEbCXoW4RHTKm
-         k1RxjI+rjHVp6qUKops+LJYpiNJ5leJp6OAj7pdZhmJ38Nt9lVTJxwXKkSRAm1FH+AHc
-         LKO7zShlBu936CsVe7XXiDUWvhk+Gei61KF5QJxm+xLLdETyuoNMYAEv+581muvnhZr+
-         ag0a2SODJtaNTsldvgtal8JHHMyKtFLq+ZdxP0U1Q0u65TPd/HaHeTbjOSV3w95Ss2y/
-         +L4FUW09e5A0szgXj2zoxW+nTvbVvsLHaLpG7dW3z1sHS8XR5Zl6v0MHFeul5kKjhXG5
-         8I8A==
-X-Gm-Message-State: ACrzQf3hvR0b1gd5xyhGPcMegWCBxgMZsAhqpfrZlGJ1luDWzcjIAfWE
-        dJa2kcbCmlCtOhH88N2Ykfu5UA==
-X-Google-Smtp-Source: AMsMyM4NsHBKiHG3MQq+rQeymQb3KkMESDFz+18LaQ6uVvnQyA4knTwpE59RihAuxGRr3IGvxsamFw==
-X-Received: by 2002:a05:6e02:b45:b0:2f5:9ee6:4ff4 with SMTP id f5-20020a056e020b4500b002f59ee64ff4mr2467698ilu.101.1663872323713;
-        Thu, 22 Sep 2022 11:45:23 -0700 (PDT)
-Received: from [192.168.1.128] ([38.15.45.1])
-        by smtp.gmail.com with ESMTPSA id c3-20020a0566022d0300b006849ee78e1bsm2619529iow.34.2022.09.22.11.45.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Sep 2022 11:45:23 -0700 (PDT)
-Message-ID: <b9044b55-1498-3309-4db5-70ca2c20b3f7@linuxfoundation.org>
-Date:   Thu, 22 Sep 2022 12:45:22 -0600
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=cnhWouSde45ALHbYWXdy8WS/vwDNaUoNBSEjHAFskkU=;
+        b=Xade1XZ5rkymbC++nlfKlMJEJyUJ18y5+tLhSKBN+NZzF5c3Zm3xxSbPnejKZOINjJ
+         8hufnbv3ZUikM5qPf+O7eBMc9VBSVOytOINKKPUQfCpLjr5GCfpDG3TtCgJKXnJ+uVbR
+         JjMUaX6wJbxR0X7P/JIAlRU1j1jQpilt5zb71U+Qefl0QRiDiwawxLoMHNtrsEbS4Hr3
+         2YcoAdAVCJZ6HRMu/gHV2QTw3ZBNnzHK2PswerHotkljAvGj461p/Ml26SfkxuqIYxmy
+         Y/5QKLTzLn4xpGuWMATg8uoLa1KWxJnzmJvmXhno/LoLmT8ilUwv+wWRdm0LwhNUtRa1
+         6ZQA==
+X-Gm-Message-State: ACrzQf1bwSWc9g0FdMbbs23gbOoYRppYF0bSh+BiKFJuhJ+3IZ/4veRw
+        2h3rnVMRSOXYiXHdbGYzrr2H6LbJvVe/BODiMcrXypjGdDNzBE4LWwNZpG0ijcnJM4jnjFdCraB
+        /9ti0rY6vXMst
+X-Received: by 2002:a05:6638:1385:b0:35a:723c:2fb3 with SMTP id w5-20020a056638138500b0035a723c2fb3mr2605030jad.222.1663873852784;
+        Thu, 22 Sep 2022 12:10:52 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7OOqQI1ZbCpUd9PIr2GP68ipI3WaHRHanmNIUyWftUVzE+2xlt4tzAiqmWoKUi9DkClCwqog==
+X-Received: by 2002:a05:6638:1385:b0:35a:723c:2fb3 with SMTP id w5-20020a056638138500b0035a723c2fb3mr2605021jad.222.1663873852560;
+        Thu, 22 Sep 2022 12:10:52 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id f12-20020a02a10c000000b0035b0eeeab89sm2402985jag.10.2022.09.22.12.10.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Sep 2022 12:10:52 -0700 (PDT)
+Date:   Thu, 22 Sep 2022 13:10:50 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Will Deacon <will@kernel.org>, Qian Cai <cai@lca.pw>,
+        Joerg Roedel <jroedel@suse.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>
+Subject: Re: [PATCH 2/4] vfio: Move the sanity check of the group to
+ vfio_create_group()
+Message-ID: <20220922131050.7136481f.alex.williamson@redhat.com>
+In-Reply-To: <2-v1-ef00ffecea52+2cb-iommu_group_lifetime_jgg@nvidia.com>
+References: <0-v1-ef00ffecea52+2cb-iommu_group_lifetime_jgg@nvidia.com>
+        <2-v1-ef00ffecea52+2cb-iommu_group_lifetime_jgg@nvidia.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH linux-next] KVM: selftests: remove redundant variable
- tsc_val
-Content-Language: en-US
-To:     cgel.zte@gmail.com, pbonzini@redhat.com, shuah@kernel.org,
-        seanjc@google.com, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     dmatlack@google.com, jmattson@google.com, peterx@redhat.com,
-        oupton@google.com, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jinpeng Cui <cui.jinpeng2@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-References: <20220831143150.304406-1-cui.jinpeng2@zte.com.cn>
-From:   Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <20220831143150.304406-1-cui.jinpeng2@zte.com.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/31/22 08:31, cgel.zte@gmail.com wrote:
-> From: Jinpeng Cui <cui.jinpeng2@zte.com.cn>
+On Thu,  8 Sep 2022 15:44:59 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> __vfio_register_dev() has a bit of code to sanity check if an (existing)
+> group is not corrupted by having two copies of the same struct device in
+> it. This should be impossible.
 > 
-> Return value directly from expression instead of
-> getting value from redundant variable tsc_val.
+> It then has some complicated error unwind to uncreate the group.
 > 
-> Reported-by: Zeal Robot <zealci@zte.com.cn>
-> Signed-off-by: Jinpeng Cui <cui.jinpeng2@zte.com.cn>
+> Instead check if the existing group is sane at the same time we locate
+> it. If a bug is found then there is no error unwind, just simply fail
+> allocation.
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 > ---
->   tools/testing/selftests/kvm/include/x86_64/processor.h | 5 ++---
->   1 file changed, 2 insertions(+), 3 deletions(-)
+>  drivers/vfio/vfio_main.c | 79 ++++++++++++++++++----------------------
+>  1 file changed, 36 insertions(+), 43 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> index 0cbc71b7af50..75920678f34d 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> @@ -237,7 +237,6 @@ static inline uint64_t get_desc64_base(const struct desc64 *desc)
->   static inline uint64_t rdtsc(void)
->   {
->   	uint32_t eax, edx;
-> -	uint64_t tsc_val;
->   	/*
->   	 * The lfence is to wait (on Intel CPUs) until all previous
->   	 * instructions have been executed. If software requires RDTSC to be
-> @@ -245,8 +244,8 @@ static inline uint64_t rdtsc(void)
->   	 * execute LFENCE immediately after RDTSC
->   	 */
->   	__asm__ __volatile__("lfence; rdtsc; lfence" : "=a"(eax), "=d"(edx));
-> -	tsc_val = ((uint64_t)edx) << 32 | eax;
-> -	return tsc_val;
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 4ab13808b536e1..ba8b6bed12c7e7 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -306,15 +306,15 @@ static void vfio_container_put(struct vfio_container *container)
+>   * Group objects - create, release, get, put, search
+>   */
+>  static struct vfio_group *
+> -__vfio_group_get_from_iommu(struct iommu_group *iommu_group)
+> +vfio_group_find_from_iommu(struct iommu_group *iommu_group)
+>  {
+>  	struct vfio_group *group;
+>  
+> +	lockdep_assert_held(&vfio.group_lock);
 > +
-> +	return ((uint64_t)edx) << 32 | eax;
->   }
->   
->   static inline uint64_t rdtscp(uint32_t *aux)
+>  	list_for_each_entry(group, &vfio.group_list, vfio_next) {
+> -		if (group->iommu_group == iommu_group) {
+> -			vfio_group_get(group);
+> +		if (group->iommu_group == iommu_group)
+>  			return group;
+> -		}
+>  	}
+>  	return NULL;
+>  }
+> @@ -365,11 +365,27 @@ static struct vfio_group *vfio_group_alloc(struct iommu_group *iommu_group,
+>  	return group;
+>  }
+>  
+> +static bool vfio_group_has_device(struct vfio_group *group, struct device *dev)
+> +{
+> +	struct vfio_device *device;
+> +
+> +	mutex_lock(&group->device_lock);
+> +	list_for_each_entry(device, &group->device_list, group_next) {
+> +		if (device->dev == dev) {
+> +			mutex_unlock(&group->device_lock);
+> +			return true;
+> +		}
+> +	}
+> +	mutex_unlock(&group->device_lock);
+> +	return false;
+> +}
+> +
+>  /*
+>   * Return a struct vfio_group * for the given iommu_group. If no vfio_group
+>   * already exists then create a new one.
+>   */
+> -static struct vfio_group *vfio_get_group(struct iommu_group *iommu_group,
+> +static struct vfio_group *vfio_get_group(struct device *dev,
+> +					 struct iommu_group *iommu_group,
+>  					 enum vfio_group_type type)
+>  {
+>  	struct vfio_group *group;
+> @@ -378,13 +394,20 @@ static struct vfio_group *vfio_get_group(struct iommu_group *iommu_group,
+>  
+>  	mutex_lock(&vfio.group_lock);
+>  
+> -	ret = __vfio_group_get_from_iommu(iommu_group);
+> -	if (ret)
+> -		goto err_unlock;
+> +	ret = vfio_group_find_from_iommu(iommu_group);
+> +	if (ret) {
+> +		if (WARN_ON(vfio_group_has_device(ret, dev))) {
+> +			ret = ERR_PTR(-EINVAL);
+> +			goto out_unlock;
+> +		}
 
-My understanding is that this patch isn't coming from individuals that work
-for ZTE. We won't be able to accept these patches. Refer to the following
-for reasons why we can't accept these patches.
+This still looks racy.  We only know within vfio_group_has_device() that
+the device is not present in the group, what prevents a race between
+here and when we finally do add it to group->device_list?  We can't
+make any guarantees if we drop group->device_lock between test and add.
 
-https://patchwork.kernel.org/project/linux-kselftest/patch/20220920063202.215088-1-ye.xingchen@zte.com.cn/
+The semantics of vfio_get_group() are also rather strange, 'return a
+vfio_group for this iommu_group, but make sure it doesn't include this
+device' :-\  Thanks,
 
-thanks,
--- Shuah
+Alex
+
