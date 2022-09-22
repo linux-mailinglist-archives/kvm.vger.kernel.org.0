@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2291C5E69E1
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 19:50:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2F3A5E69F2
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 19:53:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231561AbiIVRub (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 13:50:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38752 "EHLO
+        id S232130AbiIVRxP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 13:53:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229901AbiIVRu1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 13:50:27 -0400
-Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADB22CC8FA
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 10:50:26 -0700 (PDT)
-Received: by mail-qv1-xf2c.google.com with SMTP id mi14so7267053qvb.12
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 10:50:26 -0700 (PDT)
+        with ESMTP id S229985AbiIVRxN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 13:53:13 -0400
+Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E602D103FF5
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 10:53:12 -0700 (PDT)
+Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-127dca21a7dso14906692fac.12
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 10:53:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date;
-        bh=CqyvEnWuu2OG/5fak5hXa2GzoeHEFNlxtcQChIQbDW4=;
-        b=HSxCUJ2/ggEynUtvLBjqQNtQmQXc8g4wYZrwsuGSdQprt8ZV9uUrUxN+ZB9D+8/f+Y
-         bdeJq2M/T2OD+7jspFc4XqFQM7CPbFey7EZ8VoAVc8qT4zc8wAmkEXiCbcDkNFDjpFIM
-         4920pwnelBxUZS+8zRgdhgMVGWQMQ/chdJgBrHt847c+Q6canO1a2JHT6O6ZIRhthh1m
-         YT6/L2jm2n5Xgx7MRZduUxVm7xqjGHjdtcMYl0jnSUDGcAA93UiQByjQRkWJFa+06MVY
-         jCFp5KO/Mp5eNSpsS1K2H9zD+uSAlBBbY030rt1rskr1cUw+ayq12acdizdojnVcrjaP
-         NhRg==
+        bh=xx8/hTLwW8xNGeq7Lk/5IjrOS3Brq0vxjqtu9F4GI1M=;
+        b=VTOYuTLEi50gG6KIrbl9wsk80XvEjE3JSrIrFmEVdsyd4EpYZZ2JeT/cYMj6DccVfh
+         paPuDjzmNFuRFte/dyasDnWkUMKJFTmWmGkzvf0Lgut9+uJnKNdFt37UwTXE5JYAwCm4
+         RCka9wJKHfFbhVSyQuKNo5xTtf0L/p8rQ49Hq3Etsfv9reD6fR/gV+6dydefIeD+Mq33
+         fiosPow8AHXG7Z8q2fp9XGRrVupVxE+P9SWC8n+v+IxBWQNMWTzVWGpxbfDiEAicxKk/
+         DeMLrMVE9AKtkoz5SSZgRy+UtjN/X3MUwwEtMRSE0/XbGBK/gRkL48wp/43MNePeMPP2
+         q8Sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=CqyvEnWuu2OG/5fak5hXa2GzoeHEFNlxtcQChIQbDW4=;
-        b=zTPJZpEi7kOPv2dbpVcyqAAAn5UEsCxea1tK1P8YnC0sAqqd/dUEuCqbTSNsZsYTHC
-         kvR+vLIsHDiYoaXRbtjQd8xuitLmAskmvpXMm7rzqjR6+k5KdgeFy43WPa5GLiQ9wFmY
-         rQpEXxajJW7IEuN0mvnUkWeNdYzYAmnyNYkulz+o0dbnnkWNLTQWom7QHIrlEC6ABT7S
-         LscGtJeKuJm6vZZJnc9yil5WUGhU1Pm9x9CtqTf56cI+sLchf9GymZTQGY5UYCv8hYGL
-         wPUZbX/oZ1g2JSJ/QX80bZnHROK3ChBOcWvNc00Le9sYAHpd2I+/vrXRs6jp4yDU+Qlw
-         iY+g==
-X-Gm-Message-State: ACrzQf240HT1ubAVO/l6n+GYGdmiKefo1J4LmXEwGcsa1u3OF9Dk4+Xz
-        FCtK2/iSDvgu4gOMYth/S+3Kkv48UMChbv97PFXjPLO3t9A=
-X-Google-Smtp-Source: AMsMyM7PbHyjKpbnubFyQc8xRswuqIQFTEJPB8tTA+nlsBstVCkc1tVte2pbRVGmDvzJFCcq3Ks5AtcxFPM282jfeoM=
-X-Received: by 2002:a0c:df12:0:b0:4ac:9a04:78ee with SMTP id
- g18-20020a0cdf12000000b004ac9a0478eemr3698229qvl.63.1663869025643; Thu, 22
- Sep 2022 10:50:25 -0700 (PDT)
+        bh=xx8/hTLwW8xNGeq7Lk/5IjrOS3Brq0vxjqtu9F4GI1M=;
+        b=ouCQvnCeCT416rWmrDjrdpUipSMGXfN/MKGnVOeSd8mumaB1ar665oLWwazBPu1d5T
+         uxZ15/ErTn9NLi4nBPbNPTrzU60rMaK+KOCGnpD3O5Kp/O4gRQ6jv856Qv2jVjcPevGM
+         UxMhMfKeevwgYeVQSHKciAAv0+hBTDp1S+Gdd/Zh9i5COhLKtB/Y8dXU/zghNk/AqbVF
+         t1TSfuRTtKl9DPOVToZfU2K8DOPbxnrxdon7NAL78YgLcB4pmw38/u4lr1xAb6UgaDts
+         Czx8UYfpeac1dAfkulH7ZUgUc77x9AVqhPMAKpp9cA0kLPZKb12PgGWw3er5icEGRD7f
+         M4hA==
+X-Gm-Message-State: ACrzQf2FEeeOMRpImDNWKct4ta0Q8wM9tmuY7yu7fK4VSKV7eGTyxltx
+        sYItzuwBmxFhSfGiCOFIOwovN0cPYvvmkZcH1FokThH4Fz1FKA==
+X-Google-Smtp-Source: AMsMyM5+BzfItPpe+PRx6+ilxZfavGRYnkVx6PXMPyXiwe6iHkk7muBkXh/kJeOfVLV3LTQRGRSKxXfaUPdvlb6LZUQ=
+X-Received: by 2002:a05:6870:580c:b0:12a:f136:a8f5 with SMTP id
+ r12-20020a056870580c00b0012af136a8f5mr8773540oap.269.1663869192083; Thu, 22
+ Sep 2022 10:53:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220908233134.3523339-1-seanjc@google.com> <20220908233134.3523339-2-seanjc@google.com>
- <Yyybg3DxgLt4NVn+@google.com> <Yyyd8UN+ZO1Yf/Co@google.com>
-In-Reply-To: <Yyyd8UN+ZO1Yf/Co@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Thu, 22 Sep 2022 10:49:59 -0700
-Message-ID: <CALzav=dfL+DCFnKQnUP27SzWLMdWY0kKXr93=nL_VC1nj=aNkg@mail.gmail.com>
-Subject: Re: [PATCH 1/5] KVM: selftests: Implement memcmp(), memcpy(), and
- memset() for guest use
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+References: <20220908233134.3523339-1-seanjc@google.com> <CALzav=cZBsmtD3+hBko3kW6bh2+RC7j533r94576ExuPx7SgEQ@mail.gmail.com>
+In-Reply-To: <CALzav=cZBsmtD3+hBko3kW6bh2+RC7j533r94576ExuPx7SgEQ@mail.gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 22 Sep 2022 10:53:01 -0700
+Message-ID: <CALMp9eTgQyj22XgO4r1MYvjh4UVC3+4KF+xMUZxV50W3iYYgVw@mail.gmail.com>
+Subject: Re: [PATCH 0/5] KVM: selftests: Fix "fix hypercall test" build errors
+To:     David Matlack <dmatlack@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         kvm list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         Andrew Jones <andrew.jones@linux.dev>,
@@ -68,7 +67,7 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,83 +75,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 22, 2022 at 10:40 AM Sean Christopherson <seanjc@google.com> wrote:
+On Thu, Sep 22, 2022 at 10:20 AM David Matlack <dmatlack@google.com> wrote:
 >
-> On Thu, Sep 22, 2022, David Matlack wrote:
-> > > +LIBKVM_STRING += lib/kvm_string.c
+> On Thu, Sep 8, 2022 at 4:34 PM Sean Christopherson <seanjc@google.com> wrote:
 > >
-> > Can this file be named lib/string.c instead? This file has nothing to do
-> > with KVM per-se.
->
-> Yes and no.  I deliberately chose kvm_string to avoid confusion with
-> tools/lib/string.c and tools/include/nolibc/string.h.  The implementations
-> themselves aren't KVM specific, but the reason the file _exists_ is 100% unique
-> to KVM as there is no other environment where tools and/or selftests link to
-> glibc but need to override the string ops.
->
-> I'm not completely opposed to calling it string.c, but my preference is to keep
-> it kvm_string.c so that it's slightly more obvious that KVM selftests are a
-> special snowflake.
-
-Makes sense, the "kvm" prefix just made me do a double-take. Perhaps
-string_overrides.c? That would make it clear that this file is
-overriding string functions. And the fact that this file is in the KVM
-selftests directory signals that the overrides are specific to the KVM
-selftests.
-
-
->
-> > > diff --git a/tools/testing/selftests/kvm/lib/kvm_string.c b/tools/testing/selftests/kvm/lib/kvm_string.c
-> > > new file mode 100644
-> > > index 000000000000..a60d56d4e5b8
-> > > --- /dev/null
-> > > +++ b/tools/testing/selftests/kvm/lib/kvm_string.c
-> > > @@ -0,0 +1,33 @@
-> > > +// SPDX-License-Identifier: GPL-2.0-only
-> > > +#include "kvm_util.h"
+> > After a toolchain upgrade (I think), the x86 fix_hypercall_test started
+> > throwing warnings due to -Werror=array-bounds rightly complaining that
+> > the test is generating an out-of-bounds array access.
 > >
-> > Is this include necesary?
+> > The "obvious" fix is to replace the memcpy() with a memcmp() and compare
+> > only the exact size of the hypercall instruction.  That worked, until I
+> > fiddled with the code a bit more and suddenly the test started jumping into
+> > the weeds due to gcc generating a call to the external memcmp() through the
+> > PLT, which isn't supported in the selftests.
+> >
+> > To fix that mess, which has been a pitfall for quite some time, provide
+> > implementations of memcmp(), memcpy(), and memset() to effectively override
+> > the compiler built-ins.  My thought is to start with the helpers that are
+> > most likely to be used in guest code, and then add more as needed.
 >
-> Nope, I added the include because I also added declarations in kvm_util_base.h,
-> but that's unnecessary because stddef.h also provides the declarations, and those
-> _must_ match the prototypes of the definitions.  So yeah, this is better written as:
->
-> // SPDX-License-Identifier: GPL-2.0-only
-> #include <stddef.h>
->
-> /*
->  * Override the "basic" built-in string helpers so that they can be used in
->  * guest code.  KVM selftests don't support dynamic loading in guest code and
->  * will jump into the weeds if the compiler decides to insert an out-of-line
->  * call via the PLT.
->  */
-> int memcmp(const void *cs, const void *ct, size_t count)
-> {
->         const unsigned char *su1, *su2;
->         int res = 0;
->
->         for (su1 = cs, su2 = ct; 0 < count; ++su1, ++su2, count--) {
->                 if ((res = *su1 - *su2) != 0)
->                         break;
->         }
->         return res;
-> }
->
-> void *memcpy(void *dest, const void *src, size_t count)
-> {
->         char *tmp = dest;
->         const char *s = src;
->
->         while (count--)
->                 *tmp++ = *s++;
->         return dest;
-> }
->
-> void *memset(void *s, int c, size_t count)
-> {
->         char *xs = s;
->
->         while (count--)
->                 *xs++ = c;
->         return s;
-> }
+> Ah ha! This also fixes an issue I've long since noticed and finally
+> got around to debugging this morning. userspace_io_test fails for me
+> when built with Clang but passes with GCC. It turns out Clang
+> generates a call to <memset@plt>, whereas GCC directly generates rep
+> stos, to clear @buffer in guest_code().
+
+Hey! Did I miss a revert of commit ed290e1c20da ("KVM: selftests: Fix
+nested SVM tests when built with clang") in that patch set?
