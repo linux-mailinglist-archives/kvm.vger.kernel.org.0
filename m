@@ -2,159 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 49D945E5EEF
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 11:51:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F2705E5EFF
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 11:53:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230460AbiIVJvS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 05:51:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45882 "EHLO
+        id S231176AbiIVJxg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 05:53:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229961AbiIVJvR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 05:51:17 -0400
+        with ESMTP id S231231AbiIVJxa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 05:53:30 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09A8AD4AB5
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 02:51:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEA9CD5765
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 02:53:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663840275;
+        s=mimecast20190719; t=1663840401;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=17uXSgfBSz8VOl61mGa12Lw4z5xbVJY4l5ZjuYmcfvo=;
-        b=ZyY8jjawh1C1JfGG0diBIdexiqG+FBcl9lFD+/lLHcHFuM7OlBzDRU5JWsK91wNI5DD+t6
-        5m0/IdPSHLmKpYvzBdx0RDx2bM0Yn8Aao7ulcsWt2M34DJnWlLRXgYZX+BZWWDUJpTiy4j
-        4PXzOTpclLVyaDw/lKLub4rlPX16pLs=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=uqJ3fE+nUSVE7dKPp8g2E2Nsm1KKt4x6Y9AxJhIcEaY=;
+        b=a0S9VAXW5qKx3AkXbIwcx4HKVRfLAp+EhMkXe4jvuQ1TKUJKEBogDIYTFfu07ZLRprv7XN
+        J3PbiCqC1nPiEUr1j8f9Q5sl13MmmcNHPlG+sf2J7Jfkm2Pnb6BuY6TM6T9IoFl5fYmJVE
+        HbYsNu8bo2CHKGnNRcnpCZVFqjqu/+k=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-375-Ujjke2kfNaOA_xg91KE5_w-1; Thu, 22 Sep 2022 05:51:13 -0400
-X-MC-Unique: Ujjke2kfNaOA_xg91KE5_w-1
-Received: by mail-wm1-f69.google.com with SMTP id d5-20020a05600c34c500b003b4fb42ccdeso825855wmq.8
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 02:51:13 -0700 (PDT)
+ us-mta-445-8aw6ou6vPbSW2ZClXx5Atg-1; Thu, 22 Sep 2022 05:53:20 -0400
+X-MC-Unique: 8aw6ou6vPbSW2ZClXx5Atg-1
+Received: by mail-wm1-f70.google.com with SMTP id v190-20020a1cacc7000000b003b4ab30188fso846197wme.2
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 02:53:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date;
-        bh=17uXSgfBSz8VOl61mGa12Lw4z5xbVJY4l5ZjuYmcfvo=;
-        b=2VAhXpCSowMSXZRKXqXgtklraKsT1jvlK4Ta4OXusGgxdSflmMTBa9NC3k4oxq4EaB
-         hG/u4fP3BFQgQPzO0TNNHlDaAoY3xRAyXyy2FG+JAbqPV1u/bPbyQVbaWJS5cGUsDo/b
-         I5W4P1RN8TAKyd9yYhD2rwLnfSs81nHlGTaBACLKj7GoXcs5OxcIH6KuzJi8zDFQRVph
-         pFt3Luc4LM+i2SaqTH9m40E378+B+tH6VQQC2GRf9cRqT5oxVw26HdxzzkiHki+VJadK
-         zSYOqr7bhd3z5oRi4kw4mi8nFR9a969hXF8cM4dMO0HkKL8w764Q2tryR1y6vwXSbaZA
-         C3iA==
-X-Gm-Message-State: ACrzQf1ff+seO7Xj84bQLBCyGf8WJtsauigH1pfO973QRgxvNv0Ne1DT
-        lYjTyuHtSJkS68Fhus8f8gCJ5JOyVdYEQjWd2wIcHp1o3qYErat9cCKMUiCkCqYfskzU0dXOVf7
-        GVzbUd+3jpZTA
-X-Received: by 2002:adf:a28e:0:b0:22a:7428:3b04 with SMTP id s14-20020adfa28e000000b0022a74283b04mr1481604wra.75.1663840272513;
-        Thu, 22 Sep 2022 02:51:12 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7zLZL8RAAX4U5+E3rMsNI8F9kayZUCyiTUu7cy/V1gn1HLvX9q9YbarSNcobG7D5s96P9KWw==
-X-Received: by 2002:adf:a28e:0:b0:22a:7428:3b04 with SMTP id s14-20020adfa28e000000b0022a74283b04mr1481588wra.75.1663840272256;
-        Thu, 22 Sep 2022 02:51:12 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id z18-20020adff752000000b0022860e8ae7csm4682086wrp.77.2022.09.22.02.51.11
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=uqJ3fE+nUSVE7dKPp8g2E2Nsm1KKt4x6Y9AxJhIcEaY=;
+        b=t8mFqEQ7Y9GA2mMJKaJ6GbZJ4m93iV27Pd2BDOIxojZIMS0d5B4J0XhnCQVocUlgUH
+         kRak/A2v5cZwh/hCQ5a4Sf5q2qiXN+3yZePH5Bc92v5pOsFbPYg+93SUMqVmqMutcncH
+         myqWxP/uHH2WUcwZR5TDjbUiP7cs9mc/fif9pXp9XMd4VW89YCzqMfNLjyc54RqH/W78
+         uoS4clzn9OYUFMKgs2fvSRrg0kNu87qIWnovPuCqWnwn8Vg/LUZagoI2S7sZD6FcEO6A
+         ubQ0jkMwAN+rHWEt2ppVpQaUvBHdjtVdXDoPq+cOjzMh+5jtgjOWdkTMVrU/Lqwm2SNY
+         8LWg==
+X-Gm-Message-State: ACrzQf16f9sRfUFoh6Q6WFQky2WGSUmW17bsTMp3+lTouGHSKN2lpAnW
+        E019Wfn2Th2lKNWFOEAFCayJHJy2u0Ily3rjWG4Mgj38pTUe4PFJKFIi9bQTsKPuGf8oKFB7J3K
+        fgbMwVV6GR5v0
+X-Received: by 2002:a5d:5503:0:b0:22a:2fd7:d778 with SMTP id b3-20020a5d5503000000b0022a2fd7d778mr1417323wrv.44.1663840399284;
+        Thu, 22 Sep 2022 02:53:19 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4I0G9hKFZfByPGx9z5GwmZTjbtZsg9cph4nZ5xMcSQZeWuytkQr4J3evHBJ1Eu2JfCei19RA==
+X-Received: by 2002:a5d:5503:0:b0:22a:2fd7:d778 with SMTP id b3-20020a5d5503000000b0022a2fd7d778mr1417303wrv.44.1663840399015;
+        Thu, 22 Sep 2022 02:53:19 -0700 (PDT)
+Received: from redhat.com ([2.55.47.213])
+        by smtp.gmail.com with ESMTPSA id v10-20020a5d590a000000b002206203ed3dsm4604135wrd.29.2022.09.22.02.53.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Sep 2022 02:51:11 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v10 14/39] KVM: nSVM: Keep track of Hyper-V
- hv_vm_id/hv_vp_id
-In-Reply-To: <Yyt/Nrh4aoLrNt11@google.com>
-References: <20220921152436.3673454-1-vkuznets@redhat.com>
- <20220921152436.3673454-15-vkuznets@redhat.com>
- <Yyt/Nrh4aoLrNt11@google.com>
-Date:   Thu, 22 Sep 2022 11:51:10 +0200
-Message-ID: <87y1ubn3e9.fsf@redhat.com>
+        Thu, 22 Sep 2022 02:53:18 -0700 (PDT)
+Date:   Thu, 22 Sep 2022 05:53:13 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Gerd Hoffmann <kraxel@redhat.com>
+Cc:     qemu-devel@nongnu.org, Sergio Lopez <slp@redhat.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v3] x86: add etc/phys-bits fw_cfg file
+Message-ID: <20220922054648-mutt-send-email-mst@kernel.org>
+References: <20220922084356.878907-1-kraxel@redhat.com>
+ <20220922044906-mutt-send-email-mst@kernel.org>
+ <20220922093710.q3pxbxljdhu4a4yw@sirius.home.kraxel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220922093710.q3pxbxljdhu4a4yw@sirius.home.kraxel.org>
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On Thu, Sep 22, 2022 at 11:37:10AM +0200, Gerd Hoffmann wrote:
+> On Thu, Sep 22, 2022 at 04:55:16AM -0400, Michael S. Tsirkin wrote:
+> > On Thu, Sep 22, 2022 at 10:43:56AM +0200, Gerd Hoffmann wrote:
+> > > In case phys bits are functional and can be used by the guest (aka
+> > > host-phys-bits=on) add a fw_cfg file carrying the value.  This can
+> > > be used by the guest firmware for address space configuration.
+> > > 
+> > > This is only enabled for 7.2+ machine types for live migration
+> > > compatibility reasons.
+> > > 
+> > > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> > 
+> > I'm curious why you decided to switch from a cpuid flag to fw cfg.
+> 
+> The kernel people didn't like the cpuid approach.
+> 
+> > I guess firmware reads fw cfg anyway.
+> 
+> Correct.
+> 
+> > But would the guest kernel then need to load a fw cfg driver very
+> > early to detect this, too?
+> 
+> Nope, the guest kernel can just work with the address space layout
+> created by the firmware.  The firmware can for example reserve a
+> larger 64-bit mmio window in case there is enough address space for
+> that.  So it programs the bridge windows etc accordingly, qemu
+> generates matching acpi tables and the kernel picks up the changes
+> via _CRS.
+> 
+> > > +void fw_cfg_phys_bits(FWCfgState *fw_cfg)
+> > > +{
+> > > +    X86CPU *cpu = X86_CPU(first_cpu);
+> > > +    uint64_t phys_bits = cpu->phys_bits;
+> > > +
+> > > +    if (cpu->host_phys_bits) {
+> > > +        fw_cfg_add_file(fw_cfg, "etc/phys-bits",
+> > > +                        g_memdup2(&phys_bits, sizeof(phys_bits)),
+> > > +                        sizeof(phys_bits));
+> > > +    }
+> > > +}
+> > 
+> > So, this allows a lot of flexibility, any phys_bits value at all can now
+> > be used. Do you expect a use-case for such a flexible mechanism?  If
+> > this ends up merely repeating CPUID at all times then we are just
+> > creating confusion.
+> 
+> Yes, it'll just repeat CPUID.  Advantage is that the guest gets the
+> information it needs right away.
+> 
+> Alternatively I could create a "etc/reliable-phys-bits" bool.
+> The firmware must consult both fw_cfg and cpuid then.
+> 
+> take care,
+>   Gerd
 
-> On Wed, Sep 21, 2022, Vitaly Kuznetsov wrote:
->> Similar to nSVM, KVM needs to know L2's VM_ID/VP_ID and Partition
->> assist page address to handle L2 TLB flush requests.
->> 
->> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>  arch/x86/kvm/svm/hyperv.h | 16 ++++++++++++++++
->>  arch/x86/kvm/svm/nested.c |  2 ++
->>  2 files changed, 18 insertions(+)
->> 
->> diff --git a/arch/x86/kvm/svm/hyperv.h b/arch/x86/kvm/svm/hyperv.h
->> index 7d6d97968fb9..8cf702fed7e5 100644
->> --- a/arch/x86/kvm/svm/hyperv.h
->> +++ b/arch/x86/kvm/svm/hyperv.h
->> @@ -9,6 +9,7 @@
->>  #include <asm/mshyperv.h>
->>  
->>  #include "../hyperv.h"
->> +#include "svm.h"
->>  
->>  /*
->>   * Hyper-V uses the software reserved 32 bytes in VMCB
->> @@ -32,4 +33,19 @@ struct hv_enlightenments {
->>   */
->>  #define VMCB_HV_NESTED_ENLIGHTENMENTS VMCB_SW
->>  
->> +static inline void nested_svm_hv_update_vm_vp_ids(struct kvm_vcpu *vcpu)
->> +{
->> +	struct vcpu_svm *svm = to_svm(vcpu);
->> +	struct hv_enlightenments *hve =
->> +		(struct hv_enlightenments *)svm->nested.ctl.reserved_sw;
->
-> Eww :-)
->
-> I posted a small series to fix the casting[*], and as noted in the cover letter it's
-> going to conflict mightily.  Ignoring merge order for the moment, looking at the
-> series as a whole, if the Hyper-V definitions are moved to hyperv-tlfs.h, then I'm
-> tempted to say there's no need for svm/hyperv.h.
->
-> There should never be users of this stuff outside of svm/nested.c, and IMO there's
-> not enough stuff to warrant a separate set of files.  nested_svm_hv_update_vp_assist()
-> isn't SVM specific and fits better alongside kvm_hv_get_assist_page().
->
-> That leaves three functions and ~40 lines of code, which can easily go directly
-> into svm/nested.c.
->
-> I'm definitely not dead set against having hyperv.{ch}, but unless there's a high
-> probability of SVM+Hyper-V getting to eVMCS levels of enlightenment, my vote is
-> to put these helpers in svm/nested.c and move then if/when we do end up accumulating
-> more SVM+Hyper-V code.
+It might not be too bad if we actually allow these two to be different
+theoretically (even if unused for now).
+This is up to you. But my point is, if we do let's document what is the
+expected behaviour if fw cfg and CPUID differ.
 
-Well, there's more on the TODO list :-) There are even nSVM-only
-features like "enlightened TLB" (to split ASID invalidations into two
-stages) so I don't want to pollute 'nested.c'. In fact, I was thinking
-about renaming vmx/evmcs.{ch} into vmx/hyperv.{ch} as we're doing more
-than eVMCS there already. Also, having separate files help with the
-newly introduces 'KVM X86 HYPER-V (KVM/hyper-v)' MAINTAINERS entry. Does
-this sound like a good enough justification for keeping hyperv.{ch}?
 
->   
-> As for merge order, I don't think there's a need for this series to take a
-> dependency on the cleanup, especially if these helpers land in nested.c.  Fixing
-> up the casting and s/hv_enlightenments/hv_vmcb_enlightenments is straightforward.
->
-> [*] https://lore.kernel.org/all/20220921201607.3156750-1-seanjc@google.com
->
-
-I'll take a look, thanks!
 
 -- 
-Vitaly
+MST
 
