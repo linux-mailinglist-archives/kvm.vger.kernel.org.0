@@ -2,101 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BC6D5E5D0C
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 10:08:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F8035E5DBC
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 10:44:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230110AbiIVIIB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 04:08:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46628 "EHLO
+        id S230308AbiIVIoH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 04:44:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229814AbiIVIH7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 04:07:59 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0518BB40D9;
-        Thu, 22 Sep 2022 01:07:59 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id a29so8535954pfk.5;
-        Thu, 22 Sep 2022 01:07:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=w6ltT1uP5vP/CBS8d2EROS3KCkX2BMDsjshfNpVyQag=;
-        b=pxZeD6HvRIQy8BwCK3k7EJX9w9Djy0iY80wmFoDn+r+0Wy4bUEsEubPYqM86VtHULP
-         vQsVbXhy92+KbBJpykLUQZwRlKvrhKzFQSOTA/q4JQhs9QsSvG3DF6QuQih5QE2YzSGz
-         MiCqkEIkqTNnoMPaTMPNPx8o+14epjGcm1UsnyCw9kzFUuAXcz7sm1XROGQxM2mWnbIT
-         Xt6B4JgxOL4OV3I352fjLZHRRxo5WksoEVYD+0Q6I+Ak7eONSewOGuR8eF3X3LdkbcEE
-         tcrnbobESb3oxdXciYQXx80CJA4xBgf21RLrZKtYPwTnp96XTBOi8vCYmWAeqCENnB4j
-         lT0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=w6ltT1uP5vP/CBS8d2EROS3KCkX2BMDsjshfNpVyQag=;
-        b=svtyeLWB40pBfdFJA2eFFUSJmwGyEdvjO5oWYBidMkk9Rfgrg95nX5VhjeQ5l8Q3JA
-         R6iEdfeBV70qLjbFogMV33dGD1WrSuAhWBU+WObrmaXANNZiNng5LqkfJMoc8mEYbWHr
-         cfvDo0jxrBYMfp/yQV+Ci9CNL40KOEaeMkFUOEooZjzKe324MjYJuwYsyQMsiHIWC9Rp
-         yHdykK+KGJQ0WSkKdtIAXjJPRdQCCvuLU6DAjq7PmExyMjk8E8li6zSbg/JJfPXmwFDF
-         cXTVCgcqWeOMsPKXGY+y/mL5RoSSy+l00wxSQSCHIN4fDhEuAl7UJh0bSYVJ0ZSuJyAg
-         exLA==
-X-Gm-Message-State: ACrzQf1nZSyBzNQdKjqm2lN9M5xSy5jXpFVFcsh6UwnL+f+RzC7GcQj9
-        db00T9+xxXBVOxcTTyTmWK8=
-X-Google-Smtp-Source: AMsMyM7aHLhs9Uh7J/KHuj0dhOcvsXQKmn5lU/B9KcNRqyBGRcqB5wF7tVrBZ2ioxqhzN2BZbatyaA==
-X-Received: by 2002:a63:fd0c:0:b0:42b:93a2:af0b with SMTP id d12-20020a63fd0c000000b0042b93a2af0bmr1988098pgh.315.1663834078445;
-        Thu, 22 Sep 2022 01:07:58 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id v16-20020a63f210000000b0042a713dd68csm3154256pgh.53.2022.09.22.01.07.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Sep 2022 01:07:57 -0700 (PDT)
-Message-ID: <ad2572d0-06b5-7250-31f2-a5efa1048cc0@gmail.com>
-Date:   Thu, 22 Sep 2022 16:07:45 +0800
+        with ESMTP id S229609AbiIVIoF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 04:44:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 677DAD33F7
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 01:44:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663836243;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=g3EbjYEnNvaILRbxi6JDqLbDsLI8zvYAamKZ1FXvs7I=;
+        b=EEBAs4+n8g85PCWEL8cW7U5ERMpCoLBCIDfbCV9VEkeYFGbq5iPx73TXGYNF91t1UgJYHY
+        4BlML2Vl9OTx1cEzz1s5BYqrDEt3MBJxB+t7M1HsEpA5qp46iTfBQrMJZZV+HwR/FujaZp
+        7se+FEKw7YTcqcRpFUsmjbpOxsb5Ndc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-595-MaaJWsr7PGu3fzlRjTHVkg-1; Thu, 22 Sep 2022 04:43:59 -0400
+X-MC-Unique: MaaJWsr7PGu3fzlRjTHVkg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C811D882820;
+        Thu, 22 Sep 2022 08:43:58 +0000 (UTC)
+Received: from sirius.home.kraxel.org (unknown [10.39.192.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 55532C158CF;
+        Thu, 22 Sep 2022 08:43:58 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+        id B93D01800084; Thu, 22 Sep 2022 10:43:56 +0200 (CEST)
+From:   Gerd Hoffmann <kraxel@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Sergio Lopez <slp@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>
+Subject: [PATCH v3] x86: add etc/phys-bits fw_cfg file
+Date:   Thu, 22 Sep 2022 10:43:56 +0200
+Message-Id: <20220922084356.878907-1-kraxel@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.13.1
-Subject: Re: [PATCH RFC 1/1] perf stat: do not fatal if the leader is errored
-Content-Language: en-US
-To:     Dongli Zhang <dongli.zhang@oracle.com>
-Cc:     linux-kernel@vger.kernel.org, peterz@infradead.org,
-        mingo@redhat.com, acme@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        namhyung@kernel.org, joe.jin@oracle.com,
-        linux-perf-users@vger.kernel.org, kvm list <kvm@vger.kernel.org>,
-        Kan Liang <kan.liang@linux.intel.com>
-References: <20220922071017.17398-1-dongli.zhang@oracle.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20220922071017.17398-1-dongli.zhang@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/9/2022 3:10 pm, Dongli Zhang wrote:
-> There are three options to fix the issue.
-> 
-> 1. Do not expose /sys/bus/event_source/devices/cpu/events/slots to
-> userspace so that pmu_have_event(pmu->name, "slots") returns false.
+In case phys bits are functional and can be used by the guest (aka
+host-phys-bits=on) add a fw_cfg file carrying the value.  This can
+be used by the guest firmware for address space configuration.
 
-IMO, the guest PMU driver should be fixed
-since it misrepresents emulated hardware capabilities in terms of slots.
+This is only enabled for 7.2+ machine types for live migration
+compatibility reasons.
 
-> 
-> 2. Run cpuid at perf userspace and avoid using 'slots' if it is not
-> supported in cpuid.
-> 
-> 3. Do not fatal perf if the leader is failed. Do not create events for an
-> evsel if its leader is already failed.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/i386/fw_cfg.h     |  1 +
+ include/hw/i386/pc.h |  1 +
+ hw/i386/fw_cfg.c     | 12 ++++++++++++
+ hw/i386/pc.c         |  5 +++++
+ hw/i386/pc_piix.c    |  2 ++
+ hw/i386/pc_q35.c     |  2 ++
+ 6 files changed, 23 insertions(+)
 
-We may also need this since it's easier and more agile to update the perf tool
-than the kernel code or KVM emulated capabilities.
+diff --git a/hw/i386/fw_cfg.h b/hw/i386/fw_cfg.h
+index 275f15c1c5e8..6ff198a6cb85 100644
+--- a/hw/i386/fw_cfg.h
++++ b/hw/i386/fw_cfg.h
+@@ -26,5 +26,6 @@ FWCfgState *fw_cfg_arch_create(MachineState *ms,
+ void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg);
+ void fw_cfg_build_feature_control(MachineState *ms, FWCfgState *fw_cfg);
+ void fw_cfg_add_acpi_dsdt(Aml *scope, FWCfgState *fw_cfg);
++void fw_cfg_phys_bits(FWCfgState *fw_cfg);
+ 
+ #endif
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index c95333514ed3..bedef1ee13c1 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -119,6 +119,7 @@ struct PCMachineClass {
+     bool enforce_aligned_dimm;
+     bool broken_reserved_end;
+     bool enforce_amd_1tb_hole;
++    bool phys_bits_in_fw_cfg;
+ 
+     /* generate legacy CPU hotplug AML */
+     bool legacy_cpu_hotplug;
+diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
+index a283785a8de4..6a1f18925725 100644
+--- a/hw/i386/fw_cfg.c
++++ b/hw/i386/fw_cfg.c
+@@ -219,3 +219,15 @@ void fw_cfg_add_acpi_dsdt(Aml *scope, FWCfgState *fw_cfg)
+     aml_append(dev, aml_name_decl("_CRS", crs));
+     aml_append(scope, dev);
+ }
++
++void fw_cfg_phys_bits(FWCfgState *fw_cfg)
++{
++    X86CPU *cpu = X86_CPU(first_cpu);
++    uint64_t phys_bits = cpu->phys_bits;
++
++    if (cpu->host_phys_bits) {
++        fw_cfg_add_file(fw_cfg, "etc/phys-bits",
++                        g_memdup2(&phys_bits, sizeof(phys_bits)),
++                        sizeof(phys_bits));
++    }
++}
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 566accf7e60a..17ecc7fe4331 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -744,6 +744,7 @@ void pc_machine_done(Notifier *notifier, void *data)
+ {
+     PCMachineState *pcms = container_of(notifier,
+                                         PCMachineState, machine_done);
++    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+     X86MachineState *x86ms = X86_MACHINE(pcms);
+ 
+     cxl_hook_up_pxb_registers(pcms->bus, &pcms->cxl_devices_state,
+@@ -764,6 +765,9 @@ void pc_machine_done(Notifier *notifier, void *data)
+         fw_cfg_build_feature_control(MACHINE(pcms), x86ms->fw_cfg);
+         /* update FW_CFG_NB_CPUS to account for -device added CPUs */
+         fw_cfg_modify_i16(x86ms->fw_cfg, FW_CFG_NB_CPUS, x86ms->boot_cpus);
++        if (pcmc->phys_bits_in_fw_cfg) {
++            fw_cfg_phys_bits(x86ms->fw_cfg);
++        }
+     }
+ }
+ 
+@@ -1907,6 +1911,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     pcmc->kvmclock_enabled = true;
+     pcmc->enforce_aligned_dimm = true;
+     pcmc->enforce_amd_1tb_hole = true;
++    pcmc->phys_bits_in_fw_cfg = true;
+     /* BIOS ACPI tables: 128K. Other BIOS datastructures: less than 4K reported
+      * to be used at the moment, 32K should be enough for a while.  */
+     pcmc->acpi_data_size = 0x20000 + 0x8000;
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 8043a250adf3..c6a4dbd5c0b0 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -447,9 +447,11 @@ DEFINE_I440FX_MACHINE(v7_2, "pc-i440fx-7.2", NULL,
+ 
+ static void pc_i440fx_7_1_machine_options(MachineClass *m)
+ {
++    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+     pc_i440fx_7_2_machine_options(m);
+     m->alias = NULL;
+     m->is_default = false;
++    pcmc->phys_bits_in_fw_cfg = false;
+     compat_props_add(m->compat_props, hw_compat_7_1, hw_compat_7_1_len);
+     compat_props_add(m->compat_props, pc_compat_7_1, pc_compat_7_1_len);
+ }
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 53eda50e818c..c2b56daa1550 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -384,8 +384,10 @@ DEFINE_Q35_MACHINE(v7_2, "pc-q35-7.2", NULL,
+ 
+ static void pc_q35_7_1_machine_options(MachineClass *m)
+ {
++    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+     pc_q35_7_2_machine_options(m);
+     m->alias = NULL;
++    pcmc->phys_bits_in_fw_cfg = false;
+     compat_props_add(m->compat_props, hw_compat_7_1, hw_compat_7_1_len);
+     compat_props_add(m->compat_props, pc_compat_7_1, pc_compat_7_1_len);
+ }
+-- 
+2.37.3
 
-> 
-> This RFC patch is with the 3rd option. Would you mind suggesting which
-> option is better?
