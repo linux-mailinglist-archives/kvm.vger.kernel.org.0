@@ -2,101 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8252A5E6290
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 14:38:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CEC485E629E
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 14:41:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229644AbiIVMiT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 08:38:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35546 "EHLO
+        id S230456AbiIVMlT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 08:41:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230196AbiIVMiS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 08:38:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AD51E7C11
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 05:38:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663850296;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Uv9cmY4jlDk+x+QD2HnLadtUs/Xl/1IY2hz7KLYpLRI=;
-        b=dxGITL8gZaCJdmWojuXiiaRSN56SPmGslOpDZniNYVV4EPbzbhlYZFvCKOUshPO0+rTTCw
-        DZ9LqNElbjTZcQWgWu4BJahDIPSUsrLyu/+OWRlkFTEews9pdnOgS+YacgXAOZsHgZTgUa
-        zzPL/dmos5QcH8fWfAMGfToqdfaIWrk=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-455-ZOBZlk0HOT6jrw6YoaatNQ-1; Thu, 22 Sep 2022 08:38:14 -0400
-X-MC-Unique: ZOBZlk0HOT6jrw6YoaatNQ-1
-Received: by mail-qv1-f72.google.com with SMTP id ec8-20020ad44e68000000b004aab01f3eaaso6296447qvb.4
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 05:38:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=Uv9cmY4jlDk+x+QD2HnLadtUs/Xl/1IY2hz7KLYpLRI=;
-        b=4HT7luXbfEtfwMTT0r5LjcKAIJmbmHE6uCqLzD1vGH6FTtvNJ46mwZ3q0eheeoFHtq
-         IjBzH1SY9qVSqpmf8KjUpev45ZbDTSlekkD8PQRm63H+fxnH8SmDj1OtuL6kIoX0ZWpv
-         XpTQ+8JJD1Y5qidZohwbmn6KdPiAePmGTf+JmiCV3PA1DBqG27VciSzXs7QEVvVBUeDC
-         wS/3Q0lag3L//tzwcjUkdBafUp1h4OL5KOmmUo8rzFIUgoblNz6qJ0QkriCLagdUl4t2
-         gm4d4sXpqWRR00G420WWyNZeMXjh3l2PIU0ExoIRHcSXENeBIxzwe6xuWUWnak4CseC7
-         /5Zg==
-X-Gm-Message-State: ACrzQf1Xvs9b1tReKl0C9TdLvOXmu+U+HdgSM7lBcihvK/i9vfFhuWMs
-        2cgxp+N3cVnhXAUWh+ZgWHRsSflLqNPXs6pW8eZSZvKF/HEEE/g8X8ecV07m5uZDFKa8NJNIZ4m
-        Jug+Njmq0HMB/uRt39Kmyl2U3zwhs
-X-Received: by 2002:a05:620a:220f:b0:6ce:cead:f39e with SMTP id m15-20020a05620a220f00b006ceceadf39emr1879221qkh.233.1663850294439;
-        Thu, 22 Sep 2022 05:38:14 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM77XVEjklfVa6pEJFL3+S0rqbKAJ06fZ3p+HvE1CK75BVl1+XqdwCHAkUwmTXvBJ3cWcHAwzCuNoRa8MiXETx8=
-X-Received: by 2002:a05:620a:220f:b0:6ce:cead:f39e with SMTP id
- m15-20020a05620a220f00b006ceceadf39emr1879196qkh.233.1663850294222; Thu, 22
- Sep 2022 05:38:14 -0700 (PDT)
+        with ESMTP id S229791AbiIVMlR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 08:41:17 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5DA1E7239;
+        Thu, 22 Sep 2022 05:41:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1663850475; x=1695386475;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=2XrBvsqAS2iekK6smQOUXQvJir1/aMIF8ljeQsISlsI=;
+  b=gJsM8dQ+Ntn2gjkXVqqeZxDr3FFrJ01zJuWOA5p1DkQxThaXN979S1vp
+   lUiH3ghias5vZVNd4ztXVK8Cr7w4PetGm98S+nKzOhOcYwBlC+LkvwwDo
+   +G9nSjJEhDzdx44a/d/k+umsoAwuhBgOKH2+7Dj5RC1jAW9kkZlgPevHZ
+   cFG+tkO+F90x8Ah/RMgo1XweN77N7H2wgMSSIY0b6CegEboQEOFHtncQT
+   ZdAfq9aP6/Nvq5QTenjTFCRAi+sz0HqYpdvX+RWkPaA9A/tJfLMTL4sEm
+   EG6Z4cIEh//DDH67nNoXgPfgsyTyy6KOjog4OA4MNK/GUg+DtBohArsvn
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10478"; a="287365286"
+X-IronPort-AV: E=Sophos;i="5.93,335,1654585200"; 
+   d="scan'208";a="287365286"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2022 05:41:15 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,335,1654585200"; 
+   d="scan'208";a="688279050"
+Received: from linux.intel.com ([10.54.29.200])
+  by fmsmga004.fm.intel.com with ESMTP; 22 Sep 2022 05:41:15 -0700
+Received: from [10.252.210.171] (kliang2-mobl1.ccr.corp.intel.com [10.252.210.171])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by linux.intel.com (Postfix) with ESMTPS id 78829580AD7;
+        Thu, 22 Sep 2022 05:41:13 -0700 (PDT)
+Message-ID: <e354250c-cfb6-a48d-73cd-b703f670af57@linux.intel.com>
+Date:   Thu, 22 Sep 2022 08:41:12 -0400
 MIME-Version: 1.0
-References: <20220922101454.1069462-1-kraxel@redhat.com> <YyxF2TNwnXaefT6u@redhat.com>
- <20220922122058.vesh352623uaon6e@sirius.home.kraxel.org>
-In-Reply-To: <20220922122058.vesh352623uaon6e@sirius.home.kraxel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Thu, 22 Sep 2022 14:38:02 +0200
-Message-ID: <CABgObfavcPLUbMzaLQS2Rj2=r5eAhuBuKdiHQ4wJGfgPm_=XsQ@mail.gmail.com>
-Subject: Re: [PATCH v4] x86: add etc/phys-bits fw_cfg file
-To:     Gerd Hoffmann <kraxel@redhat.com>
-Cc:     =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
-        qemu-devel@nongnu.org, Sergio Lopez <slp@redhat.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH v2 1/2] perf/x86/intel: Expose EPT-friendly PEBS for SPR
+ and future models
+Content-Language: en-US
+To:     Like Xu <like.xu.linux@gmail.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-perf-users@vger.kernel.org
+References: <20220922051929.89484-1-likexu@tencent.com>
+From:   "Liang, Kan" <kan.liang@linux.intel.com>
+In-Reply-To: <20220922051929.89484-1-likexu@tencent.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 22, 2022 at 2:21 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
-> No.  This will basically inform the guest that host-phys-bits has been
-> enabled (and pass the number of bits).  So the firmware can make use of
-> the available address space instead of trying to be as conservative as
-> possible to avoid going beyond the (unknown) limit.
 
-Intel processors that are not extremely old have host-phys-bits equal
-to 39, 46 or 52. Older processors that had 36, in all likelihood,
-didn't have IOMMUs (so no big 64-bit BARs).
 
-AMD processors have had 48 for a while, though older consumer processors had 40.
+On 2022-09-22 1:19 a.m., Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
+> 
+> According to Intel SDM, the EPT-friendly PEBS is supported by all the
+> platforms after ICX, ADL and the future platforms with PEBS format 5.
+> 
+> Currently the only in-kernel user of this capability is KVM, which has
+> very limited support for hybrid core pmu, so ADL and its successors do
+> not currently expose this capability. When both hybrid core and PEBS
+> format 5 are present, KVM will decide on its own merits.
+> 
+> Cc: Peter Zijlstra <peterz@infradead.org>
+> Cc: linux-perf-users@vger.kernel.org
+> Suggested-by: Kan Liang <kan.liang@linux.intel.com>
+> Signed-off-by: Like Xu <likexu@tencent.com>
 
-QEMU has always used 40, though many downstream packages (IIRC RHEL
-and Ubuntu) just use host-phys-bits = true when using KVM.
 
-Would it work to:
+Reviewed-by: Kan Liang <kan.liang@linux.intel.com>
 
-1) set host-phys-bits to true on new machine types when not using TCG
-(i.e. KVM / HVF / WHPX)
+Thanks,
+Kan
 
-2) in the firmware treat 40 as if it were 39, to support old machine types?
-
-Paolo
-
+> ---
+> V1 -> V2 Changelog:
+> - the perf part should be a separate patch; (Kan)
+> - apply PEBS format 5 to avoid patching every future model; (Kan)
+> 
+>  arch/x86/events/intel/core.c | 1 +
+>  arch/x86/events/intel/ds.c   | 4 +++-
+>  2 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+> index 2db93498ff71..804540ba4599 100644
+> --- a/arch/x86/events/intel/core.c
+> +++ b/arch/x86/events/intel/core.c
+> @@ -6288,6 +6288,7 @@ __init int intel_pmu_init(void)
+>  		x86_pmu.pebs_constraints = intel_spr_pebs_event_constraints;
+>  		x86_pmu.extra_regs = intel_spr_extra_regs;
+>  		x86_pmu.limit_period = spr_limit_period;
+> +		x86_pmu.pebs_ept = 1;
+>  		x86_pmu.pebs_aliases = NULL;
+>  		x86_pmu.pebs_prec_dist = true;
+>  		x86_pmu.pebs_block = true;
+> diff --git a/arch/x86/events/intel/ds.c b/arch/x86/events/intel/ds.c
+> index ba60427caa6d..4e937f685cdc 100644
+> --- a/arch/x86/events/intel/ds.c
+> +++ b/arch/x86/events/intel/ds.c
+> @@ -2253,8 +2253,10 @@ void __init intel_ds_init(void)
+>  			x86_pmu.large_pebs_flags |= PERF_SAMPLE_TIME;
+>  			break;
+>  
+> -		case 4:
+>  		case 5:
+> +			x86_pmu.pebs_ept = 1;
+> +			fallthrough;
+> +		case 4:
+>  			x86_pmu.drain_pebs = intel_pmu_drain_pebs_icl;
+>  			x86_pmu.pebs_record_size = sizeof(struct pebs_basic);
+>  			if (x86_pmu.intel_cap.pebs_baseline) {
