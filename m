@@ -2,84 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 083965E60CC
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 13:21:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60D2F5E60DE
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 13:24:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230397AbiIVLVD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 07:21:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40978 "EHLO
+        id S231395AbiIVLYV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 07:24:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229991AbiIVLVC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 07:21:02 -0400
+        with ESMTP id S230331AbiIVLYU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 07:24:20 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36491DE0FD
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 04:21:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10B20E1181
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 04:24:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663845660;
+        s=mimecast20190719; t=1663845858;
         h=from:from:reply-to:reply-to:subject:subject:date:date:
          message-id:message-id:to:to:cc:cc:mime-version:mime-version:
          content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=VuYqmWHx8E1Kx7C1xkE5SwjBorzdn+d+oVW6/OMVJJw=;
-        b=c2ciACADM36jRrr1SInY+ZY5NCOHru8XZI1LZIkUFP+4IoBlPVL8WP9lyDNS3Aq9tZciCM
-        VjURlsbtLj4qsWZYrpuMXbnWnl+L4fMFKSyAfevmD/R++YHcqrlvppkW+uPHG5Ukx3o/EA
-        jGnHe8rvPfDf2rxcq91IRwhmt44X2mM=
+        bh=ekyat6wE5O8YWrL8KdK7RsMTtyGDEoPpZ9rWPegYGrs=;
+        b=Vc0jJITWwooIl0fL0fc5Iy1H2vnQF+hn7en03ku0KIYAjaG9FFmFXVFiMUwvS1oHXX6m03
+        wyokIYZ97NKa7dzW4HZdCUQimXHeMpaZRK7WRUQ09CDEEk7jzhK77b1jDfIQwul/qVPekk
+        SIlEN42S45cdP9Xt1aK868Uq7iTz2wk=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-331-zeKxygzaOwWJIVJYYcOBYg-1; Thu, 22 Sep 2022 07:20:57 -0400
-X-MC-Unique: zeKxygzaOwWJIVJYYcOBYg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+ us-mta-195-7TV2T3G2NUevHd_AnjKOxA-1; Thu, 22 Sep 2022 07:24:14 -0400
+X-MC-Unique: 7TV2T3G2NUevHd_AnjKOxA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 42D0C85A59D;
-        Thu, 22 Sep 2022 11:20:56 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CF6118828C3;
+        Thu, 22 Sep 2022 11:24:13 +0000 (UTC)
 Received: from redhat.com (unknown [10.33.36.120])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 629EE40C83DD;
-        Thu, 22 Sep 2022 11:20:52 +0000 (UTC)
-Date:   Thu, 22 Sep 2022 12:20:50 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 015682027061;
+        Thu, 22 Sep 2022 11:24:11 +0000 (UTC)
+Date:   Thu, 22 Sep 2022 12:24:09 +0100
 From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Rodel, Jorg" <jroedel@suse.de>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Farman <farman@linux.ibm.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Martins, Joao" <joao.m.martins@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        Steve Sistare <steven.sistare@oracle.com>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        Laine Stump <laine@redhat.com>
-Subject: Re: [PATCH RFC v2 00/13] IOMMUFD Generic interface
-Message-ID: <YyxFEpAOC2V1SZwk@redhat.com>
+To:     Gerd Hoffmann <kraxel@redhat.com>
+Cc:     qemu-devel@nongnu.org, Sergio Lopez <slp@redhat.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v4] x86: add etc/phys-bits fw_cfg file
+Message-ID: <YyxF2TNwnXaefT6u@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <0-v2-f9436d0bde78+4bb-iommufd_jgg@nvidia.com>
- <BN9PR11MB52762909D64C1194F4FCB4528C479@BN9PR11MB5276.namprd11.prod.outlook.com>
- <d5e33ebb-29e6-029d-aef4-af5c4478185a@redhat.com>
- <Yyoa+kAJi2+/YTYn@nvidia.com>
- <20220921120649.5d2ff778.alex.williamson@redhat.com>
- <YytbiCx3CxCnP6fr@nvidia.com>
+References: <20220922101454.1069462-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <YytbiCx3CxCnP6fr@nvidia.com>
+In-Reply-To: <20220922101454.1069462-1-kraxel@redhat.com>
 User-Agent: Mutt/2.2.6 (2022-06-05)
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
@@ -89,29 +65,147 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 21, 2022 at 03:44:24PM -0300, Jason Gunthorpe wrote:
-> On Wed, Sep 21, 2022 at 12:06:49PM -0600, Alex Williamson wrote:
-> > The issue is where we account these pinned pages, where accounting is
-> > necessary such that a user cannot lock an arbitrary number of pages
-> > into RAM to generate a DoS attack.  
+On Thu, Sep 22, 2022 at 12:14:54PM +0200, Gerd Hoffmann wrote:
+> In case phys bits are functional and can be used by the guest (aka
+> host-phys-bits=on) add a fw_cfg file carrying the value.  This can
+> be used by the guest firmware for address space configuration.
 > 
-> It is worth pointing out that preventing a DOS attack doesn't actually
-> work because a *task* limit is trivially bypassed by just spawning
-> more tasks. So, as a security feature, this is already very
-> questionable.
+> The value in the etc/phys-bits fw_cfg file should be identical to
+> the phys bits value published via cpuid leaf 0x80000008.
+> 
+> This is only enabled for 7.2+ machine types for live migration
+> compatibility reasons.
 
-The malicious party on host VM hosts is generally the QEMU process.
-QEMU is normally prevented from spawning more tasks, both by SELinux
-controls and be the seccomp sandbox blocking clone() (except for
-thread creation).  We need to constrain what any individual QEMU can
-do to the host, and the per-task mem locking limits can do that.
+Is this going to have any implications for what mgmt apps must
+take into account when selecting valid migration target hosts ?
 
-The mgmt app is what spawns more tasks (QEMU instances) and they
-are generally a trusted party on the host, or they are already
-constrained in other ways such as cgroups or namespaces. The
-mgmt apps would be expected to not intentionally overcommit the
-host with VMs needing too much cummulative locked RAM.
+Historically, apps have tended to ignore any checks for phys
+bits between src/dst migration hosts and hoped for the best.
 
+Will this new behaviour introduce / change any failure scenarios
+where the target host has fewer phys bits than the src host, that
+mgmt apps need to be made aware of ?
+
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  hw/i386/fw_cfg.h     |  1 +
+>  include/hw/i386/pc.h |  1 +
+>  hw/i386/fw_cfg.c     | 12 ++++++++++++
+>  hw/i386/pc.c         |  5 +++++
+>  hw/i386/pc_piix.c    |  2 ++
+>  hw/i386/pc_q35.c     |  2 ++
+>  6 files changed, 23 insertions(+)
+> 
+> diff --git a/hw/i386/fw_cfg.h b/hw/i386/fw_cfg.h
+> index 275f15c1c5e8..6ff198a6cb85 100644
+> --- a/hw/i386/fw_cfg.h
+> +++ b/hw/i386/fw_cfg.h
+> @@ -26,5 +26,6 @@ FWCfgState *fw_cfg_arch_create(MachineState *ms,
+>  void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg);
+>  void fw_cfg_build_feature_control(MachineState *ms, FWCfgState *fw_cfg);
+>  void fw_cfg_add_acpi_dsdt(Aml *scope, FWCfgState *fw_cfg);
+> +void fw_cfg_phys_bits(FWCfgState *fw_cfg);
+>  
+>  #endif
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index c95333514ed3..bedef1ee13c1 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -119,6 +119,7 @@ struct PCMachineClass {
+>      bool enforce_aligned_dimm;
+>      bool broken_reserved_end;
+>      bool enforce_amd_1tb_hole;
+> +    bool phys_bits_in_fw_cfg;
+>  
+>      /* generate legacy CPU hotplug AML */
+>      bool legacy_cpu_hotplug;
+> diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
+> index a283785a8de4..6a1f18925725 100644
+> --- a/hw/i386/fw_cfg.c
+> +++ b/hw/i386/fw_cfg.c
+> @@ -219,3 +219,15 @@ void fw_cfg_add_acpi_dsdt(Aml *scope, FWCfgState *fw_cfg)
+>      aml_append(dev, aml_name_decl("_CRS", crs));
+>      aml_append(scope, dev);
+>  }
+> +
+> +void fw_cfg_phys_bits(FWCfgState *fw_cfg)
+> +{
+> +    X86CPU *cpu = X86_CPU(first_cpu);
+> +    uint64_t phys_bits = cpu->phys_bits;
+> +
+> +    if (cpu->host_phys_bits) {
+> +        fw_cfg_add_file(fw_cfg, "etc/phys-bits",
+> +                        g_memdup2(&phys_bits, sizeof(phys_bits)),
+> +                        sizeof(phys_bits));
+> +    }
+> +}
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 566accf7e60a..17ecc7fe4331 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -744,6 +744,7 @@ void pc_machine_done(Notifier *notifier, void *data)
+>  {
+>      PCMachineState *pcms = container_of(notifier,
+>                                          PCMachineState, machine_done);
+> +    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+>      X86MachineState *x86ms = X86_MACHINE(pcms);
+>  
+>      cxl_hook_up_pxb_registers(pcms->bus, &pcms->cxl_devices_state,
+> @@ -764,6 +765,9 @@ void pc_machine_done(Notifier *notifier, void *data)
+>          fw_cfg_build_feature_control(MACHINE(pcms), x86ms->fw_cfg);
+>          /* update FW_CFG_NB_CPUS to account for -device added CPUs */
+>          fw_cfg_modify_i16(x86ms->fw_cfg, FW_CFG_NB_CPUS, x86ms->boot_cpus);
+> +        if (pcmc->phys_bits_in_fw_cfg) {
+> +            fw_cfg_phys_bits(x86ms->fw_cfg);
+> +        }
+>      }
+>  }
+>  
+> @@ -1907,6 +1911,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+>      pcmc->kvmclock_enabled = true;
+>      pcmc->enforce_aligned_dimm = true;
+>      pcmc->enforce_amd_1tb_hole = true;
+> +    pcmc->phys_bits_in_fw_cfg = true;
+>      /* BIOS ACPI tables: 128K. Other BIOS datastructures: less than 4K reported
+>       * to be used at the moment, 32K should be enough for a while.  */
+>      pcmc->acpi_data_size = 0x20000 + 0x8000;
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 8043a250adf3..c6a4dbd5c0b0 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -447,9 +447,11 @@ DEFINE_I440FX_MACHINE(v7_2, "pc-i440fx-7.2", NULL,
+>  
+>  static void pc_i440fx_7_1_machine_options(MachineClass *m)
+>  {
+> +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+>      pc_i440fx_7_2_machine_options(m);
+>      m->alias = NULL;
+>      m->is_default = false;
+> +    pcmc->phys_bits_in_fw_cfg = false;
+>      compat_props_add(m->compat_props, hw_compat_7_1, hw_compat_7_1_len);
+>      compat_props_add(m->compat_props, pc_compat_7_1, pc_compat_7_1_len);
+>  }
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 53eda50e818c..c2b56daa1550 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -384,8 +384,10 @@ DEFINE_Q35_MACHINE(v7_2, "pc-q35-7.2", NULL,
+>  
+>  static void pc_q35_7_1_machine_options(MachineClass *m)
+>  {
+> +    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+>      pc_q35_7_2_machine_options(m);
+>      m->alias = NULL;
+> +    pcmc->phys_bits_in_fw_cfg = false;
+>      compat_props_add(m->compat_props, hw_compat_7_1, hw_compat_7_1_len);
+>      compat_props_add(m->compat_props, pc_compat_7_1, pc_compat_7_1_len);
+>  }
+> -- 
+> 2.37.3
+> 
+> 
 
 With regards,
 Daniel
