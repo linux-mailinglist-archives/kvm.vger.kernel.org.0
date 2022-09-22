@@ -2,71 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 448265E6BEB
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 21:42:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6A905E6BFB
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 21:49:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232440AbiIVTlt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 15:41:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35184 "EHLO
+        id S232476AbiIVTt0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 15:49:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232372AbiIVTlr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 15:41:47 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5684610AB22
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 12:41:47 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id v4so10141336pgi.10
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 12:41:47 -0700 (PDT)
+        with ESMTP id S231990AbiIVTtY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 15:49:24 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9AE610BB29
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 12:49:22 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id p1-20020a17090a2d8100b0020040a3f75eso3250891pjd.4
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 12:49:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date;
-        bh=RCQxJld93bYDKeJgtBTmKFJY/XaunNlU2lDm3t6TXk0=;
-        b=jP7HNnvKpk5+mf4xXV1t+Hq6KRksvPaPM9pzmzd0L9fcydmqJL/SYHDatRA0oVhz5i
-         XhFmv+2SepA//a+2Akt5yuLjSk8FYTTxopchL5Y79j//Fklu2iMwNV0EuJbFuut/KF8Q
-         WSEWxVpEf+0PAFb/S7pR1Qu5UZjFFQH1v+RLzASOsfyYrmWv5JWnG4rDNiL3pWl/SG3P
-         kd9m7bdmZQIqGj2irkwIKSXK7k9UrYullGtNf1S86/cHT2BOQX/G/qmnvo4YWJHz/VVJ
-         cEghQ14vOluXpIFFdSTHHPzD+KTZT4A4JA0szLU3SBZejMR/+QDNqzj7guH/NvM5JnZ6
-         dULg==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=AOIMXA4PI9BYXrk6/Ja2mOKlrFIROrj5K/ieUQQwXS4=;
+        b=h1quGJbzNcYbvksztMmJbAj4021+BcmdngI9oVLKqryAXjZOZrGY+bZOFcLzMWlozZ
+         LAcA23Adi1Jic4pRnJCptlWTG4EcoRJkXHfvedp0K1HaJOCXyEXxuhzgdof/jPIDOZEe
+         ebqjyLF5ANcpzYiinKi6eaQnqth3W4n2V8+InjN4EWNaK7npJ/bYc7FhRS+iyNb4HHPb
+         Efk7QXZ7wTcSNyFHTH7NWGDPMQ4YLD125sVU1j3HVB2TkIAvgthLngw1wMrAfORH5ZfR
+         U8+tmRxUsuSWAVFhBHQcUHbhvue7DyoPTDpJKMkc7xktoeaZV8RiJlYUMocHTDHlXZyf
+         XJ3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=RCQxJld93bYDKeJgtBTmKFJY/XaunNlU2lDm3t6TXk0=;
-        b=pxpryNPeTV+r4kUgcvaNCo7u013bjhFsSWe06OuflxjxEkjhEENWuaWJHiEcX4SIBx
-         H8Vn3DmI9BQpqeoXKZfj1vKnCHoQbP1c9xsxF+umsjPomXE6I0i4T1cJqyyybzm01Xh4
-         5qmS5hfFXQAsreKpjucrLFJKDpfVQGA9BSL07cKnex4sf1BgfXfj6KMHZz9Vhx0WYH7g
-         cLIk4hEqSBkEoKo1xbPABWWQSgmOmbGofl5yOR+xBYZwbM4o0xRbbCbh8ustn8KO4Nbr
-         a3ufZLpUv5pJTwv54y//2d+OM8OfKp6HUyEXB6fYg8MNJqP+TzFYZaIberwABX+k+9t4
-         HyXw==
-X-Gm-Message-State: ACrzQf17E5GyXfWABiCNsNz8N/Fc1mnAgCd2vzRT5MEuZqJLIDmtI/rQ
-        mshLq/v43S6UlIbaS9FV+Uieww==
-X-Google-Smtp-Source: AMsMyM6mK3yqgGWWjVSW9drey59giIXhzur9YywXloQYbFhFrr1pcVx7BP4g0KY5uq2qv57b4W7tzw==
-X-Received: by 2002:a63:2c4c:0:b0:434:e001:89fd with SMTP id s73-20020a632c4c000000b00434e00189fdmr4348468pgs.444.1663875706700;
-        Thu, 22 Sep 2022 12:41:46 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=AOIMXA4PI9BYXrk6/Ja2mOKlrFIROrj5K/ieUQQwXS4=;
+        b=vOQ75eqF1MT39ibwJyNOgxfijpTID+d73wcz+HcXWRv5OGXolZmYiRW88qPyZ3vbRQ
+         /OPTESwqUX9YI1qMVc5z73RIEsykCnNh/lyAcPtsjrlX6wYRPNK9G0OFt3C6/c6aTSy1
+         8IbMIMcaG7roI49aAriZpYHvDqsVaO7aFnS03GYp0zjvgPVxWY7xSDf9X7iYR0Cmu/ay
+         +7KcmE5NlMf21sr876EPj+kT6odnOz/rsLMUa0uF0CaATHVaHP1b1gahmn0nsIwI20IH
+         LL97c4ZXme2n7QjfPkq8umyXbou4n9TMhoIzjFAMQHQvCjNaHE2j/HjyLIKvEVGNwRAZ
+         4BrA==
+X-Gm-Message-State: ACrzQf1C26v93Xi9942hSiDq4msjEpj6AKEkO4pK5aOlcHA+DwaCf0Nz
+        Eivjbk0NuHHLsNSnoRjRTDktYg==
+X-Google-Smtp-Source: AMsMyM7xkIpUg/GEtYg3CdJDso/M2NS+vljJqn+Iz/Og0ecRlPYRkH7bufKUsfNRGuIjAMJq7OVhXg==
+X-Received: by 2002:a17:90a:644e:b0:200:422c:6b1 with SMTP id y14-20020a17090a644e00b00200422c06b1mr5394594pjm.183.1663876162098;
+        Thu, 22 Sep 2022 12:49:22 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id fu1-20020a17090ad18100b001fd6066284dsm190812pjb.6.2022.09.22.12.41.45
+        by smtp.gmail.com with ESMTPSA id a10-20020a170902ecca00b00172897952a0sm4576315plh.283.2022.09.22.12.49.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Sep 2022 12:41:46 -0700 (PDT)
-Date:   Thu, 22 Sep 2022 19:41:42 +0000
+        Thu, 22 Sep 2022 12:49:21 -0700 (PDT)
+Date:   Thu, 22 Sep 2022 19:49:18 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org
-Subject: Re: [GIT PULL] KVM: x86: First batch of updates for 6.1, i.e.
- kvm/queue
-Message-ID: <Yyy6dv+07D3OR1K+@google.com>
-References: <YypJ62Q9bHXv07qg@google.com>
- <Yysjz3e8y4ij0l0a@google.com>
+To:     "Wang, Wei W" <wei.w.wang@intel.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        "Lutomirski, Andy" <luto@kernel.org>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "aarcange@redhat.com" <aarcange@redhat.com>,
+        "ddutile@redhat.com" <ddutile@redhat.com>,
+        "dhildenb@redhat.com" <dhildenb@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>,
+        "Hocko, Michal" <mhocko@suse.com>,
+        Muchun Song <songmuchun@bytedance.com>
+Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
+Message-ID: <Yyy8Pp0Y4NRzIzNw@google.com>
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
+ <DS0PR11MB63734D4DF4C4F368805EC97DDC4E9@DS0PR11MB6373.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Yysjz3e8y4ij0l0a@google.com>
+In-Reply-To: <DS0PR11MB63734D4DF4C4F368805EC97DDC4E9@DS0PR11MB6373.namprd11.prod.outlook.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,34 +110,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 21, 2022, Sean Christopherson wrote:
-> On Tue, Sep 20, 2022, Sean Christopherson wrote:
-> > First batch of x86 updates for 6.1, i.e. for kvm/queue.  I was planning to get
-> > this out (much) earlier and in a smaller batch, but KVM Forum and the INIT bug
-> > I initially missed in the nested events series threw a wrench in those plans.
+On Thu, Sep 22, 2022, Wang, Wei W wrote:
+> On Thursday, September 15, 2022 10:29 PM, Chao Peng wrote:
+> > +int inaccessible_get_pfn(struct file *file, pgoff_t offset, pfn_t *pfn,
+> > +			 int *order)
 > 
-> ...
-> 
-> >  - Precisely track NX huge page accounting.
-> 
-> Abort!  Abort!  Abort!
-> 
-> Please don't pull, the NX series is embarrasingly broken[*].  It could probably
-> be fixed up, but I'd much rather redo the series for 6.2.
-> 
-> [*] https://lore.kernel.org/all/87tu50oohn.fsf@redhat.com
+> Better to remove "order" from this interface?
 
-...
+Hard 'no'.
 
-> Jinpeng Cui (1):
->       KVM: x86/mmu: remove superfluous local variable "r"
+> Some callers only need to get pfn, and no need to bother with
+> defining and inputting something unused. For callers who need the "order",
+> can easily get it via thp_order(pfn_to_page(pfn)) on their own.
 
-> ye xingchen (1):
->       KVM: x86: Remove the unneeded "ret" in kvm_vm_ioctl_set_tss_addr()
+That requires (a) assuming the pfn is backed by struct page, and (b) assuming the
+struct page is a transparent huge page.  That might be true for the current
+implementation, but it most certainly will not always be true.
 
-
-I'm also going to drop two these cleanups, Shuah pointed out[1] that patches from
-this common gmail account shouldn't be accepted in their current form[2].
-
-[1] https://lore.kernel.org/all/b9044b55-1498-3309-4db5-70ca2c20b3f7@linuxfoundation.org
-[2] https://lore.kernel.org/all/Yylv5hbSBejJ58nt@kroah.com
+KVM originally did things like this, where there was dedicated code for THP vs.
+HugeTLB, and it was a mess.  The goal here is very much to avoid repeating those
+mistakes.  Have the backing store _tell_ KVM how big the mapping is, don't force
+KVM to rediscover the info on its own.
