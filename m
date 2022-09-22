@@ -2,98 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6AE155E6A03
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 19:56:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73C7C5E6A1C
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 19:58:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232161AbiIVR4D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 13:56:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48724 "EHLO
+        id S232202AbiIVR6c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 13:58:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229570AbiIVR4B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 13:56:01 -0400
-Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D236EC54B
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 10:56:00 -0700 (PDT)
-Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-1274ec87ad5so15070199fac.0
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 10:56:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=t9sywruqcuKyY9MOVDQxFF5A99e42M9asDqWWcnjP1g=;
-        b=f8iOwOZDaGvsk1kJiLcpnxW5pf3fBnQTVD4woOnEBJl8xrz9zaeBzsYIIXyAyd16SS
-         Gpr1A/Ix7iTMV3G0SuFqbxyIN6X3AbRMV8WZ8TPSNcEvHOx6vqLgITW6IRFsaglvo4LR
-         y6XNHmxAqOnQZWFs/nr0MC3Xo8xfGqRQQIdG1GwKZPLX7HqHuarB21OBhZQL+5v4/9Z8
-         hRXy4HFv6pSrQWpcrBHlx5yFCmEW3n75JLHwCkW1twjNgvmutCpYituv1dpM9FFQlsMZ
-         wbDvvT6OcIxkZBd3EkwdDiMmolcKMmtSGp83g0J/nNba7d8eGkFXOooP5OZC5KdwOywo
-         cRBQ==
+        with ESMTP id S232208AbiIVR62 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 13:58:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3736E106539
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 10:58:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663869505;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=g4NUGUXkPyLpfZsihmjyO9VtgQj5aWbqHvYtbi+s6OQ=;
+        b=PiHINStj4INo+PorvK0gUGBrz9YfOchAssNeXBIBPkoy6HnDe51/zNlafrBxvSHNiNHXz8
+        Eu2yopdx2wHMLGLMtURbzP2QK9207Bf8eRHO7vXekFRE1FIWTTPc89Ny/8Z3cyIJSZUgCq
+        6hUDY1sXmd7tEOV77Z+J457z7RUrmGI=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-588-bgysONVsN3-YtXtk7Icjmw-1; Thu, 22 Sep 2022 13:58:23 -0400
+X-MC-Unique: bgysONVsN3-YtXtk7Icjmw-1
+Received: by mail-io1-f69.google.com with SMTP id b21-20020a5d8915000000b0068aaf634432so5230614ion.20
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 10:58:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=t9sywruqcuKyY9MOVDQxFF5A99e42M9asDqWWcnjP1g=;
-        b=RXRUWMCT/ZwEvQwN+8lUmy8Pgf5ylWBsxBH3eZVrlZkIbUkBz2ogrhqmLD9TXR2vLb
-         diyQ7YVss0BwgMlup9e29IQX2ogH92Bv58T85B3YOf1LVZD7dBEC1GO9XILIkoQ6dcEF
-         GbySrABBK1mfqTb+/PNC0Ryqa8o8I8QiQC2jofN7aWnfwVfMjGVGx+BujR02clW1U/r4
-         sa9Q6fueFzhTks2G0fL5j+Vn3vvUUKErHPWqWaZ/MujEPIMgLjVSdaBp0hkm3DYubfIS
-         JX/ELg+rmIyv7webj5Q5cKSQMgVwD4SOoepOl78o6Gli/wB0JJU38G3uPBs1CmGxpRAQ
-         0NFg==
-X-Gm-Message-State: ACrzQf2yxshaZL8p5wbBmDiwHJTAn7mg2ig2SXKySnKUSUWrCiqf4PYk
-        dRbiUuDsDST0G3eh4Kpp3vpEsGebVOrIL9afdGWBvQ==
-X-Google-Smtp-Source: AMsMyM4f7HZsorZh9Oc9dnMigbdijdeZCWk/IN1jZJHRpTNiH4MjQiAYgzR8hOZ6mUUDLZ/VbEGM6NB97xPlvZUhZs8=
-X-Received: by 2002:a05:6870:580c:b0:12a:f136:a8f5 with SMTP id
- r12-20020a056870580c00b0012af136a8f5mr8779885oap.269.1663869359794; Thu, 22
- Sep 2022 10:55:59 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=g4NUGUXkPyLpfZsihmjyO9VtgQj5aWbqHvYtbi+s6OQ=;
+        b=nDxIRXjv2XwLfidOvHIjEgp4ZHSXbPOxNgAH/12OaAP1tDVlGaDP6EuYnW7KAvk3kR
+         GEsaBY5dSUvlizkcZAzfnx38SZOzAmTsFaPX6JCWKV+//hCKR7va7GIPsBoahAvwHbCs
+         F1n+ha/Digo1in07m3NbGrbQ8xrYNSbIxDtTgQOoimfKwM7EEMlwT2iR8eOoIoT32omC
+         4/ZQXhu2tCvMU+6Wun4huu8T4oRvNFw/rINF3VBHu7X48dcoM4ow8FKrXjyZFWL/vXD7
+         a0bcjE6OcYIuiIyulXG+oIG+bj1GRylANvIcy0HSQaqfvUI0d5SBvkGhlAXBOBuloBOg
+         GprA==
+X-Gm-Message-State: ACrzQf39EyNgEH798Lrz1Ly5Rs3fV6GgePHV5yTZUXhTh8FjnJnlLVwn
+        BAy4xEacO5ZpeSr8XhwUG3WlSEsOLMfE30aqjuR3EOU9ADMo+5evhLwZ8fnkApFuvp/2KkGInNU
+        /Y4UrkapU4RSZ
+X-Received: by 2002:a05:6638:1305:b0:35a:6a4e:9e57 with SMTP id r5-20020a056638130500b0035a6a4e9e57mr2680889jad.126.1663869503062;
+        Thu, 22 Sep 2022 10:58:23 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM530vCbzgK3QTaLWq3W4wuBNaUAkWaoYeBZZnU7wvG9GWi4I/K5zklV/6TeHh+w/3LQU5zx2g==
+X-Received: by 2002:a05:6638:1305:b0:35a:6a4e:9e57 with SMTP id r5-20020a056638130500b0035a6a4e9e57mr2680865jad.126.1663869502854;
+        Thu, 22 Sep 2022 10:58:22 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id p5-20020a056638216500b0035a498d222asm2456730jak.35.2022.09.22.10.58.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Sep 2022 10:58:22 -0700 (PDT)
+Date:   Thu, 22 Sep 2022 11:58:20 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Kevin Tian <kevin.tian@intel.com>
+Cc:     Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Eric Farman <farman@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Longfang Liu <liulongfang@huawei.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, Yi Liu <yi.l.liu@intel.com>
+Subject: Re: [PATCH v4 00/15] Tidy up vfio_device life cycle
+Message-ID: <20220922115820.5ac023ab.alex.williamson@redhat.com>
+In-Reply-To: <20220921104401.38898-1-kevin.tian@intel.com>
+References: <20220921104401.38898-1-kevin.tian@intel.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20220922143655.3721218-1-vkuznets@redhat.com> <20220922143655.3721218-3-vkuznets@redhat.com>
- <CALMp9eSVQSMKbYKr0n-t3JP58hLGA8ZHJZAX34-E4YWUa+VYHA@mail.gmail.com> <YyyhBTXdj96crwbZ@google.com>
-In-Reply-To: <YyyhBTXdj96crwbZ@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 22 Sep 2022 10:55:49 -0700
-Message-ID: <CALMp9eSwFYX67OL3rTNR4-nDT1i5cD36B4KcPh-RHM2UmXBMNw@mail.gmail.com>
-Subject: Re: [PATCH v4 2/6] KVM: x86: Introduce CPUID_8000_0007_EDX
- 'scattered' leaf
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 22, 2022 at 10:53 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Sep 22, 2022, Jim Mattson wrote:
-> > Why do we need a new 'scattered' leaf? We are only using two bits in
-> > the first one, right? And now we're only going to use one bit in the
-> > second one?
-> >
-> > I thought the point of the 'scattered' leaves was to collect a bunch
-> > of feature bits from different CPUID leaves in a single feature word.
-> >
-> > Allocating a new feature word for one or two bits seems extravagant.
->
-> Ah, these leafs aren't scattered from KVM's perspective.
->
-> The scattered terminology comes from the kernel side, where the KVM-only leafs
-> _may_ be used to deal with features that are scattered by the kernel.  But there
-> is no requirement that KVM-only leafs _must_ be scattered by the kernel, e.g. we
-> can and should use this for leafs that KVM wants to expose to the guest, but are
-> completely ignored by the kernel.  Intel's PSFD feature flag is a good example.
->
-> A better shortlog would be:
->
->   KVM: x86: Add a KVM-only leaf for CPUID_8000_0007_EDX
+On Wed, 21 Sep 2022 18:43:46 +0800
+Kevin Tian <kevin.tian@intel.com> wrote:
 
-Thanks. The 'scattered' terminology seems more confusing than enlightening.
+> The idea is to let vfio core manage the vfio_device life cycle instead
+> of duplicating the logic cross drivers. Besides cleaner code in driver
+> side this also allows adding struct device to vfio_device as the first
+> step toward adding cdev uAPI in the future. Another benefit is that
+> user can now look at sysfs to decide whether a device is bound to
+> vfio [1], e.g.:
+> 
+> 	/sys/devices/pci0000\:6f/0000\:6f\:01.0/vfio-dev/vfio0
+> 
+> Though most drivers can fit the new model naturally:
+> 
+>  - vfio_alloc_device() to allocate and initialize vfio_device
+>  - vfio_put_device() to release vfio_device
+>  - dev_ops->init() for driver private initialization
+>  - dev_ops->release() for driver private cleanup
+> 
+> vfio-ccw is the only exception due to a life cycle mess that its private
+> structure mixes both parent and mdev info hence must be alloc/freed
+> outside of the life cycle of vfio device.
+> 
+> Per prior discussions this won't be fixed in short term by IBM folks [2].
+> 
+> Instead of waiting this series introduces a few tricks to move forward:
+> 
+>  - vfio_init_device() to initialize a pre-allocated device structure;
+> 
+>  - require *EVERY* driver to implement @release and free vfio_device
+>    inside. Then vfio-ccw can use a completion mechanism to delay the
+>    free to css driver;
+> 
+> The second trick is not a real burden to other drivers because they
+> all require a @release for private cleanup anyway. Later once the ccw
+> mess is fixed a simple cleanup can be done by moving free from @release
+> to vfio core.
+> 
+> Thanks
+> Kevin
+> 
+> [1] https://listman.redhat.com/archives/libvir-list/2022-August/233482.html
+> [2] https://lore.kernel.org/all/0ee29bd6583f17f0ee4ec0769fa50e8ea6703623.camel@linux.ibm.com/
+> 
+> v4:
+>  - fix use-after-free issue in @release of mtty/mbochs and also change
+>    mdpy/ap to free vfio-device as the last thing in @release (Alex)
+>  - revert the rename from 'vfio' to 'vfio_group' in procfs (Alex) 
+
+Applied to vfio next branch for v6.1.  Thanks,
+
+Alex
+
