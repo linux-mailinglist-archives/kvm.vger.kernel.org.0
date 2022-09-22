@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 82A975E5759
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 02:32:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 409085E575A
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 02:32:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229731AbiIVAco (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 20:32:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43194 "EHLO
+        id S229820AbiIVAcw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 20:32:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbiIVAcm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Sep 2022 20:32:42 -0400
+        with ESMTP id S229804AbiIVAct (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Sep 2022 20:32:49 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85D48A98C2
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 17:32:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0128FA98D5
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 17:32:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663806760;
+        s=mimecast20190719; t=1663806766;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FQN7NACAPidUZq5gSxtSat4JbbbT9LWbluginiHf3ss=;
-        b=Q6VqXO5g66dSHsWkTc2Zyxf5q7FusLB5Hl+AWy1Ig4125yiGcDJ27vCWu8dJUkvyRASP7D
-        8yGWtcd5zKG+gM4zWhy5HmX3ZByzrHdCsQ1rjWu0UBm4pVjOpkZqOxUQabqcFPOyUb3x98
-        cX5qSMckTKYroatrh8Ao+mWv1hNHPZQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=HvScjfkKuSDrLb00oYmoSVUq1hJaUCKKGbiWFg0bV0E=;
+        b=PCg9luCCAsYNm5m+U6dgNKF7xWffCgmliu0m3ghLvBjIWECZYV6E3HZ/MQBPnRWwIAD3XE
+        VkQ2/e1o0TEv0orZ7KZdv8qfrzgWPDvXUPpqiGJ56zAKndyW4D0QYnuqKuwVkF7khFUXV8
+        4kBy4NUi3bp2tAYepdnbCmm3In3WjmI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-488-UmT8ND5TOUeOJpQqH6awdw-1; Wed, 21 Sep 2022 20:32:37 -0400
-X-MC-Unique: UmT8ND5TOUeOJpQqH6awdw-1
+ us-mta-522-P5m3G0UpMhWxIGxgITatpA-1; Wed, 21 Sep 2022 20:32:43 -0400
+X-MC-Unique: P5m3G0UpMhWxIGxgITatpA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A4D83185A7A4;
-        Thu, 22 Sep 2022 00:32:36 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8F88F1C14B68;
+        Thu, 22 Sep 2022 00:32:42 +0000 (UTC)
 Received: from gshan.redhat.com (vpn2-54-126.bne.redhat.com [10.64.54.126])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8020E2166B26;
-        Thu, 22 Sep 2022 00:32:31 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F3162166B26;
+        Thu, 22 Sep 2022 00:32:37 +0000 (UTC)
 From:   Gavin Shan <gshan@redhat.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com,
@@ -44,9 +44,9 @@ Cc:     kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com,
         will@kernel.org, dmatlack@google.com, oliver.upton@linux.dev,
         peterx@redhat.com, pbonzini@redhat.com, zhenyzha@redhat.com,
         shan.gavin@gmail.com
-Subject: [PATCH v3 2/6] KVM: x86: Move declaration of kvm_cpu_dirty_log_size() to kvm_dirty_ring.h
-Date:   Thu, 22 Sep 2022 08:32:10 +0800
-Message-Id: <20220922003214.276736-3-gshan@redhat.com>
+Subject: [PATCH v3 3/6] KVM: arm64: Enable ring-based dirty memory tracking
+Date:   Thu, 22 Sep 2022 08:32:11 +0800
+Message-Id: <20220922003214.276736-4-gshan@redhat.com>
 In-Reply-To: <20220922003214.276736-1-gshan@redhat.com>
 References: <20220922003214.276736-1-gshan@redhat.com>
 MIME-Version: 1.0
@@ -62,65 +62,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Not all architectures like ARM64 need to override the function. Move
-its declaration to kvm_dirty_ring.h to avoid the following compiling
-warning on ARM64 when the feature is enabled.
+This enables the ring-based dirty memory tracking on ARM64. The
+feature is configured by CONFIG_HAVE_KVM_DIRTY_RING, detected and
+enabled by KVM_CAP_DIRTY_LOG_RING. A ring buffer is created on every
+VCPU when the feature is enabled. Each entry in the ring buffer is
+described by 'struct kvm_dirty_gfn'.
 
-  arch/arm64/kvm/../../../virt/kvm/dirty_ring.c:14:12:        \
-  warning: no previous prototype for 'kvm_cpu_dirty_log_size' \
-  [-Wmissing-prototypes]                                      \
-  int __weak kvm_cpu_dirty_log_size(void)
+A ring buffer entry is pushed when a page becomes dirty on host,
+and pulled by userspace after the ring buffer is mapped at physical
+page offset KVM_DIRTY_LOG_PAGE_OFFSET. The specific VCPU is enforced
+to exit if its ring buffer becomes softly full. Besides, the ring
+buffer can be reset by ioctl command KVM_RESET_DIRTY_RINGS to release
+those pulled ring buffer entries.
 
-Reported-by: kernel test robot <lkp@intel.com>
 Signed-off-by: Gavin Shan <gshan@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h | 2 --
- arch/x86/kvm/mmu/mmu.c          | 2 ++
- include/linux/kvm_dirty_ring.h  | 1 +
- 3 files changed, 3 insertions(+), 2 deletions(-)
+ Documentation/virt/kvm/api.rst    | 2 +-
+ arch/arm64/include/uapi/asm/kvm.h | 1 +
+ arch/arm64/kvm/Kconfig            | 1 +
+ arch/arm64/kvm/arm.c              | 8 ++++++++
+ 4 files changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 2c96c43c313a..4c0fd517282b 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -2082,8 +2082,6 @@ static inline int kvm_cpu_get_apicid(int mps_cpu)
- #define GET_SMSTATE(type, buf, offset)		\
- 	(*(type *)((buf) + (offset) - 0x7e00))
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index abd7c32126ce..19fa1ac017ed 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -8022,7 +8022,7 @@ regardless of what has actually been exposed through the CPUID leaf.
+ 8.29 KVM_CAP_DIRTY_LOG_RING
+ ---------------------------
  
--int kvm_cpu_dirty_log_size(void);
--
- int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages);
+-:Architectures: x86
++:Architectures: x86, arm64
+ :Parameters: args[0] - size of the dirty log ring
  
- #define KVM_CLOCK_VALID_FLAGS						\
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index e418ef3ecfcb..b3eb6a3627ec 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1349,10 +1349,12 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
- 		kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
- }
+ KVM is capable of tracking dirty memory using ring buffers that are
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 316917b98707..a7a857f1784d 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -43,6 +43,7 @@
+ #define __KVM_HAVE_VCPU_EVENTS
  
-+#ifdef CONFIG_HAVE_KVM_DIRTY_RING
- int kvm_cpu_dirty_log_size(void)
- {
- 	return kvm_x86_ops.cpu_dirty_log_size;
- }
-+#endif
+ #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
++#define KVM_DIRTY_LOG_PAGE_OFFSET 64
  
- bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
- 				    struct kvm_memory_slot *slot, u64 gfn,
-diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
-index 906f899813dc..8c6755981c9b 100644
---- a/include/linux/kvm_dirty_ring.h
-+++ b/include/linux/kvm_dirty_ring.h
-@@ -71,6 +71,7 @@ static inline bool kvm_dirty_ring_soft_full(struct kvm_dirty_ring *ring)
+ #define KVM_REG_SIZE(id)						\
+ 	(1U << (((id) & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT))
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 815cc118c675..0309b2d0f2da 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -32,6 +32,7 @@ menuconfig KVM
+ 	select KVM_VFIO
+ 	select HAVE_KVM_EVENTFD
+ 	select HAVE_KVM_IRQFD
++	select HAVE_KVM_DIRTY_RING
+ 	select HAVE_KVM_MSI
+ 	select HAVE_KVM_IRQCHIP
+ 	select HAVE_KVM_IRQ_ROUTING
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 2ff0ef62abad..76816f8e082b 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -747,6 +747,14 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
  
- #else /* CONFIG_HAVE_KVM_DIRTY_RING */
+ 		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+ 			return kvm_vcpu_suspend(vcpu);
++
++		if (kvm_check_request(KVM_REQ_RING_SOFT_FULL, vcpu) &&
++		    kvm_dirty_ring_soft_full(&vcpu->dirty_ring)) {
++			kvm_make_request(KVM_REQ_RING_SOFT_FULL, vcpu);
++			vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
++			trace_kvm_dirty_ring_exit(vcpu);
++			return 0;
++		}
+ 	}
  
-+int kvm_cpu_dirty_log_size(void);
- u32 kvm_dirty_ring_get_rsvd_entries(void);
- int kvm_dirty_ring_alloc(struct kvm_dirty_ring *ring, int index, u32 size);
- 
+ 	return 1;
 -- 
 2.23.0
 
