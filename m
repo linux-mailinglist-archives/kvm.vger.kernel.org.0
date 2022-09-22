@@ -2,132 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C6A905E6BFB
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 21:49:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C9E715E6C03
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 21:50:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232476AbiIVTt0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 15:49:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44216 "EHLO
+        id S232490AbiIVTuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 15:50:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231990AbiIVTtY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 15:49:24 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9AE610BB29
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 12:49:22 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id p1-20020a17090a2d8100b0020040a3f75eso3250891pjd.4
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 12:49:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=AOIMXA4PI9BYXrk6/Ja2mOKlrFIROrj5K/ieUQQwXS4=;
-        b=h1quGJbzNcYbvksztMmJbAj4021+BcmdngI9oVLKqryAXjZOZrGY+bZOFcLzMWlozZ
-         LAcA23Adi1Jic4pRnJCptlWTG4EcoRJkXHfvedp0K1HaJOCXyEXxuhzgdof/jPIDOZEe
-         ebqjyLF5ANcpzYiinKi6eaQnqth3W4n2V8+InjN4EWNaK7npJ/bYc7FhRS+iyNb4HHPb
-         Efk7QXZ7wTcSNyFHTH7NWGDPMQ4YLD125sVU1j3HVB2TkIAvgthLngw1wMrAfORH5ZfR
-         U8+tmRxUsuSWAVFhBHQcUHbhvue7DyoPTDpJKMkc7xktoeaZV8RiJlYUMocHTDHlXZyf
-         XJ3w==
+        with ESMTP id S232495AbiIVTuE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 15:50:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BB6F7CAB3
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 12:50:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663876202;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7ZXRmhPwX9gChpCINfr2PtClLxFqm5t+8Ejuiulypl8=;
+        b=anA8vZL0jnjrZHLV644UCkoD2ua0b+0+kNsn1KwE+ijeqI7703+h41Ui2LJVPlKmP+M9GB
+        ogsah850A1cqdhW5akq82EMb9hQvKBM0RhezNW3a4esALeBBlLwVAYx8yDpOeTy95oE+PI
+        qrwWyg3GxCYqzw/XFMJ6pc5zixf6JXk=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-610-JFFnRSPfMP2DKm7e0MCZ_g-1; Thu, 22 Sep 2022 15:49:58 -0400
+X-MC-Unique: JFFnRSPfMP2DKm7e0MCZ_g-1
+Received: by mail-qv1-f71.google.com with SMTP id f10-20020ad443ea000000b004aca9fabe98so7096487qvu.18
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 12:49:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=AOIMXA4PI9BYXrk6/Ja2mOKlrFIROrj5K/ieUQQwXS4=;
-        b=vOQ75eqF1MT39ibwJyNOgxfijpTID+d73wcz+HcXWRv5OGXolZmYiRW88qPyZ3vbRQ
-         /OPTESwqUX9YI1qMVc5z73RIEsykCnNh/lyAcPtsjrlX6wYRPNK9G0OFt3C6/c6aTSy1
-         8IbMIMcaG7roI49aAriZpYHvDqsVaO7aFnS03GYp0zjvgPVxWY7xSDf9X7iYR0Cmu/ay
-         +7KcmE5NlMf21sr876EPj+kT6odnOz/rsLMUa0uF0CaATHVaHP1b1gahmn0nsIwI20IH
-         LL97c4ZXme2n7QjfPkq8umyXbou4n9TMhoIzjFAMQHQvCjNaHE2j/HjyLIKvEVGNwRAZ
-         4BrA==
-X-Gm-Message-State: ACrzQf1C26v93Xi9942hSiDq4msjEpj6AKEkO4pK5aOlcHA+DwaCf0Nz
-        Eivjbk0NuHHLsNSnoRjRTDktYg==
-X-Google-Smtp-Source: AMsMyM7xkIpUg/GEtYg3CdJDso/M2NS+vljJqn+Iz/Og0ecRlPYRkH7bufKUsfNRGuIjAMJq7OVhXg==
-X-Received: by 2002:a17:90a:644e:b0:200:422c:6b1 with SMTP id y14-20020a17090a644e00b00200422c06b1mr5394594pjm.183.1663876162098;
-        Thu, 22 Sep 2022 12:49:22 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id a10-20020a170902ecca00b00172897952a0sm4576315plh.283.2022.09.22.12.49.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Sep 2022 12:49:21 -0700 (PDT)
-Date:   Thu, 22 Sep 2022 19:49:18 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Wang, Wei W" <wei.w.wang@intel.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Lutomirski, Andy" <luto@kernel.org>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "aarcange@redhat.com" <aarcange@redhat.com>,
-        "ddutile@redhat.com" <ddutile@redhat.com>,
-        "dhildenb@redhat.com" <dhildenb@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>,
-        "Hocko, Michal" <mhocko@suse.com>,
-        Muchun Song <songmuchun@bytedance.com>
-Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
-Message-ID: <Yyy8Pp0Y4NRzIzNw@google.com>
-References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
- <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
- <DS0PR11MB63734D4DF4C4F368805EC97DDC4E9@DS0PR11MB6373.namprd11.prod.outlook.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=7ZXRmhPwX9gChpCINfr2PtClLxFqm5t+8Ejuiulypl8=;
+        b=0La/jaCIttkSwepb2CsR6CF/v7R7RHnU9PLymwL9BPXdf+Wfgv0svZw9L24+Q9SMEG
+         RVHGHsWMDqenpzg5ZjKXJfzR55j0gkulxSOzLRS0czIPehL3CzRo6hSr7QgUTC8LzMNy
+         C/z48FVeQBoIma4d5TEoegWDTCNju1HYfKSPPLoda9nqoudC2lECZJ4U5nqg/AmZK/b9
+         19d0RQf5goWb73IHprmEuxtL29Oi1MJ+CjSOB04GIAxM5qxtqNT/pP6Bk7KTZb9iXOvx
+         Vbax95qdlrwEMzzfMF9Q3CNCmuXtdN+z/Mf5okF534GSEJEbppyquI9stXmITBy3cdas
+         dsTA==
+X-Gm-Message-State: ACrzQf0CDkG3kU3ewUHfS3D1TDj0gxyg/s6/XoLErY21F2Zch8M4bquF
+        cFgMnJe5NBH8ltORUWsiDrfg1wvNCVgEiMH1r0EVtI27HhUyK0bk8KZtEmxEHTeuuPmKOQVIPMM
+        pOTnE7xliVoIxNxr557/iekZA5+zk
+X-Received: by 2002:a37:503:0:b0:6ce:8a8e:7625 with SMTP id 3-20020a370503000000b006ce8a8e7625mr3444850qkf.288.1663876198192;
+        Thu, 22 Sep 2022 12:49:58 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6d65F7z9P/VgdBAGCLBW1PBf+X0H6uAmc4XjUsUvh1VO6n1cVpAlv7NIWL0eCtsPfiPMdwdIImX+4sAHU+gYQ=
+X-Received: by 2002:a37:503:0:b0:6ce:8a8e:7625 with SMTP id
+ 3-20020a370503000000b006ce8a8e7625mr3444843qkf.288.1663876197974; Thu, 22 Sep
+ 2022 12:49:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DS0PR11MB63734D4DF4C4F368805EC97DDC4E9@DS0PR11MB6373.namprd11.prod.outlook.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+References: <20220922101454.1069462-1-kraxel@redhat.com> <YyxF2TNwnXaefT6u@redhat.com>
+ <20220922122058.vesh352623uaon6e@sirius.home.kraxel.org> <CABgObfavcPLUbMzaLQS2Rj2=r5eAhuBuKdiHQ4wJGfgPm_=XsQ@mail.gmail.com>
+ <20220922141633.t2dk2jviw2f3i26x@sirius.home.kraxel.org> <CALMp9eSEDEit0PEAt_qUwGhBRBPZNsyjasiuJhcrFKT9Zm4K=A@mail.gmail.com>
+In-Reply-To: <CALMp9eSEDEit0PEAt_qUwGhBRBPZNsyjasiuJhcrFKT9Zm4K=A@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Date:   Thu, 22 Sep 2022 21:49:46 +0200
+Message-ID: <CABgObfZApegzv_4AxMRf0p0LvGWoqnBL289vBXL3g-F-tpL8SA@mail.gmail.com>
+Subject: Re: [PATCH v4] x86: add etc/phys-bits fw_cfg file
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Gerd Hoffmann <kraxel@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+        qemu-devel@nongnu.org, Sergio Lopez <slp@redhat.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 22, 2022, Wang, Wei W wrote:
-> On Thursday, September 15, 2022 10:29 PM, Chao Peng wrote:
-> > +int inaccessible_get_pfn(struct file *file, pgoff_t offset, pfn_t *pfn,
-> > +			 int *order)
-> 
-> Better to remove "order" from this interface?
+On Thu, Sep 22, 2022 at 7:13 PM Jim Mattson <jmattson@google.com> wrote:
+> > Treating 40 as invalid and continue to use the current conservative
+> > heuristic, otherwise treat phys-bits as valid might work.  Obvious
+> > corner case is that it'll not catch broken manual configurations
+> > (host-phys-bits=off,phys-bits=<larger-than-host>), only the broken
+> > default.  Not sure how much of a problem that is in practice, maybe
+> > it isn't.
+> >
+> > I think I still prefer to explicitly communicate a reliable phys-bits
+> > value to the guest somehow.
+>
+> On x86 hardware, KVM is incapable of emulating a guest physical width
+> that differs from the host physical width. There isn't support in the
+> hardware for it.
 
-Hard 'no'.
+Indeed, everything else is a userspace bug. Especially since here
+we're talking of host_maxphyaddr < guest_maxphyaddr, which is
+completely impossible.
 
-> Some callers only need to get pfn, and no need to bother with
-> defining and inputting something unused. For callers who need the "order",
-> can easily get it via thp_order(pfn_to_page(pfn)) on their own.
+Paolo
 
-That requires (a) assuming the pfn is backed by struct page, and (b) assuming the
-struct page is a transparent huge page.  That might be true for the current
-implementation, but it most certainly will not always be true.
-
-KVM originally did things like this, where there was dedicated code for THP vs.
-HugeTLB, and it was a mess.  The goal here is very much to avoid repeating those
-mistakes.  Have the backing store _tell_ KVM how big the mapping is, don't force
-KVM to rediscover the info on its own.
