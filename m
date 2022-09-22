@@ -2,134 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CEC485E629E
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 14:41:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B80B05E62B7
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 14:46:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230456AbiIVMlT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 08:41:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41456 "EHLO
+        id S231552AbiIVMq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 08:46:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229791AbiIVMlR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 08:41:17 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5DA1E7239;
-        Thu, 22 Sep 2022 05:41:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663850475; x=1695386475;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=2XrBvsqAS2iekK6smQOUXQvJir1/aMIF8ljeQsISlsI=;
-  b=gJsM8dQ+Ntn2gjkXVqqeZxDr3FFrJ01zJuWOA5p1DkQxThaXN979S1vp
-   lUiH3ghias5vZVNd4ztXVK8Cr7w4PetGm98S+nKzOhOcYwBlC+LkvwwDo
-   +G9nSjJEhDzdx44a/d/k+umsoAwuhBgOKH2+7Dj5RC1jAW9kkZlgPevHZ
-   cFG+tkO+F90x8Ah/RMgo1XweN77N7H2wgMSSIY0b6CegEboQEOFHtncQT
-   ZdAfq9aP6/Nvq5QTenjTFCRAi+sz0HqYpdvX+RWkPaA9A/tJfLMTL4sEm
-   EG6Z4cIEh//DDH67nNoXgPfgsyTyy6KOjog4OA4MNK/GUg+DtBohArsvn
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10478"; a="287365286"
-X-IronPort-AV: E=Sophos;i="5.93,335,1654585200"; 
-   d="scan'208";a="287365286"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2022 05:41:15 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,335,1654585200"; 
-   d="scan'208";a="688279050"
-Received: from linux.intel.com ([10.54.29.200])
-  by fmsmga004.fm.intel.com with ESMTP; 22 Sep 2022 05:41:15 -0700
-Received: from [10.252.210.171] (kliang2-mobl1.ccr.corp.intel.com [10.252.210.171])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        with ESMTP id S230449AbiIVMqF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 08:46:05 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 599D3D98CE
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 05:45:50 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by linux.intel.com (Postfix) with ESMTPS id 78829580AD7;
-        Thu, 22 Sep 2022 05:41:13 -0700 (PDT)
-Message-ID: <e354250c-cfb6-a48d-73cd-b703f670af57@linux.intel.com>
-Date:   Thu, 22 Sep 2022 08:41:12 -0400
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E813E62E0E
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 12:45:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0017CC433C1;
+        Thu, 22 Sep 2022 12:45:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1663850749;
+        bh=zHhxvurRntGOnR/12g6NoIT2ncqO0nz6U7y4EKm2iYY=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=YgKTsSZMy+MQYXIBNBoif/VLc9a3hqSqRfqImtSsHKuwfolm8tmaVq33Y8tBoi49t
+         Yd7zkIzz5dgUvhu9QunUGlWPoKqY2Fv1UNYkm8alHQ+ePTyxRwmsFxq/TqYdR8yNg6
+         zXJpfvCRLUwIuEIKszqw9IIMbYtUkewq63FiNZT+6pkDe74kdeFykk6xq7KJt/xg4L
+         GGHi+uihduGi7owiJtnRxkjf/KvoB1C+78EhkiSxvjlOE/xBeGEjGL+ClwoMFlEHhz
+         VGLHLIgR3O1r3WWvi4PF9wkg+2pzhUAnReP7fV62KtYUDpyB3hb2uB9vzqu014Yd6m
+         9aWzNozh1cFiA==
+From:   Will Deacon <will@kernel.org>
+To:     julien.thierry.kdev@gmail.com,
+        Anup Patel <apatel@ventanamicro.com>, maz@kernel.org
+Cc:     catalin.marinas@arm.com, kernel-team@android.com,
+        Will Deacon <will@kernel.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Anup Patel <anup@brainfault.org>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH kvmtool 0/5] KVMTOOL RISC-V Svpbmt and Sstc Support
+Date:   Thu, 22 Sep 2022 13:45:38 +0100
+Message-Id: <166384971661.148293.7516865524083963807.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20220815101325.477694-1-apatel@ventanamicro.com>
+References: <20220815101325.477694-1-apatel@ventanamicro.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH v2 1/2] perf/x86/intel: Expose EPT-friendly PEBS for SPR
- and future models
-Content-Language: en-US
-To:     Like Xu <like.xu.linux@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-perf-users@vger.kernel.org
-References: <20220922051929.89484-1-likexu@tencent.com>
-From:   "Liang, Kan" <kan.liang@linux.intel.com>
-In-Reply-To: <20220922051929.89484-1-likexu@tencent.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 2022-09-22 1:19 a.m., Like Xu wrote:
-> From: Like Xu <likexu@tencent.com>
+On Mon, 15 Aug 2022 15:43:20 +0530, Anup Patel wrote:
+> The latest Linux-6.0-rc1 has support for Svpbmt and Sstc extensions
+> in KVM RISC-V. This series adds corresponding changes in KVMTOOL to
+> allow Guest/VM use these new RISC-V extensions.
 > 
-> According to Intel SDM, the EPT-friendly PEBS is supported by all the
-> platforms after ICX, ADL and the future platforms with PEBS format 5.
+> The PATCH5 is an unrelated fix which was discovered while developing
+> this series.
 > 
-> Currently the only in-kernel user of this capability is KVM, which has
-> very limited support for hybrid core pmu, so ADL and its successors do
-> not currently expose this capability. When both hybrid core and PEBS
-> format 5 are present, KVM will decide on its own merits.
-> 
-> Cc: Peter Zijlstra <peterz@infradead.org>
-> Cc: linux-perf-users@vger.kernel.org
-> Suggested-by: Kan Liang <kan.liang@linux.intel.com>
-> Signed-off-by: Like Xu <likexu@tencent.com>
+> [...]
 
+Applied to kvmtool (master), thanks!
 
-Reviewed-by: Kan Liang <kan.liang@linux.intel.com>
+[1/5] Update UAPI headers based on Linux-6.0-rc1
+      https://git.kernel.org/will/kvmtool/c/8d0facec06ae
+[2/5] riscv: Append ISA extensions to the device tree
+      https://git.kernel.org/will/kvmtool/c/8aff29e1dafe
+[3/5] riscv: Add Svpbmt extension support
+      https://git.kernel.org/will/kvmtool/c/2b4fe0f8cff1
+[4/5] riscv: Add Sstc extension support
+      https://git.kernel.org/will/kvmtool/c/3c07aeaf993a
+[5/5] riscv: Fix serial0 alias path
+      https://git.kernel.org/will/kvmtool/c/ed805be52f57
 
-Thanks,
-Kan
+Cheers,
+-- 
+Will
 
-> ---
-> V1 -> V2 Changelog:
-> - the perf part should be a separate patch; (Kan)
-> - apply PEBS format 5 to avoid patching every future model; (Kan)
-> 
->  arch/x86/events/intel/core.c | 1 +
->  arch/x86/events/intel/ds.c   | 4 +++-
->  2 files changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-> index 2db93498ff71..804540ba4599 100644
-> --- a/arch/x86/events/intel/core.c
-> +++ b/arch/x86/events/intel/core.c
-> @@ -6288,6 +6288,7 @@ __init int intel_pmu_init(void)
->  		x86_pmu.pebs_constraints = intel_spr_pebs_event_constraints;
->  		x86_pmu.extra_regs = intel_spr_extra_regs;
->  		x86_pmu.limit_period = spr_limit_period;
-> +		x86_pmu.pebs_ept = 1;
->  		x86_pmu.pebs_aliases = NULL;
->  		x86_pmu.pebs_prec_dist = true;
->  		x86_pmu.pebs_block = true;
-> diff --git a/arch/x86/events/intel/ds.c b/arch/x86/events/intel/ds.c
-> index ba60427caa6d..4e937f685cdc 100644
-> --- a/arch/x86/events/intel/ds.c
-> +++ b/arch/x86/events/intel/ds.c
-> @@ -2253,8 +2253,10 @@ void __init intel_ds_init(void)
->  			x86_pmu.large_pebs_flags |= PERF_SAMPLE_TIME;
->  			break;
->  
-> -		case 4:
->  		case 5:
-> +			x86_pmu.pebs_ept = 1;
-> +			fallthrough;
-> +		case 4:
->  			x86_pmu.drain_pebs = intel_pmu_drain_pebs_icl;
->  			x86_pmu.pebs_record_size = sizeof(struct pebs_basic);
->  			if (x86_pmu.intel_cap.pebs_baseline) {
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
