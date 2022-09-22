@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EDDC5E6AC7
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 20:24:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F1B75E6AD4
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 20:25:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229818AbiIVSX6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 14:23:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36722 "EHLO
+        id S232632AbiIVSY0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 14:24:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232406AbiIVSX2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 14:23:28 -0400
+        with ESMTP id S232640AbiIVSXl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 14:23:41 -0400
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DCF210961A;
-        Thu, 22 Sep 2022 11:22:20 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23BD910B580;
+        Thu, 22 Sep 2022 11:22:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663870940; x=1695406940;
+  t=1663870948; x=1695406948;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=AxxjbbyyR0194wjXyMbCislo3hv78tU3zlzwW8OtOcw=;
-  b=kUq0gvFlRAo9I/sbIpcCYcdTr1HkGGRiwfNFt7TIIzGVrcFqKoNsVkrH
-   hWhVq79O39cd+EjMUbVhrNZ1cfQUk0tHDk7KbUj1+eP8ep9MfuBaOP3Tp
-   dcyJIXjjxwS4QbixtkEQ6CRmYT69ky3Q0/uC5exsW4Lr10CUcpL2+qOGz
-   A5f10yItXNAjSv0h7y1T9/40i4USMzj6nliaX8vkIOTpDCKXYwbihnVB5
-   OZx02cQHbUcaGFRejncsD+fLBJAapyNu5F+RqbBQixwetqtBwOCoxss48
-   B/S5MX8WPGGuww4JtXMwNDFncn5nR85fs/zSRBBpjEH+gTQsfupaN6M//
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10478"; a="326712929"
+  bh=xexmELbi5aH40qDujxrSWqQj4dEkU4fMT/enlz5uNnQ=;
+  b=AB/8BM+mTCFs9ly15QjUz3y1vPXNnekDwSW4FQoRJE+c0CYWDkDBB46D
+   9h2Lmus+IKCRCz/OEI+Pis4VVo21Ti6MQ4f8DosxKB6SieDmaH6P+A2T6
+   a1+d+t6BKUf6qKsnkL/cAllfwqgQ7VYA6GwkSeszWDO0Bs4kXSCXMZSOs
+   l4U9b9vGPSaO0p9ucGXnJprnUdcUh61qdV7+ymMSpVtcbcN/LPuX1ogiX
+   fqs4dx90zGx9hxaPcGY5Gu3aAo4Fssjr6TKz/X9SC+Ums4bANGE9i+kGN
+   WG1hE9qkLH/mSUNcny62XqVyTBdWilcbfLt/NWXoi3YeCQuHgt3j010cG
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10478"; a="326712932"
 X-IronPort-AV: E=Sophos;i="5.93,337,1654585200"; 
-   d="scan'208";a="326712929"
+   d="scan'208";a="326712932"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2022 11:21:26 -0700
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2022 11:21:27 -0700
 X-IronPort-AV: E=Sophos;i="5.93,337,1654585200"; 
-   d="scan'208";a="653086860"
+   d="scan'208";a="653086875"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2022 11:21:26 -0700
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2022 11:21:27 -0700
 From:   isaku.yamahata@intel.com
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -51,9 +51,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Huacai Chen <chenhuacai@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Borislav Petkov <bp@alien8.de>
-Subject: [PATCH v5 24/30] KVM: Add config to not compile kvm_arch.c
-Date:   Thu, 22 Sep 2022 11:20:53 -0700
-Message-Id: <66e9475874595880b0951edf6ad17b6317992bed.1663869838.git.isaku.yamahata@intel.com>
+Subject: [PATCH v5 25/30] KVM: x86: Delete kvm_arch_hardware_enable/disable()
+Date:   Thu, 22 Sep 2022 11:20:54 -0700
+Message-Id: <23e34c8aba1372d6e7c054b737242f08a614078d.1663869838.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1663869838.git.isaku.yamahata@intel.com>
 References: <cover.1663869838.git.isaku.yamahata@intel.com>
@@ -71,98 +71,72 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-So that kvm_arch_hardware_enable/disable() aren't required.
-
-Once the conversion of all KVM archs is done, this config and kvm_arch.c
-should be removed.
+Now they're function call and there is no point to keep them.  Open code
+them.
 
 Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/Kconfig     | 1 +
- arch/x86/kvm/x86.c       | 4 ++--
- include/linux/kvm_host.h | 3 +++
- virt/kvm/Kconfig         | 3 +++
- virt/kvm/Makefile.kvm    | 5 ++++-
- 5 files changed, 13 insertions(+), 3 deletions(-)
+ arch/x86/kvm/x86.c | 18 ++++--------------
+ 1 file changed, 4 insertions(+), 14 deletions(-)
 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index e3cbd7706136..e2e16205425d 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -25,6 +25,7 @@ config KVM
- 	depends on X86_LOCAL_APIC
- 	select PREEMPT_NOTIFIERS
- 	select MMU_NOTIFIER
-+	select HAVE_KVM_OVERRIDE_HARDWARE_ENABLE
- 	select HAVE_KVM_IRQCHIP
- 	select HAVE_KVM_PFNCACHE
- 	select HAVE_KVM_IRQFD
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index bf8d3b901725..01687b553915 100644
+index 01687b553915..aa6594de1fc1 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -11864,7 +11864,7 @@ void kvm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+@@ -354,7 +354,7 @@ static void kvm_on_user_return(struct user_return_notifier *urn)
+ 
+ 	/*
+ 	 * Disabling irqs at this point since the following code could be
+-	 * interrupted and executed through kvm_arch_hardware_disable()
++	 * interrupted and executed through hardware_disable()
+ 	 */
+ 	local_irq_save(flags);
+ 	if (msrs->registered) {
+@@ -11864,11 +11864,6 @@ void kvm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
  }
  EXPORT_SYMBOL_GPL(kvm_vcpu_deliver_sipi_vector);
  
--int kvm_arch_hardware_enable(void)
-+static int kvm_arch_hardware_enable(void)
- {
- 	return static_call(kvm_x86_hardware_enable)();
- }
-@@ -11961,7 +11961,7 @@ void kvm_arch_resume(int usage_count)
+-static int kvm_arch_hardware_enable(void)
+-{
+-	return static_call(kvm_x86_hardware_enable)();
+-}
+-
+ static int __hardware_enable(void);
+ 
+ void kvm_arch_resume(int usage_count)
+@@ -11961,12 +11956,6 @@ void kvm_arch_resume(int usage_count)
  	}
  }
  
--void kvm_arch_hardware_disable(void)
-+static void kvm_arch_hardware_disable(void)
- {
- 	static_call(kvm_x86_hardware_disable)();
- 	drop_user_return_notifiers();
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 8dfa212b4543..7efc4792ff5f 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1440,8 +1440,11 @@ int kvm_arch_reboot(int val);
- int kvm_arch_suspend(int usage_count);
- void kvm_arch_resume(int usage_count);
+-static void kvm_arch_hardware_disable(void)
+-{
+-	static_call(kvm_x86_hardware_disable)();
+-	drop_user_return_notifiers();
+-}
+-
+ static cpumask_t cpus_hardware_enabled = CPU_MASK_NONE;
  
-+#ifndef CONFIG_HAVE_KVM_OVERRIDE_HARDWARE_ENABLE
- int kvm_arch_hardware_enable(void);
- void kvm_arch_hardware_disable(void);
-+#endif
-+
- int kvm_arch_hardware_setup(void *opaque);
- void kvm_arch_hardware_unsetup(void);
- int kvm_arch_check_processor_compat(void);
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index a8c5c9f06b3c..917314a87696 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -72,3 +72,6 @@ config KVM_XFER_TO_GUEST_WORK
+ static int __hardware_enable(void)
+@@ -11978,7 +11967,7 @@ static int __hardware_enable(void)
  
- config HAVE_KVM_PM_NOTIFIER
-        bool
-+
-+config HAVE_KVM_OVERRIDE_HARDWARE_ENABLE
-+	def_bool n
-diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
-index 428b09b3f80a..c0187ec4f83c 100644
---- a/virt/kvm/Makefile.kvm
-+++ b/virt/kvm/Makefile.kvm
-@@ -5,7 +5,10 @@
+ 	if (cpumask_test_cpu(cpu, &cpus_hardware_enabled))
+ 		return 0;
+-	r = kvm_arch_hardware_enable();
++	r = static_call(kvm_x86_hardware_enable)();
+ 	if (r)
+ 		pr_warn("kvm: enabling virtualization on CPU%d failed during %pSb\n",
+ 			cpu, __builtin_return_address(0));
+@@ -12004,7 +11993,8 @@ static void hardware_disable(void *junk)
+ 	if (!cpumask_test_cpu(cpu, &cpus_hardware_enabled))
+ 		return;
+ 	cpumask_clear_cpu(cpu, &cpus_hardware_enabled);
+-	kvm_arch_hardware_disable();
++	static_call(kvm_x86_hardware_disable)();
++	drop_user_return_notifiers();
+ }
  
- KVM ?= ../../../virt/kvm
- 
--kvm-y := $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o $(KVM)/kvm_arch.o
-+kvm-y := $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
-+ifneq ($(CONFIG_HAVE_KVM_OVERRIDE_HARDWARE_ENABLE), y)
-+kvm-y += $(KVM)/kvm_arch.o
-+endif
- kvm-$(CONFIG_KVM_VFIO) += $(KVM)/vfio.o
- kvm-$(CONFIG_KVM_MMIO) += $(KVM)/coalesced_mmio.o
- kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/async_pf.o
+ /*
 -- 
 2.25.1
 
