@@ -2,151 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D9D65E6BC0
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 21:32:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 182825E6BC9
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 21:36:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231519AbiIVTcv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 15:32:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50810 "EHLO
+        id S231990AbiIVTgW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 15:36:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231641AbiIVTct (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 15:32:49 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45E5E1080A0
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 12:32:47 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id q9-20020a17090a178900b0020265d92ae3so3449830pja.5
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 12:32:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=Ny4mS6pSDyL84H1BdG99sfUYk9g3T27xf8u3RbpkR3g=;
-        b=ew8sDwy+EkU8W7ZAio8iLRqNCKXMaSBkLgJi0QS4iv3I14D1Mw/Q4iitHB92m+HF4A
-         33oEJIfBRydLjz9JNuf1axbwtLHhS8r8ZbP3DhUX7Y570jsP0XVN+bKhqSMTZnq3O7hQ
-         R4wVJOv4o0HUTE/xMCQ9hdDMsfc/sWLPuvCPNg5s3Ia72spYvozxWOFbFIN0ra+hDK/v
-         xzi2hsDPz1FlBp87VIdCo93fphkP/od4Knzia3WU1sDMsUfu2tP0P5kMZCw/P69sVjGe
-         UvaCwOnXCCSBOPR8f0DJxgIyCHA3+rb9va8Px+Xzx4KuotM32lhTMzfKXSESqpukjG+W
-         guZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=Ny4mS6pSDyL84H1BdG99sfUYk9g3T27xf8u3RbpkR3g=;
-        b=VNDkdOoGFcQCVrQmW2SuzbuByqORE+MFMd/pHds4urY/pQX03Mk0BiPeceSNW8PgzW
-         t2p3ih32zO4kKMb4bWt0M2GX1IsCOk2A7lYHwyHcGqulAJ6pCH1grqeBXb1J/MhgGz1Z
-         FIKNzt54xpGVpt8fXP0xiu5jR+N8QpmDzznf4CFmaGkrO7mlrCQvFRkcT7XIpsmZQ/0E
-         zkEQ+2oSQFEuS95hPx2LxdLloI5wkpzJJb4bP+tjTXbp/Bi4g3MuE7SjSqMPw2l56fN1
-         GiOpU+DOlKFtoJwmX2DojDd5xCD2bcXlgtfsejZAXLaoqy5CBYlJai8JXJqoxMfvSUhB
-         tvJQ==
-X-Gm-Message-State: ACrzQf0ryzGo1a9EM5+e8ak0XMjgoYAONXF/yOBlwB1U19V8+tRqSxCs
-        et8m7PD3f4j132iq4At1J4P2KYz33S2g+A==
-X-Google-Smtp-Source: AMsMyM56UY+azR04/Q7tdxr2gQHDeSWmzGZg2J4abiFuofIPx2Zvmd0WSJChG1Ko2HRLwnzZ77A3AQ==
-X-Received: by 2002:a17:903:32cf:b0:178:3d49:45b0 with SMTP id i15-20020a17090332cf00b001783d4945b0mr4732611plr.5.1663875167015;
-        Thu, 22 Sep 2022 12:32:47 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id s8-20020a170902ea0800b00179b6d0f90esm1877037plg.159.2022.09.22.12.32.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Sep 2022 12:32:46 -0700 (PDT)
-Date:   Thu, 22 Sep 2022 19:32:42 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        andrew.jones@linux.dev, pbonzini@redhat.com, maz@kernel.org,
-        alexandru.elisei@arm.com, eric.auger@redhat.com, oupton@google.com,
-        reijiw@google.com, rananta@google.com, bgardon@google.com,
-        dmatlack@google.com, axelrasmussen@google.com
-Subject: Re: [PATCH v8 10/14] KVM: selftests: aarch64: Add
- aarch64/page_fault_test
-Message-ID: <Yyy4WjEmuSH1tSZb@google.com>
-References: <20220922031857.2588688-1-ricarkol@google.com>
- <20220922031857.2588688-11-ricarkol@google.com>
-MIME-Version: 1.0
+        with ESMTP id S229864AbiIVTgV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 15:36:21 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2054.outbound.protection.outlook.com [40.107.92.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C22810B21A
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 12:36:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fLNIXGxXN451Ay0kfL6qjZe8JyG0nfxRFHsaWAhQjnOs01Kl/g9U9lT0clkEdappDXxC7Jc7JF6bhX1CZ6B4dVRbOtofuP2YwnbX/AckRqmD5886+fBEPxDT3RnusnswLCVL0kM2Sv3MsimgBttTLXuNXhWCVX4YRLTsL6x72A2yfyLwYkLQgUr54vN1+1dLvI3di5DGrKNGu0Dz9TAcjXhAgSvi9tsBGEqSbX91lRUF91KpSaPzmSDwOxdUeknlIC45H7bgWI4L/3R+x/Tjv6vWbOgdEjb+yZJShryfm68dll85+0hG2nk6HtleNJtuHccvdDd/wRMbmPxS4k5GEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iy4UQnRW/dP4HGGrvRmJnlJyQh9PfBUkecaIKklNnMM=;
+ b=RnUZBlqbjrlChe0x8DwDOBlLmVkW2YQZ3+ZIgELq2BWlDrZf9oI5GiELVMHxRsvUykxhRgZOBkBPRnm4pUMBCmvmGgJsGx2lPEEDzZIL1WLg4pt5IDJtErzn/TAi3Vftr0uq2f7TE+O4bLC3l/eh9qUmUkmPXgpIb+xJ25zYTX0z2iauybsj77APRuLL+PnHNWtLTqUVHqbuvEjQHdEkc8N/T+OLMlTAHcsJa6kv00pPuLrE8IMB51pvqHEgzrWHv3ZpX0wsZceRsXpTPVPOf0jzRVjqOkntg6UMjmMiyyN5WcmTMnTu5zjNipYeq4T8ZwHLB8jevLMU3/lTsIVGbA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iy4UQnRW/dP4HGGrvRmJnlJyQh9PfBUkecaIKklNnMM=;
+ b=elhx9ssSVNNyA7EICtAzPi575l+a11cflLMLtMLK7kCXN5Xx9aV6wHh0lqn4FxepFwEyis9QkTWfjrSZnprnvJFBqPsTbwVdam0HdxZF2v1M3Sjdh0ZR+HY2Q3zGxjNDZGdYnZSun16o7LzfAgy1w1TvQDAGmrGcFkkRBMcfARZMGIGWisxDtv8JMKXE0NuoFo6LxNu5izwDwC4tcbXpkiudD5LDmAbrn7P9lO+mAEvOHRHTr2dwQ9LQ0oW2dMg5uHVGMyX0gpD2JI0H323c1wSG1mXBbD8HKTj7QcOFfJONQOU9cqjpQ8X2w18RWtMrTltHFpOTBECg38+KMYcjNw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by BL0PR12MB5011.namprd12.prod.outlook.com (2603:10b6:208:1c9::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5654.18; Thu, 22 Sep
+ 2022 19:36:15 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5%7]) with mapi id 15.20.5654.019; Thu, 22 Sep 2022
+ 19:36:15 +0000
+Date:   Thu, 22 Sep 2022 16:36:14 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        Will Deacon <will@kernel.org>, Qian Cai <cai@lca.pw>,
+        Joerg Roedel <jroedel@suse.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>
+Subject: Re: [PATCH 2/4] vfio: Move the sanity check of the group to
+ vfio_create_group()
+Message-ID: <Yyy5Lr30A3GuK4Ab@nvidia.com>
+References: <0-v1-ef00ffecea52+2cb-iommu_group_lifetime_jgg@nvidia.com>
+ <2-v1-ef00ffecea52+2cb-iommu_group_lifetime_jgg@nvidia.com>
+ <20220922131050.7136481f.alex.williamson@redhat.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220922031857.2588688-11-ricarkol@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220922131050.7136481f.alex.williamson@redhat.com>
+X-ClientProxiedBy: MN2PR06CA0016.namprd06.prod.outlook.com
+ (2603:10b6:208:23d::21) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4192:EE_|BL0PR12MB5011:EE_
+X-MS-Office365-Filtering-Correlation-Id: 802a508f-71d4-4c14-a7b6-08da9cd1b6c4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: AspAt9sLkA/Z24A6Xv7IFULEulUk/VoYos4geV1B7ClnG0K6tJOOwuAnEl5+sZNBTP2seyH4nL6xgT3dz961RWbYedJ9q5NIA8hZ1HTBcYqqxx/udqf+lnhXzK0W35TL1tL3JcF8YMo5t6wO28TRjIgZ1dbTu0mkcRl82gQqitMYKsWVAEoZM/xjmJbvfWtiyG0YPfKR8nS3IVNgzsvLoIsZeLsSsNltm7HF4pAUTlxnHzPYIPyNkNMQD1FwnltEZhVDcpE/glAAJNIhO+DA7RvFL9KJStvvInSMl5sH50X+n9VQ4ibRE5AGn6HE8o9hIgTXLqRjOYI0s8AtIrVqxkpdm3xXoSrg8yMr1ovaG2a7YVax/8mabVn2TUG/dZzMqRi/FFMn7YmoUIqoS2BS2w9+YPuQbLAI17o+qepfV/jGh/wSoo6wXfqBm9abMcPQ4LPWhWzu7+v/XbbpQzcJo+0pCyGwe85WZdyCThmHLF0iqaGPA2AVjOo+iIbjXeixmk8TF0deeIyjJZ0IhDKbT0a73+9K5RjmMypWXBLkkWKTTVjQCW6m4kxs4OMHa9pAYkqnBX4Ok0odhS+DKfwAHDJuNUDs9SWoIYreMRocHtzUCxl6IetOnrOsCLDyhPLqpFfh5krBf9ee5FBo8Owmy5uDgvSkSsrURZgGmAtSu0xaUa4oqLk+Hg1YmXxS3hu5TAMgvlN/uapqrMW8i74JvQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(346002)(396003)(366004)(136003)(39860400002)(451199015)(66946007)(66556008)(4326008)(6916009)(54906003)(86362001)(66476007)(316002)(478600001)(6486002)(8676002)(7416002)(5660300002)(6512007)(26005)(186003)(2906002)(41300700001)(2616005)(6506007)(83380400001)(36756003)(8936002)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?88Fti1aDXDUvgYhXPFm0cmAdkBKWIt6s/T1MhvzL+DmsQFa/Jat98YKEzXq7?=
+ =?us-ascii?Q?uQ/ZtyCXZR2977yhzq/bAzinPp3qqVf56puhLwFLSRqdc22k5NYtVyjRuBnn?=
+ =?us-ascii?Q?8crA+2SOMdwWPRf+9lA0IktSiSG2nMwqcFrHQE7+7HQq6XRCUOexcg1Sc5oP?=
+ =?us-ascii?Q?ZyRKxioqE6stLB+EWGWYPG2yXlBTJS7iu5WSTIn/7BXd1OtvgVJ8bqS7gNAn?=
+ =?us-ascii?Q?zo18LQlJgsLlxYjInWRGg+nYKr5NmpDsgVLQuLxxjtiztuwZmNo46tjNC8xf?=
+ =?us-ascii?Q?0GkMDYejGiYEZzwO3lXPi/kffczCLTRmYQhv6OH5asQVSrG2A6TnYmVy/nxi?=
+ =?us-ascii?Q?MqhFcg1IJkvxDP+hoDbylTUow/pl2nCyYNlgpm/bOlABZXE+acY1sNc67Mkv?=
+ =?us-ascii?Q?pVy3eKGW7YT59M8BAueGRE/VJ9fCkZH7gnEAftp6ua4W8ITNZgr5K20GcD1g?=
+ =?us-ascii?Q?64/Y4v9Rer6kJ9dZ7HoWgrKGjFajp7R2FIkoPxAr6VTV4uxpK0pkrJEKas4e?=
+ =?us-ascii?Q?70qmU/MNO70wNwTGRvHDEX56DzIBiL/peawf5lQv9J2M3A93/HKoHN4iKTtJ?=
+ =?us-ascii?Q?8MELjMK26ZTJshljgHKB2diL8Qis0I01fkDid0OAb5ZRBwuSF4OFUoOhkKgc?=
+ =?us-ascii?Q?9oAo4gWawl/J/LR41vM/xaNLnpWT5uIBdTxSmH8JUtBktQvdBUGYmi8pNChY?=
+ =?us-ascii?Q?324quW/Y/Yr7PUDcsu6TYeeplslzBePLT236jfT36h4Pf/6OYBEcQdsd+dAR?=
+ =?us-ascii?Q?GLD22JLZiWXuSOQKFtoUmwHxB8CPGUKqNwmXImY2HIPZ5lD9uVVKJxLRNDd7?=
+ =?us-ascii?Q?d0LjFXCQ3WgGiTAz/ashXd8kKlc+bPY71S45UPfp4fMru8A9dnYtm7Ja0UKE?=
+ =?us-ascii?Q?iXQnaX9TN5jCZj3r0DXf5mswcVD1x0WGJyzkA3ufFrBsSiFd8BYFXSaIdV7O?=
+ =?us-ascii?Q?m8+5GWUrorsZAfn/bihQXngDmEoYc6tzalFP+x0AkX/ZiTRrHceBdB+yrdom?=
+ =?us-ascii?Q?0D4P/I4pGENAOhSNp2xKT9oKXb/rz0p/BChcpXGWlnhtdkG6xq1Ec+WS1l+q?=
+ =?us-ascii?Q?TjofWBeitAfuZXrVnkOu90MUUt2wRnPSIz7u0FZ1s6LDlU3t7BjnVLCkP5eN?=
+ =?us-ascii?Q?yLVjtl7Ji4WIcaeEZ6QHYd/dKEXOkj/kzuMbjVREfSc7ZXgLAiQnqx+jWFz+?=
+ =?us-ascii?Q?p0ejlDIwch9e8iDwC39Vfa2oS+QDG+1injGl0RdJTG+1U0mJRt1NjQzvhMwl?=
+ =?us-ascii?Q?o4jGfYgFVzFQwXvTadPATjc21g8/wmeAgT1xK8jJ79ZMCuQT9u0Po/AmyZcz?=
+ =?us-ascii?Q?XCzwPLSDCOM+YENuolNIpFg51Zc3zQDCSxjKqzt+Oi0NWdF7srMVaFh+jzoV?=
+ =?us-ascii?Q?AgvDR3GR3hiwYtxDzzRMYCa3fQseG3JBXj4c+EjaQsVZZHmuKpYGm7cII283?=
+ =?us-ascii?Q?tjqhMBbVRAMXaAiTIalvF5mjWRFDxV8/NMHEL61N6QPdcRZDtF6E7mWbJLyl?=
+ =?us-ascii?Q?Rng5UWYY+ZIvu3+pUVBtAsBsT8jiwtOEbzCkTE6NBfpQae6UA9BBtidFAc94?=
+ =?us-ascii?Q?mB2ZWHvj6j8OarMBfhtn72HF0pzILSOIS2jMVAKk?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 802a508f-71d4-4c14-a7b6-08da9cd1b6c4
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2022 19:36:15.6347
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Wr4+35yYxrD89wklg+Y5jq9zv0WsAXDnRhtiENmKr7JdAXO/1zY+MRRmT3uSGsA5
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB5011
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 22, 2022, Ricardo Koller wrote:
-> +/* Returns true to continue the test, and false if it should be skipped. */
-> +static bool punch_hole_in_memslot(struct kvm_vm *vm,
+On Thu, Sep 22, 2022 at 01:10:50PM -0600, Alex Williamson wrote:
+> > @@ -378,13 +394,20 @@ static struct vfio_group *vfio_get_group(struct iommu_group *iommu_group,
+> >  
+> >  	mutex_lock(&vfio.group_lock);
+> >  
+> > -	ret = __vfio_group_get_from_iommu(iommu_group);
+> > -	if (ret)
+> > -		goto err_unlock;
+> > +	ret = vfio_group_find_from_iommu(iommu_group);
+> > +	if (ret) {
+> > +		if (WARN_ON(vfio_group_has_device(ret, dev))) {
+> > +			ret = ERR_PTR(-EINVAL);
+> > +			goto out_unlock;
+> > +		}
+> 
+> This still looks racy.  We only know within vfio_group_has_device() that
+> the device is not present in the group, what prevents a race between
+> here and when we finally do add it to group->device_list?
 
-This is a very misleading name, and IMO is flat out wrong.  The helper isn't
-punching a hole in the memslot, it's punching a hole in the backing store, and
-those are two very different things.  Encountering a hole in a _memslot_ yields
-emualted MMIO semantics, not CoW zero page semantics.
+This is a condition which is defined to be impossible and by
+auditing I've checked it can't happen.
 
-Ideally, if we can come up with a not awful name, I'd also prefer to avoid "punch
-hole" in the function name.  I can't think of a better alternative, so it's not
-the end of the world if we're stuck with e.g punch_hole_in_backing_store(), but I
-think the "punch_hole" name will be confusing for readers that are unfamiliar with
-PUNCH_HOLE, especially for anonymous memory as "punching a hole" in anonymous
-memory is more likely to be interpreted as "munmap()".
+There is no race in the sense that this can't actually happen, if it
+does happen it means the group is corrupted. At that point reasoning
+about locks and such goes out the window too - eg it might be
+corrupted because of bad locking.
 
-> +				  struct userspace_mem_region *region)
-> +{
-> +	void *hva = (void *)region->region.userspace_addr;
-> +	uint64_t paging_size = region->region.memory_size;
-> +	int ret, fd = region->fd;
-> +
-> +	if (fd != -1) {
-> +		ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
-> +				0, paging_size);
-> +		TEST_ASSERT(ret == 0, "fallocate failed, errno: %d\n", errno);
-> +	} else {
-> +		if (is_backing_src_hugetlb(region->backing_src_type))
-> +			return false;
+When it comes to self-debugging tests we often have these
+"races", eg in the destroy path we do:
 
-Why is hugetlb disallowed?  I thought anon hugetlb supports MADV_DONTNEED?
+	WARN_ON(!list_empty(&group->device_list));
 
-> +
-> +		ret = madvise(hva, paging_size, MADV_DONTNEED);
-> +		TEST_ASSERT(ret == 0, "madvise failed, errno: %d\n", errno);
-> +	}
-> +
-> +	return true;
-> +}
+Which doesn't hold the appropriate locks either.
 
-...
+The point is just to detect that group has been corrupted at a point
+in time in hopes of guarding against a future kernel bug.
 
-> +	/*
-> +	 * Accessing a hole in the data memslot (punched with fallocate or
+> The semantics of vfio_get_group() are also rather strange, 'return a
+> vfio_group for this iommu_group, but make sure it doesn't include this
+> device' :-\  Thanks,
 
-s/memslot/backing store
+I think of it as "return a group and also do sanity checks that the
+returned group has not been corrupted"
 
-> +	 * madvise) shouldn't fault (more sanity checks).
+I don't like the name of this function but couldn't figure a better
+one. It is something like "find or create a group for a device which
+we know doesn't already have a group"
 
-
-Naming aside, please provide more detail as to why this is the correct KVM
-behavior.  This is quite subtle and relies on gory implementation details that a
-lot of KVM developers will be unaware of.
-
-Specifically, from an accessibility perspective, PUNCH_HOLE doesn't actually create
-a hole in the file.  The "hole" can still be read and written; the "expect '0'"
-checks are correct specifically because those are the semantics of PUNCH_HOLE.
-
-In other words, it's not just that the accesses shouldn't fault, reads _must_
-return zeros and writes _must_ re-populate the page.
-
-Compare that with e.g. ftruncate() that makes the size of the file smaller, in
-which case an access should result in KVM exiting to userspace with -EFAULT.
-
-> +	 */
-> +	TEST_ACCESS(guest_read64, no_af, CMD_HOLE_DATA),
-> +	TEST_ACCESS(guest_cas, no_af, CMD_HOLE_DATA),
-> +	TEST_ACCESS(guest_ld_preidx, no_af, CMD_HOLE_DATA),
-> +	TEST_ACCESS(guest_write64, no_af, CMD_HOLE_DATA),
-> +	TEST_ACCESS(guest_st_preidx, no_af, CMD_HOLE_DATA),
-> +	TEST_ACCESS(guest_at, no_af, CMD_HOLE_DATA),
-> +	TEST_ACCESS(guest_dc_zva, no_af, CMD_HOLE_DATA),
-> +
-> +	{ 0 }
-> +};
+Jason
