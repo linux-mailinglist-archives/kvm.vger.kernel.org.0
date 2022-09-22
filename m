@@ -2,110 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3FACA5E6A8E
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 20:20:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73FFA5E6A93
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 20:21:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229918AbiIVSUK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 14:20:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60166 "EHLO
+        id S230293AbiIVSVX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 14:21:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229705AbiIVSUJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 14:20:09 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBF297C30E
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 11:20:07 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id c198so10071245pfc.13
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 11:20:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=KaDp6FRZ6c/KnColTs4cUMkFgR81w4nP6/sZqAWGhbM=;
-        b=QpYbP12FnBR1piretPlCLIrG6KfXafgQ/82SvI7U0WC2kA3Pw8Vw0XKce1xMf4BYfj
-         3nlut7536BtJmJO+esGc8iIw621Gy5IgP+AQnPxrddVjwokn1o4o2E1tuyYu6zrUWjlB
-         Heg8EpiZZhBZX1qIYBADXpr4nhNefovl+MkCy0PVsRHr/B12tZWjJp6iXtzvDtgnYeAg
-         rZHQAACvqzdhFGh/SNlFGqqC7SChDi9gKchr8udhBPZTZo8PVdss/U/8w9dlzanheBco
-         mvwMI8VlQwhkZ4/dx2pVgrqkSbYkh7Norvg7asAVl5WZxDWA4bM+UFj8826re9xDjzMa
-         Acuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=KaDp6FRZ6c/KnColTs4cUMkFgR81w4nP6/sZqAWGhbM=;
-        b=lMx1oJWAg03h63GmmIOe0LnbNKtKMinIlwKySLhWgfox8iunMUH+d4/vz7RmoxJuY0
-         lUVR9GzqIoWTjQkfOUZwgSqp8cUp39FbnAHL4w+IGDKbRmcuigTegBdNIk8sjvoAyktD
-         oj2E7kXq+afWThmDkoGSIIGtqMePP9c8ci4p3xzFmeY5GGKADd1qYihqr3S0TmrO+7o0
-         1a7t8A+3JrtdNJGReRZqR1j8DnCfuQi1x/FHXjPEX4xCFHf3ONydSPj6Siq7+YbaRLCG
-         WknfiFB9J8Wnzow1hJpu1F+sTCwwy7sm4zdZC9Qgv2zZlcsGd1qXmcuwlXUhvKheZott
-         jGCg==
-X-Gm-Message-State: ACrzQf13kixsbh9Cti9P7Em9Rvi1VAguQUJdkqoEzfd1cFeLv0kI5vze
-        TzqI/ditpk0Cz3B0/ejX0avFiA==
-X-Google-Smtp-Source: AMsMyM5aql0TsC6m2Ozrf3FMN7EEpMB0rWFkxsZrsMJIUiUzO99v3lMampT9DGk6gF4UBxO/R35gJw==
-X-Received: by 2002:a05:6a00:9a9:b0:541:787f:f2c with SMTP id u41-20020a056a0009a900b00541787f0f2cmr4829324pfg.12.1663870807085;
-        Thu, 22 Sep 2022 11:20:07 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u1-20020a17090a0c4100b001f2ef3c7956sm94269pje.25.2022.09.22.11.20.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Sep 2022 11:20:06 -0700 (PDT)
-Date:   Thu, 22 Sep 2022 18:20:02 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Anup Patel <anup@brainfault.org>,
+        with ESMTP id S230094AbiIVSVV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 14:21:21 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF0F110AB14;
+        Thu, 22 Sep 2022 11:21:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1663870880; x=1695406880;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=wLDkGwdWgKBcfDunJwn8bEHAKVMNn61aCjKIMFlG95s=;
+  b=M0Zna6V0rXStOY0jcQrH/fbgqedmZzjGbItHqMrj00q1Dn1XqGzyRSRe
+   0ArXMXjkVlel9nSs2sJ2o70D8a5yR6DSEs9x/f8YH7cRnAQKhrlez3g9D
+   AHXZsVy5BQ5nUUixIwVLyT+YB8S55Dgk5PxL1l5DuBcakXWrm9KB9vILX
+   aDbrDxB9jqN1rJP0Z6wkBsx6Klb1Zo4TwVe4iduOBjmb9bNsmb/QfB3Fc
+   XQdJCJbljns+YXozktnPopcXn7+X4PxjxiCHBDQOcsTdSzQS49LWDhpoR
+   jXjKo0OFW+WlOFPN36bS2KdeakFa68a29ShAdqv5YqvB9L3IdCOfdmtH9
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10478"; a="386675921"
+X-IronPort-AV: E=Sophos;i="5.93,337,1654585200"; 
+   d="scan'208";a="386675921"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2022 11:21:12 -0700
+X-IronPort-AV: E=Sophos;i="5.93,337,1654585200"; 
+   d="scan'208";a="653086599"
+Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2022 11:21:11 -0700
+From:   isaku.yamahata@intel.com
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>
+Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
+        Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
         Atish Patra <atishp@atishpatra.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH 1/5] KVM: selftests: Implement memcmp(), memcpy(), and
- memset() for guest use
-Message-ID: <YyynUog5sEDScYyX@google.com>
-References: <20220908233134.3523339-1-seanjc@google.com>
- <20220908233134.3523339-2-seanjc@google.com>
- <Yyybg3DxgLt4NVn+@google.com>
- <Yyyd8UN+ZO1Yf/Co@google.com>
- <CALzav=dfL+DCFnKQnUP27SzWLMdWY0kKXr93=nL_VC1nj=aNkg@mail.gmail.com>
+        Shaokun Zhang <zhangshaokun@hisilicon.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>
+Subject: [PATCH v5 00/30] KVM: hardware enable/disable reorganize
+Date:   Thu, 22 Sep 2022 11:20:29 -0700
+Message-Id: <cover.1663869838.git.isaku.yamahata@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALzav=dfL+DCFnKQnUP27SzWLMdWY0kKXr93=nL_VC1nj=aNkg@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 22, 2022, David Matlack wrote:
-> On Thu, Sep 22, 2022 at 10:40 AM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Thu, Sep 22, 2022, David Matlack wrote:
-> > > > +LIBKVM_STRING += lib/kvm_string.c
-> > >
-> > > Can this file be named lib/string.c instead? This file has nothing to do
-> > > with KVM per-se.
-> >
-> > Yes and no.  I deliberately chose kvm_string to avoid confusion with
-> > tools/lib/string.c and tools/include/nolibc/string.h.  The implementations
-> > themselves aren't KVM specific, but the reason the file _exists_ is 100% unique
-> > to KVM as there is no other environment where tools and/or selftests link to
-> > glibc but need to override the string ops.
-> >
-> > I'm not completely opposed to calling it string.c, but my preference is to keep
-> > it kvm_string.c so that it's slightly more obvious that KVM selftests are a
-> > special snowflake.
-> 
-> Makes sense, the "kvm" prefix just made me do a double-take. Perhaps
-> string_overrides.c? That would make it clear that this file is
-> overriding string functions. And the fact that this file is in the KVM
-> selftests directory signals that the overrides are specific to the KVM
-> selftests.
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-I like that, string_overrides.c it is.
+I've updated the patch series based on Chao's review and eliminated
+kvm_arch_pre_hardware_unsetup() and compatibility check on resume.
+
+Those two patch are compile only tested.
+- "KVM: arm64: Simplify the CPUHP logic"
+- "RFC: KVM: powerpc: Move processor compatibility check to hardware setup"
+- "RFC: KVM: Remove cpus_hardware_enabled and related sanity check"
+
+Changes from v4:
+- reorder/reorganize the patch.  Especially introduced one patch for each PM
+  events. reboot, suspend, resume, and cpu online/offline.
+- eliminated kvm_arch_pre_hardware_unsetup().
+- removed compatibility check on resume
+- "KVM: arm64: Simplify the CPUHP logic": fixed up signed-off-by and the link.
+- "RFC: KVM: powerpc: Move processor compatibility check to hardware setup"
+  move the comment in the code to the commit message.
+
+This patch series is to implement the suggestion by Sean Christopherson [1]
+to reorganize enable/disable cpu virtualization feature by replacing
+the arch-generic current enable/disable logic with PM related hooks. And
+convert kvm/x86 to use new hooks.
+
+- Untable x86 hardware enable logic, snapshot MSRs for user return notifier,
+  enabling cpu virtualization on cpu online and platform resume. and real
+  enabling of CPU virtualization feature
+- Introduce hooks related to PM.
+- Convert kvm/x86 code to user those hooks.
+- Split out hardware enabling/disabling logic into a separate file.  Compile
+  it for non-x86 code.  Once conversion of other KVM archs is done, this file
+  can be dropped.
+- Delete kvm_arch_check_processor_compat()
+- Delete cpus_hardware_enabled. 29/30 and 30/30
+
+[1] https://lore.kernel.org/kvm/YvU+6fdkHaqQiKxp@google.com/
+[2] https://lore.kernel.org/all/20220216031528.92558-1-chao.gao@intel.com/
+
+Changes from v3:
+- Updated "KVM: arm64: Simplify the CPUHP logic".
+- add preempt_disable/enable() around hardware_enable/disable() to keep the
+  assumption of the arch callback.
+- Eliminated arch compat check callback, kvm_arch_check_processor_compat().
+
+Changes from v2:
+- Replace the first patch("KVM: x86: Drop kvm_user_return_msr_cpu_online()")
+  with Sean's implementation
+- Included all patches of "Improve KVM's interaction with CPU hotplug" [2]
+  Until v2, Tried to cherry-pick the least patches of it. It turned out that
+  all the patches are desirable.
+
+Changes from v1:
+- Add a patch "KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section"
+  to make online/offline callback to run thread context to use mutex instead
+  of spin lock
+- fixes pointed by Chao Gao
+
+Chao Gao (4):
+  KVM: x86: Move check_processor_compatibility from init ops to runtime
+    ops
+  Partially revert "KVM: Pass kvm_init()'s opaque param to additional
+    arch funcs"
+  KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section
+  KVM: Do compatibility checks on hotplugged CPUs
+
+Isaku Yamahata (24):
+  KVM: x86: Use this_cpu_ptr() instead of
+    per_cpu_ptr(smp_processor_id())
+  KVM: Provide more information in kernel log if hardware enabling fails
+  KVM: Drop kvm_count_lock and instead protect kvm_usage_count with
+    kvm_lock
+  KVM: Add arch hooks when VM is added/deleted
+  KVM: Add arch hook for reboot event
+  KVM: Add arch hook for suspend
+  KVM: Add arch hook for resume event
+  KVM: Add arch hook for cpu online event
+  KVM: Add arch hook for cpu offline event
+  KVM: Remove on_each_cpu(hardware_disable_nolock) in kvm_exit()
+  KVM: Move out KVM arch PM hooks and hardware enable/disable logic
+  KVM: kvm_arch.c: Remove _nolock post fix
+  KVM: kvm_arch.c: Remove a global variable, hardware_enable_failed
+  KVM: Introduce an arch wrapper to check all processor compatibility
+  KVM: x86: Duplicate arch callbacks related to pm events and compat
+    check
+  KVM: x86: Move TSC fixup logic to KVM arch resume callback
+  KVM: Eliminate kvm_arch_post_init_vm()
+  KVM: Add config to not compile kvm_arch.c
+  KVM: x86: Delete kvm_arch_hardware_enable/disable()
+  KVM: x86: Make x86 processor compat check callback empty
+  RFC: KVM: powerpc: Move processor compatibility check to hardware
+    setup
+  KVM: Eliminate kvm_arch_check_processor_compat()
+  RFC: KVM: x86: Remove cpus_hardware_enabled and related sanity check
+  RFC: KVM: Remove cpus_hardware_enabled and related sanity check
+
+Marc Zyngier (1):
+  KVM: arm64: Simplify the CPUHP logic
+
+Sean Christopherson (1):
+  KVM: x86: Drop kvm_user_return_msr_cpu_online()
+
+ Documentation/virt/kvm/locking.rst |  14 +-
+ arch/arm64/kvm/arch_timer.c        |  27 ++--
+ arch/arm64/kvm/arm.c               |  18 ++-
+ arch/arm64/kvm/vgic/vgic-init.c    |  19 +--
+ arch/mips/kvm/mips.c               |   5 -
+ arch/powerpc/kvm/powerpc.c         |   5 -
+ arch/riscv/kvm/main.c              |   5 -
+ arch/s390/kvm/kvm-s390.c           |   5 -
+ arch/x86/include/asm/kvm-x86-ops.h |   1 +
+ arch/x86/include/asm/kvm_host.h    |   2 +-
+ arch/x86/kvm/Kconfig               |   1 +
+ arch/x86/kvm/svm/svm.c             |   4 +-
+ arch/x86/kvm/vmx/vmx.c             |  24 ++--
+ arch/x86/kvm/x86.c                 | 201 ++++++++++++++++++++++++----
+ include/kvm/arm_arch_timer.h       |   4 +
+ include/kvm/arm_vgic.h             |   4 +
+ include/linux/cpuhotplug.h         |   5 +-
+ include/linux/kvm_host.h           |  13 +-
+ virt/kvm/Kconfig                   |   3 +
+ virt/kvm/Makefile.kvm              |   3 +
+ virt/kvm/kvm_arch.c                | 132 +++++++++++++++++++
+ virt/kvm/kvm_main.c                | 205 +++++++++--------------------
+ 22 files changed, 443 insertions(+), 257 deletions(-)
+ create mode 100644 virt/kvm/kvm_arch.c
+
+
+base-commit: 521a547ced6477c54b4b0cc206000406c221b4d6
+-- 
+2.25.1
+
