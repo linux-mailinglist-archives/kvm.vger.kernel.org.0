@@ -2,152 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C65E95E5761
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 02:33:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2756A5E57B0
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 03:00:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229637AbiIVAdS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 20:33:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43794 "EHLO
+        id S229554AbiIVBAf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 21:00:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230113AbiIVAdL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Sep 2022 20:33:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B4DDA98D9
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 17:33:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663806784;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dsE8NdyhX5qef8QVsrNnndpCLaTRMlO/gHKVyL+LIsw=;
-        b=bmZ0D3lOL+0doHiXIEiM5K22YMuKDEX+wSWi6YSyir1PUvxR5KNvlbEH1N+dRMr9Cs1NFg
-        qhcPs4VTD4Iu5fsD1JfXXvX1jJim5qlaPg47wNTLJS68kqbN/ZHpVmwTKilGAyMeA3J5uw
-        7CC8n7PTZJ8OMj/hNYBFtD1KFktcipI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-341-AHkCP6uwMRqkB41z-iu6WQ-1; Wed, 21 Sep 2022 20:33:00 -0400
-X-MC-Unique: AHkCP6uwMRqkB41z-iu6WQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 76FCC3C0F678;
-        Thu, 22 Sep 2022 00:32:59 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-126.bne.redhat.com [10.64.54.126])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6BB2F2166B26;
-        Thu, 22 Sep 2022 00:32:54 +0000 (UTC)
-From:   Gavin Shan <gshan@redhat.com>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com,
-        shuah@kernel.org, maz@kernel.org, andrew.jones@linux.dev,
-        will@kernel.org, dmatlack@google.com, oliver.upton@linux.dev,
-        peterx@redhat.com, pbonzini@redhat.com, zhenyzha@redhat.com,
-        shan.gavin@gmail.com
-Subject: [PATCH v3 6/6] KVM: selftests: Automate choosing dirty ring size in dirty_log_test
-Date:   Thu, 22 Sep 2022 08:32:14 +0800
-Message-Id: <20220922003214.276736-7-gshan@redhat.com>
-In-Reply-To: <20220922003214.276736-1-gshan@redhat.com>
-References: <20220922003214.276736-1-gshan@redhat.com>
+        with ESMTP id S229471AbiIVBAe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Sep 2022 21:00:34 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2048.outbound.protection.outlook.com [40.107.93.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CEF753D05
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 18:00:33 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mVizuOG3w3iFdLDpuiSyytS8Zq732REbCoPGmayp8C1mSAVhyh+VQ8TvcMHOTvI5CmwTBSrwjIXU2EmYwJeJn4pa48HMY/pLp68iEZGi2wTHhYs98IcSA0er8Ov2NVGZ0N/gYFk1SNdjdUHZ9b4Wnxvmeaf5lzOEHvK5QUHJZ3mzVs+y0JtvUNKhYRNRIMNXlsNReEEBbV1HaqaECp9G2zZueiURtH/3dkvdP6JtYL/6bI91XacTaCX+LHuvX6rjX3OWVBJRCNA7zGB/+j/juNnw5ilqIcEsEogm3+YuUHJBteGVHiuv6rAK/zO9Co2P4niM172JzHTdpo3QVqhTPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oKb7G6eGDclgLSGzJWL3UgQNazkLemgUKk7Bl04NmhA=;
+ b=VoQ/mYITDzfrn3gVSB6rZolNAm8KFl7410cdUenaOMM3QzytmAc5zUW2FBvWQLQkgaySflLbREnVD/Icl5DVW7Sspvm3PI+0s7K6dx1+8BPvnt1Kj2d10C8LAtSePmAefwoGpMaNTixN2KGFxJKx6tSA1XgRGXo4njRtPlHf0u/FvyOQ64I7/yVbgBA2v3h9Xw7nC2o40KBtFmEThZGDQQdnbuS91Qylud/8o0OsnX1lUvj8c3JR5hzCJkxKi8xg8SI6K1XrEPz/wHzPVYMWltruO8daAkSNq3t4kT1S4mO/GzShL7b+EiZ5XeEUfbu6QkJZrRaJVW+DWdtXYmTlHg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oKb7G6eGDclgLSGzJWL3UgQNazkLemgUKk7Bl04NmhA=;
+ b=uW6CqqsUI82kKmVJY3YtlSmfvk4HevWwMWOnxzVjZo9sgFl+l2m88/S91N1FiVKBRZnmCqozCaAfIp82Jp0tnyY2V163x8CdkMN3GbkuR38A1d4oKfhedFwJNrcVy3YhQ7VIQ0jSNGIquoRyVx+S9uOX+v79oeKXexZlGKr4p9AtUMu7LzasQcLGNXCq6Iklcd0lnndZ3XXt4sF5EQIQ+/XLhKatE1cNCf2RuRRiz3EXAgijLOZYhlT221NFIDNGMBTAyXJEBKLde64iQB2rCDD4tDSkRv4CdRvznW5eeJdJ5Ghftt6g9w54uQnEkSQLnbX5wcmMlYNJHaup7IUZ+g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by DS7PR12MB5790.namprd12.prod.outlook.com (2603:10b6:8:75::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5632.17; Thu, 22 Sep
+ 2022 01:00:32 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5%7]) with mapi id 15.20.5654.018; Thu, 22 Sep 2022
+ 01:00:31 +0000
+Date:   Wed, 21 Sep 2022 22:00:30 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v2 0/8] vfio: Split the container code into a clean layer
+ and dedicated file
+Message-ID: <Yyuzrqe8PocywMld@nvidia.com>
+References: <0-v2-d7744ee9cf4f+33d-vfio_container_split_jgg@nvidia.com>
+ <BN9PR11MB527613A28174EBE5450B4A218C4F9@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB527613A28174EBE5450B4A218C4F9@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: MN2PR19CA0057.namprd19.prod.outlook.com
+ (2603:10b6:208:19b::34) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4192:EE_|DS7PR12MB5790:EE_
+X-MS-Office365-Filtering-Correlation-Id: 29c2a666-9c0b-4edf-bbea-08da9c35d930
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: hU3XZHx8QugeBGYdtzVdESa4/r6ZjzJ2pwTmRdhcIzN/oj9RWZvwZJfx1oJ9/z7H74zzqeWmVTLVJK/wTqk/M7t2JDRBdw9KA9VprHobMyG6eB/4qrDbXs4VWoAE9n6Y9UZBgY50u4lDSPDtMigZvdJvD+Mr/d0kwqvbiYGtEKOrl05p+XpqZrECl2fusRBHEUgE0PscsJkjtFzCVUr8+pTc1clCPBABVK5rGMihR9bwBdnnY+aA0XJz2QhVlKHVTl80lY9rOzo7R7p5w5o5Or+R+XfxUCdpt+gDrk1UWB26UAlAnh4Fmr85vy6ms+8SyvJlpCjwwQO6++pQy5SQbiZ42sLyfdQ+hZ/RPYKv759MYQsGpRQaw8WpaKu+isMJ3ai6mbZrldP6kVItGR4ltt9fMJ6LnSha9J6OL1PS2vlvvrr/xvxTyzRx0JWL8U4pqOmUAFZcQEskuL4P6fZqXMfWcd+cKp0nwzj99kM5xuAqY3pXSMWw7GzbPvVjV5TKyG6kYDi0GC9RFcMkduZo6yWRl/WX6irqjI7MCgMvDQ9DRLjHviks1K01DtDr91ntJDTwN0653e/tb6B3LpxgZFXhM+98ff4dlbgcuH+XiL3q0DUzPALhDITtkfM9zhxv1IoE+7llUoKDKa9V7y7+UM0hz520g/yRzbS2Fb+A8TwbwPF60Qu5ZnhpQ416DwZCy+44i3Ez2IQIN5XqsBaIjw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(39860400002)(366004)(136003)(396003)(346002)(451199015)(86362001)(36756003)(38100700002)(41300700001)(26005)(6506007)(2906002)(83380400001)(6512007)(6916009)(186003)(8676002)(66476007)(316002)(5660300002)(6486002)(54906003)(8936002)(66946007)(66556008)(478600001)(4326008)(2616005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?9BnMIkAy+hYtSD989YVv2W2Psan6nlsTuJsUgeqHHD6h3T1HoyYywEwvunAC?=
+ =?us-ascii?Q?Jz+QEx3JXias0D5vSPbpUluRVtIPE72kUY9fMr+xXTdRxbsaohfSgCbem2DH?=
+ =?us-ascii?Q?QidXgGFFHWg9PGbOvX4E3W8r6MMPVkDwrQwP9gL+Q0j5I62ORkKEd1D9sshV?=
+ =?us-ascii?Q?ykQ7ShyRyTGLCIcAacki8Wg/Mtx94tg4RdZeGxQBWZEn6xHMydIDCRaTpuGf?=
+ =?us-ascii?Q?80MJUPTzCvqR5RpRgbEUc0g7BqPftsXjDXtL2bYJaBTO12vH4m/xx6bIZOCs?=
+ =?us-ascii?Q?nmTNjbRVC5wg7y3rVbx7GaXelAZTcxozTTU2YRc71vCBhP5CgREP40TWrN1w?=
+ =?us-ascii?Q?VkBraTDgn9MFUiNO1Shu1GPR5zdnQQLlYlgj43UkJR3/idg9a7cxjwhXBYog?=
+ =?us-ascii?Q?atM2FVXkO/rUY6Hb8c3Neaei3eg53Ck82VJyLfX6yzuY4YVR9UOq+fLS0ypt?=
+ =?us-ascii?Q?W+SdVKpKOGi8Lg/KcyNmlyv2bBLuyRNuIZBtc05l+Gbumiiq/E7vJQ12xr38?=
+ =?us-ascii?Q?Bg+u8JSwPu9deZEoiwqNetqEl527Yrpk9xNYfhPWDFXa8YsnYWjIqgl0ZtOB?=
+ =?us-ascii?Q?tsw0XsJyyn6VrtquoFl8Q6W2IBsPxUlvEq0IQNW1fnoMhxDTfJVGmt2y/HkM?=
+ =?us-ascii?Q?hJo8JMTyh4rh6s/gFLJ1gdI87nIiyN0JPf4uBGE+57pUMX/iYsT5b7a3XXvN?=
+ =?us-ascii?Q?77BnngO6LiDi+M4o8tn7tQ3AZkBpt0nx3afGzjWWk+6VW/lD146cnSquVebj?=
+ =?us-ascii?Q?u8+duSm+gUKqezEv2YHJTBrpCA/Zwm+eUK3jaBXL3t7QBuWRyhNmMg4hgV2V?=
+ =?us-ascii?Q?y/2sE5/IVTZ7VLscKSg18FvUVsMqHUmF0C67aiYiqcOWOG4WdfzSJ66ASNKT?=
+ =?us-ascii?Q?MZKQBlMrkims+p0Kc04/ITGUXFnPokIc1PQWqATN9m2eZBnDmdFrpN5fFGU6?=
+ =?us-ascii?Q?iHic8YQkEq0srnfDo6t8CoQXUBulip1RNyswpgdn0tgopm4LQbKs75WigvVR?=
+ =?us-ascii?Q?kXa73Hzz7+Tgj7VnsQWbGuUkXJ2jgxH78MZs7IzYreRy6c3jQ6silj8rOY9C?=
+ =?us-ascii?Q?WMp+kzxPONtDCyoAZ/fkqrwvce0EcAUnWlZasFusbFjxG4wpuiMayfegmKOb?=
+ =?us-ascii?Q?30O4HMCzBXrth9klyZBuS2CnIJY6Gtu4LXbJ31sTWTY+qTsNRdudp7a7qy9I?=
+ =?us-ascii?Q?vFTy6+vFC6JexbkcFhu/HsWQc+8fVyksZkFVYOjCOABX+JVutHYIAwNFXquk?=
+ =?us-ascii?Q?liCEJbnG5p12pJEs2IT6zhqHVnx8G59InU4j1Ilen7qvc8XzHysF1Y/8CjLa?=
+ =?us-ascii?Q?oW4KdPtegIeI1R00iyslbDIVmOicpI2UZmm+fhiRWKrx9EC52yxCKJHJyfyr?=
+ =?us-ascii?Q?6uLiODCEDLS39gwsIHRNh+8D5oZC59BJ/tldpi/TQynAj1iWg6iVUaxMWQ5h?=
+ =?us-ascii?Q?F6+NQJbDct+rEMWiLLYn5SmyT+AjxlYwKISqIlypApmUHWzSwJ7n1du7mo+D?=
+ =?us-ascii?Q?yrXRza+jVezzAIMDFz+KxVdTfpLwEMGybIe+3DDft4e5r5VlHqyTA0+Y5aL9?=
+ =?us-ascii?Q?15XmUucdxoP6LtjAcoTmJINA+AsjY7Nlj6tNB9En?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 29c2a666-9c0b-4edf-bbea-08da9c35d930
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2022 01:00:31.8958
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vY+Ag1GPdnLA+s9nKBzYsf540rGB/8aFcJASgtbEL/f4duBgn34OhOlqcQl/iqBf
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5790
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In the dirty ring case, we rely on vcpu exit due to full dirty ring
-state. On ARM64 system, there are 4096 host pages when the host
-page size is 64KB. In this case, the vcpu never exits due to the
-full dirty ring state. The similar case is 4KB page size on host
-and 64KB page size on guest. The vcpu corrupts same set of host
-pages, but the dirty page information isn't collected in the main
-thread. This leads to infinite loop as the following log shows.
+On Wed, Sep 21, 2022 at 08:07:42AM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Wednesday, September 21, 2022 8:42 AM
+> >  drivers/vfio/Makefile    |   1 +
+> >  drivers/vfio/container.c | 680 +++++++++++++++++++++++++++++++++++++
+> >  drivers/vfio/vfio.h      |  56 ++++
+> >  drivers/vfio/vfio_main.c | 708 ++-------------------------------------
+> >  4 files changed, 765 insertions(+), 680 deletions(-)
+> >  create mode 100644 drivers/vfio/container.c
+> > 
+> > 
+> > base-commit: 245898eb9275ce31942cff95d0bdc7412ad3d589
+> 
+> it's not the latest vfio/next:
 
-  # ./dirty_log_test -M dirty-ring -c 65536 -m 5
-  Setting log mode to: 'dirty-ring'
-  Test iterations: 32, interval: 10 (ms)
-  Testing guest mode: PA-bits:40,  VA-bits:48,  4K pages
-  guest physical test memory offset: 0xffbffe0000
-  vcpu stops because vcpu is kicked out...
-  Notifying vcpu to continue
-  vcpu continues now.
-  Iteration 1 collected 576 pages
-  <No more output afterwards>
+Ah, I did the rebase before I left for lpc..
 
-Fix the issue by automatically choosing the best dirty ring size,
-to ensure vcpu exit due to full dirty ring state. The option '-c'
-becomes a hint to the dirty ring count, instead of the value of it.
+There is a minor merge conflict with the stuff from the last week:
 
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- tools/testing/selftests/kvm/dirty_log_test.c | 26 +++++++++++++++++---
- 1 file changed, 22 insertions(+), 4 deletions(-)
+diff --cc drivers/vfio/Makefile
+index d67c604d0407ef,d5ae6921eb4ece..00000000000000
+--- a/drivers/vfio/Makefile
++++ b/drivers/vfio/Makefile
+@@@ -1,11 -1,10 +1,12 @@@
+  # SPDX-License-Identifier: GPL-2.0
+  vfio_virqfd-y := virqfd.o
+  
+ -vfio-y += container.o
+ -vfio-y += vfio_main.o
+ -
+  obj-$(CONFIG_VFIO) += vfio.o
+ +
+ +vfio-y += vfio_main.o \
+ +        iova_bitmap.o \
+++        container.o
+ +
+  obj-$(CONFIG_VFIO_VIRQFD) += vfio_virqfd.o
+  obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
+  obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index 7d91df7e036f..47ac2c719ade 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -23,6 +23,9 @@
- #include "guest_modes.h"
- #include "processor.h"
- 
-+#define DIRTY_MEM_BITS 30 /* 1G */
-+#define PAGE_SHIFT_4K  12
-+
- /* The memory slot index to track dirty pages */
- #define TEST_MEM_SLOT_INDEX		1
- 
-@@ -271,6 +274,24 @@ static bool dirty_ring_supported(void)
- 
- static void dirty_ring_create_vm_done(struct kvm_vm *vm)
- {
-+	uint64_t pages;
-+	uint32_t limit;
-+
-+	/*
-+	 * We rely on vcpu exit due to full dirty ring state. Adjust
-+	 * the ring buffer size to ensure we're able to reach the
-+	 * full dirty ring state.
-+	 */
-+	pages = (1ul << (DIRTY_MEM_BITS - vm->page_shift)) + 3;
-+	pages = vm_adjust_num_guest_pages(vm->mode, pages);
-+	if (vm->page_size < getpagesize())
-+		pages = vm_num_host_pages(vm->mode, pages);
-+
-+	limit = 1 << (31 - __builtin_clz(pages));
-+	test_dirty_ring_count = 1 << (31 - __builtin_clz(test_dirty_ring_count));
-+	test_dirty_ring_count = min(limit, test_dirty_ring_count);
-+	pr_info("dirty ring count: 0x%x\n", test_dirty_ring_count);
-+
- 	/*
- 	 * Switch to dirty ring mode after VM creation but before any
- 	 * of the vcpu creation.
-@@ -683,9 +704,6 @@ static struct kvm_vm *create_vm(enum vm_guest_mode mode, struct kvm_vcpu **vcpu,
- 	return vm;
- }
- 
--#define DIRTY_MEM_BITS 30 /* 1G */
--#define PAGE_SHIFT_4K  12
--
- struct test_params {
- 	unsigned long iterations;
- 	unsigned long interval;
-@@ -828,7 +846,7 @@ static void help(char *name)
- 	printf("usage: %s [-h] [-i iterations] [-I interval] "
- 	       "[-p offset] [-m mode]\n", name);
- 	puts("");
--	printf(" -c: specify dirty ring size, in number of entries\n");
-+	printf(" -c: hint to dirty ring size, in number of entries\n");
- 	printf("     (only useful for dirty-ring test; default: %"PRIu32")\n",
- 	       TEST_DIRTY_RING_COUNT);
- 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
--- 
-2.23.0
+Alex, let me know if you want me to respin it
 
+Thanks,
+Jason
