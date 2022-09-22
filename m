@@ -2,134 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14C435E6935
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 19:09:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 365835E6961
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 19:14:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231460AbiIVRJz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 13:09:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35836 "EHLO
+        id S231953AbiIVRO1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 13:14:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231913AbiIVRJq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 13:09:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A172A2ED59
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 10:09:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663866581;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Pd4NQd/acmlQwbtRIaR62uheKJfZdTca4no+neUVSYQ=;
-        b=ZCdJOUs5wDzsif7GN1dwtS2hZxkuBSyLdCd7dZEOUnkLk2Fo/Rz/C7NiC1bDSLoWQMVa3u
-        3KbA3rtr5S1F3D6CqBj+uhEs0NMtencLg5leLW/+ccpgrqZ0LzG4o8RnXXcQUZVj4wQLBy
-        YFSIfi9tGZmOWvb6zqtmMuOvQvvEwNY=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-103--lrtRmfYNZ-sdJeQonF4Ig-1; Thu, 22 Sep 2022 13:09:33 -0400
-X-MC-Unique: -lrtRmfYNZ-sdJeQonF4Ig-1
-Received: by mail-il1-f199.google.com with SMTP id h10-20020a92c26a000000b002f57c5ac7dbso6023337ild.15
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 10:09:32 -0700 (PDT)
+        with ESMTP id S231990AbiIVRN6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 13:13:58 -0400
+Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D27F110197C
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 10:13:50 -0700 (PDT)
+Received: by mail-oi1-x230.google.com with SMTP id m81so13226230oia.1
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 10:13:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=rNzmkCAkz9tFhn4H0q5z3OX9gHed8gkTeWIRslHRKi8=;
+        b=eg7YwipskwomOZ9AXcRZMtc37FQslIhUMUwbC4Y/cdM1wkPb8wvqonqRdWa/LPrJyj
+         lhqKP67hGxVHQmSio+WRXNkmKkwzlLLSVo1Ndw8w7aaS0xExVsM5Rp3DUGy0ZLmFBWTe
+         83ngg7MErjW2R6mSsyZ3vYIkFiHGRiXl6LBvnPn5bTPc7o+qhkzhA2hEqQXcrB3zxq+3
+         o3mBEAtNjlrfmfDO6Ll48Y0LexHnMmr3sc9xCkX9kMSp4kbZA62qX5XM9C9/NkNMoIMI
+         24wJa7qNPoo7qF+gyYRNC9BhpL5SLkNWmSvtcD55h8pCSKbjYkrOAyqjJj7cRTgg72g0
+         cIPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=Pd4NQd/acmlQwbtRIaR62uheKJfZdTca4no+neUVSYQ=;
-        b=QqOgrN9OSsRk/E3k6AfYLrITtFPgLDWYnD3q07roEhoybjqxByQFKFb2rkDgf7k8JR
-         ESwplv0Lm5tva7ZqNPOja2czdcHNKXSn6qO9tV95MH1ox1Jdw2784V/NleL8rRqpDlLy
-         zGQNhGKOJjM/Oa9/dwpF7PcI2qwfL+HccXxeTehS37saJJiE7SU1gcWXB7dONbdVO0lC
-         rnFzUutcqGBQRqCygpiS0/oDh25Mh7hwTuQaRURiTa+dDX4kG+z4KEn74HMSOwKROAbg
-         KbAcxxdeFYIp6Pzup2TF08ram8ofA5rtSliXbxFfVI6CPSLBIsLkyoJQo9u58txNlguW
-         dIfQ==
-X-Gm-Message-State: ACrzQf2/igWQtvG+mGezOMOASoS1u6zSLaeA8AyQAB91wj/amTsLvTVH
-        OgTn+oVP1h4GH3IpkdeG42jUDMi1dPc6OEIWOOwQSTYfla5CJeHSEPsJFVDeACXuaykT5yV1rMf
-        lQoy4gUYFK1cn
-X-Received: by 2002:a6b:e60f:0:b0:6a1:75d7:271e with SMTP id g15-20020a6be60f000000b006a175d7271emr2125008ioh.79.1663866572447;
-        Thu, 22 Sep 2022 10:09:32 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM5oAmtefB+5/h7N3J1sw416SdJif/Avh5sHqzZ/Zh3Qsp0yCDr2fB+mYMXIPK8e60Memwb9kA==
-X-Received: by 2002:a6b:e60f:0:b0:6a1:75d7:271e with SMTP id g15-20020a6be60f000000b006a175d7271emr2124999ioh.79.1663866572236;
-        Thu, 22 Sep 2022 10:09:32 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id n25-20020a02a199000000b0035ad8408d40sm2419009jah.108.2022.09.22.10.09.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Sep 2022 10:09:31 -0700 (PDT)
-Date:   Thu, 22 Sep 2022 11:09:30 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH v2 0/8] vfio: Split the container code into a clean
- layer and dedicated file
-Message-ID: <20220922110930.0beadbc3.alex.williamson@redhat.com>
-In-Reply-To: <Yyuzrqe8PocywMld@nvidia.com>
-References: <0-v2-d7744ee9cf4f+33d-vfio_container_split_jgg@nvidia.com>
-        <BN9PR11MB527613A28174EBE5450B4A218C4F9@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <Yyuzrqe8PocywMld@nvidia.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=rNzmkCAkz9tFhn4H0q5z3OX9gHed8gkTeWIRslHRKi8=;
+        b=WVMyO0rxQ2UMDAyOlI6Xx3sQQFLMMOG0W6o94FY80IFgDnDs4hMUrRHKMWOsloFxG8
+         4X4PPSuz0SY56tMnKuw0zb/852HpYjDvT33TBNUHyxwWDDGDPK9KXoUDpaHxk3SwM4JQ
+         qjoGH+4njiTRf6FVoNFSunDzrpwEs/VmCXt2HWrNrNECnvx5g7v9XepfrETRfYpYg49Q
+         DwDa+b4Jx7/Kvz/ZILwiat7Q1MenNiemMon68YLk9sOMg0SHKzSQPZca37aU9pkuFvAl
+         OtInBLSVwduaXUT+LTF7kaaQCmgtfiwolUBxmCP71whySQisMm9Xc8pf87DQwxOgQiRm
+         /sJw==
+X-Gm-Message-State: ACrzQf1lcnXManwT4A8kvCLy/QqrvI3mOEyVvsv2UIidqKikfDiOsyA7
+        Z/PYGmiV3zgwpNFIdCULxAW9++3DbwwZY8wLEweylQ==
+X-Google-Smtp-Source: AMsMyM640/S01tysX4SbmLMJDMNaPV1ARbxOj0vReuk56z1cCCPujuFJSpE1JpiFZK9iwL2kUwe8+e786QsesLP2C00=
+X-Received: by 2002:aca:a8d0:0:b0:34f:7065:84b8 with SMTP id
+ r199-20020acaa8d0000000b0034f706584b8mr6943223oie.13.1663866829568; Thu, 22
+ Sep 2022 10:13:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220922101454.1069462-1-kraxel@redhat.com> <YyxF2TNwnXaefT6u@redhat.com>
+ <20220922122058.vesh352623uaon6e@sirius.home.kraxel.org> <CABgObfavcPLUbMzaLQS2Rj2=r5eAhuBuKdiHQ4wJGfgPm_=XsQ@mail.gmail.com>
+ <20220922141633.t2dk2jviw2f3i26x@sirius.home.kraxel.org>
+In-Reply-To: <20220922141633.t2dk2jviw2f3i26x@sirius.home.kraxel.org>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 22 Sep 2022 10:13:38 -0700
+Message-ID: <CALMp9eSEDEit0PEAt_qUwGhBRBPZNsyjasiuJhcrFKT9Zm4K=A@mail.gmail.com>
+Subject: Re: [PATCH v4] x86: add etc/phys-bits fw_cfg file
+To:     Gerd Hoffmann <kraxel@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+        qemu-devel@nongnu.org, Sergio Lopez <slp@redhat.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 21 Sep 2022 22:00:30 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Thu, Sep 22, 2022 at 7:16 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> On Thu, Sep 22, 2022 at 02:38:02PM +0200, Paolo Bonzini wrote:
+> > On Thu, Sep 22, 2022 at 2:21 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
+> > > No.  This will basically inform the guest that host-phys-bits has been
+> > > enabled (and pass the number of bits).  So the firmware can make use of
+> > > the available address space instead of trying to be as conservative as
+> > > possible to avoid going beyond the (unknown) limit.
+> >
+> > Intel processors that are not extremely old have host-phys-bits equal
+> > to 39, 46 or 52. Older processors that had 36, in all likelihood,
+> > didn't have IOMMUs (so no big 64-bit BARs).
+>
+> Well, I happen to have a intel box with 36 physbits + iommu.
+>
+> > 1) set host-phys-bits to true on new machine types when not using TCG
+> > (i.e. KVM / HVF / WHPX)
+>
+> That is probably a good idea, but an independent problem.
+>
+> Has live migration problems (when hosts have different phys bits),
+> which is IIRC the reason this hasn't happen yet.  Maybe that is solved
+> meanwhile the one way or another, I've seen some phys-bits changes in
+> libvirt recently ...
+>
+> > 2) in the firmware treat 40 as if it were 39, to support old machine
+> > types?
+>
+> The background of all this is that devices need more and more memory,
+> and the very conservative edk2 defaults are becoming increasingly
+> problematic.  So what I want do is scale things up with the address
+> space size.  Use 1/4 or 1/8 of the physical address space as 64bit
+> pci mmio window.  Likewise scale up the default pcie root port window
+> sizes, to have more room for hotplug.
+>
+> For that to work the firmware obviously needs to know how much it
+> actually has, which is not the case.
+>
+> Yes, the problematic cases are intel machines with 36 or 39.
+>
+> Treating 40 as if it were 39 will explode with 36 cpus.
+>
+> Treating 40 as if it were 36 will mostly work.  Will leave a big
+> chunk of address space unused.  Will cause regressions on guests
+> with > 32G of RAM.
+>
+> Treating 40 as invalid and continue to use the current conservative
+> heuristic, otherwise treat phys-bits as valid might work.  Obvious
+> corner case is that it'll not catch broken manual configurations
+> (host-phys-bits=off,phys-bits=<larger-than-host>), only the broken
+> default.  Not sure how much of a problem that is in practice, maybe
+> it isn't.
+>
+> I think I still prefer to explicitly communicate a reliable phys-bits
+> value to the guest somehow.
 
-> On Wed, Sep 21, 2022 at 08:07:42AM +0000, Tian, Kevin wrote:
-> > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > Sent: Wednesday, September 21, 2022 8:42 AM
-> > >  drivers/vfio/Makefile    |   1 +
-> > >  drivers/vfio/container.c | 680 +++++++++++++++++++++++++++++++++++++
-> > >  drivers/vfio/vfio.h      |  56 ++++
-> > >  drivers/vfio/vfio_main.c | 708 ++-------------------------------------
-> > >  4 files changed, 765 insertions(+), 680 deletions(-)
-> > >  create mode 100644 drivers/vfio/container.c
-> > > 
-> > > 
-> > > base-commit: 245898eb9275ce31942cff95d0bdc7412ad3d589  
-> > 
-> > it's not the latest vfio/next:  
-> 
-> Ah, I did the rebase before I left for lpc..
-> 
-> There is a minor merge conflict with the stuff from the last week:
-> 
-> diff --cc drivers/vfio/Makefile
-> index d67c604d0407ef,d5ae6921eb4ece..00000000000000
-> --- a/drivers/vfio/Makefile
-> +++ b/drivers/vfio/Makefile
-> @@@ -1,11 -1,10 +1,12 @@@
->   # SPDX-License-Identifier: GPL-2.0
->   vfio_virqfd-y := virqfd.o
->   
->  -vfio-y += container.o
->  -vfio-y += vfio_main.o
->  -
->   obj-$(CONFIG_VFIO) += vfio.o
->  +
->  +vfio-y += vfio_main.o \
->  +        iova_bitmap.o \
-> ++        container.o
->  +
->   obj-$(CONFIG_VFIO_VIRQFD) += vfio_virqfd.o
->   obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
->   obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
-> 
-> Alex, let me know if you want me to respin it
-
-That's trivial, but you also have conflicts with Kevin's 'Tidy up
-vfio_device life cycle' series, which gets uglier than I'd like to
-fixup on commit.  Could one of you volunteer to rebase on the other?
-Thanks,
-
-Alex
-
+On x86 hardware, KVM is incapable of emulating a guest physical width
+that differs from the host physical width. There isn't support in the
+hardware for it.
