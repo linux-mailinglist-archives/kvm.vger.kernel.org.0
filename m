@@ -2,181 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCCA05E6B8B
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 21:11:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CE9675E6BA1
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 21:20:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232525AbiIVTLB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 15:11:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55730 "EHLO
+        id S232437AbiIVTUh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 15:20:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232524AbiIVTK6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 15:10:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34AE5EB114
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 12:10:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663873854;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cnhWouSde45ALHbYWXdy8WS/vwDNaUoNBSEjHAFskkU=;
-        b=WHyqXmbHL6boLMgIvrfDjZs6lCkPxpaLBjEsPgn2RIcGu+oYQuvgqOYi80PEsKDci2w/i8
-        V/EAVUq8Ta/kDTHzMrCvBIn2/uJxgj7EHlmBbxCWFA6zWGKs89tU9qbf+KZQWAL4SyXW6V
-        Nj1dMG2nN1btRe/9qsNLoo24rhWQwuM=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-586-ajLP06e1Py-MIb6xERa1QA-1; Thu, 22 Sep 2022 15:10:53 -0400
-X-MC-Unique: ajLP06e1Py-MIb6xERa1QA-1
-Received: by mail-io1-f70.google.com with SMTP id y187-20020a6bc8c4000000b006a4014e192fso1218717iof.21
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 12:10:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=cnhWouSde45ALHbYWXdy8WS/vwDNaUoNBSEjHAFskkU=;
-        b=Xade1XZ5rkymbC++nlfKlMJEJyUJ18y5+tLhSKBN+NZzF5c3Zm3xxSbPnejKZOINjJ
-         8hufnbv3ZUikM5qPf+O7eBMc9VBSVOytOINKKPUQfCpLjr5GCfpDG3TtCgJKXnJ+uVbR
-         JjMUaX6wJbxR0X7P/JIAlRU1j1jQpilt5zb71U+Qefl0QRiDiwawxLoMHNtrsEbS4Hr3
-         2YcoAdAVCJZ6HRMu/gHV2QTw3ZBNnzHK2PswerHotkljAvGj461p/Ml26SfkxuqIYxmy
-         Y/5QKLTzLn4xpGuWMATg8uoLa1KWxJnzmJvmXhno/LoLmT8ilUwv+wWRdm0LwhNUtRa1
-         6ZQA==
-X-Gm-Message-State: ACrzQf1bwSWc9g0FdMbbs23gbOoYRppYF0bSh+BiKFJuhJ+3IZ/4veRw
-        2h3rnVMRSOXYiXHdbGYzrr2H6LbJvVe/BODiMcrXypjGdDNzBE4LWwNZpG0ijcnJM4jnjFdCraB
-        /9ti0rY6vXMst
-X-Received: by 2002:a05:6638:1385:b0:35a:723c:2fb3 with SMTP id w5-20020a056638138500b0035a723c2fb3mr2605030jad.222.1663873852784;
-        Thu, 22 Sep 2022 12:10:52 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7OOqQI1ZbCpUd9PIr2GP68ipI3WaHRHanmNIUyWftUVzE+2xlt4tzAiqmWoKUi9DkClCwqog==
-X-Received: by 2002:a05:6638:1385:b0:35a:723c:2fb3 with SMTP id w5-20020a056638138500b0035a723c2fb3mr2605021jad.222.1663873852560;
-        Thu, 22 Sep 2022 12:10:52 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id f12-20020a02a10c000000b0035b0eeeab89sm2402985jag.10.2022.09.22.12.10.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Sep 2022 12:10:52 -0700 (PDT)
-Date:   Thu, 22 Sep 2022 13:10:50 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        Will Deacon <will@kernel.org>, Qian Cai <cai@lca.pw>,
-        Joerg Roedel <jroedel@suse.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH 2/4] vfio: Move the sanity check of the group to
- vfio_create_group()
-Message-ID: <20220922131050.7136481f.alex.williamson@redhat.com>
-In-Reply-To: <2-v1-ef00ffecea52+2cb-iommu_group_lifetime_jgg@nvidia.com>
-References: <0-v1-ef00ffecea52+2cb-iommu_group_lifetime_jgg@nvidia.com>
-        <2-v1-ef00ffecea52+2cb-iommu_group_lifetime_jgg@nvidia.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S232257AbiIVTUb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 15:20:31 -0400
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2055.outbound.protection.outlook.com [40.107.95.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59751AA3D0
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 12:20:29 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XgxOGseLCy7GU1uHah6MRXEJODOJ0mNxdtbGDntMWhoCwXSMYmaLhL5pFHmTlzUotK4e/5XtK+/JVBNfckmUaxPTNYtqKJfzrxSLQ6CO+9WXb0DiZlKi5T0UkPfD3+52DNeJRxVgyldnKlCMq8X9+h61EPQJkFZevxxijftKdzAV0m2hGm9Svn+VZhvdUkNaa+HSD7SBAR2IX1niaEip/125WlU9EwkrP45DzV7I9C8eFMf/la56OCWhWOVWrvPSAP+zZo3ijqHNdhmAWfaYAw86TmZhKkSF7W2tjAL44F9UBJ39jFE2s/zn6dIyMW/TtEfiJAmilKwrDGfKsymkBg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yRhwNDFNXxVNw50WlXdWwzXcqRREoYBpjSZIiSEwZZY=;
+ b=AO54LdzaW7nX5mfXSvpVWMyogddVOn2zQwdvsw+3tfwFK/XP9a5MrCWtgzmGnQnNNcwy7tfePjKEV65L0qljCtdwJKgbriN3bX10tT/y1A7efk5B8Ifc8t2V0xS/HKLpvSh52Zf70DIeWCLkUIaUiw1x7FeP8wVYc2U7DXBccciEAuAkKXwdfNyOZbIj1qad3OiItexSnHHxigtH4VDAlQUGigu9rHAViTPUwT9v/FT3s2tcfY2l5ErSWchtrQ+yxhvlofLiCF43shgC3pQU0UvB6TUfczl1ppLNnoY9oD6Kei7+D6O8EBHFLmAIIjX3APE49l2RLtwa6eDGz4j+Pw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yRhwNDFNXxVNw50WlXdWwzXcqRREoYBpjSZIiSEwZZY=;
+ b=tcy3aDjELUoVL5x5Kn5+F2F4932+7mJOIPoknUrs0AMpFjkfzbQ1Mjb+Jg8246OgAW2OimpNS744oS7M7u+P5FsT4vc6DuH/ClbVsgdiqw8ofUAQEvPuDkARAg1DOprS58o1tHJKp+k9/Tur+bzyV6Q6O3FtkbgE7neRbcflBhb0P2Huxhrb/k3RhGIuvvV7O24T8U0Og7pl6BRcGEQD2OSNItBGwX6vc/UP5l8XntmL0CD3quH5MFAm/88W3/5cFPgvsjGLdaUXUaYBXIsAftrUEQx8tlc7Ch6QAMZRXDoDxnBoVpziw+i+4s/bsvYxC+AYAv0KSqcmdmFcjxfLPQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by SJ0PR12MB5456.namprd12.prod.outlook.com (2603:10b6:a03:3ae::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5654.19; Thu, 22 Sep
+ 2022 19:20:27 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5%7]) with mapi id 15.20.5654.019; Thu, 22 Sep 2022
+ 19:20:27 +0000
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+Cc:     Kevin Tian <kevin.tian@intel.com>
+Subject: [PATCH v3 0/8] vfio: Split the container code into a clean layer and dedicated file
+Date:   Thu, 22 Sep 2022 16:20:18 -0300
+Message-Id: <0-v3-297af71838d2+b9-vfio_container_split_jgg@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BLAPR03CA0104.namprd03.prod.outlook.com
+ (2603:10b6:208:32a::19) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4192:EE_|SJ0PR12MB5456:EE_
+X-MS-Office365-Filtering-Correlation-Id: 14207f34-9d15-467f-63ca-08da9ccf8156
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 1Qymg/xAIwy9td4Ujsu45EXR/6PdnTiTux8tOZpLjxjCebyUboiAhMJUaUJRiipsPH+EJ7FOAGjNiHrDh6z848gjF3oiSG/GV4F12dXJ5BpeZ0zjITXOT9wm33F3vBIT5lCiDtOV6Ht2gLBBzjPmoNPe5EBvv48ZJWNkkLYrXzuKyP/aDKuqtVdjmGS/zusZxlt6N9D8Iw7VLbakdcoMRNzPCX26GBkipPGEaGmjfeO+2pxPpgG32hc+2ldH3Ok3DGCK0oE7PhIt0K8TTnu7JGQK7ODR4dORYpcEmWLsq0PAL0kMKQW1An5MQRIz8dDSfkpu12CR9mxONTLYZx/nkrLtTeVTghEdZNvz3KwsjdVC1bVLyEqFKzNpl3rM8UKS0rUVKJjHTuvE30aOY7IbpIXoHOm9hazXp2aIr4eVEpALEvpcd8VRqfU4/EUr5RK37Lj23IFqhalu5EfU6wrcvI706eJ1GbSR2EHyYomlDEEdkZmfk39k4N+7TCQ9JjrD2ducBloDqbhNXNTlgJcDFVmZj+ZiqVCldV1BELFantINhC0iR4eq1I0GhxitpinyYUTK5nGvNtEC/gzDH/5ayJtd30mYTUYyTkI06BXshE2u0FGfKxURp/TezguXqkZULnvZqPdRP25MxCkV11UClUlWgHFICbf/tBmR7k7lbAwNGRdqwN+67JUOoW00vOxbhR710Ly2N5iIN1eYjqMb6bpkH9uRH9uLCQiG1EKTOsbqFxBvld3OBOLFm98jL9DLGfjF9ThaPUT5a9cxbUeE3UwV6Tz55I6g8aQD1Y4xx5/HtUYvnoQOZIGdhC8aMspl1sBjl/tra6ledDQMkxorfErGUYb9V7lMbKWtzyaqYvzLsRChcOLvPmyMsjIRJBTL
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(346002)(396003)(39860400002)(136003)(366004)(451199015)(6506007)(6666004)(26005)(6512007)(86362001)(4326008)(8676002)(66476007)(66556008)(38100700002)(110136005)(66946007)(41300700001)(36756003)(83380400001)(2616005)(966005)(6486002)(478600001)(2906002)(316002)(5660300002)(186003)(8936002)(4216001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?w0HZhUCulxOjZvc958KKtngeTaKO1rpwI9tQqFvAVfVDT1f9ulKK8Pkysu2B?=
+ =?us-ascii?Q?fnT0HBj4wdJG5z4y78zRIgtTxbQRgDbNda+UAylAClDvgdeXGo3xinr/+SLH?=
+ =?us-ascii?Q?EnvY+vy51niOUWTyuDWrkWsoHds1EvPcExTqoTHXuLxPH7UUxK+nOoySJeyd?=
+ =?us-ascii?Q?h+GUvYF6ajje3KG237e3baYWPUOZJL3fwiEKlzsx3syJPAopP7YRKpr3brJT?=
+ =?us-ascii?Q?FiuhCWM0ApRNYXr4JHDCsgThtsauwqPW5gQlT85sPhGvecm4M+nwpUAX3Pdc?=
+ =?us-ascii?Q?ondm/+KTWOCESzZ4XO9HyDr+cd94R/pSx7UgbIDLgIkDpTzVxW8OtrdJ7SLV?=
+ =?us-ascii?Q?xpzk4pzASf1g6mxhLmPZjET4+/2LqE8DmsZxEHHYmXFMKGqj46uKKg+LkX2h?=
+ =?us-ascii?Q?bunglvSEh9B8j5MRkN2gD5bVnO8wDtfsl1zgfyLDvYBLzUBkcVTAmUqfSgW/?=
+ =?us-ascii?Q?7l6PjrrN2Qe+pQy3CrH1k1MHoO43g4KR6NjDoRP0i4sQvnxggs221dk2vTY1?=
+ =?us-ascii?Q?4pbzBXskZxFzC6KYP61QPIisUHKQ8xHgA0o4jmhBGRbTx6mCUgS+gF8eNFj1?=
+ =?us-ascii?Q?Imo++qARHiC5hc1Ipblqyf2p1qY0iKbn7FJS+0DokYv9qG9fe8IKe8tVQVgQ?=
+ =?us-ascii?Q?h4mxPgDw8rF4m/H372xFTMKfVDgOCAUPU2gg41b/VD53V9tv9WwlhVS0FVr3?=
+ =?us-ascii?Q?IRDbVSfER4MVDCPavWo+zKIOJ+YE9eWtdj6Rsx8TOxGszyDZUvE7XQCxmROF?=
+ =?us-ascii?Q?1eZ61dxsJ3hLg0Lv7Yn8YtMYi3IvIg+MJdEAND9mGv46Oav2KnIVvzNNsLlx?=
+ =?us-ascii?Q?Kllz+oVui6h8FRvJL6uVKTeinbdwqTc6LtTDzw6QMUuvBoDfQZwg1ZjvEexv?=
+ =?us-ascii?Q?t63LoMbYeuHTuQRQad5vwemrhQyC0kUtFF1S0U82n/tNz0OkyHmV828hqLTk?=
+ =?us-ascii?Q?9NPxjvWXFuf1KQY5G5khe93YQb89H4xCyKh5VeYaC3D2GDATq2vqJsU+QVkf?=
+ =?us-ascii?Q?DWHrS28rc/gb1wZbPHNjCC2kMZsBkXdin/21uXFN4vd1L20kfCH4NEIkIMN2?=
+ =?us-ascii?Q?JLUQbtzR7cbhspByChsrDdAX/NVtLqEglXyFBV2tl6+hgZC5Z5lpfTGkEDcG?=
+ =?us-ascii?Q?RAGnNEXbHZdbLpDxEshMfAB0nH5Lfzl6xaT/tSnnO9NLBSYwod1q+Qgn3wlN?=
+ =?us-ascii?Q?LBeKcmGXOoMBawMZVo/GPJ9mKXJ5KKec/L+vWNxRXy1BZ9buVG1Lij55vjke?=
+ =?us-ascii?Q?sqKKSgIQsGVAtqY7b9FJr5EME/fIqpBY+CQ8j8RC6UMrbivyFjulPzTpwsTx?=
+ =?us-ascii?Q?1ksDcQvtVmdP9ZtXlV7+m/1JZjd1T17L82UJ9QpfcOv1bhMkiFyVeV6yhK0i?=
+ =?us-ascii?Q?ViGTn/5g+6LPgUVAfI79SRE7oxz0mnSmMLR8+geHd4sv5cb7ZfHbZZRsz8V3?=
+ =?us-ascii?Q?FbevXaWbCE2po84luvk8kaE7hAvLnMKpNbUhNgM5zcKGGX50B4obkN3DLFve?=
+ =?us-ascii?Q?xaMZWnGWCv6Jcosl8QVAtmpE3vNmYvmAIl3H+lWt48xsolbUJsBhU7/UDJAx?=
+ =?us-ascii?Q?YyvKvhDiRO9zsZG29ldAO9iRO9fAp9lhOCYftv9J?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 14207f34-9d15-467f-63ca-08da9ccf8156
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2022 19:20:26.9369
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XmB+PafWmARCVtJUBX8XxP6VpC6QVJwB+0Vbuw9ouGSRw+Pe7Faeaf0LrGTTRT34
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5456
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  8 Sep 2022 15:44:59 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+This creates an isolated layer around the container FD code and everything
+under it, including the VFIO iommu drivers. All this code is placed into
+container.c, along with the "struct vfio_container" to compartmentalize
+it.
 
-> __vfio_register_dev() has a bit of code to sanity check if an (existing)
-> group is not corrupted by having two copies of the same struct device in
-> it. This should be impossible.
-> 
-> It then has some complicated error unwind to uncreate the group.
-> 
-> Instead check if the existing group is sane at the same time we locate
-> it. If a bug is found then there is no error unwind, just simply fail
-> allocation.
-> 
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  drivers/vfio/vfio_main.c | 79 ++++++++++++++++++----------------------
->  1 file changed, 36 insertions(+), 43 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index 4ab13808b536e1..ba8b6bed12c7e7 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -306,15 +306,15 @@ static void vfio_container_put(struct vfio_container *container)
->   * Group objects - create, release, get, put, search
->   */
->  static struct vfio_group *
-> -__vfio_group_get_from_iommu(struct iommu_group *iommu_group)
-> +vfio_group_find_from_iommu(struct iommu_group *iommu_group)
->  {
->  	struct vfio_group *group;
->  
-> +	lockdep_assert_held(&vfio.group_lock);
-> +
->  	list_for_each_entry(group, &vfio.group_list, vfio_next) {
-> -		if (group->iommu_group == iommu_group) {
-> -			vfio_group_get(group);
-> +		if (group->iommu_group == iommu_group)
->  			return group;
-> -		}
->  	}
->  	return NULL;
->  }
-> @@ -365,11 +365,27 @@ static struct vfio_group *vfio_group_alloc(struct iommu_group *iommu_group,
->  	return group;
->  }
->  
-> +static bool vfio_group_has_device(struct vfio_group *group, struct device *dev)
-> +{
-> +	struct vfio_device *device;
-> +
-> +	mutex_lock(&group->device_lock);
-> +	list_for_each_entry(device, &group->device_list, group_next) {
-> +		if (device->dev == dev) {
-> +			mutex_unlock(&group->device_lock);
-> +			return true;
-> +		}
-> +	}
-> +	mutex_unlock(&group->device_lock);
-> +	return false;
-> +}
-> +
->  /*
->   * Return a struct vfio_group * for the given iommu_group. If no vfio_group
->   * already exists then create a new one.
->   */
-> -static struct vfio_group *vfio_get_group(struct iommu_group *iommu_group,
-> +static struct vfio_group *vfio_get_group(struct device *dev,
-> +					 struct iommu_group *iommu_group,
->  					 enum vfio_group_type type)
->  {
->  	struct vfio_group *group;
-> @@ -378,13 +394,20 @@ static struct vfio_group *vfio_get_group(struct iommu_group *iommu_group,
->  
->  	mutex_lock(&vfio.group_lock);
->  
-> -	ret = __vfio_group_get_from_iommu(iommu_group);
-> -	if (ret)
-> -		goto err_unlock;
-> +	ret = vfio_group_find_from_iommu(iommu_group);
-> +	if (ret) {
-> +		if (WARN_ON(vfio_group_has_device(ret, dev))) {
-> +			ret = ERR_PTR(-EINVAL);
-> +			goto out_unlock;
-> +		}
+Future patches will provide an iommufd based layer that gives the same API
+as the container layer and choose which layer to go to based on how
+userspace operates.
 
-This still looks racy.  We only know within vfio_group_has_device() that
-the device is not present in the group, what prevents a race between
-here and when we finally do add it to group->device_list?  We can't
-make any guarantees if we drop group->device_lock between test and add.
+The patches continue to split up existing functions and finally the last
+patch just moves every function that is a "container" function to the new
+file and creates the global symbols to link them together.
 
-The semantics of vfio_get_group() are also rather strange, 'return a
-vfio_group for this iommu_group, but make sure it doesn't include this
-device' :-\  Thanks,
+Cross-file container functions are prefixed with vfio_container_* for
+clarity.
 
-Alex
+The last patch can be defered and queued during the merge window to manage
+conflicts. The earlier patches should be fine immediately conflicts wise.
+
+This is the last big series I have to enable basic iommufd functionality.
+As part of the iommufd series the entire container.c becomes conditionally
+compiled:
+
+https://github.com/jgunthorpe/linux/commits/vfio_iommufd
+
+v3:
+ - Rebase over the vfio struct device series
+v2: https://lore.kernel.org/r/0-v2-d7744ee9cf4f+33d-vfio_container_split_jgg@nvidia.com
+ - Rename s/vfio_container_detatch_group/vfio_group_detach_container/
+          s/vfio_container_register_device/vfio_device_container_register/
+          s/vfio_container_unregister_device/vfio_device_container_unregister/
+ - Change argument order of vfio_container_attach_group()
+ - Rebased onto merged patches
+v1: https://lore.kernel.org/r/0-v1-a805b607f1fb+17b-vfio_container_split_jgg@nvidia.com
+
+Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+
+Jason Gunthorpe (8):
+  vfio: Add header guards and includes to drivers/vfio/vfio.h
+  vfio: Rename __vfio_group_unset_container()
+  vfio: Split the container logic into vfio_container_attach_group()
+  vfio: Remove #ifdefs around CONFIG_VFIO_NOIOMMU
+  vfio: Split out container code from the init/cleanup functions
+  vfio: Rename vfio_ioctl_check_extension()
+  vfio: Split the register_device ops call into functions
+  vfio: Move container code into drivers/vfio/container.c
+
+ drivers/vfio/Makefile    |   1 +
+ drivers/vfio/container.c | 680 +++++++++++++++++++++++++++++++++++++
+ drivers/vfio/vfio.h      |  56 ++++
+ drivers/vfio/vfio_main.c | 708 ++-------------------------------------
+ 4 files changed, 765 insertions(+), 680 deletions(-)
+ create mode 100644 drivers/vfio/container.c
+
+
+base-commit: 3c28a76124b25882411f005924be73795b6ef078
+-- 
+2.37.3
 
