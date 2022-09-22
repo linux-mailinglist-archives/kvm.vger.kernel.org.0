@@ -2,101 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52D765E6232
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 14:21:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BA805E6246
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 14:24:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230326AbiIVMVI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 08:21:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41000 "EHLO
+        id S231659AbiIVMYW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 08:24:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229766AbiIVMVG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 08:21:06 -0400
+        with ESMTP id S231616AbiIVMYL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 08:24:11 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 733BE15A2F
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 05:21:02 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D552E5130
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 05:24:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663849261;
+        s=mimecast20190719; t=1663849449;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=e7qSItG4GJ0pjWkOrqf7j7YUBeEY/5XkBwaXQ44W3Ko=;
-        b=UdJoPa72hZ7ZDtRi2y53HJo0rvONP82V7r6dH6lPmjf5DbwxSAwyHsQboV12W2xJXkHRMM
-        ePxd7nA9jy7VLzNZcAEBf1ubw88rY5OsqsKVy19tDQC9SM9FCAo/cz/W0Bk2Pa7I9cHumL
-        WDZI0sl5lyjwZRFw4MRk+W0sotok+f0=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-626-MbS4KflOOsWJYHqC3yy1BQ-1; Thu, 22 Sep 2022 08:21:00 -0400
-X-MC-Unique: MbS4KflOOsWJYHqC3yy1BQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D7D293C10237;
-        Thu, 22 Sep 2022 12:20:59 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.192.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7186253AA;
-        Thu, 22 Sep 2022 12:20:59 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id 353711800084; Thu, 22 Sep 2022 14:20:58 +0200 (CEST)
-Date:   Thu, 22 Sep 2022 14:20:58 +0200
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc:     qemu-devel@nongnu.org, Sergio Lopez <slp@redhat.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v4] x86: add etc/phys-bits fw_cfg file
-Message-ID: <20220922122058.vesh352623uaon6e@sirius.home.kraxel.org>
-References: <20220922101454.1069462-1-kraxel@redhat.com>
- <YyxF2TNwnXaefT6u@redhat.com>
+        bh=8e2m2BIJ4Jf3Uy1uaFM/1F4XDeTAJFxAGEpCMvvXt30=;
+        b=YkZ438xB/1wRJDzSkCSlCKzezK2jObLqYepnHjXfb9t88a5SO2/OqRunwBZFqZViB37n0A
+        ya3AtuT5UrA7Kur0oyy+niGI5FZU5Uv5+zNpU4ahc1C39iAgfqiyWgt+pew3nsSthTcRNT
+        uy/flfBIBOKW9ui4OPa8+2YdZuZBn04=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-78-Q_aazddhM2CoSodf94SybA-1; Thu, 22 Sep 2022 08:24:08 -0400
+X-MC-Unique: Q_aazddhM2CoSodf94SybA-1
+Received: by mail-ed1-f70.google.com with SMTP id m13-20020a056402510d00b004519332f0b1so6513193edd.7
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 05:24:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=8e2m2BIJ4Jf3Uy1uaFM/1F4XDeTAJFxAGEpCMvvXt30=;
+        b=wgmmPhAl7tn2QTJU+PEmNnhhFdTv8+IPpK6t+b3FvNT9i5V5iOM1ZOwZrhRIT9hhGj
+         y6LU5TMgn8HMeCMQEYb+PoGQs02fY43Gx0pCLfizDWzudwBqiQebtkTPBOtQYyAMIKlL
+         R9mZc2wAyZctMHtte4qh1VLIU67xW+mRcZJusEkQwFX0HQE//oR8m3w0g5cXg8qguXR1
+         xM7l5m8yncwv6Qili+TCY3xI4Tmuq4U1IA27iROm3fbVNLNeJcyCvkoffuNI5MahBn0U
+         OC2R+u6D8BzWF62gRg+kqtUa57Bu3HVM/ejpvWHEvR3B6IF+OGSEMCynSASwuziEwRxD
+         aelg==
+X-Gm-Message-State: ACrzQf0U9Nr6E6eyBdUuKlvcDI8zKhXSh0ZZm4zzENQDl+5qgRK5SwiG
+        Xk3GdyzBk0m2MxGPjxu3pFx4syS1LvrkBXyGR0NoFrQ4SsSsOWBt2WComOOaEQ+DkaC79UCQGEt
+        s2I6bJqqnNDEy
+X-Received: by 2002:a17:906:9c83:b0:779:c14c:55e4 with SMTP id fj3-20020a1709069c8300b00779c14c55e4mr2511292ejc.619.1663849446757;
+        Thu, 22 Sep 2022 05:24:06 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4tWYiTyufR0wbEleDRnc2xWoYUYa/ttq8hBl5FeRce4HU7msDjXoA/W9b+dN1gzhhiGgen6w==
+X-Received: by 2002:a17:906:9c83:b0:779:c14c:55e4 with SMTP id fj3-20020a1709069c8300b00779c14c55e4mr2511269ejc.619.1663849446511;
+        Thu, 22 Sep 2022 05:24:06 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
+        by smtp.googlemail.com with ESMTPSA id p16-20020a1709060e9000b007707ec25071sm2491540ejf.220.2022.09.22.05.24.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Sep 2022 05:24:05 -0700 (PDT)
+Message-ID: <2db45546-d504-d006-ce3c-65f832b5a70a@redhat.com>
+Date:   Thu, 22 Sep 2022 14:24:04 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YyxF2TNwnXaefT6u@redhat.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [PATCH] kvm/x86: reserve bit
+ KVM_HINTS_PHYS_ADDRESS_SIZE_DATA_VALID
+To:     Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Gerd Hoffmann <kraxel@redhat.com>, kvm@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>
+References: <20220908114146.473630-1-kraxel@redhat.com>
+ <YxoBtD+3sgEEiaFF@google.com>
+ <20220909050224.rzlt4x7tjrespw3k@sirius.home.kraxel.org>
+ <20220921134246.xibospqoktp4wjie@sirius.home.kraxel.org>
+ <Yysm8/Nkt6EUI5+k@google.com>
+ <CALMp9eRkXPPWbPfm16onV9+ondg0x7_RG5ku7hCpBAODLWpSgw@mail.gmail.com>
+Content-Language: en-US
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <CALMp9eRkXPPWbPfm16onV9+ondg0x7_RG5ku7hCpBAODLWpSgw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 22, 2022 at 12:24:09PM +0100, Daniel P. Berrangé wrote:
-> On Thu, Sep 22, 2022 at 12:14:54PM +0200, Gerd Hoffmann wrote:
-> > In case phys bits are functional and can be used by the guest (aka
-> > host-phys-bits=on) add a fw_cfg file carrying the value.  This can
-> > be used by the guest firmware for address space configuration.
-> > 
-> > The value in the etc/phys-bits fw_cfg file should be identical to
-> > the phys bits value published via cpuid leaf 0x80000008.
-> > 
-> > This is only enabled for 7.2+ machine types for live migration
-> > compatibility reasons.
-> 
-> Is this going to have any implications for what mgmt apps must
-> take into account when selecting valid migration target hosts ?
-> 
-> Historically, apps have tended to ignore any checks for phys
-> bits between src/dst migration hosts and hoped for the best.
-> 
-> Will this new behaviour introduce / change any failure scenarios
-> where the target host has fewer phys bits than the src host, that
-> mgmt apps need to be made aware of ?
+On 9/21/22 18:32, Jim Mattson wrote:
+>> The issue is that this "hint" effectively breaks other VMMs that already provide
+>> an accurate guest.MAXPHYADDR.
+>
+> Any VMM that doesn't provide an accurate guest.MAXPHYADDR is broken.
+> Why do we need a "hint" that the virtual processor works?
 
-No.  This will basically inform the guest that host-phys-bits has been
-enabled (and pass the number of bits).  So the firmware can make use of
-the available address space instead of trying to be as conservative as
-possible to avoid going beyond the (unknown) limit.
+I agree.  Since old (and current) versions of QEMU wouldn't get the bit 
+anyway, just fix the next one.  I'll follow up on the QEMU mailing list.
 
-The phys-bits config itself is not touched.
-
-take care,
-  Gerd
+Paolo
 
