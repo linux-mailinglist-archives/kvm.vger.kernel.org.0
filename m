@@ -2,220 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 034365E6B26
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 20:42:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8927B5E6B32
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 20:45:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232185AbiIVSml (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 14:42:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46576 "EHLO
+        id S231193AbiIVSp1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 14:45:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229777AbiIVSmj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 14:42:39 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F4D4DCE89;
-        Thu, 22 Sep 2022 11:42:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663872158; x=1695408158;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=JMwydWYZn7z86BpUMx/qytT3+s91mayLwEtnzlfgdiw=;
-  b=AxZOK+kdnJ8iAfRNhJ5voJgeW3qJnioWz0FIzqAMGZums03c3rxnjYoQ
-   XVGzhkMH7NF9FxEPbFqZE1i38F/gNQpVGQKBhsMj2TrTyuIPPnUCA4IhD
-   PmwkaDVc2ce8xmq8lOGVtmFeDrbEkFatiV5JiUPj5VcLzoWMeqcFGzhDo
-   Ptp2pN3Mt+Ld4qy1cuhV9Rq9CivefdplZqh7VbsMdC1E3FEKKXqd3NuxR
-   MrgtZhrVnVt1ou9vlozrF9Oh4HEiHLgS+TZdDbvq54cHRioC4gHDnRQt8
-   /29PgCR0qYzzLnT1QAnN7QrIwnWATH6uDTbvxSJdlZR6qA/NAxGVdmneX
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10478"; a="326720063"
-X-IronPort-AV: E=Sophos;i="5.93,337,1654585200"; 
-   d="scan'208";a="326720063"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2022 11:42:23 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,337,1654585200"; 
-   d="scan'208";a="615325567"
-Received: from linux.intel.com ([10.54.29.200])
-  by orsmga007.jf.intel.com with ESMTP; 22 Sep 2022 11:42:23 -0700
-Received: from [10.252.210.171] (kliang2-mobl1.ccr.corp.intel.com [10.252.210.171])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by linux.intel.com (Postfix) with ESMTPS id C26AA580AD7;
-        Thu, 22 Sep 2022 11:42:21 -0700 (PDT)
-Message-ID: <06962580-e052-e058-eb08-6732e633241e@linux.intel.com>
-Date:   Thu, 22 Sep 2022 14:42:20 -0400
+        with ESMTP id S229649AbiIVSpZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 14:45:25 -0400
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66AD9D01DA
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 11:45:24 -0700 (PDT)
+Received: by mail-il1-x133.google.com with SMTP id d14so4305808ilf.2
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 11:45:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linuxfoundation.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=Sckvs0FTvGyjC/ju9lFywFrSTF78gTiQEzpAFikyqII=;
+        b=grnT8CgZ1gQuEDOPJTlzBomCgI4eVGDOtVSRW4oxEgOy/f2NoelS/Ta7NvlEk6LbRX
+         gzhUDV71pkz1woX43jN0dWObCEw9lU8dWhiRfx15iMSrLhUu5GH4dwwtQCLgugTvX1z2
+         8AU9g2XA10kmW48eSrBKewQqFDDowhwFDMlFo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=Sckvs0FTvGyjC/ju9lFywFrSTF78gTiQEzpAFikyqII=;
+        b=XnRtGfDC/RyAH1mNMe5XtgiUNaGWRygJdzzGNdp16/2fGX5uCqyD5VEbCXoW4RHTKm
+         k1RxjI+rjHVp6qUKops+LJYpiNJ5leJp6OAj7pdZhmJ38Nt9lVTJxwXKkSRAm1FH+AHc
+         LKO7zShlBu936CsVe7XXiDUWvhk+Gei61KF5QJxm+xLLdETyuoNMYAEv+581muvnhZr+
+         ag0a2SODJtaNTsldvgtal8JHHMyKtFLq+ZdxP0U1Q0u65TPd/HaHeTbjOSV3w95Ss2y/
+         +L4FUW09e5A0szgXj2zoxW+nTvbVvsLHaLpG7dW3z1sHS8XR5Zl6v0MHFeul5kKjhXG5
+         8I8A==
+X-Gm-Message-State: ACrzQf3hvR0b1gd5xyhGPcMegWCBxgMZsAhqpfrZlGJ1luDWzcjIAfWE
+        dJa2kcbCmlCtOhH88N2Ykfu5UA==
+X-Google-Smtp-Source: AMsMyM4NsHBKiHG3MQq+rQeymQb3KkMESDFz+18LaQ6uVvnQyA4knTwpE59RihAuxGRr3IGvxsamFw==
+X-Received: by 2002:a05:6e02:b45:b0:2f5:9ee6:4ff4 with SMTP id f5-20020a056e020b4500b002f59ee64ff4mr2467698ilu.101.1663872323713;
+        Thu, 22 Sep 2022 11:45:23 -0700 (PDT)
+Received: from [192.168.1.128] ([38.15.45.1])
+        by smtp.gmail.com with ESMTPSA id c3-20020a0566022d0300b006849ee78e1bsm2619529iow.34.2022.09.22.11.45.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Sep 2022 11:45:23 -0700 (PDT)
+Message-ID: <b9044b55-1498-3309-4db5-70ca2c20b3f7@linuxfoundation.org>
+Date:   Thu, 22 Sep 2022 12:45:22 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH RFC 1/1] perf stat: do not fatal if the leader is errored
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH linux-next] KVM: selftests: remove redundant variable
+ tsc_val
 Content-Language: en-US
-To:     Dongli Zhang <dongli.zhang@oracle.com>,
-        Like Xu <like.xu.linux@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, peterz@infradead.org,
-        mingo@redhat.com, acme@kernel.org, mark.rutland@arm.com,
-        alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-        namhyung@kernel.org, joe.jin@oracle.com,
-        linux-perf-users@vger.kernel.org, kvm list <kvm@vger.kernel.org>
-References: <20220922071017.17398-1-dongli.zhang@oracle.com>
- <ad2572d0-06b5-7250-31f2-a5efa1048cc0@gmail.com>
- <27cb9747-8911-b3cc-25d9-9438521db832@linux.intel.com>
- <d03d8a07-a05a-f03e-189d-a07c6aecbb8a@oracle.com>
-From:   "Liang, Kan" <kan.liang@linux.intel.com>
-In-Reply-To: <d03d8a07-a05a-f03e-189d-a07c6aecbb8a@oracle.com>
-Content-Type: text/plain; charset=UTF-8
+To:     cgel.zte@gmail.com, pbonzini@redhat.com, shuah@kernel.org,
+        seanjc@google.com, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     dmatlack@google.com, jmattson@google.com, peterx@redhat.com,
+        oupton@google.com, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jinpeng Cui <cui.jinpeng2@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+References: <20220831143150.304406-1-cui.jinpeng2@zte.com.cn>
+From:   Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <20220831143150.304406-1-cui.jinpeng2@zte.com.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-8.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 8/31/22 08:31, cgel.zte@gmail.com wrote:
+> From: Jinpeng Cui <cui.jinpeng2@zte.com.cn>
+> 
+> Return value directly from expression instead of
+> getting value from redundant variable tsc_val.
+> 
+> Reported-by: Zeal Robot <zealci@zte.com.cn>
+> Signed-off-by: Jinpeng Cui <cui.jinpeng2@zte.com.cn>
+> ---
+>   tools/testing/selftests/kvm/include/x86_64/processor.h | 5 ++---
+>   1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> index 0cbc71b7af50..75920678f34d 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> @@ -237,7 +237,6 @@ static inline uint64_t get_desc64_base(const struct desc64 *desc)
+>   static inline uint64_t rdtsc(void)
+>   {
+>   	uint32_t eax, edx;
+> -	uint64_t tsc_val;
+>   	/*
+>   	 * The lfence is to wait (on Intel CPUs) until all previous
+>   	 * instructions have been executed. If software requires RDTSC to be
+> @@ -245,8 +244,8 @@ static inline uint64_t rdtsc(void)
+>   	 * execute LFENCE immediately after RDTSC
+>   	 */
+>   	__asm__ __volatile__("lfence; rdtsc; lfence" : "=a"(eax), "=d"(edx));
+> -	tsc_val = ((uint64_t)edx) << 32 | eax;
+> -	return tsc_val;
+> +
+> +	return ((uint64_t)edx) << 32 | eax;
+>   }
+>   
+>   static inline uint64_t rdtscp(uint32_t *aux)
 
+My understanding is that this patch isn't coming from individuals that work
+for ZTE. We won't be able to accept these patches. Refer to the following
+for reasons why we can't accept these patches.
 
-On 2022-09-22 2:00 p.m., Dongli Zhang wrote:
-> Hi Kan,
-> 
-> I have tested that the patch works by hiding 'slots' sysfs entries.
-> 
-> # ll /sys/bus/event_source/devices/cpu/events/
-> total 0
-> -r--r--r--. 1 root root 4096 Sep 22 17:57 branch-instructions
-> -r--r--r--. 1 root root 4096 Sep 22 17:57 branch-misses
-> -r--r--r--. 1 root root 4096 Sep 22 17:57 bus-cycles
-> -r--r--r--. 1 root root 4096 Sep 22 17:57 cache-misses
-> -r--r--r--. 1 root root 4096 Sep 22 17:57 cache-references
-> -r--r--r--. 1 root root 4096 Sep 22 17:57 cpu-cycles
-> -r--r--r--. 1 root root 4096 Sep 22 17:57 instructions
-> -r--r--r--. 1 root root 4096 Sep 22 17:57 ref-cycles
-> 
-> # perf stat
-> ^C
->  Performance counter stats for 'system wide':
-> 
->          19,256.20 msec cpu-clock                        #   16.025 CPUs
-> utilized
->                179      context-switches                 #    9.296 /sec
-> 
->                 17      cpu-migrations                   #    0.883 /sec
-> 
->                  3      page-faults                      #    0.156 /sec
-> 
->          7,502,294      cycles                           #    0.000 GHz
-> 
->          2,512,587      instructions                     #    0.33  insn per
-> cycle
->            552,989      branches                         #   28.717 K/sec
-> 
->             15,999      branch-misses                    #    2.89% of all
-> branches
-> 
->        1.201628129 seconds time elapsed
-> 
-> 
-> Would you send this patch to fix at the kernel side?
+https://patchwork.kernel.org/project/linux-kselftest/patch/20220920063202.215088-1-ye.xingchen@zte.com.cn/
 
-Yes, I will send it out shortly.
-
-
-Thanks,
-Kan
-> 
-> Thank you very much!
-> 
-> Dongli Zhang
-> 
-> On 9/22/22 6:34 AM, Liang, Kan wrote:
->>
->>
->> On 2022-09-22 4:07 a.m., Like Xu wrote:
->>> On 22/9/2022 3:10 pm, Dongli Zhang wrote:
->>>> There are three options to fix the issue.
->>>>
->>>> 1. Do not expose /sys/bus/event_source/devices/cpu/events/slots to
->>>> userspace so that pmu_have_event(pmu->name, "slots") returns false.
->>>
->>> IMO, the guest PMU driver should be fixed
->>> since it misrepresents emulated hardware capabilities in terms of slots.
->>
->> Yes, we need to fix the kernel to hide the slots event if it's not
->> available.
->>
->> The patch as below should fix it. (Not tested yet)
->>
->> diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
->> index b20e646c8205..27ee43faba32 100644
->> --- a/arch/x86/events/intel/core.c
->> +++ b/arch/x86/events/intel/core.c
->> @@ -5565,6 +5565,19 @@ static struct attribute *intel_pmu_attrs[] = {
->>  	NULL,
->>  };
->>
->> +static umode_t
->> +td_is_visible(struct kobject *kobj, struct attribute *attr, int i)
->> +{
->> +	/*
->> +	 * Hide the perf metrics topdown events
->> +	 * if the slots is not in CPUID.
->> +	 */
->> +	if (x86_pmu.num_topdown_events)
->> +		return (x86_pmu.intel_ctrl & INTEL_PMC_MSK_FIXED_SLOTS) ? attr->mode : 0;
->> +
->> +	return attr->mode;
->> +}
->> +
->>  static umode_t
->>  tsx_is_visible(struct kobject *kobj, struct attribute *attr, int i)
->>  {
->> @@ -5600,6 +5613,7 @@ default_is_visible(struct kobject *kobj, struct
->> attribute *attr, int i)
->>
->>  static struct attribute_group group_events_td  = {
->>  	.name = "events",
->> +	.is_visible = td_is_visible,
->>  };
->>
->>  static struct attribute_group group_events_mem = {
->> @@ -5758,6 +5772,23 @@ static inline int
->> hybrid_find_supported_cpu(struct x86_hybrid_pmu *pmu)
->>  	return (cpu >= nr_cpu_ids) ? -1 : cpu;
->>  }
->>
->> +static umode_t hybrid_td_is_visible(struct kobject *kobj,
->> +					struct attribute *attr, int i)
->> +{
->> +	struct device *dev = kobj_to_dev(kobj);
->> +	struct x86_hybrid_pmu *pmu =
->> +		 container_of(dev_get_drvdata(dev), struct x86_hybrid_pmu, pmu);
->> +
->> +	if (!is_attr_for_this_pmu(kobj, attr))
->> +		return 0;
->> +
->> +	/* Only check the big core which supports perf metrics */
->> +	if (pmu->cpu_type == hybrid_big)
->> +		return (pmu->intel_ctrl & INTEL_PMC_MSK_FIXED_SLOTS) ? attr->mode : 0;
->> +
->> +	return attr->mode;
->> +}
->> +
->>  static umode_t hybrid_tsx_is_visible(struct kobject *kobj,
->>  				     struct attribute *attr, int i)
->>  {
->> @@ -5784,7 +5815,7 @@ static umode_t hybrid_format_is_visible(struct
->> kobject *kobj,
->>
->>  static struct attribute_group hybrid_group_events_td  = {
->>  	.name		= "events",
->> -	.is_visible	= hybrid_events_is_visible,
->> +	.is_visible	= hybrid_td_is_visible,
->>  };
->>
->>  static struct attribute_group hybrid_group_events_mem = {
->>
->>
->> Thanks,
->> Kan
->>
+thanks,
+-- Shuah
