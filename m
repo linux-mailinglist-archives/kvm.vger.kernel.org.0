@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 809015E599B
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 05:22:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A37005E599A
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 05:22:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229939AbiIVDW4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 23:22:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59616 "EHLO
+        id S230001AbiIVDWv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 23:22:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229895AbiIVDVp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229939AbiIVDVp (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 21 Sep 2022 23:21:45 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6B819322B
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 20:19:13 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id w14-20020a170902e88e00b00177ab7a12f6so5020702plg.16
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 20:19:13 -0700 (PDT)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 634C1956A4
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 20:19:15 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-349cf83cfc7so67019817b3.5
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 20:19:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date;
-        bh=liu7uI/e22f8WJg4KuLaGgmLgmCrsiW3uXCrNS+fFnk=;
-        b=fXssmAtSBDIn2rfBB4d/5FIiwDq1eTLpavdwubE5eQewmc+0bmawRazFueWyjdXY9L
-         tgo6q+2bcERUsk+6eO2GqsdjNhr0J+UT/O0zziO4rIbsWrs0P/lS4CpvktH6YJlTePeX
-         tE5Hwl1Fw3FlEoAmFgJSBb6TBTf5rk0qmq+5NNmaK5WdAQMqxKHXi8AxxzbPpWKd449g
-         qKFLrNlh2JUSjPxAmeq0W6FuNVl5by2W+2bwpa0Lphnfwo4XHioXyDT9ZG9+hBfdHDTa
-         /f3Y+aX2x6lAF/2pKlw8CfxxZBcnimOl6uHxsnRVKfDAsSbjUNDK0ItP3cjM6k846p5p
-         QhCg==
+        bh=s8UJ0TzBgk2M9zLNKjBj7Oe73ShvrMn+G4F7HHpUgCk=;
+        b=D49JZxu98Ur5TpUrpW1HYWuvmvE1uLh4uN1Un02zx9sY0DZEpEt0XQ1uUxUu9yjkjL
+         da3k0SsW3Ay0FWitxap+WHwUCd6aTOl2umR/A2RReeT9TgPKbHHI3b/ZFnlK3k+lZQMl
+         lJbIR8y4+LVIX21YroxUsTusOiIGQSTr90rmaq8zkxkWL1RTxRRTjn3t5twmRJACTi1r
+         N62rJjXPOwZwxuNDiQ0dK9mBizasa7rSMGW3wxkrC0G6wXFgpcyHPnAGISQemzgHVyDF
+         +R8g1TVQV/snHPnfAeQ27SSm4JVuc/E8vb4CAyMZUfZAEWKIc1s6ztMWRmm7HgmDFU0w
+         PbKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date;
-        bh=liu7uI/e22f8WJg4KuLaGgmLgmCrsiW3uXCrNS+fFnk=;
-        b=qFzmYIwN7c1eD++b4elToLn0y7mWTBGDQ5DjG8dyi55g/XQjKDYP/BwvsFVpkvzzAa
-         J2bRzv0N0zGX5CxpPmPkaEmCx5OIqhBDM0bEFjjSJ5Hbi/WByCxiVmxz3EeqDcnnAvjX
-         XeYCnXtHJnbCjAQf8Vz3w2LDDkxXriJaA36t4smqzGzWckiLKAHlG5mn3CHt862rMnia
-         M4rrV2s9humUFLToSe4i/hwdmKVvSwMdMTy1z5+hMxCnAvBwy6x0XkOZtY4pSoZfhSu0
-         XhjzXsvdhQOa/ZBDpzU4TVmOFFfS7g1Vgy6CyUg0aw7ZBIHjyjIm9n4zbDMGcbf4duEx
-         3p0w==
-X-Gm-Message-State: ACrzQf2gzMlDeg0Qy5WYLoKmDvE9hYE8KCuyu3q1fWg7yjtXshJenx3f
-        tuEY3VBeA9PAppZa5W7aGlTJs/RDO1Y+Lne7NYQWnsPRgMpoSnUqPT7FaOqzbNVtc84TQLwjRVq
-        IPO5kztI/d328j6Toc//iYiziIYjObTFiiEUL/zrliqGZ62s6TvfHYzSQ2RB5LUg=
-X-Google-Smtp-Source: AMsMyM78mwru01meZ94QbbtZNQpK6DQ0wTBBe66B9NESWpPDZnszYvOvdyZwVK3YgDjfIB4ig/xQZzBy0wY4iw==
+        bh=s8UJ0TzBgk2M9zLNKjBj7Oe73ShvrMn+G4F7HHpUgCk=;
+        b=dFQhilLYrALAi7z+qhU872cdLqJTgDrRdR98Xppj8DXqX/fxDqmUDqULl+MObL5vzx
+         w8eMlwhBfphZI1/ng3mUJMbVRtqDdPeDNqii4AiwAtozYBLpYZBXXjNEK0uGMh/pWdV6
+         PaVQMjNUtfvfiTLX7ktNsW5SqWtSuiimNCdeoJaD+5VL3utY4aZdHItKEPmo6xlyYczQ
+         jA+yyIpsSgZg0WgQLbEmyOh1JnFO3ybM6ttYNN3JDNZd+UglA8C9cQs4UXZeN11IzHpR
+         qRzT76teyV2U0ALBcWzB1PQnDOg0xRSb/yORq6dAPP2o63VQfLnuPfF2Sf6XQ5p69qNG
+         zpqQ==
+X-Gm-Message-State: ACrzQf0okOz85AboSNyPj32Lfhe5PZi+7K8PQAp5RlzMtb8btBTc4sce
+        Yw5OjW/6bQ24me2t9/urinR4bbl6bXk8pjIa142ImLN+Adbf33yMdS6iyugEFoskebQF9J2g1FD
+        cRAalxjO/WklntVXLIOf3Z7/Q+ySh8c+edWPeGBwikEZ9/zgMqHPdCDEk2RXJur4=
+X-Google-Smtp-Source: AMsMyM5hdVLIdLMmJNJ2SphxYgCbLp0R1KltoYVltrnK5j+Uul81FCZdfEsUFpY2zRzmnXWrqJTE4/qxG8bWTA==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a17:902:c944:b0:178:4568:9f99 with SMTP
- id i4-20020a170902c94400b0017845689f99mr1265948pla.98.1663816753218; Wed, 21
- Sep 2022 20:19:13 -0700 (PDT)
-Date:   Thu, 22 Sep 2022 03:18:51 +0000
+ (user=ricarkol job=sendgmr) by 2002:a25:aad0:0:b0:6a8:adba:51f0 with SMTP id
+ t74-20020a25aad0000000b006a8adba51f0mr1494589ybi.639.1663816754644; Wed, 21
+ Sep 2022 20:19:14 -0700 (PDT)
+Date:   Thu, 22 Sep 2022 03:18:52 +0000
 In-Reply-To: <20220922031857.2588688-1-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20220922031857.2588688-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
-Message-ID: <20220922031857.2588688-9-ricarkol@google.com>
-Subject: [PATCH v8 08/14] KVM: selftests: Fix alignment in virt_arch_pgd_alloc()
- and vm_vaddr_alloc()
+Message-ID: <20220922031857.2588688-10-ricarkol@google.com>
+Subject: [PATCH v8 09/14] KVM: selftests: Use the right memslot for code,
+ page-tables, and data allocations
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         andrew.jones@linux.dev
@@ -73,116 +73,290 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Refactor virt_arch_pgd_alloc() and vm_vaddr_alloc() in both RISC-V and
-aarch64 to fix the alignment of parameters in a couple of calls. This will
-make it easier to fix the alignment in a future commit that adds an extra
-parameter (that happens to be very long).
+Now that kvm_vm allows specifying different memslots for code, page tables,
+and data, use the appropriate memslot when making allocations in
+common/libraty code. Change them accordingly:
 
-No functional change intended.
+- code (allocated by lib/elf) use the CODE memslot
+- stacks, exception tables, and other core data pages (like the TSS in x86)
+  use the DATA memslot
+- page tables and the PGD use the PT memslot
+- test data (anything allocated with vm_vaddr_alloc()) uses the TEST_DATA
+  memslot
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
+No functional change intended. All allocators keep using memslot #0.
+
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Andrew Jones <andrew.jones@linux.dev>
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- .../selftests/kvm/lib/aarch64/processor.c     | 27 ++++++++++---------
- .../selftests/kvm/lib/riscv/processor.c       | 27 ++++++++++---------
- 2 files changed, 30 insertions(+), 24 deletions(-)
+ .../selftests/kvm/include/kvm_util_base.h     |  4 ++
+ .../selftests/kvm/lib/aarch64/processor.c     | 12 ++--
+ tools/testing/selftests/kvm/lib/elf.c         |  3 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 57 ++++++++++++-------
+ .../selftests/kvm/lib/riscv/processor.c       |  8 ++-
+ .../selftests/kvm/lib/s390x/processor.c       |  8 ++-
+ .../selftests/kvm/lib/x86_64/processor.c      | 13 +++--
+ 7 files changed, 65 insertions(+), 40 deletions(-)
 
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index 5c0044ceae13..f47d12cd6d8c 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -403,7 +403,11 @@ void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
+ void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
+ struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id);
+ vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
++vm_vaddr_t __vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
++			    enum kvm_mem_region_type type);
+ vm_vaddr_t vm_vaddr_alloc_pages(struct kvm_vm *vm, int nr_pages);
++vm_vaddr_t __vm_vaddr_alloc_page(struct kvm_vm *vm,
++				 enum kvm_mem_region_type type);
+ vm_vaddr_t vm_vaddr_alloc_page(struct kvm_vm *vm);
+ 
+ void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
 diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index 26f0eccff6fe..6ff2b9d6cea6 100644
+index 6ff2b9d6cea6..2883dfd1ad49 100644
 --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
 +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -76,13 +76,14 @@ static uint64_t __maybe_unused ptrs_per_pte(struct kvm_vm *vm)
+@@ -82,7 +82,8 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
+ 		return;
  
- void virt_arch_pgd_alloc(struct kvm_vm *vm)
- {
--	if (!vm->pgd_created) {
--		vm_paddr_t paddr = vm_phy_pages_alloc(vm,
--			page_align(vm, ptrs_per_pgd(vm) * 8) / vm->page_size,
--			KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
--		vm->pgd = paddr;
--		vm->pgd_created = true;
--	}
-+	size_t nr_pages = page_align(vm, ptrs_per_pgd(vm) * 8) / vm->page_size;
-+
-+	if (vm->pgd_created)
-+		return;
-+
-+	vm->pgd = vm_phy_pages_alloc(vm, nr_pages,
-+				     KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
-+	vm->pgd_created = true;
+ 	vm->pgd = vm_phy_pages_alloc(vm, nr_pages,
+-				     KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
++				     KVM_GUEST_PAGE_TABLE_MIN_PADDR,
++				     vm->memslots[MEM_REGION_PT]);
+ 	vm->pgd_created = true;
  }
  
- static void _virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
-@@ -325,13 +326,15 @@ void vcpu_arch_dump(FILE *stream, struct kvm_vcpu *vcpu, uint8_t indent)
- struct kvm_vcpu *aarch64_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
- 				  struct kvm_vcpu_init *init, void *guest_code)
- {
--	size_t stack_size = vm->page_size == 4096 ?
--					DEFAULT_STACK_PGS * vm->page_size :
--					vm->page_size;
--	uint64_t stack_vaddr = vm_vaddr_alloc(vm, stack_size,
--					      DEFAULT_ARM64_GUEST_STACK_VADDR_MIN);
-+	size_t stack_size;
-+	uint64_t stack_vaddr;
- 	struct kvm_vcpu *vcpu = __vm_vcpu_add(vm, vcpu_id);
+@@ -332,8 +333,9 @@ struct kvm_vcpu *aarch64_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
  
-+	stack_size = vm->page_size == 4096 ? DEFAULT_STACK_PGS * vm->page_size :
-+					     vm->page_size;
-+	stack_vaddr = vm_vaddr_alloc(vm, stack_size,
-+				     DEFAULT_ARM64_GUEST_STACK_VADDR_MIN);
-+
+ 	stack_size = vm->page_size == 4096 ? DEFAULT_STACK_PGS * vm->page_size :
+ 					     vm->page_size;
+-	stack_vaddr = vm_vaddr_alloc(vm, stack_size,
+-				     DEFAULT_ARM64_GUEST_STACK_VADDR_MIN);
++	stack_vaddr = __vm_vaddr_alloc(vm, stack_size,
++				       DEFAULT_ARM64_GUEST_STACK_VADDR_MIN,
++				       MEM_REGION_DATA);
+ 
  	aarch64_vcpu_setup(vcpu, init);
  
- 	vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), stack_vaddr + stack_size);
-diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
-index 604478151212..ac7fc9d317db 100644
---- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-+++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-@@ -55,13 +55,14 @@ static uint64_t pte_index(struct kvm_vm *vm, vm_vaddr_t gva, int level)
+@@ -438,8 +440,8 @@ void route_exception(struct ex_regs *regs, int vector)
  
- void virt_arch_pgd_alloc(struct kvm_vm *vm)
+ void vm_init_descriptor_tables(struct kvm_vm *vm)
  {
--	if (!vm->pgd_created) {
--		vm_paddr_t paddr = vm_phy_pages_alloc(vm,
--			page_align(vm, ptrs_per_pte(vm) * 8) / vm->page_size,
--			KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
--		vm->pgd = paddr;
--		vm->pgd_created = true;
--	}
-+	size_t nr_pages = page_align(vm, ptrs_per_pte(vm) * 8) / vm->page_size;
-+
-+	if (vm->pgd_created)
-+		return;
-+
-+	vm->pgd = vm_phy_pages_alloc(vm, nr_pages,
-+				     KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
-+	vm->pgd_created = true;
+-	vm->handlers = vm_vaddr_alloc(vm, sizeof(struct handlers),
+-			vm->page_size);
++	vm->handlers = __vm_vaddr_alloc(vm, sizeof(struct handlers),
++					vm->page_size, MEM_REGION_DATA);
+ 
+ 	*(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)) = vm->handlers;
+ }
+diff --git a/tools/testing/selftests/kvm/lib/elf.c b/tools/testing/selftests/kvm/lib/elf.c
+index 9f54c098d9d0..51f280c412ba 100644
+--- a/tools/testing/selftests/kvm/lib/elf.c
++++ b/tools/testing/selftests/kvm/lib/elf.c
+@@ -161,7 +161,8 @@ void kvm_vm_elf_load(struct kvm_vm *vm, const char *filename)
+ 		seg_vend |= vm->page_size - 1;
+ 		size_t seg_size = seg_vend - seg_vstart + 1;
+ 
+-		vm_vaddr_t vaddr = vm_vaddr_alloc(vm, seg_size, seg_vstart);
++		vm_vaddr_t vaddr = __vm_vaddr_alloc(vm, seg_size, seg_vstart,
++						    MEM_REGION_CODE);
+ 		TEST_ASSERT(vaddr == seg_vstart, "Unable to allocate "
+ 			"virtual memory for segment at requested min addr,\n"
+ 			"  segment idx: %u\n"
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index a2d0c11457c0..837fec2d74b5 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -1184,32 +1184,15 @@ static vm_vaddr_t vm_vaddr_unused_gap(struct kvm_vm *vm, size_t sz,
+ 	return pgidx_start * vm->page_size;
  }
  
- void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
-@@ -279,15 +280,17 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
- 				  void *guest_code)
+-/*
+- * VM Virtual Address Allocate
+- *
+- * Input Args:
+- *   vm - Virtual Machine
+- *   sz - Size in bytes
+- *   vaddr_min - Minimum starting virtual address
+- *
+- * Output Args: None
+- *
+- * Return:
+- *   Starting guest virtual address
+- *
+- * Allocates at least sz bytes within the virtual address space of the vm
+- * given by vm.  The allocated bytes are mapped to a virtual address >=
+- * the address given by vaddr_min.  Note that each allocation uses a
+- * a unique set of pages, with the minimum real allocation being at least
+- * a page.
+- */
+-vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min)
++vm_vaddr_t __vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min,
++			    enum kvm_mem_region_type type)
  {
- 	int r;
--	size_t stack_size = vm->page_size == 4096 ?
--					DEFAULT_STACK_PGS * vm->page_size :
--					vm->page_size;
--	unsigned long stack_vaddr = vm_vaddr_alloc(vm, stack_size,
--					DEFAULT_RISCV_GUEST_STACK_VADDR_MIN);
-+	size_t stack_size;
-+	unsigned long stack_vaddr;
- 	unsigned long current_gp = 0;
- 	struct kvm_mp_state mps;
- 	struct kvm_vcpu *vcpu;
+ 	uint64_t pages = (sz >> vm->page_shift) + ((sz % vm->page_size) != 0);
  
-+	stack_size = vm->page_size == 4096 ? DEFAULT_STACK_PGS * vm->page_size :
-+					     vm->page_size;
-+	stack_vaddr = vm_vaddr_alloc(vm, stack_size,
-+				     DEFAULT_RISCV_GUEST_STACK_VADDR_MIN);
+ 	virt_pgd_alloc(vm);
+ 	vm_paddr_t paddr = vm_phy_pages_alloc(vm, pages,
+-					      KVM_UTIL_MIN_PFN * vm->page_size, 0);
++					      KVM_UTIL_MIN_PFN * vm->page_size,
++					      vm->memslots[type]);
+ 
+ 	/*
+ 	 * Find an unused range of virtual page addresses of at least
+@@ -1230,6 +1213,30 @@ vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min)
+ 	return vaddr_start;
+ }
+ 
++/*
++ * VM Virtual Address Allocate
++ *
++ * Input Args:
++ *   vm - Virtual Machine
++ *   sz - Size in bytes
++ *   vaddr_min - Minimum starting virtual address
++ *
++ * Output Args: None
++ *
++ * Return:
++ *   Starting guest virtual address
++ *
++ * Allocates at least sz bytes within the virtual address space of the vm
++ * given by vm.  The allocated bytes are mapped to a virtual address >=
++ * the address given by vaddr_min.  Note that each allocation uses a
++ * a unique set of pages, with the minimum real allocation being at least
++ * a page. The allocated physical space comes from the TEST_DATA memory region.
++ */
++vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min)
++{
++	return __vm_vaddr_alloc(vm, sz, vaddr_min, MEM_REGION_TEST_DATA);
++}
 +
+ /*
+  * VM Virtual Address Allocate Pages
+  *
+@@ -1249,6 +1256,11 @@ vm_vaddr_t vm_vaddr_alloc_pages(struct kvm_vm *vm, int nr_pages)
+ 	return vm_vaddr_alloc(vm, nr_pages * getpagesize(), KVM_UTIL_MIN_VADDR);
+ }
+ 
++vm_vaddr_t __vm_vaddr_alloc_page(struct kvm_vm *vm, enum kvm_mem_region_type type)
++{
++	return __vm_vaddr_alloc(vm, getpagesize(), KVM_UTIL_MIN_VADDR, type);
++}
++
+ /*
+  * VM Virtual Address Allocate Page
+  *
+@@ -1814,7 +1826,8 @@ vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+ 
+ vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm)
+ {
+-	return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
++	return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
++				 vm->memslots[MEM_REGION_PT]);
+ }
+ 
+ /*
+diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
+index ac7fc9d317db..d146ca71e0c0 100644
+--- a/tools/testing/selftests/kvm/lib/riscv/processor.c
++++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
+@@ -61,7 +61,8 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
+ 		return;
+ 
+ 	vm->pgd = vm_phy_pages_alloc(vm, nr_pages,
+-				     KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
++				     KVM_GUEST_PAGE_TABLE_MIN_PADDR,
++				     vm->memslots[MEM_REGION_PT]);
+ 	vm->pgd_created = true;
+ }
+ 
+@@ -288,8 +289,9 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
+ 
+ 	stack_size = vm->page_size == 4096 ? DEFAULT_STACK_PGS * vm->page_size :
+ 					     vm->page_size;
+-	stack_vaddr = vm_vaddr_alloc(vm, stack_size,
+-				     DEFAULT_RISCV_GUEST_STACK_VADDR_MIN);
++	stack_vaddr = __vm_vaddr_alloc(vm, stack_size,
++				       DEFAULT_RISCV_GUEST_STACK_VADDR_MIN,
++				       MEM_REGION_DATA);
+ 
  	vcpu = __vm_vcpu_add(vm, vcpu_id);
  	riscv_vcpu_mmu_setup(vcpu);
+diff --git a/tools/testing/selftests/kvm/lib/s390x/processor.c b/tools/testing/selftests/kvm/lib/s390x/processor.c
+index 89d7340d9cbd..15945121daf1 100644
+--- a/tools/testing/selftests/kvm/lib/s390x/processor.c
++++ b/tools/testing/selftests/kvm/lib/s390x/processor.c
+@@ -21,7 +21,8 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
+ 		return;
  
+ 	paddr = vm_phy_pages_alloc(vm, PAGES_PER_REGION,
+-				   KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
++				   KVM_GUEST_PAGE_TABLE_MIN_PADDR,
++				   vm->memslots[MEM_REGION_PT]);
+ 	memset(addr_gpa2hva(vm, paddr), 0xff, PAGES_PER_REGION * vm->page_size);
+ 
+ 	vm->pgd = paddr;
+@@ -167,8 +168,9 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
+ 	TEST_ASSERT(vm->page_size == 4096, "Unsupported page size: 0x%x",
+ 		    vm->page_size);
+ 
+-	stack_vaddr = vm_vaddr_alloc(vm, stack_size,
+-				     DEFAULT_GUEST_STACK_VADDR_MIN);
++	stack_vaddr = __vm_vaddr_alloc(vm, stack_size,
++				       DEFAULT_GUEST_STACK_VADDR_MIN,
++				       MEM_REGION_DATA);
+ 
+ 	vcpu = __vm_vcpu_add(vm, vcpu_id);
+ 
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index 2e6e61bbe81b..265ed1ccec7e 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -525,7 +525,7 @@ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+ static void kvm_setup_gdt(struct kvm_vm *vm, struct kvm_dtable *dt)
+ {
+ 	if (!vm->gdt)
+-		vm->gdt = vm_vaddr_alloc_page(vm);
++		vm->gdt = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
+ 
+ 	dt->base = vm->gdt;
+ 	dt->limit = getpagesize();
+@@ -535,7 +535,7 @@ static void kvm_setup_tss_64bit(struct kvm_vm *vm, struct kvm_segment *segp,
+ 				int selector)
+ {
+ 	if (!vm->tss)
+-		vm->tss = vm_vaddr_alloc_page(vm);
++		vm->tss = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
+ 
+ 	memset(segp, 0, sizeof(*segp));
+ 	segp->base = vm->tss;
+@@ -620,8 +620,9 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id,
+ 	vm_vaddr_t stack_vaddr;
+ 	struct kvm_vcpu *vcpu;
+ 
+-	stack_vaddr = vm_vaddr_alloc(vm, DEFAULT_STACK_PGS * getpagesize(),
+-				     DEFAULT_GUEST_STACK_VADDR_MIN);
++	stack_vaddr = __vm_vaddr_alloc(vm, DEFAULT_STACK_PGS * getpagesize(),
++				       DEFAULT_GUEST_STACK_VADDR_MIN,
++				       MEM_REGION_DATA);
+ 
+ 	vcpu = __vm_vcpu_add(vm, vcpu_id);
+ 	vcpu_init_cpuid(vcpu, kvm_get_supported_cpuid());
+@@ -1118,8 +1119,8 @@ void vm_init_descriptor_tables(struct kvm_vm *vm)
+ 	extern void *idt_handlers;
+ 	int i;
+ 
+-	vm->idt = vm_vaddr_alloc_page(vm);
+-	vm->handlers = vm_vaddr_alloc_page(vm);
++	vm->idt = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
++	vm->handlers = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
+ 	/* Handlers have the same address in both address spaces.*/
+ 	for (i = 0; i < NUM_INTERRUPTS; i++)
+ 		set_idt_entry(vm, i, (unsigned long)(&idt_handlers)[i], 0,
 -- 
 2.37.3.968.ga6b4b080e4-goog
 
