@@ -2,63 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 644165E6D10
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 22:34:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73B1D5E6D85
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 23:02:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229519AbiIVUeB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 16:34:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59654 "EHLO
+        id S229810AbiIVVCJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 17:02:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229833AbiIVUdx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 16:33:53 -0400
+        with ESMTP id S229552AbiIVVCH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 17:02:07 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 874E010FE3C
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 13:33:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7236DCCF7
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 14:02:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663878831;
+        s=mimecast20190719; t=1663880526;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=38h887HfzKb2f2rP/TsBJ7B1fN0ay51tuATW6aVKrKU=;
-        b=h4WF9cPZmxfohEWfHl2H9XwHgPyW1D5M/b7lKO+PLVD1ZXE6F7S6zj0DZuUT48hau9cL1d
-        9iBcVFerSu3UfUFidOUZtKqwbKwBnKrXqL9LQEYkhAMB/T2VgnIjYMikaJ3SzL+lUi6d2D
-        OfqKIsfl0ynMCbbNVNU1it3sLxUxj+M=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-630-5SYzBwOGMeqbFSu2t_m-ug-1; Thu, 22 Sep 2022 16:33:47 -0400
-X-MC-Unique: 5SYzBwOGMeqbFSu2t_m-ug-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 42896811E67;
-        Thu, 22 Sep 2022 20:33:47 +0000 (UTC)
-Received: from sirius.home.kraxel.org (unknown [10.39.192.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F0E8BC15BAB;
-        Thu, 22 Sep 2022 20:33:46 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
-        id 72BCC1800084; Thu, 22 Sep 2022 22:33:45 +0200 (CEST)
-Date:   Thu, 22 Sep 2022 22:33:45 +0200
-From:   Gerd Hoffmann <kraxel@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-        qemu-devel@nongnu.org, Sergio Lopez <slp@redhat.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v4] x86: add etc/phys-bits fw_cfg file
-Message-ID: <20220922203345.3r7jteg7l75vcysv@sirius.home.kraxel.org>
-References: <20220922101454.1069462-1-kraxel@redhat.com>
- <YyxF2TNwnXaefT6u@redhat.com>
- <20220922122058.vesh352623uaon6e@sirius.home.kraxel.org>
- <CABgObfavcPLUbMzaLQS2Rj2=r5eAhuBuKdiHQ4wJGfgPm_=XsQ@mail.gmail.com>
+        bh=NrC2ybEc8JLdF17QEo6DYU80wCTIo9mOjzD9ZgdBMrA=;
+        b=ao0yWztxEoZCbEfnFQkUm+L+SdrR35A3fQZkMHQvsWOamo3OvmgsLu7OxFxJHCjKqgQFAY
+        aPjSimw5UERp8NJbEx8EHCxBzB6XtRwbKsj6Xik8bKpAbdYpxe/u4us2HqC7XeNU693Wri
+        UJ+1ua84ArzdwVYPILj4Q6ZmpcLpdDk=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-660-DR6uAEKfPCaOdEGnCv9C5A-1; Thu, 22 Sep 2022 17:02:03 -0400
+X-MC-Unique: DR6uAEKfPCaOdEGnCv9C5A-1
+Received: by mail-qt1-f197.google.com with SMTP id d20-20020a05622a05d400b00344997f0537so7258925qtb.0
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 14:02:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=NrC2ybEc8JLdF17QEo6DYU80wCTIo9mOjzD9ZgdBMrA=;
+        b=kakqCbRcBVL0IbBKLGUK7W49djsETnRHRI3MOTuXclBGStnsneQW5HgcpaDOwMUtJk
+         0mxxbhVhekTuBGanM9Dqphw+8jFP3G2t3KECcNCc6OWh52oic+YxHv5odFEUA05LmFnZ
+         03afhgT+V5/20wWsAm68k3qTIyoccRPlPitPY3VN6MCd2wiwwHs51OL7Tb4vGPBy32he
+         1KevYQDOqAq2f+jty5TmBEZ3sco/nyi+ENPTm6ZN61ELaS5MUZXIUFgEkh/nxaUw1CUg
+         XlX+dzupvW6/IEHAFDDcPt5OhlzG7W2fP5q1AeFDaqVaXGfvCyJqPcC6NlmGZeLKCKyS
+         BZ4A==
+X-Gm-Message-State: ACrzQf2U35phksqqq3UyhsBnkpPp6gnspxoLPnY/MvgwiVrXeVu77b1R
+        nkDbm0cNbzoboR05JOkwAKR2pzzFhvpB6Y7Tb8wbZZjni70YffBotmQKEx0ZmjYILUkA1SQ0umf
+        k97v2Bax37zedf2tB7MLc6gB4Fr3l
+X-Received: by 2002:a05:622a:1a02:b0:35b:bb29:fb86 with SMTP id f2-20020a05622a1a0200b0035bbb29fb86mr4456046qtb.456.1663880522923;
+        Thu, 22 Sep 2022 14:02:02 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM5+1iThcdKlBWRMN91eVYVdq5u8pl0QboZdJPJJcUB5kQOeMbl+s3pRZ+jdrGDTGMyG59r4Mby7gltxhspCalI=
+X-Received: by 2002:a05:622a:1a02:b0:35b:bb29:fb86 with SMTP id
+ f2-20020a05622a1a0200b0035bbb29fb86mr4456007qtb.456.1663880522662; Thu, 22
+ Sep 2022 14:02:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABgObfavcPLUbMzaLQS2Rj2=r5eAhuBuKdiHQ4wJGfgPm_=XsQ@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+References: <20220919171843.2605597-1-maz@kernel.org>
+In-Reply-To: <20220919171843.2605597-1-maz@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Date:   Thu, 22 Sep 2022 23:01:51 +0200
+Message-ID: <CABgObfYgUSQNa-4i6iP1Ai7Bs7YiBBsEni3vxQ1=r-okeNfkNQ@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 6.0, take #2
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
@@ -68,32 +76,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 22, 2022 at 02:38:02PM +0200, Paolo Bonzini wrote:
-> On Thu, Sep 22, 2022 at 2:21 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
-> > No.  This will basically inform the guest that host-phys-bits has been
-> > enabled (and pass the number of bits).  So the firmware can make use of
-> > the available address space instead of trying to be as conservative as
-> > possible to avoid going beyond the (unknown) limit.
-> 
-> Intel processors that are not extremely old have host-phys-bits equal
-> to 39, 46 or 52. Older processors that had 36, in all likelihood,
-> didn't have IOMMUs (so no big 64-bit BARs).
-> 
-> AMD processors have had 48 for a while, though older consumer processors had 40.
+Pulled, thanks.
 
-How reliable is the vendorid?
+Paolo
 
-Given newer processors have more than 40 and for older ones we know
-the possible values for the two relevant x86 vendors we could do
-something along the lines of:
-
-   phys-bits >= 41                   -> valid
-   phys-bits == 40    + AuthenticAMD -> valid
-   phys-bits == 36,39 + GenuineIntel -> valid
-   everything else                   -> invalid
-
-Does that look sensible to you?
-
-take care,
-  Gerd
+On Mon, Sep 19, 2022 at 7:19 PM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Paolo,
+>
+> Here's the last KVM/arm64 pull request for this cycle, with
+> a small fix for pKVM and kmemleak.
+>
+> Please pull,
+>
+>         M.
+>
+> The following changes since commit 1c23f9e627a7b412978b4e852793c5e3c3efc555:
+>
+>   Linux 6.0-rc2 (2022-08-21 17:32:54 -0700)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.0-2
+>
+> for you to fetch changes up to 522c9a64c7049f50c7b1299741c13fac3f231cd4:
+>
+>   KVM: arm64: Use kmemleak_free_part_phys() to unregister hyp_mem_base (2022-09-19 17:59:48 +0100)
+>
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for 6.0, take #2
+>
+> - Fix kmemleak usage in Protected KVM (again)
+>
+> ----------------------------------------------------------------
+> Zenghui Yu (1):
+>       KVM: arm64: Use kmemleak_free_part_phys() to unregister hyp_mem_base
+>
+>  arch/arm64/kvm/arm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
 
