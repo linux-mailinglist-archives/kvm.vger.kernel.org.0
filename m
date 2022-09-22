@@ -2,66 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AE5A25E5B0F
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 08:04:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EBCB15E5B40
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 08:20:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229728AbiIVGEI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 02:04:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56618 "EHLO
+        id S230019AbiIVGUw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 02:20:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229673AbiIVGEF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 02:04:05 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D59D7B4E9D
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 23:04:02 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id a8so12878995lff.13
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 23:04:02 -0700 (PDT)
+        with ESMTP id S230020AbiIVGUs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 02:20:48 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DFAC13CCD;
+        Wed, 21 Sep 2022 23:20:46 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id x1-20020a17090ab00100b001fda21bbc90so1161911pjq.3;
+        Wed, 21 Sep 2022 23:20:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=olO03nDFwqe9rFksGooFJngR4lSdLRLgIe6BNqbbGiE=;
-        b=qzohgW4W028h1kLWT+ngvQ+sdokVC0lx0SVNa9LacLlCtQ/IxdfInBOE+kEv5Cj0Sv
-         DHbjzLNxzFQ7Q3hq60AFtTC+AbEGMhCwaxnQXjlHCBw0BV3xzEPokfX59Jpb7E/yWEmu
-         E23sL60jfE4Q8dz3+QTb3x5zHFw9x2g4ubVrrHZvQNln+8hg59HNlN73KwFlzrwc1pHJ
-         Z3CMXa44KdgPJvZIuw452Wb75sYP0rD6HkFkratfsLZgdxwfdq0mOtF9O8n8it6ZN05O
-         f/REz4t7kqW972qzmQmeSvK5zwxdKY/bv06FtuH75F7RLHdqjxuHk5Cux3hRPHRKdY9J
-         gXEw==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=kgoTZx261wCGXFCEPuaG0VSZSi543M+I3QC3uXhqVog=;
+        b=khaI+6u3BZsquYKVqv2eoNoyobNVlDjoVeynFB/MZh7AzwyOyNkrQNsyIyE2jCoiPh
+         TwrDlkqg8y6bUZPKK5Ej0MrV68esDNKm+CA7Wku5dljERmnnaUus1GmfRLMyoId5F/k/
+         SsZcNw7Gr38CwFyuQHmBBbqIYTqEcXTSAU2WOfUrZD0H9H6tqQIm3I9qy6Gh4vjCVlBP
+         nsiOjvpJaHs9TNIhRQDGm7Uq2OIQJ+CXp0WiJkV2hxQW1sfEZ54EuSF/WW5Qa/SFAvGs
+         Kvpr2KncXz8vPiPDgLhJpEknM09k7KNVgJk8C1qdFKlzPoaG/9zXa8QZYXKRxWbVdNBp
+         yrNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=olO03nDFwqe9rFksGooFJngR4lSdLRLgIe6BNqbbGiE=;
-        b=KJDjy1lVqVCUhGAGjTzlYEgrz1vokORpvqNoSCHnju8jxbaVRnXpIf+bLRR6n7bC3l
-         xjZWdyD0hmWhupIEj48PzjGK6O0tZnowEs8pFGLX0qAqP4CC+W/E/ctYVJWv+gkX7FKo
-         6n98K6WgDrige8UkphAvYHD+DXuUciKBFOB0FWvPX4O/CU80f+vELv1lbUkPhNQd700e
-         SFaxGHbocSyUwOcV60hESYmPbxjoGkVLPY1Am0hEBbjOvHCYdRLdzFDOwlMpO13O7h5F
-         M6pUUl+Q7LGLsv2dSWN6YamXQjAjv6MRsVMtCAG4kGJd02LyjQIPDTcJ64jETPKxP4Iy
-         yKDQ==
-X-Gm-Message-State: ACrzQf2vZN0KlP2hrY5LxesuMOBgcvL4Tq9SaUp4TV3ELpGeZyMnjQz1
-        mCalxNXffveXHHl50PIyICgVZwa4WEgmgT/KbtPB1w==
-X-Google-Smtp-Source: AMsMyM5AMskxCm8Jz+477vviAsdu4yz0tWJSV689o7jAqlMq0UagCEkVck9qEsRwU82oQ8UeZSA+NdDBw04kp51UQfo=
-X-Received: by 2002:a05:6512:139c:b0:48f:da64:d050 with SMTP id
- p28-20020a056512139c00b0048fda64d050mr566474lfa.268.1663826640739; Wed, 21
- Sep 2022 23:04:00 -0700 (PDT)
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=kgoTZx261wCGXFCEPuaG0VSZSi543M+I3QC3uXhqVog=;
+        b=MnVqGbcAs4Ovd0SeWjn/7Hg5w+fBJLFivDC77fTzwp4DozYDsFRTmp1uuEAE7vIx59
+         a5eAd6CykpgDMzKS8O6bJSaIGR0hKkGuKNLEVtGVWjDK/QjxLrHdYs/xNS4PWLMbEcPY
+         InhsOa8sGEpsLSXTzB9E/f36LGeJHGKiBUvMvXX2LqkURDd3B9tK8JuKIy/YMBvFLYox
+         NzHfDk9RSdDvs8WJvAIRWyJ19jCkxAHcu09+7NyywcZhWnxO51IiHUtAx6sHgsb/3lbf
+         fowM+edyspNqs3mV7X6PF/WrQONt8F0pGkDW3N6p9Nf5KIqvISqwS2Td0pZzehTrY4uW
+         BKdQ==
+X-Gm-Message-State: ACrzQf3kvCO0O4UBpkvwuQVluh/Ql8uyOrjh2J0FUNd3LxdaAGDwzmhy
+        WL1Zdq5ZaxhSO+C+IR6q73eFuiYo2KaaeA==
+X-Google-Smtp-Source: AMsMyM6wLrwdJDW/GSRfYAdHCGnwQFZjNGRn93RC9K993LnD8QJqgjG+ouzBawhDATJDq6SblpW8hw==
+X-Received: by 2002:a17:902:d4ce:b0:177:fe49:19eb with SMTP id o14-20020a170902d4ce00b00177fe4919ebmr1731044plg.170.1663827644878;
+        Wed, 21 Sep 2022 23:20:44 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id z14-20020aa79e4e000000b005375a574846sm3379899pfq.125.2022.09.21.23.20.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Sep 2022 23:20:42 -0700 (PDT)
+Message-ID: <6525670b-eb27-d0a5-2d03-cfa2006d0579@gmail.com>
+Date:   Thu, 22 Sep 2022 14:20:33 +0800
 MIME-Version: 1.0
-References: <20220921231151.2321058-1-vipinsh@google.com> <CALMp9eQ8Rr-rSjXiZ_4O0mA=k3kk=hYrfB_NTszu=9DFOwNUaQ@mail.gmail.com>
- <YyuiWk/4TFYqf0qN@google.com>
-In-Reply-To: <YyuiWk/4TFYqf0qN@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Wed, 21 Sep 2022 23:03:24 -0700
-Message-ID: <CAHVum0fSz26O0KrmNYPQzpUHBBsf-invuow9gV5dWZPUGJRm8A@mail.gmail.com>
-Subject: Re: [PATCH] KVM: selftests: Fix hyperv_features test failure when
- built on Clang
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Jim Mattson <jmattson@google.com>, pbonzini@redhat.com,
-        vkuznets@redhat.com, kvm@vger.kernel.org,
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.13.1
+Subject: Re: [PATCH v2 1/3] KVM: x86/pmu: Make part of the Intel v2 PMU MSRs
+ handling x86 generic
+Content-Language: en-US
+From:   Like Xu <like.xu.linux@gmail.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+References: <20220919093453.71737-1-likexu@tencent.com>
+ <20220919093453.71737-2-likexu@tencent.com>
+ <CALMp9eRPEFHFfW+MnMkcTBFB+vjcEe3ekg8JMrKJaRQuq7=-8Q@mail.gmail.com>
+ <856e3332-9f6b-a5f7-c3ec-afe89003cb84@gmail.com>
+In-Reply-To: <856e3332-9f6b-a5f7-c3ec-afe89003cb84@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,92 +79,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 21, 2022 at 4:46 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, Sep 21, 2022, Jim Mattson wrote:
-> > On Wed, Sep 21, 2022 at 4:11 PM Vipin Sharma <vipinsh@google.com> wrote:
-> > >
-> > > hyperv_features test fails when built on Clang. It throws error:
-> > >
-> > >          Failed guest assert: !hcall->ud_expected || res == hcall->expect at
-> > >          x86_64/hyperv_features.c:90
-> > >
-> > > On GCC, EAX is set to 0 before the hypercall whereas in Clang it is not,
-> > > this causes EAX to have garbage value when hypercall is returned in Clang
-> > > binary.
-> > >
-> > > Fix by executing the guest assertion only when ud_expected is false.
->
-> TL;DR: please rewrite the changelog to explain the actual bug (checking the
-> result when the hypercall is expected to fault) and the fix, and only mention the
-> gcc vs. clang behavior as a footnote.
+On 22/9/2022 1:47 pm, Like Xu wrote:
+>> Why this new request? It's not in the Intel-specific version of these
+>> function that you elide below.
+>>
+>> Perhaps you could split up the semantic changes from the simple renamings?
+> 
+> The creation of perf_event is delayed to the last step,
+> https://lore.kernel.org/kvm/20220831085328.45489-5-likexu@tencent.com/
+> 
+> Based on the new code base, no semantic changes I assume.
 
-On it.
->
-> As Jim pointed out, the bug has nothing to do with clang.  Ha, figured out why
-> gcc passes; it uses RAX as the scratch reg that the asm blob loads into R8,
-> i.e. loads RAX with @output_address.  So ignore my earlier suggestion of:
->
->         *hv_status = -EFAULT,
->
-> even better is to do:
->
-> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> index 79ab0152d281..673085f6edfd 100644
-> --- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-> @@ -26,7 +26,8 @@ static inline uint8_t hypercall(u64 control, vm_vaddr_t input_address,
->                      : "=a" (*hv_status),
->                        "+c" (control), "+d" (input_address),
->                        KVM_ASM_SAFE_OUTPUTS(vector)
-> -                    : [output_address] "r"(output_address)
-> +                    : [output_address] "r"(output_address),
-> +                      "a"(-EFAULT)
->                      : "cc", "memory", "r8", KVM_ASM_SAFE_CLOBBERS);
->         return vector;
->  }
->
-> so that there is zero chance of getting a false positive due to the compiler
-> (but not KVM) modifying RAX.
->
+Sorry, I think we do need one more clear commit like this:
 
-Taking it.
+---
 
-> Anyways, this bug is not clang's fault, with above patch it fails as "expected".
->
-> ==== Test Assertion Failure ====
->   x86_64/hyperv_features.c:622: false
->   pid=283847 tid=283847 errno=4 - Interrupted system call
->      1  0x0000000000402842: guest_test_hcalls_access at hyperv_features.c:622
->      2   (inlined by) main at hyperv_features.c:642
->      3  0x00007f23fc513082: ?? ??:0
->      4  0x0000000000402ebd: _start at ??:?
->   Failed guest assert: !hcall->ud_expected || res == hcall->expect at x86_64/hyperv_features.c:90
-> arg1 = 0, arg2 = fffffff2
->
->
-> > > Fixes: cc5851c6be86 ("KVM: selftests: Use exception fixup for #UD/#GP Hyper-V MSR/hcall tests")
-> > > Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> > > Suggested-by: Sean Christopherson <seanjc@google.com>
-> > >
-> > > ---
-> > >  tools/testing/selftests/kvm/x86_64/hyperv_features.c | 8 ++++----
-> > >  1 file changed, 4 insertions(+), 4 deletions(-)
-> >
-> > In case Sean doesn't point it out, be wary of starting a shortlog with
-> > "Fix." You may later regret it.
+ From e08b2d03a652e5ec226d8907c7648bff57f31d3b Mon Sep 17 00:00:00 2001
+From: Like Xu <likexu@tencent.com>
+Date: Thu, 22 Sep 2022 14:15:18 +0800
+Subject: [PATCH] KVM: x86/pmu: Rewrite reprogram_counters() to improve
+  performance
 
-I am doing it already! :D
+Before using pmu->reprogram_pmi, the test for a valid pmc is always
+applied. This part of the redundancy could be removed by setting the
+counters' bitmask directly, and furthermore triggering KVM_REQ_PMU
+only once to save more cycles.
 
->
-> Heh, I think our record is "Really, really fix xyz" for a shortlog.
->
-> > Also, I think the "clang" part is a red herring. You are fixing a
-> > latent bug in the code.
->
-> Ya, it's definitely a good idea to call out why a bug was missed, but clang is
-> not to blame here, at all.
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+  arch/x86/kvm/pmu.h | 12 ++++--------
+  1 file changed, 4 insertions(+), 8 deletions(-)
 
-I agree, my understanding was not complete for this bug. I will send
-out a v2 with an updated shortlog. Thanks, Jim and Sean, for pointing
-it out.
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index fb8040854f4d..9b8e74ccd18a 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -204,15 +204,11 @@ static inline bool pmc_is_enabled_globally(struct kvm_pmc 
+*pmc)
+  	return test_bit(pmc->idx, (unsigned long *)&pmu->global_ctrl);
+  }
+
+-static void reprogram_counters(struct kvm_pmu *pmu, u64 diff)
++static inline void reprogram_counters(struct kvm_pmu *pmu, u64 diff)
+  {
+-	int bit;
+-	struct kvm_pmc *pmc;
+-
+-	for_each_set_bit(bit, (unsigned long *)&diff, X86_PMC_IDX_MAX) {
+-		pmc = intel_pmc_idx_to_pmc(pmu, bit);
+-		if (pmc)
+-			kvm_pmu_request_counter_reprogam(pmc);
++	if (diff) {
++		pmu->reprogram_pmi |= diff;
++		kvm_make_request(KVM_REQ_PMU, pmu_to_vcpu(pmu));
+  	}
+  }
+
+-- 
+2.37.3
+
