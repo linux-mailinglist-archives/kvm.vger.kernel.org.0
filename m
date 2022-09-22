@@ -2,167 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 86A655E66FA
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 17:23:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0018D5E6720
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 17:31:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232087AbiIVPXw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Sep 2022 11:23:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49352 "EHLO
+        id S232108AbiIVPb3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Sep 2022 11:31:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232026AbiIVPXu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Sep 2022 11:23:50 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C07FF8593
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 08:23:49 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id go6so10121698pjb.2
-        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 08:23:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=4hng9hD+p8EXRULnhypgit8nkIBrMiyFlLkFJQuqnXc=;
-        b=hAZG3ucwHKwhSmqY9M0JepTbrCdrwuxIOlZAN4MIln08/ZYtOmSZIrjXhu83r9WToT
-         cL4m3YiaaRpB5np/geOW4TqgYMpojuvlBsmci8MYwYZRR/YxSAJkQsub7kwBn51uAC7E
-         RQODedh13sgSTsAKYla0DDIkncCfopXkXlxRG2iT8OMqVnIZmcTmodDqPFA8iJ7Sant6
-         DsSxnevUh4wBlBFd6KOZhMUaa15TaA7/eHJOPNUg1f5o9mcjWHnSAqrXWD/M4shdG+rk
-         LKY1oOltcI5nJuGYX8cloZDuOJJnEvd3MfSvLe5rOZYYAVszuwj0Z/bQW0FGrOJbfcSc
-         tRdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=4hng9hD+p8EXRULnhypgit8nkIBrMiyFlLkFJQuqnXc=;
-        b=20FRhspO0H80MpJj5I6VlhmLa6T49grUJoBv42KSY4R0n4L4nNDe8SDe3TZnA1HurO
-         94JDURCqhtqY3e8lSY2QXbsAhVRbRJ7J5qFTri8Gw1sr4jtKB0GxO6pCguLXnAywea3B
-         naQ7XItu3xXI8zBV+a4d2djRiIbTTrufF7h0TnO17Mj+S6t7IOq2Zdn3qeOKn9JrRhGX
-         JFrlkdxCUXYbqKzawA/srwEIavwW1lc0nk87rNd4Z3bk/8HPw2hR3s7ba/4lJgNkjJqA
-         FuZlbn1dwVgKrnZGlSLq3N0ctwVzwi1D6bhoo0UMnKlJzbtw+aOpiLHdgA5s0LXIBCRv
-         oBDg==
-X-Gm-Message-State: ACrzQf2iUjKGX2/UMZDESCNx+2Ly/d1Q39D/3E5NV6cEvUSYIpegqw0N
-        AOqbo1uSbt218ghYpSFpeaqziQ==
-X-Google-Smtp-Source: AMsMyM6D+AGe91n2NZ575lPSmGsw6EyKNHU4hFvUJeis6VvODRCrcbGL9qsraoDtCgAxRQCSlX7f5w==
-X-Received: by 2002:a17:902:f394:b0:176:b7b7:2 with SMTP id f20-20020a170902f39400b00176b7b70002mr3709012ple.57.1663860228501;
-        Thu, 22 Sep 2022 08:23:48 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id 13-20020a62140d000000b0053e93aa8fb9sm4579212pfu.71.2022.09.22.08.23.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Sep 2022 08:23:48 -0700 (PDT)
-Date:   Thu, 22 Sep 2022 15:23:44 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v10 02/39] KVM: x86: hyper-v: Resurrect dedicated
- KVM_REQ_HV_TLB_FLUSH flag
-Message-ID: <Yyx+AJLacVzOdtBr@google.com>
-References: <20220921152436.3673454-1-vkuznets@redhat.com>
- <20220921152436.3673454-3-vkuznets@redhat.com>
- <Yys6b1ZqYbw9Umyu@google.com>
- <877d1voiuz.fsf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        with ESMTP id S231670AbiIVPbZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Sep 2022 11:31:25 -0400
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2043.outbound.protection.outlook.com [40.107.102.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F94DFB31C
+        for <kvm@vger.kernel.org>; Thu, 22 Sep 2022 08:31:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Gkso2mr8LKmLF8nkd3fgH17FiMW6oPqUwTuaYAiPcshywNb+AI7KeY2EGB0AYbrSHHdqwZhX41ezXbM43JS8IEZZYFdwiUrVmy1Xb268qmNo56MZjvjXn+nSxVaZdzca0b3cCAeux9UqTmL3lbncFXPe9N7b+8LZBIDAdT69oF/03IKzIiMm4yBcOIa0Z/3M0tno6Ms2FXdsFmrs6tCfWQsJMp50VHxgbCDq9rirN4QOqY1RrmQxcNdsU1+VOGqrW/xr9UJG/TMfHAb6IqMqsirXpJq+Ep8gMLWcK1n5QiYPYJINNOBAfsRez4HROEIHINAKuphbyVbjw9fyKR+a9Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Fq7ef9dK+PweqZdDYY+/xENw3XQPKUnSABPdxMAaf1E=;
+ b=U8K9975Y51Zy4dUFl+9+KjomN81TrRR0zTdqTXHoutHRxeR7iofrFQNc3kpOZAXXHxFQ9X1yy26+DXLcwFEv+4LObI1HkB3/xXhzlWupAtZZ+VN0lcWCIC00wbg5fc1uAR5EpIwoVJbkQzOlj3SJzoJ3xtAHYKiYE9Snuvy6gPqv6auzZBPZ7BRQMccnOYldwyUduuQR3hLdepmcxJDvRwUuJeyxuj7S1rREAWMypQXuUScYQKoCzqtjHjIOUyDwaTL03bdf3Tn3GGHjPgZ7OWTcwtaLdcq1fLvRWVd0Om6y8N8AdPh6AM1hEIQjAHrqrB0H3qD9H4zur9XeTSSfog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Fq7ef9dK+PweqZdDYY+/xENw3XQPKUnSABPdxMAaf1E=;
+ b=Q3wfxZ1YanL10p1zxjoeE8VjGiPJb4GOCRIWjQhjxYaoOlxp74i7MnfPO55pAs8ZPLMFpf3T8CLuFA0rlUh+PHyMr2P/6Ay9r21ZHYOf+oFkWVQ6HE5B+d+89mn6CcOAtA8i6fqNjwbQ9CknFEwoX+dDdwJvP2gLM6QSq44RkIeZr+CqfMHwGpFx4v9yHv4s0CGrhC6FJFdLMLDtjAEjVxcLzdcErUZwKcJ0bOhbPpuv38wUR73z3Bk4/Glw3EfiGQDOFWsSh6zelnOwGqFZ+toy6EW7EAKqnw7K5kCI3EGGuSQp4qQgdQ5LcABF1VSGbe7wp8AP2rL66Xt6hicCyw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by CY8PR12MB7290.namprd12.prod.outlook.com (2603:10b6:930:55::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5654.18; Thu, 22 Sep
+ 2022 15:31:21 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5%7]) with mapi id 15.20.5654.019; Thu, 22 Sep 2022
+ 15:31:20 +0000
+Date:   Thu, 22 Sep 2022 12:31:20 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Rodel, Jorg" <jroedel@suse.de>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Farman <farman@linux.ibm.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Martins, Joao" <joao.m.martins@oracle.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        Steve Sistare <steven.sistare@oracle.com>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        Laine Stump <laine@redhat.com>
+Subject: Re: [PATCH RFC v2 00/13] IOMMUFD Generic interface
+Message-ID: <Yyx/yDQ/nDVOTKSD@nvidia.com>
+References: <BN9PR11MB52762909D64C1194F4FCB4528C479@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <d5e33ebb-29e6-029d-aef4-af5c4478185a@redhat.com>
+ <Yyoa+kAJi2+/YTYn@nvidia.com>
+ <20220921120649.5d2ff778.alex.williamson@redhat.com>
+ <YytbiCx3CxCnP6fr@nvidia.com>
+ <YyxFEpAOC2V1SZwk@redhat.com>
+ <YyxsV5SH85YcwKum@nvidia.com>
+ <Yyx13kXCF4ovsxZg@redhat.com>
+ <Yyx2ijVjKOkhcPQR@nvidia.com>
+ <Yyx4cEU1n0l6sP7X@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <877d1voiuz.fsf@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Yyx4cEU1n0l6sP7X@redhat.com>
+X-ClientProxiedBy: BL0PR03CA0017.namprd03.prod.outlook.com
+ (2603:10b6:208:2d::30) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4192:EE_|CY8PR12MB7290:EE_
+X-MS-Office365-Filtering-Correlation-Id: e67944e8-84c1-4666-8e8c-08da9caf8006
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xJ0+v50y3+PbZfvKTVFEkJUwjpVQ4iFXC3MvKZyc4mfLFSURft+Y3mFd+UT6BKF61d2j8cblQEUmCwOkFmZ38anJJ/tnzf9xPlfe6ya5Pv/Z4jGUjjytVbSe7F5LowiNaJoGvXC62p/xtjdu0j8ktSMZIOcHJQ8nKpTp0SgkzxnUTmA49lAanZ7E2zpI4aQ2Vx+wurBuf4unayFsIVthcr2/dZzBpaIQmXtdanOVFvgP755HXjv7ZbFzpFFVF3mtCI0Rtpqkez2kYYtSKt08yDlSR9vgzDO+1mQBeQs+Tw5T3tLUa1GMqYXAfHc7D1rDKesu0qofFxbaX65JKS5NtYSjrPHEhBXcK4o25efnSuhLENOyjmYhmGZC9TE9AzqLcGyZ/7aTLgQ4HDfgfHbLCiqV7kkOAo3ziCdHQgyBPENuFrtm1UPOQlTlCyEGen0gbobVC/lK4xRbKVFjUKs+xDLlB6NrWCC8FCDlWpYYMHow3BRLMA4iXUR7J2NkFpoWSUsEjooS/x/qdquPVozO5IlFFA3IHzrefmuqkvKAtXIiw0ObXnF/HMMzodvyVUcKJTXSKC6XRfHm6oqk/Gfe/YDyhf5hgollhHVD0XnpHkG7ymoL2P8gcYIQWNEQDFbOr6t96VtoR5EJLQnTJRf/pm9TMiuk62WDzIbxGMeaexMJ67W0MhOizqUkpHDCQmc4zPdN3K1fXMy0PS0c+5qScHSismqq1v4Z5/2AA7XHtExnfzboSCM9YRbK/+CsT584
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(366004)(346002)(376002)(136003)(396003)(451199015)(36756003)(26005)(6512007)(41300700001)(6506007)(86362001)(316002)(54906003)(6916009)(4326008)(66946007)(6486002)(66556008)(66476007)(478600001)(8676002)(83380400001)(8936002)(2616005)(186003)(2906002)(5660300002)(7416002)(38100700002)(41533002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?am9QamtPd1dHdzJaazFZTGVQWTJNSjl4dFBKTlBFeDBrdjFkTThPQlYxSWh4?=
+ =?utf-8?B?UWw0YVdaVHRGRWN5cXUranUvUVBEVEJmbkd0Wi9WNkJ2a042NzNJWWVUaGtp?=
+ =?utf-8?B?OE9TNzRSUlBNU0RUTDBoTHEvVFloSzU5b0VUcGpKQnRIUDlvMGgvS1BFUlI5?=
+ =?utf-8?B?eFRNeTZEWUh3ZzBQQXRob091b3paZVRhTXNyRjk1SGYrMS9kWU1QMFYyK2ZH?=
+ =?utf-8?B?OXFqV3djNjFIZlFIZTk3TWxkck50NEFIMWhpSUt2ME1iMHF1Ui84WjB1TmNQ?=
+ =?utf-8?B?NFIxUTN5SzBKZjZOaVlIZFlHMERKUzRJeFREMTEwQk1IRlJMSUdnZE1Neklv?=
+ =?utf-8?B?WmR5NXZrVzFVeWdyS3IwYWhxbEYySWUwc3pWeHloMFlxWERqTXE0ZURTSGRz?=
+ =?utf-8?B?Mkl1ZndUdm9wOXRiY011STNneVpFWGhvQXhUZytUZDVZZHNvZ1pQZThTRUtK?=
+ =?utf-8?B?YXhDL2d0NU41OWl6RWlLM1FuWHhXeW5zK1ZQb3ZyanZ6T3ZRc3Bhd1lEUXBS?=
+ =?utf-8?B?OUl4VVR4YWZHTWhybWFnRit3Q1V2dy9GQ1lBUEY2VHRmZE90NHZWVjRKZThs?=
+ =?utf-8?B?MFNkZTB6eDNTNXpIbGIzZngzL1lRREtadTVCQUJSY2N1OW5JNmIxOGlmT1k5?=
+ =?utf-8?B?SUJuUyttN3RJbHh2TGVVQmpCT29mZU9jbTdSNkEvQzBTa0V4dG1oaHNGWHYz?=
+ =?utf-8?B?azFZUEdxdG9PZ1dRRkZyaE94cjE4dlBZcDZMLzBpSGJ2UVNxOStHYU1vRGpT?=
+ =?utf-8?B?RjdTQ1VoT3FJdXNPQkplc0dudXg0RlFRaUUyUFlBUjUrY3pVUXZUcnJWREYx?=
+ =?utf-8?B?bmhCeGpqSHdtajlCWXQwcGhOSW5xU092U0haaVQ1VWZDdEtMWHJVcW5oUzNH?=
+ =?utf-8?B?bWw2Q3hxdFp4TU42QkRwd1d5bGFwOHBsVWFPd0ZuZ0laTlkycjhMemtMOW94?=
+ =?utf-8?B?ejdIUS9uSU1yTDB0VDFEQkJiWlcwUUk4d1VCb2JjVVFvMXRzbDlXQ0YrYlNv?=
+ =?utf-8?B?aW1XN1pmUXhWSjczZ0xhVndWUFU3Si9rZTE0dEwxSm1KWVRhNk9WTEhqMlox?=
+ =?utf-8?B?Z1A1UERoQ3lqUjVYZlpzNDRjR3hyNXRQMm9VL3ZuYXlDRHBzTkZSR2N2a3h4?=
+ =?utf-8?B?WjlpR1picFRyWFpaM1pGVkZ5NXBITngzLzhyTUcrRTA5L2hlbXBqMGxyWUt0?=
+ =?utf-8?B?N2hrUmJLV2xOV215d09Fc2VtWDhwdG40Qm1wYmtSOUdpOElBeEFrdENGeHBj?=
+ =?utf-8?B?bms1YjBPSjBNL2x2YUpRVFROcWpqTTNINUhLck0vVGtVUVdRWGdERGJzWWJO?=
+ =?utf-8?B?RlMvRm9PL011OWpVS1BxSjk0TTFDVVliNWhHd3RadTZDcktUMWNkMlUxdUpn?=
+ =?utf-8?B?SjB6c2pQbnhMSGtPUHp1OWR2NDBiS01vbVRITVBiaFU3enhvZS9meXcwNlJq?=
+ =?utf-8?B?UDkrYzBGbnFBanVKWDRvSTNhOGZtcmN6VFZRcFcyWWgwTmxpNHpsMnBEZFJO?=
+ =?utf-8?B?cWpWeUp1cGJqZG5YT1V0WUFKOU1SeUQ3eUZDRUVhQ1RkRTlHb2VnTVFwdFRj?=
+ =?utf-8?B?L2tDcEFWTUNMbm1Eb1N6NHhSeWl0WmRLUXdiMUpPdkFMR0Y1dlA2YWhnWlZQ?=
+ =?utf-8?B?aDV0clBmb0k0TTVKU05VV3dSQUcvQjZJSklXRXpFb3kxQm1wNlFzaEpQS2hG?=
+ =?utf-8?B?UW1Ma2NBeVVKWlhVb2grTlVRR01BTUd3OEFBWDJUNlloQm1vMHNtWU5ZQ3A1?=
+ =?utf-8?B?REpSSWUvVU84bU9GN3VjRUxhVE1qQndOMjkveGhIRi84Zzd0dStXZTJrL1Ur?=
+ =?utf-8?B?RGYrNVJIZHhWTEc2YVpkU3V4TXFaZ0pCWGtTZjI1M1VWVzJCUnNhN3FNbUxw?=
+ =?utf-8?B?LzdFZWpueFBnMi9sUHdoOFBjOHpCNjMwK3JjTG51U3ZDbk13TnBMWlhFcVBJ?=
+ =?utf-8?B?TGFRRTk2Zm9WYUZaYzE1SUxTWVhWVm91OTNoZEk2ekg4OGdCZXlGK2Z5aEZR?=
+ =?utf-8?B?QlBqdk4yV3Z0SGFvdXBNVm1tY1dkOXlTdDh4YkgrQ0JWWStXL0N1b0crNWdW?=
+ =?utf-8?B?dkdScHVjYnJ2ZXhiSnFvRUZWWWRwczE2WmxNTG0zNVlDR21CTTdWODA3Yno2?=
+ =?utf-8?Q?aR9A6f+0a1Kj6IE+01RK1axPb?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e67944e8-84c1-4666-8e8c-08da9caf8006
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2022 15:31:20.9031
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XwunGhBDc5k/CTEDQ5qzQYx9AkGXvJ0fBXV47ZZBfHqZQmTwwiSwu0960cQIVc1d
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7290
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 22, 2022, Vitaly Kuznetsov wrote:
-> Now let's get to VMX and the point of my confusion (and thanks in
-> advance for educating me!):
-> AFAIU, when EPT is in use:
->  KVM_REQ_TLB_FLUSH_CURRENT == invept
->  KVM_REQ_TLB_FLUSH_GUEST = invvpid
+On Thu, Sep 22, 2022 at 04:00:00PM +0100, Daniel P. Berrangé wrote:
+> On Thu, Sep 22, 2022 at 11:51:54AM -0300, Jason Gunthorpe wrote:
+> > On Thu, Sep 22, 2022 at 03:49:02PM +0100, Daniel P. Berrangé wrote:
+> > > On Thu, Sep 22, 2022 at 11:08:23AM -0300, Jason Gunthorpe wrote:
+> > > > On Thu, Sep 22, 2022 at 12:20:50PM +0100, Daniel P. Berrangé wrote:
+> > > > > On Wed, Sep 21, 2022 at 03:44:24PM -0300, Jason Gunthorpe wrote:
+> > > > > > On Wed, Sep 21, 2022 at 12:06:49PM -0600, Alex Williamson wrote:
+> > > > > > > The issue is where we account these pinned pages, where accounting is
+> > > > > > > necessary such that a user cannot lock an arbitrary number of pages
+> > > > > > > into RAM to generate a DoS attack.  
+> > > > > > 
+> > > > > > It is worth pointing out that preventing a DOS attack doesn't actually
+> > > > > > work because a *task* limit is trivially bypassed by just spawning
+> > > > > > more tasks. So, as a security feature, this is already very
+> > > > > > questionable.
+> > > > > 
+> > > > > The malicious party on host VM hosts is generally the QEMU process.
+> > > > > QEMU is normally prevented from spawning more tasks, both by SELinux
+> > > > > controls and be the seccomp sandbox blocking clone() (except for
+> > > > > thread creation).  We need to constrain what any individual QEMU can
+> > > > > do to the host, and the per-task mem locking limits can do that.
+> > > > 
+> > > > Even with syscall limits simple things like execve (enabled eg for
+> > > > qemu self-upgrade) can corrupt the kernel task-based accounting to the
+> > > > point that the limits don't work.
+> > > 
+> > > Note, execve is currently blocked by default too by the default
+> > > seccomp sandbox used with libvirt, as well as by the SELinux
+> > > policy again.  self-upgrade isn't a feature that exists (yet).
+> > 
+> > That userspace has disabled half the kernel isn't an excuse for the
+> > kernel to be insecure by design :( This needs to be fixed to enable
+> > features we know are coming so..
+> > 
+> > What would libvirt land like to see given task based tracking cannot
+> > be fixed in the kernel?
 > 
-> For "normal" mappings (which are mapped on both stages) this is the same
-> thing as they're 'tagged' with both VPID and 'EPT root'. The question is
-> what's left. Given your comment, do I understand correctly that in case
-> of an invalid mapping in the guest (GVA doesn't resolve to a GPA), this
-> will only be tagged with VPID but not with 'EPT root' (as the CPU never
-> reached to the second translation stage)? We certainly can't ignore
-> these. Another (probably pure theoretical question) is what are the
-> mappings which are tagged with 'EPT root' but don't have a VPID tag?
+> There needs to be a mechanism to control individual VMs, whether by
+> task or by cgroup. User based limits are not suited to what we need
+> to achieve.
 
-Intel puts mappings into three categories, which for non-root mode equates to:
+The kernel has already standardized on user based limits here for
+other subsystems - libvirt and qemu cannot ignore that it exists. It
+is only a matter of time before qemu starts using these other
+subsystem features (eg io_uring) and has problems.
 
-  linear         == GVA => GPA
-  guest-physical == GPA => HPA
-  combined       == GVA => HPA
+So, IMHO, the future must be that libvirt/etc sets an unlimited
+rlimit, because the user approach is not going away in the kernel and
+it sounds like libvirt cannot accommodate it at all.
 
-and essentially the categories that consume the GVA are tagged with the VPID
-(linear and combined), and categories that consume the GPA are tagged with the
-EPTP address (guest-physical and combined).
+This means we need to provide a new mechanism for future libvirt to
+use. Are you happy with cgroups?
 
-> Are these the mapping which happen when e.g. vCPU has paging disabled?
+Once those points are decided, we need to figure out how best to
+continue to support historical libvirt and still meet the kernel
+security needs going forward. This is where I'm thinking about storing
+the tracking in the FD instead of the user.
 
-No, these mappings can be created at all times.  Even with CR0.PG=1, the guest
-can generate GPAs without going through a GVA=>GPA translation, e.g. the page tables
-themselves, RTIT (Intel PT) addresses, etc...  And even for combined/full
-translations, the CPU can insert TLB entries for just the GPA=>HPA part.
+IMHO task based is something that cannot be made to work properly.
 
-E.g. when a page is allocated by/for userspace, the kernel will zero the page using
-the kernel's direct map, but userspace will access the page via a different GVA.
-I.e. the guest effectively aliases GPA(x) with GVA(k) and GVA(u).  By inserting
-the GPA(x) => HPA(y) into the TLB, when guest userspace access GVA(u), the CPU
-encounters a TLB miss on GVA(u) => GPA(x), but gets a TLB hit on GPA(x) => HPA(y).
-
-Separating EPT flushes from VPID (and PCID) flushes allows the CPU to retain
-the partial TLB entries, e.g. a host change in the EPT tables will result in the
-guest-physical and combined mappings being invalidated, but linear mappings can
-be kept.
-
-I'm 99% certain AMD also caches partial entries, e.g. see the blurb on INVLPGA
-not affecting NPT translations, AMD just doesn't provide a way for the host to
-flush _only_ NPT translations.  Maybe the performance benefits weren't significant
-enough to justify the extra complexity?
-
-> These are probably unrelated to Hyper-V TLB flushing.
-> 
-> To preserve the 'small' optimization, we can probably move 
->  kvm_clear_request(KVM_REQ_HV_TLB_FLUSH, vcpu);
-> 
-> to nested_svm_transition_tlb_flush() or, in case this sounds too
-> hackish
-
-Move it to svm_flush_tlb_current(), because the justification is that on SVM,
-flushing "current" TLB entries also flushes "guest" TLB entries due to the more
-coarse-grained ASID-based TLB flush.  E.g.
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index dd599afc85f5..a86b41503723 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3737,6 +3737,13 @@ static void svm_flush_tlb_current(struct kvm_vcpu *vcpu)
- {
-        struct vcpu_svm *svm = to_svm(vcpu);
- 
-+       /*
-+        * Unlike VMX, SVM doesn't provide a way to flush only NPT TLB entries.
-+        * A TLB flush for the current ASID flushes both "host" and "guest" TLB
-+        * entries, and thus is a superset of Hyper-V's fine grained flushing.
-+        */
-+       kvm_hv_vcpu_purge_flush_tlb(vcpu);
-+
-        /*
-         * Flush only the current ASID even if the TLB flush was invoked via
-         * kvm_flush_remote_tlbs().  Although flushing remote TLBs requires all
-
-> we can drop it for now and add it to the (already overfull)
-> bucket of the "optimize nested_svm_transition_tlb_flush()".
-
-I think even long term, purging Hyper-V's FIFO in svm_flush_tlb_current() is the
-correct/desired behavior.  This doesn't really have anything to do with nSVM,
-it's all about SVM not providing a way to flush only NPT entries.
+Jason
