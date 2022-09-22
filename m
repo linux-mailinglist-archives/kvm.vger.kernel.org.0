@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 214775E5991
-	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 05:22:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84F465E5992
+	for <lists+kvm@lfdr.de>; Thu, 22 Sep 2022 05:22:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231321AbiIVDWc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Sep 2022 23:22:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59506 "EHLO
+        id S231325AbiIVDWg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Sep 2022 23:22:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229706AbiIVDVm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Sep 2022 23:21:42 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F3FF90816
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 20:19:03 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id a10-20020a5b0aca000000b006b05bfb6ab0so6950589ybr.9
-        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 20:19:03 -0700 (PDT)
+        with ESMTP id S229720AbiIVDVn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Sep 2022 23:21:43 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24CAE6DAC2
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 20:19:05 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id y5-20020a25bb85000000b006af8f244604so6970509ybg.7
+        for <kvm@vger.kernel.org>; Wed, 21 Sep 2022 20:19:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date;
-        bh=1dmLlVfV3XQMim7N9LUhMLTI6KxQVUDvbYGTx2lRbg8=;
-        b=d5L/Pex/df2nsW03MAou/4OYH9F7wbd4tSrasnOYgq2tk1+iLsC2xAMhzxPZcfBHMJ
-         AFRfuoNKJHOUgJeSYrj2RQraX7oo9qFH9QAHoBll9w/ez/ptMh/8HVdSvedF/Rr2Typk
-         GmKNLM7BHtYBHC4+zm6s9gw8KIoui0aKbrtC9N48bc1V6Qg8IiFiz0M5tNanJO3CCoqJ
-         nwjgkCq6mC4fAy6bbL/KnY96n7HeVSYeebg5jRFNQKMF0woCt/PtXOIeBfWi9W0lpoUk
-         5UvB+ogLTMXfg0yw6UbXNYyJjVNe67Khk9EuQjywWTkwGJsOGvEpb7dRR2JfU0juIOqg
-         40aA==
+        bh=qjLjZKvyeIeRGOesNjjS3cTK/aOXc6uRAWIPLUpvrd8=;
+        b=kF4yRiS/Rd5ThscLooK8PSbxVEKD+XJPZZemQ1CB4rSRDSOlf/5CLq0rgxG0Iqoq4N
+         IuwFx01fTIxVzcYe7oZRxhOF3e51bSQc0lgkOlvjRrMC287hpEqGHWz/Dlc+XN7DjEzm
+         xdKJBwX3MX0Vxcb35Ke2lH1GbqMSO+YQyrNzLltFHmOzYvg0HqMxOker8n61wkBfN5IZ
+         BjQ8u1giqEVt783IdBSzR6KlLQhe9eMNBoryTt2Zg9ZsKDcHBYAQYTXa91eTuPuetFFb
+         nOc6tREpi27L6D/JIEVc3KWe0eYIl/kUxkLdomlx8SkK27KtRkEMSMqtNlnV6JOoszEQ
+         VsIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date;
-        bh=1dmLlVfV3XQMim7N9LUhMLTI6KxQVUDvbYGTx2lRbg8=;
-        b=u7iS9BsOPR48q7ys7V2ELUmFODOno2/UshafOnTwZgOAtd1CYNgDt0iqTnvP4PCRSG
-         pW8FD08LXpuIzw/ELGohvHoN+WNfnbcwbXRlLgjgOuS+rA7VXJ2KZwPpWO3fvAKg2RZl
-         dyKgQ91C6SBUlOek8tpFb7D5KoL+t/HIs0BfDbq0CRY4emVKNDrR252rzHg2P59X7SXk
-         VnHXcNXFpqbBSx4u/YBEOiq8Vd5cp/EjmF2WvpoVWYU/RBxidhKzeL1d6SLPf/rh5xgb
-         F3Sone63CPuQ/WCs+d54kUnbHMUgtdlNEK6xQED3y+Uf4zDDflamInzZaUvIgHdb2cs0
-         hXow==
-X-Gm-Message-State: ACrzQf09DiDV/C9C91LzWJ4lIVr1PnxRGVH0MoVupMLF7dC4IGPOPduo
-        h0gibQqDQb+iQv4DBewDqIScCLPCf4TaHrd819QvCxW/zGkFq7vsswIevsOGYvNbk+l6otc4ZWw
-        HL/1uc48+guReRogMkYhBAl2qeb0SePTLc0wAuCUq+Ax2XDHimuBORIquB9Nr9UQ=
-X-Google-Smtp-Source: AMsMyM4ZkS/VAsRgzEH2KFBQiF50yhXw75krrcdOmJf/P8jj8u5Z/zMedtfCl9DtWKtF7VbO/1YYyyWLDTSfeA==
+        bh=qjLjZKvyeIeRGOesNjjS3cTK/aOXc6uRAWIPLUpvrd8=;
+        b=ZHbQleh5lRIQ7Mvr9OAK7cN4T/I817Y8d7cDQT1NnE6IBNYiO4KiJXtEeNlcm/EO9Q
+         eCbjPZJuJwu+YrWuLwu9KcBKLRo6bEy8yO3+xS6dAudmCRJGWoGAsuI4dox4MOX9UFfb
+         LpwUMxXfqcCqB2b9+RdIgkLydeELw8d+vr4v1wzsvbsOz+qkPUCxdBEs2hfhN8dYAtYV
+         z2qf4HnGKSyexwM8Pkd+ao62lEJMKZqP5kHj3pBZJDmrOcP4r8otQuFQLibbClbEwc+o
+         RkIC66MlR86keAEOJwcsBrd/6tOXMIF02FkOMfDpLMza9IHSAqbdw0sHKYOUVEf8bnur
+         aBcQ==
+X-Gm-Message-State: ACrzQf047SwYvPctyoLJRZuoI4gr25ojY/ms91GSFg9x+lKYkULdEmlc
+        0zbJwlojKBZWl3ZyWBvMAl8LC4/60SdzNUOecLGPRcKxHFH+cYF9T0FfVAU6G5tQpibwrYrk39K
+        3bM9wBhU0pqdrzK75XKvresWXEH/dcp0hNMhIRRwTu3A6cpTSbvHsFnXqrrtqUo4=
+X-Google-Smtp-Source: AMsMyM7PMMbrQ4oKyuP+30wOQa0mWaPz18dLT/Ogo59kam5aTXyJF6FbF/krZJb3XY3A2cxtntFt+PqH2J0x0w==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a25:e810:0:b0:6b4:5abb:af39 with SMTP id
- k16-20020a25e810000000b006b45abbaf39mr1592729ybd.158.1663816742842; Wed, 21
- Sep 2022 20:19:02 -0700 (PDT)
-Date:   Thu, 22 Sep 2022 03:18:45 +0000
+ (user=ricarkol job=sendgmr) by 2002:a25:2d4b:0:b0:6b0:cc1:8cc with SMTP id
+ s11-20020a252d4b000000b006b00cc108ccmr1495774ybe.570.1663816744338; Wed, 21
+ Sep 2022 20:19:04 -0700 (PDT)
+Date:   Thu, 22 Sep 2022 03:18:46 +0000
 In-Reply-To: <20220922031857.2588688-1-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20220922031857.2588688-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.37.3.968.ga6b4b080e4-goog
-Message-ID: <20220922031857.2588688-3-ricarkol@google.com>
-Subject: [PATCH v8 02/14] KVM: selftests: aarch64: Add virt_get_pte_hva()
- library function
+Message-ID: <20220922031857.2588688-4-ricarkol@google.com>
+Subject: [PATCH v8 03/14] KVM: selftests: Add missing close and munmap in __vm_mem_region_delete()
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
         andrew.jones@linux.dev
@@ -61,8 +60,7 @@ Cc:     pbonzini@redhat.com, maz@kernel.org, seanjc@google.com,
         alexandru.elisei@arm.com, eric.auger@redhat.com, oupton@google.com,
         reijiw@google.com, rananta@google.com, bgardon@google.com,
         dmatlack@google.com, axelrasmussen@google.com,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>
+        Ricardo Koller <ricarkol@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -74,65 +72,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a library function to get the PTE (a host virtual address) of a
-given GVA.  This will be used in a future commit by a test to clear and
-check the access flag of a particular page.
+Deleting a memslot (when freeing a VM) is not closing the backing fd,
+nor it's unmapping the alias mapping. Fix by adding the missing close
+and munmap.
 
-Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Reviewed-by: Oliver Upton <oupton@google.com>
+Reviewed-by: Ben Gardon <bgardon@google.com>
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- .../selftests/kvm/include/aarch64/processor.h       |  2 ++
- tools/testing/selftests/kvm/lib/aarch64/processor.c | 13 ++++++++++---
- 2 files changed, 12 insertions(+), 3 deletions(-)
+ tools/testing/selftests/kvm/lib/kvm_util.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index a8124f9dd68a..df4bfac69551 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -109,6 +109,8 @@ void vm_install_exception_handler(struct kvm_vm *vm,
- void vm_install_sync_handler(struct kvm_vm *vm,
- 		int vector, int ec, handler_fn handler);
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 9889fe0d8919..9dd03eda2eb9 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -544,6 +544,12 @@ static void __vm_mem_region_delete(struct kvm_vm *vm,
+ 	sparsebit_free(&region->unused_phy_pages);
+ 	ret = munmap(region->mmap_start, region->mmap_size);
+ 	TEST_ASSERT(!ret, __KVM_SYSCALL_ERROR("munmap()", ret));
++	if (region->fd >= 0) {
++		/* There's an extra map when using shared memory. */
++		ret = munmap(region->mmap_alias, region->mmap_size);
++		TEST_ASSERT(!ret, __KVM_SYSCALL_ERROR("munmap()", ret));
++		close(region->fd);
++	}
  
-+uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva);
-+
- static inline void cpu_relax(void)
- {
- 	asm volatile("yield" ::: "memory");
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index 6f5551368944..63ef3c78e55e 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -138,7 +138,7 @@ void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
- 	_virt_pg_map(vm, vaddr, paddr, attr_idx);
+ 	free(region);
  }
- 
--vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
-+uint64_t *virt_get_pte_hva(struct kvm_vm *vm, vm_vaddr_t gva)
- {
- 	uint64_t *ptep;
- 
-@@ -169,11 +169,18 @@ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
- 		TEST_FAIL("Page table levels must be 2, 3, or 4");
- 	}
- 
--	return pte_addr(vm, *ptep) + (gva & (vm->page_size - 1));
-+	return ptep;
- 
- unmapped_gva:
- 	TEST_FAIL("No mapping for vm virtual address, gva: 0x%lx", gva);
--	exit(1);
-+	exit(EXIT_FAILURE);
-+}
-+
-+vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
-+{
-+	uint64_t *ptep = virt_get_pte_hva(vm, gva);
-+
-+	return pte_addr(vm, *ptep) + (gva & (vm->page_size - 1));
- }
- 
- static void pte_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent, uint64_t page, int level)
 -- 
 2.37.3.968.ga6b4b080e4-goog
 
