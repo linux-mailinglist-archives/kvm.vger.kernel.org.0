@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CB2F5E7700
-	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 11:27:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AF285E7706
+	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 11:27:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231818AbiIWJ1f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Sep 2022 05:27:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40716 "EHLO
+        id S230094AbiIWJ1j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Sep 2022 05:27:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231300AbiIWJ11 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Sep 2022 05:27:27 -0400
+        with ESMTP id S231797AbiIWJ1c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Sep 2022 05:27:32 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52745B56F6;
-        Fri, 23 Sep 2022 02:27:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA282EE65C;
+        Fri, 23 Sep 2022 02:27:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=BCwKNO7p6ZrQ17y/6nQVDaD6cJ2tHmteDWrP1e6xqX0=; b=n9hepubPbW1tMD7Ec8QsC8TNDV
-        12CbYMaEqA8sXT5tvrocliJB+zVQgj5vaMhMMWBmVT/0KCadfzCyrkGaCOxxRwUFWWsLHfQMOLuTv
-        kReMn/zqnT0niuc6+urTJH/4EReGlFMucPpOPNXiU35LpTvmQFQQ9ioIoSk26xOBmOQ81Xac8rAyT
-        IGO2tnlYj3RfcEhD+po/Q4cCc6JgHnlJNwPtl6Kqx6v7GCcUgYhgbmrVO9xPT4Kp11aB6MfQL1WN6
-        8zcsuWQMY3/bTydegC7V3dgpabvAK6ijBQQnfqlZ01LrbDqsDjK27aEHAtcPBU7z4aMS8R3cCWDJY
-        BrR4vMjA==;
+        bh=aQNh1z2gDNv2FMeq7coIs0k3UVXtQ4QfNnb9l8fXOL0=; b=kvBYL7RRMClziWRMP/pii9cpDe
+        utTPV3dD6c9nxnV3haQJF6dnRiOMU7WQ65ILS1G6jZywii2eah8KcBaAdjLH2N6rhbvul4yz2YDOt
+        QpKdYnBK7iiqQjWMj1a9gVa1r6tFBteSPbpdsINS5X4NpmWVrMyv5rNA9k8SWzBQYYBNjpAeudM9q
+        gGW2XHyclVQ0oU8xTKFe6HVeB6e+7D93sWAAPhSQlC8skMRIwAzExn94s5NvbVS2xe2EwtbAzadbr
+        YZsV5RxjQvrmuQRxnd/EWyvObLpitrFWFrSxuEK6fEhedjpFdkk90dRMBWdY2jaFwgt9AKEsShCWX
+        mjBV48sQ==;
 Received: from ip4d15bec4.dynamic.kabel-deutschland.de ([77.21.190.196] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1obexn-003Jpg-Be; Fri, 23 Sep 2022 09:27:15 +0000
+        id 1obexp-003Jqy-TB; Fri, 23 Sep 2022 09:27:18 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Kirti Wankhede <kwankhede@nvidia.com>,
         Tony Krowiak <akrowiak@linux.ibm.com>,
@@ -40,9 +40,9 @@ To:     Kirti Wankhede <kwankhede@nvidia.com>,
 Cc:     Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
         Kevin Tian <kevin.tian@intel.com>
-Subject: [PATCH 08/14] vfio/mdev: remove mdev_parent_dev
-Date:   Fri, 23 Sep 2022 11:26:46 +0200
-Message-Id: <20220923092652.100656-9-hch@lst.de>
+Subject: [PATCH 09/14] vfio/mdev: remove mtype_get_parent_dev
+Date:   Fri, 23 Sep 2022 11:26:47 +0200
+Message-Id: <20220923092652.100656-10-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220923092652.100656-1-hch@lst.de>
 References: <20220923092652.100656-1-hch@lst.de>
@@ -63,71 +63,63 @@ Just open code the dereferences in the only user.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
 Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 Reviewed-by: Kirti Wankhede <kwankhede@nvidia.com>
 ---
- Documentation/driver-api/vfio-mediated-device.rst | 3 ---
- drivers/gpu/drm/i915/gvt/kvmgt.c                  | 2 +-
- drivers/vfio/mdev/mdev_core.c                     | 6 ------
- include/linux/mdev.h                              | 1 -
- 4 files changed, 1 insertion(+), 11 deletions(-)
+ drivers/s390/cio/vfio_ccw_ops.c |  3 +--
+ drivers/vfio/mdev/mdev_core.c   | 10 ----------
+ include/linux/mdev.h            |  2 --
+ 3 files changed, 1 insertion(+), 14 deletions(-)
 
-diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Documentation/driver-api/vfio-mediated-device.rst
-index ff7342d2e332d..7b660f3fa2c92 100644
---- a/Documentation/driver-api/vfio-mediated-device.rst
-+++ b/Documentation/driver-api/vfio-mediated-device.rst
-@@ -200,9 +200,6 @@ Directories and files under the sysfs for Each Physical Device
+diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
+index c37e712a4b069..3db6251b31143 100644
+--- a/drivers/s390/cio/vfio_ccw_ops.c
++++ b/drivers/s390/cio/vfio_ccw_ops.c
+@@ -62,8 +62,7 @@ static ssize_t available_instances_show(struct mdev_type *mtype,
+ 					struct mdev_type_attribute *attr,
+ 					char *buf)
+ {
+-	struct vfio_ccw_private *private =
+-		dev_get_drvdata(mtype_get_parent_dev(mtype));
++	struct vfio_ccw_private *private = dev_get_drvdata(mtype->parent->dev);
  
- 	sprintf(buf, "%s-%s", dev_driver_string(parent->dev), group->name);
- 
--  (or using mdev_parent_dev(mdev) to arrive at the parent device outside
--  of the core mdev code)
--
- * device_api
- 
-   This attribute should show which device API is being created, for example,
-diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-index ce6b8cb37be0c..1947f553fcd38 100644
---- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-+++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-@@ -1488,7 +1488,7 @@ static int intel_vgpu_init_dev(struct vfio_device *vfio_dev)
- 	struct intel_vgpu_type *type =
- 		container_of(mdev->type, struct intel_vgpu_type, type);
- 
--	vgpu->gvt = kdev_to_i915(mdev_parent_dev(mdev))->gvt;
-+	vgpu->gvt = kdev_to_i915(mdev->type->parent->dev)->gvt;
- 	return intel_gvt_create_vgpu(vgpu, type->conf);
+ 	return sprintf(buf, "%d\n", atomic_read(&private->avail));
  }
- 
 diff --git a/drivers/vfio/mdev/mdev_core.c b/drivers/vfio/mdev/mdev_core.c
-index bde7ce620dae0..75628759a3bf0 100644
+index 75628759a3bf0..93f8caf2e5f77 100644
 --- a/drivers/vfio/mdev/mdev_core.c
 +++ b/drivers/vfio/mdev/mdev_core.c
-@@ -23,12 +23,6 @@ static struct class_compat *mdev_bus_compat_class;
+@@ -23,16 +23,6 @@ static struct class_compat *mdev_bus_compat_class;
  static LIST_HEAD(mdev_list);
  static DEFINE_MUTEX(mdev_list_lock);
  
--struct device *mdev_parent_dev(struct mdev_device *mdev)
+-/*
+- * Used in mdev_type_attribute sysfs functions to return the parent struct
+- * device
+- */
+-struct device *mtype_get_parent_dev(struct mdev_type *mtype)
 -{
--	return mdev->type->parent->dev;
+-	return mtype->parent->dev;
 -}
--EXPORT_SYMBOL(mdev_parent_dev);
+-EXPORT_SYMBOL(mtype_get_parent_dev);
 -
- /*
-  * Used in mdev_type_attribute sysfs functions to return the parent struct
-  * device
+ /* Caller must hold parent unreg_sem read or write lock */
+ static void mdev_device_remove_common(struct mdev_device *mdev)
+ {
 diff --git a/include/linux/mdev.h b/include/linux/mdev.h
-index 6c179d2b89274..bbedffcb38d48 100644
+index bbedffcb38d48..e445f809ceca3 100644
 --- a/include/linux/mdev.h
 +++ b/include/linux/mdev.h
-@@ -95,7 +95,6 @@ void mdev_unregister_parent(struct mdev_parent *parent);
- int mdev_register_driver(struct mdev_driver *drv);
- void mdev_unregister_driver(struct mdev_driver *drv);
+@@ -51,8 +51,6 @@ static inline struct mdev_device *to_mdev_device(struct device *dev)
+ 	return container_of(dev, struct mdev_device, dev);
+ }
  
--struct device *mdev_parent_dev(struct mdev_device *mdev);
- static inline struct device *mdev_dev(struct mdev_device *mdev)
- {
- 	return &mdev->dev;
+-struct device *mtype_get_parent_dev(struct mdev_type *mtype);
+-
+ /* interface for exporting mdev supported type attributes */
+ struct mdev_type_attribute {
+ 	struct attribute attr;
 -- 
 2.30.2
 
