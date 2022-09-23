@@ -2,65 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 246E55E7D04
-	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 16:28:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C7B45E7D5B
+	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 16:40:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229949AbiIWO2r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Sep 2022 10:28:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40808 "EHLO
+        id S232245AbiIWOkT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Sep 2022 10:40:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229616AbiIWO2p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Sep 2022 10:28:45 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBC5C248CB
-        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 07:28:43 -0700 (PDT)
+        with ESMTP id S231440AbiIWOkR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Sep 2022 10:40:17 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1E3E558F2
+        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 07:40:15 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8509961113
-        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 14:28:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD072C433D6;
-        Fri, 23 Sep 2022 14:28:42 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 5F270CE248D
+        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 14:40:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0DE4C433C1;
+        Fri, 23 Sep 2022 14:40:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1663943322;
-        bh=XdwAQ7r76Ceyap/NQFs1/P5fXYkQaKma7S1I8J/xUX4=;
+        s=k20201202; t=1663944012;
+        bh=gOZt6EdKTGQu484brR9cfVMExtN+VmOyzXOZDkQMNsQ=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=lqJnEk+JX8DogYeTRJh2XxVetLFAYZu04lq7o2wNzBVw54qt6cueE4ZwNM8XzlPVH
-         VJFw5eAqu8V5U+eCik4OTqEKvmSN9PqrQ4H7ThVGqTph+LJjCyb8IcCHLbo06ARvIY
-         qBOWjBDOvgm80XhOSwvuWVWRFGE5MGy/4XXp/DJx5XxeskUBTauD1Id5Ma9/XKG2e6
-         gGNN/LOMajCXBwmQcwuvZe3BeoZ5O9uDg8BYFHqwSK5QbjLtpNWyizxmmq/RRz/Qey
-         pO3WxJka+h6f6udujauK4bZED8SZATPUOFqBssHMypgm+aGllj1DvfROXKUw67ECa1
-         4wNMdSE5iAijg==
+        b=YnwKxoPmZiijD8emTiRrYTvk696Pv84HkovY65PXuRYbaDvHuh//YqdwWIV4zzp7+
+         c/M0nviKKy8hT6//DhVkuJ8nZRwoSXz8vVPkDRGjgXsxtH1R8GedaovvOcPFzW3Fle
+         TvKa9jTRLKHjWU48uLzFwyr9PjosF56CC7ykg2ZZKu61T/iiiWN64SsR3ZhNRSrHAc
+         eNavEQhkaZZ5BmWALIY7qK+wSGZz8HhhEWxaLpey9T4vHxf0lLeNPGUUmlu87vpeM6
+         Lo5envUt23EhNWM4LrH6tFYOsTP3nZS4a+EXjR5+/1YVgLYLy9EGXuh04ljDl5b1qs
+         igelRpKOba3Fg==
 Received: from [82.141.251.28] (helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1objfU-00CAnA-LE;
-        Fri, 23 Sep 2022 15:28:40 +0100
-Date:   Fri, 23 Sep 2022 15:28:34 +0100
-Message-ID: <87czbmjhbh.wl-maz@kernel.org>
+        id 1objqc-00CAwM-HI;
+        Fri, 23 Sep 2022 15:40:10 +0100
+Date:   Fri, 23 Sep 2022 15:40:07 +0100
+Message-ID: <87bkr6jgs8.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org,
-        andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com,
-        pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com,
-        gshan@redhat.com, James Morse <james.morse@arm.com>,
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     Peter Xu <peterx@redhat.com>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com,
+        shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org,
+        dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com,
+        shan.gavin@gmail.com, James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH 2/6] KVM: Add KVM_CAP_DIRTY_LOG_RING_ORDERED capability and config option
-In-Reply-To: <YyzYI/bvp/JnbcxS@xz-m1.local>
+Subject: Re: [PATCH 1/6] KVM: Use acquire/release semantics when accessing dirty ring GFN state
+In-Reply-To: <e8ddf130-c5e1-d872-c7c8-675d40742b1e@redhat.com>
 References: <20220922170133.2617189-1-maz@kernel.org>
-        <20220922170133.2617189-3-maz@kernel.org>
-        <YyzYI/bvp/JnbcxS@xz-m1.local>
+        <20220922170133.2617189-2-maz@kernel.org>
+        <YyzV2Q/PZHPFMD6y@xz-m1.local>
+        <e8ddf130-c5e1-d872-c7c8-675d40742b1e@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 82.141.251.28
-X-SA-Exim-Rcpt-To: peterx@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com, gshan@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev
+X-SA-Exim-Rcpt-To: gshan@redhat.com, peterx@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -72,61 +73,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 22 Sep 2022 22:48:19 +0100,
-Peter Xu <peterx@redhat.com> wrote:
+On Fri, 23 Sep 2022 00:46:58 +0100,
+Gavin Shan <gshan@redhat.com> wrote:
 > 
-> On Thu, Sep 22, 2022 at 06:01:29PM +0100, Marc Zyngier wrote:
-> > In order to differenciate between architectures that require no extra
-> > synchronisation when accessing the dirty ring and those who do,
-> > add a new capability (KVM_CAP_DIRTY_LOG_RING_ORDERED) that identify
-> > the latter sort. TSO architectures can obviously advertise both, while
-> > relaxed architectures most only advertise the ORDERED version.
-> > 
-> > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  include/linux/kvm_dirty_ring.h |  6 +++---
-> >  include/uapi/linux/kvm.h       |  1 +
-> >  virt/kvm/Kconfig               | 14 ++++++++++++++
-> >  virt/kvm/Makefile.kvm          |  2 +-
-> >  virt/kvm/kvm_main.c            | 11 +++++++++--
-> >  5 files changed, 28 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
-> > index 906f899813dc..7a0c90ae9a3f 100644
-> > --- a/include/linux/kvm_dirty_ring.h
-> > +++ b/include/linux/kvm_dirty_ring.h
-> > @@ -27,7 +27,7 @@ struct kvm_dirty_ring {
-> >  	int index;
-> >  };
-> >  
-> > -#ifndef CONFIG_HAVE_KVM_DIRTY_RING
-> > +#ifndef CONFIG_HAVE_KVM_DIRTY_LOG
+> Hi Peter,
 > 
-> s/LOG/LOG_RING/ according to the commit message? Or the name seems too
-> generic.
+> On 9/23/22 7:38 AM, Peter Xu wrote:
+> > On Thu, Sep 22, 2022 at 06:01:28PM +0100, Marc Zyngier wrote:
+> >> The current implementation of the dirty ring has an implicit requirement
+> >> that stores to the dirty ring from userspace must be:
+> >> 
+> >> - be ordered with one another
+> >> 
+> >> - visible from another CPU executing a ring reset
+> >> 
+> >> While these implicit requirements work well for x86 (and any other
+> >> TSO-like architecture), they do not work for more relaxed architectures
+> >> such as arm64 where stores to different addresses can be freely
+> >> reordered, and loads from these addresses not observing writes from
+> >> another CPU unless the required barriers (or acquire/release semantics)
+> >> are used.
+> >> 
+> >> In order to start fixing this, upgrade the ring reset accesses:
+> >> 
+> >> - the kvm_dirty_gfn_harvested() helper now uses acquire semantics
+> >>    so it is ordered after all previous writes, including that from
+> >>    userspace
+> >> 
+> >> - the kvm_dirty_gfn_set_invalid() helper now uses release semantics
+> >>    so that the next_slot and next_offset reads don't drift past
+> >>    the entry invalidation
+> >> 
+> >> This is only a partial fix as the userspace side also need upgrading.
+> > 
+> > Paolo has one fix 4802bf910e ("KVM: dirty ring: add missing memory
+> > barrier", 2022-09-01) which has already landed.
+> > 
+> > I think the other one to reset it was lost too.  I just posted a patch.
+> > 
+> > https://lore.kernel.org/qemu-devel/20220922213522.68861-1-peterx@redhat.com/
+> > (link still not yet available so far, but should be)
+> > 
+> >> 
+> >> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> >> ---
+> >>   virt/kvm/dirty_ring.c | 4 ++--
+> >>   1 file changed, 2 insertions(+), 2 deletions(-)
+> >> 
+> >> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
+> >> index f4c2a6eb1666..784bed80221d 100644
+> >> --- a/virt/kvm/dirty_ring.c
+> >> +++ b/virt/kvm/dirty_ring.c
+> >> @@ -79,12 +79,12 @@ static inline void kvm_dirty_gfn_set_invalid(struct kvm_dirty_gfn *gfn)
+> >>     static inline void kvm_dirty_gfn_set_dirtied(struct
+> >> kvm_dirty_gfn *gfn)
+> >>   {
+> >> -	gfn->flags = KVM_DIRTY_GFN_F_DIRTY;
+> >> +	smp_store_release(&gfn->flags, KVM_DIRTY_GFN_F_DIRTY);
+> > 
+> > IIUC you meant kvm_dirty_gfn_set_invalid as the comment says?
+> > 
+> > kvm_dirty_gfn_set_dirtied() has been guarded by smp_wmb() and AFAICT that's
+> > already safe.  Otherwise looks good to me.
+> > 
+> 
+> If I'm understanding the full context, smp_store_release() also
+> enforces guard on 'gfn->flags' itself. It is needed by user space
+> for the synchronization.
 
-The commit message talks about the capability, while the above is the
-config option. If you find the names inappropriate, feel free to
-suggest alternatives (for all I care, they could be called FOO, BAR
-and BAZ).
+There are multiple things at play here:
 
-> Pure question to ask: is it required to have a new cap just for the
-> ordering?  IIUC if x86 was the only supported anyway before, it means all
-> released old kvm binaries are always safe even without the strict
-> orderings.  As long as we rework all the memory ordering bits before
-> declaring support of yet another arch, we're good.  Or am I wrong?
+- userspace needs a store-release when making the flags 'harvested',
+  so that the kernel using a load-acquire can observe this write (and
+  avoid the roach-motel effect of a non-acquire load)
 
-Someone will show up with an old userspace which probes for the sole
-existing capability, and things start failing subtly. It is quite
-likely that the userspace code is built for all architectures, and we
-want to make sure that userspace actively buys into the new ordering
-requirements. A simple way to do this is to expose a new capability,
-making the new requirement obvious. Architectures with relaxed
-ordering semantics will only implement the new one, while x86 will
-implement both.
+- the kernel needs a store-release when making the flags 'invalid',
+  preventing this write from occuring before the next_* fields have
+  been sampled
 
-Thanks,
+On the ring production side, there is a heavy handed smp_wmb(), which
+makes things pretty safe.
 
 	M.
 
