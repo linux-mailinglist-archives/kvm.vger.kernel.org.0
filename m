@@ -2,119 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D60275E819F
-	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 20:15:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05A205E81B8
+	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 20:26:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232287AbiIWSO7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Sep 2022 14:14:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33676 "EHLO
+        id S231883AbiIWS00 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Sep 2022 14:26:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231893AbiIWSO4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Sep 2022 14:14:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B78236784
-        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 11:14:53 -0700 (PDT)
+        with ESMTP id S229514AbiIWS0Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Sep 2022 14:26:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 518E812167D
+        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 11:26:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663956892;
+        s=mimecast20190719; t=1663957583;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xlpsA1hVsAoy9jBxMFE7nv+cMfSPTOZYBG8PCVZGKL8=;
-        b=J2jZKhgas5hJ53W/w3TMicvumDl1Yiv1Lm5Q4IMqCewnXpqu4zMWLqG7OPtUtTi+6IfOvx
-        zYC1Ng5Xx6BlonZcR3aBtF+LZF+Ix9xQ6DXRcKOcy10PdO3NztlUeZxynLv8LjQwafOMWQ
-        mWVKDE+fqkb/MuKxOjeUOXSQ3hO4dB4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=sKwAzZec8KipecaZ1JzamS6Z7a4oJagSVbwGtwJhtZs=;
+        b=f8LrPrmH21AK1JsXayZzaPrgogaWool1hr7GJhPkOlwUaV5Vnj6YI225eVbrdfATo5PXef
+        oCS6hFork37xgXB3QftfD7mM4CL6U/bPu3qjfr+2iR/BgsJUIV3ek59uiP2WynOBiEUaIK
+        tt8QVBkxrsWIMWSXxBysG4lhGQK9oTo=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-589-itBFQXQEMQGCYYXXLHILfA-1; Fri, 23 Sep 2022 14:14:50 -0400
-X-MC-Unique: itBFQXQEMQGCYYXXLHILfA-1
-Received: by mail-wm1-f69.google.com with SMTP id r7-20020a1c4407000000b003b3309435a9so2667936wma.6
-        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 11:14:50 -0700 (PDT)
+ us-mta-532-PTpC87-zM8-jseGEjT89qA-1; Fri, 23 Sep 2022 14:26:22 -0400
+X-MC-Unique: PTpC87-zM8-jseGEjT89qA-1
+Received: by mail-qk1-f200.google.com with SMTP id v15-20020a05620a0f0f00b006ceab647023so577429qkl.13
+        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 11:26:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=xlpsA1hVsAoy9jBxMFE7nv+cMfSPTOZYBG8PCVZGKL8=;
-        b=tY6hSQ/o1+f1bqbrcYVVqyFwIHH0esainUywr9hWi2nzuH8h/mDGzwGNUrLm5VqsMm
-         8F6bdOfg+rR7pB8v271gC8HVKo3nQ/QHJwpBrOg8Z4gt1+DyTDxST7qaitF/vf/6Ir+W
-         mcPFeDQiz57bd+4Ec19l0WuykACI9cnyBmGw6wJlPXpMqsmyIKENPbGc+MuEUz5VhNO/
-         qn1qJGWruV9FxGliqu4oW2YnNcqiBuARlyNsyjsRYzFXSkGHXj442YbZSpxupQk5r/xh
-         CMgL6i4VrmaAkuZLfJ4gV8tb6R3/rf7SbJpQ6J6JIrd5eYWwLgGQ3KgwXvUiIZm7Hxhu
-         AAbQ==
-X-Gm-Message-State: ACrzQf3MGd93VKVnDXmPYp5X+IrrLAwjVN3o9w2dsiABenzSIRNVvvII
-        sykHtPbLWyxjGd7LmH0UZclfqRxOqUgwRY9sW4xixpNsK/OqoE1A8uKVKeLmdNAbvdq0QDVA88l
-        6OWdpzQpUaIHf
-X-Received: by 2002:adf:f911:0:b0:21e:c0f6:fd26 with SMTP id b17-20020adff911000000b0021ec0f6fd26mr5978815wrr.361.1663956889746;
-        Fri, 23 Sep 2022 11:14:49 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM66NypFqpfKGADDGoJyIEOtRO5ige+1TpLluYDTcbS7M5oV76CxDKtlUBV4OPgiyPPGazx8+Q==
-X-Received: by 2002:adf:f911:0:b0:21e:c0f6:fd26 with SMTP id b17-20020adff911000000b0021ec0f6fd26mr5978798wrr.361.1663956889503;
-        Fri, 23 Sep 2022 11:14:49 -0700 (PDT)
-Received: from [192.168.8.103] (tmo-097-189.customers.d1-online.com. [80.187.97.189])
-        by smtp.gmail.com with ESMTPSA id x8-20020adff0c8000000b00228c483128dsm9309204wro.90.2022.09.23.11.14.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Sep 2022 11:14:48 -0700 (PDT)
-Message-ID: <1bfedded-d245-f842-e793-c078fbab8947@redhat.com>
-Date:   Fri, 23 Sep 2022 20:14:46 +0200
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=sKwAzZec8KipecaZ1JzamS6Z7a4oJagSVbwGtwJhtZs=;
+        b=wpWghXw29eKRU075hPL+PWZsW+1NRmmFeGggFnYHlkLLH8fei/Fqcfw6YFEGmNjRob
+         rj2Kxtgk/3YU1FiPYtDhFkhmfehmh9nHBhKwCp+ikUPoBvuPMHynLvh1n5bwenqNi3P1
+         jQroVRT4qhYmzlxKEiQ50ux9hzOjr8XR2a7NuZsxLvJuEUT02dcPQR8KdccMkTJzENd1
+         0S5BS/A/uU1qBH8Vyxhj930R7bJw4x9ClLdkC19b7hbWWWUt3omdL9Abx7x5KSu17he2
+         NZ+w13OUdImBMdt/KbTmkuE+NaR6CN1nt+ZAZm909oaJ+Kd5YXMWOGQbfverhz23zjtN
+         bdFg==
+X-Gm-Message-State: ACrzQf0FW5PD8qc1mkBgeSfGGqzo0PxjjNDIUidE+YUY/WQ0xgCi5UCO
+        qEygmHHVvFwKft5A9Ls8kBHMEupmuIU+YullS23la8AWUKGI5kDSM2M/HXatMf0vmUZYjEjUKSx
+        klRJ9GbAczH0J
+X-Received: by 2002:a05:622a:1002:b0:35b:baaf:24bb with SMTP id d2-20020a05622a100200b0035bbaaf24bbmr8450491qte.85.1663957581656;
+        Fri, 23 Sep 2022 11:26:21 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM5klgSD6rdsCB+xreJDWo2YXT/MOk2drMbEljCnhf9MK11IyCj/1lotbhwRYcmUHZVuWQJ/dw==
+X-Received: by 2002:a05:622a:1002:b0:35b:baaf:24bb with SMTP id d2-20020a05622a100200b0035bbaaf24bbmr8450467qte.85.1663957581402;
+        Fri, 23 Sep 2022 11:26:21 -0700 (PDT)
+Received: from x1n (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca. [70.31.27.79])
+        by smtp.gmail.com with ESMTPSA id u15-20020a05620a0c4f00b006cf19068261sm6714936qki.116.2022.09.23.11.26.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Sep 2022 11:26:20 -0700 (PDT)
+Date:   Fri, 23 Sep 2022 14:26:18 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org,
+        andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com,
+        pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com,
+        gshan@redhat.com, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH 2/6] KVM: Add KVM_CAP_DIRTY_LOG_RING_ORDERED capability
+ and config option
+Message-ID: <Yy36Stppz4tYBPiP@x1n>
+References: <20220922170133.2617189-1-maz@kernel.org>
+ <20220922170133.2617189-3-maz@kernel.org>
+ <YyzYI/bvp/JnbcxS@xz-m1.local>
+ <87czbmjhbh.wl-maz@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH v8 3/8] s390x/pci: enable for load/store intepretation
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
-        cohuck@redhat.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com,
-        pasic@linux.ibm.com, borntraeger@linux.ibm.com, mst@redhat.com,
-        pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <20220902172737.170349-1-mjrosato@linux.ibm.com>
- <20220902172737.170349-4-mjrosato@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20220902172737.170349-4-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87czbmjhbh.wl-maz@kernel.org>
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/09/2022 19.27, Matthew Rosato wrote:
-> If the ZPCI_OP ioctl reports that is is available and usable, then the
-> underlying KVM host will enable load/store intepretation for any guest
-> device without a SHM bit in the guest function handle.  For a device that
-> will be using interpretation support, ensure the guest function handle
-> matches the host function handle; this value is re-checked every time the
-> guest issues a SET PCI FN to enable the guest device as it is the only
-> opportunity to reflect function handle changes.
+On Fri, Sep 23, 2022 at 03:28:34PM +0100, Marc Zyngier wrote:
+> On Thu, 22 Sep 2022 22:48:19 +0100,
+> Peter Xu <peterx@redhat.com> wrote:
+> > 
+> > On Thu, Sep 22, 2022 at 06:01:29PM +0100, Marc Zyngier wrote:
+> > > In order to differenciate between architectures that require no extra
+> > > synchronisation when accessing the dirty ring and those who do,
+> > > add a new capability (KVM_CAP_DIRTY_LOG_RING_ORDERED) that identify
+> > > the latter sort. TSO architectures can obviously advertise both, while
+> > > relaxed architectures most only advertise the ORDERED version.
+> > > 
+> > > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  include/linux/kvm_dirty_ring.h |  6 +++---
+> > >  include/uapi/linux/kvm.h       |  1 +
+> > >  virt/kvm/Kconfig               | 14 ++++++++++++++
+> > >  virt/kvm/Makefile.kvm          |  2 +-
+> > >  virt/kvm/kvm_main.c            | 11 +++++++++--
+> > >  5 files changed, 28 insertions(+), 6 deletions(-)
+> > > 
+> > > diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
+> > > index 906f899813dc..7a0c90ae9a3f 100644
+> > > --- a/include/linux/kvm_dirty_ring.h
+> > > +++ b/include/linux/kvm_dirty_ring.h
+> > > @@ -27,7 +27,7 @@ struct kvm_dirty_ring {
+> > >  	int index;
+> > >  };
+> > >  
+> > > -#ifndef CONFIG_HAVE_KVM_DIRTY_RING
+> > > +#ifndef CONFIG_HAVE_KVM_DIRTY_LOG
+> > 
+> > s/LOG/LOG_RING/ according to the commit message? Or the name seems too
+> > generic.
 > 
-> By default, unless interpret=off is specified, interpretation support will
-> always be assumed and exploited if the necessary ioctl and features are
-> available on the host kernel.  When these are unavailable, we will silently
-> revert to the interception model; this allows existing guest configurations
-> to work unmodified on hosts with and without zPCI interpretation support,
-> allowing QEMU to choose the best support model available.
+> The commit message talks about the capability, while the above is the
+> config option. If you find the names inappropriate, feel free to
+> suggest alternatives (for all I care, they could be called FOO, BAR
+> and BAZ).
+
+The existing name from David looks better than the new one.. to me.
+
 > 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->   hw/s390x/meson.build            |  1 +
->   hw/s390x/s390-pci-bus.c         | 66 ++++++++++++++++++++++++++++++++-
->   hw/s390x/s390-pci-inst.c        | 16 ++++++++
->   hw/s390x/s390-pci-kvm.c         | 22 +++++++++++
->   include/hw/s390x/s390-pci-bus.h |  1 +
->   include/hw/s390x/s390-pci-kvm.h | 24 ++++++++++++
->   target/s390x/kvm/kvm.c          |  7 ++++
->   target/s390x/kvm/kvm_s390x.h    |  1 +
->   8 files changed, 137 insertions(+), 1 deletion(-)
->   create mode 100644 hw/s390x/s390-pci-kvm.c
->   create mode 100644 include/hw/s390x/s390-pci-kvm.h
+> > Pure question to ask: is it required to have a new cap just for the
+> > ordering?  IIUC if x86 was the only supported anyway before, it means all
+> > released old kvm binaries are always safe even without the strict
+> > orderings.  As long as we rework all the memory ordering bits before
+> > declaring support of yet another arch, we're good.  Or am I wrong?
+> 
+> Someone will show up with an old userspace which probes for the sole
+> existing capability, and things start failing subtly. It is quite
+> likely that the userspace code is built for all architectures,
 
-Looks sane to me.
+I didn't quite follow here.  Since both kvm/qemu dirty ring was only
+supported on x86, I don't see the risk.
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+Assuming we've the old binary.
+
+If to run on old kernel, it'll work like before.
+
+If to run on new kernel, the kernel will behave stricter on memory barriers
+but should still be compatible with the old behavior (not vice versa, so
+I'll understand if we're loosing the ordering, but we're not..).
+
+Any further elaboration would be greatly helpful.
+
+Thanks,
+
+> and we
+> want to make sure that userspace actively buys into the new ordering
+> requirements. A simple way to do this is to expose a new capability,
+> making the new requirement obvious. Architectures with relaxed
+> ordering semantics will only implement the new one, while x86 will
+> implement both.
+
+-- 
+Peter Xu
 
