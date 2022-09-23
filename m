@@ -2,152 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 499C75E7899
-	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 12:45:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 358F25E78A4
+	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 12:47:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231724AbiIWKpa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Sep 2022 06:45:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49964 "EHLO
+        id S231604AbiIWKrj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Sep 2022 06:47:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231211AbiIWKp3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Sep 2022 06:45:29 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D820107DCA;
-        Fri, 23 Sep 2022 03:45:27 -0700 (PDT)
-Received: from zn.tnic (p200300ea9733e795329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e795:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 173371EC0646;
-        Fri, 23 Sep 2022 12:45:22 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1663929922;
+        with ESMTP id S231837AbiIWKr3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Sep 2022 06:47:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BEC713072E
+        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 03:47:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663930046;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=YC6QKuFEYpH0XpfhpwGB1CuLNINrgRzZ5ir3xkeSvuM=;
-        b=WkBB69seK3LQAmoCcgMvxc4T8LOtOQF+r50Tp3fx9YEEYQAlSVbgszUBjeoYyEGhxR6pW7
-        qzpRRDWwvAgaP5PoumZxgODb+d+pIUPwLzU0wxIxtraqbGFSTbX4itR9eh7OAOJlatWm9l
-        SrPmUepo8bZacWgektuZAyCYiB1bZQw=
-Date:   Fri, 23 Sep 2022 12:45:17 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Alexey Makhalov <amakhalov@vmware.com>,
-        Juergen Gross <jgross@suse.com>, x86@kernel.org,
-        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-        ganb@vmware.com, sturlapati@vmware.com, bordoloih@vmware.com,
-        ankitja@vmware.com, keerthanak@vmware.com, namit@vmware.com,
-        srivatsab@vmware.com, kvm ML <kvm@vger.kernel.org>
-Subject: Re: [PATCH] smp/hotplug, x86/vmware: Put offline vCPUs in halt
- instead of mwait
-Message-ID: <Yy2OPR0b3pG2Ia+v@zn.tnic>
-References: <165843627080.142207.12667479241667142176.stgit@csail.mit.edu>
- <Yy1attxrEMDmCFBa@hirez.programming.kicks-ass.net>
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Qr9D2nxa419/6RhWTwJtZgsn+SCyu83SR9F+lYB9nLM=;
+        b=bbusqQ+hb0TZWLTq2e/WBmMDdHFiToovxqXvxgRAnzn+hhYF+1eJmbq5h6Mambm56jkYBx
+        Oblgwcd3MpT1NSp4aMHuDrJ+Uvn3slmqVtJWpno4HMPt8ql9SMP8buK88aLztfVWkT9Ldc
+        3/eHYpIAfFBwm0V0bF7FQAzKDl4zrHc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-86-0IKzgXwcOhy0xmZ5UXTDsQ-1; Fri, 23 Sep 2022 06:47:25 -0400
+X-MC-Unique: 0IKzgXwcOhy0xmZ5UXTDsQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 7-20020a05600c020700b003b4ce6e6b12so1690034wmi.0
+        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 03:47:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=Qr9D2nxa419/6RhWTwJtZgsn+SCyu83SR9F+lYB9nLM=;
+        b=RN8p0b3oF+fzv9TjInjvP2+ASxJTtcPh+7ul254qPb7N74E9P66gBvLwMxBB6eszim
+         kPvOta7PzQiWzfmbfzT/6iUxbGmiSCvy6DtqwJtRQSHJs6LQDKBLnirByyFlyriEoJlt
+         fZwBqB1lBeZx3aDUuFqVWnIbGJkvwh/mo3tiJ2ZW461+WyIQUO0M/K4GQ33Upj3LBtTC
+         AN59QCedvOr7kDiWNtO7EPPZCXRczJHf0PAaj96EO6NmIrpc/fUEMAgdkIzbrKRNwLyS
+         pX90WLlxiywW8iId2k8jkGOMeDDIbBh6kI2fXzhyE0UwO83iHt8A6myECQsxgpQz3NVU
+         bWug==
+X-Gm-Message-State: ACrzQf10kPPb/IHCR4UllKi+GjvuUqbggOgAmkuyHzWW3X5LLgu4IC24
+        eyVer3ZORGJO3xCz0x4HAo7ItxMrLMNDKH+zG7VqXxawx+CQU5fsMd9JIKVhrn1oaxCovQn6pTO
+        Nhzc0Yp7rrlN8
+X-Received: by 2002:a5d:5232:0:b0:228:6bb8:e985 with SMTP id i18-20020a5d5232000000b002286bb8e985mr4874226wra.10.1663930044160;
+        Fri, 23 Sep 2022 03:47:24 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7oahzqi6gvqJtWwHv1wGKmPcNFzhCGBqcPBy0fWzvOcNz30QeMRmnORWlgetNmzbkUF81SyA==
+X-Received: by 2002:a5d:5232:0:b0:228:6bb8:e985 with SMTP id i18-20020a5d5232000000b002286bb8e985mr4874202wra.10.1663930043939;
+        Fri, 23 Sep 2022 03:47:23 -0700 (PDT)
+Received: from [192.168.0.5] (ip-109-43-179-37.web.vodafone.de. [109.43.179.37])
+        by smtp.gmail.com with ESMTPSA id n11-20020adfe34b000000b002252ec781f7sm7166167wrj.8.2022.09.23.03.47.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Sep 2022 03:47:23 -0700 (PDT)
+Message-ID: <282102a6-7406-0a7a-2023-d2b9b6e68e36@redhat.com>
+Date:   Fri, 23 Sep 2022 12:47:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Yy1attxrEMDmCFBa@hirez.programming.kicks-ass.net>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
+        cohuck@redhat.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com,
+        pasic@linux.ibm.com, borntraeger@linux.ibm.com, mst@redhat.com,
+        pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20220902172737.170349-1-mjrosato@linux.ibm.com>
+ <20220902172737.170349-3-mjrosato@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v8 2/8] s390x/pci: add routine to get host function handle
+ from CLP info
+In-Reply-To: <20220902172737.170349-3-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+ kvm ML and leaving the whole mail quoted in for them.
+On 02/09/2022 19.27, Matthew Rosato wrote:
+> In order to interface with the underlying host zPCI device, we need
+> to know it's function handle.  Add a routine to grab this from the
 
-On Fri, Sep 23, 2022 at 09:05:26AM +0200, Peter Zijlstra wrote:
-> On Thu, Jul 21, 2022 at 01:44:33PM -0700, Srivatsa S. Bhat wrote:
-> > From: Srivatsa S. Bhat (VMware) <srivatsa@csail.mit.edu>
-> > 
-> > VMware ESXi allows enabling a passthru mwait CPU-idle state in the
-> > guest using the following VMX option:
-> > 
-> > monitor_control.mwait_in_guest = "TRUE"
-> > 
-> > This lets a vCPU in mwait to remain in guest context (instead of
-> > yielding to the hypervisor via a VMEXIT), which helps speed up
-> > wakeups from idle.
-> > 
-> > However, this runs into problems with CPU hotplug, because the Linux
-> > CPU offline path prefers to put the vCPU-to-be-offlined in mwait
-> > state, whenever mwait is available. As a result, since a vCPU in mwait
-> > remains in guest context and does not yield to the hypervisor, an
-> > offline vCPU *appears* to be 100% busy as viewed from ESXi, which
-> > prevents the hypervisor from running other vCPUs or workloads on the
-> > corresponding pCPU (particularly when vCPU - pCPU mappings are
-> > statically defined by the user).
-> 
-> I would hope vCPU pinning is a mandatory thing when MWAIT passthrough it
-> set?
-> 
-> > [ Note that such a vCPU is not
-> > actually busy spinning though; it remains in mwait idle state in the
-> > guest ].
-> > 
-> > Fix this by overriding the CPU offline play_dead() callback for VMware
-> > hypervisor, by putting the CPU in halt state (which actually yields to
-> > the hypervisor), even if mwait support is available.
-> > 
-> > Signed-off-by: Srivatsa S. Bhat (VMware) <srivatsa@csail.mit.edu>
-> > ---
-> 
-> > +static void vmware_play_dead(void)
-> > +{
-> > +	play_dead_common();
-> > +	tboot_shutdown(TB_SHUTDOWN_WFS);
-> > +
-> > +	/*
-> > +	 * Put the vCPU going offline in halt instead of mwait (even
-> > +	 * if mwait support is available), to make sure that the
-> > +	 * offline vCPU yields to the hypervisor (which may not happen
-> > +	 * with mwait, for example, if the guest's VMX is configured
-> > +	 * to retain the vCPU in guest context upon mwait).
-> > +	 */
-> > +	hlt_play_dead();
-> > +}
-> >  #endif
-> >  
-> >  static __init int activate_jump_labels(void)
-> > @@ -349,6 +365,7 @@ static void __init vmware_paravirt_ops_setup(void)
-> >  #ifdef CONFIG_SMP
-> >  		smp_ops.smp_prepare_boot_cpu =
-> >  			vmware_smp_prepare_boot_cpu;
-> > +		smp_ops.play_dead = vmware_play_dead;
-> >  		if (cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN,
-> >  					      "x86/vmware:online",
-> >  					      vmware_cpu_online,
-> 
-> No real objection here; but would not something like the below fix the
-> problem more generally? I'm thinking MWAIT passthrough for *any*
-> hypervisor doesn't want play_dead to use it.
-> 
-> diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
-> index f24227bc3220..166cb3aaca8a 100644
-> --- a/arch/x86/kernel/smpboot.c
-> +++ b/arch/x86/kernel/smpboot.c
-> @@ -1759,6 +1759,8 @@ static inline void mwait_play_dead(void)
->  		return;
->  	if (!this_cpu_has(X86_FEATURE_CLFLUSH))
->  		return;
-> +	if (this_cpu_has(X86_FEATURE_HYPERVISOR))
-> +		return;
->  	if (__this_cpu_read(cpu_info.cpuid_level) < CPUID_MWAIT_LEAF)
->  		return;
+Nit: s/it's/its/
 
-Yeah, it would be nice if we could get a consensus here from all
-relevant HVs.
+> vfio CLP capabilities chain.
+> 
+> Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>   hw/s390x/s390-pci-vfio.c         | 83 ++++++++++++++++++++++++++------
+>   include/hw/s390x/s390-pci-vfio.h |  5 ++
+>   2 files changed, 72 insertions(+), 16 deletions(-)
+> 
+> diff --git a/hw/s390x/s390-pci-vfio.c b/hw/s390x/s390-pci-vfio.c
+> index 6f80a47e29..4bf0a7e22d 100644
+> --- a/hw/s390x/s390-pci-vfio.c
+> +++ b/hw/s390x/s390-pci-vfio.c
+> @@ -124,6 +124,27 @@ static void s390_pci_read_base(S390PCIBusDevice *pbdev,
+>       pbdev->zpci_fn.pft = 0;
+>   }
+>   
+> +static bool get_host_fh(S390PCIBusDevice *pbdev, struct vfio_device_info *info,
+> +                        uint32_t *fh)
+> +{
+> +    struct vfio_info_cap_header *hdr;
+> +    struct vfio_device_info_cap_zpci_base *cap;
+> +    VFIOPCIDevice *vpci =  container_of(pbdev->pdev, VFIOPCIDevice, pdev);
 
--- 
-Regards/Gruss,
-    Boris.
+Nit: two spaces after the "="
 
-https://people.kernel.org/tglx/notes-about-netiquette
+> +    hdr = vfio_get_device_info_cap(info, VFIO_DEVICE_INFO_CAP_ZPCI_BASE);
+> +
+> +    /* Can only get the host fh with version 2 or greater */
+> +    if (hdr == NULL || hdr->version < 2) {
+> +        trace_s390_pci_clp_cap(vpci->vbasedev.name,
+> +                               VFIO_DEVICE_INFO_CAP_ZPCI_BASE);
+> +        return false;
+> +    }
+> +    cap = (void *) hdr;
+> +
+> +    *fh = cap->fh;
+> +    return true;
+> +}
+> +
+>   static void s390_pci_read_group(S390PCIBusDevice *pbdev,
+>                                   struct vfio_device_info *info)
+>   {
+> @@ -217,25 +238,13 @@ static void s390_pci_read_pfip(S390PCIBusDevice *pbdev,
+>       memcpy(pbdev->zpci_fn.pfip, cap->pfip, CLP_PFIP_NR_SEGMENTS);
+>   }
+>   
+> -/*
+> - * This function will issue the VFIO_DEVICE_GET_INFO ioctl and look for
+> - * capabilities that contain information about CLP features provided by the
+> - * underlying host.
+> - * On entry, defaults have already been placed into the guest CLP response
+> - * buffers.  On exit, defaults will have been overwritten for any CLP features
+> - * found in the capability chain; defaults will remain for any CLP features not
+> - * found in the chain.
+> - */
+> -void s390_pci_get_clp_info(S390PCIBusDevice *pbdev)
+> +static struct vfio_device_info *get_device_info(S390PCIBusDevice *pbdev,
+> +                                                uint32_t argsz)
+>   {
+> -    g_autofree struct vfio_device_info *info = NULL;
+> +    struct vfio_device_info *info = g_malloc0(argsz);
+>       VFIOPCIDevice *vfio_pci;
+> -    uint32_t argsz;
+>       int fd;
+>   
+> -    argsz = sizeof(*info);
+> -    info = g_malloc0(argsz);
+> -
+>       vfio_pci = container_of(pbdev->pdev, VFIOPCIDevice, pdev);
+>       fd = vfio_pci->vbasedev.fd;
+>   
+> @@ -250,7 +259,8 @@ retry:
+>   
+>       if (ioctl(fd, VFIO_DEVICE_GET_INFO, info)) {
+>           trace_s390_pci_clp_dev_info(vfio_pci->vbasedev.name);
+> -        return;
+> +        free(info);
+
+Nit: Please use g_free() for things that you've allocated with g_malloc0().
+
+> +        return NULL;
+>       }
+>   
+>       if (info->argsz > argsz) {
+> @@ -259,6 +269,47 @@ retry:
+>           goto retry;
+>       }
+>   
+> +    return info;
+> +}
+...
+
+Apart from the nits, the patch looks fine to me.
+
+  Thomas
+
