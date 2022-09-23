@@ -2,233 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 87B335E7BAF
-	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 15:22:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D8D05E7BDC
+	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 15:30:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232241AbiIWNV6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Sep 2022 09:21:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54436 "EHLO
+        id S232263AbiIWNaL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Sep 2022 09:30:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230285AbiIWNVy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Sep 2022 09:21:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 091C6142E04
-        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 06:21:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663939310;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zo6WLSvgjbrNE/HT5ShlnCmyG13/PZcEnNZ7Uz62d/E=;
-        b=Brlqu/Aby8Wa+A0BVHOfZ0wSl0bh1VSn8vVOJrGeg4XaaCZW5B82JFnziPc30hF2HnK3qf
-        CNUj548RlAladxWRQ1PfNzJ2O5MqxjqL1F6gWSuNYZQoflBpYMwP6OO7FQBoIZsF2qd3iV
-        la3sv0obAUF+RX8cI9/g2mMjyj3DuPI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-63-e6SlTSxENIuJ8CUJyeSaRw-1; Fri, 23 Sep 2022 09:21:49 -0400
-X-MC-Unique: e6SlTSxENIuJ8CUJyeSaRw-1
-Received: by mail-wm1-f71.google.com with SMTP id r7-20020a1c4407000000b003b3309435a9so2320845wma.6
-        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 06:21:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:organization:from
-         :references:cc:to:content-language:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=zo6WLSvgjbrNE/HT5ShlnCmyG13/PZcEnNZ7Uz62d/E=;
-        b=Ftlt5IXzY06jNJ3HoiG7tTVlKuC8QBiEHYKeFNvOP4Tpvmv+nxnP2u3vERy3DM0UnN
-         zlfx8HBG7vIHji3gQvB5JHxJNlK2HRstRromvV5qKzdWIRnoG+YoT+ooLz06rT9G/szT
-         BtPTeBsEjl9hVCSDVsIy2hFqRODMX7UbByXUvFgODaSrgorRFs9kpI2SCVOLaS/Xjdyp
-         kjpB+h8DlgPAcISQ1VVGDksEDBVneCRUD8M657KEWGLeRwJuXEpWynX2yYnkZwThBwZE
-         DNvuaGzMBtst7gcabrrLnZOK5lCaygYlSxM2us8jm2/3r6pzt1SvqKNK5VoP8NhqtYAW
-         9yLg==
-X-Gm-Message-State: ACrzQf3O6HGB09uDMzrC4zpOgGIBsVNnegHY4m9ffcg1jkt9zyTLhACc
-        2mAld8ece5wNDY/RJ3d9u+YOWDrJ8gTZOZQUAV3ykQsz8b3ViDYcdCEIEYZ7vWV60abMSecE9N5
-        HtZyjZf1XK1DT
-X-Received: by 2002:a05:600c:2253:b0:3b4:61f2:3bba with SMTP id a19-20020a05600c225300b003b461f23bbamr5972839wmm.112.1663939308191;
-        Fri, 23 Sep 2022 06:21:48 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM5wpyYX1B8XjDJvb1BxPgQzUfqIN8t9rWyUWO5Vw1dKdHk1TTaCeGhR2BL/1P0Orzn+Mx1JiQ==
-X-Received: by 2002:a05:600c:2253:b0:3b4:61f2:3bba with SMTP id a19-20020a05600c225300b003b461f23bbamr5972817wmm.112.1663939307867;
-        Fri, 23 Sep 2022 06:21:47 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c704:cc00:4585:a83b:64f2:ad21? (p200300cbc704cc004585a83b64f2ad21.dip0.t-ipconnect.de. [2003:cb:c704:cc00:4585:a83b:64f2:ad21])
-        by smtp.gmail.com with ESMTPSA id r14-20020a0560001b8e00b0022afcc11f65sm7383443wru.47.2022.09.23.06.21.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Sep 2022 06:21:47 -0700 (PDT)
-Message-ID: <f753391e-7bdc-bada-856a-87344e75bd74@redhat.com>
-Date:   Fri, 23 Sep 2022 15:21:45 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Content-Language: en-US
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Like Xu <like.xu.linux@gmail.com>
-References: <20220909104506.738478-1-eesposit@redhat.com>
- <YxtOEgJhe4EcAJsE@google.com>
- <5f0345d2-d4d1-f4fe-86ba-6e22561cb6bd@redhat.com>
- <37b3162e-7b3a-919f-80e2-f96eca7d4b4c@redhat.com>
- <dfcbdf1d-b078-ec6c-7706-6af578f79ec2@redhat.com>
- <55d7f0bd-ace1-506b-ea5b-105a86290114@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: [RFC PATCH 0/9] kvm: implement atomic memslot updates
-In-Reply-To: <55d7f0bd-ace1-506b-ea5b-105a86290114@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        with ESMTP id S232004AbiIWN3q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Sep 2022 09:29:46 -0400
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2073.outbound.protection.outlook.com [40.107.100.73])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76B151DF21
+        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 06:29:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LTj26Jp2kUDkOMHbOopKdi13/4GUuHVxve575NQ5WNPQt1vwL/jRJezSCUxVO8izkptpCcTqbhf4ikhisTin+Vb0oduZMbHnNvm2mHFjViXNJQNG1jUO/iQ3IUkXDYD+tz69WZupbXnDb4VKdPSxK/DxYUwuiQzCDP2sgtfrcTXuUVl7+cHJMourBRBrDvSKQfef92757GU506lurrkRJdZi4agPLSdNPVhLnyMQJBgQ1Ksgo2m93Zd0XgzYdMz8XIyMeZTLcTE7qPWylGfGobs4KzRb9sY1Dykl2v7acls5OWk77o0d2AQjgkg/cTiAkVcUiuEZzCpdBSWbDo+KbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=s1nvjRPm181wna7LoWF4FVOMFmzD2V+4Yml4y/NV8fI=;
+ b=NQpfcm8hsLGJsePeVkq4hR2SaFzG0eDfsZ//PdOsVLE8aMaxplvQwFxNwox9i2pqykHw8WnMHpIFz58Gewm2eYCSfq2Yp5PDnIbnYzy+J7oiiAJLcRusS3tJ+MAjPrPhp0rZ6OfRLWMhhYoRPjUW761Q8QfyzpzfiyM1ifPNumpZMWi/fSZHjCfrj8/vp0CwdlZblm92GnCkvVaQwSwjSizlNkDecFLRIs5qH1qoXw7WqO2kACUUoWFSGYxpb54YbzQQ9iz1BLbjCn2s2PKbXKvttoZRcaXZyk7++Q9tguMitv7V353s6Yl411DVxsS8FzPSiKrdxlaaNk6JoJ18SA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=s1nvjRPm181wna7LoWF4FVOMFmzD2V+4Yml4y/NV8fI=;
+ b=MyvyeJfSa0Fy/qEJ8MG9IoCvnQ7qdZ+Y380EwBVopfXPtX7uUTYtwzXaUrC+Up5A2QSkPqLlj0pYbczXPak7VyNaVfhuoe7+M2l0eliNAnO+WQmUcWS5ocju/27wid638k0vfH+QUXBUJ2Cnl2cX5bp2jX/qtmviAcdoIY4kcznnzWnmMr+mw1vCsVrHEFHsFx2ciJh5W0c1qCzzCirP795yehZC2d97KXMocpOkhy3BcYKvr4CjNv+EnvhygGabzkKUbNB9FMEVWcuujNjggMw0Id28jqulg4JoUbjVTbb7tfi/w0xT1vfUlnf0aUPY6k+PYjcOHJ52VszeBjg5cw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by MN0PR12MB6127.namprd12.prod.outlook.com (2603:10b6:208:3c5::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5654.20; Fri, 23 Sep
+ 2022 13:29:42 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::462:7fe:f04f:d0d5%7]) with mapi id 15.20.5654.020; Fri, 23 Sep 2022
+ 13:29:42 +0000
+Date:   Fri, 23 Sep 2022 10:29:41 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "Rodel, Jorg" <jroedel@suse.de>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Farman <farman@linux.ibm.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Martins, Joao" <joao.m.martins@oracle.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        Steve Sistare <steven.sistare@oracle.com>,
+        "libvir-list@redhat.com" <libvir-list@redhat.com>,
+        Laine Stump <laine@redhat.com>
+Subject: Re: [PATCH RFC v2 00/13] IOMMUFD Generic interface
+Message-ID: <Yy20xURdYLzf0ikS@nvidia.com>
+References: <Yyoa+kAJi2+/YTYn@nvidia.com>
+ <20220921120649.5d2ff778.alex.williamson@redhat.com>
+ <YytbiCx3CxCnP6fr@nvidia.com>
+ <YyxFEpAOC2V1SZwk@redhat.com>
+ <YyxsV5SH85YcwKum@nvidia.com>
+ <Yyx13kXCF4ovsxZg@redhat.com>
+ <Yyx2ijVjKOkhcPQR@nvidia.com>
+ <Yyx4cEU1n0l6sP7X@redhat.com>
+ <Yyx/yDQ/nDVOTKSD@nvidia.com>
+ <Yy10WIgQK3Q74nBm@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <Yy10WIgQK3Q74nBm@redhat.com>
+X-ClientProxiedBy: MN2PR01CA0053.prod.exchangelabs.com (2603:10b6:208:23f::22)
+ To MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4192:EE_|MN0PR12MB6127:EE_
+X-MS-Office365-Filtering-Correlation-Id: e84ad9aa-5228-41a3-053f-08da9d67abf7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: TuPsDrsBj0V0eh3FZOZn8X1tMDQ/3a/4+25GouKCIm5Tu2MeTs0AmVUahnSdP1v4OW+LBMMWYu1b6R4dmZZjf0xT3rHX3SThlXAsoxRiop4u4Js/yyCZl3nYy0KcSxutm1NYGCr6WkZS2t8uw8fbW0Lp3b9MFQzkBu/XQu+sFoFhrk0KI5H4Mh17Rr8f5TXHLGhk656xrO1qahHMhOtXSbGjqhMoMhhh1+RQ4go4dnwVORSYbUQnvq/VuDEOheTFHh05PFyoAhE4A9njAC2uq3DcAx05Hoy2C0qzudJMkqf+ic+sbVB0TyQRyY7Ji91RyPDhA1gGpcfzq798izmRRHDj5AjhTYYwmBwyPQAU3+GJEADa695KpjHBiDz/cDAG3lfqNIJAamW+/pe/O3kB5vFExbttWLRHl/SuDDAUB1sfqJYbdLzcHBdmKSrxU5BhsW2abtD1zoFrctDD6PyAjDkbpvL80RCPPJR7xWiNPpD0Aj/aDzFqu2L9X775XUMiXeXkeXJizRfC3jGCIvd798Tfc0uJGhpUW9cIPqtsfB3WzjHi3rwUaJAPtX/kv8x0iqL40fNsBwb7O/7/WD8MZBfGo4zSgfjtuJ8jAmz+6HvF6R/Ax1XAW2NuoBLcy2YrlCpINeNZEapFi8wYHCUcoIR3M0V/ZTwZxx92KT39LgrfW1g2u4XNoxTQ+85CFveGTnYvwEMpgqRXTy9gIUQciO3pY6q2g4u5EwABiEWQsKKSJo9hAhIUqqo2ZyoeBFeN
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(396003)(346002)(136003)(39860400002)(376002)(451199015)(7416002)(558084003)(6486002)(6916009)(36756003)(478600001)(316002)(41300700001)(86362001)(4326008)(6512007)(6506007)(8676002)(66946007)(66556008)(66476007)(54906003)(26005)(8936002)(38100700002)(5660300002)(186003)(2616005)(2906002)(41533002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UkUyM3RJSEZrT1FYR1kxN01xamtZVHdzZnFKNDE3ZFlCZktGSU1mVENtcFYx?=
+ =?utf-8?B?THVvOUNkWURJT3VJYzRFeVA1TWY1dWV6VEdINWgzak96Nm5lUlZ4V0ZCR3Vq?=
+ =?utf-8?B?dmVTbkpQcUJKTkZVZFFOaDhqelVwV05hdm1udlBYMXc0ZVVHU0c0b01rVCto?=
+ =?utf-8?B?S3M5UStSRTVGVVphbWZXNG96WDQ5Sm85Y3phU0VQNGwyUllCQmR4S2Z2bnAw?=
+ =?utf-8?B?Y2dqWU94S2NTeUd3RVpoZVZ5VWx6MEFzN2oycEFnU1FYQnR3WDNXTm4zYkhI?=
+ =?utf-8?B?dmZmNjNMN2FBMXMyVlg3SHllZmF0ZS9sRlg1MmQ1bTc2VVViWktPb1NwYUsz?=
+ =?utf-8?B?aXVGMHFBTGpKV2ZZV0dsdzJxZ3JXT0E4Zm13d1Zsb0ZTUWdkUXo2bG9yN3pm?=
+ =?utf-8?B?UnBVU3JVc21uU1hwcWFHUXBZWTNiMk1aT0tEQ1lQbjNjRHBmU2p3SzlIN3VD?=
+ =?utf-8?B?SHdCRmdnNmpEMzRQZ0N5M1ZISVJ3NktNdVl3TTdldHhEYTdXTjZqaGxaUnZF?=
+ =?utf-8?B?aVRrcjh2SjVUVUpFZDNPbU5DSzJqRVJ3Q0xkNUxUa24wbW5OY242L0VJdjJ2?=
+ =?utf-8?B?dWE5bXRBMmNKWkxqcGRGT3N5ZW9VZDgvVHUrNTh5K09IK3pHSUhONEJzZ3N1?=
+ =?utf-8?B?dU14dm5qOGZtRXBiU2ZmU28rME1jMzZBd0lQdWlSYmtvWXprRGZ6QklCMUlw?=
+ =?utf-8?B?a3AwTlVZMUNuNEpRYjhCR2U4RWw0SlFiTDh1Y1Znbk9rMUkwbjdSM3Q3eW4x?=
+ =?utf-8?B?bkYvVndJM3h5RHJxbFRGdmRyd3kvQVVGaHZvTUFabnZ6UHZqakpDU3NZcWZu?=
+ =?utf-8?B?N3pUUG9vQVhRS1poK0ZhWDBSUGswSk9QZ2lGNUQ5MTBCcXk1UjdmMWZSYnlQ?=
+ =?utf-8?B?Q240Q2xJNGVETU9TbytjNCt0VlZybGFvcTdlUDFTWEUxZlBBbnlkMUVzMU5W?=
+ =?utf-8?B?SGRQQlI4VlVWaWdGdllTSGlTK1BaY2pxRkxjSWl3T3BiSm5oLzl0clJNSjV0?=
+ =?utf-8?B?Qy9XWEFrbGVaRVZrTjBwc1VVQ3FOUUdmQ1prTFhpc1hsRnRhR3RwZVdEaWRO?=
+ =?utf-8?B?R2QyV3M5cW1rUSszb2lzbFhLczdKYWk2ZE0xeFgvQWVRSHkvdHdGN05vbVhI?=
+ =?utf-8?B?NG5xbFlaZ0xrcTQ4SW41RnM4VUM5VDJKWXBwdHRZMU1aenRINGFqakJaZGhQ?=
+ =?utf-8?B?T2hyVkM2TEhpNU56dHBlblJrNTJ1T212RnVMdXdLZG5jRHhkSnl2a29OZW9S?=
+ =?utf-8?B?MElDZTlxRUJITDVFczNDMXhCUmhKSzcvSkhSdWlVRDNncWJaUHBlazUrY1Ez?=
+ =?utf-8?B?OWJPZElXNU1mK1RtR21tQXFhdWtodERlREpKb1h4bkd6bW1lTmNNN2x0Z3Zu?=
+ =?utf-8?B?ditMbU9NeTZhWExON2t5THRuK2NQckVuWXNPcUE1RjJ6aElBL0FzcVMvS1BD?=
+ =?utf-8?B?Y2xxcE1qNm04akJ5QkZnYjlwMEN6MHRUbldhRTlJS1YyUWdvcGU2TWJRRHQ1?=
+ =?utf-8?B?QjNoREZGV2ZoUWw4dlFQRi9aczVibllyUng1MVVTQVFoTXl5d1l2VTZhTWlx?=
+ =?utf-8?B?eXZDazdGekVWdTBpVUtSZlRTK0FWZFhhblQ5dVRaOW5uVEdaTlRHQzdybWNR?=
+ =?utf-8?B?RXVBM0tNRWRtTE5YWndrd2pGbnVMb0t2U0hCUTI4Z1J0b1NhWUFLT2l6K2pt?=
+ =?utf-8?B?a2JDVnZxMWt5WUdwanY5YzE5cm1hbS93WjBra3JOMlorbjVSUDF3YjN3ZkJP?=
+ =?utf-8?B?UGl5RGFqaXhPVVhHeUIzb2psaVlZTXpab0oveWVrbDk5NGNKL1dxbGpVd2F4?=
+ =?utf-8?B?eFNVeDBjNldTcWRHK2w1dUpjTnJhMDFZaGpKdTdlSFpUV2pGU2NHdG85dHZJ?=
+ =?utf-8?B?TmJBWE5jbHluUjdNaWkzVUZ5TmlrMCtmcE9FbTgyeU5iRG1DTDM5eXF5eStQ?=
+ =?utf-8?B?MG5NVGdrQ2ZvczkxVWQ2NS9ENmtxTytsdjJzQUZtYlB1aFVPczM0SGVYZnhN?=
+ =?utf-8?B?QXhIbS83OFU2aXFJWGRFYWoyYTFmYU5VQkJUdFlGdEVhVmhvM2tCaWlucnRu?=
+ =?utf-8?B?Ry9tTWd4cmV2dmtOWGRnS0VHOHNmWis3WjdETlhMRmZtdkxtcUZndHNhNzRw?=
+ =?utf-8?Q?sWfk4yJdNiTkNnZLZaXlo+ltL?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e84ad9aa-5228-41a3-053f-08da9d67abf7
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2022 13:29:42.1300
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WZk+U6a458pulnQzek+a3wDGwa2IPo+ZM/CuBdvaWPp0hS2FtQn7y9pMfC56eAfw
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6127
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23.09.22 15:10, Emanuele Giuseppe Esposito wrote:
-> 
-> 
-> Am 19/09/2022 um 19:30 schrieb David Hildenbrand:
->> On 19.09.22 09:53, David Hildenbrand wrote:
->>> On 18.09.22 18:13, Emanuele Giuseppe Esposito wrote:
->>>>
->>>>
->>>> Am 09/09/2022 um 16:30 schrieb Sean Christopherson:
->>>>> On Fri, Sep 09, 2022, Emanuele Giuseppe Esposito wrote:
->>>>>> KVM is currently capable of receiving a single memslot update through
->>>>>> the KVM_SET_USER_MEMORY_REGION ioctl.
->>>>>> The problem arises when we want to atomically perform multiple
->>>>>> updates,
->>>>>> so that readers of memslot active list avoid seeing incomplete states.
->>>>>>
->>>>>> For example, in RHBZ
->>>>>> https://bugzilla.redhat.com/show_bug.cgi?id=1979276
->>>>>
->>>>> I don't have access.  Can you provide a TL;DR?
->>>>
->>>> You should be able to have access to it now.
->>>>
->>>>>
->>>>>> we see how non atomic updates cause boot failure, because vcpus
->>>>>> will se a partial update (old memslot delete, new one not yet created)
->>>>>> and will crash.
->>>>>
->>>>> Why not simply pause vCPUs in this scenario?  This is an awful lot
->>>>> of a complexity
->>>>> to take on for something that appears to be solvable in userspace.
->>>>>
->>>>
->>>> I think it is not that easy to solve in userspace: see
->>>> https://lore.kernel.org/qemu-devel/20200312161217.3590-1-david@redhat.com/
->>>>
->>>>
->>>>
->>>> "Using pause_all_vcpus()/resume_all_vcpus() is not possible, as it will
->>>> temporarily drop the BQL - something most callers can't handle (esp.
->>>> when called from vcpu context e.g., in virtio code)."
->>>
->>> Can you please comment on the bigger picture? The patch from me works
->>> around *exactly that*, and for that reason, contains that comment.
->>>
->>
->> FWIW, I hacked up my RFC to perform atomic updates on any memslot
->> transactions (not just resizes) where ranges do add overlap with ranges
->> to remove.
->>
->> https://github.com/davidhildenbrand/qemu/tree/memslot
->>
->>
->> I only performed simple boot check under x86-64 (where I can see region
->> resizes) and some make checks -- pretty sure it has some rough edges;
->> but should indicate what's possible and what the possible price might
->> be. [one could wire up a new KVM ioctl and call it conditionally on
->> support if really required]
->>
-> 
-> A benefit of my ioctl implementation is that could be also used by other
-> hypervisors, which then do not need to share this kind of "hack".
-> However, after also talking with Maxim and Paolo, we all agreed that the
-> main disadvantage of your approach is that is not scalable with the
-> number of vcpus. It is also inferior to stop *all* vcpus just to allow a
-> memslot update (KVM only pauses vCPUs that access the modified memslots
-> instead).
-> 
-> So I took some measurements, to see what is the performance difference
-> between my implementation and yours. I used a machine where I could
-> replicate the bug mentioned in bugzilla, an AMD EPYC 7413 24-Core
-> Processor with kernel 5.19.0 (+ my patches).
-> 
-> Then I measured the time it takes that QEMU spends in kvm_commit (ie in
-> memslot updates) while booting a VM. In other words, if kvm_commit takes
-> 10 ms and QEMU calls it 20 times, "time to boot" is 200ms. kvm_commit is
-> not called anymore after boot, so this measurement is easy to compare
-> over multiple invocations of QEMU.
-> 
-> I ran the tests with different amount of cores: 1,2,4,8,16,32. QEMU
-> command is the same to replicate the bug:
-> ./qemu-system-x86_64 --overcommit cpu-pm=on --smp $v --accel kvm
-> --display none >> ~/smp_$v;
-> 
-> Each boot is reproduced 100 times, and then from results I measure
-> average and stddev (in milliseconds).
-> 
-> ioctl:
-> -smp 1:        Average: 2.1ms        Stdev: 0.8ms
-> -smp 2:        Average: 2.5ms        Stdev: 1.5ms
-> -smp 4:        Average: 2.2ms        Stdev: 1.1ms
-> -smp 8:        Average: 2.4ms        Stdev: 0.7ms
-> -smp 16:       Average: 3.6ms        Stdev: 2.4ms  (1000 repetitions)
-> -smp 24:       Average: 12.5ms        Stdev: 0.9ms  (1000 repetitions)
-> 
-> 
-> pause/resume: (https://github.com/davidhildenbrand/qemu/tree/memslot)
-> -smp 1:        Average: 2.2ms        Stdev: 1.2ms
-> -smp 2:        Average: 3.0ms        Stdev: 1.4ms
-> -smp 4:        Average: 3.1ms        Stdev: 1.3m
-> -smp 8:        Average: 3.4ms        Stdev: 1.4ms
-> -smp 16:       Average: 12ms        Stdev: 7.0ms  (1000 repetitions)
-> -smp 24:       Average: 20ms        Stdev: 7.3ms  (1000 repetitions)
-> 
-> 
-> Above 24 vCPUs performance gets worse quickly but I think it's already
-> quite clear that the results for ioctl scale better as the number of
-> vcpus increases, while pausing the vCPUs becomes slower already with 16
-> vcpus.
+On Fri, Sep 23, 2022 at 09:54:48AM +0100, Daniel P. Berrangé wrote:
 
-Right, the question is if it happens sufficiently enough that we even 
-care and if there are not ways to mitigate.
+> Yes, we use cgroups extensively already.
 
-It doesn't necessarily have to scale with the #VCPUs I think. What 
-should dominate the overall time in theory how long it takes for one 
-VCPU (the slowest one) to leave the kernel.
+Ok, I will try to see about this
 
-I wondered if
+Can you also tell me if the selinux/seccomp will prevent qemu from
+opening more than one /dev/vfio/vfio ? I suppose the answer is no?
 
-1) it might be easier to have a single KVM mechanism/call to kick all 
-VCPUs out of KVM instead of doing it per VCPU. That might speed up 
-things eventually heavily already.
-
-2) One thing I wondered is whether the biggest overhead is actually 
-taking the locks in QEMU and not actually waiting for the VCPUs. Maybe 
-we could optimize that as well. (for now I use one lock per VCPU because 
-it felt like it would reduce the ioctl overhead; maybe there is a better 
-alternative to balance between both users)
-
-So treat my patch as a completely unoptimized version.
-
--- 
 Thanks,
-
-David / dhildenb
-
+Jason
