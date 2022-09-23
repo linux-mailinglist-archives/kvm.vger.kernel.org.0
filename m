@@ -2,152 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC4245E7CBF
-	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 16:20:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB4665E7CCB
+	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 16:22:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232541AbiIWOUP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Sep 2022 10:20:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55354 "EHLO
+        id S232565AbiIWOWi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Sep 2022 10:22:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232516AbiIWOUO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Sep 2022 10:20:14 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14F41A99E6
-        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 07:20:07 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0DE98616CF
-        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 14:20:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D06BC433C1;
-        Fri, 23 Sep 2022 14:20:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1663942806;
-        bh=Kq7emLhwvdneoJtvmozd3OskIe6mAMMxre7Z0MxN+rM=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=iHoB0JQ3Wn3YayXCXt9oZO83b52P+7kufQ1Slo7/Je6Ne/JeorY48wL9gg7iEqfL6
-         OHYafCnErG69xotp3dZpZcLYoYpVBKCKusAAsmEBklpnyDAIMYpS+JQm6nQoGCmIph
-         6+v/BEgPQO20dwfLMwT6TXJy08ZStnxCRRKurMwRpHHRd3CesCOGSx+kqheLOAPgYz
-         9xJuA/kNd9Nb6N6VIuKgUhAibwROS5ozSepzFY8pFHbIJgZ/yZ7e9iR4SIQB37rJyx
-         gQObLZw7NRpUzTMJasFeCfc2Fto+MGLGXsiGtsNlJogVG5zyzoJgNCtxJkIOuJk8ta
-         gePTQk7N4Pb8A==
-Received: from [82.141.251.28] (helo=wait-a-minute.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1objXA-00CAht-2K;
-        Fri, 23 Sep 2022 15:20:04 +0100
-Date:   Fri, 23 Sep 2022 15:19:56 +0100
-Message-ID: <87edw2jhpv.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org,
-        andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com,
-        pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com,
+        with ESMTP id S231409AbiIWOWf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Sep 2022 10:22:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A90814355B
+        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 07:22:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1663942953;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xJ7NvBNqMyAjonIBYUaUOjGEw+4M/heegLtpVu08Dzc=;
+        b=NbqgqTIp3LmZT3Mpiu6v5zqj4wmzEj5j3XrX+oa8x1CKCqfV1RCzxZRLHQzD3PIkdrzuAi
+        uuliMBnszLbMsfHCEFp7n2s8Ox+LkBs7qtvYpE2b5mXPQI4dBglSrsMKFzzD6W+meypSJv
+        1QG/Si3EPCeeeHebD9eLoXfBmezyNTw=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-554-y35HsmJnO2uInPSW2SjEZg-1; Fri, 23 Sep 2022 10:22:32 -0400
+X-MC-Unique: y35HsmJnO2uInPSW2SjEZg-1
+Received: by mail-qk1-f200.google.com with SMTP id bj42-20020a05620a192a00b006cf663bca6aso145029qkb.3
+        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 07:22:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=xJ7NvBNqMyAjonIBYUaUOjGEw+4M/heegLtpVu08Dzc=;
+        b=KC8SD5LGsbKo6PgG8FY6hpj5QlJlbaJDrcJNZS8cRdXeeFPPjtVoikD2s+NYoN5aHS
+         IYmsKarOqEwTJnhcpeP2aW6425/Pv37aS5KH1jWmceDJn3Xkz7MkYGJz2cAdLda34GEM
+         V5F+JUG7fN1bqPoUvmTE7KFlFOVDtItlVY9mNDESp0I0tkT5kFineEk5YExQu8ly4kBr
+         e4VzzKPKUzDfQ2BrNBW1FLYkQSpz2X+XqhPWtjpGu596fnwyxEJUdt7rbZDrtWUlEISp
+         OvlJ+x2xoGSvwTxmaXkLo40svMgAS6AMN+vovW3XasZ1PIE2arAlIfR+U3s+dAt9KiTI
+         VKbg==
+X-Gm-Message-State: ACrzQf1izf5OsTSpU4XTNFjayvbbgfhxDnCcxCABG+wdYl0syp8EO7hR
+        PrBRlvg54/quJd/e18u6hqcm0hZnhcjd48DGDp9b8TcNVtDMdE5JDJoVPcQ3lEcvA7fr5ojkdEQ
+        RHnvIgErcAyi/HHM2RFiylP236xeE
+X-Received: by 2002:a05:622a:138c:b0:35c:e9d2:8d76 with SMTP id o12-20020a05622a138c00b0035ce9d28d76mr7419965qtk.463.1663942952210;
+        Fri, 23 Sep 2022 07:22:32 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM5U63XjjsWCKo/SDdgvyLMGUUVGC9LLE0uEX7Hqm+64kfM+1tiDckgPMyWf276UjUFrP0+Pcg+GxDuU1uEhlYw=
+X-Received: by 2002:a05:622a:138c:b0:35c:e9d2:8d76 with SMTP id
+ o12-20020a05622a138c00b0035ce9d28d76mr7419940qtk.463.1663942951968; Fri, 23
+ Sep 2022 07:22:31 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220922170133.2617189-1-maz@kernel.org> <20220922170133.2617189-2-maz@kernel.org>
+ <YyzV2Q/PZHPFMD6y@xz-m1.local> <87edw2jhpv.wl-maz@kernel.org>
+In-Reply-To: <87edw2jhpv.wl-maz@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Date:   Fri, 23 Sep 2022 16:22:20 +0200
+Message-ID: <CABgObfbRb_rPNqL+=yPVWc7e8a7uumATR6cEEdvYrkEKUS1_2A@mail.gmail.com>
+Subject: Re: [PATCH 1/6] KVM: Use acquire/release semantics when accessing
+ dirty ring GFN state
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Peter Xu <peterx@redhat.com>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com,
+        shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org,
+        dmatlack@google.com, zhenyzha@redhat.com, shan.gavin@gmail.com,
         gshan@redhat.com, James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH 1/6] KVM: Use acquire/release semantics when accessing dirty ring GFN state
-In-Reply-To: <YyzV2Q/PZHPFMD6y@xz-m1.local>
-References: <20220922170133.2617189-1-maz@kernel.org>
-        <20220922170133.2617189-2-maz@kernel.org>
-        <YyzV2Q/PZHPFMD6y@xz-m1.local>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 82.141.251.28
-X-SA-Exim-Rcpt-To: peterx@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com, gshan@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 22 Sep 2022 22:38:33 +0100,
-Peter Xu <peterx@redhat.com> wrote:
-> 
-> Marc,
-> 
-> On Thu, Sep 22, 2022 at 06:01:28PM +0100, Marc Zyngier wrote:
-> > The current implementation of the dirty ring has an implicit requirement
-> > that stores to the dirty ring from userspace must be:
-> > 
-> > - be ordered with one another
-> > 
-> > - visible from another CPU executing a ring reset
-> > 
-> > While these implicit requirements work well for x86 (and any other
-> > TSO-like architecture), they do not work for more relaxed architectures
-> > such as arm64 where stores to different addresses can be freely
-> > reordered, and loads from these addresses not observing writes from
-> > another CPU unless the required barriers (or acquire/release semantics)
-> > are used.
-> > 
-> > In order to start fixing this, upgrade the ring reset accesses:
-> > 
-> > - the kvm_dirty_gfn_harvested() helper now uses acquire semantics
-> >   so it is ordered after all previous writes, including that from
-> >   userspace
-> > 
-> > - the kvm_dirty_gfn_set_invalid() helper now uses release semantics
-> >   so that the next_slot and next_offset reads don't drift past
-> >   the entry invalidation
-> > 
-> > This is only a partial fix as the userspace side also need upgrading.
-> 
-> Paolo has one fix 4802bf910e ("KVM: dirty ring: add missing memory
-> barrier", 2022-09-01) which has already landed.
+On Fri, Sep 23, 2022 at 4:20 PM Marc Zyngier <maz@kernel.org> wrote:
+> > > This is only a partial fix as the userspace side also need upgrading.
+> >
+> > Paolo has one fix 4802bf910e ("KVM: dirty ring: add missing memory
+> > barrier", 2022-09-01) which has already landed.
+>
+> What is this commit? It doesn't exist in the kernel as far as I can see.
 
-What is this commit? It doesn't exist in the kernel as far as I can see.
+That's the load_acquire in QEMU, and the store_release part is in 7.2
+as well (commit 52281c6d11, "KVM: use store-release to mark dirty
+pages as harvested", 2022-09-18).
 
-> 
-> I think the other one to reset it was lost too.  I just posted a patch.
-> 
-> https://lore.kernel.org/qemu-devel/20220922213522.68861-1-peterx@redhat.com/
-> (link still not yet available so far, but should be)
+So all that QEMU is missing is the new capability.
 
-That's a QEMU patch, right?
+Paolo
 
-> 
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  virt/kvm/dirty_ring.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
-> > index f4c2a6eb1666..784bed80221d 100644
-> > --- a/virt/kvm/dirty_ring.c
-> > +++ b/virt/kvm/dirty_ring.c
-> > @@ -79,12 +79,12 @@ static inline void kvm_dirty_gfn_set_invalid(struct kvm_dirty_gfn *gfn)
-> >  
-> >  static inline void kvm_dirty_gfn_set_dirtied(struct kvm_dirty_gfn *gfn)
-> >  {
-> > -	gfn->flags = KVM_DIRTY_GFN_F_DIRTY;
-> > +	smp_store_release(&gfn->flags, KVM_DIRTY_GFN_F_DIRTY);
-> 
-> IIUC you meant kvm_dirty_gfn_set_invalid as the comment says?
-
-Gah, you're right, I redid the patch at the last minute and messed it
-up....
-
-> kvm_dirty_gfn_set_dirtied() has been guarded by smp_wmb() and AFAICT that's
-> already safe.  Otherwise looks good to me.
-
-Indeed. Let me fix this.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
