@@ -2,46 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B28B95E7C72
-	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 16:02:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C56025E7C76
+	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 16:03:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231796AbiIWOBi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Sep 2022 10:01:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57026 "EHLO
+        id S231937AbiIWODU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Sep 2022 10:03:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231836AbiIWOBL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Sep 2022 10:01:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E10F13A380
-        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 07:01:10 -0700 (PDT)
+        with ESMTP id S230318AbiIWODS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Sep 2022 10:03:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCB3613A04D
+        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 07:03:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663941669;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
+        s=mimecast20190719; t=1663941794;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=xjBO7tA9U+8DAn/vreMh0HlzjoAqH166EctUNXQAP6U=;
-        b=ZMatY6Gf216R4WG4Jcpc6ed1MPqW8Ftji+5YxpiqArJ26gMhhmkw+BV0xOkNX57ay/KHmH
-        07Fp7o1tvJXY0AbyzN3VrViOgYEaIkTRlAhCbkVsrtLWEJISm0N29P9WEF1tE64X9a9Zc0
-        1gbXupD+f8gH9v23TpdAjcqWoYAEwhc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-30-UsC3BSuHOY6UBfzeRcNcSQ-1; Fri, 23 Sep 2022 10:01:06 -0400
-X-MC-Unique: UsC3BSuHOY6UBfzeRcNcSQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 387A72A2AD7B;
-        Fri, 23 Sep 2022 14:01:05 +0000 (UTC)
-Received: from redhat.com (unknown [10.33.36.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CA71D4B401E;
-        Fri, 23 Sep 2022 14:00:57 +0000 (UTC)
-Date:   Fri, 23 Sep 2022 15:00:55 +0100
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+        bh=4w0e2qKjVlL2l3TiYoyEN7yHr9QOPhW8hihiff8HOpE=;
+        b=QEBLIk63X6hJTxQLsDQ0VoaNNCrbojmQPSWtPZ7vBtUeX/SUsdtuB1zWggAbR9r9bDSJ2g
+        ZCsKbYnirOhk04X5w0b7dFvp/iYBgRt+TsCQBLJnnvSfLNc9JmYLtgkIUgxdUo6Z9qO7FB
+        kU8+xrHBe1vvPDeaunvIuEQWZ/VpNFA=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-511-1tEV-Up7MACmp7SlWlun9A-1; Fri, 23 Sep 2022 10:03:12 -0400
+X-MC-Unique: 1tEV-Up7MACmp7SlWlun9A-1
+Received: by mail-io1-f69.google.com with SMTP id 5-20020a5d9c05000000b006a44709a638so275298ioe.11
+        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 07:03:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=4w0e2qKjVlL2l3TiYoyEN7yHr9QOPhW8hihiff8HOpE=;
+        b=5bGU5qbMyp3+Kb7X9pP6wN/fbOApu6itbvKoKK9pmWdynlHoaGUpJ4na7CNE1wNkej
+         SaVFQRWMgM3zXuSZdLVz5tvuR4YeF5k+zqCShX2K8/UM8Ir3p8PC9PkIulNNrrDkb1bE
+         lnM4talWMOcFKuki+IzSTdf0h7sCvjKOtlC5kLu0etFUdsJQdRSrA6cFMPe44jm9i9zD
+         aXoEo4e1uFWvFtYeeomea4c1z4TlX9aoV2nPAsIOrwU0kSsx5k2bBvt5jtOW2Geslclg
+         X46mY4dimONNWG3nfDqLZN7+6GKpQsX0sWDpPB0arY5lQBVJrbClfC1rMAE39Hi+75Gc
+         zPAg==
+X-Gm-Message-State: ACrzQf1wnOQZSGnq/o2+/vJrCiJOPknb/NcCq7CNuY2Hmb0Cr+bnFCCv
+        aTAAp4IRFeUXcrEGyM6mMGCWKACxtqfgY1kq10uVHa8NLXfNZnpYC+mWPhJbkqZvoLx5/5Tv1WX
+        hoVKUnllWpBr9
+X-Received: by 2002:a05:6638:4907:b0:35a:88c3:594d with SMTP id cx7-20020a056638490700b0035a88c3594dmr4833169jab.194.1663941791988;
+        Fri, 23 Sep 2022 07:03:11 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7rtG+aKW4uVpVRTemjU1wMA9ul0qLImqNjuSlGdG9o3Ayhgtkv7S2ZB45Ft3viH7Z1kZz4gw==
+X-Received: by 2002:a05:6638:4907:b0:35a:88c3:594d with SMTP id cx7-20020a056638490700b0035a88c3594dmr4833120jab.194.1663941791435;
+        Fri, 23 Sep 2022 07:03:11 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id t1-20020a028781000000b003428c21ed12sm3404639jai.167.2022.09.23.07.03.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Sep 2022 07:03:10 -0700 (PDT)
+Date:   Fri, 23 Sep 2022 08:03:07 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
+Cc:     "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
         Eric Auger <eric.auger@redhat.com>,
         "Tian, Kevin" <kevin.tian@intel.com>,
         "Rodel, Jorg" <jroedel@suse.de>,
@@ -68,25 +85,23 @@ Cc:     Alex Williamson <alex.williamson@redhat.com>,
         "libvir-list@redhat.com" <libvir-list@redhat.com>,
         Laine Stump <laine@redhat.com>
 Subject: Re: [PATCH RFC v2 00/13] IOMMUFD Generic interface
-Message-ID: <Yy28FzEnoKo8UExU@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <YyxFEpAOC2V1SZwk@redhat.com>
- <YyxsV5SH85YcwKum@nvidia.com>
- <Yyx13kXCF4ovsxZg@redhat.com>
- <Yyx2ijVjKOkhcPQR@nvidia.com>
- <Yyx4cEU1n0l6sP7X@redhat.com>
- <Yyx/yDQ/nDVOTKSD@nvidia.com>
- <Yy10WIgQK3Q74nBm@redhat.com>
- <Yy20xURdYLzf0ikS@nvidia.com>
- <Yy22GFgrcyMyt3q1@redhat.com>
- <Yy24rX8NQkxR2KCV@nvidia.com>
+Message-ID: <20220923080307.1d9a6166.alex.williamson@redhat.com>
+In-Reply-To: <Yy20xURdYLzf0ikS@nvidia.com>
+References: <Yyoa+kAJi2+/YTYn@nvidia.com>
+        <20220921120649.5d2ff778.alex.williamson@redhat.com>
+        <YytbiCx3CxCnP6fr@nvidia.com>
+        <YyxFEpAOC2V1SZwk@redhat.com>
+        <YyxsV5SH85YcwKum@nvidia.com>
+        <Yyx13kXCF4ovsxZg@redhat.com>
+        <Yyx2ijVjKOkhcPQR@nvidia.com>
+        <Yyx4cEU1n0l6sP7X@redhat.com>
+        <Yyx/yDQ/nDVOTKSD@nvidia.com>
+        <Yy10WIgQK3Q74nBm@redhat.com>
+        <Yy20xURdYLzf0ikS@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Yy24rX8NQkxR2KCV@nvidia.com>
-User-Agent: Mutt/2.2.6 (2022-06-05)
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
@@ -96,46 +111,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 23, 2022 at 10:46:21AM -0300, Jason Gunthorpe wrote:
-> On Fri, Sep 23, 2022 at 02:35:20PM +0100, Daniel P. Berrangé wrote:
-> > On Fri, Sep 23, 2022 at 10:29:41AM -0300, Jason Gunthorpe wrote:
-> > > On Fri, Sep 23, 2022 at 09:54:48AM +0100, Daniel P. Berrangé wrote:
-> > > 
-> > > > Yes, we use cgroups extensively already.
-> > > 
-> > > Ok, I will try to see about this
-> > > 
-> > > Can you also tell me if the selinux/seccomp will prevent qemu from
-> > > opening more than one /dev/vfio/vfio ? I suppose the answer is no?
-> > 
-> > I don't believe there's any restriction on the nubmer of open attempts,
-> > its just a case of allowed or denied globally for the VM.
-> 
-> Ok
-> 
-> For iommufd we plan to have qemu accept a single already opened FD of
-> /dev/iommu and so the selinux/etc would block all access to the
-> chardev.
+On Fri, 23 Sep 2022 10:29:41 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-A selinux policy update would be needed to allow read()/write() for the
-inherited FD, whle keeping open() blocked
+> On Fri, Sep 23, 2022 at 09:54:48AM +0100, Daniel P. Berrang=C3=A9 wrote:
+>=20
+> > Yes, we use cgroups extensively already. =20
+>=20
+> Ok, I will try to see about this
+>=20
+> Can you also tell me if the selinux/seccomp will prevent qemu from
+> opening more than one /dev/vfio/vfio ? I suppose the answer is no?
 
-> Can you tell me if the thing invoking qmeu that will open /dev/iommu
-> will have CAP_SYS_RESOURCE ? I assume yes if it is already touching
-> ulimits..
+QEMU manages the container:group association with legacy vfio, so it
+can't be restricted from creating multiple containers.  Thanks,
 
-The privileged libvirtd runs with privs equiv to root, so all
-capabilities are present.
-
-The unprivileged libvirtd runs with same privs as your user account,
-so no capabilities. I vaguely recall there was some way to enable
-use of PCI passthrough for unpriv libvirtd, but needed a bunch of
-admin setup steps ahead of time.
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Alex
 
