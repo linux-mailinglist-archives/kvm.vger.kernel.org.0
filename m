@@ -2,163 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 05A205E81B8
-	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 20:26:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ED6745E81FF
+	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 20:48:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231883AbiIWS00 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Sep 2022 14:26:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48740 "EHLO
+        id S232908AbiIWSs2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Sep 2022 14:48:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229514AbiIWS0Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Sep 2022 14:26:25 -0400
+        with ESMTP id S229461AbiIWSs0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Sep 2022 14:48:26 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 518E812167D
-        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 11:26:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DA2912059B
+        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 11:48:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663957583;
+        s=mimecast20190719; t=1663958901;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=sKwAzZec8KipecaZ1JzamS6Z7a4oJagSVbwGtwJhtZs=;
-        b=f8LrPrmH21AK1JsXayZzaPrgogaWool1hr7GJhPkOlwUaV5Vnj6YI225eVbrdfATo5PXef
-        oCS6hFork37xgXB3QftfD7mM4CL6U/bPu3qjfr+2iR/BgsJUIV3ek59uiP2WynOBiEUaIK
-        tt8QVBkxrsWIMWSXxBysG4lhGQK9oTo=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=xcZj4oAakw7NzxFLR63X5HiohQDppY+RAJFyDkVYdTw=;
+        b=hH3LjRfV6r/Oz8MNdQQnwpSs9MekaRTjolSWUJNwUCfhDot85QL5teA5L4Agw0KD3Yej9P
+        Lz4JckgroAD6aCqVdS/vl1nIFXl6vBu+wLRUcn6+8dlZ/R3Qszz2uFGQkXX8R2KEz/FOp+
+        7JeMBXg5SxO1iHrS0dlmYrQtjjSBqAM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-532-PTpC87-zM8-jseGEjT89qA-1; Fri, 23 Sep 2022 14:26:22 -0400
-X-MC-Unique: PTpC87-zM8-jseGEjT89qA-1
-Received: by mail-qk1-f200.google.com with SMTP id v15-20020a05620a0f0f00b006ceab647023so577429qkl.13
-        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 11:26:22 -0700 (PDT)
+ us-mta-50-SN5VDZypM5eiAkjpSvGaIQ-1; Fri, 23 Sep 2022 14:48:17 -0400
+X-MC-Unique: SN5VDZypM5eiAkjpSvGaIQ-1
+Received: by mail-wm1-f72.google.com with SMTP id y15-20020a1c4b0f000000b003b47578405aso255081wma.5
+        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 11:48:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=sKwAzZec8KipecaZ1JzamS6Z7a4oJagSVbwGtwJhtZs=;
-        b=wpWghXw29eKRU075hPL+PWZsW+1NRmmFeGggFnYHlkLLH8fei/Fqcfw6YFEGmNjRob
-         rj2Kxtgk/3YU1FiPYtDhFkhmfehmh9nHBhKwCp+ikUPoBvuPMHynLvh1n5bwenqNi3P1
-         jQroVRT4qhYmzlxKEiQ50ux9hzOjr8XR2a7NuZsxLvJuEUT02dcPQR8KdccMkTJzENd1
-         0S5BS/A/uU1qBH8Vyxhj930R7bJw4x9ClLdkC19b7hbWWWUt3omdL9Abx7x5KSu17he2
-         NZ+w13OUdImBMdt/KbTmkuE+NaR6CN1nt+ZAZm909oaJ+Kd5YXMWOGQbfverhz23zjtN
-         bdFg==
-X-Gm-Message-State: ACrzQf0FW5PD8qc1mkBgeSfGGqzo0PxjjNDIUidE+YUY/WQ0xgCi5UCO
-        qEygmHHVvFwKft5A9Ls8kBHMEupmuIU+YullS23la8AWUKGI5kDSM2M/HXatMf0vmUZYjEjUKSx
-        klRJ9GbAczH0J
-X-Received: by 2002:a05:622a:1002:b0:35b:baaf:24bb with SMTP id d2-20020a05622a100200b0035bbaaf24bbmr8450491qte.85.1663957581656;
-        Fri, 23 Sep 2022 11:26:21 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM5klgSD6rdsCB+xreJDWo2YXT/MOk2drMbEljCnhf9MK11IyCj/1lotbhwRYcmUHZVuWQJ/dw==
-X-Received: by 2002:a05:622a:1002:b0:35b:baaf:24bb with SMTP id d2-20020a05622a100200b0035bbaaf24bbmr8450467qte.85.1663957581402;
-        Fri, 23 Sep 2022 11:26:21 -0700 (PDT)
-Received: from x1n (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca. [70.31.27.79])
-        by smtp.gmail.com with ESMTPSA id u15-20020a05620a0c4f00b006cf19068261sm6714936qki.116.2022.09.23.11.26.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Sep 2022 11:26:20 -0700 (PDT)
-Date:   Fri, 23 Sep 2022 14:26:18 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org,
-        andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com,
-        pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com,
-        gshan@redhat.com, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH 2/6] KVM: Add KVM_CAP_DIRTY_LOG_RING_ORDERED capability
- and config option
-Message-ID: <Yy36Stppz4tYBPiP@x1n>
-References: <20220922170133.2617189-1-maz@kernel.org>
- <20220922170133.2617189-3-maz@kernel.org>
- <YyzYI/bvp/JnbcxS@xz-m1.local>
- <87czbmjhbh.wl-maz@kernel.org>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=xcZj4oAakw7NzxFLR63X5HiohQDppY+RAJFyDkVYdTw=;
+        b=cVUBrzdcUdlSshEDQ8yRhlTUDnxVaPBKBxNnp1qeD/F5zyaXJjUM52XXbFXkznXeqr
+         gtPpJl2xMBbQA58A7i825I4iT0e23ztbO1owmPGpWnVPm02yAGo1y8/7qELToDe5Sckj
+         U4pwRDbNX5h/Fvvo3/6UNjHUR50HO1l7EGwV3IhvVI0l/oSJMd/JWaI0e/CCQJSMhBqZ
+         9X6TsJ+R9e2fN0HJlOSxeyf1AOFlfkXr25cZyjfK2gAq3p2P8wh0cqISVYa1FMUsn76X
+         lKEM7qqiHQcGIRxPhaTxvAIxxA1qCUku5PfdJ1zv0o50mXJuWLOaUEaJ1ily2D+fd7sg
+         wSqA==
+X-Gm-Message-State: ACrzQf21hUMrzVRFGJ3zEqcfC+i+gWsk/dFTZLvNuWAfbqe4OnljpPnB
+        4twlTj/jD48rx+IoPS/M4CzJNPDaJSdR0V/LXs+hOQdHNITN4SeEqqEp+osD/qqygei3NDprrKp
+        PDJ6QBTY2Es1P
+X-Received: by 2002:a05:600c:1547:b0:3b4:c56b:a3a6 with SMTP id f7-20020a05600c154700b003b4c56ba3a6mr6986518wmg.29.1663958896299;
+        Fri, 23 Sep 2022 11:48:16 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7irMkZxkdU8OCZVuJM0rWKucA/Fj9+No5vqIKRBnloTbi+o1+yq3smZTbJ0wW++24DZlmgrA==
+X-Received: by 2002:a05:600c:1547:b0:3b4:c56b:a3a6 with SMTP id f7-20020a05600c154700b003b4c56ba3a6mr6986505wmg.29.1663958896093;
+        Fri, 23 Sep 2022 11:48:16 -0700 (PDT)
+Received: from [192.168.8.103] (tmo-097-189.customers.d1-online.com. [80.187.97.189])
+        by smtp.gmail.com with ESMTPSA id f10-20020a05600c154a00b003b339438733sm3497293wmg.19.2022.09.23.11.48.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Sep 2022 11:48:15 -0700 (PDT)
+Message-ID: <4927fe8e-724d-a6d0-063b-dfad0730cb61@redhat.com>
+Date:   Fri, 23 Sep 2022 20:48:12 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87czbmjhbh.wl-maz@kernel.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH v8 5/8] s390x/pci: enable adapter event notification for
+ interpreted devices
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
+        cohuck@redhat.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com,
+        pasic@linux.ibm.com, borntraeger@linux.ibm.com, mst@redhat.com,
+        pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20220902172737.170349-1-mjrosato@linux.ibm.com>
+ <20220902172737.170349-6-mjrosato@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20220902172737.170349-6-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 23, 2022 at 03:28:34PM +0100, Marc Zyngier wrote:
-> On Thu, 22 Sep 2022 22:48:19 +0100,
-> Peter Xu <peterx@redhat.com> wrote:
-> > 
-> > On Thu, Sep 22, 2022 at 06:01:29PM +0100, Marc Zyngier wrote:
-> > > In order to differenciate between architectures that require no extra
-> > > synchronisation when accessing the dirty ring and those who do,
-> > > add a new capability (KVM_CAP_DIRTY_LOG_RING_ORDERED) that identify
-> > > the latter sort. TSO architectures can obviously advertise both, while
-> > > relaxed architectures most only advertise the ORDERED version.
-> > > 
-> > > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  include/linux/kvm_dirty_ring.h |  6 +++---
-> > >  include/uapi/linux/kvm.h       |  1 +
-> > >  virt/kvm/Kconfig               | 14 ++++++++++++++
-> > >  virt/kvm/Makefile.kvm          |  2 +-
-> > >  virt/kvm/kvm_main.c            | 11 +++++++++--
-> > >  5 files changed, 28 insertions(+), 6 deletions(-)
-> > > 
-> > > diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
-> > > index 906f899813dc..7a0c90ae9a3f 100644
-> > > --- a/include/linux/kvm_dirty_ring.h
-> > > +++ b/include/linux/kvm_dirty_ring.h
-> > > @@ -27,7 +27,7 @@ struct kvm_dirty_ring {
-> > >  	int index;
-> > >  };
-> > >  
-> > > -#ifndef CONFIG_HAVE_KVM_DIRTY_RING
-> > > +#ifndef CONFIG_HAVE_KVM_DIRTY_LOG
-> > 
-> > s/LOG/LOG_RING/ according to the commit message? Or the name seems too
-> > generic.
+On 02/09/2022 19.27, Matthew Rosato wrote:
+> Use the associated kvm ioctl operation to enable adapter event notification
+> and forwarding for devices when requested.  This feature will be set up
+> with or without firmware assist based upon the 'forwarding_assist' setting.
 > 
-> The commit message talks about the capability, while the above is the
-> config option. If you find the names inappropriate, feel free to
-> suggest alternatives (for all I care, they could be called FOO, BAR
-> and BAZ).
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+> index 816d17af99..e66a0dfbef 100644
+> --- a/hw/s390x/s390-pci-bus.c
+> +++ b/hw/s390x/s390-pci-bus.c
+...
+> @@ -1428,6 +1440,8 @@ static Property s390_pci_device_properties[] = {
+>       DEFINE_PROP_S390_PCI_FID("fid", S390PCIBusDevice, fid),
+>       DEFINE_PROP_STRING("target", S390PCIBusDevice, target),
+>       DEFINE_PROP_BOOL("interpret", S390PCIBusDevice, interp, true),
+> +    DEFINE_PROP_BOOL("forwarding_assist", S390PCIBusDevice, forwarding_assist,
+> +                     true),
+>       DEFINE_PROP_END_OF_LIST(),
+>   };
 
-The existing name from David looks better than the new one.. to me.
+It seems to be more common to use "-" as separator in property names than to 
+use "_" :
 
-> 
-> > Pure question to ask: is it required to have a new cap just for the
-> > ordering?  IIUC if x86 was the only supported anyway before, it means all
-> > released old kvm binaries are always safe even without the strict
-> > orderings.  As long as we rework all the memory ordering bits before
-> > declaring support of yet another arch, we're good.  Or am I wrong?
-> 
-> Someone will show up with an old userspace which probes for the sole
-> existing capability, and things start failing subtly. It is quite
-> likely that the userspace code is built for all architectures,
+$ grep -r DEFINE_PROP_BOOL * | sed -e 's/^.*("//' -e 's/".*//' | grep _ | wc -l
+39
+$ grep -r DEFINE_PROP_BOOL * | sed -e 's/^.*("//' -e 's/".*//' | grep - | wc -l
+169
 
-I didn't quite follow here.  Since both kvm/qemu dirty ring was only
-supported on x86, I don't see the risk.
+... so maybe rename "forwarding_assist" to "forwarding-assist" ?
 
-Assuming we've the old binary.
-
-If to run on old kernel, it'll work like before.
-
-If to run on new kernel, the kernel will behave stricter on memory barriers
-but should still be compatible with the old behavior (not vice versa, so
-I'll understand if we're loosing the ordering, but we're not..).
-
-Any further elaboration would be greatly helpful.
-
-Thanks,
-
-> and we
-> want to make sure that userspace actively buys into the new ordering
-> requirements. A simple way to do this is to expose a new capability,
-> making the new requirement obvious. Architectures with relaxed
-> ordering semantics will only implement the new one, while x86 will
-> implement both.
-
--- 
-Peter Xu
+  Thomas
 
