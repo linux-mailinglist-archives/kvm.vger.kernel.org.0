@@ -2,80 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 78BA65E8239
-	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 20:59:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 638965E828B
+	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 21:25:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230514AbiIWS7v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Sep 2022 14:59:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39762 "EHLO
+        id S231547AbiIWTZQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Sep 2022 15:25:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbiIWS7t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Sep 2022 14:59:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A659425C43
-        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 11:59:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663959586;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jkp9uIojDcvTz1WAjdwqm+62cYEBiOSYUQ5dsx6Xy3c=;
-        b=XPhuzPbKLWwRy6Ul7iyMPJSmqzftxDTe0lTJE2W87AgZVPr3fBwk9rYg8YyGFLup/ZOoFI
-        2n9HVQ5wzPqT+NZ+spDBfE4DcSHJewHSGKGgtP80bSwIwRP31YIBZGbo8a+HI1l+P0UQVF
-        2JZ8ajlZyuBRJXpId0FdTElIIXUWeq8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-611-GdhNEeqrOTKWlyeWNfszUA-1; Fri, 23 Sep 2022 14:59:45 -0400
-X-MC-Unique: GdhNEeqrOTKWlyeWNfszUA-1
-Received: by mail-wr1-f70.google.com with SMTP id h20-20020adfaa94000000b0022af8c26b72so210897wrc.7
-        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 11:59:45 -0700 (PDT)
+        with ESMTP id S230369AbiIWTZN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Sep 2022 15:25:13 -0400
+Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1446A3D64
+        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 12:25:12 -0700 (PDT)
+Received: by mail-oi1-x235.google.com with SMTP id r125so1000255oia.8
+        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 12:25:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date;
+        bh=Fmt9MN5NfVGezrHnd/u5tnrRyL7gHvPLtsOh+992pbU=;
+        b=WEl6sZEBc/er/wrMM35U7lFP3w+PTJQFGCbt1lZDTIetLI4Rm63YyLyS/WM+R6Ofyf
+         Mstp0lkuGo9MJ6Euwn5DZjScS7cfV4aXTa24myZmIw1qdlt/1TLQDW9dzYEYgX0oiU77
+         URtbyL2i6E2NkMPqPYNXQ3xIfeYgcxpMBbG4D3HPoCWB6ZBFDkwXFqs4CQrqDApyzAvF
+         tOeg++TqPTTqnZaerFv95l7KaK4ix+rDlKNrJQkgvPqPwhfYGP9djaj96kC/1JC85VEn
+         ZH8r+XDoeQZwmw/MWp3HKLjJ+/mZ4TV7pIDuLeV75bRaXXjjNuP/N27spJWuM9KJ04HV
+         Ehdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=jkp9uIojDcvTz1WAjdwqm+62cYEBiOSYUQ5dsx6Xy3c=;
-        b=zRu7yMSHnalQH8qf51zcG4AlJRv+DvTc/5lW1dQ3idDKJnzU+espnZ82FmsPGDpyVC
-         1KuZttT7JZXql/nVj/knvP0oxOjeuACU5ZNbQNeys4LlIemupNdPBoxQF+wXd77YHwD9
-         hSstyAUuWFbqV4xvVdv6xuG1ii6pEpu5YPsVTlmRPQPUOICtWMJ8n+5Li3hhq527IvZg
-         FNQt/Hsq2kmrHADlIVkHv7EL3eUTx6YpYAa/M/dMOMyqpHACmUfN4bRFDbt5xyzlT1Dp
-         FQutntjp5f7HzJxbEifGQLaK6EV/ZXEc26eBVotiL4BhQSeZ7Vkdenm3Apqnfxoc7bms
-         vxbA==
-X-Gm-Message-State: ACrzQf31LFliPZLXv7PdVHfanT6LiY6s7mOVnv/AgstF0uaRqGIRz3SY
-        38szmMWSyYtm7ycdIqBbO3j049+rsHzX6DP2iI1gJ8bYbrYpbWYTmBn8V7hBj5as+19XlyQLyQT
-        QPdwy1KJ8yn0j
-X-Received: by 2002:a5d:550c:0:b0:22b:1942:4bf6 with SMTP id b12-20020a5d550c000000b0022b19424bf6mr5901931wrv.520.1663959583273;
-        Fri, 23 Sep 2022 11:59:43 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4CXt1Gmz2l63VsV0kLrMAmo+b3zf+Ph2eH6nv8EPj6XWnMUJUXHIU039mANC4WKldL8KEvYQ==
-X-Received: by 2002:a5d:550c:0:b0:22b:1942:4bf6 with SMTP id b12-20020a5d550c000000b0022b19424bf6mr5901917wrv.520.1663959583071;
-        Fri, 23 Sep 2022 11:59:43 -0700 (PDT)
-Received: from [192.168.8.103] (tmo-097-189.customers.d1-online.com. [80.187.97.189])
-        by smtp.gmail.com with ESMTPSA id g16-20020adfe410000000b0022ac13aa98fsm7849175wrm.97.2022.09.23.11.59.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Sep 2022 11:59:42 -0700 (PDT)
-Message-ID: <c783fe07-4f4c-a52b-0445-0a4df057ffa6@redhat.com>
-Date:   Fri, 23 Sep 2022 20:59:40 +0200
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=Fmt9MN5NfVGezrHnd/u5tnrRyL7gHvPLtsOh+992pbU=;
+        b=kp3cPjA3mNYgkgWtm4OAJgedxvuB7AT9Q/FJnruLIMt6Mm5whvK9MFqFdn3MLKCpiE
+         ugaEYXYcSNdui1qP0gLwL8qAioPZ+7oq9XkEERLdffMFSgAybauPOb4nUP2SjRmDS6UW
+         phNz7rObSRR1rKcEWrKUCMNYEeldhAIBn98d8FGZLuCA6fsNImMjC5E+zl3LctehO6Ru
+         LltTVzi2BaIAulZvHhfEksUOJCNPkqILJ+YCbhtjW6Myvn24ANb7vXCc134q0MBVj0JJ
+         a1Pgaw1QaewFsTtUd29gur4FISUR9+wgvJ7Wozg0jdW+fKUHwZIFBck4ElcC+0Q7FF/N
+         MqrQ==
+X-Gm-Message-State: ACrzQf2LGidE0kdyEYtE3TlbGTLu7uDilVqePx3yQlyCXT2oY0MeEWFk
+        S9z6niMcUzUFK7jA0hCifiN0PF5+0loH3rsxv1Y2xDy8Ddkq7Q==
+X-Google-Smtp-Source: AMsMyM6opd6tAaE8wRmRyYEbDHJ63Wicor8tHC/tbYo2If3Cb3Kt7nmAFS/JTZ22c/dYX0G0TUIRiAiMBO0/qrhGl8A=
+X-Received: by 2002:a05:6808:f8e:b0:351:a39:e7ca with SMTP id
+ o14-20020a0568080f8e00b003510a39e7camr3317295oiw.269.1663961111771; Fri, 23
+ Sep 2022 12:25:11 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH v8 0/8] s390x/pci: zPCI interpretation support
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
-        cohuck@redhat.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com,
-        pasic@linux.ibm.com, borntraeger@linux.ibm.com, mst@redhat.com,
-        pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <20220902172737.170349-1-mjrosato@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20220902172737.170349-1-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <50dfe81bf95db91e6148b421740490c35c33233e.camel@redhat.com>
+In-Reply-To: <50dfe81bf95db91e6148b421740490c35c33233e.camel@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 23 Sep 2022 12:25:00 -0700
+Message-ID: <CALMp9eSJbb6sSmv4c8c3ebCtfgdAARgryq5jHXdRmhxm6fYQsw@mail.gmail.com>
+Subject: Re: The root cause of failure of access_tracking_perf_test in a
+ nested guest
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vladimir Davydov <vdavydov.dev@gmail.com>, linux-mm@kvack.org,
+        Sean Christopherson <seanjc@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,63 +72,118 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/09/2022 19.27, Matthew Rosato wrote:
-> Now that the kernel series [1] is merged and the freeze is over, here is a
-> refresh of the zPCI interpretation series.
->                                                             
-> For QEMU, the majority of the work in enabling instruction interpretation
-> is handled via SHM bit settings (to indicate to firmware whether or not
-> interpretive execution facilities are to be used) + a new KVM ioctl is
-> used to setup firmware-interpreted forwarding of Adapter Event
-> Notifications.
-> 
-> This series also adds a new, optional 'interpret' parameter to zpci which
-> can be used to disable interpretation support (interpret=off) as well as
-> an 'forwarding_assist' parameter to determine whether or not the firmware
-> assist will be used for adapter event delivery (default when
-> interpretation is in use) or whether the host will be responsible for
-> delivering all adapter event notifications (forwarding_assist=off).
-> 
-> The zpcii-disable machine property is added to allow disabling use of
-> zPCI interpretation facilities for a guest. This property is set to on
-> for older (pre-7.2 compat machines), but defaults to off for 7.2 and
-> newer. This allows newer machines to use interpretation by default if
-> the necessary kernel interfaces and hardware facilities are available,
-> but also provides a mechanism for disabling interpretation completely
-> for debug purposes.
-> 
-> As a consequence of implementing zPCI interpretation, ISM devices now
-> become eligible for passthrough (but only when zPCI interpretation is
-> available).
-> 
->  From the perspective of guest configuration, you passthrough zPCI devices
-> in the same manner as before, with intepretation support being used by
-> default if available in kernel+qemu.
-> 
-> Changelog v7->v8:
-> - Rebase onto 7.1.0
-> - Move compat machine changes for patch 8
-> - Refresh kernel header sync to 6.0-rc3
-> 
-> [1] https://lore.kernel.org/kvm/20220606203325.110625-1-mjrosato@linux.ibm.com/
-> 
-> Matthew Rosato (8):
->    linux-headers: update to 6.0-rc3
->    s390x/pci: add routine to get host function handle from CLP info
->    s390x/pci: enable for load/store intepretation
+On Fri, Sep 23, 2022 at 3:16 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+>
+> Hi!
+>
+> Me and Emanuele Giuseppe Esposito were working on trying to understand wh=
+y the access_tracking_perf_test
+> fails when run in a nested guest on Intel, and I finally was able to find=
+ the root casue.
+>
+> So the access_tracking_perf_test tests the following:
+>
+> - It opens /sys/kernel/mm/page_idle/bitmap which is a special root read/w=
+ritiable
+> file which allows a process to set/clear the accessed bit in its page tab=
+les.
+> the interface of this file is inverted, it is a bitmap of 'idle' bits
+> Idle bit set =3D=3D=3D dirty bit is clear.
+>
+> - It then runs a KVM guest, and checks that when the guest accesses its m=
+emory
+> (through EPT/NPT), the accessed bits are still updated normally as seen f=
+rom /sys/kernel/mm/page_idle/bitmap.
+>
+> In particular it first clears the accesssed bit using /sys/kernel/mm/page=
+_idle/bitmap,
+> and then runs a guest which reads/writes all its memory, and then
+> it checks that the accessed bit is set again by reading the /sys/kernel/m=
+m/page_idle/bitmap.
+>
+>
+>
+> Now since KVM uses its own paging (aka secondary MMU), mmu notifiers are =
+used, and in particular
+> - kvm_mmu_notifier_clear_flush_young
+> - kvm_mmu_notifier_clear_young
+> - kvm_mmu_notifier_test_young
+>
+> First two clear the accessed bit from NPT/EPT, and the 3rd only checks it=
+s value.
+>
+> The difference between the first two notifiers is that the first one flus=
+hes EPT/NPT,
+> and the second one doesn't, and apparently the /sys/kernel/mm/page_idle/b=
+itmap uses the second one.
+>
+> This means that on the bare metal, the tlb might still have the accessed =
+bit set, and thus
+> it might not set it again in the PTE when a memory access is done through=
+ it.
+>
+> There is a comment in kvm_mmu_notifier_clear_young about this inaccuracy,=
+ so this seems to be
+> done on purpose.
+>
+> I would like to hear your opinion on why it was done this way, and if the=
+ original reasons for
+> not doing the tlb flush are still valid.
+>
+> Now why the access_tracking_perf_test fails in a nested guest?
+> It is because kvm shadow paging which is used to shadow the nested EPT, a=
+nd it has a "TLB" which
+> is not bounded by size, because it is stored in the unsync sptes in memor=
+y.
+>
+> Because of this, when the guest clears the accessed bit in its nested EPT=
+ entries, KVM doesn't
+> notice/intercept it and corresponding EPT sptes remain the same, thus lat=
+er the guest access to
+> the memory is not intercepted and because of this doesn't turn back
+> the accessed bit in the guest EPT tables.
 
-Typo in that subject, should be "interpretation" instead of "intepretation".
+Does the guest execute an INVEPT after clearing the accessed bit?
 
->    s390x/pci: don't fence interpreted devices without MSI-X
->    s390x/pci: enable adapter event notification for interpreted devices
->    s390x/pci: let intercept devices have separate PCI groups
->    s390x/pci: reflect proper maxstbl for groups of interpreted devices
->    s390x/s390-virtio-ccw: add zpcii-disable machine property
+From volume 3 of the SDM, section 28.3.5 Accessed and Dirty Flags for EPT:
 
-Thanks, patch series looks basically fine to me now. Some nits here and 
-there, so if you could still fix those up and send a v9, that would be 
-great! (If you are completely out of spare time for that, let me know, then 
-I can also try to fix those up on my own when picking up the patches)
+> A processor may cache information from the EPT paging-structure entries i=
+n TLBs and paging-structure caches (see Section 28.4). This fact implies th=
+at, if software changes an accessed flag or a dirty flag from 1 to 0, the p=
+rocessor might not set the corresponding bit in memory on a subsequent acce=
+ss using an affected guest-physical address.
 
-  Thomas
-
+> (If TLB flush were to happen, we would 'sync' the unsync sptes, by zappin=
+g them because we don't
+> keep sptes for gptes with no accessed bit)
+>
+>
+> Any comments are welcome!
+>
+> If you think that the lack of the EPT flush is still the right thing to d=
+o,
+> I vote again to have at least some form of a blacklist of selftests which
+> are expected to fail, when run under KVM (fix_hypercall_test is the other=
+ test
+> I already know that fails in a KVM guest, also without a practical way to=
+ fix it).
+>
+>
+> Best regards,
+>         Maxim Levitsky
+>
+>
+> PS: the test doesn't fail on AMD because we sync the nested NPT on each n=
+ested VM entry, which
+> means that L0 syncs all the page tables.
+>
+> Also the test sometimes passes on Intel when an unrelated TLB flush syncs=
+ the nested EPT.
+>
+> Not using the new tdp_mmu also 'helps' by letting the test pass much more=
+ often but it still
+> fails once in a while, likely because of timing and/or different implemen=
+tation.
+>
+>
+>
