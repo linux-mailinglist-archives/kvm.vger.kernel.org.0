@@ -2,190 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FD255E7A0C
-	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 13:57:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 389CD5E7A36
+	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 14:10:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232004AbiIWL5J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Sep 2022 07:57:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47730 "EHLO
+        id S232090AbiIWMKU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Sep 2022 08:10:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231858AbiIWL5H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Sep 2022 07:57:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D040FEE1D
-        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 04:57:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663934225;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4miBri3bJhR5OaFoUxgYoX/ss5biL8QmMasfztYCuX4=;
-        b=bWCG5IBbamND2+1UlP1Qe7gI5d3LEyazkG5BN0dSIFaAe9nLVcFjFn+zjHYJ/gZfoUT/aE
-        WEgQ+qTxfOktUyuLJBYlBdGbvfFRm68WtOT3NldGXQ4LKKEqTYaDH5GDbHav6sAaLTFdy7
-        c/WO7z4p0MltZLhs1M0DO+gO6dciYo4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-118-gnesH1DcP0G33xwCnnjwIw-1; Fri, 23 Sep 2022 07:57:04 -0400
-X-MC-Unique: gnesH1DcP0G33xwCnnjwIw-1
-Received: by mail-wm1-f70.google.com with SMTP id p9-20020a05600c23c900b003b48dc0cef1so1723484wmb.1
-        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 04:57:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=4miBri3bJhR5OaFoUxgYoX/ss5biL8QmMasfztYCuX4=;
-        b=3EXWnN1mvhHBRRvw1Mv7OqzLu66UfeUU2MK1b+aKIZceKzEQDNoVym9am8gWB56RVs
-         ba4Gs1MHA4PVldQWhozmszM1byA0UaiHVox47KcOggGLKwg5+olDsSB9flYcUjITT1r8
-         Nv1y5t2EE+i2p5kngzgy/gVZWIKYAWp468rv/ufkiJnuKHaOhs8Pcf6HsyD1ehZnfshv
-         FaeA+GjiZYSlZrqzwr0i8pwQNzIKN4X6+1CPNW6NLF9hTfpiJW/gg2o6NhsL4xSAHMMT
-         ASJyWUnhkZSfc+PHg2usRPeUYSc7C2ZfclLRhazOuzSBQ+Owf2Kaz0SF6FyGetDt3Lcw
-         OijA==
-X-Gm-Message-State: ACrzQf02hpo3fkU1kdi/SaKjWP0qnWE9vnppD6YjqTtXmG41irXsq1DT
-        uA7zykxDaRdnodVx/yJ43fs96xjSG8nWKh4lSlNMh14T9K1EVfBPhtd7KJiTv7UGrR9PuCYy4/H
-        DghIldzEyQNHp
-X-Received: by 2002:a5d:5887:0:b0:22b:107e:7e39 with SMTP id n7-20020a5d5887000000b0022b107e7e39mr5155811wrf.694.1663934223058;
-        Fri, 23 Sep 2022 04:57:03 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM47KtCY7OjlZi09YuqBLhLlMCLGbOE3dNReWbGbXGp3ENh5S0EFb/Vag6XNY3kRQj/zHsGi+A==
-X-Received: by 2002:a5d:5887:0:b0:22b:107e:7e39 with SMTP id n7-20020a5d5887000000b0022b107e7e39mr5155795wrf.694.1663934222736;
-        Fri, 23 Sep 2022 04:57:02 -0700 (PDT)
-Received: from [192.168.149.123] (58.254.164.109.static.wline.lns.sme.cust.swisscom.ch. [109.164.254.58])
-        by smtp.gmail.com with ESMTPSA id q16-20020a1cf310000000b003a5fa79007fsm2345707wmq.7.2022.09.23.04.57.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Sep 2022 04:57:02 -0700 (PDT)
-Message-ID: <da71648e-b501-dba2-a7f8-93d16ce6d833@redhat.com>
-Date:   Fri, 23 Sep 2022 13:57:01 +0200
+        with ESMTP id S231676AbiIWMIO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Sep 2022 08:08:14 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 897BB18B3E;
+        Fri, 23 Sep 2022 05:04:39 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28NBcKV4009282;
+        Fri, 23 Sep 2022 12:04:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=cMQsJdyHoIadexI0enjCs7e7g+XMk0AFDRQak/aforc=;
+ b=fz+pJyVluDMesZAoKmGPpwhBdb+3t/JQXg2nk0Fv408z2ck+JZuKec2xUD1mI49hT8Ew
+ ZwWUCAdiVf67BZSO15EwfB75e9Ckz1qbCs68aAcGpRrwWh99GQd7RkWzn4wtOL1/Fc2T
+ yYjkRsJKo7xDSyT1tM/TTK2A5nXgMaz5Au3AJmU2rifwmz/JYFA9igMKGL7yn/6nqC4B
+ erxCtaLz5xELgZ032vwKBO22Al03IDhuFsTLvHJrYBYmSFpUPcCQ21EVGRIkMMtszsUK
+ /U05t8WORKlDbv4FxXPDkKtXsksqN3qG+h7pRmyUO1lOtcKxtgyEXed5iF28qULFEXRZ Nw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jsa67bxng-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 23 Sep 2022 12:04:38 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28NBgGLs026501;
+        Fri, 23 Sep 2022 12:04:38 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jsa67bxme-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 23 Sep 2022 12:04:38 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 28NBpvW2025569;
+        Fri, 23 Sep 2022 12:04:36 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma01fra.de.ibm.com with ESMTP id 3jn5v8nwhv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 23 Sep 2022 12:04:35 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 28NC4WWl14549396
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 23 Sep 2022 12:04:32 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7B403AE053;
+        Fri, 23 Sep 2022 12:04:32 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 14015AE045;
+        Fri, 23 Sep 2022 12:04:32 +0000 (GMT)
+Received: from localhost.localdomain.com (unknown [9.171.28.252])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 23 Sep 2022 12:04:32 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com
+Subject: [GIT PULL 0/4] KVM: s390: Fixes for 6.0 take 2
+Date:   Fri, 23 Sep 2022 14:04:08 +0200
+Message-Id: <20220923120412.15294-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.37.3
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: m3kXJyrkLONkSIA0crx7crZPNn9rtW92
+X-Proofpoint-ORIG-GUID: mXvgXl-3u3q0Kf8YYqhJR7jS7JdQ-Rs_
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: The root cause of failure of access_tracking_perf_test in a
- nested guest
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vladimir Davydov <vdavydov.dev@gmail.com>, linux-mm@kvack.org,
-        Sean Christopherson <seanjc@google.com>
-References: <50dfe81bf95db91e6148b421740490c35c33233e.camel@redhat.com>
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-In-Reply-To: <50dfe81bf95db91e6148b421740490c35c33233e.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-09-23_04,2022-09-22_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=772
+ malwarescore=0 spamscore=0 bulkscore=0 adultscore=0 suspectscore=0
+ priorityscore=1501 impostorscore=0 phishscore=0 mlxscore=0
+ lowpriorityscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2209130000 definitions=main-2209230079
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Paolo,
 
+vfio-pci has kept us busy for a bit so here are three additional pci fixes.
+Additionally there's a smatch fix by Janis.
 
-Am 23/09/2022 um 12:16 schrieb Maxim Levitsky:
-> Hi!
-> 
-> Me and Emanuele Giuseppe Esposito were working on trying to understand why the access_tracking_perf_test
-> fails when run in a nested guest on Intel, and I finally was able to find the root casue.
-> 
-> So the access_tracking_perf_test tests the following:
-> 
-> - It opens /sys/kernel/mm/page_idle/bitmap which is a special root read/writiable
-> file which allows a process to set/clear the accessed bit in its page tables.
-> the interface of this file is inverted, it is a bitmap of 'idle' bits
-> Idle bit set === dirty bit is clear.
-> 
-> - It then runs a KVM guest, and checks that when the guest accesses its memory
-> (through EPT/NPT), the accessed bits are still updated normally as seen from /sys/kernel/mm/page_idle/bitmap.
-> 
-> In particular it first clears the accesssed bit using /sys/kernel/mm/page_idle/bitmap,
-> and then runs a guest which reads/writes all its memory, and then
-> it checks that the accessed bit is set again by reading the /sys/kernel/mm/page_idle/bitmap.
-> 
-> 
-> 
-> Now since KVM uses its own paging (aka secondary MMU), mmu notifiers are used, and in particular
-> - kvm_mmu_notifier_clear_flush_young
-> - kvm_mmu_notifier_clear_young
-> - kvm_mmu_notifier_test_young
-> 
-> First two clear the accessed bit from NPT/EPT, and the 3rd only checks its value.
-> 
-> The difference between the first two notifiers is that the first one flushes EPT/NPT,
-> and the second one doesn't, and apparently the /sys/kernel/mm/page_idle/bitmap uses the second one.
-> 
-> This means that on the bare metal, the tlb might still have the accessed bit set, and thus
-> it might not set it again in the PTE when a memory access is done through it.
-> 
-> There is a comment in kvm_mmu_notifier_clear_young about this inaccuracy, so this seems to be
-> done on purpose.
-> 
-> I would like to hear your opinion on why it was done this way, and if the original reasons for
-> not doing the tlb flush are still valid.
-> 
-> Now why the access_tracking_perf_test fails in a nested guest?
-> It is because kvm shadow paging which is used to shadow the nested EPT, and it has a "TLB" which
-> is not bounded by size, because it is stored in the unsync sptes in memory.
-> 
-> Because of this, when the guest clears the accessed bit in its nested EPT entries, KVM doesn't
-> notice/intercept it and corresponding EPT sptes remain the same, thus later the guest access to
-> the memory is not intercepted and because of this doesn't turn back
-> the accessed bit in the guest EPT tables.
-> 
-> (If TLB flush were to happen, we would 'sync' the unsync sptes, by zapping them because we don't
-> keep sptes for gptes with no accessed bit)
+It might be a bit late for rc7 but we wanted to have the coverage.
+Enjoy the weekend!
 
-As suggested by Paolo, I also tried changing page_idle.c implementation so that it would call kvm_mmu_notifier_clear_flush_young instead of its non-flush counterpart: 
+The following changes since commit 521a547ced6477c54b4b0cc206000406c221b4d6:
 
-diff --git a/mm/page_idle.c b/mm/page_idle.c
-index edead6a8a5f9..ffc1b0182534 100644
---- a/mm/page_idle.c
-+++ b/mm/page_idle.c
-@@ -62,10 +62,10 @@ static bool page_idle_clear_pte_refs_one(struct page *page,
-                         * For PTE-mapped THP, one sub page is referenced,
-                         * the whole THP is referenced.
-                         */
--                       if (ptep_clear_young_notify(vma, addr, pvmw.pte))
-+                       if (ptep_clear_flush_young_notify(vma, addr, pvmw.pte))
-                                referenced = true;
-                } else if (IS_ENABLED(CONFIG_TRANSPARENT_HUGEPAGE)) {
--                       if (pmdp_clear_young_notify(vma, addr, pvmw.pmd))
-+                       if (pmdp_clear_flush_young_notify(vma, addr, pvmw.pmd))
-                                referenced = true;
-                } else {
-                        /* unexpected pmd-mapped page? */
+  Linux 6.0-rc6 (2022-09-18 13:44:14 -0700)
 
-As expected, with the above patch the test does not fail anymore, proving Maxim's point.
-As I understand an alternative was to get rid of the test? Or at least move it outside from kvm?
+are available in the Git repository at:
 
-Thank you,
-Emanuele
+  https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git tags/kvm-s390-master-6.0-2
 
-> 
-> 
-> Any comments are welcome!
-> 
-> If you think that the lack of the EPT flush is still the right thing to do,
-> I vote again to have at least some form of a blacklist of selftests which
-> are expected to fail, when run under KVM (fix_hypercall_test is the other test
-> I already know that fails in a KVM guest, also without a practical way to fix it).
-> 
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
-> 
-> PS: the test doesn't fail on AMD because we sync the nested NPT on each nested VM entry, which
-> means that L0 syncs all the page tables.
-> 
-> Also the test sometimes passes on Intel when an unrelated TLB flush syncs the nested EPT.
-> 
-> Not using the new tdp_mmu also 'helps' by letting the test pass much more often but it still
-> fails once in a while, likely because of timing and/or different implementation.
-> 
-> 
-> 
+for you to fetch changes up to 189e7d876e48d7c791fe1c9c01516f70f5621a9f:
+
+  KVM: s390: pci: register pci hooks without interpretation (2022-09-21 16:18:38 +0200)
+
+----------------------------------------------------------------
+More pci fixes
+Fix for a code analyser warning
+----------------------------------------------------------------
+
+Janis Schoetterl-Glausch (1):
+  KVM: s390: Pass initialized arg even if unused
+
+Matthew Rosato (3):
+  KVM: s390: pci: fix plain integer as NULL pointer warnings
+  KVM: s390: pci: fix GAIT physical vs virtual pointers usage
+  KVM: s390: pci: register pci hooks without interpretation
+
+ arch/s390/kvm/gaccess.c   | 16 +++++++++++++---
+ arch/s390/kvm/interrupt.c |  2 +-
+ arch/s390/kvm/kvm-s390.c  |  4 ++--
+ arch/s390/kvm/pci.c       | 20 ++++++++++++++------
+ arch/s390/kvm/pci.h       |  6 +++---
+ 5 files changed, 33 insertions(+), 15 deletions(-)
+
+-- 
+2.37.3
 
