@@ -2,136 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D1CA5E7CA1
-	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 16:13:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BC4245E7CBF
+	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 16:20:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232357AbiIWONY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Sep 2022 10:13:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44218 "EHLO
+        id S232541AbiIWOUP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Sep 2022 10:20:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232222AbiIWONT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Sep 2022 10:13:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA2179F1A2
-        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 07:13:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663942398;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=3/tXnfx2ItcntdX91SAbA2MDsexn7TrLVcjXsKnHLr8=;
-        b=KAw4qEGg+6s2TPsYzuHM7tbuwFMeotho8go7inWfYS4o/w35N+kWVvwne1W0gx26RZdUCU
-        OmSpdBC9tBrFP9pBKzcAB9TjSAjH6XbqrHZvE1kLK7LkO1b9C1sMb1CgwIJsCbZ1928CR7
-        Syy1gH8Pl9LYgFi8kVWF+1dNhB2PxAw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-651-WaWDUrP3OWaat30aMeE9dw-1; Fri, 23 Sep 2022 10:13:12 -0400
-X-MC-Unique: WaWDUrP3OWaat30aMeE9dw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S232516AbiIWOUO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Sep 2022 10:20:14 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14F41A99E6
+        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 07:20:07 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5E685101E14D;
-        Fri, 23 Sep 2022 14:13:12 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 427CA40C2066;
-        Fri, 23 Sep 2022 14:13:12 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for Linux 5.0-rc7
-Date:   Fri, 23 Sep 2022 10:13:12 -0400
-Message-Id: <20220923141312.96688-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0DE98616CF
+        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 14:20:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D06BC433C1;
+        Fri, 23 Sep 2022 14:20:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1663942806;
+        bh=Kq7emLhwvdneoJtvmozd3OskIe6mAMMxre7Z0MxN+rM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=iHoB0JQ3Wn3YayXCXt9oZO83b52P+7kufQ1Slo7/Je6Ne/JeorY48wL9gg7iEqfL6
+         OHYafCnErG69xotp3dZpZcLYoYpVBKCKusAAsmEBklpnyDAIMYpS+JQm6nQoGCmIph
+         6+v/BEgPQO20dwfLMwT6TXJy08ZStnxCRRKurMwRpHHRd3CesCOGSx+kqheLOAPgYz
+         9xJuA/kNd9Nb6N6VIuKgUhAibwROS5ozSepzFY8pFHbIJgZ/yZ7e9iR4SIQB37rJyx
+         gQObLZw7NRpUzTMJasFeCfc2Fto+MGLGXsiGtsNlJogVG5zyzoJgNCtxJkIOuJk8ta
+         gePTQk7N4Pb8A==
+Received: from [82.141.251.28] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1objXA-00CAht-2K;
+        Fri, 23 Sep 2022 15:20:04 +0100
+Date:   Fri, 23 Sep 2022 15:19:56 +0100
+Message-ID: <87edw2jhpv.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org,
+        andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com,
+        pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com,
+        gshan@redhat.com, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH 1/6] KVM: Use acquire/release semantics when accessing dirty ring GFN state
+In-Reply-To: <YyzV2Q/PZHPFMD6y@xz-m1.local>
+References: <20220922170133.2617189-1-maz@kernel.org>
+        <20220922170133.2617189-2-maz@kernel.org>
+        <YyzV2Q/PZHPFMD6y@xz-m1.local>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 82.141.251.28
+X-SA-Exim-Rcpt-To: peterx@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com, gshan@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On Thu, 22 Sep 2022 22:38:33 +0100,
+Peter Xu <peterx@redhat.com> wrote:
+> 
+> Marc,
+> 
+> On Thu, Sep 22, 2022 at 06:01:28PM +0100, Marc Zyngier wrote:
+> > The current implementation of the dirty ring has an implicit requirement
+> > that stores to the dirty ring from userspace must be:
+> > 
+> > - be ordered with one another
+> > 
+> > - visible from another CPU executing a ring reset
+> > 
+> > While these implicit requirements work well for x86 (and any other
+> > TSO-like architecture), they do not work for more relaxed architectures
+> > such as arm64 where stores to different addresses can be freely
+> > reordered, and loads from these addresses not observing writes from
+> > another CPU unless the required barriers (or acquire/release semantics)
+> > are used.
+> > 
+> > In order to start fixing this, upgrade the ring reset accesses:
+> > 
+> > - the kvm_dirty_gfn_harvested() helper now uses acquire semantics
+> >   so it is ordered after all previous writes, including that from
+> >   userspace
+> > 
+> > - the kvm_dirty_gfn_set_invalid() helper now uses release semantics
+> >   so that the next_slot and next_offset reads don't drift past
+> >   the entry invalidation
+> > 
+> > This is only a partial fix as the userspace side also need upgrading.
+> 
+> Paolo has one fix 4802bf910e ("KVM: dirty ring: add missing memory
+> barrier", 2022-09-01) which has already landed.
 
-As everyone back came back from conferences, here are the pending patches
-for Linux 6.0.
+What is this commit? It doesn't exist in the kernel as far as I can see.
 
-The following changes since commit 521a547ced6477c54b4b0cc206000406c221b4d6:
+> 
+> I think the other one to reset it was lost too.  I just posted a patch.
+> 
+> https://lore.kernel.org/qemu-devel/20220922213522.68861-1-peterx@redhat.com/
+> (link still not yet available so far, but should be)
 
-  Linux 6.0-rc6 (2022-09-18 13:44:14 -0700)
+That's a QEMU patch, right?
 
-are available in the Git repository at:
+> 
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  virt/kvm/dirty_ring.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
+> > index f4c2a6eb1666..784bed80221d 100644
+> > --- a/virt/kvm/dirty_ring.c
+> > +++ b/virt/kvm/dirty_ring.c
+> > @@ -79,12 +79,12 @@ static inline void kvm_dirty_gfn_set_invalid(struct kvm_dirty_gfn *gfn)
+> >  
+> >  static inline void kvm_dirty_gfn_set_dirtied(struct kvm_dirty_gfn *gfn)
+> >  {
+> > -	gfn->flags = KVM_DIRTY_GFN_F_DIRTY;
+> > +	smp_store_release(&gfn->flags, KVM_DIRTY_GFN_F_DIRTY);
+> 
+> IIUC you meant kvm_dirty_gfn_set_invalid as the comment says?
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+Gah, you're right, I redid the patch at the last minute and messed it
+up....
 
-for you to fetch changes up to 69604fe76e58c9d195e48b41d019b07fc27ce9d7:
+> kvm_dirty_gfn_set_dirtied() has been guarded by smp_wmb() and AFAICT that's
+> already safe.  Otherwise looks good to me.
 
-  Merge tag 'kvm-s390-master-6.0-2' of https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD (2022-09-23 10:06:08 -0400)
+Indeed. Let me fix this.
 
-----------------------------------------------------------------
-ARM:
+Thanks,
 
-* Fix for kmemleak with pKVM
+	M.
 
-s390:
-
-* Fixes for VFIO with zPCI
-
-* smatch fix
-
-x86:
-
-* Ensure XSAVE-capable hosts always allow  FP and SSE state to be saved
-  and restored via KVM_{GET,SET}_XSAVE
-
-* Fix broken max_mmu_rmap_size stat
-
-* Fix compile error with old glibc that doesn't have gettid()
-
-----------------------------------------------------------------
-Dr. David Alan Gilbert (1):
-      KVM: x86: Always enable legacy FP/SSE in allowed user XFEATURES
-
-Janis Schoetterl-Glausch (1):
-      KVM: s390: Pass initialized arg even if unused
-
-Jinrong Liang (1):
-      selftests: kvm: Fix a compile error in selftests/kvm/rseq_test.c
-
-Matthew Rosato (3):
-      KVM: s390: pci: fix plain integer as NULL pointer warnings
-      KVM: s390: pci: fix GAIT physical vs virtual pointers usage
-      KVM: s390: pci: register pci hooks without interpretation
-
-Miaohe Lin (1):
-      KVM: x86/mmu: add missing update to max_mmu_rmap_size
-
-Paolo Bonzini (2):
-      Merge tag 'kvmarm-fixes-6.0-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
-      Merge tag 'kvm-s390-master-6.0-2' of https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD
-
-Sean Christopherson (2):
-      KVM: x86: Reinstate kvm_vcpu_arch.guest_supported_xcr0
-      KVM: x86: Inject #UD on emulated XSETBV if XSAVES isn't enabled
-
-Zenghui Yu (1):
-      KVM: arm64: Use kmemleak_free_part_phys() to unregister hyp_mem_base
-
- arch/arm64/kvm/arm.c                    |  2 +-
- arch/s390/kvm/gaccess.c                 | 16 +++++++++++++---
- arch/s390/kvm/interrupt.c               |  2 +-
- arch/s390/kvm/kvm-s390.c                |  4 ++--
- arch/s390/kvm/pci.c                     | 20 ++++++++++++++------
- arch/s390/kvm/pci.h                     |  6 +++---
- arch/x86/include/asm/kvm_host.h         |  1 +
- arch/x86/kvm/cpuid.c                    | 11 ++++++++---
- arch/x86/kvm/emulate.c                  |  3 +++
- arch/x86/kvm/mmu/mmu.c                  |  2 ++
- arch/x86/kvm/x86.c                      | 10 +++-------
- tools/testing/selftests/kvm/rseq_test.c |  2 +-
- 12 files changed, 52 insertions(+), 27 deletions(-)
-
+-- 
+Without deviation from the norm, progress is not possible.
