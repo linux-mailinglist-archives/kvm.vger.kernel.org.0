@@ -2,303 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2AC15E7659
-	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 10:59:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C9715E7717
+	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 11:28:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231535AbiIWI61 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Sep 2022 04:58:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49106 "EHLO
+        id S230024AbiIWJ2a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Sep 2022 05:28:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231493AbiIWI6T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Sep 2022 04:58:19 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70ACA12CC91;
-        Fri, 23 Sep 2022 01:58:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663923498; x=1695459498;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ye5IuAR2ki3nZDcfAggkXges9D5ud5Vzu0DnBXM27XE=;
-  b=CjGgPMSToqfbife3YmkmgtpOMqHn183PF5WF5jE+DxqL8CKvHJrGTz7e
-   7Kq+h0NG+miD3PcaQM5/A1lLeHVydaYYjQ0WJw64zOW+2CQVahnfGhuSr
-   /iwOxGWz6PjsZeVXdxyu0sTNUAryvfUzDlZ7IWaG9eXFpcIbvAQzuwIm+
-   hDvzIULqWBAId0/JH6indQF+Hun4Wz6TfxB8R96F56TqSa17b7UEWOCwf
-   GBUA6sdyHC/85KtrPN6z2MPHeeChIeBEDq5rp17l9WZKq/8lXUj9yEMYH
-   Ok5/eWxTjfLweIXhH1EeDebUy1u8pJd05pcAwCVIXCWa1VqZ/+mK3Mn8X
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10478"; a="287664024"
-X-IronPort-AV: E=Sophos;i="5.93,337,1654585200"; 
-   d="scan'208";a="287664024"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2022 01:58:18 -0700
-X-IronPort-AV: E=Sophos;i="5.93,337,1654585200"; 
-   d="scan'208";a="650880234"
-Received: from spr.sh.intel.com ([10.239.53.122])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2022 01:58:14 -0700
-From:   Chao Gao <chao.gao@intel.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, jon@nutanix.com,
-        kevin.tian@intel.com
-Cc:     Chao Gao <chao.gao@intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: [RFC v2] KVM: x86/vmx: Suppress posted interrupt notification when CPU is in host
-Date:   Fri, 23 Sep 2022 16:58:06 +0800
-Message-Id: <20220923085806.384344-1-chao.gao@intel.com>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S231858AbiIWJ1z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Sep 2022 05:27:55 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95B90EE640;
+        Fri, 23 Sep 2022 02:27:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=CoUw4thW9ufTem91w3lWVNAkfwZXyINk29SvpieilW4=; b=n/TzYmCPrsheitSnJKSvN1lOnx
+        OW+6TwU3Secx2oyZd3yujIcMnW0Nn34Re3TLuxrhLzsXTQ1+CHHFXzZoj5iDgk/asXroRyz/nyOEU
+        n6sRMk1pdYCrqBmmAsp9Ff3iWheISVdSFGN04NR/8YTyeZQadMASXbjZsP5UFiaiXpc8g3PdQtKUa
+        FcUqtT2m1wjKiPTSSzfllf6aIbDlTayfxacJ4XzBvxKLMqyFDwdEfCecgsmPM1QtTLcol+hHjiwek
+        jJSZYPVNH1O2lDKkyEbceXqpa1qT0jDrjXhc3aZTj4W5Kbed6N4n1UqeXEMSkAplVVrh0qybaoMms
+        sEloIlFw==;
+Received: from ip4d15bec4.dynamic.kabel-deutschland.de ([77.21.190.196] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1obexS-003JeO-Gs; Fri, 23 Sep 2022 09:26:55 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Kirti Wankhede <kwankhede@nvidia.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org
+Subject: simplify the mdev interface v8
+Date:   Fri, 23 Sep 2022 11:26:38 +0200
+Message-Id: <20220923092652.100656-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PIN (Posted interrupt notification) is useless to host as KVM always syncs
-pending guest interrupts in PID to guest's vAPIC before each VM entry. In
-fact, Sending PINs to a CPU running in host will lead to additional
-overhead due to interrupt handling.
+Hi all,
 
-Currently, software path, vmx_deliver_posted_interrupt(), is optimized to
-issue PINs only if target vCPU is in IN_GUEST_MODE. But hardware paths
-(VT-d and Intel IPI virtualization) aren't optimized.
+this series significantly simplifies the mdev driver interface by
+following the patterns for device model interaction used elsewhere in
+the kernel.
 
-Set PID.SN right after VM exits and clear it before VM entry to minimize
-the chance of hardware issuing PINs to a CPU when it's in host.
+Changes since v7:
+ - rebased to the latests vfio/next branch
+ - move the mdev.h include from cio.h to vfio_ccw_private.h
+ - don't free the parent in mdev_type_release
+ - set the pretty_name for vfio_ap
+ - fix the available_instances check in mdev_device_create
 
-Also honour PID.SN bit in vmx_deliver_posted_interrupt().
+Changes since v6:
+ - rebased to Linux 6.0-rc2
+ - folded in a patch from Eric Farman to fix the placement of the new
+   embedded mdev structured in the s390 cio driver
 
-Opportunistically clean up vmx_vcpu_pi_put(); when a vCPU is preempted,
-it is pointless to update PID.NV to wakeup vector since notification is
-anyway suppressed. And since PID.SN should be already set for running
-vCPUs, so, don't set it again for preempted vCPUs.
+Changes since v5:
+ - rebased to the latest vfio/next branch
+ - drop the last patch again
+ - make sure show_available_instances works properly for the internallly
+   tracked case
 
-When IPI virtualization is enabled, this patch increases "perf bench" [*]
-by 6.56%, and PIN count in 1 second drops from tens of thousands to
-hundreds. But cpuid loop test shows this patch causes 1.58% overhead in
-VM-exit round-trip latency.
+Changes since v4:
+ - move the kobject_put later in mdev_device_release 
+ - add a Fixes tag for the first patch
+ - add another patch to remove an extra kobject_get/put
 
-[*] test cmd: perf bench sched pipe -T. Note that we change the source
-code to pin two threads to two different vCPUs so that it can reproduce
-stable results.
+Changes since v3:
+ - make the sysfs_name and pretty_name fields pointers instead of arrays
+ - add an i915 cleanup to prepare for the above
 
-Signed-off-by: Chao Gao <chao.gao@intel.com>
----
-RFC: I am not sure whether the benefits outweighs the extra VM-exit cost.
+Changes since v2:
+ - rebased to vfio/next
+ - fix a pre-existing memory leak in i915 instead of making it worse
+ - never manipulate if ->available_instances if drv->get_available is
+   provided
+ - keep a parent reference for the mdev_type
+ - keep a few of the sysfs.c helper function around
+ - improve the documentation for the parent device lifetime
+ - minor spellig / formatting fixes
 
-Changes in v2 (addressed comments from Kevin):
-- measure/estimate the impact to non-IPC-intensive cases
-- don't tie PID.SN to vcpu->mode. Instead, clear PID.SN
-  right before VM-entry and set it after VM-exit.
-- use !pi_is_pir_empty() in pi_enable_wakeup_handler() to
-  check if any interrupt was posted after clearing SN.
-- clean up vmx_vcpu_pi_put(). See comments above.
+Changes since v1:
+ - embedd the mdev_parent into a different sub-structure in i916
+ - remove headers now inclued by mdev.h from individual source files
+ - pass an array of mdev_types to mdev_register_parent
+ - add additional patches to implement all attributes on the
+   mdev_type in the core code
 
- arch/x86/kvm/lapic.c           |  2 ++
- arch/x86/kvm/vmx/posted_intr.c | 55 +++++++++++-----------------------
- arch/x86/kvm/vmx/vmx.c         | 34 ++++++++++++++++++++-
- 3 files changed, 53 insertions(+), 38 deletions(-)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 9dda989a1cf0..a9f27c6ce937 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -128,7 +128,9 @@ static inline int __apic_test_and_clear_vector(int vec, void *bitmap)
- }
- 
- __read_mostly DEFINE_STATIC_KEY_DEFERRED_FALSE(apic_hw_disabled, HZ);
-+EXPORT_SYMBOL_GPL(apic_hw_disabled);
- __read_mostly DEFINE_STATIC_KEY_DEFERRED_FALSE(apic_sw_disabled, HZ);
-+EXPORT_SYMBOL_GPL(apic_sw_disabled);
- 
- static inline int apic_enabled(struct kvm_lapic *apic)
- {
-diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index 1b56c5e5c9fb..9cec3dd88f75 100644
---- a/arch/x86/kvm/vmx/posted_intr.c
-+++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -70,12 +70,6 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
- 	 * needs to be changed.
- 	 */
- 	if (pi_desc->nv != POSTED_INTR_WAKEUP_VECTOR && vcpu->cpu == cpu) {
--		/*
--		 * Clear SN if it was set due to being preempted.  Again, do
--		 * this even if there is no assigned device for simplicity.
--		 */
--		if (pi_test_and_clear_sn(pi_desc))
--			goto after_clear_sn;
- 		return;
- 	}
- 
-@@ -101,11 +95,16 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
- 		new.control = old.control;
- 
- 		/*
--		 * Clear SN (as above) and refresh the destination APIC ID to
--		 * handle task migration (@cpu != vcpu->cpu).
-+		 * Set SN and refresh the destination APIC ID to handle
-+		 * task migration (@cpu != vcpu->cpu).
-+		 *
-+		 * SN is cleared when a vCPU goes to blocked state so that
-+		 * the blocked vCPU can be waken up on receiving a
-+		 * notification. For a running/runnable vCPU, such
-+		 * notifications are useless. Set SN bit to suppress them.
- 		 */
- 		new.ndst = dest;
--		new.sn = 0;
-+		new.sn = 1;
- 
- 		/*
- 		 * Restore the notification vector; in the blocking case, the
-@@ -115,19 +114,6 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
- 	} while (pi_try_set_control(pi_desc, &old.control, new.control));
- 
- 	local_irq_restore(flags);
--
--after_clear_sn:
--
--	/*
--	 * Clear SN before reading the bitmap.  The VT-d firmware
--	 * writes the bitmap and reads SN atomically (5.2.3 in the
--	 * spec), so it doesn't really have a memory barrier that
--	 * pairs with this, but we cannot do that and we need one.
--	 */
--	smp_mb__after_atomic();
--
--	if (!pi_is_pir_empty(pi_desc))
--		pi_set_on(pi_desc);
- }
- 
- static bool vmx_can_use_vtd_pi(struct kvm *kvm)
-@@ -155,13 +141,15 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
- 		      &per_cpu(wakeup_vcpus_on_cpu, vcpu->cpu));
- 	raw_spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
- 
--	WARN(pi_desc->sn, "PI descriptor SN field set before blocking");
--
- 	old.control = READ_ONCE(pi_desc->control);
- 	do {
--		/* set 'NV' to 'wakeup vector' */
-+		/*
-+		 * set 'NV' to 'wakeup vector' and clear SN bit so that
-+		 * the blocked vCPU can be waken up on receiving interrupts.
-+		 */
- 		new.control = old.control;
- 		new.nv = POSTED_INTR_WAKEUP_VECTOR;
-+		new.sn = 0;
- 	} while (pi_try_set_control(pi_desc, &old.control, new.control));
- 
- 	/*
-@@ -172,8 +160,10 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
- 	 * enabled until it is safe to call try_to_wake_up() on the task being
- 	 * scheduled out).
- 	 */
--	if (pi_test_on(&new))
-+	if (!pi_is_pir_empty(pi_desc)) {
-+		pi_set_on(pi_desc);
- 		apic->send_IPI_self(POSTED_INTR_WAKEUP_VECTOR);
-+	}
- 
- 	local_irq_restore(flags);
- }
-@@ -193,21 +183,12 @@ static bool vmx_needs_pi_wakeup(struct kvm_vcpu *vcpu)
- 
- void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
- {
--	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
--
- 	if (!vmx_needs_pi_wakeup(vcpu))
- 		return;
- 
--	if (kvm_vcpu_is_blocking(vcpu) && !vmx_interrupt_blocked(vcpu))
-+	if (!vcpu->preempted && kvm_vcpu_is_blocking(vcpu) &&
-+	    !vmx_interrupt_blocked(vcpu))
- 		pi_enable_wakeup_handler(vcpu);
--
--	/*
--	 * Set SN when the vCPU is preempted.  Note, the vCPU can both be seen
--	 * as blocking and preempted, e.g. if it's preempted between setting
--	 * its wait state and manually scheduling out.
--	 */
--	if (vcpu->preempted)
--		pi_set_sn(pi_desc);
- }
- 
- /*
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index c9b49a09e6b5..949fb80eca3d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4186,6 +4186,9 @@ static int vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu, int vector)
- 	if (pi_test_and_set_pir(vector, &vmx->pi_desc))
- 		return 0;
- 
-+	if (pi_test_sn(&vmx->pi_desc))
-+		return 0;
-+
- 	/* If a previous notification has sent the IPI, nothing to do.  */
- 	if (pi_test_and_set_on(&vmx->pi_desc))
- 		return 0;
-@@ -6706,7 +6709,7 @@ static int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
- 	if (KVM_BUG_ON(!enable_apicv, vcpu->kvm))
- 		return -EIO;
- 
--	if (pi_test_on(&vmx->pi_desc)) {
-+	if (pi_test_on(&vmx->pi_desc) || pi_test_sn(&vmx->pi_desc)) {
- 		pi_clear_on(&vmx->pi_desc);
- 		/*
- 		 * IOMMU can write to PID.ON, so the barrier matters even on UP.
-@@ -7187,11 +7190,40 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 	if (enable_preemption_timer)
- 		vmx_update_hv_timer(vcpu);
- 
-+	/* do this even if apicv is disabled for simplicity */
-+	if (kvm_lapic_enabled(vcpu)) {
-+		pi_clear_sn(&vmx->pi_desc);
-+		/*
-+		 * Clear SN before reading the bitmap.  The VT-d firmware
-+		 * writes the bitmap and reads SN atomically (5.2.3 in the
-+		 * spec), so it doesn't really have a memory barrier that
-+		 * pairs with this, but we cannot do that and we need one.
-+		 */
-+		smp_mb__after_atomic();
-+
-+		if (!pi_is_pir_empty(&vmx->pi_desc)) {
-+			pi_set_on(&vmx->pi_desc);
-+			apic->send_IPI_self(POSTED_INTR_VECTOR);
-+		}
-+	}
-+
- 	kvm_wait_lapic_expire(vcpu);
- 
- 	/* The actual VMENTER/EXIT is in the .noinstr.text section. */
- 	vmx_vcpu_enter_exit(vcpu, vmx, __vmx_vcpu_run_flags(vmx));
- 
-+	/*
-+	 * Suppress notification right after VM exits to minimize the
-+	 * window where VT-d or remote CPU may send a useless notification
-+	 * when posting interrupts to a VM. Note that the notification is
-+	 * useless because KVM syncs pending interrupts in PID.IRR to vAPIC
-+	 * IRR before VM entry.
-+
-+	 * do this even if apicv is disabled for simplicity.
-+	 */
-+	if (kvm_lapic_enabled(vcpu))
-+		pi_set_sn(&vmx->pi_desc);
-+
- 	/* All fields are clean at this point */
- 	if (static_branch_unlikely(&enable_evmcs)) {
- 		current_evmcs->hv_clean_fields |=
-
-base-commit: 372d07084593dc7a399bf9bee815711b1fb1bcf2
--- 
-2.25.1
-
+Diffstat:
+ Documentation/driver-api/vfio-mediated-device.rst |   26 +-
+ Documentation/s390/vfio-ap.rst                    |    2 
+ Documentation/s390/vfio-ccw.rst                   |    2 
+ drivers/gpu/drm/i915/gvt/aperture_gm.c            |   20 +-
+ drivers/gpu/drm/i915/gvt/gvt.h                    |   42 ++--
+ drivers/gpu/drm/i915/gvt/kvmgt.c                  |  168 ++++-------------
+ drivers/gpu/drm/i915/gvt/vgpu.c                   |  210 +++++++---------------
+ drivers/s390/cio/cio.h                            |    1 
+ drivers/s390/cio/vfio_ccw_drv.c                   |   12 -
+ drivers/s390/cio/vfio_ccw_ops.c                   |   51 -----
+ drivers/s390/cio/vfio_ccw_private.h               |    6 
+ drivers/s390/crypto/vfio_ap_ops.c                 |   68 +------
+ drivers/s390/crypto/vfio_ap_private.h             |    6 
+ drivers/vfio/mdev/mdev_core.c                     |  190 ++++---------------
+ drivers/vfio/mdev/mdev_driver.c                   |    7 
+ drivers/vfio/mdev/mdev_private.h                  |   32 ---
+ drivers/vfio/mdev/mdev_sysfs.c                    |  189 ++++++++++---------
+ include/linux/mdev.h                              |   77 ++++----
+ samples/vfio-mdev/mbochs.c                        |  103 +++-------
+ samples/vfio-mdev/mdpy.c                          |  115 +++---------
+ samples/vfio-mdev/mtty.c                          |   94 +++------
+ 21 files changed, 464 insertions(+), 957 deletions(-)
