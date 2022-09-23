@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CAD6B5E78C5
-	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 12:53:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D40E5E78C7
+	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 12:53:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231802AbiIWKw4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Sep 2022 06:52:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60422 "EHLO
+        id S231854AbiIWKw6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Sep 2022 06:52:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230310AbiIWKwd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Sep 2022 06:52:33 -0400
-Received: from out0-158.mail.aliyun.com (out0-158.mail.aliyun.com [140.205.0.158])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E860F2F396;
-        Fri, 23 Sep 2022 03:52:31 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R511e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018047204;MF=houwenlong.hwl@antgroup.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---.PMYh3Zu_1663930348;
-Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.PMYh3Zu_1663930348)
+        with ESMTP id S230514AbiIWKwe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Sep 2022 06:52:34 -0400
+Received: from out0-151.mail.aliyun.com (out0-151.mail.aliyun.com [140.205.0.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAB3EE6DC1;
+        Fri, 23 Sep 2022 03:52:32 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018047190;MF=houwenlong.hwl@antgroup.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---.PMZ5Kv7_1663930349;
+Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.PMZ5Kv7_1663930349)
           by smtp.aliyun-inc.com;
-          Fri, 23 Sep 2022 18:52:28 +0800
+          Fri, 23 Sep 2022 18:52:29 +0800
 From:   "Hou Wenlong" <houwenlong.hwl@antgroup.com>
 To:     kvm@vger.kernel.org
 Cc:     David Matlack <dmatlack@google.com>,
@@ -26,107 +26,71 @@ Cc:     David Matlack <dmatlack@google.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Lan Tianyu <Tianyu.Lan@microsoft.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3 5/6] KVM: x86/mmu: Fix wrong start gfn of tlb flushing with range
-Date:   Fri, 23 Sep 2022 18:52:21 +0800
-Message-Id: <b48f7b7d375f8903cc606450ce49e252b90945db.1663929851.git.houwenlong.hwl@antgroup.com>
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH v3 6/6] KVM: x86/mmu: Cleanup range-based flushing for given page
+Date:   Fri, 23 Sep 2022 18:52:22 +0800
+Message-Id: <b9c1c10fc815f175025cbe0612cb1711571259e2.1663929851.git.houwenlong.hwl@antgroup.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <cover.1663929851.git.houwenlong.hwl@antgroup.com>
 References: <cover.1663929851.git.houwenlong.hwl@antgroup.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a spte is dropped, the start gfn of tlb flushing should
-be the gfn of spte not the base gfn of SP which contains the
-spte. Also introduce a helper function to do range-based
-flushing when a spte is dropped, which would help prevent
-future buggy use of kvm_flush_remote_tlbs_with_address() in
-such case.
+Use the new kvm_flush_remote_tlbs_gfn() helper to cleanup
+the call sites of range-based flushing for given page,
+which makes the code clear.
 
-Fixes: c3134ce240eed ("KVM: Replace old tlb flush function with new one to flush a specified range.")
-Suggested-by: David Matlack <dmatlack@google.com>
 Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
 ---
- arch/x86/kvm/mmu/mmu.c         | 20 ++++++++++++++------
- arch/x86/kvm/mmu/paging_tmpl.h |  3 +--
- 2 files changed, 15 insertions(+), 8 deletions(-)
+ arch/x86/kvm/mmu/mmu.c     | 5 ++---
+ arch/x86/kvm/mmu/tdp_mmu.c | 3 +--
+ 2 files changed, 3 insertions(+), 5 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index ec5b3b9880de..b64aa8379ba6 100644
+index b64aa8379ba6..3980c49a1992 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -260,6 +260,17 @@ void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
- 	kvm_flush_remote_tlbs_with_range(kvm, &range);
+@@ -817,7 +817,7 @@ static void account_shadowed(struct kvm *kvm, struct kvm_mmu_page *sp)
+ 	kvm_mmu_gfn_disallow_lpage(slot, gfn);
+ 
+ 	if (kvm_mmu_slot_gfn_write_protect(kvm, slot, gfn, PG_LEVEL_4K))
+-		kvm_flush_remote_tlbs_with_address(kvm, gfn, 1);
++		kvm_flush_remote_tlbs_gfn(kvm, gfn, PG_LEVEL_4K);
  }
  
-+static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index);
-+
-+/* Flush the range of guest memory mapped by the given SPTE. */
-+static void kvm_flush_remote_tlbs_sptep(struct kvm *kvm, u64 *sptep)
-+{
-+	struct kvm_mmu_page *sp = sptep_to_sp(sptep);
-+	gfn_t gfn = kvm_mmu_page_get_gfn(sp, spte_index(sptep));
-+
-+	kvm_flush_remote_tlbs_gfn(kvm, gfn, sp->role.level);
-+}
-+
- /* Flush all memory mapped by the given direct SP. */
- static void kvm_flush_remote_tlbs_direct_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
- {
-@@ -1155,8 +1166,7 @@ static void drop_large_spte(struct kvm *kvm, u64 *sptep, bool flush)
- 	drop_spte(kvm, sptep);
+ void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+@@ -2842,8 +2842,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+ 	}
  
  	if (flush)
--		kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
--			KVM_PAGES_PER_HPAGE(sp->role.level));
-+		kvm_flush_remote_tlbs_sptep(kvm, sptep);
- }
+-		kvm_flush_remote_tlbs_with_address(vcpu->kvm, gfn,
+-				KVM_PAGES_PER_HPAGE(level));
++		kvm_flush_remote_tlbs_gfn(vcpu->kvm, gfn, level);
  
- /*
-@@ -1607,8 +1617,7 @@ static void __rmap_add(struct kvm *kvm,
+ 	pgprintk("%s: setting spte %llx\n", __func__, *sptep);
  
- 	if (rmap_count > RMAP_RECYCLE_THRESHOLD) {
- 		kvm_zap_all_rmap_sptes(kvm, rmap_head);
--		kvm_flush_remote_tlbs_with_address(
--				kvm, sp->gfn, KVM_PAGES_PER_HPAGE(sp->role.level));
-+		kvm_flush_remote_tlbs_gfn(kvm, gfn, sp->role.level);
- 	}
- }
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 2d223c5167f8..567691440ab0 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -673,8 +673,7 @@ static inline int tdp_mmu_zap_spte_atomic(struct kvm *kvm,
+ 	if (ret)
+ 		return ret;
  
-@@ -6403,8 +6412,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
- 			kvm_zap_one_rmap_spte(kvm, rmap_head, sptep);
+-	kvm_flush_remote_tlbs_with_address(kvm, iter->gfn,
+-					   KVM_PAGES_PER_HPAGE(iter->level));
++	kvm_flush_remote_tlbs_gfn(kvm, iter->gfn, iter->level);
  
- 			if (kvm_available_flush_tlb_with_range())
--				kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
--					KVM_PAGES_PER_HPAGE(sp->role.level));
-+				kvm_flush_remote_tlbs_sptep(kvm, sptep);
- 			else
- 				need_tlb_flush = 1;
- 
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 4e9f992474cb..14268bfb0c8e 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -937,8 +937,7 @@ static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
- 
- 			mmu_page_zap_pte(vcpu->kvm, sp, sptep, NULL);
- 			if (is_shadow_present_pte(old_spte))
--				kvm_flush_remote_tlbs_with_address(vcpu->kvm,
--					sp->gfn, KVM_PAGES_PER_HPAGE(sp->role.level));
-+				kvm_flush_remote_tlbs_sptep(vcpu->kvm, sptep);
- 
- 			if (!rmap_can_add(vcpu))
- 				break;
+ 	/*
+ 	 * No other thread can overwrite the removed SPTE as they must either
 -- 
 2.31.1
 
