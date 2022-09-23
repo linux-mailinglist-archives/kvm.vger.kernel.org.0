@@ -2,130 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B085D5E7C99
-	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 16:11:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D1CA5E7CA1
+	for <lists+kvm@lfdr.de>; Fri, 23 Sep 2022 16:13:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232591AbiIWOLo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Sep 2022 10:11:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39522 "EHLO
+        id S232357AbiIWONY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Sep 2022 10:13:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232251AbiIWOLE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Sep 2022 10:11:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E997FAB4EE
-        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 07:10:51 -0700 (PDT)
+        with ESMTP id S232222AbiIWONT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Sep 2022 10:13:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA2179F1A2
+        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 07:13:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1663942251;
+        s=mimecast20190719; t=1663942398;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JE+EIlOPFCft+jE9XJOi12dnXpSf7LlMF0zSv8qu96g=;
-        b=RQZ9d+kFBu+SKTqpivIO1JBFe7IdRMnTQLu0416cHiEa2lNzbfFuBLqDkAR7OPL81hac3W
-        cYrUvUDhMujcJJLiQqGIhRfV3RwG4Gx6bFghZmjIT/JuYQFvjBc7jvxT1Mv5zxvuFwpGxL
-        yUZB4PMVHOCbmRs1j5fwgm4p6NQyl9w=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-246-DCqrvN-4NPmJah02dxJjSQ-1; Fri, 23 Sep 2022 10:10:49 -0400
-X-MC-Unique: DCqrvN-4NPmJah02dxJjSQ-1
-Received: by mail-ed1-f70.google.com with SMTP id s17-20020a056402521100b004511c8d59e3so164928edd.11
-        for <kvm@vger.kernel.org>; Fri, 23 Sep 2022 07:10:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=JE+EIlOPFCft+jE9XJOi12dnXpSf7LlMF0zSv8qu96g=;
-        b=DDA0J+f1Qc2pE2THxuGugaWC+Y7sf42Q9Bu3q+trIvmTGVgbXhMNqh1cN7iMRP6Dfs
-         VbatFbo529DmOTRtbMjdHPEx6oSN+sxyr/mbrDp2uX3Idk3ZMauZOrtaQ7LLRNVRkvig
-         UcjNuokpRuZ6Hl5yJjUyqA4ANwDjTz3KlTZmMLvNoSxkGVSIhCgJ3qqI23MX9yACFYnJ
-         R5SIXxUlQTG/BSj5b3VXz+xzsHbITc+VkiaIwA921LxmK1GlJEBqZRqHWPPLQXrnw0SG
-         CQTGBj71CcmBlOlNFSPosD7EIY2sMeO0QUmZcDBEEsjK8B8m/1fvi+oBgVc8cXNX8DlZ
-         PFhA==
-X-Gm-Message-State: ACrzQf2TF+GtpvSfv4/Iqncy09/gTWQYa9NdfE17knYYltLj8ASjHqp4
-        IAZcyqNQy4/RZHi/xaPz40uIDqDCmypnLcfB/tMqyQ9cnZa3Akn7mBqEyZTeMT5WOUB876SZdBN
-        RWc2xibcuUMQD
-X-Received: by 2002:a17:906:8448:b0:77b:e6d0:58a5 with SMTP id e8-20020a170906844800b0077be6d058a5mr7425547ejy.347.1663942248863;
-        Fri, 23 Sep 2022 07:10:48 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM6hT4TYX7LnQfuYLlQKy4zfmhp9NFBn8+JsHXXnnMqPdIKCCz3lkbwftkSETsvYydZhnMlFpQ==
-X-Received: by 2002:a17:906:8448:b0:77b:e6d0:58a5 with SMTP id e8-20020a170906844800b0077be6d058a5mr7425522ejy.347.1663942248570;
-        Fri, 23 Sep 2022 07:10:48 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id au7-20020a170907092700b0073cdeedf56fsm4055072ejc.57.2022.09.23.07.10.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Sep 2022 07:10:48 -0700 (PDT)
-Message-ID: <2d618e8c-782c-b122-f4be-618a548645e9@redhat.com>
-Date:   Fri, 23 Sep 2022 16:10:46 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [GIT PULL 0/4] KVM: s390: Fixes for 6.0 take 2
-Content-Language: en-US
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, david@redhat.com, borntraeger@de.ibm.com,
-        cohuck@redhat.com, linux-s390@vger.kernel.org,
-        imbrenda@linux.ibm.com
-References: <20220923120412.15294-1-frankja@linux.ibm.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=3/tXnfx2ItcntdX91SAbA2MDsexn7TrLVcjXsKnHLr8=;
+        b=KAw4qEGg+6s2TPsYzuHM7tbuwFMeotho8go7inWfYS4o/w35N+kWVvwne1W0gx26RZdUCU
+        OmSpdBC9tBrFP9pBKzcAB9TjSAjH6XbqrHZvE1kLK7LkO1b9C1sMb1CgwIJsCbZ1928CR7
+        Syy1gH8Pl9LYgFi8kVWF+1dNhB2PxAw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-651-WaWDUrP3OWaat30aMeE9dw-1; Fri, 23 Sep 2022 10:13:12 -0400
+X-MC-Unique: WaWDUrP3OWaat30aMeE9dw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5E685101E14D;
+        Fri, 23 Sep 2022 14:13:12 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 427CA40C2066;
+        Fri, 23 Sep 2022 14:13:12 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220923120412.15294-1-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fixes for Linux 5.0-rc7
+Date:   Fri, 23 Sep 2022 10:13:12 -0400
+Message-Id: <20220923141312.96688-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/23/22 14:04, Janosch Frank wrote:
-> Paolo,
-> 
-> vfio-pci has kept us busy for a bit so here are three additional pci fixes.
-> Additionally there's a smatch fix by Janis.
-> 
-> It might be a bit late for rc7 but we wanted to have the coverage.
+Linus,
 
-They're in today's linux-next even, and everybody was busy with other 
-stuff last week, so it's fine.  Pulled, thanks!
+As everyone back came back from conferences, here are the pending patches
+for Linux 6.0.
 
-Paolo
+The following changes since commit 521a547ced6477c54b4b0cc206000406c221b4d6:
 
-> Enjoy the weekend!
-> 
-> The following changes since commit 521a547ced6477c54b4b0cc206000406c221b4d6:
-> 
->    Linux 6.0-rc6 (2022-09-18 13:44:14 -0700)
-> 
-> are available in the Git repository at:
-> 
->    https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git tags/kvm-s390-master-6.0-2
-> 
-> for you to fetch changes up to 189e7d876e48d7c791fe1c9c01516f70f5621a9f:
-> 
->    KVM: s390: pci: register pci hooks without interpretation (2022-09-21 16:18:38 +0200)
-> 
-> ----------------------------------------------------------------
-> More pci fixes
-> Fix for a code analyser warning
-> ----------------------------------------------------------------
-> 
-> Janis Schoetterl-Glausch (1):
->    KVM: s390: Pass initialized arg even if unused
-> 
-> Matthew Rosato (3):
->    KVM: s390: pci: fix plain integer as NULL pointer warnings
->    KVM: s390: pci: fix GAIT physical vs virtual pointers usage
->    KVM: s390: pci: register pci hooks without interpretation
-> 
->   arch/s390/kvm/gaccess.c   | 16 +++++++++++++---
->   arch/s390/kvm/interrupt.c |  2 +-
->   arch/s390/kvm/kvm-s390.c  |  4 ++--
->   arch/s390/kvm/pci.c       | 20 ++++++++++++++------
->   arch/s390/kvm/pci.h       |  6 +++---
->   5 files changed, 33 insertions(+), 15 deletions(-)
-> 
+  Linux 6.0-rc6 (2022-09-18 13:44:14 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to 69604fe76e58c9d195e48b41d019b07fc27ce9d7:
+
+  Merge tag 'kvm-s390-master-6.0-2' of https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD (2022-09-23 10:06:08 -0400)
+
+----------------------------------------------------------------
+ARM:
+
+* Fix for kmemleak with pKVM
+
+s390:
+
+* Fixes for VFIO with zPCI
+
+* smatch fix
+
+x86:
+
+* Ensure XSAVE-capable hosts always allow  FP and SSE state to be saved
+  and restored via KVM_{GET,SET}_XSAVE
+
+* Fix broken max_mmu_rmap_size stat
+
+* Fix compile error with old glibc that doesn't have gettid()
+
+----------------------------------------------------------------
+Dr. David Alan Gilbert (1):
+      KVM: x86: Always enable legacy FP/SSE in allowed user XFEATURES
+
+Janis Schoetterl-Glausch (1):
+      KVM: s390: Pass initialized arg even if unused
+
+Jinrong Liang (1):
+      selftests: kvm: Fix a compile error in selftests/kvm/rseq_test.c
+
+Matthew Rosato (3):
+      KVM: s390: pci: fix plain integer as NULL pointer warnings
+      KVM: s390: pci: fix GAIT physical vs virtual pointers usage
+      KVM: s390: pci: register pci hooks without interpretation
+
+Miaohe Lin (1):
+      KVM: x86/mmu: add missing update to max_mmu_rmap_size
+
+Paolo Bonzini (2):
+      Merge tag 'kvmarm-fixes-6.0-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
+      Merge tag 'kvm-s390-master-6.0-2' of https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD
+
+Sean Christopherson (2):
+      KVM: x86: Reinstate kvm_vcpu_arch.guest_supported_xcr0
+      KVM: x86: Inject #UD on emulated XSETBV if XSAVES isn't enabled
+
+Zenghui Yu (1):
+      KVM: arm64: Use kmemleak_free_part_phys() to unregister hyp_mem_base
+
+ arch/arm64/kvm/arm.c                    |  2 +-
+ arch/s390/kvm/gaccess.c                 | 16 +++++++++++++---
+ arch/s390/kvm/interrupt.c               |  2 +-
+ arch/s390/kvm/kvm-s390.c                |  4 ++--
+ arch/s390/kvm/pci.c                     | 20 ++++++++++++++------
+ arch/s390/kvm/pci.h                     |  6 +++---
+ arch/x86/include/asm/kvm_host.h         |  1 +
+ arch/x86/kvm/cpuid.c                    | 11 ++++++++---
+ arch/x86/kvm/emulate.c                  |  3 +++
+ arch/x86/kvm/mmu/mmu.c                  |  2 ++
+ arch/x86/kvm/x86.c                      | 10 +++-------
+ tools/testing/selftests/kvm/rseq_test.c |  2 +-
+ 12 files changed, 52 insertions(+), 27 deletions(-)
 
