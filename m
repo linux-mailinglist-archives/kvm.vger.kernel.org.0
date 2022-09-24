@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF9005E8A42
-	for <lists+kvm@lfdr.de>; Sat, 24 Sep 2022 10:48:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F3D85E8A52
+	for <lists+kvm@lfdr.de>; Sat, 24 Sep 2022 10:51:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233601AbiIXIsN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 24 Sep 2022 04:48:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37852 "EHLO
+        id S233607AbiIXIvt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 24 Sep 2022 04:51:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233612AbiIXIsJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 24 Sep 2022 04:48:09 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7D93E6DE3
-        for <kvm@vger.kernel.org>; Sat, 24 Sep 2022 01:48:06 -0700 (PDT)
+        with ESMTP id S233602AbiIXIvq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 24 Sep 2022 04:51:46 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AADFBF3908
+        for <kvm@vger.kernel.org>; Sat, 24 Sep 2022 01:51:44 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A55EF6020F
-        for <kvm@vger.kernel.org>; Sat, 24 Sep 2022 08:48:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16992C433C1;
-        Sat, 24 Sep 2022 08:48:05 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 63670B80DF0
+        for <kvm@vger.kernel.org>; Sat, 24 Sep 2022 08:51:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11E81C433D7;
+        Sat, 24 Sep 2022 08:51:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664009285;
-        bh=YOpODT4va0VloCZOBnvQvpP8J5R28QS/wmKHIPcpRE4=;
+        s=k20201202; t=1664009502;
+        bh=sQu4rY26atOOmUOcr/UZfhpKLw2nqwuD8y4ts7N3Xq0=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Z/o2gU2p8Urtm0xeFGOkNZE62b7hAAJaRgGLqXhpavIfWjQIvVL+8bR6WL4otUCFW
-         +pdMiJ/O2NaLus1f+lA35EU4Xh0AXjXpp/bniJ6nbu8x/o0ylwhqYit1OKMkPVVBiv
-         IwYw3V28nwUjT2vEf8ibe7gCKw5HpCX3GHCUVyxDcdv44Gpkb6lZiA1t0ASF+jPo4V
-         T06FQ4O7a+TjgkJMjnIEoIHP6LvuvnmJxJ4M4QmCtAb9PYfz0A14aKKoy4L1M93+f4
-         Q1xlOofZBtC5nZGoXQMn+T09A+GtYifkgFjMcg1LkqMRibnZ5544yDJDiMk251QM5z
-         zomhXXj0WxSRg==
+        b=PiyTCrM2xF8ErVB2yED85XFj/4tDY3E88aPmH5y3W2wUTaKNtbXN5cYHylLyxBqe3
+         Yo7xEMMwMlk5ozGWNTQ8cFGcIr7ZC5syNJUw0nz/kTVZZft0NGFjaTrJIxdpMn5m0U
+         MAGMQhZhr1R/cnId1GnW6dy+LF3IJ7AFS9B7NWBKGfYV8e9Bfh6qy204x+NLBp22vA
+         bV4ii57bzUiiCa8vbWbenac8eoxdcI1TFB58antGyZrYILHubsrylc6PrEror27Nk9
+         yq5uwf5M64kmt3+Fu/RBF0gOBJOAbK3eojTowF4/UL3Lhrb2uMKaeAiOuIQXwN/OB9
+         AcFI7BFKpxsrQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1oc0pO-00CJg2-Ui;
-        Sat, 24 Sep 2022 09:48:03 +0100
-Date:   Sat, 24 Sep 2022 09:47:59 +0100
-Message-ID: <87fsghi2f4.wl-maz@kernel.org>
+        id 1oc0st-00CJhn-Td;
+        Sat, 24 Sep 2022 09:51:40 +0100
+Date:   Sat, 24 Sep 2022 09:51:39 +0100
+Message-ID: <87edw1i290.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Peter Xu <peterx@redhat.com>
 Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
@@ -49,9 +49,13 @@ Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH 3/6] KVM: x86: Select CONFIG_HAVE_KVM_DIRTY_RING_ORDERED
-In-Reply-To: <Yy43UM/+qTxc+/qt@x1n>
-References: <20220922170133.2617189-1-maz@kernel.org>   <20220922170133.2617189-4-maz@kernel.org>       <Yy43UM/+qTxc+/qt@x1n>
+Subject: Re: [PATCH 2/6] KVM: Add KVM_CAP_DIRTY_LOG_RING_ORDERED capability and config option
+In-Reply-To: <Yy36Stppz4tYBPiP@x1n>
+References: <20220922170133.2617189-1-maz@kernel.org>
+        <20220922170133.2617189-3-maz@kernel.org>
+        <YyzYI/bvp/JnbcxS@xz-m1.local>
+        <87czbmjhbh.wl-maz@kernel.org>
+        <Yy36Stppz4tYBPiP@x1n>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -70,61 +74,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 23 Sep 2022 23:46:40 +0100,
+On Fri, 23 Sep 2022 19:26:18 +0100,
 Peter Xu <peterx@redhat.com> wrote:
 > 
-> On Thu, Sep 22, 2022 at 06:01:30PM +0100, Marc Zyngier wrote:
-> > Since x86 is TSO (give or take), allow it to advertise the new
-> > ORDERED version of the dirty ring capability. No other change is
-> > required for it.
+> On Fri, Sep 23, 2022 at 03:28:34PM +0100, Marc Zyngier wrote:
+> > On Thu, 22 Sep 2022 22:48:19 +0100,
+> > Peter Xu <peterx@redhat.com> wrote:
+> > > 
+> > > On Thu, Sep 22, 2022 at 06:01:29PM +0100, Marc Zyngier wrote:
+> > > > In order to differenciate between architectures that require no extra
+> > > > synchronisation when accessing the dirty ring and those who do,
+> > > > add a new capability (KVM_CAP_DIRTY_LOG_RING_ORDERED) that identify
+> > > > the latter sort. TSO architectures can obviously advertise both, while
+> > > > relaxed architectures most only advertise the ORDERED version.
+> > > > 
+> > > > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > > ---
+> > > >  include/linux/kvm_dirty_ring.h |  6 +++---
+> > > >  include/uapi/linux/kvm.h       |  1 +
+> > > >  virt/kvm/Kconfig               | 14 ++++++++++++++
+> > > >  virt/kvm/Makefile.kvm          |  2 +-
+> > > >  virt/kvm/kvm_main.c            | 11 +++++++++--
+> > > >  5 files changed, 28 insertions(+), 6 deletions(-)
+> > > > 
+> > > > diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
+> > > > index 906f899813dc..7a0c90ae9a3f 100644
+> > > > --- a/include/linux/kvm_dirty_ring.h
+> > > > +++ b/include/linux/kvm_dirty_ring.h
+> > > > @@ -27,7 +27,7 @@ struct kvm_dirty_ring {
+> > > >  	int index;
+> > > >  };
+> > > >  
+> > > > -#ifndef CONFIG_HAVE_KVM_DIRTY_RING
+> > > > +#ifndef CONFIG_HAVE_KVM_DIRTY_LOG
+> > > 
+> > > s/LOG/LOG_RING/ according to the commit message? Or the name seems too
+> > > generic.
 > > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/x86/kvm/Kconfig | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> > index e3cbd7706136..eb63bc31ed1d 100644
-> > --- a/arch/x86/kvm/Kconfig
-> > +++ b/arch/x86/kvm/Kconfig
-> > @@ -29,6 +29,7 @@ config KVM
-> >  	select HAVE_KVM_PFNCACHE
-> >  	select HAVE_KVM_IRQFD
-> >  	select HAVE_KVM_DIRTY_RING
-> > +	select HAVE_KVM_DIRTY_RING_ORDERED
-> >  	select IRQ_BYPASS_MANAGER
-> >  	select HAVE_KVM_IRQ_BYPASS
-> >  	select HAVE_KVM_IRQ_ROUTING
+> > The commit message talks about the capability, while the above is the
+> > config option. If you find the names inappropriate, feel free to
+> > suggest alternatives (for all I care, they could be called FOO, BAR
+> > and BAZ).
 > 
-> Before patch 2-3, we only have HAVE_KVM_DIRTY_RING.
-> 
-> After that, we'll have:
-> 
-> HAVE_KVM_DIRTY_LOG
-> HAVE_KVM_DIRTY_RING
-> HAVE_KVM_DIRTY_RING_ORDERED
-> 
-> I'm wondering whether we can just keep using the old HAVE_KVM_DIRTY_RING,
-> but just declare a new KVM_CAP_DIRTY_LOG_RING_ORDERED only after all memory
-> barrier patches merged (after patch 1).
+> The existing name from David looks better than the new one.. to me.
 
-The problem is to decide, on a per architecture basis, how to expose
-the old property. I'm happy to key it on being x86 specific, but that
-feels pretty gross, and totally unnecessary for strongly ordered
-architectures (s390?).
+I'm happy to bikeshed, but please spell it out for me. If we follow
+the current scheme, we need 3 configuration symbols (of which we
+already have one), and 2 capabilities (of which we already have one).
 
-> IIUC it's a matter of whether any of the arch would like to support
-> !ORDERED version of dirty ring at all, but then IIUC we'll need to have the
-> memory barriers conditional too or not sure how it'll help.
+Do you have any concrete proposal for those?
 
-Memory barriers do not affect the semantics of the userspace, while
-the lack thereof do. On strongly ordered architectures,
-acquire/release is usually "free", because that's implied by their
-memory model. If it thus free for these to implement both versions of
-the API.
-
-So are we discussing the cost of couple of (mostly invisible) config
-options?
+Thanks,
 
 	M.
 
