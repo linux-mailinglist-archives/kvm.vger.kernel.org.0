@@ -2,68 +2,254 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 71D655E8FA3
-	for <lists+kvm@lfdr.de>; Sat, 24 Sep 2022 22:26:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D6185E8FA5
+	for <lists+kvm@lfdr.de>; Sat, 24 Sep 2022 22:27:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233733AbiIXU0A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 24 Sep 2022 16:26:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58632 "EHLO
+        id S233925AbiIXU1O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 24 Sep 2022 16:27:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229821AbiIXUZ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 24 Sep 2022 16:25:58 -0400
-Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C301C3B97A
-        for <kvm@vger.kernel.org>; Sat, 24 Sep 2022 13:25:57 -0700 (PDT)
-Received: by mail-ot1-x335.google.com with SMTP id r34-20020a05683044a200b0065a12392fd7so2123613otv.3
-        for <kvm@vger.kernel.org>; Sat, 24 Sep 2022 13:25:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:sender:mime-version:from:to:cc
-         :subject:date;
-        bh=m7KtlTRQ/940R7kWNpP3Vz5Bs4+fmR2cZz2mXb6ruwc=;
-        b=o/j6TYB0hLCyOCwHzpUw/Hx4WFeL4LjHBvDhaTRxy9nD5L9Yj5MY6N/S5xXVTz9Ca+
-         qp/aCH97Mro/J3JLa5sAUX7LR3H0y5Acotuh0v1QpM9vpyAa0/9In5kBDrokKy3xmTG8
-         szZSroRthPVEHP0X9LuZ3BLZaEqhwjL3w12FmEY8xgW4OBRutjtOaifcQdn4QIykPu1l
-         JNC5uDB+dPiW4X3vdK8emHl5q/HgAlWHlpfhRrtrOxrMoh+d/83RsCd79+65336W20h+
-         xFDm2i6ZIFdNiREg3eBOxB62f/4TmeTQjzPllYmkg3wFDnl1iQjmjeVerlqMqhYd6Hpu
-         d1yQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:sender:mime-version
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=m7KtlTRQ/940R7kWNpP3Vz5Bs4+fmR2cZz2mXb6ruwc=;
-        b=JBhp1+j/cZaTV4wgO42DUxYKIvpXmfTLNFTrkxJ1SpMMv4r9nl3mqpHNw2E85L2MuA
-         /+i5z+sLk2EJpPiYyYqLQh4KRoOkMOVQZux0UmMVgZBu6Rqdhg2YJSIIlWQnVz9Xt8uv
-         +2ciUWwbWRTetamAs9TYVbZrLDI2bEWRRTioCWAuI5zTzjKXBceew3mpYtrxUyJvQVZc
-         8QaVSv3rRTFdc/MaVtyd3IxkhHkBTz4Lnn1Nm32Z7qrDqzp7PVJZJFp2GERJNLzq7t0k
-         dnI77aYdYklidxvTdzXzbcYXiBe1nPpSusnDvb0r6ETLQTISnuid03UXkdKhC2uJnYA1
-         FRHw==
-X-Gm-Message-State: ACrzQf3OD3MfmqPX1EvI1Q6GS87iOgj5BtGkfsFiMKWrKLB9AVG7/+Ji
-        aEd9gT6/380w5XpR0IG9CTxgMN4/RyuLrXVXnts=
-X-Google-Smtp-Source: AMsMyM6z51yFXoEklRool/IqRRMiGtlU3wa3BoMhOtLoHawAZv7ySC98Y2CXOkjdMuUTD+uAtdX7/C5OuhlEU68beUc=
-X-Received: by 2002:a9d:7d81:0:b0:655:d419:54f1 with SMTP id
- j1-20020a9d7d81000000b00655d41954f1mr6734330otn.177.1664051156968; Sat, 24
- Sep 2022 13:25:56 -0700 (PDT)
-MIME-Version: 1.0
-Sender: anitaabdallae2017@gmail.com
-Received: by 2002:a05:6820:1620:0:0:0:0 with HTTP; Sat, 24 Sep 2022 13:25:56
- -0700 (PDT)
-From:   Monica Karim <monicakarima38@gmail.com>
-Date:   Sat, 24 Sep 2022 21:25:56 +0100
-X-Google-Sender-Auth: M8R9IfuH1a2dr9wfueHCFNfAvTw
-Message-ID: <CALrj+s9ER815OAHKR8TATZJFKZPk15BNbVkG40UbsBtgKK9M4Q@mail.gmail.com>
-Subject: Hi
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.1 required=5.0 tests=BAYES_40,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S229929AbiIXU1M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 24 Sep 2022 16:27:12 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FB354456E
+        for <kvm@vger.kernel.org>; Sat, 24 Sep 2022 13:27:11 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 135A56144F
+        for <kvm@vger.kernel.org>; Sat, 24 Sep 2022 20:27:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 503AAC433D6;
+        Sat, 24 Sep 2022 20:27:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1664051230;
+        bh=/XKQ3Q76NI4ZUsVkudc4U6IHh+iW3DGrpb95wrDj9WA=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=R+6udpMWoZuJiO1IrmSVGvYRIFQk0kCjZn92cWrCAPgGUvjez9M6MoGYD2VjsGZHl
+         HQg4YTG82pmRuR+8Pgg1F3eEYK0r2QLM+hXgMljXibsKomWxXQRSexuO9jj4+CgS3z
+         f5CWjL90NMTYgg/uVDGHqcL8aY4JKP+YKO3hdCS065q1kGGrRsXXqUGKa3GKGLV+k2
+         diiWWaA/GuYUdlm6q0VgqgAJfJsElvJrbrqybEqiCknS3+1nEHWXLvMJ3sU9RdjMka
+         wJ7zdYvZzZdDqQOPNBUf33KpMk+cMoId+fWuUkaQqxZLV2SJDkBZyGK6qiucq59kEu
+         zVEWVbc5aQycg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1ocBjw-00CODu-7X;
+        Sat, 24 Sep 2022 21:27:08 +0100
+Date:   Sat, 24 Sep 2022 21:27:01 +0100
+Message-ID: <875yhcikmi.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org,
+        andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com,
+        oliver.upton@linux.dev, peterx@redhat.com, pbonzini@redhat.com,
+        zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v3 3/6] KVM: arm64: Enable ring-based dirty memory tracking
+In-Reply-To: <20220922003214.276736-4-gshan@redhat.com>
+References: <20220922003214.276736-1-gshan@redhat.com>
+        <20220922003214.276736-4-gshan@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gshan@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com, oliver.upton@linux.dev, peterx@redhat.com, pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-How are you? I am Monica a Nurse from Netherlands .What about you?I
-need to discuss very important thing with you.
+On Thu, 22 Sep 2022 01:32:11 +0100,
+Gavin Shan <gshan@redhat.com> wrote:
+> 
+> This enables the ring-based dirty memory tracking on ARM64. The
+> feature is configured by CONFIG_HAVE_KVM_DIRTY_RING, detected and
+> enabled by KVM_CAP_DIRTY_LOG_RING. A ring buffer is created on every
+> VCPU when the feature is enabled. Each entry in the ring buffer is
+> described by 'struct kvm_dirty_gfn'.
+> 
+> A ring buffer entry is pushed when a page becomes dirty on host,
+> and pulled by userspace after the ring buffer is mapped at physical
+> page offset KVM_DIRTY_LOG_PAGE_OFFSET. The specific VCPU is enforced
+> to exit if its ring buffer becomes softly full. Besides, the ring
+> buffer can be reset by ioctl command KVM_RESET_DIRTY_RINGS to release
+> those pulled ring buffer entries.
+
+I think you can cut this message short. This description was useful
+when the feature was initially merged, but this is only a "plumb the
+damn thing" patch.
+
+> 
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> ---
+>  Documentation/virt/kvm/api.rst    | 2 +-
+>  arch/arm64/include/uapi/asm/kvm.h | 1 +
+>  arch/arm64/kvm/Kconfig            | 1 +
+>  arch/arm64/kvm/arm.c              | 8 ++++++++
+>  4 files changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index abd7c32126ce..19fa1ac017ed 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -8022,7 +8022,7 @@ regardless of what has actually been exposed through the CPUID leaf.
+>  8.29 KVM_CAP_DIRTY_LOG_RING
+>  ---------------------------
+>  
+> -:Architectures: x86
+> +:Architectures: x86, arm64
+>  :Parameters: args[0] - size of the dirty log ring
+>  
+>  KVM is capable of tracking dirty memory using ring buffers that are
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 316917b98707..a7a857f1784d 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -43,6 +43,7 @@
+>  #define __KVM_HAVE_VCPU_EVENTS
+>  
+>  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+> +#define KVM_DIRTY_LOG_PAGE_OFFSET 64
+>  
+>  #define KVM_REG_SIZE(id)						\
+>  	(1U << (((id) & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT))
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 815cc118c675..0309b2d0f2da 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -32,6 +32,7 @@ menuconfig KVM
+>  	select KVM_VFIO
+>  	select HAVE_KVM_EVENTFD
+>  	select HAVE_KVM_IRQFD
+> +	select HAVE_KVM_DIRTY_RING
+>  	select HAVE_KVM_MSI
+>  	select HAVE_KVM_IRQCHIP
+>  	select HAVE_KVM_IRQ_ROUTING
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 2ff0ef62abad..76816f8e082b 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -747,6 +747,14 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+>  
+>  		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+>  			return kvm_vcpu_suspend(vcpu);
+> +
+> +		if (kvm_check_request(KVM_REQ_RING_SOFT_FULL, vcpu) &&
+> +		    kvm_dirty_ring_soft_full(&vcpu->dirty_ring)) {
+> +			kvm_make_request(KVM_REQ_RING_SOFT_FULL, vcpu);
+> +			vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
+> +			trace_kvm_dirty_ring_exit(vcpu);
+> +			return 0;
+> +		}
+
+This is *very* similar to the x86 code. Could we move it to common
+code? Something like the diff below, to be for most of it squashed
+into patch #1.
+
+Thanks,
+
+	M.
+
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 76816f8e082b..93a16cdbe163 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -748,13 +748,8 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+ 		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+ 			return kvm_vcpu_suspend(vcpu);
+ 
+-		if (kvm_check_request(KVM_REQ_RING_SOFT_FULL, vcpu) &&
+-		    kvm_dirty_ring_soft_full(&vcpu->dirty_ring)) {
+-			kvm_make_request(KVM_REQ_RING_SOFT_FULL, vcpu);
+-			vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
+-			trace_kvm_dirty_ring_exit(vcpu);
++		if (kvm_dirty_ring_check_request(vcpu))
+ 			return 0;
+-		}
+ 	}
+ 
+ 	return 1;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index eb7d0d7654bb..48f2519b1db7 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10249,11 +10249,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 
+ 	if (kvm_request_pending(vcpu)) {
+ 		/* Forbid vmenter if vcpu dirty ring is soft-full */
+-		if (kvm_check_request(KVM_REQ_RING_SOFT_FULL, vcpu) &&
+-		    kvm_dirty_ring_soft_full(&vcpu->dirty_ring)) {
+-			kvm_make_request(KVM_REQ_RING_SOFT_FULL, vcpu);
+-			vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
+-			trace_kvm_dirty_ring_exit(vcpu);
++		if (kvm_dirty_ring_check_request(vcpu)) {
+ 			r = 0;
+ 			goto out;
+ 		}
+diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
+index 8c6755981c9b..6e484220adc0 100644
+--- a/include/linux/kvm_dirty_ring.h
++++ b/include/linux/kvm_dirty_ring.h
+@@ -64,11 +64,6 @@ static inline void kvm_dirty_ring_free(struct kvm_dirty_ring *ring)
+ {
+ }
+ 
+-static inline bool kvm_dirty_ring_soft_full(struct kvm_dirty_ring *ring)
+-{
+-	return true;
+-}
+-
+ #else /* CONFIG_HAVE_KVM_DIRTY_RING */
+ 
+ int kvm_cpu_dirty_log_size(void);
+@@ -91,7 +86,7 @@ void kvm_dirty_ring_push(struct kvm_dirty_ring *ring, u32 slot, u64 offset);
+ struct page *kvm_dirty_ring_get_page(struct kvm_dirty_ring *ring, u32 offset);
+ 
+ void kvm_dirty_ring_free(struct kvm_dirty_ring *ring);
+-bool kvm_dirty_ring_soft_full(struct kvm_dirty_ring *ring);
++bool kvm_dirty_ring_check_request(struct kvm_vcpu *vcpu);
+ 
+ #endif /* CONFIG_HAVE_KVM_DIRTY_RING */
+ 
+diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
+index 69c8c90d489d..436d7cded5bf 100644
+--- a/virt/kvm/dirty_ring.c
++++ b/virt/kvm/dirty_ring.c
+@@ -26,7 +26,7 @@ static u32 kvm_dirty_ring_used(struct kvm_dirty_ring *ring)
+ 	return READ_ONCE(ring->dirty_index) - READ_ONCE(ring->reset_index);
+ }
+ 
+-bool kvm_dirty_ring_soft_full(struct kvm_dirty_ring *ring)
++static bool kvm_dirty_ring_soft_full(struct kvm_dirty_ring *ring)
+ {
+ 	return kvm_dirty_ring_used(ring) >= ring->soft_limit;
+ }
+@@ -182,3 +182,16 @@ void kvm_dirty_ring_free(struct kvm_dirty_ring *ring)
+ 	vfree(ring->dirty_gfns);
+ 	ring->dirty_gfns = NULL;
+ }
++
++bool kvm_dirty_ring_check_request(struct kvm_vcpu *vcpu)
++{
++	if (kvm_check_request(KVM_REQ_RING_SOFT_FULL, vcpu) &&
++	    kvm_dirty_ring_soft_full(&vcpu->dirty_ring)) {
++		kvm_make_request(KVM_REQ_RING_SOFT_FULL, vcpu);
++		vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
++		trace_kvm_dirty_ring_exit(vcpu);
++		return true;
++	}
++
++	return false;
++}
+
+-- 
+Without deviation from the norm, progress is not possible.
