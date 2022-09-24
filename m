@@ -2,70 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EAC85E8F6E
-	for <lists+kvm@lfdr.de>; Sat, 24 Sep 2022 20:59:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2594B5E8F7A
+	for <lists+kvm@lfdr.de>; Sat, 24 Sep 2022 21:12:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229614AbiIXS6h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 24 Sep 2022 14:58:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41250 "EHLO
+        id S229573AbiIXTMb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 24 Sep 2022 15:12:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229690AbiIXS6f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 24 Sep 2022 14:58:35 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 230AE45989
-        for <kvm@vger.kernel.org>; Sat, 24 Sep 2022 11:58:32 -0700 (PDT)
+        with ESMTP id S229660AbiIXTM1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 24 Sep 2022 15:12:27 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67C76402CB
+        for <kvm@vger.kernel.org>; Sat, 24 Sep 2022 12:12:26 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B24FB61307
-        for <kvm@vger.kernel.org>; Sat, 24 Sep 2022 18:58:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DFCFC433D7;
-        Sat, 24 Sep 2022 18:58:31 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F0B8061347
+        for <kvm@vger.kernel.org>; Sat, 24 Sep 2022 19:12:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DDA3C433C1;
+        Sat, 24 Sep 2022 19:12:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664045911;
-        bh=VKHT4RTjYkoQW0pFVa05iY4hd4prYOcYP8L9npfI1EM=;
+        s=k20201202; t=1664046745;
+        bh=u7Bc4nbhe+xZptPvxYMwvWDt4rQu4WMGFR48vj17/6I=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=SFCKCdZKKVAGnL5ECihRh0nlRLjxh3hpLRgHeB+uSabSy+uaOCqvDZcnYd88xBHGH
-         HWWW2QfZlKqBuG1EtYOhVrRh9m019b3vb7EdiBf94bFhxV1qFlYfUHvHg5nVYYeUKk
-         IxgptMtMsQkms/CHbXju+SjujMP98VtoSJ0175lamsop9yxwxPb1csuxIWdg8P3mb7
-         NWGjgX0RqwW2UE2z5vO8p7DB6Qv26y2IhPr1OAqElDy8Kn4cbURN2F0/bjA5DlGpgK
-         lzS4naApCx0khoSsJTJdrjpFXh+iXeBScbMB//Tcth0r2MPpAvVUdbTErU23h8ruLH
-         geRbanod4dOKQ==
+        b=bMIqZ2r3zEjiD9XuLbN/Tjgm6c28olMRXZA+bYvMw80BuUm1g/jzqLLMJHvfSDwt3
+         /73/ipsvLGc5h+jZ2MejH6rqA+cHpcumsFe/vpucaytZVZt51isSJyiCbxTkvfRZGJ
+         Eq2eJnEJP9Ey+hoKVStaQjxkf7mBbQfwxWfmxrU7RIO6TjqoVO7eVUj+xl8OPcuYQF
+         PRVUox99WKJ3woLMrYcdLO3VrFT4aSAdv+YIZbUHmLG4oV4Qk8pBbr9GVE1HfbYdyz
+         nLe+LgbhlSArhj5Uo+IH58JYyXIVYlIon26rrrBT37oHwp9bE3x2jBvgrcIlakC3Rj
+         jakwThh4ZFPWw==
 Received: from 82-132-234-24.dab.02.net ([82.132.234.24] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1ocAM8-00CNoK-HN;
-        Sat, 24 Sep 2022 19:58:28 +0100
-Date:   Sat, 24 Sep 2022 19:57:49 +0100
-Message-ID: <878rm8ior6.wl-maz@kernel.org>
+        id 1ocAZa-00CNw5-Tp;
+        Sat, 24 Sep 2022 20:12:23 +0100
+Date:   Sat, 24 Sep 2022 20:12:18 +0100
+Message-ID: <877d1sio31.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Peter Xu <peterx@redhat.com>
+To:     Gavin Shan <gshan@redhat.com>
 Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org,
         andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com,
-        pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com,
-        gshan@redhat.com, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH 2/6] KVM: Add KVM_CAP_DIRTY_LOG_RING_ORDERED capability and config option
-In-Reply-To: <Yy8EmMhF+2jcm3m6@x1n>
-References: <20220922170133.2617189-1-maz@kernel.org>
-        <20220922170133.2617189-3-maz@kernel.org>
-        <YyzYI/bvp/JnbcxS@xz-m1.local>
-        <87czbmjhbh.wl-maz@kernel.org>
-        <Yy36Stppz4tYBPiP@x1n>
-        <87edw1i290.wl-maz@kernel.org>
-        <87czblhv2a.wl-maz@kernel.org>
-        <Yy8EmMhF+2jcm3m6@x1n>
+        oliver.upton@linux.dev, peterx@redhat.com, pbonzini@redhat.com,
+        zhenyzha@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v3 2/6] KVM: x86: Move declaration of kvm_cpu_dirty_log_size() to kvm_dirty_ring.h
+In-Reply-To: <20220922003214.276736-3-gshan@redhat.com>
+References: <20220922003214.276736-1-gshan@redhat.com>
+        <20220922003214.276736-3-gshan@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 82.132.234.24
-X-SA-Exim-Rcpt-To: peterx@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com, gshan@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev
+X-SA-Exim-Rcpt-To: gshan@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com, oliver.upton@linux.dev, peterx@redhat.com, pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -77,65 +68,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 24 Sep 2022 14:22:32 +0100,
-Peter Xu <peterx@redhat.com> wrote:
+On Thu, 22 Sep 2022 01:32:10 +0100,
+Gavin Shan <gshan@redhat.com> wrote:
 > 
-> On Sat, Sep 24, 2022 at 12:26:53PM +0100, Marc Zyngier wrote:
-> > On Sat, 24 Sep 2022 09:51:39 +0100,
-> > Marc Zyngier <maz@kernel.org> wrote:
-> > > 
-> > > I'm happy to bikeshed, but please spell it out for me. If we follow
-> > > the current scheme, we need 3 configuration symbols (of which we
-> > > already have one), and 2 capabilities (of which we already have one).
+> Not all architectures like ARM64 need to override the function. Move
+> its declaration to kvm_dirty_ring.h to avoid the following compiling
+> warning on ARM64 when the feature is enabled.
 > 
-> I hope it's not bikeshedding.  I normally don't comment on namings at all
-> because many of them can be "bikeshedding" to me.  But this one is so
-> special because it directly collides with KVM_GET_DIRTY_LOG, which is other
-> method of dirty tracking.
+>   arch/arm64/kvm/../../../virt/kvm/dirty_ring.c:14:12:        \
+>   warning: no previous prototype for 'kvm_cpu_dirty_log_size' \
+>   [-Wmissing-prototypes]                                      \
+>   int __weak kvm_cpu_dirty_log_size(void)
+>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 2 --
+>  arch/x86/kvm/mmu/mmu.c          | 2 ++
+>  include/linux/kvm_dirty_ring.h  | 1 +
+>  3 files changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 2c96c43c313a..4c0fd517282b 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -2082,8 +2082,6 @@ static inline int kvm_cpu_get_apicid(int mps_cpu)
+>  #define GET_SMSTATE(type, buf, offset)		\
+>  	(*(type *)((buf) + (offset) - 0x7e00))
+>  
+> -int kvm_cpu_dirty_log_size(void);
+> -
+>  int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages);
+>  
+>  #define KVM_CLOCK_VALID_FLAGS						\
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index e418ef3ecfcb..b3eb6a3627ec 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -1349,10 +1349,12 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+>  		kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
+>  }
+>  
+> +#ifdef CONFIG_HAVE_KVM_DIRTY_RING
 
-Fair enough. I'm notoriously bad at sticking a name to things, so I'm
-always happy to receive suggestions.
+I think you can drop the ifdeffery, as HAVE_KVM_DIRTY_RING is
+unconditionally selected by the arch Kconfig.
 
-> 
-> > > 
-> > > Do you have any concrete proposal for those?
-> > 
-> > In order to make some forward progress, I've reworked the series[1]
-> > with another proposal for those:
-> > 
-> > Config symbols:
-> > 
-> > - HAVE_KVM_DIRTY_RING:
-> >   * mostly the same meaning as today
-> >   * not directly selected by any architecture
-> >   * doesn't expose any capability on its own
-> > 
-> > - HAVE_KVM_DIRTY_RING_TSO:
-> >   * only for strongly ordered architectures
-> >   * selects HAVE_KVM_DIRTY_RING
-> >   * exposes KVM_CAP_DIRTY_LOG_RING
-> >   * selected by x86
-> > 
-> > - HAVE_KVM_DIRTY_RING_ACQ_REL:
-> >   * selects HAVE_KVM_DIRTY_RING
-> >   * exposes KVM_CAP_DIRTY_LOG_RING_ACQ_REL
-> >   * selected by arm64 and x86
-> > 
-> > Capabilities:
-> > 
-> > - KVM_CAP_DIRTY_LOG_RING: the good old x86-specific stuff, advertised
-> >   when HAVE_KVM_DIRTY_RING_TSO is selected
-> > 
-> > - KVM_CAP_DIRTY_LOG_RING_ACQ_REL: the new acquire/release semantics,
-> >   advertised when HAVE_KVM_DIRTY_RING_ACQ_REL is selected
-> > 
-> > This significantly reduces the churn and makes things slightly more
-> > explicit.
-> 
-> This looks good to me, thanks.
-
-OK, thanks for having a quick look. I'll repost this shortly, after
-I'm done reviewing Gavin's series.
+>  int kvm_cpu_dirty_log_size(void)
+>  {
+>  	return kvm_x86_ops.cpu_dirty_log_size;
+>  }
+> +#endif
+>  
+>  bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
+>  				    struct kvm_memory_slot *slot, u64 gfn,
+> diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
+> index 906f899813dc..8c6755981c9b 100644
+> --- a/include/linux/kvm_dirty_ring.h
+> +++ b/include/linux/kvm_dirty_ring.h
+> @@ -71,6 +71,7 @@ static inline bool kvm_dirty_ring_soft_full(struct kvm_dirty_ring *ring)
+>  
+>  #else /* CONFIG_HAVE_KVM_DIRTY_RING */
+>  
+> +int kvm_cpu_dirty_log_size(void);
+>  u32 kvm_dirty_ring_get_rsvd_entries(void);
+>  int kvm_dirty_ring_alloc(struct kvm_dirty_ring *ring, int index, u32 size);
 
 Thanks,
 
