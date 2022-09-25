@@ -2,77 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 45BD95EB3A2
-	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 23:52:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3AB65EB429
+	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 00:07:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230454AbiIZVwG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 17:52:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39176 "EHLO
+        id S229749AbiIZWHZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 18:07:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230348AbiIZVwE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 17:52:04 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DC1FB3B2E;
-        Mon, 26 Sep 2022 14:52:03 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id f193so7785415pgc.0;
-        Mon, 26 Sep 2022 14:52:03 -0700 (PDT)
+        with ESMTP id S230411AbiIZWHI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 18:07:08 -0400
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 711D3248FD
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 15:07:07 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id lh5so16966446ejb.10
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 15:07:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=nZktzK+zzsCjiwRA7br+CXR0Vc/qwKL2ngFhBD6+m64=;
-        b=TLVJoOL3zluMziQihUabADxccWS/xFw1pnySEi88cQkx3bjbVMWPdWUQt5b0c3BjxX
-         Z/E7MagaIg+4cKK745RhgOA/aCBswqEeGJPjXlbIMeXenM/1qRSMpnGd5P+rp3jeG4/p
-         gseud0za4Z9lgEGsbGIxNaIgNqw9GNyZGeQAAEzcZE3SF/UQNMIqh/k0c8tc6YkpBnle
-         f3G1rpEczuSi70dYZdmBEkFRQJwVbCd07j3DENNlSPRDmAsTvrW/rotZAnv2vca3CGvt
-         oMSTFGsKHFe2buKxfmSh9sUjVVUd4NpNJkdOa22s2wqVjRKTWRbotq5wOgvukCRX22EF
-         ieqw==
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=A2s8n5PYK3ZaMy6+MNcDLHsBXyfzYG3pJKOuijb9LrI=;
+        b=Te7p+3vXxrj1oavgx6Qi0QSolUPVebkMMjX/sx6ijkFN2QUVEgdbNz09CPYhSlQqFG
+         DtuDbGNsOkotXvdZSi4bFk+ctXOfrKiWZvbVma+fzSyW9+a0pLser4KOT38nVCgesL1o
+         eY6UO3ttb6wapWd4WbSoeoE+OV3qN5nwLiv8a+Sa/Oqu83Pkp65a2vrx+E/6xaR2BVoH
+         hicrllfmcK04EOVeiKiQR9h+x4x3DTfxK/9vn2478CmXuVRqkW9hgf6S09KBQcvaOSJG
+         VOz1vBIJVKDxvI32AZC24p1TXUeaXfdxKJQNNNNvlHEfwgBTu2tc9htc50Jl2cZEZXYi
+         iVow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=nZktzK+zzsCjiwRA7br+CXR0Vc/qwKL2ngFhBD6+m64=;
-        b=AUB6aFQXZt3zzv/RICOCaoDT5L/J372DLZKqtZuviPuC35QyVvj+w6Q3ZgR6jrk6oQ
-         xTz2N1/GiNnsTiipqepM6HDLcmWjE0vy3evcYrPYulY8kCtDLViOhu2UrYfiYM8kv78R
-         cz0XhNIkcL/2QnxsQFSwQBizr+IK9LLK4WUNx+rUHRY8XjD+Py70E6zpN+xzwun5HEaj
-         k2TfGfv21FzglVU2XomcGTUXcoFj3ynznvBTEWSxbsH/kaioOSO1wwozFJNt1ZLvMcMP
-         OaNL7TE/SmMdikaMFSgz3LO3rsYEyKFvVhTCuevEpCe8rqN1GbFs5D/wWy4tDffzlxIY
-         YVtw==
-X-Gm-Message-State: ACrzQf3pve4fD7xAHXaJX26GewTlWGNDajYWX2T2XlpChbhjk3PaxfNS
-        r3NKzikYJulRQ0EAbiHSzL0=
-X-Google-Smtp-Source: AMsMyM4T+ZuUoeZDY7V6nQrJ9QdjfWe5P5qUXQBQiuWQrJXCO1A7HT+7UKpdWFcIetN88mi41WTReQ==
-X-Received: by 2002:a63:f20e:0:b0:439:398f:80f8 with SMTP id v14-20020a63f20e000000b00439398f80f8mr21178677pgh.494.1664229122422;
-        Mon, 26 Sep 2022 14:52:02 -0700 (PDT)
-Received: from localhost (c-73-164-155-12.hsd1.wa.comcast.net. [73.164.155.12])
-        by smtp.gmail.com with ESMTPSA id i64-20020a62c143000000b0053617cbe2d2sm12606746pfg.168.2022.09.26.14.52.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Sep 2022 14:52:01 -0700 (PDT)
-Date:   Mon, 26 Sep 2022 21:52:00 +0000
-From:   Bobby Eshleman <bobbyeshleman@gmail.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Bobby Eshleman <bobby.eshleman@gmail.com>,
-        Cong Wang <cong.wang@bytedance.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Jiang Wang <jiang.wang@bytedance.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Eric Dumazet <edumazet@google.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH 4/6] virtio/vsock: add VIRTIO_VSOCK_F_DGRAM feature bit
-Message-ID: <YzIfADqYLMUHjf2a@bullseye>
-References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
- <3d1f32c4da81f8a0870e126369ba12bc8c4ad048.1660362668.git.bobby.eshleman@bytedance.com>
- <20220926131751.pdlc5mbx6gxqlmkx@sgarzare-redhat>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=A2s8n5PYK3ZaMy6+MNcDLHsBXyfzYG3pJKOuijb9LrI=;
+        b=LLuzbdSHKGbnqf/Uz1xTZVyQtM6YMMdEOfjtDt3OAXrQT6RS/Pn56qsQ4rVc+WPLgJ
+         32301KEEycY7bOlp0+/cfAbJVm5SbIqJvDhatdw41WGbDviQiQcjGudCmr6uKdQsx60Y
+         o8UjxE64Cm+zcMzYdaK+Ea1BA1zIcpyQfeuFa9wU2hMWlBIvKCPX+P9cp0bYhSmjmr9b
+         RSpAGE7uJKJQ2Db8gx4Bi/1ThKt4uBPMcZJQhwT2T0q3nKpvmGavbMAiEnenxu84VoAs
+         cL2jRn6fgRZaxEdpUhJCwxgs4oMgDywo65jHat9IfhyPeio4X/Yzv0HVi+IzYNxYPaHn
+         O+IQ==
+X-Gm-Message-State: ACrzQf3sr8GAKnjjW8Gqq2dVU7Hn9a3im9hMLA4JWkkj1jrLEAeO46V2
+        jwFHqE0jN+bDmyq3Dm+0/Znd7A==
+X-Google-Smtp-Source: AMsMyM58jr1etzMyNQUmnzQOYdUw0OknZzi2KCSPlPDP+MUwOkuDM6AZAQk/q8e2cRlv2rlB1bl4tQ==
+X-Received: by 2002:a17:907:8a15:b0:782:e6da:f13d with SMTP id sc21-20020a1709078a1500b00782e6daf13dmr12432003ejc.152.1664230025973;
+        Mon, 26 Sep 2022 15:07:05 -0700 (PDT)
+Received: from [192.168.190.227] ([31.209.146.210])
+        by smtp.gmail.com with ESMTPSA id t4-20020a05640203c400b00456df1907a1sm6744798edw.0.2022.09.26.15.07.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Sep 2022 15:07:05 -0700 (PDT)
+Message-ID: <2322dc37-ddb5-b712-92ff-3fbc6f5c914d@linaro.org>
+Date:   Sun, 25 Sep 2022 10:18:46 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220926131751.pdlc5mbx6gxqlmkx@sgarzare-redhat>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v1 9/9] gdbstub: move guest debug support check to ops
+Content-Language: en-US
+To:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        qemu-devel@nongnu.org
+Cc:     f4bug@amsat.org, mads@ynddal.dk,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>
+References: <20220922145832.1934429-1-alex.bennee@linaro.org>
+ <20220922145832.1934429-10-alex.bennee@linaro.org>
+From:   Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <20220922145832.1934429-10-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DATE_IN_PAST_24_48,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -81,116 +77,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 26, 2022 at 03:17:51PM +0200, Stefano Garzarella wrote:
-> On Mon, Aug 15, 2022 at 10:56:07AM -0700, Bobby Eshleman wrote:
-> > This commit adds a feature bit for virtio vsock to support datagrams.
-> > 
-> > Signed-off-by: Jiang Wang <jiang.wang@bytedance.com>
-> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
-> > ---
-> > drivers/vhost/vsock.c             | 3 ++-
-> > include/uapi/linux/virtio_vsock.h | 1 +
-> > net/vmw_vsock/virtio_transport.c  | 8 ++++++--
-> > 3 files changed, 9 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> > index b20ddec2664b..a5d1bdb786fe 100644
-> > --- a/drivers/vhost/vsock.c
-> > +++ b/drivers/vhost/vsock.c
-> > @@ -32,7 +32,8 @@
-> > enum {
-> > 	VHOST_VSOCK_FEATURES = VHOST_FEATURES |
-> > 			       (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
-> > -			       (1ULL << VIRTIO_VSOCK_F_SEQPACKET)
-> > +			       (1ULL << VIRTIO_VSOCK_F_SEQPACKET) |
-> > +			       (1ULL << VIRTIO_VSOCK_F_DGRAM)
-> > };
-> > 
-> > enum {
-> > diff --git a/include/uapi/linux/virtio_vsock.h b/include/uapi/linux/virtio_vsock.h
-> > index 64738838bee5..857df3a3a70d 100644
-> > --- a/include/uapi/linux/virtio_vsock.h
-> > +++ b/include/uapi/linux/virtio_vsock.h
-> > @@ -40,6 +40,7 @@
-> > 
-> > /* The feature bitmap for virtio vsock */
-> > #define VIRTIO_VSOCK_F_SEQPACKET	1	/* SOCK_SEQPACKET supported */
-> > +#define VIRTIO_VSOCK_F_DGRAM		2	/* Host support dgram vsock */
+On 9/22/22 14:58, Alex Bennée wrote:
+> This removes the final hard coding of kvm_enabled() in gdbstub and
+> moves the check to an AccelOps.
 > 
-> We already allocated bit 2 for F_NO_IMPLIED_STREAM , so we should use 3:
-> https://github.com/oasis-tcs/virtio-spec/blob/26ed30ccb049fd51d6e20aad3de2807d678edb3a/virtio-vsock.tex#L22
-> (I'll send patches to implement F_STREAM and F_NO_IMPLIED_STREAM negotiation
-> soon).
-> 
-> As long as it's RFC it's fine to introduce F_DGRAM, but we should first
-> change virtio-spec before merging this series.
-> 
-> About the patch, we should only negotiate the new feature when we really
-> have DGRAM support. So, it's better to move this patch after adding support
-> for datagram.
+> Signed-off-by: Alex Bennée<alex.bennee@linaro.org>
+> Cc: Mads Ynddal<mads@ynddal.dk>
+> ---
+>   accel/kvm/kvm-cpus.h       | 1 +
+>   gdbstub/internals.h        | 1 +
+>   include/sysemu/accel-ops.h | 1 +
+>   include/sysemu/kvm.h       | 7 -------
+>   accel/kvm/kvm-accel-ops.c  | 1 +
+>   accel/kvm/kvm-all.c        | 6 ++++++
+>   accel/tcg/tcg-accel-ops.c  | 6 ++++++
+>   gdbstub/gdbstub.c          | 5 ++---
+>   gdbstub/softmmu.c          | 9 +++++++++
+>   gdbstub/user.c             | 6 ++++++
+>   10 files changed, 33 insertions(+), 10 deletions(-)
 
-Roger that, I'll reorder that for v2 and also clarify the series by
-prefixing it with RFC.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Before removing "RFC" from the series, I'll be sure to send out
-virtio-spec patches first.
-
-Thanks,
-Bobby
-
-> 
-> Thanks,
-> Stefano
-> 
-> > 
-> > struct virtio_vsock_config {
-> > 	__le64 guest_cid;
-> > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> > index c6212eb38d3c..073314312683 100644
-> > --- a/net/vmw_vsock/virtio_transport.c
-> > +++ b/net/vmw_vsock/virtio_transport.c
-> > @@ -35,6 +35,7 @@ static struct virtio_transport virtio_transport; /*
-> > forward declaration */
-> > struct virtio_vsock {
-> > 	struct virtio_device *vdev;
-> > 	struct virtqueue *vqs[VSOCK_VQ_MAX];
-> > +	bool has_dgram;
-> > 
-> > 	/* Virtqueue processing is deferred to a workqueue */
-> > 	struct work_struct tx_work;
-> > @@ -709,7 +710,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
-> > 	}
-> > 
-> > 	vsock->vdev = vdev;
-> > -
-> > 	vsock->rx_buf_nr = 0;
-> > 	vsock->rx_buf_max_nr = 0;
-> > 	atomic_set(&vsock->queued_replies, 0);
-> > @@ -726,6 +726,9 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
-> > 	if (virtio_has_feature(vdev, VIRTIO_VSOCK_F_SEQPACKET))
-> > 		vsock->seqpacket_allow = true;
-> > 
-> > +	if (virtio_has_feature(vdev, VIRTIO_VSOCK_F_DGRAM))
-> > +		vsock->has_dgram = true;
-> > +
-> > 	vdev->priv = vsock;
-> > 
-> > 	ret = virtio_vsock_vqs_init(vsock);
-> > @@ -820,7 +823,8 @@ static struct virtio_device_id id_table[] = {
-> > };
-> > 
-> > static unsigned int features[] = {
-> > -	VIRTIO_VSOCK_F_SEQPACKET
-> > +	VIRTIO_VSOCK_F_SEQPACKET,
-> > +	VIRTIO_VSOCK_F_DGRAM
-> > };
-> > 
-> > static struct virtio_driver virtio_vsock_driver = {
-> > -- 
-> > 2.35.1
-> > 
-> 
-> _______________________________________________
-> Virtualization mailing list
-> Virtualization@lists.linux-foundation.org
-> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
+r~
