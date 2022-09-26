@@ -2,73 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 55B345E96DC
-	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 01:18:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C977A5E9875
+	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 06:34:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230128AbiIYXSK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 25 Sep 2022 19:18:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38764 "EHLO
+        id S232748AbiIZEe2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 00:34:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230404AbiIYXSJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 25 Sep 2022 19:18:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EE9022B02
-        for <kvm@vger.kernel.org>; Sun, 25 Sep 2022 16:18:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664147887;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ptiGaD3G+IhVdhjFFBlKMExPKWawt6y48scQT8DiYO0=;
-        b=bNFtBRgTKf30+vmrljhdinEM1mtch5rhw68AuP9YSPduxmfFVLc45rurzNC4NZkc+51g3T
-        EFFKU/a6iTryUX3l3uEkaG0I/JMgs4Ka7yiq/T1k6veAS2UBQpEFEkLybvdmYuYqB9Pc/6
-        sj8o1PkyImrPT7Z5Z2pC92Hurf1EF3I=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-277-pIiwYQYYMLKk88B7wUEWBQ-1; Sun, 25 Sep 2022 19:18:03 -0400
-X-MC-Unique: pIiwYQYYMLKk88B7wUEWBQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B57CE800B30;
-        Sun, 25 Sep 2022 23:18:02 +0000 (UTC)
-Received: from [10.64.54.126] (vpn2-54-126.bne.redhat.com [10.64.54.126])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E2A2492CA2;
-        Sun, 25 Sep 2022 23:17:57 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 2/6] KVM: Add KVM_CAP_DIRTY_LOG_RING_ORDERED capability
- and config option
-To:     Marc Zyngier <maz@kernel.org>, Peter Xu <peterx@redhat.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org,
-        andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com,
-        pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>
-References: <20220922170133.2617189-1-maz@kernel.org>
- <20220922170133.2617189-3-maz@kernel.org> <YyzYI/bvp/JnbcxS@xz-m1.local>
- <87czbmjhbh.wl-maz@kernel.org> <Yy36Stppz4tYBPiP@x1n>
- <87edw1i290.wl-maz@kernel.org> <87czblhv2a.wl-maz@kernel.org>
- <Yy8EmMhF+2jcm3m6@x1n> <878rm8ior6.wl-maz@kernel.org>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <66c66102-4c59-f5b4-5cb4-56488f8d156f@redhat.com>
-Date:   Mon, 26 Sep 2022 09:17:54 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
-MIME-Version: 1.0
-In-Reply-To: <878rm8ior6.wl-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+        with ESMTP id S232664AbiIZEe0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 00:34:26 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2077.outbound.protection.outlook.com [40.107.244.77])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C376A2AE1E
+        for <kvm@vger.kernel.org>; Sun, 25 Sep 2022 21:34:24 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lTbu/IzMUJdcqblV3tbNIkjPS2lsz1KUAP6wu1vNVXJhYAmTpZrKw1vhgux9uB4J4LqR1fF9w2daQKsRlSZQmuLfaaVPDOcRLQOUyuItIlLcndD3qrhoF4DHgg9IINZDvrdfXq3rkwh0LkZXIlZ2Crc6j74YtJ5JOIA4I35AbL8v/+uFxnKYUceet+OjFyoQX2tK1FSARtHklK+vuarM8g2FT65iSczphXjYdH6o8F1zioU10Kn9Jy85Z3t8o3Lm8uj53rMaeEU9S1hxU5ET+stZWXbTIOocJKDRLRf4lLP9Vblnh0j6R0Em4KhCKSOXeCAJw8EsfyYYa+OLnklZbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BhtIyO+xuLQYsykDQJ+BpZpxqpVDSk2EQS3+OZDQKY8=;
+ b=Wygi8fllTn9IP5MaUz521yqi8wabYg4ivcbHon9hV2xx8Q34aKvRWUKwOc5S+QAfyXUa6rzMpyvNOBy196ape3lI1iRz3NeyoT82tvmlrXAg2PqVA8F8pkxMEyGZD41pCDGDj3YfqWKBWg4EzFU8P9FNicObmSzrbbrNMzQ1UDR6pFAFlr7CPOV25gHaLJHf1cZVroq+ctrdBDgNa62NiDjYnsOj6dCHeoeVkri9ZMTI4LsQYOpY4LGLGZuzjD+Bm9n9yvpngMWsmKGg4hLvCLrb8cKuDbTHFnCdEDaiQZHaIO9HQmt0dSlNP59dcRHrtYKiRcl9gSZ1Ox5yeERX4Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BhtIyO+xuLQYsykDQJ+BpZpxqpVDSk2EQS3+OZDQKY8=;
+ b=WlXWNEYNRnrOsI08sk5h9cFJoHyNuU8sOVSFvTlQ3xUPFp2VwwuUtB9943cDbDfMgaCuCHQ3EptgO60AdJznUntsugNKU8DGDWOmov2EMi7rqyvOMw1ey0ie8KiCur3NDBiIw7LqT/P62dWTsahQntjjEcMKpxltq1u4AwHjKGA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
+ SJ0PR12MB5488.namprd12.prod.outlook.com (2603:10b6:a03:3ad::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5654.25; Mon, 26 Sep
+ 2022 04:34:22 +0000
+Received: from DS7PR12MB6214.namprd12.prod.outlook.com
+ ([fe80::ddaa:b947:3e9:ce72]) by DS7PR12MB6214.namprd12.prod.outlook.com
+ ([fe80::ddaa:b947:3e9:ce72%8]) with mapi id 15.20.5654.023; Mon, 26 Sep 2022
+ 04:34:22 +0000
+Message-ID: <bae31123-27ae-5996-affb-93a7199a66f1@amd.com>
+Date:   Mon, 26 Sep 2022 10:04:11 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [kvm-unit-tests PATCH v2 0/4] x86: nSVM: Add testing for routing
+ L2 exceptions
+From:   Manali Shukla <manali.shukla@amd.com>
+To:     pbonzini@redhat.com, seanjc@google.com
+Cc:     kvm@vger.kernel.org, aaronlewis@google.com
+References: <20220810050738.7442-1-manali.shukla@amd.com>
+ <d62703a8-7c8b-eab4-cf35-bb520312d0d9@amd.com>
+ <1b17bc6f-c7c6-2d3a-476c-7cf0ea24f4cc@amd.com>
+In-Reply-To: <1b17bc6f-c7c6-2d3a-476c-7cf0ea24f4cc@amd.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=-6.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+X-ClientProxiedBy: PN2PR01CA0238.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:eb::8) To DS7PR12MB6214.namprd12.prod.outlook.com
+ (2603:10b6:8:96::13)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6214:EE_|SJ0PR12MB5488:EE_
+X-MS-Office365-Filtering-Correlation-Id: 912ef814-4521-41e5-6b47-08da9f786249
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: hpkPF+riHaPqWykQ5AkqCM7UFfp38FFhrm481PElumTtZENH26Z4MkrOOYrD2lsWmmBL5UpkuJOamn0xIXPjitx0X/uqIkuS9ohDGAYxJy8OJdHcQVCBLkQFR7cD13GVb105j5R5E2cKSTPjADdsEBtYF+T0XtDa37qgDwhKEFTtsdE5hlanoOvqMR6rJOTaKcEN5NiBP4XVFM51DQ7qSZyfQv76d81KK+1DShCK8D/BzGhTJxzEWKLY/q9/7tHlExVMhc+eCcRr3iDMQ39nUe2LXXMJdHGwrbFj2S4nOR+UHCr/YKJthqW/NpKd1FAR4XuI7SBwoyiLh8myUKNsJn11E2aVdpd5EmiquZnhZAiySuN07jt3oZReU/n0m6GiJ9aIG70FnKwezUZb147yxwWJhUm8tESmXLi70olGom7e8ZCC9krOAQFBrMwlTVP8qvjZ0HesnqgAiyorhT9Au971GkSMlkPhOv4xn0Tz5AYIqAVN6YbjyGif961Fqbi2f4+zVO/fmgIYXbMaIpN/tptBihpGjBz6A3dczHOJO3SlObam4+Su5jnIwHkp4ToO5dQ6gl4FJOxXqeGeRNaw8aGTRDXIiXiegxn2DuSYuLsosfnC4EDojzJbUlZufmPIfBKMwE022U27QzpAccMSu/ZnsFe+UDEdQJf/MSeHTCio/Dt7vPmZa14oMTaitYrv1d0YW7cxBMIjnGDvfhcO5PLb/tb4PkhCMIdKl8kpvdA5ER4l02HV1TI2gS8wkTGHCyVRLrX4000eZlSV6UkA6IE6A9/yolNM14/0H3Cb8siZdSLArXIZwy2ObjA1VbSISErKwieyfzxqeNXVoNLFLVOmCJ3ZMFDNGaXTuYThd0b2d9O5JV1SZdX2Q/TMbzbf
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(376002)(346002)(39860400002)(136003)(366004)(451199015)(31686004)(966005)(478600001)(6486002)(2616005)(36756003)(316002)(2906002)(5660300002)(8676002)(4326008)(66556008)(186003)(66476007)(6666004)(6506007)(26005)(6512007)(53546011)(86362001)(83380400001)(66946007)(44832011)(8936002)(31696002)(41300700001)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZEFsNGxXWWdQeFBRakhaTEtEcVBrYjVqZjc0UnFSZDVkdWQxeVl3RVJ6Ymxy?=
+ =?utf-8?B?ZmxyS0NWaXNsZjFoQ3pic0t1b01qdTF1V0g1VzBZdDRWUVRuNHlWdW9rWkVE?=
+ =?utf-8?B?SnhtYmJqYi9TRnViMGNKdHdmWUtRVGZyMHlaMVhldWNjb3lEUHdIeEF2YnZE?=
+ =?utf-8?B?TGF6UmdlbjdrYWRYOUtlT1pXL3V2eFdRRUZ5NWxiNzIrRTNYR1JBNVc3ZWtJ?=
+ =?utf-8?B?NWdEMVlQTUxPVy83cFVXWWQ5ZVQ1aGpwMnlIU3hVOFJIYUNxN1IzOGljaHRm?=
+ =?utf-8?B?U1UvVXB6NWRON3pVWm1abmxXTUdXdUZENjVjS0JaUUViYllqbi9UV1hpTDM0?=
+ =?utf-8?B?elF6eUFRT1lnaDF0YmRlbmdZN3NsN1Bubyt2OXBFNDh4VG13Q0FOdE1iSUNB?=
+ =?utf-8?B?TU5YaGNHaVZOZnFFa2x2SHZsaVpNWHRBM0ZuTzU5QUZmai9Wd2dhcXhaQ05T?=
+ =?utf-8?B?VHlEdU5ab3BuUHZYdk1xOHNINjJUZG9ibGdpand5MG1GemR1ejFwZHRHcFN0?=
+ =?utf-8?B?eEk0YlhNOHJJOE16TTVRZWZqWlpTSGczVmtSb256aExnR3RpYS9VOHlpcXp5?=
+ =?utf-8?B?dXdka2ptWWNzWmxnMVNuUi8rOVB3QngzdUg1dlNoeVh3MXNlNGlsNVBsZ2Rp?=
+ =?utf-8?B?RStzQWRDRmhTYXAzYUtjR0wxdEZPY1lrNFc3YmN5M2diQ094SzVsQUdvOGdS?=
+ =?utf-8?B?eHBqazBYemE3RFVFSEFsZWFzS05rMWppRGZmMDJFYVVkOG9GUFlCNVVnNVh3?=
+ =?utf-8?B?Rk5UdzBqMkxvREVEazNOdHI4NFVENWxhOXE0OGRpYWRrTWhtNUhlMlptYnV4?=
+ =?utf-8?B?bTk1NkcrRFNZbzFzR0l0QUV1azRKLy9ha203WXNwNGRKb2toWkd0L25zcGNa?=
+ =?utf-8?B?WlBHa0QvZ1ppWmtiL1lRN0NFUUx0N2MxUUtsWHAvNW9kaEwzeTFBTURjREh0?=
+ =?utf-8?B?RzRBUktRcVAzeG9VTVpObmQzckRzNm81aVF5V1FlVXdZbHR6MURRMkFpRko4?=
+ =?utf-8?B?clRzVlgzM0JNcDFXWkQxckRpUjI4Wk9jVzVjcEZlNDh5WHVPQXpGeGRiYUNx?=
+ =?utf-8?B?aFFGR1h1Mmx5cGd5VjFNMzMycEJ5SzhXWUsrbjVDTllaRXFFZFk5bk1PdVdN?=
+ =?utf-8?B?czNLdmVmTjNvQUVQQ0xkYlNQc1dqcEsyTVZscWg5V3BNTmw5Rk1MYURZYWta?=
+ =?utf-8?B?QkJUY1NHdDFYcENXMERtUWlxSTlOSkdvekdSNmJNMWxrUmUwN1VuSExSSFEv?=
+ =?utf-8?B?b1Z5RmtKNjZNK080bFVYUlZWNFBBbnZSc2w2Qk1mdFMyZW9HUHU2ZmRtSkRX?=
+ =?utf-8?B?ejcxa1J6bzNyR2h4eGVPalh3Zjh1eDQveDhuN2VoZE5uZmhDVFBydmlXb2pp?=
+ =?utf-8?B?TTJEaFVVRmdaQ2V5Tnd4eXFLQU9BV0hUVnJKOVF2Q1lsTzluSWVnbUZESW9U?=
+ =?utf-8?B?WkRnZmhRdVU0YWsrTVBFTUdJS1ZsSW9HUDJPSXNyRXE2emZOMGdYTUxjVDZz?=
+ =?utf-8?B?WkpkU2dOVTdqMUJrS0dCcVMrSHAzbzBiVEVFUUFKNjVqNzZUMG9kdWU5aXM0?=
+ =?utf-8?B?cGg4QVhvR3ZxdWIyaVU2ZlVoMFZZb29wN1o0ZG1yTThqeTkybTJROXZBRE03?=
+ =?utf-8?B?alYzaHhGdUZ0YXNzS3hnSlFFaHhvc3pFR3FFUmVoUEJQdGdBa3V5aGk2bldj?=
+ =?utf-8?B?ZGc3NDc1dkhuTHY2UDJJb2IydjNWL2tCYTNMSkZOZEdPY2lLaTV4L0NnajZI?=
+ =?utf-8?B?ajVSWGVDYUdPL3R1YUpvMlZFMWg5MFQ4Uk85em1uRlhZb2h3dDdPZVZzL3VX?=
+ =?utf-8?B?bWhkNjgxQURHVHZ3cXdYOWprUjFNMi9jQ0JrY1VpakVVblFacUc4NDE1WmpJ?=
+ =?utf-8?B?R0swaUFuV0dmaFlQbEJQVlp6eDl0T2dxMU85SEFWSmtudXJOQm51OFpuODRP?=
+ =?utf-8?B?OG15UHh5K0drR1F6KzhBWDlZZ2wrSWtjeXoyR1F5V2FzYk5XK2s1eHg0Umdk?=
+ =?utf-8?B?WjFFUEcxcUxtTDlLMWtDUzJVZmtjL2V2b2tyc3NRL2VRU01OUVR1NzkrS2dS?=
+ =?utf-8?B?Q0E1aUxJWnRPSmxycHczdnpQOHJmVnc0VEhEQ0Joa1JJUG1GOWU4dllLRnFX?=
+ =?utf-8?Q?eVXFxjDPt32iFXoJHtGZAhRz3?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 912ef814-4521-41e5-6b47-08da9f786249
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2022 04:34:22.4135
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WPJBPGfXmIJ5I89emFiazn66mmUzzwrkwp4C5mKYaCOHNeCpXhj5GNeroECd0hhAck/XsbwISCCI2jAQFn6N0g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5488
+X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,73 +124,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On 9/25/22 4:57 AM, Marc Zyngier wrote:
-> On Sat, 24 Sep 2022 14:22:32 +0100,
-> Peter Xu <peterx@redhat.com> wrote:
+On 9/19/2022 10:11 AM, Manali Shukla wrote:
+> On 8/29/2022 9:41 AM, Manali Shukla wrote:
+>> On 8/10/2022 10:37 AM, Manali Shukla wrote:
+>>> Series is inspired by vmx exception test framework series[1].
+>>>
+>>> Set up a test framework that verifies an exception occurring in L2 is
+>>> forwarded to the right place (L1 or L2).
+>>>
+>>> Tests two conditions for each exception.
+>>> 1) Exception generated in L2, is handled by L2 when L2 exception handler
+>>>    is registered.
+>>> 2) Exception generated in L2, is handled by L1 when intercept exception
+>>>    bit map is set in L1.
+>>>
+>>> Above tests were added to verify 8 different exceptions.
+>>> #GP, #UD, #DE, #DB, #AC, #OF, #BP, #NM.
+>>>
+>>> There are 4 patches in this series
+>>> 1) Added test infrastructure and exception tests.
+>>> 2) Move #BP test to exception test framework.
+>>> 3) Move #OF test to exception test framework.
+>>> 4) Move part of #NM test to exception test framework because
+>>>    #NM has a test case which checks the condition for which #NM should not
+>>>    be generated, all the test cases under #NM test except this test case have been
+>>>    moved to exception test framework because of the exception test framework
+>>>    design.
+>>>
+>>> v1->v2
+>>> 1) Rebased to latest kvm-unit-tests. 
+>>> 2) Move 3 different exception test cases #BP, #OF and #NM exception to
+>>>    exception test framework.
+>>>
+>>> [1] https://lore.kernel.org/all/20220125203127.1161838-1-aaronlewis@google.com/
+>>> [2] https://lore.kernel.org/kvm/a090c16f-c307-9548-9739-ceb71687514f@amd.com/
+>>>
+>>> Manali Shukla (4):
+>>>   x86: nSVM: Add an exception test framework and tests
+>>>   x86: nSVM: Move #BP test to exception test framework
+>>>   x86: nSVM: Move #OF test to exception test framework
+>>>   x86: nSVM: Move part of #NM test to exception test framework
+>>>
+>>>  x86/svm_tests.c | 197 ++++++++++++++++++++++++++++++++++--------------
+>>>  1 file changed, 142 insertions(+), 55 deletions(-)
+>>>
 >>
->> On Sat, Sep 24, 2022 at 12:26:53PM +0100, Marc Zyngier wrote:
->>> On Sat, 24 Sep 2022 09:51:39 +0100,
->>> Marc Zyngier <maz@kernel.org> wrote:
->>>>
->>>> I'm happy to bikeshed, but please spell it out for me. If we follow
->>>> the current scheme, we need 3 configuration symbols (of which we
->>>> already have one), and 2 capabilities (of which we already have one).
+>> A gentle reminder for the review
 >>
->> I hope it's not bikeshedding.  I normally don't comment on namings at all
->> because many of them can be "bikeshedding" to me.  But this one is so
->> special because it directly collides with KVM_GET_DIRTY_LOG, which is other
->> method of dirty tracking.
+>> -Manali
 > 
-> Fair enough. I'm notoriously bad at sticking a name to things, so I'm
-> always happy to receive suggestions.
+> A gentle reminder for the review
 > 
->>
->>>>
->>>> Do you have any concrete proposal for those?
->>>
->>> In order to make some forward progress, I've reworked the series[1]
->>> with another proposal for those:
->>>
->>> Config symbols:
->>>
->>> - HAVE_KVM_DIRTY_RING:
->>>    * mostly the same meaning as today
->>>    * not directly selected by any architecture
->>>    * doesn't expose any capability on its own
->>>
->>> - HAVE_KVM_DIRTY_RING_TSO:
->>>    * only for strongly ordered architectures
->>>    * selects HAVE_KVM_DIRTY_RING
->>>    * exposes KVM_CAP_DIRTY_LOG_RING
->>>    * selected by x86
->>>
->>> - HAVE_KVM_DIRTY_RING_ACQ_REL:
->>>    * selects HAVE_KVM_DIRTY_RING
->>>    * exposes KVM_CAP_DIRTY_LOG_RING_ACQ_REL
->>>    * selected by arm64 and x86
->>>
->>> Capabilities:
->>>
->>> - KVM_CAP_DIRTY_LOG_RING: the good old x86-specific stuff, advertised
->>>    when HAVE_KVM_DIRTY_RING_TSO is selected
->>>
->>> - KVM_CAP_DIRTY_LOG_RING_ACQ_REL: the new acquire/release semantics,
->>>    advertised when HAVE_KVM_DIRTY_RING_ACQ_REL is selected
->>>
->>> This significantly reduces the churn and makes things slightly more
->>> explicit.
->>
->> This looks good to me, thanks.
-> 
-> OK, thanks for having a quick look. I'll repost this shortly, after
-> I'm done reviewing Gavin's series.
-> 
+> -Manali
 
-The config options and capabilities look good to me either. I will
-post my v4 series, which will rebased on your v2 series.
+A gentle reminder for the review
 
-Thanks,
-Gavin
-
+-Manali
