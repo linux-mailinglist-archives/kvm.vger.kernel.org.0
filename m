@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F3B05EB576
-	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 01:19:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A0EAE5EB580
+	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 01:19:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231270AbiIZXTf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 19:19:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36696 "EHLO
+        id S231194AbiIZXTy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 19:19:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230304AbiIZXSw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 19:18:52 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5E06B40F7
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 16:18:50 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id f23so7583871plr.6
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 16:18:50 -0700 (PDT)
+        with ESMTP id S230508AbiIZXTH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 19:19:07 -0400
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2B6ED74EF
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 16:18:56 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id v186so8135253pfv.11
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 16:18:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date;
-        bh=SIAPwLGrdF6de2sUvVzEsUXI67gCH9gi2KlqfGNRtvk=;
-        b=PiwXiRi6C5W9sHwMs6AfMS2o9JzPIAHf0vDUDJ4gQ4sXVlaTML3wMo++n6LPbexjxG
-         yg+3HFqUSr7IIk+GDWu3bk261jQmKuSUpnrjAeXgsQ1fqp2oldn6BXZHs5IPKkBQdm4c
-         jnBFOuGs7aTKI7SMJ6LBaNzvjg9tAMuWhXKOGN0ZdgF8r1WtCYP2z41AgLNbGUoZHtXh
-         K32XsFj7suJJr0vWAZFCww+Umdo1J5TA0yuR8gTn5cPhzkJ0ycEMDffQ0ZLU+l7yh75b
-         yK1F5yOF8lNeNKC0134uIKJ/DVxvCQ6kuXkK/aqJkCL6DGzU8g4G88Y2tXr1kimfhyEG
-         jtRw==
+        bh=Jo63jB5aNkOmZDxGlU8EM0gFxXH2llzd7sTVLu1lWkc=;
+        b=MIMLv+fnxX3/NujgpjMsljKROeTEsehckMHu/VtUXTQ6lmxDM+4W56RtENRiIpoOcD
+         T9yxqUa9KXPczd7Glb4rMT7AAWsa9huqQDk9pGaDIv4O7F1nDuM2FrxOlFx72i2r3b+4
+         AmI8YMthUGJkG+GKj3Kmtzyk/N+UoybrcC69BgcOfIfoLmrftAxhdEHoFAs/v/E4/oed
+         9yhHs663VNYfrkHDAOWT8Gz8xgkaC0BI76niXWQasZXP07OtqPIgll/tqiyIcCoZW3Af
+         APBufVCyll4LqSP4RQm2XfsaKfwf2afNIMBIvMZhrNISLDgwLBzSsdXJDulcyis1TsCc
+         Y28g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=SIAPwLGrdF6de2sUvVzEsUXI67gCH9gi2KlqfGNRtvk=;
-        b=qMmMQ6D98KaLqCz+CaazJUHZEV/TSkjuwsY6InlIPNbntB2vVuGRT8G2hn620GrC1V
-         JqJi2XlRoSnKD4jjKHAxynX99lpaMVuX31+ewVJSeOO08JWkF0SOUiCYfl2bScBSbnym
-         agQqvQLGoZcOocnzf0xRmtFkxRBRbga8HQDwIZxV7HnVt6zLzlrAdSo30vMnahlRcwbS
-         1FylfKpbRjGyYZhPy0B+U58rPaulR9yHjuKFZj3VLk86BO1fpJSGqcPkiieHvkO1YTfa
-         sOf4yWRn7nXT/n0bpStRfJVZJynhIzrR8Gf5R2Vw7Biz2zDDSHojJ9oVcdXhFAD1CTvo
-         +4og==
-X-Gm-Message-State: ACrzQf05mHBRJ8KvP0ii8fkfpmytXLHQE/wC8nHRPpaswBN4V/1Rox5k
-        uthDBcZ8Q3lZPix6n8UXQCCq4qaUSyE18K9F9ys7qg==
-X-Google-Smtp-Source: AMsMyM4SkUxm44J+T/UiQPpnhjOvmdzF9n1exmwexp+ZbQb4Ohl0IC1hqh5nzSJYdV402K/a4YDOMEG53gH7uD32kgM=
-X-Received: by 2002:a17:902:d143:b0:178:456b:8444 with SMTP id
- t3-20020a170902d14300b00178456b8444mr24452996plt.137.1664234330087; Mon, 26
- Sep 2022 16:18:50 -0700 (PDT)
+        bh=Jo63jB5aNkOmZDxGlU8EM0gFxXH2llzd7sTVLu1lWkc=;
+        b=jUmfY7SJvEat06lT3WGjlHKoB6yl9s5VFvfBCAzagBOyrVS9bAIX7Cx+xGfQ1qdCkf
+         8YEDq2KcN2Tgvu+/UnaZ+ekGH1XQ+WgWt5CpXmsOu008r21WA6C61RS2/bRXnCZLNUQ6
+         07sKjR+6LJBJI4rovv4r9Bz20slv40F8qezo6NALb6P21u5lZVw/tTkH0SLBxa2ArpQM
+         c3rwRmrnsPUUoRjww/yLEdE0XI4TtBD2C65a+QLuoDbFnO4IIFp+o82Zs/FwQQ6BrAHL
+         2R8x07z7G7q7j5pcgjSy4tg9hLYQUYmxdtdIajZABBZ83iT4QrT2QgQEVNpc0ht2UK+9
+         5pzw==
+X-Gm-Message-State: ACrzQf2IoYUNqAvthbGBbrnaSu72Qpe+NrGtPVwvODKDuQK2EtkVVSmn
+        fOiOBBrLB7f/g6DKwqC02s/v4VmpIkib5rCvsygjkw==
+X-Google-Smtp-Source: AMsMyM4S/0VFRIw7ZIAOSmkH/RM0a/mtR2soWIHzWpFEX/5z9uplwlebgbwcSlX90m2tOtR4FyMLzIYefOcWWrlEd3g=
+X-Received: by 2002:a63:b4f:0:b0:439:cc64:50e6 with SMTP id
+ a15-20020a630b4f000000b00439cc6450e6mr21426874pgl.483.1664234336144; Mon, 26
+ Sep 2022 16:18:56 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220915000448.1674802-1-vannapurve@google.com>
- <20220915000448.1674802-3-vannapurve@google.com> <20220915094442.45eldu4bes5alacm@kamzik>
-In-Reply-To: <20220915094442.45eldu4bes5alacm@kamzik>
+ <20220915000448.1674802-3-vannapurve@google.com> <Yyt5MHc1bwPfvBq/@google.com>
+In-Reply-To: <Yyt5MHc1bwPfvBq/@google.com>
 From:   Vishal Annapurve <vannapurve@google.com>
-Date:   Mon, 26 Sep 2022 16:18:39 -0700
-Message-ID: <CAGtprH-PWxLTVVZQoe3kbqBdW0dMh4djOXH0cPWfVkWxu0QjHg@mail.gmail.com>
+Date:   Mon, 26 Sep 2022 16:18:45 -0700
+Message-ID: <CAGtprH_BMgeLX14f8J+rmKBtOFs12GY+egGBPW7Un41oDAfcoA@mail.gmail.com>
 Subject: Re: [V2 PATCH 2/8] KVM: selftests: Add arch specific initialization
-To:     Andrew Jones <andrew.jones@linux.dev>
+To:     David Matlack <dmatlack@google.com>
 Cc:     x86 <x86@kernel.org>, kvm list <kvm@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         linux-kselftest@vger.kernel.org,
@@ -60,13 +60,12 @@ Cc:     x86 <x86@kernel.org>, kvm list <kvm@vger.kernel.org>,
         Ben Gardon <bgardon@google.com>,
         Sean Christopherson <seanjc@google.com>,
         Oliver Upton <oupton@google.com>, peterx@redhat.com,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        David Matlack <dmatlack@google.com>
+        Vitaly Kuznetsov <vkuznets@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,7 +73,7 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 15, 2022 at 2:44 AM Andrew Jones <andrew.jones@linux.dev> wrote:
+On Wed, Sep 21, 2022 at 1:51 PM David Matlack <dmatlack@google.com> wrote:
 >
 > On Thu, Sep 15, 2022 at 12:04:42AM +0000, Vishal Annapurve wrote:
 > > Introduce arch specific API: kvm_selftest_arch_init to allow each arch to
@@ -101,6 +100,14 @@ On Thu, Sep 15, 2022 at 2:44 AM Andrew Jones <andrew.jones@linux.dev> wrote:
 > >
 > > +/*
 > > + * API to execute architecture specific setup before executing selftest logic.
+>
+> nit: s/before executing selftest logic/before main()/
+>
+
+Ack, will fix this in the next series.
+
+> ("selftest logic" is vague)
+>
 > > + */
 > > +void kvm_selftest_arch_init(void);
 > > +
@@ -134,12 +141,6 @@ On Thu, Sep 15, 2022 at 2:44 AM Andrew Jones <andrew.jones@linux.dev> wrote:
 > > + * arm64 doesn't have a true default mode, so start by computing the
 > > + * available IPA space and page sizes early.
 > > + */
->
-> It'd be better to move this comment inside the function above the
-> guest_modes_append_default call.
->
-
-Ack, will fix this in the next series.
 > > +void kvm_selftest_arch_init(void)
 > > +{
 > > +     guest_modes_append_default();
@@ -155,46 +156,13 @@ Ack, will fix this in the next series.
 > > +
 > > +     kvm_selftest_arch_init();
 > >  }
-> > diff --git a/tools/testing/selftests/kvm/lib/riscv/processor.c b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> > index 604478151212..26660dd2ba78 100644
-> > --- a/tools/testing/selftests/kvm/lib/riscv/processor.c
-> > +++ b/tools/testing/selftests/kvm/lib/riscv/processor.c
-> > @@ -362,3 +362,7 @@ void vcpu_args_set(struct kvm_vcpu *vcpu, unsigned int num, ...)
-> >  void assert_on_unhandled_exception(struct kvm_vcpu *vcpu)
-> >  {
-> >  }
-> > +
-> > +void kvm_selftest_arch_init(void)
-> > +{
-> > +}
-> > diff --git a/tools/testing/selftests/kvm/lib/s390x/processor.c b/tools/testing/selftests/kvm/lib/s390x/processor.c
-> > index 89d7340d9cbd..8654ec74009a 100644
-> > --- a/tools/testing/selftests/kvm/lib/s390x/processor.c
-> > +++ b/tools/testing/selftests/kvm/lib/s390x/processor.c
-> > @@ -218,3 +218,7 @@ void vcpu_arch_dump(FILE *stream, struct kvm_vcpu *vcpu, uint8_t indent)
-> >  void assert_on_unhandled_exception(struct kvm_vcpu *vcpu)
-> >  {
-> >  }
-> > +
-> > +void kvm_selftest_arch_init(void)
-> > +{
-> > +}
-> > diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> > index 2e6e61bbe81b..20bf125f9363 100644
-> > --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> > +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> > @@ -1311,3 +1311,7 @@ bool vm_is_unrestricted_guest(struct kvm_vm *vm)
-> >
-> >       return val == 'Y';
-> >  }
-> > +
-> > +void kvm_selftest_arch_init(void)
-> > +{
-> > +}
-> > --
-> > 2.37.2.789.g6183377224-goog
-> >
 >
-> Otherwise,
+> Suggest defining a default no-op implementation of
+> kvm_selftest_arch_init() using __weak since most architectures do not
+> actually need an implementation.
 >
-> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+
+Ack, will update this in the next series.
+
+> > ...
+> >
