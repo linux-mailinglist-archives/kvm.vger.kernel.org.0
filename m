@@ -2,280 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 010525EA9A9
-	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 17:08:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 734235EA9BD
+	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 17:09:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235731AbiIZPIK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 11:08:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47808 "EHLO
+        id S235612AbiIZPJy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 11:09:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235631AbiIZPHZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 11:07:25 -0400
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88D637A537
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 06:39:16 -0700 (PDT)
-Received: by mail-wr1-x42b.google.com with SMTP id bk15so2525830wrb.13
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 06:39:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=vjojPbAZCZTm66THKz2INVh3tZm0jABrqXmO5V1a0wU=;
-        b=wexBxmB/+F7WpA4XCpQWiP1Rrs6Z3ERduhyLAQUDh/dWQohA03uXYxPG6Sirmf1gsA
-         mRuRwsEZ3/oGSgnN4R+qSi2nFzQnxNxhc4S7TeiFDRSMgjbnELMfNp5T77vQ2RRB3sZ+
-         3717+FXb3fFCqUJrBTk30MyGg5QD1aZmFE3yXxBYGMk8pXtqt0n9X+DZ3vFAJO1Gy87G
-         y2We++AuLr472gg0N5hdAD2+xGirI3IKqFHhJI1SM7tyfdppqbcbZoBLOJTTRz2fns76
-         gjqOmDZckZupk5gkcMTWZ7LAeo0/+TSut/6buzQd9iZCWeqb7tcvYUc0VGUQzXlImroy
-         7ZLA==
+        with ESMTP id S235632AbiIZPJL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 11:09:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B31734D4D3
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 06:42:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664199749;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FmwtN+NyrhixAl+NaySPGi8yrkPzbP4TeUvnBlgzaxk=;
+        b=gThVPn7z77OWMYQCPvRvYNfKyegFPp53ExnTFbi0u0zXB/pM0pnB27IFDZOWGa7Pkj1bWp
+        A9YOKsVmfVqoRaN8/8/S61cueZXmjn6Egyu6Mf7krUXI19yUAvl8HowLADnNyETRAJKV7o
+        t/uMHqExGCO13mER2xaUNJkDfkJRGVw=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-558-iYRGpsSFPM2JfCE8jdvvqQ-1; Mon, 26 Sep 2022 09:42:27 -0400
+X-MC-Unique: iYRGpsSFPM2JfCE8jdvvqQ-1
+Received: by mail-qv1-f70.google.com with SMTP id lq8-20020a0562145b8800b004ad7229e4e9so3810302qvb.6
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 06:42:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=vjojPbAZCZTm66THKz2INVh3tZm0jABrqXmO5V1a0wU=;
-        b=fCbE4zjwlyUDLmajoQ3QGhIhJAqetmDa/UUH6N9xhUR3Nw3IerREtnXovN26dYaJTq
-         /ZyYNiaqrvPooaXGEMD9TopmqM7u/hLTGG6VdUBq6aAgBekMF67p9phSPAscDzXC7H5E
-         qfzSPRp3l027k7V1ewIEJX6GTsrG07Q3WWMublCrBkT+kr677DwwXnV4lFOfid3PGLb5
-         xcbm7K/oNxdHwglwP14aMTvjrgOZGfjI/S8OeZJN9fdfdjuzACGzbHhYjrCUreSYAgts
-         8Tb+SIcMASAJFKRPuik61uZSjExNf0S6yOH6FCszwe8y3CCp04Wg0VSYV3H3kyM5UiQw
-         fChg==
-X-Gm-Message-State: ACrzQf3I5dqZXgwbVJowKnKsY6CAaIlm7FmwnN5VRMMIisXgntr2ITyh
-        qMkoByvwPA/S+dFkSRHrjBT8dQ==
-X-Google-Smtp-Source: AMsMyM7ssUGFVInjKfHCMVavAD1DR68ajFIpqqd/rYkJ4cXD+Vw9ape9qEWil+xk1Ln/SfnV1v/plA==
-X-Received: by 2002:a5d:5259:0:b0:22c:8c3b:31f2 with SMTP id k25-20020a5d5259000000b0022c8c3b31f2mr9207067wrc.150.1664199555021;
-        Mon, 26 Sep 2022 06:39:15 -0700 (PDT)
-Received: from zen.linaroharston ([185.81.254.11])
-        by smtp.gmail.com with ESMTPSA id m10-20020a05600c3b0a00b003b47b913901sm25520688wms.1.2022.09.26.06.39.08
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=FmwtN+NyrhixAl+NaySPGi8yrkPzbP4TeUvnBlgzaxk=;
+        b=icvzZLgFiSPgF1KBbneyz4YtMzw8OVg5qzBg0nC5srWNpHebfWRXpTbkkzw0V32hzz
+         sR/qii8Jki69+IQI0iNeAWmDH8m4p1l3PzMxQCmQOrb4YZoBUomElvTTskne13lHB1nx
+         I1J8I0gMvqdS6u9zJ4Zy5dtmF9o4wu458IculcEWsN0HVB2/098Orvanef1Z9V0rn4Uf
+         fMB4Mm1ysTeUYNaz83u+zX3sOHtU1VhT71qeVScIDVFys1oWVE9I9Xz3iUxU/fdc6SYl
+         1wVD3XiVQVy1UlXmvb3nvm3mR07dCpRkpfkNHUz9SrlXH/oamFIk9wRUjRP6jHQWdvDp
+         8kWA==
+X-Gm-Message-State: ACrzQf2iB/fVogUwnSNLQV2WVjs5U7vTIZbHA8P/gxjyaVzKPBPQ8vG9
+        4AWmzrtSNiUkQPxjbOWnq6lQVCBrQRXV/OLYQjPUPoveRWLqkH37jFw8bB2nTcEmKLUuGTyc6PA
+        EEC1p5i+uLzgZ
+X-Received: by 2002:a05:620a:3711:b0:6ce:e7b3:d91b with SMTP id de17-20020a05620a371100b006cee7b3d91bmr13773035qkb.428.1664199746838;
+        Mon, 26 Sep 2022 06:42:26 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM48rV68CI6BIVBegZsCpLRad8XltAIyLSTgKKG3vra2SE+tRk0FWFyXXO/Eu5qJt2XZgTxJpQ==
+X-Received: by 2002:a05:620a:3711:b0:6ce:e7b3:d91b with SMTP id de17-20020a05620a371100b006cee7b3d91bmr13773011qkb.428.1664199746543;
+        Mon, 26 Sep 2022 06:42:26 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-222.retail.telecomitalia.it. [79.46.200.222])
+        by smtp.gmail.com with ESMTPSA id d7-20020a05620a240700b006cede93c765sm11947587qkn.28.2022.09.26.06.42.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Sep 2022 06:39:12 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 1E5BE1FFC3;
-        Mon, 26 Sep 2022 14:39:06 +0100 (BST)
-From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To:     qemu-devel@nongnu.org
-Cc:     f4bug@amsat.org, mads@ynddal.dk, qemu-arm@nongnu.org,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        kvm@vger.kernel.org (open list:Overall KVM CPUs)
-Subject: [PATCH  v2 11/11] gdbstub: move guest debug support check to ops
-Date:   Mon, 26 Sep 2022 14:39:04 +0100
-Message-Id: <20220926133904.3297263-12-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220926133904.3297263-1-alex.bennee@linaro.org>
-References: <20220926133904.3297263-1-alex.bennee@linaro.org>
+        Mon, 26 Sep 2022 06:42:25 -0700 (PDT)
+Date:   Mon, 26 Sep 2022 15:42:19 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Bobby Eshleman <bobby.eshleman@gmail.com>
+Cc:     Bobby Eshleman <bobbyeshleman@gmail.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Cong Wang <cong.wang@bytedance.com>,
+        Jiang Wang <jiang.wang@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hyperv@vger.kernel.org
+Subject: Re: [PATCH 0/6] virtio/vsock: introduce dgrams, sk_buff, and qdisc
+Message-ID: <20220926134219.sreibsw2rfgw7625@sgarzare-redhat>
+References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <cover.1660362668.git.bobby.eshleman@bytedance.com>
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This removes the final hard coding of kvm_enabled() in gdbstub and
-moves the check to an AccelOps.
+Hi,
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Cc: Mads Ynddal <mads@ynddal.dk>
----
- accel/kvm/kvm-cpus.h       | 1 +
- gdbstub/internals.h        | 1 +
- include/sysemu/accel-ops.h | 1 +
- include/sysemu/kvm.h       | 7 -------
- accel/kvm/kvm-accel-ops.c  | 1 +
- accel/kvm/kvm-all.c        | 6 ++++++
- accel/tcg/tcg-accel-ops.c  | 6 ++++++
- gdbstub/gdbstub.c          | 5 ++---
- gdbstub/softmmu.c          | 9 +++++++++
- gdbstub/user.c             | 6 ++++++
- 10 files changed, 33 insertions(+), 10 deletions(-)
+On Mon, Aug 15, 2022 at 10:56:03AM -0700, Bobby Eshleman wrote:
+>Hey everybody,
+>
+>This series introduces datagrams, packet scheduling, and sk_buff usage
+>to virtio vsock.
 
-diff --git a/accel/kvm/kvm-cpus.h b/accel/kvm/kvm-cpus.h
-index 33e435d62b..fd63fe6a59 100644
---- a/accel/kvm/kvm-cpus.h
-+++ b/accel/kvm/kvm-cpus.h
-@@ -18,6 +18,7 @@ void kvm_destroy_vcpu(CPUState *cpu);
- void kvm_cpu_synchronize_post_reset(CPUState *cpu);
- void kvm_cpu_synchronize_post_init(CPUState *cpu);
- void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu);
-+bool kvm_supports_guest_debug(void);
- int kvm_insert_breakpoint(CPUState *cpu, int type, hwaddr addr, hwaddr len);
- int kvm_remove_breakpoint(CPUState *cpu, int type, hwaddr addr, hwaddr len);
- void kvm_remove_all_breakpoints(CPUState *cpu);
-diff --git a/gdbstub/internals.h b/gdbstub/internals.h
-index 41e2e72dbf..eabb0341d1 100644
---- a/gdbstub/internals.h
-+++ b/gdbstub/internals.h
-@@ -9,6 +9,7 @@
- #ifndef _INTERNALS_H_
- #define _INTERNALS_H_
- 
-+bool gdb_supports_guest_debug(void);
- int gdb_breakpoint_insert(CPUState *cs, int type, hwaddr addr, hwaddr len);
- int gdb_breakpoint_remove(CPUState *cs, int type, hwaddr addr, hwaddr len);
- void gdb_breakpoint_remove_all(CPUState *cs);
-diff --git a/include/sysemu/accel-ops.h b/include/sysemu/accel-ops.h
-index 86794ac273..8cc7996def 100644
---- a/include/sysemu/accel-ops.h
-+++ b/include/sysemu/accel-ops.h
-@@ -47,6 +47,7 @@ struct AccelOpsClass {
-     int64_t (*get_elapsed_ticks)(void);
- 
-     /* gdbstub hooks */
-+    bool (*supports_guest_debug)(void);
-     int (*insert_breakpoint)(CPUState *cpu, int type, hwaddr addr, hwaddr len);
-     int (*remove_breakpoint)(CPUState *cpu, int type, hwaddr addr, hwaddr len);
-     void (*remove_all_breakpoints)(CPUState *cpu);
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 21d3f1d01e..6e1bd01725 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -46,7 +46,6 @@ extern bool kvm_readonly_mem_allowed;
- extern bool kvm_direct_msi_allowed;
- extern bool kvm_ioeventfd_any_length_allowed;
- extern bool kvm_msi_use_devid;
--extern bool kvm_has_guest_debug;
- 
- #define kvm_enabled()           (kvm_allowed)
- /**
-@@ -168,11 +167,6 @@ extern bool kvm_has_guest_debug;
-  */
- #define kvm_msi_devid_required() (kvm_msi_use_devid)
- 
--/*
-- * Does KVM support guest debugging
-- */
--#define kvm_supports_guest_debug() (kvm_has_guest_debug)
--
- #else
- 
- #define kvm_enabled()           (0)
-@@ -190,7 +184,6 @@ extern bool kvm_has_guest_debug;
- #define kvm_direct_msi_enabled() (false)
- #define kvm_ioeventfd_any_length_enabled() (false)
- #define kvm_msi_devid_required() (false)
--#define kvm_supports_guest_debug() (false)
- 
- #endif  /* CONFIG_KVM_IS_POSSIBLE */
- 
-diff --git a/accel/kvm/kvm-accel-ops.c b/accel/kvm/kvm-accel-ops.c
-index 5c0e37514c..fbf4fe3497 100644
---- a/accel/kvm/kvm-accel-ops.c
-+++ b/accel/kvm/kvm-accel-ops.c
-@@ -99,6 +99,7 @@ static void kvm_accel_ops_class_init(ObjectClass *oc, void *data)
-     ops->synchronize_pre_loadvm = kvm_cpu_synchronize_pre_loadvm;
- 
- #ifdef KVM_CAP_SET_GUEST_DEBUG
-+    ops->supports_guest_debug = kvm_supports_guest_debug;
-     ops->insert_breakpoint = kvm_insert_breakpoint;
-     ops->remove_breakpoint = kvm_remove_breakpoint;
-     ops->remove_all_breakpoints = kvm_remove_all_breakpoints;
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index b8c734fe3a..6ebff6e5a6 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -3287,6 +3287,12 @@ int kvm_update_guest_debug(CPUState *cpu, unsigned long reinject_trap)
-     return data.err;
- }
- 
-+bool kvm_supports_guest_debug(void)
-+{
-+    /* probed during kvm_init() */
-+    return kvm_has_guest_debug;
-+}
-+
- int kvm_insert_breakpoint(CPUState *cpu, int type, hwaddr addr, hwaddr len)
- {
-     struct kvm_sw_breakpoint *bp;
-diff --git a/accel/tcg/tcg-accel-ops.c b/accel/tcg/tcg-accel-ops.c
-index 965c2ad581..19cbf1db3a 100644
---- a/accel/tcg/tcg-accel-ops.c
-+++ b/accel/tcg/tcg-accel-ops.c
-@@ -93,6 +93,11 @@ void tcg_handle_interrupt(CPUState *cpu, int mask)
-     }
- }
- 
-+static bool tcg_supports_guest_debug(void)
-+{
-+    return true;
-+}
-+
- /* Translate GDB watchpoint type to a flags value for cpu_watchpoint_* */
- static inline int xlat_gdb_type(CPUState *cpu, int gdbtype)
- {
-@@ -198,6 +203,7 @@ static void tcg_accel_ops_init(AccelOpsClass *ops)
-         }
-     }
- 
-+    ops->supports_guest_debug = tcg_supports_guest_debug;
-     ops->insert_breakpoint = tcg_insert_breakpoint;
-     ops->remove_breakpoint = tcg_remove_breakpoint;
-     ops->remove_all_breakpoints = tcg_remove_all_breakpoints;
-diff --git a/gdbstub/gdbstub.c b/gdbstub/gdbstub.c
-index ff9f3f9586..be88ca0d71 100644
---- a/gdbstub/gdbstub.c
-+++ b/gdbstub/gdbstub.c
-@@ -45,7 +45,6 @@
- 
- #include "qemu/sockets.h"
- #include "sysemu/hw_accel.h"
--#include "sysemu/kvm.h"
- #include "sysemu/runstate.h"
- #include "semihosting/semihost.h"
- #include "exec/exec-all.h"
-@@ -3447,8 +3446,8 @@ int gdbserver_start(const char *device)
-         return -1;
-     }
- 
--    if (kvm_enabled() && !kvm_supports_guest_debug()) {
--        error_report("gdbstub: KVM doesn't support guest debugging");
-+    if (!gdb_supports_guest_debug()) {
-+        error_report("gdbstub: current accelerator doesn't support guest debugging");
-         return -1;
-     }
- 
-diff --git a/gdbstub/softmmu.c b/gdbstub/softmmu.c
-index 4e73890379..f208c6cf15 100644
---- a/gdbstub/softmmu.c
-+++ b/gdbstub/softmmu.c
-@@ -15,6 +15,15 @@
- #include "sysemu/cpus.h"
- #include "internals.h"
- 
-+bool gdb_supports_guest_debug(void)
-+{
-+    const AccelOpsClass *ops = cpus_get_accel();
-+    if (ops->supports_guest_debug) {
-+        return ops->supports_guest_debug();
-+    }
-+    return false;
-+}
-+
- int gdb_breakpoint_insert(CPUState *cs, int type, hwaddr addr, hwaddr len)
- {
-     const AccelOpsClass *ops = cpus_get_accel();
-diff --git a/gdbstub/user.c b/gdbstub/user.c
-index 42652b28a7..033e5fdd71 100644
---- a/gdbstub/user.c
-+++ b/gdbstub/user.c
-@@ -14,6 +14,12 @@
- #include "hw/core/cpu.h"
- #include "internals.h"
- 
-+bool gdb_supports_guest_debug(void)
-+{
-+    /* user-mode == TCG == supported */
-+    return true;
-+}
-+
- int gdb_breakpoint_insert(CPUState *cs, int type, hwaddr addr, hwaddr len)
- {
-     CPUState *cpu;
--- 
-2.34.1
+Just a reminder for those who are interested, tomorrow Sep 27 @ 16:00 
+UTC we will discuss more about the next steps for this series in this 
+room: https://meet.google.com/fxi-vuzr-jjb
+(I'll try to record it and take notes that we will share)
+
+Bobby, thank you so much for working on this! It would be great to solve 
+the fairness issue and support datagram!
+
+I took a look at the series, left some comments in the individual 
+patches, and add some advice here that we could pick up tomorrow:
+- it would be nice to run benchmarks (e.g., iperf-vsock, uperf, etc.) to
+   see how much the changes cost (e.g. sk_buff use)
+- we should take care also of other transports (i.e. vmci, hyperv), the 
+   uAPI should be as close as possible regardless of the transport
+
+About the use of netdev, it seems the most controversial point and I 
+understand Jakub and Michael's concerns. Tomorrow would be great if you 
+can update us if you have found any way to avoid it, just reusing a 
+packet scheduler somehow.
+It would be great if we could make it available for all transports (I'm 
+not asking you to implement it for all, but to have a generic api that 
+others can use).
+
+But we can talk about that tomorrow!
+Thanks,
+Stefano
+
+>
+>The usage of struct sk_buff benefits users by a) preparing vsock to use
+>other related systems that require sk_buff, such as sockmap and qdisc,
+>b) supporting basic congestion control via sock_alloc_send_skb, and c)
+>reducing copying when delivering packets to TAP.
+>
+>The socket layer no longer forces errors to be -ENOMEM, as typically
+>userspace expects -EAGAIN when the sk_sndbuf threshold )s reached and
+>messages are being sent with option MSG_DONTWAIT.
+>
+>The datagram work is based off previous patches by Jiang Wang[1].
+>
+>The introduction of datagrams creates a transport layer fairness issue
+>where datagrams may freely starve streams of queue access. This happens
+>because, unlike streams, datagrams lack the transactions necessary for
+>calculating credits and throttling.
+>
+>Previous proposals introduce changes to the spec to add an additional
+>virtqueue pair for datagrams[1]. Although this solution works, using
+>Linux's qdisc for packet scheduling leverages already existing systems,
+>avoids the need to change the virtio specification, and gives additional
+>capabilities. The usage of SFQ or fq_codel, for example, may solve the
+>transport layer starvation problem. It is easy to imagine other use
+>cases as well. For example, services of varying importance may be
+>assigned different priorities, and qdisc will apply appropriate
+>priority-based scheduling. By default, the system default pfifo qdisc is
+>used. The qdisc may be bypassed and legacy queuing is resumed by simply
+>setting the virtio-vsock%d network device to state DOWN. This technique
+>still allows vsock to work with zero-configuration.
+>
+>In summary, this series introduces these major changes to vsock:
+>
+>- virtio vsock supports datagrams
+>- virtio vsock uses struct sk_buff instead of virtio_vsock_pkt
+>  - Because virtio vsock uses sk_buff, it also uses sock_alloc_send_skb,
+>    which applies the throttling threshold sk_sndbuf.
+>- The vsock socket layer supports returning errors other than -ENOMEM.
+>  - This is used to return -EAGAIN when the sk_sndbuf threshold is
+>    reached.
+>- virtio vsock uses a net_device, through which qdisc may be used.
+> - qdisc allows scheduling policies to be applied to vsock flows.
+>  - Some qdiscs, like SFQ, may allow vsock to avoid transport layer congestion. That is,
+>    it may avoid datagrams from flooding out stream flows. The benefit
+>    to this is that additional virtqueues are not needed for datagrams.
+>  - The net_device and qdisc is bypassed by simply setting the
+>    net_device state to DOWN.
+>
+>[1]: https://lore.kernel.org/all/20210914055440.3121004-1-jiang.wang@bytedance.com/
+>
+>Bobby Eshleman (5):
+>  vsock: replace virtio_vsock_pkt with sk_buff
+>  vsock: return errors other than -ENOMEM to socket
+>  vsock: add netdev to vhost/virtio vsock
+>  virtio/vsock: add VIRTIO_VSOCK_F_DGRAM feature bit
+>  virtio/vsock: add support for dgram
+>
+>Jiang Wang (1):
+>  vsock_test: add tests for vsock dgram
+>
+> drivers/vhost/vsock.c                   | 238 ++++----
+> include/linux/virtio_vsock.h            |  73 ++-
+> include/net/af_vsock.h                  |   2 +
+> include/uapi/linux/virtio_vsock.h       |   2 +
+> net/vmw_vsock/af_vsock.c                |  30 +-
+> net/vmw_vsock/hyperv_transport.c        |   2 +-
+> net/vmw_vsock/virtio_transport.c        | 237 +++++---
+> net/vmw_vsock/virtio_transport_common.c | 771 ++++++++++++++++--------
+> net/vmw_vsock/vmci_transport.c          |   9 +-
+> net/vmw_vsock/vsock_loopback.c          |  51 +-
+> tools/testing/vsock/util.c              | 105 ++++
+> tools/testing/vsock/util.h              |   4 +
+> tools/testing/vsock/vsock_test.c        | 195 ++++++
+> 13 files changed, 1176 insertions(+), 543 deletions(-)
+>
+>-- 
+>2.35.1
+>
 
