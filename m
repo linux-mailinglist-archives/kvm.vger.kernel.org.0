@@ -2,59 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B7C65EB280
-	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 22:43:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CD1B5EB2A3
+	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 22:50:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231261AbiIZUnA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 16:43:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48110 "EHLO
+        id S230147AbiIZUu0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 16:50:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231258AbiIZUms (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 16:42:48 -0400
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60361AD98C
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 13:42:19 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id q17so8766515lji.11
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 13:42:18 -0700 (PDT)
+        with ESMTP id S229998AbiIZUuY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 16:50:24 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 046DB4DB7D
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 13:50:23 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id i6so3690345pfb.2
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 13:50:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=eWz7y4gqTrIdFN6xc5A1usZceMWXooafBiB+O1iMCiw=;
-        b=kDlAe2LJCiG9zhqZzWWNXR6TmaeUeVewZJeQfpYwd6LjCpm3hTeZbhb58CjJBGocuH
-         tsS9Y5ggpNz6TAo9SV2tkZKUkCKau3tfrhVSW/XLB1JDB7HB4l3sEqLinsdsEgeTJ/zi
-         Yp+81eXcRg9M7XRIJlaJwwWhSD0AKsV3XoEbD5IGJYewnWrzYPVm4eNwPHf+/zpKHuQk
-         v86xcfqQyusE8/PZWwYJ1A5Ej38aKkX6K84QPJnXTz/dp+Ar4obQRdmW3IMeqQHJ5O9G
-         EsrLxTCshVWnK2Z2k4nCLLbr6WH/7t4LwgRkSqXUc2olU2k3zggbGcZohAhCglWdtKOF
-         01Fw==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=GaOhE9vDME2PjD2WBLnyx5X63AC8vEuVEpMFFTEj4yQ=;
+        b=Ecr+Q4IcXZCPBgp+sjDXwZ65SMQ6bk9vNHxFpN0mZZ2lJTBPO77trLkfQRd4sdyfFk
+         TG7/L86ZUDCGFy3xREquepd1gcDqTEJUYG9TG2WdHHvutyfU2rl0yMXmxtUbyg4Qkdxu
+         WX4KSOZ7+W3Xg/+efh2vmo58a+dd93KFQYyCqgLYcvHoPcAk3u5PbX2DZDJySmTWjlq7
+         8wke8DfCV6dMzMaa3mBRS9GSWEL1ge8B7a6M4+0llXGmzUv12ekNoklo6RAvgeTvojbJ
+         AdN8EZ5a3oOdmHvwUwBbCx79kZ1ktbhawdCH2Z+2LUShMzAzswUr//Nn7erTJqd2Kv2V
+         QJtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=eWz7y4gqTrIdFN6xc5A1usZceMWXooafBiB+O1iMCiw=;
-        b=YzczSqYzDAThFZATkNRrfnU5olxf7aDJbSZggY2QeirD0i3calWvOTIfHuWCntEaIi
-         n6Hcruc5QMsKXXztAvo19JWUcksT5dQY5wvsuJ8XOastbB22sNoB/z8bUymbtqv/eNLx
-         TS5CE/Q0IcFwG0EE8L4jkCs/bwiKaUo3q5mHu5ck3yrcd3bYseUbFEGLHAtgj8gaicdK
-         QKi/bUKYjqAjTnuCq9QHkKMeH8+qRyMhSExuDxEWdSUyHYRy2zkT2r4oBdo6jIJ5RD0+
-         bUuPmI5lx0UopGxwE3CJc1/o8SYV5kQR5YxsVTT1Sb05NnyGhhKVA8zug32l8jJoP4Vc
-         29UA==
-X-Gm-Message-State: ACrzQf3s/41Xp2UVofkGNbIp5oeaqvKuOOHXt8q4YJSf7poShgCn4H4N
-        1bikFEuXOiXZ28PW0FHDAJrLvrplyxYNwYDHg8Zuiw==
-X-Google-Smtp-Source: AMsMyM5WOHAjzROdaEqpfPFJf9/YcVg4kYX0KGB/bTCl40GOgkIHkXio1a9CJbGz4O9/oqXQ18B/7h6wZINlYAOjEEg=
-X-Received: by 2002:a2e:84ca:0:b0:25d:77e0:2566 with SMTP id
- q10-20020a2e84ca000000b0025d77e02566mr8779969ljh.78.1664224936638; Mon, 26
- Sep 2022 13:42:16 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=GaOhE9vDME2PjD2WBLnyx5X63AC8vEuVEpMFFTEj4yQ=;
+        b=vCcyOLKIFSpeQQr4ajofPS47ojxl5QGHy/kBNK351lNrly4KBVShZNDjD6X4gaQSjq
+         9h/reU05oVOhCLVN6zW4CEGW6TiOBKXq4EXAd43A0HMSn8LPbsRstN3qIRl4JxBjrVgB
+         eGQJ9uVhHiwzhlfyDlWO8rXG/KsQKpnmwxBvgW+yxahQWAGU5RijRscGWWwhNEfbBYqO
+         6zIK8x9H36ib3l36/y6nMwaLhdWN5cBVpvDTSCikUPvu8b4vVFlNA60JAajkKW0DEJs3
+         RaK60ZY3NDq2qHF3BTTwGBH9XTa5AERDSYFcRTkXS/MqZAcyVO00E9HKxjTwwAUAOk1g
+         kBcg==
+X-Gm-Message-State: ACrzQf2l8PC40tEgxodRpfq6TIRBe2/zmH7tTytUCW1LOhC95ejGh1jM
+        Gdls4MqXdmiaxQ7ZuF9Jx3SWjg==
+X-Google-Smtp-Source: AMsMyM7oYHTETsj+wCwud9S7htfS+SOy4QBAjARrseSiTqXDSVeylYtJ2VhFzgEDHDw/PdyNDk577A==
+X-Received: by 2002:a63:4750:0:b0:43c:dac:9e4b with SMTP id w16-20020a634750000000b0043c0dac9e4bmr21593513pgk.300.1664225422378;
+        Mon, 26 Sep 2022 13:50:22 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id x8-20020a170902a38800b00174ce512262sm11503296pla.182.2022.09.26.13.50.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Sep 2022 13:50:22 -0700 (PDT)
+Date:   Mon, 26 Sep 2022 20:50:18 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [PATCH] KVM: x86: Pass host's CPUID.16H through to
+ KVM_GET_SUPPORTED_CPUID
+Message-ID: <YzIQigG1cVLoHQvm@google.com>
+References: <20220923223338.483103-1-jmattson@google.com>
 MIME-Version: 1.0
-References: <20220922231724.3560211-1-dmatlack@google.com>
-In-Reply-To: <20220922231724.3560211-1-dmatlack@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Mon, 26 Sep 2022 13:41:40 -0700
-Message-ID: <CAHVum0cBvORZo1k0p2MQVZQ8tLddpjOmDrmfV19zuTLUYMjrpA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: selftests: Gracefully handle empty stack traces
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220923223338.483103-1-jmattson@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -66,61 +70,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 22, 2022 at 4:17 PM David Matlack <dmatlack@google.com> wrote:
->
-> Bail out of test_dump_stack() if the stack trace is empty rather than
-> invoking addr2line with zero addresses. The problem with the latter is
-> that addr2line will block waiting for addresses to be passed in via
-> stdin, e.g. if running a selftest from an interactive terminal.
->
-> Opportunistically fix up the comment that mentions skipping 3 frames
-> since only 2 are skipped in the code.
->
-> Cc: Vipin Sharma <vipinsh@google.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
->  tools/testing/selftests/kvm/lib/assert.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/lib/assert.c b/tools/testing/selftests/kvm/lib/assert.c
-> index 71ade6100fd3..c1ce54a41eca 100644
-> --- a/tools/testing/selftests/kvm/lib/assert.c
-> +++ b/tools/testing/selftests/kvm/lib/assert.c
-> @@ -42,12 +42,18 @@ static void test_dump_stack(void)
->         c = &cmd[0];
->         c += sprintf(c, "%s", addr2line);
->         /*
-> -        * Skip the first 3 frames: backtrace, test_dump_stack, and
-> -        * test_assert. We hope that backtrace isn't inlined and the other two
-> -        * we've declared noinline.
-> +        * Skip the first 2 frames, which should be test_dump_stack() and
-> +        * test_assert(); both of which are declared noinline.  Bail if the
-> +        * resulting stack trace would be empty. Otherwise, addr2line will block
-> +        * waiting for addresses to be passed in via stdin.
->          */
-> +       if (n <= 2) {
-> +               fputs("  (stack trace empty)\n", stderr);
-> +               return;
-> +       }
+On Fri, Sep 23, 2022, Jim Mattson wrote:
+> In the default configuration, the guest TSC frequency is the same as
+> the host TSC frequency. Similarly, the maximum frequency of the
+> virtual CPU is the same as the maximum frequency of the physical
+> CPU.
 
-Shouldn't this condition be put immediately after
-        n = backtrace(stack,n)
+Under the hood, yes, but after the VM is migrated, isn't it possible that the
+host frequencies are completely disjoint from the frequencies that are enumerated
+to the guest?
 
-It is more natural to check the return value when an API has returned.
+> Also, the bus (reference) frequency of the virtual CPU matches
+> that of the physical CPU.
+> 
+> Pass this information directly from host CPUID.16H to guest CPUID.16H
+> in KVM_GET_SUPPORTED_CPUID.
 
-Verified that this change does fix the issue. Thanks for the fix.
+What about "solving" this via documentation, same as CPUID.15H?  If the API were
+KVM_GET_DEFAULT_CPUID, then enumerating host properties makes sense, but from a
+very pedantic point of view, the "supported" frequencies are just about anything.
 
->         for (i = 2; i < n; i++)
->                 c += sprintf(c, " %lx", ((unsigned long) stack[i]) - 1);
-> +
->         c += sprintf(c, "%s", pipeline);
->  #pragma GCC diagnostic push
->  #pragma GCC diagnostic ignored "-Wunused-result"
->
-> base-commit: 372d07084593dc7a399bf9bee815711b1fb1bcf2
-> prerequisite-patch-id: 2e3661ba8856c29b769499bac525b6943d9284b8
-> prerequisite-patch-id: 1a148d98d96d73a520ed070260608ddf1bdd0f08
-> --
-> 2.37.3.998.g577e59143f-goog
->
+Somewhat of a moot point, as the leaf comes with "informational only" disclaimer.
+
+  The returned information should not be used for any other purpose as the returned
+  information does not accurately correlate to information / counters returned by
+  other processor interfaces.
