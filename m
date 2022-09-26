@@ -2,161 +2,285 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4ECC95EAC3A
-	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 18:15:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A3AB5EAC84
+	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 18:30:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236337AbiIZQPa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 12:15:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44234 "EHLO
+        id S229840AbiIZQaS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 12:30:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236330AbiIZQPB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 12:15:01 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 863983DF3D
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 08:03:43 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E9A6F1042;
-        Mon, 26 Sep 2022 08:03:49 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B42D93F66F;
-        Mon, 26 Sep 2022 08:03:41 -0700 (PDT)
-Date:   Mon, 26 Sep 2022 16:04:36 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Andrew Jones <andrew.jones@linux.dev>
-Cc:     pbonzini@redhat.com, thuth@redhat.com, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, nikos.nikoleris@arm.com
-Subject: Re: [kvm-unit-tests RFC PATCH 05/19] lib/alloc_phys: Remove locking
-Message-ID: <YzG/ZPLRsH4qwfnJ@monolith.localdoman>
-References: <20220809091558.14379-1-alexandru.elisei@arm.com>
- <20220809091558.14379-6-alexandru.elisei@arm.com>
- <20220920084553.734jvkqpognzgfpr@kamzik>
- <Yym+MOMK68K7abiQ@e121798.cambridge.arm.com>
- <20220920145952.fnftt2v46daigtdt@kamzik>
+        with ESMTP id S229652AbiIZQ3w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 12:29:52 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6B7611443
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 08:19:30 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id a10so7898509ljq.0
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 08:19:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=5+t0kf8gFUiFFnh/Q7NI1yZ0x97Y2cLvwCVBzXkQC40=;
+        b=Y5alOsje+V17Mvu/UEe7LvpZijxhzaul2BWGDT5bztSMyS9dMJlmavzjn+2deaq5tw
+         XvNm10CbZ4ZLITBQuIdLXCkRvPCo3ttVoMGyxzaON3gVItEvPjupvJPPUWnuX4u3O3tn
+         co73Ml8h2TBj2tZ3Q+cEwbmMhaCQyZnb/jmJORcXwiChwx+Tu1zvYoIOQ+pro7NVexxo
+         vWL6d8nrSBsIC6Mcn75pHch+puY3c+/i3igKsdBO2b6YYYhHXs9n3RQDStIPYiKWQRyr
+         lGrB/fhsUdaZ7+jLdk8uF+Qc0ur1rup4v+UwMl6mX5qWWYXjsMM4rzFwlIKmKZM9pxrk
+         cvoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=5+t0kf8gFUiFFnh/Q7NI1yZ0x97Y2cLvwCVBzXkQC40=;
+        b=hzm/6L96uawqe7VDgJXeJxplUbSu8uygzu0vzu9zVF+Od/ZCcJ3VU/gLhw7Nlnpi92
+         AlfDH6vl1PrvD9dPuoLErQpsvXiJFaEDhstT+1S3wPKVIeG3y8apoKu1O0zJqaITASSs
+         qESl81hZZ7lIdqueVqzI9IWLpgoaXksO5/HX6Rt18IhJJZoekvRDeFV/OY9Bq6XRPScT
+         Xb2+EAH2Afp70N54NMGuNI9h/JS+rBIXVwyElnt2tPU/9Q9uNSOtXo4lhEZpKBfiZqzH
+         QxUztSQJyjwlYR8Vyy6oSAvz6suZm3JLSkx1R2zUtyS78JTuAgPk2ErAbkVIuvY0noJy
+         8GPw==
+X-Gm-Message-State: ACrzQf3nMGG8oHKPaNo6QOqtun8b0K2XWLORBnt81A8c8y//TqrELjYg
+        SEgqwKH7EmrD7EwLqRR2DJP5OFj668fzntSv7w4xUA==
+X-Google-Smtp-Source: AMsMyM6+y6FU6UQ6FRNs597KPkJSz9uCZoF/CXoGwAr/mTWlHtClwgzOToRRC2voZPY2KOrU2AZgoD/DEnDfu92c2EM=
+X-Received: by 2002:a2e:983:0:b0:26c:5b0e:f5e4 with SMTP id
+ 125-20020a2e0983000000b0026c5b0ef5e4mr7720323ljj.502.1664205567769; Mon, 26
+ Sep 2022 08:19:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220920145952.fnftt2v46daigtdt@kamzik>
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <cover.1655761627.git.ashish.kalra@amd.com> <78e30b5a25c926fcfdcaafea3d484f1bb25f20b9.1655761627.git.ashish.kalra@amd.com>
+ <CAMkAt6rrGJ5DYTAJKFUTagN9i_opS8u5HPw5c_8NoyEjK7rYzA@mail.gmail.com>
+ <CABpDEum157s5+yQvikjwQRaOcxau27NkMzX9eCs9=HFOW5FYnA@mail.gmail.com>
+ <0716365f-3572-638b-e841-fcce7d30571a@amd.com> <CABpDEu=quPsv6cXfbvpsGS2N+5Pcw7inCfmv=sx3-VaK0UE76g@mail.gmail.com>
+ <8113b5d4-31c6-012c-fc0c-78a9bdbb1e69@amd.com> <31c1b2bb-b43a-709a-2b7e-0e945b9e8bb7@amd.com>
+In-Reply-To: <31c1b2bb-b43a-709a-2b7e-0e945b9e8bb7@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Mon, 26 Sep 2022 09:19:15 -0600
+Message-ID: <CAMkAt6o=G7W3pRgVYiBKK5RjQskMfzL_9me2Hcr7_e9rTHuStw@mail.gmail.com>
+Subject: Re: [PATCH Part2 v6 37/49] KVM: SVM: Add support to handle MSR based
+ Page State Change VMGEXIT
+To:     Ashish Kalra <ashkalra@amd.com>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Alper Gun <alpergun@google.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>, Marc Orr <marcorr@google.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jarkko@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        T_FILL_THIS_FORM_SHORT,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Mon, Sep 19, 2022 at 5:47 PM Ashish Kalra <ashkalra@amd.com> wrote:
+>
+>
+> On 9/19/22 22:18, Tom Lendacky wrote:
+> > On 9/19/22 17:02, Alper Gun wrote:
+> >> On Mon, Sep 19, 2022 at 2:38 PM Tom Lendacky
+> >> <thomas.lendacky@amd.com> wrote:
+> >>>
+> >>> On 9/19/22 12:53, Alper Gun wrote:
+> >>>> On Fri, Aug 19, 2022 at 9:54 AM Peter Gonda <pgonda@google.com> wrote:
+> >>>>>
+> >>>>>> +
+> >>>>>> +static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu,
+> >>>>>> enum psc_op op, gpa_t gpa,
+> >>>>>> +                                         int level)
+> >>>>>> +{
+> >>>>>> +       struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
+> >>>>>> +       struct kvm *kvm = vcpu->kvm;
+> >>>>>> +       int rc, npt_level;
+> >>>>>> +       kvm_pfn_t pfn;
+> >>>>>> +       gpa_t gpa_end;
+> >>>>>> +
+> >>>>>> +       gpa_end = gpa + page_level_size(level);
+> >>>>>> +
+> >>>>>> +       while (gpa < gpa_end) {
+> >>>>>> +               /*
+> >>>>>> +                * If the gpa is not present in the NPT then
+> >>>>>> build the NPT.
+> >>>>>> +                */
+> >>>>>> +               rc = snp_check_and_build_npt(vcpu, gpa, level);
+> >>>>>> +               if (rc)
+> >>>>>> +                       return -EINVAL;
+> >>>>>> +
+> >>>>>> +               if (op == SNP_PAGE_STATE_PRIVATE) {
+> >>>>>> +                       hva_t hva;
+> >>>>>> +
+> >>>>>> +                       if (snp_gpa_to_hva(kvm, gpa, &hva))
+> >>>>>> +                               return -EINVAL;
+> >>>>>> +
+> >>>>>> +                       /*
+> >>>>>> +                        * Verify that the hva range is
+> >>>>>> registered. This enforcement is
+> >>>>>> +                        * required to avoid the cases where a
+> >>>>>> page is marked private
+> >>>>>> +                        * in the RMP table but never gets
+> >>>>>> cleanup during the VM
+> >>>>>> +                        * termination path.
+> >>>>>> +                        */
+> >>>>>> +                       mutex_lock(&kvm->lock);
+> >>>>>> +                       rc = is_hva_registered(kvm, hva,
+> >>>>>> page_level_size(level));
+> >>>>>> +                       mutex_unlock(&kvm->lock);
+> >>>>>> +                       if (!rc)
+> >>>>>> +                               return -EINVAL;
+> >>>>>> +
+> >>>>>> +                       /*
+> >>>>>> +                        * Mark the userspace range unmerable
+> >>>>>> before adding the pages
+> >>>>>> +                        * in the RMP table.
+> >>>>>> +                        */
+> >>>>>> +                       mmap_write_lock(kvm->mm);
+> >>>>>> +                       rc = snp_mark_unmergable(kvm, hva,
+> >>>>>> page_level_size(level));
+> >>>>>> +                       mmap_write_unlock(kvm->mm);
+> >>>>>> +                       if (rc)
+> >>>>>> +                               return -EINVAL;
+> >>>>>> +               }
+> >>>>>> +
+> >>>>>> +               write_lock(&kvm->mmu_lock);
+> >>>>>> +
+> >>>>>> +               rc = kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn,
+> >>>>>> &npt_level);
+> >>>>>> +               if (!rc) {
+> >>>>>> +                       /*
+> >>>>>> +                        * This may happen if another vCPU
+> >>>>>> unmapped the page
+> >>>>>> +                        * before we acquire the lock. Retry the
+> >>>>>> PSC.
+> >>>>>> +                        */
+> >>>>>> + write_unlock(&kvm->mmu_lock);
+> >>>>>> +                       return 0;
+> >>>>>> +               }
+> >>>>>
+> >>>>> I think we want to return -EAGAIN or similar if we want the caller to
+> >>>>> retry, right? I think returning 0 here hides the error.
+> >>>>>
+> >>>>
+> >>>> The problem here is that the caller(linux guest kernel) doesn't retry
+> >>>> if PSC fails. The current implementation in the guest kernel is that
+> >>>> if a page state change request fails, it terminates the VM with
+> >>>> GHCB_TERM_PSC reason.
+> >>>> Returning 0 here is not a good option because it will fail the PSC
+> >>>> silently and will probably cause a nested RMP fault later. Returning
+> >>>
+> >>> Returning 0 here is ok because the PSC current index into the PSC
+> >>> structure will not be updated and the guest will then retry (see the
+> >>> loop
+> >>> in vmgexit_psc() in arch/x86/kernel/sev.c).
+> >>>
+> >>> Thanks,
+> >>> Tom
+> >>
+> >> But the host code updates the index. It doesn't leave the loop because
+> >> rc is 0. The guest will think that it is successful.
+> >> rc = __snp_handle_page_state_change(vcpu, op, gpa, level);
+> >> if (rc)
+> >> goto out;
+> >>
+> >> Also the page state change request with MSR is not retried. It
+> >> terminates the VM if the MSR request fails.
+> >
+> > Ah, right. I see what you mean. It should probably return a -EAGAIN
+> > instead of 0 and then the if (rc) check should be modified to
+> > specifically look for -EAGAIN and goto out after setting rc to 0.
+> >
+> > But that does leave the MSR protocol open to the problem that you
+> > mention, so, yes, retry logic in snp_handle_page_state_change() for a
+> > -EAGAIN seems reasonable.
+> >
+> > Thanks,
+> > Tom
+>
+> I believe it makes more sense to add the retry logic within
+> __snp_handle_page_state_change() itself, as that will make it work for
+> both the GHCB MSR protocol and the GHCB VMGEXIT requests.
 
-On Tue, Sep 20, 2022 at 04:59:52PM +0200, Andrew Jones wrote:
-> On Tue, Sep 20, 2022 at 02:20:48PM +0100, Alexandru Elisei wrote:
-> > Hi,
-> > 
-> > On Tue, Sep 20, 2022 at 10:45:53AM +0200, Andrew Jones wrote:
-> > > On Tue, Aug 09, 2022 at 10:15:44AM +0100, Alexandru Elisei wrote:
-> > > > With powerpc moving the page allocator, there are no architectures left
-> > > > which use the physical allocator after the boot setup:  arm, arm64,
-> > > > s390x and powerpc drain the physical allocator to initialize the page
-> > > > allocator; and x86 calls setup_vm() to drain the allocator for each of
-> > > > the tests that allocate memory.
-> > > 
-> > > Please put the motivation for this change in the commit message. I looked
-> > > ahead at the next patch to find it, but I'm not sure I agree with it. We
-> > > should be able to keep the locking even when used early, since we probably
-> > > need our locking to be something we can use early elsewhere anyway.
-> > 
-> > You are correct, the commit message doesn't explain why locking is removed,
-> > which makes the commit confusing. I will try to do a better job for the
-> > next iteration (if we decide to keep this patch).
-> > 
-> > I removed locking because the physical allocator by the end of the series
-> > will end up being used only by arm64 to create the idmap, which is done on
-> 
-> If only arm, and no unit tests, needs the phys allocator, then it can be
-> integrated with whatever arm is using it for and removed from the general
-> lib.
+You are suggesting we just retry 'kvm_mmu_get_tdp_walk' inside of
+__snp_handle_page_state_change()? That should work but how many times
+do we retry? If we return EAGAIN or error we can leave it up to the
+caller
 
-I kept the allocator in lib because I thought that RISC-V might have an use
-for it. Since it's a RISC architecture, I was thinking that it also might
-require software cache management around enabling/disabling the MMU. But in
-the end it's up to you, it would be easy to move the physical allocator to
-lib/arm if you think that is best.
-
-> 
-> > the boot CPU and with the MMU off. After that, the translation table
-> > allocator functions will use the page allocator, which can be used
-> > concurrently.
-> > 
-> > Looking at the spinlock implementation, spin_lock() doesn't protect from
-> > the concurrent accesses when the MMU is disabled (lock->v is
-> > unconditionally set to 1). Which means that spin_lock() does not work (in
-> > the sense that it doesn't protect against concurrent accesses) on the boot
-> > path, which doesn't need a spinlock anyway, because no secondaries are
-> > online secondaries. It also means that spinlocks don't work when
-> > AUXINFO_MMU_OFF is set. So for the purpose of simplicity I preferred to
-> > drop it entirely.
-> 
-> If other architectures or unit tests have / could have uses for the
-> phys allocator then we should either document that it doesn't have
-> locks or keep the locks, and arm will just know that they don't work,
-> but also that they don't need to for its purposes.
-
-I will write a comment explaining the baked in assumptions for the
-allocator.
-
-> 
-> Finally, if we drop the locks and arm doesn't have any other places where
-> we use locks without the MMU enabled, then we can change the lock
-> implementation to not have the no-mmu fallback - maybe by switching to the
-> generic implementation as the other architectures have done.
-
-The architecture mandates that load-acquire/store-release instructions are
-supported only on Normal memory (to be more precise, Inner Shareable, Inner
-Write-Back, Outer Write-Back Normal memory with Read allocation hints and
-Write allocation hints and not transient and Outer Shareable, Inner
-Write-Back, Outer Write-Back Normal memory with Read allocation hints and
-Write allocation hints and not transient, ARM DDI 0487H.a, pages B2-211 and
-B2-212).
-
-If the AUXINFO_MMU_OFF flag is set, kvm-unit-tests doesn't enable the MMU
-at boot, which means that all tests can be run with the MMU disabled. In
-this case, all memory is Device-nGnRnE (instead of Normal). By using an
-implementation that doesn't take into account that spin_lock() might be
-called with the MMU disabled, kvm-unit-tests will end up using exclusive
-access instructions on memory which doesn't support it. This can have
-various effects, all rather unpleasant, like causing an external abort or
-treating the exclusive access instruction as a NOP (ARM DDI 0487H.a, page
-B2-212).
-
-Tested this on my rockpro64 board, kvm-unit-tests built from current
-master, with the mmu_disabled() path removed from spin_lock() (and
-AUXINFO_MMU_OFF flag set), all tests hang indefinitely, that's because
-phys_alloc_init() uses a spinlock. It is conceivable that we could rework
-the setup code to remove the usage of spinlocks, but it's still the matter
-of tests needing one for synchronization. It's also the matter of the uart
-needing one for puts. And report. And probably other places.
-
-Out of curiosity, without setting the AUXINFO_MMU_OFF flag, I tried using
-the generic version of the spinlock (I assume you mean the one from
-lib/asm-generic/spinlock.h, changed lib/arm64/asm/spinlock.h to include the
-above header), selftest-setup hangs without displaying anything before
-phys_alloc_init(), I have no idea why that is.
-
-In the current implementation, when AUXINFO_MMU_OFF is set, tests that
-actually use more than one thread might end up being incorrect some of the
-time because spin_lock() doesn't protect against concurrent accesses.
-That's pretty bad, but I think the alternative off all tests hanging
-indefinitely is worse.
-
-In my opinion, the current spinlock implementation is incorrect when the
-MMU is disabled, but using a generic implementation is worse. I guess
-another thing to put on the TODO list.  Arm ARM recommends Lamport’s Bakery
-algorithm for mutual exclusion and we could try to implement that for the
-MMU disabled case, but I don't see much interest at the moment in running
-tests with the MMU disabled.
-
-Thanks,
-Alex
-
-> 
-> Thanks,
-> drew
+>
+> Thanks, Ashish
+>
+> >
+> >>
+> >>>
+> >>>> an error also terminates the guest immediately with current guest
+> >>>> implementation. I think the best approach here is adding a retry logic
+> >>>> to this function. Retrying without returning an error should help it
+> >>>> work because snp_check_and_build_npt will be called again and in the
+> >>>> second attempt this should work.
+> >>>>
+> >>>>>> +
+> >>>>>> +               /*
+> >>>>>> +                * Adjust the level so that we don't go higher
+> >>>>>> than the backing
+> >>>>>> +                * page level.
+> >>>>>> +                */
+> >>>>>> +               level = min_t(size_t, level, npt_level);
+> >>>>>> +
+> >>>>>> +               trace_kvm_snp_psc(vcpu->vcpu_id, pfn, gpa, op,
+> >>>>>> level);
+> >>>>>> +
+> >>>>>> +               switch (op) {
+> >>>>>> +               case SNP_PAGE_STATE_SHARED:
+> >>>>>> +                       rc = snp_make_page_shared(kvm, gpa, pfn,
+> >>>>>> level);
+> >>>>>> +                       break;
+> >>>>>> +               case SNP_PAGE_STATE_PRIVATE:
+> >>>>>> +                       rc = rmp_make_private(pfn, gpa, level,
+> >>>>>> sev->asid, false);
+> >>>>>> +                       break;
+> >>>>>> +               default:
+> >>>>>> +                       rc = -EINVAL;
+> >>>>>> +                       break;
+> >>>>>> +               }
+> >>>>>> +
+> >>>>>> +               write_unlock(&kvm->mmu_lock);
+> >>>>>> +
+> >>>>>> +               if (rc) {
+> >>>>>> +                       pr_err_ratelimited("Error op %d gpa %llx
+> >>>>>> pfn %llx level %d rc %d\n",
+> >>>>>> +                                          op, gpa, pfn, level, rc);
+> >>>>>> +                       return rc;
+> >>>>>> +               }
+> >>>>>> +
+> >>>>>> +               gpa = gpa + page_level_size(level);
+> >>>>>> +       }
+> >>>>>> +
+> >>>>>> +       return 0;
+> >>>>>> +}
+> >>>>>> +
