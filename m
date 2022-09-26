@@ -2,108 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E61EA5EA897
-	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 16:38:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D5BDA5EA8EC
+	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 16:48:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235054AbiIZOiF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 10:38:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35888 "EHLO
+        id S235029AbiIZOsO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 10:48:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234696AbiIZOhc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 10:37:32 -0400
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1196B4D24F
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 05:56:35 -0700 (PDT)
-Received: by mail-ej1-x633.google.com with SMTP id hy2so13834734ejc.8
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 05:56:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=rz3mlN4KbQjImCM3wC+X2Jb9p/lxfW4IHRyyTjdAQXE=;
-        b=MMoyS0pHXmUTBqpuFERSTIQXL+fMgIz3LnDzhbqDMbLxfuuuggs/e3Ywr/g/uqfVms
-         ShdH1N0tM2D7xliAYRg3PFqEKUKByrlFEoVdfWdiAaGMTSsr3DqOgYfPi5J2EgNy3SQZ
-         EgT/u2TC6/7H2CQEMfphl/bSVKpiXS7CfMcQx7XH1fYYVUgesA8q8i0FO+AQkzBVUbxu
-         HZSJIToH96Ua/xfWc/QXLBt5nK0BSOUNKAvbrcQRFJOxhLUXy5SOxzAicIqNmYe6Kc75
-         7aViVYLkQt72HVq9GNqxF7+yH94vHfSo2NWeCJVsubtDG8hxsT0lKZU7Shu2+EVGkgvF
-         2b6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=rz3mlN4KbQjImCM3wC+X2Jb9p/lxfW4IHRyyTjdAQXE=;
-        b=EkXnqklvqX14uM/OvqT70pJcFm39wcVA8rq/Hb2/ZYmNrI5rpOwf7zg19c1YZhvHQP
-         Yp02tzxa/wPahcnNlXjVD4Jn44oY7udJquJ1hE6k/aEpRAR07OysipS5IuE7e1YjeaTm
-         jCEUcpNInySGHwf3al4Ro0wEc0Ls9l9crOQ6mxSZiDitR5+NrbrAsnF8Fo9Wg+ROT2Tb
-         fkZ/8n+Cw4HaU/64II+I6NEGpZLuwVrmpNMO6ByToBshGTBlZRstjBAiyjJZbplhnAPW
-         qkBqx4DVpz4c8bpv/sKn5wbiW5fKbOvGZ4cVAJ7160XYnod9vvplhznQ9Y1ySFrDaCJZ
-         3BwA==
-X-Gm-Message-State: ACrzQf1xNU1X8DMfb1es0Tv4+dEGc/LJIN75mxMwt0GuKgNtQ5nLYamQ
-        kliKpMrcsGlb99d9KUj1yGl+M5SU5G8eDrv1nr3roA==
-X-Google-Smtp-Source: AMsMyM6rAl/HCo4G1FcZNnsCazKAx7CoRu+Sy0E+RdwAgd/vxPaeIqwqU/A20MFL9vXBDGJ+QRoVpwqBURqiBDt+YCE=
-X-Received: by 2002:a17:906:8a6b:b0:780:ab37:b63 with SMTP id
- hy11-20020a1709068a6b00b00780ab370b63mr17676870ejc.365.1664196993426; Mon, 26
- Sep 2022 05:56:33 -0700 (PDT)
+        with ESMTP id S234674AbiIZOrs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 10:47:48 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C05F6B1D4;
+        Mon, 26 Sep 2022 06:12:42 -0700 (PDT)
+Received: from zn.tnic (p200300ea9733e74d329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e74d:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id ED5171EC051E;
+        Mon, 26 Sep 2022 15:12:35 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1664197956;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=WoAsNIjxtOydRj3E9e8AKmT+MPVf0jUVuDQQzfJocNg=;
+        b=YlkrwAcwyMQjQRO0wTBEUyoDvIIogt7PwJBqH9c6yVxgqYlhBY5xt3oHREab1EXAgd1+Jt
+        ajd5Z6pFsRNvdhCy0jlBQv3Pytt9U52OucBWsQsAJGfx18Xvd1FQyx1QD2bygaB9ytBcb2
+        ccjY1VjlLyZmDeDfFXjwOze/QNV1TC0=
+Date:   Mon, 26 Sep 2022 15:12:32 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Jane Malalane <jane.malalane@citrix.com>,
+        Kees Cook <keescook@chromium.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        linux-perf-users@vger.kernel.org,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH v2 1/5] perf/x86/intel/lbr: use setup_clear_cpu_cap
+ instead of clear_cpu_cap
+Message-ID: <YzGlQBkCSJxY+8Jf@zn.tnic>
+References: <20220718141123.136106-1-mlevitsk@redhat.com>
+ <20220718141123.136106-2-mlevitsk@redhat.com>
+ <Yyh9RDbaRqUR1XSW@zn.tnic>
+ <c105971a72dfe6d46ad75fb7e71f79ba716e081c.camel@redhat.com>
 MIME-Version: 1.0
-References: <20220902172737.170349-1-mjrosato@linux.ibm.com>
- <20220902172737.170349-2-mjrosato@linux.ibm.com> <597a2761-f718-4a2c-c012-a0d25bf3c7fb@redhat.com>
-In-Reply-To: <597a2761-f718-4a2c-c012-a0d25bf3c7fb@redhat.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Mon, 26 Sep 2022 13:56:22 +0100
-Message-ID: <CAFEAcA-8zWssi4TVF5TvHet9gxNkRvNreW6-hmTR0DgOu53Msw@mail.gmail.com>
-Subject: Re: [PATCH v8 1/8] linux-headers: update to 6.0-rc3
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     Matthew Rosato <mjrosato@linux.ibm.com>, qemu-s390x@nongnu.org,
-        richard.henderson@linaro.org,
-        "Daniel P. Berrange" <berrange@redhat.com>,
-        alex.williamson@redhat.com, schnelle@linux.ibm.com,
-        cohuck@redhat.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        david@redhat.com, pasic@linux.ibm.com, borntraeger@linux.ibm.com,
-        mst@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <c105971a72dfe6d46ad75fb7e71f79ba716e081c.camel@redhat.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 26 Sept 2022 at 13:53, Thomas Huth <thuth@redhat.com> wrote:
+On Tue, Sep 20, 2022 at 11:20:47AM +0300, Maxim Levitsky wrote:
+> If I understand that correctly, the difference between clear_cpu_cap and setup_clear_cpu_cap
+> is that setup_clear_cpu_cap should be called early when only the boot cpu is running and it 
 >
-> On 02/09/2022 19.27, Matthew Rosato wrote:
-> > Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> > ---
-> ...
-> > diff --git a/linux-headers/asm-x86/kvm.h b/linux-headers/asm-x86/kvm.h
-> > index bf6e96011d..46de10a809 100644
-> > --- a/linux-headers/asm-x86/kvm.h
-> > +++ b/linux-headers/asm-x86/kvm.h
-> > @@ -198,13 +198,13 @@ struct kvm_msrs {
-> >       __u32 nmsrs; /* number of msrs in entries */
-> >       __u32 pad;
-> >
-> > -     struct kvm_msr_entry entries[0];
-> > +     struct kvm_msr_entry entries[];
-> >   };
->
-> Yuck, this fails to compile with Clang:
->
->   https://gitlab.com/thuth/qemu/-/jobs/3084427423#L2206
->
->   ../target/i386/kvm/kvm.c:470:25: error: field 'info' with variable sized
-> type 'struct kvm_msrs' not at the end of a struct or class is a GNU
-> extension [-Werror,-Wgnu-variable-sized-type-not-at-end]
->          struct kvm_msrs info;
->                          ^
->
-> Anybody any ideas how to fix this best? Simply disable the compiler warning
-> in QEMU?
+> 1. works on 'boot_cpu_data' which represents the boot cpu.
+> 2. sets a bit in 'cpu_caps_cleared' which are later applied to all CPUs, including these that are hotplugged.
 
-There's already a patchset on list that does that:
-https://patchew.org/QEMU/20220915091035.3897-1-chenyi.qiang@intel.com/
+Yes.
 
-thanks
--- PMM
+> On the other hand the clear_cpu_cap just affects the given 'struct cpuinfo_x86'.
+
+Yes.
+
+> Call of 'clear_cpu_cap(&boot_cpu_data, X86_FEATURE_ARCH_LBR)' is weird since it still affects 'boot_cpu_data'
+> but doesn't affect 'cpu_caps_cleared'
+
+Yes.
+
+> I assumed that this was a mistake and the intention was to disable the feature on all CPUs.
+
+peterz says yes.
+
+> I need this patch because in the next patch, I change the clear_cpu_cap such as it detects being
+> called on boot_cpu_data and in this case also clears bits in 'cpu_caps_cleared', thus
+> while this patch does introduce a functional change, the next patch doesn't since this is the only
+> place where clear_cpu_cap is called explicitly on 'boot_cpu_data'
+
+This is not needed - this patch doing setup_clear_cpu_cap() should suffice.
+
+But, there must be something you're fixing with this. Which is it? Some
+weird virt config?
+
+> I do now notice that initcalls are run after smp is initialized, which
+> means that this code doesn't really disable the CPUID feature on all
+> CPUs at all.
+
+Well, not exactly. There's do_pre_smp_calls() which is where the
+early_initcall() thing is run.
+
+So setup_clear_cpu_cap() will make sure that the feature bit is cleared
+when the APs come online.
+
+Do you have a virt configuration where you can test this case where the
+feature flag is clear on all CPUs when it fails?
+
+I.e., "arch_lbr" will disappear in /proc/cpuinfo completely.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
