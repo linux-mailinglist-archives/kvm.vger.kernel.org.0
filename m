@@ -2,130 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E4F055EAD3D
-	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 18:55:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 780125EAD4C
+	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 18:57:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230032AbiIZQzN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 12:55:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54124 "EHLO
+        id S230024AbiIZQ5L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 12:57:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229898AbiIZQyt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 12:54:49 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D931A47C;
-        Mon, 26 Sep 2022 08:48:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1664207320; x=1695743320;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=BSqCeRy7/n93LT8fIhy5SYrIqEP2/I0vvdbmBAF90pk=;
-  b=joxqlrNKIatUTJJ1IDMvV70/VA3BabQLpNxV2DVnppyP3K4+d7xHt85F
-   PiyKFL7ApCAxCsRMCrkhi/G9PR+CnB9nHvsNVmGHdfckwWRxt9h2tnN9m
-   qZX+LbAsJq4y4nm7mdSgLbmTQdneCueAbFSUOLnZsGATjC+9M0tPNIubd
-   R2bwQqkVboiqDHPW2ZlJzDt9xLm6tx2zxcDXjlLkvelwMzy9VoMXwfl/m
-   mLA1KipK8VP1B6RonJtLb5WZGOAzI2VF+u/i9kNJ/N+IswySeccOQH6Iz
-   SIBYvAyltJktVb1UBeAmIvxVpR2g3GCkkQCCBU7tGt//KBF6FSOf5Wthg
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10482"; a="280788694"
-X-IronPort-AV: E=Sophos;i="5.93,346,1654585200"; 
-   d="scan'208";a="280788694"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2022 08:48:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10482"; a="683577771"
-X-IronPort-AV: E=Sophos;i="5.93,346,1654585200"; 
-   d="scan'208";a="683577771"
-Received: from linux.intel.com ([10.54.29.200])
-  by fmsmga008.fm.intel.com with ESMTP; 26 Sep 2022 08:48:39 -0700
-Received: from [10.252.214.241] (kliang2-mobl1.ccr.corp.intel.com [10.252.214.241])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by linux.intel.com (Postfix) with ESMTPS id DF42F580979;
-        Mon, 26 Sep 2022 08:48:37 -0700 (PDT)
-Message-ID: <62d4bec1-a0c3-3b01-61bb-f284eede6378@linux.intel.com>
-Date:   Mon, 26 Sep 2022 11:48:36 -0400
+        with ESMTP id S229950AbiIZQ4v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 12:56:51 -0400
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF50E6C761
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 08:52:22 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id g20so7931871ljg.7
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 08:52:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=x4NTypTBJW4b7REu+E6eGP25pHpiqubalYhFPom5anA=;
+        b=nyBYl3et3D/Hwg0PXcmhDbdFVdgPs3wT1T5m4FWqxqT5warTXHeLblDbQ/PO42CWGY
+         jbpOwM8f7b+hUVCjTVqEffZDcvNQvdlgXth8PswhOzbaHGeI6lrVsgAHqFlK93PKl3Ai
+         29wu0qn3ZcEfauxpueUyETsbUfSS3n0CXd8kORVyU3Uk9W+0ddF1wH325LwJztuinsWa
+         lNrIfEakQ6yL4BBqZDrJojilF7V7sSd37sQ8L03NWeQ320JAVL8LJpzI5X3t8KB5QrvI
+         KVgePx51bdk4JXI/uNiFSoF+7/stF86Grk0vLeOtU1pn4URzIXpZfxGdKpM0y4tu7MVO
+         9wDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=x4NTypTBJW4b7REu+E6eGP25pHpiqubalYhFPom5anA=;
+        b=iQmISENB8qSqxbcac2R6S/P9qMwWS4ULAbUsbLyIXFHZ2DTMgm3pRXvYdR0/PAy73/
+         yYemfkcAmFxmGm2P4ncaRV7eWSE9JA4JmFZbH6VwlkznHnMJgIyGHfe8WWwbq8sviMQN
+         LrTeU6GquosFV1vZA9RWItj9tedSarlfCyxNKFCsYdfMLQ7zKvsyIkoACgto/KzMlVUr
+         kyhSMnet2xYxBdUt9L+znGWauO6PIp5LDM0C7+UqxxIwhCoidLKw5dfxBlW8iOCajLoo
+         GiWkXuC9W/dMmvgMnzKCBWtBR1/5bN/q5cF1+JbymWyL44UDRfSztT2f6pKU3/tb2V5E
+         gOxA==
+X-Gm-Message-State: ACrzQf0UVLq2S665NrV7lag15SDoae3g3HQVhDiTbaygpTy55qP1QNRQ
+        wokgFoSG+JBGPNshDA2Id3+rJulFa0gMIhBDRRzGvQ==
+X-Google-Smtp-Source: AMsMyM4TnPZUbURsP5BnRXq8d6hA/qshAGD43sNBUgtRFJmy1zG4ZPjO55nhnzDzvSMBCXJWhr1o64pz5goInSn46Ck=
+X-Received: by 2002:a05:651c:1508:b0:26c:622e:abe1 with SMTP id
+ e8-20020a05651c150800b0026c622eabe1mr7742402ljf.228.1664207540822; Mon, 26
+ Sep 2022 08:52:20 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [RFC PATCH v2 2/3] perf/x86/intel/pt: Introduce and export
- pt_get_curr_event()
-Content-Language: en-US
-To:     "Wang, Wei W" <wei.w.wang@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     "Li, Xiaoyao" <xiaoyao.li@intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        "Christopherson,, Sean" <seanjc@google.com>,
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-2-chao.p.peng@linux.intel.com> <d16284f5-3493-2892-38e6-f1fa5c10bdbb@redhat.com>
+ <Yyi+l3+p9lbBAC4M@google.com> <CA+EHjTzy4iOxLF=5UX=s5v6HSB3Nb1LkwmGqoKhp_PAnFeVPSQ@mail.gmail.com>
+ <20220926142330.GC2658254@chaop.bj.intel.com>
+In-Reply-To: <20220926142330.GC2658254@chaop.bj.intel.com>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Mon, 26 Sep 2022 16:51:44 +0100
+Message-ID: <CA+EHjTz5yGhsxUug+wqa9hrBO60Be0dzWeWzX00YtNxin2eYHg@mail.gmail.com>
+Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        "linux-perf-users@vger.kernel.org" <linux-perf-users@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <20220921164521.2858932-1-xiaoyao.li@intel.com>
- <20220921164521.2858932-3-xiaoyao.li@intel.com>
- <175b518c-d202-644e-a3a7-67e877852548@linux.intel.com>
- <DS0PR11MB6373C84139621DC447D3F466DC4E9@DS0PR11MB6373.namprd11.prod.outlook.com>
- <Yyxke/IO+AP4EWwT@hirez.programming.kicks-ass.net>
- <DS0PR11MB637346E9F224C5330CDEF3BFDC4E9@DS0PR11MB6373.namprd11.prod.outlook.com>
- <YyxsnAFYMLn2U9BT@hirez.programming.kicks-ass.net>
- <DS0PR11MB63730A85E00683AB7F6F3E26DC4E9@DS0PR11MB6373.namprd11.prod.outlook.com>
-From:   "Liang, Kan" <kan.liang@linux.intel.com>
-In-Reply-To: <DS0PR11MB63730A85E00683AB7F6F3E26DC4E9@DS0PR11MB6373.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
+On Mon, Sep 26, 2022 at 3:28 PM Chao Peng <chao.p.peng@linux.intel.com> wrote:
+>
+> On Fri, Sep 23, 2022 at 04:19:46PM +0100, Fuad Tabba wrote:
+> > > Regarding pKVM's use case, with the shim approach I believe this can be done by
+> > > allowing userspace mmap() the "hidden" memfd, but with a ton of restrictions
+> > > piled on top.
+> > >
+> > > My first thought was to make the uAPI a set of KVM ioctls so that KVM could tightly
+> > > tightly control usage without taking on too much complexity in the kernel, but
+> > > working through things, routing the behavior through the shim itself might not be
+> > > all that horrific.
+> > >
+> > > IIRC, we discarded the idea of allowing userspace to map the "private" fd because
+> > > things got too complex, but with the shim it doesn't seem _that_ bad.
+> > >
+> > > E.g. on the memfd side:
+> > >
+> > >   1. The entire memfd must be mapped, and at most one mapping is allowed, i.e.
+> > >      mapping is all or nothing.
+> > >
+> > >   2. Acquiring a reference via get_pfn() is disallowed if there's a mapping for
+> > >      the restricted memfd.
+> > >
+> > >   3. Add notifier hooks to allow downstream users to further restrict things.
+> > >
+> > >   4. Disallow splitting VMAs, e.g. to force userspace to munmap() everything in
+> > >      one shot.
+> > >
+> > >   5. Require that there are no outstanding references at munmap().  Or if this
+> > >      can't be guaranteed by userspace, maybe add some way for userspace to wait
+> > >      until it's ok to convert to private?  E.g. so that get_pfn() doesn't need
+> > >      to do an expensive check every time.
+> > >
+> > >   static int memfd_restricted_mmap(struct file *file, struct vm_area_struct *vma)
+> > >   {
+> > >         if (vma->vm_pgoff)
+> > >                 return -EINVAL;
+> > >
+> > >         if ((vma->vm_end - vma->vm_start) != <file size>)
+> > >                 return -EINVAL;
+> > >
+> > >         mutex_lock(&data->lock);
+> > >
+> > >         if (data->has_mapping) {
+> > >                 r = -EINVAL;
+> > >                 goto err;
+> > >         }
+> > >         list_for_each_entry(notifier, &data->notifiers, list) {
+> > >                 r = notifier->ops->mmap_start(notifier, ...);
+> > >                 if (r)
+> > >                         goto abort;
+> > >         }
+> > >
+> > >         notifier->ops->mmap_end(notifier, ...);
+> > >         mutex_unlock(&data->lock);
+> > >         return 0;
+> > >
+> > >   abort:
+> > >         list_for_each_entry_continue_reverse(notifier &data->notifiers, list)
+> > >                 notifier->ops->mmap_abort(notifier, ...);
+> > >   err:
+> > >         mutex_unlock(&data->lock);
+> > >         return r;
+> > >   }
+> > >
+> > >   static void memfd_restricted_close(struct vm_area_struct *vma)
+> > >   {
+> > >         mutex_lock(...);
+> > >
+> > >         /*
+> > >          * Destroy the memfd and disable all future accesses if there are
+> > >          * outstanding refcounts (or other unsatisfied restrictions?).
+> > >          */
+> > >         if (<outstanding references> || ???)
+> > >                 memfd_restricted_destroy(...);
+> > >         else
+> > >                 data->has_mapping = false;
+> > >
+> > >         mutex_unlock(...);
+> > >   }
+> > >
+> > >   static int memfd_restricted_may_split(struct vm_area_struct *area, unsigned long addr)
+> > >   {
+> > >         return -EINVAL;
+> > >   }
+> > >
+> > >   static int memfd_restricted_mapping_mremap(struct vm_area_struct *new_vma)
+> > >   {
+> > >         return -EINVAL;
+> > >   }
+> > >
+> > > Then on the KVM side, its mmap_start() + mmap_end() sequence would:
+> > >
+> > >   1. Not be supported for TDX or SEV-SNP because they don't allow adding non-zero
+> > >      memory into the guest (after pre-boot phase).
+> > >
+> > >   2. Be mutually exclusive with shared<=>private conversions, and is allowed if
+> > >      and only if the entire gfn range of the associated memslot is shared.
+> >
+> > In general I think that this would work with pKVM. However, limiting
+> > private<->shared conversions to the granularity of a whole memslot
+> > might be difficult to handle in pKVM, since the guest doesn't have the
+> > concept of memslots. For example, in pKVM right now, when a guest
+> > shares back its restricted DMA pool with the host it does so at the
+> > page-level. pKVM would also need a way to make an fd accessible again
+> > when shared back, which I think isn't possible with this patch.
+>
+> But does pKVM really want to mmap/munmap a new region at the page-level,
+> that can cause VMA fragmentation if the conversion is frequent as I see.
+> Even with a KVM ioctl for mapping as mentioned below, I think there will
+> be the same issue.
 
-On 2022-09-22 10:42 a.m., Wang, Wei W wrote:
-> On Thursday, September 22, 2022 10:10 PM, Peter Zijlstra wrote:
->> On Thu, Sep 22, 2022 at 01:59:53PM +0000, Wang, Wei W wrote:
->>> On Thursday, September 22, 2022 9:35 PM, Peter Zijlstra
->>>> On Thu, Sep 22, 2022 at 12:58:49PM +0000, Wang, Wei W wrote:
->>>>
->>>>> Add a function to expose the current running PT event to users.
->>>>> One usage is in KVM, it needs to get and disable the running host
->>>>> PT event before VMEnter to the guest and resumes the event after
->> VMexit to host.
->>>>
->>>> You cannot just kill a host event like that. If there is a host
->>>> event, the guest looses out.
->>>
->>> OK. The intention was to pause the event (that only profiles host
->>> info) when switching to guest, and resume when switching back to host.
->>
->> If the even doesn't profile guest context, then yes. If it does profile guest
->> context, you can't.
-> 
-> Seems better to add this one:
+pKVM doesn't really need to unmap the memory. What is really important
+is that the memory is not GUP'able. Having private memory mapped and
+then accessed by a misbehaving/malicious process will reinject a fault
+into the misbehaving process.
 
-If the guest host mode is enabled, I think the PT driver should not
-allow the perf tool to create a host event with !exclude_guest.
+Cheers,
+/fuad
 
-Thanks,
-Kan
-> 
-> +int perf_event_disable_local_exclude_guest(struct perf_event *event)
-> +{
-> +       struct perf_event_attr *attr = &event->attr;
-> +
-> +       if (!attr->exclude_guest)
-> +               return -EPERM;
-> +
-> +       event_function_local(event, __perf_event_disable, NULL);
-> +
-> +       return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(perf_event_disable_local_exclude_guest);
-> 
+> >
+> > You were initially considering a KVM ioctl for mapping, which might be
+> > better suited for this since KVM knows which pages are shared and
+> > which ones are private. So routing things through KVM might simplify
+> > things and allow it to enforce all the necessary restrictions (e.g.,
+> > private memory cannot be mapped). What do you think?
+> >
+> > Thanks,
+> > /fuad
