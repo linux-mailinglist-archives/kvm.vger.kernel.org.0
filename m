@@ -2,180 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 51D145EA90C
-	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 16:52:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01ED95EA93A
+	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 16:55:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234166AbiIZOw1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 10:52:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34252 "EHLO
+        id S234402AbiIZOzF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 10:55:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234922AbiIZOvt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 10:51:49 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8973CD10A;
-        Mon, 26 Sep 2022 06:18:11 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28QCxFIg004827;
-        Mon, 26 Sep 2022 13:18:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=3C1Rv6ElMGAfXtC1uY6XrX/SfqS1FuT25fzPSU8Z3ls=;
- b=tbWeUPzTXUR4uHMVHeFHUOU58JunB8FbxQLfb5/WEQ0fL8Bxe4ibH/mPYU34yE9sezvq
- 5Jgd8eqZuycMHNpyQc8NCYUvyfs40zn1KJej7e9ZhFZAfeLpNRo8NTlzdws+N0omWk7u
- xy03qucOM8QrCZ02T5oALWw04o9/fJI+0l9PaKOudVwvXPYSyXG+uk8l7HjthDzYkgg1
- 5LRi73MaJTRRLs8wkLl3zNrdS2yjVuQ689/e6KLCGcr+f2s94iUXrtIPlRgVau3t9MCX
- jiOm7CmQwLwwWsvqhOStwhQvTdUktPZqac+QFuJbjBu3J9P8Fwd1dgeWydfUPQhBU30N ZA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jucjr8jcv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 26 Sep 2022 13:18:10 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28QCxYNn005993;
-        Mon, 26 Sep 2022 13:18:10 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jucjr8jc1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 26 Sep 2022 13:18:10 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 28QD6ceQ009166;
-        Mon, 26 Sep 2022 13:18:08 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03fra.de.ibm.com with ESMTP id 3jssh91u80-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 26 Sep 2022 13:18:08 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 28QDDrXx46727502
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 26 Sep 2022 13:13:53 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 131CEAE051;
-        Mon, 26 Sep 2022 13:18:05 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BE28BAE045;
-        Mon, 26 Sep 2022 13:18:04 +0000 (GMT)
-Received: from [9.171.72.93] (unknown [9.171.72.93])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 26 Sep 2022 13:18:04 +0000 (GMT)
-Message-ID: <c88bc732-1b4e-2ec3-360b-80998fd32dc7@linux.ibm.com>
-Date:   Mon, 26 Sep 2022 15:18:04 +0200
+        with ESMTP id S234095AbiIZOyi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 10:54:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD1E274B9C
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 06:21:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664198517;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=i7qiiLpBZNt2KOcykqgJFQ/WQh3oxgQ6inHkaKhb85Y=;
+        b=Sib5IscLwkCJpCzcQaahJfuUkB+6APQqt7D9cK3QqMhKpRvl9R0sd2E7Vr32vnF54Y6Mqs
+        NRsh1h0qhngx7v85HvPJvlk78oWntcR9BUlf5JofTuS6g/6SPwhMztaV/z4rB94eNtXErY
+        w+xF1y9lcBIFY9wTR68yon9xlbaS+Yw=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-1-kEi2d18OOByS0MT1g4O5-Q-1; Mon, 26 Sep 2022 09:21:56 -0400
+X-MC-Unique: kEi2d18OOByS0MT1g4O5-Q-1
+Received: by mail-qv1-f72.google.com with SMTP id k10-20020ad4450a000000b004aa116eebe8so3774934qvu.5
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 06:21:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=i7qiiLpBZNt2KOcykqgJFQ/WQh3oxgQ6inHkaKhb85Y=;
+        b=ifqlhSSyvap7qd+N4EpPSo6qdSA2RlBnF9EdVqQib7g7Cntss+zzb+CNdy5YGpIwQ+
+         +AzTwawHeV2GJbjE79kvhvGZJR/2NgCmGORt9PNsld4Q+MhT1FybI4FlbnD219VRULSz
+         Sb2XK70UuknCE7C8jOmK2s4ef2yJ29M4aSbmkvwMIxLs0tLmSWdPXHIT4FgmRyIjk1TM
+         IjA1h8niM5hK69Om/gYAIAzim3GnlRUNsL8ANxqFVE1uyMiXFbluo5X/DSm9p2PmV9fz
+         3np9dLMKRsro425P1OGEjcZbxi5EU9z81IJgFocYfFyvqZC+hX6tlxnQZWfmNgMjmEqO
+         cuow==
+X-Gm-Message-State: ACrzQf1Aj4LV1ro27CgqoUo1DyPhBheHyilNVrMDeCd95OwMOnW9sNX8
+        fVxUulH/s50vuEw/PNsDm5VPGbc0mfucG/1HvbiMCM0VbTWlgZQMH/f18h3JWn8eTcdsxIoY8a0
+        FMrs4XWrG8dyz
+X-Received: by 2002:a05:620a:424c:b0:6be:78d5:ec73 with SMTP id w12-20020a05620a424c00b006be78d5ec73mr13912688qko.579.1664198516081;
+        Mon, 26 Sep 2022 06:21:56 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7NrkIGne8y/GZLW9JHXe3yOUbh+JzzdSUUNw9PrzRz4UIl+C1M5V42BCPhQxA5Z5E+K1+G3w==
+X-Received: by 2002:a05:620a:424c:b0:6be:78d5:ec73 with SMTP id w12-20020a05620a424c00b006be78d5ec73mr13912666qko.579.1664198515834;
+        Mon, 26 Sep 2022 06:21:55 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-222.retail.telecomitalia.it. [79.46.200.222])
+        by smtp.gmail.com with ESMTPSA id t14-20020a05620a450e00b006cbcdc6efedsm11986040qkp.41.2022.09.26.06.21.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Sep 2022 06:21:55 -0700 (PDT)
+Date:   Mon, 26 Sep 2022 15:21:45 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Bobby Eshleman <bobby.eshleman@gmail.com>
+Cc:     Bobby Eshleman <bobbyeshleman@gmail.com>,
+        Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Cong Wang <cong.wang@bytedance.com>,
+        Jiang Wang <jiang.wang@bytedance.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-hyperv@vger.kernel.org
+Subject: Re: [PATCH 2/6] vsock: return errors other than -ENOMEM to socket
+Message-ID: <20220926132145.utv2rzswhejhxrvb@sgarzare-redhat>
+References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
+ <d81818b868216c774613dd03641fcfe63cc55a45.1660362668.git.bobby.eshleman@bytedance.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20220826161112.3786131-1-scgl@linux.ibm.com>
- <20220826161112.3786131-3-scgl@linux.ibm.com>
-Content-Language: en-US
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v6 2/2] s390x: Test specification
- exceptions during transaction
-In-Reply-To: <20220826161112.3786131-3-scgl@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: QWo_3spIAdttnUG0rg3jGBEvaKOqXAOL
-X-Proofpoint-ORIG-GUID: sUKa6P1zX8eSZCZUII8Zb772KAehb_ob
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-26_08,2022-09-22_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
- suspectscore=0 lowpriorityscore=0 priorityscore=1501 mlxscore=0
- phishscore=0 mlxlogscore=999 impostorscore=0 clxscore=1015 malwarescore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2209260083
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <d81818b868216c774613dd03641fcfe63cc55a45.1660362668.git.bobby.eshleman@bytedance.com>
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 8/26/22 18:11, Janis Schoetterl-Glausch wrote:
-> Program interruptions during transactional execution cause other
-> interruption codes.
-> Check that we see the expected code for (some) specification exceptions.
-> 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+On Mon, Aug 15, 2022 at 10:56:05AM -0700, Bobby Eshleman wrote:
+>This commit allows vsock implementations to return errors
+>to the socket layer other than -ENOMEM. One immediate effect
+>of this is that upon the sk_sndbuf threshold being reached -EAGAIN
+>will be returned and userspace may throttle appropriately.
+>
+>Resultingly, a known issue with uperf is resolved[1].
+>
+>Additionally, to preserve legacy behavior for non-virtio
+>implementations, hyperv/vmci force errors to be -ENOMEM so that behavior
+>is unchanged.
+>
+>[1]: https://gitlab.com/vsock/vsock/-/issues/1
+>
+>Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+>---
+> include/linux/virtio_vsock.h            | 3 +++
+> net/vmw_vsock/af_vsock.c                | 3 ++-
+> net/vmw_vsock/hyperv_transport.c        | 2 +-
+> net/vmw_vsock/virtio_transport_common.c | 3 ---
+> net/vmw_vsock/vmci_transport.c          | 9 ++++++++-
+> 5 files changed, 14 insertions(+), 6 deletions(-)
+>
+>diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>index 17ed01466875..9a37eddbb87a 100644
+>--- a/include/linux/virtio_vsock.h
+>+++ b/include/linux/virtio_vsock.h
+>@@ -8,6 +8,9 @@
+> #include <net/sock.h>
+> #include <net/af_vsock.h>
+>
+>+/* Threshold for detecting small packets to copy */
+>+#define GOOD_COPY_LEN  128
+>+
 
-First off a disclaimer stating that I don't know anything about our TB 
-facility and I'm currently lacking the time to read the documentation.
+This change seems unrelated.
 
-But the code looks good to me and I don't see a reason that keeps me 
-from picking this.
+Please move it in the patch where you need this.
+Maybe it's better to add a prefix if we move it in an header file (e.g.  
+VIRTIO_VSOCK_...).
 
-Acked-by: Janosch Frank <frankja@linux.ibm.com>
+Thanks,
+Stefano
 
-Minor nits below
-
-> ---
->   lib/s390x/asm/arch_def.h |   1 +
->   s390x/spec_ex.c          | 199 ++++++++++++++++++++++++++++++++++++++-
->   2 files changed, 195 insertions(+), 5 deletions(-)
-> 
-> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
-> index b6e60fb0..c841871c 100644
-> --- a/lib/s390x/asm/arch_def.h
-> +++ b/lib/s390x/asm/arch_def.h
-> @@ -73,6 +73,7 @@ struct cpu {
->   #define PSW_MASK_BA			0x0000000080000000UL
->   #define PSW_MASK_64			(PSW_MASK_BA | PSW_MASK_EA)
->   
-> +#define CTL0_TRANSACT_EX_CTL			(63 -  8)
->   #define CTL0_LOW_ADDR_PROT			(63 - 35)
->   #define CTL0_EDAT				(63 - 40)
->   #define CTL0_FETCH_PROTECTION_OVERRIDE		(63 - 38)
-> diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
-> index 68469e4b..56f26564 100644
-> --- a/s390x/spec_ex.c
-> +++ b/s390x/spec_ex.c
-> @@ -4,13 +4,19 @@
->    *
->    * Specification exception test.
->    * Tests that specification exceptions occur when expected.
-> + * This includes specification exceptions occurring during transactional execution
-> + * as these result in another interruption code (the transactional-execution-aborted
-> + * bit is set).
->    *
->    * Can be extended by adding triggers to spec_ex_triggers, see comments below.
->    */
->   #include <stdlib.h>
-> +#include <htmintrin.h>
->   #include <libcflat.h>
->   #include <bitops.h>
-> +#include <asm/barrier.h>
->   #include <asm/interrupt.h>
-> +#include <asm/facility.h>
->   
->   /* toggled to signal occurrence of invalid psw fixup */
->   static bool invalid_psw_expected;
-> @@ -148,20 +154,22 @@ static int not_even(void)
->   /*
->    * Harness for specification exception testing.
->    * func only triggers exception, reporting is taken care of automatically.
-> + * If a trigger is transactable it will also  be executed during a transaction.
-
-Double space
-
-> +
-> +static void test_spec_ex_trans(struct args *args, const struct spec_ex_trigger *trigger)
-> +{
-> +	const uint16_t expected_pgm = PGM_INT_CODE_SPECIFICATION
-> +				      | PGM_INT_CODE_TX_ABORTED_EVENT;
-
-I usually prefer having | and & at the end so it's easier to read.
-
-> +	union {
-> +		struct __htm_tdb tdb;
-> +		uint64_t dwords[sizeof(struct __htm_tdb) / sizeof(uint64_t)];
-> +	} diag;
-> +	unsigned int i;
-> +	int trans_result;
-> +
-
+> enum virtio_vsock_metadata_flags {
+> 	VIRTIO_VSOCK_METADATA_FLAGS_REPLY		= BIT(0),
+> 	VIRTIO_VSOCK_METADATA_FLAGS_TAP_DELIVERED	= BIT(1),
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index e348b2d09eac..1893f8aafa48 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -1844,8 +1844,9 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
+> 			written = transport->stream_enqueue(vsk,
+> 					msg, len - total_written);
+> 		}
+>+
+> 		if (written < 0) {
+>-			err = -ENOMEM;
+>+			err = written;
+> 			goto out_err;
+> 		}
+>
+>diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+>index fd98229e3db3..e99aea571f6f 100644
+>--- a/net/vmw_vsock/hyperv_transport.c
+>+++ b/net/vmw_vsock/hyperv_transport.c
+>@@ -687,7 +687,7 @@ static ssize_t hvs_stream_enqueue(struct vsock_sock *vsk, struct msghdr *msg,
+> 	if (bytes_written)
+> 		ret = bytes_written;
+> 	kfree(send_buf);
+>-	return ret;
+>+	return ret < 0 ? -ENOMEM : ret;
+> }
+>
+> static s64 hvs_stream_has_data(struct vsock_sock *vsk)
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index 920578597bb9..d5780599fe93 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -23,9 +23,6 @@
+> /* How long to wait for graceful shutdown of a connection */
+> #define VSOCK_CLOSE_TIMEOUT (8 * HZ)
+>
+>-/* Threshold for detecting small packets to copy */
+>-#define GOOD_COPY_LEN  128
+>-
+> static const struct virtio_transport *
+> virtio_transport_get_ops(struct vsock_sock *vsk)
+> {
+>diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
+>index b14f0ed7427b..c927a90dc859 100644
+>--- a/net/vmw_vsock/vmci_transport.c
+>+++ b/net/vmw_vsock/vmci_transport.c
+>@@ -1838,7 +1838,14 @@ static ssize_t vmci_transport_stream_enqueue(
+> 	struct msghdr *msg,
+> 	size_t len)
+> {
+>-	return vmci_qpair_enquev(vmci_trans(vsk)->qpair, msg, len, 0);
+>+	int err;
+>+
+>+	err = vmci_qpair_enquev(vmci_trans(vsk)->qpair, msg, len, 0);
+>+
+>+	if (err < 0)
+>+		err = -ENOMEM;
+>+
+>+	return err;
+> }
+>
+> static s64 vmci_transport_stream_has_data(struct vsock_sock *vsk)
+>-- 
+>2.35.1
+>
 
