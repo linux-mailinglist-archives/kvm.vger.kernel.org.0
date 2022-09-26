@@ -2,80 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2361C5EAEA3
-	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 19:51:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71D585EAF37
+	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 20:08:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230021AbiIZRvf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 13:51:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53902 "EHLO
+        id S231360AbiIZSIO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 14:08:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230112AbiIZRvO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 13:51:14 -0400
-Received: from mail-oa1-x2f.google.com (mail-oa1-x2f.google.com [IPv6:2001:4860:4864:20::2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD2FD8559A
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 10:24:16 -0700 (PDT)
-Received: by mail-oa1-x2f.google.com with SMTP id 586e51a60fabf-1274ec87ad5so10192544fac.0
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 10:24:16 -0700 (PDT)
+        with ESMTP id S229751AbiIZSHs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 14:07:48 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42A32BF61
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 10:52:28 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id b18-20020a253412000000b006b0177978eeso6504077yba.21
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 10:52:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=gUHzJrpgIX7MrAmevww+QKfw4oN3wJovrSvxBA4zTB8=;
-        b=awzqwHGLXPv/1Hs3HJoBYiHnRA4FCKRY7v9kQNJINjnIMGTR8DgMHNaYAJJr4qCWM8
-         yOkrLZTYwGp6gN1ZbdJV784UFV0kqHXnF2afnQLoB3E/vaLaZDo4ps4ev1ZYdn88iT6y
-         D+8JlZai+E/MJwCErRTjR4aWsTLwQ+xvdrBqRYpC+gEStwDD61sFPqp71jnOEjbe6hIY
-         +TKmrxN3B6RtaoTeJa5FU6/1Ib1mV2gAw44RlkJnpgQsy3V2+lA+V33NCaZ5CYTJooYZ
-         mhF7InVOzqsQ6NLas8hMU3VncMq9+rdXP7XHz9r/HKkfNXlHblTao3rVw7T783+XHv04
-         Dmrg==
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date;
+        bh=TzTdhz8BhtFitnWuIvfdpebQMSyglvBrW2AfRQ4FnSI=;
+        b=PGgy1pYnKmN4e3fNie0bIPegv/abVlfkk7lD5mv+6tgp61+p1i1mDPPTVP4zJR7qvv
+         o0T99WGDb5hPhIUvGOH99uOqU8q1obehqItE9+eVzC2KuxT1b6cDqm0lJ0bAIKkjlE4k
+         AJOGXs530WR+Omn64R4e2xveCFao2INz/CrtGaausMMpf0fUAruQOOEchUi5JXHDRepr
+         NHsXkOGq+p182eHnxavzlfIPKanfM4ZpidGht0d8SkV2gS/D1D2KeWP6ijSS+o7pThF0
+         4r6EquylioB9JAWaQFowm408zCnSZzlctdZ2L6+pWIg1VZN71pN/je44bfbNL/E/65Jl
+         ZKdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=gUHzJrpgIX7MrAmevww+QKfw4oN3wJovrSvxBA4zTB8=;
-        b=SHeDDBl0xnoHe8C3B0byrohF9ecmAsFm0ZL38T5dFn3L+8NmC/G53dal7QH9lhrcck
-         GJeoCWfrLy/eEce8sqcM4Vasc4Vmm3ejD7ZA4vMtL9TfvNTWAE3Z9ZCkf07KqQwId3tp
-         wPiK1JxIC84LetOTRP6PuXXsYeAmCJRhjcy6dt/Kg4P7RgZMThwh2qIGDRFfgl7v6FvP
-         BPaDWaxxiEaPZSGGwypEuj8NqwCk2qIybi/79/ai729xN1JYAIDEbdPky12yjDMEH2p+
-         Eh/RdpGn21T8kd0W6RbA1/z/YGhOqjW78deg0ONSWyCZ5Dv0OkwcD3Fpk83BA6Ro0HFw
-         PgDg==
-X-Gm-Message-State: ACrzQf0v4hOJtG6XLoKfi9C1L0GfLxmuzczW99jJaZF7UMIumDTdiuRg
-        +DeqwI1WRUyZOElvQb1uqL6yrZDqsd9KLLGTHGyURw==
-X-Google-Smtp-Source: AMsMyM7jgpNZsPksAb/fx5EgKsCdFrfD0cCQTEp2cbcSx+42Oj0N/AqurTAG01ed7OQKsIzHiP132QTyZionY9hi7UE=
-X-Received: by 2002:a05:6870:580c:b0:12a:f136:a8f5 with SMTP id
- r12-20020a056870580c00b0012af136a8f5mr18512469oap.269.1664213055267; Mon, 26
- Sep 2022 10:24:15 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220921164521.2858932-1-xiaoyao.li@intel.com>
- <20220921164521.2858932-3-xiaoyao.li@intel.com> <175b518c-d202-644e-a3a7-67e877852548@linux.intel.com>
- <DS0PR11MB6373C84139621DC447D3F466DC4E9@DS0PR11MB6373.namprd11.prod.outlook.com>
- <Yyxke/IO+AP4EWwT@hirez.programming.kicks-ass.net> <DS0PR11MB637346E9F224C5330CDEF3BFDC4E9@DS0PR11MB6373.namprd11.prod.outlook.com>
- <YyxsnAFYMLn2U9BT@hirez.programming.kicks-ass.net> <DS0PR11MB63730A85E00683AB7F6F3E26DC4E9@DS0PR11MB6373.namprd11.prod.outlook.com>
- <62d4bec1-a0c3-3b01-61bb-f284eede6378@linux.intel.com>
-In-Reply-To: <62d4bec1-a0c3-3b01-61bb-f284eede6378@linux.intel.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 26 Sep 2022 10:24:03 -0700
-Message-ID: <CALMp9eTG7EbRv_fnQpDMQ3YUjYANgu=6QwVj_ACgHnK-Mhk39Q@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 2/3] perf/x86/intel/pt: Introduce and export pt_get_curr_event()
-To:     "Liang, Kan" <kan.liang@linux.intel.com>
-Cc:     "Wang, Wei W" <wei.w.wang@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "Li, Xiaoyao" <xiaoyao.li@intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "linux-perf-users@vger.kernel.org" <linux-perf-users@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=TzTdhz8BhtFitnWuIvfdpebQMSyglvBrW2AfRQ4FnSI=;
+        b=UidSus2fAwR0wW52+ptHOD8ewirWtEXlD9IWpSt+pOBbOKMndblxI+RuQybEJ1MRSw
+         /3J6+t5pJEOxzzcj7qR1dWmPFoRQVVCeFxgfzcp9U5O0gF/fxzOEmYbF1qgFpSyV103c
+         PIImHSEoHYiszD4toVNuFtSiKJaCzoPdRqv+ceoB2xTy6yeMiU4hdd+sfpuqr27yFrgH
+         g6tCj5BiGoZWb6/l42dlpbjC2ewVTuXqZYwn78bTXMLORJEzSBTvGayvQEogc6gm9Hgg
+         0jZenR1xxTcCMdxhMryT+hmRJ2BffaqTaVNh0R7JFLPbBMhWEyv+7nYcIFFOge9oAiUb
+         4hKw==
+X-Gm-Message-State: ACrzQf1F4PRONIPDYQE26yZoxQWrrmQA5Jxzpajcv/Ve41oACQqP/2DC
+        x773aYehk/YLqW8ZEfJbSQmH/DSu+r0dqw==
+X-Google-Smtp-Source: AMsMyM4O7JtA63FRb10cK/TcyAHABAWl2NtK0x0Wf/kLUnbKTiRJkPogYQB7/g1h21HEaRT8raM0BvY59XkJLA==
+X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
+ (user=dmatlack job=sendgmr) by 2002:a5b:cc4:0:b0:6ae:2a6c:59e6 with SMTP id
+ e4-20020a5b0cc4000000b006ae2a6c59e6mr21891138ybr.59.1664214747346; Mon, 26
+ Sep 2022 10:52:27 -0700 (PDT)
+Date:   Mon, 26 Sep 2022 10:52:19 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.3.998.g577e59143f-goog
+Message-ID: <20220926175219.605113-1-dmatlack@google.com>
+Subject: [PATCH] KVM: selftests: Fix nx_huge_pages_test on TDP-disabled hosts
+From:   David Matlack <dmatlack@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Yang Zhong <yang.zhong@intel.com>,
+        Wei Wang <wei.w.wang@intel.com>,
+        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,35 +70,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 26, 2022 at 9:55 AM Liang, Kan <kan.liang@linux.intel.com> wrote:
->
->
->
-> On 2022-09-22 10:42 a.m., Wang, Wei W wrote:
-> > On Thursday, September 22, 2022 10:10 PM, Peter Zijlstra wrote:
-> >> On Thu, Sep 22, 2022 at 01:59:53PM +0000, Wang, Wei W wrote:
-> >>> On Thursday, September 22, 2022 9:35 PM, Peter Zijlstra
-> >>>> On Thu, Sep 22, 2022 at 12:58:49PM +0000, Wang, Wei W wrote:
-> >>>>
-> >>>>> Add a function to expose the current running PT event to users.
-> >>>>> One usage is in KVM, it needs to get and disable the running host
-> >>>>> PT event before VMEnter to the guest and resumes the event after
-> >> VMexit to host.
-> >>>>
-> >>>> You cannot just kill a host event like that. If there is a host
-> >>>> event, the guest looses out.
-> >>>
-> >>> OK. The intention was to pause the event (that only profiles host
-> >>> info) when switching to guest, and resume when switching back to host.
-> >>
-> >> If the even doesn't profile guest context, then yes. If it does profile guest
-> >> context, you can't.
-> >
-> > Seems better to add this one:
->
-> If the guest host mode is enabled, I think the PT driver should not
-> allow the perf tool to create a host event with !exclude_guest.
+Map the test's huge page region with 2MiB virtual mappings so that KVM
+can shadow the region with huge pages. This fixes nx_huge_pages_test on
+hosts where TDP hardware support is disabled.
 
-While I agree that guest events should generally have priority over
-host events, this is not consistent with the way "normal" PMU events
-are handled.
+Purposely do not skip this test on TDP-disabled hosts. While we don't
+care about NX Huge Pages on TDP-disabled hosts from a security
+perspective, KVM does support it, and so we should test it.
+
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+ .../selftests/kvm/include/x86_64/processor.h        |  2 ++
+ tools/testing/selftests/kvm/lib/x86_64/processor.c  | 13 +++++++++++++
+ .../selftests/kvm/x86_64/nx_huge_pages_test.c       |  9 +++++++--
+ 3 files changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index 0cbc71b7af50..4ffaa79fd8d6 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -855,6 +855,8 @@ enum pg_level {
+ #define PG_SIZE_1G PG_LEVEL_SIZE(PG_LEVEL_1G)
+ 
+ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level);
++void virt_map_2m(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
++		 uint64_t nr_2m_pages);
+ 
+ /*
+  * Basic CPU control in CR0
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index 2e6e61bbe81b..df8a1498ea28 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -214,6 +214,19 @@ void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+ 	__virt_pg_map(vm, vaddr, paddr, PG_LEVEL_4K);
+ }
+ 
++void virt_map_2m(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
++		 uint64_t nr_2m_pages)
++{
++	int i;
++
++	for (i = 0; i < nr_2m_pages; i++) {
++		__virt_pg_map(vm, vaddr, paddr, PG_LEVEL_2M);
++
++		vaddr += PG_SIZE_2M;
++		paddr += PG_SIZE_2M;
++	}
++}
++
+ static uint64_t *_vm_get_page_table_entry(struct kvm_vm *vm,
+ 					  struct kvm_vcpu *vcpu,
+ 					  uint64_t vaddr)
+diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+index cc6421716400..a850769692b7 100644
+--- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
++++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+@@ -22,7 +22,8 @@
+ #define HPAGE_GPA		(4UL << 30) /* 4G prevents collision w/ slot 0 */
+ #define HPAGE_GVA		HPAGE_GPA /* GVA is arbitrary, so use GPA. */
+ #define PAGES_PER_2MB_HUGE_PAGE 512
+-#define HPAGE_SLOT_NPAGES	(3 * PAGES_PER_2MB_HUGE_PAGE)
++#define HPAGE_SLOT_2MB_PAGES	3
++#define HPAGE_SLOT_NPAGES	(HPAGE_SLOT_2MB_PAGES * PAGES_PER_2MB_HUGE_PAGE)
+ 
+ /*
+  * Passed by nx_huge_pages_test.sh to provide an easy warning if this test is
+@@ -141,7 +142,11 @@ void run_test(int reclaim_period_ms, bool disable_nx_huge_pages,
+ 				    HPAGE_GPA, HPAGE_SLOT,
+ 				    HPAGE_SLOT_NPAGES, 0);
+ 
+-	virt_map(vm, HPAGE_GVA, HPAGE_GPA, HPAGE_SLOT_NPAGES);
++	/*
++	 * Use 2MiB virtual mappings so that KVM can map the region with huge
++	 * pages even if TDP is disabled.
++	 */
++	virt_map_2m(vm, HPAGE_GVA, HPAGE_GPA, HPAGE_SLOT_2MB_PAGES);
+ 
+ 	hva = addr_gpa2hva(vm, HPAGE_GPA);
+ 	memset(hva, RETURN_OPCODE, HPAGE_SLOT_NPAGES * PAGE_SIZE);
+
+base-commit: 372d07084593dc7a399bf9bee815711b1fb1bcf2
+prerequisite-patch-id: 2e3661ba8856c29b769499bac525b6943d9284b8
+-- 
+2.37.3.998.g577e59143f-goog
+
