@@ -2,205 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 734235EA9BD
-	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 17:09:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C55B55EA9D3
+	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 17:11:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235612AbiIZPJy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 11:09:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44412 "EHLO
+        id S235871AbiIZPL4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 11:11:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235632AbiIZPJL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 11:09:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B31734D4D3
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 06:42:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664199749;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        with ESMTP id S235773AbiIZPLR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 11:11:17 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7232222
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 06:48:15 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 8C93421AC4;
+        Mon, 26 Sep 2022 13:48:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1664200094; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=FmwtN+NyrhixAl+NaySPGi8yrkPzbP4TeUvnBlgzaxk=;
-        b=gThVPn7z77OWMYQCPvRvYNfKyegFPp53ExnTFbi0u0zXB/pM0pnB27IFDZOWGa7Pkj1bWp
-        A9YOKsVmfVqoRaN8/8/S61cueZXmjn6Egyu6Mf7krUXI19yUAvl8HowLADnNyETRAJKV7o
-        t/uMHqExGCO13mER2xaUNJkDfkJRGVw=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-558-iYRGpsSFPM2JfCE8jdvvqQ-1; Mon, 26 Sep 2022 09:42:27 -0400
-X-MC-Unique: iYRGpsSFPM2JfCE8jdvvqQ-1
-Received: by mail-qv1-f70.google.com with SMTP id lq8-20020a0562145b8800b004ad7229e4e9so3810302qvb.6
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 06:42:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=FmwtN+NyrhixAl+NaySPGi8yrkPzbP4TeUvnBlgzaxk=;
-        b=icvzZLgFiSPgF1KBbneyz4YtMzw8OVg5qzBg0nC5srWNpHebfWRXpTbkkzw0V32hzz
-         sR/qii8Jki69+IQI0iNeAWmDH8m4p1l3PzMxQCmQOrb4YZoBUomElvTTskne13lHB1nx
-         I1J8I0gMvqdS6u9zJ4Zy5dtmF9o4wu458IculcEWsN0HVB2/098Orvanef1Z9V0rn4Uf
-         fMB4Mm1ysTeUYNaz83u+zX3sOHtU1VhT71qeVScIDVFys1oWVE9I9Xz3iUxU/fdc6SYl
-         1wVD3XiVQVy1UlXmvb3nvm3mR07dCpRkpfkNHUz9SrlXH/oamFIk9wRUjRP6jHQWdvDp
-         8kWA==
-X-Gm-Message-State: ACrzQf2iB/fVogUwnSNLQV2WVjs5U7vTIZbHA8P/gxjyaVzKPBPQ8vG9
-        4AWmzrtSNiUkQPxjbOWnq6lQVCBrQRXV/OLYQjPUPoveRWLqkH37jFw8bB2nTcEmKLUuGTyc6PA
-        EEC1p5i+uLzgZ
-X-Received: by 2002:a05:620a:3711:b0:6ce:e7b3:d91b with SMTP id de17-20020a05620a371100b006cee7b3d91bmr13773035qkb.428.1664199746838;
-        Mon, 26 Sep 2022 06:42:26 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM48rV68CI6BIVBegZsCpLRad8XltAIyLSTgKKG3vra2SE+tRk0FWFyXXO/Eu5qJt2XZgTxJpQ==
-X-Received: by 2002:a05:620a:3711:b0:6ce:e7b3:d91b with SMTP id de17-20020a05620a371100b006cee7b3d91bmr13773011qkb.428.1664199746543;
-        Mon, 26 Sep 2022 06:42:26 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-46-200-222.retail.telecomitalia.it. [79.46.200.222])
-        by smtp.gmail.com with ESMTPSA id d7-20020a05620a240700b006cede93c765sm11947587qkn.28.2022.09.26.06.42.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Sep 2022 06:42:25 -0700 (PDT)
-Date:   Mon, 26 Sep 2022 15:42:19 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Bobby Eshleman <bobby.eshleman@gmail.com>
-Cc:     Bobby Eshleman <bobbyeshleman@gmail.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Cong Wang <cong.wang@bytedance.com>,
-        Jiang Wang <jiang.wang@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
+        bh=EUOsebiZ1Urqu06ynHBZWM/lT0mo4ClXPjZBNsAfemU=;
+        b=eoXkY93/sOPpS6yBU2Xo9s5Vo2rpuAy0CiD+xUu+FyajQDC3gSH+RnvWAFdsXDKpmc5Zhg
+        +MEOBv7HJu0ANd80Y8DsGG/hmPwd3C/UcZbdqlM6RcCwyYsrcuSsUpvPTRJByvU0WKA8TZ
+        vOfKVabiG+tVKT5UwJo+Gms0Ir8W6Rk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1664200094;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EUOsebiZ1Urqu06ynHBZWM/lT0mo4ClXPjZBNsAfemU=;
+        b=qoCZgxXJWlGHIuLk+/PPb7wVe409ZohaCc+zSyX22Z3pq8fv9UrWdybYF2+KPu6n2lirCT
+        XrjuYOabR1YrZ8BQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E484C139BD;
+        Mon, 26 Sep 2022 13:48:13 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id +zJeNp2tMWM8dwAAMHmgww
+        (envelope-from <jroedel@suse.de>); Mon, 26 Sep 2022 13:48:13 +0000
+Date:   Mon, 26 Sep 2022 15:48:12 +0200
+From:   "Rodel, Jorg" <jroedel@suse.de>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
         Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH 0/6] virtio/vsock: introduce dgrams, sk_buff, and qdisc
-Message-ID: <20220926134219.sreibsw2rfgw7625@sgarzare-redhat>
-References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        "Martins, Joao" <joao.m.martins@oracle.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH RFC v2 00/13] IOMMUFD Generic interface
+Message-ID: <YzGtnN6pQrUxvA9Q@suse.de>
+References: <0-v2-f9436d0bde78+4bb-iommufd_jgg@nvidia.com>
+ <BN9PR11MB527620E859FF60250E7F08A98C479@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <YyodnOJaYsimbDVK@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <cover.1660362668.git.bobby.eshleman@bytedance.com>
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YyodnOJaYsimbDVK@nvidia.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Tue, Sep 20, 2022 at 05:07:56PM -0300, Jason Gunthorpe wrote:
+> From my view, I don't get the sense the Joerg is interested in
+> maintaining this, so I was expecting to have to PR this to Linus on
+> its own (with the VFIO bits) and a new group would carry it through
+> the initial phases.
 
-On Mon, Aug 15, 2022 at 10:56:03AM -0700, Bobby Eshleman wrote:
->Hey everybody,
->
->This series introduces datagrams, packet scheduling, and sk_buff usage
->to virtio vsock.
+Well, I am interested in maintaining the parts related to the IOMMU-API
+and making sure future updates don't break anything. I am happy to trust
+you all with the other details, as you all better understand the
+use-cases and interactions with other sub-systems.
 
-Just a reminder for those who are interested, tomorrow Sep 27 @ 16:00 
-UTC we will discuss more about the next steps for this series in this 
-room: https://meet.google.com/fxi-vuzr-jjb
-(I'll try to record it and take notes that we will share)
+So I am fine with you sending the PR to get iommufd upstream together with
+the VFIO changes (with my acks for the iommu-parts), but further updates
+should still go through my tree to avoid any conflicts with other IOMMU
+changes.
 
-Bobby, thank you so much for working on this! It would be great to solve 
-the fairness issue and support datagram!
+Regards,
 
-I took a look at the series, left some comments in the individual 
-patches, and add some advice here that we could pick up tomorrow:
-- it would be nice to run benchmarks (e.g., iperf-vsock, uperf, etc.) to
-   see how much the changes cost (e.g. sk_buff use)
-- we should take care also of other transports (i.e. vmci, hyperv), the 
-   uAPI should be as close as possible regardless of the transport
+-- 
+Jörg Rödel
+jroedel@suse.de
 
-About the use of netdev, it seems the most controversial point and I 
-understand Jakub and Michael's concerns. Tomorrow would be great if you 
-can update us if you have found any way to avoid it, just reusing a 
-packet scheduler somehow.
-It would be great if we could make it available for all transports (I'm 
-not asking you to implement it for all, but to have a generic api that 
-others can use).
+SUSE Software Solutions Germany GmbH
+Frankenstraße 146
+90461 Nürnberg
+Germany
 
-But we can talk about that tomorrow!
-Thanks,
-Stefano
-
->
->The usage of struct sk_buff benefits users by a) preparing vsock to use
->other related systems that require sk_buff, such as sockmap and qdisc,
->b) supporting basic congestion control via sock_alloc_send_skb, and c)
->reducing copying when delivering packets to TAP.
->
->The socket layer no longer forces errors to be -ENOMEM, as typically
->userspace expects -EAGAIN when the sk_sndbuf threshold )s reached and
->messages are being sent with option MSG_DONTWAIT.
->
->The datagram work is based off previous patches by Jiang Wang[1].
->
->The introduction of datagrams creates a transport layer fairness issue
->where datagrams may freely starve streams of queue access. This happens
->because, unlike streams, datagrams lack the transactions necessary for
->calculating credits and throttling.
->
->Previous proposals introduce changes to the spec to add an additional
->virtqueue pair for datagrams[1]. Although this solution works, using
->Linux's qdisc for packet scheduling leverages already existing systems,
->avoids the need to change the virtio specification, and gives additional
->capabilities. The usage of SFQ or fq_codel, for example, may solve the
->transport layer starvation problem. It is easy to imagine other use
->cases as well. For example, services of varying importance may be
->assigned different priorities, and qdisc will apply appropriate
->priority-based scheduling. By default, the system default pfifo qdisc is
->used. The qdisc may be bypassed and legacy queuing is resumed by simply
->setting the virtio-vsock%d network device to state DOWN. This technique
->still allows vsock to work with zero-configuration.
->
->In summary, this series introduces these major changes to vsock:
->
->- virtio vsock supports datagrams
->- virtio vsock uses struct sk_buff instead of virtio_vsock_pkt
->  - Because virtio vsock uses sk_buff, it also uses sock_alloc_send_skb,
->    which applies the throttling threshold sk_sndbuf.
->- The vsock socket layer supports returning errors other than -ENOMEM.
->  - This is used to return -EAGAIN when the sk_sndbuf threshold is
->    reached.
->- virtio vsock uses a net_device, through which qdisc may be used.
-> - qdisc allows scheduling policies to be applied to vsock flows.
->  - Some qdiscs, like SFQ, may allow vsock to avoid transport layer congestion. That is,
->    it may avoid datagrams from flooding out stream flows. The benefit
->    to this is that additional virtqueues are not needed for datagrams.
->  - The net_device and qdisc is bypassed by simply setting the
->    net_device state to DOWN.
->
->[1]: https://lore.kernel.org/all/20210914055440.3121004-1-jiang.wang@bytedance.com/
->
->Bobby Eshleman (5):
->  vsock: replace virtio_vsock_pkt with sk_buff
->  vsock: return errors other than -ENOMEM to socket
->  vsock: add netdev to vhost/virtio vsock
->  virtio/vsock: add VIRTIO_VSOCK_F_DGRAM feature bit
->  virtio/vsock: add support for dgram
->
->Jiang Wang (1):
->  vsock_test: add tests for vsock dgram
->
-> drivers/vhost/vsock.c                   | 238 ++++----
-> include/linux/virtio_vsock.h            |  73 ++-
-> include/net/af_vsock.h                  |   2 +
-> include/uapi/linux/virtio_vsock.h       |   2 +
-> net/vmw_vsock/af_vsock.c                |  30 +-
-> net/vmw_vsock/hyperv_transport.c        |   2 +-
-> net/vmw_vsock/virtio_transport.c        | 237 +++++---
-> net/vmw_vsock/virtio_transport_common.c | 771 ++++++++++++++++--------
-> net/vmw_vsock/vmci_transport.c          |   9 +-
-> net/vmw_vsock/vsock_loopback.c          |  51 +-
-> tools/testing/vsock/util.c              | 105 ++++
-> tools/testing/vsock/util.h              |   4 +
-> tools/testing/vsock/vsock_test.c        | 195 ++++++
-> 13 files changed, 1176 insertions(+), 543 deletions(-)
->
->-- 
->2.35.1
->
+(HRB 36809, AG Nürnberg)
+Geschäftsführer: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
 
