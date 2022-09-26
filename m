@@ -2,73 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F035A5EAE96
-	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 19:50:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2361C5EAEA3
+	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 19:51:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231193AbiIZRuJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 13:50:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52530 "EHLO
+        id S230021AbiIZRvf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 13:51:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231218AbiIZRth (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 13:49:37 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49BD4895E5
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 10:22:17 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id lx7so517241pjb.0
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 10:22:17 -0700 (PDT)
+        with ESMTP id S230112AbiIZRvO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 13:51:14 -0400
+Received: from mail-oa1-x2f.google.com (mail-oa1-x2f.google.com [IPv6:2001:4860:4864:20::2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD2FD8559A
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 10:24:16 -0700 (PDT)
+Received: by mail-oa1-x2f.google.com with SMTP id 586e51a60fabf-1274ec87ad5so10192544fac.0
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 10:24:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=R7X1SDUffa2GKX/qHcqI1vL/oFJyVJgl0377su/y5wk=;
-        b=Qpfjt7EqVpZbXAqTXvGvWggL9tZUa0qMg71aM1Jb7QpbfZaITj2obDXSlTBfj4mwp2
-         87Jc5cpM2MvCRGMJOPQO3KEeMTjPC/XSVzeDGiU62gEJqTDMuneeDpmSWCFXkrJW6alo
-         HLi0xSGTU5pzLh0FPhicsB9f5EoHT20TRKTos1nzXyrpdewdqPAwAl54tMz7PzFLCCQX
-         y/RYOBfpxmGeTJirxXOcmCcRkWK0Xn6xljPfc0sc4MuP5E4jN1SBjhHuOHBgMMSxlX4j
-         M4Onfp6lVFVjnp+ocVITbFA5/hdLjs0/ukGXHrgF3OcbPFrSpDg0iBClQ+ARa8bNgw7Y
-         tx5w==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=gUHzJrpgIX7MrAmevww+QKfw4oN3wJovrSvxBA4zTB8=;
+        b=awzqwHGLXPv/1Hs3HJoBYiHnRA4FCKRY7v9kQNJINjnIMGTR8DgMHNaYAJJr4qCWM8
+         yOkrLZTYwGp6gN1ZbdJV784UFV0kqHXnF2afnQLoB3E/vaLaZDo4ps4ev1ZYdn88iT6y
+         D+8JlZai+E/MJwCErRTjR4aWsTLwQ+xvdrBqRYpC+gEStwDD61sFPqp71jnOEjbe6hIY
+         +TKmrxN3B6RtaoTeJa5FU6/1Ib1mV2gAw44RlkJnpgQsy3V2+lA+V33NCaZ5CYTJooYZ
+         mhF7InVOzqsQ6NLas8hMU3VncMq9+rdXP7XHz9r/HKkfNXlHblTao3rVw7T783+XHv04
+         Dmrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=R7X1SDUffa2GKX/qHcqI1vL/oFJyVJgl0377su/y5wk=;
-        b=N07xyJnm4JCttFlHrLapOKoL7YNU/vh5dAS9Kh2KK8OC4mr1F1a3d6knp9OoqJJa1n
-         AVaI4FqQPHm+UhjPbZiPFM/3I89xyhsZL+r7TCjwVpMEIQoHDFGzvMyy7XX2hcPnPR4q
-         5BPYBf7X+vepfhK5nxDvXBKAQn3vS3Lb4ShCegpNqaP8Wk0nmggdkIPC6sMfZ4ikaWsB
-         ciQGs/v1RHz++BsssRvieQjUPOWCYYhyCb3/RBcUwf2OlgYZC9aNvap2rj69YNTBznAz
-         MfMZ9oTQTC5kXrUEfyx9XOC4RzRoF3AsF2tijj1nmormmSLklf+Fl9rc7R8PGL3l1d1J
-         AydQ==
-X-Gm-Message-State: ACrzQf3O/tuBK6eNUf0685mNxNCKvvZOpTK0AK25nNC2Wkyl4PV2MvHE
-        WAHDX7tn+LkKv8zYDGkZ7zYk1g==
-X-Google-Smtp-Source: AMsMyM4tRK4K8+B/i1JkGhoUP0+VnP30Y+iCzcZKtmgRw/orO54avzYF9KCU8PiCryAaHOJ2FTT2ig==
-X-Received: by 2002:a17:902:da8a:b0:179:e022:5f6 with SMTP id j10-20020a170902da8a00b00179e02205f6mr2308882plx.80.1664212936586;
-        Mon, 26 Sep 2022 10:22:16 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id a124-20020a636682000000b00439103a6c3bsm10929187pgc.94.2022.09.26.10.22.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Sep 2022 10:22:14 -0700 (PDT)
-Date:   Mon, 26 Sep 2022 10:22:10 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        andrew.jones@linux.dev, pbonzini@redhat.com, maz@kernel.org,
-        alexandru.elisei@arm.com, eric.auger@redhat.com, oupton@google.com,
-        reijiw@google.com, rananta@google.com, bgardon@google.com,
-        dmatlack@google.com, axelrasmussen@google.com
-Subject: Re: [PATCH v8 10/14] KVM: selftests: aarch64: Add
- aarch64/page_fault_test
-Message-ID: <YzHfwmZqMQ9xXaNa@google.com>
-References: <20220922031857.2588688-1-ricarkol@google.com>
- <20220922031857.2588688-11-ricarkol@google.com>
- <Yyy4WjEmuSH1tSZb@google.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=gUHzJrpgIX7MrAmevww+QKfw4oN3wJovrSvxBA4zTB8=;
+        b=SHeDDBl0xnoHe8C3B0byrohF9ecmAsFm0ZL38T5dFn3L+8NmC/G53dal7QH9lhrcck
+         GJeoCWfrLy/eEce8sqcM4Vasc4Vmm3ejD7ZA4vMtL9TfvNTWAE3Z9ZCkf07KqQwId3tp
+         wPiK1JxIC84LetOTRP6PuXXsYeAmCJRhjcy6dt/Kg4P7RgZMThwh2qIGDRFfgl7v6FvP
+         BPaDWaxxiEaPZSGGwypEuj8NqwCk2qIybi/79/ai729xN1JYAIDEbdPky12yjDMEH2p+
+         Eh/RdpGn21T8kd0W6RbA1/z/YGhOqjW78deg0ONSWyCZ5Dv0OkwcD3Fpk83BA6Ro0HFw
+         PgDg==
+X-Gm-Message-State: ACrzQf0v4hOJtG6XLoKfi9C1L0GfLxmuzczW99jJaZF7UMIumDTdiuRg
+        +DeqwI1WRUyZOElvQb1uqL6yrZDqsd9KLLGTHGyURw==
+X-Google-Smtp-Source: AMsMyM7jgpNZsPksAb/fx5EgKsCdFrfD0cCQTEp2cbcSx+42Oj0N/AqurTAG01ed7OQKsIzHiP132QTyZionY9hi7UE=
+X-Received: by 2002:a05:6870:580c:b0:12a:f136:a8f5 with SMTP id
+ r12-20020a056870580c00b0012af136a8f5mr18512469oap.269.1664213055267; Mon, 26
+ Sep 2022 10:24:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yyy4WjEmuSH1tSZb@google.com>
+References: <20220921164521.2858932-1-xiaoyao.li@intel.com>
+ <20220921164521.2858932-3-xiaoyao.li@intel.com> <175b518c-d202-644e-a3a7-67e877852548@linux.intel.com>
+ <DS0PR11MB6373C84139621DC447D3F466DC4E9@DS0PR11MB6373.namprd11.prod.outlook.com>
+ <Yyxke/IO+AP4EWwT@hirez.programming.kicks-ass.net> <DS0PR11MB637346E9F224C5330CDEF3BFDC4E9@DS0PR11MB6373.namprd11.prod.outlook.com>
+ <YyxsnAFYMLn2U9BT@hirez.programming.kicks-ass.net> <DS0PR11MB63730A85E00683AB7F6F3E26DC4E9@DS0PR11MB6373.namprd11.prod.outlook.com>
+ <62d4bec1-a0c3-3b01-61bb-f284eede6378@linux.intel.com>
+In-Reply-To: <62d4bec1-a0c3-3b01-61bb-f284eede6378@linux.intel.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Mon, 26 Sep 2022 10:24:03 -0700
+Message-ID: <CALMp9eTG7EbRv_fnQpDMQ3YUjYANgu=6QwVj_ACgHnK-Mhk39Q@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 2/3] perf/x86/intel/pt: Introduce and export pt_get_curr_event()
+To:     "Liang, Kan" <kan.liang@linux.intel.com>
+Cc:     "Wang, Wei W" <wei.w.wang@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "Li, Xiaoyao" <xiaoyao.li@intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "linux-perf-users@vger.kernel.org" <linux-perf-users@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,105 +83,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 22, 2022 at 07:32:42PM +0000, Sean Christopherson wrote:
-> On Thu, Sep 22, 2022, Ricardo Koller wrote:
-> > +/* Returns true to continue the test, and false if it should be skipped. */
-> > +static bool punch_hole_in_memslot(struct kvm_vm *vm,
-> 
-> This is a very misleading name, and IMO is flat out wrong.  The helper isn't
-> punching a hole in the memslot, it's punching a hole in the backing store, and
-> those are two very different things.  Encountering a hole in a _memslot_ yields
-> emualted MMIO semantics, not CoW zero page semantics.
+On Mon, Sep 26, 2022 at 9:55 AM Liang, Kan <kan.liang@linux.intel.com> wrote:
+>
+>
+>
+> On 2022-09-22 10:42 a.m., Wang, Wei W wrote:
+> > On Thursday, September 22, 2022 10:10 PM, Peter Zijlstra wrote:
+> >> On Thu, Sep 22, 2022 at 01:59:53PM +0000, Wang, Wei W wrote:
+> >>> On Thursday, September 22, 2022 9:35 PM, Peter Zijlstra
+> >>>> On Thu, Sep 22, 2022 at 12:58:49PM +0000, Wang, Wei W wrote:
+> >>>>
+> >>>>> Add a function to expose the current running PT event to users.
+> >>>>> One usage is in KVM, it needs to get and disable the running host
+> >>>>> PT event before VMEnter to the guest and resumes the event after
+> >> VMexit to host.
+> >>>>
+> >>>> You cannot just kill a host event like that. If there is a host
+> >>>> event, the guest looses out.
+> >>>
+> >>> OK. The intention was to pause the event (that only profiles host
+> >>> info) when switching to guest, and resume when switching back to host.
+> >>
+> >> If the even doesn't profile guest context, then yes. If it does profile guest
+> >> context, you can't.
+> >
+> > Seems better to add this one:
+>
+> If the guest host mode is enabled, I think the PT driver should not
+> allow the perf tool to create a host event with !exclude_guest.
 
-Interestingly, we used to refer those as "gaps", as in "gaps between memslots".
-But I get the point.
-
-> 
-> Ideally, if we can come up with a not awful name, I'd also prefer to avoid "punch
-> hole" in the function name.  I can't think of a better alternative, so it's not
-> the end of the world if we're stuck with e.g punch_hole_in_backing_store(), but I
-
-Ack.
-
-> think the "punch_hole" name will be confusing for readers that are unfamiliar with
-> PUNCH_HOLE, especially for anonymous memory as "punching a hole" in anonymous
-> memory is more likely to be interpreted as "munmap()".
-> 
-> > +				  struct userspace_mem_region *region)
-> > +{
-> > +	void *hva = (void *)region->region.userspace_addr;
-> > +	uint64_t paging_size = region->region.memory_size;
-> > +	int ret, fd = region->fd;
-> > +
-> > +	if (fd != -1) {
-> > +		ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
-> > +				0, paging_size);
-> > +		TEST_ASSERT(ret == 0, "fallocate failed, errno: %d\n", errno);
-> > +	} else {
-> > +		if (is_backing_src_hugetlb(region->backing_src_type))
-> > +			return false;
-> 
-> Why is hugetlb disallowed?  I thought anon hugetlb supports MADV_DONTNEED?
-> 
-
-It fails with EINVAL (only tried on arm) for both the PAGE_SIZE and the huge
-page size. And note that the address is aligned as well.
-
-madvise(0xffffb7c00000, 2097152, MADV_DONTNEED) = -1 EINVAL (Invalid argument)
-	^^^^^^^^^^^^^^	^^^^^^^
-	2M aligned	2M (hugepage size)
-			
-madvise(0xffff9e800000, 4096, MADV_DONTNEED) = -1 EINVAL (Invalid argument)   
-			^^^^
-			PAGE_SIZE
-
-> > +
-> > +		ret = madvise(hva, paging_size, MADV_DONTNEED);
-> > +		TEST_ASSERT(ret == 0, "madvise failed, errno: %d\n", errno);
-> > +	}
-> > +
-> > +	return true;
-> > +}
-> 
-> ...
-> 
-> > +	/*
-> > +	 * Accessing a hole in the data memslot (punched with fallocate or
-> 
-> s/memslot/backing store
-> 
-> > +	 * madvise) shouldn't fault (more sanity checks).
-> 
-> 
-> Naming aside, please provide more detail as to why this is the correct KVM
-> behavior.  This is quite subtle and relies on gory implementation details that a
-> lot of KVM developers will be unaware of.
-
-Ack.
-
-> 
-> Specifically, from an accessibility perspective, PUNCH_HOLE doesn't actually create
-> a hole in the file.  The "hole" can still be read and written; the "expect '0'"
-> checks are correct specifically because those are the semantics of PUNCH_HOLE.
-> 
-> In other words, it's not just that the accesses shouldn't fault, reads _must_
-> return zeros and writes _must_ re-populate the page.
-
-Moreover, the behavior from the guest POV should be the same as userspace
-reading/writing on a hole (with PUNCH_HOLE). Will describe this as well.
-
-> 
-> Compare that with e.g. ftruncate() that makes the size of the file smaller, in
-> which case an access should result in KVM exiting to userspace with -EFAULT.
-> 
-> > +	 */
-> > +	TEST_ACCESS(guest_read64, no_af, CMD_HOLE_DATA),
-> > +	TEST_ACCESS(guest_cas, no_af, CMD_HOLE_DATA),
-> > +	TEST_ACCESS(guest_ld_preidx, no_af, CMD_HOLE_DATA),
-> > +	TEST_ACCESS(guest_write64, no_af, CMD_HOLE_DATA),
-> > +	TEST_ACCESS(guest_st_preidx, no_af, CMD_HOLE_DATA),
-> > +	TEST_ACCESS(guest_at, no_af, CMD_HOLE_DATA),
-> > +	TEST_ACCESS(guest_dc_zva, no_af, CMD_HOLE_DATA),
-> > +
-> > +	{ 0 }
-> > +};
+While I agree that guest events should generally have priority over
+host events, this is not consistent with the way "normal" PMU events
+are handled.
