@@ -2,212 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 854DC5EAC0A
-	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 18:06:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4ECC95EAC3A
+	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 18:15:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235898AbiIZQGk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 12:06:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48282 "EHLO
+        id S236337AbiIZQPa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 12:15:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235502AbiIZQGC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 12:06:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91BA9262
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 07:53:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664204033;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JiDPhoXeiEYDPNNsZkNx5skNUhZVDc2YhX8tUxT6Z4I=;
-        b=JQ+k+zpERs7I3TjBqmwXNPTosUJNkBS7eRKEAJqE3YK12GZStwJoA74OG1RKiEknykCLFF
-        nyTVOp1OfLWJl+J6pg5lHpMKEi+ROWEXb0XnZjPCuhb7UkUU1DgXjkrjBxnt/UHgqGVn/P
-        /bHE0/c1hJpmUafqh0K7XkkeeRPF4L0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-441-w5GR10cxN3SULv4oLskgIg-1; Mon, 26 Sep 2022 10:53:43 -0400
-X-MC-Unique: w5GR10cxN3SULv4oLskgIg-1
-Received: by mail-wr1-f70.google.com with SMTP id d25-20020adf9b99000000b0022adb03aee6so1264681wrc.6
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 07:53:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=JiDPhoXeiEYDPNNsZkNx5skNUhZVDc2YhX8tUxT6Z4I=;
-        b=FCkGiKYYWQQ1kZJ+jtnxVOZ5X1nfuQBf3MJ5vNmxajWgkEA+1gqPZkWzEjWXtB0oSZ
-         tEmOT6gtqs26zntTxf2/7/vgbp+1PWfCPCXHciFM+1s+fo7+qfhXnFXYL9D/hig2j4XK
-         WdZX5e1dxk6ycL7FvJP/7HkLT+xSTKTLYmKMkOyQgH+NCvPgNQm76fUGN9r1fqg2MZo0
-         vFiZ45THYlhYZixvA2NrzvEFRe2j1lxV3rqA48chHN5+a4vh/0Ko/EkbGWVtLmawjjnL
-         rNe8xbgdzZ5MN87EXwfdXkA9/hiVl3mrfRNYCdwxHWm8Tma1QfdAwCjuChExt2kxRhL/
-         GcZw==
-X-Gm-Message-State: ACrzQf2dUH2wwZu10MaBcvg4aG9SIy44TspM5btK850mH9H9W6Co/EEG
-        QeobTiCQ+oqvKqOqpYve5N1kNvLQVLFZ6h0qxz0b+Vb5iPHXd5QejiIB46rdOaalyQoItPRExaQ
-        XeV/th3NwgUFW
-X-Received: by 2002:a05:600c:a07:b0:3ab:945:77c4 with SMTP id z7-20020a05600c0a0700b003ab094577c4mr22424182wmp.97.1664204020679;
-        Mon, 26 Sep 2022 07:53:40 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4F1aj6dFmsu9oiMooh87XJHOqSDiWx3ICISxNlRpzSCeG1iwk0ewGaZ3Lrv8KXjMX88Z1kZg==
-X-Received: by 2002:a05:600c:a07:b0:3ab:945:77c4 with SMTP id z7-20020a05600c0a0700b003ab094577c4mr22424160wmp.97.1664204020377;
-        Mon, 26 Sep 2022 07:53:40 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c703:4b00:e090:7fa6:b7d6:d4a7? (p200300cbc7034b00e0907fa6b7d6d4a7.dip0.t-ipconnect.de. [2003:cb:c703:4b00:e090:7fa6:b7d6:d4a7])
-        by smtp.gmail.com with ESMTPSA id r64-20020a1c4443000000b003b4935f04a4sm13954042wma.5.2022.09.26.07.53.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Sep 2022 07:53:39 -0700 (PDT)
-Message-ID: <0a99aa24-599c-cc60-b23b-b77887af3702@redhat.com>
-Date:   Mon, 26 Sep 2022 16:53:37 +0200
+        with ESMTP id S236330AbiIZQPB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 12:15:01 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 863983DF3D
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 08:03:43 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E9A6F1042;
+        Mon, 26 Sep 2022 08:03:49 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B42D93F66F;
+        Mon, 26 Sep 2022 08:03:41 -0700 (PDT)
+Date:   Mon, 26 Sep 2022 16:04:36 +0100
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Andrew Jones <andrew.jones@linux.dev>
+Cc:     pbonzini@redhat.com, thuth@redhat.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, nikos.nikoleris@arm.com
+Subject: Re: [kvm-unit-tests RFC PATCH 05/19] lib/alloc_phys: Remove locking
+Message-ID: <YzG/ZPLRsH4qwfnJ@monolith.localdoman>
+References: <20220809091558.14379-1-alexandru.elisei@arm.com>
+ <20220809091558.14379-6-alexandru.elisei@arm.com>
+ <20220920084553.734jvkqpognzgfpr@kamzik>
+ <Yym+MOMK68K7abiQ@e121798.cambridge.arm.com>
+ <20220920145952.fnftt2v46daigtdt@kamzik>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
-Content-Language: en-US
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc:     "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        aarcange@redhat.com, ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
- <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
- <d16284f5-3493-2892-38e6-f1fa5c10bdbb@redhat.com>
- <20220923005808.vfltoecttoatgw5o@box.shutemov.name>
- <f703e615-3b75-96a2-fb48-2fefd8a2069b@redhat.com>
- <20220926144854.dyiacztlpx4fkjs5@box.shutemov.name>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20220926144854.dyiacztlpx4fkjs5@box.shutemov.name>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220920145952.fnftt2v46daigtdt@kamzik>
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26.09.22 16:48, Kirill A. Shutemov wrote:
-> On Mon, Sep 26, 2022 at 12:35:34PM +0200, David Hildenbrand wrote:
->> On 23.09.22 02:58, Kirill A . Shutemov wrote:
->>> On Mon, Sep 19, 2022 at 11:12:46AM +0200, David Hildenbrand wrote:
->>>>> diff --git a/include/uapi/linux/magic.h b/include/uapi/linux/magic.h
->>>>> index 6325d1d0e90f..9d066be3d7e8 100644
->>>>> --- a/include/uapi/linux/magic.h
->>>>> +++ b/include/uapi/linux/magic.h
->>>>> @@ -101,5 +101,6 @@
->>>>>     #define DMA_BUF_MAGIC		0x444d4142	/* "DMAB" */
->>>>>     #define DEVMEM_MAGIC		0x454d444d	/* "DMEM" */
->>>>>     #define SECRETMEM_MAGIC		0x5345434d	/* "SECM" */
->>>>> +#define INACCESSIBLE_MAGIC	0x494e4143	/* "INAC" */
->>>>
->>>>
->>>> [...]
->>>>
->>>>> +
->>>>> +int inaccessible_get_pfn(struct file *file, pgoff_t offset, pfn_t *pfn,
->>>>> +			 int *order)
->>>>> +{
->>>>> +	struct inaccessible_data *data = file->f_mapping->private_data;
->>>>> +	struct file *memfd = data->memfd;
->>>>> +	struct page *page;
->>>>> +	int ret;
->>>>> +
->>>>> +	ret = shmem_getpage(file_inode(memfd), offset, &page, SGP_WRITE);
->>>>> +	if (ret)
->>>>> +		return ret;
->>>>> +
->>>>> +	*pfn = page_to_pfn_t(page);
->>>>> +	*order = thp_order(compound_head(page));
->>>>> +	SetPageUptodate(page);
->>>>> +	unlock_page(page);
->>>>> +
->>>>> +	return 0;
->>>>> +}
->>>>> +EXPORT_SYMBOL_GPL(inaccessible_get_pfn);
->>>>> +
->>>>> +void inaccessible_put_pfn(struct file *file, pfn_t pfn)
->>>>> +{
->>>>> +	struct page *page = pfn_t_to_page(pfn);
->>>>> +
->>>>> +	if (WARN_ON_ONCE(!page))
->>>>> +		return;
->>>>> +
->>>>> +	put_page(page);
->>>>> +}
->>>>> +EXPORT_SYMBOL_GPL(inaccessible_put_pfn);
->>>>
->>>> Sorry, I missed your reply regarding get/put interface.
->>>>
->>>> https://lore.kernel.org/linux-mm/20220810092532.GD862421@chaop.bj.intel.com/
->>>>
->>>> "We have a design assumption that somedays this can even support non-page
->>>> based backing stores."
->>>>
->>>> As long as there is no such user in sight (especially how to get the memfd
->>>> from even allocating such memory which will require bigger changes), I
->>>> prefer to keep it simple here and work on pages/folios. No need to
->>>> over-complicate it for now.
->>>
->>> Sean, Paolo , what is your take on this? Do you have conrete use case of
->>> pageless backend for the mechanism in sight? Maybe DAX?
->>
->> The problem I'm having with this is how to actually get such memory into the
->> memory backend (that triggers notifiers) and what the semantics are at all
->> with memory that is not managed by the buddy.
->>
->> memfd with fixed PFNs doesn't make too much sense.
-> 
-> What do you mean by "fixed PFN". It is as fixed as struct page/folio, no?
-> PFN covers more possible backends.
+Hi,
 
-For DAX, you usually bypass the buddy and map /dev/mem or a devdax. In 
-contrast to ordinary memfd that allocates memory via the buddy. That's 
-the difference I see -- and I wonder how it could work.
+On Tue, Sep 20, 2022 at 04:59:52PM +0200, Andrew Jones wrote:
+> On Tue, Sep 20, 2022 at 02:20:48PM +0100, Alexandru Elisei wrote:
+> > Hi,
+> > 
+> > On Tue, Sep 20, 2022 at 10:45:53AM +0200, Andrew Jones wrote:
+> > > On Tue, Aug 09, 2022 at 10:15:44AM +0100, Alexandru Elisei wrote:
+> > > > With powerpc moving the page allocator, there are no architectures left
+> > > > which use the physical allocator after the boot setup:  arm, arm64,
+> > > > s390x and powerpc drain the physical allocator to initialize the page
+> > > > allocator; and x86 calls setup_vm() to drain the allocator for each of
+> > > > the tests that allocate memory.
+> > > 
+> > > Please put the motivation for this change in the commit message. I looked
+> > > ahead at the next patch to find it, but I'm not sure I agree with it. We
+> > > should be able to keep the locking even when used early, since we probably
+> > > need our locking to be something we can use early elsewhere anyway.
+> > 
+> > You are correct, the commit message doesn't explain why locking is removed,
+> > which makes the commit confusing. I will try to do a better job for the
+> > next iteration (if we decide to keep this patch).
+> > 
+> > I removed locking because the physical allocator by the end of the series
+> > will end up being used only by arm64 to create the idmap, which is done on
+> 
+> If only arm, and no unit tests, needs the phys allocator, then it can be
+> integrated with whatever arm is using it for and removed from the general
+> lib.
+
+I kept the allocator in lib because I thought that RISC-V might have an use
+for it. Since it's a RISC architecture, I was thinking that it also might
+require software cache management around enabling/disabling the MMU. But in
+the end it's up to you, it would be easy to move the physical allocator to
+lib/arm if you think that is best.
 
 > 
->> When using DAX, what happens with the shared <->private conversion? Which
->> "type" is supposed to use dax, which not?
->>
->> In other word, I'm missing too many details on the bigger picture of how
->> this would work at all to see why it makes sense right now to prepare for
->> that.
+> > the boot CPU and with the MMU off. After that, the translation table
+> > allocator functions will use the page allocator, which can be used
+> > concurrently.
+> > 
+> > Looking at the spinlock implementation, spin_lock() doesn't protect from
+> > the concurrent accesses when the MMU is disabled (lock->v is
+> > unconditionally set to 1). Which means that spin_lock() does not work (in
+> > the sense that it doesn't protect against concurrent accesses) on the boot
+> > path, which doesn't need a spinlock anyway, because no secondaries are
+> > online secondaries. It also means that spinlocks don't work when
+> > AUXINFO_MMU_OFF is set. So for the purpose of simplicity I preferred to
+> > drop it entirely.
 > 
-> IIUC, KVM doesn't really care about pages or folios. They need PFN to
-> populate SEPT. Returning page/folio would make KVM do additional steps to
-> extract PFN and one more place to have a bug.
+> If other architectures or unit tests have / could have uses for the
+> phys allocator then we should either document that it doesn't have
+> locks or keep the locks, and arm will just know that they don't work,
+> but also that they don't need to for its purposes.
 
-Fair enough. Smells KVM specific, though.
+I will write a comment explaining the baked in assumptions for the
+allocator.
 
--- 
+> 
+> Finally, if we drop the locks and arm doesn't have any other places where
+> we use locks without the MMU enabled, then we can change the lock
+> implementation to not have the no-mmu fallback - maybe by switching to the
+> generic implementation as the other architectures have done.
+
+The architecture mandates that load-acquire/store-release instructions are
+supported only on Normal memory (to be more precise, Inner Shareable, Inner
+Write-Back, Outer Write-Back Normal memory with Read allocation hints and
+Write allocation hints and not transient and Outer Shareable, Inner
+Write-Back, Outer Write-Back Normal memory with Read allocation hints and
+Write allocation hints and not transient, ARM DDI 0487H.a, pages B2-211 and
+B2-212).
+
+If the AUXINFO_MMU_OFF flag is set, kvm-unit-tests doesn't enable the MMU
+at boot, which means that all tests can be run with the MMU disabled. In
+this case, all memory is Device-nGnRnE (instead of Normal). By using an
+implementation that doesn't take into account that spin_lock() might be
+called with the MMU disabled, kvm-unit-tests will end up using exclusive
+access instructions on memory which doesn't support it. This can have
+various effects, all rather unpleasant, like causing an external abort or
+treating the exclusive access instruction as a NOP (ARM DDI 0487H.a, page
+B2-212).
+
+Tested this on my rockpro64 board, kvm-unit-tests built from current
+master, with the mmu_disabled() path removed from spin_lock() (and
+AUXINFO_MMU_OFF flag set), all tests hang indefinitely, that's because
+phys_alloc_init() uses a spinlock. It is conceivable that we could rework
+the setup code to remove the usage of spinlocks, but it's still the matter
+of tests needing one for synchronization. It's also the matter of the uart
+needing one for puts. And report. And probably other places.
+
+Out of curiosity, without setting the AUXINFO_MMU_OFF flag, I tried using
+the generic version of the spinlock (I assume you mean the one from
+lib/asm-generic/spinlock.h, changed lib/arm64/asm/spinlock.h to include the
+above header), selftest-setup hangs without displaying anything before
+phys_alloc_init(), I have no idea why that is.
+
+In the current implementation, when AUXINFO_MMU_OFF is set, tests that
+actually use more than one thread might end up being incorrect some of the
+time because spin_lock() doesn't protect against concurrent accesses.
+That's pretty bad, but I think the alternative off all tests hanging
+indefinitely is worse.
+
+In my opinion, the current spinlock implementation is incorrect when the
+MMU is disabled, but using a generic implementation is worse. I guess
+another thing to put on the TODO list.  Arm ARM recommends Lamport’s Bakery
+algorithm for mutual exclusion and we could try to implement that for the
+MMU disabled case, but I don't see much interest at the moment in running
+tests with the MMU disabled.
+
 Thanks,
+Alex
 
-David / dhildenb
-
+> 
+> Thanks,
+> drew
