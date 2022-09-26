@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FD6D5EABF2
-	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 18:04:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B33F65EABF0
+	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 18:03:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235705AbiIZQDn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 12:03:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44614 "EHLO
+        id S233574AbiIZQDe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 12:03:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233205AbiIZQCl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 12:02:41 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D350E0F
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 07:51:29 -0700 (PDT)
+        with ESMTP id S229987AbiIZQCi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 12:02:38 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59E2472B78
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 07:51:27 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D96EAB80AC9
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 14:51:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E9DEC43148;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CD62760E83
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 14:51:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EA13C43149;
         Mon, 26 Sep 2022 14:51:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1664203886;
-        bh=WV5cxf5ghEnKU2Qr6KhozOGjAzkOIr41eedwlY0TKqw=;
+        bh=Vt4MpZxy9cA0Z6Nr6FBms3xW3YZkMmAFr0nagHkKwcI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=eIQck6//OBW+W1dywe0DknHum0rdmkdVAw4UgRVkCmCDEIdmX45GE0xpJyCygUGTP
-         WlK7j873Xpn4lCec1VPZDjlQnu6piSbyDiXcY2CfFFGCGNeRIDzy10/4Hf3/3uMjSS
-         IJYbT1xOcIMTv539YJ4ReXurJiV2TBeyZktZw8KsUjo54yc0/yzKAHAvAnFsQcvFdn
-         VuBf1GPs91dXUCofN4W8M2DTD9yleuYT2uEb6Thd0mji7F+hAhmJLAYpaud2qDHu/5
-         mAjV2SPztiS6ouhp/avwTmKB9kKTN3VPLDb9e0iurCs2M1/pI3Fve6joLNmqiwNqJM
-         oAXkzq5lVixfQ==
+        b=BxAN9o7XxK4utX1Z+e0RX5EzhITH8A5s6KNcQ/H7bj7JX1XcW9Q6MkKu773La9wyx
+         5wNDl6ZuSxiT0rw5ywYPVYYHcIMWOnQIj4Mh+sfdBM+nza+kw0q+ShvQCOUJe9BLPc
+         IYxGuR3+lB2GTHsJ3wFllegALAo8w9mjDJ3YfWxrPbSyW6sQQnYf3OJKnP3b7XOOAz
+         YtHB4eGwSj8QOc7a83R6fBsy0zM6pOYap1smfvue9LYqB+d9kRdaNUe882UwvguqEQ
+         oV7s7sh3vldHKqR2CIKhLeuB7cSvxQME5WG6KNF/RFNrCo7xyV/tKICMk+Rx9w7w8q
+         arutSGFimmgKA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1ocpS8-00Cips-FQ;
+        id 1ocpS8-00Cips-Ps;
         Mon, 26 Sep 2022 15:51:24 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
@@ -47,9 +47,9 @@ Cc:     catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 5/6] KVM: selftests: dirty-log: Upgrade flag accesses to acquire/release semantics
-Date:   Mon, 26 Sep 2022 15:51:19 +0100
-Message-Id: <20220926145120.27974-6-maz@kernel.org>
+Subject: [PATCH v2 6/6] KVM: selftests: dirty-log: Use KVM_CAP_DIRTY_LOG_RING_ACQ_REL if available
+Date:   Mon, 26 Sep 2022 15:51:20 +0100
+Message-Id: <20220926145120.27974-7-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220926145120.27974-1-maz@kernel.org>
 References: <20220926145120.27974-1-maz@kernel.org>
@@ -68,41 +68,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In order to preserve ordering, make sure that the flag accesses
-in the dirty log are done using acquire/release accessors.
+Pick KVM_CAP_DIRTY_LOG_RING_ACQ_REL if exposed by the kernel.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- tools/testing/selftests/kvm/dirty_log_test.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ tools/testing/selftests/kvm/dirty_log_test.c | 3 ++-
+ tools/testing/selftests/kvm/lib/kvm_util.c   | 5 ++++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index 9c883c94d478..53627add8a7c 100644
+index 53627add8a7c..b5234d6efbe1 100644
 --- a/tools/testing/selftests/kvm/dirty_log_test.c
 +++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -17,6 +17,7 @@
- #include <linux/bitmap.h>
- #include <linux/bitops.h>
- #include <linux/atomic.h>
-+#include <asm/barrier.h>
+@@ -265,7 +265,8 @@ static void default_after_vcpu_run(struct kvm_vcpu *vcpu, int ret, int err)
  
- #include "kvm_util.h"
- #include "test_util.h"
-@@ -279,12 +280,12 @@ static void dirty_ring_create_vm_done(struct kvm_vm *vm)
- 
- static inline bool dirty_gfn_is_dirtied(struct kvm_dirty_gfn *gfn)
+ static bool dirty_ring_supported(void)
  {
--	return gfn->flags == KVM_DIRTY_GFN_F_DIRTY;
-+	return smp_load_acquire(&gfn->flags) == KVM_DIRTY_GFN_F_DIRTY;
+-	return kvm_has_cap(KVM_CAP_DIRTY_LOG_RING);
++	return (kvm_has_cap(KVM_CAP_DIRTY_LOG_RING) ||
++		kvm_has_cap(KVM_CAP_DIRTY_LOG_RING_ACQ_REL));
  }
  
- static inline void dirty_gfn_set_collected(struct kvm_dirty_gfn *gfn)
+ static void dirty_ring_create_vm_done(struct kvm_vm *vm)
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 9889fe0d8919..411a4c0bc81c 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -82,7 +82,10 @@ unsigned int kvm_check_cap(long cap)
+ 
+ void vm_enable_dirty_ring(struct kvm_vm *vm, uint32_t ring_size)
  {
--	gfn->flags = KVM_DIRTY_GFN_F_RESET;
-+	smp_store_release(&gfn->flags, KVM_DIRTY_GFN_F_RESET);
+-	vm_enable_cap(vm, KVM_CAP_DIRTY_LOG_RING, ring_size);
++	if (vm_check_cap(vm, KVM_CAP_DIRTY_LOG_RING_ACQ_REL))
++		vm_enable_cap(vm, KVM_CAP_DIRTY_LOG_RING_ACQ_REL, ring_size);
++	else
++		vm_enable_cap(vm, KVM_CAP_DIRTY_LOG_RING, ring_size);
+ 	vm->dirty_ring_size = ring_size;
  }
  
- static uint32_t dirty_ring_collect_one(struct kvm_dirty_gfn *dirty_gfns,
 -- 
 2.34.1
 
