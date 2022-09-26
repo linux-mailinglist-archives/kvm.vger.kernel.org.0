@@ -2,231 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5E485EAB81
-	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 17:46:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAF3C5EABDC
+	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 18:01:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236676AbiIZPpw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 11:45:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44308 "EHLO
+        id S234116AbiIZQBW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 12:01:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236731AbiIZPpF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 11:45:05 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D39B72B60;
-        Mon, 26 Sep 2022 07:30:11 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id t3so6423351ply.2;
-        Mon, 26 Sep 2022 07:30:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=QQlJngE5VezXo/8MQot4/0g/a+VfDBHY7JrP45q6Buc=;
-        b=lrDGfYgxKe3J9dnQ5GuXfb/3aVuay1bD48i1l7U0YSnm5d9KEjM/V4JFq9MZADKnc6
-         KZh9SDR/ncKrOBXBejh6hNoq0iK9dFSeQdtVXFlxgI9iPKFjML2Ljnv1E4IajTlDMXuE
-         A/VDymSFhaSi5NM/Q1PlgV3CY5UlRgU/msYeoMXCynoBVP8TY3l/dEM7CQKJnXdSPnFZ
-         bGHqDv2regmnlEVH+DdMc3b6Rs+J5RUPAznHhmD9Huf0XH1o4PncuynGubzyJNXoW5Wk
-         +764umVMwrc3vVExsJ+YjUjHBQpWnOMYHDFLj2Z+XOsYuEFanhkeA0W1qWQNkudR6SnJ
-         qTOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=QQlJngE5VezXo/8MQot4/0g/a+VfDBHY7JrP45q6Buc=;
-        b=u2lat36jo/FUXdK/c5aIgo95/dibcyOgmX1o/PMfOycRb50ebceWxD19uVP3w5n4P/
-         pkfjc4F4rj/btEIV5IPsqjs1XBOToqZR+uFW711B5bLRIT8Q74h9idWBDWzuqktN6HCa
-         jdphrMYFMvM1wHg8V9CKd66lx5o8pb35Fbg4CeQqWPrURc8haF2wwDu1Qz2Y5mfZktg9
-         TphTP0Zdtdin5R48PpWBqPxN2ptTMfhq2z2kZSx+69Y50NZogeAmUkZLdPRSnNfd/swl
-         eOQGC9tOYLPxDzDJgjooR9MunnbAEPYxlg3C9XNIjUvcBFrnlY9Rw8R4xwEtVArO0Ddh
-         qRhA==
-X-Gm-Message-State: ACrzQf0Pio2lmGCahMQkxiCxzako1C0DglTGUpB+K+Ziaa/ruj13/o/o
-        bJZBPjEhCgLRLEkn9utY4ac=
-X-Google-Smtp-Source: AMsMyM7O/84KrceO47ymPO2gk8APTzCbqcUTGi496XiNuVA2njiKzmRkdv8Jn8lH3hK9nq3hF7yGwQ==
-X-Received: by 2002:a17:902:680d:b0:176:9f46:bebb with SMTP id h13-20020a170902680d00b001769f46bebbmr22012587plk.122.1664202611045;
-        Mon, 26 Sep 2022 07:30:11 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id f15-20020aa7968f000000b00543a098a6ffsm12218733pfk.212.2022.09.26.07.30.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Sep 2022 07:30:10 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Cc:     Kan Liang <kan.liang@linux.intel.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Andi Kleen <ak@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>,
+        with ESMTP id S234061AbiIZQAj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 12:00:39 -0400
+Received: from new2-smtp.messagingengine.com (new2-smtp.messagingengine.com [66.111.4.224])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 632F45FAB;
+        Mon, 26 Sep 2022 07:49:02 -0700 (PDT)
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 032D7580B47;
+        Mon, 26 Sep 2022 10:49:00 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Mon, 26 Sep 2022 10:49:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
+         h=cc:cc:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm1; t=1664203739; x=1664210939; bh=hj
+        yaiyVncGPyAcE40V9D6BFeUzHrJx4Z5KsQEWvTx6U=; b=BLkeAJVrmw7qkBJfm/
+        r53DCtBwngiqsuCp5gakhvZnWCECk6zFydkZLbd6I8KxKeonxY3Gm2ku4yAZq3DX
+        mPH+dIkbEqtuCewZbPVPywT1t0sXTaj/vq5aWDsA3hnT3F2YHzOqpGx2urUlL2EE
+        U/hsjExpJ6BXKte28MPI5f1X6kuOVEYyYkbgR5w4fjqPJgjr0ryrQrGWgyK8slPz
+        V/GfWGk7sO7BfhbizEnnaZSoWp2rG5Ulecm6xMUgTQ/3Ts/kUndBbbKfd96QtbpK
+        y35I54Zb50espMcXYT+wIyCvf2tgXT1nBc1qW+qbQ7b9KMnF2w45hTyMQ89w4C0O
+        Z9XA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm2; t=1664203739; x=1664210939; bh=hjyaiyVncGPyAcE40V9D6BFeUzHr
+        Jx4Z5KsQEWvTx6U=; b=BaxqKASgIiPw7rncxCNijATsatPiyiSIoD2+I/65CLct
+        UspOGb5FxKqzGRfzDSh/1qeoclfaerzVKVPkO7dTdAv6IAGsbKNmy/SPFTmF7jhG
+        Exx30tbN5Diyf5+E0W3bbdGQCcMN7mN/w6o2fRRAfCHlkk8Xue3EdsTbGmzJ62gQ
+        gYN7Xpcg3R0YPsq5pkPdB0omh+B0Bunz5x5wCqzDQx8hectKi6K7L8H2ynFFDGWH
+        VoDwHTyQpwEIBYhcy/LGZUvL4O6aToBkJ3zMlQsX5z51hh8mbTuDd5nIXCjXUStv
+        nChvh3skGQpP75NdIiZ8rjn+N8NVQM/ev7r6o/yLaA==
+X-ME-Sender: <xms:2bsxY-fzVVgOSVkALZI2OVCKASwpUjzbjR6aAGpsnVyW63SMm5Vtug>
+    <xme:2bsxY4N_pEiU97FgSNW0GriJk0H3G84tHuEVpxndgJMxnEIIYmtaU4MR3e4dAbwPI
+    sv-S1KQMJ7h2dBbTHg>
+X-ME-Received: <xmr:2bsxY_hUvtYjlt7DSbTT3VXW4DBkdShIS8oE1NjaR3uPbwqkWUXDbNtAH_JA71VGuD1gYQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfeegvddgkeduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdttddttddtvdenucfhrhhomhepfdfmihhr
+    ihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilhhlsehshhhuthgvmhhovhdrnh
+    grmhgvqeenucggtffrrghtthgvrhhnpeelgffhfeetlefhveffleevfffgtefffeelfedu
+    udfhjeduteeggfeiheefteehjeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuve
+    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepkhhirhhilhhl
+    sehshhhuthgvmhhovhdrnhgrmhgv
+X-ME-Proxy: <xmx:2bsxY79p5Bg7bBcj2zf51nOCacE_d6LY_iKftMbFR0YSBz7P1oPu4A>
+    <xmx:2bsxY6tkmioEyZ3Xt6KMXykJ_l9Z6Kx88E2ToRh1Gd2TnUpV6JSkdg>
+    <xmx:2bsxYyEbuXJ92o_6TphZvfKQchwxuaRYR7_NS3gg_W9x_iLq1h20xg>
+    <xmx:27sxY5qnsOBTDIeLJkdMV8asI5QTcnn829r0jRRM6aS0fx6f6qZmYw>
+Feedback-ID: ie3994620:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 26 Sep 2022 10:48:57 -0400 (EDT)
+Received: by box.shutemov.name (Postfix, from userid 1000)
+        id 03E28104928; Mon, 26 Sep 2022 17:48:54 +0300 (+03)
+Date:   Mon, 26 Sep 2022 17:48:54 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        x86@kernel.org, kvm@vger.kernel.org
-Subject: [PATCH RFC 3/3] KVM: x86/pmu: Add Intel Guest Branch Trace Store Support
-Date:   Mon, 26 Sep 2022 22:29:38 +0800
-Message-Id: <20220926142938.89608-4-likexu@tencent.com>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20220926142938.89608-1-likexu@tencent.com>
-References: <20220926142938.89608-1-likexu@tencent.com>
+        Sean Christopherson <seanjc@google.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        aarcange@redhat.com, ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
+Message-ID: <20220926144854.dyiacztlpx4fkjs5@box.shutemov.name>
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
+ <d16284f5-3493-2892-38e6-f1fa5c10bdbb@redhat.com>
+ <20220923005808.vfltoecttoatgw5o@box.shutemov.name>
+ <f703e615-3b75-96a2-fb48-2fefd8a2069b@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f703e615-3b75-96a2-fb48-2fefd8a2069b@redhat.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On Mon, Sep 26, 2022 at 12:35:34PM +0200, David Hildenbrand wrote:
+> On 23.09.22 02:58, Kirill A . Shutemov wrote:
+> > On Mon, Sep 19, 2022 at 11:12:46AM +0200, David Hildenbrand wrote:
+> > > > diff --git a/include/uapi/linux/magic.h b/include/uapi/linux/magic.h
+> > > > index 6325d1d0e90f..9d066be3d7e8 100644
+> > > > --- a/include/uapi/linux/magic.h
+> > > > +++ b/include/uapi/linux/magic.h
+> > > > @@ -101,5 +101,6 @@
+> > > >    #define DMA_BUF_MAGIC		0x444d4142	/* "DMAB" */
+> > > >    #define DEVMEM_MAGIC		0x454d444d	/* "DMEM" */
+> > > >    #define SECRETMEM_MAGIC		0x5345434d	/* "SECM" */
+> > > > +#define INACCESSIBLE_MAGIC	0x494e4143	/* "INAC" */
+> > > 
+> > > 
+> > > [...]
+> > > 
+> > > > +
+> > > > +int inaccessible_get_pfn(struct file *file, pgoff_t offset, pfn_t *pfn,
+> > > > +			 int *order)
+> > > > +{
+> > > > +	struct inaccessible_data *data = file->f_mapping->private_data;
+> > > > +	struct file *memfd = data->memfd;
+> > > > +	struct page *page;
+> > > > +	int ret;
+> > > > +
+> > > > +	ret = shmem_getpage(file_inode(memfd), offset, &page, SGP_WRITE);
+> > > > +	if (ret)
+> > > > +		return ret;
+> > > > +
+> > > > +	*pfn = page_to_pfn_t(page);
+> > > > +	*order = thp_order(compound_head(page));
+> > > > +	SetPageUptodate(page);
+> > > > +	unlock_page(page);
+> > > > +
+> > > > +	return 0;
+> > > > +}
+> > > > +EXPORT_SYMBOL_GPL(inaccessible_get_pfn);
+> > > > +
+> > > > +void inaccessible_put_pfn(struct file *file, pfn_t pfn)
+> > > > +{
+> > > > +	struct page *page = pfn_t_to_page(pfn);
+> > > > +
+> > > > +	if (WARN_ON_ONCE(!page))
+> > > > +		return;
+> > > > +
+> > > > +	put_page(page);
+> > > > +}
+> > > > +EXPORT_SYMBOL_GPL(inaccessible_put_pfn);
+> > > 
+> > > Sorry, I missed your reply regarding get/put interface.
+> > > 
+> > > https://lore.kernel.org/linux-mm/20220810092532.GD862421@chaop.bj.intel.com/
+> > > 
+> > > "We have a design assumption that somedays this can even support non-page
+> > > based backing stores."
+> > > 
+> > > As long as there is no such user in sight (especially how to get the memfd
+> > > from even allocating such memory which will require bigger changes), I
+> > > prefer to keep it simple here and work on pages/folios. No need to
+> > > over-complicate it for now.
+> > 
+> > Sean, Paolo , what is your take on this? Do you have conrete use case of
+> > pageless backend for the mechanism in sight? Maybe DAX?
+> 
+> The problem I'm having with this is how to actually get such memory into the
+> memory backend (that triggers notifiers) and what the semantics are at all
+> with memory that is not managed by the buddy.
+> 
+> memfd with fixed PFNs doesn't make too much sense.
 
-The processor supports the Branch Trace Store facility (BTS) if it has DS
-buffer and the MISC_ENABLE_BTS_UNAVAIL (RO) bit is cleared. The processor
-can supports the CPL-qualified branch trace mechanism (DSCPL) if
-CPUID.01H:ECX[bit 4] = 1.
+What do you mean by "fixed PFN". It is as fixed as struct page/folio, no?
+PFN covers more possible backends.
 
-To support guest BTS, we need expose three IA32_DEBUGCTL bits to the guest:
-The TR bit makes processor to send the branch record out on the system bus
-as a branch trace message (BTM) when it detects a taken branch, interrupt,
-or exception. The BTS bit makes processor to log BTMs to a memory-resident
-BTS buffer that is part of the DS save area. The BTINT bit makes processor
-generates an interrupt when the BTS buffer is full.
+> When using DAX, what happens with the shared <->private conversion? Which
+> "type" is supposed to use dax, which not?
+> 
+> In other word, I'm missing too many details on the bigger picture of how
+> this would work at all to see why it makes sense right now to prepare for
+> that.
 
-A simple perf test case could be:
-	perf record --per-thread -e intel_bts// ./workload
-and a valid sample looks like:
-	branches:            401243 cmp_end+0x0 (./workload)
-			=> ffffffffb6e01410 asm_exc_nmi+0x0 ([kernel.kallsyms])
+IIUC, KVM doesn't really care about pages or folios. They need PFN to
+populate SEPT. Returning page/folio would make KVM do additional steps to
+extract PFN and one more place to have a bug.
 
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- arch/x86/events/intel/bts.c     |  2 ++
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/pmu.h              |  3 +++
- arch/x86/kvm/vmx/capabilities.h |  7 +++++++
- arch/x86/kvm/vmx/vmx.c          | 32 ++++++++++++++++++++++++++++----
- 5 files changed, 41 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/events/intel/bts.c b/arch/x86/events/intel/bts.c
-index ffdcde5b97b1..32a7bfe24deb 100644
---- a/arch/x86/events/intel/bts.c
-+++ b/arch/x86/events/intel/bts.c
-@@ -463,6 +463,8 @@ int intel_bts_interrupt(void)
- 	 */
- 	if (ds && (ds->bts_index >= ds->bts_interrupt_threshold))
- 		handled = 1;
-+	else if (perf_guest_state() && perf_handle_guest_intr(GUEST_INTEL_BTS))
-+		return 1;
- 
- 	/*
- 	 * this is wrapped in intel_bts_enable_local/intel_bts_disable_local,
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 166a77a61f2d..3b0116340399 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1663,6 +1663,7 @@ struct kvm_x86_nested_ops {
- 
- enum {
- 	GUEST_INTEL_PT = 0,
-+	GUEST_INTEL_BTS,
- 	GUEST_INVALID
- };
- 
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 889d064d5ddd..bd3eb5339376 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -11,6 +11,9 @@
- #define MSR_IA32_MISC_ENABLE_PMU_RO_MASK (MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL |	\
- 					  MSR_IA32_MISC_ENABLE_BTS_UNAVAIL)
- 
-+#define DEBUGCTLMSR_BTS_MASK		(DEBUGCTLMSR_TR | DEBUGCTLMSR_BTS | DEBUGCTLMSR_BTINT)
-+#define DEBUGCTLMSR_DSCPL_MASK		(DEBUGCTLMSR_BTS_OFF_OS | DEBUGCTLMSR_BTS_OFF_USR)
-+
- /* retrieve the 4 bits for EN and PMI out of IA32_FIXED_CTR_CTRL */
- #define fixed_ctrl_field(ctrl_reg, idx) (((ctrl_reg) >> ((idx)*4)) & 0xf)
- 
-diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
-index 4dc4bbe18821..cd3b97528ab0 100644
---- a/arch/x86/kvm/vmx/capabilities.h
-+++ b/arch/x86/kvm/vmx/capabilities.h
-@@ -435,6 +435,13 @@ static inline u64 vmx_supported_debugctl(void)
- 	if (vmx_get_perf_capabilities() & PMU_CAP_LBR_FMT)
- 		debugctl |= DEBUGCTLMSR_LBR_MASK;
- 
-+	if (vmx_pebs_supported() && boot_cpu_has(X86_FEATURE_BTS)) {
-+		debugctl |= DEBUGCTLMSR_BTS_MASK;
-+		/* CPL-Qualified Branch Trace Mechanism */
-+		if (boot_cpu_has(X86_FEATURE_DSCPL))
-+			debugctl |= DEBUGCTLMSR_DSCPL_MASK;
-+	}
-+
- 	return debugctl;
- }
- 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 3622323d57c2..cd396ca3c001 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2016,6 +2016,13 @@ static u64 vcpu_supported_debugctl(struct kvm_vcpu *vcpu)
- 	if (!guest_cpuid_has(vcpu, X86_FEATURE_BUS_LOCK_DETECT))
- 		debugctl &= ~DEBUGCTLMSR_BUS_LOCK_DETECT;
- 
-+	if (!guest_cpuid_has(vcpu, X86_FEATURE_DS) ||
-+	    (vcpu->arch.ia32_misc_enable_msr & MSR_IA32_MISC_ENABLE_BTS_UNAVAIL)) {
-+		debugctl &= ~(DEBUGCTLMSR_BTS_MASK | DEBUGCTLMSR_DSCPL_MASK);
-+	} else if (!guest_cpuid_has(vcpu, X86_FEATURE_DSCPL)) {
-+		debugctl &= ~DEBUGCTLMSR_DSCPL_MASK;
-+	}
-+
- 	return debugctl;
- }
- 
-@@ -7691,6 +7698,8 @@ static __init void vmx_set_cpu_caps(void)
- 	if (vmx_pebs_supported()) {
- 		kvm_cpu_cap_check_and_set(X86_FEATURE_DS);
- 		kvm_cpu_cap_check_and_set(X86_FEATURE_DTES64);
-+		if (kvm_cpu_cap_has(X86_FEATURE_DS))
-+			kvm_cpu_cap_check_and_set(X86_FEATURE_DSCPL);
- 	}
- 
- 	if (!enable_pmu)
-@@ -8149,6 +8158,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- static unsigned int vmx_handle_guest_intr(unsigned int vector)
- {
- 	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
-+	u64 data;
- 
- 	/* '0' on failure so that the !PT case can use a RET0 static call. */
- 	if (!vcpu || !kvm_handling_nmi_from_guest(vcpu))
-@@ -8157,10 +8167,24 @@ static unsigned int vmx_handle_guest_intr(unsigned int vector)
- 	if (vector >= GUEST_INVALID)
- 		return 0;
- 
--	kvm_make_request(KVM_REQ_PMI, vcpu);
--	__set_bit(MSR_CORE_PERF_GLOBAL_OVF_CTRL_TRACE_TOPA_PMI_BIT,
--		  (unsigned long *)&vcpu->arch.pmu.global_status);
--	return 1;
-+	switch (vector) {
-+	case GUEST_INTEL_PT:
-+		__set_bit(MSR_CORE_PERF_GLOBAL_OVF_CTRL_TRACE_TOPA_PMI_BIT,
-+			  (unsigned long *)&vcpu->arch.pmu.global_status);
-+		kvm_make_request(KVM_REQ_PMI, vcpu);
-+		return 1;
-+	case GUEST_INTEL_BTS:
-+		data = vmcs_read64(GUEST_IA32_DEBUGCTL);
-+		if ((data & DEBUGCTLMSR_BTS_MASK) == DEBUGCTLMSR_BTS_MASK) {
-+			kvm_make_request(KVM_REQ_PMI, vcpu);
-+			return 1;
-+		}
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	return 0;
- }
- 
- static __init void vmx_setup_user_return_msrs(void)
 -- 
-2.37.3
-
+  Kiryl Shutsemau / Kirill A. Shutemov
