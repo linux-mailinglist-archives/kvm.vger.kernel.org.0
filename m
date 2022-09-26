@@ -2,186 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ADF735EA916
-	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 16:53:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 51D145EA90C
+	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 16:52:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234199AbiIZOwY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 10:52:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39776 "EHLO
+        id S234166AbiIZOw1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 10:52:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234906AbiIZOvs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 10:51:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83AC1BC3D
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 06:18:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664198283;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LtpLVF78yaQ8akL0eEAs7+Z0svwvAfFmddP3iRQwkjc=;
-        b=bfAofHbQn9pOaAefG1DJxnTqxuPKTeraNDC2ZWVQsRiCROA7pygeF2QdKMw5TbfgjJs7se
-        qlXjOOXr/V2Bffpe36bwP+HN53Uv8J48CykC8h0Zc8fmc9xMYKYBY5JUxIYwZEIdeNgZzN
-        dFr2q5mHMLlFD3VEQ+oTPlsum8j28z0=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-632-9WTAsJsXMyOqteIBla_SmA-1; Mon, 26 Sep 2022 09:18:02 -0400
-X-MC-Unique: 9WTAsJsXMyOqteIBla_SmA-1
-Received: by mail-qv1-f71.google.com with SMTP id dw19-20020a0562140a1300b004a8eee124b4so3816072qvb.21
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 06:18:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=LtpLVF78yaQ8akL0eEAs7+Z0svwvAfFmddP3iRQwkjc=;
-        b=kKL2yl3Dm7cTp8gzlJFrCl5nmUYqie0/sb9LvkfGyVckqG2pXLzg4YaLtZmwS+Z0iU
-         ihs2jFA9nIsa4qrYNGft6tDW/f3w+Hw8XpmvZoM64U9ijyBdaqdh5eda8bOGsce0aREv
-         d1XSvMC1l+axbZNzKI5uDXVzSVefYrFwLsHZtKSO+ueJTtpDfEWB4D9DIXmwfruuwuHi
-         CZHAdgq9In8CsEQBRI5phE5cr1RW3wtPRjdktlGUCFw3wtqbbYp1ZmU6htNFzD6uDa55
-         8M2PIuuivId5vG2LrhsE7rbz82JmnNLvLju/40kXlQF610qlZP9sCPXl1F7t8Y+p5Zbz
-         krnA==
-X-Gm-Message-State: ACrzQf27og9jljwHpMs5WpzcTJojLdG1Mr0Dz8/Qtabit4WUGYy4d7m4
-        qmCIRAMlXdtv89afAggxhTz5Nndi9bsphe2T1m7Bx+Mv1EATnALWOZ8oV+qvDmkFWofpXMEDjiU
-        H4hFqixncs8fk
-X-Received: by 2002:a05:622a:654:b0:35c:f6e6:76b7 with SMTP id a20-20020a05622a065400b0035cf6e676b7mr17820457qtb.365.1664198278777;
-        Mon, 26 Sep 2022 06:17:58 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4X2VsELTxq8A6XavJEjjHhj8YKH3iZ07B183UX0OdOkc1HRRewWyFvSFtXrHzQS3LMX97ORg==
-X-Received: by 2002:a05:622a:654:b0:35c:f6e6:76b7 with SMTP id a20-20020a05622a065400b0035cf6e676b7mr17820441qtb.365.1664198278498;
-        Mon, 26 Sep 2022 06:17:58 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-46-200-222.retail.telecomitalia.it. [79.46.200.222])
-        by smtp.gmail.com with ESMTPSA id bm17-20020a05620a199100b006c73c3d288esm11765046qkb.131.2022.09.26.06.17.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Sep 2022 06:17:57 -0700 (PDT)
-Date:   Mon, 26 Sep 2022 15:17:51 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Bobby Eshleman <bobby.eshleman@gmail.com>
-Cc:     Bobby Eshleman <bobbyeshleman@gmail.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Cong Wang <cong.wang@bytedance.com>,
-        Jiang Wang <jiang.wang@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/6] virtio/vsock: add VIRTIO_VSOCK_F_DGRAM feature bit
-Message-ID: <20220926131751.pdlc5mbx6gxqlmkx@sgarzare-redhat>
-References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
- <3d1f32c4da81f8a0870e126369ba12bc8c4ad048.1660362668.git.bobby.eshleman@bytedance.com>
+        with ESMTP id S234922AbiIZOvt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 10:51:49 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8973CD10A;
+        Mon, 26 Sep 2022 06:18:11 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28QCxFIg004827;
+        Mon, 26 Sep 2022 13:18:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=3C1Rv6ElMGAfXtC1uY6XrX/SfqS1FuT25fzPSU8Z3ls=;
+ b=tbWeUPzTXUR4uHMVHeFHUOU58JunB8FbxQLfb5/WEQ0fL8Bxe4ibH/mPYU34yE9sezvq
+ 5Jgd8eqZuycMHNpyQc8NCYUvyfs40zn1KJej7e9ZhFZAfeLpNRo8NTlzdws+N0omWk7u
+ xy03qucOM8QrCZ02T5oALWw04o9/fJI+0l9PaKOudVwvXPYSyXG+uk8l7HjthDzYkgg1
+ 5LRi73MaJTRRLs8wkLl3zNrdS2yjVuQ689/e6KLCGcr+f2s94iUXrtIPlRgVau3t9MCX
+ jiOm7CmQwLwwWsvqhOStwhQvTdUktPZqac+QFuJbjBu3J9P8Fwd1dgeWydfUPQhBU30N ZA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jucjr8jcv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 26 Sep 2022 13:18:10 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28QCxYNn005993;
+        Mon, 26 Sep 2022 13:18:10 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jucjr8jc1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 26 Sep 2022 13:18:10 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 28QD6ceQ009166;
+        Mon, 26 Sep 2022 13:18:08 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03fra.de.ibm.com with ESMTP id 3jssh91u80-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 26 Sep 2022 13:18:08 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 28QDDrXx46727502
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 26 Sep 2022 13:13:53 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 131CEAE051;
+        Mon, 26 Sep 2022 13:18:05 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BE28BAE045;
+        Mon, 26 Sep 2022 13:18:04 +0000 (GMT)
+Received: from [9.171.72.93] (unknown [9.171.72.93])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 26 Sep 2022 13:18:04 +0000 (GMT)
+Message-ID: <c88bc732-1b4e-2ec3-360b-80998fd32dc7@linux.ibm.com>
+Date:   Mon, 26 Sep 2022 15:18:04 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <3d1f32c4da81f8a0870e126369ba12bc8c4ad048.1660362668.git.bobby.eshleman@bytedance.com>
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20220826161112.3786131-1-scgl@linux.ibm.com>
+ <20220826161112.3786131-3-scgl@linux.ibm.com>
+Content-Language: en-US
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v6 2/2] s390x: Test specification
+ exceptions during transaction
+In-Reply-To: <20220826161112.3786131-3-scgl@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: QWo_3spIAdttnUG0rg3jGBEvaKOqXAOL
+X-Proofpoint-ORIG-GUID: sUKa6P1zX8eSZCZUII8Zb772KAehb_ob
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-09-26_08,2022-09-22_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
+ suspectscore=0 lowpriorityscore=0 priorityscore=1501 mlxscore=0
+ phishscore=0 mlxlogscore=999 impostorscore=0 clxscore=1015 malwarescore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2209260083
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 15, 2022 at 10:56:07AM -0700, Bobby Eshleman wrote:
->This commit adds a feature bit for virtio vsock to support datagrams.
->
->Signed-off-by: Jiang Wang <jiang.wang@bytedance.com>
->Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
->---
-> drivers/vhost/vsock.c             | 3 ++-
-> include/uapi/linux/virtio_vsock.h | 1 +
-> net/vmw_vsock/virtio_transport.c  | 8 ++++++--
-> 3 files changed, 9 insertions(+), 3 deletions(-)
->
->diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->index b20ddec2664b..a5d1bdb786fe 100644
->--- a/drivers/vhost/vsock.c
->+++ b/drivers/vhost/vsock.c
->@@ -32,7 +32,8 @@
-> enum {
-> 	VHOST_VSOCK_FEATURES = VHOST_FEATURES |
-> 			       (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
->-			       (1ULL << VIRTIO_VSOCK_F_SEQPACKET)
->+			       (1ULL << VIRTIO_VSOCK_F_SEQPACKET) |
->+			       (1ULL << VIRTIO_VSOCK_F_DGRAM)
-> };
->
-> enum {
->diff --git a/include/uapi/linux/virtio_vsock.h b/include/uapi/linux/virtio_vsock.h
->index 64738838bee5..857df3a3a70d 100644
->--- a/include/uapi/linux/virtio_vsock.h
->+++ b/include/uapi/linux/virtio_vsock.h
->@@ -40,6 +40,7 @@
->
-> /* The feature bitmap for virtio vsock */
-> #define VIRTIO_VSOCK_F_SEQPACKET	1	/* SOCK_SEQPACKET supported */
->+#define VIRTIO_VSOCK_F_DGRAM		2	/* Host support dgram vsock */
+On 8/26/22 18:11, Janis Schoetterl-Glausch wrote:
+> Program interruptions during transactional execution cause other
+> interruption codes.
+> Check that we see the expected code for (some) specification exceptions.
+> 
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
 
-We already allocated bit 2 for F_NO_IMPLIED_STREAM , so we should use 3:
-https://github.com/oasis-tcs/virtio-spec/blob/26ed30ccb049fd51d6e20aad3de2807d678edb3a/virtio-vsock.tex#L22
-(I'll send patches to implement F_STREAM and F_NO_IMPLIED_STREAM 
-negotiation soon).
+First off a disclaimer stating that I don't know anything about our TB 
+facility and I'm currently lacking the time to read the documentation.
 
-As long as it's RFC it's fine to introduce F_DGRAM, but we should first 
-change virtio-spec before merging this series.
+But the code looks good to me and I don't see a reason that keeps me 
+from picking this.
 
-About the patch, we should only negotiate the new feature when we really 
-have DGRAM support. So, it's better to move this patch after adding 
-support for datagram.
+Acked-by: Janosch Frank <frankja@linux.ibm.com>
 
-Thanks,
-Stefano
+Minor nits below
 
->
-> struct virtio_vsock_config {
-> 	__le64 guest_cid;
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index c6212eb38d3c..073314312683 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -35,6 +35,7 @@ static struct virtio_transport virtio_transport; /* 
->forward declaration */
-> struct virtio_vsock {
-> 	struct virtio_device *vdev;
-> 	struct virtqueue *vqs[VSOCK_VQ_MAX];
->+	bool has_dgram;
->
-> 	/* Virtqueue processing is deferred to a workqueue */
-> 	struct work_struct tx_work;
->@@ -709,7 +710,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
-> 	}
->
-> 	vsock->vdev = vdev;
->-
-> 	vsock->rx_buf_nr = 0;
-> 	vsock->rx_buf_max_nr = 0;
-> 	atomic_set(&vsock->queued_replies, 0);
->@@ -726,6 +726,9 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
-> 	if (virtio_has_feature(vdev, VIRTIO_VSOCK_F_SEQPACKET))
-> 		vsock->seqpacket_allow = true;
->
->+	if (virtio_has_feature(vdev, VIRTIO_VSOCK_F_DGRAM))
->+		vsock->has_dgram = true;
->+
-> 	vdev->priv = vsock;
->
-> 	ret = virtio_vsock_vqs_init(vsock);
->@@ -820,7 +823,8 @@ static struct virtio_device_id id_table[] = {
-> };
->
-> static unsigned int features[] = {
->-	VIRTIO_VSOCK_F_SEQPACKET
->+	VIRTIO_VSOCK_F_SEQPACKET,
->+	VIRTIO_VSOCK_F_DGRAM
-> };
->
-> static struct virtio_driver virtio_vsock_driver = {
->-- 
->2.35.1
->
+> ---
+>   lib/s390x/asm/arch_def.h |   1 +
+>   s390x/spec_ex.c          | 199 ++++++++++++++++++++++++++++++++++++++-
+>   2 files changed, 195 insertions(+), 5 deletions(-)
+> 
+> diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+> index b6e60fb0..c841871c 100644
+> --- a/lib/s390x/asm/arch_def.h
+> +++ b/lib/s390x/asm/arch_def.h
+> @@ -73,6 +73,7 @@ struct cpu {
+>   #define PSW_MASK_BA			0x0000000080000000UL
+>   #define PSW_MASK_64			(PSW_MASK_BA | PSW_MASK_EA)
+>   
+> +#define CTL0_TRANSACT_EX_CTL			(63 -  8)
+>   #define CTL0_LOW_ADDR_PROT			(63 - 35)
+>   #define CTL0_EDAT				(63 - 40)
+>   #define CTL0_FETCH_PROTECTION_OVERRIDE		(63 - 38)
+> diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
+> index 68469e4b..56f26564 100644
+> --- a/s390x/spec_ex.c
+> +++ b/s390x/spec_ex.c
+> @@ -4,13 +4,19 @@
+>    *
+>    * Specification exception test.
+>    * Tests that specification exceptions occur when expected.
+> + * This includes specification exceptions occurring during transactional execution
+> + * as these result in another interruption code (the transactional-execution-aborted
+> + * bit is set).
+>    *
+>    * Can be extended by adding triggers to spec_ex_triggers, see comments below.
+>    */
+>   #include <stdlib.h>
+> +#include <htmintrin.h>
+>   #include <libcflat.h>
+>   #include <bitops.h>
+> +#include <asm/barrier.h>
+>   #include <asm/interrupt.h>
+> +#include <asm/facility.h>
+>   
+>   /* toggled to signal occurrence of invalid psw fixup */
+>   static bool invalid_psw_expected;
+> @@ -148,20 +154,22 @@ static int not_even(void)
+>   /*
+>    * Harness for specification exception testing.
+>    * func only triggers exception, reporting is taken care of automatically.
+> + * If a trigger is transactable it will also  be executed during a transaction.
+
+Double space
+
+> +
+> +static void test_spec_ex_trans(struct args *args, const struct spec_ex_trigger *trigger)
+> +{
+> +	const uint16_t expected_pgm = PGM_INT_CODE_SPECIFICATION
+> +				      | PGM_INT_CODE_TX_ABORTED_EVENT;
+
+I usually prefer having | and & at the end so it's easier to read.
+
+> +	union {
+> +		struct __htm_tdb tdb;
+> +		uint64_t dwords[sizeof(struct __htm_tdb) / sizeof(uint64_t)];
+> +	} diag;
+> +	unsigned int i;
+> +	int trans_result;
+> +
+
 
