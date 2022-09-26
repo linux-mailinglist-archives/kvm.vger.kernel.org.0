@@ -2,26 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C24A5E9E93
-	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 12:06:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BDBD5E9F89
+	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 12:26:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234868AbiIZKGD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 06:06:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58822 "EHLO
+        id S235471AbiIZK0x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 06:26:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233902AbiIZKGB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 06:06:01 -0400
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:12e:520::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F5E6371BD;
-        Mon, 26 Sep 2022 03:06:00 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-        (envelope-from <fw@strlen.de>)
-        id 1ockzm-0003bT-DZ; Mon, 26 Sep 2022 12:05:50 +0200
-Date:   Mon, 26 Sep 2022 12:05:50 +0200
-From:   Florian Westphal <fw@strlen.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
-        tgraf@suug.ch, urezki@gmail.com, Paolo Abeni <pabeni@redhat.com>,
+        with ESMTP id S235764AbiIZKZB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 06:25:01 -0400
+Received: from fornost.hmeau.com (helcar.hmeau.com [216.24.177.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EBB612AEC;
+        Mon, 26 Sep 2022 03:18:16 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+        by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1oclAk-008SVO-Vc; Mon, 26 Sep 2022 20:17:12 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 26 Sep 2022 18:17:10 +0800
+Date:   Mon, 26 Sep 2022 18:17:10 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Florian Westphal <fw@strlen.de>
+Cc:     netdev@vger.kernel.org, tgraf@suug.ch, urezki@gmail.com,
+        Paolo Abeni <pabeni@redhat.com>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
@@ -29,41 +30,35 @@ Cc:     Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
         Michal Hocko <mhocko@suse.com>,
         Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
 Subject: Re: [PATCH net] rhashtable: fix crash due to mm api change
-Message-ID: <20220926100550.GA12777@breakpoint.cc>
+Message-ID: <YzF8Ju+jXe09f0kj@gondor.apana.org.au>
 References: <20220926083139.48069-1-fw@strlen.de>
  <YzFkt744uWI4y3Sv@gondor.apana.org.au>
  <20220926085018.GA11304@breakpoint.cc>
  <YzFyz5FWn50rhLsH@gondor.apana.org.au>
+ <20220926100550.GA12777@breakpoint.cc>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YzFyz5FWn50rhLsH@gondor.apana.org.au>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220926100550.GA12777@breakpoint.cc>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> On Mon, Sep 26, 2022 at 10:50:18AM +0200, Florian Westphal wrote:
-> > Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> > > On Mon, Sep 26, 2022 at 10:31:39AM +0200, Florian Westphal wrote:
-> > > >
-> > > > This patch is partial revert of
-> > > > commit 93f976b5190d ("lib/rhashtable: simplify bucket_table_alloc()"),
-> > > > to avoid kvmalloc for ATOMIC case.
-> > > 
-> > > This patch should just be reverted.  If kvzalloc fails we should
-> > > definitely know about it.
-> > 
-> > No idea what you mean, I am no mind reader.  Please consider
-> > fixing this yourself, I am done with this crap.
-> 
-> I just meant that the patch quoted above should be completely
-> reverted instead of partially reverted.
+On Mon, Sep 26, 2022 at 12:05:50PM +0200, Florian Westphal wrote:
+>
+> I don't understand that at all, since this means removal of
+> __GFP_NOWARN -- that makes no sense to me.
 
-I don't understand that at all, since this means removal of
-__GFP_NOWARN -- that makes no sense to me.
+Only in the case of kvzalloc.  We expect kzalloc to fail, that's
+why it gets NOWARN.  There is no sane reason for kvzalloc to fail
+so it should warn.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
