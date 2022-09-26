@@ -2,133 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA5D85E9C0E
-	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 10:29:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F405C5E9C16
+	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 10:32:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234296AbiIZI3g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 04:29:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34720 "EHLO
+        id S234398AbiIZIcr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 04:32:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233264AbiIZI3f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 04:29:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C43CDB1
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 01:29:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664180972;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=EXYzHGpVQuZ+lzxqJDL7MpKtdjQKwaei6cZnl1/10a8=;
-        b=FInytUpLlpuPo5E9FwVqkwkhJtRwNv5BLFlE3MZNPSb5RhpacbVrVoa2A0ZUK3c6R0hDJH
-        TpZZ9Xm9rgYjvpraBUw9U8TD5tKtGWrgDOtCgXD4i67vf+WxZj8ZUcFN0B5ze/xCghOPnG
-        pYquisbnxAwKeY3W8VqHJknYEB3kZtc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-17-gm6xPzUANT-7y0s7eTr-uQ-1; Mon, 26 Sep 2022 04:29:26 -0400
-X-MC-Unique: gm6xPzUANT-7y0s7eTr-uQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F2ABE381A729;
-        Mon, 26 Sep 2022 08:29:25 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AE54E1121314;
-        Mon, 26 Sep 2022 08:29:25 +0000 (UTC)
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Subject: [PATCH] KVM: selftests: replace assertion with warning in access_tracking_perf_test
-Date:   Mon, 26 Sep 2022 04:29:23 -0400
-Message-Id: <20220926082923.299554-1-eesposit@redhat.com>
+        with ESMTP id S234353AbiIZIcn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 04:32:43 -0400
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:12e:520::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FCA736862;
+        Mon, 26 Sep 2022 01:32:41 -0700 (PDT)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+        (envelope-from <fw@breakpoint.cc>)
+        id 1ocjXL-00030q-0S; Mon, 26 Sep 2022 10:32:23 +0200
+From:   Florian Westphal <fw@strlen.de>
+To:     <netdev@vger.kernel.org>
+Cc:     tgraf@suug.ch, urezki@gmail.com, Paolo Abeni <pabeni@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, herbert@gondor.apana.org.au,
+        linux-kernel@vger.kernel.org, akpm@linux-foundation.org,
+        Florian Westphal <fw@strlen.de>,
+        Martin Zaharinov <micron10@gmail.com>,
+        Michal Hocko <mhocko@suse.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: [PATCH net] rhashtable: fix crash due to mm api change
+Date:   Mon, 26 Sep 2022 10:31:39 +0200
+Message-Id: <20220926083139.48069-1-fw@strlen.de>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,
+        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Page_idle uses {ptep/pmdp}_clear_young_notify which in turn calls
-the mmu notifier callback ->clear_young(), which purposefully
-does not flush the TLB.
+Martin Zaharinov reports BUG() in mm land for 5.19.10 kernel:
+ kernel BUG at mm/vmalloc.c:2437!
+ invalid opcode: 0000 [#1] SMP
+ CPU: 28 PID: 0 Comm: swapper/28 Tainted: G        W  O      5.19.9 #1
+ [..]
+ RIP: 0010:__get_vm_area_node+0x120/0x130
+  __vmalloc_node_range+0x96/0x1e0
+  kvmalloc_node+0x92/0xb0
+  bucket_table_alloc.isra.0+0x47/0x140
+  rhashtable_try_insert+0x3a4/0x440
+  rhashtable_insert_slow+0x1b/0x30
+ [..]
 
-When running the test in a nested guest, point 1. of the test
-doc header is violated, because KVM TLB is unbounded by size
-and since no flush is forced, KVM does not update the sptes
-accessed/idle bits resulting in guest assertion failure.
+bucket_table_alloc uses kvzalloc(GPF_ATOMIC).  If kmalloc fails, this now
+falls through to vmalloc and hits code paths that assume GFP_KERNEL.
 
-More precisely, only the first ACCESS_WRITE in run_test() actually
-makes visible changes, because sptes are created and the accessed
-bit is set to 1 (or idle bit is 0). Then the first mark_memory_idle()
-passes since access bit is still one, and sets all pages as idle
-(or not accessed). When the next write is performed, the update
-is not flushed therefore idle is still 1 and next mark_memory_idle()
-fails.
+I sent a patch to restore GFP_ATOMIC support in kvmalloc but mm
+maintainers rejected it.
 
-Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+This patch is partial revert of
+commit 93f976b5190d ("lib/rhashtable: simplify bucket_table_alloc()"),
+to avoid kvmalloc for ATOMIC case.
+
+As kvmalloc doesn't warn when used with ATOMIC, kernel will only crash
+once vmalloc fallback occurs, so we may see more crashes in other areas
+in the future.
+
+Most other callers seem ok but kvm_mmu_topup_memory_cache looks like it
+might be affected by the same breakage, so Cc kvm@.
+
+Reported-by: Martin Zaharinov <micron10@gmail.com>
+Fixes: a421ef303008 ("mm: allow !GFP_KERNEL allocations for kvmalloc")
+Link: https://lore.kernel.org/linux-mm/Yy3MS2uhSgjF47dy@pc636/T/#t
+Cc: Michal Hocko <mhocko@suse.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org
+Signed-off-by: Florian Westphal <fw@strlen.de>
 ---
- .../selftests/kvm/access_tracking_perf_test.c | 25 ++++++++++++-------
- 1 file changed, 16 insertions(+), 9 deletions(-)
+ lib/rhashtable.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-index 1c2749b1481a..87b0bd5ebc65 100644
---- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
-+++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-@@ -31,8 +31,9 @@
-  * These limitations are worked around in this test by using a large enough
-  * region of memory for each vCPU such that the number of translations cached in
-  * the TLB and the number of pages held in pagevecs are a small fraction of the
-- * overall workload. And if either of those conditions are not true this test
-- * will fail rather than silently passing.
-+ * overall workload. And if either of those conditions are not true (for example
-+ * in nesting, where TLB size is unlimited) this test will print a warning
-+ * rather than silently passing.
-  */
- #include <inttypes.h>
- #include <limits.h>
-@@ -172,17 +173,23 @@ static void mark_vcpu_memory_idle(struct kvm_vm *vm,
- 		    vcpu_idx, no_pfn, pages);
+diff --git a/lib/rhashtable.c b/lib/rhashtable.c
+index e12bbfb240b8..9451f411bc71 100644
+--- a/lib/rhashtable.c
++++ b/lib/rhashtable.c
+@@ -181,7 +181,13 @@ static struct bucket_table *bucket_table_alloc(struct rhashtable *ht,
+ 	int i;
+ 	static struct lock_class_key __key;
  
- 	/*
--	 * Test that at least 90% of memory has been marked idle (the rest might
--	 * not be marked idle because the pages have not yet made it to an LRU
--	 * list or the translations are still cached in the TLB). 90% is
-+	 * Check that at least 90% of memory has been marked idle (the rest
-+	 * might not be marked idle because the pages have not yet made it to an
-+	 * LRU list or the translations are still cached in the TLB). 90% is
- 	 * arbitrary; high enough that we ensure most memory access went through
- 	 * access tracking but low enough as to not make the test too brittle
- 	 * over time and across architectures.
-+	 *
-+	 * Note that when run in nested virtualization, this check will trigger
-+	 * much more frequently because TLB size is unlimited and since no flush
-+	 * happens, much more pages are cached there and guest won't see the
-+	 * "idle" bit cleared.
- 	 */
--	TEST_ASSERT(still_idle < pages / 10,
--		    "vCPU%d: Too many pages still idle (%"PRIu64 " out of %"
--		    PRIu64 ").\n",
--		    vcpu_idx, still_idle, pages);
-+	if (still_idle < pages / 10)
-+		printf("WARNING: vCPU%d: Too many pages still idle (%"PRIu64 "
-+		       out of %" PRIu64 "), this will affect performance results
-+		       .\n",
-+		       vcpu_idx, still_idle, pages);
+-	tbl = kvzalloc(struct_size(tbl, buckets, nbuckets), gfp);
++	size = struct_size(tbl, buckets, nbuckets);
++
++	/* kvmalloc API does not support GFP_KERNEL anymore */
++	if ((gfp & GFP_KERNEL) != GFP_KERNEL)
++		tbl = kzalloc(size, gfp | __GFP_NOWARN | __GFP_NORETRY);
++	else
++		tbl = kvzalloc(size, gfp);
  
- 	close(page_idle_fd);
- 	close(pagemap_fd);
+ 	size = nbuckets;
+ 
 -- 
-2.31.1
+2.37.3
 
