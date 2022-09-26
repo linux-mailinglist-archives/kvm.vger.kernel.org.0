@@ -2,81 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7376D5EB368
-	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 23:44:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 927CE5EB371
+	for <lists+kvm@lfdr.de>; Mon, 26 Sep 2022 23:45:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230084AbiIZVok (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 17:44:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52962 "EHLO
+        id S229647AbiIZVps (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 17:45:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229896AbiIZVoh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 17:44:37 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 706EDE3A;
-        Mon, 26 Sep 2022 14:44:31 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id s90-20020a17090a2f6300b00203a685a1aaso8281776pjd.1;
-        Mon, 26 Sep 2022 14:44:31 -0700 (PDT)
+        with ESMTP id S229593AbiIZVpl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 17:45:41 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05400A5730
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 14:45:39 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id w20so7405677ply.12
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 14:45:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=+MXwLksTtCK5iCxRh+qzDfrMn1HKYCME03rNY5MPuX4=;
-        b=XRJmD7By+SLkgrM3+q32fwbodVwhfnEMJmCpwHDOoihQRWaG8YXv+0sOSziP8xOKLo
-         2WJ7hG2qq+NkXrmhKS4RZjgwpC6WJBuuZiVNUwyfPSEWPc3EzcjLr8cXu5+vAJNWACbc
-         pRwSJ7jPMW3lWM2LfRA0Mi9MyNDpyLZmHqKUIorhWHOKYh4URnA7TlilmLTPoR5Nj7sD
-         IXLjQvW3pGDfZOG9qb94F56o0dYRSnVj9erwMlVKpi5IiGtgAhk9UY2HxfXJTJgvpO2K
-         50GNghXJZ2tQJxmD9hYAL3KNd5JuztFbpGJAROsgjWnwHbQ+BBYHyRNwLM/2ObXO47ME
-         LdLw==
+        bh=LU6EMhAQqyZeVBZagLqvgilvEHHLPOXcgccMpjKfJK8=;
+        b=SdVlLvvVTMjaSi11aOpQfXHOJPWLl3QEHOjZ9TrE+4K2qZyGMe0R+vEU6OQvvGET5E
+         RYq4938P0Cn8aSs4fMlWLo591kzRK3RjSAab7Q1Z3EJ2pxu2I+8OJ2I4Xk1nVoexS/JV
+         SelTDURwvHOvANRxwwuBqduwi5tqlw8U0QyZMnqRLGYP9O962RG7uspZWOOjI/SDgD4W
+         F2gYNxbyrys/T1KPXIX2X62lLwtXlZpvC2rcwOf2rTmdX6X3SfuYWPj3t2C13HX2CviB
+         PhUhd7QW4Iy/jjZ2BNEX1IWY0Qi6Rrzyxj0oVs9QtMpwNOlYT1C+1IVp1QGxaSK1/I4M
+         XLcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=+MXwLksTtCK5iCxRh+qzDfrMn1HKYCME03rNY5MPuX4=;
-        b=LhacWtYoJ5lLWaNyh+GgwKcxyAqV3rwJrDxYkYZlZUJGxKDZgLnIUuplZh5gnocebr
-         I1HAx32fHbidfBws3CdiF+7UxrxhDEZM21UMaKFEP1h9hRS2zPc6UNzn3MxPyxe6INoZ
-         DON+siK/UoZhyagOdty/yHASdp7sJUgUstZbWMU/hjUYbOko75cCwD/ija6KfLSfsTvS
-         TbOVynlQlZoFet0OFfnE84RSejgEkZqsxmoNyFfDQaexSj8lgyQN/q4htjsm6X3q9brp
-         Y5x8n9EsNROvSOqnlo0hCLig3Md7FptqFUMTxT+4sUgotVzqpv6cLbcKO5edmieEAO03
-         YNdQ==
-X-Gm-Message-State: ACrzQf3rHHqTsE+D7ohIwMm55n/BT8Lx4AfzLNQJ1mG9mRHoIoVJgC/W
-        xzQE4K881v9GwwnMQYO2FpW6tufRAWkPBcDpl9A=
-X-Google-Smtp-Source: AMsMyM4N9N+Q11yxesDny8GymJSHVtk6CVMHlmbURTjglT6Coc5S7wO3MWj2pUsxpmR8L8WvIhnG6Q==
-X-Received: by 2002:a17:902:e750:b0:176:b0fb:9683 with SMTP id p16-20020a170902e75000b00176b0fb9683mr24487911plf.71.1664228670849;
-        Mon, 26 Sep 2022 14:44:30 -0700 (PDT)
-Received: from localhost (c-73-164-155-12.hsd1.wa.comcast.net. [73.164.155.12])
-        by smtp.gmail.com with ESMTPSA id p18-20020a631e52000000b004393f60db36sm11291764pgm.32.2022.09.26.14.44.30
+        bh=LU6EMhAQqyZeVBZagLqvgilvEHHLPOXcgccMpjKfJK8=;
+        b=hFEcIVTI7JK4z5uHBTqLYyM+lY1INo4OSTTuabfY1oPoSuQYHfO0M039H2OIwz4Ap9
+         ocSmAbqLdnYUgLQ4kkcZz8GJIXY4gR4sYop5dfqEn7qDpATtjRpkTbX8DdSudP5fdJWk
+         KyP/0xPLlMYAcoz8ZdV3cvSsIDzWjraC5hv2Qch74jIwch6QAROzJoenXWadtU83jLVg
+         gPmdtsv9Gxa0wivjQYJYOY5mFVD/0eVWw92UqKjMR3tcehBbmvPpMYBGjXD9Vm2QwgSO
+         1nW8E3hNjXfO61ePjSuG6PLjCksBDqlJ2+4QOYhmSjVT6I8uLD/jhjgMJQ3ds7I7hHLq
+         ukpw==
+X-Gm-Message-State: ACrzQf1tQVkYsWKgeEhiM8mYAbFtiFqo8ydw8vWaKDRh2NQfpsbl+6oI
+        aVDxwL3PkHz3lxHOQlDoxrR4eA==
+X-Google-Smtp-Source: AMsMyM5iuBjmHtQ6842LnpNJ6lGgmd6alDfIJ1BUjSGlT55CYKJKOf6ev8jAA9rsOZQ09XERxL0TBA==
+X-Received: by 2002:a17:90a:6405:b0:203:6eaa:4999 with SMTP id g5-20020a17090a640500b002036eaa4999mr888718pjj.8.1664228739239;
+        Mon, 26 Sep 2022 14:45:39 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id y13-20020a17090a1f4d00b001fd7e56da4csm7081945pjy.39.2022.09.26.14.45.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Sep 2022 14:44:30 -0700 (PDT)
-Date:   Mon, 26 Sep 2022 21:44:29 +0000
-From:   Bobby Eshleman <bobbyeshleman@gmail.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Bobby Eshleman <bobby.eshleman@gmail.com>,
-        Wei Liu <wei.liu@kernel.org>,
-        Cong Wang <cong.wang@bytedance.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Jiang Wang <jiang.wang@bytedance.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Dexuan Cui <decui@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-        Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-hyperv@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH 0/6] virtio/vsock: introduce dgrams, sk_buff, and qdisc
-Message-ID: <YzIdPWL1OWMjg6Ws@bullseye>
-References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
- <20220926134219.sreibsw2rfgw7625@sgarzare-redhat>
+        Mon, 26 Sep 2022 14:45:38 -0700 (PDT)
+Date:   Mon, 26 Sep 2022 21:45:34 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftests: Skip tests that require EPT when it is
+ not available
+Message-ID: <YzIdfkovobW3w/zk@google.com>
+References: <20220926171457.532542-1-dmatlack@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220926134219.sreibsw2rfgw7625@sgarzare-redhat>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+In-Reply-To: <20220926171457.532542-1-dmatlack@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,52 +71,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 26, 2022 at 03:42:19PM +0200, Stefano Garzarella wrote:
-> Hi,
-> 
-> On Mon, Aug 15, 2022 at 10:56:03AM -0700, Bobby Eshleman wrote:
-> > Hey everybody,
-> > 
-> > This series introduces datagrams, packet scheduling, and sk_buff usage
-> > to virtio vsock.
-> 
-> Just a reminder for those who are interested, tomorrow Sep 27 @ 16:00 UTC we
-> will discuss more about the next steps for this series in this room:
-> https://meet.google.com/fxi-vuzr-jjb
-> (I'll try to record it and take notes that we will share)
-> 
-> Bobby, thank you so much for working on this! It would be great to solve the
-> fairness issue and support datagram!
->
+On Mon, Sep 26, 2022, David Matlack wrote:
+> +bool kvm_vm_has_ept(struct kvm_vm *vm)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	uint64_t ctrl;
+> +
+> +	vcpu = list_first_entry(&vm->vcpus, struct kvm_vcpu, list);
+> +	TEST_ASSERT(vcpu, "Cannot determine EPT support without vCPUs.\n");
 
-I appreciate that, thanks!
+KVM_GET_MSRS is supported on /dev/kvm for feature MSRs, and is available for
+selftests via kvm_get_feature_msr().
 
-> I took a look at the series, left some comments in the individual patches,
-> and add some advice here that we could pick up tomorrow:
-> - it would be nice to run benchmarks (e.g., iperf-vsock, uperf, etc.) to
->   see how much the changes cost (e.g. sk_buff use)
-> - we should take care also of other transports (i.e. vmci, hyperv), the
-> uAPI should be as close as possible regardless of the transport
->
+> +
+> +	ctrl = vcpu_get_msr(vcpu, MSR_IA32_VMX_TRUE_PROCBASED_CTLS) >> 32;
+> +	if (!(ctrl & CPU_BASED_ACTIVATE_SECONDARY_CONTROLS))
+> +		return false;
+> +
+> +	ctrl = vcpu_get_msr(vcpu, MSR_IA32_VMX_PROCBASED_CTLS2) >> 32;
+> +	return ctrl & SECONDARY_EXEC_ENABLE_EPT;
+> +}
+> +
+>  void prepare_eptp(struct vmx_pages *vmx, struct kvm_vm *vm,
+>  		  uint32_t eptp_memslot)
+>  {
+> +	TEST_REQUIRE(kvm_vm_has_ept(vm));
 
-Duly noted. I have some measurements with uperf, I'll put the data
-together and send that out here.
-
-Regarding the uAPI topic, I'll save that topic for our conversation
-tomorrow as I think the netdev topic will weigh on it.
-
-> About the use of netdev, it seems the most controversial point and I
-> understand Jakub and Michael's concerns. Tomorrow would be great if you can
-> update us if you have found any way to avoid it, just reusing a packet
-> scheduler somehow.
-> It would be great if we could make it available for all transports (I'm not
-> asking you to implement it for all, but to have a generic api that others
-> can use).
->
-> But we can talk about that tomorrow!
-
-Sounds good, talk to you then!
-
-Best,
-Bobby
-
+I would much rather this be an assert, i.e. force the test to do TEST_REQUIRE(),
+even if that means duplicate code.  One of the roles of TEST_REQUIRE() is to
+document test requirements.
