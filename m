@@ -2,60 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ADCEC5EB476
-	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 00:19:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 95C5B5EB479
+	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 00:21:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229570AbiIZWT1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 18:19:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36476 "EHLO
+        id S229951AbiIZWVE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 18:21:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230281AbiIZWTI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 18:19:08 -0400
-Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F74E6E88C
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 15:18:49 -0700 (PDT)
-Received: by mail-yb1-xb2e.google.com with SMTP id e187so10125455ybh.10
-        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 15:18:49 -0700 (PDT)
+        with ESMTP id S229734AbiIZWVB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 18:21:01 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E53F5BC2
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 15:20:58 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id f23so7491012plr.6
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 15:20:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=5c7O7OE6y7iEqCyFkwUzzrySNFGgzG3FlSfpwI61xTY=;
-        b=ZidBRley+2+0BcNGYx4Fnuhk6Y9qWAsIjqKTMmJrT+swFarQLDCHS3ixYDeFBoAVJE
-         H4wC1tnB9PDPVV9t/ZagcrFwsKrTKQ7VbnIneEsXg9oO7kyP4qSgPori/1xDzPDIVswk
-         xkR7cpv+eQ7Q1Vr1bCf4ztC3egkl3nlfAPFxJbTT/jqWU95/NvEEFnKYTMvsq7aBHfFd
-         uOmLQj+tAHpMdsIK6MxuF9/7SgDSHcgvWpuSlqZp343kOVrTidSw11optu6MLBCWh76Z
-         cc9hX6WYgz0ITAdkLJSueB0rgNPjSqFsEQYZT5bc2RZlEBXbrzJd79L27mSqNohuBNGo
-         cAnA==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=q0d0JcJxo5RXSo0jSn0YKfBLhRe58BO7fShjoEBS1Ks=;
+        b=drFyRqv79+aAFp3YKkcEAtyvNvamGSby2hV3WgIar0+plycDgOjym1ov70Q+AP3rSj
+         pHK2QSF9lzHcoeGnPjCZRLbrVEGP56J8gxDkEQ8N5YcKSvk14hHefc4sfotesQ1YfLCh
+         9PrT/gWEtnB/rP0JnA+eFXt97tM7aCrzA7LnHaJxBATMA2WjkfWaEc1pSOFHLyFtBzNa
+         /0unVt8Jdd79NHF27YCvO56q8xF7gAXJqxWruAjjal/l8JUC5l8awZxRaClJNmjB2JaI
+         Y8RqbaW0/OwOhhTqukco+YZ9/uVlyUqiqqFg6JmO04gXmQODu1M1edFNBFuAFeBCLrpz
+         2fww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=5c7O7OE6y7iEqCyFkwUzzrySNFGgzG3FlSfpwI61xTY=;
-        b=GAzUQXRQt+e8rzlAdkqoADV2Ik2mcr5UaNPCwHV3mkMxTx06xOK3ADaj0bPYGqnJ5B
-         QmORz8zwz6f3DWo6sO97L7YJ+9/QF4/aNMomxcJKNCSqrJbX0T1hemU+ZDyLofg7Whx+
-         F9diNDtNRm4mgdHgg8xClnjUJvzHNC65pXm6Pc+55ombgvhkDlHHN1jTSpsBxx2P8jc9
-         bTH/4aXvROco8UvZ47ecEbTL8R9v4JP55uBihZDnpWJcJZgZTkGyf+9PNPObZ4TxHS95
-         8CSF8eCX9nCp/R1EcxIMXdr4ZBQ5GP3lF0nts+ac3H6HAYUy9TEY7HRMvlT2AbEuES5q
-         s5tQ==
-X-Gm-Message-State: ACrzQf0T5WyJ7PWzvhHTasqrRWDm4CLib2jH94ngT1JgH3CpImw4fB9G
-        yIFw92qTZyN3qlbGa5yoqMfcu1IcJWKyLljt3e4SjQ==
-X-Google-Smtp-Source: AMsMyM6rM9f44ys1MMp7kmQeMVaG1OXOWNNkfQ4aWCWOfGxpG7obV3Dk5qplJmFzsNvL8rXPheWTtgpArSwghxJj+1M=
-X-Received: by 2002:a25:4fc2:0:b0:680:f309:48e5 with SMTP id
- d185-20020a254fc2000000b00680f30948e5mr23902716ybb.0.1664230728659; Mon, 26
- Sep 2022 15:18:48 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=q0d0JcJxo5RXSo0jSn0YKfBLhRe58BO7fShjoEBS1Ks=;
+        b=ECUVUFn6HpZ6FSsVw6FaTrrkt6vMrfY853NlmHTCwEp5C+dsRj5s01fZUay+HJ/pQ3
+         YTrMhpxVW2Agm9LQckyP6RlsG/oEom29O9qzUdlm/5fGEN+jbNkVynvRxL76BD9IgMJa
+         8szfGGGK90GFSTL/OyXmtAlRefKvTmLCgM5xRqMDXnv0RK+Y7DRfJOEAuyKspoUFGglA
+         lzu6XJnNbk7BU4pqrl5SEh0IWr/lX6BXFDFPcGTVBPZEknnXmN/ZF4djmQXeFVt6xMdV
+         zcz3MhCy9ROBnNIM/M7QRkgeV53kikMaegy18YLeqrQRJAHF9x0dIW1ZwwpIoH7a+IHZ
+         e+PA==
+X-Gm-Message-State: ACrzQf2h9J1mUyzyXESveCju8Ym20lnDQkaoj/qzYdINJ7I10AgZzIQb
+        1j5gvgnzrJ13A8lduuizr/NgWQ==
+X-Google-Smtp-Source: AMsMyM6Vp57gjSMhGV468fQd2F4bdER4HWvrg1QRTzE92nU6ZjNYp3SC+OOu4oMXAcMw2GqENdEiQA==
+X-Received: by 2002:a17:90b:1809:b0:205:ccba:45a9 with SMTP id lw9-20020a17090b180900b00205ccba45a9mr979740pjb.98.1664230858310;
+        Mon, 26 Sep 2022 15:20:58 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id 23-20020a17090a199700b001f2fa09786asm7117883pji.19.2022.09.26.15.20.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Sep 2022 15:20:57 -0700 (PDT)
+Date:   Mon, 26 Sep 2022 22:20:54 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Yang Zhong <yang.zhong@intel.com>,
+        Wei Wang <wei.w.wang@intel.com>,
+        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftests: Fix nx_huge_pages_test on TDP-disabled
+ hosts
+Message-ID: <YzIlxmMOeSZHsnOu@google.com>
+References: <20220926175219.605113-1-dmatlack@google.com>
 MIME-Version: 1.0
-References: <20220926171457.532542-1-dmatlack@google.com> <YzIdfkovobW3w/zk@google.com>
-In-Reply-To: <YzIdfkovobW3w/zk@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 26 Sep 2022 15:18:22 -0700
-Message-ID: <CALzav=d-4a8yPxPUuHNh1884Z4Pe_0ewMwnunGK_jAAvr9L-vw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: selftests: Skip tests that require EPT when it is
- not available
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220926175219.605113-1-dmatlack@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -67,58 +75,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 26, 2022 at 2:45 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, Sep 26, 2022, David Matlack wrote:
-> > +bool kvm_vm_has_ept(struct kvm_vm *vm)
-> > +{
-> > +     struct kvm_vcpu *vcpu;
-> > +     uint64_t ctrl;
-> > +
-> > +     vcpu = list_first_entry(&vm->vcpus, struct kvm_vcpu, list);
-> > +     TEST_ASSERT(vcpu, "Cannot determine EPT support without vCPUs.\n");
->
-> KVM_GET_MSRS is supported on /dev/kvm for feature MSRs, and is available for
-> selftests via kvm_get_feature_msr().
+On Mon, Sep 26, 2022, David Matlack wrote:
+> +void virt_map_2m(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+> +		 uint64_t nr_2m_pages)
 
-Ack.
+Gah, the selftest APIs are so frustrating.  Taking the number of pages in virt_map()
+and vm_userspace_mem_region_add() is asinine.  Tests either assume a specific page
+size, e.g. x86 tests, or manually calculate the number of pages from the number of
+bytes, only for those calculations to be reversed.  E.g. set_memory_region_test's
+usage of getpagesize().
 
->
-> > +
-> > +     ctrl = vcpu_get_msr(vcpu, MSR_IA32_VMX_TRUE_PROCBASED_CTLS) >> 32;
-> > +     if (!(ctrl & CPU_BASED_ACTIVATE_SECONDARY_CONTROLS))
-> > +             return false;
-> > +
-> > +     ctrl = vcpu_get_msr(vcpu, MSR_IA32_VMX_PROCBASED_CTLS2) >> 32;
-> > +     return ctrl & SECONDARY_EXEC_ENABLE_EPT;
-> > +}
-> > +
-> >  void prepare_eptp(struct vmx_pages *vmx, struct kvm_vm *vm,
-> >                 uint32_t eptp_memslot)
-> >  {
-> > +     TEST_REQUIRE(kvm_vm_has_ept(vm));
->
-> I would much rather this be an assert, i.e. force the test to do TEST_REQUIRE(),
-> even if that means duplicate code.  One of the roles of TEST_REQUIRE() is to
-> document test requirements.
+As a baby step toward providing sane APIs and being able to create huge mappings
+in common tests, what about refactoring virt_map() to take the size in bytes (see
+below), and then assert in arch code that the page size matches vm->page_size,
+except for x86, which translates back to its page "levels".
 
-This gets difficult when you consider dirty_log_perf_test. Users can
-use dirty_log_perf_test in nested mode by passing "-n". But
-dirty_log_perf_test is an architecture-neutral test, so adding
-TEST_REQUIRE() there would require an ifdef, and then gets even more
-complicated if we add support for AMD or nested on non-x86
-architectures.
+Then max_guest_memory_test can use virt_map() and __virt_map(), and we could even
+delete vm_calc_num_guest_pages().  aarch64's usage in steal_time_init() can be
+hardcoded to a single page, the size of the allocation is hardcoded to 64 bytes,
+I see no reason to dance around that and pretend that page sizes can be smaller
+than 64 bytes.
 
-One option is to put the TEST_REQUIRE() in the x86-specific
-perf_test_setup_ept(), but that is only one level above
-prepare_eptp(), so not exactly any better at documenting the
-requirement.
+Then for proper support, we can figure out how to enumerate the allowed page sizes
+in the guest for use in common tests.
 
-Another option is to do nothing and let the test fail if running on
-hosts without EPT. I don't like this solution though, because that
-means developers and automation would need custom logic to skip
-running dirty_log_perf_test with -n depending on the state of the
-host. (For context: I typically run all selftests and kvm-unit-tests
-against kvm with ept=Y and ept=N.)
+And in parallel, we can cajole someone into refactoring vm_userspace_mem_region_add()
+to take the size in bytes.
 
-At least for vmx_dirty_log_test, the TEST_REQUIRE() could be put in main().
+E.g.
+
+void __virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+		uint64_t nr_bytes, size_t page_size)
+{
+	uint64_t nr_pages = DIV_ROUND_UP(nr_bytes, page_size);
+
+	TEST_ASSERT(vaddr + size > vaddr, "Vaddr overflow");
+	TEST_ASSERT(paddr + size > paddr, "Paddr overflow");
+
+	while (npages--) {
+		virt_pg_map(vm, vaddr, paddr);
+		vaddr += page_size;
+		paddr += page_size;
+	}
+}
+
+void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+	      uint64_t nr_bytes)
+{
+	__virt_map(vm, vaddr, paddr, nr_bytes, vm->page_size);
+}
+
+and in max_guest_memory_test:
+
+#ifdef __x86_64__
+		/* TODO: use huge pages for other architectures. */
+		__virt_map(vm, gpa, gpa, slot_size, PG_SIZE_1G);
+#else
+		virt_map(vm, gpa, gpa, slot_size);
+#endif
+
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < nr_2m_pages; i++) {
+> +		__virt_pg_map(vm, vaddr, paddr, PG_LEVEL_2M);
+> +
+> +		vaddr += PG_SIZE_2M;
+> +		paddr += PG_SIZE_2M;
+> +	}
+> +}
+> +
+>  static uint64_t *_vm_get_page_table_entry(struct kvm_vm *vm,
+>  					  struct kvm_vcpu *vcpu,
+>  					  uint64_t vaddr)
+> diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+> index cc6421716400..a850769692b7 100644
+> --- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+> @@ -22,7 +22,8 @@
+>  #define HPAGE_GPA		(4UL << 30) /* 4G prevents collision w/ slot 0 */
+>  #define HPAGE_GVA		HPAGE_GPA /* GVA is arbitrary, so use GPA. */
+>  #define PAGES_PER_2MB_HUGE_PAGE 512
+> -#define HPAGE_SLOT_NPAGES	(3 * PAGES_PER_2MB_HUGE_PAGE)
+> +#define HPAGE_SLOT_2MB_PAGES	3
+> +#define HPAGE_SLOT_NPAGES	(HPAGE_SLOT_2MB_PAGES * PAGES_PER_2MB_HUGE_PAGE)
+>  
+>  /*
+>   * Passed by nx_huge_pages_test.sh to provide an easy warning if this test is
+> @@ -141,7 +142,11 @@ void run_test(int reclaim_period_ms, bool disable_nx_huge_pages,
+>  				    HPAGE_GPA, HPAGE_SLOT,
+>  				    HPAGE_SLOT_NPAGES, 0);
+>  
+> -	virt_map(vm, HPAGE_GVA, HPAGE_GPA, HPAGE_SLOT_NPAGES);
+> +	/*
+> +	 * Use 2MiB virtual mappings so that KVM can map the region with huge
+> +	 * pages even if TDP is disabled.
+> +	 */
+> +	virt_map_2m(vm, HPAGE_GVA, HPAGE_GPA, HPAGE_SLOT_2MB_PAGES);
+
+Hmm, what about probing TDP support and deliberately using 4KiB pages when TDP is
+enabled?  That would give a bit of bonus coverage by verifying that KVM creates
+huge pages irrespective of guest mapping level.
