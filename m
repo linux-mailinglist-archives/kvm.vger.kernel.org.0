@@ -2,67 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CDB715EC167
-	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 13:32:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 40B1F5EC1F7
+	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 13:58:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230042AbiI0LcH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Sep 2022 07:32:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57914 "EHLO
+        id S231684AbiI0L6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Sep 2022 07:58:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229691AbiI0LcE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Sep 2022 07:32:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CC9AE0A3
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 04:32:02 -0700 (PDT)
+        with ESMTP id S231946AbiI0L6W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Sep 2022 07:58:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A13DA1559E8
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 04:58:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664278321;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
+        s=mimecast20190719; t=1664279900;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=MzM4UgG32xbsNP1OM3CxJA0n8fbwgYOZ+v3G/KQ/gb4=;
-        b=NROHQTpd1qWlBwufdYHmEkr1awrRzNWYcHtDGYbwEryT1ZeUtf6tdxKU6Dq48z3p/QdzkQ
-        i2q0kEkqdJP42UBGtwLZoB9CTJMoyq0m7MUw5RU5Ws9E6oZHMlqh4WU5AuEmZfFU5E67vJ
-        8Umrm5o4p+gwXWjguu0rnUgjFLdgi6E=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-638-EmTPAt2-OzClej66ExLb9w-1; Tue, 27 Sep 2022 07:31:58 -0400
-X-MC-Unique: EmTPAt2-OzClej66ExLb9w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C5D46185A7A9;
-        Tue, 27 Sep 2022 11:31:57 +0000 (UTC)
-Received: from [10.64.54.143] (vpn2-54-143.bne.redhat.com [10.64.54.143])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E93F92166B26;
-        Tue, 27 Sep 2022 11:31:45 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v4 1/6] KVM: x86: Introduce KVM_REQ_RING_SOFT_FULL
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org,
-        andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com,
-        peterx@redhat.com, pbonzini@redhat.com, zhenyzha@redhat.com,
-        shan.gavin@gmail.com, james.morse@arm.com, suzuki.poulose@arm.com,
-        alexandru.elisei@arm.com, oliver.upton@linux.dev
-References: <20220927005439.21130-1-gshan@redhat.com>
- <20220927005439.21130-2-gshan@redhat.com> <86y1u56rku.wl-maz@kernel.org>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <a75f7896-320c-4d15-f14d-dc900c8e27b2@redhat.com>
-Date:   Tue, 27 Sep 2022 21:31:43 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        bh=Z04ahWrbv+gyCpLbQuuob6w9lJHZaacCaCrvM8sjvoY=;
+        b=EMv43gOIp6IwcTfqlYndczYeRyUC8hHx6gRlRs75RULkkgWP8wD5+qJ+GryRm3N81u4rZx
+        2ViVeYd1snLmDnwrXEaVNJ82fIzkbB5J6yy/1sZ/7KoBTyjxy4VrmK0p69d4TfKcJZeaQT
+        ETUFcFu+/9erBaWWeB8RY1EJy2FGgb8=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-313-x63EQSxyMCqkdrFPQQ2Kfg-1; Tue, 27 Sep 2022 07:58:19 -0400
+X-MC-Unique: x63EQSxyMCqkdrFPQQ2Kfg-1
+Received: by mail-ed1-f70.google.com with SMTP id dz21-20020a0564021d5500b0045217702048so7513317edb.5
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 04:58:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=Z04ahWrbv+gyCpLbQuuob6w9lJHZaacCaCrvM8sjvoY=;
+        b=BMBrbqkdPx2tb1eNJott5lMkIx3PIvYNhx105oiiRjO9VLG6iaA06KuKe7ILXng6WI
+         tQu4MFbw9U3rFzdSzc2/7QULZDiRO+KzI3cbRBxeGVbSnENcVeQEpVgd92eBdgOCMW10
+         Y100WiYkOSvDp0B94xW2OS+PLAjAlHA336a0R2DdyG0RLOjO4TucGJNiuiZcktFSCDcD
+         GetfrPLRCQSv5fBZ7xq5NWKUbyB9mJ8I8elwGDWsP4NPXNfEI66yqicqW/YfvY9ceYBn
+         CWqxVNtY565L4jta/qTrOnTYwPnsgVCN4nXht2CJPNL5oTDLWL+e7spKhGV7j/zS3vU0
+         /dVg==
+X-Gm-Message-State: ACrzQf08a+Ch2W4GExeOJzmCYgF5wWaH6H76EJ8lU3KT8fIIzME52qKf
+        m6ce1atUO2n27FOXMN8+1t4FKlDbvjLQRMFdmPmSgEjlGz2L9rrVPuQdU9524j4y5TK1rd/Izw0
+        O3FBGyAAmEshG
+X-Received: by 2002:a17:907:70c:b0:740:33f3:cbab with SMTP id xb12-20020a170907070c00b0074033f3cbabmr22210750ejb.600.1664279897530;
+        Tue, 27 Sep 2022 04:58:17 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7mUfz41lvpm4jpECOhfIvGUYjVk3+igb6pvHQJYZLUgUgN7qW3UB/a2by9Bw5F2ymGicq4zg==
+X-Received: by 2002:a17:907:70c:b0:740:33f3:cbab with SMTP id xb12-20020a170907070c00b0074033f3cbabmr22210700ejb.600.1664279896830;
+        Tue, 27 Sep 2022 04:58:16 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
+        by smtp.googlemail.com with ESMTPSA id f20-20020a50ee94000000b004482dd03fe8sm1095629edr.91.2022.09.27.04.58.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Sep 2022 04:58:16 -0700 (PDT)
+Message-ID: <3d091669-cb83-330e-52d0-5d3ac0fe7214@redhat.com>
+Date:   Tue, 27 Sep 2022 13:58:14 +0200
 MIME-Version: 1.0
-In-Reply-To: <86y1u56rku.wl-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [PATCH] KVM: selftests: Skip tests that require EPT when it is
+ not available
+To:     David Matlack <dmatlack@google.com>
+Cc:     Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
+References: <20220926171457.532542-1-dmatlack@google.com>
 Content-Language: en-US
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220926171457.532542-1-dmatlack@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,87 +81,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On 9/27/22 8:26 PM, Marc Zyngier wrote:
-> On Mon, 26 Sep 2022 20:54:34 -0400,
-> Gavin Shan <gshan@redhat.com> wrote:
->>
->> This adds KVM_REQ_RING_SOFT_FULL, which is raised when the dirty
->> ring of the specific VCPU becomes softly full in kvm_dirty_ring_push().
->> The VCPU is enforced to exit when the request is raised and its
->> dirty ring is softly full on its entrance.
->>
->> The event is checked and handled in the newly introduced helper
->> kvm_dirty_ring_check_request(). With this, kvm_dirty_ring_soft_full()
->> becomes a private function.
->>
->> Suggested-by: Marc Zyngier <maz@kernel.org>
->> Signed-off-by: Gavin Shan <gshan@redhat.com>
->> ---
->>   arch/x86/kvm/x86.c             | 15 ++++++---------
->>   include/linux/kvm_dirty_ring.h | 13 +++++++------
->>   include/linux/kvm_host.h       |  1 +
->>   virt/kvm/dirty_ring.c          | 19 ++++++++++++++++++-
->>   4 files changed, 32 insertions(+), 16 deletions(-)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index b0c47b41c264..0dd0d32073e7 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -10260,16 +10260,13 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->>   
->>   	bool req_immediate_exit = false;
->>   
->> -	/* Forbid vmenter if vcpu dirty ring is soft-full */
->> -	if (unlikely(vcpu->kvm->dirty_ring_size &&
->> -		     kvm_dirty_ring_soft_full(&vcpu->dirty_ring))) {
->> -		vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
->> -		trace_kvm_dirty_ring_exit(vcpu);
->> -		r = 0;
->> -		goto out;
->> -	}
->> -
->>   	if (kvm_request_pending(vcpu)) {
->> +		/* Forbid vmenter if vcpu dirty ring is soft-full */
->> +		if (kvm_dirty_ring_check_request(vcpu)) {
->> +			r = 0;
->> +			goto out;
->> +		}
->> +
->>   		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) {
->>   			r = -EIO;
->>   			goto out;
->> diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
->> index 906f899813dc..b188bfcf3a09 100644
->> --- a/include/linux/kvm_dirty_ring.h
->> +++ b/include/linux/kvm_dirty_ring.h
->> @@ -54,6 +54,11 @@ static inline void kvm_dirty_ring_push(struct kvm_dirty_ring *ring,
->>   {
->>   }
->>   
->> +static inline bool kvm_dirty_ring_check_request(struct kvm_vcpu *vcpu)
->> +{
->> +	return false;
->> +}
->> +
+On 9/26/22 19:14, David Matlack wrote:
+> Skip selftests that require EPT support in the VM when it is not
+> available. For example, if running on a machine where kvm_intel.ept=N
+> since KVM does not offer EPT support to guests if EPT is not supported
+> on the host.
 > 
-> nit: I don't think this is needed at all. The dirty ring feature is
-> not user-selectable, and this is always called from arch code that is
-> fully aware of that option.
+> This commit causes vmx_dirty_log_test to be skipped instead of failing
+> on hosts where kvm_intel.ept=N.
 > 
-> This can be fixed when applying the patch though, no need to resend
-> for this.
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+>   .../selftests/kvm/include/x86_64/vmx.h        |  1 +
+>   tools/testing/selftests/kvm/lib/x86_64/vmx.c  | 20 +++++++++++++++++++
+>   2 files changed, 21 insertions(+)
 > 
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/vmx.h b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+> index 99fa1410964c..790c6d1ecb34 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/vmx.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+> @@ -617,6 +617,7 @@ void nested_map_memslot(struct vmx_pages *vmx, struct kvm_vm *vm,
+>   			uint32_t memslot);
+>   void nested_identity_map_1g(struct vmx_pages *vmx, struct kvm_vm *vm,
+>   			    uint64_t addr, uint64_t size);
+> +bool kvm_vm_has_ept(struct kvm_vm *vm);
+>   void prepare_eptp(struct vmx_pages *vmx, struct kvm_vm *vm,
+>   		  uint32_t eptp_memslot);
+>   void prepare_virtualize_apic_accesses(struct vmx_pages *vmx, struct kvm_vm *vm);
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/vmx.c b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
+> index 80a568c439b8..d21049c38fc5 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/vmx.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
+> @@ -5,6 +5,8 @@
+>    * Copyright (C) 2018, Google LLC.
+>    */
+>   
+> +#include <asm/msr-index.h>
+> +
+>   #include "test_util.h"
+>   #include "kvm_util.h"
+>   #include "processor.h"
+> @@ -542,9 +544,27 @@ void nested_identity_map_1g(struct vmx_pages *vmx, struct kvm_vm *vm,
+>   	__nested_map(vmx, vm, addr, addr, size, PG_LEVEL_1G);
+>   }
+>   
+> +bool kvm_vm_has_ept(struct kvm_vm *vm)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	uint64_t ctrl;
+> +
+> +	vcpu = list_first_entry(&vm->vcpus, struct kvm_vcpu, list);
+> +	TEST_ASSERT(vcpu, "Cannot determine EPT support without vCPUs.\n");
+> +
+> +	ctrl = vcpu_get_msr(vcpu, MSR_IA32_VMX_TRUE_PROCBASED_CTLS) >> 32;
+> +	if (!(ctrl & CPU_BASED_ACTIVATE_SECONDARY_CONTROLS))
+> +		return false;
+> +
+> +	ctrl = vcpu_get_msr(vcpu, MSR_IA32_VMX_PROCBASED_CTLS2) >> 32;
+> +	return ctrl & SECONDARY_EXEC_ENABLE_EPT;
+> +}
+> +
+>   void prepare_eptp(struct vmx_pages *vmx, struct kvm_vm *vm,
+>   		  uint32_t eptp_memslot)
+>   {
+> +	TEST_REQUIRE(kvm_vm_has_ept(vm));
+> +
+>   	vmx->eptp = (void *)vm_vaddr_alloc_page(vm);
+>   	vmx->eptp_hva = addr_gva2hva(vm, (uintptr_t)vmx->eptp);
+>   	vmx->eptp_gpa = addr_gva2gpa(vm, (uintptr_t)vmx->eptp);
+> 
+> base-commit: 372d07084593dc7a399bf9bee815711b1fb1bcf2
+> prerequisite-patch-id: 2e3661ba8856c29b769499bac525b6943d9284b8
+> prerequisite-patch-id: 93031262de7b1f7fab1ad31ea5d6ef812c139179
 
-I had the assumption that the corresponding kernel config options are
-dropped from arch/x86/kvm/Kconfig or arch/arm64/kvm/Kconfig by developers.
-I think it's fine to drop it because the developers need to add the
-stub in this particular and rare case.
+Queued for 6.0, thanks.
 
-Please help to drop it if you're going to queue the series. I will drop
-it if another respin is needed.
-
-Thanks,
-Gavin
+Paolo
 
