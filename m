@@ -2,77 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E0CC5EC222
-	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 14:13:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F26A35EC237
+	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 14:15:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231361AbiI0MNS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Sep 2022 08:13:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54300 "EHLO
+        id S232233AbiI0MPP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Sep 2022 08:15:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229951AbiI0MNQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Sep 2022 08:13:16 -0400
+        with ESMTP id S232294AbiI0MPC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Sep 2022 08:15:02 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFA88AB1B5
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 05:13:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBFC82AC46
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 05:14:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664280794;
+        s=mimecast20190719; t=1664280897;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vYau3oORiMNyBrvVH7UDB5CsI1W1nZ38yRKzoJl4tIg=;
-        b=OoXtha6Rl0Pcah4Q0eHHBaYE1v8KQQ09dUv9dw+KzKPBQtH4ZOMf+Pder4OZXqKsFyqBQ8
-        IpQBd0Gq8CY36DSyk1aIMy+7+f713937oSxT4rlwz3PdKQHYME55rcVsTbCPh6od8mUlgb
-        /PSnZGwnQ19STfCZc6Cwsd56MzahNzg=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=rSE3SZr7AU4BSfTZW9EzqUJqNHJZJS1agFSm+3MsOAM=;
+        b=gGv9rBASIqKf0hfUNjI3Fy4WclMD7UAVLGnwpDwSM67gA6rG6RqVd06N3mlrrxUkrG3dqY
+        OrH99ADbRpd5/r1Eismt+QDazxLnzFvUJHClyYTkHKXj+m8SgXpEc2+WDpXHUA/AsVIPOD
+        W0N3q/zomAb9f5KB9udPBs9GjhDrl3g=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-163-evdZGeCFN7Sn8kQAHkNfHA-1; Tue, 27 Sep 2022 08:13:13 -0400
-X-MC-Unique: evdZGeCFN7Sn8kQAHkNfHA-1
-Received: by mail-ed1-f72.google.com with SMTP id i17-20020a05640242d100b0044f18a5379aso7757957edc.21
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 05:13:13 -0700 (PDT)
+ us-mta-601-Y0a00L55MPypfVB4ZYJ9dA-1; Tue, 27 Sep 2022 08:14:56 -0400
+X-MC-Unique: Y0a00L55MPypfVB4ZYJ9dA-1
+Received: by mail-ed1-f70.google.com with SMTP id dz21-20020a0564021d5500b0045217702048so7548793edb.5
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 05:14:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=vYau3oORiMNyBrvVH7UDB5CsI1W1nZ38yRKzoJl4tIg=;
-        b=mB25qPVu4KB6YYbpY//w3LwLKmdzFASsM2iaDCzV8uf/Ijm/G95eg1LphX8eZcRvmU
-         ShArJ8iiVdeRhDHGwFkl1QC1kv2ZsZyN5PLLbz3uF3v2fbS9EEW5Smhtg5Zi+m9ufzqG
-         t9ecn9c7oZls1S64D3819yL0xyOhNjLyBazTQQWUfzoXNMgSJEu4AAMR8xNXOqgUzheE
-         hN1BuuZUzBNALcHJdhtXj7c6wVW/KZ1/4RDGtwCY3XxrobNofWoNYy3ydfw2yrnMKYoa
-         MTITKYUvI6RnZqFq3CTYf5JeieOtJnHnTFPR1M0pyj8eyuU3NdQjgbW4q/X0eSieMp+m
-         /Evw==
-X-Gm-Message-State: ACrzQf02gP9hriMPhVNm1ezyVl3ez0El34XxInS6CnFXUNRIk52MQD4O
-        E6lAd/4PfEaAz535wkofiHvJlzQZrcVC/rvnsSsqVRbC86j3yDJ/kYkprSlw0rBoSb+4AFdyi9R
-        Yx8Ay35Gfkyr5
-X-Received: by 2002:a17:907:7206:b0:783:1d78:6249 with SMTP id dr6-20020a170907720600b007831d786249mr12227812ejc.9.1664280792586;
-        Tue, 27 Sep 2022 05:13:12 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7xr33At7nySVsumCJLy3ZTO2bLFK77gRRz4aquaieSslpOcx8N1C9Wt7hZ1af4e78H4agGvA==
-X-Received: by 2002:a17:907:7206:b0:783:1d78:6249 with SMTP id dr6-20020a170907720600b007831d786249mr12227795ejc.9.1664280792264;
-        Tue, 27 Sep 2022 05:13:12 -0700 (PDT)
+        bh=rSE3SZr7AU4BSfTZW9EzqUJqNHJZJS1agFSm+3MsOAM=;
+        b=XokGRatuo1TeTF7zskdz+b8KsqyjWSfQ05iTjeFSCqmv782C0B4Q5jNH/gvFZVoPLR
+         19b2prIXzKr1F+hKNpQhJEaLb2280yZPcirP+XGtGIldRfnDZsbd+yAcxrMjHiWu86AQ
+         yBz5NK1aq2DMsxA/MCMg8XcZlD9M4LiVO7uM9nb3TPwK2zsYOYUhGH6nR51KCHDEBjQH
+         R98ybnvvpyEbQr0pl0/65DmBayZzZxYTuOjg/rrV+dw0MeaWk0CY2DEhR/rJ3aSSA7IT
+         SeO0tR5VYd3msxUQ0+vl1Nn/plQ0yIcTIuIQHnxrLpHIzgX9lE8HpaZjeOsvWf1RlckM
+         WI/A==
+X-Gm-Message-State: ACrzQf0J50xOI2To/L25XtqLd3CU9Mx7nsmrMZPkPdbkoTevHZCP/T04
+        hChTc9g3BVs5qMTwqCPWSJIE9xQVLED17vlC32s5d71pD7SBQ8E3KLT9L5DN2HK3/FKMEEt63i0
+        opi+vmCe/XXMr
+X-Received: by 2002:aa7:c04f:0:b0:457:1b08:d056 with SMTP id k15-20020aa7c04f000000b004571b08d056mr14655690edo.146.1664280895437;
+        Tue, 27 Sep 2022 05:14:55 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM5dF2l0zCe+9PMvtpzvSQRGqYKmswR21oDA/D9ukNUOBwPFoxUVmoO0fb4CxB4+uAI8q522lA==
+X-Received: by 2002:aa7:c04f:0:b0:457:1b08:d056 with SMTP id k15-20020aa7c04f000000b004571b08d056mr14655669edo.146.1664280895219;
+        Tue, 27 Sep 2022 05:14:55 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id y15-20020a50bb0f000000b0043bbb3535d6sm1144104ede.66.2022.09.27.05.13.10
+        by smtp.googlemail.com with ESMTPSA id u11-20020a170906780b00b0077a8fa8ba55sm695214ejm.210.2022.09.27.05.14.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Sep 2022 05:13:11 -0700 (PDT)
-Message-ID: <d0fc4ef7-6e7c-3734-225b-411c57b4acaa@redhat.com>
-Date:   Tue, 27 Sep 2022 14:13:10 +0200
+        Tue, 27 Sep 2022 05:14:54 -0700 (PDT)
+Message-ID: <005c8afa-d290-d140-0dac-19a41f2ef81a@redhat.com>
+Date:   Tue, 27 Sep 2022 14:14:53 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.2.1
-Subject: Re: [PATCH] KVM: selftests: Fix nx_huge_pages_test on TDP-disabled
- hosts
+Subject: Re: [PATCH] KVM: selftests: replace assertion with warning in
+ access_tracking_perf_test
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>
-Cc:     Jim Mattson <jmattson@google.com>, Peter Xu <peterx@redhat.com>,
-        Yang Zhong <yang.zhong@intel.com>,
-        Wei Wang <wei.w.wang@intel.com>,
-        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org
-References: <20220926175219.605113-1-dmatlack@google.com>
- <YzIlxmMOeSZHsnOu@google.com>
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     Shuah Khan <shuah@kernel.org>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220926082923.299554-1-eesposit@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YzIlxmMOeSZHsnOu@google.com>
+In-Reply-To: <20220926082923.299554-1-eesposit@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -85,44 +85,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/27/22 00:20, Sean Christopherson wrote:
-> void __virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
-> 		uint64_t nr_bytes, size_t page_size)
-> {
-> 	uint64_t nr_pages = DIV_ROUND_UP(nr_bytes, page_size);
+On 9/26/22 10:29, Emanuele Giuseppe Esposito wrote:
+> Page_idle uses {ptep/pmdp}_clear_young_notify which in turn calls
+> the mmu notifier callback ->clear_young(), which purposefully
+> does not flush the TLB.
 > 
-> 	TEST_ASSERT(vaddr + size > vaddr, "Vaddr overflow");
-> 	TEST_ASSERT(paddr + size > paddr, "Paddr overflow");
+> When running the test in a nested guest, point 1. of the test
+> doc header is violated, because KVM TLB is unbounded by size
+> and since no flush is forced, KVM does not update the sptes
+> accessed/idle bits resulting in guest assertion failure.
 > 
-> 	while (npages--) {
-> 		virt_pg_map(vm, vaddr, paddr);
-> 		vaddr += page_size;
-> 		paddr += page_size;
-> 	}
-> }
-> 
-> void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
-> 	      uint64_t nr_bytes)
-> {
-> 	__virt_map(vm, vaddr, paddr, nr_bytes, vm->page_size);
-> }
+> More precisely, only the first ACCESS_WRITE in run_test() actually
+> makes visible changes, because sptes are created and the accessed
+> bit is set to 1 (or idle bit is 0). Then the first mark_memory_idle()
+> passes since access bit is still one, and sets all pages as idle
+> (or not accessed). When the next write is performed, the update
+> is not flushed therefore idle is still 1 and next mark_memory_idle()
+> fails.
 
-I would just keep nr_pages in virt_map to begin with, for the sake of 
-this patch.  Changing virt_map can be done later (and should be separate 
-anyway).
-
->> -	virt_map(vm, HPAGE_GVA, HPAGE_GPA, HPAGE_SLOT_NPAGES);
->> +	/*
->> +	 * Use 2MiB virtual mappings so that KVM can map the region with huge
->> +	 * pages even if TDP is disabled.
->> +	 */
->> +	virt_map_2m(vm, HPAGE_GVA, HPAGE_GPA, HPAGE_SLOT_2MB_PAGES);
-> 
-> Hmm, what about probing TDP support and deliberately using 4KiB pages when TDP is
-> enabled?  That would give a bit of bonus coverage by verifying that KVM creates
-> huge pages irrespective of guest mapping level.
-
-Nice idea indeed.
+Queued, thanks.
 
 Paolo
 
