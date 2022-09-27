@@ -2,165 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 418F55ECCF6
-	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 21:34:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D987C5ECD7C
+	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 21:59:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231910AbiI0Tdr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Sep 2022 15:33:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60540 "EHLO
+        id S232196AbiI0T7d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Sep 2022 15:59:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231977AbiI0Tdp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Sep 2022 15:33:45 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA25B106A08
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 12:33:43 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id 9so10531406pfz.12
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 12:33:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=C0YiAmeNTTNxK+azYDy9ceezEE12O9c/kiyByUf7kiQ=;
-        b=N2FwtrrkDpWOGA8NQIrGQgCp1qRdCJGtP22Q0PpRnDGn8XQ0bB1mpcIc32OwJuA5Z9
-         UF8gdmVGd4AjRFJ9HgM0svO6QFUC4tEuk2jRvYv8fkUAfjU5j8TZJCEFtzVZVg9mIIjV
-         RO6qmj4gN/Hs+D9iNaDSODegN7ONAxOFXTLvDh5wiLc3sEh3UtBqQ6jQ/om1p1aHs/Og
-         CbB1pLuiNIlvNGVZU4SZA6YCHOeHAsOZk2Y8dbSVcgriVZfEOE/Df/4r1MkUNVbuoGPD
-         wv1dtMziwe8r3fW9/lNZtxIJl6XVFASuMjyOkBRc/bkjqfJWG8Dn8GMGQr7zrbIX8Lwm
-         IXRQ==
+        with ESMTP id S232078AbiI0T7O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Sep 2022 15:59:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A26DB1C26EF
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 12:59:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664308752;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Dx5HDOePnyxgHzqa6DOD5MnqegsYWwrLtgMoZQ1P8dI=;
+        b=OZ9/23BTvKP786RkcnXIdeMb7F6oyiy3NTV7Z36oQR7lbXRVizuDXj37K2LIiSx+yP2fjY
+        sxPNr4MxwbeuHNPX77a8x8A3555KAdSOSD5WCzpx1ldvuTANIcR5m/vO49GbMd4uGeeQKy
+        7HA86eD6PRaxdaXsGL0I5BIsEQHSae4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-360-z-dHoY9fMQuzeQh6DAogsw-1; Tue, 27 Sep 2022 15:59:09 -0400
+X-MC-Unique: z-dHoY9fMQuzeQh6DAogsw-1
+Received: by mail-wm1-f70.google.com with SMTP id h187-20020a1c21c4000000b003b51369ff1bso7081711wmh.3
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 12:59:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=C0YiAmeNTTNxK+azYDy9ceezEE12O9c/kiyByUf7kiQ=;
-        b=dXL9Qj8aMdUZDTpRD+TpK6w7VMhavWUnbp1jXtcR+W6XXxLv0Xin/55N5FNELwOn5x
-         ux0mpGbhe66569mKIi1P0rXp11ljbm0J7TnNPK92R9Z7k0+2WDBcDoevGhaeU3dVrmju
-         jKfUdb/R6Dr5WfZDWx6RiZEv+guAauZGx7PoL4XbeTvvIotewIBwQJ1hTsb20WgulF77
-         rD1/KJuMOvaYRThLAg2R/G9OSR/gMhNI447V9U8DaIqQPieSnri6oFuxZuASUsMRNNn/
-         tfUMZrPWUx95fSAH+qXvtLsa9RrTKWFrxJT3iU6CJIoX5RuD7f7McSwiJrUb7u5vLUKu
-         V8uw==
-X-Gm-Message-State: ACrzQf2BKlPdHxG0RbkvZ9nwWJ+fHbEhBkWmHnF8NE4J0vXgJU6QHpJi
-        t0JCs3E9Pdq7V+GusZbrBWPXBQ==
-X-Google-Smtp-Source: AMsMyM5Ka9IqP6PrO7ZeKW5jtFyBd76piy2y5YyhNoUBxOJJUmqcusVkm6nPmLvqLqJA7NYiMiJSJA==
-X-Received: by 2002:a63:88c3:0:b0:43c:5561:839 with SMTP id l186-20020a6388c3000000b0043c55610839mr20658329pgd.393.1664307222943;
-        Tue, 27 Sep 2022 12:33:42 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id a12-20020aa78e8c000000b0053e61633057sm2176249pfr.132.2022.09.27.12.33.42
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=Dx5HDOePnyxgHzqa6DOD5MnqegsYWwrLtgMoZQ1P8dI=;
+        b=Q1y4oEbnt0i5FOwdCS+xGdhfFwJs0NFDDRdYlzte5z8jxBnWZn6/xMX+9yhwdFDy13
+         tdUOJzwa5Ctgc16hbJOJfyKV78WFRqDLjJR/6FBgXXhQTBidRLASG+1VBUxcTWWJ0WI0
+         9Vmglnq6elVB/qADVbZXyUQAKrj1o9jn6yx3SSCIgBNOTRhhWlL3W9ZBom3LxlCb3VIs
+         OlXZlYaCxsyl3rc+6I5YwnaI/mv1Jy+Ljeg+3mUvIovjAT4xFRiVCzfeRcCFzZ1uoPOE
+         3T4p0OJugI+7/VbuHfEExcdDVurtyWWgOrGyV9+6JaSzemxwt4l0txx0qc61oqAiJkIz
+         nnbg==
+X-Gm-Message-State: ACrzQf06ig75nneJ3UuTaWCOa2OFwgmc5qdUmI2ZtGzLmM5U29j8MVgb
+        Uq1qtSMtFMg0AcDk6scu2V+DsSLzYsS+HKEgjl+tUc6LuQ2Nh0sfdER90hgWKZ8MDKLYX2DcnYn
+        7w/nH4ieGo6IC
+X-Received: by 2002:a05:6000:1a8a:b0:22a:33aa:a907 with SMTP id f10-20020a0560001a8a00b0022a33aaa907mr17893663wry.322.1664308748211;
+        Tue, 27 Sep 2022 12:59:08 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7eOWYFV9iprtkvNGfif9TK9/JHNd5re5oxCk70ig0yrmbrjCmGTXstvwdg4i4Hc1mUWp0nvA==
+X-Received: by 2002:a05:6000:1a8a:b0:22a:33aa:a907 with SMTP id f10-20020a0560001a8a00b0022a33aaa907mr17893654wry.322.1664308747882;
+        Tue, 27 Sep 2022 12:59:07 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-104-40.dyn.eolo.it. [146.241.104.40])
+        by smtp.gmail.com with ESMTPSA id f12-20020a05600c4e8c00b003b33943ce5esm17310012wmq.32.2022.09.27.12.59.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Sep 2022 12:33:42 -0700 (PDT)
-Date:   Tue, 27 Sep 2022 19:33:38 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
-Subject: Re: [PATCH] Documentation: KVM: Describe guest CPUID.15H settings
- for in-kernel APIC
-Message-ID: <YzNQEgDk/K2gBcgs@google.com>
-References: <20220921204402.29183-1-jmattson@google.com>
+        Tue, 27 Sep 2022 12:59:07 -0700 (PDT)
+Message-ID: <6502e1a45526f97a1e6d7d27bbe07e3bb3623de3.camel@redhat.com>
+Subject: Re: [PATCH net-next 0/4] shrink struct ubuf_info
+From:   Paolo Abeni <pabeni@redhat.com>
+To:     Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
+        xen-devel@lists.xenproject.org, Wei Liu <wei.liu@kernel.org>,
+        Paul Durrant <paul@xen.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>
+Date:   Tue, 27 Sep 2022 21:59:06 +0200
+In-Reply-To: <c06897d4-4883-2756-87f9-9b10ab495c43@gmail.com>
+References: <cover.1663892211.git.asml.silence@gmail.com>
+         <7fef56880d40b9d83cc99317df9060c4e7cdf919.camel@redhat.com>
+         <021d8ea4-891c-237d-686e-64cecc2cc842@gmail.com>
+         <bbb212f6-0165-0747-d99d-b49acbb02a80@gmail.com>
+         <85cccb780608e830024fc82a8e4f703031646f4e.camel@redhat.com>
+         <c06897d4-4883-2756-87f9-9b10ab495c43@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220921204402.29183-1-jmattson@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 21, 2022, Jim Mattson wrote:
-> KVM_GET_SUPPORTED_CPUID must not populate guest CPUID.15H, because KVM
-> has no way of knowing the base frequency of the local APIC emulated in
-> userspace.
+On Tue, 2022-09-27 at 19:48 +0100, Pavel Begunkov wrote:
+> On 9/27/22 18:56, Paolo Abeni wrote:
+> > On Tue, 2022-09-27 at 18:16 +0100, Pavel Begunkov wrote:
+> > > On 9/27/22 15:28, Pavel Begunkov wrote:
+> > > > Hello Paolo,
+> > > > 
+> > > > On 9/27/22 14:49, Paolo Abeni wrote:
+> > > > > Hello,
+> > > > > 
+> > > > > On Fri, 2022-09-23 at 17:39 +0100, Pavel Begunkov wrote:
+> > > > > > struct ubuf_info is large but not all fields are needed for all
+> > > > > > cases. We have limited space in io_uring for it and large ubuf_info
+> > > > > > prevents some struct embedding, even though we use only a subset
+> > > > > > of the fields. It's also not very clean trying to use this typeless
+> > > > > > extra space.
+> > > > > > 
+> > > > > > Shrink struct ubuf_info to only necessary fields used in generic paths,
+> > > > > > namely ->callback, ->refcnt and ->flags, which take only 16 bytes. And
+> > > > > > make MSG_ZEROCOPY and some other users to embed it into a larger struct
+> > > > > > ubuf_info_msgzc mimicking the former ubuf_info.
+> > > > > > 
+> > > > > > Note, xen/vhost may also have some cleaning on top by creating
+> > > > > > new structs containing ubuf_info but with proper types.
+> > > > > 
+> > > > > That sounds a bit scaring to me. If I read correctly, every uarg user
+> > > > > should check 'uarg->callback == msg_zerocopy_callback' before accessing
+> > > > > any 'extend' fields.
+> > > > 
+> > > > Providers of ubuf_info access those fields via callbacks and so already
+> > > > know the actual structure used. The net core, on the opposite, should
+> > > > keep it encapsulated and not touch them at all.
+> > > > 
+> > > > The series lists all places where we use extended fields just on the
+> > > > merit of stripping the structure of those fields and successfully
+> > > > building it. The only user in net/ipv{4,6}/* is MSG_ZEROCOPY, which
+> > > > again uses callbacks.
+> > > > 
+> > > > Sounds like the right direction for me. There is a couple of
+> > > > places where it might get type safer, i.e. adding types instead
+> > > > of void* in for struct tun_msg_ctl and getting rid of one macro
+> > > > hiding types in xen. But seems more like TODO for later.
+> > > > 
+> > > > > AFAICS the current code sometimes don't do the
+> > > > > explicit test because the condition is somewhat implied, which in turn
+> > > > > is quite hard to track.
+> > > > > 
+> > > > > clearing uarg->zerocopy for the 'wrong' uarg was armless and undetected
+> > > > > before this series, and after will trigger an oops..
+> > > > 
+> > > > And now we don't have this field at all to access, considering that
+> > > > nobody blindly casts it.
+> > > > 
+> > > > > There is some noise due to uarg -> uarg_zc renaming which make the
+> > > > > series harder to review. Have you considered instead keeping the old
+> > > > > name and introducing a smaller 'struct ubuf_info_common'? the overall
+> > > > > code should be mostly the same, but it will avoid the above mentioned
+> > > > > noise.
+> > > > 
+> > > > I don't think there will be less noise this way, but let me try
+> > > > and see if I can get rid of some churn.
+> > > 
+> > > It doesn't look any better for me
+> > > 
+> > > TL;DR; This series converts only 3 users: tap, xen and MSG_ZEROCOPY
+> > > and doesn't touch core code. If we do ubuf_info_common though I'd need
+> > > to convert lots of places in skbuff.c and multiple places across
+> > > tcp/udp, which is much worse.
+> > 
+> > Uhmm... I underlook the fact we must preserve the current accessors for
+> > the common fields.
+> > 
+> > I guess something like the following could do (completely untested,
+> > hopefully should illustrate the idea):
+> > 
+> > struct ubuf_info {
+> > 	struct_group_tagged(ubuf_info_common, common,
+> > 		void (*callback)(struct sk_buff *, struct ubuf_info *,
+> >                           bool zerocopy_success);
+> > 		refcount_t refcnt;
+> > 	        u8 flags;
+> > 	);
+> > 
+> > 	union {
+> >                  struct {
+> >                          unsigned long desc;
+> >                          void *ctx;
+> >                  };
+> >                  struct {
+> >                          u32 id;
+> >                          u16 len;
+> >                          u16 zerocopy:1;
+> >                          u32 bytelen;
+> >                  };
+> >          };
+> > 
+> >          struct mmpin {
+> >                  struct user_struct *user;
+> >                  unsigned int num_pg;
+> >          } mmp;
+> > };
+> > 
+> > Then you should be able to:
+> > - access ubuf_info->callback,
+> > - access the same field via ubuf_info->common.callback
+> > - declare variables as 'struct ubuf_info_commom' with appropriate
+> > contents.
+> > 
+> > WDYT?
 > 
-> However, in reality, the in-kernel APIC emulation is in prevalent
-> use. Document how KVM_GET_SUPPORTED_CPUID would populate CPUID.15H if
-> the in-kernel APIC were the default.
+> Interesting, I didn't think about struct_group, this would
+> let to split patches better and would limit non-core changes.
+> But if the plan is to convert the core helpers to
+> ubuf_info_common, than I think it's still messier than changing
+> ubuf providers only.
 > 
-> Signed-off-by: Jim Mattson <jmattson@google.com>
-> ---
->  Documentation/virt/kvm/api.rst | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index abd7c32126ce..1e09ac9d48e9 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -1786,6 +1786,16 @@ support.  Instead it is reported via::
->  if that returns true and you use KVM_CREATE_IRQCHIP, or if you emulate the
->  feature in userspace, then you can enable the feature for KVM_SET_CPUID2.
->  
-> +Similarly, CPUID leaf 0x15 always returns zeroes, because the core
-> +crystal clock frequency must match the local APIC base frequency, and
-> +the default configuration leaves the local APIC emulation to
-> +userspace.
-> +
-> +If KVM_CREATE_IRQCHIP is used to enable the in-kernel local APIC
-> +emulation, CPUID.15H:ECX can be set to 1000000000 (0x3b9aca00). For
-> +the default guest TSC frequency, CPUID.15H:EBX can be set to tsc_khz
-> +and CPUID.15H:ECX can be set to 1000000 (0xf4240).  The fraction can
-> +be simplified if desired.
+> I can do the exercise, but I don't really see what is the goal.
+> Let me ask this, if we forget for a second how diffs look,
+> do you care about which pair is going to be in the end?
 
-It would be helpful to explain what these numbers mean and where they come from.
+Uhm... I proposed this initially with the goal of remove non fuctional
+changes from a patch that was hard to digest for me (4/4). So it's
+about diffstat to me ;) 
 
-That said, unlike 16H, I think we can actually "solve" this case, we just need a
-way to force an in-kernel local APIC, i.e. add a module param or Kconfig.
+On the flip side the change suggested would probably not be as
+straighforward as I would hope for.
 
-I'm tempted to make it a Kconfig so that KVM can start moving toward removing
-"support" for a userspace local APIC entirely, e.g. x2APIC is basically unusable
-without an in-kernel APIC, so KVM is already quite far down that path anyways.
+> ubuf_info_common/ubuf_info vs ubuf_info/ubuf_info_msgzc?
 
-E.g.
+The specific names used are not much relevant.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index ffdc28684cb7..b67135a53edf 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -1061,6 +1061,11 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
-                                goto out;
-                }
-                break;
-+#ifdef CONFIG_KVM_REQUIRE_IN_KERNEL_LOCAL_APIC
-+       case 0x15:
-+               <fill in magic values>
-+               break;
-+#endif
-        /* Intel AMX TILE */
-        case 0x1d:
-                if (!kvm_cpu_cap_has(X86_FEATURE_AMX_TILE)) {
-diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
-index a5ac4a5a5179..5abaa09ec5aa 100644
---- a/arch/x86/kvm/lapic.h
-+++ b/arch/x86/kvm/lapic.h
-@@ -181,8 +181,10 @@ DECLARE_STATIC_KEY_FALSE(kvm_has_noapic_vcpu);
- 
- static inline bool lapic_in_kernel(struct kvm_vcpu *vcpu)
- {
-+#ifndef CONFIG_KVM_REQUIRE_IN_KERNEL_LOCAL_APIC
-        if (static_branch_unlikely(&kvm_has_noapic_vcpu))
-                return vcpu->arch.apic;
-+#endif
-        return true;
- }
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index eb412f9f03ea..8ea6f0175c1c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11763,6 +11763,10 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-        struct page *page;
-        int r;
- 
-+       if (IS_ENABLED(CONFIG_KVM_REQUIRE_IN_KERNEL_LOCAL_APIC) &&
-+           !irqchip_in_kernel(vcpu->kvm))
-+               return -EINVAL;
-+
-        vcpu->arch.last_vmentry_cpu = -1;
-        vcpu->arch.regs_avail = ~0;
-        vcpu->arch.regs_dirty = ~0;
+> Are there you concerned about naming or is there more to it?
 
+I feel like this series is potentially dangerous, but I could not spot
+bugs into the code. I would have felt more relaxed eariler in the devel
+cycle.
 
+Cheers,
 
+Paolo
 
