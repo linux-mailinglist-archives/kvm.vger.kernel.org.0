@@ -2,155 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E0885EB664
-	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 02:41:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5A865EB682
+	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 02:55:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230031AbiI0AlL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 20:41:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42088 "EHLO
+        id S229573AbiI0AzC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 20:55:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229932AbiI0Ak6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 20:40:58 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82E3E3A494;
-        Mon, 26 Sep 2022 17:40:57 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id p14so5190850pjd.3;
-        Mon, 26 Sep 2022 17:40:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=8xobog+QYukwZVnSxEr7+7WqxBnwEIa9rhAbHRvLuc0=;
-        b=FTCMFRmQQyCukqL2hxWYCxKVenu9ShL50Yamg226yHwQtpyuDdPtGQPzXO/k1rYqWq
-         kpc2VrBXq8xqNic4OqxT4fAyTdTUyb81ViwXcqIWHthuzOgp7A33k5MTIpiJ/mMQpPhA
-         6eMBZccoaglWqBm+WdqkktjAdyy6SGAn4tCKEmQA3ZjpPfCL0FILKRgWRkoSRGCE4gC+
-         7ldMIkIMU4dHHAJ7fORc8bubpbNKM9jjI4OFwNwoWsYZJUI7Zt9UDrxcCoeuS6xfmi1M
-         tSOqrp6yZVxQEtcdRZdoPwXBp01Y9N3cE3zt0LabBjPooc0427RdfI08Clap3VSZQnxP
-         xOTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=8xobog+QYukwZVnSxEr7+7WqxBnwEIa9rhAbHRvLuc0=;
-        b=EKI2WSLXLJN1x/nzFgpdI80fPXEa45a3b/NZSvCaAAck0wDJjiuWtoOlDTtc7YqhgW
-         gclrHCqawCZgC6QLHYPT/cHc6Uznsibh+XQNeGA86oqD6cuIakkn1YpMcjnnqotFr/Iw
-         jHDQEI3thtS5eJ3qiDKPH6XPhh7avALOIu38MXs0QnhmbPtiH8PJLpc+N7FNejh/zdc+
-         zByUWJHjwdxVweZLNEgQ9NSGXVBiS9aVbpicL9NexKSQe9DWI1X8APr8Ynbn18y97IUT
-         YXC3uRum65/ahJOyMkp+c5fiiyB4Hm4A+yzq3gsWZ75P+H2xqAq+iZmYriFjd2LlDpEj
-         e3wA==
-X-Gm-Message-State: ACrzQf2ooMfY717WIAstsrOlmH0RiXgkbI3gJ3iZ46SryjunTGi+adU/
-        yDJ4dtg8SwEu2XBPVpAjgZo=
-X-Google-Smtp-Source: AMsMyM5ncLCON7H69CwN1h2mFJChlFCT/tOjvv+vDzOyTbAYe4LWup3DROUOLB0qK9ZqLDTMs+Q+/w==
-X-Received: by 2002:a17:902:7e42:b0:178:489:86ac with SMTP id a2-20020a1709027e4200b00178048986acmr24950551pln.68.1664239256857;
-        Mon, 26 Sep 2022 17:40:56 -0700 (PDT)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id d14-20020a17090a3b0e00b002009db534d1sm68572pjc.24.2022.09.26.17.40.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Sep 2022 17:40:56 -0700 (PDT)
-Date:   Mon, 26 Sep 2022 17:40:54 -0700
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     isaku.yamahata@intel.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        isaku.yamahata@gmail.com, Kai Huang <kai.huang@intel.com>,
-        Chao Gao <chao.gao@intel.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Shaokun Zhang <zhangshaokun@hisilicon.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>, linuxppc-dev@lists.ozlabs.org,
-        Fabiano Rosas <farosas@linux.ibm.com>
-Subject: Re: [PATCH v5 27/30] RFC: KVM: powerpc: Move processor compatibility
- check to hardware setup
-Message-ID: <20220927004054.GA1508394@ls.amr.corp.intel.com>
-References: <cover.1663869838.git.isaku.yamahata@intel.com>
- <574ca90fdaec0f37c197d9600d47d48a74f324bd.1663869838.git.isaku.yamahata@intel.com>
- <8735ci1sri.fsf@mpe.ellerman.id.au>
+        with ESMTP id S229437AbiI0AzA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 20:55:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 908784D175
+        for <kvm@vger.kernel.org>; Mon, 26 Sep 2022 17:54:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664240096;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ws7zU+gISAyBx1MgpyOG4IHg2lyJCsLl3GGmjikN0Kg=;
+        b=e+cQvw9xnTavIN5yG4yKj0m7fcyrvKw8Bj60OJZKXt3Qa1jLXKEipCX5ve971z1/tVHMtc
+        jmoLyaU1SwXgPsrh34tOc/nOzn/BRd6tcilH4Ia4s0krQnCYkrpKeAtcA0NmMQPdRqXMZr
+        Vovt6Hzeegsf/lekGNoLlXrCGC2nz1I=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-29-KD41FZ54NZyUq83xkWEe2A-1; Mon, 26 Sep 2022 20:54:51 -0400
+X-MC-Unique: KD41FZ54NZyUq83xkWEe2A-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A1BB03C02B7C;
+        Tue, 27 Sep 2022 00:54:50 +0000 (UTC)
+Received: from gshan.redhat.com (vpn2-54-143.bne.redhat.com [10.64.54.143])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6523B40C2064;
+        Tue, 27 Sep 2022 00:54:44 +0000 (UTC)
+From:   Gavin Shan <gshan@redhat.com>
+To:     kvmarm@lists.cs.columbia.edu
+Cc:     kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com,
+        shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org,
+        dmatlack@google.com, maz@kernel.org, peterx@redhat.com,
+        pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com,
+        james.morse@arm.com, suzuki.poulose@arm.com,
+        alexandru.elisei@arm.com, oliver.upton@linux.dev
+Subject: [PATCH v4 0/6] KVM: arm64: Enable ring-based dirty memory tracking
+Date:   Tue, 27 Sep 2022 08:54:33 +0800
+Message-Id: <20220927005439.21130-1-gshan@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <8735ci1sri.fsf@mpe.ellerman.id.au>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 23, 2022 at 04:58:41PM +1000,
-Michael Ellerman <mpe@ellerman.id.au> wrote:
+This series enables the ring-based dirty memory tracking for ARM64.
+The feature has been available and enabled on x86 for a while. It
+is beneficial when the number of dirty pages is small in a checkpointing
+system or live migration scenario. More details can be found from
+fb04a1eddb1a ("KVM: X86: Implement ring-based dirty memory tracking").
 
-> isaku.yamahata@intel.com writes:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> >
-> > Move processor compatibility check from kvm_arch_processor_compat() into
->                                           ^ 
->                                           kvm_arch_check_processor_compat()
-> 
-> > kvm_arch_hardware_setup().  The check does model name comparison with a
-> > global variable, cur_cpu_spec.  There is no point to check it at run time
-> > on all processors.
-> 
-> A key detail I had to look up is that both kvm_arch_hardware_setup() and
-> kvm_arch_check_processor_compat() are called from kvm_init(), one after
-> the other. But the latter is called on each CPU.
-> 
-> And because the powerpc implementation of kvm_arch_check_processor_compat()
-> just checks a global, there's no need to call it on every CPU.
-> 
-> > kvmppc_core_check_processor_compat() checks the global variable.  There are
-> > five implementation for it as follows.
-> 
-> There are three implementations not five.
+This series is applied on top of Marc's v2 series [0], fixing dirty-ring
+ordering issue.
 
-Thanks. I'll update the commit message.
+[0] https://lore.kernel.org/kvmarm/20220926145120.27974-1-maz@kernel.org
 
-> >   arch/powerpc/include/asm/cputable.h: extern struct cpu_spec *cur_cpu_spec;
-> >   arch/powerpc/kvm/book3s.c: return 0
-> >   arch/powerpc/kvm/e500.c: strcmp(cur_cpu_spec->cpu_name, "e500v2")
-> >   arch/powerpc/kvm/e500mc.c: strcmp(cur_cpu_spec->cpu_name, "e500mc")
-> >                              strcmp(cur_cpu_spec->cpu_name, "e5500")
-> >                              strcmp(cur_cpu_spec->cpu_name, "e6500")
-> >
-> > Suggested-by: Sean Christopherson <seanjc@google.com>
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > Cc: linuxppc-dev@lists.ozlabs.org
-> > Cc: Fabiano Rosas <farosas@linux.ibm.com>
-> > ---
-> >  arch/powerpc/kvm/powerpc.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> > index 7b56d6ccfdfb..31dc4f231e9d 100644
-> > --- a/arch/powerpc/kvm/powerpc.c
-> > +++ b/arch/powerpc/kvm/powerpc.c
-> > @@ -444,12 +444,12 @@ int kvm_arch_hardware_enable(void)
-> >  
-> >  int kvm_arch_hardware_setup(void *opaque)
-> >  {
-> > -	return 0;
-> > +	return kvmppc_core_check_processor_compat();
-> >  }
-> >  
-> >  int kvm_arch_check_processor_compat(void)
-> >  {
-> > -	return kvmppc_core_check_processor_compat();
-> > +	return 0;
-> >  }
-> 
-> The actual change seems OK. I gave it a quick test boot and ran some
-> VMs, everything seems to work as before.
-> 
-> Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
+v3: https://lore.kernel.org/r/20220922003214.276736-1-gshan@redhat.com
+v2: https://lore.kernel.org/lkml/YyiV%2Fl7O23aw5aaO@xz-m1.local/T/
+v1: https://lore.kernel.org/lkml/20220819005601.198436-1-gshan@redhat.com
 
-Thanks so much for testing. I'll remove RFC.
+Testing
+=======
+(1) kvm/selftests/dirty_log_test
+(2) Live migration by QEMU
+
+Changelog
+=========
+v4:
+  * Commit log improvement                                     (Marc)
+  * Add helper kvm_dirty_ring_check_request()                  (Marc)
+  * Drop ifdef for kvm_cpu_dirty_log_size()                    (Marc)
+v3:
+  * Check KVM_REQ_RING_SOFT_RULL inside kvm_request_pending()  (Peter)
+  * Move declaration of kvm_cpu_dirty_log_size()               (test-robot)
+v2:
+  * Introduce KVM_REQ_RING_SOFT_FULL                           (Marc)
+  * Changelog improvement                                      (Marc)
+  * Fix dirty_log_test without knowing host page size          (Drew)
+
+Gavin Shan (6):
+  KVM: x86: Introduce KVM_REQ_RING_SOFT_FULL
+  KVM: x86: Move declaration of kvm_cpu_dirty_log_size() to
+    kvm_dirty_ring.h
+  KVM: arm64: Enable ring-based dirty memory tracking
+  KVM: selftests: Use host page size to map ring buffer in
+    dirty_log_test
+  KVM: selftests: Clear dirty ring states between two modes in
+    dirty_log_test
+  KVM: selftests: Automate choosing dirty ring size in dirty_log_test
+
+ Documentation/virt/kvm/api.rst               |  2 +-
+ arch/arm64/include/uapi/asm/kvm.h            |  1 +
+ arch/arm64/kvm/Kconfig                       |  1 +
+ arch/arm64/kvm/arm.c                         |  3 ++
+ arch/x86/include/asm/kvm_host.h              |  2 -
+ arch/x86/kvm/x86.c                           | 15 +++---
+ include/linux/kvm_dirty_ring.h               | 14 +++---
+ include/linux/kvm_host.h                     |  1 +
+ tools/testing/selftests/kvm/dirty_log_test.c | 53 ++++++++++++++------
+ tools/testing/selftests/kvm/lib/kvm_util.c   |  2 +-
+ virt/kvm/dirty_ring.c                        | 19 ++++++-
+ 11 files changed, 79 insertions(+), 34 deletions(-)
+
 -- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+2.23.0
+
