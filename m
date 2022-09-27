@@ -2,28 +2,28 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF8835EB6C3
-	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 03:22:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7CC725EB6CD
+	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 03:26:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229618AbiI0BWG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Sep 2022 21:22:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49560 "EHLO
+        id S229639AbiI0B0B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Sep 2022 21:26:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiI0BWE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Sep 2022 21:22:04 -0400
-Received: from ssh248.corpemail.net (ssh248.corpemail.net [210.51.61.248])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B0E8A220D;
-        Mon, 26 Sep 2022 18:22:00 -0700 (PDT)
+        with ESMTP id S229508AbiI0BZ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Sep 2022 21:25:59 -0400
+Received: from unicom146.biz-email.net (unicom146.biz-email.net [210.51.26.146])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E765963F07;
+        Mon, 26 Sep 2022 18:25:56 -0700 (PDT)
 Received: from ([60.208.111.195])
-        by ssh248.corpemail.net ((D)) with ASMTP (SSL) id VAW00150;
-        Tue, 27 Sep 2022 09:21:50 +0800
+        by unicom146.biz-email.net ((D)) with ASMTP (SSL) id VAA00051;
+        Tue, 27 Sep 2022 09:25:51 +0800
 Received: from jtjnmail201619.home.langchao.com (10.100.2.19) by
- jtjnmail201620.home.langchao.com (10.100.2.20) with Microsoft SMTP Server
+ jtjnmail201622.home.langchao.com (10.100.2.22) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.12; Tue, 27 Sep 2022 09:21:50 +0800
+ 15.1.2507.12; Tue, 27 Sep 2022 09:25:51 +0800
 Received: from jtjnmail201619.home.langchao.com ([fe80::c426:eceb:41d0:3372])
  by jtjnmail201619.home.langchao.com ([fe80::c426:eceb:41d0:3372%2]) with mapi
- id 15.01.2507.012; Tue, 27 Sep 2022 09:21:50 +0800
+ id 15.01.2507.012; Tue, 27 Sep 2022 09:25:51 +0800
 From:   =?gb2312?B?dG9tb3Jyb3cgV2FuZyAozfW1wsP3KQ==?= 
         <wangdeming@inspur.com>
 To:     "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
@@ -33,51 +33,51 @@ CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH] vfio: Use filp instead of fd
 Thread-Topic: [PATCH] vfio: Use filp instead of fd
-Thread-Index: AdjSDqlXbkUUuQYWTu6MpzuiJRbcew==
-Date:   Tue, 27 Sep 2022 01:21:50 +0000
-Message-ID: <0d0817a2c6a8467e83b07c91f50511fa@inspur.com>
+Thread-Index: AdjSD382bkUUuQYWTu6MpzuiJRbcew==
+Date:   Tue, 27 Sep 2022 01:25:51 +0000
+Message-ID: <0a80a16aa10142c5811eb6151f7cdbc9@inspur.com>
 Accept-Language: zh-CN, en-US
 Content-Language: zh-CN
 X-MS-Has-Attach: yes
 X-MS-TNEF-Correlator: 
 x-originating-ip: [10.200.104.82]
 Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";
-        micalg=SHA1; boundary="----=_NextPart_000_002B_01D8D252.2D005F60"
+        micalg=SHA1; boundary="----=_NextPart_000_000F_01D8D253.0843A8C0"
 MIME-Version: 1.0
-tUid:   20229270921500dcc1c6b3d19c02913003bfdeeeb624b
+tUid:   20229270925510745c261ed230e182cf321e4f577c8ab
 X-Abuse-Reports-To: service@corp-email.com
 Abuse-Reports-To: service@corp-email.com
 X-Complaints-To: service@corp-email.com
 X-Report-Abuse-To: service@corp-email.com
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-------=_NextPart_000_002B_01D8D252.2D005F60
+------=_NextPart_000_000F_01D8D253.0843A8C0
 Content-Type: text/plain;
 	charset="gb2312"
 Content-Transfer-Encoding: quoted-printable
 
-Hi
+Hi,
 
-Why kvm_vfio_group_add use file.
- =20
+Why kvm_vfio_group_add use file?=20
+
   struct file *filp;
-  .....
+  ......
   filp =3D fget(fd);
-
-  .....
-  kvg->file =3D filp;
   ......
   fput(filp);
 
-> from: Al Viro <viro@ftp.linux.org.uk> =B4=FA=B1=ED Al Viro
-> time: 2022-9-22 3:38
-> to: Jason Gunthorpe <jgg@nvidia.com>
+
+
+>--------
+> send: Al Viro <viro@ftp.linux.org.uk> =B4=FA=B1=ED Al Viro
+> =B7=A2=CB=CD=CA=B1=BC=E4: 2022=C4=EA9=D4=C227=C8=D5 3:38
+>to: Jason Gunthorpe <jgg@nvidia.com>
 > pbonzini@redhat.com; kvm@vger.kernel.org; linux-kernel@vger.kernel.org
 > sub: Re: [PATCH] vfio: Use filp instead of fd
 >=20
@@ -109,7 +109,7 @@ not
 fget()
 > one.
 
-------=_NextPart_000_002B_01D8D252.2D005F60
+------=_NextPart_000_000F_01D8D253.0843A8C0
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -167,19 +167,19 @@ ORikFVBLobsDNy+NQ++5ZYgx1ahEQ6BESIjeWxut+2Zqis6Zbwd5ZsBhm892l5EdzJCuYe5xDEZw
 0Z0bGvUxggOTMIIDjwIBATBwMFkxEzARBgoJkiaJk/IsZAEZFgNjb20xGDAWBgoJkiaJk/IsZAEZ
 FghsYW5nY2hhbzEUMBIGCgmSJomT8ixkARkWBGhvbWUxEjAQBgNVBAMTCUlOU1BVUi1DQQITfgAA
 1tjc3okYpZWK7QAAAADW2DAJBgUrDgMCGgUAoIIB+DAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcB
-MBwGCSqGSIb3DQEJBTEPFw0yMjA5MjcwMTE4NTlaMCMGCSqGSIb3DQEJBDEWBBSUPlXrBnzCZEo8
-i2GkSQQz8cumWDB/BgkrBgEEAYI3EAQxcjBwMFkxEzARBgoJkiaJk/IsZAEZFgNjb20xGDAWBgoJ
+MBwGCSqGSIb3DQEJBTEPFw0yMjA5MjcwMTI1MDdaMCMGCSqGSIb3DQEJBDEWBBTwjNsrSZpPKUh0
+g8frdXbNy5KD1zB/BgkrBgEEAYI3EAQxcjBwMFkxEzARBgoJkiaJk/IsZAEZFgNjb20xGDAWBgoJ
 kiaJk/IsZAEZFghsYW5nY2hhbzEUMBIGCgmSJomT8ixkARkWBGhvbWUxEjAQBgNVBAMTCUlOU1BV
 Ui1DQQITfgAA1tjc3okYpZWK7QAAAADW2DCBgQYLKoZIhvcNAQkQAgsxcqBwMFkxEzARBgoJkiaJ
 k/IsZAEZFgNjb20xGDAWBgoJkiaJk/IsZAEZFghsYW5nY2hhbzEUMBIGCgmSJomT8ixkARkWBGhv
 bWUxEjAQBgNVBAMTCUlOU1BVUi1DQQITfgAA1tjc3okYpZWK7QAAAADW2DCBkwYJKoZIhvcNAQkP
 MYGFMIGCMAoGCCqGSIb3DQMHMAsGCWCGSAFlAwQBKjALBglghkgBZQMEARYwCwYJYIZIAWUDBAEC
 MA4GCCqGSIb3DQMCAgIAgDANBggqhkiG9w0DAgIBQDAHBgUrDgMCGjALBglghkgBZQMEAgMwCwYJ
-YIZIAWUDBAICMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCGS6dp16jnk3ZbN6jSvQxy
-0SsXcHLpNSuZZKX7130kH4INwUiZW5q0HVd+SHpUpYlVlTqqO2XNE8s6OSJR1TMz9zd+uCAES1vk
-5myMuNvJApYDUMkbjmwhQ17+HqoKpGxah2HgpICYO/eXUbPJhwm8CRyitY0K1wSNM4ttM9JubpMD
-NrkylISJ9pnkJpl/DuBfXBRn+PWOU/8cm8kfxRfKd87QECQ5Jvsd82gBdtM1wpwH0BBt2kUdW9HW
-WzEyHwXkt+4a4Jz1iqT5a8ebJu10dpQ4w/XFK8n2QV7lbVzJPbmPDMkGAx+GqDymrg8eZmPLRkRA
-lkey8wtd85Poy0SgAAAAAAAA
+YIZIAWUDBAICMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQA9bA1oV93h2REQptZ9z952
+Kh0R2Ka02hjW1V9LS/tT7egXmAyUrwIHcG4mSv9/adRPLaqj6QiYM/KPv/LZkuENqBJDPSIuMBF3
+ODKEA/t750FJ1uwE+fXMuwT5gvbahI2nQZFVHpq5EybJIfqOzLkGH0DNmLmxgiiKz8eqEZE51+l8
+PSaBOGYpv3TuSnHNxhN8rJXRH56lyatHJzzs7P6PffPgyFEazEUA4MxfuyYX/DitIkAcsFMRsKEb
+hroS5uCSNXAaJ92aZep2xtZ0svTbgJgKC06dsqcg1/GNQ5O6JyaBMOGIzutCW96rdHpNfry8pWn6
+VgrfZgnMEiN5XrP2AAAAAAAA
 
-------=_NextPart_000_002B_01D8D252.2D005F60--
+------=_NextPart_000_000F_01D8D253.0843A8C0--
