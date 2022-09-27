@@ -2,128 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 881BE5ECA2D
-	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 18:54:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D9805ECA2F
+	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 18:55:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233129AbiI0Qyo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Sep 2022 12:54:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53098 "EHLO
+        id S232849AbiI0Qzr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Sep 2022 12:55:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233065AbiI0QyV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Sep 2022 12:54:21 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7153F1B86BD;
-        Tue, 27 Sep 2022 09:52:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1664297577; x=1695833577;
-  h=message-id:date:mime-version:to:cc:references:from:
-   subject:in-reply-to:content-transfer-encoding;
-  bh=5EohTMYLQrkXaT2jLZUdyETCAEaqtVx4zyPwhafHKa0=;
-  b=a5mJxHmR3wr6zzQiTcRVdKWaQYwc1zofj8QrK2TgnQrbrpQZ6AysN+Rm
-   CaqVIme/3FFE7S1wkFDNWfUjLe/YbwJXk1ZyyUjd8MwlC0iAvecyY63/Z
-   yoXEHCaMIrVn41/wD58laQSuUQVdXceZYUDFKi6JPM2h4cIqJTHsrv93M
-   Q1Q9c3Bo98ORZOi4VJgZHwe78bJhikAFJwOJG6j2sy7e8JALytsFlT7E/
-   vTJspsR37zLAo65FQz1es0bf2cjEAazyMwiOImCwCDMNqFBtRZZvTpgeW
-   xAL16DZB735i2UFJ5hK4d89CuqvOxaF7DIL19dRjJwj4i8C7ECN9jV64i
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10483"; a="302278841"
-X-IronPort-AV: E=Sophos;i="5.93,349,1654585200"; 
-   d="scan'208";a="302278841"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2022 09:52:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10483"; a="572713090"
-X-IronPort-AV: E=Sophos;i="5.93,349,1654585200"; 
-   d="scan'208";a="572713090"
-Received: from linux.intel.com ([10.54.29.200])
-  by orsmga003.jf.intel.com with ESMTP; 27 Sep 2022 09:52:40 -0700
-Received: from [10.252.215.51] (kliang2-mobl1.ccr.corp.intel.com [10.252.215.51])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by linux.intel.com (Postfix) with ESMTPS id AE3615808F0;
-        Tue, 27 Sep 2022 09:52:38 -0700 (PDT)
-Message-ID: <83db7a22-3cf8-9f5c-5530-894c663ee1fb@linux.intel.com>
-Date:   Tue, 27 Sep 2022 12:52:37 -0400
+        with ESMTP id S232904AbiI0QzK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Sep 2022 12:55:10 -0400
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85B3C101FF
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 09:54:34 -0700 (PDT)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-345528ceb87so106206177b3.11
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 09:54:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=W0xg9RtiBqYWCn75opQ1wyDHiSh1EdYgdVcJnSQAyaI=;
+        b=bRnTe953BU0S9p4GzkMTwutXKUYULiE3E2Wpn3dShC2oZ9jQjO+yNRGCVh0vFpovYx
+         QIvVUnEw09Z7bPOXir+36n4MD0SQG+mWc4pTOWgeijinfnLHdYoCCp9j7rxVNDgpuwhM
+         3rlkwqKC3se4rlZ/mQoKE5gW3UVfsvqggQjsPkAkmlqesubcgJlsvxOTi2RuDqUDynii
+         fnfD96JZy2rGjPakIYlAarTffn3C653ZtWZx4eR2WNMqS6Kca2mD7dVt3vjXpupNiRdn
+         8lwz80B/CRCr85+TE8e0Ce+n1HdV/q+DEMbisJxQFDSXqup711Zp6aR3gWwym0NqMm0i
+         4Ivw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=W0xg9RtiBqYWCn75opQ1wyDHiSh1EdYgdVcJnSQAyaI=;
+        b=c0aGV/H7jbBtDCOm174/QVv0aReTvYTI1LWqexZacQsZzfT/RKHD0Q7MADstM8V/7v
+         bp2WGovkFLMwhmnijyWIWFWOILLzQoZ9NaVXW2cGmrFsjXokfCK8pFMMOas6gXAClTXd
+         EVZnEGuGzEqVpff57OuyL7R0iOSJ/VISl65/DZ7EopvGnPaAJbuMRt6ILLx9DyKMSjPQ
+         N4DLgsbL4nGowtIMHgIc0RyG39XOi72X6haChFtOo9luIMtfDAkI8JGecnO89DXTwixT
+         Xje3uCZTQHyT6ka64UY+2ZtOlZmeFGMgFEx/gp37jg6nioA05PLEOEVxgrKgwb3DOWOi
+         bwGQ==
+X-Gm-Message-State: ACrzQf23DnzSpSqi2DIV4mi1qxQzaeuvUWpmbc+eaLfvBmjE43tT505c
+        tAr0Y104DH1whdfYSBHqfJo/JtdNbyg7htoScf2Zl2am8xA=
+X-Google-Smtp-Source: AMsMyM5iNWq9PrZ4SQcEEyjs1vDn+yBhn057UlEajJm2EicjZLp/lXTHe8LGAsvjZ9hHsk5s/BGmHSUTnw7PCtMjh38=
+X-Received: by 2002:a81:c02:0:b0:34d:829a:20f3 with SMTP id
+ 2-20020a810c02000000b0034d829a20f3mr25274846ywm.168.1664297673551; Tue, 27
+ Sep 2022 09:54:33 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Content-Language: en-US
-To:     "Wang, Wei W" <wei.w.wang@intel.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        "Li, Xiaoyao" <xiaoyao.li@intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "linux-perf-users@vger.kernel.org" <linux-perf-users@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-References: <20220921164521.2858932-1-xiaoyao.li@intel.com>
- <20220921164521.2858932-3-xiaoyao.li@intel.com>
- <175b518c-d202-644e-a3a7-67e877852548@linux.intel.com>
- <DS0PR11MB6373C84139621DC447D3F466DC4E9@DS0PR11MB6373.namprd11.prod.outlook.com>
- <Yyxke/IO+AP4EWwT@hirez.programming.kicks-ass.net>
- <DS0PR11MB637346E9F224C5330CDEF3BFDC4E9@DS0PR11MB6373.namprd11.prod.outlook.com>
- <YyxsnAFYMLn2U9BT@hirez.programming.kicks-ass.net>
- <DS0PR11MB63730A85E00683AB7F6F3E26DC4E9@DS0PR11MB6373.namprd11.prod.outlook.com>
- <62d4bec1-a0c3-3b01-61bb-f284eede6378@linux.intel.com>
- <CALMp9eTG7EbRv_fnQpDMQ3YUjYANgu=6QwVj_ACgHnK-Mhk39Q@mail.gmail.com>
- <e1327377-8e82-56a2-25e5-2ba91f2eec42@linux.intel.com>
- <DS0PR11MB63730CE4DAE000E338F092A0DC559@DS0PR11MB6373.namprd11.prod.outlook.com>
-From:   "Liang, Kan" <kan.liang@linux.intel.com>
-Subject: Re: [RFC PATCH v2 2/3] perf/x86/intel/pt: Introduce and export
- pt_get_curr_event()
-In-Reply-To: <DS0PR11MB63730CE4DAE000E338F092A0DC559@DS0PR11MB6373.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20220926171457.532542-1-dmatlack@google.com> <3d091669-cb83-330e-52d0-5d3ac0fe7214@redhat.com>
+In-Reply-To: <3d091669-cb83-330e-52d0-5d3ac0fe7214@redhat.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Tue, 27 Sep 2022 09:54:07 -0700
+Message-ID: <CALzav=de=S5wDX=_jq3EvRYf9PromLMUmEvuDF_S075o3HO=jA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: selftests: Skip tests that require EPT when it is
+ not available
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        kvm list <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Sep 27, 2022 at 4:58 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 9/26/22 19:14, David Matlack wrote:
+> > Skip selftests that require EPT support in the VM when it is not
+> > available. For example, if running on a machine where kvm_intel.ept=N
+> > since KVM does not offer EPT support to guests if EPT is not supported
+> > on the host.
+> >
+> > This commit causes vmx_dirty_log_test to be skipped instead of failing
+> > on hosts where kvm_intel.ept=N.
+> >
+> > Signed-off-by: David Matlack <dmatlack@google.com>
+>
+> Queued for 6.0, thanks.
 
-
-On 2022-09-27 10:27 a.m., Wang, Wei W wrote:
-> On Tuesday, September 27, 2022 2:09 AM, Liang, Kan wrote:
->> From my understanding of the host-guest mode, the host PT event never
->> traces the guest no matter whether the guest enables PT. So when VM-entry,
->> there is only a guest PT event or no event. If so, I think the perf tool should
->> warn the user if they try to create a host event with !exclude_guest, since the
->> host event never traces a guest.
-> 
-> Probably not from the perf side. It's actually an issue of the KVM's pt_mode:
-> How can KVM prevent host from profiling the guest when in host-guest mode?
-
-I don't think it's KVM's job to prevent host from profiling the guest.
-However, the current KVM implementation implicitly disables the guest
-profiling from the host. If I understand correct, this patch series just
-change it to an explicit way (Just for kernel. Perf tool still doesn't
-know about it.). There is no substantial change.
-
-I think it should be PT driver who decide which event should be
-scheduled. So the first step is to let the PT driver understand the
-host-guest mode. Then if a perf user in the host tries to profile with
-!exclude_guest with the host-guest mode, the pt driver can deny the
-request. The perf tool than throw a warning, e.g., "The VMM is running
-with host-guest mode. Perf cannot profile guest. Please remove the guest
-profiling setting or switch to the host-only mode.".
-
-> Just a warning from the perf side wouldn't be enough. I think that's a wrong
-> assumption from KVM side. I had a plan to fix this one. Exposing the host event
-> can tell KVM if the host is profiling the guest or not (i.e. host-guest is allowed).
-
-I don't think KVM should know such information.
-
-Thanks,
-Kan
+I sent a v2 based on the feedback from Sean. Please grab that one
+instead. Thanks.
