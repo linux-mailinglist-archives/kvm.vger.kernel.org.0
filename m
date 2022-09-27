@@ -2,76 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 318765EC622
-	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 16:31:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58E6A5EC714
+	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 17:00:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232413AbiI0Oa7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Sep 2022 10:30:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50542 "EHLO
+        id S230042AbiI0PAD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Sep 2022 11:00:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232571AbiI0OaW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Sep 2022 10:30:22 -0400
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4877FA61CD;
-        Tue, 27 Sep 2022 07:30:13 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id x18so15286551wrm.7;
-        Tue, 27 Sep 2022 07:30:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=4qLPtvUWN+AfrLhyVfZ91N3yZnBEIddv2rouQHzCYLA=;
-        b=LSvdUNSjYwsgaB1ny7A29I06dZuPVvZasJ53PSj2IRqPVKq1ohmeHh9Z6CkkhwtJQf
-         85O+gH6Z/IdRrelbEU0k1mMXu+6fxxn2WMN9doOp+loYLAuRiKZyPsNuFdcRNJn8dsQ8
-         lRGEVEdnN3VzNzjA7sb4HgBPlDNeuOXWP9VvdICO7KXryKqpFA3ehg94nCKxwk0Gpl0X
-         I+5MDhB4PGTBCY6571kzJwU8c1BDIDcYu4PmD8hWvxk6btQMMwVeIkdHwp1kUu0xXGSI
-         v+WsS2ry+SxZHb8HRxtcqqy322vcXEZOmSjORm3FjfTCAcEhB2XwEz0Q5vPUPRONX/Nv
-         BdwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=4qLPtvUWN+AfrLhyVfZ91N3yZnBEIddv2rouQHzCYLA=;
-        b=1UONNbVEuDFY6zRY99MKo1XJTEdALGtliiawL0a/bfg1ilPh32kf/k9NkEPLogRTUA
-         blwQv2/jC2CdtziHerqg3FzaT0ImtU+0+8BoBs9pBDrmHRqOaJnA/iugdAFI++1sKz2v
-         F7IkZy+gRwB1g0iePTVDNHbP+THIn5fmoXQ1MPNAzgGs+AS8OybRAI5wty7LKkIclpWG
-         xzEOvX0mkldCc+R0g/USR5nFhC/32C/ivNDfLO/EM5jar+rYd5dUicA6ISn0StDM+nfn
-         JUJYNFBogB1ON8noQJ45gG34UI2fVEHFdsOtowzG9vcTP3cwr8KG8lD7NN7D6ULCWtOf
-         NWsw==
-X-Gm-Message-State: ACrzQf2kRGhBVf0VVuhNXfCKMr3UxcDMBAkcZmQC4eSJd+u3senqsX/I
-        bHvEmYpMBiNCDcJoblclDQM=
-X-Google-Smtp-Source: AMsMyM7wIF7Q/yLHfL4qpto23LFzYlOodjB18WlyAhMXTZyo5ET7oeG7w+FroLjnnh5vWx2LP52ZzQ==
-X-Received: by 2002:adf:f347:0:b0:22c:be39:4e38 with SMTP id e7-20020adff347000000b0022cbe394e38mr2077945wrp.151.1664289011650;
-        Tue, 27 Sep 2022 07:30:11 -0700 (PDT)
-Received: from [192.168.8.100] (94.196.228.157.threembb.co.uk. [94.196.228.157])
-        by smtp.gmail.com with ESMTPSA id a5-20020a05600c224500b003b4fac020c8sm14022447wmm.16.2022.09.27.07.30.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Sep 2022 07:30:11 -0700 (PDT)
-Message-ID: <021d8ea4-891c-237d-686e-64cecc2cc842@gmail.com>
-Date:   Tue, 27 Sep 2022 15:28:34 +0100
+        with ESMTP id S231322AbiI0O7z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Sep 2022 10:59:55 -0400
+X-Greylist: delayed 1123 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 27 Sep 2022 07:59:52 PDT
+Received: from 6.mo552.mail-out.ovh.net (6.mo552.mail-out.ovh.net [188.165.49.222])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6060613D71
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 07:59:51 -0700 (PDT)
+Received: from mxplan5.mail.ovh.net (unknown [10.109.146.51])
+        by mo552.mail-out.ovh.net (Postfix) with ESMTPS id E5AB025AA6;
+        Tue, 27 Sep 2022 14:41:05 +0000 (UTC)
+Received: from kaod.org (37.59.142.109) by DAG4EX2.mxp5.local (172.16.2.32)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.12; Tue, 27 Sep
+ 2022 16:41:04 +0200
+Authentication-Results: garm.ovh; auth=pass (GARM-109S0031f5a7e25-70df-4a79-9fd9-0f1166658844,
+                    12A65CACE92C1DACCE6E97948814F03D28E096F2) smtp.auth=clg@kaod.org
+X-OVh-ClientIp: 82.64.250.170
+Message-ID: <b54249b3-3639-80e9-3c5c-f556e605e6e6@kaod.org>
+Date:   Tue, 27 Sep 2022 16:41:02 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.12.0
-Subject: Re: [PATCH net-next 0/4] shrink struct ubuf_info
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [PATCH v9 09/10] s390x/cpu_topology: activating CPU topology
 Content-Language: en-US
-To:     Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
-        xen-devel@lists.xenproject.org, Wei Liu <wei.liu@kernel.org>,
-        Paul Durrant <paul@xen.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>
-References: <cover.1663892211.git.asml.silence@gmail.com>
- <7fef56880d40b9d83cc99317df9060c4e7cdf919.camel@redhat.com>
-From:   Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <7fef56880d40b9d83cc99317df9060c4e7cdf919.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Pierre Morel <pmorel@linux.ibm.com>, <qemu-s390x@nongnu.org>
+CC:     <qemu-devel@nongnu.org>, <borntraeger@de.ibm.com>,
+        <pasic@linux.ibm.com>, <richard.henderson@linaro.org>,
+        <david@redhat.com>, <thuth@redhat.com>, <cohuck@redhat.com>,
+        <mst@redhat.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+        <ehabkost@redhat.com>, <marcel.apfelbaum@gmail.com>,
+        <eblake@redhat.com>, <armbru@redhat.com>, <seiden@linux.ibm.com>,
+        <nrb@linux.ibm.com>, <frankja@linux.ibm.com>
+References: <20220902075531.188916-1-pmorel@linux.ibm.com>
+ <20220902075531.188916-10-pmorel@linux.ibm.com>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+In-Reply-To: <20220902075531.188916-10-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+X-Originating-IP: [37.59.142.109]
+X-ClientProxiedBy: DAG3EX2.mxp5.local (172.16.2.22) To DAG4EX2.mxp5.local
+ (172.16.2.32)
+X-Ovh-Tracer-GUID: 3adfd510-bbc5-4028-9d5d-0e3fd204df60
+X-Ovh-Tracer-Id: 828943807772134157
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvfedrfeegiedgheehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkfffgggfuffvvehfhfgjtgfgihesthejredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeelleeiiefgkeefiedtvdeigeetueetkeffkeelheeugfetteegvdekgfehgffgkeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdpnhgspghrtghpthhtohepuddprhgtphhtthhopehfrhgrnhhkjhgrsehlihhnuhigrdhisghmrdgtohhmpdfovfetjfhoshhtpehmohehhedv
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -80,62 +63,215 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Paolo,
+On 9/2/22 09:55, Pierre Morel wrote:
+> Starting with a new machine, s390-virtio-ccw-7.2, the machine
+> property topology-disable is set to false while it is kept to
+> true for older machine.
 
-On 9/27/22 14:49, Paolo Abeni wrote:
-> Hello,
+We probably need a machine class option also because we don't want
+this to be possible :
+
+    -M s390-ccw-virtio-7.1,topology-disable=false
+
+
+> This allows migrating older machine without disabling the ctop
+> CPU feature for older machine, thus keeping existing start scripts.
 > 
-> On Fri, 2022-09-23 at 17:39 +0100, Pavel Begunkov wrote:
->> struct ubuf_info is large but not all fields are needed for all
->> cases. We have limited space in io_uring for it and large ubuf_info
->> prevents some struct embedding, even though we use only a subset
->> of the fields. It's also not very clean trying to use this typeless
->> extra space.
->>
->> Shrink struct ubuf_info to only necessary fields used in generic paths,
->> namely ->callback, ->refcnt and ->flags, which take only 16 bytes. And
->> make MSG_ZEROCOPY and some other users to embed it into a larger struct
->> ubuf_info_msgzc mimicking the former ubuf_info.
->>
->> Note, xen/vhost may also have some cleaning on top by creating
->> new structs containing ubuf_info but with proper types.
+> The KVM capability, KVM_CAP_S390_CPU_TOPOLOGY is used to
+> activate the S390_FEAT_CONFIGURATION_TOPOLOGY feature and
+> the topology facility for the guest in the case the topology
+> is not disabled.
 > 
-> That sounds a bit scaring to me. If I read correctly, every uarg user
-> should check 'uarg->callback == msg_zerocopy_callback' before accessing
-> any 'extend' fields.
-
-Providers of ubuf_info access those fields via callbacks and so already
-know the actual structure used. The net core, on the opposite, should
-keep it encapsulated and not touch them at all.
-
-The series lists all places where we use extended fields just on the
-merit of stripping the structure of those fields and successfully
-building it. The only user in net/ipv{4,6}/* is MSG_ZEROCOPY, which
-again uses callbacks.
-
-Sounds like the right direction for me. There is a couple of
-places where it might get type safer, i.e. adding types instead
-of void* in for struct tun_msg_ctl and getting rid of one macro
-hiding types in xen. But seems more like TODO for later.
-
-> AFAICS the current code sometimes don't do the
-> explicit test because the condition is somewhat implied, which in turn
-> is quite hard to track.
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>   hw/core/machine.c                  |  5 +++
+>   hw/s390x/s390-virtio-ccw.c         | 55 ++++++++++++++++++++++++++----
+>   include/hw/boards.h                |  3 ++
+>   include/hw/s390x/s390-virtio-ccw.h |  1 +
+>   target/s390x/kvm/kvm.c             | 14 ++++++++
+>   5 files changed, 72 insertions(+), 6 deletions(-)
 > 
-> clearing uarg->zerocopy for the 'wrong' uarg was armless and undetected
-> before this series, and after will trigger an oops..
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 4c5c8d1655..cbcdd40763 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -40,6 +40,11 @@
+>   #include "hw/virtio/virtio-pci.h"
+>   #include "qom/object_interfaces.h"
+>   
+> +GlobalProperty hw_compat_7_1[] = {
+> +    { "s390x-cpu", "ctop", "off"},
+> +};
+> +const size_t hw_compat_7_1_len = G_N_ELEMENTS(hw_compat_7_1);
+> +
+>   GlobalProperty hw_compat_7_0[] = {
+>       { "arm-gicv3-common", "force-8-bit-prio", "on" },
+>       { "nvme-ns", "eui64-default", "on"},
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 1fa98740de..3078e68df7 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -249,11 +249,16 @@ static void ccw_init(MachineState *machine)
+>       /* init memory + setup max page size. Required for the CPU model */
+>       s390_memory_init(machine->ram);
+>   
+> -    /* Adding the topology must be done before CPU intialization*/
+> -    dev = qdev_new(TYPE_S390_CPU_TOPOLOGY);
+> -    object_property_add_child(qdev_get_machine(), TYPE_S390_CPU_TOPOLOGY,
+> -                              OBJECT(dev));
+> -    sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+> +    /*
+> +     * Adding the topology must be done before CPU intialization but
+> +     * only in the case it is not disabled for migration purpose.
+> +     */
+> +    if (!S390_CCW_MACHINE(machine)->topology_disable) {
+> +        dev = qdev_new(TYPE_S390_CPU_TOPOLOGY);
+> +        object_property_add_child(qdev_get_machine(), TYPE_S390_CPU_TOPOLOGY,
+> +                                  OBJECT(dev));
+> +        sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+> +    }
+>   
+>       /* init CPUs (incl. CPU model) early so s390_has_feature() works */
+>       s390_init_cpus(machine);
+> @@ -676,6 +681,21 @@ static inline void machine_set_zpcii_disable(Object *obj, bool value,
+>       ms->zpcii_disable = value;
+>   }
+>   
+> +static inline bool machine_get_topology_disable(Object *obj, Error **errp)
+> +{
+> +    S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
+> +
+> +    return ms->topology_disable;
+> +}
+> +
+> +static inline void machine_set_topology_disable(Object *obj, bool value,
+> +                                                Error **errp)
+> +{
+> +    S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
+> +
+> +    ms->topology_disable = value;
+> +}
+> +
+>   static S390CcwMachineClass *current_mc;
+>   
+>   /*
+> @@ -778,6 +798,13 @@ static inline void s390_machine_initfn(Object *obj)
+>       object_property_set_description(obj, "zpcii-disable",
+>               "disable zPCI interpretation facilties");
+>       object_property_set_bool(obj, "zpcii-disable", false, NULL);
+> +
+> +    object_property_add_bool(obj, "topology-disable",
+> +                             machine_get_topology_disable,
+> +                             machine_set_topology_disable);
+> +    object_property_set_description(obj, "topology-disable",
+> +            "disable zPCI interpretation facilties");
+> +    object_property_set_bool(obj, "topology-disable", false, NULL);
+>   }
+>   
+>   static const TypeInfo ccw_machine_info = {
+> @@ -830,14 +857,29 @@ bool css_migration_enabled(void)
+>       }                                                                         \
+>       type_init(ccw_machine_register_##suffix)
+>   
+> +static void ccw_machine_7_2_instance_options(MachineState *machine)
+> +{
+> +}
+> +
+> +static void ccw_machine_7_2_class_options(MachineClass *mc)
+> +{
+> +}
+> +DEFINE_CCW_MACHINE(7_2, "7.2", true);
+> +
+>   static void ccw_machine_7_1_instance_options(MachineState *machine)
+>   {
+> +    S390CcwMachineState *ms = S390_CCW_MACHINE(machine);
+> +
+> +    ccw_machine_7_2_instance_options(machine);
+> +    ms->topology_disable = true;
+>   }
+>   
+>   static void ccw_machine_7_1_class_options(MachineClass *mc)
+>   {
+> +    ccw_machine_7_2_class_options(mc);
+> +    compat_props_add(mc->compat_props, hw_compat_7_1, hw_compat_7_1_len);
+>   }
+> -DEFINE_CCW_MACHINE(7_1, "7.1", true);
+> +DEFINE_CCW_MACHINE(7_1, "7.1", false);
+>   
+>   static void ccw_machine_7_0_instance_options(MachineState *machine)
+>   {
+> @@ -847,6 +889,7 @@ static void ccw_machine_7_0_instance_options(MachineState *machine)
+>       ccw_machine_7_1_instance_options(machine);
+>       s390_set_qemu_cpu_model(0x8561, 15, 1, qemu_cpu_feat);
+>       ms->zpcii_disable = true;
+> +
+>   }
+>   
+>   static void ccw_machine_7_0_class_options(MachineClass *mc)
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 69e20c1252..6e9803aa2d 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -387,6 +387,9 @@ struct MachineState {
+>       } \
+>       type_init(machine_initfn##_register_types)
+>   
+> +extern GlobalProperty hw_compat_7_1[];
+> +extern const size_t hw_compat_7_1_len;
+> +
+>   extern GlobalProperty hw_compat_7_0[];
+>   extern const size_t hw_compat_7_0_len;
+>   
+> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
+> index 9e7a0d75bc..b14660eecb 100644
+> --- a/include/hw/s390x/s390-virtio-ccw.h
+> +++ b/include/hw/s390x/s390-virtio-ccw.h
+> @@ -28,6 +28,7 @@ struct S390CcwMachineState {
+>       bool dea_key_wrap;
+>       bool pv;
+>       bool zpcii_disable;
+> +    bool topology_disable;
+>       uint8_t loadparm[8];
+>   };
+>   
+> diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
+> index cb14bcc012..6b7efee511 100644
+> --- a/target/s390x/kvm/kvm.c
+> +++ b/target/s390x/kvm/kvm.c
+> @@ -2385,6 +2385,7 @@ bool kvm_s390_cpu_models_supported(void)
+>   
+>   void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
+>   {
+> +    S390CcwMachineState *ms = S390_CCW_MACHINE(qdev_get_machine());
+>       struct kvm_s390_vm_cpu_machine prop = {};
+>       struct kvm_device_attr attr = {
+>           .group = KVM_S390_VM_CPU_MODEL,
+> @@ -2466,6 +2467,19 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
+>           set_bit(S390_FEAT_UNPACK, model->features);
+>       }
+>   
+> +    /*
+> +     * If we have the CPU Topology implemented in KVM activate
+> +     * the CPU TOPOLOGY feature.
+> +     */
+> +    if ((!ms->topology_disable) &&
 
-And now we don't have this field at all to access, considering that
-nobody blindly casts it.
+'topology_disable' is a platform level configuration. May be instead,
+the feature could be cleared at the machine level ?
 
-> There is some noise due to uarg -> uarg_zc renaming which make the
-> series harder to review. Have you considered instead keeping the old
-> name and introducing a smaller 'struct ubuf_info_common'? the overall
-> code should be mostly the same, but it will avoid the above mentioned
-> noise.
+Thanks,
 
-I don't think there will be less noise this way, but let me try
-and see if I can get rid of some churn.
+C.
 
--- 
-Pavel Begunkov
+> +        kvm_check_extension(kvm_state, KVM_CAP_S390_CPU_TOPOLOGY)) {
+> +        if (kvm_vm_enable_cap(kvm_state, KVM_CAP_S390_CPU_TOPOLOGY, 0) < 0) {
+> +            error_setg(errp, "KVM: Error enabling KVM_CAP_S390_CPU_TOPOLOGY");
+> +            return;
+> +        }
+> +        set_bit(S390_FEAT_CONFIGURATION_TOPOLOGY, model->features);
+> +    }
+> +
+>       /* We emulate a zPCI bus and AEN, therefore we don't need HW support */
+>       set_bit(S390_FEAT_ZPCI, model->features);
+>       set_bit(S390_FEAT_ADAPTER_EVENT_NOTIFICATION, model->features);
+
