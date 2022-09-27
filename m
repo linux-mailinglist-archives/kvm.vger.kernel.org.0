@@ -2,113 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 155E45EC6F7
-	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 16:54:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1381A5EC751
+	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 17:12:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231938AbiI0Oye (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Sep 2022 10:54:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52738 "EHLO
+        id S232158AbiI0PMh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Sep 2022 11:12:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231924AbiI0OyG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Sep 2022 10:54:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ACC243313
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 07:52:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664290332;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=R6mTkPvLcBDkRPEP9w1VCxjxG2Pg7cZFN1wUuSD75U8=;
-        b=OAlCx8cCtQY23ufSVXsBgYdlqMJ8y/PPhpoqP0x5ptEC7DHgA+MUXyCbL2Uj5AjhHvAG8e
-        bQr2aR6Z7i99tNYAOhsquo/UCgPGT9nZozozDBeodZpNwPbzNWQIZaCsztHDbpjQeSwQDi
-        7tc4RmuvlnL8zQUlT8L6PcCeVzWXV7E=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-447-IDnU4iNNP66yAuBLaG8e9A-1; Tue, 27 Sep 2022 10:52:10 -0400
-X-MC-Unique: IDnU4iNNP66yAuBLaG8e9A-1
-Received: by mail-wm1-f70.google.com with SMTP id d5-20020a05600c34c500b003b4fb42ccdeso8707634wmq.8
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 07:52:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=R6mTkPvLcBDkRPEP9w1VCxjxG2Pg7cZFN1wUuSD75U8=;
-        b=1Y9k8n1bVhdrflbJyzeUkRhKMzngAw3yCbW/vBpQ/20Xa1vdvJoLXfywlSF22mQdqp
-         GDVaUwLIkY0t1Lwk2ycqJo5elNNMjZIyunD52aFQa4ofhOcwZqxxTbEt5pldJG6gDyr2
-         W0SpqJti7ZSC1gIz7f3x5SxKYbj3w4WcgYFCjIy11ZbRODUHDyVLPYpeUNtsKKYWoj/9
-         hK4vHJK0+IGdIg7Ca93kqaXKSnD40pZ0lP3rVoxkeCglwGqd29vPTFK9576dNjjKTGlT
-         Vtzm21vmRj8gA3sxobIRzazmMhRbPIO740KmzMT6YPeKClmpcG7NerIONTKlkyWlnE8M
-         jkHg==
-X-Gm-Message-State: ACrzQf3RQEUWkOaUob5BONqdNjdZVWjsyitRDn5TrCVbcne0xeObut52
-        bYV90AexxFkRACGUK7Uh6fuD8v2R1nnqnu35+cNCK13HaNspzd+ymfKZu9UpxzFItjUJKGJzapE
-        y33ideq8IQlQc
-X-Received: by 2002:a05:600c:4ec7:b0:3a8:4622:ad27 with SMTP id g7-20020a05600c4ec700b003a84622ad27mr3187477wmq.88.1664290329611;
-        Tue, 27 Sep 2022 07:52:09 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM62+UnH0+JOnbyYplqTQoYjHUK04qQp8/V7xC4iNX3GpDY8U0fUFfcgyuQzRA289qMAo/xhgA==
-X-Received: by 2002:a05:600c:4ec7:b0:3a8:4622:ad27 with SMTP id g7-20020a05600c4ec700b003a84622ad27mr3187460wmq.88.1664290329340;
-        Tue, 27 Sep 2022 07:52:09 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c705:ff00:9ec2:6ff6:11a1:3e80? (p200300cbc705ff009ec26ff611a13e80.dip0.t-ipconnect.de. [2003:cb:c705:ff00:9ec2:6ff6:11a1:3e80])
-        by smtp.gmail.com with ESMTPSA id w10-20020a05600c474a00b003b4ac05a8a4sm18031124wmo.27.2022.09.27.07.52.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Sep 2022 07:52:08 -0700 (PDT)
-Message-ID: <c4662f56-578b-00bd-cdc2-19d3c45eabf0@redhat.com>
-Date:   Tue, 27 Sep 2022 16:52:07 +0200
+        with ESMTP id S231580AbiI0PMg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Sep 2022 11:12:36 -0400
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BF31F687B
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 08:12:34 -0700 (PDT)
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1odCFq-0004mD-Iu; Tue, 27 Sep 2022 17:12:14 +0200
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>
+Cc:     Marcelo Tosatti <mtosatti@redhat.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        kvm@vger.kernel.org, qemu-devel@nongnu.org
+Subject: [PATCH][RESEND] hyperv: fix SynIC SINT assertion failure on guest reset
+Date:   Tue, 27 Sep 2022 17:12:08 +0200
+Message-Id: <2ca557c8eb947112103168a9da3033ac5dc6ab99.1664291365.git.maciej.szmigiero@oracle.com>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [RFC PATCH 9/9] kvm_main.c: handle atomic memslot update
-Content-Language: en-US
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-References: <20220909104506.738478-1-eesposit@redhat.com>
- <20220909104506.738478-10-eesposit@redhat.com>
- <cde8be9d-64c0-80e5-7663-4302d075dcbc@redhat.com>
- <07014070-5186-ca95-7028-82f77612dedd@redhat.com>
- <a8c40c94-771c-ca3d-ee1d-44cbed2398e8@redhat.com>
- <81c235cc-1198-9765-d1e7-a158ea63eac4@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <81c235cc-1198-9765-d1e7-a158ea63eac4@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->> Does the invalidation already free up memslot metadata (especially the
->> rmaps) or will we end up temporarily allocating twice the memslot metadata?
->>
-> 
-> Invalidation creates a new temporary identical memslot, I am not sure
-> about the rmaps. It is anyways the same code as it was done before and
-> if I understand correctly, a new slot is required to keep the old
-> intact, in case something goes wrong and we need to revert.
+From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-Okay, thanks!
+Resetting a guest that has Hyper-V VMBus support enabled triggers a QEMU
+assertion failure:
+hw/hyperv/hyperv.c:131: synic_reset: Assertion `QLIST_EMPTY(&synic->sint_routes)' failed.
 
--- 
-Thanks,
+This happens both on normal guest reboot or when using "system_reset" HMP
+command.
 
-David / dhildenb
+The failing assertion was introduced by commit 64ddecc88bcf ("hyperv: SControl is optional to enable SynIc")
+to catch dangling SINT routes on SynIC reset.
 
+The root cause of this problem is that the SynIC itself is reset before
+devices using SINT routes have chance to clean up these routes.
+
+Since there seems to be no existing mechanism to force reset callbacks (or
+methods) to be executed in specific order let's use a similar method that
+is already used to reset another interrupt controller (APIC) after devices
+have been reset - by invoking the SynIC reset from the machine reset
+handler via a new "after_reset" X86 CPU method.
+
+Fixes: 64ddecc88bcf ("hyperv: SControl is optional to enable SynIc") # exposed the bug
+Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+---
+ hw/i386/pc.c               |  6 ++++++
+ target/i386/cpu-qom.h      |  2 ++
+ target/i386/cpu.c          | 10 ++++++++++
+ target/i386/kvm/hyperv.c   |  4 ++++
+ target/i386/kvm/kvm.c      | 24 +++++++++++++++++-------
+ target/i386/kvm/kvm_i386.h |  1 +
+ 6 files changed, 40 insertions(+), 7 deletions(-)
+
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 566accf7e6..e44f11efb3 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1850,6 +1850,7 @@ static void pc_machine_reset(MachineState *machine)
+ {
+     CPUState *cs;
+     X86CPU *cpu;
++    const X86CPUClass *cpuc;
+ 
+     qemu_devices_reset();
+ 
+@@ -1858,6 +1859,11 @@ static void pc_machine_reset(MachineState *machine)
+      */
+     CPU_FOREACH(cs) {
+         cpu = X86_CPU(cs);
++        cpuc = X86_CPU_GET_CLASS(cpu);
++
++        if (cpuc->after_reset) {
++            cpuc->after_reset(cpu);
++        }
+ 
+         if (cpu->apic_state) {
+             device_legacy_reset(cpu->apic_state);
+diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
+index c557a522e1..339d23006a 100644
+--- a/target/i386/cpu-qom.h
++++ b/target/i386/cpu-qom.h
+@@ -43,6 +43,7 @@ typedef struct X86CPUModel X86CPUModel;
+  * @static_model: See CpuDefinitionInfo::static
+  * @parent_realize: The parent class' realize handler.
+  * @parent_reset: The parent class' reset handler.
++ * @after_reset: Reset handler to be called only after all other devices have been reset.
+  *
+  * An x86 CPU model or family.
+  */
+@@ -68,6 +69,7 @@ struct X86CPUClass {
+     DeviceRealize parent_realize;
+     DeviceUnrealize parent_unrealize;
+     DeviceReset parent_reset;
++    void (*after_reset)(X86CPU *cpu);
+ };
+ 
+ 
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 1db1278a59..c908b944bd 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -6034,6 +6034,15 @@ static void x86_cpu_reset(DeviceState *dev)
+ #endif
+ }
+ 
++static void x86_cpu_after_reset(X86CPU *cpu)
++{
++#ifndef CONFIG_USER_ONLY
++    if (kvm_enabled()) {
++        kvm_arch_after_reset_vcpu(cpu);
++    }
++#endif
++}
++
+ static void mce_init(X86CPU *cpu)
+ {
+     CPUX86State *cenv = &cpu->env;
+@@ -7099,6 +7108,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
+     device_class_set_props(dc, x86_cpu_properties);
+ 
+     device_class_set_parent_reset(dc, x86_cpu_reset, &xcc->parent_reset);
++    xcc->after_reset = x86_cpu_after_reset;
+     cc->reset_dump_flags = CPU_DUMP_FPU | CPU_DUMP_CCOP;
+ 
+     cc->class_by_name = x86_cpu_class_by_name;
+diff --git a/target/i386/kvm/hyperv.c b/target/i386/kvm/hyperv.c
+index 9026ef3a81..e3ac978648 100644
+--- a/target/i386/kvm/hyperv.c
++++ b/target/i386/kvm/hyperv.c
+@@ -23,6 +23,10 @@ int hyperv_x86_synic_add(X86CPU *cpu)
+     return 0;
+ }
+ 
++/*
++ * All devices possibly using SynIC have to be reset before calling this to let
++ * them remove their SINT routes first.
++ */
+ void hyperv_x86_synic_reset(X86CPU *cpu)
+ {
+     hyperv_synic_reset(CPU(cpu));
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index a1fd1f5379..774484c588 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -2203,20 +2203,30 @@ void kvm_arch_reset_vcpu(X86CPU *cpu)
+         env->mp_state = KVM_MP_STATE_RUNNABLE;
+     }
+ 
++    /* enabled by default */
++    env->poll_control_msr = 1;
++
++    kvm_init_nested_state(env);
++
++    sev_es_set_reset_vector(CPU(cpu));
++}
++
++void kvm_arch_after_reset_vcpu(X86CPU *cpu)
++{
++    CPUX86State *env = &cpu->env;
++    int i;
++
++    /*
++     * Reset SynIC after all other devices have been reset to let them remove
++     * their SINT routes first.
++     */
+     if (hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC)) {
+-        int i;
+         for (i = 0; i < ARRAY_SIZE(env->msr_hv_synic_sint); i++) {
+             env->msr_hv_synic_sint[i] = HV_SINT_MASKED;
+         }
+ 
+         hyperv_x86_synic_reset(cpu);
+     }
+-    /* enabled by default */
+-    env->poll_control_msr = 1;
+-
+-    kvm_init_nested_state(env);
+-
+-    sev_es_set_reset_vector(CPU(cpu));
+ }
+ 
+ void kvm_arch_do_init_vcpu(X86CPU *cpu)
+diff --git a/target/i386/kvm/kvm_i386.h b/target/i386/kvm/kvm_i386.h
+index 4124912c20..096a5dd781 100644
+--- a/target/i386/kvm/kvm_i386.h
++++ b/target/i386/kvm/kvm_i386.h
+@@ -38,6 +38,7 @@ bool kvm_has_adjust_clock_stable(void);
+ bool kvm_has_exception_payload(void);
+ void kvm_synchronize_all_tsc(void);
+ void kvm_arch_reset_vcpu(X86CPU *cs);
++void kvm_arch_after_reset_vcpu(X86CPU *cpu);
+ void kvm_arch_do_init_vcpu(X86CPU *cs);
+ 
+ void kvm_put_apicbase(X86CPU *cpu, uint64_t value);
