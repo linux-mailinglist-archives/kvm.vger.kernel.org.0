@@ -2,146 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CAB815EBF30
-	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 12:03:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5116F5EBF7A
+	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 12:12:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231656AbiI0KDO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Sep 2022 06:03:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52248 "EHLO
+        id S232013AbiI0KMq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Sep 2022 06:12:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231366AbiI0KDJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Sep 2022 06:03:09 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30DE395E55;
-        Tue, 27 Sep 2022 03:03:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1664272988; x=1695808988;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=B3uGEaw5dJgYcFV9ERDaKVy8kcHjm/JqyNAQD2xGZaM=;
-  b=apiC+eblHdlqhF0Odfht0ox/kAXXss1UBtIcq/1X/RAqABnk48TEmGwT
-   ghqFqAg7zFrB8P++FFPjTu09/+9Ht7m4l9ObjMDvfTnPRnMDDJUz5DxE3
-   7E5miZA4QXVwbLtaPq2aNZpZrgkaBFNmfDEuQ930sKb4oYLaKJace09ec
-   3El3xBxxOHpCnjMRWvVKo9DRxyUDJ6JrM3Cn71ecALv6PM6EKIZ704og6
-   9s2M2VGbdtTVrVpjqK3kLoAl4CL+gdsoUq1siJMhXTEajhc0Qr2zhg3SM
-   E8kdlFL88RGFrygynRWa9OWPMKSFt3TGyzHRe6y9aJHIEjZJVI4Zl6qPB
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10482"; a="302756537"
-X-IronPort-AV: E=Sophos;i="5.93,349,1654585200"; 
-   d="scan'208";a="302756537"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2022 03:02:56 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10482"; a="689937544"
-X-IronPort-AV: E=Sophos;i="5.93,349,1654585200"; 
-   d="scan'208";a="689937544"
-Received: from lingshan-mobl.ccr.corp.intel.com (HELO [10.249.174.145]) ([10.249.174.145])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2022 03:02:54 -0700
-Message-ID: <750e006b-7ec8-873e-8df0-b6979f6890b3@intel.com>
-Date:   Tue, 27 Sep 2022 18:02:53 +0800
+        with ESMTP id S232012AbiI0KMe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Sep 2022 06:12:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F366CBAEC
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 03:12:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664273521;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=OQd8FYCDQy3HQURocCej6OC1RjFJIa51YDrjxzf/0AM=;
+        b=foBVWIyDcQ0vWJf1MEAZYcn8tUyRAacfeFLN9DjV/BxJzZaNS1yk7cLpwxTZK4mGpc5Z23
+        BQAEk7bBR/YN0MgJnrKZPYc7GtZFmEqdVritDs38D8K+X7Nh+jtYRZoqtNN6Nn22nWgAR9
+        /Fc9xncG2iMRskqT6/5sWDqZYH3cMU0=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-550-k9unhw8QPGSd8u5Ej1RIUA-1; Tue, 27 Sep 2022 06:11:59 -0400
+X-MC-Unique: k9unhw8QPGSd8u5Ej1RIUA-1
+Received: by mail-ej1-f71.google.com with SMTP id sb34-20020a1709076da200b00783a5f786easo2456483ejc.22
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 03:11:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date;
+        bh=OQd8FYCDQy3HQURocCej6OC1RjFJIa51YDrjxzf/0AM=;
+        b=fdnrGHqTxTKjnQSWaVK1PX8UqXPOpatj3BieK0EPFB8IEyfj410n99zrwqryKK1a0Q
+         dABSLmOkjbJJfHrcoQy9dOAcsCN0WhSjcb/vWXOTN2QAUsOUQnRlWf64ZLpEDsWAJHgQ
+         2O+j1SZwk2prX7PjofsnDU3dhAN7i61M/JP+mR+l1swhrNBNIcT6Mz80f7eSU1IdJuPt
+         lnbu43b/mnrR5ipgmAVUKbn6bzydTHfxQKnR4GIsgwjcxa51mV/Fqzn7gZZu3syKYHIq
+         GMpOhgpc6kDyhFXHFCgdGceILaJ9jJ5M/9PRet7KEaIfzpZrqbehkvpPS1baJZkvtTka
+         gFow==
+X-Gm-Message-State: ACrzQf1hEqLLoIzSlbDdaPF7Zc/E7zMjHjZlxQ4kCGpmnxssA9agazJD
+        PZ4/W3kQ/4X47jxDegjWTlQsF7Pzgm1zGDnv39V96hgrzRXWyuPMzoVuYu76Qsz7jUCnQ7A7+ff
+        lo7JTThbtX6vd
+X-Received: by 2002:a17:907:2d09:b0:781:d793:f51e with SMTP id gs9-20020a1709072d0900b00781d793f51emr4056431ejc.628.1664273518591;
+        Tue, 27 Sep 2022 03:11:58 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM5a/uFARed6CYSDEjLBgEocSIoC2LGZ4xrTfoHJ7Pq7WGxYRuIWKX+ve0FETVLwQS3Do7XTlg==
+X-Received: by 2002:a17:907:2d09:b0:781:d793:f51e with SMTP id gs9-20020a1709072d0900b00781d793f51emr4056405ejc.628.1664273518308;
+        Tue, 27 Sep 2022 03:11:58 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id d41-20020a056402402900b0045703d699b9sm931101eda.78.2022.09.27.03.11.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Sep 2022 03:11:57 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        "Michael Kelley (LINUX)" <mikelley@microsoft.com>
+Cc:     KY Srinivasan <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/4] x86/hyperv: Move VMCB enlightenment definitions to
+ hyperv-tlfs.h
+In-Reply-To: <YyzgD0xp/Ki9a3jK@google.com>
+References: <20220921201607.3156750-1-seanjc@google.com>
+ <20220921201607.3156750-2-seanjc@google.com>
+ <BYAPR21MB1688D04068DBA520366DA205D74E9@BYAPR21MB1688.namprd21.prod.outlook.com>
+ <YyzgD0xp/Ki9a3jK@google.com>
+Date:   Tue, 27 Sep 2022 12:11:56 +0200
+Message-ID: <87tu4tktxv.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.3.0
-Subject: Re: [PATCH V2 RESEND 2/6] vDPA: only report driver features if
- FEATURES_OK is set
-Content-Language: en-US
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, kvm@vger.kernel.org
-References: <20220927030117.5635-1-lingshan.zhu@intel.com>
- <20220927030117.5635-3-lingshan.zhu@intel.com>
- <CACGkMEsioquc=hVe0D87UjZkaZ1m3B-g1hXAAyq6bHD=Fc0uFQ@mail.gmail.com>
-From:   "Zhu, Lingshan" <lingshan.zhu@intel.com>
-In-Reply-To: <CACGkMEsioquc=hVe0D87UjZkaZ1m3B-g1hXAAyq6bHD=Fc0uFQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Sean Christopherson <seanjc@google.com> writes:
 
+> On Thu, Sep 22, 2022, Michael Kelley (LINUX) wrote:
+>> From: Sean Christopherson <seanjc@google.com> Sent: Wednesday, September 21, 2022 1:16 PM
+>> > 
+>> > Move Hyper-V's VMCB enlightenment definitions to the TLFS header; the
+>> > definitions come directly from the TLFS[*], not from KVM.
+>> > 
+>> > No functional change intended.
+>> > 
+>> > [*] https://learn.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/datatypes/hv_svm_enlightened_vmcb_fields> 
+>> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+>> > ---
+>> >  arch/x86/include/asm/hyperv-tlfs.h | 22 +++++++++++++++++++
+>> >  arch/x86/kvm/svm/hyperv.h          | 35 ------------------------------
+>> >  arch/x86/kvm/svm/svm_onhyperv.h    |  3 ++-
+>> >  3 files changed, 24 insertions(+), 36 deletions(-)
+>> >  delete mode 100644 arch/x86/kvm/svm/hyperv.h
+>> > 
+>> > diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
+>> > index 0a9407dc0859..4c4f81daf5a2 100644
+>> > --- a/arch/x86/include/asm/hyperv-tlfs.h
+>> > +++ b/arch/x86/include/asm/hyperv-tlfs.h
+>> > @@ -584,6 +584,28 @@ struct hv_enlightened_vmcs {
+>> > 
+>> >  #define HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL			0xFFFF
+>> > 
+>> > +/*
+>> > + * Hyper-V uses the software reserved 32 bytes in VMCB control area to expose
+>> > + * SVM enlightenments to guests.
+>> > + */
+>> > +struct hv_enlightenments {
+>> > +	struct __packed hv_enlightenments_control {
+>> > +		u32 nested_flush_hypercall:1;
+>> > +		u32 msr_bitmap:1;
+>> > +		u32 enlightened_npt_tlb: 1;
+>> > +		u32 reserved:29;
+>> > +	} __packed hv_enlightenments_control;
+>> > +	u32 hv_vp_id;
+>> > +	u64 hv_vm_id;
+>> > +	u64 partition_assist_page;
+>> > +	u64 reserved;
+>> > +} __packed;
+>> > +
+>> > +/*
+>> > + * Hyper-V uses the software reserved clean bit in VMCB.
+>> > + */
+>> > +#define VMCB_HV_NESTED_ENLIGHTENMENTS		31
+>> 
+>> Is it feasible to change this identifier so it starts with HV_ like
+>> everything else in this source code file, such as
+>> HV_VMCB_NESTED_ENLIGHTENMENTS?  It doesn't look like it is
+>> used in very many places.  
+>
+> Most definitely, IIRC it's used in only one spot.
+>
 
-On 9/27/2022 12:37 PM, Jason Wang wrote:
-> On Tue, Sep 27, 2022 at 11:09 AM Zhu Lingshan <lingshan.zhu@intel.com> wrote:
->> This commit reports driver features to user space
->> only after FEATURES_OK is features negotiation is done.
->>
->> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
->> ---
->>   drivers/vdpa/vdpa.c | 22 ++++++++++++++++------
->>   1 file changed, 16 insertions(+), 6 deletions(-)
->>
->> diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
->> index 2035700d6fc8..e7765953307f 100644
->> --- a/drivers/vdpa/vdpa.c
->> +++ b/drivers/vdpa/vdpa.c
->> @@ -816,7 +816,7 @@ static int vdpa_dev_net_mq_config_fill(struct vdpa_device *vdev,
->>   static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *msg)
->>   {
->>          struct virtio_net_config config = {};
->> -       u64 features_device, features_driver;
->> +       u64 features_device;
->>          u16 val_u16;
->>
->>          vdev->config->get_config(vdev, 0, &config, sizeof(config));
->> @@ -833,11 +833,6 @@ static int vdpa_dev_net_config_fill(struct vdpa_device *vdev, struct sk_buff *ms
->>          if (nla_put_u16(msg, VDPA_ATTR_DEV_NET_CFG_MTU, val_u16))
->>                  return -EMSGSIZE;
->>
->> -       features_driver = vdev->config->get_driver_features(vdev);
->> -       if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features_driver,
->> -                             VDPA_ATTR_PAD))
->> -               return -EMSGSIZE;
->> -
->>          features_device = vdev->config->get_device_features(vdev);
->>
->>          if (nla_put_u64_64bit(msg, VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES, features_device,
->> @@ -851,6 +846,8 @@ static int
->>   vdpa_dev_config_fill(struct vdpa_device *vdev, struct sk_buff *msg, u32 portid, u32 seq,
->>                       int flags, struct netlink_ext_ack *extack)
->>   {
->> +       u64 features_driver;
->> +       u8 status = 0;
->>          u32 device_id;
->>          void *hdr;
->>          int err;
->> @@ -874,6 +871,19 @@ vdpa_dev_config_fill(struct vdpa_device *vdev, struct sk_buff *msg, u32 portid,
->>                  goto msg_err;
->>          }
->>
->> +       /* only read driver features after the feature negotiation is done */
->> +       if (vdev->config->get_status)
->> +               status = vdev->config->get_status(vdev);
-> get_status is mandatory, so I think we can remove this check.
->
-> Or if you want a strict check on the config operations, we need to do
-> that in __vdpa_alloc_device().
-I will remove it
+I'll take these 4 patches to the next iteration of my "KVM: x86:
+hyper-v: Fine-grained TLB flush + L2 TLB flush features" series and I'll
+change VMCB_HV_NESTED_ENLIGHTENMENTS to HV_VMCB_NESTED_ENLIGHTENMENTS.
 
-Thanks!
->
-> Thanks
->
->> +
->> +       if (status & VIRTIO_CONFIG_S_FEATURES_OK) {
->> +               features_driver = vdev->config->get_driver_features(vdev);
->> +               if (nla_put_u64_64bit(msg, VDPA_ATTR_DEV_NEGOTIATED_FEATURES, features_driver,
->> +                                     VDPA_ATTR_PAD)) {
->> +                       err = -EMSGSIZE;
->> +                       goto msg_err;
->> +               }
->> +       }
->> +
->>          switch (device_id) {
->>          case VIRTIO_ID_NET:
->>                  err = vdpa_dev_net_config_fill(vdev, msg);
->> --
->> 2.31.1
->>
+-- 
+Vitaly
 
