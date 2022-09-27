@@ -2,81 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5293D5EC9CF
-	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 18:44:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EA195ECA26
+	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 18:54:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230517AbiI0QoU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Sep 2022 12:44:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36412 "EHLO
+        id S231920AbiI0QyG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Sep 2022 12:54:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231650AbiI0QoR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Sep 2022 12:44:17 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65CB01E05D3
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 09:44:15 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id u59-20020a17090a51c100b00205d3c44162so2912618pjh.2
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 09:44:15 -0700 (PDT)
+        with ESMTP id S230081AbiI0Qxr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Sep 2022 12:53:47 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B12059DDB3
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 09:52:21 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-34558a60c39so96532847b3.16
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 09:52:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=hka2MB6GtBxZvbqko4sxk5z5NDTLJ3qOesEZCD0X7vU=;
-        b=i/cUOlzvOFqjpGlqE7Jt5HlWISkyhBpSqtHRYPwIs2x/jE14c88WOLIDeVswI5sXGi
-         /JZEoefvgVUIUeEmIgtO345p6YNqrwTSqHX1ME9QhHmNciQix8sRA9s3FCuUhDawbhh8
-         4EspsgU1Z30HYK8eA575FPhVusVE7l+aj5FGoGsPLxSFF9GSmvIlt+pIK7FI/YInT1nT
-         CKxSDbXfHgxDKQmQarcXrnT+OufYvQFXHZ52c1Zf8qINJbeZtGzQhsJAPdd9MY16bagL
-         Gyw9A2mOz0JDIEOkepz+uaJEDHNgCbyV474fp0QClmBSRxtevHIoZQV7LlPiVYK1eqZV
-         YOKw==
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date;
+        bh=OSVb/LrkI6NClWCXcoFZkdEyxlIsoga+h/k0Pt6Y3F4=;
+        b=rSH5DcVNLrobjpAR9g9gM0iDjVEtB7pMO7jk5o6c7dINt7PffASokS0DBn7A499Cdg
+         hSrtuU3pCE+W50Jgj8lLGjWrhtWfnWyHztKOMXN2Aa2XYfGJZ0CzRu1Jb3OwLVSwrXqH
+         MMBlnwINuz4mAIyDhhT0tbLABqkax5FlsEyz3X3wTpSiPvhVZM9f5ooVgdBVt3wbSske
+         o566E3+iVy5hS0IZarfk4yaFEcHW76J91Vx9JtQ4GJ0dWFX4u3c0A2oR4waloecMs636
+         KK8NpitmPZbToasBuyjQSIaJP4yeerBtiN69epHhe6dMekOmUuUO9RQZmJGjyJCR6ofQ
+         gZCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=hka2MB6GtBxZvbqko4sxk5z5NDTLJ3qOesEZCD0X7vU=;
-        b=fJRalAGHdLteY44zmxPy7BnsJl7bkh3IaGAg+Nylnk+r4HeXv8XN6BSTtMTh2Vw+vz
-         ygY0Xmm8+rwVo5WSFPMY/DWOrpIAhC9lZ3F4PovwgwTQJbip0JG7Qy/mRU7OB3/oC1En
-         CC7qPIISXJFSuadVl9n8YNNk2MpwgFFoySzQedWqhh1CWpc/YnxucKLGwBYWHGQb7xXp
-         qd4CyF+5J3rU5quUlom0KRu5IaTlAlg0iskUuuPt3AFgQ2mpYEFkayU5YI+4mEN+Gq2q
-         E870HBMMv1zgngaJSt/mX5e+3eyL+gQpw1Q6jw3FEXOcgUOm8Mg2G5FMxcI02ptSmkQp
-         pVxQ==
-X-Gm-Message-State: ACrzQf3DbTEpp/b8SE5LN8Dv6EKVTnHGnC3WRx9rnxJNlm18zbrfK65R
-        3JTyPihckVJh9xvpwvrcqyLljg==
-X-Google-Smtp-Source: AMsMyM5ZMAA2SXfBrFTNG9fxkYHpjr6RQ+BUu3NQP5cpiVcAurwmVWV/yehxLHBCN2cZdEEycppZlw==
-X-Received: by 2002:a17:903:247:b0:179:b5e1:54b7 with SMTP id j7-20020a170903024700b00179b5e154b7mr27777288plh.84.1664297054476;
-        Tue, 27 Sep 2022 09:44:14 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id mn22-20020a17090b189600b001fde265ff4bsm158957pjb.4.2022.09.27.09.44.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Sep 2022 09:44:13 -0700 (PDT)
-Date:   Tue, 27 Sep 2022 16:44:10 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Robert Hoo <robert.hu@linux.intel.com>
-Cc:     David Matlack <dmatlack@google.com>,
-        Hou Wenlong <houwenlong.hwl@antgroup.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        Lan Tianyu <Tianyu.Lan@microsoft.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 1/6] KVM: x86/mmu: Fix wrong gfn range of tlb flushing
- in validate_direct_spte()
-Message-ID: <YzMoWghqNJdYBlaE@google.com>
-References: <cover.1661331396.git.houwenlong.hwl@antgroup.com>
- <c0ee12e44f2d218a0857a5e05628d05462b32bf9.1661331396.git.houwenlong.hwl@antgroup.com>
- <f6fd8ccff13f9f48cbca06f0a5278654198d0d06.camel@linux.intel.com>
- <YyoHNMz3CH4SnJwJ@google.com>
- <CALzav=f=y7-2uOnXUi---hvCTa2otDBPsY1VoUtDWnS7+0QX=w@mail.gmail.com>
- <d55ccf1c085d4adadc8dbbbae6443059a94eaf90.camel@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d55ccf1c085d4adadc8dbbbae6443059a94eaf90.camel@linux.intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=OSVb/LrkI6NClWCXcoFZkdEyxlIsoga+h/k0Pt6Y3F4=;
+        b=oXNn9UKyn4Fm2fkl5xB0+Misn0CxJhcG2ddWKcQE9WcEFzCCYyro9tEnDE6b0MMC0Y
+         bLnrRrwfRDdSaRa+Zy07T2heZal4LFoC+jr/keDoGNtPPx9hOxumWY969huDp44wu+JA
+         Dj4HzuSCviH36KDXYkaXjbK97HORJrcMGD4MCG6vpscvF9sjL9x0AzF7XExNfBVlVV2A
+         h+2Vgn8ZDixwQPDYq6WHfVWoRgRUi5RFWRnYZqLYsqLXbVqZ5rgHXd+DIobNr6CmcVvC
+         w1nUlg5JNGg+p2lJZY7/gjC/asbpIIKJj6ROjHJRMDjccNq+QHdxtG+f1i/XUWWpWFiH
+         nUwQ==
+X-Gm-Message-State: ACrzQf1TEf2Mf+A/ZbNm+K9CEjtlwiG3FdE72lEGkkHCl5e+GWApQKfA
+        qad6zZwQmRJKoY+8CXtDacXcYSZrt7av2Q==
+X-Google-Smtp-Source: AMsMyM4VHovzk6QyvW1Ne3fNqjtBaXdr95G2wfOShrz8BvSX8ZKutY8PvKVWHHBpNNrBtLq+9RhCEyMHc8I1YQ==
+X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
+ (user=dmatlack job=sendgmr) by 2002:a81:1908:0:b0:34d:2732:51d9 with SMTP id
+ 8-20020a811908000000b0034d273251d9mr25712166ywz.487.1664297540031; Tue, 27
+ Sep 2022 09:52:20 -0700 (PDT)
+Date:   Tue, 27 Sep 2022 09:52:09 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.3.998.g577e59143f-goog
+Message-ID: <20220927165209.930904-1-dmatlack@google.com>
+Subject: [PATCH v2] KVM: selftests: Skip tests that require EPT when it is not available
+From:   David Matlack <dmatlack@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     David Matlack <dmatlack@google.com>, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,50 +66,102 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 27, 2022, Robert Hoo wrote:
-> On Tue, 2022-09-20 at 11:44 -0700, David Matlack wrote:
-> > That being said, we might as well replace the WARN_ON_ONCE() with
-> > KVM_BUG_ON(). That will still do a WARN_ON_ONCE() but has the added
-> > benefit of terminating the VM.
-> 
-> Yeah, here was my point, WARN_ON_ONCE() might not be warning obviously
-> enough, as it usually for recoverable cases. But terminating VM is also
-> over action I think.
+Skip selftests that require EPT support in the VM when it is not
+available. For example, if running on a machine where kvm_intel.ept=N
+since KVM does not offer EPT support to guests if EPT is not supported
+on the host.
 
-Agreed, from the helper's perspective, killing the VM is unnecessary, e.g. it can
-simply flush the entire TLB as a fallback.
+Specifically, this commit causes vmx_dirty_log_test and
+dirty_log_perf_test -n to be skipped instead of failing on hosts where
+kvm_intel.ept=N.
 
-	if (WARN_ON_ONCE(!sp->role.direct)) {
-		kvm_flush_remote_tlbs(kvm);
-		return;
-	}
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+v2:
+ - Use kvm_get_feature_msr() instead of vcpu_get_msr() [Sean]
+ - Force each test to call TEST_REQUIRE() [Sean]
 
-But looking at the series as a whole, I think the better option is to just not
-introduce this helper.  There's exactly one user, and if that path encounters an
-indirect shadow page then KVM is deep in the weeds.  But that's a moot point,
-because unless I'm misreading the flow, there's no need for the unique helper.
-kvm_flush_remote_tlbs_sptep() will do the right thing even if the target SP happens
-to be indirect.
+v1: https://lore.kernel.org/kvm/20220926171457.532542-1-dmatlack@google.com/
 
-If we really want to assert that the child is a direct shadow page, then
-validate_direct_spte() would be the right location for such an assert.  IMO that's
-unnecessary paranoia.  The odds of KVM reaching this point with a completely messed
-up shadow paging tree, and without already having hosed the guest and/or yelled
-loudly are very, very low.
 
-In other words, IMO we're getting too fancy for this one and we should instead
-simply do:
+ tools/testing/selftests/kvm/include/x86_64/vmx.h   |  1 +
+ .../selftests/kvm/lib/x86_64/perf_test_util.c      |  1 +
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c       | 14 ++++++++++++++
+ .../selftests/kvm/x86_64/vmx_dirty_log_test.c      |  1 +
+ 4 files changed, 17 insertions(+)
 
-		child = to_shadow_page(*sptep & SPTE_BASE_ADDR_MASK);
-		if (child->role.access == direct_access)
-			return;
+diff --git a/tools/testing/selftests/kvm/include/x86_64/vmx.h b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+index 99fa1410964c..0e49fb27698f 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/vmx.h
++++ b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+@@ -617,6 +617,7 @@ void nested_map_memslot(struct vmx_pages *vmx, struct kvm_vm *vm,
+ 			uint32_t memslot);
+ void nested_identity_map_1g(struct vmx_pages *vmx, struct kvm_vm *vm,
+ 			    uint64_t addr, uint64_t size);
++bool kvm_cpu_has_ept(void);
+ void prepare_eptp(struct vmx_pages *vmx, struct kvm_vm *vm,
+ 		  uint32_t eptp_memslot);
+ void prepare_virtualize_apic_accesses(struct vmx_pages *vmx, struct kvm_vm *vm);
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/perf_test_util.c b/tools/testing/selftests/kvm/lib/x86_64/perf_test_util.c
+index 0f344a7c89c4..e80c182c43ce 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/perf_test_util.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/perf_test_util.c
+@@ -85,6 +85,7 @@ void perf_test_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_vcpu *vc
+ 	int vcpu_id;
+ 
+ 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
++	TEST_REQUIRE(kvm_cpu_has_ept());
+ 
+ 	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
+ 		vmx = vcpu_alloc_vmx(vm, &vmx_gva);
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/vmx.c b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
+index 80a568c439b8..13cd548e5c4c 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/vmx.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
+@@ -5,6 +5,8 @@
+  * Copyright (C) 2018, Google LLC.
+  */
+ 
++#include <asm/msr-index.h>
++
+ #include "test_util.h"
+ #include "kvm_util.h"
+ #include "processor.h"
+@@ -542,6 +544,18 @@ void nested_identity_map_1g(struct vmx_pages *vmx, struct kvm_vm *vm,
+ 	__nested_map(vmx, vm, addr, addr, size, PG_LEVEL_1G);
+ }
+ 
++bool kvm_cpu_has_ept(void)
++{
++	uint64_t ctrl;
++
++	ctrl = kvm_get_feature_msr(MSR_IA32_VMX_TRUE_PROCBASED_CTLS) >> 32;
++	if (!(ctrl & CPU_BASED_ACTIVATE_SECONDARY_CONTROLS))
++		return false;
++
++	ctrl = kvm_get_feature_msr(MSR_IA32_VMX_PROCBASED_CTLS2) >> 32;
++	return ctrl & SECONDARY_EXEC_ENABLE_EPT;
++}
++
+ void prepare_eptp(struct vmx_pages *vmx, struct kvm_vm *vm,
+ 		  uint32_t eptp_memslot)
+ {
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c b/tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c
+index 2d8c23d639f7..f0456fb031b1 100644
+--- a/tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c
++++ b/tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c
+@@ -78,6 +78,7 @@ int main(int argc, char *argv[])
+ 	bool done = false;
+ 
+ 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
++	TEST_REQUIRE(kvm_cpu_has_ept());
+ 
+ 	/* Create VM */
+ 	vm = vm_create_with_one_vcpu(&vcpu, l1_guest_code);
 
-		drop_parent_pte(child, sptep);
-		kvm_flush_remote_tlbs_sptep(kvm, sptep);
+base-commit: 372d07084593dc7a399bf9bee815711b1fb1bcf2
+prerequisite-patch-id: 2e3661ba8856c29b769499bac525b6943d9284b8
+prerequisite-patch-id: 93031262de7b1f7fab1ad31ea5d6ef812c139179
+-- 
+2.37.3.998.g577e59143f-goog
 
-That has the added benefit of flushing the same "thing" that is zapped, i.e. both
-operate on the parent SPTE, not the child.
-
-Note, kvm_flush_remote_tlbs_sptep() operates on the _parent_, where the above
-snippets retrieves the child.  This becomes much more obvious once spte_to_child_sp()
-comes along: https://lore.kernel.org/all/20220805230513.148869-8-seanjc@google.com.
