@@ -2,88 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 212DD5ECB88
-	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 19:49:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A1415ECBC4
+	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 19:56:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232773AbiI0RtJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Sep 2022 13:49:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51938 "EHLO
+        id S233271AbiI0R4a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Sep 2022 13:56:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233227AbiI0Rsc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Sep 2022 13:48:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BDC71F497F
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 10:45:35 -0700 (PDT)
+        with ESMTP id S233065AbiI0R4O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Sep 2022 13:56:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B1B8AB4EF
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 10:56:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664300734;
+        s=mimecast20190719; t=1664301368;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dVgPwMiQwWxz9qpcaIbF4/j9KUJT2Ui1z93QE0upqV8=;
-        b=bStph4NPFsgGIgWlUTgyXLp3osnNpE357f4QSiai8puCO2/TrL7YQ9ootfN5AmNAUD+eDx
-        kSAZZ9C4Bye5YTHJ2lvmhxl4lYkonX9En2ngsznPjKd8kUbrh1hbdphmMndRdC1TBz84Ln
-        8ZODVxvuYoMEaGPXZ88p0hcPUPYQkHI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=ylam0E0Yl8o7oIuCiSoTBfRDDfyFUS+FtVqqi8D5J/k=;
+        b=C0MOHD62umI44M+FuCUIUujaCYv+tZZpHZTmPvmBD0Kh5RNnX5DeCg6YILNOC6+Xr/mxtv
+        O7ZFFafdS3mgkuPm7JDj6DXv1vrrb2zLHSeEUAYFaNyv9A4gI1Qfog7sp3VGyHcpCVE+0l
+        Uq16NKKe3ypuL1fYQtoWuN3H5pdc27U=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-60--jz17UjfNNq2bGNYhO8ZGA-1; Tue, 27 Sep 2022 13:45:32 -0400
-X-MC-Unique: -jz17UjfNNq2bGNYhO8ZGA-1
-Received: by mail-wm1-f71.google.com with SMTP id b5-20020a05600c4e0500b003b499f99aceso8934339wmq.1
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 10:45:32 -0700 (PDT)
+ us-mta-513-7xklFp9bO-ae-5rOkyd7xA-1; Tue, 27 Sep 2022 13:56:07 -0400
+X-MC-Unique: 7xklFp9bO-ae-5rOkyd7xA-1
+Received: by mail-wm1-f72.google.com with SMTP id c2-20020a1c3502000000b003b535aacc0bso4126585wma.2
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 10:56:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=dVgPwMiQwWxz9qpcaIbF4/j9KUJT2Ui1z93QE0upqV8=;
-        b=OT+L/T/kSi5pC94uNIDq9smbxJKUhI2R4lBmf7Y02m8KTBy/kOa2K7R5BJUtBrDUHv
-         6R/pc9qSw1RqMBoqb65XIb9lxXpDhRg8y9QY9ziKOf7acL7ocjraDX10pMr4jFJENOzP
-         tQgdbgJxNe4FvYAMjl6ELnH7qqUA+bvB3VnlhNsfPWpA3DWedkDanMDfdysE1QUxtU3F
-         BIHjs7QXhjXEcB53aSaTT8iheRxyPdYgs7wWqTxHaTLpL4jhN68AyqcEvaQIPmDA9eui
-         wROWBmYWzIXNcWOsxD7cu/8k/eRmDW/VdGH8ATpSA3wUu0M/g0iHLc+2/iivp8eFG1AZ
-         YKpw==
-X-Gm-Message-State: ACrzQf0XPEBmne8IvHD1ct1C9FSbCc27xxQEpEYvOBbaxBtWhNy+Ao1O
-        x0png/e78x70fCiKq1B9atgtGq9dviHioy6cvcjTdxI/m/CIhQpaZjxuZBiU7QXcTpNauF/pWww
-        nQtCmcqYqj7al
-X-Received: by 2002:adf:fb88:0:b0:22a:f742:af59 with SMTP id a8-20020adffb88000000b0022af742af59mr17905409wrr.230.1664300728149;
-        Tue, 27 Sep 2022 10:45:28 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM5dw5UsDHXguGm9oaXaX47AcmjEId0lTIHxp/R1KfCc218J6dp6bwNiLDUfGstPRwVpRhUHWg==
-X-Received: by 2002:adf:fb88:0:b0:22a:f742:af59 with SMTP id a8-20020adffb88000000b0022af742af59mr17905376wrr.230.1664300727822;
-        Tue, 27 Sep 2022 10:45:27 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-46-200-222.retail.telecomitalia.it. [79.46.200.222])
-        by smtp.gmail.com with ESMTPSA id g14-20020adfe40e000000b0022ae8b862a7sm2328616wrm.35.2022.09.27.10.45.25
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=ylam0E0Yl8o7oIuCiSoTBfRDDfyFUS+FtVqqi8D5J/k=;
+        b=yr+RIQi4b9iACJ5X99h5NO0R/JgOBMcp+jCBr5+ZbB9wyV1zA+Nf44LW7C2xctQQjO
+         w0JfjGr92iXFtuPnI1vasjPoaUEWCWuXO7Z06S+vWcpvlBvwFGG15mMj3xSBz8MROf7g
+         Ar0PH7h4MViCIUumbwmUsGkh0qzUqLTcM+l5Gn2qET4o2lkncJX6nabVizDuPljlnyLh
+         RcOXWHlJenC9J8EYjZIxUiAgTPAyc2cBqOnejG2lU1EhQdnbtKCVpbamrRM4rgvCUEhL
+         82YXGuTJauEym/+gw8jIIoeavemMNANHN1XjibPtMcEtjdcrx7mcTD74qdPRt+/zOY8a
+         f38w==
+X-Gm-Message-State: ACrzQf3theWrm0d7RrAcHyQTNSiSg0BizjDcBE4SM9XvXxcdXnp+2Fjb
+        3hM8fV00rEZyoJ28pve2bAjk8Nb5scmbpLpd//YQ+ZyfOZMGQK8LhK8Q9cbJ6BtYzLvwozaCejj
+        UMdbD2JaA9dyZ
+X-Received: by 2002:a05:600c:1906:b0:3b4:c979:e639 with SMTP id j6-20020a05600c190600b003b4c979e639mr3579331wmq.10.1664301366030;
+        Tue, 27 Sep 2022 10:56:06 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7FqAzRoJe8tYb81tymnL2G1w/i5A9eSO1xA6YLlCwZrMepZTryND4cUgsUZdpNmVpZgnJ9bg==
+X-Received: by 2002:a05:600c:1906:b0:3b4:c979:e639 with SMTP id j6-20020a05600c190600b003b4c979e639mr3579316wmq.10.1664301365775;
+        Tue, 27 Sep 2022 10:56:05 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-104-40.dyn.eolo.it. [146.241.104.40])
+        by smtp.gmail.com with ESMTPSA id i24-20020a1c5418000000b003a601a1c2f7sm15224452wmb.19.2022.09.27.10.56.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Sep 2022 10:45:27 -0700 (PDT)
-Date:   Tue, 27 Sep 2022 19:45:21 +0200
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Bobby Eshleman <bobby.eshleman@gmail.com>
-Cc:     Bobby Eshleman <bobbyeshleman@gmail.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Cong Wang <cong.wang@bytedance.com>,
-        Jiang Wang <jiang.wang@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hyperv@vger.kernel.org
-Subject: Re: [PATCH 0/6] virtio/vsock: introduce dgrams, sk_buff, and qdisc
-Message-ID: <20220927174521.wo5ygmmti2sgwp2d@sgarzare-redhat>
-References: <cover.1660362668.git.bobby.eshleman@bytedance.com>
- <20220926134219.sreibsw2rfgw7625@sgarzare-redhat>
+        Tue, 27 Sep 2022 10:56:05 -0700 (PDT)
+Message-ID: <85cccb780608e830024fc82a8e4f703031646f4e.camel@redhat.com>
+Subject: Re: [PATCH net-next 0/4] shrink struct ubuf_info
+From:   Paolo Abeni <pabeni@redhat.com>
+To:     Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
+        xen-devel@lists.xenproject.org, Wei Liu <wei.liu@kernel.org>,
+        Paul Durrant <paul@xen.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>
+Date:   Tue, 27 Sep 2022 19:56:04 +0200
+In-Reply-To: <bbb212f6-0165-0747-d99d-b49acbb02a80@gmail.com>
+References: <cover.1663892211.git.asml.silence@gmail.com>
+         <7fef56880d40b9d83cc99317df9060c4e7cdf919.camel@redhat.com>
+         <021d8ea4-891c-237d-686e-64cecc2cc842@gmail.com>
+         <bbb212f6-0165-0747-d99d-b49acbb02a80@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20220926134219.sreibsw2rfgw7625@sgarzare-redhat>
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -92,29 +86,115 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 26, 2022 at 03:42:19PM +0200, Stefano Garzarella wrote:
->Hi,
->
->On Mon, Aug 15, 2022 at 10:56:03AM -0700, Bobby Eshleman wrote:
->>Hey everybody,
->>
->>This series introduces datagrams, packet scheduling, and sk_buff usage
->>to virtio vsock.
->
->Just a reminder for those who are interested, tomorrow Sep 27 @ 16:00 
->UTC we will discuss more about the next steps for this series in this 
->room: https://meet.google.com/fxi-vuzr-jjb
->(I'll try to record it and take notes that we will share)
->
+On Tue, 2022-09-27 at 18:16 +0100, Pavel Begunkov wrote:
+> On 9/27/22 15:28, Pavel Begunkov wrote:
+> > Hello Paolo,
+> > 
+> > On 9/27/22 14:49, Paolo Abeni wrote:
+> > > Hello,
+> > > 
+> > > On Fri, 2022-09-23 at 17:39 +0100, Pavel Begunkov wrote:
+> > > > struct ubuf_info is large but not all fields are needed for all
+> > > > cases. We have limited space in io_uring for it and large ubuf_info
+> > > > prevents some struct embedding, even though we use only a subset
+> > > > of the fields. It's also not very clean trying to use this typeless
+> > > > extra space.
+> > > > 
+> > > > Shrink struct ubuf_info to only necessary fields used in generic paths,
+> > > > namely ->callback, ->refcnt and ->flags, which take only 16 bytes. And
+> > > > make MSG_ZEROCOPY and some other users to embed it into a larger struct
+> > > > ubuf_info_msgzc mimicking the former ubuf_info.
+> > > > 
+> > > > Note, xen/vhost may also have some cleaning on top by creating
+> > > > new structs containing ubuf_info but with proper types.
+> > > 
+> > > That sounds a bit scaring to me. If I read correctly, every uarg user
+> > > should check 'uarg->callback == msg_zerocopy_callback' before accessing
+> > > any 'extend' fields.
+> > 
+> > Providers of ubuf_info access those fields via callbacks and so already
+> > know the actual structure used. The net core, on the opposite, should
+> > keep it encapsulated and not touch them at all.
+> > 
+> > The series lists all places where we use extended fields just on the
+> > merit of stripping the structure of those fields and successfully
+> > building it. The only user in net/ipv{4,6}/* is MSG_ZEROCOPY, which
+> > again uses callbacks.
+> > 
+> > Sounds like the right direction for me. There is a couple of
+> > places where it might get type safer, i.e. adding types instead
+> > of void* in for struct tun_msg_ctl and getting rid of one macro
+> > hiding types in xen. But seems more like TODO for later.
+> > 
+> > > AFAICS the current code sometimes don't do the
+> > > explicit test because the condition is somewhat implied, which in turn
+> > > is quite hard to track.
+> > > 
+> > > clearing uarg->zerocopy for the 'wrong' uarg was armless and undetected
+> > > before this series, and after will trigger an oops..
+> > 
+> > And now we don't have this field at all to access, considering that
+> > nobody blindly casts it.
+> > 
+> > > There is some noise due to uarg -> uarg_zc renaming which make the
+> > > series harder to review. Have you considered instead keeping the old
+> > > name and introducing a smaller 'struct ubuf_info_common'? the overall
+> > > code should be mostly the same, but it will avoid the above mentioned
+> > > noise.
+> > 
+> > I don't think there will be less noise this way, but let me try
+> > and see if I can get rid of some churn.
+> 
+> It doesn't look any better for me
+> 
+> TL;DR; This series converts only 3 users: tap, xen and MSG_ZEROCOPY
+> and doesn't touch core code. If we do ubuf_info_common though I'd need
+> to convert lots of places in skbuff.c and multiple places across
+> tcp/udp, which is much worse. 
 
-Thank you all for participating in the call!
-I'm attaching video/audio recording and notes (feel free to update it).
+Uhmm... I underlook the fact we must preserve the current accessors for
+the common fields.
 
-Notes: 
-https://docs.google.com/document/d/14UHH0tEaBKfElLZjNkyKUs_HnOgHhZZBqIS86VEIqR0/edit?usp=sharing
-Video recording: 
-https://drive.google.com/file/d/1vUvTc_aiE1mB30tLPeJjANnb915-CIKa/view?usp=sharing
+I guess something like the following could do (completely untested,
+hopefully should illustrate the idea):
+
+struct ubuf_info {
+	struct_group_tagged(ubuf_info_common, common,
+		void (*callback)(struct sk_buff *, struct ubuf_info *,
+                         bool zerocopy_success);
+		refcount_t refcnt;
+	        u8 flags;
+	);
+
+	union {
+                struct {
+                        unsigned long desc;
+                        void *ctx;
+                };
+                struct {
+                        u32 id;
+                        u16 len;
+                        u16 zerocopy:1;
+                        u32 bytelen;
+                };
+        };
+
+        struct mmpin {
+                struct user_struct *user;
+                unsigned int num_pg;
+        } mmp;
+};
+
+Then you should be able to:
+- access ubuf_info->callback, 
+- access the same field via ubuf_info->common.callback
+- declare variables as 'struct ubuf_info_commom' with appropriate
+contents.
+
+WDYT?
 
 Thanks,
-Stefano
+
+Paolo
+
 
