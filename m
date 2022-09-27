@@ -2,70 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DB605ED008
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 00:06:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACDC35ED067
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 00:47:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230183AbiI0WGc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Sep 2022 18:06:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49146 "EHLO
+        id S231519AbiI0Wri (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Sep 2022 18:47:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229940AbiI0WG3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Sep 2022 18:06:29 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50C37E21CA
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 15:06:28 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id bu5-20020a17090aee4500b00202e9ca2182so2332041pjb.0
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 15:06:28 -0700 (PDT)
+        with ESMTP id S229477AbiI0Wrf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Sep 2022 18:47:35 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4603882D19
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 15:47:34 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id a29so10959106pfk.5
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 15:47:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=fauuNPDstfZWj568q3xiy+B2bGT91D8Yz04rERb5Agk=;
-        b=bb6TqY4OGRLC3s4+XD5mAJ2HiSFhDxmZt3FTJEx4kw9/5yoX9bEwOhntdKQ202LEiB
-         VP/RlohlCkOlNazikDGLqx+Kl3wBF5XhJI5sUt5VYhqRM2FXYT+oKfAmLVRM97ZRSWwm
-         uq41IM9DNjiK38osgt3A7lvLEe04aA5+H1VU0igiLZKAt4dIDKlcT2HcMNBIAdgyGE/v
-         uRiVDmSp0SFjcjxpnROFgl0MB4/Rgl49lnLUCs3MUVRpqpOXrVtVi18Q6GqcDHWDiOIP
-         z5ePynT9lJKuhVMOrmRsSIlz95m0FrftDHNkyVgUICXo18CLg0plcPXDX5yTtTMNbJUN
-         b0QA==
+        bh=Ga4pQWEDXBG9/XYtSTlScJ77nN/lKyKRhvrVN6ZYtEQ=;
+        b=Zt6DAEHvTS8wxWv1WyEBwMpb/J0TAGqNJWSYq7B/TUUmald3XX9OlT/d5Lzj6Si+Bc
+         j2rFkg3bzOhJaWeJmSBV0V8U3XVEjrwk9qHAVJiEkvevxCuOWyXtok5P3iv/Iw8ESLef
+         6LPeA8HKLKlToZ8BNFYQq63V4Oktsc1qDJcFhLSS4oHG7yiRN/kOGqpPb7Yj4VO8VCP6
+         +5edR6WRMr1lS7G3XjYbUcnl8iY36M5Ts6GW4jUNk9gvSm6NZePMAF2GZViOeXNHh0tr
+         SRk8IvIZSS6mDMv+zdaigNV2/rVcP+cwljmgJZfO6Qwc/ZF3/efpr9a3QxY+c3ZolRxi
+         dBSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=fauuNPDstfZWj568q3xiy+B2bGT91D8Yz04rERb5Agk=;
-        b=F9HgEBcNxu9fGfZ/xR+0T1phXhqR6RQ/F4FrOGwRKICOvYh9v6mNYfRR0dRSMRYlgX
-         Cjn/e/oTa8OKFu5w1vAKPESBbXdcvKM8fHfvBx1fxdrYjcHYSOWKuIhYvyqKNzg2bfz3
-         IFq3ySJVrOXLDALH0Hk2meR0raP43kwRvHd/03F5s1+xgegieqbndfmcMG3v9ZaRF0Er
-         kLIiZKvURcTK0J3eEDuUPn+O/4vTotbEHWECwKYWrfOCxBwDIr0887oPehQb9CTdSovB
-         aWHg2DSjNO+iAqkK44y+nPLkM5U4nU9kab8C+sIJUvqPNE3KZPpZAprDMLSr7sSGT/fr
-         ub4g==
-X-Gm-Message-State: ACrzQf0O/+yf+aSxrg2ZuD5cp8AK5CUuEmwL1MZKEOFBujfktroqjLeA
-        bkPBnhZBLNEZkwPbKvFxw7vHcg==
-X-Google-Smtp-Source: AMsMyM7axbyNIr4UEZ3eDvOk36cBFXytSk86ZlNroaL1fCDvwa8InsjXbITt4AIhy8bIIM3OVNR3MA==
-X-Received: by 2002:a17:90a:650a:b0:203:a3a9:6b14 with SMTP id i10-20020a17090a650a00b00203a3a96b14mr6784620pjj.198.1664316387694;
-        Tue, 27 Sep 2022 15:06:27 -0700 (PDT)
+        bh=Ga4pQWEDXBG9/XYtSTlScJ77nN/lKyKRhvrVN6ZYtEQ=;
+        b=wCoZFT2xaxnsVJXDp+TfMZRPfw0JwK8+soAQYfJ2UlieUwYnbt1ruAU+X0xcg6nhJh
+         0WxXzbTUEHPh1EtWCp9R9MbTEDMGDxxNCeVoDCdYB5uiyVo6yF+vnc+T0mME1RJXLAp4
+         UiJCMBIGUlswni9pWorvQAwQ+lHiqBRsf/C6xfGVNiqqwmk9XKdbvHUd4I4SGUjRZmLj
+         ghl5EQqeYT97ikP8TejzRHHIU1tM32SQf0JyavTpcZ9kdfdgXVOB+lhvP9hC2h0aAtpB
+         Kk5Ad2qEBK5kKDWcnA9GNXvSKbNa6ki3ZWyhbwcPSfksnu+xv4GvU+08+EKKKfaHhRzS
+         oTyQ==
+X-Gm-Message-State: ACrzQf24jDT/Xp+zPadlmsGz4odQRNYaLMPrkQb9jrsH7Xh5yOsvzksa
+        kLRcTrPG1MChF70fRj6lEUacLQ==
+X-Google-Smtp-Source: AMsMyM7e3pORG/ZiCK/KOAmPTIhR9W8OFaIKxiR5Fl7ql/8DpZyNJcNG+S+vv6Tj5cxsHspqGFGwnQ==
+X-Received: by 2002:a63:1e03:0:b0:43a:a64d:f3a4 with SMTP id e3-20020a631e03000000b0043aa64df3a4mr26001459pge.121.1664318853506;
+        Tue, 27 Sep 2022 15:47:33 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id g10-20020a17090a708a00b002007b60e288sm8834070pjk.23.2022.09.27.15.06.26
+        by smtp.gmail.com with ESMTPSA id l3-20020a170902f68300b00176b3c9693esm2081016plg.299.2022.09.27.15.47.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Sep 2022 15:06:27 -0700 (PDT)
-Date:   Tue, 27 Sep 2022 22:06:23 +0000
+        Tue, 27 Sep 2022 15:47:32 -0700 (PDT)
+Date:   Tue, 27 Sep 2022 22:47:29 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        andrew.jones@linux.dev, pbonzini@redhat.com, maz@kernel.org,
-        alexandru.elisei@arm.com, eric.auger@redhat.com, oupton@google.com,
-        reijiw@google.com, rananta@google.com, bgardon@google.com,
-        dmatlack@google.com, axelrasmussen@google.com
-Subject: Re: [PATCH v8 10/14] KVM: selftests: aarch64: Add
- aarch64/page_fault_test
-Message-ID: <YzNz36gZqrse9GzT@google.com>
-References: <20220922031857.2588688-1-ricarkol@google.com>
- <20220922031857.2588688-11-ricarkol@google.com>
- <Yyy4WjEmuSH1tSZb@google.com>
- <YzHfwmZqMQ9xXaNa@google.com>
+To:     Fuad Tabba <tabba@google.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
+Message-ID: <YzN9gYn1uwHopthW@google.com>
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
+ <d16284f5-3493-2892-38e6-f1fa5c10bdbb@redhat.com>
+ <Yyi+l3+p9lbBAC4M@google.com>
+ <CA+EHjTzy4iOxLF=5UX=s5v6HSB3Nb1LkwmGqoKhp_PAnFeVPSQ@mail.gmail.com>
+ <20220926142330.GC2658254@chaop.bj.intel.com>
+ <CA+EHjTz5yGhsxUug+wqa9hrBO60Be0dzWeWzX00YtNxin2eYHg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YzHfwmZqMQ9xXaNa@google.com>
+In-Reply-To: <CA+EHjTz5yGhsxUug+wqa9hrBO60Be0dzWeWzX00YtNxin2eYHg@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,34 +105,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 26, 2022, Ricardo Koller wrote:
-> On Thu, Sep 22, 2022 at 07:32:42PM +0000, Sean Christopherson wrote:
-> > On Thu, Sep 22, 2022, Ricardo Koller wrote:
-> > > +	void *hva = (void *)region->region.userspace_addr;
-> > > +	uint64_t paging_size = region->region.memory_size;
-> > > +	int ret, fd = region->fd;
-> > > +
-> > > +	if (fd != -1) {
-> > > +		ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
-> > > +				0, paging_size);
-> > > +		TEST_ASSERT(ret == 0, "fallocate failed, errno: %d\n", errno);
-> > > +	} else {
-> > > +		if (is_backing_src_hugetlb(region->backing_src_type))
-> > > +			return false;
-> > 
-> > Why is hugetlb disallowed?  I thought anon hugetlb supports MADV_DONTNEED?
-> > 
+On Mon, Sep 26, 2022, Fuad Tabba wrote:
+> Hi,
 > 
-> It fails with EINVAL (only tried on arm) for both the PAGE_SIZE and the huge
-> page size. And note that the address is aligned as well.
-> 
-> madvise(0xffffb7c00000, 2097152, MADV_DONTNEED) = -1 EINVAL (Invalid argument)
-> 	^^^^^^^^^^^^^^	^^^^^^^
-> 	2M aligned	2M (hugepage size)
-> 			
-> madvise(0xffff9e800000, 4096, MADV_DONTNEED) = -1 EINVAL (Invalid argument)   
-> 			^^^^
-> 			PAGE_SIZE
+> On Mon, Sep 26, 2022 at 3:28 PM Chao Peng <chao.p.peng@linux.intel.com> wrote:
+> >
+> > On Fri, Sep 23, 2022 at 04:19:46PM +0100, Fuad Tabba wrote:
+> > > > Then on the KVM side, its mmap_start() + mmap_end() sequence would:
+> > > >
+> > > >   1. Not be supported for TDX or SEV-SNP because they don't allow adding non-zero
+> > > >      memory into the guest (after pre-boot phase).
+> > > >
+> > > >   2. Be mutually exclusive with shared<=>private conversions, and is allowed if
+> > > >      and only if the entire gfn range of the associated memslot is shared.
+> > >
+> > > In general I think that this would work with pKVM. However, limiting
+> > > private<->shared conversions to the granularity of a whole memslot
+> > > might be difficult to handle in pKVM, since the guest doesn't have the
+> > > concept of memslots. For example, in pKVM right now, when a guest
+> > > shares back its restricted DMA pool with the host it does so at the
+> > > page-level.
 
-I think this needs to be root caused before merging.  Unless I'm getting turned
-around, MADV_DONTEED should work, i.e. there is a test bug lurking somewhere.
+Y'all are killing me :-)
+
+Isn't the guest enlightened?  E.g. can't you tell the guest "thou shalt share at
+granularity X"?  With KVM's newfangled scalable memslots and per-vCPU MRU slot,
+X doesn't even have to be that high to get reasonable performance, e.g. assuming
+the DMA pool is at most 2GiB, that's "only" 1024 memslots, which is supposed to
+work just fine in KVM.
+
+> > > pKVM would also need a way to make an fd accessible again
+> > > when shared back, which I think isn't possible with this patch.
+> >
+> > But does pKVM really want to mmap/munmap a new region at the page-level,
+> > that can cause VMA fragmentation if the conversion is frequent as I see.
+> > Even with a KVM ioctl for mapping as mentioned below, I think there will
+> > be the same issue.
+> 
+> pKVM doesn't really need to unmap the memory. What is really important
+> is that the memory is not GUP'able.
+
+Well, not entirely unguppable, just unguppable without a magic FOLL_* flag,
+otherwise KVM wouldn't be able to get the PFN to map into guest memory.
+
+The problem is that gup() and "mapped" are tied together.  So yes, pKVM doesn't
+strictly need to unmap memory _in the untrusted host_, but since mapped==guppable,
+the end result is the same.
+
+Emphasis above because pKVM still needs unmap the memory _somehwere_.  IIUC, the
+current approach is to do that only in the stage-2 page tables, i.e. only in the
+context of the hypervisor.  Which is also the source of the gup() problems; the
+untrusted kernel is blissfully unaware that the memory is inaccessible.
+
+Any approach that moves some of that information into the untrusted kernel so that
+the kernel can protect itself will incur fragmentation in the VMAs.  Well, unless
+all of guest memory becomes unguppable, but that's likely not a viable option.
