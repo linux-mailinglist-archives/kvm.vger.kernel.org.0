@@ -2,61 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D9805ECA2F
-	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 18:55:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 37C515ECA7D
+	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 19:08:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232849AbiI0Qzr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Sep 2022 12:55:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36928 "EHLO
+        id S232253AbiI0RII (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Sep 2022 13:08:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232904AbiI0QzK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Sep 2022 12:55:10 -0400
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85B3C101FF
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 09:54:34 -0700 (PDT)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-345528ceb87so106206177b3.11
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 09:54:34 -0700 (PDT)
+        with ESMTP id S231236AbiI0RHv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Sep 2022 13:07:51 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 153AB87F9D
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 10:07:45 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id x1so9650215plv.5
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 10:07:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=W0xg9RtiBqYWCn75opQ1wyDHiSh1EdYgdVcJnSQAyaI=;
-        b=bRnTe953BU0S9p4GzkMTwutXKUYULiE3E2Wpn3dShC2oZ9jQjO+yNRGCVh0vFpovYx
-         QIvVUnEw09Z7bPOXir+36n4MD0SQG+mWc4pTOWgeijinfnLHdYoCCp9j7rxVNDgpuwhM
-         3rlkwqKC3se4rlZ/mQoKE5gW3UVfsvqggQjsPkAkmlqesubcgJlsvxOTi2RuDqUDynii
-         fnfD96JZy2rGjPakIYlAarTffn3C653ZtWZx4eR2WNMqS6Kca2mD7dVt3vjXpupNiRdn
-         8lwz80B/CRCr85+TE8e0Ce+n1HdV/q+DEMbisJxQFDSXqup711Zp6aR3gWwym0NqMm0i
-         4Ivw==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=f0hIq2KYifdNKFEFb7aEPEmJFmBWVDO/Zv/NjHfHkzg=;
+        b=kp2y1pD2TNHkVmFbKg/OSxw8KFbGNkM5ZdloYEPiV5zUAUrwEerxBdZKOJi0qRkwcM
+         fp/Zhiqf547RsKsnk784wVwp3youq2kUThdSRzsrx7HU+53VR+sIgN3UatNFz/xtzjZX
+         VA0U4dC2UnSJij6sWt4a4DCfqh3LsF7xhSHtZnlR+oUkOwNu7fsZzUbiaFE7UlXmmmW8
+         eSGzbAnmfMCZw9SAtwbi43UiPe7oTueIPEevMmHBOyKSblSqZltt/7rBOz4Xu0CfjeSW
+         pUWt2/k8jfcvjjj9CbAWQDPsRZUjW59edFsi0exMCRXEgvqaFHQYwIrxElO4Gc2V4Qee
+         vsUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=W0xg9RtiBqYWCn75opQ1wyDHiSh1EdYgdVcJnSQAyaI=;
-        b=c0aGV/H7jbBtDCOm174/QVv0aReTvYTI1LWqexZacQsZzfT/RKHD0Q7MADstM8V/7v
-         bp2WGovkFLMwhmnijyWIWFWOILLzQoZ9NaVXW2cGmrFsjXokfCK8pFMMOas6gXAClTXd
-         EVZnEGuGzEqVpff57OuyL7R0iOSJ/VISl65/DZ7EopvGnPaAJbuMRt6ILLx9DyKMSjPQ
-         N4DLgsbL4nGowtIMHgIc0RyG39XOi72X6haChFtOo9luIMtfDAkI8JGecnO89DXTwixT
-         Xje3uCZTQHyT6ka64UY+2ZtOlZmeFGMgFEx/gp37jg6nioA05PLEOEVxgrKgwb3DOWOi
-         bwGQ==
-X-Gm-Message-State: ACrzQf23DnzSpSqi2DIV4mi1qxQzaeuvUWpmbc+eaLfvBmjE43tT505c
-        tAr0Y104DH1whdfYSBHqfJo/JtdNbyg7htoScf2Zl2am8xA=
-X-Google-Smtp-Source: AMsMyM5iNWq9PrZ4SQcEEyjs1vDn+yBhn057UlEajJm2EicjZLp/lXTHe8LGAsvjZ9hHsk5s/BGmHSUTnw7PCtMjh38=
-X-Received: by 2002:a81:c02:0:b0:34d:829a:20f3 with SMTP id
- 2-20020a810c02000000b0034d829a20f3mr25274846ywm.168.1664297673551; Tue, 27
- Sep 2022 09:54:33 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220926171457.532542-1-dmatlack@google.com> <3d091669-cb83-330e-52d0-5d3ac0fe7214@redhat.com>
-In-Reply-To: <3d091669-cb83-330e-52d0-5d3ac0fe7214@redhat.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Tue, 27 Sep 2022 09:54:07 -0700
-Message-ID: <CALzav=de=S5wDX=_jq3EvRYf9PromLMUmEvuDF_S075o3HO=jA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: selftests: Skip tests that require EPT when it is
- not available
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=f0hIq2KYifdNKFEFb7aEPEmJFmBWVDO/Zv/NjHfHkzg=;
+        b=TZReGEm5qXabCcGncC6RfIiNnnl7eCoRpwN9uP4M2n9JkeGdUFag0zJy8jAaisl2Ln
+         WAJMwu4uGSUm3ASUBoC2O06hYLBPWergEHB/1nujUpblsuvW2sRy+Kq/cgZl2l/+U73y
+         A+//IkFS0MWd6p6p+Twhtiu/1kbfG3nCrL1KGIA/gFYg+1Mqr6uxUrB7MSqe7H3vR27y
+         3R9UMlyTLfycV/VGDAt2Ey6lX8hJS+S/4nECO+0LfvRNYqzH6CC3RiQ5Y/cjfZKbcOOd
+         4SROdYYGMJDiEgKm9te1/zJ3XAI+Rofh+alvAX72K5/bK6BwGndvRNr8AhIo1r0FrQIU
+         RQYA==
+X-Gm-Message-State: ACrzQf2jpUIptriRjhqWboFhkvhMxsDJ/BPED7GxwhjlIZ6Ks3zvI7tj
+        THg7RDC6YJiE4rogjC4+ieFiMA==
+X-Google-Smtp-Source: AMsMyM6d4d9UEcUbarBTqOcimdO4fhX+S9ZIQ+PNycGAaBaQZTVuUQHdnhU/14HYz93HVs9WNBULfw==
+X-Received: by 2002:a17:902:d512:b0:178:2898:8099 with SMTP id b18-20020a170902d51200b0017828988099mr27694224plg.131.1664298464296;
+        Tue, 27 Sep 2022 10:07:44 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id y68-20020a623247000000b0053e7293be0bsm1991287pfy.121.2022.09.27.10.07.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Sep 2022 10:07:43 -0700 (PDT)
+Date:   Tue, 27 Sep 2022 17:07:39 +0000
+From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        kvm list <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: disable on 32-bit unless CONFIG_BROKEN
+Message-ID: <YzMt24/14n1BVdnI@google.com>
+References: <20220926165112.603078-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220926165112.603078-1-pbonzini@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -68,20 +69,32 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 27, 2022 at 4:58 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 9/26/22 19:14, David Matlack wrote:
-> > Skip selftests that require EPT support in the VM when it is not
-> > available. For example, if running on a machine where kvm_intel.ept=N
-> > since KVM does not offer EPT support to guests if EPT is not supported
-> > on the host.
-> >
-> > This commit causes vmx_dirty_log_test to be skipped instead of failing
-> > on hosts where kvm_intel.ept=N.
-> >
-> > Signed-off-by: David Matlack <dmatlack@google.com>
->
-> Queued for 6.0, thanks.
+On Mon, Sep 26, 2022, Paolo Bonzini wrote:
+> 32-bit KVM has extra complications in the code due to:
+> 
+> - different ways to write 64-bit values in VMCS
+> 
+> - different handling of DS and ES selectors as well as FS/GS bases
+> 
+> - lack of CR8 and EFER
+> 
+> - lack of XFD
+> 
 
-I sent a v2 based on the feedback from Sean. Please grab that one
-instead. Thanks.
+More for the list:
+
+  - SVM is effectively restricted to PAE kernels due to NX requirements
+
+> - impossibility of writing 64-bit PTEs atomically
+
+It's not impossible, just ugly.  KVM could use CMPXCHG8B to do all of the accesses
+for the TDP MMU, including the non-atomic reads and writes.
+
+> The last is the big one, because it prevents from using the TDP MMU
+> unconditionally.
+
+As above, if the TDP MMU really is the sticking point, that's solvable.
+
+The real justification for deprecating 32-bit KVM is that, outside of KVM developers,
+literally no one uses 32-bit KVM.  I.e. any amount of effort that is required to
+continue supporting 32-bit kernels is a complete waste of resources.
