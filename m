@@ -2,203 +2,283 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E7AE15ECF23
-	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 23:11:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AE745ECF69
+	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 23:43:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231587AbiI0VLM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Sep 2022 17:11:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54834 "EHLO
+        id S231428AbiI0VnR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Sep 2022 17:43:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231854AbiI0VLH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Sep 2022 17:11:07 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E55ED1DADEA
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 14:11:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1664313062; x=1695849062;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=+YXys8KT3gnol153sjQYMPNhO8B30aGCm5LK39kumH8=;
-  b=Dn5ekNq7IhijF/7VE/8XrVnBisnQ0TeMk4QO9sDusm7TcS9Ouo6Lazdr
-   59vTDz63fdcc0Y5FOnb7TvzJxVKqT+XZzIrh7FPnNrTrzX/SI5x7NfMjg
-   a4XXOdwPQabs+pAmiMc5XIAnmpaxt0WDGz3hYxXNBYjW7BzIW+Jkofwtf
-   PuN73vMR9rSM0E7yEX9ahOL9fZFi6wXjKwaWj3XhNSZrtLOTAGuNAMIil
-   ZUIDFHKDVVySLykZ7RmOoehQoCYbuP5qbJ3xPFgIZY89H0CZ6jJ2LN+CM
-   rSrWF0Tu8SHkkv9uWsQLqanumrWyzFO+6YB2oQq4o4rjryop3fLnl8Q0R
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10483"; a="327795317"
-X-IronPort-AV: E=Sophos;i="5.93,350,1654585200"; 
-   d="scan'208";a="327795317"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2022 14:10:48 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10483"; a="747187358"
-X-IronPort-AV: E=Sophos;i="5.93,350,1654585200"; 
-   d="scan'208";a="747187358"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga004.jf.intel.com with ESMTP; 27 Sep 2022 14:10:47 -0700
-Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 27 Sep 2022 14:10:47 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31 via Frontend Transport; Tue, 27 Sep 2022 14:10:47 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.175)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.31; Tue, 27 Sep 2022 14:10:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=W6gy9IV7R2OpJHq/BK9WNbqGPb9N6+4wJyQ61nsd2TKY7vdJyYGfH8byM9wfkHraoz1Uduuwi3rYGsgrb5HoKWqNGgBqZpvy298F8fCrhlI7HhaugLwhvB9YAyVdi/ZHhRPzl6oRzIfDQqg34w4Sz5V/e62pSrgQ2sq+iuQL7HUSPTpSLIzyrnAqJLw2WKBoo0cwQGb7Qxo9th8GzsRVEI/Exb5Pd15Rxm4Me0IVfemzzJb4EgSVP+HOxFxqrbxU5H4gWkm6zyf2i83OxIXQpCoK+3w4n/aV9mYZ3vtBGQQOsPSgQCO7uAVnTUMFRZxjqcez+KXx7NuU0K6jMGANkQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+YXys8KT3gnol153sjQYMPNhO8B30aGCm5LK39kumH8=;
- b=Y2is3yOIzbdNLWrYPEDniyGhvszcLN5r8p0kLiP8NtnAbzgHr/+/kdXMXA3Aug3gudFmF7Lok64NKKezSWE7nMT7xQjdJUTt0fMowsA9eajP0cYv0ExYsWqhXjjSnnEU5p9i/WAKCnvuk9lqWAyjHoCuEOQsI5n10bn9VD1vbRnnSwCaqyTZSOhjei/IaWoJsNWAd9THG8+kbb+tJ232nXaQhVaC5/HLAl12qe8f2RDV2GcVgutTXsQmtl5T8jhuzhIdBGpKvfDZHwbj+zneQLPY+Iv0+1o2sc6ITXsoMmC/j/fTKRvRf/dReJn6+vtE3JG0hDi4LU6Ri/6qev99qg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by BN9PR11MB5452.namprd11.prod.outlook.com (2603:10b6:408:101::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5654.26; Tue, 27 Sep
- 2022 21:10:43 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::6eb:99bf:5c45:a94b]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::6eb:99bf:5c45:a94b%3]) with mapi id 15.20.5654.025; Tue, 27 Sep 2022
- 21:10:43 +0000
-From:   "Huang, Kai" <kai.huang@intel.com>
-To:     "dmatlack@google.com" <dmatlack@google.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>
-Subject: Re: [PATCH v3 01/10] KVM: x86/mmu: Change tdp_mmu to a read-only
- parameter
-Thread-Topic: [PATCH v3 01/10] KVM: x86/mmu: Change tdp_mmu to a read-only
- parameter
-Thread-Index: AQHYzeClAoVSdFoVkE6IUn79IeyfMa3zCMQAgABz3YCAAFLRAA==
-Date:   Tue, 27 Sep 2022 21:10:43 +0000
-Message-ID: <fde43a93b5139137c4783d1efe03a1c50311abc1.camel@intel.com>
-References: <20220921173546.2674386-1-dmatlack@google.com>
-         <20220921173546.2674386-2-dmatlack@google.com>
-         <1c5a14aa61d31178071565896c4f394018e83aaa.camel@intel.com>
-         <CALzav=d1wheG3bCKvjZ--HRipaehtaGPqJsDz031aohFjpcmjA@mail.gmail.com>
-In-Reply-To: <CALzav=d1wheG3bCKvjZ--HRipaehtaGPqJsDz031aohFjpcmjA@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.44.4 (3.44.4-1.fc36) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|BN9PR11MB5452:EE_
-x-ms-office365-filtering-correlation-id: bc78e744-9971-403d-14e7-08daa0ccbd5f
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: qkL2bb5BRPyVrXvE9UcI8TZ88wJE+h6teLjmSsDcmklG6phiBQB4vZ8KRS0FNQYGSKPLard+W/94wvfY6cl3uasPXvmi01MknjByZsPV9G6lHNiT6U/7/upROWyHRNYbUMvasDsUJZCkKx7UklLdABSXqCYz5+jCiQ4uQ/W4Fz+SamCldVCDBAo8AqEHj4hKhvGzo+Y+4TuYHh7itxP8QXLMX+xlPYy1gof4hIdUlTeloEv8mD33qUWHSTd/F377vK7fP2Uop6EETOb06uKLoFsypmuzWpXt5uG9lYNOb0+azZ0NqLC1TnD0rZQl3mVjqX8woiWdkH3UsPGvZFeDfOIauUG49xdERKbovl5x3TM1dyBPwuGYsJ/rc9rrnYyaJ8i5iViGsgNDooAPfXG0SPNuNndtHmjtpWi9S6qvQaE9kgVdZ+RyFSc2oiehvvg5Ozyg8J0N1V/Uxl9jD1RPTagG0lpx1YYJFHMgkfIwlvNmLvgCElaf42vMgHDtZL35DXOfqmfyuT7E2nIpnkkASd/SDnA//fTjg8exjSB+HjPqqOujh4drriJq9SRDw9QPVrsLzhgLxIjcMlyCk1gwF0uNEz649iE74gbNyVJONA8hn18j3z2bn5NeNpRCQYk2Hx61GMZ8tkrnJa+OUqba5ANOKus/HvxqiIStiKTiDtr9caUMTkWS3hWugI17mEAuCzj/HuvGBxQXRHMdDESr/Rwl6Wd8vgdRgYYIdQmK2hwIDy3JZk0aAV+BsFJg+kpGmpkNY/04mVEDtU5BEM4isg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(136003)(346002)(366004)(39860400002)(396003)(451199015)(2906002)(36756003)(86362001)(186003)(53546011)(6506007)(8936002)(6512007)(5660300002)(41300700001)(2616005)(38100700002)(82960400001)(38070700005)(122000001)(83380400001)(26005)(66946007)(54906003)(6916009)(316002)(478600001)(71200400001)(6486002)(91956017)(66556008)(66476007)(66446008)(76116006)(8676002)(64756008)(4326008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?dkdhYmlFbTc2ajdQZjdQN3Jpa082ZmxhV1JTQlN5MnMxZzdGN2pqajYwb0VN?=
- =?utf-8?B?WXZUQlFBYWpXb1loeDlSYjdyWnVXQTRMRlJ2NzUwRkx3RzZGYTNlVnk3U3k1?=
- =?utf-8?B?SUNYYmZwSUFhQWhzRDhsSmtCNVN5VDBvSWVKTjl2NmJIeDNVa1A0cUUwRnho?=
- =?utf-8?B?c0hwTVRSMmJRTDJKSVpvWXBxdkdtMURQa2JRanppaDFtTXNWNEtBY1IrZzAr?=
- =?utf-8?B?MnphRTQvWU1tNXJDVWc2T3VDSVpiY3g3U0ZMTFNpaDd3WGhTWk9vL1lTUVFZ?=
- =?utf-8?B?NjlTUnkrTUdOTlEweVlkWmhVT05YcDdqZkh1eFBQaTExT0Y4dnRETTg5NExZ?=
- =?utf-8?B?U09tc2k3WjZ3ZTNpN0E4S2VWa09iYm1MUGlxVlRZdWdFbTBPd0pqczZiblBM?=
- =?utf-8?B?NytXQ2I3c2t2NUdlYmh3VGUrSE4xVUhtYkJTd29tTjFMTUJYNFhOK1BxN3Vm?=
- =?utf-8?B?bGZERGtVVXpQSDBQaHZXL3ZKOVdaQVlaWHJnTjNNbHd6YVg2L3IzbjBwRHFj?=
- =?utf-8?B?VFVkRXRZOFkwQlNiWFUxYXpJOVFpQ0llcjBxMjVaS2JadzhuanRvZ1lFWFdL?=
- =?utf-8?B?UTRhMmRlOExYeDJLc1R5eFlkTmhMMUR0bXF1NUF4ZmowM3N5Vm85UHJ5N292?=
- =?utf-8?B?bWZ4ZndRM0xxNXRLWjBFckNNR090NjdHSEhUY3FMdEFnY092amRuWWQvQjZq?=
- =?utf-8?B?VkhST0VVbCs1N1RPbkowSnRxTU04U0NZTUE0MTNxSHRWRlRxRmk0dGNub0NL?=
- =?utf-8?B?UjJRS2NWOU1nVnNWa0JrRWRUdWFUL1BkS2ZJQWY5OWVEYlFFTVVUZnhmZjlC?=
- =?utf-8?B?TFhvZ3U4dzBSa3cydzZGZUV0UThTcTR1NlVMbmdpNXYyMUJRdys3V1BwMkFo?=
- =?utf-8?B?bHRQUWxhQWwwNC9QVWlRTEpqRERPUnJTN2tLZGNCaE9OYXQzTmMrUjVENC9R?=
- =?utf-8?B?MmpwOEJKTVJkazc3eklyN0RyM1hEWm15RGplQzRDM3Y3bnhWMURvdmxpbFhj?=
- =?utf-8?B?ZW11VituYlEwVTZRbWZ6RVdxbGlORlpxL2U4bHZxdGRyVFc5UkJTWkdVYTJ1?=
- =?utf-8?B?U1NLZFY5YXovMzA3NFNzbFdyK1VCejBKaHdVYk9zVjRHNzdnWUdLbTlrN2Ru?=
- =?utf-8?B?REZaS2JyU1Yzd3pvU2Q2SFhieUdXVEw3VGhmaFBRTGlhTUdYRWRwMmZDQzdp?=
- =?utf-8?B?cnlJVDF2YUFmaUNlSFZ1RlpwbEhtdVU2aFhBZkIxVzR0ZnFudFR2eGl4cVNL?=
- =?utf-8?B?Mkk2bzBneGIzSzVyTUZpMTUrVkx6WDVZYjNlMkNFRUVRUGVrVHMxSU1USUxW?=
- =?utf-8?B?SndBUjlPclh5Y0w3VHJKaC9VYXUzZXhoTUd3UzNUM05aMnFyUXNuckVKTXA2?=
- =?utf-8?B?UExxUmNYNnR2TDNBRFVPcFdFSXpYc3AvTWF4MlQ3ek1OSUxMMVJRR3BpV3Ro?=
- =?utf-8?B?cHphbE9Fd09BTjdoSHVHakVHaTJtUGc2QUduOEtsN2lhd3FhelN0bEhtNEtV?=
- =?utf-8?B?ZG5QLzBob1NvS3pOaEV2U2RNR1NCZGh5MzZWell2eVkxTmtzaTZRMmUyNDlL?=
- =?utf-8?B?VG93MTNDYkNVbXFYeXl0Zjh3TGJBcktFR1MwaEdLNk12OVZIZ3lHVHB0azBF?=
- =?utf-8?B?YXFrRENMSWR3K2ZXbllQNTdFVFliYzJuTUNqVWVobTJZNjV5RjJ0bnhiYTg5?=
- =?utf-8?B?a2hSSGNLNmJyMklsWWFsM3lZYTZoY0VWcmIxa2dXTHVlODMxM044YUt6dDR3?=
- =?utf-8?B?VnVXWjd2TnpIaTI1ZHlBc0JhcDlJWDc1ZUpoTHJiaXV1S0NUWDVtcGgvakhs?=
- =?utf-8?B?TEd1Q0pIR0lhZFg2YU1UWHZYSDFqRWxlSWs3R1lLWDFEWTNwMnpyVWhXc0ZP?=
- =?utf-8?B?UU1Razg3Yk9XTG9ZTGpDeXZnTUxlZmV2QlR4VHBGV2h0SldObFJBWjZCTW9n?=
- =?utf-8?B?R3JXWXNNMWNXd1FYSTMrZm12aTlKZnJjYXQxNGt5cmc3ZEJwM2UyQ2VEZ2ND?=
- =?utf-8?B?NjlVRFpRN2ZjR3lBbjVBbFp1NStvTTlONHE2NmhNMXpBbS93UjZZVmZsRXBh?=
- =?utf-8?B?YVlla0RMYWwyK0lpODRQamhnTllBRkdmMlc4L2lDOXlVSVNLeS9pUW8xSVpL?=
- =?utf-8?B?TlQ0Y3J2b3llMFZlSkpyNExmK21NRW1BcEZRcW02ZEpsVlR5Y3Q5Tko1dk05?=
- =?utf-8?B?Y2c9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3427DE238CA76544832EEBEF98568693@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        with ESMTP id S230305AbiI0VnO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Sep 2022 17:43:14 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DB8310AB3F
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 14:43:13 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id 3so10574759pga.1
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 14:43:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=rC06GjmhrHvd34k/0fcmKBaDkDTHh4ureNi4LBJEBWU=;
+        b=WJhQQJpmL0a0hLZl8y6AKS1ZFYQs5KJ0zYGkWRDN3LLQpoVImIy9r4P9zKtJU6piOi
+         SAKDqgtYF6oO5IoaKassayWfDdjFr3ImaNpToUkGVTrtGS5oPJoYM0DlgmIPaiRTkjU1
+         Ti5dony0C3FLKxernqzVgkbExA0C43iakJDXJBZgeEMQdLbMwI1JmgOifBGgUfFZWmjU
+         sUOOrJzM0NzUkmXUvO4XfGCAxXHqH56FVSBh/8zmZ9Foy0cluZwYnYZBekF6H0MrCe5J
+         bnSoQEMsZuGZfeHgEuZlee+D4GIsCP9haLLgRMb+qK5i6QiOsroHpyMO2Wo4SI1G/JfS
+         yxhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=rC06GjmhrHvd34k/0fcmKBaDkDTHh4ureNi4LBJEBWU=;
+        b=AhnkfxbQnz4QdNY23I180lFn/IoUiSQekAfKBVw5sblSLpuC09B6zG/F5dc0/tgq2T
+         ifG9awo9gQnQPNeHB7NwCLU+5Og9lhIfhzHqF9oJxnIkJ25rFJrS1RYI7BwBFzg4b8S0
+         rIuqjuk8KUgdq8vxrkG+owzTA6AFhmPTALXtgVn5d8YbNgZLb84hfzOkejdu9GmXwhcW
+         u3gQXdSIMjfXRuKRw5FDBsw4hEafHRWjiscKKnAHln6YncpgGechP2DFciKVhgMq5Mba
+         77PljWi8mFXyaTYU1qQjysLC9Da2p7MCpFn0UCudFu4vuHqFnxEGLnj3HqqioyoU4HNV
+         oMyw==
+X-Gm-Message-State: ACrzQf3lJAmC8FFO21sUR5dJM8GDPXoLuKwII2/1VIGSEl3EbvnRy2mb
+        aUS05xxB/8qFpJm8BHBz5Dbj5A==
+X-Google-Smtp-Source: AMsMyM5i1NQBXCucCmm5sYdgQMTiBhQuU2rZxyb3DdFYjUldg2vdCgzP7RYut2dT0vrxL1hPFiQWZg==
+X-Received: by 2002:a65:6e8c:0:b0:435:144e:445e with SMTP id bm12-20020a656e8c000000b00435144e445emr26953745pgb.96.1664314992602;
+        Tue, 27 Sep 2022 14:43:12 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id 5-20020a170902c20500b00176d347e9a7sm2036036pll.233.2022.09.27.14.43.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Sep 2022 14:43:11 -0700 (PDT)
+Date:   Tue, 27 Sep 2022 21:43:08 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Gao <chao.gao@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, jon@nutanix.com,
+        kevin.tian@intel.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [RFC v2] KVM: x86/vmx: Suppress posted interrupt notification
+ when CPU is in host
+Message-ID: <YzNubGQf0yvODjZC@google.com>
+References: <20220923085806.384344-1-chao.gao@intel.com>
+ <YzHRKO1v5N/BIQl6@google.com>
+ <YzKZExaU2k7qfcS9@gao-cwp>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bc78e744-9971-403d-14e7-08daa0ccbd5f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Sep 2022 21:10:43.6931
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: KXtuqP5nnvOCNKOc4NxRRGzheFCknvCmklKqn62rXTjcuNheyIWgEXwS26wuwK4bgFU3+/0FGTj84/WrvW5ddw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5452
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YzKZExaU2k7qfcS9@gao-cwp>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gVHVlLCAyMDIyLTA5LTI3IGF0IDA5OjE0IC0wNzAwLCBEYXZpZCBNYXRsYWNrIHdyb3RlOg0K
-PiBPbiBUdWUsIFNlcCAyNywgMjAyMiBhdCAyOjE5IEFNIEh1YW5nLCBLYWkgPGthaS5odWFuZ0Bp
-bnRlbC5jb20+IHdyb3RlOg0KPiA+IA0KPiA+IA0KPiA+ID4gDQo+ID4gPiArYm9vbCBfX3JvX2Fm
-dGVyX2luaXQgdGRwX21tdV9hbGxvd2VkOw0KPiA+ID4gKw0KPiA+IA0KPiA+IFsuLi5dDQo+ID4g
-DQo+ID4gPiBAQCAtNTY2Miw2ICs1NjY5LDkgQEAgdm9pZCBrdm1fY29uZmlndXJlX21tdShib29s
-IGVuYWJsZV90ZHAsIGludCB0ZHBfZm9yY2VkX3Jvb3RfbGV2ZWwsDQo+ID4gPiAgICAgICB0ZHBf
-cm9vdF9sZXZlbCA9IHRkcF9mb3JjZWRfcm9vdF9sZXZlbDsNCj4gPiA+ICAgICAgIG1heF90ZHBf
-bGV2ZWwgPSB0ZHBfbWF4X3Jvb3RfbGV2ZWw7DQo+ID4gPiANCj4gPiA+ICsjaWZkZWYgQ09ORklH
-X1g4Nl82NA0KPiA+ID4gKyAgICAgdGRwX21tdV9lbmFibGVkID0gdGRwX21tdV9hbGxvd2VkICYm
-IHRkcF9lbmFibGVkOw0KPiA+ID4gKyNlbmRpZg0KPiA+ID4gDQo+ID4gDQo+ID4gWy4uLl0NCj4g
-PiANCj4gPiA+IEBAIC02NjYxLDYgKzY2NzEsMTMgQEAgdm9pZCBfX2luaXQga3ZtX21tdV94ODZf
-bW9kdWxlX2luaXQodm9pZCkNCj4gPiA+ICAgICAgIGlmIChueF9odWdlX3BhZ2VzID09IC0xKQ0K
-PiA+ID4gICAgICAgICAgICAgICBfX3NldF9ueF9odWdlX3BhZ2VzKGdldF9ueF9hdXRvX21vZGUo
-KSk7DQo+ID4gPiANCj4gPiA+ICsgICAgIC8qDQo+ID4gPiArICAgICAgKiBTbmFwc2hvdCB1c2Vy
-c3BhY2UncyBkZXNpcmUgdG8gZW5hYmxlIHRoZSBURFAgTU1VLiBXaGV0aGVyIG9yIG5vdCB0aGUN
-Cj4gPiA+ICsgICAgICAqIFREUCBNTVUgaXMgYWN0dWFsbHkgZW5hYmxlZCBpcyBkZXRlcm1pbmVk
-IGluIGt2bV9jb25maWd1cmVfbW11KCkNCj4gPiA+ICsgICAgICAqIHdoZW4gdGhlIHZlbmRvciBt
-b2R1bGUgaXMgbG9hZGVkLg0KPiA+ID4gKyAgICAgICovDQo+ID4gPiArICAgICB0ZHBfbW11X2Fs
-bG93ZWQgPSB0ZHBfbW11X2VuYWJsZWQ7DQo+ID4gPiArDQo+ID4gPiAgICAgICBrdm1fbW11X3Nw
-dGVfbW9kdWxlX2luaXQoKTsNCj4gPiA+ICB9DQo+ID4gPiANCj4gPiANCj4gPiBTb3JyeSBsYXN0
-IHRpbWUgSSBkaWRuJ3QgcmV2aWV3IGRlZXBseSwgYnV0IEkgYW0gd29uZGVyaW5nIHdoeSBkbyB3
-ZSBuZWVkDQo+ID4gJ3RkcF9tbXVfYWxsb3dlZCcgYXQgYWxsPyAgVGhlIHB1cnBvc2Ugb2YgaGF2
-aW5nICdhbGxvd19tbWlvX2NhY2hpbmcnIGlzIGJlY2F1c2UNCj4gPiBrdm1fbW11X3NldF9tbWlv
-X3NwdGVfbWFzaygpIGlzIGNhbGxlZCB0d2ljZSwgYW5kICdlbmFibGVfbW1pb19jYWNoaW5nJyBj
-YW4gYmUNCj4gPiBkaXNhYmxlZCBpbiB0aGUgZmlyc3QgY2FsbCwgc28gaXQgY2FuIGJlIGFnYWlu
-c3QgdXNlcidzIGRlc2lyZSBpbiB0aGUgc2Vjb25kDQo+ID4gY2FsbC4gIEhvd2V2ZXIgaXQgYXBw
-ZWFycyBmb3IgJ3RkcF9tbXVfZW5hYmxlZCcgd2UgZG9uJ3QgbmVlZCAndGRwX21tdV9hbGxvd2Vk
-JywNCj4gPiBhcyBrdm1fY29uZmlndXJlX21tdSgpIGlzIG9ubHkgY2FsbGVkIG9uY2UgYnkgVk1Y
-IG9yIFNWTSwgaWYgSSByZWFkIGNvcnJlY3RseS4NCj4gDQo+IHRkcF9tbXVfYWxsb3dlZCBpcyBu
-ZWVkZWQgYmVjYXVzZSBrdm1faW50ZWwgYW5kIGt2bV9hbWQgYXJlIHNlcGFyYXRlDQo+IG1vZHVs
-ZXMgZnJvbSBrdm0uIFNvIGt2bV9jb25maWd1cmVfbW11KCkgY2FuIGJlIGNhbGxlZCBtdWx0aXBs
-ZSB0aW1lcw0KPiAoZWFjaCB0aW1lIGt2bV9pbnRlbCBvciBrdm1fYW1kIGlzIGxvYWRlZCkuDQo+
-IA0KPiANCg0KSW5kZWVkLiA6KQ0KDQpSZXZpZXdlZC1ieTogS2FpIEh1YW5nIDxrYWkuaHVhbmdA
-aW50ZWwuY29tPg0KDQo=
+On Tue, Sep 27, 2022, Chao Gao wrote:
+> On Mon, Sep 26, 2022 at 04:19:52PM +0000, Sean Christopherson wrote:
+> >On Fri, Sep 23, 2022, Chao Gao wrote:
+> >> it is pointless to update PID.NV to wakeup vector since notification is
+> >> anyway suppressed. And since PID.SN should be already set for running
+> >> vCPUs, so, don't set it again for preempted vCPUs.
+> >
+> >I'm pretty sure this is wrong.  If the vCPU is preempted between prepare_to_rcuwait()
+> >and schedule(), then skipping pi_enable_wakeup_handler() will hang the guest if
+> >the wakeup event is a posted IRQ and the event arrives while the vCPU is preempted.
+> 
+> Thanks for pointing out this subtle case.
+> 
+> My understanding is finally there will be a call of vmx_vcpu_pi_put()
+> with preempted=false (I assume that preempted vCPUs will be scheduled
+> at some later point). In that case, pi_enable_wakeup_handler() can wake
+> up the vCPU by sending a self-ipi. Plus this patch checks PIR instead of
+> ON bit, I don't get why the guest will hang.
+
+Ah, I forgot about the addition of the pi_is_pir_empty() check.  I think I was
+hoping/assuming that check would go away when I wrote the above.
+
+> >> When IPI virtualization is enabled, this patch increases "perf bench" [*]
+> >> by 6.56%, and PIN count in 1 second drops from tens of thousands to
+> >> hundreds. But cpuid loop test shows this patch causes 1.58% overhead in
+> >> VM-exit round-trip latency.
+> >
+> >The overhead is more than likely due to pi_is_pir_empty() in the VM-Entry path,
+> >i.e. should in theory go away if PID.SN is clear/set at IN_GUEST_MODE and
+> >OUTSIDE_GUEST_MODE
+> 
+> I will collect perf data after implementing what you suggested.
+> 
+> >
+> >> Also honour PID.SN bit in vmx_deliver_posted_interrupt().
+> >
+> >Why?
+> 
+> VT-d hardware doesn't set ON bit if SN bit is set.
+> 
+> Enforce the same rule in KVM can skip unnecessary work, like the
+> following pi_test_and_set_on() and kvm_vcpu_trigger_posted_interrupt().
+
+But in all likelihood it's a net negative.  IMO, ideally posted interrupts would
+set ON=1 even if SN=1 (or have another "PI pending" bit if necessary).
+
+In the optimal case, where the vCPU is IN_GUEST_MODE, it's completely unnecessary.
+If IN_GUEST_MODE isn't set, then setting ON=1 is likely a net positive, because
+it will allow KVM to avoid checking all of PIR when clearing SN, i.e. KVM can
+optimize those paths to:
+
+	if (!pi_test_on(&vmx->pi_desc) && !pi_is_pir_empty(&vmx->pi_desc))
+		pi_set_on(&vmx->pi_desc);
+	    
+> >> When IPI virtualization is enabled, this patch increases "perf bench" [*]
+> >> by 6.56%, and PIN count in 1 second drops from tens of thousands to
+> >> hundreds. But cpuid loop test shows this patch causes 1.58% overhead in
+> >> VM-exit round-trip latency.
+> >> 
+> >> [*] test cmd: perf bench sched pipe -T. Note that we change the source
+> >> code to pin two threads to two different vCPUs so that it can reproduce
+> >> stable results.
+> >> 
+> >> Signed-off-by: Chao Gao <chao.gao@intel.com>
+> >> ---
+> >> RFC: I am not sure whether the benefits outweighs the extra VM-exit cost.
+> >> 
+> >> Changes in v2 (addressed comments from Kevin):
+> >> - measure/estimate the impact to non-IPC-intensive cases
+> >> - don't tie PID.SN to vcpu->mode. Instead, clear PID.SN
+> >>   right before VM-entry and set it after VM-exit.
+> >
+> >Ah, sorry, missed v1.  Rather than key off of IN_GUEST_MODE in the sync path, add
+> >an explicit kvm_x86_ops hook to perform the transition.  I.e. make it explict.
+> 
+> It is ok to add a separate hook. But the question is how to coordinate clearing
+> SN with ->sync_pir_to_irr(). Clearing SN bit may put PIR in a state where ON/SN
+> are cleared but some outstanding IRQs left there. Current ->sync_pir_to_irr()
+> doesn't sync those IRQs to IRR in this case.
+>
+> Here are two options to fix the problem:
+> 
+> 1) clear SN with the new hook, then set ON bit if there is any outstanding IRQ.
+> No change to ->sync_pir_to_irr() is needed.
+> 
+> 2) clear SN with the new hook, add a force mode to ->sync_pir_to_irr() where
+> PIR is synced to IRR regardless of ON/SN bits, inovke ->sync_pir_to_irr()
+> on VM-entry path with force_mode=true.
+>
+> Both may lead to an extra check of PIR.
+
+  3) Unconditionally set ON when clearing SN in the VM-Enter path.
+
+#3 it's a little gross, but it would avoid the "extra" pi_is_pir_empty().
+
+I don't like #2 because it bleeds the logic into common x86, whereas #1 and #3
+keep everything in the PI code.
+
+My vote would be #1, and only do #3 if the overhead of #1 is really truly necessary
+for performance reasons.  #1 effectively optimizes for not having a pending posted
+IRQ, while #3 optimizes for having a pending posted IRQ _without ON=1.  And #1 can
+be optimized to scrub the PIR if and only if ON=0.
+
+More importantly, if we go with #1, then we can use the same hook for the
+->vcpu_blocking() hook.  More below.
+
+> >> @@ -101,11 +95,16 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+> >>  		new.control = old.control;
+> >>  
+> >>  		/*
+> >> -		 * Clear SN (as above) and refresh the destination APIC ID to
+> >> -		 * handle task migration (@cpu != vcpu->cpu).
+> >> +		 * Set SN and refresh the destination APIC ID to handle
+> >> +		 * task migration (@cpu != vcpu->cpu).
+> >> +		 *
+> >> +		 * SN is cleared when a vCPU goes to blocked state so that
+> >> +		 * the blocked vCPU can be waken up on receiving a
+> >> +		 * notification. For a running/runnable vCPU, such
+> >> +		 * notifications are useless. Set SN bit to suppress them.
+> >>  		 */
+> >>  		new.ndst = dest;
+> >> -		new.sn = 0;
+> >> +		new.sn = 1;
+> >
+> >To handle the preempted case, I believe the correct behavior is to leave SN
+> >as-is, although that would require setting SN=1 during vCPU creation.  Arguably
+> >KVM should do that anyways when APICv is enabled.
+> >
+> >Hmm, or alternatively this should do the same?
+> >
+> >		new.sn = !kvm_vcpu_is_blocking();
+> 
+> I don't get this. Probably I am misunderstanding something about vCPU preemption.
+
+Ignore the this, I was deep down a path of stuff that I'm pretty sure ends up being
+irrelevant.
+
+> >> @@ -172,8 +160,10 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
+> >>  	 * enabled until it is safe to call try_to_wake_up() on the task being
+> >>  	 * scheduled out).
+> >>  	 */
+> >> -	if (pi_test_on(&new))
+> >> +	if (!pi_is_pir_empty(pi_desc)) {
+> >> +		pi_set_on(pi_desc);
+> >
+> >As much as I wish we could get rid of kvm_arch_vcpu_blocking(), I actually think
+> >this would be a good application of that hook.  If PID.SN is cleared during
+> >kvm_arch_vcpu_blocking() and set during kvm_arch_vcpu_unblocking(), then I believe
+> >there's no need to manually check the PIR here, as any IRQ that isn't detected by
+> >kvm_vcpu_check_block() is guaranteed to set PID.ON=1.
+> 
+> Using kvm_arch_vcpu_blocking() has the same problem as using a new hook
+> for the VM-entry path: we need a force mode for ->sync_pir_to_irr() or
+> set ON bit if there is any outstanding IRQ right after clearing SN
+>
+> The former may help performance a little but since the call of
+> ->sync_pir_to_irr() in kvm_vcpu_check_block() is so far away from the
+> place where SN is cleared, I think this would be a source of bugs.
+> 
+> The latter has no benefit compared to what this patch does here.
+
+The benefits I see are:
+
+  1. The code is very explicit.  When clearing SN, check PIR and set ON=1 to
+     ensure IRQs aren't ignored.
+
+  2. pi_enable_wakeup_handler() is only responsible for changing the vector,
+     i.e. there's no clearing of SN "hidden" in the CMPXCHG loop.
+
+  3. Same for vmx_vcpu_pi_load(), it's only responsible for updating the pCPU
+     and the vector, it doesn't touch SN.
+
+  4. The logic is common to all paths that clear SN, i.e. the same helper can
+     be used for both VM-Enter and vCPU blocking.
+
+E.g. the VMX hook for both VM-Enter and vCPU blocking could be:
+
+  static void vmx_no_idea_what_to_call_this(struct kvm_vcpu *vcpu)
+  {
+	pi_clear_sn(&vmx->pi_desc);
+
+	/*
+	 * Clear SN before reading the bitmap.  The VT-d firmware writes the
+	 * bitmap and reads SN atomically (5.2.3 in the spec), so it doesn't
+	 * really have a memory barrier that pairs with this, but we cannot do
+	 * that and we need one.
+	 */
+	smp_mb__after_atomic();
+
+	/* blah blah blah */
+	if (!pi_test_on(&vmx->pi_desc) && !pi_is_pir_empty(&vmx->pi_desc))
+		pi_set_on(&vmx->pi_desc);
+  }
+
+One related thought thing I want to capture:
+
+The proposed approach is having vmx_sync_pir_to_irr() check PIR if ON=1 || SN=1
+is effectively _required_ to avoid breaking halt-polling.  I was thinking we could
+keep that path optimized to check only ON=1, but with that approach, KVM won't detect
+the pending IRQ until it actually starts to block the vCPU, i.e. until it clears SN
+and manually checks the PIR.  Clearing SN in kvm_arch_vcpu_pending() would be better
+than waiting until the vCPU is "put", but even that is too late from a halt-polling
+perspective.
+
+A comment in vmx_sync_pir_to_irr() is likely needed to capture that.
