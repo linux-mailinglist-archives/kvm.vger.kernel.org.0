@@ -2,63 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C1DB15ECED7
-	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 22:44:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E8CE85ECF13
+	for <lists+kvm@lfdr.de>; Tue, 27 Sep 2022 23:04:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231950AbiI0Uo1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Sep 2022 16:44:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56684 "EHLO
+        id S229779AbiI0VEH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Sep 2022 17:04:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230165AbiI0UoZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Sep 2022 16:44:25 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F146E10FE3C
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 13:44:23 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id o2so17405054lfc.10
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 13:44:23 -0700 (PDT)
+        with ESMTP id S229838AbiI0VEG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Sep 2022 17:04:06 -0400
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FC01B6D07;
+        Tue, 27 Sep 2022 14:04:05 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id ay36so7367337wmb.0;
+        Tue, 27 Sep 2022 14:04:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=fR1WfPLFGveMpcbeOBBo1cFw9wNYbgOtXOXOngyKU9w=;
-        b=qMSmNa0P0X9WFe0FrjmtvYsiyb25KIngX/6tiIo2rAHGB16kTowfl+2DZEQhN0G3UC
-         qZ1S+4rfDTL3SzJqaLL9XnlJUP/D8UEqf/1YYt7uj1HLW1rZxw/pA7kCckKKx2r+HLyE
-         /nAt61QJ/37k/LHQxWs+B39T4eHpAHQ2RAZMuiGFqz3ck4DoY+qoCq3Ikv3Gbx0RV27c
-         GploQ3wbj3rc7cF5V5HOUErLANZ0BiQjFPAflnYUucW7Yhxt0Fo/Fta0G/lFLtvZCd9M
-         s8R43Bkq9Hd2WRwPirPB3EL9fztwroY+VUPk06wGLUs4pjLfKV5eT5UUFaGAttdRrMbG
-         i4xQ==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date;
+        bh=4utwpaiX+nwZ8/aoptuiHSf3C3V/LbDfmFnwMH4/AB4=;
+        b=jyusM2yPG8DlGbki+SxcWD6f5AVuoTEYdygVIP1p9R1YD5O0l8LILbnNLh79Kns0Cz
+         PU2FjB4OLLFvCtesBimyiKrjAxE76xJPFK4G5iWTBnjZC9Slf5dWWzF/bNtBtvilVrM1
+         mU5ndgUOIZoGA3OaFQC28I30J3MVXpoenboUg/GvOz/mgpNzAztconza319TBTPc0yjP
+         x7LwT4WqJq5UH/nWhLn2NNZVso3FZ2V8bqvYSkYKSK3KradKkiksbySeShprzUuVrx7x
+         Up4t7mmKBdBoZ6osAnsLCMG5BVkRdKutYS2XUmqQTbrbtNMGHtRblysYOpO3k1Mol3IS
+         kCnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=fR1WfPLFGveMpcbeOBBo1cFw9wNYbgOtXOXOngyKU9w=;
-        b=Cp7cqhhQWeDbSvPH28qKLzWt2fnk63TW1jlPJMTxdLBLIYVokGFysrGz8cJw/Tbvhf
-         xTY+5ubAEXoIGTJmJB39VtiiDrrb8F7GrBEdA2Y4MiR/7a9TD2XiJkkwrzfqyUw7CBp7
-         u9W9McMDb3SEUbx1D+D4LugYpXP3MSObWBWjMofhzhSB4W5z9MP8g/R5ZPolvYcUncvb
-         gExds2uVqbH4UbH8iFhVWNV0XW1qXiJ06+6UAonL/Ez6+EwjbxUJcNjx+Mv+ogwfL9zH
-         eac1SBmRHmUf7wrLdP7PPPky7Ct4Ax2jn3B8xyQEyPlI1+W4u4niwLj8ZY0WGnPtMhQV
-         9dXg==
-X-Gm-Message-State: ACrzQf15nsVboYkj0UfIK3H4rPHGH33ihDED3Bp7Xr5m9+fletIhigOJ
-        w1MmgYA9hyzBkD6MZNfEhnTYI5mvEvUH/HwsWnTBUg==
-X-Google-Smtp-Source: AMsMyM5O/ekKBcuYgT6piRVyUJnrl8rvJ+2GF9Z9LyMe+zykZZUVaPeWUwoGNy7bE0bv2+HGaj6BI6jKUL5AwN6ji+k=
-X-Received: by 2002:ac2:5469:0:b0:497:ed1:97c6 with SMTP id
- e9-20020ac25469000000b004970ed197c6mr11203880lfn.248.1664311462027; Tue, 27
- Sep 2022 13:44:22 -0700 (PDT)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=4utwpaiX+nwZ8/aoptuiHSf3C3V/LbDfmFnwMH4/AB4=;
+        b=wzJuvlf7Qm2bLhm/mDkYR5tVNrFqGLxxz4EoP/CfCMdFr6KGKIQHf6C+AXHbSFDhsG
+         kI1wUrq3xR3iAq5ZBboSJJ9k7pcqi1OdYMimloJD4zJMQ0Kk/2v7FooHMubXYiKxYG8t
+         76/9L4KY2zHChOZKWKQawbft0MlUtMwMulnStBtwu+yJXauDACxDKRPqrd2c7zWwT/6P
+         R5JfOuvtKcAL5+w0fAL7tT/QbdY52s0PxLngwXof18TflTL5RF+OvvELzVVxnhPl9t8o
+         6AJ4EgmNfvl/k7SrRqMFf0U3oj+GIW+S9n/o6jG8qfRAeqroSdKdcCAo+9vGfow+g7Fm
+         6pUw==
+X-Gm-Message-State: ACrzQf3/OH21zXeDxYMXUyFAHRuB0lmSDPQXxQBlcVIgSwXD1o7Y5UXp
+        5J/J0x9oiE4tFTQrV64IlKQ=
+X-Google-Smtp-Source: AMsMyM5bRqdJoS8GkrzVBsbwQ/0Om0L4715MSQx2Luhy1dmQdbONNx03zPxwGHpo4vbTsTgRYmFHwA==
+X-Received: by 2002:a05:600c:35cf:b0:3b4:c0c2:d213 with SMTP id r15-20020a05600c35cf00b003b4c0c2d213mr4320200wmq.162.1664312643840;
+        Tue, 27 Sep 2022 14:04:03 -0700 (PDT)
+Received: from [192.168.8.100] (94.196.228.157.threembb.co.uk. [94.196.228.157])
+        by smtp.gmail.com with ESMTPSA id i7-20020adffc07000000b0022917d58603sm2578282wrr.32.2022.09.27.14.04.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Sep 2022 14:04:03 -0700 (PDT)
+Message-ID: <b52ae230-3a31-e29b-42fa-ff25393161c9@gmail.com>
+Date:   Tue, 27 Sep 2022 22:02:37 +0100
 MIME-Version: 1.0
-References: <20220927190515.984143-1-dmatlack@google.com>
-In-Reply-To: <20220927190515.984143-1-dmatlack@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Tue, 27 Sep 2022 13:43:45 -0700
-Message-ID: <CAHVum0exrpHNmNBkepgbB4C18NWcu--+VQj46Zr-rGoi11=gBg@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: selftests: Gracefully handle empty stack traces
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [PATCH net-next 0/4] shrink struct ubuf_info
+Content-Language: en-US
+To:     Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org,
+        xen-devel@lists.xenproject.org, Wei Liu <wei.liu@kernel.org>,
+        Paul Durrant <paul@xen.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>
+References: <cover.1663892211.git.asml.silence@gmail.com>
+ <7fef56880d40b9d83cc99317df9060c4e7cdf919.camel@redhat.com>
+ <021d8ea4-891c-237d-686e-64cecc2cc842@gmail.com>
+ <bbb212f6-0165-0747-d99d-b49acbb02a80@gmail.com>
+ <85cccb780608e830024fc82a8e4f703031646f4e.camel@redhat.com>
+ <c06897d4-4883-2756-87f9-9b10ab495c43@gmail.com>
+ <6502e1a45526f97a1e6d7d27bbe07e3bb3623de3.camel@redhat.com>
+ <eb543907-190f-c661-b5d6-b4d67b6184e6@gmail.com>
+ <b06d81fe39710b948a74a365c173b316252ed1f8.camel@redhat.com>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <b06d81fe39710b948a74a365c173b316252ed1f8.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,68 +87,174 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 27, 2022 at 12:05 PM David Matlack <dmatlack@google.com> wrote:
->
-> Bail out of test_dump_stack() if the stack trace is empty rather than
-> invoking addr2line with zero addresses. The problem with the latter is
-> that addr2line will block waiting for addresses to be passed in via
-> stdin, e.g. if running a selftest from an interactive terminal.
->
-> Opportunistically fix up the comment that mentions skipping 3 frames
-> since only 2 are skipped in the code, and move the call to backtrace()
-> down to where it is used.
->
-> Cc: Vipin Sharma <vipinsh@google.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
-> v2:
->  - Move backtrace() down to where it is used [Vipin]
->  - Change "stack trace empty" to "stack trace missing" [me]
->
-> v1: https://lore.kernel.org/kvm/20220922231724.3560211-1-dmatlack@google.com/
->
->  tools/testing/selftests/kvm/lib/assert.c | 15 +++++++++++----
->  1 file changed, 11 insertions(+), 4 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/lib/assert.c b/tools/testing/selftests/kvm/lib/assert.c
-> index 71ade6100fd3..7b92d1aaeda6 100644
-> --- a/tools/testing/selftests/kvm/lib/assert.c
-> +++ b/tools/testing/selftests/kvm/lib/assert.c
-> @@ -38,16 +38,23 @@ static void test_dump_stack(void)
->                  1];
->         char *c;
->
-> -       n = backtrace(stack, n);
->         c = &cmd[0];
->         c += sprintf(c, "%s", addr2line);
-> +
->         /*
-> -        * Skip the first 3 frames: backtrace, test_dump_stack, and
-> -        * test_assert. We hope that backtrace isn't inlined and the other two
-> -        * we've declared noinline.
-> +        * Skip the first 2 frames, which should be test_dump_stack() and
-> +        * test_assert(); both of which are declared noinline. Bail if the
-> +        * resulting stack trace would be empty. Otherwise, addr2line will block
-> +        * waiting for addresses to be passed in via stdin.
->          */
-> +       n = backtrace(stack, n);
-> +       if (n <= 2) {
-> +               fputs("  (stack trace missing)\n", stderr);
-> +               return;
-> +       }
->         for (i = 2; i < n; i++)
->                 c += sprintf(c, " %lx", ((unsigned long) stack[i]) - 1);
-> +
->         c += sprintf(c, "%s", pipeline);
->  #pragma GCC diagnostic push
->  #pragma GCC diagnostic ignored "-Wunused-result"
->
-> base-commit: 372d07084593dc7a399bf9bee815711b1fb1bcf2
-> prerequisite-patch-id: 2e3661ba8856c29b769499bac525b6943d9284b8
-> prerequisite-patch-id: 1a148d98d96d73a520ed070260608ddf1bdd0f08
-> --
-> 2.37.3.998.g577e59143f-goog
->
+On 9/27/22 21:23, Paolo Abeni wrote:
+> On Tue, 2022-09-27 at 21:17 +0100, Pavel Begunkov wrote:
+>> On 9/27/22 20:59, Paolo Abeni wrote:
+>>> On Tue, 2022-09-27 at 19:48 +0100, Pavel Begunkov wrote:
+>>>> On 9/27/22 18:56, Paolo Abeni wrote:
+>>>>> On Tue, 2022-09-27 at 18:16 +0100, Pavel Begunkov wrote:
+>>>>>> On 9/27/22 15:28, Pavel Begunkov wrote:
+>>>>>>> Hello Paolo,
+>>>>>>>
+>>>>>>> On 9/27/22 14:49, Paolo Abeni wrote:
+>>>>>>>> Hello,
+>>>>>>>>
+>>>>>>>> On Fri, 2022-09-23 at 17:39 +0100, Pavel Begunkov wrote:
+>>>>>>>>> struct ubuf_info is large but not all fields are needed for all
+>>>>>>>>> cases. We have limited space in io_uring for it and large ubuf_info
+>>>>>>>>> prevents some struct embedding, even though we use only a subset
+>>>>>>>>> of the fields. It's also not very clean trying to use this typeless
+>>>>>>>>> extra space.
+>>>>>>>>>
+>>>>>>>>> Shrink struct ubuf_info to only necessary fields used in generic paths,
+>>>>>>>>> namely ->callback, ->refcnt and ->flags, which take only 16 bytes. And
+>>>>>>>>> make MSG_ZEROCOPY and some other users to embed it into a larger struct
+>>>>>>>>> ubuf_info_msgzc mimicking the former ubuf_info.
+>>>>>>>>>
+>>>>>>>>> Note, xen/vhost may also have some cleaning on top by creating
+>>>>>>>>> new structs containing ubuf_info but with proper types.
+>>>>>>>>
+>>>>>>>> That sounds a bit scaring to me. If I read correctly, every uarg user
+>>>>>>>> should check 'uarg->callback == msg_zerocopy_callback' before accessing
+>>>>>>>> any 'extend' fields.
+>>>>>>>
+>>>>>>> Providers of ubuf_info access those fields via callbacks and so already
+>>>>>>> know the actual structure used. The net core, on the opposite, should
+>>>>>>> keep it encapsulated and not touch them at all.
+>>>>>>>
+>>>>>>> The series lists all places where we use extended fields just on the
+>>>>>>> merit of stripping the structure of those fields and successfully
+>>>>>>> building it. The only user in net/ipv{4,6}/* is MSG_ZEROCOPY, which
+>>>>>>> again uses callbacks.
+>>>>>>>
+>>>>>>> Sounds like the right direction for me. There is a couple of
+>>>>>>> places where it might get type safer, i.e. adding types instead
+>>>>>>> of void* in for struct tun_msg_ctl and getting rid of one macro
+>>>>>>> hiding types in xen. But seems more like TODO for later.
+>>>>>>>
+>>>>>>>> AFAICS the current code sometimes don't do the
+>>>>>>>> explicit test because the condition is somewhat implied, which in turn
+>>>>>>>> is quite hard to track.
+>>>>>>>>
+>>>>>>>> clearing uarg->zerocopy for the 'wrong' uarg was armless and undetected
+>>>>>>>> before this series, and after will trigger an oops..
+>>>>>>>
+>>>>>>> And now we don't have this field at all to access, considering that
+>>>>>>> nobody blindly casts it.
+>>>>>>>
+>>>>>>>> There is some noise due to uarg -> uarg_zc renaming which make the
+>>>>>>>> series harder to review. Have you considered instead keeping the old
+>>>>>>>> name and introducing a smaller 'struct ubuf_info_common'? the overall
+>>>>>>>> code should be mostly the same, but it will avoid the above mentioned
+>>>>>>>> noise.
+>>>>>>>
+>>>>>>> I don't think there will be less noise this way, but let me try
+>>>>>>> and see if I can get rid of some churn.
+>>>>>>
+>>>>>> It doesn't look any better for me
+>>>>>>
+>>>>>> TL;DR; This series converts only 3 users: tap, xen and MSG_ZEROCOPY
+>>>>>> and doesn't touch core code. If we do ubuf_info_common though I'd need
+>>>>>> to convert lots of places in skbuff.c and multiple places across
+>>>>>> tcp/udp, which is much worse.
+>>>>>
+>>>>> Uhmm... I underlook the fact we must preserve the current accessors for
+>>>>> the common fields.
+>>>>>
+>>>>> I guess something like the following could do (completely untested,
+>>>>> hopefully should illustrate the idea):
+>>>>>
+>>>>> struct ubuf_info {
+>>>>> 	struct_group_tagged(ubuf_info_common, common,
+>>>>> 		void (*callback)(struct sk_buff *, struct ubuf_info *,
+>>>>>                             bool zerocopy_success);
+>>>>> 		refcount_t refcnt;
+>>>>> 	        u8 flags;
+>>>>> 	);
+>>>>>
+>>>>> 	union {
+>>>>>                    struct {
+>>>>>                            unsigned long desc;
+>>>>>                            void *ctx;
+>>>>>                    };
+>>>>>                    struct {
+>>>>>                            u32 id;
+>>>>>                            u16 len;
+>>>>>                            u16 zerocopy:1;
+>>>>>                            u32 bytelen;
+>>>>>                    };
+>>>>>            };
+>>>>>
+>>>>>            struct mmpin {
+>>>>>                    struct user_struct *user;
+>>>>>                    unsigned int num_pg;
+>>>>>            } mmp;
+>>>>> };
+>>>>>
+>>>>> Then you should be able to:
+>>>>> - access ubuf_info->callback,
+>>>>> - access the same field via ubuf_info->common.callback
+>>>>> - declare variables as 'struct ubuf_info_commom' with appropriate
+>>>>> contents.
+>>>>>
+>>>>> WDYT?
+>>>>
+>>>> Interesting, I didn't think about struct_group, this would
+>>>> let to split patches better and would limit non-core changes.
+>>>> But if the plan is to convert the core helpers to
+>>>> ubuf_info_common, than I think it's still messier than changing
+>>>> ubuf providers only.
+>>>>
+>>>> I can do the exercise, but I don't really see what is the goal.
+>>>> Let me ask this, if we forget for a second how diffs look,
+>>>> do you care about which pair is going to be in the end?
+>>>
+>>> Uhm... I proposed this initially with the goal of remove non fuctional
+>>> changes from a patch that was hard to digest for me (4/4). So it's
+>>> about diffstat to me ;)
+>>
+>> Ah, got it
+>>
+>>> On the flip side the change suggested would probably not be as
+>>> straighforward as I would hope for.
+>>>
+>>>> ubuf_info_common/ubuf_info vs ubuf_info/ubuf_info_msgzc?
+>>>
+>>> The specific names used are not much relevant.
+>>>
+>>>> Are there you concerned about naming or is there more to it?
+>>>
+>>> I feel like this series is potentially dangerous, but I could not spot
+>>> bugs into the code. I would have felt more relaxed eariler in the devel
+>>> cycle.
+>>
+>> union {
+>> 	struct {
+>> 		unsigned long desc;
+>> 		void *ctx;
+>> 	};
+>> 	struct {
+>> 		u32 id;
+>> 		u16 len;
+>> 		u16 zerocopy:1;
+>> 		u32 bytelen;
+>> 	};
+>> };
+>>
+>>
+>> btw, nobody would frivolously change ->zerocopy anyway as it's
+>> in a union. Even without the series we're absolutely screwed
+>> if someone does that. If anything it adds a way to get rid of it:
+>>
+>> 1) Make vhost and xen use their own structures with right types.
+>> 2) kill unused struct {ctx, desc} for MSG_ZEROCOPY
+> 
+> Ok, the above sounds reasonable. Additionally I've spent the last
+> surviving neuron on my side to on this series, and it looks sane, so...
+> 
+> Acked-by: Paolo Abeni <pabeni@redhat.com>
 
-Reviewed-by: Vipin Sharma <vipinsh@google.com>
+Great, thanks for taking a look!
+
+-- 
+Pavel Begunkov
