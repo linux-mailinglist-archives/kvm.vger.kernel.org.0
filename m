@@ -2,101 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D3EB5ED0FA
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 01:23:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3ACD35ED131
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 01:48:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232410AbiI0XXe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Sep 2022 19:23:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44116 "EHLO
+        id S230455AbiI0XsH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Sep 2022 19:48:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232312AbiI0XXc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Sep 2022 19:23:32 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C36CB1E3F2
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 16:23:29 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id s26so10717992pgv.7
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 16:23:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=4MnMVs6E8JaSDSsn99y8Cflsak9Vn4oCEKVAnOpimrc=;
-        b=KTBy7fQLQX03opurQqZ2U9ctULmybQ5FJUoo4PZb+gpAETjrkid149E9fk/0W8/73E
-         ZrwvTRfgroj/9bgiZZ8XJyKrd78XrYX2iQYAUldEdxqL5OZpVAi1zS9yu8prYMHVa77l
-         4zjeo6ZBuAJWWGf1zHyMcSzUGInYNji/wPL8fWTGb5gG2xdIaqbbpro066Nv0icVdUH8
-         qi08NfiTgaHr/ClJbZ6TR3Yy/OpgSs603ryzzPCdNeTU5ylFZxeFY2UaHzVWoEaEC5jr
-         gHQ/fgp9BIfxbbHrCGK8KR3V4hCHTuvinL4qrNVOIDHv67EUocIGa2CUS0dDgpDBgy9Q
-         85BA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=4MnMVs6E8JaSDSsn99y8Cflsak9Vn4oCEKVAnOpimrc=;
-        b=tCjXMm2q+A1Ul5btTXJxzOufacOVeIztewB9uof0Nir97w5U1Ux0N4g8CGa/YyGonz
-         O6rGgtujxL95Auw32HQWwacgyPa3bIoQn73EoBYMhG16dkOV+405FkEH6E6HKg428t8t
-         iYUOmD2hEXwFaoz1lTKZ8w+l1vDYonQWs8hDxlEypq8NzDaxsy4o3mlgNsSI6P1iMRBi
-         P9JcI4+SM0NnuZ2H8u2ljJJCGThP/REn67bTHBnK+C1rJ74Cdx82L4sKe2+5EcBn3pDF
-         TsMxGjAkyo+A0Qu9w2uwJlm5+ljvfnHUuXbxohx3r73p+0KxUXsXbUPQ7mGbPSVTky6c
-         lxfw==
-X-Gm-Message-State: ACrzQf0HKmMAEV54tlX9BPBo0typopZESAlXXwt0C92GvyI4D7RQpNLt
-        +0w3W6gJ2NT5+A6Bjk16ooXX/Q==
-X-Google-Smtp-Source: AMsMyM5cCdZ/UJFMHAs5b3PS1i/34zTcpqdwe1Srr8AE4gzK5DkIpIp9pBozWLBz/E9ieWU+3YHPog==
-X-Received: by 2002:a05:6a00:124f:b0:542:6c43:5be8 with SMTP id u15-20020a056a00124f00b005426c435be8mr31885111pfi.5.1664321009101;
-        Tue, 27 Sep 2022 16:23:29 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id j1-20020a17090a318100b002007b60e288sm58733pjb.23.2022.09.27.16.23.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Sep 2022 16:23:28 -0700 (PDT)
-Date:   Tue, 27 Sep 2022 23:23:24 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     "Kirill A. Shutemov" <kirill@shutemov.name>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        aarcange@redhat.com, ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
-Message-ID: <YzOF7MT15nfBX0Ma@google.com>
-References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
- <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
- <d16284f5-3493-2892-38e6-f1fa5c10bdbb@redhat.com>
- <20220923005808.vfltoecttoatgw5o@box.shutemov.name>
- <f703e615-3b75-96a2-fb48-2fefd8a2069b@redhat.com>
- <20220926144854.dyiacztlpx4fkjs5@box.shutemov.name>
- <0a99aa24-599c-cc60-b23b-b77887af3702@redhat.com>
+        with ESMTP id S229779AbiI0XsB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Sep 2022 19:48:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A785D1B348F
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 16:48:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664322479;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=i0BKLfn5B7UzJtj+8D3KQv1ZOgyYXogau2GtF6aG8EE=;
+        b=AXAqJTkUjWe0gMCxZ/0MNC/yRoRv5kBBI2g7Ofq+XCqN7gHO3lum9X5tSQN1J70UMC2wPI
+        Pl0BzEY43SwYtNPYDANbw/YCViOyhXExhHlH8TcLbADg+3iMU2np1kgQ1maMiHChtUcjiw
+        +ZBZEUU6Ng64P4zi45IMqSX9KbtcMmQ=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-644-kFXFsxtZPZGpRiWLb-rIhw-1; Tue, 27 Sep 2022 19:47:53 -0400
+X-MC-Unique: kFXFsxtZPZGpRiWLb-rIhw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 645E91C0896D;
+        Tue, 27 Sep 2022 23:47:52 +0000 (UTC)
+Received: from [10.64.54.143] (vpn2-54-143.bne.redhat.com [10.64.54.143])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2058740C6EC2;
+        Tue, 27 Sep 2022 23:47:45 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v4 3/6] KVM: arm64: Enable ring-based dirty memory
+ tracking
+To:     Peter Xu <peterx@redhat.com>, Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org,
+        andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com,
+        pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com,
+        james.morse@arm.com, suzuki.poulose@arm.com,
+        alexandru.elisei@arm.com, oliver.upton@linux.dev
+References: <20220927005439.21130-1-gshan@redhat.com>
+ <20220927005439.21130-4-gshan@redhat.com> <YzMerD8ZvhvnprEN@x1n>
+ <86sfkc7mg8.wl-maz@kernel.org> <YzM/DFV1TgtyRfCA@x1n>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <320005d1-fe88-fd6a-be91-ddb56f1aa80f@redhat.com>
+Date:   Wed, 28 Sep 2022 09:47:43 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0a99aa24-599c-cc60-b23b-b77887af3702@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+In-Reply-To: <YzM/DFV1TgtyRfCA@x1n>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -104,51 +72,105 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 26, 2022, David Hildenbrand wrote:
-> On 26.09.22 16:48, Kirill A. Shutemov wrote:
-> > On Mon, Sep 26, 2022 at 12:35:34PM +0200, David Hildenbrand wrote:
-> > > When using DAX, what happens with the shared <->private conversion? Which
-> > > "type" is supposed to use dax, which not?
-> > > 
-> > > In other word, I'm missing too many details on the bigger picture of how
-> > > this would work at all to see why it makes sense right now to prepare for
-> > > that.
-> > 
-> > IIUC, KVM doesn't really care about pages or folios. They need PFN to
-> > populate SEPT. Returning page/folio would make KVM do additional steps to
-> > extract PFN and one more place to have a bug.
+Hi Peter and Marc,
+
+On 9/28/22 4:21 AM, Peter Xu wrote:
+> On Tue, Sep 27, 2022 at 01:32:07PM -0400, Marc Zyngier wrote:
+>> On Tue, 27 Sep 2022 12:02:52 -0400,
+>> Peter Xu <peterx@redhat.com> wrote:
+
+[...]
+
+>>>
+>>> Any decision made on how to tackle with the GIC status dirty bits?
+>>
+>> Which dirty bits? Are you talking of the per-RD pending bits?
 > 
-> Fair enough. Smells KVM specific, though.
+> Gavin found that some dirty pfn path may not have vcpu context for aarch64
+> offlist.
+> 
+> Borrowing Gavin's trace dump:
+> 
+>    el0t_64_sync
+>    el0t_64_sync_handler
+>    el0_svc
+>    do_el0_svc
+>    __arm64_sys_ioctl
+>    kvm_device_ioctl
+>    vgic_its_set_attr
+>    vgic_its_save_tables_v0
+>    kvm_write_guest
+>    __kvm_write_guest_page
+>    mark_page_dirty_in_slot
+> 
+> With current code it'll trigger the warning in mark_page_dirty_in_slot.
+> 
+> An userspace approach is doable by setting these pages as always dirty in
+> userspace (QEMU), but even if so IIUC we'll need to drop the warning
+> message in mark_page_dirty_in_slot() then we take no-vcpu dirty as no-op
+> and expected.
+> 
+> I'll leave the details to Gavin.
+> 
 
-TL;DR: I'm good with either approach, though providing a "struct page" might avoid
-       refactoring the API in the nearish future.
+Thanks to Peter for bringing the issue to here for further discussion. I'm
+slowly approaching the idea/design to resolve the issue. If Marc agrees, It
+wouldn't stop us to merge the series since the newly introduced capability
+is only used by kvm/selftests/dirty_log_test. It means more changes are needed
+by QEMU in order to enable the feature there through KVM_CAP_DIRTY_LOG_RING_ACQ_REL.
+I can post follow-up patches to fix the VGIC/ITS issue.
 
-Playing devil's advocate for a second, the counter argument is that KVM is the
-only user for the foreseeable future.
+We had some internal discussion about the mentioned issue. It's all about the
+various VGIC/ITS tables, listed as below. In QEMU, those tables are requested
+to be saved to memory for migration or shutdown. Unfortunately, there is no
+running vcpu in this particular path and the corresponding dirty bits are
+dropped with warning messages in mark_page_dirty_in_slot().
 
-That said, it might make sense to return a "struct page" from the core API and
-force KVM to do page_to_pfn().  KVM already does that for HVA-based memory, so
-it's not exactly new code.
+    ---> Command to save VGIC/ITS tables
+         group: KVM_DEV_ARM_VGIC_GRP_CTRL
+         attr : KVM_DEV_ARM_ITS_SAVE_TABLES
 
-More importantly, KVM may actually need/want the "struct page" in the not-too-distant
-future to support mapping non-refcounted "struct page" memory into the guest.  The
-ChromeOS folks have a use case involving virtio-gpu blobs where KVM can get handed a
-"struct page" that _isn't_ refcounted[*].  Once the lack of mmu_notifier integration
-is fixed, the remaining issue is that KVM doesn't currently have a way to determine
-whether or not it holds a reference to the page.  Instead, KVM assumes that if the
-page is "normal", it's refcounted, e.g. see kvm_release_pfn_clean().
+    ---> VGIC/ITS tables to be saved
+         Device Table                     // REG_GITS_BASER_0
+         Interrupt Translation Tables     // GITS_CMD_MAPD
+         Collection Table                 // REG_GITS_BASER_1
 
-KVM's current workaround for this is to refuse to map these pages into the guest,
-i.e. KVM simply forces its assumption that normal pages are refcounted to be true.
-To remove that workaround, the likely solution will be to pass around a tuple of
-page+pfn, where "page" is non-NULL if the pfn is a refcounted "struct page".
+    ---> QEMU's backtraces, triggering the issue
 
-At that point, getting handed a "struct page" from the core API would be a good
-thing as KVM wouldn't need to probe the PFN to determine whether or not it's a
-refcounted page.
+         main                                thread_start
+         qemu_main                           start_thread
+         qemu_cleanup                        qemu_thread_start
+         vm_shutdown                         migration_thread
+         do_vm_stop                          migration_iteration_run
+         vm_state_notify                     migration_completion
+         vm_change_state_handler             vm_stop_force_state
+                                             do_vm_stop
+                                             vm_state_notify
+                                             vm_change_state_handler          // In hw/intc/arm_gicv3_its_kvm.c
 
-Note, I still want the order to be provided by the API so that KVM doesn't need
-to run through a bunch of helpers to try and figure out the allowed mapping size.
+I have rough idea as below. It's appreciated if you can comment before I'm
+going a head for the prototype. The overall idea is to introduce another
+dirty ring for KVM (kvm-dirty-ring). It's updated and visited separately
+to dirty ring for vcpu (vcpu-dirty-ring).
 
-[*] https://lore.kernel.org/all/CAD=HUj736L5oxkzeL2JoPV8g1S6Rugy_TquW=PRt73YmFzP6Jw@mail.gmail.com
+    - When the various VGIC/ITS table base addresses are specified, kvm-dirty-ring
+      entries are added to mark those pages as 'always-dirty'. In mark_page_dirty_in_slot(),
+      those 'always-dirty' pages will be skipped, no entries pushed to vcpu-dirty-ring.
+
+    - Similar to vcpu-dirty-ring, kvm-dirty-ring is accessed from userspace through
+      mmap(kvm->fd). However, there won't have similar reset interface. It means
+      'struct kvm_dirty_gfn::flags' won't track any information as we do for
+      vcpu-dirty-ring. In this regard, kvm-dirty-ring is purely shared buffer to
+      advertise 'always-dirty' pages from host to userspace.
+      
+    - For QEMU, shutdown/suspend/resume cases won't be concerning us any more. The
+      only concerned case is migration. When the migration is about to complete,
+      kvm-dirty-ring entries are fetched and the dirty bits are updated to global
+      dirty page bitmap and RAMBlock's dirty page bitmap. For this, I'm still reading
+      the code to find the best spot to do it.
+
+Thanks,
+Gavin
+
+
 
