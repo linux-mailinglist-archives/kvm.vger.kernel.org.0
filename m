@@ -2,86 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 53B1B5EE11B
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 17:59:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E14695EE3B1
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 19:58:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234493AbiI1P70 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 11:59:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47490 "EHLO
+        id S234356AbiI1R6u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 13:58:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234494AbiI1P7D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 11:59:03 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C299797EDF
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 08:58:46 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id q9so12592215pgq.8
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 08:58:46 -0700 (PDT)
+        with ESMTP id S234586AbiI1R6h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 13:58:37 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0596E1003AE;
+        Wed, 28 Sep 2022 10:58:30 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id a29so13195544pfk.5;
+        Wed, 28 Sep 2022 10:58:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=L3QchRnIwNtjYNnJS8opK3mIqahWmFCOi7dCIaQNGpQ=;
-        b=RaKb42er+MjS42RMxVXedUMDvhhxKAIdOGmh/mFTePqClPo9pGhZyQdD9An6qSCOUQ
-         HQ3EQJ4FYjKsdBIH0zKQVFKYyE/5rZThQKY0FT+1YnmmRBgIkGVjMh4WPBA0tbA+VNBu
-         HV3JMXYCGrT5FjEYJjxO1w2Qp+ACW/7KJQpJ8/YCUtlAKJcY5/pea/dmNbm9p7NY3Vjt
-         JxarsJ1pHxv5WyfTd7qvVuSOVhSKW13GDDJsA6E1GMAejclyTZp0PW5DSUhDtf9lIg2D
-         TYAlpTqriEplL8CmzvuqxaP0R7CIG4Mkv0a2pxzB9j4ETVM6kT3LdUwiqPwvtiXh9Lov
-         tduQ==
+        bh=15MXwlGp8DHWOSHNdUEC95cxAZTsu8kuebEqCuCxfvs=;
+        b=k4lDfivKyIE5RxHPes2zmTkxu6/h25Yxz217JgbjYNB6e4MEUH1lxwXgyg74CVapUB
+         eOTJtaIZWcc1v7FTuj1gokeIjI2FWl/rZ6DoFxsaKNU7nFQzS00OiR0+yZwbPUCWsBaj
+         b+JZxUrCoq8dzHunvZIq+YVZ2LXwmNM4HX4R+YliCp8d6CrWFr+mXcW8b06VGtUCtwGG
+         nVcdxhIPjVjb4sgE2PCcvJzp6HC2HsTaYjpE9l0/ULxN2XcqDC8TgwP10buH/B4ikrjA
+         4jRvae9XAgnKfeDffS+86GSnYxtReOzleMKDTLHkiOBsbHnI8L322WlvANpaZ09B71W3
+         X61A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=L3QchRnIwNtjYNnJS8opK3mIqahWmFCOi7dCIaQNGpQ=;
-        b=0033Wo6UE/WUTIdsc7tWLr9VilbD2vWNvDiBWL6QKTmEG7vK4Bvh4SY+vNXk4HBnE+
-         E2Rukl6hA1g+ru9OlKKFpuGddaOwxaw7Uo7He69vJ1pmQDHCs86SG2gc4fN0jplh06hC
-         MTTD9NouRk64NBT7I30WVb2P2OPKXUe+/NMIvIUpMScZG4dJXN6nSaplWGuKnCzg2WXW
-         7xINq8oRDsqLmBTSgbNTaTzXrzrreeJCGrr0BeG+jBZeP1coPSi+i+5HTrSV0rDADzYj
-         ZN7kiehqnz8Qh1bgqomj1trZoG+SKQ8JkOzgRSBJ5LCtsfAI7mAqcaD5LGaZ1PHkVlpe
-         PZaA==
-X-Gm-Message-State: ACrzQf38QMIhG3oVLYxHNhBWhgDNN3OcKIyg/EYQaQ5y8XGYjiNHQSfT
-        GSBkLW8yuJQQoH9SoTYPUR70ItLXJBREbQ==
-X-Google-Smtp-Source: AMsMyM5SJmLnZCdCUJ8z8qBS6CbX5hvrwt1UHPHDFcOUfquiSbTmDTGbJJDQJKdCWHc/q7apaDcuAA==
-X-Received: by 2002:aa7:952f:0:b0:540:e8ee:a077 with SMTP id c15-20020aa7952f000000b00540e8eea077mr35369339pfp.34.1664380726165;
-        Wed, 28 Sep 2022 08:58:46 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id l2-20020a622502000000b00541206f9379sm4287727pfl.99.2022.09.28.08.58.45
+        bh=15MXwlGp8DHWOSHNdUEC95cxAZTsu8kuebEqCuCxfvs=;
+        b=2d5ye4aYvi2ANzcxqhG6zwfw/CcXtetNcFxNidu3mPtpGtP5QrET/zsQU/0LWXrl9q
+         +YSZK4Esz/pYYvZM6SWBMoRDT1xt9LuGfH90YUVautaVTDPf8wyC8OEBrq1HqhFPB1QM
+         Db5A93AyaeW4MknmF//MQ3VEbHg2S6RAwWeqOWUI0yQUHl4nFkZsr+mrLyy5uZOpP1OX
+         d9j48iydqwsRJ8Nw9kbvEHpmjQv5gStS6kwC0vKfP4af2s64Qz48TQtsXl06SyWpCvYs
+         ZFKmbR0pghb1YU9bJDxSgglzMaeH5JOrM1GWG8Lbe3iqiImuhzHeC3kPA5OljU1Vk4Od
+         9nKg==
+X-Gm-Message-State: ACrzQf1LMIV+7VD7+ysPlmfihoei2vTTiiWQ8FT61VMSDYSKEYLY7S3t
+        0IM/jDiTKO0HmsuGm1TH8VY=
+X-Google-Smtp-Source: AMsMyM4lk6YYwQmuzVsdQ5WpOvTn7X9yBjhJVuesFs56YgavUb5Uk4cEzAEU+5e6WH0IrJ5UFxn6FQ==
+X-Received: by 2002:a63:4143:0:b0:43a:20d4:a438 with SMTP id o64-20020a634143000000b0043a20d4a438mr30695194pga.452.1664387909512;
+        Wed, 28 Sep 2022 10:58:29 -0700 (PDT)
+Received: from localhost (c-73-164-155-12.hsd1.wa.comcast.net. [73.164.155.12])
+        by smtp.gmail.com with ESMTPSA id b66-20020a62cf45000000b0052d46b43006sm4349915pfg.156.2022.09.28.10.58.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 08:58:45 -0700 (PDT)
-Date:   Wed, 28 Sep 2022 15:58:41 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Like Xu <like.xu.linux@gmail.com>
-Subject: Re: [RFC PATCH 0/9] kvm: implement atomic memslot updates
-Message-ID: <YzRvMZDoukMbeaxR@google.com>
-References: <37b3162e-7b3a-919f-80e2-f96eca7d4b4c@redhat.com>
- <dfcbdf1d-b078-ec6c-7706-6af578f79ec2@redhat.com>
- <55d7f0bd-ace1-506b-ea5b-105a86290114@redhat.com>
- <f753391e-7bdc-bada-856a-87344e75bd74@redhat.com>
- <111a46c1-7082-62e3-4f3a-860a95cd560a@redhat.com>
- <14d5b8f2-7cb6-ce24-c7a7-32aa9117c953@redhat.com>
- <YzIZhn47brWBfQah@google.com>
- <3b04db9d-0177-7e6e-a54c-a28ada8b1d36@redhat.com>
- <YzMdjSkKaJ8HyWXh@google.com>
- <dd6db8c9-80b1-b6c5-29b8-5eced48f1303@redhat.com>
+        Wed, 28 Sep 2022 10:58:28 -0700 (PDT)
+Date:   Tue, 27 Sep 2022 10:36:20 +0000
+From:   Bobby Eshleman <bobbyeshleman@gmail.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Junichi Uekawa <uekawa@chromium.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
+        netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        Bobby Eshleman <bobby.eshleman@gmail.com>
+Subject: Re: [PATCH] vhost/vsock: Use kvmalloc/kvfree for larger packets.
+Message-ID: <YzLSJLq0gTpqPwoY@bullseye>
+References: <20220928064538.667678-1-uekawa@chromium.org>
+ <20220928082823.wyxplop5wtpuurwo@sgarzare-redhat>
+ <20220928052738-mutt-send-email-mst@kernel.org>
+ <20220928151135.pvrlsylg6j3hzh74@sgarzare-redhat>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <dd6db8c9-80b1-b6c5-29b8-5eced48f1303@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+In-Reply-To: <20220928151135.pvrlsylg6j3hzh74@sgarzare-redhat>
+X-Spam-Status: No, score=-0.8 required=5.0 tests=BAYES_00,DATE_IN_PAST_24_48,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -89,67 +79,101 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 28, 2022, Paolo Bonzini wrote:
-> On 9/27/22 17:58, Sean Christopherson wrote:
-> > I'm pretty sure this patch will Just Work for QEMU, because QEMU simply resumes
-> > the vCPU if mmio.len==0.  It's a bit of a hack, but I don't think it violates KVM's
-> > ABI in any way, and it can even become "official" behavior since KVM x86 doesn't
-> > otherwise exit with mmio.len==0.
+On Wed, Sep 28, 2022 at 05:11:35PM +0200, Stefano Garzarella wrote:
+> On Wed, Sep 28, 2022 at 05:31:58AM -0400, Michael S. Tsirkin wrote:
+> > On Wed, Sep 28, 2022 at 10:28:23AM +0200, Stefano Garzarella wrote:
+> > > On Wed, Sep 28, 2022 at 03:45:38PM +0900, Junichi Uekawa wrote:
+> > > > When copying a large file over sftp over vsock, data size is usually 32kB,
+> > > > and kmalloc seems to fail to try to allocate 32 32kB regions.
+> > > >
+> > > > Call Trace:
+> > > >  [<ffffffffb6a0df64>] dump_stack+0x97/0xdb
+> > > >  [<ffffffffb68d6aed>] warn_alloc_failed+0x10f/0x138
+> > > >  [<ffffffffb68d868a>] ? __alloc_pages_direct_compact+0x38/0xc8
+> > > >  [<ffffffffb664619f>] __alloc_pages_nodemask+0x84c/0x90d
+> > > >  [<ffffffffb6646e56>] alloc_kmem_pages+0x17/0x19
+> > > >  [<ffffffffb6653a26>] kmalloc_order_trace+0x2b/0xdb
+> > > >  [<ffffffffb66682f3>] __kmalloc+0x177/0x1f7
+> > > >  [<ffffffffb66e0d94>] ? copy_from_iter+0x8d/0x31d
+> > > >  [<ffffffffc0689ab7>] vhost_vsock_handle_tx_kick+0x1fa/0x301 [vhost_vsock]
+> > > >  [<ffffffffc06828d9>] vhost_worker+0xf7/0x157 [vhost]
+> > > >  [<ffffffffb683ddce>] kthread+0xfd/0x105
+> > > >  [<ffffffffc06827e2>] ? vhost_dev_set_owner+0x22e/0x22e [vhost]
+> > > >  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
+> > > >  [<ffffffffb6eb332e>] ret_from_fork+0x4e/0x80
+> > > >  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
+> > > >
+> > > > Work around by doing kvmalloc instead.
+> > > >
+> > > > Signed-off-by: Junichi Uekawa <uekawa@chromium.org>
+> > 
+> > My worry here is that this in more of a work around.
+> > It would be better to not allocate memory so aggressively:
+> > if we are so short on memory we should probably process
+> > packets one at a time. Is that very hard to implement?
 > 
-> I think this patch is not a good idea for two reasons:
+> Currently the "virtio_vsock_pkt" is allocated in the "handle_kick" callback
+> of TX virtqueue. Then the packet is multiplexed on the right socket queue,
+> then the user space can de-queue it whenever they want.
 > 
-> 1) we don't know how userspace behaves if mmio.len is zero.  It is of course
-> reasonable to do nothing, but an assertion failure is also a valid behavior
-
-Except that KVM currently does neither.  If the fetch happens at CPL>0 and/or in
-L2, KVM injects #UD.  That's flat out architecturally invalid.  If it's a sticking
-point, the mmio.len==0 hack can be avoided by defining a new exit reason.
-
-> 2) more important, there is no way to distinguish a failure due to the guest
-> going in the weeds (and then KVM_EXIT_INTERNAL_ERROR is fine) from one due
-> to the KVM_SET_USER_MEMORY_REGION race condition.  So this will cause a
-> guest that correctly caused an internal error to loop forever.
-
-Userspace has the GPA and absolutely should be able to detect if the MMIO may have
-been due to its memslot manipulation versus the guest jumping into the weeds.
-
-> While the former could be handled in a "wait and see" manner, the latter in
-> particular is part of the KVM_RUN contract.  Of course it is possible for a
-> guest to just loop forever, but in general all of KVM, QEMU and upper
-> userspace layers want a crashed guest to be detected and stopped forever.
+> So maybe we can stop processing the virtqueue if we are short on memory, but
+> when can we restart the TX virtqueue processing?
 > 
-> Yes, QEMU could loop only if memslot updates are in progress, but honestly
-> all the alternatives I have seen to atomic memslot updates are really
-> *awful*.  David's patches even invent a new kind of mutex for which I have
-> absolutely no idea what kind of deadlocks one should worry about and why
-> they should not exist; QEMU's locking is already pretty crappy, it's
-> certainly not on my wishlist to make it worse!
+> I think as long as the guest used only 4K buffers we had no problem, but now
+> that it can create larger buffers the host may not be able to allocate it
+> contiguously. Since there is no need to have them contiguous here, I think
+> this patch is okay.
 > 
-> This is clearly a deficiency in the KVM kernel API, and (thanks to SRCU) the
-> kernel is the only place where you can have a *good* fix.  It should have
-> been fixed years ago.
+> However, if we switch to sk_buff (as Bobby is already doing), maybe we don't
+> have this problem because I think there is some kind of pre-allocated pool.
+> 
+> > 
+> > 
+> > 
+> > > > ---
+> > > >
+> > > > drivers/vhost/vsock.c                   | 2 +-
+> > > > net/vmw_vsock/virtio_transport_common.c | 2 +-
+> > > > 2 files changed, 2 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > > > index 368330417bde..5703775af129 100644
+> > > > --- a/drivers/vhost/vsock.c
+> > > > +++ b/drivers/vhost/vsock.c
+> > > > @@ -393,7 +393,7 @@ vhost_vsock_alloc_pkt(struct vhost_virtqueue *vq,
+> > > > 		return NULL;
+> > > > 	}
+> > > >
+> > > > -	pkt->buf = kmalloc(pkt->len, GFP_KERNEL);
+> > > > +	pkt->buf = kvmalloc(pkt->len, GFP_KERNEL);
+> > > > 	if (!pkt->buf) {
+> > > > 		kfree(pkt);
+> > > > 		return NULL;
+> > > > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > > > index ec2c2afbf0d0..3a12aee33e92 100644
+> > > > --- a/net/vmw_vsock/virtio_transport_common.c
+> > > > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > > > @@ -1342,7 +1342,7 @@ EXPORT_SYMBOL_GPL(virtio_transport_recv_pkt);
+> > > >
+> > > > void virtio_transport_free_pkt(struct virtio_vsock_pkt *pkt)
+> > > > {
+> > > > -	kfree(pkt->buf);
+> > > > +	kvfree(pkt->buf);
+> > > 
+> > > virtio_transport_free_pkt() is used also in virtio_transport.c and
+> > > vsock_loopback.c where pkt->buf is allocated with kmalloc(), but IIUC
+> > > kvfree() can be used with that memory, so this should be fine.
+> > > 
+> > > > 	kfree(pkt);
+> > > > }
+> > > > EXPORT_SYMBOL_GPL(virtio_transport_free_pkt);
+> > > > --
+> > > > 2.37.3.998.g577e59143f-goog
+> > > >
+> > > 
+> > > This issue should go away with the Bobby's work about introducing sk_buff
+> > > [1], but we can queue this for now.
+> > > 
 
-I don't disagree that the memslots API is lacking, but IMO that is somewhat
-orthogonal to fixing KVM x86's "code fetch to MMIO" mess.  Such a massive new API
-should be viewed and prioritized as a new feature, not as a bug fix, e.g. I'd
-like to have the luxury of being able to explore ideas beyond "let userspace
-batch memslot updates", and I really don't want to feel pressured to get this
-code reviewed and merge.
-
-E.g. why do a batch update and not provide KVM_SET_ALL_USER_MEMORY_REGIONS to
-do wholesale replacement?  That seems like it would be vastly simpler to handle
-on KVM's end.  Or maybe there's a solution in the opposite direction, e.g. an
-API that allows 1->N or N->1 conversions but not arbitrary batching.
-
-And just because QEMU's locking is "already pretty crappy", that's not a good
-reason to drag KVM down into the mud.  E.g. taking a lock and conditionally
-releasing it...  I get that this is an RFC, but IMO anything that requires such
-shenanigans simply isn't acceptable.
-
-  /*
-   * Takes kvm->slots_arch_lock, and releases it only if
-   * invalid_slot allocation, kvm_prepare_memory_region failed
-   * or batch->is_move_delete is true.
-   */
-  static int kvm_prepare_memslot(struct kvm *kvm,
-			         struct kvm_internal_memory_region_list *batch)
+I also expect the sk_buff allocator can handle this. I've tested the
+sk_buff patch with 64K payloads via uperf without issue.
