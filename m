@@ -2,64 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21AF85EE9C9
-	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 00:58:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 729875EE9D9
+	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 01:05:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229951AbiI1W6L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 18:58:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55852 "EHLO
+        id S232827AbiI1XFg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 19:05:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbiI1W6C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 18:58:02 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 129FE1176FB
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 15:58:01 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id i15-20020a17090a4b8f00b0020073b4ac27so2893046pjh.3
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 15:58:01 -0700 (PDT)
+        with ESMTP id S229486AbiI1XFe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 19:05:34 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 365BA11C26
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 16:05:33 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id c24so12969855plo.3
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 16:05:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=BZ6EQG6wD8sUmqPjitqmyu++W/RGy6iplNgWMvWzXf4=;
-        b=m8zYfoNhV+in4y+BB1K0qwova98LPDFEuSyKTkHcvcsG+AZDWkWEZ6S57LiVlgW3Bb
-         T4ICo9b5NEuGfEu0UeZNTv791NwRREykFZh6sJ9UKIrwOguS9NUge3VLupvuNTVWZKAo
-         OT9jhqycUIVpxw8bPJMHAy7u/wICUvwI0pY4Lm7EkNRlEapWQYtmrpkjvVR56eoLEM/Z
-         iiz6GbqZKXxohLx0tybkYILFxHfPzZGq7SKBcsRlpVIUuPWGNu20ZnrA4Rodr9x2mqyM
-         ejlnjaK9ELGp4XMvIWSXA+TddvCgULpbgtQAhD6kEUbwo7kGxG+d2ctGGMdU2F3NsiFs
-         SFqQ==
+        bh=PAmyKBlgjtbvtqhVxXHx2ejMGzjNRJ+Srms5+P+ez64=;
+        b=DKwecanPirQPKezM3JUZXVruK+2m/GK9uMx0vqcCuSKCTTJmFBrkaAZ9T0tlg+T4ZF
+         oQXWRzqs0ArkQ/CirhQV9zXks0YSjINnPFWsYKq4k5nHhxf4qCVj+JwcSUOUQCojKPxL
+         AuQtpFX8q3L91jdd6FeHYvLKiiSokP2f87P1T7OMC5+wNmV3mBdxDMrEjLPds+5dcP4h
+         FPFl9p5AS68AbIFWNHS4rQVoQiVp/IAX76cgVhj+fySATYBdGdnHrB7iWzeLe+g0fMzt
+         DN8eO45YSiiSO7SrIvjjplWrFdi+PuzpyeEtcCRpAcDL8sYDDZrLW6ZQttuju8dTmtea
+         6upA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=BZ6EQG6wD8sUmqPjitqmyu++W/RGy6iplNgWMvWzXf4=;
-        b=2Kwi5qqLbu+qqvXHGFnhZYihcabIOP+yRW1zHqPasuyJvwitKFh0lIxmd9KcCdDyj3
-         XhvXcX/0vF1zePBz5Yyv26/ff8k/bouW80DCiXs1JtKDfnIrSjW5+BKLWgZv3Da0fTxZ
-         NObxv7WDxLzpHMaLUgDVA1596AYYzeoZ61+pLQ+M7msaiOLgAHghxeCUtWr7AxRw6Ata
-         lF1ETcd3NtG6LRAa54hOtfKZRoN4BwJ4PiKEBNPtY2kHSYPmaJoKPqXjXp9nxCI6oaxJ
-         /QyW1p0FtYXTx2BNOn/iPuqqHxyo3RsjQWlcZBiXIsdcMB0N0wH3MQyrJ7eRYQscRMOK
-         y4pA==
-X-Gm-Message-State: ACrzQf1R7Oytkr7XalWTaWqaRmTJpibfEsbYRjhW6vnzN4NMJUsn/KqP
-        8o1PscYWCfe+Gz4AZ44WaTU/Zw==
-X-Google-Smtp-Source: AMsMyM50vr7dDI1WPdLVgFzg3nj8pnYSmxQzT6iGC/3ufmpUBDcKA3S/EHWDofnmi5XyJErO4Dt2rg==
-X-Received: by 2002:a17:90b:1b07:b0:203:5860:b441 with SMTP id nu7-20020a17090b1b0700b002035860b441mr12786559pjb.103.1664405880517;
-        Wed, 28 Sep 2022 15:58:00 -0700 (PDT)
+        bh=PAmyKBlgjtbvtqhVxXHx2ejMGzjNRJ+Srms5+P+ez64=;
+        b=ItrVEIZ35H7kGwH1b3jQ6Ikda3REjP1pil4XfHobUQa/91w0k/+9LUpeNaBuzH8QOQ
+         CLfwUw+2nDKPjQtqa0nyJsXfJdzDQClVCHsNAr82jdM71Dii+cgyB4ERImoadDYlIgl6
+         jlil+ves8PcilCVljEuc19pqGcx2G4Zcf5D971QJvtdT2a2mCDqWbaFJ4OIOJQCPcUR0
+         lGpNfHm/VJ4iqr4Fk6jgP1b7qzY1LYcYnFuSaMWp7jonj+ElT2z1x1DhmJLzGGhDfqQE
+         Hpu2KYVtKrsKiIZGVycMBZLyJ76jvO2/H9fUSsoNiubyvaL1n3cWkfyps+H1bz3QhfeS
+         X2Ng==
+X-Gm-Message-State: ACrzQf3NEmOj/uvWX0YcWCAImz5sHrZSe+gMqKjWvkCx9xFCq9mWUZP4
+        z/wZPezzwGb9/Tmzr90njPjPc/yUVZHfaQ==
+X-Google-Smtp-Source: AMsMyM7mVBjUViDKxT1spfFBekYzPo0peBmP6JK8BMtco2twxx71XTEXbyqSX07T43HGN2Z4b2DR2Q==
+X-Received: by 2002:a17:90a:7088:b0:200:4e9f:a206 with SMTP id g8-20020a17090a708800b002004e9fa206mr12559534pjk.173.1664406332642;
+        Wed, 28 Sep 2022 16:05:32 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id g1-20020aa796a1000000b00537eb00850asm4568823pfk.130.2022.09.28.15.58.00
+        by smtp.gmail.com with ESMTPSA id c13-20020a170902d48d00b001782751833bsm4329897plg.223.2022.09.28.16.05.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 15:58:00 -0700 (PDT)
-Date:   Wed, 28 Sep 2022 22:57:56 +0000
+        Wed, 28 Sep 2022 16:05:32 -0700 (PDT)
+Date:   Wed, 28 Sep 2022 23:05:28 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: selftests: Skip tests that require EPT when it
- is not available
-Message-ID: <YzTRdBI7WmEVdJ6d@google.com>
-References: <20220927165209.930904-1-dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org,
+        Andrew Jones <andrew.jones@linux.dev>,
+        Colton Lewis <coltonlewis@google.com>,
+        Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH 2/2] KVM: selftests: Rename perf_test_util symbols to
+ memstress
+Message-ID: <YzTTOEOkrkSqGcMQ@google.com>
+References: <20220919232300.1562683-1-dmatlack@google.com>
+ <20220919232300.1562683-3-dmatlack@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220927165209.930904-1-dmatlack@google.com>
+In-Reply-To: <20220919232300.1562683-3-dmatlack@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -71,19 +75,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 27, 2022, David Matlack wrote:
-> Skip selftests that require EPT support in the VM when it is not
-> available. For example, if running on a machine where kvm_intel.ept=N
-> since KVM does not offer EPT support to guests if EPT is not supported
-> on the host.
-> 
-> Specifically, this commit causes vmx_dirty_log_test and
-> dirty_log_perf_test -n to be skipped instead of failing on hosts where
-> kvm_intel.ept=N.
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
+On Mon, Sep 19, 2022, David Matlack wrote:
+> @@ -42,10 +42,10 @@ static struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
+>   * Continuously write to the first 8 bytes of each page in the
+>   * specified region.
+>   */
+> -void perf_test_guest_code(uint32_t vcpu_idx)
+> +void memstress_guest_code(uint32_t vcpu_idx)
+>  {
+> -	struct perf_test_args *pta = &perf_test_args;
+> -	struct perf_test_vcpu_args *vcpu_args = &pta->vcpu_args[vcpu_idx];
+> +	struct memstress_args *ma = &memstress_args;
 
-Need to sync with Paolo on who is grabbing what.  In case it's Paolo...
-
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+As a prep patch, what about renaming pta=>args?  I always struggle to remember
+what "pta" means, and "ma" isn't any better.  And that would give some amount
+of alignment between "args" and "vcpu_args".  At a glance, I don't think using a
+generic name like that will be problematic.
