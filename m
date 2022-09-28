@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 610E65EE67F
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 22:17:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 230745EE682
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 22:17:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233770AbiI1URV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 16:17:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57204 "EHLO
+        id S234105AbiI1URY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 16:17:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231301AbiI1URT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 16:17:19 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB9466C115;
-        Wed, 28 Sep 2022 13:17:18 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28SIi3cp020618;
-        Wed, 28 Sep 2022 20:17:18 GMT
+        with ESMTP id S232974AbiI1URU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 16:17:20 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CDA46CD17;
+        Wed, 28 Sep 2022 13:17:19 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28SJJO6n028529;
+        Wed, 28 Sep 2022 20:17:19 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=pG1ghc692U9Q8xE03Gx97GPYR3yPEjzveHJEZlWmu8c=;
- b=SNl129ihOhzZ9CZQ5KduoOzRfifavftOyCZcK3TXzcp/zxeio9VKQ9DV4UpzHLTIfKbe
- CG25oNIavUOH1ZIQg9LAi7qLZtLiN4YQ1UnPXe01xNirCr4dH8UYund04klLbpY88i0R
- WYzCK7B5HA8M1hSRZIZ8l+ZWgHA+aSQWfwcTpeRXWcTKX6VNXh42KuFuCRWSluthM4zb
- HXfgzwdYVWKxWGg4KXgMO9SvaqlxsDf32JsM/iUrj0jN4HeO/foWR0ZWzGZI0E0FIab9
- NeRSRSDLUf5sOqTH1Fhp04BPa2GOGNZU0EhLEVfgHcDYRobxffVo41AShbSGWX42rV4v ww== 
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=6ilPBsDmmmAZ5wH2HdGyXYTpM3v9Gp6nE17EHipub1c=;
+ b=PAVCiDqyeNcSBYAw+fKqKKs848Da1BKfOOlGZd/Rp9NPGBL0Pta7yCr+dqzd1cDpXVG5
+ nIl1mFev0G87oKMM/Rn1MmzQAzpznzw5KbtTRPQejVEsXW7L/lWLMgs28/SMYbojWQJb
+ oeQXVK+nQHmSDgmYEVL5QOgtjGClxvMbTP7wrDP/8HVVV+wrcqZcxDHsFi91r5vLqSag
+ EMeVp1IoH0+/CdVOipF/I0pUdhDGdV8fcslVDIAbyNjMzJ/JXHswcSGoMmKlQsrqVckP
+ lmnhLpSWmbMdjVFg8ihWFFApLU7vG6yWZq5f0LIORDSWFf8fLULjEg+biholSVGvx54x hQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3jvq2nmq1r-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jvqhhuu2a-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Sep 2022 20:17:17 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28SJR79U009946;
-        Wed, 28 Sep 2022 20:17:17 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3jvq2nmq11-1
+        Wed, 28 Sep 2022 20:17:18 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28SJuOod018447;
+        Wed, 28 Sep 2022 20:17:18 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jvqhhuu1e-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Sep 2022 20:17:17 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 28SK6u1V020292;
-        Wed, 28 Sep 2022 20:17:15 GMT
+        Wed, 28 Sep 2022 20:17:18 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 28SK5cR6026235;
+        Wed, 28 Sep 2022 20:17:16 GMT
 Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03fra.de.ibm.com with ESMTP id 3jssh948gg-1
+        by ppma04ams.nl.ibm.com with ESMTP id 3juapukb5p-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Wed, 28 Sep 2022 20:17:15 +0000
 Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 28SKHCJE5309130
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 28SKHCmQ5309132
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Wed, 28 Sep 2022 20:17:12 GMT
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 572F0A404D;
+        by IMSVA (Postfix) with ESMTP id C87E5A404D;
         Wed, 28 Sep 2022 20:17:12 +0000 (GMT)
 Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1669AA4040;
+        by IMSVA (Postfix) with ESMTP id 7FB7DA4040;
         Wed, 28 Sep 2022 20:17:12 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
         by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
@@ -59,28 +60,30 @@ Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
 From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
 To:     Thomas Huth <thuth@redhat.com>,
         Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
 Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
+        Nico Boehr <nrb@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v7 0/2] Add specification exception tests
-Date:   Wed, 28 Sep 2022 22:17:08 +0200
-Message-Id: <20220928201710.3185449-1-scgl@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v7 1/2] s390x: Add specification exception test
+Date:   Wed, 28 Sep 2022 22:17:09 +0200
+Message-Id: <20220928201710.3185449-2-scgl@linux.ibm.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220928201710.3185449-1-scgl@linux.ibm.com>
+References: <20220928201710.3185449-1-scgl@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 3fTC2ayBeMBjy7yGgkLaotTBQuwcemhJ
-X-Proofpoint-GUID: I3povTG3MmhWHn1JB414HQwWAvw4yyDc
+X-Proofpoint-GUID: sculXaSMRCCvzDf29df0uflwUoPWfEYg
+X-Proofpoint-ORIG-GUID: Bd00Ubqlv5iXMidHIm8ofcmr9R6PcTcE
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
  definitions=2022-09-28_09,2022-09-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- spamscore=0 impostorscore=0 lowpriorityscore=0 phishscore=0 mlxscore=0
- mlxlogscore=999 adultscore=0 bulkscore=0 priorityscore=1501 clxscore=1011
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
- definitions=main-2209280120
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
+ adultscore=0 spamscore=0 mlxlogscore=999 priorityscore=1501
+ lowpriorityscore=0 suspectscore=0 malwarescore=0 phishscore=0
+ clxscore=1015 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2209280120
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
@@ -90,170 +93,270 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test that specification exceptions cause the correct interruption code
-during both normal and transactional execution.
+Generate specification exceptions and check that they occur.
 
-TCG fails the tests setting an invalid PSW bit.
-I had a look at how best to fix it, but where best to check for early
-PSW exceptions was not immediately clear to me. Ideas welcome.
-
-v6 -> v7
-	assert that we're expecting the invalid PSW we're seeing
-	rebased onto master
-	picked up tags (thanks Nico & Janosch)
-	comments and style changes
-
-v5 -> v6
-	rebased onto master
-	comments and style changes
-
-v4 -> v5
-	add lpsw with invalid bit 12 test
-		TCG fails as with lpswe but must also invert bit 12
-	update copyright statement
-	add comments
-	cleanups and style fixes
-
-v3 -> v4
-	remove iterations argument in order to simplify the code
-		for manual performance testing adding a for loop is easy
-	move report out of fixup_invalid_psw
-	simplify/improve readability of triggers
-	use positive error values
-
-v2 -> v3
-	remove non-ascii symbol
-	clean up load_psw
-	fix nits
-
-v1 -> v2
-	Add license and test description
-	Split test patch into normal test and transactional execution test
-	Add comments to
-		invalid PSW fixup function
-		with_transaction
-	Rename some variables/functions
-	Pass mask as single parameter to asm
-	Get rid of report_info_if macro
-	Introduce report_pass/fail and use them
-
-Janis Schoetterl-Glausch (2):
-  s390x: Add specification exception test
-  s390x: Test specification exceptions during transaction
-
+Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+---
  s390x/Makefile           |   1 +
- lib/s390x/asm/arch_def.h |   6 +
- s390x/spec_ex.c          | 392 +++++++++++++++++++++++++++++++++++++++
+ lib/s390x/asm/arch_def.h |   5 +
+ s390x/spec_ex.c          | 203 +++++++++++++++++++++++++++++++++++++++
  s390x/unittests.cfg      |   3 +
- 4 files changed, 402 insertions(+)
+ 4 files changed, 212 insertions(+)
  create mode 100644 s390x/spec_ex.c
 
-Range-diff against v6:
-1:  bbfb5d40 ! 1:  a239437a s390x: Add specification exception test
-    @@ Commit message
-         Generate specification exceptions and check that they occur.
-     
-         Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-    +    Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
-    +    Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-     
-      ## s390x/Makefile ##
-     @@ s390x/Makefile: tests += $(TEST_DIR)/uv-host.elf
-    @@ s390x/spec_ex.c (new)
-     + */
-     +static void fixup_invalid_psw(struct stack_frame_int *stack)
-     +{
-    ++	assert_msg(invalid_psw_expected,
-    ++		   "Unexpected invalid PSW during program interrupt fixup: %#lx %#lx",
-    ++		   lowcore.pgm_old_psw.mask, lowcore.pgm_old_psw.addr);
-     +	/* signal occurrence of invalid psw fixup */
-     +	invalid_psw_expected = false;
-     +	invalid_psw = lowcore.pgm_old_psw;
-    @@ s390x/spec_ex.c (new)
-     +	uint64_t scratch;
-     +
-     +	/*
-    -+	 * The fixup psw is current psw with the instruction address replaced by
-    -+	 * the address of the nop following the instruction loading the new psw.
-    ++	 * The fixup psw is the current psw with the instruction address replaced
-    ++	 * by the address of the nop following the instruction loading the new psw.
-     +	 */
-     +	fixup_psw.mask = extract_psw_mask();
-     +	asm volatile ( "larl	%[scratch],0f\n"
-    @@ s390x/spec_ex.c (new)
-     +
-     +static int check_invalid_psw(void)
-     +{
-    ++	/* Since the fixup sets this to false we check for false here. */
-     +	if (!invalid_psw_expected) {
-     +		if (expected_psw.mask == invalid_psw.mask &&
-     +		    expected_psw.addr == invalid_psw.addr)
-    @@ s390x/spec_ex.c (new)
-     +/* A short PSW needs to have bit 12 set to be valid. */
-     +static int short_psw_bit_12_is_0(void)
-     +{
-    ++	struct psw invalid = {
-    ++		.mask = BIT(63 - 12),
-    ++		.addr = 0x00000000deadbeee
-    ++	};
-     +	struct short_psw short_invalid = {
-     +		.mask = 0x0,
-     +		.addr = 0xdeadbeee
-     +	};
-     +
-    ++	expect_invalid_psw(invalid);
-    ++	load_short_psw(short_invalid);
-     +	/*
-     +	 * lpsw may optionally check bit 12 before loading the new psw
-     +	 * -> cannot check the expected invalid psw like with lpswe
-     +	 */
-    -+	load_short_psw(short_invalid);
-     +	return 0;
-     +}
-     +
-2:  0f19be7d ! 2:  697409f7 s390x: Test specification exceptions during transaction
-    @@ Commit message
-         Check that we see the expected code for (some) specification exceptions.
-     
-         Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-    +    Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
-    +    Acked-by: Janosch Frank <frankja@linux.ibm.com>
-     
-      ## lib/s390x/asm/arch_def.h ##
-     @@ lib/s390x/asm/arch_def.h: struct cpu {
-    @@ s390x/spec_ex.c: static int not_even(void)
-      /*
-       * Harness for specification exception testing.
-       * func only triggers exception, reporting is taken care of automatically.
-    -+ * If a trigger is transactable it will also  be executed during a transaction.
-    ++ * If a trigger is transactable it will also be executed during a transaction.
-       */
-      struct spec_ex_trigger {
-      	const char *name;
-    @@ s390x/spec_ex.c: static void test_spec_ex(const struct spec_ex_trigger *trigger)
-     +#define TRANSACTION_MAX_RETRIES 5
-     +
-     +/*
-    -+ * NULL must be passed to __builtin_tbegin via constant, forbid diagnose from
-    -+ * being NULL to keep things simple
-    ++ * NULL must not be passed to __builtin_tbegin via variable, only constant,
-    ++ * forbid diagnose from being NULL at all to keep things simple
-     + */
-     +static int __attribute__((nonnull))
-     +with_transaction(int (*trigger)(void), struct __htm_tdb *diagnose)
-    @@ s390x/spec_ex.c: static void test_spec_ex(const struct spec_ex_trigger *trigger)
-     +
-     +static void test_spec_ex_trans(struct args *args, const struct spec_ex_trigger *trigger)
-     +{
-    -+	const uint16_t expected_pgm = PGM_INT_CODE_SPECIFICATION
-    -+				      | PGM_INT_CODE_TX_ABORTED_EVENT;
-    ++	const uint16_t expected_pgm = PGM_INT_CODE_SPECIFICATION |
-    ++				      PGM_INT_CODE_TX_ABORTED_EVENT;
-     +	union {
-     +		struct __htm_tdb tdb;
-     +		uint64_t dwords[sizeof(struct __htm_tdb) / sizeof(uint64_t)];
-
-base-commit: d8a4f9e5e8d69d4ef257b40d6cd666bd2f63494e
+diff --git a/s390x/Makefile b/s390x/Makefile
+index 649486f2..6acb7b16 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -27,6 +27,7 @@ tests += $(TEST_DIR)/uv-host.elf
+ tests += $(TEST_DIR)/edat.elf
+ tests += $(TEST_DIR)/mvpg-sie.elf
+ tests += $(TEST_DIR)/spec_ex-sie.elf
++tests += $(TEST_DIR)/spec_ex.elf
+ tests += $(TEST_DIR)/firq.elf
+ tests += $(TEST_DIR)/epsw.elf
+ tests += $(TEST_DIR)/adtl-status.elf
+diff --git a/lib/s390x/asm/arch_def.h b/lib/s390x/asm/arch_def.h
+index b92291e8..aca3af8e 100644
+--- a/lib/s390x/asm/arch_def.h
++++ b/lib/s390x/asm/arch_def.h
+@@ -41,6 +41,11 @@ struct psw {
+ 	uint64_t	addr;
+ };
+ 
++struct short_psw {
++	uint32_t	mask;
++	uint32_t	addr;
++};
++
+ struct cpu {
+ 	struct lowcore *lowcore;
+ 	uint64_t *stack;
+diff --git a/s390x/spec_ex.c b/s390x/spec_ex.c
+new file mode 100644
+index 00000000..2d4adb8c
+--- /dev/null
++++ b/s390x/spec_ex.c
+@@ -0,0 +1,203 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright IBM Corp. 2021, 2022
++ *
++ * Specification exception test.
++ * Tests that specification exceptions occur when expected.
++ *
++ * Can be extended by adding triggers to spec_ex_triggers, see comments below.
++ */
++#include <stdlib.h>
++#include <libcflat.h>
++#include <bitops.h>
++#include <asm/interrupt.h>
++
++/* toggled to signal occurrence of invalid psw fixup */
++static bool invalid_psw_expected;
++static struct psw expected_psw;
++static struct psw invalid_psw;
++static struct psw fixup_psw;
++
++/*
++ * The standard program exception handler cannot deal with invalid old PSWs,
++ * especially not invalid instruction addresses, as in that case one cannot
++ * find the instruction following the faulting one from the old PSW.
++ * The PSW to return to is set by load_psw.
++ */
++static void fixup_invalid_psw(struct stack_frame_int *stack)
++{
++	assert_msg(invalid_psw_expected,
++		   "Unexpected invalid PSW during program interrupt fixup: %#lx %#lx",
++		   lowcore.pgm_old_psw.mask, lowcore.pgm_old_psw.addr);
++	/* signal occurrence of invalid psw fixup */
++	invalid_psw_expected = false;
++	invalid_psw = lowcore.pgm_old_psw;
++	lowcore.pgm_old_psw = fixup_psw;
++}
++
++/*
++ * Load possibly invalid psw, but setup fixup_psw before,
++ * so that fixup_invalid_psw() can bring us back onto the right track.
++ * Also acts as compiler barrier, -> none required in expect/check_invalid_psw
++ */
++static void load_psw(struct psw psw)
++{
++	uint64_t scratch;
++
++	/*
++	 * The fixup psw is the current psw with the instruction address replaced
++	 * by the address of the nop following the instruction loading the new psw.
++	 */
++	fixup_psw.mask = extract_psw_mask();
++	asm volatile ( "larl	%[scratch],0f\n"
++		"	stg	%[scratch],%[fixup_addr]\n"
++		"	lpswe	%[psw]\n"
++		"0:	nop\n"
++		: [scratch] "=&d" (scratch),
++		  [fixup_addr] "=&T" (fixup_psw.addr)
++		: [psw] "Q" (psw)
++		: "cc", "memory"
++	);
++}
++
++static void load_short_psw(struct short_psw psw)
++{
++	uint64_t scratch;
++
++	fixup_psw.mask = extract_psw_mask();
++	asm volatile ( "larl	%[scratch],0f\n"
++		"	stg	%[scratch],%[fixup_addr]\n"
++		"	lpsw	%[psw]\n"
++		"0:	nop\n"
++		: [scratch] "=&d" (scratch),
++		  [fixup_addr] "=&T" (fixup_psw.addr)
++		: [psw] "Q" (psw)
++		: "cc", "memory"
++	);
++}
++
++static void expect_invalid_psw(struct psw psw)
++{
++	expected_psw = psw;
++	invalid_psw_expected = true;
++}
++
++static int check_invalid_psw(void)
++{
++	/* Since the fixup sets this to false we check for false here. */
++	if (!invalid_psw_expected) {
++		if (expected_psw.mask == invalid_psw.mask &&
++		    expected_psw.addr == invalid_psw.addr)
++			return 0;
++		report_fail("Wrong invalid PSW");
++	} else {
++		report_fail("Expected exception due to invalid PSW");
++	}
++	return 1;
++}
++
++/* For normal PSWs bit 12 has to be 0 to be a valid PSW*/
++static int psw_bit_12_is_1(void)
++{
++	struct psw invalid = {
++		.mask = BIT(63 - 12),
++		.addr = 0x00000000deadbeee
++	};
++
++	expect_invalid_psw(invalid);
++	load_psw(invalid);
++	return check_invalid_psw();
++}
++
++/* A short PSW needs to have bit 12 set to be valid. */
++static int short_psw_bit_12_is_0(void)
++{
++	struct psw invalid = {
++		.mask = BIT(63 - 12),
++		.addr = 0x00000000deadbeee
++	};
++	struct short_psw short_invalid = {
++		.mask = 0x0,
++		.addr = 0xdeadbeee
++	};
++
++	expect_invalid_psw(invalid);
++	load_short_psw(short_invalid);
++	/*
++	 * lpsw may optionally check bit 12 before loading the new psw
++	 * -> cannot check the expected invalid psw like with lpswe
++	 */
++	return 0;
++}
++
++static int bad_alignment(void)
++{
++	uint32_t words[5] __attribute__((aligned(16)));
++	uint32_t (*bad_aligned)[4] = (uint32_t (*)[4])&words[1];
++
++	/* LOAD PAIR FROM QUADWORD (LPQ) requires quadword alignment */
++	asm volatile ("lpq %%r6,%[bad]"
++		      : : [bad] "T" (*bad_aligned)
++		      : "%r6", "%r7"
++	);
++	return 0;
++}
++
++static int not_even(void)
++{
++	uint64_t quad[2] __attribute__((aligned(16))) = {0};
++
++	asm volatile (".insn	rxy,0xe3000000008f,%%r7,%[quad]" /* lpq %%r7,%[quad] */
++		      : : [quad] "T" (quad)
++		      : "%r7", "%r8"
++	);
++	return 0;
++}
++
++/*
++ * Harness for specification exception testing.
++ * func only triggers exception, reporting is taken care of automatically.
++ */
++struct spec_ex_trigger {
++	const char *name;
++	int (*func)(void);
++	void (*fixup)(struct stack_frame_int *stack);
++};
++
++/* List of all tests to execute */
++static const struct spec_ex_trigger spec_ex_triggers[] = {
++	{ "psw_bit_12_is_1", &psw_bit_12_is_1, &fixup_invalid_psw },
++	{ "short_psw_bit_12_is_0", &short_psw_bit_12_is_0, &fixup_invalid_psw },
++	{ "bad_alignment", &bad_alignment, NULL },
++	{ "not_even", &not_even, NULL },
++	{ NULL, NULL, NULL },
++};
++
++static void test_spec_ex(const struct spec_ex_trigger *trigger)
++{
++	int rc;
++
++	expect_pgm_int();
++	register_pgm_cleanup_func(trigger->fixup);
++	rc = trigger->func();
++	register_pgm_cleanup_func(NULL);
++	/* test failed, nothing to be done, reporting responsibility of trigger */
++	if (rc)
++		return;
++	check_pgm_int_code(PGM_INT_CODE_SPECIFICATION);
++}
++
++int main(int argc, char **argv)
++{
++	unsigned int i;
++
++	report_prefix_push("specification exception");
++	for (i = 0; spec_ex_triggers[i].name; i++) {
++		report_prefix_push(spec_ex_triggers[i].name);
++		test_spec_ex(&spec_ex_triggers[i]);
++		report_prefix_pop();
++	}
++	report_prefix_pop();
++
++	return report_summary();
++}
+diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+index f9f102ab..412fd130 100644
+--- a/s390x/unittests.cfg
++++ b/s390x/unittests.cfg
+@@ -114,6 +114,9 @@ file = mvpg-sie.elf
+ [spec_ex-sie]
+ file = spec_ex-sie.elf
+ 
++[spec_ex]
++file = spec_ex.elf
++
+ [firq-linear-cpu-ids-kvm]
+ file = firq.elf
+ timeout = 20
 -- 
 2.36.1
 
