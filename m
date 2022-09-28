@@ -2,138 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A05905ED7B6
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 10:28:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 939D75ED7B7
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 10:28:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233357AbiI1I2a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 04:28:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55450 "EHLO
+        id S233635AbiI1I2f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 04:28:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233055AbiI1I23 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 04:28:29 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F3EC74CD5
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 01:28:25 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28S7rEjl025315;
-        Wed, 28 Sep 2022 08:28:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=NSqB2aUNr3ZNNK4I1eq9F6pOPyiilpuqM8qAVQup/9g=;
- b=MwxQqhPzQf8d/YyJmM37jM1nLQBEHDrqFvSgcr3L+PdI8RxNzPrbdEgfx3q6Y9xqjMmq
- cjjnOspU0Fn44qqetkT+BVmwrms7vp0STnsTT8BPfJpMIA5bBwqVGymqgjjpe1KIhP6t
- MjnYl8z5vLDk3kpX+Yrb5wDaTobSiMaIL7tom7s02NoghuWvljR6VcHwZ4CZtPZaLhPH
- COhwKKLThOtbit6hoEMNcYuEOGAXDslze9qKHaTK+rYzuN8W9EKwnU3o2jx1em9VlBzw
- e2fQF8WZVBH7gJ9uawAgiccgIeAoSuURd3f9xY0gjkBLutV0tnh5hY8ENYEILHo425hT Qw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jvf8rds2x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Sep 2022 08:28:20 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28S7i12p016806;
-        Wed, 28 Sep 2022 08:28:19 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jvf8rds2a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Sep 2022 08:28:19 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 28S8LbbU001225;
-        Wed, 28 Sep 2022 08:28:17 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 3juapujk7g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Sep 2022 08:28:17 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 28S8SElQ4195048
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 28 Sep 2022 08:28:14 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 76F884C044;
-        Wed, 28 Sep 2022 08:28:14 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 85B6A4C040;
-        Wed, 28 Sep 2022 08:28:13 +0000 (GMT)
-Received: from [9.171.31.212] (unknown [9.171.31.212])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 28 Sep 2022 08:28:13 +0000 (GMT)
-Message-ID: <a7fe4dbe-1f5a-e530-fcc8-6072b441bb61@linux.ibm.com>
-Date:   Wed, 28 Sep 2022 10:28:13 +0200
+        with ESMTP id S233555AbiI1I2c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 04:28:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E954774DED
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 01:28:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664353710;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=g5jRqFBs3ZpqqID4I8CKzY6l+aiJ3r8Xkuq0qHKyk3s=;
+        b=IFDiBFUUSZvfS9fbp/IzVM0jVUHpgLyUGNd8GAuxV059a10nFr6Y3r0Gg4y5GZaWnfLjbO
+        BKzZfJqxUpzMu0veeVSfwR3Bd5OOcGxhJXJ1WgBY6+O18rU0PeuU+XNJvLc6pyEYe+Vgk+
+        VmtQqGLFgyNuaRO+eXJcluvycyHpAM4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-115-9fX1KmvnMlaP2PFCR9dOEQ-1; Wed, 28 Sep 2022 04:28:29 -0400
+X-MC-Unique: 9fX1KmvnMlaP2PFCR9dOEQ-1
+Received: by mail-wr1-f71.google.com with SMTP id h20-20020adfaa94000000b0022cc1de1251so1029953wrc.15
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 01:28:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=g5jRqFBs3ZpqqID4I8CKzY6l+aiJ3r8Xkuq0qHKyk3s=;
+        b=2fCziwW2Y9A0lwi1mrv3oD/Em7Z6bNZH7iitb3pir9v2D2/1TjQJDYOq+CADPgqDP4
+         +rCr4in4JaqDktAFYdUCWEJYGfhl7/V16YoYkaGVrCW3Qr3SALzUPuP+XDNC4+/OVvUB
+         mlvjYSfItqfonFqJNnrBx0BA1ID/43iN/4mqi/Zqy9ROKqFX81BKze0iGiSjIrJmTpvp
+         zpOQUcjo/YT7Ea3/+nk6JBbyo185hgZYKUTM6nKb+5iFjuCxztkphGvJifjRyDwMNaS9
+         LuifdAH3r5bpqlkVZ0w5e09l+9gciPkBiD0OI33nxlrNYpIYDL8KPToekbi7FB4UeVol
+         CzbQ==
+X-Gm-Message-State: ACrzQf3Q1vqRKSX280v5It0qU9UVzEyPty0lDU/2lM3pZIeTF6DqEE7X
+        /egeXkZaCbaT1SJgi2mqTxwSl7zPhJ2dlKQTqcxHz22PF5DWQdza3r41kVSDeXJe5v5cnQAFM9p
+        b8nJMqC5xWgKR
+X-Received: by 2002:a7b:c4cc:0:b0:3b4:757b:492f with SMTP id g12-20020a7bc4cc000000b003b4757b492fmr5920806wmk.74.1664353707731;
+        Wed, 28 Sep 2022 01:28:27 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM47jgP3O0DziLeVykTicWQQEQFnRqKDM2sPzfZXITIBwu4Xs1v2ngdyKb/2zKNsf907hLdJjw==
+X-Received: by 2002:a7b:c4cc:0:b0:3b4:757b:492f with SMTP id g12-20020a7bc4cc000000b003b4757b492fmr5920780wmk.74.1664353707446;
+        Wed, 28 Sep 2022 01:28:27 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-222.retail.telecomitalia.it. [79.46.200.222])
+        by smtp.gmail.com with ESMTPSA id q10-20020a1cf30a000000b003b47575d304sm1233345wmq.32.2022.09.28.01.28.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Sep 2022 01:28:26 -0700 (PDT)
+Date:   Wed, 28 Sep 2022 10:28:23 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Junichi Uekawa <uekawa@chromium.org>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
+        netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        mst@redhat.com, Paolo Abeni <pabeni@redhat.com>,
+        linux-kernel@vger.kernel.org,
+        Bobby Eshleman <bobby.eshleman@gmail.com>
+Subject: Re: [PATCH] vhost/vsock: Use kvmalloc/kvfree for larger packets.
+Message-ID: <20220928082823.wyxplop5wtpuurwo@sgarzare-redhat>
+References: <20220928064538.667678-1-uekawa@chromium.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH v9 00/10] s390x: CPU Topology
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
-References: <20220902075531.188916-1-pmorel@linux.ibm.com>
- <d8fbb30bbc8dc3d5d512fbeac257c38effbe1dc2.camel@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <d8fbb30bbc8dc3d5d512fbeac257c38effbe1dc2.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: QylD9XYoJ3p0HtJ8JJA93AaeT2OWoRSY
-X-Proofpoint-GUID: 2fuKjw86iKYDlNeyuDngANmuPPLBFKfT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-28_03,2022-09-27_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- spamscore=0 mlxlogscore=793 suspectscore=0 phishscore=0 priorityscore=1501
- impostorscore=0 clxscore=1015 adultscore=0 malwarescore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2209280048
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20220928064538.667678-1-uekawa@chromium.org>
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Sep 28, 2022 at 03:45:38PM +0900, Junichi Uekawa wrote:
+>When copying a large file over sftp over vsock, data size is usually 32kB,
+>and kmalloc seems to fail to try to allocate 32 32kB regions.
+>
+> Call Trace:
+>  [<ffffffffb6a0df64>] dump_stack+0x97/0xdb
+>  [<ffffffffb68d6aed>] warn_alloc_failed+0x10f/0x138
+>  [<ffffffffb68d868a>] ? __alloc_pages_direct_compact+0x38/0xc8
+>  [<ffffffffb664619f>] __alloc_pages_nodemask+0x84c/0x90d
+>  [<ffffffffb6646e56>] alloc_kmem_pages+0x17/0x19
+>  [<ffffffffb6653a26>] kmalloc_order_trace+0x2b/0xdb
+>  [<ffffffffb66682f3>] __kmalloc+0x177/0x1f7
+>  [<ffffffffb66e0d94>] ? copy_from_iter+0x8d/0x31d
+>  [<ffffffffc0689ab7>] vhost_vsock_handle_tx_kick+0x1fa/0x301 [vhost_vsock]
+>  [<ffffffffc06828d9>] vhost_worker+0xf7/0x157 [vhost]
+>  [<ffffffffb683ddce>] kthread+0xfd/0x105
+>  [<ffffffffc06827e2>] ? vhost_dev_set_owner+0x22e/0x22e [vhost]
+>  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
+>  [<ffffffffb6eb332e>] ret_from_fork+0x4e/0x80
+>  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
+>
+>Work around by doing kvmalloc instead.
+>
+>Signed-off-by: Junichi Uekawa <uekawa@chromium.org>
+>---
+>
+> drivers/vhost/vsock.c                   | 2 +-
+> net/vmw_vsock/virtio_transport_common.c | 2 +-
+> 2 files changed, 2 insertions(+), 2 deletions(-)
+>
+>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>index 368330417bde..5703775af129 100644
+>--- a/drivers/vhost/vsock.c
+>+++ b/drivers/vhost/vsock.c
+>@@ -393,7 +393,7 @@ vhost_vsock_alloc_pkt(struct vhost_virtqueue *vq,
+> 		return NULL;
+> 	}
+>
+>-	pkt->buf = kmalloc(pkt->len, GFP_KERNEL);
+>+	pkt->buf = kvmalloc(pkt->len, GFP_KERNEL);
+> 	if (!pkt->buf) {
+> 		kfree(pkt);
+> 		return NULL;
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index ec2c2afbf0d0..3a12aee33e92 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -1342,7 +1342,7 @@ EXPORT_SYMBOL_GPL(virtio_transport_recv_pkt);
+>
+> void virtio_transport_free_pkt(struct virtio_vsock_pkt *pkt)
+> {
+>-	kfree(pkt->buf);
+>+	kvfree(pkt->buf);
 
+virtio_transport_free_pkt() is used also in virtio_transport.c and 
+vsock_loopback.c where pkt->buf is allocated with kmalloc(), but IIUC 
+kvfree() can be used with that memory, so this should be fine.
 
-On 9/12/22 16:38, Janis Schoetterl-Glausch wrote:
-> I found this version much easier to understand than the previous one.
-> 
-> You could consider splitting up the series into two.
-> One that introduces support for STSI, PTF, migration, etc.
-> And a second one that adds support for the maximum-MNist facility and
-> drawers and books.
+> 	kfree(pkt);
+> }
+> EXPORT_SYMBOL_GPL(virtio_transport_free_pkt);
+>-- 
+>2.37.3.998.g577e59143f-goog
+>
 
-I agree, sending the first part as supporting only sockets already is an 
-enhancement that could be proposed on its own.
+This issue should go away with the Bobby's work about introducing 
+sk_buff [1], but we can queue this for now.
 
-> 
-> This would also make bisecting a bit nicer because it moves the feature
-> enablement closer to the commits adding the support.
-> 
-> Right now, with this series, the topology is static and cannot change.
+I'm not sure if we should do the same also in the virtio-vsock driver 
+(virtio_transport.c). Here in vhost-vsock the buf allocated is only used 
+in the host, while in the virtio-vsock driver the buffer is exposed to 
+the device emulated in the host, so it should be physically contiguous 
+(if not, maybe we need to adjust virtio_vsock_rx_fill()).
+So for now I think is fine to use kvmalloc only on vhost-vsock 
+(eventually we can use it also in vsock_loopback), since the Bobby's 
+patch should rework this code:
 
-If we ignore changes on hotplug, yes we consider the topology fixed and 
-that the vCPU does not migrate.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-> Most of the value of making the topology visible to the guest is for it
-> to mirror reality, and a static topology is a hindrance for that.
-> I'm completely fine with having a static topology as a stepping stone
-> to a dynamic one.
-> However I think we should have a rough plan or maybe even a prototype
-> for how we turn a static into a dynamic topology before we merge this
-> series in order to avoid designing us into a corner.
-> What do you think?
-
-Yes, we can discuss this internally before moving there.
+[1] 
+https://lore.kernel.org/lkml/65d117ddc530d12a6d47fcc45b38891465a90d9f.1660362668.git.bobby.eshleman@bytedance.com/
 
 Thanks,
-Pierre
+Stefano
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
