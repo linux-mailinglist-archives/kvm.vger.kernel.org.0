@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CA3285EE9BD
-	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 00:51:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7DA65EE9C4
+	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 00:55:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234173AbiI1Wvj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 18:51:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44222 "EHLO
+        id S234611AbiI1WzV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 18:55:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234164AbiI1Wvi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 18:51:38 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B863B5E77
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 15:51:36 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id 78so13463914pgb.13
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 15:51:36 -0700 (PDT)
+        with ESMTP id S234661AbiI1WzO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 18:55:14 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5186E57BFE
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 15:55:13 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id u69so13521722pgd.2
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 15:55:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=4rijZ4ttYw21/2I1NvyKRYgY5tGibj3vrRPtbvvQIY8=;
-        b=CT6iavnj5IsuMKy25adf6SQ6jWrRGW9n7LAy4rc3B8rCGkfTVR1bapMFxV04T7BCmJ
-         T8tayXm4T3rCIJ/1KKCYHRKHnvQInf33bzr0mE+4fdnMSWvCSihIgjy+EctH7/rFNJol
-         P+q/2nXkM3wMKwOpgQMsDuoXZNjWwsNW4vKa1H03qBnyUMWcl2rQUH7BLVnIfBvvjzvU
-         7eAyZ95QyQbr1i6T6BF4D9uXEAifuA0xrB6VEfdU8EfUMwwrCivNTQtrWWNqyEPXq47J
-         V1eCbEN+GF/tu0BRGR85y06W1oxOIev7dL2zn9GZMZn3kKVCrv32+H2US7vItUMci6/g
-         4/+Q==
+        bh=kEow7JtyXZKSoXCpvGfzKSDblkL9Mmtib8QujjWXNoU=;
+        b=W5NJliA1lAIbdRt7RjgOqkzCloKRkvJxy0UkoFRSnvKxKTTjHI/mF1w/D3VVBfQSwy
+         eiJ7iqnAlItjuRkOwrgpmkBVYs54d4kv+ivKNLpdmNRGhYOb9hPgD64smE6NdDtndW9a
+         gl1oy3Amv0tOaAuRoJNEZuIddPAdMU2UGGA8Uzyw9eE6zYbCJ7Me/84n723upsochOj0
+         Xnnimebv1CwpXUycLesPsAENzIF98SfnfffSheJoWb6cFjeiCY52qHlZZZsUW+F/8eCB
+         9LES6msPeE+vjct0OcqRIeEYFsw2PBXdgKN42BYMPa3Yrvord4L1hTOzWm3wQ7leEuUq
+         Wo6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=4rijZ4ttYw21/2I1NvyKRYgY5tGibj3vrRPtbvvQIY8=;
-        b=WtDGym2g1R9nGWjUv6mMNVBQSGF7uKBlj4rx0YsP3dtbzRjsuirkOI/PUUiIfQNEia
-         AMhCN9vBU5T5f64/8ZDgjeQBJfInupM8C0OEHcDdV7EbtR9gz79+UOcrY5dHA6JD0xdj
-         pcMWjjcIIZaLO7GZWuduWmmjjz5NOJy8UG7hd1qEwK2msEzYk9QqgiCtYML48EIOS8D5
-         2HhUI9mWjBQUzeuiBguLq9e3PxmlWVFpPrzmHsriSGwbJ36AaAKE7vl81ZmxWtY0ngjx
-         9M6rY8aNrPRzIH+I1bAx+iJ4hJrVn+d6TXgiuGXR22d1aZGY/euG+eUX+HhHg5EHVFfq
-         pWzw==
-X-Gm-Message-State: ACrzQf2jN4hTrQ6zbyqvYtXqezL0agd8W4wYq9Y0xAmekKcrDsxGLz/1
-        MXDGA3IgdfU9FqB7S0fHj3yv/w==
-X-Google-Smtp-Source: AMsMyM7m5lL/W4nnfvx2ECz7WSl8W8I0dh4ldZMzc1H7iRRtM4VOIYKR4fMvESU+z46fOQ2eWIrp/g==
-X-Received: by 2002:a63:ce17:0:b0:42a:bfb6:f218 with SMTP id y23-20020a63ce17000000b0042abfb6f218mr103794pgf.484.1664405495415;
-        Wed, 28 Sep 2022 15:51:35 -0700 (PDT)
+        bh=kEow7JtyXZKSoXCpvGfzKSDblkL9Mmtib8QujjWXNoU=;
+        b=ooeshHMZoHoHFsRKevaKpw0WmcxQbUrYg8pqGIe7W6H4pkkWhaWvqGY5nWs12/3/rD
+         SLfTIVrSMMNInjwRDcp0jQgCaB6M+WZzwZptaIj5KrrP9VIzeqioLgyT5zFs0bgF3+k5
+         IsWuB90FnOO/gHAZ9uAfajPg94ULRkGOtBj7bAbfvYzkvU4UF6FHW+CH4D5SiLEXlrc8
+         XqafNKMib9gGxow7F8kLrEygZNqDo+wiq7FE6vb4gFlgSKsY3NElvnFe0UOYHpCRvFOt
+         y8gY+uoZyWfZAjvS03f2+5Zmt/vKYoTIGcx6lk6CCWnImSQrbKXAKLPlkFLgM+yODUL6
+         1FAg==
+X-Gm-Message-State: ACrzQf0zA48MB2aQ80qZ/6THt8uwlAVnjSCTDQl4/Yp7pKoI7ZVab3C0
+        EjV4Nm18pUJVjNiA/ZsIFVzgeg==
+X-Google-Smtp-Source: AMsMyM5oZsrbpWYgy5zanmRt7Yiut9T7BF7N9dL6fKosXpCx8wgGERFXZ8EeJ4TVMrjaBZ56LsKuDA==
+X-Received: by 2002:a63:1203:0:b0:43c:7fa:f306 with SMTP id h3-20020a631203000000b0043c07faf306mr103725pgl.169.1664405712691;
+        Wed, 28 Sep 2022 15:55:12 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u16-20020a170902e5d000b00172f6726d8esm4268155plf.277.2022.09.28.15.51.34
+        by smtp.gmail.com with ESMTPSA id t11-20020a170902e84b00b0016d1b70872asm4332278plg.134.2022.09.28.15.55.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 15:51:34 -0700 (PDT)
-Date:   Wed, 28 Sep 2022 22:51:31 +0000
+        Wed, 28 Sep 2022 15:55:12 -0700 (PDT)
+Date:   Wed, 28 Sep 2022 22:55:08 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     David Matlack <dmatlack@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -56,15 +56,15 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Peter Xu <peterx@redhat.com>,
         Yang Zhong <yang.zhong@intel.com>,
         Wei Wang <wei.w.wang@intel.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 2/3] KVM: selftests: Add helper to read boolean module
- parameters
-Message-ID: <YzTP8xBkBkxzB1gn@google.com>
+Subject: Re: [PATCH v2 3/3] KVM: selftests: Fix nx_huge_pages_test on
+ TDP-disabled hosts
+Message-ID: <YzTQzHf4X6hq+wyQ@google.com>
 References: <20220928184853.1681781-1-dmatlack@google.com>
- <20220928184853.1681781-3-dmatlack@google.com>
+ <20220928184853.1681781-4-dmatlack@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220928184853.1681781-3-dmatlack@google.com>
+In-Reply-To: <20220928184853.1681781-4-dmatlack@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,73 +77,14 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Sep 28, 2022, David Matlack wrote:
-> @@ -114,6 +115,36 @@ void print_skip(const char *fmt, ...)
->  	puts(", skipping test");
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> index 0cbc71b7af50..3082c2a4089b 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> @@ -825,6 +825,8 @@ static inline uint8_t wrmsr_safe(uint32_t msr, uint64_t val)
+>  	return kvm_asm_safe("wrmsr", "a"(val & -1u), "d"(val >> 32), "c"(msr));
 >  }
 >  
-> +bool get_module_param_bool(const char *module_name, const char *param)
-> +{
-> +	const int path_size = 1024;
-> +	char path[path_size];
-> +	char value;
-> +	FILE *f;
-> +	int r;
-> +
-> +	r = snprintf(path, path_size, "/sys/module/%s/parameters/%s",
-> +		     module_name, param);
-> +	TEST_ASSERT(r < path_size,
-> +		    "Failed to construct sysfs path in %d bytes.", path_size);
-> +
-> +	f = fopen(path, "r");
+> +bool kvm_tdp_enabled(void);
 
-Any particular reason for using fopen()?  Oh, because that's what the existing
-code does.  More below.
-
-> +	TEST_ASSERT(f, "fopen(%s) failed", path);
-
-I don't actually care myself, but for consistency this should probably be a
-skip condition.  The easiest thing would be to use open_path_or_exit().
-
-At that point, assuming read() instead of fread() does the right thin, that seems
-like the easiest solution.
-
-> +	TEST_FAIL("Unrecognized value: %c", value);
-
-Maybe be slightly more verbose?  E.g.
-
-	TEST_FAIL("Unrecognized value '%c' for boolean module param", value);
-
-> +}
-> +
->  bool thp_configured(void)
->  {
->  	int ret;
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index 2e6e61bbe81b..522d3e2009fb 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -1294,20 +1294,9 @@ unsigned long vm_compute_max_gfn(struct kvm_vm *vm)
->  /* Returns true if kvm_intel was loaded with unrestricted_guest=1. */
->  bool vm_is_unrestricted_guest(struct kvm_vm *vm)
->  {
-> -	char val = 'N';
-> -	size_t count;
-> -	FILE *f;
-> -
->  	/* Ensure that a KVM vendor-specific module is loaded. */
->  	if (vm == NULL)
->  		close(open_kvm_dev_path_or_exit());
->  
-> -	f = fopen("/sys/module/kvm_intel/parameters/unrestricted_guest", "r");
-> -	if (f) {
-> -		count = fread(&val, sizeof(char), 1, f);
-> -		TEST_ASSERT(count == 1, "Unable to read from param file.");
-> -		fclose(f);
-> -	}
-> -
-> -	return val == 'Y';
-> +	return get_module_param_bool("kvm_intel", "unrestricted_guest");
-
-Since there are only three possible modules, what about providing wrappers to
-handle "kvm", "kvm_amd", and "kvm_intel"?  I'm guessing we'll end up with wrappers
-for each param we care about, but one fewer strings to get right would be nice.
+Uber nit, maybe kvm_is_tdp_enabled()?
