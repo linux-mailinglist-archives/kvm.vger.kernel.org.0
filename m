@@ -2,165 +2,275 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BBA475ED463
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 07:55:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BCB1B5ED4C1
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 08:21:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232684AbiI1Fza (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 01:55:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53300 "EHLO
+        id S232866AbiI1GVk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 02:21:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231587AbiI1Fz1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 01:55:27 -0400
+        with ESMTP id S232256AbiI1GV0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 02:21:26 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8088D6D553
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 22:55:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5FF1126470
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 23:21:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664344524;
+        s=mimecast20190719; t=1664346084;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qSKMoML8jlo7ktvItBy7/G7Ijp2CasJY8TKQOTvEDco=;
-        b=Nbp3Mxt8Gh1jlIbJea9HGhdO8X5UWXb0MJwCNoGEItVbxHMIMNAl8Q2xhGGdqRb9gBshVq
-        3wl0tgYD/Y2aKse/0isZ1bJAcKw3TqUccdTLQi9tm2afgkn/UbzYIjJpHPjY1EwXo06DKo
-        7TSJweTplDSBUL5u4Z7bd4LLOGfnfnM=
+        bh=gR9YEc94x/YWrCxNEskBiCp/j0rf3zq3bUXmUrxcXYs=;
+        b=avIwKRe77ZriNE5nweLymmbKHwglw8hT32esGHkE3QzXsr3OM4IL3937oOyLmJBDyO1P3z
+        pyd9VkJZn6fIvvKH0Liw4Jb7v0e57YL13qW39CrfCinxVgrcVHwb0w2ZMbJ245nQTJ0Ubq
+        /fEyPZxSsz4T8sfQKFAGug57SVdaM8Y=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-12-I-1dG2VSONCxTzQXFdx6Jg-1; Wed, 28 Sep 2022 01:55:22 -0400
-X-MC-Unique: I-1dG2VSONCxTzQXFdx6Jg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-646-jPN1lnVKNFC58xQKGcizFw-1; Wed, 28 Sep 2022 02:21:19 -0400
+X-MC-Unique: jPN1lnVKNFC58xQKGcizFw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 12A7E185A7A8;
-        Wed, 28 Sep 2022 05:55:22 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2061D185A792;
+        Wed, 28 Sep 2022 06:21:19 +0000 (UTC)
 Received: from starship (unknown [10.40.193.233])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2F0462027061;
-        Wed, 28 Sep 2022 05:55:19 +0000 (UTC)
-Message-ID: <e5d54876b233dc71a69249c3d02d649da5040a14.camel@redhat.com>
-Subject: Re: [PATCH v3 05/28] KVM: x86: Don't inhibit APICv/AVIC if xAPIC ID
- mismatch is due to 32-bit ID
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3BFA440C6EC2;
+        Wed, 28 Sep 2022 06:21:17 +0000 (UTC)
+Message-ID: <bcc3c67abc3b2c3d896b800c5f8f7295b7238271.camel@redhat.com>
+Subject: Re: [PATCH v3 07/28] KVM: x86: Inhibit APIC memslot if x2APIC and
+ AVIC are enabled
 From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
         Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
         Li RongQing <lirongqing@baidu.com>
-Date:   Wed, 28 Sep 2022 08:55:18 +0300
-In-Reply-To: <d02d0b30-f29b-0ff6-98c7-89ddcd091c60@oracle.com>
+Date:   Wed, 28 Sep 2022 09:21:16 +0300
+In-Reply-To: <YzHawRN8vpEzP7XD@google.com>
 References: <20220920233134.940511-1-seanjc@google.com>
-         <20220920233134.940511-6-seanjc@google.com>
-         <d02d0b30-f29b-0ff6-98c7-89ddcd091c60@oracle.com>
+         <20220920233134.940511-8-seanjc@google.com>
+         <e84ebf0a7ac9322bd0cfa742ef6dd2bbfdac0df9.camel@redhat.com>
+         <YzHawRN8vpEzP7XD@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-09-27 at 23:15 -0400, Alejandro Jimenez wrote:
+On Mon, 2022-09-26 at 17:00 +0000, Sean Christopherson wrote:
+> On Fri, Sep 23, 2022, Maxim Levitsky wrote:
+> > On Tue, 2022-09-20 at 23:31 +0000, Sean Christopherson wrote:
+> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > > index 2c96c43c313a..6475c882b359 100644
+> > > --- a/arch/x86/include/asm/kvm_host.h
+> > > +++ b/arch/x86/include/asm/kvm_host.h
+> > > @@ -1132,6 +1132,17 @@ enum kvm_apicv_inhibit {
+> > >  	 * AVIC is disabled because SEV doesn't support it.
+> > >  	 */
+> > >  	APICV_INHIBIT_REASON_SEV,
+> > > +
+> > > +	/*
+> > > +	 * Due to sharing page tables across vCPUs, the xAPIC memslot must be
+> > > +	 * deleted if any vCPU has x2APIC enabled as SVM doesn't provide fully
+> > > +	 * independent controls for AVIC vs. x2AVIC, and also because SVM
+> > > +	 * supports a "hybrid" AVIC mode for CPUs that support AVIC but not
+> > > +	 * x2AVIC.  Note, this isn't a "full" inhibit and is tracked separately.
+> > > +	 * AVIC can still be activated, but KVM must not create SPTEs for the
+> > > +	 * APIC base.  For simplicity, this is sticky.
+> > > +	 */
+> > > +	APICV_INHIBIT_REASON_X2APIC,
+> > 
+> > Hi Sean!
+> > 
+> > So assuming that I won't object to making it SVM specific (I still think
+> > that VMX should also inhibit this memslot because this is closer to x86 spec,
+> > but if you really want it this way, I won't fight over it):
 > 
-> On 9/20/2022 7:31 PM, Sean Christopherson wrote:
-> > Truncate the vcpu_id, a.k.a. x2APIC ID, to an 8-bit value when comparing
-> > it against the xAPIC ID to avoid false positives (sort of) on systems
-> > with >255 CPUs, i.e. with IDs that don't fit into a u8.  The intent of
-> > APIC_ID_MODIFIED is to inhibit APICv/AVIC when the xAPIC is changed from
-> > it's original value,
-> > 
-> > The mismatch isn't technically a false positive, as architecturally the
-> > xAPIC IDs do end up being aliased in this scenario, and neither APICv
-> > nor AVIC correctly handles IPI virtualization when there is aliasing.
-> > However, KVM already deliberately does not honor the aliasing behavior
-> > that results when an x2APIC ID gets truncated to an xAPIC ID.  I.e. the
-> > resulting APICv/AVIC behavior is aligned with KVM's existing behavior
-> > when KVM's x2APIC hotplug hack is effectively enabled.
-> > 
-> > If/when KVM provides a way to disable the hotplug hack, APICv/AVIC can
-> > piggyback whatever logic disables the optimized APIC map (which is what
-> > provides the hotplug hack), i.e. so that KVM's optimized map and APIC
-> > virtualization yield the same behavior.
-> > 
-> > For now, fix the immediate problem of APIC virtualization being disabled
-> > for large VMs, which is a much more pressing issue than ensuring KVM
-> > honors architectural behavior for APIC ID aliasing.
+> Heh, I don't necessarily "want" it this way, it's more that I don't see a compelling
+> reason to change KVM's behavior and risk silently causing a performance regression.
+> If KVM didn't already have the "APIC base may have RAM semantics" quirk, and/or if
+> this were the initial APICv implementation and thus no possible users, then I would
+> probably also vote to give APICv the same treatment.
 > 
-> I built a host kernel with this entire series on top of mainline 
-> v6.0-rc6, and booting a guest with AVIC enabled works as expected on the 
-> initial boot. The issue is that during the first reboot AVIC is 
-> inhibited due to APICV_INHIBIT_REASON_APIC_ID_MODIFIED, and I see 
-> constant inhibition events due to APICV_INHIBIT_REASON_IRQWIN as seen in 
+> > I somewhat don't like this inhibit, because now it is used just to say
+> > 'I am AVIC'.
+> > 
+> > What do you think if you just move the code that removes the memslot to SVM,
+> > to avic_set_virtual_apic_mode?
+> 
+> Suffers the same SRCU issue (see below) :-/
+> 
+> Given the SRCU problem, I'd prefer to keep the management of the memslot in common
+> code, even though I agree it's a bit silly.  And KVM_REQ_UNBLOCK is a perfect fit
+> for dealing with the SRCU issue, i.e. handling this in AVIC code would require
+> another hook on top of spreading the memslot management across x86 and SVM code.
+
+OK, I am not going to argue about this. But what about at least not using an inhibit
+bit for that but something else like a boolean, or maybe really add 'I am AVIC bit'
+or rather something like vcpu->arch.apicv_type enum?
 
 
-APICV_INHIBIT_REASON_IRQWIN is OK, because that happens about every time
-the good old PIT timer fires which happens on reboot.
+Or we can make SVM code just call a common function - just put these in a function and call it
+from avic_set_virtual_apic_mode?
 
-APICV_INHIBIT_REASON_APIC_ID_MODIFIED should not happen as you noted,
-this needs investigation.
+
+void kvm_disable_apicv_memslot(struct kvm_vcpu *vcpu)
+{
+	if (!vcpu->kvm->arch.apic_access_memslot_inhibited) {
+            vcpu->kvm->arch.apic_access_memslot_inhibited = true;
+            kvm_make_request(KVM_REQ_UNBLOCK, vcpu);
+	}
+}
+
+> 
+> > > @@ -1169,10 +1180,11 @@ struct kvm_arch {
+> > >  	struct kvm_apic_map __rcu *apic_map;
+> > >  	atomic_t apic_map_dirty;
+> > >  
+> > > -	/* Protects apic_access_memslot_enabled and apicv_inhibit_reasons */
+> > > -	struct rw_semaphore apicv_update_lock;
+> > > -
+> > >  	bool apic_access_memslot_enabled;
+> > > +	bool apic_access_memslot_inhibited;
+> > 
+> > So the apic_access_memslot_enabled currently tracks if the memslot is enabled.
+> > As I see later in the patch when you free the memslot, you set it to false,
+> > which means that if a vCPU is created after that (it can happen in theory),
+> > the memslot will be created again :(
+> > 
+> > I say we need 'enabled', and 'allocated' booleans instead. Inhibit will set
+> > enabled to false, and then on next vcpu run, that will free the memslot.
+> > 
+> > when enabled == false, the code needs to be changed to not allocate it again.
+> 
+> This should be handled already.  apic_access_memslot_enabled is toggled from
+> true=>false if and only if apic_access_memslot_inhibited is set, and the "enabled"
+> flag is protected by slots_lock.  Thus, newly created vCPUs are guaranteed to
+> either see apic_access_memslot_enabled==true or apic_access_memslot_inhibited==true.
+> 
+>   int kvm_alloc_apic_access_page(struct kvm *kvm)
+>   {
+> 	struct page *page;
+> 	void __user *hva;
+> 	int ret = 0;
+> 
+> 	mutex_lock(&kvm->slots_lock);
+> 	if (kvm->arch.apic_access_memslot_enabled ||
+> 	    kvm->arch.apic_access_memslot_inhibited)  <=== prevents reallocation
+> 		goto out;
+> 
+>   out:
+> 	mutex_unlock(&kvm->slots_lock);
+> 	return ret;
+>   }
+
+Ah, you added this in previous patch which I didn't see, makes sense.
+
+> 
+> That could be made more obvious by adding a WARN in kvm_free_apic_access_page(), i.e.
+Yep, a WARN_ON_ONCE unless in hot path, is almost always a good idea, so lets add it.
+> 
+>   void kvm_free_apic_access_page(struct kvm *kvm)
+>   {
+> 	WARN_ON_ONCE(!kvm->arch.apic_access_memslot_inhibited);
+> 
+> 	mutex_lock(&kvm->slots_lock);
+> 
+> 	if (kvm->arch.apic_access_memslot_enabled) {
+> 		__x86_set_memory_region(kvm, APIC_ACCESS_PAGE_PRIVATE_MEMSLOT, 0, 0);
+> 		kvm->arch.apic_access_memslot_enabled = false;
+> 	}
+> 
+> 	mutex_unlock(&kvm->slots_lock);
+>   }
+> 
+> > > +
+> > > +	/* Protects apicv_inhibit_reasons */
+> > > +	struct rw_semaphore apicv_update_lock;
+> > >  	unsigned long apicv_inhibit_reasons;
+> > >  
+> > >  	gpa_t wall_clock;
+> > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > > index 99994d2470a2..70f00eda75b2 100644
+> > > --- a/arch/x86/kvm/lapic.c
+> > > +++ b/arch/x86/kvm/lapic.c
+> > > @@ -2394,9 +2394,26 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
+> > >  		}
+> > >  	}
+> > >  
+> > > -	if (((old_value ^ value) & X2APIC_ENABLE) && (value & X2APIC_ENABLE))
+> > > +	if (((old_value ^ value) & X2APIC_ENABLE) && (value & X2APIC_ENABLE)) {
+> > >  		kvm_apic_set_x2apic_id(apic, vcpu->vcpu_id);
+> > >  
+> > > +		/*
+> > > +		 * Mark the APIC memslot as inhibited if x2APIC is enabled and
+> > > +		 * the x2APIC inhibit is required.  The actual deletion of the
+> > > +		 * memslot is handled by vcpu_run() as SRCU may or may not be
+> > > +		 * held at this time, i.e. updating memslots isn't safe.  Don't
+> > > +		 * check apic_access_memslot_inhibited, this vCPU needs to
+> > > +		 * ensure the memslot is deleted before re-entering the guest,
+> > > +		 * i.e. needs to make the request even if the inhibit flag was
+> > > +		 * already set by a different vCPU.
+> > > +		 */
+> > > +		if (vcpu->kvm->arch.apic_access_memslot_enabled &&
+> > > +		    static_call(kvm_x86_check_apicv_inhibit_reasons)(APICV_INHIBIT_REASON_X2APIC)) {
+> > > +			vcpu->kvm->arch.apic_access_memslot_inhibited = true;
+> > > +			kvm_make_request(KVM_REQ_UNBLOCK, vcpu);
+> > 
+> > You are about to remove the KVM_REQ_UNBLOCK in other patch series.
+> 
+> No, KVM_REQ_UNHALT is being removed.  KVM_REQ_UNBLOCK needs to stay, although it
+> has a rather weird name, e.g. KVM_REQ_WORK would probably be better.
+
+Roger that!
+And I guess lets rename it while we are at it.
+
+> 
+> > How about just raising KVM_REQ_APICV_UPDATE on current vCPU
+> > and having a special case in kvm_vcpu_update_apicv of 
+> > 
+> > if (apic_access_memslot_enabled == false && apic_access_memslot_allocaed == true) {
+> > 	drop srcu lock
+> 
+> This was my initial thought as well, but the issue is that SRCU may or may not be
+> held, and so the unlock+lock would need to be conditional.  That's technically a
+> solvable problem, as it's possible to detect if SRCU is held, but I really don't
+> want to rely on kvm_vcpu.srcu_depth for anything other than proving that KVM doesn't
+> screw up SRCU.
+
+Why though? the KVM_REQ_APICV_UPDATE is only handled AFAIK in vcpu_enter_guest
+which drops the srcu lock few lines afterwards, and therefore the
+kvm_vcpu_update_apicv is always called with the lock held and it means that it
+can drop it for the duration of slot update.
+
+The original issue we had was that we tried to drop the srcu lock in 
+'kvm_set_apicv_inhibit' which indeed is called from various places,
+with, or without the lock held.
+
+Moving the memslot disable code to kvm_vcpu_update_apicv would actually solve that,
+but it was not possible because kvm_vcpu_update_apicv is called simultaneously on all vCPUs, 
+and created various races, including toggling the memslot twice.
+
+
+So if possible please take another look at using KVM_REQ_APICV_UPDATE instead of KVM_REQ_UNBLOCK.
 
 Best regards,
 	Maxim Levitsky
 
-> the traces:
 > 
-> qemu-system-x86-10147   [222] .....  1116.519052: 
-> kvm_apicv_inhibit_changed: set reason=8, inhibits=0x120
-> qemu-system-x86-10147   [222] .....  1116.519063: 
-> kvm_apicv_inhibit_changed: cleared reason=8, inhibits=0x20
-> qemu-system-x86-10147   [222] .....  1117.934222: 
-> kvm_apicv_inhibit_changed: set reason=8, inhibits=0x120
-> qemu-system-x86-10147   [222] .....  1117.934233: 
-> kvm_apicv_inhibit_changed: cleared reason=8, inhibits=0x20
-> 
-> It happens regardless of vCPU count (tested with 2, 32, 255, 380, and 
-> 512 vCPUs). This state persists for all subsequent reboots, until the VM 
-> is terminated. For vCPU counts < 256, when x2apic is disabled the 
-> problem does not occur, and AVIC continues to work properly after reboots.
-> 
-> I did not see this issue when testing a similar host kernel that did not 
-> include this current patchset, but instead applied the earlier:
-> https://lore.kernel.org/lkml/20220909195442.7660-1-suravee.suthikulpanit@amd.com/
-> which inspired this [05/23] patch and the follow up [22/28] in this series.
-> 
-> I am using QEMU built from v7.1.0 upstream tag, plus the patch at:
-> https://lore.kernel.org/qemu-devel/20220504131639.13570-1-suravee.suthikulpanit@amd.com/
-> 
-> Please feel free to request any other data points that might be relevant 
-> and I'll try to collect them.
-> 
-> Alejandro
-> > Fixes: 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or APIC base")
-> > Reported-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-> > Cc: Maxim Levitsky <mlevitsk@redhat.com>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >   arch/x86/kvm/lapic.c | 7 ++++++-
-> >   1 file changed, 6 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index adac6ca9b7dc..a02defa3f7b5 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -2075,7 +2075,12 @@ static void kvm_lapic_xapic_id_updated(struct kvm_lapic *apic)
-> >   	if (KVM_BUG_ON(apic_x2apic_mode(apic), kvm))
-> >   		return;
-> >   
-> > -	if (kvm_xapic_id(apic) == apic->vcpu->vcpu_id)
-> > +	/*
-> > +	 * Deliberately truncate the vCPU ID when detecting a modified APIC ID
-> > +	 * to avoid false positives if the vCPU ID, i.e. x2APIC ID, is a 32-bit
-> > +	 * value.
-> > +	 */
-> > +	if (kvm_xapic_id(apic) == (u8)apic->vcpu->vcpu_id)
-> >   		return;
-> >   
-> >   	kvm_set_apicv_inhibit(apic->vcpu->kvm, APICV_INHIBIT_REASON_APIC_ID_MODIFIED);
+> > 	free the memslot
+> > 	take srcu lock
+> > }
 
 
