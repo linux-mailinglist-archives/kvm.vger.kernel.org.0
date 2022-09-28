@@ -2,79 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 105F65EE133
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 18:06:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFFDD5EE13F
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 18:12:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233572AbiI1QGD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 12:06:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45392 "EHLO
+        id S234372AbiI1QMl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 12:12:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234060AbiI1QF7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 12:05:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7667A88DEC
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 09:05:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664381157;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rybUb/GfYlMSMT6cYU57AYfkSdd1kUKrcHY/UZNUSuw=;
-        b=YUX7hfqAfIWNhA6D7ACt42nmSeeL9SdZ/mHejMHbXDTIjKeXJ6zlKYKZu6nB8zZxanHL5n
-        qMH6Yc+LbJ5BSmdM675CuZ7oLPL4UCZjLSLI3dDIzjdk0dM42Scf4gyQxuZk0Pj9eRywt1
-        u7TfvPw/Y3h03bUnZhpeXCc3zG7z+mE=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-582-bm-yucTxPFC3oSEwLvRWkw-1; Wed, 28 Sep 2022 12:05:55 -0400
-X-MC-Unique: bm-yucTxPFC3oSEwLvRWkw-1
-Received: by mail-ej1-f72.google.com with SMTP id qw31-20020a1709066a1f00b00783d9fd7df2so3897396ejc.17
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 09:05:55 -0700 (PDT)
+        with ESMTP id S233190AbiI1QMj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 12:12:39 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1C2C6DF93
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 09:12:38 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id q15-20020a17090a304f00b002002ac83485so2137815pjl.0
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 09:12:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=SX46qqsXP6rNXBfhWbDF1CWQd9NesON2YiNX3aiOXY0=;
+        b=fzDC1W22cfZ4eDT1CC0OBYGcpwDVGaIUNn9gpp+5Om3tsWLsgyETbIAFuKLDILPNOF
+         NEEiTgMTRAUHTfaXUgf3Yr6pWUc0h8FDYlycrjTCqUs2iP6brpgSe2PUc3K/KC2zDHyN
+         y+EjT27JXL79rXS7ZeoidlEdf3yPQlonDfwh1D5RMd/M4SKBv3uFQK7SpAzozqBJjMJT
+         bSbDSUNDFa9pQlgJxRwPcRQJIIG1LlttRThlG3BNyEouNJCP0aREDQsErYXBSFSkfBrA
+         FCT42XP9Mrup9YwTWBjCl/U7F5pEbpKrIXeGIuwX/lIkG+uDAe+1SRLTOjqh490JtHor
+         Gu/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=rybUb/GfYlMSMT6cYU57AYfkSdd1kUKrcHY/UZNUSuw=;
-        b=FUqPD+DmMJ79JuD+s+bcfAy9aLj1N0mtvl4aAA5F4y5UBcXD/rh/FU/06qUSQsUnDL
-         PxFW3q9s7Zu/BBarx8bj674XLZ/Acoy9xeyNeyZab+rbOFutHGoMSNmooUA8f3R/jtPE
-         o+rr+7baQtC7ql0B2hJcJEWHnPvUllBfW1Y9aggKHKUUTBNYVwvlS1WUSvivhgt+OD9T
-         D+ccObGUuwTq+xwIWK21xTNMvRzuq8LhlCRqgBpq0hsLtCwyrm17hdRlHlwYRgmaFnvu
-         se/zlvwIKk51DdUVyKFCprnwp9V4L+ci7oumU37um6GXagri9pHRHNrFbELePkl3tGTr
-         zRyA==
-X-Gm-Message-State: ACrzQf0GbzxJN8xu9MvCcSuVsEMjeymBWBTygSg9P6SAIpH4HOGdZJhb
-        37nFnqGvjOK8CMdZl3YAM1dwhyD2VEQ7xo9FuLSlNjcYdiMYN7o9n6wNeIkEJC+wioGnQHW124n
-        ZJAx7k7ORXfy+
-X-Received: by 2002:a05:6402:5419:b0:457:c955:a40f with SMTP id ev25-20020a056402541900b00457c955a40fmr7638967edb.391.1664381154451;
-        Wed, 28 Sep 2022 09:05:54 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4nSyR86A+8QF3RzNshAjHdwAHrTQllA/f8QCPhHs3cLwtsxHAwUQ0y3NlZkR5XvuDiiH6wLA==
-X-Received: by 2002:a05:6402:5419:b0:457:c955:a40f with SMTP id ev25-20020a056402541900b00457c955a40fmr7638943edb.391.1664381154273;
-        Wed, 28 Sep 2022 09:05:54 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:2f4b:62da:3159:e077? ([2001:b07:6468:f312:2f4b:62da:3159:e077])
-        by smtp.googlemail.com with ESMTPSA id m17-20020a50c191000000b00456f569f31dsm3725792edf.75.2022.09.28.09.05.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Sep 2022 09:05:53 -0700 (PDT)
-Message-ID: <3e56bba7-e1d3-7804-2d8f-307e81d88a9c@redhat.com>
-Date:   Wed, 28 Sep 2022 18:05:52 +0200
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=SX46qqsXP6rNXBfhWbDF1CWQd9NesON2YiNX3aiOXY0=;
+        b=i0KH9fxTtTQ5HMRi1MtTMJoSJPhAp0gpdJ3he5hBfKLAHJzJspo/ydXnth9x0WMWMv
+         /ZIIC7o9x+rF8oS7wDJ8jqHFHnrQy8nq30NYTy0MeBjYWgzqiaBZBm/l51WRdBZOweqj
+         iB3eAiJwiF17TrgDXWi7U4PMuSR6QkKNwrkABJK4tNxn34SbNpqD5WwL1S/gA100cOQ0
+         PumPOJWOk8QlJZvh/WOK8FEmW/XCRcY5bE7MGEn6ba7Ag+EYY4w9QKQnrKBAeOgavVLP
+         vS0BtGphUs04z4JIVwYYkAiEcQZeKidcXpsXbTwoAYVmueu4FM8nnh54kHEDArqGqY4Y
+         whBQ==
+X-Gm-Message-State: ACrzQf18tdUy1AYnPl8Ou4sv4smWX7Jt4QfpzwFRrg27O48n4LVylSsa
+        QW524/e/AESz8EyTy7sJJN7jfg==
+X-Google-Smtp-Source: AMsMyM4CQonqEyArDPEJ70zxw16cAnQiwAeyZhblK/Tv64BVxU1faRMq7OaiZPq+tjiBxsdTcgQMaw==
+X-Received: by 2002:a17:903:2305:b0:178:380f:5246 with SMTP id d5-20020a170903230500b00178380f5246mr554123plh.146.1664381558359;
+        Wed, 28 Sep 2022 09:12:38 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id d128-20020a623686000000b0053e66f57334sm4194923pfa.112.2022.09.28.09.12.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Sep 2022 09:12:37 -0700 (PDT)
+Date:   Wed, 28 Sep 2022 16:12:33 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: disable on 32-bit unless CONFIG_BROKEN
+Message-ID: <YzRycXDnWgMDgbD7@google.com>
+References: <20220926165112.603078-1-pbonzini@redhat.com>
+ <YzMt24/14n1BVdnI@google.com>
+ <ed74c9a9d6a0d2fd2ad8bd98214ad36e97c243a0.camel@redhat.com>
+ <15291c3f-d55c-a206-9261-253a1a33dce1@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH] KVM: allow compiling out SMM support
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20220927152241.194900-1-pbonzini@redhat.com>
- <YzM55hqavzENQq7I@google.com>
- <f708d769-5d93-351f-ea24-8fa7deb9f689@redhat.com>
- <YzRhT6DzgDfGU7NC@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YzRhT6DzgDfGU7NC@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <15291c3f-d55c-a206-9261-253a1a33dce1@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,11 +73,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/28/22 16:59, Sean Christopherson wrote:
-> But with CONFIG_KVM_SMM=n, KVM is now reporting that KVM_CAP_X86_SMM
-> is unsupported,
+On Wed, Sep 28, 2022, Paolo Bonzini wrote:
+> On 9/28/22 09:10, Maxim Levitsky wrote:
+> > I also think that outside KVM developers nobody should be using KVM on 32 bit host.
+> > 
+> > However for_developement_  I think that 32 bit KVM support is very useful, as it
+> > allows to smoke test the support for 32 bit nested hypervisors, which I do once in a while,
+> > and can even probably be useful to some users (e.g running some legacy stuff in a VM,
+> > which includes a hypervisor, especially to run really legacy OSes / custom bare metal software,
+> > using an old hypervisor) - or in other words, 32 bit nested KVM is mostly useless, but
+> > other 32 bit nested hypervisors can be useful.
+> > 
+> > Yes, I can always use an older 32 bit kernel in a guest with KVM support, but as long
+> > as current kernel works, it is useful to use the same kernel on host and guest.
+> 
+> Yeah, I would use older 32 bit kernels just like I use RHEL4 to test PIT
+> reinjection. :)  But really the ultimate solution to this would be to
+> improve kvm-unit-tests so that we can compile vmx.c and svm.c for 32-bit.
 
-Yeah, you're right.  "default y" is what matters here the most.
-
-Paolo
-
+Agreed.  I too use 32-bit KVM to validate KVM's handling of 32-bit L1 hypervisors,
+but the maintenance cost is painfully high.
