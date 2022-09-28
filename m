@@ -2,167 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0310B5EE32F
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 19:31:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 784C35EE35A
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 19:40:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234014AbiI1Rbt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 13:31:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53904 "EHLO
+        id S234582AbiI1Rkw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 13:40:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233252AbiI1Rbr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 13:31:47 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2065.outbound.protection.outlook.com [40.107.92.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C16C95725E;
-        Wed, 28 Sep 2022 10:31:45 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RhxQ3LnJ9Irnoc67zsDnxdd5PqKpOVCUbDfxUAOFQ+EMBAuwCgHpIRwX2Fr08ZXO13IP3gr+MrzOPOF/ia1P1WMb2NOx8YSOrRIZ2e+4rxafD1WyAxVJN9co60Y+nxW0X9sFWDTLk1QTCwIPfNjYvJQ3q2j29vXsRpceHfnLoPIdbRnIudFcWJxXVit02SRSUE4N3s1yVGikNlLx0P6cUFpGVrbXnIr3mxx7dOM8alFbpoBCQhWFB7+x64mGUZPybk0hOxsq566FVRkDR2+WwcD4pVTe/Nz72T1e+wazveMTYX2z1nwKDjpglQ39SX+z7nbrenFmrYQEc4nKzbThNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=d+AAUhTEJS9+0uqL4pLU1Jj7/9anhujllFzYXTHlRpM=;
- b=DadLdKuJXN60ODL22s54oZbZj/QbINKS1Egs+rBVTToqwDCx36dweW1CGVRkw/1Yhe5m5NC8JZJbbeIdDnJKT20OJzLfsRkqB2YgDDg75ZqWmSwKpOpb96nEUmKheuZafGNOXmJA2hWlpgWM2I8N7HkSjYNIn8sED+H77PhNXVtnyELDJirj14gcCSZD+85pZRTdT2xWF3PHeB+RzM48T8YiHTtlAiIXozLN8w5J3sA4Vmvf0y4hfTnpW6fFc2P2aUwo3Q8hWdRJA2EUru+CyXzxiKHNdlmigIwZiC7awk2xPU6HFDtPPdDSOLfls0FT/Q7bRuOrX9PY2DYUVh4Jqg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=d+AAUhTEJS9+0uqL4pLU1Jj7/9anhujllFzYXTHlRpM=;
- b=3zUvJwQPhfkbhlIvJfEUzFksr5v8a0zGaNNsFUq7X+/E4r2ySXLxldz5M1EMf5D9QyVRaewRr6h61P/UXyednSuvlkyDG4WVxJGmgz8T1Oz04BNzS0WC67u8ofDAqR01fOvZgh9WdxSteiCFMRlVxJWSGswwkMcmOm0lm0mS//A=
-Received: from DS7PR03CA0231.namprd03.prod.outlook.com (2603:10b6:5:3ba::26)
- by DM6PR12MB4354.namprd12.prod.outlook.com (2603:10b6:5:28f::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.17; Wed, 28 Sep
- 2022 17:31:43 +0000
-Received: from DM6NAM11FT041.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:3ba:cafe::4c) by DS7PR03CA0231.outlook.office365.com
- (2603:10b6:5:3ba::26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5654.25 via Frontend
- Transport; Wed, 28 Sep 2022 17:31:43 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT041.mail.protection.outlook.com (10.13.172.98) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5676.17 via Frontend Transport; Wed, 28 Sep 2022 17:31:43 +0000
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Wed, 28 Sep
- 2022 12:31:43 -0500
-Received: from ethanolx1adehost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server id 15.1.2375.28 via Frontend
- Transport; Wed, 28 Sep 2022 12:31:42 -0500
-From:   Carlos Bilbao <carlos.bilbao@amd.com>
-To:     <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <bilbao@vt.edu>
-CC:     Carlos Bilbao <carlos.bilbao@amd.com>
-Subject: [PATCH] KVM: SEV: Fix a few small typos
-Date:   Wed, 28 Sep 2022 17:31:42 +0000
-Message-ID: <20220928173142.2935674-1-carlos.bilbao@amd.com>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S234607AbiI1Rku (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 13:40:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28307B4426
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 10:40:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664386846;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Fnnu4D0Chbk/Z8+NCjwUENwpIgx/DjGxPGd2Oiee5Pw=;
+        b=f+IbFLLOUqwlJfPwq6BqpgqPyiho0OZjtZr2Uv6SCZv6bAq7YOCJln7Xs2bmeCQ49J2M1a
+        1xOdi706fDiCll1CxoHBgD6UVAc3lW98TzSXJDIoP0AJbQwj3bJ2tX57HhLBxvv37SIKVD
+        fZOXNqiFEqddS/HZpRrI+8yKcB9QYPo=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-97-Te2Iw04rMlO5noLvfgVdUQ-1; Wed, 28 Sep 2022 13:40:41 -0400
+X-MC-Unique: Te2Iw04rMlO5noLvfgVdUQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BA82429DD99A;
+        Wed, 28 Sep 2022 17:40:40 +0000 (UTC)
+Received: from starship (unknown [10.40.193.233])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A44FE1121314;
+        Wed, 28 Sep 2022 17:40:38 +0000 (UTC)
+Message-ID: <2ca1b7c59e2abe661dd03309ad13eca7d692ff05.camel@redhat.com>
+Subject: Re: [PATCH v3 07/28] KVM: x86: Inhibit APIC memslot if x2APIC and
+ AVIC are enabled
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Li RongQing <lirongqing@baidu.com>
+Date:   Wed, 28 Sep 2022 20:40:37 +0300
+In-Reply-To: <YzR3PaZokwIPDoXb@google.com>
+References: <20220920233134.940511-1-seanjc@google.com>
+         <20220920233134.940511-8-seanjc@google.com>
+         <e84ebf0a7ac9322bd0cfa742ef6dd2bbfdac0df9.camel@redhat.com>
+         <YzHawRN8vpEzP7XD@google.com>
+         <bcc3c67abc3b2c3d896b800c5f8f7295b7238271.camel@redhat.com>
+         <YzR3PaZokwIPDoXb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT041:EE_|DM6PR12MB4354:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7bfe8a46-c07c-43d2-8b6e-08daa1774f92
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Ew5o00R0RzotH3uBYNlIfcjg2qGR/g8xZF7dRKzn1sGDL1JydKTPl1N2Mvs16UJdc9CdtRDgDwQ9JcQVod5lwaSapQ0cGaFC4jvkimx3tZymPnY7/Nl2YSCFKxfV91484i9U/ksNPNCusOh0Yfu1UPMKPOi4y4RXtJvNYgLJ+J/K8Vjh8s4jHl3zus3m2ZAeuP9Fha7fazNDWdR5GmIJo/k+61E3wAkgznaFQcTjRD+zdhy0PAt0L89my17+wek5G8uURvPTK/5l7XlXF8G5Sm3YRabTN3oM6J47JRpt+XaynvFDO4SEvn9lQMR23OcS5FtsgNHUpKi9TBqIatqobjqBVVJyxWwpmb/aElnY8ki+LPQguXr6QhKe0aEOVlQ5kmuZSIqnVPW6qo+gDbb5KXgUNFXhlAbURwx+dkt32IImV1vv7VFdwLwfU7vKbdWdM7I5kuqpmojwd9vCZY5cVgH49yIAQ5UBwbkcz2djEkNasocG9I+MJT5jS6DzBj7+pMK5lzxH1CF8wZU1dlhpEuYu4ZEYlRpnHXBu2aQPShxUYNtHf0XhfwpzSfZGEbvrBWBjBBW7MXbHbFvxgqU1y8AiNqqlvPaPz1LjkY/FqC6oOziyAyfHKvyVp9DYLF5o9U6aokfEVSmW1L6Wqb+xWoosCrLk/drVwP9AqSQGJ1dvzBSrOa/ENdh97RehFqDnhtQbLGKczvZoGyk78C85c4YUixU1c6sJC62J4Uk8gtDtr9oHmVv0iULVvUkJhUe8L/Xfl7E9KVvw0/Q0DYiTNpp6Iz/a9sXn8Ql21w93PO6J/rAsQ4GLwmn20y+7Hot+
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(346002)(396003)(136003)(376002)(451199015)(46966006)(36840700001)(40470700004)(7696005)(70586007)(44832011)(2906002)(40460700003)(336012)(316002)(478600001)(110136005)(186003)(1076003)(41300700001)(82740400003)(36756003)(26005)(81166007)(2616005)(5660300002)(40480700001)(86362001)(36860700001)(426003)(70206006)(356005)(82310400005)(47076005)(8676002)(8936002)(83380400001)(4326008)(2101003)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2022 17:31:43.3593
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7bfe8a46-c07c-43d2-8b6e-08daa1774f92
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT041.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4354
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix some typos in file arch/x86/kvm/svm/sev.c.
+On Wed, 2022-09-28 at 16:33 +0000, Sean Christopherson wrote:
+> On Wed, Sep 28, 2022, Maxim Levitsky wrote:
+> > On Mon, 2022-09-26 at 17:00 +0000, Sean Christopherson wrote:
+> > > Given the SRCU problem, I'd prefer to keep the management of the memslot in common
+> > > code, even though I agree it's a bit silly.  And KVM_REQ_UNBLOCK is a perfect fit
+> > > for dealing with the SRCU issue, i.e. handling this in AVIC code would require
+> > > another hook on top of spreading the memslot management across x86 and SVM code.
+> > 
+> > OK, I am not going to argue about this. But what about at least not using an inhibit
+> > bit for that but something else like a boolean, or maybe really add 'I am AVIC bit'
+> > or rather something like vcpu->arch.apicv_type enum?
+> > 
+> > Or we can make SVM code just call a common function - just put these in a
+> > function and call it from avic_set_virtual_apic_mode?
+> 
+> The issue is that kvm_vcpu_update_apicv() is called from kvm_lapic_set_base(),
+> which is the one that may or may not hold SRCU.
 
-Signed-off-by: Carlos Bilbao <carlos.bilbao@amd.com>
----
- arch/x86/kvm/svm/sev.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Makes sense now.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index f7fe0008bfd1..107fa0f442b2 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -668,7 +668,7 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
- 	 */
- 	memcpy(save, &svm->vmcb->save, sizeof(svm->vmcb->save));
- 
--	/* Sync registgers */
-+	/* Sync registers */
- 	save->rax = svm->vcpu.arch.regs[VCPU_REGS_RAX];
- 	save->rbx = svm->vcpu.arch.regs[VCPU_REGS_RBX];
- 	save->rcx = svm->vcpu.arch.regs[VCPU_REGS_RCX];
-@@ -2585,7 +2585,7 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu)
- 
- 	/*
- 	 * If its an SNP guest, then VMSA was added in the RMP entry as
--	 * a guest owned page. Transition the page to hyperivosr state
-+	 * a guest owned page. Transition the page to hypervisor state
- 	 * before releasing it back to the system.
- 	 */
- 	if (sev_snp_guest(vcpu->kvm) &&
-@@ -3150,7 +3150,7 @@ static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu, enum psc_op op,
- 				return PSC_UNDEF_ERR;
- 
- 			/*
--			 * Mark the userspace range unmerable before adding the pages
-+			 * Mark the userspace range unmergable before adding the pages
- 			 * in the RMP table.
- 			 */
- 			mmap_write_lock(kvm->mm);
-@@ -3510,7 +3510,7 @@ bool sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu)
- 
- 	ret = __sev_snp_update_protected_guest_state(vcpu);
- 	if (ret)
--		vcpu_unimpl(vcpu, "snp: AP state update on init failed\n");
-+		vcpu_unimpl(vcpu, "SNP: AP state update on init failed\n");
- 
- unlock:
- 	mutex_unlock(&svm->snp_vmsa_mutex);
-@@ -4170,7 +4170,7 @@ void sev_es_prepare_guest_switch(struct vcpu_svm *svm, unsigned int cpu)
- 	/* PKRU is restored on VMEXIT, save the current host value */
- 	hostsa->pkru = read_pkru();
- 
--	/* MSR_IA32_XSS is restored on VMEXIT, save the currnet host value */
-+	/* MSR_IA32_XSS is restored on VMEXIT, save the current host value */
- 	hostsa->xss = host_xss;
- }
- 
-@@ -4223,7 +4223,7 @@ struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
- 	 * Allocate an SNP safe page to workaround the SNP erratum where
- 	 * the CPU will incorrectly signal an RMP violation  #PF if a
- 	 * hugepage (2mb or 1gb) collides with the RMP entry of VMCB, VMSA
--	 * or AVIC backing page. The recommeded workaround is to not use the
-+	 * or AVIC backing page. The recommended workaround is to not use the
- 	 * hugepage.
- 	 *
- 	 * Allocate one extra page, use a page which is not 2mb aligned
--- 
-2.34.1
+> 
+> > > > You are about to remove the KVM_REQ_UNBLOCK in other patch series.
+> > > 
+> > > No, KVM_REQ_UNHALT is being removed.  KVM_REQ_UNBLOCK needs to stay, although it
+> > > has a rather weird name, e.g. KVM_REQ_WORK would probably be better.
+> > 
+> > Roger that!
+> > And I guess lets rename it while we are at it.
+> 
+> I'll prep a patch.
+> 
+> > > > How about just raising KVM_REQ_APICV_UPDATE on current vCPU
+> > > > and having a special case in kvm_vcpu_update_apicv of 
+> > > > 
+> > > > if (apic_access_memslot_enabled == false && apic_access_memslot_allocaed == true) {
+> > > > 	drop srcu lock
+> > > 
+> > > This was my initial thought as well, but the issue is that SRCU may or may not be
+> > > held, and so the unlock+lock would need to be conditional.  That's technically a
+> > > solvable problem, as it's possible to detect if SRCU is held, but I really don't
+> > > want to rely on kvm_vcpu.srcu_depth for anything other than proving that KVM doesn't
+> > > screw up SRCU.
+> > 
+> > Why though? the KVM_REQ_APICV_UPDATE is only handled AFAIK in vcpu_enter_guest
+> > which drops the srcu lock few lines afterwards, and therefore the
+> > kvm_vcpu_update_apicv is always called with the lock held and it means that it
+> > can drop it for the duration of slot update.
+> > 
+> > The original issue we had was that we tried to drop the srcu lock in 
+> > 'kvm_set_apicv_inhibit' which indeed is called from various places,
+> > with, or without the lock held.
+> > 
+> > Moving the memslot disable code to kvm_vcpu_update_apicv would actually solve
+> > that, but it was not possible because kvm_vcpu_update_apicv is called
+> > simultaneously on all vCPUs, and created various races, including toggling
+> > the memslot twice.
+> 
+> As above, kvm_vcpu_update_apicv() can be called without SRCU held.  Oh, but that
+> was a recent addition, commit 8fc9c7a3079e ("KVM: x86: Deactivate APICv on vCPU
+> with APIC disabled").  I was wary of using KVM_REQ_APICV_UPDATE in kvm_lapic_set_base(),
+> e.g. in case there was some dependency on updating _immediately, but since that's
+> such a new addition I have no objection to switching to the request.
+> 
+> Similarly, is there a good reason for having nested_svm_vmexit() invoke
+> kvm_vcpu_update_apicv() directly?  I'm confused by the "so that other vCPUs can
+> start to benefit from it right away".  The nested inhibit is per-vCPU and so
+> should only affect the current vCPU, no?  I.e. for all intents and purposes, using
+> a request should be functionally equivalent.
+
+It is kind of the other way around:
+
+The mere fact of switching to vmcb02 *inhibits* the AVIC on the current vCPU,
+but the AVIC inhibit is there only to set the is_running bits in the physid table
+and in IOMMU to prevent its *peers* to try and send interrupts to it via AVIC.
+
+It is the reason why APICv doesn't need it - the posted interrupts still work
+just fine when a vCPU doens't use APICv, or uses a different posted interrupt vector
+when it uses the nested APICv.
+
+So it makes sense to remove that inhibit as soon as possible that the peers
+could stop getting 'unaccellerated IPI' vmexits for nothing.
+
+
+However back to the discussion, I don't think this is a problem.
+
+We can just call both the kvm_vcpu_update_apicv() and a new function that
+does the memslot disable from KVM_REQ_APICV_UPDATE, then 
+plain kvm_vcpu_update_apicv() won't need to drop the srcu lock.
+
+It is pretty much the same that you proposed, just instead of piggybacking on 
+KVM_REQ_UNBLOCK, I proposed to piggyback on KVM_REQ_APICV_UPDATE.
+
+
+Best regards,
+	Maxim Levitsky
+
+
+> 
+> 	/*
+> 	 * Un-inhibit the AVIC right away, so that other vCPUs can start
+> 	 * to benefit from it right away.
+> 	 */
+> 	if (kvm_apicv_activated(vcpu->kvm))
+> 		kvm_vcpu_update_apicv(vcpu);
+> 
+
 
