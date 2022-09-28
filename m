@@ -2,74 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F9935EEA48
-	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 01:45:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66A025EEA4E
+	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 01:54:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234551AbiI1XpM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 19:45:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58628 "EHLO
+        id S234034AbiI1Xx6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 19:53:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234034AbiI1XpI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 19:45:08 -0400
-Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4B86FB333
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 16:45:06 -0700 (PDT)
-Received: by mail-ot1-x331.google.com with SMTP id w22-20020a056830061600b006546deda3f9so9169883oti.4
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 16:45:06 -0700 (PDT)
+        with ESMTP id S229949AbiI1Xx5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 19:53:57 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C540410B598
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 16:53:56 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id m1-20020a056a00080100b00543ffc4cfe0so8092918pfk.5
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 16:53:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=ESo7dYY6GfSDr+r4KK+gGMltslb0uxWselTUsHs3b/I=;
-        b=oItvueHC9rGpEb1pjDREbzHBF4FsxPszjkSVzhJXqpPU49y/K5jjrfmA7oddFNQfmP
-         sR629g48JwNN9T6R8G660mC9vUqTrrGYcg30Wdo+KgVe2AEYXxT0AqJRF6IxQCT7U3wz
-         HN8BVD0i673m0Llrhm1mnVpn5n0b9H+HvrBP+p43/3wVnBLIluaF6JazpmqonSDZmMSx
-         rcazm5CE45xgvNTlQGaHPuiick8amlxtoYzCvslzqE8f/L9VW5Mi7TziUCMHaDlzKyj+
-         LnLxsGsboagft/aX9Aanz8y41bPYUD6i/5aiU+zhx4vN6qQjNMp+6HtDmMytNC2gdTlu
-         GM0w==
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date;
+        bh=8q9CyG61El4v+mVMBzcJd8HOQHJbi0j0M8RnaIqWnFQ=;
+        b=QhRZZhPENaTUZ7VRoPVonJuO7TSzfjzViIjW3MJfFTPAZu0UYfK7dVBC5PLYW5qz4f
+         x0Dlq4YDv4gROk2lB3OQJMj+WiRE9+nTpu850iYpICVY+jPXbyzWorywyE3/GOp2v59j
+         pHezFyLPUjDXH+GNszaayaRVhDfCoupbXgWZuEgVIGneSigVMq/BTNovumfJ9v+R1F7J
+         xbwti8mUUadMu+MLgo0sPYAjNErx2DMbdcNc03vMlevrFbXv3QgcvblxafzOAgksPp4L
+         ArQV6JJ+fKzAXNXNmhNTHsgAoUHkvBMzCy9jpiWAEuIYn4b3X8uLKyyo2HWALU7ypaPH
+         3cGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=ESo7dYY6GfSDr+r4KK+gGMltslb0uxWselTUsHs3b/I=;
-        b=Nh9b7x7dVSR+aiyltVczaaKwUxN5UMHJx3tKStOncs8RRGqxAELFaZoG+sRS9YqVaP
-         CapiH5twSBXvvSNBtaSsALjzZUfRUEo53qVFT/KlM5mPToVinQ/QhuyW3UOyRsf/puaB
-         Xu30R+RcuUlWqZco8SWSqL1HfDJD7KQHWeO0pGUQ4ECSRjdy0YedoSMgbs4Vgy+YpCIA
-         mG0xrofqtu9PwBL78O4vOnEP8cOPPJFtpva7AUkMeTXF49wjMqv5qJcDro2SyzfzQbOS
-         0RrvYMob2tKUPwf/mG6r2yOjXJIP3F521StsEYOLb2KLlOyPFD4JdYxiYpfhIPyMR9sI
-         77Jw==
-X-Gm-Message-State: ACrzQf1+hDCcYtPa9BbjEvtlyJXGRQq31pgJGt9iU2oHsYjSChDnly9S
-        Xjdj1LsXdqpozHtRRlo7QMA4ZTNXnLkkMIWt7WpaTA==
-X-Google-Smtp-Source: AMsMyM5BEgYUYkwCxhv/sZA35LzbvEoRuf+YYFHT4kB7vvwY9taFoIle4rOgzDexyQJ331I5KruMLo+4Blr6HuHoaCo=
-X-Received: by 2002:a9d:6296:0:b0:656:761:28bc with SMTP id
- x22-20020a9d6296000000b00656076128bcmr172073otk.14.1664408705832; Wed, 28 Sep
- 2022 16:45:05 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220928233652.783504-1-seanjc@google.com> <20220928233652.783504-8-seanjc@google.com>
-In-Reply-To: <20220928233652.783504-8-seanjc@google.com>
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=8q9CyG61El4v+mVMBzcJd8HOQHJbi0j0M8RnaIqWnFQ=;
+        b=BXT+wYLzoNPyka3RRSEdTkFHBot+q570UsfZZrpF/SSGLeFAlOrlChFhyAaz9ZUUwD
+         WYrr4RTLVZyYtTCPrjDwXwwWw3eIAxs7kUT9wcdnw4i83tPliwHgt1bYf4vDsXqDASPi
+         VVnJgRSqi2s/3HLSNKo0/Xqx2ACegima8yw05D8/YEjvvGZHlpek4F2rZXOVqsRJ8iqT
+         LpjcqScONnTwa2OFTj2ib7lbd3XcgFHwm/kjkI3MTKWR/zrLUmIbs/7bjgyugVfKnnH5
+         xArmgvDoWlhYTYopDvv6nJAlr5/9hMozg0sF0c5jYnnraipRonhOzbgaS4tpOVkg7Jky
+         8OLw==
+X-Gm-Message-State: ACrzQf0FyLzHBAI2GgUN6hmEU/KSOdtnpZaHFLTtoBUEDoNASEfOVjTs
+        PJWAMeZJPMoSuoHFYa6EyiRLp9P7j2ENDoooFWHGbsURhDb66c97vB14gdwzVDRHh6aMJsqLxGx
+        NUS4sGoxUDYJ8k/xTR5Krm7WyEtcjKTxAcwWII1mHvhtf6m9LDrEQ29ADQV4GuWI=
+X-Google-Smtp-Source: AMsMyM511NFxW2ysdiMoMkEG9yd0Is8tmdPUDgzZLBHDVXZp6sSg83B7yrwtEvWvepbMYmi4pFKC+3a4ucmxDQ==
+X-Received: from loggerhead.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:29a])
+ (user=jmattson job=sendgmr) by 2002:a17:902:ceca:b0:177:fa1f:4abc with SMTP
+ id d10-20020a170902ceca00b00177fa1f4abcmr487237plg.99.1664409236260; Wed, 28
+ Sep 2022 16:53:56 -0700 (PDT)
+Date:   Wed, 28 Sep 2022 16:53:50 -0700
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.3.998.g577e59143f-goog
+Message-ID: <20220928235351.1668844-1-jmattson@google.com>
+Subject: [PATCH 1/2] KVM: VMX: Guest usage of IA32_SPEC_CTRL is likely
 From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 28 Sep 2022 16:44:53 -0700
-Message-ID: <CALMp9eTysg_AdBi3BsbMzj4uKjsHLOOa1B3x+j8=CH=Lvzr8jQ@mail.gmail.com>
-Subject: Re: [PATCH v2 7/7] Revert "KVM: selftests: Fix nested SVM tests when
- built with clang"
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>, kvm@vger.kernel.org,
-        llvm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Oliver Upton <oliver.upton@linux.dev>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com
+Cc:     Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,17 +65,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 28, 2022 at 4:37 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> Revert back to using memset() in generic_svm_setup() now that KVM
-> selftests override memset() and friends specifically to prevent the
-> compiler from generating fancy code and/or linking to the libc
-> implementation.
->
-> This reverts commit ed290e1c20da19fa100a3e0f421aa31b65984960.
->
-> Suggested-by: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-I love it!
+At this point in time, most guests (in the default, out-of-the-box
+configuration) are likely to use IA32_SPEC_CTRL.
 
-Reviewed-by: Jim Mattson <jmattson@google.com>
+Signed-off-by: Jim Mattson <jmattson@google.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index c9b49a09e6b5..ffe552a82044 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -858,7 +858,7 @@ unsigned int __vmx_vcpu_run_flags(struct vcpu_vmx *vmx)
+ 	 * to change it directly without causing a vmexit.  In that case read
+ 	 * it after vmexit and store it in vmx->spec_ctrl.
+ 	 */
+-	if (unlikely(!msr_write_intercepted(vmx, MSR_IA32_SPEC_CTRL)))
++	if (!msr_write_intercepted(vmx, MSR_IA32_SPEC_CTRL))
+ 		flags |= VMX_RUN_SAVE_SPEC_CTRL;
+ 
+ 	return flags;
+-- 
+2.37.3.998.g577e59143f-goog
+
