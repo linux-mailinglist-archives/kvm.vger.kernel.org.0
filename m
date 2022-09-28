@@ -2,73 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C1DD5EEA05
-	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 01:14:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 31E805EEA11
+	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 01:20:31 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233766AbiI1XOw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 19:14:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55392 "EHLO
+        id S232431AbiI1XU1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 19:20:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232166AbiI1XOp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 19:14:45 -0400
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AB782714
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 16:14:39 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id e10-20020a05600c4e4a00b003b4eff4ab2cso2214492wmq.4
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 16:14:38 -0700 (PDT)
+        with ESMTP id S229940AbiI1XUV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 19:20:21 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3EA927FD5
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 16:20:19 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id mi9-20020a17090b4b4900b00202b50464b6so2404331pjb.9
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 16:20:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date;
-        bh=ejGuPnbyo4ms2QIe7VBN81YCemx00ZRUVBieL39eg0M=;
-        b=DOt1r3FzrtWXF5TPEVuxhMydjWLo5/LMtOzcZLMggjr/IaWYU6Prz4TIT4OwA4tGFX
-         ivFXLKeEDCh0M2QtxZ2lRG/FDJboiSUl3gvHcJBLcOOKOqMPFPJBSsbzXIJ9ot4y+N5W
-         Efgm7s/3DXLEDf9J54t8mpYGXT9MKB+BlQlSjMp2D5wbophjq/6OtLkjC3UQg+Jm0cd4
-         ftfuK5AV3fDCxjEzNO4rQmuD7uTgjc3BUr8mfNAY/h7Lnmx/WtVhODEQJQBfhbrK2XXD
-         vivDOyTqMQawpxiBtScKIKzwoF0osPj0lVKKTixCX3MR9yqTTsQdgvy27lMT0Nvycsv3
-         rpGA==
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date;
+        bh=1BcvkZblEoh81UGBvcbacOXFb2nRKlIjpIAm5OdbSA8=;
+        b=Xk8jpCAp7kAIuzwk7BIrTBWEa1j4mAf0fiyNchS/feUtRG57b/rQVM9QarpWa9NP0B
+         XFEhW7pOb7H/nYHmczRTjoELvh3S/cY6sekhURDN2N5y69ljts5bXEwWS9ULvqEATSXx
+         8/HurJTtyAboLQfzBk2/w8I9te4jVhTMgRXZq2puvhkRRpnavVrCl5xyMbAzvrW3fOzj
+         LKoGpCXWnSLxkZF66UBHebmttqXXVYEvE60N4MB5YCjgXyV2uNepsSMh2Or/bbXt1xR1
+         myqQwp8jG9tSx90nJl6syWtYPxTwX6HacZ3T4bJkv/8phDkqkX0o+T38xD5xF3Xuhd9Z
+         g3EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=ejGuPnbyo4ms2QIe7VBN81YCemx00ZRUVBieL39eg0M=;
-        b=B7CECuUzilPXD4KGWMMu6qfC6oaf5oOYaNFl24Wc5cdZBFMI0pE0LfjofIRLWgb+rQ
-         X5o9oJhujn1YlKKIjl3V+QRd/p/XLKNE/5H8cEV+yVrJ00h5SCm3IFvMfWZm7htaQdgX
-         zoolHs6FOEWQVwZAOq65s+QVQOqI8vwTYLl7d8Ncq+c3kc5rtJDS9tHhS+HeMpmGR4zM
-         JQJIZw/8v+2yHj8hFtgQxqCn8305CuvOQ8rZSDPdtOr2JhCwZBSKf5H+lgUYwdjod+8l
-         g3NHggRiSYWUBbmRyOLfPTvFBYRiAgDkMSbvVFoXwU3ACxjNe5PKXUDDi1NIGQNisIt3
-         9o1w==
-X-Gm-Message-State: ACrzQf2ajN6Fg93BVRjStTMnTNPpCK0PbTU2r4I4NsjIJh/5s1dD/0GU
-        VpKUU7Bm2AaiWlunRU9gIANHbfylK6WxCAZzQeBOyA==
-X-Google-Smtp-Source: AMsMyM7RUQ9VuDEpAN0bVGui4vMus7mWpbhhfYCH6ruPeC2pzfR/93cY7f27OafYL2tYCJ5G94xxai+HJgzGo3k2AfI=
-X-Received: by 2002:a05:600c:510b:b0:3b5:4a6:9a32 with SMTP id
- o11-20020a05600c510b00b003b504a69a32mr210048wms.81.1664406877407; Wed, 28 Sep
- 2022 16:14:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220928064538.667678-1-uekawa@chromium.org> <20220928082823.wyxplop5wtpuurwo@sgarzare-redhat>
- <20220928052738-mutt-send-email-mst@kernel.org> <20220928151135.pvrlsylg6j3hzh74@sgarzare-redhat>
-In-Reply-To: <20220928151135.pvrlsylg6j3hzh74@sgarzare-redhat>
-From:   =?UTF-8?B?SnVuaWNoaSBVZWthd2EgKOS4iuW3nee0lOS4gCk=?= 
-        <uekawa@google.com>
-Date:   Thu, 29 Sep 2022 08:14:24 +0900
-Message-ID: <CADgJSGHxPWXJjbakEeWnqF42A03yK7Dpw6U1SKNLhk+B248Ymg@mail.gmail.com>
-Subject: Re: [PATCH] vhost/vsock: Use kvmalloc/kvfree for larger packets.
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
-        netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        Bobby Eshleman <bobby.eshleman@gmail.com>
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=1BcvkZblEoh81UGBvcbacOXFb2nRKlIjpIAm5OdbSA8=;
+        b=1ry59laA4lXqH3bBwxmv/NfwKgaNJw3q0T8iaty2ncUFlyRvp1xgrOEwmOj66VW7uz
+         IJv+Cq7c86+j5GpffHW+XLObZXl2IkXMm6r8sGxLb4QVU7Fz+QM/G0i21ioMw51ANa8i
+         qAZIKafPw0HeWUFD9HGVCcUfa97I0HYUxekKWumGrExjahQjqScYhaOyokaJUUfMEYRR
+         ouiu/XRgBjy83KMoIwU2KtHj63vFVJGuxsYRcQDH4+2N1Ak44dP1iSOSS5lHX7GcrJOB
+         3gBc0danBckWC/ZEV5V2o7G2xlxLVREMz1Tc0DFG/EWkCNuwbPqwxSOTXAo++004fynn
+         Z8mQ==
+X-Gm-Message-State: ACrzQf229b7nqo6O7pNtwCs7m30cDT34W2qavMeJFcxVmrT+Bd5NGNak
+        esRNMGbU0UurURYII+ZW27eK/GjVQWY=
+X-Google-Smtp-Source: AMsMyM7wvxCBb8zWCK0CcdiW+UMbMYc8u643F2ltwA5W/bmQ3Mq+yYFDMGhidW94hvR/6yHGKZK1ZccUaJY=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:aa7:8704:0:b0:542:5288:5e32 with SMTP id
+ b4-20020aa78704000000b0054252885e32mr153082pfo.84.1664407219578; Wed, 28 Sep
+ 2022 16:20:19 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed, 28 Sep 2022 23:20:15 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.3.998.g577e59143f-goog
+Message-ID: <20220928232015.745948-1-seanjc@google.com>
+Subject: [PATCH] KVM: VMX: Make vmread_error_trampoline() uncallable from C code
+From:   Sean Christopherson <seanjc@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Uros Bizjak <ubizjak@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,139 +67,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-2022=E5=B9=B49=E6=9C=8829=E6=97=A5(=E6=9C=A8) 0:11 Stefano Garzarella <sgar=
-zare@redhat.com>:
->
-> On Wed, Sep 28, 2022 at 05:31:58AM -0400, Michael S. Tsirkin wrote:
-> >On Wed, Sep 28, 2022 at 10:28:23AM +0200, Stefano Garzarella wrote:
-> >> On Wed, Sep 28, 2022 at 03:45:38PM +0900, Junichi Uekawa wrote:
-> >> > When copying a large file over sftp over vsock, data size is usually=
- 32kB,
-> >> > and kmalloc seems to fail to try to allocate 32 32kB regions.
-> >> >
-> >> > Call Trace:
-> >> >  [<ffffffffb6a0df64>] dump_stack+0x97/0xdb
-> >> >  [<ffffffffb68d6aed>] warn_alloc_failed+0x10f/0x138
-> >> >  [<ffffffffb68d868a>] ? __alloc_pages_direct_compact+0x38/0xc8
-> >> >  [<ffffffffb664619f>] __alloc_pages_nodemask+0x84c/0x90d
-> >> >  [<ffffffffb6646e56>] alloc_kmem_pages+0x17/0x19
-> >> >  [<ffffffffb6653a26>] kmalloc_order_trace+0x2b/0xdb
-> >> >  [<ffffffffb66682f3>] __kmalloc+0x177/0x1f7
-> >> >  [<ffffffffb66e0d94>] ? copy_from_iter+0x8d/0x31d
-> >> >  [<ffffffffc0689ab7>] vhost_vsock_handle_tx_kick+0x1fa/0x301 [vhost_=
-vsock]
-> >> >  [<ffffffffc06828d9>] vhost_worker+0xf7/0x157 [vhost]
-> >> >  [<ffffffffb683ddce>] kthread+0xfd/0x105
-> >> >  [<ffffffffc06827e2>] ? vhost_dev_set_owner+0x22e/0x22e [vhost]
-> >> >  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
-> >> >  [<ffffffffb6eb332e>] ret_from_fork+0x4e/0x80
-> >> >  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
-> >> >
-> >> > Work around by doing kvmalloc instead.
-> >> >
-> >> > Signed-off-by: Junichi Uekawa <uekawa@chromium.org>
-> >
-> >My worry here is that this in more of a work around.
-> >It would be better to not allocate memory so aggressively:
-> >if we are so short on memory we should probably process
-> >packets one at a time. Is that very hard to implement?
->
-> Currently the "virtio_vsock_pkt" is allocated in the "handle_kick"
-> callback of TX virtqueue. Then the packet is multiplexed on the right
-> socket queue, then the user space can de-queue it whenever they want.
->
-> So maybe we can stop processing the virtqueue if we are short on memory,
-> but when can we restart the TX virtqueue processing?
->
-> I think as long as the guest used only 4K buffers we had no problem, but
-> now that it can create larger buffers the host may not be able to
-> allocate it contiguously. Since there is no need to have them contiguous
-> here, I think this patch is okay.
->
-> However, if we switch to sk_buff (as Bobby is already doing), maybe we
-> don't have this problem because I think there is some kind of
-> pre-allocated pool.
->
+Declare vmread_error_trampoline() as an opaque symbol so that it cannot
+be called from C code, at least not without some serious fudging.  The
+trampoline always passes parameters on the stack so that the inline
+VMREAD sequence doesn't need to clobber registers.  regparm(0) was
+originally added to document the stack behavior, but it ended up being
+confusing because regparm(0) is a nop for 64-bit targets.
 
-Thank you for the review! I was wondering if this is a reasonable workaroun=
-d (as
-we found that this patch makes a reliably crashing system into a
-reliably surviving system.)
+Opportunustically wrap the trampoline and its declaration in #ifdeffery
+to make it even harder to invoke incorrectly, to document why it exists,
+and so that it's not left behind if/when CONFIG_CC_HAS_ASM_GOTO_OUTPUT
+is true for all supported toolchains.
 
+No functional change intended.
 
-... Sounds like it is a reasonable patch to use backported to older kernels=
-?
+Cc: Uros Bizjak <ubizjak@gmail.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/vmx/vmenter.S |  2 ++
+ arch/x86/kvm/vmx/vmx_ops.h | 18 ++++++++++++++++--
+ 2 files changed, 18 insertions(+), 2 deletions(-)
 
-> >
-> >
-> >
-> >> > ---
-> >> >
-> >> > drivers/vhost/vsock.c                   | 2 +-
-> >> > net/vmw_vsock/virtio_transport_common.c | 2 +-
-> >> > 2 files changed, 2 insertions(+), 2 deletions(-)
-> >> >
-> >> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> >> > index 368330417bde..5703775af129 100644
-> >> > --- a/drivers/vhost/vsock.c
-> >> > +++ b/drivers/vhost/vsock.c
-> >> > @@ -393,7 +393,7 @@ vhost_vsock_alloc_pkt(struct vhost_virtqueue *vq=
-,
-> >> >            return NULL;
-> >> >    }
-> >> >
-> >> > -  pkt->buf =3D kmalloc(pkt->len, GFP_KERNEL);
-> >> > +  pkt->buf =3D kvmalloc(pkt->len, GFP_KERNEL);
-> >> >    if (!pkt->buf) {
-> >> >            kfree(pkt);
-> >> >            return NULL;
-> >> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock=
-/virtio_transport_common.c
-> >> > index ec2c2afbf0d0..3a12aee33e92 100644
-> >> > --- a/net/vmw_vsock/virtio_transport_common.c
-> >> > +++ b/net/vmw_vsock/virtio_transport_common.c
-> >> > @@ -1342,7 +1342,7 @@ EXPORT_SYMBOL_GPL(virtio_transport_recv_pkt);
-> >> >
-> >> > void virtio_transport_free_pkt(struct virtio_vsock_pkt *pkt)
-> >> > {
-> >> > -  kfree(pkt->buf);
-> >> > +  kvfree(pkt->buf);
-> >>
-> >> virtio_transport_free_pkt() is used also in virtio_transport.c and
-> >> vsock_loopback.c where pkt->buf is allocated with kmalloc(), but IIUC
-> >> kvfree() can be used with that memory, so this should be fine.
-> >>
-> >> >    kfree(pkt);
-> >> > }
-> >> > EXPORT_SYMBOL_GPL(virtio_transport_free_pkt);
-> >> > --
-> >> > 2.37.3.998.g577e59143f-goog
-> >> >
-> >>
-> >> This issue should go away with the Bobby's work about introducing sk_b=
-uff
-> >> [1], but we can queue this for now.
-> >>
-> >> I'm not sure if we should do the same also in the virtio-vsock driver
-> >> (virtio_transport.c). Here in vhost-vsock the buf allocated is only us=
-ed in
-> >> the host, while in the virtio-vsock driver the buffer is exposed to th=
-e
-> >> device emulated in the host, so it should be physically contiguous (if=
- not,
-> >> maybe we need to adjust virtio_vsock_rx_fill()).
-> >
-> >More importantly it needs to support DMA API which IIUC kvmalloc
-> >memory does not.
-> >
->
-> Right, good point!
->
-> Thanks,
-> Stefano
->
+diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+index 8477d8bdd69c..24c54577ac84 100644
+--- a/arch/x86/kvm/vmx/vmenter.S
++++ b/arch/x86/kvm/vmx/vmenter.S
+@@ -269,6 +269,7 @@ SYM_FUNC_END(__vmx_vcpu_run)
+ 
+ .section .text, "ax"
+ 
++#ifndef CONFIG_CC_HAS_ASM_GOTO_OUTPUT
+ /**
+  * vmread_error_trampoline - Trampoline from inline asm to vmread_error()
+  * @field:	VMCS field encoding that failed
+@@ -317,6 +318,7 @@ SYM_FUNC_START(vmread_error_trampoline)
+ 
+ 	RET
+ SYM_FUNC_END(vmread_error_trampoline)
++#endif
+ 
+ SYM_FUNC_START(vmx_do_interrupt_nmi_irqoff)
+ 	/*
+diff --git a/arch/x86/kvm/vmx/vmx_ops.h b/arch/x86/kvm/vmx/vmx_ops.h
+index ec268df83ed6..80ad6b0a5599 100644
+--- a/arch/x86/kvm/vmx/vmx_ops.h
++++ b/arch/x86/kvm/vmx/vmx_ops.h
+@@ -11,14 +11,28 @@
+ #include "../x86.h"
+ 
+ void vmread_error(unsigned long field, bool fault);
+-__attribute__((regparm(0))) void vmread_error_trampoline(unsigned long field,
+-							 bool fault);
+ void vmwrite_error(unsigned long field, unsigned long value);
+ void vmclear_error(struct vmcs *vmcs, u64 phys_addr);
+ void vmptrld_error(struct vmcs *vmcs, u64 phys_addr);
+ void invvpid_error(unsigned long ext, u16 vpid, gva_t gva);
+ void invept_error(unsigned long ext, u64 eptp, gpa_t gpa);
+ 
++#ifndef CONFIG_CC_HAS_ASM_GOTO_OUTPUT
++/*
++ * The VMREAD error trampoline _always_ uses the stack to pass parameters, even
++ * for 64-bit targets.  Preserving all registers allows the VMREAD inline asm
++ * blob to avoid clobbering GPRs, which in turn allows the compiler to better
++ * optimize sequences of VMREADs.
++ *
++ * Declare the trampoline as an opaque label as it's not safe to call from C
++ * code; there is no way to tell the compiler to pass params on the stack for
++ * 64-bit targets.
++ *
++ * void vmread_error_trampoline(unsigned long field, bool fault);
++ */
++extern unsigned long vmread_error_trampoline;
++#endif
++
+ static __always_inline void vmcs_check16(unsigned long field)
+ {
+ 	BUILD_BUG_ON_MSG(__builtin_constant_p(field) && ((field) & 0x6001) == 0x2000,
 
+base-commit: c59fb127583869350256656b7ed848c398bef879
+-- 
+2.37.3.998.g577e59143f-goog
 
---=20
-Junichi Uekawa
-Google
