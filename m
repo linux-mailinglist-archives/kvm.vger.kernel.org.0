@@ -2,76 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 62CC55EE267
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 18:59:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A99155EE283
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 19:04:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233644AbiI1Q7C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 12:59:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57374 "EHLO
+        id S234262AbiI1REt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 13:04:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231419AbiI1Q7A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 12:59:00 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95A487D1E5
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 09:58:59 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id q35-20020a17090a752600b002038d8a68fbso3145663pjk.0
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 09:58:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=JPHVsQZph796quobJWecE9d8WYuQzTyeUzZ9fJLJCt0=;
-        b=YoST0dNL+tr2MxBQPBb3gEUaaq2rchEwRpYCm/C4/zvdm9UbKh4weE6f9Rse5smcva
-         0ahnHpBHQGqD6xuD07bwTCdT6qGIDSf9F6/AboMMdLNCblGFmx69YPL/461ja3bispRg
-         k153DDi1J/ci/zwEhY4ofIjbRC0HhlW960PgWUe/WeFDrYHoLQ39lc8uF/VM7e5pQVuz
-         2eTDb0AMqf01PjFToZsmQF4Fj0BS16kv5rz2+m7xcKElBgh8RAV574fvfcPkJMbQVVgU
-         43/eaF6HCiqUcc3OI8Dv6vd+rxicq1Qoydc+AH/IWaov28Ka3KoT6aBdmKLOjV3965OP
-         xnjg==
+        with ESMTP id S234012AbiI1REn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 13:04:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC0182B630
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 10:04:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664384681;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4d6KuZOsMOU7NFpnx9W10QIiBigRqBCL2YFQkOodRVs=;
+        b=GNMv3bP1h/ABObSPbvs9cWvsi8PF1DtDbyxSPYNMjPJf0D33af4s8G99aib7YRVuOxFcNT
+        GslubkPH7a3H6X3doeW6R8WvrYVK3XzaT9pGQTsuQJ5yrjfuNAWQ6j/b1j0g5ZNKn/lumQ
+        BgwGPTWUimb4dD4kp+kGcRQMZfonDMk=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-354-QhDCht0zMbWR1kSF3x4sYA-1; Wed, 28 Sep 2022 13:04:39 -0400
+X-MC-Unique: QhDCht0zMbWR1kSF3x4sYA-1
+Received: by mail-ed1-f69.google.com with SMTP id i17-20020a05640242d100b0044f18a5379aso10959052edc.21
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 10:04:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=JPHVsQZph796quobJWecE9d8WYuQzTyeUzZ9fJLJCt0=;
-        b=VCFyFii8yRJb7JYq3rkCLiJBeONZ82mA1JuK4AUZVxkJwub79McVVjjWOnXFIlpzML
-         haRoWZnbarrqtlXIPfa4iOfl/Y8uvVzmtvhjU//yYCN6XUHW/i/e+jG6R5spQEXwagEu
-         f/dIZUFCNIc2avp7+RsVhNxS06tFn3CvAZfQL4pzkMejlMhq8KBsFCxoataMCha43fpx
-         AjxFNwFN6pik8uRdCoLvxTucHTLAkh0AU7ACzX4CL8I03ROrESufRpNciAmMBJK0g173
-         05tIOHGAfKD0nW+NrhJ7Ur0Sy41iNE9IB2N2GMcp4oYwkpaYlzZs696Te3h7e/0orD7m
-         H4Fg==
-X-Gm-Message-State: ACrzQf0jwP9mp+FkgliA4uBkI6cTUrJPqy01WkQu7lMhewKgCYV74UTv
-        Dku6dcyeH1IBtTuveTCFvmQZ4A==
-X-Google-Smtp-Source: AMsMyM6PrX/MsmRBqg1sXs0jHHhg5Yrxul40DjOGHB7X7ofNSd1KnKk+KnOzfR/QXB8u3pbAG0zRAQ==
-X-Received: by 2002:a17:90a:4e8a:b0:203:9556:1b7d with SMTP id o10-20020a17090a4e8a00b0020395561b7dmr11605672pjh.0.1664384338687;
-        Wed, 28 Sep 2022 09:58:58 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id e8-20020a056a0000c800b005361f6a0573sm4218372pfj.44.2022.09.28.09.58.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 09:58:58 -0700 (PDT)
-Date:   Wed, 28 Sep 2022 16:58:53 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        andrew.jones@linux.dev, pbonzini@redhat.com, maz@kernel.org,
-        alexandru.elisei@arm.com, eric.auger@redhat.com, oupton@google.com,
-        reijiw@google.com, rananta@google.com, bgardon@google.com,
-        dmatlack@google.com, axelrasmussen@google.com
-Subject: Re: [PATCH v8 10/14] KVM: selftests: aarch64: Add
- aarch64/page_fault_test
-Message-ID: <YzR9TRjVFi+P7UOp@google.com>
-References: <20220922031857.2588688-1-ricarkol@google.com>
- <20220922031857.2588688-11-ricarkol@google.com>
- <Yyy4WjEmuSH1tSZb@google.com>
- <YzHfwmZqMQ9xXaNa@google.com>
- <YzNz36gZqrse9GzT@google.com>
- <YzPMaEPBtaXguJaT@google.com>
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=4d6KuZOsMOU7NFpnx9W10QIiBigRqBCL2YFQkOodRVs=;
+        b=4AZxN7TJ7IThb7HRZQ+wbGcfZyvDyQiLL9wdV4gpNwDRU0VYN6c+VEMbK+crw0mM1z
+         2G+blT4s4f8e+1hg+9jeL1cBa+FC/+ylIoQXuEJ0O418R2cUTsHygCyrKjFuULoo+/eL
+         NNqbCSE3NqRvvLjlggBwEDVs1qUkqjEOznCzMk2jx4/OVR8Gk9g+yQVMDh3OxfvRilvL
+         /3/OAnkUE08uNTkenHJEtPF3EEJOtfcpLbTKHFqmEklduNbEXbpFf5G+DwyFt1fhuTyr
+         6+6Lvmzh4yjvT4YIHyaGSM/fEHoDe7djKEGKPM6XNiEhzkTDMZfs07WpggI4eddAFAMJ
+         vEAA==
+X-Gm-Message-State: ACrzQf2LzXtNtagYn7rf66qiFbVk+LRF7ba1GmzDYRITxANbqpPYautB
+        sCwZmxISqqHUKu0z/6+Ia5pymrE5r2eQ38PQRjut+PwMd1xZ4Xu5+QWRBWnMIJVpkG4pfbFTID1
+        F3GwAXhuJOwJa
+X-Received: by 2002:a05:6402:5249:b0:451:67ff:f02 with SMTP id t9-20020a056402524900b0045167ff0f02mr34874648edd.227.1664384678727;
+        Wed, 28 Sep 2022 10:04:38 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4NDBS4umH69PMxzkco1fnOsqDzXTVFR/sVWEUDPz84ef+a4uvJEdWWjAYqykdEftyj9fvvUw==
+X-Received: by 2002:a05:6402:5249:b0:451:67ff:f02 with SMTP id t9-20020a056402524900b0045167ff0f02mr34874609edd.227.1664384678433;
+        Wed, 28 Sep 2022 10:04:38 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:2f4b:62da:3159:e077? ([2001:b07:6468:f312:2f4b:62da:3159:e077])
+        by smtp.googlemail.com with ESMTPSA id kl14-20020a170907994e00b007813968e154sm2610479ejc.86.2022.09.28.10.04.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Sep 2022 10:04:37 -0700 (PDT)
+Message-ID: <fd8fab58-2871-c2d4-f620-e454c7ac653e@redhat.com>
+Date:   Wed, 28 Sep 2022 19:04:36 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YzPMaEPBtaXguJaT@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Content-Language: en-US
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+References: <20220909104506.738478-1-eesposit@redhat.com>
+ <20220909104506.738478-5-eesposit@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [RFC PATCH 4/9] kvm_main.c: split logic in kvm_set_memslots
+In-Reply-To: <20220909104506.738478-5-eesposit@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,48 +91,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 27, 2022, Ricardo Koller wrote:
-> On Tue, Sep 27, 2022 at 10:06:23PM +0000, Sean Christopherson wrote:
-> > On Mon, Sep 26, 2022, Ricardo Koller wrote:
-> > > On Thu, Sep 22, 2022 at 07:32:42PM +0000, Sean Christopherson wrote:
-> > > > On Thu, Sep 22, 2022, Ricardo Koller wrote:
-> > > > > +	void *hva = (void *)region->region.userspace_addr;
-> > > > > +	uint64_t paging_size = region->region.memory_size;
-> > > > > +	int ret, fd = region->fd;
-> > > > > +
-> > > > > +	if (fd != -1) {
-> > > > > +		ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
-> > > > > +				0, paging_size);
-> > > > > +		TEST_ASSERT(ret == 0, "fallocate failed, errno: %d\n", errno);
-> > > > > +	} else {
-> > > > > +		if (is_backing_src_hugetlb(region->backing_src_type))
-> > > > > +			return false;
-> > > > 
-> > > > Why is hugetlb disallowed?  I thought anon hugetlb supports MADV_DONTNEED?
-> > > > 
-> > > 
-> > > It fails with EINVAL (only tried on arm) for both the PAGE_SIZE and the huge
-> > > page size. And note that the address is aligned as well.
-> > > 
-> > > madvise(0xffffb7c00000, 2097152, MADV_DONTNEED) = -1 EINVAL (Invalid argument)
-> > > 	^^^^^^^^^^^^^^	^^^^^^^
-> > > 	2M aligned	2M (hugepage size)
-> > > 			
-> > > madvise(0xffff9e800000, 4096, MADV_DONTNEED) = -1 EINVAL (Invalid argument)   
-> > > 			^^^^
-> > > 			PAGE_SIZE
-> > 
-> > I think this needs to be root caused before merging.  Unless I'm getting turned
-> > around, MADV_DONTEED should work, i.e. there is a test bug lurking somewhere.
-> 
-> Turns out that the failure is documented. Found this in the madvise manpage:
-> 
->   MADV_DONTNEED cannot be applied to locked pages, Huge TLB pages, or VM_PFNMAP pages.
+On 9/9/22 12:45, Emanuele Giuseppe Esposito wrote:
+> +/*
+> + * Takes kvm->slots_arch_lock, and releases it only if
+> + * invalid_slot allocation or kvm_prepare_memory_region failed.
+> +*/
 
-The manpages are stale:
+Much simpler: "kvm->slots_arch_lock is taken on a successful return."
 
-   c4b6cb884011 ("selftests/vm: add hugetlb madvise MADV_DONTNEED MADV_REMOVE test")
-   90e7e7f5ef3f ("mm: enable MADV_DONTNEED for hugetlb mappings")
+This is a small change in phrasing, but it makes a lot more sense: on 
+success you are preparing for the final commit operation, otherwise you 
+just want the caller to return your errno value.
 
-The tools/testing/selftests/vm/hugetlb-madvise.c selftest effectively tests what
-is being done here, so _something_ is broken.
+[...]
+
+> +/* Must be called with kvm->slots_arch_lock held, but releases it. */
+s/but/and/.  Even better, "and releases it before returning".  "But" 
+tells the reader that something strange is going on, "and" tells it that 
+something simple is going on.
+
+I would also rename the functions along the lines of my review to patch 
+3, to highlight that these function prepare/commit a *change* to a memslot.
+
+> +static void kvm_finish_memslot(struct kvm *kvm,
+> +			       struct kvm_internal_memory_region_list *batch)
+> +{
+> +	struct kvm_memory_slot *invalid_slot = batch->invalid;
+> +	struct kvm_memory_slot *old = batch->old;
+> +	struct kvm_memory_slot *new = batch->new;
+> +	enum kvm_mr_change change = batch->change;
+
+lockdep_assert_held(&kvm->slots_arch_lock);
+
+>   
+>   	/*
+>   	 * For DELETE and MOVE, the working slot is now active as the INVALID
+> @@ -1883,6 +1898,18 @@ static int kvm_set_memslot(struct kvm *kvm,
+>   	 * responsible for knowing that new->arch may be stale.
+>   	 */
+>   	kvm_commit_memory_region(kvm, batch);
+> +}
+> +
+> +static int kvm_set_memslot(struct kvm *kvm,
+> +			   struct kvm_internal_memory_region_list *batch)
+> +{
+> +	int r;
+> +
+> +	r = kvm_prepare_memslot(kvm, batch);
+> +	if (r)
+> +		return r;
+> +
+> +	kvm_finish_memslot(kvm, batch);
+>   
+>   	return 0;
+
+Ok, these are the functions I hinted at in the review of the previous 
+patch, so we're not far away.  You should be able to move the 
+kvm_set_memslot call to kvm_set_memory_region in patch 3, and then 
+replace it with the two calls here directly in kvm_set_memory_region.
+
+Paolo
+
