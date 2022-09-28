@@ -2,96 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CCB475EDDC4
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 15:34:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 817EE5EDDCF
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 15:36:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233733AbiI1Ne0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 09:34:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35714 "EHLO
+        id S233980AbiI1Ng1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 09:36:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233818AbiI1NeZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 09:34:25 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C7D3A2624
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 06:34:24 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28SDALkF023269;
-        Wed, 28 Sep 2022 13:34:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=3aHf9pgWjhKE6jxMgIh/rgYf1l/wYtjr8upzwD7Vq/4=;
- b=DsJeDGydISyGwVlPwtAu0RwbOfYxQmcxsE5eOoH/ESd9gxNX/Cg2UejUgKnkubCCfY/y
- iJjX0PmwNJaoJ9hhDtcXwEUs6EozjkHjL/6i50lPa/bn9nqZU84JDBgc7oqvY6J6XvUU
- X8ygdV2slGJRBTq1oqdjqVI9z80mDgAV9SEaVS6vdum8Xm6td59OCCqOO5P8hhrZE3nZ
- gpYaXrpbJ61Lq8xmuFMVVORrx/byIh8MgUo6hve5D6ZBjO8bPWVc+PFPKh93Y+YRtx/n
- 6vU8nR6ZwWYhgML4tD9Yr6/jcw3LgjaYqpakTGfJHAlvX0AKv6c4iNmVAeMeqe1L3K5z UA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jvjd122e5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Sep 2022 13:34:18 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28SDB3BO025708;
-        Wed, 28 Sep 2022 13:34:18 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3jvjd1227u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Sep 2022 13:34:18 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 28SDLbXs032592;
-        Wed, 28 Sep 2022 13:34:13 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 3jss5j5afn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Sep 2022 13:34:13 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 28SDYA8g30671436
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 28 Sep 2022 13:34:10 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0511D4C040;
-        Wed, 28 Sep 2022 13:34:10 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 139BD4C044;
-        Wed, 28 Sep 2022 13:34:09 +0000 (GMT)
-Received: from [9.171.31.212] (unknown [9.171.31.212])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 28 Sep 2022 13:34:08 +0000 (GMT)
-Message-ID: <1492220f-c62d-ffe2-b936-0327e9df37f8@linux.ibm.com>
-Date:   Wed, 28 Sep 2022 15:34:08 +0200
+        with ESMTP id S233742AbiI1NgY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 09:36:24 -0400
+Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com [66.111.4.230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6B26A3D4A;
+        Wed, 28 Sep 2022 06:36:15 -0700 (PDT)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 3051758057F;
+        Wed, 28 Sep 2022 09:36:12 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Wed, 28 Sep 2022 09:36:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
+         h=cc:cc:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm1; t=1664372172; x=1664379372; bh=tj
+        nmSL00ZZM1oFN2Ay5SF+8t5QvO8oA3qdQmqLG6FSc=; b=pyC2V+ZIEI8hVKL4jk
+        eh1aquPI6x2I81olRmeClPVF5hiKuHbjq+E3Y51i2sBCWzatKsoYOW5khczk6WTM
+        8J6YL2p0nhiHPsJmx3EYgz1OnPMvJkef/MNp0SnduwLZ1ZX6lpVzr9UkDHbY6eYW
+        SluwH3HiuqQUEGPhse5UegddHgqGjwiyQeFgJp003ukUcVs4zntu6M0FWPOP7TFA
+        TI1qrvyQWon8bG9iV39m4PEqzPilDsdhorlFNIzyBM1jcAIdglIV3t0JNzf7DuOC
+        l9MEdQpNb9xkBzQ6JqtJQX3ZDm5dmTKgJYDwUzRPqvXzX5m9Qt2azaQxldzP1pSO
+        v89g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm2; t=1664372172; x=1664379372; bh=tjnmSL00ZZM1oFN2Ay5SF+8t5QvO
+        8oA3qdQmqLG6FSc=; b=I81/AahetSMdo18CBUdQQn4rwPC0r15wzFvsbpWQ8B4E
+        746jkJMhyoYQKiBRceB2Gp47egha5pvGShnDJFfhL02LgoLPWnvFMmax8G6dAG0q
+        nOowrWfTh38eT9HNrQF46lVjPH8o/pV5CGVhtozHe55WVEbm75M5iXtqRH71uNsA
+        rDVoDbE4uPb4u9TexIb2JhapAbg+MC0aMx379ZD4xrzCxncdOz2grYX4F44ffRto
+        ql24c4H3yyZ5J5r7YQfN2Ql0whcssZyXK5FiGhdcpWeXcUHZ3L6H3SEluW1n/deT
+        NnMVKToWSZCaj+GJfGmYJX0mHnMa+eWkxNShDvaneg==
+X-ME-Sender: <xms:yU00Y3kjTKFsA4mKa-lwOV4QqioQlg16k5bYKWHXGWM31PtA16U6ww>
+    <xme:yU00Y63sy_55IDIvZxOjGFUOEQrlOw3cI29BFYlHinqPpZqravTtk568kQ5hXMLF9
+    QnFQMNC631kQVFFRes>
+X-ME-Received: <xmr:yU00Y9qLU-AErVU-Lm2JAIxeEVCEXTkrIaCyGkEHL8g96v_jTXTReZEvuFElOZSloLMXBw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfeegkedgieekucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdttddttddtvdenucfhrhhomhepfdfmihhr
+    ihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilhhlsehshhhuthgvmhhovhdrnh
+    grmhgvqeenucggtffrrghtthgvrhhnpeelgffhfeetlefhveffleevfffgtefffeelfedu
+    udfhjeduteeggfeiheefteehjeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuve
+    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepkhhirhhilhhl
+    sehshhhuthgvmhhovhdrnhgrmhgv
+X-ME-Proxy: <xmx:yU00Y_nTE9FQbvMtkDpXIYFpJprXJRI2pO6aaokPg4j6Pp6bC76pzA>
+    <xmx:yU00Y127smmXEKIn220aLfUL0MekHTvkmatnwtwo4Tx3n16KZSxStw>
+    <xmx:yU00Y-vwEXbGnyuz1YEqODYDj3tQYEnAcF4PVm9Hf1yGm0Oty962Ig>
+    <xmx:zE00Y-RwGOa2beh1OemdZjSQGikerz2RKwrSbfVuTlu93LrEu1bacg>
+Feedback-ID: ie3994620:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 28 Sep 2022 09:36:09 -0400 (EDT)
+Received: by box.shutemov.name (Postfix, from userid 1000)
+        id C0423104667; Wed, 28 Sep 2022 16:36:05 +0300 (+03)
+Date:   Wed, 28 Sep 2022 16:36:05 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        aarcange@redhat.com, ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
+Message-ID: <20220928133605.dy2tkdcpb5pkjejj@box.shutemov.name>
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
+ <d16284f5-3493-2892-38e6-f1fa5c10bdbb@redhat.com>
+ <20220923005808.vfltoecttoatgw5o@box.shutemov.name>
+ <f703e615-3b75-96a2-fb48-2fefd8a2069b@redhat.com>
+ <20220926144854.dyiacztlpx4fkjs5@box.shutemov.name>
+ <0a99aa24-599c-cc60-b23b-b77887af3702@redhat.com>
+ <YzOF7MT15nfBX0Ma@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH v9 08/10] target/s390x: interception of PTF instruction
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
-References: <20220902075531.188916-1-pmorel@linux.ibm.com>
- <20220902075531.188916-9-pmorel@linux.ibm.com>
- <b7a70243ccf9ec74525b10452bcbd2f6b9f5f050.camel@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <b7a70243ccf9ec74525b10452bcbd2f6b9f5f050.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Z3IJlNMpe6-o2_8Tu4XrWFWzYYyfjRbj
-X-Proofpoint-GUID: MR68j5NTxn6n83j1VRi9bnronrTFloNS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-09-28_06,2022-09-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- suspectscore=0 mlxscore=0 clxscore=1015 impostorscore=0 malwarescore=0
- spamscore=0 bulkscore=0 lowpriorityscore=0 priorityscore=1501
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2209280083
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YzOF7MT15nfBX0Ma@google.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
         SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -99,117 +120,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 9/9/22 18:50, Janis Schoetterl-Glausch wrote:
-> On Fri, 2022-09-02 at 09:55 +0200, Pierre Morel wrote:
->> When the host supports the CPU topology facility, the PTF
->> instruction with function code 2 is interpreted by the SIE,
->> provided that the userland hypervizor activates the interpretation
->> by using the KVM_CAP_S390_CPU_TOPOLOGY KVM extension.
->>
->> The PTF instructions with function code 0 and 1 are intercepted
->> and must be emulated by the userland hypervizor.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+On Tue, Sep 27, 2022 at 11:23:24PM +0000, Sean Christopherson wrote:
+> On Mon, Sep 26, 2022, David Hildenbrand wrote:
+> > On 26.09.22 16:48, Kirill A. Shutemov wrote:
+> > > On Mon, Sep 26, 2022 at 12:35:34PM +0200, David Hildenbrand wrote:
+> > > > When using DAX, what happens with the shared <->private conversion? Which
+> > > > "type" is supposed to use dax, which not?
+> > > > 
+> > > > In other word, I'm missing too many details on the bigger picture of how
+> > > > this would work at all to see why it makes sense right now to prepare for
+> > > > that.
+> > > 
+> > > IIUC, KVM doesn't really care about pages or folios. They need PFN to
+> > > populate SEPT. Returning page/folio would make KVM do additional steps to
+> > > extract PFN and one more place to have a bug.
+> > 
+> > Fair enough. Smells KVM specific, though.
 > 
-> Reviewed-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-
-Thanks
-
+> TL;DR: I'm good with either approach, though providing a "struct page" might avoid
+>        refactoring the API in the nearish future.
 > 
-> See note below.
->> ---
->>   hw/s390x/cpu-topology.c            | 52 ++++++++++++++++++++++++++++++
->>   include/hw/s390x/s390-virtio-ccw.h |  6 ++++
->>   target/s390x/kvm/kvm.c             | 13 ++++++++
->>   3 files changed, 71 insertions(+)
->>
->> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
->> index b6bf839e40..7dcaa28ca3 100644
->> --- a/hw/s390x/cpu-topology.c
->> +++ b/hw/s390x/cpu-topology.c
->> @@ -20,6 +20,58 @@
->>   #include "hw/s390x/s390-virtio-ccw.h"
->>   #include "hw/s390x/cpu-topology.h"
->>   #include "migration/vmstate.h"
->> +#include "target/s390x/cpu.h"
->> +#include "hw/s390x/s390-virtio-ccw.h"
->> +
->> +/*
->> + * s390_handle_ptf:
->> + *
->> + * @register 1: contains the function code
->> + *
->> + * Function codes 0 and 1 handle the CPU polarization.
->> + * We assume an horizontal topology, the only one supported currently
->> + * by Linux, consequently we answer to function code 0, requesting
->> + * horizontal polarization that it is already the current polarization
->> + * and reject vertical polarization request without further explanation.
->> + *
->> + * Function code 2 is handling topology changes and is interpreted
->> + * by the SIE.
->> + */
->> +void s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra)
->> +{
->> +    CPUS390XState *env = &cpu->env;
->> +    uint64_t reg = env->regs[r1];
->> +    uint8_t fc = reg & S390_TOPO_FC_MASK;
->> +
->> +    if (!s390_has_feat(S390_FEAT_CONFIGURATION_TOPOLOGY)) {
->> +        s390_program_interrupt(env, PGM_OPERATION, ra);
->> +        return;
+> Playing devil's advocate for a second, the counter argument is that KVM is the
+> only user for the foreseeable future.
 > 
-> I'm either expecting this function to return -1 here...
->> +    }
->> +
->> +    if (env->psw.mask & PSW_MASK_PSTATE) {
->> +        s390_program_interrupt(env, PGM_PRIVILEGED, ra);
->> +        return;
->> +    }
->> +
->> +    if (reg & ~S390_TOPO_FC_MASK) {
->> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
->> +        return;
->> +    }
->> +
->> +    switch (fc) {
->> +    case 0:    /* Horizontal polarization is already set */
->> +        env->regs[r1] |= S390_PTF_REASON_DONE;
->> +        setcc(cpu, 2);
->> +        break;
->> +    case 1:    /* Vertical polarization is not supported */
->> +        env->regs[r1] |= S390_PTF_REASON_NONE;
->> +        setcc(cpu, 2);
->> +        break;
->> +    default:
->> +        /* Note that fc == 2 is interpreted by the SIE */
->> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
->> +    }
->> +}
+> That said, it might make sense to return a "struct page" from the core API and
+> force KVM to do page_to_pfn().  KVM already does that for HVA-based memory, so
+> it's not exactly new code.
+
+Core MM tries to move away from struct page in favour of struct folio. We
+can make interface return folio.
+
+But it would require more work on KVM side.
+
+folio_pfn(folio) + offset % folio_nr_pages(folio) would give you PFN for
+base-pagesize PFN for given offset. I guess it is not too hard.
+
+It also gives KVM capability to populate multiple EPT entries for non-zero
+order folio and save few cycles.
+
+Does it work for you?
+
+> More importantly, KVM may actually need/want the "struct page" in the not-too-distant
+> future to support mapping non-refcounted "struct page" memory into the guest.  The
+> ChromeOS folks have a use case involving virtio-gpu blobs where KVM can get handed a
+> "struct page" that _isn't_ refcounted[*].  Once the lack of mmu_notifier integration
+> is fixed, the remaining issue is that KVM doesn't currently have a way to determine
+> whether or not it holds a reference to the page.  Instead, KVM assumes that if the
+> page is "normal", it's refcounted, e.g. see kvm_release_pfn_clean().
 > 
-> [...]
->>   
->> +static int kvm_handle_ptf(S390CPU *cpu, struct kvm_run *run)
->> +{
->> +    uint8_t r1 = (run->s390_sieic.ipb >> 20) & 0x0f;
->> +
->> +    s390_handle_ptf(cpu, r1, RA_IGNORED);
+> KVM's current workaround for this is to refuse to map these pages into the guest,
+> i.e. KVM simply forces its assumption that normal pages are refcounted to be true.
+> To remove that workaround, the likely solution will be to pass around a tuple of
+> page+pfn, where "page" is non-NULL if the pfn is a refcounted "struct page".
 > 
-> ... and this being returned here...
->> +
->> +    return 0;
+> At that point, getting handed a "struct page" from the core API would be a good
+> thing as KVM wouldn't need to probe the PFN to determine whether or not it's a
+> refcounted page.
 > 
-> ... or this function being void.
->> +}
+> Note, I still want the order to be provided by the API so that KVM doesn't need
+> to run through a bunch of helpers to try and figure out the allowed mapping size.
+> 
+> [*] https://lore.kernel.org/all/CAD=HUj736L5oxkzeL2JoPV8g1S6Rugy_TquW=PRt73YmFzP6Jw@mail.gmail.com
 
+These non-refcounted "struct page" confuses me.
 
-Yes right, thanks
+IIUC (probably not), the idea is to share a buffer between host and guest
+and avoid double buffering in page cache on the guest ("guest shadow
+buffer" means page cache, right?). Don't we already have DAX interfaces to
+bypass guest page cache?
 
-Regards,
-Pierre
-
+And do you think it would need to be handled on inaccessible API lavel or
+is it KVM-only thing that uses inaccessible API for some use-cases?
 
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+  Kiryl Shutsemau / Kirill A. Shutemov
