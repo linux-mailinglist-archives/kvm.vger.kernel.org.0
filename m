@@ -2,136 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BC235EE3F3
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 20:10:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 042B45EE400
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 20:12:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234039AbiI1SKg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 14:10:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34332 "EHLO
+        id S234674AbiI1SMY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 14:12:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234032AbiI1SKb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 14:10:31 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 336C96582F
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 11:10:29 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id cp18so3975051pjb.2
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 11:10:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=bs5D0g2ItumdYX+ue+ZykeItEbF4U1JZ3UggoNJ4PwY=;
-        b=if4oJ2uaIlB5lHRl7AMaFhWanHUi2pKzVlq8kBHrN93nEhlmd2g5rntnMaoyfdrF5m
-         f6rsyEcJ16qH5u/8AYc7teYzcjN45HL9qcdW/CGiSGL4fl+bTYDnOtOTzCEcf4RHIRPo
-         frWDcrNldeknW5r1vi8+diUa5uRH9nCnkJBU/gmR/Ed9m/36ou218pq/u0CvE6DpX3/8
-         XhmuE9/SdGRN+gnsBFg37PEANcDy2ZgUQMgIEIF7/YrY8obzVdXbiHJUn/e/L84wAi9P
-         0dKxtL7ZZxbu4erRKmgkcJCWeeoKHEHlpJbwkiPnOfRPWkofycrlgDUuCQixwIICTYkK
-         fIAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=bs5D0g2ItumdYX+ue+ZykeItEbF4U1JZ3UggoNJ4PwY=;
-        b=uklf3iCUguZzSScedzy3F5wYeQkRJCkwXVM1oBVcCLDd3vsX9b9as5Q6NXoTgVoZl7
-         ebGu28xpuuG6X3JB7ZTifM8n7y9ddzA1m+dD9WOZPHq+1UQRn+odjFkX9Z/gO5mul5pS
-         6abzocJ5WaFfLJlfKmi08GGzXxObv/GrifpKXh7ZdwainNRJsynp/bv1qqRHV0LOMaTR
-         GL9u5ZEGNCV4C/uYW8aESMDm2Qk7WLfJbJquDf6nId7+a4ud5el/M77OPQAtmBq5CXUp
-         8TAxMQKPo4dMmRe1WOp1B/gc2lDwwsoFD3gi4RhMgsv+3iQjLZzMXf64s60hO4UbgDh1
-         H/bw==
-X-Gm-Message-State: ACrzQf2FtagwQeWzNm0TJ9rJY0bH1LEcm45IPoBahOvK7rNDnu73VT99
-        e1ZYNX+IxMmadhpgrbMM2UglXg==
-X-Google-Smtp-Source: AMsMyM6sgEQzXow3Ue2nk5mlmhCBBzZ7H3WqSCOpv+sMEOnIornuNw1RUHnOPUTWNYIExbARkbbRsw==
-X-Received: by 2002:a17:902:bd8b:b0:179:d10e:97f with SMTP id q11-20020a170902bd8b00b00179d10e097fmr1041600pls.18.1664388629063;
-        Wed, 28 Sep 2022 11:10:29 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id h3-20020a628303000000b0053e8f4a10c1sm4266103pfe.217.2022.09.28.11.10.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 11:10:28 -0700 (PDT)
-Date:   Wed, 28 Sep 2022 11:10:25 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        andrew.jones@linux.dev, pbonzini@redhat.com, maz@kernel.org,
-        alexandru.elisei@arm.com, eric.auger@redhat.com, oupton@google.com,
-        reijiw@google.com, rananta@google.com, bgardon@google.com,
-        dmatlack@google.com, axelrasmussen@google.com
-Subject: Re: [PATCH v8 10/14] KVM: selftests: aarch64: Add
- aarch64/page_fault_test
-Message-ID: <YzSOEYBp25DKYNVa@google.com>
-References: <20220922031857.2588688-1-ricarkol@google.com>
- <20220922031857.2588688-11-ricarkol@google.com>
- <Yyy4WjEmuSH1tSZb@google.com>
- <YzHfwmZqMQ9xXaNa@google.com>
- <YzNz36gZqrse9GzT@google.com>
- <YzPMaEPBtaXguJaT@google.com>
- <YzR9TRjVFi+P7UOp@google.com>
+        with ESMTP id S234454AbiI1SMW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 14:12:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52C7CD0789
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 11:12:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664388738;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:in-reply-to:in-reply-to:  references:references;
+        bh=cNfUBfM5k+VGHxWCr84qkrW95eGzYmSzPp620mykmfE=;
+        b=ALX/68YhLPitEQB/zpBri8ADjKNOBltFLLWuBFZkmtt8q87VUXR2QlJbYIlq56f6syORPn
+        TyJPTt+4mUWSI48r/mNNv+kUOlbfr5vw/whkqZG8j6rgYY8xajstbP4EIcDt16pUcW+SFL
+        PRfDBJw5taxUJwUpw9i0F0C/bGrehs0=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-316-9_Ze1mxeM3aczndKUOw7jw-1; Wed, 28 Sep 2022 14:12:15 -0400
+X-MC-Unique: 9_Ze1mxeM3aczndKUOw7jw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8029E1C06EC9;
+        Wed, 28 Sep 2022 18:11:59 +0000 (UTC)
+Received: from redhat.com (unknown [10.33.36.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E31D12027061;
+        Wed, 28 Sep 2022 18:11:55 +0000 (UTC)
+Date:   Wed, 28 Sep 2022 19:11:53 +0100
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+        borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com
+Subject: Re: [PATCH v9 01/10] s390x/cpus: Make absence of multithreading clear
+Message-ID: <YzSOaczjJAgjrHG9@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20220902075531.188916-1-pmorel@linux.ibm.com>
+ <20220902075531.188916-2-pmorel@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <YzR9TRjVFi+P7UOp@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20220902075531.188916-2-pmorel@linux.ibm.com>
+User-Agent: Mutt/2.2.6 (2022-06-05)
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 28, 2022 at 04:58:53PM +0000, Sean Christopherson wrote:
-> On Tue, Sep 27, 2022, Ricardo Koller wrote:
-> > On Tue, Sep 27, 2022 at 10:06:23PM +0000, Sean Christopherson wrote:
-> > > On Mon, Sep 26, 2022, Ricardo Koller wrote:
-> > > > On Thu, Sep 22, 2022 at 07:32:42PM +0000, Sean Christopherson wrote:
-> > > > > On Thu, Sep 22, 2022, Ricardo Koller wrote:
-> > > > > > +	void *hva = (void *)region->region.userspace_addr;
-> > > > > > +	uint64_t paging_size = region->region.memory_size;
-> > > > > > +	int ret, fd = region->fd;
-> > > > > > +
-> > > > > > +	if (fd != -1) {
-> > > > > > +		ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
-> > > > > > +				0, paging_size);
-> > > > > > +		TEST_ASSERT(ret == 0, "fallocate failed, errno: %d\n", errno);
-> > > > > > +	} else {
-> > > > > > +		if (is_backing_src_hugetlb(region->backing_src_type))
-> > > > > > +			return false;
-> > > > > 
-> > > > > Why is hugetlb disallowed?  I thought anon hugetlb supports MADV_DONTNEED?
-> > > > > 
-> > > > 
-> > > > It fails with EINVAL (only tried on arm) for both the PAGE_SIZE and the huge
-> > > > page size. And note that the address is aligned as well.
-> > > > 
-> > > > madvise(0xffffb7c00000, 2097152, MADV_DONTNEED) = -1 EINVAL (Invalid argument)
-> > > > 	^^^^^^^^^^^^^^	^^^^^^^
-> > > > 	2M aligned	2M (hugepage size)
-> > > > 			
-> > > > madvise(0xffff9e800000, 4096, MADV_DONTNEED) = -1 EINVAL (Invalid argument)   
-> > > > 			^^^^
-> > > > 			PAGE_SIZE
-> > > 
-> > > I think this needs to be root caused before merging.  Unless I'm getting turned
-> > > around, MADV_DONTEED should work, i.e. there is a test bug lurking somewhere.
-> > 
-> > Turns out that the failure is documented. Found this in the madvise manpage:
-> > 
-> >   MADV_DONTNEED cannot be applied to locked pages, Huge TLB pages, or VM_PFNMAP pages.
+On Fri, Sep 02, 2022 at 09:55:22AM +0200, Pierre Morel wrote:
+> S390x do not support multithreading in the guest.
+> Do not let admin falsely specify multithreading on QEMU
+> smp commandline.
 > 
-> The manpages are stale:
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  hw/s390x/s390-virtio-ccw.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
->    c4b6cb884011 ("selftests/vm: add hugetlb madvise MADV_DONTNEED MADV_REMOVE test")
->    90e7e7f5ef3f ("mm: enable MADV_DONTNEED for hugetlb mappings")
-> 
-> The tools/testing/selftests/vm/hugetlb-madvise.c selftest effectively tests what
-> is being done here, so _something_ is broken.
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 70229b102b..b5ca154e2f 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -86,6 +86,9 @@ static void s390_init_cpus(MachineState *machine)
+>      MachineClass *mc = MACHINE_GET_CLASS(machine);
+>      int i;
+>  
+> +    /* Explicitely do not support threads */
+> +    assert(machine->smp.threads == 1);
 
-Thanks for the pointers. I was using old kernels (~5.15) for these
-latest tests. Testing on a 6.0-rc3 kernel fixed things: now able to
-madvise(MADV_DONTNEED) on anon-hugetlb from the selftest (arm).
+What is the functional effect for currently released QEMU versions
+if a user has set threads == 2  for an s390 machine ?  Is the
+threads setting simply ignored ?
 
-Will remove the check (for skppping the test) in v9.
+If we want to eliminate this mistake, then there's two possible
+options
 
-Thanks!
-Ricardo
+  * If it had no effect, treat this like a deprecation process
+    where we print a warning for 2 releases, and then turn the
+    warning into an error. Gives a little grace to fix the config
+    mistakes some users might have made, at a time convenient to
+    them.
+
+Or
+
+  * If it had effect and we need migration compatibility then forbid
+    threads > 1 only for new machine type versions, so existing
+    deployed guests are not changed.
+
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
