@@ -2,77 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E0115ED1B2
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 02:20:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C1C755ED26E
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 03:06:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232616AbiI1AUV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Sep 2022 20:20:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35900 "EHLO
+        id S229898AbiI1BGP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Sep 2022 21:06:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232557AbiI1AUU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Sep 2022 20:20:20 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7324EEF0BD
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 17:20:17 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d24so10480083pls.4
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 17:20:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date;
-        bh=ARmfSwcZmRk3I/GSYlIDluOju+opXVVFSk8yWY88kxQ=;
-        b=WKJkdzGlGnRB2S0cnnuctJ1YVt+EebjDmH4eiqhau4orPyd81qSzxZOwKO1AKneW0Z
-         hJqJNsYFIcX8bGkz1JNeTs5PY+w21wMMPsLXMQhSBGU0VAkPXmZzTh6IOiXvN5pgvPuI
-         bQl3aYLOrctepG3rb7K/bT3X94IYNjgZ2u8FcTr0b2LTwA5xKdrnxRnBuAgsc78BQrCl
-         W8UiCkjXoUdv+AK1S5mgXNs/qddOehQfVydFv9/99wrLBny1z4w7hMeh/fWl4aePyLLs
-         JacB6h8zf1bophxSuOhkc4yJiKbJIB6Rrylrmt/hvQAwr8GWyuX9qQfvpYLwmjF8ReTR
-         zt/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=ARmfSwcZmRk3I/GSYlIDluOju+opXVVFSk8yWY88kxQ=;
-        b=RNZQiBPOiL44aJKJhatc2sxgo2VxjlAN+XOVYZ0xWr2qRHhep7mghP0Zjnz9mRS9Wl
-         5J48xJI4zVmMe29DUHn5RPufdD5z3sxMZtpEY7OorEwNiOIftA16kGnx8CXXvEOqBhhQ
-         4uzlJoLL7AUnpjBtCQtp+WCCv2B5CSe91R1GxWxbHZ1NFbtbGXxhPR4wr1FDisb3lcLU
-         etxIsk1XhbKGyX2NjOhng5G3ia0VCnBLN1JdE7JnyE5jfT3lSdKvvDZnrzF6nybkdJZM
-         KAXV1ua+91C6fDd5DQpqH9Eo9WMRvBRdsuw1BRPLWJJb6K8p7J7CkbHUO7l0/MmywRYP
-         WSkA==
-X-Gm-Message-State: ACrzQf0lGyN+q7nRx4/nbjgqIgLe5VkllD79FuvIC7yxpcw7cuBkYvTh
-        0774pWFMKuttZKrGbcqYaNdMAA==
-X-Google-Smtp-Source: AMsMyM6+hUkcTMZMhO/CYJc7kwL5Vwloi16iKUQtk64rKVP+ZCg2PvZkZJiriavh1nfbiOj3ZY2pIg==
-X-Received: by 2002:a17:90a:d18c:b0:205:e522:611e with SMTP id fu12-20020a17090ad18c00b00205e522611emr3136020pjb.20.1664324416362;
-        Tue, 27 Sep 2022 17:20:16 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id y35-20020a17090a53a600b001fde265ff4bsm130325pjh.4.2022.09.27.17.20.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Sep 2022 17:20:14 -0700 (PDT)
-Date:   Wed, 28 Sep 2022 00:20:11 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Nikunj A. Dadhania" <nikunj@amd.com>
-Cc:     Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "Roth, Michael" <Michael.Roth@amd.com>
-Subject: Re: [PATCH kernel] KVM: SVM: Fix function name in comment
-Message-ID: <YzOTOzUzKPQSqURo@google.com>
-References: <20220912075219.70379-1-aik@amd.com>
- <Yx79ugW49M3FT/Zp@google.com>
- <699404b6-dfa7-f286-8e66-6d9cadd10250@amd.com>
- <YyAlVrrSpqTxrRlM@google.com>
- <1b766883-23a9-72e6-b7ee-f7473bf6b096@amd.com>
- <13ff8157-7620-bf3e-202b-f087abb72233@amd.com>
+        with ESMTP id S229862AbiI1BGL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Sep 2022 21:06:11 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A604AD9B7
+        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 18:06:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1664327169; x=1695863169;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=JCh9LK4k+nOzfu32B9UOCi7FRk87mpGfi/GAGo9EwdY=;
+  b=E97KmCZrMN1NQH2fTJscESOP6whf2blalggtCyl8HeweavJ1eJ6WUlLE
+   ULBen/afhUP85K/+67CpgIa344N34gZz/8iaFUeTzqHpXk8/wIRTWJxbl
+   1YkwJbeiqjUBIesPo7UwLcKOFzUM43TBJd3XF0esxpmfdzVehEkAPEXYK
+   Wt2sK9FgkN56GkJuo8m3RcElcD/KGQZshLIKNENu9pq1rbtDC2fhUNBqR
+   QGCCQTdUMN4fjER1LICXCl18d750erZl9RATN7gXql3GnS+wELCSluZoH
+   D8ZgzEzMXau7GTKG1b9N5xk6HpdlhJC7O3oL3UF5/n6VHxsWrfwQzX18q
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10483"; a="281191357"
+X-IronPort-AV: E=Sophos;i="5.93,350,1654585200"; 
+   d="scan'208";a="281191357"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2022 18:06:08 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10483"; a="950499845"
+X-IronPort-AV: E=Sophos;i="5.93,350,1654585200"; 
+   d="scan'208";a="950499845"
+Received: from zhaoq1-mobl.ccr.corp.intel.com (HELO [10.255.29.135]) ([10.255.29.135])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2022 18:06:06 -0700
+Message-ID: <01bc053e-2809-c585-ef75-3b9acdd09974@intel.com>
+Date:   Wed, 28 Sep 2022 09:06:03 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.3.0
+Subject: Re: [PATCH v7 1/2] i386: kvm: extend kvm_{get, put}_vcpu_events to
+ support pending triple fault
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Peter Xu <peterx@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20220923073333.23381-1-chenyi.qiang@intel.com>
+ <20220923073333.23381-2-chenyi.qiang@intel.com>
+ <c773b5aa-19b0-20de-5818-67360307abd9@redhat.com>
+Content-Language: en-US
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+In-Reply-To: <c773b5aa-19b0-20de-5818-67360307abd9@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <13ff8157-7620-bf3e-202b-f087abb72233@amd.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,113 +68,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 21, 2022, Nikunj A. Dadhania wrote:
-> On 20/09/22 14:18, Alexey Kardashevskiy wrote:
-> > On 13/9/22 16:38, Sean Christopherson wrote:
-> >> I want to avoid relying on the APM's arbitrary "Type B" classification.� Having to
-> >> dig up and look at a manual to understand something that's conceptually quite simple
-> >> is frustrating.� Providing references to "Type B" and the table in the changelog is
-> >> definitely welcome, e.g. so that someone who wants more details/background can easily
-> >> find that info via� via git blame.� 
+
+
+On 9/27/2022 9:14 PM, Paolo Bonzini wrote:
+> On 9/23/22 09:33, Chenyi Qiang wrote:
+>> For the direct triple faults, i.e. hardware detected and KVM morphed
+>> to VM-Exit, KVM will never lose them. But for triple faults sythesized
+>> by KVM, e.g. the RSM path, if KVM exits to userspace before the request
+>> is serviced, userspace could migrate the VM and lose the triple fault.
+>>
+>> A new flag KVM_VCPUEVENT_VALID_TRIPLE_FAULT is defined to signal that
+>> the event.triple_fault_pending field contains a valid state if the
+>> KVM_CAP_X86_TRIPLE_FAULT_EVENT capability is enabled.
 > 
-> How about the following:
+> Note that you are not transmitting the field on migration.  You need
+> this on top:
 > 
->       Save states are classified into three types (APM Volume 2: Table B-3. Swap Types)
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index b97d182e28..d4124973ce 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -1739,7 +1739,7 @@ typedef struct CPUArchState {
+>       uint8_t has_error_code;
+>       uint8_t exception_has_payload;
+>       uint64_t exception_payload;
+> -    bool triple_fault_pending;
+> +    uint8_t triple_fault_pending;
+>       uint32_t ins_len;
+>       uint32_t sipi_vector;
+>       bool tsc_valid;
+> diff --git a/target/i386/machine.c b/target/i386/machine.c
+> index cecd476e98..310b125235 100644
+> --- a/target/i386/machine.c
+> +++ b/target/i386/machine.c
+> @@ -1562,6 +1562,25 @@ static const VMStateDescription vmstate_arch_lbr = {
+>       }
+>   };
+> 
+> +static bool triple_fault_needed(void *opaque)
+> +{
+> +    X86CPU *cpu = opaque;
+> +    CPUX86State *env = &cpu->env;
+> +
+> +    return env->triple_fault_pending;
+> +}
+> +
+> +static const VMStateDescription vmstate_triple_fault = {
+> +    .name = "cpu/triple_fault",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .needed = triple_fault_needed,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT8(env.triple_fault_pending, X86CPU),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>   const VMStateDescription vmstate_x86_cpu = {
+>       .name = "cpu",
+>       .version_id = 12,
+> @@ -1706,6 +1725,7 @@ const VMStateDescription vmstate_x86_cpu = {
+>           &vmstate_amx_xtile,
+>   #endif
+>           &vmstate_arch_lbr,
+> +        &vmstate_triple_fault,
+>           NULL
+>       }
+>   };
 
-If we do end up with a verbose comment, don't bother with the volume+table details,
-it will inevitably become stale, even if that takes a few years.
+Thanks Paolo for your review!
 
-What I would take verbatim is the blurb on the classification being determined
-by "how it is handled by hardware during a world switch", which is the most
-important details from KVM's perspective.
-
-I don't necessarily dislike the idea of capturing the types in a comment, but I
-also don't think there's a whole lot of value added in doing so.  E.g. without the
-full table, it doesn't help verify the correctness of the code.
-
-I'm fine either way though, it's not that large of a comment and it will likely
-prove helpful to someone at some point in time.
+I'll add this in next version.
 
 > 
->       A: VM-Enter:
-
-So this really should be VMRUN, since the table here is specifically covering
-VMRUN behavior, not KVM's broader VM-Enter sequence.  As mentioned earlier in the
-thread, VM-Enter/VM-Exit is preferred when talking about the sequence, but in this
-case the table is documenting hardware behavior that is specific to VMRUN.
-
-Hrm, and I know that same earlier comment said "on VM-Exit" is preferred, but since
-this is again specifically talking about the hardware concept of VMEXIT, it's
-probably best to use that terminology for the table.
-
-The short comment I proposed used "on VM-Exit" because it didn't dive as far into
-the details of hardware's view of things.
-
-> Host state are saved in host save area
-
-Hmm, I like the APM's approach of avoiding the question of whether or not "Host
-state" is plural, i.e. omit the "are" (versus "is"?).
-
->          VM-Exit: Host state are restored
-
-s/restored/loaded
-
-Doesn't matter as much here, but when KVM is doing the "saving" for type-B,
-"restored" can become misleading as KVM isn't strictly required to save its
-current state.
-
-> automatically from host save area
-
-s/automatically//
-
-KVM could also "automatically" load state on exit, and there's also no need to
-further qualify that hardware loads are "automatic".  Hardware either loads state
-or it doesn't, e.g. there's no knob that lets KVM say "don't load this state".
-
->       B: VM-Enter: Host state are _not_ saved to host save area, KVM needs to save 
->                    required states manually in the host save area
-
-Drop the KVM line, i.e. keep the "table" purely about the types, and leave the
-"KVM needs to handle type-B" til the end.  E.g. the "manually" part is arguably
-wrong depending on how VMSAVE is classified.
-
->          VM-Exit: Host state are restored automatically from host save area
-> 
->       C: VM-Enter: Host state are _not_ saved to host save area.
->          VM-Exit: Host state are initialized to default(reset) values.
-
-Please align the comments after the colon, makes it easier on the eyes
-
->       Manually save state(type-B) that is loaded unconditionally by hardware on 
-
-The "save state(type-B)" reads a little odd, maybe "save type-B state"?  And the
-"unconditionally" can be dropped (see "automatically" above), as can the "SEV-ES
-guests" blurb since this is SEV-ES specific code.  Hmm, though it might be worth
-throwing in a "for SEV-ES guests" in the intro?
-
->       VM-Exit for SEV-ES guests, but is not saved via VMRUN or VMSAVE (performed 
->       by common SVM code).
-
-Hmm, the comma should be after VMRUN, since type-B state is _all_ state that isn't
-saved by hardware VMRUN, whereas the key point of this last blurb is to call out
-that KVM already saves a subset of type-B state via VMSAVE.
-
-All in all, this?
-
-	/*
-	 * All host state for SEV-ES guests is categorized into three swap types
-	 * based on how it is handled by hardware during a world switch:
-	 *
-	 * A: VMRUN:   Host state saved in host save area
-         *    VMEXIT:  Host state loaded from host save area
-	 *
-	 * B: VMRUN:   Host state _NOT_ saved in host save area
-         *    VMEXIT:  Host state loaded from host save area
-	 *
-	 * C: VMRUN:   Host state _NOT_ saved in host save area
-         *    VMEXIT:  Host state initialized to default(reset) values
-	 *
-	 * Manually save type-B state, i.e. state that is loaded by VMEXIT but
-	 * isn't saved by VMRUN, that isn't already saved by VMSAVE (performed
-	 * by common SVM code).
-	 */
