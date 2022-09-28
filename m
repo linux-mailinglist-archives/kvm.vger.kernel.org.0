@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2ADDD5EE49B
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 20:49:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CEC35EE49C
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 20:49:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233818AbiI1StH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 14:49:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58958 "EHLO
+        id S234051AbiI1StJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 14:49:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233749AbiI1StD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 14:49:03 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22E77EE64A
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 11:49:03 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-348608c1cd3so129694417b3.10
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 11:49:03 -0700 (PDT)
+        with ESMTP id S234100AbiI1StH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 14:49:07 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78DB1EFA47
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 11:49:05 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id a10-20020a5b0aca000000b006b05bfb6ab0so11887823ybr.9
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 11:49:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date;
-        bh=kNivHvkTfJ+yPNbnCQHmVT7RJoeYMuelFjHCvwGl40k=;
-        b=p3C7inZehvDCabcc/FNC093HNyhGdwesyAZmYdGvzDVfDkxlPY8nwxujCoCP/6gB6/
-         Wi8GyCxzFQGyx1R85Dz3ceK6qJZCT1Sn1fWWWBJwBlRjFsT6/Lu2a8c07BUWysK2cWQE
-         kn0izqTltfcp1gYfYXkE7MLJIR2IsMyd2yq4m2AZBGsIFGwAHhNYWrvuhJe7Y+imwQ4g
-         zfzftdfOIIz31MDiz6rpmvbZzSti+aXdkpCOlVFFc/kACdismRgQYjT0TTTbWHdC53El
-         ucXy41P1RYP59Uc8U6XGKHJQ/Z9+j5Jt+0BnYqKbwQW4NDAKh5VrJLWElyg3esK0giIH
-         XiXA==
+        bh=DRbk7AZvRYHRYi7wFDkcB2FJmrkOC/4Javo36Re7Ndw=;
+        b=bCYLv3E9c+QLVPgmfZszrxBwupEgG0KmSw9VK8uHWsNOHoLDcjLSYNIIPiazxfYBMV
+         g95b3fEypyIC1zuLJI9JsA/1XEYQBqoqHiHbN4MUKgKGc33wfF1L9F4S68EDmi1jLyTs
+         SuhugW9VH8xpS73zffDrPkh+h1IA3S/buYSOJJGCGVJCuZeCt7s9ZZIehz/JyZuLdRWT
+         xEwH+6b6jTpdmAb9+DEjwEkg2nNnX99aASGpnnXLIy7OkrF+rzwuiYhBgJXBr0v2gswY
+         8VWZisbygrKVkzlaMN7UZeCB+bBVVYFQgoPNfyd+OIr4IzMIfVjYdo+63xFEug9n2hgx
+         2MvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date;
-        bh=kNivHvkTfJ+yPNbnCQHmVT7RJoeYMuelFjHCvwGl40k=;
-        b=6Uy4z9GXbgAkdCrfaHYtXoykxi4yJJH9QNphDrsRV7XAC2kRvdxELrTjZ7gN6dmy8E
-         HjHLmQSJZdDDQ0/EFVs4scjcYT1Pa29OGJ2c/+rQ9UXCXMirsfPHOSzjojxqJZVOFRtf
-         3sPqkzbVmkOVylkrEViPz2tVnryhLO3WDoPjA7y2ltlMzGiptrM29K3iT4suLMiiubVo
-         yLuwGag+Bu/JIfdP35rBN0EhSj0SAKpXdhB+v2ztgdxarkdVdQWLltUvZDoT4DrvYnEb
-         dR+8c//F+vV0nuSg+LPBzG5AcnmbiVPsE/oGCjuxpmELlBHXjp/nAtTPQFhOCTKTHz8P
-         lI/Q==
-X-Gm-Message-State: ACrzQf0epynFOqPxzCElpms8PsiSBWBTQ5/U8/2kNSq0rGVplcK4aW0G
-        CQNZ72NID1i/28vyte0F6HOD5gxoDTd2Ow==
-X-Google-Smtp-Source: AMsMyM5mqcPv3vMEsQnQF8EvSOfSZ4Pt5YMWRPDsByPEb5hbG/tfKlx4TQwhJBt4sb8WQCXfP8dGkyUKPuq4qQ==
+        bh=DRbk7AZvRYHRYi7wFDkcB2FJmrkOC/4Javo36Re7Ndw=;
+        b=0yDeNGIkKi5MlGlZtAJoZvHD5/Z0UQEK10RYuJQvPOw2khCWCVUIZa4LN3BCC5YfZB
+         koBT9UGNiBE/B9mdmgK5Keg194vVuDzgUMqsV6JyanHynZEx0lBsnigU636tkIvIM1RL
+         vxrPdZrzsrCilARYa+K7f5w4ge6xNDVvKfXMfHNmGAmAb1bkNumO4VGq9pXzJHzkh2YP
+         odHCl+WpETm/kTygHU1PDdrmiaOBu9Kz54aDWPf3dWUPRc00MXMAokxDRHAHMOjUwylu
+         m4fphdJMURFLet21bQWE8TnYxpA0GRsekZK8Iqv7c2E+0FT/P06YSUJrqp7iAxpWicSD
+         YwSg==
+X-Gm-Message-State: ACrzQf1N9Bc5qhMNcsyBfNgug42Akt9JjmDwRRJHJGRx/Ike9ldordvF
+        fPcbS/azNtVD2vKl+q2zr5YvI+yTVQE1RA==
+X-Google-Smtp-Source: AMsMyM7wwu4g+yYMiTgbyHHsWFzlyRIGM70eAs9pvnpwMqEHBOFyaWsgJi9eUZDprh9aRCDtWCJPtgLeJbfM8Q==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a25:86c1:0:b0:6bc:9ad2:fb64 with SMTP id
- y1-20020a2586c1000000b006bc9ad2fb64mr1352381ybm.228.1664390942403; Wed, 28
- Sep 2022 11:49:02 -0700 (PDT)
-Date:   Wed, 28 Sep 2022 11:48:52 -0700
+ (user=dmatlack job=sendgmr) by 2002:a05:6902:1442:b0:696:4962:a73 with SMTP
+ id a2-20020a056902144200b0069649620a73mr31126637ybv.386.1664390944541; Wed,
+ 28 Sep 2022 11:49:04 -0700 (PDT)
+Date:   Wed, 28 Sep 2022 11:48:53 -0700
 In-Reply-To: <20220928184853.1681781-1-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220928184853.1681781-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.37.3.998.g577e59143f-goog
-Message-ID: <20220928184853.1681781-3-dmatlack@google.com>
-Subject: [PATCH v2 2/3] KVM: selftests: Add helper to read boolean module parameters
+Message-ID: <20220928184853.1681781-4-dmatlack@google.com>
+Subject: [PATCH v2 3/3] KVM: selftests: Fix nx_huge_pages_test on TDP-disabled hosts
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -72,111 +72,132 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a common helper function for reading boolean module parameters and
-use it in vm_is_unrestricted_guest() to check the value of
-kvm_intel.unrestricted_guest.
+Map the test's huge page region with 2MiB virtual mappings when TDP is
+disabled so that KVM can shadow the region with huge pages. This fixes
+nx_huge_pages_test on hosts where TDP hardware support is disabled.
 
-Note that vm_is_unrestricted_guest() will now fail with a TEST_ASSERT()
-if called on AMD instead of just returning false. However this should
-not cause any functional change since all of the callers of
-vm_is_unrestricted_guest() first check is_intel_cpu().
+Purposely do not skip this test on TDP-disabled hosts. While we don't
+care about NX Huge Pages on TDP-disabled hosts from a security
+perspective, KVM does support it, and so we should test it.
 
-No functional change intended.
+For TDP-enabled hosts, continue mapping the region with 4KiB pages to
+ensure that KVM can map it with huge pages irrespective of the guest
+mappings.
 
+Fixes: 8448ec5993be ("KVM: selftests: Add NX huge pages test")
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- .../testing/selftests/kvm/include/test_util.h |  1 +
- tools/testing/selftests/kvm/lib/test_util.c   | 31 +++++++++++++++++++
- .../selftests/kvm/lib/x86_64/processor.c      | 13 +-------
- 3 files changed, 33 insertions(+), 12 deletions(-)
+ .../selftests/kvm/include/x86_64/processor.h  |  4 +++
+ .../selftests/kvm/lib/x86_64/processor.c      | 27 +++++++++++++++++++
+ .../selftests/kvm/x86_64/nx_huge_pages_test.c | 19 +++++++++++--
+ 3 files changed, 48 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-index befc754ce9b3..4f119fd84ae5 100644
---- a/tools/testing/selftests/kvm/include/test_util.h
-+++ b/tools/testing/selftests/kvm/include/test_util.h
-@@ -108,6 +108,7 @@ struct vm_mem_backing_src_alias {
- 
- #define MIN_RUN_DELAY_NS	200000UL
- 
-+bool get_module_param_bool(const char *module_name, const char *param);
- bool thp_configured(void);
- size_t get_trans_hugepagesz(void);
- size_t get_def_hugetlb_pagesz(void);
-diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
-index 6d23878bbfe1..479e482d3202 100644
---- a/tools/testing/selftests/kvm/lib/test_util.c
-+++ b/tools/testing/selftests/kvm/lib/test_util.c
-@@ -9,6 +9,7 @@
- #include <ctype.h>
- #include <limits.h>
- #include <stdlib.h>
-+#include <stdio.h>
- #include <time.h>
- #include <sys/stat.h>
- #include <sys/syscall.h>
-@@ -114,6 +115,36 @@ void print_skip(const char *fmt, ...)
- 	puts(", skipping test");
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index 0cbc71b7af50..3082c2a4089b 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -825,6 +825,8 @@ static inline uint8_t wrmsr_safe(uint32_t msr, uint64_t val)
+ 	return kvm_asm_safe("wrmsr", "a"(val & -1u), "d"(val >> 32), "c"(msr));
  }
  
-+bool get_module_param_bool(const char *module_name, const char *param)
-+{
-+	const int path_size = 1024;
-+	char path[path_size];
-+	char value;
-+	FILE *f;
-+	int r;
++bool kvm_tdp_enabled(void);
 +
-+	r = snprintf(path, path_size, "/sys/module/%s/parameters/%s",
-+		     module_name, param);
-+	TEST_ASSERT(r < path_size,
-+		    "Failed to construct sysfs path in %d bytes.", path_size);
-+
-+	f = fopen(path, "r");
-+	TEST_ASSERT(f, "fopen(%s) failed", path);
-+
-+	r = fread(&value, 1, 1, f);
-+	TEST_ASSERT(r == 1, "fread(%s) failed", path);
-+
-+	r = fclose(f);
-+	TEST_ASSERT(!r, "fclose(%s) failed", path);
-+
-+	if (value == 'Y')
-+		return true;
-+	else if (value == 'N')
-+		return false;
-+
-+	TEST_FAIL("Unrecognized value: %c", value);
-+}
-+
- bool thp_configured(void)
- {
- 	int ret;
+ uint64_t vm_get_page_table_entry(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
+ 				 uint64_t vaddr);
+ void vm_set_page_table_entry(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
+@@ -855,6 +857,8 @@ enum pg_level {
+ #define PG_SIZE_1G PG_LEVEL_SIZE(PG_LEVEL_1G)
+ 
+ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level);
++void virt_map_level(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
++		    uint64_t nr_bytes, int level);
+ 
+ /*
+  * Basic CPU control in CR0
 diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 2e6e61bbe81b..522d3e2009fb 100644
+index 522d3e2009fb..5b2ee0c32e27 100644
 --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
 +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -1294,20 +1294,9 @@ unsigned long vm_compute_max_gfn(struct kvm_vm *vm)
- /* Returns true if kvm_intel was loaded with unrestricted_guest=1. */
- bool vm_is_unrestricted_guest(struct kvm_vm *vm)
- {
--	char val = 'N';
--	size_t count;
--	FILE *f;
--
- 	/* Ensure that a KVM vendor-specific module is loaded. */
- 	if (vm == NULL)
- 		close(open_kvm_dev_path_or_exit());
- 
--	f = fopen("/sys/module/kvm_intel/parameters/unrestricted_guest", "r");
--	if (f) {
--		count = fread(&val, sizeof(char), 1, f);
--		TEST_ASSERT(count == 1, "Unable to read from param file.");
--		fclose(f);
--	}
--
--	return val == 'Y';
-+	return get_module_param_bool("kvm_intel", "unrestricted_guest");
+@@ -111,6 +111,14 @@ static void sregs_dump(FILE *stream, struct kvm_sregs *sregs, uint8_t indent)
+ 	}
  }
+ 
++bool kvm_tdp_enabled(void)
++{
++	if (is_amd_cpu())
++		return get_module_param_bool("kvm_amd", "npt");
++	else
++		return get_module_param_bool("kvm_intel", "ept");
++}
++
+ void virt_arch_pgd_alloc(struct kvm_vm *vm)
+ {
+ 	TEST_ASSERT(vm->mode == VM_MODE_PXXV48_4K, "Attempt to use "
+@@ -214,6 +222,25 @@ void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+ 	__virt_pg_map(vm, vaddr, paddr, PG_LEVEL_4K);
+ }
+ 
++void virt_map_level(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
++		    uint64_t nr_bytes, int level)
++{
++	uint64_t pg_size = PG_LEVEL_SIZE(level);
++	uint64_t nr_pages = nr_bytes / pg_size;
++	int i;
++
++	TEST_ASSERT(nr_bytes % pg_size == 0,
++		    "Region size not aligned: nr_bytes: 0x%lx, page size: 0x%lx",
++		    nr_bytes, pg_size);
++
++	for (i = 0; i < nr_pages; i++) {
++		__virt_pg_map(vm, vaddr, paddr, level);
++
++		vaddr += pg_size;
++		paddr += pg_size;
++	}
++}
++
+ static uint64_t *_vm_get_page_table_entry(struct kvm_vm *vm,
+ 					  struct kvm_vcpu *vcpu,
+ 					  uint64_t vaddr)
+diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+index cc6421716400..e50e3a50ed9d 100644
+--- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
++++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+@@ -112,6 +112,7 @@ void run_test(int reclaim_period_ms, bool disable_nx_huge_pages,
+ {
+ 	struct kvm_vcpu *vcpu;
+ 	struct kvm_vm *vm;
++	uint64_t nr_bytes;
+ 	void *hva;
+ 	int r;
+ 
+@@ -141,10 +142,24 @@ void run_test(int reclaim_period_ms, bool disable_nx_huge_pages,
+ 				    HPAGE_GPA, HPAGE_SLOT,
+ 				    HPAGE_SLOT_NPAGES, 0);
+ 
+-	virt_map(vm, HPAGE_GVA, HPAGE_GPA, HPAGE_SLOT_NPAGES);
++	nr_bytes = HPAGE_SLOT_NPAGES * vm->page_size;
++
++	/*
++	 * Ensure that KVM can map HPAGE_SLOT with huge pages by mapping the
++	 * region into the guest with 2MiB pages whenever TDP is disabled (i.e.
++	 * whenever KVM is shadowing the guest page tables).
++	 *
++	 * When TDP is enabled, KVM should be able to map HPAGE_SLOT with huge
++	 * pages irrespective of the guest page size, so map with 4KiB pages
++	 * to test that that is the case.
++	 */
++	if (kvm_tdp_enabled())
++		virt_map_level(vm, HPAGE_GVA, HPAGE_GPA, nr_bytes, PG_LEVEL_4K);
++	else
++		virt_map_level(vm, HPAGE_GVA, HPAGE_GPA, nr_bytes, PG_LEVEL_2M);
+ 
+ 	hva = addr_gpa2hva(vm, HPAGE_GPA);
+-	memset(hva, RETURN_OPCODE, HPAGE_SLOT_NPAGES * PAGE_SIZE);
++	memset(hva, RETURN_OPCODE, nr_bytes);
+ 
+ 	check_2m_page_count(vm, 0);
+ 	check_split_count(vm, 0);
 -- 
 2.37.3.998.g577e59143f-goog
 
