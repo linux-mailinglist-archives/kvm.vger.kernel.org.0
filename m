@@ -2,189 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D4C75EDFC3
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 17:08:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB0045EDFD6
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 17:11:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234506AbiI1PIh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 11:08:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58614 "EHLO
+        id S234465AbiI1PLv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 11:11:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233247AbiI1PIO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 11:08:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4472F870A9
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 08:07:47 -0700 (PDT)
+        with ESMTP id S234080AbiI1PLu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 11:11:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC1888B2E7
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 08:11:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664377666;
+        s=mimecast20190719; t=1664377907;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6YP0ksLfvQ+PHdWOYzdNqMtI78ExZh2H+cCK39U/zco=;
-        b=H8zRtIE2M7Kzmput2GF5hTSWluPQEbPEamFD21LB4Sz4IQfnQx3yz4qWTCaIbrrTl7vgo1
-        kXRA9GKJJXSThh+Mg7aZ5VB+aQWLP5JikTlReSwD6EDCW/Acvn1cA7QAKHWKEGm1LjPCZN
-        Ujhk7412ZR/z7JLEl3PpX5q9w2DKzlY=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=N//yqD+aufpyhJZtChEf3+2TXlqXFfc1L7JPLKS/TRs=;
+        b=FjahSpcgl73Vjq+gSivGQb2E7GYBunB6oRn4k6UaqGF0LWuoPLSLdI2adjR20yz7CURZVA
+        A1SLXJPSX+6wikxnaI/swyZ25hIG7l2dMHW5APnXBPd8DBKGepcU3KYAOLRbgipO9/MrA9
+        fXOOj8fV/w36DJeGN5M0EY8+fT6IjUE=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-460-ggNw5r25PiujXWo2Jb_yBg-1; Wed, 28 Sep 2022 11:07:45 -0400
-X-MC-Unique: ggNw5r25PiujXWo2Jb_yBg-1
-Received: by mail-ej1-f70.google.com with SMTP id xc12-20020a170907074c00b007416699ea14so5601730ejb.19
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 08:07:43 -0700 (PDT)
+ us-mta-311-ywUkeFxZPFOqFmVsOBUAhA-1; Wed, 28 Sep 2022 11:11:45 -0400
+X-MC-Unique: ywUkeFxZPFOqFmVsOBUAhA-1
+Received: by mail-qk1-f198.google.com with SMTP id h7-20020a05620a400700b006cebec84734so9849520qko.23
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 08:11:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=6YP0ksLfvQ+PHdWOYzdNqMtI78ExZh2H+cCK39U/zco=;
-        b=vLP4QtBJY/a+qgbLGJm9GoqN+s6AR6NZrKlrMHu0mWl5gR6Vx7gxfwlpVSPvkQvLaT
-         Rw8yDcsebsjiHFLgYEvQDhZIRwZ6czsVQzV0dFL2QqZrSvEp9KT2VBWMWsroYvYruiE1
-         hecH+tqRyO2TGs0tS1kZdxtwOqrvV9H7RFuWJBSYxsHoGiC3TF+Lij6h8YT/ExRwr49h
-         1nAL16SieBTrONryD1V2lXXPV0MhasX5prArkmP7//LpcWXWlDcrVgKFnAu+z8LBz3RR
-         nl9jb7vdpkcQDwXhZUpGDe6Bvwk7e1Bb7MN3CCwwa6aaVCv73ta3cyZGQ5lBizZclitY
-         Z3gw==
-X-Gm-Message-State: ACrzQf3rxutye5h8VxNZAauWny6I+rTWY4nVtMcW83d1mXiuSfuDdk/V
-        QzP4ApxbeUpg4gAs9rjuJnA7HJzBF5ysnabPqhPcJHkF4h0s/WFPZtSYniNB0/7AbpdOYbbIHSu
-        iAvi43cB9XZjq
-X-Received: by 2002:a17:907:7fa0:b0:782:948b:e212 with SMTP id qk32-20020a1709077fa000b00782948be212mr24362665ejc.231.1664377662464;
-        Wed, 28 Sep 2022 08:07:42 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM6kUGSsrq3rUkp5nnkMIueg6zqoEQxSsxDSib+LlbUfxmD2s8qfgik439YZnZVEJ2swO3ubBw==
-X-Received: by 2002:a17:907:7fa0:b0:782:948b:e212 with SMTP id qk32-20020a1709077fa000b00782948be212mr24362631ejc.231.1664377662140;
-        Wed, 28 Sep 2022 08:07:42 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:2f4b:62da:3159:e077? ([2001:b07:6468:f312:2f4b:62da:3159:e077])
-        by smtp.googlemail.com with ESMTPSA id d14-20020a056402078e00b00457160c3c77sm3517514edy.20.2022.09.28.08.07.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Sep 2022 08:07:41 -0700 (PDT)
-Message-ID: <dd6db8c9-80b1-b6c5-29b8-5eced48f1303@redhat.com>
-Date:   Wed, 28 Sep 2022 17:07:39 +0200
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=N//yqD+aufpyhJZtChEf3+2TXlqXFfc1L7JPLKS/TRs=;
+        b=N3ZC3WKsWISQyPYVF10O3uErfH/4fImTJNacqldY1fdD3mEeU4vDhatTbYs96RRJKp
+         1tYsJ5PBXcer2jvDy6nemjCPrBEcWnWsud1KKhrAMKME0JfV96Gc5YnzGCSJHt+DluFj
+         R6tbg1T466wU1KQsGBSEWBEdPxnjS3yN38lX6rnZIO0zwcseuXiQtgb36EBI+nfaQgCu
+         2PRddY26RulyJBiGt7oBnqESahDDNQ1dmAb2IZRci4GEp22AJvQqJxPi4QTwn9dQpt/B
+         Z0eyjRDU6uuh/3Bis6eWIcO17oIZnRbFLIzugFMrKZMuc+Ajb65zZDHTP2OZL7WnT16U
+         AiRg==
+X-Gm-Message-State: ACrzQf1F5YQRTLl0dcSwkUymjqQTPqZ85w0YyTv65yslJ3oZWXWoN+AZ
+        eGvVEKCtJ7qlNUXa9eeGMZaaWQeLf8m6+2zIIaUL+tyeyxCAbzGdjbMi7kWBDSM0yX/VJq4Dfoz
+        eUEEE6XiUDqpQ
+X-Received: by 2002:a37:68d6:0:b0:6cb:cf29:dfb with SMTP id d205-20020a3768d6000000b006cbcf290dfbmr21582932qkc.406.1664377905057;
+        Wed, 28 Sep 2022 08:11:45 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6F5FAU27MZ7cS3Ks7xMKNVxbwnEj7yH65umY8MeviEbyJkDkQQ9uEbZ9y2Bnsn/Fvx15R7pQ==
+X-Received: by 2002:a37:68d6:0:b0:6cb:cf29:dfb with SMTP id d205-20020a3768d6000000b006cbcf290dfbmr21582904qkc.406.1664377904744;
+        Wed, 28 Sep 2022 08:11:44 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-222.retail.telecomitalia.it. [79.46.200.222])
+        by smtp.gmail.com with ESMTPSA id h18-20020a05620a245200b006ced196a73fsm3185370qkn.135.2022.09.28.08.11.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Sep 2022 08:11:43 -0700 (PDT)
+Date:   Wed, 28 Sep 2022 17:11:35 +0200
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Junichi Uekawa <uekawa@chromium.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
+        netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        Bobby Eshleman <bobby.eshleman@gmail.com>
+Subject: Re: [PATCH] vhost/vsock: Use kvmalloc/kvfree for larger packets.
+Message-ID: <20220928151135.pvrlsylg6j3hzh74@sgarzare-redhat>
+References: <20220928064538.667678-1-uekawa@chromium.org>
+ <20220928082823.wyxplop5wtpuurwo@sgarzare-redhat>
+ <20220928052738-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Like Xu <like.xu.linux@gmail.com>
-References: <YxtOEgJhe4EcAJsE@google.com>
- <5f0345d2-d4d1-f4fe-86ba-6e22561cb6bd@redhat.com>
- <37b3162e-7b3a-919f-80e2-f96eca7d4b4c@redhat.com>
- <dfcbdf1d-b078-ec6c-7706-6af578f79ec2@redhat.com>
- <55d7f0bd-ace1-506b-ea5b-105a86290114@redhat.com>
- <f753391e-7bdc-bada-856a-87344e75bd74@redhat.com>
- <111a46c1-7082-62e3-4f3a-860a95cd560a@redhat.com>
- <14d5b8f2-7cb6-ce24-c7a7-32aa9117c953@redhat.com>
- <YzIZhn47brWBfQah@google.com>
- <3b04db9d-0177-7e6e-a54c-a28ada8b1d36@redhat.com>
- <YzMdjSkKaJ8HyWXh@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH 0/9] kvm: implement atomic memslot updates
-In-Reply-To: <YzMdjSkKaJ8HyWXh@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20220928052738-mutt-send-email-mst@kernel.org>
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/27/22 17:58, Sean Christopherson wrote:
-> On Tue, Sep 27, 2022, Emanuele Giuseppe Esposito wrote:
+On Wed, Sep 28, 2022 at 05:31:58AM -0400, Michael S. Tsirkin wrote:
+>On Wed, Sep 28, 2022 at 10:28:23AM +0200, Stefano Garzarella wrote:
+>> On Wed, Sep 28, 2022 at 03:45:38PM +0900, Junichi Uekawa wrote:
+>> > When copying a large file over sftp over vsock, data size is usually 32kB,
+>> > and kmalloc seems to fail to try to allocate 32 32kB regions.
+>> >
+>> > Call Trace:
+>> >  [<ffffffffb6a0df64>] dump_stack+0x97/0xdb
+>> >  [<ffffffffb68d6aed>] warn_alloc_failed+0x10f/0x138
+>> >  [<ffffffffb68d868a>] ? __alloc_pages_direct_compact+0x38/0xc8
+>> >  [<ffffffffb664619f>] __alloc_pages_nodemask+0x84c/0x90d
+>> >  [<ffffffffb6646e56>] alloc_kmem_pages+0x17/0x19
+>> >  [<ffffffffb6653a26>] kmalloc_order_trace+0x2b/0xdb
+>> >  [<ffffffffb66682f3>] __kmalloc+0x177/0x1f7
+>> >  [<ffffffffb66e0d94>] ? copy_from_iter+0x8d/0x31d
+>> >  [<ffffffffc0689ab7>] vhost_vsock_handle_tx_kick+0x1fa/0x301 [vhost_vsock]
+>> >  [<ffffffffc06828d9>] vhost_worker+0xf7/0x157 [vhost]
+>> >  [<ffffffffb683ddce>] kthread+0xfd/0x105
+>> >  [<ffffffffc06827e2>] ? vhost_dev_set_owner+0x22e/0x22e [vhost]
+>> >  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
+>> >  [<ffffffffb6eb332e>] ret_from_fork+0x4e/0x80
+>> >  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
+>> >
+>> > Work around by doing kvmalloc instead.
+>> >
+>> > Signed-off-by: Junichi Uekawa <uekawa@chromium.org>
+>
+>My worry here is that this in more of a work around.
+>It would be better to not allocate memory so aggressively:
+>if we are so short on memory we should probably process
+>packets one at a time. Is that very hard to implement?
+
+Currently the "virtio_vsock_pkt" is allocated in the "handle_kick" 
+callback of TX virtqueue. Then the packet is multiplexed on the right 
+socket queue, then the user space can de-queue it whenever they want.
+
+So maybe we can stop processing the virtqueue if we are short on memory, 
+but when can we restart the TX virtqueue processing?
+
+I think as long as the guest used only 4K buffers we had no problem, but 
+now that it can create larger buffers the host may not be able to 
+allocate it contiguously. Since there is no need to have them contiguous 
+here, I think this patch is okay.
+
+However, if we switch to sk_buff (as Bobby is already doing), maybe we 
+don't have this problem because I think there is some kind of 
+pre-allocated pool.
+
+>
+>
+>
+>> > ---
+>> >
+>> > drivers/vhost/vsock.c                   | 2 +-
+>> > net/vmw_vsock/virtio_transport_common.c | 2 +-
+>> > 2 files changed, 2 insertions(+), 2 deletions(-)
+>> >
+>> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>> > index 368330417bde..5703775af129 100644
+>> > --- a/drivers/vhost/vsock.c
+>> > +++ b/drivers/vhost/vsock.c
+>> > @@ -393,7 +393,7 @@ vhost_vsock_alloc_pkt(struct vhost_virtqueue *vq,
+>> > 		return NULL;
+>> > 	}
+>> >
+>> > -	pkt->buf = kmalloc(pkt->len, GFP_KERNEL);
+>> > +	pkt->buf = kvmalloc(pkt->len, GFP_KERNEL);
+>> > 	if (!pkt->buf) {
+>> > 		kfree(pkt);
+>> > 		return NULL;
+>> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>> > index ec2c2afbf0d0..3a12aee33e92 100644
+>> > --- a/net/vmw_vsock/virtio_transport_common.c
+>> > +++ b/net/vmw_vsock/virtio_transport_common.c
+>> > @@ -1342,7 +1342,7 @@ EXPORT_SYMBOL_GPL(virtio_transport_recv_pkt);
+>> >
+>> > void virtio_transport_free_pkt(struct virtio_vsock_pkt *pkt)
+>> > {
+>> > -	kfree(pkt->buf);
+>> > +	kvfree(pkt->buf);
 >>
->> Am 26/09/2022 um 23:28 schrieb Sean Christopherson:
->>> On Mon, Sep 26, 2022, David Hildenbrand wrote:
->>>> As Sean said "This is an awful lot of a complexity to take on for something
->>>> that appears to be solvable in userspace."
->>>
->>> And if the userspace solution is unpalatable for whatever reason, I'd like to
->>> understand exactly what KVM behavior is problematic for userspace.  E.g. the
->>> above RHBZ bug should no longer be an issue as the buggy commit has since been
->>> reverted.
+>> virtio_transport_free_pkt() is used also in virtio_transport.c and
+>> vsock_loopback.c where pkt->buf is allocated with kmalloc(), but IIUC
+>> kvfree() can be used with that memory, so this should be fine.
 >>
->> It still is because I can reproduce the bug, as also pointed out in
->> multiple comments below.
-> 
-> You can reproduce _a_ bug, but it's obviously not the original bug, because the
-> last comment says:
-> 
->    Second, indeed the patch was reverted and somehow accepted without generating
->    too much noise:
-> 
->    ...
-> 
->    The underlying issue of course as we both know is still there.
-> 
->    You might have luck reproducing it with this bug
-> 
->    https://bugzilla.redhat.com/show_bug.cgi?id=1855298
-> 
->    But for me it looks like it is 'working' as well, so you might have
->    to write a unit test to trigger the issue.
-> 
->>> If the issue is KVM doing something nonsensical on a code fetch to MMIO, then I'd
->>> much rather fix _that_ bug and improve KVM's user exit ABI to let userspace handle
->>> the race _if_ userspace chooses not to pause vCPUs.
->>>
+>> > 	kfree(pkt);
+>> > }
+>> > EXPORT_SYMBOL_GPL(virtio_transport_free_pkt);
+>> > --
+>> > 2.37.3.998.g577e59143f-goog
+>> >
 >>
->> Also on the BZ they all seem (Paolo included) to agree that the issue is
->> non-atomic memslots update.
-> 
-> Yes, non-atomic memslot likely results in the guest fetching from a GPA without a
-> memslot.  I'm asking for an explanation of exactly what happens when that occurs,
-> because it should be possible to adjust KVM and/or QEMU to play nice with the
-> fetch, e.g. to resume the guest until the new memslot is installed, in which case
-> an atomic update isn't needed.
-> 
-> I assume the issue is that KVM exits with KVM_EXIT_INTERNAL_ERROR because the
-> guest is running at CPL=0, and QEMU kills the guest in response.  If that's correct,
-> then that problem can be solved by exiting to userspace with KVM_EXIT_MMIO instead
-> of KVM_EXIT_INTERNAL_ERROR so that userspace can do something sane in response to
-> the MMIO code fetch.
-> 
-> I'm pretty sure this patch will Just Work for QEMU, because QEMU simply resumes
-> the vCPU if mmio.len==0.  It's a bit of a hack, but I don't think it violates KVM's
-> ABI in any way, and it can even become "official" behavior since KVM x86 doesn't
-> otherwise exit with mmio.len==0.
+>> This issue should go away with the Bobby's work about introducing sk_buff
+>> [1], but we can queue this for now.
+>>
+>> I'm not sure if we should do the same also in the virtio-vsock driver
+>> (virtio_transport.c). Here in vhost-vsock the buf allocated is only used in
+>> the host, while in the virtio-vsock driver the buffer is exposed to the
+>> device emulated in the host, so it should be physically contiguous (if not,
+>> maybe we need to adjust virtio_vsock_rx_fill()).
+>
+>More importantly it needs to support DMA API which IIUC kvmalloc
+>memory does not.
+>
 
-I think this patch is not a good idea for two reasons:
+Right, good point!
 
-1) we don't know how userspace behaves if mmio.len is zero.  It is of 
-course reasonable to do nothing, but an assertion failure is also a 
-valid behavior
-
-2) more important, there is no way to distinguish a failure due to the 
-guest going in the weeds (and then KVM_EXIT_INTERNAL_ERROR is fine) from 
-one due to the KVM_SET_USER_MEMORY_REGION race condition.  So this will 
-cause a guest that correctly caused an internal error to loop forever.
-
-While the former could be handled in a "wait and see" manner, the latter 
-in particular is part of the KVM_RUN contract.  Of course it is possible 
-for a guest to just loop forever, but in general all of KVM, QEMU and 
-upper userspace layers want a crashed guest to be detected and stopped 
-forever.
-
-Yes, QEMU could loop only if memslot updates are in progress, but 
-honestly all the alternatives I have seen to atomic memslot updates are 
-really *awful*.  David's patches even invent a new kind of mutex for 
-which I have absolutely no idea what kind of deadlocks one should worry 
-about and why they should not exist; QEMU's locking is already pretty 
-crappy, it's certainly not on my wishlist to make it worse!
-
-This is clearly a deficiency in the KVM kernel API, and (thanks to SRCU) 
-the kernel is the only place where you can have a *good* fix.  It should 
-have been fixed years ago.
-
-Paolo
+Thanks,
+Stefano
 
