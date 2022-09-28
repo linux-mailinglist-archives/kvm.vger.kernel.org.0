@@ -2,75 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 62A2C5EE1EA
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 18:33:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 194995EE1FA
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 18:38:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233695AbiI1QdL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 12:33:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51454 "EHLO
+        id S232792AbiI1QiJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 12:38:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233049AbiI1QdJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 12:33:09 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75D3853D38
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 09:33:07 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id s26so12678064pgv.7
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 09:33:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=SAXhtOlw8ktsiTWcfNjq2uJhAEPOzK9zBrtlir+HUsQ=;
-        b=mmds/8U+Gfot3tLkv0sZ71BY9GtNlOEAKcUYByNqN+A2rtUad7yJaN2GuTiAWzR/Rx
-         Ss/ZZypzlC0fnxQDL/j1hXeWt7/1/NViMi7Oi9xy5OO28g7dMNTkd8bjl1ZDQbad1b3m
-         JJbU2TLqisOVWQmrhvYlVBgIqw+PZgJK1ESl6YbA6MrgK6cS0H+MT4aSS3MuaJGF8qhE
-         /lFU98ebEG2YLNoTwD8+rmF/9QZJeJho9BohcL9lbY2/2ZUYvutG3FOpWysGKuwgYeD2
-         64KcBhJscjDWmXqnCqmmPROXINecCfnepvKYKGUW8a8st2nmfzffRLTTBY5vsIrMI7pm
-         0zeg==
+        with ESMTP id S229951AbiI1QiH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 12:38:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5CFEB6D18
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 09:38:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664383086;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KfA3AE1gLjSHcUh55RKqlSmKAY8wUZMHb6XyxojjA7M=;
+        b=NNYa6SYRFa6Vz3bSM+a1IZ1zCK7gYWLpkG+qPjHlejg+ET4BC8SdXbMjSNLQL4fJ6zzfE9
+        oCOQILba5DGb1DRCXFNjItoGVPUTvjpQGTjfrkm962KJYKGUbfuPcBv52QKHBxHaL2s+4U
+        AUJPTmRdBMv4ZFKfo0zAcIQgMJFhMj4=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-443-GKJGChoVNwWOVAJJfV-P0A-1; Wed, 28 Sep 2022 12:38:04 -0400
+X-MC-Unique: GKJGChoVNwWOVAJJfV-P0A-1
+Received: by mail-ed1-f71.google.com with SMTP id b17-20020a056402351100b00453b19d9bd0so10603340edd.4
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 09:38:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=SAXhtOlw8ktsiTWcfNjq2uJhAEPOzK9zBrtlir+HUsQ=;
-        b=m9SkZ6tt236MmK2SqcVWL+iXLZGUKRD9w/iotAqpv7HO/3mkey4LV1mSFWLHevLQRs
-         7lDUl86YerUtK12AmbBfOSAIyfeDPvVrPZylr2KUmHEVJmEsqeL7b3jEbksepv72aET9
-         maAyvybYOF03DQwXwdwoIbPCz7h+bJabcPU+knAr0HsVVwznOHAlJPwIe5FZMPfjsP2H
-         qT1TyqeQQn7qd46/uMYSxC+RWbvLSBTzBIt0Q/i+F1A0tXTBiymwkivBGlUEDftxtue1
-         LJ6D0LpoBeXGwIrvn0vn9tn3JjDnb2VHNw03s7Ivlv7Kyj2m9eBvRMkARcSU1HZmal3W
-         jC8A==
-X-Gm-Message-State: ACrzQf3obgY2MHh0i6oZwP44W4um+hSVpaZyuZQ476Cf6uppwhymUJdt
-        4HPxbrhaGQFOPUZ2Q1nGKMYPyw==
-X-Google-Smtp-Source: AMsMyM7xHke4wbETucXZGu7h8dGGZB1s+ztiXRwI5luOckWmVLT8/uQDQje6n6T2PnvBd6+CFacZ7Q==
-X-Received: by 2002:a05:6a00:2906:b0:52a:bc7f:f801 with SMTP id cg6-20020a056a00290600b0052abc7ff801mr36158254pfb.49.1664382786825;
-        Wed, 28 Sep 2022 09:33:06 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id l6-20020a622506000000b00543a098a6ffsm4205281pfl.212.2022.09.28.09.33.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 09:33:05 -0700 (PDT)
-Date:   Wed, 28 Sep 2022 16:33:02 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Li RongQing <lirongqing@baidu.com>
-Subject: Re: [PATCH v3 07/28] KVM: x86: Inhibit APIC memslot if x2APIC and
- AVIC are enabled
-Message-ID: <YzR3PaZokwIPDoXb@google.com>
-References: <20220920233134.940511-1-seanjc@google.com>
- <20220920233134.940511-8-seanjc@google.com>
- <e84ebf0a7ac9322bd0cfa742ef6dd2bbfdac0df9.camel@redhat.com>
- <YzHawRN8vpEzP7XD@google.com>
- <bcc3c67abc3b2c3d896b800c5f8f7295b7238271.camel@redhat.com>
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=KfA3AE1gLjSHcUh55RKqlSmKAY8wUZMHb6XyxojjA7M=;
+        b=hcYlyhwlAWBWj/l7ajeXCCguh5E+sU/Nrrtp946CFOtpmHIU1PGeIuqDfyU6g+nUM0
+         L/8wiH/461NOBXdVZgCG3JbT6ZryutaDG6j5VtPSAhzrtNlVG3C8gdE4EfiEV2R8yN4+
+         HyY8gkDo3GLRIN2PgfhB1nQ8gZ844/fwDQf+NXQAyMBibPCuGxkCIrfX7ZBxBlnPKKTn
+         1+9nPL0Yc+s5AZB064NpbI2icP/OmGVfyqIrE9HrH8TbCI5TwyLyqSkaBdddawcELPGQ
+         i/T8VI/kE2hcOVSialJF8MS3BLWYKESqT77pf8EpaQ+GOamQ+O/0DE4n7qYG8qTFmZ02
+         bd9g==
+X-Gm-Message-State: ACrzQf3CCUMCkt/wuoeW/1LGFSwskvoAgLK5sWLVeI0vUYP1dg6wAs4+
+        vFs5QVlJkj0NafpXwBsWt1v+5tHWLpZlW/THAql2A6bwylmkXhUVwqU7CTLJN/xwzWYLpD0RS3g
+        AGbQHo5bLSHID
+X-Received: by 2002:a17:907:8693:b0:783:a776:ce86 with SMTP id qa19-20020a170907869300b00783a776ce86mr12834967ejc.243.1664383083449;
+        Wed, 28 Sep 2022 09:38:03 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7spf7rZI5JZmQqO2z0gdul9SCLQxL0tiDgUirwLau5dTewaGrfOYjH4OE4cXcCdnHHB0dSHA==
+X-Received: by 2002:a17:907:8693:b0:783:a776:ce86 with SMTP id qa19-20020a170907869300b00783a776ce86mr12834945ejc.243.1664383083180;
+        Wed, 28 Sep 2022 09:38:03 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:2f4b:62da:3159:e077? ([2001:b07:6468:f312:2f4b:62da:3159:e077])
+        by smtp.googlemail.com with ESMTPSA id m5-20020a1709062ac500b00773dbdd8205sm2596968eje.168.2022.09.28.09.38.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Sep 2022 09:38:02 -0700 (PDT)
+Message-ID: <8534dfe4-bc71-2c14-b268-e610a3111d14@redhat.com>
+Date:   Wed, 28 Sep 2022 18:38:00 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bcc3c67abc3b2c3d896b800c5f8f7295b7238271.camel@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Like Xu <like.xu.linux@gmail.com>
+References: <37b3162e-7b3a-919f-80e2-f96eca7d4b4c@redhat.com>
+ <dfcbdf1d-b078-ec6c-7706-6af578f79ec2@redhat.com>
+ <55d7f0bd-ace1-506b-ea5b-105a86290114@redhat.com>
+ <f753391e-7bdc-bada-856a-87344e75bd74@redhat.com>
+ <111a46c1-7082-62e3-4f3a-860a95cd560a@redhat.com>
+ <14d5b8f2-7cb6-ce24-c7a7-32aa9117c953@redhat.com>
+ <YzIZhn47brWBfQah@google.com>
+ <3b04db9d-0177-7e6e-a54c-a28ada8b1d36@redhat.com>
+ <YzMdjSkKaJ8HyWXh@google.com>
+ <dd6db8c9-80b1-b6c5-29b8-5eced48f1303@redhat.com>
+ <YzRvMZDoukMbeaxR@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [RFC PATCH 0/9] kvm: implement atomic memslot updates
+In-Reply-To: <YzRvMZDoukMbeaxR@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,74 +100,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 28, 2022, Maxim Levitsky wrote:
-> On Mon, 2022-09-26 at 17:00 +0000, Sean Christopherson wrote:
-> > Given the SRCU problem, I'd prefer to keep the management of the memslot in common
-> > code, even though I agree it's a bit silly.  And KVM_REQ_UNBLOCK is a perfect fit
-> > for dealing with the SRCU issue, i.e. handling this in AVIC code would require
-> > another hook on top of spreading the memslot management across x86 and SVM code.
+On 9/28/22 17:58, Sean Christopherson wrote:
+> On Wed, Sep 28, 2022, Paolo Bonzini wrote:
+>> On 9/27/22 17:58, Sean Christopherson wrote:
+>>> I'm pretty sure this patch will Just Work for QEMU, because QEMU simply resumes
+>>> the vCPU if mmio.len==0.  It's a bit of a hack, but I don't think it violates KVM's
+>>> ABI in any way, and it can even become "official" behavior since KVM x86 doesn't
+>>> otherwise exit with mmio.len==0.
+>>
+>> I think this patch is not a good idea for two reasons:
+>>
+>> 1) we don't know how userspace behaves if mmio.len is zero.  It is of course
+>> reasonable to do nothing, but an assertion failure is also a valid behavior
 > 
-> OK, I am not going to argue about this. But what about at least not using an inhibit
-> bit for that but something else like a boolean, or maybe really add 'I am AVIC bit'
-> or rather something like vcpu->arch.apicv_type enum?
+> Except that KVM currently does neither.  If the fetch happens at CPL>0 and/or in
+> L2, KVM injects #UD.  That's flat out architecturally invalid.  If it's a sticking
+> point, the mmio.len==0 hack can be avoided by defining a new exit reason.
+
+I agree that doing this at CPL>0 or in L2 is invalid and makes little 
+sense (because either way the invalid address cannot be reached without 
+help from the supervisor or L1's page tables).
+
+>> 2) more important, there is no way to distinguish a failure due to the guest
+>> going in the weeds (and then KVM_EXIT_INTERNAL_ERROR is fine) from one due
+>> to the KVM_SET_USER_MEMORY_REGION race condition.  So this will cause a
+>> guest that correctly caused an internal error to loop forever.
 > 
-> Or we can make SVM code just call a common function - just put these in a
-> function and call it from avic_set_virtual_apic_mode?
-
-The issue is that kvm_vcpu_update_apicv() is called from kvm_lapic_set_base(),
-which is the one that may or may not hold SRCU.
-
-> > > You are about to remove the KVM_REQ_UNBLOCK in other patch series.
-> > 
-> > No, KVM_REQ_UNHALT is being removed.  KVM_REQ_UNBLOCK needs to stay, although it
-> > has a rather weird name, e.g. KVM_REQ_WORK would probably be better.
+> Userspace has the GPA and absolutely should be able to detect if the MMIO may have
+> been due to its memslot manipulation versus the guest jumping into the weeds.
 > 
-> Roger that!
-> And I guess lets rename it while we are at it.
-
-I'll prep a patch.
-
-> > > How about just raising KVM_REQ_APICV_UPDATE on current vCPU
-> > > and having a special case in kvm_vcpu_update_apicv of 
-> > > 
-> > > if (apic_access_memslot_enabled == false && apic_access_memslot_allocaed == true) {
-> > > 	drop srcu lock
-> > 
-> > This was my initial thought as well, but the issue is that SRCU may or may not be
-> > held, and so the unlock+lock would need to be conditional.  That's technically a
-> > solvable problem, as it's possible to detect if SRCU is held, but I really don't
-> > want to rely on kvm_vcpu.srcu_depth for anything other than proving that KVM doesn't
-> > screw up SRCU.
+>> While the former could be handled in a "wait and see" manner, the latter in
+>> particular is part of the KVM_RUN contract.  Of course it is possible for a
+>> guest to just loop forever, but in general all of KVM, QEMU and upper
+>> userspace layers want a crashed guest to be detected and stopped forever.
+>>
+>> Yes, QEMU could loop only if memslot updates are in progress, but honestly
+>> all the alternatives I have seen to atomic memslot updates are really
+>> *awful*.  David's patches even invent a new kind of mutex for which I have
+>> absolutely no idea what kind of deadlocks one should worry about and why
+>> they should not exist; QEMU's locking is already pretty crappy, it's
+>> certainly not on my wishlist to make it worse!
+>>
+>> This is clearly a deficiency in the KVM kernel API, and (thanks to SRCU) the
+>> kernel is the only place where you can have a *good* fix.  It should have
+>> been fixed years ago.
 > 
-> Why though? the KVM_REQ_APICV_UPDATE is only handled AFAIK in vcpu_enter_guest
-> which drops the srcu lock few lines afterwards, and therefore the
-> kvm_vcpu_update_apicv is always called with the lock held and it means that it
-> can drop it for the duration of slot update.
+> I don't disagree that the memslots API is lacking, but IMO that is somewhat
+> orthogonal to fixing KVM x86's "code fetch to MMIO" mess.  Such a massive new API
+> should be viewed and prioritized as a new feature, not as a bug fix, e.g. I'd
+> like to have the luxury of being able to explore ideas beyond "let userspace
+> batch memslot updates", and I really don't want to feel pressured to get this
+> code reviewed and merge.
+
+I absolutely agree that this is not a bugfix.  Most new features for KVM 
+can be seen as bug fixes if you squint hard enough, but they're still 
+features.
+
+> E.g. why do a batch update and not provide KVM_SET_ALL_USER_MEMORY_REGIONS to
+> do wholesale replacement?  That seems like it would be vastly simpler to handle
+> on KVM's end.  Or maybe there's a solution in the opposite direction, e.g. an
+> API that allows 1->N or N->1 conversions but not arbitrary batching.
+
+Wholesale replacement was my first idea when I looked at the issue, I 
+think at the end of 2020.  I never got to a full implementation, but my 
+impression was that allocating/deallocating dirty bitmaps, rmaps etc. 
+would make it any easier than arbitrary batch updates.
+
+> And just because QEMU's locking is "already pretty crappy", that's not a good
+> reason to drag KVM down into the mud.  E.g. taking a lock and conditionally
+> releasing it...  I get that this is an RFC, but IMO anything that requires such
+> shenanigans simply isn't acceptable.
 > 
-> The original issue we had was that we tried to drop the srcu lock in 
-> 'kvm_set_apicv_inhibit' which indeed is called from various places,
-> with, or without the lock held.
+>    /*
+>     * Takes kvm->slots_arch_lock, and releases it only if
+>     * invalid_slot allocation, kvm_prepare_memory_region failed
+>     * or batch->is_move_delete is true.
+>     */
+>    static int kvm_prepare_memslot(struct kvm *kvm,
+> 			         struct kvm_internal_memory_region_list *batch)
 > 
-> Moving the memslot disable code to kvm_vcpu_update_apicv would actually solve
-> that, but it was not possible because kvm_vcpu_update_apicv is called
-> simultaneously on all vCPUs, and created various races, including toggling
-> the memslot twice.
 
-As above, kvm_vcpu_update_apicv() can be called without SRCU held.  Oh, but that
-was a recent addition, commit 8fc9c7a3079e ("KVM: x86: Deactivate APICv on vCPU
-with APIC disabled").  I was wary of using KVM_REQ_APICV_UPDATE in kvm_lapic_set_base(),
-e.g. in case there was some dependency on updating _immediately, but since that's
-such a new addition I have no objection to switching to the request.
+No objection about that. :)
 
-Similarly, is there a good reason for having nested_svm_vmexit() invoke
-kvm_vcpu_update_apicv() directly?  I'm confused by the "so that other vCPUs can
-start to benefit from it right away".  The nested inhibit is per-vCPU and so
-should only affect the current vCPU, no?  I.e. for all intents and purposes, using
-a request should be functionally equivalent.
+Paolo
 
-	/*
-	 * Un-inhibit the AVIC right away, so that other vCPUs can start
-	 * to benefit from it right away.
-	 */
-	if (kvm_apicv_activated(vcpu->kvm))
-		kvm_vcpu_update_apicv(vcpu);
