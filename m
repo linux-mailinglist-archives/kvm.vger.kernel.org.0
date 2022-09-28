@@ -2,289 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BAE005EE051
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 17:27:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 160F85EE08C
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 17:34:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233411AbiI1P1Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 11:27:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55994 "EHLO
+        id S234489AbiI1PeG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 11:34:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232735AbiI1P0m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 11:26:42 -0400
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2061.outbound.protection.outlook.com [40.107.102.61])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12F3E5FDCA
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 08:26:18 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mKsV9dwOMGSh9uwkAVr/o6GbWqi3XW9ziYx6Bt+D2O99a2eU2VOcyGlp5Q+TUcAueHEhdzaTGAbiv9MACHS2isgKmA3H3871mWw5gjzZ8hsQWvBPtXDKAdJEApMCKyLDs5DuywmVQxmwdDGtGrn4rtVhDV7l/v67UHvWyvGfpp/Z2rtWFQ5GkWPoIiomT8qTdFMMlVQ0Sqob9KXREd+8v8LRLTi6eLARBr8I8pXjGyA4mYW+8bSwl9we1dXij9dL0CUAqA56WRdW2iHc9/Pjt+T6YcdvA1Gb/H38KShke9SdheA8CNCAUhgtCMBCMGr341iZVMfpF30JORvCCj5emg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=acql0A6+ZuXV/x7O7u+LQohHzOatkHk8SGXSwZK5Vxw=;
- b=Lvf4yS+rYSW1z7gb6WfY6Uk7risZQkds5097OIvGO0gimH9SGFnRBzPuq42dm+4kZ0Yqjm3OnP0FCCeXGDIInRkHSMkRvfKSemfS9BiTYnk1aq+rM6MQTQPbi0s9eMjuq9Wa+bvHIGit8jI3+GcTu8smedStScCm52s81aqCF1bLiggtx2rbDuLMyMdLojGMx80MNSaUqeAM9qMO7o+O1hDaREeodaYrOJoECKlsXTbt754vDOp6ZXJpzdPL1o/3qkK0n8NAXUCAiFY4EsmhK1WEczyfx4gH4hheMMn7OjakWaVaDtFmy1ZwPd1EZFlY9nbJuMK1+ggPGzbs0HTUpg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=acql0A6+ZuXV/x7O7u+LQohHzOatkHk8SGXSwZK5Vxw=;
- b=tgdbROsIjzTFrnZ2ybKxm3K/Fmc42vWeDjs/1k1A4LgcgpR6QtwSuC6Xwk+PtALwDJK6S6rXjMvrQmul+oTGTp4THaJAGhA6HSuLUlIhraExvJ06kTwBqySRLSRQRnt1YKqYbP0ToUAR6AtynbtQq5FNBpTRorHX1vBWLbr2HFkOAJGdZzxYp2o6zPryJ3CuVik6UJ6TQUccUVxsFxO/Fh9JumNHEEIuQRGYVPUCBPHbJlHp/oLHQxeLqF45ysDqzMGnlzY6FOHXxIh3iMmBadmBSrejv1pt5BArqPTtG9IbfsxVrOjvsVkObl6ngQMoFX5Xn+yVy/eyeCP0nTPP4w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
- by IA1PR12MB6282.namprd12.prod.outlook.com (2603:10b6:208:3e6::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.17; Wed, 28 Sep
- 2022 15:26:16 +0000
-Received: from MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::f0c0:3a28:55e9:e99c]) by MN2PR12MB4192.namprd12.prod.outlook.com
- ([fe80::f0c0:3a28:55e9:e99c%5]) with mapi id 15.20.5676.018; Wed, 28 Sep 2022
- 15:26:16 +0000
-Date:   Wed, 28 Sep 2022 12:26:14 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Qian Cai <cai@lca.pw>,
-        "Rodel, Jorg" <jroedel@suse.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>
-Subject: Re: [PATCH v2] vfio: Follow a strict lifetime for struct iommu_group
-Message-ID: <YzRnlqw/U7xDhL7P@nvidia.com>
-References: <0-v2-a3c5f4429e2a+55-iommu_group_lifetime_jgg@nvidia.com>
- <BN9PR11MB5276ED36A2F498D37A18DCF38C549@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276ED36A2F498D37A18DCF38C549@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: MN2PR05CA0037.namprd05.prod.outlook.com
- (2603:10b6:208:236::6) To MN2PR12MB4192.namprd12.prod.outlook.com
- (2603:10b6:208:1d5::15)
+        with ESMTP id S234262AbiI1PeA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 11:34:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D68AD2645
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 08:33:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664379238;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7Hvc4Bth99XeaF63Xo1wSSTs7cb8JI+3eopPFDZGezg=;
+        b=NDJ8PRVgfH9fncrBkB+7/e9gFBVDZqe7Un7hSKqXUxLr17N4tIG85bfgZ7eKVmXXpxSGN8
+        p8e2I5mdL/f9flfwxseqdX/TdYlAhAz4lU7j+bnljJXZBUl2/a8oogtdyRXxMvV/DthPoD
+        y0r5C51ki1qAZ2Uv2Wo9ARRkLnyY1i4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-335-xUyl2ds_PtayJJUjtjJIxw-1; Wed, 28 Sep 2022 11:33:56 -0400
+X-MC-Unique: xUyl2ds_PtayJJUjtjJIxw-1
+Received: by mail-wr1-f72.google.com with SMTP id v22-20020adf8b56000000b0022af189148bso3156455wra.22
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 08:33:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date;
+        bh=7Hvc4Bth99XeaF63Xo1wSSTs7cb8JI+3eopPFDZGezg=;
+        b=0QEU3OkPJ1KcTpnhWVaAHwiOjjQ2sC9IyxRbVpQIjHIO5HOzGD7lnfAxrB2/D8/9JW
+         i61iEf/HW+Z3uXST+itk0BVLTpPsrsiM6h/0RpbkTpSHQABK3sjzEl5q8kuI79fm9Wks
+         XizRCN6Vesm4CPFVYZfW4jouuDQaWCtbOTgYAYtYgb0ASCJeMXfJlGAD0WNKg8kJMxhY
+         pj0PPUKnng1iBz+NovfzPKUCS+vWv4TdEXgxYTub/4sQVA/8Xj4y7xY+y0tC0coP7c83
+         uevk+3SN0tSJvU8GzIfby8PuWxeQ5QD/2wwWKDevnUgAcavCEKVGRHtiwK6aPN4dJCfg
+         1wpA==
+X-Gm-Message-State: ACrzQf0eUF/Nb6y4hS6+0MjVfbQftB4kOPHQBI4Ib6A3X64YA+Hb5jmu
+        IyxJJk5FHrKHyt8Y/bMsS9RouCRL5ENTmMSH5IvlW60RDGmfua7zrebIOW2RfaXn1HuObjLanqw
+        YfKjX6MT4KYl/
+X-Received: by 2002:a5d:4648:0:b0:22c:cc4b:5327 with SMTP id j8-20020a5d4648000000b0022ccc4b5327mr953811wrs.646.1664379235581;
+        Wed, 28 Sep 2022 08:33:55 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6rJi3nmjOcBa12AnKu94RezVzFzaamRYHigEI5k17H/J7+VENgjW/3k5n/8wLIG3t4YovXTg==
+X-Received: by 2002:a5d:4648:0:b0:22c:cc4b:5327 with SMTP id j8-20020a5d4648000000b0022ccc4b5327mr953794wrs.646.1664379235256;
+        Wed, 28 Sep 2022 08:33:55 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c704:1100:add9:5f61:6b94:7540? (p200300cbc7041100add95f616b947540.dip0.t-ipconnect.de. [2003:cb:c704:1100:add9:5f61:6b94:7540])
+        by smtp.gmail.com with ESMTPSA id m11-20020a05600c4f4b00b003b31c560a0csm2092591wmq.12.2022.09.28.08.33.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Sep 2022 08:33:54 -0700 (PDT)
+Message-ID: <57621993-95e2-b628-3c03-adf96384f4bb@redhat.com>
+Date:   Wed, 28 Sep 2022 17:33:53 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN2PR12MB4192:EE_|IA1PR12MB6282:EE_
-X-MS-Office365-Filtering-Correlation-Id: af9bbcb9-e615-4ab8-8857-08daa165c8ec
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: EK4Ug0Oc5e0sJEJsKQnSx1zUir90AN2mbKud/Ioo0EYoH7vYX+5GhkIC7Xx2xfh9s6UX/sgHIROW2SD4WQcCV3dzLLUy6Lu93GJI9oPdkzAS5kbadgKWv2wfBwlSUfNNChHARbIOzKB8WW1RtbDZPX+TnHtDd0o8eHA5oSVGIKIG0HE0G6hXDFks05axZAbO0cJu1NWUysMhEKegJicjqt/ygkNTiKjPTya5htlIja7q88ciXXkt0S5a0LO2LS6X1H17JCiPlXF8tVvl2nUayXFSjyiqh2UbEJJYe7VU9Q5GNc3ilXFAd4JDVPW0fZciD+JsN6Iqzn7htz9G6TVgd3/kiH41/l1mfs8W3hBfAix6ixZbGJbAlv+XHmmZ86MfxZ4NWv+WlwW25+iK6P898ezEI8UbYbAFt3kHREigI5mV+6WirX7si4/pwqUU+alX6XhXkW5vlYDQ2kbGHOhJ4+82CHJJxYeVhRFEm4tpZ5gJBmqjuogUdlW1trR60WmAyja5wAT/9RnvTN4Vy/A0QLXrSFmfKcYHemP+lYICg/D25U5FMQaFtzKIUbX70zP/pjeIH81+hkPwPRvtBxofVexTAmTMzCRgDdZ80xKmQF52AueWW1Xyrea0JfY9i+5mIzxtX8nCDmZB19II2HECKFbr5qRyc7AHFRSb5Jb2ai1gNl6HSsK6jVYDIIuH/Z6pj3w6nFkum+r4zKBmV6iYWw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(39860400002)(366004)(376002)(346002)(136003)(451199015)(2906002)(5660300002)(4326008)(38100700002)(36756003)(41300700001)(66476007)(66556008)(66946007)(8676002)(6486002)(54906003)(6916009)(8936002)(478600001)(316002)(2616005)(186003)(86362001)(6506007)(26005)(6512007)(83380400001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?xRRzDAtleuv1pjuKhua5wUw7sEv5Alrfab7QMiB3jrtqYGcQc+qGzZL7/9WV?=
- =?us-ascii?Q?cvAd8l/kEenyStEVGgxFPa2o9vZ03IcrNnbX9B2mVW2iVBSvZkqHmP7qgUDl?=
- =?us-ascii?Q?8JQWlzVRRdm8oP3lfD1XzZsLt+wlIsSEjwSugtLz/M+P+j72CxFRLXi+bwhe?=
- =?us-ascii?Q?8FWFAAVeRKTrrh0KLu952a1O1kqdDCjDXZylwp8F8i7oGzjNczstDYnzXynk?=
- =?us-ascii?Q?26qERDqRHrxrmkdhAFeKRIEMoWnN2JhHmfFcbOPMpy/YVlYjpgdJDH9LYoxy?=
- =?us-ascii?Q?7Y7+Q3j5uGjWIxSPjWgi6FvFMiJeakHvHiKzXkkB/32yzQS0UQEL6BjZ9BC5?=
- =?us-ascii?Q?pOSnxkz8dz9l/dr7BzpxBwmnEUBGTaoV4X/Hs2CKdHYgOn5G9O2WYrCywNfr?=
- =?us-ascii?Q?bwKHtPkYW0dRywjo98w1EAvjBmaYu9uKDMLLK52O2JcQe7TS1BEGZOcFeCI6?=
- =?us-ascii?Q?o6TIzNl0i6eK0tsC3RBqmFvYzndkrsmi3PErxX9n4KRw5ePO9kXf++cyA+iO?=
- =?us-ascii?Q?1C9LDj0kGpAAFcBjBdnBrCgupS1njXpuhNFU65klS1zcbaoxWr/LaNkcPNkw?=
- =?us-ascii?Q?5+3HwHqqB55W7WHjm3qUie+F+i5g7p8ijGx2RjipCOPs/RxqMLoO6Y86R6iz?=
- =?us-ascii?Q?Gr1FgneJnprBHuYmdPFCcaBo1V0mXj1JITXW3GCYnZcAmBzI9NAANOyWx4fm?=
- =?us-ascii?Q?rIY/yl1fpLMku1KYx06oJnb4os0Sy0UZeLkEiw3ORYMJOhDc2HRW/sdSGr/D?=
- =?us-ascii?Q?KERHyKES0ZT/JIFzCkGAeOyMhc0FlRTeSXKUHh1r+VlPlnwKRHTcyDuFCeCq?=
- =?us-ascii?Q?FODygVHDX75uQ/ZXMwV8UcaUiHGEgVoVrfZk723LAt3KuejfpfKBw8RWZI6U?=
- =?us-ascii?Q?GZrfMVvZl01PnZwskXDy0nRVZWeZO8cN9mIUYY9o8ev1fd9CzYrJhp+FcrUB?=
- =?us-ascii?Q?kBmTTQbgWJhm6WBmGi32hIu0uK7bHzKElFZ6VhiHQCqAAyY6xf/unlEs7uAD?=
- =?us-ascii?Q?GrFFiyUWhb3OvrJAfG9ZldV7exP759/fKT7LDgLhFBA21t53ciXztItHZ5+x?=
- =?us-ascii?Q?jFIcq5Kb/Np0KgsQcJDF7OH28G6xamE2hYPgroZnPMFjiDj4q3sOfz7N/Sj6?=
- =?us-ascii?Q?jEDmOqMbs2SR7W8uf8pGbxBhsQnt06UXgbdHcYd3HlPVgerk434hheHldHaS?=
- =?us-ascii?Q?bioN6N+7oUIDkwIFTqKdhhUP6y3o9hxNfL6ny/wSCWEi2/ISVsUIowlsRDHV?=
- =?us-ascii?Q?P0TMsQsbwTRDXW/yYpV7ayUs3ZOA/1SGv479D+ew0zEv2Rz8bxETxu0ayFXV?=
- =?us-ascii?Q?NMDeQ3SutkK2+nRXv0t/tcO4V5w273Qzr2mChRMKqTjMQhpi8pBjbHF3PvbP?=
- =?us-ascii?Q?ftr7BVt1h6iv7pnr1Wigf0Q0/sKA4/QOA5Ki2URRaKnTDvHRUWMiB2QE3bl0?=
- =?us-ascii?Q?p63jUxY/5NLy/sPDAHh8OeX7+qklMkW1V3ne9oHGw5lg6CCIqQ5pEHSWsn9h?=
- =?us-ascii?Q?RW3pz+he0E+c2dzXDAG8pOA2TlYYwXP4pMHzmAoNrJm2dTgBUZk+Q3P0RynR?=
- =?us-ascii?Q?NxTck64M4UIzcOLdKN0=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: af9bbcb9-e615-4ab8-8857-08daa165c8ec
-X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2022 15:26:16.3402
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ajuuR222UnxY+4M3abkbQT4OGSz18tBK4NnSQmDWsD+hpT9fGN9ZzJi5JTN4tUsB
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6282
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [RFC PATCH 0/9] kvm: implement atomic memslot updates
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Like Xu <like.xu.linux@gmail.com>
+References: <YxtOEgJhe4EcAJsE@google.com>
+ <5f0345d2-d4d1-f4fe-86ba-6e22561cb6bd@redhat.com>
+ <37b3162e-7b3a-919f-80e2-f96eca7d4b4c@redhat.com>
+ <dfcbdf1d-b078-ec6c-7706-6af578f79ec2@redhat.com>
+ <55d7f0bd-ace1-506b-ea5b-105a86290114@redhat.com>
+ <f753391e-7bdc-bada-856a-87344e75bd74@redhat.com>
+ <111a46c1-7082-62e3-4f3a-860a95cd560a@redhat.com>
+ <14d5b8f2-7cb6-ce24-c7a7-32aa9117c953@redhat.com>
+ <YzIZhn47brWBfQah@google.com>
+ <3b04db9d-0177-7e6e-a54c-a28ada8b1d36@redhat.com>
+ <YzMdjSkKaJ8HyWXh@google.com>
+ <dd6db8c9-80b1-b6c5-29b8-5eced48f1303@redhat.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <dd6db8c9-80b1-b6c5-29b8-5eced48f1303@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 28, 2022 at 03:51:01AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Friday, September 23, 2022 8:06 AM
-> >
-> > diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-> > index 56fab31f8e0ff8..039e3208d286fa 100644
-> > --- a/drivers/vfio/vfio.h
-> > +++ b/drivers/vfio/vfio.h
-> > @@ -41,7 +41,15 @@ enum vfio_group_type {
-> >  struct vfio_group {
-> >  	struct device 			dev;
-> >  	struct cdev			cdev;
-> > +	/*
-> > +	 * When drivers is non-zero a driver is attached to the struct device
-> > +	 * that provided the iommu_group and thus the iommu_group is a
-> > valid
-> > +	 * pointer. When drivers is 0 the driver is being detached. Once users
-> > +	 * reaches 0 then the iommu_group is invalid.
-> > +	 */
-> > +	refcount_t			drivers;
+On 28.09.22 17:07, Paolo Bonzini wrote:
+> On 9/27/22 17:58, Sean Christopherson wrote:
+>> On Tue, Sep 27, 2022, Emanuele Giuseppe Esposito wrote:
+>>>
+>>> Am 26/09/2022 um 23:28 schrieb Sean Christopherson:
+>>>> On Mon, Sep 26, 2022, David Hildenbrand wrote:
+>>>>> As Sean said "This is an awful lot of a complexity to take on for something
+>>>>> that appears to be solvable in userspace."
+>>>>
+>>>> And if the userspace solution is unpalatable for whatever reason, I'd like to
+>>>> understand exactly what KVM behavior is problematic for userspace.  E.g. the
+>>>> above RHBZ bug should no longer be an issue as the buggy commit has since been
+>>>> reverted.
+>>>
+>>> It still is because I can reproduce the bug, as also pointed out in
+>>> multiple comments below.
+>>
+>> You can reproduce _a_ bug, but it's obviously not the original bug, because the
+>> last comment says:
+>>
+>>     Second, indeed the patch was reverted and somehow accepted without generating
+>>     too much noise:
+>>
+>>     ...
+>>
+>>     The underlying issue of course as we both know is still there.
+>>
+>>     You might have luck reproducing it with this bug
+>>
+>>     https://bugzilla.redhat.com/show_bug.cgi?id=1855298
+>>
+>>     But for me it looks like it is 'working' as well, so you might have
+>>     to write a unit test to trigger the issue.
+>>
+>>>> If the issue is KVM doing something nonsensical on a code fetch to MMIO, then I'd
+>>>> much rather fix _that_ bug and improve KVM's user exit ABI to let userspace handle
+>>>> the race _if_ userspace chooses not to pause vCPUs.
+>>>>
+>>>
+>>> Also on the BZ they all seem (Paolo included) to agree that the issue is
+>>> non-atomic memslots update.
+>>
+>> Yes, non-atomic memslot likely results in the guest fetching from a GPA without a
+>> memslot.  I'm asking for an explanation of exactly what happens when that occurs,
+>> because it should be possible to adjust KVM and/or QEMU to play nice with the
+>> fetch, e.g. to resume the guest until the new memslot is installed, in which case
+>> an atomic update isn't needed.
+>>
+>> I assume the issue is that KVM exits with KVM_EXIT_INTERNAL_ERROR because the
+>> guest is running at CPL=0, and QEMU kills the guest in response.  If that's correct,
+>> then that problem can be solved by exiting to userspace with KVM_EXIT_MMIO instead
+>> of KVM_EXIT_INTERNAL_ERROR so that userspace can do something sane in response to
+>> the MMIO code fetch.
+>>
+>> I'm pretty sure this patch will Just Work for QEMU, because QEMU simply resumes
+>> the vCPU if mmio.len==0.  It's a bit of a hack, but I don't think it violates KVM's
+>> ABI in any way, and it can even become "official" behavior since KVM x86 doesn't
+>> otherwise exit with mmio.len==0.
 > 
-> While I agree all this patch is doing, the notation of 'drivers' here sounds
-> a bit confusing IMHO.
-
-Maybe, I picked it because we recently had a num_devices here that was
-a different thing. "drivers" comes from the idea that it is the number
-of drivers that have called 'register' on the group. This also happens
-to be the number of vfio_devices of course.
-
-> >  	refcount_t			users;
-> > +	struct completion		users_comp;
+> I think this patch is not a good idea for two reasons:
 > 
-> Now the only place poking 'users' is when a group is opened/closed,
-> while group->opened_file already plays the guard role. From this
-> angle 'users' sounds redundant now?
+> 1) we don't know how userspace behaves if mmio.len is zero.  It is of
+> course reasonable to do nothing, but an assertion failure is also a
+> valid behavior
+> 
+> 2) more important, there is no way to distinguish a failure due to the
+> guest going in the weeds (and then KVM_EXIT_INTERNAL_ERROR is fine) from
+> one due to the KVM_SET_USER_MEMORY_REGION race condition.  So this will
+> cause a guest that correctly caused an internal error to loop forever.
+> 
+> While the former could be handled in a "wait and see" manner, the latter
+> in particular is part of the KVM_RUN contract.  Of course it is possible
+> for a guest to just loop forever, but in general all of KVM, QEMU and
+> upper userspace layers want a crashed guest to be detected and stopped
+> forever.
+> 
+> Yes, QEMU could loop only if memslot updates are in progress, but
+> honestly all the alternatives I have seen to atomic memslot updates are
+> really *awful*.  David's patches even invent a new kind of mutex for
+> which I have absolutely no idea what kind of deadlocks one should worry
+> about and why they should not exist; QEMU's locking is already pretty
+> crappy, it's certainly not on my wishlist to make it worse!
 
-Oh interesting. I did try to get rid of that thing, but I was thinking
-to make it "disassociate" so we didn't have to sleep at all, but SPAPR
-messed that up.. It is a good followup patch
+Just to comment on that (I'm happy as long as this gets fixed), a simple 
+mutex with trylock should get the thing done as well -- kicking the VCPU 
+if the trylock fails. But I did not look further into locking alternatives.
 
-So like this:
+-- 
+Thanks,
 
-diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-index 039e3208d286fa..78b362a9250113 100644
---- a/drivers/vfio/vfio.h
-+++ b/drivers/vfio/vfio.h
-@@ -48,8 +48,6 @@ struct vfio_group {
- 	 * reaches 0 then the iommu_group is invalid.
- 	 */
- 	refcount_t			drivers;
--	refcount_t			users;
--	struct completion		users_comp;
- 	unsigned int			container_users;
- 	struct iommu_group		*iommu_group;
- 	struct vfio_container		*container;
-@@ -61,6 +59,7 @@ struct vfio_group {
- 	struct rw_semaphore		group_rwsem;
- 	struct kvm			*kvm;
- 	struct file			*opened_file;
-+	struct swait_queue_head		opened_file_wait;
- 	struct blocking_notifier_head	notifier;
- };
- 
-diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index f19171cad9a25f..57a7576a96a61b 100644
---- a/drivers/vfio/vfio_main.c
-+++ b/drivers/vfio/vfio_main.c
-@@ -186,10 +186,9 @@ static struct vfio_group *vfio_group_alloc(struct iommu_group *iommu_group,
- 	cdev_init(&group->cdev, &vfio_group_fops);
- 	group->cdev.owner = THIS_MODULE;
- 
--	refcount_set(&group->users, 1);
- 	refcount_set(&group->drivers, 1);
--	init_completion(&group->users_comp);
- 	init_rwsem(&group->group_rwsem);
-+	init_swait_queue_head(&group->opened_file_wait);
- 	INIT_LIST_HEAD(&group->device_list);
- 	mutex_init(&group->device_lock);
- 	group->iommu_group = iommu_group;
-@@ -245,12 +244,6 @@ static struct vfio_group *vfio_create_group(struct iommu_group *iommu_group,
- 	return ret;
- }
- 
--static void vfio_group_put(struct vfio_group *group)
--{
--	if (refcount_dec_and_test(&group->users))
--		complete(&group->users_comp);
--}
--
- static void vfio_device_remove_group(struct vfio_device *device)
- {
- 	struct vfio_group *group = device->group;
-@@ -270,10 +263,6 @@ static void vfio_device_remove_group(struct vfio_device *device)
- 	 * cdev_device_add() will fail due to the name aready existing.
- 	 */
- 	cdev_device_del(&group->cdev, &group->dev);
--	mutex_unlock(&vfio.group_lock);
--
--	/* Matches the get from vfio_group_alloc() */
--	vfio_group_put(group);
- 
- 	/*
- 	 * Before we allow the last driver in the group to be unplugged the
-@@ -281,7 +270,13 @@ static void vfio_device_remove_group(struct vfio_device *device)
- 	 * is because the group->iommu_group pointer should only be used so long
- 	 * as a device driver is attached to a device in the group.
- 	 */
--	wait_for_completion(&group->users_comp);
-+	while (group->opened_file) {
-+		mutex_unlock(&vfio.group_lock);
-+		swait_event_idle_exclusive(group->opened_file_wait,
-+					   !group->opened_file);
-+		mutex_lock(&vfio.group_lock);
-+	}
-+	mutex_unlock(&vfio.group_lock);
- 
- 	/*
- 	 * These data structures all have paired operations that can only be
-@@ -906,15 +901,18 @@ static int vfio_group_fops_open(struct inode *inode, struct file *filep)
- 
- 	down_write(&group->group_rwsem);
- 
--	/* users can be zero if this races with vfio_device_remove_group() */
--	if (!refcount_inc_not_zero(&group->users)) {
-+	/*
-+	 * drivers can be zero if this races with vfio_device_remove_group(), it
-+	 * will be stable at 0 under the group rwsem
-+	 */
-+	if (refcount_read(&group->drivers) == 0) {
- 		ret = -ENODEV;
--		goto err_unlock;
-+		goto out_unlock;
- 	}
- 
- 	if (group->type == VFIO_NO_IOMMU && !capable(CAP_SYS_RAWIO)) {
- 		ret = -EPERM;
--		goto err_put;
-+		goto out_unlock;
- 	}
- 
- 	/*
-@@ -922,16 +920,12 @@ static int vfio_group_fops_open(struct inode *inode, struct file *filep)
- 	 */
- 	if (group->opened_file) {
- 		ret = -EBUSY;
--		goto err_put;
-+		goto out_unlock;
- 	}
- 	group->opened_file = filep;
- 	filep->private_data = group;
--
--	up_write(&group->group_rwsem);
--	return 0;
--err_put:
--	vfio_group_put(group);
--err_unlock:
-+	ret = 0;
-+out_unlock:
- 	up_write(&group->group_rwsem);
- 	return ret;
- }
-@@ -952,8 +946,7 @@ static int vfio_group_fops_release(struct inode *inode, struct file *filep)
- 		vfio_group_detach_container(group);
- 	group->opened_file = NULL;
- 	up_write(&group->group_rwsem);
--
--	vfio_group_put(group);
-+	swake_up_one(&group->opened_file_wait);
- 
- 	return 0;
- }
+David / dhildenb
+
