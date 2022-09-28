@@ -2,237 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A37E15EDA22
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 12:34:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BD52A5EDA90
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 12:52:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233518AbiI1KeX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 06:34:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46138 "EHLO
+        id S233859AbiI1Kwf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 06:52:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230514AbiI1KeV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 06:34:21 -0400
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD4F882D11
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 03:34:18 -0700 (PDT)
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1odUOH-0008Ji-9b; Wed, 28 Sep 2022 12:34:09 +0200
-Message-ID: <c1721404-aadd-5941-07db-bee4d67599a1@maciej.szmigiero.name>
-Date:   Wed, 28 Sep 2022 12:34:01 +0200
+        with ESMTP id S233876AbiI1Kv0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 06:51:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0446858502
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 03:49:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664362192;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9fnqAJOUuiKB1piVG0nPPMmSdhv/P6AfGQwVpRP8lf4=;
+        b=MGNekso34/Om2AW4YoHYMZ/q2RrXalyg6EZZwINOP64GZPSYq05CJWGqb6wfReprwQKPNy
+        b1pHBWDd1RmYB4tisr1X1FUZSm0xePM62HP3q3rCX4okifBvhbOycZDduiaCbHUolSkXeF
+        6V1ooeaEBQoqhNjQFmg7cGJufDRWVQQ=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-278-Hwfy8EvFNii5fy5-D932eQ-1; Wed, 28 Sep 2022 06:49:49 -0400
+X-MC-Unique: Hwfy8EvFNii5fy5-D932eQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 009CD3C0F220;
+        Wed, 28 Sep 2022 10:49:43 +0000 (UTC)
+Received: from starship (unknown [10.40.193.233])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D19652027061;
+        Wed, 28 Sep 2022 10:49:35 +0000 (UTC)
+Message-ID: <c1168e8bd9077a2cc9ef61ee06db7a4e8c0f1600.camel@redhat.com>
+Subject: Re: [PATCH v2 1/5] perf/x86/intel/lbr: use setup_clear_cpu_cap
+ instead of clear_cpu_cap
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Jane Malalane <jane.malalane@citrix.com>,
+        Kees Cook <keescook@chromium.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        linux-perf-users@vger.kernel.org,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
+Date:   Wed, 28 Sep 2022 13:49:34 +0300
+In-Reply-To: <YzGlQBkCSJxY+8Jf@zn.tnic>
+References: <20220718141123.136106-1-mlevitsk@redhat.com>
+         <20220718141123.136106-2-mlevitsk@redhat.com> <Yyh9RDbaRqUR1XSW@zn.tnic>
+         <c105971a72dfe6d46ad75fb7e71f79ba716e081c.camel@redhat.com>
+         <YzGlQBkCSJxY+8Jf@zn.tnic>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Content-Language: en-US, pl-PL
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        kvm <kvm@vger.kernel.org>, qemu-devel <qemu-devel@nongnu.org>
-References: <2ca557c8eb947112103168a9da3033ac5dc6ab99.1664291365.git.maciej.szmigiero@oracle.com>
- <CABgObfb7ow0hZyHFEKBs_c=pbB7k7aCQjL1Qj=xu4+M9CSTzaQ@mail.gmail.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH][RESEND] hyperv: fix SynIC SINT assertion failure on guest
- reset
-In-Reply-To: <CABgObfb7ow0hZyHFEKBs_c=pbB7k7aCQjL1Qj=xu4+M9CSTzaQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28.09.2022 01:17, Paolo Bonzini wrote:
-> Why does this need to be a virtual function, if it is the same for all CPUs (it differs between system and user-mode emulation, but it is never called by user-mode emulation so that does not matter)?
+On Mon, 2022-09-26 at 15:12 +0200, Borislav Petkov wrote:
+> On Tue, Sep 20, 2022 at 11:20:47AM +0300, Maxim Levitsky wrote:
+> > If I understand that correctly, the difference between clear_cpu_cap and setup_clear_cpu_cap
+> > is that setup_clear_cpu_cap should be called early when only the boot cpu is running and it 
+> > 
+> > 1. works on 'boot_cpu_data' which represents the boot cpu.
+> > 2. sets a bit in 'cpu_caps_cleared' which are later applied to all CPUs, including these that are hotplugged.
+> 
+> Yes.
+> 
+> > On the other hand the clear_cpu_cap just affects the given 'struct cpuinfo_x86'.
+> 
+> Yes.
+> 
+> > Call of 'clear_cpu_cap(&boot_cpu_data, X86_FEATURE_ARCH_LBR)' is weird since it still affects 'boot_cpu_data'
+> > but doesn't affect 'cpu_caps_cleared'
+> 
+> Yes.
+> 
+> > I assumed that this was a mistake and the intention was to disable the feature on all CPUs.
+> 
+> peterz says yes.
+> 
+> > I need this patch because in the next patch, I change the clear_cpu_cap such as it detects being
+> > called on boot_cpu_data and in this case also clears bits in 'cpu_caps_cleared', thus
+> > while this patch does introduce a functional change, the next patch doesn't since this is the only
+> > place where clear_cpu_cap is called explicitly on 'boot_cpu_data'
+> 
+> This is not needed - this patch doing setup_clear_cpu_cap() should suffice.
+> 
+> But, there must be something you're fixing with this. Which is it? Some
+> weird virt config?
 
-Will change the patch to directly call x86_cpu_after_reset() from pc_machine_reset() then.
+Patches 1-3 don't fix anything - these are just refactoring to make the code simplier.
+
+This particular patch is done to enable the refactoring in the next patch by removing an
+(hopefully broken) outlier.
+
+
+Patch 4 is small fix in the sense that it allows the warning from the current cpuid filtering code
+to be seen (it is supressed in early code, but then it doesn't usually happen again, so no warning
+is printed at all)
+
+Patch 5 is the main fix - it  makes the kernel to be tolerant to a broken CPUID config 
+(coming hopefully from hypervisor),
+where you have a feature (AVX2 in my case) but not a feature on which this feature depends (AVX).
+
 
 > 
-> Paolo
+> > I do now notice that initcalls are run after smp is initialized, which
+> > means that this code doesn't really disable the CPUID feature on all
+> > CPUs at all.
+> 
+> Well, not exactly. There's do_pre_smp_calls() which is where the
+> early_initcall() thing is run.
+
+
+Aha! I was reading the 'do_initcalls()' code and thought that it
+goes over all initcalls.
+
+note that it turns out that this function is called 'do_pre_smp_initcalls()'.
+
+> 
+> So setup_clear_cpu_cap() will make sure that the feature bit is cleared
+> when the APs come online.
+> 
+> Do you have a virt configuration where you can test this case where the
+> feature flag is clear on all CPUs when it fails?
+
+This needs the arch lbrs which aren't yet supported by KVM (there are patches
+on the mailing list), plus I need a hardware which supportes them, of which
+I don't know even if intel released any yet.
+
+I can hack the code/KVM though to simulate enough of it to see if this failback
+happens.
+
+Besides that, anything else I should do to to see that patch series merged?
 
 Thanks,
-Maciej
-  
-> Il mar 27 set 2022, 17:12 Maciej S. Szmigiero <mail@maciej.szmigiero.name <mailto:mail@maciej.szmigiero.name>> ha scritto:
+Best regards,
+	Maxim Levitsky
+
 > 
->     From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com <mailto:maciej.szmigiero@oracle.com>>
+> I.e., "arch_lbr" will disappear in /proc/cpuinfo completely.
 > 
->     Resetting a guest that has Hyper-V VMBus support enabled triggers a QEMU
->     assertion failure:
->     hw/hyperv/hyperv.c:131: synic_reset: Assertion `QLIST_EMPTY(&synic->sint_routes)' failed.
+> Thx.
 > 
->     This happens both on normal guest reboot or when using "system_reset" HMP
->     command.
-> 
->     The failing assertion was introduced by commit 64ddecc88bcf ("hyperv: SControl is optional to enable SynIc")
->     to catch dangling SINT routes on SynIC reset.
-> 
->     The root cause of this problem is that the SynIC itself is reset before
->     devices using SINT routes have chance to clean up these routes.
-> 
->     Since there seems to be no existing mechanism to force reset callbacks (or
->     methods) to be executed in specific order let's use a similar method that
->     is already used to reset another interrupt controller (APIC) after devices
->     have been reset - by invoking the SynIC reset from the machine reset
->     handler via a new "after_reset" X86 CPU method.
-> 
->     Fixes: 64ddecc88bcf ("hyperv: SControl is optional to enable SynIc") # exposed the bug
->     Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com <mailto:maciej.szmigiero@oracle.com>>
->     ---
->       hw/i386/pc.c               |  6 ++++++
->       target/i386/cpu-qom.h      |  2 ++
->       target/i386/cpu.c          | 10 ++++++++++
->       target/i386/kvm/hyperv.c   |  4 ++++
->       target/i386/kvm/kvm.c      | 24 +++++++++++++++++-------
->       target/i386/kvm/kvm_i386.h |  1 +
->       6 files changed, 40 insertions(+), 7 deletions(-)
-> 
->     diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->     index 566accf7e6..e44f11efb3 100644
->     --- a/hw/i386/pc.c
->     +++ b/hw/i386/pc.c
->     @@ -1850,6 +1850,7 @@ static void pc_machine_reset(MachineState *machine)
->       {
->           CPUState *cs;
->           X86CPU *cpu;
->     +    const X86CPUClass *cpuc;
-> 
->           qemu_devices_reset();
-> 
->     @@ -1858,6 +1859,11 @@ static void pc_machine_reset(MachineState *machine)
->            */
->           CPU_FOREACH(cs) {
->               cpu = X86_CPU(cs);
->     +        cpuc = X86_CPU_GET_CLASS(cpu);
->     +
->     +        if (cpuc->after_reset) {
->     +            cpuc->after_reset(cpu);
->     +        }
-> 
->               if (cpu->apic_state) {
->                   device_legacy_reset(cpu->apic_state);
->     diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
->     index c557a522e1..339d23006a 100644
->     --- a/target/i386/cpu-qom.h
->     +++ b/target/i386/cpu-qom.h
->     @@ -43,6 +43,7 @@ typedef struct X86CPUModel X86CPUModel;
->        * @static_model: See CpuDefinitionInfo::static
->        * @parent_realize: The parent class' realize handler.
->        * @parent_reset: The parent class' reset handler.
->     + * @after_reset: Reset handler to be called only after all other devices have been reset.
->        *
->        * An x86 CPU model or family.
->        */
->     @@ -68,6 +69,7 @@ struct X86CPUClass {
->           DeviceRealize parent_realize;
->           DeviceUnrealize parent_unrealize;
->           DeviceReset parent_reset;
->     +    void (*after_reset)(X86CPU *cpu);
->       };
-> 
-> 
->     diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->     index 1db1278a59..c908b944bd 100644
->     --- a/target/i386/cpu.c
->     +++ b/target/i386/cpu.c
->     @@ -6034,6 +6034,15 @@ static void x86_cpu_reset(DeviceState *dev)
->       #endif
->       }
-> 
->     +static void x86_cpu_after_reset(X86CPU *cpu)
->     +{
->     +#ifndef CONFIG_USER_ONLY
->     +    if (kvm_enabled()) {
->     +        kvm_arch_after_reset_vcpu(cpu);
->     +    }
->     +#endif
->     +}
->     +
->       static void mce_init(X86CPU *cpu)
->       {
->           CPUX86State *cenv = &cpu->env;
->     @@ -7099,6 +7108,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
->           device_class_set_props(dc, x86_cpu_properties);
-> 
->           device_class_set_parent_reset(dc, x86_cpu_reset, &xcc->parent_reset);
->     +    xcc->after_reset = x86_cpu_after_reset;
->           cc->reset_dump_flags = CPU_DUMP_FPU | CPU_DUMP_CCOP;
-> 
->           cc->class_by_name = x86_cpu_class_by_name;
->     diff --git a/target/i386/kvm/hyperv.c b/target/i386/kvm/hyperv.c
->     index 9026ef3a81..e3ac978648 100644
->     --- a/target/i386/kvm/hyperv.c
->     +++ b/target/i386/kvm/hyperv.c
->     @@ -23,6 +23,10 @@ int hyperv_x86_synic_add(X86CPU *cpu)
->           return 0;
->       }
-> 
->     +/*
->     + * All devices possibly using SynIC have to be reset before calling this to let
->     + * them remove their SINT routes first.
->     + */
->       void hyperv_x86_synic_reset(X86CPU *cpu)
->       {
->           hyperv_synic_reset(CPU(cpu));
->     diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
->     index a1fd1f5379..774484c588 100644
->     --- a/target/i386/kvm/kvm.c
->     +++ b/target/i386/kvm/kvm.c
->     @@ -2203,20 +2203,30 @@ void kvm_arch_reset_vcpu(X86CPU *cpu)
->               env->mp_state = KVM_MP_STATE_RUNNABLE;
->           }
-> 
->     +    /* enabled by default */
->     +    env->poll_control_msr = 1;
->     +
->     +    kvm_init_nested_state(env);
->     +
->     +    sev_es_set_reset_vector(CPU(cpu));
->     +}
->     +
->     +void kvm_arch_after_reset_vcpu(X86CPU *cpu)
->     +{
->     +    CPUX86State *env = &cpu->env;
->     +    int i;
->     +
->     +    /*
->     +     * Reset SynIC after all other devices have been reset to let them remove
->     +     * their SINT routes first.
->     +     */
->           if (hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC)) {
->     -        int i;
->               for (i = 0; i < ARRAY_SIZE(env->msr_hv_synic_sint); i++) {
->                   env->msr_hv_synic_sint[i] = HV_SINT_MASKED;
->               }
-> 
->               hyperv_x86_synic_reset(cpu);
->           }
->     -    /* enabled by default */
->     -    env->poll_control_msr = 1;
->     -
->     -    kvm_init_nested_state(env);
->     -
->     -    sev_es_set_reset_vector(CPU(cpu));
->       }
-> 
->       void kvm_arch_do_init_vcpu(X86CPU *cpu)
->     diff --git a/target/i386/kvm/kvm_i386.h b/target/i386/kvm/kvm_i386.h
->     index 4124912c20..096a5dd781 100644
->     --- a/target/i386/kvm/kvm_i386.h
->     +++ b/target/i386/kvm/kvm_i386.h
->     @@ -38,6 +38,7 @@ bool kvm_has_adjust_clock_stable(void);
->       bool kvm_has_exception_payload(void);
->       void kvm_synchronize_all_tsc(void);
->       void kvm_arch_reset_vcpu(X86CPU *cs);
->     +void kvm_arch_after_reset_vcpu(X86CPU *cpu);
->       void kvm_arch_do_init_vcpu(X86CPU *cs);
-> 
->       void kvm_put_apicbase(X86CPU *cpu, uint64_t value);
-> 
+
 
