@@ -2,69 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E7DA65EE9C4
-	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 00:55:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 678125EE9C6
+	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 00:56:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234611AbiI1WzV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 18:55:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50496 "EHLO
+        id S233695AbiI1W4b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 18:56:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234661AbiI1WzO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 18:55:14 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5186E57BFE
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 15:55:13 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id u69so13521722pgd.2
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 15:55:13 -0700 (PDT)
+        with ESMTP id S229951AbiI1W43 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 18:56:29 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA3E81162E0
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 15:56:28 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id c7so13481768pgt.11
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 15:56:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=kEow7JtyXZKSoXCpvGfzKSDblkL9Mmtib8QujjWXNoU=;
-        b=W5NJliA1lAIbdRt7RjgOqkzCloKRkvJxy0UkoFRSnvKxKTTjHI/mF1w/D3VVBfQSwy
-         eiJ7iqnAlItjuRkOwrgpmkBVYs54d4kv+ivKNLpdmNRGhYOb9hPgD64smE6NdDtndW9a
-         gl1oy3Amv0tOaAuRoJNEZuIddPAdMU2UGGA8Uzyw9eE6zYbCJ7Me/84n723upsochOj0
-         Xnnimebv1CwpXUycLesPsAENzIF98SfnfffSheJoWb6cFjeiCY52qHlZZZsUW+F/8eCB
-         9LES6msPeE+vjct0OcqRIeEYFsw2PBXdgKN42BYMPa3Yrvord4L1hTOzWm3wQ7leEuUq
-         Wo6Q==
+        bh=3AkUHvnKzL4Hlpc/bkIJl5rxEFjWAbVhXJ4cRADP1EE=;
+        b=kZUaI18X2OGapOb/tTH8V00yNbmozyUJygTKIkKQwG3C/YlHEc8KKvCNYPlo90Co4I
+         jw11indSHwo+UKYgVMCJQnoihgRfP55p1mhw5hqKvnGET4e1hSPoPHx1vcr0k9ytd3G4
+         klwI+5LlJFBhIW4XxO0Trf/DNBW+cYJ5fm8YMllNlJ6VZHFKRshAxslZG+a/8kzpoSfH
+         qxT4lCByvTRq2FfNgFBws6g8lmU6F3eyhSGWcYGfU00bQtFPQ3FPZtZLeBHCLAeu6VuE
+         q2OJFhN7e2TGeWcNrCVDoHNpPwHPxf2vnkC5zlVkp/fQvWKPaUwp/j2WYHR5WZt8mME6
+         guNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=kEow7JtyXZKSoXCpvGfzKSDblkL9Mmtib8QujjWXNoU=;
-        b=ooeshHMZoHoHFsRKevaKpw0WmcxQbUrYg8pqGIe7W6H4pkkWhaWvqGY5nWs12/3/rD
-         SLfTIVrSMMNInjwRDcp0jQgCaB6M+WZzwZptaIj5KrrP9VIzeqioLgyT5zFs0bgF3+k5
-         IsWuB90FnOO/gHAZ9uAfajPg94ULRkGOtBj7bAbfvYzkvU4UF6FHW+CH4D5SiLEXlrc8
-         XqafNKMib9gGxow7F8kLrEygZNqDo+wiq7FE6vb4gFlgSKsY3NElvnFe0UOYHpCRvFOt
-         y8gY+uoZyWfZAjvS03f2+5Zmt/vKYoTIGcx6lk6CCWnImSQrbKXAKLPlkFLgM+yODUL6
-         1FAg==
-X-Gm-Message-State: ACrzQf0zA48MB2aQ80qZ/6THt8uwlAVnjSCTDQl4/Yp7pKoI7ZVab3C0
-        EjV4Nm18pUJVjNiA/ZsIFVzgeg==
-X-Google-Smtp-Source: AMsMyM5oZsrbpWYgy5zanmRt7Yiut9T7BF7N9dL6fKosXpCx8wgGERFXZ8EeJ4TVMrjaBZ56LsKuDA==
-X-Received: by 2002:a63:1203:0:b0:43c:7fa:f306 with SMTP id h3-20020a631203000000b0043c07faf306mr103725pgl.169.1664405712691;
-        Wed, 28 Sep 2022 15:55:12 -0700 (PDT)
+        bh=3AkUHvnKzL4Hlpc/bkIJl5rxEFjWAbVhXJ4cRADP1EE=;
+        b=Tk50kNzJLhElXNeTWiS0aq8cncPTfrWy5lSkL7rwM9ZKhrsL+eqz5lkzvYUKe/7T2v
+         eRYjIKZr99MFbT/jbakMsU835JJMUI8BN32uEj3ul/DNTfJsBPiMLz2jAUuq73FSJhPa
+         EBlJsbwY5yT9Enfn9wn9vFLE0ZWnKvE4mLUZ1LkbO88HVxHwc637zBodUKlo9Yw1ibB6
+         OVe4SiNaFqtBH9K05VHAp4Vof4QHdc3XjVWk9QCG56Na+6qRrWOYHNi8bHvBbEaitRcb
+         MxsFV9tz3F74Y4RtNeffAPaji6eiB/p93ZVVlqK0Pykspjakx0ZHccF2VviG51q2uP9q
+         ykiQ==
+X-Gm-Message-State: ACrzQf35F8rCTGgjaGXllXiKowYmsozF5NX8rhsLMV4Qo2sqYR7WfAr4
+        nkURj2AZ/Ic+kfZpZUMV9IFWpA==
+X-Google-Smtp-Source: AMsMyM7VFN9IB3bhWV4LbwHocSLLSugU4TaFY19KV4cCT2jOsXJIU+rVm7avMq2gD+69ABz5+ByWUw==
+X-Received: by 2002:a63:2cce:0:b0:434:e004:a218 with SMTP id s197-20020a632cce000000b00434e004a218mr103889pgs.241.1664405788345;
+        Wed, 28 Sep 2022 15:56:28 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id t11-20020a170902e84b00b0016d1b70872asm4332278plg.134.2022.09.28.15.55.12
+        by smtp.gmail.com with ESMTPSA id f76-20020a62384f000000b00537b6bfab7fsm4565556pfa.177.2022.09.28.15.56.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 15:55:12 -0700 (PDT)
-Date:   Wed, 28 Sep 2022 22:55:08 +0000
+        Wed, 28 Sep 2022 15:56:27 -0700 (PDT)
+Date:   Wed, 28 Sep 2022 22:56:24 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Xu <peterx@redhat.com>,
-        Yang Zhong <yang.zhong@intel.com>,
-        Wei Wang <wei.w.wang@intel.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] KVM: selftests: Fix nx_huge_pages_test on
- TDP-disabled hosts
-Message-ID: <YzTQzHf4X6hq+wyQ@google.com>
-References: <20220928184853.1681781-1-dmatlack@google.com>
- <20220928184853.1681781-4-dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Vipin Sharma <vipinsh@google.com>
+Subject: Re: [PATCH v2] KVM: selftests: Gracefully handle empty stack traces
+Message-ID: <YzTRGGKAfmu4qQaa@google.com>
+References: <20220927190515.984143-1-dmatlack@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220928184853.1681781-4-dmatlack@google.com>
+In-Reply-To: <20220927190515.984143-1-dmatlack@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -76,15 +70,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 28, 2022, David Matlack wrote:
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> index 0cbc71b7af50..3082c2a4089b 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> @@ -825,6 +825,8 @@ static inline uint8_t wrmsr_safe(uint32_t msr, uint64_t val)
->  	return kvm_asm_safe("wrmsr", "a"(val & -1u), "d"(val >> 32), "c"(msr));
->  }
->  
-> +bool kvm_tdp_enabled(void);
+On Tue, Sep 27, 2022, David Matlack wrote:
+> Bail out of test_dump_stack() if the stack trace is empty rather than
+> invoking addr2line with zero addresses. The problem with the latter is
+> that addr2line will block waiting for addresses to be passed in via
+> stdin, e.g. if running a selftest from an interactive terminal.
+> 
+> Opportunistically fix up the comment that mentions skipping 3 frames
+> since only 2 are skipped in the code, and move the call to backtrace()
+> down to where it is used.
+> 
+> Cc: Vipin Sharma <vipinsh@google.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
 
-Uber nit, maybe kvm_is_tdp_enabled()?
+In case Paolo sees the error of his ways ;-)
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
