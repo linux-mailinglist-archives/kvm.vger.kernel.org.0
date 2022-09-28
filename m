@@ -2,77 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6545D5EE978
-	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 00:36:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA3285EE9BD
+	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 00:51:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234825AbiI1Wgs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 18:36:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33814 "EHLO
+        id S234173AbiI1Wvj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 18:51:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234737AbiI1WgM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 18:36:12 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCC63109126
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 15:35:35 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id u69so13488638pgd.2
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 15:35:35 -0700 (PDT)
+        with ESMTP id S234164AbiI1Wvi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 18:51:38 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B863B5E77
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 15:51:36 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id 78so13463914pgb.13
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 15:51:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=qi4+Odnd+B+DOmVNg49D9tTKQveUHaxn81Miu97zn5M=;
-        b=V1bQIqaarDCtNQLJyHlr0qrN3mtCzvPRXlQETHivGvxtjmYQPC0ly45PcRQkTGPSQ/
-         ajpzGumv3eDOPASdvUFdudph7hChQ87cwf56riIB3ItIJiLUPZr7N07T16xeCPyo9a0v
-         qm11MkmFzNDwRFufu06RnZ42HAmT3bs0yBHQQ6M5wSjt/at798K5Ysfmx+I/QaWcGUL5
-         U8q+J9ODIwrIdL3MSFR5CLKUSeoTjXNqp5WQ9y/+mDxYdHYNsZcOcXw9/rNjmMRinyvY
-         xsY+99uazg+wFv+hmt5W9flRRMmoOBfCEzE26/uq6DQpKTEa6RwDvcFqKRmfI+9pzUiO
-         sLnA==
+        bh=4rijZ4ttYw21/2I1NvyKRYgY5tGibj3vrRPtbvvQIY8=;
+        b=CT6iavnj5IsuMKy25adf6SQ6jWrRGW9n7LAy4rc3B8rCGkfTVR1bapMFxV04T7BCmJ
+         T8tayXm4T3rCIJ/1KKCYHRKHnvQInf33bzr0mE+4fdnMSWvCSihIgjy+EctH7/rFNJol
+         P+q/2nXkM3wMKwOpgQMsDuoXZNjWwsNW4vKa1H03qBnyUMWcl2rQUH7BLVnIfBvvjzvU
+         7eAyZ95QyQbr1i6T6BF4D9uXEAifuA0xrB6VEfdU8EfUMwwrCivNTQtrWWNqyEPXq47J
+         V1eCbEN+GF/tu0BRGR85y06W1oxOIev7dL2zn9GZMZn3kKVCrv32+H2US7vItUMci6/g
+         4/+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=qi4+Odnd+B+DOmVNg49D9tTKQveUHaxn81Miu97zn5M=;
-        b=OJbP8HmIWP+WA9l+8wkxeCquq7lhwSwGcvrq/KC92ibfJYuRgLXcePcbBSYzh8V6Lr
-         l92N/+yQJxpFiguWUwmBGEL270cTZz9o/PtS9aTAjEQbvC/ueNPu/6A28g0FXoFfZuOI
-         mdtHVGI7U/84OHzNf+K0tPRhu2tLxCLPsXbc5Y8vpBSbKuvYmsFPiWuT0FPmykaCOVeh
-         NTFjYqrFIEejN0LQ4rnuAHvSsxDvBSvydJSPpExsaa9MPDKBd3qQZg97NqGNqZ/5EaKK
-         Bigjqh/8jalIljM9BCQcVjnrdNf3OYCxVkfLCzBk0WQ3DpAniIlF3iX5qK5K/GT3zf3K
-         JgEQ==
-X-Gm-Message-State: ACrzQf0QCJqY4IboftbiI2ySt6HHC+mU9QZsq3uhKNZKV/BKjjzU+8/3
-        xqELtGBhew2TCqE0uLAy+9bRsQ==
-X-Google-Smtp-Source: AMsMyM7u2jWkToCftOZSPnKa9AXPbalq+pXrd6EAccH9JbAOG2yY1DOUk4E0xjAY9H2+wwSJ7GMOBw==
-X-Received: by 2002:a63:1c13:0:b0:43b:f037:9d98 with SMTP id c19-20020a631c13000000b0043bf0379d98mr60114pgc.454.1664404534872;
-        Wed, 28 Sep 2022 15:35:34 -0700 (PDT)
+        bh=4rijZ4ttYw21/2I1NvyKRYgY5tGibj3vrRPtbvvQIY8=;
+        b=WtDGym2g1R9nGWjUv6mMNVBQSGF7uKBlj4rx0YsP3dtbzRjsuirkOI/PUUiIfQNEia
+         AMhCN9vBU5T5f64/8ZDgjeQBJfInupM8C0OEHcDdV7EbtR9gz79+UOcrY5dHA6JD0xdj
+         pcMWjjcIIZaLO7GZWuduWmmjjz5NOJy8UG7hd1qEwK2msEzYk9QqgiCtYML48EIOS8D5
+         2HhUI9mWjBQUzeuiBguLq9e3PxmlWVFpPrzmHsriSGwbJ36AaAKE7vl81ZmxWtY0ngjx
+         9M6rY8aNrPRzIH+I1bAx+iJ4hJrVn+d6TXgiuGXR22d1aZGY/euG+eUX+HhHg5EHVFfq
+         pWzw==
+X-Gm-Message-State: ACrzQf2jN4hTrQ6zbyqvYtXqezL0agd8W4wYq9Y0xAmekKcrDsxGLz/1
+        MXDGA3IgdfU9FqB7S0fHj3yv/w==
+X-Google-Smtp-Source: AMsMyM7m5lL/W4nnfvx2ECz7WSl8W8I0dh4ldZMzc1H7iRRtM4VOIYKR4fMvESU+z46fOQ2eWIrp/g==
+X-Received: by 2002:a63:ce17:0:b0:42a:bfb6:f218 with SMTP id y23-20020a63ce17000000b0042abfb6f218mr103794pgf.484.1664405495415;
+        Wed, 28 Sep 2022 15:51:35 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id s13-20020aa78bcd000000b0053e9ecf58f0sm4475226pfd.20.2022.09.28.15.35.34
+        by smtp.gmail.com with ESMTPSA id u16-20020a170902e5d000b00172f6726d8esm4268155plf.277.2022.09.28.15.51.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 15:35:34 -0700 (PDT)
-Date:   Wed, 28 Sep 2022 22:35:31 +0000
+        Wed, 28 Sep 2022 15:51:34 -0700 (PDT)
+Date:   Wed, 28 Sep 2022 22:51:31 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Li RongQing <lirongqing@baidu.com>
-Subject: Re: [PATCH v3 07/28] KVM: x86: Inhibit APIC memslot if x2APIC and
- AVIC are enabled
-Message-ID: <YzTMM+bYVSNmEatL@google.com>
-References: <20220920233134.940511-1-seanjc@google.com>
- <20220920233134.940511-8-seanjc@google.com>
- <e84ebf0a7ac9322bd0cfa742ef6dd2bbfdac0df9.camel@redhat.com>
- <YzHawRN8vpEzP7XD@google.com>
- <bcc3c67abc3b2c3d896b800c5f8f7295b7238271.camel@redhat.com>
- <YzR3PaZokwIPDoXb@google.com>
- <2ca1b7c59e2abe661dd03309ad13eca7d692ff05.camel@redhat.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Yang Zhong <yang.zhong@intel.com>,
+        Wei Wang <wei.w.wang@intel.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 2/3] KVM: selftests: Add helper to read boolean module
+ parameters
+Message-ID: <YzTP8xBkBkxzB1gn@google.com>
+References: <20220928184853.1681781-1-dmatlack@google.com>
+ <20220928184853.1681781-3-dmatlack@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2ca1b7c59e2abe661dd03309ad13eca7d692ff05.camel@redhat.com>
+In-Reply-To: <20220928184853.1681781-3-dmatlack@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,45 +76,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 28, 2022, Maxim Levitsky wrote:
-> On Wed, 2022-09-28 at 16:33 +0000, Sean Christopherson wrote:
-> > Similarly, is there a good reason for having nested_svm_vmexit() invoke
-> > kvm_vcpu_update_apicv() directly?  I'm confused by the "so that other vCPUs can
-> > start to benefit from it right away".  The nested inhibit is per-vCPU and so
-> > should only affect the current vCPU, no?  I.e. for all intents and purposes, using
-> > a request should be functionally equivalent.
-> 
-> It is kind of the other way around:
-> 
-> The mere fact of switching to vmcb02 *inhibits* the AVIC on the current vCPU,
-> but the AVIC inhibit is there only to set the is_running bits in the physid table
-> and in IOMMU to prevent its *peers* to try and send interrupts to it via AVIC.
-> 
-> It is the reason why APICv doesn't need it - the posted interrupts still work
-> just fine when a vCPU doens't use APICv, or uses a different posted interrupt vector
-> when it uses the nested APICv.
+On Wed, Sep 28, 2022, David Matlack wrote:
+> @@ -114,6 +115,36 @@ void print_skip(const char *fmt, ...)
+>  	puts(", skipping test");
+>  }
+>  
+> +bool get_module_param_bool(const char *module_name, const char *param)
+> +{
+> +	const int path_size = 1024;
+> +	char path[path_size];
+> +	char value;
+> +	FILE *f;
+> +	int r;
+> +
+> +	r = snprintf(path, path_size, "/sys/module/%s/parameters/%s",
+> +		     module_name, param);
+> +	TEST_ASSERT(r < path_size,
+> +		    "Failed to construct sysfs path in %d bytes.", path_size);
+> +
+> +	f = fopen(path, "r");
 
-Gotcha, the "other vCPUs" part is where I got confused.
+Any particular reason for using fopen()?  Oh, because that's what the existing
+code does.  More below.
 
-> So it makes sense to remove that inhibit as soon as possible that the peers
-> could stop getting 'unaccellerated IPI' vmexits for nothing.
+> +	TEST_ASSERT(f, "fopen(%s) failed", path);
 
-But practically speaking, the delay between the nested VM-Exit and servicing the
-request is minimal.  Might be a moot point if nested AVIC is supported, i.e. an
-inline update may be "required" at that point.
+I don't actually care myself, but for consistency this should probably be a
+skip condition.  The easiest thing would be to use open_path_or_exit().
 
-Not a sticking point by any means, but if possible, it would be nice to have a
-single call site for the per-vCPU APICv update.
+At that point, assuming read() instead of fread() does the right thin, that seems
+like the easiest solution.
 
-> However back to the discussion, I don't think this is a problem.
-> 
-> We can just call both the kvm_vcpu_update_apicv() and a new function that
-> does the memslot disable from KVM_REQ_APICV_UPDATE, then 
-> plain kvm_vcpu_update_apicv() won't need to drop the srcu lock.
-> 
-> It is pretty much the same that you proposed, just instead of piggybacking on 
-> KVM_REQ_UNBLOCK, I proposed to piggyback on KVM_REQ_APICV_UPDATE.
+> +	TEST_FAIL("Unrecognized value: %c", value);
 
-Yep, easy to do after converting the x2APIC toggling to use a request.
+Maybe be slightly more verbose?  E.g.
 
-Thanks!
+	TEST_FAIL("Unrecognized value '%c' for boolean module param", value);
+
+> +}
+> +
+>  bool thp_configured(void)
+>  {
+>  	int ret;
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index 2e6e61bbe81b..522d3e2009fb 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -1294,20 +1294,9 @@ unsigned long vm_compute_max_gfn(struct kvm_vm *vm)
+>  /* Returns true if kvm_intel was loaded with unrestricted_guest=1. */
+>  bool vm_is_unrestricted_guest(struct kvm_vm *vm)
+>  {
+> -	char val = 'N';
+> -	size_t count;
+> -	FILE *f;
+> -
+>  	/* Ensure that a KVM vendor-specific module is loaded. */
+>  	if (vm == NULL)
+>  		close(open_kvm_dev_path_or_exit());
+>  
+> -	f = fopen("/sys/module/kvm_intel/parameters/unrestricted_guest", "r");
+> -	if (f) {
+> -		count = fread(&val, sizeof(char), 1, f);
+> -		TEST_ASSERT(count == 1, "Unable to read from param file.");
+> -		fclose(f);
+> -	}
+> -
+> -	return val == 'Y';
+> +	return get_module_param_bool("kvm_intel", "unrestricted_guest");
+
+Since there are only three possible modules, what about providing wrappers to
+handle "kvm", "kvm_amd", and "kvm_intel"?  I'm guessing we'll end up with wrappers
+for each param we care about, but one fewer strings to get right would be nice.
