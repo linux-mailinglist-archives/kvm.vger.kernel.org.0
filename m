@@ -2,180 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C25C55ED907
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 11:32:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD7D35ED997
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 11:57:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233787AbiI1Jc2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 05:32:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43584 "EHLO
+        id S233386AbiI1J5J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 05:57:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233783AbiI1JcJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 05:32:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35C9C79ED6
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 02:32:07 -0700 (PDT)
+        with ESMTP id S233488AbiI1J4n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 05:56:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4167EEEAF
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 02:55:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664357526;
+        s=mimecast20190719; t=1664358928;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=RKWhiaA5Wv0V2eMraFNdl4jrLjbjCkjEq9//t8SsrB0=;
-        b=MaqAMnuJ8BfdaGqo8ndBWNxw78+hQCQsiFgmXxAwYLNRzWcOb98N3WmgvpkE2Qme3jPDO0
-        giPzci2pXqJUzJHL2Hrm1Cd7vuN03XxS7lzDoQ0+925+ZJtfqjSMMVb3aDcuids1gTrI77
-        vX2lb0r2fdkyy6l//LBoa8/JB49EdAA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Gb2cJ+qaMdaxmKIGMGEE3usUOdY7PjedRhOx/d0j24w=;
+        b=WAWvFwfdIWYvl8WvGW+7FoM2B5v6y5Vc8UgIXqxHbryhfCRfZ6ocewQYLiWz1zYBYNKzad
+        vh0IwHGRyRhkLrfZ1g9cVMSNxIFA3DHzRk5f1QIDXylmJ/P3mNozPbqvjn1sjjNtlFOthB
+        5P+V4cfmVwrIzwkLMU2v4ZJEoPyUNd8=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-606-8n0YhRwJMWWBtUkXSXyaGw-1; Wed, 28 Sep 2022 05:32:05 -0400
-X-MC-Unique: 8n0YhRwJMWWBtUkXSXyaGw-1
-Received: by mail-wm1-f72.google.com with SMTP id ay21-20020a05600c1e1500b003b45fd14b53so1510077wmb.1
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 02:32:04 -0700 (PDT)
+ us-mta-459-IRSeCTZZP1yIgLhLq4higw-1; Wed, 28 Sep 2022 05:55:26 -0400
+X-MC-Unique: IRSeCTZZP1yIgLhLq4higw-1
+Received: by mail-ed1-f71.google.com with SMTP id m3-20020a056402430300b004512f6268dbso10015099edc.23
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 02:55:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=RKWhiaA5Wv0V2eMraFNdl4jrLjbjCkjEq9//t8SsrB0=;
-        b=sy94zhHjjtlXLKAU5nqIZ63gaelOZ8ZdWuv2ivAqKp8zX8aLK1OfZWACplea2wxCZO
-         qwCLvBUbvPM7TzyjhUiUCThmIw6JeaL0LHk9qHXWLU3StNx8RcIgM8FOMr1pv6avyaFF
-         HQKpdlJGP8UBSs/nq1mVJJ2xMS28s8dgY0cXmCeLntHjEpeGyAAwZvLvNtIK5ytv+p1n
-         4jFTaSiOswzeBsJTH2UvS6Hq+fjhAlTpw7nPo1OKKxoFEUsIQ5kghbJZMetbe/mmwkRs
-         ZDiJAUz+K336FCJhyN7L5jWEQcSS2o6oapzeLNBA+LnVSy1gfICxj7oBKnjS+5NaCPd3
-         wGmQ==
-X-Gm-Message-State: ACrzQf1RsyrWnNxrKYELyQvRurri3S3yZW4emH5TUXaOIHbEx62lTvoT
-        92Kc/7po7PSKH+1YPKzSdAUbfadwBhaZcRm0DVf2gr3tQH2j5Ok3PNkGg1/04Nw/dq4jqWVqVB2
-        VoQPz7bBMkj2x
-X-Received: by 2002:adf:ec09:0:b0:22c:c81b:b76a with SMTP id x9-20020adfec09000000b0022cc81bb76amr1504090wrn.302.1664357522971;
-        Wed, 28 Sep 2022 02:32:02 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7kxutijrNlyBi7mEzPyu48cri6KyE/47cghTsg07CI6Bc2dECrlSlgkIO63V29kUYGSktS1g==
-X-Received: by 2002:adf:ec09:0:b0:22c:c81b:b76a with SMTP id x9-20020adfec09000000b0022cc81bb76amr1504062wrn.302.1664357522722;
-        Wed, 28 Sep 2022 02:32:02 -0700 (PDT)
-Received: from redhat.com ([2.55.47.213])
-        by smtp.gmail.com with ESMTPSA id l13-20020a5d410d000000b0022cbcfa8447sm3829691wrp.87.2022.09.28.02.32.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 02:32:02 -0700 (PDT)
-Date:   Wed, 28 Sep 2022 05:31:58 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Junichi Uekawa <uekawa@chromium.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
-        netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        Bobby Eshleman <bobby.eshleman@gmail.com>
-Subject: Re: [PATCH] vhost/vsock: Use kvmalloc/kvfree for larger packets.
-Message-ID: <20220928052738-mutt-send-email-mst@kernel.org>
-References: <20220928064538.667678-1-uekawa@chromium.org>
- <20220928082823.wyxplop5wtpuurwo@sgarzare-redhat>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=Gb2cJ+qaMdaxmKIGMGEE3usUOdY7PjedRhOx/d0j24w=;
+        b=gxIX7sS9V17SijU9fSD16hI0XTjB4PHOiQL9BMqoR8E5aqbClJ9xy6LixkXDVeLM8c
+         RnMLfOoX1VjM4gEICIMcvChbG2cInThuCfxmy4zZ9UdATl0To85NZfM4QpDFZBKj+Amo
+         Bj1QF6oPghDgVF3IYMPNNKDKJrEzQk4MeKn4ngp/rRgOokg5OyQY6cTgK7gN1libR5vK
+         Sx4JT6RsHqTN0iF9RUAASzKNfw+Cc277tZ7WIQKHOHSbd+ZNKhfX/RUvDggXVJsKgpne
+         WhoE7OoCZNj+tP0vCKL1iy1RsKNBWuGtePNcHk2fWwZmxrZ3HluMYQepCXyIAYOy8cno
+         9W9w==
+X-Gm-Message-State: ACrzQf1bCQHKKJ0TwjmsgU34hnoLqoCcdzhceHQWeTu7sXuFrzoSPH/8
+        ZnIFj52PQ4/jx0gVXY33wNMIjpYCO9hIi0y9JsjguPNtmTlSXrlLVcqq9843yUf3MQl2jDs5K9O
+        sLUfsME1poKcj
+X-Received: by 2002:a05:6402:5489:b0:43b:b935:db37 with SMTP id fg9-20020a056402548900b0043bb935db37mr33111979edb.347.1664358925448;
+        Wed, 28 Sep 2022 02:55:25 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM5aoT98C15jrHtWaJSl4x7zl5R0lQTFlQ8XfjPs33lQ63BHlo5MahvDX4rUtn3EeusKpVq9kQ==
+X-Received: by 2002:a05:6402:5489:b0:43b:b935:db37 with SMTP id fg9-20020a056402548900b0043bb935db37mr33111963edb.347.1664358925220;
+        Wed, 28 Sep 2022 02:55:25 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:2f4b:62da:3159:e077? ([2001:b07:6468:f312:2f4b:62da:3159:e077])
+        by smtp.googlemail.com with ESMTPSA id j2-20020a17090623e200b0078015cebd8csm2140882ejg.117.2022.09.28.02.55.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Sep 2022 02:55:24 -0700 (PDT)
+Message-ID: <15291c3f-d55c-a206-9261-253a1a33dce1@redhat.com>
+Date:   Wed, 28 Sep 2022 11:55:23 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220928082823.wyxplop5wtpuurwo@sgarzare-redhat>
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [PATCH] KVM: x86: disable on 32-bit unless CONFIG_BROKEN
+Content-Language: en-US
+To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20220926165112.603078-1-pbonzini@redhat.com>
+ <YzMt24/14n1BVdnI@google.com>
+ <ed74c9a9d6a0d2fd2ad8bd98214ad36e97c243a0.camel@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <ed74c9a9d6a0d2fd2ad8bd98214ad36e97c243a0.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 28, 2022 at 10:28:23AM +0200, Stefano Garzarella wrote:
-> On Wed, Sep 28, 2022 at 03:45:38PM +0900, Junichi Uekawa wrote:
-> > When copying a large file over sftp over vsock, data size is usually 32kB,
-> > and kmalloc seems to fail to try to allocate 32 32kB regions.
-> > 
-> > Call Trace:
-> >  [<ffffffffb6a0df64>] dump_stack+0x97/0xdb
-> >  [<ffffffffb68d6aed>] warn_alloc_failed+0x10f/0x138
-> >  [<ffffffffb68d868a>] ? __alloc_pages_direct_compact+0x38/0xc8
-> >  [<ffffffffb664619f>] __alloc_pages_nodemask+0x84c/0x90d
-> >  [<ffffffffb6646e56>] alloc_kmem_pages+0x17/0x19
-> >  [<ffffffffb6653a26>] kmalloc_order_trace+0x2b/0xdb
-> >  [<ffffffffb66682f3>] __kmalloc+0x177/0x1f7
-> >  [<ffffffffb66e0d94>] ? copy_from_iter+0x8d/0x31d
-> >  [<ffffffffc0689ab7>] vhost_vsock_handle_tx_kick+0x1fa/0x301 [vhost_vsock]
-> >  [<ffffffffc06828d9>] vhost_worker+0xf7/0x157 [vhost]
-> >  [<ffffffffb683ddce>] kthread+0xfd/0x105
-> >  [<ffffffffc06827e2>] ? vhost_dev_set_owner+0x22e/0x22e [vhost]
-> >  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
-> >  [<ffffffffb6eb332e>] ret_from_fork+0x4e/0x80
-> >  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
-> > 
-> > Work around by doing kvmalloc instead.
-> > 
-> > Signed-off-by: Junichi Uekawa <uekawa@chromium.org>
+On 9/28/22 09:10, Maxim Levitsky wrote:
+> I also think that outside KVM developers nobody should be using KVM on 32 bit host.
+> 
+> However for_developement_  I think that 32 bit KVM support is very useful, as it
+> allows to smoke test the support for 32 bit nested hypervisors, which I do once in a while,
+> and can even probably be useful to some users (e.g running some legacy stuff in a VM,
+> which includes a hypervisor, especially to run really legacy OSes / custom bare metal software,
+> using an old hypervisor) - or in other words, 32 bit nested KVM is mostly useless, but
+> other 32 bit nested hypervisors can be useful.
+> 
+> Yes, I can always use an older 32 bit kernel in a guest with KVM support, but as long
+> as current kernel works, it is useful to use the same kernel on host and guest.
 
-My worry here is that this in more of a work around.
-It would be better to not allocate memory so aggressively:
-if we are so short on memory we should probably process
-packets one at a time. Is that very hard to implement?
+Yeah, I would use older 32 bit kernels just like I use RHEL4 to test PIT 
+reinjection. :)  But really the ultimate solution to this would be to 
+improve kvm-unit-tests so that we can compile vmx.c and svm.c for 32-bit.
 
-
-
-> > ---
-> > 
-> > drivers/vhost/vsock.c                   | 2 +-
-> > net/vmw_vsock/virtio_transport_common.c | 2 +-
-> > 2 files changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> > index 368330417bde..5703775af129 100644
-> > --- a/drivers/vhost/vsock.c
-> > +++ b/drivers/vhost/vsock.c
-> > @@ -393,7 +393,7 @@ vhost_vsock_alloc_pkt(struct vhost_virtqueue *vq,
-> > 		return NULL;
-> > 	}
-> > 
-> > -	pkt->buf = kmalloc(pkt->len, GFP_KERNEL);
-> > +	pkt->buf = kvmalloc(pkt->len, GFP_KERNEL);
-> > 	if (!pkt->buf) {
-> > 		kfree(pkt);
-> > 		return NULL;
-> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> > index ec2c2afbf0d0..3a12aee33e92 100644
-> > --- a/net/vmw_vsock/virtio_transport_common.c
-> > +++ b/net/vmw_vsock/virtio_transport_common.c
-> > @@ -1342,7 +1342,7 @@ EXPORT_SYMBOL_GPL(virtio_transport_recv_pkt);
-> > 
-> > void virtio_transport_free_pkt(struct virtio_vsock_pkt *pkt)
-> > {
-> > -	kfree(pkt->buf);
-> > +	kvfree(pkt->buf);
-> 
-> virtio_transport_free_pkt() is used also in virtio_transport.c and
-> vsock_loopback.c where pkt->buf is allocated with kmalloc(), but IIUC
-> kvfree() can be used with that memory, so this should be fine.
-> 
-> > 	kfree(pkt);
-> > }
-> > EXPORT_SYMBOL_GPL(virtio_transport_free_pkt);
-> > -- 
-> > 2.37.3.998.g577e59143f-goog
-> > 
-> 
-> This issue should go away with the Bobby's work about introducing sk_buff
-> [1], but we can queue this for now.
-> 
-> I'm not sure if we should do the same also in the virtio-vsock driver
-> (virtio_transport.c). Here in vhost-vsock the buf allocated is only used in
-> the host, while in the virtio-vsock driver the buffer is exposed to the
-> device emulated in the host, so it should be physically contiguous (if not,
-> maybe we need to adjust virtio_vsock_rx_fill()).
-
-More importantly it needs to support DMA API which IIUC kvmalloc
-memory does not.
-
-> So for now I think is fine to use kvmalloc only on vhost-vsock (eventually
-> we can use it also in vsock_loopback), since the Bobby's patch should rework
-> this code:
-> 
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> 
-> [1] https://lore.kernel.org/lkml/65d117ddc530d12a6d47fcc45b38891465a90d9f.1660362668.git.bobby.eshleman@bytedance.com/
-> 
-> Thanks,
-> Stefano
+Paolo
 
