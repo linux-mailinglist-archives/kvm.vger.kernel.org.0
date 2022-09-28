@@ -2,141 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CC3C5ED8C8
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 11:22:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C25C55ED907
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 11:32:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233688AbiI1JW5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 05:22:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47220 "EHLO
+        id S233787AbiI1Jc2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 05:32:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233644AbiI1JWy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 05:22:54 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EEF7AC39C;
-        Wed, 28 Sep 2022 02:22:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1664356973; x=1695892973;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=LboepUjmxKb4jCu41mnETf1wIRYGxkuhefbkTgfmYdc=;
-  b=KXyyB/rXIQAcDxEt2/PoNm8eb2xzIKs/hx/bugKwxKf0S0FNSQmkCoCX
-   TV6CfMmSKQvFhxVDCVZT/DPbiMX3BvONaRWfIsLvQZMTlAxhIFciV7osL
-   cYppHLEXnoPAZh0uu/jHqkdW05FXwKGrllDAhob8HpPCE7qxA0qM6WCNO
-   Xa+3lK8vx8sT7qXIWfI9XTF91zf6Il+suxgVEzbobfZ4DQA+Np1qoIeHk
-   E4x1Ry9+1u5Pg65GPwIK3WE8odV0lrX/W+hYfvQRACdbvCLh/2vSL6hdr
-   5+2kr4bot43s9xaUcKQT2LEILEtu3RytZOtZFteNzQYOi+VUwxSu+hiUE
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10483"; a="284685090"
-X-IronPort-AV: E=Sophos;i="5.93,351,1654585200"; 
-   d="scan'208";a="284685090"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2022 02:22:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10483"; a="572967241"
-X-IronPort-AV: E=Sophos;i="5.93,351,1654585200"; 
-   d="scan'208";a="572967241"
-Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.132])
-  by orsmga003.jf.intel.com with ESMTP; 28 Sep 2022 02:22:49 -0700
-From:   Zhao Liu <zhao1.liu@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Ira Weiny <ira.weiny@intel.com>,
-        "Fabio M . De Francesco" <fmdefrancesco@gmail.com>,
-        Zhenyu Wang <zhenyu.z.wang@intel.com>,
-        Zhao Liu <zhao1.liu@intel.com>,
-        Dave Hansen <dave.hansen@intel.com>
-Subject: [PATCH v2] KVM: SVM: Replace kmap_atomic() with kmap_local_page()
-Date:   Wed, 28 Sep 2022 17:27:48 +0800
-Message-Id: <20220928092748.463631-1-zhao1.liu@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S233783AbiI1JcJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 05:32:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35C9C79ED6
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 02:32:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664357526;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=RKWhiaA5Wv0V2eMraFNdl4jrLjbjCkjEq9//t8SsrB0=;
+        b=MaqAMnuJ8BfdaGqo8ndBWNxw78+hQCQsiFgmXxAwYLNRzWcOb98N3WmgvpkE2Qme3jPDO0
+        giPzci2pXqJUzJHL2Hrm1Cd7vuN03XxS7lzDoQ0+925+ZJtfqjSMMVb3aDcuids1gTrI77
+        vX2lb0r2fdkyy6l//LBoa8/JB49EdAA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-606-8n0YhRwJMWWBtUkXSXyaGw-1; Wed, 28 Sep 2022 05:32:05 -0400
+X-MC-Unique: 8n0YhRwJMWWBtUkXSXyaGw-1
+Received: by mail-wm1-f72.google.com with SMTP id ay21-20020a05600c1e1500b003b45fd14b53so1510077wmb.1
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 02:32:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=RKWhiaA5Wv0V2eMraFNdl4jrLjbjCkjEq9//t8SsrB0=;
+        b=sy94zhHjjtlXLKAU5nqIZ63gaelOZ8ZdWuv2ivAqKp8zX8aLK1OfZWACplea2wxCZO
+         qwCLvBUbvPM7TzyjhUiUCThmIw6JeaL0LHk9qHXWLU3StNx8RcIgM8FOMr1pv6avyaFF
+         HQKpdlJGP8UBSs/nq1mVJJ2xMS28s8dgY0cXmCeLntHjEpeGyAAwZvLvNtIK5ytv+p1n
+         4jFTaSiOswzeBsJTH2UvS6Hq+fjhAlTpw7nPo1OKKxoFEUsIQ5kghbJZMetbe/mmwkRs
+         ZDiJAUz+K336FCJhyN7L5jWEQcSS2o6oapzeLNBA+LnVSy1gfICxj7oBKnjS+5NaCPd3
+         wGmQ==
+X-Gm-Message-State: ACrzQf1RsyrWnNxrKYELyQvRurri3S3yZW4emH5TUXaOIHbEx62lTvoT
+        92Kc/7po7PSKH+1YPKzSdAUbfadwBhaZcRm0DVf2gr3tQH2j5Ok3PNkGg1/04Nw/dq4jqWVqVB2
+        VoQPz7bBMkj2x
+X-Received: by 2002:adf:ec09:0:b0:22c:c81b:b76a with SMTP id x9-20020adfec09000000b0022cc81bb76amr1504090wrn.302.1664357522971;
+        Wed, 28 Sep 2022 02:32:02 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7kxutijrNlyBi7mEzPyu48cri6KyE/47cghTsg07CI6Bc2dECrlSlgkIO63V29kUYGSktS1g==
+X-Received: by 2002:adf:ec09:0:b0:22c:c81b:b76a with SMTP id x9-20020adfec09000000b0022cc81bb76amr1504062wrn.302.1664357522722;
+        Wed, 28 Sep 2022 02:32:02 -0700 (PDT)
+Received: from redhat.com ([2.55.47.213])
+        by smtp.gmail.com with ESMTPSA id l13-20020a5d410d000000b0022cbcfa8447sm3829691wrp.87.2022.09.28.02.32.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Sep 2022 02:32:02 -0700 (PDT)
+Date:   Wed, 28 Sep 2022 05:31:58 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     Junichi Uekawa <uekawa@chromium.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
+        netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        Bobby Eshleman <bobby.eshleman@gmail.com>
+Subject: Re: [PATCH] vhost/vsock: Use kvmalloc/kvfree for larger packets.
+Message-ID: <20220928052738-mutt-send-email-mst@kernel.org>
+References: <20220928064538.667678-1-uekawa@chromium.org>
+ <20220928082823.wyxplop5wtpuurwo@sgarzare-redhat>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220928082823.wyxplop5wtpuurwo@sgarzare-redhat>
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Zhao Liu <zhao1.liu@intel.com>
+On Wed, Sep 28, 2022 at 10:28:23AM +0200, Stefano Garzarella wrote:
+> On Wed, Sep 28, 2022 at 03:45:38PM +0900, Junichi Uekawa wrote:
+> > When copying a large file over sftp over vsock, data size is usually 32kB,
+> > and kmalloc seems to fail to try to allocate 32 32kB regions.
+> > 
+> > Call Trace:
+> >  [<ffffffffb6a0df64>] dump_stack+0x97/0xdb
+> >  [<ffffffffb68d6aed>] warn_alloc_failed+0x10f/0x138
+> >  [<ffffffffb68d868a>] ? __alloc_pages_direct_compact+0x38/0xc8
+> >  [<ffffffffb664619f>] __alloc_pages_nodemask+0x84c/0x90d
+> >  [<ffffffffb6646e56>] alloc_kmem_pages+0x17/0x19
+> >  [<ffffffffb6653a26>] kmalloc_order_trace+0x2b/0xdb
+> >  [<ffffffffb66682f3>] __kmalloc+0x177/0x1f7
+> >  [<ffffffffb66e0d94>] ? copy_from_iter+0x8d/0x31d
+> >  [<ffffffffc0689ab7>] vhost_vsock_handle_tx_kick+0x1fa/0x301 [vhost_vsock]
+> >  [<ffffffffc06828d9>] vhost_worker+0xf7/0x157 [vhost]
+> >  [<ffffffffb683ddce>] kthread+0xfd/0x105
+> >  [<ffffffffc06827e2>] ? vhost_dev_set_owner+0x22e/0x22e [vhost]
+> >  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
+> >  [<ffffffffb6eb332e>] ret_from_fork+0x4e/0x80
+> >  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
+> > 
+> > Work around by doing kvmalloc instead.
+> > 
+> > Signed-off-by: Junichi Uekawa <uekawa@chromium.org>
 
-The use of kmap_atomic() is being deprecated in favor of
-kmap_local_page()[1].
+My worry here is that this in more of a work around.
+It would be better to not allocate memory so aggressively:
+if we are so short on memory we should probably process
+packets one at a time. Is that very hard to implement?
 
-The main difference between kmap_atomic() and kmap_local_page() is the
-latter allows pagefaults and preemption.
 
-There're 2 reasons we can use kmap_local_page() here:
-1. SEV is 64-bit only and kmap_locla_page() doesn't disable migration in
-this case, but here the function clflush_cache_range() uses CLFLUSHOPT
-instruction to flush, and on x86 CLFLUSHOPT is not CPU-local and flushes
-the page out of the entire cache hierarchy on all CPUs (APM volume 3,
-chapter 3, CLFLUSHOPT). So there's no need to disable preemption to ensure
-CPU-local.
-2. clflush_cache_range() doesn't need to disable pagefault and the mapping
-is still valid even if sleeps. This is also true for sched out/in when
-preempted.
 
-In addition, though kmap_local_page() is a thin wrapper around
-page_address() on 64-bit, kmap_local_page() should still be used here in
-preference to page_address() since page_address() isn't suitable to be used
-in a generic function (like sev_clflush_pages()) where the page passed in
-is not easy to determine the source of allocation. Keeping the kmap* API in
-place means it can be used for things other than highmem mappings[2].
+> > ---
+> > 
+> > drivers/vhost/vsock.c                   | 2 +-
+> > net/vmw_vsock/virtio_transport_common.c | 2 +-
+> > 2 files changed, 2 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > index 368330417bde..5703775af129 100644
+> > --- a/drivers/vhost/vsock.c
+> > +++ b/drivers/vhost/vsock.c
+> > @@ -393,7 +393,7 @@ vhost_vsock_alloc_pkt(struct vhost_virtqueue *vq,
+> > 		return NULL;
+> > 	}
+> > 
+> > -	pkt->buf = kmalloc(pkt->len, GFP_KERNEL);
+> > +	pkt->buf = kvmalloc(pkt->len, GFP_KERNEL);
+> > 	if (!pkt->buf) {
+> > 		kfree(pkt);
+> > 		return NULL;
+> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > index ec2c2afbf0d0..3a12aee33e92 100644
+> > --- a/net/vmw_vsock/virtio_transport_common.c
+> > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > @@ -1342,7 +1342,7 @@ EXPORT_SYMBOL_GPL(virtio_transport_recv_pkt);
+> > 
+> > void virtio_transport_free_pkt(struct virtio_vsock_pkt *pkt)
+> > {
+> > -	kfree(pkt->buf);
+> > +	kvfree(pkt->buf);
+> 
+> virtio_transport_free_pkt() is used also in virtio_transport.c and
+> vsock_loopback.c where pkt->buf is allocated with kmalloc(), but IIUC
+> kvfree() can be used with that memory, so this should be fine.
+> 
+> > 	kfree(pkt);
+> > }
+> > EXPORT_SYMBOL_GPL(virtio_transport_free_pkt);
+> > -- 
+> > 2.37.3.998.g577e59143f-goog
+> > 
+> 
+> This issue should go away with the Bobby's work about introducing sk_buff
+> [1], but we can queue this for now.
+> 
+> I'm not sure if we should do the same also in the virtio-vsock driver
+> (virtio_transport.c). Here in vhost-vsock the buf allocated is only used in
+> the host, while in the virtio-vsock driver the buffer is exposed to the
+> device emulated in the host, so it should be physically contiguous (if not,
+> maybe we need to adjust virtio_vsock_rx_fill()).
 
-Therefore, sev_clflush_pages() is a function that should use
-kmap_local_page() in place of kmap_atomic().
+More importantly it needs to support DMA API which IIUC kvmalloc
+memory does not.
 
-Convert the calls of kmap_atomic() / kunmap_atomic() to kmap_local_page() /
-kunmap_local().
-
-[1]: https://lore.kernel.org/all/20220813220034.806698-1-ira.weiny@intel.com
-[2]: https://lore.kernel.org/lkml/5d667258-b58b-3d28-3609-e7914c99b31b@intel.com/
-
-Suggested-by: Dave Hansen <dave.hansen@intel.com>
-Suggested-by: Ira Weiny <ira.weiny@intel.com>
-Suggested-by: Fabio M. De Francesco <fmdefrancesco@gmail.com>
-Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
----
-Suggested by credits:
-  Dave: Referred to his explanation about cache flush and usage of
-        page_address().
-  Ira: Referred to his task document, review comments and explanation about
-       cache flush.
-  Fabio: Referred to his boiler plate commit message.
----
-Changes since v1:
-  * Add the explanation of global cache flush for sev_clflush_pages() in commit
-    message.
-  * Add the explanation why not use page_address() directly.
----
- arch/x86/kvm/svm/sev.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 28064060413a..12747c7bda4e 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -465,9 +465,9 @@ static void sev_clflush_pages(struct page *pages[], unsigned long npages)
- 		return;
- 
- 	for (i = 0; i < npages; i++) {
--		page_virtual = kmap_atomic(pages[i]);
-+		page_virtual = kmap_local_page(pages[i]);
- 		clflush_cache_range(page_virtual, PAGE_SIZE);
--		kunmap_atomic(page_virtual);
-+		kunmap_local(page_virtual);
- 		cond_resched();
- 	}
- }
--- 
-2.34.1
+> So for now I think is fine to use kvmalloc only on vhost-vsock (eventually
+> we can use it also in vsock_loopback), since the Bobby's patch should rework
+> this code:
+> 
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+> 
+> [1] https://lore.kernel.org/lkml/65d117ddc530d12a6d47fcc45b38891465a90d9f.1660362668.git.bobby.eshleman@bytedance.com/
+> 
+> Thanks,
+> Stefano
 
