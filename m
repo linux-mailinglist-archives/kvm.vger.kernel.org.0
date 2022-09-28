@@ -2,199 +2,258 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 59CB55EE662
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 22:03:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 610E65EE67F
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 22:17:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234528AbiI1UDS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 16:03:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56202 "EHLO
+        id S233770AbiI1URV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 16:17:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234755AbiI1UC6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 16:02:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE5D77B1C6
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 13:02:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664395341;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=d3cN46yR7NWOicCiy/yGPpGpvzjMsqsVRHSBsY1m+T4=;
-        b=H7US+pfw09WVCMRJbil145gUdZBkjzlNZKOdHiq0hU8NoKek4g//cG16rrSn0UENkgyBWC
-        exvGpE4uVqnVhvGpHs2WzHxb/nyK0QT+iTfe2O1DC4Lr/VRvKgg0yCq8lcvviRtiMaSl9N
-        /3vqaa8a/ISdvU8px+v09cNrner43Tc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-554-T6x3dPXfO7Ki-n2o2_zKgw-1; Wed, 28 Sep 2022 16:02:19 -0400
-X-MC-Unique: T6x3dPXfO7Ki-n2o2_zKgw-1
-Received: by mail-wm1-f69.google.com with SMTP id c130-20020a1c3588000000b003b56be513e1so1091443wma.0
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 13:02:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=d3cN46yR7NWOicCiy/yGPpGpvzjMsqsVRHSBsY1m+T4=;
-        b=ckGcY3k2OnyBDeVUZTRNmwIGgEs7rB0SnGgy568cVke4UwsijfQ8NUQ3FglsthbM5X
-         1oIbuy0ohZoY2kbeP/U3nPh90W9ZEg2BROnpimG7Froi8cUhj1aU7lSgRFKVfYUb3uw/
-         nFFfBNv8gfQS7wdOfuEyaYi5o7hec6N4Gwhx6iRk6bBw6ZTOAEzOrxzBbB1Nlhiho/Bx
-         yQQEPzSeSjZBHGZ/p3TAcrDgkut69c+l7UvaMVobceBPHCEsJ4dZQ8yDsyPyrtEphMp0
-         UQoEY6gqajQ7xzCsPELncO/RUgbmrvC+lmj9JXNpYb4TPcZGrzKIcHG7p6GyILFT80gv
-         xhpg==
-X-Gm-Message-State: ACrzQf3rRu8qeggzo6Ii2Vyziq+WIPosEKDA7bAeC5DxQnNTHnOXA3Ld
-        6vV2pPu3ugq7v3TcU+PnWW8QL2SyRrwqg06Bv8RI6SC0jcb14qtyc+QOgOBL/dyyxXSYoAl5PZ1
-        wWI4OU0wN7IkO
-X-Received: by 2002:a5d:4903:0:b0:22c:c960:dd23 with SMTP id x3-20020a5d4903000000b0022cc960dd23mr3052904wrq.475.1664395337490;
-        Wed, 28 Sep 2022 13:02:17 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM6rEH2X/vqm2gUOiwMyg5FCm2mYadAC0QuRkERmGHmC+5pWEVfjq4D2qb3iApkApTXtLPurEQ==
-X-Received: by 2002:a5d:4903:0:b0:22c:c960:dd23 with SMTP id x3-20020a5d4903000000b0022cc960dd23mr3052879wrq.475.1664395337220;
-        Wed, 28 Sep 2022 13:02:17 -0700 (PDT)
-Received: from redhat.com ([2.55.47.213])
-        by smtp.gmail.com with ESMTPSA id l7-20020a05600c4f0700b003b4c979e6bcsm2621685wmq.10.2022.09.28.13.02.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 13:02:16 -0700 (PDT)
-Date:   Wed, 28 Sep 2022 16:02:12 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Junichi Uekawa <uekawa@chromium.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
-        netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        Bobby Eshleman <bobby.eshleman@gmail.com>
-Subject: Re: [PATCH] vhost/vsock: Use kvmalloc/kvfree for larger packets.
-Message-ID: <20220928160116-mutt-send-email-mst@kernel.org>
-References: <20220928064538.667678-1-uekawa@chromium.org>
- <20220928082823.wyxplop5wtpuurwo@sgarzare-redhat>
- <20220928052738-mutt-send-email-mst@kernel.org>
- <20220928151135.pvrlsylg6j3hzh74@sgarzare-redhat>
+        with ESMTP id S231301AbiI1URT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 16:17:19 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB9466C115;
+        Wed, 28 Sep 2022 13:17:18 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28SIi3cp020618;
+        Wed, 28 Sep 2022 20:17:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=pG1ghc692U9Q8xE03Gx97GPYR3yPEjzveHJEZlWmu8c=;
+ b=SNl129ihOhzZ9CZQ5KduoOzRfifavftOyCZcK3TXzcp/zxeio9VKQ9DV4UpzHLTIfKbe
+ CG25oNIavUOH1ZIQg9LAi7qLZtLiN4YQ1UnPXe01xNirCr4dH8UYund04klLbpY88i0R
+ WYzCK7B5HA8M1hSRZIZ8l+ZWgHA+aSQWfwcTpeRXWcTKX6VNXh42KuFuCRWSluthM4zb
+ HXfgzwdYVWKxWGg4KXgMO9SvaqlxsDf32JsM/iUrj0jN4HeO/foWR0ZWzGZI0E0FIab9
+ NeRSRSDLUf5sOqTH1Fhp04BPa2GOGNZU0EhLEVfgHcDYRobxffVo41AShbSGWX42rV4v ww== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3jvq2nmq1r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 28 Sep 2022 20:17:17 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 28SJR79U009946;
+        Wed, 28 Sep 2022 20:17:17 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3jvq2nmq11-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 28 Sep 2022 20:17:17 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 28SK6u1V020292;
+        Wed, 28 Sep 2022 20:17:15 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03fra.de.ibm.com with ESMTP id 3jssh948gg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 28 Sep 2022 20:17:15 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 28SKHCJE5309130
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 28 Sep 2022 20:17:12 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 572F0A404D;
+        Wed, 28 Sep 2022 20:17:12 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1669AA4040;
+        Wed, 28 Sep 2022 20:17:12 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 28 Sep 2022 20:17:12 +0000 (GMT)
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v7 0/2] Add specification exception tests
+Date:   Wed, 28 Sep 2022 22:17:08 +0200
+Message-Id: <20220928201710.3185449-1-scgl@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220928151135.pvrlsylg6j3hzh74@sgarzare-redhat>
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 3fTC2ayBeMBjy7yGgkLaotTBQuwcemhJ
+X-Proofpoint-GUID: I3povTG3MmhWHn1JB414HQwWAvw4yyDc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-09-28_09,2022-09-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ spamscore=0 impostorscore=0 lowpriorityscore=0 phishscore=0 mlxscore=0
+ mlxlogscore=999 adultscore=0 bulkscore=0 priorityscore=1501 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
+ definitions=main-2209280120
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 28, 2022 at 05:11:35PM +0200, Stefano Garzarella wrote:
-> On Wed, Sep 28, 2022 at 05:31:58AM -0400, Michael S. Tsirkin wrote:
-> > On Wed, Sep 28, 2022 at 10:28:23AM +0200, Stefano Garzarella wrote:
-> > > On Wed, Sep 28, 2022 at 03:45:38PM +0900, Junichi Uekawa wrote:
-> > > > When copying a large file over sftp over vsock, data size is usually 32kB,
-> > > > and kmalloc seems to fail to try to allocate 32 32kB regions.
-> > > >
-> > > > Call Trace:
-> > > >  [<ffffffffb6a0df64>] dump_stack+0x97/0xdb
-> > > >  [<ffffffffb68d6aed>] warn_alloc_failed+0x10f/0x138
-> > > >  [<ffffffffb68d868a>] ? __alloc_pages_direct_compact+0x38/0xc8
-> > > >  [<ffffffffb664619f>] __alloc_pages_nodemask+0x84c/0x90d
-> > > >  [<ffffffffb6646e56>] alloc_kmem_pages+0x17/0x19
-> > > >  [<ffffffffb6653a26>] kmalloc_order_trace+0x2b/0xdb
-> > > >  [<ffffffffb66682f3>] __kmalloc+0x177/0x1f7
-> > > >  [<ffffffffb66e0d94>] ? copy_from_iter+0x8d/0x31d
-> > > >  [<ffffffffc0689ab7>] vhost_vsock_handle_tx_kick+0x1fa/0x301 [vhost_vsock]
-> > > >  [<ffffffffc06828d9>] vhost_worker+0xf7/0x157 [vhost]
-> > > >  [<ffffffffb683ddce>] kthread+0xfd/0x105
-> > > >  [<ffffffffc06827e2>] ? vhost_dev_set_owner+0x22e/0x22e [vhost]
-> > > >  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
-> > > >  [<ffffffffb6eb332e>] ret_from_fork+0x4e/0x80
-> > > >  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
-> > > >
-> > > > Work around by doing kvmalloc instead.
-> > > >
-> > > > Signed-off-by: Junichi Uekawa <uekawa@chromium.org>
-> > 
-> > My worry here is that this in more of a work around.
-> > It would be better to not allocate memory so aggressively:
-> > if we are so short on memory we should probably process
-> > packets one at a time. Is that very hard to implement?
-> 
-> Currently the "virtio_vsock_pkt" is allocated in the "handle_kick" callback
-> of TX virtqueue. Then the packet is multiplexed on the right socket queue,
-> then the user space can de-queue it whenever they want.
-> 
-> So maybe we can stop processing the virtqueue if we are short on memory, but
-> when can we restart the TX virtqueue processing?
+Test that specification exceptions cause the correct interruption code
+during both normal and transactional execution.
 
-Assuming you added at least one buffer, the time to restart would be
-after that buffer has been used.
+TCG fails the tests setting an invalid PSW bit.
+I had a look at how best to fix it, but where best to check for early
+PSW exceptions was not immediately clear to me. Ideas welcome.
 
+v6 -> v7
+	assert that we're expecting the invalid PSW we're seeing
+	rebased onto master
+	picked up tags (thanks Nico & Janosch)
+	comments and style changes
 
-> I think as long as the guest used only 4K buffers we had no problem, but now
-> that it can create larger buffers the host may not be able to allocate it
-> contiguously. Since there is no need to have them contiguous here, I think
-> this patch is okay.
-> 
-> However, if we switch to sk_buff (as Bobby is already doing), maybe we don't
-> have this problem because I think there is some kind of pre-allocated pool.
-> 
-> > 
-> > 
-> > 
-> > > > ---
-> > > >
-> > > > drivers/vhost/vsock.c                   | 2 +-
-> > > > net/vmw_vsock/virtio_transport_common.c | 2 +-
-> > > > 2 files changed, 2 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> > > > index 368330417bde..5703775af129 100644
-> > > > --- a/drivers/vhost/vsock.c
-> > > > +++ b/drivers/vhost/vsock.c
-> > > > @@ -393,7 +393,7 @@ vhost_vsock_alloc_pkt(struct vhost_virtqueue *vq,
-> > > > 		return NULL;
-> > > > 	}
-> > > >
-> > > > -	pkt->buf = kmalloc(pkt->len, GFP_KERNEL);
-> > > > +	pkt->buf = kvmalloc(pkt->len, GFP_KERNEL);
-> > > > 	if (!pkt->buf) {
-> > > > 		kfree(pkt);
-> > > > 		return NULL;
-> > > > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> > > > index ec2c2afbf0d0..3a12aee33e92 100644
-> > > > --- a/net/vmw_vsock/virtio_transport_common.c
-> > > > +++ b/net/vmw_vsock/virtio_transport_common.c
-> > > > @@ -1342,7 +1342,7 @@ EXPORT_SYMBOL_GPL(virtio_transport_recv_pkt);
-> > > >
-> > > > void virtio_transport_free_pkt(struct virtio_vsock_pkt *pkt)
-> > > > {
-> > > > -	kfree(pkt->buf);
-> > > > +	kvfree(pkt->buf);
-> > > 
-> > > virtio_transport_free_pkt() is used also in virtio_transport.c and
-> > > vsock_loopback.c where pkt->buf is allocated with kmalloc(), but IIUC
-> > > kvfree() can be used with that memory, so this should be fine.
-> > > 
-> > > > 	kfree(pkt);
-> > > > }
-> > > > EXPORT_SYMBOL_GPL(virtio_transport_free_pkt);
-> > > > --
-> > > > 2.37.3.998.g577e59143f-goog
-> > > >
-> > > 
-> > > This issue should go away with the Bobby's work about introducing sk_buff
-> > > [1], but we can queue this for now.
-> > > 
-> > > I'm not sure if we should do the same also in the virtio-vsock driver
-> > > (virtio_transport.c). Here in vhost-vsock the buf allocated is only used in
-> > > the host, while in the virtio-vsock driver the buffer is exposed to the
-> > > device emulated in the host, so it should be physically contiguous (if not,
-> > > maybe we need to adjust virtio_vsock_rx_fill()).
-> > 
-> > More importantly it needs to support DMA API which IIUC kvmalloc
-> > memory does not.
-> > 
-> 
-> Right, good point!
-> 
-> Thanks,
-> Stefano
+v5 -> v6
+	rebased onto master
+	comments and style changes
+
+v4 -> v5
+	add lpsw with invalid bit 12 test
+		TCG fails as with lpswe but must also invert bit 12
+	update copyright statement
+	add comments
+	cleanups and style fixes
+
+v3 -> v4
+	remove iterations argument in order to simplify the code
+		for manual performance testing adding a for loop is easy
+	move report out of fixup_invalid_psw
+	simplify/improve readability of triggers
+	use positive error values
+
+v2 -> v3
+	remove non-ascii symbol
+	clean up load_psw
+	fix nits
+
+v1 -> v2
+	Add license and test description
+	Split test patch into normal test and transactional execution test
+	Add comments to
+		invalid PSW fixup function
+		with_transaction
+	Rename some variables/functions
+	Pass mask as single parameter to asm
+	Get rid of report_info_if macro
+	Introduce report_pass/fail and use them
+
+Janis Schoetterl-Glausch (2):
+  s390x: Add specification exception test
+  s390x: Test specification exceptions during transaction
+
+ s390x/Makefile           |   1 +
+ lib/s390x/asm/arch_def.h |   6 +
+ s390x/spec_ex.c          | 392 +++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg      |   3 +
+ 4 files changed, 402 insertions(+)
+ create mode 100644 s390x/spec_ex.c
+
+Range-diff against v6:
+1:  bbfb5d40 ! 1:  a239437a s390x: Add specification exception test
+    @@ Commit message
+         Generate specification exceptions and check that they occur.
+     
+         Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+    +    Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+    +    Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+     
+      ## s390x/Makefile ##
+     @@ s390x/Makefile: tests += $(TEST_DIR)/uv-host.elf
+    @@ s390x/spec_ex.c (new)
+     + */
+     +static void fixup_invalid_psw(struct stack_frame_int *stack)
+     +{
+    ++	assert_msg(invalid_psw_expected,
+    ++		   "Unexpected invalid PSW during program interrupt fixup: %#lx %#lx",
+    ++		   lowcore.pgm_old_psw.mask, lowcore.pgm_old_psw.addr);
+     +	/* signal occurrence of invalid psw fixup */
+     +	invalid_psw_expected = false;
+     +	invalid_psw = lowcore.pgm_old_psw;
+    @@ s390x/spec_ex.c (new)
+     +	uint64_t scratch;
+     +
+     +	/*
+    -+	 * The fixup psw is current psw with the instruction address replaced by
+    -+	 * the address of the nop following the instruction loading the new psw.
+    ++	 * The fixup psw is the current psw with the instruction address replaced
+    ++	 * by the address of the nop following the instruction loading the new psw.
+     +	 */
+     +	fixup_psw.mask = extract_psw_mask();
+     +	asm volatile ( "larl	%[scratch],0f\n"
+    @@ s390x/spec_ex.c (new)
+     +
+     +static int check_invalid_psw(void)
+     +{
+    ++	/* Since the fixup sets this to false we check for false here. */
+     +	if (!invalid_psw_expected) {
+     +		if (expected_psw.mask == invalid_psw.mask &&
+     +		    expected_psw.addr == invalid_psw.addr)
+    @@ s390x/spec_ex.c (new)
+     +/* A short PSW needs to have bit 12 set to be valid. */
+     +static int short_psw_bit_12_is_0(void)
+     +{
+    ++	struct psw invalid = {
+    ++		.mask = BIT(63 - 12),
+    ++		.addr = 0x00000000deadbeee
+    ++	};
+     +	struct short_psw short_invalid = {
+     +		.mask = 0x0,
+     +		.addr = 0xdeadbeee
+     +	};
+     +
+    ++	expect_invalid_psw(invalid);
+    ++	load_short_psw(short_invalid);
+     +	/*
+     +	 * lpsw may optionally check bit 12 before loading the new psw
+     +	 * -> cannot check the expected invalid psw like with lpswe
+     +	 */
+    -+	load_short_psw(short_invalid);
+     +	return 0;
+     +}
+     +
+2:  0f19be7d ! 2:  697409f7 s390x: Test specification exceptions during transaction
+    @@ Commit message
+         Check that we see the expected code for (some) specification exceptions.
+     
+         Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+    +    Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+    +    Acked-by: Janosch Frank <frankja@linux.ibm.com>
+     
+      ## lib/s390x/asm/arch_def.h ##
+     @@ lib/s390x/asm/arch_def.h: struct cpu {
+    @@ s390x/spec_ex.c: static int not_even(void)
+      /*
+       * Harness for specification exception testing.
+       * func only triggers exception, reporting is taken care of automatically.
+    -+ * If a trigger is transactable it will also  be executed during a transaction.
+    ++ * If a trigger is transactable it will also be executed during a transaction.
+       */
+      struct spec_ex_trigger {
+      	const char *name;
+    @@ s390x/spec_ex.c: static void test_spec_ex(const struct spec_ex_trigger *trigger)
+     +#define TRANSACTION_MAX_RETRIES 5
+     +
+     +/*
+    -+ * NULL must be passed to __builtin_tbegin via constant, forbid diagnose from
+    -+ * being NULL to keep things simple
+    ++ * NULL must not be passed to __builtin_tbegin via variable, only constant,
+    ++ * forbid diagnose from being NULL at all to keep things simple
+     + */
+     +static int __attribute__((nonnull))
+     +with_transaction(int (*trigger)(void), struct __htm_tdb *diagnose)
+    @@ s390x/spec_ex.c: static void test_spec_ex(const struct spec_ex_trigger *trigger)
+     +
+     +static void test_spec_ex_trans(struct args *args, const struct spec_ex_trigger *trigger)
+     +{
+    -+	const uint16_t expected_pgm = PGM_INT_CODE_SPECIFICATION
+    -+				      | PGM_INT_CODE_TX_ABORTED_EVENT;
+    ++	const uint16_t expected_pgm = PGM_INT_CODE_SPECIFICATION |
+    ++				      PGM_INT_CODE_TX_ABORTED_EVENT;
+     +	union {
+     +		struct __htm_tdb tdb;
+     +		uint64_t dwords[sizeof(struct __htm_tdb) / sizeof(uint64_t)];
+
+base-commit: d8a4f9e5e8d69d4ef257b40d6cd666bd2f63494e
+-- 
+2.36.1
 
