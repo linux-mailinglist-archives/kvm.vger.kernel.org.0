@@ -2,195 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 817EE5EDDCF
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 15:36:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 36DCD5EDF3B
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 16:52:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233980AbiI1Ng1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 09:36:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44010 "EHLO
+        id S234584AbiI1Owb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 10:52:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233742AbiI1NgY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 09:36:24 -0400
-Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com [66.111.4.230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6B26A3D4A;
-        Wed, 28 Sep 2022 06:36:15 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 3051758057F;
-        Wed, 28 Sep 2022 09:36:12 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Wed, 28 Sep 2022 09:36:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
-         h=cc:cc:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm1; t=1664372172; x=1664379372; bh=tj
-        nmSL00ZZM1oFN2Ay5SF+8t5QvO8oA3qdQmqLG6FSc=; b=pyC2V+ZIEI8hVKL4jk
-        eh1aquPI6x2I81olRmeClPVF5hiKuHbjq+E3Y51i2sBCWzatKsoYOW5khczk6WTM
-        8J6YL2p0nhiHPsJmx3EYgz1OnPMvJkef/MNp0SnduwLZ1ZX6lpVzr9UkDHbY6eYW
-        SluwH3HiuqQUEGPhse5UegddHgqGjwiyQeFgJp003ukUcVs4zntu6M0FWPOP7TFA
-        TI1qrvyQWon8bG9iV39m4PEqzPilDsdhorlFNIzyBM1jcAIdglIV3t0JNzf7DuOC
-        l9MEdQpNb9xkBzQ6JqtJQX3ZDm5dmTKgJYDwUzRPqvXzX5m9Qt2azaQxldzP1pSO
-        v89g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm2; t=1664372172; x=1664379372; bh=tjnmSL00ZZM1oFN2Ay5SF+8t5QvO
-        8oA3qdQmqLG6FSc=; b=I81/AahetSMdo18CBUdQQn4rwPC0r15wzFvsbpWQ8B4E
-        746jkJMhyoYQKiBRceB2Gp47egha5pvGShnDJFfhL02LgoLPWnvFMmax8G6dAG0q
-        nOowrWfTh38eT9HNrQF46lVjPH8o/pV5CGVhtozHe55WVEbm75M5iXtqRH71uNsA
-        rDVoDbE4uPb4u9TexIb2JhapAbg+MC0aMx379ZD4xrzCxncdOz2grYX4F44ffRto
-        ql24c4H3yyZ5J5r7YQfN2Ql0whcssZyXK5FiGhdcpWeXcUHZ3L6H3SEluW1n/deT
-        NnMVKToWSZCaj+GJfGmYJX0mHnMa+eWkxNShDvaneg==
-X-ME-Sender: <xms:yU00Y3kjTKFsA4mKa-lwOV4QqioQlg16k5bYKWHXGWM31PtA16U6ww>
-    <xme:yU00Y63sy_55IDIvZxOjGFUOEQrlOw3cI29BFYlHinqPpZqravTtk568kQ5hXMLF9
-    QnFQMNC631kQVFFRes>
-X-ME-Received: <xmr:yU00Y9qLU-AErVU-Lm2JAIxeEVCEXTkrIaCyGkEHL8g96v_jTXTReZEvuFElOZSloLMXBw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfeegkedgieekucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdttddttddtvdenucfhrhhomhepfdfmihhr
-    ihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilhhlsehshhhuthgvmhhovhdrnh
-    grmhgvqeenucggtffrrghtthgvrhhnpeelgffhfeetlefhveffleevfffgtefffeelfedu
-    udfhjeduteeggfeiheefteehjeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuve
-    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepkhhirhhilhhl
-    sehshhhuthgvmhhovhdrnhgrmhgv
-X-ME-Proxy: <xmx:yU00Y_nTE9FQbvMtkDpXIYFpJprXJRI2pO6aaokPg4j6Pp6bC76pzA>
-    <xmx:yU00Y127smmXEKIn220aLfUL0MekHTvkmatnwtwo4Tx3n16KZSxStw>
-    <xmx:yU00Y-vwEXbGnyuz1YEqODYDj3tQYEnAcF4PVm9Hf1yGm0Oty962Ig>
-    <xmx:zE00Y-RwGOa2beh1OemdZjSQGikerz2RKwrSbfVuTlu93LrEu1bacg>
-Feedback-ID: ie3994620:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 28 Sep 2022 09:36:09 -0400 (EDT)
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id C0423104667; Wed, 28 Sep 2022 16:36:05 +0300 (+03)
-Date:   Wed, 28 Sep 2022 16:36:05 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        aarcange@redhat.com, ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
-Message-ID: <20220928133605.dy2tkdcpb5pkjejj@box.shutemov.name>
-References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
- <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
- <d16284f5-3493-2892-38e6-f1fa5c10bdbb@redhat.com>
- <20220923005808.vfltoecttoatgw5o@box.shutemov.name>
- <f703e615-3b75-96a2-fb48-2fefd8a2069b@redhat.com>
- <20220926144854.dyiacztlpx4fkjs5@box.shutemov.name>
- <0a99aa24-599c-cc60-b23b-b77887af3702@redhat.com>
- <YzOF7MT15nfBX0Ma@google.com>
+        with ESMTP id S234539AbiI1OwI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 10:52:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87D3BB2D9F
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 07:52:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664376725;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=V1rmv91tUUvou9BEXUYCuE3RXDIyugyqH/Zsh1iT0d8=;
+        b=KJmI7d9XAQoqGUgQITy/Lhmh029ux8PZ31sMV/6M082YolQpB2htKT3EerYM9ev4RS3+E+
+        s7paUSuqImPmbtZgChFa35IPip44n8mu1zAx95+eU9pLe+znDbr1NLLU3Ra53vm3dQZy+G
+        H2HUK5HaQ0zdRQVtMKr1XGr2jsavRsc=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-567-QxXVcAnGNNi-uFeOUIUMPw-1; Wed, 28 Sep 2022 10:52:03 -0400
+X-MC-Unique: QxXVcAnGNNi-uFeOUIUMPw-1
+Received: by mail-qk1-f198.google.com with SMTP id j13-20020a05620a288d00b006be7b2a758fso9606695qkp.1
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 07:52:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=V1rmv91tUUvou9BEXUYCuE3RXDIyugyqH/Zsh1iT0d8=;
+        b=OctTpElXDdLG+yraQBL/2QXvOuVf2MIRlnN56AneE4i0+IdK4O2Cr5FXV/OLNU6Wur
+         09O3CBP3+IvAoIYzI7mpdzw5LUimU1enkq0H30YNLVbCmGKGHVm3Q2nIb5zBsaPZyMiJ
+         svVjTgfCH46AqptBZg9ymo9ahV8tW7RjuIm4pSh5wjNtdW4kXHjS8rXZKX6PojxeNKin
+         14rqKu/uIxwlIz1mNOerDNk/ULJdbdYZU0bPh6kDb90kmoCETLkjTxWA2zLoNcwm3iK/
+         34q4LTeHodcUXsleexKb8GhSUbw2A3+SWD7USqe11ozMKelCLMbE7ye5xKg5jaQdA5sW
+         cpzQ==
+X-Gm-Message-State: ACrzQf1F7Xtw6wYJyOFR+6e2T0UkkOB9OcXaneW0c0hClzEhlZpUFS+l
+        xsfQKlAS8k8uYgAbI77IxaeLtBve4sMTqLjU5HCezBbm+qktPOj2HblxKeAe6DefCHfRPHaHKDN
+        k74ssppXu6LG4
+X-Received: by 2002:a05:6214:1d0a:b0:4ad:82d6:d56a with SMTP id e10-20020a0562141d0a00b004ad82d6d56amr25211046qvd.27.1664376723335;
+        Wed, 28 Sep 2022 07:52:03 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4d39+PB3ET3P/HdsjCQUYySCT8M0b2TxU1Q2Q+6jDnC9y8I5qSD+pY6EASfBqTQCOapekEUA==
+X-Received: by 2002:a05:6214:1d0a:b0:4ad:82d6:d56a with SMTP id e10-20020a0562141d0a00b004ad82d6d56amr25211026qvd.27.1664376723070;
+        Wed, 28 Sep 2022 07:52:03 -0700 (PDT)
+Received: from x1n (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca. [70.31.27.79])
+        by smtp.gmail.com with ESMTPSA id k21-20020ac81415000000b003436103df40sm3034126qtj.8.2022.09.28.07.52.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Sep 2022 07:52:02 -0700 (PDT)
+Date:   Wed, 28 Sep 2022 10:52:00 -0400
+From:   Peter Xu <peterx@redhat.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Gavin Shan <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com,
+        shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org,
+        dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com,
+        shan.gavin@gmail.com, james.morse@arm.com, suzuki.poulose@arm.com,
+        alexandru.elisei@arm.com, oliver.upton@linux.dev
+Subject: Re: [PATCH v4 3/6] KVM: arm64: Enable ring-based dirty memory
+ tracking
+Message-ID: <YzRfkBWepX2CD88h@x1n>
+References: <20220927005439.21130-1-gshan@redhat.com>
+ <20220927005439.21130-4-gshan@redhat.com>
+ <YzMerD8ZvhvnprEN@x1n>
+ <86sfkc7mg8.wl-maz@kernel.org>
+ <YzM/DFV1TgtyRfCA@x1n>
+ <320005d1-fe88-fd6a-be91-ddb56f1aa80f@redhat.com>
+ <87y1u3hpmp.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <YzOF7MT15nfBX0Ma@google.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <87y1u3hpmp.wl-maz@kernel.org>
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 27, 2022 at 11:23:24PM +0000, Sean Christopherson wrote:
-> On Mon, Sep 26, 2022, David Hildenbrand wrote:
-> > On 26.09.22 16:48, Kirill A. Shutemov wrote:
-> > > On Mon, Sep 26, 2022 at 12:35:34PM +0200, David Hildenbrand wrote:
-> > > > When using DAX, what happens with the shared <->private conversion? Which
-> > > > "type" is supposed to use dax, which not?
-> > > > 
-> > > > In other word, I'm missing too many details on the bigger picture of how
-> > > > this would work at all to see why it makes sense right now to prepare for
-> > > > that.
-> > > 
-> > > IIUC, KVM doesn't really care about pages or folios. They need PFN to
-> > > populate SEPT. Returning page/folio would make KVM do additional steps to
-> > > extract PFN and one more place to have a bug.
+On Wed, Sep 28, 2022 at 09:25:34AM +0100, Marc Zyngier wrote:
+> Hi Gavin,
+> 
+> On Wed, 28 Sep 2022 00:47:43 +0100,
+> Gavin Shan <gshan@redhat.com> wrote:
+> 
+> > I have rough idea as below. It's appreciated if you can comment before I'm
+> > going a head for the prototype. The overall idea is to introduce another
+> > dirty ring for KVM (kvm-dirty-ring). It's updated and visited separately
+> > to dirty ring for vcpu (vcpu-dirty-ring).
 > > 
-> > Fair enough. Smells KVM specific, though.
+> >    - When the various VGIC/ITS table base addresses are specified, kvm-dirty-ring
+> >      entries are added to mark those pages as 'always-dirty'. In mark_page_dirty_in_slot(),
+> >      those 'always-dirty' pages will be skipped, no entries pushed to vcpu-dirty-ring.
+> > 
+> >    - Similar to vcpu-dirty-ring, kvm-dirty-ring is accessed from userspace through
+> >      mmap(kvm->fd). However, there won't have similar reset interface. It means
+> >      'struct kvm_dirty_gfn::flags' won't track any information as we do for
+> >      vcpu-dirty-ring. In this regard, kvm-dirty-ring is purely shared buffer to
+> >      advertise 'always-dirty' pages from host to userspace.
+> >         - For QEMU, shutdown/suspend/resume cases won't be concerning
+> > us any more. The
+> >      only concerned case is migration. When the migration is about to complete,
+> >      kvm-dirty-ring entries are fetched and the dirty bits are updated to global
+> >      dirty page bitmap and RAMBlock's dirty page bitmap. For this, I'm still reading
+> >      the code to find the best spot to do it.
 > 
-> TL;DR: I'm good with either approach, though providing a "struct page" might avoid
->        refactoring the API in the nearish future.
+> I think it makes a lot of sense to have a way to log writes that are
+> not generated by a vpcu, such as the GIC and maybe other things in the
+> future, such as DMA traffic (some SMMUs are able to track dirty pages
+> as well).
 > 
-> Playing devil's advocate for a second, the counter argument is that KVM is the
-> only user for the foreseeable future.
+> However, I don't really see the point in inventing a new mechanism for
+> that. Why don't we simply allow non-vpcu dirty pages to be tracked in
+> the dirty *bitmap*?
 > 
-> That said, it might make sense to return a "struct page" from the core API and
-> force KVM to do page_to_pfn().  KVM already does that for HVA-based memory, so
-> it's not exactly new code.
-
-Core MM tries to move away from struct page in favour of struct folio. We
-can make interface return folio.
-
-But it would require more work on KVM side.
-
-folio_pfn(folio) + offset % folio_nr_pages(folio) would give you PFN for
-base-pagesize PFN for given offset. I guess it is not too hard.
-
-It also gives KVM capability to populate multiple EPT entries for non-zero
-order folio and save few cycles.
-
-Does it work for you?
-
-> More importantly, KVM may actually need/want the "struct page" in the not-too-distant
-> future to support mapping non-refcounted "struct page" memory into the guest.  The
-> ChromeOS folks have a use case involving virtio-gpu blobs where KVM can get handed a
-> "struct page" that _isn't_ refcounted[*].  Once the lack of mmu_notifier integration
-> is fixed, the remaining issue is that KVM doesn't currently have a way to determine
-> whether or not it holds a reference to the page.  Instead, KVM assumes that if the
-> page is "normal", it's refcounted, e.g. see kvm_release_pfn_clean().
+> From a kernel perspective, this is dead easy:
 > 
-> KVM's current workaround for this is to refuse to map these pages into the guest,
-> i.e. KVM simply forces its assumption that normal pages are refcounted to be true.
-> To remove that workaround, the likely solution will be to pass around a tuple of
-> page+pfn, where "page" is non-NULL if the pfn is a refcounted "struct page".
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 5b064dbadaf4..ae9138f29d51 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3305,7 +3305,7 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>  	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+>  
+>  #ifdef CONFIG_HAVE_KVM_DIRTY_RING
+> -	if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
+> +	if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
+>  		return;
+>  #endif
+>  
+> @@ -3313,10 +3313,11 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>  		unsigned long rel_gfn = gfn - memslot->base_gfn;
+>  		u32 slot = (memslot->as_id << 16) | memslot->id;
+>  
+> -		if (kvm->dirty_ring_size)
+> +		if (vpcu && kvm->dirty_ring_size)
+>  			kvm_dirty_ring_push(&vcpu->dirty_ring,
+>  					    slot, rel_gfn);
+> -		else
+> +		/* non-vpcu dirtying ends up in the global bitmap */
+> +		if (!vcpu && memslot->dirty_bitmap)
+>  			set_bit_le(rel_gfn, memslot->dirty_bitmap);
+>  	}
+>  }
 > 
-> At that point, getting handed a "struct page" from the core API would be a good
-> thing as KVM wouldn't need to probe the PFN to determine whether or not it's a
-> refcounted page.
+> though I'm sure there is a few more things to it.
+
+Yes, currently the bitmaps are not created when rings are enabled.
+kvm_prepare_memory_region() has:
+
+		else if (!kvm->dirty_ring_size) {
+			r = kvm_alloc_dirty_bitmap(new);
+
+But I think maybe that's a solution worth considering.  Using the rings
+have a major challenge on the limitation of ring size, so that for e.g. an
+ioctl we need to make sure the pages to dirty within an ioctl procedure
+will not be more than the ring can take.  Using dirty bitmap for a last
+phase sync of constant (but still very small amount of) dirty pages does
+sound reasonable and can avoid that complexity.  The payoff is we'll need
+to allocate both the rings and the bitmaps.
+
 > 
-> Note, I still want the order to be provided by the API so that KVM doesn't need
-> to run through a bunch of helpers to try and figure out the allowed mapping size.
-> 
-> [*] https://lore.kernel.org/all/CAD=HUj736L5oxkzeL2JoPV8g1S6Rugy_TquW=PRt73YmFzP6Jw@mail.gmail.com
+> To me, this is just a relaxation of an arbitrary limitation, as the
+> current assumption that only vcpus can dirty memory doesn't hold at
+> all.
 
-These non-refcounted "struct page" confuses me.
+The initial dirty ring proposal has a per-vm ring, but after we
+investigated x86 we found that all legal dirty paths are with a vcpu
+context (except one outlier on kvmgt which fixed within itself), so we
+dropped the per-vm ring.
 
-IIUC (probably not), the idea is to share a buffer between host and guest
-and avoid double buffering in page cache on the guest ("guest shadow
-buffer" means page cache, right?). Don't we already have DAX interfaces to
-bypass guest page cache?
+One thing to mention is that DMAs should not count in this case because
+that's from device perspective, IOW either IOMMU or SMMU dirty tracking
+should be reported to the device driver that interacts with the userspace
+not from KVM interfaces (e.g. vfio with VFIO_IOMMU_DIRTY_PAGES).  That even
+includes emulated DMA like vhost (VHOST_SET_LOG_BASE).
 
-And do you think it would need to be handled on inaccessible API lavel or
-is it KVM-only thing that uses inaccessible API for some use-cases?
+Thanks,
 
 -- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+Peter Xu
+
