@@ -2,67 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A4E4B5ED2F4
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 04:21:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ECF845ED35B
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 05:15:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232665AbiI1CVL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Sep 2022 22:21:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34444 "EHLO
+        id S233014AbiI1DP4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Sep 2022 23:15:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231773AbiI1CVI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Sep 2022 22:21:08 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4C319F752
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 19:21:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1664331664; x=1695867664;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=uDN29sYSmcMH5T9cuz/5RBk9La1Uw3+WsHSV0QNg284=;
-  b=UZ4+TaRMwb/wxdk4vSygSrnTLmbHLxUYEiEJYf3fs09jA5Tv+SOE0LNZ
-   zDst1wptDTX67NRP74Y364X7+LaUYL310vqYV+sZSsmVfrVOiX2dv99SQ
-   RjxQ84D8VLKFtNeTQ3Gog85cWyEC/zm8HROGK1sCaRJA5vO5t8uksU8ap
-   FtghczXN8GEM+VvShhdzb4fvIZ2vfDvmh64ViBD9APUZms2xNFb7TRv7Y
-   d6lMGfDTuFRGK5yu07n/7ELvK9Vgshgv0lqBQjJVLPfWHumeCjAtvGW+f
-   cjhXS+Tmw6u9/sqLd63NOOYf6qVzujYADQSzxlJyvYIgFy+FPH4XWH3Mq
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10483"; a="302395237"
-X-IronPort-AV: E=Sophos;i="5.93,350,1654585200"; 
-   d="scan'208";a="302395237"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2022 19:21:04 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10483"; a="652502843"
-X-IronPort-AV: E=Sophos;i="5.93,350,1654585200"; 
-   d="scan'208";a="652502843"
-Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.255.29.135]) ([10.255.29.135])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2022 19:21:01 -0700
-Message-ID: <f6caeb4e-82a8-9245-2cb6-22580af559ae@intel.com>
-Date:   Wed, 28 Sep 2022 10:20:58 +0800
-MIME-Version: 1.0
+        with ESMTP id S232964AbiI1DPs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Sep 2022 23:15:48 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F313D15737;
+        Tue, 27 Sep 2022 20:15:36 -0700 (PDT)
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 28S1BHlN003083;
+        Wed, 28 Sep 2022 03:15:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2022-7-12;
+ bh=tJvatbCbmbt69+boIwc7zgWgGryXP/2Almm3raEPi58=;
+ b=EK2zTYwUaDWXLfHNx24Lk9QvP9NgfDITbS/vwFX3XFxY6BtrgEiN8OuIQwekwz4f2+KD
+ h6PCIDUi6h1XT3UM1nYpbs1xKj4X8dvMQKRX/ORyhq5n4/NvWLJrES2b0bgTPuVhW06q
+ U9jOfGFbMEX70A8gNosQEVS34EASSMnojlnp0w0F3ezAIpuUHefBrazokb9qEu7AA6bz
+ Dw3RYd+lWjgHUYEPqjtlbaJgrsc1PQnYr7r8KN/zUE8Fjkvg6piuswLW1p3VzzBtuYaw
+ gO/GqPvUJYIaQ58cBNfvcl+1wv1zEVen4GeKoabvw5XpLAoazfFw9Wzgtj4vE0TwaK7e 1w== 
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3jssrwgjcq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 28 Sep 2022 03:15:30 +0000
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 28S2RNXk019130;
+        Wed, 28 Sep 2022 03:15:30 GMT
+Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2109.outbound.protection.outlook.com [104.47.70.109])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3jtpvevrnw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 28 Sep 2022 03:15:29 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YQl6MSRoykeff7Q4jaP0jCvh/wdcGt/3XLP4oexa3yW7kWNrnCMiuKndklmF3CpS/8RC2iaFM+VSp7E6oCeB80rDyaZ7DvSvU3guwWCgwicQiLFPQLWeFR8s4uErNCyhCFMkpD/aNWYv7T1qBi0YkPt27sCx0h+zUmJxcmrNXxXrzefp1xnvM+mx23Zl1VdiudsongtbzqLVobQ8UisnUvw3IbsEk48hz6ed2xeKMCKnaBW12/7HOuO0gakFIxzD+yEIXxz1O5hmDIit1my2r4a8nBZGCUrfn8ix9ZNJ6YwJGlWiN10VIe45VVIOWs0EXN6cZKp0Xbi0uBnjuRw3KA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tJvatbCbmbt69+boIwc7zgWgGryXP/2Almm3raEPi58=;
+ b=QzlIxc/9BZAb6xArNyjLCHHVq2BSdNUDlZ5tQ/9cQg9VfaYuNxAqOC+8uE8DHAShFtOM8Rl/jsbzuhxscrRQInqcUrqF2W+6Q6aXIzVLow1OEUY1lMiw6Exx26g7nE6Nm42IzYHK5ByH5l6bQB14nWKY361hea91PTAPC66YwE2iVEBHy2zYPQ8TeUWHnC0zzovii9MB3FccI8ku9oe5onvPQFePdDhTlfejC35VSUEVkJ/MA0iJqIqlyCKmDm+16pufsD8RXeom7N9FfCPNyzOpUTTky05lV23+LjkqxqCCnNSh36UczuwT9siwdRZflkUWqkipdfQBDLwZyUHolA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tJvatbCbmbt69+boIwc7zgWgGryXP/2Almm3raEPi58=;
+ b=AASdstbGeejAGhCCsecaHcUWdkLTnWRWGczcqiEhbRZYJce3ND5tfTz6/MNb+g6Zl/qkxrs2l9cmLsBRO4gvFePp+7OJfE6OAvQVqKKSzLFqwYL4Av8dxFqiCd2MjGt8ao7NI6unmwkykAPHqYvXlARcSesRGQsuZEOVqoFOoSs=
+Received: from DS7PR10MB5280.namprd10.prod.outlook.com (2603:10b6:5:3a7::5) by
+ MN2PR10MB4288.namprd10.prod.outlook.com (2603:10b6:208:1dc::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5654.25; Wed, 28 Sep 2022 03:15:28 +0000
+Received: from DS7PR10MB5280.namprd10.prod.outlook.com
+ ([fe80::95b4:7be6:3e45:d64e]) by DS7PR10MB5280.namprd10.prod.outlook.com
+ ([fe80::95b4:7be6:3e45:d64e%4]) with mapi id 15.20.5676.017; Wed, 28 Sep 2022
+ 03:15:28 +0000
+Message-ID: <d02d0b30-f29b-0ff6-98c7-89ddcd091c60@oracle.com>
+Date:   Tue, 27 Sep 2022 23:15:25 -0400
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.3.0
-Subject: Re: [PATCH v7 2/2] i386: Add notify VM exit support
+ Thunderbird/102.3.0
+Subject: Re: [PATCH v3 05/28] KVM: x86: Don't inhibit APICv/AVIC if xAPIC ID
+ mismatch is due to 32-bit ID
 Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Peter Xu <peterx@redhat.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <20220923073333.23381-1-chenyi.qiang@intel.com>
- <20220923073333.23381-3-chenyi.qiang@intel.com>
- <dc8d4a33-7246-222b-66b5-6ba784fac56e@redhat.com>
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-In-Reply-To: <dc8d4a33-7246-222b-66b5-6ba784fac56e@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Li RongQing <lirongqing@baidu.com>
+References: <20220920233134.940511-1-seanjc@google.com>
+ <20220920233134.940511-6-seanjc@google.com>
+From:   Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+Organization: Oracle Corporation
+In-Reply-To: <20220920233134.940511-6-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM6PR08CA0047.namprd08.prod.outlook.com
+ (2603:10b6:5:1e0::21) To DS7PR10MB5280.namprd10.prod.outlook.com
+ (2603:10b6:5:3a7::5)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR10MB5280:EE_|MN2PR10MB4288:EE_
+X-MS-Office365-Filtering-Correlation-Id: a9a611c0-e698-4a17-a596-08daa0ffb15e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: nJZHw116wRNqvHXAPZ3FDa2h3bA5/K6mImlEcTN0nSwcxXKQZeGgZMtMt74son+uwtMPGOphoNlfuuvvR/giJv5SgPLAbBiQm6ub+tfSvgg6SIf6PWs0R6b47Nv7aFZXVmYX9mLWUup+we182QCRA3vGXaKlvD7VNerwZHyU/T08MCslMEeKdMj54h8dvXPsJArf2j6GjaukKbhA4+icT8UZt428mi6lY195bqIt/sO3LKkHgHDKjK7hY0puYRortUQD8yP9K/sePFEd5r/JIu/zZP1PohTpYQm1EDNguWcIKIsouqW1N3XGNNbSHMU9jf0zmdv4XZMiFSNcIenNuryMop5PFnkbklZsymag20iUTu45m7fnsDd+DErYhoqpuiaAOFSA2hrr1D7M1EcSyBQiyKeRXPymvsZhJr8csFVm99ePGNNYMSYgbVxPbzHSkN68iMfj/EqVF4MoyvZKzvb1M2O6Ab32CApU6rnUIpVlJcWWuP4s7O5qFwZ6MoHhTDi8xGrXSBSm2avbil4+HjqaQDy8m0s+kHTO37ViWihUCy37pXK/bGVoghfpSBYcm5pnXbmGa7mYLGuhvAVvw3YXzMumM6g5cnbs9Pbjxjf4l16vg0NAvUsJQPYYKjxjyLB7ovYW0/7sw3M9qlhZLvAXBzShToOicPjudeZecPirjaVGOQ8qHX5LhPT30Oe7F6YaCWEYtpFsSMNTv4EMzkSTNYjNGupZMBIqIca+FMLSG8fExE4ZcYOsPWREcoXYpwrsW+Rotfp7CAOYOblQuBptS/fZFA9HYzMkxmzgCgxDN9lFb1T1BBxTbLRsnvRnNtGT98HAR9LSXEwAgBlTlICpuY31i3EC8MhU71+mOXw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB5280.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(366004)(346002)(376002)(39860400002)(396003)(451199015)(316002)(54906003)(6486002)(966005)(38100700002)(110136005)(31686004)(2906002)(6666004)(53546011)(8936002)(6506007)(478600001)(6512007)(41300700001)(31696002)(36756003)(26005)(5660300002)(2616005)(86362001)(186003)(4326008)(8676002)(36916002)(83380400001)(66556008)(66476007)(66946007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Uy9qMnI5dTRrYXVXQ0hLZFIwV1J0d3V1d2FrMUMveFFjNnZmVW0wUEkxMDZn?=
+ =?utf-8?B?NCtoRlhNR2Vjd0NrM1hSVU9oKzlGRE9SRlFyWUVJOEVtM3I0bGpzdENwSXdY?=
+ =?utf-8?B?R08rT28yNWZTWm5TcUFYL0Zsb1dEbkxqM3doelpqVGdrWFJxR1NhcS9Vb2Rs?=
+ =?utf-8?B?UHJ6S3BYVHZuVGFVeStzY0ZaSjdoaFR5cUg4dE56YXBCRzhRVllaWHBPVENV?=
+ =?utf-8?B?cEx1N3NTYWdjWFRqWGF5TUJmS0ZvNzBqbzM3aldoSXJZVUp6OVI4czVNOENV?=
+ =?utf-8?B?VDEydk5UN1VRdEZjMmtueVZzdGR4d0VZeWROSlVwK0lNWkFzVXBDZHBONDlR?=
+ =?utf-8?B?TGFTSmx2SVJSSHhIME1YZHpxZGlkVXB3aXg3cHJqZ1orZHJaYjF0dm5oaVBr?=
+ =?utf-8?B?MXdNZ0kwRXJzM3cxTlpnR2tDZ3ZTaG1YQ0lwNDFMZkNVZENocnUwTG1TSzQ4?=
+ =?utf-8?B?Q0hEMzdUWko1cG5iUmJtV3o1QUpNZ2xCZWJkeUoyLzFjTE40RlR0Z0QzQlpD?=
+ =?utf-8?B?S2pOaHh0ZGpYQ0xPbkFpakJiOHJpVC9MaUlHUUJndlpGUjJnUzIwZE5wUW1M?=
+ =?utf-8?B?OGlFRk84clA3YTc0OGpQa0VYaHhDYjJySzMyeWdXeGFhdlRKM2xMRDB1OWFx?=
+ =?utf-8?B?OFM0bTlWQ3d6SWJ0U3RETmNIZTBmaUJqOVRvVVI1dmdpOEQ3RCtkZ1FHTita?=
+ =?utf-8?B?cUluME94TUlWZzRnRG9NaFgxajhrNDJTUHJxMHoyeUtDN1ZERThxMkRnaEln?=
+ =?utf-8?B?Qkhxa3hNRjNaVHQ0QmlNSDZTU0h6L09EaTYxZ0d4TVlwNzNSaDJRcUFvdmY3?=
+ =?utf-8?B?SkphQytlNWFaV093R3FSM1ZIM3VXeUtad1JMR2dPMUJ4U1lKQi9PNUJVUVNL?=
+ =?utf-8?B?ZFZCOStmKzhmbm1Mb1ZIK1BERWJpNzh3bmxMTjZsc2VYRDcrbWV0dW5aejU4?=
+ =?utf-8?B?L1FVazh4S1VzOUc0VHJuQ2JLVlc4bzZxbVFweGgwUDg5QUpJdFB2cDhMU01p?=
+ =?utf-8?B?UlNBWnBUd1VLQjBLc0hlZjlma1Zrb3RONzlndWViWnNGOG4reUpscnREbHpZ?=
+ =?utf-8?B?N0dFS3J0aUZXZXJBU2hHQmZucHB5cW54WW5obTZGcGI4YUtVWkRydHNPbGZw?=
+ =?utf-8?B?WVFVbk1BdFN3UWlCMVNHT1VxVDV6MURoK2tGS0Q3aHhubnRrTmIzUkd5K2Rp?=
+ =?utf-8?B?N1BEOWJiR0t0Mm1Td2tJeXVMMjA4eUppWUdVSVRQTjdQZ1U2MTgrR2dib1Vz?=
+ =?utf-8?B?ODd3YXNuWnluSk4ySm1PSysvSUlQK0xNQmRhUllrczZYOHh3eWhPUDQxNXpi?=
+ =?utf-8?B?YVhxNEU1Z0wybnVpYkE0eWw1Vzhya21QNi9DMDZTMDQwL0RScUMxQXpuOEFn?=
+ =?utf-8?B?ekRDK3VuSGN5ejJmNnZzaFVwS2FDRTNQRTlkSFFhdWkxZDJ3R3RpNWtOeFI0?=
+ =?utf-8?B?WUQraVFXTXBxaHo2S3Y5aFd4TE9vQ29lZHRpNHpBZFRwdlNiTm1sOTQybXhw?=
+ =?utf-8?B?WThkcGZBRlU3M1kxT3BZeUhZOWtYcWFWTysrMGJZenVYWXpNd01Bd2NRVjZu?=
+ =?utf-8?B?ZzRTNEFrMXZ4Qm5SZi94Nyt4Z2lqNzZickhaKytBU2I5OGJxQUxIandXaTBI?=
+ =?utf-8?B?WVdUNWpXQUJpRG9XMUk0MEFxSjB2MHM4STZycWtZdkNxSXcwMm9nbnEwSWEv?=
+ =?utf-8?B?a2Z0Uk10NFpLcUdsalY1WlNjbmVRZzJHNk9USUV3MjR6TnVRbmhlR3duQWtM?=
+ =?utf-8?B?NHNxK2lYdGZUZmw1MnpYRTUzZDRjdkRFWllxYUg4SEtaa1c0UjdiTDlGdm84?=
+ =?utf-8?B?OWdzaFhvMzgyVkFoZWxjSVpTK05oaVROa2Z4YXlFeDM5bTlEaDJQUEJ4enBC?=
+ =?utf-8?B?cnZJNGFyQVRkZ3VHcGJDTCtsYjdiL0tnNjM0US9qTjdqVDY1bmJOa204bHRv?=
+ =?utf-8?B?bE1LdVlYT0h1SjNsY1NCRDNucE1jL1kzS3ppWHd2bWx5MmFrc0s2aFRtaUx4?=
+ =?utf-8?B?OHNYRE1STklvVHlsYW9wN0ZZN3grazFrdWNLU2o0WDNFMjkzRFNGbW1aVXBw?=
+ =?utf-8?B?Wll5eHRXQ0hUZ1ZSblQzY2YvWmJnR2V3VUN6Ny8xS2N6VXQ5VEtsNDBHUndn?=
+ =?utf-8?B?SnpFblorTldPS2ZVbU5KT2g2U25PREJqWDhHRkFCMGVZZ1JieE05SDNpa1Nt?=
+ =?utf-8?B?REE9PQ==?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a9a611c0-e698-4a17-a596-08daa0ffb15e
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB5280.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2022 03:15:28.1020
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: WQTPYCPw0p9gwFf1fEWeQJC2I5GkTm6s3B4fS0uGmp+5jPitDZynV5jbhyQuJian6gtwjV6f+VTWV8kKVVGdv6wGppsQf8wpghp6VUFe1tI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR10MB4288
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-09-27_12,2022-09-27_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
+ suspectscore=0 adultscore=0 mlxscore=0 spamscore=0 bulkscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2209280019
+X-Proofpoint-ORIG-GUID: pZ_lqwX2KC2oTdeoAiod0EFh-2DgmNgg
+X-Proofpoint-GUID: pZ_lqwX2KC2oTdeoAiod0EFh-2DgmNgg
+X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -71,212 +162,87 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 9/27/2022 9:43 PM, Paolo Bonzini wrote:
-> On 9/23/22 09:33, Chenyi Qiang wrote:
->> Because there are some concerns, e.g. a notify VM exit may happen with
->> VM_CONTEXT_INVALID set in exit qualification (no cases are anticipated
->> that would set this bit), which means VM context is corrupted. To avoid
->> the false positive and a well-behaved guest gets killed, make this
->> feature disabled by default. Users can enable the feature by a new
->> machine property:
->>      qemu -machine notify_vmexit=on,notify_window=0 ...
+On 9/20/2022 7:31 PM, Sean Christopherson wrote:
+> Truncate the vcpu_id, a.k.a. x2APIC ID, to an 8-bit value when comparing
+> it against the xAPIC ID to avoid false positives (sort of) on systems
+> with >255 CPUs, i.e. with IDs that don't fit into a u8.  The intent of
+> APIC_ID_MODIFIED is to inhibit APICv/AVIC when the xAPIC is changed from
+> it's original value,
 > 
-> Some comments on the interface:
+> The mismatch isn't technically a false positive, as architecturally the
+> xAPIC IDs do end up being aliased in this scenario, and neither APICv
+> nor AVIC correctly handles IPI virtualization when there is aliasing.
+> However, KVM already deliberately does not honor the aliasing behavior
+> that results when an x2APIC ID gets truncated to an xAPIC ID.  I.e. the
+> resulting APICv/AVIC behavior is aligned with KVM's existing behavior
+> when KVM's x2APIC hotplug hack is effectively enabled.
 > 
-> - the argument should be one of "run" (i.e. do nothing and continue, the
-> default), "internal-error" (i.e. raise a KVM internal error), "disable"
-> (i.e. do not enable the capability).  You can add the enum to
-> qapi/runstate.json and use object_class_property_add_enum to define
-> the QOM property.
+> If/when KVM provides a way to disable the hotplug hack, APICv/AVIC can
+> piggyback whatever logic disables the optimized APIC map (which is what
+> provides the hotplug hack), i.e. so that KVM's optimized map and APIC
+> virtualization yield the same behavior.
 > 
+> For now, fix the immediate problem of APIC virtualization being disabled
+> for large VMs, which is a much more pressing issue than ensuring KVM
+> honors architectural behavior for APIC ID aliasing.
 
-So, IIUC, the three options of notify-vmexit would be:
-1. run (enable the capability but do nothing if the vmexit happens)
-2. internal-error (enable the capability and raise a KVM internal error 
-if it happens)
-3. disable (do not enable the capability)
+I built a host kernel with this entire series on top of mainline 
+v6.0-rc6, and booting a guest with AVIC enabled works as expected on the 
+initial boot. The issue is that during the first reboot AVIC is 
+inhibited due to APICV_INHIBIT_REASON_APIC_ID_MODIFIED, and I see 
+constant inhibition events due to APICV_INHIBIT_REASON_IRQWIN as seen in 
+the traces:
 
-For the invalid context case, exit and raise a KVM internal error 
-unconditionally.
+qemu-system-x86-10147   [222] .....  1116.519052: 
+kvm_apicv_inhibit_changed: set reason=8, inhibits=0x120
+qemu-system-x86-10147   [222] .....  1116.519063: 
+kvm_apicv_inhibit_changed: cleared reason=8, inhibits=0x20
+qemu-system-x86-10147   [222] .....  1117.934222: 
+kvm_apicv_inhibit_changed: set reason=8, inhibits=0x120
+qemu-system-x86-10147   [222] .....  1117.934233: 
+kvm_apicv_inhibit_changed: cleared reason=8, inhibits=0x20
 
-> - properties should have a dash ("-") in the name, not an underscore
-> 
-> - the property should be added to "-accel kvm,..." (on x86 only).  See
-> after my signature for a preparatory patch that adds a new
-> kvm_arch_accel_class_init hook.
-> 
-> The default would be either "run" or "disable".  Honestly I think it
-> should be "run", otherwise there's no point in adding the feature;
-> if it is not enabled by default, it is very likely that no one would
-> use it.
-> 
+It happens regardless of vCPU count (tested with 2, 32, 255, 380, and 
+512 vCPUs). This state persists for all subsequent reboots, until the VM 
+is terminated. For vCPU counts < 256, when x2apic is disabled the 
+problem does not occur, and AVIC continues to work properly after reboots.
 
-Yeah, personally speaking, I also prefer to enable it by default. In 
-previous KVM patch discussion, we were worried about the buggy silicon 
-to cause the invalid context case, which will kill the benign VM. But 
-since there is little possibility and we can't tell if it is a false 
-positive when it happens. I think default to "run" is acceptable.
+I did not see this issue when testing a similar host kernel that did not 
+include this current patchset, but instead applied the earlier:
+https://lore.kernel.org/lkml/20220909195442.7660-1-suravee.suthikulpanit@amd.com/
+which inspired this [05/23] patch and the follow up [22/28] in this series.
 
->> A new KVM exit reason KVM_EXIT_NOTIFY is defined for notify VM exit. If
->> it happens with VM_INVALID_CONTEXT, hypervisor exits to user space to
->> inform the fatal case. Then user space can inject a SHUTDOWN event to
->> the target vcpu. This is implemented by injecting a sythesized triple
->> fault event.
-> 
-> I don't think a triple fault is a good match for an event that "should
-> not happen" and is the fault of the processor rather than the guest.
-> This should be a KVM internal error.  The workaround is to disable the
-> notify vmexit.
-> 
->> +        warn_report_once("KVM: encounter a notify exit with %svalid 
->> context in"
->> +                         " guest. It means there can be possible 
->> misbehaves in"
->> +                         " guest, please have a look.",
->> +                         ctx_invalid ? "in" : "");
-> 
-> The warning should be unconditional if the context is invalid.
-> 
+I am using QEMU built from v7.1.0 upstream tag, plus the patch at:
+https://lore.kernel.org/qemu-devel/20220504131639.13570-1-suravee.suthikulpanit@amd.com/
 
-In valid context case, the warning can also notify the admin that the 
-guest misbehaves. Is it necessary to remove it?
+Please feel free to request any other data points that might be relevant 
+and I'll try to collect them.
 
->> +    object_class_property_add(oc, X86_MACHINE_NOTIFY_WINDOW, "uint32_t",
+Alejandro
 > 
-> uint32 (not uint32_t)
+> Fixes: 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or APIC base")
+> Reported-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/lapic.c | 7 ++++++-
+>   1 file changed, 6 insertions(+), 1 deletion(-)
 > 
-
-...
-
->> +                              x86_machine_get_notify_window,
->> +                              x86_machine_set_notify_window, NULL, 
->> NULL);
->> +    object_class_property_set_description(oc, X86_MACHINE_NOTIFY_WINDOW,
->> +            "Set the notify window required by notify VM exit");
-> 
-> "Clock cycles without an event window after which a notification VM exit 
-> occurs"
-> 
-
-Will Fix it. Thanks a lot!
-
-> Thanks,
-> 
-> Paolo
-> 
->  From a5cb704991cfcda19a33c622833b69a8f6928530 Mon Sep 17 00:00:00 2001
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> Date: Tue, 27 Sep 2022 15:20:16 +0200
-> Subject: [PATCH] kvm: allow target-specific accelerator properties
-> 
-> Several hypervisor capabilities in KVM are target-specific.  When exposed
-> to QEMU users as accelerator properties (i.e. -accel kvm,prop=value), they
-> should not be available for all targets.
-> 
-> Add a hook for targets to add their own properties to -accel kvm; for
-> now no such property is defined.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 5acab1767f..f90c5cb285 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -3737,6 +3737,8 @@ static void kvm_accel_class_init(ObjectClass *oc, 
-> void *data)
->           NULL, NULL);
->       object_class_property_set_description(oc, "dirty-ring-size",
->           "Size of KVM dirty page ring buffer (default: 0, i.e. use 
-> bitmap)");
-> +
-> +    kvm_arch_accel_class_init(oc);
->   }
-> 
->   static const TypeInfo kvm_accel_type = {
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index efd6dee818..50868ebf60 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -353,6 +353,8 @@ bool kvm_device_supported(int vmfd, uint64_t type);
-> 
->   extern const KVMCapabilityInfo kvm_arch_required_capabilities[];
-> 
-> +void kvm_arch_accel_class_init(ObjectClass *oc);
-> +
->   void kvm_arch_pre_run(CPUState *cpu, struct kvm_run *run);
->   MemTxAttrs kvm_arch_post_run(CPUState *cpu, struct kvm_run *run);
-> 
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index e5c1bd50d2..d21603cf28 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -1056,3 +1056,7 @@ bool kvm_arch_cpu_check_are_resettable(void)
->   {
->       return true;
->   }
-> +
-> +void kvm_arch_accel_class_init(ObjectClass *oc)
-> +{
-> +}
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index 21880836a6..22b3b37193 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -5472,3 +5472,7 @@ void kvm_request_xsave_components(X86CPU *cpu, 
-> uint64_t mask)
->           mask &= ~BIT_ULL(bit);
->       }
->   }
-> +
-> +void kvm_arch_accel_class_init(ObjectClass *oc)
-> +{
-> +}
-> diff --git a/target/mips/kvm.c b/target/mips/kvm.c
-> index caf70decd2..bcb8e06b2c 100644
-> --- a/target/mips/kvm.c
-> +++ b/target/mips/kvm.c
-> @@ -1294,3 +1294,7 @@ bool kvm_arch_cpu_check_are_resettable(void)
->   {
->       return true;
->   }
-> +
-> +void kvm_arch_accel_class_init(ObjectClass *oc)
-> +{
-> +}
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 466d0d2f4c..7c25348b7b 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2966,3 +2966,7 @@ bool kvm_arch_cpu_check_are_resettable(void)
->   {
->       return true;
->   }
-> +
-> +void kvm_arch_accel_class_init(ObjectClass *oc)
-> +{
-> +}
-> diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
-> index 70b4cff06f..30f21453d6 100644
-> --- a/target/riscv/kvm.c
-> +++ b/target/riscv/kvm.c
-> @@ -532,3 +532,7 @@ bool kvm_arch_cpu_check_are_resettable(void)
->   {
->       return true;
->   }
-> +
-> +void kvm_arch_accel_class_init(ObjectClass *oc)
-> +{
-> +}
-> diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
-> index 7bd8db0e7b..840af34576 100644
-> --- a/target/s390x/kvm/kvm.c
-> +++ b/target/s390x/kvm/kvm.c
-> @@ -2574,3 +2574,7 @@ bool kvm_arch_cpu_check_are_resettable(void)
->   {
->       return true;
->   }
-> +
-> +void kvm_arch_accel_class_init(ObjectClass *oc)
-> +{
-> +}
-> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index adac6ca9b7dc..a02defa3f7b5 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2075,7 +2075,12 @@ static void kvm_lapic_xapic_id_updated(struct kvm_lapic *apic)
+>   	if (KVM_BUG_ON(apic_x2apic_mode(apic), kvm))
+>   		return;
+>   
+> -	if (kvm_xapic_id(apic) == apic->vcpu->vcpu_id)
+> +	/*
+> +	 * Deliberately truncate the vCPU ID when detecting a modified APIC ID
+> +	 * to avoid false positives if the vCPU ID, i.e. x2APIC ID, is a 32-bit
+> +	 * value.
+> +	 */
+> +	if (kvm_xapic_id(apic) == (u8)apic->vcpu->vcpu_id)
+>   		return;
+>   
+>   	kvm_set_apicv_inhibit(apic->vcpu->kvm, APICV_INHIBIT_REASON_APIC_ID_MODIFIED);
