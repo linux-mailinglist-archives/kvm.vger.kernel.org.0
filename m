@@ -2,76 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 598AC5EE3C9
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 20:03:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BC235EE3F3
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 20:10:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234255AbiI1SDj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 14:03:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44598 "EHLO
+        id S234039AbiI1SKg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 14:10:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234335AbiI1SDb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 14:03:31 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A0B210039F
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 11:03:30 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id d10so12079275pfh.6
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 11:03:30 -0700 (PDT)
+        with ESMTP id S234032AbiI1SKb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 14:10:31 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 336C96582F
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 11:10:29 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id cp18so3975051pjb.2
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 11:10:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=6XAUjyy8dM+memUfQW8WuFfjcJaprUOz9KHY1fZCoGw=;
-        b=P53UuYSAwxYFHB9LgLaojInB13oBd+shR1QK8QLrkhdso+QUkcvjVqDWM2vJ4I63kw
-         KlCzcL9FiEhkuBJBlwC5PJlL9NJ34wFLMuQTnDxwUThgzhPimvSVcnI2rpqOb0hCLKhd
-         viB50mL+V/HuT13gD0dJc/Pi0j5DCwUUH+qEBhzfY6h/Cjg0rRA6+jFK6bnveqS0rNDO
-         lHsQ4KZqzindpP+UZjeeiz2+fKswe/2zJNN5BTZsphgu/FUDjADeIkiOE7ICBKwO/31j
-         +8UoENl/RTohakihwLsm0RBwwn++jrGrmTGREk6RWUrUdyze6btBvJeXL6HSD+26vNEv
-         p04A==
+        bh=bs5D0g2ItumdYX+ue+ZykeItEbF4U1JZ3UggoNJ4PwY=;
+        b=if4oJ2uaIlB5lHRl7AMaFhWanHUi2pKzVlq8kBHrN93nEhlmd2g5rntnMaoyfdrF5m
+         f6rsyEcJ16qH5u/8AYc7teYzcjN45HL9qcdW/CGiSGL4fl+bTYDnOtOTzCEcf4RHIRPo
+         frWDcrNldeknW5r1vi8+diUa5uRH9nCnkJBU/gmR/Ed9m/36ou218pq/u0CvE6DpX3/8
+         XhmuE9/SdGRN+gnsBFg37PEANcDy2ZgUQMgIEIF7/YrY8obzVdXbiHJUn/e/L84wAi9P
+         0dKxtL7ZZxbu4erRKmgkcJCWeeoKHEHlpJbwkiPnOfRPWkofycrlgDUuCQixwIICTYkK
+         fIAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=6XAUjyy8dM+memUfQW8WuFfjcJaprUOz9KHY1fZCoGw=;
-        b=MN9/6Zm0nUVChifR1W6B7S3hJd8miSlOsTJq+LlXDH1bovrbITe2b5adgl3BfedUFz
-         4R9AfWqO2J/wTZaY7ECh7POMRk7KBZqBHxg1q1krm7ysbJQu5bOYaesTRljibyK8AnK3
-         5G+IiKuAf1gUWXmASK2UBWglu0f1apA+KT9ozIHd0LxABcDNwRCc1WHyS6j3LIwLJWUc
-         XDxjW5wtqSmLm5aZAGDBi7QzAAEEdlwFXRdk8r25IartB+jUH4hzjgDr0u4PtH4dH3bX
-         abYA6j9ELwPV7hwmSyldi+CXBrrUXl/ZgxEfWx5F28Us1m9VHNUuKBSChtLfhCiA1oxW
-         WLJQ==
-X-Gm-Message-State: ACrzQf1T5dZphVUgBWFUsc8xv6WLjCK5A5Vc7eI5g2acgrb4mCcPkoQP
-        WeN94uAC8D+bxpZcQmRwSadetg==
-X-Google-Smtp-Source: AMsMyM7JqeZAVXgNGynCXgynjXwAyFE7hjSnnBDGmaNtLpXl6XjEgEHwd4IDXyVuMlRfZxPvwlNagg==
-X-Received: by 2002:a63:1606:0:b0:43c:b5e1:5c52 with SMTP id w6-20020a631606000000b0043cb5e15c52mr15584384pgl.250.1664388209513;
-        Wed, 28 Sep 2022 11:03:29 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id j3-20020a63ec03000000b0043057fe66c0sm3864080pgh.48.2022.09.28.11.03.28
+        bh=bs5D0g2ItumdYX+ue+ZykeItEbF4U1JZ3UggoNJ4PwY=;
+        b=uklf3iCUguZzSScedzy3F5wYeQkRJCkwXVM1oBVcCLDd3vsX9b9as5Q6NXoTgVoZl7
+         ebGu28xpuuG6X3JB7ZTifM8n7y9ddzA1m+dD9WOZPHq+1UQRn+odjFkX9Z/gO5mul5pS
+         6abzocJ5WaFfLJlfKmi08GGzXxObv/GrifpKXh7ZdwainNRJsynp/bv1qqRHV0LOMaTR
+         GL9u5ZEGNCV4C/uYW8aESMDm2Qk7WLfJbJquDf6nId7+a4ud5el/M77OPQAtmBq5CXUp
+         8TAxMQKPo4dMmRe1WOp1B/gc2lDwwsoFD3gi4RhMgsv+3iQjLZzMXf64s60hO4UbgDh1
+         H/bw==
+X-Gm-Message-State: ACrzQf2FtagwQeWzNm0TJ9rJY0bH1LEcm45IPoBahOvK7rNDnu73VT99
+        e1ZYNX+IxMmadhpgrbMM2UglXg==
+X-Google-Smtp-Source: AMsMyM6sgEQzXow3Ue2nk5mlmhCBBzZ7H3WqSCOpv+sMEOnIornuNw1RUHnOPUTWNYIExbARkbbRsw==
+X-Received: by 2002:a17:902:bd8b:b0:179:d10e:97f with SMTP id q11-20020a170902bd8b00b00179d10e097fmr1041600pls.18.1664388629063;
+        Wed, 28 Sep 2022 11:10:29 -0700 (PDT)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
+        by smtp.gmail.com with ESMTPSA id h3-20020a628303000000b0053e8f4a10c1sm4266103pfe.217.2022.09.28.11.10.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 11:03:28 -0700 (PDT)
-Date:   Wed, 28 Sep 2022 18:03:25 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Li RongQing <lirongqing@baidu.com>
-Subject: Re: [PATCH v3 05/28] KVM: x86: Don't inhibit APICv/AVIC if xAPIC ID
- mismatch is due to 32-bit ID
-Message-ID: <YzSMbSXQXyUY7M7G@google.com>
-References: <20220920233134.940511-1-seanjc@google.com>
- <20220920233134.940511-6-seanjc@google.com>
- <d02d0b30-f29b-0ff6-98c7-89ddcd091c60@oracle.com>
- <e5d54876b233dc71a69249c3d02d649da5040a14.camel@redhat.com>
- <YzR7ezt67i1lH1/b@google.com>
- <1aea43e831cd7ed90c325b2c90bc6f3f9a1805b5.camel@redhat.com>
+        Wed, 28 Sep 2022 11:10:28 -0700 (PDT)
+Date:   Wed, 28 Sep 2022 11:10:25 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        andrew.jones@linux.dev, pbonzini@redhat.com, maz@kernel.org,
+        alexandru.elisei@arm.com, eric.auger@redhat.com, oupton@google.com,
+        reijiw@google.com, rananta@google.com, bgardon@google.com,
+        dmatlack@google.com, axelrasmussen@google.com
+Subject: Re: [PATCH v8 10/14] KVM: selftests: aarch64: Add
+ aarch64/page_fault_test
+Message-ID: <YzSOEYBp25DKYNVa@google.com>
+References: <20220922031857.2588688-1-ricarkol@google.com>
+ <20220922031857.2588688-11-ricarkol@google.com>
+ <Yyy4WjEmuSH1tSZb@google.com>
+ <YzHfwmZqMQ9xXaNa@google.com>
+ <YzNz36gZqrse9GzT@google.com>
+ <YzPMaEPBtaXguJaT@google.com>
+ <YzR9TRjVFi+P7UOp@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1aea43e831cd7ed90c325b2c90bc6f3f9a1805b5.camel@redhat.com>
+In-Reply-To: <YzR9TRjVFi+P7UOp@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,49 +80,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 28, 2022, Maxim Levitsky wrote:
-> On Wed, 2022-09-28 at 16:51 +0000, Sean Christopherson wrote:
-> > > > It happens regardless of vCPU count (tested with 2, 32, 255, 380, and 
-> > > > 512 vCPUs). This state persists for all subsequent reboots, until the VM 
-> > > > is terminated. For vCPU counts < 256, when x2apic is disabled the 
-> > > > problem does not occur, and AVIC continues to work properly after reboots.
+On Wed, Sep 28, 2022 at 04:58:53PM +0000, Sean Christopherson wrote:
+> On Tue, Sep 27, 2022, Ricardo Koller wrote:
+> > On Tue, Sep 27, 2022 at 10:06:23PM +0000, Sean Christopherson wrote:
+> > > On Mon, Sep 26, 2022, Ricardo Koller wrote:
+> > > > On Thu, Sep 22, 2022 at 07:32:42PM +0000, Sean Christopherson wrote:
+> > > > > On Thu, Sep 22, 2022, Ricardo Koller wrote:
+> > > > > > +	void *hva = (void *)region->region.userspace_addr;
+> > > > > > +	uint64_t paging_size = region->region.memory_size;
+> > > > > > +	int ret, fd = region->fd;
+> > > > > > +
+> > > > > > +	if (fd != -1) {
+> > > > > > +		ret = fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+> > > > > > +				0, paging_size);
+> > > > > > +		TEST_ASSERT(ret == 0, "fallocate failed, errno: %d\n", errno);
+> > > > > > +	} else {
+> > > > > > +		if (is_backing_src_hugetlb(region->backing_src_type))
+> > > > > > +			return false;
+> > > > > 
+> > > > > Why is hugetlb disallowed?  I thought anon hugetlb supports MADV_DONTNEED?
+> > > > > 
+> > > > 
+> > > > It fails with EINVAL (only tried on arm) for both the PAGE_SIZE and the huge
+> > > > page size. And note that the address is aligned as well.
+> > > > 
+> > > > madvise(0xffffb7c00000, 2097152, MADV_DONTNEED) = -1 EINVAL (Invalid argument)
+> > > > 	^^^^^^^^^^^^^^	^^^^^^^
+> > > > 	2M aligned	2M (hugepage size)
+> > > > 			
+> > > > madvise(0xffff9e800000, 4096, MADV_DONTNEED) = -1 EINVAL (Invalid argument)   
+> > > > 			^^^^
+> > > > 			PAGE_SIZE
+> > > 
+> > > I think this needs to be root caused before merging.  Unless I'm getting turned
+> > > around, MADV_DONTEED should work, i.e. there is a test bug lurking somewhere.
 > > 
-> > Bit of a shot in the dark, but does the below fix the issue?  There are two
-> > issues with calling kvm_lapic_xapic_id_updated() from kvm_apic_state_fixup():
+> > Turns out that the failure is documented. Found this in the madvise manpage:
 > > 
-> >   1. The xAPIC ID should only be refreshed on "set".
-> True - I didn't bother to fix it yet because it shouldn't cause harm, but
-> sure this needs to be fixed.
-
-It's probably benign on its own, but with the missing "hardware enabled" check,
-it could be problematic if userspace does KVM_GET_LAPIC while the APIC is hardware
-disabled, after the APIC was previously in x2APIC mode.  I'm guessing QEMU does
-KVM_GET_LAPIC state when emulating reboot, hence the potential for being involved
-in the bug Alejandro is seeing.
-
-> >   2. The refresh needs to be noted after memcpy(vcpu->arch.apic->regs, s->regs, sizeof(*s));
-> Are you sure? The check is first because if it fails, then error is returned to userspace
-> and the KVM's state left unchanged.
+> >   MADV_DONTNEED cannot be applied to locked pages, Huge TLB pages, or VM_PFNMAP pages.
 > 
-> I assume you are talking about 
+> The manpages are stale:
 > 
->         ....
-> 	r = kvm_apic_state_fixup(vcpu, s, true);
-> 	if (r) {
-> 		kvm_recalculate_apic_map(vcpu->kvm);
-> 		return r;
-> 	}
-> 	memcpy(vcpu->arch.apic->regs, s->regs, sizeof(*s));
+>    c4b6cb884011 ("selftests/vm: add hugetlb madvise MADV_DONTNEED MADV_REMOVE test")
+>    90e7e7f5ef3f ("mm: enable MADV_DONTNEED for hugetlb mappings")
+> 
+> The tools/testing/selftests/vm/hugetlb-madvise.c selftest effectively tests what
+> is being done here, so _something_ is broken.
 
-This isn't a failure path though, it's purely a "take note of the update", and
-KVM needs to do that processing _after_ the actual update.  Specifically,
-kvm_lapic_xapic_id_updated() consumes the internal APIC state:
+Thanks for the pointers. I was using old kernels (~5.15) for these
+latest tests. Testing on a 6.0-rc3 kernel fixed things: now able to
+madvise(MADV_DONTNEED) on anon-hugetlb from the selftest (arm).
 
-	if (kvm_xapic_id(apic) == apic->vcpu->vcpu_id)
-		return;
+Will remove the check (for skppping the test) in v9.
 
-Calling that before the internal state has been set with the incoming state from
-userspace is simply wrong.
-
-The check that the x2APIC ID is "correct" stays where it is, this is purely the
-"is the xAPIC ID different" path.
+Thanks!
+Ricardo
