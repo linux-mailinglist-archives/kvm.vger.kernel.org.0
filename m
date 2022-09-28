@@ -2,66 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC4545EE20A
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 18:41:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C3245EE20F
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 18:42:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233790AbiI1QlN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 12:41:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47250 "EHLO
+        id S234066AbiI1QmL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 12:42:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233850AbiI1QlL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 12:41:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEE236C74C
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 09:41:08 -0700 (PDT)
+        with ESMTP id S231587AbiI1QmJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 12:42:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1313DD574D
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 09:42:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664383268;
+        s=mimecast20190719; t=1664383328;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=w7yvyDDhwOplvoLz2+l06fL345Nn5UtPbR9Hw95aATs=;
-        b=H934egDm1s0yDyzcZRnmyCsFC4yqXm2vscdJNsArRyxS0EtP8tpyYpf6xrQoeoN/SqXE09
-        RB49u3l+hBmwXF+TLOuhppAPwaPTNU6M/14oqZswr/ipvrVV2NtktlQ2ggpZM3CQnB+W7K
-        UxjWvubbJKQkFgj8UfFUBHbpLa7RJb0=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=TnuxJM/ZwkodECcGRXyyBt7TlcJVtOiq1PshYO6uCqs=;
+        b=blTNi5scQUYwPnRaN6uO6VIn2tTgsA2TECEYWHHq4Rxf5XPoT5DyVDmPW51IJoJ7NOZpER
+        KDogZVMXxV4/G2kKCOJ89ZS3BRG4Nln95A5GTOUzT08y3im/YLPHU1Pa9hL1dE4yqhAmf9
+        Fu1ebKredeYUOfbVRVHjBh9z0UAcSWk=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-145-wiAaAavFPeazy3LDo6MDvg-1; Wed, 28 Sep 2022 12:41:05 -0400
-X-MC-Unique: wiAaAavFPeazy3LDo6MDvg-1
-Received: by mail-ed1-f72.google.com with SMTP id f18-20020a056402355200b0045115517911so10692275edd.14
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 09:41:04 -0700 (PDT)
+ us-mta-244-DlovOvzUN7u7nUwrb-q3JA-1; Wed, 28 Sep 2022 12:42:05 -0400
+X-MC-Unique: DlovOvzUN7u7nUwrb-q3JA-1
+Received: by mail-ej1-f71.google.com with SMTP id du10-20020a17090772ca00b00782e5bc9641so5515604ejc.23
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 09:42:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=w7yvyDDhwOplvoLz2+l06fL345Nn5UtPbR9Hw95aATs=;
-        b=JtypXlj43HMEBIe2b+OayoNvNHgT/q1TenctoVzmyuv0KKrC7Jjlf53g6VeeXae3Nl
-         s1E1LQo0deIrDKQeB6X8bfXrT5GVr2xgE/eh4eQ860GJkK7bSZEeXJ4PwsZZV6gbta93
-         AlX8LnHJZ4cAu+arvcQDlz2XyI6VfpM8bWxMK9PFPeSmOERDdDnR/KD1NGYdty17nHYU
-         PNxenhRMJPlsvtOXXWwTqB2q3g6m+PVStGK1TygGWftaxODI4w+smDW7b9/1rGjrL2D8
-         gybcPJgRLYe5gYXKvWzw3kJlUjxyvSuPN+dV0WstDTwoBqYk33QI74FqRR6i2uVOHk9K
-         ZuPQ==
-X-Gm-Message-State: ACrzQf0EJf5QMv6Ek0NdMCAm5B8b1jITvPF1nClc65kknxG+DPuSGXc6
-        tvDDS3tkWjpcPRVtYNlAtXdVuD7EMIU9kGzhPl+9e20IVbNEhpqaw1fxTUYf1ZEiKQP8hnBnAs8
-        T77s6PnKNqpvJ
-X-Received: by 2002:a17:907:6d08:b0:787:9027:cb8d with SMTP id sa8-20020a1709076d0800b007879027cb8dmr3401970ejc.396.1664383263302;
-        Wed, 28 Sep 2022 09:41:03 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7Jcx7MPqyjKrpHwcNInTTEPHhpMUmanQgJUCBtx3WSFeMZShooq5VirFuKXWAC719U1JKwrg==
-X-Received: by 2002:a17:907:6d08:b0:787:9027:cb8d with SMTP id sa8-20020a1709076d0800b007879027cb8dmr3401954ejc.396.1664383263072;
-        Wed, 28 Sep 2022 09:41:03 -0700 (PDT)
+        bh=TnuxJM/ZwkodECcGRXyyBt7TlcJVtOiq1PshYO6uCqs=;
+        b=H3RyQS8EbeZ0fq16u8bDCFUe1Gc8e5L7DpG+kDWLe4W9RstiR5QQNnaPVW/yE1L233
+         Kfj1TqMhsD00FAznIex2J03hvSY344lCXxX8JjRnIiXaeqipEPsClcy7ybS7p5p6bo9t
+         TBWlqvwmnALO5WIaLVxd3HxGOaAsu+k9ApEnvkQ2+rc+zL9hy0Wf142xHgXltM2xEbje
+         myd8dUaEJOQ3mMw8VzZxMM/wctT9B8P91GNHXzUHbxjKaeOASr7FhwR6WfUEetYT7DHQ
+         jVa5BOwCKCpORAi6KUWIltlYf4PxcgX8J5GYfZknc2DNRc0VkLWCycW/tDzucctdkp7R
+         YbHQ==
+X-Gm-Message-State: ACrzQf06qWdweXePEnM05UaYiq+U6lIL9VGUqprWRvLiMvzPE2P53X9Q
+        pRqzEtDScwa21mWSguxHIdNEluR6n4R9Yy2ZelxEGoJ71MvXfkeRi7XOyQi6LOdBAuFxmy6hB8q
+        UY690ehqFDKVZ
+X-Received: by 2002:a17:907:7204:b0:783:e152:f1f1 with SMTP id dr4-20020a170907720400b00783e152f1f1mr10654460ejc.119.1664383324535;
+        Wed, 28 Sep 2022 09:42:04 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM5eGcM6h9HE/CoQ6FfSmpE7Agb6ytD+BQYcT0Uc4nG4qcPwaw7CMsOy3vHVNR0VwzTi267SAQ==
+X-Received: by 2002:a17:907:7204:b0:783:e152:f1f1 with SMTP id dr4-20020a170907720400b00783e152f1f1mr10654427ejc.119.1664383324304;
+        Wed, 28 Sep 2022 09:42:04 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:2f4b:62da:3159:e077? ([2001:b07:6468:f312:2f4b:62da:3159:e077])
-        by smtp.googlemail.com with ESMTPSA id t15-20020a1709067c0f00b00772b5835c12sm2624370ejo.23.2022.09.28.09.41.01
+        by smtp.googlemail.com with ESMTPSA id d21-20020a170906305500b00773c60c2129sm2653030ejd.141.2022.09.28.09.42.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Sep 2022 09:41:02 -0700 (PDT)
-Message-ID: <46bc34f2-2a3d-8f38-a9f5-85bb9494285f@redhat.com>
-Date:   Wed, 28 Sep 2022 18:41:00 +0200
+        Wed, 28 Sep 2022 09:42:02 -0700 (PDT)
+Message-ID: <bb82895c-31bc-67af-d82d-c9342c665755@redhat.com>
+Date:   Wed, 28 Sep 2022 18:42:01 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.2.1
-Subject: Re: [RFC PATCH 1/9] kvm_main.c: move slot check in
- kvm_set_memory_region
+Subject: Re: [RFC PATCH 2/9] kvm.h: introduce KVM_SET_USER_MEMORY_REGION_LIST
+ ioctl
 Content-Language: en-US
 To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
         kvm@vger.kernel.org
@@ -77,14 +77,14 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Maxim Levitsky <mlevitsk@redhat.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
 References: <20220909104506.738478-1-eesposit@redhat.com>
- <20220909104506.738478-2-eesposit@redhat.com>
+ <20220909104506.738478-3-eesposit@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220909104506.738478-2-eesposit@redhat.com>
+In-Reply-To: <20220909104506.738478-3-eesposit@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -93,75 +93,62 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 9/9/22 12:44, Emanuele Giuseppe Esposito wrote:
-> And make kvm_set_memory_region static, since it is not used outside
-> kvm_main.c
+> This IOCTL enables atomic update of multiple memslots.
+> The userspace application provides a kvm_userspace_memory_region_list
+> containing a list of entries, each representing a modification to be
+> performed to a memslot.
+> 
+> Requests with invalidate_slot == 1 are pre-processed, because they
+> are ther DELETE or MOVE, and therefore the memslot must be first
+> replaced with a copy marked as KVM_MEMSLOT_INVALID, and then replaced.
 > 
 > Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
 > ---
->   include/linux/kvm_host.h |  2 --
->   virt/kvm/kvm_main.c      | 11 +++++------
->   2 files changed, 5 insertions(+), 8 deletions(-)
+>   include/uapi/linux/kvm.h | 21 ++++++++++++++++++++-
+>   1 file changed, 20 insertions(+), 1 deletion(-)
 > 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 3b40f8d68fbb..1c5b7b2e35dd 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1108,8 +1108,6 @@ enum kvm_mr_change {
->   	KVM_MR_FLAGS_ONLY,
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index a36e78710382..673496b91a25 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -103,6 +103,24 @@ struct kvm_userspace_memory_region {
+>   	__u64 userspace_addr; /* start of the userspace allocated memory */
 >   };
 >   
-> -int kvm_set_memory_region(struct kvm *kvm,
-> -			  const struct kvm_userspace_memory_region *mem);
->   int __kvm_set_memory_region(struct kvm *kvm,
->   			    const struct kvm_userspace_memory_region *mem);
->   void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot);
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index da263c370d00..339de0ed4557 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2007,24 +2007,23 @@ int __kvm_set_memory_region(struct kvm *kvm,
->   }
->   EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
->   
-> -int kvm_set_memory_region(struct kvm *kvm,
-> -			  const struct kvm_userspace_memory_region *mem)
-> +static int kvm_set_memory_region(struct kvm *kvm,
-> +				 const struct kvm_userspace_memory_region *mem)
->   {
->   	int r;
->   
-> +	if ((u16)mem->slot >= KVM_USER_MEM_SLOTS)
-> +		return -EINVAL;
+> +/* for KVM_SET_USER_MEMORY_REGION_LIST */
+> +struct kvm_userspace_memory_region_entry {
+> +	__u32 slot;
+> +	__u32 flags;
+> +	__u64 guest_phys_addr;
+> +	__u64 memory_size; /* bytes */
+> +	__u64 userspace_addr; /* start of the userspace allocated memory */
+> +	__u8 invalidate_slot;
+> +	__u8 padding[31];
+> +};
 > +
->   	mutex_lock(&kvm->slots_lock);
->   	r = __kvm_set_memory_region(kvm, mem);
->   	mutex_unlock(&kvm->slots_lock);
->   	return r;
->   }
-> -EXPORT_SYMBOL_GPL(kvm_set_memory_region);
->   
->   static int kvm_vm_ioctl_set_memory_region(struct kvm *kvm,
->   					  struct kvm_userspace_memory_region *mem)
->   {
-> -	if ((u16)mem->slot >= KVM_USER_MEM_SLOTS)
-> -		return -EINVAL;
+> +/* for KVM_SET_USER_MEMORY_REGION_LIST */
+> +struct kvm_userspace_memory_region_list {
+> +	__u32 nent;
+> +	__u32 flags;
+> +	struct kvm_userspace_memory_region_entry entries[0];
+> +};
+> +
+>   /*
+>    * The bit 0 ~ bit 15 of kvm_memory_region::flags are visible for userspace,
+>    * other bits are reserved for kvm internal use which are defined in
+> @@ -1444,7 +1462,8 @@ struct kvm_vfio_spapr_tce {
+>   					struct kvm_userspace_memory_region)
+>   #define KVM_SET_TSS_ADDR          _IO(KVMIO,   0x47)
+>   #define KVM_SET_IDENTITY_MAP_ADDR _IOW(KVMIO,  0x48, __u64)
 > -
->   	return kvm_set_memory_region(kvm, mem);
->   }
->   
+> +#define KVM_SET_USER_MEMORY_REGION_LIST _IOW(KVMIO, 0x49, \
+> +					struct kvm_userspace_memory_region_list)
+>   /* enable ucontrol for s390 */
+>   struct kvm_s390_ucas_mapping {
+>   	__u64 user_addr;
 
-The idea here was that kvm_set_memory_region could be used to set 
-private memory slots while not taking kvm->slots_lock.
-
-So, I would instead:
-
-1) rename __kvm_set_memory_region to kvm_set_memory_region;
-
-2) inline the old kvm_set_memory_region into kvm_vm_ioctl_set_memory_region.
-
-3) replace the comment "Must be called holding kvm->slots_lock for 
-write." with a proper lockdep_assert_held() now that the function 
-doesn't have the __ warning sign in front of it.
+Looks good; however, in the non-RFC I suggest adding documentation in 
+this patch already (so no Reviewed-by yet).
 
 Paolo
 
