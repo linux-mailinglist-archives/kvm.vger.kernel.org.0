@@ -2,128 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 023755ED54C
-	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 08:48:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 71C2D5ED5B9
+	for <lists+kvm@lfdr.de>; Wed, 28 Sep 2022 09:11:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229818AbiI1GsZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 02:48:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43166 "EHLO
+        id S233269AbiI1HLG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 03:11:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233310AbiI1Grs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 02:47:48 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89513D2D5E
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 23:45:43 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id c24so11028294plo.3
-        for <kvm@vger.kernel.org>; Tue, 27 Sep 2022 23:45:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=3oi+SDB8187tzA+ckFvB0jb9wA6Rb4ijKO33wMIa3kM=;
-        b=HiSxXIOHuPkQ3xrIKJ5Z6SZRWTXyIafydST8v7WI2ilz914qeGnYOHeWoS5ywVxQoh
-         jMCcB22d95dWnK522xTJ2MF296aNbYi9UoXj7T+ke7gG1dvd4OrSsxU8edRpVODg99xy
-         mfIMxF5uvvIl6Lq+COZ9rGpIQav6gZE4nSgZo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=3oi+SDB8187tzA+ckFvB0jb9wA6Rb4ijKO33wMIa3kM=;
-        b=jjf9RDaZj+FR/UxrcD7NQEzhbtnXLDo/bfqE7RAycD9FjJLQX9DuhLZ7wAnbOe/RUB
-         /Ce/d+bnciEwmnndBzL3u5O92U9zIAhLC8JOpSWWydKEJg/7dg54vQ4hmh7mZxzogC+/
-         OsxbyRQJ0+ou+ZjM+FwbioSRdOFGn+ecTFdtKKbAqNIYCaxpiWXsPuiLOpLWB0xTEJz1
-         8DEmqeYAQt+vUGmqHy0Ixa/9pGkfQAT2uPsmaULZSsd0d5ThKAI6lOC0ARdK1IgHXD9i
-         jgCh7WE5vLPFlEQRp8ZpfdjJw5N7nKFvgXIF5xBCYeFw4kOnYhVsveW1pe+lqk7dbfAx
-         l+Iw==
-X-Gm-Message-State: ACrzQf3xXJ2JaHjYf1DIj8DlV9u/SKuXZUeVZOWxLlzW4fRAwoaAmsKU
-        s85PNm47q9vXvOHen858h54aTw==
-X-Google-Smtp-Source: AMsMyM6WS7BEaumrqQGACwZzKkPH3LAw4ZdRXJeMcZ4rU1pyupbOPHSROeHptmy3p/OepWGlNZ8eZQ==
-X-Received: by 2002:a17:90b:4c8a:b0:202:b3cd:f960 with SMTP id my10-20020a17090b4c8a00b00202b3cdf960mr8881218pjb.129.1664347543006;
-        Tue, 27 Sep 2022 23:45:43 -0700 (PDT)
-Received: from localhost (82.181.189.35.bc.googleusercontent.com. [35.189.181.82])
-        by smtp.gmail.com with UTF8SMTPSA id w16-20020aa79a10000000b0053639773ad8sm3053640pfj.119.2022.09.27.23.45.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Sep 2022 23:45:42 -0700 (PDT)
-From:   Junichi Uekawa <uekawa@chromium.org>
-To:     Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
-        netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        mst@redhat.com, Paolo Abeni <pabeni@redhat.com>,
-        linux-kernel@vger.kernel.org, Junichi Uekawa <uekawa@chromium.org>
-Subject: [PATCH] vhost/vsock: Use kvmalloc/kvfree for larger packets.
-Date:   Wed, 28 Sep 2022 15:45:38 +0900
-Message-Id: <20220928064538.667678-1-uekawa@chromium.org>
-X-Mailer: git-send-email 2.37.3.998.g577e59143f-goog
+        with ESMTP id S232396AbiI1HLD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 03:11:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38F6913CC7
+        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 00:11:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664349060;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wnwp0ICYi0IL1E+eNZ2+WEbweWyAgkGiqxsj7EWaexk=;
+        b=bv0tq9ebrbdH1dZF0bnLRjDeRERs/YPbMSOUt/mz+F6kLmv3rHaBt+XqhQHwRYVl8i2mri
+        +AJPy+Km616Rj4RCK3QDvXulNWJ/9iNIH+vwF0upzo+V7VqVAcviEozhO9T6bC25ktU4Ff
+        UiB8bOB7i7LxVlj+hgMBoB6K9d917Ns=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-510-crNMTAxROma0_8wVriaKgg-1; Wed, 28 Sep 2022 03:10:55 -0400
+X-MC-Unique: crNMTAxROma0_8wVriaKgg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7202D3C0D188;
+        Wed, 28 Sep 2022 07:10:55 +0000 (UTC)
+Received: from starship (unknown [10.40.193.233])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 35B681121315;
+        Wed, 28 Sep 2022 07:10:54 +0000 (UTC)
+Message-ID: <ed74c9a9d6a0d2fd2ad8bd98214ad36e97c243a0.camel@redhat.com>
+Subject: Re: [PATCH] KVM: x86: disable on 32-bit unless CONFIG_BROKEN
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Date:   Wed, 28 Sep 2022 10:10:53 +0300
+In-Reply-To: <YzMt24/14n1BVdnI@google.com>
+References: <20220926165112.603078-1-pbonzini@redhat.com>
+         <YzMt24/14n1BVdnI@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When copying a large file over sftp over vsock, data size is usually 32kB,
-and kmalloc seems to fail to try to allocate 32 32kB regions.
+On Tue, 2022-09-27 at 17:07 +0000, Sean Christopherson wrote:
+> On Mon, Sep 26, 2022, Paolo Bonzini wrote:
+> > 32-bit KVM has extra complications in the code due to:
+> > 
+> > - different ways to write 64-bit values in VMCS
+> > 
+> > - different handling of DS and ES selectors as well as FS/GS bases
+> > 
+> > - lack of CR8 and EFER
+> > 
+> > - lack of XFD
+> > 
+> 
+> More for the list:
+> 
+>   - SVM is effectively restricted to PAE kernels due to NX requirements
+> 
+> > - impossibility of writing 64-bit PTEs atomically
+> 
+> It's not impossible, just ugly.  KVM could use CMPXCHG8B to do all of the accesses
+> for the TDP MMU, including the non-atomic reads and writes.
+> 
+> > The last is the big one, because it prevents from using the TDP MMU
+> > unconditionally.
+> 
+> As above, if the TDP MMU really is the sticking point, that's solvable.
+> 
+> The real justification for deprecating 32-bit KVM is that, outside of KVM developers,
+> literally no one uses 32-bit KVM.  I.e. any amount of effort that is required to
+> continue supporting 32-bit kernels is a complete waste of resources.
+> 
 
- Call Trace:
-  [<ffffffffb6a0df64>] dump_stack+0x97/0xdb
-  [<ffffffffb68d6aed>] warn_alloc_failed+0x10f/0x138
-  [<ffffffffb68d868a>] ? __alloc_pages_direct_compact+0x38/0xc8
-  [<ffffffffb664619f>] __alloc_pages_nodemask+0x84c/0x90d
-  [<ffffffffb6646e56>] alloc_kmem_pages+0x17/0x19
-  [<ffffffffb6653a26>] kmalloc_order_trace+0x2b/0xdb
-  [<ffffffffb66682f3>] __kmalloc+0x177/0x1f7
-  [<ffffffffb66e0d94>] ? copy_from_iter+0x8d/0x31d
-  [<ffffffffc0689ab7>] vhost_vsock_handle_tx_kick+0x1fa/0x301 [vhost_vsock]
-  [<ffffffffc06828d9>] vhost_worker+0xf7/0x157 [vhost]
-  [<ffffffffb683ddce>] kthread+0xfd/0x105
-  [<ffffffffc06827e2>] ? vhost_dev_set_owner+0x22e/0x22e [vhost]
-  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
-  [<ffffffffb6eb332e>] ret_from_fork+0x4e/0x80
-  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
+I also think that outside KVM developers nobody should be using KVM on 32 bit host.
 
-Work around by doing kvmalloc instead.
+However for _developement_ I think that 32 bit KVM support is very useful, as it
+allows to smoke test the support for 32 bit nested hypervisors, which I do once in a while,
+and can even probably be useful to some users (e.g running some legacy stuff in a VM,
+which includes a hypervisor, especially to run really legacy OSes / custom bare metal software,
+using an old hypervisor) - or in other words, 32 bit nested KVM is mostly useless, but
+other 32 bit nested hypervisors can be useful.
 
-Signed-off-by: Junichi Uekawa <uekawa@chromium.org>
----
+Yes, I can always use an older 32 bit kernel in a guest with KVM support, but as long
+as current kernel works, it is useful to use the same kernel on host and guest.
 
- drivers/vhost/vsock.c                   | 2 +-
- net/vmw_vsock/virtio_transport_common.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index 368330417bde..5703775af129 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -393,7 +393,7 @@ vhost_vsock_alloc_pkt(struct vhost_virtqueue *vq,
- 		return NULL;
- 	}
- 
--	pkt->buf = kmalloc(pkt->len, GFP_KERNEL);
-+	pkt->buf = kvmalloc(pkt->len, GFP_KERNEL);
- 	if (!pkt->buf) {
- 		kfree(pkt);
- 		return NULL;
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index ec2c2afbf0d0..3a12aee33e92 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -1342,7 +1342,7 @@ EXPORT_SYMBOL_GPL(virtio_transport_recv_pkt);
- 
- void virtio_transport_free_pkt(struct virtio_vsock_pkt *pkt)
- {
--	kfree(pkt->buf);
-+	kvfree(pkt->buf);
- 	kfree(pkt);
- }
- EXPORT_SYMBOL_GPL(virtio_transport_free_pkt);
--- 
-2.37.3.998.g577e59143f-goog
+Best regards,
+	Maxim Levitsky
 
