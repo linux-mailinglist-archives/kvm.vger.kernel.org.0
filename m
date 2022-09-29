@@ -2,138 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 734305EFCF6
-	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 20:24:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 914865EFD00
+	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 20:25:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235749AbiI2SYk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Sep 2022 14:24:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45880 "EHLO
+        id S235839AbiI2SZc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Sep 2022 14:25:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232380AbiI2SYh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Sep 2022 14:24:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C14D463FB
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 11:24:35 -0700 (PDT)
+        with ESMTP id S234852AbiI2SZV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Sep 2022 14:25:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63C60EC566
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 11:25:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664475874;
+        s=mimecast20190719; t=1664475918;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=BoITIusWH1pgiQYYyYgg2aTCkDBnXRgVNx9UWZzrGmA=;
-        b=OqcMvHd+HH89EI8UXhMCTpgc95JY4q2oPDPDMHN+rG+xKoIKL6KQo3Q1ABrYRtnFvu41+l
-        JiJvhpYBHgd7ITHa6cpubjXPTQdb3dxfutlcJURTUvmseF9waOP0/Zdcov0RCPcG3FaM2e
-        gjF7RIegpRW3AWLNPVEbMpYzSyCj2xY=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=v5ibpYJAS+Lvg2X1zKklFXddDq44aJbMNXPWgjFNAYk=;
+        b=faRvr+GzpHiOHG7sKQf1gqSzlV4n/KwqFmKhM729YNvbjkShR7YXp1FGygo97Z3qwqTWl4
+        J8MtHaaHpNjETtNElkk4v55ak2jPo8Bim1trNL0AQagkyedjMYFWRJCnarYKo9Pn/5gYxS
+        Dds9pV7t8lboyJ9l6zcgrj+Mp/fqNdU=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-595-VDKMwLFJPgKG14acipS2hw-1; Thu, 29 Sep 2022 14:24:33 -0400
-X-MC-Unique: VDKMwLFJPgKG14acipS2hw-1
-Received: by mail-il1-f200.google.com with SMTP id x3-20020a056e021ca300b002f855cd264cso1704471ill.7
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 11:24:33 -0700 (PDT)
+ us-mta-640-Huc9_IUMMXiWArmT8fqCjw-1; Thu, 29 Sep 2022 14:25:17 -0400
+X-MC-Unique: Huc9_IUMMXiWArmT8fqCjw-1
+Received: by mail-ed1-f71.google.com with SMTP id c6-20020a05640227c600b004521382116dso1857312ede.22
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 11:25:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=BoITIusWH1pgiQYYyYgg2aTCkDBnXRgVNx9UWZzrGmA=;
-        b=rpCbGEU0hLCO5X9GPNF2Ash1n3M4SgeStbyXOuhQbgt/ey8rjPNiUd8kctU7ATfaq5
-         Fe3HXizsBAiIUEYzqXN07dwkwcT5UXX04FPVNfPYybvGYqcf1bnua6JvijgI8A/nr1xT
-         8IuXbPPoSl86locGvV9xUxSCYqakzKSGVds2RF7slgaK/UWJK9Cp6gkQ8m9zWOjxsxOr
-         k0ozGBZyCTK7501/kgsOvYrA1VXbuzeDo0askiSFsadcNpv+8nMz/8NNELdYpkTVjoew
-         OVVn4QGKu37p7b5H7O/VbZ07V+bgum4mmg2epa0+OJxNXrbsKqZlCPn4V/Vnuy1QvXyR
-         7Zgg==
-X-Gm-Message-State: ACrzQf0r3gA2ylUM1JSIeX1AHDxQr49+3Kjs+X0jdnw5S2AP/12sSZQ2
-        yCR7I1r8S3Te9GPs46CQrbjkMfbutxZIVuueyBynTkLE7rKZ5o0EUJM4rq2jyJF+vq5GXBYLc7e
-        AAzo+81FfRycT
-X-Received: by 2002:a05:6e02:19ce:b0:2f1:68a6:3bec with SMTP id r14-20020a056e0219ce00b002f168a63becmr2392085ill.78.1664475872945;
-        Thu, 29 Sep 2022 11:24:32 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7KUOQo8AbbarGobEgnbxdcS5bS2mn744LEcpjpU+rvkCIe35jyhAfEJ5Pm5FWlRH0iLBHEPg==
-X-Received: by 2002:a05:6e02:19ce:b0:2f1:68a6:3bec with SMTP id r14-20020a056e0219ce00b002f168a63becmr2392060ill.78.1664475872712;
-        Thu, 29 Sep 2022 11:24:32 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id f13-20020a05660215cd00b006a1fed36549sm96051iow.10.2022.09.29.11.24.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Sep 2022 11:24:31 -0700 (PDT)
-Date:   Thu, 29 Sep 2022 12:24:27 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Kevin Tian <kevin.tian@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Longfang Liu <liulongfang@huawei.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Abhishek Sahu <abhsahu@nvidia.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, Yi Liu <yi.l.liu@intel.com>
-Subject: Re: [PATCH v4 15/15] vfio: Add struct device to vfio_device
-Message-ID: <20220929122427.3a3bca9a.alex.williamson@redhat.com>
-In-Reply-To: <YzXaxPpkc+90Xx+T@ziepe.ca>
-References: <20220921104401.38898-1-kevin.tian@intel.com>
-        <20220921104401.38898-16-kevin.tian@intel.com>
-        <20220929105519.5c9ae1d8.alex.williamson@redhat.com>
-        <YzXaxPpkc+90Xx+T@ziepe.ca>
-Organization: Red Hat
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=v5ibpYJAS+Lvg2X1zKklFXddDq44aJbMNXPWgjFNAYk=;
+        b=3eLMWwNYydYrWib7LlJrQXkk6StCf0LIJOprXNTAyQPTdebQFg7Tirfn9/f8oXAqwJ
+         Ve31M94GV88GnMUVcghkfALTHH34XULTquaAFlpJsHAz3iPkU99LQd3b8idNUdiPOoWL
+         44ucwCgDKd6WO27x9JFRXPW7+NVYN9Rj1a93/CH0u+15PoU7raGLzEr8I3Qtd+S+bd+3
+         3yf7xnPO3UPmoA6zb1DMuV3cHCxdjADk1JNxitJ5sK4nq47sKvaP/SXSLW9/OquUfuay
+         bJs4yCxpxKEHQSa7p9KITXZFsPzjrmfQx769Uw0zvSaKlLZVIXV5dj8UsSMeFrYv+ZhI
+         O1Xw==
+X-Gm-Message-State: ACrzQf1YLUAeMtCMyL1L3I8iRULteqGURToxBm6uO+AbrbGOeRHrdyiE
+        d/Pa3+xtPtEu3yYG0M35T3++9YYDNUCXZ/B1h9+PMBhkk+do9NQWHzVZJf3/blTArv+hyTQynSg
+        nXRqyS0uUlIue
+X-Received: by 2002:a05:6402:1394:b0:456:97cd:e9d4 with SMTP id b20-20020a056402139400b0045697cde9d4mr4636304edv.174.1664475916051;
+        Thu, 29 Sep 2022 11:25:16 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4dWlnWCVVkL5jqSUwxXZU+tZyksMHEMPDuLDC1ArTD8Nnvk8mkVFTHP5mAxDcyx/ndWbU4Ow==
+X-Received: by 2002:a05:6402:1394:b0:456:97cd:e9d4 with SMTP id b20-20020a056402139400b0045697cde9d4mr4636289edv.174.1664475915848;
+        Thu, 29 Sep 2022 11:25:15 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
+        by smtp.googlemail.com with ESMTPSA id kv12-20020a17090778cc00b0072af4af2f46sm4323813ejc.74.2022.09.29.11.25.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Sep 2022 11:25:15 -0700 (PDT)
+Message-ID: <830f9f23-3439-5f7a-b6be-8769ed5970c4@redhat.com>
+Date:   Thu, 29 Sep 2022 20:25:14 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [PATCH v3 0/3] KVM: selftests: Fix nx_huge_pages_test when TDP is
+ disabled
+Content-Language: en-US
+To:     David Matlack <dmatlack@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Ben Gardon <bgardon@google.com>, Peter Xu <peterx@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Yang Zhong <yang.zhong@intel.com>,
+        Wei Wang <wei.w.wang@intel.com>, kvm@vger.kernel.org
+References: <20220929181207.2281449-1-dmatlack@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220929181207.2281449-1-dmatlack@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 29 Sep 2022 14:49:56 -0300
-Jason Gunthorpe <jgg@ziepe.ca> wrote:
-
-> On Thu, Sep 29, 2022 at 10:55:19AM -0600, Alex Williamson wrote:
-> > Hi Kevin,
-> > 
-> > This introduced the regression discovered here:
-> > 
-> > https://lore.kernel.org/all/20220928125650.0a2ea297.alex.williamson@redhat.com/
-> > 
-> > Seems we're not releasing the resources when removing an mdev.  This is
-> > a regression, so it needs to be fixed or reverted before the merge
-> > window.  Thanks,  
+On 9/29/22 20:12, David Matlack wrote:
+> Fix nx_huge_pages_test when run on TDP-disabled hosts by mapping the
+> test region with huge pages in the VM so that KVM can shadow it with
+> huge pages.
 > 
-> My guess at the fix for this:
+> Patches 1 and 2 are precursor patches to add the necessary
+> infrastructure to check if TDP is enabled or not.
+
+Queued, thanks.  For now I placed them in kvm/master, but I think they 
+will not be in 6.0.
+
+Paolo
+
+> v3:
+>   - Skip the selftest if a module param file cannot be opened [Sean]
+>   - Add wrappers for reading kvm_intel and kvm_amd params [Sean]
+>   - Small renames and error reporting cleanups [Sean]
+>   - Decrease sysfs path array from 1024 to 128 bytes [me]
 > 
-> https://lore.kernel.org/r/0-v1-013609965fe8+9d-vfio_gvt_unregister_jgg@nvidia.com
-
-Indeed this seems to work  I'll look for acks and further reviews from
-Intel folks. Thanks!
-
-Alex
+> v2: https://lore.kernel.org/kvm/20220928184853.1681781-1-dmatlack@google.com/
+>   - Still use 4K mappins on TDP-enabled hosts [Sean]
+>   - Generalize virt_map_2m() to virt_map_level() [me]
+>   - Pass nr_bytes instead of nr_pages to virt_map_level() [Sean]
+> 
+> v1: https://lore.kernel.org/kvm/20220926175219.605113-1-dmatlack@google.com/
+> 
+> David Matlack (3):
+>    KVM: selftests: Tell the compiler that code after TEST_FAIL() is
+>      unreachable
+>    KVM: selftests: Add helpers to read kvm_{intel,amd} boolean module
+>      parameters
+>    KVM: selftests: Fix nx_huge_pages_test on TDP-disabled hosts
+> 
+>   .../selftests/kvm/include/kvm_util_base.h     |  4 ++
+>   .../testing/selftests/kvm/include/test_util.h |  6 ++-
+>   .../selftests/kvm/include/x86_64/processor.h  |  4 ++
+>   tools/testing/selftests/kvm/lib/kvm_util.c    | 39 ++++++++++++++++++
+>   .../selftests/kvm/lib/x86_64/processor.c      | 40 +++++++++++++------
+>   .../selftests/kvm/x86_64/nx_huge_pages_test.c | 19 ++++++++-
+>   6 files changed, 96 insertions(+), 16 deletions(-)
+> 
+> 
+> base-commit: 372d07084593dc7a399bf9bee815711b1fb1bcf2
+> prerequisite-patch-id: 2e3661ba8856c29b769499bac525b6943d9284b8
 
