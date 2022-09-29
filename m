@@ -2,95 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 723935F00D6
-	for <lists+kvm@lfdr.de>; Fri, 30 Sep 2022 00:44:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD1255F00F1
+	for <lists+kvm@lfdr.de>; Fri, 30 Sep 2022 00:46:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230019AbiI2Wn6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Sep 2022 18:43:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32784 "EHLO
+        id S230335AbiI2Wqc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Sep 2022 18:46:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbiI2WnI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Sep 2022 18:43:08 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FA14184817
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 15:38:46 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id x1-20020a17090ab00100b001fda21bbc90so7292168pjq.3
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 15:38:46 -0700 (PDT)
+        with ESMTP id S230104AbiI2Wpw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Sep 2022 18:45:52 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3FBB386AE;
+        Thu, 29 Sep 2022 15:45:20 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id w2so2719165pfb.0;
+        Thu, 29 Sep 2022 15:45:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=uRYofiYnG47hAF2aDgziR8isJuYRbsZpgovud56j32A=;
-        b=JZPVhVcSMWJOlPWPeuO7TIk2QE8xzCYuAuPJMIvNL9e/7DEG7nT1s/j0a++TuIXoJt
-         W5tOkUQ3APGpHGPx2aDs0EQFmPuIgBA+4T0avm1Lg0UJhYZ3xUC1RzFzgaGhbslD+zEA
-         8NgZgevTkenFB0f0XOWYHbeCZsUerfUuHJ0MRFMwXM5XuUFT0t5SADRdJ0rMU3iZnQpx
-         iMve53x366pyZVcyz/wlrlsM3/1JBISjrdscSFwoyHMKAyPnzbLjIdZA8bJqQmwrTVBh
-         qX5XlvQpPaLRv1P2ont+Bp7rvzNsL9me5BwcB/JytVGVWSrVmlRW7tys/zv1TCWNsOeo
-         isHw==
+        bh=ByScpYkyRiCU42lbuVk6qEFlopY8wZGmivn5KTd4TkE=;
+        b=lCAg7J5XBsmL67S4ZX++/AHEh9LqfKfUqfXAwLH9JogkhvyRO83RZ1Du9C4di0rODz
+         kLZh/NE3uWWM/16Hp3uljQIoX0MFNKNuV3C68eln7snytpYC2ZwiQ/V0cLeGd1eHLwBC
+         xZUPST6xsPprIa2dWHCykDOU91y140Q5KWomGApBmM0iNB3o1LdjW/DQ7VqhYIf1E8u2
+         h43ebHa7BCSKFwUduXxQhPuT5TwVny9wTPKsyTwC1K3cE1PDMdpfFs5LAi7yM1CLwhBA
+         SRQHTIlNp9clZhJVcQu1Dmhn2ngA/E21LXi/BXNoOBp9H7PEa/hZUshHWpvqrAmmDNji
+         +OWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=uRYofiYnG47hAF2aDgziR8isJuYRbsZpgovud56j32A=;
-        b=NSgAPzqu4HLnDHqzVuOVKxw1QNpVfN+Fq0baYTTVu26TqHLhk6rI8EAe7h8ZRtm69w
-         giyQMV4SLdX4bSL3rFelKAm+yQRZNwAUBX0Zog966DqC2hnD3QhZI5ymTp7fSJI9i3m0
-         3yYJnJTx4nkPt+UeMeaIsXkT3YgiVUTztfE7jDAYx7q86HtcphEzQfS7YSr9h4pGWUOF
-         h5U4cJuqS3/VDF/KrVjO9qyTNjJizcGQmqBU2cpUk2+V+dY+GJPtfOuTo63NyZx+zQ7T
-         cVzzlLoCc1eznSOfsVOBsaxDk0o3gBlG+g1hQJr24O/Ndb74cibpOo850/d59qsOYgvr
-         jY4Q==
-X-Gm-Message-State: ACrzQf1559TUbm0VgjUqV8NGcSSuVC+OWoouDsPMhtrDIQa7AyY4nCVB
-        dG7/GdvkEGWHfUMv8jiSl+KWSg==
-X-Google-Smtp-Source: AMsMyM6yC6NkaBuBd+HCYZGGqRfzh1aqwwfKXWPEPMxkZ/E1X0XuzRLSKCq/ziAdT/GnArgh0pqgvg==
-X-Received: by 2002:a17:903:441:b0:179:f1cc:ba89 with SMTP id iw1-20020a170903044100b00179f1ccba89mr5683259plb.146.1664491089036;
-        Thu, 29 Sep 2022 15:38:09 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id w2-20020a170902e88200b0017829a3df46sm384797plg.204.2022.09.29.15.38.08
+        bh=ByScpYkyRiCU42lbuVk6qEFlopY8wZGmivn5KTd4TkE=;
+        b=kjGJVOCcN8AG7yVFyDxNPzY8T/qzqS7FUQRXn+39oAMuLBjlD3QR8c/55sEzQnEUm9
+         y6dvvb6YRIivQ73RJDaxQ627gm4Tza/V5HyoOOC8KU485mNmqQ77FfGHJnuGIKbPDujx
+         7FL6RvZfF9vFXuClVF7zYtHORtRZqXLZNmpv8T5GMQiHXb8+Ay9lM0lRw3V5vcUfjSr3
+         vrWWXr5+hjW8yavzgWL6bcPp12VMkPWT8CCcHPY9n+qC6DaMVU5MiPDczf73KV8Abib+
+         KlrLwW6G5I8yJyvAo/Z/FyohEZVVRS3m0peyJnTocE7EMvttS/TiI9IEMJK5c4XLmAEk
+         qs6Q==
+X-Gm-Message-State: ACrzQf1rFZDXllMfMqe4qYcA8bIkE6i3SFemGJmnR0ImVEO47eP3R36G
+        PnmtRcrmuG+jcdurKxNoIU4=
+X-Google-Smtp-Source: AMsMyM6MQvFe701ujja7rvZea79ByiauTnUf8YlkU9ZkqGQBYquDrfuLbNd+uGgJ3lljB5PQecL3LA==
+X-Received: by 2002:a63:4d4:0:b0:438:ce28:757f with SMTP id 203-20020a6304d4000000b00438ce28757fmr4873802pge.441.1664491520310;
+        Thu, 29 Sep 2022 15:45:20 -0700 (PDT)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id u11-20020a170903124b00b001754cfb5e21sm415508plh.96.2022.09.29.15.45.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Sep 2022 15:38:08 -0700 (PDT)
-Date:   Thu, 29 Sep 2022 22:38:04 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
+        Thu, 29 Sep 2022 15:45:18 -0700 (PDT)
+Date:   Thu, 29 Sep 2022 15:45:16 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        David Airlie <airlied@linux.ie>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        intel-gfx@lists.freedesktop.org, Daniel Vetter <daniel@ffwll.ch>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org
-Subject: Re: Nested AVIC design (was:Re: [RFC PATCH v3 04/19] KVM: x86: mmu:
- allow to enable write tracking externally)
-Message-ID: <YzYeTCsNfQWccKJ9@google.com>
-References: <20220427200314.276673-1-mlevitsk@redhat.com>
- <20220427200314.276673-5-mlevitsk@redhat.com>
- <YoZyWOh4NPA0uN5J@google.com>
- <5ed0d0e5a88bbee2f95d794dbbeb1ad16789f319.camel@redhat.com>
- <c22a18631c2067871b9ed8a9246ad58fa1ab8947.camel@redhat.com>
- <Yt6/9V0S9of7dueW@google.com>
- <7c4cf32dca42ab84bdb427a9e4862dbf5509f961.camel@redhat.com>
- <YugLc5LLPJkt89z6@google.com>
- <fe76ea902a38a10e2d8078fd9e5a71a0c7724d84.camel@redhat.com>
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com,
+        isaku.yamahata@gmail.com
+Subject: Re: [PATCH v8 2/8] KVM: Extend the memslot to support fd-based
+ private memory
+Message-ID: <20220929224516.GA2260388@ls.amr.corp.intel.com>
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-3-chao.p.peng@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <fe76ea902a38a10e2d8078fd9e5a71a0c7724d84.camel@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+In-Reply-To: <20220915142913.2213336-3-chao.p.peng@linux.intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -98,29 +100,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 08, 2022, Maxim Levitsky wrote:
-> Hi Sean, Paolo, and everyone else who wants to review my nested AVIC work.
+On Thu, Sep 15, 2022 at 10:29:07PM +0800,
+Chao Peng <chao.p.peng@linux.intel.com> wrote:
+...
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 584a5bab3af3..12dc0dc57b06 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+...
+> @@ -4622,6 +4622,33 @@ static int kvm_vm_ioctl_get_stats_fd(struct kvm *kvm)
+>  	return fd;
+>  }
+>  
+> +#define SANITY_CHECK_MEM_REGION_FIELD(field)					\
+> +do {										\
+> +	BUILD_BUG_ON(offsetof(struct kvm_user_mem_region, field) !=		\
+> +		     offsetof(struct kvm_userspace_memory_region, field));	\
+> +	BUILD_BUG_ON(sizeof_field(struct kvm_user_mem_region, field) !=		\
+> +		     sizeof_field(struct kvm_userspace_memory_region, field));	\
+> +} while (0)
+> +
+> +#define SANITY_CHECK_MEM_REGION_EXT_FIELD(field)					\
+> +do {											\
+> +	BUILD_BUG_ON(offsetof(struct kvm_user_mem_region, field) !=			\
+> +		     offsetof(struct kvm_userspace_memory_region_ext, field));		\
+> +	BUILD_BUG_ON(sizeof_field(struct kvm_user_mem_region, field) !=			\
+> +		     sizeof_field(struct kvm_userspace_memory_region_ext, field));	\
+> +} while (0)
+> +
+> +static void kvm_sanity_check_user_mem_region_alias(void)
+> +{
+> +	SANITY_CHECK_MEM_REGION_FIELD(slot);
+> +	SANITY_CHECK_MEM_REGION_FIELD(flags);
+> +	SANITY_CHECK_MEM_REGION_FIELD(guest_phys_addr);
+> +	SANITY_CHECK_MEM_REGION_FIELD(memory_size);
+> +	SANITY_CHECK_MEM_REGION_FIELD(userspace_addr);
+> +	SANITY_CHECK_MEM_REGION_EXT_FIELD(private_offset);
+> +	SANITY_CHECK_MEM_REGION_EXT_FIELD(private_fd);
+> +}
+> +
+>  static long kvm_vm_ioctl(struct file *filp,
+>  			   unsigned int ioctl, unsigned long arg)
+>  {
+> @@ -4645,14 +4672,20 @@ static long kvm_vm_ioctl(struct file *filp,
+>  		break;
+>  	}
+>  	case KVM_SET_USER_MEMORY_REGION: {
+> -		struct kvm_userspace_memory_region kvm_userspace_mem;
+> +		struct kvm_user_mem_region mem;
+> +		unsigned long size = sizeof(struct kvm_userspace_memory_region);
+> +
+> +		kvm_sanity_check_user_mem_region_alias();
+>  
+>  		r = -EFAULT;
+> -		if (copy_from_user(&kvm_userspace_mem, argp,
+> -						sizeof(kvm_userspace_mem)))
+> +		if (copy_from_user(&mem, argp, size);
+> +			goto out;
+> +
+> +		r = -EINVAL;
+> +		if (mem.flags & KVM_MEM_PRIVATE)
+>  			goto out;
 
-Before we dive deep into design details, I think we should first decide whether
-or not nested AVIC is worth pursing/supporting.
+Nit:  It's better to check if padding is zero.  Maybe rename it to reserved.
 
-  - Rome has a ucode/silicon bug with no known workaround and no anticipated fix[*];
-    AMD's recommended "workaround" is to disable AVIC.
-  - AVIC is not available in Milan, which may or may not be related to the
-    aforementioned bug.
-  - AVIC is making a comeback on Zen4, but Zen4 comes with x2AVIC.
-  - x2APIC is likely going to become ubiquitous, e.g. Intel is effectively
-    requiring x2APIC to fudge around xAPIC bugs.
-  - It's actually quite realistic to effectively force the guest to use x2APIC,
-    at least if it's a Linux guest.  E.g. turn x2APIC on in BIOS, which is often
-    (always?) controlled by the host, and Linux will use x2APIC.
-
-In other words, given that AVIC is well on its way to becoming a "legacy" feature,
-IMO there needs to be a fairly strong use case to justify taking on this much code
-and complexity.  ~1500 lines of code to support a feature that has historically
-been buggy _without_ nested support is going to require a non-trivial amount of
-effort to review, stabilize, and maintain.
-
-[*] 1235 "Guest With AVIC (Advanced Virtual Interrupt Controller) Enabled May Fail
-    to Process IPI (Inter-Processor Interrupt) Until Guest Is Re-Scheduled" in
-    https://www.amd.com/system/files/TechDocs/56323-PUB_1.00.pdf
++               if (mem.pad1 || memchr_inv(mem.pad2, 0, sizeof(mem.pad2)))
++                       goto out;
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
