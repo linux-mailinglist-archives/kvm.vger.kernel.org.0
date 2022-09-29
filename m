@@ -2,51 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D622A5EF973
-	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 17:49:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B14445EF977
+	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 17:50:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235843AbiI2PtF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Sep 2022 11:49:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40956 "EHLO
+        id S235191AbiI2PuJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Sep 2022 11:50:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236059AbiI2Psg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Sep 2022 11:48:36 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D99731C00FA;
-        Thu, 29 Sep 2022 08:48:07 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EB9D4608D5;
-        Thu, 29 Sep 2022 15:48:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDD70C433C1;
-        Thu, 29 Sep 2022 15:48:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664466486;
-        bh=HFVqVM8he9K7QibhHjqjVgJk0ZPotaqgYB2utTtMyrk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Nj3k92wyH1ZIhG7QfdD8ACdpmTfWEk+9o7i6zFEE/GbRrmQ/dNSC41mHmfZ+5I4pt
-         d5D3NzokODjsSi81aEBXpeTPsCV0NqPs4+aGVnhKLuGI7lUCSukSSIUCJ+/xloGJyb
-         FMfe+yu4tK7LxmUG7SKhkJoXPj6HkV3MphT+37XEEYEgTfh6p+W7UE+28dvjwpTH5d
-         5oIxjgQ7lRJsW/CLkqGNlY71IepZt+c1ug06pWQevuQbnbduGgHc7LjrBG4t8kn4ca
-         a6qhhBvYIUHpIY94VelKO2gDopnKqBt2pA2I3Le/3/RMnHCw45dS64Zq9MLq9oWh69
-         6miP8BlaGVmuQ==
-Date:   Thu, 29 Sep 2022 09:48:03 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org
-Subject: Re: Commit 'iomap: add support for dma aligned direct-io' causes
- qemu/KVM boot failures
-Message-ID: <YzW+Mz12JT1BXoZA@kbusch-mbp.dhcp.thefacebook.com>
-References: <fb869c88bd48ea9018e1cc349918aa7cdd524931.camel@redhat.com>
+        with ESMTP id S235025AbiI2PuG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Sep 2022 11:50:06 -0400
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B1F71F62B;
+        Thu, 29 Sep 2022 08:50:01 -0700 (PDT)
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1odvnS-0005cZ-5r; Thu, 29 Sep 2022 17:49:58 +0200
+Message-ID: <bd4d7463-a960-3c49-9c56-a8bd5c1ea7f0@maciej.szmigiero.name>
+Date:   Thu, 29 Sep 2022 17:49:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fb869c88bd48ea9018e1cc349918aa7cdd524931.camel@redhat.com>
-X-Spam-Status: No, score=-7.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Content-Language: en-US, pl-PL
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20220927152241.194900-1-pbonzini@redhat.com>
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: Re: [PATCH] KVM: allow compiling out SMM support
+In-Reply-To: <20220927152241.194900-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -54,6 +42,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I am aware, and I've submitted the fix to qemu here:
+On 27.09.2022 17:22, Paolo Bonzini wrote:
+> Some users of KVM implement the UEFI variable store through a paravirtual device
+> that does not require the "SMM lockbox" component of edk2; allow them to
+> compile out system management mode, which is not a full implementation
+> especially in how it interacts with nested virtualization.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+> 	The patch isn't pretty.  I could skip all the changes to add WARNs
+> 	to called functions, but the point of adding the config symbol is
+> 	to make sure that those functions, and all the baggage they bring,
+> 	are dead.
+> 
 
-  https://lists.nongnu.org/archive/html/qemu-block/2022-09/msg00398.html
+Out of curiosity: why the SMM support is so special that it's worth to
+add a dedicated Kconfig entry for it?
+
+After all, the current typical way to disable stuff (for testing, etc)
+in KVM is to provide this possibility via a kvm module parameter.
+This way it also can be switched on or off without having to rebuild the
+kernel.
+
+Looking at the patch it doesn't seem to disable that much of code (like,
+significantly slim down the binary) and where it does disable something
+it mostly relies on compiler dead code removal rather than explicit
+#ifdefs (which would guarantee that the disabled code did not end in
+the binary).
+
+Thanks,
+Maciej
+
+
+
