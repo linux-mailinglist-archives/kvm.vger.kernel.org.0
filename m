@@ -2,55 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BC675EEE88
-	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 09:11:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8147A5EEEC2
+	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 09:19:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235078AbiI2HLY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Sep 2022 03:11:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59786 "EHLO
+        id S235195AbiI2HTk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Sep 2022 03:19:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235004AbiI2HLW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Sep 2022 03:11:22 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B208712262D;
-        Thu, 29 Sep 2022 00:11:21 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id F33C168BFE; Thu, 29 Sep 2022 09:11:17 +0200 (CEST)
-Date:   Thu, 29 Sep 2022 09:11:17 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org
-Subject: Re: simplify the mdev interface v8
-Message-ID: <20220929071117.GA32553@lst.de>
-References: <20220923092652.100656-1-hch@lst.de> <20220927140737.0b4c9a54.alex.williamson@redhat.com> <20220927155426.23f4b8e9.alex.williamson@redhat.com> <20220928121110.GA30738@lst.de> <20220928125650.0a2ea297.alex.williamson@redhat.com>
+        with ESMTP id S235192AbiI2HT3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Sep 2022 03:19:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54BDB132FCF
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 00:19:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664435966;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Pahe0Oi4C4m9h6JwmtN0So34FXt/ImLGT/jbwYjYeWk=;
+        b=Ym6hve/RvWHS99l+9nvKKtrJbAYW/PhHGUTUoVKFiClOT35SvxFDclZ9dK8T/28I6gg1RZ
+        WOQ9SE+uot4ZwssbiUnK40F54O0HvhpZm7Ly7d00c87cw0JIQ1OlN5II8qifTNoOE0mWZz
+        jgGmV2dzxY4VO/ThfiT6uc29ZJuIHYY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-387-AYp4Rr9jPzufug9smFSeYQ-1; Thu, 29 Sep 2022 03:19:20 -0400
+X-MC-Unique: AYp4Rr9jPzufug9smFSeYQ-1
+Received: by mail-wr1-f72.google.com with SMTP id h1-20020adfa4c1000000b0022ccc7ac944so165499wrb.5
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 00:19:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=Pahe0Oi4C4m9h6JwmtN0So34FXt/ImLGT/jbwYjYeWk=;
+        b=hSWJDJpuXoklymLfOP31uVQdufZIKsjPx01MM9XjWHfBi23WpOj2tGKGespJQkV+DH
+         zLklBp4AEhw20uyUjYh0Q4Xbn+h7+0YFo8tIxhvs0f/4VBo9BjVSjxIGHbWJ6pL7XMjc
+         mYxzHT27VboSFD4zI3DJWPW086JWrrmprXiKzW7PWHLvpanXcOntNCVzzeCvit9dm0co
+         aOkuTjypTsPkvgQlaS8n3B4iXCv/Ow/1ocUEy6CPsFksSEbAcMp5rjWldqswsI2/C2yW
+         YqjwLA32SIQTqmDLahOOXUkkJvLHZpC5RF8qDPhKnonul/7YaN/6JHNo52wiJMHWoab+
+         7r+w==
+X-Gm-Message-State: ACrzQf1pk+uE8mE4X2gqlhfRfQCW5MPdSJMXVivHxsFHjzZwenQqPYgg
+        2Dl/TsfPMwwAIfgmqV3dCrCmMiOjj1Txv136bC1XnoDsBOp1NytqZ5Ti/bB1rxkQhoTrQ0zqhIG
+        ph5gnOaDP70lV
+X-Received: by 2002:a05:600c:4841:b0:3b4:76f0:99f with SMTP id j1-20020a05600c484100b003b476f0099fmr1218126wmo.85.1664435958811;
+        Thu, 29 Sep 2022 00:19:18 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6fAAMQAEw10LqeyomvQ2r46WQeZdX8Xh4sSb3tkzAaqxsTNtqXiZNJ+nRawX6R9Z621MuZlw==
+X-Received: by 2002:a05:600c:4841:b0:3b4:76f0:99f with SMTP id j1-20020a05600c484100b003b476f0099fmr1218099wmo.85.1664435958545;
+        Thu, 29 Sep 2022 00:19:18 -0700 (PDT)
+Received: from redhat.com ([2.55.47.213])
+        by smtp.gmail.com with ESMTPSA id p16-20020adfe610000000b00225239d9265sm6149634wrm.74.2022.09.29.00.19.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Sep 2022 00:19:17 -0700 (PDT)
+Date:   Thu, 29 Sep 2022 03:19:14 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Junichi Uekawa =?utf-8?B?KOS4iuW3nee0lOS4gCk=?= 
+        <uekawa@google.com>
+Cc:     Stefano Garzarella <sgarzare@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
+        netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        Bobby Eshleman <bobby.eshleman@gmail.com>
+Subject: Re: [PATCH] vhost/vsock: Use kvmalloc/kvfree for larger packets.
+Message-ID: <20220929031419-mutt-send-email-mst@kernel.org>
+References: <20220928064538.667678-1-uekawa@chromium.org>
+ <20220928082823.wyxplop5wtpuurwo@sgarzare-redhat>
+ <20220928052738-mutt-send-email-mst@kernel.org>
+ <20220928151135.pvrlsylg6j3hzh74@sgarzare-redhat>
+ <CADgJSGHxPWXJjbakEeWnqF42A03yK7Dpw6U1SKNLhk+B248Ymg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220928125650.0a2ea297.alex.williamson@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADgJSGHxPWXJjbakEeWnqF42A03yK7Dpw6U1SKNLhk+B248Ymg@mail.gmail.com>
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 28, 2022 at 12:56:50PM -0600, Alex Williamson wrote:
-> That fixes the crash, but available_instances isn't working:
+On Thu, Sep 29, 2022 at 08:14:24AM +0900, Junichi Uekawa (上川純一) wrote:
+> 2022年9月29日(木) 0:11 Stefano Garzarella <sgarzare@redhat.com>:
+> >
+> > On Wed, Sep 28, 2022 at 05:31:58AM -0400, Michael S. Tsirkin wrote:
+> > >On Wed, Sep 28, 2022 at 10:28:23AM +0200, Stefano Garzarella wrote:
+> > >> On Wed, Sep 28, 2022 at 03:45:38PM +0900, Junichi Uekawa wrote:
+> > >> > When copying a large file over sftp over vsock, data size is usually 32kB,
+> > >> > and kmalloc seems to fail to try to allocate 32 32kB regions.
+> > >> >
+> > >> > Call Trace:
+> > >> >  [<ffffffffb6a0df64>] dump_stack+0x97/0xdb
+> > >> >  [<ffffffffb68d6aed>] warn_alloc_failed+0x10f/0x138
+> > >> >  [<ffffffffb68d868a>] ? __alloc_pages_direct_compact+0x38/0xc8
+> > >> >  [<ffffffffb664619f>] __alloc_pages_nodemask+0x84c/0x90d
+> > >> >  [<ffffffffb6646e56>] alloc_kmem_pages+0x17/0x19
+> > >> >  [<ffffffffb6653a26>] kmalloc_order_trace+0x2b/0xdb
+> > >> >  [<ffffffffb66682f3>] __kmalloc+0x177/0x1f7
+> > >> >  [<ffffffffb66e0d94>] ? copy_from_iter+0x8d/0x31d
+> > >> >  [<ffffffffc0689ab7>] vhost_vsock_handle_tx_kick+0x1fa/0x301 [vhost_vsock]
+> > >> >  [<ffffffffc06828d9>] vhost_worker+0xf7/0x157 [vhost]
+> > >> >  [<ffffffffb683ddce>] kthread+0xfd/0x105
+> > >> >  [<ffffffffc06827e2>] ? vhost_dev_set_owner+0x22e/0x22e [vhost]
+> > >> >  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
+> > >> >  [<ffffffffb6eb332e>] ret_from_fork+0x4e/0x80
+> > >> >  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
+> > >> >
+> > >> > Work around by doing kvmalloc instead.
+> > >> >
+> > >> > Signed-off-by: Junichi Uekawa <uekawa@chromium.org>
+> > >
+> > >My worry here is that this in more of a work around.
+> > >It would be better to not allocate memory so aggressively:
+> > >if we are so short on memory we should probably process
+> > >packets one at a time. Is that very hard to implement?
+> >
+> > Currently the "virtio_vsock_pkt" is allocated in the "handle_kick"
+> > callback of TX virtqueue. Then the packet is multiplexed on the right
+> > socket queue, then the user space can de-queue it whenever they want.
+> >
+> > So maybe we can stop processing the virtqueue if we are short on memory,
+> > but when can we restart the TX virtqueue processing?
+> >
+> > I think as long as the guest used only 4K buffers we had no problem, but
+> > now that it can create larger buffers the host may not be able to
+> > allocate it contiguously. Since there is no need to have them contiguous
+> > here, I think this patch is okay.
+> >
+> > However, if we switch to sk_buff (as Bobby is already doing), maybe we
+> > don't have this problem because I think there is some kind of
+> > pre-allocated pool.
+> >
+> 
+> Thank you for the review! I was wondering if this is a reasonable workaround (as
+> we found that this patch makes a reliably crashing system into a
+> reliably surviving system.)
+> 
+> 
+> ... Sounds like it is a reasonable patch to use backported to older kernels?
 
-I see the same behavior both with and without my series.  Given that
-the code to report it didn't change that is also very much expected.
+Hmm. Good point about stable. OK.
 
-So something in i915 fails to update the resources when deleting
-instances, but it is an existing issue.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+
+> > >
+> > >
+> > >
+> > >> > ---
+> > >> >
+> > >> > drivers/vhost/vsock.c                   | 2 +-
+> > >> > net/vmw_vsock/virtio_transport_common.c | 2 +-
+> > >> > 2 files changed, 2 insertions(+), 2 deletions(-)
+> > >> >
+> > >> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > >> > index 368330417bde..5703775af129 100644
+> > >> > --- a/drivers/vhost/vsock.c
+> > >> > +++ b/drivers/vhost/vsock.c
+> > >> > @@ -393,7 +393,7 @@ vhost_vsock_alloc_pkt(struct vhost_virtqueue *vq,
+> > >> >            return NULL;
+> > >> >    }
+> > >> >
+> > >> > -  pkt->buf = kmalloc(pkt->len, GFP_KERNEL);
+> > >> > +  pkt->buf = kvmalloc(pkt->len, GFP_KERNEL);
+> > >> >    if (!pkt->buf) {
+> > >> >            kfree(pkt);
+> > >> >            return NULL;
+> > >> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+> > >> > index ec2c2afbf0d0..3a12aee33e92 100644
+> > >> > --- a/net/vmw_vsock/virtio_transport_common.c
+> > >> > +++ b/net/vmw_vsock/virtio_transport_common.c
+> > >> > @@ -1342,7 +1342,7 @@ EXPORT_SYMBOL_GPL(virtio_transport_recv_pkt);
+> > >> >
+> > >> > void virtio_transport_free_pkt(struct virtio_vsock_pkt *pkt)
+> > >> > {
+> > >> > -  kfree(pkt->buf);
+> > >> > +  kvfree(pkt->buf);
+> > >>
+> > >> virtio_transport_free_pkt() is used also in virtio_transport.c and
+> > >> vsock_loopback.c where pkt->buf is allocated with kmalloc(), but IIUC
+> > >> kvfree() can be used with that memory, so this should be fine.
+> > >>
+> > >> >    kfree(pkt);
+> > >> > }
+> > >> > EXPORT_SYMBOL_GPL(virtio_transport_free_pkt);
+> > >> > --
+> > >> > 2.37.3.998.g577e59143f-goog
+> > >> >
+> > >>
+> > >> This issue should go away with the Bobby's work about introducing sk_buff
+> > >> [1], but we can queue this for now.
+> > >>
+> > >> I'm not sure if we should do the same also in the virtio-vsock driver
+> > >> (virtio_transport.c). Here in vhost-vsock the buf allocated is only used in
+> > >> the host, while in the virtio-vsock driver the buffer is exposed to the
+> > >> device emulated in the host, so it should be physically contiguous (if not,
+> > >> maybe we need to adjust virtio_vsock_rx_fill()).
+> > >
+> > >More importantly it needs to support DMA API which IIUC kvmalloc
+> > >memory does not.
+> > >
+> >
+> > Right, good point!
+> >
+> > Thanks,
+> > Stefano
+> >
+> 
+> 
+> -- 
+> Junichi Uekawa
+> Google
+
