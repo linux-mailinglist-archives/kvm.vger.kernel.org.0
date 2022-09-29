@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B1CC35EFEDA
-	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 22:47:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD7DE5EFEDB
+	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 22:47:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229726AbiI2UrX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Sep 2022 16:47:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34036 "EHLO
+        id S229745AbiI2Ur2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Sep 2022 16:47:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229650AbiI2UrT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Sep 2022 16:47:19 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 119A615312A
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 13:47:19 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-348608c1cd3so24792207b3.10
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 13:47:19 -0700 (PDT)
+        with ESMTP id S229462AbiI2UrZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Sep 2022 16:47:25 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 065FD15313C
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 13:47:21 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-349423f04dbso24598657b3.13
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 13:47:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date;
-        bh=WdZO+QIKb9m1gAu11nH6SdOXw3nLX+qDN1D4O/5fVL0=;
-        b=aL/OFNgk6ZbFlCVjZCLjGnI6qXi6HZGPFaWGCNPxiNm3aEk0A2sz+E3NaHjt50hzGS
-         UWV9M3HUVDFbUjInMftB/OvV3bka/047A3ee91QT1hcpoB1nZ5lKydoGt/zsCfI55MkL
-         UdaJIjF7HmpVrWz0sCbSaw2viOAhoQFBDWjGp/Mw2F6tPXssTXIOHKsyiQHNDxbcLyHG
-         4JjQ/ErhdE88pgELD7osYmOGqBZJkmoz/CZJi8qu5OKZUNsXGUWzNZ6kdlWPLJtdWj6S
-         OmATwqfhaCgu2WEwT9wlI5xrAaG9j9Q7aG78jAu7DB2IRJvxYAnbn5q+X4EiXi91js9Y
-         jiPw==
+        bh=m9o9aC44IY/im9QAS+qaues+I53Dzb9AHDDpW5u1v5c=;
+        b=HgRgZwUsL+vm/dX90nmv82OSQcUtARJ36y37S8UdTMx2HdsiLkwxuWRWxmfiOqrHE+
+         nLQuF5MhBOwOHQ9f7VlMQ0v4C+Y/JKmmMmOjnwFLsie2dRS/q855wl8JxN4stoNl238b
+         tZjmBVvqY4hc25JrI6jOJ6eiK6keccGoq8DWgnMDQvc3Th3SFi8nJbeXVCRF7CVREYCj
+         eptalcWmah9dev+gC8CPcS3i51rCxI+2SOTmRnVe1holvaCB0AQb1cRgrvfsTRB33Ivx
+         m0/D9w2kKULKM7XGqIiZOWQWjHA7yB35D+nr1uE3w/zsWUDGXDaqaw+aczasb5pbxv0F
+         y5Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date;
-        bh=WdZO+QIKb9m1gAu11nH6SdOXw3nLX+qDN1D4O/5fVL0=;
-        b=SWTLAzsstZmOn0iOKhOxDLs7nFvyU8FCYnOsh7fGLgZY7BNAXMQOY8+Nqw9AW1C/0p
-         +3UVFHJkSI8pEIDwlZJCGO3jmwZW2ifF7D9Vy3WHKVzvwRfu7EYcgGbESpPY+j4xIGvG
-         3oYmh+Id68wsQUq+oBZSbXwOcv2mLElHQtEZOQkcMj6ArQQkNRagwgaSGb7NOHK1z4K4
-         pTHC0NCMIZu0VfkFQlgOkZupMpMv78xHl8HCqtHqvWL//ruUl9su+ofTLSkEaF8OUI2O
-         pQukz94OVZJwZkREMtX0bEUZbaGjFjJJaeSG+nO2hQSlqfqp3hdAZmd6uuF0YhmG19Wq
-         yL3A==
-X-Gm-Message-State: ACrzQf1u5tlqidYIyGj9xd6a+4oZ2jDCTLkTi3xDVvz+wS/9By3h2q+N
-        VTcVO977JRjpnLvQUvY1G5fPlmHuj+4j3Q==
-X-Google-Smtp-Source: AMsMyM5ooLGI519TR8RVoAzXlzJ0LlYJeZJ2lcMw5I66WIgvkWi+AZayc33tT0MdSs493AAlJf+l6bueV7tcWg==
+        bh=m9o9aC44IY/im9QAS+qaues+I53Dzb9AHDDpW5u1v5c=;
+        b=rc81kP3Y1j5LiS3/8UNl6tqtPoWlf/ntoxxqCDaprxwizadAKKddNO9YRmurroK8rj
+         BVbB6X1E87cFiYwA9ymfkTh8I/NZm+t+MRNTbP9SZ9hOGDXbvq3eF1Fb7hma3D/kMz8+
+         eO0Kdw8XNRUx9PtNLGA0/uuh587H7MzXs1MjABVmjZuFjP4KHhx/wE4kerJ1ELB6BCe5
+         o6X4PNRdbioaywVFMGvSmYoHxPsJM5yUCsyOxw9ZnwlEquW+X+jblhdxFyGr5p+/tiJC
+         XFeTaGZ5HibSaQpSt1TvOZ5I4HWo5FXubT+StMS+9VD80x+WjTsxwl5wx1rU2kGNA9nG
+         ASpA==
+X-Gm-Message-State: ACrzQf11r0q2jwar2RKPAExKru9wh9o7pYUmpGPfWhfUfm3U9ECAV0Oi
+        VDTl7IsVF/ePQbhc2M2KDkvV0hAyo1DYqw==
+X-Google-Smtp-Source: AMsMyM7okvM2d9TGUnzuQXESO/VvZPGMOsOoqNODiZF7b6EaR7I7m6WBi/liP0Oia/8cL9wxIMPnv/u5JwRZZA==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a81:11cc:0:b0:345:6c7c:e6db with SMTP id
- 195-20020a8111cc000000b003456c7ce6dbmr5278953ywr.44.1664484438375; Thu, 29
- Sep 2022 13:47:18 -0700 (PDT)
-Date:   Thu, 29 Sep 2022 13:47:06 -0700
+ (user=dmatlack job=sendgmr) by 2002:a25:97c5:0:b0:6b0:7306:8a76 with SMTP id
+ j5-20020a2597c5000000b006b073068a76mr5079490ybo.400.1664484440252; Thu, 29
+ Sep 2022 13:47:20 -0700 (PDT)
+Date:   Thu, 29 Sep 2022 13:47:07 -0700
 In-Reply-To: <20220929204708.2548375-1-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220929204708.2548375-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
-Message-ID: <20220929204708.2548375-3-dmatlack@google.com>
-Subject: [PATCH 2/4] KVM: selftests: Delete dead ucall code from emulator_error_test
+Message-ID: <20220929204708.2548375-4-dmatlack@google.com>
+Subject: [PATCH 3/4] KVM: selftests: Skip emulator_error_test if
+ KVM_CAP_EXIT_ON_EMULATION_FAILURE not available
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -71,93 +72,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Delete a bunch of code related to ucall handling from
-emulator_error_test. The only thing emulator_error_test needs to check
-is that the vCPU exits with UCALL_DONE after the second vcpu_run().
-
-No functional change intended.
+Skip emulator_error_test if KVM_CAP_EXIT_ON_EMULATION_FAILURE is not
+available rather than failing. This makes emulator_error_test skip on
+older kernels and also deletes a net 2 lines of code from the test.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- .../kvm/x86_64/emulator_error_test.c          | 46 +------------------
- 1 file changed, 1 insertion(+), 45 deletions(-)
+ tools/testing/selftests/kvm/x86_64/emulator_error_test.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/x86_64/emulator_error_test.c b/tools/testing/selftests/kvm/x86_64/emulator_error_test.c
-index 2dff57991d31..52ff1eb772e9 100644
+index 52ff1eb772e9..4b06c9eefe7d 100644
 --- a/tools/testing/selftests/kvm/x86_64/emulator_error_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/emulator_error_test.c
-@@ -84,28 +84,11 @@ static void process_exit_on_emulation_error(struct kvm_vcpu *vcpu)
- 	}
- }
- 
--static void do_guest_assert(struct ucall *uc)
--{
--	REPORT_GUEST_ASSERT(*uc);
--}
--
--static void check_for_guest_assert(struct kvm_vcpu *vcpu)
--{
--	struct ucall uc;
--
--	if (vcpu->run->exit_reason == KVM_EXIT_IO &&
--	    get_ucall(vcpu, &uc) == UCALL_ABORT) {
--		do_guest_assert(&uc);
--	}
--}
--
- static void process_ucall_done(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_run *run = vcpu->run;
- 	struct ucall uc;
- 
--	check_for_guest_assert(vcpu);
--
- 	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
- 		    "Unexpected exit reason: %u (%s)",
- 		    run->exit_reason,
-@@ -116,32 +99,6 @@ static void process_ucall_done(struct kvm_vcpu *vcpu)
- 		    uc.cmd, UCALL_DONE);
- }
- 
--static uint64_t process_ucall(struct kvm_vcpu *vcpu)
--{
--	struct kvm_run *run = vcpu->run;
--	struct ucall uc;
--
--	TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
--		    "Unexpected exit reason: %u (%s)",
--		    run->exit_reason,
--		    exit_reason_str(run->exit_reason));
--
--	switch (get_ucall(vcpu, &uc)) {
--	case UCALL_SYNC:
--		break;
--	case UCALL_ABORT:
--		do_guest_assert(&uc);
--		break;
--	case UCALL_DONE:
--		process_ucall_done(vcpu);
--		break;
--	default:
--		TEST_ASSERT(false, "Unexpected ucall");
--	}
--
--	return uc.cmd;
--}
--
- int main(int argc, char *argv[])
+@@ -103,15 +103,13 @@ int main(int argc, char *argv[])
  {
  	struct kvm_vcpu *vcpu;
-@@ -168,8 +125,7 @@ int main(int argc, char *argv[])
- 	vcpu_run(vcpu);
- 	process_exit_on_emulation_error(vcpu);
- 	vcpu_run(vcpu);
--
--	TEST_ASSERT(process_ucall(vcpu) == UCALL_DONE, "Expected UCALL_DONE");
-+	process_ucall_done(vcpu);
+ 	struct kvm_vm *vm;
+-	int rc;
  
- 	kvm_vm_free(vm);
+ 	/* Tell stdout not to buffer its content */
+ 	setbuf(stdout, NULL);
  
+-	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_EXIT_ON_EMULATION_FAILURE));
+ 
+-	rc = kvm_check_cap(KVM_CAP_EXIT_ON_EMULATION_FAILURE);
+-	TEST_ASSERT(rc, "KVM_CAP_EXIT_ON_EMULATION_FAILURE is unavailable");
++	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+ 	vm_enable_cap(vm, KVM_CAP_EXIT_ON_EMULATION_FAILURE, 1);
+ 
+ 	/*
 -- 
 2.38.0.rc1.362.ged0d419d3c-goog
 
