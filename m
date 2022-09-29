@@ -2,85 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DC685EF856
-	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 17:07:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 239A75EF882
+	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 17:19:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235535AbiI2PHb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Sep 2022 11:07:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43884 "EHLO
+        id S235853AbiI2PS7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Sep 2022 11:18:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235485AbiI2PHY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Sep 2022 11:07:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D0F91166E7
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 08:07:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664464041;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OGdnN2Y2CEduI2udMkp9UJyXzBOPpQyA7MhhZbQEIv8=;
-        b=WeCtUOBLXDBZTVzjC/3hSTNR2wcWAEjXndcEs1Ke0o4ieUlP4S3FWszuzek9rwE4l9xeKk
-        2yQpYvuVHB8nDfvqOf4qDWULk375e2TRwLdaLJl8IHD87mKPxnp/Va37TrfZpErDYOGpL9
-        E7gwx/oMuX2NAyniy7yEK9SwzbXkWO8=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-662-IZrwEpzlOPip4jKGBhUwAQ-1; Thu, 29 Sep 2022 11:07:10 -0400
-X-MC-Unique: IZrwEpzlOPip4jKGBhUwAQ-1
-Received: by mail-ed1-f70.google.com with SMTP id y9-20020a056402270900b00451dfbbc9b2so1493286edd.12
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 08:07:09 -0700 (PDT)
+        with ESMTP id S235858AbiI2PSz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Sep 2022 11:18:55 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F80114F8F5
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 08:18:53 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id n7so1550337plp.1
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 08:18:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=Ga7Wq6aD2ebMvSDNvAGT7MduWJCGTvC2mzBwQ2LHRCU=;
+        b=UgD3Cw43X1U5TDmVbCANXUxQimTv+mdSmfQ0CuqGXddG15c7j5qAp8Dmp3aFoH5eyz
+         3sh5foOmN0YCP1FzXrjOw6/CZt7cTSSE1YgUxnGLccS5gJYPw63aW4eES+BfivBlQaQz
+         Tvqy0fist8KREDnDjhXNxAnOx0CQKyt49tmHj+zxsUPraIooOmqp0o7JuawPf48eaGRd
+         vSN8iLvL9YCv7MXfNXNPbkPZp1glTmA5k8YvBYNKhBqde/uqj0Pp4xFv5JziD+8V4iu9
+         y8vyMZA2hto+sMTVkWoTtKMTrXqhwSyJct87hM8LHqL4b+LX0mF9qL3/nXzN3UBZgxKS
+         500g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=OGdnN2Y2CEduI2udMkp9UJyXzBOPpQyA7MhhZbQEIv8=;
-        b=6T1ZywGx+t4nhp6w7GGC8N6QlhRHMoUio8WTuBnFOdv0qNEJ3W3+mQoC4MVKOjxdHA
-         8SSpS/gq3/5feKhLTrIosedPyVsdNa0j39cIsHe5SbT8B5x6b1mqpx7tjf2VeMNezNKR
-         rOCmX3k2koGhEzvq6Q8dkJWGFQe7gEhQBEG2S61AiRkUo6H8NqmCmrxBnuIpUheZdXZH
-         qxaRNG+4/3TVd6kLgT6elJzbW9LjodBg3Pq4Cj0AQiAidmiQlsHAos+WnWs0Fgc9dlaz
-         WAILQqfVNpECWobQNhNdrY4lYONJN8PcEFWDvKlgsMdHa50GKBqi+mlAw610mZAVWHrS
-         y8lQ==
-X-Gm-Message-State: ACrzQf1H13EgBQy/ddgmBSH4X7X1WnlYpYmdvpvFC5xwC4s8UdIV6216
-        hqeYyeES9TA4K1DBNw/+nO7vLWbl1o1glFHEY3fi5z1Ms5D7PkEjmg5+z7HKbX7Vnyj98dThBIp
-        sg48908Kyz3Pl
-X-Received: by 2002:a05:6402:50ca:b0:451:a711:1389 with SMTP id h10-20020a05640250ca00b00451a7111389mr3687650edb.239.1664464029034;
-        Thu, 29 Sep 2022 08:07:09 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4ISURrSfTuSflltACTcSX5Z6C3i1L6pHsD0+urKfUK+e9R4Ev1pnbTSa08jsymair1cZluhw==
-X-Received: by 2002:a05:6402:50ca:b0:451:a711:1389 with SMTP id h10-20020a05640250ca00b00451a7111389mr3687628edb.239.1664464028760;
-        Thu, 29 Sep 2022 08:07:08 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id ch15-20020a0564021bcf00b004585a21df62sm507478edb.0.2022.09.29.08.07.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Sep 2022 08:07:08 -0700 (PDT)
-Message-ID: <205b4d01-db86-6662-7906-24a8ca765e4f@redhat.com>
-Date:   Thu, 29 Sep 2022 17:07:06 +0200
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=Ga7Wq6aD2ebMvSDNvAGT7MduWJCGTvC2mzBwQ2LHRCU=;
+        b=v/epQVOpw/cdsH8jtgaDQYmCi6VCkimh7pPvYylJ3FDbwgW1wSVOwHtnIcqraDCzpL
+         l8r8lP6qir8FE4QY/Gdqbf5ckJyzjX8yq8jYQx4D5rgvvsyv2GEbhijBKX2PputklMVq
+         a73w0MOpWavfUSNwlqfs3jXIxhe4IeweISHqe309SQ1AtJAvN/x8JAlcLIK+C3fmi+Rv
+         SRnrjvumx1ZNXv9Y/MJc0uPx6RiQ+YZyu5uA8+Xgkuf17WrKxIb4nS6mWDoHkBwsrszL
+         7uGGc6++NqLQBBh/uUgMYRYlnZNnHSdt7NExsFf7i/yKJz1InixmrmYUkB0UGtcf85S1
+         HShg==
+X-Gm-Message-State: ACrzQf3lx5NiegV+jDck9iM/n1NM/h/Px2+g8vbyy218FyJ90o1NbDjJ
+        Ivs6RUBFIr5qDCVS8aub0oRtVA==
+X-Google-Smtp-Source: AMsMyM776dZC7Zy6WEQgOE8NUXltB/XDmd9NhL7eTPiJ3NIsvSIt/1hmAh0SJLF5hq3k0kl7GWaQ0Q==
+X-Received: by 2002:a17:902:848e:b0:178:2773:12d0 with SMTP id c14-20020a170902848e00b00178277312d0mr3799891plo.166.1664464732847;
+        Thu, 29 Sep 2022 08:18:52 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id t18-20020a17090340d200b0017315b11bb8sm5981283pld.213.2022.09.29.08.18.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Sep 2022 08:18:50 -0700 (PDT)
+Date:   Thu, 29 Sep 2022 15:18:47 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Like Xu <like.xu.linux@gmail.com>
+Subject: Re: [RFC PATCH 0/9] kvm: implement atomic memslot updates
+Message-ID: <YzW3VxqZTb2hnXCy@google.com>
+References: <111a46c1-7082-62e3-4f3a-860a95cd560a@redhat.com>
+ <14d5b8f2-7cb6-ce24-c7a7-32aa9117c953@redhat.com>
+ <YzIZhn47brWBfQah@google.com>
+ <3b04db9d-0177-7e6e-a54c-a28ada8b1d36@redhat.com>
+ <YzMdjSkKaJ8HyWXh@google.com>
+ <dd6db8c9-80b1-b6c5-29b8-5eced48f1303@redhat.com>
+ <YzRvMZDoukMbeaxR@google.com>
+ <8534dfe4-bc71-2c14-b268-e610a3111d14@redhat.com>
+ <YzSxhHzgNKHL3Cvm@google.com>
+ <637e7ef3-e204-52fc-a4ff-1f0df5227a3e@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20220926165112.603078-1-pbonzini@redhat.com>
- <YzMt24/14n1BVdnI@google.com>
- <ed74c9a9d6a0d2fd2ad8bd98214ad36e97c243a0.camel@redhat.com>
- <15291c3f-d55c-a206-9261-253a1a33dce1@redhat.com>
- <YzRycXDnWgMDgbD7@google.com>
- <ad97d0671774a873175c71c6435763a33569f669.camel@redhat.com>
- <YzSKhUEg3L1eMKOR@google.com>
- <08dab49f-9ca4-4978-4482-1815cf168e74@redhat.com>
- <b8fa9561295bb6af2b7fcaa8125c6a3b89b305c7.camel@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: x86: disable on 32-bit unless CONFIG_BROKEN
-In-Reply-To: <b8fa9561295bb6af2b7fcaa8125c6a3b89b305c7.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <637e7ef3-e204-52fc-a4ff-1f0df5227a3e@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,43 +89,93 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/29/22 15:52, Maxim Levitsky wrote:
-> On Thu, 2022-09-29 at 15:26 +0200, Paolo Bonzini wrote:
->> On 9/28/22 19:55, Sean Christopherson wrote:
->>>> As far as my opinion goes I do volunteer to test this code more often,
->>>> and I do not want to see the 32 bit KVM support be removed*yet*.
->>>
->>> Yeah, I 100% agree that it shouldn't be removed until we have equivalent test
->>> coverage.  But I do think it should an "off-by-default" sort of thing.  Maybe
->>> BROKEN is the wrong dependency though?  E.g. would EXPERT be a better option?
->>
->> Yeah, maybe EXPERT is better but I'm not sure of the equivalent test
->> coverage.  32-bit VMX/SVM kvm-unit-tests are surely a good idea, but
->> what's wrong with booting an older guest?
+On Thu, Sep 29, 2022, Emanuele Giuseppe Esposito wrote:
 > 
-> From my point of view, using the same kernel source for host and the guest
-> is easier because you know that both kernels behave the same.
-
-It is certainly easier, but it is less correct.  You don't cover 
-anything that KVM doesn't use.
-
-> About EXPERT, IMHO these days most distros already dropped 32 bit suport thus anyway
-> one needs to compile a recent 32 bit kernel manually - thus IMHO whoever
-> these days compiles a 32 bit kernel, knows what they are doing.
+> Am 28/09/2022 um 22:41 schrieb Sean Christopherson:
+> > Beyond that, there's no explanation of why this exact API is necessary, i.e. there
+> > are no requirements given.
+> > 
+> >   - Why can't this be solved in userspace?
 > 
-> I personally would wait few more releases when there is a pressing reason to remove
-> this support.
+> Because this would provide the "feature" only to QEMU, leaving each
+> other hypervisor to implement its own.
+
+But there's no evidence that any other VMM actually needs this feature.
+
+> >   - When is KVM required to invalidate and flush?  E.g. if a memslot is deleted
+> >     and recreated with a different HVA, how does KVM ensure that there are no
+> >     outstanding references to the old HVA without introducing non-determinstic
+> >     behavior.  The current API works by forcing userspace to fully delete the
+> >     memslot, i.e. KVM can ensure all references are gone in all TLBs before
+> >     allowing userspace to create new, conflicting entries.  I don't see how this
+> >     can work with batched updates.  The update needs to be "atomic", i.e. vCPUs
+> >     must never see an invalid/deleted memslot, but if the memslot is writable,
+> >     how does KVM prevent some writes from hitting the old HVA and some from hitting
+> >     the new HVA without a quiescent period?
 > 
-> AFAIK, it is not really possible to remove most of the legacy direct mmu
-> because shadowing mmu still can use it (I think Sean told me that once).
+> Sorry this might be my fault in providing definitions, even though I
+> think I made plenty of examples. Delete/move operations are not really
+> "atomic" in the sense that the slot disappears immediately.
+> 
+> The slot(s) is/are first "atomically" invalidated, allowing the guest to
+> retry the page fault
 
-Yeah, it won't let us remove a lot of code but there are several logic 
-cleanups that become possible if the TDP case can just assume the TDP 
-MMU is there.  For example, there is no reason to have a cpu_role (as 
-opposed to an mmu_page_role for the root) if you are building HPA->GPA 
-page tables.
+I completely forgot that KVM x86 now retries on KVM_MEMSLOT_INVALID[*].  That is
+somewhat arbitrary behavior, e.g. if x86 didn't do MMIO SPTE caching it wouldn't
+be "necessary" and x86 would still treat INVALID as MMIO.  It's also x86 specific,
+no other architecture retries on invalid memslots, i.e. relying on that behavior
+to provide "atomicity" won't work without updating all other architectures.
 
-(Which reminds me that toggling CR0.WP is still a hog with the TDP MMU).
+That's obviously doable, but since these updates aren't actually atomic, I don't
+see any meaningful benefit over adding e.g. KVM_MEM_DISABLED.
 
-Paolo
+[*] e0c378684b65 ("KVM: x86/mmu: Retry page faults that hit an invalid memslot")
 
+> >   - If a memslot is truncated while dirty logging is enabled, what happens to
+> >     the bitmap?  Is it preserved?  Dropped?
+> 
+> Can you explain what you mean with "truncated memslot"?
+
+Shrink the size of the memslot.
+
+> Regarding the bitmap, currently QEMU should (probably wrongly) update it
+> before even committing the changes to KVM. But I remember upstream
+> someone pointed that this could be solved later.
+
+These details can't be punted, as they affect the ABI.  My interpretation of
+"atomic" memslot updates was that KVM would truly honor the promise of atomic
+updates, e.g. that a DELETE=>CREATE sequence would effectively allow truncating
+a memslot without losing any data.  Those details aren't really something that
+can be punted down the road to be fixed at a later point because they very much
+matter from an ABI perspective.
+
+> > Again, I completely agree that the current memslots API is far from perfect, but
+> > I'm not convinced that simply extending the existing API to batch updates is the
+> > best solution from a KVM perspective.
+> > 
+> >>> E.g. why do a batch update and not provide KVM_SET_ALL_USER_MEMORY_REGIONS to
+> >>> do wholesale replacement?  That seems like it would be vastly simpler to handle
+> >>> on KVM's end.  Or maybe there's a solution in the opposite direction, e.g. an
+> >>> API that allows 1->N or N->1 conversions but not arbitrary batching.
+> >>
+> >> Wholesale replacement was my first idea when I looked at the issue, I think
+> >> at the end of 2020.  I never got to a full implementation, but my impression
+> >> was that allocating/deallocating dirty bitmaps, rmaps etc. would make it any
+> >> easier than arbitrary batch updates.
+> > 
+> > It's not obvious to me that the memslot metadata is going to be easy to handle
+> > regardless of what we do.  E.g. I'm pretty sure that batching updates will "corrupt"
+> > the dirty bitmap if a hole is punched in a memslot that's being dirty logged.
+> > 
+> 
+> Could you provide an example?
+> I mean I am not an expert but to me it looks like I preserved the same
+> old functionalities both here and in QEMU. I just batched and delayed
+> some operations, which in this case should cause no harm.
+
+As above, my confusion is due to calling these updates "atomic".  The new API is
+really just "allow batching memslot updates and subtly rely on restarting page
+faults on KVM_MEMSLOT_INVALID".
+
+IMO, KVM_MEM_DISABLED or similar is the way to go.  I.e. formalize the "restart
+page faults" semantics without taking on the complexity of batched updates.
