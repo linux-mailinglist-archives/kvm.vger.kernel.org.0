@@ -2,191 +2,302 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 19A6F5EF455
-	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 13:31:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93C265EF4AA
+	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 13:50:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235308AbiI2Lbv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Sep 2022 07:31:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47202 "EHLO
+        id S234920AbiI2LuD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Sep 2022 07:50:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235294AbiI2Lbt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Sep 2022 07:31:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA1F913C873
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 04:31:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664451108;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pEKfUYSB+7V62VJkV4AjzMMtYng+NhW8XBng+EdVuoU=;
-        b=QOwI4A0DkhB8wuPpPhUt6z/hpY3ud/DPZ0C5/KkeIwoSxT3D2q2SrzhBfRE1Tey1N8fLWB
-        xihxbzv8GzTigMWXViaqhRY6RinGp4Y3e+pUGR4l8ACJAo5CDANkf9irocmfGwZfeo8VVk
-        VleWcWz2/1pSy0RjE20ERuNvmBl66iI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-394-nLrVoXaQOaWQY-yLIcflHQ-1; Thu, 29 Sep 2022 07:31:44 -0400
-X-MC-Unique: nLrVoXaQOaWQY-yLIcflHQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 71171185A7A4;
-        Thu, 29 Sep 2022 11:31:43 +0000 (UTC)
-Received: from [10.64.54.143] (vpn2-54-143.bne.redhat.com [10.64.54.143])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 12E2340C6EC2;
-        Thu, 29 Sep 2022 11:31:36 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v4 3/6] KVM: arm64: Enable ring-based dirty memory
- tracking
-From:   Gavin Shan <gshan@redhat.com>
-To:     Peter Xu <peterx@redhat.com>, Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org,
-        andrew.jones@linux.dev, will@kernel.org, dmatlack@google.com,
-        pbonzini@redhat.com, zhenyzha@redhat.com, shan.gavin@gmail.com,
-        james.morse@arm.com, suzuki.poulose@arm.com,
-        alexandru.elisei@arm.com, oliver.upton@linux.dev
-References: <20220927005439.21130-1-gshan@redhat.com>
- <20220927005439.21130-4-gshan@redhat.com> <YzMerD8ZvhvnprEN@x1n>
- <86sfkc7mg8.wl-maz@kernel.org> <YzM/DFV1TgtyRfCA@x1n>
- <320005d1-fe88-fd6a-be91-ddb56f1aa80f@redhat.com>
- <87y1u3hpmp.wl-maz@kernel.org> <YzRfkBWepX2CD88h@x1n>
- <d0beb9bd-5295-adb6-a473-c131d6102947@redhat.com>
-Message-ID: <ddc4166c-81b6-2f7b-87a7-4af3d7db888a@redhat.com>
-Date:   Thu, 29 Sep 2022 21:31:34 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        with ESMTP id S234708AbiI2LuA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Sep 2022 07:50:00 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37EDE659CC
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 04:49:58 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id h7so1759368wru.10
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 04:49:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
+        bh=2uVWGDizSikUyJ3V+rUokvNA+pyyWFcnEoJpXpnX15E=;
+        b=rBdRTxMoWrf+jXplRsG7YNS0Ig1ZlM3mcZHPC4s4QO2PvSFGbaee2xRbeE+SoSVecC
+         HfBpuqkrOoiAo0IvusRkyZSHmdHRzKaGGLD847f07u9InySJ1DERtajyCJqULUnZ5cHh
+         6SHujvyGlwU1pF2Mjc4+7Kdej+xlXQToFSmylSjRgPgZ0o8XOrXV+TCdcr/jmr05Omek
+         yGqX9uM7C2YNGtYtTbpywJuzzLtfhK7mVH/+ELTQKeOE7pSjxBF/8WSgFUjkwYZQCY1u
+         VcJM1KJcK2phJ4lLwipEXozw6vMt42A2vaxptiQcHklRgbraF/0jQqtYUDq0C9l7YXGO
+         UFDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=2uVWGDizSikUyJ3V+rUokvNA+pyyWFcnEoJpXpnX15E=;
+        b=TdgsFzSOL+32X0gIYl63DEk7ZvS5ybR8Ehi17+T8epYNBQ1KkVZsebu6dxMb9ET0XZ
+         NMFJD+hOUQS4eTPrLNnVmOmFw1zeEOHJpN4LLkBfn8S902dfYvI4mMjQSbbNyp06NJNC
+         DxKwNXg6XZF19LuFvazViuuhKLUUklqyjP9Ef/5E4SnD2savjgLn0D7tymJm2ZpDDsMm
+         x8J8hi5s68G1z/xrW+jY3i5jber2PaWuJ326azusoUD+5TF/n0npTlD1hIvHKIo5o7Wy
+         eMyD3az+TnCjLQVFmrZJ5zt11lH6dCBIT9tmIZz8C1dXYGjBaPp8gXIHgXO5PRxK7mT7
+         cipg==
+X-Gm-Message-State: ACrzQf3D1Onl5sISL+r1CzKqjufr6To3Pl1T/E2XbKHDc33TToZTAHYN
+        UYpjBaYLzIg1NGKA0gBMsZ8Jbg==
+X-Google-Smtp-Source: AMsMyM6yrN4pZLsRYAa94YNWt50ijcDR0A0+pfBy8JMfcKzasgnMJBhUFtqnhJQe5krjQbq//6x8Aw==
+X-Received: by 2002:a05:6000:1806:b0:22c:ca13:20c1 with SMTP id m6-20020a056000180600b0022cca1320c1mr1857170wrh.460.1664452196736;
+        Thu, 29 Sep 2022 04:49:56 -0700 (PDT)
+Received: from zen.linaroharston ([185.81.254.11])
+        by smtp.gmail.com with ESMTPSA id r7-20020adfda47000000b0021e51c039c5sm6429437wrl.80.2022.09.29.04.49.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Sep 2022 04:49:54 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 394EC1FFDC;
+        Thu, 29 Sep 2022 12:42:36 +0100 (BST)
+From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     qemu-devel@nongnu.org
+Cc:     fam@euphon.net, berrange@redhat.com, f4bug@amsat.org,
+        aurelien@aurel32.net, pbonzini@redhat.com, stefanha@redhat.com,
+        crosa@redhat.com, minyihh@uci.edu, ma.mandourr@gmail.com,
+        Luke.Craig@ll.mit.edu, cota@braap.org,
+        aaron@os.amperecomputing.com, kuhn.chenqun@huawei.com,
+        robhenry@microsoft.com, mahmoudabdalghany@outlook.com,
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Mads Ynddal <mads@ynddal.dk>,
+        kvm@vger.kernel.org (open list:Overall KVM CPUs)
+Subject: [PATCH  v1 43/51] gdbstub: move sstep flags probing into AccelClass
+Date:   Thu, 29 Sep 2022 12:42:23 +0100
+Message-Id: <20220929114231.583801-44-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220929114231.583801-1-alex.bennee@linaro.org>
+References: <20220929114231.583801-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <d0beb9bd-5295-adb6-a473-c131d6102947@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Peter and Marc,
+The support of single-stepping is very much dependent on support from
+the accelerator we are using. To avoid special casing in gdbstub move
+the probing out to an AccelClass function so future accelerators can
+put their code there.
 
-On 9/29/22 7:50 PM, Gavin Shan wrote:
-> On 9/29/22 12:52 AM, Peter Xu wrote:
->> On Wed, Sep 28, 2022 at 09:25:34AM +0100, Marc Zyngier wrote:
->>> On Wed, 28 Sep 2022 00:47:43 +0100,
->>> Gavin Shan <gshan@redhat.com> wrote:
->>>
->>>> I have rough idea as below. It's appreciated if you can comment before I'm
->>>> going a head for the prototype. The overall idea is to introduce another
->>>> dirty ring for KVM (kvm-dirty-ring). It's updated and visited separately
->>>> to dirty ring for vcpu (vcpu-dirty-ring).
->>>>
->>>>     - When the various VGIC/ITS table base addresses are specified, kvm-dirty-ring
->>>>       entries are added to mark those pages as 'always-dirty'. In mark_page_dirty_in_slot(),
->>>>       those 'always-dirty' pages will be skipped, no entries pushed to vcpu-dirty-ring.
->>>>
->>>>     - Similar to vcpu-dirty-ring, kvm-dirty-ring is accessed from userspace through
->>>>       mmap(kvm->fd). However, there won't have similar reset interface. It means
->>>>       'struct kvm_dirty_gfn::flags' won't track any information as we do for
->>>>       vcpu-dirty-ring. In this regard, kvm-dirty-ring is purely shared buffer to
->>>>       advertise 'always-dirty' pages from host to userspace.
->>>>          - For QEMU, shutdown/suspend/resume cases won't be concerning
->>>> us any more. The
->>>>       only concerned case is migration. When the migration is about to complete,
->>>>       kvm-dirty-ring entries are fetched and the dirty bits are updated to global
->>>>       dirty page bitmap and RAMBlock's dirty page bitmap. For this, I'm still reading
->>>>       the code to find the best spot to do it.
->>>
->>> I think it makes a lot of sense to have a way to log writes that are
->>> not generated by a vpcu, such as the GIC and maybe other things in the
->>> future, such as DMA traffic (some SMMUs are able to track dirty pages
->>> as well).
->>>
->>> However, I don't really see the point in inventing a new mechanism for
->>> that. Why don't we simply allow non-vpcu dirty pages to be tracked in
->>> the dirty *bitmap*?
->>>
->>>  From a kernel perspective, this is dead easy:
->>>
->>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->>> index 5b064dbadaf4..ae9138f29d51 100644
->>> --- a/virt/kvm/kvm_main.c
->>> +++ b/virt/kvm/kvm_main.c
->>> @@ -3305,7 +3305,7 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
->>>       struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
->>>   #ifdef CONFIG_HAVE_KVM_DIRTY_RING
->>> -    if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
->>> +    if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
->>>           return;
->>>   #endif
->>> @@ -3313,10 +3313,11 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
->>>           unsigned long rel_gfn = gfn - memslot->base_gfn;
->>>           u32 slot = (memslot->as_id << 16) | memslot->id;
->>> -        if (kvm->dirty_ring_size)
->>> +        if (vpcu && kvm->dirty_ring_size)
->>>               kvm_dirty_ring_push(&vcpu->dirty_ring,
->>>                           slot, rel_gfn);
->>> -        else
->>> +        /* non-vpcu dirtying ends up in the global bitmap */
->>> +        if (!vcpu && memslot->dirty_bitmap)
->>>               set_bit_le(rel_gfn, memslot->dirty_bitmap);
->>>       }
->>>   }
->>>
->>> though I'm sure there is a few more things to it.
->>
->> Yes, currently the bitmaps are not created when rings are enabled.
->> kvm_prepare_memory_region() has:
->>
->>         else if (!kvm->dirty_ring_size) {
->>             r = kvm_alloc_dirty_bitmap(new);
->>
->> But I think maybe that's a solution worth considering.  Using the rings
->> have a major challenge on the limitation of ring size, so that for e.g. an
->> ioctl we need to make sure the pages to dirty within an ioctl procedure
->> will not be more than the ring can take.  Using dirty bitmap for a last
->> phase sync of constant (but still very small amount of) dirty pages does
->> sound reasonable and can avoid that complexity.  The payoff is we'll need
->> to allocate both the rings and the bitmaps.
->>
-> 
-> Ok. I was thinking of using the bitmap to convey the dirty pages for
-> this particular case, where we don't have running vcpu. The concern I had
-> is the natural difference between a ring and bitmap. The ring-buffer is
-> discrete, comparing to bitmap. Besides, it sounds a little strange to
-> have two different sets of meta-data to track the data (dirty pages).
-> 
-> However, bitmap is easier way than per-vm ring. The constrains with
-> per-vm ring is just as Peter pointed. So lets reuse the bitmap to
-> convey the dirty pages for this particular case. I think the payoff,
-> extra bitmap, is acceptable. For this, we need another capability
-> (KVM_CAP_DIRTY_LOG_RING_BITMAP?) so that QEMU can collects the dirty
-> bitmap in the last phase of migration.
-> 
-> If all of us agree on this, I can send another kernel patch to address
-> this. QEMU still need more patches so that the feature can be supported.
-> 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Mads Ynddal <mads@ynddal.dk>
+Message-Id: <20220927141504.3886314-13-alex.bennee@linaro.org>
+---
+ include/qemu/accel.h | 12 ++++++++++++
+ include/sysemu/kvm.h |  8 --------
+ accel/accel-common.c | 10 ++++++++++
+ accel/kvm/kvm-all.c  | 14 +++++++++++++-
+ accel/tcg/tcg-all.c  | 17 +++++++++++++++++
+ gdbstub/gdbstub.c    | 22 ++++------------------
+ 6 files changed, 56 insertions(+), 27 deletions(-)
 
-I've had the following PATCH[v5 3/7] to reuse bitmap for these particular
-cases. KVM_GET_DIRTY_LOG and KVM_CLEAR_DIRTY_LOG ioctls are used to visit
-the bitmap. The new capability is advertised by KVM_CAP_DIRTY_LOG_RING_BITMAP.
-Note those two ioctls are disabled when dirty-ring is enabled, we need to
-enable them accordingly.
-
-    PATCH[v5 3/7] KVM: x86: Use bitmap in ring-based dirty page tracking
-
-I would like to post v5 after someone reviews or acks kvm/selftests part
-of this series.
-
-[...]
-
-Thanks,
-Gavin
+diff --git a/include/qemu/accel.h b/include/qemu/accel.h
+index be56da1b99..ce4747634a 100644
+--- a/include/qemu/accel.h
++++ b/include/qemu/accel.h
+@@ -43,6 +43,10 @@ typedef struct AccelClass {
+     bool (*has_memory)(MachineState *ms, AddressSpace *as,
+                        hwaddr start_addr, hwaddr size);
+ #endif
++
++    /* gdbstub related hooks */
++    int (*gdbstub_supported_sstep_flags)(void);
++
+     bool *allowed;
+     /*
+      * Array of global properties that would be applied when specific
+@@ -92,4 +96,12 @@ void accel_cpu_instance_init(CPUState *cpu);
+  */
+ bool accel_cpu_realizefn(CPUState *cpu, Error **errp);
+ 
++/**
++ * accel_supported_gdbstub_sstep_flags:
++ *
++ * Returns the supported single step modes for the configured
++ * accelerator.
++ */
++int accel_supported_gdbstub_sstep_flags(void);
++
+ #endif /* QEMU_ACCEL_H */
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index efd6dee818..a20ad51aad 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -47,7 +47,6 @@ extern bool kvm_direct_msi_allowed;
+ extern bool kvm_ioeventfd_any_length_allowed;
+ extern bool kvm_msi_use_devid;
+ extern bool kvm_has_guest_debug;
+-extern int kvm_sstep_flags;
+ 
+ #define kvm_enabled()           (kvm_allowed)
+ /**
+@@ -174,12 +173,6 @@ extern int kvm_sstep_flags;
+  */
+ #define kvm_supports_guest_debug() (kvm_has_guest_debug)
+ 
+-/*
+- * kvm_supported_sstep_flags
+- * Returns: SSTEP_* flags that KVM supports for guest debug
+- */
+-#define kvm_get_supported_sstep_flags() (kvm_sstep_flags)
+-
+ #else
+ 
+ #define kvm_enabled()           (0)
+@@ -198,7 +191,6 @@ extern int kvm_sstep_flags;
+ #define kvm_ioeventfd_any_length_enabled() (false)
+ #define kvm_msi_devid_required() (false)
+ #define kvm_supports_guest_debug() (false)
+-#define kvm_get_supported_sstep_flags() (0)
+ 
+ #endif  /* CONFIG_KVM_IS_POSSIBLE */
+ 
+diff --git a/accel/accel-common.c b/accel/accel-common.c
+index 50035bda55..df72cc989a 100644
+--- a/accel/accel-common.c
++++ b/accel/accel-common.c
+@@ -129,6 +129,16 @@ bool accel_cpu_realizefn(CPUState *cpu, Error **errp)
+     return true;
+ }
+ 
++int accel_supported_gdbstub_sstep_flags(void)
++{
++    AccelState *accel = current_accel();
++    AccelClass *acc = ACCEL_GET_CLASS(accel);
++    if (acc->gdbstub_supported_sstep_flags) {
++        return acc->gdbstub_supported_sstep_flags();
++    }
++    return 0;
++}
++
+ static const TypeInfo accel_cpu_type = {
+     .name = TYPE_ACCEL_CPU,
+     .parent = TYPE_OBJECT,
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 5acab1767f..c55938453a 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -175,7 +175,7 @@ bool kvm_direct_msi_allowed;
+ bool kvm_ioeventfd_any_length_allowed;
+ bool kvm_msi_use_devid;
+ bool kvm_has_guest_debug;
+-int kvm_sstep_flags;
++static int kvm_sstep_flags;
+ static bool kvm_immediate_exit;
+ static hwaddr kvm_max_slot_size = ~0;
+ 
+@@ -3712,6 +3712,17 @@ static void kvm_accel_instance_init(Object *obj)
+     s->kvm_dirty_ring_size = 0;
+ }
+ 
++/**
++ * kvm_gdbstub_sstep_flags():
++ *
++ * Returns: SSTEP_* flags that KVM supports for guest debug. The
++ * support is probed during kvm_init()
++ */
++static int kvm_gdbstub_sstep_flags(void)
++{
++    return kvm_sstep_flags;
++}
++
+ static void kvm_accel_class_init(ObjectClass *oc, void *data)
+ {
+     AccelClass *ac = ACCEL_CLASS(oc);
+@@ -3719,6 +3730,7 @@ static void kvm_accel_class_init(ObjectClass *oc, void *data)
+     ac->init_machine = kvm_init;
+     ac->has_memory = kvm_accel_has_memory;
+     ac->allowed = &kvm_allowed;
++    ac->gdbstub_supported_sstep_flags = kvm_gdbstub_sstep_flags;
+ 
+     object_class_property_add(oc, "kernel-irqchip", "on|off|split",
+         NULL, kvm_set_kernel_irqchip,
+diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+index 47952eecd7..30b503fb22 100644
+--- a/accel/tcg/tcg-all.c
++++ b/accel/tcg/tcg-all.c
+@@ -25,6 +25,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "sysemu/tcg.h"
++#include "sysemu/replay.h"
+ #include "sysemu/cpu-timers.h"
+ #include "tcg/tcg.h"
+ #include "qapi/error.h"
+@@ -207,12 +208,28 @@ static void tcg_set_splitwx(Object *obj, bool value, Error **errp)
+     s->splitwx_enabled = value;
+ }
+ 
++static int tcg_gdbstub_supported_sstep_flags(void)
++{
++    /*
++     * In replay mode all events will come from the log and can't be
++     * suppressed otherwise we would break determinism. However as those
++     * events are tied to the number of executed instructions we won't see
++     * them occurring every time we single step.
++     */
++    if (replay_mode != REPLAY_MODE_NONE) {
++        return SSTEP_ENABLE;
++    } else {
++        return SSTEP_ENABLE | SSTEP_NOIRQ | SSTEP_NOTIMER;
++    }
++}
++
+ static void tcg_accel_class_init(ObjectClass *oc, void *data)
+ {
+     AccelClass *ac = ACCEL_CLASS(oc);
+     ac->name = "tcg";
+     ac->init_machine = tcg_init_machine;
+     ac->allowed = &tcg_allowed;
++    ac->gdbstub_supported_sstep_flags = tcg_gdbstub_supported_sstep_flags;
+ 
+     object_class_property_add_str(oc, "thread",
+                                   tcg_get_thread,
+diff --git a/gdbstub/gdbstub.c b/gdbstub/gdbstub.c
+index 7d8fe475b3..a0755e6505 100644
+--- a/gdbstub/gdbstub.c
++++ b/gdbstub/gdbstub.c
+@@ -383,27 +383,13 @@ static void init_gdbserver_state(void)
+     gdbserver_state.last_packet = g_byte_array_sized_new(MAX_PACKET_LENGTH + 4);
+ 
+     /*
+-     * In replay mode all events will come from the log and can't be
+-     * suppressed otherwise we would break determinism. However as those
+-     * events are tied to the number of executed instructions we won't see
+-     * them occurring every time we single step.
+-     */
+-    if (replay_mode != REPLAY_MODE_NONE) {
+-        gdbserver_state.supported_sstep_flags = SSTEP_ENABLE;
+-    } else if (kvm_enabled()) {
+-        gdbserver_state.supported_sstep_flags = kvm_get_supported_sstep_flags();
+-    } else {
+-        gdbserver_state.supported_sstep_flags =
+-            SSTEP_ENABLE | SSTEP_NOIRQ | SSTEP_NOTIMER;
+-    }
+-
+-    /*
+-     * By default use no IRQs and no timers while single stepping so as to
+-     * make single stepping like an ICE HW step.
++     * What single-step modes are supported is accelerator dependent.
++     * By default try to use no IRQs and no timers while single
++     * stepping so as to make single stepping like a typical ICE HW step.
+      */
++    gdbserver_state.supported_sstep_flags = accel_supported_gdbstub_sstep_flags();
+     gdbserver_state.sstep_flags = SSTEP_ENABLE | SSTEP_NOIRQ | SSTEP_NOTIMER;
+     gdbserver_state.sstep_flags &= gdbserver_state.supported_sstep_flags;
+-
+ }
+ 
+ #ifndef CONFIG_USER_ONLY
+-- 
+2.34.1
 
