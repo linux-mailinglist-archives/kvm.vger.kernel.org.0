@@ -2,222 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8147A5EEEC2
-	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 09:19:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24C675EEE94
+	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 09:14:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235195AbiI2HTk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Sep 2022 03:19:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44674 "EHLO
+        id S235159AbiI2HOM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Sep 2022 03:14:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235192AbiI2HT3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Sep 2022 03:19:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54BDB132FCF
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 00:19:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664435966;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Pahe0Oi4C4m9h6JwmtN0So34FXt/ImLGT/jbwYjYeWk=;
-        b=Ym6hve/RvWHS99l+9nvKKtrJbAYW/PhHGUTUoVKFiClOT35SvxFDclZ9dK8T/28I6gg1RZ
-        WOQ9SE+uot4ZwssbiUnK40F54O0HvhpZm7Ly7d00c87cw0JIQ1OlN5II8qifTNoOE0mWZz
-        jgGmV2dzxY4VO/ThfiT6uc29ZJuIHYY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-387-AYp4Rr9jPzufug9smFSeYQ-1; Thu, 29 Sep 2022 03:19:20 -0400
-X-MC-Unique: AYp4Rr9jPzufug9smFSeYQ-1
-Received: by mail-wr1-f72.google.com with SMTP id h1-20020adfa4c1000000b0022ccc7ac944so165499wrb.5
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 00:19:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=Pahe0Oi4C4m9h6JwmtN0So34FXt/ImLGT/jbwYjYeWk=;
-        b=hSWJDJpuXoklymLfOP31uVQdufZIKsjPx01MM9XjWHfBi23WpOj2tGKGespJQkV+DH
-         zLklBp4AEhw20uyUjYh0Q4Xbn+h7+0YFo8tIxhvs0f/4VBo9BjVSjxIGHbWJ6pL7XMjc
-         mYxzHT27VboSFD4zI3DJWPW086JWrrmprXiKzW7PWHLvpanXcOntNCVzzeCvit9dm0co
-         aOkuTjypTsPkvgQlaS8n3B4iXCv/Ow/1ocUEy6CPsFksSEbAcMp5rjWldqswsI2/C2yW
-         YqjwLA32SIQTqmDLahOOXUkkJvLHZpC5RF8qDPhKnonul/7YaN/6JHNo52wiJMHWoab+
-         7r+w==
-X-Gm-Message-State: ACrzQf1pk+uE8mE4X2gqlhfRfQCW5MPdSJMXVivHxsFHjzZwenQqPYgg
-        2Dl/TsfPMwwAIfgmqV3dCrCmMiOjj1Txv136bC1XnoDsBOp1NytqZ5Ti/bB1rxkQhoTrQ0zqhIG
-        ph5gnOaDP70lV
-X-Received: by 2002:a05:600c:4841:b0:3b4:76f0:99f with SMTP id j1-20020a05600c484100b003b476f0099fmr1218126wmo.85.1664435958811;
-        Thu, 29 Sep 2022 00:19:18 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM6fAAMQAEw10LqeyomvQ2r46WQeZdX8Xh4sSb3tkzAaqxsTNtqXiZNJ+nRawX6R9Z621MuZlw==
-X-Received: by 2002:a05:600c:4841:b0:3b4:76f0:99f with SMTP id j1-20020a05600c484100b003b476f0099fmr1218099wmo.85.1664435958545;
-        Thu, 29 Sep 2022 00:19:18 -0700 (PDT)
-Received: from redhat.com ([2.55.47.213])
-        by smtp.gmail.com with ESMTPSA id p16-20020adfe610000000b00225239d9265sm6149634wrm.74.2022.09.29.00.19.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Sep 2022 00:19:17 -0700 (PDT)
-Date:   Thu, 29 Sep 2022 03:19:14 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Junichi Uekawa =?utf-8?B?KOS4iuW3nee0lOS4gCk=?= 
-        <uekawa@google.com>
-Cc:     Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
-        netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        Bobby Eshleman <bobby.eshleman@gmail.com>
-Subject: Re: [PATCH] vhost/vsock: Use kvmalloc/kvfree for larger packets.
-Message-ID: <20220929031419-mutt-send-email-mst@kernel.org>
-References: <20220928064538.667678-1-uekawa@chromium.org>
- <20220928082823.wyxplop5wtpuurwo@sgarzare-redhat>
- <20220928052738-mutt-send-email-mst@kernel.org>
- <20220928151135.pvrlsylg6j3hzh74@sgarzare-redhat>
- <CADgJSGHxPWXJjbakEeWnqF42A03yK7Dpw6U1SKNLhk+B248Ymg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADgJSGHxPWXJjbakEeWnqF42A03yK7Dpw6U1SKNLhk+B248Ymg@mail.gmail.com>
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        with ESMTP id S235142AbiI2HOG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Sep 2022 03:14:06 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E871E132FCC
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 00:13:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1664435639; x=1695971639;
+  h=from:to:cc:subject:date:message-id;
+  bh=nwY5bmJV6FRcP6uUqHV21Hqn9xma6O1iWPE5VL+dj9s=;
+  b=Ifeiv1PE4IGRHYhrw8n0Nee8zNkD1TVhUR9riK1jy5ogaKV4oarHVayi
+   Dh5JmTxvlwOdgOq1CIv4NTeCET1BEWUCTA5tlmc2YQKvw2P5wmaUX0IOi
+   FDiwBrzhhDsuC46MGdEzXef2IEqj6w7ExBqRWu8QkyhFCGdbi9USOpGeo
+   ejYNjM7YmUhol4Ha0bOFwo5Wg+OCrCKoQCQJYYbYgtT12Cit/HXW/1eoJ
+   +dTYew7cAcz+W6Wz0sRFPTc4OnnehXMf894Rw2RyHKk9XJgcNYOpA07gu
+   N121jgO1L8aUwLtkYhWe7L2/D50IqJW2orfGXheX+ir3STfUnGNy/Lzf/
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10484"; a="288978793"
+X-IronPort-AV: E=Sophos;i="5.93,354,1654585200"; 
+   d="scan'208";a="288978793"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2022 00:13:58 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10484"; a="655440710"
+X-IronPort-AV: E=Sophos;i="5.93,354,1654585200"; 
+   d="scan'208";a="655440710"
+Received: from chenyi-pc.sh.intel.com ([10.239.159.53])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Sep 2022 00:13:56 -0700
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Peter Xu <peterx@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Chenyi Qiang <chenyi.qiang@intel.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org
+Subject: [RESEND PATCH v8 0/4] Enable notify VM exit
+Date:   Thu, 29 Sep 2022 15:20:10 +0800
+Message-Id: <20220929072014.20705-1-chenyi.qiang@intel.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 29, 2022 at 08:14:24AM +0900, Junichi Uekawa (上川純一) wrote:
-> 2022年9月29日(木) 0:11 Stefano Garzarella <sgarzare@redhat.com>:
-> >
-> > On Wed, Sep 28, 2022 at 05:31:58AM -0400, Michael S. Tsirkin wrote:
-> > >On Wed, Sep 28, 2022 at 10:28:23AM +0200, Stefano Garzarella wrote:
-> > >> On Wed, Sep 28, 2022 at 03:45:38PM +0900, Junichi Uekawa wrote:
-> > >> > When copying a large file over sftp over vsock, data size is usually 32kB,
-> > >> > and kmalloc seems to fail to try to allocate 32 32kB regions.
-> > >> >
-> > >> > Call Trace:
-> > >> >  [<ffffffffb6a0df64>] dump_stack+0x97/0xdb
-> > >> >  [<ffffffffb68d6aed>] warn_alloc_failed+0x10f/0x138
-> > >> >  [<ffffffffb68d868a>] ? __alloc_pages_direct_compact+0x38/0xc8
-> > >> >  [<ffffffffb664619f>] __alloc_pages_nodemask+0x84c/0x90d
-> > >> >  [<ffffffffb6646e56>] alloc_kmem_pages+0x17/0x19
-> > >> >  [<ffffffffb6653a26>] kmalloc_order_trace+0x2b/0xdb
-> > >> >  [<ffffffffb66682f3>] __kmalloc+0x177/0x1f7
-> > >> >  [<ffffffffb66e0d94>] ? copy_from_iter+0x8d/0x31d
-> > >> >  [<ffffffffc0689ab7>] vhost_vsock_handle_tx_kick+0x1fa/0x301 [vhost_vsock]
-> > >> >  [<ffffffffc06828d9>] vhost_worker+0xf7/0x157 [vhost]
-> > >> >  [<ffffffffb683ddce>] kthread+0xfd/0x105
-> > >> >  [<ffffffffc06827e2>] ? vhost_dev_set_owner+0x22e/0x22e [vhost]
-> > >> >  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
-> > >> >  [<ffffffffb6eb332e>] ret_from_fork+0x4e/0x80
-> > >> >  [<ffffffffb683dcd1>] ? flush_kthread_worker+0xf3/0xf3
-> > >> >
-> > >> > Work around by doing kvmalloc instead.
-> > >> >
-> > >> > Signed-off-by: Junichi Uekawa <uekawa@chromium.org>
-> > >
-> > >My worry here is that this in more of a work around.
-> > >It would be better to not allocate memory so aggressively:
-> > >if we are so short on memory we should probably process
-> > >packets one at a time. Is that very hard to implement?
-> >
-> > Currently the "virtio_vsock_pkt" is allocated in the "handle_kick"
-> > callback of TX virtqueue. Then the packet is multiplexed on the right
-> > socket queue, then the user space can de-queue it whenever they want.
-> >
-> > So maybe we can stop processing the virtqueue if we are short on memory,
-> > but when can we restart the TX virtqueue processing?
-> >
-> > I think as long as the guest used only 4K buffers we had no problem, but
-> > now that it can create larger buffers the host may not be able to
-> > allocate it contiguously. Since there is no need to have them contiguous
-> > here, I think this patch is okay.
-> >
-> > However, if we switch to sk_buff (as Bobby is already doing), maybe we
-> > don't have this problem because I think there is some kind of
-> > pre-allocated pool.
-> >
-> 
-> Thank you for the review! I was wondering if this is a reasonable workaround (as
-> we found that this patch makes a reliably crashing system into a
-> reliably surviving system.)
-> 
-> 
-> ... Sounds like it is a reasonable patch to use backported to older kernels?
+There's a minor issue in previous version. Sorry for that and please
+ignore that version. Resend the patch set.
 
-Hmm. Good point about stable. OK.
+---
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Notify VM exit is introduced to mitigate the potential DOS attach from
+malicious VM. This series is the userspace part to enable this feature
+through a new KVM capability KVM_CAP_X86_NOTIFY_VMEXIT. The detailed
+info can be seen in Patch 4.
 
+The corresponding KVM support can be found in linux 6.0-rc:
+(2f4073e08f4c KVM: VMX: Enable Notify VM exit)
 
-> > >
-> > >
-> > >
-> > >> > ---
-> > >> >
-> > >> > drivers/vhost/vsock.c                   | 2 +-
-> > >> > net/vmw_vsock/virtio_transport_common.c | 2 +-
-> > >> > 2 files changed, 2 insertions(+), 2 deletions(-)
-> > >> >
-> > >> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> > >> > index 368330417bde..5703775af129 100644
-> > >> > --- a/drivers/vhost/vsock.c
-> > >> > +++ b/drivers/vhost/vsock.c
-> > >> > @@ -393,7 +393,7 @@ vhost_vsock_alloc_pkt(struct vhost_virtqueue *vq,
-> > >> >            return NULL;
-> > >> >    }
-> > >> >
-> > >> > -  pkt->buf = kmalloc(pkt->len, GFP_KERNEL);
-> > >> > +  pkt->buf = kvmalloc(pkt->len, GFP_KERNEL);
-> > >> >    if (!pkt->buf) {
-> > >> >            kfree(pkt);
-> > >> >            return NULL;
-> > >> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> > >> > index ec2c2afbf0d0..3a12aee33e92 100644
-> > >> > --- a/net/vmw_vsock/virtio_transport_common.c
-> > >> > +++ b/net/vmw_vsock/virtio_transport_common.c
-> > >> > @@ -1342,7 +1342,7 @@ EXPORT_SYMBOL_GPL(virtio_transport_recv_pkt);
-> > >> >
-> > >> > void virtio_transport_free_pkt(struct virtio_vsock_pkt *pkt)
-> > >> > {
-> > >> > -  kfree(pkt->buf);
-> > >> > +  kvfree(pkt->buf);
-> > >>
-> > >> virtio_transport_free_pkt() is used also in virtio_transport.c and
-> > >> vsock_loopback.c where pkt->buf is allocated with kmalloc(), but IIUC
-> > >> kvfree() can be used with that memory, so this should be fine.
-> > >>
-> > >> >    kfree(pkt);
-> > >> > }
-> > >> > EXPORT_SYMBOL_GPL(virtio_transport_free_pkt);
-> > >> > --
-> > >> > 2.37.3.998.g577e59143f-goog
-> > >> >
-> > >>
-> > >> This issue should go away with the Bobby's work about introducing sk_buff
-> > >> [1], but we can queue this for now.
-> > >>
-> > >> I'm not sure if we should do the same also in the virtio-vsock driver
-> > >> (virtio_transport.c). Here in vhost-vsock the buf allocated is only used in
-> > >> the host, while in the virtio-vsock driver the buffer is exposed to the
-> > >> device emulated in the host, so it should be physically contiguous (if not,
-> > >> maybe we need to adjust virtio_vsock_rx_fill()).
-> > >
-> > >More importantly it needs to support DMA API which IIUC kvmalloc
-> > >memory does not.
-> > >
-> >
-> > Right, good point!
-> >
-> > Thanks,
-> > Stefano
-> >
-> 
-> 
-> -- 
-> Junichi Uekawa
-> Google
+---
+Change logs:
+v7 -> v8
+- Add triple_fault_pending field transmission on migration (Paolo)
+- Change the notify-vmexit and notify-window to the accelerator property. Add it as
+  a x86-specific property. (Paolo)
+- Add a preparation patch to expose struct KVMState in order to add target-specific property.
+- Define three option for notify-vmexit. Make it on by default. (Paolo)
+- Raise a KVM internal error instead of triple fault if invalid context of guest VMCS detected.
+- v7: https://lore.kernel.org/qemu-devel/20220923073333.23381-1-chenyi.qiang@intel.com/
+
+v6 -> v7
+- Add a warning message when exiting to userspace (Peter Xu)
+- v6: https://lore.kernel.org/all/20220915092839.5518-1-chenyi.qiang@intel.com/
+
+v5 -> v6
+- Add some info related to the valid range of notify_window in patch 2. (Peter Xu)
+- Add the doc in qemu-options.hx. (Peter Xu)
+- v5: https://lore.kernel.org/qemu-devel/20220817020845.21855-1-chenyi.qiang@intel.com/
+
+---
+
+Chenyi Qiang (3):
+  i386: kvm: extend kvm_{get, put}_vcpu_events to support pending triple
+    fault
+  kvm: expose struct KVMState
+  i386: add notify VM exit support
+
+Paolo Bonzini (1):
+  kvm: allow target-specific accelerator properties
+
+ accel/kvm/kvm-all.c      |  78 ++-----------------------
+ include/sysemu/kvm.h     |   2 +
+ include/sysemu/kvm_int.h |  75 ++++++++++++++++++++++++
+ qapi/run-state.json      |  17 ++++++
+ qemu-options.hx          |  11 ++++
+ target/arm/kvm.c         |   4 ++
+ target/i386/cpu.c        |   1 +
+ target/i386/cpu.h        |   1 +
+ target/i386/kvm/kvm.c    | 122 +++++++++++++++++++++++++++++++++++++++
+ target/i386/machine.c    |  20 +++++++
+ target/mips/kvm.c        |   4 ++
+ target/ppc/kvm.c         |   4 ++
+ target/riscv/kvm.c       |   4 ++
+ target/s390x/kvm/kvm.c   |   4 ++
+ 14 files changed, 273 insertions(+), 74 deletions(-)
+
+-- 
+2.17.1
 
