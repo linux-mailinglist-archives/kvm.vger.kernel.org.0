@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C43115EFBC6
-	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 19:20:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 358805EFBC9
+	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 19:20:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235911AbiI2RUX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Sep 2022 13:20:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56632 "EHLO
+        id S236180AbiI2RUl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Sep 2022 13:20:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235273AbiI2RUV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Sep 2022 13:20:21 -0400
+        with ESMTP id S236097AbiI2RU2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Sep 2022 13:20:28 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8BF91023AB
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 10:20:20 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76B7D12AEF2
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 10:20:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664472020;
+        s=mimecast20190719; t=1664472025;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=HcFaK80T9K557/Wa2SaUlDPQ+F2xISZ2hAqyCg9mPNE=;
-        b=KFOi7qmN3Mj+fe+u338d2uLCKpNgMLX5g1ZMaaU59qP9rdqi/7IJY4U5EMnnlpCb+8D2lC
-        Ad4nukHWITBYK1xed93N4zEIgEXpAsztkTL7RCYe4TbbSrzgpYaKXd01LUquY7/8n1XnB2
-        b/R1fYbGsmw6TSOycJLAbREkVRUpgq8=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=qYTAbBTJr+RvVU4YNgqc0O3Wvkwsq5mCQAgOiOHs4Xg=;
+        b=JspAuJh2FN7R4RvYKtwV2MogVsCmtwf5XzoWLFq99aHx0RtXanodmjj5snpsFZ41SgYT69
+        xR8S1qQzfyZMc40tlw8a3dv7hTYhXXtJdil2V4IMhnDW4GVPCzYxJNMuppD731ygmZ2uE0
+        YTb3sqT29NCPt0zSf9ziQpt5kFODs4o=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-669-Ph4mfmYNPUCgI8fiTCxsVw-1; Thu, 29 Sep 2022 13:20:18 -0400
-X-MC-Unique: Ph4mfmYNPUCgI8fiTCxsVw-1
+ us-mta-127-YaOGjBilNO6k6Jd2S9vu5w-1; Thu, 29 Sep 2022 13:20:18 -0400
+X-MC-Unique: YaOGjBilNO6k6Jd2S9vu5w-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DB6D829324AA;
-        Thu, 29 Sep 2022 17:20:17 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1819F803D4A;
+        Thu, 29 Sep 2022 17:20:18 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B4AC742220;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E54E34221F;
         Thu, 29 Sep 2022 17:20:17 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     seanjc@google.com, maciej.szmigiero@oracle.com
-Subject: [PATCH v2 5/8] KVM: allow compiling out SMM support
-Date:   Thu, 29 Sep 2022 13:20:13 -0400
-Message-Id: <20220929172016.319443-6-pbonzini@redhat.com>
+Subject: [PATCH v2 6/8] KVM: x86: compile out vendor-specific code if SMM is disabled
+Date:   Thu, 29 Sep 2022 13:20:14 -0400
+Message-Id: <20220929172016.319443-7-pbonzini@redhat.com>
 In-Reply-To: <20220929172016.319443-1-pbonzini@redhat.com>
 References: <20220929172016.319443-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -51,194 +51,200 @@ Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some users of KVM implement the UEFI variable store through a paravirtual device
-that does not require the "SMM lockbox" component of edk2; allow them to
-compile out system management mode, which is not a full implementation
-especially in how it interacts with nested virtualization.
+Vendor-specific code that deals with SMI injection and saving/restoring
+SMM state is not needed if CONFIG_KVM_SMM is disabled, so remove the
+four callbacks smi_allowed, enter_smm, leave_smm and enable_smi_window.
+The users in svm/nested.c and x86.c also have to be compiled out; the
+amount of #ifdef'ed code is small and it's not worth moving it to
+smm.c.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
+enter_smm is now used only within #ifdef CONFIG_KVM_SMM, and the stub
+can therefore be removed.
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/Kconfig                          | 11 ++++++++++
- arch/x86/kvm/Makefile                         |  2 +-
- arch/x86/kvm/smm.h                            | 13 ++++++++++++
- arch/x86/kvm/svm/svm.c                        |  2 ++
- arch/x86/kvm/vmx/vmx.c                        |  2 ++
- arch/x86/kvm/x86.c                            | 21 +++++++++++++++++--
- tools/testing/selftests/kvm/x86_64/smm_test.c |  2 ++
- 7 files changed, 50 insertions(+), 3 deletions(-)
+ arch/x86/include/asm/kvm-x86-ops.h | 2 ++
+ arch/x86/include/asm/kvm_host.h    | 2 ++
+ arch/x86/kvm/smm.h                 | 1 -
+ arch/x86/kvm/svm/nested.c          | 2 ++
+ arch/x86/kvm/svm/svm.c             | 4 ++++
+ arch/x86/kvm/vmx/vmx.c             | 4 ++++
+ arch/x86/kvm/x86.c                 | 4 ++++
+ 7 files changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index a107df22ffee..1679f9b4e96d 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -88,6 +88,17 @@ config KVM_INTEL
- 	  To compile this as a module, choose M here: the module
- 	  will be called kvm-intel.
+diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+index 82ba4a564e58..ea58e67e9a67 100644
+--- a/arch/x86/include/asm/kvm-x86-ops.h
++++ b/arch/x86/include/asm/kvm-x86-ops.h
+@@ -110,10 +110,12 @@ KVM_X86_OP_OPTIONAL_RET0(dy_apicv_has_pending_interrupt)
+ KVM_X86_OP_OPTIONAL(set_hv_timer)
+ KVM_X86_OP_OPTIONAL(cancel_hv_timer)
+ KVM_X86_OP(setup_mce)
++#ifdef CONFIG_KVM_SMM
+ KVM_X86_OP(smi_allowed)
+ KVM_X86_OP(enter_smm)
+ KVM_X86_OP(leave_smm)
+ KVM_X86_OP(enable_smi_window)
++#endif
+ KVM_X86_OP_OPTIONAL(mem_enc_ioctl)
+ KVM_X86_OP_OPTIONAL(mem_enc_register_region)
+ KVM_X86_OP_OPTIONAL(mem_enc_unregister_region)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index b7d078cd768d..cb88da02d965 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1606,10 +1606,12 @@ struct kvm_x86_ops {
  
-+config KVM_SMM
-+	bool "System Management Mode emulation"
-+	default y
-+	depends on KVM
-+	help
-+	  Provides support for KVM to emulate System Management Mode (SMM)
-+	  in virtual machines.  This can be used by the virtual machine
-+	  firmware to implement UEFI secure boot.
-+
-+	  If unsure, say Y.
-+
- config X86_SGX_KVM
- 	bool "Software Guard eXtensions (SGX) Virtualization"
- 	depends on X86_SGX && KVM_INTEL
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index ec6f7656254b..6cf40f668277 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -20,7 +20,7 @@ endif
- 
- kvm-$(CONFIG_X86_64) += mmu/tdp_iter.o mmu/tdp_mmu.o
- kvm-$(CONFIG_KVM_XEN)	+= xen.o
--kvm-y			+= smm.o
-+kvm-$(CONFIG_KVM_SMM)	+= smm.o
- 
- kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
- 			   vmx/evmcs.o vmx/nested.o vmx/posted_intr.o
-diff --git a/arch/x86/kvm/smm.h b/arch/x86/kvm/smm.h
-index b0602a92e511..4c699fee4492 100644
---- a/arch/x86/kvm/smm.h
-+++ b/arch/x86/kvm/smm.h
-@@ -8,6 +8,7 @@
- #define PUT_SMSTATE(type, buf, offset, val)                      \
- 	*(type *)((buf) + (offset) - 0x7e00) = val
+ 	void (*setup_mce)(struct kvm_vcpu *vcpu);
  
 +#ifdef CONFIG_KVM_SMM
- static inline int kvm_inject_smi(struct kvm_vcpu *vcpu)
- {
- 	kvm_make_request(KVM_REQ_SMI, vcpu);
-@@ -23,5 +24,17 @@ void kvm_smm_changed(struct kvm_vcpu *vcpu, bool in_smm);
- void enter_smm(struct kvm_vcpu *vcpu);
- int emulator_leave_smm(struct x86_emulate_ctxt *ctxt);
- void process_smi(struct kvm_vcpu *vcpu);
-+#else
-+static inline int kvm_inject_smi(struct kvm_vcpu *vcpu) { return -ENOTTY; }
-+static inline bool is_smm(struct kvm_vcpu *vcpu) { return false; }
-+static inline void kvm_smm_changed(struct kvm_vcpu *vcpu, bool in_smm) { WARN_ON_ONCE(1); }
-+static inline void enter_smm(struct kvm_vcpu *vcpu) { WARN_ON_ONCE(1); }
-+static inline void process_smi(struct kvm_vcpu *vcpu) { WARN_ON_ONCE(1); }
-+
-+/*
-+ * emulator_leave_smm is used as a function pointer, so the
-+ * stub is defined in x86.c.
-+ */
+ 	int (*smi_allowed)(struct kvm_vcpu *vcpu, bool for_injection);
+ 	int (*enter_smm)(struct kvm_vcpu *vcpu, char *smstate);
+ 	int (*leave_smm)(struct kvm_vcpu *vcpu, const char *smstate);
+ 	void (*enable_smi_window)(struct kvm_vcpu *vcpu);
 +#endif
  
- #endif
+ 	int (*mem_enc_ioctl)(struct kvm *kvm, void __user *argp);
+ 	int (*mem_enc_register_region)(struct kvm *kvm, struct kvm_enc_region *argp);
+diff --git a/arch/x86/kvm/smm.h b/arch/x86/kvm/smm.h
+index 4c699fee4492..7ccce6b655ca 100644
+--- a/arch/x86/kvm/smm.h
++++ b/arch/x86/kvm/smm.h
+@@ -28,7 +28,6 @@ void process_smi(struct kvm_vcpu *vcpu);
+ static inline int kvm_inject_smi(struct kvm_vcpu *vcpu) { return -ENOTTY; }
+ static inline bool is_smm(struct kvm_vcpu *vcpu) { return false; }
+ static inline void kvm_smm_changed(struct kvm_vcpu *vcpu, bool in_smm) { WARN_ON_ONCE(1); }
+-static inline void enter_smm(struct kvm_vcpu *vcpu) { WARN_ON_ONCE(1); }
+ static inline void process_smi(struct kvm_vcpu *vcpu) { WARN_ON_ONCE(1); }
+ 
+ /*
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index cc0fd75f7cba..b258d6988f5d 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -1378,6 +1378,7 @@ static int svm_check_nested_events(struct kvm_vcpu *vcpu)
+ 		return 0;
+ 	}
+ 
++#ifdef CONFIG_KVM_SMM
+ 	if (vcpu->arch.smi_pending && !svm_smi_blocked(vcpu)) {
+ 		if (block_nested_events)
+ 			return -EBUSY;
+@@ -1386,6 +1387,7 @@ static int svm_check_nested_events(struct kvm_vcpu *vcpu)
+ 		nested_svm_simple_vmexit(svm, SVM_EXIT_SMI);
+ 		return 0;
+ 	}
++#endif
+ 
+ 	if (vcpu->arch.nmi_pending && !svm_nmi_blocked(vcpu)) {
+ 		if (block_nested_events)
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 496ee7d1ae2f..6f7ceb35d2ff 100644
+index 6f7ceb35d2ff..2200b8aa7273 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -4150,6 +4150,8 @@ static bool svm_has_emulated_msr(struct kvm *kvm, u32 index)
- 	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
- 		return false;
- 	case MSR_IA32_SMBASE:
-+		if (!IS_ENABLED(CONFIG_KVM_SMM))
-+			return false;
- 		/* SEV-ES guests do not support SMM, so report false */
- 		if (kvm && sev_es_guest(kvm))
- 			return false;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 038809c68006..b22330a15adb 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6841,6 +6841,8 @@ static bool vmx_has_emulated_msr(struct kvm *kvm, u32 index)
- {
- 	switch (index) {
- 	case MSR_IA32_SMBASE:
-+		if (!IS_ENABLED(CONFIG_KVM_SMM))
-+			return false;
- 		/*
- 		 * We cannot do SMM unless we can run the guest in big
- 		 * real mode.
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 97a871635986..a9e050aefea6 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3636,7 +3636,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		break;
- 	}
- 	case MSR_IA32_SMBASE:
--		if (!msr_info->host_initiated)
-+		if (!IS_ENABLED(CONFIG_KVM_SMM) || !msr_info->host_initiated)
- 			return 1;
- 		vcpu->arch.smbase = data;
- 		break;
-@@ -4052,7 +4052,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		msr_info->data = vcpu->arch.ia32_misc_enable_msr;
- 		break;
- 	case MSR_IA32_SMBASE:
--		if (!msr_info->host_initiated)
-+		if (!IS_ENABLED(CONFIG_KVM_SMM) || !msr_info->host_initiated)
- 			return 1;
- 		msr_info->data = vcpu->arch.smbase;
- 		break;
-@@ -4426,6 +4426,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 			r |= KVM_X86_DISABLE_EXITS_MWAIT;
- 		break;
- 	case KVM_CAP_X86_SMM:
-+		if (!IS_ENABLED(CONFIG_KVM_SMM))
-+			break;
-+
- 		/* SMBASE is usually relocated above 1M on modern chipsets,
- 		 * and SMM handlers might indeed rely on 4G segment limits,
- 		 * so do not report SMM to be available if real mode is
-@@ -5176,6 +5179,12 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
- 		vcpu->arch.apic->sipi_vector = events->sipi_vector;
- 
- 	if (events->flags & KVM_VCPUEVENT_VALID_SMM) {
-+		if (!IS_ENABLED(CONFIG_KVM_SMM) &&
-+		    (events->smi.smm ||
-+		     events->smi.pending ||
-+		     events->smi.smm_inside_nmi))
-+			return -EINVAL;
-+
- 		if (!!(vcpu->arch.hflags & HF_SMM_MASK) != events->smi.smm) {
- 			kvm_x86_ops.nested_ops->leave_nested(vcpu);
- 			kvm_smm_changed(vcpu, events->smi.smm);
-@@ -8066,6 +8075,14 @@ static unsigned emulator_get_hflags(struct x86_emulate_ctxt *ctxt)
- 	return emul_to_vcpu(ctxt)->arch.hflags;
+@@ -4408,6 +4408,7 @@ static void svm_setup_mce(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.mcg_cap &= 0x1ff;
  }
  
-+#ifndef CONFIG_KVM_SMM
-+static int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
-+{
-+	WARN_ON_ONCE(1);
-+	return X86EMUL_UNHANDLEABLE;
-+}
-+#endif
-+
- static void emulator_triple_fault(struct x86_emulate_ctxt *ctxt)
++#ifdef CONFIG_KVM_SMM
+ bool svm_smi_blocked(struct kvm_vcpu *vcpu)
  {
- 	kvm_make_request(KVM_REQ_TRIPLE_FAULT, emul_to_vcpu(ctxt));
-diff --git a/tools/testing/selftests/kvm/x86_64/smm_test.c b/tools/testing/selftests/kvm/x86_64/smm_test.c
-index 1f136a81858e..cb38a478e1f6 100644
---- a/tools/testing/selftests/kvm/x86_64/smm_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/smm_test.c
-@@ -137,6 +137,8 @@ int main(int argc, char *argv[])
- 	struct kvm_x86_state *state;
- 	int stage, stage_reported;
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+@@ -4557,6 +4558,7 @@ static void svm_enable_smi_window(struct kvm_vcpu *vcpu)
+ 		/* We must be in SMM; RSM will cause a vmexit anyway.  */
+ 	}
+ }
++#endif
  
-+	TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_SMM));
-+
- 	/* Create VM */
- 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+ static bool svm_can_emulate_instruction(struct kvm_vcpu *vcpu, int emul_type,
+ 					void *insn, int insn_len)
+@@ -4832,10 +4834,12 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.pi_update_irte = avic_pi_update_irte,
+ 	.setup_mce = svm_setup_mce,
  
++#ifdef CONFIG_KVM_SMM
+ 	.smi_allowed = svm_smi_allowed,
+ 	.enter_smm = svm_enter_smm,
+ 	.leave_smm = svm_leave_smm,
+ 	.enable_smi_window = svm_enable_smi_window,
++#endif
+ 
+ 	.mem_enc_ioctl = sev_mem_enc_ioctl,
+ 	.mem_enc_register_region = sev_mem_enc_register_region,
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index b22330a15adb..107fc035c91b 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7905,6 +7905,7 @@ static void vmx_setup_mce(struct kvm_vcpu *vcpu)
+ 			~FEAT_CTL_LMCE_ENABLED;
+ }
+ 
++#ifdef CONFIG_KVM_SMM
+ static int vmx_smi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+ {
+ 	/* we need a nested vmexit to enter SMM, postpone if run is pending */
+@@ -7959,6 +7960,7 @@ static void vmx_enable_smi_window(struct kvm_vcpu *vcpu)
+ {
+ 	/* RSM will cause a vmexit anyway.  */
+ }
++#endif
+ 
+ static bool vmx_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
+ {
+@@ -8126,10 +8128,12 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+ 
+ 	.setup_mce = vmx_setup_mce,
+ 
++#ifdef CONFIG_KVM_SMM
+ 	.smi_allowed = vmx_smi_allowed,
+ 	.enter_smm = vmx_enter_smm,
+ 	.leave_smm = vmx_leave_smm,
+ 	.enable_smi_window = vmx_enable_smi_window,
++#endif
+ 
+ 	.can_emulate_instruction = vmx_can_emulate_instruction,
+ 	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a9e050aefea6..e22184bad92b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9863,6 +9863,7 @@ static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
+ 	 * in order to make progress and get back here for another iteration.
+ 	 * The kvm_x86_ops hooks communicate this by returning -EBUSY.
+ 	 */
++#ifdef CONFIG_KVM_SMM
+ 	if (vcpu->arch.smi_pending) {
+ 		r = can_inject ? static_call(kvm_x86_smi_allowed)(vcpu, true) : -EBUSY;
+ 		if (r < 0)
+@@ -9875,6 +9876,7 @@ static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
+ 		} else
+ 			static_call(kvm_x86_enable_smi_window)(vcpu);
+ 	}
++#endif
+ 
+ 	if (vcpu->arch.nmi_pending) {
+ 		r = can_inject ? static_call(kvm_x86_nmi_allowed)(vcpu, true) : -EBUSY;
+@@ -12491,10 +12493,12 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
+ 	     static_call(kvm_x86_nmi_allowed)(vcpu, false)))
+ 		return true;
+ 
++#ifdef CONFIG_KVM_SMM
+ 	if (kvm_test_request(KVM_REQ_SMI, vcpu) ||
+ 	    (vcpu->arch.smi_pending &&
+ 	     static_call(kvm_x86_smi_allowed)(vcpu, false)))
+ 		return true;
++#endif
+ 
+ 	if (kvm_arch_interrupt_allowed(vcpu) &&
+ 	    (kvm_cpu_has_interrupt(vcpu) ||
 -- 
 2.31.1
 
