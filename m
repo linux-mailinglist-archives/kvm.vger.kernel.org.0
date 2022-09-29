@@ -2,126 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 828ED5EEA59
-	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 01:56:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B2B95EEB41
+	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 03:54:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234018AbiI1X4e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Sep 2022 19:56:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49788 "EHLO
+        id S233992AbiI2ByQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Sep 2022 21:54:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231303AbiI1X4b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Sep 2022 19:56:31 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F8E110C7AB
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 16:56:31 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id b5so13607357pgb.6
-        for <kvm@vger.kernel.org>; Wed, 28 Sep 2022 16:56:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date;
-        bh=voWIOlvE6xY6pJCYliBMURGrAJOoVflZKd2yIzLEPnA=;
-        b=JCkmzE9taWz2PO23dHyQ1cN/jZXIjeBFxF5nl4dSI7GO8isbyDtQm8D+JXh7uB3axx
-         ue053OVGVgL4x7xIoU9mCQrF9ule+zudwLtemwLKCMpvzb/lp99+lJPpjxXrxPMVc/HY
-         DvOTyigoAlRjpkgm4gABxmS0yEcULZBZS2/zzgUyZ8QlGPlJBptSVUm1kRsRCrgFBB8D
-         K7aQu1DlpROc3ciAHlpR+KiRV04iE8FRBqWEVEuMBwX98+hJ/kgzB7gLK8rn0tuxqckV
-         4Gcx5Uh3JxhYId64vwN/ES2H3ZbvkDjCopcUUrig6Lqgu4QkN8eky2sVky1v+ws2rLqp
-         nq7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=voWIOlvE6xY6pJCYliBMURGrAJOoVflZKd2yIzLEPnA=;
-        b=DB46iHykiV02SA7aGvrI8YhahUpaCvjesT9scyR2UYaXCt6HJmPiTXT2MUEcx+hsHd
-         y/O3hYaf/5cGEsJ1myfEFu9yPqD+ihqxjwck3PjcfacqGzDyLuDLICWxHaEsTAGQN33p
-         gVsZIdAkj26HhkyrohFC8xszNLCoqg0jkBLkEC32BKOCSgEID+LaJVefmlamOlEASRRR
-         7wmQLTy4Jg4gKt3bo5xQZj3uF5BMbJKu/E6NWPof3f7O68kCA9wzrSZ8KqVUBLD4gtaG
-         Ajjw722Utmxa2gDrc2mKlYGaP/FqXEgBHy0FQI8lHQYXslwqz2AW0PllD8k9/bPF8nsK
-         25rw==
-X-Gm-Message-State: ACrzQf0+Yt9QWiRUleeb1WEMb4gf5jGpANupPF1ceW0wSD4tTTfi3ChI
-        hMefTzjNWRNmng0pypIag2Fykx850tK/Ag==
-X-Google-Smtp-Source: AMsMyM7NH/4yulepb5kSeUkKoLldZTDv0gTKOsOBsoSSZAVF6eXnUuRbnEvF5JZ76GI7QirHhlzMag==
-X-Received: by 2002:a63:8748:0:b0:43b:bacd:4461 with SMTP id i69-20020a638748000000b0043bbacd4461mr282115pge.507.1664409390529;
-        Wed, 28 Sep 2022 16:56:30 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id a15-20020aa78e8f000000b00540f3ac5fb8sm4671990pfr.69.2022.09.28.16.56.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 16:56:30 -0700 (PDT)
-Date:   Wed, 28 Sep 2022 23:56:26 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org
-Subject: KVM: x86: Second batch of updates for 6.1, i.e. kvm/queue
-Message-ID: <YzTfKh3Sv7RB1abm@google.com>
+        with ESMTP id S232242AbiI2ByP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Sep 2022 21:54:15 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF29822BDA;
+        Wed, 28 Sep 2022 18:54:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1664416452; x=1695952452;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=whH5AC8kMAxW+DvvWFDRKDdPE+thuIPFy2NSLFOY2uc=;
+  b=LVGlmxXgsDPCirbKnRtZoHaPCd5K8MVuZpbFO0FA0Il47TKy+TZGnQEl
+   CjablpxmezpNNly6H9fl9hLiB+7r6q1QtJFQaDfIHrpnkJpPN6N1eGdr7
+   vQtC5Vog6lPs1tuIoK+i454SUl2KxVmk+5U6f4FqKV5mGw1xniI7t9Mum
+   wEIP4wg2VftPJzrtwmCqXG8LWmXOxJ00ENyOCrCsAgoLH5GKMe/UNWevK
+   jV95yBANqSjjJTqhdcBSNjzJkbp1lNG9L+byZ/yYZNTo2j0vI0zI/2mfs
+   mzUmZZ1by+Z0t5UNLjwqONTcGB8myTC+B1CQFDGbU5Wi1HeNseDARfSC0
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10484"; a="365813983"
+X-IronPort-AV: E=Sophos;i="5.93,353,1654585200"; 
+   d="scan'208";a="365813983"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2022 18:54:12 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10484"; a="950931614"
+X-IronPort-AV: E=Sophos;i="5.93,353,1654585200"; 
+   d="scan'208";a="950931614"
+Received: from unknown (HELO localhost.localdomain.bj.intel.com) ([10.240.193.73])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2022 18:54:12 -0700
+From:   Zhu Lingshan <lingshan.zhu@intel.com>
+To:     jasowang@redhat.com, mst@redhat.com
+Cc:     virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        kvm@vger.kernel.org, Zhu Lingshan <lingshan.zhu@intel.com>
+Subject: [PATCH V3 0/6] Conditionally read fields in dev cfg space 
+Date:   Thu, 29 Sep 2022 09:45:49 +0800
+Message-Id: <20220929014555.112323-1-lingshan.zhu@intel.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Second and likely final batch of x86 updates for 6.1, i.e. for kvm/queue.  All
-larger series (NX precision, Hyper-V TLB flush, AVIC fixes, etc...) are
-destined for 6.2.
+This series intends to read the fields in virtio-net device
+configuration space conditionally on the feature bits,
+this means:
 
-There are a variety of selftest fixes and improvements that I think we should
-get into 6.1, but they're not x86 specific, i.e. I need to sync with you to
-figure out how to handle those.
+MTU exists if VIRTIO_NET_F_MTU is set
+MAC exists if VIRTIO_NET_F_NET is set
+MQ exists if VIRTIO_NET_F_MQ or VIRTIO_NET_F_RSS is set.
 
-Note, Like's PEBS KVM-unit-tests[1] will fail unless the PMU fix that's going
-through the tip tree is also applied[2].  That's my fault, I requested Like to
-post it separately without thinking through the KUT ramifications.
+This series report device features to userspace and invokes
+vdpa_config_ops.get_config() rather than
+vdpa_get_config_unlocked() to read the device config spcae,
+so no races in vdpa_set_features_unlocked()
 
 Thanks!
 
-[1] https://lore.kernel.org/all/20220819110939.78013-1-likexu@tencent.com
-[2] https://lore.kernel.org/all/20220831033524.58561-1-likexu@tencent.com
+Changes form V2:
+remove unnacessary checking for vdev->config->get_status (Jason)
 
+Changes from V1:
+1)Better comments for VDPA_ATTR_VDPA_DEV_SUPPORTED_FEATURES,
+only in the header file(Jason)
+2)Split original 3/4 into separate patches(Jason)
+3)Check FEATURES_OK for reporting driver features
+in vdpa_dev_config_fill (Jason)
+4) Add iproute2 example for reporting device features
 
-The following changes since commit c59fb127583869350256656b7ed848c398bef879:
+Zhu Lingshan (6):
+  vDPA: allow userspace to query features of a vDPA device
+  vDPA: only report driver features if FEATURES_OK is set
+  vDPA: check VIRTIO_NET_F_RSS for max_virtqueue_paris's presence
+  vDPA: check virtio device features to detect MQ
+  vDPA: fix spars cast warning in vdpa_dev_net_mq_config_fill
+  vDPA: conditionally read MTU and MAC in dev cfg space
 
-  KVM: remove KVM_REQ_UNHALT (2022-09-26 12:37:21 -0400)
+ drivers/vdpa/vdpa.c       | 68 ++++++++++++++++++++++++++++++---------
+ include/uapi/linux/vdpa.h |  4 +++
+ 2 files changed, 56 insertions(+), 16 deletions(-)
 
-are available in the Git repository at:
+-- 
+2.31.1
 
-  https://github.com/sean-jc/linux.git tags/kvm-x86-6.1-2
-
-for you to fetch changes up to ea5cbc9ff839091a86558d4e2c082225b13e0055:
-
-  KVM: x86/svm/pmu: Rewrite get_gp_pmc_amd() for more counters scalability (2022-09-28 12:47:23 -0700)
-
-----------------------------------------------------------------
-KVM x86 updates for 6.1, batch #2:
-
- - Misc PMU fixes and cleanups.
-
- - Fixes for Hyper-V hypercall selftest
-
-----------------------------------------------------------------
-Like Xu (6):
-      KVM: x86/pmu: Avoid setting BIT_ULL(-1) to pmu->host_cross_mapped_mask
-      KVM: x86/pmu: Don't generate PEBS records for emulated instructions
-      KVM: x86/pmu: Refactor PERF_GLOBAL_CTRL update helper for reuse by PEBS
-      KVM: x86/pmu: Avoid using PEBS perf_events for normal counters
-      KVM: x86/svm/pmu: Direct access pmu->gp_counter[] to implement amd_*_to_pmc()
-      KVM: x86/svm/pmu: Rewrite get_gp_pmc_amd() for more counters scalability
-
-Vipin Sharma (2):
-      KVM: selftests: Check result in hyperv_features for successful hypercalls
-      KVM: selftests: Load RAX with -EFAULT before Hyper-V hypercall
-
-Vitaly Kuznetsov (1):
-      KVM: selftests: Don't set reserved bits for invalid Hyper-V hypercall number
-
- arch/x86/kvm/pmu.c                                   |  20 ++++++++++++++-----
- arch/x86/kvm/svm/pmu.c                               | 117 +++++++++++++++++++---------------------------------------------------------------------------------------------
- arch/x86/kvm/vmx/pmu_intel.c                         |  29 +++++++++++++++-------------
- tools/testing/selftests/kvm/x86_64/hyperv_features.c |  13 +++++++------
- 4 files changed, 57 insertions(+), 122 deletions(-)
