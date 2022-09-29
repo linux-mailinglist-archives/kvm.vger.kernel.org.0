@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1569B5EF7E3
-	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 16:43:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BAA05EF7E9
+	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 16:44:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235430AbiI2Oma (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Sep 2022 10:42:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44234 "EHLO
+        id S234912AbiI2OoL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Sep 2022 10:44:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235386AbiI2Om2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Sep 2022 10:42:28 -0400
+        with ESMTP id S234421AbiI2OoJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Sep 2022 10:44:09 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A3D112FF0D
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 07:42:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0963013D63
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 07:44:09 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E0A3E614E4
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 14:42:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A439C433B5;
-        Thu, 29 Sep 2022 14:42:26 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2486C61812
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 14:44:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74D11C433C1;
+        Thu, 29 Sep 2022 14:44:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664462546;
-        bh=/SxFICnb/IGykEy7g4NmdFo3YPCbWRpQuzBLo3gamXk=;
+        s=k20201202; t=1664462647;
+        bh=Gs9H5OHTr0AT5Xc1QNtEofC7o127qef+wJzsINErOPk=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=IDWn4g189wiJF2sEazzSwxDePwTVxKdus0rLKsZhsyfH0ONUmiIFt+hwXe2rhA8iD
-         w44EmHQhpYByr/Bra4EEHC9HDbM6ABdBVmyT/hJioa5JqJHzfrkgv+rZQAHKrSCjxY
-         o/2/qTMPIn62EnJ7zx4isjhv8ErTPXiW/o6nVmhvg3lvABMEFl1+mYrqNdHfBdUiLb
-         eohwNnFB1Rd3eEg24gdOqRLZkZQ3wUCD6U9avDRgfUNWAr2zKIjMq79a1GQl1OrGVB
-         5uP92eOJDhUZz1SLq0vIZ5VHT4/E+ijDGXo6niXg+80OqeBcBx+6+etpWNWmg+0WH0
-         QNI2gLgiaJXNQ==
+        b=deOzK2FtILe0sBjK275mue9L4hd1iXPSKvcW+5SOFWCRBMIWflGcpjDdaOlCUVB35
+         fHy59rA7tMmmc3xC4vF80htz1rXzypW2HqsT9nhliljKZCDmoAdrjkkzuiGLeXuS9n
+         0jt/OYUoGpDVpbXXKOZscWJj3P1wEe+lwZDYzKBpTpr/TJi2W+rpnf46FJiRpBMxX2
+         2EnLe9MCChq4vGQNfzJQSNYteEhqlT34jfUreO7a9kJUvzaT4bXG5HiONbyOlHk5Br
+         jLVSfkI+qrZif6nVzwPVZCkxSIJKQ0SUak+Z3sUgJUuB9FOKmZJjgGrJbJ/sQcjbVc
+         ZIatjAQGtQUZQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1oduk3-00DYne-QI;
-        Thu, 29 Sep 2022 15:42:23 +0100
-Date:   Thu, 29 Sep 2022 15:42:23 +0100
-Message-ID: <86fsga6y40.wl-maz@kernel.org>
+        id 1odulh-00DYpR-95;
+        Thu, 29 Sep 2022 15:44:05 +0100
+Date:   Thu, 29 Sep 2022 15:44:04 +0100
+Message-ID: <86edvu6y17.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Gavin Shan <gshan@redhat.com>
 Cc:     Peter Xu <peterx@redhat.com>, kvmarm@lists.cs.columbia.edu,
@@ -48,7 +48,7 @@ Cc:     Peter Xu <peterx@redhat.com>, kvmarm@lists.cs.columbia.edu,
         shan.gavin@gmail.com, james.morse@arm.com, suzuki.poulose@arm.com,
         alexandru.elisei@arm.com, oliver.upton@linux.dev
 Subject: Re: [PATCH v4 3/6] KVM: arm64: Enable ring-based dirty memory tracking
-In-Reply-To: <d0beb9bd-5295-adb6-a473-c131d6102947@redhat.com>
+In-Reply-To: <ddc4166c-81b6-2f7b-87a7-4af3d7db888a@redhat.com>
 References: <20220927005439.21130-1-gshan@redhat.com>
         <20220927005439.21130-4-gshan@redhat.com>
         <YzMerD8ZvhvnprEN@x1n>
@@ -58,6 +58,7 @@ References: <20220927005439.21130-1-gshan@redhat.com>
         <87y1u3hpmp.wl-maz@kernel.org>
         <YzRfkBWepX2CD88h@x1n>
         <d0beb9bd-5295-adb6-a473-c131d6102947@redhat.com>
+        <ddc4166c-81b6-2f7b-87a7-4af3d7db888a@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -76,145 +77,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 29 Sep 2022 10:50:12 +0100,
+On Thu, 29 Sep 2022 12:31:34 +0100,
 Gavin Shan <gshan@redhat.com> wrote:
 > 
-> Hi Marc and Peter,
+> I've had the following PATCH[v5 3/7] to reuse bitmap for these particular
+> cases. KVM_GET_DIRTY_LOG and KVM_CLEAR_DIRTY_LOG ioctls are used to visit
+> the bitmap. The new capability is advertised by KVM_CAP_DIRTY_LOG_RING_BITMAP.
+> Note those two ioctls are disabled when dirty-ring is enabled, we need to
+> enable them accordingly.
 > 
-> On 9/29/22 12:52 AM, Peter Xu wrote:
-> > On Wed, Sep 28, 2022 at 09:25:34AM +0100, Marc Zyngier wrote:
-> >> On Wed, 28 Sep 2022 00:47:43 +0100,
-> >> Gavin Shan <gshan@redhat.com> wrote:
-> >> 
-> >>> I have rough idea as below. It's appreciated if you can comment before I'm
-> >>> going a head for the prototype. The overall idea is to introduce another
-> >>> dirty ring for KVM (kvm-dirty-ring). It's updated and visited separately
-> >>> to dirty ring for vcpu (vcpu-dirty-ring).
-> >>> 
-> >>>     - When the various VGIC/ITS table base addresses are specified, kvm-dirty-ring
-> >>>       entries are added to mark those pages as 'always-dirty'. In mark_page_dirty_in_slot(),
-> >>>       those 'always-dirty' pages will be skipped, no entries pushed to vcpu-dirty-ring.
-> >>> 
-> >>>     - Similar to vcpu-dirty-ring, kvm-dirty-ring is accessed from userspace through
-> >>>       mmap(kvm->fd). However, there won't have similar reset interface. It means
-> >>>       'struct kvm_dirty_gfn::flags' won't track any information as we do for
-> >>>       vcpu-dirty-ring. In this regard, kvm-dirty-ring is purely shared buffer to
-> >>>       advertise 'always-dirty' pages from host to userspace.
-> >>>          - For QEMU, shutdown/suspend/resume cases won't be concerning
-> >>> us any more. The
-> >>>       only concerned case is migration. When the migration is about to complete,
-> >>>       kvm-dirty-ring entries are fetched and the dirty bits are updated to global
-> >>>       dirty page bitmap and RAMBlock's dirty page bitmap. For this, I'm still reading
-> >>>       the code to find the best spot to do it.
-> >> 
-> >> I think it makes a lot of sense to have a way to log writes that are
-> >> not generated by a vpcu, such as the GIC and maybe other things in the
-> >> future, such as DMA traffic (some SMMUs are able to track dirty pages
-> >> as well).
-> >> 
-> >> However, I don't really see the point in inventing a new mechanism for
-> >> that. Why don't we simply allow non-vpcu dirty pages to be tracked in
-> >> the dirty *bitmap*?
-> >> 
-> >>  From a kernel perspective, this is dead easy:
-> >> 
-> >> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> >> index 5b064dbadaf4..ae9138f29d51 100644
-> >> --- a/virt/kvm/kvm_main.c
-> >> +++ b/virt/kvm/kvm_main.c
-> >> @@ -3305,7 +3305,7 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
-> >>   	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
-> >>     #ifdef CONFIG_HAVE_KVM_DIRTY_RING
-> >> -	if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
-> >> +	if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
-> >>   		return;
-> >>   #endif
-> >>   @@ -3313,10 +3313,11 @@ void mark_page_dirty_in_slot(struct kvm
-> >> *kvm,
-> >>   		unsigned long rel_gfn = gfn - memslot->base_gfn;
-> >>   		u32 slot = (memslot->as_id << 16) | memslot->id;
-> >>   -		if (kvm->dirty_ring_size)
-> >> +		if (vpcu && kvm->dirty_ring_size)
-> >>   			kvm_dirty_ring_push(&vcpu->dirty_ring,
-> >>   					    slot, rel_gfn);
-> >> -		else
-> >> +		/* non-vpcu dirtying ends up in the global bitmap */
-> >> +		if (!vcpu && memslot->dirty_bitmap)
-> >>   			set_bit_le(rel_gfn, memslot->dirty_bitmap);
-> >>   	}
-> >>   }
-> >> 
-> >> though I'm sure there is a few more things to it.
-> > 
-> > Yes, currently the bitmaps are not created when rings are enabled.
-> > kvm_prepare_memory_region() has:
-> > 
-> > 		else if (!kvm->dirty_ring_size) {
-> > 			r = kvm_alloc_dirty_bitmap(new);
-> > 
-> > But I think maybe that's a solution worth considering.  Using the rings
-> > have a major challenge on the limitation of ring size, so that for e.g. an
-> > ioctl we need to make sure the pages to dirty within an ioctl procedure
-> > will not be more than the ring can take.  Using dirty bitmap for a last
-> > phase sync of constant (but still very small amount of) dirty pages does
-> > sound reasonable and can avoid that complexity.  The payoff is we'll need
-> > to allocate both the rings and the bitmaps.
-> > 
+>    PATCH[v5 3/7] KVM: x86: Use bitmap in ring-based dirty page tracking
 > 
-> Ok. I was thinking of using the bitmap to convey the dirty pages for
-> this particular case, where we don't have running vcpu. The concern I had
-> is the natural difference between a ring and bitmap. The ring-buffer is
-> discrete, comparing to bitmap. Besides, it sounds a little strange to
-> have two different sets of meta-data to track the data (dirty pages).
+> I would like to post v5 after someone reviews or acks kvm/selftests part
+> of this series.
 
-The problem is that the dirty ring mechanism is a bit blinkered, and
-cannot consider a source of dirty pages other than from the vcpus.
-
-> However, bitmap is easier way than per-vm ring. The constrains with
-> per-vm ring is just as Peter pointed. So lets reuse the bitmap to
-> convey the dirty pages for this particular case. I think the payoff,
-> extra bitmap, is acceptable. For this, we need another capability
-> (KVM_CAP_DIRTY_LOG_RING_BITMAP?) so that QEMU can collects the dirty
-> bitmap in the last phase of migration.
-
-Why another capability? Just allowing dirty logging to be enabled
-before we saving the GIC state should be enough, shouldn't it?
-
-> If all of us agree on this, I can send another kernel patch to address
-> this. QEMU still need more patches so that the feature can be supported.
-
-Yes, this will also need some work.
-
-> >> 
-> >> To me, this is just a relaxation of an arbitrary limitation, as the
-> >> current assumption that only vcpus can dirty memory doesn't hold at
-> >> all.
-> > 
-> > The initial dirty ring proposal has a per-vm ring, but after we
-> > investigated x86 we found that all legal dirty paths are with a vcpu
-> > context (except one outlier on kvmgt which fixed within itself), so we
-> > dropped the per-vm ring.
-> > 
-> > One thing to mention is that DMAs should not count in this case because
-> > that's from device perspective, IOW either IOMMU or SMMU dirty tracking
-> > should be reported to the device driver that interacts with the userspace
-> > not from KVM interfaces (e.g. vfio with VFIO_IOMMU_DIRTY_PAGES).  That even
-> > includes emulated DMA like vhost (VHOST_SET_LOG_BASE).
-> > 
-> 
-> Thanks to Peter for mentioning the per-vm ring's history. As I said above,
-> lets use bitmap instead if all of us agree.
-> 
-> If I'm correct, Marc may be talking about SMMU, which is emulated in host
-> instead of QEMU. In this case, the DMA target pages are similar to those
-> pages for vgic/its tables. Both sets of pages are invisible from QEMU.
-
-No, I'm talking about an actual HW SMMU using the HTTU feature that
-set the Dirty bit in the PTEs. And people have been working on sharing
-SMMU and CPU PTs for some time, which would give us the one true
-source of dirty page.
-
-In this configuration, the dirty ring mechanism will be pretty useless.
+Feel free to post the series. This is too late for 6.1 anyway (I'll
+probably send the PR to Paolo tomorrow), so this gives us plenty of
+time to sort this out.
 
 	M.
 
