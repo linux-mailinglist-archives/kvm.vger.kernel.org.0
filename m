@@ -2,79 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D58285EF5AD
-	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 14:47:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 73F9F5EF673
+	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 15:27:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235200AbiI2Mre (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Sep 2022 08:47:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54946 "EHLO
+        id S235745AbiI2N0d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Sep 2022 09:26:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234687AbiI2Mrb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Sep 2022 08:47:31 -0400
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC6F214A7B6
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 05:47:28 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id l8so888615wmi.2
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 05:47:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=/jd4X0PoFWLfTb4dd6/XSxqnO/9Pw1JPWNu/UEAiCLs=;
-        b=UzJR1/QhrpVoNQ6vx8b8o/LAuxQxzwp9Fvojkzml8Jtqh8nvajBpKK7UBqYIbYvB55
-         86K9EZmdHroH1k2CUOcxZTMO/a3jHhqvXobkE1fDEd9o8OXL6zVzky7uvkSM0PhpHQ1a
-         Qqf1whTb8vvdcnUsTbTiIA6AL7eWfKB6rd0GPjEdKqIKCcuIfrLjjTSH4S99hzLxy/al
-         61uMdpcCczvTrIX8qkjyzGpZ6CtcNE7h3/QMpIaUwLNopvTOCFciWhF34bTduFugRHsD
-         MIzi+YYzsAvyAdF/vyTThrlnFxt2eM7bsY1kvHexFAGBUVE2LL31LLoK5yuu95Mr92SV
-         5oPw==
+        with ESMTP id S235681AbiI2N0M (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Sep 2022 09:26:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A19EE5FB2
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 06:26:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664457968;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cRppPu8Rg7//eJDTidhVUrVedsDey7PezTpFqKhKxns=;
+        b=hzojHKfjRpQVRfYybtqy2eUFC3yjiEpOvGIkNJFu/MwCxkj8rEj8RHeERF1Of4KP6KU02n
+        H7FE6KOAuZw9Yq6W7rkxLZJI9scrWeARTXOSB8mNXzkpD64Lj1FJWPfAvJQIf+5Aga/dzU
+        XPWe3xozmNEGTIqcxHioUO3rsIL2mkg=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-583-8gBoADE5OP2MiYM3pS6IoA-1; Thu, 29 Sep 2022 09:26:06 -0400
+X-MC-Unique: 8gBoADE5OP2MiYM3pS6IoA-1
+Received: by mail-ed1-f71.google.com with SMTP id y9-20020a056402270900b00451dfbbc9b2so1281055edd.12
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 06:26:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=/jd4X0PoFWLfTb4dd6/XSxqnO/9Pw1JPWNu/UEAiCLs=;
-        b=b/2aeTchjj1kR5fHhBkiKXouAA+vtcfyVrENwkbwetNRA1ktn0RoZ6/WiGoP4YsT0X
-         tl8Zp5ROBSkwe7nTfNLSlHXLWJzAhisMr3Ex/6j0jj+a6l4l0+20Z7GGQgFwZTYBl0zT
-         kZXEYJ3O3RcLeBI0JfDQ/REiywG0wk0geJWG4Slc/uq5RCALQxGb18QIjBLrxshyQ4Bi
-         8sM9mADQjYuAFRbJKHWnyCCeX02nO5mgfdxJYZb9jv8i0UfcuIxWi/gMtSMOn1uptF9E
-         cPGkImgQY+Fudw8rXlplQ32rn1ujjQWvHcGSJRUR+W1A4EuBeRQVTkoPnUc8mIPaokMQ
-         8fDg==
-X-Gm-Message-State: ACrzQf01S2TbbfGfce9cDzQ3WnzG1Tpm27lESNIZBKZGEb7rGHYkga4P
-        emBdNUYvuD5Dc15YVMjOsJuWtQ==
-X-Google-Smtp-Source: AMsMyM6lFmmDsnTBsYGsUilgz1qsYoqs/Bj1fKUttIQLqYZ6GsaMUyreS6XVuyHNwrGTHpteA4T6cg==
-X-Received: by 2002:a05:600c:268f:b0:3b4:acef:34ab with SMTP id 15-20020a05600c268f00b003b4acef34abmr2158749wmt.176.1664455647433;
-        Thu, 29 Sep 2022 05:47:27 -0700 (PDT)
-Received: from google.com (65.0.187.35.bc.googleusercontent.com. [35.187.0.65])
-        by smtp.gmail.com with ESMTPSA id m67-20020a1c2646000000b003a342933727sm4281494wmm.3.2022.09.29.05.47.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Sep 2022 05:47:26 -0700 (PDT)
-Date:   Thu, 29 Sep 2022 13:47:22 +0100
-From:   Vincent Donnefort <vdonnefort@google.com>
-To:     Will Deacon <will@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu,
-        Sean Christopherson <seanjc@google.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 00/25] KVM: arm64: Introduce pKVM hyp VM and vCPU
- state at EL2
-Message-ID: <YzWT2lxN/u4y/YHQ@google.com>
-References: <20220914083500.5118-1-will@kernel.org>
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=cRppPu8Rg7//eJDTidhVUrVedsDey7PezTpFqKhKxns=;
+        b=2C9UkV1Am71rqeRmWAB3GyWnCnxTf6vedT9iSPnYiJre3ASWfRQzSJJBo+XYI+W1R+
+         cCCHOjb1ujd/coyeUgAmveKtCFlHO3Cd6Tj9hCQi1zb2LXK1XXOh5rleW6nElKKsoHMg
+         J0wWA6Vqfx3EcF+cNyLHTSR0DuMNADT65YQiaPujVBwaUZfvWNhR5ny81acKkbf4iA9u
+         2yu6T089lstQF8DnMEgPE+dtGnLR0FZT/UkBTuJtXYPiXDbMSsZAQmT/Lx51DHaWFS6z
+         2e+CMK1+lW0Tg8tjNNVPff91ZPvaEKnPnpb2/od1dUSnPN8sQO5EcsP1hAJJ4d7T1TYZ
+         2+IA==
+X-Gm-Message-State: ACrzQf3/rcan4DaIPzQsqYi9GOMT97jqMg+TL6VLC0X5eM/BmQk+8RGe
+        3ti7P91uXWXDENQrN1j5F2oHHWHtCiuzS+/kiVCTutF3d39ZY8t87Brj4hCuiQnywUHhvwPQdp1
+        K7ZqZjg1kayAb
+X-Received: by 2002:a05:6402:1d48:b0:458:f29:798 with SMTP id dz8-20020a0564021d4800b004580f290798mr3412041edb.414.1664457965606;
+        Thu, 29 Sep 2022 06:26:05 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6m8ao/iBqJiTNgnUSG4lrRSPkOqbc3kShCZLMMNEpN8r9K6AkDxDEWTvQTjWe/qBTI7PveRw==
+X-Received: by 2002:a05:6402:1d48:b0:458:f29:798 with SMTP id dz8-20020a0564021d4800b004580f290798mr3412018edb.414.1664457965335;
+        Thu, 29 Sep 2022 06:26:05 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
+        by smtp.googlemail.com with ESMTPSA id r17-20020a17090609d100b00781d411a63csm3948244eje.151.2022.09.29.06.26.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Sep 2022 06:26:04 -0700 (PDT)
+Message-ID: <08dab49f-9ca4-4978-4482-1815cf168e74@redhat.com>
+Date:   Thu, 29 Sep 2022 15:26:03 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220914083500.5118-1-will@kernel.org>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [PATCH] KVM: x86: disable on 32-bit unless CONFIG_BROKEN
+To:     Sean Christopherson <seanjc@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20220926165112.603078-1-pbonzini@redhat.com>
+ <YzMt24/14n1BVdnI@google.com>
+ <ed74c9a9d6a0d2fd2ad8bd98214ad36e97c243a0.camel@redhat.com>
+ <15291c3f-d55c-a206-9261-253a1a33dce1@redhat.com>
+ <YzRycXDnWgMDgbD7@google.com>
+ <ad97d0671774a873175c71c6435763a33569f669.camel@redhat.com>
+ <YzSKhUEg3L1eMKOR@google.com>
+Content-Language: en-US
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YzSKhUEg3L1eMKOR@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,55 +86,17 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 14, 2022 at 09:34:35AM +0100, Will Deacon wrote:
-> Hi folks,
-> 
-> This is v3 of the series previously posted here:
-> 
->   Mega-series: https://lore.kernel.org/kvmarm/20220519134204.5379-1-will@kernel.org/
->   v2: https://lore.kernel.org/all/20220630135747.26983-1-will@kernel.org/
-> 
-> There have been some significant changes since v2, including:
-> 
-> - Removal of unnecessary backpointer linking a hyp vCPU to its hyp VM in
->   favour of container_of()
-> 
-> - Removing confusing use of 'shadow' at EL2 in favour of 'pkvm_hyp'
->   (although this was much more work than a simple sed expression!)
-> 
-> - Simplified vm table lookup and removal of redundant table traversal
-> 
-> - Rework of the hypervisor fixmap to avoid redundant page-table walks
-> 
-> - Splitting of memory donations required to create a guest so that the
->   requirement for physically-contiguous pages is reduced
-> 
-> - Fixed a memory leak when the stage-2 pgd is configured with an
->   unsupported size
-> 
-> - Dropped rework of 'struct hyp_page' as it is not required by this
->   series
-> 
-> - Improved commit messages
-> 
-> - Rebased onto v6.0-rc1
-> 
-> Oliver -- as discussed in person, I've left the owner ID enumeration
-> where it is for now since we will need to track the guest *instance* in
-> future and so consolidating this into the pgtable code is unlikely to be
-> beneficial.
-> 
-> As with the previous posting, the last patch is marked as RFC because,
-> although it plumbs in the shadow state, it is woefully inefficient and
-> copies to/from the host state on every vCPU run. Without the last patch,
-> the new structures are unused but we move considerably closer to
-> isolating guests from the host.
-> 
-> Cheers,
+On 9/28/22 19:55, Sean Christopherson wrote:
+>> As far as my opinion goes I do volunteer to test this code more often,
+>> and I do not want to see the 32 bit KVM support be removed*yet*.
+>
+> Yeah, I 100% agree that it shouldn't be removed until we have equivalent test
+> coverage.  But I do think it should an "off-by-default" sort of thing.  Maybe
+> BROKEN is the wrong dependency though?  E.g. would EXPERT be a better option?
 
-Tested on silicon, especially that all the donations are recovered on VM
-teardown.
+Yeah, maybe EXPERT is better but I'm not sure of the equivalent test 
+coverage.  32-bit VMX/SVM kvm-unit-tests are surely a good idea, but 
+what's wrong with booting an older guest?
 
-Tested-by: Vincent Donnefort <vdonnefort@google.com>
+Paolo
 
-[...]
