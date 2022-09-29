@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C16915F00FB
-	for <lists+kvm@lfdr.de>; Fri, 30 Sep 2022 00:52:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C52A5F00FC
+	for <lists+kvm@lfdr.de>; Fri, 30 Sep 2022 00:52:15 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229644AbiI2WwM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Sep 2022 18:52:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39172 "EHLO
+        id S229682AbiI2WwN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Sep 2022 18:52:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229588AbiI2WwK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229608AbiI2WwK (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 29 Sep 2022 18:52:10 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC206120597
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 15:52:08 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id b14-20020a056902030e00b006a827d81fd8so2312814ybs.17
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 15:52:08 -0700 (PDT)
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20D4C120BC2
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 15:52:10 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id l2-20020a170902f68200b00177ee7e673eso1897374plg.2
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 15:52:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kKsPvqIyW4p0dj5/5l/6rX3b2gtbR/FFBwPE/+n7sEQ=;
-        b=tGY9xjkHqkOFYwd/aXFe9KXVqSE7S8HHTsWciMJWauAsHTwqBrpwuckiM3Ev2rnowM
-         vY7jB7nELi924oz7LNkvGeW5UBBswyzvcJCFsSpRGnBwj5jH5Dtx8NsyJiKm0YbCtEN2
-         9Md6r+g467ZfG8V2IQX2ZDrneZeNTNQbi/qKn3HX0GgsRQcFk9x5vzv+4XmT0fw87Wjh
-         hh62ddIE8J649Y5iuhW/OVcEpZK+J9qGNFivmIb8miuSpyVWAwuE8j0pDv2A5WiMnx5u
-         ZxccAZbvoDw7o2F9HwkEW+QJSLP+NvhmSFBmLNNgW0ud4CTGP/bQhH6HsL6OE9/Y1p5/
-         q/qg==
+        bh=9EK6+OCif4txEax6qNB8fO7zvcUwT71+kULa+mgJizE=;
+        b=ImgvDWbgQPRvawqfIOrX+0np6oEmyuyB0C7QkFnHJ3ydaRiN0d/wDU25fd2CEvLLlI
+         i1GxeHQQHC8l+YLPkHl6A2f2LzkEZ42qXJgflUotnbdkKB90jbXemYd6ZuPlsxJSoE4h
+         rFOTz/69sccUS/D/FJ4+jvEaVeVSiwmtRz+10yMHCAbHLMOvkJ0D0orf1vkAuC1202rc
+         /1H1HBD6996BLUqIvxyuX05tdOmvcxSJjsiU+lEDvOPyMgRK2Ig2B1ZGn1tMKkNLwPYr
+         5QdnbNmjr4XvFA3oN4bQV0Blx+TMggkVBoSbErnhvIlSHE1t/9R/YYehC6GivdvPR21v
+         /r8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kKsPvqIyW4p0dj5/5l/6rX3b2gtbR/FFBwPE/+n7sEQ=;
-        b=ejekBi914KEiTwnL1LP5X45/7jm1UZ39MU35VwNx8WsyXkJqhj0KIE9frjpj7uSumh
-         i2OwpYkob+bf5rFLdNipILQ4+fM3c24fzFNwg3ST+AePq7MQ/RxAU29PV/ErnJ69leD3
-         CJZvJSVOk0NtfW5PDIKNcOy0U2eO3PbI3ao12qBmMaD/cv8QbnlhWdTWZ3I+1pyeLP36
-         tAp7ur1AVmSKjscOJbGSQPVLDZpbzVZ8dp1Wc5tQFQeCFoflR9kr2aJP4yKheaPUVOM+
-         KWWHoYBi0VLeOt6vxWGW79Wjg/JSMK27H/xHS6855fnvPAlTHxEgKAChNy3zOIfCwLXu
-         H/gA==
-X-Gm-Message-State: ACrzQf1FTrLYN84o6gSSacd9xarMIphXNsUUg/IraJOFi6nGHEP8oCYa
-        YC8HPiDOBp5449fq/IdEnW2wIO8fcO+Zei4Fo2SVK2nmsa0D4RLI5VlSEaFax1mk82cDL/vDQvt
-        bXRIYavNH2BMWMF8GtqWmhfR2PJ2moeEedyfOcLVPaB3UUoZfv7jGlke50VbenNo=
-X-Google-Smtp-Source: AMsMyM7PfBUYGBRago5rGLshIrN2DomWAF/HdzJu5KoDA+WBSMoLEQD9cR09sptYrpuL6XsuVO+k+Cb5isEfTw==
+        bh=9EK6+OCif4txEax6qNB8fO7zvcUwT71+kULa+mgJizE=;
+        b=e71CL197+l6kNRHJHx2RPmjGFJcCvmEmVdqM4yfRN1TPtr7DS0gCXfkzMvJn9ie2BX
+         3PerD3VWWGyJ6qcr0Z1CKmjHXxtay/tWqE6hzwNDPKaSt8QoixNuCUd5hRmYLQSzS4+p
+         jNITy5CpfGr3e+2YDDZCgiwHTAwhYOPU2FQ/n4In8JvQNgVhkiZlBTpe3QgfE2LHSlrj
+         DpEfmIbnusCGQtIC6DP6Wy5xJxUqU2zvQ4tkG9NQ9bLE5YLkWQeDf3baWv/eCJtiSxtg
+         B93bidtGQgZgUoldBkPMuy38tZ5R/yvJbQQL1E95BbU2yDumw/xp7UJsbC3AI7B+Oa9Y
+         F24A==
+X-Gm-Message-State: ACrzQf1wtVOUhEIYcCpTR2ItaF2N50AHpbOncPoF0TZ0a1ec+VYpVBW9
+        8EhrOQU7wDJKXQoAzzgeW2bCBJicDGEVzgwJpxsMZMdo6wHfMrrMn5W8Ynhl9uyus6/n5W99mqE
+        t8klcbiM5Q/JucDSYnaicuUQkmzedEdagYiWBqZ24LR+IdXyc0v1xjSggJGQO0Ic=
+X-Google-Smtp-Source: AMsMyM4KFC+8VP5Pvhk/XuJ5QhqbwJ338BItLuAoc/AnkkFHW6wjvW5X9flSTSEoEyyB23y2st21fN1IqtVRPA==
 X-Received: from loggerhead.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:29a])
- (user=jmattson job=sendgmr) by 2002:a25:af8e:0:b0:67c:3f7:e8eb with SMTP id
- g14-20020a25af8e000000b0067c03f7e8ebmr5698441ybh.646.1664491927977; Thu, 29
- Sep 2022 15:52:07 -0700 (PDT)
-Date:   Thu, 29 Sep 2022 15:51:59 -0700
+ (user=jmattson job=sendgmr) by 2002:a05:6a00:b8d:b0:543:6731:8b6c with SMTP
+ id g13-20020a056a000b8d00b0054367318b6cmr5676492pfj.80.1664491929365; Thu, 29
+ Sep 2022 15:52:09 -0700 (PDT)
+Date:   Thu, 29 Sep 2022 15:52:00 -0700
 In-Reply-To: <20220929225203.2234702-1-jmattson@google.com>
 Mime-Version: 1.0
 References: <20220929225203.2234702-1-jmattson@google.com>
 X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
-Message-ID: <20220929225203.2234702-2-jmattson@google.com>
-Subject: [PATCH 2/6] KVM: x86: Mask off reserved bits in CPUID.80000006H
+Message-ID: <20220929225203.2234702-3-jmattson@google.com>
+Subject: [PATCH 3/6] KVM: x86: Mask off reserved bits in CPUID.80000008H
 From:   Jim Mattson <jmattson@google.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com
 Cc:     Jim Mattson <jmattson@google.com>
@@ -68,27 +68,29 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 KVM_GET_SUPPORTED_CPUID should only enumerate features that KVM
-actually supports. CPUID.80000006H:EDX[17:16] are reserved bits and
-should be masked off.
+actually supports. The following ranges of CPUID.80000008H are reserved
+and should be masked off:
+    EDX[31:18]
+    EDX[11:8]
 
-Fixes: 43d05de2bee7 ("KVM: pass through CPUID(0x80000006)")
+Fixes: 24c82e576b78 ("KVM: Sanitize cpuid")
 Signed-off-by: Jim Mattson <jmattson@google.com>
 ---
  arch/x86/kvm/cpuid.c | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index ea4e213bcbfb..90f9c295825d 100644
+index 90f9c295825d..15318f3f415e 100644
 --- a/arch/x86/kvm/cpuid.c
 +++ b/arch/x86/kvm/cpuid.c
-@@ -1125,6 +1125,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+@@ -1156,6 +1156,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 
+ 		entry->eax = g_phys_as | (virt_as << 8);
+ 		entry->edx = 0;
++		entry->ecx &= ~(GENMASK(31, 18) | GENMASK(11, 8));
+ 		cpuid_entry_override(entry, CPUID_8000_0008_EBX);
  		break;
- 	case 0x80000006:
- 		/* L2 cache and TLB: pass through host info. */
-+		entry->edx &= ~GENMASK(17, 16);
- 		break;
- 	case 0x80000007: /* Advanced power management */
- 		/* invariant TSC is CPUID.80000007H:EDX[8] */
+ 	}
 -- 
 2.38.0.rc1.362.ged0d419d3c-goog
 
