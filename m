@@ -1,107 +1,139 @@
 Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from out1.vger.email (unknown [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DF0D5EFCC9
-	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 20:15:11 +0200 (CEST)
+Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
+	by mail.lfdr.de (Postfix) with ESMTP id 734305EFCF6
+	for <lists+kvm@lfdr.de>; Thu, 29 Sep 2022 20:24:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235442AbiI2SPI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Sep 2022 14:15:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49968 "EHLO
+        id S235749AbiI2SYk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Sep 2022 14:24:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230001AbiI2SPF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Sep 2022 14:15:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BB784AD59
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 11:15:01 -0700 (PDT)
+        with ESMTP id S232380AbiI2SYh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Sep 2022 14:24:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C14D463FB
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 11:24:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664475300;
+        s=mimecast20190719; t=1664475874;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lCJrrcdKYCEK8mx5WN/ohtqBMQWHx3f7oSkfu0XYxHg=;
-        b=Pf+5oSC1yjEM/3R3hGAi44iE1w8Jvd9AYmVgJBWknt+D/bm0e5ekrEpNL+UnV1hc16fsd8
-        QBaq+m6//thyxkxoVl9FBQBrNOUzeoRY/dM1WxX5ZxOa1HRIj+gGGJthSt5Z+FQILpmSvz
-        znKpstNeMQFVNBv6R+mTPcBv9rRFfS8=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=BoITIusWH1pgiQYYyYgg2aTCkDBnXRgVNx9UWZzrGmA=;
+        b=OqcMvHd+HH89EI8UXhMCTpgc95JY4q2oPDPDMHN+rG+xKoIKL6KQo3Q1ABrYRtnFvu41+l
+        JiJvhpYBHgd7ITHa6cpubjXPTQdb3dxfutlcJURTUvmseF9waOP0/Zdcov0RCPcG3FaM2e
+        gjF7RIegpRW3AWLNPVEbMpYzSyCj2xY=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-674-poWmyBEqMguZRRSX03XKDg-1; Thu, 29 Sep 2022 14:14:58 -0400
-X-MC-Unique: poWmyBEqMguZRRSX03XKDg-1
-Received: by mail-ed1-f70.google.com with SMTP id f10-20020a0564021e8a00b00451be6582d5so1831795edf.15
-        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 11:14:58 -0700 (PDT)
+ us-mta-595-VDKMwLFJPgKG14acipS2hw-1; Thu, 29 Sep 2022 14:24:33 -0400
+X-MC-Unique: VDKMwLFJPgKG14acipS2hw-1
+Received: by mail-il1-f200.google.com with SMTP id x3-20020a056e021ca300b002f855cd264cso1704471ill.7
+        for <kvm@vger.kernel.org>; Thu, 29 Sep 2022 11:24:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=lCJrrcdKYCEK8mx5WN/ohtqBMQWHx3f7oSkfu0XYxHg=;
-        b=NaswiDKMEi6ruG35O7lqmNEL+4PBb/bBy4779rhbxrXPAfeLq0Pem97lM1hihfgRH/
-         Hd6Q/YUbT3V4erWt1pn4qodrIrym8UHsubay11+DO5W/82Y+wWFvkCadwCy0q8+Q3XXf
-         d1BKECuOwbiHkGcLacsOe/VVgOY0WCDU9NKZgavV3q7/CWr9n0Q2GoBK370AwpN95dAr
-         Ni4FyoHkqHXSQteBakbBBv+dCe52cnB7CIXurR0hNKD6aIhBQjb5LDtkz+GGRfdA3JH8
-         bfZcZhLAtoNRSIWiOakpcmq1BUHiFS5l6r4898Wmu1CRlESQorkXgSEm3kfBKcd5AiDt
-         JCdQ==
-X-Gm-Message-State: ACrzQf2++z5GiY6SWX+mZ/YhlKBAKdXdCbRb6hITvV+Tl/egoo9LA/RG
-        745p6czRCh39kVbB+2BfVfXfu3yyYlC/EW7JrXM4Kxtt5njoGq7485Whnun8DEc4HlYQJ0fGrCO
-        I/RZaSn84QBO8
-X-Received: by 2002:a17:907:2c78:b0:779:7327:c897 with SMTP id ib24-20020a1709072c7800b007797327c897mr3539056ejc.657.1664475297792;
-        Thu, 29 Sep 2022 11:14:57 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM6nRddG4vqVPW/y4Jj6VZeBzKWXXY7gRnYgslGuboJMKJ+b0A32CztA9r7pNhMncFo2WOPYtw==
-X-Received: by 2002:a17:907:2c78:b0:779:7327:c897 with SMTP id ib24-20020a1709072c7800b007797327c897mr3539049ejc.657.1664475297560;
-        Thu, 29 Sep 2022 11:14:57 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id v6-20020aa7d646000000b0045851005e64sm137987edr.36.2022.09.29.11.14.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Sep 2022 11:14:57 -0700 (PDT)
-Message-ID: <3f9c7cf9-4b77-fa21-5ffa-b32b305f8d57@redhat.com>
-Date:   Thu, 29 Sep 2022 20:14:56 +0200
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=BoITIusWH1pgiQYYyYgg2aTCkDBnXRgVNx9UWZzrGmA=;
+        b=rpCbGEU0hLCO5X9GPNF2Ash1n3M4SgeStbyXOuhQbgt/ey8rjPNiUd8kctU7ATfaq5
+         Fe3HXizsBAiIUEYzqXN07dwkwcT5UXX04FPVNfPYybvGYqcf1bnua6JvijgI8A/nr1xT
+         8IuXbPPoSl86locGvV9xUxSCYqakzKSGVds2RF7slgaK/UWJK9Cp6gkQ8m9zWOjxsxOr
+         k0ozGBZyCTK7501/kgsOvYrA1VXbuzeDo0askiSFsadcNpv+8nMz/8NNELdYpkTVjoew
+         OVVn4QGKu37p7b5H7O/VbZ07V+bgum4mmg2epa0+OJxNXrbsKqZlCPn4V/Vnuy1QvXyR
+         7Zgg==
+X-Gm-Message-State: ACrzQf0r3gA2ylUM1JSIeX1AHDxQr49+3Kjs+X0jdnw5S2AP/12sSZQ2
+        yCR7I1r8S3Te9GPs46CQrbjkMfbutxZIVuueyBynTkLE7rKZ5o0EUJM4rq2jyJF+vq5GXBYLc7e
+        AAzo+81FfRycT
+X-Received: by 2002:a05:6e02:19ce:b0:2f1:68a6:3bec with SMTP id r14-20020a056e0219ce00b002f168a63becmr2392085ill.78.1664475872945;
+        Thu, 29 Sep 2022 11:24:32 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7KUOQo8AbbarGobEgnbxdcS5bS2mn744LEcpjpU+rvkCIe35jyhAfEJ5Pm5FWlRH0iLBHEPg==
+X-Received: by 2002:a05:6e02:19ce:b0:2f1:68a6:3bec with SMTP id r14-20020a056e0219ce00b002f168a63becmr2392060ill.78.1664475872712;
+        Thu, 29 Sep 2022 11:24:32 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id f13-20020a05660215cd00b006a1fed36549sm96051iow.10.2022.09.29.11.24.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Sep 2022 11:24:31 -0700 (PDT)
+Date:   Thu, 29 Sep 2022 12:24:27 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Kevin Tian <kevin.tian@intel.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Eric Farman <farman@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Longfang Liu <liulongfang@huawei.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, Yi Liu <yi.l.liu@intel.com>
+Subject: Re: [PATCH v4 15/15] vfio: Add struct device to vfio_device
+Message-ID: <20220929122427.3a3bca9a.alex.williamson@redhat.com>
+In-Reply-To: <YzXaxPpkc+90Xx+T@ziepe.ca>
+References: <20220921104401.38898-1-kevin.tian@intel.com>
+        <20220921104401.38898-16-kevin.tian@intel.com>
+        <20220929105519.5c9ae1d8.alex.williamson@redhat.com>
+        <YzXaxPpkc+90Xx+T@ziepe.ca>
+Organization: Red Hat
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: Guest IA32_SPEC_CTRL on AMD hosts without X86_FEATURE_V_SPEC_CTRL
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>
-Cc:     kvm list <kvm@vger.kernel.org>, "Moger, Babu" <Babu.Moger@amd.com>
-References: <CALMp9eRkuPPtkv7LadDDMT6DuKhvscJX0Fjyf2h05ijoxkYaoQ@mail.gmail.com>
- <20220903235013.xy275dp7zy2gkocv@treble>
- <CALMp9eR+sRARi8Y2=ZEmChSxXF1LEah3fjg57Mg7ZVM_=+_3Lw@mail.gmail.com>
- <CALMp9eT2mSjW3jpS4fGmCYorQ-9+YxHn61AZGc=azSEmgDziyA@mail.gmail.com>
- <20220908053009.p2fc2u2r327qyd6w@treble>
- <CALMp9eQ9A0qGS5RQjkX0HKdsUq3y5nKHFZQ=AVdfNOxxDPC65Q@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CALMp9eQ9A0qGS5RQjkX0HKdsUq3y5nKHFZQ=AVdfNOxxDPC65Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/29/22 19:47, Jim Mattson wrote:
->> It sounds like that behavior may need clarification from AMD.  If that's
->> possible then it might indeed make sense to move the AMD spec_ctrl wrmsr
->> to asm like we did for Intel.
+On Thu, 29 Sep 2022 14:49:56 -0300
+Jason Gunthorpe <jgg@ziepe.ca> wrote:
+
+> On Thu, Sep 29, 2022 at 10:55:19AM -0600, Alex Williamson wrote:
+> > Hi Kevin,
+> > 
+> > This introduced the regression discovered here:
+> > 
+> > https://lore.kernel.org/all/20220928125650.0a2ea297.alex.williamson@redhat.com/
+> > 
+> > Seems we're not releasing the resources when removing an mdev.  This is
+> > a regression, so it needs to be fixed or reverted before the merge
+> > window.  Thanks,  
 > 
-> On the other side of the transition, restoration of the host
-> IA32_SPEC_CTRL value is definitely way too late. With respect to the
-> user/kernel boundary, AMD says, "If software chooses to toggle STIBP
-> (e.g., set STIBP on kernel entry, and clear it on kernel exit),
-> software should set STIBP to 1 before executing the return thunk
-> training sequence." I assume the same requirements apply to the
-> guest/host boundary. The return thunk training sequence is in
-> vmenter.S, quite close to the VM-exit. On hosts without V_SPEC_CTRL,
-> the host's IA32_SPEC_CTRL value is not restored until much later.
+> My guess at the fix for this:
+> 
+> https://lore.kernel.org/r/0-v1-013609965fe8+9d-vfio_gvt_unregister_jgg@nvidia.com
 
-I think it's easier to just do both sides than to wait for 
-clarifications.  I'll take a look.
+Indeed this seems to work  I'll look for acks and further reviews from
+Intel folks. Thanks!
 
-Paolo
+Alex
 
