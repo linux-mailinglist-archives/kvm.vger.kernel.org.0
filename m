@@ -2,83 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C7C045F0853
-	for <lists+kvm@lfdr.de>; Fri, 30 Sep 2022 12:19:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2FFF35F0B17
+	for <lists+kvm@lfdr.de>; Fri, 30 Sep 2022 13:53:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231549AbiI3KTF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Sep 2022 06:19:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33530 "EHLO
+        id S230482AbiI3LxU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Sep 2022 07:53:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231251AbiI3KSz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Sep 2022 06:18:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E030015ED24
-        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 03:18:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664533133;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dx4u6C08o9BTXEfrCLmxC1gx6puUDD58EjxmAp5+vbY=;
-        b=SlrEy/7yY7o4iuDlS1uiLCkhFj+zkDNr31/dozP5hAivAEjK5Uz14oeLElWgXCykIx4+Mp
-        GuUeWegAmp8M1QcpyL2+IJ88774QT1acXS8oq7Fq5cJzorWlmdghM5h/6vJx/zRTHHFLmX
-        R34gx36kOg+awnrBOirdv+cadpX6kTA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-75-uO57ZysoMKitYIcdHD8F-Q-1; Fri, 30 Sep 2022 06:18:50 -0400
-X-MC-Unique: uO57ZysoMKitYIcdHD8F-Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6AAE3185A7A4;
-        Fri, 30 Sep 2022 10:18:50 +0000 (UTC)
-Received: from redhat.com (unknown [10.39.192.112])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D15452166B26;
-        Fri, 30 Sep 2022 10:18:48 +0000 (UTC)
-Date:   Fri, 30 Sep 2022 12:18:47 +0200
-From:   Kevin Wolf <kwolf@redhat.com>
-To:     Keith Busch <kbusch@meta.com>
-Cc:     qemu-block@nongnu.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv3 0/2] qemu direct io alignment fix
-Message-ID: <YzbChwRW7CPAWs7L@redhat.com>
-References: <20220929200523.3218710-1-kbusch@meta.com>
+        with ESMTP id S230356AbiI3LxG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Sep 2022 07:53:06 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A1D683206;
+        Fri, 30 Sep 2022 04:52:59 -0700 (PDT)
+Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1oeEZd-0005wF-Di; Fri, 30 Sep 2022 13:52:57 +0200
+Message-ID: <99249078-2026-c76c-87eb-8e3ac5dde73d@leemhuis.info>
+Date:   Fri, 30 Sep 2022 13:52:55 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220929200523.3218710-1-kbusch@meta.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: Commit 'iomap: add support for dma aligned direct-io' causes
+ qemu/KVM boot failures
+Content-Language: en-US, de-DE
+To:     linux-kernel@vger.kernel.org,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
+Cc:     linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org
+References: <fb869c88bd48ea9018e1cc349918aa7cdd524931.camel@redhat.com>
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+In-Reply-To: <fb869c88bd48ea9018e1cc349918aa7cdd524931.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1664538780;c1816c87;
+X-HE-SMSGID: 1oeEZd-0005wF-Di
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 29.09.2022 um 22:05 hat Keith Busch geschrieben:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> Changes from v2:
-> 
->   Split the patch so that the function move is separate from the
->   functional change. This makes it immediately obvious what criteria is
->   changing. (Kevin Wolf)
-> 
->   Added received Tested-by tag in the changelog. 
-> 
-> Keith Busch (2):
->   block: move bdrv_qiov_is_aligned to file-posix
->   block: use the request length for iov alignment
+TWIMC: this mail is primarily send for documentation purposes and for
+regzbot, my Linux kernel regression tracking bot. These mails usually
+contain '#forregzbot' in the subject, to make them easy to spot and filter.
 
-Thanks, applied to the block branch.
+[TLDR: I'm adding this regression report to the list of tracked
+regressions; all text from me you find below is based on a few templates
+paragraphs you might have encountered already already in similar form.]
 
-Kevin
+Hi, this is your Linux kernel regression tracker. This might be a Qemu
+bug, but it's exposed by kernel change, so I at least want to have it in
+the tracking. I'll simply remove it in a few weeks, if it turns out that
+nobody except Maxim hits this.
 
+On 29.09.22 17:41, Maxim Levitsky wrote:
+> Hi!
+>  
+> Recently I noticed that this commit broke the boot of some of the VMs that I run on my dev machine.
+>  
+> It seems that I am not the first to notice this but in my case it is a bit different
+>  
+> https://lore.kernel.org/all/e0038866ac54176beeac944c9116f7a9bdec7019.camel@linux.ibm.com/
+>  
+> My VM is a normal x86 VM, and it uses virtio-blk in the guest to access the virtual disk,
+> which is a qcow2 file stored on ext4 filesystem which is stored on NVME drive with 4K sectors.
+> (however I was also able to reproduce this on a raw file)
+>  
+> It seems that the only two things that is needed to reproduce the issue are:
+>  
+> 1. The qcow2/raw file has to be located on a drive which has 4K hardware block size.
+> 2. Qemu needs to use direct IO (both aio and 'threads' reproduce this). 
+>  
+> I did some debugging and I isolated the kernel change in behavior from qemu point of view:
+>  
+>  
+> Qemu, when using direct IO, 'probes' the underlying file.
+>  
+> It probes two things:
+>  
+> 1. It probes the minimum block size it can read.
+>    It does so by trying to read 1, 512, 1024, 2048 and 4096 bytes at offset 0,
+>    using a 4096 bytes aligned buffer, and notes the first read that works as the hardware block size.
+>  
+>    (The relevant function is 'raw_probe_alignment' in src/block/file-posix.c in qemu source code).
+>  
+>  
+> 2. It probes the buffer alignment by reading 4096 bytes also at file offset 0,
+>    this time using a buffer that is 1, 512, 1024, 2048 and 4096 aligned
+>    (this is done by allocating a buffer which is 4K aligned and adding 1/512 and so on to its address)
+>  
+>    First successful read is saved as the required buffer alignment. 
+>  
+>  
+> Before the patch, both probes would yield 4096 and everything would work fine.
+> (The file in question is stored on 4K block device)
+>  
+>  
+> After the patch the buffer alignment probe succeeds at 512 bytes.
+> This means that the kernel now allows to read 4K of data at file offset 0 with a buffer that
+> is only 512 bytes aligned. 
+>  
+> It is worth to note that the probe was done using 'pread' syscall.
+>  
+>  
+> Later on, qemu likely reads the 1st 512 sector of the drive.
+>  
+> It uses preadv with 2 io vectors:
+>  
+> First one is for 512 bytes and it seems to have 0xC00 offset into page 
+> (likely depends on debug session but seems to be consistent)
+>  
+> Second one is for 3584 bytes and also has a buffer that is not 4K aligned.
+> (0x200 page offset this time)
+>  
+> This means that the qemu does respect the 4K block size but only respects 512 bytes buffer alignment,
+> which is consistent with the result of the probing.
+>  
+> And that preadv fails with -EINVAL
+>  
+> Forcing qemu to use 4K buffer size fixes the issue, as well as reverting the offending commit.
+>  
+> Any patches, suggestions are welcome.
+> 
+> I use 6.0-rc7, using mainline master branch as yesterday.
+>  
+> Best regards,
+> 	Maxim Levitsky
+> 
+Thanks for the report. To be sure below issue doesn't fall through the
+cracks unnoticed, I'm adding it to regzbot, my Linux kernel regression
+tracking bot:
+
+#regzbot ^introduced bf8d08532bc1
+#regzbot ignore-activity
+
+This isn't a regression? This issue or a fix for it are already
+discussed somewhere else? It was fixed already? You want to clarify when
+the regression started to happen? Or point out I got the title or
+something else totally wrong? Then just reply -- ideally with also
+telling regzbot about it, as explained here:
+https://linux-regtracking.leemhuis.info/tracked-regression/
+
+Reminder for developers: When fixing the issue, add 'Link:' tags
+pointing to the report (the mail this one replies to), as explained for
+in the Linux kernel's documentation; above webpage explains why this is
+important for tracked regressions.
+
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+
+P.S.: As the Linux kernel's regression tracker I deal with a lot of
+reports and sometimes miss something important when writing mails like
+this. If that's the case here, don't hesitate to tell me in a public
+reply, it's in everyone's interest to set the public record straight.
