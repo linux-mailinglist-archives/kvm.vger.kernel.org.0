@@ -2,65 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C91545F16A3
-	for <lists+kvm@lfdr.de>; Sat,  1 Oct 2022 01:25:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F2A785F16AA
+	for <lists+kvm@lfdr.de>; Sat,  1 Oct 2022 01:31:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232496AbiI3XZx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Sep 2022 19:25:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49076 "EHLO
+        id S231857AbiI3Xbm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Sep 2022 19:31:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232655AbiI3XZV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Sep 2022 19:25:21 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81660C80F1
-        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 16:25:09 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id w14-20020a170902e88e00b00177ab7a12f6so4068274plg.16
-        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 16:25:09 -0700 (PDT)
+        with ESMTP id S231553AbiI3Xbi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Sep 2022 19:31:38 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 392E51806DC
+        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 16:31:37 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id j12-20020a63594c000000b004468ff8fc78so187315pgm.10
+        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 16:31:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date;
-        bh=nL/lfFme3jtjL6Ze3CyERsb/LSTZ5YkGYrnD4NBE2Hw=;
-        b=V/SjIoKmXFbrqT/binJvKHwdo3qdjqQCerJbBH/12Uc0FFc89bANMUmDqoGbfTRK5U
-         L7yOtqX1cogO1+gHiLwAe/CBdRYReBpcOxpTbzQEGWoUveubNHmHsXNGIbVA8ox2webe
-         n8zLcyeySOTHUeHaT928bcvRQncEqXHPN3tBuVEQZRCGfzxX9bBZe0nRlnNw6AYQkHK7
-         dlpXp8cwBBsGQ5E8zi40OQUc3N9y2LQRPSmCJ2Y7h9jXK0nQ6jiTxtRYmwnxu7GFieyi
-         n/0aYKRGTUD48PkYQQyXYdJU+jGfX6RO2yAgXvitjdNa6ooUVRfv7foO1GMv/sUmyK63
-         J94A==
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date;
+        bh=R0RgZ91roMSEBPJsrvjvkDfFam5SN/lgMQRJiTuvmqc=;
+        b=OuDkBTC/7/+wwp2oA6nxhc4qsGi9j4lxh48P9BTwteM1QHrh7U4pxZDP+3KMRH3jUl
+         mjhclAQ6XSJ2qFHly66CmaJLnpiAI7wlkU9rYa1am2YMkGHiqK4BH9ZFSq48K+utrA2B
+         K2KceinGHtClDe2GunKXJyoYY1dmN8fgrpVRLgnLMu8ACJkcnYgZfAhBh6T6zJu81vrN
+         CpyGExB6M9QBwk/KAxy/F/ohhgXa67cT4YW7ArZXhMiJXyjUvxA7ebCVuwzEH4vewrEI
+         nEEUW0ls+ygPHQUjV6V06eqDeBzB9ejojf6Hr3JagIFUtspGghQ9UbIs8eHoG4rTU+y3
+         XGzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date;
-        bh=nL/lfFme3jtjL6Ze3CyERsb/LSTZ5YkGYrnD4NBE2Hw=;
-        b=BIa6xoQEDaKvOGnxVq2RuckOv6laBBUiL4djD+DcC8LZq38eX7TT0/PpwyN7917XtB
-         HkXV1uPzEmtSOCmBrfNa7ITiyiVS+zFgDIJA/lvdD00dbDcrMV7azI3lybAOU6sIE4sI
-         0VaAiK4EQ4oNfTETXHGaeRdq/o17r2Q2sDJjXcayc78UNwBImALunszKpWIjpMH0t+Xa
-         PQajAVj8ZY/2P6mG+mZ7HlsTH77ZWBh2WsLAsuD8kTYO6RyAWCIWlfjIymlDpLnPwcQj
-         F8a1WlJE+M7eaGdtmMQblfasDRMbiS6Ptur9pgYojb94DKJrQSOKdfqdXFN4FSQCpkMh
-         h+9A==
-X-Gm-Message-State: ACrzQf2TRxeEDmKA49UAoUf502woU3GuTLud+CH7WcN6/kvS1vC139WU
-        dqUjdg+CHyneIEQyoB76n5w1s0oNb8g=
-X-Google-Smtp-Source: AMsMyM7O3dnQbXaA7lnqaczL9ag44xopYssk6pKMbWEK5nOMoCVeThtSOfQ91nWw/nDBPo4RNcxEneddvBU=
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=R0RgZ91roMSEBPJsrvjvkDfFam5SN/lgMQRJiTuvmqc=;
+        b=c25iCgCo+/BelVSXlBYeU563IlX0orQ6z30jBjLW2+P5DDmgmMJ3jeUaXlsitpGKut
+         j8JUn65RMX76PF7gI2uQzNuWapS3Mozia9LwZlMIOmmtNiekcG8CP77WdoNRa0YDMPuG
+         GZyCd87yJx5wgdtX+f5jXbH1VHoQ9Bpt6c4jleDlHQXJk4ka31IXgEMF5xCJCRk3uWb3
+         Ju42o3iqTIw9H/Dj9YmuNSgMVTqXLWAf7naMziiUpatQ2gIMEO6lLTN2GXm+CHq3mUCu
+         o585pkCxoT7BF7ivHUF3GimZGZ5jQcbbRSCtZLfPXDAPNXsFKyPEIAwz/igOKhl0xWq5
+         St9Q==
+X-Gm-Message-State: ACrzQf2fU5kqRC4Zk+JEBP3fu/fdrYo6yZWPx9tvtbzcAFwaJ/rCCwyE
+        1wG7z5U38WgVAww3HVxJ475DU1MXVe4=
+X-Google-Smtp-Source: AMsMyM723OxHhFpusATWVmoaapfvZt1if9qgEY43yn60482Rm7Q/zG9hQv1CmWYT9CI7gNWznyfx2vRR7Z4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:b085:b0:178:3af4:31b2 with SMTP id
- p5-20020a170902b08500b001783af431b2mr11378613plr.122.1664580296930; Fri, 30
- Sep 2022 16:24:56 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:c986:b0:205:f08c:a82b with SMTP id
+ w6-20020a17090ac98600b00205f08ca82bmr498120pjt.1.1664580696502; Fri, 30 Sep
+ 2022 16:31:36 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 30 Sep 2022 23:24:50 +0000
-In-Reply-To: <20220930232450.1677811-1-seanjc@google.com>
+Date:   Fri, 30 Sep 2022 23:31:32 +0000
 Mime-Version: 1.0
-References: <20220930232450.1677811-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
-Message-ID: <20220930232450.1677811-4-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH 3/3] nVMX: Dedup the bulk of the VMREAD/VMWRITE
- #PF tests
+Message-ID: <20220930233132.1723330-1-seanjc@google.com>
+Subject: [PATCH] KVM: VMX: Resume guest immediately when injecting #GP on ECREATE
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Kai Huang <kai.huang@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,166 +67,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dedup most of the VMREAD/VMWRITE #PF/flags tests, they are identical
-except for literally VMREAD vs. VMRITE.  Don't bother adding a macro to
-emit VMREAD vs. VMWRITE, the macro required isn't any better than copy
-and paste.
+Resume the guest immediately when injecting a #GP on ECREATE due to an
+invalid enclave size, i.e. don't attempt ECREATE in the host.  The #GP is
+a terminal fault, e.g. skipping the instruction if ECREATE is successful
+would result in KVM injecting #GP on the instruction following ECREATE.
 
+Fixes: 70210c044b4e ("KVM: VMX: Add SGX ENCLS[ECREATE] handler to enforce CPUID restrictions")
+Cc: stable@vger.kernel.org
+Cc: Kai Huang <kai.huang@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/vmx.c | 119 ++++++++++++++++++++----------------------------------
- 1 file changed, 43 insertions(+), 76 deletions(-)
 
-diff --git a/x86/vmx.c b/x86/vmx.c
-index 0ae134d..e28507c 100644
---- a/x86/vmx.c
-+++ b/x86/vmx.c
-@@ -387,102 +387,69 @@ static void test_vmwrite_vmread(void)
- 	free_page(vmcs);
- }
- 
--static void prep_flags_test_env(void **vpage, struct vmcs **vmcs)
--{
--	/*
--	 * get an unbacked address that will cause a #PF
--	 */
--	*vpage = alloc_vpage();
--
--	/*
--	 * set up VMCS so we have something to read from
--	 */
--	*vmcs = alloc_page();
--
--	memset(*vmcs, 0, PAGE_SIZE);
--	(*vmcs)->hdr.revision_id = basic.revision;
--	assert(!vmcs_clear(*vmcs));
--	assert(!make_vmcs_current(*vmcs));
--}
--
--static void test_read_sentinel(u8 sentinel)
-+static void __test_vmread_vmwrite_pf(bool vmread, u64 *val, u8 sentinel)
- {
- 	unsigned long flags = sentinel;
- 	unsigned int vector;
--	struct vmcs *vmcs;
--	void *vpage;
--
--	prep_flags_test_env(&vpage, &vmcs);
+Effectively compile tested only, found by inspection when auditing use of
+kvm_skip_emulated_instruction().
+
+ arch/x86/kvm/vmx/sgx.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/vmx/sgx.c b/arch/x86/kvm/vmx/sgx.c
+index 8f95c7c01433..b12da2a6dec9 100644
+--- a/arch/x86/kvm/vmx/sgx.c
++++ b/arch/x86/kvm/vmx/sgx.c
+@@ -182,8 +182,10 @@ static int __handle_encls_ecreate(struct kvm_vcpu *vcpu,
+ 	/* Enforce CPUID restriction on max enclave size. */
+ 	max_size_log2 = (attributes & SGX_ATTR_MODE64BIT) ? sgx_12_0->edx >> 8 :
+ 							    sgx_12_0->edx;
+-	if (size >= BIT_ULL(max_size_log2))
++	if (size >= BIT_ULL(max_size_log2)) {
+ 		kvm_inject_gp(vcpu, 0);
++		return 1;
++	}
  
  	/*
--	 * Execute VMREAD with a not-PRESENT memory operand, and verify a #PF
--	 * occurred and RFLAGS were not modified.
-+	 * Execute VMREAD/VMWRITE with a not-PRESENT memory operand, and verify
-+	 * a #PF occurred and RFLAGS were not modified.
- 	 */
--	asm volatile ("sahf\n\t"
--		      ASM_TRY("1f")
--		      "vmread %[enc], %[val]\n\t"
--		      "1: lahf"
--		      : [val] "=m" (*(u64 *)vpage),
--			[flags] "+a" (flags)
--		      : [enc] "r" ((u64)GUEST_SEL_SS)
--		      : "cc");
-+	if (vmread)
-+		asm volatile ("sahf\n\t"
-+			      ASM_TRY("1f")
-+			      "vmread %[enc], %[val]\n\t"
-+			      "1: lahf"
-+			      : [val] "=m" (*val),
-+			        [flags] "+a" (flags)
-+			      : [enc] "r" ((u64)GUEST_SEL_SS)
-+			      : "cc");
-+	else
-+		asm volatile ("sahf\n\t"
-+			      ASM_TRY("1f")
-+			      "vmwrite %[val], %[enc]\n\t"
-+			      "1: lahf"
-+			      : [val] "=m" (*val),
-+			        [flags] "+a" (flags)
-+			      : [enc] "r" ((u64)GUEST_SEL_SS)
-+			      : "cc");
- 
- 	vector = exception_vector();
- 	report(vector == PF_VECTOR,
--	       "Expected #PF on VMREAD, got exception 0x%x", vector);
-+	       "Expected #PF on %s, got exception '0x%x'\n",
-+	       vmread ? "VMREAD" : "VMWRITE", vector);
- 
- 	report((u8)flags == sentinel,
- 	       "Expected RFLAGS 0x%x, got 0x%x", sentinel, (u8)flags);
- }
- 
-+static void test_vmread_vmwrite_pf(bool vmread)
-+{
-+	struct vmcs *vmcs = alloc_page();
-+	void *vpage = alloc_vpage();
-+
-+	memset(vmcs, 0, PAGE_SIZE);
-+	vmcs->hdr.revision_id = basic.revision;
-+	assert(!vmcs_clear(vmcs));
-+	assert(!make_vmcs_current(vmcs));
-+
-+	/*
-+	 * Test with two values to candy-stripe the 5 flags stored/loaded by
-+	 * SAHF/LAHF.
-+	 */
-+	__test_vmread_vmwrite_pf(vmread, vpage, 0x91);
-+	__test_vmread_vmwrite_pf(vmread, vpage, 0x45);
-+}
-+
- static void test_vmread_flags_touch(void)
- {
--	/*
--	 * Test with two values to candy-stripe the 5 flags stored/loaded by
--	 * SAHF/LAHF.
--	 */
--	test_read_sentinel(0x91);
--	test_read_sentinel(0x45);
--}
--
--static void test_write_sentinel(u8 sentinel)
--{
--	unsigned long flags = sentinel;
--	unsigned int vector;
--	struct vmcs *vmcs;
--	void *vpage;
--
--	prep_flags_test_env(&vpage, &vmcs);
--
--	/*
--	 * Execute VMWRITE with a not-PRESENT memory operand, and verify a #PF
--	 * occurred and RFLAGS were not modified.
--	 */
--	asm volatile ("sahf\n\t"
--		      ASM_TRY("1f")
--		      "vmwrite %[val], %[enc]\n\t"
--		      "1: lahf"
--		      : [val] "=m" (*(u64 *)vpage),
--			[flags] "+a" (flags)
--		      : [enc] "r" ((u64)GUEST_SEL_SS)
--		      : "cc");
--
--	vector = exception_vector();
--	report(vector == PF_VECTOR,
--	       "Expected #PF on VMWRITE, got exception '0x%x'\n", vector);
--
--	report((u8)flags == sentinel,
--	       "Expected RFLAGS 0x%x, got 0x%x", sentinel, (u8)flags);
-+	test_vmread_vmwrite_pf(true);
- }
- 
- static void test_vmwrite_flags_touch(void)
- {
--	/*
--	 * Test with two values to candy-stripe the 5 flags stored/loaded by
--	 * SAHF/LAHF.
--	 */
--	test_write_sentinel(0x91);
--	test_write_sentinel(0x45);
-+	test_vmread_vmwrite_pf(false);
- }
- 
- static void test_vmcs_high(void)
+ 	 * sgx_virt_ecreate() returns:
+
+base-commit: c59fb127583869350256656b7ed848c398bef879
 -- 
 2.38.0.rc1.362.ged0d419d3c-goog
 
