@@ -2,65 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F2145F168C
-	for <lists+kvm@lfdr.de>; Sat,  1 Oct 2022 01:14:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C14F25F16A1
+	for <lists+kvm@lfdr.de>; Sat,  1 Oct 2022 01:25:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230017AbiI3XOm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Sep 2022 19:14:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52326 "EHLO
+        id S232442AbiI3XZt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Sep 2022 19:25:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231180AbiI3XOl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Sep 2022 19:14:41 -0400
-Received: from mail-oa1-x35.google.com (mail-oa1-x35.google.com [IPv6:2001:4860:4864:20::35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E7B210F
-        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 16:14:33 -0700 (PDT)
-Received: by mail-oa1-x35.google.com with SMTP id 586e51a60fabf-131b7bb5077so7125701fac.2
-        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 16:14:33 -0700 (PDT)
+        with ESMTP id S232603AbiI3XZU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Sep 2022 19:25:20 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CD67A8CC5
+        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 16:25:05 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-352e29ff8c2so55662397b3.21
+        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 16:25:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rih4dRLQPmoXFQqvyiybCfnV+B844XEcFs6s2kNsPVk=;
-        b=XmA/gs+sA/OBMvOaY1K4gSKEC0sImTCgESP0NGa75a9etT2rE90olSdo5X6eLk84ng
-         l3mYbWSrXtaRxXgu0ylM8SpIPXPXs/ehOUPEUqH1cke0nywkLuF8G2X7uibz4+f+l8SM
-         X5d7ai5Z0A1JtOs+tAzYMsseqaUDvymJTfH/ThsMxTpbqtURPzN770llZpXUua8K7+5m
-         jKHn2P5H6NFx4hynN89Rh3yooFxWL67H7Sgej2TVPMuTgi6mmzpcXcfYKIoNwMCno0VB
-         ZGsLG+9VdWftHCe3rBhjTLvxwxtawaSkMGTDjARP5X6JFA2jjz/x9eaK2OqrkRsdJ/Ji
-         ZF4Q==
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date;
+        bh=SfDYQhii7AzyAPCyAJplNJblpYaUlSFyTSjl8z/eY00=;
+        b=QySEEDRymXq3FHDv3F5SvFVmwvJNZonnDf6Vx9zAUimD1+JT6cWxsjm4ck76f7vPeV
+         x/+Io0ghkn+SWQQ5y30Zs+mubEeE5ge14hWKpNPdE1zHnr2jvjbZOKMXMw043yXMZJBU
+         d1i20hRhtwMuBDL2vZMOCUNZqtRjh+sz4CNeScus4jzVtdQsxDI7g76WallsGIEdC1hF
+         UQEVcNuFHmmBQ40IGdxoddgeNxiUJC8gZDg0y0AjqinrL+5rPA7UqyAo4h3C8lkPKC/z
+         /y7teh0KNbJTj/qRndvWGFC8/quwRzoD28Y+0sQObWfuRGsTh3/Cxz3XjkXXNRb+OWfM
+         xH2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Rih4dRLQPmoXFQqvyiybCfnV+B844XEcFs6s2kNsPVk=;
-        b=y5xAotn5pABX6QeDv+Y3XvaIcBekPsKFfDb2MlI7M6h+mHu/BXJ6+lx1DZuH7x4yHi
-         NabL9dZbA0OmM83VWwrl43DN8idFsxhWl5DxuGtyWQ+WAbFpO9z+9ESJFAgIcho62gy5
-         doi0CYkUelu1VQm1vafW8cbQGz7E53bVWv9zeGkSArWm43mJ3KiKsH7v14mWoDvPXTj1
-         g8E23qwYdFxHTtlbj+v26P44ydU3RXUZpcxbxJVXsukf99rTZN9nIG9O4ve/L8UYcMuE
-         iZuykc+YRkA5+f4r+wDXHmMNuYtDg6nmMI+97sUpTnwV1oqPAa2ftrf29ZKz1NqehEO5
-         tjyQ==
-X-Gm-Message-State: ACrzQf1Blcn8QCXXK+TmQt+7XsAOwcNZQ+M9lMO4dybwxW8NjvvSSyrz
-        Dd0n7/Uf9AnDzXkKNbrxLd75RErbLv9LLLQk679JLA==
-X-Google-Smtp-Source: AMsMyM7TLtHMmHkk2px3a/xAJQAH6olcUCSihaMUrjxU9AjdCSOUZ4JUNelqQQ6/tFR/DK8VLNho+hQAuiiWzkYg3x0=
-X-Received: by 2002:a05:6870:580c:b0:12a:f136:a8f5 with SMTP id
- r12-20020a056870580c00b0012af136a8f5mr222960oap.269.1664579672876; Fri, 30
- Sep 2022 16:14:32 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220929225203.2234702-1-jmattson@google.com> <BL0PR11MB30425351024AC155FFC377268A569@BL0PR11MB3042.namprd11.prod.outlook.com>
-In-Reply-To: <BL0PR11MB30425351024AC155FFC377268A569@BL0PR11MB3042.namprd11.prod.outlook.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 30 Sep 2022 16:14:22 -0700
-Message-ID: <CALMp9eS=gDJH9j7oDsWoHDV8uc5pSxUCVtRz6T7yUwmbgU3c6w@mail.gmail.com>
-Subject: Re: [PATCH 1/6] KVM: x86: Mask off reserved bits in CPUID.80000001H
-To:     "Dong, Eddie" <eddie.dong@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=SfDYQhii7AzyAPCyAJplNJblpYaUlSFyTSjl8z/eY00=;
+        b=TH3ew/7pEs69QvXYvthAGbIl+CTAVKnsuAiFYDSl/rZ8jqEfe77vjahtsbmkqwS2KM
+         uzhvkWgk8fM4BsCBmrqou+bq+n2j0AOXKZhCasKJfWbcvC5X/j59WDloWWv241kG+MXm
+         Z/CGUIDLcaLcyQKV3uAI1Ioahga8LlHGt2XtDO6yuJwYCguVF13UBMMURgPhwrdC5EEY
+         JFiYN9W9ChQNuqObPc08UEDaevE5wSFt+f+2bohkbyMtNE70SGYJbOITJLDo7iGO/J2u
+         3pWENnSjdV34n2UWLZbol++GJzBnAWgpxb7DmWsBPxJmLys26V/l01wibhA6VMDTpfd0
+         hFxw==
+X-Gm-Message-State: ACrzQf3uHqW1EAhyVAkIoXbGWbzwQC4n7V//p07SoTBxZGuB1BJzP91h
+        GATK+T68gTrH/XDFRHsaBwmNplutzGQ=
+X-Google-Smtp-Source: AMsMyM5HZvuNHk8Ctqn6hOnKsnMw22PcyX0U8DNOSDZ3BL5hWZ9XJ15m6gTz0ndf3UeaNDDsmBnz28uUF4E=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:7b41:0:b0:356:4ab:d538 with SMTP id
+ w62-20020a817b41000000b0035604abd538mr6088982ywc.508.1664580291960; Fri, 30
+ Sep 2022 16:24:51 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 30 Sep 2022 23:24:47 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
+Message-ID: <20220930232450.1677811-1-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH 0/3] nVMX: Fix VMREAD/VMWRITE #PF tests
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,46 +65,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 30, 2022 at 2:04 PM Dong, Eddie <eddie.dong@intel.com> wrote:
->
->
->
-> > -----Original Message-----
-> > From: Jim Mattson <jmattson@google.com>
-> > Sent: Thursday, September 29, 2022 3:52 PM
-> > To: kvm@vger.kernel.org; pbonzini@redhat.com; Christopherson,, Sean
-> > <seanjc@google.com>
-> > Cc: Jim Mattson <jmattson@google.com>
-> > Subject: [PATCH 1/6] KVM: x86: Mask off reserved bits in CPUID.80000001H
-> >
-> > KVM_GET_SUPPORTED_CPUID should only enumerate features that KVM
-> > actually supports. CPUID.80000001:EBX[27:16] are reserved bits and should
-> > be masked off.
-> >
-> > Fixes: 0771671749b5 ("KVM: Enhance guest cpuid management")
-> > Signed-off-by: Jim Mattson <jmattson@google.com>
-> > ---
-> >  arch/x86/kvm/cpuid.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c index
-> > 4c1c2c06e96b..ea4e213bcbfb 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -1119,6 +1119,7 @@ static inline int __do_cpuid_func(struct
-> > kvm_cpuid_array *array, u32 function)
-> >                       entry->eax = max(entry->eax, 0x80000021);
-> >               break;
-> >       case 0x80000001:
-> > +             entry->ebx &= ~GENMASK(27, 16);
->
-> ebx of leaf 0x80000001 is reserved, at least from SDM of Intel processor. Do I miss something?
+Thanks to a recent gcc update, the VMREAD/VMWRITE #PF tests are now
+failing due to gcc-12 optimizing away a non-volatile flag that it thinks
+can't possibly change.  Avoid the volatile shenanigans entirely by
+switching to ASM_TRY(), and dedup the two tests.
 
-This is an AMD defined leaf, so the APM is authoritative.
+Sean Christopherson (3):
+  x86: Handle all known exceptions with ASM_TRY()
+  nVMX: Use ASM_TRY() for VMREAD and VMWRITE page fault tests
+  nVMX: Dedup the bulk of the VMREAD/VMWRITE #PF tests
 
-> >               cpuid_entry_override(entry, CPUID_8000_0001_EDX);
-> >               cpuid_entry_override(entry, CPUID_8000_0001_ECX);
-> >               break;
-> > --
-> > 2.38.0.rc1.362.ged0d419d3c-goog
->
+ lib/x86/desc.c |  10 ++--
+ x86/vmx.c      | 158 ++++++++++++++-----------------------------------
+ 2 files changed, 49 insertions(+), 119 deletions(-)
+
+
+base-commit: d8a4f9e5e8d69d4ef257b40d6cd666bd2f63494e
+-- 
+2.38.0.rc1.362.ged0d419d3c-goog
+
