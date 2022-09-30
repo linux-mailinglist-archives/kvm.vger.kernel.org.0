@@ -2,102 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EF625F14EC
-	for <lists+kvm@lfdr.de>; Fri, 30 Sep 2022 23:32:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C048D5F1668
+	for <lists+kvm@lfdr.de>; Sat,  1 Oct 2022 01:00:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232077AbiI3VcC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Sep 2022 17:32:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53862 "EHLO
+        id S232051AbiI3XAO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Sep 2022 19:00:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232130AbiI3VcA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Sep 2022 17:32:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C965197F29
-        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 14:31:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664573518;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pGkWMTg66lPlawlfmY1q2ZECHFVFGNdAgfMQyGIB/3c=;
-        b=RSushoY6/se/S/0pZXLujvgkB2UAjzjV8mOTE5l1wggGsMBwjGPUAqClyBbEuTgtZWy14z
-        ddE6c071ngzeR7YTgGVYih1y0/7s77NOtySK/ydDKD1RGMGpoZ0MCqPG3JWfCSWoB/vjJR
-        UHF72DOxCfq0iSMDr0rDHtnXXU0ItpQ=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-447-u6qEiubzOHyQ_HvE7tP9OQ-1; Fri, 30 Sep 2022 17:31:57 -0400
-X-MC-Unique: u6qEiubzOHyQ_HvE7tP9OQ-1
-Received: by mail-il1-f199.google.com with SMTP id g1-20020a92cda1000000b002f612391d5bso4311820ild.2
-        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 14:31:57 -0700 (PDT)
+        with ESMTP id S232112AbiI3XAL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Sep 2022 19:00:11 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8F662B266
+        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 16:00:10 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id y16-20020a17090322d000b0017848b6f556so4071444plg.19
+        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 16:00:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date;
+        bh=1QSMu8aoY/jEAF1lKG7WvfOseFpqZMOSl6wmTYMBwPw=;
+        b=fB4GwKZ3OMfwNycXcUfmgNlsB5fkbITfuIiSzVyxjrjCnmFGoQ9yGeFuEqC7AF3tde
+         sKjAwEZdoLGIrwafW409XwahL3n/tQhVOGaZTc7ebO6iFanmT1OOtaKRfWfU+MpsXdtV
+         kM2BqjKGCYc1JXRnL3CiF5X1Bdc4n+42Uxv3PWr5g2ZwQUWfAb+BDKavskp61HJliaHW
+         0oLW5diKtYrZwmEgauM4RwquTl/D30iEpVIgZ+ajwEKr8Kb1YWgxXvyFbxTtwa1JSYPq
+         jckIyRHVJkRZaI8l3JdRPYUpsoX8m1lJ3mGcodeXtI3f4jRIi9MIsWoIF6KfC8fgYHoY
+         xvOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=pGkWMTg66lPlawlfmY1q2ZECHFVFGNdAgfMQyGIB/3c=;
-        b=Ja0VnF1FK+LaJjwIdwqkwS5d+jW2x025HHPBtt6Qqv1SGe12DJAN0Uz0SX7fLTtYR1
-         6ZP9C04gP1IGz4ltcpH8VK4uXc6SyPJkoburEgKRnqBBT5LXJkMOOqgUBWm87W8aidPV
-         0o0ky0JUgq/GefP1KT+QYsF/w8+/NmRxlfGJpQjFj2840u++iKyQ6IrI/9gx5aczwe/o
-         +6hZj7gSbgo3qGAJLUpEj/ndWTcYKOmlxBMDlAd23psWtz7YW5OUG3FrEQkUF1hodefu
-         Aa4E7w+G10QjmkzJcBgzLjc+vIJbFW85qUcLW6UsFb7I2wUpXIRIwoOAiwb1jAwlQpy0
-         WaSA==
-X-Gm-Message-State: ACrzQf32kvFGD29ILBijgaQYnIHsSP9rtdhksyGKq5aFHp4q4Vs0XYvF
-        bRYh2otKdwLy6oxiLOCUL1w7Ix1z+UqD1TI6Ny8DLcmKgi99cXDoiIcY3Ppa6XNvSeH19a7o3M6
-        /YgrCxBzDk+af
-X-Received: by 2002:a02:a313:0:b0:35b:877:1d11 with SMTP id q19-20020a02a313000000b0035b08771d11mr5756865jai.120.1664573517143;
-        Fri, 30 Sep 2022 14:31:57 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4C+kISRDVgKGEULXrlyMkNpE7N94H+pcP3Sc6apakJteVRd2TGm4hgfsE6vRmmX3OxwOu6Cg==
-X-Received: by 2002:a02:a313:0:b0:35b:877:1d11 with SMTP id q19-20020a02a313000000b0035b08771d11mr5756855jai.120.1664573516942;
-        Fri, 30 Sep 2022 14:31:56 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id z7-20020a92cec7000000b002f19d9838c6sm1342914ilq.25.2022.09.30.14.31.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Sep 2022 14:31:55 -0700 (PDT)
-Date:   Fri, 30 Sep 2022 15:31:54 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH 0/2] Simplify some of the locking in vfio_group
-Message-ID: <20220930153154.4d0b2882.alex.williamson@redhat.com>
-In-Reply-To: <0-v1-917e3647f123+b1a-vfio_group_users_jgg@nvidia.com>
-References: <0-v1-917e3647f123+b1a-vfio_group_users_jgg@nvidia.com>
-Organization: Red Hat
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=1QSMu8aoY/jEAF1lKG7WvfOseFpqZMOSl6wmTYMBwPw=;
+        b=jZQGnNDONucbWVpqFvQ2psBBmHCfs9IO+HgBFDxPbrGRKHjcz0qdYwEva6A95hp3bW
+         F2LNy5M5s9Xg38iVWQup14eHP8H7+1dqmQCYHsH+7MgGV2TUlOD7dP6J1KjlGk8TWHfG
+         6M+OdGWMYKRyy789VEWkfdAtZ8MIGVYJxgjPu2FZ8u18o+drGBWR6H0doRyfI0s3f7j2
+         HR6Ld57roKSNrgWY9oYha/HHFTEe55mBngpDDZ8mF/Vke87TsS0VPNzi3T+qWScD6e2t
+         orMRihnyEX1ySqANDvdhr6vJ4f5IW7NxG4UvOOjbG6bAXPfmQCuNRO7Ul8xdzfLsz8xY
+         pUWg==
+X-Gm-Message-State: ACrzQf3LWaJFy9aVOUc3LIPA8wMUizV5WzXAFA/gwPvESlhiKkMDLeUX
+        zBhE9lGYd+2kfaw2kfKbyhIyQxZ0gbE=
+X-Google-Smtp-Source: AMsMyM4e3iRj0bwKPO4Mh0i367Pha65uA54RGjkwlD/8HnUiJhQHesqQ3gBkhZQI37PJu0xq5u8PtFdNRxI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:2cb:b0:171:4f0d:beb6 with SMTP id
+ s11-20020a17090302cb00b001714f0dbeb6mr10909525plk.53.1664578810206; Fri, 30
+ Sep 2022 16:00:10 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 30 Sep 2022 23:00:08 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
+Message-ID: <20220930230008.1636044-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86: Exempt pending triple fault from event injection
+ sanity check
+From:   Sean Christopherson <seanjc@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel test robot <yujie.liu@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 29 Sep 2022 11:59:23 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+Exempt pending triple faults, a.k.a. KVM_REQ_TRIPLE_FAULT, when asserting
+that KVM didn't attempt to queue a new exception during event injection.
+KVM needs to emulate the injection itself when emulating Real Mode due to
+lack of unrestricted guest support (VMX) and will queue a triple fault if
+that emulation fails.
 
-> Kevin points out that the vfio_group->users doesn't really need to exist
-> now, and some other inspection shows that the group_rwsem has outlived its
-> utility as well. Replace both with simpler constructs.
-> 
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> 
-> Jason Gunthorpe (2):
->   vfio: Remove the vfio_group->users and users_comp
->   vfio: Change vfio_group->group_rwsem to a mutex
-> 
->  drivers/vfio/container.c | 10 ++---
->  drivers/vfio/vfio.h      |  5 +--
->  drivers/vfio/vfio_main.c | 92 +++++++++++++++++++---------------------
->  3 files changed, 50 insertions(+), 57 deletions(-)
-> 
-> 
-> base-commit: 42e1d1eed20a17c6cbb1d600c77a6ca69a632d4c
+Ideally the assertion would more precisely filter out the emulated Real
+Mode triple fault case, but rmode.vm86_active is buried in vcpu_vmx and
+can't be queried without a new kvm_x86_ops.  And unlike "regular"
+exceptions, triple fault cannot put the vCPU into an infinite loop; the
+triple fault will force either an exit to userspace or a nested VM-Exit,
+and triple fault after nested VM-Exit will force an exit to userspace.
+I.e. there is no functional issue, so just suppress the warning for
+triple faults.
 
-Applied to vfio next branch for v6.1.  Thanks,
+Opportunistically convert the warning to a one-time thing, when it
+fires, it fires _a lot_, and is usually user triggerable, i.e. can be
+used to spam the kernel log.
 
-Alex
+Fixes: 7055fb113116 ("KVM: x86: Treat pending TRIPLE_FAULT requests as pending exceptions")
+Reported-by: kernel test robot <yujie.liu@intel.com>
+Link: https://lore.kernel.org/r/202209301338.aca913c3-yujie.liu@intel.com
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index eb9d2c23fb04..20497685e6d1 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9972,7 +9972,20 @@ static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
+ 	    kvm_x86_ops.nested_ops->has_events(vcpu))
+ 		*req_immediate_exit = true;
+ 
+-	WARN_ON(kvm_is_exception_pending(vcpu));
++	/*
++	 * KVM must never queue a new exception while injecting an event; KVM
++	 * is done emulating and should only propagate the to-be-injected event
++	 * to the VMCS/VMCB.  Queueing a new exception can put the vCPU into an
++	 * infinite loop as KVM will bail from VM-Enter to inject the pending
++	 * exception and start the cycle all over.
++	 *
++	 * Exempt triple faults as they have special handling and won't put the
++	 * vCPU into an infinite loop.  Triple fault can be queued when running
++	 * VMX without unrestricted guest, as that requires KVM to emulate Real
++	 * Mode events (see kvm_inject_realmode_interrupt()).
++	 */
++	WARN_ON_ONCE(vcpu->arch.exception.pending ||
++		     vcpu->arch.exception_vmexit.pending);
+ 	return 0;
+ 
+ out:
+
+base-commit: c59fb127583869350256656b7ed848c398bef879
+-- 
+2.38.0.rc1.362.ged0d419d3c-goog
 
