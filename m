@@ -2,157 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2FFF35F0B17
-	for <lists+kvm@lfdr.de>; Fri, 30 Sep 2022 13:53:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F5835F0C80
+	for <lists+kvm@lfdr.de>; Fri, 30 Sep 2022 15:35:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230482AbiI3LxU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Sep 2022 07:53:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35148 "EHLO
+        id S231356AbiI3NfN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Sep 2022 09:35:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230356AbiI3LxG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Sep 2022 07:53:06 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A1D683206;
-        Fri, 30 Sep 2022 04:52:59 -0700 (PDT)
-Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1oeEZd-0005wF-Di; Fri, 30 Sep 2022 13:52:57 +0200
-Message-ID: <99249078-2026-c76c-87eb-8e3ac5dde73d@leemhuis.info>
-Date:   Fri, 30 Sep 2022 13:52:55 +0200
+        with ESMTP id S230363AbiI3NfL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Sep 2022 09:35:11 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B3D74507A
+        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 06:35:09 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id lx7so4320513pjb.0
+        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 06:35:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date;
+        bh=drulgaQumTg7MUqb+eavC3/aY6f7GE0YABILoSPZ2z0=;
+        b=hAnbGiHo1W+6K3Yt48uLtqXxiJLLL+uLW8X05fbm9BieSLrWVYYT+9Y6shsWYth0X1
+         YcSiE8imaKHFDjYwOdG5lb5T50tXrIzILHa3poODj5Hv3oVemuGaAjAb5TZlbbdAq0ug
+         EIs3xrlIdvv9dt4DFO88Ko25GEyjZF9VwSnvFuznGU41Tkh3LH9gMutY4NlwKId0xWOs
+         1lhBK7j0aKJHA4kO+b2o7zwrgLXVVkAcFDSLTWcbf/InyQJLN9e58ic1QajarQlut1lv
+         D5fm+drWdLsju2qcwaFTiDje/8llSuCeHGv4Pny44stTIQtJYC+E1Da6mlaprDg5JHrb
+         g2kQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=drulgaQumTg7MUqb+eavC3/aY6f7GE0YABILoSPZ2z0=;
+        b=OTbHic+IECXPsGwW0c4ef7X72cIEBN3+T5KgD9wKMfXE7MsEc2H/xszuN+/iwh4pCs
+         CfHY591Q6VBxEkkxMcusVUgC2xsyBsfsQS4O12ZVmLZPeQjUCkQpnYjyTYHOFEXXIU7h
+         jtQXghmPr/JlLTj5iW5D+/70Jqx+g1JYYX8sAIHIwfk0eMuGY+AEkx7ITeNZEZgXPUlZ
+         FSbRjzIkZs1Fgd6ITBKB2tGRzj8Kys2PoF0umvosmYvb6pB7OuCWtx4sSb19eV7WSETx
+         aU9ifk0jPqNNxysvHXbfI0HAbXeIcxl/Uq0dCBnTEMiq2L2Q1gVQ/tXjeJlg9DY6zf4d
+         WJzQ==
+X-Gm-Message-State: ACrzQf1XSjoV7Zz7GZji3SQDoM4YqFtG7qtIBweBeRf2MFEGvoiXKuLu
+        ouMSt0G64r6h3VVPVC6/pXN12CP2U5BYkQ==
+X-Google-Smtp-Source: AMsMyM5bdW7Mt7zvcFFsXTxRhxd4EfYJJ8wgSnTXZHN85zNKy7g0pgN5a9IMKO45A/h7b26jggIz7Q==
+X-Received: by 2002:a17:902:e944:b0:179:dee4:f115 with SMTP id b4-20020a170902e94400b00179dee4f115mr9185623pll.141.1664544908987;
+        Fri, 30 Sep 2022 06:35:08 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id w2-20020a17090a380200b0020255f4960bsm5344760pjb.24.2022.09.30.06.35.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Sep 2022 06:35:05 -0700 (PDT)
+Date:   Fri, 30 Sep 2022 13:35:01 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     kernel test robot <yujie.liu@intel.com>
+Cc:     lkp@lists.01.org, lkp@intel.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Robert Hu <robert.hu@intel.com>,
+        Farrah Chen <farrah.chen@intel.com>,
+        Danmei Wei <danmei.wei@intel.com>
+Subject: Re: [KVM] 7055fb1131:
+ WARNING:at_arch/x86/kvm/x86.c:#inject_pending_event[kvm]
+Message-ID: <YzbwhXJnQQPpFm7Q@google.com>
+References: <202209301338.aca913c3-yujie.liu@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: Commit 'iomap: add support for dma aligned direct-io' causes
- qemu/KVM boot failures
-Content-Language: en-US, de-DE
-To:     linux-kernel@vger.kernel.org,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-Cc:     linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org
-References: <fb869c88bd48ea9018e1cc349918aa7cdd524931.camel@redhat.com>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-In-Reply-To: <fb869c88bd48ea9018e1cc349918aa7cdd524931.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1664538780;c1816c87;
-X-HE-SMSGID: 1oeEZd-0005wF-Di
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202209301338.aca913c3-yujie.liu@intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TWIMC: this mail is primarily send for documentation purposes and for
-regzbot, my Linux kernel regression tracking bot. These mails usually
-contain '#forregzbot' in the subject, to make them easy to spot and filter.
-
-[TLDR: I'm adding this regression report to the list of tracked
-regressions; all text from me you find below is based on a few templates
-paragraphs you might have encountered already already in similar form.]
-
-Hi, this is your Linux kernel regression tracker. This might be a Qemu
-bug, but it's exposed by kernel change, so I at least want to have it in
-the tracking. I'll simply remove it in a few weeks, if it turns out that
-nobody except Maxim hits this.
-
-On 29.09.22 17:41, Maxim Levitsky wrote:
-> Hi!
->  
-> Recently I noticed that this commit broke the boot of some of the VMs that I run on my dev machine.
->  
-> It seems that I am not the first to notice this but in my case it is a bit different
->  
-> https://lore.kernel.org/all/e0038866ac54176beeac944c9116f7a9bdec7019.camel@linux.ibm.com/
->  
-> My VM is a normal x86 VM, and it uses virtio-blk in the guest to access the virtual disk,
-> which is a qcow2 file stored on ext4 filesystem which is stored on NVME drive with 4K sectors.
-> (however I was also able to reproduce this on a raw file)
->  
-> It seems that the only two things that is needed to reproduce the issue are:
->  
-> 1. The qcow2/raw file has to be located on a drive which has 4K hardware block size.
-> 2. Qemu needs to use direct IO (both aio and 'threads' reproduce this). 
->  
-> I did some debugging and I isolated the kernel change in behavior from qemu point of view:
->  
->  
-> Qemu, when using direct IO, 'probes' the underlying file.
->  
-> It probes two things:
->  
-> 1. It probes the minimum block size it can read.
->    It does so by trying to read 1, 512, 1024, 2048 and 4096 bytes at offset 0,
->    using a 4096 bytes aligned buffer, and notes the first read that works as the hardware block size.
->  
->    (The relevant function is 'raw_probe_alignment' in src/block/file-posix.c in qemu source code).
->  
->  
-> 2. It probes the buffer alignment by reading 4096 bytes also at file offset 0,
->    this time using a buffer that is 1, 512, 1024, 2048 and 4096 aligned
->    (this is done by allocating a buffer which is 4K aligned and adding 1/512 and so on to its address)
->  
->    First successful read is saved as the required buffer alignment. 
->  
->  
-> Before the patch, both probes would yield 4096 and everything would work fine.
-> (The file in question is stored on 4K block device)
->  
->  
-> After the patch the buffer alignment probe succeeds at 512 bytes.
-> This means that the kernel now allows to read 4K of data at file offset 0 with a buffer that
-> is only 512 bytes aligned. 
->  
-> It is worth to note that the probe was done using 'pread' syscall.
->  
->  
-> Later on, qemu likely reads the 1st 512 sector of the drive.
->  
-> It uses preadv with 2 io vectors:
->  
-> First one is for 512 bytes and it seems to have 0xC00 offset into page 
-> (likely depends on debug session but seems to be consistent)
->  
-> Second one is for 3584 bytes and also has a buffer that is not 4K aligned.
-> (0x200 page offset this time)
->  
-> This means that the qemu does respect the 4K block size but only respects 512 bytes buffer alignment,
-> which is consistent with the result of the probing.
->  
-> And that preadv fails with -EINVAL
->  
-> Forcing qemu to use 4K buffer size fixes the issue, as well as reverting the offending commit.
->  
-> Any patches, suggestions are welcome.
+On Fri, Sep 30, 2022, kernel test robot wrote:
+> Greeting,
 > 
-> I use 6.0-rc7, using mainline master branch as yesterday.
->  
-> Best regards,
-> 	Maxim Levitsky
+> FYI, we noticed the following commit (built with gcc-11):
 > 
-Thanks for the report. To be sure below issue doesn't fall through the
-cracks unnoticed, I'm adding it to regzbot, my Linux kernel regression
-tracking bot:
+> commit: 7055fb11311622852c16463b1ccaa59e7691e42e ("KVM: x86: Treat pending TRIPLE_FAULT requests as pending exceptions")
+> https://git.kernel.org/cgit/virt/kvm/kvm.git queue
 
-#regzbot ^introduced bf8d08532bc1
-#regzbot ignore-activity
+...
 
-This isn't a regression? This issue or a fix for it are already
-discussed somewhere else? It was fixed already? You want to clarify when
-the regression started to happen? Or point out I got the title or
-something else totally wrong? Then just reply -- ideally with also
-telling regzbot about it, as explained here:
-https://linux-regtracking.leemhuis.info/tracked-regression/
+> # ==== Test Assertion Failure ====
+> #   x86_64/mmio_warning_test.c:117: warnings_before == warnings_after
 
-Reminder for developers: When fixing the issue, add 'Link:' tags
-pointing to the report (the mail this one replies to), as explained for
-in the Linux kernel's documentation; above webpage explains why this is
-important for tracked regressions.
+...
+ 
+> [  100.924976][ T4704] ------------[ cut here ]------------
+> [  100.931287][ T4704] WARNING: CPU: 67 PID: 4704 at arch/x86/kvm/x86.c:9934 inject_pending_event+0x6e6/0xe00 [kvm]
+> [  101.237320][ T4704] Call Trace:
+> [  101.241522][ T4704]  <TASK>
+> [  101.245343][ T4704]  vcpu_enter_guest+0x61a/0x3540 [kvm]
+> [  101.271009][ T4704]  vcpu_run+0xbe/0x780 [kvm]
+> [  101.282791][ T4704]  kvm_arch_vcpu_ioctl_run+0x334/0x1540 [kvm]
+> [  101.289810][ T4704]  kvm_vcpu_ioctl+0x455/0xb00 [kvm]
+> [  101.359680][ T4704]  __x64_sys_ioctl+0x128/0x1c0
+> [  101.365052][ T4704]  do_syscall_64+0x38/0xc0
+> [  101.370066][ T4704]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> [  101.376647][ T4704] RIP: 0033:0x7f2a78126547
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+Good ol' emulated real mode.  The warning exists to assert that KVM didn't queue
+a new exception while injecting events, but when emulating Real Mode due to lack
+of unrestricted guest, KVM needs to emulate the actual event injection and so can
+trigger triple fault.
 
-P.S.: As the Linux kernel's regression tracker I deal with a lot of
-reports and sometimes miss something important when writing mails like
-this. If that's the case here, don't hesitate to tell me in a public
-reply, it's in everyone's interest to set the public record straight.
+Ideally the assertion would filter out this exact case, but rmode.vm86_active is
+buried in vcpu_vmx.  Easiest thing is to just exempt KVM_REQ_TRIPLE_FAULT.
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index eb9d2c23fb04..1d02cc416cbc 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9972,7 +9972,15 @@ static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
+            kvm_x86_ops.nested_ops->has_events(vcpu))
+                *req_immediate_exit = true;
+ 
+-       WARN_ON(kvm_is_exception_pending(vcpu));
++       /*
++        * KVM should never attempt to queue a new exception while injecting an
++        * event, at this point KVM is done emulating and should only propagate
++        * the exception to the VMCS/VMCB.  Exempt triple faults as VMX without
++        * unrestricted guest needs to emulate Real Mode events and queues a
++        * triple fault if injection fails (see kvm_inject_realmode_interrupt()).
++        */
++       WARN_ON_ONCE(vcpu->arch.exception.pending ||
++                    vcpu->arch.exception_vmexit.pending);
+        return 0;
+ 
+ out:
