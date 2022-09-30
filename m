@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C6635F0897
-	for <lists+kvm@lfdr.de>; Fri, 30 Sep 2022 12:21:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52E345F08A2
+	for <lists+kvm@lfdr.de>; Fri, 30 Sep 2022 12:21:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231996AbiI3KVX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Sep 2022 06:21:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33868 "EHLO
+        id S232048AbiI3KVm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Sep 2022 06:21:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231556AbiI3KTG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Sep 2022 06:19:06 -0400
+        with ESMTP id S231611AbiI3KTK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Sep 2022 06:19:10 -0400
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD9D1166F1C;
-        Fri, 30 Sep 2022 03:19:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 700DA1664AC;
+        Fri, 30 Sep 2022 03:19:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1664533144; x=1696069144;
+  t=1664533146; x=1696069146;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=YNhnhoSI1URFHxgkBnw9FxeAp7yIy5x/VY6VY34Ms74=;
-  b=DK5eZBgMXIpSd8vPCz7DuunEGde+xP7PGmAMP7ezbP23+9mIMKxFc5RX
-   8ay7PPV8XjKplGVtyfCnhm78NFOdR6tWBw1wg+iwUnAmIiSXUpF5t/t5/
-   CuHODaStppqIJWfKDvAtk/sGbQG2oUfKsena8c46V+jwUn1/w8tW+QG4E
-   zK82LZbcJTg12J5chRmOxmZkzNojLBL+DEr6M3jMYkswUoj4DuEPT8Wiq
-   iIyBYjIMVSIDFD2dBzWSjWk1iCEqRbdKt2yXwBPH/rKO798VRa6CXO3UN
-   ZlNEHrJo1QTn2fw29QfFN9qcKtSDdl5X+1NyLkopE5PnxbTc8nd7Jt7tr
+  bh=xEq02T/uQIuvtk20d4tWbp/OW6HixVvgi/WsrUctB2M=;
+  b=I2Bcxp5eF0sZqmey0HLpaSqocni/OZr6wIklOxFh9RAqhsefzVoVhJ5Z
+   RORPMklGZEaFUrLJKHQzhZCWrAaOSnOd7PUUoIO7nuR/LFDHxC1TO4xxP
+   hUsJVsacKYRF9kvALHRC2dE0otnwz4cFTpaicAjvX1K4zlRL6nUlek5Wf
+   h3ZUoy60OMnPtqWD/dkcPkuIDFbQ6GMsCQZIQ15R75u6iZvgf5eb5+r1j
+   0XglukZrGifKNm0+Zs/GIWdeUiXLyRR+7deYGJRj3TE6Lq9dSwsxrSfTx
+   gxcrWgoXNZl4s+CHyI9GeG36J4erf40gNxep1HE6fPR1i1R+AWZkyq4Aj
    Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10485"; a="285294796"
+X-IronPort-AV: E=McAfee;i="6500,9779,10485"; a="285294798"
 X-IronPort-AV: E=Sophos;i="5.93,358,1654585200"; 
-   d="scan'208";a="285294796"
+   d="scan'208";a="285294798"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
   by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2022 03:19:02 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10485"; a="726807714"
+X-IronPort-AV: E=McAfee;i="6500,9779,10485"; a="726807718"
 X-IronPort-AV: E=Sophos;i="5.93,358,1654585200"; 
-   d="scan'208";a="726807714"
+   d="scan'208";a="726807718"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2022 03:19:02 -0700
 From:   isaku.yamahata@intel.com
@@ -43,9 +43,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>
-Subject: [PATCH v9 065/105] KVM: TDX: Implement TDX vcpu enter/exit path
-Date:   Fri, 30 Sep 2022 03:17:59 -0700
-Message-Id: <0605d036f158ec1d2a4ef3ea52c4041ee1175404.1664530908.git.isaku.yamahata@intel.com>
+Subject: [PATCH v9 066/105] KVM: TDX: vcpu_run: save/restore host state(host kernel gs)
+Date:   Fri, 30 Sep 2022 03:18:00 -0700
+Message-Id: <1b16f328c88654df8fda2a5e40f26e7bf14d08a0.1664530908.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1664530907.git.isaku.yamahata@intel.com>
 References: <cover.1664530907.git.isaku.yamahata@intel.com>
@@ -62,198 +62,226 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-This patch implements running TDX vcpu.  Once vcpu runs on the logical
-processor (LP), the TDX vcpu is associated with it.  When the TDX vcpu
-moves to another LP, the TDX vcpu needs to flush its status on the LP.
-When destroying TDX vcpu, it needs to complete flush and flush cpu memory
-cache.  Track which LP the TDX vcpu run and flush it as necessary.
-
-Do nothing on sched_in event as TDX doesn't support pause loop.
-
-TDX vcpu execution requires restoring PMU debug store after returning back
-to KVM because the TDX module unconditionally resets the value.  To reuse
-the existing code, export perf_restore_debug_store.
+On entering/exiting TDX vcpu, Preserved or clobbered CPU state is different
+from VMX case.  Add TDX hooks to save/restore host/guest CPU state.
+Save/restore kernel GS base MSR.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/vmx/main.c    | 21 +++++++++++++++++++--
- arch/x86/kvm/vmx/tdx.c     | 32 ++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/tdx.h     | 33 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/x86_ops.h |  2 ++
- arch/x86/kvm/x86.c         |  1 +
- 5 files changed, 87 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/vmx/main.c         | 28 ++++++++++++++++++++--
+ arch/x86/kvm/vmx/tdx.c          | 42 +++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/tdx.h          |  4 ++++
+ arch/x86/kvm/vmx/x86_ops.h      |  4 ++++
+ arch/x86/kvm/x86.c              | 10 ++++++--
+ 6 files changed, 85 insertions(+), 4 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index b9ebe82a4c37..18224a3b59a5 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -2074,6 +2074,7 @@ int kvm_pv_send_ipi(struct kvm *kvm, unsigned long ipi_bitmap_low,
+ 
+ int kvm_add_user_return_msr(u32 msr);
+ int kvm_find_user_return_msr(u32 msr);
++void kvm_user_return_msr_init_cpu(void);
+ int kvm_set_user_return_msr(unsigned index, u64 val, u64 mask);
+ 
+ static inline bool kvm_is_supported_user_return_msr(u32 msr)
 diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 10aacde3a40a..de01b3c79eca 100644
+index de01b3c79eca..44f9fc9e987b 100644
 --- a/arch/x86/kvm/vmx/main.c
 +++ b/arch/x86/kvm/vmx/main.c
-@@ -100,6 +100,23 @@ static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+@@ -100,6 +100,30 @@ static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
  	return vmx_vcpu_reset(vcpu, init_event);
  }
  
-+static int vt_vcpu_pre_run(struct kvm_vcpu *vcpu)
++static void vt_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
 +{
-+	if (is_td_vcpu(vcpu))
-+		/* Unconditionally continue to vcpu_run(). */
-+		return 1;
++	/*
++	 * All host state is saved/restored across SEAMCALL/SEAMRET, and the
++	 * guest state of a TD is obviously off limits.  Deferring MSRs and DRs
++	 * is pointless because the TDX module needs to load *something* so as
++	 * not to expose guest state.
++	 */
++	if (is_td_vcpu(vcpu)) {
++		tdx_prepare_switch_to_guest(vcpu);
++		return;
++	}
 +
-+	return vmx_vcpu_pre_run(vcpu);
++	vmx_prepare_switch_to_guest(vcpu);
 +}
 +
-+static fastpath_t vt_vcpu_run(struct kvm_vcpu *vcpu)
++static void vt_vcpu_put(struct kvm_vcpu *vcpu)
 +{
 +	if (is_td_vcpu(vcpu))
-+		return tdx_vcpu_run(vcpu);
++		return tdx_vcpu_put(vcpu);
 +
-+	return vmx_vcpu_run(vcpu);
++	return vmx_vcpu_put(vcpu);
 +}
 +
- static void vt_flush_tlb_all(struct kvm_vcpu *vcpu)
+ static int vt_vcpu_pre_run(struct kvm_vcpu *vcpu)
  {
  	if (is_td_vcpu(vcpu))
-@@ -232,8 +249,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.flush_tlb_gva = vt_flush_tlb_gva,
- 	.flush_tlb_guest = vt_flush_tlb_guest,
+@@ -214,9 +238,9 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+ 	.vcpu_free = vt_vcpu_free,
+ 	.vcpu_reset = vt_vcpu_reset,
  
--	.vcpu_pre_run = vmx_vcpu_pre_run,
--	.vcpu_run = vmx_vcpu_run,
-+	.vcpu_pre_run = vt_vcpu_pre_run,
-+	.vcpu_run = vt_vcpu_run,
- 	.handle_exit = vmx_handle_exit,
- 	.skip_emulated_instruction = vmx_skip_emulated_instruction,
- 	.update_emulated_instruction = vmx_update_emulated_instruction,
+-	.prepare_switch_to_guest = vmx_prepare_switch_to_guest,
++	.prepare_switch_to_guest = vt_prepare_switch_to_guest,
+ 	.vcpu_load = vmx_vcpu_load,
+-	.vcpu_put = vmx_vcpu_put,
++	.vcpu_put = vt_vcpu_put,
+ 
+ 	.update_exception_bitmap = vmx_update_exception_bitmap,
+ 	.get_msr_feature = vmx_get_msr_feature,
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 6c1730443497..e5545608aea5 100644
+index e5545608aea5..869cb9952773 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -10,6 +10,9 @@
- #include "x86.h"
- #include "mmu.h"
+@@ -1,5 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0
+ #include <linux/cpu.h>
++#include <linux/mmu_context.h>
  
-+#include <trace/events/kvm.h>
-+#include "trace.h"
+ #include <asm/tdx.h>
+ 
+@@ -321,6 +322,8 @@ int tdx_vm_init(struct kvm *kvm)
+ 
+ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+ {
++	struct vcpu_tdx *tdx = to_tdx(vcpu);
 +
- #undef pr_fmt
- #define pr_fmt(fmt) "tdx: " fmt
+ 	/* TDX only supports x2APIC, which requires an in-kernel local APIC. */
+ 	if (!vcpu->arch.apic)
+ 		return -EINVAL;
+@@ -337,9 +340,46 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.guest_state_protected =
+ 		!(to_kvm_tdx(vcpu->kvm)->attributes & TDX_TD_ATTRIBUTE_DEBUG);
  
-@@ -404,6 +407,35 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	vcpu->kvm->vm_bugged = true;
++	tdx->host_state_need_save = true;
++	tdx->host_state_need_restore = false;
++
+ 	return 0;
  }
  
-+u64 __tdx_vcpu_run(hpa_t tdvpr, void *regs, u32 regs_mask);
-+
-+static noinstr void tdx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
-+					struct vcpu_tdx *tdx)
-+{
-+	guest_enter_irqoff();
-+	tdx->exit_reason.full = __tdx_vcpu_run(tdx->tdvpr.pa, vcpu->arch.regs, 0);
-+	guest_exit_irqoff();
-+}
-+
-+fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
++void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
 +{
 +	struct vcpu_tdx *tdx = to_tdx(vcpu);
 +
-+	if (unlikely(vcpu->kvm->vm_bugged)) {
-+		tdx->exit_reason.full = TDX_NON_RECOVERABLE_VCPU;
-+		return EXIT_FASTPATH_NONE;
-+	}
++	kvm_user_return_msr_init_cpu();
++	if (!tdx->host_state_need_save)
++		return;
 +
-+	trace_kvm_entry(vcpu);
++	if (likely(is_64bit_mm(current->mm)))
++		tdx->msr_host_kernel_gs_base = current->thread.gsbase;
++	else
++		tdx->msr_host_kernel_gs_base = read_msr(MSR_KERNEL_GS_BASE);
 +
-+	tdx_vcpu_enter_exit(vcpu, tdx);
-+
-+	vcpu->arch.regs_avail &= ~VMX_REGS_LAZY_LOAD_SET;
-+	trace_kvm_exit(vcpu, KVM_ISA_VMX);
-+
-+	return EXIT_FASTPATH_NONE;
++	tdx->host_state_need_save = false;
 +}
 +
- void tdx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa, int pgd_level)
++static void tdx_prepare_switch_to_host(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_tdx *tdx = to_tdx(vcpu);
++
++	tdx->host_state_need_save = true;
++	if (!tdx->host_state_need_restore)
++		return;
++
++	wrmsrl(MSR_KERNEL_GS_BASE, tdx->msr_host_kernel_gs_base);
++	tdx->host_state_need_restore = false;
++}
++
++void tdx_vcpu_put(struct kvm_vcpu *vcpu)
++{
++	vmx_vcpu_pi_put(vcpu);
++	tdx_prepare_switch_to_host(vcpu);
++}
++
+ void tdx_vcpu_free(struct kvm_vcpu *vcpu)
  {
- 	td_vmcs_write64(to_tdx(vcpu), SHARED_EPT_POINTER, root_hpa & PAGE_MASK);
+ 	struct vcpu_tdx *tdx = to_tdx(vcpu);
+@@ -430,6 +470,8 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	tdx_vcpu_enter_exit(vcpu, tdx);
+ 
++	tdx->host_state_need_restore = true;
++
+ 	vcpu->arch.regs_avail &= ~VMX_REGS_LAZY_LOAD_SET;
+ 	trace_kvm_exit(vcpu, KVM_ISA_VMX);
+ 
 diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index 8a2ad0b980e6..2c850297e8b2 100644
+index 2c850297e8b2..caf837d7f64d 100644
 --- a/arch/x86/kvm/vmx/tdx.h
 +++ b/arch/x86/kvm/vmx/tdx.h
-@@ -45,12 +45,45 @@ struct kvm_tdx {
- 	spinlock_t seamcall_lock;
- };
+@@ -86,6 +86,10 @@ struct vcpu_tdx {
  
-+union tdx_exit_reason {
-+	struct {
-+		/* 31:0 mirror the VMX Exit Reason format */
-+		u64 basic		: 16;
-+		u64 reserved16		: 1;
-+		u64 reserved17		: 1;
-+		u64 reserved18		: 1;
-+		u64 reserved19		: 1;
-+		u64 reserved20		: 1;
-+		u64 reserved21		: 1;
-+		u64 reserved22		: 1;
-+		u64 reserved23		: 1;
-+		u64 reserved24		: 1;
-+		u64 reserved25		: 1;
-+		u64 bus_lock_detected	: 1;
-+		u64 enclave_mode	: 1;
-+		u64 smi_pending_mtf	: 1;
-+		u64 smi_from_vmx_root	: 1;
-+		u64 reserved30		: 1;
-+		u64 failed_vmentry	: 1;
-+
-+		/* 63:32 are TDX specific */
-+		u64 details_l1		: 8;
-+		u64 class		: 8;
-+		u64 reserved61_48	: 14;
-+		u64 non_recoverable	: 1;
-+		u64 error		: 1;
-+	};
-+	u64 full;
-+};
-+
- struct vcpu_tdx {
- 	struct kvm_vcpu	vcpu;
- 
- 	struct tdx_td_page tdvpr;
- 	struct tdx_td_page *tdvpx;
- 
-+	union tdx_exit_reason exit_reason;
-+
  	bool vcpu_initialized;
  
++	bool host_state_need_save;
++	bool host_state_need_restore;
++	u64 msr_host_kernel_gs_base;
++
  	/*
+ 	 * Dummy to make pmu_intel not corrupt memory.
+ 	 * TODO: Support PMU for TDX.  Future work.
 diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 7d6d9a6c2562..f28812b7bf98 100644
+index f28812b7bf98..de94aa189268 100644
 --- a/arch/x86/kvm/vmx/x86_ops.h
 +++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -147,6 +147,7 @@ void tdx_vm_free(struct kvm *kvm);
- int tdx_vcpu_create(struct kvm_vcpu *vcpu);
+@@ -148,6 +148,8 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu);
  void tdx_vcpu_free(struct kvm_vcpu *vcpu);
  void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
-+fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu);
+ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu);
++void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu);
++void tdx_vcpu_put(struct kvm_vcpu *vcpu);
  
  int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
  int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
-@@ -169,6 +170,7 @@ static inline void tdx_vm_free(struct kvm *kvm) {}
- static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
+@@ -171,6 +173,8 @@ static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
  static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
  static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
-+static inline fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu) { return EXIT_FASTPATH_NONE; }
+ static inline fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu) { return EXIT_FASTPATH_NONE; }
++static inline void tdx_prepare_switch_to_guest(struct kvm_vcpu *vcpu) {}
++static inline void tdx_vcpu_put(struct kvm_vcpu *vcpu) {}
  
  static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
  static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f6f0a4b56263..7046bb601225 100644
+index 7046bb601225..9254d2e72c56 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -302,6 +302,7 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
- };
+@@ -413,7 +413,7 @@ int kvm_find_user_return_msr(u32 msr)
+ }
+ EXPORT_SYMBOL_GPL(kvm_find_user_return_msr);
  
- u64 __read_mostly host_xcr0;
-+EXPORT_SYMBOL_GPL(host_xcr0);
+-static void kvm_user_return_msr_init_cpu(struct kvm_user_return_msrs *msrs)
++static void __kvm_user_return_msr_init_cpu(struct kvm_user_return_msrs *msrs)
+ {
+ 	u64 value;
+ 	int i;
+@@ -429,12 +429,18 @@ static void kvm_user_return_msr_init_cpu(struct kvm_user_return_msrs *msrs)
+ 	msrs->initialized = true;
+ }
  
- static struct kmem_cache *x86_emulator_cache;
++void kvm_user_return_msr_init_cpu(void)
++{
++	__kvm_user_return_msr_init_cpu(this_cpu_ptr(user_return_msrs));
++}
++EXPORT_SYMBOL_GPL(kvm_user_return_msr_init_cpu);
++
+ int kvm_set_user_return_msr(unsigned slot, u64 value, u64 mask)
+ {
+ 	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
+ 	int err;
  
+-	kvm_user_return_msr_init_cpu(msrs);
++	__kvm_user_return_msr_init_cpu(msrs);
+ 
+ 	value = (value & mask) | (msrs->values[slot].host & ~mask);
+ 	if (value == msrs->values[slot].curr)
 -- 
 2.25.1
 
