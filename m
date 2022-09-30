@@ -2,63 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B03405F16BA
-	for <lists+kvm@lfdr.de>; Sat,  1 Oct 2022 01:40:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E9B85F16D2
+	for <lists+kvm@lfdr.de>; Sat,  1 Oct 2022 01:49:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231666AbiI3Xki (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Sep 2022 19:40:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35604 "EHLO
+        id S231697AbiI3Xs7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Sep 2022 19:48:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231592AbiI3Xkg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Sep 2022 19:40:36 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65804120842
-        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 16:40:35 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 189-20020a250fc6000000b006ba7d16cef3so5073696ybp.1
-        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 16:40:35 -0700 (PDT)
+        with ESMTP id S231622AbiI3Xs6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Sep 2022 19:48:58 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF7D61A6E9F
+        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 16:48:57 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id u10-20020a056a00098a00b00543b3eb6416so3568849pfg.15
+        for <kvm@vger.kernel.org>; Fri, 30 Sep 2022 16:48:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date;
-        bh=gvhk32URY2NSKU2Qoi+jLcRts74JXpln1inKdURSUy0=;
-        b=cZphvyv8l3Wjvx+c/J8n2t1402SDO9OqukGSRvptGLQp/Gxup9aDqo2f45jtX7fhIb
-         ddc+5xpIo7/10kHWeWqGp57C056F1bxasJNs17GWQPv31041TvMm4OWHXGEClaNeHU8Y
-         LA95gmij58JvZXcGMbvMueLh154zWCptXyv78IVpP5wqT2/FM2s/Ie7iKSBH9i6Dw2OM
-         5+1ptGboqejzMJXvXiNVob/fwn1WABIj0io25lb9ZAhvaiJGDo+bwz+/JJ3DwQE1UgqZ
-         VzXyz1bqfoNZ/16Yd5tKKNIVQWKIFHtm1P6Hy4CaHnb3kBq5zWRWZZBKg7eXEZmR1+V9
-         /dHw==
+        bh=OzaJ4ScQjHBlz5c/uDjxK7PJx4Q+zqh6kK2FLraX9ZA=;
+        b=C6nPwaKmoUkFb7EkGjw3AonYkoFlHEvmOV2lnpmZ3qTW6NENjrART337E+K5QgRB98
+         ALrrBw1PmRnD507v/iCpQqL2p/ClkgcquHCKiLcWK/FJSQw7iXuFA0efA+rkNUV59jB0
+         z1x9/jAAirUh8kJhrZRFn8PcoKpM9nfWnLULztDulQQ1u6g6X8VYnX9UuyIB0nt0A966
+         tMnVM1P+T7ZQD1rAPESB9cJFAnLyUi5IIqG9nE98QVlm9PPnBKrjqeayFSpX2glhaKaV
+         NGuRMaYJTioYLYSO1HZa6mmXUvO0RFtyZOE8bYEiZzjP9ZbIjjFYaZNSrRR2zOs+bfgl
+         JQ6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=gvhk32URY2NSKU2Qoi+jLcRts74JXpln1inKdURSUy0=;
-        b=bmxXVAGErkKnCfqVh4dn2D3ZjRwcKxPVJ/bsaaXEKpiYxPgOxdluroAw8P5gDfTcDM
-         5sQIYgfSAJyE1UDUzevU3N4qGlZ6LoGI2YXjL9WZxXJTxn9YSrssbujGlVuSIlElSrE6
-         nnK3iVx8rR4nufku8j0asYcbOFdePA7o5IgIzdF8/LSbLv+ahOcwscfHQj//xqcMP/R1
-         xv70lSF+DQ09F/360XsXJWiNTGzihcRseKOoHUKj6texgeSZtz/s0entETjJo/MBOJfs
-         8CyQ0Ji2en3ot6jZa/RJwANzjyMEoCUBNlv09WmGEaTdmbqJTyAoXJhUn5nEW5gzoy8t
-         BtHg==
-X-Gm-Message-State: ACrzQf24d2PbU2fQ/Pm1aymf9ukMCnt/PiKZPVycC+dHDQU6gQ6F/d5C
-        PzcnlWPXzMoAiY/SpKXW/3NS3SZEZIg=
-X-Google-Smtp-Source: AMsMyM45o1XKFlDSrx6HGeAT37nt/BYNSj7ET74GnVHVkQzfPob2hrv+d0qRVVl/UIQU+JKl6ajDW87tyng=
+        bh=OzaJ4ScQjHBlz5c/uDjxK7PJx4Q+zqh6kK2FLraX9ZA=;
+        b=0unVPovy5/6qREvKGD+7l/SA2rUSfoaXMfSebew+IP7BQhAmPN7uZXMRTTzpY6NGKn
+         SSHCOPQ/DfQQY2xR5ik14U+lZeOvVF8QUP0f2eTt/YTscH86dWGfu7G3krPw5G0cl92o
+         NcFedRoHEG/4GRnhqjfjpvtyx7G8w/N+2fOz9eKzRYLFH1VqAaZiz0d+pdDGxTWMT4pz
+         OvdPWLn6BfzFmOgRG9sJvjR+IENbAvKqFJnk8HDG41CaM+n10InewseFVuLZNcIRUKJI
+         Tb5gCmwBBk7YBUD8Sv5/WNGetw72hZtSqljdk0x/K4IYlo6Rz+j6kI5t2A2JTHhnz8U8
+         sogQ==
+X-Gm-Message-State: ACrzQf2w92QNN3iJq4LzPm4LKsqOj9RAYBT2oTKRjS5JVwUTBXbo2v0X
+        RjNPG+55ec461TsJAWoLHDlkH7LcyfU=
+X-Google-Smtp-Source: AMsMyM4cqtjQeAm7Lv9wtlAxQqbTRX3VF7xjr7jX+m6h+yKrtK2RQyHWKVm8y2HLjXu2AdUaY9XRVDM6kWw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:c2c7:0:b0:6bc:a55e:4ef8 with SMTP id
- s190-20020a25c2c7000000b006bca55e4ef8mr10342546ybf.287.1664581234686; Fri, 30
- Sep 2022 16:40:34 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:cd06:b0:203:ae0e:6a21 with SMTP id
+ d6-20020a17090acd0600b00203ae0e6a21mr500783pju.0.1664581736975; Fri, 30 Sep
+ 2022 16:48:56 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 30 Sep 2022 23:40:31 +0000
+Date:   Fri, 30 Sep 2022 23:48:47 +0000
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
-Message-ID: <20220930234031.1732249-1-seanjc@google.com>
-Subject: [PATCH] KVM: SVM: Skip WRMSR fastpath on VM-Exit if next RIP isn't valid
+Message-ID: <20220930234854.1739690-1-seanjc@google.com>
+Subject: [PATCH v5 0/7] KVM: x86: Apply NX mitigation more precisely
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mingwei Zhang <mizhang@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Yan Zhao <yan.y.zhao@intel.com>,
+        Ben Gardon <bgardon@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,88 +70,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Skip the WRMSR fastpath in SVM's VM-Exit handler if the next RIP isn't
-valid, e.g. because KVM is running with nrips=false.  SVM must decode and
-emulate to skip the WRMSR if the CPU doesn't provide the next RIP.
-Getting the instruction bytes to decode the WRMSR requires reading guest
-memory, which in turn means dereferencing memslots, and that isn't safe
-because KVM doesn't hold SRCU when the fastpath runs.
+Precisely track (via kvm_mmu_page) if a non-huge page is being forced
+and use that info to avoid unnecessarily forcing smaller page sizes in
+disallowed_hugepage_adjust().
 
-Don't bother trying to enable the fastpath for this case, e.g. by doing
-only the WRMSR and leaving the "skip" until later.  NRIPS is supported on
-all modern CPUs (KVM has considered making it mandatory), and the next
-RIP will be valid the vast, vast majority of the time.
+KVM incorrectly assumes that the NX huge page mitigation is the only
+scenario where KVM will create a non-leaf page instead of a huge page.
+As a result, if the original source of huge page incompatibility goes
+away, the NX mitigation is enabled, and KVM encounters an present shadow
+page when attempting to install a huge page, KVM will force a smaller page
+regardless of whether or not a smaller page is actually necessary to
+satisfy the NX huge page mitigation.
 
-  =============================
-  WARNING: suspicious RCU usage
-  6.0.0-smp--4e557fcd3d80-skip #13 Tainted: G           O
-  -----------------------------
-  include/linux/kvm_host.h:954 suspicious rcu_dereference_check() usage!
+Unnecessarily forcing small pages can result in degraded guest performance,
+especially on larger VMs.  The bug was originally discovered when testing
+dirty log performance, as KVM would leave small pages lying around when
+zapping collapsible SPTEs.  That case was indadvertantly fixed by commit
+5ba7c4c6d1c7 ("KVM: x86/MMU: Zap non-leaf SPTEs when disabling dirty
+logging"), but other scenarios are still affected, e.g. KVM will not
+rebuild a huge page if the mmu_notifier zaps a range of PTEs because the
+primary MMU is creating a huge page.
 
-  other info that might help us debug this:
+v5:
+ - Drop boneheaded KVM_BUG_ON() GFN aliasing. [Vitaly]
+ - Drop incorrect barrier documentation. [Yan]
 
-  rcu_scheduler_active = 2, debug_locks = 1
-  1 lock held by stable/206475:
-   #0: ffff9d9dfebcc0f0 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x8b/0x620 [kvm]
+v4:
+ - https://lore.kernel.org/all/20220830235537.4004585-1-seanjc@google.com
+ - Collect reviews. [Mingwei]
+ - Add comment to document possible_nx_huge_pages. [Mingwei]
+ - Drop extra memory barriers. [Paolo]
+ - Document ordering providing by TDP SPTE helpers. [Paolo]
 
-  stack backtrace:
-  CPU: 152 PID: 206475 Comm: stable Tainted: G           O       6.0.0-smp--4e557fcd3d80-skip #13
-  Hardware name: Google, Inc. Arcadia_IT_80/Arcadia_IT_80, BIOS 10.48.0 01/27/2022
-  Call Trace:
-   <TASK>
-   dump_stack_lvl+0x69/0xaa
-   dump_stack+0x10/0x12
-   lockdep_rcu_suspicious+0x11e/0x130
-   kvm_vcpu_gfn_to_memslot+0x155/0x190 [kvm]
-   kvm_vcpu_gfn_to_hva_prot+0x18/0x80 [kvm]
-   paging64_walk_addr_generic+0x183/0x450 [kvm]
-   paging64_gva_to_gpa+0x63/0xd0 [kvm]
-   kvm_fetch_guest_virt+0x53/0xc0 [kvm]
-   __do_insn_fetch_bytes+0x18b/0x1c0 [kvm]
-   x86_decode_insn+0xf0/0xef0 [kvm]
-   x86_emulate_instruction+0xba/0x790 [kvm]
-   kvm_emulate_instruction+0x17/0x20 [kvm]
-   __svm_skip_emulated_instruction+0x85/0x100 [kvm_amd]
-   svm_skip_emulated_instruction+0x13/0x20 [kvm_amd]
-   handle_fastpath_set_msr_irqoff+0xae/0x180 [kvm]
-   svm_vcpu_run+0x4b8/0x5a0 [kvm_amd]
-   vcpu_enter_guest+0x16ca/0x22f0 [kvm]
-   kvm_arch_vcpu_ioctl_run+0x39d/0x900 [kvm]
-   kvm_vcpu_ioctl+0x538/0x620 [kvm]
-   __se_sys_ioctl+0x77/0xc0
-   __x64_sys_ioctl+0x1d/0x20
-   do_syscall_64+0x3d/0x80
-   entry_SYSCALL_64_after_hwframe+0x63/0xcd
+v3:
+ - https://lore.kernel.org/all/20220805230513.148869-1-seanjc@google.com
+ - Bug the VM if KVM attempts to double account a shadow page that
+   disallows a NX huge page. [David]
+ - Split the rename to separate patch. [Paolo]
+ - Rename more NX huge page variables/functions. [David]
+ - Combine and tweak the comments about enforcing the NX huge page
+   mitigation for non-paging MMUs. [Paolo, David]
+ - Call out that the shadow MMU holds mmu_lock for write and doesn't need
+   to manual handle memory ordering when accounting NX huge pages. [David]
+ - Add a smp_rmb() when unlinking shadow pages in the TDP MMU.
+ - Rename spte_to_sp() to spte_to_child_sp(). [David]
+ - Collect reviews. [David]
+ - Tweak the changelog for the final patch to call out that precise
+   accounting addresses real world performance bugs. [Paolo]
+ - Reword the changelog for the patch to (almost) always tag disallowed
+   NX huge pages, and call out that it doesn't fix the TDP MMU. [David]
 
-Fixes: 404d5d7bff0d ("KVM: X86: Introduce more exit_fastpath_completion enum values")
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/svm/svm.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+v2: Rebase, tweak a changelog accordingly.
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 58f0077d9357..de9ea2b77f7d 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3904,8 +3904,14 @@ static int svm_vcpu_pre_run(struct kvm_vcpu *vcpu)
- 
- static fastpath_t svm_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
- {
--	if (to_svm(vcpu)->vmcb->control.exit_code == SVM_EXIT_MSR &&
--	    to_svm(vcpu)->vmcb->control.exit_info_1)
-+	struct vmcb_control_area *control = &to_svm(vcpu)->vmcb->control;
-+
-+	/*
-+	 * Note, the next RIP must be provided as SRCU isn't held, i.e. KVM
-+	 * can't read guest memory (dereference memslots) to decode the WRMSR.
-+	 */
-+	if (control->exit_code == SVM_EXIT_MSR && control->exit_info_1 &&
-+	    nrips && control->next_rip)
- 		return handle_fastpath_set_msr_irqoff(vcpu);
- 
- 	return EXIT_FASTPATH_NONE;
+v1: https://lore.kernel.org/all/20220409003847.819686-1-seanjc@google.com
+
+Mingwei Zhang (1):
+  KVM: x86/mmu: explicitly check nx_hugepage in
+    disallowed_hugepage_adjust()
+
+Sean Christopherson (6):
+  KVM: x86/mmu: Tag disallowed NX huge pages even if they're not tracked
+  KVM: x86/mmu: Rename NX huge pages fields/functions for consistency
+  KVM: x86/mmu: Properly account NX huge page workaround for nonpaging
+    MMUs
+  KVM: x86/mmu: Set disallowed_nx_huge_page in TDP MMU before setting
+    SPTE
+  KVM: x86/mmu: Track the number of TDP MMU pages, but not the actual
+    pages
+  KVM: x86/mmu: Add helper to convert SPTE value to its shadow page
+
+ arch/x86/include/asm/kvm_host.h |  30 ++++----
+ arch/x86/kvm/mmu/mmu.c          | 123 +++++++++++++++++++++-----------
+ arch/x86/kvm/mmu/mmu_internal.h |  33 ++++-----
+ arch/x86/kvm/mmu/paging_tmpl.h  |   6 +-
+ arch/x86/kvm/mmu/spte.c         |  12 ++++
+ arch/x86/kvm/mmu/spte.h         |  17 +++++
+ arch/x86/kvm/mmu/tdp_mmu.c      |  43 ++++++-----
+ arch/x86/kvm/mmu/tdp_mmu.h      |   2 +
+ 8 files changed, 173 insertions(+), 93 deletions(-)
+
 
 base-commit: c59fb127583869350256656b7ed848c398bef879
 -- 
 2.38.0.rc1.362.ged0d419d3c-goog
-
