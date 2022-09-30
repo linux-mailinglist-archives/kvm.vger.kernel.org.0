@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E6FF35F08E0
-	for <lists+kvm@lfdr.de>; Fri, 30 Sep 2022 12:23:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D8DA65F08F5
+	for <lists+kvm@lfdr.de>; Fri, 30 Sep 2022 12:25:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232365AbiI3KXh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Sep 2022 06:23:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43970 "EHLO
+        id S232316AbiI3KZJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Sep 2022 06:25:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232036AbiI3KVk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Sep 2022 06:21:40 -0400
+        with ESMTP id S232297AbiI3KXF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Sep 2022 06:23:05 -0400
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4A8A15AB66;
-        Fri, 30 Sep 2022 03:19:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D134F163B60;
+        Fri, 30 Sep 2022 03:19:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1664533164; x=1696069164;
+  t=1664533171; x=1696069171;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=HIrS6Twn7gSGBcV6L396WMWo2mZfJEBr9hTtzQbiApM=;
-  b=NfhpYQ9bQlX5OlMV98ViIWlgJg+t9n8gqalR3HHO9TifWlzDEDobVLbW
-   x987wMcNGIfRtgCRDmjaQv8nRg3g+DcvM+wMeXlc01gCRArgdfuUjU93W
-   F8BSpWJOO7TtNFpoFVNyYY82oQ6cthL7IL0Z09RNNtciWzrR7IxugrZEO
-   EM3mhhhViXQg6SGfWnIdEnUIoUgEsIVgwbMTWpr6lhUNe8xGgzlKx5M+I
-   otrwNgj+mgPAcR8eA6uYfeu9m58QffS4zNjOLsOTaJzgvUEQYN3LHG2vA
-   7HRfQRjBOJE+xfdgitvnAIRtQ7m7TikDz/P5PZNM/fzV/ZLE0SrWo+zhd
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10485"; a="328540165"
+  bh=AhKoPnSHGVSzISgtP2jtzWItLYKNfc5a26JG8TZ/m4A=;
+  b=n2OrMcVMwjUQP+CTRTdY3N4e2nHEG05nvalwdWGxFB8L/xSYWUk/D5xE
+   b55bT9w62byjYM/hJ2JDZBRWTiZlAewWU9V5SAMeTHkAos0z+Od8jHg5T
+   1dx5Y4m2NubLsfrYrZL7cYEajIJeTWcRZWyD2GAJqAa6gvY7BFaMN4HPN
+   iZA187GJiV4xb3mdXwR4t/dvko0vU+UW8JfRYq9XzpjozwLZ1L9dOO1Jf
+   C9bLEmPcZgHkuLcSjP535oMcDcp4oNGO6JZIJGcJShpv8AO4yBQVWfhw7
+   L1SB8jaGmT9qHAzJxeXlNQed65bz42i6ZZpqwUZNavpVP4jzaTczSy401
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10485"; a="328540168"
 X-IronPort-AV: E=Sophos;i="5.93,358,1654585200"; 
-   d="scan'208";a="328540165"
+   d="scan'208";a="328540168"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2022 03:19:06 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10485"; a="726807798"
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2022 03:19:07 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10485"; a="726807801"
 X-IronPort-AV: E=Sophos;i="5.93,358,1654585200"; 
-   d="scan'208";a="726807798"
+   d="scan'208";a="726807801"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2022 03:19:06 -0700
 From:   isaku.yamahata@intel.com
@@ -43,9 +43,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>
-Subject: [PATCH v9 090/105] KVM: TDX: handle KVM hypercall with TDG.VP.VMCALL
-Date:   Fri, 30 Sep 2022 03:18:24 -0700
-Message-Id: <50aea5742fbf45d17248903ab3811a4cf32b7fc6.1664530908.git.isaku.yamahata@intel.com>
+Subject: [PATCH v9 091/105] KVM: TDX: Handle TDX PV CPUID hypercall
+Date:   Fri, 30 Sep 2022 03:18:25 -0700
+Message-Id: <ba44ce0e50e2cacc9a9d7092808bc1aef3d120af.1664530908.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1664530907.git.isaku.yamahata@intel.com>
 References: <cover.1664530907.git.isaku.yamahata@intel.com>
@@ -63,59 +63,52 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-The TDX Guest-Host communication interface (GHCI) specification defines
-the ABI for the guest TD to issue hypercall.   It reserves vendor specific
-arguments for VMM specific use.  Use it as KVM hypercall and handle it.
+Wire up TDX PV CPUID hypercall to the KVM backend function.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ arch/x86/kvm/vmx/tdx.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 3392da81ef14..4e3c45e3b24d 100644
+index 4e3c45e3b24d..16bee3b38bf4 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -774,8 +774,39 @@ static int tdx_handle_triple_fault(struct kvm_vcpu *vcpu)
- 	return 0;
+@@ -802,12 +802,34 @@ static int tdx_emulate_vmcall(struct kvm_vcpu *vcpu)
+ 	return 1;
  }
  
-+static int tdx_emulate_vmcall(struct kvm_vcpu *vcpu)
++static int tdx_emulate_cpuid(struct kvm_vcpu *vcpu)
 +{
-+	unsigned long nr, a0, a1, a2, a3, ret;
++	u32 eax, ebx, ecx, edx;
 +
-+	/*
-+	 * ABI for KVM tdvmcall argument:
-+	 * In Guest-Hypervisor Communication Interface(GHCI) specification,
-+	 * Non-zero leaf number (R10 != 0) is defined to indicate
-+	 * vendor-specific.  KVM uses this for KVM hypercall.  NOTE: KVM
-+	 * hypercall number starts from one.  Zero isn't used for KVM hypercall
-+	 * number.
-+	 *
-+	 * R10: KVM hypercall number
-+	 * arguments: R11, R12, R13, R14.
-+	 */
-+	nr = kvm_r10_read(vcpu);
-+	a0 = kvm_r11_read(vcpu);
-+	a1 = kvm_r12_read(vcpu);
-+	a2 = kvm_r13_read(vcpu);
-+	a3 = kvm_r14_read(vcpu);
++	/* EAX and ECX for cpuid is stored in R12 and R13. */
++	eax = tdvmcall_a0_read(vcpu);
++	ecx = tdvmcall_a1_read(vcpu);
 +
-+	ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, true);
++	kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);
 +
-+	tdvmcall_set_return_code(vcpu, ret);
++	tdvmcall_a0_write(vcpu, eax);
++	tdvmcall_a1_write(vcpu, ebx);
++	tdvmcall_a2_write(vcpu, ecx);
++	tdvmcall_a3_write(vcpu, edx);
++
++	tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_SUCCESS);
 +
 +	return 1;
 +}
 +
  static int handle_tdvmcall(struct kvm_vcpu *vcpu)
  {
-+	if (tdvmcall_exit_type(vcpu))
-+		return tdx_emulate_vmcall(vcpu);
-+
+ 	if (tdvmcall_exit_type(vcpu))
+ 		return tdx_emulate_vmcall(vcpu);
+ 
  	switch (tdvmcall_leaf(vcpu)) {
++	case EXIT_REASON_CPUID:
++		return tdx_emulate_cpuid(vcpu);
  	default:
  		break;
+ 	}
 -- 
 2.25.1
 
