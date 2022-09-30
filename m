@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A917A5F08BC
-	for <lists+kvm@lfdr.de>; Fri, 30 Sep 2022 12:22:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B47C5F08C2
+	for <lists+kvm@lfdr.de>; Fri, 30 Sep 2022 12:22:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232177AbiI3KWa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Sep 2022 06:22:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33702 "EHLO
+        id S232201AbiI3KWi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Sep 2022 06:22:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231712AbiI3KTk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Sep 2022 06:19:40 -0400
+        with ESMTP id S231810AbiI3KU2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Sep 2022 06:20:28 -0400
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86C5B1E3F65;
-        Fri, 30 Sep 2022 03:19:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97B841EAD53;
+        Fri, 30 Sep 2022 03:19:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1664533148; x=1696069148;
+  t=1664533149; x=1696069149;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=OcqfRMaO4aXNMvZqCqrq4weJBUgFudnXUiOupVE00R4=;
-  b=cOAL9uMQBz8NbHePkCcGbO6bJYYhrbEzWmiedzu8AJ7fIuNP75sxwh3c
-   rqVApJsN0AhN02XnX2jLOWYnkz13s4JyoI0xurTz69ZoBdeVJVUuz6DmI
-   m1H9MttdWW1RbRDbqDeMScPGDJidtwAffmI52Z/n6eDIcVdQ+cVxRNq2H
-   tLjnmHtslaKVUzjVLchrlpQciBBd6VpHhKlNUZHH8gQLl1omBOPUhJbjT
-   RmHfrr2SN2LK7eYM5Fgf3zLCSzLBR1+RhhzsQJsHnFd+vfL7fEDasP7ms
-   SiC+OkRo7XbxXL7o3M6RZ+cszfCDxzoqHK4okVYw81mFfp6bdq4/Eb2M2
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10485"; a="281870109"
+  bh=lNZFPSHPlAXihOU3EkAk79iSkPC71ByJOnO4Yx7xM0s=;
+  b=XV71/WPzDfru/IXlrKONmza9i99LdzuTMViCMK6AVC9MjK+dIU+IPiB2
+   VctLetLc1WpaIyUFw9MyNvPcket0Cg8+6vG8Ijnv8iKArWI+Y0LT9yRri
+   nZNL2IJ/Q1t1sxDV67bK0rhDba66clMQ/VGTU/muMo10Ec14HlcYVLTON
+   iWLhTH3dYzE/4dSJLheTX1OdDfTqM40kgn81PCDG8S/7+qg8MA1PiYu//
+   YAid85L88plGvnuIiGqu/Pi2OtNIwXU6qYSlNRUts49NqYpZ90Y8tVD3x
+   DO6MGsll/dE4vPPv5/w/10RqS8feff1fT8C+WXZpPgcxGbj9LY0Yfu7z8
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10485"; a="281870111"
 X-IronPort-AV: E=Sophos;i="5.93,358,1654585200"; 
-   d="scan'208";a="281870109"
+   d="scan'208";a="281870111"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
   by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2022 03:18:59 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10485"; a="726807658"
+X-IronPort-AV: E=McAfee;i="6500,9779,10485"; a="726807661"
 X-IronPort-AV: E=Sophos;i="5.93,358,1654585200"; 
-   d="scan'208";a="726807658"
+   d="scan'208";a="726807661"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2022 03:18:59 -0700
 From:   isaku.yamahata@intel.com
@@ -42,10 +42,12 @@ To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
         Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>
-Subject: [PATCH v9 049/105] KVM: x86/tdp_mmu: Ignore unsupported mmu operation on private GFNs
-Date:   Fri, 30 Sep 2022 03:17:43 -0700
-Message-Id: <077438108fab27758a9afcb65f6d6be718c46f15.1664530907.git.isaku.yamahata@intel.com>
+        Sagi Shahar <sagis@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Kai Huang <kai.huang@intel.com>
+Subject: [PATCH v9 050/105] KVM: VMX: Split out guts of EPT violation to common/exposed function
+Date:   Fri, 30 Sep 2022 03:17:44 -0700
+Message-Id: <b6b4a42f9f9247c833e83ccfd8f68d74b7824307.1664530907.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1664530907.git.isaku.yamahata@intel.com>
 References: <cover.1664530907.git.isaku.yamahata@intel.com>
@@ -60,197 +62,124 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Some KVM MMU operations (dirty page logging, page migration, aging page)
-aren't supported for private GFNs (yet) with the first generation of TDX.
-Silently return on unsupported TDX KVM MMU operations.
+The difference of TDX EPT violation is how to retrieve information, GPA,
+and exit qualification.  To share the code to handle EPT violation, split
+out the guts of EPT violation handler so that VMX/TDX exit handler can call
+it after retrieving GPA and exit qualification.
 
+Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Kai Huang <kai.huang@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c     |  3 ++
- arch/x86/kvm/mmu/tdp_mmu.c | 73 +++++++++++++++++++++++++++++++++++---
- arch/x86/kvm/x86.c         |  3 ++
- 3 files changed, 74 insertions(+), 5 deletions(-)
+ arch/x86/kvm/vmx/common.h | 33 +++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/vmx.c    | 29 +++++------------------------
+ 2 files changed, 38 insertions(+), 24 deletions(-)
+ create mode 100644 arch/x86/kvm/vmx/common.h
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index c9013213641e..8b41a73c8264 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6554,6 +6554,9 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
- 	for_each_rmap_spte(rmap_head, &iter, sptep) {
- 		sp = sptep_to_sp(sptep);
- 
-+		/* Private page dirty logging is not supported yet. */
-+		KVM_BUG_ON(is_private_sptep(sptep), kvm);
+diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
+new file mode 100644
+index 000000000000..235908f3e044
+--- /dev/null
++++ b/arch/x86/kvm/vmx/common.h
+@@ -0,0 +1,33 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef __KVM_X86_VMX_COMMON_H
++#define __KVM_X86_VMX_COMMON_H
 +
- 		/*
- 		 * We cannot do huge page mapping for indirect shadow pages,
- 		 * which are found on the last rmap (level = 1) when not using
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 3c89f0aa776c..cb25168dbbd5 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1420,7 +1420,8 @@ typedef bool (*tdp_handler_t)(struct kvm *kvm, struct tdp_iter *iter,
++#include <linux/kvm_host.h>
++
++#include "mmu.h"
++
++static inline int __vmx_handle_ept_violation(struct kvm_vcpu *vcpu, gpa_t gpa,
++					     unsigned long exit_qualification)
++{
++	u64 error_code;
++
++	/* Is it a read fault? */
++	error_code = (exit_qualification & EPT_VIOLATION_ACC_READ)
++		     ? PFERR_USER_MASK : 0;
++	/* Is it a write fault? */
++	error_code |= (exit_qualification & EPT_VIOLATION_ACC_WRITE)
++		      ? PFERR_WRITE_MASK : 0;
++	/* Is it a fetch fault? */
++	error_code |= (exit_qualification & EPT_VIOLATION_ACC_INSTR)
++		      ? PFERR_FETCH_MASK : 0;
++	/* ept page table entry is present? */
++	error_code |= (exit_qualification & EPT_VIOLATION_RWX_MASK)
++		      ? PFERR_PRESENT_MASK : 0;
++
++	error_code |= (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) != 0 ?
++	       PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
++
++	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
++}
++
++#endif /* __KVM_X86_VMX_COMMON_H */
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index f1e25e4097e1..ec1570b151f5 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -50,6 +50,7 @@
+ #include <asm/vmx.h>
  
- static __always_inline bool kvm_tdp_mmu_handle_gfn(struct kvm *kvm,
- 						   struct kvm_gfn_range *range,
--						   tdp_handler_t handler)
-+						   tdp_handler_t handler,
-+						   bool only_shared)
+ #include "capabilities.h"
++#include "common.h"
+ #include "cpuid.h"
+ #include "evmcs.h"
+ #include "hyperv.h"
+@@ -5709,11 +5710,10 @@ static int handle_task_switch(struct kvm_vcpu *vcpu)
+ 
+ static int handle_ept_violation(struct kvm_vcpu *vcpu)
  {
- 	struct kvm_mmu_page *root;
- 	struct tdp_iter iter;
-@@ -1431,9 +1432,23 @@ static __always_inline bool kvm_tdp_mmu_handle_gfn(struct kvm *kvm,
- 	 * into this helper allow blocking; it'd be dead, wasteful code.
- 	 */
- 	for_each_tdp_mmu_root(kvm, root, range->slot->as_id) {
-+		gfn_t start;
-+		gfn_t end;
-+
-+		if (only_shared && is_private_sp(root))
-+			continue;
-+
- 		rcu_read_lock();
+-	unsigned long exit_qualification;
+-	gpa_t gpa;
+-	u64 error_code;
++	unsigned long exit_qualification = vmx_get_exit_qual(vcpu);
++	gpa_t gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
  
--		tdp_root_for_each_leaf_pte(iter, root, range->start, range->end)
-+		/*
-+		 * For TDX shared mapping, set GFN shared bit to the range,
-+		 * so the handler() doesn't need to set it, to avoid duplicated
-+		 * code in multiple handler()s.
-+		 */
-+		start = kvm_gfn_for_root(kvm, root, range->start);
-+		end = kvm_gfn_for_root(kvm, root, range->end);
-+
-+		tdp_root_for_each_leaf_pte(iter, root, start, end)
- 			ret |= handler(kvm, &iter, range);
+-	exit_qualification = vmx_get_exit_qual(vcpu);
++	trace_kvm_page_fault(gpa, exit_qualification);
  
- 		rcu_read_unlock();
-@@ -1477,7 +1492,12 @@ static bool age_gfn_range(struct kvm *kvm, struct tdp_iter *iter,
- 
- bool kvm_tdp_mmu_age_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- {
--	return kvm_tdp_mmu_handle_gfn(kvm, range, age_gfn_range);
-+	/*
-+	 * First TDX generation doesn't support clearing A bit for private
-+	 * mapping, since there's no secure EPT API to support it.  However
-+	 * it's a legitimate request for TDX guest.
-+	 */
-+	return kvm_tdp_mmu_handle_gfn(kvm, range, age_gfn_range, true);
- }
- 
- static bool test_age_gfn(struct kvm *kvm, struct tdp_iter *iter,
-@@ -1488,7 +1508,8 @@ static bool test_age_gfn(struct kvm *kvm, struct tdp_iter *iter,
- 
- bool kvm_tdp_mmu_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- {
--	return kvm_tdp_mmu_handle_gfn(kvm, range, test_age_gfn);
-+	/* The first TDX generation doesn't support A bit. */
-+	return kvm_tdp_mmu_handle_gfn(kvm, range, test_age_gfn, true);
- }
- 
- static bool set_spte_gfn(struct kvm *kvm, struct tdp_iter *iter,
-@@ -1533,8 +1554,11 @@ bool kvm_tdp_mmu_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- 	 * No need to handle the remote TLB flush under RCU protection, the
- 	 * target SPTE _must_ be a leaf SPTE, i.e. cannot result in freeing a
- 	 * shadow page.  See the WARN on pfn_changed in __handle_changed_spte().
-+	 *
-+	 * .change_pte() callback should not happen for private page, because
-+	 * for now TDX private pages are pinned during VM's life time.
- 	 */
--	return kvm_tdp_mmu_handle_gfn(kvm, range, set_spte_gfn);
-+	return kvm_tdp_mmu_handle_gfn(kvm, range, set_spte_gfn, true);
- }
- 
- /*
-@@ -1588,6 +1612,14 @@ bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm,
- 
- 	lockdep_assert_held_read(&kvm->mmu_lock);
- 
-+	/*
-+	 * Because first TDX generation doesn't support write protecting private
-+	 * mappings and kvm_arch_dirty_log_supported(kvm) = false, it's a bug
-+	 * to reach here for guest TD.
-+	 */
-+	if (WARN_ON_ONCE(!kvm_arch_dirty_log_supported(kvm)))
-+		return false;
-+
- 	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, slot->as_id, true)
- 		spte_set |= wrprot_gfn_range(kvm, root, slot->base_gfn,
- 			     slot->base_gfn + slot->npages, min_level);
-@@ -1853,6 +1885,14 @@ bool kvm_tdp_mmu_clear_dirty_slot(struct kvm *kvm,
- 
- 	lockdep_assert_held_read(&kvm->mmu_lock);
- 
-+	/*
-+	 * First TDX generation doesn't support clearing dirty bit,
-+	 * since there's no secure EPT API to support it.  It is a
-+	 * bug to reach here for TDX guest.
-+	 */
-+	if (WARN_ON_ONCE(!kvm_arch_dirty_log_supported(kvm)))
-+		return false;
-+
- 	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, slot->as_id, true)
- 		spte_set |= clear_dirty_gfn_range(kvm, root, slot->base_gfn,
- 				slot->base_gfn + slot->npages);
-@@ -1919,6 +1959,13 @@ void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
- 	struct kvm_mmu_page *root;
- 
- 	lockdep_assert_held_write(&kvm->mmu_lock);
-+	/*
-+	 * First TDX generation doesn't support clearing dirty bit,
-+	 * since there's no secure EPT API to support it.  For now silently
-+	 * ignore KVM_CLEAR_DIRTY_LOG.
-+	 */
-+	if (!kvm_arch_dirty_log_supported(kvm))
-+		return;
- 	for_each_tdp_mmu_root(kvm, root, slot->as_id)
- 		clear_dirty_pt_masked(kvm, root, gfn, mask, wrprot);
- }
-@@ -1985,6 +2032,13 @@ void kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
- 
- 	lockdep_assert_held_read(&kvm->mmu_lock);
- 
-+	/*
-+	 * This should only be reachable when diryt-log is supported. It's a
-+	 * bug to reach here.
-+	 */
-+	if (WARN_ON_ONCE(!kvm_arch_dirty_log_supported(kvm)))
-+		return;
-+
- 	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, slot->as_id, true)
- 		zap_collapsible_spte_range(kvm, root, slot);
- }
-@@ -2038,6 +2092,15 @@ bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
- 	bool spte_set = false;
- 
- 	lockdep_assert_held_write(&kvm->mmu_lock);
-+
-+	/*
-+	 * First TDX generation doesn't support write protecting private
-+	 * mappings, silently ignore the request.  KVM_GET_DIRTY_LOG etc
-+	 * can reach here, no warning.
-+	 */
-+	if (!kvm_arch_dirty_log_supported(kvm))
-+		return false;
-+
- 	for_each_tdp_mmu_root(kvm, root, slot->as_id)
- 		spte_set |= write_protect_gfn(kvm, root, gfn, min_level);
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c8b129cb772e..9060ca2b19ee 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12621,6 +12621,9 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
- 	u32 new_flags = new ? new->flags : 0;
- 	bool log_dirty_pages = new_flags & KVM_MEM_LOG_DIRTY_PAGES;
- 
-+	if (!kvm_arch_dirty_log_supported(kvm) && log_dirty_pages)
-+		return;
-+
  	/*
- 	 * Update CPU dirty logging if dirty logging is being toggled.  This
- 	 * applies to all operations.
+ 	 * EPT violation happened while executing iret from NMI,
+@@ -5726,25 +5726,6 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
+ 			(exit_qualification & INTR_INFO_UNBLOCK_NMI))
+ 		vmcs_set_bits(GUEST_INTERRUPTIBILITY_INFO, GUEST_INTR_STATE_NMI);
+ 
+-	gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
+-	trace_kvm_page_fault(gpa, exit_qualification);
+-
+-	/* Is it a read fault? */
+-	error_code = (exit_qualification & EPT_VIOLATION_ACC_READ)
+-		     ? PFERR_USER_MASK : 0;
+-	/* Is it a write fault? */
+-	error_code |= (exit_qualification & EPT_VIOLATION_ACC_WRITE)
+-		      ? PFERR_WRITE_MASK : 0;
+-	/* Is it a fetch fault? */
+-	error_code |= (exit_qualification & EPT_VIOLATION_ACC_INSTR)
+-		      ? PFERR_FETCH_MASK : 0;
+-	/* ept page table entry is present? */
+-	error_code |= (exit_qualification & EPT_VIOLATION_RWX_MASK)
+-		      ? PFERR_PRESENT_MASK : 0;
+-
+-	error_code |= (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) != 0 ?
+-	       PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
+-
+ 	vcpu->arch.exit_qualification = exit_qualification;
+ 
+ 	/*
+@@ -5758,7 +5739,7 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
+ 	if (unlikely(allow_smaller_maxphyaddr && kvm_vcpu_is_illegal_gpa(vcpu, gpa)))
+ 		return kvm_emulate_instruction(vcpu, 0);
+ 
+-	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
++	return __vmx_handle_ept_violation(vcpu, gpa, exit_qualification);
+ }
+ 
+ static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
 -- 
 2.25.1
 
