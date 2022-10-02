@@ -2,150 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B2075F2176
-	for <lists+kvm@lfdr.de>; Sun,  2 Oct 2022 07:46:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 52F825F222A
+	for <lists+kvm@lfdr.de>; Sun,  2 Oct 2022 11:00:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229629AbiJBFql (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 2 Oct 2022 01:46:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33178 "EHLO
+        id S229629AbiJBI77 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 2 Oct 2022 04:59:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbiJBFqi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 2 Oct 2022 01:46:38 -0400
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D8C63AB24
-        for <kvm@vger.kernel.org>; Sat,  1 Oct 2022 22:46:37 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id a26so16444042ejc.4
-        for <kvm@vger.kernel.org>; Sat, 01 Oct 2022 22:46:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date;
-        bh=GrhlWqAeelXfFuousvZL4+uQTtUeskpuRrDHgcNrsFk=;
-        b=XjJpKVPBIKlwhYhRUPpz9eY8Ka60DUW/QLjuULsbSKCtTlOmI948XHWtlCrP8yRQHL
-         SfqmahZAzqeGgQfVjj8fsuVnGg6cIV2NIj5dk/+sQgOJHycIYxjj4VN/jTqVdFE0Uuc6
-         CEXhLUDLFA8SbPkuJTw/hrCrey9XCgAPdOjI35jAEluH8Tf0DJW1TmmSH+onuX+NYviP
-         J6V1Dou2xcGGGQqfCO7tpLpo5u5xJHOQxs+XfeWrUCAmrSdhnKja6ukJo04ozb2JbNXB
-         o+QdZClYuVoA7IrF1j6mSN+Cegh8P69f0LHforGdryusyVioIp+N5UZVkyjha+Msn0Yt
-         5luQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=GrhlWqAeelXfFuousvZL4+uQTtUeskpuRrDHgcNrsFk=;
-        b=zs5csSLl++PRZywIFoKWjx/FAuvafkl8U+sAOJarn8xWlawv51ddR/x4VpnMElTmmE
-         wkPIvBGlTCGQnpvc08hAUXzwdBp07q3Zg5zSoCaDc5qo7IHeTkf8Aifr2B+Vt5Jn5FSy
-         aGpViRJLd1eVQDkldq0s25QJy6w9FfVuDlLhZutVgy+qlVQHZvlJg/vhtbUbFYZPpj0d
-         auYwoSBGmk2mo8PIh98JMM02po0S8Drl+uVf7p8WPzTDY/dXSOyk2LDI+c/huC5A/f9U
-         eDCiFkb3FofVsQOpI7ct5nm9MLImIdk0Bf0seAHnIAZz8tj4y4L58dRNWH+4DiTANPoC
-         qP4g==
-X-Gm-Message-State: ACrzQf3sYO7bFL4fc3q7S5+23kRlmPsuz4nwtFmF6CkkI5/Stxx99A/8
-        IQYyZDtYd+6jlvkoJS6botCEc6gcj8pH2Rlw06eFYQ==
-X-Google-Smtp-Source: AMsMyM6D693fA/UMqz9ykh3+TeK8rgLMRoHflKIaijjN8Mr9HIz1/kbi4Ju0H1KDsquIqzXaUJzgKT8CYyFMZYNBkjA=
-X-Received: by 2002:a17:906:dac8:b0:741:545b:796a with SMTP id
- xi8-20020a170906dac800b00741545b796amr11184738ejb.240.1664689595859; Sat, 01
- Oct 2022 22:46:35 -0700 (PDT)
-MIME-Version: 1.0
-From:   Anup Patel <anup@brainfault.org>
-Date:   Sun, 2 Oct 2022 11:16:24 +0530
-Message-ID: <CAAhSdy134Ve1mbeK+TNRx-pWpQ=nVzNLptDcUyPaDU4v18Qyaw@mail.gmail.com>
-Subject: [GIT PULL] KVM/riscv changes for 6.1
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>
+        with ESMTP id S229544AbiJBI74 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 2 Oct 2022 04:59:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5783314018
+        for <kvm@vger.kernel.org>; Sun,  2 Oct 2022 01:59:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664701190;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=uUV7VJSlnQzJ38mxDgh5xaYxjeTtv351HITh3SQqr0M=;
+        b=J46bbuSI5IceDu/XUYlcFprpldDrc2at2L3QOgyjjgZ0nrMk6A5QbB/rZPK1zCErmaqPEu
+        8IcM0MqzIDsTt5EWehSnuP8S/TyQZtNr64Pek5+phLy+M5KrR7Xj/PyhxDrH+SDnl8EBHL
+        QNOA9ttI82hclbPucAYNbpd1SMrSlMI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-614-A5meftXDO-6l48yy-yhurA-1; Sun, 02 Oct 2022 04:59:47 -0400
+X-MC-Unique: A5meftXDO-6l48yy-yhurA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 26727380670A;
+        Sun,  2 Oct 2022 08:59:47 +0000 (UTC)
+Received: from starship (unknown [10.40.192.10])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CD77B40C206B;
+        Sun,  2 Oct 2022 08:59:44 +0000 (UTC)
+Message-ID: <28ce86c01271c1b9b8f96a7783b55a8d458325d2.camel@redhat.com>
+Subject: Re: Commit 'iomap: add support for dma aligned direct-io' causes
+ qemu/KVM boot failures
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Kevin Wolf <kwolf@redhat.com>,
+        Michael Roth <mdroth@linux.vnet.ibm.com>
+Date:   Sun, 02 Oct 2022 11:59:42 +0300
+In-Reply-To: <32db4f89-a83f-aac4-5d27-0801bdca60bf@redhat.com>
+References: <fb869c88bd48ea9018e1cc349918aa7cdd524931.camel@redhat.com>
+         <YzW+Mz12JT1BXoZA@kbusch-mbp.dhcp.thefacebook.com>
+         <a2825beac032fd6a76838164d4e2753d30305897.camel@redhat.com>
+         <YzXJwmP8pa3WABEG@kbusch-mbp.dhcp.thefacebook.com>
+         <20220929163931.GA10232@lst.de>
+         <32db4f89-a83f-aac4-5d27-0801bdca60bf@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On Thu, 2022-09-29 at 19:35 +0200, Paolo Bonzini wrote:
+> On 9/29/22 18:39, Christoph Hellwig wrote:
+> > On Thu, Sep 29, 2022 at 10:37:22AM -0600, Keith Busch wrote:
+> > > > I am aware, and I've submitted the fix to qemu here:
+> > > > 
+> > > >   https://lists.nongnu.org/archive/html/qemu-block/2022-09/msg00398.html
+> > > 
+> > > I don't think so. Memory alignment and length granularity are two completely
+> > > different concepts. If anything, the kernel's ABI had been that the length
+> > > requirement was also required for the memory alignment, not the other way
+> > > around. That usage will continue working with this kernel patch.
 
-We have the following KVM RISC-V changes for 6.1:
-1) Improved instruction encoding infrastructure for
-    instructions not yet supported by binutils
-2) Svinval support for both KVM Host and KVM Guest
-3) Zihintpause support for KVM Guest
-4) Zicbom support for KVM Guest
-5) Record number of signal exits as a VCPU stat
-6) Use generic guest entry infrastructure
+Yes, this is how I also understand it - for example for O_DIRECT on a file which
+resides on 4K block device, you have to use page aligned buffers.
 
-Please pull.
+But here after the patch, 512 aligned buffer starts working as well - If I
+understand you correctly the ABI didn't guarantee that such usage would fail,
+but rather that it might fail.
 
-Regards,
-Anup
+> > 
+> > Well, Linus does treat anything that breaks significant userspace
+> > as a regression.  Qemu certainly is significant, but that might depend
+> > on bit how common configurations hitting this issue are.
+> 
+> Seeing the QEMU patch, I agree that it's a QEMU bug though.  I'm 
+> surprised it has ever worked.
+> 
+> It requires 4K sectors in the host but not in the guest, and can be 
+> worked around (if not migrating) by disabling O_DIRECT.  I think it's 
+> not that awful, but we probably should do some extra releases of QEMU 
+> stable branches.
+> 
+> Paolo
+> 
 
-The following changes since commit f76349cf41451c5c42a99f18a9163377e4b364ff:
+I must admit I am out of the loop on the exact requirements of the O_DIRECT.
 
-  Linux 6.0-rc7 (2022-09-25 14:01:02 -0700)
 
-are available in the Git repository at:
+If I understand that correctly, after the patch in question, 
+qemu is able to use just 512 bytes aligned buffer to read a single 4K block from the disk,
+which supposed to fail but wasn't guarnteed to fail.
 
-  https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.1-1
 
-for you to fetch changes up to b60ca69715fcc39a5f4bdd56ca2ea691b7358455:
 
-  riscv: select HAVE_POSIX_CPU_TIMERS_TASK_WORK (2022-10-02 10:19:31 +0530)
+Later qemu it submits iovec which also reads a 4K block but in two parts,
+and if I understand that correctly, each part (iov) is considered
+to be a separate IO operation,  and thus each has to be in my case 4K in size, 
+and its memory buffer *should* also be 4K aligned.
 
-----------------------------------------------------------------
-KVM/riscv changes for 6.1
+(but it can work with smaller alignement as well).
 
-- Improved instruction encoding infrastructure for
-  instructions not yet supported by binutils
-- Svinval support for both KVM Host and KVM Guest
-- Zihintpause support for KVM Guest
-- Zicbom support for KVM Guest
-- Record number of signal exits as a VCPU stat
-- Use generic guest entry infrastructure
 
-----------------------------------------------------------------
-Andrew Jones (7):
-      riscv: Add X register names to gpr-nums
-      riscv: Introduce support for defining instructions
-      riscv: KVM: Apply insn-def to hfence encodings
-      riscv: KVM: Apply insn-def to hlv encodings
-      RISC-V: KVM: Make ISA ext mappings explicit
-      RISC-V: KVM: Provide UAPI for Zicbom block size
-      RISC-V: KVM: Expose Zicbom to the guest
+Assuming that I understand all of this correctly, I agree with Paolo that this is qemu
+bug, but I do fear that it can cause quite some problems for users,
+especially for users that use outdated qemu version.
 
-Anup Patel (3):
-      RISC-V: KVM: Change the SBI specification version to v1.0
-      RISC-V: KVM: Use Svinval for local TLB maintenance when available
-      RISC-V: KVM: Allow Guest use Svinval extension
+It might be too much to ask, but maybe add a Kconfig option to keep legacy behavier
+for those that need it?
 
-Jisheng Zhang (3):
-      RISC-V: KVM: Record number of signal exits as a vCPU stat
-      RISC-V: KVM: Use generic guest entry infrastructure
-      riscv: select HAVE_POSIX_CPU_TIMERS_TASK_WORK
+Best regards,
+	Maxim Levitsky
 
-Mayuresh Chitale (2):
-      RISC-V: Probe Svinval extension form ISA string
-      RISC-V: KVM: Allow Guest use Zihintpause extension
-
-Xiu Jianfeng (1):
-      RISC-V: KVM: add __init annotation to riscv_kvm_init()
-
- arch/riscv/Kconfig                    |   4 +
- arch/riscv/include/asm/gpr-num.h      |   8 ++
- arch/riscv/include/asm/hwcap.h        |   4 +
- arch/riscv/include/asm/insn-def.h     | 137 ++++++++++++++++++++++++++++++
- arch/riscv/include/asm/kvm_host.h     |   1 +
- arch/riscv/include/asm/kvm_vcpu_sbi.h |   4 +-
- arch/riscv/include/uapi/asm/kvm.h     |   4 +
- arch/riscv/kernel/cpu.c               |   1 +
- arch/riscv/kernel/cpufeature.c        |   1 +
- arch/riscv/kvm/Kconfig                |   1 +
- arch/riscv/kvm/main.c                 |   2 +-
- arch/riscv/kvm/tlb.c                  | 155 +++++++++++-----------------------
- arch/riscv/kvm/vcpu.c                 |  60 ++++++++-----
- arch/riscv/kvm/vcpu_exit.c            |  39 ++-------
- arch/riscv/mm/dma-noncoherent.c       |   2 +
- 15 files changed, 260 insertions(+), 163 deletions(-)
- create mode 100644 arch/riscv/include/asm/insn-def.h
