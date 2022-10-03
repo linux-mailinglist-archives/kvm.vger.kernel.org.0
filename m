@@ -2,132 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D910F5F309B
-	for <lists+kvm@lfdr.de>; Mon,  3 Oct 2022 15:01:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 757265F30B4
+	for <lists+kvm@lfdr.de>; Mon,  3 Oct 2022 15:11:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229882AbiJCNBS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Oct 2022 09:01:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42916 "EHLO
+        id S229910AbiJCNLB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Oct 2022 09:11:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229888AbiJCNBR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Oct 2022 09:01:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E313641999
-        for <kvm@vger.kernel.org>; Mon,  3 Oct 2022 06:01:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664802075;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=cRj6bSlUC53GGB5VwGt/QTv7mNL3dMlu/4FM8+Jr3Ho=;
-        b=ZW9Bz6RKQOUiGLjcjyrcOF3qz0yD/7Mo8TNGPnZ3X1jJR2iOtaGV+hgni3VvtAy8SYHrGE
-        KdbkgnL7BGNDLIKkIqmGHOyr/Kvbgk+LVL/6MMvrHYPTIV6P1tXA+gwYnddO8fMq8PVTxf
-        CYU1awks3BSWIbhWHIGY464J8USCI7s=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-586-HeIQlJWAPl-WYcSuGuAn-Q-1; Mon, 03 Oct 2022 09:01:10 -0400
-X-MC-Unique: HeIQlJWAPl-WYcSuGuAn-Q-1
-Received: by mail-ed1-f69.google.com with SMTP id b17-20020a056402351100b00453b19d9bd0so8647339edd.4
-        for <kvm@vger.kernel.org>; Mon, 03 Oct 2022 06:01:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date;
-        bh=cRj6bSlUC53GGB5VwGt/QTv7mNL3dMlu/4FM8+Jr3Ho=;
-        b=BDmFEJWryyuflr3bOhl9ykLZIYxnvB7WgGnrPh6kcpRnRZx3rXSswr07ijwKnBtlBJ
-         qfuzT0xcOkz3nmGeVUS2ZgD4eKgc0uVVWNJYkRSTDs/Y3bjaHavPWH0YKNwlaVBG7BPx
-         1M1u2e3ZK9M7ZMs7wG4N7oPNqJVzcYTHOl9ZPpU7/V1JjsfV6noMjbgqCyUEHIkHKXVW
-         JTZV96Dz5d3lB41PGk83UmRaw0+fF/GZBSLbHHdiNEWFugbfL4GsSOThCDPdMmbsp8Vg
-         FU6aTBGu6E7CQYFeXX/Qh93Sf7Nv1LeKF3zi/t9cMk0fq1lvVc6/kNNgqDpFQjZ5V4YA
-         rpCg==
-X-Gm-Message-State: ACrzQf2cjz7zTwt+77ypqixEnDN8TNgDX8snoynuSOCf2wKzPuCos7iM
-        cfoHbxb9MVdUMiTAPTn+ZZM/eraAsDNQ+eqdVSScjWA3sr9qOKi2DuS4iBx510AdKt0n0jepIbS
-        WHh3wIdEts7CR
-X-Received: by 2002:aa7:d306:0:b0:459:6e9:6284 with SMTP id p6-20020aa7d306000000b0045906e96284mr3362808edq.70.1664802069338;
-        Mon, 03 Oct 2022 06:01:09 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4LhOt7lq8KC+MtSWbuxFBRAsDpLqs6b02Vk7/jD6P80CM9LRWg42h4L75YMKjHN7LJ+v/WZg==
-X-Received: by 2002:aa7:d306:0:b0:459:6e9:6284 with SMTP id p6-20020aa7d306000000b0045906e96284mr3362761edq.70.1664802068878;
-        Mon, 03 Oct 2022 06:01:08 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id m21-20020a50ef15000000b00458bb36042asm4966689eds.1.2022.10.03.06.01.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Oct 2022 06:01:08 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v10 30/39] KVM: selftests: Hyper-V PV TLB flush selftest
-In-Reply-To: <YyuVtrpQwZGHs4ez@google.com>
-References: <20220921152436.3673454-1-vkuznets@redhat.com>
- <20220921152436.3673454-31-vkuznets@redhat.com>
- <YyuVtrpQwZGHs4ez@google.com>
-Date:   Mon, 03 Oct 2022 15:01:07 +0200
-Message-ID: <87wn9h9i3w.fsf@redhat.com>
+        with ESMTP id S229831AbiJCNK7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Oct 2022 09:10:59 -0400
+Received: from smtp-relay-canonical-1.canonical.com (smtp-relay-canonical-1.canonical.com [185.125.188.121])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FA7F2B604;
+        Mon,  3 Oct 2022 06:10:56 -0700 (PDT)
+Received: from quatroqueijos.. (unknown [179.93.174.77])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id 8569742EBB;
+        Mon,  3 Oct 2022 13:10:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1664802654;
+        bh=pZq2v/Fr9QFxLOTWEDq1WB4VU4sCkAuj/nGLJx+itTg=;
+        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+        b=XTpg/94iEmrq43Sntjf0xz2rx0LLEmosm4ljk9d6J9G1o0vPGrqTsO8B30MDnTmyL
+         iEoJrSYiy9UdjYQohZWyKgGdNqRXNe8Fn2pKhMdyr/HbY9UoZPJBtD32EEDXeGH8/Y
+         CG85pJAXtrl61BV8Qf52Qg5sFQpHC+jYuJHzuLRecTv1N+Ynj4cFINCRORlgm2QVWE
+         cPsSj0cM76IzcnE/RMC/c1lZy6DkIXwkt9DoNixpTpZUuUYYB30aPW4BFV9Loxjonl
+         IibReHs2leKzsvued1HqMhMA7dBb1LCSE8V19itBndQH8Ojc192DCPV6rXSG28ccmL
+         DMOL1ticS5www==
+From:   Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+To:     stable@vger.kernel.org
+Cc:     x86@kernel.org, kvm@vger.kernel.org, bp@alien8.de,
+        pbonzini@redhat.com, peterz@infradead.org, jpoimboe@kernel.org
+Subject: [PATCH 5.4 00/37] IBRS support // Retbleed mitigations
+Date:   Mon,  3 Oct 2022 10:10:01 -0300
+Message-Id: <20221003131038.12645-1-cascardo@canonical.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+This backport introduces IBRS support to 5.4.y in order to mitigate Retbleed on
+Intel parts. Though some very small pieces for AMD have been picked up as well,
+"UNRET" mitigations are not backported, nor IBPB. It is expected, though, that
+the backport will report AMD systems as vulnerable or not affected, depending
+on the parts and the BTC_NO bit.
 
-> On Wed, Sep 21, 2022, Vitaly Kuznetsov wrote:
+One note here is that the PBRSB mitigation was backported previously to the 5.4
+series, and this would have made things a little bit more complicated. So, I
+reverted it and applied it later on.
 
-...
+This has been boot-tested and smoke-tested on a bunch of AMD and Intel systems.
 
->> +}
->> +
->> +/* Delay */
->> +static inline void rep_nop(void)
->
-> LOL, rep_nop() is a hilariously confusing function name.  "REP NOP" is "PAUSE",
-> and for whatever reason the kernel proper use rep_nop() as the function name for
-> the wrapper.  My reaction to the MFENCE+rep_nop() below was "how the hell does
-> MFENCE+PAUSE guarantee a delay?!?".
+Alexandre Chartre (2):
+  x86/bugs: Report AMD retbleed vulnerability
+  x86/bugs: Add AMD retbleed= boot parameter
 
-Well, at least you got the joke :-)
+Andrew Cooper (1):
+  x86/cpu/amd: Enumerate BTC_NO
 
->
-> Anyways, why not do e.g. usleep(1)?  
+Daniel Sneddon (1):
+  x86/speculation: Add RSB VM Exit protections
 
-I was under the impression that all these 'sleep' functions result in a
-syscall (and I do see TRIPLE_FAULT when I swap my rep_nop() with usleep())
-and here we need to wait in the guest (sender) ...
+Josh Poimboeuf (9):
+  x86/speculation: Fix RSB filling with CONFIG_RETPOLINE=n
+  x86/speculation: Fix firmware entry SPEC_CTRL handling
+  x86/speculation: Fix SPEC_CTRL write on SMT state change
+  x86/speculation: Use cached host SPEC_CTRL value for guest entry/exit
+  x86/speculation: Remove x86_spec_ctrl_mask
+  KVM: VMX: Flatten __vmx_vcpu_run()
+  KVM: VMX: Prevent guest RSB poisoning attacks with eIBRS
+  KVM: VMX: Fix IBRS handling after vmexit
+  x86/speculation: Fill RSB on vmexit for IBRS
 
-> And if you really need a udelay() and not a
-> usleep(), IMO it's worth adding exactly that instead of throwing NOPs at the CPU.
-> E.g. aarch64 KVM selftests already implements udelay(), so adding an x86 variant
-> would move us one step closer to being able to use it in common tests.
+Mark Gross (1):
+  x86/cpu: Add a steppings field to struct x86_cpu_id
 
-... so yes, I think we need a delay. The problem with implementing
-udelay() is that TSC frequency is unknown. We can get it from kvmclock
-but setting up kvmclock pages for all selftests looks like an
-overkill. Hyper-V emulation gives us HV_X64_MSR_TSC_FREQUENCY but that's
-not generic enough. Alternatively, we can use KVM_GET_TSC_KHZ when
-creating a vCPU but we'll need to pass the value to guest code somehow.
-AFAIR, we can use CPUID.0x15 and/or MSR_PLATFORM_INFO (0xce) or even
-introduce a PV MSR for our purposes -- or am I missing an obvious "easy"
-solution?
+Nathan Chancellor (1):
+  x86/speculation: Use DECLARE_PER_CPU for x86_spec_ctrl_current
 
-I'm thinking about being lazy here and implemnting a Hyper-V specific
-udelay through HV_X64_MSR_TSC_FREQUENCY (unless you object, of course)
-to avoid bloating this series beyond 46 patches it already has.
+Pawan Gupta (4):
+  x86/speculation: Add spectre_v2=ibrs option to support Kernel IBRS
+  x86/bugs: Add Cannon lake to RETBleed affected CPU list
+  x86/speculation: Disable RRSBA behavior
+  x86/bugs: Warn when "ibrs" mitigation is selected on Enhanced IBRS
+    parts
 
-...
+Peter Zijlstra (11):
+  x86/kvm/vmx: Make noinstr clean
+  x86/cpufeatures: Move RETPOLINE flags to word 11
+  x86/bugs: Keep a per-CPU IA32_SPEC_CTRL value
+  x86/entry: Remove skip_r11rcx
+  x86/entry: Add kernel IBRS implementation
+  x86/bugs: Optimize SPEC_CTRL MSR writes
+  x86/bugs: Split spectre_v2_select_mitigation() and
+    spectre_v2_user_select_mitigation()
+  x86/bugs: Report Intel retbleed vulnerability
+  intel_idle: Disable IBRS during long idle
+  x86/speculation: Change FILL_RETURN_BUFFER to work with objtool
+  x86/common: Stamp out the stepping madness
+
+Thadeu Lima de Souza Cascardo (3):
+  Revert "x86/speculation: Add RSB VM Exit protections"
+  Revert "x86/cpu: Add a steppings field to struct x86_cpu_id"
+  KVM: VMX: Convert launched argument to flags
+
+Thomas Gleixner (2):
+  x86/devicetable: Move x86 specific macro out of generic code
+  x86/cpu: Add consistent CPU match macros
+
+Uros Bizjak (2):
+  KVM/VMX: Use TEST %REG,%REG instead of CMP $0,%REG in vmenter.S
+  KVM/nVMX: Use __vmx_vcpu_run in nested_vmx_check_vmentry_hw
+
+ .../admin-guide/kernel-parameters.txt         |  13 +
+ arch/x86/entry/calling.h                      |  68 +++-
+ arch/x86/entry/entry_32.S                     |   2 -
+ arch/x86/entry/entry_64.S                     |  34 +-
+ arch/x86/entry/entry_64_compat.S              |  11 +-
+ arch/x86/include/asm/cpu_device_id.h          | 132 ++++++-
+ arch/x86/include/asm/cpufeatures.h            |  13 +-
+ arch/x86/include/asm/intel-family.h           |   6 +
+ arch/x86/include/asm/msr-index.h              |  10 +
+ arch/x86/include/asm/nospec-branch.h          |  54 +--
+ arch/x86/kernel/cpu/amd.c                     |  21 +-
+ arch/x86/kernel/cpu/bugs.c                    | 365 ++++++++++++++----
+ arch/x86/kernel/cpu/common.c                  |  61 +--
+ arch/x86/kernel/cpu/match.c                   |  13 +-
+ arch/x86/kernel/cpu/scattered.c               |   1 +
+ arch/x86/kernel/process.c                     |   2 +-
+ arch/x86/kvm/svm.c                            |   1 +
+ arch/x86/kvm/vmx/nested.c                     |  32 +-
+ arch/x86/kvm/vmx/run_flags.h                  |   8 +
+ arch/x86/kvm/vmx/vmenter.S                    | 161 ++++----
+ arch/x86/kvm/vmx/vmx.c                        |  72 ++--
+ arch/x86/kvm/vmx/vmx.h                        |   5 +
+ arch/x86/kvm/x86.c                            |   4 +-
+ drivers/base/cpu.c                            |   8 +
+ drivers/cpufreq/acpi-cpufreq.c                |   1 +
+ drivers/cpufreq/amd_freq_sensitivity.c        |   1 +
+ drivers/idle/intel_idle.c                     |  43 ++-
+ include/linux/cpu.h                           |   2 +
+ include/linux/kvm_host.h                      |   2 +-
+ include/linux/mod_devicetable.h               |   4 +-
+ tools/arch/x86/include/asm/cpufeatures.h      |   2 +-
+ 31 files changed, 840 insertions(+), 312 deletions(-)
+ create mode 100644 arch/x86/kvm/vmx/run_flags.h
 
 -- 
-Vitaly
+2.34.1
 
