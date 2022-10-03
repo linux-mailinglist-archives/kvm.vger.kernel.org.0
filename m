@@ -2,59 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 281D95F2C33
-	for <lists+kvm@lfdr.de>; Mon,  3 Oct 2022 10:43:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 851455F2F3C
+	for <lists+kvm@lfdr.de>; Mon,  3 Oct 2022 13:01:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229960AbiJCIm7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Oct 2022 04:42:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46148 "EHLO
+        id S229591AbiJCLBo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Oct 2022 07:01:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230032AbiJCIme (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Oct 2022 04:42:34 -0400
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4828213E2A
-        for <kvm@vger.kernel.org>; Mon,  3 Oct 2022 01:18:53 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id r6so15528848wru.8
-        for <kvm@vger.kernel.org>; Mon, 03 Oct 2022 01:18:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=cTF3AiWCQzUZJV3DQOd8YpyAQ0uZN+oT26/EmVI5Gno=;
-        b=DvdRFGG3GDv+8INZlnRFdJ/8sk5eEa7AareONRXiJEau+xbhzZax6uLRyfYITFWbZf
-         3NqpZEEzMP/hKmEkCARYJ5G9gzbOE0q7McTWIAngIxaTuYC1o8lT6E0RUJP/MLnLpZ7d
-         Qu+1Vd0FUnf6Z7BDCSiXfOB3Lp6wjhae3evjWtqy1Hvhcufb4H2zsgnTlazKt2OEhd79
-         BA6ZEelvKbFypTSJOPXKwWi6F96cJdE1vUQrd76EmQ0Smui1y+dlW96zT/pi7JhI5c/2
-         8NZeHRiN3xgZc7P9e5p+GcKW4B3xAZ9Q9xeU6JSlAtM3mdUAbXU1rYpnUGpgYkW0Wdos
-         uORw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=cTF3AiWCQzUZJV3DQOd8YpyAQ0uZN+oT26/EmVI5Gno=;
-        b=M5zE1L+oDOyGKgabayBYDWx9CuuCZvSN5dhWYk3O8XTBmX1yQkwWhcH9PnOfibHEz3
-         2mwYk1ochWfmuLoiHJ/HwGIsp6vIi7tIBTby8iclS6Jbl36GFm5qcy70RodRKotA/699
-         Gol6JMqwr5VXB3X54+I3RAvNm4Jt6LlWFGQke7B/tv7PCrcvmjchDYUGgMdKq/2f6hjs
-         iKHQT6lB2k64su6lrnaKdesROX3pMcPu5n5nvsISP+RzxpkOpcBo+Af/0qPVH268Zmjf
-         A8O4lvHX2M8eadt8cVJuYmEqbp7D/cImFSW5mP40SrnJWAXRO+f2T8nxL9BDJbhWJjv4
-         ZzzQ==
-X-Gm-Message-State: ACrzQf2ynAya375CYbTYAWiO0AYBWm5vxZOOW0jFykAFgiv6p2yqKa2i
-        gMFgCktGGef+UeHdWuhyjgNL7BDltvuIBqcuiLYLR8BW6WSsAP+3
-X-Google-Smtp-Source: AMsMyM54UDKb/wQylYbThizMTNEzG/N4GHFJjCY1YMNV55ssdwv1emM1/33fLKcW7+Q244fzhfIJ6l3JiIpmQNO4rxw=
-X-Received: by 2002:a05:6512:261b:b0:4a1:abd7:3129 with SMTP id
- bt27-20020a056512261b00b004a1abd73129mr7271284lfb.637.1664782430012; Mon, 03
- Oct 2022 00:33:50 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
- <20220915142913.2213336-2-chao.p.peng@linux.intel.com> <CA+EHjTyrexb_LX7Jm9-MGwm4DBvfjCrADH4oumFyAvs2_0oSYw@mail.gmail.com>
- <20220930162301.i226o523teuikygq@box.shutemov.name>
-In-Reply-To: <20220930162301.i226o523teuikygq@box.shutemov.name>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Mon, 3 Oct 2022 08:33:13 +0100
-Message-ID: <CA+EHjTyphrouY1FV2NQOBLDG81JYhiHFGBNKjT1K2j+pVNij+A@mail.gmail.com>
-Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
-To:     "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        with ESMTP id S229464AbiJCLBl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Oct 2022 07:01:41 -0400
+Received: from wnew4-smtp.messagingengine.com (wnew4-smtp.messagingengine.com [64.147.123.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39D102711;
+        Mon,  3 Oct 2022 04:01:40 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailnew.west.internal (Postfix) with ESMTP id 1427B2B0693A;
+        Mon,  3 Oct 2022 07:01:36 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Mon, 03 Oct 2022 07:01:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
+         h=cc:cc:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm1; t=1664794895; x=1664802095; bh=zW
+        dvG4+iogw6diIyocCUGRkeH6TacYI7IEyT3UtjbNg=; b=XW0tQq+0FScqGFQ+dF
+        EG6F8k62Rsx9LqjjPoMSaTzwILoz+/n7fDSAlh7WYeR96n8T61QlRplQ1RwjHMcl
+        5yeu/5/d9DsmVOkrwscLBOVYwK//hEwVRqSGfyOxvyaN6fDU3U9/Ul0OAyquCK4L
+        zRmP8Y/FYnAIVSX/EEgAEL/OVuR+e1x1q141vTbhzYa4Xr1+1qkB9dSxrZodeJSv
+        47Gsq3Ji5dnuN5ybt15lYTZBO4OY32j0R3nw90tsm7yRM3eI40KVNN4uiQQID7lJ
+        hQ73LO0XlNe44SV2CPb3saKmbWbVBGNI34ILjrBrcE4C2D0m6MgnGajRH8sJJMcx
+        k74Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm2; t=1664794895; x=1664802095; bh=zWdvG4+iogw6diIyocCUGRkeH6Ta
+        cYI7IEyT3UtjbNg=; b=1sNbOr+reC4ozopaOlqM0nB+iKaIJWlgEvuSnvehqupR
+        +mlBVJgNgylpAZCIvqFPaIK2WPBApah/unlsgtS4kvfqTaq0BXfmuOgDyqL7ZnIQ
+        N4SHAmIclsBSegb6mvH9c6U6qgmglracDnl3H9l2JEzJ06uiMWBbM0OB6YGGTfWD
+        xnzX8C09pcaBkEsrBGKxi6+eppftTXbcrP0y67raFiRetpglM6SEeybTggLt0Jxu
+        nY7ma+CNPCBaDHOqaNh+TyiGfPgg6QbqgPqtYrZHB34i7u4TRk5W/6Bl6YElrJmP
+        flUk+OkuovZLsxzhxLvWeLYpKvAWNhY6chI73rMRtg==
+X-ME-Sender: <xms:DcE6Y6f52k5yy0Jlg1AeQ7dDWJCrmyiSx6kROu3hIkspfTGHK9TTRw>
+    <xme:DcE6Y0Nyco_uRp-K-WwZKELvbqi_T8WM-Zrx3OOkmBhxAu7gSWznB0GrnN29DXbFT
+    2-3FfUfe9_RpTMbUxY>
+X-ME-Received: <xmr:DcE6Y7gwh0050G_SwvT6qpZdBhwZjbBFjdHUuyL-6_rWH_mMo2iv_wfLg4oCQTj36_KCxg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfeehledgfeegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdttddttddtvdenucfhrhhomhepfdfmihhr
+    ihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilhhlsehshhhuthgvmhhovhdrnh
+    grmhgvqeenucggtffrrghtthgvrhhnpefhieeghfdtfeehtdeftdehgfehuddtvdeuheet
+    tddtheejueekjeegueeivdektdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpehkihhrihhllhesshhhuhhtvghmohhvrdhnrghmvg
+X-ME-Proxy: <xmx:DcE6Y3962DbaiPjQuEqjImm6i_1iQb_fS9v9CvfrtqHzYR-gAxDkXQ>
+    <xmx:DcE6Y2sGkiMEPQ8rZ-eMFeI2-zb7XvW71RUslSW8I3M3jgj-wl-pxQ>
+    <xmx:DcE6Y-F5e4wRoyMQiP3Pv56Fi1Qf4Te9r2uZ0-YIquinDsLq-5Ao1w>
+    <xmx:D8E6YzreQvrnUZwE5JTwmdtxSOE-mJJ5MYLVoAkceXUT8tLhySzNUatLQXA>
+Feedback-ID: ie3994620:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 3 Oct 2022 07:01:33 -0400 (EDT)
+Received: by box.shutemov.name (Postfix, from userid 1000)
+        id 87A6C104CE4; Mon,  3 Oct 2022 14:01:29 +0300 (+03)
+Date:   Mon, 3 Oct 2022 14:01:29 +0300
+From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+To:     Fuad Tabba <tabba@google.com>
+Cc:     "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
         linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
@@ -83,136 +96,38 @@ Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
         dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
         Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
         Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
+Message-ID: <20221003110129.bbee7kawhw5ed745@box.shutemov.name>
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
+ <CA+EHjTyrexb_LX7Jm9-MGwm4DBvfjCrADH4oumFyAvs2_0oSYw@mail.gmail.com>
+ <20220930162301.i226o523teuikygq@box.shutemov.name>
+ <CA+EHjTyphrouY1FV2NQOBLDG81JYhiHFGBNKjT1K2j+pVNij+A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTyphrouY1FV2NQOBLDG81JYhiHFGBNKjT1K2j+pVNij+A@mail.gmail.com>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi
+On Mon, Oct 03, 2022 at 08:33:13AM +0100, Fuad Tabba wrote:
+> > I think it is "don't do that" category. inaccessible_register_notifier()
+> > caller has to know what file it operates on, no?
+> 
+> The thing is, you could oops the kernel from userspace. For that, all
+> you have to do is a memfd_create without the MFD_INACCESSIBLE,
+> followed by a KVM_SET_USER_MEMORY_REGION using that as the private_fd.
+> I ran into this using my port of this patch series to arm64.
 
-On Fri, Sep 30, 2022 at 5:23 PM Kirill A . Shutemov
-<kirill.shutemov@linux.intel.com> wrote:
->
-> On Fri, Sep 30, 2022 at 05:14:00PM +0100, Fuad Tabba wrote:
-> > Hi,
-> >
-> > <...>
-> >
-> > > diff --git a/mm/memfd_inaccessible.c b/mm/memfd_inaccessible.c
-> > > new file mode 100644
-> > > index 000000000000..2d33cbdd9282
-> > > --- /dev/null
-> > > +++ b/mm/memfd_inaccessible.c
-> > > @@ -0,0 +1,219 @@
-> > > +// SPDX-License-Identifier: GPL-2.0
-> > > +#include "linux/sbitmap.h"
-> > > +#include <linux/memfd.h>
-> > > +#include <linux/pagemap.h>
-> > > +#include <linux/pseudo_fs.h>
-> > > +#include <linux/shmem_fs.h>
-> > > +#include <uapi/linux/falloc.h>
-> > > +#include <uapi/linux/magic.h>
-> > > +
-> > > +struct inaccessible_data {
-> > > +       struct mutex lock;
-> > > +       struct file *memfd;
-> > > +       struct list_head notifiers;
-> > > +};
-> > > +
-> > > +static void inaccessible_notifier_invalidate(struct inaccessible_data *data,
-> > > +                                pgoff_t start, pgoff_t end)
-> > > +{
-> > > +       struct inaccessible_notifier *notifier;
-> > > +
-> > > +       mutex_lock(&data->lock);
-> > > +       list_for_each_entry(notifier, &data->notifiers, list) {
-> > > +               notifier->ops->invalidate(notifier, start, end);
-> > > +       }
-> > > +       mutex_unlock(&data->lock);
-> > > +}
-> > > +
-> > > +static int inaccessible_release(struct inode *inode, struct file *file)
-> > > +{
-> > > +       struct inaccessible_data *data = inode->i_mapping->private_data;
-> > > +
-> > > +       fput(data->memfd);
-> > > +       kfree(data);
-> > > +       return 0;
-> > > +}
-> > > +
-> > > +static long inaccessible_fallocate(struct file *file, int mode,
-> > > +                                  loff_t offset, loff_t len)
-> > > +{
-> > > +       struct inaccessible_data *data = file->f_mapping->private_data;
-> > > +       struct file *memfd = data->memfd;
-> > > +       int ret;
-> > > +
-> > > +       if (mode & FALLOC_FL_PUNCH_HOLE) {
-> > > +               if (!PAGE_ALIGNED(offset) || !PAGE_ALIGNED(len))
-> > > +                       return -EINVAL;
-> > > +       }
-> > > +
-> > > +       ret = memfd->f_op->fallocate(memfd, mode, offset, len);
-> >
-> > I think that shmem_file_operations.fallocate is only set if
-> > CONFIG_TMPFS is enabled (shmem.c). Should there be a check at
-> > initialization that fallocate is set, or maybe a config dependency, or
-> > can we count on it always being enabled?
->
-> It is already there:
->
->         config MEMFD_CREATE
->                 def_bool TMPFS || HUGETLBFS
->
-> And we reject inaccessible memfd_create() for HUGETLBFS.
->
-> But if we go with a separate syscall, yes, we need the dependency.
+My point is that it has to be handled on a different level. KVM has to
+reject private_fd if it is now inaccessible. It should be trivial by
+checking file->f_inode->i_sb->s_magic.
 
-I missed that, thanks.
-
->
-> > > +       inaccessible_notifier_invalidate(data, offset, offset + len);
-> > > +       return ret;
-> > > +}
-> > > +
-> >
-> > <...>
-> >
-> > > +void inaccessible_register_notifier(struct file *file,
-> > > +                                   struct inaccessible_notifier *notifier)
-> > > +{
-> > > +       struct inaccessible_data *data = file->f_mapping->private_data;
-> > > +
-> > > +       mutex_lock(&data->lock);
-> > > +       list_add(&notifier->list, &data->notifiers);
-> > > +       mutex_unlock(&data->lock);
-> > > +}
-> > > +EXPORT_SYMBOL_GPL(inaccessible_register_notifier);
-> >
-> > If the memfd wasn't marked as inaccessible, or more generally
-> > speaking, if the file isn't a memfd_inaccessible file, this ends up
-> > accessing an uninitialized pointer for the notifier list. Should there
-> > be a check for that here, and have this function return an error if
-> > that's not the case?
->
-> I think it is "don't do that" category. inaccessible_register_notifier()
-> caller has to know what file it operates on, no?
-
-The thing is, you could oops the kernel from userspace. For that, all
-you have to do is a memfd_create without the MFD_INACCESSIBLE,
-followed by a KVM_SET_USER_MEMORY_REGION using that as the private_fd.
-I ran into this using my port of this patch series to arm64.
-
-Cheers,
-/fuad
-
-
-> --
->   Kiryl Shutsemau / Kirill A. Shutemov
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
