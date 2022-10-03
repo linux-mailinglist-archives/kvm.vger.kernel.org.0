@@ -2,164 +2,217 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CABCF5F2BBA
-	for <lists+kvm@lfdr.de>; Mon,  3 Oct 2022 10:26:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 281D95F2C33
+	for <lists+kvm@lfdr.de>; Mon,  3 Oct 2022 10:43:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231358AbiJCI0c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Oct 2022 04:26:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53356 "EHLO
+        id S229960AbiJCIm7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Oct 2022 04:42:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229944AbiJCI0J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Oct 2022 04:26:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C9DA1ADB7
-        for <kvm@vger.kernel.org>; Mon,  3 Oct 2022 01:00:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664783941;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WmztSdLxGLePdL68BUHnz4SzM/l/VKgoGqcyR7GOU3U=;
-        b=GjKi2OuSrnnINNi0FZE2IWrQyDYg0DEXHvvBZZ64yItA9vy8F9nqCgxDo0j8M21dnOUQsa
-        qld8A8YrkoVrOJ9DORGKfmY1J7tyQMucQMLQkFPuCAUYBAz7m0zWQn4HzuPWMTKXA5arRI
-        jpGVQIzeGMkXiDPCo9ezyfrOl+pdYjk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-365-rDj1GlhuNzGvFkYvPvriTg-1; Mon, 03 Oct 2022 03:28:03 -0400
-X-MC-Unique: rDj1GlhuNzGvFkYvPvriTg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C4AB28027ED;
-        Mon,  3 Oct 2022 07:28:01 +0000 (UTC)
-Received: from starship (unknown [10.40.193.232])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B9A621121314;
-        Mon,  3 Oct 2022 07:27:54 +0000 (UTC)
-Message-ID: <a80e2f92b4a93b00ad29f16944f2748eadbdda76.camel@redhat.com>
-Subject: Re: Nested AVIC design (was:Re: [RFC PATCH v3 04/19] KVM: x86: mmu:
- allow to enable write tracking externally)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        David Airlie <airlied@linux.ie>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        intel-gfx@lists.freedesktop.org, Daniel Vetter <daniel@ffwll.ch>,
-        Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org
-Date:   Mon, 03 Oct 2022 10:27:53 +0300
-In-Reply-To: <YzYeTCsNfQWccKJ9@google.com>
-References: <20220427200314.276673-1-mlevitsk@redhat.com>
-         <20220427200314.276673-5-mlevitsk@redhat.com> <YoZyWOh4NPA0uN5J@google.com>
-         <5ed0d0e5a88bbee2f95d794dbbeb1ad16789f319.camel@redhat.com>
-         <c22a18631c2067871b9ed8a9246ad58fa1ab8947.camel@redhat.com>
-         <Yt6/9V0S9of7dueW@google.com>
-         <7c4cf32dca42ab84bdb427a9e4862dbf5509f961.camel@redhat.com>
-         <YugLc5LLPJkt89z6@google.com>
-         <fe76ea902a38a10e2d8078fd9e5a71a0c7724d84.camel@redhat.com>
-         <YzYeTCsNfQWccKJ9@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S230032AbiJCIme (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Oct 2022 04:42:34 -0400
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4828213E2A
+        for <kvm@vger.kernel.org>; Mon,  3 Oct 2022 01:18:53 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id r6so15528848wru.8
+        for <kvm@vger.kernel.org>; Mon, 03 Oct 2022 01:18:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=cTF3AiWCQzUZJV3DQOd8YpyAQ0uZN+oT26/EmVI5Gno=;
+        b=DvdRFGG3GDv+8INZlnRFdJ/8sk5eEa7AareONRXiJEau+xbhzZax6uLRyfYITFWbZf
+         3NqpZEEzMP/hKmEkCARYJ5G9gzbOE0q7McTWIAngIxaTuYC1o8lT6E0RUJP/MLnLpZ7d
+         Qu+1Vd0FUnf6Z7BDCSiXfOB3Lp6wjhae3evjWtqy1Hvhcufb4H2zsgnTlazKt2OEhd79
+         BA6ZEelvKbFypTSJOPXKwWi6F96cJdE1vUQrd76EmQ0Smui1y+dlW96zT/pi7JhI5c/2
+         8NZeHRiN3xgZc7P9e5p+GcKW4B3xAZ9Q9xeU6JSlAtM3mdUAbXU1rYpnUGpgYkW0Wdos
+         uORw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=cTF3AiWCQzUZJV3DQOd8YpyAQ0uZN+oT26/EmVI5Gno=;
+        b=M5zE1L+oDOyGKgabayBYDWx9CuuCZvSN5dhWYk3O8XTBmX1yQkwWhcH9PnOfibHEz3
+         2mwYk1ochWfmuLoiHJ/HwGIsp6vIi7tIBTby8iclS6Jbl36GFm5qcy70RodRKotA/699
+         Gol6JMqwr5VXB3X54+I3RAvNm4Jt6LlWFGQke7B/tv7PCrcvmjchDYUGgMdKq/2f6hjs
+         iKHQT6lB2k64su6lrnaKdesROX3pMcPu5n5nvsISP+RzxpkOpcBo+Af/0qPVH268Zmjf
+         A8O4lvHX2M8eadt8cVJuYmEqbp7D/cImFSW5mP40SrnJWAXRO+f2T8nxL9BDJbhWJjv4
+         ZzzQ==
+X-Gm-Message-State: ACrzQf2ynAya375CYbTYAWiO0AYBWm5vxZOOW0jFykAFgiv6p2yqKa2i
+        gMFgCktGGef+UeHdWuhyjgNL7BDltvuIBqcuiLYLR8BW6WSsAP+3
+X-Google-Smtp-Source: AMsMyM54UDKb/wQylYbThizMTNEzG/N4GHFJjCY1YMNV55ssdwv1emM1/33fLKcW7+Q244fzhfIJ6l3JiIpmQNO4rxw=
+X-Received: by 2002:a05:6512:261b:b0:4a1:abd7:3129 with SMTP id
+ bt27-20020a056512261b00b004a1abd73129mr7271284lfb.637.1664782430012; Mon, 03
+ Oct 2022 00:33:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-2-chao.p.peng@linux.intel.com> <CA+EHjTyrexb_LX7Jm9-MGwm4DBvfjCrADH4oumFyAvs2_0oSYw@mail.gmail.com>
+ <20220930162301.i226o523teuikygq@box.shutemov.name>
+In-Reply-To: <20220930162301.i226o523teuikygq@box.shutemov.name>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Mon, 3 Oct 2022 08:33:13 +0100
+Message-ID: <CA+EHjTyphrouY1FV2NQOBLDG81JYhiHFGBNKjT1K2j+pVNij+A@mail.gmail.com>
+Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
+To:     "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-09-29 at 22:38 +0000, Sean Christopherson wrote:
-> On Mon, Aug 08, 2022, Maxim Levitsky wrote:
-> > Hi Sean, Paolo, and everyone else who wants to review my nested AVIC work.
-> 
-> Before we dive deep into design details, I think we should first decide whether
-> or not nested AVIC is worth pursing/supporting.
-> 
->   - Rome has a ucode/silicon bug with no known workaround and no anticipated fix[*];
->     AMD's recommended "workaround" is to disable AVIC.
->   - AVIC is not available in Milan, which may or may not be related to the
->     aforementioned bug.
->   - AVIC is making a comeback on Zen4, but Zen4 comes with x2AVIC.
->   - x2APIC is likely going to become ubiquitous, e.g. Intel is effectively
->     requiring x2APIC to fudge around xAPIC bugs.
->   - It's actually quite realistic to effectively force the guest to use x2APIC,
->     at least if it's a Linux guest.  E.g. turn x2APIC on in BIOS, which is often
->     (always?) controlled by the host, and Linux will use x2APIC.
-> 
-> In other words, given that AVIC is well on its way to becoming a "legacy" feature,
-> IMO there needs to be a fairly strong use case to justify taking on this much code
-> and complexity.  ~1500 lines of code to support a feature that has historically
-> been buggy _without_ nested support is going to require a non-trivial amount of
-> effort to review, stabilize, and maintain.
-> 
-> [*] 1235 "Guest With AVIC (Advanced Virtual Interrupt Controller) Enabled May Fail
->     to Process IPI (Inter-Processor Interrupt) Until Guest Is Re-Scheduled" in
->     https://www.amd.com/system/files/TechDocs/56323-PUB_1.00.pdf
-> 
+Hi
 
-I am afraid that you mixed things up:
+On Fri, Sep 30, 2022 at 5:23 PM Kirill A . Shutemov
+<kirill.shutemov@linux.intel.com> wrote:
+>
+> On Fri, Sep 30, 2022 at 05:14:00PM +0100, Fuad Tabba wrote:
+> > Hi,
+> >
+> > <...>
+> >
+> > > diff --git a/mm/memfd_inaccessible.c b/mm/memfd_inaccessible.c
+> > > new file mode 100644
+> > > index 000000000000..2d33cbdd9282
+> > > --- /dev/null
+> > > +++ b/mm/memfd_inaccessible.c
+> > > @@ -0,0 +1,219 @@
+> > > +// SPDX-License-Identifier: GPL-2.0
+> > > +#include "linux/sbitmap.h"
+> > > +#include <linux/memfd.h>
+> > > +#include <linux/pagemap.h>
+> > > +#include <linux/pseudo_fs.h>
+> > > +#include <linux/shmem_fs.h>
+> > > +#include <uapi/linux/falloc.h>
+> > > +#include <uapi/linux/magic.h>
+> > > +
+> > > +struct inaccessible_data {
+> > > +       struct mutex lock;
+> > > +       struct file *memfd;
+> > > +       struct list_head notifiers;
+> > > +};
+> > > +
+> > > +static void inaccessible_notifier_invalidate(struct inaccessible_data *data,
+> > > +                                pgoff_t start, pgoff_t end)
+> > > +{
+> > > +       struct inaccessible_notifier *notifier;
+> > > +
+> > > +       mutex_lock(&data->lock);
+> > > +       list_for_each_entry(notifier, &data->notifiers, list) {
+> > > +               notifier->ops->invalidate(notifier, start, end);
+> > > +       }
+> > > +       mutex_unlock(&data->lock);
+> > > +}
+> > > +
+> > > +static int inaccessible_release(struct inode *inode, struct file *file)
+> > > +{
+> > > +       struct inaccessible_data *data = inode->i_mapping->private_data;
+> > > +
+> > > +       fput(data->memfd);
+> > > +       kfree(data);
+> > > +       return 0;
+> > > +}
+> > > +
+> > > +static long inaccessible_fallocate(struct file *file, int mode,
+> > > +                                  loff_t offset, loff_t len)
+> > > +{
+> > > +       struct inaccessible_data *data = file->f_mapping->private_data;
+> > > +       struct file *memfd = data->memfd;
+> > > +       int ret;
+> > > +
+> > > +       if (mode & FALLOC_FL_PUNCH_HOLE) {
+> > > +               if (!PAGE_ALIGNED(offset) || !PAGE_ALIGNED(len))
+> > > +                       return -EINVAL;
+> > > +       }
+> > > +
+> > > +       ret = memfd->f_op->fallocate(memfd, mode, offset, len);
+> >
+> > I think that shmem_file_operations.fallocate is only set if
+> > CONFIG_TMPFS is enabled (shmem.c). Should there be a check at
+> > initialization that fallocate is set, or maybe a config dependency, or
+> > can we count on it always being enabled?
+>
+> It is already there:
+>
+>         config MEMFD_CREATE
+>                 def_bool TMPFS || HUGETLBFS
+>
+> And we reject inaccessible memfd_create() for HUGETLBFS.
+>
+> But if we go with a separate syscall, yes, we need the dependency.
 
-You mistake is that x2avic is just a minor addition to AVIC. It is still for
-all practical purposes the same feature.
+I missed that, thanks.
 
- 
-1. The AVIC is indeed kind of broken on Zen2 (but AFAIK for all practical purposes,
-   including nested it works fine, the errata only shows up in a unit test and/or
-   under very specific workloads (most of the time a delayed wakeup doesn't cause a hang).
-   Yet, I agree that for production Zen2 should not have AVIC enabled.
- 
+>
+> > > +       inaccessible_notifier_invalidate(data, offset, offset + len);
+> > > +       return ret;
+> > > +}
+> > > +
+> >
+> > <...>
+> >
+> > > +void inaccessible_register_notifier(struct file *file,
+> > > +                                   struct inaccessible_notifier *notifier)
+> > > +{
+> > > +       struct inaccessible_data *data = file->f_mapping->private_data;
+> > > +
+> > > +       mutex_lock(&data->lock);
+> > > +       list_add(&notifier->list, &data->notifiers);
+> > > +       mutex_unlock(&data->lock);
+> > > +}
+> > > +EXPORT_SYMBOL_GPL(inaccessible_register_notifier);
+> >
+> > If the memfd wasn't marked as inaccessible, or more generally
+> > speaking, if the file isn't a memfd_inaccessible file, this ends up
+> > accessing an uninitialized pointer for the notifier list. Should there
+> > be a check for that here, and have this function return an error if
+> > that's not the case?
+>
+> I think it is "don't do that" category. inaccessible_register_notifier()
+> caller has to know what file it operates on, no?
 
-2. Zen3 does indeed have AVIC soft disabled in CPUID. AFAIK it works just fine,
-   but I understand that customers won't use it against AMD's guidance.
- 
- 
-3. On Zen4, AVIC is fully enabled and also extended to support x2apic mode.
-   The fact that AVIC was extended to support X2apic mode also shows that AMD
-   is committed to supporting it.
- 
- 
-My nested AVIC code technically doesn't expose x2avic to the guest, but it
-is pretty much trivial to add (I am only waiting to get my hands on Zen4 machine
-to do it), and also even in its current form it would work just fine if the host
-uses normal AVIC .
- 
-(or even doesn't use AVIC at all - the nested AVIC code works just fine
-even if the host has its AVIC inhibited for some reason).
- 
-Adding nested x2avic support is literally about not passing through that MMIO address,
-Enabling the x2avic bit in int_ctl, and opening up the access to x2apic msrs.
-Plus I need to do some minor changes in unaccelerated IPI handler, dealing
-With read-only logical ID and such.
- 
-Physid tables, apic backing pages, doorbell emulation, 
-everything is pretty much unchanged.
- 
-So AVIC is nothing but a legacy feature, and my nested AVIC code will support
-both nested AVIC and nested X2AVIC.
- 
-Best regards,
-	Maxim Levitsky
- 
- 
+The thing is, you could oops the kernel from userspace. For that, all
+you have to do is a memfd_create without the MFD_INACCESSIBLE,
+followed by a KVM_SET_USER_MEMORY_REGION using that as the private_fd.
+I ran into this using my port of this patch series to arm64.
 
+Cheers,
+/fuad
+
+
+> --
+>   Kiryl Shutsemau / Kirill A. Shutemov
