@@ -2,217 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 309D55F36E7
-	for <lists+kvm@lfdr.de>; Mon,  3 Oct 2022 22:18:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D717F5F37CB
+	for <lists+kvm@lfdr.de>; Mon,  3 Oct 2022 23:31:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229950AbiJCUS3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Oct 2022 16:18:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54522 "EHLO
+        id S229936AbiJCVa5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Oct 2022 17:30:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229572AbiJCUS1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Oct 2022 16:18:27 -0400
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D29C23C150
-        for <kvm@vger.kernel.org>; Mon,  3 Oct 2022 13:18:25 -0700 (PDT)
-Received: by mail-oi1-x233.google.com with SMTP id j188so12470246oih.0
-        for <kvm@vger.kernel.org>; Mon, 03 Oct 2022 13:18:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QwzUc1WyFaUeZd3YlPKoc8a7p4x8bu+R0FbFR4EB46M=;
-        b=NUAN0DmLzz1UcyqxznVcDnuTHuIZz34vOGeHB7MXsNkhE1+ZsI+FXG8VkS0Cbx1dgs
-         DVXr7oDqCSuBk2HqnQRvLwtK3JtZQdnM5gpy3hvNDoDsKTina+PPFvC44MG+JIVjFuFg
-         3KrBDhk/ikjEoQRwFemD4etKTeCSXchGbC+1MzfUrFEeA1GXArIycz7QOAUp90PIBvVZ
-         9U1Cr1cddZNWsvBIfLTt4lmPOdSDrz6EnYnfcLzrGT95s0XkxddwQmaEroBqmvQ6cYV9
-         zhmG2LdhU4qT1wcYFLDn9KD27gzVdLwbayZU/vLfOTpHTiQhxZaoTmLADthLji1tshV6
-         dJFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QwzUc1WyFaUeZd3YlPKoc8a7p4x8bu+R0FbFR4EB46M=;
-        b=kzwfGv31fDenD3AQD1wOEUKtpWcc5bvcI3aFzX9ChOYVbDdWUimnas70OTHG2StSGj
-         2vcPmQWqvEzQjy1v/uKDXWc72281zc4ofvUvC2YBW+XYfXKZXxr5x7nnSzF3kvAUhbdP
-         LRsvZhwQzI0rI4BL5W2TE4RUlvyBlCduiUY7/p6PL1a1tuN4dZJCNwTwO09AORSBrnzz
-         c8Ju9k3AXjRbHyEEp8m4mKfTD589+V6x3+NZnnVet9pCPiZPmUiaS7j+dBIgBBI02Pjr
-         jjCe5tAjckTxgEkJjVnnY4iuK60t6h948Un1i/p6aorYKA1jqyBVuboj97bwEIOEOKdT
-         19Ww==
-X-Gm-Message-State: ACrzQf3J1Oear/Op4+4pvq00XxJe4tqSPtane0o92KXklsTl4ytvuddr
-        WcoA2bdp3NHhg9O+JGEZ6S0Q0JOTAgp6GZSxeTDgZjt7Imjufg==
-X-Google-Smtp-Source: AMsMyM55T77ACQqdbMTHgik9pAkcVik5ZztvLgnRe75JC11v1le4wSMJdjAmhZqctJ7Eqv+UM0icbwn4yTcYCXdvorM=
-X-Received: by 2002:a05:6808:f8e:b0:351:a39:e7ca with SMTP id
- o14-20020a0568080f8e00b003510a39e7camr4561923oiw.269.1664828304875; Mon, 03
- Oct 2022 13:18:24 -0700 (PDT)
+        with ESMTP id S229758AbiJCV36 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Oct 2022 17:29:58 -0400
+X-Greylist: delayed 1021 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 03 Oct 2022 14:24:26 PDT
+Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C24250518;
+        Mon,  3 Oct 2022 14:24:26 -0700 (PDT)
+Received: from [127.0.0.1] ([73.223.250.219])
+        (authenticated bits=0)
+        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 293L1MEs3109337
+        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+        Mon, 3 Oct 2022 14:01:22 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 293L1MEs3109337
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+        s=2022090501; t=1664830885;
+        bh=5zHAz69mkxip2bzOLRJ4yt3No7BYKjAs2m4UMY86+jU=;
+        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+        b=oykLJvyx1Q7ObEI2DH5ERO/25eTiZzFZJgvAbC877waEJ3rI15d4aEdEhxqbJeO9A
+         9mAtYzKq8KzgRaHdsZgLzcZ2FyOyJwtGOC7Mz+CWLiAoLfbb5WWY5pApSxlkZqx2kg
+         +jdO0xgF1Zn08mAVfDnpAfBMkCcXHyW5VxanswAVTHLqQKoZ+Zkpg3OXttXf7gowum
+         15bO9ANhBUQRzE2ffGGoHuLuA3pDNZDMyqSFToe9GidZCxmVEF1Y4Vhvw77jGJ5haa
+         Ryz+0xxNJVgfA4mrSDmKj9XJmZNlHN+9On7utZ6oZSi0H5AyXYqm2nhWCl+Q2Kqooh
+         0qiZDnZqQsadQ==
+Date:   Mon, 03 Oct 2022 14:01:20 -0700
+From:   "H. Peter Anvin" <hpa@zytor.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ajay Kaher <akaher@vmware.com>
+CC:     "x86@kernel.org" <x86@kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "rostedt@goodmis.org" <rostedt@goodmis.org>,
+        Srivatsa Bhat <srivatsab@vmware.com>,
+        "srivatsa@csail.mit.edu" <srivatsa@csail.mit.edu>,
+        Alexey Makhalov <amakhalov@vmware.com>,
+        Vasavi Sirnapalli <vsirnapalli@vmware.com>,
+        "er.ajay.kaher@gmail.com" <er.ajay.kaher@gmail.com>,
+        "willy@infradead.org" <willy@infradead.org>,
+        Nadav Amit <namit@vmware.com>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "jailhouse-dev@googlegroups.com" <jailhouse-dev@googlegroups.com>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+        "acrn-dev@lists.projectacrn.org" <acrn-dev@lists.projectacrn.org>,
+        "helgaas@kernel.org" <helgaas@kernel.org>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        Alexander Graf <graf@amazon.com>
+Subject: Re: [PATCH v2] x86/PCI: Prefer MMIO over PIO on all hypervisor
+User-Agent: K-9 Mail for Android
+In-Reply-To: <87tu4l9cfm.fsf@redhat.com>
+References: <9FEC6622-780D-41E6-B7CA-8D39EDB2C093@vmware.com> <87zgf3pfd1.fsf@redhat.com> <B64FD502-E794-4E94-A267-D690476C57EE@vmware.com> <87tu4l9cfm.fsf@redhat.com>
+Message-ID: <E522EECC-D20D-4A69-8A44-9CF2B36E2A29@zytor.com>
 MIME-Version: 1.0
-References: <20220929225203.2234702-1-jmattson@google.com> <20220929225203.2234702-2-jmattson@google.com>
- <BL0PR11MB304234A34209F12E03F746198A569@BL0PR11MB3042.namprd11.prod.outlook.com>
- <CALMp9eSMbLy8mETM6SRCbMVQFcKQRm=+qfcH_s1EhV=oF656eQ@mail.gmail.com>
- <BL0PR11MB30421511435BFEF36E482AC28A569@BL0PR11MB3042.namprd11.prod.outlook.com>
- <CALMp9eTNeeCNt=xMFBKSnXV+ReSXR=D11BQACS3Gwm7my+6sHA@mail.gmail.com> <BL0PR11MB3042784D7E66686207D679268A5B9@BL0PR11MB3042.namprd11.prod.outlook.com>
-In-Reply-To: <BL0PR11MB3042784D7E66686207D679268A5B9@BL0PR11MB3042.namprd11.prod.outlook.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 3 Oct 2022 13:18:13 -0700
-Message-ID: <CALMp9eRJOHwh1twmS5X+ooGQqn+y0YrNXgJoB7UhMb+nUa+EFw@mail.gmail.com>
-Subject: Re: [PATCH 2/6] KVM: x86: Mask off reserved bits in CPUID.80000006H
-To:     "Dong, Eddie" <eddie.dong@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RDNS_NONE,SPF_HELO_PASS,
+        SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Before we get even deeper into this discussion, let me point out that
-the basic principle of reporting zero in KVM_GET_SUPPORTED_CPUID for
-reserved bits is not something new I am introducing in this series. It
-has been standard practice for a long time. See, for example, commit
-404e0a19e155 ("KVM: cpuid: mask more bits in leaf 0xd and subleaves").
-I am just fixing a few cases that have been overlooked.
+On October 3, 2022 8:03:41 AM PDT, Vitaly Kuznetsov <vkuznets@redhat=2Ecom>=
+ wrote:
+>Ajay Kaher <akaher@vmware=2Ecom> writes:
+>
+>>> =EF=BB=BFOn 13/09/22, 7:05 PM, "Vitaly Kuznetsov" <vkuznets@redhat=2Ec=
+om> wrote:
+>>>>
+>>>> Thanks Vitaly for your response=2E
+>>>>
+>>>> 1=2E we have multiple objects of struct pci_raw_ops, 2=2E adding 'pri=
+ority' field to struct pci_raw_ops
+>>>> doesn't seems to be appropriate as need to take decision which object=
+ of struct pci_raw_ops has
+>>>> to be used, not something with-in struct pci_raw_ops=2E
+>>>
+>>> I'm not sure I follow, you have two instances of 'struct pci_raw_ops'
+>>> which are called 'raw_pci_ops' and 'raw_pci_ext_ops'=2E What if you do
+>>> something like (completely untested):
+>>>
+>>> diff --git a/arch/x86/include/asm/pci_x86=2Eh b/arch/x86/include/asm/p=
+ci_x86=2Eh
+>>> index 70533fdcbf02=2E=2Efb8270fa6c78 100644
+>>> --- a/arch/x86/include/asm/pci_x86=2Eh
+>>> +++ b/arch/x86/include/asm/pci_x86=2Eh
+>>> @@ -116,6 +116,7 @@ extern void (*pcibios_disable_irq)(struct pci_dev =
+*dev);
+>>> extern bool mp_should_keep_irq(struct device *dev);
+>>>
+>>> struct pci_raw_ops {
+>>> +       int rating;
+>>>          int (*read)(unsigned int domain, unsigned int bus, unsigned i=
+nt devfn,
+>>>                                                int reg, int len, u32 *=
+val);
+>>>          int (*write)(unsigned int domain, unsigned int bus, unsigned =
+int devfn,
+>>> diff --git a/arch/x86/pci/common=2Ec b/arch/x86/pci/common=2Ec
+>>> index ddb798603201=2E=2Ee9965fd11576 100644
+>>> --- a/arch/x86/pci/common=2Ec
+>>> +++ b/arch/x86/pci/common=2Ec
+>>> @@ -40,7 +40,8 @@ const struct pci_raw_ops *__read_mostly raw_pci_ext_=
+ops;
+>>>  int raw_pci_read(unsigned int domain, unsigned int bus, unsigned int =
+devfn,
+>>>                                                 int reg, int len, u32 =
+*val)
+>>> {
+>>> -       if (domain =3D=3D 0 && reg < 256 && raw_pci_ops)
+>>> +       if (domain =3D=3D 0 && reg < 256 && raw_pci_ops &&
+>>> +           (!raw_pci_ext_ops || raw_pci_ext_ops->rating <=3D raw_pci_=
+ops->rating))
+>>>                 return raw_pci_ops->read(domain, bus, devfn, reg, len,=
+ val);
+>>>         if (raw_pci_ext_ops)
+>>>                 return raw_pci_ext_ops->read(domain, bus, devfn, reg, =
+len, val);
+>>> @@ -50,7 +51,8 @@ int raw_pci_read(unsigned int domain, unsigned int b=
+us, unsigned int devfn,
+>>>  int raw_pci_write(unsigned int domain, unsigned int bus, unsigned int=
+ devfn,
+>>>                                                 int reg, int len, u32 =
+val)
+>>> {
+>>> -       if (domain =3D=3D 0 && reg < 256 && raw_pci_ops)
+>>> +       if (domain =3D=3D 0 && reg < 256 && raw_pci_ops &&
+>>> +           (!raw_pci_ext_ops || raw_pci_ext_ops->rating <=3D raw_pci_=
+ops->rating))
+>>>                 return raw_pci_ops->write(domain, bus, devfn, reg, len=
+, val);
+>>>          if (raw_pci_ext_ops)
+>>>                 return raw_pci_ext_ops->write(domain, bus, devfn, reg,=
+ len, val);
+>>>
+>>> and then somewhere in Vmware hypervisor initialization code
+>>> (arch/x86/kernel/cpu/vmware=2Ec) you do
+>>>
+>>>  raw_pci_ext_ops->rating =3D 100;
+>>
+>> Thanks Vitaly, for your review and helping us to improve the code=2E
+>>
+>> I was working to make changes as you suggested, but before sending v3 w=
+ould like to
+>> discuss on following:
+>>
+>> If we add rating with-in struct pci_raw_ops then we can't have pci_mmcf=
+g as const,
+>> and following change is must in arch/x86/pci/mmconfig_64=2Ec:
+>>
+>> -const struct pci_raw_ops pci_mmcfg =3D {
+>> +struct pci_raw_ops pci_mmcfg =3D {
+>>  	=2Eread =3D		pci_mmcfg_read,
+>>  	=2Ewrite =3D	pci_mmcfg_write,
+>> };
+>>
+>> So to avoid this change, is it fine to have global bool prefer_raw_pci_=
+ext_ops?
+>>
+>> And raw_pci_read() will have following change:
+>>
+>> -	if (domain =3D=3D 0 && reg < 256 && raw_pci_ops)
+>> +	if (domain =3D=3D 0 && reg < 256 && raw_pci_ops &&
+>> +	     (!prefer_raw_pci_ext_ops ||  !raw_pci_ext_ops)
+>>
+>
+>Not my but rather PCI maintainer's call but IMHO dropping 'const' is
+>better, introducing a new global var is our 'last resort' and should be
+>avoided whenever possible=2E Alternatively, you can add a
+>raw_pci_ext_ops_preferred() function checking somethin within 'struct
+>hypervisor_x86' but I'm unsure if it's better=2E
+>
+>Also, please check Alex' question/suggestion=2E
+>
+>=2E=2E=2E
+>
 
-On Mon, Oct 3, 2022 at 12:35 PM Dong, Eddie <eddie.dong@intel.com> wrote:
->
-> > >
-> > > In this case, given this is the common place,  if we don't want to do
-> > conditionally for different X86 architecture (may be not necessary), ca=
-n you
-> > put comments to clarify?
-> > > This way, readers won't be confused.
-> >
-> > Will a single comment at the top of the function suffice?
->
-> So, we are handling architecture-specific code in architecture-common pat=
-h.
-> Not sure how it will impact others.
->
-> The idea solution will have to reshuffle it for different architecture to=
- be processed differently.
-
-I hope we can expect that Intel and AMD will continue to respect each
-other's definitions in the future, as they have done in the past.
->
-> >
-> > >
-> > > >
-> > > > > BTW, for those reserved bits, their meaning is not defined, and
-> > > > > the VMM
-> > > > should not depend on them IMO.
-> > > > > What is the problem if hypervisor returns none-zero value?
-> > > >
-> > > > The problem arises if/when the bits become defined in the future,
-> > > > and the functionality is not trivially virtualized.
-> > >
-> > > Assume the hardware defines the bit one day in future, if we are usin=
-g old
-> > VMM, the VMM will view the hardware as if the feature doesn't exist, si=
-nce
-> > VMM does not know the feature and view the bit as reserved. This case s=
-hould
-> > work.
-> >
-> > The VMM should be able to simply pass the results of
-> > KVM_GET_SUPPORTED_CPUID to KVM_SET_CPUID2, without masking off bits
-> > that it doesn't know about.
->
-> At least in Intel architecture, a reserved bit (hardware return "1") repo=
-rted by KVM_GET_SUPPORTED_CPUID can be set in KVM_SET_CPUID2.
-> From KVM p.o.v., I think we don't assume the reserved bit (set by KVM_SET=
-_CPUID2) must be 0.  Or I missed something?
-
-Hardware reserved CPUID bits are always zero today, though that may
-not be architecturally specified.
-
-> >
-> > Nonetheless, a future VMM that does know about the new hardware feature
-> > can certainly expect that a KVM that enumerates the feature in
-> > KVM_GET_SUPPORTED_CPUID has the ability to support the feature.
->
-> Taking native as example, a new application knows about the new hardware =
-feature, should be able to run on old hardware without the feature, even if=
- the old hardware report the reserved bit as "1".
-> This is usually guaranteed by the hardware vendor in specification design=
-.  I will double check with Intel hardware guys to see if any "reserved bit=
-s" of CPUID may report "1".
-
-If reserved bits can be reported as one by the hardware, then the
-KVM_GET_SUPPORTED_CPUID API is completely useless as currently
-defined. It would have to report both a mask of supported bits and the
-values of those bits.
-
-> VMM in this context should be able to follow the principle too.
->
-> >
-> > > If we run with the future VMM, which recognizes and handles the
-> > bit/feature. The VMM could view the hardware feature to be disabled / n=
-ot
-> > existed (if "1" is used to enable or stand for "having the capability")=
-, or view
-> > the hardware feature as enabled/ existed (if "0" is used to enable or s=
-tand for
-> > "having the capability").
-> > >
-> > > In this case, whether we have this patch doesn=E2=80=99t give us defi=
-nite answer. Am
-> > I right?
-> >
-> > Are you asking about the polarity of the CPUID bit?
-> >
-> > It is unfortunate that both Intel and AMD have started to define revers=
-e
-> > polarity CPUID bits, because these do, in fact, cause a forward compati=
-bility
-> > issue. Take, for example, AMD's recent introduction of
-> > CPUID.80000008H:EBX.EferLmsleUnsupported[bit 20]. When the bit is set,
-> > EFER.LMSLE is not available. For quite some time, KVM has been reportin=
-g
-> > that this feature *is* available on CPUs where it isn't, because KVM cl=
-eared
-> > the CPUID bit based on its previous 'reserved' definition. I have a ser=
-ies out to
-> > address that issue:
-> > https://lore.kernel.org/kvm/CALMp9eQ-
-> > qkjBm8qPhOaMzZLWeHJcrwksV+XLQ9DfOQ_i1aykqQ@mail.gmail.com/.
->
-> This case is different. It is because the new hardware converts a defined=
- bit to be reserved.  What we are talking here is to convert a reserved bit=
- to defined bit.
-
-No. The new hardware defined a previously reserved *CPUID* bit. This
-is exactly what we are talking about. The new CPUID bit just happens
-to indicate that an EFER bit is now reserved, but that is neither here
-nor there.
-
-> In this case, if one wants to remove the capability (if it is presented a=
-nd run on old platform), to L1 VM. That is definitely fine.
-> But extending this to vastly cover all reserved bits of CPUID leaf may be=
- too aggressive, and cause the future issues.
->
-> I will let you know if the reserved bits of CPUID in Intel architecture m=
-ay report "1". If this is true, we may have to handle them differently for =
-different architecture, i.e. Intel vs. AMD.
->
-> Will that make sense?
-
-No, that doesn't make sense.
-
-> >
-> > Intel did the same thing with
-> > CPUID.(EAX=3D7H,ECX=3D0):EBX.FDP_EXCPTN_ONLY[bit 6] and
-> > CPUID.(EAX=3D7H,ECX=3D0):EBX.ZERO_FCS_FDS[bit 13].
-> >
-> > In the vast majority of cases, however, '0' is the right value to repor=
-t for a
-> > reserved bit to ensure forward compatibility.
->
-> Thanks Eddie
+Could this be ro_after_init?
