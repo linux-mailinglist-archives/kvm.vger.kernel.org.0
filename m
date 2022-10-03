@@ -2,132 +2,255 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 851455F2F3C
-	for <lists+kvm@lfdr.de>; Mon,  3 Oct 2022 13:01:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 55ADD5F2FAD
+	for <lists+kvm@lfdr.de>; Mon,  3 Oct 2022 13:32:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229591AbiJCLBo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Oct 2022 07:01:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44452 "EHLO
+        id S229861AbiJCLch convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 3 Oct 2022 07:32:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229464AbiJCLBl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Oct 2022 07:01:41 -0400
-Received: from wnew4-smtp.messagingengine.com (wnew4-smtp.messagingengine.com [64.147.123.18])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39D102711;
-        Mon,  3 Oct 2022 04:01:40 -0700 (PDT)
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailnew.west.internal (Postfix) with ESMTP id 1427B2B0693A;
-        Mon,  3 Oct 2022 07:01:36 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Mon, 03 Oct 2022 07:01:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
-         h=cc:cc:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm1; t=1664794895; x=1664802095; bh=zW
-        dvG4+iogw6diIyocCUGRkeH6TacYI7IEyT3UtjbNg=; b=XW0tQq+0FScqGFQ+dF
-        EG6F8k62Rsx9LqjjPoMSaTzwILoz+/n7fDSAlh7WYeR96n8T61QlRplQ1RwjHMcl
-        5yeu/5/d9DsmVOkrwscLBOVYwK//hEwVRqSGfyOxvyaN6fDU3U9/Ul0OAyquCK4L
-        zRmP8Y/FYnAIVSX/EEgAEL/OVuR+e1x1q141vTbhzYa4Xr1+1qkB9dSxrZodeJSv
-        47Gsq3Ji5dnuN5ybt15lYTZBO4OY32j0R3nw90tsm7yRM3eI40KVNN4uiQQID7lJ
-        hQ73LO0XlNe44SV2CPb3saKmbWbVBGNI34ILjrBrcE4C2D0m6MgnGajRH8sJJMcx
-        k74Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm2; t=1664794895; x=1664802095; bh=zWdvG4+iogw6diIyocCUGRkeH6Ta
-        cYI7IEyT3UtjbNg=; b=1sNbOr+reC4ozopaOlqM0nB+iKaIJWlgEvuSnvehqupR
-        +mlBVJgNgylpAZCIvqFPaIK2WPBApah/unlsgtS4kvfqTaq0BXfmuOgDyqL7ZnIQ
-        N4SHAmIclsBSegb6mvH9c6U6qgmglracDnl3H9l2JEzJ06uiMWBbM0OB6YGGTfWD
-        xnzX8C09pcaBkEsrBGKxi6+eppftTXbcrP0y67raFiRetpglM6SEeybTggLt0Jxu
-        nY7ma+CNPCBaDHOqaNh+TyiGfPgg6QbqgPqtYrZHB34i7u4TRk5W/6Bl6YElrJmP
-        flUk+OkuovZLsxzhxLvWeLYpKvAWNhY6chI73rMRtg==
-X-ME-Sender: <xms:DcE6Y6f52k5yy0Jlg1AeQ7dDWJCrmyiSx6kROu3hIkspfTGHK9TTRw>
-    <xme:DcE6Y0Nyco_uRp-K-WwZKELvbqi_T8WM-Zrx3OOkmBhxAu7gSWznB0GrnN29DXbFT
-    2-3FfUfe9_RpTMbUxY>
-X-ME-Received: <xmr:DcE6Y7gwh0050G_SwvT6qpZdBhwZjbBFjdHUuyL-6_rWH_mMo2iv_wfLg4oCQTj36_KCxg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfeehledgfeegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdttddttddtvdenucfhrhhomhepfdfmihhr
-    ihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilhhlsehshhhuthgvmhhovhdrnh
-    grmhgvqeenucggtffrrghtthgvrhhnpefhieeghfdtfeehtdeftdehgfehuddtvdeuheet
-    tddtheejueekjeegueeivdektdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
-    epmhgrihhlfhhrohhmpehkihhrihhllhesshhhuhhtvghmohhvrdhnrghmvg
-X-ME-Proxy: <xmx:DcE6Y3962DbaiPjQuEqjImm6i_1iQb_fS9v9CvfrtqHzYR-gAxDkXQ>
-    <xmx:DcE6Y2sGkiMEPQ8rZ-eMFeI2-zb7XvW71RUslSW8I3M3jgj-wl-pxQ>
-    <xmx:DcE6Y-F5e4wRoyMQiP3Pv56Fi1Qf4Te9r2uZ0-YIquinDsLq-5Ao1w>
-    <xmx:D8E6YzreQvrnUZwE5JTwmdtxSOE-mJJ5MYLVoAkceXUT8tLhySzNUatLQXA>
-Feedback-ID: ie3994620:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 3 Oct 2022 07:01:33 -0400 (EDT)
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id 87A6C104CE4; Mon,  3 Oct 2022 14:01:29 +0300 (+03)
-Date:   Mon, 3 Oct 2022 14:01:29 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Fuad Tabba <tabba@google.com>
-Cc:     "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
-Message-ID: <20221003110129.bbee7kawhw5ed745@box.shutemov.name>
-References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
- <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
- <CA+EHjTyrexb_LX7Jm9-MGwm4DBvfjCrADH4oumFyAvs2_0oSYw@mail.gmail.com>
- <20220930162301.i226o523teuikygq@box.shutemov.name>
- <CA+EHjTyphrouY1FV2NQOBLDG81JYhiHFGBNKjT1K2j+pVNij+A@mail.gmail.com>
+        with ESMTP id S229842AbiJCLce (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Oct 2022 07:32:34 -0400
+Received: from smtp236.sjtu.edu.cn (smtp236.sjtu.edu.cn [202.120.2.236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E89D3ECFC;
+        Mon,  3 Oct 2022 04:32:32 -0700 (PDT)
+Received: from mta90.sjtu.edu.cn (unknown [10.118.0.90])
+        by smtp236.sjtu.edu.cn (Postfix) with ESMTPS id 4EE181008B388;
+        Mon,  3 Oct 2022 19:32:20 +0800 (CST)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+        by mta90.sjtu.edu.cn (Postfix) with ESMTP id 4475337C894;
+        Mon,  3 Oct 2022 19:32:20 +0800 (CST)
+X-Virus-Scanned: amavisd-new at 
+Received: from mta90.sjtu.edu.cn ([127.0.0.1])
+        by localhost (mta90.sjtu.edu.cn [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id J7WWTuoaNlsJ; Mon,  3 Oct 2022 19:32:20 +0800 (CST)
+Received: from mstore105.sjtu.edu.cn (mstore101.sjtu.edu.cn [10.118.0.105])
+        by mta90.sjtu.edu.cn (Postfix) with ESMTP id 1524437C893;
+        Mon,  3 Oct 2022 19:32:20 +0800 (CST)
+Date:   Mon, 3 Oct 2022 19:32:19 +0800 (CST)
+From:   Guo Zhi <qtxuning1999@sjtu.edu.cn>
+To:     jasowang <jasowang@redhat.com>
+Cc:     eperezma <eperezma@redhat.com>, sgarzare <sgarzare@redhat.com>,
+        Michael Tsirkin <mst@redhat.com>,
+        netdev <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>
+Message-ID: <1184679327.3310578.1664796739583.JavaMail.zimbra@sjtu.edu.cn>
+In-Reply-To: <b1a7c454-860d-6a40-9da1-2a06f30ff1be@redhat.com>
+References: <20220901055434.824-1-qtxuning1999@sjtu.edu.cn> <20220901055434.824-7-qtxuning1999@sjtu.edu.cn> <b1a7c454-860d-6a40-9da1-2a06f30ff1be@redhat.com>
+Subject: Re: [RFC v3 6/7] virtio: in order support for virtio_ring
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTyphrouY1FV2NQOBLDG81JYhiHFGBNKjT1K2j+pVNij+A@mail.gmail.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=GB2312
+Content-Transfer-Encoding: 8BIT
+X-Originating-IP: [202.120.40.82]
+X-Mailer: Zimbra 8.8.15_GA_4372 (ZimbraWebClient - GC104 (Mac)/8.8.15_GA_3928)
+Thread-Topic: virtio: in order support for virtio_ring
+Thread-Index: WmAeKxuTlnmo+iVwtRyYMcu3mA5FRQ==
+X-Spam-Status: No, score=-0.4 required=5.0 tests=BAYES_00,RCVD_IN_SORBS_WEB,
+        SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 03, 2022 at 08:33:13AM +0100, Fuad Tabba wrote:
-> > I think it is "don't do that" category. inaccessible_register_notifier()
-> > caller has to know what file it operates on, no?
+
+
+----- Original Message -----
+> From: "jasowang" <jasowang@redhat.com>
+> To: "Guo Zhi" <qtxuning1999@sjtu.edu.cn>, "eperezma" <eperezma@redhat.com>, "sgarzare" <sgarzare@redhat.com>, "Michael
+> Tsirkin" <mst@redhat.com>
+> Cc: "netdev" <netdev@vger.kernel.org>, "linux-kernel" <linux-kernel@vger.kernel.org>, "kvm list" <kvm@vger.kernel.org>,
+> "virtualization" <virtualization@lists.linux-foundation.org>
+> Sent: Wednesday, September 7, 2022 1:38:03 PM
+> Subject: Re: [RFC v3 6/7] virtio: in order support for virtio_ring
+
+> ÔÚ 2022/9/1 13:54, Guo Zhi Ð´µÀ:
+>> If in order feature negotiated, we can skip the used ring to get
+>> buffer's desc id sequentially.  For skipped buffers in the batch, the
+>> used ring doesn't contain the buffer length, actually there is not need
+>> to get skipped buffers' length as they are tx buffer.
+>>
+>> Signed-off-by: Guo Zhi <qtxuning1999@sjtu.edu.cn>
+>> ---
+>>   drivers/virtio/virtio_ring.c | 74 +++++++++++++++++++++++++++++++-----
+>>   1 file changed, 64 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+>> index 00aa4b7a49c2..d52624179b43 100644
+>> --- a/drivers/virtio/virtio_ring.c
+>> +++ b/drivers/virtio/virtio_ring.c
+>> @@ -103,6 +103,9 @@ struct vring_virtqueue {
+>>   	/* Host supports indirect buffers */
+>>   	bool indirect;
+>>   
+>> +	/* Host supports in order feature */
+>> +	bool in_order;
+>> +
+>>   	/* Host publishes avail event idx */
+>>   	bool event;
+>>   
+>> @@ -144,6 +147,19 @@ struct vring_virtqueue {
+>>   			/* DMA address and size information */
+>>   			dma_addr_t queue_dma_addr;
+>>   			size_t queue_size_in_bytes;
+>> +
+>> +			/* If in_order feature is negotiated, here is the next head to consume */
+>> +			u16 next_desc_begin;
+>> +			/*
+>> +			 * If in_order feature is negotiated,
+>> +			 * here is the last descriptor's id in the batch
+>> +			 */
+>> +			u16 last_desc_in_batch;
+>> +			/*
+>> +			 * If in_order feature is negotiated,
+>> +			 * buffers except last buffer in the batch are skipped buffer
+>> +			 */
+>> +			bool is_skipped_buffer;
+>>   		} split;
+>>   
+>>   		/* Available for packed ring */
+>> @@ -584,8 +600,6 @@ static inline int virtqueue_add_split(struct virtqueue *_vq,
+>>   					 total_sg * sizeof(struct vring_desc),
+>>   					 VRING_DESC_F_INDIRECT,
+>>   					 false);
+>> -		vq->split.desc_extra[head & (vq->split.vring.num - 1)].flags &=
+>> -			~VRING_DESC_F_NEXT;
 > 
-> The thing is, you could oops the kernel from userspace. For that, all
-> you have to do is a memfd_create without the MFD_INACCESSIBLE,
-> followed by a KVM_SET_USER_MEMORY_REGION using that as the private_fd.
-> I ran into this using my port of this patch series to arm64.
+> 
+> This seems irrelevant.
+> 
+> 
+>>   	}
+>>   
+>>   	/* We're using some buffers from the free list. */
+>> @@ -701,8 +715,16 @@ static void detach_buf_split(struct vring_virtqueue *vq,
+>> unsigned int head,
+>>   	}
+>>   
+>>   	vring_unmap_one_split(vq, i);
+>> -	vq->split.desc_extra[i].next = vq->free_head;
+>> -	vq->free_head = head;
+>> +	/*
+>> +	 * If in_order feature is negotiated,
+>> +	 * the descriptors are made available in order.
+>> +	 * Since the free_head is already a circular list,
+>> +	 * it must consume it sequentially.
+>> +	 */
+>> +	if (!vq->in_order) {
+>> +		vq->split.desc_extra[i].next = vq->free_head;
+>> +		vq->free_head = head;
+>> +	}
+>>   
+>>   	/* Plus final descriptor */
+>>   	vq->vq.num_free++;
+>> @@ -744,7 +766,7 @@ static void *virtqueue_get_buf_ctx_split(struct virtqueue
+>> *_vq,
+>>   {
+>>   	struct vring_virtqueue *vq = to_vvq(_vq);
+>>   	void *ret;
+>> -	unsigned int i;
+>> +	unsigned int i, j;
+>>   	u16 last_used;
+>>   
+>>   	START_USE(vq);
+>> @@ -763,11 +785,38 @@ static void *virtqueue_get_buf_ctx_split(struct virtqueue
+>> *_vq,
+>>   	/* Only get used array entries after they have been exposed by host. */
+>>   	virtio_rmb(vq->weak_barriers);
+>>   
+>> -	last_used = (vq->last_used_idx & (vq->split.vring.num - 1));
+>> -	i = virtio32_to_cpu(_vq->vdev,
+>> -			vq->split.vring.used->ring[last_used].id);
+>> -	*len = virtio32_to_cpu(_vq->vdev,
+>> -			vq->split.vring.used->ring[last_used].len);
+>> +	if (vq->in_order) {
+>> +		last_used = (vq->last_used_idx & (vq->split.vring.num - 1));
+> 
+> 
+> Let's move this beyond the in_order check.
+> 
+> 
+>> +		if (!vq->split.is_skipped_buffer) {
+>> +			vq->split.last_desc_in_batch =
+>> +				virtio32_to_cpu(_vq->vdev,
+>> +						vq->split.vring.used->ring[last_used].id);
+>> +			vq->split.is_skipped_buffer = true;
+>> +		}
+>> +		/* For skipped buffers in batch, we can ignore the len info, simply set len
+>> as 0 */
+> 
+> 
+> This seems to break the caller that depends on a correct len.
+> 
+> 
+>> +		if (vq->split.next_desc_begin != vq->split.last_desc_in_batch) {
+>> +			*len = 0;
+>> +		} else {
+>> +			*len = virtio32_to_cpu(_vq->vdev,
+>> +					       vq->split.vring.used->ring[last_used].len);
+>> +			vq->split.is_skipped_buffer = false;
+>> +		}
+>> +		i = vq->split.next_desc_begin;
+>> +		j = i;
+>> +		/* Indirect only takes one descriptor in descriptor table */
+>> +		while (!vq->indirect && (vq->split.desc_extra[j].flags & VRING_DESC_F_NEXT))
+>> +			j = (j + 1) & (vq->split.vring.num - 1);
+> 
+> 
+> Any reason indirect descriptors can't be chained?
+> 
 
-My point is that it has to be handled on a different level. KVM has to
-reject private_fd if it is now inaccessible. It should be trivial by
-checking file->f_inode->i_sb->s_magic.
+If the descriptor is indirect, we only take one slot in the descriptor ring. We are just calculating the number of entries here.
+If indirect is chained, it still fill only one slot in the vring.
 
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+Thanks
+
+> 
+>> +		/* move to next */
+>> +		j = (j + 1) % vq->split.vring.num;
+>> +		/* Next buffer will use this descriptor in order */
+>> +		vq->split.next_desc_begin = j;
+> 
+> 
+> Is it more efficient to poke the available ring?
+> 
+> Thanks
+> 
+The available ring is under the guest's control and it may modify it.
+Access to avail vring would be another indirection too.
+
+Thanks
+> 
+>> +	} else {
+>> +		last_used = (vq->last_used_idx & (vq->split.vring.num - 1));
+>> +		i = virtio32_to_cpu(_vq->vdev,
+>> +				    vq->split.vring.used->ring[last_used].id);
+>> +		*len = virtio32_to_cpu(_vq->vdev,
+>> +				       vq->split.vring.used->ring[last_used].len);
+>> +	}
+>>   
+>>   	if (unlikely(i >= vq->split.vring.num)) {
+>>   		BAD_RING(vq, "id %u out of range\n", i);
+>> @@ -2223,6 +2272,7 @@ struct virtqueue *__vring_new_virtqueue(unsigned int
+>> index,
+>>   
+>>   	vq->indirect = virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_DESC) &&
+>>   		!context;
+>> +	vq->in_order = virtio_has_feature(vdev, VIRTIO_F_IN_ORDER);
+>>   	vq->event = virtio_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX);
+>>   
+>>   	if (virtio_has_feature(vdev, VIRTIO_F_ORDER_PLATFORM))
+>> @@ -2235,6 +2285,10 @@ struct virtqueue *__vring_new_virtqueue(unsigned int
+>> index,
+>>   	vq->split.avail_flags_shadow = 0;
+>>   	vq->split.avail_idx_shadow = 0;
+>>   
+>> +	vq->split.next_desc_begin = 0;
+>> +	vq->split.last_desc_in_batch = 0;
+>> +	vq->split.is_skipped_buffer = false;
+>> +
+>>   	/* No callback?  Tell other side not to bother us. */
+>>   	if (!callback) {
+>>   		vq->split.avail_flags_shadow |= VRING_AVAIL_F_NO_INTERRUPT;
