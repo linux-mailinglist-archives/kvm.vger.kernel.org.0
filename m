@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 07C435F3601
-	for <lists+kvm@lfdr.de>; Mon,  3 Oct 2022 21:01:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 193495F360E
+	for <lists+kvm@lfdr.de>; Mon,  3 Oct 2022 21:05:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229550AbiJCTBX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Oct 2022 15:01:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53254 "EHLO
+        id S229577AbiJCTFs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Oct 2022 15:05:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229511AbiJCTBU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Oct 2022 15:01:20 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E53F2AC48
-        for <kvm@vger.kernel.org>; Mon,  3 Oct 2022 12:01:20 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id gf8so8126304pjb.5
-        for <kvm@vger.kernel.org>; Mon, 03 Oct 2022 12:01:20 -0700 (PDT)
+        with ESMTP id S229573AbiJCTFp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Oct 2022 15:05:45 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BAE93F1DC
+        for <kvm@vger.kernel.org>; Mon,  3 Oct 2022 12:05:44 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id c3so6116180pfb.12
+        for <kvm@vger.kernel.org>; Mon, 03 Oct 2022 12:05:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=qowFxPih2sV5NJDXGk8gZLHmTm2tmCdaGptPOJVE48o=;
-        b=jkfAFsVky9Nj9fCv+gaIdpNvivTV5FBNq+bZt8kPfK05g2P3Dlla2GeoduCWZL6Q+E
-         TPhU98l8s+QUGWe7KiKqCXPI2t45g8yUyDFUAYM80tS0SpfNica53ObOfH9nQCVA6xiJ
-         yWBiLzhQozaO7/PGPfLqLgYnkPpzFuY4HXMoYw3jjvkwcEDS2Pocg2eDnpQQcYo5z1ox
-         4W1dmuVIvpmBdJSopIbiNv6f00wGUN05cGNYse8FfMQxa4bj5sBeqpNgyCYNXje3VP+d
-         jWy8WU8tN2/qq0VF7zMOS2cLrfojKtsnZ4DX8r+CWN2bC8yyKr1xAgCJCD2K2NaouW1+
-         iQBw==
+        bh=h2jYlCgDQ5WlHamVx9ZKLzzcBp2fqo6hIoj7oWyUv8s=;
+        b=kJV2amsfSkuEta5OkZ4cFpWzh0OjgiHvEGrhvcwV+MMyWDGRCO8rmsHQlj9lLUS9Z+
+         eRz668HfYhub0e7JMC7oAucnGucMY/EZxhzLs5nYDBLub2YEsZqRYv4gzgyu5jV1VUeF
+         qv1pbJYmMdeJN6fRai6x390Bl90qzi6ViPVjL9qazlG4YkbxAznnnRPmDc3XUdMlU09J
+         +Bvw0kC5yB4FnnIokprlQUlVr7FG6g8gjZ9xtsf9wOQiKOgE335CfYlsMBVn5w5RJDvl
+         BoHDN0ixvtat54PalxFOMqQV0ygEzZ3wB1VbUva/0ErP/kGOXAfTAL/GQtCp9UL6bPv0
+         brRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=qowFxPih2sV5NJDXGk8gZLHmTm2tmCdaGptPOJVE48o=;
-        b=cFqHDVZL4LoyQAuFPGj0k5ebVh/tXU5RWspM7bUJR0kBOTSvcRw3nFcPXtSk7e0qIE
-         KG7QMdcPeRRjjjOzdKn5o2MYMJUEbTK4vlH4pXxZl8zwXoBtqoOSCuw7NkGQyyNW0+Ir
-         v2lB/wZgQZoaahwbKI2hdM4Y3+r1Sa0TRNZyeBjgBFhYM0ZlqxP+eECXoU9wXglwJQla
-         Uec0U2gCG/6y3QJb5bHORxWahfUGHGxLe5gevpK5M5Zwm5ebVl0/YCWBticiTbrEiAYj
-         9ICPDLWAakX+hYtEBmoiX0hu7HTzjpjql8yzZ+T2NRsM0ldp3LM6MbVY52+j55KKCrPO
-         PUYg==
-X-Gm-Message-State: ACrzQf3LAcMQgM+YwB6p3+hIt9gGoq+KinB0m//NfHWkvUPIHvzi/tvW
-        QP0AqywnRDjGl2FvOnxJGKU=
-X-Google-Smtp-Source: AMsMyM5390Aaf0RTwaKdPwvdas5vvrJKzXFxuwaCfRSSEuRxTRL/3AlznWyrioAIPs76WzF9UX8zag==
-X-Received: by 2002:a17:902:ef83:b0:17c:a2f:1e3 with SMTP id iz3-20020a170902ef8300b0017c0a2f01e3mr18845857plb.35.1664823679535;
-        Mon, 03 Oct 2022 12:01:19 -0700 (PDT)
+        bh=h2jYlCgDQ5WlHamVx9ZKLzzcBp2fqo6hIoj7oWyUv8s=;
+        b=1XJczu7ryQOmBbQ00Gml5GwhXnU39Zq69ap8zdMiXuPnFIzevnRkPZdJRd2Lg0NgDW
+         IL596hhJ6ZbsRjc0SIGsh7ORcjUJ+tNJGa98c0CgyDpQKldYH7MLTmXk6kKdOd/3XU55
+         Dca48VS8jC5YZbbRxVO8xwIOEC85EvOf9IZcNzF3KnFHFIjMn5ONbtSzxqvtkj3/jBTs
+         b71G8D+cM5ZyPgVwLZaaLGp04A7Jcw2A6EIXY7vZuts+4k7j70Aj+hO5BTemNfq57hW3
+         8XHXOE/OvtEcjP2BMEUx3hREh+RszBSzrMnPObEIJWlHX5p39kwCaKHSEgFFU9kLralu
+         /D2g==
+X-Gm-Message-State: ACrzQf0JHBl3FaEC+wEx5T+yyRqdvso8hJdPyovoIGPsL8gMKMZUCUMa
+        KZaiArCcUsAS8nrG/6urVoY=
+X-Google-Smtp-Source: AMsMyM4Q7Yh9qTYXt5cY501mvpbG5NaE9uqYGdVqhHyn5THE573Xxhywaz7fnO2Ta2ncj4HtToEEwA==
+X-Received: by 2002:a62:190e:0:b0:561:a818:41bb with SMTP id 14-20020a62190e000000b00561a81841bbmr2695198pfz.50.1664823944017;
+        Mon, 03 Oct 2022 12:05:44 -0700 (PDT)
 Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id im23-20020a170902bb1700b001755e4278a6sm7524709plb.261.2022.10.03.12.01.18
+        by smtp.gmail.com with ESMTPSA id x12-20020a170902ec8c00b00172fc5b0764sm7644267plg.270.2022.10.03.12.05.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Oct 2022 12:01:19 -0700 (PDT)
-Date:   Mon, 3 Oct 2022 12:01:17 -0700
+        Mon, 03 Oct 2022 12:05:43 -0700 (PDT)
+Date:   Mon, 3 Oct 2022 12:05:42 -0700
 From:   Isaku Yamahata <isaku.yamahata@gmail.com>
 To:     David Matlack <dmatlack@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -55,15 +55,15 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Kai Huang <kai.huang@intel.com>,
         Isaku Yamahata <isaku.yamahata@gmail.com>,
         Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH v3 02/10] KVM: x86/mmu: Move TDP MMU VM init/uninit
- behind tdp_mmu_enabled
-Message-ID: <20221003190117.GB2414580@ls.amr.corp.intel.com>
+Subject: Re: [PATCH v3 03/10] KVM: x86/mmu: Grab mmu_invalidate_seq in
+ kvm_faultin_pfn()
+Message-ID: <20221003190542.GC2414580@ls.amr.corp.intel.com>
 References: <20220921173546.2674386-1-dmatlack@google.com>
- <20220921173546.2674386-3-dmatlack@google.com>
+ <20220921173546.2674386-4-dmatlack@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220921173546.2674386-3-dmatlack@google.com>
+In-Reply-To: <20220921173546.2674386-4-dmatlack@google.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -74,116 +74,141 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On Wed, Sep 21, 2022 at 10:35:38AM -0700,
+On Wed, Sep 21, 2022 at 10:35:39AM -0700,
 David Matlack <dmatlack@google.com> wrote:
 
-> Move kvm_mmu_{init,uninit}_tdp_mmu() behind tdp_mmu_enabled. This makes
-> these functions consistent with the rest of the calls into the TDP MMU
-> from mmu.c, and which is now possible since tdp_mmu_enabled is only
-> modified when the x86 vendor module is loaded. i.e. It will never change
-> during the lifetime of a VM.
+> Grab mmu_invalidate_seq in kvm_faultin_pfn() and stash it in struct
+> kvm_page_fault. The eliminates duplicate code and reduces the amount of
+> parameters needed for is_page_fault_stale().
 > 
-> This change also enabled removing the stub definitions for 32-bit KVM,
-> as the compiler will just optimize the calls out like it does for all
-> the other TDP MMU functions.
+> Preemptively split out __kvm_faultin_pfn() to a separate function for
+> use in subsequent commits.
 > 
 > No functional change intended.
 > 
 > Signed-off-by: David Matlack <dmatlack@google.com>
 > ---
->  arch/x86/kvm/mmu/mmu.c     | 11 +++++++----
->  arch/x86/kvm/mmu/tdp_mmu.c |  6 ------
->  arch/x86/kvm/mmu/tdp_mmu.h |  7 +++----
->  3 files changed, 10 insertions(+), 14 deletions(-)
+>  arch/x86/kvm/mmu/mmu.c          | 21 ++++++++++++---------
+>  arch/x86/kvm/mmu/mmu_internal.h |  1 +
+>  arch/x86/kvm/mmu/paging_tmpl.h  |  6 +-----
+>  3 files changed, 14 insertions(+), 14 deletions(-)
 > 
 > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index ccb0b18fd194..dd261cd2ad4e 100644
+> index dd261cd2ad4e..31b835d20762 100644
 > --- a/arch/x86/kvm/mmu/mmu.c
 > +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -5970,9 +5970,11 @@ int kvm_mmu_init_vm(struct kvm *kvm)
->  	INIT_LIST_HEAD(&kvm->arch.lpage_disallowed_mmu_pages);
->  	spin_lock_init(&kvm->arch.mmu_unsync_pages_lock);
->  
-> -	r = kvm_mmu_init_tdp_mmu(kvm);
-> -	if (r < 0)
-> -		return r;
-> +	if (tdp_mmu_enabled) {
-> +		r = kvm_mmu_init_tdp_mmu(kvm);
-> +		if (r < 0)
-> +			return r;
-> +	}
->  
->  	node->track_write = kvm_mmu_pte_write;
->  	node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
-> @@ -6002,7 +6004,8 @@ void kvm_mmu_uninit_vm(struct kvm *kvm)
->  
->  	kvm_page_track_unregister_notifier(kvm, node);
->  
-> -	kvm_mmu_uninit_tdp_mmu(kvm);
-> +	if (tdp_mmu_enabled)
-> +		kvm_mmu_uninit_tdp_mmu(kvm);
->  
->  	mmu_free_vm_memory_caches(kvm);
+> @@ -4129,7 +4129,7 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+>  	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true);
 >  }
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index e7d0f21fbbe8..08ab3596dfaa 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -15,9 +15,6 @@ int kvm_mmu_init_tdp_mmu(struct kvm *kvm)
+>  
+> -static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> +static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
 >  {
->  	struct workqueue_struct *wq;
+>  	struct kvm_memory_slot *slot = fault->slot;
+>  	bool async;
+> @@ -4185,12 +4185,20 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>  	return RET_PF_CONTINUE;
+>  }
 >  
-> -	if (!tdp_mmu_enabled)
-> -		return 0;
-> -
->  	wq = alloc_workqueue("kvm", WQ_UNBOUND|WQ_MEM_RECLAIM|WQ_CPU_INTENSIVE, 0);
->  	if (!wq)
->  		return -ENOMEM;
-> @@ -43,9 +40,6 @@ static __always_inline bool kvm_lockdep_assert_mmu_lock_held(struct kvm *kvm,
->  
->  void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
->  {
-> -	if (!tdp_mmu_enabled)
-> -		return;
-> -
->  	/* Also waits for any queued work items.  */
->  	destroy_workqueue(kvm->arch.tdp_mmu_zap_wq);
->  
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-> index c163f7cc23ca..9d086a103f77 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.h
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.h
-> @@ -5,6 +5,9 @@
->  
->  #include <linux/kvm_host.h>
->  
-> +int kvm_mmu_init_tdp_mmu(struct kvm *kvm);
-> +void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm);
+> +static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> +{
+> +	fault->mmu_seq = vcpu->kvm->mmu_invalidate_seq;
+> +	smp_rmb();
 > +
->  hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu);
+> +	return __kvm_faultin_pfn(vcpu, fault);
+> +}
+> +
+>  /*
+>   * Returns true if the page fault is stale and needs to be retried, i.e. if the
+>   * root was invalidated by a memslot update or a relevant mmu_notifier fired.
+>   */
+>  static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
+> -				struct kvm_page_fault *fault, int mmu_seq)
+> +				struct kvm_page_fault *fault)
+>  {
+>  	struct kvm_mmu_page *sp = to_shadow_page(vcpu->arch.mmu->root.hpa);
 >  
->  __must_check static inline bool kvm_tdp_mmu_get_root(struct kvm_mmu_page *root)
-> @@ -66,8 +69,6 @@ u64 *kvm_tdp_mmu_fast_pf_get_last_sptep(struct kvm_vcpu *vcpu, u64 addr,
->  					u64 *spte);
+> @@ -4210,14 +4218,12 @@ static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
+>  		return true;
 >  
->  #ifdef CONFIG_X86_64
-> -int kvm_mmu_init_tdp_mmu(struct kvm *kvm);
-> -void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm);
->  static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp) { return sp->tdp_mmu_page; }
->  
->  static inline bool is_tdp_mmu(struct kvm_mmu *mmu)
-> @@ -87,8 +88,6 @@ static inline bool is_tdp_mmu(struct kvm_mmu *mmu)
->  	return sp && is_tdp_mmu_page(sp) && sp->root_count;
+>  	return fault->slot &&
+> -	       mmu_invalidate_retry_hva(vcpu->kvm, mmu_seq, fault->hva);
+> +	       mmu_invalidate_retry_hva(vcpu->kvm, fault->mmu_seq, fault->hva);
 >  }
->  #else
-> -static inline int kvm_mmu_init_tdp_mmu(struct kvm *kvm) { return 0; }
-> -static inline void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm) {}
->  static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp) { return false; }
->  static inline bool is_tdp_mmu(struct kvm_mmu *mmu) { return false; }
->  #endif
+>  
+>  static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+>  {
+>  	bool is_tdp_mmu_fault = is_tdp_mmu(vcpu->arch.mmu);
+> -
+> -	unsigned long mmu_seq;
+>  	int r;
+>  
+>  	fault->gfn = fault->addr >> PAGE_SHIFT;
+> @@ -4234,9 +4240,6 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  	if (r)
+>  		return r;
+>  
+> -	mmu_seq = vcpu->kvm->mmu_invalidate_seq;
+> -	smp_rmb();
+> -
+>  	r = kvm_faultin_pfn(vcpu, fault);
+>  	if (r != RET_PF_CONTINUE)
+>  		return r;
+> @@ -4252,7 +4255,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  	else
+>  		write_lock(&vcpu->kvm->mmu_lock);
+>  
+> -	if (is_page_fault_stale(vcpu, fault, mmu_seq))
+> +	if (is_page_fault_stale(vcpu, fault))
+>  		goto out_unlock;
+>  
+>  	r = make_mmu_pages_available(vcpu);
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index 582def531d4d..1c0a1e7c796d 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -221,6 +221,7 @@ struct kvm_page_fault {
+>  	struct kvm_memory_slot *slot;
+>  
+>  	/* Outputs of kvm_faultin_pfn.  */
+> +	unsigned long mmu_seq;
+>  	kvm_pfn_t pfn;
+>  	hva_t hva;
+>  	bool map_writable;
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index 39e0205e7300..98f4abce4eaf 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -791,7 +791,6 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  {
+>  	struct guest_walker walker;
+>  	int r;
+> -	unsigned long mmu_seq;
+>  	bool is_self_change_mapping;
+>  
+>  	pgprintk("%s: addr %lx err %x\n", __func__, fault->addr, fault->error_code);
+> @@ -838,9 +837,6 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  	else
+>  		fault->max_level = walker.level;
+>  
+> -	mmu_seq = vcpu->kvm->mmu_invalidate_seq;
+> -	smp_rmb();
+> -
+>  	r = kvm_faultin_pfn(vcpu, fault);
+>  	if (r != RET_PF_CONTINUE)
+>  		return r;
+> @@ -871,7 +867,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>  	r = RET_PF_RETRY;
+>  	write_lock(&vcpu->kvm->mmu_lock);
+>  
+> -	if (is_page_fault_stale(vcpu, fault, mmu_seq))
+> +	if (is_page_fault_stale(vcpu, fault))
+>  		goto out_unlock;
+>  
+>  	r = make_mmu_pages_available(vcpu);
 > -- 
 > 2.37.3.998.g577e59143f-goog
+> 
 
 Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
 -- 
