@@ -2,73 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ACBA65F32CA
-	for <lists+kvm@lfdr.de>; Mon,  3 Oct 2022 17:42:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 636F35F32E2
+	for <lists+kvm@lfdr.de>; Mon,  3 Oct 2022 17:47:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229532AbiJCPme (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Oct 2022 11:42:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54100 "EHLO
+        id S229692AbiJCPrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Oct 2022 11:47:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229534AbiJCPmc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Oct 2022 11:42:32 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6CA824F24
-        for <kvm@vger.kernel.org>; Mon,  3 Oct 2022 08:42:30 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id b2so5130084plc.7
-        for <kvm@vger.kernel.org>; Mon, 03 Oct 2022 08:42:30 -0700 (PDT)
+        with ESMTP id S229675AbiJCPrd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Oct 2022 11:47:33 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B314331ED9
+        for <kvm@vger.kernel.org>; Mon,  3 Oct 2022 08:47:31 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id q9so9990859pgq.8
+        for <kvm@vger.kernel.org>; Mon, 03 Oct 2022 08:47:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=QuA2nOD/g6wO4fWfuOSK3kZxzasuklXfklg/Thl42UI=;
-        b=iauC8CGpndM0cJg51qRBrKbHzQVrXOt5ulqjoPDFRlqkkRjLECvBZjNBSbhtx3y0Y/
-         wPkdvkD3l4OPZNXW1whw1m8MM6+Q4l67VnlPtsmtJEGyHf9kvlK20Usg27F9QDelf3lw
-         YA8HRaGQSiuayuaFnwTOB9ZIIX5IgI00N1pAWS9DyP5GINXwsCx6m2C8jFrM+hN4CTUq
-         P5VfYnDHSxZQizG+BjetkQUuy5Rgknd2hhMxkXSbJBazfSZvf8xNdzeENrj9Vpg/nDQp
-         A91IDrn7aL1OTwxUGm4UeXUbXxMBin2vWChfbyOebTwDSRPDWjbLQW9QUDHOYQDnkL2Z
-         KmDg==
+        bh=8DydcZk1u0xB1c+8RaosfYF4xcLu+b5YE36qeyQVzwg=;
+        b=MWeYoPc1MT+Zh6TDC++oipZLPGWaGX7sho1om+CA6if9CGeO4XhqtOOzoT+1qAIr1k
+         7h379rag4jGR5OOWqd9YNfGNS2IPSQpV0lwALCkQmTNOJBJCXpFbMChWirjlEhmp0kHC
+         OYILiPeSHJxkvOmpg6rTY+oVqAFG0U69/WEEUOAvCKcJP9V8XmHoObiZ/3D8WKBC9Yd5
+         hyOtD80f2AzLqB3yzVNvfRZIJAk0BUwhSOH5jx1SHhZlQZrPsJjd8jFRghEU/2+Qkxew
+         ufUO65Q5D/17rnA/h3wHD0yX7mlG/4Ocz+aOi5/+s/pBgD2SHXwZcI10PaFqtRlvO2uz
+         fLzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=QuA2nOD/g6wO4fWfuOSK3kZxzasuklXfklg/Thl42UI=;
-        b=7kwp1i2ZoPbrzKWf86uGzr2guEsckCU18EPgdk7JwgGSM3BQFJdM8U69X99jrWbSz+
-         DD0ecahl0p/LCnmNdRkhU4w83wHX1WDimXYU2uTMIcZ1wgJ6tasEjLv1xq2Vba86B5GI
-         5KV43QvzkJsMIH+010lcV5iDeoLKOnsEHR9K1eLZ0R2j2RDeyCUa4YbLCCwKl+8wZMqz
-         JtedWaUSlKo/YWnOhDC9WrXLFwZBRjAzmxIBERIh/4sXE0RtA6F9uRzz5W6Xk6ThpxA2
-         KipOVWf8PegZAul4GzuD1goXnBMLiGZp6+Vj+a6PGqY8sgO3MXtPlii5ErWzsLzA+nQG
-         9h9g==
-X-Gm-Message-State: ACrzQf2JmVpZX/zrHoR5Slig8Sy/+WzSxJNUotVuZij8HX+0DAs2f0/V
-        E9MQYNP9XHT+F0RLqq2DyHw/7g==
-X-Google-Smtp-Source: AMsMyM7PU6yJAVOgQKRYlotLyGZgeKjWdsmJfJM9qm4TXRCp70S49xvYRlR1jtgZbV1wYkLEChw0nw==
-X-Received: by 2002:a17:90a:a21:b0:20a:6fd6:f66d with SMTP id o30-20020a17090a0a2100b0020a6fd6f66dmr12967873pjo.70.1664811750230;
-        Mon, 03 Oct 2022 08:42:30 -0700 (PDT)
+        bh=8DydcZk1u0xB1c+8RaosfYF4xcLu+b5YE36qeyQVzwg=;
+        b=2aiQLOsEVugB2UxKgzT3MFW4Vtbb96oUUnvOG2PpcOOAu85EGSwGl3VzQH4QuwnIXC
+         FybydZImo7TFetZ7sjDUR3N8mZfKyGQwC7vKv7KXhtjSOVyZy8OOh73zqa71P3xasuYQ
+         vFEhK0VTJUlMT9rjl2uJky+Q7weDnsxCFFlzKA6p2ZbwSM2zxccGXwkDw3zWpwp/EiZd
+         2QhLPgKAbcePMuqpNMuO21d4W4zakg3VIMyE6OaYhBpBwrlZfdCG//c8T2QoWebnNElG
+         HcVBZGCHTP/fPIMKW+H4cgNFuT2XwdFBm4NoAF6vnR+zppiwOKEKVuRzJGURTyMUyaBm
+         G9hQ==
+X-Gm-Message-State: ACrzQf1eDmMuQDEu0LO6CMUJtCsStHKSQMPaGA5gV0dkbFKRGmfT3vdK
+        pB/hIwVUVWDWjllao8Brjm3xbw==
+X-Google-Smtp-Source: AMsMyM52dARElRANgpzevE3YdMwr8PFlAPyQOLwPouPXpqstlH2f32r1yLtIU993s71u+zmhNCU+kA==
+X-Received: by 2002:a63:4042:0:b0:43b:ddc8:235 with SMTP id n63-20020a634042000000b0043bddc80235mr19773380pga.498.1664812050292;
+        Mon, 03 Oct 2022 08:47:30 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id v5-20020a622f05000000b0053b2681b0e0sm7594949pfv.39.2022.10.03.08.42.29
+        by smtp.gmail.com with ESMTPSA id f4-20020a170902ce8400b00178b77b7e71sm7444647plg.188.2022.10.03.08.47.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Oct 2022 08:42:29 -0700 (PDT)
-Date:   Mon, 3 Oct 2022 15:42:26 +0000
+        Mon, 03 Oct 2022 08:47:29 -0700 (PDT)
+Date:   Mon, 3 Oct 2022 15:47:26 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vishal Annapurve <vannapurve@google.com>
-Cc:     David Matlack <dmatlack@google.com>, x86 <x86@kernel.org>,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>, shuah <shuah@kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        Oliver Upton <oupton@google.com>, peterx@redhat.com,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [V2 PATCH 3/8] KVM: selftests: Add arch specific post vm load
- setup
-Message-ID: <YzsC4ibDqGh5qaP9@google.com>
-References: <20220915000448.1674802-1-vannapurve@google.com>
- <20220915000448.1674802-4-vannapurve@google.com>
- <Yyt586xOWrNEoCYF@google.com>
- <CAGtprH8=wjQAhpr97KNsziT_jAqSS6sMTb5=gzgbhssNPm8q_Q@mail.gmail.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Yuan Yao <yuan.yao@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v10 30/39] KVM: selftests: Hyper-V PV TLB flush selftest
+Message-ID: <YzsEDt3f/+a0FuBS@google.com>
+References: <20220921152436.3673454-1-vkuznets@redhat.com>
+ <20220921152436.3673454-31-vkuznets@redhat.com>
+ <YyuVtrpQwZGHs4ez@google.com>
+ <87wn9h9i3w.fsf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAGtprH8=wjQAhpr97KNsziT_jAqSS6sMTb5=gzgbhssNPm8q_Q@mail.gmail.com>
+In-Reply-To: <87wn9h9i3w.fsf@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -80,54 +79,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 26, 2022, Vishal Annapurve wrote:
-> On Wed, Sep 21, 2022 at 1:54 PM David Matlack <dmatlack@google.com> wrote:
-> >
-> > On Thu, Sep 15, 2022 at 12:04:43AM +0000, Vishal Annapurve wrote:
-> > > diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> > > index 98edbbda9f97..73cfee3ebd76 100644
-> > > --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> > > +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> > > @@ -839,4 +839,8 @@ static inline int __vm_disable_nx_huge_pages(struct kvm_vm *vm)
-> > >   */
-> > >  void kvm_selftest_arch_init(void);
-> > >
-> > > +/*
-> > > + * API to execute architecture specific setup after loading the vm elf.
-> >
-> > It's not a "vm elf" per-se, it's "loading the elf into the VM". How
-> > about:
-> >
-> > /*
-> >  * API to execute arch-specific logic after loading the selftest ELF image
-> >  * into the VM.
-> >  */
-> >
+On Mon, Oct 03, 2022, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> > Anyways, why not do e.g. usleep(1)?  
 > 
-> Ack. Will update this in the next series.
+> I was under the impression that all these 'sleep' functions result in a
+> syscall (and I do see TRIPLE_FAULT when I swap my rep_nop() with usleep())
+> and here we need to wait in the guest (sender) ...
 
-Even better, call it from __vm_create() and name it something like
-kvm_arch_vm_post_create().  Like David said, while the hook has a dependency on
-being called after loading the ELF image, the action that arch code is expected
-to take doesn't have anything to do with loading the ELF image.
+Oh, duh, guest code.
 
-And then instead of introducing an arch hook with no implementation, the patch that
-adds the hook can instead use it to replace the x86-64 #ifdef in __vm_create().
+> > And if you really need a udelay() and not a
+> > usleep(), IMO it's worth adding exactly that instead of throwing NOPs at the CPU.
+> > E.g. aarch64 KVM selftests already implements udelay(), so adding an x86 variant
+> > would move us one step closer to being able to use it in common tests.
+> 
+> ... so yes, I think we need a delay. The problem with implementing
+> udelay() is that TSC frequency is unknown. We can get it from kvmclock
+> but setting up kvmclock pages for all selftests looks like an
+> overkill. Hyper-V emulation gives us HV_X64_MSR_TSC_FREQUENCY but that's
+> not generic enough. Alternatively, we can use KVM_GET_TSC_KHZ when
+> creating a vCPU but we'll need to pass the value to guest code somehow.
+> AFAIR, we can use CPUID.0x15 and/or MSR_PLATFORM_INFO (0xce) or even
+> introduce a PV MSR for our purposes -- or am I missing an obvious "easy"
+> solution?
 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index dafe4471a6c7..593dfadb662e 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -298,9 +298,8 @@ struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
- 
-        kvm_vm_elf_load(vm, program_invocation_name);
- 
--#ifdef __x86_64__
--       vm_create_irqchip(vm);
--#endif
-+       kvm_arch_vm_post_create(vm);
-+
-        return vm;
- }
- 
- 
+I don't think you're missing anything.  Getting the value into the guest is the
+biggest issue.
+
+Vishal is solving a similar problem where the guest needs to know the "native"
+hypercall.  We can piggyback that hook to do KVM_GET_TSC_KHZ there during VM
+creation, and then simply define udelay()'s behavior to always operate on the
+"default" frequency.  I.e. if a test wants to change the frequency _and_ use
+udelay() _and_ cares about the precision of udelay(), then that test can go write
+its own code.
+
+> I'm thinking about being lazy here and implemnting a Hyper-V specific
+> udelay through HV_X64_MSR_TSC_FREQUENCY (unless you object, of course)
+> to avoid bloating this series beyond 46 patches it already has.
+
+I'm totally fine being even lazier here and just using a loop of nops, but with a
+different function name and a TODO (I completely forgot this was guest code when
+making the usleep() suggestion).  Then we can clean up the TODO via udelay() in a
+follow-up series.
