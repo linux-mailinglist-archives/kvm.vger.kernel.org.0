@@ -2,60 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 06B445F3E31
-	for <lists+kvm@lfdr.de>; Tue,  4 Oct 2022 10:23:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C34F45F3E5D
+	for <lists+kvm@lfdr.de>; Tue,  4 Oct 2022 10:30:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230074AbiJDIXT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Oct 2022 04:23:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54666 "EHLO
+        id S229994AbiJDIaV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Oct 2022 04:30:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229559AbiJDIXR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Oct 2022 04:23:17 -0400
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AFD81C123;
-        Tue,  4 Oct 2022 01:23:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1664871796; x=1696407796;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=LJNqYgt9+EkQuB9NNZOVvoJbSMyT9Vb0J5NzwhljRLA=;
-  b=q0H0B+FSadkzka2Eq54Ss01G1ryhNHWnXKA9UGaaeWPBhRAIlO2DAtqp
-   K4z+V6IeLJ/DZRcrtTozrgEEJyWUfZOk0Sfh3OypJ0zzUzcTVLOoeaOmo
-   MZNpUS4cgiV6Uz98duKTlgo/N/EoblQpu4qFjefFDI6TKJKKZ70m9Fw3w
-   k=;
-X-IronPort-AV: E=Sophos;i="5.93,367,1654560000"; 
-   d="scan'208";a="136675810"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-5c4a15b1.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2022 08:22:27 +0000
-Received: from EX13MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2c-5c4a15b1.us-west-2.amazon.com (Postfix) with ESMTPS id A219D44FBC;
-        Tue,  4 Oct 2022 08:22:22 +0000 (UTC)
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
- EX13MTAUWC001.ant.amazon.com (10.43.162.135) with Microsoft SMTP Server (TLS)
- id 15.0.1497.38; Tue, 4 Oct 2022 08:22:22 +0000
-Received: from [10.95.66.18] (10.43.160.124) by EX19D020UWC004.ant.amazon.com
- (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1118.12; Tue, 4 Oct
- 2022 08:22:16 +0000
-Message-ID: <f1a7e603-2e64-fd2a-1100-f2898060e3f7@amazon.com>
-Date:   Tue, 4 Oct 2022 10:22:14 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.3.0
-Subject: Re: [PATCH v2] x86/PCI: Prefer MMIO over PIO on all hypervisor
-Content-Language: en-US
-To:     Nadav Amit <namit@vmware.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-CC:     Ajay Kaher <akaher@vmware.com>, "x86@kernel.org" <x86@kernel.org>,
-        "hpa@zytor.com" <hpa@zytor.com>,
+        with ESMTP id S230073AbiJDIaT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Oct 2022 04:30:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42803193D9
+        for <kvm@vger.kernel.org>; Tue,  4 Oct 2022 01:30:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664872217;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kChJ5YXyR55NqzsspcQL6vhugqTTUyXdwpS+PG+Hins=;
+        b=PszIL02mdq/eU/SbGZCrrIQNuKzPhkbTgZGtE1+Z7mRokm9uxq9JdZnCibIb9ngOmd50/t
+        vykwGjJRbHtoVh7L3TMyl/UdtqmzDtIQgcyRyM2YQSG7S8RfT7xCN4T2uceFN0QrCMlb5f
+        RqVqbDsv/m+6FHRceBUwuL1dZmikODQ=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-152-SKRBxzBRNHmxsntBV8gcOQ-1; Tue, 04 Oct 2022 04:30:13 -0400
+X-MC-Unique: SKRBxzBRNHmxsntBV8gcOQ-1
+Received: by mail-ed1-f71.google.com with SMTP id c6-20020a05640227c600b004521382116dso10752358ede.22
+        for <kvm@vger.kernel.org>; Tue, 04 Oct 2022 01:30:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=kChJ5YXyR55NqzsspcQL6vhugqTTUyXdwpS+PG+Hins=;
+        b=kldDEflurs9XPeX4zifYoBEq/IXQOvuVx9+pzutpo4/4nZQJRduNytPbUS81h2SrOp
+         W80rOle7mzA6X4HceOKHBr/rjOOAwJ+aZ6lX6YDvbDZUWevzrJCOAs2eBwFA/yKayyO7
+         C/svOI3Lhvotx/33ojctBlxk8FAoVLp2Cum1JVeis9F+hrUMznME3z86UMCqKkW+uB63
+         t5BKoSk0CNg8a/xJeJw+DyTncHyEGalY21+bN9T2VSaEnx5lnV3a8RHoO/peLxiRlafJ
+         Ho7gumGrS7yAaSP5Rmb/a5c8kwIQltsOvNgOxOgdzbi13vU0ob8Ri5Fa5FuCGS/n4g+d
+         emqQ==
+X-Gm-Message-State: ACrzQf0XUy9QI5VzhJreANQ0eh0KNIcIq+a+4SNUiEwosgrYBm8IQs7Q
+        xKUdim3OyD0L+lLjQW0cAPTZLBph1nrd/Xjf7wjuGJfT3lTyqzXj7wTcCM5VcjA/nECBVf82yWu
+        ap5lFq7B40iXT
+X-Received: by 2002:a17:907:1626:b0:782:e490:4f4 with SMTP id hb38-20020a170907162600b00782e49004f4mr18347584ejc.464.1664872212798;
+        Tue, 04 Oct 2022 01:30:12 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4V1XegvfHQqtOdwuF9hkqqgOAv0Ct2ylqgG/E0UdTe0kkF9v3n5AapSW1/X/ZGX1Jj9DACkw==
+X-Received: by 2002:a17:907:1626:b0:782:e490:4f4 with SMTP id hb38-20020a170907162600b00782e49004f4mr18347564ejc.464.1664872212563;
+        Tue, 04 Oct 2022 01:30:12 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id by30-20020a0564021b1e00b004590d4e35cdsm1198745edb.54.2022.10.04.01.30.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Oct 2022 01:30:11 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Nadav Amit <namit@vmware.com>, Alexander Graf <graf@amazon.com>,
+        Ajay Kaher <akaher@vmware.com>
+Cc:     "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
         "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "rostedt@goodmis.org" <rostedt@goodmis.org>,
         Srivatsa Bhat <srivatsab@vmware.com>,
         "srivatsa@csail.mit.edu" <srivatsa@csail.mit.edu>,
         Alexey Makhalov <amakhalov@vmware.com>,
-        "Vasavi Sirnapalli" <vsirnapalli@vmware.com>,
+        Vasavi Sirnapalli <vsirnapalli@vmware.com>,
         "er.ajay.kaher@gmail.com" <er.ajay.kaher@gmail.com>,
         "willy@infradead.org" <willy@infradead.org>,
         "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
@@ -68,70 +78,65 @@ CC:     Ajay Kaher <akaher@vmware.com>, "x86@kernel.org" <x86@kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         "mingo@redhat.com" <mingo@redhat.com>,
         "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-References: <9FEC6622-780D-41E6-B7CA-8D39EDB2C093@vmware.com>
- <87zgf3pfd1.fsf@redhat.com> <B64FD502-E794-4E94-A267-D690476C57EE@vmware.com>
- <87tu4l9cfm.fsf@redhat.com> <04F550C5-786A-4B8E-9A88-EBFBD8872F16@vmware.com>
-From:   Alexander Graf <graf@amazon.com>
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>
+Subject: Re: [PATCH v2] x86/PCI: Prefer MMIO over PIO on all hypervisor
 In-Reply-To: <04F550C5-786A-4B8E-9A88-EBFBD8872F16@vmware.com>
-X-Originating-IP: [10.43.160.124]
-X-ClientProxiedBy: EX13D06UWC004.ant.amazon.com (10.43.162.97) To
- EX19D020UWC004.ant.amazon.com (10.13.138.149)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-6.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <9FEC6622-780D-41E6-B7CA-8D39EDB2C093@vmware.com>
+ <87zgf3pfd1.fsf@redhat.com>
+ <B64FD502-E794-4E94-A267-D690476C57EE@vmware.com>
+ <87tu4l9cfm.fsf@redhat.com>
+ <04F550C5-786A-4B8E-9A88-EBFBD8872F16@vmware.com>
+Date:   Tue, 04 Oct 2022 10:30:10 +0200
+Message-ID: <87lepw9ejx.fsf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SGV5IE5hZGF2LAoKT24gMDMuMTAuMjIgMTk6MzQsIE5hZGF2IEFtaXQgd3JvdGU6Cj4gT24gT2N0
-IDMsIDIwMjIsIGF0IDg6MDMgQU0sIFZpdGFseSBLdXpuZXRzb3YgPHZrdXpuZXRzQHJlZGhhdC5j
-b20+IHdyb3RlOgo+Cj4+IE5vdCBteSBidXQgcmF0aGVyIFBDSSBtYWludGFpbmVyJ3MgY2FsbCBi
-dXQgSU1ITyBkcm9wcGluZyAnY29uc3QnIGlzCj4+IGJldHRlciwgaW50cm9kdWNpbmcgYSBuZXcg
-Z2xvYmFsIHZhciBpcyBvdXIgJ2xhc3QgcmVzb3J0JyBhbmQgc2hvdWxkIGJlCj4+IGF2b2lkZWQg
-d2hlbmV2ZXIgcG9zc2libGUuIEFsdGVybmF0aXZlbHksIHlvdSBjYW4gYWRkIGEKPj4gcmF3X3Bj
-aV9leHRfb3BzX3ByZWZlcnJlZCgpIGZ1bmN0aW9uIGNoZWNraW5nIHNvbWV0aGluIHdpdGhpbiAn
-c3RydWN0Cj4+IGh5cGVydmlzb3JfeDg2JyBidXQgSSdtIHVuc3VyZSBpZiBpdCdzIGJldHRlci4K
-Pj4KPj4gQWxzbywgcGxlYXNlIGNoZWNrIEFsZXgnIHF1ZXN0aW9uL3N1Z2dlc3Rpb24uCj4gSGVy
-ZSBpcyBteSB0YWtlIChhbmQgQWpheSBrbm93cyBwcm9iYWJseSBtb3JlIHRoYW4gbWUpOgo+Cj4g
-TG9va2luZyBicmllZmx5IG9uIE1DRkcsIEkgZG8gbm90IHNlZSBhIGNsZWFuIHdheSBvZiB1c2lu
-ZyB0aGUgQUNQSSB0YWJsZS4KPiBUaGUgdHdvIG9wdGlvbnMgYXJlIGVpdGhlciB0byB1c2UgYSBy
-ZXNlcnZlZCBmaWVsZCAod2hpY2ggd2hvIGtub3dzLCBtaWdodAo+IGJlIHVzZWQgb25lIGRheSkg
-b3Igc29tZSBPRU0gSUQuIEkgYW0gYWxzbyBub3QgZmFtaWxpYXIgd2l0aAo+IFBDSV9DT01NQU5E
-Lk1FTU9SWT0wLCBzbyBBamF5IGNhbiBob3BlZnVsbHkgZ2l2ZSBzb21lIGFuc3dlciBhYm91dCB0
-aGF0Lgo+Cj4gQW55aG93LCBJIHVuZGVyc3RhbmQgKGFsdGhvdWdoIG5vdCByZWxhdGUpIHRvIHRo
-ZSBvYmplY3Rpb24gZm9yIGEgbmV3IGdsb2JhbAo+IHZhcmlhYmxlLiBIb3cgYWJvdXQgZXhwbGlj
-aXRseSBjYWxsaW5nIHRoaXMgaGFyZHdhcmUgYnVnIGEg4oCcYnVn4oCdIGFuZCB1c2luZwo+IHRo
-ZSBwcm9wZXIgaW5mcmFzdHJ1Y3R1cmU/IENhbGxpbmcgaXQgZXhwbGljaXRseSBhIGJ1ZyBtYXkg
-ZXZlbiBwdXNoIHdob2V2ZXIKPiBjYW4gdG8gcmVzb2x2ZSBpdC4KCgpJIGFtIGEgbG90IG1vcmUg
-Y29uY2VybmVkIHdpdGggaG93IHdlIHByb3BhZ2F0ZSBpdCBleHRlcm5hbGx5IHRoYW4gCndpdGhp
-biBMaW51eC4gSWYgd2UgaGFyZCBjb2RlIHRoYXQgYWxsIExpbnV4IGtlcm5lbHMgNi4yKyB0aGF0
-IGFyZSAKcnVubmluZyBpbiBWTXdhcmUgcHJlZmVyIEVDQU0gb3ZlciBQSU8sIHdlIGxvY2sgb3Vy
-c2VsdmVzIGludG8gdGhhdCAKc3RhbmNlIGZvciBiZXR0ZXIgb3Igd29yc2UsIHdoaWNoIG1lYW5z
-OgoKKiBBbGwgcGFzdCBhbmQgZnV0dXJlIHZlcnNpb25zIG9mIGFueSBWTXdhcmUgaHlwZXJ2aXNv
-ciBwcm9kdWN0IGhhdmUgdG8gCmFsd2F5cyBhbGxvdyBFQ0FNIGFjY2VzcyBmb3IgYW55IFBDSWUg
-Y29uZmlnIHNwYWNlIHdyaXRlCiogTm8gb3RoZXIgaHlwZXJ2aXNvciBiZW5lZml0cyBmcm9tIGFu
-eSBvZiB0aGlzIHdpdGhvdXQgdXBzdHJlYW0gY29kZSBjaGFuZ2UKKiBObyByZWFsIGhhcmR3YXJl
-IHBsYXRmb3JtIGJlbmVmaXRzIGZyb20gdGhpcyB3aXRob3V0IHVwc3RyZWFtIGNvZGUgY2hhbmdl
-CgpCeSBtb3ZpbmcgaXQgaW50byBNQ0ZHLCB3ZSBjYW4gY3JlYXRlIGEgcGF0aCBmb3IgdGhlIG91
-dHNpZGUgZW52aXJvbm1lbnQgCnRvIHRlbGwgdGhlIE9TIHdoZXRoZXIgaXQncyBzYWZlIHRvIHVz
-ZSBFQ0FNIGFsd2F5cy4gVGhpcyBvYnZpb3VzbHkgCmRvZXNuJ3Qgd29yayB3aXRoIE1DRkcgYXMg
-aXQgc3RhbmRzIHRvZGF5LCB3ZSdkIGhhdmUgdG8gcHJvcG9zZSBhbiBNQ0ZHIApzcGVjIGNoYW5n
-ZSB0byB0aGUgUENJIFNJRydzICJQQ0kgRmlybXdhcmUgU3BlY2lmaWNhdGlvbiIgdG8gYWRkIHRo
-ZSAKcmVzcGVjdGl2ZSBmaWVsZC4gRnV0dXJlIFZNd2FyZSB2ZXJzaW9ucyBjb3VsZCB0aGVuIGFs
-d2F5cyBleHBvc2UgdGhlIApmbGFnIC0gYW5kIGlmIHlvdSBmaW5kIGl0IGJyb2tlbiwgcmVtb3Zl
-IGl0IGFnYWluLgoKUHV0dGluZyBhbGwgb2YgdGhlIGxvZ2ljIG9uIHdoaWNoIHN5c3RlbSBwb3Rl
-bnRpYWxseSBwcmVmZXJzIEVDQU0gb3ZlciAKUElPIGNvbmZpZyBzcGFjZSBhY2Nlc3MgaW50byBM
-aW51eCBpcyBqdXN0IGEgYmlnIGhhY2sgdGhhdCB3ZSBzaG91bGQgCmF2b2lkIGFzIG11Y2ggYXMg
-cG9zc2libGUuCgoKQWxleAoKCgoKQW1hem9uIERldmVsb3BtZW50IENlbnRlciBHZXJtYW55IEdt
-YkgKS3JhdXNlbnN0ci4gMzgKMTAxMTcgQmVybGluCkdlc2NoYWVmdHNmdWVocnVuZzogQ2hyaXN0
-aWFuIFNjaGxhZWdlciwgSm9uYXRoYW4gV2Vpc3MKRWluZ2V0cmFnZW4gYW0gQW10c2dlcmljaHQg
-Q2hhcmxvdHRlbmJ1cmcgdW50ZXIgSFJCIDE0OTE3MyBCClNpdHo6IEJlcmxpbgpVc3QtSUQ6IERF
-IDI4OSAyMzcgODc5CgoK
+Nadav Amit <namit@vmware.com> writes:
+
+> On Oct 3, 2022, at 8:03 AM, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+>> Not my but rather PCI maintainer's call but IMHO dropping 'const' is
+>> better, introducing a new global var is our 'last resort' and should be
+>> avoided whenever possible. Alternatively, you can add a
+>> raw_pci_ext_ops_preferred() function checking somethin within 'struct
+>> hypervisor_x86' but I'm unsure if it's better.
+>>=20
+>> Also, please check Alex' question/suggestion.
+>
+> Here is my take (and Ajay knows probably more than me):
+>
+> Looking briefly on MCFG, I do not see a clean way of using the ACPI table.
+> The two options are either to use a reserved field (which who knows, might
+> be used one day) or some OEM ID. I am also not familiar with
+> PCI_COMMAND.MEMORY=3D0, so Ajay can hopefully give some answer about that.
+>
+> Anyhow, I understand (although not relate) to the objection for a new glo=
+bal
+> variable. How about explicitly calling this hardware bug a =E2=80=9Cbug=
+=E2=80=9D and using
+> the proper infrastructure? Calling it explicitly a bug may even push whoe=
+ver
+> can to resolve it.
+>
+> IOW, how about doing something along the lines of (not tested):
+>
+
+Works for me. Going forward, the intention shoud be to also clear the
+bug on other x86 hypervisors, e.g. we test modern Hyper-V versions and
+if MMIO works well we clear it, we test modern QEMU/KVM setups and if
+MMIO works introduce a feature bit somewhere and also clear the bug in
+the guest when the bit is set.
+
+--=20
+Vitaly
 
