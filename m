@@ -2,65 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CDCC65F4820
-	for <lists+kvm@lfdr.de>; Tue,  4 Oct 2022 19:16:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D3635F484D
+	for <lists+kvm@lfdr.de>; Tue,  4 Oct 2022 19:22:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230094AbiJDRQJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Oct 2022 13:16:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55024 "EHLO
+        id S229728AbiJDRWR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Oct 2022 13:22:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229816AbiJDRQH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Oct 2022 13:16:07 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29BCF24BCF;
-        Tue,  4 Oct 2022 10:16:06 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 294Ff9pq032296;
-        Tue, 4 Oct 2022 17:15:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=eyLOLdtglKinuOC3hUyHKn1P8dBIYjzpdlRkV0aZ634=;
- b=crzqZhOVPJsKuXvBzcTaAyYmO7uw9eqEQTD7fB8PDsGaRzLj15rINJHJo1oG4btyqUUH
- Fs35nDTFZPMirZp1naTSug/t4UDSzbCfq8z+ybzh4OcYa80plY3y6Ovs+Q/6UUWsDVYj
- hcOjRJ+YKk1POkUcL10OIMv7ozDYwywy+pBUvCASIZThamz+iGa4SjVlu1YQr8u3svTS
- JmnvB9T+4L2pcvDmxP+x3Is9yCfJABN3EVGY5vwaeZHnZHGf59VuZJM7RpKrTXsyMkQ3
- r7D3Qa9zY5HnlZWsdPHyKmfhBXxcobGT/6miJpXZYDLyAGsIRBymmJR1eVUQOcDrYrSI yA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k0gu2qrmt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 04 Oct 2022 17:15:58 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 294GjEL9004331;
-        Tue, 4 Oct 2022 17:15:58 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k0gu2qrm4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 04 Oct 2022 17:15:57 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 294H67r8013309;
-        Tue, 4 Oct 2022 17:15:56 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3jxd694g48-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 04 Oct 2022 17:15:55 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 294HGMWh49152320
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 4 Oct 2022 17:16:22 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C2F2652050;
-        Tue,  4 Oct 2022 17:15:52 +0000 (GMT)
-Received: from [9.171.7.248] (unknown [9.171.7.248])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 2FC6A5204E;
-        Tue,  4 Oct 2022 17:15:52 +0000 (GMT)
-Message-ID: <b11044c1-af26-4442-25a6-655a9872e956@linux.ibm.com>
-Date:   Tue, 4 Oct 2022 19:15:51 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [PATCH v2] vfio: Follow a strict lifetime for struct iommu_group
-To:     Jason Gunthorpe <jgg@nvidia.com>
+        with ESMTP id S229702AbiJDRWO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Oct 2022 13:22:14 -0400
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2065.outbound.protection.outlook.com [40.107.102.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A698F1E3CF;
+        Tue,  4 Oct 2022 10:22:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ECMsi3mAhisUeHVaETDtXrBPZtGIisIecIiPFSUtZNLzzShqFEbp1hiSThzKAO2rVuKX4X5qnQaf2lLVaDNLIo2j0sWoAbMHpEkQFC8CH7p6MrECruGLoAmz2f27Ny0ks76W0rS5JV8YLzC2uQmkceyD2v49mveKmSL6gqW5KzWtBp4ys1332vl/BvXTpiJkhCjyrms8y5wp2ffT2XJejEt+baE4Xj110pzCpdb6ibUJrg1WXktnQZ+BpE1OrY2zIz6fWhRMT3fGbGjC3YH97XXLjJYareIVzOolqA5BdmZDuoXGjTpUa5xZdZYo3TZMdzJJN7m+FvmL6YQM3ydc8w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=p0ki7CNWI81NeXwkQsLs/6J7GorbnlB1EGHGDNc9p68=;
+ b=m+WLYbDIK6CEt1BkUn08Mt6hb6H5h3dyqsybGfHg8PGQIyIW54uEqhCq1fM6abQQdM/XZNL9DDGwbT3nBzqW3QPnUNU+WZHvqfJ4qR8oSoWuL89Mm6nylL25vhitg9+9mCF10eDv6eRfubUIevwH23H2+48vJ9N+z5Pr6+KEj5GsYf37zPGgIyYI7lopS7A442B4gPKP6Cd6WgySdxWRnJEslmt+oflY7lk+nSzYTVWRtDKpWi1tWEfSOV+8954TxOFZznHYxgb2d5yIk9+SclI0pROarYoM1pig7OGlZtAJM/+J7A+42+Dz7fQ8OIrr+ptx6j9epMBMOjPSFOVd9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=p0ki7CNWI81NeXwkQsLs/6J7GorbnlB1EGHGDNc9p68=;
+ b=NgzSojPpZxhUXueqetztT+oMSC6NXPlqL4UBRCJ2r9zv7yEwQDYUQRA/qZnhNjUSlkqH1T/9CtBTKUMJp8TZF4lxd04ExfpW/veFuraumsfCV3TMogvWwvTuJV0Ur1vZMG4Q6ae54s2WgmPXy1m3AAR2rYgCHufGVqwcAvpVmX8RcKoP/JHk8uL7YeM39FlryKVrCaYv7hi0Pckc7PIygz4cRI3EDGc1YbLfQZMy/IuTPdXqbEFi7FYq1+WMlc1gYp5lARryWUUu6aRY/ewugTiCYaSKnuYQSJgfjcshskEgw/9ST+4z/4IhHnocP8g3YxBlFZax97snEdchOFJiyA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com (2603:10b6:208:1d5::15)
+ by CH0PR12MB5025.namprd12.prod.outlook.com (2603:10b6:610:d5::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.24; Tue, 4 Oct
+ 2022 17:22:09 +0000
+Received: from MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::8557:6d56:cba9:dbba]) by MN2PR12MB4192.namprd12.prod.outlook.com
+ ([fe80::8557:6d56:cba9:dbba%5]) with mapi id 15.20.5676.031; Tue, 4 Oct 2022
+ 17:22:09 +0000
+Date:   Tue, 4 Oct 2022 14:22:07 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>
 Cc:     Alex Williamson <alex.williamson@redhat.com>,
         Matthew Rosato <mjrosato@linux.ibm.com>,
         Tony Krowiak <akrowiak@linux.ibm.com>,
@@ -71,6 +53,8 @@ Cc:     Alex Williamson <alex.williamson@redhat.com>,
         Qian Cai <cai@lca.pw>, Joerg Roedel <jroedel@suse.de>,
         Marek Szyprowski <m.szyprowski@samsung.com>,
         linux-s390 <linux-s390@vger.kernel.org>
+Subject: Re: [PATCH v2] vfio: Follow a strict lifetime for struct iommu_group
+Message-ID: <Yzxrv4M5sQWcusLp@nvidia.com>
 References: <0-v2-a3c5f4429e2a+55-iommu_group_lifetime_jgg@nvidia.com>
  <4cb6e49e-554e-57b3-e2d3-bc911d99083f@linux.ibm.com>
  <20220927140541.6f727b01.alex.williamson@redhat.com>
@@ -78,320 +62,104 @@ References: <0-v2-a3c5f4429e2a+55-iommu_group_lifetime_jgg@nvidia.com>
  <YzxT6Suu+272gDvP@nvidia.com>
  <1aebfa84-8310-5dff-1862-3d143878d9dd@linux.ibm.com>
  <YzxfK/e14Bx9yNyo@nvidia.com>
-Content-Language: en-US
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <YzxfK/e14Bx9yNyo@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: B9X50V8pf7oUnpT32xs6rMyzxz00oK_o
-X-Proofpoint-GUID: XflaMLkUr2KoPnl3W6rGUE4Rgz_WuDfI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-10-04_08,2022-09-29_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- lowpriorityscore=0 impostorscore=0 mlxscore=0 malwarescore=0 clxscore=1015
- adultscore=0 priorityscore=1501 suspectscore=0 phishscore=0 bulkscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210040111
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+ <b11044c1-af26-4442-25a6-655a9872e956@linux.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b11044c1-af26-4442-25a6-655a9872e956@linux.ibm.com>
+X-ClientProxiedBy: BLAPR03CA0088.namprd03.prod.outlook.com
+ (2603:10b6:208:329::33) To MN2PR12MB4192.namprd12.prod.outlook.com
+ (2603:10b6:208:1d5::15)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4192:EE_|CH0PR12MB5025:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1a708e43-6213-4150-7fd1-08daa62cf7df
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 84AEwGsKNGff9WPYdgb/CqLAruPBMAf0oe31KR/JqDGU9R6VS/7JgzRhGRoTdd6JITGJrYZyRVQeXXy11on/OyGOS0s4CnGY8VBWI4jUd+Dh0M8lapjRdXs0bJmZI8J7YpOp+mBfJdxczBE9dTZN8v03RKTej/XM2rl5qtVKriYWzfWijlFZHYTk8+fsIfWgyVCv7qoLJNNhaMrREY8OJZERXC8WHqs14dz/s3Ow1BkNBh5rMcV8Y/ysmt4oZJWgO1SfwsH3Q6vtCAeySClHYBt3lR7xt9QlmFJPrOXdu9LOja+pLc3XYI0f9d4x0JPhgBdcKdcZ4tzcBK1+tTHtlE7EwpysHqspctfruMeEb8SWJMXS6iCMv3O5ZrYDfXkKlzfEDGoSbeJmRpLwrHZMvxpXAvlH4YQkP7tVgxlIuzSO9lD5PKVp3PKl8YSWBm88g7IliugSdHt4DNMnJjQVQUr6Kl+CNQheIvJAZDUj/Up6doT74ExLXr0kgYpl2lhFW+cQObXDON+G1dlOKEwBCQyShrqA1s5FFfb4MHuwp4uZ4bCXYnvLrnCspiazsKqCRFGAe5kkDhLzD0T2GboYrpvPo2baROhOwEjPq5NFjwUURFnDkb7Bn2RvnXUm9x0ag0ABsB43S9f6ZJEV23idsLj05PfGJLa3Qr7QteWFdANk4Mnr1ZjFLxqzIZRFltSIjT2UVSlz9zYZxPV/hO4VKw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN2PR12MB4192.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(396003)(136003)(366004)(376002)(39860400002)(451199015)(26005)(6512007)(6916009)(6506007)(54906003)(41300700001)(66556008)(66946007)(8936002)(66476007)(83380400001)(4326008)(86362001)(8676002)(186003)(316002)(2616005)(36756003)(6486002)(5660300002)(2906002)(478600001)(38100700002)(7416002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?97Jy/mlnf8SW0cn5215Qb/qSWWIGUSDS7VBiejndW3c6TDriXwaDxTRpgLwn?=
+ =?us-ascii?Q?SSRSdhlPX9mWCwgRcab5WGb6gBDjI53YCo4ngokm7MovX/WyMvQt3cy0QTid?=
+ =?us-ascii?Q?muMB6awjC1DdQFxfXRmAjjyDbg7Z4TUjM/g2x8dJL8dl8OWnKbw9gXT72OkX?=
+ =?us-ascii?Q?jPCxFlEFr9N5arpG+nVyouMyd7SYHXIUuJKUoSwPxEwyPSnEQaDdLVQ3xm05?=
+ =?us-ascii?Q?qCbVfJRX/s9cpyhoCVOU2b4KrO+3G6kG/AuRPlelArqzTGrMPOj4e78wE+PL?=
+ =?us-ascii?Q?FKy88SS6JAdnUptVJVbuY7BbrzNmmcuSlJbNZzXcLIrvPtskjStSiK0mis9w?=
+ =?us-ascii?Q?Pp96zTgassSPxnYaSwfG8IB19Fz76G/FP6jyz9q9ZCCel7pyA6evym7k+tqy?=
+ =?us-ascii?Q?2yQZp9wEsypV2U0gHOFjVF1Ianh7Sktn3yfk1iWJzKRfG9sgAsKB/+15FaTR?=
+ =?us-ascii?Q?xadY7G42HV/pLY7jxDS4J/zGyG+wULKoHZ8XRRKwCBYeuZHn3W7LBiPoppIz?=
+ =?us-ascii?Q?AMjvq9d1yRKD9cB2HS31R4vxqoyzaRJkq4oXpcVbn9tWugWg5l/hhT7RRkU+?=
+ =?us-ascii?Q?pkc9snGoqULPyort79keF1lKujNUVOEsU7Latw1VB8j9dytpGvPIkyogGm9v?=
+ =?us-ascii?Q?sClJYcl2dhcb08qghnpP70RpKiDacdUHXYS3jHp+XpY2jYWlsHDMZoRM7ETw?=
+ =?us-ascii?Q?UkrgFLm8giIlPN8cN39CngHous5ONUcoAABYuUteu+oMDf8hnBD8dgu1f8T7?=
+ =?us-ascii?Q?AfrfZgpEJRIVHE8PtoY9Sm/a5/BDk0mj7xa5kGMc+vvThT6YOpofmJ/QysoG?=
+ =?us-ascii?Q?e83oxfdF2YIbr7g63k7kWnVm5h+138A0u/pdFGfq5HlSBJ0R5LJ87oDPj/go?=
+ =?us-ascii?Q?d8PipXMwxnV7yOqFCODR5RqheV1d97KrstMwqV5r591329RCdB9Jppc3jGtC?=
+ =?us-ascii?Q?T+5NGDWSR0WDjhxnCBbGL8h8wm0dV3P/YT+bcbFUk3tRX34mFJ9+ZmxxfMT6?=
+ =?us-ascii?Q?ybDG12Gt+YR1RxEH9af1TnsrwF179gp4dSUDIlol/dHNBH6/ufMSWrqt++mF?=
+ =?us-ascii?Q?rJcVXbnVi4nRRx/4YNs9Tvdomz2Afiro2UDhXoDMvcKCxKea3DOpejqW+PkF?=
+ =?us-ascii?Q?y2HXbbcGiV78TblwbBA+E1yFFpzcU9/P/qgGzMz8H1DRpx/n7kU+viqSTrru?=
+ =?us-ascii?Q?eZI5JbvNNN8g73nBpbAV+4L4iipgYWWwStuP3gCdL6xXCBGQzW5ti6JJD2fe?=
+ =?us-ascii?Q?gfadBERet9hAqIchohU/T1Vq0/BJA2V7QQNp5mvfU70Ls8Urn/D1m+z7dT+Y?=
+ =?us-ascii?Q?wYX1rX9G0G+phBMkYPMMtwQSlVfGK05OIu6mKGwueyhZksV2Gfnn/pfP/qhv?=
+ =?us-ascii?Q?BYyqVTSygtOEKz9B5S8diWdeGysgd5Xtg7/PI6kthg8axu8t3VHDJyorBVcv?=
+ =?us-ascii?Q?LfzkPUmr/YilyO/j8lHKfffHQdwgLP6/HfO/Z7k4nQxmLfGx3z+QNZ2/xNdB?=
+ =?us-ascii?Q?e15gLj5BVpc5+sU4K081SjZbxeaJ/wUe9ML2+6i04nk4TFPodlry9LAa2taO?=
+ =?us-ascii?Q?tlHsyX7aiR7RAiJe1W0=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1a708e43-6213-4150-7fd1-08daa62cf7df
+X-MS-Exchange-CrossTenant-AuthSource: MN2PR12MB4192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Oct 2022 17:22:09.5313
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /opM8U9bRyCUWDO+m1GXUk2R6kSs3JXOfZtkGC3JJtKuWpZ0XtPGnFnz+6ZVSgIs
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5025
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Oct 04, 2022 at 07:15:51PM +0200, Christian Borntraeger wrote:
+> 
+> Am 04.10.22 um 18:28 schrieb Jason Gunthorpe:
+> > On Tue, Oct 04, 2022 at 05:44:53PM +0200, Christian Borntraeger wrote:
+> > 
+> > > > Does some userspace have the group FD open when it stucks like this,
+> > > > eg what does fuser say?
+> > > 
+> > > /proc/<virtnodedevd>/fd
+> > > 51480 0 dr-x------. 2 root root  0  4. Okt 17:16 .
+> > > 43593 0 dr-xr-xr-x. 9 root root  0  4. Okt 17:16 ..
+> > > 65252 0 lr-x------. 1 root root 64  4. Okt 17:42 0 -> /dev/null
+> > > 65253 0 lrwx------. 1 root root 64  4. Okt 17:42 1 -> 'socket:[51479]'
+> > > 65261 0 lrwx------. 1 root root 64  4. Okt 17:42 10 -> 'anon_inode:[eventfd]'
+> > > 65262 0 lrwx------. 1 root root 64  4. Okt 17:42 11 -> 'socket:[51485]'
+> > > 65263 0 lrwx------. 1 root root 64  4. Okt 17:42 12 -> 'socket:[51487]'
+> > > 65264 0 lrwx------. 1 root root 64  4. Okt 17:42 13 -> 'socket:[51486]'
+> > > 65265 0 lrwx------. 1 root root 64  4. Okt 17:42 14 -> 'anon_inode:[eventfd]'
+> > > 65266 0 lrwx------. 1 root root 64  4. Okt 17:42 15 -> 'socket:[60421]'
+> > > 65267 0 lrwx------. 1 root root 64  4. Okt 17:42 16 -> 'anon_inode:[eventfd]'
+> > > 65268 0 lrwx------. 1 root root 64  4. Okt 17:42 17 -> 'socket:[28008]'
+> > > 65269 0 l-wx------. 1 root root 64  4. Okt 17:42 18 -> /run/libvirt/nodedev/driver.pid
+> > > 65270 0 lrwx------. 1 root root 64  4. Okt 17:42 19 -> 'socket:[28818]'
+> > > 65254 0 lrwx------. 1 root root 64  4. Okt 17:42 2 -> 'socket:[51479]'
+> > > 65271 0 lr-x------. 1 root root 64  4. Okt 17:42 20 -> '/dev/vfio/3 (deleted)'
+> > 
+> > Seems like a userspace bug to keep the group FD open after the /dev/
+> > file has been deleted :|
+> > 
+> > What do you think about this?
+> 
+> On top of which tree is this?
 
-Am 04.10.22 um 18:28 schrieb Jason Gunthorpe:
-> On Tue, Oct 04, 2022 at 05:44:53PM +0200, Christian Borntraeger wrote:
-> 
->>> Does some userspace have the group FD open when it stucks like this,
->>> eg what does fuser say?
->>
->> /proc/<virtnodedevd>/fd
->> 51480 0 dr-x------. 2 root root  0  4. Okt 17:16 .
->> 43593 0 dr-xr-xr-x. 9 root root  0  4. Okt 17:16 ..
->> 65252 0 lr-x------. 1 root root 64  4. Okt 17:42 0 -> /dev/null
->> 65253 0 lrwx------. 1 root root 64  4. Okt 17:42 1 -> 'socket:[51479]'
->> 65261 0 lrwx------. 1 root root 64  4. Okt 17:42 10 -> 'anon_inode:[eventfd]'
->> 65262 0 lrwx------. 1 root root 64  4. Okt 17:42 11 -> 'socket:[51485]'
->> 65263 0 lrwx------. 1 root root 64  4. Okt 17:42 12 -> 'socket:[51487]'
->> 65264 0 lrwx------. 1 root root 64  4. Okt 17:42 13 -> 'socket:[51486]'
->> 65265 0 lrwx------. 1 root root 64  4. Okt 17:42 14 -> 'anon_inode:[eventfd]'
->> 65266 0 lrwx------. 1 root root 64  4. Okt 17:42 15 -> 'socket:[60421]'
->> 65267 0 lrwx------. 1 root root 64  4. Okt 17:42 16 -> 'anon_inode:[eventfd]'
->> 65268 0 lrwx------. 1 root root 64  4. Okt 17:42 17 -> 'socket:[28008]'
->> 65269 0 l-wx------. 1 root root 64  4. Okt 17:42 18 -> /run/libvirt/nodedev/driver.pid
->> 65270 0 lrwx------. 1 root root 64  4. Okt 17:42 19 -> 'socket:[28818]'
->> 65254 0 lrwx------. 1 root root 64  4. Okt 17:42 2 -> 'socket:[51479]'
->> 65271 0 lr-x------. 1 root root 64  4. Okt 17:42 20 -> '/dev/vfio/3 (deleted)'
-> 
-> Seems like a userspace bug to keep the group FD open after the /dev/
-> file has been deleted :|
-> 
-> What do you think about this?
+It should apply on vfio-next
 
-On top of which tree is this?
-
-> 
-> commit a54a852b1484b1605917a8f4d80691db333b25ed
-> Author: Jason Gunthorpe <jgg@ziepe.ca>
-> Date:   Tue Oct 4 13:14:37 2022 -0300
-> 
->      vfio: Make the group FD disassociate from the iommu_group
->      
->      Allow the vfio_group struct to exist with a NULL iommu_group pointer. When
->      the pointer is NULL the vfio_group users promise not to touch the
->      iommu_group. This allows a driver to be hot unplugged while userspace is
->      keeping the group FD open.
->      
->      SPAPR mode is excluded from this behavior because of how it wrongly hacks
->      part of its iommu interface through KVM. Due to this we loose control over
->      what it is doing and cannot revoke the iommu_group usage in the IOMMU
->      layer via vfio_group_detach_container().
->      
->      Thus, for SPAPR the group FDs must still be closed before a device can be
->      hot unplugged.
->      
->      This fixes a userspace regression where we learned that virtnodedevd
->      leaves a group FD open even though the /dev/ node for it has been deleted
->      and all the drivers for it unplugged.
->      
->      Fixes: ca5f21b25749 ("vfio: Follow a strict lifetime for struct iommu_group")
->      Reported-by: Christian Borntraeger <borntraeger@linux.ibm.com>
->      Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index 59a28251bb0b97..badc9d828cac20 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -1313,7 +1313,7 @@ static int vfio_pci_ioctl_pci_hot_reset(struct vfio_pci_core_device *vdev,
->   		}
->   
->   		/* Ensure the FD is a vfio group FD.*/
-> -		if (!vfio_file_iommu_group(file)) {
-> +		if (!vfio_file_is_group(file)) {
->   			fput(file);
->   			ret = -EINVAL;
->   			break;
-> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-> index 4d2de02f2ced6e..4e10a281420e66 100644
-> --- a/drivers/vfio/vfio.h
-> +++ b/drivers/vfio/vfio.h
-> @@ -59,6 +59,7 @@ struct vfio_group {
->   	struct mutex			group_lock;
->   	struct kvm			*kvm;
->   	struct file			*opened_file;
-> +	bool				preserve_iommu_group;
->   	struct swait_queue_head		opened_file_wait;
->   	struct blocking_notifier_head	notifier;
->   };
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index 9b1e5fd5f7b73c..e725cf38886c09 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -133,6 +133,10 @@ __vfio_group_get_from_iommu(struct iommu_group *iommu_group)
->   {
->   	struct vfio_group *group;
->   
-> +	/*
-> +	 * group->iommu_group from the vfio.group_list cannot be NULL
-> +	 * under the vfio.group_lock.
-> +	 */
->   	list_for_each_entry(group, &vfio.group_list, vfio_next) {
->   		if (group->iommu_group == iommu_group) {
->   			refcount_inc(&group->drivers);
-> @@ -159,7 +163,7 @@ static void vfio_group_release(struct device *dev)
->   
->   	mutex_destroy(&group->device_lock);
->   	mutex_destroy(&group->group_lock);
-> -	iommu_group_put(group->iommu_group);
-> +	WARN_ON(group->iommu_group);
->   	ida_free(&vfio.group_ida, MINOR(group->dev.devt));
->   	kfree(group);
->   }
-> @@ -248,6 +252,7 @@ static struct vfio_group *vfio_create_group(struct iommu_group *iommu_group,
->   static void vfio_device_remove_group(struct vfio_device *device)
->   {
->   	struct vfio_group *group = device->group;
-> +	struct iommu_group *iommu_group;
->   
->   	if (group->type == VFIO_NO_IOMMU || group->type == VFIO_EMULATED_IOMMU)
->   		iommu_group_remove_device(device->dev);
-> @@ -266,12 +271,25 @@ static void vfio_device_remove_group(struct vfio_device *device)
->   	cdev_device_del(&group->cdev, &group->dev);
->   
->   	/*
-> -	 * Before we allow the last driver in the group to be unplugged the
-> -	 * group must be sanitized so nothing else is or can reference it. This
-> -	 * is because the group->iommu_group pointer should only be used so long
-> -	 * as a device driver is attached to a device in the group.
-> +	 * Revoke all users of group->iommu_group. At this point we know there
-> +	 * are no devices active because we are unplugging the last one. Setting
-> +	 * iommu_group to NULL blocks all new users.
->   	 */
-> -	while (group->opened_file) {
-> +	WARN_ON(group->notifier.head);
-> +	if (group->container)
-> +		vfio_group_detach_container(group);
-> +	iommu_group = group->iommu_group;
-> +	group->iommu_group = NULL;
-> +
-> +	/*
-> +	 * Normally we can set the iommu_group to NULL above and that will
-> +	 * prevent any users from touching it. However, the SPAPR kvm path takes
-> +	 * a reference to the iommu_group and keeps using it in arch code out
-> +	 * side our control. So if this path is triggred we have no choice but
-> +	 * to wait for the group FD to be closed to be sure everyone has stopped
-> +	 * touching the group.
-> +	 */
-> +	while (group->preserve_iommu_group && group->opened_file) {
->   		mutex_unlock(&vfio.group_lock);
->   		swait_event_idle_exclusive(group->opened_file_wait,
->   					   !group->opened_file);
-> @@ -288,8 +306,8 @@ static void vfio_device_remove_group(struct vfio_device *device)
->   	WARN_ON(!list_empty(&group->device_list));
->   	WARN_ON(group->container || group->container_users);
->   	WARN_ON(group->notifier.head);
-> -	group->iommu_group = NULL;
->   
-> +	iommu_group_put(iommu_group);
->   	put_device(&group->dev);
->   }
->   
-> @@ -531,6 +549,10 @@ static int __vfio_register_dev(struct vfio_device *device,
->   
->   	existing_device = vfio_group_get_device(group, device->dev);
->   	if (existing_device) {
-> +		/*
-> +		 * group->iommu_group is non-NULL because we hold the drivers
-> +		 * refcount.
-> +		 */
->   		dev_WARN(device->dev, "Device already exists on group %d\n",
->   			 iommu_group_id(group->iommu_group));
->   		vfio_device_put_registration(existing_device);
-> @@ -702,6 +724,11 @@ static int vfio_group_ioctl_set_container(struct vfio_group *group,
->   		ret = -EINVAL;
->   		goto out_unlock;
->   	}
-> +	if (!group->iommu_group) {
-> +		ret = -ENODEV;
-> +		goto out_unlock;
-> +	}
-> +
->   	container = vfio_container_from_file(f.file);
->   	ret = -EINVAL;
->   	if (container) {
-> @@ -862,6 +889,11 @@ static int vfio_group_ioctl_get_status(struct vfio_group *group,
->   	status.flags = 0;
->   
->   	mutex_lock(&group->group_lock);
-> +	if (!group->iommu_group) {
-> +		mutex_unlock(&group->group_lock);
-> +		return -ENODEV;
-> +	}
-> +
->   	if (group->container)
->   		status.flags |= VFIO_GROUP_FLAGS_CONTAINER_SET |
->   				VFIO_GROUP_FLAGS_VIABLE;
-> @@ -938,13 +970,6 @@ static int vfio_group_fops_release(struct inode *inode, struct file *filep)
->   	filep->private_data = NULL;
->   
->   	mutex_lock(&group->group_lock);
-> -	/*
-> -	 * Device FDs hold a group file reference, therefore the group release
-> -	 * is only called when there are no open devices.
-> -	 */
-> -	WARN_ON(group->notifier.head);
-> -	if (group->container)
-> -		vfio_group_detach_container(group);
->   	group->opened_file = NULL;
->   	mutex_unlock(&group->group_lock);
->   	swake_up_one(&group->opened_file_wait);
-> @@ -1553,17 +1578,34 @@ static const struct file_operations vfio_device_fops = {
->    * @file: VFIO group file
->    *
->    * The returned iommu_group is valid as long as a ref is held on the file.
-> + * This function is deprecated, only the SPAPR path in kvm should call it.
->    */
->   struct iommu_group *vfio_file_iommu_group(struct file *file)
->   {
->   	struct vfio_group *group = file->private_data;
-> +	struct iommu_group *iommu_group = NULL;
-> +
-> +	if (!IS_ENABLED(CONFIG_SPAPR_TCE_IOMMU))
-> +		return NULL;
->   
->   	if (file->f_op != &vfio_group_fops)
->   		return NULL;
-> -	return group->iommu_group;
-> +
-> +	mutex_lock(&group->group_lock);
-> +	if (group->iommu_group) {
-> +		iommu_group = group->iommu_group;
-> +		group->preserve_iommu_group = true;
-> +	}
-> +	mutex_unlock(&group->group_lock);
-> +	return iommu_group;
->   }
->   EXPORT_SYMBOL_GPL(vfio_file_iommu_group);
->   
-> +bool vfio_file_is_group(struct file *file)
-> +{
-> +	return (file->f_op == &vfio_group_fops;
-> +}
-> +
->   /**
->    * vfio_file_enforced_coherent - True if the DMA associated with the VFIO file
->    *        is always CPU cache coherent
-> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> index 73bcb92179a224..bd9faaab85de18 100644
-> --- a/include/linux/vfio.h
-> +++ b/include/linux/vfio.h
-> @@ -199,6 +199,7 @@ int vfio_mig_get_next_state(struct vfio_device *device,
->    * External user API
->    */
->   struct iommu_group *vfio_file_iommu_group(struct file *file);
-> +bool vfio_file_is_group(struct file *file);
->   bool vfio_file_enforced_coherent(struct file *file);
->   void vfio_file_set_kvm(struct file *file, struct kvm *kvm);
->   bool vfio_file_has_dev(struct file *file, struct vfio_device *device);
-> diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
-> index ce1b01d02c5197..6ecd3aca047375 100644
-> --- a/virt/kvm/vfio.c
-> +++ b/virt/kvm/vfio.c
-> @@ -77,6 +77,23 @@ static struct iommu_group *kvm_vfio_file_iommu_group(struct file *file)
->   	return ret;
->   }
->   
-> +static bool kvm_vfio_file_is_group(struct file *file)
-> +{
-> +	bool (*fn)(struct file *file);
-> +	bool ret;
-> +
-> +	fn = symbol_get(vfio_file_is_group);
-> +	if (!fn)
-> +		return false;
-> +
-> +	ret = fn(file);
-> +
-> +	symbol_put(vfio_file_is_group);
-> +
-> +	return ret;
-> +}
-> +
-> +
->   #ifdef CONFIG_SPAPR_TCE_IOMMU
->   static void kvm_spapr_tce_release_vfio_group(struct kvm *kvm,
->   					     struct kvm_vfio_group *kvg)
-> @@ -136,7 +153,7 @@ static int kvm_vfio_group_add(struct kvm_device *dev, unsigned int fd)
->   		return -EBADF;
->   
->   	/* Ensure the FD is a vfio group FD.*/
-> -	if (!kvm_vfio_file_iommu_group(filp)) {
-> +	if (!kvm_vfio_file_is_group(filp)) {
->   		ret = -EINVAL;
->   		goto err_fput;
->   	}
+Jason
