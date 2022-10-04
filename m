@@ -2,64 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A3CAC5F3E00
-	for <lists+kvm@lfdr.de>; Tue,  4 Oct 2022 10:15:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC4835F3E0D
+	for <lists+kvm@lfdr.de>; Tue,  4 Oct 2022 10:17:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230021AbiJDIPm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Oct 2022 04:15:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35006 "EHLO
+        id S230035AbiJDIRk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Oct 2022 04:17:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230100AbiJDIPV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Oct 2022 04:15:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 533F04F6A3
-        for <kvm@vger.kernel.org>; Tue,  4 Oct 2022 01:14:11 -0700 (PDT)
+        with ESMTP id S229949AbiJDIRN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Oct 2022 04:17:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EEC1A45A
+        for <kvm@vger.kernel.org>; Tue,  4 Oct 2022 01:16:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664871204;
+        s=mimecast20190719; t=1664871390;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=4SEPz4izziLGyZZQpQAS5WWJH9dzKde6xEWRITwwvro=;
-        b=S7lrcr6zkVfRLutUJf5vNPyuI40C/WkiCLmBbRkXi1U9O5/LJNGUhvu3uOISiE+i9Pl23N
-        0K5nJYsOwI5baPqf+X8ZTnCuZZxFcq1trkDJm8CVNrbPvYHKxmumdhj5ddYoEnwayqVdVK
-        wRGTj5GK11uM3Gky82vu0MPVbklG+GE=
+        bh=s1Ke6vWjy6sZVOxZDv/F68Ltu/tjCrJKJ2xupBwFw+g=;
+        b=YNq67rmo90yJe5xxkvUxqmkCAgD5P4nYsdc8LOkOE2/7Qfcf6X655FNxhxFZgXTBYs3Jx3
+        UQJn+tLeQRj5W/C9nILkho1b9Q/UA5xWZ8zSF3Sg0b4+YTXVV04pLBj6QnHN7EYIR/aGcL
+        avhVumLY2PRI9LBio0zrW+0zmMxN96g=
 Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
  [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-184-hKCEJeRpP-CgOa5tZuRDBw-1; Tue, 04 Oct 2022 04:13:23 -0400
-X-MC-Unique: hKCEJeRpP-CgOa5tZuRDBw-1
-Received: by mail-wm1-f69.google.com with SMTP id r9-20020a1c4409000000b003b3f017f259so7495084wma.3
-        for <kvm@vger.kernel.org>; Tue, 04 Oct 2022 01:13:23 -0700 (PDT)
+ us-mta-591-WJqFU0PvNY2AH1GYOCWTwA-1; Tue, 04 Oct 2022 04:16:29 -0400
+X-MC-Unique: WJqFU0PvNY2AH1GYOCWTwA-1
+Received: by mail-wm1-f69.google.com with SMTP id n32-20020a05600c3ba000b003b5054c71faso10503454wms.9
+        for <kvm@vger.kernel.org>; Tue, 04 Oct 2022 01:16:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=4SEPz4izziLGyZZQpQAS5WWJH9dzKde6xEWRITwwvro=;
-        b=r6rXp8MENyhQrxiYOoi6rOlH60MFML+9DCa06mGHooC/B1Tck6z7bJ2oFM2l8Np7gy
-         MFfF7UxwccXM7r2SfquiSXb4blu5Ie5QEdNuYvNGa+702j0k/u+WszxCXJQs6G1oBcn0
-         198fVEEwCMOyxmWgVHUbfrd+ClvjJW1ZtjCSQpuM4oGIZCYUyKxelIXdp/fRCxZ4Rhdp
-         cRWZuQKK8yIWWJyHARgJsJRhHe4K3qlJKV+CyVGD6z+eK6CaruP81mCa3oncY6FXjOaT
-         YW4bYJKkqNrzMpwf2an2yypRfBhXNzDwLxfBNaWPiBFuD8JbCVk5ow9itUoumSOSCX3a
-         GqvA==
-X-Gm-Message-State: ACrzQf0Gzq2JGkrR7NdEqrHMb7DEnMFp0XJIs4Jgytd3HirUlYSklWv7
-        821kybI0qnG2ybZ6GkcM6ZPF+LLS5WQ8RdilqpZgagJ1xfqABd3+fYoUBPPntwIVIYOQ0j4M+Fe
-        cGD5gW2GL3kKI
-X-Received: by 2002:a05:600c:a04:b0:3b4:f20e:63f4 with SMTP id z4-20020a05600c0a0400b003b4f20e63f4mr9326469wmp.201.1664871201964;
-        Tue, 04 Oct 2022 01:13:21 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7Elcz96X2vnDOISc0Fm0vuaZoMWuBIs/A7V2AFtBPjUPP+3RQq7GKyzaXipTZnmux/ACQIMA==
-X-Received: by 2002:a05:600c:a04:b0:3b4:f20e:63f4 with SMTP id z4-20020a05600c0a0400b003b4f20e63f4mr9326456wmp.201.1664871201722;
-        Tue, 04 Oct 2022 01:13:21 -0700 (PDT)
+        bh=s1Ke6vWjy6sZVOxZDv/F68Ltu/tjCrJKJ2xupBwFw+g=;
+        b=KdhZhELmK7EbsB3EbRzwKeXb4Q6P6SEcXkGBRcyDVWjt+CHGOvUBtX7xoR22d8v/jp
+         FeeMDMT3mck8MbBHSaQIACiVJcR4fRkemnbzhmncXiYW4SxWK5in5V+wReSQCWgBkIp2
+         nKkIGc1EVyMrTTXJ4i/a1OLV6Jf8uNmtcwAJLnNkm29uXaxZoXZ+PZCUq8diubznnCqk
+         jgeuqK4cGx1vAB19PcJw+bWIX8gl5bD33vR/dY6SOaK1SdFPOhXCMxMYpHojVs8AIYYP
+         mUaS2ZGMrq2Uc0pB/WcV++6efaB4ac1Qpygq0XV4uuDDUA/+QgfkpkdEIHfHuG/K8r0K
+         wHNw==
+X-Gm-Message-State: ACrzQf1GFqWb88okA5LwycKcbusCl3MPTvVbzzVSqi3B00eOus33O906
+        19ta8igDzDEYzZ46DN0+vW1RHWjjt91gCZKhnqxdsdy7EDe8DduB2dYWmQw8kQEpoj4jrFYy2T1
+        iMhn+9VqBIdi8
+X-Received: by 2002:a05:600c:6026:b0:3b5:b00:3a5a with SMTP id az38-20020a05600c602600b003b50b003a5amr9273966wmb.108.1664871388231;
+        Tue, 04 Oct 2022 01:16:28 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6AJR6ZKmOGetRSwFQXSiNVHL4YhpjeY5FFbBcjgQ7eWf8MFgd+CX5i7tPqgGgSKXx9pV9qqg==
+X-Received: by 2002:a05:600c:6026:b0:3b5:b00:3a5a with SMTP id az38-20020a05600c602600b003b50b003a5amr9273945wmb.108.1664871388035;
+        Tue, 04 Oct 2022 01:16:28 -0700 (PDT)
 Received: from [192.168.0.5] (ip-109-43-178-246.web.vodafone.de. [109.43.178.246])
-        by smtp.gmail.com with ESMTPSA id j2-20020adfd202000000b002285f73f11dsm14819436wrh.81.2022.10.04.01.13.19
+        by smtp.gmail.com with ESMTPSA id b4-20020a05600003c400b0022a3a887ceasm11990805wrg.49.2022.10.04.01.16.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Oct 2022 01:13:21 -0700 (PDT)
-Message-ID: <ffd5935b-a933-18b8-c6a8-2863bbb3d906@redhat.com>
-Date:   Tue, 4 Oct 2022 10:13:18 +0200
+        Tue, 04 Oct 2022 01:16:27 -0700 (PDT)
+Message-ID: <85399389-9b5a-d72a-5db1-b8418008ad58@redhat.com>
+Date:   Tue, 4 Oct 2022 10:16:24 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.13.0
+Subject: Re: [PATCH v1 3/9] Documentation: KVM: s390: Describe
+ KVM_S390_MEMOP_F_CMPXCHG
 Content-Language: en-US
 To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
@@ -76,16 +78,14 @@ Cc:     David Hildenbrand <david@redhat.com>,
         Shuah Khan <shuah@kernel.org>,
         Sven Schnelle <svens@linux.ibm.com>
 References: <20220930210751.225873-1-scgl@linux.ibm.com>
- <20220930210751.225873-3-scgl@linux.ibm.com>
+ <20220930210751.225873-4-scgl@linux.ibm.com>
 From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v1 2/9] KVM: s390: Extend MEM_OP ioctl by storage key
- checked cmpxchg
-In-Reply-To: <20220930210751.225873-3-scgl@linux.ibm.com>
+In-Reply-To: <20220930210751.225873-4-scgl@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -94,164 +94,53 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 30/09/2022 23.07, Janis Schoetterl-Glausch wrote:
-> User space can use the MEM_OP ioctl to make storage key checked reads
-> and writes to the guest, however, it has no way of performing atomic,
-> key checked, accesses to the guest.
-> Extend the MEM_OP ioctl in order to allow for this, by adding a cmpxchg
-> mode. For now, support this mode for absolute accesses only.
-> 
-> This mode can be use, for example, to set the device-state-change
-> indicator and the adapter-local-summary indicator atomically.
+> Describe the semantics of the new KVM_S390_MEMOP_F_CMPXCHG flag for
+> absolute vm write memops which allows user space to perform (storage key
+> checked) cmpxchg operations on guest memory.
 > 
 > Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
 > ---
-...
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index eed0315a77a6..b856705f3f6b 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -580,7 +580,9 @@ struct kvm_translation {
->   struct kvm_s390_mem_op {
->   	/* in */
->   	__u64 gaddr;		/* the guest address */
-> +	/* in & out */
->   	__u64 flags;		/* flags */
-> +	/* in */
->   	__u32 size;		/* amount of bytes */
->   	__u32 op;		/* type of operation */
->   	__u64 buf;		/* buffer in userspace */
-> @@ -588,6 +590,8 @@ struct kvm_s390_mem_op {
+>   Documentation/virt/kvm/api.rst | 18 +++++++++++++++++-
+>   1 file changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index abd7c32126ce..0e02d66e38ae 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -3771,6 +3771,7 @@ Parameters are specified via the following structure::
 >   		struct {
 >   			__u8 ar;	/* the access register number */
 >   			__u8 key;	/* access key, ignored if flag unset */
-> +			/* in & out */
+
+Padding / alignment?
+
 > +			__u64 old[2];	/* ignored if flag unset */
-
-The alignment looks very unfortunate now ... could you please add a "__u8 
-pad[6]" or "__u8 pad[14]" in front of the new field?
-
 >   		};
 >   		__u32 sida_offset; /* offset into the sida */
 >   		__u8 reserved[32]; /* ignored */
-> @@ -604,6 +608,7 @@ struct kvm_s390_mem_op {
->   #define KVM_S390_MEMOP_F_CHECK_ONLY		(1ULL << 0)
->   #define KVM_S390_MEMOP_F_INJECT_EXCEPTION	(1ULL << 1)
->   #define KVM_S390_MEMOP_F_SKEY_PROTECTION	(1ULL << 2)
-> +#define KVM_S390_MEMOP_F_CMPXCHG		(1ULL << 3)
->   
->   /* for KVM_INTERRUPT */
->   struct kvm_interrupt {
-> diff --git a/arch/s390/kvm/gaccess.h b/arch/s390/kvm/gaccess.h
-> index 9408d6cc8e2c..a1cb66ae0995 100644
-> --- a/arch/s390/kvm/gaccess.h
-> +++ b/arch/s390/kvm/gaccess.h
-> @@ -206,6 +206,10 @@ int access_guest_with_key(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
->   int access_guest_real(struct kvm_vcpu *vcpu, unsigned long gra,
->   		      void *data, unsigned long len, enum gacc_mode mode);
->   
-> +int cmpxchg_guest_abs_with_key(struct kvm *kvm, gpa_t gpa, int len,
-> +			       unsigned __int128 *old,
-> +			       unsigned __int128 new, u8 access_key);
+> @@ -3853,8 +3854,23 @@ Absolute accesses are permitted for non-protected guests only.
+>   Supported flags:
+>     * ``KVM_S390_MEMOP_F_CHECK_ONLY``
+>     * ``KVM_S390_MEMOP_F_SKEY_PROTECTION``
+> +  * ``KVM_S390_MEMOP_F_CMPXCHG``
 > +
->   /**
->    * write_guest_with_key - copy data from kernel space to guest space
->    * @vcpu: virtual cpu
-> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-> index 0243b6e38d36..c0e490ecc372 100644
-> --- a/arch/s390/kvm/gaccess.c
-> +++ b/arch/s390/kvm/gaccess.c
-> @@ -1161,6 +1161,62 @@ int access_guest_real(struct kvm_vcpu *vcpu, unsigned long gra,
->   	return rc;
->   }
->   
-> +/**
-> + * cmpxchg_guest_abs_with_key() - Perform cmpxchg on guest absolute address.
-> + * @kvm: Virtual machine instance.
-> + * @gpa: Absolute guest address of the location to be changed.
-> + * @len: Operand length of the cmpxchg, required: 1 <= len <= 16. Providing a
-> + *       non power of two will result in failure.
-> + * @old_p: Pointer to old value. If the location at @gpa contains this value, the
-> + *         exchange will succeed. After calling cmpxchg_guest_abs_with_key() *@old
-> + *         contains the value at @gpa before the attempt to exchange the value.
-> + * @new: The value to place at @gpa.
-> + * @access_key: The access key to use for the guest access.
-> + *
-> + * Atomically exchange the value at @gpa by @new, if it contains *@old.
-> + * Honors storage keys.
-> + *
-> + * Return: * 0: successful exchange
-> + *         * 1: exchange unsuccessful
-> + *         * a program interruption code indicating the reason cmpxchg could
-> + *           not be attempted
-> + *         * -EINVAL: address misaligned or len not power of two
-> + */
-> +int cmpxchg_guest_abs_with_key(struct kvm *kvm, gpa_t gpa, int len,
-> +			       unsigned __int128 *old_p, unsigned __int128 new,
-> +			       u8 access_key)
-> +{
-> +	gfn_t gfn = gpa >> PAGE_SHIFT;
-> +	struct kvm_memory_slot *slot = gfn_to_memslot(kvm, gfn);
-> +	bool writable;
-> +	hva_t hva;
-> +	int ret;
+> +The semantics of the flags common with logical acesses are as for logical accesses.
 > +
-> +	if (!IS_ALIGNED(gpa, len))
-> +		return -EINVAL;
-> +
-> +	hva = gfn_to_hva_memslot_prot(slot, gfn, &writable);
-> +	if (kvm_is_error_hva(hva))
-> +		return PGM_ADDRESSING;
-> +	/*
-> +	 * Check if it's a ro memslot, even tho that can't occur (they're unsupported).
+> +For write accesses, the KVM_S390_MEMOP_F_CMPXCHG might be supported.
+> +In this case, instead of doing an unconditional write, the access occurs only
+> +if the target location contains the value provided in "old". This is performed
+> +as an atomic cmpxchg. "size" must be a power of two up to and including 16.
+> +Values with sizes <8 byte are to be provided by assignment to "old[1]".
+> +Doublewords are provided with the higher value word in "old[0]" and the lower
+> +word in "old[1]".
+> +The value at the target location is returned in "old", encoded in the same manner.
+> +If the value was exchanged the KVM_S390_MEMOP_F_CMPXCHG bit in "flags" is set to
+> +0, otherwise it remains set.
+> +The KVM_S390_MEMOP_F_CMPXCHG flag is supported if KVM_CAP_S390_MEM_OP_EXTENSION
+> +has bit 1 (i.e. bit with value 2) set.
 
-Not everybody is used to read such abbreviated English ... I'd recommend to 
-spell it rather properly (ro ==> read-only, tho ==> though)
+Please try to fit the text within 80 columns.
 
-> +	 * Don't try to actually handle that case.
-> +	 */
-> +	if (!writable)
-> +		return -EOPNOTSUPP;
-> +
-> +	hva += offset_in_page(gpa);
-> +	ret = cmpxchg_user_key_size(len, (void __user *)hva, old_p, new, access_key);
-> +	mark_page_dirty_in_slot(kvm, slot, gfn);
-> +	/*
-> +	 * Assume that the fault is caused by key protection, the alternative
-> +	 * is that the user page is write protected.
-> +	 */
-> +	if (ret == -EFAULT)
-> +		ret = PGM_PROTECTION;
-> +	return ret;
-> +}
-> +
->   /**
->    * guest_translate_address_with_key - translate guest logical into guest absolute address
->    * @vcpu: virtual cpu
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index b7ef0b71014d..d594d1318d2a 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -576,7 +576,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_S390_VCPU_RESETS:
->   	case KVM_CAP_SET_GUEST_DEBUG:
->   	case KVM_CAP_S390_DIAG318:
-> -	case KVM_CAP_S390_MEM_OP_EXTENSION:
->   		r = 1;
->   		break;
->   	case KVM_CAP_SET_GUEST_DEBUG2:
-> @@ -590,6 +589,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_S390_MEM_OP:
->   		r = MEM_OP_MAX_SIZE;
->   		break;
-> +	case KVM_CAP_S390_MEM_OP_EXTENSION:
-> +		r = 0x3;
-
-Add a comment to explain that magic value 0x3 ?
-
-> +		break;
->   	case KVM_CAP_NR_VCPUS:
->   	case KVM_CAP_MAX_VCPUS:
->   	case KVM_CAP_MAX_VCPU_ID:
-
-  Thomas
+  Thanks,
+   Thomas
 
