@@ -2,151 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2136A5F3A7B
-	for <lists+kvm@lfdr.de>; Tue,  4 Oct 2022 02:19:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CAE9C5F3C1A
+	for <lists+kvm@lfdr.de>; Tue,  4 Oct 2022 06:26:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229975AbiJDATz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Oct 2022 20:19:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46096 "EHLO
+        id S229519AbiJDE0l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Oct 2022 00:26:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229842AbiJDATv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Oct 2022 20:19:51 -0400
-Received: from na01-obe.outbound.protection.outlook.com (mail-westcentralusazon11010006.outbound.protection.outlook.com [40.93.198.6])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56063B49D;
-        Mon,  3 Oct 2022 17:19:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nQiZCd/Uh5bRd+4d7oXqpdQVGiBfC7DDhOKJ/yK7aN88euOb0L+8+/ZZZhkrVttgcjRXRDKwWRqH3lPO/fxwkR9EZGixPsd2SbAe0N3IIYLCmg1pCo55TU+r+mQJ9Zr0GDAexqf8ELodJM+6Q7fv48tp6i/5160NFc9cMbtZbhllS1juQyQv1fIEabLp2+xUyCVjEw4lJRghf3ZsjE7GYyC3z2ATe3R3e2r5U7au/c4XY6ifnvtDocWjJeXU6vBtGWq5Xq10uoqXpBFruTS6auz3Kvk57SuUXOUqvGGopWtGtG1Qo5F6sEjHp1QhEToNb4eznt6ij9BSJvhvfViTHg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=v0UkDABw6ohtJ22tdaxOAXwyPxZuELnjvmHTTEte5wQ=;
- b=QD5Q4msO1l7Wsb36AnPhMkKI2+Ll7pCrk083nLSScpqaC5zF4+YSFsJxSRRNb1bM8Z12QWAWuhuTHr7X080OIcQfYy/nvcErlWguPqqDnCc7deUEGIChZPOzZwf38xiOeDrU2sw5WubWIhDpSl8YI7sj3pgknu452n5FyNQFbVdVw91v96plYtI3E7jXqeY529S2huS+PsKGuJwwa/VLPIk3jobbIUrcIcG0grtG0q/RqcWruJQG6MQ4CzkNA0Nb9o54Mw692ixL0v4wyByhOkKZ19Hu5lIGv0JU3zN8UfEgV0/+/b42mNru9PmdenAmZzllAEFuxKb6ywose2fw8w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vmware.com; dmarc=pass action=none header.from=vmware.com;
- dkim=pass header.d=vmware.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vmware.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=v0UkDABw6ohtJ22tdaxOAXwyPxZuELnjvmHTTEte5wQ=;
- b=VxG3iK/QXShXAm1LUbrhUbNOb+/YLgZt9QtTI4E/g1l7RSlsmwbJuorXmxPVkt+ClM5p8x0Pt26Puy9zaFBnnXcrP45OOixpAMy4A/FpLG+/ILz7jD+QjLuTYe6yU0fu48SlS94hTBrOl3S42SBIk/hDONBSvEApafk5xl9TmEs=
-Received: from BY3PR05MB8531.namprd05.prod.outlook.com (2603:10b6:a03:3ce::6)
- by MWHPR05MB2797.namprd05.prod.outlook.com (2603:10b6:300:60::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5709.8; Tue, 4 Oct
- 2022 00:19:47 +0000
-Received: from BY3PR05MB8531.namprd05.prod.outlook.com
- ([fe80::942c:7d1b:6b3d:85b6]) by BY3PR05MB8531.namprd05.prod.outlook.com
- ([fe80::942c:7d1b:6b3d:85b6%7]) with mapi id 15.20.5709.008; Tue, 4 Oct 2022
- 00:19:47 +0000
-From:   Nadav Amit <namit@vmware.com>
-To:     "H. Peter Anvin" <hpa@zytor.com>
-CC:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Alexander Graf <graf@amazon.com>,
-        Ajay Kaher <akaher@vmware.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "rostedt@goodmis.org" <rostedt@goodmis.org>,
-        Srivatsa Bhat <srivatsab@vmware.com>,
-        "srivatsa@csail.mit.edu" <srivatsa@csail.mit.edu>,
-        Alexey Makhalov <amakhalov@vmware.com>,
-        Vasavi Sirnapalli <vsirnapalli@vmware.com>,
-        "er.ajay.kaher@gmail.com" <er.ajay.kaher@gmail.com>,
-        "willy@infradead.org" <willy@infradead.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "jailhouse-dev@googlegroups.com" <jailhouse-dev@googlegroups.com>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "acrn-dev@lists.projectacrn.org" <acrn-dev@lists.projectacrn.org>,
-        "helgaas@kernel.org" <helgaas@kernel.org>,
-        "bhelgaas@google.com" <bhelgaas@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>
-Subject: Re: [PATCH v2] x86/PCI: Prefer MMIO over PIO on all hypervisor
-Thread-Topic: [PATCH v2] x86/PCI: Prefer MMIO over PIO on all hypervisor
-Thread-Index: AQHYx28G+J2WSwxm3kmFzqoOhSDYUK3dXFQAgBj77YCABouGgIAAKhGAgAA7TgCAAAYigIAAJ+qAgAAH8wA=
-Date:   Tue, 4 Oct 2022 00:19:46 +0000
-Message-ID: <CD4F5AD2-AEC6-47B6-AFA0-98DCE2AE1A84@vmware.com>
-References: <9FEC6622-780D-41E6-B7CA-8D39EDB2C093@vmware.com>
- <87zgf3pfd1.fsf@redhat.com> <B64FD502-E794-4E94-A267-D690476C57EE@vmware.com>
- <87tu4l9cfm.fsf@redhat.com> <04F550C5-786A-4B8E-9A88-EBFBD8872F16@vmware.com>
- <42CFC548-F8FE-4BD9-89AB-198B2B3F1091@zytor.com>
- <AD04C0EF-E3E0-4DE2-A812-B05382D6F7C2@vmware.com>
- <8859A371-E810-4720-AAFD-06603816AA53@zytor.com>
-In-Reply-To: <8859A371-E810-4720-AAFD-06603816AA53@zytor.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: Apple Mail (2.3696.120.41.1.1)
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vmware.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BY3PR05MB8531:EE_|MWHPR05MB2797:EE_
-x-ms-office365-filtering-correlation-id: 86993544-9e91-40af-e4bd-08daa59e24e9
-x-ld-processed: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 7N80bXbU2EmPnlovtiK8XuGaqXR93zh9Zg48ngcf6BB3WjKehE9ucL1exMPTFrEJDw3EgmbfxTKKsc7CwjOR6b5qdPF1UsX+1wpBsj2/xedB+2AgkCVHl6yl+LWeCHwT3H4p1Q3OFOCMaDCmJI49kJf+YnwVQclaTd19IF6ceNsrZjAG1fmT+4YsJohKJvpL/MXBmL5EOCrZiOoOiwh+2XnluvrGRvWBezzz/cKHuf7eYsO6D5XyQdG1kAUHkDPbS7AJMBQhrbQFkgnlx4A3KCA9yOYE7268unahm1wphyp5jcJUUWPcFcl4WaGGLGcLracIr0ifKnTmQHwEOOdZtdLnVrWNOvOTnu6zmVW2rNe1dstbPeFvUmhz9H4v46Oh/5KH9Pt5dizLmJgy4pKW6OXD+xGvlxqiVH3FoT7UuX8ikyV5s9jOHSMR4e9Kx2FXXIR06pYTRxfaiTCE0ofCdWQjs2prEkfiGbaSJfeAbePLEgQq0CZEOmgnanWGQGVVutRrc73/ZGB1AT8yLw1+5bE71myKv2GjsmYkSfWFiGISqxB2jmXTpu/VPsQnOQM1dZACsC4kG2n5oKj40Obe8O0wBaqkPOGO9/73pqn46jjUOv28X6usFTQCvvgYQqYPT9qPq8Dqulm7iUrrK/fAymohvS73/6tzJDupQArmScpCPUAytNy6MjbB6gc0CV5ExD2FzH6gbhJzBiDOnRXfIUiTKcaY5dbl8eWHNVvCqdLhczwBgqBT5YrUVMdIHwKt2LLOwHYXR/0NvpY1daxIBP/vgLVLZh3goBIMG7bvOCI=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR05MB8531.namprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(39860400002)(346002)(376002)(366004)(396003)(451199015)(83380400001)(2616005)(186003)(38070700005)(38100700002)(122000001)(7416002)(8936002)(4326008)(8676002)(64756008)(66446008)(66476007)(66556008)(66946007)(76116006)(5660300002)(41300700001)(2906002)(478600001)(71200400001)(26005)(6506007)(6512007)(6916009)(53546011)(54906003)(316002)(6486002)(36756003)(33656002)(86362001)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?SUhoRUEzeGdRdy9xTi9MNXNHbEF2bEJpZjJWdmg3ZWU4QW5OdFJaK01DelRG?=
- =?utf-8?B?UTJYTTFYQmk3eldoYlpwbjhiQjVIeEhyYjl2SFluZFBFaHhueDBtck83b0xU?=
- =?utf-8?B?Y01wRG9tVVRwcGFNS2EweGJGZTZJR2graDVKeEdub1o1dHM0MXFDYTBFSTZp?=
- =?utf-8?B?cytaVHdJZnRBYmZhN2tUdDhIdlQvbllGWU1VZmZ1c282RkYrNHVpdmJDSEx6?=
- =?utf-8?B?NHlDbTZzVzR0SWhkUE9rc1BlTGo3Z1VkbFdLUXNGQlc3RG4xWVhyU3Y0Q1lS?=
- =?utf-8?B?U2RIdUtVdWNhVzRFV2hUNG9PbGd0QXgrU3NVbXdnWDhjbERhOUpxcmx0cjk2?=
- =?utf-8?B?Tmh3aDdZRExhK3htS2xCSmVHNjlNTk9wY2xaQXo5elN1bzBTSzIyK2kxN29i?=
- =?utf-8?B?dU9DUklsUE0rRFgvY3c5UlJpWkcyb2VqUURpTkMwekRXZmZ1eVVpWlFneWJF?=
- =?utf-8?B?N3hua2ZReHF3ME94VTJ0TnVCdFoxYTl4WGZWRk9QK2RwWDUwa3BmbUlSZzZs?=
- =?utf-8?B?NFdIeUlKNFZPdWZLR01YOENUWHBNNG11WW54cGoydWdpemtFbzZyR0Ruam9Y?=
- =?utf-8?B?VGV1ZnR0MVVzTG03YlFtb2FSSnNzb1MwSGNqZEJLUkNnUnVWTFpXUkR4SUVZ?=
- =?utf-8?B?eGRtK1l2cThyZ3c2MUZDNERlTXVkbUtmRHl3ajF0bHFpZ0o2N2lDODUzSVlG?=
- =?utf-8?B?cWpCeXpxa1lNVVNISTlBd2dMb040SldLT0N0L3lPWHZReHc3aDc4bW85L0VO?=
- =?utf-8?B?NkJvNnRKcmwxTGlGUHNVaEJzTm9ZajR5eWV0SWdxNXBuNG9ZZkRQK3dRam51?=
- =?utf-8?B?UWp6RGRDY1pBMnluTnNpV3cwNmVrWnphajBOWjdEK1UzRWcvZmNxRUhHZ2Nw?=
- =?utf-8?B?RjVibXdFMmw2VHRnVTNvSlpJNUNORk1QaWNaWTNvY1A1OFhmZFhUWmlaSHFL?=
- =?utf-8?B?QVNBSjNzMjFKU2hOdU5pa1pYd3phVHNoZXZ1L1IrNmtDekQ2Z2xuVDBNOVpt?=
- =?utf-8?B?cVZkRnA0TDRzUkZMLzlPNW1SY0VXWlVBaWJOREtkTEdDN1MvY1IzQ0Eza3c4?=
- =?utf-8?B?ejJTRXJVV3kvMEdYaEkwZW1Oc3hScFpkN0NoSlN6eFI3R3J0cmZyeXpTanBJ?=
- =?utf-8?B?Z1VLSWZpdHdxWXVzaFBsVnA5TDZHTFloakpVQ2NBVUZkODkrNEJIdW53TEpw?=
- =?utf-8?B?N29yYzYxVGs3Yi9wOEF3SUloZWRvNjJwNHA1RC9pMFpQNm12bnFVZFZGQmtV?=
- =?utf-8?B?ak1mbVE3ckRzekhlWXBzYUprQnZQM0NlUHU4bm8vV1NzMG1nakYwM3RqUWhR?=
- =?utf-8?B?NE1EN3haOEtEZk9nUmk3RmxMd2NzN1E2R3dldU9oNlhOVDRhZm1VK056QmRL?=
- =?utf-8?B?bkRiNEN3V0FHOHAxSlppVEFlZG5ISnZNRVpiZnZMWnpuWWcrWFFMZWkxSmQ5?=
- =?utf-8?B?V2pBVWRpd1NKcWtaTzBYc2s2YWk1U2N0ZEN3T2pyR0JRczZlRkVGWTNFYzdB?=
- =?utf-8?B?dkc1MzVXTzV5OGtmWk9naGdFQk00dE43SzF1ZGFFeGJPaXYrNlk4WCtiTk92?=
- =?utf-8?B?Sm1iamVxWUpLcDRxWVVlL3lEYjdOUS8wZnlseE9UY2h5SDRRamJpOXk1bmxr?=
- =?utf-8?B?a21YSHN3N2pQUElMSHRNMXZvK3g1OVdVSTZWSUp1TklUVWtDaHRpK3hLbGox?=
- =?utf-8?B?dS9rZmJBa1Q1ZHltRFhRMm41bk0rblZGa1lJSzV0dlFXYWJkWVlVRTY3U2E2?=
- =?utf-8?B?MUFIblZ3bWpXbXZwVVlSMmNxY2RjSmhHcDBFZlBtTnJTczJCZGEvNVJCanRk?=
- =?utf-8?B?dUVaTm82TTRrMzdBRkZrdjJyRTBWZFBuaUxKVkI3b3BFd08wbXE1UFJXQlM0?=
- =?utf-8?B?a1Q1T0Z1RGdyeEY2MkV0eXdOUlQ0WEhXSWVIV1FhYnM0N2k3T0JNdUI2U2NH?=
- =?utf-8?B?aW1ZV2FHZTcwODdSMlNQWHJ0N09oY2RPNEpoQmpReG1JSXpGT1JuY3loOVoz?=
- =?utf-8?B?eElRU3JpRUdiZjVyVEc1T2syZTUzNDVJdHB5UGxBSTA4cG13ZC9sTUIwb1Zv?=
- =?utf-8?B?SXdZZ3k4dnJXK25kOW1kbnVoMFVob0ZLV0M5S1BXMGhKS1BQemNyRldnWGtp?=
- =?utf-8?Q?BcZyoJ3RGEu3sHL91TgjwcoUJ?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D2B1F25462B88D4794E529D8DBDA59C6@namprd05.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        with ESMTP id S229494AbiJDE0j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Oct 2022 00:26:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76A422D767
+        for <kvm@vger.kernel.org>; Mon,  3 Oct 2022 21:26:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664857596;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=05h8B9w2V62qixWboLULG6QdqKZmIu7qdfGd+YVJUtQ=;
+        b=alEZz8pwo5AoQ3mh4ZhwwAQfIpZ4/WiKtMHYjP7kGew8GPCCNd8tNL/IhjJe4sxe7vwy9K
+        +QUBK7drAH4Ebzp0dYXKPdo7tNK39VqOsV5rbPK+PHDyJccfl6X75pC/EI3lY7idwTI947
+        frdo1y5xw40ukVSAtSQMRVZ4NIPSMGY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-147-mt-LICemPEejFtyt_9QPdQ-1; Tue, 04 Oct 2022 00:26:33 -0400
+X-MC-Unique: mt-LICemPEejFtyt_9QPdQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 41784811E67;
+        Tue,  4 Oct 2022 04:26:32 +0000 (UTC)
+Received: from [10.64.54.56] (vpn2-54-56.bne.redhat.com [10.64.54.56])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DB24B40C6EC2;
+        Tue,  4 Oct 2022 04:26:25 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v4 3/6] KVM: arm64: Enable ring-based dirty memory
+ tracking
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Peter Xu <peterx@redhat.com>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com,
+        shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org,
+        dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com,
+        shan.gavin@gmail.com, james.morse@arm.com, suzuki.poulose@arm.com,
+        alexandru.elisei@arm.com, oliver.upton@linux.dev,
+        kvmarm@lists.linux.dev
+References: <20220927005439.21130-1-gshan@redhat.com>
+ <20220927005439.21130-4-gshan@redhat.com> <YzMerD8ZvhvnprEN@x1n>
+ <86sfkc7mg8.wl-maz@kernel.org> <YzM/DFV1TgtyRfCA@x1n>
+ <320005d1-fe88-fd6a-be91-ddb56f1aa80f@redhat.com>
+ <87y1u3hpmp.wl-maz@kernel.org> <YzRfkBWepX2CD88h@x1n>
+ <d0beb9bd-5295-adb6-a473-c131d6102947@redhat.com>
+ <86fsga6y40.wl-maz@kernel.org>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <8b82ef3d-16ab-0aee-b464-8ad9b3718028@redhat.com>
+Date:   Tue, 4 Oct 2022 12:26:23 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-OriginatorOrg: vmware.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY3PR05MB8531.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 86993544-9e91-40af-e4bd-08daa59e24e9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Oct 2022 00:19:46.8445
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b39138ca-3cee-4b4a-a4d6-cd83d9dd62f0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Csdm8jE2Q4IDVUn8fk5GivlsK2y6kcs/AII07MLZtqoTtkZlDHo4RlL5iyR1FH7c11pin3Acq+hQBB+J/oIbaw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR05MB2797
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_PASS,SPF_NONE autolearn=no
+In-Reply-To: <86fsga6y40.wl-maz@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -154,118 +77,203 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gT2N0IDMsIDIwMjIsIGF0IDQ6NTEgUE0sIEguIFBldGVyIEFudmluIDxocGFAenl0b3IuY29t
-PiB3cm90ZToNCg0KPiDimqAgRXh0ZXJuYWwgRW1haWwNCj4gDQo+IE9uIE9jdG9iZXIgMywgMjAy
-MiAyOjI4OjQwIFBNIFBEVCwgTmFkYXYgQW1pdCA8bmFtaXRAdm13YXJlLmNvbT4gd3JvdGU6DQo+
-PiBPbiBPY3QgMywgMjAyMiwgYXQgMjowNiBQTSwgSC4gUGV0ZXIgQW52aW4gPGhwYUB6eXRvci5j
-b20+IHdyb3RlOg0KPj4gDQo+Pj4g4pqgIEV4dGVybmFsIEVtYWlsDQo+Pj4gDQo+Pj4gT24gT2N0
-b2JlciAzLCAyMDIyIDEwOjM0OjE1IEFNIFBEVCwgTmFkYXYgQW1pdCA8bmFtaXRAdm13YXJlLmNv
-bT4gd3JvdGU6DQo+Pj4+IE9uIE9jdCAzLCAyMDIyLCBhdCA4OjAzIEFNLCBWaXRhbHkgS3V6bmV0
-c292IDx2a3V6bmV0c0ByZWRoYXQuY29tPiB3cm90ZToNCj4+Pj4gDQo+Pj4+PiBOb3QgbXkgYnV0
-IHJhdGhlciBQQ0kgbWFpbnRhaW5lcidzIGNhbGwgYnV0IElNSE8gZHJvcHBpbmcgJ2NvbnN0JyBp
-cw0KPj4+Pj4gYmV0dGVyLCBpbnRyb2R1Y2luZyBhIG5ldyBnbG9iYWwgdmFyIGlzIG91ciAnbGFz
-dCByZXNvcnQnIGFuZCBzaG91bGQgYmUNCj4+Pj4+IGF2b2lkZWQgd2hlbmV2ZXIgcG9zc2libGUu
-IEFsdGVybmF0aXZlbHksIHlvdSBjYW4gYWRkIGENCj4+Pj4+IHJhd19wY2lfZXh0X29wc19wcmVm
-ZXJyZWQoKSBmdW5jdGlvbiBjaGVja2luZyBzb21ldGhpbiB3aXRoaW4gJ3N0cnVjdA0KPj4+Pj4g
-aHlwZXJ2aXNvcl94ODYnIGJ1dCBJJ20gdW5zdXJlIGlmIGl0J3MgYmV0dGVyLg0KPj4+Pj4gDQo+
-Pj4+PiBBbHNvLCBwbGVhc2UgY2hlY2sgQWxleCcgcXVlc3Rpb24vc3VnZ2VzdGlvbi4NCj4+Pj4g
-DQo+Pj4+IEhlcmUgaXMgbXkgdGFrZSAoYW5kIEFqYXkga25vd3MgcHJvYmFibHkgbW9yZSB0aGFu
-IG1lKToNCj4+Pj4gDQo+Pj4+IExvb2tpbmcgYnJpZWZseSBvbiBNQ0ZHLCBJIGRvIG5vdCBzZWUg
-YSBjbGVhbiB3YXkgb2YgdXNpbmcgdGhlIEFDUEkgdGFibGUuDQo+Pj4+IFRoZSB0d28gb3B0aW9u
-cyBhcmUgZWl0aGVyIHRvIHVzZSBhIHJlc2VydmVkIGZpZWxkICh3aGljaCB3aG8ga25vd3MsIG1p
-Z2h0DQo+Pj4+IGJlIHVzZWQgb25lIGRheSkgb3Igc29tZSBPRU0gSUQuIEkgYW0gYWxzbyBub3Qg
-ZmFtaWxpYXIgd2l0aA0KPj4+PiBQQ0lfQ09NTUFORC5NRU1PUlk9MCwgc28gQWpheSBjYW4gaG9w
-ZWZ1bGx5IGdpdmUgc29tZSBhbnN3ZXIgYWJvdXQgdGhhdC4NCj4+Pj4gDQo+Pj4+IEFueWhvdywg
-SSB1bmRlcnN0YW5kIChhbHRob3VnaCBub3QgcmVsYXRlKSB0byB0aGUgb2JqZWN0aW9uIGZvciBh
-IG5ldyBnbG9iYWwNCj4+Pj4gdmFyaWFibGUuIEhvdyBhYm91dCBleHBsaWNpdGx5IGNhbGxpbmcg
-dGhpcyBoYXJkd2FyZSBidWcgYSDigJxidWfigJ0gYW5kIHVzaW5nDQo+Pj4+IHRoZSBwcm9wZXIg
-aW5mcmFzdHJ1Y3R1cmU/IENhbGxpbmcgaXQgZXhwbGljaXRseSBhIGJ1ZyBtYXkgZXZlbiBwdXNo
-IHdob2V2ZXINCj4+Pj4gY2FuIHRvIHJlc29sdmUgaXQuDQo+Pj4+IA0KPj4+PiBJT1csIGhvdyBh
-Ym91dCBkb2luZyBzb21ldGhpbmcgYWxvbmcgdGhlIGxpbmVzIG9mIChub3QgdGVzdGVkKToNCj4+
-Pj4gDQo+Pj4+IA0KPj4+PiAtLSA+OCAtLQ0KPj4+PiANCj4+Pj4gU3ViamVjdDogW1BBVENIXSB4
-ODYvUENJOiBQcmVmZXIgTU1JTyBvdmVyIFBJTyBvbiBWTXdhcmUgaHlwZXJ2aXNvcg0KPj4+PiAN
-Cj4+Pj4gLS0tDQo+Pj4+IGFyY2gveDg2L2luY2x1ZGUvYXNtL2NwdWZlYXR1cmVzLmggfCAxICsN
-Cj4+Pj4gYXJjaC94ODYva2VybmVsL2NwdS9jb21tb24uYyAgICAgICB8IDIgKysNCj4+Pj4gYXJj
-aC94ODYva2VybmVsL2NwdS92bXdhcmUuYyAgICAgICB8IDIgKysNCj4+Pj4gYXJjaC94ODYvcGNp
-L2NvbW1vbi5jICAgICAgICAgICAgICB8IDYgKysrKy0tDQo+Pj4+IDQgZmlsZXMgY2hhbmdlZCwg
-OSBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KPj4+PiANCj4+Pj4gZGlmZiAtLWdpdCBh
-L2FyY2gveDg2L2luY2x1ZGUvYXNtL2NwdWZlYXR1cmVzLmggYi9hcmNoL3g4Ni9pbmNsdWRlL2Fz
-bS9jcHVmZWF0dXJlcy5oDQo+Pj4+IGluZGV4IGVmNDc3NWM2ZGIwMS4uMjE2YjZmMzU3YjZkIDEw
-MDY0NA0KPj4+PiAtLS0gYS9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9jcHVmZWF0dXJlcy5oDQo+Pj4+
-ICsrKyBiL2FyY2gveDg2L2luY2x1ZGUvYXNtL2NwdWZlYXR1cmVzLmgNCj4+Pj4gQEAgLTQ2MCw1
-ICs0NjAsNiBAQA0KPj4+PiAjZGVmaW5lIFg4Nl9CVUdfTU1JT19VTktOT1dOICAgICAgICAgIFg4
-Nl9CVUcoMjYpIC8qIENQVSBpcyB0b28gb2xkIGFuZCBpdHMgTU1JTyBTdGFsZSBEYXRhIHN0YXR1
-cyBpcyB1bmtub3duICovDQo+Pj4+ICNkZWZpbmUgWDg2X0JVR19SRVRCTEVFRCAgICAgICAgICAg
-ICAgWDg2X0JVRygyNykgLyogQ1BVIGlzIGFmZmVjdGVkIGJ5IFJFVEJsZWVkICovDQo+Pj4+ICNk
-ZWZpbmUgWDg2X0JVR19FSUJSU19QQlJTQiAgICAgICAgICAgWDg2X0JVRygyOCkgLyogRUlCUlMg
-aXMgdnVsbmVyYWJsZSB0byBQb3N0IEJhcnJpZXIgUlNCIFByZWRpY3Rpb25zICovDQo+Pj4+ICsj
-ZGVmaW5lIFg4Nl9CVUdfRUNBTV9NTUlPICAgICAgICAgICAgIFg4Nl9CVUcoMjkpIC8qIEVDQU0g
-TU1JTyBpcyBidWdneSBhbmQgUElPIGlzIHByZWZlcmFibGUgKi8NCj4+Pj4gDQo+Pj4+ICNlbmRp
-ZiAvKiBfQVNNX1g4Nl9DUFVGRUFUVVJFU19IICovDQo+Pj4+IGRpZmYgLS1naXQgYS9hcmNoL3g4
-Ni9rZXJuZWwvY3B1L2NvbW1vbi5jIGIvYXJjaC94ODYva2VybmVsL2NwdS9jb21tb24uYw0KPj4+
-PiBpbmRleCAzZTUwOGYyMzkwOTguLmM5NDE3NWZhMzA0YiAxMDA2NDQNCj4+Pj4gLS0tIGEvYXJj
-aC94ODYva2VybmVsL2NwdS9jb21tb24uYw0KPj4+PiArKysgYi9hcmNoL3g4Ni9rZXJuZWwvY3B1
-L2NvbW1vbi5jDQo+Pj4+IEBAIC0xMjk5LDYgKzEyOTksOCBAQCBzdGF0aWMgdm9pZCBfX2luaXQg
-Y3B1X3NldF9idWdfYml0cyhzdHJ1Y3QgY3B1aW5mb194ODYgKmMpDQo+Pj4+IHsNCj4+Pj4gICAg
-IHU2NCBpYTMyX2NhcCA9IHg4Nl9yZWFkX2FyY2hfY2FwX21zcigpOw0KPj4+PiANCj4+Pj4gKyAg
-ICAgIHNldHVwX2ZvcmNlX2NwdV9idWcoWDg2X0JVR19FQ0FNX01NSU8pOw0KPj4+PiArDQo+Pj4+
-ICAgICAvKiBTZXQgSVRMQl9NVUxUSUhJVCBidWcgaWYgY3B1IGlzIG5vdCBpbiB0aGUgd2hpdGVs
-aXN0IGFuZCBub3QgbWl0aWdhdGVkICovDQo+Pj4+ICAgICBpZiAoIWNwdV9tYXRjaGVzKGNwdV92
-dWxuX3doaXRlbGlzdCwgTk9fSVRMQl9NVUxUSUhJVCkgJiYNCj4+Pj4gICAgICAgICAhKGlhMzJf
-Y2FwICYgQVJDSF9DQVBfUFNDSEFOR0VfTUNfTk8pKQ0KPj4+PiBkaWZmIC0tZ2l0IGEvYXJjaC94
-ODYva2VybmVsL2NwdS92bXdhcmUuYyBiL2FyY2gveDg2L2tlcm5lbC9jcHUvdm13YXJlLmMNCj4+
-Pj4gaW5kZXggMDIwMzllYzM1OTdkLi44OTAzNzc2Mjg0YTYgMTAwNjQ0DQo+Pj4+IC0tLSBhL2Fy
-Y2gveDg2L2tlcm5lbC9jcHUvdm13YXJlLmMNCj4+Pj4gKysrIGIvYXJjaC94ODYva2VybmVsL2Nw
-dS92bXdhcmUuYw0KPj4+PiBAQCAtMzg1LDYgKzM4NSw4IEBAIHN0YXRpYyB2b2lkIF9faW5pdCB2
-bXdhcmVfc2V0X2NhcGFiaWxpdGllcyh2b2lkKQ0KPj4+PiAgICAgICAgICAgICBzZXR1cF9mb3Jj
-ZV9jcHVfY2FwKFg4Nl9GRUFUVVJFX1ZNQ0FMTCk7DQo+Pj4+ICAgICBlbHNlIGlmICh2bXdhcmVf
-aHlwZXJjYWxsX21vZGUgPT0gQ1BVSURfVk1XQVJFX0ZFQVRVUkVTX0VDWF9WTU1DQUxMKQ0KPj4+
-PiAgICAgICAgICAgICBzZXR1cF9mb3JjZV9jcHVfY2FwKFg4Nl9GRUFUVVJFX1ZNV19WTU1DQUxM
-KTsNCj4+Pj4gKw0KPj4+PiArICAgICAgc2V0dXBfY2xlYXJfY3B1X2NhcChYODZfQlVHX0VDQU1f
-TU1JTyk7DQo+Pj4+IH0NCj4+Pj4gDQo+Pj4+IHN0YXRpYyB2b2lkIF9faW5pdCB2bXdhcmVfcGxh
-dGZvcm1fc2V0dXAodm9pZCkNCj4+Pj4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L3BjaS9jb21tb24u
-YyBiL2FyY2gveDg2L3BjaS9jb21tb24uYw0KPj4+PiBpbmRleCBkZGI3OTg2MDMyMDEuLmJjODFj
-ZjRjMTAxNCAxMDA2NDQNCj4+Pj4gLS0tIGEvYXJjaC94ODYvcGNpL2NvbW1vbi5jDQo+Pj4+ICsr
-KyBiL2FyY2gveDg2L3BjaS9jb21tb24uYw0KPj4+PiBAQCAtNDAsNyArNDAsOCBAQCBjb25zdCBz
-dHJ1Y3QgcGNpX3Jhd19vcHMgKl9fcmVhZF9tb3N0bHkgcmF3X3BjaV9leHRfb3BzOw0KPj4+PiBp
-bnQgcmF3X3BjaV9yZWFkKHVuc2lnbmVkIGludCBkb21haW4sIHVuc2lnbmVkIGludCBidXMsIHVu
-c2lnbmVkIGludCBkZXZmbiwNCj4+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBpbnQgcmVnLCBpbnQgbGVuLCB1MzIgKnZhbCkNCj4+Pj4gew0KPj4+PiAtICAg
-ICAgaWYgKGRvbWFpbiA9PSAwICYmIHJlZyA8IDI1NiAmJiByYXdfcGNpX29wcykNCj4+Pj4gKyAg
-ICAgIGlmIChkb21haW4gPT0gMCAmJiByZWcgPCAyNTYgJiYgcmF3X3BjaV9vcHMgJiYNCj4+Pj4g
-KyAgICAgICAgICAoYm9vdF9jcHVfaGFzX2J1ZyhYODZfQlVHX0VDQU1fTU1JTykgfHwgIXJhd19w
-Y2lfZXh0X29wcykpDQo+Pj4+ICAgICAgICAgICAgIHJldHVybiByYXdfcGNpX29wcy0+cmVhZChk
-b21haW4sIGJ1cywgZGV2Zm4sIHJlZywgbGVuLCB2YWwpOw0KPj4+PiAgICAgaWYgKHJhd19wY2lf
-ZXh0X29wcykNCj4+Pj4gICAgICAgICAgICAgcmV0dXJuIHJhd19wY2lfZXh0X29wcy0+cmVhZChk
-b21haW4sIGJ1cywgZGV2Zm4sIHJlZywgbGVuLCB2YWwpOw0KPj4+PiBAQCAtNTAsNyArNTEsOCBA
-QCBpbnQgcmF3X3BjaV9yZWFkKHVuc2lnbmVkIGludCBkb21haW4sIHVuc2lnbmVkIGludCBidXMs
-IHVuc2lnbmVkIGludCBkZXZmbiwNCj4+Pj4gaW50IHJhd19wY2lfd3JpdGUodW5zaWduZWQgaW50
-IGRvbWFpbiwgdW5zaWduZWQgaW50IGJ1cywgdW5zaWduZWQgaW50IGRldmZuLA0KPj4+PiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGludCByZWcsIGludCBsZW4s
-IHUzMiB2YWwpDQo+Pj4+IHsNCj4+Pj4gLSAgICAgIGlmIChkb21haW4gPT0gMCAmJiByZWcgPCAy
-NTYgJiYgcmF3X3BjaV9vcHMpDQo+Pj4+ICsgICAgICBpZiAoZG9tYWluID09IDAgJiYgcmVnIDwg
-MjU2ICYmIHJhd19wY2lfb3BzICYmDQo+Pj4+ICsgICAgICAgICAgKGJvb3RfY3B1X2hhc19idWco
-WDg2X0JVR19FQ0FNX01NSU8pIHx8ICFyYXdfcGNpX2V4dF9vcHMpKQ0KPj4+PiAgICAgICAgICAg
-ICByZXR1cm4gcmF3X3BjaV9vcHMtPndyaXRlKGRvbWFpbiwgYnVzLCBkZXZmbiwgcmVnLCBsZW4s
-IHZhbCk7DQo+Pj4+ICAgICBpZiAocmF3X3BjaV9leHRfb3BzKQ0KPj4+PiAgICAgICAgICAgICBy
-ZXR1cm4gcmF3X3BjaV9leHRfb3BzLT53cml0ZShkb21haW4sIGJ1cywgZGV2Zm4sIHJlZywgbGVu
-LCB2YWwpOw0KPj4+IA0KPj4+IEFsc28uLi4gYW55IHJlYXNvbiB3ZSBjYW4ndCBqdXN0IHNldCBy
-YXdfcGNpX29wcyA9PSByYXdfZXh0X3BjaV9vcHMgZm9yIHRoZSBjYXNlIHdoZW4gdGhlIGxhdHRl
-ciBpcyBwcmVmZXJyZWQsIGFuZCBkaXNwZW5zZSB3aXRoIHRoZSBjb25kaXRpb25hbHMgaW4gdGhl
-IHVzZSBwYXRoPyBTaW1pbGFybHksIHJhd19leHRfcGNpX29wcyBjb3VsZCBiZSBwb2ludGVkIHRv
-IGVycm9yIHJvdXRpbmVzIGluc3RlYWQgb2YgbGVmdCBhdCBOVUxMLg0KPj4gDQo+PiBJIHVuZGVy
-c3Rvb2QgZnJvbSBBamF5IHRoYXQgdGhlIGluaXRpYWxpemF0aW9uIG9mIHJhd19leHRfcGNpX29w
-cyBjYW4gYmUNCj4+IGRvbmUgYWZ0ZXIgdGhlIGh5cGVydmlzb3IgaW5pdGlhbGl6YXRpb24gdGFr
-ZXMgcGxhY2UsIHNvIGRvaW5nIHdoYXQgZXhhY3RseQ0KPj4gd2hhdCB5b3UgcHJvcG9zZWQgYnkg
-aXMgbm90IHBvc3NpYmxlLiBJdCBjYW4gcHJvYmFibHkgYmUgcmVzb2x2ZWQsIGJ1dCBJIGRvDQo+
-PiBub3QgdGhpbmsgdGhlIGVuZCByZXN1bHQgd291bGQgYmUgc2ltcGxlciBvciBjbGVhbmVyLiBJ
-IHRoaW5rIHRoYXQgdGhlIOKAnGJ1Z+KAnQ0KPj4gc29sdXRpb24gcmVhbGx5IGNvbnZleXMgdGhl
-IGJlaGF2aW9yLg0KPj4gDQo+PiBJSVVDIHBlcmZvcm1hbmNlIHdvdWxkIG5vdCBiZSBub3RpY2Vh
-YmxlIGFmZmVjdGVkIGJ5IDIgbW9yZSBjb25kaXRpb25hbA0KPj4gYnJhbmNoZXMuDQo+IA0KPiBJ
-c24ndCB0aGF0IGV4YWN0bHkgd2hhdCB5b3Ugd291bGQgd2FudD8hPw0KDQpUd28gYnJhbmNoZXMg
-KHdoaWNoIGFyZSBwcm9iYWJseSBtb3N0bHkgcHJlZGljdGVkIGNvcnJlY3RseSkgYXJlDQppbmV4
-cGVuc2l2ZSAobmFub3NlY29uZHM/KQ0KDQpDYXVzaW5nIGEgVk0tZXhpdCwgYW5kIHRoZSB3aG9s
-ZSBtZXNzIG9mIGhhbmRsaW5nIGl0IGluIHRoZSBoeXBlcnZpc29yDQoocG90ZW50aWFsbHkgdGhl
-IHVzZXJzcGFjZSBwYXJ0IG9mIHRoZSBoeXBlcnZpc29yKSBpcyBleHBlbnNpdmUNCihtaWNyb3Nl
-Y29uZHMpLiBJSVVDLCBBamF5IHdhbnRzIHRvIGxldCByZWFkcyB0byBwYXNzIHRocm91Z2ggdG8g
-bWVtb3J5LA0KYXZvaWRpbmcgdGhlc2UgVk0tZXhpdHMuDQoNCg==
+Hi Marc,
+
+On 9/29/22 10:42 PM, Marc Zyngier wrote:
+> On Thu, 29 Sep 2022 10:50:12 +0100,
+> Gavin Shan <gshan@redhat.com> wrote:
+>> On 9/29/22 12:52 AM, Peter Xu wrote:
+>>> On Wed, Sep 28, 2022 at 09:25:34AM +0100, Marc Zyngier wrote:
+>>>> On Wed, 28 Sep 2022 00:47:43 +0100,
+>>>> Gavin Shan <gshan@redhat.com> wrote:
+>>>>
+>>>>> I have rough idea as below. It's appreciated if you can comment before I'm
+>>>>> going a head for the prototype. The overall idea is to introduce another
+>>>>> dirty ring for KVM (kvm-dirty-ring). It's updated and visited separately
+>>>>> to dirty ring for vcpu (vcpu-dirty-ring).
+>>>>>
+>>>>>      - When the various VGIC/ITS table base addresses are specified, kvm-dirty-ring
+>>>>>        entries are added to mark those pages as 'always-dirty'. In mark_page_dirty_in_slot(),
+>>>>>        those 'always-dirty' pages will be skipped, no entries pushed to vcpu-dirty-ring.
+>>>>>
+>>>>>      - Similar to vcpu-dirty-ring, kvm-dirty-ring is accessed from userspace through
+>>>>>        mmap(kvm->fd). However, there won't have similar reset interface. It means
+>>>>>        'struct kvm_dirty_gfn::flags' won't track any information as we do for
+>>>>>        vcpu-dirty-ring. In this regard, kvm-dirty-ring is purely shared buffer to
+>>>>>        advertise 'always-dirty' pages from host to userspace.
+>>>>>           - For QEMU, shutdown/suspend/resume cases won't be concerning
+>>>>> us any more. The
+>>>>>        only concerned case is migration. When the migration is about to complete,
+>>>>>        kvm-dirty-ring entries are fetched and the dirty bits are updated to global
+>>>>>        dirty page bitmap and RAMBlock's dirty page bitmap. For this, I'm still reading
+>>>>>        the code to find the best spot to do it.
+>>>>
+>>>> I think it makes a lot of sense to have a way to log writes that are
+>>>> not generated by a vpcu, such as the GIC and maybe other things in the
+>>>> future, such as DMA traffic (some SMMUs are able to track dirty pages
+>>>> as well).
+>>>>
+>>>> However, I don't really see the point in inventing a new mechanism for
+>>>> that. Why don't we simply allow non-vpcu dirty pages to be tracked in
+>>>> the dirty *bitmap*?
+>>>>
+>>>>   From a kernel perspective, this is dead easy:
+>>>>
+>>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>>>> index 5b064dbadaf4..ae9138f29d51 100644
+>>>> --- a/virt/kvm/kvm_main.c
+>>>> +++ b/virt/kvm/kvm_main.c
+>>>> @@ -3305,7 +3305,7 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>>>>    	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+>>>>      #ifdef CONFIG_HAVE_KVM_DIRTY_RING
+>>>> -	if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
+>>>> +	if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
+>>>>    		return;
+>>>>    #endif
+>>>>    @@ -3313,10 +3313,11 @@ void mark_page_dirty_in_slot(struct kvm
+>>>> *kvm,
+>>>>    		unsigned long rel_gfn = gfn - memslot->base_gfn;
+>>>>    		u32 slot = (memslot->as_id << 16) | memslot->id;
+>>>>    -		if (kvm->dirty_ring_size)
+>>>> +		if (vpcu && kvm->dirty_ring_size)
+>>>>    			kvm_dirty_ring_push(&vcpu->dirty_ring,
+>>>>    					    slot, rel_gfn);
+>>>> -		else
+>>>> +		/* non-vpcu dirtying ends up in the global bitmap */
+>>>> +		if (!vcpu && memslot->dirty_bitmap)
+>>>>    			set_bit_le(rel_gfn, memslot->dirty_bitmap);
+>>>>    	}
+>>>>    }
+>>>>
+>>>> though I'm sure there is a few more things to it.
+>>>
+>>> Yes, currently the bitmaps are not created when rings are enabled.
+>>> kvm_prepare_memory_region() has:
+>>>
+>>> 		else if (!kvm->dirty_ring_size) {
+>>> 			r = kvm_alloc_dirty_bitmap(new);
+>>>
+>>> But I think maybe that's a solution worth considering.  Using the rings
+>>> have a major challenge on the limitation of ring size, so that for e.g. an
+>>> ioctl we need to make sure the pages to dirty within an ioctl procedure
+>>> will not be more than the ring can take.  Using dirty bitmap for a last
+>>> phase sync of constant (but still very small amount of) dirty pages does
+>>> sound reasonable and can avoid that complexity.  The payoff is we'll need
+>>> to allocate both the rings and the bitmaps.
+>>>
+>>
+>> Ok. I was thinking of using the bitmap to convey the dirty pages for
+>> this particular case, where we don't have running vcpu. The concern I had
+>> is the natural difference between a ring and bitmap. The ring-buffer is
+>> discrete, comparing to bitmap. Besides, it sounds a little strange to
+>> have two different sets of meta-data to track the data (dirty pages).
+> 
+> The problem is that the dirty ring mechanism is a bit blinkered, and
+> cannot consider a source of dirty pages other than from the vcpus.
+> 
+
+Ok.
+
+>> However, bitmap is easier way than per-vm ring. The constrains with
+>> per-vm ring is just as Peter pointed. So lets reuse the bitmap to
+>> convey the dirty pages for this particular case. I think the payoff,
+>> extra bitmap, is acceptable. For this, we need another capability
+>> (KVM_CAP_DIRTY_LOG_RING_BITMAP?) so that QEMU can collects the dirty
+>> bitmap in the last phase of migration.
+> 
+> Why another capability? Just allowing dirty logging to be enabled
+> before we saving the GIC state should be enough, shouldn't it?
+> 
+
+The GIC state would be just one case where no vcpu can be used to push
+dirty page information. As you mentioned, SMMMU HTTU feature could possibly
+be another case to ARM64. It's uncertain about other architectures where
+dirty-ring will be supported. In QEMU, the dirty (bitmap) logging is enabled
+at the beginning of migration and the bitmap is synchronized to global
+dirty bitmap and RAMBlock's dirty bitmap gradually, as the following
+backtrace shows. What we need to do for QEMU is probably retrieve the
+bitmap at point (A).
+
+Without the new capability, we will have to rely on the return value
+from ioctls KVM_GET_DIRTY_LOG and KVM_CLEAR_DIRTY_LOG to detect the
+capability. For example, -ENXIO is returned on old kernels.
+
+    migration_thread
+      qemu_savevm_state_setup
+        ram_save_setup
+          ram_init_all
+            ram_init_bitmaps
+              memory_global_dirty_log_start(GLOBAL_DIRTY_MIGRATION)   // dirty logging enabled
+              migration_bitmap_sync_precopy(rs)
+        :
+      migration_iteration_run                                         // iteration 0
+        qemu_savevm_state_pending
+          migration_bitmap_sync_precopy
+        qemu_savevm_state_iterate
+          ram_save_iterate
+      migration_iteration_run                                        // iteration 1
+        qemu_savevm_state_pending
+          migration_bitmap_sync_precopy
+        qemu_savevm_state_iterate
+          ram_save_iterate
+      migration_iteration_run                                        // iteration 2
+        qemu_savevm_state_pending
+          migration_bitmap_sync_precopy
+        qemu_savevm_state_iterate
+          ram_save_iterate
+        :
+      migration_iteration_run                                       // iteration N
+        qemu_savevm_state_pending
+          migration_bitmap_sync_precopy
+        migration_completion
+          qemu_savevm_state_complete_precopy
+            qemu_savevm_state_complete_precopy_iterable
+              ram_save_complete
+                migration_bitmap_sync_precopy                      // A
+                <send all dirty pages>
+
+Note: for post-copy and snapshot, I assume we need to save the dirty bitmap
+       in the last synchronization, right after the VM is stopped.
+
+>> If all of us agree on this, I can send another kernel patch to address
+>> this. QEMU still need more patches so that the feature can be supported.
+> 
+> Yes, this will also need some work.
+> 
+>>>>
+>>>> To me, this is just a relaxation of an arbitrary limitation, as the
+>>>> current assumption that only vcpus can dirty memory doesn't hold at
+>>>> all.
+>>>
+>>> The initial dirty ring proposal has a per-vm ring, but after we
+>>> investigated x86 we found that all legal dirty paths are with a vcpu
+>>> context (except one outlier on kvmgt which fixed within itself), so we
+>>> dropped the per-vm ring.
+>>>
+>>> One thing to mention is that DMAs should not count in this case because
+>>> that's from device perspective, IOW either IOMMU or SMMU dirty tracking
+>>> should be reported to the device driver that interacts with the userspace
+>>> not from KVM interfaces (e.g. vfio with VFIO_IOMMU_DIRTY_PAGES).  That even
+>>> includes emulated DMA like vhost (VHOST_SET_LOG_BASE).
+>>>
+>>
+>> Thanks to Peter for mentioning the per-vm ring's history. As I said above,
+>> lets use bitmap instead if all of us agree.
+>>
+>> If I'm correct, Marc may be talking about SMMU, which is emulated in host
+>> instead of QEMU. In this case, the DMA target pages are similar to those
+>> pages for vgic/its tables. Both sets of pages are invisible from QEMU.
+> 
+> No, I'm talking about an actual HW SMMU using the HTTU feature that
+> set the Dirty bit in the PTEs. And people have been working on sharing
+> SMMU and CPU PTs for some time, which would give us the one true
+> source of dirty page.
+> 
+> In this configuration, the dirty ring mechanism will be pretty useless.
+> 
+
+Ok. I don't know the details. Marc, the dirty bitmap is helpful in this case?
+
+Thanks,
+Gavin
+
