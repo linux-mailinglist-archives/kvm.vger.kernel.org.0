@@ -2,141 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 286B85F3A2F
-	for <lists+kvm@lfdr.de>; Tue,  4 Oct 2022 01:57:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FEB25F3A4A
+	for <lists+kvm@lfdr.de>; Tue,  4 Oct 2022 02:02:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229941AbiJCX5q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 3 Oct 2022 19:57:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39418 "EHLO
+        id S229501AbiJDACn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 3 Oct 2022 20:02:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229943AbiJCX5h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 3 Oct 2022 19:57:37 -0400
-Received: from ozlabs.ru (ozlabs.ru [107.174.27.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 773022B257;
-        Mon,  3 Oct 2022 16:57:34 -0700 (PDT)
-Received: from ole.1.ozlabs.ru (localhost [IPv6:::1])
-        by ozlabs.ru (Postfix) with ESMTP id 6E27A833CD;
-        Mon,  3 Oct 2022 19:57:29 -0400 (EDT)
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     kvm@vger.kernel.org
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm-riscv@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Anup Patel <anup@brainfault.org>, kvm-ppc@vger.kernel.org,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Marc Zyngier <maz@kernel.org>
-Subject: [PATCH kernel v4] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE support platform dependent
-Date:   Tue,  4 Oct 2022 10:57:22 +1100
-Message-Id: <20221003235722.2085145-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.37.3
+        with ESMTP id S229726AbiJDACl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 3 Oct 2022 20:02:41 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BA31DEB9
+        for <kvm@vger.kernel.org>; Mon,  3 Oct 2022 17:02:39 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id x1so11099687plv.5
+        for <kvm@vger.kernel.org>; Mon, 03 Oct 2022 17:02:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=cKEaTPB4TstuN0N6KGC5ZTChdAnFmWfuJQUnW1F7Pr0=;
+        b=XS12QK49zso7r1llsnn6fXyyTXphyYv5Dp8xvSMDQhrJyOfkt75lWqVbYyFvzw19Oa
+         tU+i4K3jdF6PbAMXgMEVnEreFLPZK8TxwhNgmMaL9r3PrlkOPV7equ4M8bPekRW3UmNu
+         DbqxKWlc5X5NjULybGRbJFifGmx/NwBtfzRzsPh7e9Us4RAHExhGw9pM1gHevlaEXP3Y
+         fXVfZA560vf014w0SYLVKE+W2sAVTpiFtxm5SK7hlBK4//BwP2zEEveq+AcGpn5a+rzs
+         FgDSnhCngq3S5qy6J8QYf+B387aoPoIHuxJbKBxG4/zXhvB6pgXAHlFDueslzb2vax+y
+         xsWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=cKEaTPB4TstuN0N6KGC5ZTChdAnFmWfuJQUnW1F7Pr0=;
+        b=5PE5SSrmvVrcV++TBemXSLkY6v5Qq3fLM3oskFP32lEROtW4RU26+LUCf9rmT6THaF
+         /5Ff4nSAlHsfIbp7nVRMPJv9s4PeAQDBUmchVRCgJoz7lEMrRqPc6EH1+W6MvSQ36eVq
+         qzKfu4tUB4NEMBqzMiWWcVCZk/WJHDT+56SlFDWaIfMOHjKBVdtLMMpDeNp1SVfxzi3b
+         /MTDV3zIqTtMaGurafDgITB5CQyRercI6hhqtbBveo/P/uo7H1Ug65I76UOpX4gTe0YL
+         5/TzMkE6mRVlVjmmH5HuuKNubb84LwKtgEh3kV2L0kTfFzWBD+S6PYH5Zgsb+VLnkdls
+         ae3Q==
+X-Gm-Message-State: ACrzQf2IGeK2XXuyZwjG7n9AfSFqZ77LD3b4ysTEEFej1fTz3oNbPZpQ
+        H+4n9Mg6SYpnPC+iUBxYh4sgzDrskizDsX2Hp/f9TA==
+X-Google-Smtp-Source: AMsMyM47Xx9aPljKNicraDhTtewm9C86wmw9och3xikp1rK+wnuurke3HKVwwW0Wk3qQbYfJ/vISYrlZnhTmB4fpxXw=
+X-Received: by 2002:a17:90a:a503:b0:20a:d877:638 with SMTP id
+ a3-20020a17090aa50300b0020ad8770638mr326473pjq.176.1664841758343; Mon, 03 Oct
+ 2022 17:02:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20220915000448.1674802-1-vannapurve@google.com>
+ <20220915000448.1674802-4-vannapurve@google.com> <Yyt586xOWrNEoCYF@google.com>
+ <CAGtprH8=wjQAhpr97KNsziT_jAqSS6sMTb5=gzgbhssNPm8q_Q@mail.gmail.com> <YzsC4ibDqGh5qaP9@google.com>
+In-Reply-To: <YzsC4ibDqGh5qaP9@google.com>
+From:   Vishal Annapurve <vannapurve@google.com>
+Date:   Mon, 3 Oct 2022 17:02:27 -0700
+Message-ID: <CAGtprH-YuA=b-oJDZnvZ5u1EfNPuwUvrbYE0fU2L2KHzu5Af_g@mail.gmail.com>
+Subject: Re: [V2 PATCH 3/8] KVM: selftests: Add arch specific post vm load setup
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     David Matlack <dmatlack@google.com>, x86 <x86@kernel.org>,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linuxkselftest <linux-kselftest@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, shuah <shuah@kernel.org>,
+        Ben Gardon <bgardon@google.com>,
+        Oliver Upton <oupton@google.com>, Peter Xu <peterx@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When introduced, IRQFD resampling worked on POWER8 with XICS. However
-KVM on POWER9 has never implemented it - the compatibility mode code
-("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
-XIVE mode does not handle INTx in KVM at all.
+On Mon, Oct 3, 2022 at 8:42 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Sep 26, 2022, Vishal Annapurve wrote:
+> > On Wed, Sep 21, 2022 at 1:54 PM David Matlack <dmatlack@google.com> wrote:
+> > >
+> > > On Thu, Sep 15, 2022 at 12:04:43AM +0000, Vishal Annapurve wrote:
+> > > > diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> > > > index 98edbbda9f97..73cfee3ebd76 100644
+> > > > --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> > > > +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> > > > @@ -839,4 +839,8 @@ static inline int __vm_disable_nx_huge_pages(struct kvm_vm *vm)
+> > > >   */
+> > > >  void kvm_selftest_arch_init(void);
+> > > >
+> > > > +/*
+> > > > + * API to execute architecture specific setup after loading the vm elf.
+> > >
+> > > It's not a "vm elf" per-se, it's "loading the elf into the VM". How
+> > > about:
+> > >
+> > > /*
+> > >  * API to execute arch-specific logic after loading the selftest ELF image
+> > >  * into the VM.
+> > >  */
+> > >
+> >
+> > Ack. Will update this in the next series.
+>
+> Even better, call it from __vm_create() and name it something like
+> kvm_arch_vm_post_create().  Like David said, while the hook has a dependency on
+> being called after loading the ELF image, the action that arch code is expected
+> to take doesn't have anything to do with loading the ELF image.
+>
+> And then instead of introducing an arch hook with no implementation, the patch that
+> adds the hook can instead use it to replace the x86-64 #ifdef in __vm_create().
+>
 
-This moved the capability support advertising to platforms and stops
-advertising it on XIVE, i.e. POWER9 and later.
+Today upstream kernel selftests don't have scenarios where
+kvm_vm_elf_load can get called directly outside ___vm_create but there
+are selftests that are up for review [1], [2] that may call
+kvm_vm_elf_load directly. Above suggestion will not work in this
+scenario, is it suitable to assume that all the callers of
+kvm_vm_elf_load will eventually execute kvm_arch_vm_post_create?
 
-This should cause no behavioural change for other architectures.
+[1] https://lore.kernel.org/lkml/20220810152033.946942-12-pgonda@google.com/
+[2] https://lore.kernel.org/lkml/20220819174659.2427983-1-vannapurve@google.com/T/#u
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Acked-by: Nicholas Piggin <npiggin@gmail.com>
-Acked-by: Marc Zyngier <maz@kernel.org>
----
-Changes:
-v4:
-* removed incorrect clause about changing behavoir on MIPS and RISCV
-
-v3:
-* removed all ifdeferry
-* removed the capability for MIPS and RISCV
-* adjusted the commit log about MIPS and RISCV
-
-v2:
-* removed ifdef for ARM64.
----
- arch/arm64/kvm/arm.c       | 1 +
- arch/powerpc/kvm/powerpc.c | 6 ++++++
- arch/s390/kvm/kvm-s390.c   | 1 +
- arch/x86/kvm/x86.c         | 1 +
- virt/kvm/kvm_main.c        | 1 -
- 5 files changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 2ff0ef62abad..d2daa4d375b5 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -218,6 +218,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VCPU_ATTRIBUTES:
- 	case KVM_CAP_PTP_KVM:
- 	case KVM_CAP_ARM_SYSTEM_SUSPEND:
-+	case KVM_CAP_IRQFD_RESAMPLE:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index fb1490761c87..908ce8bd91c9 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -593,6 +593,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		break;
- #endif
- 
-+#ifdef CONFIG_HAVE_KVM_IRQFD
-+	case KVM_CAP_IRQFD_RESAMPLE:
-+		r = !xive_enabled();
-+		break;
-+#endif
-+
- 	case KVM_CAP_PPC_ALLOC_HTAB:
- 		r = hv_enabled;
- 		break;
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index edfd4bbd0cba..7521adadb81b 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -577,6 +577,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 	case KVM_CAP_S390_DIAG318:
- 	case KVM_CAP_S390_MEM_OP_EXTENSION:
-+	case KVM_CAP_IRQFD_RESAMPLE:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 43a6a7efc6ec..2d6c5a8fdf14 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4395,6 +4395,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_VAPIC:
- 	case KVM_CAP_ENABLE_CAP:
- 	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
-+	case KVM_CAP_IRQFD_RESAMPLE:
- 		r = 1;
- 		break;
- 	case KVM_CAP_EXIT_HYPERCALL:
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 584a5bab3af3..05cf94013f02 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4447,7 +4447,6 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- #endif
- #ifdef CONFIG_HAVE_KVM_IRQFD
- 	case KVM_CAP_IRQFD:
--	case KVM_CAP_IRQFD_RESAMPLE:
- #endif
- 	case KVM_CAP_IOEVENTFD_ANY_LENGTH:
- 	case KVM_CAP_CHECK_EXTENSION_VM:
--- 
-2.37.3
-
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index dafe4471a6c7..593dfadb662e 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -298,9 +298,8 @@ struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
+>
+>         kvm_vm_elf_load(vm, program_invocation_name);
+>
+> -#ifdef __x86_64__
+> -       vm_create_irqchip(vm);
+> -#endif
+> +       kvm_arch_vm_post_create(vm);
+> +
+>         return vm;
+>  }
+>
+>
