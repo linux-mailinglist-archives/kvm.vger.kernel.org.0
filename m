@@ -2,133 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CA7465F44B1
-	for <lists+kvm@lfdr.de>; Tue,  4 Oct 2022 15:49:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 779895F451E
+	for <lists+kvm@lfdr.de>; Tue,  4 Oct 2022 16:05:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229750AbiJDNsb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Oct 2022 09:48:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46676 "EHLO
+        id S229625AbiJDOFh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Oct 2022 10:05:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229719AbiJDNsR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Oct 2022 09:48:17 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BE782AE03;
-        Tue,  4 Oct 2022 06:48:16 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 294DhsYV025906;
-        Tue, 4 Oct 2022 13:48:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=dDyDdfZuWCVkELzu73z7iClNunLBhEVpbZ/ZUfUs+hQ=;
- b=s8zj9hLwEhfqVkZ7ESPDxaASjJ7a/9geUtPzwKV51zalFgrt/N1M14jpTsg+hwg9LCdf
- uPM9JjJnys8iE2X6gap6zZafSXns/KtXT0VzdziUB6djNexCOrPfqbPJ/jRd1b2A01m9
- PvcaSh+N7C3tf3fYppbezuu07o9ACKUjhz/PKGQ8UcIr0g0JuFJDd2h3wWV9wQU/3Ba9
- qA1x3t6YNf4YJ++cMlx3hbKV5PCRlcLvBaSvpDHIGnAHacKumduWH1Mf+dzL/K+TH8Ft
- 1Q2Zb0/sBryi6d8qNHOnHiDtJaH5/bV9XC8VuOsj37a8LvjwMFXhlX9CV7JdZ1XCf2ES Dg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k0gwts7e4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 04 Oct 2022 13:48:15 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 294DhthL026538;
-        Tue, 4 Oct 2022 13:48:15 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k0gwts7cq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 04 Oct 2022 13:48:15 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 294Ddmsh005286;
-        Tue, 4 Oct 2022 13:48:13 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma01fra.de.ibm.com with ESMTP id 3jxd68u2x9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 04 Oct 2022 13:48:12 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 294Dm9lt38469918
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 4 Oct 2022 13:48:09 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9B543A405B;
-        Tue,  4 Oct 2022 13:48:09 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CF2ABA4054;
-        Tue,  4 Oct 2022 13:48:08 +0000 (GMT)
-Received: from [9.145.154.3] (unknown [9.145.154.3])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  4 Oct 2022 13:48:08 +0000 (GMT)
-Message-ID: <e183d9b5-eb39-1e08-1d23-831a2df2e0e6@linux.ibm.com>
-Date:   Tue, 4 Oct 2022 15:48:08 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH v14 6/6] KVM: s390: pv: module parameter to fence
- asynchronous destroy
+        with ESMTP id S229446AbiJDOFd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Oct 2022 10:05:33 -0400
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2045.outbound.protection.outlook.com [40.107.100.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB7C45C374;
+        Tue,  4 Oct 2022 07:05:31 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LzTMLuFhbebQ3PVFQbrGalXleamhnjdGy67eaBs3+gaU5GZOG0km6vGguvWGfWaMiqaTTlczZHuYViEtAgA5fZGuX0NLOLHnPj1gzfa4Gxug92lKyGwM14h+q7lt6k6jiSEt2iRruLTbxIGo8a8ksYw1XtRSwEvvlntU9vmInb3bxNPtw3ax8ZN71gjwJPZ/olqQDkyt/JzHIHA+dcGAN2pXP0AqpGYP4CFdcXLdjLaLg3SdvJpycsfj9W7Dg9LoWUVHzNMKaUyYwVykhX1qSv9omyVUcVWvyZHF3j8VIFaod4kT36PVllrkINO/OPJqK9bWtY7ZKtkHfBz8/3eqPw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0XEXBX3H9xx3e+6i9v/FT6F9IGiFkKHdw5Qsi+IZWo8=;
+ b=YbqFJWIZv+EHSsEaGdvdPYy+5arzZNUoNkzwWQnFMF3g4D55eiNAINd4sRub8IFrrHq82iT9X6ArZnbNr00huHG9YjvmTkTzJHRGuBWMBjU9ysyZvSbPfHXhR13zZhp3KZDw9/mvMKH72+YoC9VD9CXlllnhINc8hkrL/jQNXzHeXaYA0ct6ypWlvasSuyHgE9dG8ncMj9S/nP+VZaXRvHaIb4tC38kocOkUUt7UkcTea/k26H+JI8gHlnVLvoxQr1DrSPhR0KsDByR2aXkx5NtwBDYG6556fioF1l6ddXgA9ZV76G18MEYVWw/F7C2T07Hr8Z72PQkNTtu6Q92Gog==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0XEXBX3H9xx3e+6i9v/FT6F9IGiFkKHdw5Qsi+IZWo8=;
+ b=p8Qec+rckRMmVhZBtUUDE7DN8vzwwegwEvAGLHjXyXt7Q4/4J2u9HbfSpHaZLU8cbKyY1ch5TbfgX2iA/GcrFZlB7O5G0+cRnDPDQpWeGQBlpR4YWfpacx+I+gZk7ZYL410qOo/s+0gtTnl+kfaWv6F/qEocMp90AAjUPGgRF1g=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5874.namprd12.prod.outlook.com (2603:10b6:208:396::17)
+ by CY5PR12MB6036.namprd12.prod.outlook.com (2603:10b6:930:2c::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.30; Tue, 4 Oct
+ 2022 14:05:28 +0000
+Received: from BL1PR12MB5874.namprd12.prod.outlook.com
+ ([fe80::ea28:b6e6:143c:8649]) by BL1PR12MB5874.namprd12.prod.outlook.com
+ ([fe80::ea28:b6e6:143c:8649%6]) with mapi id 15.20.5676.019; Tue, 4 Oct 2022
+ 14:05:26 +0000
+Message-ID: <986a5886-4ddc-aa88-db52-e8781ec95aed@amd.com>
+Date:   Tue, 4 Oct 2022 09:05:24 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
 Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, thuth@redhat.com,
-        david@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, scgl@linux.ibm.com, nrb@linux.ibm.com
-References: <20220930140150.37463-1-imbrenda@linux.ibm.com>
- <20220930140150.37463-7-imbrenda@linux.ibm.com>
-From:   Steffen Eiden <seiden@linux.ibm.com>
-In-Reply-To: <20220930140150.37463-7-imbrenda@linux.ibm.com>
+To:     tglx@linutronix.de, bp@alien8.de, mingo@redhat.com,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        venu.busireddy@oracle.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+From:   Carlos Bilbao <carlos.bilbao@amd.com>
+Cc:     "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, bilbao@vt.edu
+Subject: [PATCH] KVM: SVM: Fix reserved fields of struct sev_es_save_area
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: qw7fXyNA5Hvq3RG62Izt_abfCp2L87PF
-X-Proofpoint-ORIG-GUID: 7LN1qNEnvdONuGAMeayDj6fCTLEZxDGM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-10-04_06,2022-09-29_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=999
- spamscore=0 impostorscore=0 phishscore=0 suspectscore=0 lowpriorityscore=0
- priorityscore=1501 adultscore=0 mlxscore=0 malwarescore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
- definitions=main-2210040088
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: CH0PR03CA0256.namprd03.prod.outlook.com
+ (2603:10b6:610:e5::21) To BL1PR12MB5874.namprd12.prod.outlook.com
+ (2603:10b6:208:396::17)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5874:EE_|CY5PR12MB6036:EE_
+X-MS-Office365-Filtering-Correlation-Id: 479efe3a-9676-4c27-5f2d-08daa6117cd3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fv19PbL6Pp02R2O5oBbTlWmoqoIvsEvxPF4BTNXyPACQnNhndMjit1LAhTFCtVpyP+CTJd5WDulo+3a4bPwfZAt9aeSrp2OocrG74cPoNm7bnPttIqHr+3+UbfpD8FS7X4rDonlJ1RYKjSP6Z14frJcm3eDystJAjK7As7JdYXefHr3w1K1Bf/Qo4dsWZ8OQILqeidhtsd1lsvDtgSpaz/HzFpwdI9mlkj7wzxrIWkTo7OP8bl1YMARzAhv2Wfq08W7U66UUNpkLdiQTxVK+k24rabEd9fAJt/AwWMZ6qT9hPhkRUQUC2Fgao3biWCL4ZZDiJlJVlm1F1qIcYpkorx681go7+kFyt7Wz+cYuDsTF2P7tLAIboo6zkncDqWBT5qcgEdGImqOROCbBW0CfB3GhpwV54z1l8Gatv2YdmLmTxvcG+0nT6f2NQ/MBuGs/aUo9SAGu+XYhRyo5+8CPzyrXPo14gpGhtyXjzngGajs6xtJEgY2hxYHuwjWdPSYnWw9uts4NhQQ9CXVyBtVC+WsQLIlZWJL5Gd6vFhmU0p1dAD+Q3XTcpaXJeIg79tj4ZGek1HPhinQLW2nYps0lzsihZppo1ZKgTL6QwSr5CUMrmaBSUI3+bzD05L0pM3RTzHANDYyp1L+DosUeB1LHL5h7dlmOJjxrTEoXw5UwUVEVYUh/PUQmb7BRsmsouiJvYsKiu/ZAt9DPdOlaPINaQqG6Yq41wbBLKYxTFwkvpztZHQ752PXgcDBGmsBqIeX//8WEdFv1Jc0l0jZcB7N/TLIbNWdPcqktkZPekIayeLA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5874.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(376002)(346002)(366004)(396003)(136003)(451199015)(66476007)(8676002)(4326008)(36756003)(2906002)(66556008)(31696002)(86362001)(41300700001)(316002)(6512007)(26005)(38100700002)(83380400001)(186003)(2616005)(6486002)(6506007)(478600001)(66946007)(7416002)(31686004)(8936002)(5660300002)(44832011)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NXc3ZE81ckc1Y0JtNGFBRm1Lb1BzaUdkL2QyYkRrdldZUU1DcnEyNjRkMTMr?=
+ =?utf-8?B?TkxKWk43cFhDSU5SdGdZRkszcVArZVdqbGovbHo2WHRENXpPQ0ZOQjdSd0w3?=
+ =?utf-8?B?NlM4V3Q1MmptM0Zjb1d6QVg1ck1QM3NaWENJUERnQ24yUlVUZmlxVWd2WjRV?=
+ =?utf-8?B?YzB2bDFUNE1LNU1jY0JpRTBYbDU2ZlMrZFJBR0xiREdIZGU5RUdpeThadzZw?=
+ =?utf-8?B?bjdMK0Y1K3V2Y0xFUnBlOTRQejRtTS9UN0QzMW9tSnN0SWkzSEJBMEJlZVpW?=
+ =?utf-8?B?MXd1ZEhzSFFGdUhUV2FadXY3bEJEc1k3eEtDRnVlMXpBdzFkK2hYdG1Ec3FF?=
+ =?utf-8?B?YllZSGRma0FucTlCai9jR092b1ZidzBUZUxjR0l3M3k3Sk9sclRKb2s0d0pq?=
+ =?utf-8?B?NlE3aFBBVFlFd2FYVlF1M3g3ejliVlRueGFCcjBzRGFIMStuZ0dFckVpdzB5?=
+ =?utf-8?B?Y3h5ZFJseW9RU1NSS2FkY0VHVDBSQUQxalRXU0t0NUF0SEIwN2tlOVlKamZa?=
+ =?utf-8?B?cHlNUHI5T0JTdmFGekxJM3dOR0poTDJ1TkhKN2dJZCtzRkwrZkkvQXhvNVh6?=
+ =?utf-8?B?ajAzcU5WdFh4NDByRzh3N254V0ZIOVJBVWJ1SGUvb2daNWp2bEllRUxHTXY1?=
+ =?utf-8?B?YUl5MkhqWXRGMmpjVVo2Y0pYNUdld3lYWU9qOVNpcmN5QkVOSWx2czNVWm05?=
+ =?utf-8?B?b29YbUxpNjMxZW0vUzd2ME5FazJOcUxZQlcxTVd6ZzBLa3ZMeHVza1pFSE1K?=
+ =?utf-8?B?VnZuUVhVUm43ZGluZ2RMRFhGYWFjWjUxWG5ZMGFuYktSK0FFL2x1Tmd3SFRK?=
+ =?utf-8?B?Q00rbWVLTkEwMzg5cEQ4bGZYL3lzcXdIZDdlMlJKUjRZR3VIZlhRMFpHWkdE?=
+ =?utf-8?B?Uy9GN0xxanhmSzkyWkVNMTNiYjJ0MzJFamNKZ1ZaZnFIaGpNQW8vYUFRd1B6?=
+ =?utf-8?B?WE13OVpRV09ZcU1KKzNCdzNZN1VNRXlDSmg4YnRWbytxanJrQks5MzZhQmY4?=
+ =?utf-8?B?bDdESXB5L1FxdHpnMkFuaEFEQ3BjVjRGanYxTVg4WTVYalI3U3UxSTM2VlJB?=
+ =?utf-8?B?NDlWN0x4eHBRU1hnNjRqeEZzN1Vvd2M1alhabGlOT2t1WldIV0U1NmI3aCtX?=
+ =?utf-8?B?dVpFMjV1MzF5MUVPdmZIVFBjcU0wb05VYmhjV3NPTXEvT09YRGloK3h5TWND?=
+ =?utf-8?B?Y3czaHNHYUlTZW04WW14TmFGOHpsRGV3c1gzaXc2d0JnUVpTNEVEb2FUN2ll?=
+ =?utf-8?B?clJWMjl1d3gyR3k3OUNaTnV5YnpLK05VRWV4clgwejlMTWZHT0VkT2ZRdzg0?=
+ =?utf-8?B?RW9NSkRhYWQ2dmEycHExeGI0S2JEVjR1OGU0S2k0SnBvL0hPZGFkNkM2SUxQ?=
+ =?utf-8?B?R2hUQ1NqR3VLa2U3N1BMeGN1dHFSaG9IY2RGbUFuWnRRcUJFNGZHbVEvWDA5?=
+ =?utf-8?B?T3BRSzdOSkRsSm5iSGNGOXA2endJSzNhRDdtWUI2dDB2M3J0cS9xN0JwTlZs?=
+ =?utf-8?B?SWNFbmlnNDNZS0Zud2tqTFFhQ0RQUXNuUkdpSWR6dlA3bnd6VWQzRkJucUcr?=
+ =?utf-8?B?SDdFMFFFMlk4R2Ftb1FwUk14N0ZYSjhLTWQ4NlBHdkkrNW9UamNGYzYzVXZk?=
+ =?utf-8?B?NWhGbVNvejMwcGZ6VytqUkZFZEd0UnU5dHo3NmxnTTlxSURWWGluZ2QwZVVk?=
+ =?utf-8?B?UHFsV1dOdm16MERkQXVRMTdremc1cHFlR1d4NzBmckRUY0dNVjd0cGtlQ01r?=
+ =?utf-8?B?Njh2QWZjUllhbUFGZHc1dFVWMnJVbm1oczNDRjlsTHAxSXdhdzFrQ2tmaVFN?=
+ =?utf-8?B?UkNwc2N2TEJyQnd4TWVkbWQwNzRHV0hCRVk3QVIwQzNUNjYzcWljaDVqYUIv?=
+ =?utf-8?B?cFJCOWdCa0RyUUxvQmJlKzNoOE1HMGJpc01QTWNDOHZEVE51S2xUeWx6VjJo?=
+ =?utf-8?B?VytGSDVSY09GSzZZeENwNndWaGEvMktkLzB3RGwvV0kzVHRTZDJiamRuNkxa?=
+ =?utf-8?B?QkVnRGQ2c29JcVdoQnFZbHpWOWgrZDQ2aWxKYk9xQmtZNTF4Y2c3QndpSG5k?=
+ =?utf-8?B?NGVJNkJUUzNjeU4yYUJxQmVYMFRXcVJwQTAxQmhHQWZPYW8wczBxMmdrV2VO?=
+ =?utf-8?Q?AAnNE/4x4Hmf92RM2IWvfsLJU?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 479efe3a-9676-4c27-5f2d-08daa6117cd3
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5874.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Oct 2022 14:05:26.6634
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5EtV4p3xptCkF7/GukRykM4mMAzebk6h4liUqM3fuiCo99DSnRDHW0A38elbG6cpQFzlUGu0wYC7ioFe/hvRiQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6036
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Reserved fields of struct sev_es_save_area are named by their order of
+appearance, but right now they jump from reserved_5 to reserved_7. Rename
+them with the correct order.
 
+Fixes: 6d3b3d34e39eb ("KVM: SVM: Update the SEV-ES save area mapping")
 
-On 9/30/22 16:01, Claudio Imbrenda wrote:
-> Add the module parameter "async_destroy", to allow the asynchronous
-> destroy mechanism to be switched off. This might be useful for
-> debugging purposes.
-> 
-> The parameter is enabled by default since the feature is opt-in anyway.
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-LGTM
-Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+Signed-off-by: Carlos Bilbao <carlos.bilbao@amd.com>
+---
+  arch/x86/include/asm/svm.h | 12 ++++++------
+  1 file changed, 6 insertions(+), 6 deletions(-)
 
-> ---
->   arch/s390/kvm/kvm-s390.c | 8 +++++++-
->   1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 7a3bd68efd85..33a53b389cf3 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -209,7 +209,13 @@ unsigned int diag9c_forwarding_hz;
->   module_param(diag9c_forwarding_hz, uint, 0644);
->   MODULE_PARM_DESC(diag9c_forwarding_hz, "Maximum diag9c forwarding per second, 0 to turn off");
->   
-> -static int async_destroy;
-> +/*
-> + * allow asynchronous deinit for protected guests; enable by default since
-> + * the feature is opt-in anyway
-> + */
-> +static int async_destroy = 1;
-> +module_param(async_destroy, int, 0444);
-> +MODULE_PARM_DESC(async_destroy, "Asynchronous destroy for protected guests");
->   
->   /*
->    * For now we handle at most 16 double words as this is what the s390 base
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index 0361626841bc..6ab45a0389dc 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -393,14 +393,14 @@ struct sev_es_save_area {
+      u64 br_to;
+      u64 last_excp_from;
+      u64 last_excp_to;
+-    u8 reserved_7[80];
++    u8 reserved_6[80];
+      u32 pkru;
+-    u8 reserved_8[20];
+-    u64 reserved_9;        /* rax already available at 0x01f8 */
++    u8 reserved_7[20];
++    u64 reserved_8;        /* rax already available at 0x01f8 */
+      u64 rcx;
+      u64 rdx;
+      u64 rbx;
+-    u64 reserved_10;    /* rsp already available at 0x01d8 */
++    u64 reserved_9;    /* rsp already available at 0x01d8 */
+      u64 rbp;
+      u64 rsi;
+      u64 rdi;
+@@ -412,7 +412,7 @@ struct sev_es_save_area {
+      u64 r13;
+      u64 r14;
+      u64 r15;
+-    u8 reserved_11[16];
++    u8 reserved_10[16];
+      u64 guest_exit_info_1;
+      u64 guest_exit_info_2;
+      u64 guest_exit_int_info;
+@@ -425,7 +425,7 @@ struct sev_es_save_area {
+      u64 pcpu_id;
+      u64 event_inj;
+      u64 xcr0;
+-    u8 reserved_12[16];
++    u8 reserved_11[16];
+
+      /* Floating point area */
+      u64 x87_dp;
+-- 
+2.37.0 (Apple Git-136)
+
