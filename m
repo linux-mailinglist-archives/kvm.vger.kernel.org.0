@@ -2,71 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DDF35F4793
-	for <lists+kvm@lfdr.de>; Tue,  4 Oct 2022 18:29:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B03595F47B4
+	for <lists+kvm@lfdr.de>; Tue,  4 Oct 2022 18:34:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230006AbiJDQ3w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Oct 2022 12:29:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44322 "EHLO
+        id S230146AbiJDQe3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 4 Oct 2022 12:34:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230035AbiJDQ3t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Oct 2022 12:29:49 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60AD611A27
-        for <kvm@vger.kernel.org>; Tue,  4 Oct 2022 09:29:48 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id gf8so10757208pjb.5
-        for <kvm@vger.kernel.org>; Tue, 04 Oct 2022 09:29:48 -0700 (PDT)
+        with ESMTP id S230136AbiJDQe1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 4 Oct 2022 12:34:27 -0400
+Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E48E5D0D1
+        for <kvm@vger.kernel.org>; Tue,  4 Oct 2022 09:34:26 -0700 (PDT)
+Received: by mail-yb1-xb2d.google.com with SMTP id 207so14149909ybn.1
+        for <kvm@vger.kernel.org>; Tue, 04 Oct 2022 09:34:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date;
-        bh=IUxbD+pJkUKiwbTjlub7r43XjTNODGmK4AtCtZnddII=;
-        b=RcwD9AmyzJcl4BrMwpMbX3I2CGmDQBZUfJWQyO7V/MdQX8eufTUMUaCrrRYTdqmf4j
-         6FP0J5TTLCL4ycWDcx/DbirihNzccdTtnhcFXO0m9+0PiCvYrURVw96WsrTVpVWtPXnj
-         tTogAyZ1LS5lCPWtzNW/sHb4mDVEOjHnW6AYho9Qct8lUCRBE9C2cLb0GgZiXHsaYZw2
-         LkFEjdiYelRSF1H/V0ZSsjswPx+4EBi9H0t1DlmW3pV6IoKN9jrEdHrlfbxW4Y5/os5f
-         Q4q8PlfHE5VX5nCU2iJBuibzrd6XpD7jvXRpC7jlgoSy4RqIUnYWjHtEbPqS723bOwcr
-         3l5g==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=EmPKt0lRs/QHthx/inO0C3sIobWn+R1WZttVyEUbjv4=;
+        b=pbDoYb3k4LdDvni/cuvJYsuPnuOpxiKhxyBhCs2z5peIfGjb2bUwIfgZC3LgZ9prmp
+         5v4A7nYbapemaTXk4N1L5z0FNnKhvEmHlL3G+WzWhSXKogBho9ol4drsmg6G402Qtl/+
+         5aQPjOQt2XEy09ov2DLp8/5ykI/k2uHjIkBMH05R/FLgp5lq1oLRRqPL1wYZGSnrRWd+
+         zqdXAXuEahNSOv2AX/f+lgilvvd95USMgAjiE1J6RQ/BF3PRnQnGIMARb9LW1AxOeyRa
+         63f7nCnPS/qiXG+4xWG2oPyLuBFhEDwRkBQJeHc1jolXfxgdjDowDC72U0APAq4YMJ9H
+         MPDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=IUxbD+pJkUKiwbTjlub7r43XjTNODGmK4AtCtZnddII=;
-        b=gTHtxGo9Z6OCGHIw4HYPkUTrN1AYo+XjzJaHIkZitOTKWk9C77dfF+UdGZhXEFme2Q
-         Ds5ttMfKdFrU/qIHneb/bJkC3HrtDcJuI8Q59PgYWAATsjmLILbPwtA2sARhjjY7xNOk
-         KbM3cktscEOjPJvQMwP1GsoL5G2WWOU8YudAU8Z57axqZUUnC4E2lfQRACI8lvD0mnTL
-         fSV+aZyL7JW+eedwepNdUMZAxo1yUO8qP6TX27C/tg8cJwkKGmb40t3tf+c7S7KaJvnU
-         ZyidRH/OivLSlEX6PbaXAUlUXIJYakeaGLs0RFyYF5JVyyfWHwN8DMzaYgG5UVsW3UYF
-         shRA==
-X-Gm-Message-State: ACrzQf1a2EIHYThIa0KjuYzdpnAw3yplJ7ClKCYOr0RTYGy5k95sfkh0
-        e4oUJBnXWLu/b2ekABziFs5y/w==
-X-Google-Smtp-Source: AMsMyM6kX3Gi8e2o1YL0eQILvJFlD5uxOsQjZtLQ2jNsk/OIBLFtxjrbZwKKg4SCn+Tb84n3i4Kffg==
-X-Received: by 2002:a17:902:8695:b0:17f:71ed:dac1 with SMTP id g21-20020a170902869500b0017f71eddac1mr4794424plo.127.1664900987738;
-        Tue, 04 Oct 2022 09:29:47 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id i10-20020a170902cf0a00b00177f25f8ab3sm9149694plg.89.2022.10.04.09.29.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Oct 2022 09:29:45 -0700 (PDT)
-Date:   Tue, 4 Oct 2022 16:29:41 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Carlos Bilbao <carlos.bilbao@amd.com>
-Cc:     tglx@linutronix.de, bp@alien8.de, mingo@redhat.com,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        venu.busireddy@oracle.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, bilbao@vt.edu
-Subject: Re: [PATCH] KVM: SVM: Fix reserved fields of struct sev_es_save_area
-Message-ID: <YzxfdQ7DrT9X6t7j@google.com>
-References: <986a5886-4ddc-aa88-db52-e8781ec95aed@amd.com>
- <dd357565-d428-499f-fa0e-e35aa043449f@amd.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=EmPKt0lRs/QHthx/inO0C3sIobWn+R1WZttVyEUbjv4=;
+        b=kpySau1yPIwdQRPRwdpoJSJVT1fJVkY+N+fPI/ZCdvw/VJj8uqAMNy4oa7diF7DxFB
+         Vo/QbMo4EkTL2bnajJ+9Kt6/v+ot7ZW6gpvzoGRyT3TBKMtFwAUAh226ZgoWivJIMlio
+         sWqEsjxZJkb3aW8SFl1NfDBB4b7TT9elyXca5Krm2d1obfxt6G/5ekxzpqLfqioEKoC+
+         5OhnLKDRHYxTGpvDfwo1MuBO4dDd3pCmFh4CyYQG3eYoERJCwBkXHLfXQLY/PMkFBh6i
+         g29uXyfVBK7OalFykTaku0CiXGvgzSE6Snqmk9qXIYzonM05jX7CiusNoWd87racqb4P
+         PKwQ==
+X-Gm-Message-State: ACrzQf2Ui48YUvXzKrVLrdrD3uwS4z2ZyBPcS64SAZbxFy0mgh48Soot
+        AgCCfl/6dar1SNpK9oU61x9P2QJfdoiwOWPdlGtSqExp8aEVMg==
+X-Google-Smtp-Source: AMsMyM50bLcOJmA7rgObdtIBJrytr0rdYsgxQ56eUJGhNpXQtBfj7gp+X7w7sJoTiTBbhoxSmUTHFbPlmBkPWL5Zg24=
+X-Received: by 2002:a5b:443:0:b0:6bc:e3d1:8990 with SMTP id
+ s3-20020a5b0443000000b006bce3d18990mr23179544ybp.191.1664901265770; Tue, 04
+ Oct 2022 09:34:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dd357565-d428-499f-fa0e-e35aa043449f@amd.com>
+References: <20220929204708.2548375-1-dmatlack@google.com> <Yztw5p+Y5oyJElH2@google.com>
+In-Reply-To: <Yztw5p+Y5oyJElH2@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Tue, 4 Oct 2022 09:33:58 -0700
+Message-ID: <CALzav=foJLfym8uJ88gzaHDtAdn3ivFFr7mvQpm_4ePQVMGORg@mail.gmail.com>
+Subject: Re: [PATCH 0/4] KVM: selftests: Fix and clean up emulator_error_test
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,26 +69,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 04, 2022, Carlos Bilbao wrote:
-> On 10/4/22 09:05, Carlos Bilbao wrote:
-> 
-> > Reserved fields of struct sev_es_save_area are named by their order of
-> > appearance, but right now they jump from reserved_5 to reserved_7. Rename
-> > them with the correct order.
-> > 
-> > Fixes: 6d3b3d34e39eb ("KVM: SVM: Update the SEV-ES save area mapping")
-> Actually, there is no bug, so this Fix tag could go. Thanks!!
+On Mon, Oct 3, 2022 at 4:31 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Sep 29, 2022, David Matlack wrote:
+> > Miscellaneous fixes and cleanups to emulator_error_test. The reason I
+> > started looking at this test is because it fails when TDP is disabled,
+> > which pollutes my test results when I am testing a new series for
+> > upstream.
+>
+> This series defeats the (not well documented) purpose of emulator_error_test.  The
+> test exists specifically to verify that KVM emulates in response to EPT violations
+> when "allow_smaller_maxphyaddr && guest.MAXPHYADDR < host.MAXPHADDR".
 
-Fixes: is appropriate, if we think it's worth fixing.  Personally, I don't think
-it's worth the churn/effort to keep the reserved numbers accurate, e.g. if the
-two bytes in reserved_1 are used, then every other field will need to be updated
-just to accomodate a tiny change.  We'll find ourselves in a similar situation if
-field is added in the middle of reserved_3,
+I thought that might have been the case before I sent this series, but
+I could not (and still can't) find any evidence to support it. The
+commit message and comment at the top of the test all indicate this is
+a test for KVM_CAP_EXIT_ON_EMULATION_FAILURE. What did I miss?
 
-If we really want to the number to have any kind of meaning without needing a pile
-of churn for every update, the best idea I can think of is to name them reserved_<offset>.
-That way only the affected reserved field needs to be modified when adding new
-legal fields.  But that has it's own flavor of maintenance burden as calculating
-and verifying the offset is a waste of everyone's time.
+Either way, I think we want both types of tests.  In v2 how about I split out:
 
-TL;DR: I vote to sweep this under the rug and live with arbitrary/bad numbers.
+ (1) exit_on_emulation_failure_test.c: Test that emulation failures
+exit to userspace when the cap is enabled, i.e. what
+emulator_error_test does by the end of this series.
+ (2) smaller_maxphyaddr_emulation_test.c: Test the interaction of
+allow_smaller_maxphyaddr and instruction emulation. i.e. what
+emulator_error_does at the start of this series plus your suggestions.
+
+The main benefit of splitting out (1) is to test
+KVM_CAP_EXIT_ON_EMULATION_FAILURE independent of
+allow_smaller_maxphyaddr, since allow_smaller_maxphyaddr is not
+enabled by default.
+
+
+>
+> That said, the test could use some upgrades:
+>
+>   1. Verify that a well-emulated instruction takes #PF(RSVD)
+>   2. Verify that FLDS takes #PF(RSVD) when EPT is disabled
