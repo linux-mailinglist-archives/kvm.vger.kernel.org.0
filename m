@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E650C5F5482
-	for <lists+kvm@lfdr.de>; Wed,  5 Oct 2022 14:31:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DFFAA5F547F
+	for <lists+kvm@lfdr.de>; Wed,  5 Oct 2022 14:31:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229993AbiJEMbz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Oct 2022 08:31:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58398 "EHLO
+        id S229875AbiJEMbr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Oct 2022 08:31:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229885AbiJEMbu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Oct 2022 08:31:50 -0400
+        with ESMTP id S229450AbiJEMbn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Oct 2022 08:31:43 -0400
 Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [IPv6:2a0c:5a00:149::26])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B7D84B9A5
-        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 05:31:47 -0700 (PDT)
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06CBE22502
+        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 05:31:41 -0700 (PDT)
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
         by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
         (Exim 4.93)
         (envelope-from <mhal@rbox.co>)
-        id 1og3Yv-00Gedv-OP; Wed, 05 Oct 2022 14:31:45 +0200
+        id 1og3Yq-00GedN-8z; Wed, 05 Oct 2022 14:31:40 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
         s=selector2; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
         Message-Id:Date:Subject:Cc:To:From;
-        bh=uG0AOpt2CyZI62orwWliEpaN9pL/1GxTgFPNgCfpVCQ=; b=m9KoJS0zXSUYmZyCFCPu1N22Lt
-        qggody8VTL/aMgSYbR5CP0xSa6ejLr04GhsjhqelSjM+sfqWfMnWCtwgJtIpkqmV0bCr/rdmB/MNw
-        WmCGi+yzifaGD+mooQj+HEx1m7K1ujlOwrnNXFng6+RRxk9v/qYEijjxMyog3Hc2g4rKSIxrkrR2l
-        exdSFGQDj+By76JyJS8uxraKtrmhmZBwcGli4CdhaRDfkB70Po5N9T+MKCAyB+1HI2bfvuGNW8+3M
-        JF8aPUhLlGBWg3AlOalIzNkeNPPSMir66eEB4Gac2rZp0Wo0UBXLdc2sRhfWQLcqlhKG0OQWUbnJy
-        cJFiNqSA==;
+        bh=RMI/AG/i+xYOrQqKjORbLmuUiJo4b9WZPKI4QjCONKo=; b=geIeH8C/BB6Shxyk/QKPjI7EFe
+        tnF49anZnOLxnvaax1sRWXH9REV+ccaZvWnJhhr3TNI5gCMatW7vFvRglMv/Gyetkn4wITKzdWuCD
+        uIsH075AByuuck9x46gzta/nIGqzS4LmzdcoQYA8YxKI6kJzYdSlCcKuRqHYjLPHpU9PM5UcSjYC1
+        k+VYB1TlZsKD+6gOE2w+QBOk6OJDJRjlsOa/EUzw9BGqtdI+ZZAvsBVhVScK6WcNJ+ldCFm14Vm0E
+        iWJ9b6XKS/pk+kWg9lofzGkG9grEURYykynh0/CIXk8AZVyGIwHp242zUkcKxHhXNT/dtcG2pSuYj
+        B2+5/y9A==;
 Received: from [10.9.9.73] (helo=submission02.runbox)
-        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+        by mailtransmit02.runbox with esmtp (Exim 4.86_2)
         (envelope-from <mhal@rbox.co>)
-        id 1og3Yv-000614-FI; Wed, 05 Oct 2022 14:31:45 +0200
+        id 1og3Yp-0001Kk-To; Wed, 05 Oct 2022 14:31:40 +0200
 Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.90_1)
-        id 1og3YP-0007vp-Nk; Wed, 05 Oct 2022 14:31:13 +0200
+        id 1og3YQ-0007vp-2F; Wed, 05 Oct 2022 14:31:14 +0200
 From:   Michal Luczaj <mhal@rbox.co>
 To:     kvm@vger.kernel.org
 Cc:     seanjc@google.com, pbonzini@redhat.com,
         Michal Luczaj <mhal@rbox.co>
-Subject: [PATCH v2 1/8] KVM: x86: Add initializer for gfn_to_pfn_cache
-Date:   Wed,  5 Oct 2022 14:30:44 +0200
-Message-Id: <20221005123051.895056-2-mhal@rbox.co>
+Subject: [PATCH v2 2/8] KVM: x86: Shorten gfn_to_pfn_cache function names
+Date:   Wed,  5 Oct 2022 14:30:45 +0200
+Message-Id: <20221005123051.895056-3-mhal@rbox.co>
 X-Mailer: git-send-email 2.37.3
 In-Reply-To: <20221005123051.895056-1-mhal@rbox.co>
 References: <YySujDJN2Wm3ivi/@google.com>
@@ -57,296 +57,274 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the gfn_to_pfn_cache lock initialization to another helper and
-call the new helper during VM/vCPU creation.
+Formalize "gpc" as the acronym and use it in function names.
 
-Rename "cache_init" and "cache_destroy" to activate+deactivate to
-avoid implying that the cache really is destroyed/freed.
+No functional change intended.
 
 Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Michal Luczaj <mhal@rbox.co>
 ---
- arch/x86/kvm/x86.c       | 12 +++++----
- arch/x86/kvm/xen.c       | 57 +++++++++++++++++++++-------------------
- include/linux/kvm_host.h | 23 +++++++++++-----
- virt/kvm/pfncache.c      | 21 ++++++++-------
- 4 files changed, 65 insertions(+), 48 deletions(-)
+ arch/x86/kvm/x86.c       |  8 ++++----
+ arch/x86/kvm/xen.c       | 29 ++++++++++++++---------------
+ include/linux/kvm_host.h | 21 ++++++++++-----------
+ virt/kvm/pfncache.c      | 20 ++++++++++----------
+ 4 files changed, 38 insertions(+), 40 deletions(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 43a6a7efc6ec..15032b7f0589 100644
+index 15032b7f0589..45136ce7185e 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -2301,11 +2301,11 @@ static void kvm_write_system_time(struct kvm_vcpu *vcpu, gpa_t system_time,
+@@ -3020,12 +3020,12 @@ static void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
+ 	unsigned long flags;
  
- 	/* we verify if the enable bit is set... */
- 	if (system_time & 1) {
--		kvm_gfn_to_pfn_cache_init(vcpu->kvm, &vcpu->arch.pv_time, vcpu,
--					  KVM_HOST_USES_PFN, system_time & ~1ULL,
--					  sizeof(struct pvclock_vcpu_time_info));
-+		kvm_gpc_activate(vcpu->kvm, &vcpu->arch.pv_time, vcpu,
-+				 KVM_HOST_USES_PFN, system_time & ~1ULL,
-+				 sizeof(struct pvclock_vcpu_time_info));
- 	} else {
--		kvm_gfn_to_pfn_cache_destroy(vcpu->kvm, &vcpu->arch.pv_time);
-+		kvm_gpc_deactivate(vcpu->kvm, &vcpu->arch.pv_time);
- 	}
+ 	read_lock_irqsave(&gpc->lock, flags);
+-	while (!kvm_gfn_to_pfn_cache_check(v->kvm, gpc, gpc->gpa,
+-					   offset + sizeof(*guest_hv_clock))) {
++	while (!kvm_gpc_check(v->kvm, gpc, gpc->gpa,
++			      offset + sizeof(*guest_hv_clock))) {
+ 		read_unlock_irqrestore(&gpc->lock, flags);
  
- 	return;
-@@ -3374,7 +3374,7 @@ static int kvm_pv_enable_async_pf_int(struct kvm_vcpu *vcpu, u64 data)
+-		if (kvm_gfn_to_pfn_cache_refresh(v->kvm, gpc, gpc->gpa,
+-						 offset + sizeof(*guest_hv_clock)))
++		if (kvm_gpc_refresh(v->kvm, gpc, gpc->gpa,
++				    offset + sizeof(*guest_hv_clock)))
+ 			return;
  
- static void kvmclock_reset(struct kvm_vcpu *vcpu)
- {
--	kvm_gfn_to_pfn_cache_destroy(vcpu->kvm, &vcpu->arch.pv_time);
-+	kvm_gpc_deactivate(vcpu->kvm, &vcpu->arch.pv_time);
- 	vcpu->arch.time = 0;
- }
- 
-@@ -11551,6 +11551,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	vcpu->arch.regs_avail = ~0;
- 	vcpu->arch.regs_dirty = ~0;
- 
-+	kvm_gpc_init(&vcpu->arch.pv_time);
-+
- 	if (!irqchip_in_kernel(vcpu->kvm) || kvm_vcpu_is_reset_bsp(vcpu))
- 		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
- 	else
+ 		read_lock_irqsave(&gpc->lock, flags);
 diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 280cb5dc7341..cecf8299b187 100644
+index cecf8299b187..361f77dc7a3d 100644
 --- a/arch/x86/kvm/xen.c
 +++ b/arch/x86/kvm/xen.c
-@@ -42,13 +42,13 @@ static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
- 	int idx = srcu_read_lock(&kvm->srcu);
+@@ -218,15 +218,14 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
+ 		user_len = sizeof(struct compat_vcpu_runstate_info);
  
- 	if (gfn == GPA_INVALID) {
--		kvm_gfn_to_pfn_cache_destroy(kvm, gpc);
-+		kvm_gpc_deactivate(kvm, gpc);
- 		goto out;
- 	}
+ 	read_lock_irqsave(&gpc->lock, flags);
+-	while (!kvm_gfn_to_pfn_cache_check(v->kvm, gpc, gpc->gpa,
+-					   user_len)) {
++	while (!kvm_gpc_check(v->kvm, gpc, gpc->gpa, user_len)) {
+ 		read_unlock_irqrestore(&gpc->lock, flags);
  
- 	do {
--		ret = kvm_gfn_to_pfn_cache_init(kvm, gpc, NULL, KVM_HOST_USES_PFN,
--						gpa, PAGE_SIZE);
-+		ret = kvm_gpc_activate(kvm, gpc, NULL, KVM_HOST_USES_PFN, gpa,
-+				       PAGE_SIZE);
- 		if (ret)
- 			goto out;
+ 		/* When invoked from kvm_sched_out() we cannot sleep */
+ 		if (state == RUNSTATE_runnable)
+ 			return;
  
-@@ -554,15 +554,15 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
- 			     offsetof(struct compat_vcpu_info, time));
+-		if (kvm_gfn_to_pfn_cache_refresh(v->kvm, gpc, gpc->gpa, user_len))
++		if (kvm_gpc_refresh(v->kvm, gpc, gpc->gpa, user_len))
+ 			return;
  
- 		if (data->u.gpa == GPA_INVALID) {
--			kvm_gfn_to_pfn_cache_destroy(vcpu->kvm, &vcpu->arch.xen.vcpu_info_cache);
-+			kvm_gpc_deactivate(vcpu->kvm, &vcpu->arch.xen.vcpu_info_cache);
- 			r = 0;
+ 		read_lock_irqsave(&gpc->lock, flags);
+@@ -352,12 +351,12 @@ void kvm_xen_inject_pending_events(struct kvm_vcpu *v)
+ 	 * little more honest about it.
+ 	 */
+ 	read_lock_irqsave(&gpc->lock, flags);
+-	while (!kvm_gfn_to_pfn_cache_check(v->kvm, gpc, gpc->gpa,
+-					   sizeof(struct vcpu_info))) {
++	while (!kvm_gpc_check(v->kvm, gpc, gpc->gpa,
++			      sizeof(struct vcpu_info))) {
+ 		read_unlock_irqrestore(&gpc->lock, flags);
+ 
+-		if (kvm_gfn_to_pfn_cache_refresh(v->kvm, gpc, gpc->gpa,
+-						 sizeof(struct vcpu_info)))
++		if (kvm_gpc_refresh(v->kvm, gpc, gpc->gpa,
++				    sizeof(struct vcpu_info)))
+ 			return;
+ 
+ 		read_lock_irqsave(&gpc->lock, flags);
+@@ -417,8 +416,8 @@ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
+ 		     sizeof_field(struct compat_vcpu_info, evtchn_upcall_pending));
+ 
+ 	read_lock_irqsave(&gpc->lock, flags);
+-	while (!kvm_gfn_to_pfn_cache_check(v->kvm, gpc, gpc->gpa,
+-					   sizeof(struct vcpu_info))) {
++	while (!kvm_gpc_check(v->kvm, gpc, gpc->gpa,
++			      sizeof(struct vcpu_info))) {
+ 		read_unlock_irqrestore(&gpc->lock, flags);
+ 
+ 		/*
+@@ -432,8 +431,8 @@ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
+ 		if (in_atomic() || !task_is_running(current))
+ 			return 1;
+ 
+-		if (kvm_gfn_to_pfn_cache_refresh(v->kvm, gpc, gpc->gpa,
+-						 sizeof(struct vcpu_info))) {
++		if (kvm_gpc_refresh(v->kvm, gpc, gpc->gpa,
++				    sizeof(struct vcpu_info))) {
+ 			/*
+ 			 * If this failed, userspace has screwed up the
+ 			 * vcpu_info mapping. No interrupts for you.
+@@ -966,7 +965,7 @@ static bool wait_pending_event(struct kvm_vcpu *vcpu, int nr_ports,
+ 
+ 	read_lock_irqsave(&gpc->lock, flags);
+ 	idx = srcu_read_lock(&kvm->srcu);
+-	if (!kvm_gfn_to_pfn_cache_check(kvm, gpc, gpc->gpa, PAGE_SIZE))
++	if (!kvm_gpc_check(kvm, gpc, gpc->gpa, PAGE_SIZE))
+ 		goto out_rcu;
+ 
+ 	ret = false;
+@@ -1358,7 +1357,7 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe, struct kvm *kvm)
+ 	idx = srcu_read_lock(&kvm->srcu);
+ 
+ 	read_lock_irqsave(&gpc->lock, flags);
+-	if (!kvm_gfn_to_pfn_cache_check(kvm, gpc, gpc->gpa, PAGE_SIZE))
++	if (!kvm_gpc_check(kvm, gpc, gpc->gpa, PAGE_SIZE))
+ 		goto out_rcu;
+ 
+ 	if (IS_ENABLED(CONFIG_64BIT) && kvm->arch.xen.long_mode) {
+@@ -1392,7 +1391,7 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe, struct kvm *kvm)
+ 		gpc = &vcpu->arch.xen.vcpu_info_cache;
+ 
+ 		read_lock_irqsave(&gpc->lock, flags);
+-		if (!kvm_gfn_to_pfn_cache_check(kvm, gpc, gpc->gpa, sizeof(struct vcpu_info))) {
++		if (!kvm_gpc_check(kvm, gpc, gpc->gpa, sizeof(struct vcpu_info))) {
+ 			/*
+ 			 * Could not access the vcpu_info. Set the bit in-kernel
+ 			 * and prod the vCPU to deliver it for itself.
+@@ -1490,7 +1489,7 @@ static int kvm_xen_set_evtchn(struct kvm_xen_evtchn *xe, struct kvm *kvm)
  			break;
- 		}
  
--		r = kvm_gfn_to_pfn_cache_init(vcpu->kvm,
--					      &vcpu->arch.xen.vcpu_info_cache,
--					      NULL, KVM_HOST_USES_PFN, data->u.gpa,
--					      sizeof(struct vcpu_info));
-+		r = kvm_gpc_activate(vcpu->kvm,
-+				     &vcpu->arch.xen.vcpu_info_cache, NULL,
-+				     KVM_HOST_USES_PFN, data->u.gpa,
-+				     sizeof(struct vcpu_info));
- 		if (!r)
- 			kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
+ 		idx = srcu_read_lock(&kvm->srcu);
+-		rc = kvm_gfn_to_pfn_cache_refresh(kvm, gpc, gpc->gpa, PAGE_SIZE);
++		rc = kvm_gpc_refresh(kvm, gpc, gpc->gpa, PAGE_SIZE);
+ 		srcu_read_unlock(&kvm->srcu, idx);
+ 	} while(!rc);
  
-@@ -570,16 +570,16 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
- 
- 	case KVM_XEN_VCPU_ATTR_TYPE_VCPU_TIME_INFO:
- 		if (data->u.gpa == GPA_INVALID) {
--			kvm_gfn_to_pfn_cache_destroy(vcpu->kvm,
--						     &vcpu->arch.xen.vcpu_time_info_cache);
-+			kvm_gpc_deactivate(vcpu->kvm,
-+					   &vcpu->arch.xen.vcpu_time_info_cache);
- 			r = 0;
- 			break;
- 		}
- 
--		r = kvm_gfn_to_pfn_cache_init(vcpu->kvm,
--					      &vcpu->arch.xen.vcpu_time_info_cache,
--					      NULL, KVM_HOST_USES_PFN, data->u.gpa,
--					      sizeof(struct pvclock_vcpu_time_info));
-+		r = kvm_gpc_activate(vcpu->kvm,
-+				     &vcpu->arch.xen.vcpu_time_info_cache,
-+				     NULL, KVM_HOST_USES_PFN, data->u.gpa,
-+				     sizeof(struct pvclock_vcpu_time_info));
- 		if (!r)
- 			kvm_make_request(KVM_REQ_CLOCK_UPDATE, vcpu);
- 		break;
-@@ -590,16 +590,15 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
- 			break;
- 		}
- 		if (data->u.gpa == GPA_INVALID) {
--			kvm_gfn_to_pfn_cache_destroy(vcpu->kvm,
--						     &vcpu->arch.xen.runstate_cache);
-+			kvm_gpc_deactivate(vcpu->kvm,
-+					   &vcpu->arch.xen.runstate_cache);
- 			r = 0;
- 			break;
- 		}
- 
--		r = kvm_gfn_to_pfn_cache_init(vcpu->kvm,
--					      &vcpu->arch.xen.runstate_cache,
--					      NULL, KVM_HOST_USES_PFN, data->u.gpa,
--					      sizeof(struct vcpu_runstate_info));
-+		r = kvm_gpc_activate(vcpu->kvm, &vcpu->arch.xen.runstate_cache,
-+				     NULL, KVM_HOST_USES_PFN, data->u.gpa,
-+				     sizeof(struct vcpu_runstate_info));
- 		break;
- 
- 	case KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_CURRENT:
-@@ -1817,7 +1816,12 @@ void kvm_xen_init_vcpu(struct kvm_vcpu *vcpu)
- {
- 	vcpu->arch.xen.vcpu_id = vcpu->vcpu_idx;
- 	vcpu->arch.xen.poll_evtchn = 0;
-+
- 	timer_setup(&vcpu->arch.xen.poll_timer, cancel_evtchn_poll, 0);
-+
-+	kvm_gpc_init(&vcpu->arch.xen.runstate_cache);
-+	kvm_gpc_init(&vcpu->arch.xen.vcpu_info_cache);
-+	kvm_gpc_init(&vcpu->arch.xen.vcpu_time_info_cache);
- }
- 
- void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu)
-@@ -1825,18 +1829,17 @@ void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu)
- 	if (kvm_xen_timer_enabled(vcpu))
- 		kvm_xen_stop_timer(vcpu);
- 
--	kvm_gfn_to_pfn_cache_destroy(vcpu->kvm,
--				     &vcpu->arch.xen.runstate_cache);
--	kvm_gfn_to_pfn_cache_destroy(vcpu->kvm,
--				     &vcpu->arch.xen.vcpu_info_cache);
--	kvm_gfn_to_pfn_cache_destroy(vcpu->kvm,
--				     &vcpu->arch.xen.vcpu_time_info_cache);
-+	kvm_gpc_deactivate(vcpu->kvm, &vcpu->arch.xen.runstate_cache);
-+	kvm_gpc_deactivate(vcpu->kvm, &vcpu->arch.xen.vcpu_info_cache);
-+	kvm_gpc_deactivate(vcpu->kvm, &vcpu->arch.xen.vcpu_time_info_cache);
-+
- 	del_timer_sync(&vcpu->arch.xen.poll_timer);
- }
- 
- void kvm_xen_init_vm(struct kvm *kvm)
- {
- 	idr_init(&kvm->arch.xen.evtchn_ports);
-+	kvm_gpc_init(&kvm->arch.xen.shinfo_cache);
- }
- 
- void kvm_xen_destroy_vm(struct kvm *kvm)
-@@ -1844,7 +1847,7 @@ void kvm_xen_destroy_vm(struct kvm *kvm)
- 	struct evtchnfd *evtchnfd;
- 	int i;
- 
--	kvm_gfn_to_pfn_cache_destroy(kvm, &kvm->arch.xen.shinfo_cache);
-+	kvm_gpc_deactivate(kvm, &kvm->arch.xen.shinfo_cache);
- 
- 	idr_for_each_entry(&kvm->arch.xen.evtchn_ports, evtchnfd, i) {
- 		if (!evtchnfd->deliver.port.port)
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index f4519d3689e1..9fd67026d91a 100644
+index 9fd67026d91a..f687e56c24bc 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -1241,8 +1241,17 @@ int kvm_vcpu_write_guest(struct kvm_vcpu *vcpu, gpa_t gpa, const void *data,
- void kvm_vcpu_mark_page_dirty(struct kvm_vcpu *vcpu, gfn_t gfn);
+@@ -1271,16 +1271,15 @@ void kvm_gpc_init(struct gfn_to_pfn_cache *gpc);
+  *                 -EFAULT for an untranslatable guest physical address.
+  *
+  * This primes a gfn_to_pfn_cache and links it into the @kvm's list for
+- * invalidations to be processed.  Callers are required to use
+- * kvm_gfn_to_pfn_cache_check() to ensure that the cache is valid before
+- * accessing the target page.
++ * invalidations to be processed.  Callers are required to use kvm_gpc_check()
++ * to ensure that the cache is valid before accessing the target page.
+  */
+ int kvm_gpc_activate(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+ 		     struct kvm_vcpu *vcpu, enum pfn_cache_usage usage,
+ 		     gpa_t gpa, unsigned long len);
  
  /**
-- * kvm_gfn_to_pfn_cache_init - prepare a cached kernel mapping and HPA for a
-- *                             given guest physical address.
-+ * kvm_gpc_init - initialize gfn_to_pfn_cache.
-+ *
-+ * @gpc:	   struct gfn_to_pfn_cache object.
-+ *
-+ * This sets up a gfn_to_pfn_cache by initializing locks.
-+ */
-+void kvm_gpc_init(struct gfn_to_pfn_cache *gpc);
-+
-+/**
-+ * kvm_gpc_activate - prepare a cached kernel mapping and HPA for a given guest
-+ *                    physical address.
+- * kvm_gfn_to_pfn_cache_check - check validity of a gfn_to_pfn_cache.
++ * kvm_gpc_check - check validity of a gfn_to_pfn_cache.
   *
   * @kvm:	   pointer to kvm instance.
   * @gpc:	   struct gfn_to_pfn_cache object.
-@@ -1266,9 +1275,9 @@ void kvm_vcpu_mark_page_dirty(struct kvm_vcpu *vcpu, gfn_t gfn);
-  * kvm_gfn_to_pfn_cache_check() to ensure that the cache is valid before
-  * accessing the target page.
+@@ -1297,11 +1296,11 @@ int kvm_gpc_activate(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+  * Callers in IN_GUEST_MODE may do so without locking, although they should
+  * still hold a read lock on kvm->scru for the memslot checks.
   */
--int kvm_gfn_to_pfn_cache_init(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
--			      struct kvm_vcpu *vcpu, enum pfn_cache_usage usage,
--			      gpa_t gpa, unsigned long len);
-+int kvm_gpc_activate(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
-+		     struct kvm_vcpu *vcpu, enum pfn_cache_usage usage,
-+		     gpa_t gpa, unsigned long len);
+-bool kvm_gfn_to_pfn_cache_check(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+-				gpa_t gpa, unsigned long len);
++bool kvm_gpc_check(struct kvm *kvm, struct gfn_to_pfn_cache *gpc, gpa_t gpa,
++		   unsigned long len);
  
  /**
-  * kvm_gfn_to_pfn_cache_check - check validity of a gfn_to_pfn_cache.
-@@ -1325,7 +1334,7 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
- void kvm_gfn_to_pfn_cache_unmap(struct kvm *kvm, struct gfn_to_pfn_cache *gpc);
- 
- /**
-- * kvm_gfn_to_pfn_cache_destroy - destroy and unlink a gfn_to_pfn_cache.
-+ * kvm_gpc_deactivate - deactivate and unlink a gfn_to_pfn_cache.
+- * kvm_gfn_to_pfn_cache_refresh - update a previously initialized cache.
++ * kvm_gpc_refresh - update a previously initialized cache.
   *
   * @kvm:	   pointer to kvm instance.
   * @gpc:	   struct gfn_to_pfn_cache object.
-@@ -1333,7 +1342,7 @@ void kvm_gfn_to_pfn_cache_unmap(struct kvm *kvm, struct gfn_to_pfn_cache *gpc);
-  * This removes a cache from the @kvm's list to be processed on MMU notifier
-  * invocation.
+@@ -1318,11 +1317,11 @@ bool kvm_gfn_to_pfn_cache_check(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+  * still lock and check the cache status, as this function does not return
+  * with the lock still held to permit access.
   */
--void kvm_gfn_to_pfn_cache_destroy(struct kvm *kvm, struct gfn_to_pfn_cache *gpc);
-+void kvm_gpc_deactivate(struct kvm *kvm, struct gfn_to_pfn_cache *gpc);
+-int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+-				 gpa_t gpa, unsigned long len);
++int kvm_gpc_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc, gpa_t gpa,
++		    unsigned long len);
  
- void kvm_sigset_activate(struct kvm_vcpu *vcpu);
- void kvm_sigset_deactivate(struct kvm_vcpu *vcpu);
+ /**
+- * kvm_gfn_to_pfn_cache_unmap - temporarily unmap a gfn_to_pfn_cache.
++ * kvm_gpc_unmap - temporarily unmap a gfn_to_pfn_cache.
+  *
+  * @kvm:	   pointer to kvm instance.
+  * @gpc:	   struct gfn_to_pfn_cache object.
+@@ -1331,7 +1330,7 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+  * but at least the mapping from GPA to userspace HVA will remain cached
+  * and can be reused on a subsequent refresh.
+  */
+-void kvm_gfn_to_pfn_cache_unmap(struct kvm *kvm, struct gfn_to_pfn_cache *gpc);
++void kvm_gpc_unmap(struct kvm *kvm, struct gfn_to_pfn_cache *gpc);
+ 
+ /**
+  * kvm_gpc_deactivate - deactivate and unlink a gfn_to_pfn_cache.
 diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-index 68ff41d39545..08f97cf97264 100644
+index 08f97cf97264..cc65fab0dbef 100644
 --- a/virt/kvm/pfncache.c
 +++ b/virt/kvm/pfncache.c
-@@ -346,17 +346,20 @@ void kvm_gfn_to_pfn_cache_unmap(struct kvm *kvm, struct gfn_to_pfn_cache *gpc)
- }
- EXPORT_SYMBOL_GPL(kvm_gfn_to_pfn_cache_unmap);
- 
-+void kvm_gpc_init(struct gfn_to_pfn_cache *gpc)
-+{
-+	rwlock_init(&gpc->lock);
-+	mutex_init(&gpc->refresh_lock);
-+}
-+EXPORT_SYMBOL_GPL(kvm_gpc_init);
- 
--int kvm_gfn_to_pfn_cache_init(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
--			      struct kvm_vcpu *vcpu, enum pfn_cache_usage usage,
--			      gpa_t gpa, unsigned long len)
-+int kvm_gpc_activate(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
-+		     struct kvm_vcpu *vcpu, enum pfn_cache_usage usage,
-+		     gpa_t gpa, unsigned long len)
- {
- 	WARN_ON_ONCE(!usage || (usage & KVM_GUEST_AND_HOST_USE_PFN) != usage);
- 
- 	if (!gpc->active) {
--		rwlock_init(&gpc->lock);
--		mutex_init(&gpc->refresh_lock);
--
- 		gpc->khva = NULL;
- 		gpc->pfn = KVM_PFN_ERR_FAULT;
- 		gpc->uhva = KVM_HVA_ERR_BAD;
-@@ -371,9 +374,9 @@ int kvm_gfn_to_pfn_cache_init(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+@@ -76,8 +76,8 @@ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, unsigned long start,
  	}
- 	return kvm_gfn_to_pfn_cache_refresh(kvm, gpc, gpa, len);
  }
--EXPORT_SYMBOL_GPL(kvm_gfn_to_pfn_cache_init);
-+EXPORT_SYMBOL_GPL(kvm_gpc_activate);
  
--void kvm_gfn_to_pfn_cache_destroy(struct kvm *kvm, struct gfn_to_pfn_cache *gpc)
-+void kvm_gpc_deactivate(struct kvm *kvm, struct gfn_to_pfn_cache *gpc)
+-bool kvm_gfn_to_pfn_cache_check(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+-				gpa_t gpa, unsigned long len)
++bool kvm_gpc_check(struct kvm *kvm, struct gfn_to_pfn_cache *gpc, gpa_t gpa,
++		   unsigned long len)
  {
- 	if (gpc->active) {
- 		spin_lock(&kvm->gpc_lock);
-@@ -384,4 +387,4 @@ void kvm_gfn_to_pfn_cache_destroy(struct kvm *kvm, struct gfn_to_pfn_cache *gpc)
+ 	struct kvm_memslots *slots = kvm_memslots(kvm);
+ 
+@@ -93,7 +93,7 @@ bool kvm_gfn_to_pfn_cache_check(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+ 
+ 	return true;
+ }
+-EXPORT_SYMBOL_GPL(kvm_gfn_to_pfn_cache_check);
++EXPORT_SYMBOL_GPL(kvm_gpc_check);
+ 
+ static void gpc_unmap_khva(struct kvm *kvm, kvm_pfn_t pfn, void *khva)
+ {
+@@ -235,8 +235,8 @@ static kvm_pfn_t hva_to_pfn_retry(struct kvm *kvm, struct gfn_to_pfn_cache *gpc)
+ 	return -EFAULT;
+ }
+ 
+-int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+-				 gpa_t gpa, unsigned long len)
++int kvm_gpc_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc, gpa_t gpa,
++		    unsigned long len)
+ {
+ 	struct kvm_memslots *slots = kvm_memslots(kvm);
+ 	unsigned long page_offset = gpa & ~PAGE_MASK;
+@@ -317,9 +317,9 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+ 
+ 	return ret;
+ }
+-EXPORT_SYMBOL_GPL(kvm_gfn_to_pfn_cache_refresh);
++EXPORT_SYMBOL_GPL(kvm_gpc_refresh);
+ 
+-void kvm_gfn_to_pfn_cache_unmap(struct kvm *kvm, struct gfn_to_pfn_cache *gpc)
++void kvm_gpc_unmap(struct kvm *kvm, struct gfn_to_pfn_cache *gpc)
+ {
+ 	void *old_khva;
+ 	kvm_pfn_t old_pfn;
+@@ -344,7 +344,7 @@ void kvm_gfn_to_pfn_cache_unmap(struct kvm *kvm, struct gfn_to_pfn_cache *gpc)
+ 
+ 	gpc_unmap_khva(kvm, old_pfn, old_khva);
+ }
+-EXPORT_SYMBOL_GPL(kvm_gfn_to_pfn_cache_unmap);
++EXPORT_SYMBOL_GPL(kvm_gpc_unmap);
+ 
+ void kvm_gpc_init(struct gfn_to_pfn_cache *gpc)
+ {
+@@ -372,7 +372,7 @@ int kvm_gpc_activate(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+ 		list_add(&gpc->list, &kvm->gpc_list);
+ 		spin_unlock(&kvm->gpc_lock);
+ 	}
+-	return kvm_gfn_to_pfn_cache_refresh(kvm, gpc, gpa, len);
++	return kvm_gpc_refresh(kvm, gpc, gpa, len);
+ }
+ EXPORT_SYMBOL_GPL(kvm_gpc_activate);
+ 
+@@ -383,7 +383,7 @@ void kvm_gpc_deactivate(struct kvm *kvm, struct gfn_to_pfn_cache *gpc)
+ 		list_del(&gpc->list);
+ 		spin_unlock(&kvm->gpc_lock);
+ 
+-		kvm_gfn_to_pfn_cache_unmap(kvm, gpc);
++		kvm_gpc_unmap(kvm, gpc);
  		gpc->active = false;
  	}
  }
--EXPORT_SYMBOL_GPL(kvm_gfn_to_pfn_cache_destroy);
-+EXPORT_SYMBOL_GPL(kvm_gpc_deactivate);
 -- 
 2.37.3
 
