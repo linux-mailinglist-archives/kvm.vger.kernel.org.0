@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 19AD75F5D2D
-	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 01:18:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EED2D5F5D34
+	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 01:25:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229569AbiJEXSc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Oct 2022 19:18:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46600 "EHLO
+        id S229603AbiJEXZJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Oct 2022 19:25:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbiJEXSb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Oct 2022 19:18:31 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A28C085A8E
-        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 16:18:30 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id q9so282511pgq.8
-        for <kvm@vger.kernel.org>; Wed, 05 Oct 2022 16:18:30 -0700 (PDT)
+        with ESMTP id S229491AbiJEXZH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Oct 2022 19:25:07 -0400
+Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 932EA422E4
+        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 16:25:06 -0700 (PDT)
+Received: by mail-oi1-x230.google.com with SMTP id g130so200908oia.13
+        for <kvm@vger.kernel.org>; Wed, 05 Oct 2022 16:25:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Usj5iN5cemtFO03tRyeDJUMi4SFYYsF6bTitkecHHS8=;
-        b=j3zs3KAEaPWgtX6tZgalJEuiwLIyUl87wkB3ggQ3onOc9jQvcWUCy4UsyHhAViS9Po
-         RoUcQ27y39xLtVVRejuRGOGet6FgwPRsqMmW1ujK6WYDP9WuAnea1Kly4gTI8z493GKT
-         spDHRGsm8FoJ9VFL5Aoaq7mpUvj1mCiB7WebTELx6wh80KBUoCbKeQkLsIRxZ8+xhlou
-         vgbGEURTtLkw8uf1YQUbrfZlv5x6H4k40UrAU4QTMhZsMTJOJWyIExsOWqUqEzhRdknx
-         qd6DCa/ZZMNo3EwrCq6aMo6gZwIDAOGcGuwVrI56dvy2oBQgragviesJgArek5ldbPBV
-         n3BA==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ISAhMH5CXhMhm+1I427tmkYhfjMJ9VeL8BRy8vi5aDg=;
+        b=Hv+Er/u1QUUMk2kRd/0THVgtqLoGx8V8d2vgB9TBKRsCdT6am1CAJjVlCP8D9CbGle
+         736QJMJOO9Kmd6eDoJI/6b1syOcP3tLqa/IDk4VdA0EYbefLXx/SxQz6xlGG0yG1UMtZ
+         0N0CzKsBwn67wr0WqwBLNlPTWtYGwdQtP7HmfxjbETjvMjZt4YmI8PnCcD2H8R707+kn
+         P4faM9ADQpc31G2ax5Rhi69mzRRT/k7ughzWjn2VeyyKk8vNmj8vOy1tGtbsucxjaUzz
+         AImN+C2uKh6TYfGlnSZvmwb9zB6BVvd97ZieJIk5kC36TMoI8L/eOCGwwPWMZ0bIxXo6
+         eQHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Usj5iN5cemtFO03tRyeDJUMi4SFYYsF6bTitkecHHS8=;
-        b=fKsDrkz81U2P7rhDJkOHl1DE5liedeVwK0MQh+oqdLlYrynkQmDugeWnaU3OBWuF4H
-         6qIjPFbyoOeORFFNhDxx9lqlXjnSM9T+09dQYKZX/ap8jM9mLK5ChB/LuxwgaZA7Nbyb
-         Xyu3sycER3fxNaKbUpV5JaB7l+D+BBnRp7YrPE8ML+zorRcG6rSbN2GU/QziJ4UVOC6N
-         ZXU6U8JqKnIND1roM5kl/QSC73jI6a47CxNesTIXP+2FE3NosqFGSkLWDztNz+Nz1bzj
-         XOOMyk31l/W6DG/5RwlVJOp6Z9Q32BqLk611wQuMFAdrTQO/AUZqXTyFOkzcQStSlhWb
-         q/Xg==
-X-Gm-Message-State: ACrzQf0Ad2CX2QbgQNOfp0x9g/w0hB/5pivWCb/weLf5qgmWiTsqcdll
-        gwMx2p83RhZPkM/BArzpPLrt8yqV+XRxJQ==
-X-Google-Smtp-Source: AMsMyM7A7KvY6St4CE7qxKnv2asB2yszh7h9VQYoEoOkepexJamGw32aJRuayc+2elmBxqeTW1DCcg==
-X-Received: by 2002:a63:5244:0:b0:434:a3b1:bbe8 with SMTP id s4-20020a635244000000b00434a3b1bbe8mr1880685pgl.57.1665011909956;
-        Wed, 05 Oct 2022 16:18:29 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id q19-20020a17090a2e1300b001fb1de10a4dsm262295pjd.33.2022.10.05.16.18.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Oct 2022 16:18:29 -0700 (PDT)
-Date:   Wed, 5 Oct 2022 23:18:25 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Miaohe Lin <linmiaohe@huawei.com>
-Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86/mmu: fix some comment typos
-Message-ID: <Yz4QwcnhNTRAl68A@google.com>
-References: <20220913091725.35953-1-linmiaohe@huawei.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ISAhMH5CXhMhm+1I427tmkYhfjMJ9VeL8BRy8vi5aDg=;
+        b=1jYK2eaVtV784YaFa10XVeLLZoI/iWZyE4ngIyLNVwwIlG+V7y+5mFUsxNSnpUWn3h
+         A7nEz2RvS3IYtydRL6y54W3rFYHhttVh4UmuNC0Zlyfa/jGsqJztuxhgK8qWqgmR1ajK
+         AGwKeyqntWdJnnNQVejbORYf7O5soPVecUNUt4l5/MAxBBXW//JKfu3BtCS+DSX5P2Vf
+         4TvVTJA0F2m9dIK2F4keJFft8IYq6080IBftr9VotCZebNf3NyGIhXViQ5GUUfZysH3J
+         H0FiOMIuNCjinCT4B61wwilcyWHePj68cjLjRFLnu6AKAVM7r1yEf9L9Ej5zzqk03e8z
+         djcQ==
+X-Gm-Message-State: ACrzQf1sDqwb66ZxvE8qwuu5TPIpru+FHkkdfWNPx5AX1VuAYURNiVsI
+        OnJ4WzgNvR+b6r9X4F3KN657XNOXa4olqQ3IDiJYvX+3FZ8=
+X-Google-Smtp-Source: AMsMyM7C2vSU/ABLi9NuabyIuI+l9SPY2QCOOlyvIwq45W+bnQFzXL5sL0YnWQX6S+6E6bU2OgRN2wUXgQnECLcWrSw=
+X-Received: by 2002:a05:6808:f8e:b0:351:a39:e7ca with SMTP id
+ o14-20020a0568080f8e00b003510a39e7camr3302472oiw.269.1665012305681; Wed, 05
+ Oct 2022 16:25:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220913091725.35953-1-linmiaohe@huawei.com>
+References: <20221005220227.1959-1-surajjs@amazon.com>
+In-Reply-To: <20221005220227.1959-1-surajjs@amazon.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 5 Oct 2022 16:24:54 -0700
+Message-ID: <CALMp9eTU9s+2fZ809bfOWYoGXsiziQOxCM-5Ly0JF2HeSEkwhA@mail.gmail.com>
+Subject: Re: [PATCH] x86/speculation: Mitigate eIBRS PBRSB predictions with WRMSR
+To:     Suraj Jitindar Singh <surajjs@amazon.com>
+Cc:     kvm@vger.kernel.org, sjitindarsingh@gmail.com,
+        linux-kernel@vger.kernel.org, x86@kernel.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@suse.de, dave.hansen@linux.intel.com,
+        seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
+        jpoimboe@kernel.org, daniel.sneddon@linux.intel.com,
+        pawan.kumar.gupta@linux.intel.com, benh@kernel.crashing.org,
+        stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -72,10 +72,121 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 13, 2022, Miaohe Lin wrote:
-> Fix some typos in comments.
-> 
-> Signed-off-by: Miaohe Lin <linmiaohe@huawei.com>
+On Wed, Oct 5, 2022 at 3:03 PM Suraj Jitindar Singh <surajjs@amazon.com> wrote:
+>
+> tl;dr: The existing mitigation for eIBRS PBRSB predictions uses an INT3 to
+> ensure a call instruction retires before a following unbalanced RET. Replace
+> this with a WRMSR serialising instruction which has a lower performance
+> penalty.
+>
+> == Background ==
+>
+> eIBRS (enhanced indirect branch restricted speculation) is used to prevent
+> predictor addresses from one privilege domain from being used for prediction
+> in a higher privilege domain.
+>
+> == Problem ==
+>
+> On processors with eIBRS protections there can be a case where upon VM exit
+> a guest address may be used as an RSB prediction for an unbalanced RET if a
+> CALL instruction hasn't yet been retired. This is termed PBRSB (Post-Barrier
+> Return Stack Buffer).
+>
+> A mitigation for this was introduced in:
+> (2b1299322016731d56807aa49254a5ea3080b6b3 x86/speculation: Add RSB VM Exit protections)
+>
+> This mitigation [1] has a ~1% performance impact on VM exit compared to without
+> it [2].
+>
+> == Solution ==
+>
+> The WRMSR instruction can be used as a speculation barrier and a serialising
+> instruction. Use this on the VM exit path instead to ensure that a CALL
+> instruction (in this case the call to vmx_spec_ctrl_restore_host) has retired
+> before the prediction of a following unbalanced RET.
+>
+> This mitigation [3] has a negligible performance impact.
+>
+> == Testing ==
+>
+> Run the outl_to_kernel kvm-unit-tests test 200 times per configuration which
+> counts the cycles for an exit to kernel mode.
+>
+> [1] With existing mitigation:
+> Average: 2026 cycles
+> [2] With no mitigation:
+> Average: 2008 cycles
+> [3] With proposed mitigation:
+> Average: 2008 cycles
+>
+> Signed-off-by: Suraj Jitindar Singh <surajjs@amazon.com>
+> Cc: stable@vger.kernel.org
 > ---
+>  arch/x86/include/asm/nospec-branch.h | 7 +++----
+>  arch/x86/kvm/vmx/vmenter.S           | 3 +--
+>  arch/x86/kvm/vmx/vmx.c               | 5 +++++
+>  3 files changed, 9 insertions(+), 6 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
+> index c936ce9f0c47..e5723e024b47 100644
+> --- a/arch/x86/include/asm/nospec-branch.h
+> +++ b/arch/x86/include/asm/nospec-branch.h
+> @@ -159,10 +159,9 @@
+>    * A simpler FILL_RETURN_BUFFER macro. Don't make people use the CPP
+>    * monstrosity above, manually.
+>    */
+> -.macro FILL_RETURN_BUFFER reg:req nr:req ftr:req ftr2=ALT_NOT(X86_FEATURE_ALWAYS)
+> -       ALTERNATIVE_2 "jmp .Lskip_rsb_\@", \
+> -               __stringify(__FILL_RETURN_BUFFER(\reg,\nr)), \ftr, \
+> -               __stringify(__FILL_ONE_RETURN), \ftr2
+> +.macro FILL_RETURN_BUFFER reg:req nr:req ftr:req
+> +       ALTERNATIVE "jmp .Lskip_rsb_\@", \
+> +               __stringify(__FILL_RETURN_BUFFER(\reg,\nr)), \ftr
+>
+>  .Lskip_rsb_\@:
+>  .endm
+> diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+> index 6de96b943804..eb82797bd7bf 100644
+> --- a/arch/x86/kvm/vmx/vmenter.S
+> +++ b/arch/x86/kvm/vmx/vmenter.S
+> @@ -231,8 +231,7 @@ SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
+>          * single call to retire, before the first unbalanced RET.
+>           */
+>
+> -       FILL_RETURN_BUFFER %_ASM_CX, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT,\
+> -                          X86_FEATURE_RSB_VMEXIT_LITE
+> +       FILL_RETURN_BUFFER %_ASM_CX, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT
+>
+>
+>         pop %_ASM_ARG2  /* @flags */
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index c9b49a09e6b5..fdcd8e10c2ab 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7049,8 +7049,13 @@ void noinstr vmx_spec_ctrl_restore_host(struct vcpu_vmx *vmx,
+>          * For legacy IBRS, the IBRS bit always needs to be written after
+>          * transitioning from a less privileged predictor mode, regardless of
+>          * whether the guest/host values differ.
+> +        *
+> +        * For eIBRS affected by Post Barrier RSB Predictions a serialising
+> +        * instruction (wrmsr) must be executed to ensure a call instruction has
+> +        * retired before the prediction of a following unbalanced ret.
+>          */
+>         if (cpu_feature_enabled(X86_FEATURE_KERNEL_IBRS) ||
+> +           cpu_feature_enabled(X86_FEATURE_RSB_VMEXIT_LITE) ||
+>             vmx->spec_ctrl != hostval)
+>                 native_wrmsrl(MSR_IA32_SPEC_CTRL, hostval);
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Okay. I see how this almost meets the requirements. But this WRMSR is
+conditional, which means that there's a speculative path through this
+code that ends up at the unbalanced RET without executing the WRMSR.
+
+Also, for your timings of "no mitigation" and this proposed mitigation
+to be the same, I assume that the guest in your timing test has a
+different IA32_SPEC_CTRL value than the host, which isn't always going
+to be the case in practice. How much does this WRMSR cost if the guest
+and the host have the same IA32_SPEC_CTRL value?
+
+> --
+> 2.17.1
+>
