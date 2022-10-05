@@ -2,71 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 89B855F4DFC
-	for <lists+kvm@lfdr.de>; Wed,  5 Oct 2022 04:59:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DD865F4FC6
+	for <lists+kvm@lfdr.de>; Wed,  5 Oct 2022 08:27:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229518AbiJEC72 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 4 Oct 2022 22:59:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53292 "EHLO
+        id S229539AbiJEG1j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Oct 2022 02:27:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229539AbiJEC7V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 4 Oct 2022 22:59:21 -0400
-Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E27E5D10D
-        for <kvm@vger.kernel.org>; Tue,  4 Oct 2022 19:59:20 -0700 (PDT)
-Received: by mail-oi1-x230.google.com with SMTP id m81so16351568oia.1
-        for <kvm@vger.kernel.org>; Tue, 04 Oct 2022 19:59:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=o5M3+7RUxrkIIZHvVM5xjYTfJjQaC+saLXzSqSDfEkw=;
-        b=JeyyILs+ECdXjqaSYJFxq719GG+/SDu0Bmq9ACybqU8Qel5g2FykrBs1b+IfovkNoh
-         yD0CGIFCXsjOy2iTjb7Ll4EkMwHbxZig9RBDUpMt0HVUqsf+665yg71wnL2g4zHSYcdy
-         INDcJ6siIe9weG3kgOtgONQ4QT1E8iz/bEYXQSgic3YwBjdn0/iTZFDfXJsfGmUPCtEk
-         5GF7VIJKHiW2aIKawb77BGzinetPi62dgBgoXf89hcwukcGql70egCq5ofXGuqoBu+vS
-         jPf2qkyyOj/EnvvpbYvxyUTS94Dy+KZMZsfFvpdUz1TZNd3yoQppmFqavssUDF2XjVZ3
-         21wg==
+        with ESMTP id S229650AbiJEG1f (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Oct 2022 02:27:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CB3674BB2
+        for <kvm@vger.kernel.org>; Tue,  4 Oct 2022 23:27:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1664951253;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Hzgr+GJhjprVie4kFrMDBNKKq7b6UhoiqIdbK544F4E=;
+        b=V2pcW8pfnK2k0nFcECm0LecMnB3vZkMTRUXdSdYRuetceQK/ToYQUWbSUi/qr0Aiqokysm
+        4bg0TZmEtmnJ7uVAwpaifjqX95qQj9ZSBoQdW1Uwp/gGFkNdZbNZSHt9V5kK/K5xcgN60R
+        qWjjvI+oSWSYja8l3tnVtOxzJeLnVZc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-5-BMeEm2_uP-GwbgDJcoTmzA-1; Wed, 05 Oct 2022 02:27:31 -0400
+X-MC-Unique: BMeEm2_uP-GwbgDJcoTmzA-1
+Received: by mail-wm1-f71.google.com with SMTP id h187-20020a1c21c4000000b003b51369ff1bso536028wmh.3
+        for <kvm@vger.kernel.org>; Tue, 04 Oct 2022 23:27:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=o5M3+7RUxrkIIZHvVM5xjYTfJjQaC+saLXzSqSDfEkw=;
-        b=fAzJTIFpHHmgszp6iDkzkrTQDkxQTFqw4IM1Tc8adwvf1tivyDSzbIDjzWHsSYRYUp
-         x4S/p37qZeiANzexl2dXKEM14XkbVEC5pJIbvFwWGLbRoynJuT8V1/K+/AEx5IrfwZmi
-         dWBnIgdOLDvQvQj98YxMzJj+T+9A0ioODj6W2nLd6fIDw5tdieiJorr5f7Wx4kMr8LzU
-         2yqDjOMNICeBxvWyTBJM82Uh/Cpol46r4jvCopgsgLTxpH7mUsnQaJO5eH3QNgscCFwj
-         SupsOjUJE+vmAPNnqh9gsxI1LnTak467c/QNep1AyZyXskh2ybjJs5i8qoltDPwvAdqr
-         4KIw==
-X-Gm-Message-State: ACrzQf0lTIEmwr3QjP4HV+GKmeFPmBtZuSqstmqBaMzbP2pnYHfJJ6hN
-        LZhY336drAmeUzLPUCeHks0zm5+P+8yhNleQj7OKay9U9uvtdQ==
-X-Google-Smtp-Source: AMsMyM4g7k3M6vZW2FA8OEz0BW4COw3PaFJJI+H2CTdUwRQG3xqibR+2CaZwlT7FeGfzyi+d4voA/V87znof81Egw90=
-X-Received: by 2002:a05:6808:f8e:b0:351:a39:e7ca with SMTP id
- o14-20020a0568080f8e00b003510a39e7camr1231956oiw.269.1664938759382; Tue, 04
- Oct 2022 19:59:19 -0700 (PDT)
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=Hzgr+GJhjprVie4kFrMDBNKKq7b6UhoiqIdbK544F4E=;
+        b=vamUYEtdPgu6R/xTvZyigXOvsdoFwCdU4KP04pm/tlCl+2FaJnu9KCMEulny8wJZ/4
+         PyarKERGDxeAY/qeOmSaIbwKf1DBsGYCZKBVAuNa702WCGbXz8QyxTPwqjv/OMxiHWkk
+         jZAaJAVlkv0krlT/1rCpD7XIY6LJGp4uUoJz2HiTMj+JxI1YnHXJq4BsWWsQ3jvo95J/
+         Yc4d6ulEj5CVx1isE5g3unHKzxzAgMhrykpC7C2D07hj2xUz/bNqQhwRR+d3y2l49jWV
+         XtDINDGQEfAFsGDir4ItD5YU5Vnw3ffwMCxJb8qVBn5z8rDt9oJw8eVuaK/aTFFv/RLW
+         ozmw==
+X-Gm-Message-State: ACrzQf1volpB/FPyXM1wE8a7hxNr15nWrHuyCV4C/qyqIF5E9GZd9hxd
+        eH9b6RfvYs8vS458lg3g0v5UohJ8CxAPoMayqk3mNZY0YCb/nKu9+QqQmQ16Z7mqY3NO+wRIchm
+        rSxgHZYXwvq3W
+X-Received: by 2002:a5d:6dac:0:b0:22a:fbff:b2d3 with SMTP id u12-20020a5d6dac000000b0022afbffb2d3mr17477367wrs.543.1664951250883;
+        Tue, 04 Oct 2022 23:27:30 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM51k5PL/MMj9nNisaw28ILfu80lWeQorWwHNn3p0/GD+K8Uowfp7d1JM62SxQHy7Gip404Y4Q==
+X-Received: by 2002:a5d:6dac:0:b0:22a:fbff:b2d3 with SMTP id u12-20020a5d6dac000000b0022afbffb2d3mr17477361wrs.543.1664951250690;
+        Tue, 04 Oct 2022 23:27:30 -0700 (PDT)
+Received: from [192.168.0.5] (ip-109-43-177-249.web.vodafone.de. [109.43.177.249])
+        by smtp.gmail.com with ESMTPSA id r6-20020a5d4986000000b0022ccae2fa62sm2068711wrq.22.2022.10.04.23.27.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Oct 2022 23:27:29 -0700 (PDT)
+Message-ID: <69854d56-510c-dab0-7cd6-f593ae2bef14@redhat.com>
+Date:   Wed, 5 Oct 2022 08:27:26 +0200
 MIME-Version: 1.0
-References: <20220929225203.2234702-1-jmattson@google.com> <20220929225203.2234702-2-jmattson@google.com>
- <BL0PR11MB304234A34209F12E03F746198A569@BL0PR11MB3042.namprd11.prod.outlook.com>
- <CALMp9eSMbLy8mETM6SRCbMVQFcKQRm=+qfcH_s1EhV=oF656eQ@mail.gmail.com>
- <BL0PR11MB30421511435BFEF36E482AC28A569@BL0PR11MB3042.namprd11.prod.outlook.com>
- <CALMp9eTNeeCNt=xMFBKSnXV+ReSXR=D11BQACS3Gwm7my+6sHA@mail.gmail.com>
- <BL0PR11MB3042784D7E66686207D679268A5B9@BL0PR11MB3042.namprd11.prod.outlook.com>
- <CALMp9eRJOHwh1twmS5X+ooGQqn+y0YrNXgJoB7UhMb+nUa+EFw@mail.gmail.com> <BL0PR11MB30426E91DB220599F53F577F8A5D9@BL0PR11MB3042.namprd11.prod.outlook.com>
-In-Reply-To: <BL0PR11MB30426E91DB220599F53F577F8A5D9@BL0PR11MB3042.namprd11.prod.outlook.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 4 Oct 2022 19:59:08 -0700
-Message-ID: <CALMp9eS0-j7mV8M-G30XqR3wyLhoOK3JEs5PYag7s-3fVMd=5w@mail.gmail.com>
-Subject: Re: [PATCH 2/6] KVM: x86: Mask off reserved bits in CPUID.80000006H
-To:     "Dong, Eddie" <eddie.dong@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Christopherson,, Sean" <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Content-Language: en-US
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>
+References: <20220930210751.225873-1-scgl@linux.ibm.com>
+ <20220930210751.225873-4-scgl@linux.ibm.com>
+ <85399389-9b5a-d72a-5db1-b8418008ad58@redhat.com>
+ <dca9e17ffbe71c76665ba25a6d9cd91d4aa0c329.camel@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v1 3/9] Documentation: KVM: s390: Describe
+ KVM_S390_MEMOP_F_CMPXCHG
+In-Reply-To: <dca9e17ffbe71c76665ba25a6d9cd91d4aa0c329.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,54 +95,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 4, 2022 at 5:08 PM Dong, Eddie <eddie.dong@intel.com> wrote:
->
-> > Hardware reserved CPUID bits are always zero today, though that may not be
-> > architecturally specified.
->
-> entry->edx is initialized to native value in do_host_cpuid(), which executes physical CPUID.
-> I guess I am disconnected here.
+On 04/10/2022 20.51, Janis Schoetterl-Glausch wrote:
+> On Tue, 2022-10-04 at 10:16 +0200, Thomas Huth wrote:
+>> On 30/09/2022 23.07, Janis Schoetterl-Glausch wrote:
+>>> Describe the semantics of the new KVM_S390_MEMOP_F_CMPXCHG flag for
+>>> absolute vm write memops which allows user space to perform (storage key
+>>> checked) cmpxchg operations on guest memory.
+>>>
+>>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>>> ---
+>>>    Documentation/virt/kvm/api.rst | 18 +++++++++++++++++-
+>>>    1 file changed, 17 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>>> index abd7c32126ce..0e02d66e38ae 100644
+>>> --- a/Documentation/virt/kvm/api.rst
+>>> +++ b/Documentation/virt/kvm/api.rst
+>>> @@ -3771,6 +3771,7 @@ Parameters are specified via the following structure::
+>>>    		struct {
+> 
+> What is the reason you initially didn't copy the /* in */ comment here?
 
-Hardware values should only be passed through for features that KVM
-can support. Reserved bits should be set to 0, because KVM has no idea
-whether or not it will be able to support them once they are defined.
+You mean in commit 41408c28f283b ? Uh, don't ask me, that's more than 7 
+years ago...
 
-Perhaps an example will help.
+Anyway, please be aware that the MEMOP ioctl is defined as IOW only:
 
-At one time, leaf 7 was completely reserved. Following the principle
-that KVM should not pass through reserved CPUID bits, KVM zeroed out
-this leaf prior to commit 611c120f7486 ("KVM: Mask function7 ebx
-against host capability word9").
-Suppose that the legacy KVM had, as you suggest, passed through the
-hardware values for leaf 7. As CPUs appeared with SMEP, SMAP, Intel
-Processor Trace, SGX, and a whole slew of other features, that version
-of KVM would claim that it supported those features. Not true.
+#define KVM_S390_MEM_OP _IOW(KVMIO, 0xb1, struct kvm_s390_mem_op)
 
-How would userspace be able to tell a version of KVM that could really
-support SMEP from one that just blindly passed the bit through without
-knowing what it meant? The KVM_GET_SUPPORTED_CPUID results would be
-identical.
+... so if you now introduce an "out" field in that struct, this might have 
+some impact, e.g. on Valgrind etc.
 
-In some cases, if KVM claims to support a feature that it doesn't
-(like SMEP), a guest that tries to use the feature will fail to boot
-(e.g. setting CR4.SMEP will raise an unexpected #GP).
+  Thomas
 
-However, as you alluded to earlier, zeroing out reserved bits does not
-always work out. Again, looking at leaf 7, the old KVM that clears all
-of leaf 7 claims legacy x87 behavior with respect to the FPU data
-pointer, FPU CS and FPU DS values, even on newer chips where that is
-not true. This is because of the two "reverse polarity" feature bits
-in leaf 7, where '0' indicates the presence of the feature and '1'
-indicates that the feature has been removed. At least, in this case,
-userspace can tell if KVM is wrong, just by querying CPUID leaf 7
-itself. Long after leaf 7 support was added to KVM, it continued to
-make the mistake of clearing those two bits. That bug wasn't addressed
-until commit e3bcfda012ed ("KVM: x86: Report deprecated x87 features
-in supported CPUID"). Fortunately, no software actually looks at those
-two bits.
-
-The KVM_GET_SUPPORTED_CPUID API is abysmal, but it is what we have for
-now. The best thing we can do is to zero out reserved bits. Passing
-through the hardware values is likely to get us into trouble in the
-future, when those bits are defined to mean something that we don't
-support.
