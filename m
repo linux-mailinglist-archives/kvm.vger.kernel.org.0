@@ -2,80 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 96BAB5F5410
-	for <lists+kvm@lfdr.de>; Wed,  5 Oct 2022 13:54:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 270EB5F5425
+	for <lists+kvm@lfdr.de>; Wed,  5 Oct 2022 14:04:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229726AbiJELy1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Oct 2022 07:54:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34166 "EHLO
+        id S229925AbiJEMER (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Oct 2022 08:04:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229682AbiJELy0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Oct 2022 07:54:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 007EC3881
-        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 04:54:24 -0700 (PDT)
+        with ESMTP id S229696AbiJEMEP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Oct 2022 08:04:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B27B27B3A
+        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 05:04:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1664970864;
+        s=mimecast20190719; t=1664971453;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cNSB7u7S7DM2z4JeNI1ixVq5EHPj/CnyKegZaT3nBL4=;
-        b=F3rwkI9XXGEgiXIyuq5y3VOxrFTiYNX/UF9/Reor66s56+ZLYqCBT1Wto5FeWLCqXIzMeL
-        Jj0msx8PAiQMY9s7dTQwrOhodGLAjtzhs2Dc2U0HzpXKUFQtcsXrz2254h8P6dO84zvcex
-        5NJXd/m60fNPF64+jG115saSNslnY1E=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=BlPrrfcGT4CkXDtYZUhRJ8tm3C0EIa49OiJh2AlYYUE=;
+        b=cw105nJl+CFNpl60J4e9S4UtgG5BOwrtWOhSXXBILiqdyYcuTfrlhWuSWtndwb/x68dkrB
+        85h0gMmk7ufrJhkjmVz6HkqAbVKlXGwST2fXUDGO4QR34TG0mo7eAlnFybXhS1KHBO/r+t
+        KvQEaIF2yZFiJEEIrwt3lyF161ijwII=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-330-BlZyRONIP_iH7zvP6RJyCQ-1; Wed, 05 Oct 2022 07:54:23 -0400
-X-MC-Unique: BlZyRONIP_iH7zvP6RJyCQ-1
-Received: by mail-qk1-f200.google.com with SMTP id bl17-20020a05620a1a9100b006cdf19243acso13955649qkb.4
-        for <kvm@vger.kernel.org>; Wed, 05 Oct 2022 04:54:23 -0700 (PDT)
+ us-mta-179-UOyY4d6UPd6CyWAA00wJXA-1; Wed, 05 Oct 2022 08:04:12 -0400
+X-MC-Unique: UOyY4d6UPd6CyWAA00wJXA-1
+Received: by mail-qv1-f70.google.com with SMTP id jn13-20020ad45ded000000b004b1d055fbc7so357594qvb.2
+        for <kvm@vger.kernel.org>; Wed, 05 Oct 2022 05:04:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+        h=content-transfer-encoding:in-reply-to:from:references:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date;
-        bh=cNSB7u7S7DM2z4JeNI1ixVq5EHPj/CnyKegZaT3nBL4=;
-        b=cf00AouBaKq2zK1mQSFeot5G8jMlF1obP0HqA0KQSxeZxzsS7iW7ocpRchqf9Y5u+8
-         7XlBxCcL2LiaRGhVqls5CaMXg5wNJzlBuYrxFtBax0bGkPJussULsPGd001s7NJ9Knjc
-         P+TgAY9/EUCMSEC5fB5six6vFgWXYEPezgdQRwo6U6aPhJKc+I+YUqJhEMZ+XOjDtqc5
-         YjegAwI31AUbbpFq5v+N/lJbTDYS5BaPdhRRZTc7w+Ucc+EChAc2hDU2m1D7T+SME3Ai
-         uqE/A3UjrVBh6n+VjlWkMh2c3LQlNAn2GGa1XFJ7qFq0cg4wrCrvf5BUmg4vo9MpYTDX
-         Kbrw==
-X-Gm-Message-State: ACrzQf1BMAYkADc7oemhmoVjpdA4Z2n0/o5NqBJgJ+Hh1MON6OmL+ZlI
-        eXf/YXqueRutE2D0/aBGbwaroTlDep3vza6C+M16teKIUFdWSrpUriflK74+cmmHLUdB8v++CZj
-        6u5l7WE9DbbWy
-X-Received: by 2002:a05:620a:269a:b0:6cf:3f0b:8fb4 with SMTP id c26-20020a05620a269a00b006cf3f0b8fb4mr19950073qkp.100.1664970862651;
-        Wed, 05 Oct 2022 04:54:22 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM6gmYf7EgJVAT7DFz75r8qkT0l9l49m+D27vyJDK/u9si4nmnCVXUFrYUTihMu84p3VrP4YXA==
-X-Received: by 2002:a05:620a:269a:b0:6cf:3f0b:8fb4 with SMTP id c26-20020a05620a269a00b006cf3f0b8fb4mr19950064qkp.100.1664970862427;
-        Wed, 05 Oct 2022 04:54:22 -0700 (PDT)
+        bh=BlPrrfcGT4CkXDtYZUhRJ8tm3C0EIa49OiJh2AlYYUE=;
+        b=wtd0hm8GVakeJEwNx2AC4K/yphwGNL9e6vgMsN5YykHF1e942lmlCbfvU38eK/q8b5
+         TQoVgqp3lz+OVMAia/1NqPbWMx37GCYgRmdTDFPyL4qQE/oxqRKHYEJ61aeaQicWvDsN
+         pTv5OvfO/SS1jdln7w1qCBGtHNWDYdG1Ktul5GL3zeBBe4nl6yI1nuqC47D3ggKJ2UvZ
+         6cYXfaN07fQGhvyywRkDpzhXndc2Q1XMpMbPjG30NwiMJ/tk9V0x1VrW4vVm/EHQE7ww
+         x1Z+ltuGg9jPJdsLKn/lPkJ+sP/T+I0tiFsEDZVtLIi2rpJgp1dyPwO9m/ZUrpyacIK9
+         3DnA==
+X-Gm-Message-State: ACrzQf0TZNA11sL2wvdaLBbwVS5DwHxRoN+YCa9awI+mUUzbg3uv9YSt
+        ISJkW8XVP92mNr00bJqX8Qj6/+uegOcwIXPoiqbUvUlMNJVcYIH2sVb/oEyrbcheMmXoBF9aUzs
+        hF43GugD06A13
+X-Received: by 2002:a05:620a:bcc:b0:6ce:c077:acf3 with SMTP id s12-20020a05620a0bcc00b006cec077acf3mr19618715qki.263.1664971451484;
+        Wed, 05 Oct 2022 05:04:11 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4hKMNqZ8bYcjvLp5n2KqUIIJBdLNHxVrMW4wzuvyPidckVVWCZhPsj+BIWR03I5VfGgnaIIg==
+X-Received: by 2002:a05:620a:bcc:b0:6ce:c077:acf3 with SMTP id s12-20020a05620a0bcc00b006cec077acf3mr19618692qki.263.1664971451078;
+        Wed, 05 Oct 2022 05:04:11 -0700 (PDT)
 Received: from [172.20.5.108] (rrcs-66-57-248-11.midsouth.biz.rr.com. [66.57.248.11])
-        by smtp.googlemail.com with ESMTPSA id y20-20020ac87c94000000b0038cdc487886sm2511794qtv.80.2022.10.05.04.54.21
+        by smtp.googlemail.com with ESMTPSA id o2-20020ac87c42000000b0035cebb79aaesm15016302qtv.18.2022.10.05.05.04.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Oct 2022 04:54:21 -0700 (PDT)
-Message-ID: <432d57e3-7559-1fac-9397-2441358b131a@redhat.com>
-Date:   Wed, 5 Oct 2022 13:54:20 +0200
+        Wed, 05 Oct 2022 05:04:10 -0700 (PDT)
+Message-ID: <d074cb45-72d3-a4a4-30f9-cfb664bb010a@redhat.com>
+Date:   Wed, 5 Oct 2022 14:04:09 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.2.1
-Subject: Re: [PATCH 0/3] Add TCG & KVM support for MSR_CORE_THREAD_COUNT
+Subject: Re: Finish removing MPX from arch/x86?
 Content-Language: en-US
-To:     Alexander Graf <agraf@csgraf.de>, qemu-devel@nongnu.org
-Cc:     kvm@vger.kernel.org, Eduardo Habkost <eduardo@habkost.net>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Vladislav Yaroshchuk <yaroshchuk2000@gmail.com>,
-        Roman Bolshakov <r.bolshakov@yadro.com>
-References: <20221004225643.65036-1-agraf@csgraf.de>
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Arjan van de Ven <arjan@linux.intel.com>
+References: <547a1203-0339-7ad2-9505-eab027046298@intel.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20221004225643.65036-1-agraf@csgraf.de>
+In-Reply-To: <547a1203-0339-7ad2-9505-eab027046298@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,35 +84,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/5/22 00:56, Alexander Graf wrote:
-> Commit 027ac0cb516 ("target/i386/hvf: add rdmsr 35H
-> MSR_CORE_THREAD_COUNT") added support for the MSR_CORE_THREAD_COUNT MSR
-> to HVF. This MSR is mandatory to execute macOS when run with -cpu
-> host,+hypervisor.
+On 10/4/22 19:34, Dave Hansen wrote:
+> We zapped the userspace MPX ABIs and most of its supporting code in here:
 > 
-> This patch set adds support for the very same MSR to TCG as well as
-> KVM - as long as host KVM is recent enough to support MSR trapping.
+> 	45fc24e89b7c ("x86/mpx: remove MPX from arch/x86")
 > 
-> With this support added, I can successfully execute macOS guests in
-> KVM with an APFS enabled OVMF build, a valid applesmc plus OSK and
+> But, the XSAVE enabling and KVM code were left in place.  This let folks
+> at least keep running guests with MPX.
 > 
->    -cpu Skylake-Client,+invtsc,+hypervisor
+> It's been a couple of years and I don't think I've had a single person
+> opine about the loss of MPX.  Intel also followed through and there's no
+> MPX to be found on newer CPUs like my "Tiger Lake" 11th Gen Intel(R)
+> Core(TM) i7-1165G7.
 > 
-> 
-> Alex
-> 
-> Alexander Graf (3):
->    x86: Implement MSR_CORE_THREAD_COUNT MSR
->    i386: kvm: Add support for MSR filtering
->    KVM: x86: Implement MSR_CORE_THREAD_COUNT MSR
-> 
->   target/i386/kvm/kvm.c                | 145 +++++++++++++++++++++++++++
->   target/i386/kvm/kvm_i386.h           |  11 ++
->   target/i386/tcg/sysemu/misc_helper.c |   5 +
->   3 files changed, 161 insertions(+)
-> 
+> Is it time to zap MPX from arch/x86/kvm/?
 
-Queued, thanks!
+I agree that the likelihood of anybody complaining about MPX is low but 
+Jim is right that the timeline for removing it is unfortunately quite long.
+
+Removing MPX from XFEATURE_MASK_USER_SUPPORTED is possible, though we 
+need to add a new XFEATURE_MASK_GUEST_SUPPORTED that includes MPX.  I'll 
+take a look.
+
+Also, it's worth noting that MPX lives in the sigcontext ABI because it 
+uses the non-compacted format.  Because of that it is not possible to 
+remove the structs from include/asm/fpu/types.h, for example.
 
 Paolo
 
