@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E5C65F5D54
-	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 01:52:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAB9E5F5D55
+	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 01:52:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229672AbiJEXwX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Oct 2022 19:52:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57312 "EHLO
+        id S229688AbiJEXw0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Oct 2022 19:52:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229547AbiJEXwU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Oct 2022 19:52:20 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 882CF7C76C
-        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 16:52:18 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id h186-20020a636cc3000000b0045a1966a975so137889pgc.5
-        for <kvm@vger.kernel.org>; Wed, 05 Oct 2022 16:52:18 -0700 (PDT)
+        with ESMTP id S229648AbiJEXwV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Oct 2022 19:52:21 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5436B82616
+        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 16:52:20 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-348608c1cd3so3391857b3.10
+        for <kvm@vger.kernel.org>; Wed, 05 Oct 2022 16:52:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=2h2kMN2E+bBT+oaSBY/BYga5LVNA6QkXWr22mX6Anyg=;
-        b=B7TfT1Djb9cDHKVWYgZXXtFeZYQBklPDA8QzTFkb9hRfuuIQsL++aYIUZvujbWStgp
-         B9oYNwxwytKJzDfHtrtp1NRZgzPPnIpKtPpoiiIlVqr3pnTp8qNPGQeLQKAZ7Efcb7/b
-         be1wl6YmPOMaXOkUYjeUKQSgIULH63WZ7Drf96XYXL65hv9yQ2h4YP2y3AZNxjbdFwo2
-         W5wrK0gY4OK3Y1irJDF5fA0yrcIPSwGHQGvVB7zY4E6EVDPwaAOMYnVV1tbWuOtquEFj
-         NmJz70HUIAxDOSxo7LYBu+nf/GwmH5dIUUO3wTD0qNpmLh8VP3zloF1W/9y2o0FjBCeQ
-         kB+g==
+        bh=Xw31e+TGRP2/+OxpnSpZnYUCdGsM9rcAKkyhAayOrSA=;
+        b=P8zPkRQqiRIojV0GYvPmtlWYWoqmhVXvVbeZZWDNPYKhEwC1jxhbKGzAXCgWE6TAk/
+         bQoD9ZeSpRV349F7T4/+Zd2hLvWBwqZrXbkPGenma4AA71zitGW4tq+GcU/7lWQp64Jl
+         hcXLQOnzdWeUMKDSjlXhsY0L8RQzdFNiIfLVzTh6N1Qh8z34lM77fttMRz7dDZnV/Ymm
+         yAef2Qkm0zlx25gd89CeAYOPm30VuNMw6gX+7cOf+G5cKziegcXACLumJNynO5pPMae1
+         gMmaMX1Qy409Imem+L9/JN4x0Xzf/6geVirDa0Z0j0tG9Iwr6mb5Vzb3kC5PeRZBRgE5
+         hj4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=2h2kMN2E+bBT+oaSBY/BYga5LVNA6QkXWr22mX6Anyg=;
-        b=HRHVsrMkJeImJVSgx1ssTnJ/IfOcgQ67T3B/hQBkB4g/bXVALfyH9obN7FrzfPXphS
-         BeUW0oJ+0lkJahAz4IgLHtMkx/diXeoo7V9E5+yUuZ8QyJTIBtivOaFippzIaTVL6dgE
-         hT04PQnxgWrMIJZAU7AvsKc5EMrLx2Wk5w2phmJNWwXRmAOGNN9viiD62tSVrgyXOKZM
-         koDNqIiVEZHpm/qp+eoUhEWdC2+eqaf/aOlHRO2yCRFd+K5G5e/ZF7251z8fdNaqsm91
-         IKe19qAU4RDTV53Ak8B/Ww8WakojOvAsnB159xwSW2LgB0gBIVTrQMDQY5SavIK7lA59
-         fakw==
-X-Gm-Message-State: ACrzQf3eJaW6vvQIC69AKXKaDQMGvwKFRerPJ3CNAb4hu6H1hvKsL2XK
-        VUeyQeV8XWh9VqVGgfZJuww8kcrI6k4=
-X-Google-Smtp-Source: AMsMyM7tSaHCuLyEbRKsMZLz0CEKUXuE1RCsflBGkieXS5PjGNmo47831Wrd3kKGCTEtqnVUQskjsWsxh/0=
+        bh=Xw31e+TGRP2/+OxpnSpZnYUCdGsM9rcAKkyhAayOrSA=;
+        b=tlCjPfbe5ruxEJLUreeVtOGoiPujlqVVI0DrAR0B3KyZKOO0cxox4/UEFqkOjU4art
+         teS5hYmZujpyKtm2da4iGcKJuNMSgxkCb/8bDyaWWMfzeG3gLIBN4d2QnAyEY/N61cz+
+         sOVPOJeNtbn5hyDwrLLwxVN9EnMfuWO2LDHw5JuiKBuNRIRIZ+iwwDVG0+gGt0Nq8JPr
+         jnYzQaUFIPSx6esIdy1O+jCaEJknshsSe9Un2HsBMQhnTUoknjXuT5ypMW2S8h5Z9qcA
+         MTTdJPiHviJvDd/UAE6fQu6CTGvLE90tNijlGpbKBhg1st5kkKMFhjzxbNeDdAs37w1t
+         +xjQ==
+X-Gm-Message-State: ACrzQf2zbUhg3P3Q67cKVFlFM97sS9yoS3x4Yd1XRhY8kKJYdgTXYCbv
+        GjbHLbf24MxLWUWmPijsMs4LNAfOOuw=
+X-Google-Smtp-Source: AMsMyM4kIx/ATDClr2BzaA5yNHWOpSMAzcEsoGq0iz81/GqnzMDcqNimzZ4ksUe7c35Clkdw4Q2kwtq57NI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2395:b0:562:5575:b7be with SMTP id
- f21-20020a056a00239500b005625575b7bemr2225988pfc.17.1665013938135; Wed, 05
- Oct 2022 16:52:18 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:40ce:0:b0:6be:79b3:51ac with SMTP id
+ n197-20020a2540ce000000b006be79b351acmr2319075yba.635.1665013939583; Wed, 05
+ Oct 2022 16:52:19 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  5 Oct 2022 23:52:05 +0000
+Date:   Wed,  5 Oct 2022 23:52:06 +0000
 In-Reply-To: <20221005235212.57836-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221005235212.57836-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
-Message-ID: <20221005235212.57836-3-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH v3 2/9] x86: Move helpers to generate misc
- exceptions to processor.h
+Message-ID: <20221005235212.57836-4-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH v3 3/9] nVMX: Move #OF test to generic
+ exceptions test
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
@@ -70,152 +70,172 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move nested VMX's helpers to generate miscellaenous exceptions, e.g. #DE,
-to processor.h so that they can be used for nearly-identical nested SVM
-tests.
+Move the INTO=>#OF test, along with its more precise checking of the
+exit interrupt info, to the generic nVMX exceptions test.
 
-No functional change intended.
+Move the  helper that generates #OF to processor.h so that it can be
+reused by nSVM for an identical test.
+
+Note, this effectively adds new checks for all other vectors, i.e.
+affects more vectors than just #OF.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- lib/x86/processor.h | 43 +++++++++++++++++++++++++++++++++++
- x86/vmx_tests.c     | 55 +++++----------------------------------------
- 2 files changed, 49 insertions(+), 49 deletions(-)
+ lib/x86/processor.h | 35 +++++++++++++++++++++++
+ x86/vmx_tests.c     | 67 +++++++++------------------------------------
+ 2 files changed, 48 insertions(+), 54 deletions(-)
 
 diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index 0324220..c3d112f 100644
+index c3d112f..5865933 100644
 --- a/lib/x86/processor.h
 +++ b/lib/x86/processor.h
-@@ -791,6 +791,49 @@ static inline void flush_tlb(void)
- 	write_cr4(cr4);
+@@ -834,6 +834,41 @@ static inline uint64_t generate_usermode_ac(void)
+ 	return 0;
  }
  
-+static inline void generate_non_canonical_gp(void)
++/*
++ * Switch from 64-bit to 32-bit mode and generate #OF via INTO.  Note, if RIP
++ * or RSP holds a 64-bit value, this helper will NOT generate #OF.
++ */
++static inline void generate_of(void)
 +{
-+	*(volatile u64 *)NONCANONICAL = 0;
-+}
++	struct far_pointer32 fp = {
++		.offset = (uintptr_t)&&into,
++		.selector = KERNEL_CS32,
++	};
++	uintptr_t rsp;
 +
-+static inline void generate_ud(void)
-+{
-+	asm volatile ("ud2");
-+}
++	asm volatile ("mov %%rsp, %0" : "=r"(rsp));
 +
-+static inline void generate_de(void)
-+{
-+	asm volatile (
-+		"xor %%eax, %%eax\n\t"
-+		"xor %%ebx, %%ebx\n\t"
-+		"xor %%edx, %%edx\n\t"
-+		"idiv %%ebx\n\t"
-+		::: "eax", "ebx", "edx");
-+}
++	if (fp.offset != (uintptr_t)&&into) {
++		printf("Code address too high.\n");
++		return;
++	}
++	if ((u32)rsp != rsp) {
++		printf("Stack address too high.\n");
++		return;
++	}
 +
-+static inline void generate_bp(void)
-+{
-+	asm volatile ("int3");
-+}
-+
-+static inline void generate_single_step_db(void)
-+{
-+	write_rflags(read_rflags() | X86_EFLAGS_TF);
-+	asm volatile("nop");
-+}
-+
-+static inline uint64_t generate_usermode_ac(void)
-+{
-+	/*
-+	 * Trigger an #AC by writing 8 bytes to a 4-byte aligned address.
-+	 * Disclaimer: It is assumed that the stack pointer is aligned
-+	 * on a 16-byte boundary as x86_64 stacks should be.
-+	 */
-+	asm volatile("movq $0, -0x4(%rsp)");
-+
-+	return 0;
++	asm goto ("lcall *%0" : : "m" (fp) : "rax" : into);
++	return;
++into:
++	asm volatile (".code32;"
++		      "movl $0x7fffffff, %eax;"
++		      "addl %eax, %eax;"
++		      "into;"
++		      "lret;"
++		      ".code64");
++	__builtin_unreachable();
 +}
 +
  static inline u8 pmu_version(void)
  {
  	return cpuid(10).a & 0xff;
 diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index 3e3d699..2ed20ec 100644
+index 2ed20ec..edb8062 100644
 --- a/x86/vmx_tests.c
 +++ b/x86/vmx_tests.c
-@@ -10717,49 +10717,6 @@ static void vmx_pf_vpid_test(void)
- 	__vmx_pf_vpid_test(invalidate_tlb_new_vpid, 1);
+@@ -2161,57 +2161,6 @@ static int int3_exit_handler(union exit_reason exit_reason)
+ 	return VMX_TEST_VMEXIT;
  }
  
--static void vmx_l2_gp_test(void)
+-static int into_init(struct vmcs *vmcs)
 -{
--	*(volatile u64 *)NONCANONICAL = 0;
+-	vmcs_write(EXC_BITMAP, ~0u);
+-	return VMX_TEST_START;
 -}
 -
--static void vmx_l2_ud_test(void)
+-static void into_guest_main(void)
 -{
--	asm volatile ("ud2");
+-	struct far_pointer32 fp = {
+-		.offset = (uintptr_t)&&into,
+-		.selector = KERNEL_CS32,
+-	};
+-	uintptr_t rsp;
+-
+-	asm volatile ("mov %%rsp, %0" : "=r"(rsp));
+-
+-	if (fp.offset != (uintptr_t)&&into) {
+-		printf("Code address too high.\n");
+-		return;
+-	}
+-	if ((u32)rsp != rsp) {
+-		printf("Stack address too high.\n");
+-		return;
+-	}
+-
+-	asm goto ("lcall *%0" : : "m" (fp) : "rax" : into);
+-	return;
+-into:
+-	asm volatile (".code32;"
+-		      "movl $0x7fffffff, %eax;"
+-		      "addl %eax, %eax;"
+-		      "into;"
+-		      "lret;"
+-		      ".code64");
+-	__builtin_unreachable();
 -}
 -
--static void vmx_l2_de_test(void)
+-static int into_exit_handler(union exit_reason exit_reason)
 -{
--	asm volatile (
--		"xor %%eax, %%eax\n\t"
--		"xor %%ebx, %%ebx\n\t"
--		"xor %%edx, %%edx\n\t"
--		"idiv %%ebx\n\t"
--		::: "eax", "ebx", "edx");
+-	u32 intr_info = vmcs_read(EXI_INTR_INFO);
+-
+-	report(exit_reason.basic == VMX_EXC_NMI &&
+-	       (intr_info & INTR_INFO_VALID_MASK) &&
+-	       (intr_info & INTR_INFO_VECTOR_MASK) == OF_VECTOR &&
+-	       ((intr_info & INTR_INFO_INTR_TYPE_MASK) >>
+-	        INTR_INFO_INTR_TYPE_SHIFT) == VMX_INTR_TYPE_SOFT_EXCEPTION,
+-	       "L1 intercepts #OF");
+-
+-	return VMX_TEST_VMEXIT;
 -}
 -
--static void vmx_l2_bp_test(void)
--{
--	asm volatile ("int3");
--}
--
--static void vmx_l2_db_test(void)
--{
--	write_rflags(read_rflags() | X86_EFLAGS_TF);
--	asm volatile("nop");
--}
--
--static uint64_t usermode_callback(void)
--{
--	/*
--	 * Trigger an #AC by writing 8 bytes to a 4-byte aligned address.
--	 * Disclaimer: It is assumed that the stack pointer is aligned
--	 * on a 16-byte boundary as x86_64 stacks should be.
--	 */
--	asm volatile("movq $0, -0x4(%rsp)");
--
--	return 0;
--}
--
- static void vmx_l2_ac_test(void)
+ static void exit_monitor_from_l2_main(void)
  {
- 	bool hit_ac = false;
-@@ -10767,7 +10724,7 @@ static void vmx_l2_ac_test(void)
- 	write_cr0(read_cr0() | X86_CR0_AM);
- 	write_rflags(read_rflags() | X86_EFLAGS_AC);
- 
--	run_in_user(usermode_callback, AC_VECTOR, 0, 0, 0, 0, &hit_ac);
-+	run_in_user(generate_usermode_ac, AC_VECTOR, 0, 0, 0, 0, &hit_ac);
- 	report(hit_ac, "Usermode #AC handled in L2");
- 	vmcall();
- }
-@@ -10778,11 +10735,11 @@ struct vmx_exception_test {
- };
- 
- struct vmx_exception_test vmx_exception_tests[] = {
--	{ GP_VECTOR, vmx_l2_gp_test },
--	{ UD_VECTOR, vmx_l2_ud_test },
--	{ DE_VECTOR, vmx_l2_de_test },
--	{ DB_VECTOR, vmx_l2_db_test },
--	{ BP_VECTOR, vmx_l2_bp_test },
-+	{ GP_VECTOR, generate_non_canonical_gp },
-+	{ UD_VECTOR, generate_ud },
-+	{ DE_VECTOR, generate_de },
-+	{ DB_VECTOR, generate_single_step_db },
-+	{ BP_VECTOR, generate_bp },
+ 	printf("Calling exit(0) from l2...\n");
+@@ -10741,6 +10690,7 @@ struct vmx_exception_test vmx_exception_tests[] = {
+ 	{ DB_VECTOR, generate_single_step_db },
+ 	{ BP_VECTOR, generate_bp },
  	{ AC_VECTOR, vmx_l2_ac_test },
++	{ OF_VECTOR, generate_of },
  };
  
+ static u8 vmx_exception_test_vector;
+@@ -10769,14 +10719,24 @@ static void handle_exception_in_l2(u8 vector)
+ static void handle_exception_in_l1(u32 vector)
+ {
+ 	u32 old_eb = vmcs_read(EXC_BITMAP);
++	u32 intr_type;
++	u32 intr_info;
+ 
+ 	vmcs_write(EXC_BITMAP, old_eb | (1u << vector));
+ 
+ 	enter_guest();
+ 
++	if (vector == BP_VECTOR || vector == OF_VECTOR)
++		intr_type = VMX_INTR_TYPE_SOFT_EXCEPTION;
++	else
++		intr_type = VMX_INTR_TYPE_HARD_EXCEPTION;
++
++	intr_info = vmcs_read(EXI_INTR_INFO);
+ 	report((vmcs_read(EXI_REASON) == VMX_EXC_NMI) &&
+-	       ((vmcs_read(EXI_INTR_INFO) & 0xff) == vector),
+-	       "%s handled by L1", exception_mnemonic(vector));
++	       (intr_info & INTR_INFO_VALID_MASK) &&
++	       (intr_info & INTR_INFO_VECTOR_MASK) == vector &&
++	       ((intr_info & INTR_INFO_INTR_TYPE_MASK) >> INTR_INFO_INTR_TYPE_SHIFT) == intr_type,
++	       "%s correctly routed to L1", exception_mnemonic(vector));
+ 
+ 	vmcs_write(EXC_BITMAP, old_eb);
+ }
+@@ -10836,7 +10796,6 @@ struct vmx_test vmx_tests[] = {
+ 	{ "disable RDTSCP", disable_rdtscp_init, disable_rdtscp_main,
+ 		disable_rdtscp_exit_handler, NULL, {0} },
+ 	{ "int3", int3_init, int3_guest_main, int3_exit_handler, NULL, {0} },
+-	{ "into", into_init, into_guest_main, into_exit_handler, NULL, {0} },
+ 	{ "exit_monitor_from_l2_test", NULL, exit_monitor_from_l2_main,
+ 		exit_monitor_from_l2_handler, NULL, {0} },
+ 	{ "invalid_msr", invalid_msr_init, invalid_msr_main,
 -- 
 2.38.0.rc1.362.ged0d419d3c-goog
 
