@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (unknown [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BA775F5CD8
-	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 00:44:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A53885F5CE8
+	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 00:49:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229482AbiJEWoY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Oct 2022 18:44:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55904 "EHLO
+        id S229482AbiJEWsl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Oct 2022 18:48:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229472AbiJEWoX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Oct 2022 18:44:23 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58ECA84E65
-        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 15:44:22 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id l4so48448plb.8
-        for <kvm@vger.kernel.org>; Wed, 05 Oct 2022 15:44:22 -0700 (PDT)
+        with ESMTP id S229615AbiJEWsj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Oct 2022 18:48:39 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1D805140B
+        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 15:48:38 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id t10-20020a17090a4e4a00b0020af4bcae10so2660268pjl.3
+        for <kvm@vger.kernel.org>; Wed, 05 Oct 2022 15:48:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LOQMhSU5WgKqvLmA7dxXtC5yJpKLeZOqdG0Cst2NQtc=;
-        b=fXeBDVCJznDT9jUSWalL1Z/NwqJDeRov6WZOqYGkURdQx5QqqI89aeB3JhkHYqT1MT
-         eNW2hzG7C10hYc0M/Ibzq/nTCquak92fIboMTbrWnuXY/G1VzVPJV9/5+Xdqh9zTEGMm
-         wlCTMNbkKE4o0Ep28hzE9e16F53IwQ2A1YxsFzES7oTCbihQIaTgUrGmpVob2qeKL7o3
-         an+Al4qhYSSOunFqbadpoY6SqGvhYnJddWrOOHQpvIigxCZMTeAZRJjnxB2FlNC8mAkb
-         YvzExIX1of8iVf96rP+TcrCTBTfaC3c9zeUBH3cwySaCuwTt1uiJdWCm4xwQhhlmRBQs
-         h0qg==
+        bh=twbNYJqchKMNgXbwxJCoJk1EnyAPAy/qSqHKgoEI97s=;
+        b=TP38Oqf0whNTium2uBFJwdVRJbJO4Nsk4mu7QE2uIKP1eLDqA4GAzvUAHleRnDip1L
+         OscJhEpxV5lkockl3VcQCJsGX+s2ecahwrZxYsz+UUviazaBWGlUB4oDku1Qhq9m8JPM
+         XOJXMDfVH92aQWaETZIhikpNS5eHaMGuUSCD9H3Z9/QiqcFR5zosG/9dMmatXmvijJkz
+         zHhNlpVnufWhRCFgGZ1qgXFo6bH5p+QKHST+OxnsQPgOsT3Tt/POvd+CFRGdj0888AAe
+         DMgiG5OY7/AV9Ne1LeEwk8BcwUqJqFcgTWLvOJYT6AhHArmQF+LSTQ1pE1vuioe4ImOc
+         jbWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LOQMhSU5WgKqvLmA7dxXtC5yJpKLeZOqdG0Cst2NQtc=;
-        b=5pGFJLx4tXYAty3nBfm9eVWoC6F8P8zEZFdD9vKyKNHnAfK6vzJXIfFen2a4vpRqFW
-         fnNkdaCpwEg1MIC+bB0NQiO/JYxYfjXgonTgykEOn0sPIbuGivmI3RKw5Cj2oP/Mjlg8
-         zEjmuNcfGWwCKwr3hKuK6hP458SqkfhCbLoxPI2XF9ZzZ/tv/JqwCQc2+00wwMSXwUA+
-         q0Xtm0J2f8ogs36Wtf6nx3a9rHTtZvsZ14qKNtH6UNP58FYDRAaRaAUYPw/bCOKQ0qJV
-         sKNMvzAns9PS2I9HuKg6O3lqhVaLSrtHWEKsE5IBfe7Hwn3D9I57JoDop/a+h0BiiiOn
-         bhLw==
-X-Gm-Message-State: ACrzQf3pEqVHWhfaOSZ5XjepwZgvglw/smngeoLWN/v4HDYPHLpQ3h5H
-        JgfPrqLnMQ+kSnwF9NYoSRGNY30zO1JjWQ==
-X-Google-Smtp-Source: AMsMyM6YLkVKSr3x9q1Kl/5sYS1KUTXLzZSXFLGbjhfWZtWLSF4BUEYz7oDuTU0W5GNYJrNVm3QW+g==
-X-Received: by 2002:a17:90b:350b:b0:202:8495:6275 with SMTP id ls11-20020a17090b350b00b0020284956275mr7483446pjb.216.1665009861774;
-        Wed, 05 Oct 2022 15:44:21 -0700 (PDT)
+        bh=twbNYJqchKMNgXbwxJCoJk1EnyAPAy/qSqHKgoEI97s=;
+        b=p5nMId52CwANKtW8xAE4Oglac93OxanQOkN4YSwL/bOWHL4vzHjclTQX9cIomAK8H9
+         Kj10g3r3mXj4Aegn7CSL6B6Rl7lHBErBLWoKC5wAko5A3frrwnYvX0cwh+/ReBsWHTYw
+         iXAI+D7nCNI6Ub5M62sfGLDqiOT5+ridkw4VsYD2cHeOKK+OKmaXQ/aMQhg6iYr1hgwA
+         +wBmvmpbh+yRJkYSElgBuixDRC7LmJV2P6Yp6HTTsZVdFAB+KONIsOpVo+/+bqD53B4y
+         b6pI00YhrPM4huiv1kGuUzlGcLKa/gx8GnxMCfA8+h6+Zw2BobLJ7rl+jYQwDDsoq5k2
+         n2aQ==
+X-Gm-Message-State: ACrzQf1X1O6T99Rt47TAQrrlICDQ7Cupn88yAkbUi+Ns2qXaOPxwhZCI
+        aJZdl0cC9W/NxWg58RN4qu0/4g==
+X-Google-Smtp-Source: AMsMyM77cRcph1rzldSpiXNSZedgsOFxiVnp73zo09dom9+ps+OvLz0tOqzAluTw4Tf6+DBjXrILhw==
+X-Received: by 2002:a17:902:d2c3:b0:179:ff70:2a15 with SMTP id n3-20020a170902d2c300b00179ff702a15mr1622457plc.77.1665010118153;
+        Wed, 05 Oct 2022 15:48:38 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id e10-20020aa7980a000000b0055fb15ff08csm8996030pfl.184.2022.10.05.15.44.21
+        by smtp.gmail.com with ESMTPSA id f201-20020a6238d2000000b0052e987c64efsm9172774pfa.174.2022.10.05.15.48.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Oct 2022 15:44:21 -0700 (PDT)
-Date:   Wed, 5 Oct 2022 22:44:17 +0000
+        Wed, 05 Oct 2022 15:48:37 -0700 (PDT)
+Date:   Wed, 5 Oct 2022 22:48:33 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Like Xu <like.xu.linux@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v3 12/13] x86/pmu: Add assignment
- framework for Intel-specific HW resources
-Message-ID: <Yz4IwVKje90pcIUN@google.com>
+Subject: Re: [kvm-unit-tests PATCH v3 13/13] x86/pmu: Update testcases to
+ cover AMD PMU
+Message-ID: <Yz4JwQcXIG+sQmp5@google.com>
 References: <20220819110939.78013-1-likexu@tencent.com>
- <20220819110939.78013-13-likexu@tencent.com>
+ <20220819110939.78013-14-likexu@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220819110939.78013-13-likexu@tencent.com>
+In-Reply-To: <20220819110939.78013-14-likexu@tencent.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,63 +73,146 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Aug 19, 2022, Like Xu wrote:
-> @@ -65,7 +65,13 @@ struct pmu_event {
+> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+> index 0324220..10bca27 100644
+> --- a/lib/x86/processor.h
+> +++ b/lib/x86/processor.h
+> @@ -793,6 +793,9 @@ static inline void flush_tlb(void)
+>  
+>  static inline u8 pmu_version(void)
+>  {
+> +	if (!is_intel())
+> +		return 0;
+> +
+>  	return cpuid(10).a & 0xff;
+>  }
+>  
+> @@ -806,19 +809,39 @@ static inline bool this_cpu_has_perf_global_ctrl(void)
+>  	return pmu_version() > 1;
+>  }
+>  
+> +#define AMD64_NUM_COUNTERS                             4
+> +#define AMD64_NUM_COUNTERS_CORE                                6
+> +
+> +static inline bool has_amd_perfctr_core(void)
+> +{
+> +	return cpuid(0x80000001).c & BIT_ULL(23);
+
+Add an X86_FEATURE_*, maybe X86_FEATURE_AMD_PERF_EXTENSIONS?
+
+> +}
+> +
+>  static inline u8 pmu_nr_gp_counters(void)
+>  {
+> -	return (cpuid(10).a >> 8) & 0xff;
+> +	if (is_intel()) {
+
+No curly braces.
+
+> +		return (cpuid(10).a >> 8) & 0xff;
+> +	} else if (!has_amd_perfctr_core()) {
+
+Drop the "else", the above "if" is terminal.
+
+> +		return AMD64_NUM_COUNTERS;
+> +	}
+> +
+> +	return AMD64_NUM_COUNTERS_CORE;
+>  }
+>  
+>  static inline u8 pmu_gp_counter_width(void)
+>  {
+> -	return (cpuid(10).a >> 16) & 0xff;
+> +	if (is_intel())
+> +		return (cpuid(10).a >> 16) & 0xff;
+> +	else
+> +		return 48;
+
+Please add a #define for this magic number.
+
+>  }
+>  
+>  static inline u8 pmu_gp_counter_mask_length(void)
+>  {
+> -	return (cpuid(10).a >> 24) & 0xff;
+> +	if (is_intel())
+> +		return (cpuid(10).a >> 24) & 0xff;
+> +	else
+> +		return pmu_nr_gp_counters();
+>  }
+>  
+>  static inline u8 pmu_nr_fixed_counters(void)
+> @@ -843,6 +866,9 @@ static inline u8 pmu_fixed_counter_width(void)
+>  
+>  static inline bool pmu_gp_counter_is_available(int i)
+>  {
+> +	if (!is_intel())
+> +		return i < pmu_nr_gp_counters();
+> +
+>  	/* CPUID.0xA.EBX bit is '1 if they counter is NOT available. */
+>  	return !(cpuid(10).b & BIT(i));
+>  }
+> diff --git a/x86/pmu.c b/x86/pmu.c
+> index 0706cb1..b6ab10c 100644
+> --- a/x86/pmu.c
+> +++ b/x86/pmu.c
+> @@ -62,6 +62,11 @@ struct pmu_event {
+>  	{"fixed 1", MSR_CORE_PERF_FIXED_CTR0, 10*N, 10.2*N},
+>  	{"fixed 2", MSR_CORE_PERF_FIXED_CTR0 + 1, 1*N, 30*N},
+>  	{"fixed 3", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 30*N}
+> +}, amd_gp_events[] = {
+> +	{"core cycles", 0x0076, 1*N, 50*N},
+> +	{"instructions", 0x00c0, 10*N, 10.2*N},
+> +	{"branches", 0x00c2, 1*N, 1.1*N},
+> +	{"branch misses", 0x00c3, 0, 0.1*N},
 >  };
 >  
 >  #define PMU_CAP_FW_WRITES	(1ULL << 13)
-> -static u64 gp_counter_base = MSR_IA32_PERFCTR0;
-> +static u32 gp_counter_base;
-> +static u32 gp_select_base;
-> +static unsigned int gp_events_size;
-> +static unsigned int nr_gp_counters;
+> @@ -105,14 +110,24 @@ static bool check_irq(void)
+>  
+>  static bool is_gp(pmu_counter_t *evt)
+>  {
+> +	if (!is_intel())
+> +		return true;
 > +
-> +typedef struct pmu_event PMU_EVENTS_ARRAY_t[];
-> +static PMU_EVENTS_ARRAY_t *gp_events = NULL;
-
-There's no need for a layer of indirection, C d.  The NULL is also not strictly
-required.  E.g. this should Just Work.
-
-  static struct pmu_event *gp_events;
-
-And then I beleve a large number of changes in this series go away.
-
->  char *buf;
->  
-> @@ -114,9 +120,9 @@ static struct pmu_event* get_counter_event(pmu_counter_t *cnt)
->  	if (is_gp(cnt)) {
->  		int i;
->  
-> -		for (i = 0; i < sizeof(gp_events)/sizeof(gp_events[0]); i++)
-> -			if (gp_events[i].unit_sel == (cnt->config & 0xffff))
-> -				return &gp_events[i];
-> +		for (i = 0; i < gp_events_size; i++)
-> +			if ((*gp_events)[i].unit_sel == (cnt->config & 0xffff))
-> +				return &(*gp_events)[i];
->  	} else
->  		return &fixed_events[cnt->ctr - MSR_CORE_PERF_FIXED_CTR0];
->  
-> @@ -142,12 +148,22 @@ static void global_disable(pmu_counter_t *cnt)
->  			~(1ull << cnt->idx));
+>  	return evt->ctr < MSR_CORE_PERF_FIXED_CTR0 ||
+>  		evt->ctr >= MSR_IA32_PMC0;
 >  }
 >  
-> +static inline uint32_t get_gp_counter_msr(unsigned int i)
-
-Rather than helpers, what about macros?  The problem with "get" is that it sounds
-like the helper is actually reading the counter/MSR.  E.g. see MSR_IA32_MCx_CTL()
-
-Something like this?
-
-  MSR_PERF_GP_CTRx()
-
-> +{
-> +	return gp_counter_base + i;
-> +}
+>  static int event_to_global_idx(pmu_counter_t *cnt)
+>  {
+> -	return cnt->ctr - (is_gp(cnt) ? gp_counter_base :
+> -		(MSR_CORE_PERF_FIXED_CTR0 - FIXED_CNT_INDEX));
+> +	if (is_intel())
+> +		return cnt->ctr - (is_gp(cnt) ? gp_counter_base :
+> +			(MSR_CORE_PERF_FIXED_CTR0 - FIXED_CNT_INDEX));
 > +
-> +static inline uint32_t get_gp_select_msr(unsigned int i)
-> +{
-> +	return gp_select_base + i;
+> +	if (gp_counter_base == MSR_F15H_PERF_CTR0) {
 
-Same here, maybe?
+Unnecessary curly braces.
 
-  MSR_PERF_GP_SELECTx()
+> +		return (cnt->ctr - gp_counter_base) / 2;
+> +	} else {
+> +		return cnt->ctr - gp_counter_base;
+> +	}
+>  }
+>  
+>  static struct pmu_event* get_counter_event(pmu_counter_t *cnt)
+> @@ -736,5 +783,11 @@ int main(int ac, char **av)
+>  		report_prefix_pop();
+>  	}
+>  
+> +	if (!is_intel()) {
+> +		report_prefix_push("K7");
+> +		amd_switch_to_non_perfctr_core();
+> +		check_counters();
 
+"K7" prefix needs to be popped.
+
+> +	}
+> +
+>  	return report_summary();
+>  }
+> -- 
+> 2.37.2
+> 
