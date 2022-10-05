@@ -1,381 +1,414 @@
 Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF7685F5639
-	for <lists+kvm@lfdr.de>; Wed,  5 Oct 2022 16:14:06 +0200 (CEST)
+Received: from out1.vger.email (unknown [IPv6:2620:137:e000::1:20])
+	by mail.lfdr.de (Postfix) with ESMTP id F1DD95F5646
+	for <lists+kvm@lfdr.de>; Wed,  5 Oct 2022 16:20:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230098AbiJEOOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Oct 2022 10:14:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41638 "EHLO
+        id S229873AbiJEOTu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Oct 2022 10:19:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230079AbiJEOOA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Oct 2022 10:14:00 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 438CB7C33A;
-        Wed,  5 Oct 2022 07:13:59 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 295DbnR9012930;
-        Wed, 5 Oct 2022 14:13:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
+        with ESMTP id S229870AbiJEOTq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Oct 2022 10:19:46 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42C8D65AA;
+        Wed,  5 Oct 2022 07:19:41 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 295DfZol004841;
+        Wed, 5 Oct 2022 14:19:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=M8evBa/i+BwZ32m38a3q5zdDdYZKhmZAofBOCds6t4c=;
- b=p0xHP3rGHmp9h7fjCHxQvJanlyaAlFF4f+/RDz4g1eoo/gcivDmkEWnzkYT6uBzk5Uf+
- aPt5fWWC/jTDNhDTQuErSG8G+5HCVRTp8dV6TlCCFMTYt8jtARsfI+dTOlqJDeKPu76/
- MKhRWwdS0jHd+niVOguvOr2RxptM3Vtc6iRFfweYybCeRBLI8L+Rx3Qow76mf9NlDcOn
- aPQFIQn9rjoYYCZSZ1Vbcv7lUVFptMUsJEEDJz3IFGmAdy6Nr9chOWU1qQKI1MF5JT/X
- eFB5BvbuFgWzLbbO+ArTpWwxgI7bXCeooHszgjRjkEW1Fr+pk8H9jSPEmCwXcjM7SQB3 mQ== 
+ bh=7qnHJ/iMHEFrciuyBO005eqUlV/I2ZFeYP4makXxn4c=;
+ b=VzdaBhlgf9Dz/LjXINLdwMO3Ua6yp6PSfNPMkLBDwCMnivN7ZAyBwNI9H1z4OWQWciaS
+ LPaKmf6xrQoX7jMJpjnJOXr9UqfFjh76koDznqXUcF6MCtG/iY6PHHAzzNbGw0bXOx6r
+ 0JYb6obsM/kmlZLEgsc/dgH+/RkgqzAVDlDVLh26+6N+xJ99/9DcRsai/D5QkZLun2X4
+ Cb2bMJMKWn2dt2Jvuo8zHYEo2rhxorK93VbfghRCqai6y4/hvRYKmNVQ9mA6lB6zRplP
+ kB2YFc2LPP1El4DANobyDrmcP++kgCZLMGlamyuEmmCOe9COagnFcjgNGy1TrPftp7/d Kg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k1ap29uj0-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k0hc0v67c-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 05 Oct 2022 14:13:55 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 295DcFSU013857;
-        Wed, 5 Oct 2022 14:13:55 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k1ap29uh3-1
+        Wed, 05 Oct 2022 14:19:35 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 295DgUZP008786;
+        Wed, 5 Oct 2022 14:19:34 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k0hc0v664-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 05 Oct 2022 14:13:54 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 295E67w2008184;
-        Wed, 5 Oct 2022 14:13:52 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06ams.nl.ibm.com with ESMTP id 3jxctj5p16-1
+        Wed, 05 Oct 2022 14:19:34 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 295E6mIl006401;
+        Wed, 5 Oct 2022 14:19:32 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06fra.de.ibm.com with ESMTP id 3jxcthv5pp-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 05 Oct 2022 14:13:52 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 295EDnHD34472628
+        Wed, 05 Oct 2022 14:19:32 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 295EJTm648300412
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 5 Oct 2022 14:13:49 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 462A05204E;
-        Wed,  5 Oct 2022 14:13:49 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.242])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id C7D345204F;
-        Wed,  5 Oct 2022 14:13:48 +0000 (GMT)
-Date:   Wed, 5 Oct 2022 16:13:46 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>
-Subject: Re: [PATCH v1 1/9] s390/uaccess: Add storage key checked cmpxchg
- access to user space
-Message-ID: <20221005161346.3c735249@p-imbrenda>
-In-Reply-To: <20220930210751.225873-2-scgl@linux.ibm.com>
-References: <20220930210751.225873-1-scgl@linux.ibm.com>
-        <20220930210751.225873-2-scgl@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        Wed, 5 Oct 2022 14:19:29 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9680511C050;
+        Wed,  5 Oct 2022 14:19:29 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 01BC811C04C;
+        Wed,  5 Oct 2022 14:19:29 +0000 (GMT)
+Received: from [9.171.26.202] (unknown [9.171.26.202])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  5 Oct 2022 14:19:28 +0000 (GMT)
+Message-ID: <9cf525da-1e58-ead8-5266-47ce1224d377@linux.ibm.com>
+Date:   Wed, 5 Oct 2022 16:19:28 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [PATCH v2] vfio: Follow a strict lifetime for struct iommu_group
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@ziepe.ca>,
+        Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        "Jason J . Herne" <jjherne@linux.ibm.com>,
+        Marc Hartmayer <mhartmay@linux.ibm.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Qian Cai <cai@lca.pw>, Joerg Roedel <jroedel@suse.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        linux-s390 <linux-s390@vger.kernel.org>
+References: <4cb6e49e-554e-57b3-e2d3-bc911d99083f@linux.ibm.com>
+ <20220927140541.6f727b01.alex.williamson@redhat.com>
+ <52545d8b-956b-8934-8a7e-212729ea2855@linux.ibm.com>
+ <YzxT6Suu+272gDvP@nvidia.com>
+ <1aebfa84-8310-5dff-1862-3d143878d9dd@linux.ibm.com>
+ <YzxfK/e14Bx9yNyo@nvidia.com>
+ <0a0d7937-316a-a0e2-9d7d-df8f3f8a38e3@linux.ibm.com>
+ <33bc5258-5c95-99ee-a952-5b0b2826da3a@linux.ibm.com>
+ <8982bc22-9afa-dde4-9f4e-38948db58789@linux.ibm.com>
+ <Yz2NSDa3E6LpW1c5@nvidia.com> <Yz2OH5wJUi8kI/FF@ziepe.ca>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <Yz2OH5wJUi8kI/FF@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: R0F7TXFF4spYhlUcSlnlSGo7qLPxMefO
-X-Proofpoint-GUID: PbdNM6zFOlRDSulwBK7Gr_ibpYXBPpz8
+X-Proofpoint-GUID: EkgYsr8SpUk2hg1kYVkjRUky9DtNMjU8
+X-Proofpoint-ORIG-GUID: hwD0StAK-Au2bMEY1AEE7nnA1lOP4cJh
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
  definitions=2022-10-05_03,2022-10-05_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- adultscore=0 phishscore=0 spamscore=0 mlxscore=0 bulkscore=0
- lowpriorityscore=0 clxscore=1011 mlxlogscore=999 suspectscore=0
- malwarescore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2209130000 definitions=main-2210050088
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ bulkscore=0 spamscore=0 mlxlogscore=999 priorityscore=1501 suspectscore=0
+ malwarescore=0 impostorscore=0 adultscore=0 phishscore=0 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
+ definitions=main-2210050088
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 30 Sep 2022 23:07:43 +0200
-Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
 
-> Add cmpxchg functionality similar to that in cmpxchg.h except that the
-> target is a user space address and that the address' storage key is
-> matched with the access_key argument in order to honor key-controlled
-> protection.
-> The access is performed by changing to the secondary-spaces mode and
-> setting the PSW key for the duration of the compare and swap.
 
-this whole patch is very complex, I think it can be simplified and made
-more maintainable (see my comments below)
+Am 05.10.22 um 16:01 schrieb Jason Gunthorpe:
+[..]
+> commit f8b993620af72fa5f15bd4c1515868013c1c173d
+> Author: Jason Gunthorpe <jgg@ziepe.ca>
+> Date:   Tue Oct 4 13:14:37 2022 -0300
+> 
+>      vfio: Make the group FD disassociate from the iommu_group
+>      
+>      Allow the vfio_group struct to exist with a NULL iommu_group pointer. When
+>      the pointer is NULL the vfio_group users promise not to touch the
+>      iommu_group. This allows a driver to be hot unplugged while userspace is
+>      keeping the group FD open.
+>      
+>      SPAPR mode is excluded from this behavior because of how it wrongly hacks
+>      part of its iommu interface through KVM. Due to this we loose control over
+>      what it is doing and cannot revoke the iommu_group usage in the IOMMU
+>      layer via vfio_group_detach_container().
+>      
+>      Thus, for SPAPR the group FDs must still be closed before a device can be
+>      hot unplugged.
+>      
+>      This fixes a userspace regression where we learned that virtnodedevd
+>      leaves a group FD open even though the /dev/ node for it has been deleted
+>      and all the drivers for it unplugged.
+>      
+>      Fixes: ca5f21b25749 ("vfio: Follow a strict lifetime for struct iommu_group")
+>      Reported-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+>      Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 
-in the end here we need an atomic compare and swap with key checking,
-if we are doing a syscall for it, we are clearly not looking for
-performance.
+Looks better now (I also did a quick check with vfio-pci on s390)
+
+Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
 > 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> ---
-> 
-> 
-> Possible variations:
->   * check the assumptions made in cmpxchg_user_key_size and error out
->   * call functions called by copy_to_user
->      * access_ok? is a nop
->      * should_fail_usercopy?
->      * instrument_copy_to_user? doesn't make sense IMO
->   * don't be overly strict in cmpxchg_user_key
-> 
-> 
->  arch/s390/include/asm/uaccess.h | 187 ++++++++++++++++++++++++++++++++
->  1 file changed, 187 insertions(+)
-> 
-> diff --git a/arch/s390/include/asm/uaccess.h b/arch/s390/include/asm/uaccess.h
-> index f7038b800cc3..0ce90b7e2b75 100644
-> --- a/arch/s390/include/asm/uaccess.h
-> +++ b/arch/s390/include/asm/uaccess.h
-> @@ -19,6 +19,8 @@
->  #include <asm/extable.h>
->  #include <asm/facility.h>
->  #include <asm-generic/access_ok.h>
-> +#include <asm/page.h>
-> +#include <linux/log2.h>
->  
->  void debug_user_asce(int exit);
->  
-> @@ -390,4 +392,189 @@ do {									\
->  		goto err_label;						\
->  } while (0)
->  
-> +static __always_inline int __cmpxchg_user_key_small(int size, u64 address,
-> +						    unsigned __int128 *old_p,
-> +						    unsigned __int128 new, u8 access_key)
-> +{
-
-can this whole function be simplified to be a C wrapper for the 4 byte
-version of compare and swap?
-
-> +	u32 shift, mask, old_word, new_word, align_mask, tmp, diff;
-> +	u64 aligned;
-> +	int ret = -EFAULT;
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 59a28251bb0b97..badc9d828cac20 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -1313,7 +1313,7 @@ static int vfio_pci_ioctl_pci_hot_reset(struct vfio_pci_core_device *vdev,
+>   		}
+>   
+>   		/* Ensure the FD is a vfio group FD.*/
+> -		if (!vfio_file_iommu_group(file)) {
+> +		if (!vfio_file_is_group(file)) {
+>   			fput(file);
+>   			ret = -EINVAL;
+>   			break;
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index 4d2de02f2ced6e..4e10a281420e66 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -59,6 +59,7 @@ struct vfio_group {
+>   	struct mutex			group_lock;
+>   	struct kvm			*kvm;
+>   	struct file			*opened_file;
+> +	bool				preserve_iommu_group;
+>   	struct swait_queue_head		opened_file_wait;
+>   	struct blocking_notifier_head	notifier;
+>   };
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 9b1e5fd5f7b73c..13d22bd84afc47 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -133,6 +133,10 @@ __vfio_group_get_from_iommu(struct iommu_group *iommu_group)
+>   {
+>   	struct vfio_group *group;
+>   
+> +	/*
+> +	 * group->iommu_group from the vfio.group_list cannot be NULL
+> +	 * under the vfio.group_lock.
+> +	 */
+>   	list_for_each_entry(group, &vfio.group_list, vfio_next) {
+>   		if (group->iommu_group == iommu_group) {
+>   			refcount_inc(&group->drivers);
+> @@ -159,7 +163,7 @@ static void vfio_group_release(struct device *dev)
+>   
+>   	mutex_destroy(&group->device_lock);
+>   	mutex_destroy(&group->group_lock);
+> -	iommu_group_put(group->iommu_group);
+> +	WARN_ON(group->iommu_group);
+>   	ida_free(&vfio.group_ida, MINOR(group->dev.devt));
+>   	kfree(group);
+>   }
+> @@ -248,6 +252,7 @@ static struct vfio_group *vfio_create_group(struct iommu_group *iommu_group,
+>   static void vfio_device_remove_group(struct vfio_device *device)
+>   {
+>   	struct vfio_group *group = device->group;
+> +	struct iommu_group *iommu_group;
+>   
+>   	if (group->type == VFIO_NO_IOMMU || group->type == VFIO_EMULATED_IOMMU)
+>   		iommu_group_remove_device(device->dev);
+> @@ -265,13 +270,36 @@ static void vfio_device_remove_group(struct vfio_device *device)
+>   	 */
+>   	cdev_device_del(&group->cdev, &group->dev);
+>   
+> +	mutex_lock(&group->group_lock);
+> +	/*
+> +	 * These data structures all have paired operations that can only be
+> +	 * undone when the caller holds a live reference on the device. Since
+> +	 * all pairs must be undone these WARN_ON's indicate some caller did not
+> +	 * properly hold the group reference.l.
+> +	 */
+> +	WARN_ON(!list_empty(&group->device_list));
+> +	WARN_ON(group->notifier.head);
 > +
-> +	switch (size) {
-> +	case 2:
-> +		align_mask = 2;
-> +		aligned = (address ^ (address & align_mask));
-> +		shift = (sizeof(u32) - (address & align_mask) - size) * 8;
-> +		mask = 0xffff << shift;
-> +		old_word = ((u16)*old_p) << shift;
-> +		new_word = ((u16)new) << shift;
-> +		break;
-> +	case 1:
-> +		align_mask = 3;
-> +		aligned = (address ^ (address & align_mask));
-> +		shift = (sizeof(u32) - (address & align_mask) - size) * 8;
-> +		mask = 0xff << shift;
-> +		old_word = ((u8)*old_p) << shift;
-> +		new_word = ((u8)new) << shift;
-> +		break;
+> +	/*
+> +	 * Revoke all users of group->iommu_group. At this point we know there
+> +	 * are no devices active because we are unplugging the last one. Setting
+> +	 * iommu_group to NULL blocks all new users.
+> +	 */
+> +	if (group->container)
+> +		vfio_group_detach_container(group);
+> +	iommu_group = group->iommu_group;
+> +	group->iommu_group = NULL;
+> +	mutex_unlock(&group->group_lock);
+> +
+>   	/*
+> -	 * Before we allow the last driver in the group to be unplugged the
+> -	 * group must be sanitized so nothing else is or can reference it. This
+> -	 * is because the group->iommu_group pointer should only be used so long
+> -	 * as a device driver is attached to a device in the group.
+> +	 * Normally we can set the iommu_group to NULL above and that will
+> +	 * prevent any users from touching it. However, the SPAPR kvm path takes
+> +	 * a reference to the iommu_group and keeps using it in arch code out
+> +	 * side our control. So if this path is triggred we have no choice but
+> +	 * to wait for the group FD to be closed to be sure everyone has stopped
+> +	 * touching the group.
+>   	 */
+> -	while (group->opened_file) {
+> +	while (group->preserve_iommu_group && group->opened_file) {
+>   		mutex_unlock(&vfio.group_lock);
+>   		swait_event_idle_exclusive(group->opened_file_wait,
+>   					   !group->opened_file);
+> @@ -279,17 +307,7 @@ static void vfio_device_remove_group(struct vfio_device *device)
+>   	}
+>   	mutex_unlock(&vfio.group_lock);
+>   
+> -	/*
+> -	 * These data structures all have paired operations that can only be
+> -	 * undone when the caller holds a live reference on the group. Since all
+> -	 * pairs must be undone these WARN_ON's indicate some caller did not
+> -	 * properly hold the group reference.
+> -	 */
+> -	WARN_ON(!list_empty(&group->device_list));
+> -	WARN_ON(group->container || group->container_users);
+> -	WARN_ON(group->notifier.head);
+> -	group->iommu_group = NULL;
+> -
+> +	iommu_group_put(iommu_group);
+>   	put_device(&group->dev);
+>   }
+>   
+> @@ -531,6 +549,10 @@ static int __vfio_register_dev(struct vfio_device *device,
+>   
+>   	existing_device = vfio_group_get_device(group, device->dev);
+>   	if (existing_device) {
+> +		/*
+> +		 * group->iommu_group is non-NULL because we hold the drivers
+> +		 * refcount.
+> +		 */
+>   		dev_WARN(device->dev, "Device already exists on group %d\n",
+>   			 iommu_group_id(group->iommu_group));
+>   		vfio_device_put_registration(existing_device);
+> @@ -702,6 +724,11 @@ static int vfio_group_ioctl_set_container(struct vfio_group *group,
+>   		ret = -EINVAL;
+>   		goto out_unlock;
+>   	}
+> +	if (!group->iommu_group) {
+> +		ret = -ENODEV;
+> +		goto out_unlock;
 > +	}
-> +	asm volatile(
-> +		       "spka	0(%[access_key])\n"
-> +		"	sacf	256\n"
-> +		"0:	l	%[tmp],%[aligned]\n"
-> +		"1:	nr	%[tmp],%[hole_mask]\n"
-> +		"	or	%[new_word],%[tmp]\n"
-> +		"	or	%[old_word],%[tmp]\n"
-> +		"	lr	%[tmp],%[old_word]\n"
-> +		"2:	cs	%[tmp],%[new_word],%[aligned]\n"
-> +		"3:	jnl	4f\n"
-> +		"	xrk	%[diff],%[tmp],%[old_word]\n"
-> +		"	nr	%[diff],%[hole_mask]\n"
-> +		"	xr	%[new_word],%[diff]\n"
-> +		"	xr	%[old_word],%[diff]\n"
-> +		"	xrk	%[diff],%[tmp],%[old_word]\n"
-> +		"	jz	2b\n"
-> +		"4:	ipm	%[ret]\n"
-> +		"	srl	%[ret],28\n"
-> +		"5:	sacf	768\n"
-> +		"	spka	%[default_key]\n"
-> +		EX_TABLE(0b, 5b) EX_TABLE(1b, 5b)
-> +		EX_TABLE(2b, 5b) EX_TABLE(3b, 5b)
-> +		: [old_word] "+&d" (old_word),
-> +		  [new_word] "+&d" (new_word),
-> +		  [tmp] "=&d" (tmp),
-> +		  [aligned] "+Q" (*(u32 *)aligned),
-> +		  [diff] "=&d" (diff),
-> +		  [ret] "+d" (ret)
-> +		: [access_key] "a" (access_key << 4),
-> +		  [hole_mask] "d" (~mask),
-> +		  [default_key] "J" (PAGE_DEFAULT_KEY)
-> +		: "cc"
-> +	);
-> +	*old_p = (tmp & mask) >> shift;
+> +
+>   	container = vfio_container_from_file(f.file);
+>   	ret = -EINVAL;
+>   	if (container) {
+> @@ -862,6 +889,11 @@ static int vfio_group_ioctl_get_status(struct vfio_group *group,
+>   	status.flags = 0;
+>   
+>   	mutex_lock(&group->group_lock);
+> +	if (!group->iommu_group) {
+> +		mutex_unlock(&group->group_lock);
+> +		return -ENODEV;
+> +	}
+> +
+>   	if (group->container)
+>   		status.flags |= VFIO_GROUP_FLAGS_CONTAINER_SET |
+>   				VFIO_GROUP_FLAGS_VIABLE;
+> @@ -938,13 +970,6 @@ static int vfio_group_fops_release(struct inode *inode, struct file *filep)
+>   	filep->private_data = NULL;
+>   
+>   	mutex_lock(&group->group_lock);
+> -	/*
+> -	 * Device FDs hold a group file reference, therefore the group release
+> -	 * is only called when there are no open devices.
+> -	 */
+> -	WARN_ON(group->notifier.head);
+> -	if (group->container)
+> -		vfio_group_detach_container(group);
+>   	group->opened_file = NULL;
+>   	mutex_unlock(&group->group_lock);
+>   	swake_up_one(&group->opened_file_wait);
+> @@ -1553,17 +1578,41 @@ static const struct file_operations vfio_device_fops = {
+>    * @file: VFIO group file
+>    *
+>    * The returned iommu_group is valid as long as a ref is held on the file.
+> + * This function is deprecated, only the SPAPR path in kvm should call it.
+>    */
+>   struct iommu_group *vfio_file_iommu_group(struct file *file)
+>   {
+>   	struct vfio_group *group = file->private_data;
+> +	struct iommu_group *iommu_group = NULL;
+> +
+> +	if (!IS_ENABLED(CONFIG_SPAPR_TCE_IOMMU))
+> +		return NULL;
+>   
+>   	if (file->f_op != &vfio_group_fops)
+>   		return NULL;
+> -	return group->iommu_group;
+> +
+> +	mutex_lock(&vfio.group_lock);
+> +	mutex_lock(&group->group_lock);
+> +	if (group->iommu_group) {
+> +		iommu_group = group->iommu_group;
+> +		group->preserve_iommu_group = true;
+> +	}
+> +	mutex_unlock(&group->group_lock);
+> +	mutex_unlock(&vfio.group_lock);
+> +	return iommu_group;
+>   }
+>   EXPORT_SYMBOL_GPL(vfio_file_iommu_group);
+>   
+> +/**
+> + * vfio_file_is_group - True if the file is usable with VFIO aPIS
+> + * @file: VFIO group file
+> + */
+> +bool vfio_file_is_group(struct file *file)
+> +{
+> +	return file->f_op == &vfio_group_fops;
+> +}
+> +EXPORT_SYMBOL_GPL(vfio_file_is_group);
+> +
+>   /**
+>    * vfio_file_enforced_coherent - True if the DMA associated with the VFIO file
+>    *        is always CPU cache coherent
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index 73bcb92179a224..bd9faaab85de18 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -199,6 +199,7 @@ int vfio_mig_get_next_state(struct vfio_device *device,
+>    * External user API
+>    */
+>   struct iommu_group *vfio_file_iommu_group(struct file *file);
+> +bool vfio_file_is_group(struct file *file);
+>   bool vfio_file_enforced_coherent(struct file *file);
+>   void vfio_file_set_kvm(struct file *file, struct kvm *kvm);
+>   bool vfio_file_has_dev(struct file *file, struct vfio_device *device);
+> diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
+> index ce1b01d02c5197..54aec3b0559c70 100644
+> --- a/virt/kvm/vfio.c
+> +++ b/virt/kvm/vfio.c
+> @@ -61,6 +61,23 @@ static bool kvm_vfio_file_enforced_coherent(struct file *file)
+>   	return ret;
+>   }
+>   
+> +static bool kvm_vfio_file_is_group(struct file *file)
+> +{
+> +	bool (*fn)(struct file *file);
+> +	bool ret;
+> +
+> +	fn = symbol_get(vfio_file_is_group);
+> +	if (!fn)
+> +		return false;
+> +
+> +	ret = fn(file);
+> +
+> +	symbol_put(vfio_file_is_group);
+> +
 > +	return ret;
 > +}
 > +
-> +/**
-> + * cmpxchg_user_key_size() - cmpxchg with user space target, honoring storage keys
-> + * @size: Size of the value being cmpxchg'ed, one of 1,2,4,8,16.
-> + * @address: User space address of value to compare to *@old_p and exchange with
-> + *           *@new. Must be aligned to @size.
-> + * @old_p: Pointer to old value. Interpreted as a @size byte integer and compared
-> + *         to the content pointed to by @address in order to determine if the
-> + *         exchange occurs. The value read from @address is written back to *@old_p.
-> + * @new: New value to place at @address, interpreted as a @size byte integer.
-> + * @access_key: Access key to use for checking storage key protection.
-> + *
-> + * Perform a cmpxchg on a user space target, honoring storage key protection.
-> + * @access_key alone determines how key checking is performed, neither
-> + * storage-protection-override nor fetch-protection-override apply.
-> + *
-> + * Return:	0: successful exchange
-> + *		1: exchange failed
-> + *		-EFAULT: @address not accessible or not naturally aligned
-> + *		-EINVAL: invalid @size
-> + */
-> +static __always_inline int cmpxchg_user_key_size(int size, void __user *address,
-> +						 unsigned __int128 *old_p,
-> +						 unsigned __int128 new, u8 access_key)
-> +{
-> +	union {
-> +		u32 word;
-> +		u64 doubleword;
-> +	} old;
-> +	int ret = -EFAULT;
-> +
-> +	/*
-> +	 * The following assumes that:
-> +	 *  * the current psw key is the default key
-> +	 *  * no storage protection overrides are in effect
-> +	 */
-> +	might_fault();
-> +	switch (size) {
-> +	case 16:
-> +		asm volatile(
-> +			       "spka	0(%[access_key])\n"
-> +			"	sacf	256\n"
-> +			"0:	cdsg	%[old],%[new],%[target]\n"
-> +			"1:	ipm	%[ret]\n"
-> +			"	srl	%[ret],28\n"
-> +			"2:	sacf	768\n"
-> +			"	spka	%[default_key]\n"
-> +			EX_TABLE(0b, 2b) EX_TABLE(1b, 2b)
-> +			: [old] "+d" (*old_p),
-> +			  [target] "+Q" (*(unsigned __int128 __user *)address),
-> +			  [ret] "+d" (ret)
-> +			: [access_key] "a" (access_key << 4),
-> +			  [new] "d" (new),
-> +			  [default_key] "J" (PAGE_DEFAULT_KEY)
-> +			: "cc"
-> +		);
-> +		return ret;
-> +	case 8:
-> +		old.doubleword = *old_p;
-> +		asm volatile(
-> +			       "spka	0(%[access_key])\n"
-> +			"	sacf	256\n"
-> +			"0:	csg	%[old],%[new],%[target]\n"
-> +			"1:	ipm	%[ret]\n"
-> +			"	srl	%[ret],28\n"
-> +			"2:	sacf	768\n"
-> +			"	spka	%[default_key]\n"
-> +			EX_TABLE(0b, 2b) EX_TABLE(1b, 2b)
-> +			: [old] "+d" (old.doubleword),
-> +			  [target] "+Q" (*(u64 __user *)address),
-> +			  [ret] "+d" (ret)
-> +			: [access_key] "a" (access_key << 4),
-> +			  [new] "d" ((u64)new),
-> +			  [default_key] "J" (PAGE_DEFAULT_KEY)
-> +			: "cc"
-> +		);
-> +		*old_p = old.doubleword;
-> +		return ret;
-> +	case 4:
-> +		old.word = *old_p;
-> +		asm volatile(
-> +			       "spka	0(%[access_key])\n"
-> +			"	sacf	256\n"
-> +			"0:	cs	%[old],%[new],%[target]\n"
-> +			"1:	ipm	%[ret]\n"
-> +			"	srl	%[ret],28\n"
-> +			"2:	sacf	768\n"
-> +			"	spka	%[default_key]\n"
-> +			EX_TABLE(0b, 2b) EX_TABLE(1b, 2b)
-> +			: [old] "+d" (old.word),
-> +			  [target] "+Q" (*(u32 __user *)address),
-> +			  [ret] "+d" (ret)
-> +			: [access_key] "a" (access_key << 4),
-> +			  [new] "d" ((u32)new),
-> +			  [default_key] "J" (PAGE_DEFAULT_KEY)
-> +			: "cc"
-
-this is the same code 3 times with only very minimal changes.
-can you factor it out in macros?
-
-something like this:
-
-#define DO_COMPARE_AND_SWAP(instr, _old, _addr, _ret, _key, _new) \
-	asm volatile(
-			"spka	0(%[access_key])\n"
-		"	sacf	256\n" 
-		"0:	" instr "%[old],%[new],%[target]\n"
-		"1:	ipm	%[ret]\n"
- 		"	srl 	%[ret],28\n"
-		"2:	sacf	768\n"
-		"	spka	%[default_key]\n"
-		EX_TABLE(0b, 2b) EX_TABLE(1b, 2b)
-		: [old] "+d"(_old),
-		  [target] "+Q" (*(_addr)),
-		  [ret] "+d" (_ret)
-		: [access_key] "a" ((_key) << 4),
-		  [new] "d" (_new),
-		  [default_key] "J" (PAGE_DEFAULT_KEY)
-		: "cc"
-
-and then in the code:
-
-DO_COMPARE_AND_SWAP("cs", old.word, (u32 __user *)address, ret, access_key, (u32)new)
-
-this way the code is not duplicated
-
-
-or have you tried it already and there are issues I didn't think of?
-
-> +		);
-> +		*old_p = old.word;
-> +		return ret;
-> +	case 2:
-> +	case 1:
-> +		return __cmpxchg_user_key_small(size, (u64)address, old_p, new, access_key);
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +}
-> +
-> +#define cmpxchg_user_key(target_p, old_p, new, access_key)			\
-> +({										\
-> +	__typeof__(old_p) __old_p = (old_p);					\
-> +	unsigned __int128 __old = *__old_p;					\
-> +	size_t __size = sizeof(*(target_p));					\
-> +	int __ret;								\
-> +										\
-> +	BUILD_BUG_ON(__size != sizeof(*__old_p));				\
-> +	BUILD_BUG_ON(__size != sizeof(new));					\
-> +	BUILD_BUG_ON(__size > 16 || !is_power_of_2(__size));			\
-
-and here an if to see if you need the _small version or the regular
-one, with the _small version being a wrapper around the regular one
-
-> +	__ret = cmpxchg_user_key_size(__size, (target_p), &__old, (new),	\
-> +				      (access_key));				\
-> +	*__old_p = __old;							\
-> +	__ret;									\
-> +})
-> +
->  #endif /* __S390_UACCESS_H */
-
+> +#ifdef CONFIG_SPAPR_TCE_IOMMU
+>   static struct iommu_group *kvm_vfio_file_iommu_group(struct file *file)
+>   {
+>   	struct iommu_group *(*fn)(struct file *file);
+> @@ -77,7 +94,6 @@ static struct iommu_group *kvm_vfio_file_iommu_group(struct file *file)
+>   	return ret;
+>   }
+>   
+> -#ifdef CONFIG_SPAPR_TCE_IOMMU
+>   static void kvm_spapr_tce_release_vfio_group(struct kvm *kvm,
+>   					     struct kvm_vfio_group *kvg)
+>   {
+> @@ -136,7 +152,7 @@ static int kvm_vfio_group_add(struct kvm_device *dev, unsigned int fd)
+>   		return -EBADF;
+>   
+>   	/* Ensure the FD is a vfio group FD.*/
+> -	if (!kvm_vfio_file_iommu_group(filp)) {
+> +	if (!kvm_vfio_file_is_group(filp)) {
+>   		ret = -EINVAL;
+>   		goto err_fput;
+>   	}
