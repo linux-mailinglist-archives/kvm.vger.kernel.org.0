@@ -2,152 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 81FF25F5A86
-	for <lists+kvm@lfdr.de>; Wed,  5 Oct 2022 21:17:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 14F2E5F5AC2
+	for <lists+kvm@lfdr.de>; Wed,  5 Oct 2022 21:55:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230128AbiJETRO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Oct 2022 15:17:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37104 "EHLO
+        id S230175AbiJETzJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Oct 2022 15:55:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229712AbiJETRL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Oct 2022 15:17:11 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F308913F68;
-        Wed,  5 Oct 2022 12:17:06 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 295J4kaW010737;
-        Wed, 5 Oct 2022 19:16:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=E8ePKIa98iVONEUZny1Gqy0ELAIf6a02zctey4g5Hfg=;
- b=B826LO+hllWUOwTXlZcVCjpwz9qVKABVW3DBmiW6vkmbn8bYpkMB9RPsNFQK7qklA8iB
- Oyqs26wjKG1UbFWVs06Nl+1i0DTckgQd/e6aw9gjUwndmKf1JPlJHl/eTSgFjtIOoZvn
- m793mobhX/wITZyYO7cpgnurU1jsJg6VCka1b7wxMPoiNpVuw8+oV9rwRyPT51xqDMNj
- 650zgOWCEHOUbr/BTiLSkXzZDV438M57T2gb7YAS9U9PT/eSQmZiNj7GbbbWtwlmMvxA
- EO64ao6Rwt9BEp/k/6qpSJ+eHlpEp0/lPdieIEjhmuQs3i6d8bqGLZHplPf+f6je2V2A mQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k1fs2r9v2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 05 Oct 2022 19:16:55 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 295J4k8W010746;
-        Wed, 5 Oct 2022 19:16:55 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k1fs2r9ug-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 05 Oct 2022 19:16:54 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 295J5N5R016797;
-        Wed, 5 Oct 2022 19:16:53 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03fra.de.ibm.com with ESMTP id 3jxd68vcdd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 05 Oct 2022 19:16:53 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 295JCIrB46727446
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 5 Oct 2022 19:12:18 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7032DA4051;
-        Wed,  5 Oct 2022 19:16:49 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 26256A4040;
-        Wed,  5 Oct 2022 19:16:45 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.56.127])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  5 Oct 2022 19:16:45 +0000 (GMT)
-Message-ID: <730ad052651fc393b18c7f5664788fb66719b970.camel@linux.ibm.com>
-Subject: Re: [PATCH v1 2/9] KVM: s390: Extend MEM_OP ioctl by storage key
- checked cmpxchg
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>
-Date:   Wed, 05 Oct 2022 21:16:43 +0200
-In-Reply-To: <37197cfe-d109-332f-089b-266d7e8e23f8@redhat.com>
-References: <20220930210751.225873-1-scgl@linux.ibm.com>
-         <20220930210751.225873-3-scgl@linux.ibm.com>
-         <37197cfe-d109-332f-089b-266d7e8e23f8@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        with ESMTP id S230078AbiJETzI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Oct 2022 15:55:08 -0400
+Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 564944623F
+        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 12:55:07 -0700 (PDT)
+Date:   Wed, 05 Oct 2022 19:54:53 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+        s=protonmail3; t=1664999703; x=1665258903;
+        bh=ygjTo8reVx2XjO/O5ENZntwsGUDohh4oiG5NtkdsuD4=;
+        h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+         Subject:Reply-To:Feedback-ID:Message-ID;
+        b=zaGRQr9qEBFEBjk4kZeoyQ3abMdkvaPcTzDN7KWtcWMSs7NkIK+yCuyERgHrOZ1CC
+         FqN/ZpS/Fx3OHf7gsRvl1DdpEeZjunmZh9yOQ1Z2ioc/VfIuz7L+SBipcRE27anX29
+         ityCVxfNAXrp6lPk9yJyhDUm7HHT2MwDB9mVACEOBHUgAc0GZoGYrB/M7/+WeWgJHA
+         CTaz5OJ/DtWGv9PPQJoedKcJ1LDURNO3Tq7ZSYMJB0u/Zs+8DfX3Ou0TYvCtXdb2nT
+         FPQBeFj/SJ0U6GxlSnmSK8XKIVz7z8Nhr+TSiJdlRofNpEiqfoUxSTTLXUlAclyC06
+         bf8yuPgIm17nA==
+To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+From:   kvmuser99 <kvmuser99@protonmail.com>
+Subject: High pings when using SR-IOV w\ macvtap & virtio
+Message-ID: <tlj1hWXnQMMaNewClFlGqKRaIsW8eQbW6dKlNGqGPviS-AoqJYQXoqPx6_sIOB6AzPVZuuncLtTIIUsZHerZagf9AuheA5OPwxq-MKFCrhU=@protonmail.com>
+Feedback-ID: 56853544:user:proton
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: dI4glRReVo79bjt7WRwpkeV2XRY1dYI6
-X-Proofpoint-ORIG-GUID: 7U8shb_UzHkEW4OF4lqyth2MGUMsiqw4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-10-05_05,2022-10-05_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
- impostorscore=0 mlxscore=0 adultscore=0 malwarescore=0 bulkscore=0
- lowpriorityscore=0 suspectscore=0 mlxlogscore=884 spamscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210050119
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-10-05 at 08:32 +0200, Thomas Huth wrote:
-> On 30/09/2022 23.07, Janis Schoetterl-Glausch wrote:
-> > User space can use the MEM_OP ioctl to make storage key checked reads
-> > and writes to the guest, however, it has no way of performing atomic,
-> > key checked, accesses to the guest.
-> > Extend the MEM_OP ioctl in order to allow for this, by adding a cmpxchg
-> > mode. For now, support this mode for absolute accesses only.
-> > 
-> > This mode can be use, for example, to set the device-state-change
-> > indicator and the adapter-local-summary indicator atomically.
-> > 
-> > Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> > ---
-> > 
-> > 
-> > The return value of MEM_OP is:
-> >    0 on success,
-> >    < 0 on generic error (e.g. -EFAULT or -ENOMEM),
-> >    > 0 if an exception occurred while walking the page tables
-> > A cmpxchg failing because the old value doesn't match is neither an
-> > error nor an exception, so the question is how best to signal that
-> > condition. This is not strictly necessary since user space can compare
-> > the value of old after the MEM_OP with the value it set. If they're
-> > different the cmpxchg failed. It might be a better user interface if
-> > there is an easier way to see if the cmpxchg failed.
-> > This patch sets the cmpxchg flag bit to 0 on a successful cmpxchg.
-> > This way you can compare against a constant instead of the old old
-> > value.
-> > This has the disadvantage of being a bit weird, other suggestions
-> > welcome.
-> 
-> This also breaks the old API of defining the ioctl as _IOW only ... with 
-> your change to the flags field, it effectively gets IOWR instead.
+KVM Team,
 
-Oh, right.
-> 
-> Maybe it would be better to put all the new logic into a new struct and only 
-> pass a pointer to that struct in kvm_s390_mem_op, so that the ioctl stays 
-> IOW ? ... or maybe even introduce a completely new ioctl for this 
-> functionality instead?
+I'm going to the mailing lists because I'm at a loss.=C2=A0 I have thousand=
+s of Linux (CentOS 7) VMs deployed and a very small percent of them get int=
+o a state when there's some amount of network IO the guests will constantly=
+ clock high ping times (> 100 ms local network) and performance will suffer=
+.=C2=A0 Some hosts will always clock the high ping times, other times runni=
+ng a CLI speedtest will cause the condition to surface.
 
-Hmmm, the latter seems a bit ugly since there is so much commonality
-with the existing memop. 
-> 
->   Thomas
-> 
+Rebooting the guest does not solve the issue but a reboot of the host does =
+for awhile.=C2=A0 Running something such as the following helps in most cas=
+es.=C2=A0 For reference eth0 is the physical interface from which all the V=
+Fs come from.
+
+=3D=3D=3D
+=C2=A0 126 =C2=A0ethtool -L eth0 combined 16 <-- Arbitrary number=C2=A0=20
+128 =C2=A0ethtool -L eth0 combined 4 <--- Number of CPU reserved for the ho=
+st (it as previously set to this)
+=3D=3D=3D
+
+In most of the scenarios pings even to a 'bridge' interface which just hand=
+les guest\host communication also shoot high even though there is low netwo=
+rk IO on that particular interface.
+
+
+Config is as follows
+
+-   Queues =3D number of CPU assigned to guest
+-   Affinity is enabled.
+   =20
+
+=3D=3D=3D
+=C2=A0 =C2=A0 <interface type=3D'direct' trustGuestRxFilters=3D'yes'>=C2=
+=A0 =C2=A0 =C2=A0 <mac address=3D'MACHERE'/>
+=C2=A0 =C2=A0 =C2=A0 <source dev=3D'eth26' mode=3D'passthrough'/>
+=C2=A0 =C2=A0 =C2=A0 <model type=3D'virtio'/>
+=C2=A0 =C2=A0 =C2=A0 <driver name=3D'vhost' queues=3D'5'/>
+=C2=A0 =C2=A0 =C2=A0 <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' s=
+lot=3D'0x03' function=3D'0x0'/>
+=C2=A0 =C2=A0 </interface>
+=3D=3D=3D=3D=3D
+
+
+=3D=3D=3D
+lshw -c network -businfo
+pci@0000:03:02.5 =C2=A0eth12 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 network =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0Ethernet Virtual Function 700 Series
+
+ip link show | grep eth12
+26: eth12: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mod=
+e DEFAULT group default qlen 1000110: macvtap30@eth12: <BROADCAST,MULTICAST=
+,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default=
+ qlen 5000
+
+=3D=3D=3D=3D
+
+Info about the interface
+
+=3D=3D=3D
+[root@HOST~]# ethtool -k eth12Features for eth12:
+rx-checksumming: on
+tx-checksumming: on
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-checksum-ipv4: on
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-checksum-ip-generic: off [fixed]
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-checksum-ipv6: on
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-checksum-fcoe-crc: off [fixed]
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-checksum-sctp: on
+scatter-gather: on
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-scatter-gather: on
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-scatter-gather-fraglist: off [fixed]
+tcp-segmentation-offload: on
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-tcp-segmentation: on
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-tcp-ecn-segmentation: on
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-tcp6-segmentation: on
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-tcp-mangleid-segmentation: on
+udp-fragmentation-offload: off [fixed]
+generic-segmentation-offload: on
+generic-receive-offload: off
+large-receive-offload: off [fixed]
+rx-vlan-offload: on
+tx-vlan-offload: on
+ntuple-filters: off [fixed]
+receive-hashing: on
+highdma: on
+rx-vlan-filter: on [fixed]
+vlan-challenged: off [fixed]
+tx-lockless: off [fixed]
+netns-local: off [fixed]
+tx-gso-robust: off [fixed]
+tx-fcoe-segmentation: off [fixed]
+tx-gre-segmentation: on
+tx-ipip-segmentation: on
+tx-sit-segmentation: on
+tx-udp_tnl-segmentation: on
+fcoe-mtu: off [fixed]
+tx-nocache-copy: off
+loopback: off [fixed]
+rx-fcs: off [fixed]
+rx-all: off [fixed]
+tx-vlan-stag-hw-insert: off [fixed]
+rx-vlan-stag-hw-parse: off [fixed]
+rx-vlan-stag-filter: off [fixed]
+busy-poll: off [fixed]
+tx-gre-csum-segmentation: on
+tx-udp_tnl-csum-segmentation: on
+tx-gso-partial: on
+tx-sctp-segmentation: off [fixed]
+rx-gro-hw: off [fixed]
+l2-fwd-offload: off [fixed]
+hw-tc-offload: on
+rx-udp_tunnel-port-offload: off [fixed]
+=3D=3D=3D=3D
+
+
+Versions
+=3D=3D=3D
+cat /etc/redhat-release
+CentOS Linux release 7.6.1810 (Core)
+
+
+
+modinfo i40efilename: =C2=A0 =C2=A0 =C2=A0 /lib/modules/3.10.0-957.el7.x86_=
+64/kernel/drivers/net/ethernet/intel/i40e/i40e.ko.xz
+version: =C2=A0 =C2=A0 =C2=A0 =C2=A02.3.2-k
+license: =C2=A0 =C2=A0 =C2=A0 =C2=A0GPL
+description: =C2=A0 =C2=A0Intel(R) Ethernet Connection XL710 Network Driver
+author: =C2=A0 =C2=A0 =C2=A0 =C2=A0 Intel Corporation, <e1000-devel@lists.s=
+ourceforge.net>
+retpoline: =C2=A0 =C2=A0 =C2=A0Y
+rhelversion: =C2=A0 =C2=A07.6
+
+uname -r3.10.0-957.el7.x86_64
+
+/usr/libexec/qemu-kvm -version
+QEMU emulator version 5.1.0
+
+=3D=3D=3D=3D=3D
+
+
+-kvmuser99
 
