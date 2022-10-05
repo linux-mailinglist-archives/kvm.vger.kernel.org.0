@@ -2,68 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (unknown [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7053B5F59C5
-	for <lists+kvm@lfdr.de>; Wed,  5 Oct 2022 20:21:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B36C5F59D4
+	for <lists+kvm@lfdr.de>; Wed,  5 Oct 2022 20:25:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230078AbiJESUp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Oct 2022 14:20:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38346 "EHLO
+        id S230064AbiJESZG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Oct 2022 14:25:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229917AbiJESUo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Oct 2022 14:20:44 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BFEF72B58
-        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 11:20:42 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id u24so9094331plq.12
-        for <kvm@vger.kernel.org>; Wed, 05 Oct 2022 11:20:42 -0700 (PDT)
+        with ESMTP id S229915AbiJESZE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Oct 2022 14:25:04 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B45B108B
+        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 11:25:03 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id d24so16091609pls.4
+        for <kvm@vger.kernel.org>; Wed, 05 Oct 2022 11:25:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=b6zzNw/YjH3RxSUvMPTYr8To/FV4imd1UZZMrOjTqao=;
-        b=ewr67jbi1lQIleM8nptOdHKnoaAk1apDGASF7WlKrATX0r/jv5thVXkvNu6T2Io2Qz
-         FJHfFxvKtj4dnMXVVIg9CTEBtMYnNxfwqK2oKhCJ3Jx3e2y4qrhK4ur5XzqADOvB5ROZ
-         +mfTo2KxFTZ7TX+AK0PxBK7iF/meIsd8bJWIHR7Q/ywf+LKbWfPEmGI4hqeBTQM/LvwO
-         WlOCJbv1sfZhsKv5fy5VOLWIiwQUh89WzR1S2xbyS3XhI2YOibbUroXfX/c9BDq7B57U
-         +z0AINN3Efqc06dNzAVEiUtr/4nGov8EKW8Ydn8VIyR7Q5aPSYbDNFOcnMMGlALWBUeO
-         klFg==
+        bh=CUW1KYmFopFdsPTZcWygrx33GipuP5wuO3THECfGVaI=;
+        b=lbh02NDtPX+m/svKiFI4pGnWNgyDzo0vOnkLlBGvKxQCDzXo7UuIfKTxDRbdw1Ppv4
+         f9PheA49IMbONigpuYl0nRWrlIwS5Ep0DdZqBcNEV+o1coGT626i/4W2XUfXEVOEr0dM
+         1qjwxlQnq0Ft0CjO3FaegKjXACJAEPoo3JEzjr8D0DuEwCn2/HiO0KvKns6y8OIVJQ9l
+         SARMYzM7RLjheyMWSUR9L/SJN3MgKvA2MFFaE+QL6QUEkJfaG1So+oTBGX0zarzemCCs
+         qsrxtCd/Qug0+DSvQR1EGoRw29NBt7Ra6kc5Ic3125sbc14CqHBrxLvV604E3VG5XF9M
+         Us2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=b6zzNw/YjH3RxSUvMPTYr8To/FV4imd1UZZMrOjTqao=;
-        b=Ez0ednCJvZDo1UVsgeCJE2ya/K4UjwzXkPWW2ml6NhK15K5AjUVwXcfwYw7OU0EkTf
-         8vVpKXsXax9+I46MWr8YEMetWVdf6JOEMhlKXbtW37uLA44svBRZhv2KeWc8Ag/lrJOQ
-         9VQXhQk1CH9I9p/PY7TK9KKemz99XB87xsIiIF362GqekbSySkuWXcJofI6gZLKWdYwo
-         Bz5SbPHZ1zCJu/qyOoOMeun+ZRFOs4OQlZeSfuY36f+R6Tm0n2frOW1FpLW92ilPJkwg
-         3F1EbwaAd4WRasH13K0iD2nLhMBRb8/ri1SqpfR9OXWGcDtq13oX8xVNI/k9FY4o4xzV
-         oEEA==
-X-Gm-Message-State: ACrzQf3N+qyLfhiyeD0PAWHpicVIy0W5PFZdYdg6d1qnJjKJzXAMohqa
-        PK8c7u26mMcHdd0RHODYFlO9Wg==
-X-Google-Smtp-Source: AMsMyM62Fch38nQ+xgGrRlTYEiO2c1L4XNclfYribautCoNr6damcDJC7SHKc+pc0Rst1dkMVvDxdA==
-X-Received: by 2002:a17:903:11cf:b0:178:a8f4:d511 with SMTP id q15-20020a17090311cf00b00178a8f4d511mr937878plh.72.1664994041964;
-        Wed, 05 Oct 2022 11:20:41 -0700 (PDT)
+        bh=CUW1KYmFopFdsPTZcWygrx33GipuP5wuO3THECfGVaI=;
+        b=B9Jutya1EgW84oVGhJBZWYzCgu9lR2kQi0n9lCgugakwfNqFz5I9Xh0z/SNSw10N2l
+         ZkU24a/Hm2fujwWhvIJ6zbAB/fV4pjX/dIQapcJ7a9Bsx5K24DipkE9oJMHbW5Ll2U+p
+         3Bd/yy02Nhc+lkF4f/VsnZS7xqiXVfvOY23M0Eg3JnCiPzbjA3UHb8ex1zWS0wFh+Loi
+         GLI4k9KanNuPJJVfRwzxHBsUQPmJ6eQYCyiPGTbB77UrRfQY0BymsFYYyvynMYoOf5zP
+         BwkfIJlmbB6m+1Xdq/shnBpYxZ68sA6RTm/sMsvmeerYstbNMQ7L/8ewnQ/I+fW+8Dg3
+         x4Kw==
+X-Gm-Message-State: ACrzQf38GKxgkIKmUlX5XV+UfDAspOTeQxcrfuyNDNv1ZtjRTJSe4U+Y
+        WvPuTH2nj+EXvMZzAWqDaCJvXg==
+X-Google-Smtp-Source: AMsMyM5CRhfAtPVMGpuu7ouPoc7ZjeK7GI9zyjU0pozMAB+re04TEMupJbZjBvBHSZ7kvv/Bau2YPQ==
+X-Received: by 2002:a17:902:ec89:b0:178:3ea4:2960 with SMTP id x9-20020a170902ec8900b001783ea42960mr972216plg.160.1664994302885;
+        Wed, 05 Oct 2022 11:25:02 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id i10-20020a170902cf0a00b00177f25f8ab3sm10803052plg.89.2022.10.05.11.20.41
+        by smtp.gmail.com with ESMTPSA id q13-20020a170902dacd00b0017825ab5320sm10832251plx.251.2022.10.05.11.25.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Oct 2022 11:20:41 -0700 (PDT)
-Date:   Wed, 5 Oct 2022 18:20:37 +0000
+        Wed, 05 Oct 2022 11:25:02 -0700 (PDT)
+Date:   Wed, 5 Oct 2022 18:24:58 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Zixuan Wang <zxwang@fb.com>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com,
         shankaran@fb.com, somnathc@fb.com, marcorr@google.com,
         varad.gautam@suse.com, jroedel@suse.de, bp@suse.de,
         zxwang42@gmail.com
-Subject: Re: [kvm-unit-tests RFC PATCH 1/5] efi: Compile standalone binaries
- for EFI
-Message-ID: <Yz3K9UXuut25wj2h@google.com>
+Subject: Re: [kvm-unit-tests RFC PATCH 2/5] x86/efi: Fix efi runner scripts
+ for standalone
+Message-ID: <Yz3L+nZv8ozvZ/z3@google.com>
 References: <20220816175413.3553795-1-zxwang@fb.com>
- <20220816175413.3553795-2-zxwang@fb.com>
+ <20220816175413.3553795-3-zxwang@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220816175413.3553795-2-zxwang@fb.com>
+In-Reply-To: <20220816175413.3553795-3-zxwang@fb.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -76,47 +76,23 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, Aug 16, 2022, Zixuan Wang wrote:
-> Currently the standalone binaries do not work with EFI as the scripts
-> are not aware of EFI-related files. More specifically, the scripts only
-> search for .flat files, but EFI binaries are .efi files.
+> Fix the efi runner scripts to run in the standalone mode:
+
+Capitalize EFI for consistency.
+
+> 1. Define the `x86/run` qemu runner as a function because `x86/run` is
+> embedded into the standalone and cannot be called using its file name.
 > 
-> This patch fixes this by introducing a new 'efi' option for
+> 2. Disabling the `config.mak` checks in the standalone mode as it's not
+> available.
 
-Avoid this patch, and phrase changelogs as command.  E.g.
+s/Disabling/Disable
 
-  Introduce an "efi" option in unittests.cfg <reasoning...>
-
-> unittests.cfg. This patch does not contain any modifications to use this
-> new efi option. Those updates will be folded into the follow-up patch.
 > 
-> Signed-off-by: Zixuan Wang <zxwang@fb.com>
-> ---
->  scripts/common.bash     | 24 ++++++++++++++++++++++--
->  scripts/mkstandalone.sh | 17 ++++++++++++++++-
->  x86/unittests.cfg       |  3 +++
->  3 files changed, 41 insertions(+), 3 deletions(-)
-> 
-> diff --git a/scripts/common.bash b/scripts/common.bash
-> index 7b983f7..7af9d62 100644
-> --- a/scripts/common.bash
-> +++ b/scripts/common.bash
-> @@ -1,5 +1,21 @@
->  source config.mak
->  
-> +function unittest_enabled()
-> +{
-> +	test_name="$1"
-> +	test_efi="$2"
-> +
-> +	if [ -z "${test_name}" ]; then
-> +		false
-> +	elif [ "${CONFIG_EFI}" == "y" ] && [ "${test_efi}" == "no" ]; then
-> +		false
-> +	elif [ "${CONFIG_EFI}" == "n" ] && [ "${test_efi}" == "only" ]; then
+> 3. Use the dummy test file name provided by standalone's EFI_DUMMY
+> variable, because the dummy test case is embedded into the standalone
+> files and exported as a tmp file at run time.
 
-Having to tag every test as EFI-friendly is going to get annoying, and without
-context it's not super obvious that "efi = yes" means EFI-friendly _and_ legacy-
-friendly.
-
-Rather than "efi = {yes,no,only}", what about "efi = {unsupported,required}"?
-I.e. tag only tests that don't support all flavors of firmware.
+This patch probably needs to be split into three patches, one for each of the
+above changes.  A changelog that contains a list of things that are fixed is usually
+a good hint that the patch is bundling too many things together.
