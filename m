@@ -2,41 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14F2E5F5AC2
-	for <lists+kvm@lfdr.de>; Wed,  5 Oct 2022 21:55:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B044E5F5AF2
+	for <lists+kvm@lfdr.de>; Wed,  5 Oct 2022 22:25:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230175AbiJETzJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Oct 2022 15:55:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55204 "EHLO
+        id S230424AbiJEUZo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Oct 2022 16:25:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230078AbiJETzI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Oct 2022 15:55:08 -0400
-Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 564944623F
-        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 12:55:07 -0700 (PDT)
-Date:   Wed, 05 Oct 2022 19:54:53 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-        s=protonmail3; t=1664999703; x=1665258903;
-        bh=ygjTo8reVx2XjO/O5ENZntwsGUDohh4oiG5NtkdsuD4=;
-        h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-         Subject:Reply-To:Feedback-ID:Message-ID;
-        b=zaGRQr9qEBFEBjk4kZeoyQ3abMdkvaPcTzDN7KWtcWMSs7NkIK+yCuyERgHrOZ1CC
-         FqN/ZpS/Fx3OHf7gsRvl1DdpEeZjunmZh9yOQ1Z2ioc/VfIuz7L+SBipcRE27anX29
-         ityCVxfNAXrp6lPk9yJyhDUm7HHT2MwDB9mVACEOBHUgAc0GZoGYrB/M7/+WeWgJHA
-         CTaz5OJ/DtWGv9PPQJoedKcJ1LDURNO3Tq7ZSYMJB0u/Zs+8DfX3Ou0TYvCtXdb2nT
-         FPQBeFj/SJ0U6GxlSnmSK8XKIVz7z8Nhr+TSiJdlRofNpEiqfoUxSTTLXUlAclyC06
-         bf8yuPgIm17nA==
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-From:   kvmuser99 <kvmuser99@protonmail.com>
-Subject: High pings when using SR-IOV w\ macvtap & virtio
-Message-ID: <tlj1hWXnQMMaNewClFlGqKRaIsW8eQbW6dKlNGqGPviS-AoqJYQXoqPx6_sIOB6AzPVZuuncLtTIIUsZHerZagf9AuheA5OPwxq-MKFCrhU=@protonmail.com>
-Feedback-ID: 56853544:user:proton
+        with ESMTP id S231124AbiJEUZX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Oct 2022 16:25:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB2017F27A
+        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 13:25:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665001515;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=86WWmb1vJeLs9Ctv4ANh4WOz2rPIK6lvoWUYd8tv0OA=;
+        b=AQrlhsW9bRNbW29xs8kFC/csk5e76rz1iftghepgoGvy/jbwZbWbzM6EWHXnmZ15Ue6Fva
+        +QwMbIZkkTF0Aw8wMar1xhq9tPQbgw15/kXiGp4s/XhWcfUqiPZbsHGi4KTTWPBu67lU9S
+        KS0Ia/0UJx7oelc0FHzSTWwkqG7q/qQ=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-300-w4SGPmYCPJKFUhmDBYP0NQ-1; Wed, 05 Oct 2022 16:25:14 -0400
+X-MC-Unique: w4SGPmYCPJKFUhmDBYP0NQ-1
+Received: by mail-io1-f72.google.com with SMTP id n23-20020a056602341700b00689fc6dbfd6so11653134ioz.8
+        for <kvm@vger.kernel.org>; Wed, 05 Oct 2022 13:25:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=86WWmb1vJeLs9Ctv4ANh4WOz2rPIK6lvoWUYd8tv0OA=;
+        b=myB4yvNFw1x/XlLsNu3RmftMOJfTWR6S/RaPVWZjujzBzSp/xgWWw5Aykgqh0OaEED
+         fdZM+bVS0sV7aDUyVkZENa5x1j2jGpvo5PajNDpSOt4tc7LVrG7dbOYHEQqqG0bg+PF3
+         VfAlY/DzLRqtGYLHe/fyfWmXPe3QfaY4PibaaJDgeAFREY9tNW0Qn2TxLieuMETTM1z6
+         tnEwhep8eBmC7XSeCrEZDAPvlJR330MKPx8RTQIXMcJNR+PDSSlsmlhVnyNFRu5e5ZUp
+         me/COQDXb2q38RaKt8tKFl9V07mtgBZZtlzAb69oFNSmJJnX/ehVlE+KSOu3fXwhshHV
+         LU5w==
+X-Gm-Message-State: ACrzQf2FSL1uC5lhAmOT8HVn00gQS+ctN59jeYAoqpxmbEcUoK6XLpxa
+        DJSqZW3EzlHgYvpjGvfWryF+YT3yV8bzzDkenk9q8f+gy7ravY/xeOfVMyNU7ZZYu/FssWvVKAa
+        IxfPmdwH20xzN
+X-Received: by 2002:a05:6638:1135:b0:362:bcba:6fff with SMTP id f21-20020a056638113500b00362bcba6fffmr707435jar.129.1665001513208;
+        Wed, 05 Oct 2022 13:25:13 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM5zMQ8nZBstQ8/VZUmu7G1LF5iy09Gr1MWJLuQFjO/chMV4an7kCrwy4dVvl9VBSVUH7mrGwg==
+X-Received: by 2002:a05:6638:1135:b0:362:bcba:6fff with SMTP id f21-20020a056638113500b00362bcba6fffmr707427jar.129.1665001513003;
+        Wed, 05 Oct 2022 13:25:13 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id h14-20020a056602154e00b006a175fe334dsm7161320iow.1.2022.10.05.13.25.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Oct 2022 13:25:11 -0700 (PDT)
+Date:   Wed, 5 Oct 2022 14:25:10 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: linux-next: Fixes tag needs some work in the vfio tree
+Message-ID: <20221005142510.199debc2.alex.williamson@redhat.com>
+In-Reply-To: <20221004073151.2d4f778d@canb.auug.org.au>
+References: <20221004073151.2d4f778d@canb.auug.org.au>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
         version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -44,144 +80,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM Team,
+On Tue, 4 Oct 2022 07:31:51 +1100
+Stephen Rothwell <sfr@canb.auug.org.au> wrote:
 
-I'm going to the mailing lists because I'm at a loss.=C2=A0 I have thousand=
-s of Linux (CentOS 7) VMs deployed and a very small percent of them get int=
-o a state when there's some amount of network IO the guests will constantly=
- clock high ping times (> 100 ms local network) and performance will suffer=
-.=C2=A0 Some hosts will always clock the high ping times, other times runni=
-ng a CLI speedtest will cause the condition to surface.
+> Hi all,
+> 
+> In commit
+> 
+>   66c6b7dbbda3 ("drm/i915/gvt: fix a memory leak in intel_gvt_init_vgpu_types")
+> 
+> Fixes tag
+> 
+>   Fixes: c90d097ae144 ("drm/i915/gvt: define weight according to vGPU type")
+> 
+> has these problem(s):
+> 
+>   - Target SHA1 does not exist
+> 
+> Maybe you meant
+> 
+> Fixes: bc90d097ae14 ("drm/i915/gvt: define weight according to vGPU type")
 
-Rebooting the guest does not solve the issue but a reboot of the host does =
-for awhile.=C2=A0 Running something such as the following helps in most cas=
-es.=C2=A0 For reference eth0 is the physical interface from which all the V=
-Fs come from.
+Yes, I agree.  I've fixed this in my tree and forced the update to my
+next branch.  Thanks!
 
-=3D=3D=3D
-=C2=A0 126 =C2=A0ethtool -L eth0 combined 16 <-- Arbitrary number=C2=A0=20
-128 =C2=A0ethtool -L eth0 combined 4 <--- Number of CPU reserved for the ho=
-st (it as previously set to this)
-=3D=3D=3D
-
-In most of the scenarios pings even to a 'bridge' interface which just hand=
-les guest\host communication also shoot high even though there is low netwo=
-rk IO on that particular interface.
-
-
-Config is as follows
-
--   Queues =3D number of CPU assigned to guest
--   Affinity is enabled.
-   =20
-
-=3D=3D=3D
-=C2=A0 =C2=A0 <interface type=3D'direct' trustGuestRxFilters=3D'yes'>=C2=
-=A0 =C2=A0 =C2=A0 <mac address=3D'MACHERE'/>
-=C2=A0 =C2=A0 =C2=A0 <source dev=3D'eth26' mode=3D'passthrough'/>
-=C2=A0 =C2=A0 =C2=A0 <model type=3D'virtio'/>
-=C2=A0 =C2=A0 =C2=A0 <driver name=3D'vhost' queues=3D'5'/>
-=C2=A0 =C2=A0 =C2=A0 <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' s=
-lot=3D'0x03' function=3D'0x0'/>
-=C2=A0 =C2=A0 </interface>
-=3D=3D=3D=3D=3D
-
-
-=3D=3D=3D
-lshw -c network -businfo
-pci@0000:03:02.5 =C2=A0eth12 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 network =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0Ethernet Virtual Function 700 Series
-
-ip link show | grep eth12
-26: eth12: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mod=
-e DEFAULT group default qlen 1000110: macvtap30@eth12: <BROADCAST,MULTICAST=
-,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default=
- qlen 5000
-
-=3D=3D=3D=3D
-
-Info about the interface
-
-=3D=3D=3D
-[root@HOST~]# ethtool -k eth12Features for eth12:
-rx-checksumming: on
-tx-checksumming: on
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-checksum-ipv4: on
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-checksum-ip-generic: off [fixed]
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-checksum-ipv6: on
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-checksum-fcoe-crc: off [fixed]
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-checksum-sctp: on
-scatter-gather: on
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-scatter-gather: on
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-scatter-gather-fraglist: off [fixed]
-tcp-segmentation-offload: on
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-tcp-segmentation: on
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-tcp-ecn-segmentation: on
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-tcp6-segmentation: on
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 tx-tcp-mangleid-segmentation: on
-udp-fragmentation-offload: off [fixed]
-generic-segmentation-offload: on
-generic-receive-offload: off
-large-receive-offload: off [fixed]
-rx-vlan-offload: on
-tx-vlan-offload: on
-ntuple-filters: off [fixed]
-receive-hashing: on
-highdma: on
-rx-vlan-filter: on [fixed]
-vlan-challenged: off [fixed]
-tx-lockless: off [fixed]
-netns-local: off [fixed]
-tx-gso-robust: off [fixed]
-tx-fcoe-segmentation: off [fixed]
-tx-gre-segmentation: on
-tx-ipip-segmentation: on
-tx-sit-segmentation: on
-tx-udp_tnl-segmentation: on
-fcoe-mtu: off [fixed]
-tx-nocache-copy: off
-loopback: off [fixed]
-rx-fcs: off [fixed]
-rx-all: off [fixed]
-tx-vlan-stag-hw-insert: off [fixed]
-rx-vlan-stag-hw-parse: off [fixed]
-rx-vlan-stag-filter: off [fixed]
-busy-poll: off [fixed]
-tx-gre-csum-segmentation: on
-tx-udp_tnl-csum-segmentation: on
-tx-gso-partial: on
-tx-sctp-segmentation: off [fixed]
-rx-gro-hw: off [fixed]
-l2-fwd-offload: off [fixed]
-hw-tc-offload: on
-rx-udp_tunnel-port-offload: off [fixed]
-=3D=3D=3D=3D
-
-
-Versions
-=3D=3D=3D
-cat /etc/redhat-release
-CentOS Linux release 7.6.1810 (Core)
-
-
-
-modinfo i40efilename: =C2=A0 =C2=A0 =C2=A0 /lib/modules/3.10.0-957.el7.x86_=
-64/kernel/drivers/net/ethernet/intel/i40e/i40e.ko.xz
-version: =C2=A0 =C2=A0 =C2=A0 =C2=A02.3.2-k
-license: =C2=A0 =C2=A0 =C2=A0 =C2=A0GPL
-description: =C2=A0 =C2=A0Intel(R) Ethernet Connection XL710 Network Driver
-author: =C2=A0 =C2=A0 =C2=A0 =C2=A0 Intel Corporation, <e1000-devel@lists.s=
-ourceforge.net>
-retpoline: =C2=A0 =C2=A0 =C2=A0Y
-rhelversion: =C2=A0 =C2=A07.6
-
-uname -r3.10.0-957.el7.x86_64
-
-/usr/libexec/qemu-kvm -version
-QEMU emulator version 5.1.0
-
-=3D=3D=3D=3D=3D
-
-
--kvmuser99
+Alex
 
