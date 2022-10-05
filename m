@@ -2,63 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA65F5F5D5B
-	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 01:52:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A8D495F5D63
+	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 01:54:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229487AbiJEXwi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Oct 2022 19:52:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57648 "EHLO
+        id S229674AbiJEXy1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Oct 2022 19:54:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229658AbiJEXwe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Oct 2022 19:52:34 -0400
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47CCA86833
-        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 16:52:30 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id z7-20020a170903018700b0017835863686so95409plg.11
-        for <kvm@vger.kernel.org>; Wed, 05 Oct 2022 16:52:30 -0700 (PDT)
+        with ESMTP id S229608AbiJEXy0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Oct 2022 19:54:26 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5392586803
+        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 16:54:25 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-35813c409cbso3516037b3.5
+        for <kvm@vger.kernel.org>; Wed, 05 Oct 2022 16:54:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=vd7FK6OrPoZv6Yux/Uh88ssHQBLLj+uFcVCMiEaTNlQ=;
-        b=plc9OhAGdtW+UlMaohO/pUM8IppP2PVZCD0MNDIpaISilzwJKt3k+eBQvaPV4K7TNs
-         5gv5h0r6v1PI5GsW78NOwue7a8WWoj5jpHWf91MLEAHDfr0PZDQAIrox5GzeCKHLvt/Z
-         Dp+1WYIILczbkaZmBn9/0hXUypk78WG8zVlvQzqVXJ7H2M8HTl8I4rY26UIO9O3j2jys
-         2PyMxMzmGU4P8kOUIfz4QuupdxvvEWwTqmYqtz4RxKgGEW8RtR2Uw2CYKX+a8zEsRXoj
-         H3qojkqIY850gKNYTk9sHRIwq78zPHFZDYoktqzJ3IgLaH4tpN8uO+iMl8G6Yrmwre5B
-         7qGQ==
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WuMhGRBQfJ+v5adgFv9CGHyazfwgEv9CuQJ/Cfhf22Q=;
+        b=RcN87O6UvQH/tGKDx0TUX6YKvKRheaKftygRlZmXKuJDAA1edXw6KwFRU9OfcDeJCM
+         deVltYrV2WD2dblMffD+8fgPS7dNgEuUy/T62EIvBQ8POf+K56xMl/ABEkuRnoHowdmg
+         XD4y28RGIcPNmDpz3DHTdbohexLbHUKX10wZoP/4k6u9K4IWg2kkopan6HzoP8cCzpOM
+         II3F8aVu7i6W/BovBF8mdky4BOpzoXXWbKQUBsgNaDRQ0cYyYHNJ6gysPfTZrNh6a2yb
+         cLpbZ5irrqAdO242m4qS0tkL7fI62kNX2PvjvuBdI5rEyyFd6GDKPhTZAXHRuDqQWb9S
+         VvQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vd7FK6OrPoZv6Yux/Uh88ssHQBLLj+uFcVCMiEaTNlQ=;
-        b=pPJmGU3cslLhhlPJzNKKv8Idfdz4dcWtGmS/ZCNjxByVlme2EalL1eyOjhSAYouclz
-         GkQPpFm8M5M8/F7GXcuiOlLQENWC49BGDCDJwaI3/SatZJrp8VeAcrYoJrQnQJNU40xu
-         eAltx/IW5ZKvIQNEpkbT/94q+DwicAGcLEDjubPfqBx7Pa3eqhw7wIFAPUB7P3eqTRo+
-         WHJcBNSAXk2pODL4gYBbxYuT5/U4ODcPdn03Qg4KYuufbTtttRHuVfytakUtQvUyx2A4
-         QG5jm2qPKvPTylnqre46d0gnQ3GuVxs5djM4PQpp2/XbBMozkCjlgwUfWZmHzy9Lltpd
-         8F5g==
-X-Gm-Message-State: ACrzQf0vNsoPYShnkCce+1ohginFFy6QhFScpuV6efHMTMxtHDP/Q7/J
-        gEqc5INc7Uu0Uybz3e9b7yW6F9vzVMw=
-X-Google-Smtp-Source: AMsMyM5ZrJaRMHSqFXLL2uGfNYHsqX09Nixdhmy/2suIiuLfcfSdlvh7YKfk63fiLrmrDdFKxhQojcPeU3E=
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WuMhGRBQfJ+v5adgFv9CGHyazfwgEv9CuQJ/Cfhf22Q=;
+        b=GXW55b9hnc6fUk5xyrBycfL68LDlofa0wt401isqmT+jjNROO1g39Y5cVyWNSYr5wr
+         HjK6zXOLytdxLrS13G75XNACKzfsHQZtNEiqcHGibXHhnH8aqlu2aorRjIiP9OO3rcGq
+         7OJq6KMCp/w5ZrI9ILd3zyZEXMwEpQKf9LP6vzpSEWs7tz1jWcgeCVhZizTUzCre0amD
+         uVO2t59TQcoKziwNhAGh/vJWogrXaSeykDPubtfwbCQf6yMpvEr2CsnyhADO9oDk84qu
+         nmU7bEN3tcnm1qyuwDpRcYu4MP/CRS8iCSWZSkm1qaYmlQ66CAPh5xFkE9ZmYF3nlO04
+         bqcg==
+X-Gm-Message-State: ACrzQf0JfTooX/FP+SGHTe0d8ieydSLcWmLuwVGqdMGA+6/pqyhWNFYl
+        in1ljBn68DtEQyusRFKNQF2E9uvCh+8=
+X-Google-Smtp-Source: AMsMyM5rvyItBt2ojFgn4LjwkEnL61c7MgTEXYwsnK2rFk7wR2JdZ687+hDcUmxiD0LBBoT4qCluMQIYhJk=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a62:2985:0:b0:544:77d4:f43b with SMTP id
- p127-20020a622985000000b0054477d4f43bmr2282678pfp.9.1665013949401; Wed, 05
- Oct 2022 16:52:29 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a25:3b46:0:b0:69c:a60e:2e57 with SMTP id
+ i67-20020a253b46000000b0069ca60e2e57mr2271546yba.364.1665014064611; Wed, 05
+ Oct 2022 16:54:24 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  5 Oct 2022 23:52:12 +0000
-In-Reply-To: <20221005235212.57836-1-seanjc@google.com>
+Date:   Wed,  5 Oct 2022 23:54:22 +0000
 Mime-Version: 1.0
-References: <20221005235212.57836-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
-Message-ID: <20221005235212.57836-10-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH v3 9/9] nVMX: Move #NM test to generic
- exception test framework
+Message-ID: <20221005235422.64897-1-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH] nVMX: Expect #GP on VMXON with "generic"
+ invalid CR0/CR4 bits
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Manali Shukla <manali.shukla@amd.com>
+Cc:     kvm@vger.kernel.org, Eric Li <ercli@ucdavis.edu>,
+        Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -70,109 +67,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the #NM test cases to the generic exception test framework, and
-rename the dedicated test to note that it tests the "no #NM" case.
+Expect #GP, not #UD, when executing with "generic" invalid CR0/CR4 bits,
+i.e. with invalid bits other than CR0.PE or CR4.VMXE.  The PE and VMXE
+checks are special pre-conditions to VM-Exit and thus #UD, all other
+CR0/CR4 checks are performed if and only if the CPU isn't already in
+VMX mode and so #GP.
 
+Reported-by: Eric Li <ercli@ucdavis.edu>
+Fixes: f7b730bc ("nVMX: Add subtest to verify VMXON succeeds/#UDs on good/bad CR0/CR4")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/vmx_tests.c | 67 ++++++-------------------------------------------
- 1 file changed, 8 insertions(+), 59 deletions(-)
+ x86/vmx.c | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
 
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index 368ad43..2438022 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -8359,67 +8359,14 @@ static void vmx_cr4_osxsave_test(void)
- 	TEST_ASSERT(this_cpu_has(X86_FEATURE_OSXSAVE));
- }
- 
--static void vmx_nm_test_guest(void)
--{
--	write_cr0(read_cr0() | X86_CR0_TS);
--	asm volatile("fnop");
--}
--
--static void check_nm_exit(const char *test)
--{
--	u32 reason = vmcs_read(EXI_REASON);
--	u32 intr_info = vmcs_read(EXI_INTR_INFO);
--	const u32 expected = INTR_INFO_VALID_MASK | INTR_TYPE_HARD_EXCEPTION |
--		NM_VECTOR;
--
--	report(reason == VMX_EXC_NMI && intr_info == expected, "%s", test);
--}
--
- /*
-- * This test checks that:
-- *
-- * (a) If L2 launches with CR0.TS clear, but later sets CR0.TS, then
-- *     a subsequent #NM VM-exit is reflected to L1.
-- *
-- * (b) If L2 launches with CR0.TS clear and CR0.EM set, then a
-- *     subsequent #NM VM-exit is reflected to L1.
-+ * FNOP with both CR0.TS and CR0.EM clear should not generate #NM, and the L2
-+ * guest should exit normally.
-  */
--static void vmx_nm_test(void)
-+static void vmx_no_nm_test(void)
+diff --git a/x86/vmx.c b/x86/vmx.c
+index a13f2c9..2071cc0 100644
+--- a/x86/vmx.c
++++ b/x86/vmx.c
+@@ -1474,7 +1474,7 @@ static int test_vmxon_bad_cr(int cr_number, unsigned long orig_cr,
+ 			     unsigned long *flexible_bits)
  {
--	unsigned long cr0 = read_cr0();
--
--	test_set_guest(vmx_nm_test_guest);
--
--	/*
--	 * L1 wants to intercept #NM exceptions encountered in L2.
--	 */
--	vmcs_write(EXC_BITMAP, 1 << NM_VECTOR);
--
--	/*
--	 * Launch L2 with CR0.TS clear, but don't claim host ownership of
--	 * any CR0 bits. L2 will set CR0.TS and then try to execute fnop,
--	 * which will raise #NM. L0 should reflect the #NM VM-exit to L1.
--	 */
--	vmcs_write(CR0_MASK, 0);
--	vmcs_write(GUEST_CR0, cr0 & ~X86_CR0_TS);
--	enter_guest();
--	check_nm_exit("fnop with CR0.TS set in L2 triggers #NM VM-exit to L1");
--
--	/*
--	 * Re-enter L2 at the fnop instruction, with CR0.TS clear but
--	 * CR0.EM set. The fnop will still raise #NM, and L0 should
--	 * reflect the #NM VM-exit to L1.
--	 */
--	vmcs_write(GUEST_CR0, (cr0 & ~X86_CR0_TS) | X86_CR0_EM);
--	enter_guest();
--	check_nm_exit("fnop with CR0.EM set in L2 triggers #NM VM-exit to L1");
--
--	/*
--	 * Re-enter L2 at the fnop instruction, with both CR0.TS and
--	 * CR0.EM clear. There will be no #NM, and the L2 guest should
--	 * exit normally.
--	 */
--	vmcs_write(GUEST_CR0, cr0 & ~(X86_CR0_TS | X86_CR0_EM));
-+	test_set_guest(fnop);
-+	vmcs_write(GUEST_CR0, read_cr0() & ~(X86_CR0_TS | X86_CR0_EM));
- 	enter_guest();
- }
+ 	unsigned long required1, disallowed1, val, bit;
+-	int ret, i;
++	int ret, i, expected;
  
-@@ -10666,6 +10613,8 @@ struct vmx_exception_test vmx_exception_tests[] = {
- 	{ BP_VECTOR, generate_bp },
- 	{ AC_VECTOR, vmx_l2_ac_test },
- 	{ OF_VECTOR, generate_of },
-+	{ NM_VECTOR, generate_cr0_ts_nm },
-+	{ NM_VECTOR, generate_cr0_em_nm },
- };
+ 	if (!cr_number) {
+ 		required1 =  rdmsr(MSR_IA32_VMX_CR0_FIXED0);
+@@ -1521,10 +1521,22 @@ static int test_vmxon_bad_cr(int cr_number, unsigned long orig_cr,
+ 		if (write_cr_safe(cr_number, val))
+ 			continue;
  
- static u8 vmx_exception_test_vector;
-@@ -10804,7 +10753,7 @@ struct vmx_test vmx_tests[] = {
- 	TEST(vmx_ldtr_test),
- 	TEST(vmx_cr_load_test),
- 	TEST(vmx_cr4_osxsave_test),
--	TEST(vmx_nm_test),
-+	TEST(vmx_no_nm_test),
- 	TEST(vmx_db_test),
- 	TEST(vmx_nmi_window_test),
- 	TEST(vmx_intr_window_test),
++		/*
++		 * CR0.PE==0 and CR4.VMXE==0 result in #UD, all other invalid
++		 * CR0/CR4 bits result in #GP.  Include CR0.PE even though it's
++		 * dead code (see above) for completeness.
++		 */
++		if ((cr_number == 0 && bit == X86_CR0_PE) ||
++		    (cr_number == 4 && bit == X86_CR4_VMXE))
++			expected = UD_VECTOR;
++		else
++			expected = GP_VECTOR;
++
+ 		ret = vmx_on();
+-		report(ret == UD_VECTOR,
+-		       "VMXON with CR%d bit %d %s should #UD, got '%d'",
+-		       cr_number, i, (required1 & bit) ? "cleared" : "set", ret);
++		report(ret == expected,
++		       "VMXON with CR%d bit %d %s should %s, got '%d'",
++		       cr_number, i, (required1 & bit) ? "cleared" : "set",
++		       expected == UD_VECTOR ? "UD" : "#GP", ret);
+ 
+ 		write_cr(cr_number, orig_cr);
+ 
+
+base-commit: d8a4f9e5e8d69d4ef257b40d6cd666bd2f63494e
 -- 
 2.38.0.rc1.362.ged0d419d3c-goog
 
