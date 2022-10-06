@@ -2,64 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8ADA45F6C8F
-	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 19:12:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B68AC5F6CEB
+	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 19:27:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231601AbiJFRMN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Oct 2022 13:12:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48668 "EHLO
+        id S230354AbiJFR1E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Oct 2022 13:27:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231415AbiJFRMH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Oct 2022 13:12:07 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AEDAA98E7
-        for <kvm@vger.kernel.org>; Thu,  6 Oct 2022 10:12:03 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id o14-20020a056a00214e00b0056238ef46ebso1459001pfk.2
-        for <kvm@vger.kernel.org>; Thu, 06 Oct 2022 10:12:03 -0700 (PDT)
+        with ESMTP id S229540AbiJFR1B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Oct 2022 13:27:01 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D6169FFC
+        for <kvm@vger.kernel.org>; Thu,  6 Oct 2022 10:26:59 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id a10so3049338ljq.0
+        for <kvm@vger.kernel.org>; Thu, 06 Oct 2022 10:26:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bNbcK3LL3MeRLMBsJX3wEFu+BxWkeXqN6i942qppoGM=;
-        b=S8qrJeH0gN8gfBUaxED2sgbwZGLAVK9GuIdQQZD/J9UmHKy8zhuU2xSlToWAUcJKRe
-         5UKLTE50Lczc578QLLXLci1Fgb4UnLYL6/jGTHZWTGsLNVhla8yeTnMgNL4XgNCP8smh
-         VMwDnAFa2wzCl2Rwrd6njaMK5jAhURzTPj0X0aTA2QJ5Py899Ni9BiJUDJZx/N6XXg2Q
-         fs/YKdzRFFuQyL6jSmNaElLcqD5h3qd+zzYOYl1BvzND84wSlRE0F6r34DfztQGMfoSE
-         j8G9YPdERjLazF77IcBX9JgmyIKjbGQLcyEyJ14lQlRPo//0+O2Y8LZyL5SOQKxuqqS+
-         RMdA==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=WRcVY/P3TNQqvqXdHDNlUC3IFQ9xWsVPZt3gbUvQeIQ=;
+        b=sdIF/b93GsqQ8//o/Xw6I3jsGdP6BitWx8BgljFSi1iFQxJnIDXhadYXY8VQZEGdQp
+         XPeUqgf4ec8rKP9Eub+YX5UtCpouJRPlW2YDCdOAriXz48hzG0Vk3ITG5ALWoGo2KrcN
+         LcCL0NYXwLLfQ6ZD/S21cfEbB6NuNpdro805+ermZgKbJFGa2QthTAsjpbccPSE+AHXW
+         SQqGS9Y+rwJRndls6h/wHb3zsv3tP60WTTwPXQyBTAE2Vj0LnmV07lVg3TIQv90pZv4K
+         RzkSziUMzGTzLq+cyMadsq8ZLh8Wrs5epjKXcuJD5fU7dScWlGJ3snpZhFqGy+uc/jJo
+         xVUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bNbcK3LL3MeRLMBsJX3wEFu+BxWkeXqN6i942qppoGM=;
-        b=ZJk2PED5HXzTxwWgSW1RtLiLYUaUhi34Tueii3kjVS++wKzC5iaEjHejTPfU1n7PK2
-         sDQzu1rdhTMjFt9PFrkLM2BFeLKbeLWrMsepbX20LCKVCHTVT4DqE2Ih73luW1UoV/1R
-         zoZUQBcbPHkR21hkRt6f/U4oDofahJpVauZozX+WSHx/bP8YYnmUPwl03T+Y15P8TgFh
-         72XMM7esg8OnB7eFoyLy3srQCyC7Q1cEX6kR9CT4zthNQXeH9y2kyPoEaqmjjvI1d4dX
-         gg1GAEoHugRKkLVRp+jRJpjin+bPFApQ1acpzalH7AjiY5u2ImD+zH1FsMpCIpkbCWW/
-         NVcw==
-X-Gm-Message-State: ACrzQf1aXq1Lzw2QOZg4f64h6ybxxQn/LzbHUxGWhCp0c0Rumz8ifVVR
-        DC29DHKVwxFxsqiDSblkCtAuiIP0d5WC
-X-Google-Smtp-Source: AMsMyM5rSvgSAK+YZ3JBGH9d6o9ZH5TCl/R/DmTIyBNezNnhmGVCjxSdKqbhIzk32aAAaVMSynctk/QdmCFi
-X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a17:902:784d:b0:178:6946:3ff7 with SMTP id
- e13-20020a170902784d00b0017869463ff7mr449882pln.133.1665076323020; Thu, 06
- Oct 2022 10:12:03 -0700 (PDT)
-Date:   Thu,  6 Oct 2022 10:11:32 -0700
-In-Reply-To: <20221006171133.372359-1-vipinsh@google.com>
-Mime-Version: 1.0
-References: <20221006171133.372359-1-vipinsh@google.com>
-X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
-Message-ID: <20221006171133.372359-5-vipinsh@google.com>
-Subject: [PATCH v4 4/4] KVM: selftests: Run dirty_log_perf_test on specific CPUs
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WRcVY/P3TNQqvqXdHDNlUC3IFQ9xWsVPZt3gbUvQeIQ=;
+        b=S1beGnsOj0cOiq1qlsz0QabGLvvfifPdVJrPDqcPNNVycjn1m+dvTqpEGuy/mT1mGJ
+         9cbW7VautzZCRSeYJmn5wys9Fz+Bxfqiu1LtDav3JZwECW7fcYFrm1GMdwM96pn9kGds
+         YZZfdYh1rzVdWn6y73XTqoCa8BoumdoLeWWdnQYaMomYXkh0WshNtcUKygrIkfHaXwwG
+         oqB8+zI2bOGhP3z1rGtx4uUK4hBxFp45JCgPzVGeAB/0gxS2eNo1tHNt7r5rDkyRsGv7
+         NrmlPgMmP4hR2K88cMGU5ASzHdxYy31++OX/g5XIqiAFUx0IvnfeR/H/1RbOvd/Q47Y1
+         Qt4g==
+X-Gm-Message-State: ACrzQf1iWu5+RwVfRUBNEwQ6th5WlVfpNUi3HKmxbfxGTCEZukJ/J5uy
+        CtXVoTyNFJGbj2hN+BI2aSv1SpIVuyvQZpiki1brVQ==
+X-Google-Smtp-Source: AMsMyM4gKjiVotUUTEw6cVIgaeoEeSkvPyy3e6OcT7TREiftBFLOkv8FnVmHPtLNHJDd2rEp8WDYd1Y2NcEsDzWIVPI=
+X-Received: by 2002:a2e:bf04:0:b0:26d:8fbf:5cb6 with SMTP id
+ c4-20020a2ebf04000000b0026d8fbf5cb6mr280666ljr.246.1665077217430; Thu, 06 Oct
+ 2022 10:26:57 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAHVum0cbWBXUnJ4s32Yn=TfPXLypv_RRT6LmA_QoBHw3Y+kA7w@mail.gmail.com>
+ <877d1d9w0i.fsf@redhat.com>
+In-Reply-To: <877d1d9w0i.fsf@redhat.com>
 From:   Vipin Sharma <vipinsh@google.com>
-To:     seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com
-Cc:     andrew.jones@linux.dev, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
+Date:   Thu, 6 Oct 2022 10:26:21 -0700
+Message-ID: <CAHVum0eGri=Ro1uZMoN=bb61=tJwStcwV8rZAfgLk1w86bz7sA@mail.gmail.com>
+Subject: Re: HvExtCallQueryCapabilities and HvExtCallGetBootZeroedMemory
+ implementation in KVM for Windows guest
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>, David Matlack <dmatlack@google.com>,
+        Shujun Xue <shujunxue@google.com>,
+        "yury.norov@gmail.com" <yury.norov@gmail.com>,
+        sunilmut@microsoft.com, tianyu.lan@microsoft.com
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,209 +71,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add command line options, -c,  to run the vCPUs and optionally the main
-process on the specific CPUs on a host machine. This is useful as it
-provides a way to analyze performance based on the vCPUs and dirty log
-worker locations, like on the different numa nodes or on the same numa
-nodes.
+On Thu, Oct 6, 2022 at 1:49 AM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+>
+> Vipin Sharma <vipinsh@google.com> writes:
+>
+> > Hi Vitaly, Yury, Sunil, Tianyu
+>
+> Hi Vipin!
+>
+> >
+> > Before I work on a patch series and send it out to the KVM mailing
+> > list, I wanted to check with you a potential Windows VM optimization
+> > and see if you have worked on it or if you know about some obvious
+> > known blockers regarding this feature.
+> >
+> > Hypervisor Top-Level Functional Specification v6.0b mentions a hypercall:
+> >
+> >     HvExtCallGetBootZeroedMemory
+> >     Call Code = 0x8002
+> >
+> > This hypercall can be used by Windows guest to know which pages are
+> > already zeroed and then guest can avoid zeroing them again during the
+> > boot, resulting in Windows VM faster boot time and less memory usage.
+> >
+> > KVM currently doesn't implement this feature. I am thinking of
+> > implementing it, here is a rough code flow:
+> > 1. KVM will set bit 20 in EBX of CPUID leaf 0x40000003 to let the
+> > Windows guest know that it can use the extended hypercall interface.
+> > 2. Guest during the boot will use hypercall HvExtCallQueryCapabilities
+> > (Call Code = 0x8001) to see which extended calls are available.
+> > 3. KVM will respond to guest that the hypercall
+> > HvExtCallGetBootZeroedMemory is available.
+> > 4. Guest will issue the hypercall HvExtCallGetBootZeroedMemory to know
+> > which pages are zeroed.
+> > 5. KVM or userspace VMM will respond with GPA and page count to guest.
+>
+> I think it's VMM's responsibility. How would KVM know if the memory
+> allocated to the guest was zeroed or not?
+>
+> The easiest solution would be to just pass through this hypercall to the
+> VMM and let it respond. Alternatively, we can probably add a flag to
+> KVM_SET_USER_MEMORY_REGION to either indicate that the memory is zeroed
+> or to actually ask KVM to zero it. This way we will have the required
+> information in KVM. I'm not sure if it's worth it, Windows probably
+> calls HvExtCallGetBootZeroedMemory just once upon boot so handling it in
+> the VMM is totally fine.
 
-Link: https://lore.kernel.org/lkml/20220801151928.270380-1-vipinsh@google.com
-Signed-off-by: Vipin Sharma <vipinsh@google.com>
-Suggested-by: David Matlack <dmatlack@google.com>
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
----
- .../selftests/kvm/dirty_log_perf_test.c       | 23 +++++++-
- .../selftests/kvm/include/perf_test_util.h    |  6 ++
- .../selftests/kvm/lib/perf_test_util.c        | 58 ++++++++++++++++++-
- 3 files changed, 84 insertions(+), 3 deletions(-)
+I agree with you. Since, it is probably only upon boot time, handling
+in VMM should be okay.
 
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index ecda802b78ff..33f83e423f75 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -353,7 +353,7 @@ static void help(char *name)
- 	puts("");
- 	printf("usage: %s [-h] [-i iterations] [-p offset] [-g] "
- 	       "[-m mode] [-n] [-b vcpu bytes] [-v vcpus] [-o] [-s mem type]"
--	       "[-x memslots]\n", name);
-+	       "[-x memslots] [-c physical cpus to run test on]\n", name);
- 	puts("");
- 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
- 	       TEST_HOST_LOOP_N);
-@@ -383,6 +383,18 @@ static void help(char *name)
- 	backing_src_help("-s");
- 	printf(" -x: Split the memory region into this number of memslots.\n"
- 	       "     (default: 1)\n");
-+	printf(" -c: Comma separated values of the physical CPUs, which will run\n"
-+	       "     the vCPUs, optionally, followed by the main application thread cpu.\n"
-+	       "     Number of values must be at least the number of vCPUs.\n"
-+	       "     The very next number is used to pin main application thread.\n\n"
-+	       "     Example: ./dirty_log_perf_test -v 3 -c 22,23,24,50\n"
-+	       "     This means that the vcpu 0 will run on the physical cpu 22,\n"
-+	       "     vcpu 1 on the physical cpu 23, vcpu 2 on the physical cpu 24\n"
-+	       "     and the main thread will run on cpu 50.\n\n"
-+	       "     Example: ./dirty_log_perf_test -v 3 -c 22,23,24\n"
-+	       "     Same as the previous example except now main application\n"
-+	       "     thread can run on any physical cpu\n\n"
-+	       "     (default: No cpu mapping)\n");
- 	puts("");
- 	exit(0);
- }
-@@ -398,6 +410,7 @@ int main(int argc, char *argv[])
- 		.slots = 1,
- 	};
- 	int opt;
-+	const char *pcpu_list = NULL;
- 
- 	dirty_log_manual_caps =
- 		kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
-@@ -406,11 +419,14 @@ int main(int argc, char *argv[])
- 
- 	guest_modes_append_default();
- 
--	while ((opt = getopt(argc, argv, "b:ef:ghi:m:nop:s:v:x:")) != -1) {
-+	while ((opt = getopt(argc, argv, "b:c:ef:ghi:m:nop:s:v:x:")) != -1) {
- 		switch (opt) {
- 		case 'b':
- 			guest_percpu_mem_size = parse_size(optarg);
- 			break;
-+		case 'c':
-+			pcpu_list = optarg;
-+			break;
- 		case 'e':
- 			/* 'e' is for evil. */
- 			run_vcpus_while_disabling_dirty_logging = true;
-@@ -458,6 +474,9 @@ int main(int argc, char *argv[])
- 		}
- 	}
- 
-+	if (pcpu_list)
-+		perf_test_setup_pinning(pcpu_list, nr_vcpus);
-+
- 	TEST_ASSERT(p.iterations >= 2, "The test should have at least two iterations");
- 
- 	pr_info("Test iterations: %"PRIu64"\n",	p.iterations);
-diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-index eaa88df0555a..8197260e3b6b 100644
---- a/tools/testing/selftests/kvm/include/perf_test_util.h
-+++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-@@ -27,6 +27,8 @@ struct perf_test_vcpu_args {
- 	/* Only used by the host userspace part of the vCPU thread */
- 	struct kvm_vcpu *vcpu;
- 	int vcpu_idx;
-+	/* The pCPU to which this vCPU is pinned. Only valid if pin_vcpus is true. */
-+	int pcpu;
- };
- 
- struct perf_test_args {
-@@ -39,6 +41,8 @@ struct perf_test_args {
- 
- 	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
- 	bool nested;
-+	/* True if all vCPUs are pinned to pCPUs*/
-+	bool pin_vcpus;
- 
- 	struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
- };
-@@ -60,4 +64,6 @@ void perf_test_guest_code(uint32_t vcpu_id);
- uint64_t perf_test_nested_pages(int nr_vcpus);
- void perf_test_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_vcpu *vcpus[]);
- 
-+void perf_test_setup_pinning(const char *pcpus_string, int nr_vcpus);
-+
- #endif /* SELFTEST_KVM_PERF_TEST_UTIL_H */
-diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-index 9618b37c66f7..5d1aca0482b4 100644
---- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-+++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-@@ -2,7 +2,10 @@
- /*
-  * Copyright (C) 2020, Google LLC.
-  */
-+#define _GNU_SOURCE
-+
- #include <inttypes.h>
-+#include <sched.h>
- 
- #include "kvm_util.h"
- #include "perf_test_util.h"
-@@ -240,9 +243,25 @@ void __weak perf_test_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_v
- 	exit(KSFT_SKIP);
- }
- 
-+static void pin_me_to_pcpu(int pcpu)
-+{
-+	cpu_set_t cpuset;
-+	int err;
-+
-+	CPU_ZERO(&cpuset);
-+	CPU_SET(pcpu, &cpuset);
-+	err = sched_setaffinity(0, sizeof(cpu_set_t), &cpuset);
-+	TEST_ASSERT(err == 0, "sched_setaffinity() errored out for pcpu: %d\n", pcpu);
-+}
-+
- static void *vcpu_thread_main(void *data)
- {
- 	struct vcpu_thread *vcpu = data;
-+	int idx = vcpu->vcpu_idx;
-+	struct perf_test_vcpu_args *vcpu_args = &perf_test_args.vcpu_args[idx];
-+
-+	if (perf_test_args.pin_vcpus)
-+		pin_me_to_pcpu(vcpu_args->pcpu);
- 
- 	WRITE_ONCE(vcpu->running, true);
- 
-@@ -255,7 +274,7 @@ static void *vcpu_thread_main(void *data)
- 	while (!READ_ONCE(all_vcpu_threads_running))
- 		;
- 
--	vcpu_thread_fn(&perf_test_args.vcpu_args[vcpu->vcpu_idx]);
-+	vcpu_thread_fn(vcpu_args);
- 
- 	return NULL;
- }
-@@ -292,3 +311,40 @@ void perf_test_join_vcpu_threads(int nr_vcpus)
- 	for (i = 0; i < nr_vcpus; i++)
- 		pthread_join(vcpu_threads[i].thread, NULL);
- }
-+
-+static int pcpu_num(const char *cpu_str)
-+{
-+	int pcpu = atoi_paranoid(cpu_str);
-+	TEST_ASSERT(pcpu >= 0, "Invalid cpu number: %d\n", pcpu);
-+	return pcpu;
-+}
-+
-+void perf_test_setup_pinning(const char *pcpus_string, int nr_vcpus)
-+{
-+	char delim[2] = ",";
-+	char *cpu, *cpu_list;
-+	int i = 0;
-+
-+	cpu_list = strdup(pcpus_string);
-+	TEST_ASSERT(cpu_list, "strdup() allocation failed.\n");
-+
-+	cpu = strtok(cpu_list, delim);
-+
-+	// 1. Get all pcpus for vcpus
-+	while (cpu && i < nr_vcpus) {
-+		perf_test_args.vcpu_args[i++].pcpu = pcpu_num(cpu);
-+		cpu = strtok(NULL, delim);
-+	}
-+
-+	TEST_ASSERT(i == nr_vcpus,
-+		    "Number of pcpus (%d) not sufficient for the number of vcpus (%d).",
-+		    i, nr_vcpus);
-+
-+	perf_test_args.pin_vcpus = true;
-+
-+	// 2. Check if main worker is provided
-+	if (cpu)
-+		pin_me_to_pcpu(pcpu_num(cpu));
-+
-+	free(cpu_list);
-+}
--- 
-2.38.0.rc1.362.ged0d419d3c-goog
+>
+> > 6. Guest will skip zeroing these pages, resulting in faster boot and
+> > less memory utilization of guest.
+> >
+> > This seems like a very easy win for KVM to increase Windows guest boot
+> > performance but I am not sure if I am overlooking something. If you
+> > are aware of any potential side effects of enabling these hypercalls
+> > or some other issue I am not thinking about please let me know,
+> > otherwise, I can start working on this feature and send RFC patches to
+> > the mailing list.
+>
+> I dug through my git archives and found that I've actually tried
+> HvExtCallQueryCapabilities back in 2018 but for some reason Windows
+> versions I was testing didn't use it (hope it wasn't some silly mistake
+> like forgotten CPUID bit on my part :-) so I put it aside and never got
+> back to it. Thanks for picking this up!
 
+Keeping my fingers crossed!
+
+Thanks for the feedback.
+
+>
+> --
+> Vitaly
+>
