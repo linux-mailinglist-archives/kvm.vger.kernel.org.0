@@ -2,75 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B209C5F5D80
-	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 02:04:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 194555F5D8C
+	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 02:14:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229837AbiJFAEo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Oct 2022 20:04:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44818 "EHLO
+        id S229736AbiJFAO0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Oct 2022 20:14:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229797AbiJFAEH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Oct 2022 20:04:07 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06C0287098
-        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 17:03:32 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id v5-20020a17090abb8500b0020a76ded27eso1800397pjr.3
-        for <kvm@vger.kernel.org>; Wed, 05 Oct 2022 17:03:32 -0700 (PDT)
+        with ESMTP id S229701AbiJFAOX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Oct 2022 20:14:23 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DAFA356ED
+        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 17:14:22 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id o9-20020a17090a0a0900b0020ad4e758b3so193988pjo.4
+        for <kvm@vger.kernel.org>; Wed, 05 Oct 2022 17:14:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=YG4VlFLS486HR6XzTWZkeVrEikhzGg3oNMrJdR09xN0=;
-        b=SH/m0hye551j67TpeTG6UDh5pXgMwDYYEnADzE2VuZ/b0h5xJTZIFXFQfrUcz+GaBQ
-         8IvfIWHd9N4aVrxw/FwvJHFG+ppWqdYUfPE4SsloicHC9tVPMl+9sv3szHZNeWm7ttha
-         +JQZ9+vTMCBsM7iSbFcZ6yaX/sQuprgHUqH1aK9+CuP0Qqq9KMT80txUpy4raFdzOBs1
-         +lNiIG479aHHd+4OsZH4zeziTA3Rpi43hD0ylG9e/JP2vWkcaw9Pc2FqY/f/TBRtdJMC
-         u1rUD2ti+37tzBCErE5ZBF6DydlE2GRp31nLL1kS9vKF5GTW+M1JTyQ0MYftCdHV6EjV
-         boQA==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NPRVzBaVZ9YyNu6FLenRmgIhaa2hp6qDkfP+CaVAIGk=;
+        b=mXMNHH5XOl9a3BpyRf0OW6UGuW1+o3c6nzSKeK5JBv9QS9paVtX4nkcuw6ilwpO8M9
+         pTD6cSMXs+0UvLHDnlJ4F4/rsxZfru1+vLHH/UfKYRY2y1BXCwsA4cs2LCOCcLGbJ48t
+         9Dc0pS8GCk+589pZrnZCC4pCk77x7UkKvxioO7XEHs1YTrBJLoT2dwArISPIUhXvM3yY
+         /ZF6wWLK/ghCYPh397SdcvDfclw+HCck00Nhaf5skY2HA/6pCZvNqKc8cj/29lGeZaGw
+         JepT+QwpU9qas/Rpba6GzdH4qUD/MJSh/l10+RskCMaNwY0GqnMejOC32nh0dn/mtALK
+         VWpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YG4VlFLS486HR6XzTWZkeVrEikhzGg3oNMrJdR09xN0=;
-        b=oB/D3Fcg/n/f3ibVo+imo6yuyXHG4kOvcnYKksNj9BlFZnbD9QYZBZEwexzLmXLP1A
-         46v3lgR8tEN5G40hRYS+T/a836I40WVVljRslkNQTXtn23T9Pv9yqo/D38Z6S10Ryl9A
-         77gB/eBKLGlvbyGeIUCSsPvZOHIN6cgePUUKY3yd1H5vNDdbritKBvFcpWC3AFWzN64j
-         AS4FNZ9puoTIB2xuk5mD39/JaNnAMP00wynkF+irWQhp4WWbbNjV92iHZU6mkyc5bgeb
-         8z2SNvTHt21Q7aYFXR4OzVKY40x5PTufp8NUvLDx/sY/wVgSNSeijz/mstd12eBZZe40
-         4sNg==
-X-Gm-Message-State: ACrzQf1DBcGGSB0oFSpe2v5FXFLb88jzcrVTinUBBTfY7Zzd8krM7YB2
-        TXzcvGV4tmuqlIQl6ODBWO5QG9mTSyc=
-X-Google-Smtp-Source: AMsMyM5ri2aBfQ5w9YqA3ahxTnjdm1oMk3Qr0A+RS8JT6NaMggeExdrUcGVCtoFNOX7TgNWElm4jFLYfsoY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:c986:b0:205:f08c:a82b with SMTP id
- w6-20020a17090ac98600b00205f08ca82bmr146218pjt.1.1665014611232; Wed, 05 Oct
- 2022 17:03:31 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu,  6 Oct 2022 00:03:14 +0000
-In-Reply-To: <20221006000314.73240-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20221006000314.73240-1-seanjc@google.com>
-X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
-Message-ID: <20221006000314.73240-9-seanjc@google.com>
-Subject: [PATCH v5 8/8] KVM: x86: Directly query supported PERF_CAPABILITIES
- for WRMSR checks
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NPRVzBaVZ9YyNu6FLenRmgIhaa2hp6qDkfP+CaVAIGk=;
+        b=p2xz7vEikWQrIqp5XAjlK3j0cDsiWqKkcia7xvNO2CzqKTg4QtWtUhGy515AU3Y3zn
+         9OBt+Eqa/AJ/EXeQkL4snztsirwFJ7Q893f8gQ7WnSzxGFfZMvyCTPIgHFjLa6A8b0YH
+         A8jipQz4LBUqYSXhqH0w9HK/dzq5UXzbJrvjyQ1/tqfXLeQxkV9aS+VEqFt0wciMQ5HG
+         g1JSY/GYuVf4ovNVJQBQ1oNWI2bvMDfE20S03FPM7YKHKDQE/u2mlRR4qPGWBWnzHAJ4
+         Cjf8rsQCwci+iR2TFewCVl6wnYyfDGH9fTpjaHAebEfhGMjuvRcysjS0XxB2vXAePeTK
+         ZYPg==
+X-Gm-Message-State: ACrzQf1AvtjDE+67hrDiULbSVYac179Jwkr++ZDj+psZHdl5TcrJTzYG
+        3Nx0LUyb63qQDXZZ5xeWdjaNQA==
+X-Google-Smtp-Source: AMsMyM4gI1s6pO1AYZYByn4NE7gj7vhUN+L+WWuO0l2WGy1l8zPvW7d9eNAjW0MNj62V9rNRPtdzlw==
+X-Received: by 2002:a17:902:bd05:b0:179:bbad:acff with SMTP id p5-20020a170902bd0500b00179bbadacffmr1771135pls.170.1665015261532;
+        Wed, 05 Oct 2022 17:14:21 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id t24-20020a17090a449800b001f8c532b93dsm1691353pjg.15.2022.10.05.17.14.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Oct 2022 17:14:21 -0700 (PDT)
+Date:   Thu, 6 Oct 2022 00:14:17 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Like Xu <like.xu.linux@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+To:     Zhao Liu <zhao1.liu@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>,
+        "Fabio M . De Francesco" <fmdefrancesco@gmail.com>,
+        Zhenyu Wang <zhenyu.z.wang@intel.com>,
+        Zhao Liu <zhao1.liu@intel.com>,
+        Dave Hansen <dave.hansen@intel.com>
+Subject: Re: [PATCH v2] KVM: SVM: Replace kmap_atomic() with kmap_local_page()
+Message-ID: <Yz4d2cXYi91UQT0Y@google.com>
+References: <20220928092748.463631-1-zhao1.liu@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220928092748.463631-1-zhao1.liu@linux.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,47 +79,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use kvm_caps.supported_perf_cap directly instead of bouncing through
-kvm_get_msr_feature() when checking the incoming value for writes to
-PERF_CAPABILITIES.
+On Wed, Sep 28, 2022, Zhao Liu wrote:
+> From: Zhao Liu <zhao1.liu@intel.com>
+> 
+> The use of kmap_atomic() is being deprecated in favor of
+> kmap_local_page()[1].
+> 
+> The main difference between kmap_atomic() and kmap_local_page() is the
+> latter allows pagefaults and preemption.
 
-Note, kvm_get_msr_feature() is guaranteed to succeed when getting
-PERF_CAPABILITIES, i.e. dropping that check is a nop.
+Uber nit, I would phrase this as saying that local mappings don't disable
+page faults and preemption, which is slightly different than stating that they
+allow pagefaults/preemption.  E.g. if preemption is already disabled.
 
-No functional change intended.
+> There're 2 reasons we can use kmap_local_page() here:
+> 1. SEV is 64-bit only and kmap_locla_page() doesn't disable migration in
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/x86.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+Nit, s/kmap_locla_page/kmap_local_page
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9443ddb358e6..3afe5f4b1a40 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3568,20 +3568,15 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			return 1;
- 		vcpu->arch.arch_capabilities = data;
- 		break;
--	case MSR_IA32_PERF_CAPABILITIES: {
--		struct kvm_msr_entry msr_ent = {.index = msr, .data = 0};
--
-+	case MSR_IA32_PERF_CAPABILITIES:
- 		if (!msr_info->host_initiated)
- 			return 1;
--		if (kvm_get_msr_feature(&msr_ent))
--			return 1;
--		if (data & ~msr_ent.data)
-+		if (data & ~kvm_caps.supported_perf_cap)
- 			return 1;
- 
- 		vcpu->arch.perf_capabilities = data;
- 		kvm_pmu_refresh(vcpu);
- 		return 0;
--	}
- 	case MSR_EFER:
- 		return set_efer(vcpu, msr_info);
- 	case MSR_K7_HWCR:
--- 
-2.38.0.rc1.362.ged0d419d3c-goog
+For future reference, even better would be to use human language after "introducing"
+the functions, e.g.
 
+  The main difference between atomic and local mappings is that local
+  mappings don't disable page faults or preemption.
+
+Obviously that doesn't magically prevent typos, but it does make the changelog
+easier to read (IMO).
+
+> this case, but here the function clflush_cache_range() uses CLFLUSHOPT
+> instruction to flush, and on x86 CLFLUSHOPT is not CPU-local and flushes
+> the page out of the entire cache hierarchy on all CPUs (APM volume 3,
+> chapter 3, CLFLUSHOPT). So there's no need to disable preemption to ensure
+> CPU-local.
+> 2. clflush_cache_range() doesn't need to disable pagefault and the mapping
+> is still valid even if sleeps. This is also true for sched out/in when
+> preempted.
+> 
+> In addition, though kmap_local_page() is a thin wrapper around
+> page_address() on 64-bit, kmap_local_page() should still be used here in
+> preference to page_address() since page_address() isn't suitable to be used
+> in a generic function (like sev_clflush_pages()) where the page passed in
+> is not easy to determine the source of allocation. Keeping the kmap* API in
+> place means it can be used for things other than highmem mappings[2].
+> 
+> Therefore, sev_clflush_pages() is a function that should use
+> kmap_local_page() in place of kmap_atomic().
+> 
+> Convert the calls of kmap_atomic() / kunmap_atomic() to kmap_local_page() /
+> kunmap_local().
+> 
+> [1]: https://lore.kernel.org/all/20220813220034.806698-1-ira.weiny@intel.com
+> [2]: https://lore.kernel.org/lkml/5d667258-b58b-3d28-3609-e7914c99b31b@intel.com/
+> 
+> Suggested-by: Dave Hansen <dave.hansen@intel.com>
+> Suggested-by: Ira Weiny <ira.weiny@intel.com>
+> Suggested-by: Fabio M. De Francesco <fmdefrancesco@gmail.com>
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+> ---
+
+No need to send a v3, the above are all the nittiest of nits.
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
