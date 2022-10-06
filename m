@@ -2,122 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 25C7B5F6E6F
-	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 21:53:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F89A5F6E84
+	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 21:58:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232108AbiJFTxX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Oct 2022 15:53:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56400 "EHLO
+        id S232152AbiJFT6e (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Oct 2022 15:58:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232089AbiJFTxV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Oct 2022 15:53:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A79C8A8783
-        for <kvm@vger.kernel.org>; Thu,  6 Oct 2022 12:53:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1665085999;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XWb5iI6KfJPYYCwV3xo2+MA/qeiFYvSDUTXEpn/zusY=;
-        b=eWjabsEjiMvWRlJPgdUBjBT23tSGXRdwlGNgn8yNQJdC1m+h2vI4MzAiLkzWgKgUNToOzY
-        5DX7NdHtGUnUriI2b20WPfGJGAP01Muk53dpk1lnlsQ7bP2AVJ6+dfo8elPO7X92brnUy2
-        OtxHU6sunzxdvtDLAlez3HqPOPPuygA=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-554-crnIkWkaMMm71wAqO9ngQQ-1; Thu, 06 Oct 2022 15:53:18 -0400
-X-MC-Unique: crnIkWkaMMm71wAqO9ngQQ-1
-Received: by mail-il1-f199.google.com with SMTP id c3-20020a056e020bc300b002fa92ba4606so1915920ilu.14
-        for <kvm@vger.kernel.org>; Thu, 06 Oct 2022 12:53:18 -0700 (PDT)
+        with ESMTP id S232114AbiJFT6b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Oct 2022 15:58:31 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CE97A879E
+        for <kvm@vger.kernel.org>; Thu,  6 Oct 2022 12:58:30 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id q9so2761104pgq.8
+        for <kvm@vger.kernel.org>; Thu, 06 Oct 2022 12:58:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IXlZwi8tQbkf9JfbcZapOF4ed3WL+b+3X/IWlS/eJJk=;
+        b=b0Rh4NehN3Ua78YBcPYsHQRHI+cXa2P38z4vFCn4EMumhVLD2gUkUUhcbmW1jpw5+3
+         gC5tR1DMA2PS5HxUv2ZXHMsqJ1fwo6eQ2Uebuv+eMiFXUrCdYQ6Q/VWq2Y3gIeMDwCi0
+         42VckS5DcH0tcv9cTSkkKLL5jAdpvS36C0KXOqLDf4Bvat0FxppBmfuXMe7uCKWsbBsP
+         u5TNBQEgUm1vHyC0ACFGiusSqsx7ye3p6DYfKWJhUgbcQnVxoFX80oqAP1GoK+RBiYco
+         tNJLhdJcUvv5BnSTZJVoajzXd0V2HQ0k1nwH7rYOFe1YhVG1IMl3zNWW9qUDxQCDU6wE
+         PFiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XWb5iI6KfJPYYCwV3xo2+MA/qeiFYvSDUTXEpn/zusY=;
-        b=aIG/fxTdIMPnjekAmqnyDdYvoLy8xlD9c0Zpo06OWh33aKQdGF5UH3Zgt3+0G7yZ2U
-         rYGhghTl5szOhmJMqzL2+9OajOjMndssoF4XNNu5jpr7TgfoLg84x4jfnoz3m+cYzJOT
-         4m9pC8nw0GytyugogmOdcVxLoUAF1mf0XwqBqiPoFHOferqsa9wa2y412mXMIA0ZRl+F
-         oLNsazIjnL6630IDGk3BmMucg7nbSce8/AzuMcOqkL+XxVQTWb/jhxJP4ahSQ5XBl2s+
-         YFrPzbLeFgtaowtjankIozQZ/tXbJ+18RfxiHhVSYtZxQ6l0nx+nbAARSgNJE1PC5ELQ
-         ZJ0Q==
-X-Gm-Message-State: ACrzQf2V1rQQSyywoGbIO18ZsI39a0Lxva2HxJFaz0PI7yxCaGHIUT9s
-        xf0YzVZlKCS0jvxfIumi7j7q8jYkdbOqyz3SyPUwGpArAuv1zgPWwj6aUcK4O2jVsuoc9GvQWff
-        kDarvMIPBGS0Q
-X-Received: by 2002:a02:a00b:0:b0:363:5daa:99b8 with SMTP id a11-20020a02a00b000000b003635daa99b8mr727402jah.276.1665085997874;
-        Thu, 06 Oct 2022 12:53:17 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM6wtD7BIS7a8GsND7nN97AhhZUE1taPK3BffEuFNxd65PrZ/EErVIRc7cGcZK2eidUKivkjvw==
-X-Received: by 2002:a02:a00b:0:b0:363:5daa:99b8 with SMTP id a11-20020a02a00b000000b003635daa99b8mr727394jah.276.1665085997681;
-        Thu, 06 Oct 2022 12:53:17 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id 134-20020a6b018c000000b006b69e79282dsm144187iob.49.2022.10.06.12.53.16
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IXlZwi8tQbkf9JfbcZapOF4ed3WL+b+3X/IWlS/eJJk=;
+        b=pv1J7MEMlyOH1wNDyZ7zLlL5HVK34NWn4IZFdvOW3JwHXCd2wnSbKxi8AIMo0HHopg
+         cs/w82ZI1dqdMickJZLCETzT6xkWe8+whogkYaNN3pSrkUMUb9DzzKiEfQN3YNjCbs0l
+         Yjwd9GrdeQliLH0rsFxT4jPIXM88SsepJOJGORKYT/+G3aLcK3+xEV+qRZtBwtcbmEbt
+         tRgsgZjHu77WWt/0Q8w9HayqCN+nWlV1mfxLpKcjpItxY8+kv0Z0pHzcy87M+kegcFfs
+         GAuWX7qGzFxo1kOHfIl3HWQX/hztf5ndgBa1P4BoM7eXlkFtSe30h9ygqEK2Sm9pSlkA
+         U2uw==
+X-Gm-Message-State: ACrzQf0snNvKUWMXbb79N5oyO4JffHNoJD0h0JffsMB4gi7Z0rVYLOFS
+        ciihq4edtISBavTtW5Gk/+t4Bw==
+X-Google-Smtp-Source: AMsMyM7NRiApVi3AWDuHyOSLddOe4w1fQiDb+pletF5e3gBtmvRoFD4jVaQfg4IWWzKnlbXPmfbWBA==
+X-Received: by 2002:a05:6a00:1249:b0:543:aa0a:9c0a with SMTP id u9-20020a056a00124900b00543aa0a9c0amr1174972pfi.2.1665086309546;
+        Thu, 06 Oct 2022 12:58:29 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id f14-20020a17090a4a8e00b0020b092534fbsm102727pjh.40.2022.10.06.12.58.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Oct 2022 12:53:17 -0700 (PDT)
-Date:   Thu, 6 Oct 2022 13:53:15 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Qian Cai <cai@lca.pw>, Eric Farman <farman@linux.ibm.com>,
-        Joerg Roedel <jroedel@suse.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Yi Liu <yi.l.liu@intel.com>
-Subject: Re: [PATCH 0/3] Allow the group FD to remain open when unplugging a
- device
-Message-ID: <20221006135315.3270b735.alex.williamson@redhat.com>
-In-Reply-To: <0-v1-90bf0950c42c+39-vfio_group_disassociate_jgg@nvidia.com>
-References: <0-v1-90bf0950c42c+39-vfio_group_disassociate_jgg@nvidia.com>
-Organization: Red Hat
+        Thu, 06 Oct 2022 12:58:28 -0700 (PDT)
+Date:   Thu, 6 Oct 2022 19:58:25 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     pbonzini@redhat.com, dmatlack@google.com, andrew.jones@linux.dev,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 3/4] KVM: selftests: Add atoi_paranoid() to catch
+ errors missed by atoi()
+Message-ID: <Yz8zYXvhp9WGH4Uz@google.com>
+References: <20221006171133.372359-1-vipinsh@google.com>
+ <20221006171133.372359-4-vipinsh@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221006171133.372359-4-vipinsh@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  6 Oct 2022 09:40:35 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Thu, Oct 06, 2022, Vipin Sharma wrote:
+> +int atoi_paranoid(const char *num_str)
+> +{
+> +	int num;
+> +	char *end_ptr;
 
-> Testing has shown that virtnodedevd will leave the group FD open for long
-> periods, even after all the cdevs have been destroyed. This blocks
-> destruction of the VFIO device and is undesirable.
-> 
-> That approach was selected to accomodate SPAPR which has an broken
-> lifecyle model for the iommu_group. However, we can accomodate SPAPR by
-> realizing that it doesn't use the iommu core at all, so rules about
-> iommu_group lifetime do not apply to it.
-> 
-> Giving the KVM code its own kref on the iommu_group allows the VFIO core
-> code to release its iommu_group reference earlier and we can remove the
-> sleep that only existed for SPAPR.
-> 
-> Jason Gunthorpe (3):
->   vfio: Add vfio_file_is_group()
->   vfio: Hold a reference to the iommu_group in kvm for SPAPR
->   vfio: Make the group FD disassociate from the iommu_group
-> 
->  drivers/vfio/pci/vfio_pci_core.c |  2 +-
->  drivers/vfio/vfio.h              |  1 -
->  drivers/vfio/vfio_main.c         | 90 +++++++++++++++++++++-----------
->  include/linux/vfio.h             |  1 +
->  virt/kvm/vfio.c                  | 45 +++++++++++-----
->  5 files changed, 94 insertions(+), 45 deletions(-)
+Reverse fir-tree when it's convention:
 
-Containers aren't getting cleaned up with this series, starting and
-shutting down a libvirt managed VM with vfio-pci devices, an mtty mdev
-device, and making use of hugepages, /proc/meminfo shows the hugepages
-are not released on VM shutdown and I'm unable to subsequently restart
-the VM. Thanks,
+	char *end_ptr;
 
-Alex
+> +
+> +	errno = 0;
+> +	num = (int)strtol(num_str, &end_ptr, 10);
+> +	TEST_ASSERT(!errno, "strtol(\"%s\") failed", num_str);
+> +	TEST_ASSERT(num_str != end_ptr,
+> +		    "strtol(\"%s\") didn't find any valid number.\n", num_str);
 
+s/number/integer ?  And should that be "a valid intenger", not "any valid integer"?
+"any" implies that this helper will be happy if there's at least one integer,
+whereas I believe the intent is to find _exactly_ one integer.
+
+> +	TEST_ASSERT(
+> +		*end_ptr == '\0',
+
+Weird and unnecessary wrap+indentation.
+
+> +		"strtol(\"%s\") failed to parse trailing characters \"%s\".\n",
+> +		num_str, end_ptr);
+> +
+> +	return num;
+> +}
+> diff --git a/tools/testing/selftests/kvm/max_guest_memory_test.c b/tools/testing/selftests/kvm/max_guest_memory_test.c
+> index 9a6e4f3ad6b5..1595b73dc09a 100644
+> --- a/tools/testing/selftests/kvm/max_guest_memory_test.c
+> +++ b/tools/testing/selftests/kvm/max_guest_memory_test.c
+> @@ -193,15 +193,15 @@ int main(int argc, char *argv[])
+>  	while ((opt = getopt(argc, argv, "c:h:m:s:H")) != -1) {
+>  		switch (opt) {
+>  		case 'c':
+> -			nr_vcpus = atoi(optarg);
+> +			nr_vcpus = atoi_paranoid(optarg);
+>  			TEST_ASSERT(nr_vcpus > 0, "number of vcpus must be >0");
+
+Many users require a positive and or non-negative value, maybe add wrappers in
+a follow-up?
+
+			nr_vcpus = atoi_positive(optarg);
+
+and later down
+
+			targs->tfirst = atoi_non_negative(optarg);
+
+We'll lose custom error messages, but I don't think that's a big deal.  Definitely
+not required, just a thought.
+
+> diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+> index 0d55f508d595..c366949c8362 100644
+> --- a/tools/testing/selftests/kvm/set_memory_region_test.c
+> +++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+> @@ -407,7 +407,7 @@ int main(int argc, char *argv[])
+>  
+>  #ifdef __x86_64__
+>  	if (argc > 1)
+> -		loops = atoi(argv[1]);
+> +		loops = atoi_paranoid(argv[1]);
+
+This is a good candidate for atoi_positive().
+
+>  	else
+>  		loops = 10;
+>  
+> diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+> index 59ffe7fd354f..354b6902849c 100644
+> --- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+> @@ -241,10 +241,10 @@ int main(int argc, char **argv)
+>  	while ((opt = getopt(argc, argv, "hp:t:r")) != -1) {
+>  		switch (opt) {
+>  		case 'p':
+> -			reclaim_period_ms = atoi(optarg);
+> +			reclaim_period_ms = atoi_paranoid(optarg);
+>  			break;
+>  		case 't':
+> -			token = atoi(optarg);
+> +			token = atoi_paranoid(optarg);
+>  			break;
+>  		case 'r':
+>  			reboot_permissions = true;
+> -- 
+> 2.38.0.rc1.362.ged0d419d3c-goog
+> 
