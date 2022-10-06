@@ -2,140 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 530415F630D
-	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 10:50:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57CBF5F6310
+	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 10:51:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230195AbiJFIuD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Oct 2022 04:50:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50132 "EHLO
+        id S231239AbiJFIvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Oct 2022 04:51:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230251AbiJFIt7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Oct 2022 04:49:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE55A11441
-        for <kvm@vger.kernel.org>; Thu,  6 Oct 2022 01:49:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1665046193;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zwlGzTPZfCZ8fk+Fm4Z0zxdAoqVZ4NMoUsnntY3LkAI=;
-        b=guv+bG+oAuM67QERvXJWPA1XJ58g/XMzWIwvu5izVBm5weew9YxriRzAYUk2MaKPGxw7KL
-        aebtp1yFQsdND4wEkJp9PPqWfi1QTQ2FgQ/w3RQ0TQzSMzSUfzATWAzfOFRncNJErOZWmp
-        U1T8om+BMv+f38fEgyCOyduFwfcHFn0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-641-u0zoDwasP6egvEIlSkKyGg-1; Thu, 06 Oct 2022 04:49:52 -0400
-X-MC-Unique: u0zoDwasP6egvEIlSkKyGg-1
-Received: by mail-wr1-f71.google.com with SMTP id l6-20020adfa386000000b0022e6b57045bso263806wrb.20
-        for <kvm@vger.kernel.org>; Thu, 06 Oct 2022 01:49:51 -0700 (PDT)
+        with ESMTP id S230251AbiJFIvI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Oct 2022 04:51:08 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5E016F557
+        for <kvm@vger.kernel.org>; Thu,  6 Oct 2022 01:51:06 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id o7so1692310lfk.7
+        for <kvm@vger.kernel.org>; Thu, 06 Oct 2022 01:51:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=tIvLoyAzCOVKOX99D0R9AADU51C3uknT25CXCqDgD1U=;
+        b=syjvuFslfwj1fipmU574j5/yWZL2S3jYhnbWtJ5/bW8iUM/V71vSmb5AsxhaQ/2G0o
+         ctXQnXj/0GSOAbOLK304yQgqsFpIlw2wn3vENsIXReAQESQ7FYQ3e3iDUnXAdUxwt4Td
+         kB2rW56eQNiKHDXyNU3pU/c0Ku79mAkkC7m5TZZLTqHBqVkt65rb0q9hLTPBpEEa/mRq
+         eX1zzMQ6IXkPCewSrX8mVTXOcPVRl/qAef1AVJ52kW5/Ujtn6X047jAV62EnnUX9Aztm
+         0/+I6X+EdhcVKtpUJDxafJIJ2F5NBl87Wqp+wSebFHrCPcoC3fkGq5u8ifnCkUUfBbKO
+         WVFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date;
-        bh=zwlGzTPZfCZ8fk+Fm4Z0zxdAoqVZ4NMoUsnntY3LkAI=;
-        b=mbvRnyvF7mxCZCpy7pbsOJDGmpQ15a63lRj1h8BWXOz/QkMkNv/YpbwLzbj50w41eE
-         AZEemO4OP9Srp0KMVmxjzbPCwyNEFQCHe+YXEsFug8NWbSirF7lwgEFbURtJeRzq3PSS
-         kY8nG240RykXetdBbnpM9DUG07sIefj0TNpVnkzONn0Mw6XCxueHbLKUWSKOb+t3VC1i
-         3lKWPWZEm1HPzeVr4q4m5RhP6nR1d9yahrTUv6NQvwToKJEXp6lpodV4fs1QEq8RPAHe
-         cdk3Wha/gjhH440MsKwH3a9USF/IMvWwlEzTdSsnFDJqo45xqnHWa1s4NDpSl1UeIOBG
-         g6Ng==
-X-Gm-Message-State: ACrzQf0M9LvBEKmd2msOy4q8fh3b5RNDeztfedXIsb+9p5oeAwzQIMJt
-        2kBhnQ+dXvaB5zXIsqGO3lNd6mvOWVyWlFgx9b09W6qnbk7HesL8ApmEgekvx5U2JA+ZKBFtIP2
-        NReY0Z3JH1xJ/
-X-Received: by 2002:a05:600c:793:b0:3bf:816b:144e with SMTP id z19-20020a05600c079300b003bf816b144emr4162946wmo.148.1665046191118;
-        Thu, 06 Oct 2022 01:49:51 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM6FNsBzjNm5Frdr12LipFXgXTJmJo2XYC8UmfXt0gnOugwiLVnxQisbLuMmcfiivmVGHVDZbQ==
-X-Received: by 2002:a05:600c:793:b0:3bf:816b:144e with SMTP id z19-20020a05600c079300b003bf816b144emr4162935wmo.148.1665046190762;
-        Thu, 06 Oct 2022 01:49:50 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id o11-20020a05600c510b00b003a319b67f64sm13242306wms.0.2022.10.06.01.49.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Oct 2022 01:49:50 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     KVM <kvm@vger.kernel.org>, David Matlack <dmatlack@google.com>,
-        Shujun Xue <shujunxue@google.com>,
-        "yury.norov@gmail.com" <yury.norov@gmail.com>,
-        sunilmut@microsoft.com, tianyu.lan@microsoft.com
-Subject: Re: HvExtCallQueryCapabilities and HvExtCallGetBootZeroedMemory
- implementation in KVM for Windows guest
-In-Reply-To: <CAHVum0cbWBXUnJ4s32Yn=TfPXLypv_RRT6LmA_QoBHw3Y+kA7w@mail.gmail.com>
-References: <CAHVum0cbWBXUnJ4s32Yn=TfPXLypv_RRT6LmA_QoBHw3Y+kA7w@mail.gmail.com>
-Date:   Thu, 06 Oct 2022 10:49:49 +0200
-Message-ID: <877d1d9w0i.fsf@redhat.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=tIvLoyAzCOVKOX99D0R9AADU51C3uknT25CXCqDgD1U=;
+        b=ns+MDFDBS/FmtizXb4/uN9s+PXAJGdPdw76oRQftYWQjsy552uTddzz6wzxBvxsbaH
+         sAdYyfTch+XJAJ/PSl3awUl/YDmdfvXcszREhL/9N1rzI8Q9E4VXeaWGApixe0zkcQv0
+         jzAf8AmLtnffEIOVHEODdZPaXyCCPPcWjr5ZU4ue8M1CGJ/2vy4WhBrXF9RW+kFYk2EI
+         E7Djh1RACL6x706mNKCl20edHjMH87E108ZfBbRGBJeL6ScjItEmEgBIEItuxANKbilt
+         JBaHXVuyjDnX25RPpXROd4mtse+egFQZsISdi4WYvSz//41QTP3oooO+JXkesFHqkgni
+         SHWA==
+X-Gm-Message-State: ACrzQf3ZNqM7K6KhH05jdAywUBnuWcBP5U5bKHT9J5WDhMpHl6BbOXpx
+        zz7gR0EPYGKKMP87v0m3skpLbZTeGffzrtInDWylU+5SvavWtQ==
+X-Google-Smtp-Source: AMsMyM5ikUdU3CKf42PjcY0cjPjhnAUfk+hgFVaVlzCr5IsHwJzEJDOSLagw5jbRXrOt3sxCo/qZdi3EfGbbRlMYSzI=
+X-Received: by 2002:ac2:4c8b:0:b0:4a2:2432:93ff with SMTP id
+ d11-20020ac24c8b000000b004a2243293ffmr1387544lfl.26.1665046264888; Thu, 06
+ Oct 2022 01:51:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com> <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
+In-Reply-To: <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Thu, 6 Oct 2022 09:50:28 +0100
+Message-ID: <CA+EHjTz=o9M47frGCXgNJ8J5_Rn=YjzZR5uvCTxStw+GfGE5kg@mail.gmail.com>
+Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vipin Sharma <vipinsh@google.com> writes:
+Hi,
 
-> Hi Vitaly, Yury, Sunil, Tianyu
+<...>
 
-Hi Vipin!
 
+> diff --git a/mm/memfd_inaccessible.c b/mm/memfd_inaccessible.c
+> new file mode 100644
+> index 000000000000..2d33cbdd9282
+> --- /dev/null
+> +++ b/mm/memfd_inaccessible.c
+
+<...>
+
+> +struct file *memfd_mkinaccessible(struct file *memfd)
+> +{
+> +       struct inaccessible_data *data;
+> +       struct address_space *mapping;
+> +       struct inode *inode;
+> +       struct file *file;
+> +
+> +       data = kzalloc(sizeof(*data), GFP_KERNEL);
+> +       if (!data)
+> +               return ERR_PTR(-ENOMEM);
+> +
+> +       data->memfd = memfd;
+> +       mutex_init(&data->lock);
+> +       INIT_LIST_HEAD(&data->notifiers);
+> +
+> +       inode = alloc_anon_inode(inaccessible_mnt->mnt_sb);
+> +       if (IS_ERR(inode)) {
+> +               kfree(data);
+> +               return ERR_CAST(inode);
+> +       }
+> +
+> +       inode->i_mode |= S_IFREG;
+> +       inode->i_op = &inaccessible_iops;
+> +       inode->i_mapping->private_data = data;
+> +
+> +       file = alloc_file_pseudo(inode, inaccessible_mnt,
+> +                                "[memfd:inaccessible]", O_RDWR,
+> +                                &inaccessible_fops);
+> +       if (IS_ERR(file)) {
+> +               iput(inode);
+> +               kfree(data);
+
+I think this might be missing a return at this point.
+
+> +       }
+> +
+> +       file->f_flags |= O_LARGEFILE;
+> +
+> +       mapping = memfd->f_mapping;
+> +       mapping_set_unevictable(mapping);
+> +       mapping_set_gfp_mask(mapping,
+> +                            mapping_gfp_mask(mapping) & ~__GFP_MOVABLE);
+> +
+> +       return file;
+> +}
+
+Thanks,
+/fuad
+
+
+
+> +
+> +void inaccessible_register_notifier(struct file *file,
+> +                                   struct inaccessible_notifier *notifier)
+> +{
+> +       struct inaccessible_data *data = file->f_mapping->private_data;
+> +
+> +       mutex_lock(&data->lock);
+> +       list_add(&notifier->list, &data->notifiers);
+> +       mutex_unlock(&data->lock);
+> +}
+> +EXPORT_SYMBOL_GPL(inaccessible_register_notifier);
+> +
+> +void inaccessible_unregister_notifier(struct file *file,
+> +                                     struct inaccessible_notifier *notifier)
+> +{
+> +       struct inaccessible_data *data = file->f_mapping->private_data;
+> +
+> +       mutex_lock(&data->lock);
+> +       list_del(&notifier->list);
+> +       mutex_unlock(&data->lock);
+> +}
+> +EXPORT_SYMBOL_GPL(inaccessible_unregister_notifier);
+> +
+> +int inaccessible_get_pfn(struct file *file, pgoff_t offset, pfn_t *pfn,
+> +                        int *order)
+> +{
+> +       struct inaccessible_data *data = file->f_mapping->private_data;
+> +       struct file *memfd = data->memfd;
+> +       struct page *page;
+> +       int ret;
+> +
+> +       ret = shmem_getpage(file_inode(memfd), offset, &page, SGP_WRITE);
+> +       if (ret)
+> +               return ret;
+> +
+> +       *pfn = page_to_pfn_t(page);
+> +       *order = thp_order(compound_head(page));
+> +       SetPageUptodate(page);
+> +       unlock_page(page);
+> +
+> +       return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(inaccessible_get_pfn);
+> +
+> +void inaccessible_put_pfn(struct file *file, pfn_t pfn)
+> +{
+> +       struct page *page = pfn_t_to_page(pfn);
+> +
+> +       if (WARN_ON_ONCE(!page))
+> +               return;
+> +
+> +       put_page(page);
+> +}
+> +EXPORT_SYMBOL_GPL(inaccessible_put_pfn);
+> --
+> 2.25.1
 >
-> Before I work on a patch series and send it out to the KVM mailing
-> list, I wanted to check with you a potential Windows VM optimization
-> and see if you have worked on it or if you know about some obvious
-> known blockers regarding this feature.
->
-> Hypervisor Top-Level Functional Specification v6.0b mentions a hypercall:
->
->     HvExtCallGetBootZeroedMemory
->     Call Code = 0x8002
->
-> This hypercall can be used by Windows guest to know which pages are
-> already zeroed and then guest can avoid zeroing them again during the
-> boot, resulting in Windows VM faster boot time and less memory usage.
->
-> KVM currently doesn't implement this feature. I am thinking of
-> implementing it, here is a rough code flow:
-> 1. KVM will set bit 20 in EBX of CPUID leaf 0x40000003 to let the
-> Windows guest know that it can use the extended hypercall interface.
-> 2. Guest during the boot will use hypercall HvExtCallQueryCapabilities
-> (Call Code = 0x8001) to see which extended calls are available.
-> 3. KVM will respond to guest that the hypercall
-> HvExtCallGetBootZeroedMemory is available.
-> 4. Guest will issue the hypercall HvExtCallGetBootZeroedMemory to know
-> which pages are zeroed.
-> 5. KVM or userspace VMM will respond with GPA and page count to guest.
-
-I think it's VMM's responsibility. How would KVM know if the memory
-allocated to the guest was zeroed or not?
-
-The easiest solution would be to just pass through this hypercall to the
-VMM and let it respond. Alternatively, we can probably add a flag to
-KVM_SET_USER_MEMORY_REGION to either indicate that the memory is zeroed
-or to actually ask KVM to zero it. This way we will have the required
-information in KVM. I'm not sure if it's worth it, Windows probably
-calls HvExtCallGetBootZeroedMemory just once upon boot so handling it in
-the VMM is totally fine.
-
-> 6. Guest will skip zeroing these pages, resulting in faster boot and
-> less memory utilization of guest.
->
-> This seems like a very easy win for KVM to increase Windows guest boot
-> performance but I am not sure if I am overlooking something. If you
-> are aware of any potential side effects of enabling these hypercalls
-> or some other issue I am not thinking about please let me know,
-> otherwise, I can start working on this feature and send RFC patches to
-> the mailing list.
-
-I dug through my git archives and found that I've actually tried
-HvExtCallQueryCapabilities back in 2018 but for some reason Windows
-versions I was testing didn't use it (hope it wasn't some silly mistake
-like forgotten CPUID bit on my part :-) so I put it aside and never got
-back to it. Thanks for picking this up!
-
--- 
-Vitaly
-
