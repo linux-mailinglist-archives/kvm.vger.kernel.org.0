@@ -2,146 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C34EB5F6392
-	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 11:24:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F86D5F6486
+	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 12:50:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231373AbiJFJYx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Oct 2022 05:24:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50330 "EHLO
+        id S231320AbiJFKu0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Oct 2022 06:50:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230456AbiJFJYt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Oct 2022 05:24:49 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D5A85FAE3
-        for <kvm@vger.kernel.org>; Thu,  6 Oct 2022 02:24:44 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4D7A123A;
-        Thu,  6 Oct 2022 02:24:50 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AA4D13F73B;
-        Thu,  6 Oct 2022 02:24:42 -0700 (PDT)
-Date:   Thu, 6 Oct 2022 10:25:50 +0100
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Eric Auger <eric.auger@redhat.com>
-Cc:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
-        maz@kernel.org, oliver.upton@linux.dev, reijiw@google.com
-Subject: Re: [kvm-unit-tests PATCH v3 0/3] arm: pmu: Fixes for bare metal
-Message-ID: <Yz6fHp+PZG0pK3Fk@monolith.localdoman>
-References: <20220805004139.990531-1-ricarkol@google.com>
- <89c93f1e-6e78-f679-aecb-7e506fa0cea3@redhat.com>
- <YzxmHpV2rpfaUdWi@monolith.localdoman>
- <5b69f259-4a25-18eb-6c7c-4b59e1f81036@redhat.com>
- <Yz1MiE64ZEa7twtM@monolith.localdoman>
- <2c577c0a-7bdb-81b0-f0c3-6ede3688b94d@redhat.com>
+        with ESMTP id S230512AbiJFKuZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Oct 2022 06:50:25 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFBAD75481
+        for <kvm@vger.kernel.org>; Thu,  6 Oct 2022 03:50:23 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 296AaosD035719
+        for <kvm@vger.kernel.org>; Thu, 6 Oct 2022 10:50:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=soy9vjC9eqvzdyJJumUQz3M+11VQhr87rppGrA6qQbA=;
+ b=EArB+7l+9sf7h2w9lV4xR0Xo62ldF4Rjj18qi6c1ZM1vk4UIIuStfA03Kc84dDBKAqCM
+ fTVd3bVEXsMxutU31d97FIra2VpUgf/uMTT6XTz33mKYrCgUPbKy8vSfy0FPzvN8XCc/
+ 0iX5V7dGR3OsfLKb/sBdP0md8jQSCvRaNQD9FHcCvrBJAJTw/LS/aYIRMd5FXfk+ZbhX
+ i3MXOx4cCFjG5O1zzasRvFfUxdFGG8fgRSMAkkNAIPWAsjwxjuathvEwwjmskyVyLgAc
+ SQniXVd8qlITehWL4ghx/5TON2hAof1vzd7Tifkbas6s9KnsMqHXIb7kO1hwAgXoUQLQ vQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k1v1yawyb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 06 Oct 2022 10:50:23 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29693IDj037403
+        for <kvm@vger.kernel.org>; Thu, 6 Oct 2022 10:50:22 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k1v1yawx1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 06 Oct 2022 10:50:22 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 296AaFtF011927;
+        Thu, 6 Oct 2022 10:50:20 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06ams.nl.ibm.com with ESMTP id 3jxctj6x2m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 06 Oct 2022 10:50:20 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 296AoHbs66060556
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 6 Oct 2022 10:50:17 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7AA21AE051;
+        Thu,  6 Oct 2022 10:50:17 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 41DA3AE045;
+        Thu,  6 Oct 2022 10:50:17 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.242])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  6 Oct 2022 10:50:17 +0000 (GMT)
+Date:   Thu, 6 Oct 2022 12:50:14 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v1 1/2] lib/s390x: move TOD clock related
+ functions to library
+Message-ID: <20221006125014.0df15a8b@p-imbrenda>
+In-Reply-To: <20220826084944.19466-2-nrb@linux.ibm.com>
+References: <20220826084944.19466-1-nrb@linux.ibm.com>
+        <20220826084944.19466-2-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2c577c0a-7bdb-81b0-f0c3-6ede3688b94d@redhat.com>
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: NxiSpLOb2T_oHcxuybBfMia6sjiKm-0B
+X-Proofpoint-ORIG-GUID: qG4iv3LzziScfo2sKl7gmay4XoZKOiII
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-10-05_05,2022-10-06_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ impostorscore=0 phishscore=0 suspectscore=0 mlxlogscore=999 clxscore=1015
+ bulkscore=0 spamscore=0 malwarescore=0 adultscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
+ definitions=main-2210060063
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+On Fri, 26 Aug 2022 10:49:43 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
 
-On Wed, Oct 05, 2022 at 11:50:09AM +0200, Eric Auger wrote:
-> Hi Alexandru,
+> The TOD-clock related functions can be useful for other tests beside the
+> sck test, hence move them to the library.
 > 
-> On 10/5/22 11:21, Alexandru Elisei wrote:
-> > Hi Eric,
-> >
-> > On Tue, Oct 04, 2022 at 07:31:25PM +0200, Eric Auger wrote:
-> >> Hi Alexandru,
-> >>
-> >> On 10/4/22 18:58, Alexandru Elisei wrote:
-> >>> Hi Eric,
-> >>>
-> >>> On Tue, Oct 04, 2022 at 06:20:23PM +0200, Eric Auger wrote:
-> >>>> Hi Ricardo, Marc,
-> >>>>
-> >>>> On 8/5/22 02:41, Ricardo Koller wrote:
-> >>>>> There are some tests that fail when running on bare metal (including a
-> >>>>> passthrough prototype).  There are three issues with the tests.  The
-> >>>>> first one is that there are some missing isb()'s between enabling event
-> >>>>> counting and the actual counting. This wasn't an issue on KVM as
-> >>>>> trapping on registers served as context synchronization events. The
-> >>>>> second issue is that some tests assume that registers reset to 0.  And
-> >>>>> finally, the third issue is that overflowing the low counter of a
-> >>>>> chained event sets the overflow flag in PMVOS and some tests fail by
-> >>>>> checking for it not being set.
-> >>>>>
-> >>>>> Addressed all comments from the previous version:
-> >>>>> https://lore.kernel.org/kvmarm/20220803182328.2438598-1-ricarkol@google.com/T/#t
-> >>>>> - adding missing isb() and fixed the commit message (Alexandru).
-> >>>>> - fixed wording of a report() check (Andrew).
-> >>>>>
-> >>>>> Thanks!
-> >>>>> Ricardo
-> >>>>>
-> >>>>> Ricardo Koller (3):
-> >>>>>   arm: pmu: Add missing isb()'s after sys register writing
-> >>>>>   arm: pmu: Reset the pmu registers before starting some tests
-> >>>>>   arm: pmu: Check for overflow in the low counter in chained counters
-> >>>>>     tests
-> >>>>>
-> >>>>>  arm/pmu.c | 56 ++++++++++++++++++++++++++++++++++++++-----------------
-> >>>>>  1 file changed, 39 insertions(+), 17 deletions(-)
-> >>>>>
-> >>>> While testing this series and the related '[PATCH 0/9] KVM: arm64: PMU:
-> >>>> Fixing chained events, and PMUv3p5 support' I noticed I have kvm unit
-> >>>> test failures on some machines. This does not seem related to those
-> >>>> series though since I was able to get them without. The failures happen
-> >>>> on Amberwing machine for instance with the pmu-chain-promotion.
-> >>>>
-> >>>> While further investigating I noticed there is a lot of variability on
-> >>>> the kvm unit test mem_access_loop() count. I can get the counter = 0x1F
-> >>>> on the first iteration and 0x96 on the subsequent ones for instance.
-> >>>> While running mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E) I was
-> >>>> expecting the counter to be close to 20. It is on some HW.
-> >>>>
-> >>>> [..]
-> >>>>
-> >>>> So I come to the actual question. Can we do any assumption on the
-> >>>> (virtual) PMU quality/precision? If not, the tests I originally wrote
-> >>>> are damned to fail on some HW (on some other they always pass) and I
-> >>>> need to make a decision wrt re-writing part of them, expecially those
-> >>>> which expect overflow after a given amount of ops. Otherwise, there is
-> >>>> either something wrong in the test (asm?) or in KVM PMU emulation.
-> >>>>
-> >>>> I tried to bisect because I did observe the same behavior on some older
-> >>>> kernels but the bisect was not successful as the issue does not happen
-> >>>> always.
-> >>>>
-> >>>> Thoughts?
-> >>> Looking at mem_access_loop(), the first thing that jumps out is the fact
-> >>> that is missing a DSB barrier. ISB affects only instructions, not memory
-> >>> accesses and without a DSB, the PE can reorder memory accesses however it
-> >>> sees fit.
-> >> Following your suggestion I added a dsh ish at the end of loop and
-> >> before disabling pmcr_el0 (I hope this is the place you were thinking
-> >> of) but unfortunately it does not seem to fix my issue.
-> > Yes, DSB ISH after "b.gt 1b\n" and before the write to PMCR_EL0 that
-> > disables the PMU.
-> >
-> > I think you also need a DSB ISH before the write to PMCR_EL0 that enables
-> > the PMU in the first instruction of the asm block. In your example, the
-> > MEM_ACCESS event count is higher than expected, and one explanation for the
-> > large disparity that I can think of is that previous memory accesses are
-> > reordered past the instruction that enables the PMU, which makes the PMU
-> > add these events to the total event count.
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>  lib/s390x/asm/time.h | 48 ++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/sck.c          | 32 -----------------------------
+>  2 files changed, 48 insertions(+), 32 deletions(-)
 > 
-> Makes sense. I added those at the 2 locations but unfortunately it does
-> not change the result for me.
+> diff --git a/lib/s390x/asm/time.h b/lib/s390x/asm/time.h
+> index 7652a151e87a..81b57e2b4894 100644
+> --- a/lib/s390x/asm/time.h
+> +++ b/lib/s390x/asm/time.h
+> @@ -28,6 +28,54 @@ static inline uint64_t get_clock_ms(void)
+>  	return get_clock_us() / 1000;
+>  }
+>  
+> +static inline int sck(uint64_t *time)
+> +{
+> +	int cc;
+> +
+> +	asm volatile(
+> +		"	sck %[time]\n"
+> +		"	ipm %[cc]\n"
+> +		"	srl %[cc],28\n"
+> +		: [cc] "=d"(cc)
+> +		: [time] "Q"(*time)
+> +		: "cc"
+> +	);
+> +
+> +	return cc;
+> +}
+> +
+> +static inline int stck(uint64_t *time)
+> +{
+> +	int cc;
+> +
+> +	asm volatile(
+> +		"	stck %[time]\n"
+> +		"	ipm %[cc]\n"
+> +		"	srl %[cc],28\n"
+> +		: [cc] "=d" (cc), [time] "=Q" (*time)
+> +		:
+> +		: "cc", "memory"
+> +	);
+> +
+> +	return cc;
+> +}
+> +
+> +static inline int stckf(uint64_t *time)
+> +{
+> +	int cc;
+> +
+> +	asm volatile(
+> +		"	stckf %[time]\n"
+> +		"	ipm %[cc]\n"
+> +		"	srl %[cc],28\n"
+> +		: [cc] "=d" (cc), [time] "=Q" (*time)
+> +		:
+> +		: "cc", "memory"
+> +	);
+> +
+> +	return cc;
+> +}
 
-Have you tried increasing the number of iterations for mem_access_loop to
-something very large? If the number of unexpected accesses remains about
-the same (~80) instead of growing proportionally with the number of
-iterations, that might point to some extra accesses that are performed in
-the setup phase instead of something fundamently wrong with the test.
+please put these functions before all the other inline functions, and
+then fix get_clock_us to use the wrapper instead of the (broken) inline
+asm
 
-Thanks,
-Alex
+> +
+>  static inline void udelay(unsigned long us)
+>  {
+>  	unsigned long startclk = get_clock_us();
+> diff --git a/s390x/sck.c b/s390x/sck.c
+> index 88d52b74a586..dff496187602 100644
+> --- a/s390x/sck.c
+> +++ b/s390x/sck.c
+> @@ -12,38 +12,6 @@
+>  #include <asm/interrupt.h>
+>  #include <asm/time.h>
+>  
+> -static inline int sck(uint64_t *time)
+> -{
+> -	int cc;
+> -
+> -	asm volatile(
+> -		"	sck %[time]\n"
+> -		"	ipm %[cc]\n"
+> -		"	srl %[cc],28\n"
+> -		: [cc] "=d"(cc)
+> -		: [time] "Q"(*time)
+> -		: "cc"
+> -	);
+> -
+> -	return cc;
+> -}
+> -
+> -static inline int stck(uint64_t *time)
+> -{
+> -	int cc;
+> -
+> -	asm volatile(
+> -		"	stck %[time]\n"
+> -		"	ipm %[cc]\n"
+> -		"	srl %[cc],28\n"
+> -		: [cc] "=d" (cc), [time] "=Q" (*time)
+> -		:
+> -		: "cc", "memory"
+> -	);
+> -
+> -	return cc;
+> -}
+> -
+>  static void test_priv(void)
+>  {
+>  	uint64_t time_to_set_privileged = 0xfacef00dcafe0000,
+
