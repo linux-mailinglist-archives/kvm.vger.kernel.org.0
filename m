@@ -2,190 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B9E2D5F6D3B
-	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 19:48:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF4825F6D56
+	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 20:11:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231243AbiJFRsf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Oct 2022 13:48:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55334 "EHLO
+        id S231258AbiJFSLL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Oct 2022 14:11:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229511AbiJFRse (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Oct 2022 13:48:34 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A341EC1D8A
-        for <kvm@vger.kernel.org>; Thu,  6 Oct 2022 10:48:29 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d10so2710913pfh.6
-        for <kvm@vger.kernel.org>; Thu, 06 Oct 2022 10:48:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=c4h/StqWma673GjgxtCmSoM47qdbFDg3VL6SuKsQ6BE=;
-        b=nhO2hUX/eRPyjJJ2HXBkgKUYrt6o8hp+EfcVVdgjDno+AFQlY0DoDARKO+EYWmX+7k
-         A0V79SZNf8sMdBjzEeWEhkK9RRiKP+Ub1EFL/3Un4kQ3esMq5O6uRjdbUspq553SCzH0
-         IfJ1xU4nLfWm3I6t2YfB8wxRqXQ8Hld5eCSxGTnV/SrKEyACusLCZMc1YiUD007zKFvn
-         wQY0YDs/y9rLegtmjM22+P5DpoxzEBRfX+1Zme/qPfe4lXcREKflD1Kc2FitCHX5SX1Q
-         djSFwKVst7GBDcDl4jX35En0B+k3GyF9OzrEVDqXo5c44SXGpvK+RUPfTBMSRnx/rje5
-         KWtQ==
+        with ESMTP id S230386AbiJFSLK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Oct 2022 14:11:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C80458D0C9
+        for <kvm@vger.kernel.org>; Thu,  6 Oct 2022 11:11:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665079869;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rSF04mLiE9piAEyD/d1ff4/TmCyx3idjNdHJQ0Bspp8=;
+        b=QfU3H2SbwTNoE2KpO2MJeR0rQGuaQb0UV9YG/rvfP7UrPhRjWfy9PsJsulC/t9kgUDnNIR
+        12slL4oEOzTF+FTm7LWFnMPaha5XNzSE1jyCt4iwuXDI70nylioIxTXHS7tpdVyOCte1XC
+        jOLG5cCnw3sF8JZIy91VrIK5DD8qq3w=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-170-vw7H1_JtPMOxCW13-ck13A-1; Thu, 06 Oct 2022 14:11:07 -0400
+X-MC-Unique: vw7H1_JtPMOxCW13-ck13A-1
+Received: by mail-il1-f200.google.com with SMTP id j1-20020a056e02154100b002f9abf53769so2106905ilu.23
+        for <kvm@vger.kernel.org>; Thu, 06 Oct 2022 11:11:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c4h/StqWma673GjgxtCmSoM47qdbFDg3VL6SuKsQ6BE=;
-        b=utrI3OYcURUNPQaAIPIlP0mohc1kDeRwiMYhx/NQMA2mkeLueCpCVtOAlhgeHzX+P4
-         Sz22jiD/HxsfQB7htsS76ODjQorznXaisYNReKzF5OY0lVjZjFtOh3wL9WNNNZiz0k57
-         pEnOZRDw/IVCvOBEp+pjnapSfYY5vFtXOoF/1Yzd5B2JT+ujEhasxp/AvA/ZER5fWhDf
-         GZmDG62IdoF6qb79zQmgYt3alH7AzKjhzZcb6xrbyJEMJC6Baj50KqtGbn5L7ukalBhc
-         YF+aMV/EUYElVxJf8ANlXM2eMjs8DVvaXGwOxONBF0jDpI7ndVbnAt1KYnMEI4x8YoWL
-         wS5A==
-X-Gm-Message-State: ACrzQf0JQKAZZQaO2OpaBRnH80ZolUybT5CCxVeyl9FVmmzUoFnod3tk
-        gN94NuXxT0A7w0Tkj0kcxZtJ1w==
-X-Google-Smtp-Source: AMsMyM53eLmj+ROQjPtJ1EtlC79usM+RuinHeOPjwZwNnkfUpb5jNbiPyOkiT+PAqZgAlopX3E+ewA==
-X-Received: by 2002:a05:6a00:1884:b0:562:6536:4844 with SMTP id x4-20020a056a00188400b0056265364844mr844500pfh.2.1665078508939;
-        Thu, 06 Oct 2022 10:48:28 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id y37-20020a634965000000b0041c30def5e8sm28635pgk.33.2022.10.06.10.48.15
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rSF04mLiE9piAEyD/d1ff4/TmCyx3idjNdHJQ0Bspp8=;
+        b=3aEg4vtol8mnNzYISUmq6We4wEZXcDDL7tj98RxbH7CUM2iIx13VmM7/AzUm75C2CL
+         LHusvSxtP/Zl1h0ylTxD1pW++muZW3TbyFX6uKOQvMYfi++1Zok9zIwvjOUAsVmyFqg3
+         pB8PNS5Gr6dKjL2TCFjK10wziHcQGCoO+Js8NdjhTbTNk9vjt//k8dBZhcyrp1KnUc3O
+         INW0oXefFWGYS1ZsuAIzThgEfAvr+oaF46G8VUyV5uwmXkAzsiZ1vmfUeLjfJNjaWchL
+         9VMuBvwL2HNTDFkX/ssbzFe4RrNsvpPLFbY2ITmZF+/HJRcks3I1U0sqNIRo6JQJSZxh
+         +mDg==
+X-Gm-Message-State: ACrzQf03CQqYdl2h/deT0sdhzyl558kB7Jm0W9h0VTaMmq5nfMYe3tV8
+        pdZxNHg+lvqCScTWgXa+FAMhXbi9SqO3DxGwaiK3Ayy5EqEDFFGyJ+BUMQTwvK0LEpkEtSQyPqr
+        YI9QpFQTcpwDH
+X-Received: by 2002:a05:6e02:1a0f:b0:2f9:6dcb:c451 with SMTP id s15-20020a056e021a0f00b002f96dcbc451mr447036ild.290.1665079867081;
+        Thu, 06 Oct 2022 11:11:07 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4YGxAPTA22DwffgR4HgyQrAo6tFgowT4tNe0zrV9NL24qia8r+8UBNDtiwWzZdvK04JriHPg==
+X-Received: by 2002:a05:6e02:1a0f:b0:2f9:6dcb:c451 with SMTP id s15-20020a056e021a0f00b002f96dcbc451mr447020ild.290.1665079866822;
+        Thu, 06 Oct 2022 11:11:06 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id u185-20020a0223c2000000b0035b818e7ff2sm13417jau.158.2022.10.06.11.11.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Oct 2022 10:48:18 -0700 (PDT)
-Date:   Thu, 6 Oct 2022 17:48:10 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Gonda <pgonda@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcorr@google.com, michael.roth@amd.com, thomas.lendacky@amd.com,
-        joro@8bytes.org, mizhang@google.com, pbonzini@redhat.com,
-        andrew.jones@linux.dev
-Subject: Re: [V4 3/8] KVM: selftests: add hooks for managing encrypted guest
- memory
-Message-ID: <Yz8U2k7Tu8QQNhhq@google.com>
-References: <20220829171021.701198-1-pgonda@google.com>
- <20220829171021.701198-4-pgonda@google.com>
+        Thu, 06 Oct 2022 11:11:06 -0700 (PDT)
+Date:   Thu, 6 Oct 2022 12:11:04 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Qian Cai <cai@lca.pw>, Eric Farman <farman@linux.ibm.com>,
+        Joerg Roedel <jroedel@suse.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Yi Liu <yi.l.liu@intel.com>
+Subject: Re: [PATCH 1/3] vfio: Add vfio_file_is_group()
+Message-ID: <20221006121104.3cc625d5.alex.williamson@redhat.com>
+In-Reply-To: <1-v1-90bf0950c42c+39-vfio_group_disassociate_jgg@nvidia.com>
+References: <0-v1-90bf0950c42c+39-vfio_group_disassociate_jgg@nvidia.com>
+        <1-v1-90bf0950c42c+39-vfio_group_disassociate_jgg@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220829171021.701198-4-pgonda@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 29, 2022, Peter Gonda wrote:
-> +static vm_paddr_t
-> +_vm_phy_pages_alloc(struct kvm_vm *vm, size_t num, vm_paddr_t paddr_min,
+On Thu,  6 Oct 2022 09:40:36 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Do not wrap before the function name.  Linus has a nice explanation/rant on this[*].
-Note to self, add a Vim macro for this...
-
-[*] https://lore.kernel.org/all/CAHk-=wjoLAYG446ZNHfg=GhjSY6nFmuB_wA8fYd5iLBNXjo9Bw@mail.gmail.com
-
-> +		    uint32_t memslot, bool encrypt)
->  {
->  	struct userspace_mem_region *region;
->  	sparsebit_idx_t pg, base;
-> @@ -1152,12 +1156,22 @@ vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
->  		abort();
->  	}
->  
-> -	for (pg = base; pg < base + num; ++pg)
-> +	for (pg = base; pg < base + num; ++pg) {
->  		sparsebit_clear(region->unused_phy_pages, pg);
-> +		if (encrypt)
-
-prefer s/encrypt/private, and s/encrypted_phy_pages/private_phy_pages.  pKVM
-doesn't rely on encryption, and it's not impossible that x86 will someday gain
-similar functionality.  And "encrypted" is also technically wrong for SEV and TDX,
-as shared memory can also be encrypted with a common key.
-
-> +			sparsebit_set(region->encrypted_phy_pages, pg);
-> +	}
->  
->  	return base * vm->page_size;
->  }
->  
-> +vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
-> +			      vm_paddr_t paddr_min, uint32_t memslot)
-> +{
-> +	return _vm_phy_pages_alloc(vm, num, paddr_min, memslot,
-> +				   vm->memcrypt.enc_by_default);
-
-enc_by_default yields a bizarre API.  The behavior depends on whether or not the
-VM is protected, and whether or not the VM wants to protect memory by default.
-
-For simplicity, IMO vm_phy_pages_alloc() should allocate memory as private if the
-VM supports protected memory, i.e. just have vm->protected or whatever and use
-that here.
-
-> +}
-> +
->  vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
->  			     uint32_t memslot)
->  {
-> @@ -1741,6 +1755,10 @@ void vm_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
->  			region->host_mem);
->  		fprintf(stream, "%*sunused_phy_pages: ", indent + 2, "");
->  		sparsebit_dump(stream, region->unused_phy_pages, 0);
-> +		if (vm->memcrypt.enabled) {
-
-vm->protected
-
-> +			fprintf(stream, "%*sencrypted_phy_pages: ", indent + 2, "");
-> +			sparsebit_dump(stream, region->encrypted_phy_pages, 0);
-> +		}
->  	}
->  	fprintf(stream, "%*sMapped Virtual Pages:\n", indent, "");
->  	sparsebit_dump(stream, vm->vpages_mapped, indent + 2);
-> @@ -1989,3 +2007,31 @@ void __vm_get_stat(struct kvm_vm *vm, const char *stat_name, uint64_t *data,
->  		break;
->  	}
->  }
-> +
-> +void vm_set_memory_encryption(struct kvm_vm *vm, bool enc_by_default, bool has_enc_bit,
-> +			      uint8_t enc_bit)
-> +{
-> +	vm->memcrypt.enabled = true;
-> +	vm->memcrypt.enc_by_default = enc_by_default;
-> +	vm->memcrypt.has_enc_bit = has_enc_bit;
-> +	vm->memcrypt.enc_bit = enc_bit;
-> +}
-> +
-> +const struct sparsebit *
-> +vm_get_encrypted_phy_pages(struct kvm_vm *vm, int slot, vm_paddr_t *gpa_start,
-> +			   uint64_t *size)
-
-Bad wrap.
-
-> +{
-> +	struct userspace_mem_region *region;
-> +
-> +	if (!vm->memcrypt.enabled)
-
-This seems rather silly, why not TEST_ASSERT()?
-
-> +		return NULL;
-> +
-> +	region = memslot2region(vm, slot);
-> +	if (!region)
-
-Same here, TEST_ASSERT() seems more appropriate.
-
-Actually, I can't envision a use outside of SEV.  AFAIK, no other architecture
-does the whole "launch update" thing.  I.e. just open code this in sev_encrypt().
-The more generic API that will be useful for other VM types will be to query if a
-specific GPA is private vs. shared.
-
-> +		return NULL;
-> +
-> +	*size = region->region.memory_size;
-> +	*gpa_start = region->region.guest_phys_addr;
-> +
-> +	return region->encrypted_phy_pages;
-> +}
-> -- 
-> 2.37.2.672.g94769d06f0-goog
+> This replaces uses of vfio_file_iommu_group() which were only detecting if
+> the file is a VFIO file with no interest in the actual group.
 > 
+> The only remaning user of vfio_file_iommu_group() is in KVM for the SPAPR
+> stuff. It passes the iommu_group into the arch code through kvm for some
+> reason.
+> 
+> Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Tested-by: Eric Farman <farman@linux.ibm.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_core.c |  2 +-
+>  drivers/vfio/vfio_main.c         | 14 ++++++++++++++
+>  include/linux/vfio.h             |  1 +
+>  virt/kvm/vfio.c                  | 20 ++++++++++++++++++--
+>  4 files changed, 34 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 59a28251bb0b97..badc9d828cac20 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -1313,7 +1313,7 @@ static int vfio_pci_ioctl_pci_hot_reset(struct vfio_pci_core_device *vdev,
+>  		}
+>  
+>  		/* Ensure the FD is a vfio group FD.*/
+> -		if (!vfio_file_iommu_group(file)) {
+> +		if (!vfio_file_is_group(file)) {
+>  			fput(file);
+>  			ret = -EINVAL;
+>  			break;
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 9207e6c0e3cb26..7866849be56ef6 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -1553,17 +1553,31 @@ static const struct file_operations vfio_device_fops = {
+>   * @file: VFIO group file
+>   *
+>   * The returned iommu_group is valid as long as a ref is held on the file.
+> + * This function is deprecated, only the SPAPR path in kvm should call it.
+>   */
+>  struct iommu_group *vfio_file_iommu_group(struct file *file)
+>  {
+>  	struct vfio_group *group = file->private_data;
+>  
+> +	if (!IS_ENABLED(CONFIG_SPAPR_TCE_IOMMU))
+> +		return NULL;
+> +
+>  	if (file->f_op != &vfio_group_fops)
+
+Nit, with the function below, shouldn't the line above become:
+
+	if (!vfio_file_is_group(file))
+
+Thanks,
+Alex
+
+>  		return NULL;
+>  	return group->iommu_group;
+>  }
+>  EXPORT_SYMBOL_GPL(vfio_file_iommu_group);
+>  
+> +/**
+> + * vfio_file_is_group - True if the file is usable with VFIO aPIS
+> + * @file: VFIO group file
+> + */
+> +bool vfio_file_is_group(struct file *file)
+> +{
+> +	return file->f_op == &vfio_group_fops;
+> +}
+> +EXPORT_SYMBOL_GPL(vfio_file_is_group);
+> +
+>  /**
+>   * vfio_file_enforced_coherent - True if the DMA associated with the VFIO file
+>   *        is always CPU cache coherent
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index ee399a768070d0..e7cebeb875dd1a 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -199,6 +199,7 @@ int vfio_mig_get_next_state(struct vfio_device *device,
+>   * External user API
+>   */
+>  struct iommu_group *vfio_file_iommu_group(struct file *file);
+> +bool vfio_file_is_group(struct file *file);
+>  bool vfio_file_enforced_coherent(struct file *file);
+>  void vfio_file_set_kvm(struct file *file, struct kvm *kvm);
+>  bool vfio_file_has_dev(struct file *file, struct vfio_device *device);
+> diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
+> index ce1b01d02c5197..54aec3b0559c70 100644
+> --- a/virt/kvm/vfio.c
+> +++ b/virt/kvm/vfio.c
+> @@ -61,6 +61,23 @@ static bool kvm_vfio_file_enforced_coherent(struct file *file)
+>  	return ret;
+>  }
+>  
+> +static bool kvm_vfio_file_is_group(struct file *file)
+> +{
+> +	bool (*fn)(struct file *file);
+> +	bool ret;
+> +
+> +	fn = symbol_get(vfio_file_is_group);
+> +	if (!fn)
+> +		return false;
+> +
+> +	ret = fn(file);
+> +
+> +	symbol_put(vfio_file_is_group);
+> +
+> +	return ret;
+> +}
+> +
+> +#ifdef CONFIG_SPAPR_TCE_IOMMU
+>  static struct iommu_group *kvm_vfio_file_iommu_group(struct file *file)
+>  {
+>  	struct iommu_group *(*fn)(struct file *file);
+> @@ -77,7 +94,6 @@ static struct iommu_group *kvm_vfio_file_iommu_group(struct file *file)
+>  	return ret;
+>  }
+>  
+> -#ifdef CONFIG_SPAPR_TCE_IOMMU
+>  static void kvm_spapr_tce_release_vfio_group(struct kvm *kvm,
+>  					     struct kvm_vfio_group *kvg)
+>  {
+> @@ -136,7 +152,7 @@ static int kvm_vfio_group_add(struct kvm_device *dev, unsigned int fd)
+>  		return -EBADF;
+>  
+>  	/* Ensure the FD is a vfio group FD.*/
+> -	if (!kvm_vfio_file_iommu_group(filp)) {
+> +	if (!kvm_vfio_file_is_group(filp)) {
+>  		ret = -EINVAL;
+>  		goto err_fput;
+>  	}
+
