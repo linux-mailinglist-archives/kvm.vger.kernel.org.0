@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 348C85F5E13
+	by mail.lfdr.de (Postfix) with ESMTP id D43E65F5E15
 	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 02:53:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229935AbiJFAwb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Oct 2022 20:52:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59712 "EHLO
+        id S229943AbiJFAwd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Oct 2022 20:52:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229938AbiJFAv7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Oct 2022 20:51:59 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9F9361B33
-        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 17:51:45 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id y16-20020a17090322d000b0017848b6f556so170686plg.19
-        for <kvm@vger.kernel.org>; Wed, 05 Oct 2022 17:51:45 -0700 (PDT)
+        with ESMTP id S229957AbiJFAwB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Oct 2022 20:52:01 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3581546611
+        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 17:51:47 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id a20-20020a17090acb9400b0020aff595f9eso177280pju.5
+        for <kvm@vger.kernel.org>; Wed, 05 Oct 2022 17:51:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=jTDfTXOxJxyj7hkmYar0+I86ueOMf9vHS9LeaM7akak=;
-        b=nNMVa/bNxHCJXpCCtHRBqkA2JULWc7psHgbOK+RLr1kF/r9zekj18eWRib1joyFZ/v
-         gDEqz6lXzUc5owEzCxNEXdMUhXirSfKMx6961i7mLmRfoW1qdbhG26WwVcaSkwDAo0Rv
-         RVxdWnwSCsRAMPRf7lnyeHGpo7PMOtJDDyWpa9pJ0kJ+qb6vGWyd2OcolOkBLkTpIpG1
-         4kwqBNMirXs+R8boDJsV/V9miv5L9eInVpvR/JIONfAatrvnmwZEsuCbHY0cmXCPP6ED
-         50YY5CpmT1J+cAsyMrx+AAVAjamo6HHb4MGdkqTdhF9XZYEOvTdA2tz9Nq1CFcF4JyMf
-         7ZSA==
+        bh=4+CWUStYTQoTh0BU8RtshI04zg9Zxynj28PspoRPHoc=;
+        b=rOtPmzwq4YRmk3PIS3+JztMvwdz7Z1mI20nu2l4Ha69F1mkOv+MBWjoZetB8JMjsu4
+         N/RDXxVQJPvLuvI46EXDdA3azXP/Pb8ixNP49936Y4Q5Svauz9vq2TukSzldjjRAGlyQ
+         nBUYWm3dObDKO6FSekxcnDdQ7w5uSUhxPla1CxFtZlqIqPVpOeD+MciqQkkIFtMmuxnX
+         MgHimDfUbK9Zt5F9Qd1PKcTEHWApumNoHC5NgmDB1RBGYjXEcIBc9IDBsPom4aBVwX4i
+         Bg2L6Zz9zweQtyQUywTeJom7Y9y5DM2++kVw7qpoI8kwukNsKhCsjYjbcRedR+Li7E4E
+         av4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jTDfTXOxJxyj7hkmYar0+I86ueOMf9vHS9LeaM7akak=;
-        b=Yz9SCjQEsxfx5nSBxFYOp8BmYtYAEVM8uupIPmcgtU+0z0zrw9eySEN2r9bIMcAw2R
-         9bSdERFoOeCq5RS7OystO75IgKayrGMELHFJThVtBFBG6lRBSoipVxhRDaUkKYeLlw8n
-         9qNTk633vArtZhy0O39HcJnQnSWosELGvpCTChZoNrRZWrpAsWozARxT05dAB/BDmOta
-         BH6khmM47q0gOUlPNKCkJWLQPazPOUKdrV8gfImDyBgx+w+Neth4z1uvfWal5y4gSu0/
-         nASyXIUFsebz+07YU2sQkz1ohR/USJdQ6b2V7iLta3657n6yt0XCpwwDKJRCB33RTFUh
-         k4Mw==
-X-Gm-Message-State: ACrzQf3GmoevphaKHbunv8xnoYO+4IEClVtHzBjPuc8RIEW4FA851JuW
-        ygsEeUipqEapwp2EotNJBAtnh/PzR+g=
-X-Google-Smtp-Source: AMsMyM7prMIXH0PMPxXMlIoCBFacLrfCKPBlJW4qeCe8v+fKqy9mRfYM1xuSJ+W4lTVDmcDmnqnJ4vuLGak=
+        bh=4+CWUStYTQoTh0BU8RtshI04zg9Zxynj28PspoRPHoc=;
+        b=rcWOsxitttr+3vYCdzYrvH/Jilj8syp54FDRz/ztlqMTFhkmBmsdLcPv/Aj8e7jIyJ
+         WOFf/gEBNppmxJTKKiAm5CzDunNwJWgxpsjYxDG1SdITNmrcIqMOoXEe5ga6S7a2CHM0
+         FxoV83DRK/MfXglILhGQGtBDWh+OkCRC54rkr3LtR3O3tiFJWYtxYw88rmYXNF9ABcPD
+         wObPLLIsDp2KjEA3YuCxCBVit0ebfQutKzspFLglWF6AfUMPbqaU4CAawaBD4u5EMYbT
+         9KCjrCNwAoW4FKkratR/YhP60LsdOemBsORuqRq0IpA/a6wZKofldisgnGWRN3lmaby3
+         cW6Q==
+X-Gm-Message-State: ACrzQf1XrxoQqjX+moWZ2x6mvdheenw5DBJrFWpO/iz8zH4P5jKJATME
+        TtJziKO1otmYbatkBT7B5/gRmZZVuNU=
+X-Google-Smtp-Source: AMsMyM6Zc7TATcUVy3byTQCMQVUVqVcMugAkoChUZ7xp+S/H/0fCKciymhrfxnjKqjdOYFpK2DUChO1+oIs=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:cd06:b0:203:ae0e:6a21 with SMTP id
- d6-20020a17090acd0600b00203ae0e6a21mr157806pju.0.1665017505094; Wed, 05 Oct
- 2022 17:51:45 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:903:41c6:b0:178:348e:f760 with SMTP id
+ u6-20020a17090341c600b00178348ef760mr1932110ple.123.1665017506765; Wed, 05
+ Oct 2022 17:51:46 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu,  6 Oct 2022 00:51:23 +0000
+Date:   Thu,  6 Oct 2022 00:51:24 +0000
 In-Reply-To: <20221006005125.680782-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221006005125.680782-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
-Message-ID: <20221006005125.680782-11-seanjc@google.com>
-Subject: [PATCH 10/12] KVM: selftests: Add dedicated helpers for getting x86
- Family and Model
+Message-ID: <20221006005125.680782-12-seanjc@google.com>
+Subject: [PATCH 11/12] KVM: selftests: Add and use KVM helpers for x86 Family
+ and Model
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -70,121 +70,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add dedicated helpers for getting x86's Family and Model, which are the
-last holdouts that "need" raw access to CPUID information.  FMS info is
-a mess and requires not only splicing together multiple values, but
-requires doing so conditional in the Family case.
-
-Provide wrappers to reduce the odds of copy+paste errors, but mostly to
-allow for the eventual removal of kvm_get_supported_cpuid_entry().
+Add KVM variants of the x86 Family and Model helpers, and use them in the
+PMU event filter test.  Open code the retrieval of KVM's supported CPUID
+entry 0x1.0 in anticipation of dropping kvm_get_supported_cpuid_entry().
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/include/x86_64/processor.h  | 52 +++++++++++++------
- .../selftests/kvm/lib/x86_64/processor.c      |  4 +-
- 2 files changed, 36 insertions(+), 20 deletions(-)
+ .../selftests/kvm/include/x86_64/processor.h  | 19 +++++++++++++--
+ .../kvm/x86_64/pmu_event_filter_test.c        | 23 +++++++++----------
+ 2 files changed, 28 insertions(+), 14 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index acad7184d1b6..a1dafd4e8f43 100644
+index a1dafd4e8f43..021c5f375158 100644
 --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
 +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -247,6 +247,23 @@ struct kvm_x86_pmu_feature {
- 
- #define X86_PMU_FEATURE_BRANCH_INSNS_RETIRED	KVM_X86_PMU_FEATURE(BRANCH_INSNS_RETIRED, 5)
- 
-+static inline unsigned int x86_family(unsigned int eax)
-+{
-+	unsigned int x86;
-+
-+	x86 = (eax >> 8) & 0xf;
-+
-+	if (x86 == 0xf)
-+		x86 += (eax >> 20) & 0xff;
-+
-+	return x86;
-+}
-+
-+static inline unsigned int x86_model(unsigned int eax)
-+{
-+	return ((eax >> 12) & 0xf0) | ((eax >> 4) & 0x0f);
-+}
-+
- /* Page table bitfield declarations */
- #define PTE_PRESENT_MASK        BIT_ULL(0)
- #define PTE_WRITABLE_MASK       BIT_ULL(1)
-@@ -510,6 +527,24 @@ static inline void cpuid(uint32_t function,
- 	return __cpuid(function, 0, eax, ebx, ecx, edx);
+@@ -748,10 +748,27 @@ static inline void vcpu_xcrs_set(struct kvm_vcpu *vcpu, struct kvm_xcrs *xcrs)
+ 	vcpu_ioctl(vcpu, KVM_SET_XCRS, xcrs);
  }
  
-+static inline uint32_t this_cpu_fms(void)
++const struct kvm_cpuid_entry2 *get_cpuid_entry(const struct kvm_cpuid2 *cpuid,
++					       uint32_t function, uint32_t index);
+ const struct kvm_cpuid2 *kvm_get_supported_cpuid(void);
+ const struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(void);
+ const struct kvm_cpuid2 *vcpu_get_supported_hv_cpuid(struct kvm_vcpu *vcpu);
+ 
++static inline uint32_t kvm_cpu_fms(void)
 +{
-+	uint32_t eax, ebx, ecx, edx;
-+
-+	cpuid(1, &eax, &ebx, &ecx, &edx);
-+	return eax;
++	return get_cpuid_entry(kvm_get_supported_cpuid(), 0x1, 0)->eax;
 +}
 +
-+static inline uint32_t this_cpu_family(void)
++static inline uint32_t kvm_cpu_family(void)
 +{
-+	return x86_family(this_cpu_fms());
++	return x86_family(kvm_cpu_fms());
 +}
 +
-+static inline uint32_t this_cpu_model(void)
++static inline uint32_t kvm_cpu_model(void)
 +{
-+	return x86_model(this_cpu_fms());
++	return x86_model(kvm_cpu_fms());
 +}
 +
- static inline uint32_t __this_cpu_has(uint32_t function, uint32_t index,
- 				      uint8_t reg, uint8_t lo, uint8_t hi)
+ bool kvm_cpuid_has(const struct kvm_cpuid2 *cpuid,
+ 		   struct kvm_x86_cpu_feature feature);
+ 
+@@ -819,8 +836,6 @@ static inline struct kvm_cpuid2 *allocate_kvm_cpuid2(int nr_entries)
+ 	return cpuid;
+ }
+ 
+-const struct kvm_cpuid_entry2 *get_cpuid_entry(const struct kvm_cpuid2 *cpuid,
+-					       uint32_t function, uint32_t index);
+ void vcpu_init_cpuid(struct kvm_vcpu *vcpu, const struct kvm_cpuid2 *cpuid);
+ void vcpu_set_hv_cpuid(struct kvm_vcpu *vcpu);
+ 
+diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+index 5cc88ac31c45..540b122ea588 100644
+--- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
++++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+@@ -369,20 +369,19 @@ static bool use_intel_pmu(void)
+ 	       kvm_pmu_has(X86_PMU_FEATURE_BRANCH_INSNS_RETIRED);
+ }
+ 
+-static bool is_zen1(uint32_t eax)
++static bool is_zen1(uint32_t family, uint32_t model)
  {
-@@ -652,23 +687,6 @@ static inline void cpu_relax(void)
- bool is_intel_cpu(void);
- bool is_amd_cpu(void);
+-	return x86_family(eax) == 0x17 && x86_model(eax) <= 0x0f;
++	return family == 0x17 && model <= 0x0f;
+ }
  
--static inline unsigned int x86_family(unsigned int eax)
--{
--	unsigned int x86;
--
--	x86 = (eax >> 8) & 0xf;
--
--	if (x86 == 0xf)
--		x86 += (eax >> 20) & 0xff;
--
--	return x86;
--}
--
--static inline unsigned int x86_model(unsigned int eax)
--{
--	return ((eax >> 12) & 0xf0) | ((eax >> 4) & 0x0f);
--}
--
- struct kvm_x86_state *vcpu_save_state(struct kvm_vcpu *vcpu);
- void vcpu_load_state(struct kvm_vcpu *vcpu, struct kvm_x86_state *state);
- void kvm_x86_state_cleanup(struct kvm_x86_state *state);
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 99c309595c99..9fb949d63305 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -1286,7 +1286,6 @@ unsigned long vm_compute_max_gfn(struct kvm_vm *vm)
+-static bool is_zen2(uint32_t eax)
++static bool is_zen2(uint32_t family, uint32_t model)
  {
- 	const unsigned long num_ht_pages = 12 << (30 - vm->page_shift); /* 12 GiB */
- 	unsigned long ht_gfn, max_gfn, max_pfn;
--	uint32_t eax, ebx, ecx, edx;
- 	uint8_t maxphyaddr;
+-	return x86_family(eax) == 0x17 &&
+-		x86_model(eax) >= 0x30 && x86_model(eax) <= 0x3f;
++	return family == 0x17 && model >= 0x30 && model <= 0x3f;
+ }
  
- 	max_gfn = (1ULL << (vm->pa_bits - vm->page_shift)) - 1;
-@@ -1301,8 +1300,7 @@ unsigned long vm_compute_max_gfn(struct kvm_vm *vm)
+-static bool is_zen3(uint32_t eax)
++static bool is_zen3(uint32_t family, uint32_t model)
+ {
+-	return x86_family(eax) == 0x19 && x86_model(eax) <= 0x0f;
++	return family == 0x19 && model <= 0x0f;
+ }
  
- 	/* Before family 17h, the HyperTransport area is just below 1T.  */
- 	ht_gfn = (1 << 28) - num_ht_pages;
--	cpuid(1, &eax, &ebx, &ecx, &edx);
--	if (x86_family(eax) < 0x17)
-+	if (this_cpu_family() < 0x17)
- 		goto done;
+ /*
+@@ -395,13 +394,13 @@ static bool is_zen3(uint32_t eax)
+  */
+ static bool use_amd_pmu(void)
+ {
+-	const struct kvm_cpuid_entry2 *entry;
++	uint32_t family = kvm_cpu_family();
++	uint32_t model = kvm_cpu_model();
  
- 	/*
+-	entry = kvm_get_supported_cpuid_entry(1);
+ 	return is_amd_cpu() &&
+-		(is_zen1(entry->eax) ||
+-		 is_zen2(entry->eax) ||
+-		 is_zen3(entry->eax));
++		(is_zen1(family, model) ||
++		 is_zen2(family, model) ||
++		 is_zen3(family, model));
+ }
+ 
+ int main(int argc, char *argv[])
 -- 
 2.38.0.rc1.362.ged0d419d3c-goog
 
