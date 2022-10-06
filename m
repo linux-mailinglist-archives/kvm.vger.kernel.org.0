@@ -2,188 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CE795F71BC
-	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 01:26:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 999255F71C8
+	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 01:29:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231330AbiJFX0N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Oct 2022 19:26:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53950 "EHLO
+        id S230362AbiJFX3M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Oct 2022 19:29:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230171AbiJFX0K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Oct 2022 19:26:10 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEFB0BBE22
-        for <kvm@vger.kernel.org>; Thu,  6 Oct 2022 16:26:09 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id m14so3931144ljg.2
-        for <kvm@vger.kernel.org>; Thu, 06 Oct 2022 16:26:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mV9Q8TxTnZx5YN34R7SUXMVFq34AMSjPHpiLz7F3AAE=;
-        b=Jof8LQIU/LTuSSP8IlLOJPBNTJHtoMtM4OCWw8V1VoKbuCusd4xVtpujTiPT8afnee
-         nTlskKM4P3VaniKgPk3WpNFloS+8fkySpc1bOdHqtcMd1dW830VlZuNe4woPoTqywiSA
-         bb/yVRjeb9lzQvfm/xJBL4vwjZy8/MOQI1GaoUUlj9k8SAo3Hc8qyxuxH0n6381BKmVt
-         07mG4mibyTyFYEul/6qXEW+rwhVKVJor7+IjQq/ae7H/83nbYl33YedC0Lka1M91VddC
-         qGdaJ519jZLxMn/yBCCclfxMc6aBkqK142cDYorwp+Y/39aFGbaK+5xC02QZCkdofsLR
-         jVMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mV9Q8TxTnZx5YN34R7SUXMVFq34AMSjPHpiLz7F3AAE=;
-        b=rC0vYywQYRYNxvyHpM5nwCyvh3G0tNlKqNtsNXrBXxWscbGf0DL5XRAC3BBDV9KIII
-         Py3lFM1f1V5OJqcGu+x2rzOxNK/bmG25xDGd8OsDDi7rHAVLsP1gUqpo4vU60sXtB+Dm
-         28uiJT+ucYzxnsBbV4NsAtAwrx7Ube4LlgVK5LiaFKpSJ1nbIzsmxjaouSVrqzERsmGM
-         GF1CW2d2FPUC92DWSbVyKofdsXbMEzsMJqATO9Q/f4pkk0G5kA73DURTrFH+xUPXwM47
-         TMDK1VfE31e9mxULpfeTIFk70KcVR8I2aAWZe4Zyjwg7pr9bJpcdcWKK4woI7rriMTqW
-         B4/g==
-X-Gm-Message-State: ACrzQf3R/T5VwIg+ZJJPoU3rgi1ZRccYHaT0GHGLiTSyJDKb/NitecR+
-        vGs/1uZYffYakUGpMFLTF5SZaF1tDyjDszTU0WiMFA==
-X-Google-Smtp-Source: AMsMyM4Bsu70blXGXiZx0d4DQ3MtJDtM6pfc4RygLl3vlfkNLKFvVBBszLm918fiUVz4Nmnpp8s3Ox0KB5jtzGZLrXI=
-X-Received: by 2002:a2e:aa20:0:b0:26e:609:cf08 with SMTP id
- bf32-20020a2eaa20000000b0026e0609cf08mr669552ljb.422.1665098767843; Thu, 06
- Oct 2022 16:26:07 -0700 (PDT)
+        with ESMTP id S230171AbiJFX3I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Oct 2022 19:29:08 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 649E3EB7E9
+        for <kvm@vger.kernel.org>; Thu,  6 Oct 2022 16:29:07 -0700 (PDT)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 296MrHAs028200;
+        Thu, 6 Oct 2022 23:29:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ap6MBRhSre3EnJQB3cFJAHPpAo6iYmvpfvWprNdlH/A=;
+ b=h2MyGlOra2gpbj4Ez2ZYuvXFQA86nAJe6IbsKQqRsO9rkfaAjnC5suKD1W2xqclQEOeH
+ 2YUS5vHY4Dz5ZD7gts4upu7rqc3MEsnot6bA/1+Cp+l4nsoR+eKS3AwZm9qpPipJXcLn
+ BA4Nfq+eqCBxnpXuLMx3Rt85HEM/CNggOKWGGTBpGqt8sKAuW9Ndv/Hv5c+UddwMX4La
+ d26ffwCnTi+9+QMM5hDypXUfXYxWFqf+x5Iljj8G/BLsxpYk06q0m/YLEz9XFBHvlSAB
+ /QJFhgpqd0Z1Ab81Ro5pPQ/H6iQopkXdO097+WHQPWlLpKOx7c1nh3ZMhccYwl+eyQ4p tg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k286w8tj6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 06 Oct 2022 23:29:00 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 296NQmm5013969;
+        Thu, 6 Oct 2022 23:28:59 GMT
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k286w8tht-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 06 Oct 2022 23:28:59 +0000
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 296N5qxO022407;
+        Thu, 6 Oct 2022 23:28:58 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma03dal.us.ibm.com with ESMTP id 3jxd6aes2q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 06 Oct 2022 23:28:58 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com ([9.208.128.115])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 296NSvmq64029072
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 6 Oct 2022 23:28:57 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EEE9E58054;
+        Thu,  6 Oct 2022 23:28:56 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id ABE515804E;
+        Thu,  6 Oct 2022 23:28:54 +0000 (GMT)
+Received: from [9.160.70.216] (unknown [9.160.70.216])
+        by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  6 Oct 2022 23:28:54 +0000 (GMT)
+Message-ID: <2a61068b-3645-27d0-5fae-65a6e1113a8d@linux.ibm.com>
+Date:   Thu, 6 Oct 2022 19:28:53 -0400
 MIME-Version: 1.0
-References: <20221006171133.372359-1-vipinsh@google.com> <20221006171133.372359-5-vipinsh@google.com>
- <Yz8xdJEMjcfdrcWC@google.com>
-In-Reply-To: <Yz8xdJEMjcfdrcWC@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Thu, 6 Oct 2022 16:25:31 -0700
-Message-ID: <CAHVum0e4fiaB7hGSA6z1SaiZ1632f9Md2p0Nw6G=5wqhHYvdJg@mail.gmail.com>
-Subject: Re: [PATCH v4 4/4] KVM: selftests: Run dirty_log_perf_test on
- specific CPUs
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, dmatlack@google.com, andrew.jones@linux.dev,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [PATCH 0/3] Allow the group FD to remain open when unplugging a
+ device
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Qian Cai <cai@lca.pw>, Eric Farman <farman@linux.ibm.com>,
+        Joerg Roedel <jroedel@suse.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Yi Liu <yi.l.liu@intel.com>
+References: <0-v1-90bf0950c42c+39-vfio_group_disassociate_jgg@nvidia.com>
+ <20221006135315.3270b735.alex.williamson@redhat.com>
+ <Yz9Z3um1HQHnEGVv@nvidia.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <Yz9Z3um1HQHnEGVv@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Pob0ignhfLtolPZ_rqpDnifd9vWZAF4s
+X-Proofpoint-GUID: V71yMeVVSD3SaoOHWai--p5mySVfBVm4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-10-06_05,2022-10-06_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ priorityscore=1501 suspectscore=0 lowpriorityscore=0 adultscore=0
+ mlxscore=0 mlxlogscore=999 spamscore=0 impostorscore=0 bulkscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210060137
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 6, 2022 at 12:50 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Oct 06, 2022, Vipin Sharma wrote:
-> ...
->
-> > +static void pin_me_to_pcpu
->
-> Maybe s/me/this_task ?
+On 10/6/22 6:42 PM, Jason Gunthorpe wrote:
+> On Thu, Oct 06, 2022 at 01:53:15PM -0600, Alex Williamson wrote:
+>> On Thu,  6 Oct 2022 09:40:35 -0300
+>> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>>
+>>> Testing has shown that virtnodedevd will leave the group FD open for long
+>>> periods, even after all the cdevs have been destroyed. This blocks
+>>> destruction of the VFIO device and is undesirable.
+>>>
+>>> That approach was selected to accomodate SPAPR which has an broken
+>>> lifecyle model for the iommu_group. However, we can accomodate SPAPR by
+>>> realizing that it doesn't use the iommu core at all, so rules about
+>>> iommu_group lifetime do not apply to it.
+>>>
+>>> Giving the KVM code its own kref on the iommu_group allows the VFIO core
+>>> code to release its iommu_group reference earlier and we can remove the
+>>> sleep that only existed for SPAPR.
+>>>
+>>> Jason Gunthorpe (3):
+>>>   vfio: Add vfio_file_is_group()
+>>>   vfio: Hold a reference to the iommu_group in kvm for SPAPR
+>>>   vfio: Make the group FD disassociate from the iommu_group
+>>>
+>>>  drivers/vfio/pci/vfio_pci_core.c |  2 +-
+>>>  drivers/vfio/vfio.h              |  1 -
+>>>  drivers/vfio/vfio_main.c         | 90 +++++++++++++++++++++-----------
+>>>  include/linux/vfio.h             |  1 +
+>>>  virt/kvm/vfio.c                  | 45 +++++++++++-----
+>>>  5 files changed, 94 insertions(+), 45 deletions(-)
+>>
+>> Containers aren't getting cleaned up with this series, starting and
+>> shutting down a libvirt managed VM with vfio-pci devices, an mtty mdev
+>> device, and making use of hugepages, /proc/meminfo shows the hugepages
+>> are not released on VM shutdown and I'm unable to subsequently restart
+>> the VM. Thanks,
+> 
+> Oh, I'm surprised the s390 testing didn't hit this!!
 
-Sure.
+Huh, me too, at least eventually - I think it's because we aren't pinning everything upfront but rather on-demand so the missing the type1 release / vfio_iommu_unmap_unpin_all wouldn't be so obvious.  I definitely did multiple VM (re)starts and hot (un)plugs.  But while my test workloads did some I/O, the long-running one was focused on the plug/unplug scenarios to recreate the initial issue so the I/O (and thus pinning) done would have been minimal.
 
->
-> > (int pcpu)
->
-> Unless we're using -1 as "don't pin" or "invalid", this should be an unsigned value.
->
-> > +{
-> > +     cpu_set_t cpuset;
-> > +     int err;
-> > +
-> > +     CPU_ZERO(&cpuset);
-> > +     CPU_SET(pcpu, &cpuset);
->
-> To save user pain:
->
->         r = sched_getaffinity(0, sizeof(allowed_mask), &allowed_mask);
->         TEST_ASSERT(!r, "sched_getaffinity failed, errno = %d (%s)", errno,
->                     strerror(errno));
->
->         TEST_ASSERT(CPU_ISSET(pcpu, &allowed_mask),
->                     "Task '%d' not allowed to run on pCPU '%d'\n");
->
->         CPU_ZERO(&allowed_mask);
->         CPU_SET(cpu, &allowed_mask);
->
-> that way the user will get an explicit error message if they try to pin a vCPU/task
-> that has already been affined by something else.  And then, in theory,
-> sched_setaffinity() should never fail.
->
-> Or you could have two cpu_set_t objects and use CPU_AND(), but that seems
-> unnecessarily complex.
->
+-ap and -ccw also don't pin everything upfront (and I did far less testing with those).
 
-sched_setaffinity() doesn't fail when we assign more than one task to
-the pCPU, it allows multiple tasks to be on the same pCPU. One of the
-reasons it fails is if it is provided a cpu number which is bigger
-than what is actually available on the host.
+Ugh.  Moving forward, might be worth seeing how I can loop in some non-s390-specific vfio testing into my routine.
 
-I am not convinced that pinning vCPUs to the same pCPU should throw an
-error. We should allow if someone wants to try and compare performance
-by over subscribing or any valid combination they want to test.
+> 
+> This hunk should remain since not all cases are closures due to device
+> hot unplug
+> 
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index f9cb734d3991b3..62aba3a128fb8d 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -954,6 +954,13 @@ static int vfio_group_fops_release(struct inode *inode, struct file *filep)
+>  	filep->private_data = NULL;
+>  
+>  	mutex_lock(&group->group_lock);
+> +	/*
+> +	 * Device FDs hold a group file reference, therefore the group release
+> +	 * is only called when there are no open devices.
+> +	 */
+> +	WARN_ON(group->notifier.head);
+> +	if (group->container)
+> +		vfio_group_detach_container(group);
+>  	group->opened_file = NULL;
+>  	mutex_unlock(&group->group_lock);
+>  	return 0;
 
-...
-
-> > +static int pcpu_num(const char *cpu_str)
-> > +{
-> > +     int pcpu = atoi_paranoid(cpu_str);
->
-> newline after declaration.  Though maybe just omit this helper entirely?  As a
-> somewhat belated thought, it's trivial to let "-1" mean "don't pin this vCPU".
-> No idea if there's a use case for that, but it's not any more work to support.
->
-> Even if <0 is invalid, what about just having pin_task_to_pcu() do all the
-> sanity checking?  That way it's more obvious that that helper isn't failing to
-> sanity check the incoming value.
->
-
-This will go away with atoi_non_negative() API I will write in v5. I
-won't even need this function then.
-
-...
-
-> > +     while (cpu && i < nr_vcpus) {
-> > +             perf_test_args.vcpu_args[i++].pcpu = pcpu_num(cpu);
-> > +             cpu = strtok(NULL, delim);
-> > +     }
-> > +
-> > +     TEST_ASSERT(i == nr_vcpus,
-> > +                 "Number of pcpus (%d) not sufficient for the number of vcpus (%d).",
-> > +                 i, nr_vcpus);
->
-> Rather than assert after the fact, use a for-loop:
->
->         for (i = 0; i < nr_vcpus; i++ {
->                 TEST_ASSERT(cpu, "pCPU not provided for vCPU%d\n", i);
->                 perf_test_args.vcpu_args[i++].pcpu = atoi_paranoid(cpu);
->                 cpu = strtok(NULL, delim);
->         }
->
-> so as to avoid having to consume the loop control variable before and after the
-> loop.  Or even
->
->         for (i = 0, cpu = strtok(cpu_list, delim);
->              i < nr_vcpus;
->              i++, cpu = strtok(NULL, delim)) {
->                 TEST_ASSERT(cpu, "pCPU not provided for vCPU%d\n", i);
->                 perf_test_args.vcpu_args[i++].pcpu = atoi_paranoid(cpu);
->         }
->
-> Though IMO the latter is gratuitous and hard to read.
->
-
-I will use the former one.
-
-> > +
-> > +     perf_test_args.pin_vcpus = true;
-> > +
-> > +     // 2. Check if main worker is provided
-> > +     if (cpu)
-> > +             pin_me_to_pcpu(pcpu_num(cpu));
->
-> Verify the string is now empty?  I.e. that there isn't trailing garbage.
->
-
-Okay, I will add the verification.
-
-All other suggestions to which I haven't responded, I agree with them
-and will make the changes in v5.
+Anyway, FWIW, I folded this in and re-ran a brief series of -pci, -ccw and -ap tests on s390 and things still look good.  For completeness I'll start some longer-running pci tests next but I expect this will still be fine as well.
