@@ -2,195 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 450855F5DB3
-	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 02:26:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A53A5F5DC8
+	for <lists+kvm@lfdr.de>; Thu,  6 Oct 2022 02:34:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229816AbiJFA0t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 5 Oct 2022 20:26:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51650 "EHLO
+        id S229823AbiJFAeR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 5 Oct 2022 20:34:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229665AbiJFA0s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 5 Oct 2022 20:26:48 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28BF082776;
-        Wed,  5 Oct 2022 17:26:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1665016007; x=1696552007;
-  h=message-id:date:mime-version:to:cc:references:from:
-   subject:in-reply-to:content-transfer-encoding;
-  bh=/XNHa027Ea7qpJ+BjWibHtSiU7d/RKZbxzBKrlNWOl8=;
-  b=Onml+VZnDIDBNsGACLhEAq4GV6N+kTMYdHkUvzjIMnRUmwPp5xcU4IwK
-   1xl0nAOqY/zgg8qaoYjwMovw2gvGGsh9ChtMBijtgBdDPihyyJFNW8C3I
-   Amdqab0lrUtXeeRjn3qf3pNvUa3b7C3idyF3aQLIHydaKAQC80Bz4NFzJ
-   P7mMu21dDoCFZpv0IYved5ve9p0liU9z8SROoHEFPdJ68YqvaoQwQQqnp
-   /BX63YZu6pM4sxVCu6E7F65HUo8JXi+sU9AiOBs799ADFQrl5JAKrTRI4
-   +O751FW8ynImHdq/yYMdtBYbSQEJyoue5DVYzZROU8cprHSy/ymbtSCiO
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10491"; a="389596375"
-X-IronPort-AV: E=Sophos;i="5.95,162,1661842800"; 
-   d="scan'208";a="389596375"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2022 17:26:46 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10491"; a="749962775"
-X-IronPort-AV: E=Sophos;i="5.95,162,1661842800"; 
-   d="scan'208";a="749962775"
-Received: from rholt1-mobl.amr.corp.intel.com (HELO [10.254.107.106]) ([10.254.107.106])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2022 17:26:45 -0700
-Message-ID: <684c8ef6-bf69-e31e-fb3e-d3beca52fd15@linux.intel.com>
-Date:   Wed, 5 Oct 2022 17:26:37 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>,
-        Suraj Jitindar Singh <surajjs@amazon.com>
-Cc:     kvm@vger.kernel.org, sjitindarsingh@gmail.com,
-        linux-kernel@vger.kernel.org, x86@kernel.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@suse.de, dave.hansen@linux.intel.com,
-        seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
-        jpoimboe@kernel.org, pawan.kumar.gupta@linux.intel.com,
-        benh@kernel.crashing.org, stable@vger.kernel.org
-References: <20221005220227.1959-1-surajjs@amazon.com>
- <CALMp9eThzv+5UBPtm77nvD_b48hHD7O1QLni7a+x9zAPicFk4Q@mail.gmail.com>
-From:   Daniel Sneddon <daniel.sneddon@linux.intel.com>
-Subject: Re: [PATCH] x86/speculation: Mitigate eIBRS PBRSB predictions with
- WRMSR
-In-Reply-To: <CALMp9eThzv+5UBPtm77nvD_b48hHD7O1QLni7a+x9zAPicFk4Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229544AbiJFAeP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 5 Oct 2022 20:34:15 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC371857D4
+        for <kvm@vger.kernel.org>; Wed,  5 Oct 2022 17:34:14 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-356a9048111so4113127b3.6
+        for <kvm@vger.kernel.org>; Wed, 05 Oct 2022 17:34:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aS/Wdb92KUsn+dSQWf+yYhnYTdFnVqHuKhKCKXyH9JU=;
+        b=F2g4wdl3c+W55IiNBL1XgO+YOlTtL/Cjx1CGVdwkn3nnZikiuEYRXFu5+yxq8XvD8Q
+         UnKjxO/Ihl2o7nKCs3Fyoj+597+kBPoBQydqP9spHLrAFp/AZkuV37eBUc24VeghkL8e
+         haVbAgTXMwnfUeqSyaf7Qwgnc7VBxGWvMqqr4+HraCL4gw0nLFgfcM8h2qRhivdOmTbl
+         xQjAAvTL/Xx+nRVqFB2hx/oPVgCumgax0xpgJ8zPH4AnDa+A0Era8LoseKjRTriNUs2+
+         2sp1R3eQ6bZssw7ySWObtNTOd4+HTkPE6I6ZntqOMrN6qr4SUaYKMJUhxZG0gWES5RFm
+         M2Tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aS/Wdb92KUsn+dSQWf+yYhnYTdFnVqHuKhKCKXyH9JU=;
+        b=v74l1p8WThwcq/BifrCap3UU4NSaJ2UiQ/rI3BkFqaKYIwv+KGHawOsYhsJFKZUV/t
+         yzEH6wtXkI8m7KV4ME8J+2ESK93mpwR5rWbPlj0cMhfAMPaKIJEozfF31Ly+6qtioIyx
+         he09oR/cWPh/ggJFSLDPENPIRkWzSlYoa11LD1uiVqVbKGNSYnon3qKeOeg3lBDxVOoe
+         J807IlI9eKB2WtO0ClQl1B0gxBdTISHlvDUezoMiW4qm5HIjzg8pEQE+3MM3u58EeYYc
+         mHtyGfKKKCu73zUvBNcXAPYj2nM85Ij1Xm8IPZmdNo49fLGUVPWku2eclsjmbvFAAPnN
+         Mwvg==
+X-Gm-Message-State: ACrzQf2G0elWOUuBGtF5iGFWSYrGz6+Ipow5K8RCzXQIpUJRyXCXQVCY
+        GBGsTRldlpOCL7nKKyy8+ziYpIZorxc=
+X-Google-Smtp-Source: AMsMyM5GoF0VwOlSnE1/Af4DhxMzGTCQS3omOdlhLBZkXBmerEM6VVh7882ZBLcBagfLbnLAIrgnQoTB6v4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:ad13:0:b0:6bd:9745:a428 with SMTP id
+ y19-20020a25ad13000000b006bd9745a428mr2331326ybi.563.1665016454054; Wed, 05
+ Oct 2022 17:34:14 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu,  6 Oct 2022 00:34:02 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
+Message-ID: <20221006003409.649993-1-seanjc@google.com>
+Subject: [PATCH v6 0/7] KVM: selftests: Implement ucall "pool" (for SEV)
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Anup Patel <anup@brainfault.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Atish Patra <atishp@atishpatra.org>,
+        David Hildenbrand <david@redhat.com>,
+        Tom Rix <trix@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, llvm@lists.linux.dev,
+        Colton Lewis <coltonlewis@google.com>,
+        Andrew Jones <andrew.jones@linux.dev>,
+        Peter Gonda <pgonda@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/5/22 16:46, Jim Mattson wrote:
-> On Wed, Oct 5, 2022 at 3:03 PM Suraj Jitindar Singh <surajjs@amazon.com> wrote:
->>
->> tl;dr: The existing mitigation for eIBRS PBRSB predictions uses an INT3 to
->> ensure a call instruction retires before a following unbalanced RET. Replace
->> this with a WRMSR serialising instruction which has a lower performance
->> penalty.
->>
->> == Background ==
->>
->> eIBRS (enhanced indirect branch restricted speculation) is used to prevent
->> predictor addresses from one privilege domain from being used for prediction
->> in a higher privilege domain.
->>
->> == Problem ==
->>
->> On processors with eIBRS protections there can be a case where upon VM exit
->> a guest address may be used as an RSB prediction for an unbalanced RET if a
->> CALL instruction hasn't yet been retired. This is termed PBRSB (Post-Barrier
->> Return Stack Buffer).
->>
->> A mitigation for this was introduced in:
->> (2b1299322016731d56807aa49254a5ea3080b6b3 x86/speculation: Add RSB VM Exit protections)
->>
->> This mitigation [1] has a ~1% performance impact on VM exit compared to without
->> it [2].
->>
->> == Solution ==
->>
->> The WRMSR instruction can be used as a speculation barrier and a serialising
->> instruction. Use this on the VM exit path instead to ensure that a CALL
->> instruction (in this case the call to vmx_spec_ctrl_restore_host) has retired
->> before the prediction of a following unbalanced RET.
->>
->> This mitigation [3] has a negligible performance impact.
->>
->> == Testing ==
->>
->> Run the outl_to_kernel kvm-unit-tests test 200 times per configuration which
->> counts the cycles for an exit to kernel mode.
->>
->> [1] With existing mitigation:
->> Average: 2026 cycles
->> [2] With no mitigation:
->> Average: 2008 cycles
->> [3] With proposed mitigation:
->> Average: 2008 cycles
->>
->> Signed-off-by: Suraj Jitindar Singh <surajjs@amazon.com>
->> Cc: stable@vger.kernel.org
->> ---
->>  arch/x86/include/asm/nospec-branch.h | 7 +++----
->>  arch/x86/kvm/vmx/vmenter.S           | 3 +--
->>  arch/x86/kvm/vmx/vmx.c               | 5 +++++
->>  3 files changed, 9 insertions(+), 6 deletions(-)
->>
->> diff --git a/arch/x86/include/asm/nospec-branch.h b/arch/x86/include/asm/nospec-branch.h
->> index c936ce9f0c47..e5723e024b47 100644
->> --- a/arch/x86/include/asm/nospec-branch.h
->> +++ b/arch/x86/include/asm/nospec-branch.h
->> @@ -159,10 +159,9 @@
->>    * A simpler FILL_RETURN_BUFFER macro. Don't make people use the CPP
->>    * monstrosity above, manually.
->>    */
->> -.macro FILL_RETURN_BUFFER reg:req nr:req ftr:req ftr2=ALT_NOT(X86_FEATURE_ALWAYS)
->> -       ALTERNATIVE_2 "jmp .Lskip_rsb_\@", \
->> -               __stringify(__FILL_RETURN_BUFFER(\reg,\nr)), \ftr, \
->> -               __stringify(__FILL_ONE_RETURN), \ftr2
->> +.macro FILL_RETURN_BUFFER reg:req nr:req ftr:req
->> +       ALTERNATIVE "jmp .Lskip_rsb_\@", \
->> +               __stringify(__FILL_RETURN_BUFFER(\reg,\nr)), \ftr
->>
->>  .Lskip_rsb_\@:
->>  .endm
->> diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
->> index 6de96b943804..eb82797bd7bf 100644
->> --- a/arch/x86/kvm/vmx/vmenter.S
->> +++ b/arch/x86/kvm/vmx/vmenter.S
->> @@ -231,8 +231,7 @@ SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
->>          * single call to retire, before the first unbalanced RET.
->>           */
->>
->> -       FILL_RETURN_BUFFER %_ASM_CX, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT,\
->> -                          X86_FEATURE_RSB_VMEXIT_LITE
->> +       FILL_RETURN_BUFFER %_ASM_CX, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT
->>
->>
->>         pop %_ASM_ARG2  /* @flags */
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index c9b49a09e6b5..fdcd8e10c2ab 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -7049,8 +7049,13 @@ void noinstr vmx_spec_ctrl_restore_host(struct vcpu_vmx *vmx,
->>          * For legacy IBRS, the IBRS bit always needs to be written after
->>          * transitioning from a less privileged predictor mode, regardless of
->>          * whether the guest/host values differ.
->> +        *
->> +        * For eIBRS affected by Post Barrier RSB Predictions a serialising
->> +        * instruction (wrmsr) must be executed to ensure a call instruction has
->> +        * retired before the prediction of a following unbalanced ret.
->>          */
->>         if (cpu_feature_enabled(X86_FEATURE_KERNEL_IBRS) ||
->> +           cpu_feature_enabled(X86_FEATURE_RSB_VMEXIT_LITE) ||
->>             vmx->spec_ctrl != hostval)
->>                 native_wrmsrl(MSR_IA32_SPEC_CTRL, hostval);
-> 
-> Better, I think, would be to leave the condition alone and put an
-> LFENCE on the 'else' path:
-> 
->          if (cpu_feature_enabled(X86_FEATURE_KERNEL_IBRS) ||
->              vmx->spec_ctrl != hostval)
->                  native_wrmsrl(MSR_IA32_SPEC_CTRL, hostval);
->         else
->                 rmb();
-> 
-> When the guest and host have different IA32_SPEC_CTRL values, you get
-> the serialization from the WRMSR. Otherwise, you get it from the
-> cheaper LFENCE.
-In this case systems that don't suffer from PBRSB (i.e. don've have
-X86_FEATURE_RSB_VMEXIT_LITE set) would be doing a barrier for no reason.  We're
-just trading performance on vulnerable systems for a performance hit on systems
-that aren't vulnerable.
-> 
-> This is still more convoluted than having the mitigation in one place.
-Agreed.
+Rework the ucall infrastructure to use a pool of ucall structs to pass
+memory instead of using the guest's stack.  For confidential VMs with
+encrypted memory, e.g. SEV, the guest's stack "needs" to be private memory
+and so can't be used to communicate with the host.
+
+Convert all implementations to the pool as all of the complexity is hidden
+in common code, and supporting multiple interfaces adds its own kind of
+complexity. 
+
+v6:
+ - Collect tags. [Andrew, Peter]
+ - Drop an unnecessary NULL check on in_use. [Andrew]
+
+v5:
+ - Use less convoluted method of writing per-VM "globals". [Oliver]
+ - Add patch to drop ucall_uninit().
+
+v4: https://lore.kernel.org/all/20220824032115.3563686-1-seanjc@google.com
+
+Peter Gonda (2):
+  tools: Add atomic_test_and_set_bit()
+  KVM: selftests: Add ucall pool based implementation
+
+Sean Christopherson (5):
+  KVM: selftests: Consolidate common code for populating ucall struct
+  KVM: selftests: Consolidate boilerplate code in get_ucall()
+  KVM: selftests: Automatically do init_ucall() for non-barebones VMs
+  KVM: selftests: Make arm64's MMIO ucall multi-VM friendly
+  KVM: selftest: Drop now-unnecessary ucall_uninit()
+
+ tools/arch/x86/include/asm/atomic.h           |   7 ++
+ tools/include/asm-generic/atomic-gcc.h        |  12 ++
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/arch_timer.c        |   1 -
+ .../selftests/kvm/aarch64/debug-exceptions.c  |   1 -
+ .../selftests/kvm/aarch64/hypercalls.c        |   1 -
+ .../testing/selftests/kvm/aarch64/psci_test.c |   1 -
+ .../testing/selftests/kvm/aarch64/vgic_init.c |   2 -
+ .../testing/selftests/kvm/aarch64/vgic_irq.c  |   1 -
+ tools/testing/selftests/kvm/dirty_log_test.c  |   3 -
+ .../selftests/kvm/include/kvm_util_base.h     |  15 +++
+ .../selftests/kvm/include/ucall_common.h      |  10 +-
+ .../selftests/kvm/kvm_page_table_test.c       |   2 -
+ .../testing/selftests/kvm/lib/aarch64/ucall.c | 102 +++--------------
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  11 ++
+ .../selftests/kvm/lib/perf_test_util.c        |   3 -
+ tools/testing/selftests/kvm/lib/riscv/ucall.c |  42 +------
+ tools/testing/selftests/kvm/lib/s390x/ucall.c |  39 +------
+ .../testing/selftests/kvm/lib/ucall_common.c  | 103 ++++++++++++++++++
+ .../testing/selftests/kvm/lib/x86_64/ucall.c  |  39 +------
+ .../testing/selftests/kvm/memslot_perf_test.c |   1 -
+ tools/testing/selftests/kvm/rseq_test.c       |   1 -
+ tools/testing/selftests/kvm/steal_time.c      |   1 -
+ .../kvm/system_counter_offset_test.c          |   1 -
+ 24 files changed, 190 insertions(+), 210 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/lib/ucall_common.c
+
+
+base-commit: e18d6152ff0f41b7f01f9817372022df04e0d354
+-- 
+2.38.0.rc1.362.ged0d419d3c-goog
 
