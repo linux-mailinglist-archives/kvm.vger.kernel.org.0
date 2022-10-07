@@ -2,127 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 799035F7736
-	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 13:14:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 80BA05F774B
+	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 13:17:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229709AbiJGLOM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Oct 2022 07:14:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58140 "EHLO
+        id S229638AbiJGLRv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Oct 2022 07:17:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229643AbiJGLOK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Oct 2022 07:14:10 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1519A223C;
-        Fri,  7 Oct 2022 04:14:09 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8372961C4E;
-        Fri,  7 Oct 2022 11:14:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FF19C433C1;
-        Fri,  7 Oct 2022 11:14:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665141248;
-        bh=iGUUEynvCAjegBrsy6JU4OD39853Ax+NThhfisNR9Vo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=fmKEzZfv+NcFm5KZPC8vC7ZMGO+4smagpqxidG4f8sTZ/z8q2aoMCJSNtysPorB+u
-         kk9P97XlyfQbbtnFo8LHPNJFX9dz+rglzxIJfihqhOEfRZ95SMPj67dZ/fvnuNbSqC
-         jqfHkAdl/kZOqmVgzI+rs0S1M/uPV1KhYkYw7RvKkChyMhuiR2/2wEETdeyyy8vdL+
-         xSn8DoYpH/zTYYkmMvP9NOyVC0t2HvDfp9uL80OcPykiAatvUGYg8ebg5q6VkchIVf
-         DXvK7t9XwhCTk3XnR5NXjkt3/qkelWVMPuwnPC3EPAwGRYke53ktd+UBomw4T2mbx6
-         O0+yu62YgKnxg==
-Date:   Fri, 7 Oct 2022 14:14:03 +0300
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: Re: [PATCH v8 2/8] KVM: Extend the memslot to support fd-based
- private memory
-Message-ID: <Y0AJ++m/TxoscOZg@kernel.org>
-References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
- <20220915142913.2213336-3-chao.p.peng@linux.intel.com>
- <Yz7s+JIexAHJm5dc@kernel.org>
- <Yz7vHXZmU3EpmI0j@kernel.org>
- <Yz71ogila0mSHxxJ@google.com>
+        with ESMTP id S229547AbiJGLRt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Oct 2022 07:17:49 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C202EB1B9C
+        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 04:17:48 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 2979ktZk019493;
+        Fri, 7 Oct 2022 11:17:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=IsLeqgR+xs6/9kVOHQyg/5M63NwlwZiLMou93Fuz8uo=;
+ b=J2Q48oq+uSiz4a/ioLzy0PAKxA+zicjiOrSx4W9z3ihA9wlSW6gveSAs80K4UblsofG6
+ cI10DKLISala1Krthz8CsC8N1+DBVjeJFZLxoQyOZirfoAOLkL/6yKRLY9bJhGto/r8E
+ Jn66Haqlz743KUO91YbW9PeqxTJWSOnHshGtWv0QFfF3MbJDaDNcEIyU//XUS1N+KZoc
+ VirKAcbN8Jm13kAcEoMVYqAd0vf4DwAvVlmxbiPNSp1s1iHY+eRKlH3KeWPAN3CuH202
+ TVEf4DPwntrR0TqWzWdTjgXz2S2Ymnal4QIqGK9AH4nmVJfHOj/JHjk48GuyDd3DKyPY Wg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k2hsjan7h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 07 Oct 2022 11:17:40 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 297AFPTQ016477;
+        Fri, 7 Oct 2022 11:17:40 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k2hsjan6r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 07 Oct 2022 11:17:40 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 297B6Ih5011205;
+        Fri, 7 Oct 2022 11:17:38 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04ams.nl.ibm.com with ESMTP id 3jxd698h5y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 07 Oct 2022 11:17:38 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 297BHZ5M328426
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 7 Oct 2022 11:17:35 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1A4AB11C04A;
+        Fri,  7 Oct 2022 11:17:35 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 91E0F11C050;
+        Fri,  7 Oct 2022 11:17:34 +0000 (GMT)
+Received: from [9.171.29.27] (unknown [9.171.29.27])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  7 Oct 2022 11:17:34 +0000 (GMT)
+Message-ID: <c2a952be-2700-b2be-d72d-f3d74046703c@de.ibm.com>
+Date:   Fri, 7 Oct 2022 13:17:34 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yz71ogila0mSHxxJ@google.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [PATCH 0/3] Allow the group FD to remain open when unplugging a
+ device
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Qian Cai <cai@lca.pw>, Eric Farman <farman@linux.ibm.com>,
+        Joerg Roedel <jroedel@suse.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Yi Liu <yi.l.liu@intel.com>
+References: <0-v1-90bf0950c42c+39-vfio_group_disassociate_jgg@nvidia.com>
+ <20221006135315.3270b735.alex.williamson@redhat.com>
+ <Yz9Z3um1HQHnEGVv@nvidia.com>
+Content-Language: en-US
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+In-Reply-To: <Yz9Z3um1HQHnEGVv@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 8rZfegMtQkROgVmrNrlqvR3hSgoJKeVS
+X-Proofpoint-GUID: s-j5j2BdMXj1196e1D2iDFomKpJFCIl5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-10-06_05,2022-10-07_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 mlxscore=0 malwarescore=0 lowpriorityscore=0
+ suspectscore=0 phishscore=0 spamscore=0 mlxlogscore=999 adultscore=0
+ impostorscore=0 clxscore=1011 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2209130000 definitions=main-2210070067
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 06, 2022 at 03:34:58PM +0000, Sean Christopherson wrote:
-> On Thu, Oct 06, 2022, Jarkko Sakkinen wrote:
-> > On Thu, Oct 06, 2022 at 05:58:03PM +0300, Jarkko Sakkinen wrote:
-> > > On Thu, Sep 15, 2022 at 10:29:07PM +0800, Chao Peng wrote:
-> > > > This new extension, indicated by the new flag KVM_MEM_PRIVATE, adds two
-> > > > additional KVM memslot fields private_fd/private_offset to allow
-> > > > userspace to specify that guest private memory provided from the
-> > > > private_fd and guest_phys_addr mapped at the private_offset of the
-> > > > private_fd, spanning a range of memory_size.
-> > > > 
-> > > > The extended memslot can still have the userspace_addr(hva). When use, a
-> > > > single memslot can maintain both private memory through private
-> > > > fd(private_fd/private_offset) and shared memory through
-> > > > hva(userspace_addr). Whether the private or shared part is visible to
-> > > > guest is maintained by other KVM code.
-> > > 
-> > > What is anyway the appeal of private_offset field, instead of having just
-> > > 1:1 association between regions and files, i.e. one memfd per region?
-> 
-> Modifying memslots is slow, both in KVM and in QEMU (not sure about Google's VMM).
-> E.g. if a vCPU converts a single page, it will be forced to wait until all other
-> vCPUs drop SRCU, which can have severe latency spikes, e.g. if KVM is faulting in
-> memory.  KVM's memslot updates also hold a mutex for the entire duration of the
-> update, i.e. conversions on different vCPUs would be fully serialized, exacerbating
-> the SRCU problem.
-> 
-> KVM also has historical baggage where it "needs" to zap _all_ SPTEs when any
-> memslot is deleted.
-> 
-> Taking both a private_fd and a shared userspace address allows userspace to convert
-> between private and shared without having to manipulate memslots.
 
-Right, this was really good explanation, thank you.
 
-Still wondering could this possibly work (or not):
+Am 07.10.22 um 00:42 schrieb Jason Gunthorpe:
+> On Thu, Oct 06, 2022 at 01:53:15PM -0600, Alex Williamson wrote:
+>> On Thu,  6 Oct 2022 09:40:35 -0300
+>> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>>
+>>> Testing has shown that virtnodedevd will leave the group FD open for long
+>>> periods, even after all the cdevs have been destroyed. This blocks
+>>> destruction of the VFIO device and is undesirable.
+>>>
+>>> That approach was selected to accomodate SPAPR which has an broken
+>>> lifecyle model for the iommu_group. However, we can accomodate SPAPR by
+>>> realizing that it doesn't use the iommu core at all, so rules about
+>>> iommu_group lifetime do not apply to it.
+>>>
+>>> Giving the KVM code its own kref on the iommu_group allows the VFIO core
+>>> code to release its iommu_group reference earlier and we can remove the
+>>> sleep that only existed for SPAPR.
+>>>
+>>> Jason Gunthorpe (3):
+>>>    vfio: Add vfio_file_is_group()
+>>>    vfio: Hold a reference to the iommu_group in kvm for SPAPR
+>>>    vfio: Make the group FD disassociate from the iommu_group
+>>>
+>>>   drivers/vfio/pci/vfio_pci_core.c |  2 +-
+>>>   drivers/vfio/vfio.h              |  1 -
+>>>   drivers/vfio/vfio_main.c         | 90 +++++++++++++++++++++-----------
+>>>   include/linux/vfio.h             |  1 +
+>>>   virt/kvm/vfio.c                  | 45 +++++++++++-----
+>>>   5 files changed, 94 insertions(+), 45 deletions(-)
+>>
+>> Containers aren't getting cleaned up with this series, starting and
+>> shutting down a libvirt managed VM with vfio-pci devices, an mtty mdev
+>> device, and making use of hugepages, /proc/meminfo shows the hugepages
+>> are not released on VM shutdown and I'm unable to subsequently restart
+>> the VM. Thanks,
+> 
+> Oh, I'm surprised the s390 testing didn't hit this!!
 
-1. Union userspace_addr and private_fd.
-2. Instead of introducing private_offset, use guest_phys_addr as the
-   offset.
-  
-BR, Jarkko
+I guess its because that most of our CI testcases create a new ephemeral
+guest for each testcase. We do test reboot but not shutdown and restart.
+Will have a look if that can be improved.
