@@ -2,66 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 426D55F7C83
-	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 19:55:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CD0AA5F7C84
+	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 19:55:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229799AbiJGRzA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Oct 2022 13:55:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45714 "EHLO
+        id S229868AbiJGRzp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Oct 2022 13:55:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229674AbiJGRy6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Oct 2022 13:54:58 -0400
+        with ESMTP id S229602AbiJGRzn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Oct 2022 13:55:43 -0400
 Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35B5E1A807
-        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 10:54:54 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id p3-20020a17090a284300b0020a85fa3ffcso7872630pjf.2
-        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 10:54:54 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 919248F24D
+        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 10:55:42 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id fw14so5022051pjb.3
+        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 10:55:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=VnPKWiaIaNbR7dhDVcU6qlmiAS7Igg2kXw9XPoCpyTc=;
-        b=cvom3e9GZLpahXO6IOBOlD1Xj69jfTwVMwOwauXM/donwcMQXH/Mu2bxyIG8AjkqrQ
-         MmyoPh1ABUWCljc8yj8CP6EpRJWVSaNgPqCY32O4OmXqUozU/lxKY2d9664ylk4DnuKT
-         rW2DdTcxcA4VfTEtg03x8jNJE0UJTVvRaYvRJ6ItFoxg2EBeCyM2EyJi3uDsAzofGV0+
-         uqCxTPUx1lwMxROWhI0HbgCwI3t7i5c1oPz0HoYhk5QGK5+WD23GKqN55OVV0Yo8h8Vx
-         J/hMZmnuBqVLP6qSWS6yA3hLSEo+rG4egi038OqICAzrvlgECG3zBvSHQFsp7dhCEizP
-         lOag==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eEBookgeGOBqDvX/bHV7TfcV0gaFIzHe2apW4dv9MDI=;
+        b=TW/JuK5D/CRO6j+PDcbQs1bESfBEriykbePNsqqL4JMVD7QYyAtYeIQC2ggN7VzCkK
+         /LouAvWqt2xMYfZtky+YHsTE7fJF8c2IViM1Y0RHl0SxjcTvRKf4mfxtwlda+Mq/RsAN
+         Af6NI/Qh3tbkv+dAgc2/G1UPOZH7tKRJpSXJ2CQF0lVnU182BcBHdtm5v5a8zixvU/zK
+         QAu7bw8MGv5Et6128W5xQ6aXfdGkeLlI5dNJVb4CtuM59kD96XxdQyfbc4WU43kQxISd
+         UPAQQVN2+4YHE5AhBIgTntAbFkNa4XrtMFkBVxw46cDy2nTTzD/zoSV5FbXC/y5295JA
+         TokA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VnPKWiaIaNbR7dhDVcU6qlmiAS7Igg2kXw9XPoCpyTc=;
-        b=nzl/FbDjfUipXh7XP5ZQcrVf2qzmpJ0oU2Fd9PfLP0Muo1HaSbpAASk+VaU3W5Z5Vj
-         zzDPnHVEN5m2WyThIb9INaSiCPQOMxdq3pFXf9pcnWVICPIabfLb+b08dj6semUHMt21
-         1pNR8OF4xb2h8pGA2TPtc3Iu9M9aShocsNBWh7/2bejIalKA+IikU8rdvaJrVK591KRa
-         klVEdMCAIMwSh+ZTNTWTa2JmVTnIpYq3wVDZ8clpyfJB17xlDx08IBnrSD1rkqK1A0YN
-         7NoQKFxBrWn36gQD0OfHfCysK3pd5m+vuKxRdSVmWDXkNdMcMl3ey/2hn0yImHzebVoc
-         3/rQ==
-X-Gm-Message-State: ACrzQf2pZqo0RrLZgumY2k5cjawJEycA99HswvY0LChS0RSvAy2oA6Y2
-        eMcJaV6fY6c+peZ6elmKH1/evw==
-X-Google-Smtp-Source: AMsMyM5yIb2e18dWqUSylHHcKF6T0JBTABqqgv+gtU8+1C06UnST0w/x4/FpLU2P0CfQuK9iYpS6zQ==
-X-Received: by 2002:a17:902:db12:b0:176:d6a4:53ab with SMTP id m18-20020a170902db1200b00176d6a453abmr6374936plx.113.1665165293587;
-        Fri, 07 Oct 2022 10:54:53 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eEBookgeGOBqDvX/bHV7TfcV0gaFIzHe2apW4dv9MDI=;
+        b=F83LuElYpwxiaFb1zLLQuyWOo68uaOA+v5aeMMAqL86jlRpDO3xejpR2386Bp6xEn1
+         /UDZ9LOpQJSe0nNeM9bO9g0TO37rEp2EijMy6y9ADTm9mFTNpbdYLykU8nGlz1ZP3mQe
+         UNHrtg460HFmX0xuJV4hAPUUaSVTcZ9WNGddmwCttUovBwQ3FETrbLacaS/hj8ede4Q2
+         8osrZN4GAVLny2HTDF7HSJrtjyGNNDdYOXaybUJmTnzLwViRd0TA4UqWTjcYsY7R8tlo
+         Aed9+dNI0ye9Rek9odVBkZntML4/awxl2HyeIATsitQ3BZ6zZmBSHS8eScCCVtCdZBCx
+         JIdw==
+X-Gm-Message-State: ACrzQf3WUa7e3AtzmmB1YgdOB13JWtRq/kCKt+QxTYkpkfJREA210RPA
+        PtC6IfI9HnH8ptBs+0lfCwV5Wg==
+X-Google-Smtp-Source: AMsMyM5yUe0jEYWCvBhDIwBM0yeEOLJrElZl9OMctn92bS5SREBd4Ii3ixuU7addmf2s6tABsNnQzQ==
+X-Received: by 2002:a17:90a:ae01:b0:20c:2630:528a with SMTP id t1-20020a17090aae0100b0020c2630528amr1832298pjq.37.1665165342074;
+        Fri, 07 Oct 2022 10:55:42 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id h11-20020a17090a130b00b00208c58d5a0esm4923902pja.40.2022.10.07.10.54.52
+        by smtp.gmail.com with ESMTPSA id t7-20020a625f07000000b00562b05c9674sm1904794pfb.130.2022.10.07.10.55.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Oct 2022 10:54:53 -0700 (PDT)
-Date:   Fri, 7 Oct 2022 17:54:49 +0000
+        Fri, 07 Oct 2022 10:55:41 -0700 (PDT)
+Date:   Fri, 7 Oct 2022 17:55:37 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     =?utf-8?B?Zmx5aW5ncGVuZyjlva3mtakp?= <flyingpeng@tencent.com>
-Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH]  kvm: vmx: keep constant definition format consistent
-Message-ID: <Y0Bn6SSFcwGt2II0@google.com>
-References: <E2C645A3-8160-41A7-A8D3-F605946DFEF2@tencent.com>
+To:     wangliangzz@126.com
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, wangliangzz@inspur.com
+Subject: Re: [PATCH] kvm_host.h: fix spelling typo in function declaration
+Message-ID: <Y0BoGXj8+iBo3xv4@google.com>
+References: <20220920060210.4842-1-wangliangzz@126.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <E2C645A3-8160-41A7-A8D3-F605946DFEF2@tencent.com>
+In-Reply-To: <20220920060210.4842-1-wangliangzz@126.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,25 +71,13 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 20, 2022, flyingpeng(彭浩) wrote:
-> Keep all constants using lowercase "x".
+On Tue, Sep 20, 2022, wangliangzz@126.com wrote:
+> From: Wang Liang <wangliangzz@inspur.com>
 > 
-> Signed-off-by: Peng Hao <flyingpeng@tencent.com>
+> Make parameters in function declaration consistent with
+> those in function definition for better cscope-ability
+> 
+> Signed-off-by: Wang Liang <wangliangzz@inspur.com>
 > ---
->  arch/x86/include/asm/vmx.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/include/asm/vmx.h b/arch/x86/include/asm/vmx.h
-> index 0ffaa3156a4e..d1791b612170 100644
-> --- a/arch/x86/include/asm/vmx.h
-> +++ b/arch/x86/include/asm/vmx.h
-> @@ -296,7 +296,7 @@ enum vmcs_field {
->         GUEST_LDTR_AR_BYTES             = 0x00004820,
->         GUEST_TR_AR_BYTES               = 0x00004822,
->         GUEST_INTERRUPTIBILITY_INFO     = 0x00004824,
-> -       GUEST_ACTIVITY_STATE            = 0X00004826,
-> +       GUEST_ACTIVITY_STATE            = 0x00004826,
-
-Heh, I'm somewhat surprised clang didn't throw an error on this.
 
 Reviewed-by: Sean Christopherson <seanjc@google.com>
