@@ -2,119 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 06DDF5F7E21
-	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 21:38:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BA575F7E55
+	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 21:53:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229910AbiJGTid (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Oct 2022 15:38:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33484 "EHLO
+        id S229955AbiJGTxQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Oct 2022 15:53:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230141AbiJGTiQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Oct 2022 15:38:16 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B260910B788
-        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 12:38:10 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id n7so5454072plp.1
-        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 12:38:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3rrcXpuZKRM+KusxikaUH8D4u3EuQEaFpgWMrgs+cjc=;
-        b=HDD9/5jA8tDMlJhLAIdy30TF+iTMHSUbr/TR1j6RQXFrRbmYCKpbMdd+pjqNgxiS1E
-         gPYrCqdLW+wADluCZ+5p5qXqixX/JOR88d16oahiNLWuv/8GkDLeg0XNzWpcYnT42++H
-         AXkDK/3JkKtjntneEuzE4+aSTe/TOuRs9377L3hdGrmGaTpJuqB1Uns3zm//XphsSv46
-         3AVcEFF4sufBMecyEYrodtY1X0g9Ok7hkINjfyc5KXjUoKjS+s4ikYH10yc9Gnl/b9yz
-         GBLcMNjxfSQAN8Xysl7YYu0t/3QXYDRWMqlS+MLnrEMtD3PwIA5lv8yGUwXeqyLZiIDR
-         QO3Q==
+        with ESMTP id S229925AbiJGTxP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Oct 2022 15:53:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EC65118767
+        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 12:53:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665172393;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rXS92aHvjHBlZ1bWSPCrXkOkM+Bf2FuZKlkc5QTB6SA=;
+        b=goA+Y+1xmczpRzmv3vPBhWZPI9NSVCIMPESpMM3T0HIe9NHQk/Blq92v3buwQ8Gn4u2KQy
+        fo9NaQ14rKl2KCO2NOm28g16aDXM3kGCAq3eyvMX569KRLsNDJejsevqYLwDcARsJxPM7I
+        UNd44GRjI/iLZpcwO1lNZHocd8BCctc=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-599-aBge-dozP4Kp0x8xclCJcw-1; Fri, 07 Oct 2022 15:53:08 -0400
+X-MC-Unique: aBge-dozP4Kp0x8xclCJcw-1
+Received: by mail-il1-f199.google.com with SMTP id i3-20020a056e020d8300b002f90e6fedcfso4540877ilj.12
+        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 12:53:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3rrcXpuZKRM+KusxikaUH8D4u3EuQEaFpgWMrgs+cjc=;
-        b=1MRmUygV75QsurrkkRUVrRz9PiaFyIC7Fs8QS3IO3/BP5zRLfgmzVHuIGug5AzGEqJ
-         81Um84328kKkgiqZ9vF24lTA2qjx+3SwXAVx0QBQ6+dm44IiIGDAGCEQsrBeSUDiyHqC
-         DQiR46zQAuKPpzHkK3WRwXFOMWLiL2ym5IZQViHtltx49gpKz0utLWOpybrNNXz043c1
-         m+CLeU3lSCIxtoi2/Bn3PooV3FuC2meNPLf+9l46+0WKnRQ+7XqWxFdcv6u5eJJ+rRSr
-         //UoXRrEGjq/CtUNbZgN0jLsrrjH5ng85iRqV2o5ZRsyJ2UjEB/zPAheJzXE2dlvJRig
-         NNVw==
-X-Gm-Message-State: ACrzQf1D+slXkY5VXMYf7cQ++AAUimUdqs27T4hf4NL77hJtnH0gyMaw
-        aIUQuYiFBL4sfEYyL8Yw5yH9yg==
-X-Google-Smtp-Source: AMsMyM75cyiDVTH3kQfgXNUDRS9hdpc7CkqxGMy547GhYQsQAaMw+aObwLFCGhqc0sEBfjBMrcDAhw==
-X-Received: by 2002:a17:902:aa46:b0:178:9ee5:c7f1 with SMTP id c6-20020a170902aa4600b001789ee5c7f1mr6730566plr.69.1665171489623;
-        Fri, 07 Oct 2022 12:38:09 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u4-20020a170902e80400b0018099c987e6sm348648plg.285.2022.10.07.12.38.09
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rXS92aHvjHBlZ1bWSPCrXkOkM+Bf2FuZKlkc5QTB6SA=;
+        b=F+Paq9UfP18NAhC5q+MQlGaCoXcai24v0x0heox6vpIOtJpkwcfiFCzDe6thsfEbao
+         EKhCjdMJGaf5otL2TAxUJEYQ430GPdxbadqh9rxvUuFrK8vqr69udfuimYFVuI+yzWEe
+         Nmye5YCpbEQA6SKLeqKaTl9OvX/k7T9llV4c/qD02NPgNzcrf95BwgMo3DDQfzJqOVR7
+         pcnor1WVENHjozkaT+brlbovCS42Z7B8WS+4QZ+8mc97lYKrGNapxtS+EybA2ct2T1XA
+         rHRsfHsgkjYSZB4Y1t2TbUPuttiHC6LdjG2lNCIdM1EXREbw7aSf7/kPtDZquMOSEOTA
+         uYiA==
+X-Gm-Message-State: ACrzQf2BMfTk1KFjVCuevhLCm+NU5XMYjoAb58R47PjIoatLuliumaev
+        aVZxTcPsL6ARTBa8fZWuN5rju/LSzPf63aNgO9Rm2u6umgpcOh4ANDLLhsv5852ecj1Io9EuaBm
+        w/bRpk3yOkzea
+X-Received: by 2002:a05:6638:1455:b0:363:4dc8:96b1 with SMTP id l21-20020a056638145500b003634dc896b1mr3464992jad.52.1665172388211;
+        Fri, 07 Oct 2022 12:53:08 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM756Hm3CJKOPhNUt2Twl4IMB/7Xl3TEqIkdQoTNm96ujWHrtavBGo55EkH5TFXOASMBzz8gbw==
+X-Received: by 2002:a05:6638:1455:b0:363:4dc8:96b1 with SMTP id l21-20020a056638145500b003634dc896b1mr3464983jad.52.1665172387982;
+        Fri, 07 Oct 2022 12:53:07 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id r23-20020a02b117000000b00362c9a4a3a9sm1172812jah.113.2022.10.07.12.53.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Oct 2022 12:38:09 -0700 (PDT)
-Date:   Fri, 7 Oct 2022 19:38:05 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH v3 1/3] KVM: x86/pmu: Stop adding speculative Intel GP
- PMCs that don't exist yet
-Message-ID: <Y0CAHch5UR2Lp0tU@google.com>
-References: <20220919091008.60695-1-likexu@tencent.com>
+        Fri, 07 Oct 2022 12:53:07 -0700 (PDT)
+Date:   Fri, 7 Oct 2022 13:53:05 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Qian Cai <cai@lca.pw>, Eric Farman <farman@linux.ibm.com>,
+        Joerg Roedel <jroedel@suse.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Yi Liu <yi.l.liu@intel.com>
+Subject: Re: [PATCH v2 0/3] Allow the group FD to remain open when
+ unplugging a device
+Message-ID: <20221007135305.437daafb.alex.williamson@redhat.com>
+In-Reply-To: <0-v2-15417f29324e+1c-vfio_group_disassociate_jgg@nvidia.com>
+References: <0-v2-15417f29324e+1c-vfio_group_disassociate_jgg@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220919091008.60695-1-likexu@tencent.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 19, 2022, Like Xu wrote:
-> From: Like Xu <likexu@tencent.com>
+On Fri,  7 Oct 2022 11:04:38 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> Testing has shown that virtnodedevd will leave the group FD open for long
+> periods, even after all the cdevs have been destroyed. This blocks
+> destruction of the VFIO device and is undesirable.
 > 
-> The Intel April 2022 SDM - Table 2-2. IA-32 Architectural MSRs adds
-> a new architectural IA32_OVERCLOCKING_STATUS msr (0x195), plus the
-> presence of IA32_CORE_CAPABILITIES (0xCF), the theoretical effective
-> maximum value of the Intel GP PMCs is 14 (0xCF - 0xC1) instead of 18.
+> That approach was selected to accomodate SPAPR which has an broken
+> lifecyle model for the iommu_group. However, we can accomodate SPAPR by
+> realizing that it doesn't use the iommu core at all, so rules about
+> iommu_group lifetime do not apply to it.
 > 
-> But the conclusion of this speculation "14" is very fragile and can
-> easily be overturned once Intel declares another meaningful arch msr
-
-s/msr/MSR for consistency
-
-> in the above reserved range, and even worse, just conjecture, Intel
-> probably put PMCs 8-15 in a completely different range of MSR indices.
+> Giving the KVM code its own kref on the iommu_group allows the VFIO core
+> code to release its iommu_group reference earlier and we can remove the
+> sleep that only existed for SPAPR.
 > 
-> A conservative proposal would be to stop at the maximum number of Intel
-> GP PMCs supported today. Also subsequent changes would limit both AMD
-> and Intel on the number of GP counter supported by KVM.
+> v2:
+>  - Use vfio_file_is_group() istead of open coding
+>  - Do not delete vfio_group_detach_container() from
+>    vfio_group_fops_release()
+> v1: https://lore.kernel.org/r/0-v1-90bf0950c42c+39-vfio_group_disassociate_jgg@nvidia.com
 > 
-> There are some boxes like Intel P4 (non Architectural PMU) may indeed
-> have 18 counters , but those counters are in a completely different msr
-
-unnecessary whitespace before the comma.  And s/msr/MSR again.
-
-> address range and is not supported by KVM.
+> Jason Gunthorpe (3):
+>   vfio: Add vfio_file_is_group()
+>   vfio: Hold a reference to the iommu_group in kvm for SPAPR
+>   vfio: Make the group FD disassociate from the iommu_group
 > 
-> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Fixes: cf05a67b68b8 ("KVM: x86: omit "impossible" pmu MSRs from MSR list")
+>  drivers/vfio/pci/vfio_pci_core.c |  2 +-
+>  drivers/vfio/vfio.h              |  1 -
+>  drivers/vfio/vfio_main.c         | 85 +++++++++++++++++++++++---------
+>  include/linux/vfio.h             |  1 +
+>  virt/kvm/vfio.c                  | 45 ++++++++++++-----
+>  5 files changed, 95 insertions(+), 39 deletions(-)
 
-Does this need Cc: stable@vger.kernel.org?  Or is this benign enough that we don't
-care?
+Applied to vfio next branch for v6.1, along with my trivial follow-up.
+Thanks for the group effort on this one!
 
-No need for a v4, the above nits can be handled when applying.
+Alex
 
-> Suggested-by: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> Reviewed-by: Jim Mattson <jmattson@google.com>
-> ---
-
-In the future, please provide a cover letter even for trivial series, it helps
-(me at least) mentally organize patches.
-
-Thanks!
