@@ -2,136 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 86CE85F7418
-	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 08:04:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 799035F7736
+	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 13:14:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229482AbiJGGEA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Oct 2022 02:04:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41818 "EHLO
+        id S229709AbiJGLOM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Oct 2022 07:14:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbiJGGD7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Oct 2022 02:03:59 -0400
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46848A024D
-        for <kvm@vger.kernel.org>; Thu,  6 Oct 2022 23:03:58 -0700 (PDT)
-Received: by mail-io1-xd36.google.com with SMTP id p70so2915793iod.13
-        for <kvm@vger.kernel.org>; Thu, 06 Oct 2022 23:03:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=/TxaYjGBe0JV2lzNrA+E/wu8QG+vfOtXqWin55f54II=;
-        b=jTrxfIcHwJyXnCjYLnmh5lTZvamd6Pw1/joQ20nsXL8p8bWPgskpRoTBgmfzGWYoG6
-         gXsAq6FM4O4L9pna/vxTUWXHaRmDyfYBakJRbf0snQIzgy5aoRL6W/BxKAD+mo0RtiSA
-         UFsjpvdEzDD0v3tVaS8//1TiJmv+mdORLYVyuLy8ZRTDqjObdUv3bDE4IKcQZLWN4fyb
-         pcA98TI4Y8ZZ9naYc4I/JoAvJxxAPdP8Vx24/GMWj0WNw9tQwhIlE6fQG2HL7AX/2WGu
-         kTXS5d2f0pi5zZbtzbfI6onBoAvYSOsgpLqC7lgiWg6GBGgoQeUtSYBgNAMaQ2m8+Nvh
-         n1kw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/TxaYjGBe0JV2lzNrA+E/wu8QG+vfOtXqWin55f54II=;
-        b=4N1mpuupWhhy9thV8d77V2BuUrMTl7MebZm7NkThYmLIGtj+P12Un0FuIF5LddL0eH
-         W5upEA8cysCNbcToPixJLWJK3QZP0PgZucESTiDFJx4Euox8bFwc0i2UD3FHmv9NFTVn
-         ux+ybg733B3lIinpvuPYLw0pI2N9DxQK/qgvAJ86w1b56+2EEWJA+f9MrO24rxlIMTWe
-         UtT45MkkWA04YqY6l4D3ufsYYnSi1I1B/rCkDRvX0SfC4BS5+NtSYERZbgWhucTfdBOT
-         BWj/u1pf/Klskvd9z4r6vPOYMWhqdSvKYiOYuzOVS3Kfzl/i0yEjxifVBFKPYvS67iFl
-         P62w==
-X-Gm-Message-State: ACrzQf3cv1tG8ioq8jT7N8/BCqKBAH75waIgh5SFn9gvwI7GQPavP3VU
-        at+AJxcicIeWPoqd+APM41KDrrK/C12zACB769hxfw==
-X-Google-Smtp-Source: AMsMyM5bRB6AJU3wxS2VlmYcrUeCzCUr4ujVs3dQ+R4dArnHgOUyNntGgANz5UMKc1Eym8RxkR7dUKHPABpMvqcN+z4=
-X-Received: by 2002:a05:6638:4184:b0:35a:3eb4:f932 with SMTP id
- az4-20020a056638418400b0035a3eb4f932mr1726487jab.216.1665122637553; Thu, 06
- Oct 2022 23:03:57 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220926145247.3688090-1-ovidiu.panait@windriver.com>
- <20220927000729.498292-1-Ashish.Kalra@amd.com> <YzJFvWPb1syXcVQm@google.com>
- <215ee1ce-b6eb-9699-d682-f2e592cde448@amd.com> <Yz99nF+d6D+37efE@google.com>
-In-Reply-To: <Yz99nF+d6D+37efE@google.com>
-From:   Mingwei Zhang <mizhang@google.com>
-Date:   Thu, 6 Oct 2022 23:03:46 -0700
-Message-ID: <CAL715WL4L=9vhhU3TvY7TOe3HZ73weWFNiaP2RyBtzN-kZ4EoQ@mail.gmail.com>
-Subject: Re: [PATCH 5.4 1/1] KVM: SEV: add cache flush to solve SEV cache
- incoherency issues
+        with ESMTP id S229643AbiJGLOK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Oct 2022 07:14:10 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1519A223C;
+        Fri,  7 Oct 2022 04:14:09 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8372961C4E;
+        Fri,  7 Oct 2022 11:14:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FF19C433C1;
+        Fri,  7 Oct 2022 11:14:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1665141248;
+        bh=iGUUEynvCAjegBrsy6JU4OD39853Ax+NThhfisNR9Vo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=fmKEzZfv+NcFm5KZPC8vC7ZMGO+4smagpqxidG4f8sTZ/z8q2aoMCJSNtysPorB+u
+         kk9P97XlyfQbbtnFo8LHPNJFX9dz+rglzxIJfihqhOEfRZ95SMPj67dZ/fvnuNbSqC
+         jqfHkAdl/kZOqmVgzI+rs0S1M/uPV1KhYkYw7RvKkChyMhuiR2/2wEETdeyyy8vdL+
+         xSn8DoYpH/zTYYkmMvP9NOyVC0t2HvDfp9uL80OcPykiAatvUGYg8ebg5q6VkchIVf
+         DXvK7t9XwhCTk3XnR5NXjkt3/qkelWVMPuwnPC3EPAwGRYke53ktd+UBomw4T2mbx6
+         O0+yu62YgKnxg==
+Date:   Fri, 7 Oct 2022 14:14:03 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     "Kalra, Ashish" <ashish.kalra@amd.com>,
-        ovidiu.panait@windriver.com, kvm@vger.kernel.org,
-        liam.merwick@oracle.com, pbonzini@redhat.com,
-        thomas.lendacky@amd.com, michael.roth@amd.com, pgonda@google.com,
-        marcorr@google.com, alpergun@google.com, jarkko@kernel.org,
-        jroedel@suse.de, bp@alien8.de, rientjes@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v8 2/8] KVM: Extend the memslot to support fd-based
+ private memory
+Message-ID: <Y0AJ++m/TxoscOZg@kernel.org>
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-3-chao.p.peng@linux.intel.com>
+ <Yz7s+JIexAHJm5dc@kernel.org>
+ <Yz7vHXZmU3EpmI0j@kernel.org>
+ <Yz71ogila0mSHxxJ@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yz71ogila0mSHxxJ@google.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 6, 2022 at 6:15 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Oct 06, 2022, Kalra, Ashish wrote:
-> > For the MMU invalidation notifiers we are going to make two changes
-> > currently:
-> >
-> > 1). Use clflush/clflushopt instead of wbinvd_on_all_cpus() for range <= 2MB.
->
-> IMO, this isn't worth pursuing, to the point where I might object to this code
-> being added upstream.  Avoiding WBINVD for the mmu_notifiers doesn't prevent a
-> malicious userspace from using SEV-induced WBINVD to effectively DoS the host,
-> e.g. userspace can simply ADD+DELETE memslots, or mprotect() chunks > 2mb.
->
+On Thu, Oct 06, 2022 at 03:34:58PM +0000, Sean Christopherson wrote:
+> On Thu, Oct 06, 2022, Jarkko Sakkinen wrote:
+> > On Thu, Oct 06, 2022 at 05:58:03PM +0300, Jarkko Sakkinen wrote:
+> > > On Thu, Sep 15, 2022 at 10:29:07PM +0800, Chao Peng wrote:
+> > > > This new extension, indicated by the new flag KVM_MEM_PRIVATE, adds two
+> > > > additional KVM memslot fields private_fd/private_offset to allow
+> > > > userspace to specify that guest private memory provided from the
+> > > > private_fd and guest_phys_addr mapped at the private_offset of the
+> > > > private_fd, spanning a range of memory_size.
+> > > > 
+> > > > The extended memslot can still have the userspace_addr(hva). When use, a
+> > > > single memslot can maintain both private memory through private
+> > > > fd(private_fd/private_offset) and shared memory through
+> > > > hva(userspace_addr). Whether the private or shared part is visible to
+> > > > guest is maintained by other KVM code.
+> > > 
+> > > What is anyway the appeal of private_offset field, instead of having just
+> > > 1:1 association between regions and files, i.e. one memfd per region?
+> 
+> Modifying memslots is slow, both in KVM and in QEMU (not sure about Google's VMM).
+> E.g. if a vCPU converts a single page, it will be forced to wait until all other
+> vCPUs drop SRCU, which can have severe latency spikes, e.g. if KVM is faulting in
+> memory.  KVM's memslot updates also hold a mutex for the entire duration of the
+> update, i.e. conversions on different vCPUs would be fully serialized, exacerbating
+> the SRCU problem.
+> 
+> KVM also has historical baggage where it "needs" to zap _all_ SPTEs when any
+> memslot is deleted.
+> 
+> Taking both a private_fd and a shared userspace address allows userspace to convert
+> between private and shared without having to manipulate memslots.
 
-I think using clflush/clflushopt is a tactical workaround for SNP VMs.
-As mentioned earlier by Ashish:
+Right, this was really good explanation, thank you.
 
-"For SNP guests we don't need to invoke the MMU invalidation notifiers
-and the cache flush should be done at the point of RMP ownership change
-instead of mmu_notifier, which will be when the unregister_enc_region
-ioctl is called, but as we don't trust the userspace (which can bypass
-this ioctl), therefore we continue to use the MMU invalidation
-notifiers."
+Still wondering could this possibly work (or not):
 
-So if that is true: SNP VMs also have to use mmu_notifiers for
-splitting the PMDs, then I think using clflush/clflushopt might be the
-only workaround that I know of.
-
-> Using clfushopt also effectively puts a requirement on mm/ that the notifiers
-> be invoked _before_ PTEs are modified in the primary MMU, otherwise KVM may not
-> be able to resolve the VA=>PFN, or even worse, resolve the wrong PFN.
-
-I don't understand this. Isn't it always true that MM should fire
-mmu_notifiers before modifying PTEs in host MMU? This should be a
-strict rule as in my knowledge, no?
-
->
-> And no sane VMM should be modifying userspace mappings that cover SEV guest memory
-> at any reasonable rate.
->
-> In other words, switching to CLFUSHOPT for SEV+SEV-ES VMs is effectively a
-> band-aid for the NUMA balancing issue.
-
-That's not true. KSM might also use the same mechanism. For NUMA
-balancing and KSM, there seems to be a pattern: blindly flushing
-mmu_notifier first, then try to do the actual work.
-
-I have a limited knowledge on MM, but from my observations, it looks
-like the property of a page being "PINNED" is very unreliable (or
-expensive), i.e., anyone can jump in and pin the page. So it is hard
-to see whether a page is truly "PINNED" or maybe just someone is
-"working" on it without holding the lock. Holding the refcount of a
-struct page requires a spinlock. I suspect that might be the reason
-why NUMA balancing and KSM is just aggressively firing mmu_notifiers
-first. I don't know if there is other stuff in MM following the same
-pattern.
-
-Concretely, my deep worry is the mmu_notifier in try_to_unmap_one(). I
-cannot enumerate all of the callers. But if there is someone who calls
-into this, it might be a disaster level (4K) performance lock. Hope we
-can prove that won't happen.
+1. Union userspace_addr and private_fd.
+2. Instead of introducing private_offset, use guest_phys_addr as the
+   offset.
+  
+BR, Jarkko
