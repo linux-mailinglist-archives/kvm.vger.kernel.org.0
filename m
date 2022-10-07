@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF6AC5F7B1E
-	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 18:00:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D33165F7B21
+	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 18:02:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229763AbiJGQAU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Oct 2022 12:00:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40992 "EHLO
+        id S229722AbiJGQC1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Oct 2022 12:02:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229624AbiJGQAT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Oct 2022 12:00:19 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D94E01E3E2;
-        Fri,  7 Oct 2022 09:00:17 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id n12so7916234wrp.10;
-        Fri, 07 Oct 2022 09:00:17 -0700 (PDT)
+        with ESMTP id S229525AbiJGQCZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Oct 2022 12:02:25 -0400
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25514356F3;
+        Fri,  7 Oct 2022 09:02:24 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id r13so7923299wrj.11;
+        Fri, 07 Oct 2022 09:02:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=eWhe/luQNtiek+MCh1Ji3sftnJRDLuDyTuqEnw5KB1Y=;
-        b=kYvkpJEZGPd8+VTgKqJW75WmXsItnXm/yLExbY4PKAUs3dQ83nWCE4EuMUIDorswrL
-         6HzflzGb/0Qw34TD0pf6aOVhFxAOqdbtNyypUHj3eXUqtHL3NLcdohMk9/agDFkYS3Sr
-         p6RpOktsZPhVYnwmbP64rfzrmTcS83RTZpEo5iqIHr1pD+3Hs58iH58bLwqURLNzdKf1
-         NgVUYkDlAK2tp/344Fg1k12xk8zCVvWuaKNzuFV8Vanh+8RWalsRcoh5uF7YMp1kUzcb
-         zsZzKmJM5VgY8xKqyNZV4pAxW7anfXdk7b0FzOqKXUoXNMGu9k48Tmt3kIip8VztOaHY
-         igfQ==
+        bh=po/oN5HFpqnBdAJFURXFvTa4T51++kEb3bw93327DOg=;
+        b=VhUskPVRTblLyWlpoS+ZID4TvpdluyglWYv31hMnzAA++21UVOjddsr6eyb2DG4fVV
+         jcpu76zifZfXTRu34hpjk9D6yzjvtBWlQYhFXK5OrMcdlDiGoezJKZqqf/TFn1nI6V+7
+         EIEtCuQRVn1TcwF+Dr2WN/utDuSA+LCgrOCleqe5KtRhf+fg6WpFYIayhEl86NqDyFSk
+         MmyudGCkY8i6s1UBRvTAq8HN48OoK+BCGU9SNQzvs1opQnbvNO3ioxwKksjz1XSdnpBs
+         X8S+FadySdYAo6x0bxA+zOxqj9cxvTn4swIe4dGyZPYi0HrlaLBpIEgIt7H6/4AMWzNe
+         guVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=eWhe/luQNtiek+MCh1Ji3sftnJRDLuDyTuqEnw5KB1Y=;
-        b=FhjX1EcbQTj6BdK2V9TD0wSR9frZzuy3DqIaqKWsTJcJgLVz52Ff4X457uo06HBN/W
-         usMF0FYUnYwwjUXGsJvj2Lgu6sSPKFl7vEPd/yjiAf6ThPpak1mWXb9qfxkag8oW74eO
-         K0xTeHBudzCzpDe24V4vuQKfXCNMKV9UYfV+yvjSNgkb6gNA29De2DvJquGU2cyERtZc
-         lZ+gg2O7u8UBFR5fn7SUhtJ8DT6fDrZYytPh2sVzyNVQqT+/7HeOsQ+5dgyp4KVcOzts
-         pkzA/34cIPyFlpFhfygGltPAo8c0ha3VIx33gwwzFp87vHHiybCmpQUx64H4LIGnBT+1
-         q2CA==
-X-Gm-Message-State: ACrzQf1JdNcTEir9g/i7iO9F/jdE64tIpIcN72QQqyCI/rZCDPE0r59y
-        dOQRE8R2+0YIzAgzavm61+U65fXsnByYmdNge52SA3g0EGUdHw==
-X-Google-Smtp-Source: AMsMyM6dnTT8G973h2mlbTXdQ3nGpdw/4AtFigxWff88BROQL/fagBC2j9bcIYEMEMUVo4JAoHPcToKjR0Up+fNSXpk=
-X-Received: by 2002:a5d:59a7:0:b0:22a:47e3:a1b with SMTP id
- p7-20020a5d59a7000000b0022a47e30a1bmr3647629wrr.319.1665158416381; Fri, 07
- Oct 2022 09:00:16 -0700 (PDT)
+        bh=po/oN5HFpqnBdAJFURXFvTa4T51++kEb3bw93327DOg=;
+        b=NZyyaskhKSft1LAdMrlz/qI8Wpk6uhO9/eMkjC21qfSOS7+84trbWjQ4L2GSMsjUX1
+         Z4U2muyBVBbMTnK08m2ISWQbuweQEjk2B5WSWAbuDEnbd54OAeMaSWoSAYFLxZYopcBC
+         wi8UIlQRnS5x4AvMsVKCgDWybE05lzf5CHA3vPba68WQIqOfpODgnGvEBh01Cij+b9gU
+         B6I3sR4GztCysMpwoGsTIKprbgM3UZU80KrI3SKDsfh2BsqoWpNKfBx3owBPgsIW/HB0
+         CRQPcnJMCjzHD57avVgICluEycU5vsEpas4ckv9mbxjtbv0mgl5SfnbOlaKprVOt/HHp
+         UqgA==
+X-Gm-Message-State: ACrzQf08h53NVynK5h+l9KQnCPyL8Atw9XUAGoCmUt4jsOpHXVQHsvmr
+        YDtvxTMPz8tGLx4qlSNywjTWImqUuWYhy8JphE0=
+X-Google-Smtp-Source: AMsMyM6mz1ONPhCHIkBRD9h6UegH5WOyFSdZp8vaXbryG6d7uSFqeWSoHH8ou3qFLctLd2jtzFVH0BK5wrE+oGVqE1I=
+X-Received: by 2002:a5d:6181:0:b0:22e:3db0:67a2 with SMTP id
+ j1-20020a5d6181000000b0022e3db067a2mr3841262wru.257.1665158542588; Fri, 07
+ Oct 2022 09:02:22 -0700 (PDT)
 MIME-Version: 1.0
 From:   Hao Peng <flyingpenghao@gmail.com>
-Date:   Fri, 7 Oct 2022 23:56:47 +0800
-Message-ID: <CAPm50a+gcug5XOsg_Z=7R+3j+VUxHMrzyGNbps7-okR625KB_w@mail.gmail.com>
-Subject: [PATCH] kvm: x86: Keep the lock order consistent
+Date:   Fri, 7 Oct 2022 23:58:53 +0800
+Message-ID: <CAPm50aK9oe-m5QWfrFjzGx_vvNveA+U6-Fs3KD5+Zq5RZ+UhDg@mail.gmail.com>
+Subject: [PATCH ] kvm: x86: Reduce unnecessary function call
 To:     pbonzini@redhat.com
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -64,41 +64,28 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Peng Hao <flyingpeng@tencent.com>
 
-srcu read side in critical section may sleep, so it should precede
-the read lock, while other paths such as kvm_xen_set_evtchn_fast
-execute srcu_read_lock before acquiring the read lock.
+kvm->lock is held very close to mutex_is_locked(kvm->lock).
+Do not need to call mutex_is_locked.
 
 Signed-off-by: Peng Hao <flyingpeng@tencent.com>
 ---
- arch/x86/kvm/xen.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ arch/x86/kvm/pmu.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 280cb5dc7341..fa6e54b13afb 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -965,8 +965,8 @@ static bool wait_pending_event(struct kvm_vcpu
-*vcpu, int nr_ports,
-        bool ret = true;
-        int idx, i;
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 02f9e4f245bd..8a7dbe2c469a 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -601,8 +601,7 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm
+*kvm, void __user *argp)
+        sort(&filter->events, filter->nevents, sizeof(__u64), cmp_u64, NULL);
 
--       read_lock_irqsave(&gpc->lock, flags);
-        idx = srcu_read_lock(&kvm->srcu);
-+       read_lock_irqsave(&gpc->lock, flags);
-        if (!kvm_gfn_to_pfn_cache_check(kvm, gpc, gpc->gpa, PAGE_SIZE))
-                goto out_rcu;
+        mutex_lock(&kvm->lock);
+-       filter = rcu_replace_pointer(kvm->arch.pmu_event_filter, filter,
+-                                    mutex_is_locked(&kvm->lock));
++       filter = rcu_replace_pointer(kvm->arch.pmu_event_filter, filter, 1);
+        mutex_unlock(&kvm->lock);
 
-@@ -987,9 +987,8 @@ static bool wait_pending_event(struct kvm_vcpu
-*vcpu, int nr_ports,
-        }
-
-  out_rcu:
--       srcu_read_unlock(&kvm->srcu, idx);
-        read_unlock_irqrestore(&gpc->lock, flags);
--
-+       srcu_read_unlock(&kvm->srcu, idx);
-        return ret;
- }
-
+        synchronize_srcu_expedited(&kvm->srcu);
 --
 2.27.0
