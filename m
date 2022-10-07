@@ -2,73 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B3CB5F7283
-	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 03:25:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C6845F728D
+	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 03:39:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231462AbiJGBXr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Oct 2022 21:23:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59256 "EHLO
+        id S231345AbiJGBjc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Oct 2022 21:39:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229782AbiJGBXp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Oct 2022 21:23:45 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C195C4C12
-        for <kvm@vger.kernel.org>; Thu,  6 Oct 2022 18:23:43 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id c24so3263048plo.3
-        for <kvm@vger.kernel.org>; Thu, 06 Oct 2022 18:23:43 -0700 (PDT)
+        with ESMTP id S230286AbiJGBjb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Oct 2022 21:39:31 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01544A4867
+        for <kvm@vger.kernel.org>; Thu,  6 Oct 2022 18:39:30 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id q9so3353204pgq.8
+        for <kvm@vger.kernel.org>; Thu, 06 Oct 2022 18:39:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=stxK5eytfi7UYuaTvPr6AF15rib5TqQ7VohLY8AETTo=;
-        b=BAMPgHgcFnz0m5pv8ALZ2vuDAV8Wc9woff48oOK4K3VMoOPH9YWc5vnpQ7Heyj2BBG
-         nErfRvGZFFrVBxkfN8+u3Skf3cCa62PrOw7iLZw5DPICoO1zvKaRXjGHEa+qKJZHKG3t
-         v6jrPuKfQbzGgsIL98V9SzitClNrxXtr5Gl7Sd71SrKOP7n2Rd9wK0KZVm6KQaVHa+jL
-         W4RdSyoaZbbXNRucpHlJ8Z9EtmwXiSNUZOncYy2CsQdKY2C1QH8456f9SnWskshsgZNT
-         uFOOkktZooPW0OQIjY9chxvRV0u/OC8K1zp8E3PO+lokUwafNUUGnxxbUIrlANr3bloM
-         GSLA==
+        bh=VgARxyE2xUeWs6ZD9Z2C3jeaxK0tUIpvYnHYcRwlYa0=;
+        b=cmiwTKlVBOkxVvMH61UVx2IAeAmk3ZEDhzuxfCr0BIqwMIV+vqVFL7sZMdwb6nq3Nh
+         2Bcg+SBwxvFYVst+PqWXNyfe2idtXvypWraJhg/j6Z7pR3sbeZjTISPtCjoT3Dkbp/qH
+         /KzItD6j0dJ+M0MaY/V+swyMEEqnTjkF599+5OCS+N6kVCUCqDFuyq1Y8NlrITHjp7AM
+         iy5axHPM2diZk42cMhqjf3zQk3R4qkKEAksrV0Ap+OHhoIClR1ru5yTvt2SwiFeBkyGc
+         LX00XEULTE0hbwkjxIDW/YZvpPRRJlm4BMoggtrYQ3QDCh964JHWavMxv8H1FOdW8ZBz
+         1RSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=stxK5eytfi7UYuaTvPr6AF15rib5TqQ7VohLY8AETTo=;
-        b=YFcn4ldKs6AcUUjwrnwYJsXJBzC65l3pA2swuVEmwhoMXzRYn/QlqVN3qMgBNNBJ2D
-         8vKnJTNFij5l7My+nNt38Ka7TMV3ppN+MzvX3Ry1cKOa242eM02Y7HBlC87+ZjRYa8mU
-         qmKH36Vvn/k4BOa8e2v68bnGhnpnDaM8whKk7GXdQBZZsC/6jHAqGOBuUL9h8PnIoLeD
-         zgTlr2HQdVNqIFK9jC2qMlDbUDhAAs6Mbl4AVIbEl0lC6F3f1VBTLPiDKVfloo2/inEj
-         1FscLiuNheZ3ci09+quznOHLYy8xirLmdNdBOACZ70+A8O/41oNkt2GvnnpsUxRsXojR
-         DNsw==
-X-Gm-Message-State: ACrzQf1dMbnmBhXnAC4GVgtooTXr0UcsFPL69Q9SmXCvXe3gN5OSStLM
-        TDG3XyfZf23HS8lw8v2sJRYYAQ==
-X-Google-Smtp-Source: AMsMyM4PWFE5pVw18NO2lbdt/TsjQ6FJS7+cij5WQtyZmovc7uLcrH3PCdFglUP7Tg7u6mRpJ23L7A==
-X-Received: by 2002:a17:90b:3d89:b0:20b:201e:9d with SMTP id pq9-20020a17090b3d8900b0020b201e009dmr3592539pjb.11.1665105823006;
-        Thu, 06 Oct 2022 18:23:43 -0700 (PDT)
+        bh=VgARxyE2xUeWs6ZD9Z2C3jeaxK0tUIpvYnHYcRwlYa0=;
+        b=XCsYE7+KbloOF9PKp9hVI+LWw2ImYC+EQm9Oq08lC9Gp6HKYXYuvZ4JgniQWnSyUlk
+         e3HivO5inetKKUnAuoa2Nt/wfaC4XSP9rpGaDlSzakmlFwoRgoFKFabBtWoH96tDZQMY
+         Mk66F3cY9N7d80eLIF6t9vXq2Z55vsjlEA17s1mm4P0ZrynHafknHn45sgnS3bb00iY6
+         bR8HAbd1PUsYoMzS+rh1PLdZnxnTr4oobrbAezcAYXk0gVAIASjqbpGWpXpFDoS9cVn1
+         urYYNqiMAjWrrO8JU3hQ/Q27srtivvDbi994Q7GWypycORfBe4/o8wXIGWd1l+on+PAr
+         +Qmg==
+X-Gm-Message-State: ACrzQf0D5RXBoXd04IBLvz+DXe7/jRuc+4gc/FUtXgm3ssmuXxtr1yVZ
+        ZZKbBmURIrSsr+YXO7pX14Z84A==
+X-Google-Smtp-Source: AMsMyM5ypW2SmqmuaCpoQm1fGL4m+5i4nzI1trKqT11hKBFIwEd60sTlRXe6/GS4KVSoZzMNTuKfTA==
+X-Received: by 2002:a05:6a00:1a44:b0:52a:ecd5:bbef with SMTP id h4-20020a056a001a4400b0052aecd5bbefmr2560094pfv.28.1665106769348;
+        Thu, 06 Oct 2022 18:39:29 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id k3-20020a632403000000b00439920bfcbdsm395764pgk.46.2022.10.06.18.22.30
+        by smtp.gmail.com with ESMTPSA id d6-20020a170902cec600b00176a715653dsm268651plg.145.2022.10.06.18.39.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Oct 2022 18:23:11 -0700 (PDT)
-Date:   Fri, 7 Oct 2022 01:22:26 +0000
+        Thu, 06 Oct 2022 18:39:25 -0700 (PDT)
+Date:   Fri, 7 Oct 2022 01:39:17 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Andrew Jones <andrew.jones@linux.dev>
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] KVM: selftests: Use TAP interface in the
- kvm_binary_stats_test
-Message-ID: <Yz9/UsWtYimt2T1D@google.com>
-References: <20221004093131.40392-1-thuth@redhat.com>
- <20221004093131.40392-2-thuth@redhat.com>
- <20221005083312.dnblbpe6wabspkzk@kamzik>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Linux MM Mailing List <linux-mm@kvack.org>,
+        John Hubbard <jhubbard@nvidia.com>
+Subject: Re: [PATCH v3 2/3] kvm: Add new pfn error KVM_PFN_ERR_SIGPENDING
+Message-ID: <Yz+DRTfdFGmSR7Mq@google.com>
+References: <20220817003614.58900-1-peterx@redhat.com>
+ <20220817003614.58900-3-peterx@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221005083312.dnblbpe6wabspkzk@kamzik>
+In-Reply-To: <20220817003614.58900-3-peterx@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,26 +78,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 05, 2022, Andrew Jones wrote:
-> On Tue, Oct 04, 2022 at 11:31:29AM +0200, Thomas Huth wrote:
-> > The kvm_binary_stats_test test currently does not have any output (unless
-> > one of the TEST_ASSERT statement fails), so it's hard to say for a user
-> > how far it did proceed already. Thus let's make this a little bit more
-> > user-friendly and include some TAP output via the kselftest.h interface.
-> 
-> I like the idea of switching the entire kvm selftests framework and all
-> tests to the ksft TAP interface. But, if we want to do that, then the
-> question is whether we should start by partially using it for some tests,
-> and then eventually switch over the framework, or whether we should try to
-> switch everything at once.
-> 
-> I think I prefer the latter, because without changing the framework we
-> can't provide full TAP anyway as TEST_ASSERT exits with 254 instead of 1
-> for a fail-exit and it doesn't output a final TAP test summary either.
+On Tue, Aug 16, 2022, Peter Xu wrote:
+> Since at it, renaming kvm_handle_bad_page to kvm_handle_error_pfn assuming
 
-I would much prefer the latter, e.g. with common entry/exit points[*], much of the
-boilerplate can be done once in common code.  I bet we could even figure out a way
-to have tests default to setting a plan of '1' so that simple tests don't need to
-care about TAP at all.
+Please put parantheses after function names, e.g. kvm_handle_bad_page().
 
-[*] https://lore.kernel.org/all/20220915000448.1674802-2-vannapurve@google.com
+> that'll match better with what it does, e.g. KVM_PFN_ERR_SIGPENDING is not
+> accurately a bad page but just one kind of errors.
+
+...
+
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 3e1317325e1f..23dc46da2f18 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3134,8 +3134,13 @@ static void kvm_send_hwpoison_signal(unsigned long address, struct task_struct *
+>  	send_sig_mceerr(BUS_MCEERR_AR, (void __user *)address, PAGE_SHIFT, tsk);
+>  }
+>  
+> -static int kvm_handle_bad_page(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
+> +static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
+>  {
+> +	if (is_sigpending_pfn(pfn)) {
+> +		kvm_handle_signal_exit(vcpu);
+> +		return -EINTR;
+> +	}
+
+...
+
+> @@ -2648,9 +2651,12 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool atomic, bool *async,
+>  	if (atomic)
+>  		return KVM_PFN_ERR_FAULT;
+>  
+> -	npages = hva_to_pfn_slow(addr, async, write_fault, writable, &pfn);
+> +	npages = hva_to_pfn_slow(addr, async, write_fault, interruptible,
+> +				 writable, &pfn);
+>  	if (npages == 1)
+>  		return pfn;
+> +	if (npages == -EINTR)
+> +		return KVM_PFN_ERR_SIGPENDING;
+
+This patch should be split into 3 parts:
+
+  1. Add KVM_PFN_ERR_SIGPENDING and the above code
+  2. Add the interruptible flag
+  3. Add handling in x86 and rename kvm_handle_bad_page()
+
+With #3 merged with patch 3.
+
+That was if there's oddball arch code that reacts poorly to KVM_PFN_ERR_SIGPENDING,
+those errors will bisect to #1.
+
+And if there's a typo in the plumbing, that bisects to #2.
+
+And if something goes sideways in x86, those bugs bisect to #3 (patch 3), and it's
+easy to revert just the x86 changes (though I can't imagine that's likely).
