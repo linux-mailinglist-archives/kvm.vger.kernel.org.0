@@ -2,205 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4901C5F79B2
-	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 16:32:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EA8555F79C7
+	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 16:37:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229616AbiJGOb6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Oct 2022 10:31:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44220 "EHLO
+        id S229696AbiJGOh1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Oct 2022 10:37:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbiJGObz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Oct 2022 10:31:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B7CFD0CE9
-        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 07:31:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1665153113;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HxEauzp9sdLUt/6pB/n85Z6ivdOEHoUl5EcYQVskSbw=;
-        b=QPDbsneq0ppUmH2OkK9SvcQPWHoXQuzPrtPOO50PUduDAhJsOH0SVEHn5DnWvuvNoa9UBH
-        R1DH8e+E89mc2qAhkw4oakDfDM0BHinS7PI6mW03WLXG0d6OA2XavjCxfg5tNjfocNEtXT
-        pMof/thycWiPC4QfceLkdB4zc/1yrp8=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-634-nNclD37CMEGupXq7xW98Cg-1; Fri, 07 Oct 2022 10:31:52 -0400
-X-MC-Unique: nNclD37CMEGupXq7xW98Cg-1
-Received: by mail-qk1-f200.google.com with SMTP id h8-20020a05620a284800b006b5c98f09fbso3915239qkp.21
-        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 07:31:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HxEauzp9sdLUt/6pB/n85Z6ivdOEHoUl5EcYQVskSbw=;
-        b=oP5z8Zp982SWgyHqLrGsn7JL6iSf9fmSORpg22TvjbdeKRISBGuZ6ldeOawmeqCBW/
-         bzTSeP5ozjvEN011JYcADxTfBDYGGIOFZR0jH84GvYvgw/5izM/RiFs0orBblyuJcqyb
-         aftHx+AhZYU+IATz2gLJllkxx2Lwsk/ZU5zYjyQyUNfrFWKiAsOcZE+ofWjp89hfF+rC
-         MI/zx0DHgE80u79UvLgyeTYJD+HNkS76NcZOK/qL6FKOYD/fdBchbsu+liwfIXNmyFe/
-         wNkd3pljnWXQPqNAlbwQ7shKl8TMLpGUquOD042dUIQ57nDPmSBW29rjJHyLc7LBYtBl
-         8iWQ==
-X-Gm-Message-State: ACrzQf1l2oMtaXZkYoytCzsOa+nFIS1RnTF4ojSwpiJJlBL0xdJGgQtH
-        e95X2xNOnklzj0wU+EM4dZKYiopfhuFEcMUbCnJU1ZKEtpIGMqKpV3hheFT3kKF3FgJ239Qq12a
-        ys8i7BzI8btjz
-X-Received: by 2002:a37:6942:0:b0:6cf:22d6:a887 with SMTP id e63-20020a376942000000b006cf22d6a887mr3863263qkc.0.1665153111879;
-        Fri, 07 Oct 2022 07:31:51 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7et6JpjguAseN/XDUanmE5zbkPsy7bnACNGzAbNBtnH2AIuFYJNa3uHlSqWN3/qSe+3ak+lg==
-X-Received: by 2002:a37:6942:0:b0:6cf:22d6:a887 with SMTP id e63-20020a376942000000b006cf22d6a887mr3863243qkc.0.1665153111617;
-        Fri, 07 Oct 2022 07:31:51 -0700 (PDT)
-Received: from x1n (bras-base-aurron9127w-grc-46-70-31-27-79.dsl.bell.ca. [70.31.27.79])
-        by smtp.gmail.com with ESMTPSA id bk5-20020a05620a1a0500b006af3f3b385csm2137607qkb.98.2022.10.07.07.31.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Oct 2022 07:31:50 -0700 (PDT)
-Date:   Fri, 7 Oct 2022 10:31:49 -0400
-From:   Peter Xu <peterx@redhat.com>
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com,
-        shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org,
-        dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com,
-        james.morse@arm.com, suzuki.poulose@arm.com,
-        alexandru.elisei@arm.com, oliver.upton@linux.dev,
-        seanjc@google.com, shan.gavin@gmail.com
-Subject: Re: [PATCH v5 3/7] KVM: x86: Allow to use bitmap in ring-based dirty
- page tracking
-Message-ID: <Y0A4VaSwllsSrVxT@x1n>
-References: <20221005004154.83502-1-gshan@redhat.com>
- <20221005004154.83502-4-gshan@redhat.com>
- <Yz86gEbNflDpC8As@x1n>
- <a5e291b9-e862-7c71-3617-1620d5a7d407@redhat.com>
+        with ESMTP id S229713AbiJGOhZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Oct 2022 10:37:25 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ECAAFBCF2
+        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 07:37:25 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 297EJASW019787;
+        Fri, 7 Oct 2022 14:37:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=O/jiiHVMXq4R6DLh/TIkMPxS3A5CB1+Na0xw1/5Cpx4=;
+ b=biK+3OiVbHsQYaxpSyud8u5v+7WCvkI/usk9ldtKBzijxA7fs9zVYw5orr4KZcq6KQck
+ t2EbM0PeV8BEv+8mXwIDOPuw3G3s0oZuu6Qq/WBbXsKBloThB0vamqswEOgoak/CWNYo
+ 34icOL8troKJo2/hRg9GQ3AtOoOSJEvkz5aY3RhX3J9JpsxVNbWY70wf36s3mHWWY+8s
+ ttjXUCtfTopmkPXKhR7VTB7WAnNrxbyP/KNtCknRQfzdchtNtifjVmbrUJa+CRMt7AKm
+ StNsAEHGoBST7y04nCHbv79+oa1GwrwydeWFgj3IvzKQ5ZZLG6I2EZ2iygKqY2nTwPi9 Kw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k2ns6rn8q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 07 Oct 2022 14:37:16 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 297EQH4B017906;
+        Fri, 7 Oct 2022 14:37:15 GMT
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k2ns6rn7r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 07 Oct 2022 14:37:15 +0000
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 297Eauh7017114;
+        Fri, 7 Oct 2022 14:37:14 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
+        by ppma04wdc.us.ibm.com with ESMTP id 3jxd6a9dpr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 07 Oct 2022 14:37:14 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com ([9.208.128.116])
+        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 297EbDjO9241132
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 7 Oct 2022 14:37:13 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3509058045;
+        Fri,  7 Oct 2022 14:37:13 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C4FBE58052;
+        Fri,  7 Oct 2022 14:37:11 +0000 (GMT)
+Received: from [9.160.126.121] (unknown [9.160.126.121])
+        by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Fri,  7 Oct 2022 14:37:11 +0000 (GMT)
+Message-ID: <b04ce2fd-2c68-7b0f-ec43-3f0c27d35c0e@linux.ibm.com>
+Date:   Fri, 7 Oct 2022 10:37:11 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a5e291b9-e862-7c71-3617-1620d5a7d407@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [PATCH 0/3] Allow the group FD to remain open when unplugging a
+ device
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Qian Cai <cai@lca.pw>, Eric Farman <farman@linux.ibm.com>,
+        Joerg Roedel <jroedel@suse.de>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        Yi Liu <yi.l.liu@intel.com>
+References: <0-v1-90bf0950c42c+39-vfio_group_disassociate_jgg@nvidia.com>
+ <20221006135315.3270b735.alex.williamson@redhat.com>
+ <Yz9Z3um1HQHnEGVv@nvidia.com>
+ <2a61068b-3645-27d0-5fae-65a6e1113a8d@linux.ibm.com>
+ <Y0ArhhCOXEYQMC1q@nvidia.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <Y0ArhhCOXEYQMC1q@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Psptuq6elkjobD31W74qVp_Hj1c2aeIV
+X-Proofpoint-GUID: U_x8CNaHzk9mDh3gjgwLASuT8XcudWre
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-10-06_05,2022-10-07_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 clxscore=1015 phishscore=0 spamscore=0 lowpriorityscore=0
+ priorityscore=1501 malwarescore=0 mlxlogscore=880 adultscore=0 bulkscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210070087
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 07, 2022 at 07:38:19AM +0800, Gavin Shan wrote:
-> Hi Peter,
-
-Hi, Gavin,
-
+On 10/7/22 9:37 AM, Jason Gunthorpe wrote:
+> On Thu, Oct 06, 2022 at 07:28:53PM -0400, Matthew Rosato wrote:
 > 
-> On 10/7/22 4:28 AM, Peter Xu wrote:
-> > On Wed, Oct 05, 2022 at 08:41:50AM +0800, Gavin Shan wrote:
-> > > -8.29 KVM_CAP_DIRTY_LOG_RING/KVM_CAP_DIRTY_LOG_RING_ACQ_REL
-> > > -----------------------------------------------------------
-> > > +8.29 KVM_CAP_DIRTY_LOG_{RING, RING_ACQ_REL, RING_ALLOW_BITMAP}
-> > > +--------------------------------------------------------------
-> > 
-> > Shall we make it a standalone cap, just to rely on DIRTY_RING[_ACQ_REL]
-> > being enabled first, instead of making the three caps at the same level?
-> > 
-> > E.g. we can skip creating bitmap for DIRTY_RING[_ACQ_REL] && !_ALLOW_BITMAP
-> > (x86).
-> > 
+>>> Oh, I'm surprised the s390 testing didn't hit this!!
+>>
+>> Huh, me too, at least eventually - I think it's because we aren't
+>> pinning everything upfront but rather on-demand so the missing the
+>> type1 release / vfio_iommu_unmap_unpin_all wouldn't be so obvious.
+>> I definitely did multiple VM (re)starts and hot (un)plugs.  But
+>> while my test workloads did some I/O, the long-running one was
+>> focused on the plug/unplug scenarios to recreate the initial issue
+>> so the I/O (and thus pinning) done would have been minimal.
 > 
-> Both KVM_CAP_DIRTY_LOG_RING and KVM_CAP_DIRTY_LONG_RING_ACQ_REL are available
-> to x86. So KVM_CAP_DIRTY_LONG_RING_ACQ_REL can be enabled on x86 in theory.
-> However, the idea to disallow bitmap for KVM_CAP_DIRTY_LOG_RING (x86) makes
-> sense to me. I think you may be suggesting something like below.
+> That explains ccw/ap a bit but for PCI the iommu ownership wasn't
+> released so it becomes impossible to re-attach a container to the
+> group. eg a 2nd VM can never be started
 > 
-> - bool struct kvm::dirty_ring_allow_bitmap
+> Ah well, thanks!
 > 
-> - In kvm_vm_ioctl_enable_dirty_log_ring(), set 'dirty_ring_allow_bitmap' to
->   true when the capability is KVM_CAP_DIRTY_LONG_RING_ACQ_REL
+> Jason
 
-What I wanted to do is to decouple the ACQ_REL with ALLOW_BITMAP, so mostly
-as what you suggested, except..
+Well, this bugged me enough that I traced the v1 series without fixup and vfio-pci on s390 was OK because it was still calling detach_container on vm shutdown via this chain:
 
-> 
->   static int kvm_vm_ioctl_enable_dirty_log_ring(struct kvm *kvm, u32 cap, u32 size)
->   {
->     :
->     mutex_lock(&kvm->lock);
-> 
->     if (kvm->created_vcpus) {
->        /* We don't allow to change this value after vcpu created */
->        r = -EINVAL;
->     } else {
->        kvm->dirty_ring_size = size;
+vfio_pci_remove
+ vfio_pci_core_unregister_device
+  vfio_unregister_group_dev
+   vfio_device_remove_group
+    vfio_group_detach_container
 
-.. here I'd not set dirty_ring_allow_bitmap at all so I'd drop below line,
-instead..
-
->        kvm->dirty_ring_allow_bitmap = (cap == KVM_CAP_DIRTY_LOG_RING_ACQ_REL);
->        r = 0;
->     }
-> 
->     mutex_unlock(&kvm->lock);
->     return r;
->   }
-> - In kvm_vm_ioctl_check_extension_generic(), KVM_CAP_DIRTY_LOG_RING_ALLOW_BITMAP
->   is always flase until KVM_CAP_DIRTY_LOG_RING_ACQ_REL is enabled.
-> 
->   static long kvm_vm_ioctl_check_extension_generic(...)
->   {
->     :
->     case KVM_CAP_DIRTY_LOG_RING_ALLOW_BITMAP:
->         return kvm->dirty_ring_allow_bitmap ? 1 : 0;
-
-... here we always return 1, OTOH in kvm_vm_ioctl_enable_cap_generic():
-
-      case KVM_CAP_DIRTY_LOG_RING_ALLOW_BITMAP:
-           if (kvm->dirty_ring_size)
-                return -EINVAL;
-           kvm->dirty_ring_allow_bitmap = true;
-           return 0;
-
-A side effect of checking dirty_ring_size is then we'll be sure to have no
-vcpu created too.  Maybe we should also check no memslot created to make
-sure the bitmaps are not created.
-
-Then if the userspace wants to use the bitmap altogether with the ring, it
-needs to first detect KVM_CAP_DIRTY_LOG_RING_ALLOW_BITMAP and enable it
-before it enables KVM_CAP_DIRTY_LOG_RING.
-
-One trick on ALLOW_BITMAP is in mark_page_dirty_in_slot() - after we allow
-!vcpu case we'll need to make sure it won't accidentally try to set bitmap
-for !ALLOW_BITMAP, because in that case the bitmap pointer is NULL so
-set_bit_le() will directly crash the kernel.
-
-We could keep the old flavor of having a WARN_ON_ONCE(!vcpu &&
-!ALLOW_BITMAP) then return, but since now the userspace can easily trigger
-this (e.g. on ARM, a malicious userapp can have DIRTY_RING &&
-!ALLOW_BITMAP, then it can simply trigger the gic ioctl to trigger host
-warning), I think the better approach is we can kill the process in that
-case.  Not sure whether there's anything better we can do.
-
->   }
-> 
-> - The suggested dirty_ring_exclusive() is used.
-> 
-> > > @@ -2060,10 +2060,6 @@ int kvm_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log,
-> > >   	unsigned long n;
-> > >   	unsigned long any = 0;
-> > > -	/* Dirty ring tracking is exclusive to dirty log tracking */
-> > > -	if (kvm->dirty_ring_size)
-> > > -		return -ENXIO;
-> > 
-> > Then we can also have one dirty_ring_exclusive(), with something like:
-> > 
-> > bool dirty_ring_exclusive(struct kvm *kvm)
-> > {
-> >          return kvm->dirty_ring_size && !kvm->dirty_ring_allow_bitmap;
-> > }
-> > 
-> > Does it make sense?  Thanks,
-> > 
-> 
-> Thanks,
-> Gavin
-> 
-
--- 
-Peter Xu
-
+I'd guess non-s390 vfio-pci would do the same.  Alex also had the mtty mdev, maybe that's relevant.
