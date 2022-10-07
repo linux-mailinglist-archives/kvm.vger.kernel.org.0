@@ -2,63 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E4B55F7F71
-	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 23:07:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 96B355F7F7B
+	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 23:09:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229817AbiJGVH3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Oct 2022 17:07:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44938 "EHLO
+        id S229845AbiJGVJz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Oct 2022 17:09:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229517AbiJGVH2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Oct 2022 17:07:28 -0400
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3572275CD
-        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 14:07:27 -0700 (PDT)
-Received: by mail-yb1-xb33.google.com with SMTP id 207so7116240ybn.1
-        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 14:07:27 -0700 (PDT)
+        with ESMTP id S229517AbiJGVJx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Oct 2022 17:09:53 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0642B1FCDE
+        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 14:09:50 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id q9so5666026pgq.8
+        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 14:09:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=y+w+UZ+1knR1/g5ltwOgnrO6wBkZ5WkRRMZI6pICUDM=;
-        b=F8SluGgjtBH1353QWyAg2iPDBYHa3skTGIjYwSvHtm/YmlqPYKVTefNGuN5hu4NC77
-         K9awj8C3IWo9vqh4fqlq3yDsh2Hqsce3euAWeVPLs/PkmyDXXCbMvdVx4WNpsW80xhFU
-         AWCzR5XRVFPJykKU8FbqpcAOtEsS+/PKBa5juAkcXC6NzM0I45/indD0ljvfXMB9jxUH
-         em6bGZBfxwQw0opEpkqocJbhU+dPdV9K6MpO7eP0RmmiH/S9p/FpENlMNfl7bDWoKWQY
-         uy/u+FPstxEFhOdXBHIwowhXQM8aOHYp55hi2HrB5s1aFcWNl+Od5vCuGcwVH9iZx2jU
-         YskA==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=W3sI1hYHI9mcWHNfC1WlecDK11RvAjlbSmMyVDeq0UQ=;
+        b=Z4DK/fcphuDBF+c0XkgcD/1BXjnyCcnEVHox11j8IccglcEhzq1pDGlLGgVJlRqTo2
+         Kgrovlm9VNCsVkJEOAnh3TxvVhWLsObobn3X9naQvzuitsTQaORvduQmiqDDKsYHjst5
+         iqmKAMnAGlsevjHyAkk735hfjrA/9sZ+uy/a96nOzW4Vpt05/YI0dZQAR1HQwNtMDtED
+         0rgqdOHdJGkCcpAkGKbZwTXgS+6tJEwPGev//fNbyncLJNVtrpLLMYiJ1gzWA0m31ilQ
+         Z4qLaX9tFm0nbVwhbVovibZyWsX9BiRVkvPMxkrgi5YXQ2wmrsaBb7bsTBYd2XuhYGNC
+         3B/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=y+w+UZ+1knR1/g5ltwOgnrO6wBkZ5WkRRMZI6pICUDM=;
-        b=wSY6UfOtLdZ6S3mXcVFcuDIsAqwFZpyK32GW6fcl+ZdKBCRb3Uq1TJSPOFCIlqZN5u
-         ISPVeSLySCWO7eQL2bgjcr1ebIjxM/DWqgnpNeysjoCn33P2cIL6xf8j770nwA/Qr/JK
-         y99oX+ykagv2RidkAfCg21m4jXEaO3M7XHD6hobWakNUPmsIdFd5ySGV5NKghhfjX5hy
-         jSDJIjFkxT/s9qwnQAaFnljr7bW2W+b5F+FUyGJNgHrF9WV6JwxKpLCADB+6X/OwGluE
-         evh6sFRFxD4VDwYOK1fw2KjUP+wFHvY3ag3K7xUhgy9jRppmUQ3SsBEBGQWNgUjSyn1F
-         BTgA==
-X-Gm-Message-State: ACrzQf1+7ZhRL8g9KOCPJQyPfUAWLUb4vr3GZR5/bk0Bhy/G2H4H7/Q/
-        av6a1GoFndmI3d1yIWEtTmIhhNTrDFb9kCj2sle6sw==
-X-Google-Smtp-Source: AMsMyM6BlsmpkFAJDQv0f0xfJJx74IuadWGBU/wThujFa3XoPLbJrObr2QElA6zL0w07hq5fnOP6Y+UMEf1YvjB5i3k=
-X-Received: by 2002:a25:d457:0:b0:6bc:92dd:9462 with SMTP id
- m84-20020a25d457000000b006bc92dd9462mr6818617ybf.326.1665176846906; Fri, 07
- Oct 2022 14:07:26 -0700 (PDT)
-MIME-Version: 1.0
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W3sI1hYHI9mcWHNfC1WlecDK11RvAjlbSmMyVDeq0UQ=;
+        b=Vb6jZ55DBVrl1fixwqLaByWNy1jN3MYvP8AQk97/XJkumu9Aif+3AKKQkd1isI0xl2
+         +N9rFqwiWrPqwP2rAdvl7EhsNBLuPS3b0lQWK+wRD28MCzLI3vVxIDayDSksavp/bn1r
+         8yyw4AeLRI53TYOx9xcGLl4jRE7z0Bs6+ElOBYeQVyGIEH7vnlQhce1MbeN9wnZ2u10t
+         yIR9sfQ+eyH1reeJfsOQIhk6LqxvOtQSAeN4A5xNKHPs1z1DEJD+NSdc7kkiGuSTZBL7
+         jZWS1lGb8OCqG7n4Lu1liyez6fQh48LAkKO7GwmHypfJGd5kKQ1N2aj0I33RJEwH8R5E
+         a6lA==
+X-Gm-Message-State: ACrzQf3S0FiYXujGOX30ICTUKdK2fg9n8mIS9myGU0NRZ8YNkWLKfk6a
+        S1noOPdSIZMcm/ca6XSzWxFKHw==
+X-Google-Smtp-Source: AMsMyM6uwb5CEHlO0vCxfnFaXX4JZsU+3ECCLHQEBvgdJ8+qaQ2NQtly5dadxtjlkz3XPCzUnsJHxQ==
+X-Received: by 2002:a63:581d:0:b0:42b:399:f15a with SMTP id m29-20020a63581d000000b0042b0399f15amr6166377pgb.337.1665176989202;
+        Fri, 07 Oct 2022 14:09:49 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id y198-20020a62cecf000000b005627868e27esm2022405pfg.127.2022.10.07.14.09.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Oct 2022 14:09:48 -0700 (PDT)
+Date:   Fri, 7 Oct 2022 21:09:45 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        dmatlack@google.com, oupton@google.com, ricarkol@google.com,
+        andrew.jones@linux.dev
+Subject: Re: [PATCH v6 3/3] KVM: selftests: randomize page access order
+Message-ID: <Y0CVmS9rydRbdFkN@google.com>
 References: <20220912195849.3989707-1-coltonlewis@google.com>
- <20220912195849.3989707-3-coltonlewis@google.com> <Y0CSOKOq0T48e0yr@google.com>
-In-Reply-To: <Y0CSOKOq0T48e0yr@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Fri, 7 Oct 2022 14:07:00 -0700
-Message-ID: <CALzav=eJ9F9-MaYehBUMU96_O825OpZqB72=9is3BDi24WL=Vw@mail.gmail.com>
-Subject: Re: [PATCH v6 2/3] KVM: selftests: randomize which pages are written
- vs read
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
-        ricarkol@google.com, andrew.jones@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+ <20220912195849.3989707-4-coltonlewis@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220912195849.3989707-4-coltonlewis@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -70,24 +73,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 7, 2022 at 1:55 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, Sep 12, 2022, Colton Lewis wrote:
-> > @@ -393,7 +403,7 @@ int main(int argc, char *argv[])
-> >
-> >       guest_modes_append_default();
-> >
-> > -     while ((opt = getopt(argc, argv, "ghi:p:m:nb:f:v:or:s:x:")) != -1) {
-> > +     while ((opt = getopt(argc, argv, "ghi:p:m:nb:v:or:s:x:w:")) != -1) {
->
-> This string is getting quite annoying to maintain, e.g. all of these patches
-> conflict with recent upstream changes, and IIRC will conflict again with Vipin's
-> changes.  AFAICT, the string passed to getopt() doesn't need to be constant, i.e.
-> can be built programmatically.  Not in this series, but as future cleanup we should
-> at least consider a way to make this slightly less painful to maintain.
+On Mon, Sep 12, 2022, Colton Lewis wrote:
+> @@ -57,7 +58,17 @@ void perf_test_guest_code(uint32_t vcpu_id)
+>  
+>  	while (true) {
+>  		for (i = 0; i < pages; i++) {
+> -			uint64_t addr = gva + (i * pta->guest_page_size);
+> +			guest_random(&rand);
+> +
+> +			if (pta->random_access)
+> +				addr = gva + ((rand % pages) * pta->guest_page_size);
 
-I have aspirations to consolidate all the memstress (perf_test_util)
-option handling within memstress.c, rather than duplicating it across
-all tests. That will help cut down the length of the test-specific
-option string (although I haven't found a super clean way to do it
-yet).
+Shouldn't this use a 64-bit random number since "pages" is a 64-bit value?  Ha!
+And another case where the RNG APIs can help, e.g.
+
+  uint64_t __random_u64(struct ksft_pseudo_rng *rng, uint64_t max);
+
+or maybe avoid naming pain and go straight to:
+
+
+  uint64_t __random_u64(struct ksft_pseudo_rng *rng, uint64_t min, uint64_t max);
+
+> +			else
+> +				addr = gva + (i * pta->guest_page_size);
+
+Since the calculation is the same, only the page index changes, I think it makes
+sense to write this as:
+
+			uint64_t idx = i;
+
+			if (pta->random_access)
+				idx = __random_u64(rng, 0, pages);
+
+			addr = gva + (idx * pta->guest_page_size);
+
+That way it's easy to introduce other access patterns.
+
+> +
+> +			/*
+> +			 * Use a new random number here so read/write
+> +			 * is not tied to the address used.
+> +			 */
+>  			guest_random(&rand);
+
+Ya, I'm trippling (quadrupling?) down on my suggestion to improve the APIs.  Users
+should not be able to screw up like this, i.e. shouldn't need comments to warn
+readers, and adding another call to get a random number shouldn't affect unrelated
+code.
