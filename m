@@ -2,79 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E3875F7D37
-	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 20:18:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35C5A5F7D55
+	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 20:29:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229682AbiJGSSK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Oct 2022 14:18:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35214 "EHLO
+        id S229590AbiJGS3m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Oct 2022 14:29:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229672AbiJGSSI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Oct 2022 14:18:08 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 227D126574
-        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 11:18:08 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id r18so5300525pgr.12
-        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 11:18:08 -0700 (PDT)
+        with ESMTP id S229450AbiJGS3l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Oct 2022 14:29:41 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8F1BA476
+        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 11:29:39 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id t12-20020a17090a3b4c00b0020b04251529so5394214pjf.5
+        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 11:29:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=rbzY++VZG96j0Hd8AXi9sVXtcLS0lWu2CqEOVd7OTdI=;
-        b=cCEBACQfUwmnL+1g1Hw/Hc6dcqslD0evh7EG/OqpUooecgRO1Sl758lPtUQUn7SHm4
-         wi4ZSgWkXz2ZSTvTY5fFR88tubJQ5x1/BWgYcrMQDTPAeZG4s5Sgo8zB0+h8yBLMfFh7
-         SzlO5nUKt07KjVBli1sEQzCOuxWu43pNgH1SEIP7eFKyYuV9iqQWSCX6P3Gv36EHqB3e
-         8++TM8gR0LhwS1lyBUN/YX8g1sBbpcAqrSulRRAlbAeKSh82Rd9pSKX/9s3BwOms+kYi
-         77zBNaFapIvEICfj6uPGWlPgrxgqfys4LkeWul+obhvhe2HOHxCcWJkFhnAD5X31XLH4
-         lHrA==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IDSEynMZHmcuL+ncJipcoWaMqhLdNoCSxw7KjmZTzP8=;
+        b=XRf/i10zTpRN2dBogv4zp51ORN2zGxrgKetdNozVqorX5fQDBQIy9wotA8vIbY+/2A
+         19r1kWw0GbjvPbcoNxBVfKLEsGV9RRfnb/scJ/C4OKxks3Y2YBVE261Ha7aR/+Wv2Et6
+         grZe1JKMYQB6x3nbBBtRtUNgv6zeIWYeNFosM75Cr8u0xjD9Izi3FtnL3CQLXa9ojUdX
+         uMOMrJxvNa7/vz2/WS2ZTS9Ltiw9EA7FTqyFOo7b3lD988IONhOaZkb+iYnpAo0Wjn4Q
+         LZ3Kyd+qx0T4JqUPpBgaK2C6aQhCfLnHeyNvjyNw1+4Aa+7H+2pgqNUof/ghGuPqqsTU
+         FmLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rbzY++VZG96j0Hd8AXi9sVXtcLS0lWu2CqEOVd7OTdI=;
-        b=kGRtOvE8Ov6QRqRrkxYv9R7GkSLqicRRDMIKdP7mxMXcG07yqb6tMKIcdgaH+dezOy
-         bOBg8NaaMlvx9NgTOiqsQrndYRPKrd78zV8ubFOpv4G2Wl+hGSNi9wfjrK+MyzfYPu6h
-         uaYqSaCtftg/63Wk/3AJGDGjwmkss30BHUKHJw3qci2USCAlX7CmFPag/vTs9wKdeQ4x
-         9XhFbdcx7uQQhUHoMGf+rG8ukMhYn5G1ZnuiplWXR2v0Lb+WSpCRiJ8Skxc/FmNNOcGJ
-         0Az9aAR/0djM488GYhLyjTFk82x2R1jg6EN5rvb3IeRaEAgT4r/mAE29RdbLDFGrPope
-         oYJQ==
-X-Gm-Message-State: ACrzQf1P3Y67gdwNMw94eFKtKDcyrGTrdYEKJhgt5NtRXstnGKFMS2Wc
-        3j9J2nJ3L+zXIxleLn2r43vVrQ==
-X-Google-Smtp-Source: AMsMyM7IWARJQIWSfMqjtiin2WCtyol4l1wsnURpXb5aeF2XD/JNYRfBiFUvNe4j5Wp/CTtRcJPK2Q==
-X-Received: by 2002:a63:8b44:0:b0:45f:952f:c426 with SMTP id j65-20020a638b44000000b0045f952fc426mr1708246pge.623.1665166687444;
-        Fri, 07 Oct 2022 11:18:07 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IDSEynMZHmcuL+ncJipcoWaMqhLdNoCSxw7KjmZTzP8=;
+        b=OxDRo4rzXSXnMXoVYMg2FQd7MfRt0sFP4emoXCLYEeaquyfgZrr7zuCGK7cQUUY8cW
+         aR/gWm3iqp0SQV5atYm4zu/DnMnW2Y9emd9RJvwaJIDHF5yyc7/10IRjrF+v2jzMpJe5
+         v+mpcfA/ft7XfoAKRYn1jjuSGnkc3myDTvRqFQsiRboMh6xl2aX5nZ4ujDSVLMrXDBQU
+         bdGtsHTTtKKTKh00usU+2fKgoP8tHo2dC5Umyhyy2kjiBPYMjmAIhlq/pjc6fjmHAuqB
+         i5b23zTYlciNX6PWscnFEAkGpfYOamsZgbV0HzJF9/+fBlzq+M/n4901vVqWRqtbbynQ
+         Brtw==
+X-Gm-Message-State: ACrzQf3A8hJVPj8WHZPi6xaAApSbml3GZoQ1Xmzgu46YpAJFKEshIDd5
+        hfJ0o0KQqpOiOI30cJROKpqhLw==
+X-Google-Smtp-Source: AMsMyM584F1xxNe3o/JNlIYxqdaN9jR9ovKh0w0rymYK/XdfGrlq+YwcxwQ5qX5k20T/eMJA4hVrig==
+X-Received: by 2002:a17:90b:33d2:b0:20c:64e2:2ba6 with SMTP id lk18-20020a17090b33d200b0020c64e22ba6mr708561pjb.137.1665167379129;
+        Fri, 07 Oct 2022 11:29:39 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id e88-20020a17090a6fe100b00205d85cfb30sm4956147pjk.20.2022.10.07.11.18.06
+        by smtp.gmail.com with ESMTPSA id a1-20020a170902710100b0017d12d86901sm1792066pll.187.2022.10.07.11.29.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Oct 2022 11:18:06 -0700 (PDT)
-Date:   Fri, 7 Oct 2022 18:18:02 +0000
+        Fri, 07 Oct 2022 11:29:37 -0700 (PDT)
+Date:   Fri, 7 Oct 2022 18:29:33 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc:     Shivam Kumar <shivam.kumar1@nutanix.com>, pbonzini@redhat.com,
-        maz@kernel.org, james.morse@arm.com, david@redhat.com,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>
+Cc:     pbonzini@redhat.com, maz@kernel.org, james.morse@arm.com,
+        borntraeger@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org,
         Shaju Abraham <shaju.abraham@nutanix.com>,
         Manish Mishra <manish.mishra@nutanix.com>,
-        Anurag Madnawat <anurag.madnawat@nutanix.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Subject: Re: [PATCH v6 1/5] KVM: Implement dirty quota-based throttling of
- vcpus
-Message-ID: <Y0BtWixstpm/fFlE@google.com>
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v6 5/5] KVM: selftests: Add selftests for dirty quota
+ throttling
+Message-ID: <Y0BwDSIqPYCZZACm@google.com>
 References: <20220915101049.187325-1-shivam.kumar1@nutanix.com>
- <20220915101049.187325-2-shivam.kumar1@nutanix.com>
- <a63becdf-18d7-25f1-9070-209dbc008add@linux.ibm.com>
- <52ad1240-1201-259a-80d0-6e05da561a7f@linux.ibm.com>
+ <20220915101049.187325-6-shivam.kumar1@nutanix.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <52ad1240-1201-259a-80d0-6e05da561a7f@linux.ibm.com>
+In-Reply-To: <20220915101049.187325-6-shivam.kumar1@nutanix.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -86,25 +76,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 15, 2022, Christian Borntraeger wrote:
-> Am 15.09.22 um 15:21 schrieb Christian Borntraeger:
-> > I am wondering if this will work on s390. On s390  we only call
-> > mark_page_dirty_in_slot for the kvm_read/write functions but not
-> > for those done by the guest on fault. We do account those lazily in
-> > kvm_arch_sync_dirty_log (like x96 in the past).
-> > 
+On Thu, Sep 15, 2022, Shivam Kumar wrote:
+>  #endif /* SELFTEST_KVM_UTIL_BASE_H */
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 9889fe0d8919..4c7bd9807d0b 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -18,6 +18,7 @@
+>  #include <linux/kernel.h>
+>  
+>  #define KVM_UTIL_MIN_PFN	2
+> +#define PML_BUFFER_SIZE	512
+
+...
+
+> +	/*
+> +	 * Due to PML, number of pages dirtied by the vcpu can exceed its dirty
+> +	 * quota by PML buffer size.
+> +	 */
+
+Buffering for PML is very Intel centric, and even then it's not guaranteed.  In
+x86, PML can and should be detected programmatically:
+
+bool kvm_is_pml_enabled(void)
+{
+	return is_intel_cpu() && get_kvm_intel_param_bool("pml");
+}
+
+
+Not sure if it's worth a generic arch hook to get the CPU buffer size, e.g. the
+test could do:
+
+
+	/*
+	 * Allow ??? pages of overrun, KVM is allowed to dirty multiple pages
+	 * before exiting to userspace, e.g. when emulating an instruction that
+	 * performs multiple memory accesses.
+	 */
+	uint64_t buffer = ???;
+
+	/*
+	 * When Intel's Page-Modification Logging (PML) is enabled, the CPU may
+	 * dirty up to 512 pages (number of entries in the PML buffer) without
+	 * exiting, thus KVM may effectively dirty that many pages before
+	 * enforcing the dirty quota.
+	 */
+#ifdef __x86_64__
+	if (kvm_is_pml_enabled(void)
+		buffer = PML_BUFFER_SIZE;
+#endif
+	
+
+> +	TEST_ASSERT(count <= quota + PML_BUFFER_SIZE, "Invalid number of pages
+
+Clarify _why_ the count is invalid.
+
+> +		dirtied: count=%"PRIu64", quota=%"PRIu64"\n", count, quota);
+
+Don't split strings unless it's truly necessary.  This is one of those cases where
+running over the 80 char soft limit is preferable to wrapping.  And no need to use
+PRIu64, selftests are 64-bit only.  E.g.
+
+	TEST_ASSERT(count <= (quota + buffer),
+		    "KVM dirtied too many pages: count = %lx, quota = %lx, buffer = %lx",
+		    count, quota, buffer);
+
+
+> +
+> +	TEST_ASSERT(count >= quota, "Dirty quota exit happened with quota yet to
+> +		be exhausted: count=%"PRIu64", quota=%"PRIu64"\n", count, quota);
+
+Similar comments here.
+
+> +
+> +	if (count > quota)
+> +		pr_info("Dirty quota exit with unequal quota and count:
+> +			count=%"PRIu64", quota=%"PRIu64"\n", count, quota);
+
+Not sure I'd bother with this.  Realistically, is anyone ever going to be able to
+do anything useful with this information?  E.g. is this just going to be a "PML is
+enabled!" message?
+
+> +
+> +	run->dirty_quota = count + test_dirty_quota_increment;
+> +}
+> -- 
+> 2.22.3
 > 
-> I think we need to rework the page fault handling on s390 to actually make
-> use of this. This has to happen anyway somewhen (as indicated by the guest
-> enter/exit rework from Mark). Right now we handle KVM page faults directly
-> in the normal system fault handler. It seems we need to make a side turn
-> into KVM for page faults on guests in the long run.
-
-s390's page table management came up in conversation at KVM Forum in the context
-of a common MMU (or MMUs)[*].  If/when we get an MMU that supports multiple
-architectures, that would be a perfect opportunity for s390 to switch.  I don't
-know that it'll be feasible to make a common MMU support s390 from the get-go,
-but at the very least we can keep y'all in the loop and not make it unnecessarily
-difficult to support s390.
-
-[*] https://kvmforum2022.sched.com/event/15jJk
