@@ -2,139 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 74F895F8052
-	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 23:54:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 821865F805C
+	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 23:58:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229691AbiJGVyl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Oct 2022 17:54:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36170 "EHLO
+        id S229734AbiJGV6H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Oct 2022 17:58:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiJGVyj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Oct 2022 17:54:39 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8292FCD3;
-        Fri,  7 Oct 2022 14:54:35 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1D4E061DF3;
-        Fri,  7 Oct 2022 21:54:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8B8EC433C1;
-        Fri,  7 Oct 2022 21:54:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665179674;
-        bh=G2Bpq4X4c8Ld9teic5MSWuwfYmtsWLlVtQM7SvLz7EM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=NJdWRQVjYLReY1JTMnenjvtgVCZt4egbIwOAesAgJ0c5LRyiJ6FS2Is1wil1ZXdTz
-         AJ1kwpOlrcj05wS26ZoEzT3/8h530P4CX+wFcr9u1OEiqHvLE+PC7ho2e7GJFdEUru
-         7tzvwEpp+KSGnrXLeNvlQNkIzXs14GKQ2UEf9fckV+owFuT9iIYNbE89lYFrF4/9i6
-         RXxYXRFq8nqmJMmmQd4o6QJMRj+U707HR9qwU7r4/1xjmo4p6qYx/RPgcl8VWzrfqq
-         vMBKtC9AalFy4+WmipyZkd+XoDdrkbKg+xypPSWQwhnm8oQlSaLdzQoYjHHrShp+pT
-         +BMOJNADjwkmA==
-Date:   Sat, 8 Oct 2022 00:54:28 +0300
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: Re: [PATCH v8 2/8] KVM: Extend the memslot to support fd-based
- private memory
-Message-ID: <Y0CgFIq6JnHmdWrL@kernel.org>
-References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
- <20220915142913.2213336-3-chao.p.peng@linux.intel.com>
- <Yz7s+JIexAHJm5dc@kernel.org>
- <Yz7vHXZmU3EpmI0j@kernel.org>
- <Yz71ogila0mSHxxJ@google.com>
- <Y0AJ++m/TxoscOZg@kernel.org>
- <Y0A+rogB6TRDtbyE@google.com>
+        with ESMTP id S229540AbiJGV6G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Oct 2022 17:58:06 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0AB112791B
+        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 14:58:03 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id h13so4586770pfr.7
+        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 14:58:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=brNBXr+8/wzZA+nIy3egINBkzFrPq5ruF6R05GO6Hrg=;
+        b=RUGA2S7sdUtmxjzn27zRSKLTchu19o/wBZ+twIGuoBNaeqkIBV8KlGGpurJN7KVe9D
+         A08AAzMvMG4pshxlFQLnZyJX/mDOkxeKZdJASytXQwCamw46VWmxt+RPxDGe5sNiPV1v
+         aWqhbk/GgBpUfNd0f6M+WtpRaKiUDfLFlhGma6HCMAFIUtL2ougz5TsVV/s89HCvMmKY
+         I8mk705OQv+XJKSG5NA0DAM/T2hABEFLCoFg8B2NA+i1RYm+0hxx9+wiD3XvimVZYv79
+         q5PBhWvpdQ9sBeHl+hoQjyuhLW7dcZFZerOEMPEACSjGZcTmmsyr0w35b6armnMr8sGJ
+         pOxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=brNBXr+8/wzZA+nIy3egINBkzFrPq5ruF6R05GO6Hrg=;
+        b=ZW0ZHr0hZr0XsdAeZZKOqv6pxfL6H5NguJnQK/kpdm57OVp3ez2I2omEReCChhM7AN
+         3mSvjeqlXfdE54VQ6nBDoJHOFF6gdkbKDXpktC6+1XQMqESEszPyTItRiFZhZ0msGd85
+         iZNNFPfTIFOJjUzbA9+9h0dyhozms7YgNh0PjOml2Z0b4+wtnFkvBvMLol5iWA6+c/N5
+         W5uGZE64JuR+xWNCmS8oBXc7TAdvbWn4o5hPYvWpjFmWIN/hpsbt/YiBuY+DU9bNf41x
+         eoIJxje4PXAqs4VYvpnJuAvGFDUkhSLDBhBYkqUNVrFVaCk8Zmd/r8Z7labpl9/DR7zP
+         oyEg==
+X-Gm-Message-State: ACrzQf148l9WkAgSlUEO8cVJYId6E2rZtmF8BnUkv3/4mgaJILmTiPU3
+        JCGZZ7V8UIhVi13fckUnwnUSYQ==
+X-Google-Smtp-Source: AMsMyM7XbnkBjpWb+HSCPMbMUTi6gsW4BX2AxXGEWTzBQpkldATEkpjeh/6Fj8YCcftto2okxXOarA==
+X-Received: by 2002:a05:6a00:218c:b0:561:bd69:dca6 with SMTP id h12-20020a056a00218c00b00561bd69dca6mr7307893pfi.83.1665179883323;
+        Fri, 07 Oct 2022 14:58:03 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id a10-20020a1709027e4a00b001806f4fbf25sm845116pln.182.2022.10.07.14.58.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Oct 2022 14:58:02 -0700 (PDT)
+Date:   Fri, 7 Oct 2022 21:57:59 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Subject: Re: [PATCH v4 1/5] KVM: x86: Disallow the use of
+ KVM_MSR_FILTER_DEFAULT_ALLOW in the kernel
+Message-ID: <Y0Cg5zPruZZPg9Ed@google.com>
+References: <20220921151525.904162-1-aaronlewis@google.com>
+ <20220921151525.904162-2-aaronlewis@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y0A+rogB6TRDtbyE@google.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20220921151525.904162-2-aaronlewis@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 07, 2022 at 02:58:54PM +0000, Sean Christopherson wrote:
-> On Fri, Oct 07, 2022, Jarkko Sakkinen wrote:
-> > On Thu, Oct 06, 2022 at 03:34:58PM +0000, Sean Christopherson wrote:
-> > > On Thu, Oct 06, 2022, Jarkko Sakkinen wrote:
-> > > > On Thu, Oct 06, 2022 at 05:58:03PM +0300, Jarkko Sakkinen wrote:
-> > > > > On Thu, Sep 15, 2022 at 10:29:07PM +0800, Chao Peng wrote:
-> > > > > > This new extension, indicated by the new flag KVM_MEM_PRIVATE, adds two
-> > > > > > additional KVM memslot fields private_fd/private_offset to allow
-> > > > > > userspace to specify that guest private memory provided from the
-> > > > > > private_fd and guest_phys_addr mapped at the private_offset of the
-> > > > > > private_fd, spanning a range of memory_size.
-> > > > > > 
-> > > > > > The extended memslot can still have the userspace_addr(hva). When use, a
-> > > > > > single memslot can maintain both private memory through private
-> > > > > > fd(private_fd/private_offset) and shared memory through
-> > > > > > hva(userspace_addr). Whether the private or shared part is visible to
-> > > > > > guest is maintained by other KVM code.
-> > > > > 
-> > > > > What is anyway the appeal of private_offset field, instead of having just
-> > > > > 1:1 association between regions and files, i.e. one memfd per region?
-> > > 
-> > > Modifying memslots is slow, both in KVM and in QEMU (not sure about Google's VMM).
-> > > E.g. if a vCPU converts a single page, it will be forced to wait until all other
-> > > vCPUs drop SRCU, which can have severe latency spikes, e.g. if KVM is faulting in
-> > > memory.  KVM's memslot updates also hold a mutex for the entire duration of the
-> > > update, i.e. conversions on different vCPUs would be fully serialized, exacerbating
-> > > the SRCU problem.
-> > > 
-> > > KVM also has historical baggage where it "needs" to zap _all_ SPTEs when any
-> > > memslot is deleted.
-> > > 
-> > > Taking both a private_fd and a shared userspace address allows userspace to convert
-> > > between private and shared without having to manipulate memslots.
-> > 
-> > Right, this was really good explanation, thank you.
-> > 
-> > Still wondering could this possibly work (or not):
-> > 
-> > 1. Union userspace_addr and private_fd.
+On Wed, Sep 21, 2022, Aaron Lewis wrote:
+> Protect the kernel from using the flag KVM_MSR_FILTER_DEFAULT_ALLOW.
+> Its value is 0, and using it incorrectly could have unintended
+> consequences. E.g. prevent someone in the kernel from writing something
+> like this.
 > 
-> No, because userspace needs to be able to provide both userspace_addr (shared
-> memory) and private_fd (private memory) for a single memslot.
+> if (filter.flags & KVM_MSR_FILTER_DEFAULT_ALLOW)
+>         <allow the MSR>
+> 
+> and getting confused when it doesn't work.
+> 
+> It would be more ideal to remove this flag altogether, but userspace
+> may already be using it, so protecting the kernel is all that can
+> reasonably be done at this point.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> ---
 
-Got it, thanks for clearing my misunderstandings on this topic, and it
-is quite obviously visible in 5/8 and 7/8. I.e. if I got it right,
-memblock can be partially private, and you dig the shared holes with
-KVM_MEMORY_ENCRYPT_UNREG_REGION. We have (in Enarx) ATM have memblock
-per host mmap, I was looking into this dilated by that mindset but makes
-definitely sense to support that.
+Reviewed-by: Sean Christopherson <seanjc@google.com>
 
-BR, Jarkko
+> Google's VMM is already using this flag, so we *know* that dropping the
+> flag entirely will break userspace.  All we can do at this point is
+> prevent the kernel from using it.
+
+LOL, nice.
