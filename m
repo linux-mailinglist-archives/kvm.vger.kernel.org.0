@@ -2,150 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0901B5F79E8
-	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 16:47:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC5AC5F7A2C
+	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 16:59:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229630AbiJGOrA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Oct 2022 10:47:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42866 "EHLO
+        id S229849AbiJGO7W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Oct 2022 10:59:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229495AbiJGOq7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Oct 2022 10:46:59 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DFF692595
-        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 07:46:58 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 297EfeQ4030796;
-        Fri, 7 Oct 2022 14:46:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=H+SVr0bavP6qe+kYNXgJV47669l6DjidwDvkBau7NqY=;
- b=gVJJc9iVWqzia4cNXRz3cnnvZrpqE3tkc72BhPCy1uSOk7gqRbk+PW7KE/b+g2r7/lKp
- YWaW9dOn8XTq+juCLhOZGWVh1vZ8gTG2ni08yHAinPxE8KcNk9flf3iDIO+l7wNwy+PC
- j+uLM5L3Ch1/qO/2RPi4gz92GqllHiMp/4j6zCAuANN5Sbo4lh6rd4+tfk3J3JoQAJCO
- UGJuqzTdS+3jasCb77ZsYpNMf8iolsUiaA9HDQVQ05gG6+MEssc0dxN50rQf9BoRyLPY
- Pz+ygcEcvDrYb9HF93RR62O6zNLaUqM/E+nrV6OvAy5UWUUHiJ8qb/lKJ/JWlF/L8M4t nw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k2p3m06v4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Oct 2022 14:46:51 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 297Eg8U9002174;
-        Fri, 7 Oct 2022 14:46:50 GMT
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k2p3m06uj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Oct 2022 14:46:50 +0000
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 297Earkw018515;
-        Fri, 7 Oct 2022 14:46:49 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma04dal.us.ibm.com with ESMTP id 3jxd6aupe9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 07 Oct 2022 14:46:49 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com ([9.208.128.116])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 297EkmtP131714
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 7 Oct 2022 14:46:48 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0D00758045;
-        Fri,  7 Oct 2022 14:46:48 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 59F0458056;
-        Fri,  7 Oct 2022 14:46:46 +0000 (GMT)
-Received: from [9.160.126.121] (unknown [9.160.126.121])
-        by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  7 Oct 2022 14:46:46 +0000 (GMT)
-Message-ID: <d3df30ac-6bf5-4565-15f7-49c4c282742c@linux.ibm.com>
-Date:   Fri, 7 Oct 2022 10:46:45 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [PATCH 0/3] Allow the group FD to remain open when unplugging a
- device
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        with ESMTP id S229993AbiJGO7D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Oct 2022 10:59:03 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DE30DD8AF
+        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 07:58:59 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id l1-20020a17090a72c100b0020a6949a66aso4994679pjk.1
+        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 07:58:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ApS1gjiguDXZcZz0fMT7VsMAGGvTEXNN7etXS65aF2E=;
+        b=P9at1gy00LaQ67U9E1PqFxXj/+/Ep5lZ2MxNKcytXi47pMqLiyWzEa/Xe2j6FHWM4y
+         /hs7KujqnFNPAE3jZS5MWMfe3+xQAhIhJuW1dyoA1ekhjNaxULNBuqb/2klgeUPGWkYF
+         5S5WGPJDOLGI8G3dhBrFVznCIwrT7f7u07MoT7kQCn0HddgT1cP9+6D1aAApMjbGxIQJ
+         KQ5lGGS71MMnAnQJ7FClUslBS7YWByNlLuUfhv2PRp7+0dcRnApGUnnJxK061ld3oLrF
+         aqw3+neqPNcUW0v6HArS65p+1L4Mc4p5Eyi3bOlG00rA6Ll3S9qG/ECPlhkMQusT3cha
+         xF/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ApS1gjiguDXZcZz0fMT7VsMAGGvTEXNN7etXS65aF2E=;
+        b=LMJht1jEp3ZFSEZJVJ4E1GWG5/vLxxbacCPuwdYFHi77l/fyPsJV5Xjyh/QGS2WN/7
+         WfrwUTmiaVaYpSME5QxoXh/Gyv9WPYoXZXq5d0JajHckOulnzZwl2mGvargwHLXbKlXS
+         nLc22UvccVg4KGNRjypfZWJssObmSDkmhbug/MH/DnLnboBPx30EEMWeN2YzLveNLSY8
+         /RJpUmnNqTn8Velri6lP8ouMMdNT3JZOzR+uL8DTalc8IHp4wv/0rLi+1LUc6DujBjcI
+         UjvDGk9jSj6DdSuzU14ntoANIwocV02l7WR1GV828OjLGp+7yO3NFqzUk5EkJ7q1ISBi
+         /2/w==
+X-Gm-Message-State: ACrzQf2eHWcfNVG631rwveLeQcjUo3kgH0Xn6mZaR5dGGeKS1PW8s2Au
+        NLNtU743E0yRIOtKPl/gNm4akQ==
+X-Google-Smtp-Source: AMsMyM642quwEQBN0ZX14M9u9coJDsTKuGQ1cCzLKA6Dq2TZW06v6vpj0wGS9syx5rD7OWwlzHZvqw==
+X-Received: by 2002:a17:90b:3ec1:b0:202:f490:e508 with SMTP id rm1-20020a17090b3ec100b00202f490e508mr5980841pjb.156.1665154738493;
+        Fri, 07 Oct 2022 07:58:58 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id m22-20020a63ed56000000b0043a0de69c94sm1750587pgk.14.2022.10.07.07.58.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Oct 2022 07:58:57 -0700 (PDT)
+Date:   Fri, 7 Oct 2022 14:58:54 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Qian Cai <cai@lca.pw>, Eric Farman <farman@linux.ibm.com>,
-        Joerg Roedel <jroedel@suse.de>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Yi Liu <yi.l.liu@intel.com>
-References: <0-v1-90bf0950c42c+39-vfio_group_disassociate_jgg@nvidia.com>
- <20221006135315.3270b735.alex.williamson@redhat.com>
- <Yz9Z3um1HQHnEGVv@nvidia.com>
- <2a61068b-3645-27d0-5fae-65a6e1113a8d@linux.ibm.com>
- <Y0ArhhCOXEYQMC1q@nvidia.com>
- <b04ce2fd-2c68-7b0f-ec43-3f0c27d35c0e@linux.ibm.com>
- <Y0A6MH0Espv2JFWu@nvidia.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <Y0A6MH0Espv2JFWu@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: kSoAoA0ejpqMuphLvrxv8BO-B-cc9ezy
-X-Proofpoint-GUID: erSgNwzvLJGsfFGLdwbKkDW9ufp_GfRI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-10-06_05,2022-10-07_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
- clxscore=1015 mlxscore=0 adultscore=0 impostorscore=0 bulkscore=0
- suspectscore=0 lowpriorityscore=0 malwarescore=0 priorityscore=1501
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210070087
-X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v8 2/8] KVM: Extend the memslot to support fd-based
+ private memory
+Message-ID: <Y0A+rogB6TRDtbyE@google.com>
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-3-chao.p.peng@linux.intel.com>
+ <Yz7s+JIexAHJm5dc@kernel.org>
+ <Yz7vHXZmU3EpmI0j@kernel.org>
+ <Yz71ogila0mSHxxJ@google.com>
+ <Y0AJ++m/TxoscOZg@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y0AJ++m/TxoscOZg@kernel.org>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/7/22 10:39 AM, Jason Gunthorpe wrote:
-> On Fri, Oct 07, 2022 at 10:37:11AM -0400, Matthew Rosato wrote:
->> On 10/7/22 9:37 AM, Jason Gunthorpe wrote:
->>> On Thu, Oct 06, 2022 at 07:28:53PM -0400, Matthew Rosato wrote:
->>>
->>>>> Oh, I'm surprised the s390 testing didn't hit this!!
->>>>
->>>> Huh, me too, at least eventually - I think it's because we aren't
->>>> pinning everything upfront but rather on-demand so the missing the
->>>> type1 release / vfio_iommu_unmap_unpin_all wouldn't be so obvious.
->>>> I definitely did multiple VM (re)starts and hot (un)plugs.  But
->>>> while my test workloads did some I/O, the long-running one was
->>>> focused on the plug/unplug scenarios to recreate the initial issue
->>>> so the I/O (and thus pinning) done would have been minimal.
->>>
->>> That explains ccw/ap a bit but for PCI the iommu ownership wasn't
->>> released so it becomes impossible to re-attach a container to the
->>> group. eg a 2nd VM can never be started
->>>
->>> Ah well, thanks!
->>>
->>> Jason
->>
->> Well, this bugged me enough that I traced the v1 series without fixup and vfio-pci on s390 was OK because it was still calling detach_container on vm shutdown via this chain:
->>
->> vfio_pci_remove
->>  vfio_pci_core_unregister_device
->>   vfio_unregister_group_dev
->>    vfio_device_remove_group
->>     vfio_group_detach_container
->>
->> I'd guess non-s390 vfio-pci would do the same.  Alex also had the mtty mdev, maybe that's relevant.
+On Fri, Oct 07, 2022, Jarkko Sakkinen wrote:
+> On Thu, Oct 06, 2022 at 03:34:58PM +0000, Sean Christopherson wrote:
+> > On Thu, Oct 06, 2022, Jarkko Sakkinen wrote:
+> > > On Thu, Oct 06, 2022 at 05:58:03PM +0300, Jarkko Sakkinen wrote:
+> > > > On Thu, Sep 15, 2022 at 10:29:07PM +0800, Chao Peng wrote:
+> > > > > This new extension, indicated by the new flag KVM_MEM_PRIVATE, adds two
+> > > > > additional KVM memslot fields private_fd/private_offset to allow
+> > > > > userspace to specify that guest private memory provided from the
+> > > > > private_fd and guest_phys_addr mapped at the private_offset of the
+> > > > > private_fd, spanning a range of memory_size.
+> > > > > 
+> > > > > The extended memslot can still have the userspace_addr(hva). When use, a
+> > > > > single memslot can maintain both private memory through private
+> > > > > fd(private_fd/private_offset) and shared memory through
+> > > > > hva(userspace_addr). Whether the private or shared part is visible to
+> > > > > guest is maintained by other KVM code.
+> > > > 
+> > > > What is anyway the appeal of private_offset field, instead of having just
+> > > > 1:1 association between regions and files, i.e. one memfd per region?
+> > 
+> > Modifying memslots is slow, both in KVM and in QEMU (not sure about Google's VMM).
+> > E.g. if a vCPU converts a single page, it will be forced to wait until all other
+> > vCPUs drop SRCU, which can have severe latency spikes, e.g. if KVM is faulting in
+> > memory.  KVM's memslot updates also hold a mutex for the entire duration of the
+> > update, i.e. conversions on different vCPUs would be fully serialized, exacerbating
+> > the SRCU problem.
+> > 
+> > KVM also has historical baggage where it "needs" to zap _all_ SPTEs when any
+> > memslot is deleted.
+> > 
+> > Taking both a private_fd and a shared userspace address allows userspace to convert
+> > between private and shared without having to manipulate memslots.
 > 
-> As long as you are unplugging a driver the v1 series would work. The
-> failure mode is when you don't unplug the driver and just run a VM
-> twice in a row.
+> Right, this was really good explanation, thank you.
 > 
-> Jason
+> Still wondering could this possibly work (or not):
+> 
+> 1. Union userspace_addr and private_fd.
 
-Oh, duh - And yep all of my tests are using managed libvirt so its unbinding from vfio-pci back to the default host driver on VM shutdown.
+No, because userspace needs to be able to provide both userspace_addr (shared
+memory) and private_fd (private memory) for a single memslot.
 
-OK, if I force the point and leave vfio-pci bound the 2nd guest boot indeed fails setting up the container with unmodified v1.  I'll try again with the new v2 now
+> 2. Instead of introducing private_offset, use guest_phys_addr as the
+>    offset.
 
+No, because that would force userspace to use a single private_fd for all of guest
+memory since it effectively means private_offset=0.  And userspace couldn't skip
+over holes in guest memory, i.e. the size of the memfd would need to follow the
+max guest gpa.  In other words, dropping private_offset could work, but it'd be
+quite kludgy and not worth saving 8 bytes.
