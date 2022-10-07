@@ -1,69 +1,68 @@
 Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C2A15F7C3C
-	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 19:29:05 +0200 (CEST)
+Received: from out1.vger.email (unknown [IPv6:2620:137:e000::1:20])
+	by mail.lfdr.de (Postfix) with ESMTP id B6EA35F7C62
+	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 19:40:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229854AbiJGR3D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Oct 2022 13:29:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53436 "EHLO
+        id S229852AbiJGRkZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Oct 2022 13:40:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229815AbiJGR2z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Oct 2022 13:28:55 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7939C10C4E2
-        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 10:28:50 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id j71so5260929pge.2
-        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 10:28:50 -0700 (PDT)
+        with ESMTP id S229827AbiJGRkX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Oct 2022 13:40:23 -0400
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E301ED7E24
+        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 10:40:21 -0700 (PDT)
+Received: by mail-lj1-x22d.google.com with SMTP id s10so6523622ljp.5
+        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 10:40:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=e6VKEJBSnD7n5od0XaTiGO38JX8JUsRQmKYwfdVSQmM=;
-        b=crnj2Qjz8aFWT8URx9wUX4DnOa2++syxRDBP8I8V+Dz8POl5R+3VKiFSLMC/vr0Cor
-         e63JrunKsmPXZNmDl/iylAeUWaw0EBTUy16hmgJ5gp8HaZxoL6wAA+UG07f5usXykt7A
-         ieviITOlp+KFdB5LiLxEqzSdy8MDpoiFFQATnEv46dX53mHKFb082d1nZTex+fq18mOD
-         s8YwgRLLvJVV0B6/hkXQfLAik3lAKy32hna1pL5p4ck3Ta/lj4sLtyqvNSv361Q8IfOW
-         DYzA8SgfesbtmFOYrwbzYaQOtYuXh/7CBZUSYR2OZ4xkLgS1ErJBOlo228yhZUwv3mvd
-         ChBQ==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=/qyZfhFMqsGY+2x81lxkw4SeGXVJxcXp72bwU6csGYs=;
+        b=TKGR1uQTGER1ZWKJGAM+dHVm1xLKYwU2Zk88DPGtKUPt+8WfU45u1WPdxzZ9+gtzpl
+         4a7uHdIzCiVkZcr6/QIrcaDXYL9Pvxg3EMiNWl9A4t4BxW5jxTqWdBa2m3K8WkrY7x0d
+         RGfsLni2dEJJzRBP2AneWh7JJg7Ai+Ppoxv+/3wMw4/tgMRRe0uMb1CKGQfkeVo/7iHD
+         6JztSiF3O9rLBFGcnhy1LMT5dav76J1oYC3iurdfJq+tCgy8uw5APMXku3kdN2IbKF47
+         qu1jjC2EmVMFMJ6CRXIZprsUACsHUSeVYDgj3xEGPLd0GkyohxFc+TEVqzrMc75ejmoj
+         yrMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e6VKEJBSnD7n5od0XaTiGO38JX8JUsRQmKYwfdVSQmM=;
-        b=7ckIbO1TQQnjTPlvOu8KrHQ97HnzrJxgINdxY8YDfPieLMV6tfV/66X7km9lLhNLit
-         cfMLTzlSLcnjz8xwkS9vbTWwrGywmMg85kUwHpmED0n+ExelX0TxAmgwTjIfNtEkK3gN
-         6731z7z1Ru7dV6/3Eh6Od8fE4pjWNsbpAz1E7H3ib8ZY3AeHXYurT0UPPY8U9nfmHnHm
-         gqExjHlf8++0hlgupjcXLWQRHmWvMVCftVkLwJmbcxwdvfFkHke2EtkIkRqxE0PnXr1W
-         bbMOMLVrBkqszkUr+amAypabuPM96Hw2RqJ1nnYuehjJd92dGec8xG8om7c0Jsrpg3Ia
-         92tg==
-X-Gm-Message-State: ACrzQf1iWT4kHSV5sGkQNG+1dLoLSd0Sa/YkAIiugL4E+/IyGSV2CWpS
-        ZC4jqBNqg8xV6EnYXC0NoBozIw==
-X-Google-Smtp-Source: AMsMyM5bBudqx/dOvE76R9v9HV0MahFAW1GMZapY+7p6If1WHfIxHi/QBI4oOD4f/41Gza3voNIwmw==
-X-Received: by 2002:a63:db42:0:b0:45c:9c73:d72e with SMTP id x2-20020a63db42000000b0045c9c73d72emr5345138pgi.181.1665163729203;
-        Fri, 07 Oct 2022 10:28:49 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id z15-20020a170903018f00b00177fb862a87sm1839955plg.20.2022.10.07.10.28.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Oct 2022 10:28:48 -0700 (PDT)
-Date:   Fri, 7 Oct 2022 17:28:43 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Hao Peng <flyingpenghao@gmail.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] kvm: x86: Keep the lock order consistent
-Message-ID: <Y0Bhy/z+1Z1seT2d@google.com>
-References: <CAPm50a+gcug5XOsg_Z=7R+3j+VUxHMrzyGNbps7-okR625KB_w@mail.gmail.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/qyZfhFMqsGY+2x81lxkw4SeGXVJxcXp72bwU6csGYs=;
+        b=Oea8DVbr1Ab8ziXggof6MweFMQ8qO8i6S7q9rKqcAurKZUiK/RDY3VyAIKNEG+xioR
+         RVc/0hJpSywVTqgijC1m+azIe+QETHYTE7KDfhv9ww//BBjf/Bsh/L2pwsZV+iifycwl
+         7dF2Aa+gYUUgvOsNd/g4IeOToq/arAoXH4tgLCLCvQERvpGzdb/atLzmMTJasIUi4k6/
+         yHpg7gsnj7T+miXL+b1qXQUi/7k4mslk2dsst0CIGXPWv4/P27NaAiTT0UEgM/lYQHvg
+         JtAOGuzZV3MlWzi9Ugl183BbbOmSC/lTLjMvL9/i34QmHKbzaJNMX/zUUHxGuakAz/4e
+         sjXA==
+X-Gm-Message-State: ACrzQf10/xU/bDa0QSHtQCmZtIWIoOuvQ1oJTumSTVlbMPgFP+N2JWD6
+        OMSzsPUWAVnvhKU5ZzULXCMLshUszy4OC07KKzntPg==
+X-Google-Smtp-Source: AMsMyM7sCgTfoIcnsRjFd8b/qqibflc1XJSea0Wdh9/guDuPfxt95cCHHpxfsEaF9/Ne4FIJS5o5vJN949fy40KyiM8=
+X-Received: by 2002:a2e:aa20:0:b0:26e:609:cf08 with SMTP id
+ bf32-20020a2eaa20000000b0026e0609cf08mr2038925ljb.422.1665164420071; Fri, 07
+ Oct 2022 10:40:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPm50a+gcug5XOsg_Z=7R+3j+VUxHMrzyGNbps7-okR625KB_w@mail.gmail.com>
+References: <20221006171133.372359-1-vipinsh@google.com> <20221006171133.372359-5-vipinsh@google.com>
+ <Yz8xdJEMjcfdrcWC@google.com> <CAHVum0e4fiaB7hGSA6z1SaiZ1632f9Md2p0Nw6G=5wqhHYvdJg@mail.gmail.com>
+ <Yz9vdoiq+0TyaGqo@google.com>
+In-Reply-To: <Yz9vdoiq+0TyaGqo@google.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Fri, 7 Oct 2022 10:39:43 -0700
+Message-ID: <CAHVum0duCPZSqDcT2L0uupvMB0uGe31Oh-DSpojAnBLFN1d1XQ@mail.gmail.com>
+Subject: Re: [PATCH v4 4/4] KVM: selftests: Run dirty_log_perf_test on
+ specific CPUs
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, dmatlack@google.com, andrew.jones@linux.dev,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,30 +70,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 07, 2022, Hao Peng wrote:
-> From: Peng Hao <flyingpeng@tencent.com>
-> 
-> srcu read side in critical section may sleep, so it should precede
-> the read lock,
+On Thu, Oct 6, 2022 at 5:14 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Oct 06, 2022, Vipin Sharma wrote:
+> > On Thu, Oct 6, 2022 at 12:50 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > > +{
+> > > > +     cpu_set_t cpuset;
+> > > > +     int err;
+> > > > +
+> > > > +     CPU_ZERO(&cpuset);
+> > > > +     CPU_SET(pcpu, &cpuset);
+> > >
+> > > To save user pain:
+> > >
+> > >         r = sched_getaffinity(0, sizeof(allowed_mask), &allowed_mask);
+> > >         TEST_ASSERT(!r, "sched_getaffinity failed, errno = %d (%s)", errno,
+> > >                     strerror(errno));
+> > >
+> > >         TEST_ASSERT(CPU_ISSET(pcpu, &allowed_mask),
+> > >                     "Task '%d' not allowed to run on pCPU '%d'\n");
+> > >
+> > >         CPU_ZERO(&allowed_mask);
+> > >         CPU_SET(cpu, &allowed_mask);
+> > >
+> > > that way the user will get an explicit error message if they try to pin a vCPU/task
+> > > that has already been affined by something else.  And then, in theory,
+> > > sched_setaffinity() should never fail.
+> > >
+> > > Or you could have two cpu_set_t objects and use CPU_AND(), but that seems
+> > > unnecessarily complex.
+> > >
+> >
+> > sched_setaffinity() doesn't fail when we assign more than one task to
+> > the pCPU, it allows multiple tasks to be on the same pCPU. One of the
+> > reasons it fails is if it is provided a cpu number which is bigger
+> > than what is actually available on the host.
+> >
+> > I am not convinced that pinning vCPUs to the same pCPU should throw an
+> > error. We should allow if someone wants to try and compare performance
+> > by over subscribing or any valid combination they want to test.
+>
+> Oh, I'm not talking about the user pinning multiple vCPUs to the same pCPU via
+> the test, I'm talking about the user, or more likely something in the users's
+> environment, restricting what pCPUs the user's tasks are allowed on.  E.g. if
+> the test is run in shell that has been restricted to CPU8 via cgroups, then
+> sched_setaffinity() will fail if the user tries to pin vCPUs to any other CPU.
 
-I agree with the patch, but not necessarily with this statement.  The above
-implies that it's not safe to acquire SRCU while in a non-sleepable context,
-which is incorrect.  E.g. at first I thought the above implied there is an
-incorrect sleep buried in this code.
-
-> while other paths such as kvm_xen_set_evtchn_fast
-
-Please put parantheses after function names, e.g. kvm_xen_set_evtchn_fast()
-and srcu_read_lock().
-
-> execute srcu_read_lock before acquiring the read lock.
-
-How about this for a changelog?
-
-  Acquire SRCU before taking the gpc spinlock in wait_pending_event() so as
-  to be consistent with all other functions that acquire both locks.  It's
-  not illegal to acquire SRCU inside a spinlock, nor is there deadlock
-  potential, but in general it's preferable to order locks from least
-  restrictive to most restrictive, e.g. if wait_pending_event() needed to
-  sleep for whatever reason, it could do so while holding SRCU, but would
-  need to drop the spinlock.
+I see, I will add this validation.
