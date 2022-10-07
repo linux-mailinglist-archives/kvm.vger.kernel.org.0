@@ -2,69 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F5ED5F80B6
-	for <lists+kvm@lfdr.de>; Sat,  8 Oct 2022 00:19:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E58AC5F80C5
+	for <lists+kvm@lfdr.de>; Sat,  8 Oct 2022 00:24:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229691AbiJGWTS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Oct 2022 18:19:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43480 "EHLO
+        id S229731AbiJGWY1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Oct 2022 18:24:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229605AbiJGWTQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Oct 2022 18:19:16 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 542C19E0CD
-        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 15:19:13 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id x1so5722857plv.5
-        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 15:19:13 -0700 (PDT)
+        with ESMTP id S229511AbiJGWYZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Oct 2022 18:24:25 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C036DD01A6
+        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 15:24:24 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id i7-20020a17090a65c700b0020ad9666a86so8443770pjs.0
+        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 15:24:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bgGfGMmgZcTgRkcv5RMEIwz9Tdn3jga876+AoB1hcVM=;
-        b=oP8otBidcp+51iAMk8Ul1te2fmxymf/gFlAPGWKmq0IFrWooNvqf20ptiB+juM/8gi
-         zyUWt0fXjHAZMERlbNUAOH4H4LMkXOKjkmVL6Kfuqh6Ml+Ar3cEqWjXV1x4entip0e7z
-         Q3GDacTaLvtMkUCmf3QDLFCswWTZjCdYMT4onp02sO1plDPH6UZ8oEA6GFR64oUpd4C0
-         8uutrIkQjI+14qBSbzD77bKM0uN1EG2dYgqtoihbU9dqAG+IebJBjogmQCKrnXI7RySh
-         zzmuPTNiDix20zo+iL5quqCq3W9QLqD4TxIoMrYbHDSNjwuX0SjiBIcRgFfLiDzpCkGM
-         IuGA==
+        bh=59hgvhDRUt+M/dRVt6uQ4wb9apA1vJ61fWUCmRW4UQg=;
+        b=kk8GCHtPq4IDS7mfxvqqrER92tF3MJ3BVt7lbTuxLUYee+PH8s2n9OXW2unfZwvr32
+         AROfGNR9P7ERogLiPzMfSfSQ8pZlCQTuVUD3Ohl4Wpi7LZ7xddw6kl7Uv7zLL4MmJFp8
+         oEgcxzVBNtfyiuwhtjxNmPXNx22oauJgpdGWiVqRiWYhbpaNkrdD+cN0SEp6PItSlqI8
+         kQdzyJ6tlE7Q2oCU/zbTEeWga4Ha9gyvea1/N5M1HLX5u0FWuPcx+sYwKFu/1J+gyxJF
+         VTyI2ERWVzBbdZJn2BEsJAe8LGFmEcKM/AC9oj1CAr2cCw7BhhbvJS6wYjnbn6Z7XRCt
+         BN2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bgGfGMmgZcTgRkcv5RMEIwz9Tdn3jga876+AoB1hcVM=;
-        b=0WWAfp0Gff8PFiKwZCLxW6RDjDjWsvLXGaL1XZ5VPfpq58quHzwgk3ytbgRtXRWLNh
-         ssYFVEXTmtp+WumgyZk1F4iMhysggbNt020Di1l0GOO+RZubUjjRoBmQmkyiG5RjhD6a
-         8yLlEM9P3JW1cAkI59v+uMz/eZUmEUdb/pq93/7XbNCWvRjZfOr7e5PvPswxqmCQU7lo
-         fQJq5hyZ7006hxTFoHCpWtFpq5T5roK8i8M3gkjIruSpK/aSBDekBLR5Fm0ugtg7wCQC
-         XhxZ4HSTwbvFY1s9WywBTq/KVCA5lPaWd4u+MhEq21Jc2HCnZIphHZuCaDalhN6z45pn
-         l9WQ==
-X-Gm-Message-State: ACrzQf2i317BsohjOA9DifATXHBDklxrxyKr99U0ntOTXI3SN021Y+wb
-        zXqFnAwsTQy61bMTv4JxcWq3CQ==
-X-Google-Smtp-Source: AMsMyM7euDqs9H7UQ0Yn4ieSA0Glg2rY15Fb9v0W+GySyeIGGfsYP7kRJizUie/DdRpwsbJ7n8EHHQ==
-X-Received: by 2002:a17:90a:7c4a:b0:20a:b201:461a with SMTP id e10-20020a17090a7c4a00b0020ab201461amr7545475pjl.181.1665181152680;
-        Fri, 07 Oct 2022 15:19:12 -0700 (PDT)
+        bh=59hgvhDRUt+M/dRVt6uQ4wb9apA1vJ61fWUCmRW4UQg=;
+        b=YubO2/YZo9ny+QX/g5b1gXkQBCBgaNsiMJyie8MAfWmexiOISqEo0IiHCUwyp1G1RN
+         xEZtNXNIkPrOR6GO7sG/2ZT+RCRcES+ddnAQQsPAB0iapYMFo2iHLpsaQF9s+DCEX6cH
+         wwne+ew/IxusWwDMhdr7hKN1rM3s0hLb0GUx1KKOIBM6PwpTCO9QVNBi27bdthr+RWno
+         QcdNAMGrXfw5fT4PrQxWSEOKNoOg6tP4j/nHL7Q/GU+M/LJujeljVX218y43+TACKSje
+         OtAqsHVuyLf1F1m/RFod38wMc1O5d+z2V/UidNErnlk0nTnrUX+Ut8scxBIpjkYEsPKY
+         Ti+w==
+X-Gm-Message-State: ACrzQf26x2idE0lr5tBQ0/Cw8a+muv63EDlut49hUFpqyX9gk0GpqRPz
+        dLqoWztJa1U0keeNdkokQbzxlg==
+X-Google-Smtp-Source: AMsMyM5OcWlPXpzUE9rIkQy7vPreWxX9NMzfb2GrQyyPA8JBelRQWQnn4Ihtlj2pBBLDrYOrTh2ZnA==
+X-Received: by 2002:a17:90a:9381:b0:20a:79b7:766a with SMTP id q1-20020a17090a938100b0020a79b7766amr19001607pjo.33.1665181464133;
+        Fri, 07 Oct 2022 15:24:24 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id z5-20020a623305000000b00562a0c8a195sm2112417pfz.69.2022.10.07.15.19.11
+        by smtp.gmail.com with ESMTPSA id y22-20020a17090a6c9600b0020ad46d277bsm5082551pjj.42.2022.10.07.15.24.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Oct 2022 15:19:12 -0700 (PDT)
-Date:   Fri, 7 Oct 2022 22:19:08 +0000
+        Fri, 07 Oct 2022 15:24:23 -0700 (PDT)
+Date:   Fri, 7 Oct 2022 22:24:19 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Jim Mattson <jmattson@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] KVM: x86/pmu: Make part of the Intel v2 PMU MSRs
- handling x86 generic
-Message-ID: <Y0Cl3GtMhwr3hwK8@google.com>
-References: <20220919093453.71737-1-likexu@tencent.com>
- <20220919093453.71737-2-likexu@tencent.com>
- <CALMp9eRPEFHFfW+MnMkcTBFB+vjcEe3ekg8JMrKJaRQuq7=-8Q@mail.gmail.com>
- <856e3332-9f6b-a5f7-c3ec-afe89003cb84@gmail.com>
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Subject: Re: [PATCH v4 5/5] selftests: kvm/x86: Test the flags in MSR
+ filtering and MSR exiting
+Message-ID: <Y0CnE4iqo60j2wdT@google.com>
+References: <20220921151525.904162-1-aaronlewis@google.com>
+ <20220921151525.904162-6-aaronlewis@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <856e3332-9f6b-a5f7-c3ec-afe89003cb84@gmail.com>
+In-Reply-To: <20220921151525.904162-6-aaronlewis@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -76,237 +72,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 22, 2022, Like Xu wrote:
-> On 22/9/2022 8:20 am, Jim Mattson wrote:
-> > >   int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> > >   {
-> > > +       struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> > > +       u32 msr = msr_info->index;
-> > > +       u64 data = msr_info->data;
-> > > +       u64 diff;
-> > > +
-> > > +       switch (msr) {
-> > > +       case MSR_CORE_PERF_GLOBAL_STATUS:
-> > > +               if (msr_info->host_initiated) {
-> > > +                       pmu->global_status = data;
-> > > +                       return 0;
-> > > +               }
-> > > +               break; /* RO MSR */
-> > Perhaps 'return 1'?
-> > > +       case MSR_CORE_PERF_GLOBAL_CTRL:
-> > > +               if (pmu->global_ctrl == data)
-> > > +                       return 0;
-> > > +               if (kvm_valid_perf_global_ctrl(pmu, data)) {
-> > > +                       diff = pmu->global_ctrl ^ data;
-> > > +                       pmu->global_ctrl = data;
-> > > +                       reprogram_counters(pmu, diff);
-> > > +                       return 0;
-> > > +               }
-> > > +               break;
-> > Perhaps 'return 1'?
-> > > +       case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
-> > > +               if (!(data & pmu->global_ovf_ctrl_mask)) {
-> > > +                       if (!msr_info->host_initiated)
-> > > +                               pmu->global_status &= ~data;
+On Wed, Sep 21, 2022, Aaron Lewis wrote:
+> +#define test_user_exit_msr_ioctl(vm, cmd, arg, flag, valid_mask)	\
 
-Pre-existing code question: why are writes from host userspace dropped?  Is the
-intent to avoid clearing the status register when the VM is migrated?
+There's nothing specific to userspace MSR exiting in this macro.  To keep the
+name short, and to potentially allow moving it to common code in the future, how
+about test_ioctl_flags()?
 
-> > > +                       return 0;
-> > > +               }
-> > > +               break;
-> > Perhaps 'return 1'?
+> +({									\
+> +	int r = __vm_ioctl(vm, cmd, arg);				\
+> +									\
+> +	if (flag & valid_mask)						\
+> +		TEST_ASSERT(!r, __KVM_IOCTL_ERROR(#cmd, r));		\
+> +	else								\
+> +		TEST_ASSERT(r == -1 && errno == EINVAL,			\
+> +			    "Wanted EINVAL for %s with flag = 0x%llx, got  rc: %i errno: %i (%s)", \
+> +			    #cmd, flag, r, errno,  strerror(errno));	\
+> +})
+> +
+> +static void run_user_space_msr_flag_test(struct kvm_vm *vm)
+> +{
+> +	struct kvm_enable_cap cap = { .cap = KVM_CAP_X86_USER_SPACE_MSR };
+> +	int nflags = sizeof(cap.args[0]) * BITS_PER_BYTE;
+> +	int rc;
+> +	int i;
 
-Assuming the code is inverted, I'd prefer to keep the "break" to be consistent
-with the other set_msr() helpers.
+These declarations can go on a single line.
 
-> All above applied.
+> +
+> +	rc = kvm_check_cap(KVM_CAP_X86_USER_SPACE_MSR);
+> +	TEST_ASSERT(rc, "KVM_CAP_X86_USER_SPACE_MSR is available");
+> +
+> +	for (i = 0; i < nflags; i++) {
+> +		cap.args[0] = BIT_ULL(i);
+> +		test_user_exit_msr_ioctl(vm, KVM_ENABLE_CAP, &cap,
+> +			   BIT_ULL(i), KVM_MSR_EXIT_REASON_VALID_MASK);
 
-I realize the code is pre-existing, but as opportunistic refactoring this should
-be cleaned up to align with pretty much every other set_msr() helper, and with
-respect to how the kernel typically handles errors.  The preferred pattern is to do:
+Align params.  With a shorter macro name, that's easy to do without creating
+massively long lines.
 
-		if (xyz)
-			return <error>
+And pass in the actual flags, e.g. cap.args[0] here, so that it's slightly more
+obvious what is being tested, and to minimize the risk of mixups.
 
-		<commit change>
-	
-		return <success>
+E.g.
 
-I.e. intel_pmu_set_msr() is backwards, and having "default" statement silently
-fallthrough is a bit nasty.
+		test_ioctl_flags(vm, KVM_ENABLE_CAP, &cap, cap.args[0],
+				 KVM_MSR_EXIT_REASON_VALID_MASK);
 
-Cases like MSR_PEBS_DATA_CFG have also needlessly copied the "do check iff the
-value is changing".
-		
-Can you add fold in the below (lightly tested) prep patch to fix intel_pmu_set_msr()?
-Then this patch becomes a straight code movement.
+> +	}
+> +}
+> +
+> +static void run_msr_filter_flag_test(struct kvm_vm *vm)
+> +{
+> +	u64 deny_bits = 0;
+> +	struct kvm_msr_filter filter = {
+> +		.flags = KVM_MSR_FILTER_DEFAULT_ALLOW,
+> +		.ranges = {
+> +			{
+> +				.flags = KVM_MSR_FILTER_READ,
+> +				.nmsrs = 1,
+> +				.base = 0,
+> +				.bitmap = (uint8_t *)&deny_bits,
+> +			},
+> +		},
+> +	};
+> +	int nflags;
+> +	int rc;
+> +	int i;
 
---
-From: Sean Christopherson <seanjc@google.com>
-Date: Fri, 7 Oct 2022 14:40:49 -0700
-Subject: [PATCH] KVM: VMX: Refactor intel_pmu_set_msr() to align with other
- set_msr() helpers
+	int nflags, rc, i;
 
-Invert the flows in intel_pmu_set_msr()'s case statements so that they
-follow the kernel's preferred style of:
+> +
+> +	rc = kvm_check_cap(KVM_CAP_X86_MSR_FILTER);
+> +	TEST_ASSERT(rc, "KVM_CAP_X86_MSR_FILTER is available");
+> +
+> +	nflags = sizeof(filter.flags) * BITS_PER_BYTE;
+> +	for (i = 0; i < nflags; i++) {
+> +		filter.flags = BIT_ULL(i);
+> +		test_user_exit_msr_ioctl(vm, KVM_X86_SET_MSR_FILTER, &filter,
+> +			   BIT_ULL(i), KVM_MSR_FILTER_VALID_MASK);
 
-	if (<not valid>)
-		return <error>
+		test_ioctl_flags(vm, KVM_X86_SET_MSR_FILTER, &filter,
+				 filter.flags, KVM_MSR_FILTER_VALID_MASK);
 
-	<commit change>
-	return <success>
+> +	}
+> +
+> +	filter.flags = KVM_MSR_FILTER_DEFAULT_ALLOW;
+> +	nflags = sizeof(filter.ranges[0].flags) * BITS_PER_BYTE;
+> +	for (i = 0; i < nflags; i++) {
+> +		filter.ranges[0].flags = BIT_ULL(i);
+> +		test_user_exit_msr_ioctl(vm, KVM_X86_SET_MSR_FILTER, &filter,
+> +			   BIT_ULL(i), KVM_MSR_FILTER_RANGE_VALID_MASK);
 
-which is also the style used by every other set_msr() helper (except
-AMD's PMU variant, which doesn't use a switch statement).
+		test_ioctl_flags(vm, KVM_X86_SET_MSR_FILTER, &filter,
+				 filter.ranges[0].flags,
+				 KVM_MSR_FILTER_RANGE_VALID_MASK);
 
-Opportunstically move the "val == current" checks below the validity
-checks.  Except for the one-off case for MSR_P6_EVNTSEL2, the reserved
-bit checks are extremely cheap, and the guest is unlikely to frequently
-write the current value, i.e. avoiding the reserved bit checks doesn't
-add much (any?) value.
+> +	}
+> +}
 
-No functional change intended.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/pmu_intel.c | 78 ++++++++++++++++++------------------
- 1 file changed, 39 insertions(+), 39 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 25b70a85bef5..3031baa6742b 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -397,44 +397,43 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 
- 	switch (msr) {
- 	case MSR_CORE_PERF_FIXED_CTR_CTRL:
--		if (pmu->fixed_ctr_ctrl == data)
--			return 0;
--		if (!(data & pmu->fixed_ctr_ctrl_mask)) {
-+		if (data & pmu->fixed_ctr_ctrl_mask)
-+			return 1;
-+
-+		if (pmu->fixed_ctr_ctrl != data)
- 			reprogram_fixed_counters(pmu, data);
--			return 0;
--		}
- 		break;
- 	case MSR_CORE_PERF_GLOBAL_STATUS:
--		if (msr_info->host_initiated) {
--			pmu->global_status = data;
--			return 0;
--		}
--		break; /* RO MSR */
-+		if (!msr_info->host_initiated)
-+			return 1;
-+
-+		pmu->global_status = data;
-+		break;
- 	case MSR_CORE_PERF_GLOBAL_CTRL:
--		if (pmu->global_ctrl == data)
--			return 0;
--		if (kvm_valid_perf_global_ctrl(pmu, data)) {
-+		if (!kvm_valid_perf_global_ctrl(pmu, data))
-+			return 1;
-+
-+		if (pmu->global_ctrl != data) {
- 			diff = pmu->global_ctrl ^ data;
- 			pmu->global_ctrl = data;
- 			reprogram_counters(pmu, diff);
--			return 0;
- 		}
- 		break;
- 	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
--		if (!(data & pmu->global_ovf_ctrl_mask)) {
--			if (!msr_info->host_initiated)
--				pmu->global_status &= ~data;
--			return 0;
--		}
-+		if (data & pmu->global_ovf_ctrl_mask)
-+			return 1;
-+
-+		if (!msr_info->host_initiated)
-+			pmu->global_status &= ~data;
- 		break;
- 	case MSR_IA32_PEBS_ENABLE:
--		if (pmu->pebs_enable == data)
--			return 0;
--		if (!(data & pmu->pebs_enable_mask)) {
-+		if (data & pmu->pebs_enable_mask)
-+			return 1;
-+
-+		if (pmu->pebs_enable != data) {
- 			diff = pmu->pebs_enable ^ data;
- 			pmu->pebs_enable = data;
- 			reprogram_counters(pmu, diff);
--			return 0;
- 		}
- 		break;
- 	case MSR_IA32_DS_AREA:
-@@ -443,14 +442,11 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		if (is_noncanonical_address(data, vcpu))
- 			return 1;
- 		pmu->ds_area = data;
--		return 0;
-+		break;
- 	case MSR_PEBS_DATA_CFG:
--		if (pmu->pebs_data_cfg == data)
--			return 0;
--		if (!(data & pmu->pebs_data_cfg_mask)) {
--			pmu->pebs_data_cfg = data;
--			return 0;
--		}
-+		if (data & pmu->pebs_data_cfg_mask)
-+			return 1;
-+		pmu->pebs_data_cfg = data;
- 		break;
- 	default:
- 		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
-@@ -463,28 +459,32 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 				data = (s64)(s32)data;
- 			pmc->counter += data - pmc_read_counter(pmc);
- 			pmc_update_sample_period(pmc);
--			return 0;
-+			break;
- 		} else if ((pmc = get_fixed_pmc(pmu, msr))) {
- 			pmc->counter += data - pmc_read_counter(pmc);
- 			pmc_update_sample_period(pmc);
--			return 0;
-+			break;
- 		} else if ((pmc = get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0))) {
--			if (data == pmc->eventsel)
--				return 0;
- 			reserved_bits = pmu->reserved_bits;
- 			if ((pmc->idx == 2) &&
- 			    (pmu->raw_event_mask & HSW_IN_TX_CHECKPOINTED))
- 				reserved_bits ^= HSW_IN_TX_CHECKPOINTED;
--			if (!(data & reserved_bits)) {
-+			if (data & reserved_bits)
-+				return 1;
-+
-+			if (data != pmc->eventsel) {
- 				pmc->eventsel = data;
- 				reprogram_counter(pmc);
--				return 0;
- 			}
--		} else if (intel_pmu_handle_lbr_msrs_access(vcpu, msr_info, false))
--			return 0;
-+			break;
-+		} else if (intel_pmu_handle_lbr_msrs_access(vcpu, msr_info, false)) {
-+			break;
-+		}
-+		/* Not a known PMU MSR. */
-+		return 1;
- 	}
- 
--	return 1;
-+	return 0;
- }
- 
- static void setup_fixed_pmc_eventsel(struct kvm_pmu *pmu)
-
-base-commit: e18d6152ff0f41b7f01f9817372022df04e0d354
--- 
-
+Nits aside, nice test!
 
