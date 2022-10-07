@@ -2,71 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 16C705F727F
-	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 03:15:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B3CB5F7283
+	for <lists+kvm@lfdr.de>; Fri,  7 Oct 2022 03:25:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232142AbiJGBPQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 6 Oct 2022 21:15:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51206 "EHLO
+        id S231462AbiJGBXr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 6 Oct 2022 21:23:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231862AbiJGBPP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 6 Oct 2022 21:15:15 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 024BA40E1A
-        for <kvm@vger.kernel.org>; Thu,  6 Oct 2022 18:15:14 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id g28so3603237pfk.8
-        for <kvm@vger.kernel.org>; Thu, 06 Oct 2022 18:15:13 -0700 (PDT)
+        with ESMTP id S229782AbiJGBXp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 6 Oct 2022 21:23:45 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C195C4C12
+        for <kvm@vger.kernel.org>; Thu,  6 Oct 2022 18:23:43 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id c24so3263048plo.3
+        for <kvm@vger.kernel.org>; Thu, 06 Oct 2022 18:23:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=h4XgRZp03/RQpMaeNuS7Q56rf+wF1PU/JtpGOuJoPr0=;
-        b=VL9k24462zz+D9/UiiuhNgxBOX1et1sbkRv5FtkMGNxGOpkB1T/ngf2K1O6P3lv9fv
-         FYjZWYZwNvlyKHvJGXclNcEWp/yTx9uOg40Qg+q7GqC5ZLYM1bXgTwkQtagyPf/QrhG6
-         cTrWppXmWyfMNeUviaXmQMMA6F9vG+6NfbTV5TC23fUyi3kEpoJ7EZUJ7bF3hGncYykU
-         gqQ3SLZ7YMpyxCZNYRiXaYwjK7PT7uv9y5B5dhJ4HKkpKz9Ddz1ARTGXOIKjDoXrxWdT
-         kJf34VYvc07BncSQfRm7sgZrJD2hZd0dN2scstqqtwgGrdkep7ARe+QjVxHNtmwXRoCk
-         /RXw==
+        bh=stxK5eytfi7UYuaTvPr6AF15rib5TqQ7VohLY8AETTo=;
+        b=BAMPgHgcFnz0m5pv8ALZ2vuDAV8Wc9woff48oOK4K3VMoOPH9YWc5vnpQ7Heyj2BBG
+         nErfRvGZFFrVBxkfN8+u3Skf3cCa62PrOw7iLZw5DPICoO1zvKaRXjGHEa+qKJZHKG3t
+         v6jrPuKfQbzGgsIL98V9SzitClNrxXtr5Gl7Sd71SrKOP7n2Rd9wK0KZVm6KQaVHa+jL
+         W4RdSyoaZbbXNRucpHlJ8Z9EtmwXiSNUZOncYy2CsQdKY2C1QH8456f9SnWskshsgZNT
+         uFOOkktZooPW0OQIjY9chxvRV0u/OC8K1zp8E3PO+lokUwafNUUGnxxbUIrlANr3bloM
+         GSLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=h4XgRZp03/RQpMaeNuS7Q56rf+wF1PU/JtpGOuJoPr0=;
-        b=xBlixFW0KN2p7x/wUrVXcrrTWJ2okL2CC+psUEZPjtIpHh2HWIr6nUte2IzkrCGlZV
-         AdDOl4xJugG7A46TVwEq/vCAGVfGE16KaZRjy4V2pF5ezxBgjVz0340iejOoLRDoZ9vS
-         pXmY1iUBTmYlrtWXy+T2wIcgjvqyhXCe6UfrzJKK7uxQce2DS/nRQBhRKsNOi33//Lh4
-         wnS2hkKA18Bvrr7L6TlC5lSuPCWeupgrXITW8vtXUiOug9bazN6oFxAwC9npCyWjrxj6
-         cB7/Nt2aPbyrMbtWTHc711n2ATWMdmD7WfP8pEkPdYl4x/Pl7vJPNmb40BfyQ7aANoXJ
-         QOiw==
-X-Gm-Message-State: ACrzQf1dRliZaoTw0ftI8y0sT15LoUc4EJuambC5FPXH7YdP2/yx2ZHf
-        IUrbMslTq9W/yZtHYzJ5Q61teA==
-X-Google-Smtp-Source: AMsMyM7/UvQoNoJu0mp5Jq7zF/a1fahnuy7Re5M3UTVKOeP0t3IZIkO9E67buUdjHm0f13W0pocYYg==
-X-Received: by 2002:a65:6753:0:b0:438:e83a:bebc with SMTP id c19-20020a656753000000b00438e83abebcmr2246733pgu.602.1665105313419;
-        Thu, 06 Oct 2022 18:15:13 -0700 (PDT)
+        bh=stxK5eytfi7UYuaTvPr6AF15rib5TqQ7VohLY8AETTo=;
+        b=YFcn4ldKs6AcUUjwrnwYJsXJBzC65l3pA2swuVEmwhoMXzRYn/QlqVN3qMgBNNBJ2D
+         8vKnJTNFij5l7My+nNt38Ka7TMV3ppN+MzvX3Ry1cKOa242eM02Y7HBlC87+ZjRYa8mU
+         qmKH36Vvn/k4BOa8e2v68bnGhnpnDaM8whKk7GXdQBZZsC/6jHAqGOBuUL9h8PnIoLeD
+         zgTlr2HQdVNqIFK9jC2qMlDbUDhAAs6Mbl4AVIbEl0lC6F3f1VBTLPiDKVfloo2/inEj
+         1FscLiuNheZ3ci09+quznOHLYy8xirLmdNdBOACZ70+A8O/41oNkt2GvnnpsUxRsXojR
+         DNsw==
+X-Gm-Message-State: ACrzQf1dMbnmBhXnAC4GVgtooTXr0UcsFPL69Q9SmXCvXe3gN5OSStLM
+        TDG3XyfZf23HS8lw8v2sJRYYAQ==
+X-Google-Smtp-Source: AMsMyM4PWFE5pVw18NO2lbdt/TsjQ6FJS7+cij5WQtyZmovc7uLcrH3PCdFglUP7Tg7u6mRpJ23L7A==
+X-Received: by 2002:a17:90b:3d89:b0:20b:201e:9d with SMTP id pq9-20020a17090b3d8900b0020b201e009dmr3592539pjb.11.1665105823006;
+        Thu, 06 Oct 2022 18:23:43 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id p18-20020a1709028a9200b0017d97d13b18sm263133plo.65.2022.10.06.18.15.12
+        by smtp.gmail.com with ESMTPSA id k3-20020a632403000000b00439920bfcbdsm395764pgk.46.2022.10.06.18.22.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Oct 2022 18:15:12 -0700 (PDT)
-Date:   Fri, 7 Oct 2022 01:15:08 +0000
+        Thu, 06 Oct 2022 18:23:11 -0700 (PDT)
+Date:   Fri, 7 Oct 2022 01:22:26 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     "Kalra, Ashish" <ashish.kalra@amd.com>
-Cc:     ovidiu.panait@windriver.com, kvm@vger.kernel.org,
-        liam.merwick@oracle.com, mizhang@google.com, pbonzini@redhat.com,
-        thomas.lendacky@amd.com, michael.roth@amd.com, pgonda@google.com,
-        marcorr@google.com, alpergun@google.com, jarkko@kernel.org,
-        jroedel@suse.de, bp@alien8.de, rientjes@google.com
-Subject: Re: [PATCH 5.4 1/1] KVM: SEV: add cache flush to solve SEV cache
- incoherency issues
-Message-ID: <Yz99nF+d6D+37efE@google.com>
-References: <20220926145247.3688090-1-ovidiu.panait@windriver.com>
- <20220927000729.498292-1-Ashish.Kalra@amd.com>
- <YzJFvWPb1syXcVQm@google.com>
- <215ee1ce-b6eb-9699-d682-f2e592cde448@amd.com>
+To:     Andrew Jones <andrew.jones@linux.dev>
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: selftests: Use TAP interface in the
+ kvm_binary_stats_test
+Message-ID: <Yz9/UsWtYimt2T1D@google.com>
+References: <20221004093131.40392-1-thuth@redhat.com>
+ <20221004093131.40392-2-thuth@redhat.com>
+ <20221005083312.dnblbpe6wabspkzk@kamzik>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <215ee1ce-b6eb-9699-d682-f2e592cde448@amd.com>
+In-Reply-To: <20221005083312.dnblbpe6wabspkzk@kamzik>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -78,32 +76,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 06, 2022, Kalra, Ashish wrote:
-> For the MMU invalidation notifiers we are going to make two changes
-> currently:
+On Wed, Oct 05, 2022, Andrew Jones wrote:
+> On Tue, Oct 04, 2022 at 11:31:29AM +0200, Thomas Huth wrote:
+> > The kvm_binary_stats_test test currently does not have any output (unless
+> > one of the TEST_ASSERT statement fails), so it's hard to say for a user
+> > how far it did proceed already. Thus let's make this a little bit more
+> > user-friendly and include some TAP output via the kselftest.h interface.
 > 
-> 1). Use clflush/clflushopt instead of wbinvd_on_all_cpus() for range <= 2MB.
+> I like the idea of switching the entire kvm selftests framework and all
+> tests to the ksft TAP interface. But, if we want to do that, then the
+> question is whether we should start by partially using it for some tests,
+> and then eventually switch over the framework, or whether we should try to
+> switch everything at once.
+> 
+> I think I prefer the latter, because without changing the framework we
+> can't provide full TAP anyway as TEST_ASSERT exits with 254 instead of 1
+> for a fail-exit and it doesn't output a final TAP test summary either.
 
-IMO, this isn't worth pursuing, to the point where I might object to this code
-being added upstream.  Avoiding WBINVD for the mmu_notifiers doesn't prevent a
-malicious userspace from using SEV-induced WBINVD to effectively DoS the host,
-e.g. userspace can simply ADD+DELETE memslots, or mprotect() chunks > 2mb.
+I would much prefer the latter, e.g. with common entry/exit points[*], much of the
+boilerplate can be done once in common code.  I bet we could even figure out a way
+to have tests default to setting a plan of '1' so that simple tests don't need to
+care about TAP at all.
 
-Using clfushopt also effectively puts a requirement on mm/ that the notifiers
-be invoked _before_ PTEs are modified in the primary MMU, otherwise KVM may not
-be able to resolve the VA=>PFN, or even worse, resolve the wrong PFN.
-
-And no sane VMM should be modifying userspace mappings that cover SEV guest memory
-at any reasonable rate.
-
-In other words, switching to CLFUSHOPT for SEV+SEV-ES VMs is effectively a
-band-aid for the NUMA balancing issue.  A far better solution for NUMA balancing
-would be to pursue a fix for the underlying problem, e.g. disable NUMA balancing
-entirely for SEV/SEV-ES VMs.  That might already be doable from userspace by
-manipulating memory policy, and if not there's a WIP patch[*] that would make it
-trivial for the userspace VMM to disable NUMA balancing.
-
-As for guarding against DoS, /dev/sev should really be locked down so that only
-sufficiently privileged users can create SEV VMs.
-
-[*] https://lore.kernel.org/all/20220929064359.46932-1-ligang.bdlg@bytedance.com
+[*] https://lore.kernel.org/all/20220915000448.1674802-2-vannapurve@google.com
