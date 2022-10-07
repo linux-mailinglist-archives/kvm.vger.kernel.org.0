@@ -2,29 +2,29 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BAD3C5F813C
-	for <lists+kvm@lfdr.de>; Sat,  8 Oct 2022 01:32:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7DC695F813D
+	for <lists+kvm@lfdr.de>; Sat,  8 Oct 2022 01:32:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229452AbiJGXcW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Oct 2022 19:32:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45204 "EHLO
+        id S229666AbiJGXcu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Oct 2022 19:32:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229517AbiJGXcU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Oct 2022 19:32:20 -0400
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0A42193FA
-        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 16:32:19 -0700 (PDT)
+        with ESMTP id S229720AbiJGXcr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Oct 2022 19:32:47 -0400
+Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EB2741D2C
+        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 16:32:46 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1665185538;
+        t=1665185565;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=juZOgW0Fco7l7oEBH2jmC+8Mcq7jexj2RPeIOTMYq7s=;
-        b=bv8GHDF7czdPtxUkkCj/Yx4RNrNgeHLkufQRHzOb8B2aAssBIeWRC8BchEsW4B3ubwEFVY
-        Sau6C+6MP8FL/Z9icklHu13+itlHgQCVJyo3Rlh3Px8NAZ03F3MxxP4xojdyBHmObMzTX5
-        uhSdVjVSaHfRq8sguPBTrXBuxXUzF4Q=
+        bh=OOuk4eVGVEVWUN1bV4vF+FEmeHUfqlni6DbXnJIs1VM=;
+        b=TOwPYi7Na1aVtwybas0i4fv5NH3dlAKOu/DkoMLuSnJ3ACg06qc7Frp0aGut4M6d1tGS3r
+        1ccN5hceeF9/Fto5lOz93V25bXYTDvRr437V7HcIaRWwI0edMCcwJLDlomnswnRjt87LTY
+        AvL9k8sj0yZnFubvhCmhG7I5QRNynsc=
 From:   Oliver Upton <oliver.upton@linux.dev>
 To:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>
@@ -37,9 +37,9 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>,
         Sean Christopherson <seanjc@google.com>,
         kvmarm@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 13/15] KVM: arm64: Make leaf->leaf PTE changes parallel-aware
-Date:   Fri,  7 Oct 2022 23:32:09 +0000
-Message-Id: <20221007233209.460120-1-oliver.upton@linux.dev>
+Subject: [PATCH v2 14/15] KVM: arm64: Make table->block changes parallel-aware
+Date:   Fri,  7 Oct 2022 23:32:26 +0000
+Message-Id: <20221007233226.460179-1-oliver.upton@linux.dev>
 In-Reply-To: <20221007232818.459650-1-oliver.upton@linux.dev>
 References: <20221007232818.459650-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
@@ -54,61 +54,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Convert stage2_map_walker_try_leaf() to use the new break-before-make
-helpers, thereby making the handler parallel-aware. As before, avoid the
-break-before-make if recreating the existing mapping. Additionally,
-retry execution if another vCPU thread is modifying the same PTE.
+stage2_map_walk_leaf() and friends now handle stage-2 PTEs generically,
+and perform the correct flush when a table PTE is removed. Additionally,
+they've been made parallel-aware, using an atomic break to take
+ownership of the PTE.
+
+Stop clearing the PTE in the pre-order callback and instead let
+stage2_map_walk_leaf() deal with it.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/hyp/pgtable.c | 26 ++++++++++++--------------
- 1 file changed, 12 insertions(+), 14 deletions(-)
+ arch/arm64/kvm/hyp/pgtable.c | 15 +++------------
+ 1 file changed, 3 insertions(+), 12 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 932134f0d359..adeece227495 100644
+index adeece227495..d951829c3876 100644
 --- a/arch/arm64/kvm/hyp/pgtable.c
 +++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -801,18 +801,17 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- 	else
- 		new = kvm_init_invalid_leaf_owner(data->owner_id);
+@@ -841,21 +841,12 @@ static int stage2_map_walk_table_pre(const struct kvm_pgtable_visit_ctx *ctx,
+ 	if (!stage2_leaf_mapping_allowed(ctx, data))
+ 		return 0;
  
--	if (stage2_pte_is_counted(ctx->old)) {
--		/*
--		 * Skip updating the PTE if we are trying to recreate the exact
--		 * same mapping or only change the access permissions. Instead,
--		 * the vCPU will exit one more time from guest if still needed
--		 * and then go through the path of relaxing permissions.
--		 */
--		if (!stage2_pte_needs_update(ctx->old, new))
--			return -EAGAIN;
-+	/*
-+	 * Skip updating the PTE if we are trying to recreate the exact
-+	 * same mapping or only change the access permissions. Instead,
-+	 * the vCPU will exit one more time from guest if still needed
-+	 * and then go through the path of relaxing permissions.
-+	 */
-+	if (!stage2_pte_needs_update(ctx->old, new))
-+		return -EAGAIN;
+-	kvm_clear_pte(ctx->ptep);
+-
+-	/*
+-	 * Invalidate the whole stage-2, as we may have numerous leaf
+-	 * entries below us which would otherwise need invalidating
+-	 * individually.
+-	 */
+-	kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
+-
+ 	ret = stage2_map_walk_leaf(ctx, data);
++	if (ret)
++		return ret;
  
--		stage2_put_pte(ctx, data->mmu, mm_ops);
--	}
-+	if (!stage2_try_break_pte(ctx, data))
-+		return -EAGAIN;
+-	mm_ops->put_page(ctx->ptep);
+ 	mm_ops->free_removed_table(childp, ctx->level + 1);
+-
+-	return ret;
++	return 0;
+ }
  
- 	/* Perform CMOs before installation of the guest stage-2 PTE */
- 	if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
-@@ -822,9 +821,8 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
- 	if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
- 		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
- 
--	smp_store_release(ctx->ptep, new);
--	if (stage2_pte_is_counted(new))
--		mm_ops->get_page(ctx->ptep);
-+	stage2_make_pte(ctx, new);
-+
- 	if (kvm_phys_is_valid(phys))
- 		data->phys += granule;
- 	return 0;
+ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
 -- 
 2.38.0.rc1.362.ged0d419d3c-goog
 
