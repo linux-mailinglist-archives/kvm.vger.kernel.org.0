@@ -2,67 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD65D5F80C8
-	for <lists+kvm@lfdr.de>; Sat,  8 Oct 2022 00:28:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 972DA5F80D9
+	for <lists+kvm@lfdr.de>; Sat,  8 Oct 2022 00:41:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229459AbiJGW2A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Oct 2022 18:28:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58238 "EHLO
+        id S229642AbiJGWlc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Oct 2022 18:41:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbiJGW1x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Oct 2022 18:27:53 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BF04A0279
-        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 15:27:52 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id t12-20020a17090a3b4c00b0020b04251529so5835423pjf.5
-        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 15:27:52 -0700 (PDT)
+        with ESMTP id S229634AbiJGWla (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Oct 2022 18:41:30 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66184792E8
+        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 15:41:26 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id 204so6066529pfx.10
+        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 15:41:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XCPFyE5W3Gb2XwMJCAS90JkzDHFPydn2y1iISed8r44=;
-        b=aLguLEeccD1vUU7uhdr3i3/U9eMe7mOBjh7518ewke7SfE9lKu8sLdT9lXzVyuFJaV
-         P39byuRg2X+cGiI/VKOFdhFSy7jNr6FQR0/Ic+SM4o2ie//tmbZuE3Ele/i934zXgwjQ
-         UuvpiBx/FR5JhmNmztWHM+r/cHTitg5Udib7Wa6YZCrzbd9zQUJc+wHBIu8lEMm/dIai
-         otPrgq1gNHL3xeqyTscRD3eAtfXWj2uR3aaw9eRPVOuF+39CzFhDF3RkMFKBoVS6D/FR
-         Rfe3T6X9dL5ldtqowY95oMsntlHvZpjsgk5vXDjZv6TU+OgmQKLKMac7JfRcFPgj0vUa
-         PGVQ==
+        bh=XZo46KulR3GJqtVuZHIWbUUZizarbLhyKl4TV2qKphU=;
+        b=dBBdyRYuo32YUPpc1kGUEYYAzpkYTTnrRhBl72Uadl3ko8LhHSWsmYs9i/H+A5IIRy
+         HwzMZ71od0PXvo5KcAGPDGqTfiupn7S3CO/Gor9rE83zMRkPMTlbzLmnsKUjHgIZg8LN
+         2juqE0SCgI095Dw2wskPWPXZmF+GYPIiO73ixWc6ilrstT0Jb5+zbXR8opgyw5Ng2y+U
+         9i2SqN7uxjBBGUXGP9k3SRcIU3VBwMGHEUv7kYTLMKmxW8h8tTuwOOeZy0g6eaGrDLn0
+         RQg4QKwsTQpr/NJfGxU+dHtPK1Tt5vY4flFa/Y0WFMowYAI42st5gno21ZVaJ7uqSmrF
+         rQCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XCPFyE5W3Gb2XwMJCAS90JkzDHFPydn2y1iISed8r44=;
-        b=PlLtNpBithVJanWKyddnbnq3oh9agxv1S0X7YziUUm4ftlcTQKMgzctGGw8mq0pIat
-         tVKYEArSRpuauCAq4Zoorj+gxInkOG7LNNZsiMjWGNGjC9TBmtbZd+k1/KeE6xqOBN66
-         BhkKRKHLUuJhS/EDmDTghKekkLFm6OXxJAlruQrvME3iiD3acwEMZWmmOtjBxwBH3GcL
-         5dn9vhVyNBj4nmnmgzZUrdMtNcUHP9H4lFVgZmiQlU0/0J9npK07oVHMOZeZPU+YgNud
-         eMmuUfnz/2H8/TwtJhNWrDxVm3W+dt7QaF68gurYR7ymVIvlL6Bxj7vGJk3NbVRsEfra
-         teRw==
-X-Gm-Message-State: ACrzQf3iwSuDtQqes/GAfYyzf1MKfS663VcKHdd0DU4sw6Zse7XDklkc
-        8M1cWKGFU/2vkKqjoi/Czb7i8A==
-X-Google-Smtp-Source: AMsMyM6BvPjzsoTtyu89YHZ6oezxGx8MxufaaLACT7Rj8Bq8M1oiuwhLIA13ukUS7jpdZJoNZ0zuBw==
-X-Received: by 2002:a17:902:e5d1:b0:178:443b:3e76 with SMTP id u17-20020a170902e5d100b00178443b3e76mr6717595plf.153.1665181671533;
-        Fri, 07 Oct 2022 15:27:51 -0700 (PDT)
+        bh=XZo46KulR3GJqtVuZHIWbUUZizarbLhyKl4TV2qKphU=;
+        b=lqj5YmQLcxm4pS7V9J/U+p8PcO/zd0UR5l1vyN0OU4znQKaFptC5/dkZpvNZFBUXY+
+         k4DYWSjRG/rFgGmydMyhTXmuw0JWUJXuXdUjHsDAH6/a4MAMEBGo0P67oH08n7QASXqj
+         ke8eLuBJibFP2Nna31QiL/DEP+BoDQ3IrQC/uRUeQ0xlcnkJae9LOFTs5FLharjJ0wEq
+         eK5v6a2G2ekP+upVyaXfgBJpAJtxhZPY9SVNqWT1WBORfdnLf09vB7eHQAlDaI5ciyox
+         RTUB0wPmOwws+8u48iXKJnK3Dk/oZslusXP7erklplYI9YOwU2Jo0GvuqNiaA5iRpbMo
+         1Htg==
+X-Gm-Message-State: ACrzQf2fRi9jVnrMd1LYqalKegt2GAGJPsCQQpCyagY/YvenJn1ofVXD
+        3Ex32aEIiNajODfTF4vyHd3GHg==
+X-Google-Smtp-Source: AMsMyM6v3bn6n2QXmRyp6k9/WFXcHeQTrFHSgtt18uX5jmUuho3VNautnRtV5ssoL+ke73ayUJkiiQ==
+X-Received: by 2002:a63:2f45:0:b0:457:dc63:68b4 with SMTP id v66-20020a632f45000000b00457dc6368b4mr6416380pgv.228.1665182485640;
+        Fri, 07 Oct 2022 15:41:25 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id v29-20020aa799dd000000b0056258a3606csm2087253pfi.215.2022.10.07.15.27.50
+        by smtp.gmail.com with ESMTPSA id e17-20020a17090301d100b00172e19c2fa9sm2069723plh.9.2022.10.07.15.41.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Oct 2022 15:27:50 -0700 (PDT)
-Date:   Fri, 7 Oct 2022 22:27:46 +0000
+        Fri, 07 Oct 2022 15:41:25 -0700 (PDT)
+Date:   Fri, 7 Oct 2022 22:41:21 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
-Subject: Re: [PATCH] KVM: x86: Advertise that the SMM_CTL MSR is not supported
-Message-ID: <Y0Cn4p6DjgO2skrL@google.com>
-References: <20221007221644.138355-1-jmattson@google.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 3/3] KVM: SVM: Unconditionally enumerate
+ EferLmsleUnsupported
+Message-ID: <Y0CrER/yiHheWiZw@google.com>
+References: <20220920205922.1564814-1-jmattson@google.com>
+ <20220920205922.1564814-4-jmattson@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221007221644.138355-1-jmattson@google.com>
+In-Reply-To: <20220920205922.1564814-4-jmattson@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,40 +77,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 07, 2022, Jim Mattson wrote:
-> CPUID.80000021H:EAX[bit 9] indicates that the SMM_CTL MSR (0xc0010116)
-> is not supported. This defeature can be advertised by
-> KVM_GET_SUPPORTED_CPUID regardless of whether or not the host
-> enumerates it.
-
-Might be worth noting that KVM will only enumerate the bit if the host happens to
-have a max extend leaf > 80000021.
+On Tue, Sep 20, 2022, Jim Mattson wrote:
+> CPUID.80000008H:EDX.EferLmsleUnsupported[bit 20] indicates that
+> IA32_EFER.LMSLE[bit 13] is unsupported and must be zero.
+> 
+> KVM doesn't support "Long Mode Segment Limit Enable," even if the
+> underlying physical processor does, so set that bit in the guest CPUID
+> table returned by KVM_GET_SUPPORTED_CPUID.
 > 
 > Signed-off-by: Jim Mattson <jmattson@google.com>
 > ---
->  arch/x86/kvm/cpuid.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  arch/x86/kvm/svm/svm.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 2796dde06302..b748fac2ae37 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -1199,8 +1199,12 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->  		 * Other defined bits are for MSRs that KVM does not expose:
->  		 *   EAX      3      SPCL, SMM page configuration lock
->  		 *   EAX      13     PCMSR, Prefetch control MSR
-> +		 *
-> +		 * KVM doesn't support SMM_CTL.
-> +		 *   EAX       9     SMM_CTL MSR is not supported
->  		 */
->  		entry->eax &= BIT(0) | BIT(2) | BIT(6);
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 3af360fe21e6..0bf6ac51f097 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4945,6 +4945,7 @@ static __init void svm_set_cpu_caps(void)
+>  	if (boot_cpu_has(X86_FEATURE_LS_CFG_SSBD) ||
+>  	    boot_cpu_has(X86_FEATURE_AMD_SSBD))
+>  		kvm_cpu_cap_set(X86_FEATURE_VIRT_SSBD);
+> +	kvm_cpu_cap_set(X86_FEATURE_NO_LMSLE);
 
-I don't suppose I can bribe you to add a kvm_only_cpuid_leafs entry for these? :-)
+This can go in common x86 code, e.g. if someone wants to run an AMD VM on Intel
+hardware.
 
-> +		entry->eax |= BIT(9);
->  		if (static_cpu_has(X86_FEATURE_LFENCE_RDTSC))
->  			entry->eax |= BIT(2);
->  		if (!static_cpu_has_bug(X86_BUG_NULL_SEG))
-> -- 
-> 2.38.0.rc1.362.ged0d419d3c-goog
-> 
+Side topic, in the context of this series, the below diff highlights how silly it
+is for PSFD to be banished from cpufeatures.h.  While we have Boris's attention
+(and ACK!), can you tack on a patch to move drop KVM_X86_FEATURE_PSFD and move the
+bit to cpufeatures.h where it belongs?
+
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -696,6 +696,7 @@ void kvm_set_cpu_caps(void)
+                F(AMD_SSB_NO) | F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON) |
+                __feature_bit(KVM_X86_FEATURE_PSFD)
+        );
++       kvm_cpu_cap_set(X86_FEATURE_NO_LMSLE);
+ 
+        /*
+         * AMD has separate bits for each SPEC_CTRL bit.
