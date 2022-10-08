@@ -2,69 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E4625F8198
-	for <lists+kvm@lfdr.de>; Sat,  8 Oct 2022 02:37:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 669345F81A7
+	for <lists+kvm@lfdr.de>; Sat,  8 Oct 2022 02:47:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229508AbiJHAhQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 7 Oct 2022 20:37:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59388 "EHLO
+        id S229711AbiJHArM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 7 Oct 2022 20:47:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiJHAhO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 7 Oct 2022 20:37:14 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B831EC5113
-        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 17:37:13 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id o9-20020a17090a0a0900b0020ad4e758b3so6012337pjo.4
-        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 17:37:13 -0700 (PDT)
+        with ESMTP id S229693AbiJHArK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 7 Oct 2022 20:47:10 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 916B2923FE
+        for <kvm@vger.kernel.org>; Fri,  7 Oct 2022 17:47:07 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id f37so9403464lfv.8
+        for <kvm@vger.kernel.org>; Fri, 07 Oct 2022 17:47:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6WXdeiroUwzI1m1TzkyRbdX6EmdcFzs3AcZ0suaC00w=;
-        b=bng6zSE89nAhphFytrcePiNUn78t06CAG7MHmQsOuZU41sWkbGuxCGVxppU618zgOh
-         pr8GxOuNIfbC737PwYyH6e7LcISnRSodGsf1S0JkykzV14loUyC5ATb+w9tSGhvuXBvD
-         cpOInsWZNDPlskZb2ljFQYIrSjt8Yp/n6G3Zvy6QMUzlIbGg1plj/8vjDMU/MktJPzN+
-         9rpUJtmdzohwjxbxmBf9FIfITgZdLsntfsc0v347oZr+g/Boj9mox0Hw6eVdV3shfYhD
-         0h/coeo9qlLxay1eOMC0fR50iFXDEKgP5DGzXbsWVtKoXYLQh2bPVsgF+9fOOtplYxFq
-         P0iw==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=p7KMiKmygQljdaDze+1Mi5dSyi76bw3K5QTxXbuEomg=;
+        b=FwJC73g7hln2Woi+OdqsgomZb1YT6HDjlJtR0dHZDJKg4T4xoc5flWGZSuL09O2SHY
+         EggpVgmlGO68sqS95xEI4UDUSy9nocvp3ASQORU8zgpyQ/x/emSMYsyUYHVGcQDpbP4V
+         Jw7f/KA8QMoK1EYoKUs8pwOTcizZSq6C4+DzcZVDVpygIq6isc8e5D8vtGW1+0uGNOZN
+         fXRRqpM3vHT/EdUSQC8j5/bEV5I5/L4jvukacbP2nxfWjiGhuu129b1OfLg148hkjxFh
+         Bi051ku+vXBrWt+h9OseDpsnzrhoCx+JlOmjgnnicUIGyJD8jQLnVssRG/Wy8psaWMFZ
+         R8+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6WXdeiroUwzI1m1TzkyRbdX6EmdcFzs3AcZ0suaC00w=;
-        b=2e6DGDW/HlMQi3MtSbJ06pAG+cpSFCHvBiQml8uFZI9+pgt0Kh4wG+YxXTvyrDOKeL
-         Ie0fRZKb5mF2dSYAmeaaYh7AhNVNHslkk7X+Cj8KawpC807EBBdk8+wwfNiUs4hHx1Dz
-         sBFIEjB0BQzeVBzQeiPpsT9vUW3e9vWQvQNhb2UU9puJqlDlke6f7/9pYrbbzUMr0h9R
-         6S3VHhzuVU1PFD1Dzg0bNjBBuruLZ0HDn/aoK+ijFe6j+c10VectiJjrqLU39kmEfICd
-         31tZOUSjdj+saJzgT3e4cZLNPoMXSXlT/es1bxqSfuz8nDRtMh8OML2SgIVjhH3KRZ9z
-         uMNQ==
-X-Gm-Message-State: ACrzQf0KPMVzrIULhUe8lAr4YR7bdi8qgkGW8qRwP/UHpoANdsbbSrCb
-        gx7A0okrOqhoRWXW+taCRmUm1w==
-X-Google-Smtp-Source: AMsMyM6g0bPGQGyBEjmD/oeHQKMI42CPv2PLf8fhDLRVppAsuHGG+/wII8iXlUn4fxX5O8CmyG2FpQ==
-X-Received: by 2002:a17:90b:3903:b0:202:affa:1c9f with SMTP id ob3-20020a17090b390300b00202affa1c9fmr8210002pjb.27.1665189433147;
-        Fri, 07 Oct 2022 17:37:13 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id h12-20020a170902f7cc00b001781a7c28b9sm2075255plw.240.2022.10.07.17.37.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Oct 2022 17:37:12 -0700 (PDT)
-Date:   Sat, 8 Oct 2022 00:37:08 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-Subject: Re: [PATCH v5 4/7] kvm: x86/pmu: Introduce masked events to the pmu
- event filter
-Message-ID: <Y0DGNEvbmT3kWR56@google.com>
-References: <20220920174603.302510-1-aaronlewis@google.com>
- <20220920174603.302510-5-aaronlewis@google.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=p7KMiKmygQljdaDze+1Mi5dSyi76bw3K5QTxXbuEomg=;
+        b=QHGEbXX7V20yyLBB9JDL3rXjqZ5qOSTCDgV86RoCgs/tuUTvdmcZYf77HAMaq/g3s4
+         HAhOnRg+VseS7pPwog4czmmNua60uxOzKbcuWmTaurwLfgkEVn42xCauKjn0w90I7kpd
+         kmA4Gm7b9TYmpo06nbomPoom9EVJiXPjVFHIB3o3udoVqyDeDtAIARr8g/W5yILTKWvn
+         YQDotY455lYkYxV6AfmRjkXT5YlEGxPrsv62s2nCDuJRyWExcnhjPy43uvn0AajHORri
+         HYhdZW+OrnGHuLReRS9PwDIamo+43BmAUNezMDiVs2xP7fxAObOngCsFryqjeUzhFINC
+         GMrw==
+X-Gm-Message-State: ACrzQf3/bFHueHYjF/qv9wljsCGQM08lMHeiOBsepu7ueg/Tt1nvAr2/
+        Q3M/6mZgMys6pdUDgCesxV1FgnzxspOm+EnmIwwB0Qz67AGctA==
+X-Google-Smtp-Source: AMsMyM64qzh4cdRvUydaeoSPr1Eur/9lKKt+EIT0/wUB2PNNfV9bRheVITft4fI6c7Zc1FYl6XnzgnS4GortN5iKvUY=
+X-Received: by 2002:ac2:5cd1:0:b0:4a2:291a:9460 with SMTP id
+ f17-20020ac25cd1000000b004a2291a9460mr2636611lfq.203.1665190025651; Fri, 07
+ Oct 2022 17:47:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220920174603.302510-5-aaronlewis@google.com>
+References: <20221006171133.372359-1-vipinsh@google.com> <20221006171133.372359-5-vipinsh@google.com>
+ <Yz8xdJEMjcfdrcWC@google.com> <CAHVum0e4fiaB7hGSA6z1SaiZ1632f9Md2p0Nw6G=5wqhHYvdJg@mail.gmail.com>
+ <Yz9vdoiq+0TyaGqo@google.com> <CAHVum0duCPZSqDcT2L0uupvMB0uGe31Oh-DSpojAnBLFN1d1XQ@mail.gmail.com>
+In-Reply-To: <CAHVum0duCPZSqDcT2L0uupvMB0uGe31Oh-DSpojAnBLFN1d1XQ@mail.gmail.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Fri, 7 Oct 2022 17:46:29 -0700
+Message-ID: <CAHVum0ehcP_tn_7g5RP6HAd8cr50DfHO2H+i_UnjyKE8NJrn7Q@mail.gmail.com>
+Subject: Re: [PATCH v4 4/4] KVM: selftests: Run dirty_log_perf_test on
+ specific CPUs
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, dmatlack@google.com, andrew.jones@linux.dev,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,101 +70,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 20, 2022, Aaron Lewis wrote:
-> +To access individual components in a masked entry use:
-> +::
-> +  struct kvm_pmu_event_masked_entry {
-> +	union {
-> +	__u64 raw;
-> +		struct {
-> +			/* event_select bits 11:8 are only valid on AMD. */
-> +			__u64 event_select:12;
-> +			__u64 mask:8;
-> +			__u64 match:8;
-> +			__u64 exclude:1;
+On Fri, Oct 7, 2022 at 10:39 AM Vipin Sharma <vipinsh@google.com> wrote:
+>
+> On Thu, Oct 6, 2022 at 5:14 PM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Thu, Oct 06, 2022, Vipin Sharma wrote:
+> > > On Thu, Oct 6, 2022 at 12:50 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > > > +{
+> > > > > +     cpu_set_t cpuset;
+> > > > > +     int err;
+> > > > > +
+> > > > > +     CPU_ZERO(&cpuset);
+> > > > > +     CPU_SET(pcpu, &cpuset);
+> > > >
+> > > > To save user pain:
+> > > >
+> > > >         r = sched_getaffinity(0, sizeof(allowed_mask), &allowed_mask);
+> > > >         TEST_ASSERT(!r, "sched_getaffinity failed, errno = %d (%s)", errno,
+> > > >                     strerror(errno));
+> > > >
+> > > >         TEST_ASSERT(CPU_ISSET(pcpu, &allowed_mask),
+> > > >                     "Task '%d' not allowed to run on pCPU '%d'\n");
+> > > >
+> > > >         CPU_ZERO(&allowed_mask);
+> > > >         CPU_SET(cpu, &allowed_mask);
+> > > >
+> > > > that way the user will get an explicit error message if they try to pin a vCPU/task
+> > > > that has already been affined by something else.  And then, in theory,
+> > > > sched_setaffinity() should never fail.
+> > > >
+> > > > Or you could have two cpu_set_t objects and use CPU_AND(), but that seems
+> > > > unnecessarily complex.
+> > > >
+> > >
+> > > sched_setaffinity() doesn't fail when we assign more than one task to
+> > > the pCPU, it allows multiple tasks to be on the same pCPU. One of the
+> > > reasons it fails is if it is provided a cpu number which is bigger
+> > > than what is actually available on the host.
+> > >
+> > > I am not convinced that pinning vCPUs to the same pCPU should throw an
+> > > error. We should allow if someone wants to try and compare performance
+> > > by over subscribing or any valid combination they want to test.
+> >
+> > Oh, I'm not talking about the user pinning multiple vCPUs to the same pCPU via
+> > the test, I'm talking about the user, or more likely something in the users's
+> > environment, restricting what pCPUs the user's tasks are allowed on.  E.g. if
+> > the test is run in shell that has been restricted to CPU8 via cgroups, then
+> > sched_setaffinity() will fail if the user tries to pin vCPUs to any other CPU.
+>
+> I see, I will add this validation.
 
-As suggested in patch 3, keep the architectural bits where they are and fill in
-the gaps.  IIUC, all of bits 63:36 are available, i.e. there's lots of room for
-expansion.  Go top down (start at 63) and cross our fingers that neither Intel
-nor AMD puts stuff there.  If that does happen, then we can start mucking with
-the layout, but until then, let's not make it too hard for ourselves.
+I think we should drop this check. Current logic is that the new
+function perf_test_setup_pinning() parses the vcpu mappings, stores
+them in perf_test_vcpu_args{} struct and moves the main thread to the
+provided pcpu. But this causes TEST_ASSERT(CPU_ISSET...) to fail for
+vcpu threads when they are created because they inherit task affinity
+from the main thread which has the pcpu set during setup.
 
-> +			__u64 rsvd:35;
+However, this affinity is not strict, so, if TEST_ASSERT(CPU_ISSET...)
+is removed then vcpu threads successfully move to their required pcpu
+via sched_setaffinity() even though the main thread has different
+affinity. If cpus are restricted via cgroups then sched_setaffinity()
+fails as expected no matter what.
 
->  #define KVM_VCPU_TSC_CTRL 0 /* control group for the timestamp counter (TSC) */
->  #define   KVM_VCPU_TSC_OFFSET 0 /* attribute for the TSC offset */
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index 7ce8bfafea91..b188ddb23f75 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -252,34 +252,61 @@ static inline u8 get_unit_mask(u64 eventsel)
->  	return (eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
->  }
-
-...
-
-> +/*
-> + * Sort will order the list by exclude, then event select.  This function will
-> + * then index the sublists of event selects such that when a search is done on
-> + * the list, the head of the event select sublist is returned.  This simplifies
-> + * the logic in filter_contains_match() when walking the list.
-
-Unless I'm missing something, this is a complex way to solve a relatively simple
-problem.  You want a list of "includes" and a list of "excludes".  Just have two
-separate lists.
-
-Actually, if we're effectively changing the ABI, why not make everyone's lives
-simpler and expose that to userspace.  E.g. use one of the "pad" words to specify
-the number of "include" events and effectively do this:
-
-struct kvm_pmu_event_filter {
-	__u32 action;
-	__u32 nevents;
-	__u32 fixed_counter_bitmap;
-	__u32 flags;
-	__u32 nr_include_events;
-	__u64 include[nr_include_events];
-	__u64 exclude[nevents - nr_allowed_events];
-};
-
-Then we don't need to steal a bit for "exclude" in the uABI.  The kernel code
-gets a wee bit simpler.
-
-> @@ -693,6 +796,10 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
->  	/* Ensure nevents can't be changed between the user copies. */
->  	*filter = tmp;
->  
-> +	r = -EINVAL;
-> +	if (!is_filter_valid(filter))
-
-Do this in prepare_filter_events() to avoid walking the filter multiple times.
-I've gotten fairly twisted around and my local copy of the code is a mess, but
-something like this:
-
-static int prepare_filter_events(struct kvm_pmu_event_filter *filter)
-{
-	int i;
-
-	for (i = 0, j = 0; i < filter->nevents; i++) {
-		if (filter->events[i] & ~kvm_pmu_ops.EVENTSEL_MASK) {
-			if (!filter->mask)
-				continue;
-
-			if (<reserved bits set>)
-				return -EINVAL;
-		}
-
-		filter->events[j++] = filter->events[i];
-	}
-
-	<more magic here>
-}
-
-
-> +		goto cleanup;
-> +
->  	prepare_filter_events(filter);
->  
->  	mutex_lock(&kvm->lock);
-
-
+Another option will be to split the API, perf_test_setup_pinning()
+will return the main thread pcpu and dirty_log_perf_test can call
+pin_this_task_to_cpu() with the returned pcpu after vcpus have been
+started. I do not like this approach, I also think
+TEST_ASSERT(CPU_ISSET...) is not reducing user pain that much because
+users can still figure out with returned errno what is happening.
