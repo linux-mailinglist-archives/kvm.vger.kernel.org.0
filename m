@@ -2,80 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC2B65F84A7
-	for <lists+kvm@lfdr.de>; Sat,  8 Oct 2022 11:50:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B9135F8604
+	for <lists+kvm@lfdr.de>; Sat,  8 Oct 2022 18:15:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229755AbiJHJum (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 8 Oct 2022 05:50:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56132 "EHLO
+        id S229849AbiJHQPX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 8 Oct 2022 12:15:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229695AbiJHJui (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 8 Oct 2022 05:50:38 -0400
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3082042D45
-        for <kvm@vger.kernel.org>; Sat,  8 Oct 2022 02:50:35 -0700 (PDT)
-Date:   Sat, 8 Oct 2022 11:50:32 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1665222634;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z2ZkYxEmGQXPz/45TkJJknVMlw8vPU4nddhOpAc1+jI=;
-        b=BMCmUnGzn75mZCu9lmT/uDyu+WvJNT5yNnFodC7GOKj8i7P7uarIPgBf/9cvmAztahL8vT
-        bM3/lQCaKFcd/UCA+1xrm8lTHFiyeDwrZE49PtgHyXaNN4X79TcojnjVIgGpkWw5rPI0Ka
-        reGqI8GmCZxuZtgU1tChRscEZuFgBTI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Andrew Jones <andrew.jones@linux.dev>
+        with ESMTP id S229609AbiJHQPV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 8 Oct 2022 12:15:21 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ED1431DC7;
+        Sat,  8 Oct 2022 09:15:20 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 34BE160A37;
+        Sat,  8 Oct 2022 16:15:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A207C433D6;
+        Sat,  8 Oct 2022 16:15:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1665245719;
+        bh=NIgNigZexN067z2ad+UvtpUHM+JSZc0JYM0evS6yNx0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=VAGeVVDf6KIOhTWVugZOJTuKPzDIFSGBDrGjIzZCQaYbWM1BU4NBt3yHdh/p+QB8Z
+         Mx6iHaLe+DEGh+bDFLK83w/Rr0LUpsfWq5pCWNpvvFsJhEEnvolwGToq7kVMYm16C7
+         QcypgNRE4zg87Wqm9iJT8rOYJDbQxSGv57JHugrmcHqPoIxRdFRiHZJqRPFSyCDMtn
+         VuP1L+Zw3IgC/rMVlFF4fXoapnhUapUQB/vBk7S49rXo0meL1hSUbsDRuB/MFvpsc1
+         IrKiCJ6IemXXuaxmEzEV+cS22e0yEOJl6KXc6pQBJg1bl7a6cOxdRgEbitVsWeCajN
+         r4dGxRV6nD9YQ==
+Date:   Sat, 8 Oct 2022 19:15:13 +0300
+From:   Jarkko Sakkinen <jarkko@kernel.org>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com, maz@kernel.org, dmatlack@google.com,
-        oupton@google.com, ricarkol@google.com
-Subject: Re: [PATCH v6 2/3] KVM: selftests: randomize which pages are written
- vs read
-Message-ID: <20221008095032.kcbvpdz4o5tunptn@kamzik>
-References: <20220912195849.3989707-1-coltonlewis@google.com>
- <20220912195849.3989707-3-coltonlewis@google.com>
- <Y0CSOKOq0T48e0yr@google.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v8 2/8] KVM: Extend the memslot to support fd-based
+ private memory
+Message-ID: <Y0GiEW0cYCNx5jyK@kernel.org>
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-3-chao.p.peng@linux.intel.com>
+ <Yz7s+JIexAHJm5dc@kernel.org>
+ <Yz7vHXZmU3EpmI0j@kernel.org>
+ <Yz71ogila0mSHxxJ@google.com>
+ <Y0AJ++m/TxoscOZg@kernel.org>
+ <Y0A+rogB6TRDtbyE@google.com>
+ <Y0CgFIq6JnHmdWrL@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y0CSOKOq0T48e0yr@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <Y0CgFIq6JnHmdWrL@kernel.org>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 07, 2022 at 08:55:20PM +0000, Sean Christopherson wrote:
-> On Mon, Sep 12, 2022, Colton Lewis wrote:
-> > @@ -393,7 +403,7 @@ int main(int argc, char *argv[])
-> >  
-> >  	guest_modes_append_default();
-> >  
-> > -	while ((opt = getopt(argc, argv, "ghi:p:m:nb:f:v:or:s:x:")) != -1) {
-> > +	while ((opt = getopt(argc, argv, "ghi:p:m:nb:v:or:s:x:w:")) != -1) {
+On Sat, Oct 08, 2022 at 12:54:32AM +0300, Jarkko Sakkinen wrote:
+> On Fri, Oct 07, 2022 at 02:58:54PM +0000, Sean Christopherson wrote:
+> > On Fri, Oct 07, 2022, Jarkko Sakkinen wrote:
+> > > On Thu, Oct 06, 2022 at 03:34:58PM +0000, Sean Christopherson wrote:
+> > > > On Thu, Oct 06, 2022, Jarkko Sakkinen wrote:
+> > > > > On Thu, Oct 06, 2022 at 05:58:03PM +0300, Jarkko Sakkinen wrote:
+> > > > > > On Thu, Sep 15, 2022 at 10:29:07PM +0800, Chao Peng wrote:
+> > > > > > > This new extension, indicated by the new flag KVM_MEM_PRIVATE, adds two
+> > > > > > > additional KVM memslot fields private_fd/private_offset to allow
+> > > > > > > userspace to specify that guest private memory provided from the
+> > > > > > > private_fd and guest_phys_addr mapped at the private_offset of the
+> > > > > > > private_fd, spanning a range of memory_size.
+> > > > > > > 
+> > > > > > > The extended memslot can still have the userspace_addr(hva). When use, a
+> > > > > > > single memslot can maintain both private memory through private
+> > > > > > > fd(private_fd/private_offset) and shared memory through
+> > > > > > > hva(userspace_addr). Whether the private or shared part is visible to
+> > > > > > > guest is maintained by other KVM code.
+> > > > > > 
+> > > > > > What is anyway the appeal of private_offset field, instead of having just
+> > > > > > 1:1 association between regions and files, i.e. one memfd per region?
+> > > > 
+> > > > Modifying memslots is slow, both in KVM and in QEMU (not sure about Google's VMM).
+> > > > E.g. if a vCPU converts a single page, it will be forced to wait until all other
+> > > > vCPUs drop SRCU, which can have severe latency spikes, e.g. if KVM is faulting in
+> > > > memory.  KVM's memslot updates also hold a mutex for the entire duration of the
+> > > > update, i.e. conversions on different vCPUs would be fully serialized, exacerbating
+> > > > the SRCU problem.
+> > > > 
+> > > > KVM also has historical baggage where it "needs" to zap _all_ SPTEs when any
+> > > > memslot is deleted.
+> > > > 
+> > > > Taking both a private_fd and a shared userspace address allows userspace to convert
+> > > > between private and shared without having to manipulate memslots.
+> > > 
+> > > Right, this was really good explanation, thank you.
+> > > 
+> > > Still wondering could this possibly work (or not):
+> > > 
+> > > 1. Union userspace_addr and private_fd.
+> > 
+> > No, because userspace needs to be able to provide both userspace_addr (shared
+> > memory) and private_fd (private memory) for a single memslot.
 > 
-> This string is getting quite annoying to maintain, e.g. all of these patches
-> conflict with recent upstream changes, and IIRC will conflict again with Vipin's
-> changes.  AFAICT, the string passed to getopt() doesn't need to be constant, i.e.
-> can be built programmatically.  Not in this series, but as future cleanup we should
-> at least consider a way to make this slightly less painful to maintain.
->
+> Got it, thanks for clearing my misunderstandings on this topic, and it
+> is quite obviously visible in 5/8 and 7/8. I.e. if I got it right,
+> memblock can be partially private, and you dig the shared holes with
+> KVM_MEMORY_ENCRYPT_UNREG_REGION. We have (in Enarx) ATM have memblock
+> per host mmap, I was looking into this dilated by that mindset but makes
+> definitely sense to support that.
 
-I wonder if a getopt string like above is really saying "we're doing too
-much in a single test binary". Are all these switches just for one-off
-experiments which developers need? Or, are testers expected to run this
-binary multiple times with different combinations of switches? If it's
-the latter, then I think we need a test runner script and config file to
-capture those separate invocations (similar to kvm-unit-tests). Or, change
-from a collection of command line switches to building the file multiple
-times with different compile time switches and output filenames. Then,
-testers are just expected to run all binaries (which is what I think most
-believe / do today).
+For me the most useful reference with this feature is kvm_set_phys_mem()
+implementation in privmem-v8 branch. Took while to find it because I did
+not have much experience with QEMU code base. I'd even recommend to mention
+that function in the cover letter because it is really good reference on
+how this feature is supposed to be used.
 
-Thanks,
-drew
+BR, Jarkko
