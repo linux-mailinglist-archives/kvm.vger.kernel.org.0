@@ -2,145 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E9E295FA211
-	for <lists+kvm@lfdr.de>; Mon, 10 Oct 2022 18:41:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D8175FA26C
+	for <lists+kvm@lfdr.de>; Mon, 10 Oct 2022 19:05:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229731AbiJJQl1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Oct 2022 12:41:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42676 "EHLO
+        id S229955AbiJJRFr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Oct 2022 13:05:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229619AbiJJQlZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Oct 2022 12:41:25 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 316C6631F2
-        for <kvm@vger.kernel.org>; Mon, 10 Oct 2022 09:41:25 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id b15so10284232pje.1
-        for <kvm@vger.kernel.org>; Mon, 10 Oct 2022 09:41:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kBInphdFTXa+77vEzA8kMD40VeRTtiaezhjgTdUa2c8=;
-        b=Ioiculmaz1YAb5NVneZFkhzIt6X3SGkkzMsJwSvkJM6hcobICfyHe8TyvymAj0qT6b
-         ZUTFM5KCdpQ44aCQ6ZLyNYfcp7TdGyBlm6MHHCa9Xva8V7nYYCsWlnlGomhQ4vjy3ISU
-         fofiNRh3k1oPiS7NFLW3+NnTgREVsoOmZgqppbAUpof32omJtwTC9CDvpj/rq5Uef4ea
-         TrFijDKYWipyHQC0rTUk9udh11czrQEaL9YvVRs2irIIdadWKHS7KgNC0GeptcqF7p6+
-         Az+Ht15iu3F4rgLfUy7OPBt3a6yh596fLSnKYBNDCWdRz1C67Mv05ysWrHYEgtGUi+kP
-         IHFA==
+        with ESMTP id S229937AbiJJRFm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Oct 2022 13:05:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 635D818376
+        for <kvm@vger.kernel.org>; Mon, 10 Oct 2022 10:05:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665421539;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=PIyB/HY40+8TeBToBpv65MXDYl/DWNxmK/k3JvGCIiE=;
+        b=ivdHdAQYN2ZcqqUu4ct8zVwS3FoWakrSMJDGcWEQo0QoA1g2+uynjn80KRYiGIBndzsAAb
+        P03dkYLDFbo4F8CdpAlleLpo/PASLVVBiC3z6vS7F2LJrkl8UdgpT5/Wy6Sq8o7qNxOcLD
+        pjuDEHTgUnzvxL/84MVJHSqM5+vItyU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-114-UaruGU6IO_OE5m5ajK0A0g-1; Mon, 10 Oct 2022 13:05:36 -0400
+X-MC-Unique: UaruGU6IO_OE5m5ajK0A0g-1
+Received: by mail-wm1-f71.google.com with SMTP id az35-20020a05600c602300b003c5273b79fdso3636626wmb.3
+        for <kvm@vger.kernel.org>; Mon, 10 Oct 2022 10:05:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kBInphdFTXa+77vEzA8kMD40VeRTtiaezhjgTdUa2c8=;
-        b=2kRE/wR9KU0kxagtY7YqASyYjZOI5iFlg0a1WC69VyQ8ha/d77MsmDZ14/i3zSFEaz
-         570+4YmlvVAnG895K520WZaDa6KwSqs2L3bSS43V/qjmZFknEZkbNRDKwyuRJAbJVEft
-         gaEgo+zg0iRup0GOMu4mrxxAhECXvLNTxLC+H9blfZdBG7IaJDHmvPH8rUG9EMYlYHuD
-         PUnfOIfQglxZVzePIYL1U75Nriq8R2Bvuy5kdtUkNuUfg4Cnwhn1JZb2oV49Be5TEZHf
-         NLSNd3qXKKWjIR3BfuYcbSN6jwckVkLG8HyfG55Ly+Kh7Q5BVPiddQFQ5g2s8Azj4jLv
-         sFLg==
-X-Gm-Message-State: ACrzQf1JFBEYC9WKEroxZVzNEbObLzKRoxI4MuaZRUnuGekm36mXkJjO
-        MfYF2E6S3bGzuw7PbP/Ry+O9aw==
-X-Google-Smtp-Source: AMsMyM4hWhFMlChYX1VJsTIrwqLA5NexCdb9SNtPs67uwYmXA6KlZ7sCtrOQtTR2AySyoPBQZhFe3Q==
-X-Received: by 2002:a17:902:eb87:b0:180:dfae:553a with SMTP id q7-20020a170902eb8700b00180dfae553amr14133045plg.114.1665420084555;
-        Mon, 10 Oct 2022 09:41:24 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id g12-20020a170902868c00b0017f7f8bb718sm6818970plo.232.2022.10.10.09.41.23
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PIyB/HY40+8TeBToBpv65MXDYl/DWNxmK/k3JvGCIiE=;
+        b=1mf2r2wenO0Z8XJ8L3/B5wCer6lRg02Q/FTGLP9KIdfb+akfrfItg2itM1PW57+luv
+         ayeNaklq5wzWdfHZY3VPRivHRqI9kL+OlEUhjhxcfh1TLU0nIMxc6gwExnebdY4epSVn
+         gdGdspmNo43VZExuWbCLO4EPsrYMBmujVN/TNdK/bdV73+/HV6El+pB4LcOkcWSgQILD
+         pOwENc/3yhKq6hinPo/FZo7FB23TrX8S/Fu1fgyjrgJHoYY+hiJk+8J+hrDBZ9VqNqgz
+         OuVYgQYoBKpEHiA6oySpU01rFaa7TVNN/MFzsFCxXrqBJ+nBXQrC4DNpqLYTKVJ7AV0P
+         u01g==
+X-Gm-Message-State: ACrzQf2euWWfvZ6ZyUFPAM48SVRf8GOCLiDchNITobGCsmty2alwDPui
+        i5N3GiH5jTHMcB+4DbsaFtv1sKSMi7ocNa4rj7bJ+JfDl6cdpqPX+NbJqdniMbqgFqtF5yw/hPK
+        r+6nav4MWh2CQ
+X-Received: by 2002:a05:6000:551:b0:22e:4499:a478 with SMTP id b17-20020a056000055100b0022e4499a478mr12211634wrf.459.1665421535016;
+        Mon, 10 Oct 2022 10:05:35 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6MDzV9L01F029gTj1ssLnHEx3xEyweFq79VqCpbwfJHiOCzNf0Eeex8rsDJwqhIumi3/kkGQ==
+X-Received: by 2002:a05:6000:551:b0:22e:4499:a478 with SMTP id b17-20020a056000055100b0022e4499a478mr12211606wrf.459.1665421534723;
+        Mon, 10 Oct 2022 10:05:34 -0700 (PDT)
+Received: from redhat.com ([2.55.183.131])
+        by smtp.gmail.com with ESMTPSA id l19-20020a05600c089300b003c5571c27a1sm7263313wmp.32.2022.10.10.10.05.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Oct 2022 09:41:24 -0700 (PDT)
-Date:   Mon, 10 Oct 2022 16:41:20 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     kernel test robot <yujie.liu@intel.com>
-Cc:     lkp@lists.01.org, lkp@intel.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [KVM] 21d4c575eb: perf-sanity-tests.Test_event_parsing.fail
-Message-ID: <Y0RLMJW27AmKTgLQ@google.com>
-References: <202210091636.2f13027d-yujie.liu@intel.com>
+        Mon, 10 Oct 2022 10:05:34 -0700 (PDT)
+Date:   Mon, 10 Oct 2022 13:05:24 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Nadav Amit <namit@vmware.com>
+Cc:     Alexander Graf <graf@amazon.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Ajay Kaher <akaher@vmware.com>,
+        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "rostedt@goodmis.org" <rostedt@goodmis.org>,
+        Srivatsa Bhat <srivatsab@vmware.com>,
+        "srivatsa@csail.mit.edu" <srivatsa@csail.mit.edu>,
+        Alexey Makhalov <amakhalov@vmware.com>,
+        Vasavi Sirnapalli <vsirnapalli@vmware.com>,
+        "er.ajay.kaher@gmail.com" <er.ajay.kaher@gmail.com>,
+        "willy@infradead.org" <willy@infradead.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "jailhouse-dev@googlegroups.com" <jailhouse-dev@googlegroups.com>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+        "helgaas@kernel.org" <helgaas@kernel.org>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>
+Subject: Re: [PATCH v2] x86/PCI: Prefer MMIO over PIO on all hypervisor
+Message-ID: <20221010130413-mutt-send-email-mst@kernel.org>
+References: <9FEC6622-780D-41E6-B7CA-8D39EDB2C093@vmware.com>
+ <87zgf3pfd1.fsf@redhat.com>
+ <B64FD502-E794-4E94-A267-D690476C57EE@vmware.com>
+ <87tu4l9cfm.fsf@redhat.com>
+ <04F550C5-786A-4B8E-9A88-EBFBD8872F16@vmware.com>
+ <f1a7e603-2e64-fd2a-1100-f2898060e3f7@amazon.com>
+ <DF8775A4-5332-412C-9359-749E96E83907@vmware.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <202210091636.2f13027d-yujie.liu@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <DF8775A4-5332-412C-9359-749E96E83907@vmware.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Oct 09, 2022, kernel test robot wrote:
-> Greeting,
+On Tue, Oct 04, 2022 at 06:48:11PM +0000, Nadav Amit wrote:
+> On Oct 4, 2022, at 1:22 AM, Alexander Graf <graf@amazon.com> wrote:
 > 
-> FYI, we noticed the following commit (built with gcc-11):
+> > ⚠ External Email
+> > 
+> > Hey Nadav,
+> > 
+> > On 03.10.22 19:34, Nadav Amit wrote:
+> >> On Oct 3, 2022, at 8:03 AM, Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+> >> 
+> >>> Not my but rather PCI maintainer's call but IMHO dropping 'const' is
+> >>> better, introducing a new global var is our 'last resort' and should be
+> >>> avoided whenever possible. Alternatively, you can add a
+> >>> raw_pci_ext_ops_preferred() function checking somethin within 'struct
+> >>> hypervisor_x86' but I'm unsure if it's better.
+> >>> 
+> >>> Also, please check Alex' question/suggestion.
+> >> Here is my take (and Ajay knows probably more than me):
+> >> 
+> >> Looking briefly on MCFG, I do not see a clean way of using the ACPI table.
+> >> The two options are either to use a reserved field (which who knows, might
+> >> be used one day) or some OEM ID. I am also not familiar with
+> >> PCI_COMMAND.MEMORY=0, so Ajay can hopefully give some answer about that.
+> >> 
+> >> Anyhow, I understand (although not relate) to the objection for a new global
+> >> variable. How about explicitly calling this hardware bug a “bug” and using
+> >> the proper infrastructure? Calling it explicitly a bug may even push whoever
+> >> can to resolve it.
+> > 
+> > 
+> > I am a lot more concerned with how we propagate it externally than
+> > within Linux. If we hard code that all Linux kernels 6.2+ that are
+> > running in VMware prefer ECAM over PIO, we lock ourselves into that
+> > stance for better or worse, which means:
+> > 
+> > * All past and future versions of any VMware hypervisor product have to
+> > always allow ECAM access for any PCIe config space write
+> > * No other hypervisor benefits from any of this without upstream code change
+> > * No real hardware platform benefits from this without upstream code change
+> > 
+> > By moving it into MCFG, we can create a path for the outside environment
+> > to tell the OS whether it's safe to use ECAM always. This obviously
+> > doesn't work with MCFG as it stands today, we'd have to propose an MCFG
+> > spec change to the PCI SIG's "PCI Firmware Specification" to add the
+> > respective field. Future VMware versions could then always expose the
+> > flag - and if you find it broken, remove it again.
+> > 
+> > Putting all of the logic on which system potentially prefers ECAM over
+> > PIO config space access into Linux is just a big hack that we should
+> > avoid as much as possible.
 > 
-> commit: 21d4c575eb4a1e6d956b61b5e9c162895fa7d4ba ("KVM: x86: Print error code in exception injection tracepoint iff valid")
-> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
+> Thanks Alex. You raise important points. Let me try to break down your
+> concerns slightly differently:
 > 
-> in testcase: perf-sanity-tests
-> version: 
-> with following parameters:
+> 1. Enabling MMIO access should be selective, and potentially controlled by
+> the hypervisor. The very least a "chicken-bit” is needed.
 > 
-> 	perf_compiler: gcc
+> 2. PCI SIG would change its specifications to address unclear hardware bug.
 > 
-> on test machine: 4 threads Intel(R) Core(TM) i5-6500 CPU @ 3.20GHz (Skylake) with 32G memory
+> I think (1) makes sense and we can discuss different ways of addressing it.
+> But (2) would not happen in a reasonable timeline and seems to me as an
+> unnecessary complication.
 > 
-> caused below changes (please refer to attached dmesg/kmsg for entire log/backtrace):
+> But before we discuss how to address the issue, perhaps we need to first
+> understand it better. I am not sure that I understand this MMIO bug, and so
+> far nobody was able to provide exact details.
+> 
+> So I went to have a look. It might not be super helpful, but for the record,
+> here is what I collected.
+> 
+> First, we have commit d6ece5491ae71d ("i386/x86-64 Correct for broken MCFG
+> tables on K8 systems”). It tried to "try to discover all devices on bus 0
+> that are unreachable using MM and fallback for them.” Interestingly, it
+> seems similar to FreeBSD code (commit 2d10570afe2b3e) that also mentions K8
+> and has similar detection logic in FreeBSD’s pcie_cfgregopen().
+> 
+> Then commit a0ca9909609470 ("PCI x86: always use conf1 to access config
+> space below 256 bytes”). The correspondence [1] mentions some bugs: ATI
+> chipset, VIA chipset, Intel 3 Series Express chipset family and some reports
+> on Nvidia. It turned out some devices had problem probing - to figure out if
+> MMIO is broken - the way the previous patch did.
 
-What exactly is changing?  I see some "FAILED!" entries, but I don't see how a
-commit that only affects tracepoint string output can be related to things like
-"Lookup mmap thread".  If the issue is that the output change caused
-"Parse event definition strings" to fail, and that propagated to everything else,
-then this is effectively "working as intended".
+There's also a statement by Linus that MCFG might not cover all buses
+in that thread.  I didn't think the implications through yet ...
 
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index d07428e660e3..385436d12024 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -376,10 +376,11 @@ TRACE_EVENT(kvm_inj_exception,
-                __entry->reinjected     = reinjected;
-        ),
- 
--       TP_printk("%s (0x%x)%s",
-+       TP_printk("%s%s%s%s%s",
-                  __print_symbolic(__entry->exception, kvm_trace_sym_exc),
--                 /* FIXME: don't print error_code if not present */
--                 __entry->has_error ? __entry->error_code : 0,
-+                 !__entry->has_error ? "" : " (",
-+                 !__entry->has_error ? "" : __print_symbolic(__entry->error_code, { }),
-+                 !__entry->has_error ? "" : ")",
-                  __entry->reinjected ? " [reinjected]" : "")
- );
+> All of these bugs are circa 2008, of course. And note that FreeBSD did not
+> take a similar path. The correspondence around Linux patch is endless. I
+> admit that I did not understand whether eventually the issues were found to
+> be per-bus or per-device.
+> 
+> 
+> Back to the matter at hand. The benefit of using the MCFG approach that you
+> propose is that it can enable native systems to use MMIO as well. However,
+> since the list of bugs is unclear and the problems might be device-specific,
+> it is not clear what information BIOSes have that Linux doesn’t. In other
+> words, the benefit of getting it into the specifications is questionable,
+> and the complexity+time is high.
+> 
+> Can we agree that the feature would be enabled explicitly by the hypervisor
+> and Linux would enable it based on the hypervisor input (through some
+> channel?)
+> 
+> Thanks,
+> Nadav
+> 
+> [1] https://lore.kernel.org/all/20080112144030.GA19279@jurassic.park.msu.ru/T/#u
 
-> 2022-10-08 04:47:24 sudo /usr/src/perf_selftests-x86_64-rhel-8.3-func-21d4c575eb4a1e6d956b61b5e9c162895fa7d4ba/tools/perf/perf test 6
->   6: Parse event definition strings                                  :
->   6.1: Test event parsing                                            : FAILED!
-
-> 2022-10-08 04:48:12 sudo /usr/src/perf_selftests-x86_64-rhel-8.3-func-21d4c575eb4a1e6d956b61b5e9c162895fa7d4ba/tools/perf/perf test 19
->  19: 'import perf' in python                                         : FAILED!
-
-> 2022-10-08 04:48:36 sudo /usr/src/perf_selftests-x86_64-rhel-8.3-func-21d4c575eb4a1e6d956b61b5e9c162895fa7d4ba/tools/perf/perf test 31
->  31: Lookup mmap thread                                              : FAILED!
-
-> 2022-10-08 04:48:45 sudo /usr/src/perf_selftests-x86_64-rhel-8.3-func-21d4c575eb4a1e6d956b61b5e9c162895fa7d4ba/tools/perf/perf test 72
->  72: dlfilter C API                                                  : FAILED!
-
-> 2022-10-08 04:48:46 sudo /usr/src/perf_selftests-x86_64-rhel-8.3-func-21d4c575eb4a1e6d956b61b5e9c162895fa7d4ba/tools/perf/perf test 75
->  75: Test dwarf unwind                                               : FAILED!
-
-> 2022-10-08 04:48:47 sudo /usr/src/perf_selftests-x86_64-rhel-8.3-func-21d4c575eb4a1e6d956b61b5e9c162895fa7d4ba/tools/perf/perf test 80
->  80: build id cache operations                                       : FAILED!
-
-> 2022-10-08 04:49:27 sudo /usr/src/perf_selftests-x86_64-rhel-8.3-func-21d4c575eb4a1e6d956b61b5e9c162895fa7d4ba/tools/perf/perf test 89
->  89: perf stat CSV output linter                                     : FAILED!
-
-> 2022-10-08 04:49:51 sudo /usr/src/perf_selftests-x86_64-rhel-8.3-func-21d4c575eb4a1e6d956b61b5e9c162895fa7d4ba/tools/perf/perf test 94
->  94: perf all metrics test                                           : FAILED!
-
-> 2022-10-08 04:56:05 sudo /usr/src/perf_selftests-x86_64-rhel-8.3-func-21d4c575eb4a1e6d956b61b5e9c162895fa7d4ba/tools/perf/perf test 101
-> 101: Miscellaneous Intel PT testing                                  : FAILED!
