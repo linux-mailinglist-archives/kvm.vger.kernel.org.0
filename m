@@ -2,106 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AEE5E5FA35B
-	for <lists+kvm@lfdr.de>; Mon, 10 Oct 2022 20:28:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EDD735FA364
+	for <lists+kvm@lfdr.de>; Mon, 10 Oct 2022 20:32:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229755AbiJJS2B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Oct 2022 14:28:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44338 "EHLO
+        id S229552AbiJJSch (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Oct 2022 14:32:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229538AbiJJS2A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Oct 2022 14:28:00 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2078.outbound.protection.outlook.com [40.107.244.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B49874DC3
-        for <kvm@vger.kernel.org>; Mon, 10 Oct 2022 11:27:59 -0700 (PDT)
+        with ESMTP id S229644AbiJJSce (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Oct 2022 14:32:34 -0400
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2068.outbound.protection.outlook.com [40.107.92.68])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A29E7675E
+        for <kvm@vger.kernel.org>; Mon, 10 Oct 2022 11:32:33 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TXc/wJb51hIF4Z5frYD55WaSdGZQSg1tXrPI/oE23jlWYAf/ofuEMZu3JFem0JNDzWyVeThkSPXwLM6TwK3Ddw1zIywDN5RiN8u72dZYJjit058/QaeoFmWLE3Inr4wsFdVI/MOaqDPDtp0FCz7K+Q6tiwAGz5vndwXosRJ1kRqPhd0d6ZmzUBzgCTcjarOXQawFmrdECtVcDEwZRkVT42V0YM6JayIA4hSzIo/fgm4IQMEG6zRj3dCVz4aD5XltxZC9UZ/I/GdH+XPvgZHkyRYfzvfc/Jm5dRzB6GTWWED4ed7WZRXFoNZn13/OetjCgLi9bwHvzFli1ltW3LhcYQ==
+ b=MKJfYBUEy5G3QNgn/lbsD9F7EboM4j+6Yt4KxrDTZuyHPn3qylBf8gxiKbeokGTsRKnPeLWmAH3QjH8AiEBnpBhRppmz77g9JicS6/qPTKtpLnoTCv3vEUiV+VQ4Ve029AowHplrv3G96K0rNYUPU7ADcj0POVtlxE49okxFUtLQOLwEFVf2YjhWx64HI33mczt9+8DSKStBjr6vrgcsyRJIlqkQNKC6jQnRdYFcHLZ+drYMSItk+6/kdOVrVIeBVCgp2jjpPCVVZo0Db9km9pPoO8VmEzgaQFIjjns/zhGqdc+UwDSshPS63sIfrctnTURjQDuxRMkH3HLBmf2dig==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CsaDn7amSYCyS0lgDfMQHHGIb56bZ2Sc4ltb7Wrq4dM=;
- b=CdFsA0OhrxXmAfGijse3eRcVRbD9tH1ct68GkKC5rz5+09/HZvaVptTaT9HOjBx+teAtAYRsHqhNPIO8Wz3uIgOw1gZpGGhb07ekAM6jF8ngWFplbPjLuTx+62TzkIgkFaUkD6oD2MLTIBIaBGYHqXXm8GUbPOL+B+TZDYzdv2DDpq7Pb4sN9Ouj6vUZSHhroxQtoNGrczWoMWuvLAwSRoCrnFI2d0e3jMzKlnJR0wcS0cK6+lhkSPoBRViksEBqkP6gwEISd6nRgk7HUMAtptW2D65TjDkoVDrB1nVdZG8b0tw1SRktfcGaiICudBrCxJc1+9aTze07NW5hh29BQQ==
+ bh=tdSvloMInp2kCFtO7C37yCjBkgIBulLKU0PWOCQO/Ks=;
+ b=c9j4zGg1zWZBijU2DUshbFBUfxx5CTldGfL+3CNeZU2L9e8wws4imQEYSjQ/FcwI+e97U/8AROD3x7DesHxANZT2WAvH6qLQEks2cpQhXelwPFUSlOHG2aFIRtIMQTB0yKrvI9RKQoH7DZQAhmJfGpatVZrkmbELtJqGs+By21VnMyucMwL9SZ3IhJwMXX5Dfta+NM0ddzU5wDid2zOYI9os2bxMXkePL/KPEtpVDPhfMguRSO367jS6AXjI3CoXVGAB0VISpAQeeJ4Ng3HKZ7tpWMx7U7WcBRpmnMJDdLz5Fa5+fdH2J/0Zf83R0oyORm+yhcUR+lS9bcgOJJ9NGg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CsaDn7amSYCyS0lgDfMQHHGIb56bZ2Sc4ltb7Wrq4dM=;
- b=DoGRO6a6+i0YraDb6D3K784diTOWSH9zrz/RnPON8ktyB/y2P6NuKf+GXvLEX9flmb5fq6fKi/lJKgWgidGW5olFnpXmVNGTCA5Gp6nJh05UEyPlo2WA1ox6cwruSWog0PPaO/Nv44jD/hGVUDYP+VNokLQyykp11wIKT5tB4qcW/9k30YknkjZu7tFJjUAttATgk6KFRuAXApjGEaHt8xU62/8BDxrJFwWIZRDkIv8yQZjuCX1ZVz2fze0fERQXHI/D8vGkDqcAa4e/XvxaI1FBU6SVPEH8OLA11P9AQn/b8oIJ9HA/kR4yfi/ujvfyYKQPPAMwa6dfW+hFgoyHEg==
+ bh=tdSvloMInp2kCFtO7C37yCjBkgIBulLKU0PWOCQO/Ks=;
+ b=JyPTU5Wza6YYo6dKHFwwWsEj+gh39zRkOvtHCr7MFi2Mb928gB5iOePghD8bmkWQ7bYepFAwoJO0XFrV3kjmCa2dchFqVYg16uQQ7BT0C2E/rt9bO4taAWMUzVmlqks+LoP9IpzoIAQGA02Ic1IWqWHghM7ubGXof9hUGA+eB0fOmwtYyPt2hF8W5A8Drl2gRQe1HbTQ+gcpQrQHHwPtPCKbUKoViTK5lLGD+i79hQy049bV4fNjNrUaP9vdrahdxJUbIARBfgfEInYGfrzGZ4JhFw1KqwmX7qP8HdazzjDJBpiVq3UlSSEoj8xQd4psRglmbyW0uk4FhrF3zpEzbg==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM6PR12MB4059.namprd12.prod.outlook.com (2603:10b6:5:215::14) with
+ by CH2PR12MB4905.namprd12.prod.outlook.com (2603:10b6:610:64::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5709.15; Mon, 10 Oct
- 2022 18:27:57 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.24; Mon, 10 Oct
+ 2022 18:32:31 +0000
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::7a81:a4e4:bb9c:d1de%5]) with mapi id 15.20.5676.032; Mon, 10 Oct 2022
- 18:27:57 +0000
-Date:   Mon, 10 Oct 2022 15:27:56 -0300
+ 18:32:31 +0000
+Date:   Mon, 10 Oct 2022 15:32:30 -0300
 From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     chenxiang <chenxiang66@hisilicon.com>
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com, kvm@vger.kernel.org,
-        baolu.lu@linux.intel.com, kevin.tian@intel.com, linuxarm@huawei.com
-Subject: Re: [PATCH] [PATCH] Revert 'vfio: Delete container_q'
-Message-ID: <Y0RkLBiZc6RWl3pB@nvidia.com>
-References: <1665222631-202970-1-git-send-email-chenxiang66@hisilicon.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 1/4] vfio/pci: Move all the SPAPR PCI specific logic
+ to vfio_pci_core.ko
+Message-ID: <Y0RlPnLAoZgPd8u9@nvidia.com>
+References: <0-v2-18daead6a41e+98-vfio_modules_jgg@nvidia.com>
+ <1-v2-18daead6a41e+98-vfio_modules_jgg@nvidia.com>
+ <Y0PEo+K+Q7fkcMcB@infradead.org>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1665222631-202970-1-git-send-email-chenxiang66@hisilicon.com>
-X-ClientProxiedBy: MN2PR05CA0052.namprd05.prod.outlook.com
- (2603:10b6:208:236::21) To LV2PR12MB5869.namprd12.prod.outlook.com
+In-Reply-To: <Y0PEo+K+Q7fkcMcB@infradead.org>
+X-ClientProxiedBy: BLAPR03CA0132.namprd03.prod.outlook.com
+ (2603:10b6:208:32e::17) To LV2PR12MB5869.namprd12.prod.outlook.com
  (2603:10b6:408:176::16)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM6PR12MB4059:EE_
-X-MS-Office365-Filtering-Correlation-Id: 09db2bcc-4e9c-41b5-8665-08daaaed2729
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH2PR12MB4905:EE_
+X-MS-Office365-Filtering-Correlation-Id: b4dc7b51-0385-4f9d-2095-08daaaedca8b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: AOzdFnfI45d56PV+NZ3k0h52z+6xmP5/dIKdJBXzZw2gd6ciXJfHoSJYSYQF8VtarNXzfQJ7dIC58ALN1rUcgxUFRLWf4ocHAeU/XVKWeKeEqWsh+PS8lR9fGEf8EUO9UWVoP+DeM5EJYUOWYGsd4u/0AwljkMyzWhk65Dfk/ZqARhG5HrdsCq7ot8pMijekDziX+Do6+mgbtvwWHpBmO1nlHPK5V32SUwGaNlKyWJzelMKtbengFB+3lXIH6faOXi2R4WfnPrYovUc1DcIa7bYhI2SvjuuCk3mDa8oYB7Jnl0A/B7JiPVh74r9hHVe0fNw2rC8WHZnutjGr+wSNkDXdWQi3RXQMa9zSyz5NT5Qj4G5IIC1n/vGv+JpfZ9gugmiYyhqx1/exQiBYgddfUJc3tHyLlTwnE0eknD6tvfMGZDG/yrme96nOPcM8XxIoJrfqdz5e1UNTKlLp+olVHfkozXlxvrJW6wwHBapUT3ja7fPby9x3aDRkywNPC2zVN1Chxmgf5GN/+BbNJPMGLPJ1uI93GjaHtySvo8qQVuLxVM8jnRIINH71LiEPdPoV3AXkYKfxK4ZDH3wa/3C/A3zERJ8vqG2sp599lY0uxFSL3Bn4qUIzG9q73Ws/yIseC6i146KTQTAtTVND5Ao2sET82I2VJigvLwWdnpdBWcxXXiqoOcdF8DPqonOOS9oXt+abPVMlPeHqboCB5isGlQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(396003)(346002)(136003)(39860400002)(366004)(451199015)(6506007)(26005)(4326008)(38100700002)(8676002)(316002)(66946007)(66476007)(66556008)(86362001)(6486002)(186003)(2616005)(478600001)(6512007)(83380400001)(36756003)(2906002)(6916009)(41300700001)(4744005)(5660300002)(8936002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: xNtcSfl2AgPmT9ZOiKImWeFyUdLMW+k1UntPe10BWWY8nxa1Ik4HNftav7RUbpZ8SIJ4TQDXzWh/fwan01ooVw1oaTjckbQSDpjKkeNb1WotH4dzc6YTIvnPOU13EXlKcEmJQh+0ph75K78IIUlZajgqFCYsUOfdQ74LlAbgafs10TH7gGEXbitGS2ftrxjNQxuo1EjLJHVzpF9aEW+go3tKkPHekVb9ReRW+IxnrjTCJI6Vz8UHh6ZM5dD8g6cNSJYhP9QW239WpT/OIc9fC/NzrhH07R8x6ASrOKilcz8KS0G8k6VWBNew9dvY0cCDKxCyKRScls4DdZL73RyBIvOBm8qLTHLcHeY9pDF+82ZhdldBJuWQGjXmIUJig5FdnmtLkW4ohz62ckFnvszXHiPbNF2beXDuActosgDabs0ABAKt0OcmZqQku+/5L0E4mcBs8eL4s8/Jsrig7YElxXCTwE07NPdXcUkLKTW2HLQGlpsxYAVctI7qSFoVX6fr7pYAyqCeI5+DKHFNLqrhegs/MzD1RmNyoL+fdEfhSq9XjNe11Rmk9nFUkpMsuSwkqg0TySp1fcR4hhsuGOK/ZxXjVke2D2/af/UuVjcpJqEjkzqOJq+1+Jzgct8sEKl/2acN4OB3v/5Pk2JFmw0PhwwE5zNwJZdQW+HkY3VhKlYTOT5xmM54juiloF3XGIy6+KIjIGj7rbGnXGo3t/nIgg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(366004)(376002)(39860400002)(396003)(136003)(451199015)(36756003)(6512007)(186003)(86362001)(41300700001)(2906002)(66556008)(4326008)(8676002)(2616005)(66476007)(5660300002)(66946007)(6506007)(478600001)(38100700002)(54906003)(6916009)(4744005)(26005)(316002)(8936002)(6486002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?pM0wkbSvTtVns0gmmrFb7q1t/1ePJ2v6panlV2dbNGVcblmCiK0zn7XnWknj?=
- =?us-ascii?Q?J+g6OUI9WhLwkhYqMwY3jIoDePspZpXHxl/hhzr4aGoV6Qlzt0NebLZsYzlU?=
- =?us-ascii?Q?ParnNsNlfJBp+Llh1X45MtAiMvApHwNr60gDj2WhTFFLYsxSjNPvJo4teuaL?=
- =?us-ascii?Q?OaB+Ty+9V8tk1YMB0GvLKUtpwvplkqKMb1KxV2Bg8aXvwVhXh+WB7ITWOgUK?=
- =?us-ascii?Q?w2nYtpXS119iBqpkPYNx9Cgw2mSVj6+0BseMPxKxrLZV6XfeeBQMp11q1Y7l?=
- =?us-ascii?Q?7Vp9+y7a8TuoZO16fvttb2+4Kx1hp9537mOFVoXwRDySi8WSGb16cKtbf8MT?=
- =?us-ascii?Q?LjKCyvgLxMqC9+yWrU6ocakM3FHJcEj/JofjQh9TmBNqSTfwZCGIMbPYmoXr?=
- =?us-ascii?Q?BPXcD0keF5WLp5PnRsvQdZnoJDd2egA2oksw68BkBOBQCRBVEkZrU+Hpca5G?=
- =?us-ascii?Q?iAsUf7oowvVP23sKA63XnkpaTgL9nGIuNGXZb+sHXhe8WWsqtmnBpab4Sq+O?=
- =?us-ascii?Q?jt7sbetZF+cMG1tI2MYfgxKUxHVMiF+0z2y4cdzOQaB0ERvYq6xlRb9Ey4kL?=
- =?us-ascii?Q?iIT72VKM+BqbxgjqHfhqsWtE+Iq4v0dPz4HfJ1VCOyfiKKgTbH2RTjEUiCbB?=
- =?us-ascii?Q?7Jt6OJcSvmqZFq41P0JKA6uyiwyjqF8GhgsQfhA7loNQx6X1I8xmWNHVdPL0?=
- =?us-ascii?Q?uVBbQJW4fefY7DYc5ldkFTUwAYHPNQkXaMnM0SSM9RW+KW1BJGeW1Sw1LjEC?=
- =?us-ascii?Q?DpxLN0sUbNcQsUkFcB5USsTu6h1ZWhJgqLSzVZC9MS7UnjMhQzG/M6Fjb0nP?=
- =?us-ascii?Q?9bDnYhdTKdtAGOuqhlPny4fMfrQ/Zvn7PQXjhHjOWl0toqPn8QIcoIe9n/m3?=
- =?us-ascii?Q?ALGYLSCKLkMj1aRet1vcJojYntSeE2vnb3/dHyk7sKeCoil1tWifysPRRRqo?=
- =?us-ascii?Q?LnuuEKMgFqygrwg1f0yZUPsgFQrRec86Och9Jd6VkMQweW9lY1CguShRGF/y?=
- =?us-ascii?Q?NaaBdJz5/kvIs7+HdxbeWYwarf4ar3Hdoo0TghrpJyQnxZvtdYHJNhZ1DSm9?=
- =?us-ascii?Q?/Wdcv/zPcE1JlEQ2ZP/MrCAynjd4vRu2DwahCqoi+Or/MFNeycNqfsNBKL7T?=
- =?us-ascii?Q?T4ij7vRoxzGSI6iIaPbYhzWH0DWxqDOQLAH7Tg2UxpOP3zNNEuRzrVnezyqV?=
- =?us-ascii?Q?Y+OIq6Shwj6sfMLqPeumIVlzu5zvg7GfRM7j5hnxaPR1t4e3LDQ4TPNzhWLO?=
- =?us-ascii?Q?a4znn84PrAOCnIbUc0yOfobd8nL3buY71k0A7a1Ne75kyRkacPJzEx1dFaKp?=
- =?us-ascii?Q?DzenK4KDZ7GRCM1sk0pGmNMDJtSL++ryHlPxvg+iH+pQS8YRFAVJSZQyNZGN?=
- =?us-ascii?Q?uU6xneZMxtu9AH6K3G137n/p0OmHQO1MwiTMuZhMXnR9g+gDbxCNgLpqAT71?=
- =?us-ascii?Q?RxCTgSi6CAKpW2eHItkVNxGnVH/3KVn4w8e22qi42+yerD4L03kZaQWCWjfb?=
- =?us-ascii?Q?xpQPjlBrMos+8RXN1s9P8+shUweg6Ft2NUBsvaHM9vb0Z4D8pPxihEFSSMs1?=
- =?us-ascii?Q?o408DL6yGQkKaI7lSVA=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?AKvARMV5WI/HCsQybePB4o96csAG6WMhM0TFaHnar/HseC+fnVHyeU/m95wT?=
+ =?us-ascii?Q?JZuWfdDWFV8jn3nm0R4jWk8jjMIw+VSQzFF7PQH+fd573IZBVYgIIhMwvFnQ?=
+ =?us-ascii?Q?NLlUNifvC+YEjFwBN0rTUJhyDUVkTIZAlfnoyaIoEJGy/3ZBtaPXBGjdNWj6?=
+ =?us-ascii?Q?lyyw9nPWfV8NvMgbnkGiT958XMZ35rPzzejSBt7ORMzlNyXmCNgedHco9QDP?=
+ =?us-ascii?Q?aQU1EtaR2G2TyClJjZcL4oPcBkpPa7bJB44LThpfbZROq4j2ulraiqPRobJu?=
+ =?us-ascii?Q?koZF8aC4vUX76FJBTfELMRjQxgYEi7CIyxnPPUkA0Bsrn43Xtb1DFkUvnN4R?=
+ =?us-ascii?Q?uG6pNmvdz732jBhRAeBXqfiOvadCUMP3SGYbYfq1tizDXPNlvTJ+xJs7I7S8?=
+ =?us-ascii?Q?/HdbF0g8gH/C/PB3ZHQmRotcxz1zlmSDzFvOrODGxk4TbWBtuyd9tUwC4Xbw?=
+ =?us-ascii?Q?gug69q3L5vdtBUvF5JwaW5GT65jRHU17N20iDuBQiblTax3AIXZB93LmHz73?=
+ =?us-ascii?Q?0vxeekMnAW0OsjUfoZErN5FAP4xY2s8gEYcXHJ1YfwEzub1txH7RGcT0YPnV?=
+ =?us-ascii?Q?vnGn1jtpW63AoVqMo0kmnUV5iIk4Z2WhG9MtzgA8ASwsEQIfNVHZteHUQIz0?=
+ =?us-ascii?Q?Cs4v9EaC9QDXKBiNAR2sMMsGvUKhpzTWKATA5QfxPcH/Fw5q/kcDaPdqhqrT?=
+ =?us-ascii?Q?sO4t7/sXI9AsU+l/+3K6tmNJl8au/h13M3MY3mYCIMNyBYbnR6UM2phqKWw4?=
+ =?us-ascii?Q?Q5KO09TTq2gjYDp+2i/EXP+2hxChdp5344KCaCx5NEQfEMFrmjFsnRjc6bJU?=
+ =?us-ascii?Q?QVrNSjd6CGUJOsUCdlB7soKt9kffhVGf54mPQaC60LC+lnWq8s+wH40OjkkE?=
+ =?us-ascii?Q?e28lCgff6VI4zPZ8yTPYVCtHX8jUeiqI0AMaOkyNYbhM46Aai2wXBCaZHI0K?=
+ =?us-ascii?Q?CLREBRe71ZX3Z+mkvdx5fUXQHfVJd0zzlYXtr42n18iR1UXGHJQElSDveH45?=
+ =?us-ascii?Q?NNt8Tkq1FFuoSvBoEx8f0/gIJHyvkzzTd8lLAr+DvVQy4Alk+DzHMjzK2HQa?=
+ =?us-ascii?Q?fZtMDGg2zyG6IQLPbmdpfARvm8HDjAe5kaU4uleO7b7O7umgbZzimYizrmpo?=
+ =?us-ascii?Q?OcJ85alDEHLaP2OQS4xv1N2KRS7yMCInzC3UbHa5ljGckaUKgmbWNqbYsw8H?=
+ =?us-ascii?Q?5TECQXjEXmHyxXh6NwxghCND/NK4gY544DUTvoQOVxjQJ6IeQ0P6ZmAnj+WR?=
+ =?us-ascii?Q?uY9vE2IrW9K88n5i+bcZSdVPKayFDipD8h0CCkzB1o+DKreewL9GRL9oDMbH?=
+ =?us-ascii?Q?oKqa433cRPww243P7WU0F25F1QukrT8KhGpPwAxxfKVQem/sdVvF+rLsQ48V?=
+ =?us-ascii?Q?cnUeWOA8ps+TpqPazrzuSR/QEfI3+1gbVBrifswfoQGa8UrkUQHUz59nE9li?=
+ =?us-ascii?Q?fDHwx84SSuWXsQwMgA++Nmrmy6L+irjVoB/cjkBzTKfIGKDwmAcTuNTWgUVp?=
+ =?us-ascii?Q?2q/bWjPJAN8r4QbTvXgH962P0VhbqcvUhQX7FQEr3AVAmACSeUuOuHTUYQ1l?=
+ =?us-ascii?Q?9dYB00PQSHiHRr+e/7E=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 09db2bcc-4e9c-41b5-8665-08daaaed2729
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4dc7b51-0385-4f9d-2095-08daaaedca8b
 X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2022 18:27:56.8912
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Oct 2022 18:32:30.9995
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YtKRPzhbj5vC+NaJZE+isfwTcgbtaQvBnLQL7nFGxYCsiffuUtl6QBEr841yySit
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4059
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7iF8VR2PVWIWZhqTg43DcJAmqEu02D/TZb0nnreNWj8IKutlqQHOq7HDcufar8H9
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4905
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -112,24 +115,17 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Oct 08, 2022 at 05:50:31PM +0800, chenxiang wrote:
-> From: Xiang Chen <chenxiang66@hisilicon.com>
+On Mon, Oct 10, 2022 at 12:07:15AM -0700, Christoph Hellwig wrote:
+> On Mon, Oct 03, 2022 at 12:39:30PM -0300, Jason Gunthorpe wrote:
+> > The vfio_spapr_pci_eeh_open/release() functions are one line wrappers
+> > around an arch function. Just make them static inline and move them into
+> > vfio_pci_priv.h.
 > 
-> We find a issue on ARM64 platform with HNS3 VF SRIOV enabled (VFIO
-> passthrough in qemu):
-> kill the qemu thread, then echo 0 > sriov_numvfs to disable sriov
-> immediately, sometimes we will see following warnings:
+> Please just kill them entirely - the vfio spapr code depends on EEH
+> anyway.  In fact I have an old patch to do that floating around
+> somewhere, but it's probably less work to just recreate it.
 
-I suspect this is fixed in vfio-next now, in a different way. Please check
-
-> After removing container_q, arm_smmu_release_dev() caused by disabling
-> sriov may occur before arm_smmuv3_attach_dev() called by echo 0 > sriov_numvfs,
-> and arm_smmu_attach_dev() may refer to freed iommu_fwspec, so it causes
-> above warnings.
-
-Which is the same effective issue s390 hit already.
-
-It is interesting that container_q was solving this, that seems to be
-a inadverent side effect nobody noticed.
+How do you mean? You want to put the #ifdef in the vfio_pci_core.c at
+the only call site?
 
 Jason
