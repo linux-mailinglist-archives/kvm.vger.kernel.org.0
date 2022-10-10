@@ -2,115 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EDCE5FA063
-	for <lists+kvm@lfdr.de>; Mon, 10 Oct 2022 16:46:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 398555FA099
+	for <lists+kvm@lfdr.de>; Mon, 10 Oct 2022 16:55:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229625AbiJJOqn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Oct 2022 10:46:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45506 "EHLO
+        id S229939AbiJJOzF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Oct 2022 10:55:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbiJJOqk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Oct 2022 10:46:40 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5918920BC6
-        for <kvm@vger.kernel.org>; Mon, 10 Oct 2022 07:46:40 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id b2so10562765plc.7
-        for <kvm@vger.kernel.org>; Mon, 10 Oct 2022 07:46:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tBIijKTV6MbLjjpEdc9XiJPykCvwUEaS5Ef1WceGfdo=;
-        b=kQgWP2dkY/RgESZanfPkUpuIEdPs/ztoUT5VUMgKWn1F35JicR4bg6rnGQHO3tSbh7
-         H/majzYja7Jit7yBWMnDJBs1ph/FsIULmJyu6pDJFxCpt72sMoKJTpvtNjWoxqdC01Hi
-         QlHtDYlZkdhiOyVA1Se/lYrilzo0l+wZKExw386LQxXhIkPlZJILgpywzL3iuLp/rovG
-         WHcZmOewNZ3i7iOPL2Aw+Cz6r/iseAv0+AZa/FhAlqS6abkH6cSL4db0KCPVjQlizm3R
-         Wr880l0B34v6fIHnu8Ut/VWXSn+kxWafgD6+pQQvcvQuAqpy/zWJjoJvhoOC5oWUREXR
-         +J+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tBIijKTV6MbLjjpEdc9XiJPykCvwUEaS5Ef1WceGfdo=;
-        b=20m2Dl6wtzQXtXnlIBq7cOOF4+/LOgmKpm3KWka0H6g9460ccui4b5oVhOwrYZSeAy
-         sVSxrYfzqLzMPPZKFoxj+V3SowF87L89QMsW6fdceSOfNA96M5PqXs++nHhIDmGEu/KX
-         /IvEzQMApdC+gc0IXdDwIpXCR0ifu96dnCeu+oauMNdxivgwc1Ir5mJxBDEKvjqXDu5G
-         m084o7VyAcNCbOI3EjBDtYGZdvJqCB8uN9RXj5BPZ/OS+106Wo8krR/dHYwN7VM9d/lc
-         JAcfkKJzClIosCxd053Z14+QE2Ep/ruz2gktR0/HhlxszzaXBFJvfpQvZUFXtoF+yZyd
-         ynwQ==
-X-Gm-Message-State: ACrzQf14F0rhTkL956go05lluUWoxlYXptkWg5eULIgnqpnKnMVG22fj
-        H+Pxf4g0wYikfwIu8rJwe8SF0sxH+6u0yQ==
-X-Google-Smtp-Source: AMsMyM7smnVRHSZmjn9K/Ac3q5LuMJdjYOlv960vFjXiQ+iH3uyZLPK5BMxjDHk3rWEDr+RjgOCHEw==
-X-Received: by 2002:a17:902:ccc2:b0:178:29e1:899e with SMTP id z2-20020a170902ccc200b0017829e1899emr19346690ple.114.1665413188754;
-        Mon, 10 Oct 2022 07:46:28 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id k10-20020a170902c40a00b0017f5ba1fffasm2462554plk.297.2022.10.10.07.46.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Oct 2022 07:46:28 -0700 (PDT)
-Date:   Mon, 10 Oct 2022 14:46:24 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Andrew Jones <andrew.jones@linux.dev>
-Cc:     Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com, maz@kernel.org, dmatlack@google.com,
-        oupton@google.com, ricarkol@google.com
-Subject: Re: [PATCH v6 2/3] KVM: selftests: randomize which pages are written
- vs read
-Message-ID: <Y0QwQCq3pyb0v/b3@google.com>
-References: <20220912195849.3989707-1-coltonlewis@google.com>
- <20220912195849.3989707-3-coltonlewis@google.com>
- <Y0CSOKOq0T48e0yr@google.com>
- <20221008095032.kcbvpdz4o5tunptn@kamzik>
+        with ESMTP id S229606AbiJJOyx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Oct 2022 10:54:53 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B79F3140A8;
+        Mon, 10 Oct 2022 07:54:49 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29AE5m1I003082;
+        Mon, 10 Oct 2022 14:54:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=MNllhxLP8eX778MTVCjQg9W7CjVu5l43psMt8gtpb1Q=;
+ b=Pxn1tYLMTU0lQ/4pCzpIGRANFLKOg0C3RoVMeeiFPpgjQ8/dtdbfMg11wwNA1yrmonBh
+ oveRIgFd6QBZmAeHeBZvmeNSmmgqSqYknGjUsD70j7B7OtyJrMq4Uv+yyoXHxtsT+ZUD
+ hHopjlYmfJAXRBFphBT4tbz1LaPIKAUFyIsaeoBpnn5wycoQhwc65WpXmoSYywjIr6UO
+ or79KP6u/GmRtDSSVzurbZqY4u9JHPgZ+mQLP/8yKm5lj9ZdeSFgwYSlotMdignIMZQA
+ dVKRdF2qs9i/fWt+RcwVkLUM9BS842qosVcS8adOOzDgz0qqlVMJzg2noV+PdjbsnnrI yQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3k3k98g9vu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Oct 2022 14:54:48 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29AEoeDA013758;
+        Mon, 10 Oct 2022 14:54:48 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3k3k98g9v5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Oct 2022 14:54:48 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29AEowQx023153;
+        Mon, 10 Oct 2022 14:54:46 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma05fra.de.ibm.com with ESMTP id 3k30u9j653-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Oct 2022 14:54:46 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29AEshFM066072
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 10 Oct 2022 14:54:43 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 289D652050;
+        Mon, 10 Oct 2022 14:54:43 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.242])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id CE1375204F;
+        Mon, 10 Oct 2022 14:54:42 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     borntraeger@de.ibm.com, frankja@linux.ibm.com, thuth@redhat.com,
+        david@redhat.com, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com
+Subject: [PATCH v15 0/6] KVM: s390: pv: implement lazy destroy for reboot
+Date:   Mon, 10 Oct 2022 16:54:36 +0200
+Message-Id: <20221010145442.85867-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221008095032.kcbvpdz4o5tunptn@kamzik>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 5F5Ni2pU0REBOa0oYuNpnOyHnm9w5iGD
+X-Proofpoint-ORIG-GUID: cBq1Xg4c3Z9cdKE54gXFclL5t0IFWZUN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
+ definitions=2022-10-10_08,2022-10-10_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ mlxscore=0 suspectscore=0 clxscore=1015 lowpriorityscore=0 phishscore=0
+ priorityscore=1501 malwarescore=0 mlxlogscore=849 bulkscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210100086
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Oct 08, 2022, Andrew Jones wrote:
-> On Fri, Oct 07, 2022 at 08:55:20PM +0000, Sean Christopherson wrote:
-> > On Mon, Sep 12, 2022, Colton Lewis wrote:
-> > > @@ -393,7 +403,7 @@ int main(int argc, char *argv[])
-> > >  
-> > >  	guest_modes_append_default();
-> > >  
-> > > -	while ((opt = getopt(argc, argv, "ghi:p:m:nb:f:v:or:s:x:")) != -1) {
-> > > +	while ((opt = getopt(argc, argv, "ghi:p:m:nb:v:or:s:x:w:")) != -1) {
-> > 
-> > This string is getting quite annoying to maintain, e.g. all of these patches
-> > conflict with recent upstream changes, and IIRC will conflict again with Vipin's
-> > changes.  AFAICT, the string passed to getopt() doesn't need to be constant, i.e.
-> > can be built programmatically.  Not in this series, but as future cleanup we should
-> > at least consider a way to make this slightly less painful to maintain.
-> >
-> 
-> I wonder if a getopt string like above is really saying "we're doing too
-> much in a single test binary". Are all these switches just for one-off
-> experiments which developers need? Or, are testers expected to run this
-> binary multiple times with different combinations of switches?
+Previously, when a protected VM was rebooted or when it was shut down,
+its memory was made unprotected, and then the protected VM itself was
+destroyed. Looping over the whole address space can take some time,
+considering the overhead of the various Ultravisor Calls (UVCs). This
+means that a reboot or a shutdown would take a potentially long amount
+of time, depending on the amount of used memory.
 
-Even if it's just 2 or 3 switches, I agree we need a way to run those configs by
-default.
+This patchseries implements a deferred destroy mechanism for protected
+guests. When a protected guest is destroyed, its memory can be cleared
+in background, allowing the guest to restart or terminate significantly
+faster than before.
 
-> If it's the latter, then I think we need a test runner script and config file
-> to capture those separate invocations (similar to kvm-unit-tests). Or, change
-> from a collection of command line switches to building the file multiple
-> times with different compile time switches and output filenames.
+There are 2 possibilities when a protected VM is torn down:
+* it still has an address space associated (reboot case)
+* it does not have an address space anymore (shutdown case)
 
-What about a mix of those two approaches and having individual scripts for each
-config?  I like the idea of one executable per config, but we shouldn't need to
-compile multiple times.  And that would still allow developers to easily run
-non-standard configs.
+For the reboot case, two new commands are available for the
+KVM_S390_PV_COMMAND:
 
-I'd prefer to avoid adding a test runner, partly because I can never remember the
-invocation strings, partly becuase I don't want to encourage mega tests like the
-VMX and SVM KVM-unit-tests.
+KVM_PV_ASYNC_CLEANUP_PREPARE: prepares the current protected VM for
+asynchronous teardown. The current VM will then continue immediately
+as non-protected. If a protected VM had already been set aside without
+starting the teardown process, this call will fail. In this case the
+userspace process should issue a normal KVM_PV_DISABLE
+
+KVM_PV_ASYNC_CLEANUP_PERFORM: tears down the protected VM previously
+set aside for asychronous teardown. This PV command should ideally be
+issued by userspace from a separate thread. If a fatal signal is
+received (or the process terminates naturally), the command will
+terminate immediately without completing. The rest of the normal KVM
+teardown process will take care of properly cleaning up all leftovers.
+
+The idea is that userspace should first issue the
+KVM_PV_ASYNC_CLEANUP_PREPARE command, and in case of success, create a
+new thread and issue KVM_PV_ASYNC_CLEANUP_PERFORM from there. This also
+allows for proper accounting of the CPU time needed for the
+asynchronous teardown.
+
+This means that the same address space can have memory belonging to
+more than one protected guest, although only one will be running, the
+others will in fact not even have any CPUs.
+
+The shutdown case should be dealt with in userspace (e.g. using
+clone(CLONE_VM)).
+
+A module parameter is also provided to disable the new functionality,
+which is otherwise enabled by default. This should not be an issue
+since the new functionality is opt-in anyway. This is mainly thought to
+aid debugging.
+
+v14->v15
+* fix some variable names
+* improve comment in kvm_s390_pv_deinit_vm
+* use existing macros instead of magic values for UVC_RC_EXECUTED
+* add lockdep_assert_held to kvm_s390_pv_set_aside
+
+v13->v14
+* improve wording of commit messages
+* improve wording of documentation
+* improve wording of comments
+* add if (!async_destroy) check in ioctl handler
+* use UVC_RC_EXECUTED macro instead of hardcoded value
+* use kzalloc instead of kmalloc with __GFP_ZERO flag
+* rebase
+
+v12->v13
+* drop the patches that have been already merged
+* rebase
+
+Claudio Imbrenda (6):
+  KVM: s390: pv: asynchronous destroy for reboot
+  KVM: s390: pv: api documentation for asynchronous destroy
+  KVM: s390: pv: add KVM_CAP_S390_PROTECTED_ASYNC_DISABLE
+  KVM: s390: pv: avoid export before import if possible
+  KVM: s390: pv: support for Destroy fast UVC
+  KVM: s390: pv: module parameter to fence asynchronous destroy
+
+ Documentation/virt/kvm/api.rst   |  37 +++-
+ arch/s390/include/asm/kvm_host.h |   2 +
+ arch/s390/include/asm/uv.h       |  10 +
+ arch/s390/kernel/uv.c            |   7 +
+ arch/s390/kvm/kvm-s390.c         |  58 +++++-
+ arch/s390/kvm/kvm-s390.h         |   3 +
+ arch/s390/kvm/pv.c               | 336 ++++++++++++++++++++++++++++++-
+ include/uapi/linux/kvm.h         |   3 +
+ 8 files changed, 434 insertions(+), 22 deletions(-)
+
+-- 
+2.37.3
+
