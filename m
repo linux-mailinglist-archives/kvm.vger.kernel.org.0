@@ -2,150 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 03A4A5F9F29
-	for <lists+kvm@lfdr.de>; Mon, 10 Oct 2022 15:10:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DFF005F9FB6
+	for <lists+kvm@lfdr.de>; Mon, 10 Oct 2022 15:57:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229707AbiJJNKq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Oct 2022 09:10:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49070 "EHLO
+        id S229590AbiJJN5T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Oct 2022 09:57:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbiJJNKn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Oct 2022 09:10:43 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E103915718;
-        Mon, 10 Oct 2022 06:10:41 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29ACue60011472;
-        Mon, 10 Oct 2022 13:10:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=+P3hQRCynIBxrklRQT3Di9PZqt/NJ+VejWPlet9Qa8Y=;
- b=A6d5Mlk6OxkTbAcJQpFmalG9CuHtwXORcRta4Jwc0LNtx/i6bxdTCsvL7ve8v5ttf2xS
- HyRBkJcVDqBQMHHcz18dw1DqMN7Eb0glMyfuGuz/wQvPBEQTei0+Gf1iB/9IVVyzj9p+
- h/PRaFysvhptQcZnGNjgyg8ZFkQGxP2iiD3Qn0q3LPXenwFyvnYgygjJnrxX5MrOtwOJ
- bXTfFHCdcsOSl5xqI4leNUAOZ/941K72aec8zQPwjprBjkBXFPmzdI66hlqZkn9tCBtc
- BB67BmDzbMcmVZrB8+psf1IBkTZZuoDfF9mmSKKhzgO45GmTS3UuId5FAT2qg9fiAvoO 2w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k3k6hn23g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 Oct 2022 13:10:41 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29ABpawO019166;
-        Mon, 10 Oct 2022 13:10:41 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k3k6hn21p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 Oct 2022 13:10:41 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29AD8aiS015820;
-        Mon, 10 Oct 2022 13:10:38 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 3k30u9atsy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 Oct 2022 13:10:38 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29ADAZsS59179418
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 10 Oct 2022 13:10:35 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 094ED11C04A;
-        Mon, 10 Oct 2022 13:10:35 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8630611C04C;
-        Mon, 10 Oct 2022 13:10:34 +0000 (GMT)
-Received: from [9.171.5.210] (unknown [9.171.5.210])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 10 Oct 2022 13:10:34 +0000 (GMT)
-Message-ID: <0059c67b-3dda-e95d-9b96-8c69af77bbb9@linux.ibm.com>
-Date:   Mon, 10 Oct 2022 15:10:34 +0200
+        with ESMTP id S229791AbiJJN5K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Oct 2022 09:57:10 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDC416D9E1;
+        Mon, 10 Oct 2022 06:57:07 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id bk15so17137020wrb.13;
+        Mon, 10 Oct 2022 06:57:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LoUiMfmEnN9CtUaXVzPZjr+vlbcco3+KEqK1em9Pmho=;
+        b=cKCUvEpSaWkOXUXxbWypqyLEcOlAoVbGQrUqD08+qNY3YLFYq5bol+nkMfrsJqZl2i
+         c0WflFNIar1l9IE+w2LfdP2cp3HxuHsuVfVodASK62r8DWBZaZZZfJbI9D+yoe4BO7AB
+         geUus8GFUwkhzUo/UhwpzBjGUv/g+XVTND37bt94MdmrUEnXxI7hHogCMPRNhk+HAc3m
+         cO1dOfouarSaZtHgPxXsEN7pKpuOLEVkarAL3Q5tCSplGIycCKCbuKKkhVq1ISrDMDTT
+         NSoj1tDvbaKJO90XJ8+Cj6kk3Z6rh3cZCTPB47tsfIy/mhmmiv7cpS7wyZAWR+vUhihW
+         YE1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LoUiMfmEnN9CtUaXVzPZjr+vlbcco3+KEqK1em9Pmho=;
+        b=G+yX2NOI62RR3ZkkZORS716So2gy+CIzFTybCcJU6vWIyNRu41D8Tfy8Y+qJzWFSaQ
+         ur9dWaGy3eGJufeqJxEjbvkkJKF7Op3u/iHW8+dOuIGh4Gpo+Sl9FWdpwwkFzu3trx9C
+         rEXSfxvOWlUkwMrIPsh6H6Le6LJJ8uSmme+kOJ6SCXWWdER58h0wzW6w4CHBaujcDgHd
+         0ecGA+ba8AMI4yHgehxnlDFqz9BoEkOiwBIQ7x44UqLcnHrvRFlMdTagTw376d08bc8Y
+         LIudfcI+d02UMYmYbdG6y6208pw7HkpJkQcYGd+o3oO5wH2tu3zWLApG84HvKtAm1I07
+         zpQw==
+X-Gm-Message-State: ACrzQf2Jy1ucN8Fovo9ittLHMe4NqhaJOfrYLPAGr29DcMp2fCodMRzJ
+        qGO4ktxqRQe0YdzUtmsAZE8PHI06jCBZLTkVlk/9dT8IpCQ=
+X-Google-Smtp-Source: AMsMyM4rc02AveqREQPsOjS+iLcrK0FZ/Kq29LVjCkoRiMbErFYzYeqCOebLpHoGcSgLrytz+/Rm++OD6Rx2BTb5feg=
+X-Received: by 2002:a05:6000:1f8e:b0:230:816f:3175 with SMTP id
+ bw14-20020a0560001f8e00b00230816f3175mr3368263wrb.691.1665410224957; Mon, 10
+ Oct 2022 06:57:04 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH v14 3/6] KVM: s390: pv: add
- KVM_CAP_S390_PROTECTED_ASYNC_DISABLE
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, borntraeger@de.ibm.com, thuth@redhat.com,
-        david@redhat.com, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, scgl@linux.ibm.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com
-References: <20220930140150.37463-1-imbrenda@linux.ibm.com>
- <20220930140150.37463-4-imbrenda@linux.ibm.com>
- <748d07b8-1746-c12a-ccfb-89c8b15901d9@linux.ibm.com>
- <20221010141511.25eca963@p-imbrenda>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20221010141511.25eca963@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: cJ0kc0EUsOhaRT70Ny5FY9WtqjizMOrl
-X-Proofpoint-GUID: kFry-r5W_Zz1dUJHC-EK-gbFzUU3b7Pb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-10-10_07,2022-10-10_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- mlxscore=0 priorityscore=1501 malwarescore=0 lowpriorityscore=0
- clxscore=1015 suspectscore=0 mlxlogscore=999 phishscore=0 impostorscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210100076
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+From:   Peter Geis <pgwipeout@gmail.com>
+Date:   Mon, 10 Oct 2022 09:56:53 -0400
+Message-ID: <CAMdYzYrUOoTmBL2c_+=xLBMXg38Pp4hANnzqxoe1cVDDrFvqTA@mail.gmail.com>
+Subject: [BUG] KVM USB passthrough did not claim interface before use
+To:     kvm@vger.kernel.org, linux-usb@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/10/22 14:15, Claudio Imbrenda wrote:
-> On Mon, 10 Oct 2022 13:45:54 +0200
-> Janosch Frank <frankja@linux.ibm.com> wrote:
-> 
->> On 9/30/22 16:01, Claudio Imbrenda wrote:
->>> Add KVM_CAP_S390_PROTECTED_ASYNC_DISABLE to signal that the
->>> KVM_PV_ASYNC_DISABLE and KVM_PV_ASYNC_DISABLE_PREPARE commands for the
->>> KVM_S390_PV_COMMAND ioctl are available.
->>>
->>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
->>> Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
->>> ---
->>>    arch/s390/kvm/kvm-s390.c | 3 +++
->>>    include/uapi/linux/kvm.h | 1 +
->>>    2 files changed, 4 insertions(+)
->>>
->>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->>> index d0027964a6f5..7a3bd68efd85 100644
->>> --- a/arch/s390/kvm/kvm-s390.c
->>> +++ b/arch/s390/kvm/kvm-s390.c
->>> @@ -618,6 +618,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->>>    	case KVM_CAP_S390_BPB:
->>>    		r = test_facility(82);
->>>    		break;
->>> +	case KVM_CAP_S390_PROTECTED_ASYNC_DISABLE:
->>> +		r = async_destroy && is_prot_virt_host();
->>> +		break;
->>>    	case KVM_CAP_S390_PROTECTED:
->>>    		r = is_prot_virt_host();
->>>    		break;
->>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
->>> index 02602c5c1975..9afe0084b2c5 100644
->>> --- a/include/uapi/linux/kvm.h
->>> +++ b/include/uapi/linux/kvm.h
->>> @@ -1177,6 +1177,7 @@ struct kvm_ppc_resize_hpt {
->>>    #define KVM_CAP_VM_DISABLE_NX_HUGE_PAGES 220
->>>    #define KVM_CAP_S390_ZPCI_OP 221
->>>    #define KVM_CAP_S390_CPU_TOPOLOGY 222
->>> +#define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 225
->>
->> I can see 223 in Paolo's next, is there a 224 that I've missed?
-> 
-> no, I set this to an arbitrarily high value to avoid conficts
-> 
-> seems like I got it more or less right :)
-> 
-> feel free to change the value of the macro when merging, so it's
-> contiguous.
+Good Morning,
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+I've run into a bug with a new usb device when attempting to pass
+through using qemu-kvm. Another device is passed through without
+issue, and qemu spice passthrough does not exhibit the issue. The usb
+device shows up in the KVM machine, but is unusable. I'm unsure if
+this is a usbfs bug, a qemu bug, or a bug in the device driver.
 
+usb 3-6.2: usbfs: process 365671 (CPU 2/KVM) did not claim interface 0
+before use
+usb 3-6.2: usbfs: process 365671 (CPU 2/KVM) did not claim interface 0
+before use
+usb 3-6.2: usbfs: process 365672 (CPU 3/KVM) did not claim interface 1
+before use
+usb 3-6.2: usbfs: process 365671 (CPU 2/KVM) did not claim interface 0
+before use
+usb 3-6.2: usbfs: process 365672 (CPU 3/KVM) did not claim interface 0
+before use
+usb 3-6.2: usbfs: process 365672 (CPU 3/KVM) did not claim interface 0
+before use
+
+The host system is Ubuntu 22.04.
+The qemu version is as shipped: QEMU emulator version 6.2.0 (Debian
+1:6.2+dfsg-2ubuntu6.3)
+The host kernel version is: 5.15.0-48-generic #54-Ubuntu SMP Fri Aug
+26 13:26:29 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
+
+The VM is HomeAssistant, running kernel 5.15.67. Issue was also
+observed on kernel version 5.10.
+
+The device in question is:
+Bus 003 Device 006: ID 1cf1:0030 Dresden Elektronik ZigBee gateway [ConBee II]
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               2.01
+  bDeviceClass            2 Communications
+  bDeviceSubClass         0
+  bDeviceProtocol         0
+  bMaxPacketSize0        64
+  idVendor           0x1cf1 Dresden Elektronik
+  idProduct          0x0030 ZigBee gateway [ConBee II]
+  bcdDevice            1.00
+  iManufacturer           1 dresden elektronik ingenieurtechnik GmbH
+  iProduct                2 ConBee II
+  iSerial                 3 DE2597089
+  bNumConfigurations      1
+  Configuration Descriptor:
+    bLength                 9
+    bDescriptorType         2
+    wTotalLength       0x0043
+    bNumInterfaces          2
+    bConfigurationValue     1
+    iConfiguration          0
+    bmAttributes         0x80
+      (Bus Powered)
+    MaxPower              100mA
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        0
+      bAlternateSetting       0
+      bNumEndpoints           1
+      bInterfaceClass         2 Communications
+      bInterfaceSubClass      2 Abstract (modem)
+      bInterfaceProtocol      1 AT-commands (v.25ter)
+      iInterface              0
+      CDC Header:
+        bcdCDC               1.10
+      CDC ACM:
+        bmCapabilities       0x02
+          line coding and serial state
+      CDC Union:
+        bMasterInterface        0
+        bSlaveInterface         1
+      CDC Call Management:
+        bmCapabilities       0x03
+          call management
+          use DataInterface
+        bDataInterface          1
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x83  EP 3 IN
+        bmAttributes            3
+          Transfer Type            Interrupt
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval              16
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        1
+      bAlternateSetting       0
+      bNumEndpoints           2
+      bInterfaceClass        10 CDC Data
+      bInterfaceSubClass      0
+      bInterfaceProtocol      0
+      iInterface              0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x81  EP 1 IN
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x02  EP 2 OUT
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               0
+Binary Object Store Descriptor:
+  bLength                 5
+  bDescriptorType        15
+  wTotalLength       0x000c
+  bNumDeviceCaps          1
+  USB 2.0 Extension Device Capability:
+    bLength                 7
+    bDescriptorType        16
+    bDevCapabilityType      2
+    bmAttributes   0x00000002
+      HIRD Link Power Management (LPM) Supported
+Device Status:     0x0000
+  (Bus Powered)
+
+Very Respectfully,
+Peter Geis
