@@ -2,63 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 223D25FA01F
-	for <lists+kvm@lfdr.de>; Mon, 10 Oct 2022 16:23:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EDCE5FA063
+	for <lists+kvm@lfdr.de>; Mon, 10 Oct 2022 16:46:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229758AbiJJOXN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Oct 2022 10:23:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34940 "EHLO
+        id S229625AbiJJOqn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Oct 2022 10:46:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbiJJOXK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Oct 2022 10:23:10 -0400
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B157E73334;
-        Mon, 10 Oct 2022 07:23:08 -0700 (PDT)
-Received: by mail-wr1-x432.google.com with SMTP id bk15so17252513wrb.13;
-        Mon, 10 Oct 2022 07:23:08 -0700 (PDT)
+        with ESMTP id S229487AbiJJOqk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Oct 2022 10:46:40 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5918920BC6
+        for <kvm@vger.kernel.org>; Mon, 10 Oct 2022 07:46:40 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id b2so10562765plc.7
+        for <kvm@vger.kernel.org>; Mon, 10 Oct 2022 07:46:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=TahS+pInlUSQRZ8Rm+e9KVPB/oIUr10xMPSI7jd51lo=;
-        b=g/fB6ohtI5z5Ub/Iab9A1xL2IO2ox+7dEIL9uRQwQZWhuw98OuyqT8hOYC4z1DjDoz
-         wZbS1TXxBTL5Zl85t3WSkII5NtT7Eq5b5jLOuM4Y2OUDrz2CC4kMgk5a5UAXHlb+uCCl
-         QS4/K8ok2iajnUoRcHd6Ad6SG3RBS7Lqsjhsk+DrWEvppwtqTGOL7qiIN1B1TMIigjpd
-         bEiPZrO8/h8nzmGSPdsTATrSUzDDJD5vBzXqzMcxmOZ+grvT7aqzRdY2hSP9hir3Owfw
-         IpD/EsTSFDZP4LnDxeYrfG4H6faTw6XrLBkIJUy5CKCYJzTk6DVs1Ln7dbEOklzpwVCs
-         z1DA==
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tBIijKTV6MbLjjpEdc9XiJPykCvwUEaS5Ef1WceGfdo=;
+        b=kQgWP2dkY/RgESZanfPkUpuIEdPs/ztoUT5VUMgKWn1F35JicR4bg6rnGQHO3tSbh7
+         H/majzYja7Jit7yBWMnDJBs1ph/FsIULmJyu6pDJFxCpt72sMoKJTpvtNjWoxqdC01Hi
+         QlHtDYlZkdhiOyVA1Se/lYrilzo0l+wZKExw386LQxXhIkPlZJILgpywzL3iuLp/rovG
+         WHcZmOewNZ3i7iOPL2Aw+Cz6r/iseAv0+AZa/FhAlqS6abkH6cSL4db0KCPVjQlizm3R
+         Wr880l0B34v6fIHnu8Ut/VWXSn+kxWafgD6+pQQvcvQuAqpy/zWJjoJvhoOC5oWUREXR
+         +J+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TahS+pInlUSQRZ8Rm+e9KVPB/oIUr10xMPSI7jd51lo=;
-        b=JYdcIHNUBGFT9wcKzkUEZEdQ2y0KjrTuF8b7sd6ueU8W4vkHtvXc1nd03/CM+T/mHP
-         I8J3WxDjPxdNOm8ayrJWwxZk5hxDMOIx10XtMTCiRtOQ28miR1UJhXUL43cUccb74i+1
-         MGQIN6hN6PL4QCesMqULoPnWwcu+H/AtexMdMlUqA7/UMyVoI8GMZJid6FFUfWN00i5w
-         J8muWJnMImeURepjte5TNR220deWnTdCWXkS9AmolIW7bRsOWkjRtm8mAHJI3mVm1V/0
-         +BluHf2fTSTNQbgbe053acBopBYI9wReWHlewVc6zldlvyIeOIr6EEFe4DKgkIM+iUWS
-         G1YQ==
-X-Gm-Message-State: ACrzQf3lS8xrPXz98j8dF3J6zcV3pYiSkLa3HGSAjbJ6FW1AlI0Pr5sc
-        qB+MtGRGGC3k4jDmdu0QZHUf1eog8NB4yDozK/X+GpoL
-X-Google-Smtp-Source: AMsMyM7+XyzfWxUOKvsoWLI8TNFb4gbgScfxqcUjkOer7pGXREtwJmb6W0h27PdSj2zVq1ZUlsNNWkhSvJJmpBljuDM=
-X-Received: by 2002:a05:6000:1562:b0:231:1b02:3dbb with SMTP id
- 2-20020a056000156200b002311b023dbbmr987314wrz.685.1665411787059; Mon, 10 Oct
- 2022 07:23:07 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tBIijKTV6MbLjjpEdc9XiJPykCvwUEaS5Ef1WceGfdo=;
+        b=20m2Dl6wtzQXtXnlIBq7cOOF4+/LOgmKpm3KWka0H6g9460ccui4b5oVhOwrYZSeAy
+         sVSxrYfzqLzMPPZKFoxj+V3SowF87L89QMsW6fdceSOfNA96M5PqXs++nHhIDmGEu/KX
+         /IvEzQMApdC+gc0IXdDwIpXCR0ifu96dnCeu+oauMNdxivgwc1Ir5mJxBDEKvjqXDu5G
+         m084o7VyAcNCbOI3EjBDtYGZdvJqCB8uN9RXj5BPZ/OS+106Wo8krR/dHYwN7VM9d/lc
+         JAcfkKJzClIosCxd053Z14+QE2Ep/ruz2gktR0/HhlxszzaXBFJvfpQvZUFXtoF+yZyd
+         ynwQ==
+X-Gm-Message-State: ACrzQf14F0rhTkL956go05lluUWoxlYXptkWg5eULIgnqpnKnMVG22fj
+        H+Pxf4g0wYikfwIu8rJwe8SF0sxH+6u0yQ==
+X-Google-Smtp-Source: AMsMyM7smnVRHSZmjn9K/Ac3q5LuMJdjYOlv960vFjXiQ+iH3uyZLPK5BMxjDHk3rWEDr+RjgOCHEw==
+X-Received: by 2002:a17:902:ccc2:b0:178:29e1:899e with SMTP id z2-20020a170902ccc200b0017829e1899emr19346690ple.114.1665413188754;
+        Mon, 10 Oct 2022 07:46:28 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id k10-20020a170902c40a00b0017f5ba1fffasm2462554plk.297.2022.10.10.07.46.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Oct 2022 07:46:28 -0700 (PDT)
+Date:   Mon, 10 Oct 2022 14:46:24 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Andrew Jones <andrew.jones@linux.dev>
+Cc:     Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com, maz@kernel.org, dmatlack@google.com,
+        oupton@google.com, ricarkol@google.com
+Subject: Re: [PATCH v6 2/3] KVM: selftests: randomize which pages are written
+ vs read
+Message-ID: <Y0QwQCq3pyb0v/b3@google.com>
+References: <20220912195849.3989707-1-coltonlewis@google.com>
+ <20220912195849.3989707-3-coltonlewis@google.com>
+ <Y0CSOKOq0T48e0yr@google.com>
+ <20221008095032.kcbvpdz4o5tunptn@kamzik>
 MIME-Version: 1.0
-References: <CAMdYzYrUOoTmBL2c_+=xLBMXg38Pp4hANnzqxoe1cVDDrFvqTA@mail.gmail.com>
- <Y0QnFHqrX2r/7oUz@rowland.harvard.edu>
-In-Reply-To: <Y0QnFHqrX2r/7oUz@rowland.harvard.edu>
-From:   Peter Geis <pgwipeout@gmail.com>
-Date:   Mon, 10 Oct 2022 10:22:55 -0400
-Message-ID: <CAMdYzYodS7Y4bZ+fzzAXMSiCfQHwMkmV8-C=b3FVUXDExavXgA@mail.gmail.com>
-Subject: Re: [BUG] KVM USB passthrough did not claim interface before use
-To:     Alan Stern <stern@rowland.harvard.edu>
-Cc:     kvm@vger.kernel.org, linux-usb@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221008095032.kcbvpdz4o5tunptn@kamzik>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,58 +76,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 10, 2022 at 10:07 AM Alan Stern <stern@rowland.harvard.edu> wrote:
->
-> On Mon, Oct 10, 2022 at 09:56:53AM -0400, Peter Geis wrote:
-> > Good Morning,
+On Sat, Oct 08, 2022, Andrew Jones wrote:
+> On Fri, Oct 07, 2022 at 08:55:20PM +0000, Sean Christopherson wrote:
+> > On Mon, Sep 12, 2022, Colton Lewis wrote:
+> > > @@ -393,7 +403,7 @@ int main(int argc, char *argv[])
+> > >  
+> > >  	guest_modes_append_default();
+> > >  
+> > > -	while ((opt = getopt(argc, argv, "ghi:p:m:nb:f:v:or:s:x:")) != -1) {
+> > > +	while ((opt = getopt(argc, argv, "ghi:p:m:nb:v:or:s:x:w:")) != -1) {
+> > 
+> > This string is getting quite annoying to maintain, e.g. all of these patches
+> > conflict with recent upstream changes, and IIRC will conflict again with Vipin's
+> > changes.  AFAICT, the string passed to getopt() doesn't need to be constant, i.e.
+> > can be built programmatically.  Not in this series, but as future cleanup we should
+> > at least consider a way to make this slightly less painful to maintain.
 > >
-> > I've run into a bug with a new usb device when attempting to pass
-> > through using qemu-kvm. Another device is passed through without
-> > issue, and qemu spice passthrough does not exhibit the issue. The usb
-> > device shows up in the KVM machine, but is unusable. I'm unsure if
-> > this is a usbfs bug, a qemu bug, or a bug in the device driver.
-> >
-> > usb 3-6.2: usbfs: process 365671 (CPU 2/KVM) did not claim interface 0
-> > before use
-> > usb 3-6.2: usbfs: process 365671 (CPU 2/KVM) did not claim interface 0
-> > before use
-> > usb 3-6.2: usbfs: process 365672 (CPU 3/KVM) did not claim interface 1
-> > before use
-> > usb 3-6.2: usbfs: process 365671 (CPU 2/KVM) did not claim interface 0
-> > before use
-> > usb 3-6.2: usbfs: process 365672 (CPU 3/KVM) did not claim interface 0
-> > before use
-> > usb 3-6.2: usbfs: process 365672 (CPU 3/KVM) did not claim interface 0
-> > before use
->
-> These are warnings, not bugs, although one could claim that the warnings
-> are caused by a bug in qemu-kvm.
+> 
+> I wonder if a getopt string like above is really saying "we're doing too
+> much in a single test binary". Are all these switches just for one-off
+> experiments which developers need? Or, are testers expected to run this
+> binary multiple times with different combinations of switches?
 
-The bug is the device is unusable in passthrough, this is the only
-direction as to why. The question is which piece of software is
-causing it. I figure qemu is the most likely suspect, but they request
-bugs that are possibly in kvm start here. The cdc-acm driver is the
-least likely in my mind, as the other device that works also uses it.
-I just tested removing the other working device and only passing
-through the suspect device, and it still triggers the bug. So whatever
-the problem is, it's specific to this one device.
+Even if it's just 2 or 3 switches, I agree we need a way to run those configs by
+default.
 
->
-> > The host system is Ubuntu 22.04.
-> > The qemu version is as shipped: QEMU emulator version 6.2.0 (Debian
-> > 1:6.2+dfsg-2ubuntu6.3)
-> > The host kernel version is: 5.15.0-48-generic #54-Ubuntu SMP Fri Aug
-> > 26 13:26:29 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
-> >
-> > The VM is HomeAssistant, running kernel 5.15.67. Issue was also
-> > observed on kernel version 5.10.
->
-> Does the device work if your virtual machine has only one CPU?
+> If it's the latter, then I think we need a test runner script and config file
+> to capture those separate invocations (similar to kvm-unit-tests). Or, change
+> from a collection of command line switches to building the file multiple
+> times with different compile time switches and output filenames.
 
-Just tested, this doesn't make a difference.
+What about a mix of those two approaches and having individual scripts for each
+config?  I like the idea of one executable per config, but we shouldn't need to
+compile multiple times.  And that would still allow developers to easily run
+non-standard configs.
 
->
-> Alan Stern
-
-Thanks,
-Peter
+I'd prefer to avoid adding a test runner, partly because I can never remember the
+invocation strings, partly becuase I don't want to encourage mega tests like the
+VMX and SVM KVM-unit-tests.
