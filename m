@@ -2,66 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 631125FBDF7
-	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 00:50:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A9F65FBE80
+	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 01:47:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229560AbiJKWum (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Oct 2022 18:50:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51102 "EHLO
+        id S229653AbiJKXrV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Oct 2022 19:47:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229492AbiJKWul (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Oct 2022 18:50:41 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 975A720F5C
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 15:50:40 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id z20so14568664plb.10
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 15:50:40 -0700 (PDT)
+        with ESMTP id S229615AbiJKXrS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Oct 2022 19:47:18 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B453A50C1
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 16:47:10 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id q10-20020a17090a304a00b0020b1d5f6975so470955pjl.0
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 16:47:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TbMJWEdPmfNeD0kB+jWHSuutd5si9I9mcn62ZSQ6ebk=;
-        b=EXwvrG72/XgRccZJF0450rqTfdzfHvKeCIUy1TkXACWGjIgySzQzW9UMgVepeUouUC
-         f1XHj3SN6upvcHME3O3xUiRhEorvlY0PEYQ/rKyl6NF3r20py4TTyryxb4yTplAKZ6lg
-         QCdfk4AUdEdks/E1qLrWM/ZbVVfLqgmoPwjBy63WY6xr7ACQ2GUphD/VZxytYJ/yl9CP
-         Hbq/sATKbkpfdzqMyu15ltynXJI63odYrnORh13mppv66RV7bSH2q+QFy0fJrTG7RNfM
-         6H65HEnU7CS1CTTaRffc9lRyPJTpyz71hB2jMi/jD0iG6xYa5tBPk92YXeKC2BG32aWs
-         mPxQ==
+        bh=Fuh4qop4UMDp8ZyQUueG7mURFaCM89/3M/PCM4KHlOg=;
+        b=PzC3XCwZAq6xs8cUmec7+/ChlJSdUG5gxlh6n4ily7tMgujzBVqymjCuW5wpbyXw8x
+         B0tf3E1QEtqNeIyDzNfKpkatQ7DJyjWI+0gqCTi7blpCSAyN34Y6x6rFXe6qGY44tfxd
+         D9XB1ml7cFku/3VhaaMg0MtdPpDml73Y+NnrQ4E0vnxfbR7AjR22W/z/p0/oeH6TrgaC
+         7HquUHeG2/x1hJYz1RNyWo+4AyGbrWXM3UDT13bXv4nGP+OVGTm0gD8oAvm+7XQPLG+B
+         ISYDERfYl8hFZSEpObDxKh7YdPIpM73dckk+ak2c+p4J2HHuOKm34EeT8HNRwy2TeR6X
+         jwtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TbMJWEdPmfNeD0kB+jWHSuutd5si9I9mcn62ZSQ6ebk=;
-        b=oX5QbtVmpZrDisfB3USox+ij+ttpBDqBL1qovu9zEwiRzjuCFD49flwWBWjIBSUb8U
-         UlTKqtBJ2RucIHW8u1cRI71lU0VogC6l+ktV0mfuFD8V61z/3A4+Sb9kKlZG/Xxv3BO6
-         ihEHCh+ND3BOklZL6y7Zk/JkkeT8fCvr7cwzxmZZftxXAe65dKx12zjWbajRW4ec73Li
-         63lcdX6uN7XERd4gihkvo1NNeX4WhPH5ItadWy6Bxw1CHnjeqC46uU95Ze5nE5nEcoZf
-         p1kcNzPwSyfiZPTfCCJsTY6E53IcK8lnjoKHF4HjyPsLz7frkH+RR9pzOLcyttihMSmR
-         S8Mg==
-X-Gm-Message-State: ACrzQf1FmypYJPQWznQfvlpKiNo4/Lz1E6l+p1qd4U+rChnDDvORmehQ
-        2Uz0DJ0I1Y3CFqEIQPmdTZZaNg==
-X-Google-Smtp-Source: AMsMyM7HcrjWn/0gr8m9HBM3NPMfpNqj/jVFu77GnXRjqwOs0nxgjAIOsce2gWlRdmTzISieYuDhjA==
-X-Received: by 2002:a17:902:e801:b0:178:11e9:2ba2 with SMTP id u1-20020a170902e80100b0017811e92ba2mr25127237plg.26.1665528639885;
-        Tue, 11 Oct 2022 15:50:39 -0700 (PDT)
+        bh=Fuh4qop4UMDp8ZyQUueG7mURFaCM89/3M/PCM4KHlOg=;
+        b=LaOZ0X/cbi+Au94f1L+dhUthS2tS81v95VVhAC6AX/wb5FR4CAJ+H5jANOkHH4lbLS
+         AO5EgAeEoOodfCAyw+eA0o9vLp2RJW0S2AtvFvb3scyCprRKdlvC6F+viBrS6899Qh4R
+         OrR56mUhHoJKym8k7fi50nWTPW9/ASsBBXNqVdX8LpF6YualNFZP4X+JfgSceuAL81HY
+         L9wwFDuRMf3mQs6OpNJpC/+K5uuEFR94OqdVVyL8U5VuEsUyT9UWCYmKwJmLt+CCql9Q
+         bBoihvVwjTp3eoSBzJ/rCsyHNv9gv1x+q+1/jXmegS7maZf/Xl3nyjYqTo/m0+KqRy1j
+         t5hQ==
+X-Gm-Message-State: ACrzQf3qOMoBTY80Q8sYXwk7xnixvtv/B+Cz48/hodLH5xKAsZjuMMuO
+        vsJfYULVbLrLxH74xZj3Yam6qw==
+X-Google-Smtp-Source: AMsMyM4GLzXlshfV6Wf4tzxfxP4FuZcm/K/bEgH2Rc7MP/w1vKEXY+mNJu6c6vTkgMtmmZ+w+I5rSQ==
+X-Received: by 2002:a17:902:7043:b0:184:40e5:b5e7 with SMTP id h3-20020a170902704300b0018440e5b5e7mr2022989plt.98.1665532027312;
+        Tue, 11 Oct 2022 16:47:07 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id d29-20020a634f1d000000b0043a09d5c32bsm218734pgb.74.2022.10.11.15.50.39
+        by smtp.gmail.com with ESMTPSA id y14-20020aa79e0e000000b005623a138583sm9631317pfq.124.2022.10.11.16.47.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Oct 2022 15:50:39 -0700 (PDT)
-Date:   Tue, 11 Oct 2022 22:50:35 +0000
+        Tue, 11 Oct 2022 16:47:06 -0700 (PDT)
+Date:   Tue, 11 Oct 2022 23:47:01 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Colton Lewis <coltonlewis@google.com>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
         dmatlack@google.com, oupton@google.com, ricarkol@google.com,
         andrew.jones@linux.dev
-Subject: Re: [PATCH v6 3/3] KVM: selftests: randomize page access order
-Message-ID: <Y0XzO/MZjMICCjt3@google.com>
-References: <Y0W0V5hsTkKLg59D@google.com>
- <gsnt7d162e2i.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v6 1/3] KVM: selftests: implement random number
+ generation for guest code
+Message-ID: <Y0YAdQC7eP1TN90b@google.com>
+References: <Y0W4dImhloev7Iaq@google.com>
+ <gsnt8rlm2e38.fsf@coltonlewis-kvm.c.googlers.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <gsnt7d162e2i.fsf@coltonlewis-kvm.c.googlers.com>
+In-Reply-To: <gsnt8rlm2e38.fsf@coltonlewis-kvm.c.googlers.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -75,48 +76,66 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, Oct 11, 2022, Colton Lewis wrote:
 > Sean Christopherson <seanjc@google.com> writes:
+> > Regardless of whether or not the details are gory, having to be aware of
+> > those details unnecessarily impedes understanding the code.  The vast, vast
+> > majority of folks that read this code won't care about how PRNGs work.
+> > Even if the reader is familiar with PRNGs, those details aren't at all
+> > relevant to understanding what the guest code does.  The reader only needs
+> > to know "oh, this is randomizing the address".  How the randomization works
+> > is completely irrelevant for that level of understanding.
 > 
-> > On Tue, Oct 11, 2022, Colton Lewis wrote:
-> > > Sean Christopherson <seanjc@google.com> writes:
-> > > > Ya, I'm trippling (quadrupling?) down on my suggestion to improve the
-> > > > APIs.  Users
-> > > > should not be able to screw up like this, i.e. shouldn't need comments
-> > > > to warn
-> > > > readers, and adding another call to get a random number shouldn't
-> > > affect
-> > > > unrelated
-> > > > code.
-> 
-> > > Previous calls to PRNGs always affect later calls to PRNGs. That's how
-> > > they work.
-> 
-> > Ya, that's not the type of bugs I'm worried about.
-> 
-> > > This "screw up" would be equally likely with any API because the caller
-> > > always needs to decide if they should reuse the same random number
-> > > or need a
-> > > new one.
-> 
-> > I disagree, the in/out parameter _requires_ the calling code to store
-> > the random
-> > number in a variable.  Returning the random number allows consuming the
-> > number
-> > without needing an intermediate variable, e.g.
-> 
-> > 	if (random_bool())
-> > 		<do stuff>
-> 
-> > which makes it easy to avoid an entire class of bugs.
-> 
-> Yes, but it's impossible to do this without hidden global state at the
-> implementation level. That sacrifices reentrancy and thread-safety.
+> It is relevant if the reader of the guest code cares about reentrancy
+> and thread-safety (good for such things as reproducing the same stream
+> of randoms from the same initial conditions), because they will have to
+> manage some state to make that work. Whether that state is an integer or
+> an opaque struct requires the same level of knowledge to use the API.
 
-The above is super quick pseudocode that wasn't intended to be taken verbatim.
-From my original suggestion in patch one[*], throw the seed/metadata in a opaque
-struct, e.g. ksft_pseudo_rng (or kvm_pseudo_rng if the code ends up being KVM-only).
+By "readers" I'm not (only) talking about developers actively writing code, I'm
+I'm talking about people that run this test, encounter a failure, and read the code
+to try and understand what went wrong.  For those people, knowing that the guest is
+generating a random number is sufficient information during initial triage.  If the
+failure ends up being related to the random number, then yes they'll likely need to
+learn the details, but that's a few steps down the road.
 
-The intent is to hide the details of the rng, both so that the caller doesn't have
-to worry about those details, but also so that the guts can be changed at will
-without having to update callers.
+> > > I agree returning the value could make it easier to use as part of
+> > > expressions, but is it that important?
+> 
+> > Yes, because in pretty much every use case, the random number is going to
+> > be immediately consumed.  Readability and robustness aside, returning the
+> > value cuts the amount of code need to generate and consume a random number
+> > in half.
+> 
+> Ok. This is trivial to change (or implement on top of what is
+> there). Would you be happy with something like the following?
+> 
+> uint32_t guest_random(uint32_t *seed)
+> {
+> 	*seed = (uint64_t)*seed * 48271 % ((uint32_t)(1 << 31) - 1);
+> 	return *seed;
+> }
 
-[*] https://lore.kernel.org/all/20220912195849.3989707-2-coltonlewis@google.com
+Honestly, no.  I truly don't understand the pushback on throwing the seed into
+a struct and giving the helpers more precise names.  E.g. without looking at the
+prototype, guest_random() tells the reader nothing about the size of the random
+number returned, whereas <namespace>_random_u32() or <namespace>_get_random_u32()
+(if we want to more closely follow kernel nomenclature) tells the reader exactly
+what is returned.
+
+As a contrived example, imagine a bug where the intent was to do 50/50 reads/writes,
+but the test ends up doing almost all writes.  Code that looks like:
+
+	if (guest_random(...))
+
+is less obviously wrong than
+
+	if (guest_random_u32(...))
+
+even if the user knows nothing about how the random number is generated.
+
+And aside from hiding details and providing abstraction for readers, throwing a
+shim struct around the seed means that if we do want to change up the internal
+implementation, then we can do so without having to churn users.
+
+The code is trivial to write and I can't think of any meaningful downside.  Worst
+case scenario, we end up with an implementation that is slightly more formal than
+then we really need.
