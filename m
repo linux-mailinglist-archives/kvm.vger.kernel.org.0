@@ -2,201 +2,298 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7477A5FB272
-	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 14:31:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CFA6D5FB3A6
+	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 15:48:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229548AbiJKMb0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Oct 2022 08:31:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43556 "EHLO
+        id S229863AbiJKNsE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Oct 2022 09:48:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229820AbiJKMav (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Oct 2022 08:30:51 -0400
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2041.outbound.protection.outlook.com [40.107.102.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E03AB642E8
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 05:30:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RuC+wVxtCnbV3vT6gpJxIY3pTKliGiabbMEC6GI1Yujvh4+WZTvhyog7jEZEM+0WZ2f4eUemXT6iyERjVVplIpqe0Ggv6KtYQ9z2Qv7XjBKO07BBK1UtW6JG/xtkczVXRuBWKEnRVOnue7oNe2kSQtarCu8HI/P7R8OY1hzs80zMtR2a7yUWKEWZz/BbxuIJbb3i6EIdXt55oJpmewRn1yXjHxGO1VfjfeDnmIXqJAmMdcxhnbQS10P/Qy43cBKDr3/viRl1Iwh6gDGMAO2Vo0kLw97iu7uAj3T1St4wkfJEZiBSweghLL3tl/3Ky2NZHlfT3kNz75P5JDS9OQ/u5A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bIwTs5h6AqURjF8SCmPjybogRLgo1DKC621vzzeasa4=;
- b=lmmjFsdcqI09GSvwXqlIKcdGpwPRKq5w/4aAijcIUFDUhmvbSC6ixT/mI4UAKmZVzBEPgDUfiqGR4L22lXjt4wOjSkKPL7Wr80xpr5+jgji8SAC+F5Uh28Gz+/zFoWoudrIzz21yq869upNq7oNqIEo9+fUTSEAHreB21GOJ1B4mh/X6AyXtxjvezjyfvBrcS/LylMkZhWRigSxQkY6B3QAItKKbMpw+cC3PDgUdL4CubjnoIUWoQXPh6MowbWdlBen3EamgmOtYklmgFltM8TygOkCBo4wKAZBXsAllZB4rMkbB9qJ1lYxUV7d70UAkS+Vr88cKrtAWwmFeNCWLwA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bIwTs5h6AqURjF8SCmPjybogRLgo1DKC621vzzeasa4=;
- b=m8cUFw9h4NUeRFswvPS76Lqrka0SGEoy/POSwoEiBaqAi4gJcJ0NklX5wjYXC4i4Ohz0sRB/AMSW/kPmXQVOpDMVRMe/zIYft4u6Mrol2Bd/NpH+jiR+EAusuyIHqvOpyCJQlJLuNbEusPraAVmHNgtsjIQrcW+up48RWgEQE+PA8Uph9Z1OY7pJaKm+j1DkEDJN1B6jGWp4SXGWoHMOP13HGBDlf31mWXGQ6vrX/CbSuZOKUBIbxXgCptGLoNprqT51ZW+9KBlDsvCp+WoRvoTUcz/qTCyybbNqjkAcmY4WQaVbo9vHT4KHjKFBIf5B3F//prFJuGi9LxKRRnxghQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DS0PR12MB7557.namprd12.prod.outlook.com (2603:10b6:8:133::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5654.35; Tue, 11 Oct
- 2022 12:30:45 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de%5]) with mapi id 15.20.5676.032; Tue, 11 Oct 2022
- 12:30:45 +0000
-Date:   Tue, 11 Oct 2022 09:30:43 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Steven Sistare <steven.sistare@oracle.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Rodel, Jorg" <jroedel@suse.de>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Farman <farman@linux.ibm.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Martins, Joao" <joao.m.martins@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-        Laine Stump <laine@redhat.com>
-Subject: Re: [PATCH RFC v2 00/13] IOMMUFD Generic interface
-Message-ID: <Y0Vh868qUQPazQlr@nvidia.com>
-References: <0-v2-f9436d0bde78+4bb-iommufd_jgg@nvidia.com>
- <BN9PR11MB52762909D64C1194F4FCB4528C479@BN9PR11MB5276.namprd11.prod.outlook.com>
- <d5e33ebb-29e6-029d-aef4-af5c4478185a@redhat.com>
- <Yyoa+kAJi2+/YTYn@nvidia.com>
- <20220921120649.5d2ff778.alex.williamson@redhat.com>
- <YytbiCx3CxCnP6fr@nvidia.com>
- <2be93527-d71f-9370-2a68-fac0215d4cd4@oracle.com>
- <YyuZwnksf70lj84L@nvidia.com>
- <Yz777bJZjTyLrHEQ@nvidia.com>
- <0745238e-a006-0f9c-a7f2-f120e4df3530@oracle.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0745238e-a006-0f9c-a7f2-f120e4df3530@oracle.com>
-X-ClientProxiedBy: MN2PR07CA0020.namprd07.prod.outlook.com
- (2603:10b6:208:1a0::30) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229605AbiJKNsB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Oct 2022 09:48:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B89F9FD7
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 06:48:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665496079;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ut543M5MM4j6DKo2OXC427AI7o1rBoooUtsTSCU7wDU=;
+        b=SEEew4PrJ411zwmDhMAdVFkJMOKqzK1Ws1fJOQsRzsEYLpDxF64KfH4lP0ODSCkEJILfva
+        XN1Q+eHyKD5cNMZHykOOg/+cF+c3cI5fhqrKLbdNtX11lwZnzhmBTxlA+6Fyb8/zeH/wMA
+        r31P+/xaS+p2cYjDeduhcyOzSuqK0tU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-125-Di_HDJ0kOtC3syLS4Ws1BA-1; Tue, 11 Oct 2022 09:47:58 -0400
+X-MC-Unique: Di_HDJ0kOtC3syLS4Ws1BA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DB0FA87A9E5;
+        Tue, 11 Oct 2022 13:47:57 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B60992166B26;
+        Tue, 11 Oct 2022 13:47:57 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] Second batch of KVM changes for Linux 6.1
+Date:   Tue, 11 Oct 2022 09:47:57 -0400
+Message-Id: <20221011134757.1074225-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS0PR12MB7557:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7ff303b8-c79b-4a43-37a7-08daab846b0d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: aK5xloj3wWg7Lj61NNe/suKyle2pnbgjhzWXBSwuRbZ/03394Jp92TJrNtTcgWlAMghqTfFnjCOvnRWUJNVs5j132TTo+inh+u8jlgYEYfbzhliPCAxP2elInefSaf7AWJByayNcSSKDxc4BB1g4igDFXd1I9JMuW0fdOBee1T/dWybV0R/mr/JrVYWOeSYv5p2b9O4jUACoq1FyK2E8UomsJlHICWjCB91Oxdzyg5Pj4eE8P1yO6OTmLOC/GOeco4B2lUJaXZsf+pXJClM2lPSH9hgZcF2LA0xfoR7LZzPtQazigauBw8dEctRJjnJfuOgFWclrfvURqIo57TheobrVDp6MLcPSrWWYmaNw9/BAcypppkYp8cgbqCotvw3C4VSULvo3nE2DZGqVHqEQnZc/EuVt3gsMmzFEb7lnm1BwChTlbYa2epJAF7ZF0+c24E0PiiMUG/IIVHvPlfSs1rcOpG0aw6c5KgGzgYzRYnNqJ/yphQriU8MTOpIhQH59JJiqE34xXaw2iRysMS4W0wggrOp83W3pHuaYPUbUF0CLvk4yNgprScYWvRW08pc01/ZqPd2GTphW+j8b3fp2dJXWTR2PuFXQYYE190ex2o4+4v7/g8pHlY+Kxdmxu5+dPgAQVcituPYr3Lq1xEz/GuD43VBdyG+N3YVdZGaA1/dn0toeinoCmYfwfzwXo4d9VkbwoA7+1UMwg3Y0uRoa7nQdAn1VKZ9kXcStCpWnLVfJ2f4iEypsQyWZcfOI7tym
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(366004)(136003)(346002)(39860400002)(396003)(451199015)(86362001)(38100700002)(316002)(6916009)(478600001)(36756003)(54906003)(6486002)(8936002)(7416002)(5660300002)(66476007)(66946007)(66556008)(4326008)(2906002)(41300700001)(8676002)(83380400001)(6506007)(2616005)(6512007)(26005)(186003)(41533002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?aMfF0nIaVoUWFoIteL+Q2Bius+311z3Cz/cluPVkZKPJj7t6IQbnfffPT2lP?=
- =?us-ascii?Q?JjUljI5qmWIe7hp4GTg++davk6Id1/yh7YWZtRvm1GvMzJCD7MzZNG+0pQHA?=
- =?us-ascii?Q?R69gqRNib3IDCyde736CTBVRVxOk82HwLeRt0oJyq0cjfct3TS+ECqIjFiuF?=
- =?us-ascii?Q?e6SBxE/tEvPu4Ve9i1IfsM5twNexzCicbD7BEbR5d7prJfcFgoXjWIrdmeUU?=
- =?us-ascii?Q?fGkVnG0LV2lo+ivhGA9Tt75+O+cKFITVCXKyIfiwGsTEM//W5ywaj5SMn3cm?=
- =?us-ascii?Q?G+U13jkpImPyITHLNu8/ST9Ydl3tFLYHBZ32D5YFtJrW1C9NlchXP9oUFslB?=
- =?us-ascii?Q?Hp3UESaW1sHcxiyvGNLenNyMP0pwhqzbcSOdTdUv9ZCMo41zT0aOKZ5lyBLo?=
- =?us-ascii?Q?dnl8J3KY3PxIZIquBT0DK+hZrPz0OwM4kT1ytbb3bwhvve0cOCvx5QXIm/OW?=
- =?us-ascii?Q?Y92/gw9TMi8w6VBJho/5WIX08nV0yQZJsa/GMAee9fvQ98IAOguVPWCRAGHm?=
- =?us-ascii?Q?k54ZD2LobXZTgYxV74vflqBTVRCgYUgiSetoDSl/AvhPimIgcuH6s+squsXl?=
- =?us-ascii?Q?sUk+Cr6kBCYElq5OSSCqJU30ex4iZdwtdXNwleNXYR3vo1tCDdHrG5Ekd/w4?=
- =?us-ascii?Q?L8ocv5WF7+EJ7ujm7KKB/fZQCG6EMXhAimIde6aMVSUBg4FOmi7L6emxadwu?=
- =?us-ascii?Q?/Q/Y6+EEBFICtqWFaGs6mpcX4zGCfbnqVLvzTm0fbU57VS4skcibqzVq3l02?=
- =?us-ascii?Q?+SlOwO0eYQE3LkVh768L28ma+/yDoBVW5BLwydlfn59+vfGPwUP59E5iDGB3?=
- =?us-ascii?Q?2+wogzhOZpAUiF138NNcPxxn9Mz3oGUmfGAp19lvVykSs2dKpn4hDLxFbFo5?=
- =?us-ascii?Q?N7BGZNiskmABu4OZDGyePincYRJTptxn1jgcaE7N8hXdOG72OwD1bc73evoy?=
- =?us-ascii?Q?ePdB8dgWtApENpuD1DTPS2fK5IF+fWEd07Sw+X3QT7IRUWygXEKJ1rcrYBF6?=
- =?us-ascii?Q?9nd8mA1aGURi9RRgrnvUafNOinQNR1kuj3TkDvEgD8ejEl2bHC4vFN/xLCEC?=
- =?us-ascii?Q?KXX0vPa8UR693P40dmDd7mJfdTzEXrKSur1pGGz7cXIZw9eVvf+FFt89OY3H?=
- =?us-ascii?Q?L5jBfxzfx1/Z8GmeTXc3piIk8JNanfY/K7iBn4wJv8cy5f1rwWB1v1RBW8Su?=
- =?us-ascii?Q?6vyOPM4g4ZOfIM4m5KN6SwjKis3UrwWAbAjmBXPbSGznPkF/K/0uZAGDAsYp?=
- =?us-ascii?Q?1vd5Ven0PR5Nh6QPu0LO49WGXTXkA1vwJ2LFlkw+8/w1nEH/7MqlfFyb1EP/?=
- =?us-ascii?Q?yUEDlkkkERs89EsikjDdlUMXt9sWmZa1/Io1c0opBOUQ1i+wDC4yVFWn9wYS?=
- =?us-ascii?Q?jTMa5OE1MchGAQp2JU0gGvKTv4xVsZR2GJYWxkDYpx9RQx0xCguv3dlT9hsv?=
- =?us-ascii?Q?8J9hxR63aIa7p6iz/t46msWUayryx6b9fcRmtR7CLIlVRHDVZzYHr/Iyg1ZC?=
- =?us-ascii?Q?dW8T55VkPjs+sNU3OmWPekcu2vb4cyD8NyKK+IPWvVElykHC9iVtcpOYRDga?=
- =?us-ascii?Q?52f0gi6qQB6tGWLlRUs=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ff303b8-c79b-4a43-37a7-08daab846b0d
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Oct 2022 12:30:44.9063
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dKApZ/bS1BiZ7NQSF9eoLHSXbarDXYg0JgnGrSTKr3Y+vYtt8Txa4vW7GtalqdCe
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7557
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 10, 2022 at 04:54:50PM -0400, Steven Sistare wrote:
-> > Do we have a solution to this?
-> > 
-> > If not I would like to make a patch removing VFIO_DMA_UNMAP_FLAG_VADDR
-> > 
-> > Aside from the approach to use the FD, another idea is to just use
-> > fork.
-> > 
-> > qemu would do something like
-> > 
-> >  .. stop all container ioctl activity ..
-> >  fork()
-> >     ioctl(CHANGE_MM) // switch all maps to this mm
-> >     .. signal parent.. 
-> >     .. wait parent..
-> >     exit(0)
-> >  .. wait child ..
-> >  exec()
-> >  ioctl(CHANGE_MM) // switch all maps to this mm
-> >  ..signal child..
-> >  waitpid(childpid)
-> > 
-> > This way the kernel is never left without a page provider for the
-> > maps, the dummy mm_struct belonging to the fork will serve that role
-> > for the gap.
-> > 
-> > And the above is only required if we have mdevs, so we could imagine
-> > userspace optimizing it away for, eg vfio-pci only cases.
-> > 
-> > It is not as efficient as using a FD backing, but this is super easy
-> > to implement in the kernel.
-> 
-> I propose to avoid deadlock for mediated devices as follows.  Currently, an
-> mdev calling vfio_pin_pages blocks in vfio_wait while VFIO_DMA_UNMAP_FLAG_VADDR
-> is asserted.
-> 
->   * In vfio_wait, I will maintain a list of waiters, each list element
->     consisting of (task, mdev, close_flag=false).
-> 
->   * When the vfio device descriptor is closed, vfio_device_fops_release
->     will notify the vfio_iommu driver, which will find the mdev on the waiters
->     list, set elem->close_flag=true, and call wake_up_process for the task.
+Linus,
 
-This alone is not sufficient, the mdev driver can continue to
-establish new mappings until it's close_device function
-returns. Killing only existing mappings is racy.
+The following changes since commit 394265079b6c271fdc191ac31b1ebfbee3dd6d63:
 
-I think you are focusing on the one issue I pointed at, as I said, I'm
-sure there are more ways than just close to abuse this functionality
-to deadlock the kernel.
+  KVM: selftests: Compare insn opcodes directly in fix_hypercall_test (2022-09-30 06:38:02 -0400)
 
-I continue to prefer we remove it completely and do something more
-robust. I suggested two options.
+are available in the Git repository at:
 
-Jason
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to e18d6152ff0f41b7f01f9817372022df04e0d354:
+
+  Merge tag 'kvm-riscv-6.1-1' of https://github.com/kvm-riscv/linux into HEAD (2022-10-03 15:33:43 -0400)
+
+Main batch of ARM + RISC-V changes, and a few fixes and cleanups for x86 (PMU
+virtualization and selftests).
+
+There is a small conflict because the RISC-V pull request sorted isa_ext_arr
+in alphabetical order, conflicting with Svinval support in this one.  Linux
+itself does not yet use Svinval instructions, but KVM does.  The resolution
+is after the diffstat for your reference.
+
+----------------------------------------------------------------
+ARM:
+
+* Fixes for single-stepping in the presence of an async
+  exception as well as the preservation of PSTATE.SS
+
+* Better handling of AArch32 ID registers on AArch64-only
+  systems
+
+* Fixes for the dirty-ring API, allowing it to work on
+  architectures with relaxed memory ordering
+
+* Advertise the new kvmarm mailing list
+
+* Various minor cleanups and spelling fixes
+
+RISC-V:
+
+* Improved instruction encoding infrastructure for
+  instructions not yet supported by binutils
+
+* Svinval support for both KVM Host and KVM Guest
+
+* Zihintpause support for KVM Guest
+
+* Zicbom support for KVM Guest
+
+* Record number of signal exits as a VCPU stat
+
+* Use generic guest entry infrastructure
+
+x86:
+
+* Misc PMU fixes and cleanups.
+
+* selftests: fixes for Hyper-V hypercall
+
+* selftests: fix nx_huge_pages_test on TDP-disabled hosts
+
+* selftests: cleanups for fix_hypercall_test
+
+----------------------------------------------------------------
+Andrew Jones (7):
+      riscv: Add X register names to gpr-nums
+      riscv: Introduce support for defining instructions
+      riscv: KVM: Apply insn-def to hfence encodings
+      riscv: KVM: Apply insn-def to hlv encodings
+      RISC-V: KVM: Make ISA ext mappings explicit
+      RISC-V: KVM: Provide UAPI for Zicbom block size
+      RISC-V: KVM: Expose Zicbom to the guest
+
+Anup Patel (3):
+      RISC-V: KVM: Change the SBI specification version to v1.0
+      RISC-V: KVM: Use Svinval for local TLB maintenance when available
+      RISC-V: KVM: Allow Guest use Svinval extension
+
+David Matlack (3):
+      KVM: selftests: Tell the compiler that code after TEST_FAIL() is unreachable
+      KVM: selftests: Add helpers to read kvm_{intel,amd} boolean module parameters
+      KVM: selftests: Fix nx_huge_pages_test on TDP-disabled hosts
+
+Elliot Berman (1):
+      KVM: arm64: Ignore kvm-arm.mode if !is_hyp_mode_available()
+
+Gavin Shan (1):
+      KVM: arm64: vgic: Remove duplicate check in update_affinity_collection()
+
+Jisheng Zhang (3):
+      RISC-V: KVM: Record number of signal exits as a vCPU stat
+      RISC-V: KVM: Use generic guest entry infrastructure
+      riscv: select HAVE_POSIX_CPU_TIMERS_TASK_WORK
+
+Like Xu (6):
+      KVM: x86/pmu: Avoid setting BIT_ULL(-1) to pmu->host_cross_mapped_mask
+      KVM: x86/pmu: Don't generate PEBS records for emulated instructions
+      KVM: x86/pmu: Refactor PERF_GLOBAL_CTRL update helper for reuse by PEBS
+      KVM: x86/pmu: Avoid using PEBS perf_events for normal counters
+      KVM: x86/svm/pmu: Direct access pmu->gp_counter[] to implement amd_*_to_pmc()
+      KVM: x86/svm/pmu: Rewrite get_gp_pmc_amd() for more counters scalability
+
+Marc Zyngier (12):
+      Merge branch kvm-arm64/aarch32-raz-idregs into kvmarm-master/next
+      Merge remote-tracking branch 'arm64/for-next/sysreg' into kvmarm-master/next
+      Merge branch kvm-arm64/single-step-async-exception into kvmarm-master/next
+      KVM: Use acquire/release semantics when accessing dirty ring GFN state
+      KVM: Add KVM_CAP_DIRTY_LOG_RING_ACQ_REL capability and config option
+      KVM: x86: Select CONFIG_HAVE_KVM_DIRTY_RING_ACQ_REL
+      KVM: Document weakly ordered architecture requirements for dirty ring
+      KVM: selftests: dirty-log: Upgrade flag accesses to acquire/release semantics
+      KVM: selftests: dirty-log: Use KVM_CAP_DIRTY_LOG_RING_ACQ_REL if available
+      KVM: arm64: Advertise new kvmarm mailing list
+      Merge branch kvm-arm64/dirty-log-ordered into kvmarm-master/next
+      Merge branch kvm-arm64/misc-6.1 into kvmarm-master/next
+
+Mayuresh Chitale (2):
+      RISC-V: Probe Svinval extension form ISA string
+      RISC-V: KVM: Allow Guest use Zihintpause extension
+
+Oliver Upton (8):
+      KVM: arm64: Use visibility hook to treat ID regs as RAZ
+      KVM: arm64: Remove internal accessor helpers for id regs
+      KVM: arm64: Drop raz parameter from read_id_reg()
+      KVM: arm64: Spin off helper for calling visibility hook
+      KVM: arm64: Add a visibility bit to ignore user writes
+      KVM: arm64: Treat 32bit ID registers as RAZ/WI on 64bit-only system
+      KVM: selftests: Add test for AArch32 ID registers
+      KVM: selftests: Update top-of-file comment in psci_test
+
+Paolo Bonzini (3):
+      Merge tag 'kvm-x86-6.1-2' of https://github.com/sean-jc/linux into HEAD
+      Merge tag 'kvmarm-6.1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
+      Merge tag 'kvm-riscv-6.1-1' of https://github.com/kvm-riscv/linux into HEAD
+
+Peng Hao (2):
+      kvm: mmu: fix typos in struct kvm_arch
+      kvm: vmx: keep constant definition format consistent
+
+Reiji Watanabe (4):
+      KVM: arm64: Preserve PSTATE.SS for the guest while single-step is enabled
+      KVM: arm64: Clear PSTATE.SS when the Software Step state was Active-pending
+      KVM: arm64: selftests: Refactor debug-exceptions to make it amenable to new test cases
+      KVM: arm64: selftests: Add a test case for KVM_GUESTDBG_SINGLESTEP
+
+Sean Christopherson (5):
+      KVM: selftests: Remove unnecessary register shuffling in fix_hypercall_test
+      KVM: selftests: Hardcode VMCALL/VMMCALL opcodes in "fix hypercall" test
+      KVM: selftests: Explicitly verify KVM doesn't patch hypercall if quirk==off
+      KVM: selftests: Dedup subtests of fix_hypercall_test
+      Revert "KVM: selftests: Fix nested SVM tests when built with clang"
+
+Vipin Sharma (2):
+      KVM: selftests: Check result in hyperv_features for successful hypercalls
+      KVM: selftests: Load RAX with -EFAULT before Hyper-V hypercall
+
+Vitaly Kuznetsov (1):
+      KVM: selftests: Don't set reserved bits for invalid Hyper-V hypercall number
+
+Wei-Lin Chang (1):
+      KVM: arm64: Fix comment typo in nvhe/switch.c
+
+Xiu Jianfeng (1):
+      RISC-V: KVM: add __init annotation to riscv_kvm_init()
+
+ Documentation/virt/kvm/api.rst                |  17 +-
+ MAINTAINERS                                   |   3 +-
+ arch/arm64/include/asm/kvm_host.h             |   4 +
+ arch/arm64/kvm/arm.c                          |  15 +-
+ arch/arm64/kvm/debug.c                        |  34 +++-
+ arch/arm64/kvm/guest.c                        |   1 +
+ arch/arm64/kvm/handle_exit.c                  |   8 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c              |   2 +-
+ arch/arm64/kvm/sys_regs.c                     | 154 ++++++++--------
+ arch/arm64/kvm/sys_regs.h                     |  24 ++-
+ arch/arm64/kvm/vgic/vgic-its.c                |   2 +-
+ arch/riscv/Kconfig                            |   4 +
+ arch/riscv/include/asm/gpr-num.h              |   8 +
+ arch/riscv/include/asm/hwcap.h                |   4 +
+ arch/riscv/include/asm/insn-def.h             | 137 ++++++++++++++
+ arch/riscv/include/asm/kvm_host.h             |   1 +
+ arch/riscv/include/asm/kvm_vcpu_sbi.h         |   4 +-
+ arch/riscv/include/uapi/asm/kvm.h             |   4 +
+ arch/riscv/kernel/cpu.c                       |   1 +
+ arch/riscv/kernel/cpufeature.c                |   1 +
+ arch/riscv/kvm/Kconfig                        |   1 +
+ arch/riscv/kvm/main.c                         |   2 +-
+ arch/riscv/kvm/tlb.c                          | 155 +++++-----------
+ arch/riscv/kvm/vcpu.c                         |  60 ++++---
+ arch/riscv/kvm/vcpu_exit.c                    |  39 +---
+ arch/riscv/mm/dma-noncoherent.c               |   2 +
+ arch/x86/include/asm/kvm_host.h               |  12 +-
+ arch/x86/include/asm/vmx.h                    |   2 +-
+ arch/x86/kvm/Kconfig                          |   3 +-
+ arch/x86/kvm/pmu.c                            |  20 ++-
+ arch/x86/kvm/svm/pmu.c                        | 117 ++----------
+ arch/x86/kvm/vmx/pmu_intel.c                  |  29 +--
+ include/uapi/linux/kvm.h                      |   1 +
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/aarch32_id_regs.c   | 169 ++++++++++++++++++
+ .../selftests/kvm/aarch64/debug-exceptions.c  | 149 ++++++++++++++-
+ .../testing/selftests/kvm/aarch64/psci_test.c |  10 +-
+ tools/testing/selftests/kvm/dirty_log_test.c  |   8 +-
+ .../selftests/kvm/include/kvm_util_base.h     |   4 +
+ .../testing/selftests/kvm/include/test_util.h |   6 +-
+ .../selftests/kvm/include/x86_64/processor.h  |   4 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  44 ++++-
+ .../selftests/kvm/lib/x86_64/processor.c      |  40 +++--
+ tools/testing/selftests/kvm/lib/x86_64/svm.c  |  14 +-
+ .../selftests/kvm/x86_64/fix_hypercall_test.c | 122 +++++--------
+ .../selftests/kvm/x86_64/hyperv_features.c    |  13 +-
+ .../selftests/kvm/x86_64/nx_huge_pages_test.c |  19 +-
+ virt/kvm/Kconfig                              |  14 ++
+ virt/kvm/dirty_ring.c                         |   4 +-
+ virt/kvm/kvm_main.c                           |   9 +-
+ 51 files changed, 991 insertions(+), 511 deletions(-)
+ create mode 100644 arch/riscv/include/asm/insn-def.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/aarch32_id_regs.c
+
+diff --cc arch/riscv/kernel/cpu.c
+index 87455d12970f,7d1cd653ca02..000000000000
+--- a/arch/riscv/kernel/cpu.c
++++ b/arch/riscv/kernel/cpu.c
+@@@ -90,14 -90,15 +90,15 @@@ int riscv_of_parent_hartid(struct devic
+   *    standard extensions. They must be separated from other multi-letter
+   *    extensions by an underscore.
+   */
+  static struct riscv_isa_ext_data isa_ext_arr[] = {
+  	__RISCV_ISA_EXT_DATA(sscofpmf, RISCV_ISA_EXT_SSCOFPMF),
+ +	__RISCV_ISA_EXT_DATA(sstc, RISCV_ISA_EXT_SSTC),
+++	__RISCV_ISA_EXT_DATA(svinval, RISCV_ISA_EXT_SVINVAL),
+  	__RISCV_ISA_EXT_DATA(svpbmt, RISCV_ISA_EXT_SVPBMT),
+  	__RISCV_ISA_EXT_DATA(zicbom, RISCV_ISA_EXT_ZICBOM),
+  	__RISCV_ISA_EXT_DATA(zihintpause, RISCV_ISA_EXT_ZIHINTPAUSE),
+ -	__RISCV_ISA_EXT_DATA(sstc, RISCV_ISA_EXT_SSTC),
+ -	__RISCV_ISA_EXT_DATA(svinval, RISCV_ISA_EXT_SVINVAL),
+  	__RISCV_ISA_EXT_DATA("", RISCV_ISA_EXT_MAX),
+  };
+  
+  static void print_isa_ext(struct seq_file *f)
+  {
+
