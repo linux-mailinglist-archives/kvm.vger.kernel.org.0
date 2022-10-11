@@ -2,76 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F16AC5FAB6B
-	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 05:50:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BB8005FAB78
+	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 05:56:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229573AbiJKDu0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 10 Oct 2022 23:50:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38006 "EHLO
+        id S229486AbiJKD4j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 10 Oct 2022 23:56:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229519AbiJKDuX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 10 Oct 2022 23:50:23 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5C0925584
-        for <kvm@vger.kernel.org>; Mon, 10 Oct 2022 20:50:13 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id d7-20020a17090a2a4700b0020d268b1f02so5365585pjg.1
-        for <kvm@vger.kernel.org>; Mon, 10 Oct 2022 20:50:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=HhqceA9XVnV2jj9E6aHbcgTtQtB5Rry1ltkGlDIo+pA=;
-        b=J2dNBDaHKoR12uDNtoxL90mg7ZDM/KQOl/HNokibBrEUiPwsGvgQ1E+72raQP420xc
-         Dh4fvZ0KnalxEBZWvOVe5+keZ2UP2NyCCOteMva63fW7WWbmPceLlt+FhEATosOj2gJ8
-         BbVpLhO3QPvE6lLn1sSlb8gef2/9iT+BiG7H0Nil5k0qp1Ef+shTC60KatBYodqF5aBt
-         dNAUQs9ByDwEwuvOJYi8ix1eRwLXF1frndT3u6AkP2Tpz2urU7Jj0u3sEvoVrndPpXW/
-         hliUQMouNFYxSj6Jo/XEgVVGrhH0+VgCx2fv6NWT8vIv7MKXu2InTPKJKPxJTQvZz7QY
-         I9VA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HhqceA9XVnV2jj9E6aHbcgTtQtB5Rry1ltkGlDIo+pA=;
-        b=PYXjhEWAHVg/h9g8Db/67vj4sXo4ja0sjnRJYHTfVIt98ScKv7OEw/eNeF4QqPbLzT
-         2YkXPIG3kr+EdlaFINojJPTRZcuF41hFo/w+8wXb9pyJGaHJ1ca+h2b+3KaryDbHHV64
-         LrAvM+l4TBxJ+d8hj19SzJK23fM0seJLIwp9kI6BmojgWvmv9H1OwpSO/yue5lJ/A61U
-         id563muW8WoJtFdO1fJhtJ+Yp4K2f2KScDmHTQ6Bpi52O2bjrY+sqGZnTsYy5qtm+qqN
-         e6oewloJ3VznVxU817QY3/oADoM+DkjI9A+5rFXF1dKijD90pt7eP8jW4NeOWqC+5reG
-         pVUQ==
-X-Gm-Message-State: ACrzQf3zy1MuxGfP+M8MkWiQKz12nhyA12cl+uostOcaovwfbnhSbR67
-        UscMQ7jIX4Qsgw7jw980g5VtIA==
-X-Google-Smtp-Source: AMsMyM7DCRFYQkEj/T2FjkIv61uGnwpf5X7GHkQzIRmf2Us4HuI+pNXriPXsIa+FJ/Hzh18avR2o4Q==
-X-Received: by 2002:a17:90b:4d8d:b0:20a:ad78:7826 with SMTP id oj13-20020a17090b4d8d00b0020aad787826mr24684083pjb.237.1665460212289;
-        Mon, 10 Oct 2022 20:50:12 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id w35-20020a17090a6ba600b0020ad7678ba0sm6790553pjj.3.2022.10.10.20.50.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Oct 2022 20:50:11 -0700 (PDT)
-Date:   Mon, 10 Oct 2022 20:50:08 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Eric Auger <eric.auger@redhat.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
-        maz@kernel.org, oliver.upton@linux.dev, reijiw@google.com
-Subject: Re: [kvm-unit-tests PATCH v3 0/3] arm: pmu: Fixes for bare metal
-Message-ID: <Y0Tn8FNjsRgesMjh@google.com>
-References: <20220805004139.990531-1-ricarkol@google.com>
- <89c93f1e-6e78-f679-aecb-7e506fa0cea3@redhat.com>
- <YzxmHpV2rpfaUdWi@monolith.localdoman>
- <5b69f259-4a25-18eb-6c7c-4b59e1f81036@redhat.com>
- <Yz1MiE64ZEa7twtM@monolith.localdoman>
- <2c577c0a-7bdb-81b0-f0c3-6ede3688b94d@redhat.com>
+        with ESMTP id S229517AbiJKD4h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 10 Oct 2022 23:56:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68C857437D
+        for <kvm@vger.kernel.org>; Mon, 10 Oct 2022 20:56:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665460594;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jT4B4+nLwhdk058DSBmtM9jFtuoC91qYN182nNDbcXQ=;
+        b=gJAP3yfXsQ/9maCYCf9HSdd9S5WR/HGarnAj8qCDLICaB+aTHR8fy1vccWjYWrKwLq6+sT
+        NXyasSzbv5iC3ib61ceC1FK5gSI+DPcFq0CC/chk/iVWAk87LP3wRkI23JutiAFTGtMXRj
+        yylwmTrKsax4C2v/znH5KKAVRrJyU6E=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-10-_wXVCgQ1PsCtvVyJaUGwOg-1; Mon, 10 Oct 2022 23:56:30 -0400
+X-MC-Unique: _wXVCgQ1PsCtvVyJaUGwOg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5A927185A792;
+        Tue, 11 Oct 2022 03:56:29 +0000 (UTC)
+Received: from [10.64.54.52] (vpn2-54-52.bne.redhat.com [10.64.54.52])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C646404CD98;
+        Tue, 11 Oct 2022 03:56:23 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v5 3/7] KVM: x86: Allow to use bitmap in ring-based dirty
+ page tracking
+To:     Oliver Upton <oliver.upton@linux.dev>, Peter Xu <peterx@redhat.com>
+Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, catalin.marinas@arm.com, bgardon@google.com,
+        shuah@kernel.org, andrew.jones@linux.dev, will@kernel.org,
+        dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com,
+        james.morse@arm.com, suzuki.poulose@arm.com,
+        alexandru.elisei@arm.com, seanjc@google.com, shan.gavin@gmail.com
+References: <20221005004154.83502-1-gshan@redhat.com>
+ <20221005004154.83502-4-gshan@redhat.com> <Yz86gEbNflDpC8As@x1n>
+ <a5e291b9-e862-7c71-3617-1620d5a7d407@redhat.com> <Y0A4VaSwllsSrVxT@x1n>
+ <Y0SoX2/E828mbxuf@google.com> <Y0SvexjbHN78XVcq@xz-m1.local>
+ <Y0SxnoT5u7+1TCT+@google.com> <Y0S2zY4G7jBxVgpu@xz-m1.local>
+ <Y0TDCxfVVme8uPGU@google.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <6440b74c-9ebc-12f4-dd4e-469376a434f2@redhat.com>
+Date:   Tue, 11 Oct 2022 11:56:09 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2c577c0a-7bdb-81b0-f0c3-6ede3688b94d@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+In-Reply-To: <Y0TDCxfVVme8uPGU@google.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,197 +75,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 05, 2022 at 11:50:09AM +0200, Eric Auger wrote:
-> Hi Alexandru,
+On 10/11/22 9:12 AM, Oliver Upton wrote:
+> On Mon, Oct 10, 2022 at 08:20:29PM -0400, Peter Xu wrote:
+>> On Mon, Oct 10, 2022 at 11:58:22PM +0000, Oliver Upton wrote:
+>>> I think this further drives the point home -- there's zero need for the
+>>> bitmap with dirty ring on x86, so why even support it? The proposal of
+>>> ALLOW_BITMAP && DIRTY_RING should be arm64-specific. Any other arch that
+>>> needs to dirty memory outside of a vCPU context can opt-in to the
+>>> behavior.
+>>
+>> Yeah that sounds working too, but it'll be slightly hackish as then the
+>> user app will need some "#ifdef ARM64" blocks for e.g. sync dirty bitmap.
+>> With the new cap the user app can implement the whole ring with generic
+>> code.
 > 
-> On 10/5/22 11:21, Alexandru Elisei wrote:
-> > Hi Eric,
-> >
-> > On Tue, Oct 04, 2022 at 07:31:25PM +0200, Eric Auger wrote:
-> >> Hi Alexandru,
-> >>
-> >> On 10/4/22 18:58, Alexandru Elisei wrote:
-> >>> Hi Eric,
-> >>>
-> >>> On Tue, Oct 04, 2022 at 06:20:23PM +0200, Eric Auger wrote:
-> >>>> Hi Ricardo, Marc,
-> >>>>
-> >>>> On 8/5/22 02:41, Ricardo Koller wrote:
-> >>>>> There are some tests that fail when running on bare metal (including a
-> >>>>> passthrough prototype).  There are three issues with the tests.  The
-> >>>>> first one is that there are some missing isb()'s between enabling event
-> >>>>> counting and the actual counting. This wasn't an issue on KVM as
-> >>>>> trapping on registers served as context synchronization events. The
-> >>>>> second issue is that some tests assume that registers reset to 0.  And
-> >>>>> finally, the third issue is that overflowing the low counter of a
-> >>>>> chained event sets the overflow flag in PMVOS and some tests fail by
-> >>>>> checking for it not being set.
-> >>>>>
-> >>>>> Addressed all comments from the previous version:
-> >>>>> https://lore.kernel.org/kvmarm/20220803182328.2438598-1-ricarkol@google.com/T/#t
-> >>>>> - adding missing isb() and fixed the commit message (Alexandru).
-> >>>>> - fixed wording of a report() check (Andrew).
-> >>>>>
-> >>>>> Thanks!
-> >>>>> Ricardo
-> >>>>>
-> >>>>> Ricardo Koller (3):
-> >>>>>   arm: pmu: Add missing isb()'s after sys register writing
-> >>>>>   arm: pmu: Reset the pmu registers before starting some tests
-> >>>>>   arm: pmu: Check for overflow in the low counter in chained counters
-> >>>>>     tests
-> >>>>>
-> >>>>>  arm/pmu.c | 56 ++++++++++++++++++++++++++++++++++++++-----------------
-> >>>>>  1 file changed, 39 insertions(+), 17 deletions(-)
-> >>>>>
-> >>>> While testing this series and the related '[PATCH 0/9] KVM: arm64: PMU:
-> >>>> Fixing chained events, and PMUv3p5 support' I noticed I have kvm unit
-> >>>> test failures on some machines. This does not seem related to those
-> >>>> series though since I was able to get them without. The failures happen
-> >>>> on Amberwing machine for instance with the pmu-chain-promotion.
-> >>>>
-> >>>> While further investigating I noticed there is a lot of variability on
-> >>>> the kvm unit test mem_access_loop() count. I can get the counter = 0x1F
-> >>>> on the first iteration and 0x96 on the subsequent ones for instance.
-> >>>> While running mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E) I was
-> >>>> expecting the counter to be close to 20. It is on some HW.
-> >>>>
-> >>>> [..]
-> >>>>
-> >>>> So I come to the actual question. Can we do any assumption on the
-> >>>> (virtual) PMU quality/precision? If not, the tests I originally wrote
-> >>>> are damned to fail on some HW (on some other they always pass) and I
-> >>>> need to make a decision wrt re-writing part of them, expecially those
-> >>>> which expect overflow after a given amount of ops. Otherwise, there is
-> >>>> either something wrong in the test (asm?) or in KVM PMU emulation.
+> Isn't the current route of exposing ALLOW_BITMAP on other arches for no
+> reason headed in exactly that direction? Userspace would need to know if
+> it _really_ needs the dirty bitmap in addition to the dirty ring, which
+> could take the form of architecture ifdeffery.
+> 
+> OTOH, if the cap is only exposed when it is absolutely necessary, an
+> arch-generic live migration implementation could enable the cap whenever
+> it is advertized and scan the bitmap accordingly.
+> 
+> The VMM must know something about the architecture it is running on, as
+> it calls KVM_DEV_ARM_ITS_SAVE_TABLES after all...
+> 
 
-I don't think it's the asm because in that case the counter value should
-be the same every time (even if wrong).
+It looks good to me by using CONFIG_HAVE_KVM_DIRTY_RING_USE_BITMAP to
+opt-in KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP. The most important point is
+to ensure 'kvm->dirty_ring_with_bitmap == true' when dirty ring capability
+is enabled. In this way, we can fail early when KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP
+isn't enabled on attempt to enable dirty ring capability.
 
-> >>>>
-> >>>> I tried to bisect because I did observe the same behavior on some older
-> >>>> kernels but the bisect was not successful as the issue does not happen
-> >>>> always.
-> >>>>
-> >>>> Thoughts?
-> >>> Looking at mem_access_loop(), the first thing that jumps out is the fact
-> >>> that is missing a DSB barrier. ISB affects only instructions, not memory
-> >>> accesses and without a DSB, the PE can reorder memory accesses however it
-> >>> sees fit.
-> >> Following your suggestion I added a dsh ish at the end of loop and
-> >> before disabling pmcr_el0 (I hope this is the place you were thinking
-> >> of) but unfortunately it does not seem to fix my issue.
-> > Yes, DSB ISH after "b.gt 1b\n" and before the write to PMCR_EL0 that
-> > disables the PMU.
-> >
-> > I think you also need a DSB ISH before the write to PMCR_EL0 that enables
-> > the PMU in the first instruction of the asm block. In your example, the
-> > MEM_ACCESS event count is higher than expected, and one explanation for the
-> > large disparity that I can think of is that previous memory accesses are
-> > reordered past the instruction that enables the PMU, which makes the PMU
-> > add these events to the total event count.
-> 
-> Makes sense. I added those at the 2 locations but unfortunately it does
-> not change the result for me.
-> >
-> >>> I also believe precise_instrs_loop() to be in the same situation, as the
-> >>> architecture doesn't guarantee that the cycle counter increments after
-> >>> every CPU cycle (ARM DDI 0487I.a, page D11-5246):
-> >>>
-> >>> "Although the architecture requires that direct reads of PMCCNTR_EL0 or
-> >>> PMCCNTR occur in program order, there is no requirement that the count
-> >>> increments between two such reads. Even when the counter is incrementing on
-> >>> every clock cycle, software might need check that the difference between
-> >>> two reads of the counter is nonzero."
-> >> OK
-> >>> There's also an entire section in ARM DDI 0487I.a dedicated to this, titled
-> >>> "A reasonable degree of inaccuracy" (page D11-5248). I'll post some
-> >>> snippets that I found interesting, but there are more examples and
-> >>> explanations to be found in that chapter.
-> >> yeah I saw that, hence my question about the reasonable disparity we can
-> >> expect from the HW/SW stack.
-> >>> "In exceptional circumstances, such as a change in Security state or other
-> >>> boundary condition, it is acceptable for the count to be inaccurate."
-> >>>
-> >>> PMCR writes are trapped by KVM. Is a change in exception level an
-> >>> "exception circumstance"? Could be, but couldn't find anything definitive.
-> >>> For example, the architecture allows an implementation to drop an event in
-> >>> the case of an interrupt:
-> >>>
-> >>> "However, dropping a single branch count as the result of a rare
-> >>> interaction with an interrupt is acceptable."
-> >>>
-> >>> So events could definitely be dropped because of an interrupt for the host.
-> >>>
-> >>> And there's also this:
-> >>>
-> >>> "The imprecision means that the counter might have counted an event around
-> >>> the time the counter was disabled, but does not allow the event to be
-> >>> observed as counted after the counter was disabled."
-> >> In our case there seems to be a huge discrepancy.
-> > I agree. There is this about the MEM_ACCESS event in the Arm ARM:
-> >
-> > "The counter counts each Memory-read operation or Memory-write operation
-> > that the PE makes."
-> >
-> > As for what a Memory-read operation is (emphasis added by me):
-> >
-> > "A memory-read operation might be due to:
-> > The result of an architecturally executed memory-reading instructions.
-> > The result of a Speculatively executed memory-reading instructions <- this
-> > is why the DSB ISH is needed before enabling the PMU.
-> > **A translation table walk**."
-> >
-> > Those extra memory accesses might be caused by the table walker deciding to
-> > walk the tables, speculatively or not. Software has no control over the
-> > table walker (as long as it is enabled).
-> That's indeed an interesting track. But can it be possible that for 20
-> expected load instructions we end up with ~150 actual memory accesses.
-> I can't help thinking this is a quite surprising amount.  Also the
-> pattern is surprising: the first iteration gives low counter count (~30)
-> while subsequent ones bring higher and constant ones (~150). I would
-> have expected the opposite, no? I will try to run the same experience on
-> various HW I have access to.
-> 
-> Anyway there is a problem while interpreting the result of the tests.
-> Either it can happen on some HW (it is a valid behavior according to the
-> ARM spec) and the test is simply not runnable or it is a bug somewhere
-> in the SW stack. 
-> 
-> It would be interesting to run the same tests at baremetal level on
-> Amberwing and see what are the results. Ricardo/Drew, could you give
-> some links about the setup?
+If both of you agree, I will integrate the suggested code changes in
+next respin, with necessary tweak.
 
-Actually, the "bare metal" tests I performed were on a prototype
-passthrough implementation:
-https://github.com/ricarkol/linux/commit/c2b009e813e18e89d6945915bd3ae5787bbe3164
-Let me know how it goes.
+- In kvm_vm_ioctl_enable_cap_generic(), 'kvm->dirty_ring_with_bitmap' is
+   updated to 'true' unconditionally.
+
+   static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+                                              struct kvm_enable_cap *cap)
+   {
+       :
+       case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP:
+            kvm->dirty_ring_with_bitmap = true;
+            return 0;
+   }
+
+- In mark_page_dirty_in_slot(), we need comprehensive checks like below.
+
+   void mark_page_dirty_in_slot(struct kvm *kvm,
+                                const struct kvm_memory_slot *memslot,
+                                gfn_t gfn)
+   {
+#ifdef CONFIG_HAVE_KVM_DIRTY_RING
+       if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
+           return;
+
+#ifndef CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP
+       if (WARN_ON_ONCE(!vcpu))
+           return;
+#endif
+#endif
+
+   }
+
+- Use kvm_dirty_ring_exclusive(), which was suggested by Peter before.
+   The function is used in various spots to allow the dirty bitmap is
+   created and accessed.
+
+   bool kvm_dirty_ring_exclusive(struct kvm *kvm)
+   {
+       return kvm->dirty_ring_size && !kvm->dirty_ring_with_bitmap;
+   }
+
+
+>> Also more flexible to expose it as generic cap? E.g., one day x86 can
+>> enable this too for whatever reason (even though I don't think so..).
+> 
+> I had imagined something like this patch where the arch opts-in to some
+> generic construct if it *requires* the use of both the ring and bitmap
+> (very rough sketch).
+> 
 
 Thanks,
-Ricardo
+Gavin
 
-> 
-> Thanks
-> 
-> Eric
-> >
-> > Thanks,
-> > Alex
-> >
-> >>> If you want my opinion, if it is necessary to count the number of events
-> >>> for a test instead, I would define a margin of error on the number of
-> >>> events counted. Or the test could be changed to check that at least one
-> >>> such event was observed.
-> >> I agree with you on the fact a reasonable margin must be observed and
-> >> the tests may need to be rewritten to account for the observed disparity
-> >> if considered "normal". Another way to proceed is to compute the
-> >> disparity before launching the main tests and if too big, skip the main
-> >> tests. Again on some HW, the counts are really 'as expected' and constant.
-> >>
-> >> Thanks!
-> >>
-> >> Eric
-> >>> Thanks,
-> >>> Alex
-> >>>
-> 
+
+
