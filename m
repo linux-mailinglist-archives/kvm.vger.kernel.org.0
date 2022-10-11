@@ -2,122 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 163895FB8A5
-	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 18:54:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1005E5FB8C1
+	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 19:00:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229436AbiJKQyS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Oct 2022 12:54:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38298 "EHLO
+        id S229962AbiJKRAo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Oct 2022 13:00:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229703AbiJKQyQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Oct 2022 12:54:16 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4890BA7A92
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 09:54:10 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6534EB81644
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 16:54:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04CC6C433C1;
-        Tue, 11 Oct 2022 16:54:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665507247;
-        bh=xlwuYvosoE0BbYbq9HHwAmrNUGKKZ8giCfeDw0SQPDU=;
-        h=From:To:Cc:Subject:Date:From;
-        b=OnGUroGoqo+A2kb/uGY64G53Fuk5sMBo5h9SoFlhYzk/VBfgV5Vd9PhsTSAX+Vup2
-         3iNn2Nay8RoSDYsGIZJ1xo53eezwfbGo7Cdb3uLP2GGOQzf6zCa5HfpThOrvZl5P2c
-         aZJIN5Sd2Be4LktxeptQd6DI4x2YzdvZoCpWvQeP4QVj1wuz4YIUwuhPYdah/8YUFU
-         Q2R3mfjTwucFLJfuwR/g8q+id3EhBkvC1s4XRfIyGupcL45efn1egi5VR07wSXIBHY
-         2irXOapsRRpUV5fAf43q6piwhvSPctRqBvojE1UqKYVHlU862Kp1N4AWkBhI/udih9
-         ccyI02eoLUtlQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1oiIW4-00Fs7W-Oh;
-        Tue, 11 Oct 2022 17:54:04 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     <kvmarm@lists.cs.columbia.edu>, <kvmarm@lists.linux.dev>,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Quentin Perret <qperret@google.com>,
-        Will Deacon <will@kernel.org>,
-        Vincent Donnefort <vdonnefort@google.com>
-Subject: [PATCH] KVM: arm64: pkvm: Fixup boot mode to reflect that the kernel resumes from EL1
-Date:   Tue, 11 Oct 2022 17:54:00 +0100
-Message-Id: <20221011165400.1241729-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S229983AbiJKRAh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Oct 2022 13:00:37 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43D94AE5D
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 10:00:34 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29BG42Bm016306
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 17:00:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=zXVE7MaAmIg3Fz1aEdPf7KnCuI9IgFX1ycqBkhbMf4s=;
+ b=N6eosLkMPmxsX/FTv7s9CfPwCPTdiQ6OI9GTBoBfxEbi6ANdsxv1ULv3VFztwO3YvwxE
+ cD+J+ONAs1s8NfEMcPOd/vi6Mv1g8w/PHdtfVJiwWUxtzuMffcJ08s/YEqXEyIrNhHjh
+ okGuXqelli1ZkJtFKy5SDnKW7oA9mFoIKaZ8pcDuIfGVPvtrOV+OaABIWhiN5A2yp++R
+ X9yGjwCIyWZkjT1Qcc7RALutw0UcbffuyZP2obvUW607fMNC1UizLV78XsGp+VYsXpxj
+ uBdAyLz06dCpgprG7vz/Qlabyc+WBQwu4S3zWxRALBHT1hIrF0cZC0rUfI/kzaKGFUOy pQ== 
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3k590dg6bx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 17:00:30 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29BGptFZ027515
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 17:00:28 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma02fra.de.ibm.com with ESMTP id 3k30u93kd7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 17:00:28 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29BGtf0e50659808
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 11 Oct 2022 16:55:41 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 19435AE051;
+        Tue, 11 Oct 2022 17:00:25 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D29E5AE053;
+        Tue, 11 Oct 2022 17:00:24 +0000 (GMT)
+Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 11 Oct 2022 17:00:24 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com,
+        borntraeger@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v3 0/2] s390x: Add migration test for guest TOD clock
+Date:   Tue, 11 Oct 2022 19:00:22 +0200
+Message-Id: <20221011170024.972135-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, qperret@google.com, will@kernel.org, vdonnefort@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Vi9UZteyio1CHHSsQknV9BUEFL-wlQPf
+X-Proofpoint-ORIG-GUID: Vi9UZteyio1CHHSsQknV9BUEFL-wlQPf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-11_08,2022-10-11_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=968
+ lowpriorityscore=0 suspectscore=0 priorityscore=1501 malwarescore=0
+ bulkscore=0 impostorscore=0 spamscore=0 clxscore=1015 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210110095
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The kernel has an awfully complicated boot sequence in order to cope
-with the various EL2 configurations, including those that "enhanced"
-the architecture. We go from EL2 to EL1, then back to EL2, staying
-at EL2 if VHE capable and otherwise go back to EL1.
-
-Here's a paracetamol tablet for you.
-
-The cpu_resume path follows the same logic, because coming up with
-two versions of a square wheel is hard.
-
-However, things aren't this straightforward with pKVM, as the host
-resume path is always proxied by the hypervisor, which means that
-the kernel is always entered at EL1. Which contradicts what the
-__boot_cpu_mode[] array contains (it obviously says EL2).
-
-This thus triggers a HVC call from EL1 to EL2 in a vain attempt
-to upgrade from EL1 to EL2 VHE, which we are, funnily enough,
-reluctant to grant to the host kernel. This is also completely
-unexpected, and puzzles your average EL2 hacker.
-
-Address it by fixing up the boot mode at the point the host gets
-deprivileged. is_hyp_mode_available() and co already have a static
-branch to deal with this, making it pretty safe.
-
-Reported-by: Vincent Donnefort <vdonnefort@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+v2->v3:
 ---
- arch/arm64/kvm/arm.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+- check the clock is really set after setting (thanks Claudio)
+- remove unneeded memory clobber (thanks Claudio)
+- add comment to explain what we're testing (thanks Christian)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index b6c9bfa8492f..cf075c9b9ab1 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2107,6 +2107,17 @@ static int pkvm_drop_host_privileges(void)
- 	 * once the host stage 2 is installed.
- 	 */
- 	static_branch_enable(&kvm_protected_mode_initialized);
-+
-+	/*
-+	 * Fixup the boot mode so that we don't take spurious round
-+	 * trips via EL2 on cpu_resume. Flush to the PoC for a good
-+	 * measure, so that it can be observed by a CPU coming out of
-+	 * suspend with the MMU off.
-+	 */
-+	__boot_cpu_mode[0] = __boot_cpu_mode[1] = BOOT_CPU_MODE_EL1;
-+	dcache_clean_poc((unsigned long)__boot_cpu_mode,
-+			 (unsigned long)(__boot_cpu_mode + 2));
-+
- 	on_each_cpu(_kvm_host_prot_finalize, &ret, 1);
- 	return ret;
- }
+v1->v2:
+---
+- remove unneeded include
+- advance clock by 10 minutes instead of 1 minute (thanks Claudio)
+- express get_clock_us() using stck() (thanks Claudio)
+
+The guest TOD clock should not go backwards on migration. Add a test to
+verify that.
+
+To reduce code duplication, move some of the time-related defined
+from the sck test to the library.
+
+Nico Boehr (2):
+  lib/s390x: move TOD clock related functions to library
+  s390x: add migration TOD clock test
+
+ lib/s390x/asm/time.h  | 50 ++++++++++++++++++++++++++++++++++++++-
+ s390x/Makefile        |  1 +
+ s390x/migration-sck.c | 54 +++++++++++++++++++++++++++++++++++++++++++
+ s390x/sck.c           | 32 -------------------------
+ s390x/unittests.cfg   |  4 ++++
+ 5 files changed, 108 insertions(+), 33 deletions(-)
+ create mode 100644 s390x/migration-sck.c
+
 -- 
-2.34.1
+2.36.1
 
