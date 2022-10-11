@@ -2,157 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED2145FAE98
-	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 10:42:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5692A5FAF21
+	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 11:13:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229472AbiJKImH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Oct 2022 04:42:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38646 "EHLO
+        id S229824AbiJKJNV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Oct 2022 05:13:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229806AbiJKImF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Oct 2022 04:42:05 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A95F1D0D1
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 01:42:04 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29B8YWOO002930
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 08:42:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : to :
- from : cc : subject : message-id : date; s=pp1;
- bh=hsAbRPkMpFINL3NGFt14K6GMxHotTo+J5VFUe0goYyg=;
- b=GoeS9PO2q0VMYoQ/gtxqkGnx/q0NvMgTePrvno08EtzqCdTSMHIUPEqcXhFEDyI+RKPd
- /l2zwkxuz5O6JGYeY9/jI9pwnlGDUkApqqcgW6Kk7UCWx8BA29fNH3jJgpzCWOhl+iSi
- n86iEooLPwxRJJ/u8/nuJzLKo2cuaMxjmuF1qHG/qooea4iLqA0awbRi48rJpVuU9tNk
- 2a3w3rCQ5aGBy7WKFyBB6THFz/HIk9Sr1rc68pAMZ+RelxwnGj9IOHlIkKigaDGcHxXZ
- 6nFFFI1WjXynp3HGwdyOXxcuzwpzxdruVh0K4OJgNPiavK3ZMtJ0qKr1RLl7qL2AZJZk Ng== 
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k50xuq2nd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 08:42:03 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29B8Zc6Q026646
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 08:42:01 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03fra.de.ibm.com with ESMTP id 3k30u9ay2r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 08:42:00 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29B8fvPb62587288
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Oct 2022 08:41:57 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id ABD954C044;
-        Tue, 11 Oct 2022 08:41:57 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 883424C040;
-        Tue, 11 Oct 2022 08:41:57 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.53.19])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 11 Oct 2022 08:41:57 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S229603AbiJKJNT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Oct 2022 05:13:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A664EE18
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 02:13:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665479597;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=VThX7WbifVT6BXrss5grux5JWHQo9lFU0LPJWiFOeu0=;
+        b=HaVXElnoD4pqV079MOOxXahhkE+qm0zjwDGtY6Uejtk5pZ2E5IH1U0U8uGAgUHOqV8dLPh
+        M9woKYnEqt6vPZ2NP0Nm+DAjAbmufsQ8gD117/DX+TFsHUgPY0cevAxbqt56numnyu5ucz
+        uGaQkzgioyFSw8HnsA1MOcF1q3s0sGY=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-112-nFEXwkFNPgifarM7ZTB24A-1; Tue, 11 Oct 2022 05:13:11 -0400
+X-MC-Unique: nFEXwkFNPgifarM7ZTB24A-1
+Received: by mail-ej1-f70.google.com with SMTP id qa14-20020a170907868e00b0078db5ba61bdso1876731ejc.12
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 02:13:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VThX7WbifVT6BXrss5grux5JWHQo9lFU0LPJWiFOeu0=;
+        b=5Vtp5uYFGYF1seZwiEOpxtk7mYVowyXCnZHI0znIQP7hjl9s8ELOt8iPbTOg4Py/5D
+         9S3pSU6Azd+23oMZ9wR38VC0rt5ceLi7AEwhS94oWLBDGBn5/aludrPE7EzT9O13c6CF
+         CpcC1R7p0NXyLZVW061lyfzkIPDMYHPrAwoio6/NABywSTm2HrkYV82AhiS6WKmy6ZgV
+         OBbGvc3Tudjml3KRZo6/mf3GxQ+3jS6Uh7oW4UMmWL36Sy3YDlu3PiHy5HelWB5i3R+U
+         2w1qN5xyP4ESJLeuVWq4hXNU+DdbfAVBZYXSHYW3yDPGbpcyTG1SpMF5pw1CmLcoE/tU
+         GCkw==
+X-Gm-Message-State: ACrzQf2v301OiH+Hw5BL18HAiUWBXQZ2Mc9HUA93thKL/LADa+qNO2M3
+        Unfl6tdkRf3clPvjK71zaM/lKISX9LRF2GLpq9w/NpsOCgyUP499r5iQ1etaWnrngOVR6kXiy9c
+        Eb7iwiInkZSB85L65ikIDryIH4I+OJ4p+0aBiMyrfK013mwAAqIw0UxOb7eOv6i0/
+X-Received: by 2002:a05:6402:42c3:b0:459:cebb:8d3a with SMTP id i3-20020a05640242c300b00459cebb8d3amr22291466edc.421.1665479589967;
+        Tue, 11 Oct 2022 02:13:09 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7rwXi31GTGapUa9CJLiOZ/I3OJKRFG0ol4xHLIaRP/F+ZlHvFBopeGF9Nqar2zmSmyZrZuLw==
+X-Received: by 2002:a05:6402:42c3:b0:459:cebb:8d3a with SMTP id i3-20020a05640242c300b00459cebb8d3amr22291444edc.421.1665479589769;
+        Tue, 11 Oct 2022 02:13:09 -0700 (PDT)
+Received: from ovpn-194-196.brq.redhat.com (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id ti5-20020a170907c20500b0078bfff89de4sm6573881ejc.58.2022.10.11.02.13.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Oct 2022 02:13:08 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kernel test robot <lkp@intel.com>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        linux-kernel@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
+Subject: Re: [linux-stable-rc:linux-5.15.y 4542/9999]
+ arch/x86/kvm/hyperv.c:2185:5: warning: stack frame size (1036) exceeds
+ limit (1024) in 'kvm_hv_hypercall'
+In-Reply-To: <202210110411.z2fNZUCa-lkp@intel.com>
+References: <202210110411.z2fNZUCa-lkp@intel.com>
+Date:   Tue, 11 Oct 2022 11:13:07 +0200
+Message-ID: <875ygq910c.fsf@ovpn-194-196.brq.redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <f982f740-1227-8033-a9bd-4830db8e5b6b@linux.ibm.com>
-References: <20221005163258.117232-1-nrb@linux.ibm.com> <20221005163258.117232-2-nrb@linux.ibm.com> <f982f740-1227-8033-a9bd-4830db8e5b6b@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-From:   Nico Boehr <nrb@linux.ibm.com>
-Cc:     imbrenda@linux.ibm.com, borntraeger@linux.ibm.com
-Subject: Re: [PATCH v3 1/2] KVM: s390: pv: don't allow userspace to set the clock under PV
-Message-ID: <166547771730.25289.7471151387651448087@t14-nrb>
-User-Agent: alot/0.8.1
-Date:   Tue, 11 Oct 2022 10:41:57 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: aoM4rbD8eZF0RqM7WwdlmwCZ_tN6miUA
-X-Proofpoint-ORIG-GUID: aoM4rbD8eZF0RqM7WwdlmwCZ_tN6miUA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.528,FMLib:17.11.122.1
- definitions=2022-10-11_03,2022-10-10_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- priorityscore=1501 mlxlogscore=852 impostorscore=0 lowpriorityscore=0
- spamscore=0 malwarescore=0 mlxscore=0 suspectscore=0 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210110047
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Janosch Frank (2022-10-10 17:20:10)
-[...]
-> This will ONLY result in a warning and there's no way that this can=20
-> result in QEMU crashing, right?
+kernel test robot <lkp@intel.com> writes:
 
-Yes, QEMU code in hw/s390x/tod-kvm.c just sets an Error pointer which is th=
-en
-passed to warn_report(). So no crash is possible.
+> Hi Vitaly,
+>
+> FYI, the error/warning still remains.
+>
+> tree:
+> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git
+> linux-5.15.y
 
-> >=20
-> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> > index b7ef0b71014d..0a8019b14c8f 100644
-> > --- a/arch/s390/kvm/kvm-s390.c
-> > +++ b/arch/s390/kvm/kvm-s390.c
-> > @@ -1207,6 +1207,8 @@ static int kvm_s390_vm_get_migration(struct kvm *=
-kvm,
-> >       return 0;
-> >   }
-> >  =20
-> > +static void __kvm_s390_set_tod_clock(struct kvm *kvm, const struct kvm=
-_s390_vm_tod_clock *gtod);
-> > +
-> >   static int kvm_s390_set_tod_ext(struct kvm *kvm, struct kvm_device_at=
-tr *attr)
-> >   {
-> >       struct kvm_s390_vm_tod_clock gtod;
-> > @@ -1216,7 +1218,7 @@ static int kvm_s390_set_tod_ext(struct kvm *kvm, =
-struct kvm_device_attr *attr)
-> >  =20
-> >       if (!test_kvm_facility(kvm, 139) && gtod.epoch_idx)
-> >               return -EINVAL;
-> > -     kvm_s390_set_tod_clock(kvm, &gtod);
-> > +     __kvm_s390_set_tod_clock(kvm, &gtod);
-> >  =20
-> >       VM_EVENT(kvm, 3, "SET: TOD extension: 0x%x, TOD base: 0x%llx",
-> >               gtod.epoch_idx, gtod.tod);
-> > @@ -1247,7 +1249,7 @@ static int kvm_s390_set_tod_low(struct kvm *kvm, =
-struct kvm_device_attr *attr)
-> >                          sizeof(gtod.tod)))
-> >               return -EFAULT;
-> >  =20
-> > -     kvm_s390_set_tod_clock(kvm, &gtod);
-> > +     __kvm_s390_set_tod_clock(kvm, &gtod);
-> >       VM_EVENT(kvm, 3, "SET: TOD base: 0x%llx", gtod.tod);
-> >       return 0;
-> >   }
-> > @@ -1259,6 +1261,12 @@ static int kvm_s390_set_tod(struct kvm *kvm, str=
-uct kvm_device_attr *attr)
-> >       if (attr->flags)
-> >               return -EINVAL;
-> >  =20
->=20
-> Add comment:
-> For a protected guest the TOD is managed by the Ultravisor so trying to=20
-> change it will never bring the expected results.
+...
 
-Yes, good point. Done.
+>
+> All warnings (new ones prefixed by >>):
+>
+>>> arch/x86/kvm/hyperv.c:2185:5: warning: stack frame size (1036) exceeds limit (1024) in 'kvm_hv_hypercall' [-Wframe-larger-than]
+>    int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+>        ^
+>    1 warning generated.
 
-> -EOPNOTSUPP is a new return code for the tod attribute, therefore=20
-> programs using it might need a fix to be able to handle it.
+For the reference, previous discussion of the problem:
+https://lore.kernel.org/kvm/87zgg6sza8.fsf@redhat.com/
 
-Hmm, yes indeed.
+The patch to fix this:
+https://lore.kernel.org/kvm/20221004123956.188909-19-vkuznets@redhat.com/
 
-Another alternative to consider might be -EINVAL. That is already specified=
- as a
-return for KVM_S390_VM_TOD_HIGH and KVM_S390_VM_TOD_EXT (in different
-circumstances though). However, it's missing from KVM_S390_VM_TOD_LOW...
+is part of "KVM: x86: hyper-v: Fine-grained TLB flush + L2 TLB flush
+features" series (v11:
+https://lore.kernel.org/kvm/20221004123956.188909-1-vkuznets@redhat.com/) 
+which I hope to see in 6.2 (fingers crossed!), however, it is unlikely
+to go to stable@ unless we know that there's a real problem to fix. I'll
+backport it then.
 
-> And as -EOPNOTSUPP has never been used before you'll also need to=20
-> update: Documentation/virt/kvm/devices/vm.rst
+-- 
+Vitaly
 
-Yeah, I will update the docs and use -EOPNOTSUPP for now. If someone argues=
- for
--EINVAL, I can still change it.
