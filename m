@@ -2,110 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4872A5FB815
-	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 18:15:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58BE65FB861
+	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 18:40:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229739AbiJKQP3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Oct 2022 12:15:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55896 "EHLO
+        id S229851AbiJKQkd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Oct 2022 12:40:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbiJKQPZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Oct 2022 12:15:25 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1487A71BC3
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 09:15:23 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29BG9BXA029075
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 16:15:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=8yXPogZngpuWHN6b3FoaGaANXS8D3bfpNdhz/BGvLIA=;
- b=ZOEi4/7INPwnvWj/ueY3UrMiD0DQiQq531vwrylSxw/I1Dx0P+BrlV1vxJk85oRaMwEV
- m8T8q2x/2pvUbQ9jouTAZKu+bYDHFH0knbWCpiCvIcGG0BeDFGSDyAOOBb3zXXVwigRd
- /R4ffrrmbGSCt+k1UYf4H6gZTB/YYOkeySCSEwhR6FCwMl1qWeE/3Gv4wJHPvWMJQPWR
- nLsQstaVoOKst2BydfHNiijXs3KbhheDOJzI8X6yVN8l3dSspYXkqDIHVRXnPjMqU9sO
- wi6cpkqlvrXsXdDex0s+cnpuyGA8ZOHrYxqty1b9bW0dwnktT5B6I8vlv99f0Pra7KSq CA== 
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k59xumm9j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 16:15:23 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29BG5Ltt013699
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 16:15:21 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06fra.de.ibm.com with ESMTP id 3k30fj3htp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 16:15:21 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29BGFILg5178016
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Oct 2022 16:15:18 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F105A52051;
-        Tue, 11 Oct 2022 16:15:17 +0000 (GMT)
-Received: from [9.171.36.147] (unknown [9.171.36.147])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id B93D152050;
-        Tue, 11 Oct 2022 16:15:17 +0000 (GMT)
-Message-ID: <cf3fbf75-076f-b5c3-39c8-b490dfe660e1@linux.ibm.com>
-Date:   Tue, 11 Oct 2022 18:15:17 +0200
+        with ESMTP id S229483AbiJKQka (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Oct 2022 12:40:30 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2048.outbound.protection.outlook.com [40.107.243.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A218AA2235
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 09:40:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=W+m/1arGRXOBU47bYfBmF/KvciDQTve/l7TGA9xhaP9m2RD9rZmhtzOMDBCFZ9gOC5orRmNUG+Jt6a0ujtvkqIqh3uRpvbCwAsLD8BBBITf6T1dybIrxlu78Pf0XtfIVDQpbRBac71hvfztLp6x22zbTbezelArUjlNxYiDVpeasVxTcER6m5umBCfr9gZLY5jHceKOYp1Ty15/XxfvSD1VHw7z/GFEqvlYMxHKF6eUOJJtoNYuBB1Nb2ttijkr/euMCs8DdYxtTuIujt8sHcz/nh1A7diEw+maSF35NMi4Tv16I2+KUH1Qvv++COjdvVPGrEGmeE0VlQUArFJnqbg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3H38aXrdJl4zKmRtGLJq3IM9JjnD6Oii30XzJol3fok=;
+ b=f8mccKiB2j9pdUC/egarYm7Z3frvctiZ2E/xeI0WfJDc8GuBH8cxvTWW/AG0MT44gZBPZP4R8cX8sS+ppMiBzfy0nSgQ1/TmwlTZo1qjd6B894wyQPct1XW1OJXhForowuYBlf/LkYqmdn/inCdGCy/T6R74APrkQbSPayg0QVHFq5rjOT3UPJ+XjxBzCsOvWN4/jnp85WMozpg5oLSFou/oe2oTvgS51XZ6nv2BrdqIyBll/UBg+t6FNsZUchoBlIAqXuDL3pMzhYZLWGRZZm5KlBINIwBFfsoWuOBa9UDFb3XVCqvLuPUe9nXFwOMVHNWu6I401XsfNMa1LBJF7A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3H38aXrdJl4zKmRtGLJq3IM9JjnD6Oii30XzJol3fok=;
+ b=BlosdIZyGwZjOrJA/rtDg1RU81gWUT2RWDINJNp17ZHa9frTit113Kds38Gktf8Ho9DUcF8ApsRpVC+T2dh889GfYFLfJ9HWRzarW1UKXU/Vo0R4R6oS05xVPB9TcwiLxM3hqJySnoDroxkpvfRynQ7Jj/ysxNzFcldvzdd6hyS9s1o5ZVR4os3+hs9i+R8u0wJMSFOSkTaZmSqpK8xy7NMsaPjTgaQz7RYtLWWmB9mnm0vpAVQOUHg6Chs1Vmcf5ZPbVRNgIgZWIQ19JjJvZAE6QY5IjrD0Ji7g9MwQ+88Ctcj4gO5ZkeLh5IlRY/xKDgAhgSs0lKdQtNv0VgAWKA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DM4PR12MB5104.namprd12.prod.outlook.com (2603:10b6:5:393::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5709.21; Tue, 11 Oct
+ 2022 16:40:26 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de%5]) with mapi id 15.20.5676.032; Tue, 11 Oct 2022
+ 16:40:26 +0000
+Date:   Tue, 11 Oct 2022 13:40:24 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 4/4] vfio: Fold vfio_virqfd.ko into vfio.ko
+Message-ID: <Y0WceKm7xzJZprtP@nvidia.com>
+References: <0-v2-18daead6a41e+98-vfio_modules_jgg@nvidia.com>
+ <4-v2-18daead6a41e+98-vfio_modules_jgg@nvidia.com>
+ <Y0PF/fcZ/6gzy1JL@infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y0PF/fcZ/6gzy1JL@infradead.org>
+X-ClientProxiedBy: BLAPR03CA0101.namprd03.prod.outlook.com
+ (2603:10b6:208:32a::16) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [kvm-unit-tests PATCH v2 0/2] s390x: Add migration test for guest
- TOD clock
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
-        frankja@linux.ibm.com
-References: <20221011151433.886294-1-nrb@linux.ibm.com>
- <70217003-867c-ce7a-7503-2e058e51995c@linux.ibm.com>
- <20221011181037.73ae8aa9@p-imbrenda>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20221011181037.73ae8aa9@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: cZn3IYTA7umSSlcJEbLi7D-8RF1niRo4
-X-Proofpoint-ORIG-GUID: cZn3IYTA7umSSlcJEbLi7D-8RF1niRo4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-11_08,2022-10-11_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
- impostorscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0
- mlxscore=0 malwarescore=0 priorityscore=1501 spamscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
- definitions=main-2210110092
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB5104:EE_
+X-MS-Office365-Filtering-Correlation-Id: 867a82bc-1456-42b4-8dd2-08daaba74c95
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /qGgfYIdvNBBxfasuFd4XjjrlUbNArjzSObb7nxWQv28NoJ6++dFvR2T5D5xjBMGvSsO4g2GRJbBzPqFw7wMHG/GMohwjtepZgEuXV00GpX+4cak2z4k3hhwyYrzTSgsNjjbYyaWqHEctYVXCFICVPpeHvAKNkDPzi4e91qM2x7IwaohbQyWXciKV6ph8TgMzFKHqlpswdkjDpBUZd2vxu9QQM+OKgeIMYPIsnR4lB3jUcYIJKtxQfgoJL/RcGXgnI/Y0rqbbm2a1Dw7pvpMtLCWVJJiAjOiEe7ifjZgnx4ulk3UaguZYq5xDYiULmf/5itzc3fLWYEhVCYqIjh9p2dhaCguJmjgnI+j9QihzMnhhUVOQgN4zNaO0vJYZOQAONf2a5pHPbz7/aPrwNteXOcJ3PYl5ieeUqdjTuI31z6juUXhMnwvYhBo2wFSCNbWYR3AQLZpfNzQv35piJBOSGxlCaYnIBJxhyx3HtjP/k1REGbiAwsb8WvIspRqfYfTa2sbRJ3odS39shyZLi7wFyRWdvGojbg/BnE2hSYY5aSTkgBd77GznbiLpcDhCuDWJbtKryIk7Slvfq2HMurcc6/l/FgU8RncZkeunJsWGCDjO+CrBqgHRV1mzyeqK9ytkxCK44AqM4nXu13/nHl4jGiJqaGJVgssqhiJXMcAFapSMuZZiF7FFLFrOgrGJoR4oKtRdo7F/ye1PFBdriEp4g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(396003)(39860400002)(366004)(376002)(346002)(451199015)(6512007)(26005)(316002)(6916009)(38100700002)(6486002)(8676002)(54906003)(36756003)(86362001)(2616005)(186003)(6506007)(478600001)(5660300002)(4744005)(2906002)(8936002)(41300700001)(66946007)(4326008)(66476007)(66556008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?comFL3URCmfKjrkm5dECem4DhA5PwI1AKKj1EAmcDWP5ZEgNHtMfxYX/UfdH?=
+ =?us-ascii?Q?MZfp6Ywxr86IVLR1Tscv5UMCWZTjgEdHuaial7CH/Y7ia/I7SX1dNglDikqG?=
+ =?us-ascii?Q?FB0WYDfuMtkRK+rScMtJz22K9ryzKqCvy/jQOBcW7muLNlQI0ddY6r5N168F?=
+ =?us-ascii?Q?ToUT5X0/2ODtigI/Y3m6c/CqnWEtW7I03ef+2cuiwpN5zTUSEKcUFyJI7l4D?=
+ =?us-ascii?Q?8ot3KvrJlbC/flf9o/SKTMtjRkZ1Nwyr+E22p96q1HOX4cGOygF0BPlVLrC1?=
+ =?us-ascii?Q?b7UnzcF/D8mEjQOYIT/IqUXPwJN0TKA15rGaVd7L+E0NQbjqFi2A4Qo0758c?=
+ =?us-ascii?Q?ZW3NMgSjWR7HqelMEbLOtknSEubbwL2zuHZ4Unw4alOkamKDNTZB+HHYyPtt?=
+ =?us-ascii?Q?08cgfx6oQrBa/RfaRJAP8kWgab/XNqjDTHXktp4SR5Fy97bRQflwh+nMYpoG?=
+ =?us-ascii?Q?Ot1LGwPGp0JpPDb/pFeWHQuBOof0A3rBl3t4Js7uT/x7hCJtr2S8HcF0Buj1?=
+ =?us-ascii?Q?9VdUy4u0m0Qh7sE8wAZfhgoQKGBwk4WMOxSg5rrk0jy1br37mDwjsduyBami?=
+ =?us-ascii?Q?XAS8phKqzoXSmGFLu3X9y2HEsPRRT96orueBrXXxuLR9a41t9KeBwOIUcIzB?=
+ =?us-ascii?Q?IR6H8v44Nw3r+q75jW3VPFQXy6xN9n9zncUWdxTrGz/bg7l4IDNxHcMBZ0Ag?=
+ =?us-ascii?Q?Fjsv9NBm8NwPm1w6m0F0cpw9BBMGGiOczEKGkMT12qWkQmiwh5WOoFyH+WBF?=
+ =?us-ascii?Q?NDlT6oCM0U+pibZ0k9vDsDntRDjfQj6LDB4jSqk7XQWrVluX2EDA7/ptRxep?=
+ =?us-ascii?Q?v/pwZE4THn7VIyh1+ZZPz/UGG1wsmqtDVgPuGJRhjlsDCVc2knAyA8zhTC6z?=
+ =?us-ascii?Q?vLbK4xf0zMc43rq8PlL0/sELM89mQaYxwTQ+JdtcE5He06VcGmkbIWmdOkF6?=
+ =?us-ascii?Q?il0NLjLUho7ZADs3+MHRO2D0ERYj5revK+Kdf7MdQqMumOXDcHRXClc7v6uO?=
+ =?us-ascii?Q?HftxNBoFTHsmCMpSY00c1YKZotbfZauFYIlav7kUL4dxF6AO9cEC9BEnkYZ6?=
+ =?us-ascii?Q?iQIdL+Ms9u8W/LktmI9Xmbmue3a42cijycMHBDiUzTeOmacROj9I8aNJmxYG?=
+ =?us-ascii?Q?voc2ejqn780bynHSTHSf++oRnrJ2dMFqSHYCL8A1BsVylAJNjhEeABY3b4OD?=
+ =?us-ascii?Q?LhLwJEr79Q64tkr5GCMiWOl1BDZjTm5QGAk3091OnH+QfXNf71sjsoHfwLvJ?=
+ =?us-ascii?Q?LhBm3iejSOK08kHGMYESp+zkGXxqi6c/6TCDSbTcsFiNwga4gPcAY2ft2jTj?=
+ =?us-ascii?Q?bM5o5SXB2WddGeJivd9HrfYycaeuyS82AQkX9cDP0RA1NtsPx8bSmRp+ynyd?=
+ =?us-ascii?Q?P2/7aF/Cn658BF1rgZlmr9FWmyIkZQGwEl/hV/jf+NpJVjBUkHJ9v4XTHW5B?=
+ =?us-ascii?Q?E+/V7+aXo639NZCzL3m5PHNsz/O563HZO2326MyhBcTfXmHmMvQ2DG0dPh8P?=
+ =?us-ascii?Q?oOfUuOxsHxAprKzHogw1Nn4U9HUAx5yacrhWAdP+pEWqVnYhFBovDXd4mQkh?=
+ =?us-ascii?Q?jXNWdK8yJJQNULB9xHc=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 867a82bc-1456-42b4-8dd2-08daaba74c95
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Oct 2022 16:40:26.0510
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: i6OgY0F/6KPq4hKvHC+Y60D26B5bLuUWT9C0eleiW9IYaQ1W2mlFs/wQ0fjUqw2E
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5104
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-Am 11.10.22 um 18:10 schrieb Claudio Imbrenda:
-> On Tue, 11 Oct 2022 17:58:29 +0200
-> Christian Borntraeger <borntraeger@linux.ibm.com> wrote:
+On Mon, Oct 10, 2022 at 12:13:01AM -0700, Christoph Hellwig wrote:
+> On Mon, Oct 03, 2022 at 12:39:33PM -0300, Jason Gunthorpe wrote:
+> > This is only 1.8k, putting it in its own module is going to waste more
+> > space rounding up to a PAGE_SIZE than it is worth. Put it in the main
+> > vfio.ko module now that kbuild can support multiple .c files.
 > 
->> Am 11.10.22 um 17:14 schrieb Nico Boehr:
->>> v1->v2:
->>> ---
->>> - remove unneeded include
->>> - advance clock by 10 minutes instead of 1 minute (thanks Claudio)
->>> - express get_clock_us() using stck() (thanks Claudio)
->>>
->>> The guest TOD clock should be preserved on migration. Add a test to
->>> verify that.
->>
->> I do not fully agree with this assumption. Its the way it curently is, but we might want to have a configurable or different behaviour in the future.
->>
->> For example if the difference is smaller than time x it could be allowed to move the time forward to get the guest synced to the new host (never go backward though).
-> 
-> the test is actually testing that the clock does not go backwards,
-> rather than staying the same
+> Assuming you actually need it (only vfio_platform and vfio_pci actually
+> need it) and you don't otherwise need EVENTFD support.  While I guess
+> the configfs that do not fit the above aren't the most common they
+> are real and are a real tradeoff.
 
-I think this is an must and a perfectly valid test.
+Well, the config still exists, if someone is building a stripped down
+kernel they can disable it and save the space. By the time you fully
+load VFIO this is just noise. I don't have a specific preference here,
+but I would like to reduce the number of modules just for sanity's
+sake.
+
+Jason
