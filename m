@@ -2,72 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 09A2F5FBD39
-	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 23:56:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B8C985FBDDC
+	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 00:24:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229542AbiJKV4p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Oct 2022 17:56:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45818 "EHLO
+        id S229502AbiJKWYy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Oct 2022 18:24:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbiJKV4m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Oct 2022 17:56:42 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F08583FEE6
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 14:56:41 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id c24so14467922pls.9
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 14:56:41 -0700 (PDT)
+        with ESMTP id S229721AbiJKWYv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Oct 2022 18:24:51 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39B7763AC
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 15:24:45 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-358c893992cso143025887b3.9
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 15:24:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SKoeZztmL6V88QbO/3svaXjwzvQ3Y47A//j9o1HAFhk=;
-        b=cex7Bex/7Xn8kdwtRtXRWA2Hrhasiv4qVNY2MTrerdleBvCTGBCIuC5zieBRR2Ifrx
-         jnyO4ZASEa44vJp3WaZ5SJ/v3CsfqpMBQJcgT2XaZlPvnpVesUlIGhXg0S+TANT99kz1
-         A8qMbhBaqL/reWmkq/vk6EkAsq8T9ZciZbANMl4tpv7aev8JCfBWZj4lETNaCR+8PuJN
-         G/tkci6j3COCY8gRUndEx0xlm2vFTR0Frep2I7CI10xdRRHR2mUGYbJa4Z3tG65AEDF/
-         8tvnYMJFQs44W2ShwYmS6LbLNiZCcJ9bbJpq0O5LcX0KZJo9IMeaKtMJnK6k9Op6td/r
-         GWyA==
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=scIFVLMhvIGzjgXLs0mh1a6DJd//CqMMPxWVpLV4yJI=;
+        b=DGhOlyJ/7IrmBBs2WiRLdtm+AiDv/fFlWXPpZuIzUSAXFGvrfzgiuCDByq6CQSh6wS
+         sTYk2MLglvWLcXlaw6FpTg58FrBK9JZeoY7FXtU6vW7R8JcBRi7v0f3vyKF3SUeX4JAs
+         b1aZ3GltAVvxYBXnblzj/9g0+v9MhNYDAgmPwIJ2w3RZ7H7k/hVSveMbdEm9wxPwD/PM
+         t8PXOHLU19gYMu+tnatMz8u8baxqQyK12UOOlrHLw/+ZMWEIu+QQvQLzRe4bn6LMOjlt
+         kgtsdv8OrSj1eXiCTsDMurmtMduLEj6s/9I3F4SjEo2v8G8/KNsVUGj+M2GkzMNqM/I9
+         pD7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SKoeZztmL6V88QbO/3svaXjwzvQ3Y47A//j9o1HAFhk=;
-        b=YnW60X8pssKU7GxHVPeX3qah9Do1UGTBGDqdpz6MlXYg30Djid45CsD3JrbPlmlg1q
-         Nz9pzPG4Nbjt6EmtBel3nhWvaxBZ3sjT2jp3/KwPzQB5UaAQQO+/1tH0NPxuoCw8H40S
-         kc4XxWBYdjbFymxXj1sH3vOx1MWajFqjk5KOl/UNstFGoXej7bPJLXxR1r6t/Aj1DuZy
-         gKmxuVbLFmZIDV48CZ/S3L4nMwZ1PU9PhY2Sr7y8phrcovduR/7GvofQ1nLnrBiz7Mn9
-         Azd5TDYu1W4wBu9lid7d1XvANEHhh0Y4ThzvL9GXgvIWLjugia4R6PTHo867BQ8Z0K2p
-         P8dQ==
-X-Gm-Message-State: ACrzQf0oqhlMJ9is83zqFGPIbq8lGye6AJb2hmImso9yfECr1CWObQBa
-        uYRzgYndgATIYyjZgOOwMyfUcg==
-X-Google-Smtp-Source: AMsMyM51J+HiChOJUj0QeMK/Eyr8iuIsgqJjFYvaHRGN0Pu8bvKnF6E1Rq4eK7aePkRn0u63CvGt4A==
-X-Received: by 2002:a17:902:db11:b0:17d:5e67:c51c with SMTP id m17-20020a170902db1100b0017d5e67c51cmr25372269plx.64.1665525401248;
-        Tue, 11 Oct 2022 14:56:41 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id f2-20020a170902ce8200b00177fb862a87sm6840539plg.20.2022.10.11.14.56.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Oct 2022 14:56:40 -0700 (PDT)
-Date:   Tue, 11 Oct 2022 21:56:36 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Kai Huang <kai.huang@intel.com>,
-        Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH v3 08/10] KVM: x86/mmu: Split out TDP MMU page fault
- handling
-Message-ID: <Y0XmlE90yHqfnEFM@google.com>
-References: <20220921173546.2674386-1-dmatlack@google.com>
- <20220921173546.2674386-9-dmatlack@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220921173546.2674386-9-dmatlack@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=scIFVLMhvIGzjgXLs0mh1a6DJd//CqMMPxWVpLV4yJI=;
+        b=dxEkH0T5PbWtqlH7JDSxRDhRiUeqv7t8OWxNSIVWz2maVCLAJCXK4GmPmdbr7Lj/x6
+         GCF+haVZ2MY39mck/L+CkOEf1et6Iv5Wd6rkyssdOH8NDaYnY8CFYBK08GXXHk5F3Psb
+         wn/87KyrXcOwkj5jo2UPNtLOIwjPM4CG/qOSOOrjUrJp/bpIqWGD/7ypeGkPSpGec3MR
+         xoYWGAB6t3ANO+VySqV6JAebXBM+7uP8drwtyN2Rer1QtRWjq1pt7KA/IVkVlo9lmfqZ
+         pZntTpXSQvnZg/wat7yO65MdjkkANzzkIapEC1o4RssbOj3qoCH+ZY3D4GhkvQxwbpjz
+         tF8A==
+X-Gm-Message-State: ACrzQf3xbjbFauYiOewif4JIBInkZuTCRakCvrLr70mE7PCsLZJWVDeV
+        M8D+F41vn6j/nfJhJXwnH73eI4AiLfzTFTp9KA==
+X-Google-Smtp-Source: AMsMyM5MTysYJ5zqfXTlABpizIwcgK4R0PTuryWaT94HAVQYQH6bGJv9dp9CRYvoOmwdlGu0wB7f+A5wmj22cgyDLQ==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a81:7344:0:b0:360:97a5:8716 with SMTP
+ id o65-20020a817344000000b0036097a58716mr16557840ywc.459.1665527084083; Tue,
+ 11 Oct 2022 15:24:44 -0700 (PDT)
+Date:   Tue, 11 Oct 2022 22:24:43 +0000
+In-Reply-To: <Y0W4dImhloev7Iaq@google.com> (message from Sean Christopherson
+ on Tue, 11 Oct 2022 18:39:48 +0000)
+Mime-Version: 1.0
+Message-ID: <gsnt8rlm2e38.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v6 1/3] KVM: selftests: implement random number generation
+ for guest code
+From:   Colton Lewis <coltonlewis@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        dmatlack@google.com, oupton@google.com, ricarkol@google.com,
+        andrew.jones@linux.dev
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,107 +68,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 21, 2022, David Matlack wrote:
-> Split out the page fault handling for the TDP MMU to a separate
-> function.  This creates some duplicate code, but makes the TDP MMU fault
-> handler simpler to read by eliminating branches and will enable future
-> cleanups by allowing the TDP MMU and non-TDP MMU fault paths to diverge.
+Sean Christopherson <seanjc@google.com> writes:
 
-IMO, the code duplication isn't worth the relatively minor simplification.  And
-some of the "cleanups" to reduce the duplication arguably add complexity, e.g.
-moving code around in "Initialize fault.{gfn,slot} earlier for direct MMUs" isn't
-a net positive IMO.
+> On Tue, Oct 11, 2022, Colton Lewis wrote:
+>> Sean Christopherson <seanjc@google.com> writes:
 
-With the TDP MMU being all-or-nothing, the need to check if the MMU is a TDP MMU
-goes away.  If the TDP MMU is enabled, direct_page_fault() will be reached only
-for non-nested TDP page faults.  Paging is required for NPT, and EPT faults will
-always go through ept_page_fault(), i.e. nonpaging_page_fault() is unused.
+>> > On Mon, Sep 12, 2022, Colton Lewis wrote:
+>> > > diff --git a/tools/testing/selftests/kvm/include/test_util.h
+>> > > b/tools/testing/selftests/kvm/include/test_util.h
+>> > > index 99e0dcdc923f..2dd286bcf46f 100644
+>> > > --- a/tools/testing/selftests/kvm/include/test_util.h
+>> > > +++ b/tools/testing/selftests/kvm/include/test_util.h
+>> > > @@ -143,4 +143,6 @@ static inline void *align_ptr_up(void *x, size_t
+>> > > size)
+>> > >   	return (void *)align_up((unsigned long)x, size);
+>> > >   }
 
-In other words, this code
+>> > > +void guest_random(uint32_t *seed);
 
-	bool is_tdp_mmu_fault = is_tdp_mmu(vcpu->arch.mmu);
+>> > This is a weird and unintuitive API.  The in/out param exposes the gory
+>> > details of the pseudo-RNG to the caller, and makes it cumbersome to  
+>> use,
+>> > e.g. to create a 64-bit number or to consume the result in a  
+>> conditional.
 
-gets replaced with direct checks on is_tdp_mmu_enabled().  And because fast page
-faults are used only for direct MMUs,  that code can also simply query whether or
-not the TDP MMU is enabled.
+>> To explain my reasoning:
 
-Avoiding make_mmu_pages_available() for the TDP MMU is easy enough and doesn't
-require any new conditionals.
+>> It's simple because there is exactly one way to use it and it's short so
+>> anyone can understand how the function works at a glance. It's similar
+>> to the API used by other thread-safe RNGs like rand_r and random_r. They
+>> also use in/out parameters. That's the only way to buy thread
+>> safety. Callers would also have to manage their own state in your
+>> example with an in/out parameter if they want thread safety.
 
-	if (is_tdp_mmu_enabled()) {
-		r = kvm_tdp_mmu_map(vcpu, fault);
-	} else {
-		r = make_mmu_pages_available(vcpu);
-		if (r)
-			goto out_unlock;
+>> I disagree the details are gory. You put in a number and get a new
+>> number.
 
-		r = __direct_map(vcpu, fault);
-	}
-
-
-That leaves the read vs. write lock as the only code that is borderline difficult
-to read.  I agree that's a little ugly, but IMO it's not worth duplicating the
-entire function.  If we really wanted to hide that ugliness, we could add helpers
-to do the lock+unlock, but even that seems somewhat superfluous.
-
-From a performance perspective, with the flag being read-only after the vendor
-module is loaded, we can add a static key to track TDP MMU enabling, biased to the
-TDP MMU being enabled.  That turns all of if-statements into NOPs for the TDP MMU.
-(this is why I suggested keeping the is_tdp_mmu_enabled() wrapper in patch 1).
-Static branches actually shrink the code size too (because that matters), e.g. a
-5-byte nop instead of 8 bytes for TEST+Jcc.
-
-I'll speculatively post a v4 with the static key idea, minus patches 7, 8, and 10.
-I think that'll make it easier to discuss the static key/branch implementation.
-If we decide we still want to split out the TDP MMU page fault handler, then it
-should be relatively simple to fold back in those patches.
-
-E.g. the generate code looks like this:
-
-4282		if (is_tdp_mmu_enabled())
-4283			read_lock(&vcpu->kvm->mmu_lock);
-   0x000000000005ff7e <+494>:   nopl   0x0(%rax,%rax,1)
-   0x000000000005ff83 <+499>:	mov    (%rbx),%rdi
-   0x000000000005ff86 <+502>:	call   0x5ff8b <direct_page_fault+507>
-
-4286	
-4287		if (is_page_fault_stale(vcpu, fault))
-   0x000000000005ff8b <+507>:	mov    %r15,%rsi
-   0x000000000005ff8e <+510>:	mov    %rbx,%rdi
-   0x000000000005ff91 <+513>:	call   0x558b0 <is_page_fault_stale>
-   0x000000000005ff96 <+518>:	test   %al,%al
-   0x000000000005ff98 <+520>:	jne    0x603e1 <direct_page_fault+1617>
-
-4288			goto out_unlock;
-4289	
-4290		if (is_tdp_mmu_enabled()) {
-4291			r = kvm_tdp_mmu_map(vcpu, fault);
-   0x000000000005ff9e <+526>:   nopl   0x0(%rax,%rax,1)
-   0x000000000005ffa3 <+531>:	mov    %rbx,%rdi
-   0x000000000005ffa6 <+534>:	mov    %r15,%rsi
-   0x000000000005ffa9 <+537>:	call   0x5ffae <direct_page_fault+542>
-   0x000000000005ffae <+542>:	mov    (%rbx),%rdi
-   0x000000000005ffb1 <+545>:	mov    %eax,%ebp
+> Regardless of whether or not the details are gory, having to be aware of  
+> those
+> details unnecessarily impedes understanding the code.  The vast, vast  
+> majority of
+> folks that read this code won't care about how PRNGs work.  Even if the  
+> reader is
+> familiar with PRNGs, those details aren't at all relevant to  
+> understanding what
+> the guest code does.  The reader only needs to know "oh, this is  
+> randomizing the
+> address".  How the randomization works is completely irrelevant for that  
+> level of
+> understanding.
 
 
-#ifdef CONFIG_X86_64
-DECLARE_STATIC_KEY_TRUE(tdp_mmu_enabled);
-#endif
-                                     
-static inline bool is_tdp_mmu_enabled(void)
+It is relevant if the reader of the guest code cares about reentrancy
+and thread-safety (good for such things as reproducing the same stream
+of randoms from the same initial conditions), because they will have to
+manage some state to make that work. Whether that state is an integer or
+an opaque struct requires the same level of knowledge to use the API.
+
+>> It's common knowledge PRNGs work this way.
+
+> For people that are familiar with PRNGs, yes, but there will undoubtedly  
+> be people
+> that read this code and have practically zero experience with PRNGs.
+
+>> I understand you are thinking about ease of future extensions, but this
+>> strikes me as premature abstraction. Additional APIs can always be added
+>> later for the fancy stuff without modifying the callers that don't need  
+>> it.
+
+>> I agree returning the value could make it easier to use as part of
+>> expressions, but is it that important?
+
+> Yes, because in pretty much every use case, the random number is going to  
+> be
+> immediately consumed.  Readability and robustness aside, returning the  
+> value cuts
+> the amount of code need to generate and consume a random number in half.
+
+
+Ok. This is trivial to change (or implement on top of what is
+there). Would you be happy with something like the following?
+
+uint32_t guest_random(uint32_t *seed)
 {
-#ifdef CONFIG_X86_64
-        return static_branch_likely(&tdp_mmu_enabled);
-#else
-        return false;
-#endif
+	*seed = (uint64_t)*seed * 48271 % ((uint32_t)(1 << 31) - 1);
+	return *seed;
 }
-                              
-static inline bool is_tdp_mmu(struct kvm_mmu *mmu)
-{
-        return is_tdp_mmu_enabled() && mmu->root_role.direct;
-}
-
-
-
-
