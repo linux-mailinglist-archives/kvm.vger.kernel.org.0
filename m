@@ -2,67 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D6C0A5FB9CC
-	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 19:38:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BF435FBA22
+	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 20:11:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229736AbiJKRiz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Oct 2022 13:38:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57976 "EHLO
+        id S230021AbiJKSLo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Oct 2022 14:11:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230151AbiJKRiW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Oct 2022 13:38:22 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A414F12AFB
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 10:38:15 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id x18so9170635ljm.1
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 10:38:15 -0700 (PDT)
+        with ESMTP id S229698AbiJKSLl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Oct 2022 14:11:41 -0400
+Received: from mail-oo1-xc49.google.com (mail-oo1-xc49.google.com [IPv6:2607:f8b0:4864:20::c49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D45B61D71
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 11:11:40 -0700 (PDT)
+Received: by mail-oo1-xc49.google.com with SMTP id n27-20020a4a611b000000b0048067b2a6f7so4415885ooc.6
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 11:11:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ASTy3jp38n51CkkEO2l/MmR02UbjdKNfCtO2dYm1obw=;
-        b=Y7Ji+9EE6yHJ/lLNaqSZcPo4O4aRr56qhFXjXUYPQzTOnzptuMwe8kepBEjSO0s8rT
-         5OIMCMpi9AqfiPy/rlelt5Tces3luVxuKjj0/09SRBZT/tQk4hgIbCBDob9CNKLLUltF
-         ZYq+A91X3Vx7N+9zhe/PctUTfyPWXoIcLDGjsahVOTaiuq3eNbM1Hfbgp7i3+uq128Iv
-         r6ySpiDZK7sOY+udbAZVjI6sEm11O+aqYcHySZuWb5MuqOiYV2CEF72cF+Y9y+yqcmMh
-         8UZiywRV6+vPEp3qkDyN3cME+dPnuLN0QNOMDkcbWXizYFMQn3rUwZQEfDiOJHBwr3OH
-         lM2g==
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=W3JMUwu6ziuvpjpq9F0zq68QvyahiwJaOE4mHzUkx+4=;
+        b=ZMGnlBVUaauNbXvukBXR8oMKUClj1sHHGWGTsw9UJp8iSfZSk1RYcT8jLH3x6COlU9
+         +xga1da7BBwGvuR6T3h4ZWjYMdhbKHs2eIhal2HEyHSN5vKR5Y8gQ7+NcK+c/BenF4nI
+         5o8nY0SIfkNBE2zhtZcvWd+jtTkbwcil9Lvv3GZk/B8hQLy877L00jDV3R4ByQISRL7p
+         Rust1Sl4fFuby0VTYrJKrmMDqYAAJKyWAL71RG7LFxTWZLtvQ5L9D0qlwJiKBABa3HQG
+         vF6NTOabTPnavz6IXI14BCrphpxW98R44XJckMOsdgmL/dPjNGaP5jjB7Z2lYpJ1NJkD
+         Fl4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ASTy3jp38n51CkkEO2l/MmR02UbjdKNfCtO2dYm1obw=;
-        b=n7HEtHSEywxC2ptFnOMD2WkJtW5bMOTs6IHjeC+fci+sDfVW/2EyyXyfytH5bm8aQK
-         XsCybivewFptARWnM6dX/Zux2hj08nw/W3vAGnDbXyJiWwsETBQ8UQi0NWVCdBmfLksA
-         foPfOYrTCUQVASI0QDJzEUprSt0b4IcK22yjYmz5AL264OFO8y5CQgHT8fJr5yhGQrdG
-         6i5zLOqVJNN2rGWT9KzR59UfQSQeZ0yeKPuOkYEP7HvLaGpR1WPFA+u5EhhGtjY1RbTf
-         5XqVHsff0MmgycCVE+FnlE+UCkquveEkG/dy5pO4PG2k+XnpuFucz2dA83bPkJKioMWm
-         4aMw==
-X-Gm-Message-State: ACrzQf2krCXCE/eX629dMzL0MHv/D/P3Rx5dclVKKILxclHTs02/Uv4/
-        Owe+mVBcHy+KSKFZ0no2aJewyOV4bhQFzULn2O7HGA==
-X-Google-Smtp-Source: AMsMyM7xO4MkCPUjy69frHSk+iYYvoEEAbwPa+iw5sCPNlkqqWHHHZalHxJvMqmz/w22JhcaiWQAmaASxLFaamAiTuI=
-X-Received: by 2002:a2e:7c17:0:b0:26e:4f7:3c95 with SMTP id
- x23-20020a2e7c17000000b0026e04f73c95mr9634809ljc.455.1665509893631; Tue, 11
- Oct 2022 10:38:13 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220829171021.701198-1-pgonda@google.com> <20220829171021.701198-4-pgonda@google.com>
- <Yz8U2k7Tu8QQNhhq@google.com>
-In-Reply-To: <Yz8U2k7Tu8QQNhhq@google.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 11 Oct 2022 11:38:01 -0600
-Message-ID: <CAMkAt6qQLO-6W8Ek-syUSzZpWLPDe8EzzfuWvY3iQZhczti7Pw@mail.gmail.com>
-Subject: Re: [V4 3/8] KVM: selftests: add hooks for managing encrypted guest memory
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=W3JMUwu6ziuvpjpq9F0zq68QvyahiwJaOE4mHzUkx+4=;
+        b=GTCahfHEdi01AJVkUB1j1ZDhps5cBAIJTjivqxut/tu0CroJ5D2rE2X8CwlVY010V3
+         uWLcPUmyXkRG9GF/mQRdGNXAmxyNb6RF6tk4k8/+VXSlgDCII09yeTyfIIGQd5aLU7kL
+         Jd6Op6sbY+zbWCcIU0rzyx9h+4fKQfFhhUWzjWg7QmdTh6HbFZwr2x7cprpOpZY9gM0L
+         DshKbKGqkPEca3GGSg6hBM4xTBC8N9Zb616HAPQPCIBzCoW6fWpMZrS9bYka7nMrFaih
+         bAb78QDYUpblTbHh/YWmx6EvSOkBASSgOy1OZtitp5DXCOeLlkwnM+aU45lCiNK9Ub/Q
+         dy1g==
+X-Gm-Message-State: ACrzQf3wrlEtxDxNN8mYPurxKu4ZPNA20jugskIr4Q68hDZJBfYCRBli
+        X9OpRVBbOIyYkFLQ07HKISEu80hBWc/JbzsxFA==
+X-Google-Smtp-Source: AMsMyM6abr17LtJPwWObF4Wp/uVgpO4vq2OMkAwcPfXyNUFoHSbErTE6vbPoRoSz1ineZbD7lUMYWQ3IfLwoiWMsvA==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:aca:4b45:0:b0:354:461c:5b58 with SMTP
+ id y66-20020aca4b45000000b00354461c5b58mr192753oia.131.1665511899904; Tue, 11
+ Oct 2022 11:11:39 -0700 (PDT)
+Date:   Tue, 11 Oct 2022 18:11:38 +0000
+In-Reply-To: <Y0CO+5m8hJyok/oG@google.com> (message from Sean Christopherson
+ on Fri, 7 Oct 2022 20:41:31 +0000)
+Mime-Version: 1.0
+Message-ID: <gsntfsfu2pt1.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v6 1/3] KVM: selftests: implement random number generation
+ for guest code
+From:   Colton Lewis <coltonlewis@google.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcorr@google.com, michael.roth@amd.com, thomas.lendacky@amd.com,
-        joro@8bytes.org, mizhang@google.com, pbonzini@redhat.com,
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        dmatlack@google.com, oupton@google.com, ricarkol@google.com,
         andrew.jones@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,138 +68,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 6, 2022 at 11:48 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, Aug 29, 2022, Peter Gonda wrote:
-> > +static vm_paddr_t
-> > +_vm_phy_pages_alloc(struct kvm_vm *vm, size_t num, vm_paddr_t paddr_min,
->
-> Do not wrap before the function name.  Linus has a nice explanation/rant on this[*].
-> Note to self, add a Vim macro for this...
->
-> [*] https://lore.kernel.org/all/CAHk-=wjoLAYG446ZNHfg=GhjSY6nFmuB_wA8fYd5iLBNXjo9Bw@mail.gmail.com
->
+Sean Christopherson <seanjc@google.com> writes:
 
-Fixed. Thanks. I'll work on a fix to my VIM setup.
+> On Mon, Sep 12, 2022, Colton Lewis wrote:
+>> diff --git a/tools/testing/selftests/kvm/include/test_util.h  
+>> b/tools/testing/selftests/kvm/include/test_util.h
+>> index 99e0dcdc923f..2dd286bcf46f 100644
+>> --- a/tools/testing/selftests/kvm/include/test_util.h
+>> +++ b/tools/testing/selftests/kvm/include/test_util.h
+>> @@ -143,4 +143,6 @@ static inline void *align_ptr_up(void *x, size_t  
+>> size)
+>>   	return (void *)align_up((unsigned long)x, size);
+>>   }
 
-> > +                 uint32_t memslot, bool encrypt)
-> >  {
-> >       struct userspace_mem_region *region;
-> >       sparsebit_idx_t pg, base;
-> > @@ -1152,12 +1156,22 @@ vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
-> >               abort();
-> >       }
-> >
-> > -     for (pg = base; pg < base + num; ++pg)
-> > +     for (pg = base; pg < base + num; ++pg) {
-> >               sparsebit_clear(region->unused_phy_pages, pg);
-> > +             if (encrypt)
->
-> prefer s/encrypt/private, and s/encrypted_phy_pages/private_phy_pages.  pKVM
-> doesn't rely on encryption, and it's not impossible that x86 will someday gain
-> similar functionality.  And "encrypted" is also technically wrong for SEV and TDX,
-> as shared memory can also be encrypted with a common key.
+>> +void guest_random(uint32_t *seed);
 
-Makes sense. Private or protected sound better.
+> This is a weird and unintuitive API.  The in/out param exposes the gory  
+> details
+> of the pseudo-RNG to the caller, and makes it cumbersome to use, e.g. to  
+> create
+> a 64-bit number or to consume the result in a conditional.
 
->
-> > +                     sparsebit_set(region->encrypted_phy_pages, pg);
-> > +     }
-> >
-> >       return base * vm->page_size;
-> >  }
-> >
-> > +vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
-> > +                           vm_paddr_t paddr_min, uint32_t memslot)
-> > +{
-> > +     return _vm_phy_pages_alloc(vm, num, paddr_min, memslot,
-> > +                                vm->memcrypt.enc_by_default);
->
-> enc_by_default yields a bizarre API.  The behavior depends on whether or not the
-> VM is protected, and whether or not the VM wants to protect memory by default.
->
-> For simplicity, IMO vm_phy_pages_alloc() should allocate memory as private if the
-> VM supports protected memory, i.e. just have vm->protected or whatever and use
-> that here.
 
-Removed "enc_by_default" concept.
+To explain my reasoning:
 
->
-> > +}
-> > +
-> >  vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
-> >                            uint32_t memslot)
-> >  {
-> > @@ -1741,6 +1755,10 @@ void vm_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
-> >                       region->host_mem);
-> >               fprintf(stream, "%*sunused_phy_pages: ", indent + 2, "");
-> >               sparsebit_dump(stream, region->unused_phy_pages, 0);
-> > +             if (vm->memcrypt.enabled) {
->
-> vm->protected
+It's simple because there is exactly one way to use it and it's short so
+anyone can understand how the function works at a glance. It's similar
+to the API used by other thread-safe RNGs like rand_r and random_r. They
+also use in/out parameters. That's the only way to buy thread
+safety. Callers would also have to manage their own state in your
+example with an in/out parameter if they want thread safety.
 
-renamed memcrypt -> protected.
+I disagree the details are gory. You put in a number and get a new
+number. It's common knowledge PRNGs work this way. I understand you are
+thinking about ease of future extensions, but this strikes me as
+premature abstraction. Additional APIs can always be added later for the
+fancy stuff without modifying the callers that don't need it.
 
->
-> > +                     fprintf(stream, "%*sencrypted_phy_pages: ", indent + 2, "");
-> > +                     sparsebit_dump(stream, region->encrypted_phy_pages, 0);
-> > +             }
-> >       }
-> >       fprintf(stream, "%*sMapped Virtual Pages:\n", indent, "");
-> >       sparsebit_dump(stream, vm->vpages_mapped, indent + 2);
-> > @@ -1989,3 +2007,31 @@ void __vm_get_stat(struct kvm_vm *vm, const char *stat_name, uint64_t *data,
-> >               break;
-> >       }
-> >  }
-> > +
-> > +void vm_set_memory_encryption(struct kvm_vm *vm, bool enc_by_default, bool has_enc_bit,
-> > +                           uint8_t enc_bit)
-> > +{
-> > +     vm->memcrypt.enabled = true;
-> > +     vm->memcrypt.enc_by_default = enc_by_default;
-> > +     vm->memcrypt.has_enc_bit = has_enc_bit;
-> > +     vm->memcrypt.enc_bit = enc_bit;
-> > +}
-> > +
-> > +const struct sparsebit *
-> > +vm_get_encrypted_phy_pages(struct kvm_vm *vm, int slot, vm_paddr_t *gpa_start,
-> > +                        uint64_t *size)
->
-> Bad wrap.
+I agree returning the value could make it easier to use as part of
+expressions, but is it that important?
 
-Fixed.
+> It's also not inherently guest-specific, or even KVM specific.  We should  
+> consider
+> landing this in common selftests code so that others can use it and even  
+> expand on
+> it.  E.g. in a previous life, I worked with a tool that implemented all  
+> sorts of
+> random number magic that provided APIs to get random bools with 1->99  
+> probabilty,
+> random numbers along Guassian curves, bounded numbers, etc.
 
->
-> > +{
-> > +     struct userspace_mem_region *region;
-> > +
-> > +     if (!vm->memcrypt.enabled)
->
-> This seems rather silly, why not TEST_ASSERT()?
->
-> > +             return NULL;
-> > +
-> > +     region = memslot2region(vm, slot);
-> > +     if (!region)
->
-> Same here, TEST_ASSERT() seems more appropriate.
->
-> Actually, I can't envision a use outside of SEV.  AFAIK, no other architecture
-> does the whole "launch update" thing.  I.e. just open code this in sev_encrypt().
-> The more generic API that will be useful for other VM types will be to query if a
-> specific GPA is private vs. shared.
 
-Good point. I'll move this code into that sev_encrypt() flow and
-remove this function completely.
-
->
-> > +             return NULL;
-> > +
-> > +     *size = region->region.memory_size;
-> > +     *gpa_start = region->region.guest_phys_addr;
-> > +
-> > +     return region->encrypted_phy_pages;
-> > +}
-> > --
-> > 2.37.2.672.g94769d06f0-goog
-> >
+People who need random numbers outside the guest should use stdlib.h. No
+need to reimplement a full random library. The point of this
+implementation was to do the simplest thing that could provide random
+numbers to the guest.
