@@ -2,81 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D4DB05FB7B0
-	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 17:50:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 546545FB7BE
+	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 17:52:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231215AbiJKPuc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Oct 2022 11:50:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55666 "EHLO
+        id S229619AbiJKPwO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Oct 2022 11:52:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230286AbiJKPuH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Oct 2022 11:50:07 -0400
+        with ESMTP id S230337AbiJKPvz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Oct 2022 11:51:55 -0400
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED99F19C16
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 08:44:58 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29BEie8n029148
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 15:44:44 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFE093F337
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 08:49:20 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29BFL2WR025812
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 15:49:20 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
  subject : message-id : in-reply-to : references : mime-version :
  content-type : content-transfer-encoding; s=pp1;
- bh=yz6jccx0zz2TBaeTxC2g4gxn7pIPuJmQAG7kuLYsCxg=;
- b=iJcEgQVNq4pKFKAjz7300boS9haTW+51kahmN+Fow2fhQ8pXDQ8JDwAMaBiM8irouj1o
- Iyc7MsNRAgHZ94P6OOnAul0ZtVwvYHQsPeQhaLNf0k4uq4uoFf3SFLFzTnFDjlxK1q1J
- PCuQt64REGOMwRlB/4Od0c9pdH4QztE3ZuDTH6GPlvSrYxE3UrKFR/2OV7XkOglKUn1M
- omNMAFjowb+P5rSYm9W+VTLQFSYFEFLxrsBzYtSbWl8kNh3PDy/GMDAbaCX/STvuHDQk
- RZHfGVspHrnW2a463Mo8LxQjoMqqOsloTtqv+NOqNmanFtCuWCxYyGJrQ0d9V86y+Ida Gw== 
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k59xukn94-1
+ bh=1IL2X5LagJcTTHKfBB0fQKL4MG7UJJa6lxeVwBzDK9k=;
+ b=EbrsSsmAJJQPXAVqdccVA5b4uhvRSs1FBoEmRD85BmIET5J8q5rQWZha346gOKhk74T/
+ xEmRFbz6ka8uyJQHqyBGJYqS17y/RhjEToF7VWaUIUG5lofrsGv0K07S/DbX+BXzcRai
+ Bil+GN2z58CWJ+hV1Wt1zS+iTJFHm6uTq5w0qZSoKj9ASXbcLODEd4VYPZ32sERFqOc+
+ Ko/w2Xhi5nsPvjC8EqwEkLzBQnUZmCVkTWpvSMlnHe7/rvtme0gkNzctMDZwopKrUwnU
+ AZLS4ojMDHqK0eoWDOOfmRm3hz1ewxRre36zK2CtSpDMHJGpY5nxIMZjXWZd3OOm14+q WQ== 
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k5b270v58-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 15:44:44 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29BFbC7v025065
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 15:44:41 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma06fra.de.ibm.com with ESMTP id 3k30fj3h02-1
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 15:49:19 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29BFaZsH005428
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 15:49:17 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3k30u9cpcr-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 15:44:41 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29BFicdC38666726
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 15:49:17 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29BFnjSD51446256
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Oct 2022 15:44:38 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A5D35A4053;
-        Tue, 11 Oct 2022 15:44:38 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 56D8EA4040;
-        Tue, 11 Oct 2022 15:44:38 +0000 (GMT)
+        Tue, 11 Oct 2022 15:49:45 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3F37BAE051;
+        Tue, 11 Oct 2022 15:49:14 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 06A75AE045;
+        Tue, 11 Oct 2022 15:49:14 +0000 (GMT)
 Received: from p-imbrenda (unknown [9.152.224.242])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 11 Oct 2022 15:44:38 +0000 (GMT)
-Date:   Tue, 11 Oct 2022 17:41:35 +0200
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 11 Oct 2022 15:49:13 +0000 (GMT)
+Date:   Tue, 11 Oct 2022 17:49:12 +0200
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     Nico Boehr <nrb@linux.ibm.com>
 Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com,
         borntraeger@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v2 1/2] lib/s390x: move TOD clock related
- functions to library
-Message-ID: <20221011174135.1cdcd472@p-imbrenda>
-In-Reply-To: <20221011151433.886294-2-nrb@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v2 2/2] s390x: add migration TOD clock
+ test
+Message-ID: <20221011174912.1495d8c7@p-imbrenda>
+In-Reply-To: <20221011151433.886294-3-nrb@linux.ibm.com>
 References: <20221011151433.886294-1-nrb@linux.ibm.com>
-        <20221011151433.886294-2-nrb@linux.ibm.com>
+        <20221011151433.886294-3-nrb@linux.ibm.com>
 Organization: IBM
 X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Pvxrys0O2ble6YbnGuibyzNyg8kvE-QZ
-X-Proofpoint-ORIG-GUID: Pvxrys0O2ble6YbnGuibyzNyg8kvE-QZ
+X-Proofpoint-ORIG-GUID: VDdm00gfo9v0JnuQT0hHWtDxzWNiMICf
+X-Proofpoint-GUID: VDdm00gfo9v0JnuQT0hHWtDxzWNiMICf
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-10-11_08,2022-10-11_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
- impostorscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0
- mlxscore=0 malwarescore=0 priorityscore=1501 spamscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
- definitions=main-2210110089
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ lowpriorityscore=0 mlxscore=0 malwarescore=0 suspectscore=0
+ impostorscore=0 clxscore=1015 adultscore=0 phishscore=0 priorityscore=1501
+ spamscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210110089
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
@@ -86,135 +86,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 11 Oct 2022 17:14:32 +0200
+On Tue, 11 Oct 2022 17:14:33 +0200
 Nico Boehr <nrb@linux.ibm.com> wrote:
 
-> The TOD-clock related functions can be useful for other tests beside the
-> sck test, hence move them to the library.
+> On migration, we expect the guest clock value to be preserved. Add a
+> test to verify this:
+> - advance the guest TOD by much more than we need to migrate
+> - migrate the guest
+> - get the guest TOD
 > 
-> While at it, add a wrapper for stckf and express get_clock_us() with
-> stck() to reduce code duplication.
+> After migration, assert the guest TOD value is at least the value we set
+> before migration.
 > 
 > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 > ---
->  lib/s390x/asm/time.h | 50 +++++++++++++++++++++++++++++++++++++++++++-
->  s390x/sck.c          | 32 ----------------------------
->  2 files changed, 49 insertions(+), 33 deletions(-)
+>  s390x/Makefile        |  1 +
+>  s390x/migration-sck.c | 44 +++++++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg   |  4 ++++
+>  3 files changed, 49 insertions(+)
+>  create mode 100644 s390x/migration-sck.c
 > 
-> diff --git a/lib/s390x/asm/time.h b/lib/s390x/asm/time.h
-> index d8d91d68a667..c5e1797fd29e 100644
-> --- a/lib/s390x/asm/time.h
-> +++ b/lib/s390x/asm/time.h
-> @@ -18,11 +18,59 @@
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 649486f2d4a0..fba09bc2df3a 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -36,6 +36,7 @@ tests += $(TEST_DIR)/migration-cmm.elf
+>  tests += $(TEST_DIR)/migration-skey.elf
+>  tests += $(TEST_DIR)/panic-loop-extint.elf
+>  tests += $(TEST_DIR)/panic-loop-pgm.elf
+> +tests += $(TEST_DIR)/migration-sck.elf
 >  
->  #define CPU_TIMER_SHIFT_US	S390_CLOCK_SHIFT_US
+>  pv-tests += $(TEST_DIR)/pv-diags.elf
 >  
-> +static inline int sck(uint64_t *time)
+> diff --git a/s390x/migration-sck.c b/s390x/migration-sck.c
+> new file mode 100644
+> index 000000000000..286a693b4858
+> --- /dev/null
+> +++ b/s390x/migration-sck.c
+> @@ -0,0 +1,44 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * SET CLOCK migration tests
+> + *
+> + * Copyright IBM Corp. 2022
+> + *
+> + * Authors:
+> + *  Nico Boehr <nrb@linux.ibm.com>
+> + */
+> +
+> +#include <libcflat.h>
+> +#include <asm/time.h>
+> +
+> +static void test_sck_migration(void)
 > +{
+> +	uint64_t now_before_set = 0, now_after_migration, time_to_set, time_to_advance;
 > +	int cc;
 > +
-> +	asm volatile(
-> +		"	sck %[time]\n"
-> +		"	ipm %[cc]\n"
-> +		"	srl %[cc],28\n"
-> +		: [cc] "=d"(cc)
-> +		: [time] "Q"(*time)
-> +		: "cc"
-> +	);
+> +	stckf(&now_before_set);
 > +
-> +	return cc;
+> +	/* Advance the clock by a lot more than we might ever need to migrate (600s) */
+> +	time_to_advance = (600ULL * 1000000) << STCK_SHIFT_US;
+> +	time_to_set = now_before_set + time_to_advance;
+> +
+> +	cc = sck(&time_to_set);
+> +	report(!cc, "setting clock succeeded");
+
+I would also check here that the clock is set. This way we can
+differentiate between a migration issue or a more general (and more
+severe) clock issue. Even if we have this test somewhere else, this
+makes it easier when debugging to narrow down the issue to migration.
+
+> +
+> +	puts("Please migrate me, then press return\n");
+> +	(void)getchar();
+> +
+> +	cc = stckf(&now_after_migration);
+> +	report(!cc, "clock still set");
+> +
+> +	report(now_after_migration >= time_to_set, "TOD clock value preserved");
 > +}
 > +
-> +static inline int stck(uint64_t *time)
+> +int main(void)
 > +{
-> +	int cc;
+> +	report_prefix_push("migration-sck");
 > +
-> +	asm volatile(
-> +		"	stck %[time]\n"
-> +		"	ipm %[cc]\n"
-> +		"	srl %[cc],28\n"
-> +		: [cc] "=d" (cc), [time] "=Q" (*time)
-> +		:
-> +		: "cc", "memory"
-
-why do you need "memory" ?
-
-(I know it was in the old code, but probably it should not have)
-
-> +	);
-> +
-> +	return cc;
+> +	test_sck_migration();
+> +	report_prefix_pop();
+> +	return report_summary();
 > +}
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index f9f102abfa89..2c04ae7c7c15 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -197,3 +197,7 @@ file = panic-loop-pgm.elf
+>  groups = panic
+>  accel = kvm
+>  timeout = 5
 > +
-> +static inline int stckf(uint64_t *time)
-> +{
-> +	int cc;
-> +
-> +	asm volatile(
-> +		"	stckf %[time]\n"
-> +		"	ipm %[cc]\n"
-> +		"	srl %[cc],28\n"
-> +		: [cc] "=d" (cc), [time] "=Q" (*time)
-> +		:
-> +		: "cc", "memory"
-
-same here
-
-> +	);
-> +
-> +	return cc;
-> +}
-> +
->  static inline uint64_t get_clock_us(void)
->  {
->  	uint64_t clk;
->  
-> -	asm volatile(" stck %0 " : : "Q"(clk) : "memory");
-> +	stck(&clk);
->  
->  	return clk >> STCK_SHIFT_US;
->  }
-> diff --git a/s390x/sck.c b/s390x/sck.c
-> index 88d52b74a586..dff496187602 100644
-> --- a/s390x/sck.c
-> +++ b/s390x/sck.c
-> @@ -12,38 +12,6 @@
->  #include <asm/interrupt.h>
->  #include <asm/time.h>
->  
-> -static inline int sck(uint64_t *time)
-> -{
-> -	int cc;
-> -
-> -	asm volatile(
-> -		"	sck %[time]\n"
-> -		"	ipm %[cc]\n"
-> -		"	srl %[cc],28\n"
-> -		: [cc] "=d"(cc)
-> -		: [time] "Q"(*time)
-> -		: "cc"
-> -	);
-> -
-> -	return cc;
-> -}
-> -
-> -static inline int stck(uint64_t *time)
-> -{
-> -	int cc;
-> -
-> -	asm volatile(
-> -		"	stck %[time]\n"
-> -		"	ipm %[cc]\n"
-> -		"	srl %[cc],28\n"
-> -		: [cc] "=d" (cc), [time] "=Q" (*time)
-> -		:
-> -		: "cc", "memory"
-> -	);
-> -
-> -	return cc;
-> -}
-> -
->  static void test_priv(void)
->  {
->  	uint64_t time_to_set_privileged = 0xfacef00dcafe0000,
+> +[migration-sck]
+> +file = migration-sck.elf
+> +groups = migration
 
