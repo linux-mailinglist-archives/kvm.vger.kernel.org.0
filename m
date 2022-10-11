@@ -2,120 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B380A5FB8F4
-	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 19:09:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D6C0A5FB9CC
+	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 19:38:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229864AbiJKRJc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Oct 2022 13:09:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47624 "EHLO
+        id S229736AbiJKRiz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Oct 2022 13:38:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229872AbiJKRJ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Oct 2022 13:09:28 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BF3FA9261
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 10:09:26 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29BG7rGq020614
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 17:09:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=Xf2AJZiOBs2tGjqI+BEsZqHE8buStgYdFjvThunenEw=;
- b=bW90M9AYvcdieMQXYojKIywp+fWnnvvvn6jdFXpAp5currudbVoYMlPxh53aXWRXaXYN
- UbtSCqdOMy3cfXURHRkCuobVk4ZnE96CIrV5SwjKTJ17GH+Q8pAQPrui6WZH+tTcVqsI
- NRImxJahjU/qbsnjt/0cE172QfIDnzTFVUTUV+X37RlAGatEISY8zdvdk8MrjRwlnNHx
- RXVEt1RdauaSqSxWJ3f4ABTiNt/0vqOg1KwEoChdF5LwppUNkCYCAQrFN4mlX/mWtXvo
- BXwqmtxix+wL52T1iaJOgmvapjumXuOZqZIqe+Brc4W6HAUknliIHsqtMHbrMTvJDmkt Rg== 
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k5bfwa9dm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 17:09:25 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29BH4v9Y006133
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 17:09:23 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03ams.nl.ibm.com with ESMTP id 3k30u94rjx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 17:09:23 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29BH9Kco61079830
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Oct 2022 17:09:20 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AC75C5204F;
-        Tue, 11 Oct 2022 17:09:20 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.242])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 78AB45204E;
-        Tue, 11 Oct 2022 17:09:20 +0000 (GMT)
-Date:   Tue, 11 Oct 2022 19:09:18 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com,
-        borntraeger@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v3 0/2] s390x: Add migration test for
- guest TOD clock
-Message-ID: <20221011190918.182d3001@p-imbrenda>
-In-Reply-To: <20221011170024.972135-1-nrb@linux.ibm.com>
-References: <20221011170024.972135-1-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S230151AbiJKRiW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Oct 2022 13:38:22 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A414F12AFB
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 10:38:15 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id x18so9170635ljm.1
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 10:38:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ASTy3jp38n51CkkEO2l/MmR02UbjdKNfCtO2dYm1obw=;
+        b=Y7Ji+9EE6yHJ/lLNaqSZcPo4O4aRr56qhFXjXUYPQzTOnzptuMwe8kepBEjSO0s8rT
+         5OIMCMpi9AqfiPy/rlelt5Tces3luVxuKjj0/09SRBZT/tQk4hgIbCBDob9CNKLLUltF
+         ZYq+A91X3Vx7N+9zhe/PctUTfyPWXoIcLDGjsahVOTaiuq3eNbM1Hfbgp7i3+uq128Iv
+         r6ySpiDZK7sOY+udbAZVjI6sEm11O+aqYcHySZuWb5MuqOiYV2CEF72cF+Y9y+yqcmMh
+         8UZiywRV6+vPEp3qkDyN3cME+dPnuLN0QNOMDkcbWXizYFMQn3rUwZQEfDiOJHBwr3OH
+         lM2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ASTy3jp38n51CkkEO2l/MmR02UbjdKNfCtO2dYm1obw=;
+        b=n7HEtHSEywxC2ptFnOMD2WkJtW5bMOTs6IHjeC+fci+sDfVW/2EyyXyfytH5bm8aQK
+         XsCybivewFptARWnM6dX/Zux2hj08nw/W3vAGnDbXyJiWwsETBQ8UQi0NWVCdBmfLksA
+         foPfOYrTCUQVASI0QDJzEUprSt0b4IcK22yjYmz5AL264OFO8y5CQgHT8fJr5yhGQrdG
+         6i5zLOqVJNN2rGWT9KzR59UfQSQeZ0yeKPuOkYEP7HvLaGpR1WPFA+u5EhhGtjY1RbTf
+         5XqVHsff0MmgycCVE+FnlE+UCkquveEkG/dy5pO4PG2k+XnpuFucz2dA83bPkJKioMWm
+         4aMw==
+X-Gm-Message-State: ACrzQf2krCXCE/eX629dMzL0MHv/D/P3Rx5dclVKKILxclHTs02/Uv4/
+        Owe+mVBcHy+KSKFZ0no2aJewyOV4bhQFzULn2O7HGA==
+X-Google-Smtp-Source: AMsMyM7xO4MkCPUjy69frHSk+iYYvoEEAbwPa+iw5sCPNlkqqWHHHZalHxJvMqmz/w22JhcaiWQAmaASxLFaamAiTuI=
+X-Received: by 2002:a2e:7c17:0:b0:26e:4f7:3c95 with SMTP id
+ x23-20020a2e7c17000000b0026e04f73c95mr9634809ljc.455.1665509893631; Tue, 11
+ Oct 2022 10:38:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: bH8uuIXkE4vuugxNgyq7jxwJFB57tdwd
-X-Proofpoint-ORIG-GUID: bH8uuIXkE4vuugxNgyq7jxwJFB57tdwd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-11_08,2022-10-11_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
- impostorscore=0 mlxscore=0 suspectscore=0 phishscore=0 lowpriorityscore=0
- mlxlogscore=999 priorityscore=1501 malwarescore=0 bulkscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
- definitions=main-2210110098
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20220829171021.701198-1-pgonda@google.com> <20220829171021.701198-4-pgonda@google.com>
+ <Yz8U2k7Tu8QQNhhq@google.com>
+In-Reply-To: <Yz8U2k7Tu8QQNhhq@google.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Tue, 11 Oct 2022 11:38:01 -0600
+Message-ID: <CAMkAt6qQLO-6W8Ek-syUSzZpWLPDe8EzzfuWvY3iQZhczti7Pw@mail.gmail.com>
+Subject: Re: [V4 3/8] KVM: selftests: add hooks for managing encrypted guest memory
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcorr@google.com, michael.roth@amd.com, thomas.lendacky@amd.com,
+        joro@8bytes.org, mizhang@google.com, pbonzini@redhat.com,
+        andrew.jones@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 11 Oct 2022 19:00:22 +0200
-Nico Boehr <nrb@linux.ibm.com> wrote:
+On Thu, Oct 6, 2022 at 11:48 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Aug 29, 2022, Peter Gonda wrote:
+> > +static vm_paddr_t
+> > +_vm_phy_pages_alloc(struct kvm_vm *vm, size_t num, vm_paddr_t paddr_min,
+>
+> Do not wrap before the function name.  Linus has a nice explanation/rant on this[*].
+> Note to self, add a Vim macro for this...
+>
+> [*] https://lore.kernel.org/all/CAHk-=wjoLAYG446ZNHfg=GhjSY6nFmuB_wA8fYd5iLBNXjo9Bw@mail.gmail.com
+>
 
-> v2->v3:
-> ---
-> - check the clock is really set after setting (thanks Claudio)
-> - remove unneeded memory clobber (thanks Claudio)
-> - add comment to explain what we're testing (thanks Christian)
-> 
-> v1->v2:
-> ---
-> - remove unneeded include
-> - advance clock by 10 minutes instead of 1 minute (thanks Claudio)
-> - express get_clock_us() using stck() (thanks Claudio)
-> 
-> The guest TOD clock should not go backwards on migration. Add a test to
-> verify that.
-> 
-> To reduce code duplication, move some of the time-related defined
-> from the sck test to the library.
-> 
+Fixed. Thanks. I'll work on a fix to my VIM setup.
 
-thanks, picked
+> > +                 uint32_t memslot, bool encrypt)
+> >  {
+> >       struct userspace_mem_region *region;
+> >       sparsebit_idx_t pg, base;
+> > @@ -1152,12 +1156,22 @@ vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+> >               abort();
+> >       }
+> >
+> > -     for (pg = base; pg < base + num; ++pg)
+> > +     for (pg = base; pg < base + num; ++pg) {
+> >               sparsebit_clear(region->unused_phy_pages, pg);
+> > +             if (encrypt)
+>
+> prefer s/encrypt/private, and s/encrypted_phy_pages/private_phy_pages.  pKVM
+> doesn't rely on encryption, and it's not impossible that x86 will someday gain
+> similar functionality.  And "encrypted" is also technically wrong for SEV and TDX,
+> as shared memory can also be encrypted with a common key.
 
-> Nico Boehr (2):
->   lib/s390x: move TOD clock related functions to library
->   s390x: add migration TOD clock test
-> 
->  lib/s390x/asm/time.h  | 50 ++++++++++++++++++++++++++++++++++++++-
->  s390x/Makefile        |  1 +
->  s390x/migration-sck.c | 54 +++++++++++++++++++++++++++++++++++++++++++
->  s390x/sck.c           | 32 -------------------------
->  s390x/unittests.cfg   |  4 ++++
->  5 files changed, 108 insertions(+), 33 deletions(-)
->  create mode 100644 s390x/migration-sck.c
-> 
+Makes sense. Private or protected sound better.
 
+>
+> > +                     sparsebit_set(region->encrypted_phy_pages, pg);
+> > +     }
+> >
+> >       return base * vm->page_size;
+> >  }
+> >
+> > +vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+> > +                           vm_paddr_t paddr_min, uint32_t memslot)
+> > +{
+> > +     return _vm_phy_pages_alloc(vm, num, paddr_min, memslot,
+> > +                                vm->memcrypt.enc_by_default);
+>
+> enc_by_default yields a bizarre API.  The behavior depends on whether or not the
+> VM is protected, and whether or not the VM wants to protect memory by default.
+>
+> For simplicity, IMO vm_phy_pages_alloc() should allocate memory as private if the
+> VM supports protected memory, i.e. just have vm->protected or whatever and use
+> that here.
+
+Removed "enc_by_default" concept.
+
+>
+> > +}
+> > +
+> >  vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+> >                            uint32_t memslot)
+> >  {
+> > @@ -1741,6 +1755,10 @@ void vm_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
+> >                       region->host_mem);
+> >               fprintf(stream, "%*sunused_phy_pages: ", indent + 2, "");
+> >               sparsebit_dump(stream, region->unused_phy_pages, 0);
+> > +             if (vm->memcrypt.enabled) {
+>
+> vm->protected
+
+renamed memcrypt -> protected.
+
+>
+> > +                     fprintf(stream, "%*sencrypted_phy_pages: ", indent + 2, "");
+> > +                     sparsebit_dump(stream, region->encrypted_phy_pages, 0);
+> > +             }
+> >       }
+> >       fprintf(stream, "%*sMapped Virtual Pages:\n", indent, "");
+> >       sparsebit_dump(stream, vm->vpages_mapped, indent + 2);
+> > @@ -1989,3 +2007,31 @@ void __vm_get_stat(struct kvm_vm *vm, const char *stat_name, uint64_t *data,
+> >               break;
+> >       }
+> >  }
+> > +
+> > +void vm_set_memory_encryption(struct kvm_vm *vm, bool enc_by_default, bool has_enc_bit,
+> > +                           uint8_t enc_bit)
+> > +{
+> > +     vm->memcrypt.enabled = true;
+> > +     vm->memcrypt.enc_by_default = enc_by_default;
+> > +     vm->memcrypt.has_enc_bit = has_enc_bit;
+> > +     vm->memcrypt.enc_bit = enc_bit;
+> > +}
+> > +
+> > +const struct sparsebit *
+> > +vm_get_encrypted_phy_pages(struct kvm_vm *vm, int slot, vm_paddr_t *gpa_start,
+> > +                        uint64_t *size)
+>
+> Bad wrap.
+
+Fixed.
+
+>
+> > +{
+> > +     struct userspace_mem_region *region;
+> > +
+> > +     if (!vm->memcrypt.enabled)
+>
+> This seems rather silly, why not TEST_ASSERT()?
+>
+> > +             return NULL;
+> > +
+> > +     region = memslot2region(vm, slot);
+> > +     if (!region)
+>
+> Same here, TEST_ASSERT() seems more appropriate.
+>
+> Actually, I can't envision a use outside of SEV.  AFAIK, no other architecture
+> does the whole "launch update" thing.  I.e. just open code this in sev_encrypt().
+> The more generic API that will be useful for other VM types will be to query if a
+> specific GPA is private vs. shared.
+
+Good point. I'll move this code into that sev_encrypt() flow and
+remove this function completely.
+
+>
+> > +             return NULL;
+> > +
+> > +     *size = region->region.memory_size;
+> > +     *gpa_start = region->region.guest_phys_addr;
+> > +
+> > +     return region->encrypted_phy_pages;
+> > +}
+> > --
+> > 2.37.2.672.g94769d06f0-goog
+> >
