@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A22B45FBB36
-	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 21:15:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C657D5FBB3C
+	for <lists+kvm@lfdr.de>; Tue, 11 Oct 2022 21:18:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229846AbiJKTPp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 11 Oct 2022 15:15:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36020 "EHLO
+        id S229863AbiJKTSh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 11 Oct 2022 15:18:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229830AbiJKTPl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 11 Oct 2022 15:15:41 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A4DF5FF58
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 12:15:39 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id c24so14110790pls.9
-        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 12:15:39 -0700 (PDT)
+        with ESMTP id S229506AbiJKTSg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 11 Oct 2022 15:18:36 -0400
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1F567B2B3
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 12:18:34 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id s206so13631713pgs.3
+        for <kvm@vger.kernel.org>; Tue, 11 Oct 2022 12:18:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gyuABnJw/T589iuhSb5mht/YLLE+xLjud9zjMiPRJI4=;
-        b=mHljrkmgI8NGzkYjKAyz3szyp2BEF52+qwqaVnORtSZMYF+dhEncTMEL7eIQQSX5aw
-         8GFwqpOJYQ97b2P7GU352b62eUOIxPu/9NlmXwY0t2oh9AUgkkufZOTT8TNAAmgL+6ZM
-         T3YqlbNiW1zSg1TUrnm9yONL4mc+raRqs9G4y9vYNprVKRbDdtAu9D7H/jZ2TZJYqSpy
-         uw8gDr4RGrkWNZgiUGAWg0gEmaWtjh0k2tyWMhXJmTkxkZd7VZYWMZ4nxf4fnB0FQ79J
-         fHQer3d3HP6qCqNRWpLfQ30QItCMRiheraiau6EzHjPb+GCS0hQjaLIP9JsbmbPV7lQv
-         u2cQ==
+        bh=tN++RzycQhI0zOp3/Gpp2COjyDOKXNStECTnSP6UROw=;
+        b=IyC7A4pZD44WrZ37I0tOZ64uJmBOj3T0Y6/d8vwNtfoAks/qFvpZ3aqeTRcz0CIYUA
+         tVbhNkt+bZ8STsTHo+X99qTpNQeiWf/Fq9tf0E6hb4xsP3X7JEI47VZ4K5JKBiR2Ct4D
+         4pC+ttie49WcFkKYXXETNWfwglxIYDq00ShX9Rgwc4sSZjVCjZaR4iM9wjVYZeZhsafT
+         sDslrO6ecAGv7q1ESrKhsfj5mw+46uHk/pBArm1Vc8ZgVrWD2oi4TYbjLnyvMEzfsxox
+         bE1QwJs5lO8VblHTeCGMbTBSf7IR4XJ42XC1gki7p7imZIAPvXQDutmGZq+sXl9cv8bo
+         XGqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gyuABnJw/T589iuhSb5mht/YLLE+xLjud9zjMiPRJI4=;
-        b=Jq7vF/yUqvXvYre+CkK6Q03n/YxYDKWEwudZRxWBVX1CsQOv1jxXYzb6Y6xv/i5Asx
-         tAf0stUYG/Enu1b+3hNFOBUO4ARyVNZ6nPH7REVVEnpZWG26x8k7dTAAbJgMNAWcvT3e
-         2WAsY8WJ1tmwkSnbtD4yZotGC1qph0ln5Qu6tlJrXiPPtTrlnGGX/GaFdGQlxi+25KLD
-         VmiE0ar+4q9k+G0jz09i5Es4krmu4XQ05SAsnDeXL6Twv84uPpBVU+9zzLF9WxfFWoti
-         9aJMGX0NnPFBmeMtYPX0LhQTrI4sam2aLKWQ85Mfufj+eDL20Vq8c/r7697f2g5+98Mg
-         SzEA==
-X-Gm-Message-State: ACrzQf29I1lyf19iVydkdQmll4obpgMU2LwB4mKA0NdEeDXixxak0VsT
-        S9SyfM+CpGpJBxQVUwHV+DEVbQ==
-X-Google-Smtp-Source: AMsMyM6r7Mgl+VA2MqserQBZOFIzFB2iRK0PYyXc5YH0R7A5S8wz05QJ76hddhlqdl7inBV2w7raWQ==
-X-Received: by 2002:a17:903:2616:b0:17f:8042:723a with SMTP id jd22-20020a170903261600b0017f8042723amr26791188plb.106.1665515737936;
-        Tue, 11 Oct 2022 12:15:37 -0700 (PDT)
+        bh=tN++RzycQhI0zOp3/Gpp2COjyDOKXNStECTnSP6UROw=;
+        b=mMurjLqkVIJIX9rq1BXt9k2MuVGi7fO74v40ZPtwggtddc/xI73FxAIs8U6kJ7/o5q
+         nWYxYF7EmyaND4gUZGumrkFKaQknu9IG62ZKS668VWcIAHRtsy03ksNVeKMfZ1vc8FZ0
+         2LQ6pKph/akwHSdOkavBbPUhWvYLxtksst/VyHAWIlV9pUKqQrXWoAB2jG5J+9ORWHkS
+         riy0YiDOLr2VdEkrlNH6wdy+ZOkjGwVwG8SwMgm1JlDO/7dB/V6ZQkUSMOXuijlDM/62
+         /FzGiqKECsTnhPueCsycgqkm/TLOXayfJvOXOMLaCUaNxXsvQtNfXtJ2dbGoL1H4AKSz
+         MgDg==
+X-Gm-Message-State: ACrzQf0xGP6m6kOuBE23gU5Gviw4W/khP3ACikwpiPM2MSbIrrJfuTbv
+        EZSpKe6yFK3DQkkXxE6HYJo7IXEDYilhvw==
+X-Google-Smtp-Source: AMsMyM4YQ4sfPYLUzw55FberGjLaMi/YCNqWtb/vNksc4dhyg3jGtswU1Y/i8QjYx5BlqBuD2nxppA==
+X-Received: by 2002:a63:f349:0:b0:43a:b82b:1173 with SMTP id t9-20020a63f349000000b0043ab82b1173mr22747244pgj.534.1665515914419;
+        Tue, 11 Oct 2022 12:18:34 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id b8-20020a17090a7ac800b00205d70ccfeesm11134681pjl.33.2022.10.11.12.15.37
+        by smtp.gmail.com with ESMTPSA id ix21-20020a170902f81500b001750792f20asm844033plb.238.2022.10.11.12.18.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Oct 2022 12:15:37 -0700 (PDT)
-Date:   Tue, 11 Oct 2022 19:15:33 +0000
+        Tue, 11 Oct 2022 12:18:34 -0700 (PDT)
+Date:   Tue, 11 Oct 2022 19:18:30 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -57,15 +57,15 @@ Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         Michael Kelley <mikelley@microsoft.com>,
         linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 2/6] KVM: x86: Introduce CPUID_8000_0007_EDX
- 'scattered' leaf
-Message-ID: <Y0XA1f+H8NxzcMW4@google.com>
+Subject: Re: [PATCH v4 4/6] KVM: selftests: Rename 'msr->availble' to
+ 'msr->fault_exepected' in hyperv_features test
+Message-ID: <Y0XBhsbvy60b8Zy9@google.com>
 References: <20220922143655.3721218-1-vkuznets@redhat.com>
- <20220922143655.3721218-3-vkuznets@redhat.com>
+ <20220922143655.3721218-5-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220922143655.3721218-3-vkuznets@redhat.com>
+In-Reply-To: <20220922143655.3721218-5-vkuznets@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,20 +77,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 22, 2022, Vitaly Kuznetsov wrote:
-> diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
-> index a19d473d0184..a5514c89dc29 100644
-> --- a/arch/x86/kvm/reverse_cpuid.h
-> +++ b/arch/x86/kvm/reverse_cpuid.h
-> @@ -12,7 +12,8 @@
->   * "bug" caps, but KVM doesn't use those.
->   */
->  enum kvm_only_cpuid_leafs {
-> -	CPUID_12_EAX	 = NCAPINTS,
-> +	CPUID_12_EAX		= NCAPINTS,
-> +	CPUID_8000_0007_EDX	= NCAPINTS + 1,
+Nit, s/availble,/available
 
-No need to explicitly initialize the new leaf, only the first enum entry needs
-explicit initialization to NCAPINTS, i.e. let all other entries automatically
-increment.  The order doesn't matter, so not caring about the exact value will
-avoid bugs due to mismerge and/or bad copy+paste.
+On Thu, Sep 22, 2022, Vitaly Kuznetsov wrote:
+> It may not be clear what 'msr->availble' means. The test actually
+
+Same typo here.
+
+> checks that accessing the particular MSR doesn't cause #GP, rename
+> the varialble accordingly.
+
+s/varialble/variable
+
+At least you're consistent :-)
+
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  .../selftests/kvm/x86_64/hyperv_features.c    | 96 +++++++++----------
+>  1 file changed, 48 insertions(+), 48 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+> index 79ab0152d281..1383b979e90b 100644
+> --- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
+> @@ -33,7 +33,7 @@ static inline uint8_t hypercall(u64 control, vm_vaddr_t input_address,
+>  
+>  struct msr_data {
+>  	uint32_t idx;
+> -	bool available;
+> +	bool fault_expected;
+>  	bool write;
+>  	u64 write_val;
+>  };
+> @@ -56,10 +56,10 @@ static void guest_msr(struct msr_data *msr)
+>  	else
+>  		vector = wrmsr_safe(msr->idx, msr->write_val);
+>  
+> -	if (msr->available)
+> -		GUEST_ASSERT_2(!vector, msr->idx, vector);
+> -	else
+> +	if (msr->fault_expected)
+>  		GUEST_ASSERT_2(vector == GP_VECTOR, msr->idx, vector);
+> +	else
+> +		GUEST_ASSERT_2(!vector, msr->idx, vector);
+>  	GUEST_DONE();
+>  }
+>  
+> @@ -153,12 +153,12 @@ static void guest_test_msrs_access(void)
+>  			 */
+>  			msr->idx = HV_X64_MSR_GUEST_OS_ID;
+>  			msr->write = 0;
+> -			msr->available = 0;
+> +			msr->fault_expected = 1;
+
+Since all of these are getting inverted, opportunistically use "true" instead of "1"?
