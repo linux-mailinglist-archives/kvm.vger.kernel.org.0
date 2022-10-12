@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CABC55FCA6C
-	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 20:18:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 567CB5FCA63
+	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 20:17:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229797AbiJLSR4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Oct 2022 14:17:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44182 "EHLO
+        id S229812AbiJLSRl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Oct 2022 14:17:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229527AbiJLSRh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Oct 2022 14:17:37 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C89898C81
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 11:17:24 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id a33-20020a630b61000000b00429d91cc649so9578833pgl.8
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 11:17:24 -0700 (PDT)
+        with ESMTP id S229766AbiJLSRe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Oct 2022 14:17:34 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58D1AA484E
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 11:17:25 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id u5-20020a170902e80500b00178944c46aaso12238948plg.4
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 11:17:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=6LjPpC5WMK+HN+fw4FsDT2cJnXsT7lM8aCSyAvCtEgA=;
-        b=NuW25Nv3biN2IHS4poTdCD4rAjew+qpVd76+lQVBDIym1H9FoBeMG+X5ODgl4H7p+j
-         ZpINWlCzUXGsBCo+2p0WR5bMJ301Ad+BvriGTTYQfCAA8N5N2XXgElBzbFpja/WmjtbD
-         r1U8sdlPTHKYjp8AvuMc1BWKuAZP28hM/xHbow2I2ehjSa41fxbYvgHZ8ZEzsL9i/0ME
-         ygk4gfSIsEx7D8ZGXcxyuXrxbMtiuDj2aklQMMfTSeLfRo56aPgXRP+spNxfF50lNsqQ
-         HTvy9TUINVREz4MVmhk7Qka+Qs1NjZoIMI5z2xXnuFzD0+FsaKIJA1oySTG7+XOptZNb
-         URPg==
+        bh=oyyfiq1u1ow61sJxYdtEop67BKEuTOwTRoB44Qlve6k=;
+        b=P2usEtoXL2d7Kadfzc6pHmhtZOrLbkU1dncF458jZB05kEaDR4KjrjxeuY2vSXDSFo
+         bzwldY+iDn3YjfRcxMznyMfidl6/WuUWEP2QFEgmLDI3MAwPiaWHJCuCHdIGXcW+eSGN
+         g/sEzO9PGlOgo6Vr6vFw6JZI73bhDmBxShW+cbqHQzscfO6bl7+73l8UYRTpUv1xyY3g
+         +iU0rq7hqAlv49yzPLEq1daKsx2PPabZ8Od1fF8YSttMwMcfv7oszFPM2d32wM99sV4e
+         h1fDGa/bn6rViRE0jfB29EyHUGVv1B9iTHYnpZW4bVSacmvCNnfVBmr1nw2Q07saZkag
+         o1uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=6LjPpC5WMK+HN+fw4FsDT2cJnXsT7lM8aCSyAvCtEgA=;
-        b=xRNgsZ6IKceQl+7rL06s1Ae28tib8Z6n097yTIk1t7OnW5cNNe9xx3kwSxGNPQXclf
-         Fw2U3TainuJn3Cffq5StK5PJZy6R8yRHb2XavTST1Is+jeXRg9QyPSfRqOR98RLPFAQ+
-         h8Il96gVpy0xz+P2E5vkBVCYIxFGl8BYAb+3sylz4xqSVkp0i0e+1UJu7obCTP1rF8LZ
-         5JKnpRVTgvooBXzKZUNcySDnomSt9U6c0ALxv1qvMEWp+Sfz2EdVcXUpaydzE0T3J/k9
-         ugGvQx+P2Fs/mUcM9pRkQiQxLNZG0qvyzPn3sFLOsqQg7BkBGx7AJjyNqS162YOb5OkN
-         cw+A==
-X-Gm-Message-State: ACrzQf0PP8aDNmGz2npcJJxgxzZ6uBUsweHUD0ENNk8PZuYYFZl3EnJI
-        6g0eVyBV+5v2PBnvs7Rb0hH/GkZ1kRU=
-X-Google-Smtp-Source: AMsMyM7htAu+wDIbq1XRbKYSbs7Fwquqh8ysfXFz2L3IgX1ZynIZzrjBpLYtIdUWzgxbDYA5EHlVbNckaRM=
+        bh=oyyfiq1u1ow61sJxYdtEop67BKEuTOwTRoB44Qlve6k=;
+        b=uv3EDYWLd9OGlJ1HEShR/Wm6Zksx9WW0Re1+l1DcMttYDClJgx8m+pWXjKuGY0AOZb
+         OyaTlkn4fzFWnPo8FeSrb6mfQS/BVTUOVS49kQqZ++sjQx/P6NFpQN6cSqSXL/R/OmzF
+         BVOuP6DfnVkCidS3/bnNLa046scnYRF5ALg0PJ03G57+mbok0Dd09o10+po8dks4ExEN
+         yfjYUc5qG/toWBDQg++utLPZ21vo4T9LRFLzDFOHIslzdWevW6xSEm5AuLXwgR8PxbcZ
+         LPSIK8duCCSv3laP9v3HYpznIM7Qj2Dq3sajmIps+vKLKmQKXwYJSp22Xgovnjo6QsX/
+         G+GA==
+X-Gm-Message-State: ACrzQf11O+WR5wKN6WdfS7H9QoXmYVsRsUaU38kAtw7k96H5nTXIATF8
+        ywvdD9Jq5u6s/mRh1gnWYb7sYAAkiIM=
+X-Google-Smtp-Source: AMsMyM5a7PIgQlH+XQAxQkl3E0hWyOTVe15+NXdqge73zQWdRTWS96H4/6KaihK8TGdSJwuYFfp8urRmBZs=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:e7d0:b0:20c:169f:7503 with SMTP id
- kb16-20020a17090ae7d000b0020c169f7503mr6483671pjb.175.1665598643087; Wed, 12
- Oct 2022 11:17:23 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1349:b0:563:654d:ce3f with SMTP id
+ k9-20020a056a00134900b00563654dce3fmr17351716pfu.32.1665598644547; Wed, 12
+ Oct 2022 11:17:24 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 12 Oct 2022 18:17:00 +0000
+Date:   Wed, 12 Oct 2022 18:17:01 +0000
 In-Reply-To: <20221012181702.3663607-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221012181702.3663607-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
-Message-ID: <20221012181702.3663607-10-seanjc@google.com>
-Subject: [PATCH v4 09/11] KVM: x86/mmu: Replace open coded usage of
- tdp_mmu_page with is_tdp_mmu_page()
+Message-ID: <20221012181702.3663607-11-seanjc@google.com>
+Subject: [PATCH v4 10/11] KVM: x86/mmu: Use static key/branches for checking
+ if TDP MMU is enabled
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -72,43 +72,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use is_tdp_mmu_page() instead of querying sp->tdp_mmu_page directly so
-that all users benefit if KVM ever finds a way to optimize the logic.
-
-No functional change intended.
+Now that the TDP MMU being enabled is read-only after the vendor module
+is loaded, use a static key to track whether or not the TDP MMU is
+enabled to avoid conditional branches in hot paths, e.g. in
+direct_page_fault() and fast_page_fault().
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c     | 2 +-
- arch/x86/kvm/mmu/tdp_mmu.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/kvm/mmu.h     |  5 +++--
+ arch/x86/kvm/mmu/mmu.c | 14 ++++++++++----
+ 2 files changed, 13 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 1598aaf29c4a..4792d76edd6d 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1907,7 +1907,7 @@ static bool is_obsolete_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
- 		return true;
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 1ad6d02e103f..bc0d8a5c09f9 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -2,6 +2,7 @@
+ #ifndef __KVM_X86_MMU_H
+ #define __KVM_X86_MMU_H
  
- 	/* TDP MMU pages due not use the MMU generation. */
--	return !sp->tdp_mmu_page &&
-+	return !is_tdp_mmu_page(sp) &&
- 	       unlikely(sp->mmu_valid_gen != kvm->arch.mmu_valid_gen);
++#include <linux/jump_label.h>
+ #include <linux/kvm_host.h>
+ #include "kvm_cache_regs.h"
+ #include "cpuid.h"
+@@ -230,13 +231,13 @@ static inline bool kvm_shadow_root_allocated(struct kvm *kvm)
  }
  
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index f7c4555d5d36..477418a2ed9b 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -134,7 +134,7 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 	if (!refcount_dec_and_test(&root->tdp_mmu_root_count))
- 		return;
+ #ifdef CONFIG_X86_64
+-extern bool tdp_mmu_enabled;
++DECLARE_STATIC_KEY_TRUE(tdp_mmu_enabled);
+ #endif
  
--	WARN_ON(!root->tdp_mmu_page);
-+	WARN_ON(!is_tdp_mmu_page(root));
+ static inline bool is_tdp_mmu_enabled(void)
+ {
+ #ifdef CONFIG_X86_64
+-	return tdp_mmu_enabled;
++	return static_branch_likely(&tdp_mmu_enabled);
+ #else
+ 	return false;
+ #endif
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 4792d76edd6d..a5ba7b41263d 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -101,8 +101,10 @@ bool tdp_enabled = false;
+ #ifdef CONFIG_X86_64
+ static bool __ro_after_init tdp_mmu_allowed;
  
+-bool __read_mostly tdp_mmu_enabled = true;
+-module_param_named(tdp_mmu, tdp_mmu_enabled, bool, 0444);
++static bool __read_mostly __tdp_mmu_enabled = true;
++module_param_named(tdp_mmu, __tdp_mmu_enabled, bool, 0444);
++
++DEFINE_STATIC_KEY_TRUE(tdp_mmu_enabled);
+ #endif
+ 
+ static int max_huge_page_level __read_mostly;
+@@ -5702,7 +5704,11 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
+ 	max_tdp_level = tdp_max_root_level;
+ 
+ #ifdef CONFIG_X86_64
+-	tdp_mmu_enabled = tdp_mmu_allowed && tdp_enabled;
++	__tdp_mmu_enabled = tdp_mmu_allowed && tdp_enabled;
++	if (__tdp_mmu_enabled)
++		static_branch_enable(&tdp_mmu_enabled);
++	else
++		static_branch_disable(&tdp_mmu_enabled);
+ #endif
  	/*
- 	 * The root now has refcount=0.  It is valid, but readers already
+ 	 * max_huge_page_level reflects KVM's MMU capabilities irrespective
+@@ -6712,7 +6718,7 @@ void __init kvm_mmu_x86_module_init(void)
+ 	 * TDP MMU is actually enabled is determined in kvm_configure_mmu()
+ 	 * when the vendor module is loaded.
+ 	 */
+-	tdp_mmu_allowed = tdp_mmu_enabled;
++	tdp_mmu_allowed = __tdp_mmu_enabled;
+ #endif
+ 
+ 	kvm_mmu_spte_module_init();
 -- 
 2.38.0.rc1.362.ged0d419d3c-goog
 
