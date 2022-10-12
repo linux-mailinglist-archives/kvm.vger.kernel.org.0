@@ -2,61 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DADDB5FC9A7
-	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 18:59:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EF385FC9D7
+	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 19:22:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229941AbiJLQ7q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Oct 2022 12:59:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40714 "EHLO
+        id S229487AbiJLRWk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Oct 2022 13:22:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229680AbiJLQ7l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Oct 2022 12:59:41 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3835FE92A
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 09:59:32 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id f193so16086115pgc.0
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 09:59:32 -0700 (PDT)
+        with ESMTP id S229618AbiJLRWc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Oct 2022 13:22:32 -0400
+Received: from mail-oo1-xc2d.google.com (mail-oo1-xc2d.google.com [IPv6:2607:f8b0:4864:20::c2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A602E1FCCB
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 10:22:29 -0700 (PDT)
+Received: by mail-oo1-xc2d.google.com with SMTP id r11-20020a4aa2cb000000b004806f49e27eso6502045ool.7
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 10:22:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ewQpo6SyzsCd+TVr4dngzoh/1LumYtAxcdZG9494fvM=;
-        b=DzwjZ6oCSiR0/0Xe5yTo5hS4sfi1Qf3T72pp5dGmxcxXxT6xgKZaRowQ0eOCKSrFqW
-         NPdaBbujgUM/v4LsY4eYOoV9mqeKbBXdXgrtMXIxWXwmXqOaQvuuzsgwtUa1mtfkTirK
-         qUXL4QjIF2PUCPNZtLlNPgFm8RHMOsURdLD2iKzmgASYJJNOSPZGG4np/+/BLiJ2dOxq
-         qiS6tUSX80LtJvGXW/5SNO73P01DSDJCDa6w3qh3YGoQioZRJErV7wKiqVjTaN+56Uxu
-         PCOEqIZf9emRspCJ9Xjwf0a8rOunDS1URjX8v3ap42r7l70bV5tCORGN49cTznXnV8mr
-         oMQA==
+        d=linux-foundation.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZRYFk+9yyHZHAcB/2rwgdrsgnigrvHFKirKgHeDmUno=;
+        b=AE8z8KD6uwSVMiRp4ABm0Kn9UkMq8P+bk8+Y1ITmg3vl1hYmjp6k8LU6URk5HzGGQF
+         2/fqw2HhcOa/gTcb1tS3SQgcP9XK2z4BjeVToHve1GXn4ay7pgmzQA+nKS017UcVgGKS
+         Udydt9y4k+dIUSNMddvtmXX3tSMn7byJOqVUk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ewQpo6SyzsCd+TVr4dngzoh/1LumYtAxcdZG9494fvM=;
-        b=VwGnhzI+hUlxK2nKbBBtJw58vdCFeoPRSkgtYmf350/XkxzvAIgVBqjYcHUBpSnTg0
-         ri2FaREEefqYkYgnAb2QNyxRimlBdmwqNatdpWXZU22OIVCkcr92KzYlAfh6saezQURS
-         dDgd2O/q7RJ0SsuyCbV5vWhc5YRBCP0ci9dC1cyh8EAli7q6EoljSTZo9FFZerE8sDBl
-         Vf+KmKtGKWLKUC1Rr4WPxGCqFPMurFgjsbZyb3aTl1VeKE+Q8iULcpJHTUJaXm4kvz5x
-         zzoqzqhSz+s5BSeu1XgQUOJUj/Nmt5ICEQQQo5xwVFrZwaO271SO3TEbHycfQtYBgxTs
-         R3Tg==
-X-Gm-Message-State: ACrzQf2i4dK1jZPIjM/eTcyTW5x6L3EuYZxj0IOkGIutasI9o4ciMAaz
-        MGiBOhNDK4i20LYCAjqege8d6xEmuDoXOQ==
-X-Google-Smtp-Source: AMsMyM6QlAXDkvBArVj2SUglXYsmsrSFS9PDQRCfhtMH5c2TRBrdF5AGwHU929t3lHrPygD60k1epA==
-X-Received: by 2002:aa7:9057:0:b0:565:d7dd:a453 with SMTP id n23-20020aa79057000000b00565d7dda453mr305113pfo.33.1665593971047;
-        Wed, 12 Oct 2022 09:59:31 -0700 (PDT)
-Received: from e69h04161.et15sqa.tbsite.net ([140.205.118.126])
-        by smtp.gmail.com with ESMTPSA id f8-20020a170902684800b0017534ffd491sm4462697pln.163.2022.10.12.09.59.29
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 12 Oct 2022 09:59:30 -0700 (PDT)
-From:   Eric Ren <renzhengeek@gmail.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     eric.auger@redhat.com, cdall@linaro.org, marc.zyngier@arm.com
-Subject: [PATCH] KVM: arm64: vgic: fix wrong loop condition in scan_its_table()
-Date:   Thu, 13 Oct 2022 00:59:25 +0800
-Message-Id: <acd9f1643980fbd27cd22523d2d84ca7c9add84a.1665592448.git.renzhengeek@gmail.com>
-X-Mailer: git-send-email 1.8.3.1
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZRYFk+9yyHZHAcB/2rwgdrsgnigrvHFKirKgHeDmUno=;
+        b=NwxbGxB+ec8D0GLsT16kzuA74pr4dPrqf+g8hjrp1BlM3+HCrMQrhQ6tTd2C5hxcH+
+         WP65v6GpDw5bIVNaVXwNurZZGfVxYY/zLAEIqDOcQZW00IhnvIRvdH+0umB4XTyrKBJE
+         6ludv4w28xJBQ1zMLqpHYfwMVNmMzZ/X17FzDcY3Txy3pEiHKogQhyMQwvsKQrv70uiA
+         oa+7lXzYBs/2X70CVxeA1E9YE4V6dxIsjgtoKXWgEUTTbq68eBZdXC+l1eTUfb1OS/d7
+         JNkpUGzJC92dlNtRfeN4wgoHUOmwFRgWhIP0yhI9BgStOIcWZisuK5VwzRdYCSu8rAU1
+         L0pQ==
+X-Gm-Message-State: ACrzQf3e/vUSVqhV6324TiXCx3BTSh8FfwVKuZLIZ9fhJQjNHbOXgQ9f
+        BZrbgTErgQ/2AHSJgPijEdKn30R9YlYV9w==
+X-Google-Smtp-Source: AMsMyM6KcRiqb1/bxw7VX5bwFrAyI6adz/HElKqHJ/gbDJyYnALHp97hYheaOHSDQSydplWv3CqDEw==
+X-Received: by 2002:a4a:af4d:0:b0:475:dcf4:65fb with SMTP id x13-20020a4aaf4d000000b00475dcf465fbmr11567414oon.1.1665595347363;
+        Wed, 12 Oct 2022 10:22:27 -0700 (PDT)
+Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com. [209.85.160.43])
+        by smtp.gmail.com with ESMTPSA id bu11-20020a0568300d0b00b00655ca9a109bsm7671597otb.36.2022.10.12.10.22.24
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Oct 2022 10:22:24 -0700 (PDT)
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-1324e7a1284so20201499fac.10
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 10:22:24 -0700 (PDT)
+X-Received: by 2002:a05:6870:c0c9:b0:127:c4df:5b50 with SMTP id
+ e9-20020a056870c0c900b00127c4df5b50mr3072194oad.126.1665595344160; Wed, 12
+ Oct 2022 10:22:24 -0700 (PDT)
+MIME-Version: 1.0
+References: <20221010132030-mutt-send-email-mst@kernel.org>
+ <87r0zdmujf.fsf@mpe.ellerman.id.au> <20221012070532-mutt-send-email-mst@kernel.org>
+ <87mta1marq.fsf@mpe.ellerman.id.au> <87edvdm7qg.fsf@mpe.ellerman.id.au> <20221012115023-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20221012115023-mutt-send-email-mst@kernel.org>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed, 12 Oct 2022 10:22:08 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wg2Pkb9kbfbstbB91AJA2SF6cySbsgHG-iQMq56j3VTcA@mail.gmail.com>
+Message-ID: <CAHk-=wg2Pkb9kbfbstbB91AJA2SF6cySbsgHG-iQMq56j3VTcA@mail.gmail.com>
+Subject: Re: [GIT PULL] virtio: fixes, features
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, alvaro.karsz@solid-run.com,
+        angus.chen@jaguarmicro.com, gavinl@nvidia.com, jasowang@redhat.com,
+        lingshan.zhu@intel.com, wangdeming@inspur.com,
+        xiujianfeng@huawei.com, linuxppc-dev@lists.ozlabs.org,
+        linux-pci@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -64,43 +80,35 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Reproducer hints:
-1. Create ARM virt VM with pxb-pcie bus which adds
-   extra host bridges, with qemu command like:
+On Wed, Oct 12, 2022 at 8:51 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> Are you sure?
 
-```
-  -device pxb-pcie,bus_nr=8,id=pci.x,numa_node=0,bus=pcie.0 \
-  -device pcie-root-port,..,bus=pci.x \
-  ...
-  -device pxb-pcie,bus_nr=37,id=pci.y,numa_node=1,bus=pcie.0 \
-  -device pcie-root-port,..,bus=pci.y \
-  ...
+MichaelE is right.
 
-```
-2. Perform VM migration which calls save/restore device tables.
+This is just bogus historical garbage:
 
-In that setup, we get a big "offset" between 2 device_ids (
-one is small, another is big), which makes unsigned "len" round
-up a big positive number, causing loop to continue exceptionally.
+> arch/arm/include/asm/irq.h:#ifndef NO_IRQ
+> arch/arm/include/asm/irq.h:#define NO_IRQ       ((unsigned int)(-1))
 
-Signed-off-by: Eric Ren <renzhengeek@gmail.com>
----
- arch/arm64/kvm/vgic/vgic-its.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+that I've tried to get rid of for years, but for some reason it just won't die.
 
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 24d7778d1ce6..673554ef02f9 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -2141,7 +2141,7 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
- 			  int start_id, entry_fn_t fn, void *opaque)
- {
- 	struct kvm *kvm = its->dev->kvm;
--	unsigned long len = size;
-+	ssize_t len = size;
- 	int id = start_id;
- 	gpa_t gpa = base;
- 	char entry[ESZ_MAX];
--- 
-2.19.1.6.gb485710b
+NO_IRQ should be zero. Or rather, it shouldn't exist at all. It's a bogus thing.
 
+You can see just how bogus it is from grepping for it - the users are
+all completely and utterly confused, and all are entirely historical
+brokenness.
+
+The correct way to check for "no irq" doesn't use NO_IRQ at all, it just does
+
+        if (dev->irq) ...
+
+which is why you will only find a few instances of NO_IRQ in the tree
+in the first place.
+
+The NO_IRQ thing is mainly actually defined by a few drivers that just
+never got converted to the proper world order, and even then you can
+see the confusion (ie some drivers use "-1", others use "0", and yet
+others use "((unsigned int)(-1)".
+
+                   Linus
