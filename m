@@ -2,193 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C8375FC915
-	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 18:21:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 79E955FC95B
+	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 18:35:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229930AbiJLQVr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Oct 2022 12:21:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52184 "EHLO
+        id S230029AbiJLQfI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Oct 2022 12:35:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229899AbiJLQVn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Oct 2022 12:21:43 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8372CDED21
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 09:21:41 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29CGIY37023356;
-        Wed, 12 Oct 2022 16:21:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=GbvH9IfnUHV15Ycx4DN2/N9WZhsIDvK8HLSDy9LB31k=;
- b=KahROpjaH+T/OCrzAj1+BVmddjGU58L7Fo22gSG7iOB3TOHc7q6B6mspuCpEoab+3Y20
- TpVIUCuMmGM9n5rKRW578lNT/rBDKIwxLdVj+phDvmypsVJbPLDU6FHSxXOMmZOdjlcc
- ranyUfnBctn4RWxrS2RLq4uoOxj9AWh+T706WWNyI0VGhoUABgzSCxDx/WgDOaJ+pStV
- mAdHq1W6SEmbJkoVWI0m5hp9qz+/pQCxxzTwWJstr1bVawALtZykOBbVRuMbX5dIEiDt
- eTgAypF/HpWiU5e8hORGaqlGH2+uy2ZE3qljjz9Dg/Q2MzuV4JTyZCr6H2tFWo6fvLBq +g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k5xfmdwvk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 Oct 2022 16:21:28 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29CEUNmk029383;
-        Wed, 12 Oct 2022 16:21:27 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k5xfmdwtp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 Oct 2022 16:21:27 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29CGLKlg021778;
-        Wed, 12 Oct 2022 16:21:25 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma04ams.nl.ibm.com with ESMTP id 3k30u9e9y3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 Oct 2022 16:21:24 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29CGLr8i51380688
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 12 Oct 2022 16:21:53 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CE2D2A405B;
-        Wed, 12 Oct 2022 16:21:21 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E29BFA4054;
-        Wed, 12 Oct 2022 16:21:20 +0000 (GMT)
-Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.34.168])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 12 Oct 2022 16:21:20 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-Subject: [PATCH v10 9/9] docs/s390x: document s390x cpu topology
-Date:   Wed, 12 Oct 2022 18:21:07 +0200
-Message-Id: <20221012162107.91734-10-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20221012162107.91734-1-pmorel@linux.ibm.com>
-References: <20221012162107.91734-1-pmorel@linux.ibm.com>
+        with ESMTP id S229686AbiJLQfG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Oct 2022 12:35:06 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04DE32F3AB
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 09:35:03 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id x6so16721069pll.11
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 09:35:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Det2ITA/n+WXH8RhBcuNargdlyOW5bs99Gk+aJ7/qCQ=;
+        b=QMdpGzfBf0NldWY/bD/I/AQC+34DaQ6T41DAl98Jbq3s4BBRU97wbxp6mrDPsK+Ajy
+         2edzfjH61I/TPtM4Ld3Sg286tM7g4/bes7Zj7CMqf7PHJuiZGAuKkb6vrw7R0AqElJ9g
+         q5JEZvX/mhYNsoqrl/mrS7yh+EMgeDi+PhabUfW+c9hkX5GBav4GP492SXT4icsqZZ/V
+         eezHq/vlZYz/Pecf8ouJtRivFcbERqR8LAZMKRKHEx10V7KKojX63yeROb8OYzdtW9eV
+         xcjCMO/aCFW0H9FYI8asOxTjzUTXU1kGeFnALca+5xVmM5t5zT1ohcqLE2wChC6vaWJL
+         3d2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Det2ITA/n+WXH8RhBcuNargdlyOW5bs99Gk+aJ7/qCQ=;
+        b=FdaoGaTkS65P/x9t4obga6UxeffYbeeWF2dJwRXF+Z/oiufUtbnH0CfZQhQTYUlMOH
+         AnJZHPyBKQy47wnvP+8e+ozA8RbceX4And3kCaiQF0C1TkiDV9+hUcdgF4xoLlSMN11C
+         51EnUTCrO8a5jFfrOLPJLbNTsZEEp5qGyhSBKta7aetUtbbVFzytfR6OXSpfROzCUiZQ
+         SfsmToOSRuAfy+NDmPJ2T7mkrswhw/H/qlmKfWFfVWBfQ5BpwyCGV4o+SPe47uNFdT8n
+         u6u3yZC2MmFLGp9FbSzKvRFJsihXAQ2g/7r3inyZQT8Eyseh2jb79Se4AJj3CevZ6DlZ
+         xekQ==
+X-Gm-Message-State: ACrzQf2sj41/i2ne3es7tyB5Weiyz7DI3LgveUG268ClsrZqwqESH0FI
+        b0u+eRBV8hA86g3RZG66STQzMg==
+X-Google-Smtp-Source: AMsMyM5bRwBjSvlQxjunzry9lBqSVllHge5nfGrWav7re3NtQU4PfgFY/iLmKUI5YvxO/sC4U49WJw==
+X-Received: by 2002:a17:90b:1e4b:b0:20d:2ad0:ce00 with SMTP id pi11-20020a17090b1e4b00b0020d2ad0ce00mr6388449pjb.72.1665592502345;
+        Wed, 12 Oct 2022 09:35:02 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id q2-20020a170902f34200b0017a1145eec7sm10799750ple.157.2022.10.12.09.35.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Oct 2022 09:35:01 -0700 (PDT)
+Date:   Wed, 12 Oct 2022 16:34:57 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Hou Wenlong <houwenlong.hwl@antgroup.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Mark transfer type as X86_TRANSFER_RET when
+ loading CS in iret emulation
+Message-ID: <Y0bssbjJTQVB+SCg@google.com>
+References: <fcaf1408d2aaaa39b33cdd3b11bf06e7e935d11a.1665565774.git.houwenlong.hwl@antgroup.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: e_WqOzVVVFhmksv5dRLxIRlOz-saHstW
-X-Proofpoint-ORIG-GUID: ev99_bxm0-JyLL96BLsIh9FH1T0-NDzQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-12_07,2022-10-12_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
- impostorscore=0 adultscore=0 mlxlogscore=999 bulkscore=0 malwarescore=0
- priorityscore=1501 suspectscore=0 spamscore=0 lowpriorityscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210120106
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fcaf1408d2aaaa39b33cdd3b11bf06e7e935d11a.1665565774.git.houwenlong.hwl@antgroup.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add some basic examples for the definition of cpu topology
-in s390x.
+On Wed, Oct 12, 2022, Hou Wenlong wrote:
+> When loading code segment descriptor in iret instruction emulation, the
+> checks are same as far return instruction emulation, so transfer type
+> should be X86_TRANSFER_RET in __load_segment_descriptor(). Although,
+> only iret in real mode is implemented now, and no checks are actually
+> needed for real mode, it would still be better to mark transfer type as
+> X86_TRANSFER_RET.
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- docs/system/s390x/cpu_topology.rst | 80 ++++++++++++++++++++++++++++++
- 1 file changed, 80 insertions(+)
- create mode 100644 docs/system/s390x/cpu_topology.rst
+It's not strictly a RET though.  The RPL vs. DPL checks in __load_segment_descriptor()
+might do the right thing, but there's a rather large pile of stuff IRET can do that
+RET can't (ignoring the fact that KVM doesn't even emulate FAR RET to outer privilege
+levels).
 
-diff --git a/docs/system/s390x/cpu_topology.rst b/docs/system/s390x/cpu_topology.rst
-new file mode 100644
-index 0000000000..1dcd24cbbc
---- /dev/null
-+++ b/docs/system/s390x/cpu_topology.rst
-@@ -0,0 +1,80 @@
-+CPU Topology on s390x
-+=====================
-+
-+CPU Topology on S390x provides up to 5 levels of topology containers:
-+nodes, drawers, books, sockets and CPUs.
-+While the higher level containers, Containers Topology List Entries,
-+(Containers TLE) define a tree hierarchy, the lowest level of topology
-+definition, the CPU Topology List Entry (CPU TLE), provides the placement
-+of the CPUs inside the parent container.
-+
-+Currently QEMU CPU topology uses a single level of container: the sockets.
-+
-+For backward compatibility, threads can be declared on the ``-smp`` command
-+line. They will be seen as CPUs by the guest as long as multithreading
-+is not really supported by QEMU for S390.
-+
-+Prerequisites
-+-------------
-+
-+To use CPU Topology a Linux QEMU/KVM machine providing the CPU Topology facility
-+(STFLE bit 11) is required.
-+
-+However, since this facility has been enabled by default in an early version
-+of QEMU, we use a capability, ``KVM_CAP_S390_CPU_TOPOLOGY``, to notify KVM
-+QEMU use of the CPU Topology.
-+
-+Indicating the CPU topology to the Virtual Machine
-+--------------------------------------------------
-+
-+The CPU Topology, can be specified on the QEMU command line
-+with the ``-smp`` or the ``-device`` qemu command arguments.
-+
-+Like in :
-+
-+.. code-block:: sh
-+    -smp cpus=5,sockets=8,cores=2,threads=2,maxcpus=32
-+    -device host-s390x-cpu,core-id=14
-+
-+New CPUs can be plugged using the device_add hmp command like in:
-+
-+.. code-block:: sh
-+   (qemu) device_add host-s390x-cpu,core-id=9
-+
-+The core-id defines the placement of the core in the topology by
-+starting with core 0 in socket 0 up to maxcpus.
-+
-+In the example above:
-+
-+* There are 5 cpus provided to the guest with the ``-smp`` command line
-+  They will take the core-ids 0,1,2,3,4
-+  As we have 2 threads in 2 cores in a socket, we have 4 cpus provided
-+  to the guest in socket 0, with core-ids 0,1,2,3.
-+  The last cpu, with core-id 4, will be on socket 1.
-+
-+* the core with ID 14 provided by the ``-device`` command line will
-+  be placed in socket 3, with core-id 14
-+
-+* the core with ID 9 provided by the ``device_add`` qmp command will
-+  be placed in socket 2, with core-id 9
-+
-+Note that the core ID is machine wide and the CPU TLE masks provided
-+by the STSI instruction will be:
-+
-+* in socket 0: 0xf0000000 (core id 0,1,2,3)
-+* in socket 1: 0x00400000 (core id 9)
-+* in socket 1: 0x00020000 (core id 14)
-+
-+Migration
-+---------
-+
-+For virtio-ccw machines older than s390-virtio-ccw-7.3, CPU Topoogy is
-+unavailable.
-+
-+CPU Topoogy is by default enabled for s390-virtio-ccw-7.3 and newer machines.
-+
-+Disabling CPU topology can be done by setting the global option
-+``topology-disable`` to ``on`` like in:
-+
-+.. code-block:: sh
-+   -machine s390-ccw-virtio-7.3,accel=kvm,topology-disable=on
--- 
-2.31.1
+And __emulate_int_real() also loads CS with X86_TRANSFER_NONE, i.e. KVM still has
+a weird path to worry about.
 
+Rather than make the IRET case slightly less wrong, what about adding a sanity
+check in __load_segment_descriptor() that KVM doesn't attempt to load CS in Protected
+Mode with X86_TRANSFER_NONE?
+
+diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+index 3b27622d4642..fe735e18c419 100644
+--- a/arch/x86/kvm/emulate.c
++++ b/arch/x86/kvm/emulate.c
+@@ -1641,6 +1641,14 @@ static int __load_segment_descriptor(struct x86_emulate_ctxt *ctxt,
+                        goto exception;
+                break;
+        case VCPU_SREG_CS:
++               /*
++                * KVM uses "none" when loading CS as part of emulating Real
++                * Mode exceptions and IRET (handled above).  In all other
++                * cases, loading CS without a control transfer is a KVM bug.
++                */
++               if (WARN_ON_ONCE(transfer == X86_TRANSFER_NONE))
++                       goto exception;
++
+                if (!(seg_desc.type & 8))
+                        goto exception;
+
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
+> ---
+>  arch/x86/kvm/emulate.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index 3b27622d4642..5052eb480068 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -2100,6 +2100,7 @@ static int emulate_iret_real(struct x86_emulate_ctxt *ctxt)
+>  			     X86_EFLAGS_FIXED;
+>  	unsigned long vm86_mask = X86_EFLAGS_VM | X86_EFLAGS_VIF |
+>  				  X86_EFLAGS_VIP;
+> +	u8 cpl = ctxt->ops->cpl(ctxt);
+>  
+>  	/* TODO: Add stack limit check */
+>  
+> @@ -2121,7 +2122,8 @@ static int emulate_iret_real(struct x86_emulate_ctxt *ctxt)
+>  	if (rc != X86EMUL_CONTINUE)
+>  		return rc;
+>  
+> -	rc = load_segment_descriptor(ctxt, (u16)cs, VCPU_SREG_CS);
+> +	rc = __load_segment_descriptor(ctxt, (u16)cs, VCPU_SREG_CS, cpl,
+> +				       X86_TRANSFER_RET, NULL);
+>  
+>  	if (rc != X86EMUL_CONTINUE)
+>  		return rc;
+> -- 
+> 2.31.1
+> 
