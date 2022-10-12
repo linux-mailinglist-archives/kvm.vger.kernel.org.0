@@ -2,187 +2,368 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 09D3C5FCE9A
-	for <lists+kvm@lfdr.de>; Thu, 13 Oct 2022 00:54:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6866D5FCEAA
+	for <lists+kvm@lfdr.de>; Thu, 13 Oct 2022 00:59:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229612AbiJLWx6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Oct 2022 18:53:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34102 "EHLO
+        id S229788AbiJLW7f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Oct 2022 18:59:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229550AbiJLWx4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Oct 2022 18:53:56 -0400
-Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FCA71191F9
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 15:53:55 -0700 (PDT)
-Received: by mail-io1-xd2a.google.com with SMTP id n73so5125iod.13
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 15:53:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=RQNjMU9F7vPSKS5uWf+TJ+P/AZGC+XAnlHRyO/MXA08=;
-        b=rEFHKVqXjRvwQxwzGNNKKFp9aOGsLl53zJS6B4HC04ArBiJtVtMayr7GLgt65O+xtM
-         XSii2F5kbX/kegvMstg+rbvPHPeaMkSzCFYq6w70RrfeBBgGGoaM4ENO9LCmsIWUWwDE
-         eT2JK8bZsylPfKGQ7s4U+Cb/JN39xCy4jiycSKOf9k8zvlQzvZkLieDkLuJQoOGN6pMW
-         0YpmVTJWofQHNkSH9CJ5f0t4QaVOBbQk7q0xtASQHjdEhZuCd8xQATwsDwqRpwIOesq1
-         YBzAX5ooidsB6GNtasb8F4BlSnmBBl31994gI/IcgXqb1zyWn8D0pHaeHb0Bm97dxjfs
-         E18w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RQNjMU9F7vPSKS5uWf+TJ+P/AZGC+XAnlHRyO/MXA08=;
-        b=deCkuNh0d08WrhXhJJ4Z/+Uovkg8OpWKXn5rAmFM46FfcgA7npMku6RD5twIp2KYfn
-         4admrCJs0avRzDZaMAMiU+Xx2Eyj/OLMQzY9P7JI7lcvX0Tf7SmckRvxnuGtwnhTvbKR
-         ce71jJnr+Vr1AHkSt9OoOz5baK5w93cX05r3i8emZAPv0eV0A0A49BYpgufjV7PnSXqs
-         d7nlH6UzC/KAhoQj+So5miCjD7kAWVtkdJcg4QXGqMqo07vtimQf+UdKNHvJ3C9pSHei
-         5C3xMqwywpUhQEgo6UReP+L7k4g331ycFmLWOC5ozkIyO1CntnanbjCVCueOg7s4Ztuf
-         9Oww==
-X-Gm-Message-State: ACrzQf0+WVodlRLPIWY7edQh8Ig7A9DjDGRQEmDKcR3gxDEi8l7GvZIC
-        p2dfVSqKxnOGclS6Ynj+W+Wp2/DikdNl2f/JaP0hvg==
-X-Google-Smtp-Source: AMsMyM7e+//UCnfRh+nTLZE0owcwmsn4kCNm6rKOkfT2PnUs3F5HM7g0xf1cXM3+hs8+Yq0l9mPms5F8A4MHIDVW4Zs=
-X-Received: by 2002:a5e:d506:0:b0:6a4:b8b3:a6f0 with SMTP id
- e6-20020a5ed506000000b006a4b8b3a6f0mr14689600iom.138.1665615234351; Wed, 12
- Oct 2022 15:53:54 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1655761627.git.ashish.kalra@amd.com> <d7decd3cb48d962da086afb65feb94a124e5c537.1655761627.git.ashish.kalra@amd.com>
- <CABpDEukNp9eH8jXpv6+Dun+e943AbEMA6G68uQu=TrOLSvh_oA@mail.gmail.com> <318682c1-34a5-44e3-a15e-ef71067d4fd7@amd.com>
-In-Reply-To: <318682c1-34a5-44e3-a15e-ef71067d4fd7@amd.com>
-From:   Alper Gun <alpergun@google.com>
-Date:   Wed, 12 Oct 2022 15:53:43 -0700
-Message-ID: <CABpDEun0KTeWXqRS0Xj5mDTajix_xGt5DTpqtK_wfGcSH3Cu1Q@mail.gmail.com>
-Subject: Re: [PATCH Part2 v6 41/49] KVM: SVM: Add support to handle the RMP
- nested page fault
+        with ESMTP id S229626AbiJLW62 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Oct 2022 18:58:28 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2043.outbound.protection.outlook.com [40.107.223.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18A53120BEB;
+        Wed, 12 Oct 2022 15:58:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Io3q2jwQ8MO1+xn0BTi59o3v08G1MnkTrQBrYGqO4g+X2fDSwsG1vMCbw0dmecl7FWYu2OvcHW6KlMvbwMZdmvkQfIY7AQw/mNVhaYh1gsvVsuI0hbVigG5XBpsUMlT6E4f27ZuncKl6hlCCcWT/VU9ej/+GWP9xiSNGDBJ8eYJ7CP0DQJcMTR7RD1avBns6lGo/TPCthKUT9xVmJ5maA618FyrK9cYM8oRvYo0UQK9p11k0sZZ0YIYPDLEAHagwfoWTvcW84qhK2M0WdIZnKT0xjRERSdjrMYdQiU7sipxoBdQCi2vYcKiqr5/zMU+cDDS5zLDSVbGObMWzfDX49A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NoiPAXbycVc2JvqIJ0QHKmjoUU6vT0Oot4s+R0A+FYU=;
+ b=npM2+yk9IULo0GTsjVpI4yOd19mZmyL2+skSiDKeCeYIXkeny4CWMQcdOXgsUnog4NhRLUdx+nGoEqOb+4GalCYRe8l9eEwkMExFnwqpfAanQEGJVsv/iU97WmagEUksm0RcShUhJq+6OaC27uLK9gqBO3tmzKEFe5Sb2+TW4aPV0Ts4y1hxhMo0X4wkcyhkdlJYSgkhAyWPRr4FjJgqJkvyxkSKPFRS+1SyJD/cf5xPA7jaUQxVvbQzNvaZOtfMwZktFrrNYQiIMlrIDzwt9TeQxkWUb4z/O3Wx2JaxvDiMhG9xpwArKGfRITlRtSXzD0F8vRiKJ2RXxt+/JD3+WA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NoiPAXbycVc2JvqIJ0QHKmjoUU6vT0Oot4s+R0A+FYU=;
+ b=kayLj/AJX/j8TInYGZJu58CtT9M6S05aRso8vQUOUU4Hfk5xMYBxP4yimKHpgpEQHgnd7iO8BVRyo7UDWNQBpdqcKs+H6zkqs2SCJGHWoG4YUSc9JCrKIlSwJ7h7wLzZkEgtbfH3ByeOJ5r+MnjDnDzHT0XJ9jvJ4sGaXKP5uIU=
+Received: from DM6PR07CA0068.namprd07.prod.outlook.com (2603:10b6:5:74::45) by
+ CY5PR12MB6549.namprd12.prod.outlook.com (2603:10b6:930:43::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5709.15; Wed, 12 Oct 2022 22:58:02 +0000
+Received: from DM6NAM11FT055.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:74:cafe::25) by DM6PR07CA0068.outlook.office365.com
+ (2603:10b6:5:74::45) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5709.21 via Frontend
+ Transport; Wed, 12 Oct 2022 22:58:02 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT055.mail.protection.outlook.com (10.13.173.103) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5723.20 via Frontend Transport; Wed, 12 Oct 2022 22:58:02 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Wed, 12 Oct
+ 2022 17:58:01 -0500
+Date:   Wed, 12 Oct 2022 17:57:42 -0500
+From:   Michael Roth <michael.roth@amd.com>
 To:     "Kalra, Ashish" <ashish.kalra@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        bp@alien8.de, michael.roth@amd.com, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        dgilbert@redhat.com, jarkko@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+CC:     Peter Gonda <pgonda@google.com>, Ashish Kalra <ashkalra@amd.com>,
+        "Tom Lendacky" <thomas.lendacky@amd.com>,
+        Alper Gun <alpergun@google.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
+        "Linux Memory Management List" <linux-mm@kvack.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Ingo Molnar" <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        "Andy Lutomirski" <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        "Tobin Feldman-Fitzthum" <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "Vlastimil Babka" <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        "Andi Kleen" <ak@linux.intel.com>, Tony Luck <tony.luck@intel.com>,
+        Marc Orr <marcorr@google.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>, <jarkko@kernel.org>
+Subject: Re: [PATCH Part2 v6 37/49] KVM: SVM: Add support to handle MSR based
+ Page State Change VMGEXIT
+Message-ID: <20221012225742.hirj4kfovrs4cumq@amd.com>
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <78e30b5a25c926fcfdcaafea3d484f1bb25f20b9.1655761627.git.ashish.kalra@amd.com>
+ <CAMkAt6rrGJ5DYTAJKFUTagN9i_opS8u5HPw5c_8NoyEjK7rYzA@mail.gmail.com>
+ <CABpDEum157s5+yQvikjwQRaOcxau27NkMzX9eCs9=HFOW5FYnA@mail.gmail.com>
+ <0716365f-3572-638b-e841-fcce7d30571a@amd.com>
+ <CABpDEu=quPsv6cXfbvpsGS2N+5Pcw7inCfmv=sx3-VaK0UE76g@mail.gmail.com>
+ <8113b5d4-31c6-012c-fc0c-78a9bdbb1e69@amd.com>
+ <31c1b2bb-b43a-709a-2b7e-0e945b9e8bb7@amd.com>
+ <CAMkAt6o=G7W3pRgVYiBKK5RjQskMfzL_9me2Hcr7_e9rTHuStw@mail.gmail.com>
+ <53010b89-ae47-0065-9238-0ab065b70a44@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <53010b89-ae47-0065-9238-0ab065b70a44@amd.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT055:EE_|CY5PR12MB6549:EE_
+X-MS-Office365-Filtering-Correlation-Id: 38aa3887-8453-4066-c677-08daaca5377f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 16Wzrbt8r0rJkOZeuL/0kd7H+1AaqkrWQ0OP6/aYa126+DMqSmsVrWcJXVQWIylF5grww8MVD/p3Fg5hglwKt9QvFM2g9Q/cAA+DR5zVywjBKnm7350bJn6q2hY6M0t4qJDVT7MbrNeV0e/uLMZtep8+MfYK7juqqp1uK2Ccc+COQC7/9p5nGQBbDz4mTq4pLSpZIwZrpWjPfWUq8e2F2NADQw+G3R5rDZKcSSFIUwLK5HmbNDwxosrgxKRopGrA008VXfwC3kJy2WydckHNXfnm/4QOdjnVge1BusDQLowZx52QL6POOBQEvh2Sk5K4tFUt4YWBXYoY2Y/JgHh4B/uGRKV+x+RWIBbKA2uI10GIiO0Joe+Ox+6NKeG+oJrShZN4GVS9j7hKhoAbl3F7AP++x+xLTykFggVxhVb4bmLZSIHWUbgYrcweNRKdYA2uzspAJMs2hV9k0C1s3Ek+LYWi8A884zMPzRzrTQ5Z7pHf8e3hhHh8QIg1q6v35Bf5P0UXvttYmmnkzS41t8ejJ3u3Gg+keaDO66XO1brN4zRLqHzNlry5BvDMjckGyuUgKdCvqNQB736gvFcaxba5MaOpuMR87FpNlcD3h2gMgQ3FdBMB71p5zCqFQfDO2gYWj4b79SXuEhiOhw/65uFE1p41AyclDBMSLPpN8YyKqCZXIhXSEjuvHuKXjdHJ0Qv2b9txZ8gM+WbyGurLYRKzgAlRbaHCt7L5r+3WevvYQEtWT/3EcsEkPvxdc7uuYBn+VdyjddgdBBJe7GC+TpuonjR3cpFy504fD7iVxggey49b/VAFm9Fe1YWrGyB2HQUQ
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(396003)(376002)(346002)(39860400002)(136003)(451199015)(46966006)(40470700004)(36840700001)(66899015)(26005)(36860700001)(37006003)(54906003)(8676002)(6636002)(316002)(36756003)(82740400003)(356005)(40480700001)(40460700003)(86362001)(478600001)(2616005)(6666004)(336012)(83380400001)(5660300002)(426003)(1076003)(7406005)(7416002)(53546011)(47076005)(16526019)(4326008)(8936002)(6862004)(2906002)(81166007)(186003)(41300700001)(44832011)(70586007)(70206006)(82310400005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2022 22:58:02.5642
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 38aa3887-8453-4066-c677-08daaca5377f
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT055.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6549
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_FILL_THIS_FORM_SHORT
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 10, 2022 at 7:32 PM Kalra, Ashish <ashish.kalra@amd.com> wrote:
->
-> Hello Alper,
->
-> On 10/10/2022 5:03 PM, Alper Gun wrote:
-> > On Mon, Jun 20, 2022 at 4:13 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
-> >>
-> >> From: Brijesh Singh <brijesh.singh@amd.com>
-> >>
-> >> When SEV-SNP is enabled in the guest, the hardware places restrictions on
-> >> all memory accesses based on the contents of the RMP table. When hardware
-> >> encounters RMP check failure caused by the guest memory access it raises
-> >> the #NPF. The error code contains additional information on the access
-> >> type. See the APM volume 2 for additional information.
-> >>
-> >> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> >> ---
-> >>   arch/x86/kvm/svm/sev.c | 76 ++++++++++++++++++++++++++++++++++++++++++
-> >>   arch/x86/kvm/svm/svm.c | 14 +++++---
-> >>   2 files changed, 86 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> >> index 4ed90331bca0..7fc0fad87054 100644
-> >> --- a/arch/x86/kvm/svm/sev.c
-> >> +++ b/arch/x86/kvm/svm/sev.c
-> >> @@ -4009,3 +4009,79 @@ void sev_post_unmap_gfn(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn)
-> >>
-> >>          spin_unlock(&sev->psc_lock);
-> >>   }
-> >> +
-> >> +void handle_rmp_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
-> >> +{
-> >> +       int rmp_level, npt_level, rc, assigned;
-> >> +       struct kvm *kvm = vcpu->kvm;
-> >> +       gfn_t gfn = gpa_to_gfn(gpa);
-> >> +       bool need_psc = false;
-> >> +       enum psc_op psc_op;
-> >> +       kvm_pfn_t pfn;
-> >> +       bool private;
-> >> +
-> >> +       write_lock(&kvm->mmu_lock);
-> >> +
-> >> +       if (unlikely(!kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn, &npt_level)))
-> >> +               goto unlock;
-> >> +
-> >> +       assigned = snp_lookup_rmpentry(pfn, &rmp_level);
-> >> +       if (unlikely(assigned < 0))
-> >> +               goto unlock;
-> >> +
-> >> +       private = !!(error_code & PFERR_GUEST_ENC_MASK);
-> >> +
-> >> +       /*
-> >> +        * If the fault was due to size mismatch, or NPT and RMP page level's
-> >> +        * are not in sync, then use PSMASH to split the RMP entry into 4K.
-> >> +        */
-> >> +       if ((error_code & PFERR_GUEST_SIZEM_MASK) ||
-> >> +           (npt_level == PG_LEVEL_4K && rmp_level == PG_LEVEL_2M && private)) {
-> >> +               rc = snp_rmptable_psmash(kvm, pfn);
-> >
-> >
-> > Regarding this case:
-> > RMP level is 4K
-> > Page table level is 2M
-> >
-> > Does this also cause a page fault with size mismatch? If so, we
-> > shouldn't try psmash because the rmp entry is already 4K.
-> >
-> > I see these errors in our tests and I think it may be happening
-> > because rmp size is already 4K.
-> >
-> > [ 1848.752952] psmash failed, gpa 0x191560000 pfn 0x536cd60 rc 7
-> > [ 2922.879635] psmash failed, gpa 0x102830000 pfn 0x37c8230 rc 7
-> > [ 3010.983090] psmash failed, gpa 0x104220000 pfn 0x6cf1e20 rc 7
-> > [ 3170.792050] psmash failed, gpa 0x108a80000 pfn 0x20e0080 rc 7
-> > [ 3345.955147] psmash failed, gpa 0x11b480000 pfn 0x1545e480 rc 7
-> >
-> > Shouldn't we use AND instead of OR in the if statement?
-> >
->
-> I believe this we can't do, looking at the typical usage case below :
->
-> [   37.243969] #VMEXIT (NPF) - SIZEM, err 0xc80000005 npt_level 2,
-> rmp_level 2, private 1
-> [   37.243973] trying psmash gpa 0x7f790000 pfn 0x1f5d90
->
-> This is typically the case with #VMEXIT(NPF) with SIZEM error code, when
-> the guest tries to do PVALIDATE on 4K GHCB pages, in this case both the
-> RMP table and NPT will be optimally setup to 2M hugepage as can be seen.
->
-> Is it possible to investigate in more depth, when is the this case being
-> observed:
+On Wed, Oct 12, 2022 at 03:15:15PM -0500, Kalra, Ashish wrote:
+> On 9/26/2022 10:19 AM, Peter Gonda wrote:
+> > On Mon, Sep 19, 2022 at 5:47 PM Ashish Kalra <ashkalra@amd.com> wrote:
+> > > 
+> > > 
+> > > On 9/19/22 22:18, Tom Lendacky wrote:
+> > > > On 9/19/22 17:02, Alper Gun wrote:
+> > > > > On Mon, Sep 19, 2022 at 2:38 PM Tom Lendacky
+> > > > > <thomas.lendacky@amd.com> wrote:
+> > > > > > 
+> > > > > > On 9/19/22 12:53, Alper Gun wrote:
+> > > > > > > On Fri, Aug 19, 2022 at 9:54 AM Peter Gonda <pgonda@google.com> wrote:
+> > > > > > > > 
+> > > > > > > > > +
+> > > > > > > > > +static int __snp_handle_page_state_change(struct kvm_vcpu *vcpu,
+> > > > > > > > > enum psc_op op, gpa_t gpa,
+> > > > > > > > > +                                         int level)
+> > > > > > > > > +{
+> > > > > > > > > +       struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
+> > > > > > > > > +       struct kvm *kvm = vcpu->kvm;
+> > > > > > > > > +       int rc, npt_level;
+> > > > > > > > > +       kvm_pfn_t pfn;
+> > > > > > > > > +       gpa_t gpa_end;
+> > > > > > > > > +
+> > > > > > > > > +       gpa_end = gpa + page_level_size(level);
+> > > > > > > > > +
+> > > > > > > > > +       while (gpa < gpa_end) {
+> > > > > > > > > +               /*
+> > > > > > > > > +                * If the gpa is not present in the NPT then
+> > > > > > > > > build the NPT.
+> > > > > > > > > +                */
+> > > > > > > > > +               rc = snp_check_and_build_npt(vcpu, gpa, level);
+> > > > > > > > > +               if (rc)
+> > > > > > > > > +                       return -EINVAL;
+> > > > > > > > > +
+> > > > > > > > > +               if (op == SNP_PAGE_STATE_PRIVATE) {
+> > > > > > > > > +                       hva_t hva;
+> > > > > > > > > +
+> > > > > > > > > +                       if (snp_gpa_to_hva(kvm, gpa, &hva))
+> > > > > > > > > +                               return -EINVAL;
+> > > > > > > > > +
+> > > > > > > > > +                       /*
+> > > > > > > > > +                        * Verify that the hva range is
+> > > > > > > > > registered. This enforcement is
+> > > > > > > > > +                        * required to avoid the cases where a
+> > > > > > > > > page is marked private
+> > > > > > > > > +                        * in the RMP table but never gets
+> > > > > > > > > cleanup during the VM
+> > > > > > > > > +                        * termination path.
+> > > > > > > > > +                        */
+> > > > > > > > > +                       mutex_lock(&kvm->lock);
+> > > > > > > > > +                       rc = is_hva_registered(kvm, hva,
+> > > > > > > > > page_level_size(level));
+> > > > > > > > > +                       mutex_unlock(&kvm->lock);
+> > > > > > > > > +                       if (!rc)
+> > > > > > > > > +                               return -EINVAL;
+> > > > > > > > > +
+> > > > > > > > > +                       /*
+> > > > > > > > > +                        * Mark the userspace range unmerable
+> > > > > > > > > before adding the pages
+> > > > > > > > > +                        * in the RMP table.
+> > > > > > > > > +                        */
+> > > > > > > > > +                       mmap_write_lock(kvm->mm);
+> > > > > > > > > +                       rc = snp_mark_unmergable(kvm, hva,
+> > > > > > > > > page_level_size(level));
+> > > > > > > > > +                       mmap_write_unlock(kvm->mm);
+> > > > > > > > > +                       if (rc)
+> > > > > > > > > +                               return -EINVAL;
+> > > > > > > > > +               }
+> > > > > > > > > +
+> > > > > > > > > +               write_lock(&kvm->mmu_lock);
+> > > > > > > > > +
+> > > > > > > > > +               rc = kvm_mmu_get_tdp_walk(vcpu, gpa, &pfn,
+> > > > > > > > > &npt_level);
+> > > > > > > > > +               if (!rc) {
+> > > > > > > > > +                       /*
+> > > > > > > > > +                        * This may happen if another vCPU
+> > > > > > > > > unmapped the page
+> > > > > > > > > +                        * before we acquire the lock. Retry the
+> > > > > > > > > PSC.
+> > > > > > > > > +                        */
+> > > > > > > > > + write_unlock(&kvm->mmu_lock);
+> > > > > > > > > +                       return 0;
+> > > > > > > > > +               }
+> > > > > > > > 
+> > > > > > > > I think we want to return -EAGAIN or similar if we want the caller to
+> > > > > > > > retry, right? I think returning 0 here hides the error.
+> > > > > > > > 
+> > > > > > > 
+> > > > > > > The problem here is that the caller(linux guest kernel) doesn't retry
+> > > > > > > if PSC fails. The current implementation in the guest kernel is that
+> > > > > > > if a page state change request fails, it terminates the VM with
+> > > > > > > GHCB_TERM_PSC reason.
+> > > > > > > Returning 0 here is not a good option because it will fail the PSC
+> > > > > > > silently and will probably cause a nested RMP fault later. Returning
+> > > > > > 
+> > > > > > Returning 0 here is ok because the PSC current index into the PSC
+> > > > > > structure will not be updated and the guest will then retry (see the
+> > > > > > loop
+> > > > > > in vmgexit_psc() in arch/x86/kernel/sev.c).
+> > > > > > 
+> > > > > > Thanks,
+> > > > > > Tom
+> > > > > 
+> > > > > But the host code updates the index. It doesn't leave the loop because
+> > > > > rc is 0. The guest will think that it is successful.
+> > > > > rc = __snp_handle_page_state_change(vcpu, op, gpa, level);
+> > > > > if (rc)
+> > > > > goto out;
+> > > > > 
+> > > > > Also the page state change request with MSR is not retried. It
+> > > > > terminates the VM if the MSR request fails.
+> > > > 
+> > > > Ah, right. I see what you mean. It should probably return a -EAGAIN
+> > > > instead of 0 and then the if (rc) check should be modified to
+> > > > specifically look for -EAGAIN and goto out after setting rc to 0.
+> > > > 
+> > > > But that does leave the MSR protocol open to the problem that you
+> > > > mention, so, yes, retry logic in snp_handle_page_state_change() for a
+> > > > -EAGAIN seems reasonable.
+> > > > 
+> > > > Thanks,
+> > > > Tom
+> > > 
+> > > I believe it makes more sense to add the retry logic within
+> > > __snp_handle_page_state_change() itself, as that will make it work for
+> > > both the GHCB MSR protocol and the GHCB VMGEXIT requests.
+> > 
+> > You are suggesting we just retry 'kvm_mmu_get_tdp_walk' inside of
+> > __snp_handle_page_state_change()? That should work but how many times
+> > do we retry? If we return EAGAIN or error we can leave it up to the
+> > caller
+> > 
+> 
+> Ok, we return -EAGAIN here and then let the caller in
+> snp_handle_page_state_change() or sev_handle_vmgexit_msr_protocol()
+> (in case of GHCB MSR protocol) do the retries.
+> 
+> But, the question still remains, how may retry attempts should the caller
+> attempt ?
 
-Yes, I added more logs and I can see that these errors happen when RMP
-level is 4K and NPT level is 2M.
-psmash fails as expected. I think it is just a log, there is no real
-issue but the best is not trying psmash if rmp level is 4K.
+With UPM I don't think we need to deal with this particular case, since we
+don't need to walk the NPT to determine the PFN. The PSC will simply get
+forward to userspace, and userspace will (generally):
 
-> RMP level is 4K
-> Page table level is 2M
-> We shouldn't try psmash because the rmp entry is already 4K.
->
+ for shared->private:
+   - deallocate page in shared pool
+   - allocate page in private pool
+   - issue KVM_MEM_ENCRYPT_REG_REGION on the GFN to switch it to private
+     in the KVM xarray and RMP table (and zap current NPT mapping)
+   - resume guest
+   - guest faults on GFN and KVM MMU sees that it is private and maps the GFN
+     to the corresponding PFN in the private pool, which should be reliably
+     obtainable since it is pinned
+
+ for private->shared:
+   - deallocate page in private pool (which will switch it to shared in
+     RMP table so it can be safely released back to host)
+   - allocate page in shared pool
+   - issue KVM_MEM_ENCRYPT_UNREG_REGION on the GFN to switch it to
+     shared in the KVM xarray (and zap current NPT mapping)
+   - resume guest
+   - guest faults on GFN and KVM MMU sees that it is shared and handles it
+     just like it would a normal non-SEV guest, so we don't ever need to
+     acquire the specific PFN backing the HVA since they are implicitly
+     shared, so no need anymore for kvm_mmu_get_tdp_walk() helper
+
+     (also no need for pre-mapping into TDP via kvm_mmu_map_tdp_page() in
+     this case, but not sure that was needed even without UPM, seems more like
+     an optimization to avoid a 2nd #NPF. I guess we still have the option with
+     UPM though if it seems justified, but it would likely happen in
+     {REG,UNREG}_REGION in that case rather than SNP-specific hooks)
+
+There may be some other edge cases to consider, but I'm not aware of any
+sequences that aren't clearly misbehavior on the part of userspace/guest,
+in which case terminating at the host/guest level seems reasonable.
+
+-Mike
+
+> 
 > Thanks,
 > Ashish
->
-> > if ((error_code & PFERR_GUEST_SIZEM_MASK) && ...
-> >
+> 
+> > > > 
+> > > > > 
+> > > > > > 
+> > > > > > > an error also terminates the guest immediately with current guest
+> > > > > > > implementation. I think the best approach here is adding a retry logic
+> > > > > > > to this function. Retrying without returning an error should help it
+> > > > > > > work because snp_check_and_build_npt will be called again and in the
+> > > > > > > second attempt this should work.
+> > > > > > > 
+> > > > > > > > > +
+> > > > > > > > > +               /*
+> > > > > > > > > +                * Adjust the level so that we don't go higher
+> > > > > > > > > than the backing
+> > > > > > > > > +                * page level.
+> > > > > > > > > +                */
+> > > > > > > > > +               level = min_t(size_t, level, npt_level);
+> > > > > > > > > +
+> > > > > > > > > +               trace_kvm_snp_psc(vcpu->vcpu_id, pfn, gpa, op,
+> > > > > > > > > level);
+> > > > > > > > > +
+> > > > > > > > > +               switch (op) {
+> > > > > > > > > +               case SNP_PAGE_STATE_SHARED:
+> > > > > > > > > +                       rc = snp_make_page_shared(kvm, gpa, pfn,
+> > > > > > > > > level);
+> > > > > > > > > +                       break;
+> > > > > > > > > +               case SNP_PAGE_STATE_PRIVATE:
+> > > > > > > > > +                       rc = rmp_make_private(pfn, gpa, level,
+> > > > > > > > > sev->asid, false);
+> > > > > > > > > +                       break;
+> > > > > > > > > +               default:
+> > > > > > > > > +                       rc = -EINVAL;
+> > > > > > > > > +                       break;
+> > > > > > > > > +               }
+> > > > > > > > > +
+> > > > > > > > > +               write_unlock(&kvm->mmu_lock);
+> > > > > > > > > +
+> > > > > > > > > +               if (rc) {
+> > > > > > > > > +                       pr_err_ratelimited("Error op %d gpa %llx
+> > > > > > > > > pfn %llx level %d rc %d\n",
+> > > > > > > > > +                                          op, gpa, pfn, level, rc);
+> > > > > > > > > +                       return rc;
+> > > > > > > > > +               }
+> > > > > > > > > +
+> > > > > > > > > +               gpa = gpa + page_level_size(level);
+> > > > > > > > > +       }
+> > > > > > > > > +
+> > > > > > > > > +       return 0;
+> > > > > > > > > +}
+> > > > > > > > > +
