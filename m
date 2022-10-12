@@ -2,81 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D26D85FCCCB
-	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 23:10:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 59ED15FCCCF
+	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 23:11:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229732AbiJLVKK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Oct 2022 17:10:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45872 "EHLO
+        id S229851AbiJLVLa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Oct 2022 17:11:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229686AbiJLVKH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Oct 2022 17:10:07 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDB0F5E64C
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 14:10:06 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id d24so35090pls.4
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 14:10:06 -0700 (PDT)
+        with ESMTP id S229831AbiJLVL3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Oct 2022 17:11:29 -0400
+Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37F9D114DD5
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 14:11:28 -0700 (PDT)
+Received: by mail-io1-xd4a.google.com with SMTP id n23-20020a056602341700b00689fc6dbfd6so12024564ioz.8
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 14:11:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wjaTEfJW5Bp0cQ1SgqTjNeIGFXK/pZcyrdaMaR+Pa9k=;
-        b=VL2awohoutj1yH/bSjK02iCcRXB1F+Uyl/PBoTnn92KaWqwAjytTQXjB0yJFTij60T
-         CE9SdcPfR/FgTAJ3lf5kHS4GOp9EUfcwk0ekcdwOxYkJJfzaV+q9SvS00M1cripbMq6J
-         K+QfHkx2H07aCvO2qwT3caw3ME5HN+rTUN8x0p5sAIfdtmLpyUy8DlfHP9DDB5NO7P0Z
-         ahxQxYFUdIK1kS1/K7Quz5P1/3DcOJtaHNGhBVyKgrOdPfb0rR1Vsxty96tFPnKgsShj
-         SsmspqcD7OCL4c+k6C6GZG0FsHr+nJvAhnCeFmvachLNmC+8ISwHICBa6DMzbxIhZjsd
-         2ULQ==
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=BU0PmmEyqdDZtH0P95soOoLlcvNj0UCw8s+AE9RKqZA=;
+        b=l8K1Ymw3j4umU1WkgYkyA4IcN0FCf/rcfX8Et+q/aNSANMGcmN0n/Njey8Sk1Uf9v1
+         /EnQXrbP2nLWpyodxNkUUK9wfm4Bz+F+xOPFV+MMAEvBe1E+Iu1EHSXkaPaAXOsWS8wd
+         jKuLhbJPKSGyMtDRMUdJPjhjkETfcZH4D17IY0xhEXZPMbwp1TOdXig29FAI247xfdpQ
+         WWK/BtwHfkpdKsy1reagXWCyMbi1xyR8z6WIRl6QRDq+ZzC0WNKWqgYDz/KjVcBmYfWq
+         H/dsz5/R08j5bVPHakD4Wr9E8yCVg7pWaeCiCvrOqsg+O1yu5G04E0zOifaJHmy0mvCe
+         J61A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wjaTEfJW5Bp0cQ1SgqTjNeIGFXK/pZcyrdaMaR+Pa9k=;
-        b=lIqv34kE0pmZqEbbPpTQDFKx2SGm8zBVsoAu448bFQ2+AyVEUjqxC6ePhiAbhQKLkv
-         6tvA2kQEX5mwBGtzoHQjbLzuh150+0aLVs3c6vCubZ2RTeeGovEYgcwcjFb9qIMxrhMm
-         2DbZOipkqoWOTKp/0zKOhbN7r6uxrPiCMA6nSZmbvHHqtkyV5tF3/KQfh2mu7fMDwS1w
-         m9nsaF7RlGbzkkwXdYREjHHR//wVXpPP1f/N4SHN948r1DWXxsDhxrzSVfjevIzksFXr
-         KEzVIB8qbHRLnTCu7k25GnPgunIy4GaHQV/fXZF7rcB8BEnG5oo5hFLg9whXKxM7krEQ
-         SPFQ==
-X-Gm-Message-State: ACrzQf32RmZ+gtBd+KREqGkRoHYKWhchjaAjc9eO3Le8Kq0wQ5hTfjCk
-        AZ6HG5SKr0nRZ3HR7BoKYXAIuCPiko1viQ==
-X-Google-Smtp-Source: AMsMyM442BMSD5mIJngvPBzBEq79NZQgzFi1rf7LeT0pHARAlXsrIPhEuYTeCKZHlFZzLVEQX9nrDA==
-X-Received: by 2002:a17:903:244c:b0:183:afb6:e803 with SMTP id l12-20020a170903244c00b00183afb6e803mr10356683pls.164.1665609006386;
-        Wed, 12 Oct 2022 14:10:06 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id h19-20020aa796d3000000b0056126b79072sm337513pfq.21.2022.10.12.14.10.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Oct 2022 14:10:05 -0700 (PDT)
-Date:   Wed, 12 Oct 2022 21:10:02 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     isaku.yamahata@intel.com
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        isaku.yamahata@gmail.com, Kai Huang <kai.huang@intel.com>,
-        Chao Gao <chao.gao@intel.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Shaokun Zhang <zhangshaokun@hisilicon.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v5 17/30] KVM: Move out KVM arch PM hooks and hardware
- enable/disable logic
-Message-ID: <Y0ctKrMAmX8WvWRA@google.com>
-References: <cover.1663869838.git.isaku.yamahata@intel.com>
- <245445b7326fb86cdae11ad2709d5f3dac3c9e53.1663869838.git.isaku.yamahata@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <245445b7326fb86cdae11ad2709d5f3dac3c9e53.1663869838.git.isaku.yamahata@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BU0PmmEyqdDZtH0P95soOoLlcvNj0UCw8s+AE9RKqZA=;
+        b=vfSe07O8niUk9N1TCDtmiAAuTI+JHoqGlNeBull33hcDlDy09Ctx9Yt2pC0u5lJExL
+         m4GSKBIQUQRQWCQ5/9D7+MG4PAwwFyRFTMWnzaf74tZY0xF5h1Wh6SumEyF+nE2q86bx
+         MdvnXVEcO8xLnvfk2z0/D4RaqqS5CLimkh5B+PXBWhbxUjA/E8NTekEANrmO57SM6WkN
+         VGUQdvq69eqmqAiAZFZPHjmB0LDcyM273F8YfFx2Ih/SzS3zrswHG4V6B1IBoWEsjdi4
+         xpNZ6sv18i4IsRvkK46W7PrBD/i2/XskcP2Q7vohXtmXuufdJMf+bNr5ZwNKtZPpPyRb
+         j8kg==
+X-Gm-Message-State: ACrzQf0HSBQVsPYm+TrLm6S+PG2Le3Zz9BXtiw6ZHRtDdOLKE/kdyDI9
+        A+srH8qdBc+yQcLTEibUwGN8IZgXtdkyi2Otpg==
+X-Google-Smtp-Source: AMsMyM5uCuGRZ2TGzsD82V9IYYbBScxYI9Dk0AaZunTjzuPzRiVOLkA29UPPjx0MXpDWkn0qPWlmOlZeYp7RlZU94w==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6e02:1b88:b0:2fa:cf20:3a21 with
+ SMTP id h8-20020a056e021b8800b002facf203a21mr14986833ili.137.1665609087620;
+ Wed, 12 Oct 2022 14:11:27 -0700 (PDT)
+Date:   Wed, 12 Oct 2022 21:11:26 +0000
+In-Reply-To: <Y0YAdQC7eP1TN90b@google.com> (message from Sean Christopherson
+ on Tue, 11 Oct 2022 23:47:01 +0000)
+Mime-Version: 1.0
+Message-ID: <gsnt1qrc3fy9.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v6 1/3] KVM: selftests: implement random number generation
+ for guest code
+From:   Colton Lewis <coltonlewis@google.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        dmatlack@google.com, oupton@google.com, ricarkol@google.com,
+        andrew.jones@linux.dev
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -84,15 +68,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 22, 2022, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> To make clear that those files are default implementation
+Sean Christopherson <seanjc@google.com> writes:
 
-Heh, this is debatable, I was quite confused/surprised by seeing kvm_arch.c.  It's
-also incomplete, which is further confusing, since there are a lot of default hooks
-that are left behind.  And we most definitely don't want to move all of them, since
-many of those hooks are pure nops, i.e. get completely compiled out.
+> On Tue, Oct 11, 2022, Colton Lewis wrote:
+>> Sean Christopherson <seanjc@google.com> writes:
+>> > Regardless of whether or not the details are gory, having to be aware  
+>> of
+>> > those details unnecessarily impedes understanding the code.  The vast,  
+>> vast
+>> > majority of folks that read this code won't care about how PRNGs work.
+>> > Even if the reader is familiar with PRNGs, those details aren't at all
+>> > relevant to understanding what the guest code does.  The reader only  
+>> needs
+>> > to know "oh, this is randomizing the address".  How the randomization  
+>> works
+>> > is completely irrelevant for that level of understanding.
 
-Given that we want this code to go away sooner than later, I don't think adding
-a temporarily to-be-deleted file makes sense.
+>> It is relevant if the reader of the guest code cares about reentrancy
+>> and thread-safety (good for such things as reproducing the same stream
+>> of randoms from the same initial conditions), because they will have to
+>> manage some state to make that work. Whether that state is an integer or
+>> an opaque struct requires the same level of knowledge to use the API.
+
+> By "readers" I'm not (only) talking about developers actively writing  
+> code, I'm
+> I'm talking about people that run this test, encounter a failure, and  
+> read the code
+> to try and understand what went wrong.  For those people, knowing that  
+> the guest is
+> generating a random number is sufficient information during initial  
+> triage.  If the
+> failure ends up being related to the random number, then yes they'll  
+> likely need to
+> learn the details, but that's a few steps down the road.
+
+
+Ok. That makes sense to me.
+
+>> > > I agree returning the value could make it easier to use as part of
+>> > > expressions, but is it that important?
+
+>> > Yes, because in pretty much every use case, the random number is going  
+>> to
+>> > be immediately consumed.  Readability and robustness aside, returning  
+>> the
+>> > value cuts the amount of code need to generate and consume a random  
+>> number
+>> > in half.
+
+>> Ok. This is trivial to change (or implement on top of what is
+>> there). Would you be happy with something like the following?
+
+>> uint32_t guest_random(uint32_t *seed)
+>> {
+>> 	*seed = (uint64_t)*seed * 48271 % ((uint32_t)(1 << 31) - 1);
+>> 	return *seed;
+>> }
+
+> Honestly, no.  I truly don't understand the pushback on throwing the seed  
+> into
+> a struct and giving the helpers more precise names.  E.g. without looking  
+> at the
+> prototype, guest_random() tells the reader nothing about the size of the  
+> random
+> number returned, whereas <namespace>_random_u32() or  
+> <namespace>_get_random_u32()
+> (if we want to more closely follow kernel nomenclature) tells the reader  
+> exactly
+> what is returned.
+
+
+If that's what you care about, I'll wrap the state and put better
+information in the names. I think I misunderstood your original comments
+to mean you wanted something much more expansive than you really did and
+I'm getting tired of redoing this patch.
+
+> The code is trivial to write and I can't think of any meaningful  
+> downside.  Worst
+> case scenario, we end up with an implementation that is slightly more  
+> formal than
+> then we really need.
+
+As a matter of personal taste, I don't like the additional formality
+making things look more complicated than they are. The stakes are small
+here but that kind of extra boilerplate can add up to make things
+confusing.
+
+Thanks for your patience. I never wanted to cause trouble.
