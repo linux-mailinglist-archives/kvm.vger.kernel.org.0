@@ -2,138 +2,256 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 567635FC8D8
-	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 18:05:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EE435FC90D
+	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 18:21:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229600AbiJLQFx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Oct 2022 12:05:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50732 "EHLO
+        id S229776AbiJLQVd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Oct 2022 12:21:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229733AbiJLQFv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Oct 2022 12:05:51 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C38E3753B0
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 09:05:50 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id pq16so15672488pjb.2
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 09:05:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=enbmISb3NwCM4DbXn/DwQoZKZgOZCD6E3xV48iVN1Og=;
-        b=m5F8qFJGBxFIeg20XFGxqcny2ByrS6fRZu4TwNdU/NpqHnhuSG6rR9ckpqyFbY01FQ
-         CiobMnO49rWL9nZLkwQQk4y6ioS/OE2jYK2OglqxF8wygXJyggELIPOkrP2CDHNUwE6q
-         6VdjvG49eCUjhd619FXeMaAlhpIoi8QYm1XowWaMLI+VRTlVldTw5AszRl3goC0Wowvz
-         3lhHMgkc9SQxNG8NzY3cJ+AD5ylhnbj5pcAzUuHm4vTGjWyVpTpSIZDqG5+/Z5aHVAT1
-         aAllPsIlVeGgf00Ecn88g90CvfvMM+3pVjpIE/f1Q3DN2nwwUtNu6xCPc76XRF8QQzda
-         gELQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=enbmISb3NwCM4DbXn/DwQoZKZgOZCD6E3xV48iVN1Og=;
-        b=aFsKNPZxa2iEgnEsKTOurpFo36+Ne3u8mBbYbBOZeQELhufhGnC9VFOf9k2Ine4FcN
-         NlSRpFX6dlVOpztaF4p7YxDfeJ6tgw63qyDg59+6kLJxrObTTjKT1WMxjf5yl9cx4zYz
-         n7F4ksRpOM/iGxo9MII2RG8mcLNCMERFf1r3xLkFzSAXYETW/HnVR8JB5y/S/HKkZpPJ
-         6IlnoflLT9qFna8n5ixqgghIWRz+CkO/YFJX6+erEBdwIoYoKnqvvUnAGau1aOwLNGCO
-         cJT5dsY4fPF0nSaKJMwtiX+5CYJJdBiVXUwy1eAwQ+a7nchzwBcwrly0jUb2LuYLu23C
-         WTcg==
-X-Gm-Message-State: ACrzQf11iEV1ORbhnmBvqOFWKpDxRGeprVMZ9KOIqj1k0eflIs5d8NaE
-        3xeyKlgZeI6jRSyl1lHNkNLJCQ==
-X-Google-Smtp-Source: AMsMyM4ujjInYGZ6D4HVYOvu5Sm4p6UoXALhGvZayBjp+zBuZQMMRjM16zywX2YpV7NyU6hy3heewA==
-X-Received: by 2002:a17:902:6bc8:b0:178:81db:c6d9 with SMTP id m8-20020a1709026bc800b0017881dbc6d9mr30903720plt.56.1665590750137;
-        Wed, 12 Oct 2022 09:05:50 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id x2-20020a170902ea8200b0016d5b7fb02esm10782257plb.60.2022.10.12.09.05.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Oct 2022 09:05:49 -0700 (PDT)
-Date:   Wed, 12 Oct 2022 16:05:45 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Li RongQing <lirongqing@baidu.com>
-Cc:     kvm@vger.kernel.org, Peter Shier <pshier@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>
-Subject: Re: [PATCH][RFC] KVM: x86: Don't reset deadline to period when timer
- is in one shot mode
-Message-ID: <Y0bl2WjoG12WcCPv@google.com>
-References: <1665579268-7336-1-git-send-email-lirongqing@baidu.com>
+        with ESMTP id S229462AbiJLQVa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Oct 2022 12:21:30 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AFD6220E6
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 09:21:29 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29CFCYJi029528;
+        Wed, 12 Oct 2022 16:21:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=zZT2uzSpT3q9XjUcEP7tqYMqB0dCmsWj/XCbAGFuCo8=;
+ b=Eq/unVxBzrjpLYHYS9S+c1yLOFpSQJCKywlHN2lKipH9favCsMSHpmzJd3By9PjWhAPB
+ MUelE9Ys6J/fanPmQxQEs+p4Lzutg2f9SwyjTvldhnS8x5qS9cbL/8GOgfUHt+BwgCwf
+ Y6WLQ0J7OOGbFYPSQeMKuJqmxzNTz3MGeFTTYCnQQS9vyo9Z2jdNQ4EQoLrgQ7lRIfCz
+ lkU/ozMEzuiS4jsgh1iyFH11r+296vRS8Rmp0Bmifxyc2mXKD9tTjNQj3Rg60Q7RtI/x
+ qAFkHTY028fJHCeinh6XhH8DSXGatEocEb0oMVMDTfI0tgHWQr+tJckWgTV5/kOX24vE aQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k5xwvmcq6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 12 Oct 2022 16:21:19 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29CFDpol035001;
+        Wed, 12 Oct 2022 16:21:18 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k5xwvmcp4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 12 Oct 2022 16:21:18 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29CGLEYA026194;
+        Wed, 12 Oct 2022 16:21:16 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma05fra.de.ibm.com with ESMTP id 3k30u9mqu8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 12 Oct 2022 16:21:16 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29CGLCi557803230
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 12 Oct 2022 16:21:12 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8A7C6A405B;
+        Wed, 12 Oct 2022 16:21:12 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8B453A4054;
+        Wed, 12 Oct 2022 16:21:11 +0000 (GMT)
+Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.34.168])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 12 Oct 2022 16:21:11 +0000 (GMT)
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+Subject: [PATCH v10 0/9] s390x: CPU Topology
+Date:   Wed, 12 Oct 2022 18:20:58 +0200
+Message-Id: <20221012162107.91734-1-pmorel@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1665579268-7336-1-git-send-email-lirongqing@baidu.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: y-nHzy9ghktJqVRhEZuQClpyy4cgiluJ
+X-Proofpoint-ORIG-GUID: ALjjRAjiZS66q8u3d4tq6onKwk0vmAaN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-12_07,2022-10-12_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ spamscore=0 adultscore=0 mlxscore=0 phishscore=0 bulkscore=0
+ malwarescore=0 clxscore=1015 priorityscore=1501 mlxlogscore=999
+ impostorscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2209130000 definitions=main-2210120106
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+Jim, Peter, and Wanpeng
+Hi,
 
-On Wed, Oct 12, 2022, Li RongQing wrote:
-> In one-shot mode, the APIC timer stops counting when the timer
-> reaches zero, so don't reset deadline to period for one shot mode
-> 
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> ---
->  arch/x86/kvm/lapic.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 9dda989..bf39027 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1840,8 +1840,12 @@ static bool set_target_expiration(struct kvm_lapic *apic, u32 count_reg)
->  		if (unlikely(count_reg != APIC_TMICT)) {
->  			deadline = tmict_to_ns(apic,
->  				     kvm_lapic_get_reg(apic, count_reg));
-> -			if (unlikely(deadline <= 0))
-> -				deadline = apic->lapic_timer.period;
-> +			if (unlikely(deadline <= 0)) {
-> +				if (apic_lvtt_period(apic))
-> +					deadline = apic->lapic_timer.period;
-> +				else
-> +					deadline = 0;
-> +			}
+The implementation of the CPU Topology in QEMU has been drastically
+modified since the last patch series and the number of LOCs has been
+greatly reduced.
 
-This is not the standard "count has reached zero" path, it's the "vCPU is migrated
-and the timer needs to be resumed on the destination" path.  Zeroing the deadline
-here will not squash the timer, IIUC it will cause the timer to immediately fire.
+1) Unnecessary objects have been removed, only a single S390Topology
+   object is created to support migration and reset.
 
-That said, I think the patch is actually correct even though the shortlog+changelog
-are wrong.  If the timer expired while the vCPU was migrated, KVM _should_ fire
-the timer ASAP.  AFAICT, nothing else in KVM will detect the expired timer, e.g.
-if the timer expired on the source, apic_get_tmcct() on the source should have
-returned zero.
+2) The introduction of drawers and books is deferred to a later version.
 
-The only wrinkle I can see is the bug called out in the commit that added this
-code (the wonderfully (extreme sarcasm) titled commit 24647e0a39b6, "KVM: x86:
-Return updated timer current count register from KVM_GET_LAPIC")
+3) A new property, topology-disable, is added for new machines for test
+   purpose and migration to/from a host without facility 11 from/to a
+   host with the facility 11.
 
- : Note: When a one-shot timer expires, the code in arch/x86/kvm/lapic.c does
- : not zero the value of the LAPIC initial count register (emulating HW
- : behavior). If no other timer is run and pending prior to a subsequent
- : KVM_GET_LAPIC call, the returned register set will include the expired
- : one-shot initial count. On a subsequent KVM_SET_LAPIC call the code will
- : see a non-zero initial count and start a new one-shot timer using the
- : expired timer's count. This is a prior existing bug and will be addressed
- : in a separate patch. Thanks to jmattson@google.com for this find.
+Also a documentation has been added to the series.
 
-I don't see any evidence that that bug was ever fixed.  But again, that's an
-orthogonal bug.
 
-There is commit 2735886c9ef1 ("KVM: LAPIC: Keep stored TMCCT register value 0
-after KVM_SET_LAPIC"), but I'm struggling to see how that's anything but a glorified
-nop.
+To use the QEMU patches, you will need Linux V6-rc1 or newer,
+or use the following Linux mainline patches:
 
->  			else if (unlikely(deadline > apic->lapic_timer.period)) {
->  				pr_info_ratelimited(
->  				    "kvm: vcpu %i: requested lapic timer restore with "
-> -- 
-> 2.9.4
-> 
+f5ecfee94493 2022-07-20 KVM: s390: resetting the Topology-Change-Report    
+24fe0195bc19 2022-07-20 KVM: s390: guest support for topology function     
+0130337ec45b 2022-07-20 KVM: s390: Cleanup ipte lock access and SIIF fac.. 
+
+Currently this code is for KVM only, I have no idea if it is interesting
+to provide a TCG patch. If ever it will be done in another series.
+
+To have a better understanding of the S390x CPU Topology and its
+implementation in QEMU you can have a look at the documentation in the
+last patch of this series.
+
+The admin will want to match the host and the guest topology, taking
+into account that the guest does not recognize multithreading.
+Consequently, two vCPU assigned to threads of the same real CPU should
+preferably be assigned to the same socket of the guest machine.
+
+Regards,
+Pierre
+
+Pierre Morel (9):
+  s390x/cpu topology: core_id sets s390x CPU topology
+  s390x/cpu topology: reporting the CPU topology to the guest
+  s390x/cpu_topology: resetting the Topology-Change-Report
+  s390x/cpu_topology: CPU topology migration
+  target/s390x: interception of PTF instruction
+  s390x/cpu topology: add topology-disable machine property
+  s390x/cpu topology: add max_threads machine class attribute
+  s390x/cpu_topology: activating CPU topology
+  docs/s390x: document s390x cpu topology
+
+ docs/system/s390x/cpu_topology.rst |  80 +++++++++
+ include/hw/boards.h                |   3 +
+ include/hw/s390x/cpu-topology.h    |  65 +++++++
+ include/hw/s390x/s390-virtio-ccw.h |   9 +
+ target/s390x/cpu.h                 |  50 ++++++
+ target/s390x/kvm/kvm_s390x.h       |   1 +
+ hw/core/machine.c                  |   5 +
+ hw/s390x/cpu-topology.c            | 279 +++++++++++++++++++++++++++++
+ hw/s390x/s390-virtio-ccw.c         |  85 ++++++++-
+ target/s390x/cpu-sysemu.c          |  15 ++
+ target/s390x/cpu_topology.c        | 109 +++++++++++
+ target/s390x/kvm/kvm.c             |  56 +++++-
+ util/qemu-config.c                 |   4 +
+ hw/s390x/meson.build               |   1 +
+ qemu-options.hx                    |   6 +-
+ target/s390x/meson.build           |   1 +
+ 16 files changed, 766 insertions(+), 3 deletions(-)
+ create mode 100644 docs/system/s390x/cpu_topology.rst
+ create mode 100644 include/hw/s390x/cpu-topology.h
+ create mode 100644 hw/s390x/cpu-topology.c
+ create mode 100644 target/s390x/cpu_topology.c
+
+-- 
+2.31.1
+
+Changelog:
+
+- since v9
+
+- remove books and drawers
+
+- remove thread denying and replace with a merge
+  of cores * threads to specify the CPUs available
+  to the guest
+
+- add a class option to avoid topology on older
+  machines
+  (Cedric)
+
+- Allocate a SYSIB buffer of the maximal length to
+  avoid overflow.
+  (Nico, Janis)
+
+- suppress redundancy of smp parameters in topology
+  and use directly the machine smp structure
+
+- Early check for topology support
+  (Cedric)
+
+- since v8
+
+- Linux patches are now mainline
+
+- simplification of the implementation
+  (Janis)
+
+- Migration, new machine definition
+  (Thomas)
+
+- Documentation
+
+- since v7
+
+- Coherence with the Linux patch series changes for MTCR get
+  (Pierre)
+
+- check return values during new CPU creation
+  (Thomas)
+
+- Improving codding style and argument usages
+  (Thomas)
+
+- since v6
+
+- Changes on smp args in qemu-options
+  (Daniel)
+  
+- changed comments in machine.jason
+  (Daniel)
+ 
+- Added reset
+  (Janosch)
+
+- since v5
+
+- rebasing on newer QEMU version
+
+- reworked most lines above 80 characters.
+
+- since v4
+
+- Added drawer and books to topology
+
+- Added numa topology
+
+- Added documentation
+
+- since v3
+
+- Added migration
+  (Thomas)
+
+- Separated STSI instruction from KVM to prepare TCG
+  (Thomas)
+
+- Take care of endianess to prepare TCG
+  (Thomas)
+
+- Added comments on STSI CPU container and PFT instruction
+  (Thomas)
+
+- Moved enabling the instructions as the last patch
+  (Thomas)
