@@ -2,77 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9EF385FC9D7
-	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 19:22:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B3175FCA61
+	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 20:17:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229487AbiJLRWk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Oct 2022 13:22:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56612 "EHLO
+        id S229827AbiJLSRk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Oct 2022 14:17:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229618AbiJLRWc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Oct 2022 13:22:32 -0400
-Received: from mail-oo1-xc2d.google.com (mail-oo1-xc2d.google.com [IPv6:2607:f8b0:4864:20::c2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A602E1FCCB
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 10:22:29 -0700 (PDT)
-Received: by mail-oo1-xc2d.google.com with SMTP id r11-20020a4aa2cb000000b004806f49e27eso6502045ool.7
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 10:22:29 -0700 (PDT)
+        with ESMTP id S229537AbiJLSRd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Oct 2022 14:17:33 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F408149B71
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 11:17:08 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-3538689fc60so166297777b3.3
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 11:17:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZRYFk+9yyHZHAcB/2rwgdrsgnigrvHFKirKgHeDmUno=;
-        b=AE8z8KD6uwSVMiRp4ABm0Kn9UkMq8P+bk8+Y1ITmg3vl1hYmjp6k8LU6URk5HzGGQF
-         2/fqw2HhcOa/gTcb1tS3SQgcP9XK2z4BjeVToHve1GXn4ay7pgmzQA+nKS017UcVgGKS
-         Udydt9y4k+dIUSNMddvtmXX3tSMn7byJOqVUk=
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8z/N7rajPM5bDbkRc7ux+RB4h16QzYAJS8fnP1UPndE=;
+        b=M/huj/nHRTShArCrudhJ7iG+SfM8N0CLPP7gdjYfeC3hoJLIqKIua/Mtb9p984G0jg
+         kXvLGi1REkmVhvv+KDBdFg3pz7ILz+gWJkrCVS8Umc8koGm8s7jodek4b84Xa6qBVhXf
+         d7rIf7DKQnCcvym1eIgAypVrehMRrMzoLAZgUzHfblBX3ZF3r8Do2tnaclV8zanwV5Az
+         voFmthDUQHR1wv42I9Mc1soUJW6UrrPU+reuMjZVDu7AUC3yENb1SXXxISreFD87AiBA
+         PisiXE9tfW7yPL86qpYBltsKCPseYrKbTXEgSM1BxTQ4HwheT5jc+zl7kSxEy93UjsLk
+         zpBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZRYFk+9yyHZHAcB/2rwgdrsgnigrvHFKirKgHeDmUno=;
-        b=NwxbGxB+ec8D0GLsT16kzuA74pr4dPrqf+g8hjrp1BlM3+HCrMQrhQ6tTd2C5hxcH+
-         WP65v6GpDw5bIVNaVXwNurZZGfVxYY/zLAEIqDOcQZW00IhnvIRvdH+0umB4XTyrKBJE
-         6ludv4w28xJBQ1zMLqpHYfwMVNmMzZ/X17FzDcY3Txy3pEiHKogQhyMQwvsKQrv70uiA
-         oa+7lXzYBs/2X70CVxeA1E9YE4V6dxIsjgtoKXWgEUTTbq68eBZdXC+l1eTUfb1OS/d7
-         JNkpUGzJC92dlNtRfeN4wgoHUOmwFRgWhIP0yhI9BgStOIcWZisuK5VwzRdYCSu8rAU1
-         L0pQ==
-X-Gm-Message-State: ACrzQf3e/vUSVqhV6324TiXCx3BTSh8FfwVKuZLIZ9fhJQjNHbOXgQ9f
-        BZrbgTErgQ/2AHSJgPijEdKn30R9YlYV9w==
-X-Google-Smtp-Source: AMsMyM6KcRiqb1/bxw7VX5bwFrAyI6adz/HElKqHJ/gbDJyYnALHp97hYheaOHSDQSydplWv3CqDEw==
-X-Received: by 2002:a4a:af4d:0:b0:475:dcf4:65fb with SMTP id x13-20020a4aaf4d000000b00475dcf465fbmr11567414oon.1.1665595347363;
-        Wed, 12 Oct 2022 10:22:27 -0700 (PDT)
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com. [209.85.160.43])
-        by smtp.gmail.com with ESMTPSA id bu11-20020a0568300d0b00b00655ca9a109bsm7671597otb.36.2022.10.12.10.22.24
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Oct 2022 10:22:24 -0700 (PDT)
-Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-1324e7a1284so20201499fac.10
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 10:22:24 -0700 (PDT)
-X-Received: by 2002:a05:6870:c0c9:b0:127:c4df:5b50 with SMTP id
- e9-20020a056870c0c900b00127c4df5b50mr3072194oad.126.1665595344160; Wed, 12
- Oct 2022 10:22:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <20221010132030-mutt-send-email-mst@kernel.org>
- <87r0zdmujf.fsf@mpe.ellerman.id.au> <20221012070532-mutt-send-email-mst@kernel.org>
- <87mta1marq.fsf@mpe.ellerman.id.au> <87edvdm7qg.fsf@mpe.ellerman.id.au> <20221012115023-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20221012115023-mutt-send-email-mst@kernel.org>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed, 12 Oct 2022 10:22:08 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wg2Pkb9kbfbstbB91AJA2SF6cySbsgHG-iQMq56j3VTcA@mail.gmail.com>
-Message-ID: <CAHk-=wg2Pkb9kbfbstbB91AJA2SF6cySbsgHG-iQMq56j3VTcA@mail.gmail.com>
-Subject: Re: [GIT PULL] virtio: fixes, features
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, alvaro.karsz@solid-run.com,
-        angus.chen@jaguarmicro.com, gavinl@nvidia.com, jasowang@redhat.com,
-        lingshan.zhu@intel.com, wangdeming@inspur.com,
-        xiujianfeng@huawei.com, linuxppc-dev@lists.ozlabs.org,
-        linux-pci@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8z/N7rajPM5bDbkRc7ux+RB4h16QzYAJS8fnP1UPndE=;
+        b=CXrIF2LUHqD0F7Or9VCvj28iCkjT3slaDNbaa0+ZUfzOecvZlPLPRrjZE5nTyQr6Nx
+         a8XbpNWJeP19qIjjriv1XIrX5xvPsRfDD3ey6pvsCGG5i7frpwkmgpKWJrbqskIj2YqY
+         VS+brABrweDyswLpbcS6CgPS34XY2MU6joUgrmiVGa1iAbcGS70Zul+yMFAHS+4YkW7i
+         ksVjVvp+Wc6OuwC9mD5mEUilBXnQe4LgkGg3BdiNB1Vrn0K3h5G36zKJRjD8FjZ2XfP0
+         493ErH9rT2HJRNepMhRCshhzBH7R9abt8Nq2QHkAsX6el31r9tXd7W00W9/i7r0nSpSH
+         cc4Q==
+X-Gm-Message-State: ACrzQf0xoqjrtTO9FazyktxqDZ4DXSlj0fQBbTkuoj0zHX/IIgNbUk5s
+        U27e6yOWT5eF0kX7xxps068z7Wxlj2E=
+X-Google-Smtp-Source: AMsMyM7PHmAGWW8xmkb9zmUhh7qx+uzrZL2OJC5GLZzb/QSCLd/oiR+K3itria64T/zEE3HJaSwPk38Uo0c=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a5b:443:0:b0:6bc:e3d1:8990 with SMTP id
+ s3-20020a5b0443000000b006bce3d18990mr30993521ybp.191.1665598627584; Wed, 12
+ Oct 2022 11:17:07 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Wed, 12 Oct 2022 18:16:51 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
+Message-ID: <20221012181702.3663607-1-seanjc@google.com>
+Subject: [PATCH v4 00/11] KVM: x86/mmu: Make tdp_mmu a read-only parameter
+From:   Sean Christopherson <seanjc@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Isaku Yamahata <isaku.yamahata@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,35 +68,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 12, 2022 at 8:51 AM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> Are you sure?
+This is a variation of David's series to change tdp_mmu to a RO param[*].
+The key difference is that instead of moving the TDP MMU page fault handler
+to its own function, use static branches to make TDP MMU page faults (and
+a few other paths) effectively branch free.
 
-MichaelE is right.
+I'm not dead set against having a dedicated TDP MMU page fault handler, but
+IMO it's not really better once the TDP MMU vs. shadow MMU is reduced to a
+static branch, just different.  The read vs. write mmu_lock is the most
+visible ugliness, and that can be buried in helpers if we really want to
+make the page fault handler easier on the eyes, e.g.
 
-This is just bogus historical garbage:
+	direct_page_fault_mmu_lock(vcpu);
 
-> arch/arm/include/asm/irq.h:#ifndef NO_IRQ
-> arch/arm/include/asm/irq.h:#define NO_IRQ       ((unsigned int)(-1))
+	if (is_page_fault_stale(vcpu, fault))
+		goto out_unlock;
 
-that I've tried to get rid of for years, but for some reason it just won't die.
+	if (is_tdp_mmu_enabled()) {
+		r = kvm_tdp_mmu_map(vcpu, fault);
+	} else {
+		r = make_mmu_pages_available(vcpu);
+		if (r)
+			goto out_unlock;
 
-NO_IRQ should be zero. Or rather, it shouldn't exist at all. It's a bogus thing.
+		r = __direct_map(vcpu, fault);
+	}
 
-You can see just how bogus it is from grepping for it - the users are
-all completely and utterly confused, and all are entirely historical
-brokenness.
+out_unlock:
+	direct_page_fault_mmu_unlock(vcpu);
 
-The correct way to check for "no irq" doesn't use NO_IRQ at all, it just does
+v4:
+  - Keep is_tdp_mmu_page() in patch 1.
+  - Collect reviews. [Isaku]
+  - Skip "make MMU pages available" for root allocations.
+  - Rework "is TDP MMU" checks to take advantage of read-only param.
+  - Use a static key to track TDP MMU enabling.
 
-        if (dev->irq) ...
+[*] https://lkml.kernel.org/r/20220921173546.2674386-1-dmatlack@google.com
 
-which is why you will only find a few instances of NO_IRQ in the tree
-in the first place.
+David Matlack (7):
+  KVM: x86/mmu: Change tdp_mmu to a read-only parameter
+  KVM: x86/mmu: Move TDP MMU VM init/uninit behind tdp_mmu_enabled
+  KVM: x86/mmu: Grab mmu_invalidate_seq in kvm_faultin_pfn()
+  KVM: x86/mmu: Handle error PFNs in kvm_faultin_pfn()
+  KVM: x86/mmu: Avoid memslot lookup during KVM_PFN_ERR_HWPOISON
+    handling
+  KVM: x86/mmu: Handle no-slot faults in kvm_faultin_pfn()
+  KVM: x86/mmu: Stop needlessly making MMU pages available for TDP MMU
 
-The NO_IRQ thing is mainly actually defined by a few drivers that just
-never got converted to the proper world order, and even then you can
-see the confusion (ie some drivers use "-1", others use "0", and yet
-others use "((unsigned int)(-1)".
+Sean Christopherson (4):
+  KVM: x86/mmu: Pivot on "TDP MMU enabled" when handling direct page
+    faults
+  KVM: x86/mmu: Pivot on "TDP MMU enabled" to check if active MMU is TDP
+    MMU
+  KVM: x86/mmu: Replace open coded usage of tdp_mmu_page with
+    is_tdp_mmu_page()
+  KVM: x86/mmu: Use static key/branches for checking if TDP MMU is
+    enabled
 
-                   Linus
+ arch/x86/include/asm/kvm_host.h |   9 --
+ arch/x86/kvm/mmu.h              |  14 ++-
+ arch/x86/kvm/mmu/mmu.c          | 212 ++++++++++++++++++++------------
+ arch/x86/kvm/mmu/mmu_internal.h |   1 +
+ arch/x86/kvm/mmu/paging_tmpl.h  |  12 +-
+ arch/x86/kvm/mmu/tdp_mmu.c      |  13 +-
+ arch/x86/kvm/mmu/tdp_mmu.h      |  25 +---
+ 7 files changed, 149 insertions(+), 137 deletions(-)
+
+
+base-commit: e18d6152ff0f41b7f01f9817372022df04e0d354
+-- 
+2.38.0.rc1.362.ged0d419d3c-goog
+
