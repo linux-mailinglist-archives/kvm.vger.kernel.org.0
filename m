@@ -2,147 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B9A9D5FC424
-	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 13:11:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 313E95FC50E
+	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 14:11:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229610AbiJLLLR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Oct 2022 07:11:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48114 "EHLO
+        id S229721AbiJLMLk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Oct 2022 08:11:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229516AbiJLLLQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Oct 2022 07:11:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7ED9A99E6
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 04:11:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1665573074;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8YiAlVcyacuAF1cXPKHrDiH+rQYQoNsO4NEHWDYYi14=;
-        b=iDIJ8YJ7dFjXb2rzD86PK0sSXWE5o+yyGWbgK1DjTyFZ0efUFxwFHVKz8UGuyLEBCkwFl7
-        +d3RimS8s9MPiH0k6PRjiTrDzuo1DsRkD9xY01+ZeO+U1HKW4dQf0Uhlon5kBjzgT8iIfT
-        zPWZJQWhakUsBq5rMgd29tNz/jRHf0Y=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-90-7okeR0rtOnqJt_AMbLNlRg-1; Wed, 12 Oct 2022 07:11:13 -0400
-X-MC-Unique: 7okeR0rtOnqJt_AMbLNlRg-1
-Received: by mail-wr1-f70.google.com with SMTP id k30-20020adfb35e000000b0022e04708c18so4891190wrd.22
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 04:11:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8YiAlVcyacuAF1cXPKHrDiH+rQYQoNsO4NEHWDYYi14=;
-        b=JehBcAmkFiaXBAzF2U9W0nzdfnBXnriR/IIL1fAsxj0Di1Yv9YAPYUjCwbCd8XAOcT
-         b5cCpEHQGB/xZfYcGjuNl27CA+QCEtZa2TioGiQNfTdyH2s1HoiTJw5TfTpkFAZYXhG6
-         DHDk3EazRGor4awbLIVqQpJ+oA7zLyIh5q3Ao3lmvyH/9nmXrf2BYPEGnCK0TnFt42c8
-         N60dcCVg6pUtSqx0WbQMiIaNkeatzi2QmvgDG7+YgzC4uE0coSfEFAUwe91KOZS7syEN
-         2DXq5YdX105EIIU6RVPWoeotBP/IBxIObU+bD8KufEfNok1gwVHf2uK/sZdFGr8cv8n5
-         sXhQ==
-X-Gm-Message-State: ACrzQf01cS6cKR2Pjng04CdALazuTKNThRbQPZ1wLewyo+nj+ccKuUaS
-        WeRyuk3glmVu5PvOA97KRvdfeysIvBG2GHpXznTZN8jGlTP8XwUNphGGznbYV2y/O18jj4L9oeV
-        AMbtqgwVrVOHS
-X-Received: by 2002:a5d:4581:0:b0:228:a8e5:253c with SMTP id p1-20020a5d4581000000b00228a8e5253cmr16709130wrq.506.1665573072676;
-        Wed, 12 Oct 2022 04:11:12 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4M2UeBQqsLu/YgEb0FS7XO2FtVoGI+qgl10zlKDVC740GbGZGoVVc16JkgQ8fSzCwcytvnSw==
-X-Received: by 2002:a5d:4581:0:b0:228:a8e5:253c with SMTP id p1-20020a5d4581000000b00228a8e5253cmr16709111wrq.506.1665573072445;
-        Wed, 12 Oct 2022 04:11:12 -0700 (PDT)
-Received: from redhat.com ([2.54.162.123])
-        by smtp.gmail.com with ESMTPSA id y8-20020a05600c364800b003c6bd91caa5sm1493777wmq.17.2022.10.12.04.11.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Oct 2022 04:11:11 -0700 (PDT)
-Date:   Wed, 12 Oct 2022 07:11:08 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        alvaro.karsz@solid-run.com, angus.chen@jaguarmicro.com,
-        gavinl@nvidia.com, jasowang@redhat.com, lingshan.zhu@intel.com,
-        wangdeming@inspur.com, xiujianfeng@huawei.com,
-        linuxppc-dev@lists.ozlabs.org,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [GIT PULL] virtio: fixes, features
-Message-ID: <20221012070532-mutt-send-email-mst@kernel.org>
-References: <20221010132030-mutt-send-email-mst@kernel.org>
- <87r0zdmujf.fsf@mpe.ellerman.id.au>
+        with ESMTP id S229490AbiJLMLg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Oct 2022 08:11:36 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33ED18053F
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 05:11:35 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29CBUgH4003367
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 12:11:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=on2d2JVi31Ye+h/cWxTyNctxp0qYO76YyPbmOJ6vsqE=;
+ b=Y+MWYiR0ZNqMjo/uyNnIYrel2+3632Hbu4ZNzyBxLHz/Y7sY3Y2sOSr3K99HzjaHycF+
+ SHKL1KgbsWtZo1IjjidEWt2675rL3L4LY0JCzTjKIN/SBNrldV5FnRqCdHZF6Nz3PDnu
+ yhTSe2kJAa880FyRfb3cFWmdCgrZGQZtH6Vby9i0Y0uASVvwDvDG+pslTm0FAo/k6fgW
+ wP3DyjRJ1kEwMkA33BetikGyWzdwVRXTP2Trmz2aN4JyJj55lJ8LMBJ38/xD6ff6KY/0
+ 6t2Vhg3S3KVP+9x8zlPQZ3F6MdpXSqwnMQnoLUhDIlL70Yg9lYdY6VTLhT6qZlhBNBR9 Dw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k5vs814qw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 12:11:34 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29CBUuEJ004113
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 12:11:34 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k5vs814pw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 12 Oct 2022 12:11:34 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29CC6TmF013128;
+        Wed, 12 Oct 2022 12:11:32 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 3k30fjdyt9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 12 Oct 2022 12:11:31 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29CCBSUq66978246
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 12 Oct 2022 12:11:28 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 88C52AE04D;
+        Wed, 12 Oct 2022 12:11:28 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 52EFBAE045;
+        Wed, 12 Oct 2022 12:11:28 +0000 (GMT)
+Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 12 Oct 2022 12:11:28 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Subject: [kvm-unit-tests PATCH v3 0/1] s390x: Add exit time test
+Date:   Wed, 12 Oct 2022 14:11:27 +0200
+Message-Id: <20221012121128.1179252-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.36.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: esSyGXZMP_dtQzDd-ilaUr44uxqswreq
+X-Proofpoint-GUID: dBDKKo96BddA75hyzn-xXxa0QKDr1-CO
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87r0zdmujf.fsf@mpe.ellerman.id.au>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-12_06,2022-10-12_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 suspectscore=0 priorityscore=1501 mlxscore=0
+ phishscore=0 spamscore=0 malwarescore=0 bulkscore=0 clxscore=1015
+ impostorscore=0 mlxlogscore=711 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2209130000 definitions=main-2210120079
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 12, 2022 at 05:21:24PM +1100, Michael Ellerman wrote:
-> "Michael S. Tsirkin" <mst@redhat.com> writes:
-> > The following changes since commit 4fe89d07dcc2804c8b562f6c7896a45643d34b2f:
-> >
-> >   Linux 6.0 (2022-10-02 14:09:07 -0700)
-> >
-> > are available in the Git repository at:
-> >
-> >   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-> >
-> > for you to fetch changes up to 71491c54eafa318fdd24a1f26a1c82b28e1ac21d:
-> >
-> >   virtio_pci: don't try to use intxif pin is zero (2022-10-07 20:00:44 -0400)
-> >
-> > ----------------------------------------------------------------
-> > virtio: fixes, features
-> >
-> > 9k mtu perf improvements
-> > vdpa feature provisioning
-> > virtio blk SECURE ERASE support
-> >
-> > Fixes, cleanups all over the place.
-> >
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> >
-> > ----------------------------------------------------------------
-> > Alvaro Karsz (1):
-> >       virtio_blk: add SECURE ERASE command support
-> >
-> > Angus Chen (1):
-> >       virtio_pci: don't try to use intxif pin is zero
-> 
-> This commit breaks virtio_pci for me on powerpc, when running as a qemu
-> guest.
-> 
-> vp_find_vqs() bails out because pci_dev->pin == 0.
-> 
-> But pci_dev->irq is populated correctly, so vp_find_vqs_intx() would
-> succeed if we called it - which is what the code used to do.
-> 
-> I think this happens because pci_dev->pin is not populated in
-> pci_assign_irq().
-> 
-> I would absolutely believe this is bug in our PCI code, but I think it
-> may also affect other platforms that use of_irq_parse_and_map_pci().
-> 
-> cheers
+v2->v3:
+---
+* print average (thanks Claudio)
+* have asm constraints look the same everywhere (thanks Claudio)
+* rebase patchset on top of my migration sck patches[1] to make use of the
+  time.h improvements
 
-How about fixing this in of_irq_parse_and_map_pci then?
-Something like the below maybe?
+v1->v2:
+---
+* add missing cc clobber, fix constraints for get_clock_us() (thanks
+  Thomas)
+* avoid array and use pointer to const char* (thanks Thomas)
+* add comment why testing nop makes sense (thanks Thomas)
+* rework constraints and clobbers (thanks Thomas)
 
-diff --git a/drivers/pci/of.c b/drivers/pci/of.c
-index 196834ed44fe..504c4d75c83f 100644
---- a/drivers/pci/of.c
-+++ b/drivers/pci/of.c
-@@ -446,6 +446,8 @@ static int of_irq_parse_pci(const struct pci_dev *pdev, struct of_phandle_args *
- 	if (pin == 0)
- 		return -ENODEV;
- 
-+	pdev->pin = pin;
-+
- 	/* Local interrupt-map in the device node? Use it! */
- 	if (of_get_property(dn, "interrupt-map", NULL)) {
- 		pin = pci_swizzle_interrupt_pin(pdev, pin);
+Sometimes, it is useful to measure the exit time of certain instructions
+to e.g. identify performance regressions in instructions emulated by the
+hypervisor.
+
+This series adds a test which executes some instructions and measures
+their execution time. Since their execution time depends a lot on the
+environment at hand, all tests are reported as PASS currently.
+
+The point of this series is not so much the instructions which have been
+chosen here (but your ideas are welcome), but rather the general
+question whether it makes sense to have a test like this in
+kvm-unit-tests.
+
+This series is based on my migration sck patches[1] to make use of the
+time.h improvements there.
+
+[1] https://lore.kernel.org/all/20221011170024.972135-1-nrb@linux.ibm.com/
+
+Nico Boehr (1):
+  s390x: add exittime tests
+
+ s390x/Makefile      |   1 +
+ s390x/exittime.c    | 253 ++++++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg |   5 +
+ 3 files changed, 259 insertions(+)
+ create mode 100644 s390x/exittime.c
+
+-- 
+2.36.1
 
