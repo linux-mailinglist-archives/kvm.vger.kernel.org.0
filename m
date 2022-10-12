@@ -2,97 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7126F5FCC33
-	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 22:40:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D1F7C5FCC43
+	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 22:44:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229924AbiJLUkn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Oct 2022 16:40:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55186 "EHLO
+        id S229755AbiJLUoE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Oct 2022 16:44:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229844AbiJLUkV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Oct 2022 16:40:21 -0400
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam07on2062.outbound.protection.outlook.com [40.107.212.62])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A85A74057E;
-        Wed, 12 Oct 2022 13:40:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fGdLmBeiHQuUTU5Fq0Ya2vUQlR/bAzfc8NijdQzXamV/VBsPLDoYjTGYZml2QubMeqCj9NryOSb7CZLQJjOMg+4jCEyM7liBlrfgcDkT6/LgiSFuUZi0PzNhW0YHLgHDekA3+gggp/XsrFNbz6cTUzT9gqk9DkBCfKQHnwEo6qZmSoKzZFj918HpDjlvcieXrcCE0uyTj+dJdz3cFsdy6WmUWKOjHImBzfwivfR+EYU5tfKsIpZtroZ6gU9ojb0W3TfY/3YdKpOEfCAzRlm9on00WMPoT59QNMNg9iI6m9iDX6rzq4i6/p5ZQtJ6H0CGsVPf1/Jw0psqHydt1oT0Xg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yykaEUDx4k4btdvcxxhughkIR/ZXY/PQ+ERv5MKUim0=;
- b=AzCjOg73YYM47KReOuXIKdSMtNSU2REv1fs6K54e8GsezxoBNPpYoMkLwDgv5XeOk7pzcEwHNSNxvtTUc+SaLMBG6WwcV7rV8g5T/Jhm+5dCJaCunJCEx7Ds6l/ZA4C7Xpn0d3c5lH4qDCp8lxSG4JSmbb8BdKQlHZpcGrlGQ76s0Rsgcb5rPz3FLGI046P4/zDXOhr4pR2mGxU6g1e+1ITi4E+3mG46Ti1PzSMUeg2N1eeRwpYzpl3ulUAKIJAFFNc/N1KBGSPxXl3gW+ICFMp1gJYxoG9IcQsgPoZvu7qyosgR78egP1wUUsRx2SmM8lAljHak/iJIof6VLc+/NQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yykaEUDx4k4btdvcxxhughkIR/ZXY/PQ+ERv5MKUim0=;
- b=g4h4zw/zVHRqecCijOLJuuVEGfbWuZh5kDz/tpPfyyK+an9kH0ioEZ1vifkhuWMfgYXTQV8K6LveDsQboXnOqCQEVXcMIi2b7ptxGbEWIz5Ts332vlMMM/gJXZXm+O5hhEDYxOqV4vfnWswjHwI+QGAvEwQ7GaOSgDmPv0HtCDQ=
-Received: from DM6PR05CA0059.namprd05.prod.outlook.com (2603:10b6:5:335::28)
- by SA1PR12MB7296.namprd12.prod.outlook.com (2603:10b6:806:2ba::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5709.15; Wed, 12 Oct
- 2022 20:40:02 +0000
-Received: from DM6NAM11FT104.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:335:cafe::1d) by DM6PR05CA0059.outlook.office365.com
- (2603:10b6:5:335::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.10 via Frontend
- Transport; Wed, 12 Oct 2022 20:40:01 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT104.mail.protection.outlook.com (10.13.173.232) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5723.20 via Frontend Transport; Wed, 12 Oct 2022 20:40:01 +0000
-Received: from jallen-jump-host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.28; Wed, 12 Oct
- 2022 15:40:00 -0500
-From:   John Allen <john.allen@amd.com>
-To:     <kvm@vger.kernel.org>
-CC:     <linux-kernel@vger.kernel.org>, <pbonzini@redhat.com>,
-        <weijiang.yang@intel.com>, <rick.p.edgecombe@intel.com>,
-        <seanjc@google.com>, <x86@kernel.org>, <thomas.lendacky@amd.com>,
-        John Allen <john.allen@amd.com>
-Subject: [RFC PATCH 7/7] KVM: SVM: Add CET features to supported_xss
-Date:   Wed, 12 Oct 2022 20:39:10 +0000
-Message-ID: <20221012203910.204793-8-john.allen@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20221012203910.204793-1-john.allen@amd.com>
-References: <20221012203910.204793-1-john.allen@amd.com>
+        with ESMTP id S229832AbiJLUnp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Oct 2022 16:43:45 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6565108DE4
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 13:43:15 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id i6so12271811pli.12
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 13:43:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=U6r/BPuFlFmFKd44EKySSOKaSq/489LAsa5byNyptW8=;
+        b=RnEe0ZX+RHvVag17aEkAUEXw3yPvtk0wrRCTtThUqRZUYQJxmmTC0nhCKDdOMBwVhp
+         k224QpffiM/1rSCpcSmJxrDqW2zPD9Bb7kYnRg03JTHiRHx+WV5fIQpg/XBOirrKwl2+
+         R325Yugy7Jv1PZVc5vKN7pfiRDTrnU7hOm9fBYuWVWriWsYyE9fpRnW1/IKA+gf7i+Ez
+         ED5QLEgks5D+jr56BGxICRUEyKzQdXB/9YVNsH8oFOPIsXe2RSsILF1rqwcnSDA0+EHv
+         /NGOGQ9hjaiIW0e+0IXFR3PU8/kXkWuPjMFKa70m4/wKOW9EUdRT1lDvZA2m6U2pDWtT
+         J2jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U6r/BPuFlFmFKd44EKySSOKaSq/489LAsa5byNyptW8=;
+        b=6OCkk3bMIt0wXPxkCJKeUSo5PqMb1+ppIMbh8hwM/FxzFTCxwlDbJMTAOi1X+caEJg
+         tNZn95AhO5vNr4dSFsjcZ9hNlWCcV6Y4zDr6ldUjMNLW38Ox6eO8fmBDlSUsFbAcQQXj
+         GjCN2sCA1ZKAIiFBX3BwJ0euGek4zkg4Xux0OmcgNKliUQTNwALCPHFuscJhWGGzDIvU
+         RyEwlKnT7SBNpPOtGnZddw63cSeAo1mwznW0amOg287pG53ALo5Xd0D2FeYFtb6pVtk3
+         5S/pZTc/NROdmy6ZNoypv4rozKth58g8WT4I/Gx6hzXKP6Hh/OkQw8QxbAjayvde+iGQ
+         mDwQ==
+X-Gm-Message-State: ACrzQf0dpILMtIxIbemmzm+9L3UgLicr9qwhikf6GjND+vFg9qXU/OlS
+        6go/Z5XMWA5HG9XWvRCfMgxykg==
+X-Google-Smtp-Source: AMsMyM7izQqjj1waykTDHWBlkRoyvjYygmLJQciJ4HBHmj/OkRkXvuQE4xmk6WpnEXGpBUCQp+2gNA==
+X-Received: by 2002:a17:90b:1e0b:b0:20d:85ca:b50e with SMTP id pg11-20020a17090b1e0b00b0020d85cab50emr6766634pjb.82.1665607394482;
+        Wed, 12 Oct 2022 13:43:14 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id m14-20020a17090a668e00b0020aedddd3cesm1842187pjj.5.2022.10.12.13.43.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Oct 2022 13:43:13 -0700 (PDT)
+Date:   Wed, 12 Oct 2022 20:43:09 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     isaku.yamahata@intel.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        isaku.yamahata@gmail.com, Kai Huang <kai.huang@intel.com>,
+        Chao Gao <chao.gao@intel.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Shaokun Zhang <zhangshaokun@hisilicon.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Huang Ying <ying.huang@intel.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v5 10/30] KVM: Add arch hooks when VM is added/deleted
+Message-ID: <Y0cm3dJmgnpLgswQ@google.com>
+References: <cover.1663869838.git.isaku.yamahata@intel.com>
+ <aab342d576fe22b8f5b27e61d4fc635d45a4f866.1663869838.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT104:EE_|SA1PR12MB7296:EE_
-X-MS-Office365-Filtering-Correlation-Id: bc92e5dc-91ca-4def-fbd5-08daac91efba
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: GK/F6oBJPiaktMd7+hopSpjJP7jU1bUd1NCmonryS0IhBV4A7XEBiLWr7k0qaqKXblMxVhB7phSCzi1ZismCfK695skRClHZ44t/XVQdikV3ckg+QifJ+MN6gOdXTh5hHQZGVQg2T8euxNwKyuiFzc0+5yfCx+VHdin7HaDZW+BINZhBdjQnMjMBbRnP5DzE8K0nAMTPsy4xBUqaFUuS795O1vmie67rjxdxG5X+7rg4y+mCyP7Di6XhcxCp0qyWMIlUxhNfkHNrzhVs1L8aOylk/6Aqq+0/tN2PFhSJYHAZuTOsgonZBZZLI7iGZ0HurJyj4oqqzGfSWDAegZvU/O8OssmeE4QJNdyol63LPfjV1AAYUZdW+TpPhEbr3qbGE4arsm8TlFowW96UhdiESaCoSl8BEtJoNyTxBdzv3lQxSIg616jkQ699FVu9IY5zbNobKVlfgc4iHds4FFmnzgvVDSsPqR/+YxN0huS8tPpMkEjGKKoru/mkzulCbmOnKkCNKNlqzNZCngJ1sW6j9HZFUxGJYsfxy5YmkxuKtTlJF8xGhdYkW+53GXaaOoAf7R8nrAlwF6PYiFUcdXTuYYradxHfCIcl9WxK8bjthD3/mlGIv0jsPMbIs+6UpcrBEzkAwOTLgmC7Qt+0EB9acJ28/a2qb3esz26qYg3MwrBlDI237CsVMcXLgUJCABOGiLG6ucIcCk0LLBAuAzGPTXJ30zf1QBtf8upNYNyCX6KJBJIesY/76bAhXuC7c6BvkLXF6XkgqGsQIEhyjJBlYpqiw3IvFFCjPG91ErqnJK7dOVs2/7cdFqSgCq5PyEal
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(136003)(376002)(396003)(346002)(39860400002)(451199015)(40470700004)(36840700001)(46966006)(70586007)(356005)(8676002)(82310400005)(4326008)(81166007)(70206006)(54906003)(40460700003)(40480700001)(36860700001)(44832011)(86362001)(82740400003)(6916009)(36756003)(316002)(186003)(16526019)(8936002)(26005)(426003)(47076005)(7696005)(478600001)(336012)(2616005)(6666004)(1076003)(41300700001)(4744005)(2906002)(5660300002)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2022 20:40:01.7809
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: bc92e5dc-91ca-4def-fbd5-08daac91efba
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT104.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7296
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aab342d576fe22b8f5b27e61d4fc635d45a4f866.1663869838.git.isaku.yamahata@intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -100,30 +83,137 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If the CPU supports CET, add CET XSAVES feature bits to the
-supported_xss mask.
+On Thu, Sep 22, 2022, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> and pass kvm_usage_count with kvm_lock.  Move kvm_arch_post_init_vm() under
+> kvm_arch_add_vm().  Replace enable/disable_hardware_all() with the default
+> implementation of kvm_arch_add/del_vm().  Later kvm_arch_post_init_vm() is
+> deleted once x86 overrides kvm_arch_add_vm().
 
-Signed-off-by: John Allen <john.allen@amd.com>
----
- arch/x86/kvm/svm/svm.c | 5 +++++
- 1 file changed, 5 insertions(+)
+This needs to explain _why_ KVM is pivoting to add/remove hooks.
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index b474c7e57139..b815865ad0fb 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -5026,6 +5026,11 @@ static __init void svm_set_cpu_caps(void)
- 	    boot_cpu_has(X86_FEATURE_AMD_SSBD))
- 		kvm_cpu_cap_set(X86_FEATURE_VIRT_SSBD);
- 
-+	if (kvm_cpu_cap_has(X86_FEATURE_SHSTK)) {
-+		kvm_caps.supported_xss |= XFEATURE_MASK_CET_USER |
-+					  XFEATURE_MASK_CET_KERNEL;
-+	}
-+
- 	/* AMD PMU PERFCTR_CORE CPUID */
- 	if (enable_pmu && boot_cpu_has(X86_FEATURE_PERFCTR_CORE))
- 		kvm_cpu_cap_set(X86_FEATURE_PERFCTR_CORE);
--- 
-2.34.3
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  include/linux/kvm_host.h |   2 +
+>  virt/kvm/kvm_main.c      | 121 ++++++++++++++++++++-------------------
+>  2 files changed, 65 insertions(+), 58 deletions(-)
+> 
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index eab352902de7..3fbb01bbac98 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1445,6 +1445,8 @@ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
+>  bool kvm_arch_dy_runnable(struct kvm_vcpu *vcpu);
+>  bool kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu);
+>  int kvm_arch_post_init_vm(struct kvm *kvm);
+> +int kvm_arch_add_vm(struct kvm *kvm, int usage_count);
+> +int kvm_arch_del_vm(int usage_count);
+>  void kvm_arch_pre_destroy_vm(struct kvm *kvm);
+>  int kvm_arch_create_vm_debugfs(struct kvm *kvm);
+>  
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index c4b908553726..e2c8823786ff 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -142,8 +142,9 @@ static int kvm_no_compat_open(struct inode *inode, struct file *file)
+>  #define KVM_COMPAT(c)	.compat_ioctl	= kvm_no_compat_ioctl,	\
+>  			.open		= kvm_no_compat_open
+>  #endif
+> -static int hardware_enable_all(void);
+> -static void hardware_disable_all(void);
+> +static void hardware_enable_nolock(void *junk);
+> +static void hardware_disable_nolock(void *junk);
+> +static void kvm_del_vm(void);
 
+I think kvm_remove_vm() will be less confusing as "remove" is almost never used
+to describe freeing something, whereas "delete" is somewhat interchangeable with
+"free.  I.e. make it more obvious that the hook isn't intented to actually
+delete/free a VM, rather it's there to remove/delete a VM from global tracking.
+
+Ah, and this is especially true since the VM needs to be deleted from vm_list
+before the is destroyed, but hardware needs to stay enabled until the VM is fully
+destroyed.
+
+Hmm, actually, I think even better would be to have kvm_remove_vm() and kvm_drop_vm()
+to make it more obvious that there isn't 100% symmetry between "add" and "remove".
+
+E.g. rename kvm_arch_pre_destroy_vm() => kvm_arch_remove_vm() and then we end up
+with (see comments below for more details):
+
+static int kvm_add_vm(struct kvm *kvm)
+{
+	/*
+	 * During onlining a CPU, cpu_online_mask is set before kvm_online_cpu()
+	 * is called, i.e. on_each_cpu() includes CPUs that have not yet been
+	 * onlined by KVM.  Disable CPU hotplug to prevent enabling hardware on
+	 * a CPU that hasn't yet done compatibility checks.
+	 */
+	cpus_read_lock();
+	mutex_lock(&kvm_lock);
+	r = kvm_arch_add_vm(kvm, ++kvm_usage_count);
+	if (r) {
+		--kvm_usage_count;
+		goto out;
+	}
+	
+	list_add(&kvm->vm_list, &vm_list);
+
+out:
+	mutex_unlock(&kvm_lock);
+	cpus_read_unlock();
+}
+
+static void kvm_remove_vm(struct kvm *kvm)
+{
+	mutex_lock(&kvm_lock);
+	list_del(&kvm->vm_list);
+	mutex_unlock(&kvm_lock);
+	kvm_arch_remove_vm(kvm);
+}
+
+static void kvm_drop_vm(void)
+{
+	cpus_read_lock();
+	mutex_lock(&kvm_lock);
+	WARN_ON_ONCE(!kvm_usage_count);
+	kvm_usage_count--;
+	kvm_arch_drop_vm(kvm_usage_count);
+	mutex_unlock(&kvm_lock);
+	cpus_read_unlock();
+}
+
+> @@ -1223,13 +1255,28 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
+>  	if (r)
+>  		goto out_err_no_debugfs;
+>  
+> -	r = kvm_arch_post_init_vm(kvm);
+> -	if (r)
+> -		goto out_err;
+> -
+> +	/*
+> +	 * During onlining a CPU, cpu_online_mask is set before kvm_online_cpu()
+> +	 * is called. on_each_cpu() between them includes the CPU. As a result,
+> +	 * hardware_enable_nolock() may get invoked before kvm_online_cpu().
+> +	 * This would enable hardware virtualization on that cpu without
+> +	 * compatibility checks, which can potentially crash system or break
+> +	 * running VMs.
+> +	 *
+> +	 * Disable CPU hotplug to prevent this case from happening.
+> +	 */
+> +	cpus_read_lock();
+>  	mutex_lock(&kvm_lock);
+> +	kvm_usage_count++;
+> +	r = kvm_arch_add_vm(kvm, kvm_usage_count);
+> +	if (r) {
+> +		/* the following kvm_del_vm() decrements kvm_usage_count. */
+
+This is buggy on two fronts.  kvm_usage_count needs to be protected with kvm_lock,
+and AFAICT cpus_read_unlock() isn't called.
+
+Invoking kvm_del_vm() in the error path is the source of both bugs.  Typically,
+the paired "undo" of an operation should only be used if the "do" operation was
+fully successful.
+
+As above, move this to a helper to make juggling the locks less painful.
