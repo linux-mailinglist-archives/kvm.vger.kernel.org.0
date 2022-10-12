@@ -2,94 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F308E5FCC9E
-	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 22:57:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D95AA5FCCC2
+	for <lists+kvm@lfdr.de>; Wed, 12 Oct 2022 23:07:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230024AbiJLU4m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Oct 2022 16:56:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40914 "EHLO
+        id S229686AbiJLVHl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Oct 2022 17:07:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229905AbiJLU40 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Oct 2022 16:56:26 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05A7752442;
-        Wed, 12 Oct 2022 13:56:25 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29CKi9H3025550;
-        Wed, 12 Oct 2022 20:56:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=1PuDpjSFWDvxAeAfoCZnMFkZH26Yu5cUrDXtdLgDV1s=;
- b=Zlj6067Ij4UK6A05UhGwGqtgI6w7TtQ/h8wNm2Vgl0jtaamUn2JhKB6DzYu5a1qqeI0C
- BuJCxMX1GG2/20s49TqBgv2qI/iGogkM3nSXlCUC/Fn+e2IvDZxeMck4lYCGSe2lQWLr
- PM0YISLTs3GrCeZ7HCzQaypKCwFS5ecC9BCwxx4l9BJAoTKQaFzo6lG3d59bwWCEOSGB
- p09/xF2bSRWI07V++AIfEgCtyzVQ50Ss65C6pW1udY9nTkzq3ZzTqqy28ABU+IloxUeE
- hTEsnh3Ztscgo2XPmNHQ5DZO0F+c2Zl+ri/TXUiEnl0n8T9jpTlZivIGrykAgS3LvtQu UA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k62v1kjaa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 Oct 2022 20:56:22 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29CKjDTx028254;
-        Wed, 12 Oct 2022 20:56:21 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k62v1kj9p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 Oct 2022 20:56:21 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29CKrxSO030513;
-        Wed, 12 Oct 2022 20:56:19 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma02fra.de.ibm.com with ESMTP id 3k30u94xx9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 12 Oct 2022 20:56:19 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29CKulQl48300484
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 12 Oct 2022 20:56:47 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 274A35204E;
-        Wed, 12 Oct 2022 20:56:16 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id A1DD05204F;
-        Wed, 12 Oct 2022 20:56:15 +0000 (GMT)
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>
-Subject: [PATCH v2 9/9] KVM: s390: selftest: memop: Fix wrong address being used in test
-Date:   Wed, 12 Oct 2022 22:56:09 +0200
-Message-Id: <20221012205609.2811294-10-scgl@linux.ibm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221012205609.2811294-1-scgl@linux.ibm.com>
-References: <20221012205609.2811294-1-scgl@linux.ibm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: AMi6Dm22KS96HeLWt0RV4yTPreZ_EPaj
-X-Proofpoint-GUID: knxT8wRWUjPTGZeEqhJ2-u2j5vAfbRyJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-12_10,2022-10-12_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
- bulkscore=0 adultscore=0 mlxlogscore=956 phishscore=0 malwarescore=0
- impostorscore=0 spamscore=0 lowpriorityscore=0 mlxscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210120131
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        with ESMTP id S229791AbiJLVHi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Oct 2022 17:07:38 -0400
+Received: from out2-smtp.messagingengine.com (out2-smtp.messagingengine.com [66.111.4.26])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 409B513DC6;
+        Wed, 12 Oct 2022 14:07:33 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailout.nyi.internal (Postfix) with ESMTP id 68F2B5C00BC;
+        Wed, 12 Oct 2022 17:07:30 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute3.internal (MEProxy); Wed, 12 Oct 2022 17:07:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to; s=fm2; t=1665608850; x=1665695250; bh=1zjTzbu3nE
+        vKPjEu+A0VVC9cmYrYpXNTso2KnYCuc7o=; b=vAwa1ydC+9d2I9JWQMsHnQzLD0
+        NajTZT00Z6YRtX9eVlpSljSvsU/yFsucT7Aq4Oscd1E2DbgdPAvw7h8MKi+SfPJi
+        6olwV0ACpfjzjzNIEvpw0f/+c5g/bj3HsWyEX4gLB+349ezXY0uOnWrZsu6S7TNx
+        mfiAfZoqvCDtQdLE6T4GDduKjKA2nipxepU9MAG7ujEEXk99r8DrNRZfGlK15Cfu
+        z2WWUcSqqd0bankroEDffJ6XWZiKoziKWQd8PePJNpvICMQhTRfBPaFsQfDtKMUQ
+        MpT0yNPx59E+CJiAriCqWotq1txyVUSWV7+ett3PIQE6J6q76SW15b7lC0nw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm3; t=1665608850; x=1665695250; bh=1zjTzbu3nEvKPjEu+A0VVC9cmYrY
+        pXNTso2KnYCuc7o=; b=VFM8vr6JEg7opglf79F9TeVrikpH40HEGO+JtHdDIeGo
+        JDNkv7wsHZKKzWWSsZGrud+/BfHI86ACBp7Eh2fzKmPR66F8OFpDhsKVcYTF3km4
+        fFrIaAgxygV9e3TVbuCCWSF+3oxXTTbLWobgiAdbqQm0TbXyIObYp94McGRHBuYL
+        O1dyvj+JVJzlRkigjzYCMQ0mYi0YxGQ4Ipe4pnbIw6CFmauLOazr6n3faaW+nETo
+        5vFahsqFKyaqFPx8QGAQW3Tdw+ANTXwL8y8U/rytPX57DKMWyIGBdHLm4rMbHaVe
+        kqcHrt6Y/l1Vx6o3khLwq3Hlu6WofmmXMSVZWsPt2Q==
+X-ME-Sender: <xms:kSxHY4uYl8NqQVKE7TlRYofsBddMRUrI96xa6Pk9mWO3s30GLZXhVw>
+    <xme:kSxHY1fxsuw10Uc3pbJSjBs6_0Up0QOclLg48G8pVmvua6kas8vOv7Rp8Ih-15c7Q
+    aHhfUnNJWhs47BeYJc>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfeejkedgudehlecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdet
+    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
+    htthgvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedt
+    keetffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    grrhhnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:kSxHYzxEmXJhVtY7mzAljiIxJ8g7vbYtpPC0tpJEjUSewlAhg0JIhw>
+    <xmx:kSxHY7Nhw7JdZ-kUMWRwEPuRQzBFD8USLwWQFxnptjhFcbC8wS7iMg>
+    <xmx:kSxHY48vPy4-hM5zI6LGwuSveJEJXMlJt5fVNQg9kSkEIfc1U4af4w>
+    <xmx:kixHYydoUmNqBtkkA6x_gy4dCaEesVEAWfyCYVTtN8EfE59z9KQcCw>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 02DC4B60086; Wed, 12 Oct 2022 17:07:29 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.7.0-alpha0-1047-g9e4af4ada4-fm-20221005.001-g9e4af4ad
+Mime-Version: 1.0
+Message-Id: <38893b2e-c7a1-4ad2-b691-7fbcbbeb310f@app.fastmail.com>
+In-Reply-To: <CAHk-=wg2Pkb9kbfbstbB91AJA2SF6cySbsgHG-iQMq56j3VTcA@mail.gmail.com>
+References: <20221010132030-mutt-send-email-mst@kernel.org>
+ <87r0zdmujf.fsf@mpe.ellerman.id.au>
+ <20221012070532-mutt-send-email-mst@kernel.org>
+ <87mta1marq.fsf@mpe.ellerman.id.au> <87edvdm7qg.fsf@mpe.ellerman.id.au>
+ <20221012115023-mutt-send-email-mst@kernel.org>
+ <CAHk-=wg2Pkb9kbfbstbB91AJA2SF6cySbsgHG-iQMq56j3VTcA@mail.gmail.com>
+Date:   Wed, 12 Oct 2022 23:06:54 +0200
+From:   "Arnd Bergmann" <arnd@arndb.de>
+To:     "Linus Torvalds" <torvalds@linux-foundation.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     xiujianfeng@huawei.com, kvm@vger.kernel.org,
+        alvaro.karsz@solid-run.com, "Jason Wang" <jasowang@redhat.com>,
+        angus.chen@jaguarmicro.com, wangdeming@inspur.com,
+        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Netdev <netdev@vger.kernel.org>,
+        "Bjorn Helgaas" <bhelgaas@google.com>, lingshan.zhu@intel.com,
+        linuxppc-dev@lists.ozlabs.org, gavinl@nvidia.com
+Subject: Re: [GIT PULL] virtio: fixes, features
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -97,30 +94,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The guest code sets the key for mem1 only. In order to provoke a
-protection exception the test codes needs to address mem1.
+On Wed, Oct 12, 2022, at 7:22 PM, Linus Torvalds wrote:
+>
+> The NO_IRQ thing is mainly actually defined by a few drivers that just
+> never got converted to the proper world order, and even then you can
+> see the confusion (ie some drivers use "-1", others use "0", and yet
+> others use "((unsigned int)(-1)".
 
-Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
----
- tools/testing/selftests/kvm/s390x/memop.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+The last time I looked at removing it for arch/arm/, one problem was
+that there were a number of platforms using IRQ 0 as a valid number.
+We have converted most of them in the meantime, leaving now only
+mach-rpc and mach-footbridge. For the other platforms, we just
+renumbered all interrupts to add one, but footbridge apparently
+relies on hardcoded ISA interrupts in device drivers. For rpc,
+it looks like IRQ 0 (printer) already wouldn't work, and it
+looks like there was never a driver referencing it either.
 
-diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
-index 7491f1731460..e7b3897ee60a 100644
---- a/tools/testing/selftests/kvm/s390x/memop.c
-+++ b/tools/testing/selftests/kvm/s390x/memop.c
-@@ -760,9 +760,9 @@ static void test_errors_key(void)
- 
- 	/* vm/vcpu, mismatching keys, fetch protection in effect */
- 	CHECK_N_DO(ERR_PROT_MOP, t.vcpu, LOGICAL, WRITE, mem1, t.size, GADDR_V(mem1), KEY(2));
--	CHECK_N_DO(ERR_PROT_MOP, t.vcpu, LOGICAL, READ, mem2, t.size, GADDR_V(mem2), KEY(2));
-+	CHECK_N_DO(ERR_PROT_MOP, t.vcpu, LOGICAL, READ, mem2, t.size, GADDR_V(mem1), KEY(2));
- 	CHECK_N_DO(ERR_PROT_MOP, t.vm, ABSOLUTE, WRITE, mem1, t.size, GADDR_V(mem1), KEY(2));
--	CHECK_N_DO(ERR_PROT_MOP, t.vm, ABSOLUTE, READ, mem2, t.size, GADDR_V(mem2), KEY(2));
-+	CHECK_N_DO(ERR_PROT_MOP, t.vm, ABSOLUTE, READ, mem2, t.size, GADDR_V(mem1), KEY(2));
- 
- 	kvm_vm_free(t.kvm_vm);
- }
--- 
-2.34.1
+I see that openrisc and parisc also still define NO_IRQ to -1, but at
+least openrisc already relies on 0 being the invalid IRQ (from
+CONFIG_IRQ_DOMAIN), probably parisc as well.
 
+     Arnd
