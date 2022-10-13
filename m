@@ -2,109 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 780DD5FD1C2
-	for <lists+kvm@lfdr.de>; Thu, 13 Oct 2022 02:46:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 751A05FD4D0
+	for <lists+kvm@lfdr.de>; Thu, 13 Oct 2022 08:29:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232284AbiJMAqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Oct 2022 20:46:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50272 "EHLO
+        id S229844AbiJMG3S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Oct 2022 02:29:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232100AbiJMApd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Oct 2022 20:45:33 -0400
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 485D9F6C26
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 17:37:55 -0700 (PDT)
-Received: by mail-pj1-f46.google.com with SMTP id x1-20020a17090ab00100b001fda21bbc90so3473332pjq.3
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 17:37:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sLhr5UEdODqNRx69fxh3jRb3tIUO59cTzeH/dk/N40Q=;
-        b=lbMVFVWkt0+AkHPs/B78S0AxNXAwt0BHhEEleMCC13XefRbkjVr/zYJa9cIA4U+1Tn
-         Kh5KCDMTEwuzJSOdivAYr3z7C3LqHtKfsLndTo1O/FVZClyqgq0ce2ewl/4DflH1y0Fj
-         PGFrZ0rmvQwRyrTNjYRgQv+WvCDyHNrNnf+KVZBNclaBDoavl3ru6CnrLs0vyD5ikGhO
-         X5MlfW4tzv7iriza1GkwYh3wgkJW+Q8Pd3pC1y0IfONIe/Tku4HNWhdmWu6yyER4e2Zh
-         swD9TclYa0nG9MGMttykmy85WrLUn4q2z0w5xKDUcjN03H9MQ4u5xR1XVA4te818+LYR
-         Gxmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sLhr5UEdODqNRx69fxh3jRb3tIUO59cTzeH/dk/N40Q=;
-        b=WQ929olHE8fT8fYA+uEBHswsG7Am5Wg7FHpfd9ckcqSM+1/zIl49+3VnbM6uXahh5s
-         K9Vs7wwYFa7Bvts43Hw0f9IswnEYDOy44JAADOSUornbjjrXdPgIDm7EyVe4ijy0ZD3V
-         VvAn/+yim3BnlHACS2MlT1qAmbzxKY7NvOUMtiKx0VSE8+f1SGpodSEMcVmBr8o7bLK0
-         kOGjfbi4cCLckctqJKTv0sK6lC9iuLN8pk9nOa9c36q6M+SdWz0KIjRbRqkN7ipys845
-         fbKM+zETOetfpyhYTyEKgkjH+pcvNDaKCkB7t4ao4BbbrszTk6RtGOiEFQjPk41+COqE
-         PoeQ==
-X-Gm-Message-State: ACrzQf3fnhVFnedFQ2BAosBEabqzbRbosO6VBNtHV2HK0yS6B6PV8GoJ
-        MZAwBWSm3URb4qKiJQbVNGS8Jm0fk4O3Hg==
-X-Google-Smtp-Source: AMsMyM4WKigvoVxiMMu10g2VZ2ng5TIMKMfZh/e73wzbvqLvNPoDk+tQGo8Z7ow8byi/dCkgCUpK5Q==
-X-Received: by 2002:a05:6a00:bc7:b0:562:d2e5:adfd with SMTP id x7-20020a056a000bc700b00562d2e5adfdmr30000973pfu.4.1665620733630;
-        Wed, 12 Oct 2022 17:25:33 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id c1-20020a170902d48100b00182a9c27acfsm6287423plg.227.2022.10.12.17.25.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Oct 2022 17:25:33 -0700 (PDT)
-Date:   Thu, 13 Oct 2022 00:25:29 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     isaku.yamahata@intel.com
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-        isaku.yamahata@gmail.com, Kai Huang <kai.huang@intel.com>,
-        Chao Gao <chao.gao@intel.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Shaokun Zhang <zhangshaokun@hisilicon.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Huang Ying <ying.huang@intel.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v5 00/30] KVM: hardware enable/disable reorganize
-Message-ID: <Y0da+Sj3BjYnMoh3@google.com>
-References: <cover.1663869838.git.isaku.yamahata@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1663869838.git.isaku.yamahata@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229824AbiJMG3Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Oct 2022 02:29:16 -0400
+Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D1DD1EC55;
+        Wed, 12 Oct 2022 23:29:13 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+        by mailout.nyi.internal (Postfix) with ESMTP id 55C7E5C00FC;
+        Thu, 13 Oct 2022 02:29:11 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute3.internal (MEProxy); Thu, 13 Oct 2022 02:29:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to; s=fm2; t=1665642551; x=1665728951; bh=IK7qyXP/Hq
+        Hv2l79+EvbWbN9n2PDThaIIYKN+SdCmLU=; b=InSsjplS9Ys0U2AGlXKt7JrKR9
+        P4de4X3Des9x2jpi0NY5SqXFP9lDw2DELcTICNVaFYyQVug4NSAlLn2wnv5RNlKE
+        yseSXnYYuoWnY4pjo8NBgTmK4BauaA0Vxpaxn30Rme9wCptdagLbtyc4WqCbQL+Q
+        cbpa5YWMf59gAIoWc3xf7hsmriAvf6j0yjBXUSGoOutA/yJEXGrfxtUUh5GtWCLx
+        zifPjL/UKNieG6TcgJ/e4rUEQQTkNwwTqlJHxlGJxgo3ljAN8kc2ybhzMWsdCfpj
+        IJCSW6YUymHtrKbcSmGL7p68Usa2uTDg003fZ+yniKqlbvDqZ69trc46dPqg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm3; t=1665642551; x=1665728951; bh=IK7qyXP/HqHv2l79+EvbWbN9n2PD
+        ThaIIYKN+SdCmLU=; b=Q2CpNE0R0yn5ejpW0T6nFjfHoMnRLXBS32u4Y90NWnC0
+        1tIINvXRjhsIWBsk9oo21L9SAU2QG0twhkXlxNprdbOVir6CW2viY7ro8/IkN8ok
+        W1MerrZ+NRcgQkEAfAo90dHOYlI/yT2O/u4mZarMEBDibKBp2TtBsMdspWbRg2kQ
+        Px0D68KqMraQDAElccP2rC/C/MFaZSBgdlWvMtzRW6oqKkXKDumd9MfS8pJCrir2
+        nCjkuqxVVg1yMAURsQv5HJ7jx7PktJYsnkYbIGw3/La60yExsGRF81MZ30FuyXLE
+        3X3N1SLQ8ZDLF1NicDFofzohyntVbzNOOhnOW0gCgQ==
+X-ME-Sender: <xms:NrBHY7_Ni3TZ3cVbcq129ad5lztFqrAYS710Pvv1ow2bZY2XNGV1gw>
+    <xme:NrBHY3tQatCkmrhc2_bIhRoGWRGOqxv5firinyaUfWUaMrKmhSZ-4DcpdrafBG5Xr
+    vDrDMrPBmVYdpapWdQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfeejledguddutdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdet
+    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
+    htthgvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedt
+    keetffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    grrhhnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:NrBHY5AeVxScoHloAQn3dk12_0JBsCSMxhuCYcm0_4fd4jccNPWxqA>
+    <xmx:NrBHY3fPMECVqQVWlU7aEwnSnBUtJ3eZzm5kEW7Di4IbMUH406kCmw>
+    <xmx:NrBHYwMEJd_OL-fNGSTJEFtKIs8WIBfG6KXbe-VRRsY3OPi7Nu-NYw>
+    <xmx:N7BHYyv332Ii0uhigppB6rMr2NLWWMg9MonS7J95YHIiD4hXOpdN6Q>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 28323B60086; Thu, 13 Oct 2022 02:29:10 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.7.0-alpha0-1047-g9e4af4ada4-fm-20221005.001-g9e4af4ad
+Mime-Version: 1.0
+Message-Id: <a35fd31b-0658-4ac1-8340-99cdf4c75bb7@app.fastmail.com>
+In-Reply-To: <20221012180806-mutt-send-email-mst@kernel.org>
+References: <20221010132030-mutt-send-email-mst@kernel.org>
+ <87r0zdmujf.fsf@mpe.ellerman.id.au>
+ <20221012070532-mutt-send-email-mst@kernel.org>
+ <87mta1marq.fsf@mpe.ellerman.id.au> <87edvdm7qg.fsf@mpe.ellerman.id.au>
+ <20221012115023-mutt-send-email-mst@kernel.org>
+ <CAHk-=wg2Pkb9kbfbstbB91AJA2SF6cySbsgHG-iQMq56j3VTcA@mail.gmail.com>
+ <38893b2e-c7a1-4ad2-b691-7fbcbbeb310f@app.fastmail.com>
+ <20221012180806-mutt-send-email-mst@kernel.org>
+Date:   Thu, 13 Oct 2022 08:28:03 +0200
+From:   "Arnd Bergmann" <arnd@arndb.de>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     "Linus Torvalds" <torvalds@linux-foundation.org>,
+        xiujianfeng@huawei.com, kvm@vger.kernel.org,
+        alvaro.karsz@solid-run.com, "Jason Wang" <jasowang@redhat.com>,
+        angus.chen@jaguarmicro.com, wangdeming@inspur.com,
+        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Netdev <netdev@vger.kernel.org>,
+        "Bjorn Helgaas" <bhelgaas@google.com>, lingshan.zhu@intel.com,
+        linuxppc-dev@lists.ozlabs.org, gavinl@nvidia.com
+Subject: Re: [GIT PULL] virtio: fixes, features
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 22, 2022, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> This patch series is to implement the suggestion by Sean Christopherson [1]
-> to reorganize enable/disable cpu virtualization feature by replacing
-> the arch-generic current enable/disable logic with PM related hooks. And
-> convert kvm/x86 to use new hooks.
+On Thu, Oct 13, 2022, at 12:08 AM, Michael S. Tsirkin wrote:
+> On Wed, Oct 12, 2022 at 11:06:54PM +0200, Arnd Bergmann wrote:
+>> On Wed, Oct 12, 2022, at 7:22 PM, Linus Torvalds wrote:
+>> >
+>> > The NO_IRQ thing is mainly actually defined by a few drivers that just
+>> > never got converted to the proper world order, and even then you can
+>> > see the confusion (ie some drivers use "-1", others use "0", and yet
+>> > others use "((unsigned int)(-1)".
+>> 
+>> The last time I looked at removing it for arch/arm/, one problem was
+>> that there were a number of platforms using IRQ 0 as a valid number.
+>> We have converted most of them in the meantime, leaving now only
+>> mach-rpc and mach-footbridge. For the other platforms, we just
+>> renumbered all interrupts to add one, but footbridge apparently
+>> relies on hardcoded ISA interrupts in device drivers. For rpc,
+>> it looks like IRQ 0 (printer) already wouldn't work, and it
+>> looks like there was never a driver referencing it either.
+>
+> Do these two boxes even have pci?
 
-Thanks for putting this together, actually seeing code is super helpful!
+Footbridge/netwinder has PCI and PC-style ISA on-board devices
+(floppy, ps2 mouse/keyboard, parport, soundblaster, ...), RiscPC
+has neither.
 
-Unfortunately, after seeing the code, I think my suggestion was a bad one.  At
-the end of this series, there's a rather gross amount of duplicate code between
-x86 and common KVM, and no clear line of sight to improving things.
-
-Even if we move ARM, s390, and PPC away from the generic hooks, MIPS and RISC-V
-still need the generic implementation, i.e. we'll still have duplicate code.
-
-Rather than force arch code to implement most/all power management hooks, I think
-we can achieve a similar outcome (let ARM do its own thing, turn s390 and PPC into
-nops) by wrapping the hardware enable/disable (and thus PM code) in a Kconfig,
-e.g. KVM_GENERIC_HARDWARE_ENABLING.
-
-I'll throw together a rough prototype tomorrow (got partway through and then got
-distracted by other stuff) and hopefully post an RFC series.
-
-Thanks again!
+    Arnd
