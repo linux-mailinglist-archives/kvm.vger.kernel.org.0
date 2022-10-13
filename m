@@ -2,130 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1525A5FD901
-	for <lists+kvm@lfdr.de>; Thu, 13 Oct 2022 14:14:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE8525FD962
+	for <lists+kvm@lfdr.de>; Thu, 13 Oct 2022 14:43:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229755AbiJMMOF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Oct 2022 08:14:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37338 "EHLO
+        id S229804AbiJMMni (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Oct 2022 08:43:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229724AbiJMMOC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Oct 2022 08:14:02 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8525EFF21C
-        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 05:13:54 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id cu10-20020a056a00448a00b00562f2ff1058so1123924pfb.23
-        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 05:13:54 -0700 (PDT)
+        with ESMTP id S229754AbiJMMnf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Oct 2022 08:43:35 -0400
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D426012007F
+        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 05:43:32 -0700 (PDT)
+Received: by mail-qt1-x82f.google.com with SMTP id a24so866279qto.10
+        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 05:43:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=H9SaswMeDVA0PXtGn+/RgF2ttyuiFbIBcmIgImTCEOc=;
-        b=Ii25z3y8bR8LKI7fL+IKrahfLIIcV3i2dTRT7mx45kXaZTqxy+AlAEJavNtwpa3Anw
-         FzlrCvqcIVsgqY5N/4i6RpGtHtnXrv/KT6iO8pgRcqZeKk0f08HQPZeixvrS75+Ucw5L
-         VV0Kp9LASJiH661+y+0zqS+0bi4Ge2wi5JIRdmc3Simtu4fnznbSA2LJuCQfxGGBNgOd
-         km5BGclc4f2DTtfQwUTKXBVv+e3Mc14iEnNDliLXhGJtJJ+t/Xt3wBj9OliaFx99xuMS
-         sLj0INBleT8YXIcOCau1ft0h9gLiAptL/Q5xHngJ5C8CySJVqOXuEHFcRnQWu/xLRthx
-         +jsw==
+        d=ziepe.ca; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5GLjOW0BdIWUzC24491suSRlciPNhdwolicX7+j12wA=;
+        b=SAEIiL74kEmoL7i6K+FYqWYt1OQC0cAaHX12qGeOzYXKJYjkEQAv7uljHXJ4swa6JR
+         xHlzlAi1STF9FMZLYrCuntQOvDs5BQQQPxJNF3wfOuWu4E3nVEPIqcgSDMeXg4W9foEx
+         0k+Hg9nLfuR5H3rbCakZXpB23lScKeqGXgHhy6TUwyz+9v5bENkOeE6fD/gpEwe5Bxf8
+         M/NMiVb+q2oJLRq1/nR2hNa+gk4jKzwubgW4zUEfNWFDeL0SX384wdAplhzPwDYznJw8
+         lgiepffTEMTrRRlC+4XC2iHdyDe8mR5JOTJf66zXX3BgrzWWTN5zjDZrFb7Xy67Npu6b
+         X8Dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H9SaswMeDVA0PXtGn+/RgF2ttyuiFbIBcmIgImTCEOc=;
-        b=v/TnF3wOrj/MBXmIyV5RcHIO8r2h2W+Ieo+eHu3dDN1YQr1dAPNOTwvEdGN0XCxhfX
-         0+6AA8ss1zneXh4wZy6M7GOEwmjni5bjdMOSrsJil6ruOSghsw9WC8beCYsl13bZGZNa
-         yJyauDTCFPIYQV5KvHI9FxFhUmyw6F+pej0f7L5i5XeIqZ24UhhD5BLzzpWGtrC7LDto
-         T/iIAHYrIdUmi7nlN0XL8JEqhc+f6ljeKeoocMx67jKoGznqoUvAh6u2aTzFccMOLD0T
-         X4KZmX0Z0hRLkF9NHtR4oX7cVvgl5cxSrgwLJ2ji1Y/a/CRjqxDr+lE92QczAdQerqc3
-         1R4w==
-X-Gm-Message-State: ACrzQf1Ves3jkFOYNVVAL9lLLPFtsqbonxu+gl2O3YpLkIAZPpCcoYLY
-        TkpWl2E050qnaVNP9pUOomosldwu+UXbcbtr
-X-Google-Smtp-Source: AMsMyM4D8UD/snB7p//EsveGwAXY3dAujc5wCqE1XPJTo18Kkxmke1rbuc5ZoadCWIyta62qcE9Z4Z4GaauE7Vv5
-X-Received: from vannapurve2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:41f8])
- (user=vannapurve job=sendgmr) by 2002:a17:90a:8c8e:b0:202:883b:2644 with SMTP
- id b14-20020a17090a8c8e00b00202883b2644mr10744181pjo.89.1665663233436; Thu,
- 13 Oct 2022 05:13:53 -0700 (PDT)
-Date:   Thu, 13 Oct 2022 12:13:19 +0000
-In-Reply-To: <20221013121319.994170-1-vannapurve@google.com>
-Mime-Version: 1.0
-References: <20221013121319.994170-1-vannapurve@google.com>
-X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
-Message-ID: <20221013121319.994170-5-vannapurve@google.com>
-Subject: [V3 PATCH 4/4] KVM: selftests: x86: Precompute the cpu type
-From:   Vishal Annapurve <vannapurve@google.com>
-To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     pbonzini@redhat.com, shuah@kernel.org, bgardon@google.com,
-        seanjc@google.com, oupton@google.com, peterx@redhat.com,
-        vkuznets@redhat.com, dmatlack@google.com,
-        Vishal Annapurve <vannapurve@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5GLjOW0BdIWUzC24491suSRlciPNhdwolicX7+j12wA=;
+        b=QZf5aphC/+XCZquR+9up+EY87WjAw5x3i+O/Pik8ijzdhi1J4MfS+Q9FkMCbXqnROS
+         +5oU5Gqi2K37OUgeluIwyfokuUglt3JX9zizGZunX8NV7KBWqyueRhamTIH/VjSRnlMw
+         vk3EBQmFQrU3oXlS07m7m0voB3x/X7uOx9S4F5V8gNkSEh8Rr5a5B7g5uIXCKuoZ5mCE
+         6zCnqcHI+q7KFRqEoHe3VtV6YmaQSWVgf6BudOPgkAnFIJtepZAxZEwLu+TlUwfM2vVD
+         sTt3WVoGoxIjt1h1HuGupyv+GhK/nQeLCIiw7Jn/MsbSL7bNK5cG3I8SPRwm+/kw9ZJn
+         LoKg==
+X-Gm-Message-State: ACrzQf2z3CfQtdOhTjgIroAyFuAXxwpKqasx0iMktM6lZN122fJP0LGb
+        4ms60qwJzNA9CEZg830tcPVNiA==
+X-Google-Smtp-Source: AMsMyM6G5JimpMoD9asbrrZ+i9ANXy1SXyDx3Pt9ou8Ri40WatBI18xwZQ0CGdktSGP9wh6uVBoUDg==
+X-Received: by 2002:a05:622a:90:b0:394:1a9b:638e with SMTP id o16-20020a05622a009000b003941a9b638emr27765696qtw.314.1665665011242;
+        Thu, 13 Oct 2022 05:43:31 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-47-55-122-23.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.122.23])
+        by smtp.gmail.com with ESMTPSA id h19-20020a05620a401300b006eeb185c209sm2752971qko.50.2022.10.13.05.43.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Oct 2022 05:43:30 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1oixYf-002fJN-2g;
+        Thu, 13 Oct 2022 09:43:29 -0300
+Date:   Thu, 13 Oct 2022 09:43:29 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     "Radovanovic, Aleksandar" <aleksandar.radovanovic@amd.com>
+Cc:     "Gupta, Nipun" <Nipun.Gupta@amd.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        "robh+dt@kernel.org" <robh+dt@kernel.org>,
+        "krzysztof.kozlowski+dt@linaro.org" 
+        <krzysztof.kozlowski+dt@linaro.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "Gupta, Puneet (DCG-ENG)" <puneet.gupta@amd.com>,
+        "song.bao.hua@hisilicon.com" <song.bao.hua@hisilicon.com>,
+        "mchehab+huawei@kernel.org" <mchehab+huawei@kernel.org>,
+        "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
+        "jeffrey.l.hugo@gmail.com" <jeffrey.l.hugo@gmail.com>,
+        "saravanak@google.com" <saravanak@google.com>,
+        "Michael.Srba@seznam.cz" <Michael.Srba@seznam.cz>,
+        "mani@kernel.org" <mani@kernel.org>,
+        "yishaih@nvidia.com" <yishaih@nvidia.com>,
+        "will@kernel.org" <will@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "masahiroy@kernel.org" <masahiroy@kernel.org>,
+        "ndesaulniers@google.com" <ndesaulniers@google.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "okaya@kernel.org" <okaya@kernel.org>,
+        "Anand, Harpreet" <harpreet.anand@amd.com>,
+        "Agarwal, Nikhil" <nikhil.agarwal@amd.com>,
+        "Simek, Michal" <michal.simek@amd.com>,
+        "git (AMD-Xilinx)" <git@amd.com>
+Subject: Re: [RFC PATCH v3 4/7] bus/cdx: add cdx-MSI domain with gic-its
+ domain as parent
+Message-ID: <Y0gH8R8tEqn6sqZ5@ziepe.ca>
+References: <20220803122655.100254-1-nipun.gupta@amd.com>
+ <20220906134801.4079497-1-nipun.gupta@amd.com>
+ <20220906134801.4079497-5-nipun.gupta@amd.com>
+ <87h71juxuk.wl-maz@kernel.org>
+ <DM6PR12MB30820EE430405FF50C7F856BE8229@DM6PR12MB3082.namprd12.prod.outlook.com>
+ <MN2PR12MB43586084670E14691920952889229@MN2PR12MB4358.namprd12.prod.outlook.com>
+ <Y0a65a9leWXpKfTo@ziepe.ca>
+ <MN2PR12MB4358A871519748CD7A6DB7A089229@MN2PR12MB4358.namprd12.prod.outlook.com>
+ <Y0bRZTP9Kc6mdCiu@ziepe.ca>
+ <MN2PR12MB4358277977C1B7E0BC214AC789229@MN2PR12MB4358.namprd12.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MN2PR12MB4358277977C1B7E0BC214AC789229@MN2PR12MB4358.namprd12.prod.outlook.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Cache the vendor CPU type in a global variable so that multiple calls
-to is_amd/intel_cpu() do not need to re-execute CPUID.
+On Wed, Oct 12, 2022 at 03:09:26PM +0000, Radovanovic, Aleksandar wrote:
 
-Sync the global variable is_cpu_amd into the guest so the guest can also
-avoid executing CPUID instruction.
+> > On Wed, Oct 12, 2022 at 01:37:54PM +0000, Radovanovic, Aleksandar wrote:
+> > > > On Wed, Oct 12, 2022 at 10:34:23AM +0000, Radovanovic, Aleksandar
+> > wrote:
+> > > >
+> > > >
+> > > > > As for GITS_TRANSLATER, we can take up to 4 different IOVAs, which
+> > > > > limits us to 4 CDX devices (should be sufficient for current HW
+> > > > > use-cases). Also, it means that the address part must be the same
+> > > > > for all vectors within a single CDX device. I'm assuming this is
+> > > > > OK as it is going to be a single interrupt and IOMMU domain anyway.
+> > > >
+> > > > This is not at all how MSI is supposed to work.
+> > >
+> > > In the general case, no, they're not.
+> > 
+> > I don't mean that you can hack this to work - I mean that in MSI the
+> > addr/data is supposed to come from the end point itself, not from some kind
+> > of shared structure. This is important because the actual act of generating
+> > the write has to be coherent with the DMA the device is doing, as the MSI
+> > write must push any DMA data to visibility to meet the "producer /
+> > consumer" model.
+> > 
+> 
+> I'm not sure I follow your argument, the limitation here is that the MSI
+> address value is shared between vectors of the same device (requester id
+> or endpoint, whichever way you prefer to call it), not between
+> devices.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Vishal Annapurve <vannapurve@google.com>
----
- tools/testing/selftests/kvm/lib/x86_64/processor.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+That isn't what you said, you said "we can take up to 4 different
+IOVAs, which limits us to 4 CDX devices" - which sounds like HW being
+shared across devices??
 
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index fa65e8142c16..f508e58346e9 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -19,6 +19,7 @@
- #define MAX_NR_CPUID_ENTRIES 100
- 
- vm_vaddr_t exception_handlers;
-+static bool is_cpu_amd;
- 
- static void regs_dump(FILE *stream, struct kvm_regs *regs, uint8_t indent)
- {
-@@ -1046,7 +1047,7 @@ static bool cpu_vendor_string_is(const char *vendor)
- 
- bool is_intel_cpu(void)
- {
--	return cpu_vendor_string_is("GenuineIntel");
-+	return !is_cpu_amd;
- }
- 
- /*
-@@ -1054,7 +1055,7 @@ bool is_intel_cpu(void)
-  */
- bool is_amd_cpu(void)
- {
--	return cpu_vendor_string_is("AuthenticAMD");
-+	return is_cpu_amd;
- }
- 
- void kvm_get_cpu_address_width(unsigned int *pa_bits, unsigned int *va_bits)
-@@ -1328,8 +1329,13 @@ bool vm_is_unrestricted_guest(struct kvm_vm *vm)
- 	return get_kvm_intel_param_bool("unrestricted_guest");
- }
- 
-+void kvm_selftest_arch_init(void)
-+{
-+	is_cpu_amd = cpu_vendor_string_is("AuthenticAMD");
-+}
- 
- void kvm_arch_vm_post_create(struct kvm_vm *vm)
- {
- 	vm_create_irqchip(vm);
-+	sync_global_to_guest(vm, is_cpu_amd);
- }
--- 
-2.38.0.rc1.362.ged0d419d3c-goog
-
+Jason
