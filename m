@@ -2,102 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5872C5FCEF6
-	for <lists+kvm@lfdr.de>; Thu, 13 Oct 2022 01:34:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DA0715FD0C8
+	for <lists+kvm@lfdr.de>; Thu, 13 Oct 2022 02:30:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229704AbiJLXeq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 12 Oct 2022 19:34:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51716 "EHLO
+        id S231351AbiJMAaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 12 Oct 2022 20:30:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229660AbiJLXen (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 12 Oct 2022 19:34:43 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C67362655
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 16:34:41 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id x31-20020a17090a38a200b0020d2afec803so436750pjb.2
-        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 16:34:41 -0700 (PDT)
+        with ESMTP id S231429AbiJMA2h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 12 Oct 2022 20:28:37 -0400
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC330171CE4
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 17:25:30 -0700 (PDT)
+Received: by mail-pf1-f172.google.com with SMTP id d10so498566pfh.6
+        for <kvm@vger.kernel.org>; Wed, 12 Oct 2022 17:25:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cERvbXaBoiwZpLKTMnoym2lrd8wojnSLxS5/Et/ZtxM=;
-        b=Gkxb8MUaDmEzLcR56fUT7U9XlDq92WTgfJvzf394J9kipOUYLIxUTIOJy0wHD/ynj7
-         hgAf5bUmHtQA1Wrn5/cpLo9xJzzdT8v6dtOSZiTTCsRm3Nm7CtZ+kIwgdWutPKU7xP31
-         LgqrIStVocg96iTePzjBNRSbbX6vRJU6LKhqsORbDlJPf90Sss9EBObqq4KFo7WMmNfD
-         THRNC1hyTlvmZKuTTVIHxLxqtSR2hDjCFgnDonRSpJxIw3pBNGTGpuXiAZ4nidVUObQm
-         msltusfCmr0j3tDaaeH2Kwulq14Tb0p8bz38pFEXlkrCCW0MGBY0wbcyhvDg9kR4hkYA
-         kNMA==
+        bh=K7whd1nR2fxk/R3cx2zyxmptqUHfIbD5kvw3pDYFzeY=;
+        b=e566s0v9gEdcj855wSrlCgX4YHujADy4NcAJWC9Hw8Xqj3kQVu0jVG6JAlWRUPnA2d
+         yMUNl1hul0C3uJu8TMi93rbQDQjmNNir0NL2bFhBAaqpzPr8L93y3rS6uhzXM/dOf/0l
+         h30s45JEPeLSOFq5sKQjtBbuLeDyndNpZg8V1UCuKHzS/X5UB3t0eg5Z83V51RUKAa3v
+         XKRLj6hUCg0gBjVVI39A8o4HbwkzVDGGQz14VUh0SCtFjmzz/Cf4rpjLngnD8rPNRa8T
+         CVL68UmBzXVxXanfxMyH/rWWwwNsrZezOUnw8ffeK/8e9pekpJ4uUj/iGD/FbXUH7qb3
+         ywEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cERvbXaBoiwZpLKTMnoym2lrd8wojnSLxS5/Et/ZtxM=;
-        b=BHh6hAU3kO5EqMnonIuLil4/gGmOAWXS0Cl8IW7pK0PlGz4JxtzQkfkb+VV0x2zh9K
-         9OtgUnbfjvWVMyVZQeYY4NXDmNCQUGOCQZ3wAQQtpaifhRH2hlaF0phod+4YAKUo/7/C
-         tIK2lJZGUCmA7DbK26+qM2qNqE93KBJxkQdik8cEEsEPsD+QkaH+8UMSr022Ka8sQ1/M
-         2+44xeXwUYTOXBO76/w3uj9kWi6BYo4mRqdIdmOcB6Ydfs70Bo+iCR24s9ZpReRQ2OGs
-         jbUs0Xq8aZBMESOaiP6dO5qSveprTuTWKgH+1zcYnoSPgd9qCdU66V0HbMnxxodkD5wx
-         mElw==
-X-Gm-Message-State: ACrzQf1WjKqb0rx2EjTnUxpBWIOiUIFv2A2ef6khmXxpZk62uFKAMZgU
-        8kDn4bMj8Gi0aAbWGH/b3npg3Rtnipm66w==
-X-Google-Smtp-Source: AMsMyM46sM7BCLJjLxJHK32ndolQlA3APMWrMKLNoV5eSatnFPGtNz60YL4T59Rzsf11vIKItLJHsg==
-X-Received: by 2002:a17:902:d588:b0:180:cf18:e76c with SMTP id k8-20020a170902d58800b00180cf18e76cmr25806611plh.138.1665617681224;
-        Wed, 12 Oct 2022 16:34:41 -0700 (PDT)
+        bh=K7whd1nR2fxk/R3cx2zyxmptqUHfIbD5kvw3pDYFzeY=;
+        b=yh35VPDP4i7fRU7KurQhcamU2ai/vQm7Tdji0YTAZiXiejwfa4KCNkbGku8EV8caXH
+         NmFKVbFxvv/MbS4oLY6HCcT1YYQlXoMSr+7y2rVkbnGw+6HNLfA+YfxxuEjcJqZn+0MU
+         8i01qk2vUUKbTrzP65fHJQQq64uR0Rg+0YEtiIWA1qpWiTeQ+1u/SQKHqNkz1FCPrmYy
+         Z8H1ildnvu567UinW3cwPlliYjqoGGr56w1DznLbbL6gFEsKcU7Uj+Vck/xX9va32reM
+         EbgmKoJKdFVaOpYlx0q0DeqM1mvJFWi+KvM4+2U3PPA1M94RJ/ur2ppWRGtkGb6t6bGB
+         z1Sg==
+X-Gm-Message-State: ACrzQf0YfeypRtRHnu4H2TJhf+WZEFEif4JpBxZiMRmV9+Z9DoMkhQKB
+        GY2M0eE2MDePUDr/v57+dKFTtA==
+X-Google-Smtp-Source: AMsMyM7U3ZOfPGst/WeZswFT/39Idt5/dCb2XWX4uzAW6+oLRyDTmnV8VxXSnqpodQSFBE/Vjs0J5g==
+X-Received: by 2002:aa7:93a8:0:b0:563:4dc2:9e5f with SMTP id x8-20020aa793a8000000b005634dc29e5fmr20061854pff.68.1665620543941;
+        Wed, 12 Oct 2022 17:22:23 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id b3-20020a62cf03000000b005625ef68eecsm444952pfg.31.2022.10.12.16.34.40
+        by smtp.gmail.com with ESMTPSA id w187-20020a6262c4000000b00562f431f3d2sm460119pfb.83.2022.10.12.17.22.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Oct 2022 16:34:40 -0700 (PDT)
-Date:   Wed, 12 Oct 2022 23:34:36 +0000
+        Wed, 12 Oct 2022 17:22:23 -0700 (PDT)
+Date:   Thu, 13 Oct 2022 00:22:20 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Colton Lewis <coltonlewis@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
-        dmatlack@google.com, oupton@google.com, ricarkol@google.com,
-        andrew.jones@linux.dev
-Subject: Re: [PATCH v6 1/3] KVM: selftests: implement random number
- generation for guest code
-Message-ID: <Y0dPDGtj4SJTeqAO@google.com>
-References: <Y0YAdQC7eP1TN90b@google.com>
- <gsnt1qrc3fy9.fsf@coltonlewis-kvm.c.googlers.com>
+To:     Michal Luczaj <mhal@rbox.co>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [PATCH 8/8] KVM: x86: Fix NULL pointer dereference in
+ kvm_xen_set_evtchn_fast()
+Message-ID: <Y0daPIFwmosxV/NO@google.com>
+References: <YySujDJN2Wm3ivi/@google.com>
+ <20220921020140.3240092-1-mhal@rbox.co>
+ <20220921020140.3240092-9-mhal@rbox.co>
+ <Y0SquPNxS5AOGcDP@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <gsnt1qrc3fy9.fsf@coltonlewis-kvm.c.googlers.com>
+In-Reply-To: <Y0SquPNxS5AOGcDP@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 12, 2022, Colton Lewis wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> > The code is trivial to write and I can't think of any meaningful downside.
-> > Worst case scenario, we end up with an implementation that is slightly more
-> > formal than then we really need.
-> 
-> As a matter of personal taste, I don't like the additional formality
-> making things look more complicated than they are. The stakes are small
-> here but that kind of extra boilerplate can add up to make things
-> confusing.
+On Mon, Oct 10, 2022, Sean Christopherson wrote:
+> On Wed, Sep 21, 2022, Michal Luczaj wrote:
+> If this fixes things on your end (I'll properly test tomorrow too), I'll post a
+> v2 of the entire series.  There are some cleanups that can be done on top, e.g.
+> I think we should drop kvm_gpc_unmap() entirely until there's actually a user,
+> because it's not at all obvious that it's (a) necessary and (b) has desirable
+> behavior.
 
-I agree about unnecessary boilerplate being a burden, especially when it comes to
-KVM selftests, which are ridiculously "formal" and make simple operations
-frustratingly difficult.
-
-In this case though, I think the benefits of encapsulating the seed outweigh the
-cost of the formality by a good margin, and I don't see that formality snowballing
-any further.  A struct gets us:
-
-  - Type checking on the input param, e.g. prevents passing in garbage for the seed.
-  - The ability to switch out the algorithm.
-  - Some protection against overwriting the seed, e.g. corrupting the struct pointer
-    will explode and a memcpy() to overwrite the struct will be more visibily wrong.
-
-> Thanks for your patience. I never wanted to cause trouble.
-
-Heh, no worries.
+Sorry for the delay, I initially missed that you included a selftest for the race
+in the original RFC.  The kernel is no longer exploding, but the test is intermittently
+soft hanging waiting for the "IRQ".  I'll debug and hopefully post tomorrow.
