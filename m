@@ -2,448 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AC1B5FD5AA
-	for <lists+kvm@lfdr.de>; Thu, 13 Oct 2022 09:42:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9591E5FD5AF
+	for <lists+kvm@lfdr.de>; Thu, 13 Oct 2022 09:43:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229712AbiJMHmD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Oct 2022 03:42:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35384 "EHLO
+        id S229735AbiJMHnS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Oct 2022 03:43:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229640AbiJMHmB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Oct 2022 03:42:01 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A3F012C88A
-        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 00:41:59 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29D7e2UB011917
-        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 07:41:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=qoHbsPfJhPq65g43PXZGTd/hTUIsQHa14VE0SUkBUt4=;
- b=XSScUTesY2MYeBxLwB2MDub040TiuCtnXkQqKGiLWDemk8mM8/I7KlOdJmRfQTHuxeED
- n+lNTwUuXRTEStdXvWK56+sZE+6pLG6HjCfIOlHDiUlkkZnycIFGyNk3vOaQcMTbc+dW
- Ep8Wp/FZdfschTiZSWzs8P+FDD9MQslFmqWxvnQxtkBrROVRxmM6dPYn6m8Qn1UM4Lmq
- iV/EmdbWUEh3VOhhgweWPRf4OUAQ3rs/KQXDGivuPPDqW97l5FIzzhuqcFfIJgglWobc
- +32d0dAtlYnzgUow0cxKux7aWegRf/FwnRoaAMl+OHCp5mOqFxSo6JYtzHJNVTOOsmYC jw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k6bwpm6bd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 07:41:58 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29D7fwkr019384
-        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 07:41:58 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k6bwpm6aa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Oct 2022 07:41:58 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29D7aiAD011558;
-        Thu, 13 Oct 2022 07:41:56 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 3k30u9f6w8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 13 Oct 2022 07:41:55 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29D7b6BB48759166
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 13 Oct 2022 07:37:06 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D3E4911C04C;
-        Thu, 13 Oct 2022 07:41:52 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9F4F311C054;
-        Thu, 13 Oct 2022 07:41:52 +0000 (GMT)
-Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 13 Oct 2022 07:41:52 +0000 (GMT)
-From:   Nico Boehr <nrb@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
-Subject: [kvm-unit-tests PATCH v5 1/1] s390x: add exittime tests
-Date:   Thu, 13 Oct 2022 09:41:52 +0200
-Message-Id: <20221013074152.1412545-2-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20221013074152.1412545-1-nrb@linux.ibm.com>
-References: <20221013074152.1412545-1-nrb@linux.ibm.com>
+        with ESMTP id S229724AbiJMHnR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Oct 2022 03:43:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 761EE12C8A2
+        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 00:43:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665646995;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=SXWdlgPiKZdtloajnM9kce+ffCg7auTKtNFzfsnZZt0=;
+        b=XYfKQEq9amdBwzIqqjTmSqz6IBmv/xhyWtramVOb/cPwiBb9PmKJ1ZFhFv1Ph13o5/baZy
+        Y1SjB31gv+TsHVB1IpLQ8T2KpGFt1g5ZPkeWXXKMeGbYwW8cjy2LmgfdqT7OR7Ci1e12kt
+        W1ALFR0fatoQz6rdFBYcggCRTTz2RCs=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-593-De2R0kIxPbmMxtuL0Bucmg-1; Thu, 13 Oct 2022 03:43:14 -0400
+X-MC-Unique: De2R0kIxPbmMxtuL0Bucmg-1
+Received: by mail-wm1-f72.google.com with SMTP id l1-20020a7bc341000000b003bfe1273d6cso473088wmj.4
+        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 00:43:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SXWdlgPiKZdtloajnM9kce+ffCg7auTKtNFzfsnZZt0=;
+        b=vosvBgRqFWrva4q3KUdtNMRGz/llpkCWP5AnvE4s7FzgMVywRDJrQAqTwiotgtiaAw
+         cs/VSYhJR8i6jCXL9/Lo14ptsl3BbTKrD6i1PDv4N7s40fsBIytwMMmYh3kHDyUgDtqC
+         ntq9W6x7ysj5wPnpuviXD0JbnaMUCG3DR3qHpajkjD440QbSvtHEL46qKD6Y7Pyc5yrM
+         VNP6/I+T0pyp8y39opiSx9XyYsSsfesgPyh+T4yDDiXNJjqJCm45KYFATVqXMH3XDsXp
+         YI9Acekazwzi47gWvzYk9my4GtfQdskGtCiwOHlzMsQc+JN4LL13zfkjgyNO7nYNIaTB
+         Hspg==
+X-Gm-Message-State: ACrzQf3ROqcH6BaEa2nN79nMa8L4DtbV5nvYCDRqhGN9PBg9Qg/pv6yp
+        dCtp92536SVhya0HFBZo29foNvQipWj3mTFG/eVw8/qW1gRShgSaS272Qf7cwra52qV3D9h0rwL
+        aBl7c+OLIq3vr
+X-Received: by 2002:a5d:4535:0:b0:232:3648:7771 with SMTP id j21-20020a5d4535000000b0023236487771mr3614231wra.342.1665646993065;
+        Thu, 13 Oct 2022 00:43:13 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7u3l5fwviJkxhnWoyRDVIgzzas3DGCD8aBAIrgJcW2Qz/UfWuNQCeZOp0IQZhhlxWjJcOcaQ==
+X-Received: by 2002:a5d:4535:0:b0:232:3648:7771 with SMTP id j21-20020a5d4535000000b0023236487771mr3614216wra.342.1665646992852;
+        Thu, 13 Oct 2022 00:43:12 -0700 (PDT)
+Received: from [192.168.149.123] (58.254.164.109.static.wline.lns.sme.cust.swisscom.ch. [109.164.254.58])
+        by smtp.gmail.com with ESMTPSA id p8-20020a5d6388000000b00228da845d4dsm1324871wru.94.2022.10.13.00.43.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Oct 2022 00:43:12 -0700 (PDT)
+Message-ID: <261aff0b-874e-0644-e0c8-97e0a9bfbe04@redhat.com>
+Date:   Thu, 13 Oct 2022 09:43:09 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: dE77ARXe6mYNdy1_3_8iF8SCManLSbEp
-X-Proofpoint-ORIG-GUID: vch9nxkCj1G5sUKkOZFCq9EMuA883ugI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-13_06,2022-10-12_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 spamscore=0 impostorscore=0 mlxscore=0 adultscore=0
- bulkscore=0 priorityscore=1501 suspectscore=0 mlxlogscore=990
- clxscore=1015 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210130044
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [RFC PATCH 0/9] kvm: implement atomic memslot updates
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Hildenbrand <david@redhat.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Like Xu <like.xu.linux@gmail.com>
+References: <111a46c1-7082-62e3-4f3a-860a95cd560a@redhat.com>
+ <14d5b8f2-7cb6-ce24-c7a7-32aa9117c953@redhat.com>
+ <YzIZhn47brWBfQah@google.com>
+ <3b04db9d-0177-7e6e-a54c-a28ada8b1d36@redhat.com>
+ <YzMdjSkKaJ8HyWXh@google.com>
+ <dd6db8c9-80b1-b6c5-29b8-5eced48f1303@redhat.com>
+ <YzRvMZDoukMbeaxR@google.com>
+ <8534dfe4-bc71-2c14-b268-e610a3111d14@redhat.com>
+ <YzSxhHzgNKHL3Cvm@google.com>
+ <d8d2bd39-cbb3-010d-266a-4e967765a382@redhat.com>
+ <YzYQe2Lc+l2KpLBl@google.com>
+From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
+In-Reply-To: <YzYQe2Lc+l2KpLBl@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a test to measure the execution time of several instructions. This
-can be helpful in finding performance regressions in hypervisor code.
 
-All tests are currently reported as PASS, since the baseline for their
-execution time depends on the respective environment and since needs to
-be determined on a case-by-case basis.
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
----
- s390x/Makefile      |   1 +
- s390x/exittime.c    | 311 ++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |   4 +
- 3 files changed, 316 insertions(+)
- create mode 100644 s390x/exittime.c
+Am 29/09/2022 um 23:39 schrieb Sean Christopherson:
+> If we really want to provide a better experience for userspace, why not provide
+> more primitives to address those specific use cases?  E.g. fix KVM's historic wart
+> of disallowing toggling of KVM_MEM_READONLY, and then add one or more ioctls to:
+> 
+>   - Merge 2+ memory regions that are contiguous in GPA and HVA
+>   - Split a memory region into 2+ memory regions
+>   - Truncate a memory region
+>   - Grow a memory region
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index fba09bc2df3a..a28c6746cf55 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -37,6 +37,7 @@ tests += $(TEST_DIR)/migration-skey.elf
- tests += $(TEST_DIR)/panic-loop-extint.elf
- tests += $(TEST_DIR)/panic-loop-pgm.elf
- tests += $(TEST_DIR)/migration-sck.elf
-+tests += $(TEST_DIR)/exittime.elf
- 
- pv-tests += $(TEST_DIR)/pv-diags.elf
- 
-diff --git a/s390x/exittime.c b/s390x/exittime.c
-new file mode 100644
-index 000000000000..6c94e262cdfc
---- /dev/null
-+++ b/s390x/exittime.c
-@@ -0,0 +1,311 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Measure run time of various instructions. Can be used to find runtime
-+ * regressions of instructions which cause exits.
-+ *
-+ * Copyright IBM Corp. 2022
-+ *
-+ * Authors:
-+ *  Nico Boehr <nrb@linux.ibm.com>
-+ */
-+#include <libcflat.h>
-+#include <smp.h>
-+#include <sclp.h>
-+#include <asm/time.h>
-+#include <asm/sigp.h>
-+#include <asm/interrupt.h>
-+#include <asm/page.h>
-+
-+const uint64_t iters_to_normalize_to = 10000;
-+char pagebuf[PAGE_SIZE] __attribute__((__aligned__(PAGE_SIZE)));
-+
-+static void test_sigp_sense_running(long destcpu)
-+{
-+	smp_sigp(destcpu, SIGP_SENSE_RUNNING, 0, NULL);
-+}
-+
-+static void test_nop(long ignore)
-+{
-+	/* nops don't trap into the hypervisor, so let's test them for reference */
-+	asm volatile(
-+		"nop"
-+		:
-+		:
-+		: "memory"
-+	);
-+}
-+
-+static void test_diag9c(long destcpu)
-+{
-+	asm volatile(
-+		"diag %[destcpu],0,0x9c"
-+		:
-+		: [destcpu] "d" (destcpu)
-+	);
-+}
-+
-+static long setup_get_this_cpuaddr(long ignore)
-+{
-+	return stap();
-+}
-+
-+static void test_diag44(long ignore)
-+{
-+	asm volatile(
-+		"diag 0,0,0x44"
-+	);
-+}
-+
-+static void test_stnsm(long ignore)
-+{
-+	int out;
-+
-+	asm volatile(
-+		"stnsm %[out],0xff"
-+		: [out] "=Q" (out)
-+	);
-+}
-+
-+static void test_stosm(long ignore)
-+{
-+	int out;
-+
-+	asm volatile(
-+		"stosm %[out],0"
-+		: [out] "=Q" (out)
-+	);
-+}
-+
-+static long setup_ssm(long ignore)
-+{
-+	long system_mask = 0;
-+
-+	asm volatile(
-+		"stosm %[system_mask],0"
-+		: [system_mask] "=Q" (system_mask)
-+	);
-+
-+	return system_mask;
-+}
-+
-+static void test_ssm(long old_system_mask)
-+{
-+	asm volatile(
-+		"ssm %[old_system_mask]"
-+		:
-+		: [old_system_mask] "Q" (old_system_mask)
-+	);
-+}
-+
-+static long setup_lctl4(long ignore)
-+{
-+	long ctl4_orig = 0;
-+
-+	asm volatile(
-+		"stctg 4,4,%[ctl4_orig]"
-+		: [ctl4_orig] "=S" (ctl4_orig)
-+	);
-+
-+	return ctl4_orig;
-+}
-+
-+static void test_lctl4(long ctl4_orig)
-+{
-+	asm volatile(
-+		"lctlg 4,4,%[ctl4_orig]"
-+		:
-+		: [ctl4_orig] "S" (ctl4_orig)
-+	);
-+}
-+
-+static void test_stpx(long ignore)
-+{
-+	unsigned int prefix;
-+
-+	asm volatile(
-+		"stpx %[prefix]"
-+		: [prefix] "=Q" (prefix)
-+	);
-+}
-+
-+static void test_stfl(long ignore)
-+{
-+	asm volatile(
-+		"stfl 0"
-+		:
-+		:
-+		: "memory"
-+	);
-+}
-+
-+static void test_epsw(long ignore)
-+{
-+	long r1, r2;
-+
-+	asm volatile(
-+		"epsw %[r1], %[r2]"
-+		: [r1] "=d" (r1), [r2] "=d" (r2)
-+	);
-+}
-+
-+static void test_illegal(long ignore)
-+{
-+	expect_pgm_int();
-+	asm volatile(
-+		".word 0"
-+	);
-+	clear_pgm_int();
-+}
-+
-+static long setup_servc(long arg)
-+{
-+	memset(pagebuf, 0, PAGE_SIZE);
-+	return arg;
-+}
-+
-+static void test_servc(long ignore)
-+{
-+	SCCB *sccb = (SCCB *) pagebuf;
-+
-+	sccb->h.length = 8;
-+	servc(0, (unsigned long) sccb);
-+}
-+
-+static void test_stsi(long fc)
-+{
-+	stsi(pagebuf, fc, 2, 2);
-+}
-+
-+struct test {
-+	const char *name;
-+	/*
-+	 * When non-null, will be called once before running the test loop.
-+	 * Its return value will be given as argument to testfunc.
-+	 */
-+	long (*setupfunc)(long arg);
-+	void (*testfunc)(long arg);
-+	long arg;
-+	long iters;
-+} const exittime_tests[] = {
-+	{"nop",                   NULL,                   test_nop,                0, 200000 },
-+	{"sigp sense running(0)", NULL,                   test_sigp_sense_running, 0, 20000 },
-+	{"sigp sense running(1)", NULL,                   test_sigp_sense_running, 1, 20000 },
-+	{"diag9c(self)",          setup_get_this_cpuaddr, test_diag9c,             0, 2000 },
-+	{"diag9c(0)",             NULL,                   test_diag9c,             0, 2000 },
-+	{"diag9c(1)",             NULL,                   test_diag9c,             1, 2000 },
-+	{"diag44",                NULL,                   test_diag44,             0, 2000 },
-+	{"stnsm",                 NULL,                   test_stnsm,              0, 200000 },
-+	{"stosm",                 NULL,                   test_stosm,              0, 200000 },
-+	{"ssm",                   setup_ssm,              test_ssm,                0, 200000 },
-+	{"lctl4",                 setup_lctl4,            test_lctl4,              0, 20000 },
-+	{"stpx",                  NULL,                   test_stpx,               0, 2000 },
-+	{"stfl",                  NULL,                   test_stfl,               0, 2000 },
-+	{"epsw",                  NULL,                   test_epsw,               0, 20000 },
-+	{"illegal",               NULL,                   test_illegal,            0, 2000 },
-+	{"servc",                 setup_servc,            test_servc,              0, 2000 },
-+	{"stsi122",               NULL,                   test_stsi,               1, 200 },
-+	{"stsi222",               NULL,                   test_stsi,               2, 200 },
-+	{"stsi322",               NULL,                   test_stsi,               3, 200 },
-+};
-+
-+struct test_result {
-+	uint64_t total;
-+	uint64_t best;
-+	uint64_t average;
-+	uint64_t worst;
-+};
-+
-+static uint64_t tod_to_us(uint64_t tod)
-+{
-+	return tod >> STCK_SHIFT_US;
-+}
-+
-+static uint64_t normalize_iters(uint64_t value_to_normalize, struct test const* test)
-+{
-+	return value_to_normalize / test->iters * iters_to_normalize_to;
-+}
-+
-+static void normalize_result(struct test const* test, struct test_result const* test_result_in, struct test_result *test_result_out)
-+{
-+	test_result_out->total = normalize_iters(test_result_in->total, test);
-+	test_result_out->best = normalize_iters(test_result_in->best, test);
-+	test_result_out->average = normalize_iters(test_result_in->average, test);
-+	test_result_out->worst = normalize_iters(test_result_in->worst, test);
-+}
-+
-+static void report_test_result(uint64_t iters, struct test_result const* test_result)
-+{
-+	report_pass(
-+		"iters/total/best/avg/worst %lu/%lu/%lu/%lu/%lu us",
-+		iters,
-+		tod_to_us(test_result->total),
-+		tod_to_us(test_result->best),
-+		tod_to_us(test_result->average),
-+		tod_to_us(test_result->worst)
-+	);
-+}
-+
-+static void report_iteration_result(struct test const* test, struct test_result const* test_result)
-+{
-+	struct test_result test_result_normalized;
-+
-+	/*
-+	 * The test result as measured. Useful to compare the runtime of a
-+	 * single instruction in two runs, i.e. to identify performance
-+	 * regressions.
-+	 */
-+	report_prefix_push("non-normalized");
-+	report_test_result(test->iters, test_result);
-+	report_prefix_pop();
-+
-+	/*
-+	 * Normalize to a number of inner iterations. Useful to compare the
-+	 * runtime of two instructions in a single run (i.e. instruction A is X
-+	 * times faster than B).
-+	 */
-+	report_prefix_push("normalized");
-+	normalize_result(test, test_result, &test_result_normalized);
-+	report_test_result(iters_to_normalize_to, &test_result_normalized);
-+	report_prefix_pop();
-+}
-+
-+int main(void)
-+{
-+	int i, j, k, testfunc_arg;
-+	const int outer_iters = 100;
-+	struct test const *current_test;
-+	struct test_result result;
-+	uint64_t start, end, elapsed;
-+
-+	report_prefix_push("exittime");
-+	report_info("reporting total/best/worst of %d outer iterations", outer_iters);
-+
-+	for (i = 0; i < ARRAY_SIZE(exittime_tests); i++) {
-+		current_test = &exittime_tests[i];
-+		result.total = 0;
-+		result.worst = 0;
-+		result.best = -1;
-+		report_prefix_pushf("%s", current_test->name);
-+
-+		testfunc_arg = current_test->arg;
-+		if (current_test->setupfunc)
-+			testfunc_arg = current_test->setupfunc(testfunc_arg);
-+
-+		for (j = 0; j < outer_iters; j++) {
-+			stckf(&start);
-+			for (k = 0; k < current_test->iters; k++)
-+				current_test->testfunc(testfunc_arg);
-+			stckf(&end);
-+			elapsed = end - start;
-+			result.best = MIN(result.best, elapsed);
-+			result.worst = MAX(result.worst, elapsed);
-+			result.total += elapsed;
-+		}
-+		result.average = result.total / outer_iters;
-+		report_iteration_result(current_test, &result);
-+		report_prefix_pop();
-+	}
-+
-+	report_prefix_pop();
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 2c04ae7c7c15..feb9abf03745 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -201,3 +201,7 @@ timeout = 5
- [migration-sck]
- file = migration-sck.elf
- groups = migration
-+
-+[exittime]
-+file = exittime.elf
-+smp = 2
--- 
-2.36.1
+I looked again at the code and specifically the use case that triggers
+the crash in bugzilla. I *think* (correct me if I am wrong), that the
+only operation that QEMU performs right now is "grow/shrink".
+
+So *if* we want to go this way, we could start with a simple grow/shrink
+API.
+
+Even though we need to consider that this could bring additional
+complexity in QEMU. Currently, DELETE+CREATE (grow/shrink) is not
+performed one after the other (in my innocent fantasy I was expecting to
+find 2 subsequent ioctls in the code), but in QEMU's
+address_space_set_flatview(), which seems to first remove all regions
+and then add them when changing flatviews.
+
+address_space_update_topology_pass(as, old_view2, new_view, adding=false);
+address_space_update_topology_pass(as, old_view2, new_view, adding=true);
+
+I don't think we can change this, as other listeners also rely on such
+ordering, but we can still batch all callback requests like I currently
+do and process them in kvm_commit(), figuring there which operation is
+which.
+
+In other words, we would have something like:
+
+region_del() --> DELETE memslot X -> add it to the queue of operations
+region_del() --> DELETE memslot Y -> add it to the queue of operations
+region_add() --> CREATE memslot X (size doubled) -> add it to the queue
+of operations
+region_add() --> CREATE memslot Y (size halved) -> add it to the queue
+of operations
+...
+commit() --> scan QUEUE and figure what to do -> GROW X (+size), SHRINK
+Y (-size) -> issue 2 ioctls, GROW and SHRINK.
+
+> That would probably require more KVM code overall, but each operation would be more
+> tightly bounded and thus simpler to define.  And I think more precise APIs would
+> provide other benefits, e.g. growing a region wouldn't require first deleting the
+> current region, and so could avoid zapping SPTEs and destroying metadata.  Merge,
+> split, and truncate would have similar benefits, though they might be more
+> difficult to realize in practice.
+
+So essentially grow would not require INVALIDATE. Makes sense, but would
+it work also with shrink? I guess so, as the memslot is still present
+(but shrinked) right?
+
+Paolo, would you be ok with this smaller API? Probably just starting
+with grow and shrink first.
+
+I am not against any of the two approaches:
+- my approach has the disadvantage that the list could be arbitrarily
+long, and it is difficult to rollback the intermediate changes if
+something breaks during the request processing (but could be simplified
+by making kvm exit or crash).
+
+- Sean approach could potentially provide more burden to the userspace,
+as we need to figure which operation is which. Also from my
+understanding split and merge won't be really straightforward to
+implement, especially in userspace.
+
+David, any concern from userspace prospective on this "CISC" approach?
+
+Thank you,
+Emanuele
 
