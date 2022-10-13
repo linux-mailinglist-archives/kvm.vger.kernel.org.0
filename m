@@ -2,82 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7825C5FDECE
-	for <lists+kvm@lfdr.de>; Thu, 13 Oct 2022 19:19:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AA755FDED6
+	for <lists+kvm@lfdr.de>; Thu, 13 Oct 2022 19:21:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229698AbiJMRTZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Oct 2022 13:19:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57480 "EHLO
+        id S229740AbiJMRVd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Oct 2022 13:21:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229656AbiJMRTY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Oct 2022 13:19:24 -0400
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25407D2CE5
-        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 10:19:23 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id p127so1786860oih.9
-        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 10:19:23 -0700 (PDT)
+        with ESMTP id S229726AbiJMRVb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Oct 2022 13:21:31 -0400
+Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16887D9945
+        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 10:21:30 -0700 (PDT)
+Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-360871745b0so24040067b3.3
+        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 10:21:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
+        d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=j1qTz+oYugF8Lf770mKCIrdepvqmBbCEzwy+EaukMrM=;
-        b=RwP93R0i/58OL7LRD+//xbsGSpXEvsNfrhi2GXL/rRnIR0fEBr1hhf0AxtH9ySaIuq
-         fxnBUs5tBFF0nv+sS5fXPWTFdyDQIQyfW3oaIHCHCny57nHo+jkN3VT1oW56ATf0pSAn
-         /cXKnAs4MWRb/mczWEGT2NYOdgosHqzbcK1Ec=
+        bh=QuAPrq7fg7n5xtr2Tt6KkaaUEeLuu+jNnvfbI0TJOvQ=;
+        b=TcbfAV+G20cD+j8MXhlBXVZ6475WoerOXjRAY/TZ78ZBxROpWGFW7BdXnDll3LaO9N
+         XQdOKl8y1MWP2bMGTEFHXLc0bdGKtpAPEhP8qmAlEleBjK+L+e7hLO7YabSdLMmdB23i
+         duN3DXmq35Pze0amNomz6pGO6SuLtDj9K86YpB7i+ZB8bw7AxIFTpxMOAsgltOB5pjIJ
+         x9m4eDjS+y5RiuL/nBIJ6lvytzuccgJROuVcaOK34QSeSVUi/Jf9PnTBY/ZO58tBHih0
+         u0H2gF9auA/tZvvqm/CACMFf3GiKsOr67MJb5a3DEUS9gEHJNd/E+9ktazTwsGG2Hswc
+         4ESg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=j1qTz+oYugF8Lf770mKCIrdepvqmBbCEzwy+EaukMrM=;
-        b=bQo0nYgAZGY0kBT1ePFc1Ulj3yEQZQTqClAuflHvPpEcpUiN2zHO/JwPOy07oQGezD
-         6FYpLXl9w2V140zUo/bm19kgiW7JoWiY8sMJKK7ivVh5p/nOx+icVVIud3cftfVpz/5V
-         lD7AQyzW0E0qmaZFi1gzz6Zn8IaradVR+ArkHv8QuukOlzfqWcxcWA/E7BjrI5MSIOP8
-         yqUlXPHF7C6KUuk23iG+TYgOIP+HvUcyFjYnRZ5kc6q9lNghH+KxyNEXuYLkjgBYZ3W2
-         CrPsj7Xpk2+kREUU7lNcg/A2l/2zFfR7dU0eAyB7XqpRVdKodR5MOszBrdvDdTz4g7/F
-         ozNg==
-X-Gm-Message-State: ACrzQf3vnsz37Ygc0hhNwHvAqQtbKUtntSyF+m5grjBfOCvxtTrVE6GV
-        Tf+PfaqI8iBOgjJ90XoH97XbiLwg+aSfgQ==
-X-Google-Smtp-Source: AMsMyM4a29/M+mo8YWRObjG7G78zPmc2Poy/JJP/OMU82vpz0orQTrak/qgSbLxb7b81Alq2ziYJiQ==
-X-Received: by 2002:a05:6808:3087:b0:354:badb:8238 with SMTP id bl7-20020a056808308700b00354badb8238mr462300oib.90.1665681561379;
-        Thu, 13 Oct 2022 10:19:21 -0700 (PDT)
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com. [209.85.210.45])
-        by smtp.gmail.com with ESMTPSA id er33-20020a056870c8a100b0011e37fb5493sm222822oab.30.2022.10.13.10.19.19
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Oct 2022 10:19:19 -0700 (PDT)
-Received: by mail-ot1-f45.google.com with SMTP id d18-20020a05683025d200b00661c6f1b6a4so427619otu.1
-        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 10:19:19 -0700 (PDT)
-X-Received: by 2002:a05:6830:4421:b0:661:8fdd:81e9 with SMTP id
- q33-20020a056830442100b006618fdd81e9mr528782otv.69.1665681558964; Thu, 13 Oct
- 2022 10:19:18 -0700 (PDT)
+        bh=QuAPrq7fg7n5xtr2Tt6KkaaUEeLuu+jNnvfbI0TJOvQ=;
+        b=thVyGZWXSQ4lxmGcsLaGGI6AWhBFbkd0iPwYpXqV4ooh5If0TuHYqZJFNcTrATvzfc
+         JfL4ePX/J6IVCWaGzf9FLd/7uTuMtLtdizN/dFdw2b0jR5nd83H0Y73cZNfncdIUhwvZ
+         jiRx/5mpgiN+/V5WAIZyao2TPM0i2LJiSombL6Cv+yFZsMrMfLSHXP0me2Xljr3k7ug6
+         pvBQMvFMYJUdxjCkCxFuzLcyKfi8Wgb/6vpTBPtlQTJQl41yyfODdaqTXIH8AMYFmCOl
+         DB0S4KGHs9p84f10pkm0pZU8s0AnFKxPaW9SQX4W4r2wXRvV5Q9gaU4r3TtypmfnVMBF
+         aVSg==
+X-Gm-Message-State: ACrzQf2KpMxT4KzB+dchBR6ZihVQ6Jd/RHitt32QJGme74vJVdyDuqpV
+        9dTqodcVsa2wuizEoVTPzN4Df8EtqgK1ccT+qPTlBw==
+X-Google-Smtp-Source: AMsMyM7EYOPAqQtv3tYWi/iflfKvVcuZlSSnM/7DH525UefT2YqiASBW2R2cOnQ8OvVCMuzlp1djkiUueSzgoa6C2PE=
+X-Received: by 2002:a81:9204:0:b0:358:89e9:cff9 with SMTP id
+ j4-20020a819204000000b0035889e9cff9mr973200ywg.168.1665681689194; Thu, 13 Oct
+ 2022 10:21:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20221010132030-mutt-send-email-mst@kernel.org>
- <87r0zdmujf.fsf@mpe.ellerman.id.au> <20221012070532-mutt-send-email-mst@kernel.org>
- <87mta1marq.fsf@mpe.ellerman.id.au> <87edvdm7qg.fsf@mpe.ellerman.id.au>
- <20221012115023-mutt-send-email-mst@kernel.org> <CAHk-=wg2Pkb9kbfbstbB91AJA2SF6cySbsgHG-iQMq56j3VTcA@mail.gmail.com>
- <38893b2e-c7a1-4ad2-b691-7fbcbbeb310f@app.fastmail.com> <20221012180806-mutt-send-email-mst@kernel.org>
- <a35fd31b-0658-4ac1-8340-99cdf4c75bb7@app.fastmail.com>
-In-Reply-To: <a35fd31b-0658-4ac1-8340-99cdf4c75bb7@app.fastmail.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Thu, 13 Oct 2022 10:19:02 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whLv3MO0Tvc62zJ+=4yvSfKMK17C0wfpbXBwUJqSjKbYA@mail.gmail.com>
-Message-ID: <CAHk-=whLv3MO0Tvc62zJ+=4yvSfKMK17C0wfpbXBwUJqSjKbYA@mail.gmail.com>
-Subject: Re: [GIT PULL] virtio: fixes, features
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, xiujianfeng@huawei.com,
-        kvm@vger.kernel.org, alvaro.karsz@solid-run.com,
-        Jason Wang <jasowang@redhat.com>, angus.chen@jaguarmicro.com,
-        wangdeming@inspur.com, linux-kernel@vger.kernel.org,
-        linux-pci@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Netdev <netdev@vger.kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>, lingshan.zhu@intel.com,
-        linuxppc-dev@lists.ozlabs.org, gavinl@nvidia.com
+References: <20221012181702.3663607-1-seanjc@google.com>
+In-Reply-To: <20221012181702.3663607-1-seanjc@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Thu, 13 Oct 2022 10:21:02 -0700
+Message-ID: <CALzav=fZvNttbXSZfCCaFym8cNHYmFZX7286CW_zTZA1CTr3kA@mail.gmail.com>
+Subject: Re: [PATCH v4 00/11] KVM: x86/mmu: Make tdp_mmu a read-only parameter
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Isaku Yamahata <isaku.yamahata@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -85,59 +68,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 12, 2022 at 11:29 PM Arnd Bergmann <arnd@arndb.de> wrote:
+On Wed, Oct 12, 2022 at 11:17 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> On Thu, Oct 13, 2022, at 12:08 AM, Michael S. Tsirkin wrote:
-> >
-> > Do these two boxes even have pci?
+> This is a variation of David's series to change tdp_mmu to a RO param[*].
+> The key difference is that instead of moving the TDP MMU page fault handler
+> to its own function, use static branches to make TDP MMU page faults (and
+> a few other paths) effectively branch free.
 >
-> Footbridge/netwinder has PCI and PC-style ISA on-board devices
-> (floppy, ps2 mouse/keyboard, parport, soundblaster, ...), RiscPC
-> has neither.
+> I'm not dead set against having a dedicated TDP MMU page fault handler, but
+> IMO it's not really better once the TDP MMU vs. shadow MMU is reduced to a
+> static branch, just different.  The read vs. write mmu_lock is the most
+> visible ugliness, and that can be buried in helpers if we really want to
+> make the page fault handler easier on the eyes, e.g.
+>
+>         direct_page_fault_mmu_lock(vcpu);
+>
+>         if (is_page_fault_stale(vcpu, fault))
+>                 goto out_unlock;
+>
+>         if (is_tdp_mmu_enabled()) {
+>                 r = kvm_tdp_mmu_map(vcpu, fault);
+>         } else {
+>                 r = make_mmu_pages_available(vcpu);
+>                 if (r)
+>                         goto out_unlock;
+>
+>                 r = __direct_map(vcpu, fault);
+>         }
+>
+> out_unlock:
+>         direct_page_fault_mmu_unlock(vcpu);
 
-It's worth noting that changing a driver that does
+Thanks for the respin.
 
-        if (dev->irq == NO_IRQ)
-                return -ENODEV;
+My preference is still separate handlers. When I am reading this code,
+I only care about one path (TDP MMU or Shadow MMU, usually TDP MMU).
+Having separate handlers makes it easy to read since I don't have to
+care about the implementation details of the other MMU.
 
-to use
+And more importantly (but less certain), the TDP MMU fault handler is
+going to diverge further from the Shadow MMU fault handler in the near
+future. i.e. There will be more and more branches in a common fault
+handler, and the value of having a common fault handler diminishes.
+Specifically, to support moving the TDP MMU to common code, the TDP
+MMU is no longer going to topup the same mem caches as the Shadow MMU
+(TDP MMU is not going to use struct kvm_mmu_page), and the TDP MMU
+will probably have its own fast_page_fault() handler eventually.
 
-        if (!dev->irq)
-                return -ENODEV;
+If we do go the common handler route, I don't prefer the
+direct_page_fault_mmu_lock/unlock() wrapper since it further obscures
+the differences between the 2 MMUs.
 
-should be pretty much always fine.
-
-Even *if* that driver is then compiled and used on an architecture
-where NO_IRQ is one of the odd values, you end up having only two
-cases
-
- (a) irq 0 was actually a valid irq after all
-
- (b) you just get the error later when actually trying to use the odd
-NO_IRQ interrupt with request_irq() and friends
-
-and here (a) basically never happens - certainly not for any PCI setup
-- and (b) is harmless unless the driver was already terminally broken
-anyway.
-
-The one exception for (a) might be some platform irq code. On x86,
-that would be the legacy timer interrupt, of course.
-
-So if some odd platform actually has a "real" interrupt on irq0, that
-platform should either just fix the irq number mapping, or should
-consider that interrupt to be a platform-specific thing and handle it
-very very specially.
-
-On x86, for example, we do
-
-        if (request_irq(0, timer_interrupt, flags, "timer", NULL))
-
-early in boot, and that's basically what then makes sure that no
-driver can get that irq. It's done through the platform "timer_init"
-code at the "late_time_init()" call.
-
-(And that "late_time_init()" - despite the name - isn't very late at
-all. It's just later than the very early timekeeping init - after
-interrupts have been enabled at all.
-
-             Linus
+>
+> v4:
+>   - Keep is_tdp_mmu_page() in patch 1.
+>   - Collect reviews. [Isaku]
+>   - Skip "make MMU pages available" for root allocations.
+>   - Rework "is TDP MMU" checks to take advantage of read-only param.
+>   - Use a static key to track TDP MMU enabling.
+>
+> [*] https://lkml.kernel.org/r/20220921173546.2674386-1-dmatlack@google.com
+>
+> David Matlack (7):
+>   KVM: x86/mmu: Change tdp_mmu to a read-only parameter
+>   KVM: x86/mmu: Move TDP MMU VM init/uninit behind tdp_mmu_enabled
+>   KVM: x86/mmu: Grab mmu_invalidate_seq in kvm_faultin_pfn()
+>   KVM: x86/mmu: Handle error PFNs in kvm_faultin_pfn()
+>   KVM: x86/mmu: Avoid memslot lookup during KVM_PFN_ERR_HWPOISON
+>     handling
+>   KVM: x86/mmu: Handle no-slot faults in kvm_faultin_pfn()
+>   KVM: x86/mmu: Stop needlessly making MMU pages available for TDP MMU
+>
+> Sean Christopherson (4):
+>   KVM: x86/mmu: Pivot on "TDP MMU enabled" when handling direct page
+>     faults
+>   KVM: x86/mmu: Pivot on "TDP MMU enabled" to check if active MMU is TDP
+>     MMU
+>   KVM: x86/mmu: Replace open coded usage of tdp_mmu_page with
+>     is_tdp_mmu_page()
+>   KVM: x86/mmu: Use static key/branches for checking if TDP MMU is
+>     enabled
+>
+>  arch/x86/include/asm/kvm_host.h |   9 --
+>  arch/x86/kvm/mmu.h              |  14 ++-
+>  arch/x86/kvm/mmu/mmu.c          | 212 ++++++++++++++++++++------------
+>  arch/x86/kvm/mmu/mmu_internal.h |   1 +
+>  arch/x86/kvm/mmu/paging_tmpl.h  |  12 +-
+>  arch/x86/kvm/mmu/tdp_mmu.c      |  13 +-
+>  arch/x86/kvm/mmu/tdp_mmu.h      |  25 +---
+>  7 files changed, 149 insertions(+), 137 deletions(-)
+>
+>
+> base-commit: e18d6152ff0f41b7f01f9817372022df04e0d354
+> --
+> 2.38.0.rc1.362.ged0d419d3c-goog
+>
