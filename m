@@ -2,76 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 01C225FD8B7
-	for <lists+kvm@lfdr.de>; Thu, 13 Oct 2022 14:01:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D3D315FD8F6
+	for <lists+kvm@lfdr.de>; Thu, 13 Oct 2022 14:13:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229751AbiJMMBp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Oct 2022 08:01:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42192 "EHLO
+        id S229628AbiJMMNp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Oct 2022 08:13:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229565AbiJMMBn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Oct 2022 08:01:43 -0400
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B44CBDED33;
-        Thu, 13 Oct 2022 05:01:42 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id y8so1711118pfp.13;
-        Thu, 13 Oct 2022 05:01:42 -0700 (PDT)
+        with ESMTP id S229496AbiJMMNn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Oct 2022 08:13:43 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03343FA011
+        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 05:13:42 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id b1-20020a17090a10c100b0020da29fa5e5so1010559pje.2
+        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 05:13:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ElBYTgFlxjWs/MeokXyE9WiTAY9kACvPyV78ldgqQ0I=;
-        b=BNvSx3+biHAzmMQ0IwB+wNmj7oDhUd30T5z20pi+MYtPsJqTYGm0SigZ1UJ4sCfoYU
-         7phTYl6Wx5eJWe/0/Pslb196lExabN9Tt8xgT/wIsmtNS3itk+rwgbwKhK9G+y5CgUD0
-         nKP2Kk12ZOHwFGiugg9w8B3fjedJmBbztIQzBEztZTEYol+SuhXHyTKbotRwQD+vpyXh
-         X3yaDZ50lwaQnJq8DzBO6NV6Z3/pvvH1PEvmgwsSz5Om3tG1j7FxJ5MydKDQR+zCGTCA
-         NtTe5FWXlBPxa29okQGQgKChv5eW/UScZF68L5PTV2WnQSKbEbhMyJGw8ZofdNChhnj7
-         NFLQ==
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=9d+vaj1FTruzdJSiSw/Zn2gxH71jsLWJ5ZYfpHyYTxs=;
+        b=UsDG2XB62PQ5XB1xZvpayV/A2gNWj251NrNGJ2niovIws3Ap89Cvi7ppbdpGsT4XAn
+         CsM9Po61g6KKpq7h49ImCJ5MTMgfn5YW0CvaA0Vhut0JPl6mviCTUHbglLXkoThv2vSM
+         sRbxqwQdqWWS9bJG53eRRPDADSJ3RUuVknwCPym09OFJOx0F/6d/gpEyqISDQacUaKHT
+         J0P/QQqbRAgCnp/lvcQRrgr2KTNZR8dCIIPi979minW2qiTICJzZUHVrlxSuQ0XZEnxm
+         1t4ThURbWcoxPjL7R3iWy0XxFXBwAp4NXfCgoKYC4+NLs9nJ/uH0hnop1MDcBUXtFNPM
+         UwXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ElBYTgFlxjWs/MeokXyE9WiTAY9kACvPyV78ldgqQ0I=;
-        b=hTsbq/AfrJszr3l8HRJngQz3d2KrMf1vrwrobjW7HS6BZ67vocP/r33XEHmGGuJ8Dv
-         jO5IVBhat/PBthxjelW/qUgCRtdAFYti2deyMg7aOPmWs7gjEzVgslNWs3jKomHeLk+M
-         o4Ue6t7TubnEItRAXx25tqsMemzbmN/sk3NvrVr121//CMl6g8tuAUPo52iOsCPj4Fic
-         3xPQjCe6DrDrCqgc8LoG/XNT/17eCTjjHUFb7Con40qAD6et84NyLROBQngW2fHUUE89
-         wpyHyeiYoTBiqHUjP/Y1Zhxh/AvoOJxeFXoKHCfjjzE2K84JgvScQTWu+qQb7KS0BjCo
-         D7hA==
-X-Gm-Message-State: ACrzQf1R61cs4TR0BhOp3k8D0X2ksDR2Rg6YAyThk4ltHFPPuaFOlKRR
-        HZHRt7QcTm0PYMaTtZz8BZo=
-X-Google-Smtp-Source: AMsMyM4ByYmuC11mk7RUBGIjVJ4rKO/Ymm2irbDGkd6KZkB/DnpPA4JQ8chyE6ZAo9Vo2mOydBCE6A==
-X-Received: by 2002:aa7:8f12:0:b0:565:cb1e:bd7f with SMTP id x18-20020aa78f12000000b00565cb1ebd7fmr5853111pfr.86.1665662502067;
-        Thu, 13 Oct 2022 05:01:42 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id n3-20020a056a00212300b005625d6d2999sm1779709pfj.187.2022.10.13.05.01.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Oct 2022 05:01:41 -0700 (PDT)
-Message-ID: <86d88222-a70f-49ef-71f3-a7d15ae17d7d@gmail.com>
-Date:   Thu, 13 Oct 2022 20:01:33 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.3.2
-Subject: Re: [PATCH 1/4] KVM: x86/pmu: Force reprogramming of all counters on
- PMU filter change
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Aaron Lewis <aaronlewis@google.com>,
-        Like Xu <likexu@tencent.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20220923001355.3741194-1-seanjc@google.com>
- <20220923001355.3741194-2-seanjc@google.com>
-Content-Language: en-US
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20220923001355.3741194-2-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9d+vaj1FTruzdJSiSw/Zn2gxH71jsLWJ5ZYfpHyYTxs=;
+        b=Wr6U6y3QSHT2l6ywzGqGAEF1AxWrjqXBP0AXNzf0Vpg6F19aaxZlzSTXtlIAAphvIO
+         0VpcW6ijjGRl+D2eCNzBzcv/+0lPZ4byx3zcddFPrWLIeRGjFbDRAV1F7cMkKr3TWmJI
+         hPkexgl9yqyd6AYc6iFIQPzRqA0PylyPxHJwaTgtSrNmGpJw1ui6Zm4/IqKAfWM1C3rv
+         ZChlJuMiAotofirU3XT7aReQm9j3obqS8OvIxj3S5hp9rTlj+3eQERnYhTgoSHXb/E09
+         zSOhgJSAPjhNelwARqRpcdegsduaUkliHW2VrpP4X8FA9vXvXUZcwXniRnGgUCVMnT/R
+         g/Uw==
+X-Gm-Message-State: ACrzQf1JfWl8kwpYpX9kCLq+ZVDH8r1+rfqq16vhKHSoPMXEXEt87OVd
+        IvK9MRfkn3x+XWj5zkpPAPKbFdmco2685ygK
+X-Google-Smtp-Source: AMsMyM5HqKeLUwJMedyOvgE6UGTKF9wwH11VsWQ9kDOnJ8QAa/T6/q9l51uL4YUH7Cp/Lb+wWiTfvq500YGo5tjM
+X-Received: from vannapurve2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:41f8])
+ (user=vannapurve job=sendgmr) by 2002:aa7:9614:0:b0:562:b07b:ad62 with SMTP
+ id q20-20020aa79614000000b00562b07bad62mr35572057pfg.79.1665663221460; Thu,
+ 13 Oct 2022 05:13:41 -0700 (PDT)
+Date:   Thu, 13 Oct 2022 12:13:15 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
+Message-ID: <20221013121319.994170-1-vannapurve@google.com>
+Subject: [V3 PATCH 0/4] Minor improvements to the selftest setup logic
+From:   Vishal Annapurve <vannapurve@google.com>
+To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Cc:     pbonzini@redhat.com, shuah@kernel.org, bgardon@google.com,
+        seanjc@google.com, oupton@google.com, peterx@redhat.com,
+        vkuznets@redhat.com, dmatlack@google.com,
+        Vishal Annapurve <vannapurve@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,108 +68,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Firstly, thanks for your comments that spewed out around vpmu.
+This series is posted in context of the discussion at:
+https://lore.kernel.org/lkml/Ywa9T+jKUpaHLu%2Fl@google.com/
 
-On 23/9/2022 8:13 am, Sean Christopherson wrote:
-> Force vCPUs to reprogram all counters on a PMU filter change to provide
-> a sane ABI for userspace.  Use the existing KVM_REQ_PMU to do the
-> programming, and take advantage of the fact that the reprogram_pmi bitmap
-> fits in a u64 to set all bits in a single atomic update.  Note, setting
-> the bitmap and making the request needs to be done _after_ the SRCU
-> synchronization to ensure that vCPUs will reprogram using the new filter.
-> 
-> KVM's current "lazy" approach is confusing and non-deterministic.  It's
+Changes in v3:
+* Original series is split into two and this v3 version contains the
+  improvements to selftest and VM setup.
+  * Planning to upload the second series to execute hypercall
+    instruction according to cpu type separately.
+* Addressed comments from David and Sean.
 
-The resolute lazy approach was introduced in patch 03, right after this change.
+link to v2:
+https://lore.kernel.org/all/20220915000448.1674802-1-vannapurve@google.com/
 
-> confusing because, from a developer perspective, the code is buggy as it
-> makes zero sense to let userspace modify the filter but then not actually
-> enforce the new filter.  The lazy approach is non-deterministic because
-> KVM enforces the filter whenever a counter is reprogrammed, not just on
-> guest WRMSRs, i.e. a guest might gain/lose access to an event at random
-> times depending on what is going on in the host.
-> 
-> Note, the resulting behavior is still non-determinstic while the filter
-> is in flux.  If userspace wants to guarantee deterministic behavior, all
-> vCPUs should be paused during the filter update.
-> 
-> Fixes: 66bb8a065f5a ("KVM: x86: PMU Event Filter")
-> Cc: Aaron Lewis <aaronlewis@google.com>
-> Jim Mattson <jmattson@google.com>
+Changes in v2:
+* Addressed comments from Andrew and David
+  * Common function with constructor attribute used to setup initial state
+  * Changes are split in more logical granules as per feedback
 
-miss "Cc:" ?
+Major changes:
+1) Move common startup logic to a single function in kvm_util.c
+2) Introduce following APIs:
+	kvm_selftest_arch_init: to perform arch specific common startup.
+	kvm_arch_vm_post_create: to update the guest memory state to convey
+		common information to guests.
+3) For x86, capture cpu type at startup and pass on the cpu type to
+guest after guest elf is loaded.
 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/include/asm/kvm_host.h | 11 ++++++++++-
->   arch/x86/kvm/pmu.c              | 15 +++++++++++++--
->   2 files changed, 23 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index b3ce723efb43..462f041ede9f 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -519,7 +519,16 @@ struct kvm_pmu {
->   	struct kvm_pmc gp_counters[INTEL_PMC_MAX_GENERIC];
->   	struct kvm_pmc fixed_counters[KVM_PMC_MAX_FIXED];
->   	struct irq_work irq_work;
-> -	DECLARE_BITMAP(reprogram_pmi, X86_PMC_IDX_MAX);
-> +
-> +	/*
-> +	 * Overlay the bitmap with a 64-bit atomic so that all bits can be
-> +	 * set in a single access, e.g. to reprogram all counters when the PMU
-> +	 * filter changes.
-> +	 */
-> +	union {
-> +		DECLARE_BITMAP(reprogram_pmi, X86_PMC_IDX_MAX);
-> +		atomic64_t __reprogram_pmi;
-> +	};
->   	DECLARE_BITMAP(all_valid_pmc_idx, X86_PMC_IDX_MAX);
->   	DECLARE_BITMAP(pmc_in_use, X86_PMC_IDX_MAX);
->   
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index d9b9a0f0db17..4504987cbbe2 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -577,6 +577,8 @@ EXPORT_SYMBOL_GPL(kvm_pmu_trigger_event);
->   int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
->   {
->   	struct kvm_pmu_event_filter tmp, *filter;
-> +	struct kvm_vcpu *vcpu;
-> +	unsigned long i;
->   	size_t size;
->   	int r;
->   
-> @@ -613,9 +615,18 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
->   	mutex_lock(&kvm->lock);
->   	filter = rcu_replace_pointer(kvm->arch.pmu_event_filter, filter,
->   				     mutex_is_locked(&kvm->lock));
-> -	mutex_unlock(&kvm->lock);
-> -
->   	synchronize_srcu_expedited(&kvm->srcu);
+Vishal Annapurve (4):
+  KVM: selftests: move common startup logic to kvm_util.c
+  KVM: selftests: Add arch specific initialization
+  KVM: selftests: Add arch specific post vm creation hook
+  KVM: selftests: x86: Precompute the cpu type
 
-The relative order of these two operations has been reversed
-	mutex_unlock() and synchronize_srcu_expedited()
-, extending the execution window of the critical area of "kvm->lock)".
-The motivation is also not explicitly stated in the commit message.
+ .../selftests/kvm/aarch64/arch_timer.c        |  3 ---
+ .../selftests/kvm/aarch64/hypercalls.c        |  2 --
+ .../testing/selftests/kvm/aarch64/vgic_irq.c  |  3 ---
+ .../selftests/kvm/include/kvm_util_base.h     |  9 ++++++++
+ .../selftests/kvm/lib/aarch64/processor.c     | 18 ++++++++--------
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 21 ++++++++++++++++---
+ .../selftests/kvm/lib/x86_64/processor.c      | 16 ++++++++++++--
+ .../testing/selftests/kvm/memslot_perf_test.c |  3 ---
+ tools/testing/selftests/kvm/rseq_test.c       |  3 ---
+ tools/testing/selftests/kvm/s390x/memop.c     |  2 --
+ tools/testing/selftests/kvm/s390x/resets.c    |  2 --
+ .../selftests/kvm/s390x/sync_regs_test.c      |  3 ---
+ .../selftests/kvm/set_memory_region_test.c    |  3 ---
+ .../kvm/x86_64/cr4_cpuid_sync_test.c          |  3 ---
+ .../kvm/x86_64/emulator_error_test.c          |  3 ---
+ .../selftests/kvm/x86_64/hyperv_cpuid.c       |  3 ---
+ .../selftests/kvm/x86_64/platform_info_test.c |  3 ---
+ .../kvm/x86_64/pmu_event_filter_test.c        |  3 ---
+ .../selftests/kvm/x86_64/set_sregs_test.c     |  3 ---
+ .../kvm/x86_64/svm_nested_soft_inject_test.c  |  3 ---
+ .../selftests/kvm/x86_64/sync_regs_test.c     |  3 ---
+ .../selftests/kvm/x86_64/userspace_io_test.c  |  3 ---
+ .../kvm/x86_64/userspace_msr_exit_test.c      |  3 ---
+ 23 files changed, 50 insertions(+), 68 deletions(-)
 
-> +
-> +	BUILD_BUG_ON(sizeof(((struct kvm_pmu *)0)->reprogram_pmi) >
-> +		     sizeof(((struct kvm_pmu *)0)->__reprogram_pmi));
-> +
-> +	kvm_for_each_vcpu(i, vcpu, kvm)
-> +		atomic64_set(&vcpu_to_pmu(vcpu)->__reprogram_pmi, -1ull);
+-- 
+2.38.0.rc1.362.ged0d419d3c-goog
 
-How about:
-	bitmap_copy(pmu->reprogram_pmi, pmu->all_valid_pmc_idx, X86_PMC_IDX_MAX);
-to avoid further cycles on calls of 
-"static_call(kvm_x86_pmu_pmc_idx_to_pmc)(pmu, bit)" ?
-
-> +
-> +	kvm_make_all_cpus_request(kvm, KVM_REQ_PMU);
-> +
-> +	mutex_unlock(&kvm->lock);
-> +
->   	r = 0;
->   cleanup:
->   	kfree(filter);
