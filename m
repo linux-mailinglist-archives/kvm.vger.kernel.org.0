@@ -2,187 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 704585FE4EB
-	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 00:01:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E3215FE5B5
+	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 00:57:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229727AbiJMWBQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Oct 2022 18:01:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45968 "EHLO
+        id S229653AbiJMW5I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Oct 2022 18:57:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229533AbiJMWBO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Oct 2022 18:01:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FA8E189802
-        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 15:01:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1665698472;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=iF0bAvMZpKcz6Yp8gJQHUr2yf6LEe5KLr2h0xqDTYlI=;
-        b=SLPxVW47AX5kbq827Wl29NlOROwynMSc8Zr4WnYOqtDYYFSv9QK0fc0iYXdj1u2RUHZIxP
-        adxTCiC1GnZPIncEHad3kqr9D/UxsKB0J4c/2OayHXLBzVELLsyIoq96/pNMQuR2snt/bC
-        U669iaUHdHa/nCyy+llyftC31CqOfmM=
-Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
- [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-317-UdazTfoaM3qr6lx4gwgRtQ-1; Thu, 13 Oct 2022 18:01:11 -0400
-X-MC-Unique: UdazTfoaM3qr6lx4gwgRtQ-1
-Received: by mail-ua1-f70.google.com with SMTP id 95-20020a9f23e8000000b0038caa7cd5c1so1203740uao.8
-        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 15:01:11 -0700 (PDT)
+        with ESMTP id S229537AbiJMW5F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Oct 2022 18:57:05 -0400
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E89FC895A
+        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 15:57:00 -0700 (PDT)
+Received: by mail-yb1-xb2e.google.com with SMTP id e62so3734418yba.6
+        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 15:57:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=IwDbrf5ua3RWGH1fA//O2Bd73yrfFtMaKuUjb0t9zHY=;
+        b=TQo376WVarzDfY+FIslbpljS+Enb8HqJGI6ZbCoj7OuMguUd9Udc73hl2/MauE4A3R
+         JrPFqNtosNMk/wtvFU9JPZjAlUohc1nWu2qJQQ/vpjOLVmoK2Ut6/msjIPUsjUAhsKbv
+         ilZIKPpgYvSc7ql/YSsXpHbHwiz06axKI1nPZIo55atA8EYq9w/WRLEcsjr6YSdgWwJW
+         9+bUgoGT9UR2F+AId6Q7VHcjvksyuSdJ+xMQBND/E1anfnsiTKf3rqtgHvhIsnE/qwa7
+         MGkDEN7ecLxBk/6ppahFMLyajjSOUl2/3z8LrnP+RxfAYdHSU9ovSqLOjTBGu0nF26sv
+         tHSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=iF0bAvMZpKcz6Yp8gJQHUr2yf6LEe5KLr2h0xqDTYlI=;
-        b=IN8qkEaiNd/DmeNf1j0QClkwXQeiIUpaiIgliYUH/td4cviC4Uy5O4f13zyF3d9+/9
-         Mvm6OohP0IJu1Gg7ZE2AW5go2YrUA37J95y39SCcnvWpez+0dkKAhDePHvHaL0fAP7o+
-         keBWcpl4hPwuSbZN+FsSFYrkx6X19WAakf4E51X46GNBJhfCE5mzlraRwzEOKcA//zHm
-         vVA/3ZZBFkes661chElb2+BdKeUvOy1nTMVw/oVxQ3MSiNkWlgzZTV1S7spTXwg6qQ2V
-         ye4BvpZTJk/cyEQcOMAhOCghxnCuIcXh9TylihGY02DeOxJxJq0w4ZBfiPh3AZrCxupK
-         UR/Q==
-X-Gm-Message-State: ACrzQf0IYhZAmenjcNX1tU5oSE4KeSWbAVhWT3CjQAafbZljozOCcBLR
-        bktSjxsyrBDlbR5VuxmbCowngDsa5kcwQWk/9NF5xNCCjNSPF6YDcJSJmhhCIntAU36TuxBAOR7
-        Q2TRv6UCRwgYF5ihtH1Jx6hUsMFbV
-X-Received: by 2002:a67:ac4c:0:b0:3a4:b881:4490 with SMTP id n12-20020a67ac4c000000b003a4b8814490mr1326712vsh.42.1665698470241;
-        Thu, 13 Oct 2022 15:01:10 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM5NvWSJOiEFzvCJIy4O2OoyZQ3eF7OT0hx+f2vfvWv0gFBPFYvAMXAvYdwoKZxaOmYfdpr6zdYInqmldh88+v0=
-X-Received: by 2002:a67:ac4c:0:b0:3a4:b881:4490 with SMTP id
- n12-20020a67ac4c000000b003a4b8814490mr1326625vsh.42.1665698469250; Thu, 13
- Oct 2022 15:01:09 -0700 (PDT)
+        bh=IwDbrf5ua3RWGH1fA//O2Bd73yrfFtMaKuUjb0t9zHY=;
+        b=40OEuUslk6oit60vg9sY5lA0ev4MoMWzdvrLPBJYDbJvOPc3BQ61j7F5zxbi4n/QUX
+         yBCKdsWn2QGQrPDeLmY8iGdGpc2vYOIkvwKd+ytxm2PiAW3ehf0i2CiTUJe9/i0siW5x
+         kvYczGxJ3WdKhDI8+PC86HHnNdyJZXb60F0PXNaMPAYnp/kTEIwwcXyJ/4+bOXfLA4hr
+         3HOrwSSsN5QxJ4dKOekgys0OeTJtZWVQ3nigLOkgoYMOwfQT1bFsO/xgO4pc290bs1Yg
+         Rid1EQxKk1YhD7FAvuhpKWrbgL8yM926cQq/q6WHDYiZEnE9ImX5LT9K+6Cq1YDQl3L4
+         OmyQ==
+X-Gm-Message-State: ACrzQf3TYy3Ge+24dwa3jcP5YWVunVFbfw5IjFveLravLtNxpUdHWJcq
+        W1t9QXjmG8ANRVoF0FIjNNUAt3c2QF8PIAhovmKLiA==
+X-Google-Smtp-Source: AMsMyM4ifIx9yTJ+LffARvuiPa+t/B7kLOUFHZninyQNoMn2l8Wji/QsMAcDHyksAfMFzGsgmchSMC6tfKUQr2r30SA=
+X-Received: by 2002:a5b:10c:0:b0:6be:28ee:2b86 with SMTP id
+ 12-20020a5b010c000000b006be28ee2b86mr1993858ybx.582.1665701819235; Thu, 13
+ Oct 2022 15:56:59 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220729130040.1428779-1-afaria@redhat.com>
-In-Reply-To: <20220729130040.1428779-1-afaria@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Fri, 14 Oct 2022 00:00:58 +0200
-Message-ID: <CABgObfZD__Z=g3rvXxYVLcYb9wtkdQ14=mgMpsKoiVRxFCicUw@mail.gmail.com>
-Subject: Re: [RFC v2 00/10] Introduce an extensible static analyzer
-To:     Alberto Faria <afaria@redhat.com>
-Cc:     qemu-devel@nongnu.org,
-        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Hannes Reinecke <hare@suse.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
-        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
-        Peter Lieven <pl@kamp.de>, kvm@vger.kernel.org,
-        Xie Yongji <xieyongji@bytedance.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Hanna Reitz <hreitz@redhat.com>,
-        Jeff Cody <codyprime@gmail.com>,
-        Eric Blake <eblake@redhat.com>,
-        "Denis V. Lunev" <den@openvz.org>,
-        =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
-        Christian Schoenebeck <qemu_oss@crudebyte.com>,
-        Stefan Weil <sw@weilnetz.de>, Klaus Jensen <its@irrelevant.dk>,
-        Laurent Vivier <lvivier@redhat.com>,
-        Alberto Garcia <berto@igalia.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Juan Quintela <quintela@redhat.com>,
-        David Hildenbrand <david@redhat.com>, qemu-block@nongnu.org,
-        Konstantin Kostiuk <kkostiuk@redhat.com>,
-        Kevin Wolf <kwolf@redhat.com>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Greg Kurz <groug@kaod.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>, Amit Shah <amit@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Raphael Norwitz <raphael.norwitz@nutanix.com>,
-        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
-        Eduardo Habkost <eduardo@habkost.net>,
-        Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
-        Keith Busch <kbusch@kernel.org>,
-        =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
-        "Richard W.M. Jones" <rjones@redhat.com>,
-        John Snow <jsnow@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>
+References: <20221012181702.3663607-1-seanjc@google.com> <CALzav=fZvNttbXSZfCCaFym8cNHYmFZX7286CW_zTZA1CTr3kA@mail.gmail.com>
+ <Y0hxFF6ai3cX8uA+@google.com>
+In-Reply-To: <Y0hxFF6ai3cX8uA+@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Thu, 13 Oct 2022 15:56:31 -0700
+Message-ID: <CALzav=d_UEEAvy6NcOLNWByuRzRqV=y2BWVXzyFMsS4zZwcZkA@mail.gmail.com>
+Subject: Re: [PATCH v4 00/11] KVM: x86/mmu: Make tdp_mmu a read-only parameter
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Isaku Yamahata <isaku.yamahata@intel.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jul 29, 2022 at 3:01 PM Alberto Faria <afaria@redhat.com> wrote:
-> Performance isn't great, but with some more optimization, the analyzer
-> should be fast enough to be used iteratively during development, given
-> that it avoids reanalyzing unmodified translation units, and that users
-> can restrict the set of translation units under consideration. It should
-> also be fast enough to run in CI (?).
+On Thu, Oct 13, 2022 at 1:12 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Oct 13, 2022, David Matlack wrote:
+> > On Wed, Oct 12, 2022 at 11:17 AM Sean Christopherson <seanjc@google.com> wrote:
+> > > I'm not dead set against having a dedicated TDP MMU page fault handler, but
+> > > IMO it's not really better once the TDP MMU vs. shadow MMU is reduced to a
+> > > static branch, just different.  The read vs. write mmu_lock is the most
+> > > visible ugliness, and that can be buried in helpers if we really want to
+> > > make the page fault handler easier on the eyes, e.g.
+>
+> ...
+>
+> > My preference is still separate handlers. When I am reading this code,
+> > I only care about one path (TDP MMU or Shadow MMU, usually TDP MMU).
+> > Having separate handlers makes it easy to read since I don't have to
+> > care about the implementation details of the other MMU.
+> >
+> > And more importantly (but less certain), the TDP MMU fault handler is
+> > going to diverge further from the Shadow MMU fault handler in the near
+> > future. i.e. There will be more and more branches in a common fault
+> > handler, and the value of having a common fault handler diminishes.
+> > Specifically, to support moving the TDP MMU to common code, the TDP
+> > MMU is no longer going to topup the same mem caches as the Shadow MMU
+> > (TDP MMU is not going to use struct kvm_mmu_page), and the TDP MMU
+> > will probably have its own fast_page_fault() handler eventually.
+>
+> What if we hold off on the split for the moment, and then revisit the handler when
+> a common MMU is closer to reality?  I agree that a separate handler makes sense
+> once things start diverging, but until that happens, supporting two flows instead
+> of one seems like it would add (minor) maintenance cost without much benefit.
 
-I took a look again today, and the results are indeed very nice (I
-sent a patch series with the code changes from this one).
+Sure thing. I'll do the split as part of my series to split out the
+TDP MMU to common code and we can revisit the discussion then.
 
-The performance is not great as you point out. :/  I made a couple
-attempts at optimizing it, for example the "actual_visitor" can be
-written in a more efficient way like this, to avoid the stack:
-
-    @CFUNCTYPE(c_int, Cursor, Cursor, py_object)
-    def actual_visitor(node: Cursor, parent: Cursor, client_data:
-Cursor) -> int:
-
-        try:
-            node.parent = client_data
-
-            # several clang.cindex methods need Cursor._tu to be set
-            node._tu = client_data._tu
-            r = visitor(node)
-            if r is VisitorResult.RECURSE:
-                return 0 \
-                    if conf.lib.clang_visitChildren(node,
-actual_visitor, node) != 0 \
-                    else 1
-            else:
-                return r.value
-
-        except BaseException as e:
-            # Exceptions can't cross into C. Stash it, abort the visitation, and
-            # reraise it.
-            if exception is None:
-                exception = e
-
-            return VisitorResult.BREAK.value
-
-    root.parent = None
-    result = conf.lib.clang_visitChildren(root, actual_visitor, root)
-
-    if exception is not None:
-        raise exception
-
-    return result == 0
-
-However, it seems like a lost battle. :( Some of the optimizations are
-stuff that you should just not have to do, for example only invoking
-"x.kind" once (because it's a property not a field). Another issue is
-that the bindings are incomplete, for example if you have a ForStmt
-you just get a Cursor and you are not able to access individual
-expressions. As a result, this for example is wrong in the
-return-value-never-used test:
-
-                static int f(void) { return 42; }
-                static void g(void) {
-                    for (f(); ; ) { } /* should warn, it doesn't */
-                }
-
-and I couldn't fix it without breaking "for (; f(); )" because AFAICT
-the two are indistinguishable.
-
-On top of this, using libclang directly should make it possible to use
-the Matcher API (the same one used by clang-match), instead of writing
-everything by hand. It may not be that useful though in practice, but
-it's a possibility.
-
-Paolo
-
+>
+> > If we do go the common handler route, I don't prefer the
+> > direct_page_fault_mmu_lock/unlock() wrapper since it further obscures
+> > the differences between the 2 MMUs.
+>
+> Yeah, I don't like the wrappers either.
