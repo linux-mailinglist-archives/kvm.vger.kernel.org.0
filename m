@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77B535FE904
-	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 08:42:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 253025FE948
+	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 09:15:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229814AbiJNGmH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Oct 2022 02:42:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43294 "EHLO
+        id S229871AbiJNHPK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Oct 2022 03:15:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229649AbiJNGmF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Oct 2022 02:42:05 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D10271946E9;
-        Thu, 13 Oct 2022 23:42:03 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id h185so3522979pgc.10;
-        Thu, 13 Oct 2022 23:42:03 -0700 (PDT)
+        with ESMTP id S229809AbiJNHPG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Oct 2022 03:15:06 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C0C927B36;
+        Fri, 14 Oct 2022 00:14:55 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id y191so4148265pfb.2;
+        Fri, 14 Oct 2022 00:14:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=wgMNc1/p3kWYBlyjxsEmMlPIxvpXqHiHcX9JbgUw0hE=;
-        b=UaerY0EgkXWYExScySFZ2Prsnh1NEHkEjxmiJzt8PKASJuHT3i1A0OYXLZhltsRRsF
-         yGM9xDaVu1JeiMEFUwAfm9YNYqu7jA4JPMD0axLXkjPx6OtsqZkasnVytLYJayBNQpCT
-         dr1x8Rdk+6uHUk/18vFqEFDENbQm6CiT+HhAFZOZhn06QOjlejZCimA6YZwwhzdc9ZcK
-         TLdKnC/ydl/TW9Zs+uMEtH3mk9toiVMJIru7pt/0iHeLZzSMqNb/crhRB5kObI55ZG33
-         t8t11yRqBq3nvoVF3Sa2kQz4jH051C5GguJYxQb9KZSNbL+XEw1PQ6uMgSCs93wA80ZK
-         b4Cg==
+        bh=O1uTvZzh8RS2GyiFatdDCOZIfUcH2ah3khqENyTDbD8=;
+        b=CT5TyGBbuObOvfYQz4+vbt7NRdOIo78d5sbDgKK70zuwHBLcj4eLjDqLfMhqe4uZGx
+         aTxQVDUHbPk2ZuNmVtV5Symquz0zFsXSXoh2AAEwZRACnUzDg8UhztN6hzO16/yLAnsp
+         mVfSRAioiOTx7gZPhkV8DtbDuakA7ngaUNzCrZ6oan5JUd2Mx4R2Uncaptk3wssq+mtS
+         IZHoyRtXNhQqDCUJHe/dDRCmX9EDsC/1E+j+8a7/5TvbDBVGOVN1kOw9yqOaNbx9ZjLq
+         Lhq8K9wr102zyOYPzDFx8ySFHr8UaAXdsk7HeAkaDyZUTya2qW2QnP9PB+M1WuhJXXcu
+         Mz7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wgMNc1/p3kWYBlyjxsEmMlPIxvpXqHiHcX9JbgUw0hE=;
-        b=EaF8sM0TAbDY/24siKulu09sozGI7+lw1LZaRVE0GiUQUPKKxLUEq/gIeepkWgHRnA
-         /ZyUK3/PjelZxD3SMYbkmcRbtP/9DQlX072ZfVUeKJ62UY2CMJXH3ymtK3+BbKbUiFGr
-         OzapvehS5XJQEys9af9yIe25FYBLAb+2sgqgvYUiP63aTuouHSOpRc1zMZ86nqDn0Zn+
-         TnaYy8poRsjjQIu+FfHrx3Ws4dAVTbKCeGUXbp8OygBH3s5m+6W5UdPPe8Xb2rD0zzI4
-         BQ1/Uv2b14y93el99wb8lQHR/IGG5NrerK1f5g2C4SF5ALMgvDoF6VPYj9+/FHAhb0f4
-         BLgw==
-X-Gm-Message-State: ACrzQf1D/a/wJnDcIRBksv7poBrYftSxlpCdvgFjcCK/jby0g8Q3XQ6x
-        S4u5OFguXtZymm4fXSJpvug=
-X-Google-Smtp-Source: AMsMyM78ugh/Q3fxI7oiGZBbomPmFzisVotLkYNBVKamTAzC9zoHFV6Ic+Cz0oV6LOcWkG8KZ32Etg==
-X-Received: by 2002:a65:49c9:0:b0:462:9ce1:3f58 with SMTP id t9-20020a6549c9000000b004629ce13f58mr3319538pgs.200.1665729723243;
-        Thu, 13 Oct 2022 23:42:03 -0700 (PDT)
+        bh=O1uTvZzh8RS2GyiFatdDCOZIfUcH2ah3khqENyTDbD8=;
+        b=uxlynC+DOcUeb2+5Ek1q0YqZIZgMoghUapTsQewi7ccfx/Lu8ejjfyC3EOIsXAtg7p
+         wNn/j3HRRm+6gLq2ZM9H3ujXqGP9xmIl864DzJm4yP5FOp/M+sEJWkxqlgwh53EnLfoH
+         jaY5dnjFgdkPb2uGhEJP0S17YYiQ9o46LMOUZAZq1jikZZEYPPl1XdJID9Iv9AerPqir
+         W6D0W0OHQlhsenQcGLaxHBz2Hxb/ehweGOiucpI33m/lHf8JE0Fe9mCXavwLdfphGrCW
+         KseokzfRh+5jkB3Y3PEwgb68Y+8ca0B3tekQE57Y/vwZN+tzTKvI39GhuOjkgC7/uL0+
+         ggkA==
+X-Gm-Message-State: ACrzQf1lKGFGiKlPUtmQEIBWln1+GYT1aMuAizwKfozpusI2fc5lIXqI
+        ZvZ8FDSoYrFHhXWwSwgv06oNXhmfE13FEkQx
+X-Google-Smtp-Source: AMsMyM5rpnAaPmHIoqUzmfO/5//fBOf4dPQQucAL4kzQZ1t2tSfZ85asIXufiJ0i9P5BG9Q6yov2Yg==
+X-Received: by 2002:a05:6a00:807:b0:563:136f:a4fe with SMTP id m7-20020a056a00080700b00563136fa4femr3709865pfk.36.1665731694593;
+        Fri, 14 Oct 2022 00:14:54 -0700 (PDT)
 Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id t23-20020a656097000000b00434272fe870sm730080pgu.88.2022.10.13.23.42.00
+        by smtp.gmail.com with ESMTPSA id f14-20020a170902ab8e00b001783f964fe3sm981519plr.113.2022.10.14.00.14.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 Oct 2022 23:42:02 -0700 (PDT)
-Message-ID: <8007659a-6c6c-2c5e-f500-652ed31448fb@gmail.com>
-Date:   Fri, 14 Oct 2022 14:41:54 +0800
+        Fri, 14 Oct 2022 00:14:53 -0700 (PDT)
+Message-ID: <2a83292b-a4d0-8d5e-b52a-31b7fcad2de6@gmail.com>
+Date:   Fri, 14 Oct 2022 15:14:47 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.3.2
-Subject: Re: [PATCH 1/4] KVM: x86/pmu: Force reprogramming of all counters on
- PMU filter change
+Subject: Re: [PATCH 2/4] KVM: x86/pmu: Clear "reprogram" bit if counter is
+ disabled or disallowed
 Content-Language: en-US
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -63,11 +63,9 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Wanpeng Li <wanpengli@tencent.com>,
         Paolo Bonzini <pbonzini@redhat.com>
 References: <20220923001355.3741194-1-seanjc@google.com>
- <20220923001355.3741194-2-seanjc@google.com>
- <86d88222-a70f-49ef-71f3-a7d15ae17d7d@gmail.com>
- <Y0h6x0ZJWYH56Z88@google.com>
+ <20220923001355.3741194-3-seanjc@google.com>
 From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <Y0h6x0ZJWYH56Z88@google.com>
+In-Reply-To: <20220923001355.3741194-3-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -80,91 +78,125 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/10/2022 4:53 am, Sean Christopherson wrote:
-> On Thu, Oct 13, 2022, Like Xu wrote:
->> Firstly, thanks for your comments that spewed out around vpmu.
->>
->> On 23/9/2022 8:13 am, Sean Christopherson wrote:
->>> Force vCPUs to reprogram all counters on a PMU filter change to provide
->>> a sane ABI for userspace.  Use the existing KVM_REQ_PMU to do the
->>> programming, and take advantage of the fact that the reprogram_pmi bitmap
->>> fits in a u64 to set all bits in a single atomic update.  Note, setting
->>> the bitmap and making the request needs to be done _after_ the SRCU
->>> synchronization to ensure that vCPUs will reprogram using the new filter.
->>>
->>> KVM's current "lazy" approach is confusing and non-deterministic.  It's
->>
->> The resolute lazy approach was introduced in patch 03, right after this change.
-> 
-> This is referring to the lazy recognition of the filter, not the deferred
-> reprogramming of the counters.  Regardless of whether reprogramming is handled
-> via request or in-line, KVM is still lazily recognizing the new filter as vCPUs
-> won't picke up the new filter until the _guest_ triggers a refresh.
+For subject title, the "reprogram" bit is _only_ used to keep track of 
+pmc->perf_event,
+not whether the counter is disabled.
 
-It may still be too late for the pmu filter to take effect. To eliminate this 
-"non-deterministic",
-should we kick out all vpmu-enabled vcpus right after making KVM_REQ_PMU requests ?
+On 23/9/2022 8:13 am, Sean Christopherson wrote:
+> When reprogramming a counter, clear the counter's "reprogram pending" bit
+> if the counter is disabled (by the guest) or is disallowed (by the
+> userspace filter).  In both cases, there's no need to re-attempt
+> programming on the next coincident KVM_REQ_PMU as enabling the counter by
+> either method will trigger reprogramming.
+
+Perhaps we could move the check_pmu_event_filter() towards the top of the call 
+stack.
 
 > 
->>> @@ -613,9 +615,18 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
->>>    	mutex_lock(&kvm->lock);
->>>    	filter = rcu_replace_pointer(kvm->arch.pmu_event_filter, filter,
->>>    				     mutex_is_locked(&kvm->lock));
->>> -	mutex_unlock(&kvm->lock);
->>> -
->>>    	synchronize_srcu_expedited(&kvm->srcu);
->>
->> The relative order of these two operations has been reversed
->> 	mutex_unlock() and synchronize_srcu_expedited()
->> , extending the execution window of the critical area of "kvm->lock)".
->> The motivation is also not explicitly stated in the commit message.
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/pmu.c | 38 ++++++++++++++++++++++++--------------
+>   1 file changed, 24 insertions(+), 14 deletions(-)
 > 
-> I'll add a blurb, after I re-convince myself that the sync+request needs to be
-> done under kvm->lock.
-> 
->>> +	BUILD_BUG_ON(sizeof(((struct kvm_pmu *)0)->reprogram_pmi) >
->>> +		     sizeof(((struct kvm_pmu *)0)->__reprogram_pmi));
->>> +
->>> +	kvm_for_each_vcpu(i, vcpu, kvm)
->>> +		atomic64_set(&vcpu_to_pmu(vcpu)->__reprogram_pmi, -1ull);
->>
->> How about:
->> 	bitmap_copy(pmu->reprogram_pmi, pmu->all_valid_pmc_idx, X86_PMC_IDX_MAX);
->> to avoid further cycles on calls of
->> "static_call(kvm_x86_pmu_pmc_idx_to_pmc)(pmu, bit)" ?
-> 
-> bitmap_copy() was my first choice too, but unfortunately it's doesn't guarantee
-> atomicity and could lead to data corruption if the target vCPU is concurrently
-> modifying the bitmap.
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index 4504987cbbe2..4cd99320019b 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -150,9 +150,9 @@ static void kvm_perf_overflow(struct perf_event *perf_event,
+>   	__kvm_perf_overflow(pmc, true);
+>   }
+>   
+> -static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+> -				  u64 config, bool exclude_user,
+> -				  bool exclude_kernel, bool intr)
+> +static int pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type, u64 config,
+> +				 bool exclude_user, bool exclude_kernel,
+> +				 bool intr)
+>   {
+>   	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+>   	struct perf_event *event;
+> @@ -204,14 +204,14 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
+>   	if (IS_ERR(event)) {
+>   		pr_debug_ratelimited("kvm_pmu: event creation failed %ld for pmc->idx = %d\n",
+>   			    PTR_ERR(event), pmc->idx);
+> -		return;
+> +		return PTR_ERR(event);
+>   	}
+>   
+>   	pmc->perf_event = event;
+>   	pmc_to_pmu(pmc)->event_count++;
+> -	clear_bit(pmc->idx, pmc_to_pmu(pmc)->reprogram_pmi);
+>   	pmc->is_paused = false;
+>   	pmc->intr = intr || pebs;
+> +	return 0;
+>   }
+>   
+>   static void pmc_pause_counter(struct kvm_pmc *pmc)
+> @@ -245,7 +245,6 @@ static bool pmc_resume_counter(struct kvm_pmc *pmc)
+>   	perf_event_enable(pmc->perf_event);
+>   	pmc->is_paused = false;
+>   
+> -	clear_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->reprogram_pmi);
 
-Indeed, it may help to reuse "pmu->global_ctrl_mask" instead of "-1ull":
+This change is very suspicious.
 
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 4504987cbbe2..8e279f816e27 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -621,7 +621,8 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void 
-__user *argp)
-  		     sizeof(((struct kvm_pmu *)0)->__reprogram_pmi));
+>   	return true;
+>   }
+>   
+> @@ -303,10 +302,10 @@ void reprogram_counter(struct kvm_pmc *pmc)
+>   	pmc_pause_counter(pmc);
+>   
+>   	if (!pmc_speculative_in_use(pmc) || !pmc_is_enabled(pmc))
+> -		return;
+> +		goto reprogram_complete;
+>   
+>   	if (!check_pmu_event_filter(pmc))
+> -		return;
+> +		goto reprogram_complete;
+>   
+>   	if (eventsel & ARCH_PERFMON_EVENTSEL_PIN_CONTROL)
+>   		printk_once("kvm pmu: pin control bit is ignored\n");
+> @@ -324,16 +323,27 @@ void reprogram_counter(struct kvm_pmc *pmc)
+>   	}
+>   
+>   	if (pmc->current_config == new_config && pmc_resume_counter(pmc))
+> -		return;
+> +		goto reprogram_complete;
+>   
+>   	pmc_release_perf_event(pmc);
+>   
+>   	pmc->current_config = new_config;
+> -	pmc_reprogram_counter(pmc, PERF_TYPE_RAW,
+> -			      (eventsel & pmu->raw_event_mask),
+> -			      !(eventsel & ARCH_PERFMON_EVENTSEL_USR),
+> -			      !(eventsel & ARCH_PERFMON_EVENTSEL_OS),
+> -			      eventsel & ARCH_PERFMON_EVENTSEL_INT);
+> +
+> +	/*
+> +	 * If reprogramming fails, e.g. due to contention, leave the counter's
+> +	 * regprogram bit set, i.e. opportunistically try again on the next PMU
 
-  	kvm_for_each_vcpu(i, vcpu, kvm)
--		atomic64_set(&vcpu_to_pmu(vcpu)->__reprogram_pmi, -1ull);
-+		atomic64_set(&vcpu_to_pmu(vcpu)->__reprogram_pmi,
-+			     pmu->global_ctrl_mask);
+This is what we need, in the upstream case we need to keep trying regprogram
+to try to occupy the hardware.
 
-  	kvm_make_all_cpus_request(kvm, KVM_REQ_PMU);
+> +	 * refresh.  Don't make a new request as doing so can stall the guest
+> +	 * if reprogramming repeatedly fails.
 
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index b68956299fa8..a946c1c57e1d 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -185,6 +185,7 @@ static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
-  	pmu->nr_arch_fixed_counters = 0;
-  	pmu->global_status = 0;
-  	bitmap_set(pmu->all_valid_pmc_idx, 0, pmu->nr_arch_gp_counters);
-+	pmu->global_ctrl_mask = ~((1ull << pmu->nr_arch_gp_counters) - 1);
-  }
+This does not happen, the guest still enters w/p perf_event backend support
+and the vPMU is broken until the next vm-exit.
 
-  static void amd_pmu_init(struct kvm_vcpu *vcpu)
--- 
-2.38.0
+There is no need to endlessly call kvm_pmu_handle_event() when reprogram fails.
+
+> +	 */
+> +	if (pmc_reprogram_counter(pmc, PERF_TYPE_RAW,
+> +				  (eventsel & pmu->raw_event_mask),
+> +				  !(eventsel & ARCH_PERFMON_EVENTSEL_USR),
+> +				  !(eventsel & ARCH_PERFMON_EVENTSEL_OS),
+> +				  eventsel & ARCH_PERFMON_EVENTSEL_INT))
+> +		return;
+> +
+> +reprogram_complete:
+> +	clear_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->reprogram_pmi);
+>   }
+>   EXPORT_SYMBOL_GPL(reprogram_counter);
+>   
