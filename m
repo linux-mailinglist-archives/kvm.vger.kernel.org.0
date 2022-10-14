@@ -2,66 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E3215FE5B5
-	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 00:57:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A3E55FE671
+	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 03:02:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229653AbiJMW5I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 13 Oct 2022 18:57:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34232 "EHLO
+        id S229640AbiJNBCT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 13 Oct 2022 21:02:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229537AbiJMW5F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 13 Oct 2022 18:57:05 -0400
-Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E89FC895A
-        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 15:57:00 -0700 (PDT)
-Received: by mail-yb1-xb2e.google.com with SMTP id e62so3734418yba.6
-        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 15:57:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=IwDbrf5ua3RWGH1fA//O2Bd73yrfFtMaKuUjb0t9zHY=;
-        b=TQo376WVarzDfY+FIslbpljS+Enb8HqJGI6ZbCoj7OuMguUd9Udc73hl2/MauE4A3R
-         JrPFqNtosNMk/wtvFU9JPZjAlUohc1nWu2qJQQ/vpjOLVmoK2Ut6/msjIPUsjUAhsKbv
-         ilZIKPpgYvSc7ql/YSsXpHbHwiz06axKI1nPZIo55atA8EYq9w/WRLEcsjr6YSdgWwJW
-         9+bUgoGT9UR2F+AId6Q7VHcjvksyuSdJ+xMQBND/E1anfnsiTKf3rqtgHvhIsnE/qwa7
-         MGkDEN7ecLxBk/6ppahFMLyajjSOUl2/3z8LrnP+RxfAYdHSU9ovSqLOjTBGu0nF26sv
-         tHSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IwDbrf5ua3RWGH1fA//O2Bd73yrfFtMaKuUjb0t9zHY=;
-        b=40OEuUslk6oit60vg9sY5lA0ev4MoMWzdvrLPBJYDbJvOPc3BQ61j7F5zxbi4n/QUX
-         yBCKdsWn2QGQrPDeLmY8iGdGpc2vYOIkvwKd+ytxm2PiAW3ehf0i2CiTUJe9/i0siW5x
-         kvYczGxJ3WdKhDI8+PC86HHnNdyJZXb60F0PXNaMPAYnp/kTEIwwcXyJ/4+bOXfLA4hr
-         3HOrwSSsN5QxJ4dKOekgys0OeTJtZWVQ3nigLOkgoYMOwfQT1bFsO/xgO4pc290bs1Yg
-         Rid1EQxKk1YhD7FAvuhpKWrbgL8yM926cQq/q6WHDYiZEnE9ImX5LT9K+6Cq1YDQl3L4
-         OmyQ==
-X-Gm-Message-State: ACrzQf3TYy3Ge+24dwa3jcP5YWVunVFbfw5IjFveLravLtNxpUdHWJcq
-        W1t9QXjmG8ANRVoF0FIjNNUAt3c2QF8PIAhovmKLiA==
-X-Google-Smtp-Source: AMsMyM4ifIx9yTJ+LffARvuiPa+t/B7kLOUFHZninyQNoMn2l8Wji/QsMAcDHyksAfMFzGsgmchSMC6tfKUQr2r30SA=
-X-Received: by 2002:a5b:10c:0:b0:6be:28ee:2b86 with SMTP id
- 12-20020a5b010c000000b006be28ee2b86mr1993858ybx.582.1665701819235; Thu, 13
- Oct 2022 15:56:59 -0700 (PDT)
+        with ESMTP id S229491AbiJNBCS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 13 Oct 2022 21:02:18 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14944E4C3A
+        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 18:02:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1665709338; x=1697245338;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=N8onz1+4r0f6KBh2AenjHcSU6m4ESpWPrn5RzDkFSwI=;
+  b=TTuE/YMv+//rRmQ83jTESHVRPgBlcHxJKO4GlBULUKzNoENKD///iOIq
+   QjuGPsIa6jcWaH4F8qrJh3WCVPV/z+W8dLTpZ1u4v3SnPEpkxmJKFBJLT
+   jbyq1nsSKNSqSRom1iLgES6+4BM2m0qaZf8W9NBy9ohKXLpdGbMoh+p1t
+   UZRO3I8ZlwaWI8zYaNmgRqq/ErpAj7xRTUCiqfScrTpHzYXNOd4qh4jf8
+   AsVWktVO3nanlYHx7j7FQaUE7i9W2Pm09fpiaGAUY/U0uXYF5DeDy13zC
+   ad5SPuP8P3Up/hxsqvr+FeTR88C86mWjUa9d6q0zpvCT+JJUzpJRGUWtA
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10499"; a="302861009"
+X-IronPort-AV: E=Sophos;i="5.95,182,1661842800"; 
+   d="scan'208";a="302861009"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2022 18:01:40 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10499"; a="696111821"
+X-IronPort-AV: E=Sophos;i="5.95,182,1661842800"; 
+   d="scan'208";a="696111821"
+Received: from zengguan-mobl1.ccr.corp.intel.com (HELO [10.254.209.200]) ([10.254.209.200])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2022 18:01:35 -0700
+Message-ID: <cea2094f-72e7-a63d-ddca-86160240db7b@intel.com>
+Date:   Fri, 14 Oct 2022 09:01:02 +0800
 MIME-Version: 1.0
-References: <20221012181702.3663607-1-seanjc@google.com> <CALzav=fZvNttbXSZfCCaFym8cNHYmFZX7286CW_zTZA1CTr3kA@mail.gmail.com>
- <Y0hxFF6ai3cX8uA+@google.com>
-In-Reply-To: <Y0hxFF6ai3cX8uA+@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Thu, 13 Oct 2022 15:56:31 -0700
-Message-ID: <CALzav=d_UEEAvy6NcOLNWByuRzRqV=y2BWVXzyFMsS4zZwcZkA@mail.gmail.com>
-Subject: Re: [PATCH v4 00/11] KVM: x86/mmu: Make tdp_mmu a read-only parameter
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Isaku Yamahata <isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH v3] target/i386: Set maximum APIC ID to KVM prior to vCPU
+ creation
+Content-Language: en-US
+From:   Zeng Guang <guang.zeng@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Gao, Chao" <chao.gao@intel.com>
+References: <20220825025246.26618-1-guang.zeng@intel.com>
+ <2c9d8124-c8f5-5f21-74c5-307e16544143@intel.com>
+In-Reply-To: <2c9d8124-c8f5-5f21-74c5-307e16544143@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,43 +71,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 13, 2022 at 1:12 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Oct 13, 2022, David Matlack wrote:
-> > On Wed, Oct 12, 2022 at 11:17 AM Sean Christopherson <seanjc@google.com> wrote:
-> > > I'm not dead set against having a dedicated TDP MMU page fault handler, but
-> > > IMO it's not really better once the TDP MMU vs. shadow MMU is reduced to a
-> > > static branch, just different.  The read vs. write mmu_lock is the most
-> > > visible ugliness, and that can be buried in helpers if we really want to
-> > > make the page fault handler easier on the eyes, e.g.
->
-> ...
->
-> > My preference is still separate handlers. When I am reading this code,
-> > I only care about one path (TDP MMU or Shadow MMU, usually TDP MMU).
-> > Having separate handlers makes it easy to read since I don't have to
-> > care about the implementation details of the other MMU.
-> >
-> > And more importantly (but less certain), the TDP MMU fault handler is
-> > going to diverge further from the Shadow MMU fault handler in the near
-> > future. i.e. There will be more and more branches in a common fault
-> > handler, and the value of having a common fault handler diminishes.
-> > Specifically, to support moving the TDP MMU to common code, the TDP
-> > MMU is no longer going to topup the same mem caches as the Shadow MMU
-> > (TDP MMU is not going to use struct kvm_mmu_page), and the TDP MMU
-> > will probably have its own fast_page_fault() handler eventually.
->
-> What if we hold off on the split for the moment, and then revisit the handler when
-> a common MMU is closer to reality?  I agree that a separate handler makes sense
-> once things start diverging, but until that happens, supporting two flows instead
-> of one seems like it would add (minor) maintenance cost without much benefit.
+PING again !
+This QEMU patch is to optimize max APIC ID set for current VM session 
+introduced since linux v6.0. It's also compatible with previous linux 
+version.
 
-Sure thing. I'll do the split as part of my series to split out the
-TDP MMU to common code and we can revisit the discussion then.
+Thanks.
 
+On 9/5/2022 9:27 AM, Zeng Guang wrote:
+> Kindly PING!
 >
-> > If we do go the common handler route, I don't prefer the
-> > direct_page_fault_mmu_lock/unlock() wrapper since it further obscures
-> > the differences between the 2 MMUs.
->
-> Yeah, I don't like the wrappers either.
+> On 8/25/2022 10:52 AM, Zeng Guang wrote:
+>> Specify maximum possible APIC ID assigned for current VM session to KVM
+>> prior to the creation of vCPUs. By this setting, KVM can set up VM-scoped
+>> data structure indexed by the APIC ID, e.g. Posted-Interrupt Descriptor
+>> pointer table to support Intel IPI virtualization, with the most optimal
+>> memory footprint.
+>>
+>> It can be achieved by calling KVM_ENABLE_CAP for KVM_CAP_MAX_VCPU_ID
+>> capability once KVM has enabled it. Ignoring the return error if KVM
+>> doesn't support this capability yet.
+>>
+>> Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+>> ---
+>>    hw/i386/x86.c              | 4 ++++
+>>    target/i386/kvm/kvm-stub.c | 5 +++++
+>>    target/i386/kvm/kvm.c      | 5 +++++
+>>    target/i386/kvm/kvm_i386.h | 1 +
+>>    4 files changed, 15 insertions(+)
+>>
+>> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+>> index 050eedc0c8..4831193c86 100644
+>> --- a/hw/i386/x86.c
+>> +++ b/hw/i386/x86.c
+>> @@ -139,6 +139,10 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
+>>            exit(EXIT_FAILURE);
+>>        }
+>>    
+>> +    if (kvm_enabled()) {
+>> +        kvm_set_max_apic_id(x86ms->apic_id_limit);
+>> +    }
+>> +
+>>        possible_cpus = mc->possible_cpu_arch_ids(ms);
+>>        for (i = 0; i < ms->smp.cpus; i++) {
+>>            x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id, &error_fatal);
+>> diff --git a/target/i386/kvm/kvm-stub.c b/target/i386/kvm/kvm-stub.c
+>> index f6e7e4466e..e052f1c7b0 100644
+>> --- a/target/i386/kvm/kvm-stub.c
+>> +++ b/target/i386/kvm/kvm-stub.c
+>> @@ -44,3 +44,8 @@ bool kvm_hyperv_expand_features(X86CPU *cpu, Error **errp)
+>>    {
+>>        abort();
+>>    }
+>> +
+>> +void kvm_set_max_apic_id(uint32_t max_apic_id)
+>> +{
+>> +    return;
+>> +}
+>> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+>> index f148a6d52f..af4ef1e8f0 100644
+>> --- a/target/i386/kvm/kvm.c
+>> +++ b/target/i386/kvm/kvm.c
+>> @@ -5428,3 +5428,8 @@ void kvm_request_xsave_components(X86CPU *cpu, uint64_t mask)
+>>            mask &= ~BIT_ULL(bit);
+>>        }
+>>    }
+>> +
+>> +void kvm_set_max_apic_id(uint32_t max_apic_id)
+>> +{
+>> +    kvm_vm_enable_cap(kvm_state, KVM_CAP_MAX_VCPU_ID, 0, max_apic_id);
+>> +}
+>> diff --git a/target/i386/kvm/kvm_i386.h b/target/i386/kvm/kvm_i386.h
+>> index 4124912c20..c133b32a58 100644
+>> --- a/target/i386/kvm/kvm_i386.h
+>> +++ b/target/i386/kvm/kvm_i386.h
+>> @@ -54,4 +54,5 @@ uint64_t kvm_swizzle_msi_ext_dest_id(uint64_t address);
+>>    bool kvm_enable_sgx_provisioning(KVMState *s);
+>>    void kvm_request_xsave_components(X86CPU *cpu, uint64_t mask);
+>>    
+>> +void kvm_set_max_apic_id(uint32_t max_apic_id);
+>>    #endif
