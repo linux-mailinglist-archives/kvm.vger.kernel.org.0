@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 493655FF488
-	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 22:27:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 30B685FF4F6
+	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 23:04:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231477AbiJNU10 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Oct 2022 16:27:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38964 "EHLO
+        id S229518AbiJNVEG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Oct 2022 17:04:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231256AbiJNU1X (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Oct 2022 16:27:23 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3E491C1177
-        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 13:27:20 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id h185so5258905pgc.10
-        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 13:27:20 -0700 (PDT)
+        with ESMTP id S229454AbiJNVEE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Oct 2022 17:04:04 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABC941DC4F3
+        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 14:04:03 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id q10-20020a17090a304a00b0020b1d5f6975so5877335pjl.0
+        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 14:04:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+UEsOAndO33n5xImeJNTvyfBdBqXe1KC5LWIrPoqWNs=;
-        b=JQ79iqzSOqg0Bur5Ypadql7lmKQ5+ybc5D/asdZJnrcm5xu8IOdQQFYOM206SbSK98
-         aovABu1c+hkUhwjwLDjs7wMWQzQ/nZCDAWsuLwztXfbSLyF9xtLlkZy5T/y+LK4Dqn6Z
-         QIh9F8BSVlXdIeHXagAFCdB/YwR7BacRr4rzBB3xeh0T+ftlhUFAg8atZvS+8e3nceDk
-         sV5Zf7QEKOU14h0SszzkqnzXrNn5HcUCfjddfSYWJEMfp8xpzqwU5XQZFsjjjgia/XsL
-         2aTVbwOTQ73mNe7yr9FaH2+q6Nl75lfvrR2kylK54M8PexjMt8J83CJw6jC8VFbPXVhn
-         VEwQ==
+        bh=FEPtKNTg7NezEV8TRfsVFDaZ2fJ2JKYBjP7uR8dhm+Q=;
+        b=ghXdUokTFObMpYmEMyA5TGYHsb9p1yIdHyjKldJRnv8meEPZNLqDb6gaJC6CS3gCAU
+         wKI/E9fp70U4GxOlUa9Tk49BfJ7YtDWHwV8siA1GOD5deWy8f1N9GPDcWEsqIoiobPr9
+         cm18E706gRnczeSjs9KGMfnvsmBMRsFeBo5SFCK188aD8A0ErFSk0GNNO02uA7nPyrs7
+         wAp1Q2/XdVvr5ekyAAwiJhTM/tinI0cw7rq0wFvrap7tnezgLnqlm1o+eFSi8REqPquv
+         HCV5HrFWGZK2V9XrRGF08TekR6EyyL9a10mSlEBNtNAZG8s94GAn2iSkGRcZub6dcdYW
+         xbgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+UEsOAndO33n5xImeJNTvyfBdBqXe1KC5LWIrPoqWNs=;
-        b=7Sobv/dFSPWyXjC3I1eusZGDccw6LfxhNynmQwOVWk4xrUYYw6cpxDOMY3wIG8A6wO
-         BjFPm0Y3OZphNaRYeM2dHoe99UOr/TYZSx6/ysHdjLzaSonux+X00yahqRLTmkY8gbkV
-         P411PB/wTQc7g717zzJhcogdvBM0Qx9cM9IVM33TEu7Y5S3Bbjqx6K3n9H5xxJX50fVl
-         44fyXTX+ugtyRp62c3uQxDmi3I16Gqt9Zo6eTJ/mSxolPaBvuqLcOcoFwdeADk23ionJ
-         SRdKrWhakCqbuBhTBfFYasFIFE7oSJtc/g6v3mtKK+nBq6Js4JQczydShfm/Kwa2sXpS
-         KJwg==
-X-Gm-Message-State: ACrzQf2TXjWhqjC4DMROBU64zIOxCjHLbmCWDSRVGpV3l5WpoLVfm84m
-        f28nQ4F25qL2kQZKhWF1XRbEPaGaErDpwQ==
-X-Google-Smtp-Source: AMsMyM7BBOr2ZvF64i0NTeL0ox3f/cbc2qck7JToyIKdsJL67GvfmsARuYjWeDCZgj09VHLaS6I6yA==
-X-Received: by 2002:a17:902:d2ce:b0:185:3f05:acf4 with SMTP id n14-20020a170902d2ce00b001853f05acf4mr6643607plc.35.1665779229355;
-        Fri, 14 Oct 2022 13:27:09 -0700 (PDT)
+        bh=FEPtKNTg7NezEV8TRfsVFDaZ2fJ2JKYBjP7uR8dhm+Q=;
+        b=RLKaCpOJd8gfZUtI2J9YabPTtoBQzvmrHHOcNRWje8oUius4YLa1VcHZ+FQ9D7+UHd
+         1pLWghuKOi2vM5viGd25HM7N5bgtZsy0FTBdpo6UrSixaxO+kt/zwjmHrIeEBLXrs8P9
+         NDlpNwuasGme/cQJfGoKOe0ycObqoFwyShbCpCxUbrigvmLReYjI7ZloyA43ZThIRf7d
+         ZOd3lFDxt0YX8enwqCA9RDSO6IkSTy4wx3y618pp9kPCwV3uvrxisx0yvB0WBYUry1tm
+         mcWPZJl/UdfabG6l0gCXbSDVhxaYm0xlev4hIANTNXDhvfobk838rBw21NBC3a/lQabo
+         NtqA==
+X-Gm-Message-State: ACrzQf3fa9E15stQReIye88TiZzASp90ZAl3g20ha6Xb9pEIKd5BXIMg
+        Vv/BkwaLLw2BKTMDhhtsR5qOGw==
+X-Google-Smtp-Source: AMsMyM5JdhDG1UpOFIQKo1Xnh0Iup3kp8kSlAUfnxdMjkyOeWnzbt+R+akO078ePfB3UOfdracdJ7Q==
+X-Received: by 2002:a17:902:9684:b0:17e:71b2:bd16 with SMTP id n4-20020a170902968400b0017e71b2bd16mr7234080plp.163.1665781443064;
+        Fri, 14 Oct 2022 14:04:03 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id h8-20020a056a00000800b0053ebe7ffddcsm2095332pfk.116.2022.10.14.13.27.08
+        by smtp.gmail.com with ESMTPSA id b30-20020aa78ede000000b0053e6eae9665sm2253296pfr.140.2022.10.14.14.04.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Oct 2022 13:27:08 -0700 (PDT)
-Date:   Fri, 14 Oct 2022 20:27:05 +0000
+        Fri, 14 Oct 2022 14:04:02 -0700 (PDT)
+Date:   Fri, 14 Oct 2022 21:03:59 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     John Allen <john.allen@amd.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, weijiang.yang@intel.com,
-        rick.p.edgecombe@intel.com, x86@kernel.org, thomas.lendacky@amd.com
-Subject: Re: [RFC PATCH] x86/sev-es: Include XSS value in GHCB CPUID request
-Message-ID: <Y0nGGeCK+/FPOZej@google.com>
-References: <20221012204716.204904-1-john.allen@amd.com>
+To:     Thomas Huth <thuth@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/3] Use TAP in some more KVM selftests
+Message-ID: <Y0nOv6fqTe2NnPuu@google.com>
+References: <20221004093131.40392-1-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221012204716.204904-1-john.allen@amd.com>
+In-Reply-To: <20221004093131.40392-1-thuth@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -72,72 +72,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 12, 2022, John Allen wrote:
-> When a guest issues a cpuid instruction for Fn0000000D_x0B
-> (CetUserOffset), KVM will intercept and need to access the guest
-
-s/KVM will/the hypervisor may
-
-> XSS value.
-
-Heh, "need" is debatable.
-
-> For SEV-ES, this is encrypted and needs to be
-> included in the GHCB to be visible to the hypervisor. The rdmsr
-> instruction needs to be called directly as the code may be used in early
-> boot in which case the rdmsr wrappers should be avoided as they are
-> incompatible with the decompression boot phase.
+On Tue, Oct 04, 2022, Thomas Huth wrote:
+> Many KVM selftests are completely silent. This has the disadvantage
+> for the users that they do not know what's going on here. For example,
+> some time ago, a tester asked me how to know whether a certain new
+> sub-test has been added to one of the s390x test binaries or not (which
+> he didn't compile on his own), which is hard to judge when there is no
+> output. So I finally went ahead and implemented TAP output in the
+> s390x-specific tests some months ago.
 > 
-> Signed-off-by: John Allen <john.allen@amd.com>
-> ---
-> This patch is logically part of the SVM guest shadow stack support series seen
-> here:
-> https://lore.kernel.org/all/20221012203910.204793-1-john.allen@amd.com/
-> 
-> Sending this patch separately from the main series as it should apply to the
-> tip tree as opposed to the kvm tree as this patch is related to guest kernel
-> support.
-> ---
->  arch/x86/kernel/sev-shared.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
-> 
-> diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
-> index 3a5b0c9c4fcc..34469fac03f0 100644
-> --- a/arch/x86/kernel/sev-shared.c
-> +++ b/arch/x86/kernel/sev-shared.c
-> @@ -887,6 +887,21 @@ static enum es_result vc_handle_cpuid(struct ghcb *ghcb,
->  		/* xgetbv will cause #GP - use reset value for xcr0 */
->  		ghcb_set_xcr0(ghcb, 1);
->  
-> +	if (has_cpuflag(X86_FEATURE_SHSTK) && regs->ax == 0xd) {
+> Now I wonder whether that could be a good strategy for the x86 and
+> generic tests, too?
 
-IIRC, XCR0 and XSS are only needed for sub-leafs 0 and 1, i.e. this and the code
-above don't need to expose XCR0/XSS to the host for ECX > 1.
+Taking Andrew's thoughts a step further, I'm in favor of adding TAP output, but
+only if we implement it in such a way that it reduces the burden on writing new
+tests.  I _really_ like that sync_regs_test's subtests are split into consumable
+chunks, but I worry that the amount of boilerplate needed will deter test writes
+and increase the maintenance cost.
 
-FWIW, I think it's ridiculous that the guest willingly exposes state to the host,
-it's not _that_ difficult to do the math in the guest.
+And my experience with KVM-unit-tests is that letting test writers specify strings
+for test names is a bad idea, e.g. using an arbitrary string creates a disconnect
+between what the user sees and what code is running, and makes it unnecessarily
+difficult to connect a failure back to code.  And if we ever support running
+specific testcases by name (I'm still not sure this is a net positive), arbitrary
+strings get really annoying because inevitably an arbitrary string will contain
+characters that need to be escaped in the shell.
 
-> +		unsigned long lo, hi;
-> +		u64 xss;
-> +
-> +		/*
-> +		 * Since vc_handle_cpuid may be used during early boot, the
-> +		 * rdmsr wrappers are incompatible and should not be used.
-> +		 * Invoke the instruction directly.
-> +		 */
-> +		asm volatile("rdmsr" : "=a" (lo), "=d" (hi)
-> +				    : "c" (MSR_IA32_XSS));
+Adding a macro or three to let tests define and run testscases with minimal effort
+would more or less eliminate the boilerplate.  And in theory providing semi-rigid
+macros would help force simple tests to conform to standard patterns, which should
+reduce the cost of someone new understanding the test, and would likely let us do
+more automagic things in the future.
 
-Doesn't __rdmsr() do what you want?  But even that seems unnecessary, isn't the
-current XSS available in xfeatures_mask_supervisor()?
+E.g. something like this in the test:
 
-> +		xss = (hi << 32) | lo;
-> +		ghcb_set_xss(ghcb, xss);
-> +	}
-> +
->  	ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_CPUID, 0, 0);
->  	if (ret != ES_OK)
->  		return ret;
-> -- 
-> 2.34.3
-> 
+	KVM_RUN_TESTCASES(vcpu,
+		test_clear_kvm_dirty_regs_bits,
+		test_set_invalid,
+		test_req_and_verify_all_valid_regs,
+		test_set_and_verify_various_reg_values,
+		test_clear_kvm_dirty_regs_bits,
+	);
