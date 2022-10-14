@@ -2,191 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 880F25FF01C
-	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 16:17:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 22F855FF054
+	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 16:29:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230455AbiJNORl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Oct 2022 10:17:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36826 "EHLO
+        id S229735AbiJNO26 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Oct 2022 10:28:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230462AbiJNORd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Oct 2022 10:17:33 -0400
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEBFA1D2B61;
-        Fri, 14 Oct 2022 07:17:18 -0700 (PDT)
-Received: by mail-ot1-f53.google.com with SMTP id z11-20020a05683020cb00b00661a95cf920so1908371otq.5;
-        Fri, 14 Oct 2022 07:17:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SJgQbbx8GSTxjlJ5aSREgb5VNrrd8KKlXzB6L8m9N+U=;
-        b=3cRXTvr/VuU3qFtcOtr8IF0GviVlIopMG91MNoYtZHHq1vL/GIJTfdEoDxcnWyXh2I
-         AZVFbmjPrlP64BC/UlTdzh4DnGbZtU34HZeAzwJORX5UPOguCaEEVjqLYaT1UAqeysa3
-         fCdredyrReUjohGs5crCgbF704MuFtUz3bZVQqXsYp7fMuY1Z0prFhrjHBA7a0lmr1gt
-         H9BKuJOebtbJySFbg7+HM1mH/01qN9jpB03L9cbvFJpmaGS8YYvBb5ezF8PFPsDx3bfD
-         r+BcqFBkxOjXZP6bzx1W80hYoZLO+6pThwkuKZaFkklTCe4B8IE/FDWWGpBeveEhZFgV
-         glgg==
-X-Gm-Message-State: ACrzQf15ORcJg8ahJMPLDz8EADqQhwGJPAdgJ2PmqUewqRI3V68fx/ZV
-        W0QyKw1wXoWxdeQ+YBflsg==
-X-Google-Smtp-Source: AMsMyM59Imc0Bum5glqerPFxzEzBx5VO/JKDoGC25QZgv78bQSe0lQuroyOM/A7u3yzpW/yFykaDuA==
-X-Received: by 2002:a9d:1d3:0:b0:661:a1a9:3727 with SMTP id e77-20020a9d01d3000000b00661a1a93727mr2551605ote.372.1665757037501;
-        Fri, 14 Oct 2022 07:17:17 -0700 (PDT)
-Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id v6-20020a9d69c6000000b006618586b850sm1284868oto.46.2022.10.14.07.17.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Oct 2022 07:17:16 -0700 (PDT)
-Received: (nullmailer pid 1900473 invoked by uid 1000);
-        Fri, 14 Oct 2022 14:17:17 -0000
-Date:   Fri, 14 Oct 2022 09:17:17 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Nipun Gupta <nipun.gupta@amd.com>
-Cc:     krzysztof.kozlowski+dt@linaro.org, gregkh@linuxfoundation.org,
-        rafael@kernel.org, eric.auger@redhat.com,
-        alex.williamson@redhat.com, cohuck@redhat.com,
-        puneet.gupta@amd.com, song.bao.hua@hisilicon.com,
-        mchehab+huawei@kernel.org, maz@kernel.org, f.fainelli@gmail.com,
-        jeffrey.l.hugo@gmail.com, saravanak@google.com,
-        Michael.Srba@seznam.cz, mani@kernel.org, yishaih@nvidia.com,
-        jgg@ziepe.ca, jgg@nvidia.com, robin.murphy@arm.com,
-        will@kernel.org, joro@8bytes.org, masahiroy@kernel.org,
-        ndesaulniers@google.com, linux-arm-kernel@lists.infradead.org,
-        linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org,
-        devicetree@vger.kernel.org, kvm@vger.kernel.org, okaya@kernel.org,
-        harpreet.anand@amd.com, nikhil.agarwal@amd.com,
-        michal.simek@amd.com, aleksandar.radovanovic@amd.com, git@amd.com
-Subject: Re: [RFC PATCH v4 1/8] dt-bindings: bus: add CDX bus device tree
- bindings
-Message-ID: <20221014141717.GB1862711-robh@kernel.org>
-References: <20220803122655.100254-1-nipun.gupta@amd.com>
- <20221014044049.2557085-1-nipun.gupta@amd.com>
- <20221014044049.2557085-2-nipun.gupta@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221014044049.2557085-2-nipun.gupta@amd.com>
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,
-        FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
-        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=no
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229638AbiJNO25 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Oct 2022 10:28:57 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 531E41D73D1
+        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 07:28:56 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 02EB1B82352
+        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 14:28:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B7E1C433C1;
+        Fri, 14 Oct 2022 14:28:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1665757733;
+        bh=zX+pORsQkCidDg3PgRpxsrmwbtK10x2AqJSPcWF7yOQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=eJRrmiIO5y6iBCFj3Nzue5WtBxR5hRJOeEPRlBK7WujHLGCDe60dhiSFD3iAcWPXl
+         pAUmGYDAAzZUh5QGWjze2NL2By7DOf5s2PDJcwA7UIUPVvmDBurbln9GZNklhMMEAc
+         fKEiVt2kivL1sxNLWftppp3jTGUAy+dvsuxnlbgtr8CW6qCegmQWzTDrYlHlhkqT/B
+         uAS+vrI3MNTN7QC5PdVaLx5GrnRWNRPM63PdDtdwBgZY/No11xmZ8Ybg3bqhFN1P4P
+         CXwiMY767ktu9NFBGx7OtCpkfwgO5YrzWGjIXPZmHuECEe/yNB95mwqlMmHy8mN//I
+         SCi15/Z0bD8hQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1ojLgB-00GXzh-9F;
+        Fri, 14 Oct 2022 15:28:51 +0100
+Date:   Fri, 14 Oct 2022 15:28:02 +0100
+Message-ID: <87mt9yh43x.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Eric Auger <eauger@redhat.com>, Eric Ren <renzhengeek@gmail.com>
+Cc:     kvm@vger.kernel.org, kvmarm <kvmarm@lists.cs.columbia.edu>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH] KVM: arm64: vgic: fix wrong loop condition in scan_its_table()
+In-Reply-To: <7f071249-b402-9534-c127-40af9379756d@redhat.com>
+References: <acd9f1643980fbd27cd22523d2d84ca7c9add84a.1665592448.git.renzhengeek@gmail.com>
+        <87o7ughoyf.wl-maz@kernel.org>
+        <7f071249-b402-9534-c127-40af9379756d@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: eauger@redhat.com, renzhengeek@gmail.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, suzuki.poulose@arm.com, james.morse@arm.com, Alexandru.Elisei@arm.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 14, 2022 at 10:10:42AM +0530, Nipun Gupta wrote:
-> This patch adds a devicetree binding documentation for CDX
-> bus.
-
-Please read submitting-patches.rst and what it says about commit 
-messages.
-
+On Thu, 13 Oct 2022 17:42:31 +0100,
+Eric Auger <eauger@redhat.com> wrote:
 > 
-> Signed-off-by: Nipun Gupta <nipun.gupta@amd.com>
-> ---
->  .../devicetree/bindings/bus/xlnx,cdx.yaml     | 65 +++++++++++++++++++
->  MAINTAINERS                                   |  6 ++
->  2 files changed, 71 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/bus/xlnx,cdx.yaml
+> Hi Eric,
 > 
-> diff --git a/Documentation/devicetree/bindings/bus/xlnx,cdx.yaml b/Documentation/devicetree/bindings/bus/xlnx,cdx.yaml
-> new file mode 100644
-> index 000000000000..984ff65b668a
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/bus/xlnx,cdx.yaml
-> @@ -0,0 +1,65 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/bus/xlnx,cdx.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: AMD CDX bus controller
-> +
-> +description: |
-> +  CDX bus controller detects CDX devices using CDX firmware and
-> +  add those to cdx bus. The CDX bus manages multiple FPGA based
-> +  hardware devices, which can support network, crypto or any other
-> +  specialized type of devices. These FPGA based devices can be
-> +  added/modified dynamically on run-time.
-> +
-> +  All devices on the CDX bus will have a unique streamid (for IOMMU)
-> +  and a unique device ID (for MSI) corresponding to a requestor ID
-> +  (one to one associated with the device). The streamid and deviceid
-> +  are used to configure SMMU and GIC-ITS respectively.
-> +
-> +  iommu-map property is used to define the set of stream ids
-> +  corresponding to each device and the associated IOMMU.
-> +
-> +  The MSI writes are accompanied by sideband data (Device ID).
-> +  The msi-map property is used to associate the devices with the
-> +  device ID as well as the associated ITS controller.
-> +
-> +maintainers:
-> +  - Nipun Gupta <nipun.gupta@amd.com>
-> +  - Nikhil Agarwal <nikhil.agarwal@amd.com>
-> +
-> +properties:
-> +  compatible:
-> +    const: xlnx,cdxbus-controller-1.0
+> On 10/12/22 20:33, Marc Zyngier wrote:
+> > Hi Eric,
+> > 
+> > Before I comment on this patch, a couple of things that need
+> > addressing:
+> > 
+> >> "Cc: marc.zyngier@arm.com, cdall@linaro.org"
+> > 
+> > None of these two addresses are valid anymore, and haven't been for
+> > several years.
+> > 
+> > Please consult the MAINTAINERS file for up-to-date addresses for
+> > current maintainers and reviewers, all of whom should be Cc'd on this
+> > email. I've now added them as well as Eric Auger who has written most
+> > of the ITS migration code, and the new mailing list (the Columbia list
+> > is about to be killed).
 
-Where does 1.0 come from?
+Duh, I never CC'd the new list... Now hopefully done.
 
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  iommu-map: true
-> +
-> +  msi-map: true
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - iommu-map
-> +  - msi-map
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    soc {
-> +        #address-cells = <2>;
-> +        #size-cells = <2>;
-> +
-> +        cdx: cdx@4000000 {
-
-bus@...
-
-> +            compatible = "xlnx,cdxbus-controller-1.0";
-> +            reg = <0x00000000 0x04000000 0 0x1000>;
-> +            /* define map for RIDs 250-259 */
-> +            iommu-map = <250 &smmu 250 10>;
-> +            /* define msi map for RIDs 250-259 */
-> +            msi-map = <250 &its 250 10>;
-> +        };
-> +    };
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index f5ca4aefd184..5f48f11fe0c3 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -935,6 +935,12 @@ S:	Supported
->  F:	drivers/crypto/ccp/
->  F:	include/linux/ccp.h
->  
-> +AMD CDX BUS DRIVER
-> +M:	Nipun Gupta <nipun.gupta@amd.com>
-> +M:	Nikhil Agarwal <nikhil.agarwal@amd.com>
-> +S:	Maintained
-> +F:	Documentation/devicetree/bindings/bus/xlnx,cdx.yaml
-> +
->  AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - SEV SUPPORT
->  M:	Brijesh Singh <brijesh.singh@amd.com>
->  M:	Tom Lendacky <thomas.lendacky@amd.com>
-> -- 
-> 2.25.1
+> > 
+> > On Wed, 12 Oct 2022 17:59:25 +0100,
+> > Eric Ren <renzhengeek@gmail.com> wrote:
+> >>
+> >> Reproducer hints:
+> >> 1. Create ARM virt VM with pxb-pcie bus which adds
+> >>    extra host bridges, with qemu command like:
+> >>
+> >> ```
+> >>   -device pxb-pcie,bus_nr=8,id=pci.x,numa_node=0,bus=pcie.0 \
+> >>   -device pcie-root-port,..,bus=pci.x \
+> >>   ...
+> >>   -device pxb-pcie,bus_nr=37,id=pci.y,numa_node=1,bus=pcie.0 \
+> >>   -device pcie-root-port,..,bus=pci.y \
+> >>   ...
+> >>
+> >> ```
+> >> 2. Perform VM migration which calls save/restore device tables.
+> >>
+> >> In that setup, we get a big "offset" between 2 device_ids (
+> >> one is small, another is big), which makes unsigned "len" round
+> >> up a big positive number, causing loop to continue exceptionally.
+> > 
+> > You'll have to spell it out for me here. If you have a very sparse
+> > device ID and you are only using a single level device table, you are
+> > bound to have a large len. Now, is the issue that 'size' is so large
+> > that it is negative as an 'int'? Describing the exact situation you're
+> > in would help a lot.
+> > 
+> >>
+> >> Signed-off-by: Eric Ren <renzhengeek@gmail.com>
+> >> ---
+> >>  arch/arm64/kvm/vgic/vgic-its.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> >> index 24d7778d1ce6..673554ef02f9 100644
+> >> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> >> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> >> @@ -2141,7 +2141,7 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
+> >>  			  int start_id, entry_fn_t fn, void *opaque)
+> >>  {
+> >>  	struct kvm *kvm = its->dev->kvm;
+> >> -	unsigned long len = size;
+> >> +	ssize_t len = size;
+> > 
+> > This feels wrong, really. If anything, all these types should be
+> > unsigned, not signed. Signed types in this context make very little
+> > sense...
 > 
+> After digging into the code back again, I realized I told you something
+> wrong. The next_offset is the delta between the current device id and
+> the next one. The next device can perfectly be in a different L1 device
+
+A different L2 table, surely? By definition, we only have a single L1
+table.
+
+> table, - it is your case actually- , in which case the code is
+> definitely broken.
 > 
+> So I guess we should rather have a
+> while (true) {
+> 	../..
+> 	if (byte_offset >= len)
+> 		break;
+> 	len -= byte_offset;
+> }
+> 
+> You can add a Fixes tag too:
+> Fixes: 920a7a8fa92a ("KVM: arm64: vgic-its: Add infrastructure for table
+> lookup")
+> and cc stable@vger.kernel.org
+
+Just to make it clear, do you mean this:
+
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 9d3299a70242..e722cafdff60 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -2162,6 +2162,9 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
+ 			return next_offset;
+ 
+ 		byte_offset = next_offset * esz;
++		if (byte_offset >= len)
++			break;
++
+ 		id += next_offset;
+ 		gpa += byte_offset;
+ 		len -= byte_offset;
+
+
+If so, then I agree that this is a sensible fix. EricR, do you mind
+respinning this ASAP so that I can get it merged and backported?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
