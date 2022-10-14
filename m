@@ -2,164 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B7E415FEBE4
-	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 11:41:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 302005FEC5E
+	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 12:11:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230180AbiJNJll (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Oct 2022 05:41:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60186 "EHLO
+        id S229572AbiJNKLh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Oct 2022 06:11:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230166AbiJNJlg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Oct 2022 05:41:36 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B46AD1C69D8
-        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 02:41:31 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id l1so4216340pld.13
-        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 02:41:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=KdrfFMceV7elb/rA2YCTui/ZhC4l1ygRRIMRPNusZhU=;
-        b=tILJoqotiPdze1TCCwL+mF59nGOxYtncfKrouddVFax7Gcsz+crVbOVRREI0Tubts5
-         vV3yE8640V3CYRlQELJMmFfQQTczEty9SrunN7E3D3rGtjh2DtqxOyXcFHLCaUj06bmI
-         n2K5LQbByQ+bIzM6sx24DqM+gWvxy+s7nteoahhh7v3RsKCxB7wfK3JM651TalbDEgCt
-         iq+ySPOEI9A34HStVa3+jhYVticSF1HMoHESfANw0eGaYRCfMc6JZDSu2ulbuQq9aPiZ
-         CEjBxmmj7CjShgC3jfj1T37OUIOlhGbi6AzfZNYGfNVtK/Ji6CXdTMJ7lej9vyZzHKB2
-         fE3g==
+        with ESMTP id S229679AbiJNKL3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Oct 2022 06:11:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE91514EC7D
+        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 03:11:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665742274;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:mime-version:mime-version:
+         content-type:content-type; bh=8FGCSnmWS9YSeKOVf31i5PwnQR2o9ASrKbCvKXlkXbo=;
+        b=ak5lus/UbEJ1lkIvtwNNrin9+LgNVEhRIHs/6/9voF+ObPSmMZLlE+aGtHsBmSTZln/oGb
+        3NPrak2+cKD39rehe42bx/B+JzPunla7R49Mgw3ktmeCKQc6UWPlZXGWV4Uhz000iyK6Ll
+        BKB9lmXNKPNxqu2igxfnUuB4dA+GuI4=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-139-BWy53kmoPk2KSpYPNvuCTg-1; Fri, 14 Oct 2022 06:11:13 -0400
+X-MC-Unique: BWy53kmoPk2KSpYPNvuCTg-1
+Received: by mail-wm1-f71.google.com with SMTP id 133-20020a1c028b000000b003c5e6b44ebaso4433601wmc.9
+        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 03:11:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KdrfFMceV7elb/rA2YCTui/ZhC4l1ygRRIMRPNusZhU=;
-        b=O+RQNC8UHx/VCpLCnvLpoaCNiEetvTQNb3KUruw3lIrx2J4p7qKxRB3Ky6qV2TLaLB
-         b3S+/AWm2DtGfD5890IsIcRQMXCzUt3D4VH4eIYPww2BuwBuRucFizho6t3kI622UhsL
-         b0UpHauGm04mgNIJsvVHQjHbnU/Kl+MvnHrfnwj8dBxkJfbBP/rTt/v1JmUv2ntyLj00
-         c3zMSOY7j4STz/U8K7qgBXlC5B5b7e9veDgFAWJfVVQOxKloIxInguQPagnbzs9873ZW
-         jAIyjGzcDxWErpb+3aFhaDvZ6/LNNIz5IuUmqBO7CjtTBewy5JI8iocbRgZtsjJsMmSL
-         i8bw==
-X-Gm-Message-State: ACrzQf3BY8dFaLTQ3uPmHq/Vri/m5q7Eyj1WPj02ZNwqP5BjUPwvw1tG
-        +8XYwxxn0xWLkGB1WQ5a7G4LHX8jLGxKg4tP4yCLKQ==
-X-Google-Smtp-Source: AMsMyM4UqG/vIk3S7koHuixUnBbVmb4fDf+woVq1uoMPm6jtVGqdAhA4fxEgS9gbQtKnvvq2Dv3MB4MMySXFLzb02qg=
-X-Received: by 2002:a17:90b:38c3:b0:20d:406e:26d9 with SMTP id
- nn3-20020a17090b38c300b0020d406e26d9mr4843007pjb.121.1665740490315; Fri, 14
- Oct 2022 02:41:30 -0700 (PDT)
+        h=mime-version:message-id:date:reply-to:user-agent:subject:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8FGCSnmWS9YSeKOVf31i5PwnQR2o9ASrKbCvKXlkXbo=;
+        b=j+ErbAOedNPJmmcYirpbcHm/NCSkYpXmeIMH1IxmbGCscH5xwf5M75A1sWW2fVbAwz
+         5F6T5YD4AYp7Y6tZDODhaOerGGunrikvwlIAfvikhvB/Muw2wXwhfSBw4CrLu54anrV3
+         5oTvyml3H6kd5zU82NJ1HPSglqR81J0my+xge2wQ7FX/ZEInTPzCv85K5jU8Mzrr5e6P
+         jeDniTGJoLC2qbZg3lPNc/33DJoyWgaXVXW4B1JmjMndGfHu9zRBejJVnrBndK+wp4nl
+         qy/i3gifcyYecNJ4Zd+eVslINbciZ/J+N/MdVycy+r1c50lfNVGV5vV5GvueWxX2uKrp
+         LYQw==
+X-Gm-Message-State: ACrzQf0t1oUHOwTf7r4mQE2itZiqkPlOKT7IK9vw0udwvX+Fh+AvuVko
+        DS5ib5dBIsQ+5h/z77b3oCOLIANFSpJpNpAgvx2e3+/CzL8OATX3CPsw6nN75miKugN1ugBsfyg
+        c3KdnNIqMloOlQ20p6BzKR1MHzLe9W8Q297h6fIw6UOHoeLflx4q+ILtf14W8PY+u
+X-Received: by 2002:a05:600c:3543:b0:3b4:ba45:9945 with SMTP id i3-20020a05600c354300b003b4ba459945mr9577719wmq.58.1665742271765;
+        Fri, 14 Oct 2022 03:11:11 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6A2Bin5AZhSEMXDLhNhYgDun/z4RfB6byLpdAGZq7yTCkkZL3M2MiC2ssF7e8YTATSpoq2dQ==
+X-Received: by 2002:a05:600c:3543:b0:3b4:ba45:9945 with SMTP id i3-20020a05600c354300b003b4ba459945mr9577700wmq.58.1665742271495;
+        Fri, 14 Oct 2022 03:11:11 -0700 (PDT)
+Received: from localhost (static-28-206-230-77.ipcom.comunitel.net. [77.230.206.28])
+        by smtp.gmail.com with ESMTPSA id m187-20020a1ca3c4000000b003b476cabf1csm1734772wme.26.2022.10.14.03.11.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Oct 2022 03:11:11 -0700 (PDT)
+From:   Juan Quintela <quintela@redhat.com>
+To:     kvm-devel <kvm@vger.kernel.org>, qemu-devel@nongnu.org
+Subject: KVM Call for 2022-10-18
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.1 (gnu/linux)
+Reply-To: quintela@redhat.com
+Date:   Fri, 14 Oct 2022 12:11:10 +0200
+Message-ID: <871qran29t.fsf@secure.mitica>
 MIME-Version: 1.0
-References: <20220819174659.2427983-1-vannapurve@google.com>
- <20220819174659.2427983-7-vannapurve@google.com> <Yz85WEQWsXAbLWnu@google.com>
-In-Reply-To: <Yz85WEQWsXAbLWnu@google.com>
-From:   Vishal Annapurve <vannapurve@google.com>
-Date:   Fri, 14 Oct 2022 15:11:19 +0530
-Message-ID: <CAGtprH-eA+k3BwczSyds+Hrr5QZn96hNK81Op_iBH20-wKfKeg@mail.gmail.com>
-Subject: Re: [RFC V3 PATCH 6/6] sefltests: kvm: x86: Add selftest for private memory
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        shuah@kernel.org, yang.zhong@intel.com, drjones@redhat.com,
-        ricarkol@google.com, aaronlewis@google.com, wei.w.wang@intel.com,
-        kirill.shutemov@linux.intel.com, corbet@lwn.net, hughd@google.com,
-        jlayton@kernel.org, bfields@fieldses.org,
-        akpm@linux-foundation.org, chao.p.peng@linux.intel.com,
-        yu.c.zhang@linux.intel.com, jun.nakajima@intel.com,
-        dave.hansen@intel.com, michael.roth@amd.com, qperret@google.com,
-        steven.price@arm.com, ak@linux.intel.com, david@redhat.com,
-        luto@kernel.org, vbabka@suse.cz, marcorr@google.com,
-        erdemaktas@google.com, pgonda@google.com, nikunj@amd.com,
-        diviness@google.com, maz@kernel.org, dmatlack@google.com,
-        axelrasmussen@google.com, maciej.szmigiero@oracle.com,
-        mizhang@google.com, bgardon@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 7, 2022 at 1:54 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Aug 19, 2022, Vishal Annapurve wrote:
-> > +static bool verify_mem_contents(void *mem, uint32_t size, uint8_t pat)
->
-> As per feedback in v1[*], spell out "pattern".
->
-> [*] https://lore.kernel.org/all/YtiJx11AZHslcGnN@google.com
->
-> > +{
-> > +     uint8_t *buf = (uint8_t *)mem;
-> > +
-> > +     for (uint32_t i = 0; i < size; i++) {
-> > +             if (buf[i] != pat)
-> > +                     return false;
-> > +     }
-> > +
-> > +     return true;
-> > +}
-> > +
-> > +/*
-> > + * Add custom implementation for memset to avoid using standard/builtin memset
-> > + * which may use features like SSE/GOT that don't work with guest vm execution
-> > + * within selftests.
-> > + */
-> > +void *memset(void *mem, int byte, size_t size)
-> > +{
-> > +     uint8_t *buf = (uint8_t *)mem;
-> > +
-> > +     for (uint32_t i = 0; i < size; i++)
-> > +             buf[i] = byte;
-> > +
-> > +     return buf;
-> > +}
->
-> memset(), memcpy(), and memcmp() are safe to use as of commit 6b6f71484bf4 ("KVM:
-> selftests: Implement memcmp(), memcpy(), and memset() for guest use").
->
 
-This is much better. It made less sense to add a custom memset for a
-single selftest.
 
-> Note the "fun" with gcc "optimizing" into infinite recursion... :-)
->
-> > +
-> > +static void populate_test_area(void *test_area_base, uint64_t pat)
-> > +{
-> > +     memset(test_area_base, pat, TEST_AREA_SIZE);
-> > +}
-> > +
-> > +static void populate_guest_test_mem(void *guest_test_mem, uint64_t pat)
-> > +{
-> > +     memset(guest_test_mem, pat, GUEST_TEST_MEM_SIZE);
-> > +}
-> > +
-> > +static bool verify_test_area(void *test_area_base, uint64_t area_pat,
-> > +     uint64_t guest_pat)
->
-> Again, avoid "pat".
->
-> > +{
-> > +     void *test_area1_base = test_area_base;
-> > +     uint64_t test_area1_size = GUEST_TEST_MEM_OFFSET;
-> > +     void *guest_test_mem = test_area_base + test_area1_size;
-> > +     uint64_t guest_test_size = GUEST_TEST_MEM_SIZE;
-> > +     void *test_area2_base = guest_test_mem + guest_test_size;
-> > +     uint64_t test_area2_size = (TEST_AREA_SIZE - (GUEST_TEST_MEM_OFFSET +
-> > +                     GUEST_TEST_MEM_SIZE));
->
-> This is all amazingly hard to read.  AFAICT, the local variables are largely useless.
-> Actually, why even take in @test_area_base, isn't it hardcoded to TEST_AREA_GPA?
-> Then everything except the pattern can be hardcoded.
->
-> > +     return (verify_mem_contents(test_area1_base, test_area1_size, area_pat) &&
-> > +             verify_mem_contents(guest_test_mem, guest_test_size, guest_pat) &&
-> > +             verify_mem_contents(test_area2_base, test_area2_size, area_pat));
-> > +}
+Hi
 
-Ack. Will address these comments in the next series.
+Please, send any topic that you are interested in covering.
+
+For next week, we have a topic:
+
+- VFIO and migration
+
+We are going to discuss what to do with vfio devices that support
+migration.  See my RFC on the list, so far we are discussing:
+
+- we need a way to know the size of the vfio device state
+  (In the cases we are discussing, they require that the guest is
+  stopped, so I am redoing how we calculate pending state).
+
+- We need an estimate/exact sizes.
+  Estimate can be the one calculated last time.  This is supposed to be
+  fast, and needs to work with the guest running.
+  Exact size is just that, we have stopped the guest, and we want to
+  know how big is the state for this device, to know if we can complete
+  migration ore we will continue in iterative stage.
+
+- We need to send the state asynchronously.
+  VFIO devices are very fast at doing whatever they are designed to do.
+  But copying its state to memory is not one of the things that they do
+  fast.  So I am working in an asynchronous way to copy that state in
+  parallel.  The particular setup that caused this problem was using 4
+  network vfio cards in the guest.  Current code will:
+
+  for i in network cards:
+     copy the state from card i into memory
+     send the state from memory from card i to destination
+
+  what we want is something like:
+
+  for i in network cards:
+     start asyrchronous copy the state from card i into memory
+
+  for i in network cards:
+     wait for copy the state from card i into memory to finish
+     send the state from memory from card i to destination
+
+So the cards can tranfer its state to memory in parallel.
+
+
+At the end of Monday I will send an email with the agenda or the
+cancellation of the call, so hurry up.
+
+After discussions on the QEMU Summit, we are going to have always open a
+KVM call where you can add topics.
+
+ Call details:
+
+By popular demand, a google calendar public entry with it
+
+   https://calendar.google.com/calendar/u/0?cid=ZWdlZDdja2kwNWxtdTF0bmd2a2wzdGhpZHNAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ
+
+(Let me know if you have any problems with the calendar entry.  I just
+gave up about getting right at the same time CEST, CET, EDT and DST).
+
+If you need phone number details,  contact me privately
+
+Thanks, Juan.
+
