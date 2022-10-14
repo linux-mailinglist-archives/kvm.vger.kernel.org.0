@@ -2,70 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 211285FF501
-	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 23:06:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D074C5FF507
+	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 23:09:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229586AbiJNVGq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Oct 2022 17:06:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41254 "EHLO
+        id S229598AbiJNVJY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Oct 2022 17:09:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229577AbiJNVGp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Oct 2022 17:06:45 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DDD71CCCD2
-        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 14:06:43 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id q10-20020a17090a304a00b0020b1d5f6975so5882727pjl.0
-        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 14:06:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gBsIgMFkR4hW6DkbKUL3jsquGqWZiZYs8XXLe7DQw4A=;
-        b=EZEnHyPWVM20eYK0drT8VKRVFesb8BxKsJzc0N+c8Wa34hBYJ9Q6wgFLIdZOwP2E2A
-         snZ8B9uD5ZMLmdIeDQTPBg5PfNB4eBY2/6kO+U06aK1ADIhjSOZUjL1tOQoN/z2a7Kun
-         WjJsTnYEQLDEx7jASlQs0iLsRJ2AIE2dVwfgPgoxt4krLRyaIs6K5r1V0XDInXNPdJmG
-         jrRPrXsfD+0AUNroc6Ysr03801gaTAC7fZuMbfHuID6fMhC4bphXtGYn5aGZlqD0ViXp
-         fLfvaZUXPywdh4phfAmRqFHubAUgEvH+UGdKgvBBBWHEcOYKY2L0o0bu+NREHGB4zAsm
-         6dzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gBsIgMFkR4hW6DkbKUL3jsquGqWZiZYs8XXLe7DQw4A=;
-        b=6AEJEjG3AO5w9XMsbz8NIgES212qdD4SQKe1eUVfCPVwC+33luJZMqNl17M2ur/yM9
-         TFglduX0Eq+dTENJlg/H2UTPuyn6+xX/v6imYkcd1j5aKu9GpTTTTWL4P490/AK8ihJ0
-         D68zWu7loOXtDzKkJyDT+bR77xe71CFTziDdHcewS7oK9B3ph3qt0Kbv3OJRMP10NT39
-         yU46zReduMLgQJlQFE+c2ycVn9OCRZLBIuw2VlOSauDbzZ69OXyJOzbg5CW4hhRmOVrG
-         4s8PnyvbcpJlWXTC5AyVO3uKQgKhKlSceyG2A01zc20xNsT9lj6MUw3OL1sz1aAgUlt/
-         cHkg==
-X-Gm-Message-State: ACrzQf3UaJCeW7sd2O6xcbjmID+6d3mcodPyyxuJDOijq3AQ/iuI0rYb
-        NGZUWOu2Zz2lFx7V6pPs+Ehjiw==
-X-Google-Smtp-Source: AMsMyM4TRUGumiH9zPUpVbD+pbo9y8PKyNt58Hq6N9oJ6PlfFsmKD5LHpHH6bXmjSd0NXZc8ax2ong==
-X-Received: by 2002:a17:902:d48e:b0:178:b5d:ab3 with SMTP id c14-20020a170902d48e00b001780b5d0ab3mr6947676plg.22.1665781602184;
-        Fri, 14 Oct 2022 14:06:42 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id i18-20020a63e912000000b0045724d09cb4sm1835259pgh.29.2022.10.14.14.06.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Oct 2022 14:06:41 -0700 (PDT)
-Date:   Fri, 14 Oct 2022 21:06:37 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        maciej.szmigiero@oracle.com
-Subject: Re: [PATCH v2 8/8] KVM: x86: do not define KVM_REQ_SMI if SMM
- disabled
-Message-ID: <Y0nPXfVT1pUaGppn@google.com>
-References: <20220929172016.319443-1-pbonzini@redhat.com>
- <20220929172016.319443-9-pbonzini@redhat.com>
+        with ESMTP id S229652AbiJNVJV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Oct 2022 17:09:21 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2077.outbound.protection.outlook.com [40.107.237.77])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08ACD1DC822;
+        Fri, 14 Oct 2022 14:09:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LQVNXbW7AeG4KVVje8L5lcAkvW6FvuCMmV2ApPR31j3wtr5DyYA4sPmCH70kYm3+CFQez5CzYNmoRe1U2Tg8RBRITSxvGFursMPV52MWfbBtPkP9vd5jKt32uUo5Z6LiabGO4AZqm+QGMZALrfhWbDwW+/qgRzlQL478nvWgqEdwQe12Lekdk9+l0FVFFuGHhgVDfBQsY1n9njBG7JHElVEyxQNveKr4mkZf6qevPcqLONt1ZVBqj3pLtspRcQtHyKupGq5pTqd7unNMhgdoW6uQl4YHZ1EKZiySA9gl7cN97Xcf1b0CuRr1mFUlSyxqzrEnB3KDqnfiHn3urGaXcg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aFfwb7Ia6RjTQLBtQ1zxJKKj2IeqG0FMS0QPRb7sPQY=;
+ b=ZFinu+eX0t/hwiQ5T5ugtBaUPFlT3dNiiIuQCc1TRyzQlhhnZNHXkp1LePGEI9rrI8VzeFK6FU8HNqzLv4s/PBl140rwLZVQ9RJOoNn/UpjjiDH0MXLatzTUIINf8enL6IAHrlh1cC0FgTJj+6L+5WHorEDvk2y8078y+8zKYpA0RTm05uV0F/WmnvE5Qanqq3vgXf8GpMopF1nH8sKGEykFbjeQBpIRthFRG8R82E7NqwrmQ34GSaQ16qk7tPVQjkKpU/OJT85kXRnCXXUhQZCWIBylebDKEl+/HvONp/Fn8MwL+1rZfuhxb31P9T7b60aXafMeZ4W8Ecvff1cIhw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aFfwb7Ia6RjTQLBtQ1zxJKKj2IeqG0FMS0QPRb7sPQY=;
+ b=vRnBPGcOPszYRUmaE1zE9EcAp6hWW8qOufRqSP7Bnx3qlYPnpShAAgikezsPB0AMo/saUCUsMV8RoxQcfN+IFZtBKJY8SDMziTKaYs83uM27BMDG9yj9qp6O50yRe5YxSTAEquZvcG7xv/DWBi/Lp4FVZeaY2Slii+WoKhsx08o=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by BL1PR12MB5285.namprd12.prod.outlook.com (2603:10b6:208:31f::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.26; Fri, 14 Oct
+ 2022 21:09:17 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::6dad:12a0:10d6:5967]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::6dad:12a0:10d6:5967%7]) with mapi id 15.20.5723.026; Fri, 14 Oct 2022
+ 21:09:17 +0000
+Message-ID: <f997dd38-a615-e343-44cd-a7aeb9447a1e@amd.com>
+Date:   Fri, 14 Oct 2022 16:09:11 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [PATCH Part2 v6 12/49] crypto: ccp: Add support to initialize the
+ AMD-SP for SEV-SNP
+Content-Language: en-US
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        michael.roth@amd.com, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <87a0481526e66ddd5f6192cbb43a50708aee2883.1655761627.git.ashish.kalra@amd.com>
+ <Yzh558vy+rJfsBBq@zn.tnic>
+From:   "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <Yzh558vy+rJfsBBq@zn.tnic>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH0PR03CA0237.namprd03.prod.outlook.com
+ (2603:10b6:610:e7::32) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220929172016.319443-9-pbonzini@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|BL1PR12MB5285:EE_
+X-MS-Office365-Filtering-Correlation-Id: 33bf375b-a75e-47e0-a1dd-08daae285ab6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 4tuYATPjushDpxgCFQjPWuImmo3E5scs6dJZnbUBi4DSKdrS63NKjKxIbXXrvPlNhq6Ymjr6oKcONt+jC5/BomRJSXOFaltzqzMxK+nC8JkcF6CGRoqVq5PmjRsNiKWDjEDU9qzzXr0Tpk9jIH+y0pCds9Kf89h0DuPNfRH4Sgqx3y0KLNe3CGI/AfBibhRufijvLCRGd7Lif0q6ElqxdKqBJfuDkBomG/8X8+9zuCK4WPwESaTDmyjOI2Z6FhlXAv6PMVpLrSNsfYRYq9SdE0nxM3J0nUEVwcijN8JwcN06ychCDgJQHJxttsotfaMphcLFJ+75sOFbitZteFv38g5WWykwMIqu1mwRPtJ/2ItWGPYKDN/6qzQwxVIfRxOpR20H9cZ/8l9pbfrkIaC/xr9wOU2K0csQwktCS2XRe+n0yYZ2WX6QCiz2zKl3Ip5ut4+e9YCRGBtJBUmapjAnHAtQKNobwVI8zb0j6ryfgjIg+GsK9h+F2/v4PwXmgH58GmwHCxaMxthcGwAayBcdjHyyRpTRzAVYlPpITMuw4pycGMzmuBXBumj1BPQWxC1AB9dfGQkzqBmTsO5NGGlxI5yByDbDbnhQ2eRj2xBAygtXFmToFi+kasyeXemhGZTEIS7hTHlsQFNDeIQk2eDzadlf1hThzbP3E4/5e2tCuHkb9M52WmoDjP5nUGogAazipHOd01l4Iqz7jf/7pVdMKdlmnm4hMSdfUrfSL/C3+Je4oL7GOSKNyhD6odJL76vOrbQr1NmzE3N/OoFRqXGveYFvu3X8uiyoDwhPhiN1HEgwkGCUNzsw60qisA0NWfhLBvo4LjYS9nCAb3ewnZ2Gqg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(39860400002)(346002)(366004)(376002)(136003)(451199015)(5660300002)(7406005)(7416002)(2906002)(38100700002)(2616005)(6506007)(41300700001)(26005)(83380400001)(8936002)(186003)(31696002)(53546011)(86362001)(6512007)(36756003)(478600001)(316002)(6916009)(31686004)(66946007)(8676002)(66476007)(4326008)(66556008)(6666004)(6486002)(43740500002)(45980500001)(134885004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?M0FkbE9UWWJhbzYzTEVFa2c1R3ZLWTR3MndFcnZ1ZXcxc1dPOHVTVGt4SVQ3?=
+ =?utf-8?B?dGRuRFRpdi9JNXFFNFlFR1pYQ1p5MG1XQldONnV2NDEzQWtTdC9mNEd6aVlQ?=
+ =?utf-8?B?cE1sY0R6elRKU2xyUXVoY2RmMWwzVUNKZW44aGlPOEhvb05NM0lYc1o0YzZs?=
+ =?utf-8?B?WlFVVEk3a0lwMGxJU09SS0pZOHRFbTQ1VW5WTWxSK0Q5OEkxNGZLeWY2Wlk2?=
+ =?utf-8?B?cDh5ZW5MYmxBY0o1Z0NyZWFTemlOZ2dQamVTSm40ZVBkZWo0RUtuOWI2SmN2?=
+ =?utf-8?B?ZVJKUjR3YVkyMHhmTnRqUGRodE0rSTVLQU56c0VQcGRjamZ0bXc1cHM5eStq?=
+ =?utf-8?B?SHdxd1ZBWjFnOGdBOXNNWjd2OVRsVUR6RGJ1TTRzd2R4TzRrcytNWDF5Y1pQ?=
+ =?utf-8?B?MHhJZ051ZUV4MllDNXZ5K2U0MzN3dmxMbDZPcnpwYjB2M2pZWkRCVGwwQ1Rh?=
+ =?utf-8?B?bTBNY2Z2VUtKMXBtbVV0Y2FUbWtUTk5RZSt3WU1WbEZ0L3A5UEgzZTFsZXZB?=
+ =?utf-8?B?L2c1R0Evb0F6OWRFTlJ4T3RnZ2pOSCtNSC9aZ1FSdGI0Y3ovMjBGSG0rQWRZ?=
+ =?utf-8?B?ZmxzREU2VTd3bUU0NFFxWmhkdVpUNEc1QTY1bndTendRV3ZNbGlGZzIvdlky?=
+ =?utf-8?B?N2xLWjhKc2hKdFp4T2RVemRPWC9vS1U2d1l2cHptUU1xSWhNUWE1WWhOYzlM?=
+ =?utf-8?B?dGE1RElXQzBRd3RHVzEyYmdkS0VVbnBUVm9wbGYyd3dPVzh1eVljT015aE9G?=
+ =?utf-8?B?UDZtU05LRlBLdXJmMDEzZnRua2E5VVh3OEI1Snp1Vk15V05ZNUc4WG1Wc1BN?=
+ =?utf-8?B?bU1yaFNjZG5yR3YvUTd2UVdCRXIrTFlqcUtPSE53UEx0QWNTUWRYNTc0WVZG?=
+ =?utf-8?B?UVIwaVpWampadTd5c25mUFg3ZVNIUURHdjgwekhqUmdaMjUwSHc5ZzRxazB5?=
+ =?utf-8?B?VnRLaEo3N2FzTXBsNi80akF1S29aTzU2Q1VKTTY2REhBSTdCMmxFbVkvLzBY?=
+ =?utf-8?B?NjlDMDFXd2NBZlpoUkFxdnJDZzBvQXFGT0hxN3d1OEpVblNtajB6VWR0ZlBh?=
+ =?utf-8?B?MWFRM1FpbmRnRm1SRTBJOXhaOWJQVW9JU094OVBjeVJKZTZLUGdmbVFOaXU3?=
+ =?utf-8?B?MnRYS0NIT0F3Rnc3QXFveFJ4T0orTSt0MjIwT1BLcHZzTUo0UklTajFkd3Ey?=
+ =?utf-8?B?dDRCOVU5aGZLWnQvZSttK0gwQ1c2Z0FRWk1EbG02Znp2ZytrMFkwZnVlR2Y5?=
+ =?utf-8?B?ZUtTQkhoR1VnUzlSWEcxQ2duQmtHdHQ5TExvQ1ZZL2l1SzUwU3ZOYzF6aENR?=
+ =?utf-8?B?dFNTRXdkWFVEMnowZ2VrbXphY1RtMys5L0xiS2tacVNBR1NaWUt1cEVTdG9q?=
+ =?utf-8?B?NTJBZnREU1hwb2pUUVZObDd1STdFcWo4eXRid1pQcTZiM0ZOTGVwb0huZ0Jq?=
+ =?utf-8?B?TERneFlxRXRYcTBPQUVWSkN5MnN0eTgyQTM2dEU4OW5qbCs4enRTSGFkZlMw?=
+ =?utf-8?B?bHFRcjBVSVd1NnRobk1lc1lwSnJNOVVGNmo2bHZRVk5Ec1U4OTM2dXQ2QnhY?=
+ =?utf-8?B?MXFNZmE1MDg5RC9FcWhDaEY1RStzVTduRWlJbGYyeENBSnVZdDdIb0x6cVcx?=
+ =?utf-8?B?cWl0dXhFem9MUGhnMW1pVWZBR3JFTlp1Sm56WnZNdCtRcDI2V25XNkRvNWdR?=
+ =?utf-8?B?ckVHSU1NS2txWmlnZVhrWU1wK0NpbUJHQkQvbmRIYWkydlk1VDl5KzZKazVY?=
+ =?utf-8?B?NWhLUFBTM0VqVmpLQ1doczFYTnpucDVQWjcrSFpMWWVXWlVKUWVWQmRWYWE4?=
+ =?utf-8?B?RVdvZzVuSmJYZlRHUkdTSzhCaG9DRnEvWjhTdEZSakYyZUx1S0huQWVvbGpx?=
+ =?utf-8?B?TC93Ly9QUklmUVZ0MnVoS2l1VFFRRXNSaG1PbERaSUN5OEN5Q0UvNlFabjBH?=
+ =?utf-8?B?WmhaUmhidGRiZG5xVTRZVzhIRWZWWHF4dkpFVkFITWxYOTIrZ1ZLOW9qeldJ?=
+ =?utf-8?B?WGNaeEdFUW8zc3R3QVFxTkNhdXpLVjlrL1JGbE5qVElZbGQ0YUd5WkVkelJ4?=
+ =?utf-8?B?K0hDM1ZpQ3lKTEIycU84TDkzejJZdlVBdFc4U2dIVmZRSmJMdUFVTkFhWVNT?=
+ =?utf-8?Q?ynOLJ7s0hpUAhHFwMfxmV8koL?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 33bf375b-a75e-47e0-a1dd-08daae285ab6
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2022 21:09:17.2220
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: m+dmuQlzjT0iyDW2peREH0XfStT89gCFdE/rC7Tti7tFS3XQO2NLucSl5HbI2MvnffyW5hVjFO4rFGnExqSSXw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5285
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,151 +137,190 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-	On Thu, Sep 29, 2022, Paolo Bonzini wrote:
-> This ensures that all the relevant code is compiled out, in fact
-> the process_smi stub can be removed too.
+Hello Boris,
+
+On 10/1/2022 12:33 PM, Borislav Petkov wrote:
+> On Mon, Jun 20, 2022 at 11:04:29PM +0000, Ashish Kalra wrote:
+>> +static int __sev_snp_init_locked(int *error)
+>> +{
+>> +	struct psp_device *psp = psp_master;
+>> +	struct sev_device *sev;
+>> +	int rc = 0;
+>> +
+>> +	if (!psp || !psp->sev_data)
+>> +		return -ENODEV;
+>> +
+>> +	sev = psp->sev_data;
+>> +
+>> +	if (sev->snp_inited)
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 2 ++
->  arch/x86/kvm/smm.h              | 1 -
->  arch/x86/kvm/x86.c              | 6 ++++++
->  3 files changed, 8 insertions(+), 1 deletion(-)
+> snp_inited? That's silly.
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index d11697504471..d58d4a62b227 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -81,7 +81,9 @@
->  #define KVM_REQ_NMI			KVM_ARCH_REQ(9)
->  #define KVM_REQ_PMU			KVM_ARCH_REQ(10)
->  #define KVM_REQ_PMI			KVM_ARCH_REQ(11)
-> +#ifdef CONFIG_KVM_SMM
->  #define KVM_REQ_SMI			KVM_ARCH_REQ(12)
-> +#endif
->  #define KVM_REQ_MASTERCLOCK_UPDATE	KVM_ARCH_REQ(13)
->  #define KVM_REQ_MCLOCK_INPROGRESS \
->  	KVM_ARCH_REQ_FLAGS(14, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-> diff --git a/arch/x86/kvm/smm.h b/arch/x86/kvm/smm.h
-> index 7ccce6b655ca..a6795b93ba30 100644
-> --- a/arch/x86/kvm/smm.h
-> +++ b/arch/x86/kvm/smm.h
-> @@ -28,7 +28,6 @@ void process_smi(struct kvm_vcpu *vcpu);
->  static inline int kvm_inject_smi(struct kvm_vcpu *vcpu) { return -ENOTTY; }
->  static inline bool is_smm(struct kvm_vcpu *vcpu) { return false; }
->  static inline void kvm_smm_changed(struct kvm_vcpu *vcpu, bool in_smm) { WARN_ON_ONCE(1); }
-> -static inline void process_smi(struct kvm_vcpu *vcpu) { WARN_ON_ONCE(1); }
+> 	snp_initialized
+> 
+> pls.
 
-I think it's worth adding one more patch to kill off kvm_smm_changed() too.  Most
-of the affected code already has references to CONFIG_KVM_SMM nearby.
+Yes.
 
----
- arch/x86/include/asm/kvm_host.h |  3 ++-
- arch/x86/kvm/smm.c              |  4 ++++
- arch/x86/kvm/smm.h              |  2 --
- arch/x86/kvm/x86.c              | 18 +++++++++---------
- 4 files changed, 15 insertions(+), 12 deletions(-)
+> 
+>> +		return 0;
+>> +
+>> +	/*
+>> +	 * The SNP_INIT requires the MSR_VM_HSAVE_PA must be set to 0h
+> 
+> 	/* Clear MSR_VM_HSAVE_PA on all cores before SNP_INIT */
+> 
+>> +	 * across all cores.
+>> +	 */
+>> +	on_each_cpu(snp_set_hsave_pa, NULL, 1);
+>> +
+>> +	/* Issue the SNP_INIT firmware command. */
+> 
+> Useless comment.
+> 
+>> +	rc = __sev_do_cmd_locked(SEV_CMD_SNP_INIT, NULL, error);
+>> +	if (rc)
+>> +		return rc;
+>> +
+>> +	/* Prepare for first SNP guest launch after INIT */
+>> +	wbinvd_on_all_cpus();
+> 
+> Can you put a wbinvd() in snp_set_hsave_pa() instead and save yourself
+> the second IPI?
+> 
+> Or is that order of the commands:
+> 
+> 	1. clear MSR IPI
+> 	2. SNP_INIT
+> 	3. WBINVD IPI
+> 	4. ...
+> 
+> mandatory?
+> 
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 0b0a82c0bb5c..6c572cf1cf8d 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1994,10 +1994,11 @@ enum {
- #define HF_NMI_MASK		(1 << 3)
- #define HF_IRET_MASK		(1 << 4)
- #define HF_GUEST_MASK		(1 << 5) /* VCPU is in guest-mode */
-+
-+#ifdef CONFIG_KVM_SMM
- #define HF_SMM_MASK		(1 << 6)
- #define HF_SMM_INSIDE_NMI_MASK	(1 << 7)
- 
--#ifdef CONFIG_KVM_SMM
- # define __KVM_VCPU_MULTIPLE_ADDRESS_SPACE
- # define KVM_ADDRESS_SPACE_NUM 2
- # define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
-diff --git a/arch/x86/kvm/smm.c b/arch/x86/kvm/smm.c
-index 740fca1cf3a3..12480446c43b 100644
---- a/arch/x86/kvm/smm.c
-+++ b/arch/x86/kvm/smm.c
-@@ -10,6 +10,10 @@
- 
- void kvm_smm_changed(struct kvm_vcpu *vcpu, bool entering_smm)
- {
-+	BUILD_BUG_ON(HF_GUEST_MASK != X86EMUL_GUEST_MASK);
-+	BUILD_BUG_ON(HF_SMM_MASK != X86EMUL_SMM_MASK);
-+	BUILD_BUG_ON(HF_SMM_INSIDE_NMI_MASK != X86EMUL_SMM_INSIDE_NMI_MASK);
-+
- 	trace_kvm_smm_transition(vcpu->vcpu_id, vcpu->arch.smbase, entering_smm);
- 
- 	if (entering_smm) {
-diff --git a/arch/x86/kvm/smm.h b/arch/x86/kvm/smm.h
-index 131fbe1817d5..9935045fcf20 100644
---- a/arch/x86/kvm/smm.h
-+++ b/arch/x86/kvm/smm.h
-@@ -29,8 +29,6 @@ void process_smi(struct kvm_vcpu *vcpu);
- #else
- static inline int kvm_inject_smi(struct kvm_vcpu *vcpu) { return -ENOTTY; }
- static inline bool is_smm(struct kvm_vcpu *vcpu) { return false; }
--static inline void kvm_smm_changed(struct kvm_vcpu *vcpu, bool in_smm) { WARN_ON_ONCE(1); }
--
- /*
-  * emulator_leave_smm is used as a function pointer, so the
-  * stub is defined in x86.c.
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 56004890a717..ec74d579ca1b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5103,10 +5103,12 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
- 
- 	events->sipi_vector = 0; /* never valid when reporting to user space */
- 
-+#ifdef CONFIG_KVM_SMM
- 	events->smi.smm = is_smm(vcpu);
- 	events->smi.pending = vcpu->arch.smi_pending;
- 	events->smi.smm_inside_nmi =
- 		!!(vcpu->arch.hflags & HF_SMM_INSIDE_NMI_MASK);
-+#endif
- 	events->smi.latched_init = kvm_lapic_latched_init(vcpu);
- 
- 	events->flags = (KVM_VCPUEVENT_VALID_NMI_PENDING
-@@ -5194,12 +5196,7 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
- 		vcpu->arch.apic->sipi_vector = events->sipi_vector;
- 
- 	if (events->flags & KVM_VCPUEVENT_VALID_SMM) {
--		if (!IS_ENABLED(CONFIG_KVM_SMM) &&
--		    (events->smi.smm ||
--		     events->smi.pending ||
--		     events->smi.smm_inside_nmi))
--			return -EINVAL;
--
-+#ifdef CONFIG_KVM_SMM
- 		if (!!(vcpu->arch.hflags & HF_SMM_MASK) != events->smi.smm) {
- 			kvm_x86_ops.nested_ops->leave_nested(vcpu);
- 			kvm_smm_changed(vcpu, events->smi.smm);
-@@ -5214,6 +5211,12 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
- 				vcpu->arch.hflags &= ~HF_SMM_INSIDE_NMI_MASK;
- 		}
- 
-+#else
-+		if (events->smi.smm || events->smi.pending ||
-+		    events->smi.smm_inside_nmi)
-+			return -EINVAL;
-+#endif
-+
- 		if (lapic_in_kernel(vcpu)) {
- 			if (events->smi.latched_init)
- 				set_bit(KVM_APIC_INIT, &vcpu->arch.apic->pending_events);
-@@ -8228,9 +8231,6 @@ static void init_emulate_ctxt(struct kvm_vcpu *vcpu)
- 		     (cs_l && is_long_mode(vcpu))	? X86EMUL_MODE_PROT64 :
- 		     cs_db				? X86EMUL_MODE_PROT32 :
- 							  X86EMUL_MODE_PROT16;
--	BUILD_BUG_ON(HF_GUEST_MASK != X86EMUL_GUEST_MASK);
--	BUILD_BUG_ON(HF_SMM_MASK != X86EMUL_SMM_MASK);
--	BUILD_BUG_ON(HF_SMM_INSIDE_NMI_MASK != X86EMUL_SMM_INSIDE_NMI_MASK);
- 
- 	ctxt->interruptibility = 0;
- 	ctxt->have_exception = false;
+Yes, we need to do:
 
-base-commit: f7641bcac507589d34b20d30cceb7067f8bcfd08
--- 
+wbinvd_on_all_cpus();
+SNP_DF_FLUSH
 
+Need to ensure all the caches are clear before launching the first guest 
+and this has to be a combination of WBINVD and SNP_DF_FLUSH command.
+
+> ...
+> 
+>> +static int __sev_snp_shutdown_locked(int *error)
+>> +{
+>> +	struct sev_device *sev = psp_master->sev_data;
+>> +	int ret;
+>> +
+>> +	if (!sev->snp_inited)
+>> +		return 0;
+>> +
+>> +	/* SHUTDOWN requires the DF_FLUSH */
+>> +	wbinvd_on_all_cpus();
+>> +	__sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, NULL);
+> 
+> Why isn't this retval checked?
+
+ From the SNP FW ABI specs, for the SNP_SHUTDOWN command:
+
+Firmware checks for every encryption capable ASID that the ASID is not 
+in use by a guest and a DF_FLUSH is not required. If a DF_FLUSH is 
+required, the firmware returns DFFLUSH_REQUIRED.
+
+Considering that SNP_SHUTDOWN command will check if DF_FLUSH was
+required and if so, and not invoked before that command, returns
+an error indicating that DFFLUSH is required.
+
+This way, we can cleverly avoid taking the error code path for
+DF_FLUSH command here and instead let the SNP_SHUTDOWN command
+failure below indicate if DF_FLUSH command failed.
+
+This also ensures that we always invoke SNP_SHUTDOWN command,
+irrespective of SNP_DF_FLUSH command failure as SNP_DF_FLUSH may
+actually not be required by the SHUTDOWN command.
+
+> 
+>> +
+>> +	ret = __sev_do_cmd_locked(SEV_CMD_SNP_SHUTDOWN, NULL, error);
+>> +	if (ret) {
+>> +		dev_err(sev->dev, "SEV-SNP firmware shutdown failed\n");
+>> +		return ret;
+>> +	}
+>> +
+>> +	sev->snp_inited = false;
+>> +	dev_dbg(sev->dev, "SEV-SNP firmware shutdown\n");
+>> +
+>> +	return ret;
+>> +}
+> 
+> ...
+> 
+>>   void sev_dev_destroy(struct psp_device *psp)
+>> @@ -1287,6 +1385,26 @@ void sev_pci_init(void)
+>>   		}
+>>   	}
+>>   
+>> +	/*
+>> +	 * If boot CPU supports the SNP, then first attempt to initialize
+> 
+> s/the SNP/SNP/g
+> 
+>> +	 * the SNP firmware.
+>> +	 */
+>> +	if (cpu_feature_enabled(X86_FEATURE_SEV_SNP)) {
+>> +		if (!sev_version_greater_or_equal(SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR)) {
+>> +			dev_err(sev->dev, "SEV-SNP support requires firmware version >= %d:%d\n",
+>> +				SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR);
+>> +		} else {
+>> +			rc = sev_snp_init(&error);
+>> +			if (rc) {
+>> +				/*
+>> +				 * If we failed to INIT SNP then don't abort the probe.
+> 
+> Who's "we"?
+> 
+>> +				 * Continue to initialize the legacy SEV firmware.
+>> +				 */
+>> +				dev_err(sev->dev, "SEV-SNP: failed to INIT error %#x\n", error);
+>> +			}
+>> +		}
+>> +	}
+>> +
+>>   	/* Obtain the TMR memory area for SEV-ES use */
+>>   	sev_es_tmr = sev_fw_alloc(SEV_ES_TMR_SIZE);
+>>   	if (!sev_es_tmr)
+> 
+> ...
+> 
+>> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+>> index 01ba9dc46ca3..ef4d42e8c96e 100644
+>> --- a/include/linux/psp-sev.h
+>> +++ b/include/linux/psp-sev.h
+>> @@ -769,6 +769,20 @@ struct sev_data_snp_init_ex {
+>>    */
+>>   int sev_platform_init(int *error);
+>>   
+>> +/**
+>> + * sev_snp_init - perform SEV SNP_INIT command
+>> + *
+>> + * @error: SEV command return code
+>> + *
+>> + * Returns:
+>> + * 0 if the SEV successfully processed the command
+>> + * -%ENODEV    if the SEV device is not available
+>> + * -%ENOTSUPP  if the SEV does not support SEV
+>> + * -%ETIMEDOUT if the SEV command timed out
+>> + * -%EIO       if the SEV returned a non-zero return code
+> 
+> Something's weird with those args. I think it should be
+> 
+> 	%-ENODEV
+> 
+> and so on...
+> 
+
+Yes, off course %-<errno>
+
+Thanks,
+Ashish
