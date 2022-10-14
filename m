@@ -2,76 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E26575FF3EC
-	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 21:03:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C95045FF427
+	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 21:39:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231229AbiJNTDC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Oct 2022 15:03:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33852 "EHLO
+        id S231349AbiJNTjH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Oct 2022 15:39:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231211AbiJNTDA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Oct 2022 15:03:00 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D05F1958D5
-        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 12:02:59 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id s196so3800328pgs.3
-        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 12:02:59 -0700 (PDT)
+        with ESMTP id S229737AbiJNTjE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Oct 2022 15:39:04 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97DA61D3A6A
+        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 12:39:03 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id o17-20020a17090aac1100b0020d98b0c0f4so7455177pjq.4
+        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 12:39:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=93SM5edoQTmh30dhmcftbv07FMloClt4sRz/Es4IFlM=;
-        b=BUJRV0Pc2cbfpCvcp0VnINHf8OFz/twYIlfpd4Oyf50KGIddch6YqP9L/dp6C+D7Md
-         GmPFvjkicX1rvEyRJDsvivlcJW5pBFTP2t1E/IBV3J9JoNBff6RYngi9r7psUHt8UOGR
-         ruYq+PfEDjUWW1GkfJwZiSah0WpONl7pW00iqVCpZ0jraczJaw0Iaz08dPZus3Msxg4Z
-         ss8BCwyflYryxfQ3BV2WEcYL1nRSsT63Dg9W8Y4wlKimRoUha2ibmRsVNUcy9PD0Grsc
-         OPtdEtjlbt0fKRZ3Q9s9hyEsPjyzlQTMJEiTdHaDM561/iCSmwZ420LAJRIBk7iW8VL7
-         25QA==
+        bh=RKH2hZmlrtGelcAWDklfuk9AgunUYQvq2tq9R0N/2SQ=;
+        b=J6Pw7Qlvrl+GLJBq7xnCi2LEx4Oc/8/7zJpUWLxNyodGxDehX5K1O3AaUm2u3yokYw
+         yu4qgzVOw2yia0Ay6K81PP/BKaHTCL4yVW8TPghYtL0dQmxqn/PvGl26AbYmLuWZQf+z
+         8RBDNs7xO5bQPQGJhS5QCwT6sz14v+kT1xQw50dTomuCyJtKkoLvXiyIIE7NbRb9uksd
+         dsZE0Gh1NhJBT9nLx/XegdtryiQrY2O1DyOEsyyYtYHgkcUP3Jb+Uk0+BFEqS+3yRsW9
+         kSweAgv8M8ihxHlAM0AFNHZG7iv+bLpvgSU9ivJBbLnZj0tdj5oOPJ0DOFLIGWmQqC81
+         qRRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=93SM5edoQTmh30dhmcftbv07FMloClt4sRz/Es4IFlM=;
-        b=iAdSoJAVXMcknxnS/ecMHZp0Bz159tagSaCKs9zYrpbLay2XJzzRK2jY5LRqcphzgo
-         ihztxP2TiKfcP3OoGWmGA+TapuB7ebzNKbwA6cts+w0BGfy3y05sz4oi4fH8UaICaMVq
-         ndPxkoQPfA4bW/C+fbSkttz6gu6LJsCF2PoDcflBkKA6mbzeEt08Ay7sMLfimuxkMceK
-         Znf5v9Zk0bVFWO80bkS60SGtr5FMThmdSAIIWPwX9fcGNzquGcgVh6Xgz78x1b0Y+c9a
-         Ve1H8AXkYT4Uv/ReRipYqLHEKwDJyuWleNBkPna4fQfz1TAU8VI3XGpxSlc2HTNNz7FT
-         7mgQ==
-X-Gm-Message-State: ACrzQf3yYnYT3VYWRBsBrMXUX3koxNcXYg5XiDtz1QeA+LvuIZGlnUxq
-        Ng2PzzJy6k57gkYP80RvjAMbqg==
-X-Google-Smtp-Source: AMsMyM71eRcCLDDCqpb7XXz4/MQpa6Z2VN36ZgDsI/P22mjS9jZp1Izpx/9ABooVI5nyhiKSWq3Tsw==
-X-Received: by 2002:a63:454d:0:b0:43c:e834:ec0 with SMTP id u13-20020a63454d000000b0043ce8340ec0mr5999924pgk.270.1665774178987;
-        Fri, 14 Oct 2022 12:02:58 -0700 (PDT)
+        bh=RKH2hZmlrtGelcAWDklfuk9AgunUYQvq2tq9R0N/2SQ=;
+        b=YIg16WRjJyBCDdoErCxbZmaAl73gdnHmsCvq4fFd/lYgMFBghArXQEXwcQ+T2ocFRi
+         uUfFQF4WMRbbYbqqKEibvUgDp/Aq8Jr1HSj4rbtV3VPtkGoYAVwoUNJ94rwQ4Ch78hR7
+         kJjClFDJY7S48T7aqZJT9RmqFnovIc5tYZoU8QmGvDP4KLUa51w1JZlDJX/JjSPfRbpx
+         e+YV6yRsMoUaRdDJlNrmC6ca96Mr6TDRhLjkRLfbQjLTRV454zZpsdbKbYNCQnGLJrhZ
+         kKs9RhmZxjnEfOvzpAUmRn+Mar3hj93Of2tpwuFqTUgn4ImlRVZU4eu/B4OyqvJkHQtm
+         smNg==
+X-Gm-Message-State: ACrzQf3MVYAbqas/sy9dV0N1DRBLh7y2wS7okBHFRtDd61DCMOBGUa71
+        7v59hGuHeynhsJ7y6r+yyEjPK8DtO7d0ng==
+X-Google-Smtp-Source: AMsMyM50IQWqmBBHPE2W2XgYj3Bblk1PmdlFM+JYyyDLQy5mB0lA5sgH6nttvTkgxGh0i8XPIH8qUw==
+X-Received: by 2002:a17:90b:1b08:b0:20d:7bbf:4701 with SMTP id nu8-20020a17090b1b0800b0020d7bbf4701mr19152349pjb.87.1665776342962;
+        Fri, 14 Oct 2022 12:39:02 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id g17-20020aa79dd1000000b0053e5daf1a25sm2087262pfq.45.2022.10.14.12.02.58
+        by smtp.gmail.com with ESMTPSA id q3-20020a170902a3c300b001784a45511asm2093816plb.79.2022.10.14.12.39.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Oct 2022 12:02:58 -0700 (PDT)
-Date:   Fri, 14 Oct 2022 19:02:54 +0000
+        Fri, 14 Oct 2022 12:39:02 -0700 (PDT)
+Date:   Fri, 14 Oct 2022 19:38:58 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     "Wang, Wei W" <wei.w.wang@intel.com>,
-        David Matlack <dmatlack@google.com>,
-        "andrew.jones@linux.dev" <andrew.jones@linux.dev>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v5 0/5] dirty_log_perf_test vCPU pinning
-Message-ID: <Y0myXiIjlT8pYyr8@google.com>
-References: <20221010220538.1154054-1-vipinsh@google.com>
- <DS0PR11MB63735576A8FBF80738FF9B76DC249@DS0PR11MB6373.namprd11.prod.outlook.com>
- <Y0mPqNRSgpArgyS8@google.com>
- <CALzav=dU2-3avKGT2-AxO8d_uVH9bmYaO=ym8pPFM8esuSWP=A@mail.gmail.com>
- <CAHVum0d2Jfr=WVxKxvnmwGKzPfV3vN5dbz11=rdcW6qoSoobew@mail.gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        maciej.szmigiero@oracle.com
+Subject: Re: [PATCH v2 1/8] KVM: x86: start moving SMM-related functions to
+ new files
+Message-ID: <Y0m60gnBZLSe6F2N@google.com>
+References: <20220929172016.319443-1-pbonzini@redhat.com>
+ <20220929172016.319443-2-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHVum0d2Jfr=WVxKxvnmwGKzPfV3vN5dbz11=rdcW6qoSoobew@mail.gmail.com>
+In-Reply-To: <20220929172016.319443-2-pbonzini@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,37 +73,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 14, 2022, Vipin Sharma wrote:
-> On Fri, Oct 14, 2022 at 9:55 AM David Matlack <dmatlack@google.com> wrote:
-> >
-> > On Fri, Oct 14, 2022 at 9:34 AM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > On Fri, Oct 14, 2022, Wang, Wei W wrote:
-> > > > Just curious why not re-using the existing tools (e.g. taskset) to do the pinning?
-> > >
-> > > IIUC, you're suggesting the test give tasks meaningful names so that the user can
-> > > do taskset on the appropriate tasks?  The goal is to ensure vCPUs are pinned before
-> > > they do any meaningful work.  I don't see how that can be accomplished with taskset
-> > > without some form of hook in the test to effectively pause the test until the user
-> > > (or some run script) is ready to continue.
-> >
-> > A taskset approach would also be more difficult to incorporate into
-> > automated runs of dirty_log_perf_test.
-> >
-> > >
-> > > Pinning aside, naming the threads is a great idea!  That would definitely help
-> > > debug, e.g. if one vCPU gets stuck or is lagging behind.
-> >
-> > +1
-> 
-> I also like the idea.
-> 
-> Sean:
-> Do you want a v6 with the naming patch or you will be fine taking v5,
-> if there are no changes needed in v5, and I can send a separate patch
-> for naming?
+On Thu, Sep 29, 2022, Paolo Bonzini wrote:
+> diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+> index a5ac4a5a5179..cb7e68c93e1a 100644
+> --- a/arch/x86/kvm/lapic.h
+> +++ b/arch/x86/kvm/lapic.h
+> @@ -7,7 +7,6 @@
+>  #include <linux/kvm_host.h>
+>  
+>  #include "hyperv.h"
+> -#include "kvm_cache_regs.h"
+>  
+>  #define KVM_APIC_INIT		0
+>  #define KVM_APIC_SIPI		1
+> @@ -229,11 +228,7 @@ static inline bool kvm_apic_has_pending_init_or_sipi(struct kvm_vcpu *vcpu)
+>  	return lapic_in_kernel(vcpu) && vcpu->arch.apic->pending_events;
+>  }
+>  
+> -static inline bool kvm_apic_init_sipi_allowed(struct kvm_vcpu *vcpu)
+> -{
+> -	return !is_smm(vcpu) &&
+> -	       !static_call(kvm_x86_apic_init_signal_blocked)(vcpu);
+> -}
+> +bool kvm_apic_init_sipi_allowed(struct kvm_vcpu *vcpu);
 
-Definitely separate, this is an orthogonal change and I don't think there will be
-any conflict.  If there is a conflict, it will be trivial to resolve.  But since
-Wei provided a more or less complete patch, let's let Wei post a formal patch
-(unless he doesn't want to).
+I don't see any reason to force this to go in lapic.c, just include smm.h in
+lapic.h, it's not an unreasonable dependency.  That way this ends up being a
+direct call when SMM is compiled out.
+
+> diff --git a/arch/x86/kvm/smm.h b/arch/x86/kvm/smm.h
+> new file mode 100644
+> index 000000000000..d85d4ccd32dd
+> --- /dev/null
+> +++ b/arch/x86/kvm/smm.h
+> @@ -0,0 +1,25 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef ASM_KVM_SMM_H
+> +#define ASM_KVM_SMM_H
+
+#include <linux/kvm_host.h>
+
+For HF_SMM_MASK, KVM_REQ_SMI, struct kvm_vcpu, etc...  Relying on the caller to
+include that might bite someone in the futrure.
