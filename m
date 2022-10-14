@@ -2,248 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B94D85FE83B
-	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 06:52:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 01EDC5FE86E
+	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 07:34:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229436AbiJNEv7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Oct 2022 00:51:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58056 "EHLO
+        id S229591AbiJNFeb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Oct 2022 01:34:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbiJNEv4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Oct 2022 00:51:56 -0400
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2084.outbound.protection.outlook.com [40.107.93.84])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EC52169118;
-        Thu, 13 Oct 2022 21:51:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kG5Rf7Jui7M/Pk4HHbwcRjl05WbBwlw8rG/fIE/pvavVUvC3euIEeUGGBRUAclojvyNhC0b64OY7jdt0YXYm1KGWguMaSTA4jsmyZLs76LlZSBq8WpWq5CWoeiHCPisejfZ+eswHp5ZUdOyid5nZOhDI674ZV98q9w6l6i95sL2G9fdmqSu7UE2GT5oLVNnUKQr/kzLxvfOtrg2uHpRS1JarSzIr6vWuxjmLitdGcLGzzqpxNfepTa8y3WDjaoC1zS0I0VQyBbX3K6sX2rmbvfWt7tRB+kfEeMJ71Aj9mcHpU4m7KzhzGPQYyTtAzNYHEhHcazcx4EMNq4jPtAp5Qw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1vy66B0XxIa7jFSWe6aeDpLm7WddeznfaAftGLAmB9A=;
- b=Jxwk8vur9k869lFMw67SWZXp32/+fm3MaRDc3Pq9S+Kk9k4EhPplziFoqG63t15EWDohsMsjxuugTx3Ccd8DDkt9ly74N7mKiTjO5E/kHZEz3QumVjvgeGThzKV+VID6ouHoH0YqEP5tcQHmJ+sk9wJ3I5XudjMCMiHfXfeSwUhpcFnM6ljQLNjeWoOgXFWTvrw2v/zVDnovaz4s+LAJAuT/hv3kO9Vh9ObxRTQCS3sYeJCUX9GiH8o8NwTtnlA/CuMs721XiaBxbc9Jhp85qvyzakTUvAvnigNIgDegsC3IZeg38MPqxYUpfR+SkE7JBxAU2c+Awypff4h6AiA7rA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1vy66B0XxIa7jFSWe6aeDpLm7WddeznfaAftGLAmB9A=;
- b=qejITBBNH5Zfx5q3CgI2mQrdUJY2mlUxT06kWVokkmQov6X5hlkH8Npy+n0WntdjcsBAvA9HEf2NTUT1sAWOZhtl2VntGKSRXrn/xymMNoj1hqsxn9Mew3DpYGtatCgZ1hKgLpf3Uou2EJoBjhmyq/gy5Yu9fbqimxg7dzxxeAY=
-Received: from DM6PR12MB3082.namprd12.prod.outlook.com (2603:10b6:5:11b::12)
- by IA1PR12MB6650.namprd12.prod.outlook.com (2603:10b6:208:3a1::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.26; Fri, 14 Oct
- 2022 04:51:51 +0000
-Received: from DM6PR12MB3082.namprd12.prod.outlook.com
- ([fe80::377f:69eb:dcb:3ea8]) by DM6PR12MB3082.namprd12.prod.outlook.com
- ([fe80::377f:69eb:dcb:3ea8%6]) with mapi id 15.20.5723.026; Fri, 14 Oct 2022
- 04:51:51 +0000
-From:   "Gupta, Nipun" <Nipun.Gupta@amd.com>
-To:     "Gupta, Nipun" <Nipun.Gupta@amd.com>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "krzysztof.kozlowski+dt@linaro.org" 
-        <krzysztof.kozlowski+dt@linaro.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "Gupta, Puneet (DCG-ENG)" <puneet.gupta@amd.com>,
-        "song.bao.hua@hisilicon.com" <song.bao.hua@hisilicon.com>,
-        "mchehab+huawei@kernel.org" <mchehab+huawei@kernel.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-        "jeffrey.l.hugo@gmail.com" <jeffrey.l.hugo@gmail.com>,
-        "saravanak@google.com" <saravanak@google.com>,
-        "Michael.Srba@seznam.cz" <Michael.Srba@seznam.cz>,
-        "mani@kernel.org" <mani@kernel.org>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "jgg@ziepe.ca" <jgg@ziepe.ca>, "jgg@nvidia.com" <jgg@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "will@kernel.org" <will@kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "masahiroy@kernel.org" <masahiroy@kernel.org>,
-        "ndesaulniers@google.com" <ndesaulniers@google.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "okaya@kernel.org" <okaya@kernel.org>,
-        "Anand, Harpreet" <harpreet.anand@amd.com>,
-        "Agarwal, Nikhil" <nikhil.agarwal@amd.com>,
-        "Simek, Michal" <michal.simek@amd.com>,
-        "Radovanovic, Aleksandar" <aleksandar.radovanovic@amd.com>,
-        "git (AMD-Xilinx)" <git@amd.com>
-Subject: RE: [RFC PATCH v4 3/8] iommu/arm-smmu-v3: support ops registration
- for CDX bus
-Thread-Topic: [RFC PATCH v4 3/8] iommu/arm-smmu-v3: support ops registration
- for CDX bus
-Thread-Index: AQHY34dTQC9mGlmp3UOx5Opq013mC64NUdeg
-Date:   Fri, 14 Oct 2022 04:51:51 +0000
-Message-ID: <DM6PR12MB30824E232253ED0355CA776DE8249@DM6PR12MB3082.namprd12.prod.outlook.com>
-References: <20220803122655.100254-1-nipun.gupta@amd.com>
- <20221014044049.2557085-1-nipun.gupta@amd.com>
- <20221014044049.2557085-4-nipun.gupta@amd.com>
-In-Reply-To: <20221014044049.2557085-4-nipun.gupta@amd.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-10-14T04:51:47Z;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=e370cb75-f5d0-4a97-83c0-cb9388ae3eec;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR12MB3082:EE_|IA1PR12MB6650:EE_
-x-ms-office365-filtering-correlation-id: a04f178d-1acd-444b-182b-08daad9fcf62
-x-ld-processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: U0fqWtwXWsBXCcY/poPCsvhovA6niFQtW9GKFAnHvdomkK4p8+ZGRCQQBbWsvdIN8WyuI8FOAo31wbKKobD/mO7gn64P+mAQa9pSk+ziFVPguDkN2pMEuKDAoTI4/xB3/AsvIsdTUE/nP41DncY5dNMgfxIRcs0Gys6x3oBOFX3xI/fFdOzRxjZsh38NEXRGA3kcPehmq8EKoVDfkt4GAiJjc7lluNYwDl1BI4LdF66alET6Fm5gmGT+4IubQKaG2HsZrlEhWoH1TiZFG5K6XxaZ/mVcLDI+7U+h6Kw5LPEomWQzml8sJMhEkLQfPS7jZ2uP6DBUjkaWUHRGjojKCSasuupiYYZC3OdQyos0F7VjzI/UPd0ePGjcj1jd29kJvA7BTmuykQxZYqLv0PefsJB/NOsSdtVaX5HR1tfzbYrXa/v4NOigOKZzU2R/n23dabGamA27ob52ENRm5NG2XmGgd1nKUaXfwZ34eVotdDf6ujWDICxrm8xafF3Fg2egpg5P903sSZVQ186CVlFU/Vxckqpg1IdX3sQOtirraHJtRDw2EqORe/GzIKCsrT0FjlJvZ+rxKH0jCXerbzCfMUblWFgxYVzhHzRibzi80SQk1GQ8eYeN+GYQsFV0ST3jCtYjsqCLXDOvtX9OqsDEtMAX6yndn8CCf4pI/dmSO627VXIw85+7aR4Gu3CjOovv36O6doRgaHkSYU7Q0/sq4cfDAMz9CeImfrrahxSu+reo1fvdkPTnvLdjSS2xFYEAeolM3H4SVsXX9P/4Z3PIMEUv0zp9Eaf3lnhRIx540j7uzx4h4XutgDio1s2voF78
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3082.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(396003)(136003)(39860400002)(376002)(366004)(451199015)(9686003)(186003)(26005)(4326008)(55016003)(2906002)(122000001)(53546011)(52536014)(66476007)(316002)(8936002)(33656002)(86362001)(54906003)(64756008)(66446008)(76116006)(66946007)(66556008)(8676002)(38100700002)(110136005)(7696005)(478600001)(6506007)(7406005)(71200400001)(7416002)(5660300002)(38070700005)(921005)(966005)(41300700001)(83380400001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?4Q2xu4lYTjojZ6iAy2vGf6z1v0QH9W0Z5rPo+fLDvYQ8bSDdAr7eY0m0tbBc?=
- =?us-ascii?Q?Xuv1hmM1lEQ9Bhrm8b6M2G34f/svm6aX45MJYVzms8/R2y3lAHAOXnMJUDoA?=
- =?us-ascii?Q?oXUGUT/xXqx/b0ioYxRHiGc1w6nPprcHxFc9DI0WXvsM6Gm7564IfK6hrX9T?=
- =?us-ascii?Q?4lxf31MKljTFzB6MpZakPRnH9E+r5Om2++x/SkdptF5tw1zP1M5H3H35DGND?=
- =?us-ascii?Q?2m5xxZDLSveV0acpEZN/udLCErctp3qXYQqofwa7uPq2rrsWpsWUATf+OITe?=
- =?us-ascii?Q?lGqCgP8khNPg0wENzCClD89KJuWT+OiWTFeeTdflSzoC3sbJltQQpMac7yaj?=
- =?us-ascii?Q?k2eDclo9mBMCjo0PBuuk9C3BBzwKXFrXY4SIgkIL0b4zqSyhgD6eRX5sP4KZ?=
- =?us-ascii?Q?lBUF5c/TmWuYIFUhmJpEXJuBVYM5qKZsg9Li3/xxbJZlVQwiV+ksPM/Nzt74?=
- =?us-ascii?Q?ohm2yqMorqVIuc7zNCgcrZh3oN3d0hyFJcY523NZlaGAAwVrbBN68PBrus/O?=
- =?us-ascii?Q?y5fGXCEGef/wNrhoVoeWVEfw+eJdcQTnv5T3egeE5BhqWbDFqSnHDHOcASZw?=
- =?us-ascii?Q?u6rBKnEAddsDkE4IxI1/FYIDH07d8hbHyWbDJEq97KifXJ3317YZcGF9RzhO?=
- =?us-ascii?Q?7qs0hCEc/eds+4PcBZLHq9Hx0JDtofK/kgktn9XL9/4jrws1L8ur6py3MisY?=
- =?us-ascii?Q?Mf04bZ09017nRaYoxgzcNsBPR9XdANWDTU+6XF+aEQ4TWT5HLwjOvUQyhyvP?=
- =?us-ascii?Q?g4QiTi9IERRCOT7QuPdnk+I2L8HdQlx2933v11/35WLoFUvpbyI7+EBe2k+G?=
- =?us-ascii?Q?o9eKB07Jt+VOOCl37GGkfznLlr1RUCUeYczNtTWWfEIp5eraz9D1CNjQke59?=
- =?us-ascii?Q?xlPYBpEIxgTCLRhvUS74PwedKLIF/JbDiY66/GcEhooE6LwC/uEbbE9lTwEV?=
- =?us-ascii?Q?9VjVGKR4fo3Jb3vx/oALSU+OFlaWCmso0zMUhXlAOQ8QvmPxE/5QNf8VnTOn?=
- =?us-ascii?Q?EA5kSHu8iLGPm/11P8rhpgEIgYDD4A3x4JqoT58qB0ty3h7p3hjBca/YX4oc?=
- =?us-ascii?Q?6sgzNWGxlOyO9hU5oQIQet1dN+fsHU+vVHhSyULA+tFWVi/z2KtK7E3aGY9G?=
- =?us-ascii?Q?/IM73VAUZKcqbNaa9PWOLe8BKjDUA8aGB33Vg7pNjN8PkkLuK1q6oGvgJ6/W?=
- =?us-ascii?Q?a+xJnlTUjSPQSbuzu0Q1o4P/gv6Yxbki/0E1bTB5BMjWeIz0i+1fP5tRNmff?=
- =?us-ascii?Q?bnsrPTcCCoTdGyNS2f+1V0TCPAlrxGPCSJDKhohd2rH23UpfFiNpBHXLPWfE?=
- =?us-ascii?Q?R73afdmOq96sHNBTHTz8ZuSWrs5ob3YHVGq5he3TaJHZd0psGXIdrVaWDlNH?=
- =?us-ascii?Q?6MyWAUkeOipJuQhAprev9BbC1uL9VMuG2aUCMS+eaB4bTKZbAmJFvgt13aW3?=
- =?us-ascii?Q?yRjBdbWDPFm1JqsGoefLnjJUoygXGbNfuE/wcieU6JptQpz7wQuA2H5z27Yi?=
- =?us-ascii?Q?ojI61MZX09F1lfMh4T/hxuxbK4YBVDZk8ei2EVGAJ8VYxFqIQWY8KHW2arey?=
- =?us-ascii?Q?hrrA43eo0PQGGlI+/bg=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S229614AbiJNFe3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Oct 2022 01:34:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F054E196B5C
+        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 22:34:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1665725668;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=V8trlJsHTyBYFl3iSoKLkKxiftpMCd5kSe7wrtw8WL4=;
+        b=AeDaDqd7mjMHhHjB1TeTpgQVbrlj9sNVaX0kQEhntjZJ8r8pTHDz9h29lz2Hwpblrrc7zK
+        LZ+VOf8oXlgMMkbp+G8cGQ1PKl/1rh+yBhEWCV2qLzjDoEqBWa4xV9xp9BOfDBfcZlH87J
+        1b1bCQb+kE/JyOTZcP5Q0s3NUmpyZlU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-211-yESvCzNDOL24xPjuN-g9mA-1; Fri, 14 Oct 2022 01:34:26 -0400
+X-MC-Unique: yESvCzNDOL24xPjuN-g9mA-1
+Received: by mail-wm1-f72.google.com with SMTP id t20-20020a7bc3d4000000b003c6bfea856aso1649431wmj.1
+        for <kvm@vger.kernel.org>; Thu, 13 Oct 2022 22:34:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V8trlJsHTyBYFl3iSoKLkKxiftpMCd5kSe7wrtw8WL4=;
+        b=QIzkj29D4KrLl4/XnIWdHkQcmkeuh02k5saw1bsWBq+cgPo4MXfGpjL1C1+pgGzP+L
+         WS6SMW/X1Ze6pbh9hZiFJdVsghcWbcmgL6o0G+/M4ABcot6E5vbnSEp/wdmP7hoClSi5
+         GHbR9a3SRcfsEwvtp9u9S/hnI7zefYPGvS8yTJ50SfQt0BSzfZkc4u4BiO2/AIHQCPPq
+         c35G463i2SKViCeztC7cDgqc77O3Q+7ZjWqslJyNxMd9//c4Cl3Ada5Bz3FetY+u7SbS
+         W4D8etUOx5Bi+GV58S8X06dSn0OYEZS5Ph/WF2AjkLawyZ3tZC87nwdP9hu2RVwNsKer
+         AlMw==
+X-Gm-Message-State: ACrzQf1zo6kZwmu0Rlx/9j6+idQ/cKvZSvym4N4DtRj+NCQ7Errq5BVd
+        SC2+QcBRoiKo1GYg4oCuYTOUze5dQhq9OJVkUV4utrBqVdUzBH8pV1/GrQP3WlDzO9Zw0dMzX63
+        nZYg/9m8MkDh/
+X-Received: by 2002:a05:600c:4611:b0:3c5:e3a3:942a with SMTP id m17-20020a05600c461100b003c5e3a3942amr9049116wmo.82.1665725665671;
+        Thu, 13 Oct 2022 22:34:25 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6bB8zKYPiC5hvp1CsHP3BssllLnc3EpU8ceRce26Epnl3AziK2mHwtoH4iEZ7wcoRzL51/lQ==
+X-Received: by 2002:a05:600c:4611:b0:3c5:e3a3:942a with SMTP id m17-20020a05600c461100b003c5e3a3942amr9049103wmo.82.1665725665395;
+        Thu, 13 Oct 2022 22:34:25 -0700 (PDT)
+Received: from redhat.com ([2.54.162.123])
+        by smtp.gmail.com with ESMTPSA id bl13-20020adfe24d000000b00228de351fc0sm1076394wrb.38.2022.10.13.22.34.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Oct 2022 22:34:24 -0700 (PDT)
+Date:   Fri, 14 Oct 2022 01:34:21 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Zeng Guang <guang.zeng@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Gao, Chao" <chao.gao@intel.com>
+Subject: Re: [PATCH v3] target/i386: Set maximum APIC ID to KVM prior to vCPU
+ creation
+Message-ID: <20221014013323-mutt-send-email-mst@kernel.org>
+References: <20220825025246.26618-1-guang.zeng@intel.com>
+ <2c9d8124-c8f5-5f21-74c5-307e16544143@intel.com>
+ <cea2094f-72e7-a63d-ddca-86160240db7b@intel.com>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3082.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a04f178d-1acd-444b-182b-08daad9fcf62
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Oct 2022 04:51:51.6908
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: eWvdsgOc/P09qk2AQYWYyA+MGEHw1UYBM2GydtJmERS0N/L/j8GGJ3QzaRTzvCQ2
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6650
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cea2094f-72e7-a63d-ddca-86160240db7b@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[AMD Official Use Only - General]
+On Fri, Oct 14, 2022 at 09:01:02AM +0800, Zeng Guang wrote:
+> PING again !
+> This QEMU patch is to optimize max APIC ID set for current VM session
+> introduced since linux v6.0. It's also compatible with previous linux
+> version.
+> 
+> Thanks.
+> 
+> On 9/5/2022 9:27 AM, Zeng Guang wrote:
+> > Kindly PING!
+> > 
+> > On 8/25/2022 10:52 AM, Zeng Guang wrote:
+> > > Specify maximum possible APIC ID assigned for current VM session to KVM
+> > > prior to the creation of vCPUs. By this setting, KVM can set up VM-scoped
+> > > data structure indexed by the APIC ID, e.g. Posted-Interrupt Descriptor
+> > > pointer table to support Intel IPI virtualization, with the most optimal
+> > > memory footprint.
+> > > 
+> > > It can be achieved by calling KVM_ENABLE_CAP for KVM_CAP_MAX_VCPU_ID
+> > > capability once KVM has enabled it. Ignoring the return error if KVM
+> > > doesn't support this capability yet.
+> > > 
+> > > Signed-off-by: Zeng Guang <guang.zeng@intel.com>
+> > > ---
+> > >    hw/i386/x86.c              | 4 ++++
+> > >    target/i386/kvm/kvm-stub.c | 5 +++++
+> > >    target/i386/kvm/kvm.c      | 5 +++++
+> > >    target/i386/kvm/kvm_i386.h | 1 +
+> > >    4 files changed, 15 insertions(+)
+> > > 
+> > > diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+> > > index 050eedc0c8..4831193c86 100644
+> > > --- a/hw/i386/x86.c
+> > > +++ b/hw/i386/x86.c
+> > > @@ -139,6 +139,10 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
+> > >            exit(EXIT_FAILURE);
+> > >        }
+> > > +    if (kvm_enabled()) {
+> > > +        kvm_set_max_apic_id(x86ms->apic_id_limit);
+> > > +    }
+> > > +
+> > >        possible_cpus = mc->possible_cpu_arch_ids(ms);
+> > >        for (i = 0; i < ms->smp.cpus; i++) {
+> > >            x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id, &error_fatal);
+> > > diff --git a/target/i386/kvm/kvm-stub.c b/target/i386/kvm/kvm-stub.c
+> > > index f6e7e4466e..e052f1c7b0 100644
+> > > --- a/target/i386/kvm/kvm-stub.c
+> > > +++ b/target/i386/kvm/kvm-stub.c
+> > > @@ -44,3 +44,8 @@ bool kvm_hyperv_expand_features(X86CPU *cpu, Error **errp)
+> > >    {
+> > >        abort();
+> > >    }
+> > > +
+> > > +void kvm_set_max_apic_id(uint32_t max_apic_id)
+> > > +{
+> > > +    return;
+> > > +}
+> > > diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+> > > index f148a6d52f..af4ef1e8f0 100644
+> > > --- a/target/i386/kvm/kvm.c
+> > > +++ b/target/i386/kvm/kvm.c
+> > > @@ -5428,3 +5428,8 @@ void kvm_request_xsave_components(X86CPU *cpu, uint64_t mask)
+> > >            mask &= ~BIT_ULL(bit);
+> > >        }
+> > >    }
+> > > +
+> > > +void kvm_set_max_apic_id(uint32_t max_apic_id)
+> > > +{
+> > > +    kvm_vm_enable_cap(kvm_state, KVM_CAP_MAX_VCPU_ID, 0, max_apic_id);
+> > > +}
+> > > diff --git a/target/i386/kvm/kvm_i386.h b/target/i386/kvm/kvm_i386.h
+> > > index 4124912c20..c133b32a58 100644
+> > > --- a/target/i386/kvm/kvm_i386.h
+> > > +++ b/target/i386/kvm/kvm_i386.h
+> > > @@ -54,4 +54,5 @@ uint64_t kvm_swizzle_msi_ext_dest_id(uint64_t address);
+> > >    bool kvm_enable_sgx_provisioning(KVMState *s);
+> > >    void kvm_request_xsave_components(X86CPU *cpu, uint64_t mask);
+> > > +void kvm_set_max_apic_id(uint32_t max_apic_id);
+> > >    #endif
 
-This patch will be rebased on top of https://lore.kernel.org/linux-iommu/co=
-ver.1660572783.git.robin.murphy@arm.com/T/#t
-in next respin.
 
-Regards,
-Nipun
+Looks ok on the surface, but this is Paolo's area.
 
-> -----Original Message-----
-> From: Nipun Gupta <nipun.gupta@amd.com>
-> Sent: Friday, October 14, 2022 10:11 AM
-> To: robh+dt@kernel.org; krzysztof.kozlowski+dt@linaro.org;
-> gregkh@linuxfoundation.org; rafael@kernel.org; eric.auger@redhat.com;
-> alex.williamson@redhat.com; cohuck@redhat.com; Gupta, Puneet (DCG-ENG)
-> <puneet.gupta@amd.com>; song.bao.hua@hisilicon.com;
-> mchehab+huawei@kernel.org; maz@kernel.org; f.fainelli@gmail.com;
-> jeffrey.l.hugo@gmail.com; saravanak@google.com; Michael.Srba@seznam.cz;
-> mani@kernel.org; yishaih@nvidia.com; jgg@ziepe.ca; jgg@nvidia.com;
-> robin.murphy@arm.com; will@kernel.org; joro@8bytes.org;
-> masahiroy@kernel.org; ndesaulniers@google.com; linux-arm-
-> kernel@lists.infradead.org; linux-kbuild@vger.kernel.org; linux-
-> kernel@vger.kernel.org; devicetree@vger.kernel.org; kvm@vger.kernel.org
-> Cc: okaya@kernel.org; Anand, Harpreet <harpreet.anand@amd.com>; Agarwal,
-> Nikhil <nikhil.agarwal@amd.com>; Simek, Michal <michal.simek@amd.com>;
-> Radovanovic, Aleksandar <aleksandar.radovanovic@amd.com>; git (AMD-Xilinx=
-)
-> <git@amd.com>; Gupta, Nipun <Nipun.Gupta@amd.com>
-> Subject: [RFC PATCH v4 3/8] iommu/arm-smmu-v3: support ops registration f=
-or
-> CDX bus
->=20
-> With new CDX bus supported for AMD FPGA devices on ARM
-> platform, the bus requires registration for the SMMU v3
-> driver.
->=20
-> Signed-off-by: Nipun Gupta <nipun.gupta@amd.com>
-> ---
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 16 ++++++++++++++--
->  1 file changed, 14 insertions(+), 2 deletions(-)
->=20
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index d32b02336411..8ec9f2baf12d 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -29,6 +29,7 @@
->  #include <linux/platform_device.h>
->=20
->  #include <linux/amba/bus.h>
-> +#include <linux/cdx/cdx_bus.h>
->=20
->  #include "arm-smmu-v3.h"
->  #include "../../iommu-sva-lib.h"
-> @@ -3690,16 +3691,27 @@ static int arm_smmu_set_bus_ops(struct
-> iommu_ops *ops)
->  		if (err)
->  			goto err_reset_pci_ops;
->  	}
-> +#endif
-> +#ifdef CONFIG_CDX_BUS
-> +	if (cdx_bus_type.iommu_ops !=3D ops) {
-> +		err =3D bus_set_iommu(&cdx_bus_type, ops);
-> +		if (err)
-> +			goto err_reset_amba_ops;
-> +	}
->  #endif
->  	if (platform_bus_type.iommu_ops !=3D ops) {
->  		err =3D bus_set_iommu(&platform_bus_type, ops);
->  		if (err)
-> -			goto err_reset_amba_ops;
-> +			goto err_reset_cdx_ops;
->  	}
->=20
->  	return 0;
->=20
-> -err_reset_amba_ops:
-> +err_reset_cdx_ops:
-> +#ifdef CONFIG_CDX_BUS
-> +	bus_set_iommu(&cdx_bus_type, NULL);
-> +#endif
-> +err_reset_amba_ops: __maybe_unused;
->  #ifdef CONFIG_ARM_AMBA
->  	bus_set_iommu(&amba_bustype, NULL);
->  #endif
-> --
-> 2.25.1
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+-- 
+MST
+
