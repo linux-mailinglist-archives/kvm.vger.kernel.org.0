@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8707D5FEEFA
-	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 15:51:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A62785FEF1E
+	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 15:53:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229892AbiJNNvw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Oct 2022 09:51:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36770 "EHLO
+        id S230010AbiJNNxa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Oct 2022 09:53:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229702AbiJNNvv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Oct 2022 09:51:51 -0400
+        with ESMTP id S230006AbiJNNxR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Oct 2022 09:53:17 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 131DA1BF86F;
-        Fri, 14 Oct 2022 06:51:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 604CC1D0D40;
+        Fri, 14 Oct 2022 06:52:55 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9B2D561B16;
-        Fri, 14 Oct 2022 13:51:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E469BC433C1;
-        Fri, 14 Oct 2022 13:51:45 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A7ADA61B48;
+        Fri, 14 Oct 2022 13:52:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6DA3C4347C;
+        Fri, 14 Oct 2022 13:52:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665755507;
-        bh=qdSYfyAPhXkohJ1ehRKmHK8DO1eUirwKvza2n4S6E50=;
+        s=k20201202; t=1665755550;
+        bh=HsDrC9F/fHxc03GfWdKOZly3wd0F/Y4NmNsP1reemDY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Rw1KgzJiPDbt7Kz0tmj/1CDfaCcjLUicrslTHDLiWgSc8aDDqYFfvJk4Fs8+BS76t
-         SJr3wssu/jK9G+mcbjyXq4T0szXK/AO7a/Nede5/6p7JAEn0ChQ62c6izs6ya447o7
-         zLoHgJ+vY75Gxhx021UrST6s7wdA6OcrfM7nd1ZGeGF16dJf748aK91Z5AL0fXhSxY
-         THpfwb2VhL8aPaEIkTuuap1sYvn/L2q8+Quw4q+/aPO89UTVqbnVCH6IOlzJh8d4pP
-         HAQALI02MCgyQ6r44H9XSW+53wC+tQszN8Bsb2XF1QKwkDn69QJiKVqdsAYmJxom3P
-         eqp0EyVYy6UpA==
+        b=C3++PJn5JklfLUfAcOunPjaVrqaO7vuJIYtDQ3xN7hDHaOmPZ+Epgfyb7dafR+5iJ
+         dhrkWxdO2GtgDgoGRK5kR2TnDERqcLVL51gbe9hYwpi0lvWsTQ+7CjDApB7a8PiEw4
+         ojLmko7j4GKFteufTsFD0/wV29mh93mvDQZ3GMcxt4o7xSkyu4ihtGBE6CBdsmh8b1
+         tLaFd5mVWSffNTflQ+jzoK90Iikji5Ynv3Zv9m7zP6EAtMLD/WgvJjGqN/ikouwaXH
+         tuy9Zu8Fl/hB7eMyAf1oAihOZ17cRowTZOy5G17K5E6IIttete9JRx2ajZYMYfcQG1
+         WIdNKax2WmxWg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Junaid Shahid <junaids@google.com>,
@@ -38,12 +38,12 @@ Cc:     Junaid Shahid <junaids@google.com>,
         Sasha Levin <sashal@kernel.org>, pbonzini@redhat.com,
         tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, x86@kernel.org, kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.0 03/11] kvm: x86: Do proper cleanup if kvm_x86_ops->vm_init() fails
-Date:   Fri, 14 Oct 2022 09:51:29 -0400
-Message-Id: <20221014135139.2109024-3-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.19 03/10] kvm: x86: Do proper cleanup if kvm_x86_ops->vm_init() fails
+Date:   Fri, 14 Oct 2022 09:52:14 -0400
+Message-Id: <20221014135222.2109334-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221014135139.2109024-1-sashal@kernel.org>
-References: <20221014135139.2109024-1-sashal@kernel.org>
+In-Reply-To: <20221014135222.2109334-1-sashal@kernel.org>
+References: <20221014135222.2109334-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -74,10 +74,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b0c47b41c264..11fbd42100be 100644
+index 8c2815151864..8d2211b22ff3 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -12080,6 +12080,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+@@ -11842,6 +11842,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
  	if (ret)
  		goto out_page_track;
  
@@ -88,7 +88,7 @@ index b0c47b41c264..11fbd42100be 100644
  	INIT_HLIST_HEAD(&kvm->arch.mask_notifier_list);
  	INIT_LIST_HEAD(&kvm->arch.assigned_dev_head);
  	atomic_set(&kvm->arch.noncoherent_dma_count, 0);
-@@ -12115,8 +12119,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+@@ -11877,8 +11881,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
  	kvm_hv_init_vm(kvm);
  	kvm_xen_init_vm(kvm);
  
