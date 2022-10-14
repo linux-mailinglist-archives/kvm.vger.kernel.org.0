@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA9EF5FEBBB
-	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 11:35:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7E415FEBE4
+	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 11:41:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229949AbiJNJfk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Oct 2022 05:35:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46078 "EHLO
+        id S230180AbiJNJll (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Oct 2022 05:41:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229526AbiJNJfg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Oct 2022 05:35:36 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7590B109D67
-        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 02:35:34 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id d7-20020a17090a2a4700b0020d268b1f02so7410226pjg.1
-        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 02:35:34 -0700 (PDT)
+        with ESMTP id S230166AbiJNJlg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Oct 2022 05:41:36 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B46AD1C69D8
+        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 02:41:31 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id l1so4216340pld.13
+        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 02:41:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=W72qU+VIW5XhUX7uAnZIVpuOffuQisEiiwK4cvRG0vU=;
-        b=B9ME/S36KxBRTW5prTouAg9AKCdUX8Tw8YNjYsziP8yB91x6yiA47toBWLLiWtsGLI
-         34pOrn+YJiLNY7QpKuTEJ664bbLnq5WqD5/3e0RnXhuwA5RYV1CxeuZJ+rnkUSCTvCJc
-         CeFgzSy2B8UJsIcTBxKfHg93Kzh65ocunBLGM3Vju03U27NSJuNJ2SKqnNQOEOZvdYcK
-         pdxL0oy3ZnESEAu3bkI1uokIv/bYhm4RNjgAJ8AbTfTXyLnbnYi8g7O5k/t1BCD2K0zi
-         KZuetDlu4F4XzoYbqEh8A4Z81TH6leaug5RBlniKwls3xyYyYu4WwGGSepX6TabCzzMJ
-         nXXQ==
+        bh=KdrfFMceV7elb/rA2YCTui/ZhC4l1ygRRIMRPNusZhU=;
+        b=tILJoqotiPdze1TCCwL+mF59nGOxYtncfKrouddVFax7Gcsz+crVbOVRREI0Tubts5
+         vV3yE8640V3CYRlQELJMmFfQQTczEty9SrunN7E3D3rGtjh2DtqxOyXcFHLCaUj06bmI
+         n2K5LQbByQ+bIzM6sx24DqM+gWvxy+s7nteoahhh7v3RsKCxB7wfK3JM651TalbDEgCt
+         iq+ySPOEI9A34HStVa3+jhYVticSF1HMoHESfANw0eGaYRCfMc6JZDSu2ulbuQq9aPiZ
+         CEjBxmmj7CjShgC3jfj1T37OUIOlhGbi6AzfZNYGfNVtK/Ji6CXdTMJ7lej9vyZzHKB2
+         fE3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=W72qU+VIW5XhUX7uAnZIVpuOffuQisEiiwK4cvRG0vU=;
-        b=Bo3Vhiq9fdFaUp3Ob2CuBVI2FUEMr44VXxTKISvXFnYSDoF/2CZqTfz2+1XgvcEBP2
-         xYSETa6Hw+9/PfbJYB52Y9+bCwNPycHrOLaEk7cV6Ef0SUXieYJG9/Bdp0ZDT7CAQAEC
-         MZkSE/CVDMb1CE41muXWmdG0qmMzoDY/aNfnjYehMB/oFNyBi7Ilb3qFmwzuuLUfB01m
-         9kncG+QSV9JRH6g3nqtZ4mPdPAmNobNcfHthsCJsNWBfrQBdtye6sj8H5Zq3PjhXtlkK
-         efZtmz7bnqi4WqcrnAYPTP6O5h0W559/9tvk4JcYqAS8SDVK9buKN5RF001ZxCwRqdT4
-         Badg==
-X-Gm-Message-State: ACrzQf2CZMkAFSgr/3QyWwDEKNXbI8mfSkrpoU9W8hsTMT1iL7atXo6R
-        hh/4swIheelvt9rIIwsC7K8RvBZpWyGSPu60fVoi1w==
-X-Google-Smtp-Source: AMsMyM5JTkM1AeJ9RQt3kUkKbZLzqh69dodlb7V1REpt+lPteLG7O67szgwid5ocSo1qHiAmpQ/sKjFR23AaBwSdvMk=
-X-Received: by 2002:a17:902:e74f:b0:178:3af4:fb13 with SMTP id
- p15-20020a170902e74f00b001783af4fb13mr4214727plf.19.1665740133649; Fri, 14
- Oct 2022 02:35:33 -0700 (PDT)
+        bh=KdrfFMceV7elb/rA2YCTui/ZhC4l1ygRRIMRPNusZhU=;
+        b=O+RQNC8UHx/VCpLCnvLpoaCNiEetvTQNb3KUruw3lIrx2J4p7qKxRB3Ky6qV2TLaLB
+         b3S+/AWm2DtGfD5890IsIcRQMXCzUt3D4VH4eIYPww2BuwBuRucFizho6t3kI622UhsL
+         b0UpHauGm04mgNIJsvVHQjHbnU/Kl+MvnHrfnwj8dBxkJfbBP/rTt/v1JmUv2ntyLj00
+         c3zMSOY7j4STz/U8K7qgBXlC5B5b7e9veDgFAWJfVVQOxKloIxInguQPagnbzs9873ZW
+         jAIyjGzcDxWErpb+3aFhaDvZ6/LNNIz5IuUmqBO7CjtTBewy5JI8iocbRgZtsjJsMmSL
+         i8bw==
+X-Gm-Message-State: ACrzQf3BY8dFaLTQ3uPmHq/Vri/m5q7Eyj1WPj02ZNwqP5BjUPwvw1tG
+        +8XYwxxn0xWLkGB1WQ5a7G4LHX8jLGxKg4tP4yCLKQ==
+X-Google-Smtp-Source: AMsMyM4UqG/vIk3S7koHuixUnBbVmb4fDf+woVq1uoMPm6jtVGqdAhA4fxEgS9gbQtKnvvq2Dv3MB4MMySXFLzb02qg=
+X-Received: by 2002:a17:90b:38c3:b0:20d:406e:26d9 with SMTP id
+ nn3-20020a17090b38c300b0020d406e26d9mr4843007pjb.121.1665740490315; Fri, 14
+ Oct 2022 02:41:30 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220819174659.2427983-1-vannapurve@google.com>
- <20220819174659.2427983-6-vannapurve@google.com> <Yz834mGQDtkdwn7q@google.com>
-In-Reply-To: <Yz834mGQDtkdwn7q@google.com>
+ <20220819174659.2427983-7-vannapurve@google.com> <Yz85WEQWsXAbLWnu@google.com>
+In-Reply-To: <Yz85WEQWsXAbLWnu@google.com>
 From:   Vishal Annapurve <vannapurve@google.com>
-Date:   Fri, 14 Oct 2022 15:05:22 +0530
-Message-ID: <CAGtprH_c+vhr8iBYYd7+BZtwzs_r6uFzxPyW1D3bHGhmHugcnA@mail.gmail.com>
-Subject: Re: [RFC V3 PATCH 5/6] selftests: kvm: x86: Execute VMs with private memory
+Date:   Fri, 14 Oct 2022 15:11:19 +0530
+Message-ID: <CAGtprH-eA+k3BwczSyds+Hrr5QZn96hNK81Op_iBH20-wKfKeg@mail.gmail.com>
+Subject: Re: [RFC V3 PATCH 6/6] sefltests: kvm: x86: Add selftest for private memory
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
@@ -84,102 +84,82 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 7, 2022 at 1:47 AM Sean Christopherson <seanjc@google.com> wrote:
+On Fri, Oct 7, 2022 at 1:54 AM Sean Christopherson <seanjc@google.com> wrote:
 >
 > On Fri, Aug 19, 2022, Vishal Annapurve wrote:
-> > +/*
-> > + * Execute KVM hypercall to change memory access type for a given gpa range.
-> > + *
-> > + * Input Args:
-> > + *   type - memory conversion type TO_SHARED/TO_PRIVATE
-> > + *   gpa - starting gpa address
-> > + *   size - size of the range starting from gpa for which memory access needs
-> > + *     to be changed
-> > + *
-> > + * Output Args: None
-> > + *
-> > + * Return: None
-> > + *
-> > + * Function called by guest logic in selftests to update the memory access type
-> > + * for a given gpa range. This API is useful in exercising implicit conversion
-> > + * path.
-> > + */
-> > +void guest_update_mem_access(enum mem_conversion_type type, uint64_t gpa,
-> > +     uint64_t size)
+> > +static bool verify_mem_contents(void *mem, uint32_t size, uint8_t pat)
 >
-> Provide wrappers to self-document what's going on, then the massive block comments
-> go away.  And the guts of this and guest_update_mem_map() are nearly identical.
+> As per feedback in v1[*], spell out "pattern".
 >
-> Hmm, and we probably want to make it possible to do negative testing.
->
-> Then the one-off enums for TO_PRIVATE and whatnot go way too.
+> [*] https://lore.kernel.org/all/YtiJx11AZHslcGnN@google.com
 >
 > > +{
-> > +     int ret = kvm_hypercall(KVM_HC_MAP_GPA_RANGE, gpa, size >> MIN_PAGE_SHIFT,
->
-> Needs an assert that @size is page aligned.  And since these are x86-64 specific,
-> just use PAGE_SHIFT.  Huh, IS_ALIGNED() doesn't exist in selftests.  That should
-> be added, either by pulling in align.h or by adding the generic macros to
-> kvm_util_base.h.
->
-> And then x86-64's processor.h can defined IS_PAGE_ALIGNED().
->
-> E.g.
->
-> static inline void __kvm_hypercall_map_gpa_range(uint64_t gpa, uint64_t size,
->                                                  uint64_t flags)
-> {
->         return = kvm_hypercall(KVM_HC_MAP_GPA_RANGE, gpa, size >> PAGE_SHIFT, flags, 0);
-> }
->
-> static inline void kvm_hypercall_map_gpa_range(uint64_t gpa, uint64_t size,
->                                                uint64_t flags)
-> {
->         int ret;
->
->         GUEST_ASSERT_2(IS_PAGE_ALIGNED(gpa) && IS_PAGE_ALIGNED(size), gpa, size);
->
->         ret = __kvm_hypercall_map_gpa_range(gpa, size, flags);
->         GUEST_ASSERT_1(!ret, ret);
-> }
->
-> static inline kvm_hypercall_map_shared(uint64_t gpa, uint64_t size)
-> {
->         kvm_hypercall_map_gpa_range(gpa, size, KVM_CLR_GPA_RANGE_ENC_ACCESS);
-> }
->
-> static inline kvm_hypercall_map_private(uint64_t gpa, uint64_t size)
-> {
->         kvm_hypercall_map_gpa_range(gpa, size, KVM_MARK_GPA_RANGE_ENC_ACCESS);
-> }
->
-> > +static void handle_vm_exit_map_gpa_hypercall(struct kvm_vm *vm,
-> > +                             volatile struct kvm_run *run)
->
-> Pass in @vcpu, not a vm+run.
->
-> > +{
-> > +     uint64_t gpa, npages, attrs, size;
+> > +     uint8_t *buf = (uint8_t *)mem;
 > > +
-> > +     TEST_ASSERT(run->hypercall.nr == KVM_HC_MAP_GPA_RANGE,
-> > +             "Unhandled Hypercall %lld\n", run->hypercall.nr);
-> > +     gpa = run->hypercall.args[0];
-> > +     npages = run->hypercall.args[1];
-> > +     size = npages << MIN_PAGE_SHIFT;
-> > +     attrs = run->hypercall.args[2];
-> > +     pr_info("Explicit conversion off 0x%lx size 0x%lx to %s\n", gpa, size,
-> > +             (attrs & KVM_MAP_GPA_RANGE_ENCRYPTED) ? "private" : "shared");
+> > +     for (uint32_t i = 0; i < size; i++) {
+> > +             if (buf[i] != pat)
+> > +                     return false;
+> > +     }
 > > +
-> > +     if (attrs & KVM_MAP_GPA_RANGE_ENCRYPTED)
-> > +             vm_update_private_mem(vm, gpa, size, ALLOCATE_MEM);
-> > +     else
-> > +             vm_update_private_mem(vm, gpa, size, UNBACK_MEM);
-> > +
-> > +     run->hypercall.ret = 0;
+> > +     return true;
 > > +}
 > > +
-> > +static void handle_vm_exit_memory_error(struct kvm_vm *vm, volatile struct kvm_run *run)
+> > +/*
+> > + * Add custom implementation for memset to avoid using standard/builtin memset
+> > + * which may use features like SSE/GOT that don't work with guest vm execution
+> > + * within selftests.
+> > + */
+> > +void *memset(void *mem, int byte, size_t size)
+> > +{
+> > +     uint8_t *buf = (uint8_t *)mem;
+> > +
+> > +     for (uint32_t i = 0; i < size; i++)
+> > +             buf[i] = byte;
+> > +
+> > +     return buf;
+> > +}
 >
-> Same  here, take a @vcpu.
+> memset(), memcpy(), and memcmp() are safe to use as of commit 6b6f71484bf4 ("KVM:
+> selftests: Implement memcmp(), memcpy(), and memset() for guest use").
+>
+
+This is much better. It made less sense to add a custom memset for a
+single selftest.
+
+> Note the "fun" with gcc "optimizing" into infinite recursion... :-)
+>
+> > +
+> > +static void populate_test_area(void *test_area_base, uint64_t pat)
+> > +{
+> > +     memset(test_area_base, pat, TEST_AREA_SIZE);
+> > +}
+> > +
+> > +static void populate_guest_test_mem(void *guest_test_mem, uint64_t pat)
+> > +{
+> > +     memset(guest_test_mem, pat, GUEST_TEST_MEM_SIZE);
+> > +}
+> > +
+> > +static bool verify_test_area(void *test_area_base, uint64_t area_pat,
+> > +     uint64_t guest_pat)
+>
+> Again, avoid "pat".
+>
+> > +{
+> > +     void *test_area1_base = test_area_base;
+> > +     uint64_t test_area1_size = GUEST_TEST_MEM_OFFSET;
+> > +     void *guest_test_mem = test_area_base + test_area1_size;
+> > +     uint64_t guest_test_size = GUEST_TEST_MEM_SIZE;
+> > +     void *test_area2_base = guest_test_mem + guest_test_size;
+> > +     uint64_t test_area2_size = (TEST_AREA_SIZE - (GUEST_TEST_MEM_OFFSET +
+> > +                     GUEST_TEST_MEM_SIZE));
+>
+> This is all amazingly hard to read.  AFAICT, the local variables are largely useless.
+> Actually, why even take in @test_area_base, isn't it hardcoded to TEST_AREA_GPA?
+> Then everything except the pattern can be hardcoded.
+>
+> > +     return (verify_mem_contents(test_area1_base, test_area1_size, area_pat) &&
+> > +             verify_mem_contents(guest_test_mem, guest_test_size, guest_pat) &&
+> > +             verify_mem_contents(test_area2_base, test_area2_size, area_pat));
+> > +}
 
 Ack. Will address these comments in the next series.
