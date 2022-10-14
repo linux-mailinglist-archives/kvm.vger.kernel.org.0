@@ -2,69 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BEA635FF51D
-	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 23:15:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F4055FF536
+	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 23:22:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229749AbiJNVPL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Oct 2022 17:15:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58912 "EHLO
+        id S229899AbiJNVWP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Oct 2022 17:22:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229754AbiJNVPH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Oct 2022 17:15:07 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB8F32DE8
-        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 14:15:06 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id r18so5341197pgr.12
-        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 14:15:06 -0700 (PDT)
+        with ESMTP id S229862AbiJNVWF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Oct 2022 17:22:05 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4FAF1DD884
+        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 14:21:56 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id i21so4651145ljh.12
+        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 14:21:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PZCd+YWp6Rkdf8GaAemTwPAfWHSubBGbIoqG74NI1ms=;
-        b=cRoXvbDvQMwnmouYRU9bA6BnbMqIjlR+t9dwtgHTh24hpPv7uk3XmVXIJbgw6P8Eg9
-         uU3QY2KRaVJK0F92yWi4lVW7keg0Y9Lful81loNULOo4P9SHVXeJSgQyrCaLfy3IHwIO
-         Obc5PDktwXnmgO12NR7VgdJPy/2idgNnHwyMniFZgxK7Es52QbzYDil5VIddOwZ9ycLV
-         /tsBIK0Z4qWqa44E/uQID8GzRzZNBvLyhcV8n6p+8JmNYRddayZJ+2GJDUnWEp21MPsQ
-         FphmiTX70hT3biWGoKJmjEUTUTIpadx1/5gtx6nTy/QFCJcUIglQuje8g1WsugdjDiHx
-         c6Jg==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=tKq14h3L8DuFvFIc1/toFN9il0HrAJZRTsymLOESL+4=;
+        b=mySxM6vSz9WNpDWgs9WvCAaiMLUE7dK/EUmo+cDPFzHdu82YZFloiRCAnmWbkQiCOo
+         r4pclB/Xuz16mfrbhGtTe8xXyiRB3H7SXGYljmk32wxqSPi6j1alBSM3xpICqiTxlsz3
+         AV2TCkvdvDG2AwoLFus2/mVUhCWLm6IRNd2dAv3mHMDrtzfY2AmTQ9+I7nyv1YjpafdF
+         pzoZrtB6fkoef41u6egJXsmJYyD/xkmSX/6UGxBvq2TN/5KWz3I0olnQdxeytoYgdcgg
+         q/27Cx8HWO7SshXib5JwcYgCbnpMGBkmO8FLc16qtJNPtTXMO6SR/kDpdFWR8ALX8gt4
+         eDJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PZCd+YWp6Rkdf8GaAemTwPAfWHSubBGbIoqG74NI1ms=;
-        b=qkt0Ug9IieP3XWeK2QNZxGe7rzsycJlD8Qz9E414CGyEE+EPdSJQh17MtfR+cHlBTP
-         DFen5O6uRxKSqk3mqJS/DaW3C2twArQD2TG+TfPaPqxztsiEZRBjOpHBwSIk3aN2r12z
-         L7/agEWH6wo5M3H43x2Seb7r9xhbrScL/TeY+fMoXGyd6Cq27tlooYZkS/oMX1/XvRZA
-         F7vrPFdNizSpBPBtZRMttGU2GGl9rkFHReGdjPyJg4bYcSFqQENHvEC604hNlqNb3BUB
-         CCvn4ke1I0Y6R315eW7uHRp5bVUw3zBeb40y1wGAYWiuukhBLVmYlcX2EjPVmEqNdH17
-         QumQ==
-X-Gm-Message-State: ACrzQf02Twp/Y39Hzi9oBjsUKeaoGTbdXNZOfdisXGJXiVm3wfl9rC9s
-        ZMHOTKHzAbYBcYjt4MTsnJirTA==
-X-Google-Smtp-Source: AMsMyM6RmjeHSSzE4pJtJXoG7Eo99Kdim1xVs2z0jB4XgAle1pf8E0nfbUcXkYLxxP7MtTx96ZTsyw==
-X-Received: by 2002:aa7:8d17:0:b0:560:485a:e242 with SMTP id j23-20020aa78d17000000b00560485ae242mr7099026pfe.31.1665782106003;
-        Fri, 14 Oct 2022 14:15:06 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u2-20020a17090341c200b0017f7bef8cfasm2127464ple.281.2022.10.14.14.15.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Oct 2022 14:15:05 -0700 (PDT)
-Date:   Fri, 14 Oct 2022 21:15:01 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
-        pbonzini@redhat.com, maz@kernel.org, alexandru.elisei@arm.com,
-        eric.auger@redhat.com, oupton@google.com, reijiw@google.com,
-        rananta@google.com, bgardon@google.com, dmatlack@google.com,
-        axelrasmussen@google.com, Oliver Upton <oliver.upton@linux.dev>
-Subject: Re: [PATCH v9 01/14] KVM: selftests: Add a userfaultfd library
-Message-ID: <Y0nRVTcWGybRAw+q@google.com>
-References: <20221011010628.1734342-1-ricarkol@google.com>
- <20221011010628.1734342-2-ricarkol@google.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tKq14h3L8DuFvFIc1/toFN9il0HrAJZRTsymLOESL+4=;
+        b=O/MdY+aO9zS8z3bAzCLraqcv5euB25T1qgahXADtcHEd+tEU2ycbEy+D0Utj8d7HqV
+         x4qAT8JRSYJ+arBfE65kMim2zHcySiXGNNvrEKeq6gyKBW4uII0dYnZJVvWMqwzpGoQZ
+         DFrpmizXnU2RgEL6LKq8iEa454qiGDvmAKdpkZEF4p3e6zLJed/Yn4QGMopiCFwF5YlE
+         +icEjKgzxurPSmxlGn2F13VMKJ3JM6GyeH/gcc+9RD8AuzSCNS2ko0Umj1uL/+zjcm3i
+         pTQXkKu+Wr23aawsllj9VtE5/MaFWYWOJGCBOnMCvWTA8IRMf18Ciwd0BuJksYbCKdF+
+         H1WQ==
+X-Gm-Message-State: ACrzQf2UoabNhrIOezr/TNSOVHDgDByT3pgQa+Y7whMSTrUw+RIT6WLc
+        wI+TZHYgFpROC2XD0yQdBcp1ZJzyd0YFZvAz26n2rg==
+X-Google-Smtp-Source: AMsMyM7RfQSCNFkfdmCX8rMwbPUObMSkQkobBqn2l/baX55oiYmBev50wCALmO5IDM+jTnQDPQTPyhZGVM7jZxIPl3w=
+X-Received: by 2002:a2e:9547:0:b0:26b:fb41:f60a with SMTP id
+ t7-20020a2e9547000000b0026bfb41f60amr2609653ljh.295.1665782514418; Fri, 14
+ Oct 2022 14:21:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221011010628.1734342-2-ricarkol@google.com>
+References: <20221010220538.1154054-1-vipinsh@google.com> <DS0PR11MB63735576A8FBF80738FF9B76DC249@DS0PR11MB6373.namprd11.prod.outlook.com>
+ <Y0mPqNRSgpArgyS8@google.com> <CALzav=dU2-3avKGT2-AxO8d_uVH9bmYaO=ym8pPFM8esuSWP=A@mail.gmail.com>
+ <CAHVum0d2Jfr=WVxKxvnmwGKzPfV3vN5dbz11=rdcW6qoSoobew@mail.gmail.com> <Y0myXiIjlT8pYyr8@google.com>
+In-Reply-To: <Y0myXiIjlT8pYyr8@google.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Fri, 14 Oct 2022 14:21:17 -0700
+Message-ID: <CAHVum0cKG_LHN3PhskxLAOK18YCin2ee_keoGQsR4tUtwxLz=A@mail.gmail.com>
+Subject: Re: [PATCH v5 0/5] dirty_log_perf_test vCPU pinning
+To:     Sean Christopherson <seanjc@google.com>,
+        "Wang, Wei W" <wei.w.wang@intel.com>
+Cc:     David Matlack <dmatlack@google.com>,
+        "andrew.jones@linux.dev" <andrew.jones@linux.dev>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -76,15 +73,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 11, 2022, Ricardo Koller wrote:
-> +struct uffd_desc *uffd_setup_demand_paging(int uffd_mode,
-> +		useconds_t uffd_delay, void *hva, uint64_t len,
-> +		uffd_handler_t handler)
+On Fri, Oct 14, 2022 at 12:03 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Fri, Oct 14, 2022, Vipin Sharma wrote:
+> > On Fri, Oct 14, 2022 at 9:55 AM David Matlack <dmatlack@google.com> wrote:
+> > >
+> > > On Fri, Oct 14, 2022 at 9:34 AM Sean Christopherson <seanjc@google.com> wrote:
+> > > >
+> > > > On Fri, Oct 14, 2022, Wang, Wei W wrote:
+> > > > > Just curious why not re-using the existing tools (e.g. taskset) to do the pinning?
+> > > >
+> > > > IIUC, you're suggesting the test give tasks meaningful names so that the user can
+> > > > do taskset on the appropriate tasks?  The goal is to ensure vCPUs are pinned before
+> > > > they do any meaningful work.  I don't see how that can be accomplished with taskset
+> > > > without some form of hook in the test to effectively pause the test until the user
+> > > > (or some run script) is ready to continue.
+> > >
+> > > A taskset approach would also be more difficult to incorporate into
+> > > automated runs of dirty_log_perf_test.
+> > >
+> > > >
+> > > > Pinning aside, naming the threads is a great idea!  That would definitely help
+> > > > debug, e.g. if one vCPU gets stuck or is lagging behind.
+> > >
+> > > +1
+> >
+> > I also like the idea.
+> >
+> > Sean:
+> > Do you want a v6 with the naming patch or you will be fine taking v5,
+> > if there are no changes needed in v5, and I can send a separate patch
+> > for naming?
+>
+> Definitely separate, this is an orthogonal change and I don't think there will be
+> any conflict.  If there is a conflict, it will be trivial to resolve.  But since
+> Wei provided a more or less complete patch, let's let Wei post a formal patch
+> (unless he doesn't want to).
 
-s/uffd_delay/delay, and then this prototype is easier to align.  Keeping the
-uffd_ prefix for "mode" makes sense since that might be ambiguous, but like
-"handler", I don't see much value in prefixing "delay".
-
-struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
-					   void *hva, uint64_t len,
-					   uffd_handler_t handler)
+Sounds good!
