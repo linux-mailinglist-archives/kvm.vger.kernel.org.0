@@ -2,70 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AC7B45FF4F8
-	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 23:04:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 211285FF501
+	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 23:06:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229548AbiJNVE0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Oct 2022 17:04:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59722 "EHLO
+        id S229586AbiJNVGq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Oct 2022 17:06:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229544AbiJNVEY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Oct 2022 17:04:24 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7126F1DC817
-        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 14:04:23 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id i3so5978455pfk.9
-        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 14:04:23 -0700 (PDT)
+        with ESMTP id S229577AbiJNVGp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Oct 2022 17:06:45 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DDD71CCCD2
+        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 14:06:43 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id q10-20020a17090a304a00b0020b1d5f6975so5882727pjl.0
+        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 14:06:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ci/sgzHgR3d0PFeCOGERzmh/pNEGWCM51oway6gP1ic=;
-        b=bZosADocQdRBlEJI0ayUUpAZrXnpGu+7TB3h17CyYBp8w9gT1qkmP2u1x9Xq56T1mM
-         TvzKTXQzKIpBV7rtIrHeCsh1OVMKkUBmbkijlDiJ2GGWxqTUeT/YwfgkDRP2oeEYHRjJ
-         Kpm+/b/KjP7JJfS+JqI8y/7mzT0iRshxu3DSlIc2U22Bl7bVlCxVyJQj9bAwuXELCIkd
-         698nI2jh1mT+HerTc/h91+7J4N/z5MNIP5BBFOZ6T6z5ZxzVuC7+v7ez4ouXtkzut4oX
-         XdQ9FFF34op+c+qhQlaC2ypn6YrhKoIRVT9nO/VpoJcbk8w7Zp4D5BOA236o5VR59RGM
-         KG4A==
+        bh=gBsIgMFkR4hW6DkbKUL3jsquGqWZiZYs8XXLe7DQw4A=;
+        b=EZEnHyPWVM20eYK0drT8VKRVFesb8BxKsJzc0N+c8Wa34hBYJ9Q6wgFLIdZOwP2E2A
+         snZ8B9uD5ZMLmdIeDQTPBg5PfNB4eBY2/6kO+U06aK1ADIhjSOZUjL1tOQoN/z2a7Kun
+         WjJsTnYEQLDEx7jASlQs0iLsRJ2AIE2dVwfgPgoxt4krLRyaIs6K5r1V0XDInXNPdJmG
+         jrRPrXsfD+0AUNroc6Ysr03801gaTAC7fZuMbfHuID6fMhC4bphXtGYn5aGZlqD0ViXp
+         fLfvaZUXPywdh4phfAmRqFHubAUgEvH+UGdKgvBBBWHEcOYKY2L0o0bu+NREHGB4zAsm
+         6dzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ci/sgzHgR3d0PFeCOGERzmh/pNEGWCM51oway6gP1ic=;
-        b=VrCQu7hKiGvlOvs1xq+d8w6Wz4C48VrX1L6++pBuVkWjprs7vXFZhABHH4ehCOQtpG
-         Zx5DUnQtsB0nm8ORzGorkSOcKpS97mBpMl4M5BwKhyfCz/NBDZilALB7pu6Hq6ipvVO/
-         5e13MNfT+ctL7BV8DBLLJQ82d/RQPauyGqgGg3il8pg66RJezrxaL/Q9+caqZHWtgo06
-         O0qydCzoUilMo6LQThZCEKbzd/nDzmzUu+yzGtcIXXn73Iw9/s6wdLd+OuS1NomhVPOo
-         Z1AsvlsB8jBDNMCxZA2DedqkchLjOhf7PaIY5pGKVeWIiLjYrwM7qGuks+fE9BEwVgAK
-         vovQ==
-X-Gm-Message-State: ACrzQf2Zgr/fhoPplVl4marnRw9TZPbzgRpiUXySXbNJy16QiDIKHdi7
-        cUFntPPOM+ZZTX6KXEPmRUeASw==
-X-Google-Smtp-Source: AMsMyM4I7xCNIreqlQtGJiS3h42xl7qThTw8N1DikSu2ja1uzqHa+EKcRAIzd6ZsWgQCutT99icVKA==
-X-Received: by 2002:a63:8643:0:b0:462:9b02:a0c1 with SMTP id x64-20020a638643000000b004629b02a0c1mr6325633pgd.536.1665781462773;
-        Fri, 14 Oct 2022 14:04:22 -0700 (PDT)
+        bh=gBsIgMFkR4hW6DkbKUL3jsquGqWZiZYs8XXLe7DQw4A=;
+        b=6AEJEjG3AO5w9XMsbz8NIgES212qdD4SQKe1eUVfCPVwC+33luJZMqNl17M2ur/yM9
+         TFglduX0Eq+dTENJlg/H2UTPuyn6+xX/v6imYkcd1j5aKu9GpTTTTWL4P490/AK8ihJ0
+         D68zWu7loOXtDzKkJyDT+bR77xe71CFTziDdHcewS7oK9B3ph3qt0Kbv3OJRMP10NT39
+         yU46zReduMLgQJlQFE+c2ycVn9OCRZLBIuw2VlOSauDbzZ69OXyJOzbg5CW4hhRmOVrG
+         4s8PnyvbcpJlWXTC5AyVO3uKQgKhKlSceyG2A01zc20xNsT9lj6MUw3OL1sz1aAgUlt/
+         cHkg==
+X-Gm-Message-State: ACrzQf3UaJCeW7sd2O6xcbjmID+6d3mcodPyyxuJDOijq3AQ/iuI0rYb
+        NGZUWOu2Zz2lFx7V6pPs+Ehjiw==
+X-Google-Smtp-Source: AMsMyM4TRUGumiH9zPUpVbD+pbo9y8PKyNt58Hq6N9oJ6PlfFsmKD5LHpHH6bXmjSd0NXZc8ax2ong==
+X-Received: by 2002:a17:902:d48e:b0:178:b5d:ab3 with SMTP id c14-20020a170902d48e00b001780b5d0ab3mr6947676plg.22.1665781602184;
+        Fri, 14 Oct 2022 14:06:42 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id j23-20020a63e757000000b0043a18cef977sm1784619pgk.13.2022.10.14.14.04.22
+        by smtp.gmail.com with ESMTPSA id i18-20020a63e912000000b0045724d09cb4sm1835259pgh.29.2022.10.14.14.06.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Oct 2022 14:04:22 -0700 (PDT)
-Date:   Fri, 14 Oct 2022 21:04:18 +0000
+        Fri, 14 Oct 2022 14:06:41 -0700 (PDT)
+Date:   Fri, 14 Oct 2022 21:06:37 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         maciej.szmigiero@oracle.com
-Subject: Re: [PATCH v2 4/8] KVM: x86: do not go through ctxt->ops when
- emulating rsm
-Message-ID: <Y0nO0quQnVFQruPM@google.com>
+Subject: Re: [PATCH v2 8/8] KVM: x86: do not define KVM_REQ_SMI if SMM
+ disabled
+Message-ID: <Y0nPXfVT1pUaGppn@google.com>
 References: <20220929172016.319443-1-pbonzini@redhat.com>
- <20220929172016.319443-5-pbonzini@redhat.com>
+ <20220929172016.319443-9-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220929172016.319443-5-pbonzini@redhat.com>
+In-Reply-To: <20220929172016.319443-9-pbonzini@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,107 +73,151 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Sep 29, 2022, Paolo Bonzini wrote:
-> @@ -520,14 +505,14 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
->  	u64 smbase;
->  	int ret;
->  
-> -	smbase = ctxt->ops->get_smbase(ctxt);
-> +	smbase = vcpu->arch.smbase;
->  
-> -	ret = ctxt->ops->read_phys(ctxt, smbase + 0xfe00, buf, sizeof(buf));
-> -	if (ret != X86EMUL_CONTINUE)
-> +	ret = kvm_vcpu_read_guest(vcpu, smbase + 0xfe00, buf, sizeof(buf));
-> +	if (ret < 0)
->  		return X86EMUL_UNHANDLEABLE;
->  
-> -	if ((ctxt->ops->get_hflags(ctxt) & X86EMUL_SMM_INSIDE_NMI_MASK) == 0)
-> -		ctxt->ops->set_nmi_mask(ctxt, false);
-> +	if ((vcpu->arch.hflags & HF_SMM_INSIDE_NMI_MASK) == 0)
-> +		static_call(kvm_x86_set_nmi_mask)(vcpu, false);
->  
->  	kvm_smm_changed(vcpu, false);
->  
-> @@ -535,41 +520,41 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
->  	 * Get back to real mode, to prepare a safe state in which to load
->  	 * CR0/CR3/CR4/EFER.  It's all a bit more complicated if the vCPU
->  	 * supports long mode.
-> -	 *
-> -	 * The ctxt->ops callbacks will handle all side effects when writing
-> -	 * writing MSRs and CRs, e.g. MMU context resets, CPUID
-> -	 * runtime updates, etc.
->  	 */
-> -	if (emulator_has_longmode(ctxt)) {
-> -		struct desc_struct cs_desc;
-> +#ifdef CONFIG_X86_64
-> +	if (guest_cpuid_has(vcpu, X86_FEATURE_LM)) {
+	On Thu, Sep 29, 2022, Paolo Bonzini wrote:
+> This ensures that all the relevant code is compiled out, in fact
+> the process_smi stub can be removed too.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 2 ++
+>  arch/x86/kvm/smm.h              | 1 -
+>  arch/x86/kvm/x86.c              | 6 ++++++
+>  3 files changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index d11697504471..d58d4a62b227 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -81,7 +81,9 @@
+>  #define KVM_REQ_NMI			KVM_ARCH_REQ(9)
+>  #define KVM_REQ_PMU			KVM_ARCH_REQ(10)
+>  #define KVM_REQ_PMI			KVM_ARCH_REQ(11)
+> +#ifdef CONFIG_KVM_SMM
+>  #define KVM_REQ_SMI			KVM_ARCH_REQ(12)
+> +#endif
+>  #define KVM_REQ_MASTERCLOCK_UPDATE	KVM_ARCH_REQ(13)
+>  #define KVM_REQ_MCLOCK_INPROGRESS \
+>  	KVM_ARCH_REQ_FLAGS(14, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> diff --git a/arch/x86/kvm/smm.h b/arch/x86/kvm/smm.h
+> index 7ccce6b655ca..a6795b93ba30 100644
+> --- a/arch/x86/kvm/smm.h
+> +++ b/arch/x86/kvm/smm.h
+> @@ -28,7 +28,6 @@ void process_smi(struct kvm_vcpu *vcpu);
+>  static inline int kvm_inject_smi(struct kvm_vcpu *vcpu) { return -ENOTTY; }
+>  static inline bool is_smm(struct kvm_vcpu *vcpu) { return false; }
+>  static inline void kvm_smm_changed(struct kvm_vcpu *vcpu, bool in_smm) { WARN_ON_ONCE(1); }
+> -static inline void process_smi(struct kvm_vcpu *vcpu) { WARN_ON_ONCE(1); }
 
-To fix the "unused 'efer'" issue and avoid multiple guest_cpuid_has() calls, this
-as fixup?  It's not like we care about the code footprint for 32-bit KVM if the
-compiler isn't clever enough to optimize away the dead code.
+I think it's worth adding one more patch to kill off kvm_smm_changed() too.  Most
+of the affected code already has references to CONFIG_KVM_SMM nearby.
 
 ---
- arch/x86/kvm/smm.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  3 ++-
+ arch/x86/kvm/smm.c              |  4 ++++
+ arch/x86/kvm/smm.h              |  2 --
+ arch/x86/kvm/x86.c              | 18 +++++++++---------
+ 4 files changed, 15 insertions(+), 12 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 0b0a82c0bb5c..6c572cf1cf8d 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1994,10 +1994,11 @@ enum {
+ #define HF_NMI_MASK		(1 << 3)
+ #define HF_IRET_MASK		(1 << 4)
+ #define HF_GUEST_MASK		(1 << 5) /* VCPU is in guest-mode */
++
++#ifdef CONFIG_KVM_SMM
+ #define HF_SMM_MASK		(1 << 6)
+ #define HF_SMM_INSIDE_NMI_MASK	(1 << 7)
+ 
+-#ifdef CONFIG_KVM_SMM
+ # define __KVM_VCPU_MULTIPLE_ADDRESS_SPACE
+ # define KVM_ADDRESS_SPACE_NUM 2
+ # define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
 diff --git a/arch/x86/kvm/smm.c b/arch/x86/kvm/smm.c
-index 41ca128478fc..740fca1cf3a3 100644
+index 740fca1cf3a3..12480446c43b 100644
 --- a/arch/x86/kvm/smm.c
 +++ b/arch/x86/kvm/smm.c
-@@ -500,6 +500,8 @@ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
- int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
+@@ -10,6 +10,10 @@
+ 
+ void kvm_smm_changed(struct kvm_vcpu *vcpu, bool entering_smm)
  {
- 	struct kvm_vcpu *vcpu = ctxt->vcpu;
-+	bool is_64bit_vcpu = IS_ENABLED(CONFIG_X86_64) &&
-+			     guest_cpuid_has(vcpu, X86_FEATURE_LM);
- 	unsigned long cr0, cr4, efer;
- 	char buf[512];
- 	u64 smbase;
-@@ -521,8 +523,7 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
- 	 * CR0/CR3/CR4/EFER.  It's all a bit more complicated if the vCPU
- 	 * supports long mode.
- 	 */
--#ifdef CONFIG_X86_64
--	if (guest_cpuid_has(vcpu, X86_FEATURE_LM)) {
-+	if (is_64bit_vcpu) {
- 		struct kvm_segment cs_desc;
++	BUILD_BUG_ON(HF_GUEST_MASK != X86EMUL_GUEST_MASK);
++	BUILD_BUG_ON(HF_SMM_MASK != X86EMUL_SMM_MASK);
++	BUILD_BUG_ON(HF_SMM_INSIDE_NMI_MASK != X86EMUL_SMM_INSIDE_NMI_MASK);
++
+ 	trace_kvm_smm_transition(vcpu->vcpu_id, vcpu->arch.smbase, entering_smm);
  
- 		/* Zero CR4.PCIDE before CR0.PG.  */
-@@ -536,15 +537,13 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
- 		cs_desc.s = cs_desc.g = cs_desc.present = 1;
- 		kvm_set_segment(vcpu, &cs_desc, VCPU_SREG_CS);
- 	}
--#endif
+ 	if (entering_smm) {
+diff --git a/arch/x86/kvm/smm.h b/arch/x86/kvm/smm.h
+index 131fbe1817d5..9935045fcf20 100644
+--- a/arch/x86/kvm/smm.h
++++ b/arch/x86/kvm/smm.h
+@@ -29,8 +29,6 @@ void process_smi(struct kvm_vcpu *vcpu);
+ #else
+ static inline int kvm_inject_smi(struct kvm_vcpu *vcpu) { return -ENOTTY; }
+ static inline bool is_smm(struct kvm_vcpu *vcpu) { return false; }
+-static inline void kvm_smm_changed(struct kvm_vcpu *vcpu, bool in_smm) { WARN_ON_ONCE(1); }
+-
+ /*
+  * emulator_leave_smm is used as a function pointer, so the
+  * stub is defined in x86.c.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 56004890a717..ec74d579ca1b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5103,10 +5103,12 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
  
- 	/* For the 64-bit case, this will clear EFER.LMA.  */
- 	cr0 = kvm_read_cr0(vcpu);
- 	if (cr0 & X86_CR0_PE)
- 		kvm_set_cr0(vcpu, cr0 & ~(X86_CR0_PG | X86_CR0_PE));
+ 	events->sipi_vector = 0; /* never valid when reporting to user space */
  
--#ifdef CONFIG_X86_64
--	if (guest_cpuid_has(vcpu, X86_FEATURE_LM)) {
-+	if (is_64bit_vcpu) {
- 		/* Clear CR4.PAE before clearing EFER.LME. */
- 		cr4 = kvm_read_cr4(vcpu);
- 		if (cr4 & X86_CR4_PAE)
-@@ -554,7 +553,6 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
- 		efer = 0;
- 		kvm_set_msr(vcpu, MSR_EFER, efer);
- 	}
--#endif
++#ifdef CONFIG_KVM_SMM
+ 	events->smi.smm = is_smm(vcpu);
+ 	events->smi.pending = vcpu->arch.smi_pending;
+ 	events->smi.smm_inside_nmi =
+ 		!!(vcpu->arch.hflags & HF_SMM_INSIDE_NMI_MASK);
++#endif
+ 	events->smi.latched_init = kvm_lapic_latched_init(vcpu);
  
- 	/*
- 	 * Give leave_smm() a chance to make ISA-specific changes to the vCPU
-@@ -565,7 +563,7 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
- 		return X86EMUL_UNHANDLEABLE;
+ 	events->flags = (KVM_VCPUEVENT_VALID_NMI_PENDING
+@@ -5194,12 +5196,7 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
+ 		vcpu->arch.apic->sipi_vector = events->sipi_vector;
  
- #ifdef CONFIG_X86_64
--	if (guest_cpuid_has(vcpu, X86_FEATURE_LM))
-+	if (is_64bit_vcpu)
- 		return rsm_load_state_64(ctxt, buf);
- 	else
- #endif
+ 	if (events->flags & KVM_VCPUEVENT_VALID_SMM) {
+-		if (!IS_ENABLED(CONFIG_KVM_SMM) &&
+-		    (events->smi.smm ||
+-		     events->smi.pending ||
+-		     events->smi.smm_inside_nmi))
+-			return -EINVAL;
+-
++#ifdef CONFIG_KVM_SMM
+ 		if (!!(vcpu->arch.hflags & HF_SMM_MASK) != events->smi.smm) {
+ 			kvm_x86_ops.nested_ops->leave_nested(vcpu);
+ 			kvm_smm_changed(vcpu, events->smi.smm);
+@@ -5214,6 +5211,12 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
+ 				vcpu->arch.hflags &= ~HF_SMM_INSIDE_NMI_MASK;
+ 		}
+ 
++#else
++		if (events->smi.smm || events->smi.pending ||
++		    events->smi.smm_inside_nmi)
++			return -EINVAL;
++#endif
++
+ 		if (lapic_in_kernel(vcpu)) {
+ 			if (events->smi.latched_init)
+ 				set_bit(KVM_APIC_INIT, &vcpu->arch.apic->pending_events);
+@@ -8228,9 +8231,6 @@ static void init_emulate_ctxt(struct kvm_vcpu *vcpu)
+ 		     (cs_l && is_long_mode(vcpu))	? X86EMUL_MODE_PROT64 :
+ 		     cs_db				? X86EMUL_MODE_PROT32 :
+ 							  X86EMUL_MODE_PROT16;
+-	BUILD_BUG_ON(HF_GUEST_MASK != X86EMUL_GUEST_MASK);
+-	BUILD_BUG_ON(HF_SMM_MASK != X86EMUL_SMM_MASK);
+-	BUILD_BUG_ON(HF_SMM_INSIDE_NMI_MASK != X86EMUL_SMM_INSIDE_NMI_MASK);
+ 
+ 	ctxt->interruptibility = 0;
+ 	ctxt->have_exception = false;
 
-base-commit: 8b86d27cc60a150252b04989de818ad4ec85f899
+base-commit: f7641bcac507589d34b20d30cceb7067f8bcfd08
 -- 
 
