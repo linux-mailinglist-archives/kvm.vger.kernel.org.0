@@ -2,179 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 733EF5FE988
-	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 09:27:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 66E105FE971
+	for <lists+kvm@lfdr.de>; Fri, 14 Oct 2022 09:23:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229932AbiJNH1k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Oct 2022 03:27:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58214 "EHLO
+        id S229926AbiJNHXV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 14 Oct 2022 03:23:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229747AbiJNH1h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Oct 2022 03:27:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 645441BF84F
-        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 00:27:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1665732452;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1HO6ItwplxcowXlIKdJH2SQbuhYvBFkPnC0M8MrxP0E=;
-        b=A4WpDt4WpKng+e6qfy5Pxh9KsZ/KqVEVPPAvhLOYqMpiqYgxfa863/etV0CvLg6fzZVOAK
-        g/ZZn8HoJAI/XJC6UXGIqziIoQ1YTU/UG1rRW0Bx93F9x2S7R8FFc4V8Ofg9yWmd47Y5sn
-        RecIzB4EQ0CI4C9LieOowGIsbdYWCMM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-193-l_Q2vU7YPHS0w63Vld1mlw-1; Fri, 14 Oct 2022 03:27:30 -0400
-X-MC-Unique: l_Q2vU7YPHS0w63Vld1mlw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 50BD518029D2;
-        Fri, 14 Oct 2022 07:27:09 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-52.bne.redhat.com [10.64.54.52])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 180DEC56621;
-        Fri, 14 Oct 2022 07:20:40 +0000 (UTC)
-From:   Gavin Shan <gshan@redhat.com>
-To:     kvmarm@lists.linux.dev
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ajones@ventanamicro.com,
-        pbonzini@redhat.com, maz@kernel.org, shuah@kernel.org,
-        oliver.upton@linux.dev, seanjc@google.com, peterx@redhat.com,
-        maciej.szmigiero@oracle.com, ricarkol@google.com,
-        zhenyzha@redhat.com, shan.gavin@gmail.com
-Subject: [PATCH 6/6] KVM: selftests: memslot_perf_test: Report optimal memory slots
-Date:   Fri, 14 Oct 2022 15:19:14 +0800
-Message-Id: <20221014071914.227134-7-gshan@redhat.com>
-In-Reply-To: <20221014071914.227134-1-gshan@redhat.com>
-References: <20221014071914.227134-1-gshan@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+        with ESMTP id S229676AbiJNHXU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 14 Oct 2022 03:23:20 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3335F196B61
+        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 00:23:19 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29E63ALL008155
+        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 07:23:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=C1vPgcSV5N9iPf70021f88PqhxcwyPmTG0qLa3j6wT8=;
+ b=MC+iVU/tmEDoYBXSHh7JCTFfuTPmOJZHvetsNVamrgQamIAyUT37uz0CzFiVSN82ZWr5
+ 0gtFYUvli+lO2qck5mwipaAc/TsNWvOWtSEuTUM/qbkTYi38iPgTLx7eHAjLnEjEl8Yi
+ v1oT7J5S+yhUJr05BSP65DnJ50oaqAB3hP+qylmqmKOXC3SuJWV2MMIVqsNTQ8Wh94w1
+ cPSGX3pxd+BrlG+srxCNHn/eFjyhkRk3vjqFSHaNGx9cskMW+rgXgMm78jDYkIKZdQ0y
+ QmrIRgbv9XWZTEYHMoRxRCxfYSh4vPYRmVj2yIVyZ9jZ2Fb/7s6OHS8gcxfMJuBXARyF nA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k6j8cdvrn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 07:23:18 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29E6qOGA031929
+        for <kvm@vger.kernel.org>; Fri, 14 Oct 2022 07:23:18 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k6j8cdvqq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Oct 2022 07:23:18 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29E7L1KM016207;
+        Fri, 14 Oct 2022 07:23:15 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04fra.de.ibm.com with ESMTP id 3k30u9ekdm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 14 Oct 2022 07:23:15 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29E7NCcd60948866
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 14 Oct 2022 07:23:12 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 772B5A405C;
+        Fri, 14 Oct 2022 07:23:12 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 40CCDA4054;
+        Fri, 14 Oct 2022 07:23:12 +0000 (GMT)
+Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 14 Oct 2022 07:23:12 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Subject: [kvm-unit-tests PATCH v6 0/1] s390x: Add exit time test
+Date:   Fri, 14 Oct 2022 09:23:11 +0200
+Message-Id: <20221014072312.198606-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.36.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Cv74SBR7PJyIreKDGl93ywKbL3fSKXFb
+X-Proofpoint-GUID: gGiwwftHSvJUQhrWUZiGD51wXY22NWQH
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-14_03,2022-10-13_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
+ mlxscore=0 adultscore=0 bulkscore=0 priorityscore=1501 clxscore=1015
+ suspectscore=0 phishscore=0 lowpriorityscore=0 mlxlogscore=733
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210140041
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The memory area in each slot should be aligned to host page size.
-Otherwise, the test will failure. For example, the following command
-fails with the following messages with 64KB-page-size-host and
-4KB-pae-size-guest. It's not user friendly. Lets do something to report
-the optimal memory slots, instead of failing the test.
-
-  # ./memslot_perf_test -v -s 1000
-  Number of memory slots: 999
-  Testing map performance with 1 runs, 5 seconds each
-  Adding slots 1..999, each slot with 8 pages + 216 extra pages last
-  ==== Test Assertion Failure ====
-    lib/kvm_util.c:824: vm_adjust_num_guest_pages(vm->mode, npages) == npages
-    pid=19872 tid=19872 errno=0 - Success
-       1  0x00000000004065b3: vm_userspace_mem_region_add at kvm_util.c:822
-       2  0x0000000000401d6b: prepare_vm at memslot_perf_test.c:273
-       3  (inlined by) test_execute at memslot_perf_test.c:756
-       4  (inlined by) test_loop at memslot_perf_test.c:994
-       5  (inlined by) main at memslot_perf_test.c:1073
-       6  0x0000ffff7ebb4383: ?? ??:0
-       7  0x00000000004021ff: _start at :?
-    Number of guest pages is not compatible with the host. Try npages=16
-
-Report the optimal memory slots instead of failing the test when
-the memory area in each slot isn't aligned to host page size. With
-this applied, the optimal memory slots is reported.
-
-  # ./memslot_perf_test -v -s 1000
-  # ./memslot_perf_test -v -s 1000
-  Number of memory slots: 999
-  Testing map performance with 1 runs, 5 seconds each
-  Memslot count too high for this test, decrease the cap (max is 514)
-
-Signed-off-by: Gavin Shan <gshan@redhat.com>
+v5->v6:
 ---
- .../testing/selftests/kvm/memslot_perf_test.c | 45 +++++++++++++++++--
- 1 file changed, 41 insertions(+), 4 deletions(-)
+* multiply first, then divide when normalizing (thanks Claudio)
+* print fractions of us (thanks Claudio)
+* remove non-normalized output (thanks Claudio)
+* fence dag9c since not supported under TCG
 
-diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
-index e6d34744b45d..bec65803f220 100644
---- a/tools/testing/selftests/kvm/memslot_perf_test.c
-+++ b/tools/testing/selftests/kvm/memslot_perf_test.c
-@@ -230,16 +230,52 @@ static struct vm_data *alloc_vm(void)
- 	return data;
- }
- 
-+static bool check_slot_pages(uint32_t host_page_size, uint32_t guest_page_size,
-+			     uint64_t pages_per_slot, uint64_t rempages)
-+{
-+	if (!pages_per_slot)
-+		return false;
-+
-+	if ((pages_per_slot * guest_page_size) % host_page_size)
-+		return false;
-+
-+	if ((rempages * guest_page_size) % host_page_size)
-+		return false;
-+
-+	return true;
-+}
-+
-+
-+static uint64_t get_max_slots(struct vm_data *data, uint32_t host_page_size)
-+{
-+	uint32_t guest_page_size = data->vm->page_size;
-+	uint64_t mempages, pages_per_slot, rempages;
-+	uint64_t slots;
-+
-+	mempages = data->npages;
-+	slots = data->nslots;
-+	while (--slots > 1) {
-+		pages_per_slot = mempages / slots;
-+		rempages = mempages % pages_per_slot;
-+		if (check_slot_pages(host_page_size, guest_page_size,
-+				     pages_per_slot, rempages))
-+			return slots + 1;	/* slot 0 is reserved */
-+	}
-+
-+	return 0;
-+}
-+
- static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
- 		       void *guest_code, uint64_t mem_size,
- 		       struct timespec *slot_runtime)
- {
- 	uint64_t mempages, rempages;
- 	uint64_t guest_addr;
--	uint32_t slot, guest_page_size;
-+	uint32_t slot, host_page_size, guest_page_size;
- 	struct timespec tstart;
- 	struct sync_area *sync;
- 
-+	host_page_size = getpagesize();
- 	guest_page_size = vm_guest_mode_params[VM_MODE_DEFAULT].page_size;
- 	mempages = mem_size / guest_page_size;
- 
-@@ -250,12 +286,13 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
- 	TEST_ASSERT(data->npages > 1, "Can't test without any memory");
- 	data->nslots = nslots;
- 	data->pages_per_slot = data->npages / data->nslots;
--	if (!data->pages_per_slot) {
--		*maxslots = data->npages + 1;
-+	rempages = data->npages % data->nslots;
-+	if (!check_slot_pages(host_page_size, guest_page_size,
-+			      data->pages_per_slot, rempages)) {
-+		*maxslots = get_max_slots(data, host_page_size);
- 		return false;
- 	}
- 
--	rempages = data->npages % data->nslots;
- 	data->hva_slots = malloc(sizeof(*data->hva_slots) * data->nslots);
- 	TEST_ASSERT(data->hva_slots, "malloc() fail");
- 
+v4->v5:
+---
+* print normalized runtime to be able to compare runtime of
+  instructions in a single run (thanks Claudio)
+
+v3->v4:
+---
+* remove merge conflict markers (thanks Christian)
+
+v2->v3:
+---
+* print average (thanks Claudio)
+* have asm constraints look the same everywhere (thanks Claudio)
+* rebase patchset on top of my migration sck patches[1] to make use of the
+  time.h improvements
+
+v1->v2:
+---
+* add missing cc clobber, fix constraints for get_clock_us() (thanks
+  Thomas)
+* avoid array and use pointer to const char* (thanks Thomas)
+* add comment why testing nop makes sense (thanks Thomas)
+* rework constraints and clobbers (thanks Thomas)
+
+Sometimes, it is useful to measure the exit time of certain instructions
+to e.g. identify performance regressions in instructions emulated by the
+hypervisor.
+
+This series adds a test which executes some instructions and measures
+their execution time. Since their execution time depends a lot on the
+environment at hand, all tests are reported as PASS currently.
+
+The point of this series is not so much the instructions which have been
+chosen here (but your ideas are welcome), but rather the general
+question whether it makes sense to have a test like this in
+kvm-unit-tests.
+
+This series is based on my migration sck patches[1] to make use of the
+time.h improvements there.
+
+[1] https://lore.kernel.org/all/20221011170024.972135-1-nrb@linux.ibm.com/
+
+Nico Boehr (1):
+  s390x: add exittime tests
+
+ s390x/Makefile      |   1 +
+ s390x/exittime.c    | 296 ++++++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg |   4 +
+ 3 files changed, 301 insertions(+)
+ create mode 100644 s390x/exittime.c
+
 -- 
-2.23.0
+2.36.1
 
