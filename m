@@ -2,139 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1B5AB5FF828
-	for <lists+kvm@lfdr.de>; Sat, 15 Oct 2022 05:19:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 690015FFA4C
+	for <lists+kvm@lfdr.de>; Sat, 15 Oct 2022 15:35:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229688AbiJODTp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 14 Oct 2022 23:19:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45398 "EHLO
+        id S229635AbiJONfr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 15 Oct 2022 09:35:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229540AbiJODTn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 14 Oct 2022 23:19:43 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 407C2E7D;
-        Fri, 14 Oct 2022 20:19:38 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id x1-20020a17090ab00100b001fda21bbc90so9549305pjq.3;
-        Fri, 14 Oct 2022 20:19:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=62n/SKrDkBxAMeilZhMyUB+MsRZ+hq6qWI8NmvUUw/Y=;
-        b=ZgXqEF1Cf0UI0SlcSm6xYR2RqEJMRcTTEYUOLuYzMrWP4a1ySXtjBwBX+UeSqYrgud
-         8K9h3/PzsXf/pPH73Q1OqFNevxJXgkOtsMsawPfu8Q+TNhvz8n9DB088m82Q2UH+7Dab
-         HmvVICBXmIBOlQT1Kwx/btsSaQrr8lZ0LCTFuXycvwYRhRRX6V7dBgyhHp4j/g9cqfCh
-         GDnl4plmjDjOg5vAJ+u+hDoRXLUTkuznJnHKi2rgHiF3eQoSL6cgTzi7TvDOyHLRUTIX
-         pEw5b3KhucQRm3oU7XegKBJK8AiYM0bYKn6ZK3HGDZKtlcJNJrLvdScaY/Ewt1/gf2PH
-         K3Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=62n/SKrDkBxAMeilZhMyUB+MsRZ+hq6qWI8NmvUUw/Y=;
-        b=LHEG3qwi7mDHx3KNPhq1hvAX18IKCOJPTRzJgI5pfLBOk+RKqKIDsDP4H3OLTlC4s/
-         zML7dya+yEoHwb4Li4XNOCORLChV6qnW6spI3icUKa+uVdwyKctFyX2/RQvPaCwcYkPf
-         GynFqugsbQ9CuBOr4z4u2SPRQjpLFeZD0zr2dmKkPJokJmMqx50xdKUioKajTF5Xlk9n
-         Lb9oRg5QrVMfCgDpcIlW0FWILRnQySPj9Dj2SiI4nEIlHqQeo1zGWufv5bF7RM5ip5jt
-         3S4liFhPCmK3Fu2b6UR3NmCvgzUkZbzvxhXT9H/kdOxW0hf5d+AN9xRUhs6De2Us+HP5
-         Qv5Q==
-X-Gm-Message-State: ACrzQf1IYx5pnRxWEKSzebzeLFM172jWezMSoluZoEWf8PRsAKmcUv/2
-        mJYh5NYe/bb2rQa4bIhbLyA=
-X-Google-Smtp-Source: AMsMyM5NBdJT1xV/iPskYV3xpxtHE/cTYEF+pA7jg6hgAcKEZTikivegIkKlM1tCU28TSxnGn/EYAQ==
-X-Received: by 2002:a17:902:9048:b0:17f:93a5:4638 with SMTP id w8-20020a170902904800b0017f93a54638mr1077192plz.108.1665803977349;
-        Fri, 14 Oct 2022 20:19:37 -0700 (PDT)
-Received: from e69h04161.et15sqa.tbsite.net ([140.205.118.227])
-        by smtp.gmail.com with ESMTPSA id g2-20020a17090a290200b0020a7d076bfesm2129699pjd.2.2022.10.14.20.19.33
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Oct 2022 20:19:36 -0700 (PDT)
-From:   Eric Ren <renzhengeek@gmail.com>
-To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        eauger@redhat.com, maz@kernel.org
-Cc:     james.morse@arm.com, alexandru.elisei@arm.com,
-        suzuki.poulose@arm.com, oliver.upton@linux.dev,
-        catalin.marinas@arm.com, will@kernel.org, ricarkol@google.com,
-        eric.auger@redhat.com, yuzhe@nfschina.com, gshan@redhat.com,
-        justin.he@arm.com
-Subject: [PATCH V2] KVM: arm64: vgic: fix wrong loop condition in scan_its_table()
-Date:   Sat, 15 Oct 2022 11:19:28 +0800
-Message-Id: <d9c3a564af9e2c5bf63f48a7dcbf08cd593c5c0b.1665802985.git.renzhengeek@gmail.com>
-X-Mailer: git-send-email 1.8.3.1
+        with ESMTP id S229547AbiJONfp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 15 Oct 2022 09:35:45 -0400
+X-Greylist: delayed 1272 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 15 Oct 2022 06:35:43 PDT
+Received: from kylie.crudebyte.com (kylie.crudebyte.com [5.189.157.229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EA9F4D162
+        for <kvm@vger.kernel.org>; Sat, 15 Oct 2022 06:35:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=crudebyte.com; s=kylie; h=Content-Type:Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        Content-ID:Content-Description;
+        bh=1xgL3nGmvsWM+eEOqBnpQ1xASQnjO01Ot02KqniN8vM=; b=Zx4UzJcow0ashPdOdi8f+pS9eG
+        qsgoKZAQcc+D7sdLgmFBo5xEARyUMJsBv6HiMEMlQ76VeBQ179vdsk4JacN11Y/Rbep45xjXd5qnI
+        KX37Mc2m22PUWKvGm3bKcMJvT5rHPo9ZYBw72EZOBBz0zkK8wiA67M4h0XZrCOycMz9FX3jQvJ6ZE
+        ch4fZ2Ym+8zSLRa3mzdefRGxh+uDczZHVdoWZX0M5tz3EO3/e0FA41U78TrQilfMU69UpV8UameAy
+        oc8ptxr0f1gPOkM1fyVnNxkUxAOZl7yQWoWoRRvfuSN/rkfMu72QY1ivIJazAz5Rxt+/LKGW4J3RE
+        dcSbXGMMTxSNXLUIhcE5az+bBPmpH8sXIy9Lk8uRFe9LTVHAOc0IHjxv6XAJ4UNd4gzvyoH8+yZQQ
+        DCOX8xz/YbD5INB8IIV4KAffRsif2m4Kw7IjTNT9FkWF+Ca2Nvj6/q2zCjlBLA4EHOG2Dn05RBYfc
+        pePgwhzPZmJqmEG9JHwzPPsxoCSR2Loz1a6yT185sbdqH5FvCNfnkYLd7bJsnsgV/R5OPo4T9wysO
+        6+MIxcV+y+CYdtxZAboVQhg6P2XyhIT57sV3PZ0Tn6+8b/38GKc4LRFV1DH0vNZOLM3oztpwRR9vJ
+        b8DlROi0AYXbgpm8IAwLTsyhaDNoGdMd6codbqs/A=;
+From:   Christian Schoenebeck <qemu_oss@crudebyte.com>
+To:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Alberto Faria <afaria@redhat.com>,
+        =?ISO-8859-1?Q?Marc=2DAndr=E9?= Lureau 
+        <marcandre.lureau@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Hannes Reinecke <hare@suse.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Vladimir Sementsov-Ogievskiy <vsementsov@yandex-team.ru>,
+        "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+        Peter Lieven <pl@kamp.de>, kvm@vger.kernel.org,
+        Xie Yongji <xieyongji@bytedance.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Jeff Cody <codyprime@gmail.com>,
+        Eric Blake <eblake@redhat.com>,
+        "Denis V. Lunev" <den@openvz.org>,
+        Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+        Philippe =?ISO-8859-1?Q?Mathieu=2DDaud=E9?= <f4bug@amsat.org>,
+        Stefan Weil <sw@weilnetz.de>, Klaus Jensen <its@irrelevant.dk>,
+        Laurent Vivier <lvivier@redhat.com>,
+        Alberto Garcia <berto@igalia.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Juan Quintela <quintela@redhat.com>,
+        David Hildenbrand <david@redhat.com>, qemu-block@nongnu.org,
+        Konstantin Kostiuk <kkostiuk@redhat.com>,
+        Kevin Wolf <kwolf@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Greg Kurz <groug@kaod.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>, Amit Shah <amit@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Raphael Norwitz <raphael.norwitz@nutanix.com>,
+        Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+        "Richard W.M. Jones" <rjones@redhat.com>,
+        John Snow <jsnow@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>
+Subject: Re: [RFC v2 00/10] Introduce an extensible static analyzer
+Date:   Sat, 15 Oct 2022 15:14:20 +0200
+Message-ID: <3662732.oTPJGMJ31K@silver>
+In-Reply-To: <CABgObfZD__Z=g3rvXxYVLcYb9wtkdQ14=mgMpsKoiVRxFCicUw@mail.gmail.com>
+References: <20220729130040.1428779-1-afaria@redhat.com>
+ <CABgObfZD__Z=g3rvXxYVLcYb9wtkdQ14=mgMpsKoiVRxFCicUw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Reproducer hints:
-1. Create ARM virt VM with pxb-pcie bus which adds
-   extra host bridges, with qemu command like:
+On Freitag, 14. Oktober 2022 00:00:58 CEST Paolo Bonzini wrote:
+[...]
+> However, it seems like a lost battle. :( Some of the optimizations are
+> stuff that you should just not have to do, for example only invoking
+> "x.kind" once (because it's a property not a field). Another issue is
+> that the bindings are incomplete, for example if you have a ForStmt
+> you just get a Cursor and you are not able to access individual
+> expressions. As a result, this for example is wrong in the
+> return-value-never-used test:
+> 
+>                 static int f(void) { return 42; }
+>                 static void g(void) {
+>                     for (f(); ; ) { } /* should warn, it doesn't */
+>                 }
+> 
+> and I couldn't fix it without breaking "for (; f(); )" because AFAICT
+> the two are indistinguishable.
 
-```
-  -device pxb-pcie,bus_nr=8,id=pci.x,numa_node=0,bus=pcie.0 \
-  -device pcie-root-port,..,bus=pci.x \
-  ...
-  -device pxb-pcie,bus_nr=37,id=pci.y,numa_node=1,bus=pcie.0 \
-  -device pcie-root-port,..,bus=pci.y \
-  ...
+You mean accessing the `for` loop's init expression, condition expression,
+increment statement? AFAICS those are accessible already by calling
+get_children() on the `for` statement cursor:
+https://github.com/llvm/llvm-project/blob/main/clang/bindings/python/clang/cindex.py#L1833
 
-```
-2. Perform VM migration which calls save/restore device tables;
-3. vgic its use 2 level device table.
+I just made a quick test with a short .c file and their demo script:
+https://github.com/llvm/llvm-project/blob/main/clang/bindings/python/examples/cindex/cindex-dump.py
 
-In that setup, we get a big "offset" between 2 device_ids (
-one is small, another is big), which makes unsigned "len" round
-up a big positive number, causing loop to continue with a
-bad GPA. For example,
+And I got all those components of the `for` loop as children of the `for`
+cursor.
 
-1. L1 table has 2 entries;
-2. and we are now scanning at L2 table entry index 2075 (pointed by L1
-first entry)
-3. if next device id is 9472, we will get a big offset: 7397;
-4. with signed 'len', 'len -= offset * esz', len will underflow to a
-positive number, mistakenly into next iteration with a bad GPA;
-(It should break the current L2 table scanning, and jump into the next
-L1 table entry)
-5. that bad GPA fails the guest read.
+Best regards,
+Christian Schoenebeck
 
-Fix it by stopping the L2 table scan when the next device id fits
-into next L1 table entry.
-
-Thanks Eric Auger's suggestion for the fix.
-
-Fixes: 920a7a8fa92a ("KVM: arm64: vgic-its: Add infrastructure for tableookup")
-Signed-off-by: Eric Ren <renzhengeek@gmail.com>
----
- arch/arm64/kvm/vgic/vgic-its.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 24d7778..733b530 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -2149,7 +2149,7 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
- 
- 	memset(entry, 0, esz);
- 
--	while (len > 0) {
-+	while (true) {
- 		int next_offset;
- 		size_t byte_offset;
- 
-@@ -2162,6 +2162,9 @@ static int scan_its_table(struct vgic_its *its, gpa_t base, int size, u32 esz,
- 			return next_offset;
- 
- 		byte_offset = next_offset * esz;
-+		if (byte_offset >= len)
-+			break;
-+
- 		id += next_offset;
- 		gpa += byte_offset;
- 		len -= byte_offset;
--- 
-1.8.3.1
 
