@@ -2,65 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 84C815FFCC4
-	for <lists+kvm@lfdr.de>; Sun, 16 Oct 2022 02:36:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EBB685FFCE5
+	for <lists+kvm@lfdr.de>; Sun, 16 Oct 2022 03:33:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229739AbiJPAgh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 15 Oct 2022 20:36:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35112 "EHLO
+        id S229583AbiJPBdX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 15 Oct 2022 21:33:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229504AbiJPAgg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 15 Oct 2022 20:36:36 -0400
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DD6136BF4;
-        Sat, 15 Oct 2022 17:36:34 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id bu30so13119244wrb.8;
-        Sat, 15 Oct 2022 17:36:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nb7jhOQ83X5yFK0Kl8+4+uBvzezoMeAfm0CCx4JCdq0=;
-        b=B86WMaHcU5f3DNE2nmMlDEFszaepoiCOnCfvnDiXcPlNz8bs1FLOpmPC+gysfviRFp
-         IhMk09hiXhY/oU4KoreF22ccQKbxjak1oBFiqM0f/mArjCYsixHzA+USOT7XUCixmO5k
-         jhLQ8AixtouEuhZVW3wICnx3PcQQ/lVS5qRMs1TwFkLud7JsZ7k8mVfYUvvzNV+wuxFn
-         aMXAHISa7QcbIPnOweBKD+VdZXW93yWYU263ujIIeYpnCOU3fQnNsJwHZiK8zaIMjaKo
-         Onksit2NHsJ/c2/LBToC/+UWLICpLlLGQnVf6tGBC2YXdSEuQNV+v/0O/a0QO5tWnE5k
-         YuRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Nb7jhOQ83X5yFK0Kl8+4+uBvzezoMeAfm0CCx4JCdq0=;
-        b=LxAwCMvCeSprlSo+lF/IWZfFwNB5AvH3DVRrcmJB5jvYbgQyRGhPIqTHL8IR5rvaZt
-         OmgqPY4pHQdHFBcc9R9N2hqfEL8Rz59wM8VxakaggJomfDOZRW3W1Uz5NlUNbLiQefou
-         fjexLYENe/lvX578ZZkjxvssD9+y/Uy5Vs9+qnDSH4YkoVBAndOBsGCrMe3s1wqYVNCr
-         53fI9t+3ThbowOmdlcZS4hnKah0xJyW+a27IVyitzTgMNdaL7uM01AinmDbywQZuw8Yy
-         oRqPxif6Blkn2D/061BiAd4/ySQk77mK6NxM0aZdaxp2rkuvRW4lS9cVJTy+OLxUzSEi
-         2qXw==
-X-Gm-Message-State: ACrzQf2A6F0KRc4zK5tmlcqbEassIXVohmI0wpaGpGPoyOJzYx7i0193
-        4e1/9uwknKDhipCdyG5Qd061w1/uvf7cMiWuuwoxxjg/
-X-Google-Smtp-Source: AMsMyM7YyagFVImlnMgJ9iTJwJJEAVduK+RBvuQCJuQ/WxuBobtqR1/d1O50wERhiOmMplmvul3Re3+uDVtR6ntARBE=
-X-Received: by 2002:a05:6000:1562:b0:231:1b02:3dbb with SMTP id
- 2-20020a056000156200b002311b023dbbmr2540675wrz.685.1665880592422; Sat, 15 Oct
- 2022 17:36:32 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAMdYzYrUOoTmBL2c_+=xLBMXg38Pp4hANnzqxoe1cVDDrFvqTA@mail.gmail.com>
- <Y0QnFHqrX2r/7oUz@rowland.harvard.edu> <CAMdYzYodS7Y4bZ+fzzAXMSiCfQHwMkmV8-C=b3FVUXDExavXgA@mail.gmail.com>
- <Y0QzrI92f9BL+91W@rowland.harvard.edu> <CAMdYzYpdLEKMSytGStvM2Gi+gkBY7GTUHZfoBt5X-2BEzLrfOw@mail.gmail.com>
- <Y0cuHHWL3r7+mpcq@rowland.harvard.edu>
-In-Reply-To: <Y0cuHHWL3r7+mpcq@rowland.harvard.edu>
-From:   Peter Geis <pgwipeout@gmail.com>
-Date:   Sat, 15 Oct 2022 20:36:19 -0400
-Message-ID: <CAMdYzYockLYigqgX+R28a_Xy=wGExGj-MXL79Jrc7Jv7B6Qh3w@mail.gmail.com>
-Subject: Re: [BUG] KVM USB passthrough did not claim interface before use
-To:     Alan Stern <stern@rowland.harvard.edu>
+        with ESMTP id S229463AbiJPBdV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 15 Oct 2022 21:33:21 -0400
+Received: from netrider.rowland.org (netrider.rowland.org [192.131.102.5])
+        by lindbergh.monkeyblade.net (Postfix) with SMTP id C965741D1D
+        for <kvm@vger.kernel.org>; Sat, 15 Oct 2022 18:33:19 -0700 (PDT)
+Received: (qmail 1125367 invoked by uid 1000); 15 Oct 2022 21:33:18 -0400
+Date:   Sat, 15 Oct 2022 21:33:18 -0400
+From:   Alan Stern <stern@rowland.harvard.edu>
+To:     Peter Geis <pgwipeout@gmail.com>
 Cc:     kvm@vger.kernel.org, linux-usb@vger.kernel.org
-Content-Type: multipart/mixed; boundary="000000000000f33c8205eb1c0ce0"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Subject: Re: [BUG] KVM USB passthrough did not claim interface before use
+Message-ID: <Y0tfXv2U7Izx5boj@rowland.harvard.edu>
+References: <CAMdYzYrUOoTmBL2c_+=xLBMXg38Pp4hANnzqxoe1cVDDrFvqTA@mail.gmail.com>
+ <Y0QnFHqrX2r/7oUz@rowland.harvard.edu>
+ <CAMdYzYodS7Y4bZ+fzzAXMSiCfQHwMkmV8-C=b3FVUXDExavXgA@mail.gmail.com>
+ <Y0QzrI92f9BL+91W@rowland.harvard.edu>
+ <CAMdYzYpdLEKMSytGStvM2Gi+gkBY7GTUHZfoBt5X-2BEzLrfOw@mail.gmail.com>
+ <Y0cuHHWL3r7+mpcq@rowland.harvard.edu>
+ <CAMdYzYockLYigqgX+R28a_Xy=wGExGj-MXL79Jrc7Jv7B6Qh3w@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMdYzYockLYigqgX+R28a_Xy=wGExGj-MXL79Jrc7Jv7B6Qh3w@mail.gmail.com>
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
+        HEADER_FROM_DIFFERENT_DOMAINS,SPF_HELO_PASS,SPF_PASS autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,406 +41,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---000000000000f33c8205eb1c0ce0
-Content-Type: text/plain; charset="UTF-8"
-
-On Wed, Oct 12, 2022 at 5:14 PM Alan Stern <stern@rowland.harvard.edu> wrote:
->
-> On Tue, Oct 11, 2022 at 02:49:09PM -0400, Peter Geis wrote:
-> > On Mon, Oct 10, 2022 at 11:01 AM Alan Stern <stern@rowland.harvard.edu> wrote:
->
-> > > > The bug is the device is unusable in passthrough, this is the only
-> > > > direction as to why. The question is which piece of software is
-> > > > causing it. I figure qemu is the most likely suspect, but they request
-> > > > bugs that are possibly in kvm start here. The cdc-acm driver is the
-> > > > least likely in my mind, as the other device that works also uses it.
-> > > > I just tested removing the other working device and only passing
-> > > > through the suspect device, and it still triggers the bug. So whatever
-> > > > the problem is, it's specific to this one device.
-> > >
-> > > Does anything of interest about the device show up in the virtual
-> > > machine's kernel log?
+On Sat, Oct 15, 2022 at 08:36:19PM -0400, Peter Geis wrote:
+> On Wed, Oct 12, 2022 at 5:14 PM Alan Stern <stern@rowland.harvard.edu> wrote:
 > >
-> > Nothing in regards to this no. The device enumerates, but any attempt
-> > to access it triggers the warning on the host only.
->
-> That's odd.  I don't see anything in the usbmon trace corresponding to
-> the warning messages about interface 1.  In fact, I don't see anything
-> at all in the trace relating to interface 1.
->
-> > > You can collect a usbmon trace on the host system to gather more
-> > > information about what the virtual machine is trying to do.  Your
-> > > previous post shows that the device is on bus 3, so before starting
-> > > qemu-kvm you would do:
-> > >
-> > >         cat /sys/kernel/debug/usb/usbmon/3u >mon.txt
-> > >
-> > > in a separate window.  Kill the cat process when the test is over and
-> > > post the output file.
-> > >
-> > > It'll help if you unplug the working device (and in fact as many devices
-> > > on bus 3 as is practical) before running the test, so that the trace
-> > > includes only traffic to the non-working device.
-> > >
-> > > For comparison, you could also acquire a usbmon trace of what happens
-> > > when you try using the device on a real, non-virtual machine.  For this
-> > > test you would start the trace before plugging in the device.
+> > There's one other thing you might try, although I'm not sure that it
+> > will provide any useful new information.  Instead of collecting a
+> > usbmon trace, collect a usbfs snoop log.  Before starting qemu, do:
 > >
-> > I've attached the requested file, but I have no idea how to read this.
-> > The file consists of the host when the device is plugged in until
-> > enumeration, left to idle for a few moments, then the guest is started
-> > and permitted to claim it.
->
-> Actually the device was plugged in and enumerated, and then about four
-> seconds later it spontaneously disconnected for a moment.  It was
-> enumerated again, and about three minutes after that it looks like the
-> virtual guest started up.  The guest reset the device and enumerated it,
-> but did nothing more.  In particular, the guest did not try to install
-> configuration 1, which is odd.  Or if it did try this, the attempt
-> wasn't visible in the usbmon trace.
->
-> I'm inclined to agree that the fault appears to lie in qemu-kvm.
->
-> >  No other device is on the bus.
->
-> In fact one other device was.  It identified itself with the strings
-> "PbAcid" and "CPS", but I can't tell more than that.  A UPS device,
-> perhaps?
->
-> There's one other thing you might try, although I'm not sure that it
-> will provide any useful new information.  Instead of collecting a
-> usbmon trace, collect a usbfs snoop log.  Before starting qemu, do:
->
->         echo 1 >/sys/module/usbcore/parameters/usbfs_snoop
->
-> This will cause the accesses performed via usbfs, including those
-> performed by the qemu process, to be printed in the kernel log.  (Not
-> all of the accesses, but the more important ones.)  Let's see what shows
-> up.
+> >         echo 1 >/sys/module/usbcore/parameters/usbfs_snoop
+> >
+> > This will cause the accesses performed via usbfs, including those
+> > performed by the qemu process, to be printed in the kernel log.  (Not
+> > all of the accesses, but the more important ones.)  Let's see what shows
+> > up.
+> 
+> So I built and tested the newest version of QEMU, and it exhibits the
+> same issue. I've also captured the log as requested and attached it
+> here.
 
-So I built and tested the newest version of QEMU, and it exhibits the
-same issue. I've also captured the log as requested and attached it
-here.
+Here's what appears to be the relevant parts of the log.
 
->
-> Alan Stern
+> [93190.933026] usb 3-6.2: opened by process 149607: rpc-libvirtd
+> [93191.006429] usb 3-6.2: opened by process 149605: qemu-system-x86
 
-Thanks again,
-Peter
+The device is opened by proces 194605, which is probably the main qemu
+process (or the main one in charge of USB I/O).  I assume this is the
+process which goes ahead with initialization and enumeration, because
+there are no indications of other processes opening the device.
 
---000000000000f33c8205eb1c0ce0
-Content-Type: text/plain; charset="US-ASCII"; name="usbfs_snoop.txt"
-Content-Disposition: attachment; filename="usbfs_snoop.txt"
-Content-Transfer-Encoding: base64
-Content-ID: <f_l9am8uv50>
-X-Attachment-Id: f_l9am8uv50
+> [93195.712484] usb 3-6.2: usbdev_do_ioctl: RESET
+> [93195.892482] usb 3-6.2: reset full-speed USB device number 70 using xhci_hcd
+> [93196.095050] cdc_acm 3-6.2:1.0: ttyACM0: USB ACM device
 
-WzkzMTkwLjg3NjUwMV0gYXVkaXQ6IHR5cGU9MTQwMCBhdWRpdCgxNjY1ODgwMzc0LjAwOToxNDgp
-OiBhcHBhcm1vcj0iU1RBVFVTIiBvcGVyYXRpb249InByb2ZpbGVfcmVwbGFjZSIgcHJvZmlsZT0i
-dW5jb25maW5lZCIgbmFtZT0ibGlidmlydC00YzU4NTVkZC0yZDYxLTQ1MmYtOGY5Zi01Y2M3OTY4
-MWE4YmUiIHBpZD0xNDk2MDIgY29tbT0iYXBwYXJtb3JfcGFyc2VyIg0KWzkzMTkwLjkzMzAyNl0g
-dXNiIDMtNi4yOiBvcGVuZWQgYnkgcHJvY2VzcyAxNDk2MDc6IHJwYy1saWJ2aXJ0ZA0KWzkzMTkx
-LjAwNjQyOV0gdXNiIDMtNi4yOiBvcGVuZWQgYnkgcHJvY2VzcyAxNDk2MDU6IHFlbXUtc3lzdGVt
-LXg4Ng0KWzkzMTkxLjAwNjQ2MV0gdXNiIDMtNi4yOiB1c2JkZXZfZG9faW9jdGw6IENPTlRST0wN
-Cls5MzE5MS4wMDY0NjVdIHVzYiAzLTYuMjogY29udHJvbCB1cmI6IGJSZXF1ZXN0VHlwZT04MCBi
-UmVxdWVzdD0wOCB3VmFsdWU9MDAwMCB3SW5kZXg9MDAwMCB3TGVuZ3RoPTAwMDENCls5MzE5MS4w
-MDY0NjhdIHVzYiAzLTYuMjogZXAwIGN0cmwtaW4sIGxlbmd0aCAxLCB0aW1lb3V0IDEwMDANCls5
-MzE5MS4wMDY1ODldIHVzYiAzLTYuMjogZXAwIGN0cmwtaW4sIGFjdHVhbF9sZW5ndGggMSwgc3Rh
-dHVzIDANCls5MzE5MS4wMDY1OTJdIGRhdGE6IDAwICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAuDQpbOTMxOTEuMDA2NjE1XSB1c2IgMy02LjI6IHVzYmRldl9kb19pb2N0bDog
-U1VCTUlUVVJCDQpbOTMxOTEuMDA2NjE2XSB1c2IgMy02LjI6IGNvbnRyb2wgdXJiOiBiUmVxdWVz
-dFR5cGU9ODAgYlJlcXVlc3Q9MDYgd1ZhbHVlPTAzMDAgd0luZGV4PTAwMDAgd0xlbmd0aD0wMDA0
-DQpbOTMxOTEuMDA2NjE5XSB1c2IgMy02LjI6IHVzZXJ1cmIgMDAwMDU2MDY5YmMyNzA0MCwgZXAw
-IGN0cmwtaW4sIGxlbmd0aCA0DQpbOTMxOTEuMDA2NzE2XSB1c2IgMy02LjI6IHVyYiBjb21wbGV0
-ZQ0KWzkzMTkxLjAwNjcxOF0gdXNiIDMtNi4yOiB1c2VydXJiIDAwMDA1NjA2OWJjMjcwNDAsIGVw
-MCBjdHJsLWluLCBhY3R1YWxfbGVuZ3RoIDQgc3RhdHVzIDANCls5MzE5MS4wMDY3MjFdIGRhdGE6
-IDA0IDAzIDA5IDA0ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAuLi4uDQpbOTMxOTEuMDA2
-NzI5XSB1c2IgMy02LjI6IHVzYmRldl9kb19pb2N0bDogUkVBUFVSQk5ERUxBWQ0KWzkzMTkxLjAw
-NjczMV0gdXNiIDMtNi4yOiByZWFwIDAwMDA1NjA2OWJjMjcwNDANCls5MzE5MS4wMDY3MzRdIHVz
-YiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBSRUFQVVJCTkRFTEFZDQpbOTMxOTEuMDA2NzM3XSB1
-c2IgMy02LjI6IHVzYmRldl9kb19pb2N0bDogU1VCTUlUVVJCDQpbOTMxOTEuMDA2NzM4XSB1c2Ig
-My02LjI6IGNvbnRyb2wgdXJiOiBiUmVxdWVzdFR5cGU9ODAgYlJlcXVlc3Q9MDYgd1ZhbHVlPTAz
-MDIgd0luZGV4PTA0MDkgd0xlbmd0aD0wMGZmDQpbOTMxOTEuMDA2NzQwXSB1c2IgMy02LjI6IHVz
-ZXJ1cmIgMDAwMDU2MDY5YmMyNzA0MCwgZXAwIGN0cmwtaW4sIGxlbmd0aCAyNTUNCls5MzE5MS4w
-MDY4NjFdIHVzYiAzLTYuMjogdXJiIGNvbXBsZXRlDQpbOTMxOTEuMDA2ODYzXSB1c2IgMy02LjI6
-IHVzZXJ1cmIgMDAwMDU2MDY5YmMyNzA0MCwgZXAwIGN0cmwtaW4sIGFjdHVhbF9sZW5ndGggMjAg
-c3RhdHVzIDANCls5MzE5MS4wMDY4NjVdIGRhdGE6IDE0IDAzIDQzIDAwIDZmIDAwIDZlIDAwIDQy
-IDAwIDY1IDAwIDY1IDAwIDIwIDAwIDQ5IDAwIDQ5IDAwICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAuLkMuby5uLkIuZS5lLiAuSS5JLg0KWzkzMTkxLjAwNjg3Ml0gdXNiIDMt
-Ni4yOiB1c2JkZXZfZG9faW9jdGw6IFJFQVBVUkJOREVMQVkNCls5MzE5MS4wMDY4NzRdIHVzYiAz
-LTYuMjogcmVhcCAwMDAwNTYwNjliYzI3MDQwDQpbOTMxOTEuMDA2ODc3XSB1c2IgMy02LjI6IHVz
-YmRldl9kb19pb2N0bDogUkVBUFVSQk5ERUxBWQ0KWzkzMTkzLjc5NzA1NV0gdXNiIDMtNi4yOiB1
-c2JkZXZfZG9faW9jdGw6IFNVQk1JVFVSQg0KWzkzMTkzLjc5NzA2MF0gdXNiIDMtNi4yOiBjb250
-cm9sIHVyYjogYlJlcXVlc3RUeXBlPTgwIGJSZXF1ZXN0PTA2IHdWYWx1ZT0wMTAwIHdJbmRleD0w
-MDAwIHdMZW5ndGg9MDAwOA0KWzkzMTkzLjc5NzA2NF0gdXNiIDMtNi4yOiB1c2VydXJiIDAwMDA3
-ZmRkNTQ2NmVhNTAsIGVwMCBjdHJsLWluLCBsZW5ndGggOA0KWzkzMTkzLjc5NzIwMV0gdXNiIDMt
-Ni4yOiB1cmIgY29tcGxldGUNCls5MzE5My43OTcyMDNdIHVzYiAzLTYuMjogdXNlcnVyYiAwMDAw
-N2ZkZDU0NjZlYTUwLCBlcDAgY3RybC1pbiwgYWN0dWFsX2xlbmd0aCA4IHN0YXR1cyAwDQpbOTMx
-OTMuNzk3MjA2XSBkYXRhOiAxMiAwMSAwMSAwMiAwMiAwMCAwMCA0MCAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-Li4uLi4uLkANCls5MzE5My43OTcyNDhdIHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBSRUFQ
-VVJCTkRFTEFZDQpbOTMxOTMuNzk3MjUwXSB1c2IgMy02LjI6IHJlYXAgMDAwMDdmZGQ1NDY2ZWE1
-MA0KWzkzMTkzLjc5NzI1OV0gdXNiIDMtNi4yOiB1c2JkZXZfZG9faW9jdGw6IFJFQVBVUkJOREVM
-QVkNCls5MzE5My43OTczNzhdIHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBTVUJNSVRVUkIN
-Cls5MzE5My43OTczODBdIHVzYiAzLTYuMjogY29udHJvbCB1cmI6IGJSZXF1ZXN0VHlwZT04MCBi
-UmVxdWVzdD0wNiB3VmFsdWU9MDEwMCB3SW5kZXg9MDAwMCB3TGVuZ3RoPTAwMTINCls5MzE5My43
-OTczODRdIHVzYiAzLTYuMjogdXNlcnVyYiAwMDAwN2ZkZDU1MTk1MDYwLCBlcDAgY3RybC1pbiwg
-bGVuZ3RoIDE4DQpbOTMxOTMuNzk3NTYxXSB1c2IgMy02LjI6IHVyYiBjb21wbGV0ZQ0KWzkzMTkz
-Ljc5NzU2M10gdXNiIDMtNi4yOiB1c2VydXJiIDAwMDA3ZmRkNTUxOTUwNjAsIGVwMCBjdHJsLWlu
-LCBhY3R1YWxfbGVuZ3RoIDE4IHN0YXR1cyAwDQpbOTMxOTMuNzk3NTY1XSBkYXRhOiAxMiAwMSAw
-MSAwMiAwMiAwMCAwMCA0MCBmMSAxYyAzMCAwMCAwMCAwMSAwMSAwMiAwMyAwMSAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgLi4uLi4uLkAuLjAuLi4uLi4uDQpbOTMx
-OTMuNzk3NTk3XSB1c2IgMy02LjI6IHVzYmRldl9kb19pb2N0bDogUkVBUFVSQk5ERUxBWQ0KWzkz
-MTkzLjc5NzU5OV0gdXNiIDMtNi4yOiByZWFwIDAwMDA3ZmRkNTUxOTUwNjANCls5MzE5My43OTc2
-MDddIHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBSRUFQVVJCTkRFTEFZDQpbOTMxOTMuNzk3
-Njc0XSB1c2IgMy02LjI6IHVzYmRldl9kb19pb2N0bDogU1VCTUlUVVJCDQpbOTMxOTMuNzk3Njc2
-XSB1c2IgMy02LjI6IGNvbnRyb2wgdXJiOiBiUmVxdWVzdFR5cGU9ODAgYlJlcXVlc3Q9MDYgd1Zh
-bHVlPTAyMDAgd0luZGV4PTAwMDAgd0xlbmd0aD0wMDA4DQpbOTMxOTMuNzk3Njc4XSB1c2IgMy02
-LjI6IHVzZXJ1cmIgMDAwMDdmZGQ1NTEwNDFjMCwgZXAwIGN0cmwtaW4sIGxlbmd0aCA4DQpbOTMx
-OTMuNzk3ODEyXSB1c2IgMy02LjI6IHVyYiBjb21wbGV0ZQ0KWzkzMTkzLjc5NzgxNF0gdXNiIDMt
-Ni4yOiB1c2VydXJiIDAwMDA3ZmRkNTUxMDQxYzAsIGVwMCBjdHJsLWluLCBhY3R1YWxfbGVuZ3Ro
-IDggc3RhdHVzIDANCls5MzE5My43OTc4MTddIGRhdGE6IDA5IDAyIDQzIDAwIDAyIDAxIDAwIDgw
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAuLkMuLi4uLg0KWzkzMTkzLjc5NzgzMF0gdXNiIDMtNi4yOiB1c2Jk
-ZXZfZG9faW9jdGw6IFJFQVBVUkJOREVMQVkNCls5MzE5My43OTc4MzJdIHVzYiAzLTYuMjogcmVh
-cCAwMDAwN2ZkZDU1MTA0MWMwDQpbOTMxOTMuNzk3ODQ3XSB1c2IgMy02LjI6IHVzYmRldl9kb19p
-b2N0bDogUkVBUFVSQk5ERUxBWQ0KWzkzMTkzLjc5Nzg5NF0gdXNiIDMtNi4yOiB1c2JkZXZfZG9f
-aW9jdGw6IFNVQk1JVFVSQg0KWzkzMTkzLjc5Nzg5Nl0gdXNiIDMtNi4yOiBjb250cm9sIHVyYjog
-YlJlcXVlc3RUeXBlPTgwIGJSZXF1ZXN0PTA2IHdWYWx1ZT0wMjAwIHdJbmRleD0wMDAwIHdMZW5n
-dGg9MDA0Mw0KWzkzMTkzLjc5Nzg5OF0gdXNiIDMtNi4yOiB1c2VydXJiIDAwMDA3ZmRkNTQ2NmVh
-NTAsIGVwMCBjdHJsLWluLCBsZW5ndGggNjcNCls5MzE5My43OTgxMDddIHVzYiAzLTYuMjogdXJi
-IGNvbXBsZXRlDQpbOTMxOTMuNzk4MTA5XSB1c2IgMy02LjI6IHVzZXJ1cmIgMDAwMDdmZGQ1NDY2
-ZWE1MCwgZXAwIGN0cmwtaW4sIGFjdHVhbF9sZW5ndGggNjcgc3RhdHVzIDANCls5MzE5My43OTgx
-MTJdIGRhdGE6IDA5IDAyIDQzIDAwIDAyIDAxIDAwIDgwIDMyIDA5IDA0IDAwIDAwIDAxIDAyIDAy
-IDAxIDAwIDA1IDI0IDAwIDEwIDAxIDA0IDI0IDAyIDAyIDA1IDI0IDA2IDAwIDAxICAuLkMuLi4u
-LjIuLi4uLi4uLi4uJC4uLi4kLi4uJC4uLg0KWzkzMTkzLjc5ODExM10gZGF0YTogMDUgMjQgMDEg
-MDMgMDEgMDcgMDUgODMgMDMgNDAgMDAgMTAgMDkgMDQgMDEgMDAgMDIgMGEgMDAgMDAgMDAgMDcg
-MDUgODEgMDIgNDAgMDAgMDAgMDcgMDUgMDIgMDIgIC4kLi4uLi4uLkAuLi4uLi4uLi4uLi4uLi5A
-Li4uLi4uDQpbOTMxOTMuNzk4MTE0XSBkYXRhOiA0MCAwMCAwMCAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgQC4uDQpbOTMxOTMuNzk4MTI3XSB1c2IgMy02LjI6IHVzYmRldl9kb19pb2N0
-bDogUkVBUFVSQk5ERUxBWQ0KWzkzMTkzLjc5ODEyOV0gdXNiIDMtNi4yOiByZWFwIDAwMDA3ZmRk
-NTQ2NmVhNTANCls5MzE5My43OTgxNDNdIHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBSRUFQ
-VVJCTkRFTEFZDQpbOTMxOTMuNzk4MTk3XSB1c2IgMy02LjI6IHVzYmRldl9kb19pb2N0bDogU1VC
-TUlUVVJCDQpbOTMxOTMuNzk4MTk5XSB1c2IgMy02LjI6IGNvbnRyb2wgdXJiOiBiUmVxdWVzdFR5
-cGU9ODAgYlJlcXVlc3Q9MDYgd1ZhbHVlPTAzMDAgd0luZGV4PTAwMDAgd0xlbmd0aD0wMDAyDQpb
-OTMxOTMuNzk4MjAxXSB1c2IgMy02LjI6IHVzZXJ1cmIgMDAwMDdmZGQ1NTE5NTA2MCwgZXAwIGN0
-cmwtaW4sIGxlbmd0aCAyDQpbOTMxOTMuNzk4MzM1XSB1c2IgMy02LjI6IHVyYiBjb21wbGV0ZQ0K
-WzkzMTkzLjc5ODMzN10gdXNiIDMtNi4yOiB1c2VydXJiIDAwMDA3ZmRkNTUxOTUwNjAsIGVwMCBj
-dHJsLWluLCBhY3R1YWxfbGVuZ3RoIDIgc3RhdHVzIDANCls5MzE5My43OTgzMzldIGRhdGE6IDA0
-IDAzICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAuLg0KWzkzMTkzLjc5ODM1Ml0g
-dXNiIDMtNi4yOiB1c2JkZXZfZG9faW9jdGw6IFJFQVBVUkJOREVMQVkNCls5MzE5My43OTgzNTRd
-IHVzYiAzLTYuMjogcmVhcCAwMDAwN2ZkZDU1MTk1MDYwDQpbOTMxOTMuNzk4MzY4XSB1c2IgMy02
-LjI6IHVzYmRldl9kb19pb2N0bDogUkVBUFVSQk5ERUxBWQ0KWzkzMTkzLjc5ODQxMl0gdXNiIDMt
-Ni4yOiB1c2JkZXZfZG9faW9jdGw6IFNVQk1JVFVSQg0KWzkzMTkzLjc5ODQxNF0gdXNiIDMtNi4y
-OiBjb250cm9sIHVyYjogYlJlcXVlc3RUeXBlPTgwIGJSZXF1ZXN0PTA2IHdWYWx1ZT0wMzAwIHdJ
-bmRleD0wMDAwIHdMZW5ndGg9MDAwNA0KWzkzMTkzLjc5ODQxNV0gdXNiIDMtNi4yOiB1c2VydXJi
-IDAwMDA3ZmRkNTUxMDQxYzAsIGVwMCBjdHJsLWluLCBsZW5ndGggNA0KWzkzMTkzLjc5ODU4OV0g
-dXNiIDMtNi4yOiB1cmIgY29tcGxldGUNCls5MzE5My43OTg1OTFdIHVzYiAzLTYuMjogdXNlcnVy
-YiAwMDAwN2ZkZDU1MTA0MWMwLCBlcDAgY3RybC1pbiwgYWN0dWFsX2xlbmd0aCA0IHN0YXR1cyAw
-DQpbOTMxOTMuNzk4NTkzXSBkYXRhOiAwNCAwMyAwOSAwNCAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgLi4uLg0KWzkzMTkzLjc5ODYwNl0gdXNiIDMtNi4yOiB1c2JkZXZfZG9faW9jdGw6IFJF
-QVBVUkJOREVMQVkNCls5MzE5My43OTg2MDhdIHVzYiAzLTYuMjogcmVhcCAwMDAwN2ZkZDU1MTA0
-MWMwDQpbOTMxOTMuNzk4NjIyXSB1c2IgMy02LjI6IHVzYmRldl9kb19pb2N0bDogUkVBUFVSQk5E
-RUxBWQ0KWzkzMTk1LjcxMjQ4NF0gdXNiIDMtNi4yOiB1c2JkZXZfZG9faW9jdGw6IFJFU0VUDQpb
-OTMxOTUuODkyNDgyXSB1c2IgMy02LjI6IHJlc2V0IGZ1bGwtc3BlZWQgVVNCIGRldmljZSBudW1i
-ZXIgNzAgdXNpbmcgeGhjaV9oY2QNCls5MzE5Ni4wOTUwNTBdIGNkY19hY20gMy02LjI6MS4wOiB0
-dHlBQ00wOiBVU0IgQUNNIGRldmljZQ0KWzkzMTk2LjIxNzA0MF0gdXNiIDMtNi4yOiB1c2JkZXZf
-ZG9faW9jdGw6IFNVQk1JVFVSQg0KWzkzMTk2LjIxNzA0N10gdXNiIDMtNi4yOiBjb250cm9sIHVy
-YjogYlJlcXVlc3RUeXBlPTgwIGJSZXF1ZXN0PTA2IHdWYWx1ZT0wMTAwIHdJbmRleD0wMDAwIHdM
-ZW5ndGg9MDA0MA0KWzkzMTk2LjIxNzA1Ml0gdXNiIDMtNi4yOiB1c2VydXJiIDAwMDA3ZmRkNTRi
-MTc1ZDAsIGVwMCBjdHJsLWluLCBsZW5ndGggNjQNCls5MzE5Ni4yMTcxODldIHVzYiAzLTYuMjog
-dXJiIGNvbXBsZXRlDQpbOTMxOTYuMjE3MTkxXSB1c2IgMy02LjI6IHVzZXJ1cmIgMDAwMDdmZGQ1
-NGIxNzVkMCwgZXAwIGN0cmwtaW4sIGFjdHVhbF9sZW5ndGggMTggc3RhdHVzIDANCls5MzE5Ni4y
-MTcxOTRdIGRhdGE6IDEyIDAxIDAxIDAyIDAyIDAwIDAwIDQwIGYxIDFjIDMwIDAwIDAwIDAxIDAx
-IDAyIDAzIDAxICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAuLi4u
-Li4uQC4uMC4uLi4uLi4NCls5MzE5Ni4yMTcyMDVdIHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3Rs
-OiBSRUFQVVJCTkRFTEFZDQpbOTMxOTYuMjE3MjA3XSB1c2IgMy02LjI6IHJlYXAgMDAwMDdmZGQ1
-NGIxNzVkMA0KWzkzMTk2LjIxNzIyMl0gdXNiIDMtNi4yOiB1c2JkZXZfZG9faW9jdGw6IFJFQVBV
-UkJOREVMQVkNCls5MzE5Ni4zNDY3NjNdIHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBTVUJN
-SVRVUkINCls5MzE5Ni4zNDY3NzldIHVzYiAzLTYuMjogY29udHJvbCB1cmI6IGJSZXF1ZXN0VHlw
-ZT04MCBiUmVxdWVzdD0wNiB3VmFsdWU9MDEwMCB3SW5kZXg9MDAwMCB3TGVuZ3RoPTAwMTINCls5
-MzE5Ni4zNDY3ODVdIHVzYiAzLTYuMjogdXNlcnVyYiAwMDAwN2ZkZDU0YjE3NWQwLCBlcDAgY3Ry
-bC1pbiwgbGVuZ3RoIDE4DQpbOTMxOTYuMzQ2OTI1XSB1c2IgMy02LjI6IHVyYiBjb21wbGV0ZQ0K
-WzkzMTk2LjM0NjkyOF0gdXNiIDMtNi4yOiB1c2VydXJiIDAwMDA3ZmRkNTRiMTc1ZDAsIGVwMCBj
-dHJsLWluLCBhY3R1YWxfbGVuZ3RoIDE4IHN0YXR1cyAwDQpbOTMxOTYuMzQ2OTMzXSBkYXRhOiAx
-MiAwMSAwMSAwMiAwMiAwMCAwMCA0MCBmMSAxYyAzMCAwMCAwMCAwMSAwMSAwMiAwMyAwMSAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgLi4uLi4uLkAuLjAuLi4uLi4u
-DQpbOTMxOTYuMzQ2OTQ3XSB1c2IgMy02LjI6IHVzYmRldl9kb19pb2N0bDogUkVBUFVSQk5ERUxB
-WQ0KWzkzMTk2LjM0Njk0OV0gdXNiIDMtNi4yOiByZWFwIDAwMDA3ZmRkNTRiMTc1ZDANCls5MzE5
-Ni4zNDY5NjhdIHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBSRUFQVVJCTkRFTEFZDQpbOTMx
-OTYuMzQ3MDM1XSB1c2IgMy02LjI6IHVzYmRldl9kb19pb2N0bDogU1VCTUlUVVJCDQpbOTMxOTYu
-MzQ3MDM5XSB1c2IgMy02LjI6IGNvbnRyb2wgdXJiOiBiUmVxdWVzdFR5cGU9ODAgYlJlcXVlc3Q9
-MDYgd1ZhbHVlPTBmMDAgd0luZGV4PTAwMDAgd0xlbmd0aD0wMDA1DQpbOTMxOTYuMzQ3MDQyXSB1
-c2IgMy02LjI6IHVzZXJ1cmIgMDAwMDdmZGQ1NTE4Zjg2MCwgZXAwIGN0cmwtaW4sIGxlbmd0aCA1
-DQpbOTMxOTYuMzQ3MTU0XSB1c2IgMy02LjI6IHVyYiBjb21wbGV0ZQ0KWzkzMTk2LjM0NzE1Nl0g
-dXNiIDMtNi4yOiB1c2VydXJiIDAwMDA3ZmRkNTUxOGY4NjAsIGVwMCBjdHJsLWluLCBhY3R1YWxf
-bGVuZ3RoIDUgc3RhdHVzIDANCls5MzE5Ni4zNDcxNTldIGRhdGE6IDA1IDBmIDBjIDAwIDAxICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAuLi4uLg0KWzkzMTk2LjM0NzE2N10gdXNiIDMtNi4yOiB1
-c2JkZXZfZG9faW9jdGw6IFJFQVBVUkJOREVMQVkNCls5MzE5Ni4zNDcxNjhdIHVzYiAzLTYuMjog
-cmVhcCAwMDAwN2ZkZDU1MThmODYwDQpbOTMxOTYuMzQ3MTc0XSB1c2IgMy02LjI6IHVzYmRldl9k
-b19pb2N0bDogUkVBUFVSQk5ERUxBWQ0KWzkzMTk2LjM0NzIzN10gdXNiIDMtNi4yOiB1c2JkZXZf
-ZG9faW9jdGw6IFNVQk1JVFVSQg0KWzkzMTk2LjM0NzI0MF0gdXNiIDMtNi4yOiBjb250cm9sIHVy
-YjogYlJlcXVlc3RUeXBlPTgwIGJSZXF1ZXN0PTA2IHdWYWx1ZT0wZjAwIHdJbmRleD0wMDAwIHdM
-ZW5ndGg9MDAwYw0KWzkzMTk2LjM0NzI0NF0gdXNiIDMtNi4yOiB1c2VydXJiIDAwMDA3ZmRkNTQx
-NmUyZjAsIGVwMCBjdHJsLWluLCBsZW5ndGggMTINCls5MzE5Ni4zNDczNTldIHVzYiAzLTYuMjog
-dXJiIGNvbXBsZXRlDQpbOTMxOTYuMzQ3MzYyXSB1c2IgMy02LjI6IHVzZXJ1cmIgMDAwMDdmZGQ1
-NDE2ZTJmMCwgZXAwIGN0cmwtaW4sIGFjdHVhbF9sZW5ndGggMTIgc3RhdHVzIDANCls5MzE5Ni4z
-NDczNjRdIGRhdGE6IDA1IDBmIDBjIDAwIDAxIDA3IDEwIDAyIDAyIDAwIDAwIDAwICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAuLi4u
-Li4uLi4uLi4NCls5MzE5Ni4zNDczNzddIHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBSRUFQ
-VVJCTkRFTEFZDQpbOTMxOTYuMzQ3Mzc4XSB1c2IgMy02LjI6IHJlYXAgMDAwMDdmZGQ1NDE2ZTJm
-MA0KWzkzMTk2LjM0NzM4NV0gdXNiIDMtNi4yOiB1c2JkZXZfZG9faW9jdGw6IFJFQVBVUkJOREVM
-QVkNCls5MzE5Ni4zNDc0NDldIHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBTVUJNSVRVUkIN
-Cls5MzE5Ni4zNDc0NTNdIHVzYiAzLTYuMjogY29udHJvbCB1cmI6IGJSZXF1ZXN0VHlwZT04MCBi
-UmVxdWVzdD0wNiB3VmFsdWU9MDYwMCB3SW5kZXg9MDAwMCB3TGVuZ3RoPTAwMGENCls5MzE5Ni4z
-NDc0NTddIHVzYiAzLTYuMjogdXNlcnVyYiAwMDAwN2ZkZDU0YjE3NWQwLCBlcDAgY3RybC1pbiwg
-bGVuZ3RoIDEwDQpbOTMxOTYuMzQ3NjQ4XSB1c2IgMy02LjI6IHVyYiBjb21wbGV0ZQ0KWzkzMTk2
-LjM0NzY1MF0gdXNiIDMtNi4yOiB1c2VydXJiIDAwMDA3ZmRkNTRiMTc1ZDAsIGVwMCBjdHJsLWlu
-LCBhY3R1YWxfbGVuZ3RoIDAgc3RhdHVzIC0zMg0KWzkzMTk2LjM0NzY2MF0gdXNiIDMtNi4yOiB1
-c2JkZXZfZG9faW9jdGw6IFJFQVBVUkJOREVMQVkNCls5MzE5Ni4zNDc2NjFdIHVzYiAzLTYuMjog
-cmVhcCAwMDAwN2ZkZDU0YjE3NWQwDQpbOTMxOTYuMzQ3NjY2XSB1c2IgMy02LjI6IHVzYmRldl9k
-b19pb2N0bDogUkVBUFVSQk5ERUxBWQ0KWzkzMTk2LjM0Nzc1OF0gdXNiIDMtNi4yOiB1c2JkZXZf
-ZG9faW9jdGw6IFNVQk1JVFVSQg0KWzkzMTk2LjM0Nzc2Ml0gdXNiIDMtNi4yOiBjb250cm9sIHVy
-YjogYlJlcXVlc3RUeXBlPTgwIGJSZXF1ZXN0PTA2IHdWYWx1ZT0wNjAwIHdJbmRleD0wMDAwIHdM
-ZW5ndGg9MDAwYQ0KWzkzMTk2LjM0Nzc2N10gdXNiIDMtNi4yOiB1c2VydXJiIDAwMDA3ZmRkNTUx
-OGY4NjAsIGVwMCBjdHJsLWluLCBsZW5ndGggMTANCls5MzE5Ni4zNDc5MzZdIHVzYiAzLTYuMjog
-dXJiIGNvbXBsZXRlDQpbOTMxOTYuMzQ3OTM4XSB1c2IgMy02LjI6IHVzZXJ1cmIgMDAwMDdmZGQ1
-NTE4Zjg2MCwgZXAwIGN0cmwtaW4sIGFjdHVhbF9sZW5ndGggMCBzdGF0dXMgLTMyDQpbOTMxOTYu
-MzQ3OTQ2XSB1c2IgMy02LjI6IHVzYmRldl9kb19pb2N0bDogUkVBUFVSQk5ERUxBWQ0KWzkzMTk2
-LjM0Nzk0N10gdXNiIDMtNi4yOiByZWFwIDAwMDA3ZmRkNTUxOGY4NjANCls5MzE5Ni4zNDc5NTJd
-IHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBSRUFQVVJCTkRFTEFZDQpbOTMxOTYuMzQ4NDg2
-XSB1c2IgMy02LjI6IHVzYmRldl9kb19pb2N0bDogU1VCTUlUVVJCDQpbOTMxOTYuMzQ4NDkwXSB1
-c2IgMy02LjI6IGNvbnRyb2wgdXJiOiBiUmVxdWVzdFR5cGU9ODAgYlJlcXVlc3Q9MDYgd1ZhbHVl
-PTA2MDAgd0luZGV4PTAwMDAgd0xlbmd0aD0wMDBhDQpbOTMxOTYuMzQ4NDk0XSB1c2IgMy02LjI6
-IHVzZXJ1cmIgMDAwMDdmZGQ1NDE2ZTJmMCwgZXAwIGN0cmwtaW4sIGxlbmd0aCAxMA0KWzkzMTk2
-LjM0ODY2Nl0gdXNiIDMtNi4yOiB1cmIgY29tcGxldGUNCls5MzE5Ni4zNDg2NjhdIHVzYiAzLTYu
-MjogdXNlcnVyYiAwMDAwN2ZkZDU0MTZlMmYwLCBlcDAgY3RybC1pbiwgYWN0dWFsX2xlbmd0aCAw
-IHN0YXR1cyAtMzINCls5MzE5Ni4zNDg3MDNdIHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBS
-RUFQVVJCTkRFTEFZDQpbOTMxOTYuMzQ4NzA1XSB1c2IgMy02LjI6IHJlYXAgMDAwMDdmZGQ1NDE2
-ZTJmMA0KWzkzMTk2LjM0ODcxNV0gdXNiIDMtNi4yOiB1c2JkZXZfZG9faW9jdGw6IFJFQVBVUkJO
-REVMQVkNCls5MzE5Ni4zNTA5NTJdIHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBTVUJNSVRV
-UkINCls5MzE5Ni4zNTA5NjBdIHVzYiAzLTYuMjogY29udHJvbCB1cmI6IGJSZXF1ZXN0VHlwZT04
-MCBiUmVxdWVzdD0wNiB3VmFsdWU9MDIwMCB3SW5kZXg9MDAwMCB3TGVuZ3RoPTAwMDkNCls5MzE5
-Ni4zNTA5NjRdIHVzYiAzLTYuMjogdXNlcnVyYiAwMDAwN2ZkZDU0YjE3NWQwLCBlcDAgY3RybC1p
-biwgbGVuZ3RoIDkNCls5MzE5Ni4zNTExMjldIHVzYiAzLTYuMjogdXJiIGNvbXBsZXRlDQpbOTMx
-OTYuMzUxMTMzXSB1c2IgMy02LjI6IHVzZXJ1cmIgMDAwMDdmZGQ1NGIxNzVkMCwgZXAwIGN0cmwt
-aW4sIGFjdHVhbF9sZW5ndGggOSBzdGF0dXMgMA0KWzkzMTk2LjM1MTEzN10gZGF0YTogMDkgMDIg
-NDMgMDAgMDIgMDEgMDAgODAgMzIgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC4uQy4uLi4uMg0KWzkzMTk2LjM1MTE2
-NF0gdXNiIDMtNi4yOiB1c2JkZXZfZG9faW9jdGw6IFJFQVBVUkJOREVMQVkNCls5MzE5Ni4zNTEx
-NjddIHVzYiAzLTYuMjogcmVhcCAwMDAwN2ZkZDU0YjE3NWQwDQpbOTMxOTYuMzUxMTg5XSB1c2Ig
-My02LjI6IHVzYmRldl9kb19pb2N0bDogUkVBUFVSQk5ERUxBWQ0KWzkzMTk2LjM1MTMxNV0gdXNi
-IDMtNi4yOiB1c2JkZXZfZG9faW9jdGw6IFNVQk1JVFVSQg0KWzkzMTk2LjM1MTMxOF0gdXNiIDMt
-Ni4yOiBjb250cm9sIHVyYjogYlJlcXVlc3RUeXBlPTgwIGJSZXF1ZXN0PTA2IHdWYWx1ZT0wMjAw
-IHdJbmRleD0wMDAwIHdMZW5ndGg9MDA0Mw0KWzkzMTk2LjM1MTMyMl0gdXNiIDMtNi4yOiB1c2Vy
-dXJiIDAwMDA3ZmRkNTUxOGY4NjAsIGVwMCBjdHJsLWluLCBsZW5ndGggNjcNCls5MzE5Ni4zNTE1
-MzddIHVzYiAzLTYuMjogdXJiIGNvbXBsZXRlDQpbOTMxOTYuMzUxNTQwXSB1c2IgMy02LjI6IHVz
-ZXJ1cmIgMDAwMDdmZGQ1NTE4Zjg2MCwgZXAwIGN0cmwtaW4sIGFjdHVhbF9sZW5ndGggNjcgc3Rh
-dHVzIDANCls5MzE5Ni4zNTE1NDNdIGRhdGE6IDA5IDAyIDQzIDAwIDAyIDAxIDAwIDgwIDMyIDA5
-IDA0IDAwIDAwIDAxIDAyIDAyIDAxIDAwIDA1IDI0IDAwIDEwIDAxIDA0IDI0IDAyIDAyIDA1IDI0
-IDA2IDAwIDAxICAuLkMuLi4uLjIuLi4uLi4uLi4uJC4uLi4kLi4uJC4uLg0KWzkzMTk2LjM1MTU0
-NV0gZGF0YTogMDUgMjQgMDEgMDMgMDEgMDcgMDUgODMgMDMgNDAgMDAgMTAgMDkgMDQgMDEgMDAg
-MDIgMGEgMDAgMDAgMDAgMDcgMDUgODEgMDIgNDAgMDAgMDAgMDcgMDUgMDIgMDIgIC4kLi4uLi4u
-LkAuLi4uLi4uLi4uLi4uLi5ALi4uLi4uDQpbOTMxOTYuMzUxNTQ3XSBkYXRhOiA0MCAwMCAwMCAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgQC4uDQpbOTMxOTYuMzUxNTYyXSB1c2IgMy02
-LjI6IHVzYmRldl9kb19pb2N0bDogUkVBUFVSQk5ERUxBWQ0KWzkzMTk2LjM1MTU2NF0gdXNiIDMt
-Ni4yOiByZWFwIDAwMDA3ZmRkNTUxOGY4NjANCls5MzE5Ni4zNTE1NzNdIHVzYiAzLTYuMjogdXNi
-ZGV2X2RvX2lvY3RsOiBSRUFQVVJCTkRFTEFZDQpbOTMxOTYuMzUxNjY2XSB1c2IgMy02LjI6IHVz
-YmRldl9kb19pb2N0bDogU1VCTUlUVVJCDQpbOTMxOTYuMzUxNjY4XSB1c2IgMy02LjI6IGNvbnRy
-b2wgdXJiOiBiUmVxdWVzdFR5cGU9ODAgYlJlcXVlc3Q9MDYgd1ZhbHVlPTAzMDAgd0luZGV4PTAw
-MDAgd0xlbmd0aD0wMGZmDQpbOTMxOTYuMzUxNjcyXSB1c2IgMy02LjI6IHVzZXJ1cmIgMDAwMDdm
-ZGQ1NDE2ZTJmMCwgZXAwIGN0cmwtaW4sIGxlbmd0aCAyNTUNCls5MzE5Ni4zNTE3ODhdIHVzYiAz
-LTYuMjogdXJiIGNvbXBsZXRlDQpbOTMxOTYuMzUxNzkxXSB1c2IgMy02LjI6IHVzZXJ1cmIgMDAw
-MDdmZGQ1NDE2ZTJmMCwgZXAwIGN0cmwtaW4sIGFjdHVhbF9sZW5ndGggNCBzdGF0dXMgMA0KWzkz
-MTk2LjM1MTc5NF0gZGF0YTogMDQgMDMgMDkgMDQgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IC4uLi4NCls5MzE5Ni4zNTE4MDldIHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBSRUFQVVJC
-TkRFTEFZDQpbOTMxOTYuMzUxODExXSB1c2IgMy02LjI6IHJlYXAgMDAwMDdmZGQ1NDE2ZTJmMA0K
-WzkzMTk2LjM1MTgyMV0gdXNiIDMtNi4yOiB1c2JkZXZfZG9faW9jdGw6IFJFQVBVUkJOREVMQVkN
-Cls5MzE5Ni4zNTE4OTZdIHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBTVUJNSVRVUkINCls5
-MzE5Ni4zNTE4OTldIHVzYiAzLTYuMjogY29udHJvbCB1cmI6IGJSZXF1ZXN0VHlwZT04MCBiUmVx
-dWVzdD0wNiB3VmFsdWU9MDMwMiB3SW5kZXg9MDQwOSB3TGVuZ3RoPTAwZmYNCls5MzE5Ni4zNTE5
-MDJdIHVzYiAzLTYuMjogdXNlcnVyYiAwMDAwN2ZkZDU0YjE3NWQwLCBlcDAgY3RybC1pbiwgbGVu
-Z3RoIDI1NQ0KWzkzMTk2LjM1MjAxN10gdXNiIDMtNi4yOiB1cmIgY29tcGxldGUNCls5MzE5Ni4z
-NTIwMTldIHVzYiAzLTYuMjogdXNlcnVyYiAwMDAwN2ZkZDU0YjE3NWQwLCBlcDAgY3RybC1pbiwg
-YWN0dWFsX2xlbmd0aCAyMCBzdGF0dXMgMA0KWzkzMTk2LjM1MjAyMl0gZGF0YTogMTQgMDMgNDMg
-MDAgNmYgMDAgNmUgMDAgNDIgMDAgNjUgMDAgNjUgMDAgMjAgMDAgNDkgMDAgNDkgMDAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC4uQy5vLm4uQi5lLmUuIC5JLkkuDQpbOTMx
-OTYuMzUyNDQ3XSB1c2IgMy02LjI6IHVzYmRldl9kb19pb2N0bDogUkVBUFVSQk5ERUxBWQ0KWzkz
-MTk2LjM1MjQ0OV0gdXNiIDMtNi4yOiByZWFwIDAwMDA3ZmRkNTRiMTc1ZDANCls5MzE5Ni4zNTI0
-NTldIHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBSRUFQVVJCTkRFTEFZDQpbOTMxOTYuMzUy
-NTY4XSB1c2IgMy02LjI6IHVzYmRldl9kb19pb2N0bDogU1VCTUlUVVJCDQpbOTMxOTYuMzUyNTcx
-XSB1c2IgMy02LjI6IGNvbnRyb2wgdXJiOiBiUmVxdWVzdFR5cGU9ODAgYlJlcXVlc3Q9MDYgd1Zh
-bHVlPTAzMDEgd0luZGV4PTA0MDkgd0xlbmd0aD0wMGZmDQpbOTMxOTYuMzUyNTc0XSB1c2IgMy02
-LjI6IHVzZXJ1cmIgMDAwMDdmZGQ1NTE4Zjg2MCwgZXAwIGN0cmwtaW4sIGxlbmd0aCAyNTUNCls5
-MzE5Ni4zNTI4MDJdIHVzYiAzLTYuMjogdXJiIGNvbXBsZXRlDQpbOTMxOTYuMzUyODA1XSB1c2Ig
-My02LjI6IHVzZXJ1cmIgMDAwMDdmZGQ1NTE4Zjg2MCwgZXAwIGN0cmwtaW4sIGFjdHVhbF9sZW5n
-dGggODIgc3RhdHVzIDANCls5MzE5Ni4zNTI4MDldIGRhdGE6IDUyIDAzIDY0IDAwIDcyIDAwIDY1
-IDAwIDczIDAwIDY0IDAwIDY1IDAwIDZlIDAwIDIwIDAwIDY1IDAwIDZjIDAwIDY1IDAwIDZiIDAw
-IDc0IDAwIDcyIDAwIDZmIDAwICBSLmQuci5lLnMuZC5lLm4uIC5lLmwuZS5rLnQuci5vLg0KWzkz
-MTk2LjM1MjgxMV0gZGF0YTogNmUgMDAgNjkgMDAgNmIgMDAgMjAgMDAgNjkgMDAgNmUgMDAgNjcg
-MDAgNjUgMDAgNmUgMDAgNjkgMDAgNjUgMDAgNzUgMDAgNzIgMDAgNzQgMDAgNjUgMDAgNjMgMDAg
-IG4uaS5rLiAuaS5uLmcuZS5uLmkuZS51LnIudC5lLmMuDQpbOTMxOTYuMzUyODEyXSBkYXRhOiA2
-OCAwMCA2ZSAwMCA2OSAwMCA2YiAwMCAyMCAwMCA0NyAwMCA2ZCAwMCA2MiAwMCA0OCAwMCAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaC5uLmkuay4gLkcubS5iLkgu
-DQpbOTMxOTYuMzUyODI2XSB1c2IgMy02LjI6IHVzYmRldl9kb19pb2N0bDogUkVBUFVSQk5ERUxB
-WQ0KWzkzMTk2LjM1MjgzMF0gdXNiIDMtNi4yOiByZWFwIDAwMDA3ZmRkNTUxOGY4NjANCls5MzE5
-Ni4zNTI4NDJdIHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBSRUFQVVJCTkRFTEFZDQpbOTMx
-OTYuMzUyOTMzXSB1c2IgMy02LjI6IHVzYmRldl9kb19pb2N0bDogU1VCTUlUVVJCDQpbOTMxOTYu
-MzUyOTM2XSB1c2IgMy02LjI6IGNvbnRyb2wgdXJiOiBiUmVxdWVzdFR5cGU9ODAgYlJlcXVlc3Q9
-MDYgd1ZhbHVlPTAzMDMgd0luZGV4PTA0MDkgd0xlbmd0aD0wMGZmDQpbOTMxOTYuMzUyOTQwXSB1
-c2IgMy02LjI6IHVzZXJ1cmIgMDAwMDdmZGQ1NDE2ZTJmMCwgZXAwIGN0cmwtaW4sIGxlbmd0aCAy
-NTUNCls5MzE5Ni4zNTMwOTddIHVzYiAzLTYuMjogdXJiIGNvbXBsZXRlDQpbOTMxOTYuMzUzMTAw
-XSB1c2IgMy02LjI6IHVzZXJ1cmIgMDAwMDdmZGQ1NDE2ZTJmMCwgZXAwIGN0cmwtaW4sIGFjdHVh
-bF9sZW5ndGggMjAgc3RhdHVzIDANCls5MzE5Ni4zNTMxMDRdIGRhdGE6IDE0IDAzIDQ0IDAwIDQ1
-IDAwIDMyIDAwIDM1IDAwIDM5IDAwIDM3IDAwIDMwIDAwIDM4IDAwIDM5IDAwICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAuLkQuRS4yLjUuOS43LjAuOC45Lg0KWzkzMTk2LjM1
-MzEyMV0gdXNiIDMtNi4yOiB1c2JkZXZfZG9faW9jdGw6IFJFQVBVUkJOREVMQVkNCls5MzE5Ni4z
-NTMxMjRdIHVzYiAzLTYuMjogcmVhcCAwMDAwN2ZkZDU0MTZlMmYwDQpbOTMxOTYuMzUzMTMzXSB1
-c2IgMy02LjI6IHVzYmRldl9kb19pb2N0bDogUkVBUFVSQk5ERUxBWQ0KWzkzMTk2LjQ4MjU4NF0g
-dXNiIDMtNi4yOiB1c2JkZXZfZG9faW9jdGw6IFNVQk1JVFVSQg0KWzkzMTk2LjQ4MjU4OV0gdXNi
-IDMtNi4yOiB1c2JmczogcHJvY2VzcyAxNDk2MTcgKENQVSAzL0tWTSkgZGlkIG5vdCBjbGFpbSBp
-bnRlcmZhY2UgMCBiZWZvcmUgdXNlDQpbOTMyMDkuNzI5NDg0XSB1c2IgMy02LjI6IHVzYmRldl9k
-b19pb2N0bDogU1VCTUlUVVJCDQpbOTMyMDkuNzI5NDg5XSB1c2IgMy02LjI6IHVzYmZzOiBwcm9j
-ZXNzIDE0OTYxNiAoQ1BVIDIvS1ZNKSBkaWQgbm90IGNsYWltIGludGVyZmFjZSAwIGJlZm9yZSB1
-c2UNCls5MzIwOS43Mjk1NzRdIHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBDTEVBUl9IQUxU
-DQpbOTMyMDkuNzI5NTc3XSB1c2IgMy02LjI6IHVzYmZzOiBwcm9jZXNzIDE0OTYxNyAoQ1BVIDMv
-S1ZNKSBkaWQgbm90IGNsYWltIGludGVyZmFjZSAxIGJlZm9yZSB1c2UNCls5MzIwOS43Mjk2MzJd
-IHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBTVUJNSVRVUkINCls5MzIwOS43Mjk2MzVdIHVz
-YiAzLTYuMjogdXNiZnM6IHByb2Nlc3MgMTQ5NjE0IChDUFUgMC9LVk0pIGRpZCBub3QgY2xhaW0g
-aW50ZXJmYWNlIDAgYmVmb3JlIHVzZQ0KWzkzMjE0LjQ2NTU1N10gdXNiIDMtNi4yOiB1c2JkZXZf
-ZG9faW9jdGw6IFNVQk1JVFVSQg0KWzkzMjE0LjQ2NTU2M10gdXNiIDMtNi4yOiB1c2JmczogcHJv
-Y2VzcyAxNDk2MTQgKENQVSAwL0tWTSkgZGlkIG5vdCBjbGFpbSBpbnRlcmZhY2UgMCBiZWZvcmUg
-dXNlDQpbOTMyMTQuNDk2NjQ4XSB1c2IgMy02LjI6IHVzYmRldl9kb19pb2N0bDogU1VCTUlUVVJC
-DQpbOTMyMTQuNDk2NjUzXSB1c2IgMy02LjI6IHVzYmZzOiBwcm9jZXNzIDE0OTYxNSAoQ1BVIDEv
-S1ZNKSBkaWQgbm90IGNsYWltIGludGVyZmFjZSAwIGJlZm9yZSB1c2UNCls5MzIxNC40OTY3NTdd
-IHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBDTEVBUl9IQUxUDQpbOTMyMTQuNDk2NzYwXSB1
-c2IgMy02LjI6IHVzYmZzOiBwcm9jZXNzIDE0OTYxNyAoQ1BVIDMvS1ZNKSBkaWQgbm90IGNsYWlt
-IGludGVyZmFjZSAxIGJlZm9yZSB1c2UNCls5MzIxOS4wNDkxNDhdIHVzYiAzLTYuMjogdXNiZGV2
-X2RvX2lvY3RsOiBTVUJNSVRVUkINCls5MzIxOS4wNDkxNTVdIHVzYiAzLTYuMjogdXNiZnM6IHBy
-b2Nlc3MgMTQ5NjE3IChDUFUgMy9LVk0pIGRpZCBub3QgY2xhaW0gaW50ZXJmYWNlIDAgYmVmb3Jl
-IHVzZQ0KWzkzMjE5LjA1NjI1OF0gdXNiIDMtNi4yOiB1c2JkZXZfZG9faW9jdGw6IENMRUFSX0hB
-TFQNCls5MzIxOS4wNTYyNjRdIHVzYiAzLTYuMjogdXNiZnM6IHByb2Nlc3MgMTQ5NjE3IChDUFUg
-My9LVk0pIGRpZCBub3QgY2xhaW0gaW50ZXJmYWNlIDEgYmVmb3JlIHVzZQ0KWzkzMjIwLjA1OTIx
-MF0gdXNiIDMtNi4yOiB1c2JkZXZfZG9faW9jdGw6IFNVQk1JVFVSQg0KWzkzMjIwLjA1OTIxNV0g
-dXNiIDMtNi4yOiB1c2JmczogcHJvY2VzcyAxNDk2MTUgKENQVSAxL0tWTSkgZGlkIG5vdCBjbGFp
-bSBpbnRlcmZhY2UgMCBiZWZvcmUgdXNlDQpbOTMyMjAuMDU5NDAxXSB1c2IgMy02LjI6IHVzYmRl
-dl9kb19pb2N0bDogQ0xFQVJfSEFMVA0KWzkzMjIwLjA1OTQwNF0gdXNiIDMtNi4yOiB1c2Jmczog
-cHJvY2VzcyAxNDk2MTcgKENQVSAzL0tWTSkgZGlkIG5vdCBjbGFpbSBpbnRlcmZhY2UgMSBiZWZv
-cmUgdXNlDQpbOTMyMjQuNjA4NzI2XSB1c2IgMy02LjI6IHVzYmRldl9kb19pb2N0bDogU1VCTUlU
-VVJCDQpbOTMyMjQuNjA4NzMxXSB1c2IgMy02LjI6IHVzYmZzOiBwcm9jZXNzIDE0OTYxNyAoQ1BV
-IDMvS1ZNKSBkaWQgbm90IGNsYWltIGludGVyZmFjZSAwIGJlZm9yZSB1c2UNCls5MzIyNC42MTUy
-MjFdIHVzYiAzLTYuMjogdXNiZGV2X2RvX2lvY3RsOiBTVUJNSVRVUkINCls5MzIyNC42MTUyMjZd
-IHVzYiAzLTYuMjogdXNiZnM6IHByb2Nlc3MgMTQ5NjE2IChDUFUgMi9LVk0pIGRpZCBub3QgY2xh
-aW0gaW50ZXJmYWNlIDAgYmVmb3JlIHVzZQ0KWzkzMjI0LjYxNTMzOV0gdXNiIDMtNi4yOiB1c2Jk
-ZXZfZG9faW9jdGw6IENMRUFSX0hBTFQNCls5MzIyNC42MTUzNDJdIHVzYiAzLTYuMjogdXNiZnM6
-IHByb2Nlc3MgMTQ5NjE3IChDUFUgMy9LVk0pIGRpZCBub3QgY2xhaW0gaW50ZXJmYWNlIDEgYmVm
-b3JlIHVzZQ==
---000000000000f33c8205eb1c0ce0--
+As part of initialization, qemu resets the device and its interfaces
+then get claimed by the cdc_acm driver on the host.  This may be the
+problem; there's no indication in the log that cdc_acm ever releases
+those interfaces.
+
+> [93196.482584] usb 3-6.2: usbdev_do_ioctl: SUBMITURB
+> [93196.482589] usb 3-6.2: usbfs: process 149617 (CPU 3/KVM) did not claim interface 0 before use
+> [93209.729484] usb 3-6.2: usbdev_do_ioctl: SUBMITURB
+> [93209.729489] usb 3-6.2: usbfs: process 149616 (CPU 2/KVM) did not claim interface 0 before use
+> [93209.729574] usb 3-6.2: usbdev_do_ioctl: CLEAR_HALT
+> [93209.729577] usb 3-6.2: usbfs: process 149617 (CPU 3/KVM) did not claim interface 1 before use
+> [93209.729632] usb 3-6.2: usbdev_do_ioctl: SUBMITURB
+> [93209.729635] usb 3-6.2: usbfs: process 149614 (CPU 0/KVM) did not claim interface 0 before use
+
+Unforunately these warning messages don't indicate directly whether
+the attempts to use the interfaces were successful.  But it's clear
+that something went wrong with those URB submissions because the snoop
+log doesn't include the contents of the URBs or their results.
+
+My guess is that the attempts failed because the interfaces were
+already claimed by cdc_acm in the host.  I would expect qemu to unbind
+cdc_acm when it starts up, but apparently it doesn't.  And there are
+no CLAIM_PORT messages in the log.
+
+Perhaps it will help if you do the unbind by hand before starting
+qemu.  Try doing:
+
+	echo 3-6.2:1.0 >/sys/bus/usb/drivers/cdc_acm/unbind
+	echo 3-6.2:1.1 >/sys/bus/usb/drivers/cdc_acm/unbind
+
+Or better yet, blacklist the cdc_acm driver on the host if you can.
+
+Alan Stern
