@@ -2,167 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 22D4160168D
-	for <lists+kvm@lfdr.de>; Mon, 17 Oct 2022 20:46:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C1CA6016E7
+	for <lists+kvm@lfdr.de>; Mon, 17 Oct 2022 21:05:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229933AbiJQSqH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Oct 2022 14:46:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52856 "EHLO
+        id S230181AbiJQTFx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Oct 2022 15:05:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229925AbiJQSqF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Oct 2022 14:46:05 -0400
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48B276CD39;
-        Mon, 17 Oct 2022 11:46:04 -0700 (PDT)
+        with ESMTP id S230120AbiJQTFv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Oct 2022 15:05:51 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA69458529
+        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 12:05:48 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id a6so15146817ljq.5
+        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 12:05:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1666032365; x=1697568365;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Y7P4CUTJ+HKkeBiHLXxdrw9k3ZvgWZpB7DAeZdKoH/Y=;
-  b=TVeLWI6qqgRJOy0q6/BCOp0Zb0/NrXDyVubCMig/pnn9AtF5SbeU4Kxl
-   rwSIn5sYynj1mowrMehOFy6F93Rno+INExvu/R/iv7Nbt01FsGxBsouTE
-   jzGxu290YQNtFs12++f3kjscvcLUiohTFJmPP6HjV7+vZErLukCUcdhGl
-   E=;
-X-IronPort-AV: E=Sophos;i="5.95,192,1661817600"; 
-   d="scan'208";a="141055391"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-e6c05252.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2022 18:46:05 +0000
-Received: from EX13MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2a-e6c05252.us-west-2.amazon.com (Postfix) with ESMTPS id D9A7045CC1;
-        Mon, 17 Oct 2022 18:46:03 +0000 (UTC)
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
- EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
- id 15.0.1497.42; Mon, 17 Oct 2022 18:45:56 +0000
-Received: from f02f4b0103c5.ant.amazon.com (10.43.162.35) by
- EX19D020UWC004.ant.amazon.com (10.13.138.149) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.2.1118.15; Mon, 17 Oct 2022 18:45:55 +0000
-From:   Alexander Graf <graf@amazon.com>
-To:     <kvm@vger.kernel.org>
-CC:     <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Andrew Randrianasulu" <randrianasulu@gmail.com>,
-        Thomas Huth <thuth@redhat.com>
-Subject: [PATCH 3/3] KVM: x86: Add compat handler for KVM_X86_SET_MSR_FILTER
-Date:   Mon, 17 Oct 2022 20:45:41 +0200
-Message-ID: <20221017184541.2658-4-graf@amazon.com>
-X-Mailer: git-send-email 2.37.0 (Apple Git-136)
-In-Reply-To: <20221017184541.2658-1-graf@amazon.com>
-References: <20221017184541.2658-1-graf@amazon.com>
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=tpLbF7MUjfgdwKeolFrKwUGGJvkFHEynVfhNRIRYzO0=;
+        b=cTXJI0UBOdBxXG2IHW1rqIDOvBkglMHN1TS3v9u/Mg6E19sNCf3CHq90Ltlb8bjRuV
+         uwZxsI3QP9DlzIDrz8Ff7f9zknZmBhB2m3pkIj381yHasQYOvkpoqdJncN9JKC2twFC8
+         ShVufGPOkpE2dB+4eCyihCzXtxWBY+X/y95BOpw7uAHWW2nmY6ScgSdvp0Pxz6khfbyi
+         YxhW1XKkSTezSkUawIx5/j0VpvJshXk6TJGUrtcsbKTwNFF6pKmyHcosQZh7T9atBa+E
+         fdb7oqoR8tN6oS+MAKpeLCi//GJfCoW515YxPGh6OzLSq2gny6eetjefpyJ4o3QbBEiq
+         9V6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tpLbF7MUjfgdwKeolFrKwUGGJvkFHEynVfhNRIRYzO0=;
+        b=68G3MTf/S7DQktyZRqp+M+RslSAIyV0MAhAcsP0RNXgA7/tgJuAbCBb7uZFHxnlcMM
+         493CFWE3CgW+9/kQRqOQUcAW7bQdBAfLTmaNOwyptcWahuypaUt+Dx49zudcJlwsIJxt
+         LJIjB+gCmio7V0cUuCaVb4hIKT1/dlj/H9aCKysXkq5kyXaYsgkT+G1uZPaePVTLZV+0
+         6g3ltOhrlc8CWNchK54KAfmByxCgjD8+tMZpdqnY5A9zWkd4g6Zmx+sJZ348qEwxmFvf
+         nHlhdFhSUP4cBA4ZttqDDD6k2ekE1K/o5Ih8S9+Z9gD8CdTwoj0D6Qhp9pfGcQ6+PEDp
+         uJtw==
+X-Gm-Message-State: ACrzQf00z7Ty+hf3kvUd8yCITWDihjxYdnKTVdZYQD5HDxKTUxRP5gan
+        1Jnshir81vTvbF+ejSv51NBtBGW62fi+7+0824DlrQ==
+X-Google-Smtp-Source: AMsMyM4AkQi9c7U3RtdWYwjcZCizC5KFrocAewLyWt0H2WuNks4/hroyUpSgGTZ2Szy1PxqSxcVc8+OpiywAfS+j4K8=
+X-Received: by 2002:a05:651c:20d:b0:26f:bc4c:f957 with SMTP id
+ y13-20020a05651c020d00b0026fbc4cf957mr4763341ljn.199.1666033547017; Mon, 17
+ Oct 2022 12:05:47 -0700 (PDT)
 MIME-Version: 1.0
-X-Originating-IP: [10.43.162.35]
-X-ClientProxiedBy: EX13D25UWB003.ant.amazon.com (10.43.161.33) To
- EX19D020UWC004.ant.amazon.com (10.13.138.149)
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
+ <d16284f5-3493-2892-38e6-f1fa5c10bdbb@redhat.com> <Yyi+l3+p9lbBAC4M@google.com>
+ <CA+EHjTzy4iOxLF=5UX=s5v6HSB3Nb1LkwmGqoKhp_PAnFeVPSQ@mail.gmail.com>
+ <20220926142330.GC2658254@chaop.bj.intel.com> <CA+EHjTz5yGhsxUug+wqa9hrBO60Be0dzWeWzX00YtNxin2eYHg@mail.gmail.com>
+ <YzN9gYn1uwHopthW@google.com> <CA+EHjTw3din891hMUeRW-cn46ktyMWSdoB31pL+zWpXo_=3UVg@mail.gmail.com>
+ <20221013133457.GA3263142@chaop.bj.intel.com> <CA+EHjTzZ2zsm7Ru_OKCZg9FCYESgZsmB=7ScKRh6ZN4=4OZ3gw@mail.gmail.com>
+ <20221017145856.GB3417432@chaop.bj.intel.com>
+In-Reply-To: <20221017145856.GB3417432@chaop.bj.intel.com>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Mon, 17 Oct 2022 20:05:10 +0100
+Message-ID: <CA+EHjTyiU230am0cuWc7xBBirGocPWGmyqCskhTytA10xpigYQ@mail.gmail.com>
+Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The KVM_X86_SET_MSR_FILTER ioctls contains a pointer in the passed in
-struct which means it has a different struct size depending on whether
-it gets called from 32bit or 64bit code.
+Hi,
 
-This patch introduces compat code that converts from the 32bit struct to
-its 64bit counterpart which then gets used going forward internally.
-With this applied, 32bit QEMU can successfully set MSR bitmaps when
-running on 64bit kernels.
+> > > Using both private_fd and userspace_addr is only needed in TDX and other
+> > > confidential computing scenarios, pKVM may only use private_fd if the fd
+> > > can also be mmaped as a whole to userspace as Sean suggested.
+> >
+> > That does work in practice, for now at least, and is what I do in my
+> > current port. However, the naming and how the API is defined as
+> > implied by the name and the documentation. By calling the field
+> > private_fd, it does imply that it should not be mapped, which is also
+> > what api.rst says in PATCH v8 5/8. My worry is that in that case pKVM
+> > would be mis/ab-using this interface, and that future changes could
+> > cause unforeseen issues for pKVM.
+>
+> That is fairly enough. We can change the naming and the documents.
+>
+> >
+> > Maybe renaming this to something like "guest_fp", and specifying in
+> > the documentation that it can be restricted, e.g., instead of "the
+> > content of the private memory is invisible to userspace" something
+> > along the lines of  "the content of the guest memory may be restricted
+> > to userspace".
+>
+> Some other candidates in my mind:
+> - restricted_fd: to pair with the mm side restricted_memfd
+> - protected_fd: as Sean suggested before
+> - fd: how it's explained relies on the memslot.flag.
 
-Reported-by: Andrew Randrianasulu <randrianasulu@gmail.com>
-Fixes: 1a155254ff937 ("KVM: x86: Introduce MSR filtering")
-Signed-off-by: Alexander Graf <graf@amazon.com>
----
- arch/x86/kvm/x86.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
+All these sound good, since they all capture the potential use cases.
+Restricted might be the most logical choice if that's going to also
+become the name for the mem_fd.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 19f060ce577f..20b5d25ba265 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -6446,6 +6446,62 @@ static int kvm_vm_ioctl_set_msr_filter(struct kvm *kvm,
- 	return 0;
- }
- 
-+#ifdef CONFIG_KVM_COMPAT
-+/* for KVM_X86_SET_MSR_FILTER */
-+struct kvm_msr_filter_range_compat {
-+	__u32 flags;
-+	__u32 nmsrs;
-+	__u32 base;
-+	__u32 bitmap;
-+};
-+
-+struct kvm_msr_filter_compat {
-+	__u32 flags;
-+	struct kvm_msr_filter_range_compat ranges[KVM_MSR_FILTER_MAX_RANGES];
-+};
-+
-+#define KVM_X86_SET_MSR_FILTER_COMPAT _IOW(KVMIO, 0xc6, struct kvm_msr_filter_compat)
-+
-+long kvm_arch_vm_compat_ioctl(struct file *filp, unsigned int ioctl,
-+			      unsigned long arg)
-+{
-+	void __user *argp = (void __user *)arg;
-+	struct kvm *kvm = filp->private_data;
-+	long r = -ENOTTY;
-+
-+	switch (ioctl) {
-+	case KVM_X86_SET_MSR_FILTER_COMPAT: {
-+		struct kvm_msr_filter __user *user_msr_filter = argp;
-+		struct kvm_msr_filter_compat filter_compat;
-+		struct kvm_msr_filter filter;
-+		int i;
-+
-+		if (copy_from_user(&filter_compat, user_msr_filter,
-+				   sizeof(filter_compat)))
-+			return -EFAULT;
-+
-+		filter.flags = filter_compat.flags;
-+		for (i = 0; i < ARRAY_SIZE(filter.ranges); i++) {
-+			struct kvm_msr_filter_range_compat *cr;
-+
-+			cr = &filter_compat.ranges[i];
-+			filter.ranges[i] = (struct kvm_msr_filter_range) {
-+				.flags = cr->flags,
-+				.nmsrs = cr->nmsrs,
-+				.base = cr->base,
-+				.bitmap = (__u8 *)(ulong)cr->bitmap,
-+			};
-+		}
-+
-+		r = kvm_vm_ioctl_set_msr_filter(kvm, &filter);
-+		break;
-+	}
-+	}
-+
-+	return r;
-+}
-+#endif
-+
- #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
- static int kvm_arch_suspend_notifier(struct kvm *kvm)
- {
--- 
-2.37.1
+Thanks,
+/fuad
 
-
-
-
-Amazon Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-Sitz: Berlin
-Ust-ID: DE 289 237 879
-
-
-
+> Thanks,
+> Chao
+> >
+> > What do you think?
+> >
+> > Cheers,
+> > /fuad
+> >
+> > >
+> > > Thanks,
+> > > Chao
+> > > >
+> > > > Cheers,
+> > > > /fuad
