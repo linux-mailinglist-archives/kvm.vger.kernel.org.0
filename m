@@ -2,49 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A482560073F
-	for <lists+kvm@lfdr.de>; Mon, 17 Oct 2022 09:05:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E061600740
+	for <lists+kvm@lfdr.de>; Mon, 17 Oct 2022 09:05:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230133AbiJQHFs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Oct 2022 03:05:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35276 "EHLO
+        id S230154AbiJQHFu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Oct 2022 03:05:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230127AbiJQHFq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Oct 2022 03:05:46 -0400
+        with ESMTP id S230128AbiJQHFr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Oct 2022 03:05:47 -0400
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1689122B1C
-        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 00:05:43 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1E9F4DF3B
+        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 00:05:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1665990344; x=1697526344;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+Zz77OkhNZKF8tBU8sPdCcTsGxcasRZTz3tmsxf8znk=;
-  b=Y3PyokIIJYhhK3Ab4ONsdkwjraGHdbe3kw/F4rg79otN3PBY/msDETfo
-   5T8q8pnZTcnC/jF+995tGz+3tsBzT8yo+w7Pqzs+wZnAIFhvjCF6B+1bX
-   FvkH0nCCyu9nlY3JLQ2WBAkWecmI7sgrZqvf4JNeXGWnH6X+apGH2SZSM
-   uRD7P03Wh7JpRGGRJwdCu3lkqkVIBM2DRW3KJFwzW/V6uY5wyNPqBWFeF
-   Qu4c2gIovEyZ0NAJujkzaKS3lehifGIH0+/tMaUbKZbGJsgSpmwKxmGYn
-   how50YWHMqYUGRlHy7Y1CRe8GzXmv8aUcLkJwn59qFqygrYtmjWsQ3wYj
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10502"; a="392031203"
+  bh=7ifg6/sc+fwSQXD/jV2lw/ufITayAG1Yn/Gno+7xKRw=;
+  b=UfsWQJo2KuCNr1EtNbJB1Hk0rvJrS8ZUyTlMKOMVBLIOVdsN/RhphMVQ
+   AN0WdG1doSxKEyIuL/oM6efug917cZw6V1/mXcaG4xuLF2bvw4CXGwjgu
+   wwMf3d46ceVzyp7BOnETn9kyB7if8EdMQZoqVNB/2gSz6yt2yVZhiwfS3
+   h++phhL8YH9ZOsW9qXlxcjsNEdxIbm25dGjsVqS819HYFiD6KaQNrh07U
+   Lb3LSEWzQnXZHlwWMf7MQi+9U8PWS+8m7peaf/0Mjp8rBNlSWw6MfvSYW
+   z59p3a/hfLLuJzfbDY1Z91U/bXXqV3gldgjCuj6QslW6Fqh/W3rDEQMzA
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10502"; a="392031205"
 X-IronPort-AV: E=Sophos;i="5.95,190,1661842800"; 
-   d="scan'208";a="392031203"
+   d="scan'208";a="392031205"
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
   by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2022 00:05:41 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10502"; a="579271413"
+X-IronPort-AV: E=McAfee;i="6500,9779,10502"; a="579271416"
 X-IronPort-AV: E=Sophos;i="5.95,190,1661842800"; 
-   d="scan'208";a="579271413"
+   d="scan'208";a="579271416"
 Received: from sqa-gate.sh.intel.com (HELO robert-clx2.tsp.org) ([10.239.48.212])
-  by orsmga003.jf.intel.com with ESMTP; 17 Oct 2022 00:05:24 -0700
+  by orsmga003.jf.intel.com with ESMTP; 17 Oct 2022 00:05:26 -0700
 From:   Robert Hoo <robert.hu@linux.intel.com>
 To:     seanjc@google.com, pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, Robert Hoo <robert.hu@linux.intel.com>,
-        Jingqi Liu <jingqi.liu@intel.com>
-Subject: [PATCH 7/9] KVM: x86: When judging setting CR3 valid or not, consider LAM bits
-Date:   Mon, 17 Oct 2022 15:04:48 +0800
-Message-Id: <20221017070450.23031-8-robert.hu@linux.intel.com>
+Cc:     kvm@vger.kernel.org, Robert Hoo <robert.hu@linux.intel.com>
+Subject: [PATCH 8/9] KVM: x86: When guest set CR3, handle LAM bits semantics
+Date:   Mon, 17 Oct 2022 15:04:49 +0800
+Message-Id: <20221017070450.23031-9-robert.hu@linux.intel.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20221017070450.23031-1-robert.hu@linux.intel.com>
 References: <20221017070450.23031-1-robert.hu@linux.intel.com>
@@ -59,42 +58,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Before apply to kvm_vcpu_is_illegal_gpa(), clear LAM bits if it's valid.
+When only changes LAM bits, ask next vcpu run to load mmu pgd, so that it
+will build new CR3 with LAM bits updates. No TLB flush needed on this case.
+When changes on effective addresses, no matter LAM bits changes or not, go
+through normal pgd update process.
 
 Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-Reviewed-by: Jingqi Liu <jingqi.liu@intel.com>
 ---
- arch/x86/kvm/x86.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ arch/x86/kvm/x86.c | 26 ++++++++++++++++++++++----
+ 1 file changed, 22 insertions(+), 4 deletions(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 3fa532cd1911..e9b465bff8d3 100644
+index e9b465bff8d3..fb779f88ae88 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -1217,6 +1217,14 @@ static void kvm_invalidate_pcid(struct kvm_vcpu *vcpu, unsigned long pcid)
- 	kvm_mmu_free_roots(vcpu->kvm, mmu, roots_to_free);
- }
- 
-+static bool kvm_is_valid_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
-+{
-+	if (guest_cpuid_has(vcpu, X86_FEATURE_LAM))
-+		cr3 &= ~(X86_CR3_LAM_U48 | X86_CR3_LAM_U57);
-+
-+	return kvm_vcpu_is_legal_gpa(vcpu, cr3);
-+}
-+
+@@ -1228,9 +1228,9 @@ static bool kvm_is_valid_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
  int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
  {
  	bool skip_tlb_flush = false;
-@@ -1240,7 +1248,7 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+-	unsigned long pcid = 0;
++	unsigned long pcid = 0, old_cr3;
+ #ifdef CONFIG_X86_64
+-	bool pcid_enabled = kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
++	bool pcid_enabled = !!kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
+ 
+ 	if (pcid_enabled) {
+ 		skip_tlb_flush = cr3 & X86_CR3_PCID_NOFLUSH;
+@@ -1243,6 +1243,10 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+ 	if (cr3 == kvm_read_cr3(vcpu) && !is_pae_paging(vcpu))
+ 		goto handle_tlb_flush;
+ 
++	if (!guest_cpuid_has(vcpu, X86_FEATURE_LAM) &&
++	    (cr3 & (X86_CR3_LAM_U48 | X86_CR3_LAM_U57)))
++		return	1;
++
+ 	/*
+ 	 * Do not condition the GPA check on long mode, this helper is used to
  	 * stuff CR3, e.g. for RSM emulation, and there is no guarantee that
- 	 * the current vCPU mode is accurate.
- 	 */
--	if (kvm_vcpu_is_illegal_gpa(vcpu, cr3))
-+	if (!kvm_is_valid_cr3(vcpu, cr3))
+@@ -1254,8 +1258,22 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+ 	if (is_pae_paging(vcpu) && !load_pdptrs(vcpu, cr3))
  		return 1;
  
- 	if (is_pae_paging(vcpu) && !load_pdptrs(vcpu, cr3))
+-	if (cr3 != kvm_read_cr3(vcpu))
+-		kvm_mmu_new_pgd(vcpu, cr3);
++	old_cr3 = kvm_read_cr3(vcpu);
++	if (cr3 != old_cr3) {
++		if ((cr3 ^ old_cr3) & CR3_ADDR_MASK) {
++			kvm_mmu_new_pgd(vcpu, cr3 & ~(X86_CR3_LAM_U48 |
++					X86_CR3_LAM_U57));
++		} else {
++			/* Only LAM conf changes, no tlb flush needed */
++			skip_tlb_flush = true;
++			/*
++			 * Though effective addr no change, mark the
++			 * request so that LAM bits will take effect
++			 * when enter guest.
++			 */
++			kvm_make_request(KVM_REQ_LOAD_MMU_PGD, vcpu);
++		}
++	}
+ 
+ 	vcpu->arch.cr3 = cr3;
+ 	kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
 -- 
 2.31.1
 
