@@ -2,154 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA5B2600C08
-	for <lists+kvm@lfdr.de>; Mon, 17 Oct 2022 12:09:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 29E35600C1A
+	for <lists+kvm@lfdr.de>; Mon, 17 Oct 2022 12:16:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230240AbiJQKJE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Oct 2022 06:09:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36294 "EHLO
+        id S230360AbiJQKP6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Oct 2022 06:15:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230394AbiJQKIk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Oct 2022 06:08:40 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2076.outbound.protection.outlook.com [40.107.223.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9448B444A4;
-        Mon, 17 Oct 2022 03:08:39 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RMEbwIkzDs3hkftUTLTmKr//A7q835Orugm95JOTM16lj6TYnZitDH7pQTlogNMa/pjbvNMIszXQcmX7NlRJx/QYODQXIYxZNm/w8hvPJDmDDdJKVHHeTMsN0WMkRhMR6TV150PCSjBjVlij626wT0v1xzXDbeydiEevXhiEVhg5kAyJxtjUQEcUy39u3zmcpTCvsE1q6S6cp6XCG4f1fTBggKX3DnvZWtMUjiPvMcbaT46rY3TJ85HhFOn7CDMtB/2E2OmMe/P5YoTDnPyo/HpKyk/YvojiDL43ossUFDjVCZXeDF2g4pMtP/iQIvogh6uH+tAhf6QPRCm/LZjMcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GM6U17y2OFYZ3M44j/9SkA0eae7MVBseDq72DdRR+vY=;
- b=MztzWob0x7GeaF42MKIhkAPdnOhU8EGaFFbQbFk3d2tHgTHYaQZAwQPsvFO+wEC13TTiMfoT3AD+q7kLu9U1DnOKt7Ii4dWb1zXrqshO96ub3HJ+bhYa13Yq50TB1L9eVZmweaqh3B7aJKSVbNE4M0QmpL+2v63WLKfIbMS0C6FdObZzOQ9UjPofsT4KROWNjHLobQJ0iuF0BcBNVoSSYgu8hltd5z2+eUZSPCLZ+HDtn78rfQQABmZ6pismqQNmt6KZgngy3o8Opc/wlAV0mWbSlzPiOBmw5E6dph1zBmkN2DMCqZ3CPJoi/yO+kDrIevnxi2EgpscCirJ/t2I0JQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GM6U17y2OFYZ3M44j/9SkA0eae7MVBseDq72DdRR+vY=;
- b=ZdyorfCIsRrOJCxiIA07u8K/rmbMDh75rZNXYFKknWH19J2zrZcUet2pQcYdOkDVMyXnc0Nh59osUWF0XEX9wM/V4Pg49ugQ+dBMQ5234MAt3/fyMX0ivi+HlKnqUk/I5JFOwiGnFcREoEkz5HOodylAyipD0xbeLdmKPVlG+o4=
-Received: from DM6PR12MB3082.namprd12.prod.outlook.com (2603:10b6:5:11b::12)
- by CY8PR12MB7660.namprd12.prod.outlook.com (2603:10b6:930:84::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.29; Mon, 17 Oct
- 2022 10:08:37 +0000
-Received: from DM6PR12MB3082.namprd12.prod.outlook.com
- ([fe80::377f:69eb:dcb:3ea8]) by DM6PR12MB3082.namprd12.prod.outlook.com
- ([fe80::377f:69eb:dcb:3ea8%6]) with mapi id 15.20.5723.026; Mon, 17 Oct 2022
- 10:08:37 +0000
-From:   "Gupta, Nipun" <Nipun.Gupta@amd.com>
-To:     Rob Herring <robh@kernel.org>
-CC:     "krzysztof.kozlowski+dt@linaro.org" 
-        <krzysztof.kozlowski+dt@linaro.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "Gupta, Puneet (DCG-ENG)" <puneet.gupta@amd.com>,
-        "song.bao.hua@hisilicon.com" <song.bao.hua@hisilicon.com>,
-        "mchehab+huawei@kernel.org" <mchehab+huawei@kernel.org>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-        "jeffrey.l.hugo@gmail.com" <jeffrey.l.hugo@gmail.com>,
-        "saravanak@google.com" <saravanak@google.com>,
-        "Michael.Srba@seznam.cz" <Michael.Srba@seznam.cz>,
-        "mani@kernel.org" <mani@kernel.org>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "jgg@ziepe.ca" <jgg@ziepe.ca>, "jgg@nvidia.com" <jgg@nvidia.com>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "will@kernel.org" <will@kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "masahiroy@kernel.org" <masahiroy@kernel.org>,
-        "ndesaulniers@google.com" <ndesaulniers@google.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "okaya@kernel.org" <okaya@kernel.org>,
-        "Anand, Harpreet" <harpreet.anand@amd.com>,
-        "Agarwal, Nikhil" <nikhil.agarwal@amd.com>,
-        "Simek, Michal" <michal.simek@amd.com>,
-        "Radovanovic, Aleksandar" <aleksandar.radovanovic@amd.com>,
-        "git (AMD-Xilinx)" <git@amd.com>
-Subject: RE: [RFC PATCH v4 0/8] add support for CDX bus
-Thread-Topic: [RFC PATCH v4 0/8] add support for CDX bus
-Thread-Index: AQHY34c74HOa7on0qkCTYkXoz4N/wK4N7kKAgARzQmA=
-Date:   Mon, 17 Oct 2022 10:08:37 +0000
-Message-ID: <DM6PR12MB30828A6C817B17FF576FBCA8E8299@DM6PR12MB3082.namprd12.prod.outlook.com>
-References: <20220803122655.100254-1-nipun.gupta@amd.com>
- <20221014044049.2557085-1-nipun.gupta@amd.com>
- <20221014141005.GA1862711-robh@kernel.org>
-In-Reply-To: <20221014141005.GA1862711-robh@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2022-10-17T10:08:34Z;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=763a7ca8-a825-4855-a2ed-63dbe18b7623;
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=1
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR12MB3082:EE_|CY8PR12MB7660:EE_
-x-ms-office365-filtering-correlation-id: 83ea7dab-c744-4e82-8b62-08dab0278edb
-x-ld-processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: HNCKa2w+9uNEFN8DWQN+ZUjDYehaoFFDkP5ojJcKlAaO89fIwQaswTxAiU2TNuIN4dI0nhRLyV9LXtyzEiDG3BKz5ez/G8YupE21t9y1emdl3RMYpa4KTr7p6DRfBn1wu8meXSl6FFmd4Lmuw/3lrx6TR5e5Do25IREjX2lSe4ekzrTmPrzjycU7voQcmnr6xbbO+0+RIKD+853nKlmfLEbfV+N7E3SsTtk8ce7v2M4e76DWtAomXpOJog6eRy0KOxBKb99k/CE8QnLakh4ytPs+y+bu9195CVPkHlXf700LpeAAREVU09pPx5qayBWjihS2huMsYF6XJRLmty+UJxscRqcjaJCYRpurHU79ZJ2dGrbZ31BbCHKxJCr2SKTf8GsaYvji8rj3qQJ75Aiwh5HpVxYNZP7CcYdDgjVQCM0BUGG5a1YYTMX0CfUO3wRVLWBtJkymVoaRMXMsk6QX/rdh68FdIqC2tLqST/hgraiHm9kyt8P87t5XUDNBgPGDA3cnT87/jG8MDZ2YwhSLyAqLDacB/nM774LiLX9znUtbZZmzpn2/XaOjQR3ODtO550yFui6MAaSrsZCXl6TVqhECrbgubTA/W89grX7yTZLG9rQgUNVCOT8GrJb4QM2eNfRPnLKp91+6TuWFnKlBcZqW663gdPGtZqPQXlQb+rgoR0HLgcz333HXeHX6iyIhKDOFMZMgYd8C2QTQlRxctoC7QLL5xButjag/Nj9wUp6CpaUpyJUXeHz1MC5lwx3y4HLdBx7S7rtsLsh1JchBWg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3082.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(346002)(39860400002)(136003)(366004)(396003)(451199015)(54906003)(5660300002)(7416002)(7406005)(66946007)(76116006)(66556008)(6916009)(316002)(64756008)(478600001)(7696005)(6506007)(53546011)(41300700001)(4326008)(52536014)(8676002)(9686003)(26005)(66446008)(2906002)(71200400001)(186003)(8936002)(66476007)(83380400001)(38070700005)(38100700002)(55016003)(86362001)(33656002)(122000001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?li9fH6qrjbE9zFc5iAFEnQ4w0HYjEmdnUI+L/uwaGote5oejAwb/Svrf17Lo?=
- =?us-ascii?Q?cyYB+eE2bZvAhY4whbfdaJZg0P2qSc3q/wyllF6zPEJ9Tj4NQxSGVfJ4lIeo?=
- =?us-ascii?Q?E+nE6Ldd7OBbG3r6U22Xd0FjwZ/3HkZFSyrH6EasGiEXJ8PsWxxDMtj/DjkS?=
- =?us-ascii?Q?Tsq4XmVVZjrhfWteJKvnjhlGXQfOVQYXVu0SlBj4OWQJyEZhvvANCpnXyaLc?=
- =?us-ascii?Q?ABKqvHWfHkSDSL0MMsk7d2pESSz1A+JXphL3kJgs2sGhCCuRNFXT34FBJD8x?=
- =?us-ascii?Q?bXeNx9qWrAVnFYRj0RN3uidoNEz4s5uHbCu5fA3r3O30czs+t9HDVaO8sRlE?=
- =?us-ascii?Q?lVhaUJlzRjGC+Y6+XHvTV/WSG3nCpr+ZM/njI6p35SR2wqx5uaNOgfDTpUVq?=
- =?us-ascii?Q?qOZ+IQL1hqSuVBmTTrpn2ze2kOKQ8+7qSBT3QeRTExAdvu5kzTrDEpWa1mjY?=
- =?us-ascii?Q?gNieOBgbPHaTWkPWY5jXlWvXNK0XczchuHyHHDxMwUaRbEOKL1G4XadFBcDC?=
- =?us-ascii?Q?008HXDILEz0GH8SAiqGasNfbw1t9pMb3GUAI6yZn7AMxLfzu2Q+BxbYhI3BN?=
- =?us-ascii?Q?+Wv8bX8kPXCPUFKWdJuOnQGk3C5xXuR8sk+CxTtvAcEyGqjKwhD73PuUzgVv?=
- =?us-ascii?Q?JnuP8AGoiKvTRjA6zmHZExQkl2jDp+m5FFPycdUaLDHC954bZVEz94NTOcbY?=
- =?us-ascii?Q?AyPWgbRNI+N8yS9EBHZUdtyunKwJmb/A8avPHCywdPd9i/S8Aq00e1VkSshl?=
- =?us-ascii?Q?GCJtuTqrlvAXwmnCMJRGRnjjxEC4SRapCin9wdCUnZ94FUz94WyaU59XW4/O?=
- =?us-ascii?Q?crBV65zWQwS1jFUSfQ+ncjMlsvBpLUPgBWfWmGz89eIEfps7LyJg0eoThyPI?=
- =?us-ascii?Q?ohP98MZilGOH3BvL5CuGVSO+ju4vNm76W+po4vH9XNOmBJke20i/5kkfAzrk?=
- =?us-ascii?Q?WHYTs/OLgnzOA58Vfyntrcs/H3DOfJ1AI5O9LtZ27QuatsLetqigA501HcMg?=
- =?us-ascii?Q?N3xuOwjSeUgs2ySmg7J62xBkffsW34EwPH4ZFwHHTwTD8i/CJRcJqKfjq0vn?=
- =?us-ascii?Q?Zc/jsq0sEV8r2orqvIvZvVeu8UME7eTJ3jLyVjaRSJIxFWPfEzUe/9cDY1Yt?=
- =?us-ascii?Q?QLuwxUMPYrI/LtojDOt5NjEdSsGw39fDUenvveWSso/aYmwgntCoWh8DpU31?=
- =?us-ascii?Q?ohvlPUFE+Rk6NagSml+wfXFd5C8Ip1svbVfM1WB5a6CGzZ3V8y2ijNT4b+/Y?=
- =?us-ascii?Q?mtRziNj67v2JMmP4Nz/xpXGQIS0uDHeK0ZjnKY0JpvkiMr8DNquHBJKAfL7T?=
- =?us-ascii?Q?RHTfvPkV9VytQ16lBmAFFEc7OBX5jWRIhrQxpRlSRQp0O9gkrvFnzTpQKjIX?=
- =?us-ascii?Q?boSRmkXXcfBrRgIpKSEkiS4CItT3Yc5dIn2XO78EmoOvrfAa8evFNADG1Mcv?=
- =?us-ascii?Q?isTwZR/OWIajkbXs/LHtf4Nb0p6DwD9zIs7ufllRyE6TBZSf+I5VZAdMRYSm?=
- =?us-ascii?Q?X+BYi0IqAmldhRb2z8yj2r0Qc4b36Hs9LF5oPgX0HnacqPhIGdoQ8TWtsRfq?=
- =?us-ascii?Q?mDs48JNJCiHOGWP7lqg=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S230491AbiJQKPv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Oct 2022 06:15:51 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BE89DFE9
+        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 03:15:50 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id a3so17795097wrt.0
+        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 03:15:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=FcjnuXRaDiwRJahvKb8RBCSyzSGwOC5LjhLUGe1uDng=;
+        b=hyvfh2EkmGJkje0pk/QxmrMK3wu58HezXpCWZTir75qkSbdgybYs5f9BdEJQ8VRxZo
+         y6aRpYY6PJTNs0keePmRwtJhkNJD/XdF8OsFUhWZ+UwwjrnzDoAYIKRkdVUgvJixyXjW
+         nD/o6Eqw8u2mx1XAbOWJsbL1mUmxxl7uY7YrsW4c+w0aEXLsr3iTAgFzKFCcXNq9JWeD
+         DtktHswPI1Ib69o/b5Xw5PWUIeu21lJtPIx06bfk/qBH1eUXTV/osa+5ULa0LTre2WLP
+         s1m1famLesITF3XC4ZTWNGzXqcgELAkbqC6CXhHknsOgV91Knx2CcUJjk+K6FMwFZKrp
+         i0nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FcjnuXRaDiwRJahvKb8RBCSyzSGwOC5LjhLUGe1uDng=;
+        b=sU1Brihkvd91XgfzROo9FSfCph9d0mtf++rDChDKj0AtkEq/ks+Z5/ql+7w/mRGD/F
+         0P2J1h16EST2q7uv8hnP2FD+pJFpzf0a+oEaxPYBFRx+NrIVniY+RUuzHHKaxDUqyJLp
+         n2z38immvs1uaEmf8enRUurv7vRVVwfsAGZq0DlKZfkqZ/Dne8sQs6vnvQ4RS1sriXO1
+         gaNtZsRg2/j3VtT12vMKEGPxVDpPvY05sNGyd+weDtjQ+GklrzNL9iDcPsDmi1v1jf9o
+         vntOZkvK2IQy6Bj0VuLQQUsvuoar08d/vvuf+bPfARkLL+gcAOXgkEfaFhilcdGrOss6
+         sp8Q==
+X-Gm-Message-State: ACrzQf169T3XAfI4g7AmZdICECfsNrz82rwxvuT6AJwuvOlJTyXJswhR
+        CLmzefO63PlmF/nghjM9VhTsh31W4lof7hmYUFGobQAQ3ip1Dw==
+X-Google-Smtp-Source: AMsMyM5H+U3jrxyNNUs6l1VKxbOPrLqVbM8TSFTJ1Nj0WQRe3+Q8Gepb86AIPBI4Du2SI+pEA/5+OnPmPbAp2YR5khI=
+X-Received: by 2002:a2e:bd12:0:b0:264:7373:3668 with SMTP id
+ n18-20020a2ebd12000000b0026473733668mr3490403ljq.18.1666001738408; Mon, 17
+ Oct 2022 03:15:38 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3082.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 83ea7dab-c744-4e82-8b62-08dab0278edb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Oct 2022 10:08:37.2843
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: jw1imZSFI7IZUN9eYXdZokKuDrz7ndi5roWE6tJkU3wrr3sYTUr1PmZlLxwdeTiw
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7660
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-6-chao.p.peng@linux.intel.com> <CA+EHjTxukqBfaN6D+rPOiX83zkGknHEQ16J0k6GQSdL_-e9C6g@mail.gmail.com>
+ <20221012023516.GA3218049@chaop.bj.intel.com>
+In-Reply-To: <20221012023516.GA3218049@chaop.bj.intel.com>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Mon, 17 Oct 2022 11:15:02 +0100
+Message-ID: <CA+EHjTyGyGL+ox81=jdtoHERtHPV=P7wJub=3j7chdijyq-AgA@mail.gmail.com>
+Subject: Re: [PATCH v8 5/8] KVM: Register/unregister the guest private memory regions
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -157,50 +97,155 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[AMD Official Use Only - General]
+Hi,
+
+> > > +#ifdef CONFIG_HAVE_KVM_PRIVATE_MEM
+> > > +#define KVM_MEM_ATTR_SHARED    0x0001
+> > > +static int kvm_vm_ioctl_set_mem_attr(struct kvm *kvm, gpa_t gpa, gpa_t size,
+> > > +                                    bool is_private)
+> > > +{
+> >
+> > I wonder if this ioctl should be implemented as an arch-specific
+> > ioctl. In this patch it performs some actions that pKVM might not need
+> > or might want to do differently.
+>
+> I think it's doable. We can provide the mem_attr_array kind thing in
+> common code and let arch code decide to use it or not. Currently
+> mem_attr_array is defined in the struct kvm, if those bytes are
+> unnecessary for pKVM it can even be moved to arch definition, but that
+> also loses the potential code sharing for confidential usages in other
+> non-architectures, e.g. if ARM also supports such usage. Or it can be
+> provided through a different CONFIG_ instead of
+> CONFIG_HAVE_KVM_PRIVATE_MEM.
+
+This sounds good. Thank you.
 
 
+/fuad
 
-> -----Original Message-----
-> From: Rob Herring <robh@kernel.org>
-> Sent: Friday, October 14, 2022 7:40 PM
-> To: Gupta, Nipun <Nipun.Gupta@amd.com>
-> Cc: krzysztof.kozlowski+dt@linaro.org; gregkh@linuxfoundation.org;
-> rafael@kernel.org; eric.auger@redhat.com; alex.williamson@redhat.com;
-> cohuck@redhat.com; Gupta, Puneet (DCG-ENG) <puneet.gupta@amd.com>;
-> song.bao.hua@hisilicon.com; mchehab+huawei@kernel.org; maz@kernel.org;
-> f.fainelli@gmail.com; jeffrey.l.hugo@gmail.com; saravanak@google.com;
-> Michael.Srba@seznam.cz; mani@kernel.org; yishaih@nvidia.com;
-> jgg@ziepe.ca; jgg@nvidia.com; robin.murphy@arm.com; will@kernel.org;
-> joro@8bytes.org; masahiroy@kernel.org; ndesaulniers@google.com; linux-arm=
--
-> kernel@lists.infradead.org; linux-kbuild@vger.kernel.org; linux-
-> kernel@vger.kernel.org; devicetree@vger.kernel.org; kvm@vger.kernel.org;
-> okaya@kernel.org; Anand, Harpreet <harpreet.anand@amd.com>; Agarwal,
-> Nikhil <nikhil.agarwal@amd.com>; Simek, Michal <michal.simek@amd.com>;
-> Radovanovic, Aleksandar <aleksandar.radovanovic@amd.com>; git (AMD-Xilinx=
-)
-> <git@amd.com>
-> Subject: Re: [RFC PATCH v4 0/8] add support for CDX bus
->=20
-> Caution: This message originated from an External Source. Use proper caut=
-ion
-> when opening attachments, clicking links, or responding.
->=20
->=20
-> On Fri, Oct 14, 2022 at 10:10:41AM +0530, Nipun Gupta wrote:
-> > This patch series introduces AMD CDX bus, which provides a
-> > mechanism to discover/rescan FPGA devices on run-time. These
-> > devices are memory mapped on system bus for embedded CPUs, and
-> > added as CDX devices in Linux framework.
->=20
-> Please don't send a new version of a series as a reply to older
-> versions. Just provide a lore link to older versions.
-
-Okay. Will provide lore link instead of in-reply from next version.
-
-Thanks,
-Nipun
-
->=20
-> Rob
+> Thanks,
+> Chao
+> >
+> > pKVM tracks the sharing status in the stage-2 page table's software
+> > bits, so it can avoid the overhead of using mem_attr_array.
+> >
+> > Also, this ioctl calls kvm_zap_gfn_range(), as does the invalidation
+> > notifier (introduced in patch 8). For pKVM, the kind of zapping (or
+> > the information conveyed to the hypervisor) might need to be different
+> > depending on the cause; whether it's invalidation or change of sharing
+> > status.
+>
+> >
+> > Thanks,
+> > /fuad
+> >
+> >
+> > > +       gfn_t start, end;
+> > > +       unsigned long index;
+> > > +       void *entry;
+> > > +       int r;
+> > > +
+> > > +       if (size == 0 || gpa + size < gpa)
+> > > +               return -EINVAL;
+> > > +       if (gpa & (PAGE_SIZE - 1) || size & (PAGE_SIZE - 1))
+> > > +               return -EINVAL;
+> > > +
+> > > +       start = gpa >> PAGE_SHIFT;
+> > > +       end = (gpa + size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
+> > > +
+> > > +       /*
+> > > +        * Guest memory defaults to private, kvm->mem_attr_array only stores
+> > > +        * shared memory.
+> > > +        */
+> > > +       entry = is_private ? NULL : xa_mk_value(KVM_MEM_ATTR_SHARED);
+> > > +
+> > > +       for (index = start; index < end; index++) {
+> > > +               r = xa_err(xa_store(&kvm->mem_attr_array, index, entry,
+> > > +                                   GFP_KERNEL_ACCOUNT));
+> > > +               if (r)
+> > > +                       goto err;
+> > > +       }
+> > > +
+> > > +       kvm_zap_gfn_range(kvm, start, end);
+> > > +
+> > > +       return r;
+> > > +err:
+> > > +       for (; index > start; index--)
+> > > +               xa_erase(&kvm->mem_attr_array, index);
+> > > +       return r;
+> > > +}
+> > > +#endif /* CONFIG_HAVE_KVM_PRIVATE_MEM */
+> > > +
+> > >  #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
+> > >  static int kvm_pm_notifier_call(struct notifier_block *bl,
+> > >                                 unsigned long state,
+> > > @@ -1165,6 +1206,9 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
+> > >         spin_lock_init(&kvm->mn_invalidate_lock);
+> > >         rcuwait_init(&kvm->mn_memslots_update_rcuwait);
+> > >         xa_init(&kvm->vcpu_array);
+> > > +#ifdef CONFIG_HAVE_KVM_PRIVATE_MEM
+> > > +       xa_init(&kvm->mem_attr_array);
+> > > +#endif
+> > >
+> > >         INIT_LIST_HEAD(&kvm->gpc_list);
+> > >         spin_lock_init(&kvm->gpc_lock);
+> > > @@ -1338,6 +1382,9 @@ static void kvm_destroy_vm(struct kvm *kvm)
+> > >                 kvm_free_memslots(kvm, &kvm->__memslots[i][0]);
+> > >                 kvm_free_memslots(kvm, &kvm->__memslots[i][1]);
+> > >         }
+> > > +#ifdef CONFIG_HAVE_KVM_PRIVATE_MEM
+> > > +       xa_destroy(&kvm->mem_attr_array);
+> > > +#endif
+> > >         cleanup_srcu_struct(&kvm->irq_srcu);
+> > >         cleanup_srcu_struct(&kvm->srcu);
+> > >         kvm_arch_free_vm(kvm);
+> > > @@ -1541,6 +1588,11 @@ static void kvm_replace_memslot(struct kvm *kvm,
+> > >         }
+> > >  }
+> > >
+> > > +bool __weak kvm_arch_has_private_mem(struct kvm *kvm)
+> > > +{
+> > > +       return false;
+> > > +}
+> > > +
+> > >  static int check_memory_region_flags(const struct kvm_user_mem_region *mem)
+> > >  {
+> > >         u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
+> > > @@ -4703,6 +4755,24 @@ static long kvm_vm_ioctl(struct file *filp,
+> > >                 r = kvm_vm_ioctl_set_memory_region(kvm, &mem);
+> > >                 break;
+> > >         }
+> > > +#ifdef CONFIG_HAVE_KVM_PRIVATE_MEM
+> > > +       case KVM_MEMORY_ENCRYPT_REG_REGION:
+> > > +       case KVM_MEMORY_ENCRYPT_UNREG_REGION: {
+> > > +               struct kvm_enc_region region;
+> > > +               bool set = ioctl == KVM_MEMORY_ENCRYPT_REG_REGION;
+> > > +
+> > > +               if (!kvm_arch_has_private_mem(kvm))
+> > > +                       goto arch_vm_ioctl;
+> > > +
+> > > +               r = -EFAULT;
+> > > +               if (copy_from_user(&region, argp, sizeof(region)))
+> > > +                       goto out;
+> > > +
+> > > +               r = kvm_vm_ioctl_set_mem_attr(kvm, region.addr,
+> > > +                                             region.size, set);
+> > > +               break;
+> > > +       }
+> > > +#endif
+> > >         case KVM_GET_DIRTY_LOG: {
+> > >                 struct kvm_dirty_log log;
+> > >
+> > > @@ -4856,6 +4926,9 @@ static long kvm_vm_ioctl(struct file *filp,
+> > >                 r = kvm_vm_ioctl_get_stats_fd(kvm);
+> > >                 break;
+> > >         default:
+> > > +#ifdef CONFIG_HAVE_KVM_PRIVATE_MEM
+> > > +arch_vm_ioctl:
+> > > +#endif
+> > >                 r = kvm_arch_vm_ioctl(filp, ioctl, arg);
+> > >         }
+> > >  out:
+> > > --
+> > > 2.25.1
+> > >
