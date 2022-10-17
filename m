@@ -2,158 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 967D5600BCE
-	for <lists+kvm@lfdr.de>; Mon, 17 Oct 2022 12:00:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F589600C10
+	for <lists+kvm@lfdr.de>; Mon, 17 Oct 2022 12:10:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230484AbiJQKAV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Oct 2022 06:00:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43526 "EHLO
+        id S230141AbiJQKKM convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Mon, 17 Oct 2022 06:10:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230248AbiJQKAS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Oct 2022 06:00:18 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A4C02BB3A
-        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 03:00:14 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id 78so9985606pgb.13
-        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 03:00:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ePppwLt74DC17JINfUdq6ewo+ZOCDgPxBEotdIjpxzA=;
-        b=Pznod0+OlFAyAl5hAqI+jlkkU/ZBSOnS+JMGGJfh/SEvsibrXGTR9F5IZn01jbWw4Y
-         ALzLuPu2RwziBUKwMKBr2UMMWB3xoN3qlgOpspRHsSLWWM4BLcyRi3WGM4qeTIlkn1gK
-         T9H4qNR7rIZ03evY2tV+JtwI/1ECZxySJCTk/DwgkIm8hmTCk9QrpVbRHcR9hR86m7sw
-         xUq2/zwwKb6fAiAnNZVr2mHoitgkZYXKeANksUY0y7coiHKSnBUIDmnsSmUEWPpcg5ip
-         /9nOy19mqIX/KdcacIC/9aNk56b0Gvs9LwgedSS+siKOIZqUYWo/8eNNLMgE5ZWjqTby
-         oRQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ePppwLt74DC17JINfUdq6ewo+ZOCDgPxBEotdIjpxzA=;
-        b=j7mIqxlVHZeSFN1HYyfIQ9DyY3EEvC/TXrahjHHVzphghI8Jqll4syRpa/N2C3tuzj
-         Ku1VbLu5Z3iYD2bXQWKqLxBwanAqoXeqrp7+ZgepLOEXxl1Z9XEtDmZVxzLHdDvfInPs
-         7+4ksAfxLUz+7xkDFv3LTZNujBCqDMxq1UaxU8rcxk3rR3GFSZX8M5PnOCzo4A2NtKw7
-         PVQbEbZW6hUlAJZzrJ27RjMN0MvBKdJrZEc4YeeJCdF88u3GDA3kVnhJ/30ldNeoLrLg
-         3cR2UYLnueEvv8AreGj69BdDjJLrNMmrZwLSuwGDFLP/tjzXuTVZdbfghM/bVg2qaf9S
-         oUOg==
-X-Gm-Message-State: ACrzQf1Sb6mJHhzqlQ94/AeBr2X+ZLvt/t/YEMktbWXPizmb/djHTmtI
-        wODrkV1+UQ991mkZcoeNlFXuy9ERpgIctqSveulVy9VRYHs=
-X-Google-Smtp-Source: AMsMyM61at4bEZhvaPH428j8qUSJp4507BHO65b98Rw1OxZWJISyAn81PnFbbiQ5nxYYzPcOCG7jOmcfSrXYqkKvPEY=
-X-Received: by 2002:a65:4c46:0:b0:460:f598:d038 with SMTP id
- l6-20020a654c46000000b00460f598d038mr10254368pgr.99.1666000813404; Mon, 17
- Oct 2022 03:00:13 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220819174659.2427983-1-vannapurve@google.com>
- <20220819174659.2427983-4-vannapurve@google.com> <Yz80XAg74KGdSqco@google.com>
- <CAGtprH_XSCXZDroGUnL3H1CwcsbH_A_NDn8B4P2xfpSYGqKmqw@mail.gmail.com> <Y0mu1FKugNQG5T8K@google.com>
-In-Reply-To: <Y0mu1FKugNQG5T8K@google.com>
-From:   Vishal Annapurve <vannapurve@google.com>
-Date:   Mon, 17 Oct 2022 15:30:02 +0530
-Message-ID: <CAGtprH9tm2ZPY6skZuqeYq9LzpPeoSzYEnqMja3heVf06qoFgQ@mail.gmail.com>
-Subject: Re: [RFC V3 PATCH 3/6] selftests: kvm: ucall: Allow querying ucall
- pool gpa
+        with ESMTP id S230301AbiJQKKH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Oct 2022 06:10:07 -0400
+X-Greylist: delayed 903 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 17 Oct 2022 03:10:06 PDT
+Received: from baidu.com (mx21.baidu.com [220.181.3.85])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DCF762EA
+        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 03:10:05 -0700 (PDT)
+From:   "Li,Rongqing" <lirongqing@baidu.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        shuah@kernel.org, yang.zhong@intel.com, drjones@redhat.com,
-        ricarkol@google.com, aaronlewis@google.com, wei.w.wang@intel.com,
-        kirill.shutemov@linux.intel.com, corbet@lwn.net, hughd@google.com,
-        jlayton@kernel.org, bfields@fieldses.org,
-        akpm@linux-foundation.org, chao.p.peng@linux.intel.com,
-        yu.c.zhang@linux.intel.com, jun.nakajima@intel.com,
-        dave.hansen@intel.com, michael.roth@amd.com, qperret@google.com,
-        steven.price@arm.com, ak@linux.intel.com, david@redhat.com,
-        luto@kernel.org, vbabka@suse.cz, marcorr@google.com,
-        erdemaktas@google.com, pgonda@google.com, nikunj@amd.com,
-        diviness@google.com, maz@kernel.org, dmatlack@google.com,
-        axelrasmussen@google.com, maciej.szmigiero@oracle.com,
-        mizhang@google.com, bgardon@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Peter Shier <pshier@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>
+Subject: RE: [PATCH][RFC] KVM: x86: Don't reset deadline to period when timer
+ is in one shot mode
+Thread-Topic: [PATCH][RFC] KVM: x86: Don't reset deadline to period when timer
+ is in one shot mode
+Thread-Index: AQHY3lSBV3JkMQGyf0Sj/LaU+iedy64SXz/g
+Date:   Mon, 17 Oct 2022 09:54:48 +0000
+Message-ID: <94584fc76a5f41629febc53615f82b6f@baidu.com>
+References: <1665579268-7336-1-git-send-email-lirongqing@baidu.com>
+ <Y0bl2WjoG12WcCPv@google.com>
+In-Reply-To: <Y0bl2WjoG12WcCPv@google.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.22.206.8]
+x-baidu-bdmsfe-datecheck: 1_BJHW-Mail-Ex14_2022-10-17 17:54:49:128
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
+X-FEAS-Client-IP: 10.127.64.37
+X-FE-Last-Public-Client-IP: 100.100.100.38
+X-FE-Policy-ID: 15:10:21:SYSTEM
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Oct 15, 2022 at 12:17 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Oct 14, 2022, Vishal Annapurve wrote:
-> > On Fri, Oct 7, 2022 at 1:32 AM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > On Fri, Aug 19, 2022, Vishal Annapurve wrote:
-> > > > Add a helper to query guest physical address for ucall pool
-> > > > so that guest can mark the page as accessed shared or private.
-> > > >
-> > > > Signed-off-by: Vishal Annapurve <vannapurve@google.com>
-> > > > ---
-> > >
-> > > This should be handled by the SEV series[*].  Can you provide feedback on that
-> > > series if having a generic way to map the ucall address as shared won't work?
-> > >
-> > > [*] https://lore.kernel.org/all/20220829171021.701198-1-pgonda@google.com
+
+
+> -----Original Message-----
+> From: Sean Christopherson <seanjc@google.com>
+> Sent: Thursday, October 13, 2022 12:06 AM
+> To: Li,Rongqing <lirongqing@baidu.com>
+> Cc: kvm@vger.kernel.org; Peter Shier <pshier@google.com>; Jim Mattson
+> <jmattson@google.com>; Wanpeng Li <wanpengli@tencent.com>
+> Subject: Re: [PATCH][RFC] KVM: x86: Don't reset deadline to period when timer
+> is in one shot mode
+> 
+> +Jim, Peter, and Wanpeng
+> 
+> On Wed, Oct 12, 2022, Li RongQing wrote:
+> > In one-shot mode, the APIC timer stops counting when the timer reaches
+> > zero, so don't reset deadline to period for one shot mode
 > >
-> > Based on the SEV series you referred to, selftests are capable of
-> > accessing ucall pool memory by having encryption bit cleared (as set
-> > by guest pagetables) as allowed by generic API vm_vaddr_alloc_shared.
-> > This change is needed in the context of fd based private memory where
-> > guest (specifically non-confidential/sev guests) code in the selftests
-> > will have to explicitly indicate that ucall pool address range will be
-> > accessed by guest as shared.
->
-> Ah, right, the conversion needs an explicit hypercall, which gets downright
-> annoying because auto-converting shared pages would effectivfely require injecting
-> code into the start of every guest.
->
-Ack.
+> > Signed-off-by: Li RongQing <lirongqing@baidu.com>
+> > ---
+> >  arch/x86/kvm/lapic.c | 8 ++++++--
+> >  1 file changed, 6 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c index
+> > 9dda989..bf39027 100644
+> > --- a/arch/x86/kvm/lapic.c
+> > +++ b/arch/x86/kvm/lapic.c
+> > @@ -1840,8 +1840,12 @@ static bool set_target_expiration(struct kvm_lapic
+> *apic, u32 count_reg)
+> >  		if (unlikely(count_reg != APIC_TMICT)) {
+> >  			deadline = tmict_to_ns(apic,
+> >  				     kvm_lapic_get_reg(apic, count_reg));
+> > -			if (unlikely(deadline <= 0))
+> > -				deadline = apic->lapic_timer.period;
+> > +			if (unlikely(deadline <= 0)) {
+> > +				if (apic_lvtt_period(apic))
+> > +					deadline = apic->lapic_timer.period;
+> > +				else
+> > +					deadline = 0;
+> > +			}
+> 
+> This is not the standard "count has reached zero" path, it's the "vCPU is
+> migrated and the timer needs to be resumed on the destination" path.
+> Zeroing the deadline here will not squash the timer, IIUC it will cause the timer
+> to immediately fire.
+> 
+> That said, I think the patch is actually correct 
 
-> Ha!  I think we got too fancy.  This is purely for testing UPM, not any kind of
-> trust model, i.e. there's no need for KVM to treat userspace as untrusted.  Rather
-> than jump through hoops just to let the guest dictate private vs. shared, simply
-> "trust" userspace when determining whether a page should be mapped private.  Then
-> the selftests can invoke the repurposed KVM_MEMORY_ENCRYPT_(UN)REG_REGION ioctls
-> as appropriate when allocating/remapping guest private memory.
->
-> E.g. on top of UPM v8, I think the test hook boils down to:
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index d68944f07b4b..d42d0e6bdd8c 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4279,6 +4279,9 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->
->         fault->gfn = fault->addr >> PAGE_SHIFT;
->         fault->slot = kvm_vcpu_gfn_to_memslot(vcpu, fault->gfn);
-> +       fault->is_private = IS_ENABLED(CONFIG_KVM_PRIVATE_MEM_TESTING) &&
-> +                           kvm_slot_can_be_private(fault->slot) &&
-> +                           kvm_mem_is_private(vcpu->kvm, fault->gfn);
->
->         if (page_fault_handle_page_track(vcpu, fault))
->                 return RET_PF_EMULATE;
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 8ffd4607c7d8..0dc5d0bf647c 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1653,7 +1653,7 @@ static void kvm_replace_memslot(struct kvm *kvm,
->
->  bool __weak kvm_arch_has_private_mem(struct kvm *kvm)
->  {
-> -       return false;
-> +       return IS_ENABLED(CONFIG_KVM_PRIVATE_MEM_TESTING);
->  }
->
->  static int check_memory_region_flags(struct kvm *kvm,
+Should we set deadline to 0 when it is expired whether the timer is one shot mode or period mode ?
 
-This is much sleeker and will avoid hacking KVM for testing. Only
-caveat here is that these tests will not be able to exercise implicit
-conversion path if we go this route.
+>even though the shortlog+changelog are wrong. 
+
+I will rewrite it
+
+Thanks
+
+-Li
+
+
+
+
+
+
