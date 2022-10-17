@@ -2,66 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B41E1600FA7
-	for <lists+kvm@lfdr.de>; Mon, 17 Oct 2022 15:00:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3310460119C
+	for <lists+kvm@lfdr.de>; Mon, 17 Oct 2022 16:53:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230474AbiJQNA3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Oct 2022 09:00:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53526 "EHLO
+        id S230233AbiJQOx0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Oct 2022 10:53:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230455AbiJQNAZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Oct 2022 09:00:25 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50B98402F7;
-        Mon, 17 Oct 2022 06:00:23 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 6C7EA20628;
-        Mon, 17 Oct 2022 13:00:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1666011622; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9MB8IK99devSsbVKuCFsHUWmVzyz2mqfU8Y26jvqzv4=;
-        b=zhssMzsy/2w3OsoMr5WAqLlA15XAps4taHC3oW1kGemgiv5Of9mor6m5UgiloYUrq2u49x
-        uDXT5zpFbYy9NZ0ASsOtsb+1Qs6LN7GNt7HIVECX8kRRRI3VZDkM5TDsZSFVpj/QXQNNwK
-        yanlAR/KhCIc2KkUwCruBQ0yKEZ+4Kg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1666011622;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9MB8IK99devSsbVKuCFsHUWmVzyz2mqfU8Y26jvqzv4=;
-        b=kbo9YyUMH19Ty6ZeoQYYH6O8OBIIOCUsNjK8YY66kGueMJBtfGm21E2ES6nlbGbqGWxjnN
-        LDRgm2Xy/RcUW8Cw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D189713ABE;
-        Mon, 17 Oct 2022 13:00:21 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id QVZuMuVRTWOhRgAAMHmgww
-        (envelope-from <vbabka@suse.cz>); Mon, 17 Oct 2022 13:00:21 +0000
-Message-ID: <de680280-f6b1-9337-2ae4-4b2faf2b823b@suse.cz>
-Date:   Mon, 17 Oct 2022 15:00:21 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
-Content-Language: en-US
-To:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S229949AbiJQOxZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Oct 2022 10:53:25 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C3FB68CD1;
+        Mon, 17 Oct 2022 07:53:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1666018398; x=1697554398;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=I4wfniHW10JfPeprn5rTb+kTvRXkxXZTaEZmmRNpMCk=;
+  b=P8R4Dh4olIwXLAjxWflWJ5tLmVFc0gNEIKGdSW0s1WdPBjbDbeK4mdnp
+   IeBEmYrdybRBOeEBW0e3OfTJhuD/BJm+m4xFTNVdgvUGStjGZ/gPyFGmm
+   2fdWUHlHLPk3TAh4PQ7JQ5JOlPwU0VJgXSEsycHLqxDJ2pBw/cLAZb82R
+   Nf9QAqzkIamAMl/vebcQUKjpOC8T7zFi/7nXzwOMw1MhqAVrIOGnwJjNS
+   1kTD9F0XiNbmIFPrBGB5UwNEUhasB1KvuF3vezv9rPu+A2WqTK14lPp9y
+   SPEbJIA0hubiF89W/60ihQzPLn4SMhrZZ3We3+O71Vd73sTL556F2Nrad
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10503"; a="370008643"
+X-IronPort-AV: E=Sophos;i="5.95,191,1661842800"; 
+   d="scan'208";a="370008643"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2022 07:53:15 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10503"; a="691384101"
+X-IronPort-AV: E=Sophos;i="5.95,191,1661842800"; 
+   d="scan'208";a="691384101"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by fmsmga008.fm.intel.com with ESMTP; 17 Oct 2022 07:53:06 -0700
+Date:   Mon, 17 Oct 2022 22:48:35 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
         Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -76,6 +60,7 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
         Steven Price <steven.price@arm.com>,
         "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
         Vishal Annapurve <vannapurve@google.com>,
         Yu Zhang <yu.c.zhang@linux.intel.com>,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
@@ -85,103 +70,102 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Quentin Perret <qperret@google.com>,
         Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
         Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v8 7/8] KVM: Handle page fault for private memory
+Message-ID: <20221017144835.GA3417432@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
 References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
- <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
-From:   Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_SOFTFAIL autolearn=ham autolearn_force=no
-        version=3.4.6
+ <20220915142913.2213336-8-chao.p.peng@linux.intel.com>
+ <Y0mxEFpvS7O96CCD@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y0mxEFpvS7O96CCD@google.com>
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/15/22 16:29, Chao Peng wrote:
-> From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+On Fri, Oct 14, 2022 at 06:57:20PM +0000, Sean Christopherson wrote:
+> On Thu, Sep 15, 2022, Chao Peng wrote:
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index a0f198cede3d..81ab20003824 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -3028,6 +3028,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
+> >  			break;
+> >  	}
+> >  
+> > +	if (kvm_mem_is_private(kvm, gfn))
 > 
-> KVM can use memfd-provided memory for guest memory. For normal userspace
-> accessible memory, KVM userspace (e.g. QEMU) mmaps the memfd into its
-> virtual address space and then tells KVM to use the virtual address to
-> setup the mapping in the secondary page table (e.g. EPT).
-> 
-> With confidential computing technologies like Intel TDX, the
-> memfd-provided memory may be encrypted with special key for special
-> software domain (e.g. KVM guest) and is not expected to be directly
-> accessed by userspace. Precisely, userspace access to such encrypted
-> memory may lead to host crash so it should be prevented.
-> 
-> This patch introduces userspace inaccessible memfd (created with
-> MFD_INACCESSIBLE). Its memory is inaccessible from userspace through
-> ordinary MMU access (e.g. read/write/mmap) but can be accessed via
-> in-kernel interface so KVM can directly interact with core-mm without
-> the need to map the memory into KVM userspace.
-> 
-> It provides semantics required for KVM guest private(encrypted) memory
-> support that a file descriptor with this flag set is going to be used as
-> the source of guest memory in confidential computing environments such
-> as Intel TDX/AMD SEV.
-> 
-> KVM userspace is still in charge of the lifecycle of the memfd. It
-> should pass the opened fd to KVM. KVM uses the kernel APIs newly added
-> in this patch to obtain the physical memory address and then populate
-> the secondary page table entries.
-> 
-> The userspace inaccessible memfd can be fallocate-ed and hole-punched
-> from userspace. When hole-punching happens, KVM can get notified through
-> inaccessible_notifier it then gets chance to remove any mapped entries
-> of the range in the secondary page tables.
-> 
-> The userspace inaccessible memfd itself is implemented as a shim layer
-> on top of real memory file systems like tmpfs/hugetlbfs but this patch
-> only implemented tmpfs. The allocated memory is currently marked as
-> unmovable and unevictable, this is required for current confidential
-> usage. But in future this might be changed.
-> 
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> ---
+> Rather than reload the Xarray info, which is unnecessary overhead, pass in
+> @is_private.  The caller must hold mmu_lock, i.e. invalidations from
+> private<->shared conversions will be stalled and will zap the new SPTE if the
+> state is changed.
 
-...
+Make sense. TDX/SEV should be easy to query that.
 
-> +static long inaccessible_fallocate(struct file *file, int mode,
-> +				   loff_t offset, loff_t len)
+Chao
+> 
+> E.g.
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index d68944f07b4b..44eea47697d8 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3072,8 +3072,8 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+>          * Enforce the iTLB multihit workaround after capturing the requested
+>          * level, which will be used to do precise, accurate accounting.
+>          */
+> -       fault->req_level = kvm_mmu_max_mapping_level(vcpu->kvm, slot,
+> -                                                    fault->gfn, fault->max_level);
+> +       fault->req_level = kvm_mmu_max_mapping_level(vcpu->kvm, slot, fault->gfn,
+> +                                                    fault->max_level, fault->is_private);
+>         if (fault->req_level == PG_LEVEL_4K || fault->huge_page_disallowed)
+>                 return;
+>  
+> @@ -6460,7 +6460,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+>                  */
+>                 if (sp->role.direct &&
+>                     sp->role.level < kvm_mmu_max_mapping_level(kvm, slot, sp->gfn,
+> -                                                              PG_LEVEL_NUM)) {
+> +                                                              PG_LEVEL_NUM, false)) {
+>                         kvm_zap_one_rmap_spte(kvm, rmap_head, sptep);
+>  
+>                         if (kvm_available_flush_tlb_with_range())
+> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+> index 7670c13ce251..9acdf72537ce 100644
+> --- a/arch/x86/kvm/mmu/spte.h
+> +++ b/arch/x86/kvm/mmu/spte.h
+> @@ -315,6 +315,12 @@ static inline bool is_dirty_spte(u64 spte)
+>         return dirty_mask ? spte & dirty_mask : spte & PT_WRITABLE_MASK;
+>  }
+>  
+> +static inline bool is_private_spte(u64 spte)
 > +{
-> +	struct inaccessible_data *data = file->f_mapping->private_data;
-> +	struct file *memfd = data->memfd;
-> +	int ret;
-> +
-> +	if (mode & FALLOC_FL_PUNCH_HOLE) {
-> +		if (!PAGE_ALIGNED(offset) || !PAGE_ALIGNED(len))
-> +			return -EINVAL;
-> +	}
-> +
-> +	ret = memfd->f_op->fallocate(memfd, mode, offset, len);
-> +	inaccessible_notifier_invalidate(data, offset, offset + len);
-
-Wonder if invalidate should precede the actual hole punch, otherwise we open
-a window where the page tables point to memory no longer valid?
-
-> +	return ret;
+> +       /* FIXME: Query C-bit/S-bit for SEV/TDX. */
+> +       return false;
 > +}
 > +
-
-...
-
-> +
-> +static struct file_system_type inaccessible_fs = {
-> +	.owner		= THIS_MODULE,
-> +	.name		= "[inaccessible]",
-
-Dunno where exactly is this name visible, but shouldn't it better be
-"[memfd:inaccessible]"?
-
-> +	.init_fs_context = inaccessible_init_fs_context,
-> +	.kill_sb	= kill_anon_super,
-> +};
-> +
-
+>  static inline u64 get_rsvd_bits(struct rsvd_bits_validate *rsvd_check, u64 pte,
+>                                 int level)
+>  {
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 672f0432d777..69ba00157e90 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -1767,8 +1767,9 @@ static void zap_collapsible_spte_range(struct kvm *kvm,
+>                 if (iter.gfn < start || iter.gfn >= end)
+>                         continue;
+>  
+> -               max_mapping_level = kvm_mmu_max_mapping_level(kvm, slot,
+> -                                                             iter.gfn, PG_LEVEL_NUM);
+> +               max_mapping_level = kvm_mmu_max_mapping_level(kvm, slot, iter.gfn,
+> +                                                             PG_LEVEL_NUM,
+> +                                                             is_private_spte(iter.old_spte));
+>                 if (max_mapping_level < iter.level)
+>                         continue;
+>  
