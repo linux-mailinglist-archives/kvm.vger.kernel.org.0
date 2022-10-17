@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB03D600E23
-	for <lists+kvm@lfdr.de>; Mon, 17 Oct 2022 13:52:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2EE9600E25
+	for <lists+kvm@lfdr.de>; Mon, 17 Oct 2022 13:52:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229984AbiJQLwZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Oct 2022 07:52:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59412 "EHLO
+        id S230102AbiJQLw3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Oct 2022 07:52:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229663AbiJQLwY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Oct 2022 07:52:24 -0400
+        with ESMTP id S229816AbiJQLw2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Oct 2022 07:52:28 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71AD52AF6
-        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 04:52:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C1AE15812
+        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 04:52:27 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0D53761059
-        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 11:52:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67715C433D6;
-        Mon, 17 Oct 2022 11:52:19 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8D33B610A2
+        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 11:52:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB5B4C4347C;
+        Mon, 17 Oct 2022 11:52:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666007542;
-        bh=Agj2ydyGb7Qw6DHm3okfH7eFFMNUSbdiqhNp1y5awkk=;
-        h=From:To:Cc:Subject:Date:From;
-        b=IlLqhrzCc89+oU47Thh5Ldinei61r0KRjREeJH1vovec2TsHvZYk5GHAiSnpExOnG
-         MQkTXmxX8MvB9C+UZSF/MsRNFQpYPI3UCYp9rHACATnysPhvCyADu2ZcO/eN5jHcAp
-         4/tByLpRnO8riY26KQOmQge0ZLA2phOcPIIOVOMwRmxTcaXWkjNQaEZJ28ZDFd7tV5
-         1vmApOOGPCDPrxyV9Ayvwey0Vu88gG3oemr/YbVViEk9yoBzL0RL1w4PYpxZDyatnl
-         bp5jkYVr02L48UXqMveF5goIS5KpsKk5BdMu/Of1ed3y/E4cCYLeOQOYp2ol6172Y1
-         zyu2VqFx4QG/Q==
+        s=k20201202; t=1666007546;
+        bh=+fQLKdCRMyVXv9zLE1eBeiQI5NRaL8bTwzFAc5SEhgA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=VVyzoKkgxXVLlKW+5D+YXWMw+eO+YwNFEq7bybQ7FVGUq2S/jHJs665RCaw9C+QgX
+         r4+DbDzpZjjl2HhbMAybZMG65B+CUDVXyoSkNNgmfxWGS4lBHa5lccnxJAb0kkkhOa
+         y8VHQHGYnX6xcJpxPCk2+andsIWNmOMa/FJalQ8y6vs31J8CuUNTU7hanuXSRXjV1z
+         085HAXdIo6MGb/GsV05ARQVSanCmitQAHSEiMGYZ80MC0bMboFdw+p++B2JLJbTItj
+         ptaT5o52dhY/FrYbvVfYdrWYg/4UXiFydICg6B7IVNLS8nNFCMeGBewh6MNxyT7QBt
+         wbB8swDwtyhyA==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.linux.dev
 Cc:     Will Deacon <will@kernel.org>,
@@ -47,10 +47,12 @@ Cc:     Will Deacon <will@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v4 00/25] KVM: arm64: Introduce pKVM hyp VM and vCPU state at EL2
-Date:   Mon, 17 Oct 2022 12:51:44 +0100
-Message-Id: <20221017115209.2099-1-will@kernel.org>
+Subject: [PATCH v4 01/25] KVM: arm64: Move hyp refcount manipulation helpers to common header file
+Date:   Mon, 17 Oct 2022 12:51:45 +0100
+Message-Id: <20221017115209.2099-2-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20221017115209.2099-1-will@kernel.org>
+References: <20221017115209.2099-1-will@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-7.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -62,138 +64,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi everyone,
+From: Quentin Perret <qperret@google.com>
 
-This is version four of the patches previously posted at:
+We will soon need to manipulate 'struct hyp_page' refcounts from outside
+page_alloc.c, so move the helpers to a common header file to allow them
+to be reused easily.
 
-  Mega-patch: https://lore.kernel.org/kvmarm/20220519134204.5379-1-will@kernel.org/
-  v2: https://lore.kernel.org/all/20220630135747.26983-1-will@kernel.org/
-  v3: https://lore.kernel.org/kvmarm/20220914083500.5118-1-will@kernel.org/
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+Tested-by: Vincent Donnefort <vdonnefort@google.com>
+Signed-off-by: Quentin Perret <qperret@google.com>
+Signed-off-by: Will Deacon <will@kernel.org>
+---
+ arch/arm64/kvm/hyp/include/nvhe/memory.h | 22 ++++++++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c     | 19 -------------------
+ 2 files changed, 22 insertions(+), 19 deletions(-)
 
-This series extends the pKVM EL2 code so that it can dynamically
-instantiate and manage VM data structures without the host being able to
-access them directly. These structures consist of a hyp VM, a set of hyp
-vCPUs and the stage-2 page-table for the MMU. The pages used to hold the
-hypervisor structures are returned to the host when the VM is destroyed.
-
-There are only a few small changes for v4:
-
-  * Fixed missing cache maintenance when reclaiming guest pages on a system
-    with the FWB ("Force WriteBack") CPU feature
-  * Added a comment about locking requirements for refcount manipulation
-  * Fixed a kbuild robot complaint when using 52-bit physical addresses
-  * Added Vincent's Tested-by for the series
-  * Added Oliver's Reviewed-by for the first patch
-  * Rebased onto 6.1-rc1
-
-One big change since v3 is that Quentin's pKVM "technical deep dive" talk
-from this year's KVM forum is now online and hopefully provides an
-enjoyable narrative to this series:
-
-  https://www.youtube.com/watch?v=9npebeVFbFw
-
-There are still a bunch of extra patches needed to achieve guest/host
-isolation, but that follow-up work is largely stalled pending resolution
-of the guest private memory API (although KVM forum provided an
-excellent venue to iron some of those details out!):
-
-  https://lore.kernel.org/kvm/20220915142913.2213336-1-chao.p.peng@linux.intel.com/T/#t
-
-The last patch remains "RFC" as it's primarily intended for testing and
-I couldn't think of a better way to flag it.
-
-Cheers,
-
-Will, Quentin, Fuad and Marc
-
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Will Deacon <will@kernel.org>
-Cc: Vincent Donnefort <vdonnefort@google.com>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: James Morse <james.morse@arm.com>
-Cc: Chao Peng <chao.p.peng@linux.intel.com>
-Cc: Quentin Perret <qperret@google.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Fuad Tabba <tabba@google.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>
-
-Cc: kernel-team@android.com
-Cc: kvm@vger.kernel.org
-Cc: kvmarm@lists.linux.dev
-Cc: linux-arm-kernel@lists.infradead.org
-
---->8
-
-Fuad Tabba (3):
-  KVM: arm64: Add hyp_spinlock_t static initializer
-  KVM: arm64: Add infrastructure to create and track pKVM instances at
-    EL2
-  KVM: arm64: Instantiate pKVM hypervisor VM and vCPU structures from
-    EL1
-
-Quentin Perret (15):
-  KVM: arm64: Move hyp refcount manipulation helpers to common header
-    file
-  KVM: arm64: Allow attaching of non-coalescable pages to a hyp pool
-  KVM: arm64: Back the hypervisor 'struct hyp_page' array for all memory
-  KVM: arm64: Fix-up hyp stage-1 refcounts for all pages mapped at EL2
-  KVM: arm64: Implement do_donate() helper for donating memory
-  KVM: arm64: Prevent the donation of no-map pages
-  KVM: arm64: Add helpers to pin memory shared with the hypervisor at
-    EL2
-  KVM: arm64: Add per-cpu fixmap infrastructure at EL2
-  KVM: arm64: Add generic hyp_memcache helpers
-  KVM: arm64: Consolidate stage-2 initialisation into a single function
-  KVM: arm64: Instantiate guest stage-2 page-tables at EL2
-  KVM: arm64: Return guest memory from EL2 via dedicated teardown
-    memcache
-  KVM: arm64: Unmap 'kvm_arm_hyp_percpu_base' from the host
-  KVM: arm64: Explicitly map 'kvm_vgic_global_state' at EL2
-  KVM: arm64: Don't unnecessarily map host kernel sections at EL2
-
-Will Deacon (7):
-  KVM: arm64: Unify identifiers used to distinguish host and hypervisor
-  KVM: arm64: Include asm/kvm_mmu.h in nvhe/mem_protect.h
-  KVM: arm64: Rename 'host_kvm' to 'host_mmu'
-  KVM: arm64: Initialise hypervisor copies of host symbols
-    unconditionally
-  KVM: arm64: Provide I-cache invalidation by virtual address at EL2
-  KVM: arm64: Maintain a copy of 'kvm_arm_vmid_bits' at EL2
-  KVM: arm64: Use the pKVM hyp vCPU structure in handle___kvm_vcpu_run()
-
- arch/arm64/include/asm/kvm_arm.h              |   2 +-
- arch/arm64/include/asm/kvm_asm.h              |   7 +-
- arch/arm64/include/asm/kvm_host.h             |  73 ++-
- arch/arm64/include/asm/kvm_hyp.h              |   3 +
- arch/arm64/include/asm/kvm_mmu.h              |   2 +-
- arch/arm64/include/asm/kvm_pgtable.h          |  22 +
- arch/arm64/include/asm/kvm_pkvm.h             |  38 ++
- arch/arm64/kernel/image-vars.h                |  15 -
- arch/arm64/kvm/arm.c                          |  61 ++-
- arch/arm64/kvm/hyp/hyp-constants.c            |   3 +
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  25 +-
- arch/arm64/kvm/hyp/include/nvhe/memory.h      |  27 +
- arch/arm64/kvm/hyp/include/nvhe/mm.h          |  18 +-
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h        |  74 +++
- arch/arm64/kvm/hyp/include/nvhe/spinlock.h    |  10 +-
- arch/arm64/kvm/hyp/nvhe/cache.S               |  11 +
- arch/arm64/kvm/hyp/nvhe/hyp-main.c            | 110 +++-
- arch/arm64/kvm/hyp/nvhe/hyp-smp.c             |   2 +
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 502 ++++++++++++++++--
- arch/arm64/kvm/hyp/nvhe/mm.c                  | 158 +++++-
- arch/arm64/kvm/hyp/nvhe/page_alloc.c          |  28 +-
- arch/arm64/kvm/hyp/nvhe/pkvm.c                | 444 ++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/setup.c               |  96 ++--
- arch/arm64/kvm/hyp/pgtable.c                  |  21 +-
- arch/arm64/kvm/mmu.c                          |  55 +-
- arch/arm64/kvm/pkvm.c                         | 138 ++++-
- arch/arm64/kvm/reset.c                        |  29 -
- 27 files changed, 1758 insertions(+), 216 deletions(-)
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+index 592b7edb3edb..9422900e5c6a 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+@@ -38,6 +38,10 @@ static inline phys_addr_t hyp_virt_to_phys(void *addr)
+ #define hyp_page_to_virt(page)	__hyp_va(hyp_page_to_phys(page))
+ #define hyp_page_to_pool(page)	(((struct hyp_page *)page)->pool)
+ 
++/*
++ * Refcounting for 'struct hyp_page'.
++ * hyp_pool::lock must be held if atomic access to the refcount is required.
++ */
+ static inline int hyp_page_count(void *addr)
+ {
+ 	struct hyp_page *p = hyp_virt_to_page(addr);
+@@ -45,4 +49,22 @@ static inline int hyp_page_count(void *addr)
+ 	return p->refcount;
+ }
+ 
++static inline void hyp_page_ref_inc(struct hyp_page *p)
++{
++	BUG_ON(p->refcount == USHRT_MAX);
++	p->refcount++;
++}
++
++static inline int hyp_page_ref_dec_and_test(struct hyp_page *p)
++{
++	BUG_ON(!p->refcount);
++	p->refcount--;
++	return (p->refcount == 0);
++}
++
++static inline void hyp_set_page_refcounted(struct hyp_page *p)
++{
++	BUG_ON(p->refcount);
++	p->refcount = 1;
++}
+ #endif /* __KVM_HYP_MEMORY_H */
+diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+index d40f0b30b534..1ded09fc9b10 100644
+--- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
++++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+@@ -144,25 +144,6 @@ static struct hyp_page *__hyp_extract_page(struct hyp_pool *pool,
+ 	return p;
+ }
+ 
+-static inline void hyp_page_ref_inc(struct hyp_page *p)
+-{
+-	BUG_ON(p->refcount == USHRT_MAX);
+-	p->refcount++;
+-}
+-
+-static inline int hyp_page_ref_dec_and_test(struct hyp_page *p)
+-{
+-	BUG_ON(!p->refcount);
+-	p->refcount--;
+-	return (p->refcount == 0);
+-}
+-
+-static inline void hyp_set_page_refcounted(struct hyp_page *p)
+-{
+-	BUG_ON(p->refcount);
+-	p->refcount = 1;
+-}
+-
+ static void __hyp_put_page(struct hyp_pool *pool, struct hyp_page *p)
+ {
+ 	if (hyp_page_ref_dec_and_test(p))
 -- 
 2.38.0.413.g74048e4d9e-goog
 
