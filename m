@@ -2,71 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C928F601626
-	for <lists+kvm@lfdr.de>; Mon, 17 Oct 2022 20:20:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F26EA601634
+	for <lists+kvm@lfdr.de>; Mon, 17 Oct 2022 20:25:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230053AbiJQSUg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Oct 2022 14:20:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52136 "EHLO
+        id S230196AbiJQSZv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Oct 2022 14:25:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229767AbiJQSUd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Oct 2022 14:20:33 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5C841A3A9
-        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 11:20:30 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id x1-20020a17090ab00100b001fda21bbc90so15018240pjq.3
-        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 11:20:30 -0700 (PDT)
+        with ESMTP id S229905AbiJQSZt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Oct 2022 14:25:49 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD54071BC7
+        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 11:25:46 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id b18so14980132ljr.13
+        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 11:25:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6jzGua7xpgU+8ricngS1qbS/DmygEHOLjUfJqLmkbXc=;
-        b=iqgJRnrd9hi8EcWTYk8NOT6dJTCx/JvLMyK84CkHFjHm3oNtFgEOovS2tWYR/EsxUw
-         ZL53GZ6ssLz88tFUMb6KMvmal9jWV8o7uB5cPgMsotv2eIXGJtfpvdr/OkacnTtejtRC
-         mVaKk6lnoRPbFLKEqczrcfpnWAmoyiYUtzh4V8YDbTjmR3jyALem+3a9hJ4VkhP2i82C
-         UKI2xCi/02AjofBvwcHotG3dO8+8qLbLZe9P/AfL6faIWGonepnVSS3K+0mh0s0DRQtj
-         4f+TkO0WM3a8KJhmWf+a9aNk7K5B7HGPV9QMu8FBDNwdlQF/vqyOxb9mf9d+fwPVLnzC
-         zUIw==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=s0J5M786TwaMLoMsZ1Scm7fs/H+L1tdOLwBM6CQTWeI=;
+        b=ipD578I3BnnfeMqQ/xcTjxHYz3cX6TI59AYe00AjkAU6nGV+Q4GiPC8EO4sQnVGrwM
+         d9RsREiia8cfIgb8q8f8Evaa2nf/zEpw4jeK+KgLQbAfAhT8wrkgCdoVbtjt3upSxoag
+         G8T5O5j259sPtYDszziZ6q899421SWMASVuP50YovJMxS/SUrT5lQ+vxYZZibcKP7hYK
+         A68Hs1ILFe/Qj9itaDs3xvMdl+BpCAounrj11jHn9KD/jsodwPS0EAxbi40BB+EPyJT0
+         eCvMGiD+kdLSCMByEYAVOsWULFHg466L3MqT/5Eckgluy+YnDqUjhLMnNBKEYV6GA9Ik
+         SflQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6jzGua7xpgU+8ricngS1qbS/DmygEHOLjUfJqLmkbXc=;
-        b=GxE8THis2o3p/F7ka6L+vC9w9GbPdJO2XGp91XlSdMJSfCVG/mMZw6j0Wkpe9GT/Qr
-         R+YB1WbO+oeKcfEEiYGEbFzCFLzz9ioU5gfBwn8THWFnQ4gCrFSqHl04Hbe+wy7fu5j9
-         7qKzM166R7aiEaGS/KEapiKUuYQxW8w0tt8N18n/OKlqFahcD2EmS3e5Tgayjc19mdBf
-         pKgV3jtzvEnhb4cayUukoOo33LFYD/qjzLdsut9UhMYCGbztYuyA2sJs+0pY4KtbJeix
-         TtIDa2a4aB6sDSOq2BLM4FhzGIEt/rDmIczzWyPjR3Kbf/3F/h2/rWvq0xvZUzzzaycO
-         Mg6Q==
-X-Gm-Message-State: ACrzQf2rIbIeecJug2LRN9j+HO9iZLq/Nco+drUmYNp4ZeN4UlwiaKie
-        Yf5EzmHszMq5pkGESMiYSonTuSa1/aW2+Q==
-X-Google-Smtp-Source: AMsMyM52092vOS4KtpIsEhCL9ehrUvM3YK0nowIodox2T3d1VQtgl6lpjprnkONQyYHvk8VkKaZT3w==
-X-Received: by 2002:a17:903:32c1:b0:185:5398:8c66 with SMTP id i1-20020a17090332c100b0018553988c66mr5000643plr.135.1666030830221;
-        Mon, 17 Oct 2022 11:20:30 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id n14-20020a170902d2ce00b0017f36638010sm6926072plc.276.2022.10.17.11.20.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Oct 2022 11:20:29 -0700 (PDT)
-Date:   Mon, 17 Oct 2022 18:20:24 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-Subject: Re: [PATCH v5 1/7] kvm: x86/pmu: Correct the mask used in a pmu
- event filter lookup
-Message-ID: <Y02c6JdM432f8H+A@google.com>
-References: <20220920174603.302510-1-aaronlewis@google.com>
- <20220920174603.302510-2-aaronlewis@google.com>
- <Y0C1c2bBNVF4qxJq@google.com>
- <CAAAPnDEk_bckk0W5C2vKiL4HJVUHFGV3_NqfdbsqYFqpJvuXog@mail.gmail.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=s0J5M786TwaMLoMsZ1Scm7fs/H+L1tdOLwBM6CQTWeI=;
+        b=42RZ5HOaH8vRHNNd3TrKNd6mKMrrdW4nxU5LE3adJ8zNIRTzb/TQDx4vYvC1hOLiQC
+         yJmhIEtRbGE4eCgU+eiH/1Gkknm2Flkv7OBOhewjHwCAGMw4wbHxpbdScBhYMjWLiS8U
+         dwRGokHEktq3YOi31wT8BqK0DcGfxZ3B+MjAgmvjsvu6MALyXaVLOiTJZc2nwCyMKj2n
+         QWrjziYXgOgfb1QXmCOfPLRMt7PNfuByE5jORjv8I3cSqDMi8GoWbOkRStAdp2aqHb0H
+         qBVLJ8IgHt2iyerYqypfuAEGxeajLgZYfpFhugn2ECMJdlBJN8ia2cNuVHdscbIvElnO
+         pthg==
+X-Gm-Message-State: ACrzQf2hO9ecU4WcmzIjAvUeBfo50xpOfggxhlx6ciAyPDdVl98dSDYy
+        nGWq+cc3Fdt1RDg+ijdwLiE5VjTJPaCKHap5RFOrbw==
+X-Google-Smtp-Source: AMsMyM6MN2i4QFOsG6TOmRT4cmD9zZRF8XxU4VoVShT1r4QoakmftxqylA/JwJDlztOJn6NuD4CeRvlQdvGolhVp25I=
+X-Received: by 2002:a2e:7c17:0:b0:26e:4f7:3c95 with SMTP id
+ x23-20020a2e7c17000000b0026e04f73c95mr4732936ljc.455.1666031144602; Mon, 17
+ Oct 2022 11:25:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAAPnDEk_bckk0W5C2vKiL4HJVUHFGV3_NqfdbsqYFqpJvuXog@mail.gmail.com>
+References: <20220829171021.701198-1-pgonda@google.com> <20220829171021.701198-7-pgonda@google.com>
+ <Yz8dpB5+RFjEhA3n@google.com> <CAMkAt6oZQc4jqF7FOXOKkpbP3c4NXxPumVVjX9gXwPCh-zbtYg@mail.gmail.com>
+ <Y02ZLFcDQbX6lP9z@google.com>
+In-Reply-To: <Y02ZLFcDQbX6lP9z@google.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Mon, 17 Oct 2022 12:25:32 -0600
+Message-ID: <CAMkAt6q0g5Ua=PwLXa2oA4zCQUaHuEQ3pTXycD61HU6-dtQ5Gg@mail.gmail.com>
+Subject: Re: [V4 6/8] KVM: selftests: add library for creating/interacting
+ with SEV guests
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcorr@google.com, michael.roth@amd.com, thomas.lendacky@amd.com,
+        joro@8bytes.org, mizhang@google.com, pbonzini@redhat.com,
+        andrew.jones@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,58 +72,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Oct 15, 2022, Aaron Lewis wrote:
-> > And the total patch is:
+On Mon, Oct 17, 2022 at 12:04 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Oct 17, 2022, Peter Gonda wrote:
+> > On Thu, Oct 6, 2022 at 12:25 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > And with that, I believe sev_vm_create() can go away entirely and the SEV encryption
+> > > stuff can be handled via a new vm_guest_mode.  ____vm_create() already has a gross
+> > > __x86_64__ hook that we can tweak, e.g.
+> > >
+> > > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > > index 54b8d8825f5d..2d6cbca2c01a 100644
+> > > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> > > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > > @@ -238,9 +238,10 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode, uint64_t nr_pages)
+> > >         case VM_MODE_P36V47_16K:
+> > >                 vm->pgtable_levels = 3;
+> > >                 break;
+> > > +       case VM_MODE_PXXV48_4K_SEV:
+> > >         case VM_MODE_PXXV48_4K:
+> > >  #ifdef __x86_64__
+> > > -               kvm_get_cpu_address_width(&vm->pa_bits, &vm->va_bits);
+> > > +               kvm_init_vm_address_properties(vm);
+> > >                 /*
+> > >                  * Ignore KVM support for 5-level paging (vm->va_bits == 57),
+> > >                  * it doesn't take effect unless a CR4.LA57 is set, which it
+> > >
+> > > Then kvm_init_vm_address_properties() can pivot on vm->mode to deal with SEV
+> > > specific stuff.
+>
+> ...
+>
+> > This refactor sounds good, working on this with a few changes.
 > >
-> > ---
-> >  arch/x86/kvm/pmu.c           | 2 +-
-> >  arch/x86/kvm/pmu.h           | 2 ++
-> >  arch/x86/kvm/svm/pmu.c       | 2 ++
-> >  arch/x86/kvm/vmx/pmu_intel.c | 2 ++
-> >  4 files changed, 7 insertions(+), 1 deletion(-)
+> > Instead of kvm_init_vm_address_properties() as you suggested I've added this:
 > >
-> > diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> > index d9b9a0f0db17..d0e2c7eda65b 100644
-> > --- a/arch/x86/kvm/pmu.c
-> > +++ b/arch/x86/kvm/pmu.c
-> > @@ -273,7 +273,7 @@ static bool check_pmu_event_filter(struct kvm_pmc *pmc)
-> >                 goto out;
+> > @@ -272,6 +275,8 @@ struct kvm_vm *____vm_create(enum vm_guest_mode
+> >  mode, uint64_t nr_pages)
+> >                 vm->type = KVM_VM_TYPE_ARM_IPA_SIZE(vm->pa_bits);
+> >  #endif
 > >
-> >         if (pmc_is_gp(pmc)) {
-> > -               key = pmc->eventsel & AMD64_RAW_EVENT_MASK_NB;
-> > +               key = pmc->eventsel & kvm_pmu_ops.EVENTSEL_MASK;
-> >                 if (bsearch(&key, filter->events, filter->nevents,
-> >                             sizeof(__u64), cmp_u64))
-> >                         allow_event = filter->action == KVM_PMU_EVENT_ALLOW;
-> > diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-> > index 5cc5721f260b..45a7dd24125d 100644
-> > --- a/arch/x86/kvm/pmu.h
-> > +++ b/arch/x86/kvm/pmu.h
-> > @@ -40,6 +40,8 @@ struct kvm_pmu_ops {
-> >         void (*reset)(struct kvm_vcpu *vcpu);
-> >         void (*deliver_pmi)(struct kvm_vcpu *vcpu);
-> >         void (*cleanup)(struct kvm_vcpu *vcpu);
+> > +       kvm_init_vm_arch(vm);
+>
+> Why?  I'm not necessarily opposed to adding kvm_init_vm_arch(), but since x86
+> "needs" a dedicated hook to unpack the mode, why not piggyback that one?
+>
+
+Well I since I need to do more than just
+kvm_init_vm_address_properties() I thought the more generic name would
+be better. We need to allocate kvm_vm_arch, find the c-bit, and call
+KVM_SEV_INIT. I can put it back in that switch case if thats better,
+thoughts?
+
 > > +
-> > +       const u64 EVENTSEL_MASK;
-> 
-> Agreed, a constant is better.  Had I realized I could do that, that
-> would have been my first choice.
-> 
-> What about calling it EVENTSEL_RAW_MASK to make it more descriptive
-> though?  It's a little too generic given there is EVENTSEL_UMASK and
-> EVENTSEL_CMASK, also there is precedent for using the term 'raw event'
-> for (eventsel+umask), i.e.
-> https://man7.org/linux/man-pages/man1/perf-record.1.html.
+> >         vm_open(vm);
+> >
+> >         /* Limit to VA-bit canonical virtual addresses. */
+> >
+> > And I need to put kvm_arch_vm_post_create() after the vCPUs are
+> > created because the ordering we need is: KVM_SEV_INIT -> Create vCPUS
+> > -> KVM_SEV_LAUNCH_FINISH.
+>
+> Hrm, that's annoying.  Please don't use kvm_arch_vm_post_create() as the name,
+> that's a better fit for what Vishal is doing since the "vm_post_create()" implies
+> that it's called for "all" VM creation paths, where "all" means "everything
+> except barebones VMs".  E.g. in Vishal's series, kvm_arch_vm_post_create() can
+> be used to drop the vm_create_irqchip() call in common code.  In your case, IIUC
+> the hook will be invoked from __vm_create_with_vcpus().
+>
+> I'm a little hesitant to have an arch hook for this case since it can't be
+> all-or-nothing (again, ignoring barebones VMs).  If a "finalize" arch hook is added,
+> then arguably tests that do __vm_create() and manually add vCPUs should call the
+> arch hook, i.e. we'd be adding maintenance burden to tests that in all likelihood
+> don't care about SEV and never will.
+>
+> It's somewhat unfortunate, but dedicated vm_sev_create_with_one_vcpu() and
+> and vm_sev_create_with_vcpus() wrappers is probably the least awful solution.
 
-Hmm.  I'd prefer to avoid "raw" because that implies there's a non-raw version
-that can be translated into the "raw" version.  This is kinda the opposite, where
-the above field is the composite type and the invidiual fields are the "raw"
-components.
-
-Refresh me, as I've gotten twisted about: this mask needs to be EVENTSEL_EVENT_MASK
-+ EVENTSEL_UMASK, correct?  Or phrased differently, it'll hold more than just
-EVENTSEL_EVENT_MASK?
-
-What about something completely different, e.g. FILTER_MASK?  It'll require a
-comment to document, but that seems inevitable, and FILTER_MASK should be really
-hard to confuse with the myriad EVENTSEL_*MASK fields.
+Make sense. I think we can go back to your suggestion of
+kvm_init_vm_address_properties() above since we can now do all the
+KVM_SEV_* stuff. I think this means we don't need to add
+VM_MODE_PXXV48_4K_SEV since we can set up the c-bit from inside of
+vm_sev_create_*(), thoughts?
