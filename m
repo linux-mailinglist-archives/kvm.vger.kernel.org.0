@@ -2,611 +2,511 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ACC69601357
-	for <lists+kvm@lfdr.de>; Mon, 17 Oct 2022 18:24:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5EF4D60137C
+	for <lists+kvm@lfdr.de>; Mon, 17 Oct 2022 18:33:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229797AbiJQQY5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Oct 2022 12:24:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60554 "EHLO
+        id S230085AbiJQQc6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Oct 2022 12:32:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229772AbiJQQYz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Oct 2022 12:24:55 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CA1E24BE5;
-        Mon, 17 Oct 2022 09:24:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666023893; x=1697559893;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=4R89BSmAMFrRQ1rbp8RHr7lLvOERqv6UEHJTCyKVdZY=;
-  b=hSJawlH68KFODyuv2R8mU3t6XnUfDY8tFARj4kx55Mh4sOkvGI2mu6jf
-   eKhJO1JOka9cA4L4Z6zGUCH+s7luXCK4uKtcsQF53SnHvJuYKecn4gint
-   d7fXQtE1XZVeHBEeobxlY844VKZpr9TFRt6rJSnCOfkvJ8jZnN/yQpD+j
-   dqDSaWq0qZzZq0xj9h68Bt4Y0WWU0jxDsC6IEuOokYQut7KR53wPu5m6Z
-   X2AAayJ7OPa4wi7b/JZ+4zgKDyV7DTNVEMlV20IbX7bl8M/bUJvUUtEsI
-   xsAxLcOmhk3paI76Vw1Jf9ACmCtG+XTUg+zgt+D/nJteoC+mixia1W//N
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10503"; a="367873200"
-X-IronPort-AV: E=Sophos;i="5.95,192,1661842800"; 
-   d="scan'208";a="367873200"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2022 09:24:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10503"; a="733220984"
-X-IronPort-AV: E=Sophos;i="5.95,192,1661842800"; 
-   d="scan'208";a="733220984"
-Received: from tdx-lm.sh.intel.com ([10.239.53.27])
-  by fmsmga002.fm.intel.com with ESMTP; 17 Oct 2022 09:24:50 -0700
-From:   Wei Wang <wei.w.wang@intel.com>
-To:     seanjc@google.com, pbonzini@redhat.com
-Cc:     dmatlack@google.com, vipinsh@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Wei Wang <wei.w.wang@intel.com>
-Subject: [PATCH v1] KVM: selftests: name the threads
-Date:   Tue, 18 Oct 2022 00:24:48 +0800
-Message-Id: <20221017162448.257173-1-wei.w.wang@intel.com>
-X-Mailer: git-send-email 2.27.0
+        with ESMTP id S229942AbiJQQc5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Oct 2022 12:32:57 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42A3F2BCA
+        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 09:32:55 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id j4so18434241lfk.0
+        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 09:32:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=G+NNDBimJt6iuNVKZWTKNAygMVDxh+MmfNb6Pvu89mM=;
+        b=jqIpXUutzBroBLsBPqFpFNHIETNkF4VBS5xSmyqGesst1d2puspWlJRGIXD0WSQbHv
+         KHhcmQvRKuomtxCxCc+mEcWoPtrMr8DI9g+mXOhTOiP52LMRCGNREfVin2ZjnzUSW567
+         8QOHFNcHsEsNzfXWeerA+VBkcWjqxmk34CjYWYUAJ9kisgYBlguDJQImKCgNB4z7cnZ9
+         eVgI98JoQPgExFsE85/yDzUFOJi59Tm6olBy/0ltAyFiV8RYBgJ8ANiLPdhX1nwrhTtH
+         nu8uENMZWCf8+3CtDGY//4qN6CHEhCokO5rbYlJ2FfMRoxGqqTb/v33GAZ/4OsYG0kZX
+         lqbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=G+NNDBimJt6iuNVKZWTKNAygMVDxh+MmfNb6Pvu89mM=;
+        b=BZ+mjAOz1I73HNjLWRN/R3bbaq5XTJ9hyak4v2mlmNBGMYkPhY4pjNqfdZF4l1B9BA
+         hOZxUPQ1xmaoGKKnngpUdBndWL1DlQcZ4KVbIFkn6BiXlG3nKuxtDmKjR9SuL3K7TO/K
+         uIEri8n1YEzBM1an9nJAJlsmhqhKem5wvvm0tpEBfTAwjM0V87l61gODnxrIomoZrqP3
+         mO0hDoa4DwUooQ2kEmO2Zuv6gf5E57cRfbInIYx3aNcZpG2QyX7lrXHsFidTT18ye7VC
+         nUUGBc+29pc6TGvBycbtAA8byXpQILomzA7yzt61PPg0s+E4SAgXt8AIQHP5BNYk4T3T
+         QLHw==
+X-Gm-Message-State: ACrzQf3/YEeGK71fSjx1rXgogXHqm0xa+vIqOQl+SND9WhvDZC7qRPOl
+        rULN45V4tMWogqrqh9t+7uUD5kMJeoAQ7ZyoM604Sw==
+X-Google-Smtp-Source: AMsMyM7ePTv77sEaro3RsDVe6c8dX0ljwdugOpwh4TdimBQERnam8DtyJF5BC5WX+q2SH92VwzpFr0Vv4hBHiD8hCy4=
+X-Received: by 2002:a05:6512:12c4:b0:4a2:5598:f6a2 with SMTP id
+ p4-20020a05651212c400b004a25598f6a2mr4083606lfg.409.1666024373216; Mon, 17
+ Oct 2022 09:32:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20220829171021.701198-1-pgonda@google.com> <20220829171021.701198-7-pgonda@google.com>
+ <Yz8dpB5+RFjEhA3n@google.com>
+In-Reply-To: <Yz8dpB5+RFjEhA3n@google.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Mon, 17 Oct 2022 10:32:41 -0600
+Message-ID: <CAMkAt6oZQc4jqF7FOXOKkpbP3c4NXxPumVVjX9gXwPCh-zbtYg@mail.gmail.com>
+Subject: Re: [V4 6/8] KVM: selftests: add library for creating/interacting
+ with SEV guests
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcorr@google.com, michael.roth@amd.com, thomas.lendacky@amd.com,
+        joro@8bytes.org, mizhang@google.com, pbonzini@redhat.com,
+        andrew.jones@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Name the threads to facilitate debugging, performance tuning,
-runtime pining etc. pthread_create_with_name is used to create
-general threads with user specified name, and kvm_vcpu_thread_create
-is used to create vcpu threads with name in "vcpu##id" format.
+On Thu, Oct 6, 2022 at 12:25 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Aug 29, 2022, Peter Gonda wrote:
+> > Add interfaces to allow tests to create/manage SEV guests. The
+> > additional state associated with these guests is encapsulated in a new
+> > struct sev_vm, which is a light wrapper around struct kvm_vm. These
+> > VMs will use vm_set_memory_encryption() and vm_get_encrypted_phy_pages()
+> > under the covers to configure and sync up with the core kvm_util
+> > library on what should/shouldn't be treated as encrypted memory.
+> >
+> > Originally-by: Michael Roth <michael.roth@amd.com>
+> > Signed-off-by: Peter Gonda <pgonda@google.com>
+> > ---
+> >  tools/testing/selftests/kvm/Makefile          |   1 +
+> >  .../selftests/kvm/include/kvm_util_base.h     |   3 +
+> >  .../selftests/kvm/include/x86_64/sev.h        |  47 ++++
+> >  tools/testing/selftests/kvm/lib/x86_64/sev.c  | 232 ++++++++++++++++++
+> >  4 files changed, 283 insertions(+)
+> >  create mode 100644 tools/testing/selftests/kvm/include/x86_64/sev.h
+> >  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/sev.c
+> >
+> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> > index 23649c5d42fc..0a70e50f0498 100644
+> > --- a/tools/testing/selftests/kvm/Makefile
+> > +++ b/tools/testing/selftests/kvm/Makefile
+> > @@ -56,6 +56,7 @@ LIBKVM_x86_64 += lib/x86_64/processor.c
+> >  LIBKVM_x86_64 += lib/x86_64/svm.c
+> >  LIBKVM_x86_64 += lib/x86_64/ucall.c
+> >  LIBKVM_x86_64 += lib/x86_64/vmx.c
+> > +LIBKVM_x86_64 += lib/x86_64/sev.c
+> >
+> >  LIBKVM_aarch64 += lib/aarch64/gic.c
+> >  LIBKVM_aarch64 += lib/aarch64/gic_v3.c
+> > diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> > index 489e8c833e5f..0927e262623d 100644
+> > --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> > +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> > @@ -69,6 +69,7 @@ struct userspace_mem_regions {
+> >  /* Memory encryption policy/configuration. */
+> >  struct vm_memcrypt {
+> >       bool enabled;
+> > +     bool encrypted;
+> >       int8_t enc_by_default;
+> >       bool has_enc_bit;
+> >       int8_t enc_bit;
+> > @@ -831,6 +832,8 @@ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva);
+> >
+> >  static inline vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+> >  {
+> > +     TEST_ASSERT(!vm->memcrypt.encrypted,
+>
+> vm->protected
+>
+> > +                 "Encrypted guests have their page tables encrypted so gva2gpa conversions are not possible.");
+>
+> Unnecessarily verbose, e.g.
+>
+>                     "Protected VMs have private, inaccessible page tables");
+>
+> > +#define CPUID_MEM_ENC_LEAF 0x8000001f
+> > +#define CPUID_EBX_CBIT_MASK 0x3f
+> > +
+> > +/* Common SEV helpers/accessors. */
+>
+> Please drop this comment and the "Local helpers" and "SEV VM implementation" comments
+> below.  There's 0% chance these comments will stay fresh as code is added and moved
+> around.  They also add no value IMO, e.g. "static" makes it quite obvious it's a
+> local function, and sev_* vs. sev_es_*. vs. sev_snp_* namespacing takes care of the
+> rest.
+>
+> > +void sev_ioctl(int sev_fd, int cmd, void *data)
+> > +{
+> > +     int ret;
+> > +     struct sev_issue_cmd arg;
+> > +
+> > +     arg.cmd = cmd;
+> > +     arg.data = (unsigned long)data;
+> > +     ret = ioctl(sev_fd, SEV_ISSUE_CMD, &arg);
+> > +     TEST_ASSERT(ret == 0,
+> > +                 "SEV ioctl %d failed, error: %d, fw_error: %d",
+> > +                 cmd, ret, arg.error);
+> > +}
+> > +
+> > +void kvm_sev_ioctl(struct sev_vm *sev, int cmd, void *data)
+> > +{
+> > +     struct kvm_sev_cmd arg = {0};
+> > +     int ret;
+> > +
+> > +     arg.id = cmd;
+> > +     arg.sev_fd = sev->fd;
+> > +     arg.data = (__u64)data;
+> > +
+> > +     ret = ioctl(sev->vm->fd, KVM_MEMORY_ENCRYPT_OP, &arg);
+> > +     TEST_ASSERT(ret == 0,
+> > +                 "SEV KVM ioctl %d failed, rc: %i errno: %i (%s), fw_error: %d",
+> > +                 cmd, ret, errno, strerror(errno), arg.error);
+> > +}
+> > +
+> > +/* Local helpers. */
+> > +
+> > +static void sev_register_user_region(struct sev_vm *sev, void *hva, uint64_t size)
+> > +{
+> > +     struct kvm_enc_region range = {0};
+> > +     int ret;
+> > +
+> > +     pr_debug("%s: hva: %p, size: %lu\n", __func__, hva, size);
+> > +
+> > +     range.addr = (__u64)hva;
+> > +     range.size = size;
+> > +
+> > +     ret = ioctl(sev->vm->fd, KVM_MEMORY_ENCRYPT_REG_REGION, &range);
+> > +     TEST_ASSERT(ret == 0, "failed to register user range, errno: %i\n", errno);
+> > +}
+> > +
+> > +static void sev_encrypt_phy_range(struct sev_vm *sev, vm_paddr_t gpa, uint64_t size)
+> > +{
+> > +     struct kvm_sev_launch_update_data ksev_update_data = {0};
+> > +
+> > +     pr_debug("%s: addr: 0x%lx, size: %lu\n", __func__, gpa, size);
+> > +
+> > +     ksev_update_data.uaddr = (__u64)addr_gpa2hva(sev->vm, gpa);
+> > +     ksev_update_data.len = size;
+> > +
+> > +     kvm_sev_ioctl(sev, KVM_SEV_LAUNCH_UPDATE_DATA, &ksev_update_data);
+> > +}
+> > +
+> > +static void sev_encrypt(struct sev_vm *sev)
+> > +{
+> > +     const struct sparsebit *enc_phy_pages;
+> > +     struct kvm_vm *vm = sev->vm;
+> > +     sparsebit_idx_t pg = 0;
+> > +     vm_paddr_t gpa_start;
+> > +     uint64_t memory_size;
+> > +     int ctr;
+> > +     struct userspace_mem_region *region;
+> > +
+> > +     hash_for_each(vm->regions.slot_hash, ctr, region, slot_node) {
+> > +             enc_phy_pages = vm_get_encrypted_phy_pages(
+>
+> Please don't wrap after the opening paranthesis unless it's really, really necessary.
+> More for future reference since I think vm_get_encrypted_phy_pages() should be open
+> coded here.  E.g. in this case, the "enc_phy_" prefix doesn't add much value, and
+> dropping that makes the code easier to read overall.
+>
+>                 pages = vm_get_encrypted_phy_pages(sev->vm, region->region.slot,
+>                                                    &gpa_start, &memory_size);
+>
+> > +                     sev->vm, region->region.slot, &gpa_start, &memory_size);
+> > +             TEST_ASSERT(enc_phy_pages,
+> > +                         "Unable to retrieve encrypted pages bitmap");
+> > +             while (pg < (memory_size / vm->page_size)) {
+> > +                     sparsebit_idx_t pg_cnt;
+>
+> s/pg_cnt/nr_pages
+>
+> > +
+> > +                     if (sparsebit_is_clear(enc_phy_pages, pg)) {
+> > +                             pg = sparsebit_next_set(enc_phy_pages, pg);
+> > +                             if (!pg)
+> > +                                     break;
+> > +                     }
+> > +
+> > +                     pg_cnt = sparsebit_next_clear(enc_phy_pages, pg) - pg;
+> > +                     if (pg_cnt <= 0)
+> > +                             pg_cnt = 1;
+> > +
+> > +                     sev_encrypt_phy_range(sev,
+> > +                                           gpa_start + pg * vm->page_size,
+> > +                                           pg_cnt * vm->page_size);
+> > +                     pg += pg_cnt;
+> > +             }
+> > +     }
+> > +
+> > +     sev->vm->memcrypt.encrypted = true;
+> > +}
+> > +
+> > +/* SEV VM implementation. */
+> > +
+> > +static struct sev_vm *sev_vm_alloc(struct kvm_vm *vm)
+> > +{
+> > +     struct sev_user_data_status sev_status;
+> > +     uint32_t eax, ebx, ecx, edx;
+> > +     struct sev_vm *sev;
+> > +     int sev_fd;
+> > +
+> > +     sev_fd = open(SEV_DEV_PATH, O_RDWR);
+> > +     if (sev_fd < 0) {
+> > +             pr_info("Failed to open SEV device, path: %s, error: %d, skipping test.\n",
+> > +                     SEV_DEV_PATH, sev_fd);
+> > +             return NULL;
+>
+> Printing "skipping test" is wrong as there's no guarantee the caller is going to
+> skip the test.  E.g. the sole user in this series asserts, i.e. fails the test.
+>
+> I also think that waiting until VM allocation to perform these sanity checks is
+> flawed.  Rather do these checks every time, add helpers to query SEV and SEV-ES
+> support, and then use TEST_REQUIRE() to actually skip tests that require support,
+> e.g.
+>
+>         TEST_REQUIRE(kvm_is_sev_supported());
+>
+> or
+>
+>         TEST_REQUIRE(kvm_is_sev_es_supported());
+>
+> Then this helper can simply assert that opening SEV_DEV_PATH succeeds.
+>
+> > +     }
+> > +
+> > +     sev_ioctl(sev_fd, SEV_PLATFORM_STATUS, &sev_status);
+> > +
+> > +     if (!(sev_status.api_major > SEV_FW_REQ_VER_MAJOR ||
+> > +           (sev_status.api_major == SEV_FW_REQ_VER_MAJOR &&
+> > +            sev_status.api_minor >= SEV_FW_REQ_VER_MINOR))) {
+> > +             pr_info("SEV FW version too old. Have API %d.%d (build: %d), need %d.%d, skipping test.\n",
+> > +                     sev_status.api_major, sev_status.api_minor, sev_status.build,
+> > +                     SEV_FW_REQ_VER_MAJOR, SEV_FW_REQ_VER_MINOR);
+> > +             return NULL;
+> > +     }
+> > +
+> > +     sev = calloc(1, sizeof(*sev));
+>
+> TEST_ASSERT(sev, ...)
+>
+> > +     sev->fd = sev_fd;
+> > +     sev->vm = vm;
+> > +
+> > +     /* Get encryption bit via CPUID. */
+> > +     cpuid(CPUID_MEM_ENC_LEAF, &eax, &ebx, &ecx, &edx);
+> > +     sev->enc_bit = ebx & CPUID_EBX_CBIT_MASK;
+>
+> Oh hey, another series of mine[*] that you can leverage :-)
+>
+> [*] https://lore.kernel.org/all/20221006005125.680782-1-seanjc@google.com
+>
+> > +
+> > +     return sev;
+> > +}
+> > +
+> > +void sev_vm_free(struct sev_vm *sev)
+> > +{
+> > +     kvm_vm_free(sev->vm);
+> > +     close(sev->fd);
+> > +     free(sev);
+> > +}
+> > +
+> > +struct sev_vm *sev_vm_create(uint32_t policy, uint64_t npages)
+>
+> The migration test already defines sev_vm_create().  That conflict needs to be
+> resolved.
+>
+> > +{
+> > +     struct sev_vm *sev;
+> > +     struct kvm_vm *vm;
+> > +
+> > +     /* Need to handle memslots after init, and after setting memcrypt. */
+> > +     vm = vm_create_barebones();
+>
+> Do not use vm_create_barebones().  That API is only to be used for tests that do
+> not intend to run vCPUs.
+>
+>
+>
+> > +     sev = sev_vm_alloc(vm);
+> > +     if (!sev)
+> > +             return NULL;
+> > +     sev->sev_policy = policy;
+> > +
+> > +     kvm_sev_ioctl(sev, KVM_SEV_INIT, NULL);
+> > +
+> > +     vm->vpages_mapped = sparsebit_alloc();
+>
+> This is unnecessary and leaks memory, vm->vpages_mapped is allocated by
+> ____vm_create().
+>
+> > +     vm_set_memory_encryption(vm, true, true, sev->enc_bit);
+> > +     pr_info("SEV cbit: %d\n", sev->enc_bit);
+> > +     vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, 0, npages, 0);
+> > +     sev_register_user_region(sev, addr_gpa2hva(vm, 0),
+> > +                              npages * vm->page_size);
+>
+> Burying sev_register_user_region() in here is not going to be maintainble.  I
+> think the best away to handle this is to add an arch hook in vm_userspace_mem_region_add()
+> and automatically register regions when they're created.
+>
+> And with that, I believe sev_vm_create() can go away entirely and the SEV encryption
+> stuff can be handled via a new vm_guest_mode.  ____vm_create() already has a gross
+> __x86_64__ hook that we can tweak, e.g.
+>
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 54b8d8825f5d..2d6cbca2c01a 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -238,9 +238,10 @@ struct kvm_vm *____vm_create(enum vm_guest_mode mode, uint64_t nr_pages)
+>         case VM_MODE_P36V47_16K:
+>                 vm->pgtable_levels = 3;
+>                 break;
+> +       case VM_MODE_PXXV48_4K_SEV:
+>         case VM_MODE_PXXV48_4K:
+>  #ifdef __x86_64__
+> -               kvm_get_cpu_address_width(&vm->pa_bits, &vm->va_bits);
+> +               kvm_init_vm_address_properties(vm);
+>                 /*
+>                  * Ignore KVM support for 5-level paging (vm->va_bits == 57),
+>                  * it doesn't take effect unless a CR4.LA57 is set, which it
+>
+> Then kvm_init_vm_address_properties() can pivot on vm->mode to deal with SEV
+> specific stuff.
+>
+> > +
+> > +     pr_info("SEV guest created, policy: 0x%x, size: %lu KB\n",
+> > +             sev->sev_policy, npages * vm->page_size / 1024);
+> > +
+> > +     return sev;
+> > +}
+> > +
+> > +void sev_vm_launch(struct sev_vm *sev)
+> > +{
+> > +     struct kvm_sev_launch_start ksev_launch_start = {0};
+> > +     struct kvm_sev_guest_status ksev_status;
+> > +
+> > +     ksev_launch_start.policy = sev->sev_policy;
+> > +     kvm_sev_ioctl(sev, KVM_SEV_LAUNCH_START, &ksev_launch_start);
+> > +     kvm_sev_ioctl(sev, KVM_SEV_GUEST_STATUS, &ksev_status);
+> > +     TEST_ASSERT(ksev_status.policy == sev->sev_policy, "Incorrect guest policy.");
+> > +     TEST_ASSERT(ksev_status.state == SEV_GSTATE_LUPDATE,
+> > +                 "Unexpected guest state: %d", ksev_status.state);
+> > +
+> > +     ucall_init(sev->vm, 0);
+> > +
+> > +     sev_encrypt(sev);
+> > +}
+> > +
+> > +void sev_vm_launch_measure(struct sev_vm *sev, uint8_t *measurement)
+> > +{
+> > +     struct kvm_sev_launch_measure ksev_launch_measure;
+> > +     struct kvm_sev_guest_status ksev_guest_status;
+> > +
+> > +     ksev_launch_measure.len = 256;
+> > +     ksev_launch_measure.uaddr = (__u64)measurement;
+> > +     kvm_sev_ioctl(sev, KVM_SEV_LAUNCH_MEASURE, &ksev_launch_measure);
+> > +
+> > +     /* Measurement causes a state transition, check that. */
+> > +     kvm_sev_ioctl(sev, KVM_SEV_GUEST_STATUS, &ksev_guest_status);
+> > +     TEST_ASSERT(ksev_guest_status.state == SEV_GSTATE_LSECRET,
+> > +                 "Unexpected guest state: %d", ksev_guest_status.state);
+> > +}
+> > +
+> > +void sev_vm_launch_finish(struct sev_vm *sev)
+> > +{
+> > +     struct kvm_sev_guest_status ksev_status;
+> > +
+> > +     kvm_sev_ioctl(sev, KVM_SEV_GUEST_STATUS, &ksev_status);
+> > +     TEST_ASSERT(ksev_status.state == SEV_GSTATE_LUPDATE ||
+> > +                 ksev_status.state == SEV_GSTATE_LSECRET,
+> > +                 "Unexpected guest state: %d", ksev_status.state);
+> > +
+> > +     kvm_sev_ioctl(sev, KVM_SEV_LAUNCH_FINISH, NULL);
+> > +
+> > +     kvm_sev_ioctl(sev, KVM_SEV_GUEST_STATUS, &ksev_status);
+> > +     TEST_ASSERT(ksev_status.state == SEV_GSTATE_RUNNING,
+> > +                 "Unexpected guest state: %d", ksev_status.state);
+> > +}
+>
+> Rather than force each test to invoke these via something like setup_test_common(),
+> add the same kvm_arch_vm_post_create() hook that Vishal is likely going to add,
+> and then automatically do all of the launch+measure+finish stuff for non-barebones
+> VMs.  That will let SEV/SEV-ES tests use __vm_create_with_vcpus() and
+> __vm_create().
+>
+> And it'd be a little gross, but I think it'd be wortwhile to add another layer
+> to the "one_vcpu" helpers to make things even more convenient, e.g.
+>
+> struct kvm_vm *____vm_create_with_one_vcpu(enum vm_guest_mode mode,
+>                                            struct kvm_vcpu **vcpu,
+>                                            uint64_t extra_mem_pages,
+>                                            void *guest_code)
+> {
+>         struct kvm_vcpu *vcpus[1];
+>         struct kvm_vm *vm;
+>
+>         vm = __vm_create_with_vcpus(mode, 1, extra_mem_pages, guest_code, vcpus);
+>
+>         *vcpu = vcpus[0];
+>         return vm;
+> }
+>
+> static inline struct kvm_vm *__vm_create_with_one_vcpu(struct kvm_vcpu **vcpu,
+>                                                        uint64_t extra_mem_pages,
+>                                                        void *guest_code)
+> {
+>         return ____vm_create_with_one_vcpu(VM_MODE_DEFAULT, vcpu,
+>                                            extra_mem_pages, guest_code);
+> }
+>
+> static inline struct kvm_vm *____vm_create_with_one_vcpu(enum vm_guest_mode mode,
+>                                            struct kvm_vcpu **vcpu,
+>                                            uint64_t extra_mem_pages,
+>                                            void *guest_code)
+> ____vm_create_with_one_vcpu
+>
+>
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index dafe4471a6c7..593dfadb662e 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -298,9 +298,8 @@ struct kvm_vm *__vm_create(enum vm_guest_mode mode, uint32_t nr_runnable_vcpus,
+>
+>         kvm_vm_elf_load(vm, program_invocation_name);
+>
+> -#ifdef __x86_64__
+> -       vm_create_irqchip(vm);
+> -#endif
+> +       kvm_arch_vm_post_create(vm);
+> +
+>         return vm;
+>  }
+>
+>
+> [*] https://lore.kernel.org/all/YzsC4ibDqGh5qaP9@google.com
 
-An example is shown below reported from "top". With naming the
-vcpu threads, the per-vcpu info becomes more noticeable.
+This refactor sounds good, working on this with a few changes.
 
-PID  USER PR  NI VIRT    RES  SHR  S  %CPU  %MEM TIME+   COMMAND
-4464 root 20  0  4248684 4.0g 1628 R  99.9  26.2 0:50.97 dirty_log_perf_
-4467 root 20  0  4248684 4.0g 1628 R  99.9  26.2 0:50.93 vcpu0
-4469 root 20  0  4248684 4.0g 1628 R  99.9  26.2 0:50.93 vcpu2
-4470 root 20  0  4248684 4.0g 1628 R  99.9  26.2 0:50.94 vcpu3
-4468 root 20  0  4248684 4.0g 1628 R  99.7  26.2 0:50.93 vcpu1
+Instead of kvm_init_vm_address_properties() as you suggested I've added this:
 
-pthread.h is included in kvm_util.h, so remove it from the files
-that have already included kvm_util.h.
+@@ -272,6 +275,8 @@ struct kvm_vm *____vm_create(enum vm_guest_mode
+ mode, uint64_t nr_pages)
+                vm->type = KVM_VM_TYPE_ARM_IPA_SIZE(vm->pa_bits);
+ #endif
 
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
----
- .../selftests/kvm/aarch64/arch_timer.c        | 16 ++-----
- .../selftests/kvm/access_tracking_perf_test.c |  1 -
- .../selftests/kvm/demand_paging_test.c        |  5 +-
- .../selftests/kvm/dirty_log_perf_test.c       |  1 -
- tools/testing/selftests/kvm/dirty_log_test.c  |  2 +-
- .../selftests/kvm/hardware_disable_test.c     | 17 ++-----
- .../testing/selftests/kvm/include/kvm_util.h  |  8 ++++
- .../selftests/kvm/include/perf_test_util.h    |  2 -
- .../selftests/kvm/kvm_page_table_test.c       |  5 +-
- tools/testing/selftests/kvm/lib/kvm_util.c    | 47 +++++++++++++++++++
- .../selftests/kvm/lib/perf_test_util.c        |  3 +-
- .../selftests/kvm/max_guest_memory_test.c     |  4 +-
- .../kvm/memslot_modification_stress_test.c    |  1 -
- .../testing/selftests/kvm/memslot_perf_test.c |  3 +-
- tools/testing/selftests/kvm/rseq_test.c       |  5 +-
- .../selftests/kvm/set_memory_region_test.c    |  3 +-
- tools/testing/selftests/kvm/steal_time.c      |  4 +-
- .../selftests/kvm/x86_64/mmio_warning_test.c  |  3 +-
- .../selftests/kvm/x86_64/sev_migrate_tests.c  |  1 -
- .../selftests/kvm/x86_64/tsc_scaling_sync.c   |  4 +-
- .../kvm/x86_64/ucna_injection_test.c          |  1 -
- .../selftests/kvm/x86_64/xapic_ipi_test.c     | 10 ++--
- 22 files changed, 85 insertions(+), 61 deletions(-)
++       kvm_init_vm_arch(vm);
++
+        vm_open(vm);
 
-diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-index 574eb73f0e90..14f56327ca28 100644
---- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-+++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-@@ -23,7 +23,6 @@
- #define _GNU_SOURCE
- 
- #include <stdlib.h>
--#include <pthread.h>
- #include <linux/kvm.h>
- #include <linux/sizes.h>
- #include <linux/bitmap.h>
-@@ -314,28 +313,23 @@ static void test_run(struct kvm_vm *vm)
- {
- 	pthread_t pt_vcpu_migration;
- 	unsigned int i;
--	int ret;
- 
- 	pthread_mutex_init(&vcpu_done_map_lock, NULL);
- 	vcpu_done_map = bitmap_zalloc(test_args.nr_vcpus);
- 	TEST_ASSERT(vcpu_done_map, "Failed to allocate vcpu done bitmap\n");
- 
--	for (i = 0; i < (unsigned long)test_args.nr_vcpus; i++) {
--		ret = pthread_create(&pt_vcpu_run[i], NULL, test_vcpu_run,
--				     (void *)(unsigned long)i);
--		TEST_ASSERT(!ret, "Failed to create vCPU-%d pthread\n", i);
--	}
-+	for (i = 0; i < (unsigned long)test_args.nr_vcpus; i++)
-+		kvm_create_vcpu_thread(&pt_vcpu_run[i], NULL,
-+				test_vcpu_run, (void *)(unsigned long)i, i);
- 
- 	/* Spawn a thread to control the vCPU migrations */
- 	if (test_args.migration_freq_ms) {
- 		srand(time(NULL));
- 
--		ret = pthread_create(&pt_vcpu_migration, NULL,
--					test_vcpu_migration, NULL);
--		TEST_ASSERT(!ret, "Failed to create the migration pthread\n");
-+		pthread_create_with_name(&pt_vcpu_migration, NULL,
-+				test_vcpu_migration, NULL, "control-thread");
- 	}
- 
--
- 	for (i = 0; i < test_args.nr_vcpus; i++)
- 		pthread_join(pt_vcpu_run[i], NULL);
- 
-diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-index 76c583a07ea2..b61ecc907d61 100644
---- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
-+++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-@@ -37,7 +37,6 @@
-  */
- #include <inttypes.h>
- #include <limits.h>
--#include <pthread.h>
- #include <sys/mman.h>
- #include <sys/types.h>
- #include <sys/stat.h>
-diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-index 779ae54f89c4..f75d531008e8 100644
---- a/tools/testing/selftests/kvm/demand_paging_test.c
-+++ b/tools/testing/selftests/kvm/demand_paging_test.c
-@@ -14,7 +14,6 @@
- #include <stdlib.h>
- #include <time.h>
- #include <poll.h>
--#include <pthread.h>
- #include <linux/userfaultfd.h>
- #include <sys/syscall.h>
- 
-@@ -260,8 +259,8 @@ static void setup_demand_paging(struct kvm_vm *vm,
- 	uffd_args->uffd = uffd;
- 	uffd_args->pipefd = pipefd;
- 	uffd_args->delay = uffd_delay;
--	pthread_create(uffd_handler_thread, NULL, uffd_handler_thread_fn,
--		       uffd_args);
-+	pthread_create_with_name(uffd_handler_thread, NULL,
-+		uffd_handler_thread_fn, uffd_args, "uffd-handler-thread");
- 
- 	PER_VCPU_DEBUG("Created uffd thread for HVA range [%p, %p)\n",
- 		       hva, hva + len);
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index f99e39a672d3..5cf9080b3864 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -11,7 +11,6 @@
- #include <stdio.h>
- #include <stdlib.h>
- #include <time.h>
--#include <pthread.h>
- #include <linux/bitmap.h>
- 
- #include "kvm_util.h"
-diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
-index b5234d6efbe1..c7a30b4dd33a 100644
---- a/tools/testing/selftests/kvm/dirty_log_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_test.c
-@@ -772,7 +772,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	host_clear_count = 0;
- 	host_track_next_count = 0;
- 
--	pthread_create(&vcpu_thread, NULL, vcpu_worker, vcpu);
-+	kvm_create_vcpu_thread(&vcpu_thread, NULL, vcpu_worker, vcpu, 0);
- 
- 	while (iteration < p->iterations) {
- 		/* Give the vcpu thread some time to dirty some pages */
-diff --git a/tools/testing/selftests/kvm/hardware_disable_test.c b/tools/testing/selftests/kvm/hardware_disable_test.c
-index f5d59b9934f1..c22b8445a809 100644
---- a/tools/testing/selftests/kvm/hardware_disable_test.c
-+++ b/tools/testing/selftests/kvm/hardware_disable_test.c
-@@ -8,7 +8,6 @@
- #define _GNU_SOURCE
- 
- #include <fcntl.h>
--#include <pthread.h>
- #include <semaphore.h>
- #include <stdint.h>
- #include <stdlib.h>
-@@ -59,15 +58,6 @@ static void *sleeping_thread(void *arg)
- 	pthread_exit(NULL);
- }
- 
--static inline void check_create_thread(pthread_t *thread, pthread_attr_t *attr,
--				       void *(*f)(void *), void *arg)
--{
--	int r;
--
--	r = pthread_create(thread, attr, f, arg);
--	TEST_ASSERT(r == 0, "%s: failed to create thread", __func__);
--}
--
- static inline void check_set_affinity(pthread_t thread, cpu_set_t *cpu_set)
- {
- 	int r;
-@@ -104,12 +94,13 @@ static void run_test(uint32_t run)
- 	for (i = 0; i < VCPU_NUM; ++i) {
- 		vcpu = vm_vcpu_add(vm, i, guest_code);
- 
--		check_create_thread(&threads[i], NULL, run_vcpu, vcpu);
-+		kvm_create_vcpu_thread(&threads[i], NULL, run_vcpu, vcpu, i);
- 		check_set_affinity(threads[i], &cpu_set);
- 
- 		for (j = 0; j < SLEEPING_THREAD_NUM; ++j) {
--			check_create_thread(&throw_away, NULL, sleeping_thread,
--					    (void *)NULL);
-+			pthread_create_with_name(&throw_away, NULL,
-+						 sleeping_thread, (void *)NULL,
-+						 "sleeping-thread");
- 			check_set_affinity(throw_away, &cpu_set);
- 		}
- 	}
-diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index c9286811a4cb..b7f0295d928e 100644
---- a/tools/testing/selftests/kvm/include/kvm_util.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -7,7 +7,15 @@
- #ifndef SELFTEST_KVM_UTIL_H
- #define SELFTEST_KVM_UTIL_H
- 
-+#include <pthread.h>
-+
- #include "kvm_util_base.h"
- #include "ucall_common.h"
- 
-+void pthread_create_with_name(pthread_t *thread, const pthread_attr_t *attr,
-+			void *(*start_routine)(void *), void *arg, char *name);
-+
-+void kvm_create_vcpu_thread(pthread_t *thread, const pthread_attr_t *attr,
-+		void *(*start_routine)(void *), void *arg, int vcpu_id);
-+
- #endif /* SELFTEST_KVM_UTIL_H */
-diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-index eaa88df0555a..cb6971c8740f 100644
---- a/tools/testing/selftests/kvm/include/perf_test_util.h
-+++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-@@ -8,8 +8,6 @@
- #ifndef SELFTEST_KVM_PERF_TEST_UTIL_H
- #define SELFTEST_KVM_PERF_TEST_UTIL_H
- 
--#include <pthread.h>
--
- #include "kvm_util.h"
- 
- /* Default guest test virtual memory offset */
-diff --git a/tools/testing/selftests/kvm/kvm_page_table_test.c b/tools/testing/selftests/kvm/kvm_page_table_test.c
-index f42c6ac6d71d..1e41dca7f67d 100644
---- a/tools/testing/selftests/kvm/kvm_page_table_test.c
-+++ b/tools/testing/selftests/kvm/kvm_page_table_test.c
-@@ -14,7 +14,6 @@
- #include <stdio.h>
- #include <stdlib.h>
- #include <time.h>
--#include <pthread.h>
- #include <semaphore.h>
- 
- #include "test_util.h"
-@@ -359,8 +358,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	*current_stage = KVM_BEFORE_MAPPINGS;
- 
- 	for (i = 0; i < nr_vcpus; i++)
--		pthread_create(&vcpu_threads[i], NULL, vcpu_worker,
--			       test_args.vcpus[i]);
-+		kvm_create_vcpu_thread(&vcpu_threads[i], NULL,
-+				       vcpu_worker, test_args.vcpus[i], i);
- 
- 	vcpus_complete_new_stage(*current_stage);
- 	pr_info("Started all vCPUs successfully\n");
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index f1cb1627161f..c252c912f1ba 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -2021,3 +2021,50 @@ void __vm_get_stat(struct kvm_vm *vm, const char *stat_name, uint64_t *data,
- 		break;
- 	}
- }
-+
-+/*
-+ * Create a named thread
-+ *
-+ * Input Args:
-+ *   attr - the attributes for the new thread
-+ *   start_routine - the routine to run in the thread context
-+ *   arg - the argument passed to start_routine
-+ *   name - the name of the thread
-+ *
-+ * Output Args:
-+ *   thread - the thread to be created
-+ *
-+ * Create a thread with user specified name.
-+ */
-+void pthread_create_with_name(pthread_t *thread, const pthread_attr_t *attr,
-+			void *(*start_routine)(void *), void *arg, char *name)
-+{
-+	int r;
-+
-+	r = pthread_create(thread, attr, start_routine, arg);
-+	TEST_ASSERT(!r, "thread(%s) creation failed, r = %d", name, r);
-+	pthread_setname_np(*thread, name);
-+}
-+
-+/*
-+ * Create a vcpu thread
-+ *
-+ * Input Args:
-+ *   attr - the attributes for the new thread
-+ *   start_routine - the routine to run in the thread context
-+ *   arg - the argument passed to start_routine
-+ *   vcpu_id - the id of the vcpu
-+ *
-+ * Output Args:
-+ *   thread - the thread to be created
-+ *
-+ * Create a vcpu thread with the name in "vcpu##id" format.
-+ */
-+void kvm_create_vcpu_thread(pthread_t *thread, const pthread_attr_t *attr,
-+			void *(*start_routine)(void *), void *arg, int vcpu_id)
-+{
-+	char vcpu_name[6];
-+
-+	sprintf(vcpu_name, "%s%d", "vcpu", vcpu_id);
-+	pthread_create_with_name(thread, attr, start_routine, arg, vcpu_name);
-+}
-diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-index 9618b37c66f7..4e57181daffc 100644
---- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-+++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-@@ -274,7 +274,8 @@ void perf_test_start_vcpu_threads(int nr_vcpus,
- 		vcpu->vcpu_idx = i;
- 		WRITE_ONCE(vcpu->running, false);
- 
--		pthread_create(&vcpu->thread, NULL, vcpu_thread_main, vcpu);
-+		kvm_create_vcpu_thread(&vcpu->thread, NULL,
-+				       vcpu_thread_main, vcpu, i);
- 	}
- 
- 	for (i = 0; i < nr_vcpus; i++) {
-diff --git a/tools/testing/selftests/kvm/max_guest_memory_test.c b/tools/testing/selftests/kvm/max_guest_memory_test.c
-index 9a6e4f3ad6b5..04524694e2b6 100644
---- a/tools/testing/selftests/kvm/max_guest_memory_test.c
-+++ b/tools/testing/selftests/kvm/max_guest_memory_test.c
-@@ -3,7 +3,6 @@
- 
- #include <stdio.h>
- #include <stdlib.h>
--#include <pthread.h>
- #include <semaphore.h>
- #include <sys/types.h>
- #include <signal.h>
-@@ -110,7 +109,8 @@ static pthread_t *spawn_workers(struct kvm_vm *vm, struct kvm_vcpu **vcpus,
- 		info[i].vcpu = vcpus[i];
- 		info[i].start_gpa = gpa;
- 		info[i].end_gpa = gpa + nr_bytes;
--		pthread_create(&threads[i], NULL, vcpu_worker, &info[i]);
-+		kvm_create_vcpu_thread(&threads[i], NULL,
-+				       vcpu_worker, &info[i], i);
- 	}
- 	return threads;
- }
-diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-index 6ee7e1dde404..769300181597 100644
---- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-+++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-@@ -16,7 +16,6 @@
- #include <asm/unistd.h>
- #include <time.h>
- #include <poll.h>
--#include <pthread.h>
- #include <linux/bitmap.h>
- #include <linux/bitops.h>
- #include <linux/userfaultfd.h>
-diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
-index 44995446d942..041a07acba3d 100644
---- a/tools/testing/selftests/kvm/memslot_perf_test.c
-+++ b/tools/testing/selftests/kvm/memslot_perf_test.c
-@@ -6,7 +6,6 @@
-  *
-  * Basic guest setup / host vCPU thread code lifted from set_memory_region_test.
-  */
--#include <pthread.h>
- #include <sched.h>
- #include <semaphore.h>
- #include <stdatomic.h>
-@@ -332,7 +331,7 @@ static void launch_vm(struct vm_data *data)
- {
- 	pr_info_v("Launching the test VM\n");
- 
--	pthread_create(&data->vcpu_thread, NULL, vcpu_worker, data);
-+	kvm_create_vcpu_thread(&data->vcpu_thread, NULL, vcpu_worker, data, 0);
- 
- 	/* Ensure the guest thread is spun up. */
- 	wait_for_vcpu();
-diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
-index 6f88da7e60be..11e0b1b7abb1 100644
---- a/tools/testing/selftests/kvm/rseq_test.c
-+++ b/tools/testing/selftests/kvm/rseq_test.c
-@@ -2,7 +2,6 @@
- #define _GNU_SOURCE /* for program_invocation_short_name */
- #include <errno.h>
- #include <fcntl.h>
--#include <pthread.h>
- #include <sched.h>
- #include <stdio.h>
- #include <stdlib.h>
-@@ -226,8 +225,8 @@ int main(int argc, char *argv[])
- 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
- 	ucall_init(vm, NULL);
- 
--	pthread_create(&migration_thread, NULL, migration_worker,
--		       (void *)(unsigned long)syscall(SYS_gettid));
-+	pthread_create_with_name(&migration_thread, NULL, migration_worker,
-+	       (void *)(unsigned long)syscall(SYS_gettid), "migration-thread");
- 
- 	for (i = 0; !done; i++) {
- 		vcpu_run(vcpu);
-diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-index 0d55f508d595..4c9ab5595a22 100644
---- a/tools/testing/selftests/kvm/set_memory_region_test.c
-+++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-@@ -1,7 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0
- #define _GNU_SOURCE /* for program_invocation_short_name */
- #include <fcntl.h>
--#include <pthread.h>
- #include <sched.h>
- #include <semaphore.h>
- #include <signal.h>
-@@ -134,7 +133,7 @@ static struct kvm_vm *spawn_vm(struct kvm_vcpu **vcpu, pthread_t *vcpu_thread,
- 	hva = addr_gpa2hva(vm, MEM_REGION_GPA);
- 	memset(hva, 0, 2 * 4096);
- 
--	pthread_create(vcpu_thread, NULL, vcpu_worker, *vcpu);
-+	kvm_create_vcpu_thread(vcpu_thread, NULL, vcpu_worker, *vcpu, 0);
- 
- 	/* Ensure the guest thread is spun up. */
- 	wait_for_vcpu();
-diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
-index db8967f1a17b..be93a333ce04 100644
---- a/tools/testing/selftests/kvm/steal_time.c
-+++ b/tools/testing/selftests/kvm/steal_time.c
-@@ -8,7 +8,6 @@
- #include <stdio.h>
- #include <time.h>
- #include <sched.h>
--#include <pthread.h>
- #include <linux/kernel.h>
- #include <asm/kvm.h>
- #include <asm/kvm_para.h>
-@@ -290,7 +289,8 @@ int main(int ac, char **av)
- 
- 		/* Steal time from the VCPU. The steal time thread has the same CPU affinity as the VCPUs. */
- 		run_delay = get_run_delay();
--		pthread_create(&thread, &attr, do_steal_time, NULL);
-+		pthread_create_with_name(&thread, &attr, do_steal_time,
-+					 NULL, "steal-time-thread");
- 		do
- 			sched_yield();
- 		while (get_run_delay() - run_delay < MIN_RUN_DELAY_NS);
-diff --git a/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c b/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
-index fb02581953a3..abbd5a4f2828 100644
---- a/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/mmio_warning_test.c
-@@ -16,7 +16,6 @@
- #include <kvm_util.h>
- #include <linux/kvm.h>
- #include <processor.h>
--#include <pthread.h>
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
-@@ -69,7 +68,7 @@ void test(void)
- 	tc.run = run;
- 	srand(getpid());
- 	for (i = 0; i < NTHREAD; i++) {
--		pthread_create(&th[i], NULL, thr, (void *)(uintptr_t)&tc);
-+		kvm_create_vcpu_thread(&th[i], NULL, thr, (void *)(uintptr_t)&tc, i);
- 		usleep(rand() % 10000);
- 	}
- 	for (i = 0; i < NTHREAD; i++)
-diff --git a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
-index c7ef97561038..b00ba08a19eb 100644
---- a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
-+++ b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
-@@ -5,7 +5,6 @@
- #include <sys/ioctl.h>
- #include <stdlib.h>
- #include <errno.h>
--#include <pthread.h>
- 
- #include "test_util.h"
- #include "kvm_util.h"
-diff --git a/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c b/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c
-index 47139aab7408..a6511c399173 100644
---- a/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c
-+++ b/tools/testing/selftests/kvm/x86_64/tsc_scaling_sync.c
-@@ -15,7 +15,6 @@
- #include <time.h>
- #include <sched.h>
- #include <signal.h>
--#include <pthread.h>
- 
- #define NR_TEST_VCPUS 20
- 
-@@ -102,7 +101,8 @@ int main(int argc, char *argv[])
- 	pthread_t cpu_threads[NR_TEST_VCPUS];
- 	unsigned long cpu;
- 	for (cpu = 0; cpu < NR_TEST_VCPUS; cpu++)
--		pthread_create(&cpu_threads[cpu], NULL, run_vcpu, (void *)cpu);
-+		kvm_create_vcpu_thread(&cpu_threads[cpu], NULL,
-+				       run_vcpu, (void *)cpu, cpu);
- 
- 	unsigned long failures = 0;
- 	for (cpu = 0; cpu < NR_TEST_VCPUS; cpu++) {
-diff --git a/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c b/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
-index a897c7fd8abe..24a89a3a11db 100644
---- a/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
-@@ -19,7 +19,6 @@
-  */
- 
- #define _GNU_SOURCE /* for program_invocation_short_name */
--#include <pthread.h>
- #include <inttypes.h>
- #include <string.h>
- #include <time.h>
-diff --git a/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c b/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
-index 3d272d7f961e..8bdef8e0f2b0 100644
---- a/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
-@@ -22,7 +22,6 @@
- 
- #define _GNU_SOURCE /* for program_invocation_short_name */
- #include <getopt.h>
--#include <pthread.h>
- #include <inttypes.h>
- #include <string.h>
- #include <time.h>
-@@ -393,7 +392,6 @@ void get_cmdline_args(int argc, char *argv[], int *run_secs,
- 
- int main(int argc, char *argv[])
- {
--	int r;
- 	int wait_secs;
- 	const int max_halter_wait = 10;
- 	int run_secs = 0;
-@@ -436,9 +434,8 @@ int main(int argc, char *argv[])
- 	params[1].pipis_rcvd = pipis_rcvd;
- 
- 	/* Start halter vCPU thread and wait for it to execute first HLT. */
--	r = pthread_create(&threads[0], NULL, vcpu_thread, &params[0]);
--	TEST_ASSERT(r == 0,
--		    "pthread_create halter failed errno=%d", errno);
-+	kvm_create_vcpu_thread(&threads[0], NULL,
-+			       vcpu_thread, &params[0], 0);
- 	fprintf(stderr, "Halter vCPU thread started\n");
- 
- 	wait_secs = 0;
-@@ -455,8 +452,7 @@ int main(int argc, char *argv[])
- 		"Halter vCPU thread reported its APIC ID: %u after %d seconds.\n",
- 		data->halter_apic_id, wait_secs);
- 
--	r = pthread_create(&threads[1], NULL, vcpu_thread, &params[1]);
--	TEST_ASSERT(r == 0, "pthread_create sender failed errno=%d", errno);
-+	kvm_create_vcpu_thread(&threads[1], NULL, vcpu_thread, &params[1], 1);
- 
- 	fprintf(stderr,
- 		"IPI sender vCPU thread started. Letting vCPUs run for %d seconds.\n",
--- 
-2.27.0
+        /* Limit to VA-bit canonical virtual addresses. */
 
+And I need to put kvm_arch_vm_post_create() after the vCPUs are
+created because the ordering we need is: KVM_SEV_INIT -> Create vCPUS
+-> KVM_SEV_LAUNCH_FINISH.
