@@ -2,163 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 919FA602D33
-	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 15:42:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 13D83602D38
+	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 15:42:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230411AbiJRNmT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Oct 2022 09:42:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34408 "EHLO
+        id S229975AbiJRNmd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Oct 2022 09:42:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230399AbiJRNmQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Oct 2022 09:42:16 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37D1879606
-        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 06:42:15 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id c7-20020a05600c0ac700b003c6cad86f38so15027125wmr.2
-        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 06:42:14 -0700 (PDT)
+        with ESMTP id S230442AbiJRNm1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Oct 2022 09:42:27 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58A43CD5FD
+        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 06:42:24 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id 3so14111075pfw.4
+        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 06:42:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zJkCAiJHLxUZwzr5tFQxyP5W2DnDI9cvMk9vr73FdTQ=;
-        b=cH/a18bj2gfE2DhWLyxpNZsuWatw0ThunY35SY43PqJhoyct4SliXvj6pUNgT8bZiv
-         wMCc4GO8EaWqiXlj4mMYt2yRE39Az6OBsR+NdNXOo34k9MtwPtJt493q46vlXpYluy9L
-         9aAnKYuffQO3HPs+Q3SDyaqWO9+u+ud1f8YklGI4um083sOSdMxQEAsNMLzZ3daeCRnH
-         kPTma0lgo6jg0IzCUNkbV0hA4OyxiUlRE9jRbZm6PRDkAaB/s/KroN7PFy06Ujbae5GN
-         AwFzvTrFVI34wA8UCMxxZhrEBT3RjVHMRc3vbBr8c6vaF0midgWER6A4Luo7DTDi5Xta
-         iFww==
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=TQSORsKSMngPJb5f/eC6Hu6kpkY5kYXJ98QHFM8UvxY=;
+        b=ZHxxlG3UTEot3sPjKtvw1X3aBdRbEmIooxBSsM63jzfeOELeKLeWEK8Ka0UBZMDOP+
+         akvRFs76C2wKq91BFhqgTb5HB703LMV7esd/A+wWslFPM0+sKw9GkKbhOLqB+y2xkhr8
+         xAw55/tP2EjBapVx7JcnOuoy3rb21J87PUbxaFqakG14s9yKfbb31M3qi5ybSq2mRACM
+         jSitk4irsc/WL0t07xPDMeWHTF1Fx+OZSUwfySvO4jPCavdKRxOz8qiV/i/KYM1y4DB8
+         jWL9urfkjvvcFCgxaCtIJ6pE7MoPjXcItlLTszbdaWP+IhZBfYH0+bbwgZYx0bdSzYu+
+         tT2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zJkCAiJHLxUZwzr5tFQxyP5W2DnDI9cvMk9vr73FdTQ=;
-        b=QY8EEcbjaPh/1gYmciUi+oEQBG+uZCnSoEmTuOmlRadYd90E2Z/zGQLM8Zyc9+BmTU
-         k6nstI8t4EfxkLK36hE+/thAyiKdoJgRPikLY2E86fGCtAoTGvP8vE5TLZLqt4c7RH4t
-         mSfiQ/q1RSb+k1vakfZcv/8BsY2X8fb++NoOyii9hN9h1FRBzcL7u1sZ58v3GUnd7Bww
-         fEq3ZCuAVZvnW1vjOnSkedcKk4vRt8wxQBj3qwIS/L/rPr3JjfqMnnbKBAwvGPY7+icP
-         IVK2U+gSeetwHtztmbChsLvwor1My+6hYvZ3pRSnOncyYGnIz2CpflpDo9uo8nxch1Fx
-         YahA==
-X-Gm-Message-State: ACrzQf3ItyJ2oL2clZCTGYepFaJEHtknULomZbSru8yiOdytH0BF82Zo
-        n19DymeQNsjWo+gTgTDCGi8OUQ==
-X-Google-Smtp-Source: AMsMyM7wCcbFf1zbh8Y5oHXV6AXBJ9PTPQ4114zKrWFWrMnafOFFV6P9gV4VERIFsDKqkmc71bs9wQ==
-X-Received: by 2002:a05:600c:1f16:b0:3c7:cf:8e72 with SMTP id bd22-20020a05600c1f1600b003c700cf8e72mr851015wmb.88.1666100533284;
-        Tue, 18 Oct 2022 06:42:13 -0700 (PDT)
-Received: from [192.168.1.115] ([185.126.107.38])
-        by smtp.gmail.com with ESMTPSA id t15-20020a5d49cf000000b0022e32f4c06asm11172895wrs.11.2022.10.18.06.42.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Oct 2022 06:42:12 -0700 (PDT)
-Message-ID: <4c9e1602-25e4-6489-e4da-3b1b7fda5302@linaro.org>
-Date:   Tue, 18 Oct 2022 15:42:08 +0200
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TQSORsKSMngPJb5f/eC6Hu6kpkY5kYXJ98QHFM8UvxY=;
+        b=Q6ZrvCUt5ipoZr4IyG3jf3KxX0hrbevl7QhhrhrpB2faSpVsrzLzOPaOkHJbKnVx/I
+         GMr/K+eV1+emMtte1S+rYX1oth/MI2grko/JZvkFpNS9gyhGPgSqkQfte6rZLB/PpMva
+         LRWcMQWb0Cg67jSkuHt2tPg1h3+UgtZGcsQHmUXlZTAFQfwbarQx3GRNIcyRmsCxOXKU
+         ADtQBb4kjLGOBSYS9z61fCbSYTw5FixjrNuX3sbR65wfNf9t7Y9u3/XZ6A0cRwsLEEXj
+         NPQySQ0SZljpRDIOM+45gCbfholAbpI69nchIvK/9HfBlUzmUdLJIPEmqCopmV93dI8O
+         8FxA==
+X-Gm-Message-State: ACrzQf3rT4mjSD4zIFrBYbarOiUbWRB5YYy6tlwQz2ZkmyUGSaguWpDi
+        +Wj1BFsjSyvnHQTdDRYaclFeEl2gwY1wcXbKsWkPjd9EJPVqag==
+X-Google-Smtp-Source: AMsMyM457hPoLFIJ8lUjGLgHK/+h3GgdmiyyuIPyEtfxcbOdN4bX0W7oNp+dFIXy83RpDOunf04FJy/8XBLnfxpoQmE=
+X-Received: by 2002:a63:88c7:0:b0:462:79de:dc75 with SMTP id
+ l190-20020a6388c7000000b0046279dedc75mr2721715pgd.458.1666100542751; Tue, 18
+ Oct 2022 06:42:22 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.13.1
-Subject: Re: [PATCH v4 07/25] KVM: arm64: Prevent the donation of no-map pages
-Content-Language: en-US
-To:     Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-References: <20221017115209.2099-1-will@kernel.org>
- <20221017115209.2099-8-will@kernel.org>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-In-Reply-To: <20221017115209.2099-8-will@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-2-chao.p.peng@linux.intel.com> <de680280-f6b1-9337-2ae4-4b2faf2b823b@suse.cz>
+ <20221017161955.t4gditaztbwijgcn@box.shutemov.name> <c63ad0cd-d517-0f1e-59e9-927d8ae15a1a@amd.com>
+ <20221017215640.hobzcz47es7dq2bi@box.shutemov.name>
+In-Reply-To: <20221017215640.hobzcz47es7dq2bi@box.shutemov.name>
+From:   Vishal Annapurve <vannapurve@google.com>
+Date:   Tue, 18 Oct 2022 19:12:10 +0530
+Message-ID: <CAGtprH8xEdgATjQdhi2b_KqUuSOZHUM-Lh+O-ZtcFKbHf2_75g@mail.gmail.com>
+Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
+To:     "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Cc:     "Gupta, Pankaj" <pankaj.gupta@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Will & Quentin,
+On Tue, Oct 18, 2022 at 3:27 AM Kirill A . Shutemov
+<kirill.shutemov@linux.intel.com> wrote:
+>
+> On Mon, Oct 17, 2022 at 06:39:06PM +0200, Gupta, Pankaj wrote:
+> > On 10/17/2022 6:19 PM, Kirill A . Shutemov wrote:
+> > > On Mon, Oct 17, 2022 at 03:00:21PM +0200, Vlastimil Babka wrote:
+> > > > On 9/15/22 16:29, Chao Peng wrote:
+> > > > > From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+> > > > >
+> > > > > KVM can use memfd-provided memory for guest memory. For normal userspace
+> > > > > accessible memory, KVM userspace (e.g. QEMU) mmaps the memfd into its
+> > > > > virtual address space and then tells KVM to use the virtual address to
+> > > > > setup the mapping in the secondary page table (e.g. EPT).
+> > > > >
+> > > > > With confidential computing technologies like Intel TDX, the
+> > > > > memfd-provided memory may be encrypted with special key for special
+> > > > > software domain (e.g. KVM guest) and is not expected to be directly
+> > > > > accessed by userspace. Precisely, userspace access to such encrypted
+> > > > > memory may lead to host crash so it should be prevented.
+> > > > >
+> > > > > This patch introduces userspace inaccessible memfd (created with
+> > > > > MFD_INACCESSIBLE). Its memory is inaccessible from userspace through
+> > > > > ordinary MMU access (e.g. read/write/mmap) but can be accessed via
+> > > > > in-kernel interface so KVM can directly interact with core-mm without
+> > > > > the need to map the memory into KVM userspace.
+> > > > >
+> > > > > It provides semantics required for KVM guest private(encrypted) memory
+> > > > > support that a file descriptor with this flag set is going to be used as
+> > > > > the source of guest memory in confidential computing environments such
+> > > > > as Intel TDX/AMD SEV.
+> > > > >
+> > > > > KVM userspace is still in charge of the lifecycle of the memfd. It
+> > > > > should pass the opened fd to KVM. KVM uses the kernel APIs newly added
+> > > > > in this patch to obtain the physical memory address and then populate
+> > > > > the secondary page table entries.
+> > > > >
+> > > > > The userspace inaccessible memfd can be fallocate-ed and hole-punched
+> > > > > from userspace. When hole-punching happens, KVM can get notified through
+> > > > > inaccessible_notifier it then gets chance to remove any mapped entries
+> > > > > of the range in the secondary page tables.
+> > > > >
+> > > > > The userspace inaccessible memfd itself is implemented as a shim layer
+> > > > > on top of real memory file systems like tmpfs/hugetlbfs but this patch
+> > > > > only implemented tmpfs. The allocated memory is currently marked as
+> > > > > unmovable and unevictable, this is required for current confidential
+> > > > > usage. But in future this might be changed.
+> > > > >
+> > > > > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> > > > > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > > > > ---
+> > > >
+> > > > ...
+> > > >
+> > > > > +static long inaccessible_fallocate(struct file *file, int mode,
+> > > > > +                                  loff_t offset, loff_t len)
+> > > > > +{
+> > > > > +       struct inaccessible_data *data = file->f_mapping->private_data;
+> > > > > +       struct file *memfd = data->memfd;
+> > > > > +       int ret;
+> > > > > +
+> > > > > +       if (mode & FALLOC_FL_PUNCH_HOLE) {
+> > > > > +               if (!PAGE_ALIGNED(offset) || !PAGE_ALIGNED(len))
+> > > > > +                       return -EINVAL;
+> > > > > +       }
+> > > > > +
+> > > > > +       ret = memfd->f_op->fallocate(memfd, mode, offset, len);
+> > > > > +       inaccessible_notifier_invalidate(data, offset, offset + len);
+> > > >
+> > > > Wonder if invalidate should precede the actual hole punch, otherwise we open
+> > > > a window where the page tables point to memory no longer valid?
+> > >
+> > > Yes, you are right. Thanks for catching this.
+> >
+> > I also noticed this. But then thought the memory would be anyways zeroed
+> > (hole punched) before this call?
+>
+> Hole punching can free pages, given that offset/len covers full page.
+>
+> --
+>   Kiryl Shutsemau / Kirill A. Shutemov
 
-On 17/10/22 13:51, Will Deacon wrote:
-> From: Quentin Perret <qperret@google.com>
-> 
-> Memory regions marked as "no-map" in the host device-tree routinely
-> include TrustZone carevouts and DMA pools. Although donating such pages
-
-Typo "carve-outs"?
-
-> to the hypervisor may not breach confidentiality, it could be used to
-> corrupt its state in uncontrollable ways. To prevent this, let's block
-> host-initiated memory transitions targeting "no-map" pages altogether in
-> nVHE protected mode as there should be no valid reason to do this in
-> current operation.
-> 
-> Thankfully, the pKVM EL2 hypervisor has a full copy of the host's list
-> of memblock regions, so we can easily check for the presence of the
-> MEMBLOCK_NOMAP flag on a region containing pages being donated from the
-> host.
-> 
-> Tested-by: Vincent Donnefort <vdonnefort@google.com>
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> Signed-off-by: Will Deacon <will@kernel.org>
-> ---
->   arch/arm64/kvm/hyp/nvhe/mem_protect.c | 22 ++++++++++++++++------
->   1 file changed, 16 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index c30402737548..a7156fd13bc8 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -193,7 +193,7 @@ struct kvm_mem_range {
->   	u64 end;
->   };
-
->   bool addr_is_memory(phys_addr_t phys)
->   {
->   	struct kvm_mem_range range;
->   
-> -	return find_mem_range(phys, &range);
-> +	return !!find_mem_range(phys, &range);
-> +}
-> +
-> +static bool addr_is_allowed_memory(phys_addr_t phys)
-> +{
-> +	struct memblock_region *reg;
-> +	struct kvm_mem_range range;
-> +
-> +	reg = find_mem_range(phys, &range);
-> +
-> +	return reg && !(reg->flags & MEMBLOCK_NOMAP);
->   }
->   
->   static bool is_in_mem_range(u64 addr, struct kvm_mem_range *range)
-> @@ -346,7 +356,7 @@ static bool host_stage2_force_pte_cb(u64 addr, u64 end, enum kvm_pgtable_prot pr
->   static int host_stage2_idmap(u64 addr)
->   {
->   	struct kvm_mem_range range;
-> -	bool is_memory = find_mem_range(addr, &range);
-> +	bool is_memory = !!find_mem_range(addr, &range);
-
-We don't replace by addr_is_allowed_memory() because we still use
-&range, OK.
-
->   	enum kvm_pgtable_prot prot;
->   	int ret;
->   
-> @@ -424,7 +434,7 @@ static int __check_page_state_visitor(u64 addr, u64 end, u32 level,
->   	struct check_walk_data *d = arg;
->   	kvm_pte_t pte = *ptep;
->   
-> -	if (kvm_pte_valid(pte) && !addr_is_memory(kvm_pte_to_phys(pte)))
-> +	if (kvm_pte_valid(pte) && !addr_is_allowed_memory(kvm_pte_to_phys(pte)))
->   		return -EINVAL;
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+I think moving this notifier_invalidate before fallocate may not solve
+the problem completely. Is it possible that between invalidate and
+fallocate, KVM tries to handle the page fault for the guest VM from
+another vcpu and uses the pages to be freed to back gpa ranges? Should
+hole punching here also update mem_attr first to say that KVM should
+consider the corresponding gpa ranges to be no more backed by
+inaccessible memfd?
