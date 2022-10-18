@@ -2,63 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 459E9602DE5
-	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 16:06:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CF1B602DF4
+	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 16:09:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229799AbiJROF6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Oct 2022 10:05:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42724 "EHLO
+        id S230227AbiJROJc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Oct 2022 10:09:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229633AbiJROF5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Oct 2022 10:05:57 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11204C4DB4
-        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 07:05:24 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B2789B81F73
-        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 14:05:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A267C433B5;
-        Tue, 18 Oct 2022 14:05:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666101921;
-        bh=7enIwia2O0x8eQSQ3lN0e02m+bCbVuNSE08teTk7wfU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=MzeEm2IeAqmyEeS0iezWjjHpiUfqP+9+5hX7TTmS103U478iW/gmgo7sD8vtU0FFN
-         uvp8EzPv3dOeRqrmpe/VuaWbES13WD7M9qAOmgwEqCWUrbPOosKsPDwZsT8BkfsNMF
-         rQHFNAkQsaVZXeNZKOBgdRmW71P/4kSQFhWeHc3cQwJGknSjreQAgLFeVG6/NQ0fhs
-         ojsDVGW2ieCZAE2bZFkkamJ+uVaq4NZ8eJJtP5ogpEdgjqafMspcZ8SVVcFLhhCyBn
-         99O2Wi6NjuSeZD/wFDuESSE4a8r7kxvlBgKAhGiy8smBMB7UmGDc7kvk5/WP/l2ebc
-         cwMtPl6VpHw9A==
-Date:   Tue, 18 Oct 2022 15:05:14 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Mark Rutland <mark.rutland@arm.com>
-Cc:     kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v4 14/25] KVM: arm64: Add per-cpu fixmap infrastructure
- at EL2
-Message-ID: <20221018140514.GA3323@willie-the-truck>
-References: <20221017115209.2099-1-will@kernel.org>
- <20221017115209.2099-15-will@kernel.org>
- <Y06Iihi/RPAOMuwR@FVFF77S0Q05N>
+        with ESMTP id S229980AbiJROJa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Oct 2022 10:09:30 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9052BA191
+        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 07:09:27 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id z20so13912322plb.10
+        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 07:09:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zLYGLW92+QDS2tatdBIF+eWiA8z6wO0DOJUQRMlllsk=;
+        b=Q7+TU83unTlXTjf03Higcr8RYNMHQwYutK39/HXdJJ3M3tEzqKNYpQHeyphXnWvZCg
+         +wYK/zYRMo17Rom6KkHdmLO6Cd2sQWfFkKmgl7iTAV+O1l6C1JREKaM4JIGCeI2iq/0E
+         ovVb7OgZ8wg/gGLH4T5NunxFgxnPGJfZN312sLd2uwM01l5HxrFt8so975gSNpIMU/FL
+         bsqRQFVXIpGDN4ID79q0EVuCkhjijLfm+aO1fI7ckbvx+XPYKMIkc/EL3qcWX/7GSNKF
+         zmfoRIFVqoMKhpt6EP1SC2CpkmW7V3AkNabqO/MYPyMbGCOGQ2rZyfeR5qGqe/dQrhMM
+         t7dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zLYGLW92+QDS2tatdBIF+eWiA8z6wO0DOJUQRMlllsk=;
+        b=JFLKXdYxYMop5q+A4phKALm3SUPjahDt7WvWo6vRAj27+KqVaWxO6gKRicxassZ83b
+         fQY9PyeevUbWYHs4C95v4AdB9XMBbtcU6L5xX28+U8hZ62mnbKbe5OJUGQ8pdXijhwh8
+         sUooth+UoHZPelAJMLPDNIff+lpDe6naCv4DlGERjDy4Kxxm1tt7zpTVBZtHLhLEZ0VG
+         JwqwpZDDYxYmeU7fXTAOWnDg5Bqtxky0NVMKTASVBI4n5OyyN41v5KMSxKHlLdxxlCr+
+         DdODKicLFgiQ8jOvexb/0TIMPFMIMkVkZPrD0FEPjQ4kaVILeTkOs9uIwlx26wQ7aUQn
+         RElA==
+X-Gm-Message-State: ACrzQf2tg1m/FRvnkr3Fdqs70uIUWLZqXH1EEMTnaa039En6Gjth6FiJ
+        1en8noILdZFLaZSP2sqG8Ryt8A==
+X-Google-Smtp-Source: AMsMyM4o/6xqzAWsSKkYgdCp/Y7tfw/YBHjC9JeQ1WWYcZxH/jccK1/4F9AUcFGKe3CONCThzzG2/A==
+X-Received: by 2002:a17:90b:17c7:b0:20b:7cb:9397 with SMTP id me7-20020a17090b17c700b0020b07cb9397mr34334269pjb.191.1666102166811;
+        Tue, 18 Oct 2022 07:09:26 -0700 (PDT)
+Received: from anup-ubuntu64-vm.. ([171.76.86.161])
+        by smtp.gmail.com with ESMTPSA id z15-20020a17090a170f00b002009db534d1sm8119913pjd.24.2022.10.18.07.09.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Oct 2022 07:09:26 -0700 (PDT)
+From:   Anup Patel <apatel@ventanamicro.com>
+To:     Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com,
+        maz@kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, Anup Patel <apatel@ventanamicro.com>
+Subject: [PATCH kvmtool 0/6] RISC-V Svinval, Zihintpause, anad Zicbom support
+Date:   Tue, 18 Oct 2022 19:38:48 +0530
+Message-Id: <20221018140854.69846-1-apatel@ventanamicro.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y06Iihi/RPAOMuwR@FVFF77S0Q05N>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-7.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,91 +71,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Mark,
+The latest Linux-6.1-rc1 has support for Svinval, Zihintpause and Zicbom
+extensions in KVM RISC-V. This series adds corresponding changes in KVMTOOL
+to allow Guest/VM use these new RISC-V extensions.
 
-Cheers for having a look.
+These patches can also be found in the riscv_svinval_zihintpause_zicbom_v1
+branch at: https://github.com/avpatel/kvmtool.git
 
-On Tue, Oct 18, 2022 at 12:06:14PM +0100, Mark Rutland wrote:
-> On Mon, Oct 17, 2022 at 12:51:58PM +0100, Will Deacon wrote:
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-> > index d3a3b47181de..b77215630d5c 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/mm.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-> > @@ -14,6 +14,7 @@
-> >  #include <nvhe/early_alloc.h>
-> >  #include <nvhe/gfp.h>
-> >  #include <nvhe/memory.h>
-> > +#include <nvhe/mem_protect.h>
-> >  #include <nvhe/mm.h>
-> >  #include <nvhe/spinlock.h>
-> >  
-> > @@ -25,6 +26,12 @@ unsigned int hyp_memblock_nr;
-> >  
-> >  static u64 __io_map_base;
-> >  
-> > +struct hyp_fixmap_slot {
-> > +	u64 addr;
-> > +	kvm_pte_t *ptep;
-> > +};
-> > +static DEFINE_PER_CPU(struct hyp_fixmap_slot, fixmap_slots);
-> > +
-> >  static int __pkvm_create_mappings(unsigned long start, unsigned long size,
-> >  				  unsigned long phys, enum kvm_pgtable_prot prot)
-> >  {
-> > @@ -212,6 +219,93 @@ int hyp_map_vectors(void)
-> >  	return 0;
-> >  }
-> >  
-> > +void *hyp_fixmap_map(phys_addr_t phys)
-> > +{
-> > +	struct hyp_fixmap_slot *slot = this_cpu_ptr(&fixmap_slots);
-> > +	kvm_pte_t pte, *ptep = slot->ptep;
-> > +
-> > +	pte = *ptep;
-> > +	pte &= ~kvm_phys_to_pte(KVM_PHYS_INVALID);
-> > +	pte |= kvm_phys_to_pte(phys) | KVM_PTE_VALID;
-> > +	WRITE_ONCE(*ptep, pte);
-> > +	dsb(nshst);
-> > +
-> > +	return (void *)slot->addr;
-> > +}
-> > +
-> > +static void fixmap_clear_slot(struct hyp_fixmap_slot *slot)
-> > +{
-> > +	kvm_pte_t *ptep = slot->ptep;
-> > +	u64 addr = slot->addr;
-> > +
-> > +	WRITE_ONCE(*ptep, *ptep & ~KVM_PTE_VALID);
-> > +	dsb(nshst);
-> > +	__tlbi_level(vale2, __TLBI_VADDR(addr, 0), (KVM_PGTABLE_MAX_LEVELS - 1));
-> > +	dsb(nsh);
-> > +	isb();
-> > +}
-> 
-> Does each CPU have independent Stage-1 tables at EL2? i.e. each has a distinct
-> root table?
+Andrew Jones (2):
+  riscv: Move reg encoding helpers to kvm-cpu-arch.h
+  riscv: Add Zicbom extension support
 
-No, the CPUs share the same stage-1 table at EL2.
+Anup Patel (3):
+  Update UAPI headers based on Linux-6.1-rc1
+  riscv: Add Svinval extension support
+  riscv: Add --disable-<xyz> options to allow user disable extensions
 
-> If the tables are shared, you need broadcast maintenance and ISH barriers here,
-> or you risk the usual issues with asynchronous MMU behaviour.
+Mayuresh Chitale (1):
+  riscv: Add zihintpause extension support
 
-Can you elaborate a bit, please? What we're trying to do is reserve a page
-of VA space for each CPU, which is only ever accessed explicitly by that
-CPU using a normal memory mapping. The fixmap code therefore just updates
-the relevant leaf entry for the CPU on which we're running and the TLBI
-is there to ensure that the new mapping takes effect.
+ arm/aarch64/include/asm/kvm.h       |  6 ++++--
+ include/linux/kvm.h                 |  1 +
+ include/linux/virtio_blk.h          | 19 +++++++++++++++++++
+ include/linux/virtio_net.h          | 14 +++++++-------
+ include/linux/virtio_ring.h         | 16 +++++++++++-----
+ riscv/fdt.c                         | 23 +++++++++++++++++++++--
+ riscv/include/asm/kvm.h             |  4 ++++
+ riscv/include/kvm/kvm-config-arch.h | 18 +++++++++++++++++-
+ riscv/include/kvm/kvm-cpu-arch.h    | 19 +++++++++++++++++++
+ riscv/kvm-cpu.c                     | 16 ----------------
+ 10 files changed, 103 insertions(+), 33 deletions(-)
 
-If another CPU speculatively walks another CPU's fixmap slot, then I agree
-that it could access that page after the slot had been cleared. Although
-I can see theoretical security arguments around avoiding that situation,
-there's a very real performance cost to broadcast invalidation that we
-were hoping to avoid on this fast path.
+-- 
+2.34.1
 
-Of course, in the likely event that I've purged "the usual issues" from
-my head and we need broadcasting for _correctness_, then we'll just have
-to suck it up!
-
-Cheers,
-
-Will
