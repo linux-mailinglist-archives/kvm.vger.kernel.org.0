@@ -2,122 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C69DA6030F8
-	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 18:46:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 938BC60310C
+	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 18:52:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229926AbiJRQqL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Oct 2022 12:46:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55646 "EHLO
+        id S229947AbiJRQwa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Oct 2022 12:52:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229885AbiJRQqH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Oct 2022 12:46:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9522E8C52
-        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 09:46:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666111564;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QZP3yvTEQQM8pWfWWjNvcvdOOz/gh8bcKPbdVAik3fQ=;
-        b=SelquGwYOU6J1rZnhrCVg48LK2X+QZy/f5HrimnYJTEAXDrP5Muf3K7hBwCqIqH00WNF7y
-        9nefzf0zVFYXmGDwiOIxogtmhY9kOIgyAcQpUeb0YHkjglGfaARUV51qtaLnQfyLEQoiB5
-        stoW0jNPB4aQX6B+TlEf5YMxZDzp/pY=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-125-o-VsMidLPn-r8WpEWivpVQ-1; Tue, 18 Oct 2022 12:46:03 -0400
-X-MC-Unique: o-VsMidLPn-r8WpEWivpVQ-1
-Received: by mail-qv1-f71.google.com with SMTP id em2-20020ad44f82000000b004af5338777cso8957677qvb.4
-        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 09:46:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QZP3yvTEQQM8pWfWWjNvcvdOOz/gh8bcKPbdVAik3fQ=;
-        b=UUrP8zej90Q3gDtewcay1to0ggz4NcFOMCytmLvJeT6Go8p4rOXydGa8XwdmY2kXM6
-         p1wuTOOi3dIW9lDqj7tdfdcwXG1HAKacJq9U+Fib/N5uBGn2nzXp5EiogecMIs/M1pyJ
-         eyT3RGx5YeJwZ2Nwq1Yt5+EGs+wYJN/1ekY4OV2Yyy+OtNLvkorD7hiVoSfZj4myE9Dk
-         MI7TdhT3LwVBhGad8SjU4Q2pa4UbRMGZvcrunt5izlmbwoXrBA62NI2FZm8ZB1ZfQ8QI
-         zxVVdfvcx/tsmX7sOPg80Xy06sViqm3GRjjWC/gz9uwmHxyHHsxK29zD1rVloxC0M5ez
-         pPfg==
-X-Gm-Message-State: ACrzQf2sQ36fyKj3TvFkMq9U+LiL/Zzg1j4zzsRc5QG78R5XdLbvYwn9
-        hL0YsidjV2NFwEmiLL4a9I0RfTEt1z/LC7cPPbYZgiUFxYzprR+Cubtaer/VOk/nAPH1cVqBBVW
-        BaNw8LkxHzR7M
-X-Received: by 2002:a0c:9122:0:b0:4b1:80fc:c405 with SMTP id q31-20020a0c9122000000b004b180fcc405mr3134938qvq.120.1666111562690;
-        Tue, 18 Oct 2022 09:46:02 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM5qRKddE7VWNwmZ5E6Sy6/79Fxdoo5cJ0pbCHMIAhFQSQw6AiGBLAstyLwyrj9w+PYdaDSKhg==
-X-Received: by 2002:a0c:9122:0:b0:4b1:80fc:c405 with SMTP id q31-20020a0c9122000000b004b180fcc405mr3134927qvq.120.1666111562513;
-        Tue, 18 Oct 2022 09:46:02 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id l13-20020ac8148d000000b0039c72bb51f3sm2185059qtj.86.2022.10.18.09.46.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Oct 2022 09:46:01 -0700 (PDT)
-Message-ID: <12a6fae1-c7c5-c531-fce7-1a57cf6122fa@redhat.com>
-Date:   Tue, 18 Oct 2022 18:45:58 +0200
+        with ESMTP id S229722AbiJRQw2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Oct 2022 12:52:28 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AF774EB74B
+        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 09:52:27 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4AB5E113E;
+        Tue, 18 Oct 2022 09:52:33 -0700 (PDT)
+Received: from lakrids (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1E1813F7D8;
+        Tue, 18 Oct 2022 09:52:25 -0700 (PDT)
+Date:   Tue, 18 Oct 2022 17:52:18 +0100
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Will Deacon <will@kernel.org>
+Cc:     kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Quentin Perret <qperret@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v4 14/25] KVM: arm64: Add per-cpu fixmap infrastructure
+ at EL2
+Message-ID: <Y07Zwsn+oFbMWeKI@lakrids>
+References: <20221017115209.2099-1-will@kernel.org>
+ <20221017115209.2099-15-will@kernel.org>
+ <Y06Iihi/RPAOMuwR@FVFF77S0Q05N>
+ <20221018140514.GA3323@willie-the-truck>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Reply-To: eric.auger@redhat.com
-Subject: Re: [PATCH] vfio: platform: Do not pass return buffer to ACPI _RST
- method
-Content-Language: en-US
-To:     Rafael Mendonca <rafaelmendsr@gmail.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Sinan Kaya <okaya@codeaurora.org>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20221018152825.891032-1-rafaelmendsr@gmail.com>
-From:   Eric Auger <eric.auger@redhat.com>
-In-Reply-To: <20221018152825.891032-1-rafaelmendsr@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221018140514.GA3323@willie-the-truck>
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Rafael,
-On 10/18/22 17:28, Rafael Mendonca wrote:
-> The ACPI _RST method has no return value, there's no need to pass a return
-> buffer to acpi_evaluate_object().
->
-> Fixes: d30daa33ec1d ("vfio: platform: call _RST method when using ACPI")
-> Signed-off-by: Rafael Mendonca <rafaelmendsr@gmail.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+On Tue, Oct 18, 2022 at 03:05:14PM +0100, Will Deacon wrote:
+> Hi Mark,
+> 
+> Cheers for having a look.
+> 
+> On Tue, Oct 18, 2022 at 12:06:14PM +0100, Mark Rutland wrote:
+> > On Mon, Oct 17, 2022 at 12:51:58PM +0100, Will Deacon wrote:
+> > > diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+> > > index d3a3b47181de..b77215630d5c 100644
+> > > --- a/arch/arm64/kvm/hyp/nvhe/mm.c
+> > > +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+> > > @@ -14,6 +14,7 @@
+> > >  #include <nvhe/early_alloc.h>
+> > >  #include <nvhe/gfp.h>
+> > >  #include <nvhe/memory.h>
+> > > +#include <nvhe/mem_protect.h>
+> > >  #include <nvhe/mm.h>
+> > >  #include <nvhe/spinlock.h>
+> > >  
+> > > @@ -25,6 +26,12 @@ unsigned int hyp_memblock_nr;
+> > >  
+> > >  static u64 __io_map_base;
+> > >  
+> > > +struct hyp_fixmap_slot {
+> > > +	u64 addr;
+> > > +	kvm_pte_t *ptep;
+> > > +};
+> > > +static DEFINE_PER_CPU(struct hyp_fixmap_slot, fixmap_slots);
+> > > +
+> > >  static int __pkvm_create_mappings(unsigned long start, unsigned long size,
+> > >  				  unsigned long phys, enum kvm_pgtable_prot prot)
+> > >  {
+> > > @@ -212,6 +219,93 @@ int hyp_map_vectors(void)
+> > >  	return 0;
+> > >  }
+> > >  
+> > > +void *hyp_fixmap_map(phys_addr_t phys)
+> > > +{
+> > > +	struct hyp_fixmap_slot *slot = this_cpu_ptr(&fixmap_slots);
+> > > +	kvm_pte_t pte, *ptep = slot->ptep;
+> > > +
+> > > +	pte = *ptep;
+> > > +	pte &= ~kvm_phys_to_pte(KVM_PHYS_INVALID);
+> > > +	pte |= kvm_phys_to_pte(phys) | KVM_PTE_VALID;
+> > > +	WRITE_ONCE(*ptep, pte);
+> > > +	dsb(nshst);
+> > > +
+> > > +	return (void *)slot->addr;
+> > > +}
+> > > +
+> > > +static void fixmap_clear_slot(struct hyp_fixmap_slot *slot)
+> > > +{
+> > > +	kvm_pte_t *ptep = slot->ptep;
+> > > +	u64 addr = slot->addr;
+> > > +
+> > > +	WRITE_ONCE(*ptep, *ptep & ~KVM_PTE_VALID);
+> > > +	dsb(nshst);
+> > > +	__tlbi_level(vale2, __TLBI_VADDR(addr, 0), (KVM_PGTABLE_MAX_LEVELS - 1));
+> > > +	dsb(nsh);
+> > > +	isb();
+> > > +}
+> > 
+> > Does each CPU have independent Stage-1 tables at EL2? i.e. each has a distinct
+> > root table?
+> 
+> No, the CPUs share the same stage-1 table at EL2.
 
-Thanks
+Ah, then I think there's a problem here.
 
-Eric
-> ---
->  drivers/vfio/platform/vfio_platform_common.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
-> index 55dc4f43c31e..1a0a238ffa35 100644
-> --- a/drivers/vfio/platform/vfio_platform_common.c
-> +++ b/drivers/vfio/platform/vfio_platform_common.c
-> @@ -72,12 +72,11 @@ static int vfio_platform_acpi_call_reset(struct vfio_platform_device *vdev,
->  				  const char **extra_dbg)
->  {
->  #ifdef CONFIG_ACPI
-> -	struct acpi_buffer buffer = { ACPI_ALLOCATE_BUFFER, NULL };
->  	struct device *dev = vdev->device;
->  	acpi_handle handle = ACPI_HANDLE(dev);
->  	acpi_status acpi_ret;
->  
-> -	acpi_ret = acpi_evaluate_object(handle, "_RST", NULL, &buffer);
-> +	acpi_ret = acpi_evaluate_object(handle, "_RST", NULL, NULL);
->  	if (ACPI_FAILURE(acpi_ret)) {
->  		if (extra_dbg)
->  			*extra_dbg = acpi_format_exception(acpi_ret);
+> > If the tables are shared, you need broadcast maintenance and ISH barriers here,
+> > or you risk the usual issues with asynchronous MMU behaviour.
+> 
+> Can you elaborate a bit, please? What we're trying to do is reserve a page
+> of VA space for each CPU, which is only ever accessed explicitly by that
+> CPU using a normal memory mapping. The fixmap code therefore just updates
+> the relevant leaf entry for the CPU on which we're running and the TLBI
+> is there to ensure that the new mapping takes effect.
+> 
+> If another CPU speculatively walks another CPU's fixmap slot, then I agree
+> that it could access that page after the slot had been cleared. Although
+> I can see theoretical security arguments around avoiding that situation,
+> there's a very real performance cost to broadcast invalidation that we
+> were hoping to avoid on this fast path.
 
+The issue is that any CPU could walk any of these entries at any time
+for any reason, and without broadcast maintenance we'd be violating the
+Break-Before-Make requirements. That permits a number of things,
+including "amalgamation", which would permit the CPU to consume some
+arbitrary function of the old+new entries. Among other things, that can
+permit accesses to entirely bogus physical addresses that weren't in
+either entry (e.g. making speculative accesses to arbitrary device
+addresses).
+
+For correctness, you need the maintenance to be broadcast to all PEs
+which could observe the old and new entries.
+
+> Of course, in the likely event that I've purged "the usual issues" from
+> my head and we need broadcasting for _correctness_, then we'll just have
+> to suck it up!
+
+As above, I believe you need this for correctness.
+
+I'm not sure if FEAT_BBM level 2 gives you the necessary properties to
+relax this on some HW.
+
+Thanks,
+Mark.
