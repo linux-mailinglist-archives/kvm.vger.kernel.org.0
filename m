@@ -2,135 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 522F06030E0
-	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 18:40:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3687A6030E5
+	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 18:42:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229832AbiJRQkX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Oct 2022 12:40:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40988 "EHLO
+        id S229736AbiJRQmZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Oct 2022 12:42:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229657AbiJRQkT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Oct 2022 12:40:19 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 584CFC3566
-        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 09:40:16 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id m16so21376701edc.4
-        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 09:40:16 -0700 (PDT)
+        with ESMTP id S229491AbiJRQmY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Oct 2022 12:42:24 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF0DFE8C4B
+        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 09:42:22 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id b4so24519584wrs.1
+        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 09:42:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iOPA6fmSUQtvOcvu63Z4VIuGCcRSbgkai17AnO42Xg8=;
-        b=RwOSzwSlFSbCd7ZBY+OuXxbAjYHeUdWktNJRobH9SE1tBqo+ITG+S/2lqQ99WtmZGg
-         2aklvAWwCrZAx0WH3PgMsnj83COBQ8EHzUnN/XJ7xG6IsbY5W8R5VFOWceL//p/6rYJV
-         uIPytEw9UgH8/6EUaPS0RF+l5QZ1XgcJsIVQdyGngbNT6vPQuI/xdHCUv3ucc95MOCFB
-         /4X/44neCUuawCWgVLmlYyyt+MG8/pNfDjmANn88qH8rDWp0Ve4Y8GCi9bLi51hWzpdz
-         iDkB1tzuk46gjKvZYbU/sTHqsHpFLI3l87eHYe5xINvdWGxUBpfjq52o1EBlMeIiWQsq
-         tWiQ==
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Zyuk2vqool0ZJsR32P+3e4lQalita2jOOTT18RJHHoY=;
+        b=WvBgZntHJH1LRfE6NUAsZ9MWhwho5l3Cw1x0tS61S8rhXUrBGt7T+aXzwHrJHHSMqP
+         z2bUAMqoWrSMCUhPOoStkE46O8N0mA81YVXgAGFmAS4+IIZQn1lSmWOSXJRs5U5vBLZL
+         cRfjvB8XRf9LGME/5vIRSf4lAFwff+ojQl8WMyN4TgKOSD1eVpeoaguUY/+hqngQ1hDZ
+         JXCHsLsF0P8a1eJEyGrolQaUG9QKxl6KcpcHoTwx0KftEKJxKxF2QbG7FcDV8WcuHaYU
+         Rx7XL0RCDNJjt6dFEjyJTbrkUspTtG6nghQzrt3+JXMqNaVHt3RqLMhQxwMMUk5JdqvU
+         qd5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iOPA6fmSUQtvOcvu63Z4VIuGCcRSbgkai17AnO42Xg8=;
-        b=MM6yySDej7O1XCmQR/EsaAIvHqzShpOOpBEzmROeKfJASQ13EtDxups/Xq++MyJZg9
-         masXpbJ+sElPr6ontoi9WO8Psz6yHbx/18lOMltvM/1PYMaar+08ePEf1cxT8OdIUN1G
-         SxlNAN5Rksi/jr1kh73BVJpnerx2naPQ2K+2G+SRVllt716RRv5pLTpgaHaHxFoD2B6j
-         MUwChBEShWlPFjh74wv8XnL1hKV0JtrRM9vmmIp6Ma3Amf7dHx5ANkD2BMm5dabwHrdI
-         57DgifNazSmmbIqttOJlX0QMt7hq+OA2gyz7cpHKtuLKCIzGIicMJ4bEn/hfyTp0v3KV
-         72mQ==
-X-Gm-Message-State: ACrzQf1jEO9QR7jnpAn4i2GcCtPIaDY87ofH4z1U3gtd78zdmVb4qgSm
-        4HTQICjFSXqj5Qdb4v6Rq3nrcg==
-X-Google-Smtp-Source: AMsMyM6jfwRi0igcgtP8NlX5XCTCI9iXBrg469ezzZODlwCSp+LE/lDHgH145M2jwzJFZG2F8RM4ZA==
-X-Received: by 2002:aa7:d348:0:b0:45b:8ae3:ee3d with SMTP id m8-20020aa7d348000000b0045b8ae3ee3dmr3440508edr.428.1666111214784;
-        Tue, 18 Oct 2022 09:40:14 -0700 (PDT)
-Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
-        by smtp.gmail.com with ESMTPSA id i18-20020a0564020f1200b00458a03203b1sm9244566eda.31.2022.10.18.09.40.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Oct 2022 09:40:14 -0700 (PDT)
-Date:   Tue, 18 Oct 2022 16:40:11 +0000
-From:   Quentin Perret <qperret@google.com>
-To:     Will Deacon <will@kernel.org>
-Cc:     kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v4 12/25] KVM: arm64: Add infrastructure to create and
- track pKVM instances at EL2
-Message-ID: <Y07W63YlwZ6yClOi@google.com>
-References: <20221017115209.2099-1-will@kernel.org>
- <20221017115209.2099-13-will@kernel.org>
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zyuk2vqool0ZJsR32P+3e4lQalita2jOOTT18RJHHoY=;
+        b=L6q+wZMGmDNa1UR/Vg9Jijmgt5rWmT8vl3qJ6gVzTRGMiA5vrGdlV1pL1Lwr4BBmFP
+         0gPt7I5GZjqQCEmnvXtPbffB84tx4YULydQFUFbIvTx6lUzknh8V3SKgiwYjCa2vlIxo
+         Bs22BlDHuuVJW7+KPfp4NEZdHu86kUT5ln6A7/CdF9V9KNllxlXknha6k91xgfNnwN/M
+         1Gn2pIMeXEgYuYH72H2BmSt+He4Z3qSQ3rfhVFQugGsjfidfYuLkSKn2/pZA7VFIWFww
+         QHeqnOXgrtFL4LXXi/zFpNxFe7PlOPiAeDBIpaoeX9OR7kL0pAx6nlV944mODJfkrb7D
+         RJ9Q==
+X-Gm-Message-State: ACrzQf2EfC+ug2LQ36mLoMLe1EXu12et33TUx2mocnmkoaofabnuhP8b
+        xX3XPtsDsEwil6uXAAaLtXzNRA==
+X-Google-Smtp-Source: AMsMyM5912HfPWSludNbWAHArs7ZDbAyFVAHpAbhZKcK3gEZgDte7ZYWreKddEYJaTpsKpLG3VydZw==
+X-Received: by 2002:a5d:64c2:0:b0:22e:41b1:faf7 with SMTP id f2-20020a5d64c2000000b0022e41b1faf7mr2380429wri.428.1666111341291;
+        Tue, 18 Oct 2022 09:42:21 -0700 (PDT)
+Received: from [192.168.1.115] ([185.126.107.38])
+        by smtp.gmail.com with ESMTPSA id a19-20020a05600c225300b003a6a3595edasm14146164wmm.27.2022.10.18.09.42.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Oct 2022 09:42:20 -0700 (PDT)
+Message-ID: <7ed5b0d3-70e3-3542-1895-4bbf6a0784d2@linaro.org>
+Date:   Tue, 18 Oct 2022 18:42:19 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221017115209.2099-13-will@kernel.org>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.13.1
+Subject: Re: [PATCH v3 2/5] vfio/spapr: Move VFIO_CHECK_EXTENSION into
+ tce_iommu_ioctl()
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+References: <2-v3-8db96837cdf9+784-vfio_modules_jgg@nvidia.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
+In-Reply-To: <2-v3-8db96837cdf9+784-vfio_modules_jgg@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Monday 17 Oct 2022 at 12:51:56 (+0100), Will Deacon wrote:
-> +static void *map_donated_memory_noclear(unsigned long host_va, size_t size)
-> +{
-> +	void *va = (void *)kern_hyp_va(host_va);
-> +
-> +	if (!PAGE_ALIGNED(va))
-> +		return NULL;
-> +
-> +	if (__pkvm_host_donate_hyp(hyp_virt_to_pfn(va),
-> +				   PAGE_ALIGN(size) >> PAGE_SHIFT))
-> +		return NULL;
-> +
-> +	return va;
-> +}
-> +
-> +static void *map_donated_memory(unsigned long host_va, size_t size)
-> +{
-> +	void *va = map_donated_memory_noclear(host_va, size);
-> +
-> +	if (va)
-> +		memset(va, 0, size);
-> +
-> +	return va;
-> +}
-> +
-> +static void __unmap_donated_memory(void *va, size_t size)
-> +{
-> +	WARN_ON(__pkvm_hyp_donate_host(hyp_virt_to_pfn(va),
-> +				       PAGE_ALIGN(size) >> PAGE_SHIFT));
-> +}
-> +
-> +static void unmap_donated_memory(void *va, size_t size)
-> +{
-> +	if (!va)
-> +		return;
-> +
-> +	memset(va, 0, size);
-> +	__unmap_donated_memory(va, size);
-> +}
-> +
-> +static void unmap_donated_memory_noclear(void *va, size_t size)
-> +{
-> +	if (!va)
-> +		return;
-> +
-> +	__unmap_donated_memory(va, size);
-> +}
+On 17/10/22 20:38, Jason Gunthorpe wrote:
+> The PPC64 kconfig is a bit of a rats nest, but it turns out that if
+> CONFIG_SPAPR_TCE_IOMMU is on then EEH must be too:
+> 
+> config SPAPR_TCE_IOMMU
+> 	bool "sPAPR TCE IOMMU Support"
+> 	depends on PPC_POWERNV || PPC_PSERIES
+> 	select IOMMU_API
+> 	help
+> 	  Enables bits of IOMMU API required by VFIO. The iommu_ops
+> 	  is not implemented as it is not necessary for VFIO.
+> 
+> config PPC_POWERNV
+> 	select FORCE_PCI
+> 
+> config PPC_PSERIES
+> 	select FORCE_PCI
+> 
+> config EEH
+> 	bool
+> 	depends on (PPC_POWERNV || PPC_PSERIES) && PCI
+> 	default y
+> 
+> So, just open code the call to eeh_enabled() into tce_iommu_ioctl().
+> 
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>   drivers/vfio/vfio_iommu_spapr_tce.c | 10 ++++------
+>   drivers/vfio/vfio_spapr_eeh.c       |  6 ------
+>   2 files changed, 4 insertions(+), 12 deletions(-)
 
-Nit: I'm not a huge fan of the naming here, these do more than just
-map/unmap random pages. This only works for host pages, the donation
-path has permission checks, etc. Maybe {admit,return}_host_memory()?
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
