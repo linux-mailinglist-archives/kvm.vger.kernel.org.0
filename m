@@ -2,332 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 85AFD6029D8
-	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 13:06:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 43F836029FC
+	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 13:15:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229717AbiJRLGZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Oct 2022 07:06:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49850 "EHLO
+        id S229717AbiJRLPj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Oct 2022 07:15:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229556AbiJRLGX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Oct 2022 07:06:23 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5808124964
-        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 04:06:22 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ED1C4113E;
-        Tue, 18 Oct 2022 04:06:27 -0700 (PDT)
-Received: from FVFF77S0Q05N (unknown [10.57.0.253])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6172A3F7D8;
-        Tue, 18 Oct 2022 04:06:19 -0700 (PDT)
-Date:   Tue, 18 Oct 2022 12:06:14 +0100
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Will Deacon <will@kernel.org>
-Cc:     kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v4 14/25] KVM: arm64: Add per-cpu fixmap infrastructure
- at EL2
-Message-ID: <Y06Iihi/RPAOMuwR@FVFF77S0Q05N>
-References: <20221017115209.2099-1-will@kernel.org>
- <20221017115209.2099-15-will@kernel.org>
+        with ESMTP id S229619AbiJRLPh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Oct 2022 07:15:37 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7996D4F
+        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 04:15:35 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29IBC9nB004132
+        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 11:15:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=fd+bciPqzE52eAyQClDuggmV+kmpSakn9MgN/tYRRQg=;
+ b=EU3xHsZsq/aOrI/gumA+8ob8QrOwcppdq4gYPMfD0FAc7uuhyJjpj8dy7Xiyo1nLhDGT
+ EW0BqIdken/7Of6dFk5BAr/aU9yWE5cyLN3jZlHWRz2wnFcEmHqtpFkSGV30Jzs7p6SV
+ g4HuPg0TA4gi4wlJMIhzp1Og10xAmby2FseCDVIeH2vKbJ8nNTUFyTLy/WpokR7d+4Kl
+ RKiaDEFlmz2xeuEhbEmbBkXEvu4QexsReIGmRxxZPALpKL+v+l5C6iSJNM9YnvYKDl6p
+ 0qLZ3jVLdZcZnCJU69JMnLHudvJcLobl0wjsbh1bN9F/SQsWk/aocZxcTJc37p2jb7s8 1g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k9u2b031v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 11:15:35 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29IBEHkF012595
+        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 11:15:34 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3k9u2b0303-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Oct 2022 11:15:34 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29IB56ed013397;
+        Tue, 18 Oct 2022 11:15:32 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3k7mg953rp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Oct 2022 11:15:32 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29IBFTlA5046886
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Oct 2022 11:15:29 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3E7F7A405B;
+        Tue, 18 Oct 2022 11:15:29 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0B972A4054;
+        Tue, 18 Oct 2022 11:15:29 +0000 (GMT)
+Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 18 Oct 2022 11:15:28 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Subject: [kvm-unit-tests PATCH v1] s390x: do not enable PV dump support by default
+Date:   Tue, 18 Oct 2022 13:15:28 +0200
+Message-Id: <20221018111528.173989-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221017115209.2099-15-will@kernel.org>
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 78Akfypc82IsX8SZYpt2BOXd3KPRwXSJ
+X-Proofpoint-ORIG-GUID: PHMn18C2mStCr7emwrGkPZIkDvOaiJfy
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-18_03,2022-10-18_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
+ priorityscore=1501 impostorscore=0 suspectscore=0 adultscore=0 spamscore=0
+ phishscore=0 lowpriorityscore=0 mlxscore=0 bulkscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
+ definitions=main-2210180063
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 17, 2022 at 12:51:58PM +0100, Will Deacon wrote:
-> From: Quentin Perret <qperret@google.com>
-> 
-> Mapping pages in a guest page-table from within the pKVM hypervisor at
-> EL2 may require cache maintenance to ensure that the initialised page
-> contents is visible even to non-cacheable (e.g. MMU-off) accesses from
-> the guest.
-> 
-> In preparation for performing this maintenance at EL2, introduce a
-> per-vCPU fixmap which allows the pKVM hypervisor to map guest pages
-> temporarily into its stage-1 page-table for the purposes of cache
-> maintenance and, in future, poisoning on the reclaim path. The use of a
-> fixmap avoids the need for memory allocation or locking on the map()
-> path.
-> 
-> Tested-by: Vincent Donnefort <vdonnefort@google.com>
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> Signed-off-by: Will Deacon <will@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h          | 14 +++
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 +
->  arch/arm64/kvm/hyp/include/nvhe/mm.h          |  4 +
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  1 -
->  arch/arm64/kvm/hyp/nvhe/mm.c                  | 94 +++++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/setup.c               |  4 +
->  arch/arm64/kvm/hyp/pgtable.c                  | 12 ---
->  7 files changed, 118 insertions(+), 13 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 4f6d79fe4352..b2a886c9e78d 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -30,6 +30,8 @@ typedef u64 kvm_pte_t;
->  #define KVM_PTE_ADDR_MASK		GENMASK(47, PAGE_SHIFT)
->  #define KVM_PTE_ADDR_51_48		GENMASK(15, 12)
->  
-> +#define KVM_PHYS_INVALID		(-1ULL)
-> +
->  static inline bool kvm_pte_valid(kvm_pte_t pte)
->  {
->  	return pte & KVM_PTE_VALID;
-> @@ -45,6 +47,18 @@ static inline u64 kvm_pte_to_phys(kvm_pte_t pte)
->  	return pa;
->  }
->  
-> +static inline kvm_pte_t kvm_phys_to_pte(u64 pa)
-> +{
-> +	kvm_pte_t pte = pa & KVM_PTE_ADDR_MASK;
-> +
-> +	if (PAGE_SHIFT == 16) {
-> +		pa &= GENMASK(51, 48);
-> +		pte |= FIELD_PREP(KVM_PTE_ADDR_51_48, pa >> 48);
-> +	}
-> +
-> +	return pte;
-> +}
-> +
->  static inline u64 kvm_granule_shift(u32 level)
->  {
->  	/* Assumes KVM_PGTABLE_MAX_LEVELS is 4 */
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> index ce9a796a85ee..ef31a1872c93 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> @@ -59,6 +59,8 @@ enum pkvm_component_id {
->  	PKVM_ID_HYP,
->  };
->  
-> +extern unsigned long hyp_nr_cpus;
-> +
->  int __pkvm_prot_finalize(void);
->  int __pkvm_host_share_hyp(u64 pfn);
->  int __pkvm_host_unshare_hyp(u64 pfn);
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-> index b2ee6d5df55b..d5ec972b5c1e 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-> @@ -13,6 +13,10 @@
->  extern struct kvm_pgtable pkvm_pgtable;
->  extern hyp_spinlock_t pkvm_pgd_lock;
->  
-> +int hyp_create_pcpu_fixmap(void);
-> +void *hyp_fixmap_map(phys_addr_t phys);
-> +void hyp_fixmap_unmap(void);
-> +
->  int hyp_create_idmap(u32 hyp_va_bits);
->  int hyp_map_vectors(void);
->  int hyp_back_vmemmap(phys_addr_t back);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> index 2ef6aaa21ba5..1c38451050e5 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> @@ -21,7 +21,6 @@
->  
->  #define KVM_HOST_S2_FLAGS (KVM_PGTABLE_S2_NOFWB | KVM_PGTABLE_S2_IDMAP)
->  
-> -extern unsigned long hyp_nr_cpus;
->  struct host_mmu host_mmu;
->  
->  static struct hyp_pool host_s2_pool;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-> index d3a3b47181de..b77215630d5c 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/mm.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-> @@ -14,6 +14,7 @@
->  #include <nvhe/early_alloc.h>
->  #include <nvhe/gfp.h>
->  #include <nvhe/memory.h>
-> +#include <nvhe/mem_protect.h>
->  #include <nvhe/mm.h>
->  #include <nvhe/spinlock.h>
->  
-> @@ -25,6 +26,12 @@ unsigned int hyp_memblock_nr;
->  
->  static u64 __io_map_base;
->  
-> +struct hyp_fixmap_slot {
-> +	u64 addr;
-> +	kvm_pte_t *ptep;
-> +};
-> +static DEFINE_PER_CPU(struct hyp_fixmap_slot, fixmap_slots);
-> +
->  static int __pkvm_create_mappings(unsigned long start, unsigned long size,
->  				  unsigned long phys, enum kvm_pgtable_prot prot)
->  {
-> @@ -212,6 +219,93 @@ int hyp_map_vectors(void)
->  	return 0;
->  }
->  
-> +void *hyp_fixmap_map(phys_addr_t phys)
-> +{
-> +	struct hyp_fixmap_slot *slot = this_cpu_ptr(&fixmap_slots);
-> +	kvm_pte_t pte, *ptep = slot->ptep;
-> +
-> +	pte = *ptep;
-> +	pte &= ~kvm_phys_to_pte(KVM_PHYS_INVALID);
-> +	pte |= kvm_phys_to_pte(phys) | KVM_PTE_VALID;
-> +	WRITE_ONCE(*ptep, pte);
-> +	dsb(nshst);
-> +
-> +	return (void *)slot->addr;
-> +}
-> +
-> +static void fixmap_clear_slot(struct hyp_fixmap_slot *slot)
-> +{
-> +	kvm_pte_t *ptep = slot->ptep;
-> +	u64 addr = slot->addr;
-> +
-> +	WRITE_ONCE(*ptep, *ptep & ~KVM_PTE_VALID);
-> +	dsb(nshst);
-> +	__tlbi_level(vale2, __TLBI_VADDR(addr, 0), (KVM_PGTABLE_MAX_LEVELS - 1));
-> +	dsb(nsh);
-> +	isb();
-> +}
+Currently, dump support is always enabled by setting the respective
+plaintext control flag (PCF). Unfortunately, older machines without
+support for PV dump will not start the guest when this PCF is set. This
+will result in an error message like this:
 
-Does each CPU have independent Stage-1 tables at EL2? i.e. each has a distinct
-root table?
+qemu-system-s390x: KVM PV command 2 (KVM_PV_SET_SEC_PARMS) failed: header rc 106 rrc 30 IOCTL rc: -22
 
-If the tables are shared, you need broadcast maintenance and ISH barriers here,
-or you risk the usual issues with asynchronous MMU behaviour.
+Hence, by default, disable dump support to preserve compatibility with
+older machines. Users can enable dumping support by passing
+--enable-dump to the configure script.
 
-If those are per-cpu, sorry for the noise!
+Fixes: 3043685825d9 ("s390x: create persistent comm-key")
+Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+---
+ configure      | 11 +++++++++++
+ s390x/Makefile |  9 ++++++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-Thanks,
-Mark.
+diff --git a/configure b/configure
+index 5b7daac3c6e8..b81f20942c9c 100755
+--- a/configure
++++ b/configure
+@@ -28,6 +28,7 @@ errata_force=0
+ erratatxt="$srcdir/errata.txt"
+ host_key_document=
+ gen_se_header=
++enable_dump=no
+ page_size=
+ earlycon=
+ efi=
+@@ -67,6 +68,9 @@ usage() {
+ 	    --gen-se-header=GEN_SE_HEADER
+ 	                           Provide an executable to generate a PV header
+ 	                           requires --host-key-document. (s390x-snippets only)
++	    --[enable|disable]-dump
++	                           Allow PV guests to be dumped. Requires at least z16.
++	                           (s390x only)
+ 	    --page-size=PAGE_SIZE
+ 	                           Specify the page size (translation granule) (4k, 16k or
+ 	                           64k, default is 64k, arm64 only)
+@@ -146,6 +150,12 @@ while [[ "$1" = -* ]]; do
+ 	--gen-se-header)
+ 	    gen_se_header="$arg"
+ 	    ;;
++	--enable-dump)
++	    enable_dump=yes
++	    ;;
++	--disable-dump)
++	    enable_dump=no
++	    ;;
+ 	--page-size)
+ 	    page_size="$arg"
+ 	    ;;
+@@ -387,6 +397,7 @@ U32_LONG_FMT=$u32_long
+ WA_DIVIDE=$wa_divide
+ GENPROTIMG=${GENPROTIMG-genprotimg}
+ HOST_KEY_DOCUMENT=$host_key_document
++CONFIG_DUMP=$enable_dump
+ CONFIG_EFI=$efi
+ CONFIG_WERROR=$werror
+ GEN_SE_HEADER=$gen_se_header
+diff --git a/s390x/Makefile b/s390x/Makefile
+index 649486f2d4a0..5b4aff5e57ef 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -173,6 +173,11 @@ $(comm-key):
+ %.bin: %.elf
+ 	$(OBJCOPY) -O binary  $< $@
+ 
++GENPROTIMG_COMM_KEY =
++# allow PCKMO
++genprotimg_pcf = 0x000000e0
++
++ifeq ($(CONFIG_DUMP),yes)
+ # The genprotimg arguments for the cck changed over time so we need to
+ # figure out which argument to use in order to set the cck
+ GENPROTIMG_HAS_COMM_KEY = $(shell $(GENPROTIMG) --help | grep -q -- --comm-key && echo yes)
+@@ -182,9 +187,11 @@ else
+ 	GENPROTIMG_COMM_KEY = --x-comm-key $(comm-key)
+ endif
+ 
+-# use x-pcf to be compatible with old genprotimg versions
+ # allow dumping + PCKMO
+ genprotimg_pcf = 0x200000e0
++endif
++
++# use x-pcf to be compatible with old genprotimg versions
+ genprotimg_args = --host-key-document $(HOST_KEY_DOCUMENT) --no-verify $(GENPROTIMG_COMM_KEY) --x-pcf $(genprotimg_pcf)
+ 
+ %selftest.pv.bin: %selftest.bin $(HOST_KEY_DOCUMENT) $(patsubst %.pv.bin,%.parmfile,$@) $(comm-key)
+-- 
+2.35.3
 
-> +
-> +void hyp_fixmap_unmap(void)
-> +{
-> +	fixmap_clear_slot(this_cpu_ptr(&fixmap_slots));
-> +}
-> +
-> +static int __create_fixmap_slot_cb(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> +				   enum kvm_pgtable_walk_flags flag,
-> +				   void * const arg)
-> +{
-> +	struct hyp_fixmap_slot *slot = per_cpu_ptr(&fixmap_slots, (u64)arg);
-> +
-> +	if (!kvm_pte_valid(*ptep) || level != KVM_PGTABLE_MAX_LEVELS - 1)
-> +		return -EINVAL;
-> +
-> +	slot->addr = addr;
-> +	slot->ptep = ptep;
-> +
-> +	/*
-> +	 * Clear the PTE, but keep the page-table page refcount elevated to
-> +	 * prevent it from ever being freed. This lets us manipulate the PTEs
-> +	 * by hand safely without ever needing to allocate memory.
-> +	 */
-> +	fixmap_clear_slot(slot);
-> +
-> +	return 0;
-> +}
-> +
-> +static int create_fixmap_slot(u64 addr, u64 cpu)
-> +{
-> +	struct kvm_pgtable_walker walker = {
-> +		.cb	= __create_fixmap_slot_cb,
-> +		.flags	= KVM_PGTABLE_WALK_LEAF,
-> +		.arg = (void *)cpu,
-> +	};
-> +
-> +	return kvm_pgtable_walk(&pkvm_pgtable, addr, PAGE_SIZE, &walker);
-> +}
-> +
-> +int hyp_create_pcpu_fixmap(void)
-> +{
-> +	unsigned long addr, i;
-> +	int ret;
-> +
-> +	for (i = 0; i < hyp_nr_cpus; i++) {
-> +		ret = pkvm_alloc_private_va_range(PAGE_SIZE, &addr);
-> +		if (ret)
-> +			return ret;
-> +
-> +		ret = kvm_pgtable_hyp_map(&pkvm_pgtable, addr, PAGE_SIZE,
-> +					  __hyp_pa(__hyp_bss_start), PAGE_HYP);
-> +		if (ret)
-> +			return ret;
-> +
-> +		ret = create_fixmap_slot(addr, i);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  int hyp_create_idmap(u32 hyp_va_bits)
->  {
->  	unsigned long start, end;
-> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-> index 2be72fbe7279..0f69c1393416 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-> @@ -321,6 +321,10 @@ void __noreturn __pkvm_init_finalise(void)
->  	if (ret)
->  		goto out;
->  
-> +	ret = hyp_create_pcpu_fixmap();
-> +	if (ret)
-> +		goto out;
-> +
->  	pkvm_hyp_vm_table_init(vm_table_base);
->  out:
->  	/*
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index a1a27f88a312..2bcb2d5903ba 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -57,8 +57,6 @@ struct kvm_pgtable_walk_data {
->  	u64				end;
->  };
->  
-> -#define KVM_PHYS_INVALID (-1ULL)
-> -
->  static bool kvm_phys_is_valid(u64 phys)
->  {
->  	return phys < BIT(id_aa64mmfr0_parange_to_phys_shift(ID_AA64MMFR0_EL1_PARANGE_MAX));
-> @@ -122,16 +120,6 @@ static bool kvm_pte_table(kvm_pte_t pte, u32 level)
->  	return FIELD_GET(KVM_PTE_TYPE, pte) == KVM_PTE_TYPE_TABLE;
->  }
->  
-> -static kvm_pte_t kvm_phys_to_pte(u64 pa)
-> -{
-> -	kvm_pte_t pte = pa & KVM_PTE_ADDR_MASK;
-> -
-> -	if (PAGE_SHIFT == 16)
-> -		pte |= FIELD_PREP(KVM_PTE_ADDR_51_48, pa >> 48);
-> -
-> -	return pte;
-> -}
-> -
->  static kvm_pte_t *kvm_pte_follow(kvm_pte_t pte, struct kvm_pgtable_mm_ops *mm_ops)
->  {
->  	return mm_ops->phys_to_virt(kvm_pte_to_phys(pte));
-> -- 
-> 2.38.0.413.g74048e4d9e-goog
-> 
