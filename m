@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB7796030AF
-	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 18:21:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 308306030D1
+	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 18:33:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229574AbiJRQVV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Oct 2022 12:21:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46864 "EHLO
+        id S229625AbiJRQdw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Oct 2022 12:33:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbiJRQVT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Oct 2022 12:21:19 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B179DB2DB5
-        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 09:21:16 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id r17so33495922eja.7
-        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 09:21:16 -0700 (PDT)
+        with ESMTP id S229470AbiJRQdv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Oct 2022 12:33:51 -0400
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 577031C126
+        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 09:33:50 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id 13so33572896ejn.3
+        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 09:33:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DMD6KRfAh8gLsTdSq1azk8KGRzliZHblOOH99fliBBo=;
-        b=eBasbqc45ny3TsN5xHvPYR0nIt0QFeQUPu9c7yPZZOds5097P3BJ2iGt4wRvIS9tEs
-         MQXUQQUsNjgY0fpAODB0YF3wYff2bSXANslnUInSERSXgNnTuN5AIVlIdXP/iz/aI3X+
-         GpQJ3Rs0eYEM+gfkzYqhYJfC46Px/ETHHCZsR7P0im57GjJyGQG1iBRY1b88haggOhOg
-         1qBG96EWS/D8Vm75+m1lJZ3sDzKcFMccO7Dwzdyd0eOs+FHM9TASIL+jgiicEDBZuNhV
-         RwL9DybM9+ce3O9iDMzolgdPgxOhI5kXqeP1WGQ70AQkXlbD5KDc5OFbEUaBjCOtaGYE
-         zozg==
+        bh=DqDgXXUBKgC05Hv+WG8VLItfXbNXEiS/cMK9T9OzjCs=;
+        b=EDVjXNcJBQF3sMy6ywtF+Bbf8LfvpG0Ow0j3NoGv4ZwLzhdNxu0siesmOopfPJNYTi
+         Q1TdZV8pOeLQwNRQUl8icKzCsINTo7YVaQnsLEzpwW8cdn8ebQR//CSFnD4fhBQ+Tf1H
+         /5cpfU1ilnYG9XecfXoOJT9Rdo/rmcCp+qX1kbiKCAbi4wDgGVgRoX+O+I1b1K+oeyU0
+         FGP7wcsVZ+QliZq3POvA6X6UXGMpec7yW+Xf2UG/ZkTUuKhrv53jnj8m6ErVy1fXxDmB
+         +Mjl+g8duDlR4HZp7BiVUn1XwXG1kE9jTpWZ5+cx62qyRBaXSt7m1TfF3lm6XM9BoS5M
+         1JiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DMD6KRfAh8gLsTdSq1azk8KGRzliZHblOOH99fliBBo=;
-        b=3KgEeMmj+YK5GikATpyGaOYK6E5kBNZxZgpaMIJu9TH161mT6kwiA8IXzzTUNS6Vmf
-         eEbQDaOwHgHBaWRmGnhhheofjfAQ/qN5/OrKOAi4r8pr5Mrd0kO61pfo/zdVcg3Ttkqs
-         5Kmb8izExvFgesgPiN/VOJ1cpFbMgaPuAE9i02sC7nI1WyTxS05cUtwqBNO3TalxAIDG
-         xja78hZE3qys71jOtbkx8OGAVtnYLfGFKsd8tP/gDKh1cltF+yl6cLdBGM0gvM5FEvz1
-         pdmfwr0dzNxUVyGKGpC/gqIl3IEO3BbWbFflrqxSjb2ywoJeDKLsE/6qSyhQ2KPSLrfK
-         uGOg==
-X-Gm-Message-State: ACrzQf3G9s0Fw2ZRk+DdnZYTQVgXah6Ilj5YTKPFkzc2nmQO+jcYbjU0
-        7vH5Po63+BNbslxOSZRsvhOAqQ==
-X-Google-Smtp-Source: AMsMyM4R1wfcxR2Oe0g2nQCwfd6EAIfKtbPVegiEAjUE+BZ0OMN8V8O7plKwhNwKvZQiCe6VCI2RRA==
-X-Received: by 2002:a17:906:8a4b:b0:78d:d475:ff74 with SMTP id gx11-20020a1709068a4b00b0078dd475ff74mr2983068ejc.131.1666110074863;
-        Tue, 18 Oct 2022 09:21:14 -0700 (PDT)
+        bh=DqDgXXUBKgC05Hv+WG8VLItfXbNXEiS/cMK9T9OzjCs=;
+        b=qkFSaHidJP9yFpbe74q37Wt0CDO2Juw+S1pIHdNQZ08aqE8RoztQ1IBtQMGxJV5hVk
+         JtNbxQTsWavx/4ogIvw5z2RfyvXv928hnRrRJGfvlItMnt1BG7Aeu99lSiHbIyAE5C7s
+         R5dqN/r6eKerWbWJOhN5w1L74S5515S9Pjt64+dxliHsZIwB2HcZIJhV61kWVJCQg7i/
+         TA5AJTKQxY3M2K1pPufExid7WNQzV6bj75NYlZ4NHO0CWQ92zJ293m638F1Jx26q9seM
+         cO/Pzm1yqO8opvinImTBB5MFxAUdHr9wNUxq+7Gf136GTA//9TV711XZZDNIymAfGe1N
+         tizA==
+X-Gm-Message-State: ACrzQf3e9YTNKIStv1YsFiXibmSOaK3XaBZ5UDHOv80dGbnDMuzD2lOF
+        0U/ml2C8ommxheCOgACqXnX2iQ==
+X-Google-Smtp-Source: AMsMyM75nkHFBrc8vAbS6QOzzLFaHYxFqm8Mdjtq2X4oVdP8KRhyics/XG4ZyYsOZYHfc53Cnkg3pA==
+X-Received: by 2002:a17:906:5dac:b0:791:93de:c61d with SMTP id n12-20020a1709065dac00b0079193dec61dmr3059147ejv.751.1666110828800;
+        Tue, 18 Oct 2022 09:33:48 -0700 (PDT)
 Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
-        by smtp.gmail.com with ESMTPSA id fy19-20020a170906b7d300b00781dbdb292asm7716920ejb.155.2022.10.18.09.21.14
+        by smtp.gmail.com with ESMTPSA id l6-20020a1709062a8600b0073d796a1043sm7687814eje.123.2022.10.18.09.33.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Oct 2022 09:21:14 -0700 (PDT)
-Date:   Tue, 18 Oct 2022 16:21:11 +0000
+        Tue, 18 Oct 2022 09:33:48 -0700 (PDT)
+Date:   Tue, 18 Oct 2022 16:33:45 +0000
 From:   Quentin Perret <qperret@google.com>
 To:     Will Deacon <will@kernel.org>
 Cc:     kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
@@ -65,7 +65,7 @@ Cc:     kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 Subject: Re: [PATCH v4 12/25] KVM: arm64: Add infrastructure to create and
  track pKVM instances at EL2
-Message-ID: <Y07Sd6lVfD4IUywQ@google.com>
+Message-ID: <Y07VaRwVf3McX27a@google.com>
 References: <20221017115209.2099-1-will@kernel.org>
  <20221017115209.2099-13-will@kernel.org>
 MIME-Version: 1.0
@@ -84,35 +84,10 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Monday 17 Oct 2022 at 12:51:56 (+0100), Will Deacon wrote:
-> +struct pkvm_hyp_vm {
-> +	struct kvm kvm;
-> +
-> +	/* Backpointer to the host's (untrusted) KVM instance. */
-> +	struct kvm *host_kvm;
-> +
-> +	/*
-> +	 * Total amount of memory donated by the host for maintaining
-> +	 * this 'struct pkvm_hyp_vm' in the hypervisor.
-> +	 */
-> +	size_t donated_memory_size;
+> +void pkvm_hyp_vm_table_init(void *tbl)
+> +{
+> +	WARN_ON(vm_table);
+> +	vm_table = tbl;
+> +}
 
-I think you could get rid of that member. IIUC, all you need to
-re-compute it in the teardown path is the number of created vCPUs on
-the host, which we should have safely stored in
-pkvm_hyp_vm::kvm::created_vcpus.
-
-> +	/* The guest's stage-2 page-table managed by the hypervisor. */
-> +	struct kvm_pgtable pgt;
-> +
-> +	/*
-> +	 * The number of vcpus initialized and ready to run.
-> +	 * Modifying this is protected by 'vm_table_lock'.
-> +	 */
-> +	unsigned int nr_vcpus;
-> +
-> +	/* Array of the hyp vCPU structures for this VM. */
-> +	struct pkvm_hyp_vcpu *vcpus[];
-> +};
-
-Cheers,
-Quentin
+Uh, why does this one need to be exposed outside pkvm.c ?
