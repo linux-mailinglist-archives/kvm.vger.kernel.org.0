@@ -2,189 +2,268 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10C3C601FAA
-	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 02:37:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B99CE601FCD
+	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 02:46:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231206AbiJRAhT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 17 Oct 2022 20:37:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42268 "EHLO
+        id S229993AbiJRAqs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 17 Oct 2022 20:46:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232136AbiJRAhD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 17 Oct 2022 20:37:03 -0400
-Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85CAC2D1DE
-        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 17:36:23 -0700 (PDT)
-Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-131dda37dddso15245932fac.0
-        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 17:36:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DZFNHgeagPRGpN511S5OVmTVLDSRxzqHSZND+ilItHI=;
-        b=rX/14hxyK+jbBsNmsi6OICKyz6vY8MdAjLpdpmL8Eoa7S9QfTsmtZ2g16772VPAdQ3
-         fyx8viqBFbhwe4fsuILQVTdMHesYZMcl1oUOCmX8b3E05NNXj84+XzmbL1LsDXmL5F1j
-         LMV1n2XU1a76XmxIXhbX/jQLk94Nf9oyipbD0iN/8f2ZIv+JsTvOocrVsgP0HsxvQWOB
-         FV59MeLky59LcmcQNFmf5mPPHgZyPDz4SSGEWvXafNz+jO3Il6nH3aWk0dudbCEewkRL
-         w2EkcpSee8Zn3VXKnm1otN85uvjvLHE28I2YLKCADeFtBWdkawzMyHE1W2n1XGklWzw2
-         7bHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DZFNHgeagPRGpN511S5OVmTVLDSRxzqHSZND+ilItHI=;
-        b=iamWSRI3MmmF6gw6PBsl64+4MwYQNOjN2J7vnLFnxsERkM8aPleUXha2xZB60qII/R
-         g/gUIb9/AztX61EwiciB7zJ0xT2nkGQ9BvY884KOD2HFxuRvc+WqlW6w1Y1Xud+ZuCYY
-         ZXVAFok/0cVVDJ/cdTtk9ZRePeoBwVDQld/mXRg91SU8weVV9jtn10kGj2/eQmiKIC9j
-         JDbLChbpixqsiLX9F2kle7SwLg2NvTNy5P6SUqb99idrEve6r9ox3gDAMW7a1r+nigBE
-         sgn6iUIgJ7BkfIXu7KiKYkT9+5IUDGJGcCAFjfVp08ba8LK1Hx+9uIeUvEjDMxUu6xwi
-         CH/A==
-X-Gm-Message-State: ACrzQf2uLDcl8yzcjenPTBUFr6p2bkKYp6xpGnR2gWkRYxn9gWShh9sP
-        OBFcGTV+xiRJSaJzai6MdDaEWS5x0pKbQg==
-X-Google-Smtp-Source: AMsMyM6GsW9qHuPFp8+B+qhuY2BytXR7EdsQrQz18ZdcSSusgW2PC6Ay30Uig0XRAo3WSxCvao9eLQ==
-X-Received: by 2002:a17:90a:4594:b0:20b:23d5:8ead with SMTP id v20-20020a17090a459400b0020b23d58eadmr35608180pjg.127.1666053232202;
-        Mon, 17 Oct 2022 17:33:52 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id q59-20020a17090a1b4100b001efa9e83927sm9986738pjq.51.2022.10.17.17.33.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Oct 2022 17:33:51 -0700 (PDT)
-Date:   Tue, 18 Oct 2022 00:33:48 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Fuad Tabba <tabba@google.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
-Message-ID: <Y030bGhh0mvGS6E1@google.com>
-References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
- <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
- <d16284f5-3493-2892-38e6-f1fa5c10bdbb@redhat.com>
- <Yyi+l3+p9lbBAC4M@google.com>
- <CA+EHjTzy4iOxLF=5UX=s5v6HSB3Nb1LkwmGqoKhp_PAnFeVPSQ@mail.gmail.com>
- <20220926142330.GC2658254@chaop.bj.intel.com>
- <CA+EHjTz5yGhsxUug+wqa9hrBO60Be0dzWeWzX00YtNxin2eYHg@mail.gmail.com>
- <YzN9gYn1uwHopthW@google.com>
- <CA+EHjTw3din891hMUeRW-cn46ktyMWSdoB31pL+zWpXo_=3UVg@mail.gmail.com>
+        with ESMTP id S230014AbiJRAqf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 17 Oct 2022 20:46:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20CCF10F9
+        for <kvm@vger.kernel.org>; Mon, 17 Oct 2022 17:46:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666053991;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=G5ql+ZHZqoj03bFqQztJ8LdTDZnWgqOwdaisBDDNe/I=;
+        b=h/oHIuj0IjJ0gBiHqPg4LNMVkpEEglaZZwQqb4kFftp6lkanwSnVYx+T+CpFT1C+9h4RA7
+        0VsC4nLbso57SBeM7uHNSIfTwDKaqizihWwsUatXjm7J2U+nCkuYhnK/MRYo7p53BU9TN6
+        aB+D3Ng032GM8VDEXT3XFlKKtaY0RCc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-16-eT4pDrE-OVycqNH8JzyLBA-1; Mon, 17 Oct 2022 20:46:28 -0400
+X-MC-Unique: eT4pDrE-OVycqNH8JzyLBA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CC63A811E75;
+        Tue, 18 Oct 2022 00:46:27 +0000 (UTC)
+Received: from [10.64.54.70] (vpn2-54-70.bne.redhat.com [10.64.54.70])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3A4E140C2140;
+        Tue, 18 Oct 2022 00:46:15 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH 4/6] KVM: selftests: memslot_perf_test: Support variable
+ guest page size
+To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ajones@ventanamicro.com,
+        pbonzini@redhat.com, maz@kernel.org, shuah@kernel.org,
+        oliver.upton@linux.dev, seanjc@google.com, peterx@redhat.com,
+        ricarkol@google.com, zhenyzha@redhat.com, shan.gavin@gmail.com,
+        kvmarm@lists.linux.dev
+References: <20221014071914.227134-1-gshan@redhat.com>
+ <20221014071914.227134-5-gshan@redhat.com>
+ <3eecebca-a526-d10a-02d3-496ce919d577@maciej.szmigiero.name>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <bd5df92c-6870-8053-0b35-a2ad993970bd@redhat.com>
+Date:   Tue, 18 Oct 2022 08:46:11 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+EHjTw3din891hMUeRW-cn46ktyMWSdoB31pL+zWpXo_=3UVg@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <3eecebca-a526-d10a-02d3-496ce919d577@maciej.szmigiero.name>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 30, 2022, Fuad Tabba wrote:
-> > > > > pKVM would also need a way to make an fd accessible again
-> > > > > when shared back, which I think isn't possible with this patch.
-> > > >
-> > > > But does pKVM really want to mmap/munmap a new region at the page-level,
-> > > > that can cause VMA fragmentation if the conversion is frequent as I see.
-> > > > Even with a KVM ioctl for mapping as mentioned below, I think there will
-> > > > be the same issue.
-> > >
-> > > pKVM doesn't really need to unmap the memory. What is really important
-> > > is that the memory is not GUP'able.
-> >
-> > Well, not entirely unguppable, just unguppable without a magic FOLL_* flag,
-> > otherwise KVM wouldn't be able to get the PFN to map into guest memory.
-> >
-> > The problem is that gup() and "mapped" are tied together.  So yes, pKVM doesn't
-> > strictly need to unmap memory _in the untrusted host_, but since mapped==guppable,
-> > the end result is the same.
-> >
-> > Emphasis above because pKVM still needs unmap the memory _somehwere_.  IIUC, the
-> > current approach is to do that only in the stage-2 page tables, i.e. only in the
-> > context of the hypervisor.  Which is also the source of the gup() problems; the
-> > untrusted kernel is blissfully unaware that the memory is inaccessible.
-> >
-> > Any approach that moves some of that information into the untrusted kernel so that
-> > the kernel can protect itself will incur fragmentation in the VMAs.  Well, unless
-> > all of guest memory becomes unguppable, but that's likely not a viable option.
+On 10/18/22 5:31 AM, Maciej S. Szmigiero wrote:
+> On 14.10.2022 09:19, Gavin Shan wrote:
+>> The test case is obviously broken on aarch64 because non-4KB guest
+>> page size is supported. The guest page size on aarch64 could be 4KB,
+>> 16KB or 64KB.
+>>
+>> This supports variable guest page size, mostly for aarch64.
+>>
+>>    - The host determines the guest page size when virtual machine is
+>>      created. The value is also passed to guest through the synchronization
+>>      area.
+>>
+>>    - The number of guest pages are unknown until the virtual machine
+>>      is to be created. So all the related macros are dropped. Instead,
+>>      their values are dynamically calculated based on the guest page
+>>      size.
+>>
+>>    - The static checks on memory sizes and pages becomes dependent
+>>      on guest page size, which is unknown until the virtual machine
+>>      is about to be created. So all the static checks are converted
+>>      to dynamic checks, done in check_memory_sizes().
+>>
+>>    - As the address passed to madvise() should be aligned to host page,
+>>      the size of page chunk is automatically selected, other than one
+>>      page.
+>>
+>>    - All other changes included in this patch are almost mechanical
+>>      replacing '4096' with 'guest_page_size'.
+>>
+>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>> ---
+>>   .../testing/selftests/kvm/memslot_perf_test.c | 191 +++++++++++-------
+>>   1 file changed, 115 insertions(+), 76 deletions(-)
+>>
+>> diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
+>> index d5aa9148f96f..d587bd952ff9 100644
+>> --- a/tools/testing/selftests/kvm/memslot_perf_test.c
+>> +++ b/tools/testing/selftests/kvm/memslot_perf_test.c
+>> @@ -26,14 +26,11 @@
+>>   #include <processor.h>
+>>   #define MEM_SIZE        ((512U << 20) + 4096)
+>> -#define MEM_SIZE_PAGES        (MEM_SIZE / 4096)
+>>   #define MEM_GPA        0x10000000UL
+>>   #define MEM_AUX_GPA        MEM_GPA
+>>   #define MEM_SYNC_GPA        MEM_AUX_GPA
+>>   #define MEM_TEST_GPA        (MEM_AUX_GPA + 4096)
+>>   #define MEM_TEST_SIZE        (MEM_SIZE - 4096)
+>> -static_assert(MEM_SIZE % 4096 == 0, "invalid mem size");
+>> -static_assert(MEM_TEST_SIZE % 4096 == 0, "invalid mem test size");
+>>   /*
+>>    * 32 MiB is max size that gets well over 100 iterations on 509 slots.
+>> @@ -42,29 +39,16 @@ static_assert(MEM_TEST_SIZE % 4096 == 0, "invalid mem test size");
+>>    * limited resolution).
+>>    */
+>>   #define MEM_SIZE_MAP        ((32U << 20) + 4096)
+>> -#define MEM_SIZE_MAP_PAGES    (MEM_SIZE_MAP / 4096)
+>>   #define MEM_TEST_MAP_SIZE    (MEM_SIZE_MAP - 4096)
+>> -#define MEM_TEST_MAP_SIZE_PAGES (MEM_TEST_MAP_SIZE / 4096)
+>> -static_assert(MEM_SIZE_MAP % 4096 == 0, "invalid map test region size");
+>> -static_assert(MEM_TEST_MAP_SIZE % 4096 == 0, "invalid map test region size");
+>> -static_assert(MEM_TEST_MAP_SIZE_PAGES % 2 == 0, "invalid map test region size");
+>> -static_assert(MEM_TEST_MAP_SIZE_PAGES > 2, "invalid map test region size");
+>>   /*
+>>    * 128 MiB is min size that fills 32k slots with at least one page in each
+>>    * while at the same time gets 100+ iterations in such test
+>> + *
+>> + * 2 MiB chunk size like a typical huge page
+>>    */
+>>   #define MEM_TEST_UNMAP_SIZE        (128U << 20)
+>> -#define MEM_TEST_UNMAP_SIZE_PAGES    (MEM_TEST_UNMAP_SIZE / 4096)
+>> -/* 2 MiB chunk size like a typical huge page */
+>> -#define MEM_TEST_UNMAP_CHUNK_PAGES    (2U << (20 - 12))
+>> -static_assert(MEM_TEST_UNMAP_SIZE <= MEM_TEST_SIZE,
+>> -          "invalid unmap test region size");
+>> -static_assert(MEM_TEST_UNMAP_SIZE % 4096 == 0,
+>> -          "invalid unmap test region size");
+>> -static_assert(MEM_TEST_UNMAP_SIZE_PAGES %
+>> -          (2 * MEM_TEST_UNMAP_CHUNK_PAGES) == 0,
+>> -          "invalid unmap test region size");
+>> +#define MEM_TEST_UNMAP_CHUNK_SIZE    (2U << 20)
+>>   /*
+>>    * For the move active test the middle of the test area is placed on
+>> @@ -77,8 +61,7 @@ static_assert(MEM_TEST_UNMAP_SIZE_PAGES %
+>>    * for the total size of 25 pages.
+>>    * Hence, the maximum size here is 50 pages.
+>>    */
+>> -#define MEM_TEST_MOVE_SIZE_PAGES    (50)
+>> -#define MEM_TEST_MOVE_SIZE        (MEM_TEST_MOVE_SIZE_PAGES * 4096)
+>> +#define MEM_TEST_MOVE_SIZE        0x32000
 > 
-> Actually, for pKVM, there is no need for the guest memory to be GUP'able at
-> all if we use the new inaccessible_get_pfn().
+> The above number seems less readable than an explicit value of 50 pages.
+> 
+> In addition to that, it's 50 pages only with 4k page size, so at least
+> the comment above needs to be updated to reflect this fact.
+> 
 
-Ya, I was referring to pKVM without UPM / inaccessible memory.
+Yeah, I will change the comments like below in next revision.
 
-Jumping back to blocking gup(), what about using the same tricks as secretmem to
-block gup()?  E.g. compare vm_ops to block regular gup() and a_ops to block fast
-gup() on struct page?  With a Kconfig that's selected by pKVM (which would also
-need its own Kconfig), e.g. CONFIG_INACCESSIBLE_MAPPABLE_MEM, there would be zero
-performance overhead for non-pKVM kernels, i.e. hooking gup() shouldn't be
-controversial.
+  /*
+   * When running this test with 32k memslots, actually 32763 excluding
+   * the reserved memory slot 0, the memory for each slot is 0x4000 bytes.
+   * The last slot contains 0x19000 bytes memory. Hence, the maximum size
+   * here is 0x32000 bytes.
+   */
 
-I suspect the fast gup() path could even be optimized to avoid the page_mapping()
-lookup by adding a PG_inaccessible flag that's defined iff the TBD Kconfig is
-selected.  I'm guessing pKVM isn't expected to be deployed on massivve NUMA systems
-anytime soon, so there should be plenty of page flags to go around.
+>>   #define MEM_TEST_MOVE_GPA_DEST        (MEM_GPA + MEM_SIZE)
+>>   static_assert(MEM_TEST_MOVE_SIZE <= MEM_TEST_SIZE,
+>>             "invalid move test region size");
+> (...)
+>> @@ -242,33 +229,34 @@ static struct vm_data *alloc_vm(void)
+>>   }
+>>   static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
+>> -               void *guest_code, uint64_t mempages,
+>> +               void *guest_code, uint64_t mem_size,
+>>                  struct timespec *slot_runtime)
+>>   {
+>> -    uint64_t rempages;
+>> +    uint64_t mempages, rempages;
+>>       uint64_t guest_addr;
+>> -    uint32_t slot;
+>> +    uint32_t slot, guest_page_size;
+>>       struct timespec tstart;
+>>       struct sync_area *sync;
+>> -    TEST_ASSERT(mempages > 1,
+>> -            "Can't test without any memory");
+>> +    guest_page_size = vm_guest_mode_params[VM_MODE_DEFAULT].page_size;
+>> +    mempages = mem_size / guest_page_size;
+>> +
+>> +    data->vm = __vm_create_with_one_vcpu(&data->vcpu, mempages, guest_code);
+>> +    ucall_init(data->vm, NULL);
+>>
+> 
+> TEST_ASSERT(data->vm->page_size == guest_page_size, "Invalid VM page size")
+> here would catch the case if someone accidentally modifies
+> __vm_create_with_one_vcpu() to use other page size than specified for
+> VM_MODE_DEFAULT.
+> 
 
-Blocking gup() instead of trying to play refcount games when converting back to
-private would eliminate the need to put heavy restrictions on mapping, as the goal
-of those were purely to simplify the KVM implementation, e.g. the "one mapping per
-memslot" thing would go away entirely.
+Sure, it's not harmful at least.
 
-> This of course goes back to what I'd mentioned before in v7; it seems that
-> representing the memslot memory as a file descriptor should be orthogonal to
-> whether the memory is shared or private, rather than a private_fd for private
-> memory and the userspace_addr for shared memory.
+>>       data->npages = mempages;
+>> +    TEST_ASSERT(data->npages > 1, "Can't test without any memory");
+>>       data->nslots = nslots;
+>> -    data->pages_per_slot = mempages / data->nslots;
+>> +    data->pages_per_slot = data->npages / data->nslots;
+>>       if (!data->pages_per_slot) {
+>> -        *maxslots = mempages + 1;
+>> +        *maxslots = data->npages + 1;
+>>           return false;
+>>       }
+>> -    rempages = mempages % data->nslots;
+>> +    rempages = data->npages % data->nslots;
+>>       data->hva_slots = malloc(sizeof(*data->hva_slots) * data->nslots);
+>>       TEST_ASSERT(data->hva_slots, "malloc() fail");
+>> -    data->vm = __vm_create_with_one_vcpu(&data->vcpu, mempages, guest_code);
+>> -    ucall_init(data->vm, NULL);
+>> -
+>>       pr_info_v("Adding slots 1..%i, each slot with %"PRIu64" pages + %"PRIu64" extra pages last\n",
+>>           data->nslots, data->pages_per_slot, rempages);
+> (...)
+>> @@ -856,6 +863,35 @@ static void help(char *name, struct test_args *targs)
+>>           pr_info("%d: %s\n", ctr, tests[ctr].name);
+>>   }
+>> +static bool check_memory_sizes(void)
+>> +{
+>> +    uint32_t guest_page_size = vm_guest_mode_params[VM_MODE_DEFAULT].page_size;
+>> +
+>> +    if (MEM_SIZE % guest_page_size ||
+>> +        MEM_TEST_SIZE % guest_page_size) {
+>> +        pr_info("invalid MEM_SIZE or MEM_TEST_SIZE\n");
+>> +        return false;
+>> +    }
+>> +
+>> +    if (MEM_SIZE_MAP % guest_page_size        ||
+>> +        MEM_TEST_MAP_SIZE % guest_page_size        ||
+>> +        (MEM_TEST_MAP_SIZE / guest_page_size) <= 2    ||
+>> +        (MEM_TEST_MAP_SIZE / guest_page_size) % 2) {
+>> +        pr_info("invalid MEM_SIZE_MAP or MEM_TEST_MAP_SIZE\n");
+>> +        return false;
+>> +    }
+>> +
+>> +    if (MEM_TEST_UNMAP_SIZE > MEM_TEST_SIZE        ||
+>> +        MEM_TEST_UNMAP_SIZE % guest_page_size    ||
+>> +        (MEM_TEST_UNMAP_SIZE / guest_page_size) %
+>> +        (MEM_TEST_UNMAP_CHUNK_SIZE / guest_page_size)) {
+> 
+> This should be (MEM_TEST_UNMAP_SIZE / guest_page_size) % (2 * MEM_TEST_UNMAP_CHUNK_SIZE / guest_page_size))
+> to match the old static_assert().
+> 
 
-I also explored the idea of backing any guest memory with an fd, but came to
-the conclusion that private memory needs a separate handle[1], at least on x86.
+Nice catch! I will fix it up in next revision :)
 
-For SNP and TDX, even though the GPA is the same (ignoring the fact that SNP and
-TDX steal GPA bits to differentiate private vs. shared), the two types need to be
-treated as separate mappings[2].  Post-boot, converting is lossy in both directions,
-so even conceptually they are two disctint pages that just happen to share (some)
-GPA bits.
+Thanks,
+Gavin
 
-To allow conversions, i.e. changing which mapping to use, without memslot updates,
-KVM needs to let userspace provide both mappings in a single memslot.  So while
-fd-based memory is an orthogonal concept, e.g. we could add fd-based shared memory,
-KVM would still need a dedicated private handle.
-
-For pKVM, the fd doesn't strictly need to be mutually exclusive with the existing
-userspace_addr, but since the private_fd is going to be added for x86, I think it
-makes sense to use that instead of adding generic fd-based memory for pKVM's use
-case (which is arguably still "private" memory but with special semantics).
-
-[1] https://lore.kernel.org/all/YulTH7bL4MwT5v5K@google.com
-[2] https://lore.kernel.org/all/869622df-5bf6-0fbb-cac4-34c6ae7df119@kernel.org
-
->  The host can then map or unmap the shared/private memory using the fd, which
->  allows it more freedom in even choosing to unmap shared memory when not
->  needed, for example.
