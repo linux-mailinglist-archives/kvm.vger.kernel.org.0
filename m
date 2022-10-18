@@ -2,62 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B21836032D3
-	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 20:51:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 24924603474
+	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 22:59:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229719AbiJRSvV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Oct 2022 14:51:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54408 "EHLO
+        id S230147AbiJRU7D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Oct 2022 16:59:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229658AbiJRSvT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Oct 2022 14:51:19 -0400
-X-Greylist: delayed 3593 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 18 Oct 2022 11:51:16 PDT
-Received: from 6.mo548.mail-out.ovh.net (6.mo548.mail-out.ovh.net [188.165.58.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B30CE63B6
-        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 11:51:16 -0700 (PDT)
-Received: from mxplan5.mail.ovh.net (unknown [10.108.1.141])
-        by mo548.mail-out.ovh.net (Postfix) with ESMTPS id 3A0962272B;
-        Tue, 18 Oct 2022 17:34:54 +0000 (UTC)
-Received: from kaod.org (37.59.142.104) by DAG4EX2.mxp5.local (172.16.2.32)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.12; Tue, 18 Oct
- 2022 19:34:54 +0200
-Authentication-Results: garm.ovh; auth=pass (GARM-104R0059f61b7cb-bda1-4116-8703-25f36a2f64d9,
-                    E583C31B167A4CECD7AFA5F42DA6B4ED7D5BF57A) smtp.auth=clg@kaod.org
-X-OVh-ClientIp: 82.64.250.170
-Message-ID: <08bbd6f8-6ae3-4a28-66ed-d5a290c1a30d@kaod.org>
-Date:   Tue, 18 Oct 2022 19:34:53 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH v10 6/9] s390x/cpu topology: add topology-disable machine
- property
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, <qemu-s390x@nongnu.org>
-CC:     <qemu-devel@nongnu.org>, <borntraeger@de.ibm.com>,
-        <pasic@linux.ibm.com>, <richard.henderson@linaro.org>,
-        <david@redhat.com>, <thuth@redhat.com>, <cohuck@redhat.com>,
-        <mst@redhat.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-        <ehabkost@redhat.com>, <marcel.apfelbaum@gmail.com>,
-        <eblake@redhat.com>, <armbru@redhat.com>, <seiden@linux.ibm.com>,
-        <nrb@linux.ibm.com>, <frankja@linux.ibm.com>, <berrange@redhat.com>
-References: <20221012162107.91734-1-pmorel@linux.ibm.com>
- <20221012162107.91734-7-pmorel@linux.ibm.com>
-From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-In-Reply-To: <20221012162107.91734-7-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.104]
-X-ClientProxiedBy: DAG5EX1.mxp5.local (172.16.2.41) To DAG4EX2.mxp5.local
- (172.16.2.32)
-X-Ovh-Tracer-GUID: 2d99707d-972a-4c4d-a87c-4330bdcbad69
-X-Ovh-Tracer-Id: 16410554092817713936
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvfedrfeelvddgkeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkfffgggfuffvvehfhfgjtgfgihesthejredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeelleeiiefgkeefiedtvdeigeetueetkeffkeelheeugfetteegvdekgfehgffgkeenucfkphepuddvjedrtddrtddruddpfeejrdehledrudegvddruddtgeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduvdejrddtrddtrddupdhmrghilhhfrhhomhepoegtlhhgsehkrghougdrohhrgheqpdhnsggprhgtphhtthhopedupdhrtghpthhtohepphhmohhrvghlsehlihhnuhigrdhisghmrdgtohhmpdhnrhgssehlihhnuhigrdhisghmrdgtohhmpdhsvghiuggvnheslhhinhhugidrihgsmhdrtghomhdprghrmhgsrhhusehrvgguhhgrthdrtghomhdpvggslhgrkhgvsehrvgguhhgrthdrtghomhdpmhgrrhgtvghlrdgrphhfvghlsggruhhmsehgmhgrihhlrdgtohhmpdgvhhgrsghkohhsthesrhgvughhrghtrdgtohhmpdhkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhpsghonhiiihhnihesrhgvughhrghtrdgtoh
- hmpdhmshhtsehrvgguhhgrthdrtghomhdptghohhhutghksehrvgguhhgrthdrtghomhdpthhhuhhthhesrhgvughhrghtrdgtohhmpdgurghvihgusehrvgguhhgrthdrtghomhdprhhitghhrghrugdrhhgvnhguvghrshhonheslhhinhgrrhhordhorhhgpdhprghsihgtsehlihhnuhigrdhisghmrdgtohhmpdgsohhrnhhtrhgrvghgvghrseguvgdrihgsmhdrtghomhdpqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghdpqhgvmhhuqdhsfeeltdigsehnohhnghhnuhdrohhrghdpfhhrrghnkhhjrgeslhhinhhugidrihgsmhdrtghomhdpsggvrhhrrghnghgvsehrvgguhhgrthdrtghomhdpoffvtefjohhsthepmhhoheegkedpmhhouggvpehsmhhtphhouhht
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        with ESMTP id S230125AbiJRU6z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Oct 2022 16:58:55 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B30D9C06B5
+        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 13:58:54 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id lx11-20020a17090b4b0b00b0020d7c0b426dso12421048pjb.6
+        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 13:58:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=kNWqE5oSMNPl31vBAcUWs8MhWMZMoIHwD5R3GLMR2V0=;
+        b=hEeVUXOJOaLsXfMd/B8oSQem2Uqa5PAmxofPXcAc6ncC5A2cPCq2RpbiWUpnrzE2dM
+         IxY/39pKh+rYwNtrxWuVFLeNrVPoLsvR4qTNSqp2e8OicqxEWfIfcmcwOPqM85lGy2n1
+         rd1QXbr2sFNOX7xEcxr3KCm9J7FdAQa9VBUMdscdlm4VV9+4JX604NonlFX1Dousawxc
+         npbW52yWoOS4+ckENf/T/25av9DZFlh9H3jkAkltz9b6IqEiVWAw0kgDBHCuug5pqTUV
+         2cmaJ7XHSPfSQvHeDR5/WXlOjvjF40cs8ThZEwsYyvWdwoe8bt7pGADICYiiN5Dh0p64
+         hPyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kNWqE5oSMNPl31vBAcUWs8MhWMZMoIHwD5R3GLMR2V0=;
+        b=nv/mHqPuW4gQN9lmPL1GCha7pdDi4nNyWyzMLNWkFF5p13/tLBemlwWWHt7+KSsOgS
+         h6Ld/qbIlldX1ERR/6dEbaBZ8HuWpyApoJh8xm14Y5vtH2A7miA02BB8AsZ4Shbghv18
+         lOdbZ5gV0kY+DaTYpE93F1d/pDkGbJzDX82G0RK8VFt5LAxVFP/p4JDM8Mn65uVGhopG
+         sQizvURYWXGC17qg1q8VcFR+MUE5UsAMrnKNT6cbdtdLopXUUokYz7PLoy93w5ntyhxf
+         tsP7hJW2isyW8IGA/qMEv+JzwKFihXaU/92w+agvfUwBPhLwEKwS/ABP7yNeTHesBOXo
+         wFxQ==
+X-Gm-Message-State: ACrzQf3Z56D3uiGs8QtSfDRpWVtac1q0c6SjZ8m/CRIXNQlOd3RHDbdg
+        3+5xaUuOg4J5M4D1wmkjSh0aNVP/DDezHdZRBGIsZ5pqXZ9Is/U/cJt/u9BjCb9WBtqB1ZfxBqg
+        hmWFF6FthV4luYApmiV+81MCY+f11E3RW/v8B/QzjipeDac71IV93PgrLmg==
+X-Google-Smtp-Source: AMsMyM7w2XKJKW1SsCbY9NUbjWlBQowiLQp6HtyyW9RNXzoQOfhtvEjx3ztQ5J/XNm4QDj79VvUbqdhDqu4=
+X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:c89b:7f49:3437:9db8])
+ (user=pgonda job=sendgmr) by 2002:a17:902:e80b:b0:183:7463:f628 with SMTP id
+ u11-20020a170902e80b00b001837463f628mr5039102plg.19.1666126733578; Tue, 18
+ Oct 2022 13:58:53 -0700 (PDT)
+Date:   Tue, 18 Oct 2022 13:58:38 -0700
+Message-Id: <20221018205845.770121-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.0.413.g74048e4d9e-goog
+Subject: [PATCH V5 0/7] KVM: selftests: Add simple SEV test
+From:   Peter Gonda <pgonda@google.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, marcorr@google.com,
+        seanjc@google.com, michael.roth@amd.com, thomas.lendacky@amd.com,
+        joro@8bytes.org, mizhang@google.com, pbonzini@redhat.com,
+        andrew.jones@linux.dev, pgonda@google.com, vannapurve@google.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,275 +68,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/12/22 18:21, Pierre Morel wrote:
-> S390 CPU topology is only allowed for s390-virtio-ccw-7.3 and
-> newer S390 machines.
-> We keep the possibility to disable the topology on these newer
-> machines with the property topology-disable.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->   include/hw/boards.h                |  3 ++
->   include/hw/s390x/cpu-topology.h    | 18 +++++++++-
->   include/hw/s390x/s390-virtio-ccw.h |  2 ++
->   hw/core/machine.c                  |  5 +++
->   hw/s390x/s390-virtio-ccw.c         | 53 +++++++++++++++++++++++++++++-
->   util/qemu-config.c                 |  4 +++
->   qemu-options.hx                    |  6 +++-
->   7 files changed, 88 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 311ed17e18..67147c47bf 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -379,6 +379,9 @@ struct MachineState {
->       } \
->       type_init(machine_initfn##_register_types)
->   
-> +extern GlobalProperty hw_compat_7_2[];
-> +extern const size_t hw_compat_7_2_len;
+This patch series continues the work Michael Roth has done in supporting
+SEV guests in selftests. It continues on top of the work Sean
+Christopherson has sent to support ucalls from SEV guests. Along with a
+very simple version of the SEV selftests Michael originally proposed.
 
-QEMU 7.2 is not out yet.
+V5
+ * Rebase onto seanjc@'s latest ucall pool series.
+ * More review changes based on seanjc:
+ ** use protected instead of encrypted outside of SEV specific files
+ ** Swap memcrypt struct for kvm_vm_arch arch specific struct
+ ** Make protected page table data agnostic of address bit stealing specifics
+    of SEV
+ ** Further clean up for SEV library to just vm_sev_create_one_vcpu()
+ * Due to large changes moved more authorships from mroth@ to pgonda@. Gave 
+   originally-by tags to mroth@ as suggested by Seanjc for this.
 
-> +
->   extern GlobalProperty hw_compat_7_1[];
->   extern const size_t hw_compat_7_1_len;
->   
-> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
-> index 35a8a981ec..747c9ab4c6 100644
-> --- a/include/hw/s390x/cpu-topology.h
-> +++ b/include/hw/s390x/cpu-topology.h
-> @@ -12,6 +12,8 @@
->   
->   #include "hw/qdev-core.h"
->   #include "qom/object.h"
-> +#include "cpu.h"
-> +#include "hw/s390x/s390-virtio-ccw.h"
->   
->   #define S390_TOPOLOGY_POLARITY_H  0x00
->   
-> @@ -43,7 +45,21 @@ void s390_topology_new_cpu(int core_id);
->   
->   static inline bool s390_has_topology(void)
->   {
-> -    return false;
-> +    static S390CcwMachineState *ccw;
+V4
+ * Rebase ontop of seanjc@'s latest Ucall Pool series:
+   https://lore.kernel.org/linux-arm-kernel/20220825232522.3997340-8-seanjc@google.com/
+ * Fix up review comments from seanjc
+ * Switch authorship on 2 patches because of significant changes, added
+ * Michael as suggested-by or originally-by.
 
-hmm, s390_has_topology is a static inline. It would be preferable to
-change its definition to extern.
+V3
+ * Addressed more of andrew.jones@ in ucall patches.
+ * Fix build in non-x86 archs.
 
-> +    Object *obj;
-> +
-> +    if (ccw) {
-> +        return !ccw->topology_disable;
-> +    }
-> +
-> +    /* we have to bail out for the "none" machine */
-> +    obj = object_dynamic_cast(qdev_get_machine(),
-> +                              TYPE_S390_CCW_MACHINE);
-> +    if (!obj) {
-> +        return false;
-> +    }
-> +    ccw = S390_CCW_MACHINE(obj);
-> +    return !ccw->topology_disable;
->   }
->   
->   #endif
-> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
-> index 9e7a0d75bc..6c4b4645fc 100644
-> --- a/include/hw/s390x/s390-virtio-ccw.h
-> +++ b/include/hw/s390x/s390-virtio-ccw.h
-> @@ -28,6 +28,7 @@ struct S390CcwMachineState {
->       bool dea_key_wrap;
->       bool pv;
->       bool zpcii_disable;
-> +    bool topology_disable;
->       uint8_t loadparm[8];
->   };
->   
-> @@ -46,6 +47,7 @@ struct S390CcwMachineClass {
->       bool cpu_model_allowed;
->       bool css_migration_enabled;
->       bool hpage_1m_allowed;
-> +    bool topology_allowed;
+V2
+ * Dropped RFC tag
+ * Correctly separated Sean's ucall patches into 2 as originally
+   intended.
+ * Addressed andrew.jones@ in ucall patches.
+ * Fixed ucall pool usage to work for other archs
 
-'topology_disable' in the state and 'topology_allowed' in the class.
-This is confusing :/
+V1
+ * https://lore.kernel.org/all/20220715192956.1873315-1-pgonda@google.com/
 
-you should add 'topology_allowed' in its own patch and maybe call
-it 'topology_capable' ? it is a QEMU capability AIUI
+Michael Roth (2):
+  KVM: selftests: sparsebit: add const where appropriate
+  KVM: selftests: add support for protected vm_vaddr_* allocations
 
->   };
->   
->   /* runtime-instrumentation allowed by the machine */
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index aa520e74a8..93c497655e 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -40,6 +40,11 @@
->   #include "hw/virtio/virtio-pci.h"
->   #include "qom/object_interfaces.h"
->   
-> +GlobalProperty hw_compat_7_2[] = {
-> +    { "s390-topology", "topology-disable", "true" },
+Peter Gonda (5):
+  KVM: selftests: add hooks for managing protected guest memory
+  KVM: selftests: handle protected bits in page tables
+  KVM: selftests: add library for creating/interacting with SEV guests
+  KVM: selftests: Update ucall pool to allocate from shared memory
+  KVM: selftests: Add simple sev vm testing
 
-May be use TYPE_S390_CPU_TOPOLOGY instead.
+ tools/arch/arm64/include/asm/kvm_host.h       |   7 +
+ tools/arch/riscv/include/asm/kvm_host.h       |   7 +
+ tools/arch/s390/include/asm/kvm_host.h        |   7 +
+ tools/arch/x86/include/asm/kvm_host.h         |  15 ++
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   2 +
+ .../selftests/kvm/include/kvm_util_base.h     |  49 +++-
+ .../testing/selftests/kvm/include/sparsebit.h |  36 +--
+ .../selftests/kvm/include/x86_64/sev.h        |  22 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  63 ++++-
+ tools/testing/selftests/kvm/lib/sparsebit.c   |  48 ++--
+ .../testing/selftests/kvm/lib/ucall_common.c  |   2 +-
+ .../selftests/kvm/lib/x86_64/processor.c      |  23 +-
+ tools/testing/selftests/kvm/lib/x86_64/sev.c  | 243 ++++++++++++++++++
+ .../selftests/kvm/x86_64/sev_all_boot_test.c  |  84 ++++++
+ 15 files changed, 549 insertions(+), 60 deletions(-)
+ create mode 100644 tools/arch/arm64/include/asm/kvm_host.h
+ create mode 100644 tools/arch/riscv/include/asm/kvm_host.h
+ create mode 100644 tools/arch/s390/include/asm/kvm_host.h
+ create mode 100644 tools/arch/x86/include/asm/kvm_host.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/sev.h
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/sev.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/sev_all_boot_test.c
 
-But again, this should only apply to 7.1 machines and below. 7.2 is
-not out yet.
-
-
-> +};
-> +const size_t hw_compat_7_2_len = G_N_ELEMENTS(hw_compat_7_2);
-> +
->   GlobalProperty hw_compat_7_1[] = {};
->   const size_t hw_compat_7_1_len = G_N_ELEMENTS(hw_compat_7_1);
->   
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 362378454a..3a13fad4df 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -616,6 +616,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
->       s390mc->cpu_model_allowed = true;
->       s390mc->css_migration_enabled = true;
->       s390mc->hpage_1m_allowed = true;
-> +    s390mc->topology_allowed = true;
->       mc->init = ccw_init;
->       mc->reset = s390_machine_reset;
->       mc->block_default_type = IF_VIRTIO;
-> @@ -726,6 +727,27 @@ bool hpage_1m_allowed(void)
->       return get_machine_class()->hpage_1m_allowed;
->   }
->   
-> +static inline bool machine_get_topology_disable(Object *obj, Error **errp)
-> +{
-> +    S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
-> +
-> +    return ms->topology_disable;
-> +}
-> +
-> +static inline void machine_set_topology_disable(Object *obj, bool value,
-> +                                                Error **errp)
-> +{
-> +    S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
-> +
-> +    if (!get_machine_class()->topology_allowed) {
-> +        error_setg(errp, "Property topology-disable not available on machine %s",
-> +                   get_machine_class()->parent_class.name);
-
-OK. I get it now. May be we should consider adding the capability concept
-David introduced in the pseries machine. Please take a look. That's not
-for this patchset though. It would be too much work.
-
-> +        return;
-> +    }
-> +
-> +    ms->topology_disable = value;
-> +}
-> +
->   static char *machine_get_loadparm(Object *obj, Error **errp)
->   {
->       S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
-> @@ -784,6 +806,13 @@ static inline void s390_machine_initfn(Object *obj)
->       object_property_set_description(obj, "zpcii-disable",
->               "disable zPCI interpretation facilties");
->       object_property_set_bool(obj, "zpcii-disable", false, NULL);
-> +
-> +    object_property_add_bool(obj, "topology-disable",
-> +                             machine_get_topology_disable,
-> +                             machine_set_topology_disable);
-> +    object_property_set_description(obj, "topology-disable",
-> +            "disable CPU topology");
-> +    object_property_set_bool(obj, "topology-disable", false, NULL);
-
-All the properties should be added in the machine class_init routine.
-There is a preliminary cleanup patch required to move them all :/
-   
->   }
->   
->   static const TypeInfo ccw_machine_info = {
-> @@ -836,14 +865,36 @@ bool css_migration_enabled(void)
->       }                                                                         \
->       type_init(ccw_machine_register_##suffix)
->   
-> +static void ccw_machine_7_3_instance_options(MachineState *machine)
-> +{
-> +}
-> +
-> +static void ccw_machine_7_3_class_options(MachineClass *mc)
-> +{
-> +}
-> +DEFINE_CCW_MACHINE(7_3, "7.3", true);
-
-That's too early.
-
-> +
->   static void ccw_machine_7_2_instance_options(MachineState *machine)
->   {
-> +    S390CcwMachineState *ms = S390_CCW_MACHINE(machine);
-> +
-> +    ccw_machine_7_3_instance_options(machine);
-> +    ms->topology_disable = true;
->   }
->   
->   static void ccw_machine_7_2_class_options(MachineClass *mc)
->   {
-> +    S390CcwMachineClass *s390mc = S390_CCW_MACHINE_CLASS(mc);
-> +    static GlobalProperty compat[] = {
-> +        { TYPE_S390_CPU_TOPOLOGY, "topology-allowed", "off", },
-
-hmm, "topology-allowed" is not a TYPE_S390_CPU_TOPOLOGY property.
-
-
-> +    };
-> +
-> +    ccw_machine_7_3_class_options(mc);
-> +    compat_props_add(mc->compat_props, hw_compat_7_2, hw_compat_7_2_len);
-> +    compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-> +    s390mc->topology_allowed = false;
->   }
-> -DEFINE_CCW_MACHINE(7_2, "7.2", true);
-> +DEFINE_CCW_MACHINE(7_2, "7.2", false);
->   
->   static void ccw_machine_7_1_instance_options(MachineState *machine)
->   {
-> diff --git a/util/qemu-config.c b/util/qemu-config.c
-> index 5325f6bf80..c19e8bc8f3 100644
-> --- a/util/qemu-config.c
-> +++ b/util/qemu-config.c
-> @@ -240,6 +240,10 @@ static QemuOptsList machine_opts = {
->               .name = "zpcii-disable",
->               .type = QEMU_OPT_BOOL,
->               .help = "disable zPCI interpretation facilities",
-> +        },{
-> +            .name = "topology-disable",
-> +            .type = QEMU_OPT_BOOL,
-> +            .help = "disable CPU topology",
->           },
->           { /* End of list */ }
->       }
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 95b998a13b..c804b0f899 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -38,7 +38,8 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
->       "                hmat=on|off controls ACPI HMAT support (default=off)\n"
->       "                memory-backend='backend-id' specifies explicitly provided backend for main RAM (default=none)\n"
->       "                cxl-fmw.0.targets.0=firsttarget,cxl-fmw.0.targets.1=secondtarget,cxl-fmw.0.size=size[,cxl-fmw.0.interleave-granularity=granularity]\n"
-> -    "                zpcii-disable=on|off disables zPCI interpretation facilities (default=off)\n",
-> +    "                zpcii-disable=on|off disables zPCI interpretation facilities (default=off)\n"
-> +    "                topology-disable=on|off disables CPU topology (default=off)\n",
->       QEMU_ARCH_ALL)
->   SRST
->   ``-machine [type=]name[,prop=value[,...]]``
-> @@ -163,6 +164,9 @@ SRST
->           Disables zPCI interpretation facilties on s390-ccw hosts.
->           This feature can be used to disable hardware virtual assists
->           related to zPCI devices. The default is off.
-> +
-> +    ``topology-disable=on|off``
-> +        Disables CPU topology on for S390 machines starting with s390-ccw-virtio-7.3.
->   ERST
->   
->   DEF("M", HAS_ARG, QEMU_OPTION_M,
+-- 
+2.38.0.413.g74048e4d9e-goog
 
