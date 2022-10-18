@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 13B99602DF8
-	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 16:10:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C3540602DF9
+	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 16:10:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230471AbiJROJ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Oct 2022 10:09:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49346 "EHLO
+        id S231311AbiJROKI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Oct 2022 10:10:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230259AbiJROJs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Oct 2022 10:09:48 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C7251F605
-        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 07:09:44 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id l1-20020a17090a72c100b0020a6949a66aso14119258pjk.1
-        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 07:09:44 -0700 (PDT)
+        with ESMTP id S230366AbiJROJ5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Oct 2022 10:09:57 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DC7924BFD
+        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 07:09:49 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id k9so13508303pll.11
+        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 07:09:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ventanamicro.com; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=r2IpBJzC/KZLEhOakHFoNifjUYgUg4NurhrpOreBu/A=;
-        b=i7BNkwhBmRa911t30Yz5CURDDoTYRau2vSyCQvKiKh5hBnfXfXdPATcb5C3HeuPbOO
-         ZP848bhXlrfsq3kgizUEIYjnbfqggU5ahRGXNM90LmQdWnYU1snwdCJXHoJX2ThjUOiF
-         ZX1UahzlEP4mVTQC+Pk5k4kPGHD3hndG0C00NmK+8rdXEEq4Je5wWKA9nUwoXfF0y+7V
-         /du2jQfJzvAJZmXXAMQibYgcG/dNIyrpTLKEpnF78gUfF+G8pJcxYC9PsZUFJlsv4XYV
-         HX7WA/MjzJQ/ZBaUUhn8GZLor4BWOmWJ4kZeKN07aWMr9uFq+9RQ6jMM+yOpqtF+GKuZ
-         d5sQ==
+        bh=mi3OAs84SzVBPhryxf2ZsSZ37TjM6IJmsjgpojTEKnM=;
+        b=ea2VyPaevGOuNcc9XN5oBXqCdIxVdzh3HulObLalOaK18xQ5BGToy8ZdTMjE7CX+lW
+         WWOJ6zom4emXHhj2L/w/h/IKCe0YHShrva+t8QFYeWg6+fNqAtCTTlcqX2e04o2iJBn+
+         a1ymN+x4CAQlwSYyXe/mwamYNsyL5sxl0e//d88oJjyiJOHxzpFleZvzYcMU+tSoiJLY
+         SnDQGOt4C9sB8El4gWrgj5x5erEaOT+Prq7nUnOVXhVl29eF7ago2EpPSL2XYJ9Weg9c
+         VC9BED7C7BmemQeJCqOZ3o8W2r201oNXRPce2UUsHCX0oSeCX1s4yT7J4gXi03+Ad93z
+         jbaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=r2IpBJzC/KZLEhOakHFoNifjUYgUg4NurhrpOreBu/A=;
-        b=YeCxn/HIv7FBD3JNv+d9Ew8du1IHn7Wa5i+6ae280jM6MwuDsC/r0I6tMIkBgNIf23
-         3VkOf/qDUJk7kYFTNEfLLxprP+IV7c22G5+CycVP8yp+6V+ZXK9GhF3Ruyfz1pCrP5nB
-         +bfGZNqWDrrqe3HQJNPZt0b/h3Ub/vmQ0PgWAgAyDXSNAzqNAEnG4VlkScrRvRZdstx2
-         huBmenTTTQ4dmFclS8jf+ytl+PFhJk3UTvYKS5x9I5ZtmH42ot+YU+vYseObLqPZsK7b
-         Tu/HOfZ/OD9VzG7dHSt+6Bs9oBKaZ+mdgzFKLhsLK3fuTTpc9QCotivR19AUvciL+lyj
-         xKVw==
-X-Gm-Message-State: ACrzQf1ROmq167sF+yxiZtmtMITaSiP/4Z791DDXgDIqgiWqu7M3pu++
-        N666WbMB5cHmYWHqgltXc52XyQ==
-X-Google-Smtp-Source: AMsMyM5/1xD9nchl7YiD8PnipajH6ICLb8WzrqA2KonCjgdXWURk46jUpTdgmv0uhbUdbiWOuwle4Q==
-X-Received: by 2002:a17:903:240d:b0:183:9bab:9c3 with SMTP id e13-20020a170903240d00b001839bab09c3mr3318161plo.48.1666102183918;
-        Tue, 18 Oct 2022 07:09:43 -0700 (PDT)
+        bh=mi3OAs84SzVBPhryxf2ZsSZ37TjM6IJmsjgpojTEKnM=;
+        b=amdnJJcLuHRN3+xDB7ytC07mEzuQOjdSU0+Ycl8qWUp0Zl8Tv2peFcXG+fOxb4gETa
+         8vTET9qfiQHfx0m12zjK9dAc2ryMAWPPVOR1ObfmmUk66J1dN71YFhhN/qsv3jOiouPa
+         5Hxc4ZmVMlSPi0SoQlVF8p1kOSuCNOjnvIZsFufDn1nQrDvvyujjvGm9f6XVosNcV5Kf
+         GLwlvzyqN3pF6cDsQ0i1YUO+Lz1Zn2SuxL+EO03BDQhN9YwAgvYfLuWTkNXkTbh/3jwO
+         l7FVLVmsTbOnkwgQBsLgMTi3bb7dW6q8HnDi7zz9vNnZLSQ3mclKdTVvYfIQDlvGynQR
+         NaFw==
+X-Gm-Message-State: ACrzQf1FEXNUdYvODDfz36FZ1d8PVDngBJ+U7yQDaibN1IKwd0lLNh0N
+        qrHfuC3GHMlmUEPPVfZt6YN6ow==
+X-Google-Smtp-Source: AMsMyM45WVWO8hcChugqdDf8Q8WxPdJUKNE3dnIWHgszCH6BwMey/owW3t6zGZv685a1AmzVTV60aA==
+X-Received: by 2002:a17:903:1250:b0:185:40c6:3c2c with SMTP id u16-20020a170903125000b0018540c63c2cmr3436236plh.64.1666102188179;
+        Tue, 18 Oct 2022 07:09:48 -0700 (PDT)
 Received: from anup-ubuntu64-vm.. ([171.76.86.161])
-        by smtp.gmail.com with ESMTPSA id z15-20020a17090a170f00b002009db534d1sm8119913pjd.24.2022.10.18.07.09.36
+        by smtp.gmail.com with ESMTPSA id z15-20020a17090a170f00b002009db534d1sm8119913pjd.24.2022.10.18.07.09.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Oct 2022 07:09:40 -0700 (PDT)
+        Tue, 18 Oct 2022 07:09:47 -0700 (PDT)
 From:   Anup Patel <apatel@ventanamicro.com>
 To:     Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com,
         maz@kernel.org
@@ -57,10 +57,10 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Alistair Francis <Alistair.Francis@wdc.com>,
         Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
         kvm-riscv@lists.infradead.org,
-        Mayuresh Chitale <mchitale@ventanamicro.com>
-Subject: [PATCH kvmtool 3/6] riscv: Add zihintpause extension support
-Date:   Tue, 18 Oct 2022 19:38:51 +0530
-Message-Id: <20221018140854.69846-4-apatel@ventanamicro.com>
+        Andrew Jones <ajones@ventanamicro.com>
+Subject: [PATCH kvmtool 4/6] riscv: Move reg encoding helpers to kvm-cpu-arch.h
+Date:   Tue, 18 Oct 2022 19:38:52 +0530
+Message-Id: <20221018140854.69846-5-apatel@ventanamicro.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221018140854.69846-1-apatel@ventanamicro.com>
 References: <20221018140854.69846-1-apatel@ventanamicro.com>
@@ -75,29 +75,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Mayuresh Chitale <mchitale@ventanamicro.com>
+From: Andrew Jones <ajones@ventanamicro.com>
 
-The zihintpause extension allows software to use the PAUSE instruction to
-reduce energy consumption while executing spin-wait code sequences. Add the
-zihintpause extension to the device tree if it is supported by the host.
+We'll need one of these helpers in the next patch in another file.
+Let's proactively move them all now, since others may some day also
+be useful.
 
-Signed-off-by: Mayuresh Chitale <mchitale@ventanamicro.com>
+Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
 ---
- riscv/fdt.c | 1 +
- 1 file changed, 1 insertion(+)
+ riscv/fdt.c                      |  2 --
+ riscv/include/kvm/kvm-cpu-arch.h | 19 +++++++++++++++++++
+ riscv/kvm-cpu.c                  | 16 ----------------
+ 3 files changed, 19 insertions(+), 18 deletions(-)
 
 diff --git a/riscv/fdt.c b/riscv/fdt.c
-index 42bc062..ef0bc47 100644
+index ef0bc47..8d6da11 100644
 --- a/riscv/fdt.c
 +++ b/riscv/fdt.c
-@@ -20,6 +20,7 @@ struct isa_ext_info isa_info_arr[] = {
- 	{"svpbmt", KVM_RISCV_ISA_EXT_SVPBMT},
- 	{"sstc", KVM_RISCV_ISA_EXT_SSTC},
- 	{"svinval", KVM_RISCV_ISA_EXT_SVINVAL},
-+	{"zihintpause", KVM_RISCV_ISA_EXT_ZIHINTPAUSE},
- };
+@@ -9,8 +9,6 @@
+ #include <linux/kernel.h>
+ #include <linux/sizes.h>
  
- static void dump_fdt(const char *dtb_file, void *fdt)
+-#define RISCV_ISA_EXT_REG(id)	__kvm_reg_id(KVM_REG_RISCV_ISA_EXT, \
+-					     id, KVM_REG_SIZE_ULONG)
+ struct isa_ext_info {
+ 	const char *name;
+ 	unsigned long ext_id;
+diff --git a/riscv/include/kvm/kvm-cpu-arch.h b/riscv/include/kvm/kvm-cpu-arch.h
+index 4b3e602..e014839 100644
+--- a/riscv/include/kvm/kvm-cpu-arch.h
++++ b/riscv/include/kvm/kvm-cpu-arch.h
+@@ -18,6 +18,25 @@ static inline __u64 __kvm_reg_id(__u64 type, __u64 idx, __u64  size)
+ #define KVM_REG_SIZE_ULONG	KVM_REG_SIZE_U32
+ #endif
+ 
++#define RISCV_CONFIG_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CONFIG, \
++					     KVM_REG_RISCV_CONFIG_REG(name), \
++					     KVM_REG_SIZE_ULONG)
++
++#define RISCV_ISA_EXT_REG(id)	__kvm_reg_id(KVM_REG_RISCV_ISA_EXT, \
++					     id, KVM_REG_SIZE_ULONG)
++
++#define RISCV_CORE_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CORE, \
++					     KVM_REG_RISCV_CORE_REG(name), \
++					     KVM_REG_SIZE_ULONG)
++
++#define RISCV_CSR_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CSR, \
++					     KVM_REG_RISCV_CSR_REG(name), \
++					     KVM_REG_SIZE_ULONG)
++
++#define RISCV_TIMER_REG(name)	__kvm_reg_id(KVM_REG_RISCV_TIMER, \
++					     KVM_REG_RISCV_TIMER_REG(name), \
++					     KVM_REG_SIZE_U64)
++
+ struct kvm_cpu {
+ 	pthread_t	thread;
+ 
+diff --git a/riscv/kvm-cpu.c b/riscv/kvm-cpu.c
+index a17b957..f98bd7a 100644
+--- a/riscv/kvm-cpu.c
++++ b/riscv/kvm-cpu.c
+@@ -18,22 +18,6 @@ int kvm_cpu__get_debug_fd(void)
+ 	return debug_fd;
+ }
+ 
+-#define RISCV_CONFIG_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CONFIG, \
+-					     KVM_REG_RISCV_CONFIG_REG(name), \
+-					     KVM_REG_SIZE_ULONG)
+-
+-#define RISCV_CORE_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CORE, \
+-					     KVM_REG_RISCV_CORE_REG(name), \
+-					     KVM_REG_SIZE_ULONG)
+-
+-#define RISCV_CSR_REG(name)	__kvm_reg_id(KVM_REG_RISCV_CSR, \
+-					     KVM_REG_RISCV_CSR_REG(name), \
+-					     KVM_REG_SIZE_ULONG)
+-
+-#define RISCV_TIMER_REG(name)	__kvm_reg_id(KVM_REG_RISCV_TIMER, \
+-					     KVM_REG_RISCV_TIMER_REG(name), \
+-					     KVM_REG_SIZE_U64)
+-
+ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+ {
+ 	struct kvm_cpu *vcpu;
 -- 
 2.34.1
 
