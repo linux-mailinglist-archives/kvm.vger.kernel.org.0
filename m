@@ -2,279 +2,332 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EF40602918
-	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 12:10:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 85AFD6029D8
+	for <lists+kvm@lfdr.de>; Tue, 18 Oct 2022 13:06:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230366AbiJRKKa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 18 Oct 2022 06:10:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37462 "EHLO
+        id S229717AbiJRLGZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 18 Oct 2022 07:06:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229849AbiJRKKR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 18 Oct 2022 06:10:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3A0D6CF6F
-        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 03:10:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666087814;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=A9Jck7KUtqojsImURvcQHqLduKuZ3IugcOkTqhUz1cU=;
-        b=AIcR5hM63Y4552qXb+K4Kd6L2Ztgkw2xBIfvvWFBA5pVli0pQrel18mp/ajWMnyvUmD3Rk
-        XQn0MSG+doc8NZYdRyIpUJSmd+QSnDvdqHH3I4cHMYVsPsHBlx8x6p+dtjGGLBX2dyWNPb
-        fcU1by9js3lCNvERCEsGbtR0xDRfQqY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-97-Neg-AG1KPiqrP7xjefF7Fw-1; Tue, 18 Oct 2022 06:10:11 -0400
-X-MC-Unique: Neg-AG1KPiqrP7xjefF7Fw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 99B1C185A7AC;
-        Tue, 18 Oct 2022 10:10:10 +0000 (UTC)
-Received: from ovpn-193-156.brq.redhat.com (ovpn-193-156.brq.redhat.com [10.40.193.156])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1EFB040C94AA;
-        Tue, 18 Oct 2022 10:10:08 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] KVM: VMX: Resurrect vmcs_conf sanitization for KVM-on-Hyper-V
-Date:   Tue, 18 Oct 2022 12:10:00 +0200
-Message-Id: <20221018101000.934413-5-vkuznets@redhat.com>
-In-Reply-To: <20221018101000.934413-1-vkuznets@redhat.com>
-References: <20221018101000.934413-1-vkuznets@redhat.com>
+        with ESMTP id S229556AbiJRLGX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 18 Oct 2022 07:06:23 -0400
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5808124964
+        for <kvm@vger.kernel.org>; Tue, 18 Oct 2022 04:06:22 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ED1C4113E;
+        Tue, 18 Oct 2022 04:06:27 -0700 (PDT)
+Received: from FVFF77S0Q05N (unknown [10.57.0.253])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6172A3F7D8;
+        Tue, 18 Oct 2022 04:06:19 -0700 (PDT)
+Date:   Tue, 18 Oct 2022 12:06:14 +0100
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Will Deacon <will@kernel.org>
+Cc:     kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Quentin Perret <qperret@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v4 14/25] KVM: arm64: Add per-cpu fixmap infrastructure
+ at EL2
+Message-ID: <Y06Iihi/RPAOMuwR@FVFF77S0Q05N>
+References: <20221017115209.2099-1-will@kernel.org>
+ <20221017115209.2099-15-will@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221017115209.2099-15-will@kernel.org>
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Commit 9bcb90650e31 ("KVM: VMX: Get rid of eVMCS specific VMX controls
-sanitization") dropped 'vmcs_conf' sanitization for KVM-on-Hyper-V because
-there's no known Hyper-V version which would expose a feature
-unsupported in eVMCS in VMX feature MSRs. This works well for all
-currently existing Hyper-V version, however, future Hyper-V versions
-may add features which are supported by KVM and are currently missing
-in eVMCSv1 definition (e.g. APIC virtualization, PML,...). When this
-happens, existing KVMs will get broken. With the inverted 'unsupported
-by eVMCSv1' checks, we can resurrect vmcs_conf sanitization and make
-KVM future proof.
+On Mon, Oct 17, 2022 at 12:51:58PM +0100, Will Deacon wrote:
+> From: Quentin Perret <qperret@google.com>
+> 
+> Mapping pages in a guest page-table from within the pKVM hypervisor at
+> EL2 may require cache maintenance to ensure that the initialised page
+> contents is visible even to non-cacheable (e.g. MMU-off) accesses from
+> the guest.
+> 
+> In preparation for performing this maintenance at EL2, introduce a
+> per-vCPU fixmap which allows the pKVM hypervisor to map guest pages
+> temporarily into its stage-1 page-table for the purposes of cache
+> maintenance and, in future, poisoning on the reclaim path. The use of a
+> fixmap avoids the need for memory allocation or locking on the map()
+> path.
+> 
+> Tested-by: Vincent Donnefort <vdonnefort@google.com>
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> Signed-off-by: Will Deacon <will@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_pgtable.h          | 14 +++
+>  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 +
+>  arch/arm64/kvm/hyp/include/nvhe/mm.h          |  4 +
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  1 -
+>  arch/arm64/kvm/hyp/nvhe/mm.c                  | 94 +++++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/setup.c               |  4 +
+>  arch/arm64/kvm/hyp/pgtable.c                  | 12 ---
+>  7 files changed, 118 insertions(+), 13 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> index 4f6d79fe4352..b2a886c9e78d 100644
+> --- a/arch/arm64/include/asm/kvm_pgtable.h
+> +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> @@ -30,6 +30,8 @@ typedef u64 kvm_pte_t;
+>  #define KVM_PTE_ADDR_MASK		GENMASK(47, PAGE_SHIFT)
+>  #define KVM_PTE_ADDR_51_48		GENMASK(15, 12)
+>  
+> +#define KVM_PHYS_INVALID		(-1ULL)
+> +
+>  static inline bool kvm_pte_valid(kvm_pte_t pte)
+>  {
+>  	return pte & KVM_PTE_VALID;
+> @@ -45,6 +47,18 @@ static inline u64 kvm_pte_to_phys(kvm_pte_t pte)
+>  	return pa;
+>  }
+>  
+> +static inline kvm_pte_t kvm_phys_to_pte(u64 pa)
+> +{
+> +	kvm_pte_t pte = pa & KVM_PTE_ADDR_MASK;
+> +
+> +	if (PAGE_SHIFT == 16) {
+> +		pa &= GENMASK(51, 48);
+> +		pte |= FIELD_PREP(KVM_PTE_ADDR_51_48, pa >> 48);
+> +	}
+> +
+> +	return pte;
+> +}
+> +
+>  static inline u64 kvm_granule_shift(u32 level)
+>  {
+>  	/* Assumes KVM_PGTABLE_MAX_LEVELS is 4 */
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> index ce9a796a85ee..ef31a1872c93 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> @@ -59,6 +59,8 @@ enum pkvm_component_id {
+>  	PKVM_ID_HYP,
+>  };
+>  
+> +extern unsigned long hyp_nr_cpus;
+> +
+>  int __pkvm_prot_finalize(void);
+>  int __pkvm_host_share_hyp(u64 pfn);
+>  int __pkvm_host_unshare_hyp(u64 pfn);
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
+> index b2ee6d5df55b..d5ec972b5c1e 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
+> @@ -13,6 +13,10 @@
+>  extern struct kvm_pgtable pkvm_pgtable;
+>  extern hyp_spinlock_t pkvm_pgd_lock;
+>  
+> +int hyp_create_pcpu_fixmap(void);
+> +void *hyp_fixmap_map(phys_addr_t phys);
+> +void hyp_fixmap_unmap(void);
+> +
+>  int hyp_create_idmap(u32 hyp_va_bits);
+>  int hyp_map_vectors(void);
+>  int hyp_back_vmemmap(phys_addr_t back);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 2ef6aaa21ba5..1c38451050e5 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -21,7 +21,6 @@
+>  
+>  #define KVM_HOST_S2_FLAGS (KVM_PGTABLE_S2_NOFWB | KVM_PGTABLE_S2_IDMAP)
+>  
+> -extern unsigned long hyp_nr_cpus;
+>  struct host_mmu host_mmu;
+>  
+>  static struct hyp_pool host_s2_pool;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+> index d3a3b47181de..b77215630d5c 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mm.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+> @@ -14,6 +14,7 @@
+>  #include <nvhe/early_alloc.h>
+>  #include <nvhe/gfp.h>
+>  #include <nvhe/memory.h>
+> +#include <nvhe/mem_protect.h>
+>  #include <nvhe/mm.h>
+>  #include <nvhe/spinlock.h>
+>  
+> @@ -25,6 +26,12 @@ unsigned int hyp_memblock_nr;
+>  
+>  static u64 __io_map_base;
+>  
+> +struct hyp_fixmap_slot {
+> +	u64 addr;
+> +	kvm_pte_t *ptep;
+> +};
+> +static DEFINE_PER_CPU(struct hyp_fixmap_slot, fixmap_slots);
+> +
+>  static int __pkvm_create_mappings(unsigned long start, unsigned long size,
+>  				  unsigned long phys, enum kvm_pgtable_prot prot)
+>  {
+> @@ -212,6 +219,93 @@ int hyp_map_vectors(void)
+>  	return 0;
+>  }
+>  
+> +void *hyp_fixmap_map(phys_addr_t phys)
+> +{
+> +	struct hyp_fixmap_slot *slot = this_cpu_ptr(&fixmap_slots);
+> +	kvm_pte_t pte, *ptep = slot->ptep;
+> +
+> +	pte = *ptep;
+> +	pte &= ~kvm_phys_to_pte(KVM_PHYS_INVALID);
+> +	pte |= kvm_phys_to_pte(phys) | KVM_PTE_VALID;
+> +	WRITE_ONCE(*ptep, pte);
+> +	dsb(nshst);
+> +
+> +	return (void *)slot->addr;
+> +}
+> +
+> +static void fixmap_clear_slot(struct hyp_fixmap_slot *slot)
+> +{
+> +	kvm_pte_t *ptep = slot->ptep;
+> +	u64 addr = slot->addr;
+> +
+> +	WRITE_ONCE(*ptep, *ptep & ~KVM_PTE_VALID);
+> +	dsb(nshst);
+> +	__tlbi_level(vale2, __TLBI_VADDR(addr, 0), (KVM_PGTABLE_MAX_LEVELS - 1));
+> +	dsb(nsh);
+> +	isb();
+> +}
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/vmx/evmcs.c | 80 +++++++++++++++++++++++++++++++++++-----
- arch/x86/kvm/vmx/evmcs.h |  1 +
- arch/x86/kvm/vmx/vmx.c   |  5 +++
- 3 files changed, 76 insertions(+), 10 deletions(-)
+Does each CPU have independent Stage-1 tables at EL2? i.e. each has a distinct
+root table?
 
-diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
-index 47f6d1cbd428..89d7b9537ada 100644
---- a/arch/x86/kvm/vmx/evmcs.c
-+++ b/arch/x86/kvm/vmx/evmcs.c
-@@ -1,5 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
- 
-+#define pr_fmt(fmt) "kvm/hyper-v: " fmt
-+
- #include <linux/errno.h>
- #include <linux/smp.h>
- 
-@@ -362,6 +364,7 @@ uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu)
- 
- enum evmcs_revision {
- 	EVMCSv1_LEGACY,
-+	EVMCSv1_STRICT,
- 	NR_EVMCS_REVISIONS,
- };
- 
-@@ -379,31 +382,36 @@ enum evmcs_ctrl_type {
- static const u32 evmcs_supported_ctrls[NR_EVMCS_CTRLS][NR_EVMCS_REVISIONS] = {
- 	[EVMCS_EXIT_CTRLS] = {
- 		[EVMCSv1_LEGACY] = EVMCS1_SUPPORTED_VMEXIT_CTRL,
-+		[EVMCSv1_STRICT] = EVMCS1_SUPPORTED_VMEXIT_CTRL,
- 	},
- 	[EVMCS_ENTRY_CTRLS] = {
- 		[EVMCSv1_LEGACY] = EVMCS1_SUPPORTED_VMENTRY_CTRL,
-+		[EVMCSv1_STRICT] = EVMCS1_SUPPORTED_VMENTRY_CTRL,
- 	},
- 	[EVMCS_EXEC_CTRL] = {
- 		[EVMCSv1_LEGACY] = EVMCS1_SUPPORTED_EXEC_CTRL,
-+		[EVMCSv1_STRICT] = EVMCS1_SUPPORTED_EXEC_CTRL,
- 	},
- 	[EVMCS_2NDEXEC] = {
- 		[EVMCSv1_LEGACY] = EVMCS1_SUPPORTED_2NDEXEC & ~SECONDARY_EXEC_TSC_SCALING,
-+		[EVMCSv1_STRICT] = EVMCS1_SUPPORTED_2NDEXEC,
- 	},
- 	[EVMCS_3RDEXEC] = {
- 		[EVMCSv1_LEGACY] = EVMCS1_SUPPORTED_3RDEXEC,
- 	},
- 	[EVMCS_PINCTRL] = {
- 		[EVMCSv1_LEGACY] = EVMCS1_SUPPORTED_PINCTRL,
-+		[EVMCSv1_STRICT] = EVMCS1_SUPPORTED_PINCTRL,
- 	},
- 	[EVMCS_VMFUNC] = {
- 		[EVMCSv1_LEGACY] = EVMCS1_SUPPORTED_VMFUNC,
-+		[EVMCSv1_STRICT] = EVMCS1_SUPPORTED_VMFUNC,
- 	},
- };
- 
--static u32 evmcs_get_supported_ctls(enum evmcs_ctrl_type ctrl_type)
-+static u32 evmcs_get_supported_ctls(enum evmcs_ctrl_type ctrl_type,
-+				    enum evmcs_revision evmcs_rev)
- {
--	enum evmcs_revision evmcs_rev = EVMCSv1_LEGACY;
--
- 	return evmcs_supported_ctrls[ctrl_type][evmcs_rev];
- }
- 
-@@ -437,31 +445,37 @@ void nested_evmcs_filter_control_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 *
- 	switch (msr_index) {
- 	case MSR_IA32_VMX_EXIT_CTLS:
- 	case MSR_IA32_VMX_TRUE_EXIT_CTLS:
--		supported_ctrls = evmcs_get_supported_ctls(EVMCS_EXIT_CTRLS);
-+		supported_ctrls = evmcs_get_supported_ctls(EVMCS_EXIT_CTRLS,
-+							   EVMCSv1_LEGACY);
- 		if (!evmcs_has_perf_global_ctrl(vcpu))
- 			supported_ctrls &= ~VM_EXIT_LOAD_IA32_PERF_GLOBAL_CTRL;
- 		ctl_high &= supported_ctrls;
- 		break;
- 	case MSR_IA32_VMX_ENTRY_CTLS:
- 	case MSR_IA32_VMX_TRUE_ENTRY_CTLS:
--		supported_ctrls = evmcs_get_supported_ctls(EVMCS_ENTRY_CTRLS);
-+		supported_ctrls = evmcs_get_supported_ctls(EVMCS_ENTRY_CTRLS,
-+							   EVMCSv1_LEGACY);
- 		if (!evmcs_has_perf_global_ctrl(vcpu))
- 			supported_ctrls &= ~VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
- 		ctl_high &= supported_ctrls;
- 		break;
- 	case MSR_IA32_VMX_PROCBASED_CTLS:
- 	case MSR_IA32_VMX_TRUE_PROCBASED_CTLS:
--		ctl_high &= evmcs_get_supported_ctls(EVMCS_EXEC_CTRL);
-+		ctl_high &= evmcs_get_supported_ctls(EVMCS_EXEC_CTRL,
-+						     EVMCSv1_LEGACY);
- 		break;
- 	case MSR_IA32_VMX_PROCBASED_CTLS2:
--		ctl_high &= evmcs_get_supported_ctls(EVMCS_2NDEXEC);
-+		ctl_high &= evmcs_get_supported_ctls(EVMCS_2NDEXEC,
-+						     EVMCSv1_LEGACY);
- 		break;
- 	case MSR_IA32_VMX_TRUE_PINBASED_CTLS:
- 	case MSR_IA32_VMX_PINBASED_CTLS:
--		ctl_high &= evmcs_get_supported_ctls(EVMCS_PINCTRL);
-+		ctl_high &= evmcs_get_supported_ctls(EVMCS_PINCTRL,
-+						     EVMCSv1_LEGACY);
- 		break;
- 	case MSR_IA32_VMX_VMFUNC:
--		ctl_low &= evmcs_get_supported_ctls(EVMCS_VMFUNC);
-+		ctl_low &= evmcs_get_supported_ctls(EVMCS_VMFUNC,
-+						    EVMCSv1_LEGACY);
- 		break;
- 	}
- 
-@@ -471,7 +485,7 @@ void nested_evmcs_filter_control_msr(struct kvm_vcpu *vcpu, u32 msr_index, u64 *
- static bool nested_evmcs_is_valid_controls(enum evmcs_ctrl_type ctrl_type,
- 					   u32 val)
- {
--	return !(val & ~evmcs_get_supported_ctls(ctrl_type));
-+	return !(val & ~evmcs_get_supported_ctls(ctrl_type, EVMCSv1_LEGACY));
- }
- 
- int nested_evmcs_check_controls(struct vmcs12 *vmcs12)
-@@ -511,6 +525,52 @@ int nested_evmcs_check_controls(struct vmcs12 *vmcs12)
- 	return 0;
- }
- 
-+#if IS_ENABLED(CONFIG_HYPERV)
-+/*
-+ * KVM on Hyper-V always uses the newest known eVMCSv1 revision, the assumption
-+ * is: in case a feature has corresponding fields in eVMCS described and it was
-+ * exposed in VMX feature MSRs, KVM is free to use it. Warn if KVM meets a
-+ * feature which has no corresponding eVMCS field, this likely means that KVM
-+ * needs to be updated.
-+ */
-+#define evmcs_check_vmcs_conf32(field, ctrl)					\
-+	{									\
-+		u32 supported, unsupported32;					\
-+										\
-+		supported = evmcs_get_supported_ctls(ctrl, EVMCSv1_STRICT);	\
-+		unsupported32 = vmcs_conf->field & ~supported;			\
-+		if (unsupported32) {						\
-+			pr_warn_once(#field " unsupported with eVMCS: 0x%x\n",	\
-+				     unsupported32);				\
-+			vmcs_conf->field &= supported;				\
-+		}								\
-+	}
-+
-+#define evmcs_check_vmcs_conf64(field, ctrl)					\
-+	{									\
-+		u32 supported;							\
-+		u64 unsupported64;						\
-+										\
-+		supported = evmcs_get_supported_ctls(ctrl, EVMCSv1_STRICT);	\
-+		unsupported64 = vmcs_conf->field & ~supported;			\
-+		if (unsupported64) {						\
-+			pr_warn_once(#field " unsupported with eVMCS: 0x%llx\n",\
-+				     unsupported64);				\
-+			vmcs_conf->field &= supported;				\
-+		}								\
-+	}
-+
-+__init void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf)
-+{
-+	evmcs_check_vmcs_conf32(cpu_based_exec_ctrl, EVMCS_EXEC_CTRL);
-+	evmcs_check_vmcs_conf32(pin_based_exec_ctrl, EVMCS_PINCTRL);
-+	evmcs_check_vmcs_conf32(cpu_based_2nd_exec_ctrl, EVMCS_2NDEXEC);
-+	evmcs_check_vmcs_conf64(cpu_based_3rd_exec_ctrl, EVMCS_3RDEXEC);
-+	evmcs_check_vmcs_conf32(vmentry_ctrl, EVMCS_ENTRY_CTRLS);
-+	evmcs_check_vmcs_conf32(vmexit_ctrl, EVMCS_EXIT_CTRLS);
-+}
-+#endif
-+
- int nested_enable_evmcs(struct kvm_vcpu *vcpu,
- 			uint16_t *vmcs_version)
- {
-diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
-index 205b5b467617..300e50d52042 100644
---- a/arch/x86/kvm/vmx/evmcs.h
-+++ b/arch/x86/kvm/vmx/evmcs.h
-@@ -271,6 +271,7 @@ static inline void evmcs_load(u64 phys_addr)
- 	vp_ap->enlighten_vmentry = 1;
- }
- 
-+__init void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf);
- #else /* !IS_ENABLED(CONFIG_HYPERV) */
- static __always_inline void evmcs_write64(unsigned long field, u64 value) {}
- static inline void evmcs_write32(unsigned long field, u32 value) {}
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 9dba04b6b019..7fd21b1fae1d 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2720,6 +2720,11 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
- 	vmcs_conf->vmentry_ctrl        = _vmentry_control;
- 	vmcs_conf->misc	= misc_msr;
- 
-+#if IS_ENABLED(CONFIG_HYPERV)
-+	if (enlightened_vmcs)
-+		evmcs_sanitize_exec_ctrls(vmcs_conf);
-+#endif
-+
- 	return 0;
- }
- 
--- 
-2.37.3
+If the tables are shared, you need broadcast maintenance and ISH barriers here,
+or you risk the usual issues with asynchronous MMU behaviour.
 
+If those are per-cpu, sorry for the noise!
+
+Thanks,
+Mark.
+
+> +
+> +void hyp_fixmap_unmap(void)
+> +{
+> +	fixmap_clear_slot(this_cpu_ptr(&fixmap_slots));
+> +}
+> +
+> +static int __create_fixmap_slot_cb(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+> +				   enum kvm_pgtable_walk_flags flag,
+> +				   void * const arg)
+> +{
+> +	struct hyp_fixmap_slot *slot = per_cpu_ptr(&fixmap_slots, (u64)arg);
+> +
+> +	if (!kvm_pte_valid(*ptep) || level != KVM_PGTABLE_MAX_LEVELS - 1)
+> +		return -EINVAL;
+> +
+> +	slot->addr = addr;
+> +	slot->ptep = ptep;
+> +
+> +	/*
+> +	 * Clear the PTE, but keep the page-table page refcount elevated to
+> +	 * prevent it from ever being freed. This lets us manipulate the PTEs
+> +	 * by hand safely without ever needing to allocate memory.
+> +	 */
+> +	fixmap_clear_slot(slot);
+> +
+> +	return 0;
+> +}
+> +
+> +static int create_fixmap_slot(u64 addr, u64 cpu)
+> +{
+> +	struct kvm_pgtable_walker walker = {
+> +		.cb	= __create_fixmap_slot_cb,
+> +		.flags	= KVM_PGTABLE_WALK_LEAF,
+> +		.arg = (void *)cpu,
+> +	};
+> +
+> +	return kvm_pgtable_walk(&pkvm_pgtable, addr, PAGE_SIZE, &walker);
+> +}
+> +
+> +int hyp_create_pcpu_fixmap(void)
+> +{
+> +	unsigned long addr, i;
+> +	int ret;
+> +
+> +	for (i = 0; i < hyp_nr_cpus; i++) {
+> +		ret = pkvm_alloc_private_va_range(PAGE_SIZE, &addr);
+> +		if (ret)
+> +			return ret;
+> +
+> +		ret = kvm_pgtable_hyp_map(&pkvm_pgtable, addr, PAGE_SIZE,
+> +					  __hyp_pa(__hyp_bss_start), PAGE_HYP);
+> +		if (ret)
+> +			return ret;
+> +
+> +		ret = create_fixmap_slot(addr, i);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  int hyp_create_idmap(u32 hyp_va_bits)
+>  {
+>  	unsigned long start, end;
+> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> index 2be72fbe7279..0f69c1393416 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> @@ -321,6 +321,10 @@ void __noreturn __pkvm_init_finalise(void)
+>  	if (ret)
+>  		goto out;
+>  
+> +	ret = hyp_create_pcpu_fixmap();
+> +	if (ret)
+> +		goto out;
+> +
+>  	pkvm_hyp_vm_table_init(vm_table_base);
+>  out:
+>  	/*
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index a1a27f88a312..2bcb2d5903ba 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -57,8 +57,6 @@ struct kvm_pgtable_walk_data {
+>  	u64				end;
+>  };
+>  
+> -#define KVM_PHYS_INVALID (-1ULL)
+> -
+>  static bool kvm_phys_is_valid(u64 phys)
+>  {
+>  	return phys < BIT(id_aa64mmfr0_parange_to_phys_shift(ID_AA64MMFR0_EL1_PARANGE_MAX));
+> @@ -122,16 +120,6 @@ static bool kvm_pte_table(kvm_pte_t pte, u32 level)
+>  	return FIELD_GET(KVM_PTE_TYPE, pte) == KVM_PTE_TYPE_TABLE;
+>  }
+>  
+> -static kvm_pte_t kvm_phys_to_pte(u64 pa)
+> -{
+> -	kvm_pte_t pte = pa & KVM_PTE_ADDR_MASK;
+> -
+> -	if (PAGE_SHIFT == 16)
+> -		pte |= FIELD_PREP(KVM_PTE_ADDR_51_48, pa >> 48);
+> -
+> -	return pte;
+> -}
+> -
+>  static kvm_pte_t *kvm_pte_follow(kvm_pte_t pte, struct kvm_pgtable_mm_ops *mm_ops)
+>  {
+>  	return mm_ops->phys_to_virt(kvm_pte_to_phys(pte));
+> -- 
+> 2.38.0.413.g74048e4d9e-goog
+> 
