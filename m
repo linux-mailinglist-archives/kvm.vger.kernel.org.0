@@ -2,152 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 417C3604F3A
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 19:59:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 20B64604FB1
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 20:33:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229989AbiJSR7F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 13:59:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42456 "EHLO
+        id S230048AbiJSSdE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 14:33:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230137AbiJSR7A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 13:59:00 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3273C1CC744;
-        Wed, 19 Oct 2022 10:58:59 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29JHK4BW028697;
-        Wed, 19 Oct 2022 17:57:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=wZzMm1jtxHr+WaUIZ4Y63cRmn37N5D0/4CBTCQveU6w=;
- b=JQ0O+II8QvaXO/4UtzqTF9r2/eJEwZi3jPXrE0+cM1KIUMAEfri6XVkVJz3CV8iRP4y8
- UALFzbQKJnMvm9c6XjWgoOFC6M2xc1ko7LZwRJrxL0ZfQpC316Pl40lL4wyNaFKjye6p
- FqX/jXIlsGlUzyC1l7xvHuty2oWEnfQuBgjh1B5m2P1au9wXxv3X9ttkdEn/wc8pDjib
- PGpvRRICt6dp2NyNMhWmIabXJqtAtj1CD8VD0LRyP7rKIsgk3v4mDl/bAOykROAfgH7T
- MwOAQwsroTrLYFsUQVSUrivlCTFSn6MWJ1KpHbU67MqQ0BRyCPZCL9KP2B3naNGD8XpB qA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kan7e1gqy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Oct 2022 17:57:50 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29JHf5U1015979;
-        Wed, 19 Oct 2022 17:57:49 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kan7e1gqa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Oct 2022 17:57:49 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29JHtl61002643;
-        Wed, 19 Oct 2022 17:57:48 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma02wdc.us.ibm.com with ESMTP id 3k7mga7v7f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Oct 2022 17:57:48 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com ([9.208.128.116])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29JHvlT46619706
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Oct 2022 17:57:47 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 67B6158063;
-        Wed, 19 Oct 2022 17:57:46 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 389EB58052;
-        Wed, 19 Oct 2022 17:57:42 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.160.41.243])
-        by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 19 Oct 2022 17:57:42 +0000 (GMT)
-Message-ID: <44b6c9d164b1ba02483ed23a89ec843f18f1cd63.camel@linux.ibm.com>
-Subject: Re: [PATCH v1 6/7] vfio/ccw: replace vfio_init_device with _alloc_
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>, Yi Liu <yi.l.liu@intel.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        David Airlie <airlied@gmail.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Abhishek Sahu <abhsahu@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Date:   Wed, 19 Oct 2022 13:57:41 -0400
-In-Reply-To: <Y1Awsh56Ur/cDrHh@nvidia.com>
-References: <20221019162135.798901-1-farman@linux.ibm.com>
-         <20221019162135.798901-7-farman@linux.ibm.com>
-         <Y1Awsh56Ur/cDrHh@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+        with ESMTP id S229794AbiJSSdC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 14:33:02 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7221E1C7102
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 11:33:00 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id g7so24506083lfv.5
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 11:33:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=VPr6UAOpmN1/gMX0ewomaOCJg5YtZQmOBncflHxMDjk=;
+        b=LwRPgs44Xx9fZBCWVguQMsygec+a76lxS9ASG3VWi6VBR4o+JOMKkdn5tTnapNhNbx
+         FCagxAT3CfEM6YSuiTVMbPHaJojgG9FhVAFnQbxsBultlVUY0pF/BJ7Pb1rCsoLbQEMZ
+         Tsz/eakulZFZMoaUwgMl+Q1Q2Mo6Ja/eO1XGRRJI1TLh6z4IE3uaaC2a1iSmaS0U4Sg7
+         StbFJsC36uGNihltZfZ/naEuTHBMd0aKRn0MseX2AD4OY2VEwCn3xL3Np44L+mr8bSRa
+         xewHLuoL2hqyU3VemdfwUsM41M+NZMYII6+iUpJITWhnfKF5ZBr0cRMrYzrFp5Hl4kbC
+         lg5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VPr6UAOpmN1/gMX0ewomaOCJg5YtZQmOBncflHxMDjk=;
+        b=P2W0nX6yh9POUog70GSvzxvjgXBMBbaeMS1yuAKpu5/XdVMw4xMQ2Ci3wdiODULAlD
+         LotYikPsGN26tvble+0lxfCDlBQK7K0h1EN+bpPpV8bEneMaPitlS2sWbEU4C4h7moIe
+         f0MRdkM6t8TOdwioZimb2IHSIQwYktOlp9U491gkmoEbJlRhS2WiH4KOvPtUD+ysSYXN
+         jD2MY5qR7ZeS7vRv5BcxWhbBPA5MhjSqv9FgteFSbgA7CnJDBm7hsJoe/r5nRAs2uh8S
+         qEeta+8+fYUaMrFqb2nqMd8PMVKENmpoLq3qfd7HF6DoF4uC4js02XqJSzySQvTenSJ5
+         w2VQ==
+X-Gm-Message-State: ACrzQf0S3vTdARZuZLGjvSZ7JagwK6UXkKHqHZKZBERI1zS5nkrg1UGu
+        vrxHvaQ0z1IwDSxmN0FPYgcBbMu6vC0GRInwN0ZXnsugI0mpRA==
+X-Google-Smtp-Source: AMsMyM4EBV5NPiqUSsGoH76d60Oj4XtTNKzmBM3XB8zcFOXHmexalPNeyd2MnHJenC/4Cf4QA3Wt+/yC+VCqwQatWHo=
+X-Received: by 2002:a05:6512:3119:b0:4a2:d749:ff82 with SMTP id
+ n25-20020a056512311900b004a2d749ff82mr3531001lfb.637.1666204378020; Wed, 19
+ Oct 2022 11:32:58 -0700 (PDT)
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: q2mvKpVcdgQlwFBaW1mfglcq_AZETqcy
-X-Proofpoint-ORIG-GUID: g1ueXzvxe0ge2ZRClxxJJQOvrPAfn-Qw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-19_10,2022-10-19_04,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 priorityscore=1501 adultscore=0 clxscore=1015 mlxlogscore=999
- mlxscore=0 suspectscore=0 impostorscore=0 spamscore=0 bulkscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210190099
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-6-chao.p.peng@linux.intel.com> <CA+EHjTxukqBfaN6D+rPOiX83zkGknHEQ16J0k6GQSdL_-e9C6g@mail.gmail.com>
+ <20221012023516.GA3218049@chaop.bj.intel.com> <CA+EHjTyGyGL+ox81=jdtoHERtHPV=P7wJub=3j7chdijyq-AgA@mail.gmail.com>
+ <Y03UiYYioV+FQIpx@google.com> <20221019132308.GA3496045@chaop.bj.intel.com>
+ <CA+EHjTytCEup0m-nhnVHsuQ1xjaCxXNHO_Oxe+QbpwqaewpfKQ@mail.gmail.com> <Y1AhP0dlRSgTCObX@google.com>
+In-Reply-To: <Y1AhP0dlRSgTCObX@google.com>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Wed, 19 Oct 2022 19:32:21 +0100
+Message-ID: <CA+EHjTzR6DwU950gud1opEGCNqCfiEvA4-JFtyJ0NBgTD-uHNg@mail.gmail.com>
+Subject: Re: [PATCH v8 5/8] KVM: Register/unregister the guest private memory regions
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-10-19 at 14:15 -0300, Jason Gunthorpe wrote:
-> On Wed, Oct 19, 2022 at 06:21:34PM +0200, Eric Farman wrote:
->=20
-> > =C2=A0/*
-> > =C2=A0 * Initialize a vfio_device so it can be registered to vfio core.
-> > - *
-> > - * Only vfio-ccw driver should call this interface.
-> > =C2=A0 */
-> > =C2=A0int vfio_init_device(struct vfio_device *device, struct device
-> > *dev,
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const struct vfio_devic=
-e_ops *ops)
-> > @@ -422,7 +420,6 @@ int vfio_init_device(struct vfio_device
-> > *device, struct device *dev,
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ida_free(&vfio.device_i=
-da, device->index);
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return ret;
-> > =C2=A0}
-> > -EXPORT_SYMBOL_GPL(vfio_init_device);
->=20
-> Should be made static as well
+On Wed, Oct 19, 2022 at 5:09 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Wed, Oct 19, 2022, Fuad Tabba wrote:
+> > > > > This sounds good. Thank you.
+> > > >
+> > > > I like the idea of a separate Kconfig, e.g. CONFIG_KVM_GENERIC_PRIVATE_MEM or
+> > > > something.  I highly doubt there will be any non-x86 users for multiple years,
+> > > > if ever, but it would allow testing the private memory stuff on ARM (and any other
+> > > > non-x86 arch) without needing full pKVM support and with only minor KVM
+> > > > modifications, e.g. the x86 support[*] to test UPM without TDX is shaping up to be
+> > > > trivial.
+> > >
+> > > CONFIG_KVM_GENERIC_PRIVATE_MEM looks good to me.
+> >
+> > That sounds good to me, and just keeping the xarray isn't really an
+> > issue for pKVM.
+>
+> The xarray won't exist for pKVM if the #ifdefs in this patch are changed from
+> CONFIG_HAVE_KVM_PRIVATE_MEM => CONFIG_KVM_GENERIC_PRIVATE_MEM.
+>
+> > We could end up using it instead of some of the other
+> > structures we use for tracking.
+>
+> I don't think pKVM should hijack the xarray for other purposes.  At best, it will
+> be confusing, at worst we'll end up with a mess if ARM ever supports the "generic"
+> implementation.
 
-Agreed. Only reason I didn't was there's a prototype in
-include/linux/vfio.h to satisfy the call to vfio_init_device from
-_vfio_alloc_device, and I didn't want to get into moving things around
-if I didn't need to. I can do that on top, if you'd like.
+Definitely wasn't referring to hijacking it for other purposes, which
+is the main reason I wanted to clarify the documentation and the
+naming of private_fd. Anyway, I'm glad to see that we're in agreement.
+Once I've tightened the screws, I'll share the pKVM port as an RFC as
+well.
 
-Eric
+Cheers,
+/fuad
