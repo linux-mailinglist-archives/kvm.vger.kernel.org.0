@@ -2,168 +2,201 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67F8B604B07
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 17:17:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7987F604B23
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 17:22:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232411AbiJSPRs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 11:17:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36520 "EHLO
+        id S230139AbiJSPWL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 11:22:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232075AbiJSPRd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 11:17:33 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 717CA1CD6B0
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 08:10:24 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id n7so17561031plp.1
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 08:10:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2DixuWllqtEEhZE9JBfkpCOOYoYTM4QC00/Ubs5BToo=;
-        b=qB4BoG68qOoT7hZPHxcqZYEg2fNwccwvH+/dO+OJVWxexqLR5iTgSozi/pX8RsH+6b
-         ixr79O64VG2ucycVujOhqy1H+nkgdVFYjH5AMEgkZly4DmjCvb3Af1MPLyp8NOTWDM7/
-         xxOQ3zVnrNIbh/VFW2TLRRQI2Hd3Pk6O6PKZC79vlD886B8hMY6cMspUVnl3TncH8qfp
-         Bp50U2mscsn+B94lhD0cgzoN3gJ2XIhEwEJxXGqTtcEyWtbJ98C2OVsEWg8YA+8IBohw
-         GJsxuhrSYsGtg9a3p/MtpNySvqLZr84SG+rMrfqe/GpCvQBjbHdCi4WyqrBEv6VyKHLs
-         N7+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2DixuWllqtEEhZE9JBfkpCOOYoYTM4QC00/Ubs5BToo=;
-        b=PoMREthivl0cu+Jjwwl4GBQoQwfiG2a7IYko2Y2kZbkPaHNQwU7qtYn0708Q4z13DG
-         avsvHjXtBMar15nh3enNKQU6exuMwZsTLp+DhcGN6a8/cImBRZfchIub4VXRFXg5eKod
-         heM78nrHNgXti/7YeLAtEtIGq7BYeHd5DLsuUlvHXn3+IuD9EfCyGLVQom4ySrCBWR+R
-         oeTRqZtLzVtbPvTfb53mQFCW52Gu1fEtauyphvQYsCy2eJqEO2hR/l5Ai0Lh44DOntT7
-         MR6H2fGuwXj5ASSKa2R9fRvMmQ3TDGK8VLJnqz1kQVEe/OlqztzVMYLPCQiFef5l+GP2
-         kv8g==
-X-Gm-Message-State: ACrzQf1BDW+8LHbDYM0gAvjoky/cwTsn+wKM7Dm1eJkZTbeWd2CunKwI
-        l4u4Fvx92+sDFM0LprvUiMn4pA==
-X-Google-Smtp-Source: AMsMyM4R0PY7qix/nuvdxWbd5kybx++ZPgEWv4AvW7PfszITQWd9Rad0fsqGrCGtC6Nbvf/b90qV0Q==
-X-Received: by 2002:a17:903:1205:b0:178:ac4e:70b8 with SMTP id l5-20020a170903120500b00178ac4e70b8mr8719937plh.52.1666192172629;
-        Wed, 19 Oct 2022 08:09:32 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id f1-20020a170902ff0100b0018099c9618esm10734227plj.231.2022.10.19.08.09.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Oct 2022 08:09:32 -0700 (PDT)
-Date:   Wed, 19 Oct 2022 15:09:28 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Jiaxi Chen <jiaxi.chen@linux.intel.com>, kvm@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, pbonzini@redhat.com,
-        ndesaulniers@google.com, alexandre.belloni@bootlin.com,
-        peterz@infradead.org, jpoimboe@kernel.org,
-        chang.seok.bae@intel.com, pawan.kumar.gupta@linux.intel.com,
-        babu.moger@amd.com, jmattson@google.com, sandipan.das@amd.com,
-        tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        fenghua.yu@intel.com, keescook@chromium.org,
-        jane.malalane@citrix.com, nathan@kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/6] x86: KVM: Enable AVX-VNNI-INT8 CPUID and expose it
- to guest
-Message-ID: <Y1ATKF2xjERFbspn@google.com>
-References: <20221019084734.3590760-1-jiaxi.chen@linux.intel.com>
- <20221019084734.3590760-5-jiaxi.chen@linux.intel.com>
- <Y0+6tJ7MiZWbYK5l@zn.tnic>
- <Y1AQX3RfM+awULlE@google.com>
+        with ESMTP id S229760AbiJSPVy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 11:21:54 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFCF916EA15
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 08:15:08 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29JFC3Aa007762
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 15:14:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=A7lZ+1vWeDfOIetqwHJ3h+FKFmxX/cMyKq+91s9zMQg=;
+ b=GXO8HRPG5oUaINVeYrQNK5k8iB1cUBJJh8xUfVz+4ajA0dxwHZhh2ckmaNTHEqtTWPzV
+ 7iF0E71yLtc1bRNZJU4GpG9EbdwOaidyrOrcrFQYLYxSbf3SKebDm4+P/PXbapOhgoKP
+ OS54L/BRH9gBTmnippnYQaT5kC/hL1vf7SDHF1YMNfpsSWhIGSbywVB100y0IDMenNM2
+ u5A9s+jBuL38b6c6UXu58ZK/9xcae8HtnfXbUIoEiXyrNrLY4GiHJZRrW/6FS5c45q4m
+ EXq8o//CXlkJ+r3fOA7k4IrhKMZnhh4+e+aRbPfGMWnmUPbRw6c0czPJRzVa5yPiczs3 3w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kaknx84t0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 15:14:07 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29JFC4KU007932
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 15:14:06 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kaknx84r8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Oct 2022 15:14:06 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29JF9O5q029677;
+        Wed, 19 Oct 2022 15:14:04 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03ams.nl.ibm.com with ESMTP id 3k7mg97d8q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Oct 2022 15:14:04 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29JF917K45023512
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Oct 2022 15:09:01 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4EDD1AE055;
+        Wed, 19 Oct 2022 15:14:01 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 104A1AE053;
+        Wed, 19 Oct 2022 15:14:01 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.8.239])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 19 Oct 2022 15:14:00 +0000 (GMT)
+Date:   Wed, 19 Oct 2022 17:13:59 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 1/1] s390x: do not enable PV dump
+ support by default
+Message-ID: <20221019171359.2b1db783@p-imbrenda>
+In-Reply-To: <20221019145320.1228710-2-nrb@linux.ibm.com>
+References: <20221019145320.1228710-1-nrb@linux.ibm.com>
+        <20221019145320.1228710-2-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y1AQX3RfM+awULlE@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: MUqvm3AArJtMnCYH2E2SgshmghmMPn2i
+X-Proofpoint-GUID: g14TKRjLE3WqgEFb40RLyT7JWb_qV0yD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-19_09,2022-10-19_03,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=0
+ phishscore=0 lowpriorityscore=0 adultscore=0 clxscore=1015
+ priorityscore=1501 mlxscore=0 mlxlogscore=999 malwarescore=0 spamscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210190085
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 19, 2022, Sean Christopherson wrote:
-> On Wed, Oct 19, 2022, Borislav Petkov wrote:
-> > On Wed, Oct 19, 2022 at 04:47:32PM +0800, Jiaxi Chen wrote:
-> > > AVX-VNNI-INT8 is a new set of instructions in the latest Intel platform
-> > > Sierra Forest. It multiplies the individual bytes of two unsigned or
-> > > unsigned source operands, then add and accumulate the results into the
-> > > destination dword element size operand. This instruction allows for the
-> > > platform to have superior AI capabilities.
-> > > 
-> > > The bit definition:
-> > > CPUID.(EAX=7,ECX=1):EDX[bit 4]
-> >
-> > For this particular one, use scattered.c instead of adding a new leaf.
+On Wed, 19 Oct 2022 16:53:20 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
+
+> Currently, dump support is always enabled by setting the respective
+> plaintext control flag (PCF). Unfortunately, older machines without
+> support for PV dump will not start the guest when this PCF is set. This
+> will result in an error message like this:
 > 
-> Unless the kernel wants to use X86_FEATURE_AVX_VNNI_INT8, which seems unlikely,
-> there's no need to create a scattered entry.  This can be handled in KVM by adding
-> a KVM-only leaf entry (which will be needed no matter what), plus a #define for
-> X86_FEATURE_AVX_VNNI_INT8 to direct it to the KVM entry.
+> qemu-system-s390x: KVM PV command 2 (KVM_PV_SET_SEC_PARMS) failed: header rc 106 rrc 0 IOCTL rc: -22
 > 
-> E.g. 
+> Hence, by default, disable dump support to preserve compatibility with
+> older machines. Users can enable dumping support by passing
+> --enable-dump to the configure script.
 > 
-> diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
-> index a19d473d0184..25e7bfc61607 100644
-> --- a/arch/x86/kvm/reverse_cpuid.h
-> +++ b/arch/x86/kvm/reverse_cpuid.h
-> @@ -13,6 +13,7 @@
->   */
->  enum kvm_only_cpuid_leafs {
->         CPUID_12_EAX     = NCAPINTS,
-> +       CPUID_7_1_EDX,
->         NR_KVM_CPU_CAPS,
+> Fixes: 3043685825d9 ("s390x: create persistent comm-key")
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> ---
+>  configure      | 11 +++++++++++
+>  s390x/Makefile | 26 +++++++++++++++++---------
+>  2 files changed, 28 insertions(+), 9 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 5b7daac3c6e8..b81f20942c9c 100755
+> --- a/configure
+> +++ b/configure
+> @@ -28,6 +28,7 @@ errata_force=0
+>  erratatxt="$srcdir/errata.txt"
+>  host_key_document=
+>  gen_se_header=
+> +enable_dump=no
+>  page_size=
+>  earlycon=
+>  efi=
+> @@ -67,6 +68,9 @@ usage() {
+>  	    --gen-se-header=GEN_SE_HEADER
+>  	                           Provide an executable to generate a PV header
+>  	                           requires --host-key-document. (s390x-snippets only)
+> +	    --[enable|disable]-dump
+> +	                           Allow PV guests to be dumped. Requires at least z16.
+> +	                           (s390x only)
+>  	    --page-size=PAGE_SIZE
+>  	                           Specify the page size (translation granule) (4k, 16k or
+>  	                           64k, default is 64k, arm64 only)
+> @@ -146,6 +150,12 @@ while [[ "$1" = -* ]]; do
+>  	--gen-se-header)
+>  	    gen_se_header="$arg"
+>  	    ;;
+> +	--enable-dump)
+> +	    enable_dump=yes
+> +	    ;;
+> +	--disable-dump)
+> +	    enable_dump=no
+> +	    ;;
+>  	--page-size)
+>  	    page_size="$arg"
+>  	    ;;
+> @@ -387,6 +397,7 @@ U32_LONG_FMT=$u32_long
+>  WA_DIVIDE=$wa_divide
+>  GENPROTIMG=${GENPROTIMG-genprotimg}
+>  HOST_KEY_DOCUMENT=$host_key_document
+> +CONFIG_DUMP=$enable_dump
+>  CONFIG_EFI=$efi
+>  CONFIG_WERROR=$werror
+>  GEN_SE_HEADER=$gen_se_header
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 649486f2d4a0..271b6803a1c5 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -173,18 +173,26 @@ $(comm-key):
+>  %.bin: %.elf
+>  	$(OBJCOPY) -O binary  $< $@
 >  
->         NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
-> @@ -24,6 +25,16 @@ enum kvm_only_cpuid_leafs {
->  #define KVM_X86_FEATURE_SGX1           KVM_X86_FEATURE(CPUID_12_EAX, 0)
->  #define KVM_X86_FEATURE_SGX2           KVM_X86_FEATURE(CPUID_12_EAX, 1)
->  
-> +#define KVM_X86_FEATURE_AVX_VNNI_INT8  KVM_X86_FEATURE(CPUID_7_1_EDX, 4)
+> -# The genprotimg arguments for the cck changed over time so we need to
+> -# figure out which argument to use in order to set the cck
+> -GENPROTIMG_HAS_COMM_KEY = $(shell $(GENPROTIMG) --help | grep -q -- --comm-key && echo yes)
+> -ifeq ($(GENPROTIMG_HAS_COMM_KEY),yes)
+> -	GENPROTIMG_COMM_KEY = --comm-key $(comm-key)
+> -else
+> -	GENPROTIMG_COMM_KEY = --x-comm-key $(comm-key)
+> +# Will only be filled when dump has been enabled
+> +GENPROTIMG_COMM_KEY =
+> +# allow PCKMO
+> +genprotimg_pcf = 0x000000e0
 > +
-> +/*
-> + * Alias X86_FEATURE_* to the KVM variant for features in KVM-only leafs that
-> + * aren't scattered by cpufeatures.h so that X86_FEATURE_* can be used in KVM,
-> + * e.g. to query guest CPUID.  As a bonus, no translation is needed for these
-> + * features in __feature_translate().
-> + */
-> +#define X86_FEATURE_AVX_VNNI_INT8      KVM_X86_FEATURE_AVX_VNNI_INT8
+> +ifeq ($(CONFIG_DUMP),yes)
+> +	# The genprotimg arguments for the cck changed over time so we need to
+> +	# figure out which argument to use in order to set the cck
+> +	GENPROTIMG_HAS_COMM_KEY = $(shell $(GENPROTIMG) --help | grep -q -- --comm-key && echo yes)
+> +	ifeq ($(GENPROTIMG_HAS_COMM_KEY),yes)
+> +		GENPROTIMG_COMM_KEY = --comm-key $(comm-key)
+> +	else
+> +		GENPROTIMG_COMM_KEY = --x-comm-key $(comm-key)
+> +	endif
+> +
+> +	# allow dumping + PCKMO
+> +	genprotimg_pcf = 0x200000e0
+>  endif
+>  
+>  # use x-pcf to be compatible with old genprotimg versions
+> -# allow dumping + PCKMO
+> -genprotimg_pcf = 0x200000e0
+>  genprotimg_args = --host-key-document $(HOST_KEY_DOCUMENT) --no-verify $(GENPROTIMG_COMM_KEY) --x-pcf $(genprotimg_pcf)
+>  
+>  %selftest.pv.bin: %selftest.bin $(HOST_KEY_DOCUMENT) $(patsubst %.pv.bin,%.parmfile,$@) $(comm-key)
 
-Actually, there's no need for KVM_X86_FEATURE_AVX_VNNI_INT8 in this case, just
-#define X86_FEATURE_AVX_VNNI_INT8 directly.  The KVM_ prefixed macro exists purely
-to redirect the non-KVM_ version, but that's unnecessary in this case.
-
-diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
-index a19d473d0184..38adafb03490 100644
---- a/arch/x86/kvm/reverse_cpuid.h
-+++ b/arch/x86/kvm/reverse_cpuid.h
-@@ -13,6 +13,7 @@
-  */
- enum kvm_only_cpuid_leafs {
-        CPUID_12_EAX     = NCAPINTS,
-+       CPUID_7_1_EDX,
-        NR_KVM_CPU_CAPS,
- 
-        NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
-@@ -24,6 +25,13 @@ enum kvm_only_cpuid_leafs {
- #define KVM_X86_FEATURE_SGX1           KVM_X86_FEATURE(CPUID_12_EAX, 0)
- #define KVM_X86_FEATURE_SGX2           KVM_X86_FEATURE(CPUID_12_EAX, 1)
- 
-+/*
-+ * Omit the KVM_ prefix for features in KVM-only leafs that aren't scattered by
-+ * cpufeatures.h so that X86_FEATURE_* can be used in KVM,* e.g. to query guest
-+ * CPUID.  As a bonus, no handling in __feature_translate() is needed.
-+ */
-+#define X86_FEATURE_AVX_VNNI_INT8      KVM_X86_FEATURE(CPUID_7_1_EDX, 4)
-+
- struct cpuid_reg {
-        u32 function;
-        u32 index;
-@@ -48,6 +56,7 @@ static const struct cpuid_reg reverse_cpuid[] = {
-        [CPUID_7_1_EAX]       = {         7, 1, CPUID_EAX},
-        [CPUID_12_EAX]        = {0x00000012, 0, CPUID_EAX},
-        [CPUID_8000_001F_EAX] = {0x8000001f, 0, CPUID_EAX},
-+       [CPUID_7_1_EDX]       = {         7, 1, CPUID_EDX},
- };
