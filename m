@@ -2,55 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB98260520F
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 23:36:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 994F1605210
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 23:36:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230505AbiJSVg3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 17:36:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34080 "EHLO
+        id S231135AbiJSVgc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 17:36:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229803AbiJSVg2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 17:36:28 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86FED185425
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 14:36:27 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id a11-20020a056a001d0b00b005635c581a24so10130542pfx.17
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 14:36:27 -0700 (PDT)
+        with ESMTP id S229803AbiJSVgb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 17:36:31 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B24C194F82
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 14:36:30 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id gz13-20020a17090b0ecd00b0020d67a4e6e5so7808647pjb.3
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 14:36:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=PnSH3vVxwGsS8m9ew2l67OjK+KiDAxDYc+tAVIHDXKg=;
-        b=g0gs/QDJIxkhakjNOqrC+nDFoxufGA36nL55/bcChRjV4hrdMrWSGAFYxOryneZcT5
-         4nlMH6E0IacDdi+UhdePFkLpBP/HLa5rFAA9pvx+8YFEFM7v4hzIvSke/mcjt+kKw3lN
-         OneR6PiGFzwnXCE7L61Gp4Qdx72AXnwI7a6rt7pwIJJFL4SLL2T/Z7PSus1VBrcpcupS
-         hBww/CFwMQYiSedZqA1xBMl5Y3YGmNb/+0AgRvmcI5xDFqCHO+HKt2QTDbc8Ar0Y+weq
-         +63fz3E4jx+9NTVIAtJSEYxLCL87bJf1wNdErrkN/KpW8e3KpNdDgSjfqYEOq1oa9QZS
-         L5fw==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3c3fjpS7b6lyRZwyafOTjKsv3G2yFfUTLLOxAv+pE68=;
+        b=eYBHpwKfZg4P/ZAo2gwOzhtUs2xxkNKRCNRo+RxKv0PE5v+UBuzHss1HYh7YpqMhh+
+         FGnexuvXV/sxfX6LQvqDLafTD83ujqkkvil28FSj2cor6tfsFaVskEe48/xw12r5rbdZ
+         dsohLV1OL7hYsnWyMX9TNQDeZ1lKLfrqR+NXbH3XS++W1jFMtDeAyYFM3bFV0NeNsnM9
+         +wTLBjuKt20emWqTdaCEoQnhuSODDdx2GB9Hboqn8FVavVs4xE6fgDwmgTysGfSv3WRb
+         tTchKZuXmpfzJoRcBUV+gWln4z21tuWCcyXUb+k2y5O5iK1ptMVLj08zmeI3LahyiW4d
+         P87g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PnSH3vVxwGsS8m9ew2l67OjK+KiDAxDYc+tAVIHDXKg=;
-        b=cr9GlIN4UaFeJiFmoEhyk70bF40bLj7kr2+Zt3aKqdR0Gi0h3V2ffnGiQd759j5ulR
-         x0uLI7gbecRCF+lBKBj2s4UqDaen3lXU/an07FjpRxUcNX23EIPF5uefO9XLoukmX/Rp
-         mL35QboSX0lG1WhjVHBgUx6qtenEH+pHe0EUatw/nh0e2xYXWxx989Mh1pV0fSeaCJQd
-         V3HrcqZnozedMItqCofSqiXY/7uu9qgAgFcOe/5UZK6+UBCBBBaWvu/XCIgBsIXATYGa
-         xYi75JCZHqUIMBRHgMDTOwWnIQRW32J/UiCZciwxmk3Rzub1dpLaSui2kSAY+aczAQUA
-         aqOA==
-X-Gm-Message-State: ACrzQf2b4uc8gNz/lr7FadfVjgPxBqaYXublmyMiC5vuYnQw/Rmiu/uu
-        rtQvAYQBMMLvmDWDuOrCHNtfYwJ7CoU78gQ2Wjkpe5IdQkvWHKWhLCFa0PJnmE8l1Q39zSnhGnG
-        QiCPaBlR8GDbXop0F9Uk25qiNbu2ePfQQ96C0HI/v8nEEUKTyg6+6tCkMcBcklo8=
-X-Google-Smtp-Source: AMsMyM7g+Q3AB6pqX0xkbp6CQwZ0/z+OucgSC6XhXHgeKmy9xAKO/d3fHeEv1Wv7kA07uU3SC0PyHag0M3p2yw==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3c3fjpS7b6lyRZwyafOTjKsv3G2yFfUTLLOxAv+pE68=;
+        b=ZhVuxORT4Eu5FqdDABacbj+DpjsnwNiP4QYaYgm+chQlrjAt5fgAc00RgChZbPLwbg
+         X1C8vp9p+CPuLFbPxwlrX07Is1apH9UI3dp6OKzByfik9YMEdTosW533FkJw5ZyLz19g
+         iXDSk3ooLCiTfACxdZv417mOM2jkY0X6M4eoixkxbNOmicOH+i60j+iwQhk/FKDo1uwL
+         AVY9buxunncT3tMaCIOxVq/NcjtCRBrKAAtWlzpVUyk1X1dh0x8XKqTdvx9pC7w5R/R9
+         Kc/fj4wTk1Hvp4ataXWvcqEKkw4VqIrLi0o/iXGqsln4sTAosP/EioaBSIyyvZI1bmGI
+         tg3w==
+X-Gm-Message-State: ACrzQf0Sdhk5+Z+q8KmH8R/LuHaXIQvVhUOGbUeVIHi4DBjezbgMjNU8
+        jAI7vDH9WgaNjxLqnCyjSp2XVULMGfHzyGknnLZYHuqtwQd4hZy7du1bKCsg6vfe0rc5s5HgvZm
+        YgQRDXBNl5Qvv1iw+a5gYRMfvyRW43BmKkljSnkiVarwglbjdts0MpD5maHFt4SQ=
+X-Google-Smtp-Source: AMsMyM7quhyFHevROLu76Ailc8FZuIEU/r+NrZmVHDHgYg2DMi6vUV6kI2TvQ+YO/sP+Y8jUEXrJBVPkkpSrzA==
 X-Received: from loggerhead.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:29a])
  (user=jmattson job=sendgmr) by 2002:a17:90a:c986:b0:205:f08c:a82b with SMTP
- id w6-20020a17090ac98600b00205f08ca82bmr1438pjt.1.1666215386332; Wed, 19 Oct
- 2022 14:36:26 -0700 (PDT)
-Date:   Wed, 19 Oct 2022 14:36:18 -0700
+ id w6-20020a17090ac98600b00205f08ca82bmr1447pjt.1.1666215388682; Wed, 19 Oct
+ 2022 14:36:28 -0700 (PDT)
+Date:   Wed, 19 Oct 2022 14:36:19 -0700
+In-Reply-To: <20221019213620.1953281-1-jmattson@google.com>
 Mime-Version: 1.0
+References: <20221019213620.1953281-1-jmattson@google.com>
 X-Mailer: git-send-email 2.38.0.413.g74048e4d9e-goog
-Message-ID: <20221019213620.1953281-1-jmattson@google.com>
-Subject: [PATCH v2 0/2] KVM: nVMX: Add IBPB between L2 and L1 to
+Message-ID: <20221019213620.1953281-2-jmattson@google.com>
+Subject: [PATCH v2 1/2] KVM: VMX: Guest usage of IA32_SPEC_CTRL is likely
 From:   Jim Mattson <jmattson@google.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com
 Cc:     Jim Mattson <jmattson@google.com>
@@ -65,28 +67,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since L1 and L2 share branch prediction modes (guest {kernel,user}), the
-hardware will not protect indirect branches in L1 from steering by a
-malicious agent in L2. However, IBRS guarantees this protection. (For
-basic IBRS, a value of 1 must be written to IA32_SPEC_CTRL.IBRS after
-the transition  from L2 to L1.)
+At this point in time, most guests (in the default, out-of-the-box
+configuration) are likely to use IA32_SPEC_CTRL.  Therefore, drop the
+compiler hint that it is unlikely for KVM to be intercepting WRMSR of
+IA32_SPEC_CTRL.
 
-Fix the regression introduced in commit 5c911beff20a ("KVM: nVMX: Skip
-IBPB when switching between vmcs01 and vmcs02") by issuing an IBPB when
-emulating a VM-exit from L2 to L1.
+Signed-off-by: Jim Mattson <jmattson@google.com>
+---
+ arch/x86/kvm/vmx/vmx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This is CVE-2022-2196.
-
-v2: Reworded some comments [Sean].
-
-Jim Mattson (2):
-  KVM: VMX: Guest usage of IA32_SPEC_CTRL is likely
-  KVM: VMX: Execute IBPB on emulated VM-exit when guest has IBRS
-
- arch/x86/kvm/vmx/nested.c | 11 +++++++++++
- arch/x86/kvm/vmx/vmx.c    | 10 ++++++----
- 2 files changed, 17 insertions(+), 4 deletions(-)
-
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 9dba04b6b019..b092f61b8258 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -858,7 +858,7 @@ unsigned int __vmx_vcpu_run_flags(struct vcpu_vmx *vmx)
+ 	 * to change it directly without causing a vmexit.  In that case read
+ 	 * it after vmexit and store it in vmx->spec_ctrl.
+ 	 */
+-	if (unlikely(!msr_write_intercepted(vmx, MSR_IA32_SPEC_CTRL)))
++	if (!msr_write_intercepted(vmx, MSR_IA32_SPEC_CTRL))
+ 		flags |= VMX_RUN_SAVE_SPEC_CTRL;
+ 
+ 	return flags;
 -- 
 2.38.0.413.g74048e4d9e-goog
 
