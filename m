@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E4720605417
-	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 01:41:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2AE88605418
+	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 01:41:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231684AbiJSXlE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 19:41:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43720 "EHLO
+        id S231795AbiJSXlF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 19:41:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231655AbiJSXlC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 19:41:02 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09FE7144E2C
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 16:41:01 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-33dc888dc62so183230217b3.4
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 16:41:01 -0700 (PDT)
+        with ESMTP id S229630AbiJSXlD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 19:41:03 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A95714706B
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 16:41:02 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-355ece59b6fso184725417b3.22
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 16:41:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8CXVNYUpJoVjRpDEGzmn6NH/mgEdClCVKX/GIlWS7CQ=;
-        b=HU7D/ksLYkWUOjPDsKqihV0KWCCLoSK0f6lenKp5anSi2/2yDxw5c4e+Jl+cs65y8V
-         HeRAKUgAzwESYB4rnhGtBFSnjCORNF7qQYHSd8VIxNuuGcCAOKqCFMyhrzlh5YaAqAW1
-         CzMRgsFkVlnN9kUxDgSqh279W5XTfN+lr4tNALV2Z5NdBpwjy5ah958AzXxx2N1bC1Jf
-         JWEj4/PDVuvYf4F83B2Bv7Yo0cuHTfyQwgP3JPdlsx4UpdPnH1wVYnZ1WKwez9AYqPi8
-         apsl8WJEWC7RGpe+rW0OvWZHjrTMq5N4nNt3HiZrxuQgnRAnRrtASSU6bODc7kfkr+Bc
-         V4xw==
+        bh=zFH3G7LsSXeaC13FetE3TNq4DuchE1MnbnYjQT4HA7E=;
+        b=YNsR91JctrtPdsguBr6NgBHhDdYnYDeP6HxmtsefOhJeAqHMIxPZ3axdeVFOqJIhxQ
+         c2rH8QZE4x3io6GUnjLyO/T7z9trIHyphbkpp2T9fx4KLiqq364qJ/GFIziTtPHyGVHr
+         J0jq9xom2PBwl7ggJ3PMfSXEwdQqko3L5r3tTHk/xA2ajx6xwF1nOLxtjt7jW7Zvyaa6
+         Vh7yAxRWMi7jz9YwYOGDg+tGByJbciklEPYGQjKRx+ToSHexQ+haGxLTNHHwkKL62+OC
+         mSaYp/O9K4PFbfDMv5f1+7mRDS6fYbfRbNpmdSpRTDJJWLhGkLaa8XaggbT9De3Lvqut
+         Ka8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8CXVNYUpJoVjRpDEGzmn6NH/mgEdClCVKX/GIlWS7CQ=;
-        b=fMpmGB+7pJszrNv2Bbe89Nk07B1cZbva26hvoLTPBY462CRMorgMzc+IhfP0k4Ol6X
-         wSrzeh8bvC2SIPZeV4WNMIyGXiz+hXvVWOM1HoGEpwLV9KuRz4PVSRG8j1blXmT590Gg
-         +gqCIeYyQ3swZULXN3SSOw2QtBGMFbLZUBZlgHz9Go9YYlNOBq9U5xGtSNw2418+En+a
-         Rtd+R14HlwloqX83BRZqqqqCjgx+WYtpWcs+drMmFAW2cbzbvemZdJZT/rqO+Vif1ANv
-         0glioz4Yh5ORg9aMWZTFu58MI4Wsoo34TZ2N1embtR+MFPJPgTLpNIrdzxpe+mLQLJY7
-         FoYQ==
-X-Gm-Message-State: ACrzQf2WOYwINY0K+2+hquPZqYyijSlF7SF9VGd6JIuwJp/RxUiSVunN
-        PWulsrsqvDY/CCuNjyGuQQQm/flaLOJvPQ==
-X-Google-Smtp-Source: AMsMyM7my4JYRAVAh/k2kjYVaJwem1CGx7JHjcS6986SO6ob2FIuSxCaXmJk/ErDDkpO2Jn85kU0vfeCh7783Q==
+        bh=zFH3G7LsSXeaC13FetE3TNq4DuchE1MnbnYjQT4HA7E=;
+        b=e3ARPE52vNCb/u7Itz21vA9EaFs/5Tol1jpXtKDyfnp7cKWHXB1ufTTWi88+NifHVa
+         8wdY7Pz7UV8ueusabSuVhH2Tu01yJv/n2PkICB3vXSvdeR2GtNyqUr4DUZ3qwbWjbyd7
+         Pdmz4s/JuDB53ump0GLWjHEOB6muETDy5bw9gfFXRNLbxPc0Z+6aEHCJ6T16q3A8Sxll
+         Xrx1kmx37Fv4UyZCmgkkNY7pIh+BOoedQWQZVTCtyFoja5rN+hnnBHnIjSAOYbhojvEv
+         rfAo6zXPq+0VG+H8jPV6tu4f1ryGQ9ZaxI1oUcrRaedmBikVr2cupni1bAsR1gl0nlIw
+         peoQ==
+X-Gm-Message-State: ACrzQf21tPzytsTLZdineo0m5tF5AQPT3jsgJBicj4gY2fzsStOMvJVT
+        K0orfKhlGHaPtqTmtHVAKFaR1N6A6blRnA==
+X-Google-Smtp-Source: AMsMyM6RwHZLehJEkuJ61NRKoZExZ/UgCPFJQWPEc13LGeZe5IQO9Qx608bTkYBQ5qM62oVF5lnac77yPAhVXA==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a81:2544:0:b0:360:c270:15a1 with SMTP id
- l65-20020a812544000000b00360c27015a1mr8557272ywl.67.1666222860372; Wed, 19
- Oct 2022 16:41:00 -0700 (PDT)
-Date:   Wed, 19 Oct 2022 16:40:49 -0700
+ (user=dmatlack job=sendgmr) by 2002:a25:6e54:0:b0:6c2:645e:6d7b with SMTP id
+ j81-20020a256e54000000b006c2645e6d7bmr8838555ybc.124.1666222861707; Wed, 19
+ Oct 2022 16:41:01 -0700 (PDT)
+Date:   Wed, 19 Oct 2022 16:40:50 -0700
 In-Reply-To: <20221019234050.3919566-1-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20221019234050.3919566-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.38.0.413.g74048e4d9e-goog
-Message-ID: <20221019234050.3919566-2-dmatlack@google.com>
-Subject: [PATCH v2 1/2] KVM: selftests: Introduce a selftest to measure
- execution performance
+Message-ID: <20221019234050.3919566-3-dmatlack@google.com>
+Subject: [PATCH v2 2/2] KVM: x86/mmu: Split huge pages mapped by the TDP MMU
+ on fault
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -70,314 +70,191 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce a new selftest, execute_perf_test, that uses the
-perf_test_util framework to measure the performance of executing code
-within a VM. This test is similar to the other perf_test_util-based
-tests in that it spins up a variable number of vCPUs and runs them
-concurrently, accessing memory.
+Now that the TDP MMU has a mechanism to split huge pages, use it in the
+fault path when a huge page needs to be replaced with a mapping at a
+lower level.
 
-In order to support executiong, extend perf_test_util to populate guest
-memory with return instructions rather than random garbage. This way
-memory can be execute simply by calling it.
+This change reduces the negative performance impact of NX HugePages.
+Prior to this change if a vCPU executed from a huge page and NX
+HugePages was enabled, the vCPU would take a fault, zap the huge page,
+and mapping the faulting address at 4KiB with execute permissions
+enabled. The rest of the memory would be left *unmapped* and have to be
+faulted back in by the guest upon access (read, write, or execute). If
+guest is backed by 1GiB, a single execute instruction can zap an entire
+GiB of its physical address space.
 
-Currently only x86-64 supports execution, but other architectures can be
-easily added by providing their return code instruction.
+For example, it can take a VM longer to execute from its memory than to
+populate that memory in the first place:
+
+$ ./execute_perf_test -s anonymous_hugetlb_1gb -v96
+
+Populating memory             : 2.748378795s
+Executing from memory         : 2.899670885s
+
+With this change, such faults split the huge page instead of zapping it,
+which avoids the non-present faults on the rest of the huge page:
+
+$ ./execute_perf_test -s anonymous_hugetlb_1gb -v96
+
+Populating memory             : 2.729544474s
+Executing from memory         : 0.111965688s   <---
+
+This change also reduces the performance impact of dirty logging when
+eager_page_split=N. eager_page_split=N (abbreviated "eps=N" below) can
+be desirable for read-heavy workloads, as it avoids allocating memory to
+split huge pages that are never written and avoids increasing the TLB
+miss cost on reads of those pages.
+
+             | Config: ept=Y, tdp_mmu=Y, 5% writes           |
+             | Iteration 1 dirty memory time                 |
+             | --------------------------------------------- |
+vCPU Count   | eps=N (Before) | eps=N (After) | eps=Y        |
+------------ | -------------- | ------------- | ------------ |
+2            | 0.332305091s   | 0.019615027s  | 0.006108211s |
+4            | 0.353096020s   | 0.019452131s  | 0.006214670s |
+8            | 0.453938562s   | 0.019748246s  | 0.006610997s |
+16           | 0.719095024s   | 0.019972171s  | 0.007757889s |
+32           | 1.698727124s   | 0.021361615s  | 0.012274432s |
+64           | 2.630673582s   | 0.031122014s  | 0.016994683s |
+96           | 3.016535213s   | 0.062608739s  | 0.044760838s |
+
+Eager page splitting remains beneficial for write-heavy workloads, but
+the gap is now reduced.
+
+             | Config: ept=Y, tdp_mmu=Y, 100% writes         |
+             | Iteration 1 dirty memory time                 |
+             | --------------------------------------------- |
+vCPU Count   | eps=N (Before) | eps=N (After) | eps=Y        |
+------------ | -------------- | ------------- | ------------ |
+2            | 0.317710329s   | 0.296204596s  | 0.058689782s |
+4            | 0.337102375s   | 0.299841017s  | 0.060343076s |
+8            | 0.386025681s   | 0.297274460s  | 0.060399702s |
+16           | 0.791462524s   | 0.298942578s  | 0.062508699s |
+32           | 1.719646014s   | 0.313101996s  | 0.075984855s |
+64           | 2.527973150s   | 0.455779206s  | 0.079789363s |
+96           | 2.681123208s   | 0.673778787s  | 0.165386739s |
+
+Further study is needed to determine if the remaining gap is acceptable
+for customer workloads or if eager_page_split=N still requires a-priori
+knowledge of the VM workload, especially when considering these costs
+extrapolated out to large VMs with e.g. 416 vCPUs and 12TB RAM.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../testing/selftests/kvm/execute_perf_test.c | 185 ++++++++++++++++++
- .../selftests/kvm/include/perf_test_util.h    |   2 +
- .../selftests/kvm/lib/perf_test_util.c        |  25 ++-
- 5 files changed, 212 insertions(+), 2 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/execute_perf_test.c
+ arch/x86/kvm/mmu/tdp_mmu.c | 72 ++++++++++++++++++--------------------
+ 1 file changed, 34 insertions(+), 38 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 2f0d705db9db..60ec1f0b70b5 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -68,6 +68,7 @@
- /demand_paging_test
- /dirty_log_test
- /dirty_log_perf_test
-+/execute_perf_test
- /hardware_disable_test
- /kvm_create_max_vcpus
- /kvm_page_table_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 0172eb6cb6ee..73ea068f90de 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -132,6 +132,7 @@ TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
- TEST_GEN_PROGS_x86_64 += demand_paging_test
- TEST_GEN_PROGS_x86_64 += dirty_log_test
- TEST_GEN_PROGS_x86_64 += dirty_log_perf_test
-+TEST_GEN_PROGS_x86_64 += execute_perf_test
- TEST_GEN_PROGS_x86_64 += hardware_disable_test
- TEST_GEN_PROGS_x86_64 += kvm_create_max_vcpus
- TEST_GEN_PROGS_x86_64 += kvm_page_table_test
-diff --git a/tools/testing/selftests/kvm/execute_perf_test.c b/tools/testing/selftests/kvm/execute_perf_test.c
-new file mode 100644
-index 000000000000..665bdbe62206
---- /dev/null
-+++ b/tools/testing/selftests/kvm/execute_perf_test.c
-@@ -0,0 +1,185 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <inttypes.h>
-+#include <limits.h>
-+#include <pthread.h>
-+#include <sys/mman.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+
-+#include "kvm_util.h"
-+#include "test_util.h"
-+#include "perf_test_util.h"
-+#include "guest_modes.h"
-+
-+/* Global variable used to synchronize all of the vCPU threads. */
-+static int iteration;
-+
-+/* Set to true when vCPU threads should exit. */
-+static bool done;
-+
-+/* The iteration that was last completed by each vCPU. */
-+static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
-+
-+/* Whether to overlap the regions of memory vCPUs access. */
-+static bool overlap_memory_access;
-+
-+struct test_params {
-+	/* The backing source for the region of memory. */
-+	enum vm_mem_backing_src_type backing_src;
-+
-+	/* The amount of memory to allocate for each vCPU. */
-+	uint64_t vcpu_memory_bytes;
-+
-+	/* The number of vCPUs to create in the VM. */
-+	int nr_vcpus;
-+};
-+
-+static void assert_ucall(struct kvm_vcpu *vcpu, uint64_t expected_ucall)
-+{
-+	struct ucall uc;
-+
-+	TEST_ASSERT(expected_ucall == get_ucall(vcpu, &uc),
-+		    "Guest exited unexpectedly (expected ucall %" PRIu64
-+		    ", got %" PRIu64 ")",
-+		    expected_ucall, uc.cmd);
-+}
-+
-+static bool spin_wait_for_next_iteration(int *current_iteration)
-+{
-+	int last_iteration = *current_iteration;
-+
-+	do {
-+		if (READ_ONCE(done))
-+			return false;
-+
-+		*current_iteration = READ_ONCE(iteration);
-+	} while (last_iteration == *current_iteration);
-+
-+	return true;
-+}
-+
-+static void vcpu_thread_main(struct perf_test_vcpu_args *vcpu_args)
-+{
-+	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
-+	int current_iteration = 0;
-+
-+	while (spin_wait_for_next_iteration(&current_iteration)) {
-+		vcpu_run(vcpu);
-+		assert_ucall(vcpu, UCALL_SYNC);
-+		vcpu_last_completed_iteration[vcpu->id] = current_iteration;
-+	}
-+}
-+
-+static void spin_wait_for_vcpu(struct kvm_vcpu *vcpu, int target_iteration)
-+{
-+	while (READ_ONCE(vcpu_last_completed_iteration[vcpu->id]) !=
-+	       target_iteration) {
-+		continue;
-+	}
-+}
-+
-+static void run_iteration(struct kvm_vm *vm, const char *description)
-+{
-+	struct timespec ts_elapsed;
-+	struct timespec ts_start;
-+	struct kvm_vcpu *vcpu;
-+	int next_iteration;
-+
-+	/* Kick off the vCPUs by incrementing iteration. */
-+	next_iteration = ++iteration;
-+
-+	clock_gettime(CLOCK_MONOTONIC, &ts_start);
-+
-+	/* Wait for all vCPUs to finish the iteration. */
-+	list_for_each_entry(vcpu, &vm->vcpus, list)
-+		spin_wait_for_vcpu(vcpu, next_iteration);
-+
-+	ts_elapsed = timespec_elapsed(ts_start);
-+	pr_info("%-30s: %ld.%09lds\n",
-+		description, ts_elapsed.tv_sec, ts_elapsed.tv_nsec);
-+}
-+
-+static void run_test(enum vm_guest_mode mode, void *arg)
-+{
-+	struct test_params *params = arg;
-+	struct kvm_vm *vm;
-+
-+	vm = perf_test_create_vm(mode, params->nr_vcpus,
-+				 params->vcpu_memory_bytes, 1,
-+				 params->backing_src, !overlap_memory_access);
-+
-+	perf_test_start_vcpu_threads(params->nr_vcpus, vcpu_thread_main);
-+
-+	pr_info("\n");
-+
-+	perf_test_set_wr_fract(vm, 1);
-+	run_iteration(vm, "Populating memory");
-+
-+	perf_test_set_execute(vm, true);
-+	run_iteration(vm, "Executing from memory");
-+
-+	/* Set done to signal the vCPU threads to exit */
-+	done = true;
-+
-+	perf_test_join_vcpu_threads(params->nr_vcpus);
-+	perf_test_destroy_vm(vm);
-+}
-+
-+static void help(char *name)
-+{
-+	puts("");
-+	printf("usage: %s [-h] [-m mode] [-b vcpu_bytes] [-v nr_vcpus] [-o]  [-s mem_type]\n",
-+	       name);
-+	puts("");
-+	printf(" -h: Display this help message.");
-+	guest_modes_help();
-+	printf(" -b: specify the size of the memory region which should be\n"
-+	       "     dirtied by each vCPU. e.g. 10M or 3G.\n"
-+	       "     (default: 1G)\n");
-+	printf(" -v: specify the number of vCPUs to run.\n");
-+	printf(" -o: Overlap guest memory accesses instead of partitioning\n"
-+	       "     them into a separate region of memory for each vCPU.\n");
-+	backing_src_help("-s");
-+	puts("");
-+	exit(0);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct test_params params = {
-+		.backing_src = DEFAULT_VM_MEM_SRC,
-+		.vcpu_memory_bytes = DEFAULT_PER_VCPU_MEM_SIZE,
-+		.nr_vcpus = 1,
-+	};
-+	int opt;
-+
-+	guest_modes_append_default();
-+
-+	while ((opt = getopt(argc, argv, "hm:b:v:os:")) != -1) {
-+		switch (opt) {
-+		case 'm':
-+			guest_modes_cmdline(optarg);
-+			break;
-+		case 'b':
-+			params.vcpu_memory_bytes = parse_size(optarg);
-+			break;
-+		case 'v':
-+			params.nr_vcpus = atoi(optarg);
-+			break;
-+		case 'o':
-+			overlap_memory_access = true;
-+			break;
-+		case 's':
-+			params.backing_src = parse_backing_src_type(optarg);
-+			break;
-+		case 'h':
-+		default:
-+			help(argv[0]);
-+			break;
-+		}
-+	}
-+
-+	for_each_guest_mode(run_test, &params);
-+
-+	return 0;
-+}
-diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-index eaa88df0555a..ec2540e36906 100644
---- a/tools/testing/selftests/kvm/include/perf_test_util.h
-+++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-@@ -36,6 +36,7 @@ struct perf_test_args {
- 	uint64_t size;
- 	uint64_t guest_page_size;
- 	int wr_fract;
-+	bool execute;
- 
- 	/* Run vCPUs in L2 instead of L1, if the architecture supports it. */
- 	bool nested;
-@@ -52,6 +53,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int nr_vcpus,
- void perf_test_destroy_vm(struct kvm_vm *vm);
- 
- void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract);
-+void perf_test_set_execute(struct kvm_vm *vm, bool execute);
- 
- void perf_test_start_vcpu_threads(int vcpus, void (*vcpu_fn)(struct perf_test_vcpu_args *));
- void perf_test_join_vcpu_threads(int vcpus);
-diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-index 9618b37c66f7..99721076d31f 100644
---- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-+++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-@@ -38,6 +38,16 @@ static bool all_vcpu_threads_running;
- 
- static struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
- 
-+/*
-+ * When writing to guest memory, write the opcode for the `ret` instruction so
-+ * that subsequent iteractions can exercise instruction fetch by calling the
-+ * memory.
-+ *
-+ * NOTE: Non-x86 architectures would to use different values here to support
-+ * execute.
-+ */
-+#define RETURN_OPCODE 0xC3
-+
- /*
-  * Continuously write to the first 8 bytes of each page in the
-  * specified region.
-@@ -60,8 +70,10 @@ void perf_test_guest_code(uint32_t vcpu_idx)
- 		for (i = 0; i < pages; i++) {
- 			uint64_t addr = gva + (i * pta->guest_page_size);
- 
--			if (i % pta->wr_fract == 0)
--				*(uint64_t *)addr = 0x0123456789ABCDEF;
-+			if (pta->execute)
-+				((void (*)(void)) addr)();
-+			else if (i % pta->wr_fract == 0)
-+				*(uint64_t *)addr = RETURN_OPCODE;
- 			else
- 				READ_ONCE(*(uint64_t *)addr);
- 		}
-@@ -240,6 +252,15 @@ void __weak perf_test_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_v
- 	exit(KSFT_SKIP);
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 4e5b3ae824c1..c53767104d5b 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1146,6 +1146,9 @@ static int tdp_mmu_link_sp(struct kvm *kvm, struct tdp_iter *iter,
+ 	return 0;
  }
  
-+void perf_test_set_execute(struct kvm_vm *vm, bool execute)
-+{
-+#ifndef __x86_64__
-+	TEST_ASSERT(false, "Execute not supported on this architure; see RETURN_OPCODE.");
-+#endif
-+	perf_test_args.execute = execute;
-+	sync_global_to_guest(vm, perf_test_args);
-+}
++static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
++				   struct kvm_mmu_page *sp, bool shared);
 +
- static void *vcpu_thread_main(void *data)
- {
- 	struct vcpu_thread *vcpu = data;
+ /*
+  * Handle a TDP page fault (NPT/EPT violation/misconfiguration) by installing
+  * page tables and SPTEs to translate the faulting guest physical address.
+@@ -1171,49 +1174,42 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 		if (iter.level == fault->goal_level)
+ 			break;
+ 
+-		/*
+-		 * If there is an SPTE mapping a large page at a higher level
+-		 * than the target, that SPTE must be cleared and replaced
+-		 * with a non-leaf SPTE.
+-		 */
++		/* Step down into the lower level page table if it exists. */
+ 		if (is_shadow_present_pte(iter.old_spte) &&
+-		    is_large_pte(iter.old_spte)) {
+-			if (tdp_mmu_zap_spte_atomic(vcpu->kvm, &iter))
+-				break;
++		    !is_large_pte(iter.old_spte))
++			continue;
+ 
+-			/*
+-			 * The iter must explicitly re-read the spte here
+-			 * because the new value informs the !present
+-			 * path below.
+-			 */
+-			iter.old_spte = kvm_tdp_mmu_read_spte(iter.sptep);
+-		}
++		/*
++		 * If SPTE has been frozen by another thread, just give up and
++		 * retry, avoiding unnecessary page table allocation and free.
++		 */
++		if (is_removed_spte(iter.old_spte))
++			break;
+ 
+-		if (!is_shadow_present_pte(iter.old_spte)) {
+-			/*
+-			 * If SPTE has been frozen by another thread, just
+-			 * give up and retry, avoiding unnecessary page table
+-			 * allocation and free.
+-			 */
+-			if (is_removed_spte(iter.old_spte))
+-				break;
++		/*
++		 * The SPTE is either non-present or points to a huge page that
++		 * needs to be split.
++		 */
++		sp = tdp_mmu_alloc_sp(vcpu);
++		tdp_mmu_init_child_sp(sp, &iter);
+ 
+-			sp = tdp_mmu_alloc_sp(vcpu);
+-			tdp_mmu_init_child_sp(sp, &iter);
++		sp->nx_huge_page_disallowed = fault->huge_page_disallowed;
+ 
+-			sp->nx_huge_page_disallowed = fault->huge_page_disallowed;
++		if (is_shadow_present_pte(iter.old_spte))
++			ret = tdp_mmu_split_huge_page(kvm, &iter, sp, true);
++		else
++			ret = tdp_mmu_link_sp(kvm, &iter, sp, true);
+ 
+-			if (tdp_mmu_link_sp(kvm, &iter, sp, true)) {
+-				tdp_mmu_free_sp(sp);
+-				break;
+-			}
++		if (ret) {
++			tdp_mmu_free_sp(sp);
++			break;
++		}
+ 
+-			if (fault->huge_page_disallowed &&
+-			    fault->req_level >= iter.level) {
+-				spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+-				track_possible_nx_huge_page(kvm, sp);
+-				spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+-			}
++		if (fault->huge_page_disallowed &&
++		    fault->req_level >= iter.level) {
++			spin_lock(&kvm->arch.tdp_mmu_pages_lock);
++			track_possible_nx_huge_page(kvm, sp);
++			spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+ 		}
+ 	}
+ 
+@@ -1484,8 +1480,6 @@ static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
+ 	const int level = iter->level;
+ 	int ret, i;
+ 
+-	tdp_mmu_init_child_sp(sp, iter);
+-
+ 	/*
+ 	 * No need for atomics when writing to sp->spt since the page table has
+ 	 * not been linked in yet and thus is not reachable from any other CPU.
+@@ -1561,6 +1555,8 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
+ 				continue;
+ 		}
+ 
++		tdp_mmu_init_child_sp(sp, &iter);
++
+ 		if (tdp_mmu_split_huge_page(kvm, &iter, sp, shared))
+ 			goto retry;
+ 
 -- 
 2.38.0.413.g74048e4d9e-goog
 
