@@ -2,79 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 436FC604642
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 15:03:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18434604589
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 14:39:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232570AbiJSNDp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 09:03:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34004 "EHLO
+        id S233260AbiJSMjt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 08:39:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232611AbiJSND3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 09:03:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A96D1D463A
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 05:46:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666183572;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rt+KjTtKd5GM/lbgv3ThuxZ4mjfxNVrl70y97s4Oa2I=;
-        b=AdlnKdkTyL4yZUtSV80DMyj7h5Zk5T+9f9L0NFEHYp9l/PNORFeP66LnvnULQS6Mc111SM
-        0Q5k0w5OzyuVYWPOnnVyUsHf0dqXivf0uoY4NGzyoTxc4infCVeJll6r6BnhuA1lt8VZ++
-        vcjWTIDDL9XjAdXK1Zm2Ol9lNgZWOT8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-482-n93G0LGvOOSJyXudWSGAnA-1; Wed, 19 Oct 2022 08:13:39 -0400
-X-MC-Unique: n93G0LGvOOSJyXudWSGAnA-1
-Received: by mail-wr1-f72.google.com with SMTP id h4-20020adfa4c4000000b0022ec3966c3aso5495125wrb.6
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 05:13:39 -0700 (PDT)
+        with ESMTP id S233501AbiJSMjS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 08:39:18 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8C213B466
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 05:20:32 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id o12so19324455lfq.9
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 05:20:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=l66+WLbhAlzPkyHFepjJ8VPyMoK+GDU3eUQBN3ZbwNk=;
+        b=QfLHua9SUQ3cWtrSq3McnLndCx2mA3ijM5R/zZF0C4k3w7iTfpZiDMJD0dMzR8po7r
+         nT12MX7BJ+z+zM1uhGOyUEMQ6LfI7wMqwDZLNgbyVWd6UEUjOINItZKgEiZqYiU27Iq5
+         lK8khYGQGBm35jPdTcQndnZluivOIi36+9gQNysUPwL65LwDvnvOZUh75rXUwd6yMD6U
+         /xnNP/G2B5RmZp1H3AN3TciuxupqJzz1XHKECOrL1Um2g/tA1R12KxRZihAwGMod7mBV
+         vULmqNaidNLc0U27P3UnnAY+Ue5K9e24NPsWmtbT4Eyzlo5HcJQ2VjOBcWQavWyNmqH/
+         AEhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rt+KjTtKd5GM/lbgv3ThuxZ4mjfxNVrl70y97s4Oa2I=;
-        b=lOw2DeGlD3wHXAxvqZjNGDLT89da+yCu3QcPk3K/DfV1S1Ac723O4/dcvVn70aPqRD
-         FTNc6X9oICqtB1MuafIQql7ElEtUjvMwBFWNj2vXyAKtPcccIixrNMnd6xugvCqHjsFH
-         PgnvyujI9qG1FkgVUPJ/3owCk0z1UhqwdhAjDa5PgYbCSMaeRZJOuZQWbIZo5H2kbRsb
-         wa5I91QJ1eirUhBos1yKGv7BSqoEMKN1QW5w8a+Qo8uyiTu0FtXblL/UP34V9HaM8g1q
-         pNuSKWFjPPFDm9mYlzfWNj2qzMrP8Tk2/wXGnKcsgYKBdZndbY6WhwABaFYSLiCT/dbY
-         aFCw==
-X-Gm-Message-State: ACrzQf14nMwygLYjHMzKUdxOYtT+MtR2Tmtqx9vuQzgeyW1OcgsNB3p7
-        s1CtgUGF+1/BSL0ow0GH3oshOlxn0znotVUGblI2pG7kjjBFBHbONrcCMXdHDfXfOmB6mj8hcZt
-        kuABKDq5p5RNM
-X-Received: by 2002:a05:6000:15c7:b0:22e:7aea:f7b1 with SMTP id y7-20020a05600015c700b0022e7aeaf7b1mr4993890wry.213.1666181618816;
-        Wed, 19 Oct 2022 05:13:38 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM6JN+v9V/eI4lFO+Gpxy/bvHqkz+lbhiqh+NhJiJzp++eKrJi9AtneI5CkR/vfIsCG6bdbq4w==
-X-Received: by 2002:a05:6000:15c7:b0:22e:7aea:f7b1 with SMTP id y7-20020a05600015c700b0022e7aeaf7b1mr4993865wry.213.1666181618507;
-        Wed, 19 Oct 2022 05:13:38 -0700 (PDT)
-Received: from redhat.com ([2.54.191.184])
-        by smtp.gmail.com with ESMTPSA id o36-20020a05600c512400b003c6edc05159sm14710053wms.1.2022.10.19.05.13.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Oct 2022 05:13:37 -0700 (PDT)
-Date:   Wed, 19 Oct 2022 08:13:34 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        kvm list <kvm@vger.kernel.org>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Yury Norov <yury.norov@gmail.com>, netdev@vger.kernel.org
-Subject: Re: 6.1-rc1 regression: virtio-net cpumask and during reboot
-Message-ID: <20221019081320-mutt-send-email-mst@kernel.org>
-References: <ac72ff9d-4246-3631-6e31-8c3033a70bf0@linux.ibm.com>
- <20221019074308-mutt-send-email-mst@kernel.org>
- <780306ca-4aba-3cf7-88ca-75e1903f76d0@linux.ibm.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=l66+WLbhAlzPkyHFepjJ8VPyMoK+GDU3eUQBN3ZbwNk=;
+        b=KObAE73PCMk1JVAoDILkmCLJ2pg9LVN4gGGNZpJT+mlqKgca7yWFvAQCVI2u3VFNfG
+         akxcVQREXribnH87KIGMpy1rHwhT3k7mWCFQAbRHJs7QBPjIfKnQ1xb+N4YZj8qW7cm5
+         jIwoTEIQkm4o1GGoekYKabpK58iwhC8OKGjR9nTUvRW4ou9ILvbd3o0UX6D+fVz6R8By
+         cKfHAxQXSPFyvqGgRSRjAVFjBlHCLXuiIkdoHqqlfONeH7RGZUGLVPIE1qc+KPPR6pIq
+         Ny2ha/7BrEG4yvsTRFPUnItlGl3XwQ19N9qHYF8NQj3RfhTHj8gnE2KwyOcWYHabneZW
+         LEqA==
+X-Gm-Message-State: ACrzQf048GSIsVFGyZStmDY3egy+/UKBAEhjpZ0FrOzGJCibv/ELRUlo
+        /6ZfrpTvFVP1vavVmxQIUJW/IoIZIBz/zbwnwiKhKQ==
+X-Google-Smtp-Source: AMsMyM6QuAQGdziehqyNNg/dYLtJsZNxcgWER/SNrhmNQ9i6DMHJoP1Fx9le0dqEgW94QIKYhJ9aw9jygeYpRtlfJQw=
+X-Received: by 2002:ac2:5ca9:0:b0:4a6:f2c:a1f9 with SMTP id
+ e9-20020ac25ca9000000b004a60f2ca1f9mr217735lfq.26.1666181939680; Wed, 19 Oct
+ 2022 05:18:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <780306ca-4aba-3cf7-88ca-75e1903f76d0@linux.ibm.com>
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+References: <20221017115209.2099-1-will@kernel.org> <20221017115209.2099-13-will@kernel.org>
+ <Y07YJvEsUnjSasA0@google.com>
+In-Reply-To: <Y07YJvEsUnjSasA0@google.com>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Wed, 19 Oct 2022 13:18:23 +0100
+Message-ID: <CA+EHjTyrBCjJ_=qEs1tQ_4SO+oMq4BTGTnipJa1kDRXVxu0RcA@mail.gmail.com>
+Subject: Re: [PATCH v4 12/25] KVM: arm64: Add infrastructure to create and
+ track pKVM instances at EL2
+To:     Quentin Perret <qperret@google.com>
+Cc:     Will Deacon <will@kernel.org>, kvmarm@lists.linux.dev,
+        Sean Christopherson <seanjc@google.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,70 +79,38 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 19, 2022 at 02:11:37PM +0200, Christian Borntraeger wrote:
-> Am 19.10.22 um 13:50 schrieb Michael S. Tsirkin:
-> > On Wed, Oct 19, 2022 at 12:59:58PM +0200, Christian Borntraeger wrote:
-> > > Michael,
-> > > 
-> > > as a heads-up.
-> > > I have not looked into any details yet but we do get the following during reboot of a system on s390.
-> > > It seems to be new with 6.1-rc1 (over 6.0)
-> > > 
-> > >    [    8.532461] ------------[ cut here ]------------
-> > >    [    8.532497] WARNING: CPU: 8 PID: 377 at include/linux/cpumask.h:110 __netif_set_xps_queue+0x3d8/0xca8
-> > >    [    8.532507] Modules linked in: sha1_s390(+) sha_common virtio_net(+) net_failover failover pkey zcrypt rng_core autofs4
-> > >    [    8.532528] CPU: 8 PID: 377 Comm: systemd-udevd Not tainted 6.1.0-20221018.rc1.git15.0fd5f2557625.300.fc36.s390x+debug #1
-> > >    [    8.532533] Hardware name: IBM 8561 T01 701 (KVM/Linux)
-> > >    [    8.532537] Krnl PSW : 0704e00180000000 00000000b05ec33c (__netif_set_xps_queue+0x3dc/0xca8)
-> > >    [    8.532546]            R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 CC:2 PM:0 RI:0 EA:3
-> > >    [    8.532552] Krnl GPRS: 00000000e7fb8b3f 0000000080000001 00000000b1870700 00000000b0ca1d3c
-> > >    [    8.532557]            0000000000000100 0000000000000300 000000008b362500 00000000b133ba48
-> > >    [    8.532561]            000000000000000c 0000038000000100 000000000000000c 0000000000000070
-> > >    [    8.532566]            0000000084cd3200 0000000000000000 00000000b05ec0c2 00000380010b77c8
-> > >    [    8.532575] Krnl Code: 00000000b05ec32e: c0e500187331      brasl   %r14,00000000b08fa990
-> > >                              00000000b05ec334: a7f4ff0c          brc     15,00000000b05ec14c
-> > >                             #00000000b05ec338: af000000          mc      0,0
-> > >                             >00000000b05ec33c: ec76fed8007c      cgij    %r7,0,6,00000000b05ec0ec
-> > >                              00000000b05ec342: e310f0b00004      lg      %r1,176(%r15)
-> > >                              00000000b05ec348: ec16ffac007c      cgij    %r1,0,6,00000000b05ec2a0
-> > >                              00000000b05ec34e: ec680388007c      cgij    %r6,0,8,00000000b05eca5e
-> > >                              00000000b05ec354: e310f0b80004      lg      %r1,184(%r15)
-> > >    [    8.532600] Call Trace:
-> > >    [    8.532604]  [<00000000b05ec33c>] __netif_set_xps_queue+0x3dc/0xca8
-> > >    [    8.532609] ([<00000000b05ec0c2>] __netif_set_xps_queue+0x162/0xca8)
-> > >    [    8.532614]  [<000003ff7fbb81ce>] virtnet_set_affinity+0x1de/0x2a0 [virtio_net]
-> > >    [    8.532622]  [<000003ff7fbbb674>] virtnet_probe+0x4d4/0xc08 [virtio_net]
-> > >    [    8.532630]  [<00000000b04ec4e8>] virtio_dev_probe+0x1e8/0x418
-> > >    [    8.532638]  [<00000000b05350ea>] really_probe+0xd2/0x480
-> > >    [    8.532644]  [<00000000b0535648>] driver_probe_device+0x40/0xf0
-> > >    [    8.532649]  [<00000000b0535fac>] __driver_attach+0x10c/0x208
-> > >    [    8.532655]  [<00000000b0532542>] bus_for_each_dev+0x82/0xb8
-> > >    [    8.532662]  [<00000000b053422e>] bus_add_driver+0x1d6/0x260
-> > >    [    8.532667]  [<00000000b0536a70>] driver_register+0xa8/0x170
-> > >    [    8.532672]  [<000003ff7fbc8088>] virtio_net_driver_init+0x88/0x1000 [virtio_net]
-> > >    [    8.532680]  [<00000000afb50ab0>] do_one_initcall+0x78/0x388
-> > >    [    8.532685]  [<00000000afc7b5b8>] do_init_module+0x60/0x248
-> > >    [    8.532692]  [<00000000afc7ce96>] __do_sys_init_module+0xbe/0xd8
-> > >    [    8.532698]  [<00000000b09123b2>] __do_syscall+0x1da/0x208
-> > >    [    8.532704]  [<00000000b0925b12>] system_call+0x82/0xb0
-> > >    [    8.532710] 3 locks held by systemd-udevd/377:
-> > >    [    8.532715]  #0: 0000000089af5188 (&dev->mutex){....}-{3:3}, at: __driver_attach+0xfe/0x208
-> > >    [    8.532728]  #1: 00000000b14668f0 (cpu_hotplug_lock){++++}-{0:0}, at: virtnet_probe+0x4ca/0xc08 [virtio_net]
-> > >    [    8.532744]  #2: 00000000b1509d40 (xps_map_mutex){+.+.}-{3:3}, at: __netif_set_xps_queue+0x88/0xca8
-> > >    [    8.532757] Last Breaking-Event-Address:
-> > >    [    8.532760]  [<00000000b05ec0e0>] __netif_set_xps_queue+0x180/0xca8
-> > 
-> > 
-> > Does this fix it for you?
-> > 
-> > https://lore.kernel.org/r/20221017030947.1295426-1-yury.norov%40gmail.com
-> 
-> Yes, it does. Thanks a lot.
-> 
-> Tested-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+Hi,
 
-You will want to reply to that one P).
+On Tue, Oct 18, 2022 at 5:45 PM Quentin Perret <qperret@google.com> wrote:
+>
+> On Monday 17 Oct 2022 at 12:51:56 (+0100), Will Deacon wrote:
+> > +static int find_free_vm_table_entry(struct kvm *host_kvm)
+> > +{
+> > +     int i, ret = -ENOMEM;
+> > +
+> > +     for (i = 0; i < KVM_MAX_PVMS; ++i) {
+> > +             struct pkvm_hyp_vm *vm = vm_table[i];
+> > +
+> > +             if (!vm) {
+> > +                     if (ret < 0)
+> > +                             ret = i;
+> > +                     continue;
+> > +             }
+> > +
+> > +             if (unlikely(vm->host_kvm == host_kvm)) {
+> > +                     ret = -EEXIST;
+> > +                     break;
+> > +             }
+>
+> That would be funny if the host passed the same struct twice, but do we
+> care? If the host wants to shoot itself in the foot, it's not our
+> problem I guess :) ? Also, we don't do the same check for vCPUs so ...
 
--- 
-MST
+You're right, the host can shoot itself in the foot if it wants to.
+The reason why we don't have it for vcpus is that that code was
+factored out later, and as you said, a similar check isn't necessary.
 
+TLDR: we'll remove it :)
+
+Thanks,
+/fuad
