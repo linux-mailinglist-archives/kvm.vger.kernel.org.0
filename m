@@ -2,78 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DB55860482F
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 15:52:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2B156049C8
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 16:52:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232265AbiJSNwA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 09:52:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37384 "EHLO
+        id S231445AbiJSOwV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 10:52:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233710AbiJSNvi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 09:51:38 -0400
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4289118499B
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 06:35:34 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id a67so25250194edf.12
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 06:35:34 -0700 (PDT)
+        with ESMTP id S230097AbiJSOv6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 10:51:58 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0851213FDDC
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 07:42:29 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id 128so16453890pga.1
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 07:42:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jGDuBvVBWtQQhTh15f+xlFUiPdaWSbx11jMCTBh0luA=;
-        b=PxTuqiFHKGLs6Q04zg2G4eSd00jK6zzgrt4HdFyWkirB8aCwSWFmJDbb4XEBPbs84b
-         XjeLDlepBSGLM9yuvsYFtIMpaA2nrkP9RseT+JMyFrkJmTtNG6S7IBl+ZFb+Z7EU964K
-         51qHIrDOsh043I6Y6V8E1g4XMUP9UGgmtMVCorWtgXXr8Ez+6KCd5ZzkSfC1vBvU0cH1
-         djCo4kPBwtzeKGV/O9N2hFeEJoYjXLSvmvYEL25wdP7p2Tf7hgW6O1nT+5fEjsm/qMk2
-         LLG+qdTEOncIhwY/g1cG4Fb+GhzkkvlzTi4NT6ZkssFxxTJuSnyH4YRDTPFp3De08sQ/
-         Humg==
+        bh=5OVUDZU1XsNkGq6YBOokd70bXwqta2LzCMha4S1CMlc=;
+        b=a0xG4jYFrerAn25dxCU/C/OGI0Puv9XMGadP0q4bCBlcqTPJBi9aQoruM7nomfeEmR
+         +NRJBOJfJSQAPnaPxjRZti4bj8xMxQiIenx/423qfo/QsreRA4iz2rUkQ2oEgjWEBAMK
+         l5yvHgpX3yTT7LdUjprJNoALAWGj4t7DEZ1ev+oh6ivTjfR1gMhjsv4M9cI6+EzOlZJJ
+         SlwtxNNQ1lID1kq9iN6P+ECZ3y2UMwPqwSzCLKm7hMM6ZAhpbdoCBLJGgkNY74d5RCKS
+         agnJ5gpSksK3MMREl5gmFchj+PyDnDYgBbY5G54CVcR5mo0jBTO/xABKMsrH/+8dGMAu
+         ZJ8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jGDuBvVBWtQQhTh15f+xlFUiPdaWSbx11jMCTBh0luA=;
-        b=2z0hZGm3iqF6R02o36w6Fq8DBLtRMC2L3yMM33cxpDQ+9He+WoqeJjlQ6yEa8sIS2U
-         NEcbZ2GiikvQpuCIWczO5QMfD7lecvcJB2RZlaINTbuhG/3iYusF4aiNpTNKE1rilorh
-         uKv1CKwdrjgYIojIaC/IZCRJJcG5tc1DfKKX0T0m0VYK2Mj+9DFpFIPslSeO26b6lyOq
-         I47PUQfc3gtrxeRf6JjhWN3soUBf5ammq1KVe24XIgTkcvE7eJUyYiVSQ3W5MAuHW0EF
-         9MlXk0yJ4huK+2PnVm2Xte5H290h2Qbt12PwnPTyunl3ymxSHPfDsPRHRNmAgMWqYvZd
-         izSA==
-X-Gm-Message-State: ACrzQf1yaUxnZy4C8xrhanKH4pNcsNkoyK6NUbbGI2roh45HS+kfchs3
-        3BEAIERHRB7lE/qYZi1QEUfCeQ==
-X-Google-Smtp-Source: AMsMyM5/lmcijk1PTC/MIbN3EcbOaf5vqEsarZQ2QfOuX/8iQ6m+Bp7SwPos1MPS6rC1Qfj/aMnvQg==
-X-Received: by 2002:a05:6402:5ca:b0:445:c80a:3c2 with SMTP id n10-20020a05640205ca00b00445c80a03c2mr7515578edx.247.1666186508675;
-        Wed, 19 Oct 2022 06:35:08 -0700 (PDT)
-Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
-        by smtp.gmail.com with ESMTPSA id d7-20020aa7d687000000b004580296bb0bsm10538281edr.83.2022.10.19.06.35.08
+        bh=5OVUDZU1XsNkGq6YBOokd70bXwqta2LzCMha4S1CMlc=;
+        b=7NyTmY8UV08sdg/MkmIG1ayJ6Nm20jQxs3rjpcpe3cGJuj40SJC8ZvMxM8Vt2q7EDk
+         /V+Dwd5hNt3gouPIwSEI+ESiwqrMYioC0BLhkLBTmu3p0q0Io1ghjpGIub57MIbRsezV
+         Y6T82K7huc/WZI3wIdIhkxRNWXfcjO6buSdVlF3gIzOuNLCkESHDWGhq8OW0YWMeu1Sl
+         /ucv4+zHNSgZ9lpdFYBbWc7RsQhuJiuaPdGgU5U9en/5Z48vRqhQxA6k7x7+AHUMYyHb
+         mTW9cbL+EccU1kGbCohbmqZpmq6XjPZcLAGPue3GX03ogRFSNHRGNdYYJHu76NSnlAU/
+         1oRg==
+X-Gm-Message-State: ACrzQf0r02lpREcuNl+38QCKMvoCMWas9Q8EwwuoocaGTew1Ompb6/xX
+        uPZ/4/YlcCrvfQfgwyYJHtyXog==
+X-Google-Smtp-Source: AMsMyM6YaV2gi5aTzWiyK7eAPwuHYlRpXlMiL4DOi/f/qjoKQI5OZH+CzzccMwMSkPyPXR6nfI6B6w==
+X-Received: by 2002:aa7:8741:0:b0:562:bacb:136a with SMTP id g1-20020aa78741000000b00562bacb136amr8957282pfo.46.1666190547619;
+        Wed, 19 Oct 2022 07:42:27 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id d204-20020a621dd5000000b0056238741ba0sm11337278pfd.79.2022.10.19.07.42.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Oct 2022 06:35:08 -0700 (PDT)
-Date:   Wed, 19 Oct 2022 13:35:05 +0000
-From:   Quentin Perret <qperret@google.com>
-To:     Will Deacon <will@kernel.org>
-Cc:     kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v4 12/25] KVM: arm64: Add infrastructure to create and
- track pKVM instances at EL2
-Message-ID: <Y0/9CZHSMLLnmWU9@google.com>
-References: <20221017115209.2099-1-will@kernel.org>
- <20221017115209.2099-13-will@kernel.org>
- <Y07VaRwVf3McX27a@google.com>
- <20221019115723.GA4067@willie-the-truck>
+        Wed, 19 Oct 2022 07:42:27 -0700 (PDT)
+Date:   Wed, 19 Oct 2022 14:42:23 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [PATCH v2 2/2] KVM: x86: Expose Predictive Store Forwarding
+ Disable on Intel parts
+Message-ID: <Y1AMz6sUceNmjm3r@google.com>
+References: <20220830225210.2381310-1-jmattson@google.com>
+ <20220830225210.2381310-2-jmattson@google.com>
+ <Yw6fkyJrsu/i+Byy@google.com>
+ <CALMp9eRfq9jtC20an2brOL=+LpFFReqz0-BvOE_6p-461C8vaw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221019115723.GA4067@willie-the-truck>
+In-Reply-To: <CALMp9eRfq9jtC20an2brOL=+LpFFReqz0-BvOE_6p-461C8vaw@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -85,25 +74,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wednesday 19 Oct 2022 at 12:57:24 (+0100), Will Deacon wrote:
-> On Tue, Oct 18, 2022 at 04:33:45PM +0000, Quentin Perret wrote:
-> > On Monday 17 Oct 2022 at 12:51:56 (+0100), Will Deacon wrote:
-> > > +void pkvm_hyp_vm_table_init(void *tbl)
-> > > +{
-> > > +	WARN_ON(vm_table);
-> > > +	vm_table = tbl;
-> > > +}
-> > 
-> > Uh, why does this one need to be exposed outside pkvm.c ?
+On Tue, Aug 30, 2022, Jim Mattson wrote:
+> On Tue, Aug 30, 2022 at 4:39 PM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Tue, Aug 30, 2022, Jim Mattson wrote:
+> > > Intel enumerates support for PSFD in CPUID.(EAX=7,ECX=2):EDX.PSFD[bit
+> > > 0]. Report support for this feature in KVM if it is available on the
+> > > host.
+> > >
+> > > Presumably, this feature bit, like its AMD counterpart, is not welcome
+> > > in cpufeatures.h, so add a local definition of this feature in KVM.
+> > >
+> > > Signed-off-by: Jim Mattson <jmattson@google.com>
+> > > ---
+> > >  arch/x86/kvm/cpuid.c | 23 +++++++++++++++++------
+> > >  1 file changed, 17 insertions(+), 6 deletions(-)
+> > >
+> > > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> > > index 07be45c5bb93..b5af9e451bef 100644
+> > > --- a/arch/x86/kvm/cpuid.c
+> > > +++ b/arch/x86/kvm/cpuid.c
+> > > @@ -62,6 +62,7 @@ u32 xstate_required_size(u64 xstate_bv, bool compacted)
+> > >   * This one is tied to SSB in the user API, and not
+> > >   * visible in /proc/cpuinfo.
+> > >   */
+> > > +#define KVM_X86_FEATURE_PSFD         0          /* Predictive Store Forwarding Disable */
+> >
+> > I believe we can use "enum kvm_only_cpuid_leafs" to handle this.  E.g.
+> >
+> >         enum kvm_only_cpuid_leafs {
+> >                 CPUID_12_EAX     = NCAPINTS,
+> >                 CPUID_7_2_EDX,
+> >                 NR_KVM_CPU_CAPS,
+> >
+> >                 NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
+> >         };
+> >
+> > then the intended use of KVM_X86_FEATURE_*
+> >
+> >         #define KVM_X86_FEATURE_PSFD    KVM_X86_FEATURE(CPUID_7_2_EDX, 0)
+> >
+> > I _think_ we can then define an arbitrary word for X86_FEATURE_PSFD, e.g.
+> >
+> >         #define X86_FEATURE_PSFD        (NKVMCAPINTS*32+0)
 > 
-> We need to initialise the table using the memory donated by the host
-> on the __pkvm_init path. That's all private to nvhe/setup.c, so rather
-> than expose the raw pointers (of either the table or the donated memory),
-> we've got this initialisation function instead which is invoked by
-> __pkvm_init_finalise() on the deprivilege path.
-> 
-> Happy to repaint it if you have a patch?
+> We may run afoul of reverse_cpuid_check(), depending on usage.
 
-I don't, I just got confused, maybe because in an older version of this
-(possibly quite old) the table was statically allocated? Anyways, it's
-all fine as-is, thanks for the reply.
+Oh, yeah, an entry in reverse_cpuid[] would also be needed.  For posterity since
+PSFD doesn't need a KVM-only entry[*]...
+
+[*] https://lore.kernel.org/all/Y0CrER%2FyiHheWiZw@google.com
