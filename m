@@ -2,80 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8081A604A71
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 17:05:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 16587604AB9
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 17:10:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231601AbiJSPFE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 11:05:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42162 "EHLO
+        id S231966AbiJSPKS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 11:10:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232102AbiJSPEE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 11:04:04 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A283192BAB
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 07:58:38 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id y191so17495711pfb.2
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 07:58:38 -0700 (PDT)
+        with ESMTP id S232636AbiJSPJc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 11:09:32 -0400
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25E4FE4A
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 08:03:01 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id bu25so28651602lfb.3
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 08:03:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9s0rzFSy14ksG7NNdNRlqlEq20etJaJC/FAX/Yq5BNY=;
-        b=afBPkpHRRvLWtBKufifpN2Wl9C6FeT9ZTYPsEWcnM3BeXZjd0U04i4IP6l6Ua+RhdI
-         yjyN0ox7KkxLOJ1BGF6OZvd3yg1zMpKban444BBDmmzaHUlW7+3SpeP/P4ScK9nujoX+
-         /eO62ftDvrLmBHJXYa2HEVR/1TnTiGQTAdFbNsRt28OkIZVNZRiNDLAPDSD/khRS85/l
-         cEnEmvT9OjxhdfpbwPIDUWOkMFFMKB5IP3bP0t80LhgsPqqih+eqjBshEV0RBw9+TBT8
-         qqG9JF5mBxjghVwqs4b2XuHmAyel7lE82+frHCxxp8VnV+4G75Q2kYim9muanS3Xkcav
-         WGZA==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=8uws4B5WgtxEQQPonRBN7dDm57mj+TMYZwg9NWMF6uE=;
+        b=GNoRQIq9JKVsi3NBMOHtxRxaA+HyiSRxEbQwKROCIdQN7YeQVvkeCL/tBfTJ0rFShS
+         wLv+OMed6GKtlzQERAvDIH0fS9RwWNLH1iDzg8iIFUBsQUCTCUR56HEIdBHp5w6KeZ+i
+         ed0p1SeRI6LjurmDyBxbuv8clbnocReb3YyBgtI/ebogw01dMtsK7A/KD1lbcyPsqtH5
+         TaWyyc8eNama/1dRhNwUMQO8P85tBb+QCcPLfYt81cuF60S21NuSTt9ENjFqtPiqHbYW
+         QbAZcIWW265YqQ7fQmjB0etPPuYGAVxyYuBBwAInvDjayuW/S/xhDX/aqG8lWy7/HjYu
+         bNlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9s0rzFSy14ksG7NNdNRlqlEq20etJaJC/FAX/Yq5BNY=;
-        b=omCg4gjw+oX4QONGgpwhSOvMJTXmPmpx+ymiTpRVr8+TnrW7LhCwMVhEFo80WCcLp5
-         48puD23LSqhyfL/qpS/tU5iMuk/dB4YGSibxI5Fk947vcTTqb0BXnxd+q3S/Fs+fFo1U
-         kDrI5Xl+ojcagqirppscTmzEGEhCtKxuWYJAvTp8HnViOMGD8dl953nWYlyzn8N2WLYu
-         m6QC2wHIrFKEwI+GAMAQNL7MSL9N0XMHaj2XPzV6phf5imvkrlo/4YyU0r9uda3h5HpU
-         lWaIsuPkSCuDnriQHCMsRh+zpB/J7p38EQrIDpzHpFa0u0Qi1VtbBO1DU8o0YaCeGLTN
-         AMrg==
-X-Gm-Message-State: ACrzQf27vnksV2tvIIdFGLrAvlyihw90GFbR01n4XzWiF5Yo1aHFllYy
-        I3ljZOZ34b2HQz0D+p/ceSZQVg==
-X-Google-Smtp-Source: AMsMyM4qXn1XlEdmAJaEAbseNMZXl2PQJfCmqQGJRqdVfUjd0ddXT6IpMqxx/KzWC/+YDx+OnKq7PQ==
-X-Received: by 2002:a05:6a00:150e:b0:563:b133:2932 with SMTP id q14-20020a056a00150e00b00563b1332932mr8687743pfu.37.1666191458992;
-        Wed, 19 Oct 2022 07:57:38 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id a22-20020aa795b6000000b005639a80af7bsm11460201pfk.75.2022.10.19.07.57.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Oct 2022 07:57:38 -0700 (PDT)
-Date:   Wed, 19 Oct 2022 14:57:35 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Jiaxi Chen <jiaxi.chen@linux.intel.com>, kvm@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, pbonzini@redhat.com,
-        ndesaulniers@google.com, alexandre.belloni@bootlin.com,
-        peterz@infradead.org, jpoimboe@kernel.org,
-        chang.seok.bae@intel.com, pawan.kumar.gupta@linux.intel.com,
-        babu.moger@amd.com, jmattson@google.com, sandipan.das@amd.com,
-        tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        fenghua.yu@intel.com, keescook@chromium.org,
-        jane.malalane@citrix.com, nathan@kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/6] x86: KVM: Enable AVX-VNNI-INT8 CPUID and expose it
- to guest
-Message-ID: <Y1AQX3RfM+awULlE@google.com>
-References: <20221019084734.3590760-1-jiaxi.chen@linux.intel.com>
- <20221019084734.3590760-5-jiaxi.chen@linux.intel.com>
- <Y0+6tJ7MiZWbYK5l@zn.tnic>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8uws4B5WgtxEQQPonRBN7dDm57mj+TMYZwg9NWMF6uE=;
+        b=Ti0YhJ0G0wKTfdPnb/4ABx1NVMicxbzuA8hR7daVYGOmVcdZmkasNjT+JsNbQQuki9
+         1qihdZlzJdu7aQzUNime5ElelcafUXtlGLkJ3sQgOalgVNYuOfyhCxqTpfGPdlzWfsdX
+         Dph8juNp1/+0OcC9Vua8iAirHLcqNnAsDXgo8ilvsUtQgVb5+2JB+yQ+ysPaEzp4c670
+         AuU2rPr7OhVZWVrUOSt7h/efSsFOB69JUVK7sUTam0MmKWHRVwD9EzlOdrwT+LksuW2h
+         n9F65xQJLfRghHaKMiikHXo0hR0o8D9HE1s825xMjhkFVwq02wpuGtRRgavLhZHVfSIj
+         cJxA==
+X-Gm-Message-State: ACrzQf11vXUptdJAzzLZSKjFBvdRcVE0b4stCH4jTZXNTfwpxg0TceLi
+        wPX6s8TagXA1oAsXL3sdmO+KKY6bkxuKFNMueZieOg==
+X-Google-Smtp-Source: AMsMyM73/Iz2UA6hD6VnKREmVWKox8T+CDDwCUSlKn0rjft7dc92r9M4EXDXMPFumhxI7Ld+a4+gjwQViVOGvFn4W+A=
+X-Received: by 2002:a05:6512:4cb:b0:4a2:25b6:9e73 with SMTP id
+ w11-20020a05651204cb00b004a225b69e73mr3205357lfq.30.1666191778897; Wed, 19
+ Oct 2022 08:02:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y0+6tJ7MiZWbYK5l@zn.tnic>
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-6-chao.p.peng@linux.intel.com> <CA+EHjTxukqBfaN6D+rPOiX83zkGknHEQ16J0k6GQSdL_-e9C6g@mail.gmail.com>
+ <20221012023516.GA3218049@chaop.bj.intel.com> <CA+EHjTyGyGL+ox81=jdtoHERtHPV=P7wJub=3j7chdijyq-AgA@mail.gmail.com>
+ <Y03UiYYioV+FQIpx@google.com> <20221019132308.GA3496045@chaop.bj.intel.com>
+In-Reply-To: <20221019132308.GA3496045@chaop.bj.intel.com>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Wed, 19 Oct 2022 16:02:22 +0100
+Message-ID: <CA+EHjTytCEup0m-nhnVHsuQ1xjaCxXNHO_Oxe+QbpwqaewpfKQ@mail.gmail.com>
+Subject: Re: [PATCH v8 5/8] KVM: Register/unregister the guest private memory regions
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,61 +98,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 19, 2022, Borislav Petkov wrote:
-> On Wed, Oct 19, 2022 at 04:47:32PM +0800, Jiaxi Chen wrote:
-> > AVX-VNNI-INT8 is a new set of instructions in the latest Intel platform
-> > Sierra Forest. It multiplies the individual bytes of two unsigned or
-> > unsigned source operands, then add and accumulate the results into the
-> > destination dword element size operand. This instruction allows for the
-> > platform to have superior AI capabilities.
-> > 
-> > The bit definition:
-> > CPUID.(EAX=7,ECX=1):EDX[bit 4]
+> > > This sounds good. Thank you.
+> >
+> > I like the idea of a separate Kconfig, e.g. CONFIG_KVM_GENERIC_PRIVATE_MEM or
+> > something.  I highly doubt there will be any non-x86 users for multiple years,
+> > if ever, but it would allow testing the private memory stuff on ARM (and any other
+> > non-x86 arch) without needing full pKVM support and with only minor KVM
+> > modifications, e.g. the x86 support[*] to test UPM without TDX is shaping up to be
+> > trivial.
 >
-> For this particular one, use scattered.c instead of adding a new leaf.
+> CONFIG_KVM_GENERIC_PRIVATE_MEM looks good to me.
 
-Unless the kernel wants to use X86_FEATURE_AVX_VNNI_INT8, which seems unlikely,
-there's no need to create a scattered entry.  This can be handled in KVM by adding
-a KVM-only leaf entry (which will be needed no matter what), plus a #define for
-X86_FEATURE_AVX_VNNI_INT8 to direct it to the KVM entry.
+That sounds good to me, and just keeping the xarray isn't really an
+issue for pKVM. We could end up using it instead of some of the other
+structures we use for tracking.
 
-E.g. 
+Cheers,
+/fuad
 
-diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
-index a19d473d0184..25e7bfc61607 100644
---- a/arch/x86/kvm/reverse_cpuid.h
-+++ b/arch/x86/kvm/reverse_cpuid.h
-@@ -13,6 +13,7 @@
-  */
- enum kvm_only_cpuid_leafs {
-        CPUID_12_EAX     = NCAPINTS,
-+       CPUID_7_1_EDX,
-        NR_KVM_CPU_CAPS,
- 
-        NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
-@@ -24,6 +25,16 @@ enum kvm_only_cpuid_leafs {
- #define KVM_X86_FEATURE_SGX1           KVM_X86_FEATURE(CPUID_12_EAX, 0)
- #define KVM_X86_FEATURE_SGX2           KVM_X86_FEATURE(CPUID_12_EAX, 1)
- 
-+#define KVM_X86_FEATURE_AVX_VNNI_INT8  KVM_X86_FEATURE(CPUID_7_1_EDX, 4)
-+
-+/*
-+ * Alias X86_FEATURE_* to the KVM variant for features in KVM-only leafs that
-+ * aren't scattered by cpufeatures.h so that X86_FEATURE_* can be used in KVM,
-+ * e.g. to query guest CPUID.  As a bonus, no translation is needed for these
-+ * features in __feature_translate().
-+ */
-+#define X86_FEATURE_AVX_VNNI_INT8      KVM_X86_FEATURE_AVX_VNNI_INT8
-+
- struct cpuid_reg {
-        u32 function;
-        u32 index;
-@@ -48,6 +59,7 @@ static const struct cpuid_reg reverse_cpuid[] = {
-        [CPUID_7_1_EAX]       = {         7, 1, CPUID_EAX},
-        [CPUID_12_EAX]        = {0x00000012, 0, CPUID_EAX},
-        [CPUID_8000_001F_EAX] = {0x8000001f, 0, CPUID_EAX},
-+       [CPUID_7_1_EDX]       = {         7, 1, CPUID_EDX},
- };
- 
- /*
-
+> Thanks,
+> Chao
+> >
+> > [*] https://lore.kernel.org/all/Y0mu1FKugNQG5T8K@google.com
