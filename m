@@ -2,133 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AE42B604CC7
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 18:09:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D58A604CCB
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 18:09:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230209AbiJSQI7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 12:08:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47300 "EHLO
+        id S229958AbiJSQJz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 12:09:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230267AbiJSQIz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 12:08:55 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C7E713333E
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 09:08:52 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29JFiFoN004126
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 16:08:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=kopqt5nnArU1fNDUCrEph7csOGBVD/QfhuPanB51eo0=;
- b=XZI1tTWqRfaOz/FVb3xbMvexNo9xNtR2SF2PPFebTAdS3jX0ZalE5zo/BJcEouKScFoo
- ye0mxSxe0Ducc9Rfau6+RhDiMgaHgXtv1ADHkg3lQRL+0Vde0FfM/IaFlv27t7EqhEr+
- +rRVSWcywIrkje1o7JSF5uKGpY9adVxGBc5jwhGqVSmJ1y8QtOmRg/MqcXO1jhyLQwVo
- ozJNtH6whQ2o0QMBKAEKoDvyCAkuEtm2yHkHQ/m3F6QIZod+YVD4Og8oqF2l+xb9/oL7
- l9r2OPfn1kCv+UyMAQBofjENvoWy4vUBIDnEoSFujqJj8LmMkShtnhMHr7fyRV0Zx0OW rA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kam4u0vq1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 16:08:50 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29JFj8xH006888
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 16:08:50 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kam4u0vnf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Oct 2022 16:08:50 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29JFqNLg004255;
-        Wed, 19 Oct 2022 16:03:48 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06ams.nl.ibm.com with ESMTP id 3kajmrr5f7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Oct 2022 16:03:48 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29JFwiqs30671304
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Oct 2022 15:58:44 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D61C54C04A;
-        Wed, 19 Oct 2022 16:03:44 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 948EE4C040;
-        Wed, 19 Oct 2022 16:03:44 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.8.239])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 19 Oct 2022 16:03:44 +0000 (GMT)
-Date:   Wed, 19 Oct 2022 18:03:42 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 0/1] s390x: do not enable PV dump
- support by default
-Message-ID: <20221019180342.2d8b7ca1@p-imbrenda>
-In-Reply-To: <166619305695.37435.2798515077166987872@t14-nrb>
-References: <20221019145320.1228710-1-nrb@linux.ibm.com>
-        <20221019171920.455451ea@p-imbrenda>
-        <166619305695.37435.2798515077166987872@t14-nrb>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S232774AbiJSQJu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 12:09:50 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E156444B3
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 09:09:40 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id k9so17267914pll.11
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 09:09:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ypkvL3yaAxMPxurJS0uFGqCkiFZ+RyzOnuF9leoHMPg=;
+        b=h+1KlUYCjsRVvRZom/eZaqVVZPwLNuYTzVtc/yfchg/FVn3f5I4RUVC9fB77Ol9VGf
+         HgCK8mY6Nv+Xq72Fx81Po6YrtpzWxQ53rseaDQp3xO+NUuzg/Q/QlKyJ26MY8whFSFB9
+         Yz/rDhSdBT3TPLIrEG1lXL4xKfi0GT6oeGR8n8SqA7rIg+ZhIQiSL6k7+pVB5ukZ64kF
+         kVFFiLi2o9zlE+Zz99wb/PPKOZvfE8v4DtNHoGGtu9prsA4BZL7zqk0frRY/JGZwwNq7
+         g2L2w4CVrM6EQ0r7EXNj734PT3xgw2/P2uRLexg59HxYszjKm2su2n+onT/oKpMmOXgw
+         qJ9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ypkvL3yaAxMPxurJS0uFGqCkiFZ+RyzOnuF9leoHMPg=;
+        b=AhtUJTQmyAh19DlsP939VheMJtWGS1G2UE/2SANkrNe+GVmnvOW2yD+uKvZQx8S6TQ
+         Y+httUNbwvt3g38yCiOcjY3QHTv3jL0LAcybzE6yNAZ/BQ1sbgASOLeCDj57tXl8DWw6
+         L350JhYDtIcZdAqN7NeyUL1bdQ+EneN99En2V34wxYLIPDWPTJiyWZGyO6osF/4PX5ll
+         I/QccEkLv86pOa876G+Yh/osZ2YHQkmUQQEu36SopW3PyIb10iYFnuI2Mo/N9oOpvR4E
+         O5UKwQif9knnLIKeGk+CPo4sipXqPfsds3vMds7QVRTTIRipfvWFIj/XiLvdUlLzG85x
+         eQBw==
+X-Gm-Message-State: ACrzQf1rkr8ar8wdup1skkvedHyg5FJI9PtXObHcJczKSaKFY/1GFvad
+        hVk3PVZueLIVGEDPZRFOrK0uwg==
+X-Google-Smtp-Source: AMsMyM5J8mv9XBDJfNSTMwrJGznqodpAH+vWLTNt9JpHQACwNEqu56e3wBHUQ6hekV2SylbV5oa2BA==
+X-Received: by 2002:a17:903:248b:b0:17d:ea45:d76a with SMTP id p11-20020a170903248b00b0017dea45d76amr9440949plw.97.1666195779474;
+        Wed, 19 Oct 2022 09:09:39 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id d13-20020aa797ad000000b00553d573222fsm11558997pfq.199.2022.10.19.09.09.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Oct 2022 09:09:38 -0700 (PDT)
+Date:   Wed, 19 Oct 2022 16:09:35 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Fuad Tabba <tabba@google.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v8 5/8] KVM: Register/unregister the guest private memory
+ regions
+Message-ID: <Y1AhP0dlRSgTCObX@google.com>
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-6-chao.p.peng@linux.intel.com>
+ <CA+EHjTxukqBfaN6D+rPOiX83zkGknHEQ16J0k6GQSdL_-e9C6g@mail.gmail.com>
+ <20221012023516.GA3218049@chaop.bj.intel.com>
+ <CA+EHjTyGyGL+ox81=jdtoHERtHPV=P7wJub=3j7chdijyq-AgA@mail.gmail.com>
+ <Y03UiYYioV+FQIpx@google.com>
+ <20221019132308.GA3496045@chaop.bj.intel.com>
+ <CA+EHjTytCEup0m-nhnVHsuQ1xjaCxXNHO_Oxe+QbpwqaewpfKQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: gNckSS0GQz3M0sSA9lxro-PRHRdoTOp8
-X-Proofpoint-ORIG-GUID: tYfGTl5BZG3FXYmmckAEf5Zk2xZ7b61f
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-19_09,2022-10-19_04,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
- spamscore=0 priorityscore=1501 lowpriorityscore=0 bulkscore=0 mlxscore=0
- mlxlogscore=999 phishscore=0 malwarescore=0 adultscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
- definitions=main-2210190091
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+EHjTytCEup0m-nhnVHsuQ1xjaCxXNHO_Oxe+QbpwqaewpfKQ@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 19 Oct 2022 17:24:16 +0200
-Nico Boehr <nrb@linux.ibm.com> wrote:
-
-> Quoting Claudio Imbrenda (2022-10-19 17:19:43)
-> > On Wed, 19 Oct 2022 16:53:19 +0200
-> > Nico Boehr <nrb@linux.ibm.com> wrote:
-> >   
-> > > v1->v2:
-> > > ---
-> > > * add indent to CONFIG_DUMP if in Makefile (thanks Janosch)
-> > > * add comment (thanks Janosch)
-> > > 
-> > > Currently, dump support is always enabled by setting the respective
-> > > plaintext control flag (PCF). Unfortunately, older machines without
-> > > support for PV dump will not start the guest when this PCF is set.  
-> > 
-> > maybe for the long term we could try to fix the stub generated by
-> > genprotimg to check the plaintext flags and the available features and
-> > refuse to try to start if the required features are missing.
-> > 
-> > ideally providing a custom message when generating the image, to be
-> > shown if the required features are missing. e.g. for kvm unit test, the
-> > custom message could be something like
-> > SKIP: $TEST_NAME: Missing hardware features
-> > 
-> > once that is in place, we could revert this patch  
+On Wed, Oct 19, 2022, Fuad Tabba wrote:
+> > > > This sounds good. Thank you.
+> > >
+> > > I like the idea of a separate Kconfig, e.g. CONFIG_KVM_GENERIC_PRIVATE_MEM or
+> > > something.  I highly doubt there will be any non-x86 users for multiple years,
+> > > if ever, but it would allow testing the private memory stuff on ARM (and any other
+> > > non-x86 arch) without needing full pKVM support and with only minor KVM
+> > > modifications, e.g. the x86 support[*] to test UPM without TDX is shaping up to be
+> > > trivial.
+> >
+> > CONFIG_KVM_GENERIC_PRIVATE_MEM looks good to me.
 > 
-> But that would mean that on machines which don't support dumping, PV tests will never run, will they?
+> That sounds good to me, and just keeping the xarray isn't really an
+> issue for pKVM.
 
-no, the check would be done at run time, so the test would only be
-skipped on machines that don't support dumping (or whatever other
-feature)
+The xarray won't exist for pKVM if the #ifdefs in this patch are changed from
+CONFIG_HAVE_KVM_PRIVATE_MEM => CONFIG_KVM_GENERIC_PRIVATE_MEM.
 
-but again, this is a long term idea, for now we'll take your patch
-since it solves the problem :)
+> We could end up using it instead of some of the other
+> structures we use for tracking.
 
-> 
-> So we need some way of specifing at compile time whether you want dump support or not.
-
+I don't think pKVM should hijack the xarray for other purposes.  At best, it will
+be confusing, at worst we'll end up with a mess if ARM ever supports the "generic"
+implementation.  
