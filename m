@@ -2,89 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BD2160463B
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 15:03:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C481C604790
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 15:41:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232474AbiJSNDF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 09:03:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53594 "EHLO
+        id S232963AbiJSNlr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 09:41:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231991AbiJSNCr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 09:02:47 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C6471C97F0
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 05:46:09 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 601D5B823B5
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 12:45:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3115AC433C1;
-        Wed, 19 Oct 2022 12:45:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666183557;
-        bh=Obz1Eb/Z1rSTVB9Z76pArj6atKQy6kIjY4hqiJTSRN8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=RkiBykevhVkmTsqyfTzSmxmpZk5zDiQoxov0nhLJFVZ3c+l+SFBpCnk6nAGBoAZ+r
-         b0XAJgDCjOw63BLWbG9NOiy01bZeMHUX7Xo0rxHT9p7mswzqAfSfOUuzgFqRiS5s8A
-         QU1yrVdLg5fz6GQK5ABx4nduS5pX1OyjUSMzWFL+CxoibJ0euIbcoDKRYtyeTJJtrS
-         z9NPxJZCmcQsmyAkK9AcT61Mr13cchMvt4LruB7efjoZf8NrFuFKuweD7H3miMBY9K
-         ex8zHjquIYRq8PioeqP5UYjAlQVY7RVLkieDnJS12PuNRgxmwmDKTeimyWcuvhCXzW
-         94+yYKa3d5UgQ==
-Date:   Wed, 19 Oct 2022 13:45:50 +0100
-From:   Will Deacon <will@kernel.org>
-To:     Quentin Perret <qperret@google.com>
-Cc:     kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v4 12/25] KVM: arm64: Add infrastructure to create and
- track pKVM instances at EL2
-Message-ID: <20221019124549.GC4220@willie-the-truck>
-References: <20221017115209.2099-1-will@kernel.org>
- <20221017115209.2099-13-will@kernel.org>
- <Y07Sd6lVfD4IUywQ@google.com>
+        with ESMTP id S231907AbiJSNlX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 09:41:23 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABFE6155DA9;
+        Wed, 19 Oct 2022 06:29:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1666186147; x=1697722147;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=maPvHabENdJbu0SifYloWSh+XeE9JeazxOD/pHHB/rU=;
+  b=ePpJqt9a4rYoKf3f12FBETQeEqSJKEclKShJ3msgjKvjAPf7WfCLI1pf
+   v/r7NAhjqY+sXAHXt5vodSFw96vWkPNKLGRhe0pahKlQlXpL++/LXbVpr
+   kNF5fTwmx4O6rTERYAPEXWBuIeLmNoYU6Tlpzm1LBIOP0KgEb9AtLbeRg
+   lXM3vlo4Mpb1lJJLLQrQOUqcZ58JEi7L+HUI+yhK30BgKRuvvCNoUeqa6
+   5FLxBsKLf7t2mkQ0630JT7P1FhtIjFThhPj7EVrXK7QHE0WXRcnU+wSfV
+   ZPYEcaJ0VotbFFJVd34yECs4DH8tU9SCPoxaizR7DvaQXGAc9rZe7bvqv
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10505"; a="293803646"
+X-IronPort-AV: E=Sophos;i="5.95,196,1661842800"; 
+   d="scan'208";a="293803646"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2022 06:27:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10505"; a="624134706"
+X-IronPort-AV: E=Sophos;i="5.95,196,1661842800"; 
+   d="scan'208";a="624134706"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by orsmga007.jf.intel.com with ESMTP; 19 Oct 2022 06:27:39 -0700
+Date:   Wed, 19 Oct 2022 21:23:08 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v8 5/8] KVM: Register/unregister the guest private memory
+ regions
+Message-ID: <20221019132308.GA3496045@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-6-chao.p.peng@linux.intel.com>
+ <CA+EHjTxukqBfaN6D+rPOiX83zkGknHEQ16J0k6GQSdL_-e9C6g@mail.gmail.com>
+ <20221012023516.GA3218049@chaop.bj.intel.com>
+ <CA+EHjTyGyGL+ox81=jdtoHERtHPV=P7wJub=3j7chdijyq-AgA@mail.gmail.com>
+ <Y03UiYYioV+FQIpx@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y07Sd6lVfD4IUywQ@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-7.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <Y03UiYYioV+FQIpx@google.com>
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 18, 2022 at 04:21:11PM +0000, Quentin Perret wrote:
-> On Monday 17 Oct 2022 at 12:51:56 (+0100), Will Deacon wrote:
-> > +struct pkvm_hyp_vm {
-> > +	struct kvm kvm;
-> > +
-> > +	/* Backpointer to the host's (untrusted) KVM instance. */
-> > +	struct kvm *host_kvm;
-> > +
-> > +	/*
-> > +	 * Total amount of memory donated by the host for maintaining
-> > +	 * this 'struct pkvm_hyp_vm' in the hypervisor.
-> > +	 */
-> > +	size_t donated_memory_size;
+On Mon, Oct 17, 2022 at 10:17:45PM +0000, Sean Christopherson wrote:
+> On Mon, Oct 17, 2022, Fuad Tabba wrote:
+> > Hi,
+> > 
+> > > > > +#ifdef CONFIG_HAVE_KVM_PRIVATE_MEM
+> > > > > +#define KVM_MEM_ATTR_SHARED    0x0001
+> > > > > +static int kvm_vm_ioctl_set_mem_attr(struct kvm *kvm, gpa_t gpa, gpa_t size,
+> > > > > +                                    bool is_private)
+> > > > > +{
+> > > >
+> > > > I wonder if this ioctl should be implemented as an arch-specific
+> > > > ioctl. In this patch it performs some actions that pKVM might not need
+> > > > or might want to do differently.
+> > >
+> > > I think it's doable. We can provide the mem_attr_array kind thing in
+> > > common code and let arch code decide to use it or not. Currently
+> > > mem_attr_array is defined in the struct kvm, if those bytes are
+> > > unnecessary for pKVM it can even be moved to arch definition, but that
+> > > also loses the potential code sharing for confidential usages in other
+> > > non-architectures, e.g. if ARM also supports such usage. Or it can be
+> > > provided through a different CONFIG_ instead of
+> > > CONFIG_HAVE_KVM_PRIVATE_MEM.
+> > 
+> > This sounds good. Thank you.
 > 
-> I think you could get rid of that member. IIUC, all you need to
-> re-compute it in the teardown path is the number of created vCPUs on
-> the host, which we should have safely stored in
-> pkvm_hyp_vm::kvm::created_vcpus.
+> I like the idea of a separate Kconfig, e.g. CONFIG_KVM_GENERIC_PRIVATE_MEM or
+> something.  I highly doubt there will be any non-x86 users for multiple years,
+> if ever, but it would allow testing the private memory stuff on ARM (and any other
+> non-x86 arch) without needing full pKVM support and with only minor KVM
+> modifications, e.g. the x86 support[*] to test UPM without TDX is shaping up to be
+> trivial.
 
-Oh, well spotted! I've dropped this as you have suggested.
+CONFIG_KVM_GENERIC_PRIVATE_MEM looks good to me.
 
-Will
+Thanks,
+Chao
+> 
+> [*] https://lore.kernel.org/all/Y0mu1FKugNQG5T8K@google.com
