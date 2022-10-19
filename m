@@ -2,62 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58749605169
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 22:40:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACD0460516F
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 22:41:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229861AbiJSUkF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 16:40:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42628 "EHLO
+        id S231437AbiJSUlI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 16:41:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229958AbiJSUkC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 16:40:02 -0400
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35B82631C4
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 13:40:01 -0700 (PDT)
-Received: by mail-lj1-x234.google.com with SMTP id r22so23684360ljn.10
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 13:40:01 -0700 (PDT)
+        with ESMTP id S230095AbiJSUlF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 16:41:05 -0400
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AC9614EC4F
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 13:41:03 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id bj12so42687269ejb.13
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 13:41:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZyhaVSeboNnmbbORkfJfg3+R6TH6gnFWXu6Bt8NE9Ug=;
-        b=jqGK/hlmh4ll0U93BxRicTre7TncMg/7u6AnOPl1YgsOAnCVJ2gBGQjEKV1EPUR8T6
-         RoK14Smlif/GD8/biJNyLb5bW2xgmUeDG0QvrTiin5CJrnDD5ASub5YozVIK/Y2De9FJ
-         74Y2uXqX0hOkUk2yrGSCIkyCZd4wTCgShWpub0LUx4w48EUdncM06gLe93SerhDqCM9l
-         luzNLCFWpiEm+Hhd0tKiwtkmcDsxkIS5dtmyxVm/BSO1oEnNRoCfPO6XiVjx9reFVh4e
-         x/GrEu+Fr+8mJCiN9NH96uJve/gN+mOhqw+y7HO+cEbU0V1kxXhhkGl+8XrGL8XOge+D
-         ar7g==
+        bh=joCEkh4xuAKfbwjroBgzhwFYeKLC3Rr/Phk5mK3CEIs=;
+        b=ljKjEQ6/LXrjOB//YoMH8wFykC0d2vUdow7fzGBEOiWXBe+MBrIfmNuj07kqijMQyS
+         wiI/xaxludaEc225qycRkhZLKfKADBCZEAmv006++mXtnihdL9Q5rWZ1ipk5canlzZhs
+         p4X0kwmlEX3nJ6gLsAIWVASWXbPaaEEovAQc59P9W6oFJat0H7ogfYgIXH5DCQVV1fEd
+         lmT6ieDJftmrkPAnu4EJUnenP6VhowAI08zR43MweoQ6eD6I5RuqqGCwsmczmW+StIcl
+         MFKWuJy0S3QjrvQpfrbsf/YjcBzm7Sga70vmcjv0Nt8Qx2Gs/11rIOMHh6TRhW3fiJJf
+         NQdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ZyhaVSeboNnmbbORkfJfg3+R6TH6gnFWXu6Bt8NE9Ug=;
-        b=lY9vepKtQ108dKqU0T+dD62Kcad6AOFbSHB9BV9znzt7jGipgwEtiYUaNC8da4Lrjy
-         4s9jPLDPuQUKQtDhEOwQnhWud2S5Sdemxy27gGGcC4vest5Nh6wF/R9o1F52E0nYtIC3
-         DyD6EfeQrPv6IF4s6dhxXK+6M1AILHvQ1/N05pUobtouBrsPm7cWqkAZ2ID3yzeGMUuC
-         p/LkEpemf6gkrWH3RCzsb+Acpqb3k7QPQPuUUVb3XpWCWa11pwey56jffuS8iJL2jL/H
-         D5N7gvzKtGLFgsS0ZoZUNNNYxajWjFr2EXAGiO1wF6xkkcjCg8TRBT4btJBDarWGL2SJ
-         z0Qw==
-X-Gm-Message-State: ACrzQf39sRSWUzkYjfFDE0a8cOFY27TKKNA1TWf5WLYXpjnPfDjWFfF8
-        X11HUrcPdRUn34DgmgGCMLa6oAgcILKlQJCINBgYOg==
-X-Google-Smtp-Source: AMsMyM5w0OLJWgjY7Ypi9aLarAlEWCRmn41iiVutqlVMTIDWesFJ8aVfJsxkEdIygN2IYZiTQiMeWOhsGek/x13lMF8=
-X-Received: by 2002:a2e:8717:0:b0:26f:c379:677 with SMTP id
- m23-20020a2e8717000000b0026fc3790677mr3486124lji.445.1666211999223; Wed, 19
- Oct 2022 13:39:59 -0700 (PDT)
+        bh=joCEkh4xuAKfbwjroBgzhwFYeKLC3Rr/Phk5mK3CEIs=;
+        b=eQOl7VKh0wJqaRv3m9o1iGjI7XvUSdfrQGOcsi0wYpkkGZ4xdyUpar03EaEVmpcEpA
+         62YKvX5u3LzzIZU+MtB3ODbydX/zMLBAGblcOrZE8aubF7CMYIX38+luUPW0LDUwH5T5
+         SEJjaT7OupjfXL1E7oawwzhow0nEdKd5q7OTwlG3QX/kxDUTHS1b4XH1aKweUVh1Thoy
+         Hg3cKDAtJLd5+HODmB9vI8D6vNytUp37omy3hZ1JR5uFDGke4As3Dxc6KCnEj1dFG0l0
+         KcCP5s884MovkPPMqXMhjSe3NKc2R2OrGwXcGdHE6n4K0NI+kHpn2EkDg8a94L/dQcU9
+         f8Lw==
+X-Gm-Message-State: ACrzQf3ozcrKO++dSf5mtNwxRVDTpHgSw9Evo0tzXEpikJLQDSVYhhDr
+        pJ653rxf5bhmMIj/ZPOgI8wSeDmT+Vnu2V+PUjg0Bg==
+X-Google-Smtp-Source: AMsMyM4QJOcZTviY2WRyiIf1MzRpYndp0olLr4BgKpndmfz6QaTNGv4T7TznqWveDKh7ibH/2J+XYgRPI/lMgzv9j04=
+X-Received: by 2002:a17:907:628f:b0:72f:58fc:3815 with SMTP id
+ nd15-20020a170907628f00b0072f58fc3815mr8424634ejc.719.1666212061665; Wed, 19
+ Oct 2022 13:41:01 -0700 (PDT)
 MIME-Version: 1.0
 References: <20221019150333.1047423-1-pgonda@google.com> <528937ab-8046-d5d1-26ff-50ef35f5635f@amd.com>
  <CAMkAt6ritG1zmOreh9WYLYAGww0EJQy+m-Y0nfxD5+gpTkpJ1w@mail.gmail.com>
  <821e750b-26c9-3331-7577-5cb832a35afa@amd.com> <CAAH4kHYhLkiN7H03GKgMU+3h9rhp2a03gNFGLbrNtjp=PYYHQw@mail.gmail.com>
  <5621c2b6-a5eb-c786-afee-020e97c0e4c8@amd.com>
 In-Reply-To: <5621c2b6-a5eb-c786-afee-020e97c0e4c8@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Wed, 19 Oct 2022 14:39:47 -0600
-Message-ID: <CAMkAt6pCPmf++Dg=x5bSN4-gR-s7BuYiryOGvGezLupFN9aEKw@mail.gmail.com>
+From:   Dionna Amalie Glaze <dionnaglaze@google.com>
+Date:   Wed, 19 Oct 2022 13:40:50 -0700
+Message-ID: <CAAH4kHYnfQF6fweNQixQnjA95Os9RBvoAhFk6CPtOZmnA0+-9w@mail.gmail.com>
 Subject: Re: [PATCH] virt: Prevent AES-GCM IV reuse in SNP guest driver
 To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Dionna Amalie Glaze <dionnaglaze@google.com>,
-        Borislav Petkov <bp@suse.de>,
+Cc:     Peter Gonda <pgonda@google.com>, Borislav Petkov <bp@suse.de>,
         Michael Roth <michael.roth@amd.com>,
         Haowen Bai <baihaowen@meizu.com>,
         Yang Yingliang <yangyingliang@huawei.com>,
@@ -77,7 +76,7 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 19, 2022 at 1:56 PM Tom Lendacky <thomas.lendacky@amd.com> wrote:
+On Wed, Oct 19, 2022 at 12:56 PM Tom Lendacky <thomas.lendacky@amd.com> wrote:
 >
 > On 10/19/22 14:17, Dionna Amalie Glaze wrote:
 > > On Wed, Oct 19, 2022 at 11:44 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
@@ -150,9 +149,6 @@ On Wed, Oct 19, 2022 at 1:56 PM Tom Lendacky <thomas.lendacky@amd.com> wrote:
 > On the hypervisor side, the certificate blob can be replaced at any time
 > with a new blob that is larger. So you may still have to handle the case
 > where you get a SNP_GUEST_REQ_INVALID_LEN even if you previously asked before.
-
-Ah, I forgot the host could keep changing the size of this data.
-
 >
 > > If not, then send an all zeroes request buffer with the req.certs_len
 > > = 0 values to the VMM.
@@ -167,9 +163,13 @@ Ah, I forgot the host could keep changing the size of this data.
 > >
 > > The way /dev/sev-guest user code has been written, I don't think this
 > > will break any existing software package.
+
 >
 > I think having the sev-guest driver re-issue the request with the internal
 > buffer when it receives SNP_GUEST_REQ_INVALID_LEN is the better way to go.
+
+I take it you mean in the case that the host's certs_len == 0?
+
 > You could still cache the size request and always return that to
 > user-space when a request is received with a 0 length. The user-space
 > program must be able to handle receiving multiple
@@ -179,17 +179,15 @@ Ah, I forgot the host could keep changing the size of this data.
 > logic of the first 0 length request that was received if you get an
 > SNP_GUEST_REQ_INVALID_LEN with the user-space supplied value.
 >
+
+A request that gets SNP_GUEST_REQ_INVALID_LEN when the guest expects
+that it is providing a sufficiently sized certificate buffer means
+that the guest has encrypted its report request.
+We then have a harder problem than throttling because not only do we
+have to reissue the same request, it must be with different
+certificate arguments provided from user space.
+
 > Peter, is this something you could change the patch to do?
-
-OK so the guest retires with the same request when it gets an
-SNP_GUEST_REQ_INVALID_LEN error. It expands its internal buffer to
-hold the certificates. When it finally gets a successful request w/
-certs. Do we want to return the attestation bits to userspace, but
-leave out the certificate data. Or just error out the ioctl
-completely?
-
-I can do that in this series.
-
 >
 > >
 > >>>
@@ -222,28 +220,24 @@ I can do that in this series.
 >
 > And the first caller will have received an -EAGAIN in order to
 > differentiate between the two situations?
->
-> >
-> > Calling the retry ioctl without a pending command will result in -EINVAL.
-> >
-> > Let me know what you think.
+
+Yes, the throttled caller gets -EAGAIN, and other ioctls other than
+retry after that get -EBUSY.
+
 >
 > I think that sounds reasonable, but there are some catches. You will need
 > to ensure that the caller that is supposed to retry does actually retry
 > and that a caller that does retry is the same caller that was told to retry.
-
-Whats the issue with the guest driver taking some time?
-
-This sounds complex because there may be many users of the driver. How
-do multiple users coordinate when they need to use the retry ioctl?
-
 >
-> Thanks,
-> Tom
->
-> >>
-> >> Thanks,
-> >> Tom
-> >
-> >
-> >
+
+I think that constitutes a change to task_struct, the way that there's
+a buffer for interrupted system calls.
+That seems a bit much. Do we have to model for protocol-breaking user
+tasks that have access to /dev/sev-guest?
+The caller that gets -EAGAIN knows to retry. There's no reason for
+other tasks to retry due to command serialization and the -EBUSY
+behavior.
+
+
+-- 
+-Dionna Glaze, PhD (she/her)
