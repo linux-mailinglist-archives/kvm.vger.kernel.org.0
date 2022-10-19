@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0E1C6051A9
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 22:58:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C8226051B5
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 23:05:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231592AbiJSU6i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 16:58:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36952 "EHLO
+        id S231601AbiJSVFT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 17:05:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231571AbiJSU6d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 16:58:33 -0400
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1anam02on2080.outbound.protection.outlook.com [40.107.96.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2515E1C4920;
-        Wed, 19 Oct 2022 13:58:32 -0700 (PDT)
+        with ESMTP id S229724AbiJSVFR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 17:05:17 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2067.outbound.protection.outlook.com [40.107.94.67])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FAF522BCB;
+        Wed, 19 Oct 2022 14:05:15 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XevjOFc4D5blByItFuBmRPZQqYmiZt5peFKzQXiGzfEuR8dj8wAOp2DDKsjDfZbksrRfakYwL2EqEAl3/8t2z40PH2Xlhx6Z5fk88HjlqNCo8Ft5jE22KYl/OcnsRBnDwW0kRc0Rke0/mQ/9SszyBwcx+LQR7kDnOhO2lAv9H21+4rwKzTUfYwMlqCHs3rMYu/pjUSeHiEqs2XV4rLhW7QpGAcRRSDgFYxTbgEV7CJi2nKnNqFxIVQnI0AawqRF++f+xJLljQxeDWSd+hGrkr3upeqk2NvrrtUMKly40cz/V0qg6tYx/R3o/EcCvU1qLiVqIizQbxy0x8d1gbAKjiw==
+ b=fJc1S3Gdnvt7BAR2CiXLrZ6FadU2aejbnBLDLAf9FLooMUMuz7ImWYZfAYX1MQ0i1a7jZ32WqyhPvJQ6n/Cv48KDY/cp/60wKmpZKUFT7nJO6ZMpmhmdMhoEDa4bJprimrtAD5pRegXAAD5bkeYBeGH6YByMMF+kwy9C/jzcFqrB/ptyYpk9uHvumssdgSFYEPD1s6XEN8KnUmkYVgAq3mGJFyX8+QlZ4y6KgLJ1sF8qW/UP6x5qLFRjAUJ+KnAY0DbTD7T9bPZ/eEyWQq1ZC75GJ6DvHgCZkzDHDa3yKdCXnGfyn/uC2bd7Aodu4ruqcpVqNM+G8f0u88yHypKApA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Yl7mtEH25Pc6+rDOzuvbOww7vGpO2M8JHAVpeKTKyts=;
- b=CeLMQ+G3+grZcT0he3lng5UhN5xUHMXkyyjFa6Wrdtpvhuw+fxHbkFjJpKWZBPozGjC+0s/XH8gyc8TRwpZTY5ZejicOpXkphnfm47haNjdUaWgBB/VJG/76hPAXqHeAO2V4rSpZcuYLEofOWYpP35553NFxko8qhMyhSa5w0vFdFhLJAtR5W01GYAjcAtN2HZGmZQj+T5Xt8L+e2SQfOFPUiAQPgHWFuUsrCLzNscHtBhivybvn13zk/o/nMjZklvtq5SRY5yxSyJmaFWzW4Q6tMXAeaCOBhsYW3Sqjulg4ibc1jW1kpNAlxIVXN7le4EcpH+/X1CUATcUW6E/lfw==
+ bh=UTZPjFR+UGzqmSXdgqIGQuBZtOV8GrFY6YqrPsZk0gs=;
+ b=GzFIAZaAFrnzyFFZ62yRs0eTMLoD4xnp5fd2Ek+uvS254q1ptztq3oKJRNROAiIDpFad8HZwopKCueJTBwxwqp3vw/8rAXuA9PnscnWbY17Uaz0mvmG4YjlBMwZ1JLl//Tn/iTzx7BHMIeATkMKN/lO8e/1J3ppt/dMP6KBdDAPdcnKDM1Qr1ZHXPIdKWktCisWrNuf6lKui6EGOM/itfAuSRy6aeWGK+eyfdZfwfENcZZ0Wx+GHGkO9WEpDD1OzxypJ1+Y08touxesb1805iseAhKWM9iDAz+lx80t5OwDtDdPfFpPimZFgk2AIzxcjs0EJmhTIE416pfZ2KBaMBQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Yl7mtEH25Pc6+rDOzuvbOww7vGpO2M8JHAVpeKTKyts=;
- b=nmVo199BPDoeiVpfnCV6yjB4T5lN3caodZxzxNV0McT6W0cf7sEuQxQZxpSToV2rsB5kT7npHIFlq4IV4JeaPmDCwBmc6XolBDYhQm2L3bzfD9AsecC4EAnjXla12fM8f4gas+Q5pKmxUy8DmzKXUYp623Sbp0c2fom4cAxH2DQ=
+ bh=UTZPjFR+UGzqmSXdgqIGQuBZtOV8GrFY6YqrPsZk0gs=;
+ b=onhfvxIUBPzZgkN6jVvfYCvzf/ZM0U10k1AATYcrnYnXjZDfnGSpMMCm4buDhrImvsFmuECipht+bbEkg8JQjQwx02csvTlr0m7bsQAuAvxaWAv9efGhqzK7/xFJyFfOAx9t4SDMuoNiPAXIMaqvvidBaEEvVkUFfBpfHYwAHwk=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by DS0PR12MB6559.namprd12.prod.outlook.com (2603:10b6:8:d1::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5723.26; Wed, 19 Oct 2022 20:58:29 +0000
+ by CY8PR12MB7196.namprd12.prod.outlook.com (2603:10b6:930:58::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.33; Wed, 19 Oct
+ 2022 21:05:13 +0000
 Received: from DM4PR12MB5229.namprd12.prod.outlook.com
  ([fe80::4da8:e3eb:20eb:f00]) by DM4PR12MB5229.namprd12.prod.outlook.com
  ([fe80::4da8:e3eb:20eb:f00%2]) with mapi id 15.20.5723.033; Wed, 19 Oct 2022
- 20:58:29 +0000
-Message-ID: <948704a4-2348-041f-4f46-bbf42d985549@amd.com>
-Date:   Wed, 19 Oct 2022 15:58:27 -0500
+ 21:05:13 +0000
+Message-ID: <10497679-8323-b830-56dc-4a6dc2581a27@amd.com>
+Date:   Wed, 19 Oct 2022 16:05:11 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.2.2
 Subject: Re: [PATCH] virt: Prevent AES-GCM IV reuse in SNP guest driver
 Content-Language: en-US
-To:     Peter Gonda <pgonda@google.com>
-Cc:     Dionna Amalie Glaze <dionnaglaze@google.com>,
-        Borislav Petkov <bp@suse.de>,
+To:     Dionna Amalie Glaze <dionnaglaze@google.com>
+Cc:     Peter Gonda <pgonda@google.com>, Borislav Petkov <bp@suse.de>,
         Michael Roth <michael.roth@amd.com>,
         Haowen Bai <baihaowen@meizu.com>,
         Yang Yingliang <yangyingliang@huawei.com>,
@@ -60,71 +60,71 @@ References: <20221019150333.1047423-1-pgonda@google.com>
  <821e750b-26c9-3331-7577-5cb832a35afa@amd.com>
  <CAAH4kHYhLkiN7H03GKgMU+3h9rhp2a03gNFGLbrNtjp=PYYHQw@mail.gmail.com>
  <5621c2b6-a5eb-c786-afee-020e97c0e4c8@amd.com>
- <CAMkAt6pCPmf++Dg=x5bSN4-gR-s7BuYiryOGvGezLupFN9aEKw@mail.gmail.com>
+ <CAAH4kHYnfQF6fweNQixQnjA95Os9RBvoAhFk6CPtOZmnA0+-9w@mail.gmail.com>
 From:   Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <CAMkAt6pCPmf++Dg=x5bSN4-gR-s7BuYiryOGvGezLupFN9aEKw@mail.gmail.com>
+In-Reply-To: <CAAH4kHYnfQF6fweNQixQnjA95Os9RBvoAhFk6CPtOZmnA0+-9w@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BL0PR02CA0018.namprd02.prod.outlook.com
- (2603:10b6:207:3c::31) To DM4PR12MB5229.namprd12.prod.outlook.com
+X-ClientProxiedBy: CH0PR03CA0008.namprd03.prod.outlook.com
+ (2603:10b6:610:b0::13) To DM4PR12MB5229.namprd12.prod.outlook.com
  (2603:10b6:5:398::12)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|DS0PR12MB6559:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8f8e3535-2575-47f1-5615-08dab214acf1
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|CY8PR12MB7196:EE_
+X-MS-Office365-Filtering-Correlation-Id: 547d2c41-f898-4363-70a4-08dab2159d65
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: CMj/+U/ehn342CvpsIObUtHOhLtYxqRrd3/q0D42Ew0gisErw1B4DcuY1FkU0TlWJ+YVUwL1FnL+2WDxlVI+SItabzmqIOMf7fL+ld5MXPPBRXV+KXhxcUetTU/jNJdSlzx7jPSBDrMeSyt4EXan2+tnDimT8ikuCJCdRMLTptgMKwEOrZ3lG8hAXdLB9DXBGPRfYhgT7eBdvVRKemqmUHVys6qaV+YIBednfezvGqzJRif2cInGhGwUEzNXfRhMeIxiwctkEElb+Dj5xogKmOjzgMaVPvDcvasb5a4MfnrUPHayChq75iMzOBIxukE3MxsFJYu2cTgSKm0QD3ZBeE1Z65Cligyw+fMezszyPPzOWx912DbFSgGjLdOIPVU8Y25p4ORxtBaJ94whJw5rkCwyNvsOgjBFBTyN82tp/YUqmo5tmPyU2rHfbJ1rd100ubOGUDYMWYYrQIjwk7VOyOb1+cL3ff3pWxkXOwXrTD/RmL0t8pIekAWC62EuzHWsztjcbDT1G5Uz8JD05SXNmFLkQZ3cO2Tx2QEMuVzB3K7BkGI+PkxXQYZbgKwEFdOlF+ZNJNq6h1JUX32sRBGWvg0XIWdha0CgE6CqBANplu5VgJxQ9vORUwHd716BmuEC72flTwRkocrBno8hB/cy+X0P2RsWVyOAZYIR9OtzhBsBbwWFp6ktoOffSFOB3NU3YKwDfJjHRf3Ya//2oKv8RH4uPLZFeJeOicf08aA6n+LnxVAuQt4euBzBPh69E1RihXgqNzQXdCR7LoCiK1D1pwMuiEb9CP9YzLuWtKvaONLjGQ1shCB6Wydi7vlEopsdSL22iAEKfxjfb/XpQ36N0kYO6e048fMCGl6q2Jqiqko9L5u7ZGDAlIhbruMmhjNT
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(346002)(39860400002)(136003)(396003)(376002)(451199015)(31686004)(86362001)(8676002)(66556008)(36756003)(6512007)(26005)(6506007)(4326008)(2906002)(66476007)(8936002)(31696002)(38100700002)(5660300002)(41300700001)(66946007)(83380400001)(316002)(54906003)(6916009)(966005)(6486002)(186003)(53546011)(2616005)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: Ml8Y77dyI9ihLFWCOv2z3Ynf+qF02bsoIBiWPQmIJDj+b+9aj/3s229iJZDt4nLnBvNUGz+Z3kMX4cWR2ITxIIwQkXdcG41HraYpBYLfrclgTEKpI1ae74xv2Tn1xViWXUsNpuks5/OV9bZ05QYeTwM5iE+A40C0ds1K8wEPxgVz5rnc+0e1VCU0bxz4xKyWi26VOUX3ZXUaVeDaOIUYsfROx5vuUzvxCK+yFEUhQTk2YWn1XkyXNA1bGLEowBgEpetdtk5l6RsVPwbzNgGPAzS/96fa7jMbACUJtze7l6cBK5u2gWbdl3fmRC7ZjhXF7/dCR7m9V+T6HZ3ZS9aoMAREByoNrwxfkWlRbgi1GTR7oWRDtcoKFQ9wtR3IM0kqxVN38k9jFH0v8H34IOC6mQ/Mo0ZSZUFfa/UDzxa9LmTJ1/xfICb0jFH5xMbIHsh/WYmUwksKw1Og9S45BXIqU2xezdB6TjxIExhyPZYOils7dEHWyoPOalhQAnfLoz7JqMvDXr+WidaPcYM5XdczkSHJDIIizJQRRp3fzy3d2A8cwgv9oFOm4AGayEuxl921fkMf3ZAHfE1yv7AM42tfGJEaOLAZ5+XZ33hLfq5om9+Rx4icOBB3RUaVxlFx6Y/eHnoWHWQxD/+OqIFWeJ5Mo3BCUOI7f9+z6zF07eVCbe96mu7pKjSyUfmxAUVTed0kGYx3B6r9r4Wqc3mFpwWmqPT5DfLVysVn/3W923jfc2m5Y5kTCS+OLsn0DhUVhJQsirUXh2RAwv/1TBDw7E6TRWyEaaPyADxZ5FS7QEV9j981ToNW45Vc3Z7F31Wkv6pMV+Z20tlppSIPiN3gDMeVTeAmo8UsVmWsVhmneOgQlej7UDEoaoGGEL9wOQX6BhtA
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(136003)(366004)(346002)(39860400002)(396003)(451199015)(8676002)(66556008)(4326008)(66476007)(66946007)(316002)(8936002)(41300700001)(6486002)(86362001)(6506007)(6512007)(26005)(966005)(53546011)(54906003)(31696002)(6916009)(31686004)(38100700002)(83380400001)(5660300002)(2616005)(478600001)(36756003)(2906002)(186003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bmRRNUMvL3pPWWtzOGNUVmdobm1XajE0THJja1ZZcEdZUWxqWmxjVnNkcVMw?=
- =?utf-8?B?KzR1d09kTHZCRFNUWTNMbE1XRWoyaEo5bDRKYUMweThpSFFoenUvaFp2VXZk?=
- =?utf-8?B?YlNCSU5zMWdBZVZlVy9pYU16SzZzYzRvTEFTT1Rtb001djFoVzF6ZEhUZGdk?=
- =?utf-8?B?T3NQdE5HdUxyWDFKYVgwdE9nTTZVR0tMZ1QwdUZxa3MvUlJDVjlYdkdKWFdT?=
- =?utf-8?B?VVliRzJzVVgxek04YmluaGhLLzBGMFBVUVFLQ2RRZTJkVGhDZHZqSTU2MURO?=
- =?utf-8?B?aVZ4OEE4a0VQcEhNUVp0SHQ5eURxYTYwdlMra3YwRUZhYXVsZU56dllvTlhG?=
- =?utf-8?B?cGk4d2lzcFozV3NlNXZNUzdmSlU1TENFMjdCOXdGUzBkb2N5dXZCTVAyVFZv?=
- =?utf-8?B?R3pkaFZsR2hjK3RzRDN4VGVEOWt4c0VNTVY4YS96eDRGaU1yMjJwWnU4UkpB?=
- =?utf-8?B?MFBxSU5qdGYxVkR1ZDZJeFM4VjltOE0zZy9VTTd0VWc2VGtMWDF4bFRtV3N4?=
- =?utf-8?B?STEwUC9XcjlBQVVud0JXVnFXZEhnRzhoZGxTcVZDZyt3UTRpTjNKU2lNbWdy?=
- =?utf-8?B?VGYycDFCTVdGbEF5OU5xc2lDRzNSczNKTm5QUThvN3dTc3pTZjZqVWFMSWVh?=
- =?utf-8?B?VGhNektvbkpnbmJoSnNITTR6bmFMMStZNGs2WHk2dXN5bTBCczJqKzByeTRK?=
- =?utf-8?B?UXE3d2dOTkt6cWVCS2VCTXV5cFpacVRhTHU5RGVmLzZWeHZhTjJ0dTB2NklE?=
- =?utf-8?B?SVZLRDNuWWZCU0ZJdk5haGpRVG1MbnZXaDdSZzZjTFdmZmhYNXBNRW5CTTZt?=
- =?utf-8?B?eGptRjZLeGJPZXpNNmpKVklEMVdKZjBkcm13cHRSYU5JQkZuTHlEWU9PbGNO?=
- =?utf-8?B?ZmRxaWVOZ2hIaWdUT1grcUtIQ2dyZXNhcGRhTWxvZE1JcTZXbHpSVkRmNzVF?=
- =?utf-8?B?amJTbEpBT3p2MjQ2K2wzekd3VTlsbGZjWm9zUWdJaWMxV3c5eS9BU2xIUU05?=
- =?utf-8?B?b1d6amVaTVdpZjVPczcwdng0cjJVT2VXZUU3WUV1N3RkL1FJdXkrNjV1djJY?=
- =?utf-8?B?LzFlQXdvOFNmaVAxL2ppejIyWTc5dXNTcWRWL1kvNzI2bEI5dkNWWHAvdDRY?=
- =?utf-8?B?R2JSRHY5S3dhS0FnbU1uaWRUdWMwdVRJN29meGJKWkNWWjN1VnVWd2t6UWFH?=
- =?utf-8?B?L1g4bzI3emhaVUpxNTZJK1l1Vk1WTko2ZDRrQTVEaDBBUS81NENhOHF4ZklS?=
- =?utf-8?B?cTdqV1dxdmI2SW9jdzQvRzd6a2pTZkNxaWxtTE9SemZxNmVyVmMxS3VRYnlK?=
- =?utf-8?B?MmljbndFRXpUZm5NUnRDQ3h1c2ZVV29DczJ5b05oN2FKanYvYWg1a1R0c240?=
- =?utf-8?B?dDNCZGNqVGtndHFYM0hCTFhPckgzbFJBQkI5MkhWR204VVVranE5V3czRjlt?=
- =?utf-8?B?Q2tJSHlXSGJHV3Fibnh5R1FzcUpBbXpBRi92TkZnbk5XeFQxaTBtWmNnZThx?=
- =?utf-8?B?cTA3OFJFL1M3VktSRUJvdDBmc3hobTJadzh5NlVqa3NoSXQwaDV2SW5XMUd4?=
- =?utf-8?B?bVZJK3FXMmd0REZmdlVqQ1cyQUxmYmYrOXlQaUlpL3FyTkdzYTdtNmpVVlAz?=
- =?utf-8?B?YkZiTmtyREN0NTY5S0hiNjNucDE1N0xWUjIyTVFmNTVTaFBUOXluVmEwSzln?=
- =?utf-8?B?d21mcC8wRi9Cc2xwbUVPbjVjcVhGSGhocGJWQXhYUktENEdZRWl1WXM0QjVS?=
- =?utf-8?B?M0wvWGtiRVM3QXF5eWZkWGU2bjIvVjNEaUh3TitmaGhFK1BrUTJURE9CajNw?=
- =?utf-8?B?Q2dsbzRTTkxFeE5MZXlZQ3ZGTXlxcTdSUEd4b2pFcitYWmN5ZVNpQ1RiU1Zk?=
- =?utf-8?B?OGFFdFhueStCT29ScFhldk5mdVBUbVB1VHNRc28zVEJYSUtuS0dyRmhIV3Jh?=
- =?utf-8?B?UFUweDlmMGdWTDl0cWZGbjNIMHUwSW1YSE5zNGE0OUk2VG0rUVlhOGIyMXhG?=
- =?utf-8?B?VGZkUmFwTVAzRTZqcFdLandBdWY1Wkx3VVJ3Y01CUVZDYUQvWFhGRkpzV1Nn?=
- =?utf-8?B?dUVhQ0dobzVRZXhaT2d1dXV0bGVoWEN4ZGVRclRNbFZLZVpYTUlvRzd3cWhD?=
- =?utf-8?Q?QpblEHwhlaxaxK+TwnTawbuSZ?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WDI4dEhuK3B1emJyeVo4Ynl1bUR6NUZ1T1VhRHIrYlRrSE1sSEVudnBWNEtE?=
+ =?utf-8?B?MWt6dGJkM1UrLytaT1VqMDkxK2h3ODVpa3E1dGQ5aXh1elNXbGNxZ2FsRXhY?=
+ =?utf-8?B?M2U5c3JJTFJUc0VLcmhqMytIY1JHNFNnUS8yb21OZS9VcDNONDRqeWNqMlh1?=
+ =?utf-8?B?b0llWTNNWE8xUUhyek54ajlBVUFYa3FMZmFXbERPUmhXTW5aYUlBeWNtcHFo?=
+ =?utf-8?B?eC9nTW5oSmluaFNXR0FaUmVZUlNvVHh4YnU1aWgxSDlJa201ZFMzcURJcG5Z?=
+ =?utf-8?B?NVlDTDVFaTBqdERyQzNUR1VYNkgrdnIzcUJYWUhhNURKN0ZZVzh2eEJFT1NT?=
+ =?utf-8?B?TzBHWi9GdzZJZ1RRSjNPeDVFalIzZW80THlCSWl2QmFCdDZDcUFBeThTcHVO?=
+ =?utf-8?B?bnkvcFlBVXdWa1JlMGdyM1lpeDZ4ZS9lVyszdTRFQjRsaUtKSjJyVWN6aC9a?=
+ =?utf-8?B?R0VhMVU0RUNRL2w4MGxOMXNpY3ZhT2l6eGZmaHZyVW1Ka3ZHRy9oNlBDYnVo?=
+ =?utf-8?B?SmxJelFoYyt0OEFGbGdmbm9aRzNRNmk4NVVmcnV1dzdIbXdjMmdQUFVjRFhJ?=
+ =?utf-8?B?b2QxWWI1V0xJcWlhZzY0Q1R1MVJiVGh2WkJldWxucGttYmJDZFB3K1BaeFhv?=
+ =?utf-8?B?eFVtMXV2QkVzTHo5Qk1qbWV3bU04STd5RGpsMkdLbjJabFc2UUJvUEFBaUt5?=
+ =?utf-8?B?WFV5VFE1WjNrKzltQ2o4N1gzanpVUWIzRWVtRDFwM1hRcWQvMnhSVGx3UE84?=
+ =?utf-8?B?SjA5bWpwTkJjdUdNTHhGa3huZjFsd0ZNdU5OeDVjQVo2WTlPUU1YaXdUVHZS?=
+ =?utf-8?B?V0VKR0M1VXRtZ0VmVDFiK2x6MkozcnhwMUU4UlhZejFad3lyRzRwMFlBNFJk?=
+ =?utf-8?B?bUZnaGtlWFRwd2VQTzRHWGlMMERXNVpCOUV0cFUxdng3TW9pYTg3NTYrUldZ?=
+ =?utf-8?B?UDNGY3hlSFUrSFlWc0tnVUZKM1JDSWlhTitoak5RMkE3VUVmU3ZzSjFKT3E4?=
+ =?utf-8?B?eVNXQUlCSmdBMkFIako3Rm1hamlVTlR4OXo5K0g2TXZ0ajNTeGp5R3ZnbEZ0?=
+ =?utf-8?B?NzlXMXRSRzhiKzlxTmIyRDhDWm80T3RQbkdkTS92dm96UG02OGdBYW9tV0RG?=
+ =?utf-8?B?RHViOTkyWkFmVWRqQ3NqenYwRDRpa1czZ2I4ZzQzcEVHVzI0ZHFpVUVrNzV5?=
+ =?utf-8?B?U3RBTUM4UUtqR0ZFZDlkd1l5Vi85SGoyekI0TG9WeHlpNnFEZndRbjNheVhL?=
+ =?utf-8?B?Znh1K2lYZXprWUxmb1dEMXBOWmlpM000U0NHRHd3ZDcwNVNnU1cyNGZQdWc3?=
+ =?utf-8?B?MFNQUjFtdXYyZHB3R1NsV1JnUTN4cnJKS0FhUmdOVkc3UG1TaUZETCtCVE9o?=
+ =?utf-8?B?cTV0SnluUHgyZGdXc0ErKzlqb0VWYzFhcnZoTzFFckJkeTF2NWFWNGZmMTUw?=
+ =?utf-8?B?bUQ1WXNiT1Y3dkxKWEJnZ2o4RG1HT2hDVEY3STZvb1FGOW45cWxub1psM3U1?=
+ =?utf-8?B?VFdBeFYvbTBKc2czVzBIWmpnRVMrZGJ1bG1IMU1pV1dCTjlVZGt1MG91QkRp?=
+ =?utf-8?B?N0drTEtBdFJzZm1BdFlKTlkxc0xiTWxvRm1JY1NjakhjcmYwczh1LysvK1lu?=
+ =?utf-8?B?d09OWm5tRENLWkV1dnczM2c0NzRmMHNLbG9UV3Q0Sk5QUiszeXR6QStRbWlh?=
+ =?utf-8?B?Qm42Vk1ma2RwNTl5YVhkUGdzMnRvdE1tblN4ZlVKWmhHZGNlWVI1RXk4a3Nn?=
+ =?utf-8?B?SzF4SWZKamMvNkF5S3hWSkg3cTZ1eldJQ0ppTmdnTlpweWFGdHcxdU1yU2l2?=
+ =?utf-8?B?N0lkUWtlemZySUg4Y3VlaXRMeGNqOHJWUEpFVnlkbFVGNGk3S3V1ZWp0S3VF?=
+ =?utf-8?B?WmFPdmZwS1ZDMEZKNVVnbVlWSUNXV21JMVBScnBuQWhjZDhJbm43VnJXWFZQ?=
+ =?utf-8?B?eXRnbFBnSm4yM3AwSmZFN0YrMHBQck9walFNLzNEMkU2R1FmRFo5eXNmZUpv?=
+ =?utf-8?B?bnc2S0lqL2xJRGtGWEFzT0dWbEFaYS94d0lDNHdhdDhhUTZOOVVCNDNjMGUw?=
+ =?utf-8?B?MS80TTNVSTdCMklJTklLT2pWcisrdGk2Y1gvd3BRZ2tMVWtuUE4yd1BFaGNw?=
+ =?utf-8?Q?+JfsCN8tv88wKsJd75tHts2nQ?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8f8e3535-2575-47f1-5615-08dab214acf1
+X-MS-Exchange-CrossTenant-Network-Message-Id: 547d2c41-f898-4363-70a4-08dab2159d65
 X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2022 20:58:29.8027
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Oct 2022 21:05:13.2325
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fxv45hpiaRctdmt7ieuPkP8mQLf6+GDCXsvfGvb1KOcIARhXBCdYMLF9bJMhb9jT0yDqElZgQLcYpRifLqOwEw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6559
+X-MS-Exchange-CrossTenant-UserPrincipalName: sN2nm8+mK3FLTJBWf3PTdHBXj7eRnEAETOLAqu4JWwfUnYsAn0eRN3soOs0YLZ71Sbhp7vF/4fXi+29DtMtseA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7196
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
@@ -135,8 +135,8 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/19/22 15:39, Peter Gonda wrote:
-> On Wed, Oct 19, 2022 at 1:56 PM Tom Lendacky <thomas.lendacky@amd.com> wrote:
+On 10/19/22 15:40, Dionna Amalie Glaze wrote:
+> On Wed, Oct 19, 2022 at 12:56 PM Tom Lendacky <thomas.lendacky@amd.com> wrote:
 >>
 >> On 10/19/22 14:17, Dionna Amalie Glaze wrote:
 >>> On Wed, Oct 19, 2022 at 11:44 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
@@ -209,9 +209,6 @@ On 10/19/22 15:39, Peter Gonda wrote:
 >> On the hypervisor side, the certificate blob can be replaced at any time
 >> with a new blob that is larger. So you may still have to handle the case
 >> where you get a SNP_GUEST_REQ_INVALID_LEN even if you previously asked before.
-> 
-> Ah, I forgot the host could keep changing the size of this data.
-> 
 >>
 >>> If not, then send an all zeroes request buffer with the req.certs_len
 >>> = 0 values to the VMM.
@@ -226,9 +223,18 @@ On 10/19/22 15:39, Peter Gonda wrote:
 >>>
 >>> The way /dev/sev-guest user code has been written, I don't think this
 >>> will break any existing software package.
+> 
 >>
 >> I think having the sev-guest driver re-issue the request with the internal
 >> buffer when it receives SNP_GUEST_REQ_INVALID_LEN is the better way to go.
+> 
+> I take it you mean in the case that the host's certs_len == 0?
+
+Not sure what you mean. The sev-guest driver has an internal buffer for 
+receiving the certs, snp_dev->certs_data, and it would use that whenever 
+it receives an SNP_GUEST_REQ_INVALID_LEN return code.
+
+> 
 >> You could still cache the size request and always return that to
 >> user-space when a request is received with a 0 length. The user-space
 >> program must be able to handle receiving multiple
@@ -238,29 +244,23 @@ On 10/19/22 15:39, Peter Gonda wrote:
 >> logic of the first 0 length request that was received if you get an
 >> SNP_GUEST_REQ_INVALID_LEN with the user-space supplied value.
 >>
+> 
+> A request that gets SNP_GUEST_REQ_INVALID_LEN when the guest expects
+> that it is providing a sufficiently sized certificate buffer means
+> that the guest has encrypted its report request.
+
+Correct.
+
+> We then have a harder problem than throttling because not only do we
+> have to reissue the same request, it must be with different
+> certificate arguments provided from user space.
+
+Correct. But before returning the error to userspace, the sev-guest driver 
+will issue the request again with its internal buffer so that the sequence 
+numbers are updated and a new request can be issued.
+
+> 
 >> Peter, is this something you could change the patch to do?
-> 
-> OK so the guest retires with the same request when it gets an
-> SNP_GUEST_REQ_INVALID_LEN error. It expands its internal buffer to
-
-It would just use the pre-allocated snp_dev->certs_data buffer with npages 
-set to the full size of that buffer.
-
-> hold the certificates. When it finally gets a successful request w/
-> certs. Do we want to return the attestation bits to userspace, but
-> leave out the certificate data. Or just error out the ioctl
-> completely?
-
-We need to be able to return the attestation bits that came back with the 
-extra certs. So just error out of the ioctl with the length error and let 
-user-space retry with the recommended number of pages.
-
-> 
-> I can do that in this series.
-
-Thanks!
-
-> 
 >>
 >>>
 >>>>>
@@ -293,28 +293,30 @@ Thanks!
 >>
 >> And the first caller will have received an -EAGAIN in order to
 >> differentiate between the two situations?
->>
->>>
->>> Calling the retry ioctl without a pending command will result in -EINVAL.
->>>
->>> Let me know what you think.
+> 
+> Yes, the throttled caller gets -EAGAIN, and other ioctls other than
+> retry after that get -EBUSY.
+> 
 >>
 >> I think that sounds reasonable, but there are some catches. You will need
 >> to ensure that the caller that is supposed to retry does actually retry
 >> and that a caller that does retry is the same caller that was told to retry.
-> 
-> Whats the issue with the guest driver taking some time?
-> 
-> This sounds complex because there may be many users of the driver. How
-> do multiple users coordinate when they need to use the retry ioctl?
-> 
 >>
->> Thanks,
->> Tom
->>
->>>>
->>>> Thanks,
->>>> Tom
->>>
->>>
->>>
+> 
+> I think that constitutes a change to task_struct, the way that there's
+> a buffer for interrupted system calls.
+> That seems a bit much. Do we have to model for protocol-breaking user
+> tasks that have access to /dev/sev-guest?
+> The caller that gets -EAGAIN knows to retry. There's no reason for
+> other tasks to retry due to command serialization and the -EBUSY
+> behavior.
+
+Maybe for well-behaving user-space applications, but that's not 
+guaranteed. I agree with Peter and think waiting in the sev-guest driver 
+is the simplest and fairest thing to do in the case of throttling.
+
+Thanks,
+Tom
+
+> 
+> 
