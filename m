@@ -2,115 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08401604F06
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 19:40:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 502F4604F30
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 19:57:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230316AbiJSRkm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 13:40:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59976 "EHLO
+        id S229773AbiJSR5I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 13:57:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229836AbiJSRkk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 13:40:40 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9233819044A
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 10:40:34 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id b1so29346361lfs.7
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 10:40:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Afowyyon5euI9PhaibGARBLnjdO0Eh8339cH1CRlAG4=;
-        b=oN5WzzhF2z026vxDeU3ravyd7cp56GNv6K4OlSAMpfrlWRMw2m0fPV2wVMpeV5UKaV
-         +0OvWqZcLSTARVGN7SEtsOnWNk54doU/b7NF/vnK47uMwOBpOUCvkx4gW66j05fldwch
-         5Ht2SmtpsBrDZcX5oC6Qc+/vT5S52k9674loddh1y+h91B5X8Rj+EHmCBaU/ueH6GZeg
-         n8u9n/sE6sxaaz5BCUDyjHtmrILpugKGn51vrV2/Y2onvHPAy7lDcFHpRfl4bg6Itsb5
-         j/K/1/0XTpyyLrP04yPqP+UT5+/Zjo10XfMaA4n7ZgZKw0x8dVbXgulldmfgJFK5duDq
-         6K8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Afowyyon5euI9PhaibGARBLnjdO0Eh8339cH1CRlAG4=;
-        b=KWJWA87Z0zrjWd65Ajc4aDFrqnMwl8h1EGrjBQTeMugfvNCUpVart3szIuTej+94bC
-         0513SnkIkUW5CaA82gWLUwG8CCS5Pcpbc16OudPJGuLJaRnZ/jdWvA6rT8DgSX80ujDt
-         9ah32xO6NdO9yMJO50JqF9uPcgxg1HFhTS8X+gEUn079Mx7iEKXA9W1YJWFiy56kQ2bl
-         zBlWkMDWerooqEVYAi5Kk9mXeIW5lZ1Zm3iv+6hF0aRQ6U+ROwgIX69jTh2Wl5wV2Uau
-         jdSI9OrCq6IRecJVzpk3VEEVP/VuFn0RnetaWPENc67OqC2K/ZovRvlJkLKeoXJnwQ8w
-         +uEA==
-X-Gm-Message-State: ACrzQf0BMKUQ55awC93ERAE17gQQaykAeLI8Zwm6WFHdxCZj4eW+n+IL
-        r4/KtSfI5nwdZIJeaPFjoTzfT6oi7JhUWv4HvJqbDg==
-X-Google-Smtp-Source: AMsMyM5OM0rkP4xd7qFD7X+W9BDiy0UNKNnDjY/WWqLGY78WJGku/tyVodwij2Sz0kBzFDfICmNvPAAhyWIOG7+B0NQ=
-X-Received: by 2002:a19:5f52:0:b0:4a2:2429:c6d5 with SMTP id
- a18-20020a195f52000000b004a22429c6d5mr3690244lfj.291.1666201231457; Wed, 19
- Oct 2022 10:40:31 -0700 (PDT)
-MIME-Version: 1.0
-References: <20221019150333.1047423-1-pgonda@google.com> <528937ab-8046-d5d1-26ff-50ef35f5635f@amd.com>
-In-Reply-To: <528937ab-8046-d5d1-26ff-50ef35f5635f@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Wed, 19 Oct 2022 11:40:18 -0600
-Message-ID: <CAMkAt6ritG1zmOreh9WYLYAGww0EJQy+m-Y0nfxD5+gpTkpJ1w@mail.gmail.com>
-Subject: Re: [PATCH] virt: Prevent AES-GCM IV reuse in SNP guest driver
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Borislav Petkov <bp@suse.de>, Michael Roth <michael.roth@amd.com>,
-        Haowen Bai <baihaowen@meizu.com>,
-        Yang Yingliang <yangyingliang@huawei.com>,
-        Marc Orr <marcorr@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Dionna Glaze <dionnaglaze@google.com>
+        with ESMTP id S229861AbiJSR5H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 13:57:07 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C75441CC3F6
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 10:57:05 -0700 (PDT)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29JGC7NS014876;
+        Wed, 19 Oct 2022 17:56:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=/xMreriU+31uXvWJjV2YSNJJwQFg+4U2/9ARamyXzUM=;
+ b=FcmSdTL8pe0Yz4OTtjGwjWaSiJIFZ4ude3bmvfyxue4nmH7ou1SSUIactEHifbzBJCT6
+ x9weXJWpAvLwM9eFWLGyvGxgK9s7b4Y5y7yCTylvyy4YcMMGqVjsUymtkoyXP7c+Lok6
+ TIjPezesUmKn5oDD5t1rN1iEEoMcDW28koT3V3+hVr5cGmnW3Y8u+Vwi+kAcBqtNTF8h
+ bKotgsmvA+VqAGrVhi+Emv31TkZHcPDAey2UI9X31jNALRjLwU2uQu4fiZaZJd2tL3L/
+ tN0NGTSM81SIfxWORDY0cqYaqea6GiDfeQ6qtObItO4ibWhUovRYYQvTbCA3DfYg7niF Mg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kamhx36f2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Oct 2022 17:56:46 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29JH2XDu016750;
+        Wed, 19 Oct 2022 17:56:46 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kamhx36ds-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Oct 2022 17:56:46 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29JHuheB001044;
+        Wed, 19 Oct 2022 17:56:43 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma02fra.de.ibm.com with ESMTP id 3k7mg95p2s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Oct 2022 17:56:43 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29JHvDE852363674
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Oct 2022 17:57:13 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 78BA142041;
+        Wed, 19 Oct 2022 17:56:40 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A376B4203F;
+        Wed, 19 Oct 2022 17:56:39 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.16.14])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 19 Oct 2022 17:56:39 +0000 (GMT)
+Message-ID: <f3b7dc0cbbbcb53f9763a0ed00f96e8157002517.camel@linux.ibm.com>
+Subject: Re: [PATCH v10 1/9] s390x/cpu topology: core_id sets s390x CPU
+ topology
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>,
+        =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+        qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com
+Date:   Wed, 19 Oct 2022 19:56:39 +0200
+In-Reply-To: <b584418d-8a6d-d618-fd21-3b71d27f1e3e@linux.ibm.com>
+References: <20221012162107.91734-1-pmorel@linux.ibm.com>
+         <20221012162107.91734-2-pmorel@linux.ibm.com>
+         <5d5ff3cb-43a0-3d15-ff17-50b46c57a525@kaod.org>
+         <b584418d-8a6d-d618-fd21-3b71d27f1e3e@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ZmEJoVBUOCGmKItUSyQXBfyBloswc0PL
+X-Proofpoint-GUID: 9aLup1NQoCP_iTB_xpZUWWH3rXCFYKa7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-19_11,2022-10-19_04,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
+ impostorscore=0 mlxscore=0 clxscore=1011 adultscore=0 malwarescore=0
+ bulkscore=0 mlxlogscore=763 priorityscore=1501 phishscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210190099
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 19, 2022 at 11:03 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
->
-> On 10/19/22 10:03, Peter Gonda wrote:
-> > The ASP and an SNP guest use a series of AES-GCM keys called VMPCKs to
-> > communicate securely with each other. The IV to this scheme is a
-> > sequence number that both the ASP and the guest track. Currently this
-> > sequence number in a guest request must exactly match the sequence
-> > number tracked by the ASP. This means that if the guest sees an error
-> > from the host during a request it can only retry that exact request or
-> > disable the VMPCK to prevent an IV reuse. AES-GCM cannot tolerate IV
-> > reuse see:
-> > https://csrc.nist.gov/csrc/media/projects/block-cipher-techniques/documents/bcm/comments/800-38-series-drafts/gcm/joux_comments.pdf
->
-> I wonder if we can at least still support the extended report length query
-> by having the kernel allocate the required pages when the error is
-> SNP_GUEST_REQ_INVALID_LEN and retry the exact request again. If there are
-> no errors on the second request, the sequence numbers can be safely
-> updated, but the kernel returns the original error (which will provide the
-> caller with the number of pages required).
+On Wed, 2022-10-19 at 17:39 +0200, Pierre Morel wrote:
+> 
+> On 10/18/22 18:43, Cédric Le Goater wrote:
+[...]
+> > 
+> > > diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+> > > new file mode 100644
+> > > index 0000000000..42b22a1831
+> > > --- /dev/null
+> > > +++ b/hw/s390x/cpu-topology.c
+> > > @@ -0,0 +1,132 @@
+> > > +/*
+> > > + * CPU Topology
+> > > + *
+> > > + * Copyright IBM Corp. 2022
+> > 
+> > The Copyright tag is different in the .h file.
+> 
+> OK, I change this to be like in the header file it seems to be the most 
+> used format.
+> 
+No, this form, with the date at the end, is the correct one.
+> 
 
-I think we can but I thought fixing the security bug could come first,
-then the usability fix after. Dionna was planning on working on that
-fix.
-
-In that flow how does userspace get the data? Its called the ioctl
-with not enough output buffer space. What if the userspace calls the
-ioctl with no buffers space allocated, so its trying to query the
-length. We just send the host the request without any encrypted data.
-
->
-> For the rate-limiting patch series [1], the rate-limiting will have to be
-> performed within the kernel, while the mutex is held, and then retry the
-> exact request again. Otherwise, that error will require disabling the
-> VMPCK. Either that, or the hypervisor must provide the rate limiting.
->
-> Thoughts?
->
-> [1] https://lore.kernel.org/lkml/20221013160040.2858732-1-dionnaglaze@google.com/
-
-Yes I think if the host rate limits the guest. The guest kernel should
-retry the exact message. Which mutex are you referring too?
+[...]
