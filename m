@@ -2,143 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75F5360511D
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 22:14:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B7BA660512B
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 22:18:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230198AbiJSUOO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 16:14:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35396 "EHLO
+        id S230218AbiJSUSy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 16:18:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230202AbiJSUOM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 16:14:12 -0400
-Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E2801C73EC
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 13:14:11 -0700 (PDT)
-Received: by mail-oi1-x236.google.com with SMTP id w196so20530142oiw.8
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 13:14:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kqJOFlfwNgCDzAUg+3GKgd5GjZJIWzZ3Ope902HuuIc=;
-        b=aamPcz5cH2f8vrWESZ8tn5FtLYZ0e2DUYmpGuRUSftaqxaK1qlNpUlih4yCfZesLbY
-         k0GC/vrRRBwmINiUlgmBYLEoi54Rw1e61DBNjVJ3m1zIZqV5DlC0sj43HJPpaprwDQFF
-         gtom64pXNAd5XfaKkKu8OfnRqwFcsGO59fopaEzxI+Ap7brT85i96IbVXUMNhS/1fYf3
-         HQlTdAojQumAEuhFodP9w5LLXb7y33T4FKd9OcDEjDPXwPXKJ44Jpz94UUXC3PwQVjMl
-         QA9RGuLFUuKtd1T2IrpyBNFCweBnL8MQXxLPcdSKwTw76yFEOuexU0IjNjvN+I5dIKJ0
-         Skcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kqJOFlfwNgCDzAUg+3GKgd5GjZJIWzZ3Ope902HuuIc=;
-        b=O+iRIdkaIICEhEsQUmBumQ+DGo4m5uQJbLIgZs6OzJ13Vq9aVIqG/0MWfJGA4YCdbr
-         G5N/rxcZJ1ReV8FGtEcweLiQQm5efsFAoJ3AC/QK6VXLy+cijbfnBfBH8bXkqLxJOWJZ
-         Sk2qgNW+MJO0C9/824El0/kDbov3BLAP15TWrdCL38PbuG668lr9SN+oRhd8MUMDrj05
-         84m150+SIvDsnTVCWOEmcvJJSWtJOrLSlN+ITCco7bEiBLwCEQMh45K+7/wzJvKLCAQ+
-         QBfuzcWvKimrxCAZiRArpRMqA9c0BcFByU6oyR3nUXvL/wkT/yRGXshwJHwQ2cAOPX1j
-         wQGg==
-X-Gm-Message-State: ACrzQf2/wxOCJUPwXU9HZjYeGTcJwL9zSN6+XfjAhfA3i7xG7kadtgwR
-        dB+b2xpHaIt0yJtQvJz1wJYX/tqs5OuaRQ==
-X-Google-Smtp-Source: AMsMyM6ZjthZ89X/AzB9A91vqAp+Yy+SUd6tr8hw1WsJG+8UbSs3dNoWv5Uxjsb5wSL4CoQUU7urSw==
-X-Received: by 2002:a17:90b:278c:b0:20a:e1e6:5340 with SMTP id pw12-20020a17090b278c00b0020ae1e65340mr47245894pjb.239.1666210440194;
-        Wed, 19 Oct 2022 13:14:00 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id q6-20020a170902dac600b0018542a1b553sm10954895plx.127.2022.10.19.13.13.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Oct 2022 13:13:59 -0700 (PDT)
-Date:   Wed, 19 Oct 2022 20:13:56 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v11 16/46] KVM: x86: hyper-v: Don't use
- sparse_set_to_vcpu_mask() in kvm_hv_send_ipi()
-Message-ID: <Y1BahCzO4jxFC9Ey@google.com>
-References: <20221004123956.188909-1-vkuznets@redhat.com>
- <20221004123956.188909-17-vkuznets@redhat.com>
+        with ESMTP id S229935AbiJSUSw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 16:18:52 -0400
+Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B0631A0C2F;
+        Wed, 19 Oct 2022 13:18:49 -0700 (PDT)
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1olFWW-0003EF-DJ; Wed, 19 Oct 2022 22:18:44 +0200
+Message-ID: <a45cfcc9-0255-14f0-30a5-18d6efaad0d4@maciej.szmigiero.name>
+Date:   Wed, 19 Oct 2022 22:18:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221004123956.188909-17-vkuznets@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Content-Language: en-US, pl-PL
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
+        zhenyzha@redhat.com, shan.gavin@gmail.com, kvmarm@lists.linux.dev,
+        pbonzini@redhat.com, shuah@kernel.org,
+        kvmarm@lists.cs.columbia.edu, ajones@ventanamicro.com
+References: <20221014071914.227134-1-gshan@redhat.com>
+ <20221014071914.227134-5-gshan@redhat.com>
+ <3eecebca-a526-d10a-02d3-496ce919d577@maciej.szmigiero.name>
+ <bd5df92c-6870-8053-0b35-a2ad993970bd@redhat.com>
+ <da2b7db0-509a-c9e0-c36b-6487a265a779@redhat.com>
+ <a1a8664c-4d06-89e7-8cfa-b730969bb841@maciej.szmigiero.name>
+ <5bfbe050-a654-8400-e1f1-dcfa4dba13e6@redhat.com>
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: Re: [PATCH 4/6] KVM: selftests: memslot_perf_test: Support variable
+ guest page size
+In-Reply-To: <5bfbe050-a654-8400-e1f1-dcfa4dba13e6@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 04, 2022, Vitaly Kuznetsov wrote:
-> @@ -2034,7 +2056,10 @@ static void kvm_send_ipi_to_many(struct kvm *kvm, u32 vector,
->  	unsigned long i;
->  
->  	kvm_for_each_vcpu(i, vcpu, kvm) {
-> -		if (vcpu_bitmap && !test_bit(i, vcpu_bitmap))
-> +		if (sparse_banks &&
-> +		    !hv_is_vp_in_sparse_set(kvm_hv_get_vpindex(vcpu),
-> +					    valid_bank_mask,
-> +					    sparse_banks))
+On 19.10.2022 02:26, Gavin Shan wrote:
+> On 10/18/22 11:56 PM, Maciej S. Szmigiero wrote:
+>> On 18.10.2022 02:51, Gavin Shan wrote:
+>>> On 10/18/22 8:46 AM, Gavin Shan wrote:
+>>>> On 10/18/22 5:31 AM, Maciej S. Szmigiero wrote:
+>>>>> On 14.10.2022 09:19, Gavin Shan wrote:
+>>>>>> The test case is obviously broken on aarch64 because non-4KB guest
+>>>>>> page size is supported. The guest page size on aarch64 could be 4KB,
+>>>>>> 16KB or 64KB.
+>>>>>>
+>>>>>> This supports variable guest page size, mostly for aarch64.
+>>>>>>
+>>>>>>    - The host determines the guest page size when virtual machine is
+>>>>>>      created. The value is also passed to guest through the synchronization
+>>>>>>      area.
+>>>>>>
+>>>>>>    - The number of guest pages are unknown until the virtual machine
+>>>>>>      is to be created. So all the related macros are dropped. Instead,
+>>>>>>      their values are dynamically calculated based on the guest page
+>>>>>>      size.
+>>>>>>
+>>>>>>    - The static checks on memory sizes and pages becomes dependent
+>>>>>>      on guest page size, which is unknown until the virtual machine
+>>>>>>      is about to be created. So all the static checks are converted
+>>>>>>      to dynamic checks, done in check_memory_sizes().
+>>>>>>
+>>>>>>    - As the address passed to madvise() should be aligned to host page,
+>>>>>>      the size of page chunk is automatically selected, other than one
+>>>>>>      page.
+>>>>>>
+>>>>>>    - All other changes included in this patch are almost mechanical
+>>>>>>      replacing '4096' with 'guest_page_size'.
+>>>>>>
+>>>>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>>>>>> ---
+>>>>>>   .../testing/selftests/kvm/memslot_perf_test.c | 191 +++++++++++-------
+>>>>>>   1 file changed, 115 insertions(+), 76 deletions(-)
+>>>>>>
+>>>>>> diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
+>>>>>> index d5aa9148f96f..d587bd952ff9 100644
+>>>>>> --- a/tools/testing/selftests/kvm/memslot_perf_test.c
+>>>>>> +++ b/tools/testing/selftests/kvm/memslot_perf_test.c
+>> (...)
+>>>>>> @@ -77,8 +61,7 @@ static_assert(MEM_TEST_UNMAP_SIZE_PAGES %
+>>>>>>    * for the total size of 25 pages.
+>>>>>>    * Hence, the maximum size here is 50 pages.
+>>>>>>    */
+>>>>>> -#define MEM_TEST_MOVE_SIZE_PAGES    (50)
+>>>>>> -#define MEM_TEST_MOVE_SIZE        (MEM_TEST_MOVE_SIZE_PAGES * 4096)
+>>>>>> +#define MEM_TEST_MOVE_SIZE        0x32000
+>>>>>
+>>>>> The above number seems less readable than an explicit value of 50 pages.
+>>>>>
+>>>>> In addition to that, it's 50 pages only with 4k page size, so at least
+>>>>> the comment above needs to be updated to reflect this fact.
+>>>>>
+>>>>
+>>>> Yeah, I will change the comments like below in next revision.
+>>>>
+>>>>   /*
+>>>>    * When running this test with 32k memslots, actually 32763 excluding
+>>>>    * the reserved memory slot 0, the memory for each slot is 0x4000 bytes.
+>>>>    * The last slot contains 0x19000 bytes memory. Hence, the maximum size
+>>>>    * here is 0x32000 bytes.
+>>>>    */
+>>>>
+>>>
+>>> I will replace those numbers with readable ones like below :)
+>>>
+>>> /*
+>>>   * When running this test with 32k memslots, actually 32763 excluding
+>>>   * the reserved memory slot 0, the memory for each slot is 16KB. The
+>>>   * last slot contains 100KB memory with the remaining 84KB. Hence,
+>>>   * the maximum size is double of that (200KB)
+>>>   */
+>>
+>> Still, these numbers are for x86, which has KVM_INTERNAL_MEM_SLOTS
+>> defined as 3.
+>>
+>> As far as I can see aarch64 has KVM_INTERNAL_MEM_SLOTS equal to 0, so
+>> this arch has 32766 slot available for the test memory.
+>>
+>> Quick calculations show that this will result in 112 KiB of memory in
+>> the last slot for 4 KiB page size (while for 64 KiB page size the
+>> maximum slot count for this test is 8192 anyway - not counting slot 0).
+>>
+> 
+> It seems your calculation had (512MB+64KB), instead of (512MB+4KB).
+> In this particular patch, we still have (512MB+4KB). How about to change
+> like below in this patch. In next patch, it's adjusted accordingly after
+> we have (512MB+64KB).
 
-Nit, this fits on two lines and IMO is slightly easier on the eyes:
+My review comment above referred to the final MEM_SIZE value after the
+whole series, so 512 MiB + 64 KiB.
 
-		if (sparse_banks &&
-		    !hv_is_vp_in_sparse_set(kvm_hv_get_vpindex(vcpu),
-					    valid_bank_mask, sparse_banks))
-			continue;
+I placed that review comment on patch 4 since it's the only patch in this
+series that modified the code comment about MEM_TEST_MOVE_SIZE.
 
->  			continue;
->  
->  		/* We fail only when APIC is disabled */
-> @@ -2047,7 +2072,6 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
->  	struct kvm *kvm = vcpu->kvm;
->  	struct hv_send_ipi_ex send_ipi_ex;
->  	struct hv_send_ipi send_ipi;
-> -	DECLARE_BITMAP(vcpu_mask, KVM_MAX_VCPUS);
->  	u64 valid_bank_mask;
->  	u64 sparse_banks[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
->  	u32 vector;
-> @@ -2109,13 +2133,7 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
->  	if ((vector < HV_IPI_LOW_VECTOR) || (vector > HV_IPI_HIGH_VECTOR))
->  		return HV_STATUS_INVALID_HYPERCALL_INPUT;
->  
-> -	if (all_cpus) {
-> -		kvm_send_ipi_to_many(kvm, vector, NULL);
-> -	} else {
-> -		sparse_set_to_vcpu_mask(kvm, sparse_banks, valid_bank_mask, vcpu_mask);
-> -
-> -		kvm_send_ipi_to_many(kvm, vector, vcpu_mask);
-> -	}
-> +	kvm_hv_send_ipi_to_many(kvm, vector, all_cpus ? NULL : sparse_banks, valid_bank_mask);
+> 
+> (1) In this patch, the comment is changed to as below
+> 
+>      /*
+>       * We have different number of memory slots, excluding the reserved
+>       * memory slot 0, on various architectures and configurations. The
+>       * memory size in this test is calculated by doubling the maximal
+>       * memory size in last memory slot, with alignment to the largest
+>       * supported page size (64KB).
+>       *
+>       * architecture   slots    memory-per-slot    memory-on-last-slot
+>       * --------------------------------------------------------------
+>       * x86-4KB        32763    16KB               100KB
+>       * arm64-4KB      32766    16KB               52KB
+>       * arm64-64KB     8192     64KB               64KB
+>       */
+>      #define MEM_TEST_MOVE_SIZE    0x40000           /* 256KB */
+>
+> (2) In the next patch, where we have (512MB+64KB) after the various
+>      memory sizes are consolidated, It is adjusted accordingly as below.
+> 
+>      /*
+>       * We have different number of memory slots, excluding the reserved
+>       * memory slot 0, on various architectures and configurations. The
+>       * memory size in this test is calculated by doubling the maximal
+>       * memory size in last memory slot, with alignment to the largest
+>       * supported page size (64KB).
+>       *
+>       * architecture   slots    memory-per-slot    memory-on-last-slot
+>       * --------------------------------------------------------------
+>       * x86-4KB        32763    16KB               160KB
+>       * arm64-4KB      32766    16KB               112KB
+>       * arm64-64KB     8192     64KB               128KB
+>       */
+>      #define MEM_TEST_MOVE_SIZE    0x50000           /* 320KB */
 
-Any objection to not using a ternary operator?
+Now MEM_TEST_MOVE_SIZE is too high for arm64-4KB and arm64-64KB cases
+(it needs 160 KiB in the last slot but has less available in these two
+cases).
 
-	if (all_cpus)
-		kvm_hv_send_ipi_to_many(kvm, vector, NULL, 0);
-	else
-		kvm_hv_send_ipi_to_many(kvm, vector, sparse_banks, valid_bank_mask);
+Using a test size of 192 KiB instead seems like a small difference
+from the original size of 200 KiB, while still being aligned to
+64 KiB.
 
-Mostly because it's somewhat arbitrary that earlier code ensures valid_bank_mask
-is set in the all_cpus=true case, e.g. arguably KVM doesn't need to do the var_cnt
-sanity check in the all_cpus case:
+The move benchmarks runtime difference on x86-4KB with this size
+(compared to sizes of 200 KiB and 320 KiB) seems to be negligible.
 
-		all_cpus = send_ipi_ex.vp_set.format == HV_GENERIC_SET_ALL;
-		if (all_cpus)
-			goto check_and_send_ipi;
+Since it's an odd number of 64 KiB pages (3) the code that halves
+this number of pages will need to be adjusted to operate on raw
+sizes instead.
 
-		valid_bank_mask = send_ipi_ex.vp_set.valid_bank_mask;
-		if (hc->var_cnt != hweight64(valid_bank_mask))
-			return HV_STATUS_INVALID_HYPERCALL_INPUT;
+I can see a single block of code that will need such adjustment:
+> if (lastpages < move_pages / 2) {
+>         *maxslots = 0;
+>         return false;
+> }   
 
-		if (!hc->var_cnt)
-			goto ret_success;
+Similar remark goes for the case (1) above, where you'll probably need
+to use 64 KiB test area size (it's only an intermediate form of code
+before the final patch changes this value so it's fine if it doesn't
+perform as well as the final form of the code).
+
+> Thanks,
+> Gavin
+> 
+
+Thanks,
+Maciej
+
