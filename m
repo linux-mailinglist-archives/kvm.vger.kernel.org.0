@@ -2,162 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 60FF36044B5
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 14:11:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B0D0604530
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 14:25:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232823AbiJSMLr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 08:11:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49054 "EHLO
+        id S232810AbiJSMXv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 08:23:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231784AbiJSMLR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 08:11:17 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5614516251D
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 04:46:18 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id l4so16986606plb.8
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 04:46:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZGoLnZ3sUUjQ6T551O77F/cGWLjVF5P0hXeaCsgTaUA=;
-        b=Vskm+yty8cHq30qB1XgOoU1LcXaaEsiDus8pFxuanPbvYIXPc6bX1hGlNQ0jVDCNx7
-         eRrfGWJZtsJKhE+FRBodn3GyYJNof9dRTPdWw5kWatcodxLb7pielQnya3aMZ/idFhDz
-         vUhdMfRJQRw1mCEpBP+iGQQneQTwaShSGR5vqu6EqaRbpx9/VFR+p4m+mkzBr8pVVLq1
-         T6EgPUC/QTeQCwSmc1lS2hjHIohlhAAjTGDGvl5YxbLcF7TflrNID3CGaZSVQtm1pzVi
-         FwQErpkGCfvYOQBTLy5ztGY7xHOyWDh7flnFI3HPRO9Iaf8HYeUTDbjlB2mesrR4KVO/
-         Xupw==
+        with ESMTP id S233073AbiJSMXf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 08:23:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 632A1C4C36
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 04:58:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666180620;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=U0Ito9oBTwecyhoOGkvM7eQkEImsAA6dypnkM5tOFSU=;
+        b=fqjANRmOcq2K16glH8Jd/CYwjp7GF8uzDzWuakaknG2MoTBHV4aaCEyAeM12Uqsv3CE0ju
+        tXV66MoWKvqWAiOTkdC+DXq3Mq3HfIX9fEz8+IpsEQDjoBDk0Up06g/UahqdbfL7aBua9Y
+        KKqa47H/r74FXU2Qge9E+92RC0yY5jw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-56-hCdH9DkcMqihn_CFVldM1g-1; Wed, 19 Oct 2022 07:50:47 -0400
+X-MC-Unique: hCdH9DkcMqihn_CFVldM1g-1
+Received: by mail-wr1-f71.google.com with SMTP id s5-20020adf9785000000b0022e1af0e7e8so5571551wrb.11
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 04:50:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZGoLnZ3sUUjQ6T551O77F/cGWLjVF5P0hXeaCsgTaUA=;
-        b=MO3+K7J5xl0cJW5TJps7FGHGUYIG2mxwmKH8HJwwPkc/5EYBoG9b4r94Z8UCdEy9Q6
-         IT2hLa4k2D72I7NDzmw1zsLD85LiCRGe4Zn6iZLUfFqsyHG7nwjH3TSMr0579DYTRWIg
-         H9V2h8N9AyO6/XlhQLx5HAlPuHb5Z0xUlRN/ofVuKS14IsusBHNJWGwEQFS5KESp4ZWD
-         p9RsDdsF4ChS53BZv3n54CDmBu8aBEAML9XfCs2sS4iJBn0tqp3+Y0FZdeLjRGLL+svk
-         C0FqYTvztTPzwFw6OTKH8mvy2uC+8aVSZKN5FwhZqzE71dH4LYcbQ6R3d+lifKu1vuvZ
-         YF2g==
-X-Gm-Message-State: ACrzQf120LdqdpMWM5DGYQei4IuPPq7Zjt5kr6t4I+7d++A3DlUkvzav
-        Pf3TwPxNPA/qV+9gMo0j95f9TA==
-X-Google-Smtp-Source: AMsMyM77U4ULWvxjJJOXxoE5nYztOUYKiByZiqSqBWtTwWGz4p8dLYj8lRpsHAlLZdstaJ2qIsHw8g==
-X-Received: by 2002:a17:90b:1bc3:b0:20d:75b8:ee74 with SMTP id oa3-20020a17090b1bc300b0020d75b8ee74mr46164266pjb.1.1666179945267;
-        Wed, 19 Oct 2022 04:45:45 -0700 (PDT)
-Received: from anup-ubuntu64-vm.. ([171.76.82.102])
-        by smtp.gmail.com with ESMTPSA id e15-20020a17090301cf00b00185507b5ef8sm6664148plh.50.2022.10.19.04.45.41
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U0Ito9oBTwecyhoOGkvM7eQkEImsAA6dypnkM5tOFSU=;
+        b=4qLtec1mWSEYYWn43RpD4lmy0jPSBWFiN3KSiTgN9YzFPk0NBxFKp0k/iAnEm/x6pw
+         7AfJaSATRurUtuT1LcrphVhTbbVJR/OY4Sz5b+wTdZFAAHCGCQx8iBj5vvt4sNrZ3tOd
+         n9RkSr5IjjWUiSVAGv8L4ClwQtQ7Fird6/WU4Yj3+6qxHPLeyk2XQ6L2HQGWqIAAvhLp
+         1keqXAAmOLYiGcwWdsPlrNrOXs/DGfRrTRkbUdbI6wGXNnJ37qT4TzvHEJTjc5I0+4J/
+         ymRqNnU5WxpgHfMBforg4QjKBMzZWaX0JK0VLXFLYIqovqlCxXkyPnVl7HhLy7o8R8ra
+         +orA==
+X-Gm-Message-State: ACrzQf1QZMYIIHfdvYi8q4nrD+4qSm5YPC//RTmYCFSi8jzINluPK0R/
+        WPY0HIKFQApJauP/NdBmPTkJ3N8dCBwaBUTaNIhk2FA2fhMLp6HjecPnuJ0I9tJ7xrdzcT18Hm0
+        v+nPMGYKpb25u
+X-Received: by 2002:adf:f40e:0:b0:22e:2ce4:e6a2 with SMTP id g14-20020adff40e000000b0022e2ce4e6a2mr5230956wro.30.1666180246162;
+        Wed, 19 Oct 2022 04:50:46 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM46+3jUTqcGiLRotFZdSsYsXxrsUcvAJFYWAwhfGL5+lnqYoZHaA3KZlDHoCCIDDoqAzIcPIw==
+X-Received: by 2002:adf:f40e:0:b0:22e:2ce4:e6a2 with SMTP id g14-20020adff40e000000b0022e2ce4e6a2mr5230933wro.30.1666180245888;
+        Wed, 19 Oct 2022 04:50:45 -0700 (PDT)
+Received: from redhat.com ([2.54.191.184])
+        by smtp.gmail.com with ESMTPSA id d20-20020a05600c34d400b003b4de550e34sm16769319wmq.40.2022.10.19.04.50.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Oct 2022 04:45:44 -0700 (PDT)
-From:   Anup Patel <apatel@ventanamicro.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Anup Patel <apatel@ventanamicro.com>
-Subject: [PATCH] RISC-V: KVM: Fix kvm_riscv_vcpu_timer_pending() for Sstc
-Date:   Wed, 19 Oct 2022 17:15:35 +0530
-Message-Id: <20221019114535.131469-1-apatel@ventanamicro.com>
-X-Mailer: git-send-email 2.34.1
+        Wed, 19 Oct 2022 04:50:45 -0700 (PDT)
+Date:   Wed, 19 Oct 2022 07:50:42 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        kvm list <kvm@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Yury Norov <yury.norov@gmail.com>, netdev@vger.kernel.org
+Subject: Re: 6.1-rc1 regression: virtio-net cpumask and during reboot
+Message-ID: <20221019074308-mutt-send-email-mst@kernel.org>
+References: <ac72ff9d-4246-3631-6e31-8c3033a70bf0@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ac72ff9d-4246-3631-6e31-8c3033a70bf0@linux.ibm.com>
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The kvm_riscv_vcpu_timer_pending() checks per-VCPU next_cycles
-and per-VCPU software injected VS timer interrupt. This function
-returns incorrect value when Sstc is available because the per-VCPU
-next_cycles are only updated by kvm_riscv_vcpu_timer_save() called
-from kvm_arch_vcpu_put(). As a result, when Sstc is available the
-VCPU does not block properly upon WFI traps.
+On Wed, Oct 19, 2022 at 12:59:58PM +0200, Christian Borntraeger wrote:
+> Michael,
+> 
+> as a heads-up.
+> I have not looked into any details yet but we do get the following during reboot of a system on s390.
+> It seems to be new with 6.1-rc1 (over 6.0)
+> 
+>   [    8.532461] ------------[ cut here ]------------
+>   [    8.532497] WARNING: CPU: 8 PID: 377 at include/linux/cpumask.h:110 __netif_set_xps_queue+0x3d8/0xca8
+>   [    8.532507] Modules linked in: sha1_s390(+) sha_common virtio_net(+) net_failover failover pkey zcrypt rng_core autofs4
+>   [    8.532528] CPU: 8 PID: 377 Comm: systemd-udevd Not tainted 6.1.0-20221018.rc1.git15.0fd5f2557625.300.fc36.s390x+debug #1
+>   [    8.532533] Hardware name: IBM 8561 T01 701 (KVM/Linux)
+>   [    8.532537] Krnl PSW : 0704e00180000000 00000000b05ec33c (__netif_set_xps_queue+0x3dc/0xca8)
+>   [    8.532546]            R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 CC:2 PM:0 RI:0 EA:3
+>   [    8.532552] Krnl GPRS: 00000000e7fb8b3f 0000000080000001 00000000b1870700 00000000b0ca1d3c
+>   [    8.532557]            0000000000000100 0000000000000300 000000008b362500 00000000b133ba48
+>   [    8.532561]            000000000000000c 0000038000000100 000000000000000c 0000000000000070
+>   [    8.532566]            0000000084cd3200 0000000000000000 00000000b05ec0c2 00000380010b77c8
+>   [    8.532575] Krnl Code: 00000000b05ec32e: c0e500187331      brasl   %r14,00000000b08fa990
+>                             00000000b05ec334: a7f4ff0c          brc     15,00000000b05ec14c
+>                            #00000000b05ec338: af000000          mc      0,0
+>                            >00000000b05ec33c: ec76fed8007c      cgij    %r7,0,6,00000000b05ec0ec
+>                             00000000b05ec342: e310f0b00004      lg      %r1,176(%r15)
+>                             00000000b05ec348: ec16ffac007c      cgij    %r1,0,6,00000000b05ec2a0
+>                             00000000b05ec34e: ec680388007c      cgij    %r6,0,8,00000000b05eca5e
+>                             00000000b05ec354: e310f0b80004      lg      %r1,184(%r15)
+>   [    8.532600] Call Trace:
+>   [    8.532604]  [<00000000b05ec33c>] __netif_set_xps_queue+0x3dc/0xca8
+>   [    8.532609] ([<00000000b05ec0c2>] __netif_set_xps_queue+0x162/0xca8)
+>   [    8.532614]  [<000003ff7fbb81ce>] virtnet_set_affinity+0x1de/0x2a0 [virtio_net]
+>   [    8.532622]  [<000003ff7fbbb674>] virtnet_probe+0x4d4/0xc08 [virtio_net]
+>   [    8.532630]  [<00000000b04ec4e8>] virtio_dev_probe+0x1e8/0x418
+>   [    8.532638]  [<00000000b05350ea>] really_probe+0xd2/0x480
+>   [    8.532644]  [<00000000b0535648>] driver_probe_device+0x40/0xf0
+>   [    8.532649]  [<00000000b0535fac>] __driver_attach+0x10c/0x208
+>   [    8.532655]  [<00000000b0532542>] bus_for_each_dev+0x82/0xb8
+>   [    8.532662]  [<00000000b053422e>] bus_add_driver+0x1d6/0x260
+>   [    8.532667]  [<00000000b0536a70>] driver_register+0xa8/0x170
+>   [    8.532672]  [<000003ff7fbc8088>] virtio_net_driver_init+0x88/0x1000 [virtio_net]
+>   [    8.532680]  [<00000000afb50ab0>] do_one_initcall+0x78/0x388
+>   [    8.532685]  [<00000000afc7b5b8>] do_init_module+0x60/0x248
+>   [    8.532692]  [<00000000afc7ce96>] __do_sys_init_module+0xbe/0xd8
+>   [    8.532698]  [<00000000b09123b2>] __do_syscall+0x1da/0x208
+>   [    8.532704]  [<00000000b0925b12>] system_call+0x82/0xb0
+>   [    8.532710] 3 locks held by systemd-udevd/377:
+>   [    8.532715]  #0: 0000000089af5188 (&dev->mutex){....}-{3:3}, at: __driver_attach+0xfe/0x208
+>   [    8.532728]  #1: 00000000b14668f0 (cpu_hotplug_lock){++++}-{0:0}, at: virtnet_probe+0x4ca/0xc08 [virtio_net]
+>   [    8.532744]  #2: 00000000b1509d40 (xps_map_mutex){+.+.}-{3:3}, at: __netif_set_xps_queue+0x88/0xca8
+>   [    8.532757] Last Breaking-Event-Address:
+>   [    8.532760]  [<00000000b05ec0e0>] __netif_set_xps_queue+0x180/0xca8
 
-To fix the above issue, we introduce kvm_riscv_vcpu_timer_sync()
-which will update per-VCPU next_cycles upon every VM exit instead
-of kvm_riscv_vcpu_timer_save().
 
-Fixes: 8f5cb44b1bae ("RISC-V: KVM: Support sstc extension")
-Signed-off-by: Anup Patel <apatel@ventanamicro.com>
----
- arch/riscv/include/asm/kvm_vcpu_timer.h |  1 +
- arch/riscv/kvm/vcpu.c                   |  3 +++
- arch/riscv/kvm/vcpu_timer.c             | 17 +++++++++++++++--
- 3 files changed, 19 insertions(+), 2 deletions(-)
+Does this fix it for you?
 
-diff --git a/arch/riscv/include/asm/kvm_vcpu_timer.h b/arch/riscv/include/asm/kvm_vcpu_timer.h
-index 0d8fdb8ec63a..82f7260301da 100644
---- a/arch/riscv/include/asm/kvm_vcpu_timer.h
-+++ b/arch/riscv/include/asm/kvm_vcpu_timer.h
-@@ -45,6 +45,7 @@ int kvm_riscv_vcpu_timer_deinit(struct kvm_vcpu *vcpu);
- int kvm_riscv_vcpu_timer_reset(struct kvm_vcpu *vcpu);
- void kvm_riscv_vcpu_timer_restore(struct kvm_vcpu *vcpu);
- void kvm_riscv_guest_timer_init(struct kvm *kvm);
-+void kvm_riscv_vcpu_timer_sync(struct kvm_vcpu *vcpu);
- void kvm_riscv_vcpu_timer_save(struct kvm_vcpu *vcpu);
- bool kvm_riscv_vcpu_timer_pending(struct kvm_vcpu *vcpu);
- 
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index a032c4f0d600..71ebbc4821f0 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -708,6 +708,9 @@ void kvm_riscv_vcpu_sync_interrupts(struct kvm_vcpu *vcpu)
- 				clear_bit(IRQ_VS_SOFT, &v->irqs_pending);
- 		}
- 	}
-+
-+	/* Sync-up timer CSRs */
-+	kvm_riscv_vcpu_timer_sync(vcpu);
- }
- 
- int kvm_riscv_vcpu_set_interrupt(struct kvm_vcpu *vcpu, unsigned int irq)
-diff --git a/arch/riscv/kvm/vcpu_timer.c b/arch/riscv/kvm/vcpu_timer.c
-index 185f2386a747..ad34519c8a13 100644
---- a/arch/riscv/kvm/vcpu_timer.c
-+++ b/arch/riscv/kvm/vcpu_timer.c
-@@ -320,20 +320,33 @@ void kvm_riscv_vcpu_timer_restore(struct kvm_vcpu *vcpu)
- 	kvm_riscv_vcpu_timer_unblocking(vcpu);
- }
- 
--void kvm_riscv_vcpu_timer_save(struct kvm_vcpu *vcpu)
-+void kvm_riscv_vcpu_timer_sync(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_vcpu_timer *t = &vcpu->arch.timer;
- 
- 	if (!t->sstc_enabled)
- 		return;
- 
--	t = &vcpu->arch.timer;
- #if defined(CONFIG_32BIT)
- 	t->next_cycles = csr_read(CSR_VSTIMECMP);
- 	t->next_cycles |= (u64)csr_read(CSR_VSTIMECMPH) << 32;
- #else
- 	t->next_cycles = csr_read(CSR_VSTIMECMP);
- #endif
-+}
-+
-+void kvm_riscv_vcpu_timer_save(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_vcpu_timer *t = &vcpu->arch.timer;
-+
-+	if (!t->sstc_enabled)
-+		return;
-+
-+	/*
-+	 * The vstimecmp CSRs are saved by kvm_riscv_vcpu_timer_sync()
-+	 * upon every VM exit so no need to save here.
-+	 */
-+
- 	/* timer should be enabled for the remaining operations */
- 	if (unlikely(!t->init_done))
- 		return;
+https://lore.kernel.org/r/20221017030947.1295426-1-yury.norov%40gmail.com
+
+
+
+
+
+
+
+
 -- 
-2.34.1
+MST
 
