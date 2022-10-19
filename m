@@ -2,55 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F3828604DEF
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 18:57:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D538604DE4
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 18:56:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231299AbiJSQ5B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 12:57:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37360 "EHLO
+        id S230123AbiJSQ40 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 12:56:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231167AbiJSQ4g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 12:56:36 -0400
-Received: from mail-oo1-xc49.google.com (mail-oo1-xc49.google.com [IPv6:2607:f8b0:4864:20::c49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 090B01D0649
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 09:56:33 -0700 (PDT)
-Received: by mail-oo1-xc49.google.com with SMTP id c4-20020a4a9c44000000b00480da4502b9so2885970ook.15
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 09:56:33 -0700 (PDT)
+        with ESMTP id S229497AbiJSQ4Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 12:56:25 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E4E3159A22
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 09:56:24 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id u8-20020a170902e5c800b00185483ee4f5so8501675plf.10
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 09:56:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oY8XEU2fkYE98MWfcMi47y+6Tzv6AnBcVCW4WAVAxZs=;
-        b=fVWJHQO1iTUYtO4q3pmDdPVGWF8C/VkhPKaSCksdqw87DP+QbVYQ/D1uq5s9E8NTyM
-         dTa/z2un1OlcetlYIE/0vuJ9bmf4ZSHOqS4EhSIukjXDon/1k2yigUL7qePGTrrn0v7h
-         zpVk1ki0ET/8ZBMiJGz97h1Bpis+t3+V/1FEEWdhJAM1GKu5aV0ylCHq9UIfYTzmTSqm
-         rmWLLInstHjp94OdB5019J/+pnIwEXlcNcJOiLLTcMBSQmbzgPt3a4DEr2HmW6W4OcUn
-         jBIhNHhi+fU16/EWupEOzUQWwoZY7RijHxcm7pgbVuK/09IiULzqaR352cCzp7W2LNrJ
-         bQlA==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=tUi0BoiMqtO/M/WpUaQHGu1rzQiQ7c9np2BzoBF+UZg=;
+        b=Wx1HWb2AcBMg7QFvDkkaYmzy/2Ol3jWSHV09YGjMZQhczMlcdYT0g571M8pTqkvscu
+         07QFzJG1Epij+6OOw4tOL24/F6ieoj3UE/elZbukLXfCV7pKFjvpUEvBbSlhZvtps7Fe
+         Z2+YkVZ7UIp0KaHuK6kiS4OWDbCRcnX5xh5nWLZ0eUPqAa7gX8C/YVd3EgRxFVrFA3RM
+         jP4jPQ0tOydhJknuwYbF5Bg04SnkJuBC6kxbsFNepTozpVEZFHBgteXp1cj1oU+M8wKU
+         1gKYnzFB3RQJ/tpJ0AArvkHq/wdxyJIUoeEQ2dHFSL6QtR9pqFG9JUD1yMYIqOFL0jCq
+         k5dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oY8XEU2fkYE98MWfcMi47y+6Tzv6AnBcVCW4WAVAxZs=;
-        b=chpihjvNn9zUeOARRsZvWTIWZLOvQMQFn3qN1I3HIbEbe/3z4W3vYJFIgCwbrAPaqE
-         BhCVRpDfpsKLo3rPo/p06OhnxjqzsYVkvvNrvpeeoA8VzERGZJPGlnoDuBpRQVVxwB4M
-         LF42rReAtmb9Zx1hLAvjdqFTR86meePbrUVeJ+fyjzjeUcVJU3dkNRUksClfTC3aq3xj
-         7NiKhbkdXD3tGG/4eAugrDxFu0lPcH32chZ2A+T5pUW0h6Hd8UX+astB6mstcqHFZ0YN
-         OxKmvyHPOrADdR2mS0A5BrYh5C8xbHToZq5TfQxW9dyYG9hzPaXlMeNgQLbe5NeH+UcH
-         TSbg==
-X-Gm-Message-State: ACrzQf1IBu25yd/s5eWEoIrmTdRjc4PVIrlRMGXyn3C0o8r37xGZwiB+
-        UIWtIfFF40xCWr23Tf1UqLd9pDsvWyQ=
-X-Google-Smtp-Source: AMsMyM6n/I3reJT7orVHRTr5HcoVoECUey8oDxHaW6HZriXy9eaHoIi9nO9JeA79Z4woO84UPW72GPnq64A=
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tUi0BoiMqtO/M/WpUaQHGu1rzQiQ7c9np2BzoBF+UZg=;
+        b=X51xhTuoRyIA9p7vvLMwYt77jQcYh5IogB7U+u9YIHDeDKk9hWSq6JJrt/xeiHZAN1
+         1Egt7Mo3tvVG6Nf5S/Be7M818Vc+40odjObNYBRsZRavnQMPJ8TE/hmH7zLipkblg02K
+         6TS9AIGdRL3TGReJjBZt76SEosPiXKxxUKNWz9ecHfNWevNTRjyMDvKXqJXJ/NToqRZp
+         GszQtLc8QmQSYuPk0kkstFCaY7zd+c7URR7BfmdIBn1HBV1rMeIhfAfXsEf51NVZVbYM
+         4laU3pR2F5BTFzcu9OEOv9A/FOgIaccPFdDhSz5TlBo1n7Ia+9kloUAj0TzVcyDPFAOc
+         SAcw==
+X-Gm-Message-State: ACrzQf1FmyhFMhH9+bqx5dsb98CAks26MeL/gv43zCspIhruB8IyVhz6
+        +j0eTBnOBmexpluWWH992M8N17EPMh4=
+X-Google-Smtp-Source: AMsMyM5T5hC0RFvqL9v861YrNl0O+r6LYnfZUtEwhsBEiyFo5+Rev74O3Vtwk8iRJ280tm6VF2FBIllPUzM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:3505:b0:20d:ba2e:994b with SMTP id
- ls5-20020a17090b350500b0020dba2e994bmr34572645pjb.46.1666198582055; Wed, 19
- Oct 2022 09:56:22 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:b794:b0:20a:eab5:cf39 with SMTP id
+ m20-20020a17090ab79400b0020aeab5cf39mr2181968pjr.1.1666198583493; Wed, 19 Oct
+ 2022 09:56:23 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 19 Oct 2022 16:56:10 +0000
+Date:   Wed, 19 Oct 2022 16:56:11 +0000
+In-Reply-To: <20221019165618.927057-1-seanjc@google.com>
 Mime-Version: 1.0
+References: <20221019165618.927057-1-seanjc@google.com>
 X-Mailer: git-send-email 2.38.0.413.g74048e4d9e-goog
-Message-ID: <20221019165618.927057-1-seanjc@google.com>
-Subject: [PATCH v6 0/8] KVM: x86: Apply NX mitigation more precisely
+Message-ID: <20221019165618.927057-2-seanjc@google.com>
+Subject: [PATCH v6 1/8] KVM: x86/mmu: Tag disallowed NX huge pages even if
+ they're not tracked
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -62,7 +66,7 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,99 +74,178 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-David and Ben, I kept your Reviewed-by for patch 7 even though it's now a
-fairly different patch than what you reviewed, as the code generation is
-identical.  Holler if you want your review dropped.
+Tag shadow pages that cannot be replaced with an NX huge page regardless
+of whether or not zapping the page would allow KVM to immediately create
+a huge page, e.g. because something else prevents creating a huge page.
 
-Precisely track (via kvm_mmu_page) if a non-huge page is being forced
-and use that info to avoid unnecessarily forcing smaller page sizes in
-disallowed_hugepage_adjust().
+I.e. track pages that are disallowed from being NX huge pages regardless
+of whether or not the page could have been huge at the time of fault.
+KVM currently tracks pages that were disallowed from being huge due to
+the NX workaround if and only if the page could otherwise be huge.  But
+that fails to handled the scenario where whatever restriction prevented
+KVM from installing a huge page goes away, e.g. if dirty logging is
+disabled, the host mapping level changes, etc...
 
-KVM incorrectly assumes that the NX huge page mitigation is the only
-scenario where KVM will create a non-leaf page instead of a huge page.
-As a result, if the original source of huge page incompatibility goes
-away, the NX mitigation is enabled, and KVM encounters an present shadow
-page when attempting to install a huge page, KVM will force a smaller page
-regardless of whether or not a smaller page is actually necessary to
-satisfy the NX huge page mitigation.
+Failure to tag shadow pages appropriately could theoretically lead to
+false negatives, e.g. if a fetch fault requests a small page and thus
+isn't tracked, and a read/write fault later requests a huge page, KVM
+will not reject the huge page as it should.
 
-Unnecessarily forcing small pages can result in degraded guest performance,
-especially on larger VMs.  The bug was originally discovered when testing
-dirty log performance, as KVM would leave small pages lying around when
-zapping collapsible SPTEs.  That case was indadvertantly fixed by commit
-5ba7c4c6d1c7 ("KVM: x86/MMU: Zap non-leaf SPTEs when disabling dirty
-logging"), but other scenarios are still affected, e.g. KVM will not
-rebuild a huge page if the mmu_notifier zaps a range of PTEs because the
-primary MMU is creating a huge page.
+To avoid yet another flag, initialize the list_head and use list_empty()
+to determine whether or not a page is on the list of NX huge pages that
+should be recovered.
 
-v6:
- - Fold the nx_huge_page_disallowed check in disallowed_hugepage_adjust()
-   into the existing if-statement. [Yan]
- - Add a patch to extend the accounting sanity check in recovery to the
-   TDP MMU. [Yan]
+Note, the TDP MMU accounting is still flawed as fixing the TDP MMU is
+more involved due to mmu_lock being held for read.  This will be
+addressed in a future commit.
 
-v5:
- - Drop boneheaded KVM_BUG_ON() GFN aliasing. [Vitaly]
- - Drop incorrect barrier documentation. [Yan]
+Fixes: 5bcaf3e1715f ("KVM: x86/mmu: Account NX huge page disallowed iff huge page was requested")
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c          | 32 ++++++++++++++++++++++++--------
+ arch/x86/kvm/mmu/mmu_internal.h | 10 +++++++++-
+ arch/x86/kvm/mmu/paging_tmpl.h  |  6 +++---
+ arch/x86/kvm/mmu/tdp_mmu.c      |  4 +++-
+ 4 files changed, 39 insertions(+), 13 deletions(-)
 
-v4:
- - https://lore.kernel.org/all/20220830235537.4004585-1-seanjc@google.com
- - Collect reviews. [Mingwei]
- - Add comment to document possible_nx_huge_pages. [Mingwei]
- - Drop extra memory barriers. [Paolo]
- - Document ordering providing by TDP SPTE helpers. [Paolo]
-
-v3:
- - https://lore.kernel.org/all/20220805230513.148869-1-seanjc@google.com
- - Bug the VM if KVM attempts to double account a shadow page that
-   disallows a NX huge page. [David]
- - Split the rename to separate patch. [Paolo]
- - Rename more NX huge page variables/functions. [David]
- - Combine and tweak the comments about enforcing the NX huge page
-   mitigation for non-paging MMUs. [Paolo, David]
- - Call out that the shadow MMU holds mmu_lock for write and doesn't need
-   to manual handle memory ordering when accounting NX huge pages. [David]
- - Add a smp_rmb() when unlinking shadow pages in the TDP MMU.
- - Rename spte_to_sp() to spte_to_child_sp(). [David]
- - Collect reviews. [David]
- - Tweak the changelog for the final patch to call out that precise
-   accounting addresses real world performance bugs. [Paolo]
- - Reword the changelog for the patch to (almost) always tag disallowed
-   NX huge pages, and call out that it doesn't fix the TDP MMU. [David]
-
-v2: Rebase, tweak a changelog accordingly.
-
-v1: https://lore.kernel.org/all/20220409003847.819686-1-seanjc@google.com
-
-
-Mingwei Zhang (1):
-  KVM: x86/mmu: explicitly check nx_hugepage in
-    disallowed_hugepage_adjust()
-
-Sean Christopherson (7):
-  KVM: x86/mmu: Tag disallowed NX huge pages even if they're not tracked
-  KVM: x86/mmu: Rename NX huge pages fields/functions for consistency
-  KVM: x86/mmu: Properly account NX huge page workaround for nonpaging
-    MMUs
-  KVM: x86/mmu: Set disallowed_nx_huge_page in TDP MMU before setting
-    SPTE
-  KVM: x86/mmu: Track the number of TDP MMU pages, but not the actual
-    pages
-  KVM: x86/mmu: Add helper to convert SPTE value to its shadow page
-  KVM: x86/mmu: WARN if TDP MMU SP disallows hugepage after being zapped
-
- arch/x86/include/asm/kvm_host.h |  30 ++++----
- arch/x86/kvm/mmu/mmu.c          | 122 ++++++++++++++++++++------------
- arch/x86/kvm/mmu/mmu_internal.h |  33 ++++-----
- arch/x86/kvm/mmu/paging_tmpl.h  |   6 +-
- arch/x86/kvm/mmu/spte.c         |  12 ++++
- arch/x86/kvm/mmu/spte.h         |  17 +++++
- arch/x86/kvm/mmu/tdp_mmu.c      |  43 ++++++-----
- arch/x86/kvm/mmu/tdp_mmu.h      |   2 +
- 8 files changed, 170 insertions(+), 95 deletions(-)
-
-
-base-commit: e18d6152ff0f41b7f01f9817372022df04e0d354
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 6f81539061d6..f1e089dfdd22 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -802,15 +802,25 @@ static void account_shadowed(struct kvm *kvm, struct kvm_mmu_page *sp)
+ 		kvm_flush_remote_tlbs_with_address(kvm, gfn, 1);
+ }
+ 
+-void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp)
++void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp,
++			  bool nx_huge_page_possible)
+ {
+-	if (sp->lpage_disallowed)
++	sp->lpage_disallowed = true;
++
++	/*
++	 * If it's possible to replace the shadow page with an NX huge page,
++	 * i.e. if the shadow page is the only thing currently preventing KVM
++	 * from using a huge page, add the shadow page to the list of "to be
++	 * zapped for NX recovery" pages.  Note, the shadow page can already be
++	 * on the list if KVM is reusing an existing shadow page, i.e. if KVM
++	 * links a shadow page at multiple points.
++	 */
++	if (!nx_huge_page_possible || !list_empty(&sp->lpage_disallowed_link))
+ 		return;
+ 
+ 	++kvm->stat.nx_lpage_splits;
+ 	list_add_tail(&sp->lpage_disallowed_link,
+ 		      &kvm->arch.lpage_disallowed_mmu_pages);
+-	sp->lpage_disallowed = true;
+ }
+ 
+ static void unaccount_shadowed(struct kvm *kvm, struct kvm_mmu_page *sp)
+@@ -832,9 +842,13 @@ static void unaccount_shadowed(struct kvm *kvm, struct kvm_mmu_page *sp)
+ 
+ void unaccount_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+ {
+-	--kvm->stat.nx_lpage_splits;
+ 	sp->lpage_disallowed = false;
+-	list_del(&sp->lpage_disallowed_link);
++
++	if (list_empty(&sp->lpage_disallowed_link))
++		return;
++
++	--kvm->stat.nx_lpage_splits;
++	list_del_init(&sp->lpage_disallowed_link);
+ }
+ 
+ static struct kvm_memory_slot *
+@@ -2129,6 +2143,8 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
+ 
+ 	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+ 
++	INIT_LIST_HEAD(&sp->lpage_disallowed_link);
++
+ 	/*
+ 	 * active_mmu_pages must be a FIFO list, as kvm_zap_obsolete_pages()
+ 	 * depends on valid pages being added to the head of the list.  See
+@@ -3126,9 +3142,9 @@ static int __direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 			continue;
+ 
+ 		link_shadow_page(vcpu, it.sptep, sp);
+-		if (fault->is_tdp && fault->huge_page_disallowed &&
+-		    fault->req_level >= it.level)
+-			account_huge_nx_page(vcpu->kvm, sp);
++		if (fault->is_tdp && fault->huge_page_disallowed)
++			account_huge_nx_page(vcpu->kvm, sp,
++					     fault->req_level >= it.level);
+ 	}
+ 
+ 	if (WARN_ON_ONCE(it.level != fault->goal_level))
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index 582def531d4d..cca1ad75d096 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -100,6 +100,13 @@ struct kvm_mmu_page {
+ 		};
+ 	};
+ 
++	/*
++	 * Tracks shadow pages that, if zapped, would allow KVM to create an NX
++	 * huge page.  A shadow page will have lpage_disallowed set but not be
++	 * on the list if a huge page is disallowed for other reasons, e.g.
++	 * because KVM is shadowing a PTE at the same gfn, the memslot isn't
++	 * properly aligned, etc...
++	 */
+ 	struct list_head lpage_disallowed_link;
+ #ifdef CONFIG_X86_32
+ 	/*
+@@ -315,7 +322,8 @@ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_
+ 
+ void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+ 
+-void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
++void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp,
++			  bool nx_huge_page_possible);
+ void unaccount_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
+ 
+ #endif /* __KVM_X86_MMU_INTERNAL_H */
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 5ab5f94dcb6f..8fd0c4e1e575 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -713,9 +713,9 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+ 			continue;
+ 
+ 		link_shadow_page(vcpu, it.sptep, sp);
+-		if (fault->huge_page_disallowed &&
+-		    fault->req_level >= it.level)
+-			account_huge_nx_page(vcpu->kvm, sp);
++		if (fault->huge_page_disallowed)
++			account_huge_nx_page(vcpu->kvm, sp,
++					     fault->req_level >= it.level);
+ 	}
+ 
+ 	if (WARN_ON_ONCE(it.level != fault->goal_level))
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 672f0432d777..80a4a1a09131 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -284,6 +284,8 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu)
+ static void tdp_mmu_init_sp(struct kvm_mmu_page *sp, tdp_ptep_t sptep,
+ 			    gfn_t gfn, union kvm_mmu_page_role role)
+ {
++	INIT_LIST_HEAD(&sp->lpage_disallowed_link);
++
+ 	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+ 
+ 	sp->role = role;
+@@ -1141,7 +1143,7 @@ static int tdp_mmu_link_sp(struct kvm *kvm, struct tdp_iter *iter,
+ 	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+ 	list_add(&sp->link, &kvm->arch.tdp_mmu_pages);
+ 	if (account_nx)
+-		account_huge_nx_page(kvm, sp);
++		account_huge_nx_page(kvm, sp, true);
+ 	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+ 	tdp_account_mmu_page(kvm, sp);
+ 
 -- 
 2.38.0.413.g74048e4d9e-goog
 
