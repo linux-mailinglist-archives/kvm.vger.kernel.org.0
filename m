@@ -2,120 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 01E2B6043E8
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 13:53:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 90DE960439D
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 13:45:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230164AbiJSLxb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 07:53:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35026 "EHLO
+        id S231631AbiJSLpB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 07:45:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231805AbiJSLxC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 07:53:02 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAA37FF229
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 04:32:13 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29J9odjV004502
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 09:51:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=OJBfIUDwhmcQsuz0BmWey3sVlm0yrTl1GvmoK8JthFw=;
- b=ZDFUWdraDTubvYzij6EYT7QhGynITB5/uihYW61CmsqC7+Y1X+Aj6NV6zuTp/S1Rb2Hk
- vIEaCUZKTKr+zQtcetv4pzQHNZwvjQYY0l1+mwGHUsFF0AuR3aGp6qf+oy5y8aO/j6Br
- u1LD3lP1SxNwnPEZiTkoSEPuPzlTkevu7Hc7VXLyaKEVkJX5FoVerCw+kdoPOgOkHi78
- fXPvybg7Yg2gOHDHe9EVSjMjzv2tDixEgZ52OhsF4phiybmhootXY0LRCcf2/dvOfGev
- rqQA6Y0gM7tf5juiZqbDpNLL5281JreQCp0Bm/b+5I76zqh9oe7Cnz0lCfP6WjiKI+cu tA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kaeyb80n9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 09:51:36 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29J9pZiF007105
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 09:51:35 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kaeyb80ms-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Oct 2022 09:51:35 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29J9oxrR003684;
-        Wed, 19 Oct 2022 09:51:34 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3k7m4jpubx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Oct 2022 09:51:33 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29J9q3N350921776
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Oct 2022 09:52:03 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D2908A4057;
-        Wed, 19 Oct 2022 09:51:30 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8333BA404D;
-        Wed, 19 Oct 2022 09:51:30 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.8.239])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 19 Oct 2022 09:51:30 +0000 (GMT)
-Date:   Wed, 19 Oct 2022 11:51:28 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, seiden@linux.ibm.com,
-        scgl@linux.ibm.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v1 1/2] lib: s390x: terminate if PGM
- interrupt in interrupt handler
-Message-ID: <20221019115128.2a8cbf13@p-imbrenda>
-In-Reply-To: <166616486603.37435.2225106614844458657@t14-nrb>
-References: <20221018140951.127093-1-imbrenda@linux.ibm.com>
-        <20221018140951.127093-2-imbrenda@linux.ibm.com>
-        <166616486603.37435.2225106614844458657@t14-nrb>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S230000AbiJSLoi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 07:44:38 -0400
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8315E12744
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 04:24:22 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id bk15so28547075wrb.13
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 04:24:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qdeaJX55sH31dG5hyU1Da1POz39+LgsgnxASJcUuNZc=;
+        b=Yi4ARY+mHRWrHOYRqIUS8DQySqkvWtqiwtwhh7E9WKQCkDoii/ldkCt1pxBSQ90iet
+         AGrzztLNZUM+l4PmxNx08+uGgRiRBIGE2JSvGX758UDAETXPNck9U35m4grY91KUN9UP
+         k45QoTE2XNWSU4gLLAX87sZBzlpuoRGxwBRnofm9ODUGsB640BThktfeC+gwCn+CtxpP
+         suAODdD7XMXVecaUnl61dfrSdqdsk8UxPSNtoxUzqpf0N15ZFSVqDYd+C41R0RYJR4yF
+         NwZWQUx/Z84J62y5qXu3poZkNvFBoD1bsqMqkE/BRqDDEqjN7KRwKFoAVhjwizCTeWny
+         yfcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qdeaJX55sH31dG5hyU1Da1POz39+LgsgnxASJcUuNZc=;
+        b=4eD1WfmWMRoBcm4KvvlFjO0fgOyiaAEtWjgLniJ40ul2i0p63ck5s/rNuIWWonApqm
+         G8EyzqEHwnfdJQQTUr8oUO5ix6SrgPVVFGrJS1hcoUWXbhqES/2AAbsiB+eZBg886GNY
+         YTDC8DO0R2VqVKy7nm/MV/2qD27fPDgBIroWrhJo7JrFMFF0/tSOfbcope1s0Yv8bszD
+         oiGi6g3FZ1AHE0JtWYAGLrPYRoxtbn/PE4G3wGlgO8O5mW4iz0nq/l0Zd9MxRXN47DEd
+         2rPkaq5mL6slNVolDxParxi53djIUndpFW/OmEEAb5j/My1nTGIxaE7mcaIYYIcsYunI
+         N7vw==
+X-Gm-Message-State: ACrzQf0Egey9K5fUOqgWEZBUCK7w89rIkxUZ+C69k7GGGmYVWBmZJ8tu
+        4y72pRk1vmGogt6OEwYX1z8n/0Z+6yi7NFdf
+X-Google-Smtp-Source: AMsMyM59jhX1vFGcRAtMphxABbSR7dOtpbpeVT53Gy1hZCktN70biH0Ho/oV4Ep+O6Q9RkpLJ44gSg==
+X-Received: by 2002:a5d:414c:0:b0:22c:de8a:d233 with SMTP id c12-20020a5d414c000000b0022cde8ad233mr4806983wrq.194.1666176258215;
+        Wed, 19 Oct 2022 03:44:18 -0700 (PDT)
+Received: from [192.168.1.115] ([185.126.107.38])
+        by smtp.gmail.com with ESMTPSA id c16-20020a5d4cd0000000b002302dc43d77sm13708102wrt.115.2022.10.19.03.44.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Oct 2022 03:44:17 -0700 (PDT)
+Message-ID: <dbcf971a-54c9-7778-06af-16837e8cb1fc@linaro.org>
+Date:   Wed, 19 Oct 2022 12:44:15 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ThriRgjP_SziwogJgWA_yBAzjq5md5qV
-X-Proofpoint-ORIG-GUID: BeIIcMm92QCKYHgTPuhAK0zhPqwpUuE3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-19_06,2022-10-19_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
- spamscore=0 mlxscore=0 bulkscore=0 phishscore=0 mlxlogscore=782
- clxscore=1015 lowpriorityscore=0 impostorscore=0 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210190052
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.3.2
+Subject: Re: [PATCH v3 04/15] target/arm: ensure KVM traps set appropriate
+ MemTxAttrs
+Content-Language: en-US
+To:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        qemu-devel@nongnu.org
+Cc:     qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>
+References: <20220927141504.3886314-1-alex.bennee@linaro.org>
+ <20220927141504.3886314-5-alex.bennee@linaro.org>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
+In-Reply-To: <20220927141504.3886314-5-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 19 Oct 2022 09:34:26 +0200
-Nico Boehr <nrb@linux.ibm.com> wrote:
-
-> Quoting Claudio Imbrenda (2022-10-18 16:09:50)
-> [...]
-> > diff --git a/lib/s390x/interrupt.c b/lib/s390x/interrupt.c
-> > index 7cc2c5fb..22bf443b 100644
-> > --- a/lib/s390x/interrupt.c
-> > +++ b/lib/s390x/interrupt.c  
-> [...]
-> >  void handle_pgm_int(struct stack_frame_int *stack)
-> >  {
-> > +       if (THIS_CPU->in_interrupt_handler) {
-> > +               /* Something went very wrong, stop everything now without printing anything */
-> > +               smp_teardown();
-> > +               disabled_wait(0xfa12edbad21);
-> > +       }  
+On 27/9/22 16:14, Alex Bennée wrote:
+> Although most KVM users will use the in-kernel GIC emulation it is
+> perfectly possible not to. In this case we need to ensure the
+> MemTxAttrs are correctly populated so the GIC can divine the source
+> CPU of the operation.
 > 
-> Maybe I am missing something, but is there a particular reson why you don't do
->  THIS_CPU->in_interrupt_handler = true;
-> here as well?
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> 
+> ---
+> v3
+>    - new for v3
+> ---
+>   target/arm/kvm.c | 12 ++++++++----
+>   1 file changed, 8 insertions(+), 4 deletions(-)
 
-I was thinking that we set pgm_int_expected = false so we would catch a
-wild program interrupt there, but in hindsight maybe it's better to set
-in_interrupt_handler = true there so we can abort immediately
+>   void kvm_arm_vm_state_change(void *opaque, bool running, RunState state)
+> @@ -1003,6 +1004,10 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+>       hwaddr xlat, len, doorbell_gpa;
+>       MemoryRegionSection mrs;
+>       MemoryRegion *mr;
+> +    MemTxAttrs attrs = {
+> +        .requester_type = MTRT_PCI,
+> +        .requester_id = pci_requester_id(dev)
+> +    };
+
+Can we add a MEMTXATTRS_PCI() macro similar to MEMTXATTRS_CPU()?
+
+   #define MEMTXATTRS_PCI(pci_dev) ((MemTxAttrs) \
+                             {.requester_type = MTRT_PCI, \
+                              .requester_id = pci_requester_id(pci_dev)})
+
+So here we can use:
+
+   MemTxAttrs attrs = MEMTXATTRS_PCI(dev);
+
+> @@ -1012,8 +1017,7 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
+>   
+>       RCU_READ_LOCK_GUARD();
+>   
+> -    mr = address_space_translate(as, address, &xlat, &len, true,
+> -                                 MEMTXATTRS_UNSPECIFIED);
+> +    mr = address_space_translate(as, address, &xlat, &len, true, attrs);
+>   
+>       if (!mr) {
+>           return 1;
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+
