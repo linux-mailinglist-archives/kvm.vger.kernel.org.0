@@ -2,68 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F617604AC0
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 17:11:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 63CD1604AEF
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 17:13:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231347AbiJSPLB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 11:11:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57646 "EHLO
+        id S232383AbiJSPNe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 11:13:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231342AbiJSPKp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 11:10:45 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 856931440BD
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 08:03:45 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id gz13-20020a17090b0ecd00b0020d67a4e6e5so7466790pjb.3
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 08:03:44 -0700 (PDT)
+        with ESMTP id S232320AbiJSPNM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 11:13:12 -0400
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FF5B1BE92E
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 08:05:42 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id x18so22580546ljm.1
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 08:05:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jjeUrnqbhNp6g16FZyggyoCcMU0gxOqp1sDPYM/lLjs=;
-        b=I466DihAisJ43CiyCl9Txr4J6tmUK+4Kffzv68FV2YFCjEqBNMPDcpcuSHi0whTLCf
-         xhnuMeDaOdHqDF4cXcTspPKG0j4XD40sGfkcAkMNjcPBlKXRGdY5RQciC+mhd/2Iu2Yw
-         yuc9nOjcPp8a+62C40n+i2vaAmQztCSPpUDWy+Fir3N3/kRcesPOQZPmwIbYsISmZ7nC
-         Yu6ItOpa644BhXEZ0C7hYUQNcitpwkRSjV140VlddREJNqyX0o3widEKrcy3iFZZzxwv
-         rTt9mx04aZgG4f8S9Hj9wUS2OGGRyyfxFUsa4PDRjaqk1/vme5VJGOhP1SVcBPyFaIad
-         615w==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GQN3xPWEz80R9HLK7JV5q12hLSAfmmt3AkrUC4EVJho=;
+        b=ZtzKb9bf0kl/pILB/MreCGWs3HY3xz/J5znIIt+ih1I+DS9Baz4ZCKTyXqVnYQOAS+
+         V6QVBNa/A5tGi+XgQ3wQ/nMzWhSb4oPpDy5DVP/oTOR1D99/6mXkdRjTjPGkgyFCVd/k
+         MeCz2GQlahKw0B4SPorBsy6aaMo1Y8vetsa5D14CxosC/gFGr1U7i/O2pf1WWTzAYw+t
+         ISKJm3BRcC3fYJeGm6J60yWx9ZOpYS1Z+ehehirudx28YZ914nLWPcDEakMmtkEMsxra
+         1zFnLTP6AZbcwQ6m5YMxlfTE2slt6esDIpPTrJAG7863klJALjIVm0v020eIkoRGYSkV
+         O4Ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jjeUrnqbhNp6g16FZyggyoCcMU0gxOqp1sDPYM/lLjs=;
-        b=cWy1ZTKFW4VH86Fkkx/6qHZzmhowukAI++KgS3UPqJuCXswWTboG3mhb2T/dZrdOfc
-         25H2y4C1q2BunKnWQfgKad9Ms5ZzfMTjs8RFW3uMQdCHwnhZkNvLEjM1sFXtOfPaxn9y
-         YiJVs8D7j/9AeYkxtWoiGHT5PEEC5k+8u9Hrk0oYatQ2jT/eKyjYh02tXO7q18C/ti6I
-         6GBA3gvuXAlRKJNI1ARC6JIY4MLDi6tYjdTl/adwRtK0PX+oN9VCRTt6bkzqNdZp2XfP
-         3nM6iJ0VeXd1XV+ro3SQAJc12FWmgnkK2MSgZAGuElzFl1QMzZbSLyw+wUI7McMaRWzx
-         v0Rw==
-X-Gm-Message-State: ACrzQf3LlVkpuR0Xuvi6UZiZS0iUpCPVljRKxlUZQiZuAoNiKRZd32Rf
-        MpJBkbfjDGcA5x9xmGK/MJxSHtyqUjE=
-X-Google-Smtp-Source: AMsMyM6pteOsQYBnT17r7bvVUp+6YhBd4RkggukkPWftHlgid6du2KUWvGMkL/OBx05FKGFvHhdFUmnNUo8=
-X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:a42:8a14:f405:2ee1])
- (user=pgonda job=sendgmr) by 2002:a65:5a0b:0:b0:46b:158e:ad7c with SMTP id
- y11-20020a655a0b000000b0046b158ead7cmr7728945pgs.272.1666191824125; Wed, 19
- Oct 2022 08:03:44 -0700 (PDT)
-Date:   Wed, 19 Oct 2022 08:03:33 -0700
-Message-Id: <20221019150333.1047423-1-pgonda@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.38.0.413.g74048e4d9e-goog
-Subject: [PATCH] virt: Prevent AES-GCM IV reuse in SNP guest driver
-From:   Peter Gonda <pgonda@google.com>
-To:     thomas.lendacky@amd.com
-Cc:     Peter Gonda <pgonda@google.com>, Borislav Petkov <bp@suse.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Haowen Bai <baihaowen@meizu.com>,
-        Yang Yingliang <yangyingliang@huawei.com>,
-        Marc Orr <marcorr@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GQN3xPWEz80R9HLK7JV5q12hLSAfmmt3AkrUC4EVJho=;
+        b=p3II3I7D3mk2U/7BOHMqJX4CzZVL6RKSd1JjjWUzhyFChmk8JA25TRiQOe1djey4JU
+         0NCo7iDiYCCv/uqbmFlQVRp6CrgfXrOpPar9G+qvvHflmLV17PtDzmNegi2ljolc6vuu
+         QJvBoQazvkCZfJk8TJcBLM2QGFPDCPkPRNwAw8qWA1pHKoglYwiiggb4uXR7jHJqKQ3U
+         4dY+Wi8cRHzI1KrGn8sHcmi6Z2fcxxBbuoZPtSxYC8FCca+1Z7LNIHPs/78GgEThOy1O
+         hq5juVwByi1gblDOapfMCu94ClRa1mgYfqO2BFFfu4lk+fCIYaVJc6Rcm1OK800e3d+9
+         UJpg==
+X-Gm-Message-State: ACrzQf0zP1T8iB6n2c9TcEgBaK0RX07NOpjIbFQ+X2BLvhNtRhH9FEwG
+        iASv1Ht8gV1tj4E8othQ7Yuuy9/uM5R3ycO+qoq4Cw==
+X-Google-Smtp-Source: AMsMyM7zEJ7a72P/c6HXyJCsWM2MpEG2w4gRuPgsLcWOhRdb89OcuooXjcuMFVvo+b/FWTUfd+LFgMAfBmxdQhZD75M=
+X-Received: by 2002:a2e:bd12:0:b0:264:7373:3668 with SMTP id
+ n18-20020a2ebd12000000b0026473733668mr2834642ljq.18.1666191934004; Wed, 19
+ Oct 2022 08:05:34 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-2-chao.p.peng@linux.intel.com> <d16284f5-3493-2892-38e6-f1fa5c10bdbb@redhat.com>
+ <Yyi+l3+p9lbBAC4M@google.com> <CA+EHjTzy4iOxLF=5UX=s5v6HSB3Nb1LkwmGqoKhp_PAnFeVPSQ@mail.gmail.com>
+ <20220926142330.GC2658254@chaop.bj.intel.com> <CA+EHjTz5yGhsxUug+wqa9hrBO60Be0dzWeWzX00YtNxin2eYHg@mail.gmail.com>
+ <YzN9gYn1uwHopthW@google.com> <CA+EHjTw3din891hMUeRW-cn46ktyMWSdoB31pL+zWpXo_=3UVg@mail.gmail.com>
+ <Y030bGhh0mvGS6E1@google.com>
+In-Reply-To: <Y030bGhh0mvGS6E1@google.com>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Wed, 19 Oct 2022 16:04:57 +0100
+Message-ID: <CA+EHjTwrTe1-ryt0sYx7360qeYmifEQqUa-_T=25eb4s6F0JPw@mail.gmail.com>
+Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,109 +101,95 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The ASP and an SNP guest use a series of AES-GCM keys called VMPCKs to
-communicate securely with each other. The IV to this scheme is a
-sequence number that both the ASP and the guest track. Currently this
-sequence number in a guest request must exactly match the sequence
-number tracked by the ASP. This means that if the guest sees an error
-from the host during a request it can only retry that exact request or
-disable the VMPCK to prevent an IV reuse. AES-GCM cannot tolerate IV
-reuse see:
-https://csrc.nist.gov/csrc/media/projects/block-cipher-techniques/documents/bcm/comments/800-38-series-drafts/gcm/joux_comments.pdf
+Hi,
 
-Fixes: fce96cf044308 ("virt: Add SEV-SNP guest driver")
-Signed-off-by: Peter Gonda <pgonda@google.com>
-Reported-by: Peter Gonda <pgonda@google.com>
-Cc: Borislav Petkov <bp@suse.de>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Michael Roth <michael.roth@amd.com>
-Cc: Haowen Bai <baihaowen@meizu.com>
-Cc: Yang Yingliang <yangyingliang@huawei.com>
-Cc: Marc Orr <marcorr@google.com>
-Cc: David Rientjes <rientjes@google.com>
-Cc: Ashish Kalra <Ashish.Kalra@amd.com>
-Cc: linux-kernel@vger.kernel.org
-Cc: kvm@vger.kernel.org
+On Tue, Oct 18, 2022 at 1:34 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Fri, Sep 30, 2022, Fuad Tabba wrote:
+> > > > > > pKVM would also need a way to make an fd accessible again
+> > > > > > when shared back, which I think isn't possible with this patch.
+> > > > >
+> > > > > But does pKVM really want to mmap/munmap a new region at the page-level,
+> > > > > that can cause VMA fragmentation if the conversion is frequent as I see.
+> > > > > Even with a KVM ioctl for mapping as mentioned below, I think there will
+> > > > > be the same issue.
+> > > >
+> > > > pKVM doesn't really need to unmap the memory. What is really important
+> > > > is that the memory is not GUP'able.
+> > >
+> > > Well, not entirely unguppable, just unguppable without a magic FOLL_* flag,
+> > > otherwise KVM wouldn't be able to get the PFN to map into guest memory.
+> > >
+> > > The problem is that gup() and "mapped" are tied together.  So yes, pKVM doesn't
+> > > strictly need to unmap memory _in the untrusted host_, but since mapped==guppable,
+> > > the end result is the same.
+> > >
+> > > Emphasis above because pKVM still needs unmap the memory _somehwere_.  IIUC, the
+> > > current approach is to do that only in the stage-2 page tables, i.e. only in the
+> > > context of the hypervisor.  Which is also the source of the gup() problems; the
+> > > untrusted kernel is blissfully unaware that the memory is inaccessible.
+> > >
+> > > Any approach that moves some of that information into the untrusted kernel so that
+> > > the kernel can protect itself will incur fragmentation in the VMAs.  Well, unless
+> > > all of guest memory becomes unguppable, but that's likely not a viable option.
+> >
+> > Actually, for pKVM, there is no need for the guest memory to be GUP'able at
+> > all if we use the new inaccessible_get_pfn().
+>
+> Ya, I was referring to pKVM without UPM / inaccessible memory.
+>
+> Jumping back to blocking gup(), what about using the same tricks as secretmem to
+> block gup()?  E.g. compare vm_ops to block regular gup() and a_ops to block fast
+> gup() on struct page?  With a Kconfig that's selected by pKVM (which would also
+> need its own Kconfig), e.g. CONFIG_INACCESSIBLE_MAPPABLE_MEM, there would be zero
+> performance overhead for non-pKVM kernels, i.e. hooking gup() shouldn't be
+> controversial.
+>
+> I suspect the fast gup() path could even be optimized to avoid the page_mapping()
+> lookup by adding a PG_inaccessible flag that's defined iff the TBD Kconfig is
+> selected.  I'm guessing pKVM isn't expected to be deployed on massivve NUMA systems
+> anytime soon, so there should be plenty of page flags to go around.
+>
+> Blocking gup() instead of trying to play refcount games when converting back to
+> private would eliminate the need to put heavy restrictions on mapping, as the goal
+> of those were purely to simplify the KVM implementation, e.g. the "one mapping per
+> memslot" thing would go away entirely.
 
----
- drivers/virt/coco/sev-guest/sev-guest.c | 45 ++++++++++++++++++-------
- 1 file changed, 32 insertions(+), 13 deletions(-)
+My implementation of mmap for inaccessible_fops was setting VM_PFNMAP.
+That said, I realized that that might be adding an unnecessary
+restriction, and now have changed it to do it the secretmem way.
+That's straightforward and works well.
 
-diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
-index f422f9c58ba7..227ae6a10ef2 100644
---- a/drivers/virt/coco/sev-guest/sev-guest.c
-+++ b/drivers/virt/coco/sev-guest/sev-guest.c
-@@ -67,8 +67,27 @@ static bool is_vmpck_empty(struct snp_guest_dev *snp_dev)
- 	return true;
- }
- 
-+/*
-+ * If we receive an error from the host or ASP we have two options. We can
-+ * either retry the exact same encrypted request or we can discontinue using the
-+ * VMPCK.
-+ *
-+ * This is because in the current encryption scheme GHCB v2 uses AES-GCM to
-+ * encrypt the requests. The IV for this scheme is the sequence number. GCM
-+ * cannot tolerate IV reuse.
-+ *
-+ * The ASP FW v1.51 only increments the sequence numbers on a successful
-+ * guest<->ASP back and forth and only accepts messages at its exact sequence
-+ * number.
-+ *
-+ * So if we were to reuse the sequence number the encryption scheme is
-+ * vulnerable. If we encrypt the sequence number for a fresh IV the ASP will
-+ * reject our request.
-+ */
- static void snp_disable_vmpck(struct snp_guest_dev *snp_dev)
- {
-+	dev_alert(snp_dev->dev, "Disabling vmpck_id: %d to prevent IV reuse.\n",
-+		  vmpck_id);
- 	memzero_explicit(snp_dev->vmpck, VMPCK_KEY_LEN);
- 	snp_dev->vmpck = NULL;
- }
-@@ -326,29 +345,29 @@ static int handle_guest_request(struct snp_guest_dev *snp_dev, u64 exit_code, in
- 	if (fw_err)
- 		*fw_err = err;
- 
--	if (rc)
--		return rc;
-+	if (rc) {
-+		dev_alert(snp_dev->dev,
-+			  "Detected error from ASP request. rc: %d, fw_err: %lu\n",
-+			  rc, fw_err);
-+		goto disable_vmpck;
-+	}
- 
--	/*
--	 * The verify_and_dec_payload() will fail only if the hypervisor is
--	 * actively modifying the message header or corrupting the encrypted payload.
--	 * This hints that hypervisor is acting in a bad faith. Disable the VMPCK so that
--	 * the key cannot be used for any communication. The key is disabled to ensure
--	 * that AES-GCM does not use the same IV while encrypting the request payload.
--	 */
- 	rc = verify_and_dec_payload(snp_dev, resp_buf, resp_sz);
- 	if (rc) {
- 		dev_alert(snp_dev->dev,
--			  "Detected unexpected decode failure, disabling the vmpck_id %d\n",
--			  vmpck_id);
--		snp_disable_vmpck(snp_dev);
--		return rc;
-+			  "Detected unexpected decode failure from ASP. rc: %d\n",
-+			  rc);
-+		goto disable_vmpck;
- 	}
- 
- 	/* Increment to new message sequence after payload decryption was successful. */
- 	snp_inc_msg_seqno(snp_dev);
- 
- 	return 0;
-+
-+disable_vmpck:
-+	snp_disable_vmpck(snp_dev);
-+	return rc;
- }
- 
- static int get_report(struct snp_guest_dev *snp_dev, struct snp_guest_request_ioctl *arg)
--- 
-2.38.0.413.g74048e4d9e-goog
+> > This of course goes back to what I'd mentioned before in v7; it seems that
+> > representing the memslot memory as a file descriptor should be orthogonal to
+> > whether the memory is shared or private, rather than a private_fd for private
+> > memory and the userspace_addr for shared memory.
+>
+> I also explored the idea of backing any guest memory with an fd, but came to
+> the conclusion that private memory needs a separate handle[1], at least on x86.
+>
+> For SNP and TDX, even though the GPA is the same (ignoring the fact that SNP and
+> TDX steal GPA bits to differentiate private vs. shared), the two types need to be
+> treated as separate mappings[2].  Post-boot, converting is lossy in both directions,
+> so even conceptually they are two disctint pages that just happen to share (some)
+> GPA bits.
+>
+> To allow conversions, i.e. changing which mapping to use, without memslot updates,
+> KVM needs to let userspace provide both mappings in a single memslot.  So while
+> fd-based memory is an orthogonal concept, e.g. we could add fd-based shared memory,
+> KVM would still need a dedicated private handle.
+>
+> For pKVM, the fd doesn't strictly need to be mutually exclusive with the existing
+> userspace_addr, but since the private_fd is going to be added for x86, I think it
+> makes sense to use that instead of adding generic fd-based memory for pKVM's use
+> case (which is arguably still "private" memory but with special semantics).
+>
+> [1] https://lore.kernel.org/all/YulTH7bL4MwT5v5K@google.com
+> [2] https://lore.kernel.org/all/869622df-5bf6-0fbb-cac4-34c6ae7df119@kernel.org
 
+As long as the API does not impose this limit, which would imply pKVM
+is misusing it, then I agree. I think that's why renaming it to
+something like "restricted" might be clearer.
+
+Thanks,
+/fuad
