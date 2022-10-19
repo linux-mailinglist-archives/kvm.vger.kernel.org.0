@@ -2,95 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 16587604AB9
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 17:10:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F617604AC0
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 17:11:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231966AbiJSPKS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 11:10:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49102 "EHLO
+        id S231347AbiJSPLB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 11:11:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232636AbiJSPJc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 11:09:32 -0400
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25E4FE4A
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 08:03:01 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id bu25so28651602lfb.3
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 08:03:01 -0700 (PDT)
+        with ESMTP id S231342AbiJSPKp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 11:10:45 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 856931440BD
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 08:03:45 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id gz13-20020a17090b0ecd00b0020d67a4e6e5so7466790pjb.3
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 08:03:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=8uws4B5WgtxEQQPonRBN7dDm57mj+TMYZwg9NWMF6uE=;
-        b=GNoRQIq9JKVsi3NBMOHtxRxaA+HyiSRxEbQwKROCIdQN7YeQVvkeCL/tBfTJ0rFShS
-         wLv+OMed6GKtlzQERAvDIH0fS9RwWNLH1iDzg8iIFUBsQUCTCUR56HEIdBHp5w6KeZ+i
-         ed0p1SeRI6LjurmDyBxbuv8clbnocReb3YyBgtI/ebogw01dMtsK7A/KD1lbcyPsqtH5
-         TaWyyc8eNama/1dRhNwUMQO8P85tBb+QCcPLfYt81cuF60S21NuSTt9ENjFqtPiqHbYW
-         QbAZcIWW265YqQ7fQmjB0etPPuYGAVxyYuBBwAInvDjayuW/S/xhDX/aqG8lWy7/HjYu
-         bNlw==
+        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jjeUrnqbhNp6g16FZyggyoCcMU0gxOqp1sDPYM/lLjs=;
+        b=I466DihAisJ43CiyCl9Txr4J6tmUK+4Kffzv68FV2YFCjEqBNMPDcpcuSHi0whTLCf
+         xhnuMeDaOdHqDF4cXcTspPKG0j4XD40sGfkcAkMNjcPBlKXRGdY5RQciC+mhd/2Iu2Yw
+         yuc9nOjcPp8a+62C40n+i2vaAmQztCSPpUDWy+Fir3N3/kRcesPOQZPmwIbYsISmZ7nC
+         Yu6ItOpa644BhXEZ0C7hYUQNcitpwkRSjV140VlddREJNqyX0o3widEKrcy3iFZZzxwv
+         rTt9mx04aZgG4f8S9Hj9wUS2OGGRyyfxFUsa4PDRjaqk1/vme5VJGOhP1SVcBPyFaIad
+         615w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8uws4B5WgtxEQQPonRBN7dDm57mj+TMYZwg9NWMF6uE=;
-        b=Ti0YhJ0G0wKTfdPnb/4ABx1NVMicxbzuA8hR7daVYGOmVcdZmkasNjT+JsNbQQuki9
-         1qihdZlzJdu7aQzUNime5ElelcafUXtlGLkJ3sQgOalgVNYuOfyhCxqTpfGPdlzWfsdX
-         Dph8juNp1/+0OcC9Vua8iAirHLcqNnAsDXgo8ilvsUtQgVb5+2JB+yQ+ysPaEzp4c670
-         AuU2rPr7OhVZWVrUOSt7h/efSsFOB69JUVK7sUTam0MmKWHRVwD9EzlOdrwT+LksuW2h
-         n9F65xQJLfRghHaKMiikHXo0hR0o8D9HE1s825xMjhkFVwq02wpuGtRRgavLhZHVfSIj
-         cJxA==
-X-Gm-Message-State: ACrzQf11vXUptdJAzzLZSKjFBvdRcVE0b4stCH4jTZXNTfwpxg0TceLi
-        wPX6s8TagXA1oAsXL3sdmO+KKY6bkxuKFNMueZieOg==
-X-Google-Smtp-Source: AMsMyM73/Iz2UA6hD6VnKREmVWKox8T+CDDwCUSlKn0rjft7dc92r9M4EXDXMPFumhxI7Ld+a4+gjwQViVOGvFn4W+A=
-X-Received: by 2002:a05:6512:4cb:b0:4a2:25b6:9e73 with SMTP id
- w11-20020a05651204cb00b004a225b69e73mr3205357lfq.30.1666191778897; Wed, 19
- Oct 2022 08:02:58 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
- <20220915142913.2213336-6-chao.p.peng@linux.intel.com> <CA+EHjTxukqBfaN6D+rPOiX83zkGknHEQ16J0k6GQSdL_-e9C6g@mail.gmail.com>
- <20221012023516.GA3218049@chaop.bj.intel.com> <CA+EHjTyGyGL+ox81=jdtoHERtHPV=P7wJub=3j7chdijyq-AgA@mail.gmail.com>
- <Y03UiYYioV+FQIpx@google.com> <20221019132308.GA3496045@chaop.bj.intel.com>
-In-Reply-To: <20221019132308.GA3496045@chaop.bj.intel.com>
-From:   Fuad Tabba <tabba@google.com>
-Date:   Wed, 19 Oct 2022 16:02:22 +0100
-Message-ID: <CA+EHjTytCEup0m-nhnVHsuQ1xjaCxXNHO_Oxe+QbpwqaewpfKQ@mail.gmail.com>
-Subject: Re: [PATCH v8 5/8] KVM: Register/unregister the guest private memory regions
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jjeUrnqbhNp6g16FZyggyoCcMU0gxOqp1sDPYM/lLjs=;
+        b=cWy1ZTKFW4VH86Fkkx/6qHZzmhowukAI++KgS3UPqJuCXswWTboG3mhb2T/dZrdOfc
+         25H2y4C1q2BunKnWQfgKad9Ms5ZzfMTjs8RFW3uMQdCHwnhZkNvLEjM1sFXtOfPaxn9y
+         YiJVs8D7j/9AeYkxtWoiGHT5PEEC5k+8u9Hrk0oYatQ2jT/eKyjYh02tXO7q18C/ti6I
+         6GBA3gvuXAlRKJNI1ARC6JIY4MLDi6tYjdTl/adwRtK0PX+oN9VCRTt6bkzqNdZp2XfP
+         3nM6iJ0VeXd1XV+ro3SQAJc12FWmgnkK2MSgZAGuElzFl1QMzZbSLyw+wUI7McMaRWzx
+         v0Rw==
+X-Gm-Message-State: ACrzQf3LlVkpuR0Xuvi6UZiZS0iUpCPVljRKxlUZQiZuAoNiKRZd32Rf
+        MpJBkbfjDGcA5x9xmGK/MJxSHtyqUjE=
+X-Google-Smtp-Source: AMsMyM6pteOsQYBnT17r7bvVUp+6YhBd4RkggukkPWftHlgid6du2KUWvGMkL/OBx05FKGFvHhdFUmnNUo8=
+X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:a42:8a14:f405:2ee1])
+ (user=pgonda job=sendgmr) by 2002:a65:5a0b:0:b0:46b:158e:ad7c with SMTP id
+ y11-20020a655a0b000000b0046b158ead7cmr7728945pgs.272.1666191824125; Wed, 19
+ Oct 2022 08:03:44 -0700 (PDT)
+Date:   Wed, 19 Oct 2022 08:03:33 -0700
+Message-Id: <20221019150333.1047423-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.0.413.g74048e4d9e-goog
+Subject: [PATCH] virt: Prevent AES-GCM IV reuse in SNP guest driver
+From:   Peter Gonda <pgonda@google.com>
+To:     thomas.lendacky@amd.com
+Cc:     Peter Gonda <pgonda@google.com>, Borislav Petkov <bp@suse.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Haowen Bai <baihaowen@meizu.com>,
+        Yang Yingliang <yangyingliang@huawei.com>,
+        Marc Orr <marcorr@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -98,25 +71,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > > This sounds good. Thank you.
-> >
-> > I like the idea of a separate Kconfig, e.g. CONFIG_KVM_GENERIC_PRIVATE_MEM or
-> > something.  I highly doubt there will be any non-x86 users for multiple years,
-> > if ever, but it would allow testing the private memory stuff on ARM (and any other
-> > non-x86 arch) without needing full pKVM support and with only minor KVM
-> > modifications, e.g. the x86 support[*] to test UPM without TDX is shaping up to be
-> > trivial.
->
-> CONFIG_KVM_GENERIC_PRIVATE_MEM looks good to me.
+The ASP and an SNP guest use a series of AES-GCM keys called VMPCKs to
+communicate securely with each other. The IV to this scheme is a
+sequence number that both the ASP and the guest track. Currently this
+sequence number in a guest request must exactly match the sequence
+number tracked by the ASP. This means that if the guest sees an error
+from the host during a request it can only retry that exact request or
+disable the VMPCK to prevent an IV reuse. AES-GCM cannot tolerate IV
+reuse see:
+https://csrc.nist.gov/csrc/media/projects/block-cipher-techniques/documents/bcm/comments/800-38-series-drafts/gcm/joux_comments.pdf
 
-That sounds good to me, and just keeping the xarray isn't really an
-issue for pKVM. We could end up using it instead of some of the other
-structures we use for tracking.
+Fixes: fce96cf044308 ("virt: Add SEV-SNP guest driver")
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Reported-by: Peter Gonda <pgonda@google.com>
+Cc: Borislav Petkov <bp@suse.de>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Michael Roth <michael.roth@amd.com>
+Cc: Haowen Bai <baihaowen@meizu.com>
+Cc: Yang Yingliang <yangyingliang@huawei.com>
+Cc: Marc Orr <marcorr@google.com>
+Cc: David Rientjes <rientjes@google.com>
+Cc: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org
 
-Cheers,
-/fuad
+---
+ drivers/virt/coco/sev-guest/sev-guest.c | 45 ++++++++++++++++++-------
+ 1 file changed, 32 insertions(+), 13 deletions(-)
 
-> Thanks,
-> Chao
-> >
-> > [*] https://lore.kernel.org/all/Y0mu1FKugNQG5T8K@google.com
+diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
+index f422f9c58ba7..227ae6a10ef2 100644
+--- a/drivers/virt/coco/sev-guest/sev-guest.c
++++ b/drivers/virt/coco/sev-guest/sev-guest.c
+@@ -67,8 +67,27 @@ static bool is_vmpck_empty(struct snp_guest_dev *snp_dev)
+ 	return true;
+ }
+ 
++/*
++ * If we receive an error from the host or ASP we have two options. We can
++ * either retry the exact same encrypted request or we can discontinue using the
++ * VMPCK.
++ *
++ * This is because in the current encryption scheme GHCB v2 uses AES-GCM to
++ * encrypt the requests. The IV for this scheme is the sequence number. GCM
++ * cannot tolerate IV reuse.
++ *
++ * The ASP FW v1.51 only increments the sequence numbers on a successful
++ * guest<->ASP back and forth and only accepts messages at its exact sequence
++ * number.
++ *
++ * So if we were to reuse the sequence number the encryption scheme is
++ * vulnerable. If we encrypt the sequence number for a fresh IV the ASP will
++ * reject our request.
++ */
+ static void snp_disable_vmpck(struct snp_guest_dev *snp_dev)
+ {
++	dev_alert(snp_dev->dev, "Disabling vmpck_id: %d to prevent IV reuse.\n",
++		  vmpck_id);
+ 	memzero_explicit(snp_dev->vmpck, VMPCK_KEY_LEN);
+ 	snp_dev->vmpck = NULL;
+ }
+@@ -326,29 +345,29 @@ static int handle_guest_request(struct snp_guest_dev *snp_dev, u64 exit_code, in
+ 	if (fw_err)
+ 		*fw_err = err;
+ 
+-	if (rc)
+-		return rc;
++	if (rc) {
++		dev_alert(snp_dev->dev,
++			  "Detected error from ASP request. rc: %d, fw_err: %lu\n",
++			  rc, fw_err);
++		goto disable_vmpck;
++	}
+ 
+-	/*
+-	 * The verify_and_dec_payload() will fail only if the hypervisor is
+-	 * actively modifying the message header or corrupting the encrypted payload.
+-	 * This hints that hypervisor is acting in a bad faith. Disable the VMPCK so that
+-	 * the key cannot be used for any communication. The key is disabled to ensure
+-	 * that AES-GCM does not use the same IV while encrypting the request payload.
+-	 */
+ 	rc = verify_and_dec_payload(snp_dev, resp_buf, resp_sz);
+ 	if (rc) {
+ 		dev_alert(snp_dev->dev,
+-			  "Detected unexpected decode failure, disabling the vmpck_id %d\n",
+-			  vmpck_id);
+-		snp_disable_vmpck(snp_dev);
+-		return rc;
++			  "Detected unexpected decode failure from ASP. rc: %d\n",
++			  rc);
++		goto disable_vmpck;
+ 	}
+ 
+ 	/* Increment to new message sequence after payload decryption was successful. */
+ 	snp_inc_msg_seqno(snp_dev);
+ 
+ 	return 0;
++
++disable_vmpck:
++	snp_disable_vmpck(snp_dev);
++	return rc;
+ }
+ 
+ static int get_report(struct snp_guest_dev *snp_dev, struct snp_guest_request_ioctl *arg)
+-- 
+2.38.0.413.g74048e4d9e-goog
+
