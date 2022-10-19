@@ -2,124 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 86605604B5C
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 17:28:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2353604BB9
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 17:38:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232233AbiJSP2p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 11:28:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59722 "EHLO
+        id S231442AbiJSPiQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 11:38:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230114AbiJSP1g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 11:27:36 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 029E81D7989
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 08:20:36 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29JEmS8w009877
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 15:19:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=jhPT1zF7RKYzQg7RBbsRpd6T8cdH8Op4F/ycURs1hs0=;
- b=Hei3ZakEguuAgpqxHir0gt9CYwkHVxUVbxGGhVeECVSJcQ88oecmdfcmhu5QEjZJJzbn
- tqPPNtwuBrtKhZHu2oZJQgLhDytK9RxzyXO4qligAigaXTb1Sp00kqu5gxP34GmcaRSs
- O7ROx5PBPTKdRwQJUzodDWRXfF5LvuBGsetL7edrJ0h2CH3X6fbMwHPcvqFt/7BUJull
- GrMIwyS+/lZ1uGF47+0eRs+AeaTN2RUYnGSwgHdfzES5ZCPKw4Wvoys0Q0c74yTM9p4D
- qz3MkVa5JI2PpShkyRWfue596qwz16JrXJNgXOCwm1HB8m8U4xOPPEeA0L7V3t4ymKtj Kw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kakax9f0f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 15:19:50 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29JEqMNc026977
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 15:19:50 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kakax9ey8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Oct 2022 15:19:50 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29JF8A7W004445;
-        Wed, 19 Oct 2022 15:19:48 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03fra.de.ibm.com with ESMTP id 3k7mg9dh4f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 19 Oct 2022 15:19:48 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29JFJjqo2228834
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Oct 2022 15:19:45 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 563D911C04C;
-        Wed, 19 Oct 2022 15:19:45 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1664F11C04A;
-        Wed, 19 Oct 2022 15:19:45 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.8.239])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 19 Oct 2022 15:19:45 +0000 (GMT)
-Date:   Wed, 19 Oct 2022 17:19:43 +0200
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v2 0/1] s390x: do not enable PV dump
- support by default
-Message-ID: <20221019171920.455451ea@p-imbrenda>
-In-Reply-To: <20221019145320.1228710-1-nrb@linux.ibm.com>
-References: <20221019145320.1228710-1-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S231405AbiJSPhz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 11:37:55 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 640DB11A14;
+        Wed, 19 Oct 2022 08:34:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1666193662; x=1697729662;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=UHIaR+J+RVnHQe0Epq5Q2DkYje1xjf/qW1B/YS+Op6c=;
+  b=VvPpVcXKTnPm6ViHgyMo2/wtljFGuq5++wIOWJJ9lsIjZw6LauP0h0Mb
+   L9Zy/NS3EsTIAcFWU15APa5MqDs8bKuQhlvN85adCPYfGT+IAMLvF47+F
+   154orwrFsWezjQqUTt1DxS+h2+iKAa/kEuOIXq2f2jhZgNjjhxxgqZyjb
+   s4aqi2BiCcAOnfvZLXHfWA22nXOx7GVEsK5XKQHj1BSi0VVboLmvcN/Gz
+   m6Q67G+bKe7iT+/Ec+4agKVwm/wt2qGZr2ckLQFbT6fHqkrAzcZgCBf8I
+   QzancLZ9mEatE46AXkpNbFF/4MfyhI0aTvo6ybne0Ya9+kxYwfzxoWonG
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10505"; a="286163006"
+X-IronPort-AV: E=Sophos;i="5.95,196,1661842800"; 
+   d="scan'208";a="286163006"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2022 08:32:38 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10505"; a="607149381"
+X-IronPort-AV: E=Sophos;i="5.95,196,1661842800"; 
+   d="scan'208";a="607149381"
+Received: from selvaku-mobl.ger.corp.intel.com (HELO box.shutemov.name) ([10.249.38.73])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2022 08:32:28 -0700
+Received: by box.shutemov.name (Postfix, from userid 1000)
+        id DEF33106C73; Wed, 19 Oct 2022 18:32:25 +0300 (+03)
+Date:   Wed, 19 Oct 2022 18:32:25 +0300
+From:   "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+To:     Vishal Annapurve <vannapurve@google.com>
+Cc:     "Gupta, Pankaj" <pankaj.gupta@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
+Message-ID: <20221019153225.njvg45glehlnjgc7@box.shutemov.name>
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
+ <de680280-f6b1-9337-2ae4-4b2faf2b823b@suse.cz>
+ <20221017161955.t4gditaztbwijgcn@box.shutemov.name>
+ <c63ad0cd-d517-0f1e-59e9-927d8ae15a1a@amd.com>
+ <20221017215640.hobzcz47es7dq2bi@box.shutemov.name>
+ <CAGtprH8xEdgATjQdhi2b_KqUuSOZHUM-Lh+O-ZtcFKbHf2_75g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: VaPhX-Edb5jjfycz9EDmDLz3jnioBQry
-X-Proofpoint-GUID: P4qDoU1b-5gBsclplB9r_7okpL95lNWN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-19_09,2022-10-19_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- suspectscore=0 bulkscore=0 mlxlogscore=968 spamscore=0 priorityscore=1501
- impostorscore=0 mlxscore=0 phishscore=0 lowpriorityscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
- definitions=main-2210190085
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAGtprH8xEdgATjQdhi2b_KqUuSOZHUM-Lh+O-ZtcFKbHf2_75g@mail.gmail.com>
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 19 Oct 2022 16:53:19 +0200
-Nico Boehr <nrb@linux.ibm.com> wrote:
-
-> v1->v2:
-> ---
-> * add indent to CONFIG_DUMP if in Makefile (thanks Janosch)
-> * add comment (thanks Janosch)
+On Tue, Oct 18, 2022 at 07:12:10PM +0530, Vishal Annapurve wrote:
+> On Tue, Oct 18, 2022 at 3:27 AM Kirill A . Shutemov
+> <kirill.shutemov@linux.intel.com> wrote:
+> >
+> > On Mon, Oct 17, 2022 at 06:39:06PM +0200, Gupta, Pankaj wrote:
+> > > On 10/17/2022 6:19 PM, Kirill A . Shutemov wrote:
+> > > > On Mon, Oct 17, 2022 at 03:00:21PM +0200, Vlastimil Babka wrote:
+> > > > > On 9/15/22 16:29, Chao Peng wrote:
+> > > > > > From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+> > > > > >
+> > > > > > KVM can use memfd-provided memory for guest memory. For normal userspace
+> > > > > > accessible memory, KVM userspace (e.g. QEMU) mmaps the memfd into its
+> > > > > > virtual address space and then tells KVM to use the virtual address to
+> > > > > > setup the mapping in the secondary page table (e.g. EPT).
+> > > > > >
+> > > > > > With confidential computing technologies like Intel TDX, the
+> > > > > > memfd-provided memory may be encrypted with special key for special
+> > > > > > software domain (e.g. KVM guest) and is not expected to be directly
+> > > > > > accessed by userspace. Precisely, userspace access to such encrypted
+> > > > > > memory may lead to host crash so it should be prevented.
+> > > > > >
+> > > > > > This patch introduces userspace inaccessible memfd (created with
+> > > > > > MFD_INACCESSIBLE). Its memory is inaccessible from userspace through
+> > > > > > ordinary MMU access (e.g. read/write/mmap) but can be accessed via
+> > > > > > in-kernel interface so KVM can directly interact with core-mm without
+> > > > > > the need to map the memory into KVM userspace.
+> > > > > >
+> > > > > > It provides semantics required for KVM guest private(encrypted) memory
+> > > > > > support that a file descriptor with this flag set is going to be used as
+> > > > > > the source of guest memory in confidential computing environments such
+> > > > > > as Intel TDX/AMD SEV.
+> > > > > >
+> > > > > > KVM userspace is still in charge of the lifecycle of the memfd. It
+> > > > > > should pass the opened fd to KVM. KVM uses the kernel APIs newly added
+> > > > > > in this patch to obtain the physical memory address and then populate
+> > > > > > the secondary page table entries.
+> > > > > >
+> > > > > > The userspace inaccessible memfd can be fallocate-ed and hole-punched
+> > > > > > from userspace. When hole-punching happens, KVM can get notified through
+> > > > > > inaccessible_notifier it then gets chance to remove any mapped entries
+> > > > > > of the range in the secondary page tables.
+> > > > > >
+> > > > > > The userspace inaccessible memfd itself is implemented as a shim layer
+> > > > > > on top of real memory file systems like tmpfs/hugetlbfs but this patch
+> > > > > > only implemented tmpfs. The allocated memory is currently marked as
+> > > > > > unmovable and unevictable, this is required for current confidential
+> > > > > > usage. But in future this might be changed.
+> > > > > >
+> > > > > > Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+> > > > > > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > > > > > ---
+> > > > >
+> > > > > ...
+> > > > >
+> > > > > > +static long inaccessible_fallocate(struct file *file, int mode,
+> > > > > > +                                  loff_t offset, loff_t len)
+> > > > > > +{
+> > > > > > +       struct inaccessible_data *data = file->f_mapping->private_data;
+> > > > > > +       struct file *memfd = data->memfd;
+> > > > > > +       int ret;
+> > > > > > +
+> > > > > > +       if (mode & FALLOC_FL_PUNCH_HOLE) {
+> > > > > > +               if (!PAGE_ALIGNED(offset) || !PAGE_ALIGNED(len))
+> > > > > > +                       return -EINVAL;
+> > > > > > +       }
+> > > > > > +
+> > > > > > +       ret = memfd->f_op->fallocate(memfd, mode, offset, len);
+> > > > > > +       inaccessible_notifier_invalidate(data, offset, offset + len);
+> > > > >
+> > > > > Wonder if invalidate should precede the actual hole punch, otherwise we open
+> > > > > a window where the page tables point to memory no longer valid?
+> > > >
+> > > > Yes, you are right. Thanks for catching this.
+> > >
+> > > I also noticed this. But then thought the memory would be anyways zeroed
+> > > (hole punched) before this call?
+> >
+> > Hole punching can free pages, given that offset/len covers full page.
+> >
+> > --
+> >   Kiryl Shutsemau / Kirill A. Shutemov
 > 
-> Currently, dump support is always enabled by setting the respective
-> plaintext control flag (PCF). Unfortunately, older machines without
-> support for PV dump will not start the guest when this PCF is set.
+> I think moving this notifier_invalidate before fallocate may not solve
+> the problem completely. Is it possible that between invalidate and
+> fallocate, KVM tries to handle the page fault for the guest VM from
+> another vcpu and uses the pages to be freed to back gpa ranges? Should
+> hole punching here also update mem_attr first to say that KVM should
+> consider the corresponding gpa ranges to be no more backed by
+> inaccessible memfd?
 
-maybe for the long term we could try to fix the stub generated by
-genprotimg to check the plaintext flags and the available features and
-refuse to try to start if the required features are missing.
+We rely on external synchronization to prevent this. See code around
+mmu_invalidate_retry_hva().
 
-ideally providing a custom message when generating the image, to be
-shown if the required features are missing. e.g. for kvm unit test, the
-custom message could be something like
-SKIP: $TEST_NAME: Missing hardware features
-
-once that is in place, we could revert this patch
-
-> 
-> Nico Boehr (1):
->   s390x: do not enable PV dump support by default
-> 
->  configure      | 11 +++++++++++
->  s390x/Makefile | 26 +++++++++++++++++---------
->  2 files changed, 28 insertions(+), 9 deletions(-)
-> 
-
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
