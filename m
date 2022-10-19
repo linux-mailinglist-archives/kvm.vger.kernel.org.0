@@ -2,159 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 50A5C604840
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 15:53:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB55860482F
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 15:52:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233632AbiJSNw6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 09:52:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43456 "EHLO
+        id S232265AbiJSNwA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 09:52:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233595AbiJSNwI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 09:52:08 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EBC2185422;
-        Wed, 19 Oct 2022 06:35:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666186557; x=1697722557;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=4xcGc4T12PBypY/VcZfHNkEly5yZ/s7CT5KUy36zg78=;
-  b=jjhzCoBCsLf8VUs0R+QfGydIe7QYMFm556unX6I3R1DhSqiZ6WdqdGVa
-   b58y8RqAbpOUVWcVU80uo6UdKSAEaP58z78cTXYknf8jnPI1EPw1Ko8CS
-   9P4GSLacFbYoEP5y0IdzcamCNPNMyiKLNICDGy3Sb384VgKaZcR10bNVB
-   RA8w2ffKnvwlH2hIji1lwf7aova5NGJGlNbXdroBiWEj3jQJb4F+KSwx+
-   P8m2wZLALph4TDFXT2aZIqb6t4vHFkYos0euU2OjLo9a0tQGtZztObxhN
-   m5uvSoc3lGKdeFUgCz0ogBy9KOvVgmRg9BL0ZqEQxRM9EEY9rXf4luzXk
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10505"; a="286801355"
-X-IronPort-AV: E=Sophos;i="5.95,196,1661842800"; 
-   d="scan'208";a="286801355"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2022 06:35:26 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10505"; a="624137726"
-X-IronPort-AV: E=Sophos;i="5.95,196,1661842800"; 
-   d="scan'208";a="624137726"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by orsmga007.jf.intel.com with ESMTP; 19 Oct 2022 06:35:14 -0700
-Date:   Wed, 19 Oct 2022 21:30:43 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Fuad Tabba <tabba@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
-Message-ID: <20221019133043.GB3496045@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <Yyi+l3+p9lbBAC4M@google.com>
- <CA+EHjTzy4iOxLF=5UX=s5v6HSB3Nb1LkwmGqoKhp_PAnFeVPSQ@mail.gmail.com>
- <20220926142330.GC2658254@chaop.bj.intel.com>
- <CA+EHjTz5yGhsxUug+wqa9hrBO60Be0dzWeWzX00YtNxin2eYHg@mail.gmail.com>
- <YzN9gYn1uwHopthW@google.com>
- <CA+EHjTw3din891hMUeRW-cn46ktyMWSdoB31pL+zWpXo_=3UVg@mail.gmail.com>
- <20221013133457.GA3263142@chaop.bj.intel.com>
- <CA+EHjTzZ2zsm7Ru_OKCZg9FCYESgZsmB=7ScKRh6ZN4=4OZ3gw@mail.gmail.com>
- <20221017145856.GB3417432@chaop.bj.intel.com>
- <CA+EHjTyiU230am0cuWc7xBBirGocPWGmyqCskhTytA10xpigYQ@mail.gmail.com>
+        with ESMTP id S233710AbiJSNvi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 09:51:38 -0400
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4289118499B
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 06:35:34 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id a67so25250194edf.12
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 06:35:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jGDuBvVBWtQQhTh15f+xlFUiPdaWSbx11jMCTBh0luA=;
+        b=PxTuqiFHKGLs6Q04zg2G4eSd00jK6zzgrt4HdFyWkirB8aCwSWFmJDbb4XEBPbs84b
+         XjeLDlepBSGLM9yuvsYFtIMpaA2nrkP9RseT+JMyFrkJmTtNG6S7IBl+ZFb+Z7EU964K
+         51qHIrDOsh043I6Y6V8E1g4XMUP9UGgmtMVCorWtgXXr8Ez+6KCd5ZzkSfC1vBvU0cH1
+         djCo4kPBwtzeKGV/O9N2hFeEJoYjXLSvmvYEL25wdP7p2Tf7hgW6O1nT+5fEjsm/qMk2
+         LLG+qdTEOncIhwY/g1cG4Fb+GhzkkvlzTi4NT6ZkssFxxTJuSnyH4YRDTPFp3De08sQ/
+         Humg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jGDuBvVBWtQQhTh15f+xlFUiPdaWSbx11jMCTBh0luA=;
+        b=2z0hZGm3iqF6R02o36w6Fq8DBLtRMC2L3yMM33cxpDQ+9He+WoqeJjlQ6yEa8sIS2U
+         NEcbZ2GiikvQpuCIWczO5QMfD7lecvcJB2RZlaINTbuhG/3iYusF4aiNpTNKE1rilorh
+         uKv1CKwdrjgYIojIaC/IZCRJJcG5tc1DfKKX0T0m0VYK2Mj+9DFpFIPslSeO26b6lyOq
+         I47PUQfc3gtrxeRf6JjhWN3soUBf5ammq1KVe24XIgTkcvE7eJUyYiVSQ3W5MAuHW0EF
+         9MlXk0yJ4huK+2PnVm2Xte5H290h2Qbt12PwnPTyunl3ymxSHPfDsPRHRNmAgMWqYvZd
+         izSA==
+X-Gm-Message-State: ACrzQf1yaUxnZy4C8xrhanKH4pNcsNkoyK6NUbbGI2roh45HS+kfchs3
+        3BEAIERHRB7lE/qYZi1QEUfCeQ==
+X-Google-Smtp-Source: AMsMyM5/lmcijk1PTC/MIbN3EcbOaf5vqEsarZQ2QfOuX/8iQ6m+Bp7SwPos1MPS6rC1Qfj/aMnvQg==
+X-Received: by 2002:a05:6402:5ca:b0:445:c80a:3c2 with SMTP id n10-20020a05640205ca00b00445c80a03c2mr7515578edx.247.1666186508675;
+        Wed, 19 Oct 2022 06:35:08 -0700 (PDT)
+Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
+        by smtp.gmail.com with ESMTPSA id d7-20020aa7d687000000b004580296bb0bsm10538281edr.83.2022.10.19.06.35.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Oct 2022 06:35:08 -0700 (PDT)
+Date:   Wed, 19 Oct 2022 13:35:05 +0000
+From:   Quentin Perret <qperret@google.com>
+To:     Will Deacon <will@kernel.org>
+Cc:     kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v4 12/25] KVM: arm64: Add infrastructure to create and
+ track pKVM instances at EL2
+Message-ID: <Y0/9CZHSMLLnmWU9@google.com>
+References: <20221017115209.2099-1-will@kernel.org>
+ <20221017115209.2099-13-will@kernel.org>
+ <Y07VaRwVf3McX27a@google.com>
+ <20221019115723.GA4067@willie-the-truck>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CA+EHjTyiU230am0cuWc7xBBirGocPWGmyqCskhTytA10xpigYQ@mail.gmail.com>
-X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20221019115723.GA4067@willie-the-truck>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 17, 2022 at 08:05:10PM +0100, Fuad Tabba wrote:
-> Hi,
+On Wednesday 19 Oct 2022 at 12:57:24 (+0100), Will Deacon wrote:
+> On Tue, Oct 18, 2022 at 04:33:45PM +0000, Quentin Perret wrote:
+> > On Monday 17 Oct 2022 at 12:51:56 (+0100), Will Deacon wrote:
+> > > +void pkvm_hyp_vm_table_init(void *tbl)
+> > > +{
+> > > +	WARN_ON(vm_table);
+> > > +	vm_table = tbl;
+> > > +}
+> > 
+> > Uh, why does this one need to be exposed outside pkvm.c ?
 > 
-> > > > Using both private_fd and userspace_addr is only needed in TDX and other
-> > > > confidential computing scenarios, pKVM may only use private_fd if the fd
-> > > > can also be mmaped as a whole to userspace as Sean suggested.
-> > >
-> > > That does work in practice, for now at least, and is what I do in my
-> > > current port. However, the naming and how the API is defined as
-> > > implied by the name and the documentation. By calling the field
-> > > private_fd, it does imply that it should not be mapped, which is also
-> > > what api.rst says in PATCH v8 5/8. My worry is that in that case pKVM
-> > > would be mis/ab-using this interface, and that future changes could
-> > > cause unforeseen issues for pKVM.
-> >
-> > That is fairly enough. We can change the naming and the documents.
-> >
-> > >
-> > > Maybe renaming this to something like "guest_fp", and specifying in
-> > > the documentation that it can be restricted, e.g., instead of "the
-> > > content of the private memory is invisible to userspace" something
-> > > along the lines of  "the content of the guest memory may be restricted
-> > > to userspace".
-> >
-> > Some other candidates in my mind:
-> > - restricted_fd: to pair with the mm side restricted_memfd
-> > - protected_fd: as Sean suggested before
-> > - fd: how it's explained relies on the memslot.flag.
+> We need to initialise the table using the memory donated by the host
+> on the __pkvm_init path. That's all private to nvhe/setup.c, so rather
+> than expose the raw pointers (of either the table or the donated memory),
+> we've got this initialisation function instead which is invoked by
+> __pkvm_init_finalise() on the deprivilege path.
 > 
-> All these sound good, since they all capture the potential use cases.
-> Restricted might be the most logical choice if that's going to also
-> become the name for the mem_fd.
+> Happy to repaint it if you have a patch?
 
-Thanks, I will use 'restricted' for them. e.g.:
-- memfd_restricted() syscall
-- restricted_fd
-- restricted_offset
-
-The memslot flags will still be KVM_MEM_PRIVATE, since I think pKVM will
-create its own one?
-
-Chao
-> 
-> Thanks,
-> /fuad
-> 
-> > Thanks,
-> > Chao
-> > >
-> > > What do you think?
-> > >
-> > > Cheers,
-> > > /fuad
-> > >
-> > > >
-> > > > Thanks,
-> > > > Chao
-> > > > >
-> > > > > Cheers,
-> > > > > /fuad
+I don't, I just got confused, maybe because in an older version of this
+(possibly quite old) the table was statically allocated? Anyways, it's
+all fine as-is, thanks for the reply.
