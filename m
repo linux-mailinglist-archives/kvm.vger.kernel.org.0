@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4CB06603CF1
-	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 10:55:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 55F2C603D3A
+	for <lists+kvm@lfdr.de>; Wed, 19 Oct 2022 11:00:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231688AbiJSIzN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 19 Oct 2022 04:55:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49264 "EHLO
+        id S229919AbiJSJAE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 19 Oct 2022 05:00:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231941AbiJSIyL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 19 Oct 2022 04:54:11 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30AD49620A;
-        Wed, 19 Oct 2022 01:51:15 -0700 (PDT)
+        with ESMTP id S232319AbiJSI72 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 19 Oct 2022 04:59:28 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6EBE1260F;
+        Wed, 19 Oct 2022 01:54:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666169475; x=1697705475;
+  t=1666169696; x=1697705696;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+X6cm8tXEq53y0cLc6cRR4TvIr9g+2l/NPCkvPotupE=;
-  b=aM8QV0DubBd1jl08CrpYJxL6nf55tub/CGuPNKAZb/i3eW4k73apdiWb
-   zJc6I9XVZaaDrqKbmZoDDfm7tBxisD6VXTNF7KEsouPKdNa8+0kdsznSH
-   tcWeDgg86GCPs70fM3H2xl28q675dbbuQ/5JNV/lxEI+kIiIHc7/p5iZx
-   SQ0CuFuXpSxUAisG/8mcE2k/9t2IfbgUDftUb3McbESw8Z9sFkU8aX/iC
-   +hDbts3fz2MDBpuCnny66hS0QZfdXvOc5k1UvU230cBK2FPWeLBciw+6g
-   7Lv4mMo9OFtGDcDRltlBkO+zgsutOl95hNStuEJqCnlBo2X9SXA2OKrIB
+  bh=Xh50grAc2J9OL82QlhScNH50h2hDqC36SRcoKoSLDwA=;
+  b=lCbh+6FxrCSqBrcKL2DjQzfd1gqBG4pkiH6CCZRZy33Pb1cf4JsxHbHm
+   1F+6UJO7lgMxsycSskJLtYnOXK5cWvfVt9kaacIQLkkTtsO1Xlp0/OFhA
+   SgwUjCFy28XrFcAQ9mLOEj3V2bPCG7v6Ww96ye/LMGLzMIBFc5Fy/G8Hw
+   k8aYZ8sLI0PpEeifBsPK318vhnQfJ9DzAy5Z2GnDy6gVg+x1G10omPj96
+   2vuJFu+xnVMLP/JO/wZMrTOMAd+wLMHL4ZKo4ORzLZTMKZBc4SCp9PicK
+   zsSMYBlzrTpaCHhu/9ZhuVGHh4gp/IlEXpxvcj4uXmO/PGRxLBSv9wM72
    Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10504"; a="286739743"
+X-IronPort-AV: E=McAfee;i="6500,9779,10504"; a="370567294"
 X-IronPort-AV: E=Sophos;i="5.95,195,1661842800"; 
-   d="scan'208";a="286739743"
+   d="scan'208";a="370567294"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2022 01:48:07 -0700
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2022 01:48:13 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10504"; a="804196026"
+X-IronPort-AV: E=McAfee;i="6500,9779,10504"; a="804196060"
 X-IronPort-AV: E=Sophos;i="5.95,195,1661842800"; 
-   d="scan'208";a="804196026"
+   d="scan'208";a="804196060"
 Received: from jiaxichen-precision-3650-tower.sh.intel.com ([10.239.159.75])
-  by orsmga005.jf.intel.com with ESMTP; 19 Oct 2022 01:48:02 -0700
+  by orsmga005.jf.intel.com with ESMTP; 19 Oct 2022 01:48:07 -0700
 From:   Jiaxi Chen <jiaxi.chen@linux.intel.com>
 To:     kvm@vger.kernel.org
 Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
@@ -51,9 +51,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         fenghua.yu@intel.com, keescook@chromium.org,
         jane.malalane@citrix.com, nathan@kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 5/6] x86: KVM: Enable AVX-NE-CONVERT CPUID and expose it to guest
-Date:   Wed, 19 Oct 2022 16:47:33 +0800
-Message-Id: <20221019084734.3590760-6-jiaxi.chen@linux.intel.com>
+Subject: [PATCH 6/6] x86: KVM: Enable PREFETCHIT0/1 CPUID and expose it to guest
+Date:   Wed, 19 Oct 2022 16:47:34 +0800
+Message-Id: <20221019084734.3590760-7-jiaxi.chen@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20221019084734.3590760-1-jiaxi.chen@linux.intel.com>
 References: <20221019084734.3590760-1-jiaxi.chen@linux.intel.com>
@@ -68,14 +68,12 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-AVX-NE-CONVERT is a new set of instructions in the latest Intel platform
-Sierra Forest, which can convert low precision floating point like
-BF16/FP16 to high precision floating point FP32. It can also convert
-FP32 elements to BF16. This instruction allows the platform to have
-improved AI capabilities and better compatibility.
+Latest Intel platform Granite Rapids has introduced a new instruction -
+PREFETCHIT0/1, which moves code to memory (cache) closer to the processor
+depending on specific hints.
 
 The bit definition:
-CPUID.(EAX=7,ECX=1):EDX[bit 5]
+CPUID.(EAX=7,ECX=1):EDX[bit 14]
 
 This patch enables this CPUID in the kernel feature bits and expose it
 to guest OS.
@@ -83,35 +81,34 @@ to guest OS.
 Signed-off-by: Jiaxi Chen <jiaxi.chen@linux.intel.com>
 ---
  arch/x86/include/asm/cpufeatures.h | 1 +
- arch/x86/kvm/cpuid.c               | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ arch/x86/kvm/cpuid.c               | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index b2aa761ea110..4e0bbffedbb4 100644
+index 4e0bbffedbb4..de8aa62bbdb1 100644
 --- a/arch/x86/include/asm/cpufeatures.h
 +++ b/arch/x86/include/asm/cpufeatures.h
-@@ -425,6 +425,7 @@
- 
+@@ -426,6 +426,7 @@
  /* Intel-defined CPU features, CPUID level 0x00000007:1 (EDX), word 20 */
  #define X86_FEATURE_AVX_VNNI_INT8       (20*32+ 4) /* Support for VPDPB[SU,UU,SS]D[,S] */
-+#define X86_FEATURE_AVX_NE_CONVERT      (20*32+ 5) /* AVX NE CONVERT Instructions */
+ #define X86_FEATURE_AVX_NE_CONVERT      (20*32+ 5) /* AVX NE CONVERT Instructions */
++#define X86_FEATURE_PREFETCHITI         (20*32+14) /* PREFETCHIT0/1 Instructions */
  
  /*
   * BUG word(s)
 diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index b1b53a5c788a..fcd00c68e546 100644
+index fcd00c68e546..e73307732d10 100644
 --- a/arch/x86/kvm/cpuid.c
 +++ b/arch/x86/kvm/cpuid.c
-@@ -661,7 +661,8 @@ void kvm_set_cpu_caps(void)
+@@ -661,7 +661,7 @@ void kvm_set_cpu_caps(void)
  		F(AVX_IFMA));
  
  	kvm_cpu_cap_mask(CPUID_7_1_EDX,
--		F(AVX_VNNI_INT8));
-+		F(AVX_VNNI_INT8) | F(AVX_NE_CONVERT)
-+	);
+-		F(AVX_VNNI_INT8) | F(AVX_NE_CONVERT)
++		F(AVX_VNNI_INT8) | F(AVX_NE_CONVERT) | F(PREFETCHITI)
+ 	);
  
  	kvm_cpu_cap_mask(CPUID_D_1_EAX,
- 		F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | F(XSAVES) | f_xfd
 -- 
 2.27.0
 
