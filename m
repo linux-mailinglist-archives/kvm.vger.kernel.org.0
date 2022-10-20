@@ -2,125 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E91A560631E
-	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 16:32:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DD056606378
+	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 16:47:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229610AbiJTOcx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Oct 2022 10:32:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35782 "EHLO
+        id S230193AbiJTOrH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Oct 2022 10:47:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229868AbiJTOcv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Oct 2022 10:32:51 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 792B619635B
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 07:32:44 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29KEMA2G005212;
-        Thu, 20 Oct 2022 14:32:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=pkaKCD6eUecp+1SxFlu+uWxIaeD0jm3xzPJMF1CqNTE=;
- b=en9hXo5oFVwxOFG9ld7cVhgKAd/IpithZice1iK1pOYsMT9fTnyOBXPKSp2PoJ2zinYi
- Nk7P8tKz+CMma+cNkiA7PY3ar1DOUjtqN8yJWV5w1AReqBaud/bZ/YR7rLm4wqlrNykS
- z80TPDm0VlBxtxkHxNYyYCg2nDKE3HBtPeZfzVOviwuEyJIWYz60JIaArICag5kxpUFI
- eGojRK4gTaqBf6jBMPljCiUYhuNzhX99G4RHAgTlBmM1RV5vK+ovLITwJt2S5Q/en1el
- 7Wbtvj8Cb9qim60nfVxjvbVKoN2Ljdzzpv75iZMPzv39/PEvFo8Jk1POYhmXNrZrnU05 Aw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kb81e0afh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Oct 2022 14:32:36 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29KEOE7f012225;
-        Thu, 20 Oct 2022 14:32:36 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kb81e0adx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Oct 2022 14:32:36 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29KEKHkG026369;
-        Thu, 20 Oct 2022 14:32:33 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03fra.de.ibm.com with ESMTP id 3k7mg9et23-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Oct 2022 14:32:33 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29KEWU3T66453792
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 20 Oct 2022 14:32:30 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5E4E84C046;
-        Thu, 20 Oct 2022 14:32:30 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5194D4C044;
-        Thu, 20 Oct 2022 14:32:29 +0000 (GMT)
-Received: from [9.171.54.135] (unknown [9.171.54.135])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 20 Oct 2022 14:32:29 +0000 (GMT)
-Message-ID: <3db6c742-4d48-788a-7a84-710a4b4e2e0f@linux.ibm.com>
-Date:   Thu, 20 Oct 2022 16:32:29 +0200
+        with ESMTP id S229898AbiJTOrE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Oct 2022 10:47:04 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C38D5A8792
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 07:47:02 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id r14so33996104lfm.2
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 07:47:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=p+QLcntPNquWGA1ARPKGqcsFovLnDGGACStBc6YWpJE=;
+        b=WGaWzXNmStE18xevdTnFF7SFzon6bb6zpTKu05Cvb/sWRr/Yl798OoETjUYO0PRSYp
+         xRaZFTO78m3ojbvMzB3MOPK02Q8D/5tdJ3wrtzc/6Pc/TuW6k/QG5Utr1RkkNePw8a9y
+         EXUT1qHq/rVQK+Cl99tY0X3OhaIsKSyBATMqS1cacvvIpyss1fdkHjtbqmggiDzmKqBT
+         LTaIbA77mDafWDX39O3WcdQnQrWGT2DrVvZi2MOaVhu/WqHRMX3snvdWmrTjZ0yGf4gF
+         MiPpMDC+dCVKj3+lDH3YOFy3lSYNehZEXMfmgiK1hjRjvfeIqeYZZBR5NadIh35vUVrZ
+         D5gQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=p+QLcntPNquWGA1ARPKGqcsFovLnDGGACStBc6YWpJE=;
+        b=hbaloPToXV5Cb8pCzkOUOT1Q06aljzXm4x8SMXxqlo1sEluWo0nVNsRowbpMQYhm2S
+         2xPZtU3hK6/YDreyfI2tzn0sMWGGdMwUyYxG3bIHqCfQ69qkrsGk7BrsSbaL6jyMZMsl
+         0fkLvf7V+E4Wo4gsFziPO1EC5jHJaPGgQeNHJEoBm4J7hUc/qTIzXAQ8jEN+N29FDG1l
+         jEVE+1jUuT3Ff545UQWIiaEXQFSMvrQjTp4Gyvq5XQRav2ObdPFVKsTtSC4pafHGFiIj
+         vKfp6ohcQpfHN1HVnZMo1tf2BmOUbQTOI+xR2MhfykrCF9NnYmrX/nSyGKGrfZRvELH3
+         mOXA==
+X-Gm-Message-State: ACrzQf3KbdXfifHlrNsaM8eQfAmK2Gsx+oVbClNosL31zn05bxkls1Cl
+        AwZdRDaNmlkgbTfKTAzoz7U5gGPRPEfhxROV1Y0NXg==
+X-Google-Smtp-Source: AMsMyM6kt+/AcdRolhlWvfCUWwkN1TI+8ZVTwkmYAf3ufmRK1hu/bT4Q1AWe2MNyQhIWzOKq/NcU+haMFp+R7RpkDDc=
+X-Received: by 2002:a05:6512:521:b0:4a2:7576:82f4 with SMTP id
+ o1-20020a056512052100b004a2757682f4mr5236360lfc.558.1666277220192; Thu, 20
+ Oct 2022 07:47:00 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH v10 6/9] s390x/cpu topology: add topology-disable machine
- property
-Content-Language: en-US
-To:     =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com
-References: <20221012162107.91734-1-pmorel@linux.ibm.com>
- <20221012162107.91734-7-pmorel@linux.ibm.com>
- <f4e07f9f-dd31-d300-cb3b-9714b88880e5@kaod.org>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <f4e07f9f-dd31-d300-cb3b-9714b88880e5@kaod.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: XEqZOm4IQPSzef1luWhewb8aW4-KnArF
-X-Proofpoint-ORIG-GUID: OLqqVs5j2ZcRHeiT1iPqmeFrCJzlWIrY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-20_05,2022-10-20_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 lowpriorityscore=0 mlxlogscore=727 adultscore=0
- suspectscore=0 mlxscore=0 impostorscore=0 spamscore=0 clxscore=1015
- phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210200086
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20221019150333.1047423-1-pgonda@google.com> <528937ab-8046-d5d1-26ff-50ef35f5635f@amd.com>
+ <CAMkAt6ritG1zmOreh9WYLYAGww0EJQy+m-Y0nfxD5+gpTkpJ1w@mail.gmail.com>
+ <821e750b-26c9-3331-7577-5cb832a35afa@amd.com> <CAAH4kHYhLkiN7H03GKgMU+3h9rhp2a03gNFGLbrNtjp=PYYHQw@mail.gmail.com>
+ <5621c2b6-a5eb-c786-afee-020e97c0e4c8@amd.com> <CAMkAt6pCPmf++Dg=x5bSN4-gR-s7BuYiryOGvGezLupFN9aEKw@mail.gmail.com>
+ <948704a4-2348-041f-4f46-bbf42d985549@amd.com> <CAMkAt6rb-f3qCb7Np-SdHd7u87-zShFpYkWcA910uYXUafqtPQ@mail.gmail.com>
+ <195a9a2d-d758-e70f-335f-c394b0c587ad@amd.com>
+In-Reply-To: <195a9a2d-d758-e70f-335f-c394b0c587ad@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Thu, 20 Oct 2022 08:46:48 -0600
+Message-ID: <CAMkAt6qFDS3GgCPZD-T6Ro4VSrTwy7oww9NnAw5Vyu_9SBRpZg@mail.gmail.com>
+Subject: Re: [PATCH] virt: Prevent AES-GCM IV reuse in SNP guest driver
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Dionna Amalie Glaze <dionnaglaze@google.com>,
+        Borislav Petkov <bp@suse.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Haowen Bai <baihaowen@meizu.com>,
+        Yang Yingliang <yangyingliang@huawei.com>,
+        Marc Orr <marcorr@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Oct 20, 2022 at 8:02 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
+>
+> On 10/19/22 16:47, Peter Gonda wrote:
+> > On Wed, Oct 19, 2022 at 2:58 PM Tom Lendacky <thomas.lendacky@amd.com> wrote:
+> >> On 10/19/22 15:39, Peter Gonda wrote:
+> >>> On Wed, Oct 19, 2022 at 1:56 PM Tom Lendacky <thomas.lendacky@amd.com> wrote:
+> >>>> On 10/19/22 14:17, Dionna Amalie Glaze wrote:
+> >>>>> On Wed, Oct 19, 2022 at 11:44 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
+> >>>>>> On 10/19/22 12:40, Peter Gonda wrote:
+> >>>>>>> On Wed, Oct 19, 2022 at 11:03 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
+> >>>>>>>> On 10/19/22 10:03, Peter Gonda wrote:
+> >>>>>>>>> The ASP and an SNP guest use a series of AES-GCM keys called VMPCKs to
+> >>>>>>>>> communicate securely with each other. The IV to this scheme is a
+> >>>>>>>>> sequence number that both the ASP and the guest track. Currently this
+> >>>>>>>>> sequence number in a guest request must exactly match the sequence
+> >>>>>>>>> number tracked by the ASP. This means that if the guest sees an error
+> >>>>>>>>> from the host during a request it can only retry that exact request or
+> >>>>>>>>> disable the VMPCK to prevent an IV reuse. AES-GCM cannot tolerate IV
+> >>>>>>>>> reuse see:
+> >>>>>>>>> https://csrc.nist.gov/csrc/media/projects/block-cipher-techniques/documents/bcm/comments/800-38-series-drafts/gcm/joux_comments.pdf
+>
+> >>> OK so the guest retires with the same request when it gets an
+> >>> SNP_GUEST_REQ_INVALID_LEN error. It expands its internal buffer to
+> >>
+> >> It would just use the pre-allocated snp_dev->certs_data buffer with npages
+> >> set to the full size of that buffer.
+> >
+> > Actually we allocate that buffer with size SEV_FW_BLOB_MAX_SIZE. Maybe
+> > we want to just allocate this buffer which we think is sufficient and
+> > never increase the allocation?
+> >
+> > I see the size of
+> > https://developer.amd.com/wp-content/resources/ask_ark_milan.cert is
+> > 3200 bytes. Assuming the VCEK cert is the same size (which it should
+> > be since this .cert is 2 certificates). 16K seems to leave enough room
+> > even for some vendor certificates?
+>
+> I think just using the 16K buffer (4 pages) as it is allocated today is
+> ok. If we get a SNP_GUEST_REQ_INVALID_LEN error that is larger than 4
+> pages, then we won't ever be able to pull the certs given how the driver
+> is coded today. In that case, disabling the VMPCK is in order.
+>
+> A separate patch could be submitted later to improve this overall aspect
+> of the certs buffer if needed.
 
+If that sounds OK I'd prefer that. This keeps the drivers current limit:
 
-On 10/18/22 19:51, Cédric Le Goater wrote:
-> On 10/12/22 18:21, Pierre Morel wrote:
->> S390 CPU topology is only allowed for s390-virtio-ccw-7.3 and
->> newer S390 machines.
->> We keep the possibility to disable the topology on these newer
->> machines with the property topology-disable.
-> 
-> Isn't 'topology' enough for the property ? I don't think the
-> '-disable' prefix adds much to the meaning.
-> 
-> C.
-> 
-> 
+static int get_ext_report(struct snp_guest_dev *snp_dev, struct
+snp_guest_request_ioctl *arg)
+...
+if (req.certs_len > SEV_FW_BLOB_MAX_SIZE ||
+    !IS_ALIGNED(req.certs_len, PAGE_SIZE))
+return -EINVAL;
 
-Agreed.
+I'd prefer not to add extra features during the bug fix. But happy to
+make this work with buffers greater than SEV_FW_BLOB_MAX_SIZE as
+follow up if you want.
 
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+>
+> Thanks,
+> Tom
+>
+> >
+> >>
+> >>> hold the certificates. When it finally gets a successful request w/
+> >>> certs. Do we want to return the attestation bits to userspace, but
+> >>> leave out the certificate data. Or just error out the ioctl
+> >>> completely?
+> >>
+> >> We need to be able to return the attestation bits that came back with the
+> >> extra certs. So just error out of the ioctl with the length error and let
+> >> user-space retry with the recommended number of pages.
+> >
+> > That sounded simpler to me. Will do.
+> >
+> >>
+> >>>
+> >>> I can do that in this series.
+> >>
+> >> Thanks!
+> >>
+> >>>
+> >>>>
+> >>>>>
+> >>>>>>>
+> >>>>>>>>
+> >>>>>>>> For the rate-limiting patch series [1], the rate-limiting will have to be
+> >>>>>>>> performed within the kernel, while the mutex is held, and then retry the
+> >>>>>>>> exact request again. Otherwise, that error will require disabling the
+> >>>>>>>> VMPCK. Either that, or the hypervisor must provide the rate limiting.
+> >>>>>>>>
+> >>>>>>>> Thoughts?
+> >>>>>>>>
+> >>>>>>>> [1] https://lore.kernel.org/lkml/20221013160040.2858732-1-dionnaglaze@google.com/
+> >>>>>>>
+> >>>>>>> Yes I think if the host rate limits the guest. The guest kernel should
+> >>>>>>> retry the exact message. Which mutex are you referring too?
+> >>>>>>
+> >>>>>> Or the host waits and then submits the request and the guest kernel
+> >>>>>> doesn't have to do anything. The mutex I'm referring to is the
+> >>>>>> snp_cmd_mutex that is taken in snp_guest_ioctl().
+> >>>>>
+> >>>>> I think that either the host kernel or guest kernel waiting can lead
+> >>>>> to unacceptable delays.
+> >>>>> I would recommend that we add a zero argument ioctl to /dev/sev-guest
+> >>>>> specifically for retrying the last request.
+> >>>>>
+> >>>>> We can know what the last request is due to the sev_cmd_mutex serialization.
+> >>>>> The driver will just keep a scratch buffer for this. Any other request
+> >>>>> that comes in without resolving the retry will get an -EBUSY error
+> >>>>> code.
+> >>>>
+> >>>> And the first caller will have received an -EAGAIN in order to
+> >>>> differentiate between the two situations?
+> >>>>
+> >>>>>
+> >>>>> Calling the retry ioctl without a pending command will result in -EINVAL.
+> >>>>>
+> >>>>> Let me know what you think.
+> >>>>
+> >>>> I think that sounds reasonable, but there are some catches. You will need
+> >>>> to ensure that the caller that is supposed to retry does actually retry
+> >>>> and that a caller that does retry is the same caller that was told to retry.
+> >>>
+> >>> Whats the issue with the guest driver taking some time?
+> >>>
+> >>> This sounds complex because there may be many users of the driver. How
+> >>> do multiple users coordinate when they need to use the retry ioctl?
+> >>>
+> >>>>
+> >>>> Thanks,
+> >>>> Tom
+> >>>>
+> >>>>>>
+> >>>>>> Thanks,
+> >>>>>> Tom
+> >>>>>
+> >>>>>
+> >>>>>
