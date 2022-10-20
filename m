@@ -2,78 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A256460631B
-	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 16:32:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 42ECE606324
+	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 16:33:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230140AbiJTOcQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Oct 2022 10:32:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34798 "EHLO
+        id S229763AbiJTOdl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Oct 2022 10:33:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229868AbiJTOcJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Oct 2022 10:32:09 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B01514DF37;
-        Thu, 20 Oct 2022 07:32:07 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29KE3gZt026078;
-        Thu, 20 Oct 2022 14:32:07 GMT
+        with ESMTP id S230017AbiJTOdi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Oct 2022 10:33:38 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A27515DB3E;
+        Thu, 20 Oct 2022 07:33:33 -0700 (PDT)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29KEGkje003824;
+        Thu, 20 Oct 2022 14:33:32 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=Uxv4bQDysXNnEvEFn01RbxbVnrcjZ+L3wBpHqRt841Y=;
- b=tftkazWAKHxgHhM2sYFaGQW1uxJx5112nU7GBPNJnkWMdep2jz2H9sMfsbYtgXUKyEUC
- IQhLRMSxR0763k3Y8Ved3K9lINSL77HA2mKc54IHwRZo0cX21tiGezUN5hACBSaac4ux
- N6ZwK5f/ppfO/oWhCR1Vy+NBxaq6Kj7e57lIYreFlDTM6FQBc2WrazrfjcwyvRnkfCsT
- WYoPpwURygrdO1zWYRCAN60IIVAIAa6Vz/F16Ikju4HK+X4ezY7K2QDNgylhjZ1EXAIX
- 8Y0qguw7sFMmN1ZlguIp35+Jn6hSYLnN/Sjq4wsmsvvY7uvJ8Z6p9vMyFoG9fwKPgdCe Sg== 
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kb7rrhfm4-1
+ bh=6y3grxiCUqjZW1P2xC3g5gcir4KiPgH14Zi0nk3whs4=;
+ b=hHJwzqlqSr+d+mcl0G60s32M3UBBIQ2x45gyfwQ6LsOaGsezbLdGba4T7xR3hVu8kC48
+ d/41Ja0kSCsBIo8bD/eIZA9tZTejXbqNudiKtXJIE4AVsWqVz8QdnXEc+oCG8JVazxnY
+ 91bZQdb89sjnQFPR+nlU6Zd7bowPWV0umWHlvstQhEAwr3+CWrDBBPi5Ynltgpy+/A5E
+ QHdYVOZ9SUlR3BmWTzvpbruMDNQDYpDQqCfEQP9HslO8F8HXhRDDm9cbyjJOhyZ2p5jm
+ bpCVAyNwqrk5tJnKIYtIvF9rv9Qn0xFtBDYTxBEGUmltpq6yE2XsZ2npjtZP8DNCE5pR Cg== 
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kb7xr8h1j-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Oct 2022 14:32:06 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29KELQs3021439;
+        Thu, 20 Oct 2022 14:33:30 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29KELGfN010193;
         Thu, 20 Oct 2022 14:32:04 GMT
 Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04ams.nl.ibm.com with ESMTP id 3k7mg990q2-1
+        by ppma03ams.nl.ibm.com with ESMTP id 3k7mg993pe-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Thu, 20 Oct 2022 14:32:04 +0000
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29KEW16k32309870
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29KEW1sf2097778
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Thu, 20 Oct 2022 14:32:01 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 348C0AE045;
+        by IMSVA (Postfix) with ESMTP id 8A433AE045;
         Thu, 20 Oct 2022 14:32:01 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DE5EBAE051;
-        Thu, 20 Oct 2022 14:32:00 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 3FF9AAE04D;
+        Thu, 20 Oct 2022 14:32:01 +0000 (GMT)
 Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
         by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 20 Oct 2022 14:32:00 +0000 (GMT)
+        Thu, 20 Oct 2022 14:32:01 +0000 (GMT)
 From:   Nico Boehr <nrb@linux.ibm.com>
 To:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
         imbrenda@linux.ibm.com
 Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, hca@linux.ibm.com,
         gor@linux.ibm.com, agordeev@linux.ibm.com
-Subject: [v1 3/5] KVM: s390: sort out physical vs virtual pointers usage
-Date:   Thu, 20 Oct 2022 16:31:57 +0200
-Message-Id: <20221020143159.294605-4-nrb@linux.ibm.com>
+Subject: [v1 4/5] KVM: s390: sida: sort out physical vs virtual pointers usage
+Date:   Thu, 20 Oct 2022 16:31:58 +0200
+Message-Id: <20221020143159.294605-5-nrb@linux.ibm.com>
 X-Mailer: git-send-email 2.37.3
 In-Reply-To: <20221020143159.294605-1-nrb@linux.ibm.com>
 References: <20221020143159.294605-1-nrb@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: mWLvjv5rmk3SzxVHxlPP7DeGTS6QncCY
-X-Proofpoint-ORIG-GUID: mWLvjv5rmk3SzxVHxlPP7DeGTS6QncCY
+X-Proofpoint-ORIG-GUID: KHRJLPzsJnxP2_URPlx82Y5d0rlpHSMe
+X-Proofpoint-GUID: KHRJLPzsJnxP2_URPlx82Y5d0rlpHSMe
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-10-20_05,2022-10-20_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- lowpriorityscore=0 suspectscore=0 mlxlogscore=999 malwarescore=0
- mlxscore=0 adultscore=0 priorityscore=1501 phishscore=0 impostorscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210200083
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 clxscore=1015 lowpriorityscore=0 suspectscore=0
+ bulkscore=0 phishscore=0 malwarescore=0 priorityscore=1501 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210200086
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
@@ -83,181 +83,153 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix virtual vs physical address confusion (which currently are the same).
+All callers of the sida_origin() macro actually expected a virtual
+address, so rename it to sida_addr() and hand out a virtual address.
+
+At some places, the macro wasn't used, potentially creating problems
+if the sida size ever becomes nonzero (not currently the case), so let's
+start using it everywhere now while at it.
 
 Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 ---
- arch/s390/include/asm/kvm_host.h |  1 +
- arch/s390/kvm/intercept.c        |  2 +-
- arch/s390/kvm/kvm-s390.c         | 44 ++++++++++++++++++--------------
- arch/s390/kvm/kvm-s390.h         |  5 ++--
- 4 files changed, 30 insertions(+), 22 deletions(-)
+ arch/s390/include/asm/kvm_host.h | 3 +--
+ arch/s390/kvm/intercept.c        | 7 +++----
+ arch/s390/kvm/kvm-s390.c         | 9 +++++----
+ arch/s390/kvm/priv.c             | 3 +--
+ arch/s390/kvm/pv.c               | 8 +++++---
+ 5 files changed, 15 insertions(+), 15 deletions(-)
 
 diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index 9a31d00e99b3..931f97875899 100644
+index 931f97875899..21f1339a4197 100644
 --- a/arch/s390/include/asm/kvm_host.h
 +++ b/arch/s390/include/asm/kvm_host.h
-@@ -276,6 +276,7 @@ struct kvm_s390_sie_block {
- #define ECB3_AES 0x04
- #define ECB3_RI  0x01
- 	__u8    ecb3;			/* 0x0063 */
-+#define ESCA_SCAOL_MASK ~0x3fU
- 	__u32	scaol;			/* 0x0064 */
- 	__u8	sdf;			/* 0x0068 */
- 	__u8    epdx;			/* 0x0069 */
+@@ -142,8 +142,7 @@ struct mcck_volatile_info {
+ 			   CR14_EXTERNAL_DAMAGE_SUBMASK)
+ 
+ #define SIDAD_SIZE_MASK		0xff
+-#define sida_origin(sie_block) \
+-	((sie_block)->sidad & PAGE_MASK)
++#define sida_addr(sie_block) phys_to_virt((sie_block)->sidad & PAGE_MASK)
+ #define sida_size(sie_block) \
+ 	((((sie_block)->sidad & SIDAD_SIZE_MASK) + 1) * PAGE_SIZE)
+ 
 diff --git a/arch/s390/kvm/intercept.c b/arch/s390/kvm/intercept.c
-index 88112065d941..b703b5202f25 100644
+index b703b5202f25..0ee02dae14b2 100644
 --- a/arch/s390/kvm/intercept.c
 +++ b/arch/s390/kvm/intercept.c
-@@ -217,7 +217,7 @@ static int handle_itdb(struct kvm_vcpu *vcpu)
- 		return 0;
- 	if (current->thread.per_flags & PER_FLAG_NO_TE)
- 		return 0;
--	itdb = (struct kvm_s390_itdb *)vcpu->arch.sie_block->itdba;
-+	itdb = phys_to_virt(vcpu->arch.sie_block->itdba);
- 	rc = write_guest_lc(vcpu, __LC_PGM_TDB, itdb, sizeof(*itdb));
- 	if (rc)
- 		return rc;
+@@ -409,8 +409,7 @@ int handle_sthyi(struct kvm_vcpu *vcpu)
+ out:
+ 	if (!cc) {
+ 		if (kvm_s390_pv_cpu_is_protected(vcpu)) {
+-			memcpy((void *)(sida_origin(vcpu->arch.sie_block)),
+-			       sctns, PAGE_SIZE);
++			memcpy(sida_addr(vcpu->arch.sie_block), sctns, PAGE_SIZE);
+ 		} else {
+ 			r = write_guest(vcpu, addr, reg2, sctns, PAGE_SIZE);
+ 			if (r) {
+@@ -464,7 +463,7 @@ static int handle_operexc(struct kvm_vcpu *vcpu)
+ 
+ static int handle_pv_spx(struct kvm_vcpu *vcpu)
+ {
+-	u32 pref = *(u32 *)vcpu->arch.sie_block->sidad;
++	u32 pref = *(u32 *)sida_addr(vcpu->arch.sie_block);
+ 
+ 	kvm_s390_set_prefix(vcpu, pref);
+ 	trace_kvm_s390_handle_prefix(vcpu, 1, pref);
+@@ -497,7 +496,7 @@ static int handle_pv_sclp(struct kvm_vcpu *vcpu)
+ 
+ static int handle_pv_uvc(struct kvm_vcpu *vcpu)
+ {
+-	struct uv_cb_share *guest_uvcb = (void *)vcpu->arch.sie_block->sidad;
++	struct uv_cb_share *guest_uvcb = sida_addr(vcpu->arch.sie_block);
+ 	struct uv_cb_cts uvcb = {
+ 		.header.cmd	= UVC_CMD_UNPIN_PAGE_SHARED,
+ 		.header.len	= sizeof(uvcb),
 diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 45d4b8182b07..0f7ff0c9019f 100644
+index 0f7ff0c9019f..bd6e0201bfe5 100644
 --- a/arch/s390/kvm/kvm-s390.c
 +++ b/arch/s390/kvm/kvm-s390.c
-@@ -3329,28 +3329,30 @@ static void sca_del_vcpu(struct kvm_vcpu *vcpu)
- static void sca_add_vcpu(struct kvm_vcpu *vcpu)
+@@ -5167,6 +5167,7 @@ static long kvm_s390_vcpu_sida_op(struct kvm_vcpu *vcpu,
+ 				  struct kvm_s390_mem_op *mop)
  {
- 	if (!kvm_s390_use_sca_entries()) {
--		struct bsca_block *sca = vcpu->kvm->arch.sca;
-+		phys_addr_t sca_phys = virt_to_phys(vcpu->kvm->arch.sca);
+ 	void __user *uaddr = (void __user *)mop->buf;
++	void *sida_addr;
+ 	int r = 0;
  
- 		/* we still need the basic sca for the ipte control */
--		vcpu->arch.sie_block->scaoh = (__u32)(((__u64)sca) >> 32);
--		vcpu->arch.sie_block->scaol = (__u32)(__u64)sca;
-+		vcpu->arch.sie_block->scaoh = sca_phys >> 32;
-+		vcpu->arch.sie_block->scaol = sca_phys;
- 		return;
+ 	if (mop->flags || !mop->size)
+@@ -5178,16 +5179,16 @@ static long kvm_s390_vcpu_sida_op(struct kvm_vcpu *vcpu,
+ 	if (!kvm_s390_pv_cpu_is_protected(vcpu))
+ 		return -EINVAL;
+ 
++	sida_addr = (char *)sida_addr(vcpu->arch.sie_block) + mop->sida_offset;
++
+ 	switch (mop->op) {
+ 	case KVM_S390_MEMOP_SIDA_READ:
+-		if (copy_to_user(uaddr, (void *)(sida_origin(vcpu->arch.sie_block) +
+-				 mop->sida_offset), mop->size))
++		if (copy_to_user(uaddr, sida_addr, mop->size))
+ 			r = -EFAULT;
+ 
+ 		break;
+ 	case KVM_S390_MEMOP_SIDA_WRITE:
+-		if (copy_from_user((void *)(sida_origin(vcpu->arch.sie_block) +
+-				   mop->sida_offset), uaddr, mop->size))
++		if (copy_from_user(sida_addr, uaddr, mop->size))
+ 			r = -EFAULT;
+ 		break;
  	}
- 	read_lock(&vcpu->kvm->arch.sca_lock);
- 	if (vcpu->kvm->arch.use_esca) {
- 		struct esca_block *sca = vcpu->kvm->arch.sca;
-+		phys_addr_t sca_phys = virt_to_phys(sca);
- 
--		sca->cpu[vcpu->vcpu_id].sda = (__u64) vcpu->arch.sie_block;
--		vcpu->arch.sie_block->scaoh = (__u32)(((__u64)sca) >> 32);
--		vcpu->arch.sie_block->scaol = (__u32)(__u64)sca & ~0x3fU;
-+		sca->cpu[vcpu->vcpu_id].sda = virt_to_phys(vcpu->arch.sie_block);
-+		vcpu->arch.sie_block->scaoh = sca_phys >> 32;
-+		vcpu->arch.sie_block->scaol = sca_phys & ESCA_SCAOL_MASK;
- 		vcpu->arch.sie_block->ecb2 |= ECB2_ESCA;
- 		set_bit_inv(vcpu->vcpu_id, (unsigned long *) sca->mcn);
+diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+index 3335fa09b6f1..9f8a192bd750 100644
+--- a/arch/s390/kvm/priv.c
++++ b/arch/s390/kvm/priv.c
+@@ -924,8 +924,7 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
+ 		return -EREMOTE;
+ 	}
+ 	if (kvm_s390_pv_cpu_is_protected(vcpu)) {
+-		memcpy((void *)sida_origin(vcpu->arch.sie_block), (void *)mem,
+-		       PAGE_SIZE);
++		memcpy(sida_addr(vcpu->arch.sie_block), (void *)mem, PAGE_SIZE);
+ 		rc = 0;
  	} else {
- 		struct bsca_block *sca = vcpu->kvm->arch.sca;
-+		phys_addr_t sca_phys = virt_to_phys(sca);
+ 		rc = write_guest(vcpu, operand2, ar, (void *)mem, PAGE_SIZE);
+diff --git a/arch/s390/kvm/pv.c b/arch/s390/kvm/pv.c
+index 7cb7799a0acb..c7435c37cdfe 100644
+--- a/arch/s390/kvm/pv.c
++++ b/arch/s390/kvm/pv.c
+@@ -44,7 +44,7 @@ int kvm_s390_pv_destroy_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc)
+ 		free_pages(vcpu->arch.pv.stor_base,
+ 			   get_order(uv_info.guest_cpu_stor_len));
  
--		sca->cpu[vcpu->vcpu_id].sda = (__u64) vcpu->arch.sie_block;
--		vcpu->arch.sie_block->scaoh = (__u32)(((__u64)sca) >> 32);
--		vcpu->arch.sie_block->scaol = (__u32)(__u64)sca;
-+		sca->cpu[vcpu->vcpu_id].sda = virt_to_phys(vcpu->arch.sie_block);
-+		vcpu->arch.sie_block->scaoh = sca_phys >> 32;
-+		vcpu->arch.sie_block->scaol = sca_phys;
- 		set_bit_inv(vcpu->vcpu_id, (unsigned long *) &sca->mcn);
+-	free_page(sida_origin(vcpu->arch.sie_block));
++	free_page((unsigned long)sida_addr(vcpu->arch.sie_block));
+ 	vcpu->arch.sie_block->pv_handle_cpu = 0;
+ 	vcpu->arch.sie_block->pv_handle_config = 0;
+ 	memset(&vcpu->arch.pv, 0, sizeof(vcpu->arch.pv));
+@@ -66,6 +66,7 @@ int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc)
+ 		.header.cmd = UVC_CMD_CREATE_SEC_CPU,
+ 		.header.len = sizeof(uvcb),
+ 	};
++	void *sida_addr;
+ 	int cc;
+ 
+ 	if (kvm_s390_pv_cpu_get_handle(vcpu))
+@@ -83,12 +84,13 @@ int kvm_s390_pv_create_cpu(struct kvm_vcpu *vcpu, u16 *rc, u16 *rrc)
+ 	uvcb.stor_origin = (u64)vcpu->arch.pv.stor_base;
+ 
+ 	/* Alloc Secure Instruction Data Area Designation */
+-	vcpu->arch.sie_block->sidad = __get_free_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+-	if (!vcpu->arch.sie_block->sidad) {
++	sida_addr = (void *)__get_free_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
++	if (!sida_addr) {
+ 		free_pages(vcpu->arch.pv.stor_base,
+ 			   get_order(uv_info.guest_cpu_stor_len));
+ 		return -ENOMEM;
  	}
- 	read_unlock(&vcpu->kvm->arch.sca_lock);
-@@ -3381,6 +3383,7 @@ static int sca_switch_to_extended(struct kvm *kvm)
- 	struct kvm_vcpu *vcpu;
- 	unsigned long vcpu_idx;
- 	u32 scaol, scaoh;
-+	phys_addr_t new_sca_phys;
++	vcpu->arch.sie_block->sidad = virt_to_phys(sida_addr);
  
- 	if (kvm->arch.use_esca)
- 		return 0;
-@@ -3389,8 +3392,9 @@ static int sca_switch_to_extended(struct kvm *kvm)
- 	if (!new_sca)
- 		return -ENOMEM;
- 
--	scaoh = (u32)((u64)(new_sca) >> 32);
--	scaol = (u32)(u64)(new_sca) & ~0x3fU;
-+	new_sca_phys = virt_to_phys(new_sca);
-+	scaoh = new_sca_phys >> 32;
-+	scaol = new_sca_phys & ESCA_SCAOL_MASK;
- 
- 	kvm_s390_vcpu_block_all(kvm);
- 	write_lock(&kvm->arch.sca_lock);
-@@ -3610,15 +3614,18 @@ static void kvm_s390_vcpu_crypto_setup(struct kvm_vcpu *vcpu)
- 
- void kvm_s390_vcpu_unsetup_cmma(struct kvm_vcpu *vcpu)
- {
--	free_page(vcpu->arch.sie_block->cbrlo);
-+	free_page((unsigned long)phys_to_virt(vcpu->arch.sie_block->cbrlo));
- 	vcpu->arch.sie_block->cbrlo = 0;
- }
- 
- int kvm_s390_vcpu_setup_cmma(struct kvm_vcpu *vcpu)
- {
--	vcpu->arch.sie_block->cbrlo = get_zeroed_page(GFP_KERNEL_ACCOUNT);
--	if (!vcpu->arch.sie_block->cbrlo)
-+	void *cbrlo_page = (void *)get_zeroed_page(GFP_KERNEL_ACCOUNT);
-+
-+	if (!cbrlo_page)
- 		return -ENOMEM;
-+
-+	vcpu->arch.sie_block->cbrlo = virt_to_phys(cbrlo_page);
- 	return 0;
- }
- 
-@@ -3628,7 +3635,7 @@ static void kvm_s390_vcpu_setup_model(struct kvm_vcpu *vcpu)
- 
- 	vcpu->arch.sie_block->ibc = model->ibc;
- 	if (test_kvm_facility(vcpu->kvm, 7))
--		vcpu->arch.sie_block->fac = (u32)(u64) model->fac_list;
-+		vcpu->arch.sie_block->fac = virt_to_phys(model->fac_list);
- }
- 
- static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
-@@ -3685,9 +3692,8 @@ static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
- 		VCPU_EVENT(vcpu, 3, "AIV gisa format-%u enabled for cpu %03u",
- 			   vcpu->arch.sie_block->gd & 0x3, vcpu->vcpu_id);
- 	}
--	vcpu->arch.sie_block->sdnxo = ((unsigned long) &vcpu->run->s.regs.sdnx)
--					| SDNXC;
--	vcpu->arch.sie_block->riccbd = (unsigned long) &vcpu->run->s.regs.riccb;
-+	vcpu->arch.sie_block->sdnxo = virt_to_phys(&vcpu->run->s.regs.sdnx) | SDNXC;
-+	vcpu->arch.sie_block->riccbd = virt_to_phys(&vcpu->run->s.regs.riccb);
- 
- 	if (sclp.has_kss)
- 		kvm_s390_set_cpuflags(vcpu, CPUSTAT_KSS);
-@@ -3737,7 +3743,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 		return -ENOMEM;
- 
- 	vcpu->arch.sie_block = &sie_page->sie_block;
--	vcpu->arch.sie_block->itdba = (unsigned long) &sie_page->itdb;
-+	vcpu->arch.sie_block->itdba = virt_to_phys(&sie_page->itdb);
- 
- 	/* the real guest size will always be smaller than msl */
- 	vcpu->arch.sie_block->mso = 0;
-diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-index f6fd668f887e..a60d1e5c44cd 100644
---- a/arch/s390/kvm/kvm-s390.h
-+++ b/arch/s390/kvm/kvm-s390.h
-@@ -23,7 +23,8 @@
- /* Transactional Memory Execution related macros */
- #define IS_TE_ENABLED(vcpu)	((vcpu->arch.sie_block->ecb & ECB_TE))
- #define TDB_FORMAT1		1
--#define IS_ITDB_VALID(vcpu)	((*(char *)vcpu->arch.sie_block->itdba == TDB_FORMAT1))
-+#define IS_ITDB_VALID(vcpu) \
-+	((*(char *)phys_to_virt((vcpu)->arch.sie_block->itdba) == TDB_FORMAT1))
- 
- extern debug_info_t *kvm_s390_dbf;
- extern debug_info_t *kvm_s390_dbf_uv;
-@@ -233,7 +234,7 @@ static inline unsigned long kvm_s390_get_gfn_end(struct kvm_memslots *slots)
- 
- static inline u32 kvm_s390_get_gisa_desc(struct kvm *kvm)
- {
--	u32 gd = (u32)(u64)kvm->arch.gisa_int.origin;
-+	u32 gd = virt_to_phys(kvm->arch.gisa_int.origin);
- 
- 	if (gd && sclp.has_gisaf)
- 		gd |= GISA_FORMAT1;
+ 	cc = uv_call(0, (u64)&uvcb);
+ 	*rc = uvcb.header.rc;
 -- 
 2.37.3
 
