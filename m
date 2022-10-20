@@ -2,139 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D554C60688E
-	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 20:59:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CE7A606891
+	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 21:02:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230151AbiJTS7H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Oct 2022 14:59:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47344 "EHLO
+        id S229915AbiJTTCc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Oct 2022 15:02:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230207AbiJTS7D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Oct 2022 14:59:03 -0400
-Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76A3120DB6B
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 11:59:01 -0700 (PDT)
-Date:   Thu, 20 Oct 2022 21:58:56 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1666292339;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mFdDcgKlE3XXuFjEiY8riBIIBCcAHkobBQ7341g9M90=;
-        b=GBvTT4pg9b2Mv+zTUr/jo41QG91tUZ/UsI3TdPofqrz7XnlrVadmYDpGENJWcjvANT1Xfm
-        cI9/haQ1cXe+qrw7EQf0hZsacBftfAyDGUm318EGanAuncotmKPu9TAR2sVGTfH9gu/eNx
-        LCymui04NS4GxPFRTL5nX7pbcsaG3fg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     Peter Xu <peterx@redhat.com>, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, maz@kernel.org,
-        will@kernel.org, catalin.marinas@arm.com, bgardon@google.com,
-        shuah@kernel.org, andrew.jones@linux.dev, dmatlack@google.com,
-        pbonzini@redhat.com, zhenyzha@redhat.com, james.morse@arm.com,
-        suzuki.poulose@arm.com, alexandru.elisei@arm.com,
-        seanjc@google.com, shan.gavin@gmail.com
-Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in
- conjunction with bitmap
-Message-ID: <Y1GacKRhwBqKKekw@google.com>
-References: <20221011061447.131531-1-gshan@redhat.com>
- <20221011061447.131531-4-gshan@redhat.com>
- <Y07PNJZ+RJrWxDUP@x1n>
- <12746816-0d9e-15ee-bb08-2025aa4d9ed3@redhat.com>
+        with ESMTP id S229509AbiJTTCa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Oct 2022 15:02:30 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6F9618A01C
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 12:02:29 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d24so186747pls.4
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 12:02:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8KAlJQQJ5FQu1qVFxkgATPb3Wj8F4GmKPCoxa33rfgg=;
+        b=QLNqximVI/V3mdyjitNFfUihsv+HeepAILjBFnKhghdqvGcJJj/er21FcCm+sLs9vD
+         1h8VRqjOtIIUE73W8dsBAjvTOKXMaMFUzUHF6ukR/uped7cUQDThCTfCfW2Wc4Hf8RGH
+         E13rtEwhIx+GsJOnehJekQSlPZpU8rv8yKSN1fq9Kkz5CqWAn5cge4dQD1qrC2n8tsEq
+         8UYNV3i7mTogPUviLaFOxIYENu9aWCnOdh+cIWoI/8jdoVJ8BFoBvGFyI1MS2EsmRoy1
+         9kE3d1JFDtXlQ6p+XN3e8Dr/5g6wrBzpXygvuLk4ZYcuGV3WYKMbLRDrPz6soMkUYoGZ
+         1adQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8KAlJQQJ5FQu1qVFxkgATPb3Wj8F4GmKPCoxa33rfgg=;
+        b=RCbAkWBHl0mDV0H1fe7KdNeasxZwe5KIQEc29wfTlZ7Zt4BT5ppemadHOPWyhIl/we
+         47roeNKIu/0uTo+q21/klbZ9++20rTgIeNTMDN8ZtILHUsCPg3WcYMIsHFxncVC24yAF
+         FOznwYNI8ObrZmFsLn39xzacggoE51UN100TtqQ8C0qdypKr1E5YTn5Y18gu2Ci/YHlJ
+         1cfcWBzmemZMcnj92rxr3Wg9PylCaY3TWq9HAt08ja+8JsF8eGwsLPEnFwxcTcJhqdak
+         Ik/FW8Rekk/CVPIltxeDwNpR7zRED63kHqwFXdmCURJ2DaAPDJrMlqUa/1Tp0GCjsB+w
+         KJBw==
+X-Gm-Message-State: ACrzQf1053BGlgmlL5KB3jyFx/+QYiBqAVarjW79bbxqSTiUXiW51LOD
+        1Ow5TjbE7uVhJbROD7GvOZkcYA==
+X-Google-Smtp-Source: AMsMyM6wc+43w/dyEP+67NFvqLgsRvL1q29RwqOwBgR4H4Vym7aZKlwRpLfzDVQft99d6sTvY7FHTw==
+X-Received: by 2002:a17:90b:3b8d:b0:20d:5c7a:abf1 with SMTP id pc13-20020a17090b3b8d00b0020d5c7aabf1mr18276779pjb.118.1666292549183;
+        Thu, 20 Oct 2022 12:02:29 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id g135-20020a62528d000000b0056328e516f4sm13967173pfb.148.2022.10.20.12.02.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Oct 2022 12:02:28 -0700 (PDT)
+Date:   Thu, 20 Oct 2022 19:02:25 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Cathy Avery <cavery@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 15/16] svm: introduce svm_vcpu
+Message-ID: <Y1GbQbJxEAGqIP93@google.com>
+References: <20221020152404.283980-1-mlevitsk@redhat.com>
+ <20221020152404.283980-16-mlevitsk@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <12746816-0d9e-15ee-bb08-2025aa4d9ed3@redhat.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20221020152404.283980-16-mlevitsk@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 19, 2022 at 06:20:32AM +0800, Gavin Shan wrote:
-> Hi Peter,
+On Thu, Oct 20, 2022, Maxim Levitsky wrote:
+> This adds minimum amout of code to support tests that
+> run SVM on more that one vCPU.
+
+s/that/than
+
 > 
-> On 10/19/22 12:07 AM, Peter Xu wrote:
-> > On Tue, Oct 11, 2022 at 02:14:42PM +0800, Gavin Shan wrote:
-
-[...]
-
-> > IMHO it'll be great to start with something like below to describe the
-> > userspace's responsibility to proactively detect the WITH_BITMAP cap:
-> > 
-> >    Before using the dirty rings, the userspace needs to detect the cap of
-> >    KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP to see whether the ring structures
-> >    need to be backed by per-slot bitmaps.
-> > 
-> >    When KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP returns 1, it means the arch can
-> >    dirty guest pages without vcpu/ring context, so that some of the dirty
-> >    information will still be maintained in the bitmap structure.
-> > 
-> >    Note that the bitmap here is only a backup of the ring structure, and it
-> >    doesn't need to be collected until the final switch-over of migration
-> >    process.  Normally the bitmap should only contain a very small amount of
-> >    dirty pages only, which needs to be transferred during VM downtime.
-> > 
-> >    To collect dirty bits in the backup bitmap, the userspace can use the
-> >    same KVM_GET_DIRTY_LOG ioctl.  Since it's always the last phase of
-> >    migration that needs the fetching of dirty bitmap, KVM_CLEAR_DIRTY_LOG
-> >    ioctl should not be needed in this case and its behavior undefined.
-> > 
-> > That's how I understand this new cap, but let me know if you think any of
-> > above is inproper.
-> > 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  lib/x86/svm_lib.c |   9 +
+>  lib/x86/svm_lib.h |  10 +
+>  x86/svm.c         |  37 ++-
+>  x86/svm.h         |   5 +-
+>  x86/svm_npt.c     |  44 ++--
+>  x86/svm_tests.c   | 615 +++++++++++++++++++++++-----------------------
+>  6 files changed, 362 insertions(+), 358 deletions(-)
 > 
-> Yes, It looks much better to describe how KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP
-> is used. However, the missed part is the capability is still need to be enabled
-> prior to KVM_CAP_DIRTY_LOG_RING_ACQ_REL on ARM64. It means the capability needs
-> to be acknowledged (confirmed) by user space. Otherwise, KVM_CAP_DIRTY_LOG_RING_ACQ_REL
-> can't be enabled successfully. It seems Oliver, you and I aren't on same page for
-> this part. Please refer to below reply for more discussion. After the discussion
-> is finalized, I can amend the description accordingly here.
+> diff --git a/lib/x86/svm_lib.c b/lib/x86/svm_lib.c
+> index 2b067c65..1152c497 100644
+> --- a/lib/x86/svm_lib.c
+> +++ b/lib/x86/svm_lib.c
+> @@ -157,3 +157,12 @@ void vmcb_ident(struct vmcb *vmcb)
+>  		ctrl->tlb_ctl = TLB_CONTROL_FLUSH_ALL_ASID;
+>  	}
+>  }
+> +
+> +void svm_vcpu_init(struct svm_vcpu *vcpu)
+> +{
+> +	vcpu->vmcb = alloc_page();
+> +	vmcb_ident(vcpu->vmcb);
+> +	memset(&vcpu->regs, 0, sizeof(vcpu->regs));
+> +	vcpu->stack = alloc_pages(4) + (PAGE_SIZE << 4);
+> +	vcpu->vmcb->save.rsp = (ulong)(vcpu->stack);
+> +}
+> diff --git a/lib/x86/svm_lib.h b/lib/x86/svm_lib.h
+> index 59db26de..c6957dba 100644
+> --- a/lib/x86/svm_lib.h
+> +++ b/lib/x86/svm_lib.h
+> @@ -89,6 +89,16 @@ struct svm_extra_regs
+>      u64 r15;
+>  };
+>  
+> +
+> +struct svm_vcpu
+> +{
+> +	struct vmcb *vmcb;
+> +	struct svm_extra_regs regs;
+> +	void *stack;
+> +};
+> +
+> +void svm_vcpu_init(struct svm_vcpu *vcpu);
+> +
+>  #define SWAP_GPRS(reg) \
+>  		"xchg %%rcx, 0x08(%%" reg ")\n\t"       \
+>  		"xchg %%rdx, 0x10(%%" reg ")\n\t"       \
+> diff --git a/x86/svm.c b/x86/svm.c
+> index 9484a6d1..7aa3ebd2 100644
+> --- a/x86/svm.c
+> +++ b/x86/svm.c
+> @@ -16,7 +16,7 @@
+>  #include "apic.h"
+>  #include "svm_lib.h"
+>  
+> -struct vmcb *vmcb;
+> +struct svm_vcpu vcpu0;
 
-I'll follow up on the details of the CAP below, but wanted to explicitly
-note some stuff for documentation:
+It's not strictly vCPU0, e.g. svm_init_intercept_test() deliberately runs on
+vCPU2, presumably to avoid running on the BSP?
 
-Collecting the dirty bitmap should be the very last thing that the VMM
-does before transmitting state to the target VMM. You'll want to make
-sure that the dirty state is final and avoid missing dirty pages from
-another ioctl ordered after bitmap collection.
-
-[...]
-
-> > > +	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP:
-> > > +		kvm->dirty_ring_with_bitmap = true;
-> > 
-> > IIUC what Oliver wanted to suggest is we can avoid enabling of this cap,
-> > then we don't need dirty_ring_with_bitmap field but instead we can check
-> > against CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP when needed.
-> > 
-> > I think that'll make sense, because without the bitmap the ring won't work
-> > with arm64, so not valid to not enable it at all.  But good to double check
-> > with Oliver too.
-> > 
-> > The rest looks good to me, thanks,
-> > 
-> 
-> It was suggested by Oliver to expose KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP. The
-> user space also needs to enable the capability prior to KVM_CAP_DIRTY_LOG_RING_ACQ_REL
-> on ARM64. I may be missing something since Oliver and you had lots of discussion
-> on this particular new capability.
-> 
-> I'm fine to drop the bits to enable KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP. It means
-> the capability is exposed to user space on ARM64 and user space need __not__ to
-> enable it prior to KVM_CAP_DIRTY_LOG_RING_ACQ_REL. I would like Oliver helps to
-> confirm before I'm able to post v7.
-
-IMO you really want the explicit buy-in from userspace, as failure to
-collect the dirty bitmap will result in a dead VM on the other side of
-migration. Fundamentally we're changing the ABI of
-KVM_CAP_DIRTY_LOG_RING[_ACQ_REL].
-
---
-Thanks,
-Oliver
+Since this is churning a lot of code anyways, why not clean this all up and have
+run_svm_tests() dynamically allocate state instead of relying on global data?
