@@ -2,66 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B66A6067B8
-	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 20:03:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AF0CB60681B
+	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 20:22:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230203AbiJTSDv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Oct 2022 14:03:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59308 "EHLO
+        id S229777AbiJTSV7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Oct 2022 14:21:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229732AbiJTSDZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Oct 2022 14:03:25 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98B7095E51
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 11:02:41 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id 128so254077pga.1
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 11:02:41 -0700 (PDT)
+        with ESMTP id S229497AbiJTSV6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Oct 2022 14:21:58 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 711AF106E2C
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 11:21:57 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id c24so76378pls.9
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 11:21:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yM+q1MLeyW2pRAnXBYaZyBXoFYvNATSrQID9soAtBIQ=;
-        b=btxSZSWIOv2Rxc6fAtaWk7bAN7qW7fgOEBq2aKI0Xx9KYPNwkMQ4SExpKnwsOWicOa
-         FCcfYtXOvChEeeD3kESeT7dVH9M5mBxQ7cO/j/BdqvS/T+qe8iELpnfWh/pXr4te8dCP
-         pswekE55AdqpN6oHJBx6rzDB9IQ9c6ezKsrk8F89uZ2iljVE6uUSJ0geRPCy+JTVcxo8
-         2bpRd/jNPUFmxOOsGVu3Jns/1Q5omsz1F7bOz+abqb8xs5P1kY29DqForsk6+U17Gs6s
-         DlL5Nt6TnDYAy64xrCKy6SMjmec69Upe/pnYFT4Rb/kcYPfrEORHW9jQBoHkXdOa5nKV
-         gLwA==
+        bh=+5XGjBdCf/8LFBdQcCN59KvxyIpL1ByzupgSnjZz9bg=;
+        b=LvvbtoIxbssp4Dw2B1Mwk3i0tGgAnMay6dCF1Lb/LZIP11zKi1J1eExyxslJa7cn6h
+         39UGosxy0JQ85sDpX63Toz/Kc0piVqlOckARuuSBy5raAZzR/nWLj+UhkEhDPRW9F2AR
+         VQHaisJgfttwTTbPEnK4VaT6/w6Cv84FkRo+HLg8ivl/n063vIFaiXroT9lS+Z21S5BR
+         E1oN27lHtgI2xKYpoyu/QkjUyTiJUnc2Z0r3zoN+tz3TJiYqB291Tj+7a8bbJ2gEx/mj
+         VJwTNRxmKe628AuE5PpnryO9FdLtBLnKSmJR3ayoUU1CJ+ib1UBeB4VhJ9XQCK4RbHNc
+         sUNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yM+q1MLeyW2pRAnXBYaZyBXoFYvNATSrQID9soAtBIQ=;
-        b=ZkiFZ4KCxvPy7IKrlCuEwmTElw0/gkHdp9srPEURk1+7NvSM1PnwGg6ZFMJSAgLXYY
-         5ixQAEpZZkp8WKHs8yCl6mi+vn0NMV+giyHONsluO4g7/SKi+2HHO5UXVjuGNvcPgfdF
-         5qVH62/x/C4ZxAPJTC2IYDGzBKf4H0jIgph8t79OfJ/K8lbvl2D5NEXTkwsWK6vS9C1L
-         289l/aYHWdwcOAHqeniaUiWkh0LCuX/NyxHohH9hNJKQnBTr9ssPd8jNT4zzbhbiB5Th
-         zMui/DA4igABze3DEQRVmhXum9y2cVDs7p2jvEb7dPlIRpV3rUn4kzTlOlmTQ9jhSp68
-         3EXA==
-X-Gm-Message-State: ACrzQf3j6ZfWwH+RXEnS0boiD/HYTbDMX3XsZ+xF9jFdDnWk8ZjmqJfl
-        SxSlv/+19wjZOG7nx956sAwsUg==
-X-Google-Smtp-Source: AMsMyM6W5nuzSRWjom+4dNCGUfU6o2dEJnucCO7mCuKUq171uTqwDqTPSD3fjj5eYRsxNThWMCOeaw==
-X-Received: by 2002:a63:555e:0:b0:43c:4f2e:dd25 with SMTP id f30-20020a63555e000000b0043c4f2edd25mr13127040pgm.131.1666288920750;
-        Thu, 20 Oct 2022 11:02:00 -0700 (PDT)
+        bh=+5XGjBdCf/8LFBdQcCN59KvxyIpL1ByzupgSnjZz9bg=;
+        b=by4RzD+4sQbqO3W+f1/OoZTTDLqpU57KYeWyPaOMZxhu23ErOYdeZqEvh2YZbQ7uKo
+         hwRi0QJ0eX09ec5AZDYjVO02hayo2cOnshDf290th5CUo4dxlEPy5MM+hgYotyBull1K
+         zzGdaHdLjW6Lx9IHf4Wk4kiPGUJTOKyCS+Xt6VajVWPljNtJ1IP8r1ea1DxCILTZEIai
+         6iB+YLutmbAP1MiBIxyDj7raPrHqxkaYBe5NLnTh0yQK1mz4mrF1Bf9R/pqKfSiFlyya
+         82wNzC6jiUiunfqyZbOAbQfBUuPO/r5xR4cy5xsfTndUqDDl4kC7rQvnf725Uiau0q81
+         YAWQ==
+X-Gm-Message-State: ACrzQf2RHQsNgMSGDZ+22P3vBc2N3UXIQcDzaZKEflrzfemPFzBI0YD0
+        65N/p9IP3q3vdTRrRTOeea4QvgnQe7dGxA==
+X-Google-Smtp-Source: AMsMyM4HVD0/uSnWyZqydXcfN/V23kb42o21O3xCIB2kkAbI8fnFVn5B57jXMxjtsklgoDDID3+j5g==
+X-Received: by 2002:a17:902:ccd1:b0:186:5ee4:cf49 with SMTP id z17-20020a170902ccd100b001865ee4cf49mr6526959ple.26.1666290116845;
+        Thu, 20 Oct 2022 11:21:56 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id t20-20020a63f354000000b00451f4071151sm11780670pgj.65.2022.10.20.11.01.59
+        by smtp.gmail.com with ESMTPSA id m3-20020a62a203000000b0053e38ac0ff4sm13588725pff.115.2022.10.20.11.21.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Oct 2022 11:01:59 -0700 (PDT)
-Date:   Thu, 20 Oct 2022 18:01:55 +0000
+        Thu, 20 Oct 2022 11:21:56 -0700 (PDT)
+Date:   Thu, 20 Oct 2022 18:21:53 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Maxim Levitsky <mlevitsk@redhat.com>
 Cc:     kvm@vger.kernel.org, Cathy Avery <cavery@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 01/16] x86: make irq_enable avoid the
- interrupt shadow
-Message-ID: <Y1GNE9YdEuGPkadi@google.com>
+Subject: Re: [kvm-unit-tests PATCH 11/16] svm: add svm_suported
+Message-ID: <Y1GRwf071rJDqVbh@google.com>
 References: <20221020152404.283980-1-mlevitsk@redhat.com>
- <20221020152404.283980-2-mlevitsk@redhat.com>
+ <20221020152404.283980-12-mlevitsk@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221020152404.283980-2-mlevitsk@redhat.com>
+In-Reply-To: <20221020152404.283980-12-mlevitsk@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,98 +72,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+s/suported/supported
+
 On Thu, Oct 20, 2022, Maxim Levitsky wrote:
-> Tests that need interrupt shadow can't rely on irq_enable function anyway,
-> as its comment states,  and it is useful to know for sure that interrupts
-> are enabled after the call to this function.
-> 
+
+Please provide a changelog.
+
 > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
->  lib/x86/processor.h       | 9 ++++-----
->  x86/apic.c                | 1 -
->  x86/ioapic.c              | 1 -
->  x86/svm_tests.c           | 9 ---------
->  x86/tscdeadline_latency.c | 1 -
->  x86/vmx_tests.c           | 7 -------
->  6 files changed, 4 insertions(+), 24 deletions(-)
+>  lib/x86/svm_lib.h | 5 +++++
+>  x86/svm.c         | 2 +-
+>  2 files changed, 6 insertions(+), 1 deletion(-)
 > 
-> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-> index 03242206..9db07346 100644
-> --- a/lib/x86/processor.h
-> +++ b/lib/x86/processor.h
-> @@ -720,13 +720,12 @@ static inline void irq_disable(void)
->  	asm volatile("cli");
->  }
+> diff --git a/lib/x86/svm_lib.h b/lib/x86/svm_lib.h
+> index 04910281..2d13b066 100644
+> --- a/lib/x86/svm_lib.h
+> +++ b/lib/x86/svm_lib.h
+> @@ -4,6 +4,11 @@
+>  #include <x86/svm.h>
+>  #include "processor.h"
 >  
-> -/* Note that irq_enable() does not ensure an interrupt shadow due
-> - * to the vagaries of compiler optimizations.  If you need the
-> - * shadow, use a single asm with "sti" and the instruction after it.
-> - */
->  static inline void irq_enable(void)
->  {
-> -	asm volatile("sti");
-> +	asm volatile(
-> +			"sti \n\t"
+> +static inline bool svm_supported(void)
+> +{
+> +	return this_cpu_has(X86_FEATURE_SVM);
 
-Formatting is odd.  Doesn't really matter, but I think this can simply be:
+Why add a wrapper?  The only reason NPT and a few others have wrappers is to
+play nice with svm_test's "bool (*supported)(void)" hook.
 
-static inline void sti_nop(void)
-{
-	asm volatile("sti; nop");
-}
+I would rather go the opposite direction and get rid of the wrappers, which IMO
+only make it harder to understand what is being checked.
 
+E.g. add a required_feature to the tests and use that for all X86_FEATURE_*
+checks instead of adding wrappers.  And unless there's a supported helper I'm not
+seeing, the .supported hook can go away entirely by adding a dedicated "smp_required"
+flag.
 
-> +			"nop\n\t"
+We'd probaby want helper macros for SMP vs. non-SMP, e.g.
 
-I like the idea of a helper to enable IRQs and consume pending interrupts, but I
-think we should add a new helper instead of changing irq_enable().
+#define SVM_V1_TEST(name, feature, ...)
+	{ #name, feature, false, ... }
+#define SVM_SMP_V1_TEST(name, feature, ...)
+	{ #name, feature, true, ... }
 
-Hmm, or alternatively, kill off irq_enable() and irq_disable() entirely and instead
-add sti_nop().  I like this idea even better.  The helpers are all x86-specific,
-so there's no need to add a layer of abstraction, and sti() + sti_nop() has the
-benefit of making it very clear what code is being emitted without having to come
-up with clever function names.
-
-And I think we should go even further and provide a helper to do the entire sequence
-of enable->nop->disable, which is a very common pattern.  No idea what to call
-this one, though I suppose sti_nop_cli() would work.
-
-My vote is to replace all irq_enable() and irq_disable() usage with sti() and cli(),
-and then introduce sti_nop() and sti_nop_cli() (or whatever it gets called) and
-convert users as appropriate.
-
-> +	);
->  }
->  
->  static inline void invlpg(volatile void *va)
-> diff --git a/x86/apic.c b/x86/apic.c
-> index 23508ad5..a8964d88 100644
-> --- a/x86/apic.c
-> +++ b/x86/apic.c
-> @@ -36,7 +36,6 @@ static void __test_tsc_deadline_timer(void)
->      irq_enable();
->  
->      wrmsr(MSR_IA32_TSCDEADLINE, rdmsr(MSR_IA32_TSC));
-> -    asm volatile ("nop");
-
-I'm not entirely sure the existing nop is necessary here, but it's a functional
-change since it hoists the nop above the WRMSR.  To be safe, probably best to
-leave this as-is for now.
-
->      report(tdt_count == 1, "tsc deadline timer");
->      report(rdmsr(MSR_IA32_TSCDEADLINE) == 0, "tsc deadline timer clearing");
->  }
-
-...
-
-> diff --git a/x86/tscdeadline_latency.c b/x86/tscdeadline_latency.c
-> index a3bc4ea4..c54530dd 100644
-> --- a/x86/tscdeadline_latency.c
-> +++ b/x86/tscdeadline_latency.c
-> @@ -73,7 +73,6 @@ static void start_tsc_deadline_timer(void)
->      irq_enable();
->  
->      wrmsr(MSR_IA32_TSCDEADLINE, rdmsr(MSR_IA32_TSC)+delta);
-> -    asm volatile ("nop");
-
-Another functional change that should be skipped, at least for now.
+diff --git a/x86/svm.c b/x86/svm.c
+index 7aa3ebd2..2a412c27 100644
+--- a/x86/svm.c
++++ b/x86/svm.c
+@@ -170,6 +170,7 @@ test_wanted(const char *name, char *filters[], int filter_count)
+ 
+ int run_svm_tests(int ac, char **av, struct svm_test *svm_tests)
+ {
++       bool smp_supported = cpu_count() > 1;
+        int i = 0;
+ 
+        ac--;
+@@ -187,7 +188,10 @@ int run_svm_tests(int ac, char **av, struct svm_test *svm_tests)
+        for (; svm_tests[i].name != NULL; i++) {
+                if (!test_wanted(svm_tests[i].name, av, ac))
+                        continue;
+-               if (svm_tests[i].supported && !svm_tests[i].supported())
++               if (svm_tests[i].required_feature &&
++                   !this_cpu_has(svm_tests[i].required_feature))
++                       continue;
++               if (svm_tests[i].smp_required && !smp_supported)
+                        continue;
+                if (svm_tests[i].v2 == NULL) {
+                        if (svm_tests[i].on_vcpu) {
+diff --git a/x86/svm.h b/x86/svm.h
+index 0c40a086..632287ca 100644
+--- a/x86/svm.h
++++ b/x86/svm.h
+@@ -9,7 +9,8 @@
+ 
+ struct svm_test {
+        const char *name;
+-       bool (*supported)(void);
++       u64 required_feature;
++       bool smp_required;
+        void (*prepare)(struct svm_test *test);
+        void (*prepare_gif_clear)(struct svm_test *test);
+        void (*guest_func)(struct svm_test *test);
