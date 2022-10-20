@@ -2,67 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 02FAE606AF1
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 00:03:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0B11606B62
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 00:42:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229944AbiJTWDZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Oct 2022 18:03:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47112 "EHLO
+        id S229904AbiJTWmv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Oct 2022 18:42:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229968AbiJTWDY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Oct 2022 18:03:24 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 023D2226E49
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 15:03:23 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id a6-20020a17090abe0600b0020d7c0c6650so4869059pjs.0
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 15:03:22 -0700 (PDT)
+        with ESMTP id S229736AbiJTWmt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Oct 2022 18:42:49 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35416222F32
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 15:42:48 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id l6so871387pgu.7
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 15:42:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S1VD5C+pAgvew+V4xoo1uUoaM3ZMiEwvUilJ3S/jYtQ=;
-        b=IK87+moPvFtmGU5qN/L/sVsaLQuL2Kgl8JKr6y9wROs1N1A2EOxXsEBi4OpVrlhuaA
-         +P4Av/p/ArpdHupvBIshtM8X60pz0b2Dax7XHVHdrky/m6g3BRKlB9bhKaCAQ4LJVS2/
-         xz5CY0ji/JS7OkG/9FHTMp/pzpAoZGGHuaG5kEiWgpBzKLu3sfB0NoDzAuVvKK7jiftn
-         ohHEdmxghMCy66c8HoCSiahSfxdlACMGl5UyTDgHdF+/Nsr2ZB5njMntsFTCUr1r9u36
-         +VdF+NahOO2IepLt5pe2re2VXxY4jNUpGSpHww5RX2f+vnYQC8hCBfKL9O540nd7uQpN
-         R6Zg==
+        bh=FDFfzkE5dBJ5m6UqarnXclPiOYRM3ZnuG29aeElkJZ8=;
+        b=UFyoF3/kPlkt8lmbdzCeNxrtN54Gvnzwlm6/jKsU5K/Mx+Zi+HwDfQ7UxBuccJHjwT
+         FF/O/U0LJ81NbHXU1XqFIpc5LF3JCSeveqIRBGPN03THEGBU4v57rGEqKUjuVjhcB1i/
+         p0uQl3N+4jVpvxyO3cDiPD12xRWdu5W4a5xnP0NwL7l2oJaStOFKIxqjNsbuxfb4EaN1
+         y2EOtpNLG1rHsf1+Fd85K3EDV2HwKToEaOhhJAy/ivRAnwpSGtWhvw7BEQmNr0xUuPFT
+         JCUJ8U+wO6kVeTWgjt+2elG8nTCDckhpxTG5vHstj5zWaeyb7w5k3EEwqOijwfqC5N2a
+         bSzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=S1VD5C+pAgvew+V4xoo1uUoaM3ZMiEwvUilJ3S/jYtQ=;
-        b=NA3zAnOsu8K+6+G7sNwGIe/OiGRmK/vIONrN3HEKNU3MRCG1RZuAQQo2MLl455gukt
-         CKKQ166qdr6VvuHGxuJFXYGrevnCAjuyGfI7UxZqNmF9/BIeNgqgxvQ4Ij/+TI8qNm9p
-         WSDpprSrEZmTKjm2ZQHkLJDeNa8h+4ZVci3/O6DUXzSNLRncEPkdoI1z7shbDWedfZWR
-         img0ZQgyOMbX9GPjvso7gwjpKZx03OOmBbp0mO9pmZdEJq+TKaCgEf7jK1QnFApmO8W1
-         rdNDqVHujGvdr7gYxJ0lRsYEhiHDWYLgR//Di3pM8NTm8lVOJlNGBrQnQfcncJojHFPL
-         3dFQ==
-X-Gm-Message-State: ACrzQf1EiiKXmE3u/YNPqg/k7lvHWjekdTLOrpGP7Qw/baDJ9bO/DjXg
-        6PtykL5suJKcni4GCpaLmllpegujNjPWOg==
-X-Google-Smtp-Source: AMsMyM6hcDMwpLpfdl0Uup5Y0ftIO7MoF5BPzjpLCOs8Dj09s3x90YJ41cFsobBZEHmTvog+XgkMow==
-X-Received: by 2002:a17:90b:17c9:b0:20d:b4ee:aec2 with SMTP id me9-20020a17090b17c900b0020db4eeaec2mr43764464pjb.234.1666303402230;
-        Thu, 20 Oct 2022 15:03:22 -0700 (PDT)
-Received: from google.com (33.5.83.34.bc.googleusercontent.com. [34.83.5.33])
-        by smtp.gmail.com with ESMTPSA id w67-20020a626246000000b005623df48a39sm14178897pfb.13.2022.10.20.15.03.21
+        bh=FDFfzkE5dBJ5m6UqarnXclPiOYRM3ZnuG29aeElkJZ8=;
+        b=kxvB7Iv+wLXaSk1+MbEC7GpTgHX6nC5IMbKLCKHhKr4DjI6OszQMnGQoFmDLlBW50o
+         wlIUa5+oj6gYZOkrEkd1GJnRV7OU9PtDv5BjGL+WL3JX4bQvv+pZRZvwL+7Srph9XbB+
+         FI65BxE2RTR737bTCFsD9JitIsLx8lrczwgPcR2Z8ab6arGBol/JtnsyYsferBYApC+C
+         z5SxlJDGL9mXh3E0/XeYMJl6IjZuaOyY8jof7+jKUWhRuz3ysNQ+gx1u4v4w6UVjen56
+         9OXRUrHQuTILDqY1x3RnJ+yX1fvn9r6+ynsdXB7pfOpRq4UxQoSaVwYVdhiCvC9RQ8av
+         ko7Q==
+X-Gm-Message-State: ACrzQf1imUoBa9Lr4V8Y8ztkaCfcc04nSyg9OaDf+HBmnrIz9ZDjRs7G
+        BfovPsv+wphaHwGvZ0/RVjfLbgOC8wiFUQ==
+X-Google-Smtp-Source: AMsMyM4JQIqv54X7L2VMODIVQcxLu8cn0BAcxLq2cfv7QyfUO4ao734HP8s0sZIrch8ZWhhpsUlCGA==
+X-Received: by 2002:a63:854a:0:b0:46e:af42:ed12 with SMTP id u71-20020a63854a000000b0046eaf42ed12mr2502242pgd.510.1666305767257;
+        Thu, 20 Oct 2022 15:42:47 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id m9-20020a63ed49000000b0043c7996f7f0sm12182415pgk.58.2022.10.20.15.42.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Oct 2022 15:03:21 -0700 (PDT)
-Date:   Thu, 20 Oct 2022 22:03:17 +0000
-From:   Mingwei Zhang <mizhang@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] KVM: x86/mmu: Split huge pages mapped by the TDP
- MMU on fault
-Message-ID: <Y1HFpTl+bZBFHaCQ@google.com>
-References: <20221019234050.3919566-1-dmatlack@google.com>
- <20221019234050.3919566-3-dmatlack@google.com>
+        Thu, 20 Oct 2022 15:42:46 -0700 (PDT)
+Date:   Thu, 20 Oct 2022 22:42:43 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, peterx@redhat.com, maz@kernel.org,
+        will@kernel.org, catalin.marinas@arm.com, bgardon@google.com,
+        shuah@kernel.org, andrew.jones@linux.dev, dmatlack@google.com,
+        pbonzini@redhat.com, zhenyzha@redhat.com, james.morse@arm.com,
+        suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+        oliver.upton@linux.dev, shan.gavin@gmail.com
+Subject: Re: [PATCH v6 1/8] KVM: x86: Introduce KVM_REQ_RING_SOFT_FULL
+Message-ID: <Y1HO46UCyhc9M6nM@google.com>
+References: <20221011061447.131531-1-gshan@redhat.com>
+ <20221011061447.131531-2-gshan@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221019234050.3919566-3-dmatlack@google.com>
+In-Reply-To: <20221011061447.131531-2-gshan@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -74,202 +77,163 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 19, 2022, David Matlack wrote:
-> Now that the TDP MMU has a mechanism to split huge pages, use it in the
-> fault path when a huge page needs to be replaced with a mapping at a
-> lower level.
+On Tue, Oct 11, 2022, Gavin Shan wrote:
+> This adds KVM_REQ_RING_SOFT_FULL, which is raised when the dirty
+
+"This" is basically "This patch", which is generally frowned upon.  Just state
+what changes are being made.
+
+> ring of the specific VCPU becomes softly full in kvm_dirty_ring_push().
+> The VCPU is enforced to exit when the request is raised and its
+> dirty ring is softly full on its entrance.
 > 
-> This change reduces the negative performance impact of NX HugePages.
-> Prior to this change if a vCPU executed from a huge page and NX
-> HugePages was enabled, the vCPU would take a fault, zap the huge page,
-> and mapping the faulting address at 4KiB with execute permissions
-> enabled. The rest of the memory would be left *unmapped* and have to be
-> faulted back in by the guest upon access (read, write, or execute). If
-> guest is backed by 1GiB, a single execute instruction can zap an entire
-> GiB of its physical address space.
-> 
-> For example, it can take a VM longer to execute from its memory than to
-> populate that memory in the first place:
-> 
-> $ ./execute_perf_test -s anonymous_hugetlb_1gb -v96
-> 
-> Populating memory             : 2.748378795s
-> Executing from memory         : 2.899670885s
-> 
-> With this change, such faults split the huge page instead of zapping it,
-> which avoids the non-present faults on the rest of the huge page:
-> 
-> $ ./execute_perf_test -s anonymous_hugetlb_1gb -v96
-> 
-> Populating memory             : 2.729544474s
-> Executing from memory         : 0.111965688s   <---
-> 
-> This change also reduces the performance impact of dirty logging when
-> eager_page_split=N. eager_page_split=N (abbreviated "eps=N" below) can
-> be desirable for read-heavy workloads, as it avoids allocating memory to
-> split huge pages that are never written and avoids increasing the TLB
-> miss cost on reads of those pages.
-> 
->              | Config: ept=Y, tdp_mmu=Y, 5% writes           |
->              | Iteration 1 dirty memory time                 |
->              | --------------------------------------------- |
-> vCPU Count   | eps=N (Before) | eps=N (After) | eps=Y        |
-> ------------ | -------------- | ------------- | ------------ |
-> 2            | 0.332305091s   | 0.019615027s  | 0.006108211s |
-> 4            | 0.353096020s   | 0.019452131s  | 0.006214670s |
-> 8            | 0.453938562s   | 0.019748246s  | 0.006610997s |
-> 16           | 0.719095024s   | 0.019972171s  | 0.007757889s |
-> 32           | 1.698727124s   | 0.021361615s  | 0.012274432s |
-> 64           | 2.630673582s   | 0.031122014s  | 0.016994683s |
-> 96           | 3.016535213s   | 0.062608739s  | 0.044760838s |
-> 
-> Eager page splitting remains beneficial for write-heavy workloads, but
-> the gap is now reduced.
-> 
->              | Config: ept=Y, tdp_mmu=Y, 100% writes         |
->              | Iteration 1 dirty memory time                 |
->              | --------------------------------------------- |
-> vCPU Count   | eps=N (Before) | eps=N (After) | eps=Y        |
-> ------------ | -------------- | ------------- | ------------ |
-> 2            | 0.317710329s   | 0.296204596s  | 0.058689782s |
-> 4            | 0.337102375s   | 0.299841017s  | 0.060343076s |
-> 8            | 0.386025681s   | 0.297274460s  | 0.060399702s |
-> 16           | 0.791462524s   | 0.298942578s  | 0.062508699s |
-> 32           | 1.719646014s   | 0.313101996s  | 0.075984855s |
-> 64           | 2.527973150s   | 0.455779206s  | 0.079789363s |
-> 96           | 2.681123208s   | 0.673778787s  | 0.165386739s |
-> 
-> Further study is needed to determine if the remaining gap is acceptable
-> for customer workloads or if eager_page_split=N still requires a-priori
-> knowledge of the VM workload, especially when considering these costs
-> extrapolated out to large VMs with e.g. 416 vCPUs and 12TB RAM.
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
+> The event is checked and handled in the newly introduced helper
+> kvm_dirty_ring_check_request(). With this, kvm_dirty_ring_soft_full()
+> becomes a private function.
+
+None of this captures why the request is being added.  I'm guessing Marc's
+motivation is to avoid having to check ring on every entry, though there might
+also be a correctness issue too?
+
+It'd also be helpful to explain that KVM re-queues the request to maintain KVM's
+existing uABI, which enforces the soft_limit even if no entries have been added
+to the ring since the last KVM_EXIT_DIRTY_RING_FULL exit.
+
+And maybe call out the alternative(s) that was discussed in v2[*]?
+
+[*] https://lore.kernel.org/all/87illlkqfu.wl-maz@kernel.org
+
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> Reviewed-by: Peter Xu <peterx@redhat.com>
 > ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 72 ++++++++++++++++++--------------------
->  1 file changed, 34 insertions(+), 38 deletions(-)
+>  arch/x86/kvm/x86.c             | 15 ++++++---------
+>  include/linux/kvm_dirty_ring.h |  8 ++------
+>  include/linux/kvm_host.h       |  1 +
+>  virt/kvm/dirty_ring.c          | 19 ++++++++++++++++++-
+>  4 files changed, 27 insertions(+), 16 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 4e5b3ae824c1..c53767104d5b 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1146,6 +1146,9 @@ static int tdp_mmu_link_sp(struct kvm *kvm, struct tdp_iter *iter,
->  	return 0;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index b0c47b41c264..0dd0d32073e7 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10260,16 +10260,13 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  
+>  	bool req_immediate_exit = false;
+>  
+> -	/* Forbid vmenter if vcpu dirty ring is soft-full */
+> -	if (unlikely(vcpu->kvm->dirty_ring_size &&
+> -		     kvm_dirty_ring_soft_full(&vcpu->dirty_ring))) {
+> -		vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
+> -		trace_kvm_dirty_ring_exit(vcpu);
+> -		r = 0;
+> -		goto out;
+> -	}
+> -
+>  	if (kvm_request_pending(vcpu)) {
+> +		/* Forbid vmenter if vcpu dirty ring is soft-full */
+
+Eh, I'd drop the comment, pretty obvious what the code is doing
+
+> +		if (kvm_dirty_ring_check_request(vcpu)) {
+
+I think it makes to move this check below at KVM_REQ_VM_DEAD.  I doubt it will
+ever matter in practice, but conceptually VM_DEAD is a higher priority event.
+
+I'm pretty sure the check can be moved to the very end of the request checks,
+e.g. to avoid an aborted VM-Enter attempt if one of the other request triggers
+KVM_REQ_RING_SOFT_FULL.
+
+Heh, this might actually be a bug fix of sorts.  If anything pushes to the ring
+after the check at the start of vcpu_enter_guest(), then without the request, KVM
+would enter the guest while at or above the soft limit, e.g. record_steal_time()
+can dirty a page, and the big pile of stuff that's behind KVM_REQ_EVENT can
+certainly dirty pages.
+
+> +			r = 0;
+> +			goto out;
+> +		}
+> +
+>  		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) {
+>  			r = -EIO;
+>  			goto out;
+
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -157,6 +157,7 @@ static inline bool is_error_page(struct page *page)
+>  #define KVM_REQ_VM_DEAD           (1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>  #define KVM_REQ_UNBLOCK           2
+>  #define KVM_REQ_UNHALT            3
+
+UNHALT is gone, the new request can use '3'.
+
+> +#define KVM_REQ_RING_SOFT_FULL    4
+
+Any objection to calling this KVM_REQ_DIRTY_RING_SOFT_FULL?  None of the users
+are in danger of having too long lines, and at first glance it's not clear that
+this is specifically for the dirty ring.
+
+It'd also give us an excuse to replace spaces with tabs in the above alignment :-)
+
+#define KVM_REQ_TLB_FLUSH		(0 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+#define KVM_REQ_VM_DEAD			(1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+#define KVM_REQ_UNBLOCK			2
+#define KVM_REQ_DIRTY_RING_SOFT_FULL	3
+#define KVM_REQUEST_ARCH_BASE		8
+
+> @@ -149,6 +149,7 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
+>  
+>  void kvm_dirty_ring_push(struct kvm_dirty_ring *ring, u32 slot, u64 offset)
+>  {
+> +	struct kvm_vcpu *vcpu = container_of(ring, struct kvm_vcpu, dirty_ring);
+>  	struct kvm_dirty_gfn *entry;
+>  
+>  	/* It should never get full */
+> @@ -166,6 +167,22 @@ void kvm_dirty_ring_push(struct kvm_dirty_ring *ring, u32 slot, u64 offset)
+>  	kvm_dirty_gfn_set_dirtied(entry);
+>  	ring->dirty_index++;
+>  	trace_kvm_dirty_ring_push(ring, slot, offset);
+> +
+> +	if (kvm_dirty_ring_soft_full(ring))
+> +		kvm_make_request(KVM_REQ_RING_SOFT_FULL, vcpu);
+
+Would it make sense to clear the request in kvm_dirty_ring_reset()?  I don't care
+about the overhead of having to re-check the request, the goal would be to help
+document what causes the request to go away.
+
+E.g. modify kvm_dirty_ring_reset() to take @vcpu and then do:
+
+	if (!kvm_dirty_ring_soft_full(ring))
+		kvm_clear_request(KVM_REQ_RING_SOFT_FULL, vcpu);
+
+> +}
+> +
+> +bool kvm_dirty_ring_check_request(struct kvm_vcpu *vcpu)
+> +{
+> +	if (kvm_check_request(KVM_REQ_RING_SOFT_FULL, vcpu) &&
+> +		kvm_dirty_ring_soft_full(&vcpu->dirty_ring)) {
+
+Align please,
+
+	if (kvm_check_request(KVM_REQ_RING_SOFT_FULL, vcpu) &&
+	    kvm_dirty_ring_soft_full(&vcpu->dirty_ring)) {
+
+> +		kvm_make_request(KVM_REQ_RING_SOFT_FULL, vcpu);
+
+A comment would be helpful to explain (a) why KVM needs to re-check on the next
+KVM_RUN and (b) why this won't indefinitely prevent KVM from entering the guest.
+For pretty every other request I can think of, re-queueing a request like this
+will effectively hang the vCPU, i.e. this looks wrong at first glance.
+
+> +		vcpu->run->exit_reason = KVM_EXIT_DIRTY_RING_FULL;
+> +		trace_kvm_dirty_ring_exit(vcpu);
+> +		return true;
+> +	}
+> +
+> +	return false;
 >  }
 >  
-> +static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
-> +				   struct kvm_mmu_page *sp, bool shared);
-> +
->  /*
->   * Handle a TDP page fault (NPT/EPT violation/misconfiguration) by installing
->   * page tables and SPTEs to translate the faulting guest physical address.
-> @@ -1171,49 +1174,42 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->  		if (iter.level == fault->goal_level)
->  			break;
->  
-> -		/*
-> -		 * If there is an SPTE mapping a large page at a higher level
-> -		 * than the target, that SPTE must be cleared and replaced
-> -		 * with a non-leaf SPTE.
-> -		 */
-> +		/* Step down into the lower level page table if it exists. */
->  		if (is_shadow_present_pte(iter.old_spte) &&
-> -		    is_large_pte(iter.old_spte)) {
-> -			if (tdp_mmu_zap_spte_atomic(vcpu->kvm, &iter))
-> -				break;
-> +		    !is_large_pte(iter.old_spte))
-> +			continue;
->  
-> -			/*
-> -			 * The iter must explicitly re-read the spte here
-> -			 * because the new value informs the !present
-> -			 * path below.
-> -			 */
-> -			iter.old_spte = kvm_tdp_mmu_read_spte(iter.sptep);
-> -		}
-> +		/*
-> +		 * If SPTE has been frozen by another thread, just give up and
-> +		 * retry, avoiding unnecessary page table allocation and free.
-> +		 */
-> +		if (is_removed_spte(iter.old_spte))
-> +			break;
->  
-> -		if (!is_shadow_present_pte(iter.old_spte)) {
-> -			/*
-> -			 * If SPTE has been frozen by another thread, just
-> -			 * give up and retry, avoiding unnecessary page table
-> -			 * allocation and free.
-> -			 */
-> -			if (is_removed_spte(iter.old_spte))
-> -				break;
-> +		/*
-> +		 * The SPTE is either non-present or points to a huge page that
-> +		 * needs to be split.
-> +		 */
-> +		sp = tdp_mmu_alloc_sp(vcpu);
-> +		tdp_mmu_init_child_sp(sp, &iter);
->  
-> -			sp = tdp_mmu_alloc_sp(vcpu);
-> -			tdp_mmu_init_child_sp(sp, &iter);
-> +		sp->nx_huge_page_disallowed = fault->huge_page_disallowed;
->  
-> -			sp->nx_huge_page_disallowed = fault->huge_page_disallowed;
-> +		if (is_shadow_present_pte(iter.old_spte))
-> +			ret = tdp_mmu_split_huge_page(kvm, &iter, sp, true);
-> +		else
-> +			ret = tdp_mmu_link_sp(kvm, &iter, sp, true);
->  
-> -			if (tdp_mmu_link_sp(kvm, &iter, sp, true)) {
-> -				tdp_mmu_free_sp(sp);
-> -				break;
-> -			}
-> +		if (ret) {
-> +			tdp_mmu_free_sp(sp);
-> +			break;
-> +		}
->  
-> -			if (fault->huge_page_disallowed &&
-> -			    fault->req_level >= iter.level) {
-> -				spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-> -				track_possible_nx_huge_page(kvm, sp);
-> -				spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
-> -			}
-> +		if (fault->huge_page_disallowed &&
-> +		    fault->req_level >= iter.level) {
-> +			spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-> +			track_possible_nx_huge_page(kvm, sp);
-> +			spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
->  		}
->  	}
->  
-> @@ -1484,8 +1480,6 @@ static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
->  	const int level = iter->level;
->  	int ret, i;
->  
-> -	tdp_mmu_init_child_sp(sp, iter);
-> -
-David, thanks for the alignment with the precise nx huge page series.
-
-Nit: since this patch puts tdp_mmu_init_child_sp() out of the
-tdp_mmu_split_huge_page(), can we add a comment mentioned that, i.e.,
-initialization of child sp is required before invoking the function?
-
-With that action done,
-
-Reviewed-by: Mingwei Zhang <mizhang@google.com>
-
->  	/*
->  	 * No need for atomics when writing to sp->spt since the page table has
->  	 * not been linked in yet and thus is not reachable from any other CPU.
-> @@ -1561,6 +1555,8 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
->  				continue;
->  		}
->  
-> +		tdp_mmu_init_child_sp(sp, &iter);
-> +
->  		if (tdp_mmu_split_huge_page(kvm, &iter, sp, shared))
->  			goto retry;
->  
+>  struct page *kvm_dirty_ring_get_page(struct kvm_dirty_ring *ring, u32 offset)
 > -- 
-> 2.38.0.413.g74048e4d9e-goog
+> 2.23.0
 > 
