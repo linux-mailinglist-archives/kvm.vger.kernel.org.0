@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DEBC605AF0
-	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 11:17:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 44C6B605AEE
+	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 11:16:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230150AbiJTJQ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Oct 2022 05:16:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43960 "EHLO
+        id S230076AbiJTJQy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Oct 2022 05:16:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229660AbiJTJQ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Oct 2022 05:16:56 -0400
+        with ESMTP id S230029AbiJTJQu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Oct 2022 05:16:50 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D28671BE90B
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 02:16:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57C101BE914
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 02:16:46 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id DAA2BB82691
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 09:16:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2802C433C1;
-        Thu, 20 Oct 2022 09:16:46 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 7E216B826B1
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 09:16:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E184C433C1;
+        Thu, 20 Oct 2022 09:16:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666257406;
-        bh=3tbOfP787ivANekjOpi0D+lzmeYXSesKC2n+sLbSetQ=;
+        s=k20201202; t=1666257403;
+        bh=aLcbmyX/kgZvgaopcNcriA4ZyIsxFlgipcGUgzsXUfs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=tmp9gTo1hdSKd8xa/Cb4CnZj4NfRTUvH93BSsSvZM+UeGmtVcuCX7T2lRtTTWwMMX
-         O9OuS9WUHXGOv7LgGvPwf9F59FHLbsCGWM++xfNo00bS/JkWxp/jdpItRAt6TaTq06
-         JNb0vvi6whYfO0vHJ20B8CAiwuZFy9t+3gf8OuCmlo4MqyuV8+8xwGT9tjvifIVmBp
-         bRfyZeLObwa69MxkxXYb3MOBXBBjvq4M/u6+J7RtNQNSzP67KOV1ACD+Dxa/7my430
-         aA8dlX6id4K0aeTON7QOQlhdQ3DmL8gHxbWcuSgbcyEvQBOX8VPpb42yhtORk1LJXt
-         Pq/xvllZwECkA==
+        b=oTCKgkNEk8Z0FKLsnxSj5WaHmv+AE3/EupRmztvJQZ71/vwlS/sa9xRqp/hC683WI
+         jJ0+QXBbIpHBn1q86vDT4v0HV9syQkYELj0anKweTu3B4NMjtWdZMSjB/xBkpbkAKT
+         jyLCAjgJLX0zHPHz+9eE/zQ9jxmu7wJEEXUBAL44JdmEN8CAAsur8HF8KQSf/HdMvb
+         wudtP9RWwbloSoKM+8DC1MKpKdSJ0hEiKKvj8AjOcakt4Pke10sMTU1W74yftEO2Fb
+         Jk9m4gAJBDfyyuOixv33//Dv243NrT3jtt+viwm2djhnXskIkgHGQs9tuVVOC9UiId
+         gYQK+Zr0GTXEg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1olRWb-000Buf-3W;
+        id 1olRWb-000Buf-Bg;
         Thu, 20 Oct 2022 10:07:37 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     <kvmarm@lists.cs.columbia.edu>, <kvmarm@lists.linux.dev>,
@@ -46,9 +46,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Quentin Perret <qperret@google.com>,
         Will Deacon <will@kernel.org>, Fuad Tabba <tabba@google.com>
-Subject: [PATCH 10/17] KVM: arm64: Force HCR_EL2.E2H when ARM64_KVM_HVHE is set
-Date:   Thu, 20 Oct 2022 10:07:20 +0100
-Message-Id: <20221020090727.3669908-11-maz@kernel.org>
+Subject: [PATCH 11/17] KVM: arm64: Disable TTBR1_EL2 when using ARM64_KVM_HVHE
+Date:   Thu, 20 Oct 2022 10:07:21 +0100
+Message-Id: <20221020090727.3669908-12-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221020090727.3669908-1-maz@kernel.org>
 References: <20221020090727.3669908-1-maz@kernel.org>
@@ -67,27 +67,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Obviously, in order to be able to use VHE whilst at EL2, we need
-to set HCR_EL2.E2H. Do so when ARM64_KVM_HVHE is set.
+When using hVHE, we end-up with two TTBRs at EL2. That's great,
+but we're not quite ready for this just yet.
+
+Disable TTBR1_EL2 by setting TCR_EL2.EPD1 so that we only
+translate via TTBR0_EL2.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arm.c | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm64/kvm/arm.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 94d33e296e10..85df7ce0b051 100644
+index 85df7ce0b051..cf0f15f4d69a 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -1558,6 +1558,8 @@ static void cpu_prepare_hyp_mode(int cpu)
- 		params->hcr_el2 = HCR_HOST_NVHE_PROTECTED_FLAGS;
- 	else
- 		params->hcr_el2 = HCR_HOST_NVHE_FLAGS;
-+	if (cpus_have_final_cap(ARM64_KVM_HVHE))
-+		params->hcr_el2 |= HCR_E2H;
- 	params->vttbr = params->vtcr = 0;
- 
- 	/*
+@@ -1548,7 +1548,13 @@ static void cpu_prepare_hyp_mode(int cpu)
+ 	 *
+ 	 * So use the same T0SZ value we use for the ID map.
+ 	 */
+-	tcr = (read_sysreg(tcr_el1) & TCR_EL2_MASK) | TCR_EL2_RES1;
++	tcr = read_sysreg(tcr_el1);
++	if (cpus_have_final_cap(ARM64_KVM_HVHE)) {
++		tcr |= TCR_EPD1_MASK;
++	} else {
++		tcr &= TCR_EL2_MASK;
++		tcr |= TCR_EL2_RES1;
++	}
+ 	tcr &= ~TCR_T0SZ_MASK;
+ 	tcr |= (idmap_t0sz & GENMASK(TCR_TxSZ_WIDTH - 1, 0)) << TCR_T0SZ_OFFSET;
+ 	params->tcr_el2 = tcr;
 -- 
 2.34.1
 
