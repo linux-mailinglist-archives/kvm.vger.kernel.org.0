@@ -2,109 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 43E756057BB
-	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 08:56:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7420A6057FE
+	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 09:12:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229841AbiJTG4o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Oct 2022 02:56:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36888 "EHLO
+        id S230095AbiJTHMy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Oct 2022 03:12:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229783AbiJTG4h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Oct 2022 02:56:37 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E65A120EF9
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 23:56:35 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29K6bsbo011968
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 06:56:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=QplY6tD2v4iEKcz+U1eStzYBsGa7iKnVwYTF/Df5Uek=;
- b=bKGXnmE7/b7jvFzQygynzsiCJBLiraeRzTGiahigDYIznBreVyHb3Ycc344yvBgX9WkS
- Fg70HAGTFNEKC6WHdzH4izK5YpZlaUNkiti0DZuzVWU5x2568qPUodZ38sAMBc5mpxV7
- PgwKceUG1al+VONq35sLGOaNPt2NGx7Y3xDySZjoIGxiBL6g8h93BTTKShPzU3KweZYG
- gg62FAtDJgWnoSg85uLK3NSkOqFTxtexH+lCr/nq7A0nRjBCO/lg5/j5znE0UU+vmz9b
- ylEOAxOcP1fNgguKhmwkwohkyqvEODCS5KPoYBWP+mDmC+NfDJmjEOWGAUDpTUE4siAd ow== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kb0yh0rnj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 06:56:34 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29K6dc24018278
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 06:56:33 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kb0yh0rmw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Oct 2022 06:56:33 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29K6q4bt018494;
-        Thu, 20 Oct 2022 06:56:31 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 3k7mg98bb1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Oct 2022 06:56:31 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29K6uSEB66257230
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 20 Oct 2022 06:56:28 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9077442041;
-        Thu, 20 Oct 2022 06:56:28 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 15A454203F;
-        Thu, 20 Oct 2022 06:56:28 +0000 (GMT)
-Received: from [9.171.57.143] (unknown [9.171.57.143])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 20 Oct 2022 06:56:28 +0000 (GMT)
-Message-ID: <a4909c99-1aa6-1acb-5ff6-1093a1b1dadf@linux.ibm.com>
-Date:   Thu, 20 Oct 2022 08:56:27 +0200
+        with ESMTP id S229657AbiJTHMv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Oct 2022 03:12:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 082CD159A15
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 00:12:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666249968;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=iSbqsg4g0J+uDTur4nOLOrDlqWhjBL7zIdyxmPl56wI=;
+        b=JBb5P3wSgMJfLi30+oCzV1VB7373nMV1LjGrmE5PySTrSnLcUDznAXSMJLqhevPvEPh+04
+        y9A3rU8jSCrwd9X1/MrTdg+TqatO0kLy92WBGYgB92zwUCbJgd23V29Mxkv7XwDMvelXwS
+        IOiTvgrqdg7L/pfQiPWFlt8kj0dfamk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-636-Va38NGliOg6Us14EzfvzXA-1; Thu, 20 Oct 2022 03:12:44 -0400
+X-MC-Unique: Va38NGliOg6Us14EzfvzXA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C45BE101A52A;
+        Thu, 20 Oct 2022 07:12:43 +0000 (UTC)
+Received: from gshan.redhat.com (vpn2-54-70.bne.redhat.com [10.64.54.70])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7703C40C6EC2;
+        Thu, 20 Oct 2022 07:12:38 +0000 (UTC)
+From:   Gavin Shan <gshan@redhat.com>
+To:     kvmarm@lists.linux.dev
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mail@maciej.szmigiero.name,
+        maz@kernel.org, pbonzini@redhat.com, ajones@ventanamicro.com,
+        shuah@kernel.org, peterx@redhat.com, oliver.upton@linux.dev,
+        seanjc@google.com, ricarkol@google.com, zhenyzha@redhat.com,
+        shan.gavin@gmail.com
+Subject: [PATCH v3 0/6] KVM: selftests: memslot_perf_test: aarch64 cleanup/fixes
+Date:   Thu, 20 Oct 2022 15:12:03 +0800
+Message-Id: <20221020071209.559062-1-gshan@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [kvm-unit-tests PATCH v2 1/1] s390x: do not enable PV dump
- support by default
-To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     imbrenda@linux.ibm.com, thuth@redhat.com
-References: <20221019145320.1228710-1-nrb@linux.ibm.com>
- <20221019145320.1228710-2-nrb@linux.ibm.com>
-Content-Language: en-US
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20221019145320.1228710-2-nrb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: -WYLf3cqlnDs1Y6CYjIA7AGo9uBMs2sW
-X-Proofpoint-ORIG-GUID: VDkeFOKOkBqFqIUnIQ0GkjaEvW6ZG-v-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-20_01,2022-10-19_04,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 mlxlogscore=999 priorityscore=1501 suspectscore=0
- adultscore=0 impostorscore=0 bulkscore=0 spamscore=0 clxscore=1015
- mlxscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210200037
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/19/22 16:53, Nico Boehr wrote:
-> Currently, dump support is always enabled by setting the respective
-> plaintext control flag (PCF). Unfortunately, older machines without
-> support for PV dump will not start the guest when this PCF is set. This
-> will result in an error message like this:
-> 
-> qemu-system-s390x: KVM PV command 2 (KVM_PV_SET_SEC_PARMS) failed: header rc 106 rrc 0 IOCTL rc: -22
-> 
-> Hence, by default, disable dump support to preserve compatibility with
-> older machines. Users can enable dumping support by passing
-> --enable-dump to the configure script.
-> 
+kvm/selftests/memslots_perf_test doesn't work with 64KB-page-size-host
+and 4KB-page-size-guest on aarch64. In the implementation, the host and
+guest page size have been hardcoded to 4KB. It's ovbiously not working
+on aarch64 which supports 4KB, 16KB, 64KB individually on host and guest.
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+This series tries to fix it. After the series is applied, the test runs
+successfully with 64KB-page-size-host and 4KB-page-size-guest.
+
+   # ./memslots_perf_tests -v -s 512
+
+Since we're here, the code is cleaned up a bit as PATCH[1-3] do. The
+other patches are fixes to handle the mismatched host/guest page
+sized.
+
+v1: https://lore.kernel.org/kvmarm/20221014071914.227134-1-gshan@redhat.com/T/#t
+v2: https://lore.kernel.org/kvmarm/20221018040454.405719-1-gshan@redhat.com/T/#t
+
+Changelog
+=========
+v3:
+  * Improved comments about MEM_TEST_MOVE_SIZE, which is set
+    to 64KB in PATCH[v3 4/6] and finally fixed to 192KB in
+    PATCH[v3 5/6].                                              (Maciej)
+  * Use size instead of pages to do the comparison in
+    test_memslot_move_prepare()                                 (Maciej)
+  * Use tools/include/linux/sizes.h instead of inventing
+    our own macros.                                             (Oliver)
+v2:
+  * Pick the smaller value between the ones specified by
+    user or probed from KVM_CAP_NR_MEMSLOTS in PATCH[v2 3/6]    (Maciej)
+  * Improved comments about MEM_TEST_MOVE_SIZE in
+    PATCH[v2 4/6]                                               (Maciej)
+  * Avoid mismatched guest page size after VM is started in
+    prepare_vm() in PATCH[v2 4/6]                               (Maciej)
+  * Fix condition to check MEM_TEST_{UNMAP, UNMAP_CHUNK}_SIZE
+    in check_memory_size() in PATCH[v2 4/6]                     (Maciej)
+  * Define base and huge page size in kvm_util_base.h in
+    PATCH[v2 5/6]                                               (Sean)
+  * Add checks on host/guest page size in check_memory_size()
+    and fail early if any of them exceeds 64KB in PATCH[v2 5/6] (Maciej)
+
+
+Gavin Shan (6):
+  KVM: selftests: memslot_perf_test: Use data->nslots in prepare_vm()
+  KVM: selftests: memslot_perf_test: Consolidate loop conditions in
+    prepare_vm()
+  KVM: selftests: memslot_perf_test: Probe memory slots for once
+  KVM: selftests: memslot_perf_test: Support variable guest page size
+  KVM: selftests: memslot_perf_test: Consolidate memory
+  KVM: selftests: memslot_perf_test: Report optimal memory slots
+
+ .../testing/selftests/kvm/memslot_perf_test.c | 317 ++++++++++++------
+ 1 file changed, 208 insertions(+), 109 deletions(-)
+
+-- 
+2.23.0
 
