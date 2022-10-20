@@ -2,122 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 120E7605952
-	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 10:08:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 67B6260599C
+	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 10:22:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229960AbiJTIIC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Oct 2022 04:08:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47980 "EHLO
+        id S231297AbiJTIWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Oct 2022 04:22:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229824AbiJTIH6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Oct 2022 04:07:58 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 826571757B1
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 01:07:57 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29K7nr2g022918
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 08:07:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=ocvmhZA68tFlIJ8wrSQjZntC1szPs5Y85vXyuGTBuY8=;
- b=C1OWBmcLgcSf0kU152mY8CJmWyV1I1CNx9mV6LxYXEYJumYP5SWpQYAjBQ8ZQ5oeewLy
- 8qg9W/BmLdDwXRYqVsTxErwXyw82m8s4GDDO9r98qC3f7z2ibp540g1cgzIThQ50SwcQ
- Rqmjo42vBtTmxi3rKbuHK8QSqdALyBlDlqAwS1hzNaizbV+ErzN1bqjCuoXFSvuMbeEN
- VetU2RmGyhY/BycY7CYGhxmL25qjZk8jzA6AESuIAItJ7heMuVYU8yePF2yUFgYX9Bcm
- Y8igl4FsWuSe3C/1df7sBERqLNt+qUC5Sd8Y7rIFzptANvpVzGKocKmjJJjdD+guIE3K UQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kb29q0nmj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 08:07:56 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29K7oaR1025942
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 08:07:55 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kb29q0nk4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Oct 2022 08:07:55 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29K85FIe000762;
-        Thu, 20 Oct 2022 08:07:54 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03ams.nl.ibm.com with ESMTP id 3k7mg98hqv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 20 Oct 2022 08:07:54 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29K87pSe2490938
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 20 Oct 2022 08:07:51 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0BCA9AE045;
-        Thu, 20 Oct 2022 08:07:51 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C957CAE053;
-        Thu, 20 Oct 2022 08:07:50 +0000 (GMT)
-Received: from [9.152.224.253] (unknown [9.152.224.253])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 20 Oct 2022 08:07:50 +0000 (GMT)
-Message-ID: <a6bd8a00-b6b7-1e0f-1989-c5b59d3182fd@linux.ibm.com>
-Date:   Thu, 20 Oct 2022 10:07:50 +0200
+        with ESMTP id S231301AbiJTIWm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Oct 2022 04:22:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1DEE171CFF
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 01:22:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666254145;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NXxC5THgAjtEYfgbLwABUhO1u5EsuU0JRYrQfyg0GwE=;
+        b=GSTGPFRV0HIksq6uiqH5BHD31Mfm4kGsbNEBEH+2UcO6JTa76uhqRUoF2JWsH/s3R60Klx
+        HxDS5ztEGny7ZFnjpF9POITdKn99Ia6gCF226/Tfag45FhMx16YbkjsN/zIqE0V+muWucP
+        8ZtToTFJXqk/GOUaSjBLGNy7EF2EAA0=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-595-Dp48Nrj5M_C6PRbyFV0GDg-1; Thu, 20 Oct 2022 04:22:23 -0400
+X-MC-Unique: Dp48Nrj5M_C6PRbyFV0GDg-1
+Received: by mail-ej1-f72.google.com with SMTP id xj11-20020a170906db0b00b0077b6ecb23fcso9082986ejb.5
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 01:22:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NXxC5THgAjtEYfgbLwABUhO1u5EsuU0JRYrQfyg0GwE=;
+        b=grYHHTsDeWXdauOtLlyiHtrov1NIKlwoFs/Tws/Z9fctGgrV0E34TpT2hH9NgRnUUe
+         BRVefpzgMMMavKIhu6bduwwWxeLw6va8/xtVVarSQ6nQEujPwNB8nAN+JzrA4LowCd0W
+         ooY3zkKB9WYAp16ut5Y/vfEhsrk7rg2n+e1/+RDN1hN/oVBAjFhwD6fdc/6HZSBtJyhf
+         lFdEYLUd0xOtZU0p8sjjrtLkYCz7UqtEM/ANCsqKsx8du1YH73MWADQZjEmwvV1u3sAt
+         6MaVQj5byak6gOre6BhTmT/QodWiCEBMx7OjIw3KqtZuuxvMaaE+4fFCz4QMLhI/zWhL
+         NySA==
+X-Gm-Message-State: ACrzQf1rDxQdVCipOhPETXDZ0L+LFbPwvjEXUdzg7/npbNLvvoptbWll
+        IgCU9fgBgdb7O8pHkFoIMvzqUlG/2qLZUTFiLIC3tZ9GyykXevMs6tJKLzdyS8l+jMj00LIMvA6
+        bRoyYj2IUu9ek
+X-Received: by 2002:a17:907:971c:b0:78e:63f:c766 with SMTP id jg28-20020a170907971c00b0078e063fc766mr9957387ejc.330.1666254141383;
+        Thu, 20 Oct 2022 01:22:21 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM77hNuYpdTNzaBxaGl4qanwjEest2MmHQgxj9LIOEFNPTGkaoTFS2OSELTfyljEa7SX2DQbRw==
+X-Received: by 2002:a17:907:971c:b0:78e:63f:c766 with SMTP id jg28-20020a170907971c00b0078e063fc766mr9957379ejc.330.1666254141175;
+        Thu, 20 Oct 2022 01:22:21 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id t14-20020a05640203ce00b00459e3a3f3ddsm11633580edw.79.2022.10.20.01.22.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Oct 2022 01:22:20 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Yuan Yao <yuan.yao@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v11 00/46] KVM: x86: hyper-v: Fine-grained TLB flush +
+ L2 TLB flush features
+In-Reply-To: <Y1B4kAIsc8Z0b2P9@google.com>
+References: <20221004123956.188909-1-vkuznets@redhat.com>
+ <Y1B4kAIsc8Z0b2P9@google.com>
+Date:   Thu, 20 Oct 2022 10:22:19 +0200
+Message-ID: <87v8oedhvo.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [kvm-unit-tests PATCH v1 2/2] s390x: uv-host: fix allocation of
- UV memory
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
-        thuth@redhat.com
-References: <20221018140951.127093-1-imbrenda@linux.ibm.com>
- <20221018140951.127093-3-imbrenda@linux.ibm.com>
-Content-Language: en-US
-From:   Steffen Eiden <seiden@linux.ibm.com>
-In-Reply-To: <20221018140951.127093-3-imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: TRCB3yUyOaSbxdDuJZYtL_Tm1U0rZ_TP
-X-Proofpoint-GUID: VhEVKqagN0eF_-9m0afeGYbjH_ie6VTH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-20_02,2022-10-19_04,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- malwarescore=0 phishscore=0 impostorscore=0 clxscore=1015 mlxlogscore=999
- lowpriorityscore=0 bulkscore=0 spamscore=0 adultscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
- definitions=main-2210200047
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Sean Christopherson <seanjc@google.com> writes:
 
+> On Tue, Oct 04, 2022, Vitaly Kuznetsov wrote:
+>> Changes since v10 (Sean):
+>> - New patches added:
+>>   - "x86/hyperv: Move VMCB enlightenment definitions to hyperv-tlfs.h"
+>>   - "KVM: selftests: Move "struct hv_enlightenments" to x86_64/svm.h"
+>>   - "KVM: SVM: Add a proper field for Hyper-V VMCB enlightenments"
+>>   - 'x86/hyperv: KVM: Rename "hv_enlightenments" to "hv_vmcb_enlightenments"'
+>>   - 'KVM: VMX: Rename "vmx/evmcs.{ch}" to "vmx/hyperv.{ch}"'
+>>   - "KVM: x86: Move clearing of TLB_FLUSH_CURRENT to kvm_vcpu_flush_tlb_all()"
+>>   - "KVM: selftests: Drop helpers to read/write page table entries"
+>>   - "KVM: x86: Make kvm_hv_get_assist_page() return 0/-errno"
+>> - Removed patches:
+>>   - "KVM: selftests: Export _vm_get_page_table_entry()"
+>> - Main differences:
+>>   - Move Hyper-V TLB flushing out of kvm_service_local_tlb_flush_requests().
+>>     On SVM, Hyper-V TLB flush FIFO is emptied from svm_flush_tlb_current()
+>>   - Don't disable IRQs in hv_tlb_flush_enqueue().
+>>   - Don't call kvm_vcpu_flush_tlb_guest() from kvm_hv_vcpu_flush_tlb() but
+>>     return -errno instead.
+>>   - Avoid unneded flushes in !EPT/!NPT cases.
+>>   - Optimize hv_is_vp_in_sparse_set().
+>>   - Move TLFS definitions to asm/hyperv-tlfs.h.
+>>   - Use u64 vals in Hyper-V PV TLB flush selftest + multiple smaler changes
+>>   - Typos, indentation, renames, ...
+>
+> Some nits throughout, but nothing major.  Everything could be fixed up when
+> applying, but if it's not too much trouble I'd prefer a v11, the potential changes
+> to kvm_hv_hypercall_complete() aren't completely trivial.
 
-On 10/18/22 16:09, Claudio Imbrenda wrote:
-> Allocate the donated storage with 1M alignment from the normal pool, to
-> force it to be above 2G without wasting a whole 2G block of memory.
-> 
-> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-LGTM
-Reviewed-by; Steffen Eiden <seiden@linux.ibm.com>
+Thanks for the review! Let me do v12 to address your comments, I plan to
+do it tomorrow.
 
-> ---
->   s390x/uv-host.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/s390x/uv-host.c b/s390x/uv-host.c
-> index a1a6d120..e1fc0213 100644
-> --- a/s390x/uv-host.c
-> +++ b/s390x/uv-host.c
-> @@ -329,7 +329,7 @@ static void test_init(void)
->   	struct psw psw;
->   
->   	/* Donated storage needs to be over 2GB */
-> -	mem = (uint64_t)memalign(1UL << 31, uvcb_qui.uv_base_stor_len);
-> +	mem = (uint64_t)memalign_pages_flags(SZ_1M, uvcb_qui.uv_base_stor_len, AREA_NORMAL);
->   
->   	uvcb_init.header.len = sizeof(uvcb_init);
->   	uvcb_init.header.cmd = UVC_CMD_INIT_UV;
+-- 
+Vitaly
+
