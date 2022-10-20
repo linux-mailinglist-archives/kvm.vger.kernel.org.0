@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E7366061D9
-	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 15:39:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 432EE6061DC
+	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 15:39:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230347AbiJTNjN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Oct 2022 09:39:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36296 "EHLO
+        id S230091AbiJTNjS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Oct 2022 09:39:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36538 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230287AbiJTNjJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Oct 2022 09:39:09 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4FF51A2E34
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 06:39:04 -0700 (PDT)
+        with ESMTP id S230365AbiJTNjQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Oct 2022 09:39:16 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2D311A2E34
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 06:39:09 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1A9E961B7F
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 13:39:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51DAFC433D7;
-        Thu, 20 Oct 2022 13:39:00 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 79CF9B82750
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 13:39:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03E44C43470;
+        Thu, 20 Oct 2022 13:39:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666273143;
-        bh=yQYxpwGVyoU+XJXTPxigRCKt0VDReCR4zBLvixYhuxo=;
+        s=k20201202; t=1666273147;
+        bh=VxPja3d2GHqoIhuBEgJwpkqFA2a5hFZGKu7/PjMAaYM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=L+YsItLpaffwOQvbgkn1m89kTo7cQgGb0/BvjIKzZZCfnQKL8Au6FfZesFx6xbdr4
-         KiRFhC4v1MqLFE1ZV1poqz8mMwieVH51wdr+MyFMx3XbhVkIY2NG6xZee5oEqS5R3W
-         1ATIJ8t7kWmUkrazCkqCNQMpQaFIY8SzhdAfQzGnSvaivNcMUh9iqfq6Gyf69BvLkJ
-         C5tud5JbwXFcWtPJAz0Ck7a3sA1XX9nBGIO0c/8JwURmelZR7/oaFeIi4Btse/vDdv
-         feeZQBh7Fp9whYsZENTLPDCCNTmlAOjeS2hldUItFoHdMvO9qujk4mDQ6mCUHRyQPx
-         AOgxJvH7V0UfQ==
+        b=oFQwIoexMsZr+kZvehX1yBJivHJlHddsUYbrQnS+C5FjDRTwNjEnuXhwzDgcc3RpG
+         YwIU8Qc3sZFV88G4O0urXzJEB9eCsh6Jv5MtPiIO2FJuPCOhjednVS23fL0NBUOS/8
+         nXC5APF2w6FVf+sWfNzgblb5BkuK+Hh6uMws4wniVV3sjt6Jr2aBaosjI6wfMPEApK
+         d1g8PKdYcVGR4IcR0zOvoOrQIqDxoM1rlP6XP9Kmfbdxq/Xd/atgh9lzRvGNShRiY1
+         HTTR5ue9j5fyKio6+EucJ9cMQo/yLWWtkTUcVutrR3IGiGGXQK9A6Tn/Pn/cRxpYZ8
+         WoxGymYYQ3L/A==
 From:   Will Deacon <will@kernel.org>
 To:     kvmarm@lists.linux.dev
 Cc:     Will Deacon <will@kernel.org>,
@@ -48,18 +48,18 @@ Cc:     Will Deacon <will@kernel.org>,
         Oliver Upton <oliver.upton@linux.dev>,
         Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
         kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v5 07/25] KVM: arm64: Prevent the donation of no-map pages
-Date:   Thu, 20 Oct 2022 14:38:09 +0100
-Message-Id: <20221020133827.5541-8-will@kernel.org>
+Subject: [PATCH v5 08/25] KVM: arm64: Add helpers to pin memory shared with the hypervisor at EL2
+Date:   Thu, 20 Oct 2022 14:38:10 +0100
+Message-Id: <20221020133827.5541-9-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20221020133827.5541-1-will@kernel.org>
 References: <20221020133827.5541-1-will@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-7.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -68,90 +68,122 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Quentin Perret <qperret@google.com>
 
-Memory regions marked as "no-map" in the host device-tree routinely
-include TrustZone carev-outs and DMA pools. Although donating such pages
-to the hypervisor may not breach confidentiality, it could be used to
-corrupt its state in uncontrollable ways. To prevent this, let's block
-host-initiated memory transitions targeting "no-map" pages altogether in
-nVHE protected mode as there should be no valid reason to do this in
-current operation.
+Add helpers allowing the hypervisor to check whether a range of pages
+are currently shared by the host, and 'pin' them if so by blocking host
+unshare operations until the memory has been unpinned.
 
-Thankfully, the pKVM EL2 hypervisor has a full copy of the host's list
-of memblock regions, so we can easily check for the presence of the
-MEMBLOCK_NOMAP flag on a region containing pages being donated from the
-host.
+This will allow the hypervisor to take references on host-provided
+data-structures (e.g. 'struct kvm') with the guarantee that these pages
+will remain in a stable state until the hypervisor decides to release
+them, for example during guest teardown.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Tested-by: Vincent Donnefort <vdonnefort@google.com>
 Signed-off-by: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  3 ++
+ arch/arm64/kvm/hyp/include/nvhe/memory.h      |  7 ++-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 48 +++++++++++++++++++
+ 3 files changed, 57 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index c30402737548..a7156fd13bc8 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -193,7 +193,7 @@ struct kvm_mem_range {
- 	u64 end;
- };
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+index c87b19b2d468..998bf165af71 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+@@ -69,6 +69,9 @@ int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id);
+ int kvm_host_prepare_stage2(void *pgt_pool_base);
+ void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt);
  
--static bool find_mem_range(phys_addr_t addr, struct kvm_mem_range *range)
-+static struct memblock_region *find_mem_range(phys_addr_t addr, struct kvm_mem_range *range)
++int hyp_pin_shared_mem(void *from, void *to);
++void hyp_unpin_shared_mem(void *from, void *to);
++
+ static __always_inline void __load_host_stage2(void)
  {
- 	int cur, left = 0, right = hyp_memblock_nr;
- 	struct memblock_region *reg;
-@@ -216,18 +216,28 @@ static bool find_mem_range(phys_addr_t addr, struct kvm_mem_range *range)
- 		} else {
- 			range->start = reg->base;
- 			range->end = end;
--			return true;
-+			return reg;
- 		}
- 	}
- 
--	return false;
-+	return NULL;
+ 	if (static_branch_likely(&kvm_protected_mode_initialized))
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/memory.h b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+index 9422900e5c6a..ab205c4d6774 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/memory.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/memory.h
+@@ -55,10 +55,15 @@ static inline void hyp_page_ref_inc(struct hyp_page *p)
+ 	p->refcount++;
  }
  
- bool addr_is_memory(phys_addr_t phys)
+-static inline int hyp_page_ref_dec_and_test(struct hyp_page *p)
++static inline void hyp_page_ref_dec(struct hyp_page *p)
  {
- 	struct kvm_mem_range range;
- 
--	return find_mem_range(phys, &range);
-+	return !!find_mem_range(phys, &range);
+ 	BUG_ON(!p->refcount);
+ 	p->refcount--;
 +}
 +
-+static bool addr_is_allowed_memory(phys_addr_t phys)
++static inline int hyp_page_ref_dec_and_test(struct hyp_page *p)
 +{
-+	struct memblock_region *reg;
-+	struct kvm_mem_range range;
-+
-+	reg = find_mem_range(phys, &range);
-+
-+	return reg && !(reg->flags & MEMBLOCK_NOMAP);
++	hyp_page_ref_dec(p);
+ 	return (p->refcount == 0);
  }
  
- static bool is_in_mem_range(u64 addr, struct kvm_mem_range *range)
-@@ -346,7 +356,7 @@ static bool host_stage2_force_pte_cb(u64 addr, u64 end, enum kvm_pgtable_prot pr
- static int host_stage2_idmap(u64 addr)
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index a7156fd13bc8..1262dbae7f06 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -625,6 +625,9 @@ static int hyp_ack_unshare(u64 addr, const struct pkvm_mem_transition *tx)
  {
- 	struct kvm_mem_range range;
--	bool is_memory = find_mem_range(addr, &range);
-+	bool is_memory = !!find_mem_range(addr, &range);
- 	enum kvm_pgtable_prot prot;
- 	int ret;
+ 	u64 size = tx->nr_pages * PAGE_SIZE;
  
-@@ -424,7 +434,7 @@ static int __check_page_state_visitor(u64 addr, u64 end, u32 level,
- 	struct check_walk_data *d = arg;
- 	kvm_pte_t pte = *ptep;
++	if (tx->initiator.id == PKVM_ID_HOST && hyp_page_count((void *)addr))
++		return -EBUSY;
++
+ 	if (__hyp_ack_skip_pgtable_check(tx))
+ 		return 0;
  
--	if (kvm_pte_valid(pte) && !addr_is_memory(kvm_pte_to_phys(pte)))
-+	if (kvm_pte_valid(pte) && !addr_is_allowed_memory(kvm_pte_to_phys(pte)))
- 		return -EINVAL;
+@@ -1038,3 +1041,48 @@ int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages)
  
- 	return d->get_page_state(pte) == d->desired ? 0 : -EPERM;
+ 	return ret;
+ }
++
++int hyp_pin_shared_mem(void *from, void *to)
++{
++	u64 cur, start = ALIGN_DOWN((u64)from, PAGE_SIZE);
++	u64 end = PAGE_ALIGN((u64)to);
++	u64 size = end - start;
++	int ret;
++
++	host_lock_component();
++	hyp_lock_component();
++
++	ret = __host_check_page_state_range(__hyp_pa(start), size,
++					    PKVM_PAGE_SHARED_OWNED);
++	if (ret)
++		goto unlock;
++
++	ret = __hyp_check_page_state_range(start, size,
++					   PKVM_PAGE_SHARED_BORROWED);
++	if (ret)
++		goto unlock;
++
++	for (cur = start; cur < end; cur += PAGE_SIZE)
++		hyp_page_ref_inc(hyp_virt_to_page(cur));
++
++unlock:
++	hyp_unlock_component();
++	host_unlock_component();
++
++	return ret;
++}
++
++void hyp_unpin_shared_mem(void *from, void *to)
++{
++	u64 cur, start = ALIGN_DOWN((u64)from, PAGE_SIZE);
++	u64 end = PAGE_ALIGN((u64)to);
++
++	host_lock_component();
++	hyp_lock_component();
++
++	for (cur = start; cur < end; cur += PAGE_SIZE)
++		hyp_page_ref_dec(hyp_virt_to_page(cur));
++
++	hyp_unlock_component();
++	host_unlock_component();
++}
 -- 
 2.38.0.413.g74048e4d9e-goog
 
