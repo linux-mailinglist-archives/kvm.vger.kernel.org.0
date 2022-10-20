@@ -2,180 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E77766056F5
-	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 07:43:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 43E756057BB
+	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 08:56:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230033AbiJTFnz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Oct 2022 01:43:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42008 "EHLO
+        id S229841AbiJTG4o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Oct 2022 02:56:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229744AbiJTFnv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Oct 2022 01:43:51 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6FB612FF9E
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 22:43:50 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id z9-20020a17090a468900b00202fdb32ba1so1122833pjf.1
-        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 22:43:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=B5VialaYDd/5nDZq2FGZQSkkeS3yDmkJ8xITb2jtJu4=;
-        b=JCQN7ZN/2N0cWyp8F8z9Q/AWQsvHJudQPiteYqEIcj7XfWugeQhVkTmnP0ARsWsoks
-         ucgnIuxwkVOi6HfufXCOivOoWc0OAfMaQ5LcZ7LoJDphUF5BD661KNYr13g9b8M69Wg5
-         sYWriD3ommK1rvL7wYoQei3CW09bn2tk9bumU08bD2tbJvn7h2d3n2uBe3lkScwHMXo/
-         +pgtGuA2YWI5nKvdUoxnT816Q+TSg6g4SRqRLOa1HBJbbymWGCLYzRrE86VGWUgxGIhh
-         fAoVU8gmlDs5BJ+XuOZSg+xtcNGDwIO9ya/KVTRPWvkUMcFeE/PKg4uoGNBwomtfA+sz
-         SrMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B5VialaYDd/5nDZq2FGZQSkkeS3yDmkJ8xITb2jtJu4=;
-        b=2da1lAGN+v3O62dp92619+DyLOWVV4rFOT388Bg9icgprDLdhns+9HoM5CA2Sj+RU+
-         iwZ2oxb479SASreMnF9SKFlriZfm30uK9YY7YzhINp7/e60w8ltrSJpVmdTN+YGG86uH
-         HbtovEKmuUOT39029M3xNrac1ML+Gd5yeAdDwVkCaNquk520Ua5qdaJexMTgUh8VcKci
-         /4zTTwzHoeVxlqQWw1YhsbYEXZpJRGKZzTbmAi1qp1XhOGYbttXtQTtoi5T2hQ6qekzq
-         creex88/Ir3sna0hDV7X1XM/JWFTCTFWwfQFI8Fr8NEXVIbetyrlAfehQiiV/8rlVhuS
-         Dx0w==
-X-Gm-Message-State: ACrzQf3slix4wLJVSFNAp/zRMclDc1tbJIMUOSX0O4qjIN0OAqUlcguB
-        i6Som6WQTl7Ljf+cYFxI45VI30lbNYE=
-X-Google-Smtp-Source: AMsMyM4nwPtJ6JpQSfu86pZslSfGKYI7Hejk4DKn49pB5qd4AvXEqW2ZJclxhcgitaqs9lCMA2XixsTUavc=
-X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a17:90a:b794:b0:20a:eab5:cf39 with SMTP id
- m20-20020a17090ab79400b0020aeab5cf39mr2379113pjr.1.1666244629981; Wed, 19 Oct
- 2022 22:43:49 -0700 (PDT)
-Date:   Wed, 19 Oct 2022 22:42:02 -0700
-In-Reply-To: <20221020054202.2119018-1-reijiw@google.com>
-Mime-Version: 1.0
-References: <20221020054202.2119018-1-reijiw@google.com>
-X-Mailer: git-send-email 2.38.0.413.g74048e4d9e-goog
-Message-ID: <20221020054202.2119018-10-reijiw@google.com>
-Subject: [PATCH v2 9/9] KVM: arm64: selftests: Test with every breakpoint/watchpoint
-From:   Reiji Watanabe <reijiw@google.com>
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        Reiji Watanabe <reijiw@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229783AbiJTG4h (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Oct 2022 02:56:37 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E65A120EF9
+        for <kvm@vger.kernel.org>; Wed, 19 Oct 2022 23:56:35 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29K6bsbo011968
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 06:56:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=QplY6tD2v4iEKcz+U1eStzYBsGa7iKnVwYTF/Df5Uek=;
+ b=bKGXnmE7/b7jvFzQygynzsiCJBLiraeRzTGiahigDYIznBreVyHb3Ycc344yvBgX9WkS
+ Fg70HAGTFNEKC6WHdzH4izK5YpZlaUNkiti0DZuzVWU5x2568qPUodZ38sAMBc5mpxV7
+ PgwKceUG1al+VONq35sLGOaNPt2NGx7Y3xDySZjoIGxiBL6g8h93BTTKShPzU3KweZYG
+ gg62FAtDJgWnoSg85uLK3NSkOqFTxtexH+lCr/nq7A0nRjBCO/lg5/j5znE0UU+vmz9b
+ ylEOAxOcP1fNgguKhmwkwohkyqvEODCS5KPoYBWP+mDmC+NfDJmjEOWGAUDpTUE4siAd ow== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kb0yh0rnj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 06:56:34 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29K6dc24018278
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 06:56:33 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kb0yh0rmw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Oct 2022 06:56:33 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29K6q4bt018494;
+        Thu, 20 Oct 2022 06:56:31 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04ams.nl.ibm.com with ESMTP id 3k7mg98bb1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Oct 2022 06:56:31 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29K6uSEB66257230
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 20 Oct 2022 06:56:28 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9077442041;
+        Thu, 20 Oct 2022 06:56:28 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 15A454203F;
+        Thu, 20 Oct 2022 06:56:28 +0000 (GMT)
+Received: from [9.171.57.143] (unknown [9.171.57.143])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 20 Oct 2022 06:56:28 +0000 (GMT)
+Message-ID: <a4909c99-1aa6-1acb-5ff6-1093a1b1dadf@linux.ibm.com>
+Date:   Thu, 20 Oct 2022 08:56:27 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [kvm-unit-tests PATCH v2 1/1] s390x: do not enable PV dump
+ support by default
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     imbrenda@linux.ibm.com, thuth@redhat.com
+References: <20221019145320.1228710-1-nrb@linux.ibm.com>
+ <20221019145320.1228710-2-nrb@linux.ibm.com>
+Content-Language: en-US
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20221019145320.1228710-2-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: -WYLf3cqlnDs1Y6CYjIA7AGo9uBMs2sW
+X-Proofpoint-ORIG-GUID: VDkeFOKOkBqFqIUnIQ0GkjaEvW6ZG-v-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-20_01,2022-10-19_04,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ lowpriorityscore=0 mlxlogscore=999 priorityscore=1501 suspectscore=0
+ adultscore=0 impostorscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ mlxscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210200037
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, the debug-exceptions test always uses only
-{break,watch}point#0 and the highest numbered context-aware
-breakpoint. Modify the test to use all {break,watch}points and
-context-aware breakpoints supported on the system.
+On 10/19/22 16:53, Nico Boehr wrote:
+> Currently, dump support is always enabled by setting the respective
+> plaintext control flag (PCF). Unfortunately, older machines without
+> support for PV dump will not start the guest when this PCF is set. This
+> will result in an error message like this:
+> 
+> qemu-system-s390x: KVM PV command 2 (KVM_PV_SET_SEC_PARMS) failed: header rc 106 rrc 0 IOCTL rc: -22
+> 
+> Hence, by default, disable dump support to preserve compatibility with
+> older machines. Users can enable dumping support by passing
+> --enable-dump to the configure script.
+> 
 
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
----
- .../selftests/kvm/aarch64/debug-exceptions.c  | 54 ++++++++++++++-----
- 1 file changed, 42 insertions(+), 12 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-index 73a95e6b345e..b30add3e7726 100644
---- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-+++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-@@ -420,12 +420,11 @@ static int debug_version(uint64_t id_aa64dfr0)
- 	return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), id_aa64dfr0);
- }
- 
--static void test_guest_debug_exceptions(uint64_t aa64dfr0)
-+static void test_guest_debug_exceptions(uint8_t bpn, uint8_t wpn, uint8_t ctx_bpn)
- {
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_vm *vm;
- 	struct ucall uc;
--	uint8_t brp_num;
- 
- 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
- 	ucall_init(vm, NULL);
-@@ -444,15 +443,9 @@ static void test_guest_debug_exceptions(uint64_t aa64dfr0)
- 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
- 				ESR_EC_SVC64, guest_svc_handler);
- 
--	/* Number of breakpoints */
--	brp_num = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_BRPS), aa64dfr0) + 1;
--	__TEST_REQUIRE(brp_num >= 2, "At least two breakpoints are required");
--
--	/*
--	 * Run tests with breakpoint#0, watchpoint#0, and the higiest
--	 * numbered (context-aware) breakpoint.
--	 */
--	vcpu_args_set(vcpu, 3, 0, 0, brp_num - 1);
-+	/* Specify bpn/wpn/ctx_bpn to be tested */
-+	vcpu_args_set(vcpu, 3, bpn, wpn, ctx_bpn);
-+	pr_debug("Use bpn#%d, wpn#%d and ctx_bpn#%d\n", bpn, wpn, ctx_bpn);
- 
- 	vcpu_run(vcpu);
- 	switch (get_ucall(vcpu, &uc)) {
-@@ -535,6 +528,43 @@ void test_single_step_from_userspace(int test_cnt)
- 	kvm_vm_free(vm);
- }
- 
-+/*
-+ * Run debug testing using the various breakpoint#, watchpoint# and
-+ * context-aware breakpoint# with the given ID_AA64DFR0_EL1 configuration.
-+ */
-+void test_guest_debug_exceptions_all(uint64_t aa64dfr0)
-+{
-+	uint8_t brp_num, wrp_num, ctx_brp_num, normal_brp_num, ctx_brp_base;
-+	int b, w, c;
-+
-+	/* Number of breakpoints */
-+	brp_num = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_BRPS), aa64dfr0) + 1;
-+	__TEST_REQUIRE(brp_num >= 2, "At least two breakpoints are required");
-+
-+	/* Number of watchpoints */
-+	wrp_num = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_WRPS), aa64dfr0) + 1;
-+
-+	/* Number of context aware breakpoints */
-+	ctx_brp_num = FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_CTX_CMPS), aa64dfr0) + 1;
-+
-+	pr_debug("%s brp_num:%d, wrp_num:%d, ctx_brp_num:%d\n", __func__,
-+		 brp_num, wrp_num, ctx_brp_num);
-+
-+	/* Number of normal (non-context aware) breakpoints */
-+	normal_brp_num = brp_num - ctx_brp_num;
-+
-+	/* Lowest context aware breakpoint number */
-+	ctx_brp_base = normal_brp_num;
-+
-+	/* Run tests with all supported breakpoints/watchpoints */
-+	for (c = ctx_brp_base; c < ctx_brp_base + ctx_brp_num; c++) {
-+		for (b = 0; b < normal_brp_num; b++) {
-+			for (w = 0; w < wrp_num; w++)
-+				test_guest_debug_exceptions(b, w, c);
-+		}
-+	}
-+}
-+
- static void help(char *name)
- {
- 	puts("");
-@@ -569,7 +599,7 @@ int main(int argc, char *argv[])
- 		}
- 	}
- 
--	test_guest_debug_exceptions(aa64dfr0);
-+	test_guest_debug_exceptions_all(aa64dfr0);
- 	test_single_step_from_userspace(ss_iteration);
- 
- 	return 0;
--- 
-2.38.0.413.g74048e4d9e-goog
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
