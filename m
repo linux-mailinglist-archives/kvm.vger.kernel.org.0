@@ -2,253 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C17DC605847
-	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 09:20:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05A2C605881
+	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 09:28:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230238AbiJTHUL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Oct 2022 03:20:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47698 "EHLO
+        id S229961AbiJTH2N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Oct 2022 03:28:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230208AbiJTHUC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Oct 2022 03:20:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFCDA15A1A
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 00:19:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666250397;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=d9HqOzVsB8T4yggWYl1bqige06n7AwLzVreZ+LrEySM=;
-        b=KzWb2GdqCw9t6whQCncjrTJ9pC6Gb2HBe7EpSnkOjwQaSyhAcR8aPHbavrnxdaq5OtGFUq
-        y4praoinjLI7y2Ycfhx/VU6ioWwyl5vaEQfM0IidH/5k3XpxHKHWqmHEu26JZvw54+pH2p
-        EkodJhJOPsOGLlBN3C9AHT8U46wY1VA=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-339--4tmXxcVONmOztGz3krQ0w-1; Thu, 20 Oct 2022 03:19:54 -0400
-X-MC-Unique: -4tmXxcVONmOztGz3krQ0w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EDD051C068C9;
-        Thu, 20 Oct 2022 07:19:53 +0000 (UTC)
-Received: from [10.64.54.70] (vpn2-54-70.bne.redhat.com [10.64.54.70])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A5A1EC15BA5;
-        Thu, 20 Oct 2022 07:19:45 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH 4/6] KVM: selftests: memslot_perf_test: Support variable
- guest page size
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
-        zhenyzha@redhat.com, shan.gavin@gmail.com, kvmarm@lists.linux.dev,
-        pbonzini@redhat.com, shuah@kernel.org,
-        kvmarm@lists.cs.columbia.edu, ajones@ventanamicro.com
-References: <20221014071914.227134-1-gshan@redhat.com>
- <20221014071914.227134-5-gshan@redhat.com>
- <3eecebca-a526-d10a-02d3-496ce919d577@maciej.szmigiero.name>
- <bd5df92c-6870-8053-0b35-a2ad993970bd@redhat.com>
- <da2b7db0-509a-c9e0-c36b-6487a265a779@redhat.com>
- <a1a8664c-4d06-89e7-8cfa-b730969bb841@maciej.szmigiero.name>
- <5bfbe050-a654-8400-e1f1-dcfa4dba13e6@redhat.com>
- <a45cfcc9-0255-14f0-30a5-18d6efaad0d4@maciej.szmigiero.name>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <001d6b60-dc05-370d-5cb3-9f8f855089c3@redhat.com>
-Date:   Thu, 20 Oct 2022 15:19:42 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        with ESMTP id S229931AbiJTH2K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Oct 2022 03:28:10 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AECD1633B2;
+        Thu, 20 Oct 2022 00:28:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1666250885; x=1697786885;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=QewixQfgm3HBp8Zzn7LLgL+CKWo5zXT8KcWLvc3D8hM=;
+  b=iYLJgaFAIWs8b9ZNOdgq2gI6gup7OuQC4iGUrN1xZyM9Nq46BtmJST0n
+   FvCv4y8GnIY0Dn286RSRscN1vVDscNf301WwCEpZgNqJimpLefDLmRYaT
+   Rrjks3iBG/nYRlRR2F2KrGIZrG6wKJ8m2c+xbZ9dpKJ2gnd+JFUMGoi51
+   zUKT12NVol8hdYI4OawgM5aehWLiGvVC/xgXMIPISKK633yZhs7aWJ+JO
+   h6kxBeuWd9k+4HvifCTYRtt2MfvFBIB4FVTEHl/jidb6Uf2jTGsc3cUUc
+   c1Ww8LY1SstR+0VIx5euKOajrnSqiVf1ayvsSfF3GC/BzIC2X5WMfuTDO
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10505"; a="286351772"
+X-IronPort-AV: E=Sophos;i="5.95,198,1661842800"; 
+   d="scan'208";a="286351772"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2022 00:28:04 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10505"; a="629655174"
+X-IronPort-AV: E=Sophos;i="5.95,198,1661842800"; 
+   d="scan'208";a="629655174"
+Received: from jiaxiche-mobl.ccr.corp.intel.com (HELO [10.238.2.23]) ([10.238.2.23])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2022 00:27:58 -0700
+Message-ID: <cd225cb6-9b74-4dca-bb35-6bde5e80701e@linux.intel.com>
+Date:   Thu, 20 Oct 2022 15:27:56 +0800
 MIME-Version: 1.0
-In-Reply-To: <a45cfcc9-0255-14f0-30a5-18d6efaad0d4@maciej.szmigiero.name>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.1
+Subject: Re: [PATCH 1/6] x86: KVM: Enable CMPccXADD CPUID and expose it to
+ guest
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, pbonzini@redhat.com, ndesaulniers@google.com,
+        alexandre.belloni@bootlin.com, peterz@infradead.org,
+        jpoimboe@kernel.org, chang.seok.bae@intel.com,
+        pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com,
+        jmattson@google.com, sandipan.das@amd.com, tony.luck@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, fenghua.yu@intel.com,
+        keescook@chromium.org, jane.malalane@citrix.com, nathan@kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20221019084734.3590760-1-jiaxi.chen@linux.intel.com>
+ <20221019084734.3590760-2-jiaxi.chen@linux.intel.com>
+ <Y1AUhlwWjIkKfZHA@google.com>
+From:   "Chen, Jiaxi" <jiaxi.chen@linux.intel.com>
+In-Reply-To: <Y1AUhlwWjIkKfZHA@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/20/22 4:18 AM, Maciej S. Szmigiero wrote:
-> On 19.10.2022 02:26, Gavin Shan wrote:
->> On 10/18/22 11:56 PM, Maciej S. Szmigiero wrote:
->>> On 18.10.2022 02:51, Gavin Shan wrote:
->>>> On 10/18/22 8:46 AM, Gavin Shan wrote:
->>>>> On 10/18/22 5:31 AM, Maciej S. Szmigiero wrote:
->>>>>> On 14.10.2022 09:19, Gavin Shan wrote:
->>>>>>> The test case is obviously broken on aarch64 because non-4KB guest
->>>>>>> page size is supported. The guest page size on aarch64 could be 4KB,
->>>>>>> 16KB or 64KB.
->>>>>>>
->>>>>>> This supports variable guest page size, mostly for aarch64.
->>>>>>>
->>>>>>>    - The host determines the guest page size when virtual machine is
->>>>>>>      created. The value is also passed to guest through the synchronization
->>>>>>>      area.
->>>>>>>
->>>>>>>    - The number of guest pages are unknown until the virtual machine
->>>>>>>      is to be created. So all the related macros are dropped. Instead,
->>>>>>>      their values are dynamically calculated based on the guest page
->>>>>>>      size.
->>>>>>>
->>>>>>>    - The static checks on memory sizes and pages becomes dependent
->>>>>>>      on guest page size, which is unknown until the virtual machine
->>>>>>>      is about to be created. So all the static checks are converted
->>>>>>>      to dynamic checks, done in check_memory_sizes().
->>>>>>>
->>>>>>>    - As the address passed to madvise() should be aligned to host page,
->>>>>>>      the size of page chunk is automatically selected, other than one
->>>>>>>      page.
->>>>>>>
->>>>>>>    - All other changes included in this patch are almost mechanical
->>>>>>>      replacing '4096' with 'guest_page_size'.
->>>>>>>
->>>>>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
->>>>>>> ---
->>>>>>>   .../testing/selftests/kvm/memslot_perf_test.c | 191 +++++++++++-------
->>>>>>>   1 file changed, 115 insertions(+), 76 deletions(-)
->>>>>>>
->>>>>>> diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
->>>>>>> index d5aa9148f96f..d587bd952ff9 100644
->>>>>>> --- a/tools/testing/selftests/kvm/memslot_perf_test.c
->>>>>>> +++ b/tools/testing/selftests/kvm/memslot_perf_test.c
->>> (...)
->>>>>>> @@ -77,8 +61,7 @@ static_assert(MEM_TEST_UNMAP_SIZE_PAGES %
->>>>>>>    * for the total size of 25 pages.
->>>>>>>    * Hence, the maximum size here is 50 pages.
->>>>>>>    */
->>>>>>> -#define MEM_TEST_MOVE_SIZE_PAGES    (50)
->>>>>>> -#define MEM_TEST_MOVE_SIZE        (MEM_TEST_MOVE_SIZE_PAGES * 4096)
->>>>>>> +#define MEM_TEST_MOVE_SIZE        0x32000
->>>>>>
->>>>>> The above number seems less readable than an explicit value of 50 pages.
->>>>>>
->>>>>> In addition to that, it's 50 pages only with 4k page size, so at least
->>>>>> the comment above needs to be updated to reflect this fact.
->>>>>>
->>>>>
->>>>> Yeah, I will change the comments like below in next revision.
->>>>>
->>>>>   /*
->>>>>    * When running this test with 32k memslots, actually 32763 excluding
->>>>>    * the reserved memory slot 0, the memory for each slot is 0x4000 bytes.
->>>>>    * The last slot contains 0x19000 bytes memory. Hence, the maximum size
->>>>>    * here is 0x32000 bytes.
->>>>>    */
->>>>>
->>>>
->>>> I will replace those numbers with readable ones like below :)
->>>>
->>>> /*
->>>>   * When running this test with 32k memslots, actually 32763 excluding
->>>>   * the reserved memory slot 0, the memory for each slot is 16KB. The
->>>>   * last slot contains 100KB memory with the remaining 84KB. Hence,
->>>>   * the maximum size is double of that (200KB)
->>>>   */
->>>
->>> Still, these numbers are for x86, which has KVM_INTERNAL_MEM_SLOTS
->>> defined as 3.
->>>
->>> As far as I can see aarch64 has KVM_INTERNAL_MEM_SLOTS equal to 0, so
->>> this arch has 32766 slot available for the test memory.
->>>
->>> Quick calculations show that this will result in 112 KiB of memory in
->>> the last slot for 4 KiB page size (while for 64 KiB page size the
->>> maximum slot count for this test is 8192 anyway - not counting slot 0).
->>>
+
+
+在 2022/10/19 23:15, Sean Christopherson 写道:
+> For all the shortlogs, "expose it to guest" is technically wrong.  Adding
+> recognition in kvm/cpuid.c advertises KVM support to host userspace.  Whether or
+> not a feature is exposed to the guest is up to the userspace VMM.
+
+Thanks for reminding. How about to change the subject to this:
+x86: KVM: Advertise CMPccXADD CPUID to userspace
+> 
+> On Wed, Oct 19, 2022, Jiaxi Chen wrote:
+>> CMPccXADD is a new set of instructions in the latest Intel platform Sierra
+>> Forest. It includes a semaphore operation that can compare and add the
+> 
+> In general, avoid pronouns in changelogs, it's not clear what "it" refers to here.
+> 
+Will change it to: 'This new instruction set' here and avoid use pronouns in
+the future commit message.
+
+> And for all of these changelogs, please explicitly state that there are no VMX
+> controls for these instructions, assuming that's actually true.  From a KVM
+> perspective, that's far more interesting than the details of the instruction(s).
+> 
+Yes, thanks for comments. Will change this patch series to: 
+This instruction has no other VMX control except for exposed to userspace.
+
+>> operands if condition is met, which can improve database performance.
 >>
->> It seems your calculation had (512MB+64KB), instead of (512MB+4KB).
->> In this particular patch, we still have (512MB+4KB). How about to change
->> like below in this patch. In next patch, it's adjusted accordingly after
->> we have (512MB+64KB).
-> 
-> My review comment above referred to the final MEM_SIZE value after the
-> whole series, so 512 MiB + 64 KiB.
-> 
-> I placed that review comment on patch 4 since it's the only patch in this
-> series that modified the code comment about MEM_TEST_MOVE_SIZE.
-> 
+>> The bit definition:
+>> CPUID.(EAX=7,ECX=1):EAX[bit 7]
 >>
->> (1) In this patch, the comment is changed to as below
+>> This patch enables this CPUID in the kernel feature bits and expose it to
+>> guest OS.
+> 
+> Same thing here, KVM doesn't decide whether or not to expose the feature to the
+> guest.
+> 
+Applied.Thanks.
+>> Signed-off-by: Jiaxi Chen <jiaxi.chen@linux.intel.com>
+>> ---
+>>  arch/x86/include/asm/cpufeatures.h | 1 +
+>>  arch/x86/kvm/cpuid.c               | 2 +-
+>>  2 files changed, 2 insertions(+), 1 deletion(-)
 >>
->>      /*
->>       * We have different number of memory slots, excluding the reserved
->>       * memory slot 0, on various architectures and configurations. The
->>       * memory size in this test is calculated by doubling the maximal
->>       * memory size in last memory slot, with alignment to the largest
->>       * supported page size (64KB).
->>       *
->>       * architecture   slots    memory-per-slot    memory-on-last-slot
->>       * --------------------------------------------------------------
->>       * x86-4KB        32763    16KB               100KB
->>       * arm64-4KB      32766    16KB               52KB
->>       * arm64-64KB     8192     64KB               64KB
->>       */
->>      #define MEM_TEST_MOVE_SIZE    0x40000           /* 256KB */
->>
->> (2) In the next patch, where we have (512MB+64KB) after the various
->>      memory sizes are consolidated, It is adjusted accordingly as below.
->>
->>      /*
->>       * We have different number of memory slots, excluding the reserved
->>       * memory slot 0, on various architectures and configurations. The
->>       * memory size in this test is calculated by doubling the maximal
->>       * memory size in last memory slot, with alignment to the largest
->>       * supported page size (64KB).
->>       *
->>       * architecture   slots    memory-per-slot    memory-on-last-slot
->>       * --------------------------------------------------------------
->>       * x86-4KB        32763    16KB               160KB
->>       * arm64-4KB      32766    16KB               112KB
->>       * arm64-64KB     8192     64KB               128KB
->>       */
->>      #define MEM_TEST_MOVE_SIZE    0x50000           /* 320KB */
+>> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+>> index ef4775c6db01..445626cb5779 100644
+>> --- a/arch/x86/include/asm/cpufeatures.h
+>> +++ b/arch/x86/include/asm/cpufeatures.h
+>> @@ -308,6 +308,7 @@
+>>  /* Intel-defined CPU features, CPUID level 0x00000007:1 (EAX), word 12 */
+>>  #define X86_FEATURE_AVX_VNNI		(12*32+ 4) /* AVX VNNI instructions */
+>>  #define X86_FEATURE_AVX512_BF16		(12*32+ 5) /* AVX512 BFLOAT16 instructions */
+>> +#define X86_FEATURE_CMPCCXADD           (12*32+ 7) /* CMPccXADD instructions */
 > 
-> Now MEM_TEST_MOVE_SIZE is too high for arm64-4KB and arm64-64KB cases
-> (it needs 160 KiB in the last slot but has less available in these two
-> cases).
+> Boris,
 > 
-> Using a test size of 192 KiB instead seems like a small difference
-> from the original size of 200 KiB, while still being aligned to
-> 64 KiB.
-> 
-> The move benchmarks runtime difference on x86-4KB with this size
-> (compared to sizes of 200 KiB and 320 KiB) seems to be negligible.
-> 
-> Since it's an odd number of 64 KiB pages (3) the code that halves
-> this number of pages will need to be adjusted to operate on raw
-> sizes instead.
-> 
-> I can see a single block of code that will need such adjustment:
->> if (lastpages < move_pages / 2) {
->>         *maxslots = 0;
->>         return false;
->> } 
-> 
-> Similar remark goes for the case (1) above, where you'll probably need
-> to use 64 KiB test area size (it's only an intermediate form of code
-> before the final patch changes this value so it's fine if it doesn't
-> perform as well as the final form of the code).
-> 
-
-Maciej, all your comments make sense to me. It really took me some times
-to do the calculation. I just posted v3 to address all your comments.
-Hopefully, there is nothing missed. Please go ahead to review v3 directly
-when you get a chance.
-
-    v3: https://lore.kernel.org/kvmarm/20221020071209.559062-1-gshan@redhat.com/T/#t
-
-In v3, the comments about MEM_TEST_MOVE_SIZE is fixed in PATCH[v3 4/6],
-but it's 64KB. In PATCH[v3 5/6], it's fixed up to 192KB and memory size
-is used for the comparison in test_memslot_move_prepare().
-
-Thanks,
-Gavin
-
-
+> What do you think about moving CPUID_7_1_EAX to be a KVM-only leaf too?  AFAICT,
+> KVM passthrough is the only reason the existing features are defined.
