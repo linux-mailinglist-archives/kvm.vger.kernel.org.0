@@ -2,239 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 84CBC6061F9
-	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 15:40:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DB168606203
+	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 15:42:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231249AbiJTNke (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Oct 2022 09:40:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39640 "EHLO
+        id S230089AbiJTNmC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Oct 2022 09:42:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230387AbiJTNkY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Oct 2022 09:40:24 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 955244C2FA
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 06:40:11 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 84D7861B6C
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 13:40:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B87C6C433D7;
-        Thu, 20 Oct 2022 13:40:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666273209;
-        bh=Uuj76PE5UrSVtEHGj/sJNXinl/fnjBDdTi8gPTrjZJ8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=TerLUVEAjjgNqSJ9Woe0yIin3a6Iw7z8cKuP/fpOH4ZqUW+FWOhspDn6FOQjEakW5
-         wjPbJWJxmHYPFKfiIz0V2mtUVdePhiovx67JzDEE0uUhhoH50TkbyxLumX//7CXLJW
-         rbWugNFMB/wGlwavvwwnFevdyLhbBqUQIkqyCyNUWLvKJ6BTQVWwF6H9uZGhFl1UBH
-         rfAKo3YgNbaFaNRJ9KMIY9gl5gg39iFfr2CJ//JksexDiK4expkIw9F0wzxA02Oddm
-         Z5r5o6KzzsHwoB2oko1ZweaFVDEmrN0Lvd8vp3cavcu4XKZYcQPze4WDQDq6vog8J9
-         FxDzkCCanCp5g==
-From:   Will Deacon <will@kernel.org>
-To:     kvmarm@lists.linux.dev
-Cc:     Will Deacon <will@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Vincent Donnefort <vdonnefort@google.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [RFC PATCH v5 25/25] KVM: arm64: Use the pKVM hyp vCPU structure in handle___kvm_vcpu_run()
-Date:   Thu, 20 Oct 2022 14:38:27 +0100
-Message-Id: <20221020133827.5541-26-will@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20221020133827.5541-1-will@kernel.org>
-References: <20221020133827.5541-1-will@kernel.org>
+        with ESMTP id S230123AbiJTNlf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Oct 2022 09:41:35 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F5801A650D;
+        Thu, 20 Oct 2022 06:41:22 -0700 (PDT)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29KDGrx4025981;
+        Thu, 20 Oct 2022 13:41:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : from
+ : to : subject : cc : message-id : date; s=pp1;
+ bh=t8l3kKsZDZ/AZkt0hRQbiV3KZM8BxnPFYuJg5YPTk8o=;
+ b=Dkb96XS0AdGa/jCNdSv2V5p6tlnzzobgrkSVNrZe5LYVk0Egq6MFNbAPcMuD9ESihsn6
+ QCi7A0RPewtJM4Hv57MVkjCvyRQ92eUTgKp5hJuszvmST7xwisucp9RVhEvdIcRyYn2h
+ O9o9dGX16V6BPv9n0IknRuvLPNEnsHdWZTMB1yZJ++9xHwiG7YAHCPFlFsjkzcfYLIr1
+ 7egAPcJ/8BxHlwmAmswVspTQuTg8P//SkmkTlXCIOayvhK01MlblQYPnYyBtSiKWD0Ui
+ cA9Ohhk+/2miyROJYVmJc+xzAbqoxZTBjAfGnXtm2iWvBXd3mg2QKhvXgXKU53XtYDJS +Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kb72y12gb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Oct 2022 13:41:03 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29KDH2tY026402;
+        Thu, 20 Oct 2022 13:41:02 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kb72y12ed-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Oct 2022 13:41:02 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29KDaLVO006241;
+        Thu, 20 Oct 2022 13:41:00 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06ams.nl.ibm.com with ESMTP id 3kajmrsqer-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 20 Oct 2022 13:41:00 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29KDevWa61211124
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 20 Oct 2022 13:40:57 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1B4A64C044;
+        Thu, 20 Oct 2022 13:40:57 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F0E504C040;
+        Thu, 20 Oct 2022 13:40:56 +0000 (GMT)
+Received: from t14-nrb (unknown [9.155.203.253])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 20 Oct 2022 13:40:56 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20221012205609.2811294-2-scgl@linux.ibm.com>
+References: <20221012205609.2811294-1-scgl@linux.ibm.com> <20221012205609.2811294-2-scgl@linux.ibm.com>
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+Subject: Re: [PATCH v2 1/9] s390/uaccess: Add storage key checked cmpxchg access to user space
+Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>
+Message-ID: <166627325676.27216.13358887886569042677@t14-nrb>
+User-Agent: alot/0.8.1
+Date:   Thu, 20 Oct 2022 15:40:56 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: DLrlK0IIG6wl0xaMkZClxGmT1kqTLDv1
+X-Proofpoint-GUID: 6NA1uWqsDKKHW0CEddXjic_nuy0441YH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-20_04,2022-10-20_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ priorityscore=1501 suspectscore=0 adultscore=0 clxscore=1015 mlxscore=0
+ spamscore=0 phishscore=0 mlxlogscore=999 bulkscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210200080
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As a stepping stone towards deprivileging the host's access to the
-guest's vCPU structures, introduce some naive flush/sync routines to
-copy most of the host vCPU into the hyp vCPU on vCPU run and back
-again on return to EL1.
+Quoting Janis Schoetterl-Glausch (2022-10-12 22:56:01)
+[...]
+> diff --git a/arch/s390/include/asm/uaccess.h b/arch/s390/include/asm/uacc=
+ess.h
+> index f7038b800cc3..f148f5a22c93 100644
+[...]
+> +static __always_inline int __cmpxchg_user_key_small(int size, u64 addres=
+s,
+> +                                                   unsigned __int128 *ol=
+d_p,
+> +                                                   unsigned __int128 new=
+, u8 access_key)
+> +{
 
-This allows us to run using the pKVM hyp structures when KVM is
-initialised in protected mode.
+This function is quite hard to understand for me without some context. I ha=
+ve a
+few suggestions for some comments and one small question below.
 
-Tested-by: Vincent Donnefort <vdonnefort@google.com>
-Co-developed-by: Fuad Tabba <tabba@google.com>
-Signed-off-by: Fuad Tabba <tabba@google.com>
-Signed-off-by: Will Deacon <will@kernel.org>
----
- arch/arm64/kvm/hyp/include/nvhe/pkvm.h |  4 ++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c     | 79 +++++++++++++++++++++++++-
- arch/arm64/kvm/hyp/nvhe/pkvm.c         | 28 +++++++++
- 3 files changed, 109 insertions(+), 2 deletions(-)
+> +       u32 shift, mask, old_word, new_word, align_mask, tmp;
+> +       u64 aligned;
+> +       int ret =3D -EFAULT;
+> +
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-index d14dfbcb7da1..82b3d62538a6 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
-@@ -61,4 +61,8 @@ int __pkvm_init_vcpu(pkvm_handle_t handle, struct kvm_vcpu *host_vcpu,
- 		     unsigned long vcpu_hva);
- int __pkvm_teardown_vm(pkvm_handle_t handle);
- 
-+struct pkvm_hyp_vcpu *pkvm_load_hyp_vcpu(pkvm_handle_t handle,
-+					 unsigned int vcpu_idx);
-+void pkvm_put_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu);
-+
- #endif /* __ARM64_KVM_NVHE_PKVM_H__ */
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index b5f3fcfe9135..728e01d4536b 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -22,11 +22,86 @@ DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
- 
- void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
- 
-+static void flush_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-+
-+	hyp_vcpu->vcpu.arch.ctxt	= host_vcpu->arch.ctxt;
-+
-+	hyp_vcpu->vcpu.arch.sve_state	= kern_hyp_va(host_vcpu->arch.sve_state);
-+	hyp_vcpu->vcpu.arch.sve_max_vl	= host_vcpu->arch.sve_max_vl;
-+
-+	hyp_vcpu->vcpu.arch.hw_mmu	= host_vcpu->arch.hw_mmu;
-+
-+	hyp_vcpu->vcpu.arch.hcr_el2	= host_vcpu->arch.hcr_el2;
-+	hyp_vcpu->vcpu.arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
-+	hyp_vcpu->vcpu.arch.cptr_el2	= host_vcpu->arch.cptr_el2;
-+
-+	hyp_vcpu->vcpu.arch.iflags	= host_vcpu->arch.iflags;
-+	hyp_vcpu->vcpu.arch.fp_state	= host_vcpu->arch.fp_state;
-+
-+	hyp_vcpu->vcpu.arch.debug_ptr	= kern_hyp_va(host_vcpu->arch.debug_ptr);
-+	hyp_vcpu->vcpu.arch.host_fpsimd_state = host_vcpu->arch.host_fpsimd_state;
-+
-+	hyp_vcpu->vcpu.arch.vsesr_el2	= host_vcpu->arch.vsesr_el2;
-+
-+	hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3 = host_vcpu->arch.vgic_cpu.vgic_v3;
-+}
-+
-+static void sync_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	struct kvm_vcpu *host_vcpu = hyp_vcpu->host_vcpu;
-+	struct vgic_v3_cpu_if *hyp_cpu_if = &hyp_vcpu->vcpu.arch.vgic_cpu.vgic_v3;
-+	struct vgic_v3_cpu_if *host_cpu_if = &host_vcpu->arch.vgic_cpu.vgic_v3;
-+	unsigned int i;
-+
-+	host_vcpu->arch.ctxt		= hyp_vcpu->vcpu.arch.ctxt;
-+
-+	host_vcpu->arch.hcr_el2		= hyp_vcpu->vcpu.arch.hcr_el2;
-+	host_vcpu->arch.cptr_el2	= hyp_vcpu->vcpu.arch.cptr_el2;
-+
-+	host_vcpu->arch.fault		= hyp_vcpu->vcpu.arch.fault;
-+
-+	host_vcpu->arch.iflags		= hyp_vcpu->vcpu.arch.iflags;
-+	host_vcpu->arch.fp_state	= hyp_vcpu->vcpu.arch.fp_state;
-+
-+	host_cpu_if->vgic_hcr		= hyp_cpu_if->vgic_hcr;
-+	for (i = 0; i < hyp_cpu_if->used_lrs; ++i)
-+		host_cpu_if->vgic_lr[i] = hyp_cpu_if->vgic_lr[i];
-+}
-+
- static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
- {
--	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
-+	DECLARE_REG(struct kvm_vcpu *, host_vcpu, host_ctxt, 1);
-+	int ret;
-+
-+	host_vcpu = kern_hyp_va(host_vcpu);
-+
-+	if (unlikely(is_protected_kvm_enabled())) {
-+		struct pkvm_hyp_vcpu *hyp_vcpu;
-+		struct kvm *host_kvm;
-+
-+		host_kvm = kern_hyp_va(host_vcpu->kvm);
-+		hyp_vcpu = pkvm_load_hyp_vcpu(host_kvm->arch.pkvm.handle,
-+					      host_vcpu->vcpu_idx);
-+		if (!hyp_vcpu) {
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+
-+		flush_hyp_vcpu(hyp_vcpu);
-+
-+		ret = __kvm_vcpu_run(&hyp_vcpu->vcpu);
-+
-+		sync_hyp_vcpu(hyp_vcpu);
-+		pkvm_put_hyp_vcpu(hyp_vcpu);
-+	} else {
-+		/* The host is fully trusted, run its vCPU directly. */
-+		ret = __kvm_vcpu_run(host_vcpu);
-+	}
- 
--	cpu_reg(host_ctxt, 1) =  __kvm_vcpu_run(kern_hyp_va(vcpu));
-+out:
-+	cpu_reg(host_ctxt, 1) =  ret;
- }
- 
- static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 0504f2678bd4..6f78a92679f4 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -241,6 +241,33 @@ static struct pkvm_hyp_vm *get_vm_by_handle(pkvm_handle_t handle)
- 	return vm_table[idx];
- }
- 
-+struct pkvm_hyp_vcpu *pkvm_load_hyp_vcpu(pkvm_handle_t handle,
-+					 unsigned int vcpu_idx)
-+{
-+	struct pkvm_hyp_vcpu *hyp_vcpu = NULL;
-+	struct pkvm_hyp_vm *hyp_vm;
-+
-+	hyp_spin_lock(&vm_table_lock);
-+	hyp_vm = get_vm_by_handle(handle);
-+	if (!hyp_vm || hyp_vm->nr_vcpus <= vcpu_idx)
-+		goto unlock;
-+
-+	hyp_vcpu = hyp_vm->vcpus[vcpu_idx];
-+	hyp_page_ref_inc(hyp_virt_to_page(hyp_vm));
-+unlock:
-+	hyp_spin_unlock(&vm_table_lock);
-+	return hyp_vcpu;
-+}
-+
-+void pkvm_put_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu)
-+{
-+	struct pkvm_hyp_vm *hyp_vm = pkvm_hyp_vcpu_to_hyp_vm(hyp_vcpu);
-+
-+	hyp_spin_lock(&vm_table_lock);
-+	hyp_page_ref_dec(hyp_virt_to_page(hyp_vm));
-+	hyp_spin_unlock(&vm_table_lock);
-+}
-+
- static void unpin_host_vcpu(struct kvm_vcpu *host_vcpu)
- {
- 	if (host_vcpu)
-@@ -286,6 +313,7 @@ static int init_pkvm_hyp_vcpu(struct pkvm_hyp_vcpu *hyp_vcpu,
- 	hyp_vcpu->vcpu.vcpu_idx = vcpu_idx;
- 
- 	hyp_vcpu->vcpu.arch.hw_mmu = &hyp_vm->kvm.arch.mmu;
-+	hyp_vcpu->vcpu.arch.cflags = READ_ONCE(host_vcpu->arch.cflags);
- done:
- 	if (ret)
- 		unpin_host_vcpu(host_vcpu);
--- 
-2.38.0.413.g74048e4d9e-goog
+something like this:
 
+/*
+ * There is no instruction for 2 and 1 byte compare swap, hence emulate it =
+with
+ * a 4-byte compare swap.
+ * When the 4-bytes compare swap fails, it can be because the actual value =
+user
+ * space wanted to exchange mismatched. In this case, return to user space.
+ * Or it can be because something outside of the value user space wanted to
+ * access mismatched (the "remainder" of the word). In this case, retry in
+ * kernel space.
+ */
+
+> +       switch (size) {
+> +       case 2:
+
+/* assume address is 2-byte-aligned - cannot cross word boundary */
+
+> +               align_mask =3D 2;
+
+/* fancy way of saying aligned =3D address & ~align_mask */
+
+> +               aligned =3D (address ^ (address & align_mask));
+
+/* generate mask to extract value to xchg from the word */
+
+> +               shift =3D (sizeof(u32) - (address & align_mask) - size) *=
+ 8;
+> +               mask =3D 0xffff << shift;
+> +               old_word =3D ((u16)*old_p) << shift;
+> +               new_word =3D ((u16)new) << shift;
+> +               break;
+> +       case 1:
+> +               align_mask =3D 3;
+> +               aligned =3D (address ^ (address & align_mask));
+> +               shift =3D (sizeof(u32) - (address & align_mask) - size) *=
+ 8;
+> +               mask =3D 0xff << shift;
+> +               old_word =3D ((u8)*old_p) << shift;
+> +               new_word =3D ((u8)new) << shift;
+> +               break;
+> +       }
+> +       tmp =3D old_word; /* don't modify *old_p on fault */
+> +       asm volatile(
+> +                      "spka    0(%[access_key])\n"
+
+/* secondary space has user asce loaded */
+
+> +               "       sacf    256\n"
+> +               "0:     l       %[tmp],%[aligned]\n"
+> +               "1:     nr      %[tmp],%[mask]\n"
+
+/* invert mask to generate mask for the remainder */
+
+> +               "       xilf    %[mask],0xffffffff\n"
+> +               "       or      %[new_word],%[tmp]\n"
+> +               "       or      %[tmp],%[old_word]\n"
+> +               "2:     lr      %[old_word],%[tmp]\n"
+> +               "3:     cs      %[tmp],%[new_word],%[aligned]\n"
+> +               "4:     jnl     5f\n"
+> +               /* We'll restore old_word before the cs, use reg for the =
+diff */
+> +               "       xr      %[old_word],%[tmp]\n"
+> +               /* Apply diff assuming only bits outside target byte(s) c=
+hanged */
+> +               "       xr      %[new_word],%[old_word]\n"
+> +               /* If prior assumption false we exit loop, so not an issu=
+e */
+> +               "       nr      %[old_word],%[mask]\n"
+> +               "       jz      2b\n"
+
+So if the remainder changed but the actual value to exchange stays the same=
+, we
+loop in the kernel. Does it maybe make sense to limit the number of iterati=
+ons
+we spend retrying? I think while looping here the calling process can't be
+killed, can it?
