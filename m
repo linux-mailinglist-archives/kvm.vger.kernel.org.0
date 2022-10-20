@@ -2,120 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 67B6260599C
-	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 10:22:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 93EE56059D7
+	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 10:32:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231297AbiJTIWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Oct 2022 04:22:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34760 "EHLO
+        id S229711AbiJTIc5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Oct 2022 04:32:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231301AbiJTIWm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Oct 2022 04:22:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1DEE171CFF
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 01:22:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666254145;
+        with ESMTP id S230078AbiJTIc4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Oct 2022 04:32:56 -0400
+Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C168018B4BF
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 01:32:33 -0700 (PDT)
+Date:   Thu, 20 Oct 2022 11:32:28 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1666254751;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=NXxC5THgAjtEYfgbLwABUhO1u5EsuU0JRYrQfyg0GwE=;
-        b=GSTGPFRV0HIksq6uiqH5BHD31Mfm4kGsbNEBEH+2UcO6JTa76uhqRUoF2JWsH/s3R60Klx
-        HxDS5ztEGny7ZFnjpF9POITdKn99Ia6gCF226/Tfag45FhMx16YbkjsN/zIqE0V+muWucP
-        8ZtToTFJXqk/GOUaSjBLGNy7EF2EAA0=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-595-Dp48Nrj5M_C6PRbyFV0GDg-1; Thu, 20 Oct 2022 04:22:23 -0400
-X-MC-Unique: Dp48Nrj5M_C6PRbyFV0GDg-1
-Received: by mail-ej1-f72.google.com with SMTP id xj11-20020a170906db0b00b0077b6ecb23fcso9082986ejb.5
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 01:22:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NXxC5THgAjtEYfgbLwABUhO1u5EsuU0JRYrQfyg0GwE=;
-        b=grYHHTsDeWXdauOtLlyiHtrov1NIKlwoFs/Tws/Z9fctGgrV0E34TpT2hH9NgRnUUe
-         BRVefpzgMMMavKIhu6bduwwWxeLw6va8/xtVVarSQ6nQEujPwNB8nAN+JzrA4LowCd0W
-         ooY3zkKB9WYAp16ut5Y/vfEhsrk7rg2n+e1/+RDN1hN/oVBAjFhwD6fdc/6HZSBtJyhf
-         lFdEYLUd0xOtZU0p8sjjrtLkYCz7UqtEM/ANCsqKsx8du1YH73MWADQZjEmwvV1u3sAt
-         6MaVQj5byak6gOre6BhTmT/QodWiCEBMx7OjIw3KqtZuuxvMaaE+4fFCz4QMLhI/zWhL
-         NySA==
-X-Gm-Message-State: ACrzQf1rDxQdVCipOhPETXDZ0L+LFbPwvjEXUdzg7/npbNLvvoptbWll
-        IgCU9fgBgdb7O8pHkFoIMvzqUlG/2qLZUTFiLIC3tZ9GyykXevMs6tJKLzdyS8l+jMj00LIMvA6
-        bRoyYj2IUu9ek
-X-Received: by 2002:a17:907:971c:b0:78e:63f:c766 with SMTP id jg28-20020a170907971c00b0078e063fc766mr9957387ejc.330.1666254141383;
-        Thu, 20 Oct 2022 01:22:21 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM77hNuYpdTNzaBxaGl4qanwjEest2MmHQgxj9LIOEFNPTGkaoTFS2OSELTfyljEa7SX2DQbRw==
-X-Received: by 2002:a17:907:971c:b0:78e:63f:c766 with SMTP id jg28-20020a170907971c00b0078e063fc766mr9957379ejc.330.1666254141175;
-        Thu, 20 Oct 2022 01:22:21 -0700 (PDT)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id t14-20020a05640203ce00b00459e3a3f3ddsm11633580edw.79.2022.10.20.01.22.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Oct 2022 01:22:20 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+        bh=ctJTA03g4S212w2fsHSI6DaGgRDXgMSNX17PNK39G/0=;
+        b=pgyjDfj23srvir/0JWPCeon9S2icBTGfjwie/jgTm29lfHFUB5MWMUQC2NOCYHM+Ev6Kwu
+        vYfDqUZn9trZqo950qlzCnTvt9p28mC3423MnKGH9g/cZ6eb9s50soaCKfJQLzQJkzCN7N
+        sIVBDEL8fDY+TEzFGGrstuX4JGlSOfY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v11 00/46] KVM: x86: hyper-v: Fine-grained TLB flush +
- L2 TLB flush features
-In-Reply-To: <Y1B4kAIsc8Z0b2P9@google.com>
-References: <20221004123956.188909-1-vkuznets@redhat.com>
- <Y1B4kAIsc8Z0b2P9@google.com>
-Date:   Thu, 20 Oct 2022 10:22:19 +0200
-Message-ID: <87v8oedhvo.fsf@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Quentin Perret <qperret@google.com>,
+        Ben Gardon <bgardon@google.com>, Gavin Shan <gshan@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>,
+        kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 07/15] KVM: arm64: Use an opaque type for pteps
+Message-ID: <Y1EHnFN2Goj2eLkE@google.com>
+References: <20221007232818.459650-1-oliver.upton@linux.dev>
+ <20221007232818.459650-8-oliver.upton@linux.dev>
+ <Y1CFl8sLllXm4seK@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y1CFl8sLllXm4seK@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On Wed, Oct 19, 2022 at 11:17:43PM +0000, Sean Christopherson wrote:
+> On Fri, Oct 07, 2022, Oliver Upton wrote:
+> > Use an opaque type for pteps and require visitors explicitly dereference
+> > the pointer before using. Protecting page table memory with RCU requires
+> > that KVM dereferences RCU-annotated pointers before using. However, RCU
+> > is not available for use in the nVHE hypervisor and the opaque type can
+> > be conditionally annotated with RCU for the stage-2 MMU.
+> > 
+> > Call the type a 'pteref' to avoid a naming collision with raw pteps. No
+> > functional change intended.
+> > 
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >  arch/arm64/include/asm/kvm_pgtable.h |  9 ++++++++-
+> >  arch/arm64/kvm/hyp/pgtable.c         | 23 ++++++++++++-----------
+> >  2 files changed, 20 insertions(+), 12 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index c33edcf36b5b..beb89eac155c 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -25,6 +25,13 @@ static inline u64 kvm_get_parange(u64 mmfr0)
+> >  
+> >  typedef u64 kvm_pte_t;
+> >  
+> > +typedef kvm_pte_t *kvm_pteref_t;
+> > +
+> > +static inline kvm_pte_t *kvm_dereference_pteref(kvm_pteref_t pteref, bool shared)
+> > +{
+> > +	return pteref;
+> 
+> Returning the pointer is unsafe (when it becomes RCU-protected).  The full
+> dereference of the data needs to occur under RCU protection, not just the retrieval
+> of the pointer.  E.g. this (straw man) would be broken
+> 
+> 	bool table = kvm_pte_table(ctx.old, level);
+> 
+> 	rcu_read_lock();
+> 	ptep = kvm_dereference_pteref(pteref, flags & KVM_PGTABLE_WALK_SHARED);
+> 	rcu_read_unlock();
+> 
+> 	if (table && (ctx.flags & KVM_PGTABLE_WALK_TABLE_PRE))
+> 		ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_TABLE_PRE);
+> 
+> 	if (!table && (ctx.flags & KVM_PGTABLE_WALK_LEAF)) {
+> 		ret = kvm_pgtable_visitor_cb(data, &ctx, KVM_PGTABLE_WALK_LEAF);
+> 		ctx.old = READ_ONCE(*ptep);
+> 		table = kvm_pte_table(ctx.old, level);
+> 	}
+> 
+> as the read of the entry pointed at by ptep could be to a page table that is freed
+> in an RCU callback.
+> 
+> The naming collision you are trying to avoid is a symptom of this bad pattern,
+> as there should never be "raw" pteps floating around, at least not in non-pKVM
+> contexts that utilize RCU.
 
-> On Tue, Oct 04, 2022, Vitaly Kuznetsov wrote:
->> Changes since v10 (Sean):
->> - New patches added:
->>   - "x86/hyperv: Move VMCB enlightenment definitions to hyperv-tlfs.h"
->>   - "KVM: selftests: Move "struct hv_enlightenments" to x86_64/svm.h"
->>   - "KVM: SVM: Add a proper field for Hyper-V VMCB enlightenments"
->>   - 'x86/hyperv: KVM: Rename "hv_enlightenments" to "hv_vmcb_enlightenments"'
->>   - 'KVM: VMX: Rename "vmx/evmcs.{ch}" to "vmx/hyperv.{ch}"'
->>   - "KVM: x86: Move clearing of TLB_FLUSH_CURRENT to kvm_vcpu_flush_tlb_all()"
->>   - "KVM: selftests: Drop helpers to read/write page table entries"
->>   - "KVM: x86: Make kvm_hv_get_assist_page() return 0/-errno"
->> - Removed patches:
->>   - "KVM: selftests: Export _vm_get_page_table_entry()"
->> - Main differences:
->>   - Move Hyper-V TLB flushing out of kvm_service_local_tlb_flush_requests().
->>     On SVM, Hyper-V TLB flush FIFO is emptied from svm_flush_tlb_current()
->>   - Don't disable IRQs in hv_tlb_flush_enqueue().
->>   - Don't call kvm_vcpu_flush_tlb_guest() from kvm_hv_vcpu_flush_tlb() but
->>     return -errno instead.
->>   - Avoid unneded flushes in !EPT/!NPT cases.
->>   - Optimize hv_is_vp_in_sparse_set().
->>   - Move TLFS definitions to asm/hyperv-tlfs.h.
->>   - Use u64 vals in Hyper-V PV TLB flush selftest + multiple smaler changes
->>   - Typos, indentation, renames, ...
->
-> Some nits throughout, but nothing major.  Everything could be fixed up when
-> applying, but if it's not too much trouble I'd prefer a v11, the potential changes
-> to kvm_hv_hypercall_complete() aren't completely trivial.
+Fair enough, this was mostly from an attempt to avoid churn in the
+visitor callbacks by adding more layering for reads/writes through RCU
+pointers. The lifetime of the raw pointer is 'safe' as it sits on the
+stack and we go behind the rcu lock much further up.
 
-Thanks for the review! Let me do v12 to address your comments, I plan to
-do it tomorrow.
+> > +}
+> > +
+> >  #define KVM_PTE_VALID			BIT(0)
+> >  
+> >  #define KVM_PTE_ADDR_MASK		GENMASK(47, PAGE_SHIFT)
+> > @@ -170,7 +177,7 @@ typedef bool (*kvm_pgtable_force_pte_cb_t)(u64 addr, u64 end,
+> >  struct kvm_pgtable {
+> >  	u32					ia_bits;
+> >  	u32					start_level;
+> > -	kvm_pte_t				*pgd;
+> > +	kvm_pteref_t				pgd;
+> >  	struct kvm_pgtable_mm_ops		*mm_ops;
+> >  
+> >  	/* Stage-2 only */
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index 02c33fccb178..6b6e1ed7ee2f 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -175,13 +175,14 @@ static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data,
+> >  }
+> >  
+> >  static int __kvm_pgtable_walk(struct kvm_pgtable_walk_data *data,
+> > -			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pte_t *pgtable, u32 level);
+> > +			      struct kvm_pgtable_mm_ops *mm_ops, kvm_pteref_t pgtable, u32 level);
+> >  
+> >  static inline int __kvm_pgtable_visit(struct kvm_pgtable_walk_data *data,
+> >  				      struct kvm_pgtable_mm_ops *mm_ops,
+> > -				      kvm_pte_t *ptep, u32 level)
+> > +				      kvm_pteref_t pteref, u32 level)
+> >  {
+> >  	enum kvm_pgtable_walk_flags flags = data->walker->flags;
+> > +	kvm_pte_t *ptep = kvm_dereference_pteref(pteref, false);
+> >  	struct kvm_pgtable_visit_ctx ctx = {
+> >  		.ptep	= ptep,
+> >  		.old	= READ_ONCE(*ptep),
+> 
+> This is where you want the protection to kick in, e.g. 
+> 
+>   typedef kvm_pte_t __rcu *kvm_ptep_t;
+> 
+>   static inline kvm_pte_t kvm_read_pte(kvm_ptep_t ptep)
+>   {
+> 	return READ_ONCE(*rcu_dereference(ptep));
+>   }
+> 
+> 		.old	= kvm_read_pte(ptep),
+> 
+> In other words, the pointer itself isn't that's protected, it's PTE that the
+> pointer points at that's protected.
 
--- 
-Vitaly
+Right, but practically speaking it is the boundary at which we assert
+that protection.
 
+Anyhow, I'll look at abstracting the actual memory accesses in the
+visitors without too much mess.
+
+--
+Thanks,
+Oliver
