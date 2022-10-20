@@ -2,59 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EAD2860646A
-	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 17:26:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D12D06064AF
+	for <lists+kvm@lfdr.de>; Thu, 20 Oct 2022 17:35:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230357AbiJTP0f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Oct 2022 11:26:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40264 "EHLO
+        id S229779AbiJTPfc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Oct 2022 11:35:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230216AbiJTP0b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Oct 2022 11:26:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41BBC1AA27C
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 08:26:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666279582;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ufks/tNcb9SOyDmv9oYgoUwOJgMNKxxwfpPfplrSfKg=;
-        b=O9UXL0mN9xnc1dLwLijMra54+0cAEbHs3XMHdJ8tnFGpTKVG7D1+UdXGG7dmlaGvIPJZGo
-        W8D/JYh1fYcEMwiC/DfFMgbjscnpAmZXEYwdskicq3W+kHWSNFq0Yo7z60UYIHGvudRiIf
-        WrxRkrFaWohrL9KW3JWSa4fiK9AWv/8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-564-zBhq3g3QN9K-sXj9IRW4Cw-1; Thu, 20 Oct 2022 11:26:20 -0400
-X-MC-Unique: zBhq3g3QN9K-sXj9IRW4Cw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 69835811E75
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 15:26:20 +0000 (UTC)
-Received: from starship (ovpn-192-51.brq.redhat.com [10.40.192.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 60D4449BB60;
-        Thu, 20 Oct 2022 15:26:19 +0000 (UTC)
-Message-ID: <4f991c306dca5764c5822fca43f8092001817790.camel@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 08/16] svm: add nested shutdown test.
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Cathy Avery <cavery@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Date:   Thu, 20 Oct 2022 18:26:18 +0300
-In-Reply-To: <20221020152404.283980-9-mlevitsk@redhat.com>
-References: <20221020152404.283980-1-mlevitsk@redhat.com>
-         <20221020152404.283980-9-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S229717AbiJTPfa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Oct 2022 11:35:30 -0400
+Received: from mail-vk1-xa2d.google.com (mail-vk1-xa2d.google.com [IPv6:2607:f8b0:4864:20::a2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7EB1FBCE6
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 08:35:29 -0700 (PDT)
+Received: by mail-vk1-xa2d.google.com with SMTP id b81so9944vkf.1
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 08:35:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cLdV6PnMuiKqKn7gplx6uvtLf96oiQWdR0P2i4ykuy0=;
+        b=TQT2+C3O9UUEZA+1iAGO7fXFxtjW15uivVF5CNBDmGN2z0KWp+O2blljq7h9DyKSc5
+         EvOMFs/UY84ParhE3rIwN9cVgLml7iv7F4mLfv+Cs0ujLRmntlZx1rtpA3jabG4i6fWI
+         bJZ1faD95NoNYmNvr8lopzIUTC1s/fp08cBi2jq9MSen0qEwKRL/YXOsSthHh6udKfvi
+         /KOIKnc+V+AZlCCynwrOiofsJ9i38TmXK72rP0fejJL+yJJq+n6SluNS6E+Qx73zVhRo
+         mP7PsUSvMOwz4hfXsHZruD04/bMBgDjfHKX62X1CV66rqnJG7w5xhdF+LqyuZwUi0s7w
+         kq9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cLdV6PnMuiKqKn7gplx6uvtLf96oiQWdR0P2i4ykuy0=;
+        b=tL8R2zccNfyDDk5ZuvXrrHC3pWTrKKfkZ6AxO3J9JXB9lXy4k7xSQPVb9evCu6r/ty
+         gsPBWALd5OXwFP9BfcUrMMFfAnnoQrIgadISyj/Rtrnb2a6OtpjGMENrXSfSRgmyC2za
+         oftsrOa8rqvAq8WZUAMGLteNQl6pGctYYc/AkRVMdPT34OlIvSTM3x2Qrv1hWOofxGr9
+         caHSJwmprjlmCKiKlWCo9FtAgB7/uL4zLhqsy0ZvstT4yeLFEXaxakUNP+sBaiukCKMx
+         +Bv2BIIavsgPWAH834lx1n52Sp3vOzVi4mZv/wWBVJ55zdLXNOGD/p6IzRT7bZBRaooA
+         hFRQ==
+X-Gm-Message-State: ACrzQf3MebPgD6OvoIpTunnDRauceEBt0ZUeRY1cBji7DkRnGBe4Yc0F
+        S0ly1/W7eMS4+TzAT1nliDsSNkeuONFTBw==
+X-Google-Smtp-Source: AMsMyM4SAjheRdafoKSz7GuP3WqVBUXFdEVhBe4c4GJ/YHF97KUpwVnjB7h5dCGblkpUFxePss9bpQ==
+X-Received: by 2002:a17:902:9a07:b0:178:8024:1393 with SMTP id v7-20020a1709029a0700b0017880241393mr14554070plp.128.1666280038382;
+        Thu, 20 Oct 2022 08:33:58 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id l1-20020a63f301000000b00440416463fesm11770926pgh.27.2022.10.20.08.33.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Oct 2022 08:33:54 -0700 (PDT)
+Date:   Thu, 20 Oct 2022 15:33:50 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, stable@vger.kernel.org
+Subject: Re: [PATCH 4/4] KVM: x86: forcibly leave nested mode on vCPU reset
+Message-ID: <Y1FqXiBB7Bqzj8eh@google.com>
+References: <20221020093055.224317-1-mlevitsk@redhat.com>
+ <20221020093055.224317-5-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221020093055.224317-5-mlevitsk@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -62,97 +76,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-10-20 at 18:23 +0300, Maxim Levitsky wrote:
-> Test that if L2 triggers a shutdown, this VM exits to L1
-> and doesn't crash the host.
+On Thu, Oct 20, 2022, Maxim Levitsky wrote:
+> While not obivous, kvm_vcpu_reset leaves the nested mode by
+
+Please add () when referencing function, and wrap closer to ~75 chars.
+
+> clearing 'vcpu->arch.hflags' but it does so without all the
+> required housekeeping.
 > 
+> This makes SVM and VMX continue to use vmcs02/vmcb02 while
+
+This bug should be impossible to hit on VMX as INIT and TRIPLE_FAULT unconditionally
+cause VM-Exit, i.e. will always be forwarded to L1.
+
+> the cpu is not in nested mode.
+
+Can you add a blurb to call out exactly how this bug can be triggered?  Doesn't
+take much effort to suss out the "how", but it'd be nice to capture that info in
+the changelog.
+
+> In particular, in SVM code, it makes the 'svm_free_nested'
+> free the vmcb02, while still in use, which later triggers
+> use after free and a kernel crash.
+> 
+> This issue is assigned CVE-2022-3344
+> 
+> Cc: stable@vger.kernel.org
 > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > ---
->  x86/svm_tests.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 51 insertions(+)
+>  arch/x86/kvm/x86.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-> index 19b35e95..2c29c2b0 100644
-> --- a/x86/svm_tests.c
-> +++ b/x86/svm_tests.c
-> @@ -10,6 +10,7 @@
->  #include "isr.h"
->  #include "apic.h"
->  #include "delay.h"
-> +#include "vmalloc.h"
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index d86a8aae1471d3..313c4a6dc65e45 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -11931,6 +11931,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>  	WARN_ON_ONCE(!init_event &&
+>  		     (old_cr0 || kvm_read_cr3(vcpu) || kvm_read_cr4(vcpu)));
 >  
->  #define SVM_EXIT_MAX_DR_INTERCEPT 0x3f
+> +	kvm_leave_nested(vcpu);
+
+Not a big deal, especially if/when nested_ops are turned into static_calls, but
+at the same time it's quite easy to do:
+
+	if (is_guest_mode(vcpu))
+		kvm_leave_nested(vcpu);
+
+I think it's worth adding a comment explaining how this can happen, and to also
+call out that EFER is cleared on INIT, i.e. that virtualization is disabled due
+to EFER.SVME=0.  Unsurprisingly, I don't see anything in the APM that explicitly
+states what happens if INIT occurs in guest mode, i.e. it's not immediately obvious
+that forcing the vCPU back to L1 is architecturally correct.
+
+
+>  	kvm_lapic_reset(vcpu, init_event);
 >  
-> @@ -3270,6 +3271,55 @@ static void svm_intr_intercept_mix_smi(void)
->  	svm_intr_intercept_mix_run_guest(NULL, SVM_EXIT_SMI);
->  }
->  
-> +
-> +static void shutdown_intercept_test_guest(struct svm_test *test)
-> +{
-> +	asm volatile ("int3");
-> +	report_fail("should not reach here\n");
-> +
-> +}
-> +
-> +static void shutdown_intercept_test_guest2(struct svm_test *test)
-> +{
-> +	asm volatile ("ud2");
-> +	report_fail("should not reach here\n");
-> +
-> +}
-> +
-> +static void svm_shutdown_intercept_test(void)
-> +{
-> +	void* unmapped_address = alloc_vpage();
-> +
-> +	/*
-> +	 * Test that shutdown vm exit doesn't crash L0
-> +	 *
-> +	 * Test both native and emulated triple fault
-> +	 * (due to exception merging)
-> +	 */
-> +
-> +
-> +	/*
-> +	 * This will usually cause native SVM_EXIT_SHUTDOWN
-> +	 * (KVM usually doesn't intercept #PF)
-> +	 * */
-> +	test_set_guest(shutdown_intercept_test_guest);
-> +	vmcb->save.idtr.base = (u64)unmapped_address;
-> +	vmcb->control.intercept |= (1ULL << INTERCEPT_SHUTDOWN);
-> +	svm_vmrun();
-> +	report (vmcb->control.exit_code == SVM_EXIT_SHUTDOWN, "shutdown (BP->PF->DF->TRIPLE_FAULT) test passed");
-> +
-> +	/*
-> +	 * This will usually cause emulated SVM_EXIT_SHUTDOWN
-> +	 * (KVM usually intercepts #UD)
-> +	 */
-> +	test_set_guest(shutdown_intercept_test_guest2);
-> +	vmcb_ident(vmcb);
-> +	vmcb->save.idtr.limit = 0;
-> +	vmcb->control.intercept |= (1ULL << INTERCEPT_SHUTDOWN);
-> +	svm_vmrun();
-> +	report (vmcb->control.exit_code == SVM_EXIT_SHUTDOWN, "shutdown (UD->DF->TRIPLE_FAULT) test passed");
-> +}
-> +
->  struct svm_test svm_tests[] = {
->  	{ "null", default_supported, default_prepare,
->  	  default_prepare_gif_clear, null_test,
-> @@ -3382,6 +3432,7 @@ struct svm_test svm_tests[] = {
->  	TEST(svm_intr_intercept_mix_smi),
->  	TEST(svm_tsc_scale_test),
->  	TEST(pause_filter_test),
-> +	TEST(svm_shutdown_intercept_test),
->  	{ NULL, NULL, NULL, NULL, NULL, NULL, NULL }
->  };
->  
+>  	vcpu->arch.hflags = 0;
 
+Maybe add a WARN above this to try and detect other potential issues?  Kinda silly,
+but it'd at least help draw attention to the importance of hflags.
 
-Note that on unpatched KVM, this test will cause a kernel panic on the host if run.
+E.g. this?
 
-I sent a patch today with a fix for this.
-
-Best regards,
-	MaxiM Levitsky
-
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4bd5f8a751de..c50fa0751a0b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11915,6 +11915,15 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+        unsigned long old_cr0 = kvm_read_cr0(vcpu);
+        unsigned long new_cr0;
+ 
++       /*
++        * SVM doesn't unconditionally VM-Exit on INIT and SHUTDOWN, thus it's
++        * possible to INIT the vCPU while L2 is active.  Force the vCPU back
++        * into L1 as EFER.SVME is cleared on INIT (along with all other EFER
++        * bits), i.e. virtualization is disabled.
++        */
++       if (is_guest_mode(vcpu))
++               kvm_leave_nested(vcpu);
++
+        /*
+         * Several of the "set" flows, e.g. ->set_cr0(), read other registers
+         * to handle side effects.  RESET emulation hits those flows and relies
+@@ -11927,6 +11936,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 
+        kvm_lapic_reset(vcpu, init_event);
+ 
++       WARN_ON_ONCE(is_guest_mode(vcpu) || is_smm(vcpu));
+        vcpu->arch.hflags = 0;
+ 
+        vcpu->arch.smi_pending = 0;
