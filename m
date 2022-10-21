@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 066E3607B16
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 17:38:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E76E1607B23
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 17:38:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230399AbiJUPhu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 11:37:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47008 "EHLO
+        id S230427AbiJUPhy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 11:37:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230347AbiJUPgy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 11:36:54 -0400
+        with ESMTP id S230375AbiJUPgz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 11:36:55 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 777CC247E1D
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFA6626D908
         for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 08:36:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666366593;
+        s=mimecast20190719; t=1666366594;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=hf23owwXyl4mzv8DXKFj7XQPTlriWIPQsbBxFbBqkTQ=;
-        b=hy45KArIzyhNMfUuQjZetd8/V3wJgheKNT+nOpHYY3RDlSLWzMYqmV3rywf1v/WlxkFiGf
-        cSSAeryoAHZ3kQVHUil733aQ6kN+dYvBzuH38TpgZaMEfRU5Hz1e8Vx7VMBwXadsQpv50Y
-        V1ZH5KNfKGiYjX9aXRZTagCyjXFaQhM=
+        bh=kKvT0hySMtVu/Azto4trWGpMthHmrHZkr9WDqyfRArs=;
+        b=KPbr3jfu4LWmKCrQXDjImmigvYLIRbwU60ZO6QSpaoyfyg6iYSRlH3lqyEsbnDB3oy8jkR
+        cP0nmiLCY1gNreqQrjxsjeOsXbDOnvx2cf2OTm482kxeEulZ2EvrHltz3lR+QDV38/3Mu/
+        uYtAVoz11G8e1wR3vzrN27Rsw9LFJg8=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-213-Zh2UNZhJN-mZMORCqRT5gg-1; Fri, 21 Oct 2022 11:36:27 -0400
-X-MC-Unique: Zh2UNZhJN-mZMORCqRT5gg-1
+ us-mta-297-dafKLTSBPfKqhDFY1bJ6_g-1; Fri, 21 Oct 2022 11:36:28 -0400
+X-MC-Unique: dafKLTSBPfKqhDFY1bJ6_g-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2EB71800B23;
-        Fri, 21 Oct 2022 15:36:25 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7DB4E185A7AF;
+        Fri, 21 Oct 2022 15:36:27 +0000 (UTC)
 Received: from ovpn-192-65.brq.redhat.com (ovpn-192-65.brq.redhat.com [10.40.192.65])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AF2B940CA41F;
-        Fri, 21 Oct 2022 15:36:22 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 81B6C40CA41F;
+        Fri, 21 Oct 2022 15:36:25 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
@@ -47,9 +47,9 @@ Cc:     Wanpeng Li <wanpengli@tencent.com>,
         Yuan Yao <yuan.yao@linux.intel.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v12 24/46] KVM: x86: hyper-v: Introduce fast guest_hv_cpuid_has_l2_tlb_flush() check
-Date:   Fri, 21 Oct 2022 17:34:59 +0200
-Message-Id: <20221021153521.1216911-25-vkuznets@redhat.com>
+Subject: [PATCH v12 25/46] KVM: nVMX: hyper-v: Cache VP assist page in 'struct kvm_vcpu_hv'
+Date:   Fri, 21 Oct 2022 17:35:00 +0200
+Message-Id: <20221021153521.1216911-26-vkuznets@redhat.com>
 In-Reply-To: <20221021153521.1216911-1-vkuznets@redhat.com>
 References: <20221021153521.1216911-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -66,34 +66,154 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Introduce a helper to quickly check if KVM needs to handle VMCALL/VMMCALL
-from L2 in L0 to process L2 TLB flush requests.
+In preparation to enabling L2 TLB flush, cache VP assist page in
+'struct kvm_vcpu_hv'. While on it, rename nested_enlightened_vmentry()
+to nested_get_evmptr() and make it return eVMCS GPA directly.
+
+No functional change intended.
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- arch/x86/kvm/hyperv.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/x86/include/asm/kvm_host.h |  2 ++
+ arch/x86/kvm/hyperv.c           | 10 ++++++----
+ arch/x86/kvm/hyperv.h           |  3 +--
+ arch/x86/kvm/vmx/hyperv.c       | 21 +++++++--------------
+ arch/x86/kvm/vmx/hyperv.h       |  2 +-
+ arch/x86/kvm/vmx/nested.c       |  6 +++---
+ 6 files changed, 20 insertions(+), 24 deletions(-)
 
-diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
-index 7706e203ff43..bd698eb2bda1 100644
---- a/arch/x86/kvm/hyperv.h
-+++ b/arch/x86/kvm/hyperv.h
-@@ -174,6 +174,14 @@ static inline void kvm_hv_vcpu_purge_flush_tlb(struct kvm_vcpu *vcpu)
- 	kfifo_reset_out(&tlb_flush_fifo->entries);
- }
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index cccaf423f4d9..63fd3c160331 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -650,6 +650,8 @@ struct kvm_vcpu_hv {
+ 	/* Preallocated buffer for handling hypercalls passing sparse vCPU set */
+ 	u64 sparse_banks[HV_MAX_SPARSE_VCPU_BANKS];
  
-+static inline bool guest_hv_cpuid_has_l2_tlb_flush(struct kvm_vcpu *vcpu)
-+{
++	struct hv_vp_assist_page vp_assist_page;
++
+ 	struct {
+ 		u64 pa_page_gpa;
+ 		u64 vm_id;
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index ec3051699d2a..90f37e58a9ed 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -900,13 +900,15 @@ bool kvm_hv_assist_page_enabled(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_GPL(kvm_hv_assist_page_enabled);
+ 
+-bool kvm_hv_get_assist_page(struct kvm_vcpu *vcpu,
+-			    struct hv_vp_assist_page *assist_page)
++bool kvm_hv_get_assist_page(struct kvm_vcpu *vcpu)
+ {
+-	if (!kvm_hv_assist_page_enabled(vcpu))
 +	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
 +
-+	return hv_vcpu &&
-+		(hv_vcpu->cpuid_cache.nested_eax & HV_X64_NESTED_DIRECT_FLUSH);
-+}
++	if (!hv_vcpu || !kvm_hv_assist_page_enabled(vcpu))
+ 		return false;
 +
- static inline bool kvm_hv_is_tlb_flush_hcall(struct kvm_vcpu *vcpu)
+ 	return !kvm_read_guest_cached(vcpu->kvm, &vcpu->arch.pv_eoi.data,
+-				      assist_page, sizeof(*assist_page));
++				      &hv_vcpu->vp_assist_page, sizeof(struct hv_vp_assist_page));
+ }
+ EXPORT_SYMBOL_GPL(kvm_hv_get_assist_page);
+ 
+diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
+index bd698eb2bda1..81313e418b80 100644
+--- a/arch/x86/kvm/hyperv.h
++++ b/arch/x86/kvm/hyperv.h
+@@ -108,8 +108,7 @@ int kvm_hv_activate_synic(struct kvm_vcpu *vcpu, bool dont_zero_synic_pages);
+ void kvm_hv_vcpu_uninit(struct kvm_vcpu *vcpu);
+ 
+ bool kvm_hv_assist_page_enabled(struct kvm_vcpu *vcpu);
+-bool kvm_hv_get_assist_page(struct kvm_vcpu *vcpu,
+-			    struct hv_vp_assist_page *assist_page);
++bool kvm_hv_get_assist_page(struct kvm_vcpu *vcpu);
+ 
+ static inline struct kvm_vcpu_hv_stimer *to_hv_stimer(struct kvm_vcpu *vcpu,
+ 						      int timer_index)
+diff --git a/arch/x86/kvm/vmx/hyperv.c b/arch/x86/kvm/vmx/hyperv.c
+index f05464db4fdc..bceca1a99804 100644
+--- a/arch/x86/kvm/vmx/hyperv.c
++++ b/arch/x86/kvm/vmx/hyperv.c
+@@ -321,24 +321,17 @@ const struct evmcs_field vmcs_field_to_evmcs_1[] = {
+ };
+ const unsigned int nr_evmcs_1_fields = ARRAY_SIZE(vmcs_field_to_evmcs_1);
+ 
+-bool nested_enlightened_vmentry(struct kvm_vcpu *vcpu, u64 *evmcs_gpa)
++u64 nested_get_evmptr(struct kvm_vcpu *vcpu)
  {
- 	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+-	struct hv_vp_assist_page assist_page;
+-
+-	*evmcs_gpa = -1ull;
+-
+-	if (unlikely(!kvm_hv_get_assist_page(vcpu, &assist_page)))
+-		return false;
+-
+-	if (unlikely(!assist_page.enlighten_vmentry))
+-		return false;
++	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+ 
+-	if (unlikely(!evmptr_is_valid(assist_page.current_nested_vmcs)))
+-		return false;
++	if (unlikely(!kvm_hv_get_assist_page(vcpu)))
++		return EVMPTR_INVALID;
+ 
+-	*evmcs_gpa = assist_page.current_nested_vmcs;
++	if (unlikely(!hv_vcpu->vp_assist_page.enlighten_vmentry))
++		return EVMPTR_INVALID;
+ 
+-	return true;
++	return hv_vcpu->vp_assist_page.current_nested_vmcs;
+ }
+ 
+ uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/vmx/hyperv.h b/arch/x86/kvm/vmx/hyperv.h
+index 8efaffe9215b..8bf366730d33 100644
+--- a/arch/x86/kvm/vmx/hyperv.h
++++ b/arch/x86/kvm/vmx/hyperv.h
+@@ -237,7 +237,7 @@ enum nested_evmptrld_status {
+ 	EVMPTRLD_ERROR,
+ };
+ 
+-bool nested_enlightened_vmentry(struct kvm_vcpu *vcpu, u64 *evmcs_gpa);
++u64 nested_get_evmptr(struct kvm_vcpu *vcpu);
+ uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu);
+ int nested_enable_evmcs(struct kvm_vcpu *vcpu,
+ 			uint16_t *vmcs_version);
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index a89b8e6f90f3..29a210df4066 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -1991,7 +1991,8 @@ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
+ 	if (likely(!guest_cpuid_has_evmcs(vcpu)))
+ 		return EVMPTRLD_DISABLED;
+ 
+-	if (!nested_enlightened_vmentry(vcpu, &evmcs_gpa)) {
++	evmcs_gpa = nested_get_evmptr(vcpu);
++	if (!evmptr_is_valid(evmcs_gpa)) {
+ 		nested_release_evmcs(vcpu);
+ 		return EVMPTRLD_DISABLED;
+ 	}
+@@ -5219,7 +5220,6 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 	u32 zero = 0;
+ 	gpa_t vmptr;
+-	u64 evmcs_gpa;
+ 	int r;
+ 
+ 	if (!nested_vmx_check_permission(vcpu))
+@@ -5245,7 +5245,7 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
+ 	 * vmx->nested.hv_evmcs but this shouldn't be a problem.
+ 	 */
+ 	if (likely(!guest_cpuid_has_evmcs(vcpu) ||
+-		   !nested_enlightened_vmentry(vcpu, &evmcs_gpa))) {
++		   !evmptr_is_valid(nested_get_evmptr(vcpu)))) {
+ 		if (vmptr == vmx->nested.current_vmptr)
+ 			nested_release_vmcs12(vcpu);
+ 
 -- 
 2.37.3
 
