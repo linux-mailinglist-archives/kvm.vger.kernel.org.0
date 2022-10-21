@@ -2,70 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 12A2A607D93
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 19:33:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 41C5B607DF2
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 19:51:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230143AbiJURdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 13:33:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35274 "EHLO
+        id S229987AbiJURvB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 13:51:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229853AbiJURdh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 13:33:37 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91DB626205B
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 10:33:36 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id w11-20020a170902e88b00b001855276704aso2050412plg.4
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 10:33:36 -0700 (PDT)
+        with ESMTP id S230071AbiJURu7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 13:50:59 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F2E5275DDD
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 10:50:54 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id h12so3094591pjk.0
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 10:50:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Rm31qAFaq+M5EgnK0auSpdF+G0fRaJUMCym7D7tYLvw=;
-        b=YrHCpg3QEb9QJEUkOK3NXTmjU0qVBg1fZfBzLdxZoVUVe0ZbDSdSlLJs50rvbe0zL6
-         2i2fHKgaCdM4MDMWA5FB4J4yF4zEfp+172NtQvekyq98xeDI6wNceG2aYhaUu/hujtnI
-         YofEh9QFhpuWWjI9yEK5Ctgai33+KfV9F5nHvKjHs6OOgZRrC9TeP4Id6FfXZOYFx1ks
-         zVArlk9s0+tGOBcHEMb61aVIfLhlw1x8KzO95Zn1gAq/c+BgeUb/hVGf43b04o7hLrr5
-         3ktFYcBGfUHLyUkDqJXHQIZ/ynGYfinJFlUSXEIMvDpv47Hq+Ur+ogXGIiUf+MdJxl7L
-         ijXA==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sdQVvxh/D4PbcURR4EnVNhyGztTcewiCaPhCdQoFyIs=;
+        b=k1nOFp8yp3mtb4PfoSJ9DFXoKwqhsFYNwc18cFOOm8exHthjpAJDCa3mGHGZ746YZs
+         s+rd8rfVU3Sj4gRgWsPxeaQGu5EaLpPT5cEfhUO6rtqjiVsn+LfN5LH5UbrklIs2/Ipl
+         x5Mdwlpm1pwsdZ8d2sHuc//Z0PbTnJH84klYp64Ns+KqDUEkJ3ibeyNo6q4JD/RtaFVu
+         WHtBq2kpKGv/l6uljqbGRIDXQrwirm8wbTDuo6nw+iWZPiIMr4RbyrY986gzWJqEjPkA
+         TxuiHNZE9SxgNNDeBQ4T1CDrD7GOrTnO7CFaPcwxo/F4klf8h/ZokgPru/VadoEEpfnL
+         0IwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Rm31qAFaq+M5EgnK0auSpdF+G0fRaJUMCym7D7tYLvw=;
-        b=VfULks8QSBy0racrQbJEzstLzdxUelZ1djSJdjNm5rsX8dMsAU9FfBUPNLC72nfo74
-         vOR9qkdD0PbX3pBP8J56fK/pjN4cNOZdeajr18U47tsHmG0dyS3BB9TKAWwB+dtKXjX/
-         s9q5Y3W515z/vq9FkatvFf1cvUlsxiub9cM1KEEhfy/x7diLJBF37N8VmiSH805isMPr
-         tDHcIDQCCGgp17NUV97wmu58AjCoIr32YlKvsmXgdabVt7imIeZmLy2khQWeHr7j5bhw
-         TUkb5JvHAohf8Irnc0BM7eUBcxRLyKav7kF7wV0BOLbxWUpHkJl3apBl6XXhv+ztzRaz
-         4x7g==
-X-Gm-Message-State: ACrzQf2yH/+Z2UIq9sumH/Tam4mGXqvIqLQGB5Z+yl8KMAb2xL/E8R6u
-        6tU1zIznrair79zEC9e5L/dkcJOUZrM=
-X-Google-Smtp-Source: AMsMyM4fVZqqp2S5uhWZHjdVvRNZU+skQdKq/j16fQ/MICKD5HU6uWA/WkxAVI1JxfGo+yZxrVtCIqMNGng=
-X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:3e70:6547:73ac:76aa])
- (user=pgonda job=sendgmr) by 2002:a17:902:cecf:b0:185:475a:4073 with SMTP id
- d15-20020a170902cecf00b00185475a4073mr20663741plg.60.1666373616083; Fri, 21
- Oct 2022 10:33:36 -0700 (PDT)
-Date:   Fri, 21 Oct 2022 10:33:28 -0700
-Message-Id: <20221021173328.2489411-1-pgonda@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.38.0.135.g90850a2211-goog
-Subject: [PATCH V2] virt: Prevent IV reuse in SNP guest driver
-From:   Peter Gonda <pgonda@google.com>
-To:     thomas.lendacky@amd.com
-Cc:     Peter Gonda <pgonda@google.com>,
-        Dionna Glaze <dionnaglaze@google.com>,
-        Borislav Petkov <bp@suse.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Haowen Bai <baihaowen@meizu.com>,
-        Yang Yingliang <yangyingliang@huawei.com>,
-        Marc Orr <marcorr@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sdQVvxh/D4PbcURR4EnVNhyGztTcewiCaPhCdQoFyIs=;
+        b=oCtoOhQSi7qMz3/G6GGglSyzIQCQJlEejLSELrqWD5VBhcEiu37XfquC4LOT/6vPlR
+         S7MxQluvHEW7vI4DSch+ZnOJz9FbcgIfikpRbbFRkiJXUPf8wKrQeCaOPg8mCKroVqSK
+         8sKfolz4QRoXfkTIJ+eyeEwGiO0VTrtg5o/Nrk8M1hAjlN81y/ZsyN+vu3xlrxM/rHBk
+         c6iwwLYhWe0O7TTkev01NtMNzppzw0xKC3rmYf6ysd47LbO3H+EM3bVfeVzJNyO9nJfX
+         WG2W0in+Dgy9IOr6add51+jDcTWGKJqbJwng5jFMIUz4R/DjiAaOIUmnlN+XRfjYPUle
+         QDWA==
+X-Gm-Message-State: ACrzQf11Ob2uuat6Clmq8bR/yJozPg0HXmADTbQ3kArhZz8QAfb/mlYG
+        RDtFFTxx6DivgoGIEOC2iuPjRM05f0Z9eQ==
+X-Google-Smtp-Source: AMsMyM4pJLhmAkopDaWvBlUFI5HTmeuhBhwtUs+YXpmR7aLZm5UhxXkgevgPhPLrA2pMSYe7v2FMmA==
+X-Received: by 2002:a17:90b:1806:b0:20d:a753:7d4b with SMTP id lw6-20020a17090b180600b0020da7537d4bmr23929044pjb.160.1666374653881;
+        Fri, 21 Oct 2022 10:50:53 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id b3-20020a17090a990300b0020b2082e0acsm1880013pjp.0.2022.10.21.10.50.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Oct 2022 10:50:52 -0700 (PDT)
+Date:   Fri, 21 Oct 2022 17:50:49 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Subject: Re: [PATCH v5 4/7] kvm: x86/pmu: Introduce masked events to the pmu
+ event filter
+Message-ID: <Y1Lb+bfaO1Y+skUD@google.com>
+References: <20220920174603.302510-1-aaronlewis@google.com>
+ <20220920174603.302510-5-aaronlewis@google.com>
+ <Y0Q9ZFGQf1On/Cus@google.com>
+ <CAAAPnDGfPZ7k6mHkefhT2tvt6E4cWpEm_QE2Hz=zaVONoXO+xg@mail.gmail.com>
+ <Y02VRyrVu2Fh3ipS@google.com>
+ <CAAAPnDFqkkEzixJGn39CqrZoAUBo8MbK7j1VorWT0U4cTSwSCQ@mail.gmail.com>
+ <CAAAPnDGvnC4uP5Q_yio+m8Q-cu+5anZTLwYRpro9E+W=U5gcTA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAAAPnDGvnC4uP5Q_yio+m8Q-cu+5anZTLwYRpro9E+W=U5gcTA@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,234 +77,296 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The ASP and an SNP guest use a series of AES-GCM keys called VMPCKs to
-communicate securely with each other. The IV to this scheme is a
-sequence number that both the ASP and the guest track. Currently this
-sequence number in a guest request must exactly match the sequence
-number tracked by the ASP. This means that if the guest sees an error
-from the host during a request it can only retry that exact request or
-disable the VMPCK to prevent an IV reuse. AES-GCM cannot tolerate IV
-reuse see:
-https://csrc.nist.gov/csrc/media/projects/block-cipher-techniques/documents/bcm/comments/800-38-series-drafts/gcm/joux_comments.pdf
+On Fri, Oct 21, 2022, Aaron Lewis wrote:
+> Here's what I came up with.  Let me know if this is what you were thinking:
 
-To handle userspace querying the cert_data length. Instead of requesting
-the cert length from userspace use the size of the drivers allocated
-shared buffer. Then copy that buffer to userspace, or give userspace an
-error depending on the size of the buffer given by userspace.
+A purely mechanical suggestions, but overall looks awesome! 
 
-Fixes: fce96cf044308 ("virt: Add SEV-SNP guest driver")
-Signed-off-by: Peter Gonda <pgonda@google.com>
-Reported-by: Peter Gonda <pgonda@google.com>
-Reviewed-by: Dionna Glaze <dionnaglaze@google.com>
-Cc: Borislav Petkov <bp@suse.de>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Michael Roth <michael.roth@amd.com>
-Cc: Haowen Bai <baihaowen@meizu.com>
-Cc: Yang Yingliang <yangyingliang@huawei.com>
-Cc: Marc Orr <marcorr@google.com>
-Cc: David Rientjes <rientjes@google.com>
-Cc: Ashish Kalra <Ashish.Kalra@amd.com>
-Cc: linux-kernel@vger.kernel.org
-Cc: kvm@vger.kernel.org
----
- drivers/virt/coco/sev-guest/sev-guest.c | 93 ++++++++++++++++---------
- 1 file changed, 62 insertions(+), 31 deletions(-)
+> static int filter_sort_cmp(const void *pa, const void *pb)
+> {
+>         u64 a = *(u64 *)pa & (KVM_PMU_MASKED_ENTRY_EVENT_SELECT |
+>                               KVM_PMU_MASKED_ENTRY_EXCLUDE);
+>         u64 b = *(u64 *)pb & (KVM_PMU_MASKED_ENTRY_EVENT_SELECT |
+>                               KVM_PMU_MASKED_ENTRY_EXCLUDE);
+> 
+>         return (a > b) - (a < b);
+> }
+> 
+> /*
+>  * For the event filter, searching is done on the 'includes' list and
+>  * 'excludes' list separately rather than on the 'events' list (which
+>  * has both).  As a result the exclude bit can be ignored.
+>  */
+> static int filter_event_cmp(const void *pa, const void *pb)
+> {
+>         u64 a = *(u64 *)pa & KVM_PMU_MASKED_ENTRY_EVENT_SELECT;
+>         u64 b = *(u64 *)pb & KVM_PMU_MASKED_ENTRY_EVENT_SELECT;
+> 
+>         return (a > b) - (a < b);
+> }
 
-diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
-index f422f9c58ba7..8c54ea84bc57 100644
---- a/drivers/virt/coco/sev-guest/sev-guest.c
-+++ b/drivers/virt/coco/sev-guest/sev-guest.c
-@@ -41,7 +41,7 @@ struct snp_guest_dev {
- 	struct device *dev;
- 	struct miscdevice misc;
- 
--	void *certs_data;
-+	u8 (*certs_data)[SEV_FW_BLOB_MAX_SIZE];
- 	struct snp_guest_crypto *crypto;
- 	struct snp_guest_msg *request, *response;
- 	struct snp_secrets_page_layout *layout;
-@@ -67,8 +67,27 @@ static bool is_vmpck_empty(struct snp_guest_dev *snp_dev)
- 	return true;
- }
- 
-+/*
-+ * If we receive an error from the host or ASP we have two options. We can
-+ * either retry the exact same encrypted request or we can discontinue using the
-+ * VMPCK.
-+ *
-+ * This is because in the current encryption scheme GHCB v2 uses AES-GCM to
-+ * encrypt the requests. The IV for this scheme is the sequence number. GCM
-+ * cannot tolerate IV reuse.
-+ *
-+ * The ASP FW v1.51 only increments the sequence numbers on a successful
-+ * guest<->ASP back and forth and only accepts messages at its exact sequence
-+ * number.
-+ *
-+ * So if we were to reuse the sequence number the encryption scheme is
-+ * vulnerable. If we encrypt the sequence number for a fresh IV the ASP will
-+ * reject our request.
-+ */
- static void snp_disable_vmpck(struct snp_guest_dev *snp_dev)
- {
-+	dev_alert(snp_dev->dev, "Disabling vmpck_id: %d to prevent IV reuse.\n",
-+		  vmpck_id);
- 	memzero_explicit(snp_dev->vmpck, VMPCK_KEY_LEN);
- 	snp_dev->vmpck = NULL;
- }
-@@ -326,29 +345,29 @@ static int handle_guest_request(struct snp_guest_dev *snp_dev, u64 exit_code, in
- 	if (fw_err)
- 		*fw_err = err;
- 
--	if (rc)
--		return rc;
-+	if (rc) {
-+		dev_alert(snp_dev->dev,
-+			  "Detected error from ASP request. rc: %d, fw_err: %llu\n",
-+			  rc, *fw_err);
-+		goto disable_vmpck;
-+	}
- 
--	/*
--	 * The verify_and_dec_payload() will fail only if the hypervisor is
--	 * actively modifying the message header or corrupting the encrypted payload.
--	 * This hints that hypervisor is acting in a bad faith. Disable the VMPCK so that
--	 * the key cannot be used for any communication. The key is disabled to ensure
--	 * that AES-GCM does not use the same IV while encrypting the request payload.
--	 */
- 	rc = verify_and_dec_payload(snp_dev, resp_buf, resp_sz);
- 	if (rc) {
- 		dev_alert(snp_dev->dev,
--			  "Detected unexpected decode failure, disabling the vmpck_id %d\n",
--			  vmpck_id);
--		snp_disable_vmpck(snp_dev);
--		return rc;
-+			  "Detected unexpected decode failure from ASP. rc: %d\n",
-+			  rc);
-+		goto disable_vmpck;
- 	}
- 
- 	/* Increment to new message sequence after payload decryption was successful. */
- 	snp_inc_msg_seqno(snp_dev);
- 
- 	return 0;
-+
-+disable_vmpck:
-+	snp_disable_vmpck(snp_dev);
-+	return rc;
- }
- 
- static int get_report(struct snp_guest_dev *snp_dev, struct snp_guest_request_ioctl *arg)
-@@ -437,7 +456,7 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
- 	struct snp_guest_crypto *crypto = snp_dev->crypto;
- 	struct snp_ext_report_req req;
- 	struct snp_report_resp *resp;
--	int ret, npages = 0, resp_len;
-+	int ret, resp_len, req_cert_len, resp_cert_len;
- 
- 	lockdep_assert_held(&snp_cmd_mutex);
- 
-@@ -448,14 +467,15 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
- 		return -EFAULT;
- 
- 	/* userspace does not want certificate data */
--	if (!req.certs_len || !req.certs_address)
-+	req_cert_len = req.certs_len;
-+	if (!req_cert_len || !req.certs_address)
- 		goto cmd;
- 
--	if (req.certs_len > SEV_FW_BLOB_MAX_SIZE ||
--	    !IS_ALIGNED(req.certs_len, PAGE_SIZE))
-+	if (req_cert_len > sizeof(*snp_dev->certs_data) ||
-+	    !IS_ALIGNED(req_cert_len, PAGE_SIZE))
- 		return -EINVAL;
- 
--	if (!access_ok((const void __user *)req.certs_address, req.certs_len))
-+	if (!access_ok((const void __user *)req.certs_address, req_cert_len))
- 		return -EFAULT;
- 
- 	/*
-@@ -464,8 +484,7 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
- 	 * the host. If host does not supply any certs in it, then copy
- 	 * zeros to indicate that certificate data was not provided.
- 	 */
--	memset(snp_dev->certs_data, 0, req.certs_len);
--	npages = req.certs_len >> PAGE_SHIFT;
-+	memset(snp_dev->certs_data, 0, sizeof(*snp_dev->certs_data));
- cmd:
- 	/*
- 	 * The intermediate response buffer is used while decrypting the
-@@ -477,25 +496,37 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
- 	if (!resp)
- 		return -ENOMEM;
- 
--	snp_dev->input.data_npages = npages;
-+	snp_dev->input.data_npages = sizeof(*snp_dev->certs_data) >> PAGE_SHIFT;
- 	ret = handle_guest_request(snp_dev, SVM_VMGEXIT_EXT_GUEST_REQUEST, arg->msg_version,
- 				   SNP_MSG_REPORT_REQ, &req.data,
- 				   sizeof(req.data), resp->data, resp_len, &arg->fw_err);
- 
-+	resp_cert_len = snp_dev->input.data_npages << PAGE_SHIFT;
-+
- 	/* If certs length is invalid then copy the returned length */
- 	if (arg->fw_err == SNP_GUEST_REQ_INVALID_LEN) {
--		req.certs_len = snp_dev->input.data_npages << PAGE_SHIFT;
-+		dev_alert(snp_dev->dev,
-+			  "Certificate data from host: %d, Max size allocated by driver: %lu.\n",
-+			  resp_cert_len, sizeof(*snp_dev->certs_data));
-+		ret = -EFAULT;
-+	}
-+
-+	if (ret)
-+		goto e_free;
-+
-+	/* Pass the actual certificate data size back to userspace */
-+	req.certs_len = resp_cert_len;
-+	if (resp_cert_len > req_cert_len) {
-+		arg->fw_err = SNP_GUEST_REQ_INVALID_LEN;
- 
- 		if (copy_to_user((void __user *)arg->req_data, &req, sizeof(req)))
- 			ret = -EFAULT;
--	}
- 
--	if (ret)
- 		goto e_free;
-+	}
- 
--	if (npages &&
--	    copy_to_user((void __user *)req.certs_address, snp_dev->certs_data,
--			 req.certs_len)) {
-+	if (copy_to_user((void __user *)req.certs_address, snp_dev->certs_data,
-+			 resp_cert_len)) {
- 		ret = -EFAULT;
- 		goto e_free;
- 	}
-@@ -676,7 +707,7 @@ static int __init sev_guest_probe(struct platform_device *pdev)
- 	if (!snp_dev->response)
- 		goto e_free_request;
- 
--	snp_dev->certs_data = alloc_shared_pages(dev, SEV_FW_BLOB_MAX_SIZE);
-+	snp_dev->certs_data = alloc_shared_pages(dev, sizeof(*snp_dev->certs_data));
- 	if (!snp_dev->certs_data)
- 		goto e_free_response;
- 
-@@ -703,7 +734,7 @@ static int __init sev_guest_probe(struct platform_device *pdev)
- 	return 0;
- 
- e_free_cert_data:
--	free_shared_pages(snp_dev->certs_data, SEV_FW_BLOB_MAX_SIZE);
-+	free_shared_pages(snp_dev->certs_data, sizeof(*snp_dev->certs_data));
- e_free_response:
- 	free_shared_pages(snp_dev->response, sizeof(struct snp_guest_msg));
- e_free_request:
-@@ -717,7 +748,7 @@ static int __exit sev_guest_remove(struct platform_device *pdev)
- {
- 	struct snp_guest_dev *snp_dev = platform_get_drvdata(pdev);
- 
--	free_shared_pages(snp_dev->certs_data, SEV_FW_BLOB_MAX_SIZE);
-+	free_shared_pages(snp_dev->certs_data, sizeof(*snp_dev->certs_data));
- 	free_shared_pages(snp_dev->response, sizeof(struct snp_guest_msg));
- 	free_shared_pages(snp_dev->request, sizeof(struct snp_guest_msg));
- 	deinit_crypto(snp_dev->crypto);
--- 
-2.38.0.135.g90850a2211-goog
 
+To dedup code slightly and make this a little more readable, what about adding a
+common helper to do the compare?  That also makes it quite obvious that the only
+difference is the inclusion (heh) of the EXCLUDE flag.
+
+static int filter_cmp(u64 *pa, u64 *pb, u64 mask)
+{
+        u64 a = *pa & mask;
+        u64 b = *pb & mask;
+
+        return (a > b) - (a < b);
+}
+
+static int filter_sort_cmp(const void *pa, const void *pb)
+{
+        return filter_cmp(pa, pb, (KVM_PMU_MASKED_ENTRY_EVENT_SELECT |
+                                   KVM_PMU_MASKED_ENTRY_EXCLUDE);
+}
+
+/*
+ * For the event filter, searching is done on the 'includes' list and
+ * 'excludes' list separately rather than on the 'events' list (which
+ * has both).  As a result the exclude bit can be ignored.
+ */
+static int filter_event_cmp(const void *pa, const void *pb)
+{
+        return filter_cmp(pa, pb, (KVM_PMU_MASKED_ENTRY_EVENT_SELECT);
+}
+
+> static bool filter_contains_match(u64 *events, u64 nevents, u64 eventsel)
+> {
+>         u64 event_select = eventsel & kvm_pmu_ops.EVENTSEL_EVENT;
+>         u64 umask = eventsel & ARCH_PERFMON_EVENTSEL_UMASK;
+>         int i, index;
+> 
+>         index = find_filter_index(events, nevents, event_select);
+>         if (index < 0)
+>                 return false;
+> 
+>         /*
+>          * Entries are sorted by the event select.  Walk the list in both
+>          * directions to process all entries with the targeted event select.
+>          */
+>         for (i = index; i < nevents; i++) {
+>                 if (filter_event_cmp(&events[i], &event_select) != 0)
+
+Preferred kernel style is to omit comparisons against zero, i.e. just
+
+		if (filter_event_cmp(&events[i], &event_select))
+			break;
+
+>                         break;
+> 
+>                 if (is_filter_entry_match(events[i], umask))
+>                         return true;
+>         }
+> 
+>         for (i = index - 1; i >= 0; i--) {
+>                 if (filter_event_cmp(&events[i], &event_select) != 0)
+>                         break;
+> 
+>                 if (is_filter_entry_match(events[i], umask))
+>                         return true;
+>         }
+> 
+>         return false;
+> }
+> 
+> static bool is_gp_event_allowed(struct kvm_x86_pmu_event_filter *filter,
+>                                 u64 eventsel)
+> {
+>         if (filter_contains_match(filter->includes,
+> filter->nr_includes, eventsel) &&
+>             !filter_contains_match(filter->excludes,
+> filter->nr_excludes, eventsel))
+>                 return filter->action == KVM_PMU_EVENT_ALLOW;
+> 
+>         return filter->action == KVM_PMU_EVENT_DENY;
+
+Might be worth using a single char for the filter param, e.g. 'f' yields:
+
+static bool is_gp_event_allowed(struct kvm_x86_pmu_event_filter *f,
+                                u64 eventsel)
+{
+        if (filter_contains_match(f->includes, f->nr_includes, eventsel) &&
+            !filter_contains_match(f->excludes, f->nr_excludes, eventsel))
+                return f->action == KVM_PMU_EVENT_ALLOW;
+
+        return f->action == KVM_PMU_EVENT_DENY;
+}
+
+> static void setup_filter_lists(struct kvm_x86_pmu_event_filter *filter)
+> {
+>         int i;
+> 
+>         for (i = 0; i < filter->nevents; i++) {
+>                 if(filter->events[i] & KVM_PMU_MASKED_ENTRY_EXCLUDE)a
+
+Space after the if
+
+		if (filter-> ...)
+
+>                         break;
+>         }
+> 
+>         filter->nr_includes = i;
+>         filter->nr_excludes = filter->nevents - filter->nr_includes;
+>         filter->includes = filter->events;
+>         filter->excludes = filter->events + filter->nr_includes;
+> }
+> 
+
+...
+
+> static void prepare_filter_events(struct kvm_x86_pmu_event_filter *filter)
+> {
+>         int i, j;
+> 
+>         if (filter->flags & KVM_PMU_EVENT_FLAG_MASKED_EVENTS)
+>                 return;
+> 
+>         for (i = 0, j = 0; i < filter->nevents; i++) {
+>                 /*
+>                  * Skip events that are impossible to match against a guest
+>                  * event.  When filtering, only the event select + unit mask
+>                  * of the guest event is used.
+
+This is a good place for calling out that impossible filters can't be rejected
+for backwards compatibility reasons.
+
+>                  */
+>                 if (filter->events[i] & ~(kvm_pmu_ops.EVENTSEL_EVENT |
+>                                           ARCH_PERFMON_EVENTSEL_UMASK))
+>                         continue;
+> 
+>                 /*
+>                  * Convert userspace events to a common in-kernel event so
+>                  * only one code path is needed to support both events.  For
+>                  * the in-kernel events use masked events because they are
+>                  * flexible enough to handle both cases.  To convert to masked
+>                  * events all that's needed is to add the umask_mask.
+
+I think it's worth calling out this creates an "all ones" umask_mask, and that
+EXCLUDE isn't supported.
+
+>                  */
+>                 filter->events[j++] =
+>                         filter->events[i] |
+>                         (0xFFULL << KVM_PMU_MASKED_ENTRY_UMASK_MASK_SHIFT);
+>         }
+> 
+>         filter->nevents = j;
+> }
+
+...
+
+> -       /* Restore the verified state to guard against TOCTOU attacks. */
+> -       *filter = tmp;
+> +       r = -EINVAL;
+> +       if (!is_filter_valid(filter))
+> +               goto cleanup;
+> 
+> -       remove_impossible_events(filter);
+> +       prepare_filter_events(filter);
+> 
+>         /*
+> -        * Sort the in-kernel list so that we can search it with bsearch.
+> +        * Sort entries by event select so that all entries for a given
+> +        * event select can be processed efficiently during filtering.
+>          */
+> -       sort(&filter->events, filter->nevents, sizeof(__u64), cmp_u64, NULL);
+> +       sort(&filter->events, filter->nevents, sizeof(filter->events[0]),
+> +            filter_sort_cmp, NULL);
+> +
+> +       setup_filter_lists(filter);
+
+The sort+setup should definitely go in a single helper.  Rather than have the
+helpers deal with masked vs. legacy, what about putting that logic in a top-level
+helper?  Then this code is simply:
+
+	r = prepare_filter_lists(filter);
+	if (r)
+		goto cleanup;
+
+And the helper names can be more explicit, i.e. can call out that they validate
+a masked filter and convert to a masked filter.
+
+E.g. (completely untested)
+
+static bool is_masked_filter_valid(const struct kvm_x86_pmu_event_filter *filter)
+{
+        u64 mask = kvm_pmu_ops.EVENTSEL_EVENT |
+                   KVM_PMU_MASKED_ENTRY_UMASK_MASK |
+                   KVM_PMU_MASKED_ENTRY_UMASK_MATCH |
+                   KVM_PMU_MASKED_ENTRY_EXCLUDE;
+        int i;
+
+        for (i = 0; i < filter->nevents; i++) {
+                if (filter->events[i] & ~mask)
+                        return false;
+        }
+
+        return true;
+}
+static void convert_to_masked_filter(struct kvm_x86_pmu_event_filter *filter)
+{
+        int i, j;
+
+        for (i = 0, j = 0; i < filter->nevents; i++) {
+                /*
+                 * Skip events that are impossible to match against a guest
+                 * event.  When filtering, only the event select + unit mask
+                 * of the guest event is used.  To maintain backwards
+                 * compatibility, impossible filters can't be rejected :-(
+                 */
+                if (filter->events[i] & ~(kvm_pmu_ops.EVENTSEL_EVENT |
+                                          ARCH_PERFMON_EVENTSEL_UMASK))
+                        continue;
+                /*
+                 * Convert userspace events to a common in-kernel event so
+                 * only one code path is needed to support both events.  For
+                 * the in-kernel events use masked events because they are
+                 * flexible enough to handle both cases.  To convert to masked
+                 * events all that's needed is to add an "all ones" umask_mask,
+                 * (unmasked filter events don't support EXCLUDE).
+                 */
+                filter->events[j++] = filter->events[i] |
+                                      (0xFFULL << KVM_PMU_MASKED_ENTRY_UMASK_MASK_SHIFT);
+	}
+
+        filter->nevents = j;
+}
+
+static int prepare_filter_lists(struct kvm_x86_pmu_event_filter *filter)
+{
+        int i;
+
+        if (!(filter->flags & KVM_PMU_EVENT_FLAG_MASKED_EVENTS)
+                convert_to_masked_filter(filter)
+        else if (!is_masked_filter_valid(filter))
+                return -EINVAL;
+
+        /*
+         * Sort entries by event select and includes vs. excludes so that all
+         * entries for a given event select can be processed efficiently during
+         * filtering.  The EXCLUDE flag uses a more significant bit than the
+         * event select, and so the sorted list is also effectively split into
+         * includes and excludes sub-lists.
+         */
+        sort(&filter->events, filter->nevents, sizeof(filter->events[0]),
+             filter_sort_cmp, NULL);
+
+        /* Find the first EXCLUDE event (only supported for masked events). */
+        if (filter->flags & KVM_PMU_EVENT_FLAG_MASKED_EVENTS) {
+                for (i = 0; i < filter->nevents; i++) {
+                        if (filter->events[i] & KVM_PMU_MASKED_ENTRY_EXCLUDE)
+                                break;
+                }
+        }
+
+        filter->nr_includes = i;
+        filter->nr_excludes = filter->nevents - filter->nr_includes;
+        filter->includes = filter->events;
+        filter->excludes = filter->events + filter->nr_includes;
+}
