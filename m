@@ -2,104 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0319607CDF
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 18:54:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 12A2A607D93
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 19:33:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231341AbiJUQx7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 12:53:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51234 "EHLO
+        id S230143AbiJURdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 13:33:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231295AbiJUQxg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 12:53:36 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED5572906A5
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 09:53:21 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id i3-20020a17090a3d8300b00212cf2e2af9so2275498pjc.1
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 09:53:21 -0700 (PDT)
+        with ESMTP id S229853AbiJURdh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 13:33:37 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91DB626205B
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 10:33:36 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id w11-20020a170902e88b00b001855276704aso2050412plg.4
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 10:33:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xrysGx55UenjRLyS1DI8lWgE85TWYqrMWgtnLZZFAkc=;
-        b=RHWZQBLe9HXVngD3tJPBIAxrqGbPxOHUi+EuoMf2wh8wAVWCUykhVBw5M4bpHipxKX
-         AQrvUqN4owfPyZqdyzULb7AFBCSDE+f4NUKYHAYIddpZR67VGGUvvxapOtY3ozT/Ml4t
-         aiXuSjYrXY3eVMT1GbVbskQFgGxypZbRWqNEOhCm30Zif46drkOhIOZelqHekwQwUk43
-         bnuW3YgCEoukR20OzDrDD/o7UY7n/fRCHqej35doY178zBweJ3IoeGQQs9hPHYSo3Ohx
-         OqzLxanZHEvXOsNtWfWWxGtsKOFGJnejx5vYFgdKqN5Vb6+SO3aa9cMSKsUkIyd4p5eH
-         sJHA==
+        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Rm31qAFaq+M5EgnK0auSpdF+G0fRaJUMCym7D7tYLvw=;
+        b=YrHCpg3QEb9QJEUkOK3NXTmjU0qVBg1fZfBzLdxZoVUVe0ZbDSdSlLJs50rvbe0zL6
+         2i2fHKgaCdM4MDMWA5FB4J4yF4zEfp+172NtQvekyq98xeDI6wNceG2aYhaUu/hujtnI
+         YofEh9QFhpuWWjI9yEK5Ctgai33+KfV9F5nHvKjHs6OOgZRrC9TeP4Id6FfXZOYFx1ks
+         zVArlk9s0+tGOBcHEMb61aVIfLhlw1x8KzO95Zn1gAq/c+BgeUb/hVGf43b04o7hLrr5
+         3ktFYcBGfUHLyUkDqJXHQIZ/ynGYfinJFlUSXEIMvDpv47Hq+Ur+ogXGIiUf+MdJxl7L
+         ijXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xrysGx55UenjRLyS1DI8lWgE85TWYqrMWgtnLZZFAkc=;
-        b=vCYSh8JUi9cZwHKH5kxVSmRpB/5H5kh/qWHwYJLJcYbrhmaxVKs4TUY1kmM+nwzyyU
-         DWkVXqs2ojyLKu3q3CeN0IPx/0Fx//QeEU7IFelgByOeCjoUUvVq/i7H/ZWMl5GP6scK
-         hdxSUNNN+xuiKCMrgBHfI1I8ZeFWlGMyAsnKZ0IYjiQ98cMG38K11nDXCaHChUr9S3KO
-         Ccz+nWnFIXrB6QLv6WLD9yBY/iOgynR2KwCx8JyNwniDlkNBuyExxJpHUPiUCPjc3sH6
-         CcJaiKZEUG1szUwdqWCPy9pN6SGlEVvisCRG8z0qKsPn4jCznt+fjlrq7TvzQ/BzUdV1
-         pINw==
-X-Gm-Message-State: ACrzQf0rBmFkbWbCyWM9Kx9uP7sIeq09nIJ6uOKTCMn9Jqrvs8n7PPaz
-        6gih6s08qyUqka1oT60l7F+Gpw==
-X-Google-Smtp-Source: AMsMyM4X0ByBcSID7/aMrdZ0mivytsG1EHhlrHnS2og4yoaJvAdKT/AGmOFlcmS9yqzFtIJMO1ZXxQ==
-X-Received: by 2002:a17:90b:2651:b0:20a:daaf:75f0 with SMTP id pa17-20020a17090b265100b0020adaaf75f0mr22464873pjb.142.1666371200475;
-        Fri, 21 Oct 2022 09:53:20 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id b14-20020a170903228e00b00176e8f85147sm15298020plh.83.2022.10.21.09.53.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Oct 2022 09:53:19 -0700 (PDT)
-Date:   Fri, 21 Oct 2022 16:53:15 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     Vishal Annapurve <vannapurve@google.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Gupta, Pankaj" <pankaj.gupta@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
-Message-ID: <Y1LOe4JvnTbFNs4u@google.com>
-References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
- <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
- <de680280-f6b1-9337-2ae4-4b2faf2b823b@suse.cz>
- <20221017161955.t4gditaztbwijgcn@box.shutemov.name>
- <c63ad0cd-d517-0f1e-59e9-927d8ae15a1a@amd.com>
- <20221017215640.hobzcz47es7dq2bi@box.shutemov.name>
- <CAGtprH8xEdgATjQdhi2b_KqUuSOZHUM-Lh+O-ZtcFKbHf2_75g@mail.gmail.com>
- <20221019153225.njvg45glehlnjgc7@box.shutemov.name>
- <CAGtprH-8y9iTyVZ+EYW2t=zGqz7fVgPu-3wVm0Wgv5134NU6WQ@mail.gmail.com>
- <20221021135434.GB3607894@chaop.bj.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221021135434.GB3607894@chaop.bj.intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Rm31qAFaq+M5EgnK0auSpdF+G0fRaJUMCym7D7tYLvw=;
+        b=VfULks8QSBy0racrQbJEzstLzdxUelZ1djSJdjNm5rsX8dMsAU9FfBUPNLC72nfo74
+         vOR9qkdD0PbX3pBP8J56fK/pjN4cNOZdeajr18U47tsHmG0dyS3BB9TKAWwB+dtKXjX/
+         s9q5Y3W515z/vq9FkatvFf1cvUlsxiub9cM1KEEhfy/x7diLJBF37N8VmiSH805isMPr
+         tDHcIDQCCGgp17NUV97wmu58AjCoIr32YlKvsmXgdabVt7imIeZmLy2khQWeHr7j5bhw
+         TUkb5JvHAohf8Irnc0BM7eUBcxRLyKav7kF7wV0BOLbxWUpHkJl3apBl6XXhv+ztzRaz
+         4x7g==
+X-Gm-Message-State: ACrzQf2yH/+Z2UIq9sumH/Tam4mGXqvIqLQGB5Z+yl8KMAb2xL/E8R6u
+        6tU1zIznrair79zEC9e5L/dkcJOUZrM=
+X-Google-Smtp-Source: AMsMyM4fVZqqp2S5uhWZHjdVvRNZU+skQdKq/j16fQ/MICKD5HU6uWA/WkxAVI1JxfGo+yZxrVtCIqMNGng=
+X-Received: from pgonda1.kir.corp.google.com ([2620:15c:29:203:3e70:6547:73ac:76aa])
+ (user=pgonda job=sendgmr) by 2002:a17:902:cecf:b0:185:475a:4073 with SMTP id
+ d15-20020a170902cecf00b00185475a4073mr20663741plg.60.1666373616083; Fri, 21
+ Oct 2022 10:33:36 -0700 (PDT)
+Date:   Fri, 21 Oct 2022 10:33:28 -0700
+Message-Id: <20221021173328.2489411-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.0.135.g90850a2211-goog
+Subject: [PATCH V2] virt: Prevent IV reuse in SNP guest driver
+From:   Peter Gonda <pgonda@google.com>
+To:     thomas.lendacky@amd.com
+Cc:     Peter Gonda <pgonda@google.com>,
+        Dionna Glaze <dionnaglaze@google.com>,
+        Borislav Petkov <bp@suse.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Haowen Bai <baihaowen@meizu.com>,
+        Yang Yingliang <yangyingliang@huawei.com>,
+        Marc Orr <marcorr@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -107,65 +73,234 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 21, 2022, Chao Peng wrote:
-> On Thu, Oct 20, 2022 at 04:20:58PM +0530, Vishal Annapurve wrote:
-> > On Wed, Oct 19, 2022 at 9:02 PM Kirill A . Shutemov <kirill.shutemov@linux.intel.com> wrote:
-> > >
-> > > On Tue, Oct 18, 2022 at 07:12:10PM +0530, Vishal Annapurve wrote:
-> > > > I think moving this notifier_invalidate before fallocate may not solve
-> > > > the problem completely. Is it possible that between invalidate and
-> > > > fallocate, KVM tries to handle the page fault for the guest VM from
-> > > > another vcpu and uses the pages to be freed to back gpa ranges? Should
-> > > > hole punching here also update mem_attr first to say that KVM should
-> > > > consider the corresponding gpa ranges to be no more backed by
-> > > > inaccessible memfd?
-> > >
-> > > We rely on external synchronization to prevent this. See code around
-> > > mmu_invalidate_retry_hva().
-> > >
-> > > --
-> > >   Kiryl Shutsemau / Kirill A. Shutemov
-> > 
-> > IIUC, mmu_invalidate_retry_hva/gfn ensures that page faults on gfn
-> > ranges that are being invalidated are retried till invalidation is
-> > complete. In this case, is it possible that KVM tries to serve the
-> > page fault after inaccessible_notifier_invalidate is complete but
-> > before fallocate could punch hole into the files?
+The ASP and an SNP guest use a series of AES-GCM keys called VMPCKs to
+communicate securely with each other. The IV to this scheme is a
+sequence number that both the ASP and the guest track. Currently this
+sequence number in a guest request must exactly match the sequence
+number tracked by the ASP. This means that if the guest sees an error
+from the host during a request it can only retry that exact request or
+disable the VMPCK to prevent an IV reuse. AES-GCM cannot tolerate IV
+reuse see:
+https://csrc.nist.gov/csrc/media/projects/block-cipher-techniques/documents/bcm/comments/800-38-series-drafts/gcm/joux_comments.pdf
 
-It's not just the page fault edge case.  In the more straightforward scenario
-where the memory is already mapped into the guest, freeing pages back to the kernel
-before they are removed from the guest will lead to use-after-free.
+To handle userspace querying the cert_data length. Instead of requesting
+the cert length from userspace use the size of the drivers allocated
+shared buffer. Then copy that buffer to userspace, or give userspace an
+error depending on the size of the buffer given by userspace.
 
-> > e.g.
-> > inaccessible_notifier_invalidate(...)
-> > ... (system event preempting this control flow, giving a window for
-> > the guest to retry accessing the gfn range which was invalidated)
-> > fallocate(.., PUNCH_HOLE..)
-> 
-> Looks this is something can happen.
-> And sounds to me the solution needs
-> just follow the mmu_notifier's way of using a invalidate_start/end pair.
-> 
->   invalidate_start()  --> kvm->mmu_invalidate_in_progress++;
->                           zap KVM page table entries;
->   fallocate()
->   invalidate_end()  --> kvm->mmu_invalidate_in_progress--;
-> 
-> Then during invalidate_start/end time window mmu_invalidate_retry_gfn
-> checks 'mmu_invalidate_in_progress' and prevent repopulating the same
-> page in KVM page table.
+Fixes: fce96cf044308 ("virt: Add SEV-SNP guest driver")
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Reported-by: Peter Gonda <pgonda@google.com>
+Reviewed-by: Dionna Glaze <dionnaglaze@google.com>
+Cc: Borislav Petkov <bp@suse.de>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Michael Roth <michael.roth@amd.com>
+Cc: Haowen Bai <baihaowen@meizu.com>
+Cc: Yang Yingliang <yangyingliang@huawei.com>
+Cc: Marc Orr <marcorr@google.com>
+Cc: David Rientjes <rientjes@google.com>
+Cc: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org
+---
+ drivers/virt/coco/sev-guest/sev-guest.c | 93 ++++++++++++++++---------
+ 1 file changed, 62 insertions(+), 31 deletions(-)
 
-Yes, if it's not safe to invalidate after making the change (fallocate()), then
-the change needs to be bookended by a start+end pair.  The mmu_notifier's unpaired
-invalidate() hook works by zapping the primary MMU's PTEs before invalidate(), but
-frees the underlying physical page _after_ invalidate().
+diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
+index f422f9c58ba7..8c54ea84bc57 100644
+--- a/drivers/virt/coco/sev-guest/sev-guest.c
++++ b/drivers/virt/coco/sev-guest/sev-guest.c
+@@ -41,7 +41,7 @@ struct snp_guest_dev {
+ 	struct device *dev;
+ 	struct miscdevice misc;
+ 
+-	void *certs_data;
++	u8 (*certs_data)[SEV_FW_BLOB_MAX_SIZE];
+ 	struct snp_guest_crypto *crypto;
+ 	struct snp_guest_msg *request, *response;
+ 	struct snp_secrets_page_layout *layout;
+@@ -67,8 +67,27 @@ static bool is_vmpck_empty(struct snp_guest_dev *snp_dev)
+ 	return true;
+ }
+ 
++/*
++ * If we receive an error from the host or ASP we have two options. We can
++ * either retry the exact same encrypted request or we can discontinue using the
++ * VMPCK.
++ *
++ * This is because in the current encryption scheme GHCB v2 uses AES-GCM to
++ * encrypt the requests. The IV for this scheme is the sequence number. GCM
++ * cannot tolerate IV reuse.
++ *
++ * The ASP FW v1.51 only increments the sequence numbers on a successful
++ * guest<->ASP back and forth and only accepts messages at its exact sequence
++ * number.
++ *
++ * So if we were to reuse the sequence number the encryption scheme is
++ * vulnerable. If we encrypt the sequence number for a fresh IV the ASP will
++ * reject our request.
++ */
+ static void snp_disable_vmpck(struct snp_guest_dev *snp_dev)
+ {
++	dev_alert(snp_dev->dev, "Disabling vmpck_id: %d to prevent IV reuse.\n",
++		  vmpck_id);
+ 	memzero_explicit(snp_dev->vmpck, VMPCK_KEY_LEN);
+ 	snp_dev->vmpck = NULL;
+ }
+@@ -326,29 +345,29 @@ static int handle_guest_request(struct snp_guest_dev *snp_dev, u64 exit_code, in
+ 	if (fw_err)
+ 		*fw_err = err;
+ 
+-	if (rc)
+-		return rc;
++	if (rc) {
++		dev_alert(snp_dev->dev,
++			  "Detected error from ASP request. rc: %d, fw_err: %llu\n",
++			  rc, *fw_err);
++		goto disable_vmpck;
++	}
+ 
+-	/*
+-	 * The verify_and_dec_payload() will fail only if the hypervisor is
+-	 * actively modifying the message header or corrupting the encrypted payload.
+-	 * This hints that hypervisor is acting in a bad faith. Disable the VMPCK so that
+-	 * the key cannot be used for any communication. The key is disabled to ensure
+-	 * that AES-GCM does not use the same IV while encrypting the request payload.
+-	 */
+ 	rc = verify_and_dec_payload(snp_dev, resp_buf, resp_sz);
+ 	if (rc) {
+ 		dev_alert(snp_dev->dev,
+-			  "Detected unexpected decode failure, disabling the vmpck_id %d\n",
+-			  vmpck_id);
+-		snp_disable_vmpck(snp_dev);
+-		return rc;
++			  "Detected unexpected decode failure from ASP. rc: %d\n",
++			  rc);
++		goto disable_vmpck;
+ 	}
+ 
+ 	/* Increment to new message sequence after payload decryption was successful. */
+ 	snp_inc_msg_seqno(snp_dev);
+ 
+ 	return 0;
++
++disable_vmpck:
++	snp_disable_vmpck(snp_dev);
++	return rc;
+ }
+ 
+ static int get_report(struct snp_guest_dev *snp_dev, struct snp_guest_request_ioctl *arg)
+@@ -437,7 +456,7 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
+ 	struct snp_guest_crypto *crypto = snp_dev->crypto;
+ 	struct snp_ext_report_req req;
+ 	struct snp_report_resp *resp;
+-	int ret, npages = 0, resp_len;
++	int ret, resp_len, req_cert_len, resp_cert_len;
+ 
+ 	lockdep_assert_held(&snp_cmd_mutex);
+ 
+@@ -448,14 +467,15 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
+ 		return -EFAULT;
+ 
+ 	/* userspace does not want certificate data */
+-	if (!req.certs_len || !req.certs_address)
++	req_cert_len = req.certs_len;
++	if (!req_cert_len || !req.certs_address)
+ 		goto cmd;
+ 
+-	if (req.certs_len > SEV_FW_BLOB_MAX_SIZE ||
+-	    !IS_ALIGNED(req.certs_len, PAGE_SIZE))
++	if (req_cert_len > sizeof(*snp_dev->certs_data) ||
++	    !IS_ALIGNED(req_cert_len, PAGE_SIZE))
+ 		return -EINVAL;
+ 
+-	if (!access_ok((const void __user *)req.certs_address, req.certs_len))
++	if (!access_ok((const void __user *)req.certs_address, req_cert_len))
+ 		return -EFAULT;
+ 
+ 	/*
+@@ -464,8 +484,7 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
+ 	 * the host. If host does not supply any certs in it, then copy
+ 	 * zeros to indicate that certificate data was not provided.
+ 	 */
+-	memset(snp_dev->certs_data, 0, req.certs_len);
+-	npages = req.certs_len >> PAGE_SHIFT;
++	memset(snp_dev->certs_data, 0, sizeof(*snp_dev->certs_data));
+ cmd:
+ 	/*
+ 	 * The intermediate response buffer is used while decrypting the
+@@ -477,25 +496,37 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
+ 	if (!resp)
+ 		return -ENOMEM;
+ 
+-	snp_dev->input.data_npages = npages;
++	snp_dev->input.data_npages = sizeof(*snp_dev->certs_data) >> PAGE_SHIFT;
+ 	ret = handle_guest_request(snp_dev, SVM_VMGEXIT_EXT_GUEST_REQUEST, arg->msg_version,
+ 				   SNP_MSG_REPORT_REQ, &req.data,
+ 				   sizeof(req.data), resp->data, resp_len, &arg->fw_err);
+ 
++	resp_cert_len = snp_dev->input.data_npages << PAGE_SHIFT;
++
+ 	/* If certs length is invalid then copy the returned length */
+ 	if (arg->fw_err == SNP_GUEST_REQ_INVALID_LEN) {
+-		req.certs_len = snp_dev->input.data_npages << PAGE_SHIFT;
++		dev_alert(snp_dev->dev,
++			  "Certificate data from host: %d, Max size allocated by driver: %lu.\n",
++			  resp_cert_len, sizeof(*snp_dev->certs_data));
++		ret = -EFAULT;
++	}
++
++	if (ret)
++		goto e_free;
++
++	/* Pass the actual certificate data size back to userspace */
++	req.certs_len = resp_cert_len;
++	if (resp_cert_len > req_cert_len) {
++		arg->fw_err = SNP_GUEST_REQ_INVALID_LEN;
+ 
+ 		if (copy_to_user((void __user *)arg->req_data, &req, sizeof(req)))
+ 			ret = -EFAULT;
+-	}
+ 
+-	if (ret)
+ 		goto e_free;
++	}
+ 
+-	if (npages &&
+-	    copy_to_user((void __user *)req.certs_address, snp_dev->certs_data,
+-			 req.certs_len)) {
++	if (copy_to_user((void __user *)req.certs_address, snp_dev->certs_data,
++			 resp_cert_len)) {
+ 		ret = -EFAULT;
+ 		goto e_free;
+ 	}
+@@ -676,7 +707,7 @@ static int __init sev_guest_probe(struct platform_device *pdev)
+ 	if (!snp_dev->response)
+ 		goto e_free_request;
+ 
+-	snp_dev->certs_data = alloc_shared_pages(dev, SEV_FW_BLOB_MAX_SIZE);
++	snp_dev->certs_data = alloc_shared_pages(dev, sizeof(*snp_dev->certs_data));
+ 	if (!snp_dev->certs_data)
+ 		goto e_free_response;
+ 
+@@ -703,7 +734,7 @@ static int __init sev_guest_probe(struct platform_device *pdev)
+ 	return 0;
+ 
+ e_free_cert_data:
+-	free_shared_pages(snp_dev->certs_data, SEV_FW_BLOB_MAX_SIZE);
++	free_shared_pages(snp_dev->certs_data, sizeof(*snp_dev->certs_data));
+ e_free_response:
+ 	free_shared_pages(snp_dev->response, sizeof(struct snp_guest_msg));
+ e_free_request:
+@@ -717,7 +748,7 @@ static int __exit sev_guest_remove(struct platform_device *pdev)
+ {
+ 	struct snp_guest_dev *snp_dev = platform_get_drvdata(pdev);
+ 
+-	free_shared_pages(snp_dev->certs_data, SEV_FW_BLOB_MAX_SIZE);
++	free_shared_pages(snp_dev->certs_data, sizeof(*snp_dev->certs_data));
+ 	free_shared_pages(snp_dev->response, sizeof(struct snp_guest_msg));
+ 	free_shared_pages(snp_dev->request, sizeof(struct snp_guest_msg));
+ 	deinit_crypto(snp_dev->crypto);
+-- 
+2.38.0.135.g90850a2211-goog
 
-And the only reason the unpaired invalidate() exists is because there are secondary
-MMUs that reuse the primary MMU's page tables, e.g. shared virtual addressing, in
-which case bookending doesn't work because the secondary MMU can't remove PTEs, it
-can only flush its TLBs.
-
-For this case, the whole point is to not create PTEs in the primary MMU, so there
-should never be a use case that _needs_ an unpaired invalidate().
-
-TL;DR: a start+end pair is likely the simplest solution.
