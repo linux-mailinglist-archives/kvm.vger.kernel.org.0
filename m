@@ -2,67 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C8CB607E3B
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 20:22:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A3C1607E56
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 20:35:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230063AbiJUSW3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 14:22:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58542 "EHLO
+        id S230176AbiJUSfN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 14:35:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229779AbiJUSW1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 14:22:27 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7D58253BE0
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 11:22:26 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id y4so3095810plb.2
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 11:22:26 -0700 (PDT)
+        with ESMTP id S229633AbiJUSfK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 14:35:10 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E6FF66122
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 11:35:08 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id i3so3333225pfc.11
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 11:35:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wck+muLAxLDCxfIP+3i9zIUWykRb/pohhRWDh4LFtKA=;
-        b=LPA0o3fKU9iwxQt3YTae3C7bsOPZhr/phA7P4mhC5gpgwXFHminLRHhU77qercRKgR
-         1tsPEaRIrC5X4AHSYFHu+MPHcdjlbm3TFdAKdN8b1J6IsH0c0lHNU0U4TcWIaVq/F03X
-         HLvoAQsY5kLFHT3F5Ij8quGmwAuyBdUgBYdUIEhS8LIUXkTKlMdYInulR6a+S8unNcw6
-         lbeNXoaP29cUmu9kKj2zJPC1DrBNAl2xfR97fQ6cJ969APLa0ZHI/SmLRQ4yArWntWok
-         ZtyZlluW8VTKVdPgG3IbRZ1/NLWUIJmAqj469nauofac9H42RgkLo/yizcemozK02vha
-         8DwQ==
+        bh=RbVgeTtCM02kPqYNtbeyhsWp7ZqZ9UH42EzNv221eVU=;
+        b=g0K9So0kuv+lWZGKTwvhP1SbKVRRXuLtb1ArR2RJYXdBTW5aCKVTxK0iF4QVJCm3Bf
+         qK64Ftc6YjlDZBrzedI4YyCJEMxu2UyjXWTZB5izZLP9kUjgXWH5zfJuTKgmhl+omQTj
+         mEXZBxu6FtPtC7qSwgVabW2/YrD8LywRi2k6w7MOryDz6vqsHb3lZ+HPrf6gDILUq1h3
+         PQV6Y0E72RYSDWNyToJwtAa+Qo1iuaZQo9xGMDu9pb14teVljAi4n8wEjsrqyw2/a3IE
+         5FPKP9b5HePpdKctATwnSN6DY7SjnorowxmRlNakfXZzTgCvL8D8LZOXgSF4/86GuyXe
+         FAmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wck+muLAxLDCxfIP+3i9zIUWykRb/pohhRWDh4LFtKA=;
-        b=VTBYNkx/qW433v35K/IYVn0iUG7a3hQmxx4xwYc1zZeaE1tDn1E8ELBhXyPyUrseeb
-         GZE7NZ8bwrzqa78wAwyTmNJ9BXnX30Zha09bF6Re/rnt0mdRi3Qlfs6PH8RBr3GyCiWQ
-         7nAFUjS22iynHynoX2FYqmX1zra7LUvuOaO+9My0wA4WJbOIWaLjSddAOKT8/R8UizKP
-         gm+gtdO4emXRcK/10bFuaGggq6/LX9w0TzF67KpUfQF80h8mEk1pAZaAs2L8KS65PGmH
-         x3Hl4UPE6qFTdP125jexP35o1GW+Np/E+fzaJM0JEkusQmfItQ5u8BRMX00eEtZWriXM
-         RELQ==
-X-Gm-Message-State: ACrzQf16GYANpUImsMr+9VNtriwqs63q6jNdA+/pbTrwI8barLg842o3
-        0C8DbrA+1Op8WbinXre3ppFjhQ==
-X-Google-Smtp-Source: AMsMyM4LZY+3iUsv1i4u6JzQXRc1fGTWW+gyzSVix4Z9SqUaS1ond8f97+NkSfpPP/dXyeYaE/aZqw==
-X-Received: by 2002:a17:902:ce08:b0:179:ed2b:8cd8 with SMTP id k8-20020a170902ce0800b00179ed2b8cd8mr20629755plg.23.1666376546379;
-        Fri, 21 Oct 2022 11:22:26 -0700 (PDT)
+        bh=RbVgeTtCM02kPqYNtbeyhsWp7ZqZ9UH42EzNv221eVU=;
+        b=wfG3WXiff70H7zmaXEpSulthtsQBxhq0yVSY1ct1A0jfEWGmy2MbExaoRmxC8s7L5P
+         2P6dui2/YFoHXn64vJonLuMD+wzg+GxyVVkiRsXc5/F7aO0vEsIV6ySb7yHYbgfT//H2
+         j/htRlm2VgMoroyujHgwX0cr972oRr4xhnDyt4TqHs/NBeOCGeo1MorT6o/zSIr2E35X
+         lGZEe+zIQcouBa56xQV+wy4VCrmkNhk5JrwZguSLicclyPrNt0g4a41fXa3Z/3O853Ei
+         jy9wCkmDslmJ5KJeOM8j6JR0vhiLmAmjfV2XKQrcuHrLKVqCNaGhUAVwizlxndsbCGgi
+         vY2A==
+X-Gm-Message-State: ACrzQf00bzrpnp6qX4v+BvUUapQeivJzfWFXBMSyDS9PlfSAxxcG20Ou
+        jQjwIh/mBb+pPq/Nt3/QDnyi+g==
+X-Google-Smtp-Source: AMsMyM6CFrI3TebUqw8G9APsnCJTcyJ3UhnwN87wo5TFxtbiPLBJNPKF37qhEOe3JPnCYdSoF+9UGw==
+X-Received: by 2002:a05:6a00:16c4:b0:535:890:d52 with SMTP id l4-20020a056a0016c400b0053508900d52mr20707625pfc.9.1666377307899;
+        Fri, 21 Oct 2022 11:35:07 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id f7-20020a170902684700b0017a04542a45sm2524651pln.159.2022.10.21.11.22.25
+        by smtp.gmail.com with ESMTPSA id i13-20020a170902c94d00b001754064ac31sm15122073pla.280.2022.10.21.11.35.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Oct 2022 11:22:25 -0700 (PDT)
-Date:   Fri, 21 Oct 2022 18:22:21 +0000
+        Fri, 21 Oct 2022 11:35:07 -0700 (PDT)
+Date:   Fri, 21 Oct 2022 18:35:04 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v3 12/13] x86/pmu: Add assignment
- framework for Intel-specific HW resources
-Message-ID: <Y1LjXfnCpf4k5uf8@google.com>
-References: <20220819110939.78013-1-likexu@tencent.com>
- <20220819110939.78013-13-likexu@tencent.com>
- <Yz4IwVKje90pcIUN@google.com>
- <8aeb4890-269b-1bd5-abe6-974e79858390@gmail.com>
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Fix the initial value of mcg_cap
+Message-ID: <Y1LmWAyG7S4bgzBs@google.com>
+References: <20221020031615.890400-1-xiaoyao.li@intel.com>
+ <Y1FatU6Yf9n5pWB+@google.com>
+ <092dc961-76f6-331a-6f91-a77a58f6732d@intel.com>
+ <Y1F4AoeOhNFQnHnJ@google.com>
+ <b40fd338-cb3b-b602-0059-39f775e77ad6@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8aeb4890-269b-1bd5-abe6-974e79858390@gmail.com>
+In-Reply-To: <b40fd338-cb3b-b602-0059-39f775e77ad6@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -74,33 +75,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 21, 2022, Like Xu wrote:
-> On 6/10/2022 6:44 am, Sean Christopherson wrote:
-> > On Fri, Aug 19, 2022, Like Xu wrote:
-> > > @@ -142,12 +148,22 @@ static void global_disable(pmu_counter_t *cnt)
-> > >   			~(1ull << cnt->idx));
-> > >   }
-> > > +static inline uint32_t get_gp_counter_msr(unsigned int i)
-> > 
-> > Rather than helpers, what about macros?  The problem with "get" is that it sounds
-> > like the helper is actually reading the counter/MSR.  E.g. see MSR_IA32_MCx_CTL()
-> > 
-> > Something like this?
-> > 
-> >    MSR_PERF_GP_CTRx()
+On Fri, Oct 21, 2022, Xiaoyao Li wrote:
+> On 10/21/2022 12:32 AM, Sean Christopherson wrote:
+> > If we really want to clean up this code, I think the correct approach would be to
+> > inject #GP on all relevant MSRs if CPUID.MCA==0, e.g.
 > 
-> The base address msr is different for intel and amd (including K7), and
-> using different macros in the same location sounds like it would require a
-> helper.
+> It's what I thought of as well. But I didn't find any statement in SDM of
+> "Accessing Machine Check MSRs gets #GP if no CPUID.MCA"
 
-I wasn't thinking different macros, I was thinking a macro that consumes the
-gp_counter_base.
+Ugh, stupid SDM.  Really old SDMs, e.g. circa 1997, explicity state in the
+CPUID.MCA entry that:
 
-But actually, there's no need to use a macro, it's really just the naming
-convention that I think we should use.  It obviously violates the preferred style,
-but in this case I think the deviation is a net postive.
+  Processor supports the MCG_CAP MSR.
 
-static inline uint32_t MSR_PERF_GP_CTRx(unsigned int i)
-{
-	return gp_counter_base + i;
-}
+But, when Intel introduced the "Architectural MSRs" section (2001 or so), the
+wording was changed to be less explicit:
+
+  The Machine Check Architecture, which provides a compatible mechanism for error
+  reporting in P6 family, Pentium 4, and Intel Xeon processors, and future processors,
+  is supported. The MCG_CAP MSR contains feature bits describing how many banks of
+  error reporting MSRs are supported.
+
+and the entry in the MSR index just lists P6 as the dependency:
+
+  IA32_MCG_CAP (MCG_CAP) Global Machine Check Capability (R/O) 06_01H
+
+So I think it's technically true that MCG_CAP is supposed to exist iff CPUID.MCA=1,
+but we'd probably need an SDM change to really be able to enforce that :-(
