@@ -2,63 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 68405607E7F
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 21:00:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 14304607E96
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 21:02:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229587AbiJUTAD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 15:00:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37796 "EHLO
+        id S229894AbiJUTCe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 15:02:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbiJUTAB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 15:00:01 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70EA3132EAE
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 11:59:59 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id g66-20020a636b45000000b0043a256d3639so1748471pgc.12
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 11:59:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=il9gk1S5qojK7G4xKoqIgvriNuF5wmsn4l8++fZfPGQ=;
-        b=QM7yKZWVI2m015h4EqgtiKZ1qMRWhX97e1kYND9ElhVHtmkKi7b31QfcTFg4B4T0Gw
-         tMkudKcPS7RGnuUH8Mx+FfiUFFGdatqUQ6LFmVhn0RcMKJ5BErFCE3a5W6fP/eHoz6Ou
-         19q51RSrQcOvxm0vN6tZoGTos+bKExVixOuXaUsWApaU5IkPm2Op3d5pikyWXa8E9DOr
-         nOYByBNc9QurJ6RwccCdutmrJJi6yZLJGJz2FJc6K7FQXQFfpeOHpLKzdnkcRuA8EhzA
-         Js5LlACHGl+j1KOP6qMWkYAZNSiPoh6S+V5CN3wnp4mgrj2pjPwY9fMCHsqShURMaIkx
-         VGyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=il9gk1S5qojK7G4xKoqIgvriNuF5wmsn4l8++fZfPGQ=;
-        b=76X+0iFIcVFdGpKoebiyAYA8q4vrYgfuaGz6W592NAibu0D5hgzlYosA9fTMunvqgY
-         Z813hPQeDwaT61Hk//3pt8ujq8lOStLJd6HBaB4kDTudK6x4zg5U0tMsDvp5dgyI2pno
-         5Y9K46PYBTvRSEyFvzQk56YqSjH6tN0+8RQWWdJGch5oISH9L/wKopBnT6stvIN+98Zd
-         HtN0RJ7n1GEMDoscgypsDrTv8hINOWeuwaGiKtZnglTLxpClQGm22ZeVMtbu3VK8RvZ7
-         R+35liMWapI37tJovWT9tegj+IwIloDt9LALsNjVZD1Mb3DcZ+bwcnt7rQhDKwRc6u6W
-         M0Nw==
-X-Gm-Message-State: ACrzQf0EcVzMifd21CA0Akq1KBIQB6M+AXpj06dpIh/z+UCrRQZSLTrK
-        DIkH/5EN9nSHms/QOFe7CjVfNhd1XK1I
-X-Google-Smtp-Source: AMsMyM44QesJEnRZVEWJz9kBQyL9A08BTyY9DE0GeJsweUuHrTGYyk8050rr3pYT9Rz89+jSRP8Z1ZZDnNXx
-X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a05:6a00:1742:b0:565:c73a:90de with SMTP
- id j2-20020a056a00174200b00565c73a90demr21246889pfc.68.1666378766941; Fri, 21
- Oct 2022 11:59:26 -0700 (PDT)
-Date:   Fri, 21 Oct 2022 11:59:16 -0700
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.38.0.135.g90850a2211-goog
-Message-ID: <20221021185916.1494314-1-vipinsh@google.com>
-Subject: [RFC PATCH] Add Hyperv extended hypercall support in KVM
-From:   Vipin Sharma <vipinsh@google.com>
-To:     vkuznets@redhat.com, seanjc@google.com, pbonzini@redhat.com,
-        dmatlack@google.com, kvm@vger.kernel.org
-Cc:     shujunxue@google.com, terrytaehyun@google.com,
-        linux-kernel@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        with ESMTP id S230306AbiJUTCT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 15:02:19 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2073.outbound.protection.outlook.com [40.107.220.73])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 266102764DD;
+        Fri, 21 Oct 2022 12:02:06 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=D1Pb3M5knGenxza1++VgyRilfTNHzDp6xl/4h9ZahHphPqbRbOvePHcu5RVPlTHufo4381xCl+xtT34qn/3hyOoem4U8NQ5gnwHa2Ps1dV/lr/9yqaHcGF3qxhicyyZ+SFlra/VXmOEugk60lms+Syyf9ighM0M2rCCTz3IDtZewxySEJ1dhL773tmg3OuYze7ulzS81rm8A8rWlJCygqx78VlEYOTJ7X2zd5rRjxfLXsAek5s0Iu9wiUyzvioQMM4+JbmQHgEeaz33wmWQZ8C+IeNKOA3Bnn/X9NmmezfDb8dqvZFokfY6vXITuoZ/zJ1e1oh0Z3fZdF+6/P+9tUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NUscHsuG6TfwC4jDJg3ZNO5fLQ3AUsK1DiNrj+2unE4=;
+ b=ct0Oy32O512y9HO+JFdjrSKIumxquQ/YRrM5qFGBMRxEibsNKTwCwwmGD3Je66OrJ4kGibLzx7MwrFaiMpcPsLmafqxzPVpcPTM9yezUsPv1cUM3SfpX7K/WoQKNjgXDxG504AkHFly/raUk1OgypWEk7ML2B1JnxBZL8Z9rXVbvPXITac9rVt3PzdcsMoCXi+RI7xpjejyahUQzCr3mC9eKKIsJO5OTmml4getf+0cnEi2RdsvyTJ5kzC52dFMf1Z7S7ScWhIHrelWUYJJRVtHdynfvq6u6mDJP7r/wMdguZPWrUvkCeJ+rRvCS4GpVw4YN/wT2mRIos8Mg6FLk6A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NUscHsuG6TfwC4jDJg3ZNO5fLQ3AUsK1DiNrj+2unE4=;
+ b=G0qfcXoP3B1TRRckOu//vWLoBNPKVF8sdzK+rTZWV/SV8AguTb627PQgwLFr2EbNYCR4z74mSfqWMXWYdtfidgV8W14oNzlkSuSE5LfXzvnUvdn1ngjyzew22xQqojvMOA7BexSg90IYjMyty+pwIteANhUUeJR/8TJthqWolYA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by CH3PR12MB7523.namprd12.prod.outlook.com (2603:10b6:610:148::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5746.21; Fri, 21 Oct
+ 2022 19:02:01 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::4da8:e3eb:20eb:f00]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::4da8:e3eb:20eb:f00%2]) with mapi id 15.20.5723.033; Fri, 21 Oct 2022
+ 19:02:01 +0000
+Message-ID: <b7414cda-9924-33c3-68da-9b26b2bcc0b6@amd.com>
+Date:   Fri, 21 Oct 2022 14:01:59 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH V2] virt: Prevent IV reuse in SNP guest driver
+Content-Language: en-US
+To:     Peter Gonda <pgonda@google.com>
+Cc:     Dionna Glaze <dionnaglaze@google.com>,
+        Borislav Petkov <bp@suse.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Haowen Bai <baihaowen@meizu.com>,
+        Yang Yingliang <yangyingliang@huawei.com>,
+        Marc Orr <marcorr@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20221021173328.2489411-1-pgonda@google.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20221021173328.2489411-1-pgonda@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM6PR06CA0095.namprd06.prod.outlook.com
+ (2603:10b6:5:336::28) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|CH3PR12MB7523:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8e183139-0969-4b12-d974-08dab396bc1a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: QHo9bFT8bczl75FpGvoVWDRTaTRUMnfxfWRy4kvOrzPuo7jRBNMMtB8a2gtzZxW5EY5iEDQBzwj3LfqG1KWSp/tckidDULRYlAkRZP/wXhZ7k0Un8AyG/AbJtGwSbZbE9rQArOi1bq3ZhxMbqqcnXby3hiCwcZmHNoYpEvRAK7n4OhK8ANTBTva5SM/O9CzpqwFLtxmZ2zWABXwMuPBLGCqGnBmcO41szmV80dra8SmZxSQ1AI8PIZoJ7qchjZBiIRUodVkD/SxqSEz1DYm0hR1ssvlDOU+vOUq49H4WEuNGu+qMbvA1eTDok8ZKKcG5cQbQwMBlf0nN9VTN1FWnF5zJeTLs30MxzEYLuvvzaN4/IhyNEFmrfAPhARf8D0qpzsLiFiYzX6ckOAmrsd0FpLiSSGAlgYO/3/d/mfL38rSkjwRqvj1iX9eZu7H/BUmHq3l3vlBa0x1QtISCZoyZWGenUxRkJYBP/GT4upIqQaJfVZGzKqge/8YpDc25KGJOmRt4SoGbHKBP9bcTLFrkvoTcJ/QgEVNEZCAdDb6VJKKApDkvKz0NYpZsRba+8OUgkdHdA48qIWCB5/9bgXXpL3sxgNn0U3K3J42+0M8zbMk86FMwJ5IKupnGUzZ7FVjXAEKQcNI0hiCQFj9ycggV2W6T5g0PVbXL3RQmkuu4HEZzlp5kLbQYQpjLejZKboR22IDGU8hzJEh4JlmuGYxcr4L5KodjkkTbeplrLdGQ7OYpXp9wCs2vKmaN0iTUk1+ZL8cb1nnxRReQt7R6izEB6jd+oIKOjvXW5ZQVFeI/Dk/PhMXhSVBtSIFXJKHfmU6+gt7Cu09j2Eq55yJT8V9noQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(366004)(376002)(39860400002)(346002)(136003)(451199015)(4326008)(66946007)(66556008)(5660300002)(8936002)(26005)(8676002)(66476007)(41300700001)(6512007)(53546011)(6506007)(36756003)(6916009)(54906003)(316002)(86362001)(31696002)(83380400001)(2906002)(38100700002)(186003)(2616005)(478600001)(31686004)(966005)(6486002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YVExQXQ3aU4vWllXV0o4NDcvRkdxSnR0L1NBZnZpZ0hpNVc3VHlHUjlJNXN6?=
+ =?utf-8?B?QVNVcWVTTXZnNWxvcnFYYWsvcExDYW5pMzhLRGxGNzc3cDJlNzVpRzZNSDlY?=
+ =?utf-8?B?M2RJbElWWTRtdEFLbjZuRjFzSjlvdTdxcEo0R1BJaWVudzlYNGdEMFA0NjAv?=
+ =?utf-8?B?WkQrK3o5Nk8waWhJeGZFWE1HWkVvT3BuMGw3Nms4M3Z4WE5qSkQybmJhNHRm?=
+ =?utf-8?B?Z2plTUlNUWFuZ3RFT0FEdWladWtWS2dHM3ZRV1N1bzVzQW45K0Y0S2dqWGxM?=
+ =?utf-8?B?Wk9SeTN4NkxnSzk3SVJGSUlCV2RZdE96QlJjUm9HRzcvd3hWV3dpRkJCazdK?=
+ =?utf-8?B?NVkyRkh6czJCWmczS2lGaEZuVzk5TitidW1ZRExQMTB3QjNlUUJQdXhkblVE?=
+ =?utf-8?B?S2N3Ym9xbUd5M2VDNmU0alRvTVBQZEhOeVFnMFp6TkxVUlN5QUlPRkRySU5u?=
+ =?utf-8?B?OVdRYUhPczhjZ1dOaW1JYloyVEEyUHA0TGJvaFBIL1J3WURocDFGc2VUL0ow?=
+ =?utf-8?B?Mk9FUkdRMHpEc1d3d3hGZW5DaGY2UkU0T2JlNTU2Z21ZcTVIUFQ5U0xSWkdS?=
+ =?utf-8?B?OTVSVEM1Q1NkdXJpR3UwV2l6a3FKTDEzRWlGUkVpZEJiZGZ3aGZnQzVJMm1v?=
+ =?utf-8?B?bFNRZjBzRlViTjNWZXpic1F2UFJabXQ2T1lQOTF6RnBXTlJGMnJiMkVKQjVT?=
+ =?utf-8?B?SzNkbSt6T2xBa0VxVStmdnMyREg1T3lUVWhwK25PSDNCT2NCbW5tb3FtVWtT?=
+ =?utf-8?B?akplazFxemZSZXR2UGo0czY3dHpiYjlGbXZ3NW94MEFnMTA2cVBpZU1WVU8v?=
+ =?utf-8?B?M1dUa2NNVUdqVnNVVzlSZW1ZMkRabkpQOWsybUdWWWczVHg2TVFUazdqU3FC?=
+ =?utf-8?B?OUFmTWw3bVVDbVN2QzAxanM4d3BNVEN0REpodkR1MGRYR0xpenI1dWR2Z1R3?=
+ =?utf-8?B?ZWxTY1IxTDE2MG1NYWIrOWhyTDR3MEVCR0tRdkRlYmVHTmJ3RVBhdE1WZlIx?=
+ =?utf-8?B?cUVvYkV0RHVuOVZoS0ZVQVJiMERFbit1M01lUE5tQ254LzdTNnZHMjJyWEV2?=
+ =?utf-8?B?SmxVcjY3KzdiL0hvcjBTYlVXN2hVSllKVFVFZ2xhL2FpNG02M0kyMmU3Qlcv?=
+ =?utf-8?B?SE9jOElucEgwLy9XdXhGWmt3NldXemxwRndOWjY3aHVjd2ZmcEpXTUZoREll?=
+ =?utf-8?B?dGtpRnJ3aVpmVnZHVHI4UmVmckdDMG1QVCsvUEl0dld3TGxsV2RFRFlTN0Fo?=
+ =?utf-8?B?TlNRMDh4MGZ4bTRyWGdiNG9QVC84ZTFkczlhendhVmx4TnRobW9qaTJDU0Zv?=
+ =?utf-8?B?WUd5dk53dkF1ZzNiTUZqbEFENUJnYWJNa0hrMkRpMnJOZE1vdm96S0ZQRHVy?=
+ =?utf-8?B?M3BPaGlDRmJ6cUZGdUtSMjdLcEx2WmZPZ2V1OW5aa0ZHQUJMaWRvVTFLRjNH?=
+ =?utf-8?B?OEUyRXliU2k5aTdXT1BHTUN2V2dKN2ZqTnlIdmR1cmJlN01PNlJOVnV1RjY4?=
+ =?utf-8?B?YlhHNDBQbUFuZ3FLNmhscjhrNFB2NzdHdnpML3MxMkxPWHpwSlBUVjdCcmJI?=
+ =?utf-8?B?SnhMRHFkb1pUSlpvdkkxbzVQLzNIREpFMGp6WkI2cHJGWXo4MWtMbUUveCtN?=
+ =?utf-8?B?SUJhV2x5Y3FIbzJ6UmExTGFPcVRzbmJONE1wb2pmY0lVM0x6VnJhS0NzZWJ3?=
+ =?utf-8?B?UkNBQlBUZ0tyczkzdTlFcmd6SG15ci9NTFhyc2c0OWE2K0MrbzRzTXpjYUpI?=
+ =?utf-8?B?MG9KczYveGNtUXFpWHRTVTdIVFQyZ2V0THdKdnFCajRYZzFFeUx1dlVJWmJM?=
+ =?utf-8?B?UXN1cnhOSjZ1a21ySVdmZTdOZk93Y3RhbnZlR2U5WEI0NEI3NUhLc1VCZ3px?=
+ =?utf-8?B?TWZWQVBhaGI0d0lxMEhDbTVPN3ZVUlJpZXg5dlliejhWaks5NDJTKzVrQk5M?=
+ =?utf-8?B?SnJBNitZeHpQVXdRS2hsYTBhZ0FtWE1RSzlEMFY4RnNqTCtyU0NTZzkzQlpa?=
+ =?utf-8?B?M1BUNEEySktJMjVRcDVsNGY3N2JjTTJlMUt3TU8wQk5RcFFlR1BZVzJiY09F?=
+ =?utf-8?B?dFYvSVkvbFVLdzdaUWx6Mk5TSzl2ZmJTUEFRVUQrSlkzTTh4SUoraURyOVRO?=
+ =?utf-8?Q?F4J+NFmkMk/LcYYlnBrEkZ6Nt?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8e183139-0969-4b12-d974-08dab396bc1a
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2022 19:02:01.0095
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PxR9vH2AOj4Qyo9UGZWP40GxNl8XlNa7X13d4JytMzxeWI3WWiWAqK+G87j+rJ2Nq9jCcP39axkTVOb/HTBvyQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7523
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,264 +130,245 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hyperv hypercalls above 0x8000 are called as extended hypercalls as per
-Hyperv TLFS. Hypercall 0x8001 is used to enquire about available
-hypercalls by guest VMs.
+On 10/21/22 12:33, Peter Gonda wrote:
+> The ASP and an SNP guest use a series of AES-GCM keys called VMPCKs to
+> communicate securely with each other. The IV to this scheme is a
+> sequence number that both the ASP and the guest track. Currently this
+> sequence number in a guest request must exactly match the sequence
+> number tracked by the ASP. This means that if the guest sees an error
+> from the host during a request it can only retry that exact request or
+> disable the VMPCK to prevent an IV reuse. AES-GCM cannot tolerate IV
+> reuse see:
+> https://csrc.nist.gov/csrc/media/projects/block-cipher-techniques/documents/bcm/comments/800-38-series-drafts/gcm/joux_comments.pdf
+> 
+> To handle userspace querying the cert_data length. Instead of requesting
+> the cert length from userspace use the size of the drivers allocated
+> shared buffer. Then copy that buffer to userspace, or give userspace an
+> error depending on the size of the buffer given by userspace.
+> 
+> Fixes: fce96cf044308 ("virt: Add SEV-SNP guest driver")
+> Signed-off-by: Peter Gonda <pgonda@google.com>
+> Reported-by: Peter Gonda <pgonda@google.com>
+> Reviewed-by: Dionna Glaze <dionnaglaze@google.com>
+> Cc: Borislav Petkov <bp@suse.de>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Michael Roth <michael.roth@amd.com>
+> Cc: Haowen Bai <baihaowen@meizu.com>
+> Cc: Yang Yingliang <yangyingliang@huawei.com>
+> Cc: Marc Orr <marcorr@google.com>
+> Cc: David Rientjes <rientjes@google.com>
+> Cc: Ashish Kalra <Ashish.Kalra@amd.com>
+> Cc: linux-kernel@vger.kernel.org
+> Cc: kvm@vger.kernel.org
+> ---
+>   drivers/virt/coco/sev-guest/sev-guest.c | 93 ++++++++++++++++---------
+>   1 file changed, 62 insertions(+), 31 deletions(-)
+> 
+> diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
+> index f422f9c58ba7..8c54ea84bc57 100644
+> --- a/drivers/virt/coco/sev-guest/sev-guest.c
+> +++ b/drivers/virt/coco/sev-guest/sev-guest.c
+> @@ -41,7 +41,7 @@ struct snp_guest_dev {
+>   	struct device *dev;
+>   	struct miscdevice misc;
+>   
+> -	void *certs_data;
+> +	u8 (*certs_data)[SEV_FW_BLOB_MAX_SIZE];
+>   	struct snp_guest_crypto *crypto;
+>   	struct snp_guest_msg *request, *response;
+>   	struct snp_secrets_page_layout *layout;
+> @@ -67,8 +67,27 @@ static bool is_vmpck_empty(struct snp_guest_dev *snp_dev)
+>   	return true;
+>   }
+>   
+> +/*
+> + * If we receive an error from the host or ASP we have two options. We can
+> + * either retry the exact same encrypted request or we can discontinue using the
+> + * VMPCK.
+> + *
+> + * This is because in the current encryption scheme GHCB v2 uses AES-GCM to
+> + * encrypt the requests. The IV for this scheme is the sequence number. GCM
+> + * cannot tolerate IV reuse.
+> + *
+> + * The ASP FW v1.51 only increments the sequence numbers on a successful
+> + * guest<->ASP back and forth and only accepts messages at its exact sequence
+> + * number.
+> + *
+> + * So if we were to reuse the sequence number the encryption scheme is
+> + * vulnerable. If we encrypt the sequence number for a fresh IV the ASP will
+> + * reject our request.
+> + */
+>   static void snp_disable_vmpck(struct snp_guest_dev *snp_dev)
+>   {
+> +	dev_alert(snp_dev->dev, "Disabling vmpck_id: %d to prevent IV reuse.\n",
+> +		  vmpck_id);
+>   	memzero_explicit(snp_dev->vmpck, VMPCK_KEY_LEN);
+>   	snp_dev->vmpck = NULL;
+>   }
+> @@ -326,29 +345,29 @@ static int handle_guest_request(struct snp_guest_dev *snp_dev, u64 exit_code, in
+>   	if (fw_err)
+>   		*fw_err = err;
+>   
+> -	if (rc)
+> -		return rc;
+> +	if (rc) {
+> +		dev_alert(snp_dev->dev,
+> +			  "Detected error from ASP request. rc: %d, fw_err: %llu\n",
+> +			  rc, *fw_err);
+> +		goto disable_vmpck;
+> +	}
+>   
+> -	/*
+> -	 * The verify_and_dec_payload() will fail only if the hypervisor is
+> -	 * actively modifying the message header or corrupting the encrypted payload.
+> -	 * This hints that hypervisor is acting in a bad faith. Disable the VMPCK so that
+> -	 * the key cannot be used for any communication. The key is disabled to ensure
+> -	 * that AES-GCM does not use the same IV while encrypting the request payload.
+> -	 */
+>   	rc = verify_and_dec_payload(snp_dev, resp_buf, resp_sz);
+>   	if (rc) {
+>   		dev_alert(snp_dev->dev,
+> -			  "Detected unexpected decode failure, disabling the vmpck_id %d\n",
+> -			  vmpck_id);
+> -		snp_disable_vmpck(snp_dev);
+> -		return rc;
+> +			  "Detected unexpected decode failure from ASP. rc: %d\n",
+> +			  rc);
+> +		goto disable_vmpck;
+>   	}
+>   
+>   	/* Increment to new message sequence after payload decryption was successful. */
+>   	snp_inc_msg_seqno(snp_dev);
+>   
+>   	return 0;
+> +
+> +disable_vmpck:
+> +	snp_disable_vmpck(snp_dev);
+> +	return rc;
+>   }
+>   
+>   static int get_report(struct snp_guest_dev *snp_dev, struct snp_guest_request_ioctl *arg)
+> @@ -437,7 +456,7 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
+>   	struct snp_guest_crypto *crypto = snp_dev->crypto;
+>   	struct snp_ext_report_req req;
+>   	struct snp_report_resp *resp;
+> -	int ret, npages = 0, resp_len;
+> +	int ret, resp_len, req_cert_len, resp_cert_len;
+>   
+>   	lockdep_assert_held(&snp_cmd_mutex);
+>   
+> @@ -448,14 +467,15 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
+>   		return -EFAULT;
+>   
+>   	/* userspace does not want certificate data */
+> -	if (!req.certs_len || !req.certs_address)
+> +	req_cert_len = req.certs_len;
+> +	if (!req_cert_len || !req.certs_address)
+>   		goto cmd;
+>   
+> -	if (req.certs_len > SEV_FW_BLOB_MAX_SIZE ||
+> -	    !IS_ALIGNED(req.certs_len, PAGE_SIZE))
+> +	if (req_cert_len > sizeof(*snp_dev->certs_data) ||
+> +	    !IS_ALIGNED(req_cert_len, PAGE_SIZE))
+>   		return -EINVAL;
+>   
+> -	if (!access_ok((const void __user *)req.certs_address, req.certs_len))
+> +	if (!access_ok((const void __user *)req.certs_address, req_cert_len))
+>   		return -EFAULT;
+>   
+>   	/*
+> @@ -464,8 +484,7 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
+>   	 * the host. If host does not supply any certs in it, then copy
+>   	 * zeros to indicate that certificate data was not provided.
+>   	 */
+> -	memset(snp_dev->certs_data, 0, req.certs_len);
+> -	npages = req.certs_len >> PAGE_SHIFT;
+> +	memset(snp_dev->certs_data, 0, sizeof(*snp_dev->certs_data));
+>   cmd:
+>   	/*
+>   	 * The intermediate response buffer is used while decrypting the
+> @@ -477,25 +496,37 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
+>   	if (!resp)
+>   		return -ENOMEM;
+>   
+> -	snp_dev->input.data_npages = npages;
+> +	snp_dev->input.data_npages = sizeof(*snp_dev->certs_data) >> PAGE_SHIFT;
+>   	ret = handle_guest_request(snp_dev, SVM_VMGEXIT_EXT_GUEST_REQUEST, arg->msg_version,
+>   				   SNP_MSG_REPORT_REQ, &req.data,
+>   				   sizeof(req.data), resp->data, resp_len, &arg->fw_err);
+>   
+> +	resp_cert_len = snp_dev->input.data_npages << PAGE_SHIFT;
 
-Add support for HvExtCallQueryCapabilities (0x8001) and
-HvExtCallGetBootZeroedMemory (0x8002) in KVM.
+The hypervisor is not required to update the number of pages that the 
+certificates actually used/required if enough pages were supplied. So this 
+value could always remain as 4 (based on SEV_FW_BLOB_MAX_SIZE) on 
+successful return.
 
-A guest VM finds availability of HvExtCallQueryCapabilities (0x8001) by
-using CPUID.0x40000003.EBX BIT(20). If the bit is set then the guest VM
-make hypercall HvExtCallQueryCapabilities (0x8001) to know what all
-extended hypercalls are supported by hypervisor.
+And if that's the case, we could always just return 4 for the number of 
+pages no matter what. Otherwise you'll have to update the logic here if 
+you want to obtain the actual number.
 
-A userspace VMM can query capability KVM_CAP_HYPERV_EXT_CALL_QUERY to
-know which extended hypercalls are supported in KVM. After which the
-userspace will enable capabilities for the guest VM.
+Thanks,
+Tom
 
-HvExtCallQueryCapabilities (0x8001) is handled by KVM in kernel,
-whereas, HvExtCallGetBootZeroedMemory (0x8002) is passed to userspace
-for further action.
-
-Change-Id: Ib3709fadbf11f91be2842c8486bcbe755e09cbea
-Signed-off-by: Vipin Sharma <vipinsh@google.com>
----
-
-Hi,
-
-This is an RFC patch based on the previous discussion
-https://lore.kernel.org/kvm/CAHVum0cbWBXUnJ4s32Yn=TfPXLypv_RRT6LmA_QoBHw3Y+kA7w@mail.gmail.com/#t
-
-Things missing in this RFC patch which I will add when sending proper
-patch:
-1. Documentation
-2. Selftest
-3. Multiple smaller patches instead of one.
-
-I also need suggestions regarding KVM_ENABLE_CAP usage in this patch. My
-idea is userspace can query to know what all capabilities are supported by KVM
-and based on that it can call KVM_ENABLE_CAP to enable only select
-capabilities. Also userspace need to enforce hyperv CPUID check by
-KVM_CAP_HYPERV_ENFORCE_CPUID to make sure these are enforced (hyperv
-default is to accept all, hv_check_hypercall_access()).
-
-Current approach is storing capabilities given by userspace in struct kvm_hv{},
-I was not sure which will be good place, struct kvm_hv{} or struct
-kvm_vcpu_hv{}.
-
-Thanks
-Vipin
-
- arch/x86/include/asm/hyperv-tlfs.h |  3 ++
- arch/x86/include/asm/kvm_host.h    |  2 ++
- arch/x86/kvm/hyperv.c              | 55 ++++++++++++++++++++++++++++++
- arch/x86/kvm/hyperv.h              |  1 +
- arch/x86/kvm/x86.c                 |  5 +++
- include/asm-generic/hyperv-tlfs.h  |  4 ++-
- include/uapi/linux/kvm.h           |  1 +
- 7 files changed, 70 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
-index 3089ec352743..421279a61a9a 100644
---- a/arch/x86/include/asm/hyperv-tlfs.h
-+++ b/arch/x86/include/asm/hyperv-tlfs.h
-@@ -158,6 +158,9 @@
- #define HV_SHARED_GPA_BOUNDARY_ACTIVE			BIT(5)
- #define HV_SHARED_GPA_BOUNDARY_BITS			GENMASK(11, 6)
- 
-+/* Extended hypercalls supported by KVM */
-+#define HV_EXT_CALL_QUERY_CAPABILITIES_MASK		BIT(0)
-+
- enum hv_isolation_type {
- 	HV_ISOLATION_TYPE_NONE	= 0,
- 	HV_ISOLATION_TYPE_VBS	= 1,
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 7551b6f9c31c..b1892ea39a23 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1041,6 +1041,8 @@ struct kvm_hv {
- 
- 	struct hv_partition_assist_pg *hv_pa_pg;
- 	struct kvm_hv_syndbg hv_syndbg;
-+
-+	u64 extended_hypercalls_cap;
- };
- 
- struct msr_bitmap_range {
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 0adf4a437e85..5f0b7d8789a8 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -32,6 +32,7 @@
- #include <linux/eventfd.h>
- 
- #include <asm/apicdef.h>
-+#include <asm/hyperv-tlfs.h>
- #include <trace/events/kvm.h>
- 
- #include "trace.h"
-@@ -2140,6 +2141,8 @@ static void kvm_hv_hypercall_read_xmm(struct kvm_hv_hcall *hc)
- 
- static bool hv_check_hypercall_access(struct kvm_vcpu_hv *hv_vcpu, u16 code)
- {
-+	struct kvm_hv *hv;
-+
- 	if (!hv_vcpu->enforce_cpuid)
- 		return true;
- 
-@@ -2178,6 +2181,14 @@ static bool hv_check_hypercall_access(struct kvm_vcpu_hv *hv_vcpu, u16 code)
- 	case HVCALL_SEND_IPI:
- 		return hv_vcpu->cpuid_cache.enlightenments_eax &
- 			HV_X64_CLUSTER_IPI_RECOMMENDED;
-+	case HV_EXT_CALL_QUERY_CAPABILITIES:
-+		return hv_vcpu->cpuid_cache.features_ebx &
-+				HV_ENABLE_EXTENDED_HYPERCALLS;
-+	case HV_EXT_CALL_GET_BOOT_ZEROED_MEMORY:
-+		hv = to_kvm_hv(hv_vcpu->vcpu->kvm);
-+		return hv->extended_hypercalls_cap &
-+			HV_EXT_CAPABILITY_GET_BOOT_ZEROED_MEMORY;
-+		break;
- 	default:
- 		break;
- 	}
-@@ -2189,6 +2200,7 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
- 	struct kvm_hv_hcall hc;
-+	struct kvm_hv *hv;
- 	u64 ret = HV_STATUS_SUCCESS;
- 
- 	/*
-@@ -2345,6 +2357,30 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
- 				kvm_hv_hypercall_complete_userspace;
- 		return 0;
- 	}
-+	case HV_EXT_CALL_QUERY_CAPABILITIES:
-+		if (unlikely(hc.fast)) {
-+			ret = HV_STATUS_INVALID_PARAMETER;
-+			break;
-+		}
-+		hv = to_kvm_hv(hv_vcpu->vcpu->kvm);
-+		if (kvm_vcpu_write_guest(vcpu, hc.outgpa,
-+					 &hv->extended_hypercalls_cap,
-+					 sizeof(hv->extended_hypercalls_cap)))
-+			ret = HV_STATUS_OPERATION_DENIED;
-+		break;
-+	case HV_EXT_CALL_GET_BOOT_ZEROED_MEMORY:
-+		if (unlikely(hc.fast)) {
-+			ret = HV_STATUS_INVALID_PARAMETER;
-+			break;
-+		}
-+		vcpu->run->exit_reason = KVM_EXIT_HYPERV;
-+		vcpu->run->hyperv.type = KVM_EXIT_HYPERV_HCALL;
-+		vcpu->run->hyperv.u.hcall.input = hc.param;
-+		vcpu->run->hyperv.u.hcall.params[0] = hc.ingpa;
-+		vcpu->run->hyperv.u.hcall.params[1] = hc.outgpa;
-+		vcpu->arch.complete_userspace_io =
-+				kvm_hv_hypercall_complete_userspace;
-+		return 0;
- 	default:
- 		ret = HV_STATUS_INVALID_HYPERCALL_CODE;
- 		break;
-@@ -2494,6 +2530,7 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 
- 			ent->ebx |= HV_POST_MESSAGES;
- 			ent->ebx |= HV_SIGNAL_EVENTS;
-+			ent->ebx |= HV_ENABLE_EXTENDED_HYPERCALLS;
- 
- 			ent->edx |= HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE;
- 			ent->edx |= HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
-@@ -2578,3 +2615,21 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 
- 	return 0;
- }
-+
-+int kvm_hv_set_ext_call_cap(struct kvm_vcpu *vcpu, uint64_t cap)
-+{
-+	struct kvm_hv *hv;
-+	int r;
-+
-+	if (cap & ~HV_EXT_CALL_QUERY_CAPABILITIES_MASK)
-+		return -EINVAL;
-+
-+	r = kvm_hv_vcpu_init(vcpu);
-+	if (r)
-+		return r;
-+
-+	hv = to_kvm_hv(vcpu->kvm);
-+	hv->extended_hypercalls_cap = cap;
-+
-+	return 0;
-+}
-diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
-index 1030b1b50552..b92f8abdbf0d 100644
---- a/arch/x86/kvm/hyperv.h
-+++ b/arch/x86/kvm/hyperv.h
-@@ -150,5 +150,6 @@ int kvm_hv_set_enforce_cpuid(struct kvm_vcpu *vcpu, bool enforce);
- int kvm_vm_ioctl_hv_eventfd(struct kvm *kvm, struct kvm_hyperv_eventfd *args);
- int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 		     struct kvm_cpuid_entry2 __user *entries);
-+int kvm_hv_set_ext_call_cap(struct kvm_vcpu *vcpu, uint64_t cap);
- 
- #endif
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 4bd5f8a751de..caca1f537f6d 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4515,6 +4515,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_X86_NOTIFY_VMEXIT:
- 		r = kvm_caps.has_notify_vmexit;
- 		break;
-+	case KVM_CAP_HYPERV_EXT_CALL_QUERY:
-+		r = HV_EXT_CALL_QUERY_CAPABILITIES_MASK;
-+		break;
- 	default:
- 		break;
- 	}
-@@ -5510,6 +5513,8 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
- 			kvm_update_pv_runtime(vcpu);
- 
- 		return 0;
-+	case KVM_CAP_HYPERV_EXT_CALL_QUERY:
-+		return kvm_hv_set_ext_call_cap(vcpu, cap->args[0]);
- 	default:
- 		return -EINVAL;
- 	}
-diff --git a/include/asm-generic/hyperv-tlfs.h b/include/asm-generic/hyperv-tlfs.h
-index fdce7a4cfc6f..15ffc2c5d950 100644
---- a/include/asm-generic/hyperv-tlfs.h
-+++ b/include/asm-generic/hyperv-tlfs.h
-@@ -162,6 +162,7 @@ struct ms_hyperv_tsc_page {
- 
- /* Extended hypercalls */
- #define HV_EXT_CALL_QUERY_CAPABILITIES		0x8001
-+#define HV_EXT_CALL_GET_BOOT_ZEROED_MEMORY	0x8002
- #define HV_EXT_CALL_MEMORY_HEAT_HINT		0x8003
- 
- #define HV_FLUSH_ALL_PROCESSORS			BIT(0)
-@@ -170,7 +171,8 @@ struct ms_hyperv_tsc_page {
- #define HV_FLUSH_USE_EXTENDED_RANGE_FORMAT	BIT(3)
- 
- /* Extended capability bits */
--#define HV_EXT_CAPABILITY_MEMORY_COLD_DISCARD_HINT BIT(8)
-+#define HV_EXT_CAPABILITY_GET_BOOT_ZEROED_MEMORY	BIT(0)
-+#define HV_EXT_CAPABILITY_MEMORY_COLD_DISCARD_HINT	BIT(8)
- 
- enum HV_GENERIC_SET_FORMAT {
- 	HV_GENERIC_SET_SPARSE_4K,
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 0d5d4419139a..42860137e545 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1178,6 +1178,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_S390_ZPCI_OP 221
- #define KVM_CAP_S390_CPU_TOPOLOGY 222
- #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
-+#define KVM_CAP_HYPERV_EXT_CALL_QUERY 224
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
--- 
-2.38.0.135.g90850a2211-goog
-
+> +
+>   	/* If certs length is invalid then copy the returned length */
+>   	if (arg->fw_err == SNP_GUEST_REQ_INVALID_LEN) {
+> -		req.certs_len = snp_dev->input.data_npages << PAGE_SHIFT;
+> +		dev_alert(snp_dev->dev,
+> +			  "Certificate data from host: %d, Max size allocated by driver: %lu.\n",
+> +			  resp_cert_len, sizeof(*snp_dev->certs_data));
+> +		ret = -EFAULT;
+> +	}
+> +
+> +	if (ret)
+> +		goto e_free;
+> +
+> +	/* Pass the actual certificate data size back to userspace */
+> +	req.certs_len = resp_cert_len;
+> +	if (resp_cert_len > req_cert_len) {
+> +		arg->fw_err = SNP_GUEST_REQ_INVALID_LEN;
+>   
+>   		if (copy_to_user((void __user *)arg->req_data, &req, sizeof(req)))
+>   			ret = -EFAULT;
+> -	}
+>   
+> -	if (ret)
+>   		goto e_free;
+> +	}
+>   
+> -	if (npages &&
+> -	    copy_to_user((void __user *)req.certs_address, snp_dev->certs_data,
+> -			 req.certs_len)) {
+> +	if (copy_to_user((void __user *)req.certs_address, snp_dev->certs_data,
+> +			 resp_cert_len)) {
+>   		ret = -EFAULT;
+>   		goto e_free;
+>   	}
+> @@ -676,7 +707,7 @@ static int __init sev_guest_probe(struct platform_device *pdev)
+>   	if (!snp_dev->response)
+>   		goto e_free_request;
+>   
+> -	snp_dev->certs_data = alloc_shared_pages(dev, SEV_FW_BLOB_MAX_SIZE);
+> +	snp_dev->certs_data = alloc_shared_pages(dev, sizeof(*snp_dev->certs_data));
+>   	if (!snp_dev->certs_data)
+>   		goto e_free_response;
+>   
+> @@ -703,7 +734,7 @@ static int __init sev_guest_probe(struct platform_device *pdev)
+>   	return 0;
+>   
+>   e_free_cert_data:
+> -	free_shared_pages(snp_dev->certs_data, SEV_FW_BLOB_MAX_SIZE);
+> +	free_shared_pages(snp_dev->certs_data, sizeof(*snp_dev->certs_data));
+>   e_free_response:
+>   	free_shared_pages(snp_dev->response, sizeof(struct snp_guest_msg));
+>   e_free_request:
+> @@ -717,7 +748,7 @@ static int __exit sev_guest_remove(struct platform_device *pdev)
+>   {
+>   	struct snp_guest_dev *snp_dev = platform_get_drvdata(pdev);
+>   
+> -	free_shared_pages(snp_dev->certs_data, SEV_FW_BLOB_MAX_SIZE);
+> +	free_shared_pages(snp_dev->certs_data, sizeof(*snp_dev->certs_data));
+>   	free_shared_pages(snp_dev->response, sizeof(struct snp_guest_msg));
+>   	free_shared_pages(snp_dev->request, sizeof(struct snp_guest_msg));
+>   	deinit_crypto(snp_dev->crypto);
