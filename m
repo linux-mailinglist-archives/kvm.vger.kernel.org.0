@@ -2,464 +2,340 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 74745608050
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 22:51:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACB0C608069
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 22:58:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230074AbiJUUvr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 16:51:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53112 "EHLO
+        id S230117AbiJUU6H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 16:58:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230030AbiJUUvl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 16:51:41 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F28ED2892E1
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 13:51:35 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id e10-20020a17090301ca00b00183d123e2a5so2260234plh.14
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 13:51:35 -0700 (PDT)
+        with ESMTP id S229456AbiJUU6C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 16:58:02 -0400
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 121AF2A43BE
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 13:58:00 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id a25so5423162ljk.0
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 13:57:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+NUq1pnmzHdXnrMvd4KmYhaXcmeq2zps0wpBk//Fn7g=;
-        b=ITpGVEkh6yyr27L8Ucc5XIGyQ2RHX0gs6QFp+TTv86sLbTx1BCMuQSBjq8mV1EsC4T
-         rEFCVj+zRRnvrh2SwZJ3PKN+5C5VbixXh39J4Qv8WzXSZOhUUJ2/dFm+P23iZyPxR9cN
-         XFuRtfoZUsBKfixwQMwXO3qBtkhtsowPTpEj+LKvmVkjTeYb0KjZ2S3H5UQVff2BwZuD
-         5A5Yo99UpgsxprJOwb5QIGOHg36T2bnzKKU1YW7muaWoiw+MnjzM/zEdfQCIETs8MwcY
-         QUdzZYmveHH3VEkGDIIxvHLqSiQU1875UrcBElEjFQ9N+SWV+4Mc2PofsTrY2Y3teLYd
-         xUXw==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=zPoXRl3vqSRiOkEBnTagjx/z8JLR9tKOglaOv2B1U2U=;
+        b=N0uswtbOcvcrjYWhK209jQ57ivFejDqckNGgi+6v1+TlRJIyOc4ERhENLxmujLLygZ
+         J6eMgJLDpsSBocWsuUUUwHzHqIRRAR11BwGqyd3RVVh+L7A9Yu0m9UhcFcjHcmZeXJNH
+         joGIrz7kJFXxYaN8pecViJhxe+f6YqZDnwFHB145bCMcp5a3r6kxlGVz6y5vJTkc5QTn
+         ag2fK/CdBQr32vLegoJngzYctpda2BXs9gUjmDo8BwlZhRPt1G7rTXMsZyaYuHj2HA7C
+         sBCAkCnl8Ug6w3jcpiPaklZKiTgY6cer1/Uc0k36kEAJj4OrzRGGVHGUqSgk8GwJqybJ
+         zI4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+NUq1pnmzHdXnrMvd4KmYhaXcmeq2zps0wpBk//Fn7g=;
-        b=V02G/jFM4qpk9VLpQVUePjXp/SIH2gK1Rf49gmRmLCLCFntUoOC3ePEYnh+fjWFibG
-         TS6utbyw9T7HMUQ07o0NbCgRi0uM/bDmZKW9v2Zfo8z1r83guDj02xExmbAwJuaSKQRj
-         Oykz3g+0QSX3hSEb62X1/9TNaXQM7Wx+BBOI1M1/F1tP8f6NetmCXof71qNWyoTrlU7B
-         WlfTYcE+8/HTiqj6RX6u9SpiVLqhVDj1BszqtxSPzkUG4krqoDkyK6jBX9fwGCneVn6n
-         93XdOWdZY1TwaRPeOyij4MNm5UCLgBZLKMu9ePxH5di6V7CXUssBPBLR8MYdNimJxJrK
-         C8zg==
-X-Gm-Message-State: ACrzQf0zUNrh4c3CTBfVKfcUtiLmFBf2B8LXGYw2UA1KJIsBr1MsgOcg
-        RSh5PV1o3dSZJvhSgIyeR9CeuK/a0CzS3poyQGSBno7xXr0is+Wr/UjouOk7a0Gzo0BaqiJx6Km
-        I2OG7nPIXdMyotiOWNTl9jjGYY1sBr2Y6WYQ6rdFdI/sjHQGsoqip6FdnOFRgyDfA8KmY
-X-Google-Smtp-Source: AMsMyM7pbICA5w9nrLq/9c3D9CGqwq/2+bZGoZVGgpjpLw1tvmWYpf55bozfpg7wuXI2eUU5GV6wa/Kvf7jNt/8k
-X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
- (user=aaronlewis job=sendgmr) by 2002:a17:902:b944:b0:179:fdb0:1c39 with SMTP
- id h4-20020a170902b94400b00179fdb01c39mr21039281pls.98.1666385494620; Fri, 21
- Oct 2022 13:51:34 -0700 (PDT)
-Date:   Fri, 21 Oct 2022 20:51:05 +0000
-In-Reply-To: <20221021205105.1621014-1-aaronlewis@google.com>
-Mime-Version: 1.0
-References: <20221021205105.1621014-1-aaronlewis@google.com>
-X-Mailer: git-send-email 2.38.0.135.g90850a2211-goog
-Message-ID: <20221021205105.1621014-8-aaronlewis@google.com>
-Subject: [PATCH v6 7/7] selftests: kvm/x86: Test masked events
-From:   Aaron Lewis <aaronlewis@google.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
-        Aaron Lewis <aaronlewis@google.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zPoXRl3vqSRiOkEBnTagjx/z8JLR9tKOglaOv2B1U2U=;
+        b=jqU+shrvvCN0iIDYcmFboL9VZnmQGVtH5hGAhgChDv11/PrUAhZ24UlaF+RqkihPgg
+         iL7uu9pS2Le28lyyV55OYxt5ItgL0TaJG4SsZZYfMR/Z4ZwVYdrlkYYhxUGw1Vyxz/pa
+         9thw6nXb9j12NMgyefc+Tv4Dw0AKakByJW7/BGMtOzhCsAdkEZYU//OtuiRiw1GJIOti
+         6Y4ZMX+mqxSRuCCcNzF1/x3m/+s/W8suNk20qTvyJ239mPVcWB++NnVafpTqGe8McQ4c
+         0hhHuAWy05VkckD37bnza9wgNeE3kHKHwucVVUZAAI3vFnMoF7hFYv3ZkBvSmn958Nsv
+         WDqA==
+X-Gm-Message-State: ACrzQf1fyXr6U7SfM3M+X7PFljOdQnEmoxScztwTCsxo+76GV+JRbDPf
+        BBKz9wuHilqAf+92+ZH2nexEFSTMZKjdSXG4vwRIsw==
+X-Google-Smtp-Source: AMsMyM6liyZL2chJT/HcVrSUXohK/qQW8DkT5NwZSfVK/d7lwDrnh4DQUf2YqW0RDbkqUXvvcJY3QfV08FmhrOCZvBA=
+X-Received: by 2002:a2e:8717:0:b0:26f:c379:677 with SMTP id
+ m23-20020a2e8717000000b0026fc3790677mr7345924lji.445.1666385878156; Fri, 21
+ Oct 2022 13:57:58 -0700 (PDT)
+MIME-Version: 1.0
+References: <20221021173328.2489411-1-pgonda@google.com> <b7414cda-9924-33c3-68da-9b26b2bcc0b6@amd.com>
+In-Reply-To: <b7414cda-9924-33c3-68da-9b26b2bcc0b6@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Fri, 21 Oct 2022 14:57:46 -0600
+Message-ID: <CAMkAt6rCPYi3EewVfrTb6ie5VZwSnY0aEv_oDT4pom9dLTgf9A@mail.gmail.com>
+Subject: Re: [PATCH V2] virt: Prevent IV reuse in SNP guest driver
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Dionna Glaze <dionnaglaze@google.com>,
+        Borislav Petkov <bp@suse.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Haowen Bai <baihaowen@meizu.com>,
+        Yang Yingliang <yangyingliang@huawei.com>,
+        Marc Orr <marcorr@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add testing to show that a pmu event can be filtered with a generalized
-match on it's unit mask.
+On Fri, Oct 21, 2022 at 1:02 PM Tom Lendacky <thomas.lendacky@amd.com> wrote:
+>
+> On 10/21/22 12:33, Peter Gonda wrote:
+> > The ASP and an SNP guest use a series of AES-GCM keys called VMPCKs to
+> > communicate securely with each other. The IV to this scheme is a
+> > sequence number that both the ASP and the guest track. Currently this
+> > sequence number in a guest request must exactly match the sequence
+> > number tracked by the ASP. This means that if the guest sees an error
+> > from the host during a request it can only retry that exact request or
+> > disable the VMPCK to prevent an IV reuse. AES-GCM cannot tolerate IV
+> > reuse see:
+> > https://csrc.nist.gov/csrc/media/projects/block-cipher-techniques/documents/bcm/comments/800-38-series-drafts/gcm/joux_comments.pdf
+> >
+> > To handle userspace querying the cert_data length. Instead of requesting
+> > the cert length from userspace use the size of the drivers allocated
+> > shared buffer. Then copy that buffer to userspace, or give userspace an
+> > error depending on the size of the buffer given by userspace.
+> >
+> > Fixes: fce96cf044308 ("virt: Add SEV-SNP guest driver")
+> > Signed-off-by: Peter Gonda <pgonda@google.com>
+> > Reported-by: Peter Gonda <pgonda@google.com>
+> > Reviewed-by: Dionna Glaze <dionnaglaze@google.com>
+> > Cc: Borislav Petkov <bp@suse.de>
+> > Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> > Cc: Michael Roth <michael.roth@amd.com>
+> > Cc: Haowen Bai <baihaowen@meizu.com>
+> > Cc: Yang Yingliang <yangyingliang@huawei.com>
+> > Cc: Marc Orr <marcorr@google.com>
+> > Cc: David Rientjes <rientjes@google.com>
+> > Cc: Ashish Kalra <Ashish.Kalra@amd.com>
+> > Cc: linux-kernel@vger.kernel.org
+> > Cc: kvm@vger.kernel.org
+> > ---
+> >   drivers/virt/coco/sev-guest/sev-guest.c | 93 ++++++++++++++++---------
+> >   1 file changed, 62 insertions(+), 31 deletions(-)
+> >
+> > diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
+> > index f422f9c58ba7..8c54ea84bc57 100644
+> > --- a/drivers/virt/coco/sev-guest/sev-guest.c
+> > +++ b/drivers/virt/coco/sev-guest/sev-guest.c
+> > @@ -41,7 +41,7 @@ struct snp_guest_dev {
+> >       struct device *dev;
+> >       struct miscdevice misc;
+> >
+> > -     void *certs_data;
+> > +     u8 (*certs_data)[SEV_FW_BLOB_MAX_SIZE];
+> >       struct snp_guest_crypto *crypto;
+> >       struct snp_guest_msg *request, *response;
+> >       struct snp_secrets_page_layout *layout;
+> > @@ -67,8 +67,27 @@ static bool is_vmpck_empty(struct snp_guest_dev *snp_dev)
+> >       return true;
+> >   }
+> >
+> > +/*
+> > + * If we receive an error from the host or ASP we have two options. We can
+> > + * either retry the exact same encrypted request or we can discontinue using the
+> > + * VMPCK.
+> > + *
+> > + * This is because in the current encryption scheme GHCB v2 uses AES-GCM to
+> > + * encrypt the requests. The IV for this scheme is the sequence number. GCM
+> > + * cannot tolerate IV reuse.
+> > + *
+> > + * The ASP FW v1.51 only increments the sequence numbers on a successful
+> > + * guest<->ASP back and forth and only accepts messages at its exact sequence
+> > + * number.
+> > + *
+> > + * So if we were to reuse the sequence number the encryption scheme is
+> > + * vulnerable. If we encrypt the sequence number for a fresh IV the ASP will
+> > + * reject our request.
+> > + */
+> >   static void snp_disable_vmpck(struct snp_guest_dev *snp_dev)
+> >   {
+> > +     dev_alert(snp_dev->dev, "Disabling vmpck_id: %d to prevent IV reuse.\n",
+> > +               vmpck_id);
+> >       memzero_explicit(snp_dev->vmpck, VMPCK_KEY_LEN);
+> >       snp_dev->vmpck = NULL;
+> >   }
+> > @@ -326,29 +345,29 @@ static int handle_guest_request(struct snp_guest_dev *snp_dev, u64 exit_code, in
+> >       if (fw_err)
+> >               *fw_err = err;
+> >
+> > -     if (rc)
+> > -             return rc;
+> > +     if (rc) {
+> > +             dev_alert(snp_dev->dev,
+> > +                       "Detected error from ASP request. rc: %d, fw_err: %llu\n",
+> > +                       rc, *fw_err);
+> > +             goto disable_vmpck;
+> > +     }
+> >
+> > -     /*
+> > -      * The verify_and_dec_payload() will fail only if the hypervisor is
+> > -      * actively modifying the message header or corrupting the encrypted payload.
+> > -      * This hints that hypervisor is acting in a bad faith. Disable the VMPCK so that
+> > -      * the key cannot be used for any communication. The key is disabled to ensure
+> > -      * that AES-GCM does not use the same IV while encrypting the request payload.
+> > -      */
+> >       rc = verify_and_dec_payload(snp_dev, resp_buf, resp_sz);
+> >       if (rc) {
+> >               dev_alert(snp_dev->dev,
+> > -                       "Detected unexpected decode failure, disabling the vmpck_id %d\n",
+> > -                       vmpck_id);
+> > -             snp_disable_vmpck(snp_dev);
+> > -             return rc;
+> > +                       "Detected unexpected decode failure from ASP. rc: %d\n",
+> > +                       rc);
+> > +             goto disable_vmpck;
+> >       }
+> >
+> >       /* Increment to new message sequence after payload decryption was successful. */
+> >       snp_inc_msg_seqno(snp_dev);
+> >
+> >       return 0;
+> > +
+> > +disable_vmpck:
+> > +     snp_disable_vmpck(snp_dev);
+> > +     return rc;
+> >   }
+> >
+> >   static int get_report(struct snp_guest_dev *snp_dev, struct snp_guest_request_ioctl *arg)
+> > @@ -437,7 +456,7 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
+> >       struct snp_guest_crypto *crypto = snp_dev->crypto;
+> >       struct snp_ext_report_req req;
+> >       struct snp_report_resp *resp;
+> > -     int ret, npages = 0, resp_len;
+> > +     int ret, resp_len, req_cert_len, resp_cert_len;
+> >
+> >       lockdep_assert_held(&snp_cmd_mutex);
+> >
+> > @@ -448,14 +467,15 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
+> >               return -EFAULT;
+> >
+> >       /* userspace does not want certificate data */
+> > -     if (!req.certs_len || !req.certs_address)
+> > +     req_cert_len = req.certs_len;
+> > +     if (!req_cert_len || !req.certs_address)
+> >               goto cmd;
+> >
+> > -     if (req.certs_len > SEV_FW_BLOB_MAX_SIZE ||
+> > -         !IS_ALIGNED(req.certs_len, PAGE_SIZE))
+> > +     if (req_cert_len > sizeof(*snp_dev->certs_data) ||
+> > +         !IS_ALIGNED(req_cert_len, PAGE_SIZE))
+> >               return -EINVAL;
+> >
+> > -     if (!access_ok((const void __user *)req.certs_address, req.certs_len))
+> > +     if (!access_ok((const void __user *)req.certs_address, req_cert_len))
+> >               return -EFAULT;
+> >
+> >       /*
+> > @@ -464,8 +484,7 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
+> >        * the host. If host does not supply any certs in it, then copy
+> >        * zeros to indicate that certificate data was not provided.
+> >        */
+> > -     memset(snp_dev->certs_data, 0, req.certs_len);
+> > -     npages = req.certs_len >> PAGE_SHIFT;
+> > +     memset(snp_dev->certs_data, 0, sizeof(*snp_dev->certs_data));
+> >   cmd:
+> >       /*
+> >        * The intermediate response buffer is used while decrypting the
+> > @@ -477,25 +496,37 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
+> >       if (!resp)
+> >               return -ENOMEM;
+> >
+> > -     snp_dev->input.data_npages = npages;
+> > +     snp_dev->input.data_npages = sizeof(*snp_dev->certs_data) >> PAGE_SHIFT;
+> >       ret = handle_guest_request(snp_dev, SVM_VMGEXIT_EXT_GUEST_REQUEST, arg->msg_version,
+> >                                  SNP_MSG_REPORT_REQ, &req.data,
+> >                                  sizeof(req.data), resp->data, resp_len, &arg->fw_err);
+> >
+> > +     resp_cert_len = snp_dev->input.data_npages << PAGE_SHIFT;
+>
+> The hypervisor is not required to update the number of pages that the
+> certificates actually used/required if enough pages were supplied. So this
+> value could always remain as 4 (based on SEV_FW_BLOB_MAX_SIZE) on
+> successful return.
+>
+> And if that's the case, we could always just return 4 for the number of
+> pages no matter what. Otherwise you'll have to update the logic here if
+> you want to obtain the actual number.
 
-These tests set up test cases to demonstrate various ways of filtering
-a pmu event that has multiple unit mask values.  It does this by
-setting up the filter in KVM with the masked events provided, then
-enabling three pmu counters in the guest.  The test then verifies that
-the pmu counters agree with which counters should be counting and which
-counters should be filtered for both a sparse filter list and a dense
-filter list.
+Are you asking for this to just hard code the userspace requirement to
+4 pages? We could leave this as written here, that would leave the
+guest open to a new GHCB spec where
 
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
----
- .../kvm/x86_64/pmu_event_filter_test.c        | 344 +++++++++++++++++-
- 1 file changed, 342 insertions(+), 2 deletions(-)
+"State from Hypervisor: on error will contain the number of guest
+contiguous pages required to hold the data to be returned"
 
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-index 0750e2fa7a38..926c449aac78 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
-@@ -442,6 +442,337 @@ static bool use_amd_pmu(void)
- 		 is_zen3(entry->eax));
- }
- 
-+/*
-+ * "MEM_INST_RETIRED.ALL_LOADS", "MEM_INST_RETIRED.ALL_STORES", and
-+ * "MEM_INST_RETIRED.ANY" from https://perfmon-events.intel.com/
-+ * supported on Intel Xeon processors:
-+ *  - Sapphire Rapids, Ice Lake, Cascade Lake, Skylake.
-+ */
-+#define MEM_INST_RETIRED		0xD0
-+#define MEM_INST_RETIRED_LOAD		EVENT(MEM_INST_RETIRED, 0x81)
-+#define MEM_INST_RETIRED_STORE		EVENT(MEM_INST_RETIRED, 0x82)
-+#define MEM_INST_RETIRED_LOAD_STORE	EVENT(MEM_INST_RETIRED, 0x83)
-+
-+static bool supports_event_mem_inst_retired(void)
-+{
-+	uint32_t eax, ebx, ecx, edx;
-+
-+	cpuid(1, &eax, &ebx, &ecx, &edx);
-+	if (x86_family(eax) == 0x6) {
-+		switch (x86_model(eax)) {
-+		/* Sapphire Rapids */
-+		case 0x8F:
-+		/* Ice Lake */
-+		case 0x6A:
-+		/* Skylake */
-+		/* Cascade Lake */
-+		case 0x55:
-+			return true;
-+		}
-+	}
-+
-+	return false;
-+}
-+
-+static int num_gp_counters(void)
-+{
-+	const struct kvm_cpuid_entry2 *entry;
-+
-+	entry = kvm_get_supported_cpuid_entry(0xa);
-+	union cpuid10_eax eax = { .full = entry->eax };
-+
-+	return eax.split.num_counters;
-+}
-+
-+/*
-+ * "LS Dispatch", from Processor Programming Reference
-+ * (PPR) for AMD Family 17h Model 01h, Revision B1 Processors,
-+ * Preliminary Processor Programming Reference (PPR) for AMD Family
-+ * 17h Model 31h, Revision B0 Processors, and Preliminary Processor
-+ * Programming Reference (PPR) for AMD Family 19h Model 01h, Revision
-+ * B1 Processors Volume 1 of 2.
-+ */
-+#define LS_DISPATCH		0x29
-+#define LS_DISPATCH_LOAD	EVENT(LS_DISPATCH, BIT(0))
-+#define LS_DISPATCH_STORE	EVENT(LS_DISPATCH, BIT(1))
-+#define LS_DISPATCH_LOAD_STORE	EVENT(LS_DISPATCH, BIT(2))
-+
-+#define INCLUDE_MASKED_ENTRY(event_select, mask, match) \
-+	KVM_PMU_ENCODE_MASKED_ENTRY(event_select, mask, match, false)
-+#define EXCLUDE_MASKED_ENTRY(event_select, mask, match) \
-+	KVM_PMU_ENCODE_MASKED_ENTRY(event_select, mask, match, true)
-+
-+struct perf_counter {
-+	union {
-+		uint64_t raw;
-+		struct {
-+			uint64_t loads:22;
-+			uint64_t stores:22;
-+			uint64_t loads_stores:20;
-+		};
-+	};
-+};
-+
-+static uint64_t masked_events_guest_test(uint32_t msr_base)
-+{
-+	uint64_t ld0, ld1, st0, st1, ls0, ls1;
-+	struct perf_counter c;
-+	int val;
-+
-+	ld0 = rdmsr(msr_base + 0);
-+	st0 = rdmsr(msr_base + 1);
-+	ls0 = rdmsr(msr_base + 2);
-+
-+	__asm__ __volatile__("movl $0, %[v];"
-+			     "movl %[v], %%eax;"
-+			     "incl %[v];"
-+			     : [v]"+m"(val) :: "eax");
-+
-+	ld1 = rdmsr(msr_base + 0);
-+	st1 = rdmsr(msr_base + 1);
-+	ls1 = rdmsr(msr_base + 2);
-+
-+	c.loads = ld1 - ld0;
-+	c.stores = st1 - st0;
-+	c.loads_stores = ls1 - ls0;
-+
-+	return c.raw;
-+}
-+
-+static void intel_masked_events_guest_code(void)
-+{
-+	uint64_t r;
-+
-+	for (;;) {
-+		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
-+
-+		wrmsr(MSR_P6_EVNTSEL0 + 0, ARCH_PERFMON_EVENTSEL_ENABLE |
-+		      ARCH_PERFMON_EVENTSEL_OS | MEM_INST_RETIRED_LOAD);
-+		wrmsr(MSR_P6_EVNTSEL0 + 1, ARCH_PERFMON_EVENTSEL_ENABLE |
-+		      ARCH_PERFMON_EVENTSEL_OS | MEM_INST_RETIRED_STORE);
-+		wrmsr(MSR_P6_EVNTSEL0 + 2, ARCH_PERFMON_EVENTSEL_ENABLE |
-+		      ARCH_PERFMON_EVENTSEL_OS | MEM_INST_RETIRED_LOAD_STORE);
-+
-+		wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0x7);
-+
-+		r = masked_events_guest_test(MSR_IA32_PMC0);
-+
-+		GUEST_SYNC(r);
-+	}
-+}
-+
-+static void amd_masked_events_guest_code(void)
-+{
-+	uint64_t r;
-+
-+	for (;;) {
-+		wrmsr(MSR_K7_EVNTSEL0, 0);
-+		wrmsr(MSR_K7_EVNTSEL1, 0);
-+		wrmsr(MSR_K7_EVNTSEL2, 0);
-+
-+		wrmsr(MSR_K7_EVNTSEL0, ARCH_PERFMON_EVENTSEL_ENABLE |
-+		      ARCH_PERFMON_EVENTSEL_OS | LS_DISPATCH_LOAD);
-+		wrmsr(MSR_K7_EVNTSEL1, ARCH_PERFMON_EVENTSEL_ENABLE |
-+		      ARCH_PERFMON_EVENTSEL_OS | LS_DISPATCH_STORE);
-+		wrmsr(MSR_K7_EVNTSEL2, ARCH_PERFMON_EVENTSEL_ENABLE |
-+		      ARCH_PERFMON_EVENTSEL_OS | LS_DISPATCH_LOAD_STORE);
-+
-+		r = masked_events_guest_test(MSR_K7_PERFCTR0);
-+
-+		GUEST_SYNC(r);
-+	}
-+}
-+
-+static struct perf_counter run_masked_events_test(struct kvm_vcpu *vcpu,
-+						 const uint64_t masked_events[],
-+						 const int nmasked_events)
-+{
-+	struct kvm_pmu_event_filter *f;
-+	struct perf_counter r;
-+
-+	f = create_pmu_event_filter(masked_events, nmasked_events,
-+				    KVM_PMU_EVENT_ALLOW,
-+				    KVM_PMU_EVENT_FLAG_MASKED_EVENTS);
-+	r.raw = test_with_filter(vcpu, f);
-+	free(f);
-+
-+	return r;
-+}
-+
-+/* Matches KVM_PMU_EVENT_FILTER_MAX_EVENTS in pmu.c */
-+#define MAX_FILTER_EVENTS	300
-+#define MAX_TEST_EVENTS		10
-+
-+#define ALLOW_LOADS		BIT(0)
-+#define ALLOW_STORES		BIT(1)
-+#define ALLOW_LOADS_STORES	BIT(2)
-+
-+struct masked_events_test {
-+	uint64_t intel_events[MAX_TEST_EVENTS];
-+	uint64_t intel_event_end;
-+	uint64_t amd_events[MAX_TEST_EVENTS];
-+	uint64_t amd_event_end;
-+	const char *msg;
-+	uint32_t flags;
-+};
-+
-+/*
-+ * These are the test cases for the masked events tests.
-+ *
-+ * For each test, the guest enables 3 PMU counters (loads, stores,
-+ * loads + stores).  The filter is then set in KVM with the masked events
-+ * provided.  The test then verifies that the counters agree with which
-+ * ones should be counting and which ones should be filtered.
-+ */
-+const struct masked_events_test test_cases[] = {
-+	{
-+		.intel_events = {
-+			INCLUDE_MASKED_ENTRY(MEM_INST_RETIRED, 0xFF, 0x81),
-+		},
-+		.amd_events = {
-+			INCLUDE_MASKED_ENTRY(LS_DISPATCH, 0xFF, BIT(0)),
-+		},
-+		.msg = "Only allow loads.",
-+		.flags = ALLOW_LOADS,
-+	}, {
-+		.intel_events = {
-+			INCLUDE_MASKED_ENTRY(MEM_INST_RETIRED, 0xFF, 0x82),
-+		},
-+		.amd_events = {
-+			INCLUDE_MASKED_ENTRY(LS_DISPATCH, 0xFF, BIT(1)),
-+		},
-+		.msg = "Only allow stores.",
-+		.flags = ALLOW_STORES,
-+	}, {
-+		.intel_events = {
-+			INCLUDE_MASKED_ENTRY(MEM_INST_RETIRED, 0xFF, 0x83),
-+		},
-+		.amd_events = {
-+			INCLUDE_MASKED_ENTRY(LS_DISPATCH, 0xFF, BIT(2)),
-+		},
-+		.msg = "Only allow loads + stores.",
-+		.flags = ALLOW_LOADS_STORES,
-+	}, {
-+		.intel_events = {
-+			INCLUDE_MASKED_ENTRY(MEM_INST_RETIRED, 0x7C, 0),
-+			EXCLUDE_MASKED_ENTRY(MEM_INST_RETIRED, 0xFF, 0x83),
-+		},
-+		.amd_events = {
-+			INCLUDE_MASKED_ENTRY(LS_DISPATCH, ~(BIT(0) | BIT(1)), 0),
-+		},
-+		.msg = "Only allow loads and stores.",
-+		.flags = ALLOW_LOADS | ALLOW_STORES,
-+	}, {
-+		.intel_events = {
-+			INCLUDE_MASKED_ENTRY(MEM_INST_RETIRED, 0x7C, 0),
-+			EXCLUDE_MASKED_ENTRY(MEM_INST_RETIRED, 0xFF, 0x82),
-+		},
-+		.amd_events = {
-+			INCLUDE_MASKED_ENTRY(LS_DISPATCH, 0xF8, 0),
-+			EXCLUDE_MASKED_ENTRY(LS_DISPATCH, 0xFF, BIT(1)),
-+		},
-+		.msg = "Only allow loads and loads + stores.",
-+		.flags = ALLOW_LOADS | ALLOW_LOADS_STORES
-+	}, {
-+		.intel_events = {
-+			INCLUDE_MASKED_ENTRY(MEM_INST_RETIRED, 0xFE, 0x82),
-+		},
-+		.amd_events = {
-+			INCLUDE_MASKED_ENTRY(LS_DISPATCH, 0xF8, 0),
-+			EXCLUDE_MASKED_ENTRY(LS_DISPATCH, 0xFF, BIT(0)),
-+		},
-+		.msg = "Only allow stores and loads + stores.",
-+		.flags = ALLOW_STORES | ALLOW_LOADS_STORES
-+	}, {
-+		.intel_events = {
-+			INCLUDE_MASKED_ENTRY(MEM_INST_RETIRED, 0x7C, 0),
-+		},
-+		.amd_events = {
-+			INCLUDE_MASKED_ENTRY(LS_DISPATCH, 0xF8, 0),
-+		},
-+		.msg = "Only allow loads, stores, and loads + stores.",
-+		.flags = ALLOW_LOADS | ALLOW_STORES | ALLOW_LOADS_STORES
-+	},
-+};
-+
-+static int append_test_events(const struct masked_events_test *test,
-+			      uint64_t *events, int nevents)
-+{
-+	const uint64_t *evts;
-+	int i;
-+
-+	evts = use_intel_pmu() ? test->intel_events : test->amd_events;
-+	for (i = 0; i < MAX_TEST_EVENTS; i++) {
-+		if (evts[i] == 0)
-+			break;
-+
-+		events[nevents + i] = evts[i];
-+	}
-+
-+	return nevents + i;
-+}
-+
-+static bool bool_eq(bool a, bool b)
-+{
-+	return a == b;
-+}
-+
-+static void run_masked_events_tests(struct kvm_vcpu *vcpu, uint64_t *events,
-+				    int nevents)
-+{
-+	int ntests = ARRAY_SIZE(test_cases);
-+	struct perf_counter c;
-+	int i, n;
-+
-+	for (i = 0; i < ntests; i++) {
-+		const struct masked_events_test *test = &test_cases[i];
-+
-+		/* Do any test case events overflow MAX_TEST_EVENTS? */
-+		assert(test->intel_event_end == 0);
-+		assert(test->amd_event_end == 0);
-+
-+		n = append_test_events(test, events, nevents);
-+
-+		c = run_masked_events_test(vcpu, events, n);
-+		TEST_ASSERT(bool_eq(c.loads, test->flags & ALLOW_LOADS) &&
-+			    bool_eq(c.stores, test->flags & ALLOW_STORES) &&
-+			    bool_eq(c.loads_stores,
-+				    test->flags & ALLOW_LOADS_STORES),
-+			    "%s  loads: %u, stores: %u, loads + stores: %u",
-+			    test->msg, c.loads, c.stores, c.loads_stores);
-+	}
-+}
-+
-+static void add_dummy_events(uint64_t *events, int nevents)
-+{
-+	int i;
-+
-+	for (i = 0; i < nevents; i++) {
-+		int event_select = i % 0xFF;
-+		bool exclude = ((i % 4) == 0);
-+
-+		if (event_select == MEM_INST_RETIRED ||
-+		    event_select == LS_DISPATCH)
-+			event_select++;
-+
-+		events[i] = KVM_PMU_ENCODE_MASKED_ENTRY(event_select, 0,
-+							0, exclude);
-+	}
-+}
-+
-+static void test_masked_events(struct kvm_vcpu *vcpu)
-+{
-+	int nevents = MAX_FILTER_EVENTS - MAX_TEST_EVENTS;
-+	uint64_t events[MAX_FILTER_EVENTS];
-+
-+	/* Run the test cases against a sparse PMU event filter. */
-+	run_masked_events_tests(vcpu, events, 0);
-+
-+	/* Run the test cases against a dense PMU event filter. */
-+	add_dummy_events(events, MAX_FILTER_EVENTS);
-+	run_masked_events_tests(vcpu, events, nevents);
-+}
-+
- static int run_filter_test(struct kvm_vcpu *vcpu, const uint64_t *events,
- 			   int nevents, uint32_t flags)
- {
-@@ -470,7 +801,7 @@ static void test_filter_ioctl(struct kvm_vcpu *vcpu)
- 	r = run_filter_test(vcpu, &e, 1, KVM_PMU_EVENT_FLAG_MASKED_EVENTS);
- 	TEST_ASSERT(r != 0, "Invalid PMU Event Filter is expected to fail");
- 
--	e = KVM_PMU_EVENT_ENCODE_MASKED_ENTRY(0xff, 0xff, 0xff, 0xf);
-+	e = KVM_PMU_ENCODE_MASKED_ENTRY(0xff, 0xff, 0xff, 0xf);
- 	r = run_filter_test(vcpu, &e, 1, KVM_PMU_EVENT_FLAG_MASKED_EVENTS);
- 	TEST_ASSERT(r == 0, "Valid PMU Event Filter is failing");
- }
-@@ -478,7 +809,7 @@ static void test_filter_ioctl(struct kvm_vcpu *vcpu)
- int main(int argc, char *argv[])
- {
- 	void (*guest_code)(void);
--	struct kvm_vcpu *vcpu;
-+	struct kvm_vcpu *vcpu, *vcpu2 = NULL;
- 	struct kvm_vm *vm;
- 
- 	/* Tell stdout not to buffer its content */
-@@ -506,6 +837,15 @@ int main(int argc, char *argv[])
- 	test_not_member_deny_list(vcpu);
- 	test_not_member_allow_list(vcpu);
- 
-+	if (use_intel_pmu() &&
-+	    supports_event_mem_inst_retired() &&
-+	    num_gp_counters() >= 3)
-+		vcpu2 = vm_vcpu_add(vm, 2, intel_masked_events_guest_code);
-+	else if (use_amd_pmu())
-+		vcpu2 = vm_vcpu_add(vm, 2, amd_masked_events_guest_code);
-+
-+	if (vcpu2)
-+		test_masked_events(vcpu2);
- 	test_filter_ioctl(vcpu);
- 
- 	kvm_vm_free(vm);
--- 
-2.38.0.135.g90850a2211-goog
+Is instead:
 
+"State from Hypervisor: contain the number of guest contiguous pages
+required to hold the data to be returned"
+
+I think this would be a non-breaking change since the spec says
+nothing of the non-error case currently. Fine with your preference
+here. Either Dionna or I can follow up with a series to allow more
+than 4pages if needed.
+
+The logic required would be parsing the GUID table? I think we'd
+rather keep that out of the kernel driver, right?
+
+>
+> Thanks,
+> Tom
+>
+> > +
+> >       /* If certs length is invalid then copy the returned length */
+> >       if (arg->fw_err == SNP_GUEST_REQ_INVALID_LEN) {
+> > -             req.certs_len = snp_dev->input.data_npages << PAGE_SHIFT;
+> > +             dev_alert(snp_dev->dev,
+> > +                       "Certificate data from host: %d, Max size allocated by driver: %lu.\n",
+> > +                       resp_cert_len, sizeof(*snp_dev->certs_data));
+> > +             ret = -EFAULT;
+> > +     }
+> > +
+> > +     if (ret)
+> > +             goto e_free;
+> > +
+> > +     /* Pass the actual certificate data size back to userspace */
+> > +     req.certs_len = resp_cert_len;
+> > +     if (resp_cert_len > req_cert_len) {
+> > +             arg->fw_err = SNP_GUEST_REQ_INVALID_LEN;
+> >
+> >               if (copy_to_user((void __user *)arg->req_data, &req, sizeof(req)))
+> >                       ret = -EFAULT;
+> > -     }
+> >
+> > -     if (ret)
+> >               goto e_free;
+> > +     }
+> >
+> > -     if (npages &&
+> > -         copy_to_user((void __user *)req.certs_address, snp_dev->certs_data,
+> > -                      req.certs_len)) {
+> > +     if (copy_to_user((void __user *)req.certs_address, snp_dev->certs_data,
+> > +                      resp_cert_len)) {
+> >               ret = -EFAULT;
+> >               goto e_free;
+> >       }
+> > @@ -676,7 +707,7 @@ static int __init sev_guest_probe(struct platform_device *pdev)
+> >       if (!snp_dev->response)
+> >               goto e_free_request;
+> >
+> > -     snp_dev->certs_data = alloc_shared_pages(dev, SEV_FW_BLOB_MAX_SIZE);
+> > +     snp_dev->certs_data = alloc_shared_pages(dev, sizeof(*snp_dev->certs_data));
+> >       if (!snp_dev->certs_data)
+> >               goto e_free_response;
+> >
+> > @@ -703,7 +734,7 @@ static int __init sev_guest_probe(struct platform_device *pdev)
+> >       return 0;
+> >
+> >   e_free_cert_data:
+> > -     free_shared_pages(snp_dev->certs_data, SEV_FW_BLOB_MAX_SIZE);
+> > +     free_shared_pages(snp_dev->certs_data, sizeof(*snp_dev->certs_data));
+> >   e_free_response:
+> >       free_shared_pages(snp_dev->response, sizeof(struct snp_guest_msg));
+> >   e_free_request:
+> > @@ -717,7 +748,7 @@ static int __exit sev_guest_remove(struct platform_device *pdev)
+> >   {
+> >       struct snp_guest_dev *snp_dev = platform_get_drvdata(pdev);
+> >
+> > -     free_shared_pages(snp_dev->certs_data, SEV_FW_BLOB_MAX_SIZE);
+> > +     free_shared_pages(snp_dev->certs_data, sizeof(*snp_dev->certs_data));
+> >       free_shared_pages(snp_dev->response, sizeof(struct snp_guest_msg));
+> >       free_shared_pages(snp_dev->request, sizeof(struct snp_guest_msg));
+> >       deinit_crypto(snp_dev->crypto);
