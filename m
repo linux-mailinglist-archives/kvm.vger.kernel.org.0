@@ -2,158 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 12E15606C5A
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 02:03:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BD67606CB9
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 02:58:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229795AbiJUADZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Oct 2022 20:03:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43268 "EHLO
+        id S229739AbiJUA6C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Oct 2022 20:58:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229816AbiJUADY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Oct 2022 20:03:24 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F97E230805
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 17:03:20 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id l4so779233plb.8
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 17:03:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sYVRxk9zv95/rFuldjiWQhzUXXLiE1Nf1Pm7x/wKrxU=;
-        b=THfVzfjL32SPhvD/WSWN519kLVcz4lMkjLoJrROQzqF/Imj3q2uPrEhEJxP0FNrx+a
-         OAJerLFzuN3w6n3GuhPH83m5Wg5LBcclvi7UvyXYpawGCJXIPv443xRdzFQiZQJZA+zo
-         SJB5G3OxiLIcU3+RIx83DNwwaslDLKvkBH5CPE1Np4DhzWr28FAAKPwTickTvZOaHinA
-         X0cfowmPTUOgI6VNxoZwB4J5noWT10ZjSTi8TG+ZYf+nIa/KOcAR3CX1zdk+upvXi7oG
-         JMUS7Rryj6G1eMDMjtz7bQuyQelGvXxw1bVaXg9Z+gZuyYYac2BUow1MtsjgY2w0lvoC
-         YTmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sYVRxk9zv95/rFuldjiWQhzUXXLiE1Nf1Pm7x/wKrxU=;
-        b=eUteL4u36CiR3Fqbm+A78++A2rs41AQ+EEhkroAyfNM8cx4w43FOhKkV8l1Hbfw0Aw
-         cQCltMwF9dg6SEcQrLaFEIa8eehRDBehDo87KOmjRBUvWNu2VBcUcCcWBspAUkYMYcwl
-         fXCk94d+aAUaB/94RmG6PuF/maTUVYILxaeU/lqJKX38fRDD3eP1IrIdjsXvjPm2CAly
-         mrq83TWy2G21nUroKmZGfPpADd4G7x8NonbMSO4X6yPBgw9F6BdWUdq7IvAmiQmPMau4
-         p8t7NjXkHrdW07gYW1vBpr0jp+2Tj9nNcR9pe7xU2tvnLCuRjj+Vy+wrORi8nyg6tg0X
-         Zr/Q==
-X-Gm-Message-State: ACrzQf1ShZbPuIRCOZQOrG+m3RmMZ1WrHV5wtT1gMl9i/4Dtw//x/Lcy
-        QPEz1CO7b6K0QXqp6gAISy2XgQ==
-X-Google-Smtp-Source: AMsMyM5oP6p5xd1sG1FSBuifQFZ9eTxa2EctG1rAcLMZeClgXEj3gfbfaIwU9m/ygjES8kXEyGVGRw==
-X-Received: by 2002:a17:90a:1b0d:b0:20d:69b1:70c3 with SMTP id q13-20020a17090a1b0d00b0020d69b170c3mr19296704pjq.5.1666310599088;
-        Thu, 20 Oct 2022 17:03:19 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u7-20020a170903124700b0017a1145eec7sm13618876plh.157.2022.10.20.17.03.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Oct 2022 17:03:18 -0700 (PDT)
-Date:   Fri, 21 Oct 2022 00:03:15 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vishal Annapurve <vannapurve@google.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        shuah@kernel.org, bgardon@google.com, oupton@google.com,
-        peterx@redhat.com, vkuznets@redhat.com, dmatlack@google.com
-Subject: Re: [V3 PATCH 4/4] KVM: selftests: x86: Precompute the cpu type
-Message-ID: <Y1Hhw40H58EmZ6lK@google.com>
-References: <20221013121319.994170-1-vannapurve@google.com>
- <20221013121319.994170-5-vannapurve@google.com>
+        with ESMTP id S229832AbiJUA55 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Oct 2022 20:57:57 -0400
+Received: from out203-205-221-210.mail.qq.com (out203-205-221-210.mail.qq.com [203.205.221.210])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F7FE220F9D
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 17:57:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+        s=s201512; t=1666313868;
+        bh=dl6yBMYwe2DpRerjx1DwIpqPoeEi77jJTwJJ4yakXcw=;
+        h=From:To:Cc:Subject:Date;
+        b=OXrU6QK7H88OGpncfbeF9Atn5gBx7fntYNuupXmO34GFm/DA/r5qv9bb7GKczMCsq
+         YmHJoq81bURH2r+AAhJv7MOqg++jx1bSei77QhJTyqq/6UdIjRBlny3c9+YV4c5Kym
+         ORLsfpaFM84nOdcXl9NYFquhTUDBUDqcsNNLGsCA=
+Received: from localhost.localdomain ([39.156.73.13])
+        by newxmesmtplogicsvrsza32.qq.com (NewEsmtp) with SMTP
+        id E6C0F64A; Fri, 21 Oct 2022 08:57:44 +0800
+X-QQ-mid: xmsmtpt1666313864toqnf29sc
+Message-ID: <tencent_768ACEEBE1E803E29F4191906956D065B806@qq.com>
+X-QQ-XMAILINFO: N7h1OCCDntujVo9Hfi8wbg9LPgS406+zvQTITmAD8nORjvpp5imfSfXMri5wj2
+         UGkC1dgWu75HAPm4Be98DV1aokEVMPBFiLBNYNEtIqdmNWbZJ1mnsINioGFkoRZvFFlbf2cqVS/P
+         TKe+XeRC/wEUvIFDkAharLneEpucmpKvk7TTfjaf6CcmYjFOBAGPYganYWaJOTfCnXvXl0g61usk
+         zONKzkcwlenZts7hjaX091E5F8xAlVC+VdwS6mmhB1nlwROloZWJ/rqur5o0ngZrkdd3cmiyuldq
+         5xvzgY3hYEFqba57v7i2p1n5LGnafMCRm74DjxbOBGlwcFVu9TyKX2DeY2Mf/AQxiLNEKcvkrwLp
+         nF6nIlR+H825OsZFIjEzNKVDEv4mfQlOlKyuQJZWnwk54CdfU1fmnCu+xJ84c4LZxnyudxJkN/vt
+         bHVTwIeU91qy3ERq7YpepX43uYX1aeJ4JdEZh4TWOxg7JmnHz4k6G3bEoeVCrAfLqQwHAtg1yW+C
+         sLGxnNRcuQGnm/rkPJXtE6ZdW5HpzVy9ne7FNTcTYuVSEvWXIxLUmw+8fiBOhKSKQ/MJliqWSO+T
+         1zfFaX7ZSqnvYWXZd07qw7oE2FRzcC533AB27bpaWguNmMhDrZ9Ifc4nrenEu8tQwoO6FxjQ6t/K
+         Rwgm094erd6KWHi9d9vnUt6U36+/0k1o20s2L6Q52aRDb9u5R7IWsNzIfSl7zdOzMS5GizRWB1YK
+         35Dij5670IMz/yn0glJAQHNQ/vCFWfbmm0T9fPL1fd8kp7mN5Z7P1wbWNjByeAjMX2TgwXVxk+Xt
+         DvedF3uUzdPJ5geaI7s8ezRFQ7MPRTosbJQKRhwrMc4IEDCE8KEYMgpe/aiVyf/t0xGCJvUKrZnm
+         yxAlrDCHxCK8hCaFYAv9NoSlHdR0xeZZ/NKHe0TOyp59rYktnjqlqIYAdjf53ed4ShVSNetuuAC+
+         5hxj45G3Ku6xzOMDjBqeT/u6bgisv68ZSRFANOdBQ+qw9HNTkmSMel90NboXgF
+From:   Rong Tao <rtoax@foxmail.com>
+Cc:     rtoax@foxmail.com, Rong Tao <rongtao@cestc.cn>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] kvm: vmenter: Use tabs instead of spaces for indentation
+Date:   Fri, 21 Oct 2022 08:57:41 +0800
+X-OQ-MSGID: <20221021005741.12240-1-rtoax@foxmail.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221013121319.994170-5-vannapurve@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        HELO_DYNAMIC_IPADDR,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,RDNS_DYNAMIC,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 13, 2022, Vishal Annapurve wrote:
-> Cache the vendor CPU type in a global variable so that multiple calls
-> to is_amd/intel_cpu() do not need to re-execute CPUID.
-> 
-> Sync the global variable is_cpu_amd into the guest so the guest can also
-> avoid executing CPUID instruction.
-> 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
-> ---
->  tools/testing/selftests/kvm/lib/x86_64/processor.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index fa65e8142c16..f508e58346e9 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -19,6 +19,7 @@
->  #define MAX_NR_CPUID_ENTRIES 100
->  
->  vm_vaddr_t exception_handlers;
-> +static bool is_cpu_amd;
+From: Rong Tao <rongtao@cestc.cn>
 
-This should probably have a "host" qualifier, e.g. is_host_cpu_amd.  More below.
+Code indentation should use tabs where possible and miss a '*'.
 
->  
->  static void regs_dump(FILE *stream, struct kvm_regs *regs, uint8_t indent)
->  {
-> @@ -1046,7 +1047,7 @@ static bool cpu_vendor_string_is(const char *vendor)
->  
->  bool is_intel_cpu(void)
+Signed-off-by: Rong Tao <rongtao@cestc.cn>
+---
+ arch/x86/kvm/vmx/vmenter.S | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-It'll be more churn, but I think we should drop the wrappers in this patch so
-that we can visually audit all users.  There is technically a subtle functional
-change here, as previously executing is_intel_cpu() and is_amd_cpu() in the guest
-will consume the _guest_ CPUID, whereas with this change, the guest will now
-consume the _host_ CPUID.
+diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+index 8477d8bdd69c..f09e3aaab102 100644
+--- a/arch/x86/kvm/vmx/vmenter.S
++++ b/arch/x86/kvm/vmx/vmenter.S
+@@ -229,7 +229,7 @@ SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
+ 	 * eIBRS has its own protection against poisoned RSB, so it doesn't
+ 	 * need the RSB filling sequence.  But it does need to be enabled, and a
+ 	 * single call to retire, before the first unbalanced RET.
+-         */
++	 */
+ 
+ 	FILL_RETURN_BUFFER %_ASM_CX, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT,\
+ 			   X86_FEATURE_RSB_VMEXIT_LITE
+@@ -273,7 +273,7 @@ SYM_FUNC_END(__vmx_vcpu_run)
+  * vmread_error_trampoline - Trampoline from inline asm to vmread_error()
+  * @field:	VMCS field encoding that failed
+  * @fault:	%true if the VMREAD faulted, %false if it failed
+-
++ *
+  * Save and restore volatile registers across a call to vmread_error().  Note,
+  * all parameters are passed on the stack.
+  */
+-- 
+2.31.1
 
-It just so happens that the existing user and the new user both want to query
-Intel vs. AMD for VMCALL vs. VMMCALL, i.e. care about the host even when checking
-from the guest.  It's extreme paranoia since I don't think there are any parallel
-series that are adding is_intel_cpu()/is_amd_cpu() users, not to mention that I
-don't think any selftests does cross-vendor virtualization, but on the other hand
-the paranoia doesn't cost much.
-
->  {
-> -	return cpu_vendor_string_is("GenuineIntel");
-> +	return !is_cpu_amd;
-
-Please keep the explicit "GenuineIntel" check, i.e. add is_host_cpu_intel.  KVM
-technically supports other vendors, e.g. Centaur and Zhaoxin for VMX, and Hygon
-for AMD, so it's not impossible that someone could run on Centuar or Zhaoxin and
-get a false positive.  Again, extreme paranoia, but doesn't cost much.
-
->  }
->  
->  /*
-> @@ -1054,7 +1055,7 @@ bool is_intel_cpu(void)
->   */
->  bool is_amd_cpu(void)
->  {
-> -	return cpu_vendor_string_is("AuthenticAMD");
-> +	return is_cpu_amd;
->  }
->  
->  void kvm_get_cpu_address_width(unsigned int *pa_bits, unsigned int *va_bits)
-> @@ -1328,8 +1329,13 @@ bool vm_is_unrestricted_guest(struct kvm_vm *vm)
->  	return get_kvm_intel_param_bool("unrestricted_guest");
->  }
->  
-> +void kvm_selftest_arch_init(void)
-> +{
-> +	is_cpu_amd = cpu_vendor_string_is("AuthenticAMD");
-> +}
->  
->  void kvm_arch_vm_post_create(struct kvm_vm *vm)
->  {
->  	vm_create_irqchip(vm);
-> +	sync_global_to_guest(vm, is_cpu_amd);
->  }
-> -- 
-> 2.38.0.rc1.362.ged0d419d3c-goog
-> 
