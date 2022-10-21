@@ -2,185 +2,212 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9649B607F55
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 21:56:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 800EB607F8E
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 22:13:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229941AbiJUT45 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 15:56:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60256 "EHLO
+        id S230131AbiJUUNe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 16:13:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229795AbiJUT4z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 15:56:55 -0400
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2043.outbound.protection.outlook.com [40.107.243.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6239D29B88F
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 12:56:51 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JkH8esi4BYcyCnDLFgN/i7JpsT9ttV1YhdJIrCPoiMHoKZbNeH3EkuAynCqzFk+gRzlvd7Ccp63ea2TSsKBazf0Sa9JH2v7TfAA06ridaFQp6LsxzJHwCgeyL6ewkw3OoYi7wRYtZ4MztvUU65vl1/FLAppg8zSPcFnuLk5TcJdsRdpyk6KeyVKOuFci2IlG0SLzN8rWUlM50zfKVTkkfYHMNFjoJ0SIxIHLF6fTn32NeFIrx/Zj78cIzZ+6L533U7PFo0KOCsVMjCkrRl5j/m3hwZIJH/J/zw5SnCqmEce7xDL82kbnQdz/njYd7hPQmE7KQzoYRPcg4RIE4UzjKg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=D4ulHbrWbeqoyAexNPrXueUMPOSfyYgdjTyJ2Ismxa8=;
- b=A5DY2nSJTd2Qy6ID4s7a4YiMQQfEAoW7BUUWMyTAvxub3fCV4vSDpxeL7SAp02g19f4G6KX+Ij0Wx2lh9upk6SkQAkl95CkheWPPAVyXXdXJS6ewCSvoXZGi59l47M7ZE/L5SBdU8bYWS/3ztBUWIVhuFNiBEop6auN4uxg49M44yP1AbaPMKjhxO+EtYoXK5wIs0ocDvnAQ9k72Sfvse5q5fBabyJnDJWV7KjJHb0F1FS11Nv3cwVTacJrpjSoClQ6rOQqqXknI8eaOgdOZs3kXtXKcFGbkd4uaOIwVdgjmYZkr6CbdbcmclxI0gT0uG4kPe300aDKCtp+Xo1Haeg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=D4ulHbrWbeqoyAexNPrXueUMPOSfyYgdjTyJ2Ismxa8=;
- b=aEtIpTauOYZENPWZdctpCjRVb8Hfxv2K+n9xCKPzUdjkI5x4VP33XAked976gcnInPJBYtFzJkYJcuZhw4foKtR56aqe6VSJn/3RL8dH8PYgqX2SmxCSNPcadY6hm5N9kVLFG4DuMbPjm2ZPjMbl7OZJGUDcVCttKzMJFheED4sq9VuBd9OJKOuWHXl/1F8nahja0PLJyQWLHGRGh2YTFXYmj7wXmnSdaE5yQAdumgefCAB7ukFE+1uAbXItBuTIxW5Fvd90gDIcdGK4dsZCHwTsqtE7N/uD6IA96r+UGRyIM3wJVlWa7ANNJxxbKIZL3SpJdQpnRg/RaK3XucftsQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by BL1PR12MB5272.namprd12.prod.outlook.com (2603:10b6:208:319::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.30; Fri, 21 Oct
- 2022 19:56:49 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5723.033; Fri, 21 Oct 2022
- 19:56:49 +0000
-Date:   Fri, 21 Oct 2022 16:56:47 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Laine Stump <laine@redhat.com>
-Cc:     Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Rodel, Jorg" <jroedel@suse.de>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Farman <farman@linux.ibm.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "Martins, Joao" <joao.m.martins@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        Steve Sistare <steven.sistare@oracle.com>,
-        "libvir-list@redhat.com" <libvir-list@redhat.com>,
-        Alistair Popple <apopple@nvidia.com>
-Subject: Re: [PATCH RFC v2 00/13] IOMMUFD Generic interface
-Message-ID: <Y1L5f3zW97672IAy@nvidia.com>
-References: <Yyx13kXCF4ovsxZg@redhat.com>
- <Yyx2ijVjKOkhcPQR@nvidia.com>
- <Yyx4cEU1n0l6sP7X@redhat.com>
- <Yyx/yDQ/nDVOTKSD@nvidia.com>
- <Yy10WIgQK3Q74nBm@redhat.com>
- <Yy20xURdYLzf0ikS@nvidia.com>
- <Yy22GFgrcyMyt3q1@redhat.com>
- <Yy24rX8NQkxR2KCV@nvidia.com>
- <Yy28FzEnoKo8UExU@redhat.com>
- <5ae777d2-f95c-d8bb-5405-192a89f16e90@redhat.com>
+        with ESMTP id S229777AbiJUUNc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 16:13:32 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6209C29E99A
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 13:13:31 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id 10so3371213pli.0
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 13:13:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SsTrKyn4D6bUIajE0OuRcI1eQtyN8Db+ITFw4jj2MPM=;
+        b=KEbIkqbaFppP5trnLE3+Bq6MI1q5c4gTevgjr1cuDmInMwjCCGQzAQYqNOvb2IGv9+
+         8pBQN+rrJMfDOOfKOqiY4AetSsT5QQNB5tH0FLHKyvuC0wibPylmafhvzIwRH824efVz
+         RQK1RdhVxTNUWGKArm3L1eux9n3X4c2Mgznfnh88INuWMq3AZqYoj626iQxOJWiop/wq
+         sk7jloKq2UhvQ6TRdHGGc8gfO2xlVS34r4L5kMVT4KQ/imoNTmsVlDdPd07AWpVuuIn+
+         oAPr3qWgRSvCzraPR05esOCe5BU90qd1gnDZWxTN/yQDOWEddbkHiXtPqo11VMBSyMM1
+         3BXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SsTrKyn4D6bUIajE0OuRcI1eQtyN8Db+ITFw4jj2MPM=;
+        b=OdfI2sPcChC4e14LlWE4wVHQTp3NxW80n2SWAwb2F0GplUJQfviFLqBTcnvlTnLnHm
+         gYBErQNDokSsMwV5669ngZijD6kabIL7PYhAagLaxV7WoUsLxPc+FhVIRILppAEtVgo+
+         9iHD5ciUsHifK4VmyPOLRCOdLGfXCRjvhu0OD7swun3N+6FDLJ1Lqw1f7f9AoYacw+yP
+         pbyU3xMmYOPxxHdLwAzToPhe/lbCBchjEy35soV4yFHPbNvW8oa9KOa1EKF1v4VijKbb
+         9e1ViM5sYnd3SKMU189mvLbC218ZmS2fJTa1kUlAuQwaC4QXr0zv+RUNQlKfpapw3le1
+         hXyQ==
+X-Gm-Message-State: ACrzQf2tIXsMLya/42nTEVrwAb/d+0lbWVtKgofxjCT1znLMvG5SPWVk
+        R4xjLNw8n7n3+V+SOjW5TKp/lg==
+X-Google-Smtp-Source: AMsMyM6gDlDqchxuAvlSVTovrxJg6Ns53+Pr2a+hXKGM4UEFJD4Hp3hXH/8Qi2uTBQm3FyOYcClOGA==
+X-Received: by 2002:a17:903:22c8:b0:17f:7039:a2d4 with SMTP id y8-20020a17090322c800b0017f7039a2d4mr21566760plg.2.1666383210794;
+        Fri, 21 Oct 2022 13:13:30 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id h190-20020a6283c7000000b00561578478f9sm15430062pfe.134.2022.10.21.13.13.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Oct 2022 13:13:30 -0700 (PDT)
+Date:   Fri, 21 Oct 2022 20:13:27 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     vkuznets@redhat.com, pbonzini@redhat.com, dmatlack@google.com,
+        kvm@vger.kernel.org, shujunxue@google.com, terrytaehyun@google.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH] Add Hyperv extended hypercall support in KVM
+Message-ID: <Y1L9Z8RgIs8yrU6o@google.com>
+References: <20221021185916.1494314-1-vipinsh@google.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5ae777d2-f95c-d8bb-5405-192a89f16e90@redhat.com>
-X-ClientProxiedBy: MN2PR06CA0007.namprd06.prod.outlook.com
- (2603:10b6:208:23d::12) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL1PR12MB5272:EE_
-X-MS-Office365-Filtering-Correlation-Id: 67d2872f-6fff-4245-9491-08dab39e63e3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XNp+Ow6lDoL/UzGrMFRK5kwR/qWdzNxPyT1Dvcv9OMNExkQq3MJZwSWsValrWmpsXyVDcu69nbiJi7xHAPthVhbxcEwoO5Fy8K1oQewf1n4huFt8mOuxdw1sIUkhnOStLNgyPRqrmb9qG7SrXl0PFhkt1emY0CD08SbdpRXfehZrjfu7rNN2KUZ1gloxV3of8YzFhlWfj+sXlasSyTOvzfZEqMmewRpPrN1zazstoaKsYvZB2L0yfhYuJ9NBoI9zTsA8IyCRbLdVnW+0YoPVT9DA3vbsbjEJQZ73XyKp/1brlH/nngbi0PCSR5znguUp5vDay4Ybzg4rU3zT8kGIjvWBbqOKEvbxjQJ78E7JhoArrvaZURQwBBGBO2/n4jkPGhXtuEPmDYnkYwduiGRlk2aCSd03aug2rPWn+CxQnHFK1/u0u8wmMLRB2hkTdLXdqRPiGwd1T0UV/bUGV2haopBaFA20FkLhfENqnjUUOxkfriUVK7AJrOKbDtO8moI/0YCGz31p2Tsw3i16W0IJupEVJsokr+m4BTphBUpQsbQu2PcUn4bVV5CeEPxxCU2JgNf4sXUcmlRqSU3OtbRSm5XDXIbllJHUtDp/P6ALD+3f6irFTrDFUikf5ZPZXvDxQuSk9WvEe52jfDRKXuzAu0AzAZU3Bc9CSXPiva8I5ghcOsWPcWR6TsuOZ3U4W0Gl+KVInyklL1Bk/6MJw1w0aFZhIlmf81w35geaP6r4DPbUDK/1uJp5gzaqjFNtDQpQ
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(376002)(136003)(346002)(396003)(366004)(451199015)(6486002)(478600001)(38100700002)(186003)(2616005)(6916009)(4326008)(54906003)(36756003)(6506007)(316002)(66476007)(66946007)(66556008)(107886003)(83380400001)(5660300002)(8676002)(7416002)(2906002)(26005)(8936002)(6512007)(41300700001)(86362001)(41533002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?JOFmyDnlSP/A9iOu6EJHBZBX2Jsaf8uW/V+va+PUu7gqg0myl7OXVPBURTo/?=
- =?us-ascii?Q?Npz4VEFfpSIoBWPp8lHIT1rfWPBysqRZ8zlCnNw/z0TDcqkFL14Yxq9K+a+Y?=
- =?us-ascii?Q?V6C5v9s4LirYGDD2TXiFhVHbRcOl6d3E03AuVB42kU0zM1RAcw/zrQ9OesSt?=
- =?us-ascii?Q?A9t1RwVo2yPTM4RB1SkFsKpLDILYymb3eMj8/8GJ8QZz69HH+RhghvPQ2PDb?=
- =?us-ascii?Q?dzrN9JlVej2xyXtQNKGoKUruZamtVXxdGpJqmQke75XS+cNgkez2b6l61n9T?=
- =?us-ascii?Q?m+1atX818EVw4bOiF7YFU+emvZJf+aINQOvCm7YLA7N5YFf78uWzmt5sb9be?=
- =?us-ascii?Q?KHLTV3oDcLxmIRT9cuenBhRnB9upN2Ww04vBoAmWsafG64JJTEu7WzCOUks7?=
- =?us-ascii?Q?E5WtTWy5uDp0UuDWA0Wv6L/MuSylYBRbNZgVRIKgSnhJa1/uwWkyE1T+de0z?=
- =?us-ascii?Q?ZRN07z1YA3/XrmwZVW9VbV4aBKxH8H6wLBgPRXuo3f5+8OY/gKiGyj/Nc3OP?=
- =?us-ascii?Q?JTGQ/FDcbP9qu8g00+7/VdeDLKTQ6m7OcXeEWGisAC0MNLlyzH5EQnKqzJ7z?=
- =?us-ascii?Q?ev0Cnstjueo/0h0WLXzphphzhCPfO/UvVDSzxZpetfeZZMjM3JJ0lq0LTUqe?=
- =?us-ascii?Q?c5YPPaFT0V2vWWPRpu4c0Tx8t1o87+FgWTNwS80QUa6yJ2W8xiremnY+SuzE?=
- =?us-ascii?Q?9EmI+AIqiC309Z/jJu4WUfN+Y1kpIVgzuLoPxPlqKDcvSikXEplBw0XLLUyU?=
- =?us-ascii?Q?QD4v73JkjxtepEPv1W41kLI2kx7dM+rZzT1/smEWE7UsCmLdgsGfv9B2FHRV?=
- =?us-ascii?Q?0XD4gvLaTE5BhZFtBisgWKhU3olCQOHm2i86vedosmkhDBghqINV8oepxf9w?=
- =?us-ascii?Q?HgaCM7LpxiZsYwlK91lQ1eK1CpUT7j8qaSKPO9Su2tCd3aGsWTA9KPsrDxc8?=
- =?us-ascii?Q?17HljD/CjeO7dfCu3RhBrDiL3he78VWdB013wGZtC0/z2SDM3Xu9gv0rBzop?=
- =?us-ascii?Q?WrSv+LTYfRN/WpgaszJ/UPG4r+mZ88SG33AJw/kuNviX5MTXC7CzUDleS/0R?=
- =?us-ascii?Q?XPzHbBCPVirV224AfG76Z8xbT55uF+Bqi5IlJEFDlyHtYG4cODoHv0cJPVR8?=
- =?us-ascii?Q?+hpvc0EhbxTignZq538HCqxsP9y/jbKGyOavfwO9xzRqGZyDtXVcYQF/ULUD?=
- =?us-ascii?Q?6OabuWhYjoPX39xO5iSyDOXAhfOFb91nG81pGekikXY3HF8Sg9A9XtZDw+FD?=
- =?us-ascii?Q?lRd/t+A2vqdqlelBIegpIsNPM+WO0xGgEyshntgujFr14oCEC98blXvUvVIo?=
- =?us-ascii?Q?MOiXF/8YRk5nYtf1BlDc8/9m0aQwptRRi3n+eCPdtNCMl7rm4pDbSxNsIErg?=
- =?us-ascii?Q?cYmcIRfT5ymLgDnP+lcoA0NtCFEjrX3H/qGNk9aKBHSnW1zBGjcCXqEpuHv4?=
- =?us-ascii?Q?uLp7QbKKLH/UJQMaR8VZfflthRkRc/ug3ZCX70f3JPLD80T3V/va7lm0+bom?=
- =?us-ascii?Q?ZvN2KI1umbW/zqLuOIzQabO0TDmIk8+JVW6GpF6vrAi9wmBwI/CYDntfmBgK?=
- =?us-ascii?Q?apaIntOMsUnWiWHgRhs=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 67d2872f-6fff-4245-9491-08dab39e63e3
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2022 19:56:49.0597
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lSTEKNn19+wyoxQPiQ1cI/oWuXh1jLgUbqjUt6KYzXNHvbQweVJiWvISMmGUbM4g
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5272
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20221021185916.1494314-1-vipinsh@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Sep 23, 2022 at 11:40:51AM -0400, Laine Stump wrote:
-> It's been a few years, but my recollection is that before starting a
-> libvirtd that will run a guest with a vfio device, a privileged process
-> needs to
+On Fri, Oct 21, 2022, Vipin Sharma wrote:
+> Hyperv hypercalls above 0x8000 are called as extended hypercalls as per
+> Hyperv TLFS. Hypercall 0x8001 is used to enquire about available
+> hypercalls by guest VMs.
 > 
-> 1) increase the locked memory limit for the user that will be running qemu
-> (eg. by adding a file with the increased limit to /etc/security/limits.d)
+> Add support for HvExtCallQueryCapabilities (0x8001) and
+> HvExtCallGetBootZeroedMemory (0x8002) in KVM.
 > 
-> 2) bind the device to the vfio-pci driver, and
+> A guest VM finds availability of HvExtCallQueryCapabilities (0x8001) by
+> using CPUID.0x40000003.EBX BIT(20). If the bit is set then the guest VM
+> make hypercall HvExtCallQueryCapabilities (0x8001) to know what all
+> extended hypercalls are supported by hypervisor.
 > 
-> 3) chown /dev/vfio/$iommu_group to the user running qemu.
+> A userspace VMM can query capability KVM_CAP_HYPERV_EXT_CALL_QUERY to
+> know which extended hypercalls are supported in KVM. After which the
+> userspace will enable capabilities for the guest VM.
+> 
+> HvExtCallQueryCapabilities (0x8001) is handled by KVM in kernel,
 
-Here is what is going on to resolve this:
+Does this really need to be handle by KVM?  I assume this is a rare operation,
+e.g. done once during guest boot, so performance shouldn't be a concern.  To
+avoid breaking existing userspace, KVM can forward HV_EXT_CALL_GET_BOOT_ZEROED_MEMORY
+to userspace if and only if HV_ENABLE_EXTENDED_HYPERCALLS is enabled in CPUID,
+but otherwise KVM can let userspace deal with the "is this enabled" check.
 
-1) iommufd internally supports two ways to account ulimits, the vfio
-   way and the io_uring way. Each FD operates in its own mode.
+Aha!  And if KVM "allows" all theoretically possible extended hypercalls, then
+KVM will never need a capability to announce "support" for a new hypercall, i.e.
+define KVM's ABI to be that KVM punts all possible extended hypercalls to userspace
+if CPUID.0x40000003.EBX BIT(20) is enabled.
+
+> whereas, HvExtCallGetBootZeroedMemory (0x8002) is passed to userspace
+> for further action.
+> 
+> Change-Id: Ib3709fadbf11f91be2842c8486bcbe755e09cbea
+
+Drop gerrit's Change-Id when posting publicly.
+
+If KVM punts the support checks to userspace, then the KVM side of things is very
+minimal and future proof (unless Microsoft hoses us).  E.g. with code deduplication
+that should be moved to a prep patch:
+
+---
+ arch/x86/kvm/hyperv.c | 43 +++++++++++++++++++++++++++----------------
+ 1 file changed, 27 insertions(+), 16 deletions(-)
+
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 0adf4a437e85..f9253249de00 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -2138,6 +2138,12 @@ static void kvm_hv_hypercall_read_xmm(struct kvm_hv_hcall *hc)
+ 	kvm_fpu_put();
+ }
  
-   When /dev/iommu is opened the FD defaults to the io_uring way, when
-   /dev/vfio/vfio is opened it uses the VFIO way. This means
-   /dev/vfio/vfio is not a symlink, there is a new kconfig
-   now to make iommufd directly provide a miscdev.
++/*
++ * The TLFS carves out 64 possible extended hypercalls, numbered sequentially
++ * after the base capabilities extended hypercall.
++ */
++#define HV_EXT_CALL_MAX (HV_EXT_CALL_QUERY_CAPABILITIES + 64)
++
+ static bool hv_check_hypercall_access(struct kvm_vcpu_hv *hv_vcpu, u16 code)
+ {
+ 	if (!hv_vcpu->enforce_cpuid)
+@@ -2178,6 +2184,10 @@ static bool hv_check_hypercall_access(struct kvm_vcpu_hv *hv_vcpu, u16 code)
+ 	case HVCALL_SEND_IPI:
+ 		return hv_vcpu->cpuid_cache.enlightenments_eax &
+ 			HV_X64_CLUSTER_IPI_RECOMMENDED;
++	case HV_EXT_CALL_QUERY_CAPABILITIES ... HV_EXT_CALL_MAX:
++		return hv_vcpu->cpuid_cache.features_ebx &
++		       HV_ENABLE_EXTENDED_HYPERCALLS;
++		break;
+ 	default:
+ 		break;
+ 	}
+@@ -2270,14 +2280,7 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+ 			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+ 			break;
+ 		}
+-		vcpu->run->exit_reason = KVM_EXIT_HYPERV;
+-		vcpu->run->hyperv.type = KVM_EXIT_HYPERV_HCALL;
+-		vcpu->run->hyperv.u.hcall.input = hc.param;
+-		vcpu->run->hyperv.u.hcall.params[0] = hc.ingpa;
+-		vcpu->run->hyperv.u.hcall.params[1] = hc.outgpa;
+-		vcpu->arch.complete_userspace_io =
+-				kvm_hv_hypercall_complete_userspace;
+-		return 0;
++		goto hypercall_userspace_exit;
+ 	case HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST:
+ 		if (unlikely(hc.var_cnt)) {
+ 			ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
+@@ -2336,15 +2339,14 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+ 			ret = HV_STATUS_OPERATION_DENIED;
+ 			break;
+ 		}
+-		vcpu->run->exit_reason = KVM_EXIT_HYPERV;
+-		vcpu->run->hyperv.type = KVM_EXIT_HYPERV_HCALL;
+-		vcpu->run->hyperv.u.hcall.input = hc.param;
+-		vcpu->run->hyperv.u.hcall.params[0] = hc.ingpa;
+-		vcpu->run->hyperv.u.hcall.params[1] = hc.outgpa;
+-		vcpu->arch.complete_userspace_io =
+-				kvm_hv_hypercall_complete_userspace;
+-		return 0;
++		goto hypercall_userspace_exit;
+ 	}
++	case HV_EXT_CALL_QUERY_CAPABILITIES ... HV_EXT_CALL_MAX:
++		if (unlikely(hc.fast)) {
++			ret = HV_STATUS_INVALID_PARAMETER;
++			break;
++		}
++		goto hypercall_userspace_exit;
+ 	default:
+ 		ret = HV_STATUS_INVALID_HYPERCALL_CODE;
+ 		break;
+@@ -2352,6 +2354,14 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+ 
+ hypercall_complete:
+ 	return kvm_hv_hypercall_complete(vcpu, ret);
++hypercall_userspace_exit:
++	vcpu->run->exit_reason = KVM_EXIT_HYPERV;
++	vcpu->run->hyperv.type = KVM_EXIT_HYPERV_HCALL;
++	vcpu->run->hyperv.u.hcall.input = hc.param;
++	vcpu->run->hyperv.u.hcall.params[0] = hc.ingpa;
++	vcpu->run->hyperv.u.hcall.params[1] = hc.outgpa;
++	vcpu->arch.complete_userspace_io = kvm_hv_hypercall_complete_userspace;
++	return 0;
+ }
+ 
+ void kvm_hv_init_vm(struct kvm *kvm)
+@@ -2494,6 +2504,7 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
+ 
+ 			ent->ebx |= HV_POST_MESSAGES;
+ 			ent->ebx |= HV_SIGNAL_EVENTS;
++			ent->ebx |= HV_ENABLE_EXTENDED_HYPERCALLS;
+ 
+ 			ent->edx |= HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE;
+ 			ent->edx |= HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
 
-2) There is an ioctl IOMMU_OPTION_RLIMIT_MODE which allows a
-   privileged user to query/set which mode the FD will run in.
+base-commit: e18d6152ff0f41b7f01f9817372022df04e0d354
+-- 
 
-   The idea is that libvirt will open iommufd, the first action will
-   be to set vfio compat mode, and then it will fd pass the fd to
-   qemu and qemu will operate in the correct sandbox.
-
-3) We are working on a cgroup for FOLL_LONGTERM, it is a big job but
-   this should prove a comprehensive resolution to this problem across
-   the kernel and improve the qemu sandbox security.
-
-   Still TBD, but most likely when the cgroup supports this libvirt
-   would set the rlimit to unlimited, then set new mlock and
-   FOLL_LONGTERM cgroup limits to create the sandbox.
-
-Jason
