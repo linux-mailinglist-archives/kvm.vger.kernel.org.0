@@ -2,140 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 885316072A2
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 10:41:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 06CF1607340
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 11:08:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230297AbiJUIlx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 04:41:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60862 "EHLO
+        id S230116AbiJUJID (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 05:08:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230018AbiJUIls (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 04:41:48 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 632A724F179
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 01:41:44 -0700 (PDT)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29L87GUc029036
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 08:41:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=B0z9eEsq+PqglQXdE2dtYL5eRHca1A0hEYzTTrpFeq0=;
- b=EmRCetnf5oddqrTSNAkODjw7H+UGvyU6TDAiB/F+tnB9dqNOLXah546xR5uUWIeCQkV+
- 1bkc4OZq/CzLRvRpC+X6+zfNRh3+inzb1Dx/h+SQ6e5rCrX43jqM/ZGfZhdncBEHyHTA
- pSP5qBSM+tHpA/gtq/lsxUX7/dgLXTMOG6ftKT3XY0GA7z6++mE+xq1PpXrl0Xkpp2Cy
- uaE06FNgAHcEmCNc1bHgm3TP12HXkc2lYQGtXY+riY29cRrSvAjjnHKTmjtX6Bt97g8L
- HkYql8sBNz8eP1jFZh99nbckpKZb7jRZT45oEsUrp6K1xYv+VjtJStWaJOwC25ul706F aw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kbq6tsy94-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 08:41:42 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29L87Heb029097
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 08:41:42 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kbq6tsy8d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 Oct 2022 08:41:42 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29L8a5RZ032339;
-        Fri, 21 Oct 2022 08:41:39 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04fra.de.ibm.com with ESMTP id 3k7mg97nwm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 Oct 2022 08:41:39 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29L8faE466912614
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 21 Oct 2022 08:41:36 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 79E3042045;
-        Fri, 21 Oct 2022 08:41:36 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2F67242042;
-        Fri, 21 Oct 2022 08:41:36 +0000 (GMT)
-Received: from [9.171.11.206] (unknown [9.171.11.206])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 21 Oct 2022 08:41:36 +0000 (GMT)
-Message-ID: <999c3833-d10c-18da-4319-ed150e9c71fa@linux.ibm.com>
-Date:   Fri, 21 Oct 2022 10:41:35 +0200
+        with ESMTP id S230027AbiJUJIA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 05:08:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A588F251D55
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 02:07:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666343278;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=MNw8AC5b+llDM1gmU2HXsAh1LFF65S14nk18Zclt7ao=;
+        b=Ph35VijTKqOWctbLqwtRCYDuTZhPx4qCwTPZxqPclQk6BlZ/r/swpDIaEZDEsUHV/N1JhS
+        JHysJ/imN4wh/+pEti7ODfiKsvQR/hVpxBxnuN7OpKDaSu9rEQpQxGTHCgg16sTG1PF7Z1
+        gJaH1I5EmPEaGuZMG78nI+Ka/bfEYNk=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-543-J2i4nhM3P9e9i9AV1e-5Vg-1; Fri, 21 Oct 2022 05:07:57 -0400
+X-MC-Unique: J2i4nhM3P9e9i9AV1e-5Vg-1
+Received: by mail-ed1-f72.google.com with SMTP id z20-20020a05640240d400b0045cec07c3dcso1700669edb.3
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 02:07:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MNw8AC5b+llDM1gmU2HXsAh1LFF65S14nk18Zclt7ao=;
+        b=jiiEQo7ux8WxBShotnTcRVjYvRsQjJxzy8VIYEWFutsWtc2kW8FrxPL6T34JeBF9gi
+         eMgLKZVXk13sybtZ6eM5m76W1e34gioHIaXMnXqzc0sBmZla5sBDfNLJ6W4CesrnL34I
+         82gJgHQSKm1A+sjRRYKQ9cipXzX011KEIEGPkdej+AwAm3eVn+WES1aSVehPAFE1MWyi
+         xqRMwUDhwZum2VBxzvsOhCvtP04rC8m/g/+Ytw7Jddqd+VcNOtIf8Ok9Kj1jIhy3qvza
+         W3QoMflDHXChuXYRbUcBfPesMd68NPYkAuieQfHpBea8mPNAkuXeSffAb91gWyfyfjkk
+         wotw==
+X-Gm-Message-State: ACrzQf3h9bvFqmby+6B4+vHxZnNTff+ciPxE6BVeqoDbBKtElXpJvOky
+        ryB+PU1a1H0HtcjmF1hN3n3z5qPaEW5vAr4cOX//XvbarucQUGivx6qgsWBRa69Baz7GFJhGniC
+        OTXQF9pcu0Gi9
+X-Received: by 2002:aa7:c04f:0:b0:457:1b08:d056 with SMTP id k15-20020aa7c04f000000b004571b08d056mr17007036edo.146.1666343276113;
+        Fri, 21 Oct 2022 02:07:56 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM69NlpmYvYv3ssSGswnUuzLIS1UqmQvOGi0GdebezUPqC7rmqfHYelpVj4T6cq0qaion/WYLw==
+X-Received: by 2002:aa7:c04f:0:b0:457:1b08:d056 with SMTP id k15-20020aa7c04f000000b004571b08d056mr17007008edo.146.1666343275745;
+        Fri, 21 Oct 2022 02:07:55 -0700 (PDT)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id g12-20020a1709061e0c00b0079d7ec3b211sm73622ejj.150.2022.10.21.02.07.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Oct 2022 02:07:55 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Michael Kelley <mikelley@microsoft.com>,
+        Siddharth Chandrasekaran <sidcha@amazon.de>,
+        Yuan Yao <yuan.yao@linux.intel.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v11 16/46] KVM: x86: hyper-v: Don't use
+ sparse_set_to_vcpu_mask() in kvm_hv_send_ipi()
+In-Reply-To: <Y1BahCzO4jxFC9Ey@google.com>
+References: <20221004123956.188909-1-vkuznets@redhat.com>
+ <20221004123956.188909-17-vkuznets@redhat.com>
+ <Y1BahCzO4jxFC9Ey@google.com>
+Date:   Fri, 21 Oct 2022 11:07:53 +0200
+Message-ID: <87czalczo6.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [kvm-unit-tests PATCH v3 0/6] s390x: PV fixups
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        scgl@linux.ibm.com, thuth@redhat.com
-References: <20221021063902.10878-1-frankja@linux.ibm.com>
- <20221021094628.79239c86@p-imbrenda>
-Content-Language: en-US
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20221021094628.79239c86@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: UECy7yQbHUHu4g8PEOETfVBWjGgcm8ZW
-X-Proofpoint-ORIG-GUID: uf3a4AFxyA2dogdEUt7gXIb730XELUuV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-21_03,2022-10-20_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
- impostorscore=0 mlxscore=0 phishscore=0 adultscore=0 spamscore=0
- suspectscore=0 malwarescore=0 priorityscore=1501 mlxlogscore=999
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210210049
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/21/22 09:46, Claudio Imbrenda wrote:
-> On Fri, 21 Oct 2022 06:38:56 +0000
-> Janosch Frank <frankja@linux.ibm.com> wrote:
-> 
->> A small set of patches that clean up the PV snippet handling.
->>
->> v3:
->> 	* Dropped asm snippet linker script patch for now
-> 
-> shame, I really liked that patch (modulo the nits)
+Sean Christopherson <seanjc@google.com> writes:
 
-You'll see it again soonish with another fix series.
-There are still a lot of patches that I need to upstream. :)
+> On Tue, Oct 04, 2022, Vitaly Kuznetsov wrote:
 
-> 
->> 	* Replaced memalign_pages_flags() with memalign_pages()
->> 	* PV ASCEs will now recieve DT and TL fields from the main test ASCE
->>
->> v2:
->> 	* Macro uses 64bit PSW mask
->> 	* SBLK reset on PV destroy and uv_init() early return have been split off
->>
->>
->> Janosch Frank (6):
->>    s390x: snippets: asm: Add a macro to write an exception PSW
->>    s390x: MAKEFILE: Use $< instead of pathsubst
->>    lib: s390x: sie: Improve validity handling and make it vm specific
->>    lib: s390x: Use a new asce for each PV guest
->>    lib: s390x: Enable reusability of VMs that were in PV mode
->>    lib: s390x: sie: Properly populate SCA
->>
->>   lib/s390x/asm-offsets.c                  |  2 ++
->>   lib/s390x/sie.c                          | 37 +++++++++++++-------
->>   lib/s390x/sie.h                          | 43 ++++++++++++++++++++++--
->>   lib/s390x/uv.c                           | 35 +++++++++++++++++--
->>   lib/s390x/uv.h                           |  5 ++-
->>   s390x/Makefile                           |  2 +-
->>   s390x/cpu.S                              |  6 ++++
->>   s390x/snippets/asm/macros.S              | 28 +++++++++++++++
->>   s390x/snippets/asm/snippet-pv-diag-288.S |  4 +--
->>   s390x/snippets/asm/snippet-pv-diag-500.S |  6 ++--
->>   10 files changed, 140 insertions(+), 28 deletions(-)
->>   create mode 100644 s390x/snippets/asm/macros.S
->>
-> 
+...
+
+>>  
+>> -	if (all_cpus) {
+>> -		kvm_send_ipi_to_many(kvm, vector, NULL);
+>> -	} else {
+>> -		sparse_set_to_vcpu_mask(kvm, sparse_banks, valid_bank_mask, vcpu_mask);
+>> -
+>> -		kvm_send_ipi_to_many(kvm, vector, vcpu_mask);
+>> -	}
+>> +	kvm_hv_send_ipi_to_many(kvm, vector, all_cpus ? NULL : sparse_banks, valid_bank_mask);
+>
+> Any objection to not using a ternary operator?
+>
+> 	if (all_cpus)
+> 		kvm_hv_send_ipi_to_many(kvm, vector, NULL, 0);
+> 	else
+> 		kvm_hv_send_ipi_to_many(kvm, vector, sparse_banks, valid_bank_mask);
+>
+
+Not at all,
+
+> Mostly because it's somewhat arbitrary that earlier code ensures valid_bank_mask
+> is set in the all_cpus=true case, e.g. arguably KVM doesn't need to do the var_cnt
+> sanity check in the all_cpus case:
+>
+> 		all_cpus = send_ipi_ex.vp_set.format == HV_GENERIC_SET_ALL;
+> 		if (all_cpus)
+> 			goto check_and_send_ipi;
+>
+> 		valid_bank_mask = send_ipi_ex.vp_set.valid_bank_mask;
+> 		if (hc->var_cnt != hweight64(valid_bank_mask))
+> 			return HV_STATUS_INVALID_HYPERCALL_INPUT;
+>
+> 		if (!hc->var_cnt)
+> 			goto ret_success;
+>
+
+I think 'var_cnt' (== hweight64(valid_bank_mask)) has to be checked in
+'all_cpus' case, especially in kvm_hv_flush_tlb(): the code which reads
+TLB flush entries will read them from the wrong offset (data_offset/
+consumed_xmm_halves) otherwise. The problem is less severe in
+kvm_hv_send_ipi() as there's no data after CPU banks. 
+
+At the bare minimum, "KVM: x86: hyper-v: Handle
+HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST{,EX} calls gently" patch from this
+series will have to be adjusted. I *think* mandating var_cnt==0 in 'all_cpus'
+is OK but I don't recall such requirement from TLFS, maybe it's safer to
+just adjust 'data_offset'/'consumed_xmm_halves' even in 'all_cpus' case.
+
+Let me do some tests... 
+
+-- 
+Vitaly
 
