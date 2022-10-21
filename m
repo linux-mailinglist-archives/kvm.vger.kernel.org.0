@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A385C607AD9
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 17:35:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BE79607ADE
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 17:36:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229929AbiJUPfq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 11:35:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43928 "EHLO
+        id S230029AbiJUPgG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 11:36:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229832AbiJUPfk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 11:35:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B38B726C451
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 08:35:36 -0700 (PDT)
+        with ESMTP id S229932AbiJUPfx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 11:35:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C351124D8BA
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 08:35:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666366535;
+        s=mimecast20190719; t=1666366540;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=QFxOQ3PtGIbBD+RVLQskRjxlIhD002VdmDFB8+zh1fI=;
-        b=DOtF9vklyLVs7/TyINsmiNxhHAst7oTlTtXKlnWrie4kmPtiBEqHLazkvDwzt8K1qkgOk2
-        gWusvp6bt1FeA3AMG8CH/I95NcNqQYEOvM77YM4DW+b0+gHrrlAB8UmG1wYNiUrjTLvCDp
-        M2FWQHLo8Pr5AzwW6NSx2d1p0X19UGA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=weUMpV8rLBIJE19g/7rH1MfNP/dxn0LjcTdx888tsxY=;
+        b=AtG0L9UY44OdtSlNiVwhAB3DyCbKMW1F/vYB/EsbzUVrP4WjaCfDYfRiKxMhRD2FWh0319
+        Y58bxpDv/3/IqAXF0d4JI62uJv71hLDAU00bRXjLgnBuvEUpny6ISm7KlAI6C4SFj+YqU1
+        qp1/hx5AZDQEHhTNCoLnKQA3apeJb+U=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-222-P_5zjh6oM0u4nUAx2-raFw-1; Fri, 21 Oct 2022 11:35:33 -0400
-X-MC-Unique: P_5zjh6oM0u4nUAx2-raFw-1
+ us-mta-35-_xZRQfyiN1iTeSllnOkgpA-1; Fri, 21 Oct 2022 11:35:34 -0400
+X-MC-Unique: _xZRQfyiN1iTeSllnOkgpA-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B4C45811E75;
-        Fri, 21 Oct 2022 15:35:31 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2071D29AB42D;
+        Fri, 21 Oct 2022 15:35:34 +0000 (UTC)
 Received: from ovpn-192-65.brq.redhat.com (ovpn-192-65.brq.redhat.com [10.40.192.65])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5539E40CA41F;
-        Fri, 21 Oct 2022 15:35:29 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0E00A40CA41F;
+        Fri, 21 Oct 2022 15:35:31 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
@@ -47,9 +47,9 @@ Cc:     Wanpeng Li <wanpengli@tencent.com>,
         Yuan Yao <yuan.yao@linux.intel.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v12 02/46] KVM: selftests: Move "struct hv_enlightenments" to x86_64/svm.h
-Date:   Fri, 21 Oct 2022 17:34:37 +0200
-Message-Id: <20221021153521.1216911-3-vkuznets@redhat.com>
+Subject: [PATCH v12 03/46] KVM: SVM: Add a proper field for Hyper-V VMCB enlightenments
+Date:   Fri, 21 Oct 2022 17:34:38 +0200
+Message-Id: <20221021153521.1216911-4-vkuznets@redhat.com>
 In-Reply-To: <20221021153521.1216911-1-vkuznets@redhat.com>
 References: <20221021153521.1216911-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -58,7 +58,7 @@ Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
 X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,78 +68,181 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <seanjc@google.com>
 
-Move Hyper-V's VMCB "struct hv_enlightenments" to the svm.h header so
-that the struct can be referenced in "struct vmcb_control_area".
-Alternatively, a dedicated header for SVM+Hyper-V could be added, a la
-x86_64/evmcs.h, but it doesn't appear that Hyper-V will end up needing
-a wholesale replacement for the VMCB.
+Add a union to provide hv_enlightenments side-by-side with the sw_reserved
+bytes that Hyper-V's enlightenments overlay.  Casting sw_reserved
+everywhere is messy, confusing, and unnecessarily unsafe.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- .../testing/selftests/kvm/include/x86_64/svm.h | 17 +++++++++++++++++
- .../selftests/kvm/x86_64/hyperv_svm_test.c     | 18 ------------------
- 2 files changed, 17 insertions(+), 18 deletions(-)
+ arch/x86/include/asm/svm.h                        |  7 ++++++-
+ arch/x86/kvm/svm/nested.c                         |  9 ++++-----
+ arch/x86/kvm/svm/svm.h                            |  5 ++++-
+ arch/x86/kvm/svm/svm_onhyperv.c                   |  2 +-
+ arch/x86/kvm/svm/svm_onhyperv.h                   | 15 +++++++--------
+ tools/testing/selftests/kvm/include/x86_64/svm.h  |  5 ++++-
+ .../selftests/kvm/x86_64/hyperv_svm_test.c        |  3 +--
+ 7 files changed, 27 insertions(+), 19 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/svm.h b/tools/testing/selftests/kvm/include/x86_64/svm.h
-index c8343ff84f7f..89ce2c6b57fe 100644
---- a/tools/testing/selftests/kvm/include/x86_64/svm.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/svm.h
-@@ -58,6 +58,23 @@ enum {
- 	INTERCEPT_RDPRU,
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index 0361626841bc..6befed2b30a6 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -5,6 +5,8 @@
+ #include <uapi/asm/svm.h>
+ #include <uapi/asm/kvm.h>
+ 
++#include <asm/hyperv-tlfs.h>
++
+ /*
+  * 32-bit intercept words in the VMCB Control Area, starting
+  * at Byte offset 000h.
+@@ -161,7 +163,10 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ 	 * Offset 0x3e0, 32 bytes reserved
+ 	 * for use by hypervisor/software.
+ 	 */
+-	u8 reserved_sw[32];
++	union {
++		struct hv_enlightenments hv_enlightenments;
++		u8 reserved_sw[32];
++	};
  };
  
-+struct hv_enlightenments {
-+	struct __packed hv_enlightenments_control {
-+		u32 nested_flush_hypercall:1;
-+		u32 msr_bitmap:1;
-+		u32 enlightened_npt_tlb: 1;
-+		u32 reserved:29;
-+	} __packed hv_enlightenments_control;
-+	u32 hv_vp_id;
-+	u64 hv_vm_id;
-+	u64 partition_assist_page;
-+	u64 reserved;
-+} __packed;
-+
-+/*
-+ * Hyper-V uses the software reserved clean bit in VMCB
-+ */
-+#define HV_VMCB_NESTED_ENLIGHTENMENTS (1U << 31)
  
- struct __attribute__ ((__packed__)) vmcb_control_area {
- 	u32 intercept_cr;
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 3131c4476b7b..c8e967f6cafe 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -179,8 +179,7 @@ void recalc_intercepts(struct vcpu_svm *svm)
+  */
+ static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
+ {
+-	struct hv_enlightenments *hve =
+-		(struct hv_enlightenments *)svm->nested.ctl.reserved_sw;
++	struct hv_enlightenments *hve = &svm->nested.ctl.hv_enlightenments;
+ 	int i;
+ 
+ 	/*
+@@ -369,8 +368,8 @@ void __nested_copy_vmcb_control_to_cache(struct kvm_vcpu *vcpu,
+ 	/* Hyper-V extensions (Enlightened VMCB) */
+ 	if (kvm_hv_hypercall_enabled(vcpu)) {
+ 		to->clean = from->clean;
+-		memcpy(to->reserved_sw, from->reserved_sw,
+-		       sizeof(struct hv_enlightenments));
++		memcpy(&to->hv_enlightenments, &from->hv_enlightenments,
++		       sizeof(to->hv_enlightenments));
+ 	}
+ }
+ 
+@@ -1479,7 +1478,7 @@ static void nested_copy_vmcb_cache_to_control(struct vmcb_control_area *dst,
+ 	dst->virt_ext              = from->virt_ext;
+ 	dst->pause_filter_count   = from->pause_filter_count;
+ 	dst->pause_filter_thresh  = from->pause_filter_thresh;
+-	/* 'clean' and 'reserved_sw' are not changed by KVM */
++	/* 'clean' and 'hv_enlightenments' are not changed by KVM */
+ }
+ 
+ static int svm_get_nested_state(struct kvm_vcpu *vcpu,
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 6a7686bf6900..9eb2fc76732f 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -151,7 +151,10 @@ struct vmcb_ctrl_area_cached {
+ 	u64 nested_cr3;
+ 	u64 virt_ext;
+ 	u32 clean;
+-	u8 reserved_sw[32];
++	union {
++		struct hv_enlightenments hv_enlightenments;
++		u8 reserved_sw[32];
++	};
+ };
+ 
+ struct svm_nested_state {
+diff --git a/arch/x86/kvm/svm/svm_onhyperv.c b/arch/x86/kvm/svm/svm_onhyperv.c
+index ed5e79392544..422d00fee24a 100644
+--- a/arch/x86/kvm/svm/svm_onhyperv.c
++++ b/arch/x86/kvm/svm/svm_onhyperv.c
+@@ -26,7 +26,7 @@ int svm_hv_enable_direct_tlbflush(struct kvm_vcpu *vcpu)
+ 	if (!*p_hv_pa_pg)
+ 		return -ENOMEM;
+ 
+-	hve = (struct hv_enlightenments *)to_svm(vcpu)->vmcb->control.reserved_sw;
++	hve = &to_svm(vcpu)->vmcb->control.hv_enlightenments;
+ 
+ 	hve->partition_assist_page = __pa(*p_hv_pa_pg);
+ 	hve->hv_vm_id = (unsigned long)vcpu->kvm;
+diff --git a/arch/x86/kvm/svm/svm_onhyperv.h b/arch/x86/kvm/svm/svm_onhyperv.h
+index 66e61a73caeb..5c664dd7bee2 100644
+--- a/arch/x86/kvm/svm/svm_onhyperv.h
++++ b/arch/x86/kvm/svm/svm_onhyperv.h
+@@ -17,8 +17,10 @@ int svm_hv_enable_direct_tlbflush(struct kvm_vcpu *vcpu);
+ 
+ static inline void svm_hv_init_vmcb(struct vmcb *vmcb)
+ {
+-	struct hv_enlightenments *hve =
+-		(struct hv_enlightenments *)vmcb->control.reserved_sw;
++	struct hv_enlightenments *hve = &vmcb->control.hv_enlightenments;
++
++	BUILD_BUG_ON(sizeof(vmcb->control.hv_enlightenments) !=
++		     sizeof(vmcb->control.reserved_sw));
+ 
+ 	if (npt_enabled &&
+ 	    ms_hyperv.nested_features & HV_X64_NESTED_ENLIGHTENED_TLB)
+@@ -60,18 +62,15 @@ static inline void svm_hv_vmcb_dirty_nested_enlightenments(
+ 		struct kvm_vcpu *vcpu)
+ {
+ 	struct vmcb *vmcb = to_svm(vcpu)->vmcb;
+-	struct hv_enlightenments *hve =
+-		(struct hv_enlightenments *)vmcb->control.reserved_sw;
++	struct hv_enlightenments *hve = &vmcb->control.hv_enlightenments;
+ 
+ 	if (hve->hv_enlightenments_control.msr_bitmap)
+ 		vmcb_mark_dirty(vmcb, HV_VMCB_NESTED_ENLIGHTENMENTS);
+ }
+ 
+-static inline void svm_hv_update_vp_id(struct vmcb *vmcb,
+-		struct kvm_vcpu *vcpu)
++static inline void svm_hv_update_vp_id(struct vmcb *vmcb, struct kvm_vcpu *vcpu)
+ {
+-	struct hv_enlightenments *hve =
+-		(struct hv_enlightenments *)vmcb->control.reserved_sw;
++	struct hv_enlightenments *hve = &vmcb->control.hv_enlightenments;
+ 	u32 vp_index = kvm_hv_get_vpindex(vcpu);
+ 
+ 	if (hve->hv_vp_id != vp_index) {
+diff --git a/tools/testing/selftests/kvm/include/x86_64/svm.h b/tools/testing/selftests/kvm/include/x86_64/svm.h
+index 89ce2c6b57fe..6e1527aa3419 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/svm.h
++++ b/tools/testing/selftests/kvm/include/x86_64/svm.h
+@@ -123,7 +123,10 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+ 	 * Offset 0x3e0, 32 bytes reserved
+ 	 * for use by hypervisor/software.
+ 	 */
+-	u8 reserved_sw[32];
++	union {
++		struct hv_enlightenments hv_enlightenments;
++		u8 reserved_sw[32];
++	};
+ };
+ 
+ 
 diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
-index 5060fcfe1760..2fd64b419928 100644
+index 2fd64b419928..8ef6a4c83cb1 100644
 --- a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
-@@ -23,24 +23,6 @@
- 
- #define L2_GUEST_STACK_SIZE 256
- 
--struct hv_enlightenments {
--	struct __packed hv_enlightenments_control {
--		u32 nested_flush_hypercall:1;
--		u32 msr_bitmap:1;
--		u32 enlightened_npt_tlb: 1;
--		u32 reserved:29;
--	} __packed hv_enlightenments_control;
--	u32 hv_vp_id;
--	u64 hv_vm_id;
--	u64 partition_assist_page;
--	u64 reserved;
--} __packed;
--
--/*
-- * Hyper-V uses the software reserved clean bit in VMCB
-- */
--#define HV_VMCB_NESTED_ENLIGHTENMENTS (1U << 31)
--
- void l2_guest_code(void)
+@@ -46,8 +46,7 @@ static void __attribute__((__flatten__)) guest_code(struct svm_test_data *svm)
  {
- 	GUEST_SYNC(3);
+ 	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
+ 	struct vmcb *vmcb = svm->vmcb;
+-	struct hv_enlightenments *hve =
+-		(struct hv_enlightenments *)vmcb->control.reserved_sw;
++	struct hv_enlightenments *hve = &vmcb->control.hv_enlightenments;
+ 
+ 	GUEST_SYNC(1);
+ 
 -- 
 2.37.3
 
