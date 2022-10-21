@@ -2,156 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 44B82607F32
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 21:41:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EE9E607F3B
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 21:46:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230254AbiJUTlC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 15:41:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43754 "EHLO
+        id S230236AbiJUTqz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 15:46:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230297AbiJUTkr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 15:40:47 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D56B0198446
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 12:40:43 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id 204so3502118pfx.10
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 12:40:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y5Kub3oyocSWTl/XejmtkMUlSMgpTSGJ542v3b15fFs=;
-        b=e22cd3ycGxe1vhNw6YtFt+nF2EN4biL9M9o8f2ZYq+vUKdm+bZmUYR4aYK/WMoI+VK
-         VjrLz2rb84qmIrR4iuhL78OxatUxpobhy9bulH3oS71MT+z8oUtoqyZcq0nu+GtqYwzE
-         IQiFvVuTp5afzUAEJW21mX8qww58a94y6nisjffcGgTrNoAs8+ZOu121+67wzNE1Qztj
-         fRqDAm9SYC/+3Q7I2lEVl6wcW2AB0MYL2BvVC2SIwqT+paPkePlDI28sch4lhI9EPkXZ
-         bot59j/0KXQQd2rsovyT5qkU2SI3W/KnlmXInuvzeam/3iSfGh3Fg3iCGkBmGUk7B38x
-         kgUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y5Kub3oyocSWTl/XejmtkMUlSMgpTSGJ542v3b15fFs=;
-        b=aQEEuQ88ufrGBbyXozC8X/gdf2BcdoNBaN5D7GVy0LsDzC6+FhtGNpA+WK9vrpM32Y
-         HMeM8M497fSF8b8hUKxdk/DUaGEeJjwgx0fXemLRzMiohML+/WmQztxn5hT9o8SATc68
-         gILLh0SjSX/cwcOb3wWd3NhLbQn0NXzwfqk8nyVkSvgCfZAjB12VRcLnjtL8HN9ZCAiQ
-         jKu31/dVFgpGgd+ZxQpbxX1c+HEg8UVT05wQ7b1cKeC7RBoPTLmSEfZ+ocbJrkFQed6y
-         3DzsBTULhGID6UN1tjpNny2ia/rFu340m4IfFb+jHz1ydZpiUyD/ZbECKqVt6H4B7ATz
-         B6gg==
-X-Gm-Message-State: ACrzQf1X4YUj5Hwe8EznW+q45QetVPKlXNh1pyc2l0U6NBvyAqwticJB
-        3+sMNnVkRZfusq+Zo+yo8oiuFQ==
-X-Google-Smtp-Source: AMsMyM4TLsbSsaSVguefvhGZcYd5mnHh9TucImBl/AnEXlazTUYhfLUHdM/T8vnWbhF0uVZeQFsqmA==
-X-Received: by 2002:a05:6a00:408c:b0:565:fc2c:8c71 with SMTP id bw12-20020a056a00408c00b00565fc2c8c71mr21037646pfb.82.1666381243244;
-        Fri, 21 Oct 2022 12:40:43 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id x71-20020a62864a000000b0056b126431eesm1266409pfd.218.2022.10.21.12.40.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Oct 2022 12:40:42 -0700 (PDT)
-Date:   Fri, 21 Oct 2022 19:40:39 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Alexander Graf <graf@amazon.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org, Xiao Guangrong <guangrong.xiao@gmail.com>,
-        "Chandrasekaran, Siddharth" <sidcha@amazon.de>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 11/27] KVM: x86/mmu: Zap only the relevant pages when
- removing a memslot
-Message-ID: <Y1L1t6Qw2CaLwJk3@google.com>
-References: <20190813115737.5db7d815@x1.home>
- <20190813133316.6fc6f257@x1.home>
- <20190813201914.GI13991@linux.intel.com>
- <20190815092324.46bb3ac1@x1.home>
- <a05b07d8-343b-3f3d-4262-f6562ce648f2@redhat.com>
- <20190820200318.GA15808@linux.intel.com>
- <20200626173250.GD6583@linux.intel.com>
- <590c9312-a21f-8569-9da3-34508300afcc@amazon.com>
- <Y1GxnGo3A8UF3iTt@google.com>
- <cdaf34bc-b2ab-1a9d-22d0-3d9dc3364bf2@amazon.com>
-MIME-Version: 1.0
+        with ESMTP id S229739AbiJUTqx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 15:46:53 -0400
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2084.outbound.protection.outlook.com [40.107.95.84])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05D782958CD
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 12:46:52 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gdtB4rcmlmvu/n2w3AxtjDCY3GWEX0zVlHF/vfcLS7EDGIBYIQqA3XAifvuXWmCE38yuF84SS/0/z3dfj/Cum6pueeA4OzwYye0GF2UIZlduUjRJQm/yVKfuAW0RH1q7LI6sK6eaBvyuXV+m9AXA3hnw/KH2rSeeqjTZ3+h+lPkkH8yu8tK2j/cWUaJf4n/9SirZVkQMvndTsK1Jq8tQTzMIqMlDqFT0i0rnx2jqMJI1NvN8YK9gnHbw4epLv7QxiO3QUbpJSgSEVqVsdlOcH9AxOJNalzr9MP9i8sKtfMYP8BVI+7aVgpTco5hl/83vQJgoMohPrYXqZxRdi/3R8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=H3OE8lN2UmOsQG2wmJC2/HQ+WSzOmyhczHWqmqYKLtM=;
+ b=lXqVDKO/sl1LfWHiKGKulnqRZbKK+A+3/cpzEArUltaJCpA3M47Qxh8kKSNJ6AX78W+jSabp1/kxam3HGSvY3KRfYa6nufaAgqC1fGcxR/+7ZmvA1MjFHK+O/1XQIqDoUdvuCNv2iI2ZaB5FTfzbtALX4aKn8sBZ/TSABwck36hCo/8y/cwvIkBthBoe7fIwkfZhgoaVxkgZMmFmtFHgFM90XePzpMQZfbcLLg3KbGO83eVgBpeKeGe+xDwxt0WAzcLda28lsUHpmraFJfmhGoTk3NDG5BFDWCz4Q5gUm6VD9RaRSAJr64NYpDljLQSX47V/K+pA6Vtvt5uwnbJo5g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H3OE8lN2UmOsQG2wmJC2/HQ+WSzOmyhczHWqmqYKLtM=;
+ b=fDsZbqxuWLmdRj6MXQEC5XJP7SpLjiPf3EgNt0cgWbZEsL9y/lNCRbsADDI3seJTuTQ1cT8AVNth6wCFLiDrzxoHiyPYNn/Rk8Brpm/C6aLElcP94sp3MCXjMlWBZQlkBOMrCMy3xT7KzJCChZ5/lSvj9oRDDzHhfCWJns1IQ82ZQWK5RXLYgxUx5DopS+yzL9wGTOLO7+NeIo+cB6KgwdazjT3r8Lxp95V2eQ3l5vbXgEKqzrZRFKCdNasC0x01exAXebfwHGJM3Xh2n+jjUP9kpDXopgNjDBuRB+st1nyI1/PgMwgRXknlrH8dbR/WXTA1HESwT731VmaLuJ2b3g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SN7PR12MB6888.namprd12.prod.outlook.com (2603:10b6:806:260::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5746.21; Fri, 21 Oct
+ 2022 19:46:50 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5723.033; Fri, 21 Oct 2022
+ 19:46:50 +0000
+Date:   Fri, 21 Oct 2022 16:46:49 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Russell Currey <ruscur@russell.cc>,
+        Oliver O'Halloran <oohall@gmail.com>,
+        Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH v3 4/5] vfio: Remove CONFIG_VFIO_SPAPR_EEH
+Message-ID: <Y1L3KYwWe/reh3TY@nvidia.com>
+References: <0-v3-8db96837cdf9+784-vfio_modules_jgg@nvidia.com>
+ <4-v3-8db96837cdf9+784-vfio_modules_jgg@nvidia.com>
+ <Y05C4xT7r+Tz9Jn3@infradead.org>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cdaf34bc-b2ab-1a9d-22d0-3d9dc3364bf2@amazon.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <Y05C4xT7r+Tz9Jn3@infradead.org>
+X-ClientProxiedBy: BL1PR13CA0314.namprd13.prod.outlook.com
+ (2603:10b6:208:2c1::19) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SN7PR12MB6888:EE_
+X-MS-Office365-Filtering-Correlation-Id: dbb5f05c-7e10-4174-3d21-08dab39cff1c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: q7c36EYF+/7Mh9EeLILJ0NMTPwFPcNvj6BTcAQ5TLqklixYv9/9XQFygLNg0/evBDAEWrEuWQxQgF9PVyryoIM8a1HqhzlEUOq+6U1MMNr6XruMLVKL8n47JNtxa3Tpxm6YLMGtICRXyIC749mLeBUx4dt0kVpJFolAYO+tnai0wG0xXoP4B6pgw7L9ohxquIMS7Os9azVZcKlogRYWsHnAuOxvy12eHeP8Q36HU36w/fsKFsNdzDKGYN35jNTCrjNAIB5mFeGunopH+9FHdTKevuxAki4LLUNOrMr/aZiv3imQ5kdxlylfL5gc7XLaTCaMqSTxNG8zHtNIZtntiolq/+9kcxPIXwg+2cZWxWnH5p+XvY6tuM1iZv3lh3u/YlBe/I66d5AFTsdu+qMbUHtx0mvVAfT/PA7eLuoj9IgrQzxEM0GHVWlYgW1YWetP5CEJ4LiGqKjcMoJQWLvnWCByvfk+bpjjVKRD4GwWnkuuOfRNIIA5qHRodog+Lgtm9YzrdkFF1NeP+W4dfCbMQNG1/mA+eEa2UdWKyf31H2PfwHpFg+XRlq/hEb4twjpZ8DIotHOSP6926C+F74304AkDKhU/3NPTIRn7b3zfW6qPNgX5FW8XJcg3AN41DbxV9GOaB1o9N7rqekitZupASpX8OivMQx+HYWpyl/37yKVevQ+Yp8MH7cwnrWULsLsCJiN34DGCUZvS7PtebXQ5Luw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(346002)(136003)(376002)(366004)(396003)(451199015)(8936002)(41300700001)(4744005)(54906003)(316002)(6916009)(4326008)(66476007)(8676002)(66556008)(66946007)(5660300002)(38100700002)(478600001)(86362001)(6486002)(186003)(83380400001)(6512007)(26005)(6506007)(2616005)(36756003)(2906002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?e9El/uPh27foOiF2kvkI3QMSoWywwSwLeu69BwHszJo6jOeQHQIZEdT8lJi3?=
+ =?us-ascii?Q?fyJhnU0Qky3id9d3biPLvF6DWWQUGU3t1na6BZy+Ioe/2x+eXAojRTSNaD0P?=
+ =?us-ascii?Q?/l3mNDNiDo2ujLdpgOaMunO528enwTg1yll2NCxWTEG0tHsZAsfABkLd2Z8l?=
+ =?us-ascii?Q?9nSNk9dPh7KjVVuqtj5g/4eeAOrv5MxlCfKRyw5VoyfJbta5Iu0rFE7SWOPv?=
+ =?us-ascii?Q?TK0tWy8exBhLrB5mV0udN3hviS2JXBKw609fPCDyD+IeGLZ1idFe6gMgGGix?=
+ =?us-ascii?Q?QTDWNvdrY9ZudyA36f2zKBjLAsw0BysZ5wNvmFNOd47S8jtbStSjIQ8nfuwR?=
+ =?us-ascii?Q?5XNoDCitOtICoGaS1qkdGNArGdJkJAa+epRnborJ3+enPjYtjTCD9G7UUg2I?=
+ =?us-ascii?Q?Wt5H0g0t8n13NmXXVxWH7McybMFKW51Awj4g2FhClDQT2OUlkO0/GnNRsSBH?=
+ =?us-ascii?Q?f0gkDgqoJMm5pWSE5mrIayw9RXwgrPJEIUZmzd/u5pKI9cVifmmjJe475Cf7?=
+ =?us-ascii?Q?UDjTrqYfOEbAa3t1pRFysZYktNrkj3gZz74jQKv/J/j5k4qdkLk05SlKSNsf?=
+ =?us-ascii?Q?TarusVhLlzdjlkLnq60Fm+Cc5JsOqm1FeU5enANdJPi5mBk56peYJGdw+YzE?=
+ =?us-ascii?Q?x0QZKg0gVypUwyWfOHPawzKLkRix1An4PrwRJwFrE36fQPGnesPYM6TDGdUo?=
+ =?us-ascii?Q?tJCCtJGLAjHCbjmAsHmxcXIW3e1thzcUVIeZ3KnrRMiM5QLrdcmk3nJeLxVF?=
+ =?us-ascii?Q?rQbw2RMdwE2n7PmDQ1Kt8mMLJjUDhXfceaZ6JAz438Kv8BgXTBy6Jmaa2pwM?=
+ =?us-ascii?Q?2cICDQV5AilqG7itHSJYYhIKhhFMrMPUNyewcM6CB5AR52FhKa4VrkGMr9PG?=
+ =?us-ascii?Q?sEHoyt1gLNhmOoogJW7a/BlpVCo/3MAcY7ZGlrDqRCHVCRiNTRS4fa+MVFa9?=
+ =?us-ascii?Q?VOhvrIWbl1BojoWsHtXqrrTdfmvWMx73/BoaOgEDX68L9oJl8otkPAPd6Z+1?=
+ =?us-ascii?Q?kLVLXD4c0t2eZa8xfZAdNpcOuZF94Xe4tHlZLX6dCoRTaPeYrzvpwS+e31Nr?=
+ =?us-ascii?Q?19voArwvwG250uc+Y8tHtTY4RKT/0VXq8OxIsE+Zz1uT1cNoX7LlhkuQrII3?=
+ =?us-ascii?Q?1La9WIDBo26Rft73LpHtiJ6UMVw0ztVHGkrnOJDwIWuf/wS1rwHCeaDZ2Eox?=
+ =?us-ascii?Q?k+LBNJeCusK3fmDdKgEE2YtRzONgJ/wKt/VBxgt2l/ANDXCNBtwIDUsdgf5R?=
+ =?us-ascii?Q?D6T2DG7fLvSSrdcPS9zIpT7TVxSXzF0we2g1n6t9brf1Xh7H1JLCp7AT4feU?=
+ =?us-ascii?Q?kXPsJnPsVCzJmv8TvGYalbUHgR0OLOrCMYIbAd82AAAOsSghvANVtRX7Wxmx?=
+ =?us-ascii?Q?258trSieXyw8bWheDPy+7G31+drc4UICwCQjw6YyhcHWE/xPtKwLJzoEl3pM?=
+ =?us-ascii?Q?C/vrpUtXE1FZepvYNXltfyoc7AdA9Ic+CHwq2w3wsnIIEy3fEDc1FHv/+Y8v?=
+ =?us-ascii?Q?rveBVhCrIDsNl6el3GvAhVVf0kGSEBCWXUiX2kuEnS3dYtf748xoMVBDAPLp?=
+ =?us-ascii?Q?/mol4kr/cymdZyBSL4o=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dbb5f05c-7e10-4174-3d21-08dab39cff1c
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2022 19:46:50.3907
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jyrtO9BF7PJAqBBA6rjIY8WwGVF0FBg92/FA8rM75q5BJcbCfQv5DuW4OvM7QTOP
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6888
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 20, 2022, Alexander Graf wrote:
+On Mon, Oct 17, 2022 at 11:08:35PM -0700, Christoph Hellwig wrote:
+> > +#if IS_ENABLED(CONFIG_EEH) && IS_ENABLED(CONFIG_VFIO_IOMMU_SPAPR_TCE)
+> >  #include <asm/eeh.h>
+> >  #endif
+> >  
+> > @@ -689,7 +689,7 @@ void vfio_pci_core_close_device(struct vfio_device *core_vdev)
+> >  		vdev->sriov_pf_core_dev->vf_token->users--;
+> >  		mutex_unlock(&vdev->sriov_pf_core_dev->vf_token->lock);
+> >  	}
+> > -#if IS_ENABLED(CONFIG_VFIO_SPAPR_EEH)
+> > +#if IS_ENABLED(CONFIG_EEH) && IS_ENABLED(CONFIG_VFIO_IOMMU_SPAPR_TCE)
 > 
-> On 20.10.22 22:37, Sean Christopherson wrote:
-> > On Thu, Oct 20, 2022, Alexander Graf wrote:
-> > > On 26.06.20 19:32, Sean Christopherson wrote:
-> > > > /cast <thread necromancy>
-> > > > 
-> > > > On Tue, Aug 20, 2019 at 01:03:19PM -0700, Sean Christopherson wrote:
-> > > [...]
-> > > 
-> > > > I don't think any of this explains the pass-through GPU issue.  But, we
-> > > > have a few use cases where zapping the entire MMU is undesirable, so I'm
-> > > > going to retry upstreaming this patch as with per-VM opt-in.  I wanted to
-> > > > set the record straight for posterity before doing so.
-> > > Hey Sean,
-> > > 
-> > > Did you ever get around to upstream or rework the zap optimization? The way
-> > > I read current upstream, a memslot change still always wipes all SPTEs, not
-> > > only the ones that were changed.
-> > Nope, I've more or less given up hope on zapping only the deleted/moved memslot.
-> > TDX (and SNP?) will preserve SPTEs for guest private memory, but they're very
-> > much a special case.
-> > 
-> > Do you have use case and/or issue that doesn't play nice with the "zap all" behavior?
-> 
-> 
-> Yeah, we're looking at adding support for the Hyper-V VSM extensions which
-> Windows uses to implement Credential Guard. With that, the guest gets access
-> to hypercalls that allow it to set reduced permissions for arbitrary gfns.
-> To ensure that user space has full visibility into those for live migration,
-> memory slots to model access would be a great fit. But it means we'd do
-> ~100k memslot modifications on boot.
+> So while this preserves the existing behavior, I wonder if checking
+> CONFIG_EEH only would make more sense here.
 
-Oof.  100k memslot updates is going to be painful irrespective of flushing.  And
-memslots (in their current form) won't work if the guest can drop executable
-permissions.
+Yes, it does read better, done
 
-Assuming KVM needs to support a KVM_MEM_NO_EXEC flag, rather than trying to solve
-the "KVM flushes everything on memslot deletion", I think we should instead
-properly support toggling KVM_MEM_READONLY (and KVM_MEM_NO_EXEC) without forcing
-userspace to delete the memslot.  Commit 75d61fbcf563 ("KVM: set_memory_region:
-Disallow changing read-only attribute later") was just a quick-and-dirty fix,
-there's no fundemental problem that makes it impossible (or even all that difficult)
-to support toggling permissions.
-
-The ABI would be that KVM only guarantees the new permissions take effect when
-the ioctl() returns, i.e. KVM doesn't need to ensure there are no writable SPTEs
-when the memslot is installed, just that there are no writable SPTEs before
-userspace regains control.
-
-E.g. sans sanity checking and whatnot, I think x86 support would be something like:
-
-@@ -12669,9 +12667,16 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
-         * MOVE/DELETE: The old mappings will already have been cleaned up by
-         *              kvm_arch_flush_shadow_memslot().
-         */
--       if ((change != KVM_MR_FLAGS_ONLY) || (new_flags & KVM_MEM_READONLY))
-+       if (change != KVM_MR_FLAGS_ONLY)
-                return;
- 
-+       if ((old_flags ^ new_flags) & KVM_MEM_READONLY) {
-+               if ((new_flags & KVM_MEM_READONLY) &&
-+                   kvm_mmu_slot_write_protect(kvm, new))
-+                       kvm_arch_flush_remote_tlbs_memslot(kvm, new);
-+               return;
-+       }
-+
-        /*
-         * READONLY and non-flags changes were filtered out above, and the only
-         * other flag is LOG_DIRTY_PAGES, i.e. something is wrong if dirty
-
+Thanks,
+Jason
