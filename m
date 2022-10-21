@@ -2,102 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BD67606CB9
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 02:58:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C8DB2606D0C
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 03:33:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229739AbiJUA6C (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 20 Oct 2022 20:58:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54942 "EHLO
+        id S229633AbiJUBdy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 20 Oct 2022 21:33:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229832AbiJUA55 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 20 Oct 2022 20:57:57 -0400
-Received: from out203-205-221-210.mail.qq.com (out203-205-221-210.mail.qq.com [203.205.221.210])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F7FE220F9D
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 17:57:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-        s=s201512; t=1666313868;
-        bh=dl6yBMYwe2DpRerjx1DwIpqPoeEi77jJTwJJ4yakXcw=;
-        h=From:To:Cc:Subject:Date;
-        b=OXrU6QK7H88OGpncfbeF9Atn5gBx7fntYNuupXmO34GFm/DA/r5qv9bb7GKczMCsq
-         YmHJoq81bURH2r+AAhJv7MOqg++jx1bSei77QhJTyqq/6UdIjRBlny3c9+YV4c5Kym
-         ORLsfpaFM84nOdcXl9NYFquhTUDBUDqcsNNLGsCA=
-Received: from localhost.localdomain ([39.156.73.13])
-        by newxmesmtplogicsvrsza32.qq.com (NewEsmtp) with SMTP
-        id E6C0F64A; Fri, 21 Oct 2022 08:57:44 +0800
-X-QQ-mid: xmsmtpt1666313864toqnf29sc
-Message-ID: <tencent_768ACEEBE1E803E29F4191906956D065B806@qq.com>
-X-QQ-XMAILINFO: N7h1OCCDntujVo9Hfi8wbg9LPgS406+zvQTITmAD8nORjvpp5imfSfXMri5wj2
-         UGkC1dgWu75HAPm4Be98DV1aokEVMPBFiLBNYNEtIqdmNWbZJ1mnsINioGFkoRZvFFlbf2cqVS/P
-         TKe+XeRC/wEUvIFDkAharLneEpucmpKvk7TTfjaf6CcmYjFOBAGPYganYWaJOTfCnXvXl0g61usk
-         zONKzkcwlenZts7hjaX091E5F8xAlVC+VdwS6mmhB1nlwROloZWJ/rqur5o0ngZrkdd3cmiyuldq
-         5xvzgY3hYEFqba57v7i2p1n5LGnafMCRm74DjxbOBGlwcFVu9TyKX2DeY2Mf/AQxiLNEKcvkrwLp
-         nF6nIlR+H825OsZFIjEzNKVDEv4mfQlOlKyuQJZWnwk54CdfU1fmnCu+xJ84c4LZxnyudxJkN/vt
-         bHVTwIeU91qy3ERq7YpepX43uYX1aeJ4JdEZh4TWOxg7JmnHz4k6G3bEoeVCrAfLqQwHAtg1yW+C
-         sLGxnNRcuQGnm/rkPJXtE6ZdW5HpzVy9ne7FNTcTYuVSEvWXIxLUmw+8fiBOhKSKQ/MJliqWSO+T
-         1zfFaX7ZSqnvYWXZd07qw7oE2FRzcC533AB27bpaWguNmMhDrZ9Ifc4nrenEu8tQwoO6FxjQ6t/K
-         Rwgm094erd6KWHi9d9vnUt6U36+/0k1o20s2L6Q52aRDb9u5R7IWsNzIfSl7zdOzMS5GizRWB1YK
-         35Dij5670IMz/yn0glJAQHNQ/vCFWfbmm0T9fPL1fd8kp7mN5Z7P1wbWNjByeAjMX2TgwXVxk+Xt
-         DvedF3uUzdPJ5geaI7s8ezRFQ7MPRTosbJQKRhwrMc4IEDCE8KEYMgpe/aiVyf/t0xGCJvUKrZnm
-         yxAlrDCHxCK8hCaFYAv9NoSlHdR0xeZZ/NKHe0TOyp59rYktnjqlqIYAdjf53ed4ShVSNetuuAC+
-         5hxj45G3Ku6xzOMDjBqeT/u6bgisv68ZSRFANOdBQ+qw9HNTkmSMel90NboXgF
-From:   Rong Tao <rtoax@foxmail.com>
-Cc:     rtoax@foxmail.com, Rong Tao <rongtao@cestc.cn>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] kvm: vmenter: Use tabs instead of spaces for indentation
-Date:   Fri, 21 Oct 2022 08:57:41 +0800
-X-OQ-MSGID: <20221021005741.12240-1-rtoax@foxmail.com>
-X-Mailer: git-send-email 2.31.1
+        with ESMTP id S229727AbiJUBdw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 20 Oct 2022 21:33:52 -0400
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F347219FC6
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 18:33:51 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id bu30so2414944wrb.8
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 18:33:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=UDc/7EKe3fjg9/HlzFBTEgTvDgZRorby6bcrR56TrdU=;
+        b=pcexPsk5/8WuhU2x15Z1v+rgdwBZLj3YlhPJBkQgfTeW/CgQaMEhG2WKmc7L2o5Rsy
+         CDD5/DPx0oGd05JxpopmjJ2xv/+/vJ7AXT6AMQfgu0KPECbYoeXyXQff0+LxOMX10cGz
+         6w/ROYS+vD/U81tet2pJJpROdTcwPQo+EigMzuQ1Ptri99pqtKrZ62hfgBZMKrfg5hM0
+         UPUr3/jsRm0Xv/RJ1V9kikbkayVpBWwZOsaFKbuaTHoVyZIrCa1zqg8BuzZnlqKaM4Xr
+         hOGn3S/j/gQUYaxMzLpb/nW2bKu21MgWeGSJ6CB5BwGV0z0ywAmDgMyjCi1TCFMxiQkK
+         0D9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UDc/7EKe3fjg9/HlzFBTEgTvDgZRorby6bcrR56TrdU=;
+        b=eeuzpFVD2/9oqkHksBN7YVOhppgyxe5rLjOpncBE28uAusExrm0IxQ4Ih+W0jE+mG3
+         c3ldR5vN17mBdBdLxqouRDv94IvkJkgp74W+jn5tGSjcHF8VI/QIlKj6nk8/ILGYb3u/
+         FxURcIeD236hZKt8lziNClrJP7paVya4v4eWfgTOFkYxawT39hMjeUJnk5tFjy2Gi8sv
+         RDVSfgUPb66a+Z6LDU0IxquUj4tvO2hlsQV0cYH4q8Yko/a0fCLvjWW4hrcGFzYjddNu
+         SX4/S83vQjpvEpTwm5dJxnRqE9MTgZytydnvcPbcQeavBqdTJRLQvLLUICh9KpYxLnHl
+         RCVQ==
+X-Gm-Message-State: ACrzQf1oo4kM4FfSyrjnKHXILSFBMSXs0ln7Vc6oTNzc1ix3EZjDq3rj
+        Oyu95G9IS57lgcYkpjcUnIrSDS/HI+HQJHm9EW3lLfTkfGOdiA==
+X-Google-Smtp-Source: AMsMyM4U+vhw2RnvU7W8rr1RBQ3zqz2Y8O5Gq9DmAgxup7kdaiSWyTfLyhc7p55pYn3ZyShIbpb9YcPubpRO8Z6oxRM=
+X-Received: by 2002:adf:f491:0:b0:235:894e:8d6c with SMTP id
+ l17-20020adff491000000b00235894e8d6cmr4365371wro.209.1666316029690; Thu, 20
+ Oct 2022 18:33:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        HELO_DYNAMIC_IPADDR,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,RDNS_DYNAMIC,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-        version=3.4.6
+References: <20220920174603.302510-1-aaronlewis@google.com>
+ <20220920174603.302510-2-aaronlewis@google.com> <Y0C1c2bBNVF4qxJq@google.com>
+ <CAAAPnDEk_bckk0W5C2vKiL4HJVUHFGV3_NqfdbsqYFqpJvuXog@mail.gmail.com> <Y02c6JdM432f8H+A@google.com>
+In-Reply-To: <Y02c6JdM432f8H+A@google.com>
+From:   Aaron Lewis <aaronlewis@google.com>
+Date:   Fri, 21 Oct 2022 01:33:38 +0000
+Message-ID: <CAAAPnDGbDp37x+V5n8b_vxzBbBXROrg5bhVQcvrfCC1UMo-RJA@mail.gmail.com>
+Subject: Re: [PATCH v5 1/7] kvm: x86/pmu: Correct the mask used in a pmu event
+ filter lookup
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
-To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Rong Tao <rongtao@cestc.cn>
+On Mon, Oct 17, 2022 at 6:20 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Sat, Oct 15, 2022, Aaron Lewis wrote:
+> > > And the total patch is:
+> > >
+> > > ---
+> > >  arch/x86/kvm/pmu.c           | 2 +-
+> > >  arch/x86/kvm/pmu.h           | 2 ++
+> > >  arch/x86/kvm/svm/pmu.c       | 2 ++
+> > >  arch/x86/kvm/vmx/pmu_intel.c | 2 ++
+> > >  4 files changed, 7 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> > > index d9b9a0f0db17..d0e2c7eda65b 100644
+> > > --- a/arch/x86/kvm/pmu.c
+> > > +++ b/arch/x86/kvm/pmu.c
+> > > @@ -273,7 +273,7 @@ static bool check_pmu_event_filter(struct kvm_pmc *pmc)
+> > >                 goto out;
+> > >
+> > >         if (pmc_is_gp(pmc)) {
+> > > -               key = pmc->eventsel & AMD64_RAW_EVENT_MASK_NB;
+> > > +               key = pmc->eventsel & kvm_pmu_ops.EVENTSEL_MASK;
+> > >                 if (bsearch(&key, filter->events, filter->nevents,
+> > >                             sizeof(__u64), cmp_u64))
+> > >                         allow_event = filter->action == KVM_PMU_EVENT_ALLOW;
+> > > diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+> > > index 5cc5721f260b..45a7dd24125d 100644
+> > > --- a/arch/x86/kvm/pmu.h
+> > > +++ b/arch/x86/kvm/pmu.h
+> > > @@ -40,6 +40,8 @@ struct kvm_pmu_ops {
+> > >         void (*reset)(struct kvm_vcpu *vcpu);
+> > >         void (*deliver_pmi)(struct kvm_vcpu *vcpu);
+> > >         void (*cleanup)(struct kvm_vcpu *vcpu);
+> > > +
+> > > +       const u64 EVENTSEL_MASK;
+> >
+> > Agreed, a constant is better.  Had I realized I could do that, that
+> > would have been my first choice.
+> >
+> > What about calling it EVENTSEL_RAW_MASK to make it more descriptive
+> > though?  It's a little too generic given there is EVENTSEL_UMASK and
+> > EVENTSEL_CMASK, also there is precedent for using the term 'raw event'
+> > for (eventsel+umask), i.e.
+> > https://man7.org/linux/man-pages/man1/perf-record.1.html.
+>
+> Hmm.  I'd prefer to avoid "raw" because that implies there's a non-raw version
+> that can be translated into the "raw" version.  This is kinda the opposite, where
+> the above field is the composite type and the invidiual fields are the "raw"
+> components.
+>
+> Refresh me, as I've gotten twisted about: this mask needs to be EVENTSEL_EVENT_MASK
+> + EVENTSEL_UMASK, correct?  Or phrased differently, it'll hold more than just
+> EVENTSEL_EVENT_MASK?
 
-Code indentation should use tabs where possible and miss a '*'.
+I found it more useful to just have the event select.  That allowed me
+to use just it or the event select + umask as needed in patch #4.
 
-Signed-off-by: Rong Tao <rongtao@cestc.cn>
----
- arch/x86/kvm/vmx/vmenter.S | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+const u64 EVENTSEL_EVENT;
 
-diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-index 8477d8bdd69c..f09e3aaab102 100644
---- a/arch/x86/kvm/vmx/vmenter.S
-+++ b/arch/x86/kvm/vmx/vmenter.S
-@@ -229,7 +229,7 @@ SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
- 	 * eIBRS has its own protection against poisoned RSB, so it doesn't
- 	 * need the RSB filling sequence.  But it does need to be enabled, and a
- 	 * single call to retire, before the first unbalanced RET.
--         */
-+	 */
- 
- 	FILL_RETURN_BUFFER %_ASM_CX, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT,\
- 			   X86_FEATURE_RSB_VMEXIT_LITE
-@@ -273,7 +273,7 @@ SYM_FUNC_END(__vmx_vcpu_run)
-  * vmread_error_trampoline - Trampoline from inline asm to vmread_error()
-  * @field:	VMCS field encoding that failed
-  * @fault:	%true if the VMREAD faulted, %false if it failed
--
-+ *
-  * Save and restore volatile registers across a call to vmread_error().  Note,
-  * all parameters are passed on the stack.
-  */
--- 
-2.31.1
-
+>
+> What about something completely different, e.g. FILTER_MASK?  It'll require a
+> comment to document, but that seems inevitable, and FILTER_MASK should be really
+> hard to confuse with the myriad EVENTSEL_*MASK fields.
