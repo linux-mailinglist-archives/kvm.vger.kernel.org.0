@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B8FA607B5B
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 17:40:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3CC43607B56
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 17:40:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231313AbiJUPka (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 11:40:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47082 "EHLO
+        id S231367AbiJUPkY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 11:40:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230525AbiJUPjf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 11:39:35 -0400
+        with ESMTP id S230393AbiJUPj2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 11:39:28 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3499026C44F
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25E4126FF87
         for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 08:37:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666366635;
+        s=mimecast20190719; t=1666366637;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Tb21lXhzgRX9MHFjr+LwZeM+AE4z+ukO80KSKbm0cYE=;
-        b=S04a98nD8Tju7QJG2NYzTpazMW91+1nVCFZ0v7axGrKDJhKxOJ5bMir5Fvoys09Ah8H0Vu
-        9NF0RXvA93IpH5OC7M4yfjd2bdnypef9W3gmGF21SY/fe1iKKkpG0s+AWHx3tQBWAKAHAy
-        fFgdFSbqVBOf0lygQGXPX/sgzzoPCFk=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=FjTcyQcdhFzdkgPfUhXQYfc0xThJKXS/B6/bnJJjp9U=;
+        b=broY/BaSvdU+Dil8z3Cc0wcpnnaHIkLfZKszam0wc2/NkUaP3jikatsOSIiJS7cPjZ9aF/
+        VV7g0826XU91C3pXyrfEcTEad4Fya+8Kr2d/EMtHB7eRCgg3726DHrz/JlFMmrs3kL1UtX
+        TCNMiFY1mhVzpdF+xOCnRG8m79WAXcQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-212-UmRB-F4DOn2U1TJ59auVwQ-1; Fri, 21 Oct 2022 11:37:09 -0400
-X-MC-Unique: UmRB-F4DOn2U1TJ59auVwQ-1
+ us-mta-658-hausxnUjN5KH4OqT_J6dxQ-1; Fri, 21 Oct 2022 11:37:11 -0400
+X-MC-Unique: hausxnUjN5KH4OqT_J6dxQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4A2AB1C0755E;
-        Fri, 21 Oct 2022 15:37:08 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 10A55185A7A3;
+        Fri, 21 Oct 2022 15:37:11 +0000 (UTC)
 Received: from ovpn-192-65.brq.redhat.com (ovpn-192-65.brq.redhat.com [10.40.192.65])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E31E640CA41F;
-        Fri, 21 Oct 2022 15:37:05 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 96BB840CA41F;
+        Fri, 21 Oct 2022 15:37:08 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
@@ -47,9 +47,9 @@ Cc:     Wanpeng Li <wanpengli@tencent.com>,
         Yuan Yao <yuan.yao@linux.intel.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v12 41/46] KVM: selftests: Split off load_evmcs() from load_vmcs()
-Date:   Fri, 21 Oct 2022 17:35:16 +0200
-Message-Id: <20221021153521.1216911-42-vkuznets@redhat.com>
+Subject: [PATCH v12 42/46] KVM: selftests: Create a vendor independent helper to allocate Hyper-V specific test pages
+Date:   Fri, 21 Oct 2022 17:35:17 +0200
+Message-Id: <20221021153521.1216911-43-vkuznets@redhat.com>
 In-Reply-To: <20221021153521.1216911-1-vkuznets@redhat.com>
 References: <20221021153521.1216911-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -66,102 +66,213 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In preparation to putting Hyper-V specific test pages to a dedicated
-struct, move eVMCS load logic from load_vmcs(). Tests call load_vmcs()
-directly and the only one which needs 'enlightened' version is
-evmcs_test so there's not much gain in having this merged.
-
-Temporary pass both GPA and HVA to load_evmcs().
+There's no need to pollute VMX and SVM code with Hyper-V specific
+stuff and allocate Hyper-V specific test pages for all test as only
+few really need them. Create a dedicated struct and an allocation
+helper.
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- .../selftests/kvm/include/x86_64/evmcs.h      | 10 ++++++
- tools/testing/selftests/kvm/lib/x86_64/vmx.c  | 33 ++++++++-----------
- .../testing/selftests/kvm/x86_64/evmcs_test.c |  4 +--
- 3 files changed, 25 insertions(+), 22 deletions(-)
+ .../selftests/kvm/include/x86_64/evmcs.h      |  4 ++--
+ .../selftests/kvm/include/x86_64/hyperv.h     | 15 +++++++++++++
+ .../selftests/kvm/include/x86_64/vmx.h        |  8 -------
+ .../testing/selftests/kvm/lib/x86_64/hyperv.c | 20 +++++++++++++++++
+ tools/testing/selftests/kvm/lib/x86_64/vmx.c  | 12 ----------
+ .../testing/selftests/kvm/x86_64/evmcs_test.c | 22 +++++++++----------
+ 6 files changed, 48 insertions(+), 33 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/include/x86_64/evmcs.h b/tools/testing/selftests/kvm/include/x86_64/evmcs.h
-index 2530b5aeb4ba..59b60d45b8f6 100644
+index 59b60d45b8f6..94d6059e9a12 100644
 --- a/tools/testing/selftests/kvm/include/x86_64/evmcs.h
 +++ b/tools/testing/selftests/kvm/include/x86_64/evmcs.h
-@@ -256,6 +256,16 @@ static inline int evmcs_vmptrld(uint64_t vmcs_pa, void *vmcs)
+@@ -256,9 +256,9 @@ static inline int evmcs_vmptrld(uint64_t vmcs_pa, void *vmcs)
  	return 0;
  }
  
-+static inline bool load_evmcs(uint64_t enlightened_vmcs_gpa, void *enlightened_vmcs)
+-static inline bool load_evmcs(uint64_t enlightened_vmcs_gpa, void *enlightened_vmcs)
++static inline bool load_evmcs(struct hyperv_test_pages *hv)
+ {
+-	if (evmcs_vmptrld(enlightened_vmcs_gpa, enlightened_vmcs))
++	if (evmcs_vmptrld(hv->enlightened_vmcs_gpa, hv->enlightened_vmcs))
+ 		return false;
+ 
+ 	current_evmcs->revision_id = EVMCS_VERSION;
+diff --git a/tools/testing/selftests/kvm/include/x86_64/hyperv.h b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
+index 3a17431c5771..186f3aab888f 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/hyperv.h
++++ b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
+@@ -267,4 +267,19 @@ extern struct hv_vp_assist_page *current_vp_assist;
+ 
+ int enable_vp_assist(uint64_t vp_assist_pa, void *vp_assist);
+ 
++struct hyperv_test_pages {
++	/* VP assist page */
++	void *vp_assist_hva;
++	uint64_t vp_assist_gpa;
++	void *vp_assist;
++
++	/* Enlightened VMCS */
++	void *enlightened_vmcs_hva;
++	uint64_t enlightened_vmcs_gpa;
++	void *enlightened_vmcs;
++};
++
++struct hyperv_test_pages *vcpu_alloc_hyperv_test_pages(struct kvm_vm *vm,
++						       vm_vaddr_t *p_hv_pages_gva);
++
+ #endif /* !SELFTEST_KVM_HYPERV_H */
+diff --git a/tools/testing/selftests/kvm/include/x86_64/vmx.h b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+index 71b290b6469d..9e0ef83e7091 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/vmx.h
++++ b/tools/testing/selftests/kvm/include/x86_64/vmx.h
+@@ -517,14 +517,6 @@ struct vmx_pages {
+ 	uint64_t vmwrite_gpa;
+ 	void *vmwrite;
+ 
+-	void *vp_assist_hva;
+-	uint64_t vp_assist_gpa;
+-	void *vp_assist;
+-
+-	void *enlightened_vmcs_hva;
+-	uint64_t enlightened_vmcs_gpa;
+-	void *enlightened_vmcs;
+-
+ 	void *eptp_hva;
+ 	uint64_t eptp_gpa;
+ 	void *eptp;
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/hyperv.c b/tools/testing/selftests/kvm/lib/x86_64/hyperv.c
+index 32dc0afd9e5b..a2fc083c65ef 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/hyperv.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/hyperv.c
+@@ -8,6 +8,26 @@
+ #include "processor.h"
+ #include "hyperv.h"
+ 
++struct hyperv_test_pages *vcpu_alloc_hyperv_test_pages(struct kvm_vm *vm,
++						       vm_vaddr_t *p_hv_pages_gva)
 +{
-+	if (evmcs_vmptrld(enlightened_vmcs_gpa, enlightened_vmcs))
-+		return false;
++	vm_vaddr_t hv_pages_gva = vm_vaddr_alloc_page(vm);
++	struct hyperv_test_pages *hv = addr_gva2hva(vm, hv_pages_gva);
 +
-+	current_evmcs->revision_id = EVMCS_VERSION;
++	/* Setup of a region of guest memory for the VP Assist page. */
++	hv->vp_assist = (void *)vm_vaddr_alloc_page(vm);
++	hv->vp_assist_hva = addr_gva2hva(vm, (uintptr_t)hv->vp_assist);
++	hv->vp_assist_gpa = addr_gva2gpa(vm, (uintptr_t)hv->vp_assist);
 +
-+	return true;
++	/* Setup of a region of guest memory for the enlightened VMCS. */
++	hv->enlightened_vmcs = (void *)vm_vaddr_alloc_page(vm);
++	hv->enlightened_vmcs_hva = addr_gva2hva(vm, (uintptr_t)hv->enlightened_vmcs);
++	hv->enlightened_vmcs_gpa = addr_gva2gpa(vm, (uintptr_t)hv->enlightened_vmcs);
++
++	*p_hv_pages_gva = hv_pages_gva;
++	return hv;
 +}
 +
- static inline int evmcs_vmptrst(uint64_t *value)
+ int enable_vp_assist(uint64_t vp_assist_pa, void *vp_assist)
  {
- 	*value = current_vp_assist->current_nested_vmcs &
+ 	uint64_t val = (vp_assist_pa & HV_X64_MSR_VP_ASSIST_PAGE_ADDRESS_MASK) |
 diff --git a/tools/testing/selftests/kvm/lib/x86_64/vmx.c b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-index d21049c38fc5..40e4f427a3ec 100644
+index 40e4f427a3ec..de6571cd1065 100644
 --- a/tools/testing/selftests/kvm/lib/x86_64/vmx.c
 +++ b/tools/testing/selftests/kvm/lib/x86_64/vmx.c
-@@ -171,26 +171,19 @@ bool prepare_for_vmx_operation(struct vmx_pages *vmx)
+@@ -109,18 +109,6 @@ vcpu_alloc_vmx(struct kvm_vm *vm, vm_vaddr_t *p_vmx_gva)
+ 	vmx->vmwrite_gpa = addr_gva2gpa(vm, (uintptr_t)vmx->vmwrite);
+ 	memset(vmx->vmwrite_hva, 0, getpagesize());
  
- bool load_vmcs(struct vmx_pages *vmx)
- {
--	if (!enable_evmcs) {
--		/* Load a VMCS. */
--		*(uint32_t *)(vmx->vmcs) = vmcs_revision();
--		if (vmclear(vmx->vmcs_gpa))
--			return false;
+-	/* Setup of a region of guest memory for the VP Assist page. */
+-	vmx->vp_assist = (void *)vm_vaddr_alloc_page(vm);
+-	vmx->vp_assist_hva = addr_gva2hva(vm, (uintptr_t)vmx->vp_assist);
+-	vmx->vp_assist_gpa = addr_gva2gpa(vm, (uintptr_t)vmx->vp_assist);
 -
--		if (vmptrld(vmx->vmcs_gpa))
--			return false;
+-	/* Setup of a region of guest memory for the enlightened VMCS. */
+-	vmx->enlightened_vmcs = (void *)vm_vaddr_alloc_page(vm);
+-	vmx->enlightened_vmcs_hva =
+-		addr_gva2hva(vm, (uintptr_t)vmx->enlightened_vmcs);
+-	vmx->enlightened_vmcs_gpa =
+-		addr_gva2gpa(vm, (uintptr_t)vmx->enlightened_vmcs);
 -
--		/* Setup shadow VMCS, do not load it yet. */
--		*(uint32_t *)(vmx->shadow_vmcs) =
--			vmcs_revision() | 0x80000000ul;
--		if (vmclear(vmx->shadow_vmcs_gpa))
--			return false;
--	} else {
--		if (evmcs_vmptrld(vmx->enlightened_vmcs_gpa,
--				  vmx->enlightened_vmcs))
--			return false;
--		current_evmcs->revision_id = EVMCS_VERSION;
--	}
-+	/* Load a VMCS. */
-+	*(uint32_t *)(vmx->vmcs) = vmcs_revision();
-+	if (vmclear(vmx->vmcs_gpa))
-+		return false;
-+
-+	if (vmptrld(vmx->vmcs_gpa))
-+		return false;
-+
-+	/* Setup shadow VMCS, do not load it yet. */
-+	*(uint32_t *)(vmx->shadow_vmcs) =
-+		vmcs_revision() | 0x80000000ul;
-+	if (vmclear(vmx->shadow_vmcs_gpa))
-+		return false;
- 
- 	return true;
+ 	*p_vmx_gva = vmx_gva;
+ 	return vmx;
  }
 diff --git a/tools/testing/selftests/kvm/x86_64/evmcs_test.c b/tools/testing/selftests/kvm/x86_64/evmcs_test.c
-index 9007fb04343b..5a4c8b1873aa 100644
+index 5a4c8b1873aa..74f076ba574b 100644
 --- a/tools/testing/selftests/kvm/x86_64/evmcs_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/evmcs_test.c
-@@ -81,10 +81,10 @@ void guest_code(struct vmx_pages *vmx_pages)
- 	enable_vp_assist(vmx_pages->vp_assist_gpa, vmx_pages->vp_assist);
+@@ -68,7 +68,7 @@ void l2_guest_code(void)
+ 	vmcall();
+ }
+ 
+-void guest_code(struct vmx_pages *vmx_pages)
++void guest_code(struct vmx_pages *vmx_pages, struct hyperv_test_pages *hv_pages)
+ {
+ #define L2_GUEST_STACK_SIZE 64
+ 	unsigned long l2_guest_stack[L2_GUEST_STACK_SIZE];
+@@ -78,23 +78,22 @@ void guest_code(struct vmx_pages *vmx_pages)
+ 	GUEST_SYNC(1);
+ 	GUEST_SYNC(2);
+ 
+-	enable_vp_assist(vmx_pages->vp_assist_gpa, vmx_pages->vp_assist);
++	enable_vp_assist(hv_pages->vp_assist_gpa, hv_pages->vp_assist);
  	evmcs_enable();
  
--	GUEST_ASSERT(vmx_pages->vmcs_gpa);
  	GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
  	GUEST_SYNC(3);
--	GUEST_ASSERT(load_vmcs(vmx_pages));
-+	GUEST_ASSERT(load_evmcs(vmx_pages->enlightened_vmcs_gpa,
-+				vmx_pages->enlightened_vmcs));
- 	GUEST_ASSERT(vmptrstz() == vmx_pages->enlightened_vmcs_gpa);
+-	GUEST_ASSERT(load_evmcs(vmx_pages->enlightened_vmcs_gpa,
+-				vmx_pages->enlightened_vmcs));
+-	GUEST_ASSERT(vmptrstz() == vmx_pages->enlightened_vmcs_gpa);
++	GUEST_ASSERT(load_evmcs(hv_pages));
++	GUEST_ASSERT(vmptrstz() == hv_pages->enlightened_vmcs_gpa);
  
  	GUEST_SYNC(4);
+-	GUEST_ASSERT(vmptrstz() == vmx_pages->enlightened_vmcs_gpa);
++	GUEST_ASSERT(vmptrstz() == hv_pages->enlightened_vmcs_gpa);
+ 
+ 	prepare_vmcs(vmx_pages, l2_guest_code,
+ 		     &l2_guest_stack[L2_GUEST_STACK_SIZE]);
+ 
+ 	GUEST_SYNC(5);
+-	GUEST_ASSERT(vmptrstz() == vmx_pages->enlightened_vmcs_gpa);
++	GUEST_ASSERT(vmptrstz() == hv_pages->enlightened_vmcs_gpa);
+ 	current_evmcs->revision_id = -1u;
+ 	GUEST_ASSERT(vmlaunch());
+ 	current_evmcs->revision_id = EVMCS_VERSION;
+@@ -104,7 +103,7 @@ void guest_code(struct vmx_pages *vmx_pages)
+ 		PIN_BASED_NMI_EXITING);
+ 
+ 	GUEST_ASSERT(!vmlaunch());
+-	GUEST_ASSERT(vmptrstz() == vmx_pages->enlightened_vmcs_gpa);
++	GUEST_ASSERT(vmptrstz() == hv_pages->enlightened_vmcs_gpa);
+ 
+ 	/*
+ 	 * NMI forces L2->L1 exit, resuming L2 and hope that EVMCS is
+@@ -152,7 +151,7 @@ void guest_code(struct vmx_pages *vmx_pages)
+ 	GUEST_SYNC(11);
+ 
+ 	/* Try enlightened vmptrld with an incorrect GPA */
+-	evmcs_vmptrld(0xdeadbeef, vmx_pages->enlightened_vmcs);
++	evmcs_vmptrld(0xdeadbeef, hv_pages->enlightened_vmcs);
+ 	GUEST_ASSERT(vmlaunch());
+ 	GUEST_ASSERT(ud_count == 1);
+ 	GUEST_DONE();
+@@ -199,7 +198,7 @@ static struct kvm_vcpu *save_restore_vm(struct kvm_vm *vm,
+ 
+ int main(int argc, char *argv[])
+ {
+-	vm_vaddr_t vmx_pages_gva = 0;
++	vm_vaddr_t vmx_pages_gva = 0, hv_pages_gva = 0;
+ 
+ 	struct kvm_vcpu *vcpu;
+ 	struct kvm_vm *vm;
+@@ -217,7 +216,8 @@ int main(int argc, char *argv[])
+ 	vcpu_enable_evmcs(vcpu);
+ 
+ 	vcpu_alloc_vmx(vm, &vmx_pages_gva);
+-	vcpu_args_set(vcpu, 1, vmx_pages_gva);
++	vcpu_alloc_hyperv_test_pages(vm, &hv_pages_gva);
++	vcpu_args_set(vcpu, 2, vmx_pages_gva, hv_pages_gva);
+ 
+ 	vm_init_descriptor_tables(vm);
+ 	vcpu_init_descriptor_tables(vcpu);
 -- 
 2.37.3
 
