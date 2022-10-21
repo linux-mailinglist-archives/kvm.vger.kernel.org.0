@@ -2,140 +2,415 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6022D607450
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 11:40:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA1506074C6
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 12:14:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230271AbiJUJkq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 05:40:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58098 "EHLO
+        id S230381AbiJUKOK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 06:14:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230260AbiJUJkm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 05:40:42 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EA0924CCBA
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 02:40:39 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29L9bq7V028664
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 09:40:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=EUE358VAEu5XSecfhJaXTAd9m1rGoWrSmPYSUbRJwhw=;
- b=OKIJMx4H6NkWE/8z7zX/BuR5N9PHPFsQvicddiNMgBd6qj7xW91cK1Bq0cnT3oWWJDjP
- swhEML89tXJCnLLesRt3iekbw4awlx5aj/3NHlHUpRx+ucSrERUnnN6yhY95T8Ey0Wp2
- Adup03V4DP4kVsfhz8JsqBwry70ByXhZ/C8WAsWnq69a+injVNdHawdDDCDr+Jfc5SZf
- uSGmCKXXfn2EWq+XbR07HRv8V2/c5CWlX5DH9QYtG6HRXNUYpVL5aRgstjD5bUDgw3vN
- LKzCTGHVd9mKOTPg8NOvTyDP2zGwAbAWc7xQoXGgN9Q0nF2MlBDVrj+gkx2YL01IJ3aW uA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kbrqs8e70-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 09:40:38 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29L9cZIs002388
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 09:40:38 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kbrqs8e4n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 Oct 2022 09:40:37 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29L9bUA8003392;
-        Fri, 21 Oct 2022 09:40:35 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3k7mg9ab98-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 21 Oct 2022 09:40:35 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29L9eWam7340742
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 21 Oct 2022 09:40:32 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 13850AE053;
-        Fri, 21 Oct 2022 09:40:32 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CB91BAE04D;
-        Fri, 21 Oct 2022 09:40:31 +0000 (GMT)
-Received: from [9.145.155.93] (unknown [9.145.155.93])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 21 Oct 2022 09:40:31 +0000 (GMT)
-Message-ID: <f615f244-e5d6-1f2e-7976-10ff6bcd055e@linux.ibm.com>
-Date:   Fri, 21 Oct 2022 11:40:31 +0200
+        with ESMTP id S230513AbiJUKNy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 06:13:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2A1E25CE37
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 03:13:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666347218;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zxSHiJqXEe68yrq3fvsLCMyo3+mxkzp0c9iP5btBQnY=;
+        b=hB/McqJqXLC8c8rS8RDphYbSSIkI45rsaBTmaJfpSRlm985HD4S5TGPGRdGFrB2UlKLnj1
+        zLlTO4K6LmL/NQ6q6Q8qgmC+ihDlVQ9kK7wqlWdspsRATCOIycYQGCNn5qei+O11S1QD3R
+        iURKGda4qHyyiqd6Bbah3+eB1dkL4zY=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-144-3XiFzfzWPi63l03CpB3jFA-1; Fri, 21 Oct 2022 06:13:32 -0400
+X-MC-Unique: 3XiFzfzWPi63l03CpB3jFA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1E7F43815D33;
+        Fri, 21 Oct 2022 10:13:32 +0000 (UTC)
+Received: from [10.64.54.99] (vpn2-54-99.bne.redhat.com [10.64.54.99])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E86A1C15BBD;
+        Fri, 21 Oct 2022 10:13:25 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in
+ conjunction with bitmap
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, peterx@redhat.com, maz@kernel.org,
+        will@kernel.org, catalin.marinas@arm.com, bgardon@google.com,
+        shuah@kernel.org, andrew.jones@linux.dev, dmatlack@google.com,
+        pbonzini@redhat.com, zhenyzha@redhat.com, james.morse@arm.com,
+        suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+        oliver.upton@linux.dev, shan.gavin@gmail.com
+References: <20221011061447.131531-1-gshan@redhat.com>
+ <20221011061447.131531-4-gshan@redhat.com> <Y1Hdc/UVta3A5kHM@google.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <0adc538b-594e-c662-5a38-3ca6b98ab059@redhat.com>
+Date:   Fri, 21 Oct 2022 18:13:23 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [kvm-unit-tests PATCH v3 5/6] lib: s390x: Enable reusability of
- VMs that were in PV mode
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     imbrenda@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
-        thuth@redhat.com
-References: <20221021063902.10878-1-frankja@linux.ibm.com>
- <20221021063902.10878-6-frankja@linux.ibm.com>
+In-Reply-To: <Y1Hdc/UVta3A5kHM@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-From:   Steffen Eiden <seiden@linux.ibm.com>
-In-Reply-To: <20221021063902.10878-6-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: VHMsyBvUMBkTMu72hM8BXNoXnukEZUPa
-X-Proofpoint-GUID: jR74e8xG-VpNE9gtIBc7wWTI3hqT6nAK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-21_04,2022-10-20_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
- suspectscore=0 spamscore=0 priorityscore=1501 malwarescore=0 mlxscore=0
- lowpriorityscore=0 impostorscore=0 clxscore=1015 bulkscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2209130000
- definitions=main-2210210055
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Sean,
+
+On 10/21/22 7:44 AM, Sean Christopherson wrote:
+> On Tue, Oct 11, 2022, Gavin Shan wrote:
+>> Some architectures (such as arm64) need to dirty memory outside of the
+>> context of a vCPU. Of course, this simply doesn't fit with the UAPI of
+>> KVM's per-vCPU dirty ring.
+> 
+> What is the point of using the dirty ring in this case?  KVM still burns a pile
+> of memory for the bitmap.  Is the benefit that userspace can get away with
+> scanning the bitmap fewer times, e.g. scan it once just before blackout under
+> the assumption that very few pages will dirty the bitmap?
+> 
+> Why not add a global ring to @kvm?  I assume thread safety is a problem, but the
+> memory overhead of the dirty_bitmap also seems like a fairly big problem.
+> 
+
+Most of the dirty pages are tracked by the per-vcpu-ring in this particular
+case. It means the minority of the dirty pages are tracked by the bitmap.
+The trade-off is the coexistence of dirty-ring and bitmap. The advantage of
+ring is the discrete property, comparing to bitmap. With dirty ring, userspace
+(QEMU) needs to copy in-kernel bitmap. In low-dirty-speed scenario, it's
+efficient.
+
+We ever discussed bitmap and per-vm-ring [1]. per-vm-ring is just too
+complicated. However, bitmap uses extra memory to track dirty pages.
+The bitmap will be only used in two cases (migration and quiescent system).
+So the bitmap will be retrieved for limited times and time used to parse
+it is limited.
+
+[1] https://lore.kernel.org/kvmarm/320005d1-fe88-fd6a-be91-ddb56f1aa80f@redhat.com/
+
+>> Introduce a new flavor of dirty ring that requires the use of both vCPU
+>> dirty rings and a dirty bitmap. The expectation is that for non-vCPU
+>> sources of dirty memory (such as the GIC ITS on arm64), KVM writes to
+>> the dirty bitmap. Userspace should scan the dirty bitmap before
+>> migrating the VM to the target.
+>>
+>> Use an additional capability to advertize this behavior and require
+>> explicit opt-in to avoid breaking the existing dirty ring ABI. And yes,
+>> you can use this with your preferred flavor of DIRTY_RING[_ACQ_REL]. Do
+>> not allow userspace to enable dirty ring if it hasn't also enabled the
+>> ring && bitmap capability, as a VM is likely DOA without the pages
+>> marked in the bitmap.
+>>
+>> Suggested-by: Marc Zyngier <maz@kernel.org>
+>> Suggested-by: Peter Xu <peterx@redhat.com>
+>> Co-developed-by: Oliver Upton <oliver.upton@linux.dev>
+> 
+> Co-developed-by needs Oliver's SoB.
+> 
+
+Sure.
+
+>>   #ifndef CONFIG_HAVE_KVM_DIRTY_RING
+>> +static inline bool kvm_dirty_ring_exclusive(struct kvm *kvm)
+> 
+> What about inverting the naming to better capture that this is about the dirty
+> bitmap, and less so about the dirty ring?  It's not obvious what "exclusive"
+> means, e.g. I saw this stub before reading the changelog and assumed it was
+> making a dirty ring exclusive to something.
+> 
+> Something like this?
+> 
+> bool kvm_use_dirty_bitmap(struct kvm *kvm)
+> {
+> 	return !kvm->dirty_ring_size || kvm->dirty_ring_with_bitmap;
+> }
+> 
+
+If you agree, I would rename is to kvm_dirty_ring_use_bitmap(). In this way,
+we will have "kvm_dirty_ring" prefix for the function name, consistent with
+other functions from same module.
+
+>> @@ -3305,15 +3305,20 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>>   	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+>>   
+>>   #ifdef CONFIG_HAVE_KVM_DIRTY_RING
+>> -	if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
+>> +	if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
+>>   		return;
+>> +
+>> +#ifndef CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP
+>> +	if (WARN_ON_ONCE(!vcpu))
+> 
+> To cut down on the #ifdefs, this can be:
+> 
+> 	if (WARN_ON_ONCE(!IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) && !vcpu)
+> 
+> though that's arguably even harder to read.  Blech.
+> 
+
+Your suggestion counts :)
+
+>> +		return;
+>> +#endif
+>>   #endif
+>>   
+>>   	if (memslot && kvm_slot_dirty_track_enabled(memslot)) {
+>>   		unsigned long rel_gfn = gfn - memslot->base_gfn;
+>>   		u32 slot = (memslot->as_id << 16) | memslot->id;
+>>   
+>> -		if (kvm->dirty_ring_size)
+>> +		if (vcpu && kvm->dirty_ring_size)
+>>   			kvm_dirty_ring_push(&vcpu->dirty_ring,
+>>   					    slot, rel_gfn);
+>>   		else
+>> @@ -4485,6 +4490,9 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+>>   		return KVM_DIRTY_RING_MAX_ENTRIES * sizeof(struct kvm_dirty_gfn);
+>>   #else
+>>   		return 0;
+>> +#endif
+>> +#ifdef CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP
+>> +	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP:
+>>   #endif
+>>   	case KVM_CAP_BINARY_STATS_FD:
+>>   	case KVM_CAP_SYSTEM_EVENT_DATA:
+>> @@ -4499,6 +4507,11 @@ static int kvm_vm_ioctl_enable_dirty_log_ring(struct kvm *kvm, u32 size)
+>>   {
+>>   	int r;
+>>   
+>> +#ifdef CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP
+>> +	if (!kvm->dirty_ring_with_bitmap)
+>> +		return -EINVAL;
+>> +#endif
+> 
+> This one at least is prettier with IS_ENABLED
+> 
+> 	if (IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) &&
+> 	    !kvm->dirty_ring_with_bitmap)
+> 		return -EINVAL;
+> 
+> But dirty_ring_with_bitmap really shouldn't need to exist.  It's mandatory for
+> architectures that have HAVE_KVM_DIRTY_RING_WITH_BITMAP, and unsupported for
+> architectures that don't.  In other words, the API for enabling the dirty ring
+> is a bit ugly.
+> 
+> Rather than add KVM_CAP_DIRTY_LOG_RING_ACQ_REL, which hasn't been officially
+> released yet, and then KVM_CAP_DIRTY_LOG_ING_WITH_BITMAP on top, what about
+> usurping bits 63:32 of cap->args[0] for flags?  E.g.
+> 
+> Ideally we'd use cap->flags directly, but we screwed up with KVM_CAP_DIRTY_LOG_RING
+> and didn't require flags to be zero :-(
+> 
+> Actually, what's the point of allowing KVM_CAP_DIRTY_LOG_RING_ACQ_REL to be
+> enabled?  I get why KVM would enumerate this info, i.e. allowing checking, but I
+> don't seen any value in supporting a second method for enabling the dirty ring.
+> 
+> The acquire-release thing is irrelevant for x86, and no other architecture
+> supports the dirty ring until this series, i.e. there's no need for KVM to detect
+> that userspace has been updated to gain acquire-release semantics, because the
+> fact that userspace is enabling the dirty ring on arm64 means userspace has been
+> updated.
+> 
+> Same goes for the "with bitmap" capability.  There are no existing arm64 users,
+> so there's no risk of breaking existing userspace by suddenly shoving stuff into
+> the dirty bitmap.
+> 
+> KVM doesn't even get the enabling checks right, e.g. KVM_CAP_DIRTY_LOG_RING can be
+> enabled on architectures that select CONFIG_HAVE_KVM_DIRTY_RING_ACQ_REL but not
+> KVM_CAP_DIRTY_LOG_RING.  The reverse is true (ignoring that x86 selects both and
+> is the only arch that selects the TSO variant).
+> 
+> Ditto for KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP...
+
+If I didn't miss anything in the previous discussions, we don't want to make
+KVM_CAP_DIRTY_LOG_RING_ACQ_REL and KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP architecture
+dependent. If they become architecture dependent, the userspace will have different
+stubs (x86, arm64, other architectures to support dirty-ring in future) to enable
+those capabilities. It's not friendly to userspace. So I intend to prefer the existing
+pattern: advertise, enable. To enable a capability without knowing if it's supported
+sounds a bit weird to me.
+
+I think it's a good idea to enable KVM_CAP_DIRTY_LOG_RING_{ACQ_REL, WITH_BITMAP} as
+flags, instead of standalone capabilities. In this way, those two capabilities can
+be treated as sub-capability of KVM_CAP_DIRTY_LOG_RING. The question is how these
+two flags can be exposed by kvm_vm_ioctl_check_extension_generic(), if we really
+want to expose those two flags.
+
+I don't understand your question on how KVM has wrong checks when KVM_CAP_DIRTY_LOG_RING
+and KVM_CAP_DIRTY_LOG_RING_ACQ_REL are enabled.
 
 
-On 10/21/22 08:39, Janosch Frank wrote:
-> Convert the sblk to non-PV when the PV guest is destroyed.
+>> +
+>>   	if (!KVM_DIRTY_LOG_PAGE_OFFSET)
+>>   		return -EINVAL;
+>>   
+>> @@ -4588,6 +4601,9 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+>>   	case KVM_CAP_DIRTY_LOG_RING:
+>>   	case KVM_CAP_DIRTY_LOG_RING_ACQ_REL:
+>>   		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
+>> +	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP:
 > 
-> Early return in uv_init() instead of running into the assert. This is
-> necessary since snippet_pv_init() will always call uv_init().
+> ... as this should return -EINVAL if CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP=n.
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+
+Yes.
+
+> So rather than add a rather useless flag and increase KVM's API surface, why not
+> make the capabilities informational-only?
+> 
+
+Please refer to the reply above. I still intend to prefer the pattern of advertising
+and enabling. If architecture dependent stubs to enable those capabilities isn't a
+concern to us. I think we can make those capabilities information-only, but I guess
+Oliver might have different ideas?
+
 > ---
->   lib/s390x/uv.c | 11 ++++++++++-
->   1 file changed, 10 insertions(+), 1 deletion(-)
+>   include/linux/kvm_dirty_ring.h |  6 +++---
+>   include/linux/kvm_host.h       |  1 -
+>   virt/kvm/dirty_ring.c          |  5 +++--
+>   virt/kvm/kvm_main.c            | 20 ++++----------------
+>   4 files changed, 10 insertions(+), 22 deletions(-)
 > 
-> diff --git a/lib/s390x/uv.c b/lib/s390x/uv.c
-> index b2a43424..383271a5 100644
-> --- a/lib/s390x/uv.c
-> +++ b/lib/s390x/uv.c
-> @@ -76,7 +76,8 @@ void uv_init(void)
->   	int cc;
+> diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
+> index 23b2b466aa0f..f49db42bc26a 100644
+> --- a/include/linux/kvm_dirty_ring.h
+> +++ b/include/linux/kvm_dirty_ring.h
+> @@ -28,9 +28,9 @@ struct kvm_dirty_ring {
+>   };
 >   
->   	/* Let's not do this twice */
-> -	assert(!initialized);
-> +	if (initialized)
-> +		return;
->   	/* Query is done on initialization but let's check anyway */
->   	assert(uvcb_qui.header.rc == 1 || uvcb_qui.header.rc == 0x100);
->   
-> @@ -188,6 +189,14 @@ void uv_destroy_guest(struct vm *vm)
->   	free_pages(vm->uv.conf_var_stor);
->   
->   	free_pages((void *)(vm->uv.asce & PAGE_MASK));
-> +	memset(&vm->uv, 0, sizeof(vm->uv));
-> +
-> +	/* Convert the sblk back to non-PV */
-> +	vm->save_area.guest.asce = stctg(1);
-> +	vm->sblk->sdf = 0;
-> +	vm->sblk->sidad = 0;
-> +	vm->sblk->pv_handle_cpu = 0;
-> +	vm->sblk->pv_handle_config = 0;
+>   #ifndef CONFIG_HAVE_KVM_DIRTY_RING
+> -static inline bool kvm_dirty_ring_exclusive(struct kvm *kvm)
+> +static inline bool kvm_use_dirty_bitmap(struct kvm *kvm)
+>   {
+> -	return false;
+> +	return true;
 >   }
 >   
->   int uv_unpack(struct vm *vm, uint64_t addr, uint64_t len, uint64_t tweak)
+>   /*
+> @@ -71,7 +71,7 @@ static inline void kvm_dirty_ring_free(struct kvm_dirty_ring *ring)
+>   
+>   #else /* CONFIG_HAVE_KVM_DIRTY_RING */
+>   
+> -bool kvm_dirty_ring_exclusive(struct kvm *kvm);
+> +bool kvm_use_dirty_bitmap(struct kvm *kvm);
+>   int kvm_cpu_dirty_log_size(void);
+>   u32 kvm_dirty_ring_get_rsvd_entries(void);
+>   int kvm_dirty_ring_alloc(struct kvm_dirty_ring *ring, int index, u32 size);
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index d06fbf3e5e95..eb7b1310146d 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -779,7 +779,6 @@ struct kvm {
+>   	pid_t userspace_pid;
+>   	unsigned int max_halt_poll_ns;
+>   	u32 dirty_ring_size;
+> -	bool dirty_ring_with_bitmap;
+>   	bool vm_bugged;
+>   	bool vm_dead;
+>   
+> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
+> index 9cc60af291ef..53802513de79 100644
+> --- a/virt/kvm/dirty_ring.c
+> +++ b/virt/kvm/dirty_ring.c
+> @@ -11,9 +11,10 @@
+>   #include <trace/events/kvm.h>
+>   #include "kvm_mm.h"
+>   
+> -bool kvm_dirty_ring_exclusive(struct kvm *kvm)
+> +bool kvm_use_dirty_bitmap(struct kvm *kvm)
+>   {
+> -	return kvm->dirty_ring_size && !kvm->dirty_ring_with_bitmap;
+> +	return IS_ENABLED(CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP) ||
+> +	       !kvm->dirty_ring_size;
+>   }
+>   
+>   int __weak kvm_cpu_dirty_log_size(void)
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index dd52b8e42307..0e8aaac5a222 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1617,7 +1617,7 @@ static int kvm_prepare_memory_region(struct kvm *kvm,
+>   			new->dirty_bitmap = NULL;
+>   		else if (old && old->dirty_bitmap)
+>   			new->dirty_bitmap = old->dirty_bitmap;
+> -		else if (!kvm_dirty_ring_exclusive(kvm)) {
+> +		else if (kvm_use_dirty_bitmap(kvm)) {
+>   			r = kvm_alloc_dirty_bitmap(new);
+>   			if (r)
+>   				return r;
+> @@ -2060,8 +2060,7 @@ int kvm_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log,
+>   	unsigned long n;
+>   	unsigned long any = 0;
+>   
+> -	/* Dirty ring tracking may be exclusive to dirty log tracking */
+> -	if (kvm_dirty_ring_exclusive(kvm))
+> +	if (!kvm_use_dirty_bitmap(kvm))
+>   		return -ENXIO;
+>   
+>   	*memslot = NULL;
+> @@ -2125,8 +2124,7 @@ static int kvm_get_dirty_log_protect(struct kvm *kvm, struct kvm_dirty_log *log)
+>   	unsigned long *dirty_bitmap_buffer;
+>   	bool flush;
+>   
+> -	/* Dirty ring tracking may be exclusive to dirty log tracking */
+> -	if (kvm_dirty_ring_exclusive(kvm))
+> +	if (!kvm_use_dirty_bitmap(kvm))
+>   		return -ENXIO;
+>   
+>   	as_id = log->slot >> 16;
+> @@ -2237,8 +2235,7 @@ static int kvm_clear_dirty_log_protect(struct kvm *kvm,
+>   	unsigned long *dirty_bitmap_buffer;
+>   	bool flush;
+>   
+> -	/* Dirty ring tracking may be exclusive to dirty log tracking */
+> -	if (kvm_dirty_ring_exclusive(kvm))
+> +	if (!kvm_use_dirty_bitmap(kvm))
+>   		return -ENXIO;
+>   
+>   	as_id = log->slot >> 16;
+> @@ -4505,11 +4502,6 @@ static int kvm_vm_ioctl_enable_dirty_log_ring(struct kvm *kvm, u32 size)
+>   {
+>   	int r;
+>   
+> -#ifdef CONFIG_HAVE_KVM_DIRTY_RING_WITH_BITMAP
+> -	if (!kvm->dirty_ring_with_bitmap)
+> -		return -EINVAL;
+> -#endif
+> -
+>   	if (!KVM_DIRTY_LOG_PAGE_OFFSET)
+>   		return -EINVAL;
+>   
+> @@ -4597,11 +4589,7 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+>   		return 0;
+>   	}
+>   	case KVM_CAP_DIRTY_LOG_RING:
+> -	case KVM_CAP_DIRTY_LOG_RING_ACQ_REL:
+>   		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
+> -	case KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP:
+> -		kvm->dirty_ring_with_bitmap = true;
+> -		return 0;
+>   	default:
+>   		return kvm_vm_ioctl_enable_cap(kvm, cap);
+>   	}
+> 
+> base-commit: 4826e54f82ded9f54782f8e9d6bc36c7bae06c1f
+> 
+
+Thanks,
+Gavin
 
