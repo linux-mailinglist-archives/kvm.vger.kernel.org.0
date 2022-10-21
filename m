@@ -2,220 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BF5F60712C
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 09:32:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6503660715B
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 09:46:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229738AbiJUHcq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 03:32:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34888 "EHLO
+        id S229783AbiJUHqj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 03:46:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbiJUHco (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 03:32:44 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4708821F95F
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 00:32:43 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id g28so1823626pfk.8
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 00:32:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GBh09c5bp2M8+imG6DX1mt6urttUKIOXRq8kmVafKg4=;
-        b=VArgmKxavtvoJux29yQwsi49bZTx04on3l4b4zuUJxJVsYJ3qN3np405DIL2mqylTg
-         kPvJ1RtOR8dR2yqbnVr8R+wfGT3VMD1RPS/CrvQhqNbsMdjGpiJPX8TnD5fF1lLFjBij
-         lDtitTNGeNdNS8+pomTia6Vv70P1AKMOm3rvSzej0NQ5+DsiVkbpcXDMXfT5IvjmSPNa
-         BQNvBhRTj+a1P0CCjsjyDY7mGIUIPT/FJiF5Fw3yZpeYnpbT47PwIpJd3pcCiiZSMhx/
-         keAPrAE/zNyjsmNdup2/ZWputkbW0V3WawiqxPRWwxDOkvy8d7Uv4EjPdStsPkG69ud9
-         gjVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GBh09c5bp2M8+imG6DX1mt6urttUKIOXRq8kmVafKg4=;
-        b=6qN6MROGYZaag986ZF3nwuTtFNQiz/4PNqcJsgVykl3YYZ+j4ROMvF4ZvSUpAhylJj
-         kBtU3htDq5n2ukE4GDkHqG5rKSXHstbBa9wh3/+laKgWP/nM8+ObehxqkK0DCIDJMB4y
-         jaJIQfxDRb3Oeuv6rUwjpJiDeobE7M2EfOdEv7DVF6+sdJP+2O9lOvKUKtg/E20uNatu
-         T9C9NXVyHDbheM6wQRGVb/RJbr25qE/7Iig6xPiyLSupr5cvFUkR1VwsviVbhzqoseyZ
-         ZOe6aS83xqdxlfcPeGt0SIYajmTHrpa8n8Klf5r0iCDJXOde413NXnnbb7myONraRbpa
-         pmQQ==
-X-Gm-Message-State: ACrzQf2lmJUfVdApQI2P/OdwQ7ke5RtMyGXb37CmyM2mSAAoK8Iqi4SL
-        sapGQFZXdqYzFc9mH/rGUCY=
-X-Google-Smtp-Source: AMsMyM6gA3KL/VCz1kns7cnMYB5cciz+4JiYiNwhMd7pAyzNLL3sCRHFsrxTZ9qDVPmZOR159ldCsA==
-X-Received: by 2002:a63:8:0:b0:460:e669:a0c4 with SMTP id 8-20020a630008000000b00460e669a0c4mr15238532pga.475.1666337562733;
-        Fri, 21 Oct 2022 00:32:42 -0700 (PDT)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id y8-20020a170902b48800b0018099c9618esm2837684plr.231.2022.10.21.00.32.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Oct 2022 00:32:42 -0700 (PDT)
-Message-ID: <0210ab19-78b0-d036-687d-1201abc2c732@gmail.com>
-Date:   Fri, 21 Oct 2022 15:32:35 +0800
+        with ESMTP id S229799AbiJUHqi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 03:46:38 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C786208809
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 00:46:37 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29L7bgYh028531
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 07:46:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=swUrOMw4u3T9T0cSKklBAvF1oaRjdvGBblil3dir13U=;
+ b=Tw1f3nrlroIwiog5keBr8CeLfgAbxmBhFQSe8vYnZO4twA3URwvWCAtjgAE9e2ifo+5N
+ sTILF03NB4N+GQ7+JLWZs39nn/ir6DH8Fm4N1vO9Dlu6GlUo3+sldS6H74p0cyEZaTBO
+ E258nrEi1Znb0FhGirXg5om6dm+x4Sor4oaRRoQTPb64bObbMAhy/antEKtJGixtd6Bj
+ VA2L4AzLn2WWu/RQJHz1wQMSv+TWGp6ma8ChN67QckBU8pvrvxi9k0Lk0sIlyu90NpuN
+ 52FmTTtUEHN4RZu4HXhSKd65GkPhFG2gW9Zb3xVB5giFyUV+Y71TkjoIZPCZEx0TAt21 8g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kbq6tr910-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 07:46:36 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29L7cOM5000682
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 07:46:36 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kbq6tr8yy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Oct 2022 07:46:36 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29L7ZSLF017255;
+        Fri, 21 Oct 2022 07:46:34 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3k7mg9a3pa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Oct 2022 07:46:33 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29L7kUqu4915844
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 21 Oct 2022 07:46:30 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C0243A405F;
+        Fri, 21 Oct 2022 07:46:30 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 71A4EA405B;
+        Fri, 21 Oct 2022 07:46:30 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.8.239])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 21 Oct 2022 07:46:30 +0000 (GMT)
+Date:   Fri, 21 Oct 2022 09:46:28 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        scgl@linux.ibm.com, thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v3 0/6] s390x: PV fixups
+Message-ID: <20221021094628.79239c86@p-imbrenda>
+In-Reply-To: <20221021063902.10878-1-frankja@linux.ibm.com>
+References: <20221021063902.10878-1-frankja@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.3.3
-Subject: Re: [kvm-unit-tests PATCH v3 10/13] x86/pmu: Update testcases to
- cover Intel Arch PMU Version 1
-Content-Language: en-US
-From:   Like Xu <like.xu.linux@gmail.com>
-To:     Sandipan Das <sandipan.das@amd.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-References: <20220819110939.78013-1-likexu@tencent.com>
- <20220819110939.78013-11-likexu@tencent.com>
- <0666abab-ed22-6708-a794-de5449d049f1@amd.com>
- <a1e202f0-260e-fe00-4e39-42e390d4021b@gmail.com>
- <27ef941b-05df-7fa4-a54e-8571b0bf70e7@amd.com>
- <991bf043-3c5e-09f6-9080-ce8ae5c819e7@gmail.com>
-In-Reply-To: <991bf043-3c5e-09f6-9080-ce8ae5c819e7@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: IvjC9rFnnVnp-EfmzNp3kMf0bNI1AR2c
+X-Proofpoint-ORIG-GUID: ptB6jX5n_chkd50oY_wzjX-F6ZQiVCF0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-21_03,2022-10-20_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
+ impostorscore=0 mlxscore=0 phishscore=0 adultscore=0 spamscore=0
+ suspectscore=0 malwarescore=0 priorityscore=1501 mlxlogscore=969
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210210044
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sandipan,
+On Fri, 21 Oct 2022 06:38:56 +0000
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-On 19/9/2022 3:09 pm, Like Xu wrote:
-> On 8/9/2022 4:23 pm, Sandipan Das wrote:
->> On 9/6/2022 7:05 PM, Like Xu wrote:
->>> On 6/9/2022 4:16 pm, Sandipan Das wrote:
->>>> Hi Like,
->>>>
->>>> On 8/19/2022 4:39 PM, Like Xu wrote:
->>>>> From: Like Xu <likexu@tencent.com>
->>>>>
->>>>> For most unit tests, the basic framework and use cases which test
->>>>> any PMU counter do not require any changes, except for two things:
->>>>>
->>>>> - No access to registers introduced only in PMU version 2 and above;
->>>>> - Expanded tolerance for testing counter overflows
->>>>>     due to the loss of uniform control of the gloabl_ctrl register
->>>>>
->>>>> Adding some pmu_version() return value checks can seamlessly support
->>>>> Intel Arch PMU Version 1, while opening the door for AMD PMUs tests.
->>>>>
->>>>> Signed-off-by: Like Xu <likexu@tencent.com>
->>>>> ---
->>>>>    x86/pmu.c | 64 +++++++++++++++++++++++++++++++++++++------------------
->>>>>    1 file changed, 43 insertions(+), 21 deletions(-)
->>>>>
->>>>> [...]
->>>>> @@ -327,13 +335,21 @@ static void check_counter_overflow(void)
->>>>>                cnt.config &= ~EVNTSEL_INT;
->>>>>            idx = event_to_global_idx(&cnt);
->>>>>            __measure(&cnt, cnt.count);
->>>>> -        report(cnt.count == 1, "cntr-%d", i);
->>>>> +
->>>>> +        report(check_irq() == (i % 2), "irq-%d", i);
->>>>> +        if (pmu_version() > 1)
->>>>> +            report(cnt.count == 1, "cntr-%d", i);
->>>>> +        else
->>>>> +            report(cnt.count < 4, "cntr-%d", i);
->>>>> +
->>>>> [...]
->>>>
->>>> Sorry I missed this in the previous response. With an upper bound of
->>>> 4, I see this test failing some times for at least one of the six
->>>> counters (with NMI watchdog disabled on the host) on a Milan (Zen 3)
->>>> system. Increasing it further does reduce the probability but I still
->>>> see failures. Do you see the same behaviour on systems with Zen 3 and
->>>> older processors?
->>>
->>> A hundred runs on my machine did not report a failure.
->>>
->>
->> Was this on a Zen 4 system?
->>
->>> But I'm not surprised by this, because some AMD platforms do
->>> have hw PMU errata which requires bios or ucode fixes.
->>>
->>> Please help find the right upper bound for all your available AMD boxes.
->>>
->>
->> Even after updating the microcode, the tests failed just as often in an
->> overnight loop. However, upon closer inspection, the reason for failure
->> was different. The variance is well within the bounds now but sometimes,
->> is_the_count_reproducible() is true. Since this selects the original
->> verification criteria (cnt.count == 1), the tests fail.
->>
->>> What makes me most nervous is that AMD's core hardware events run
->>> repeatedly against the same workload, and their count results are erratic.
->>>
->>
->> With that in mind, should we consider having the following change?
->>
->> diff --git a/x86/pmu.c b/x86/pmu.c
->> index bb16b3c..39979b8 100644
->> --- a/x86/pmu.c
->> +++ b/x86/pmu.c
->> @@ -352,7 +352,7 @@ static void check_counter_overflow(void)
->>                  .ctr = gp_counter_base,
->>                  .config = EVNTSEL_OS | EVNTSEL_USR | (*gp_events)[1].unit_sel 
->> /* instructions */,
->>          };
->> -       bool precise_event = is_the_count_reproducible(&cnt);
->> +       bool precise_event = is_intel() ? is_the_count_reproducible(&cnt) : 
->> false;
->>
->>          __measure(&cnt, 0);
->>          count = cnt.count;
->>
->> With this, the tests always pass. I will run another overnight loop and
->> report back if I see any errors.
->>
->>> You may check is_the_count_reproducible() in the test case:
->>> [1]https://lore.kernel.org/kvm/20220905123946.95223-7-likexu@tencent.com/
->>
->> On Zen 4 systems, this is always false and the overflow tests always
->> pass irrespective of whether PerfMonV2 is enabled for the guest or not.
->>
->> - Sandipan
+> A small set of patches that clean up the PV snippet handling.
 > 
-> I could change it to:
-> 
->          if (is_intel())
->              report(cnt.count == 1, "cntr-%d", i);
->          else
->              report(cnt.count < 4, "cntr-%d", i);
+> v3:
+> 	* Dropped asm snippet linker script patch for now
 
-On AMD (zen3/zen4) machines this seems to be the only way to ensure that the 
-test cases don't fail:
+shame, I really liked that patch (modulo the nits)
 
-		if (is_intel())
-			report(cnt.count == 1, "cntr-%d", i);
-		else
-			report(cnt.count == 0xffffffffffff || cnt.count < 7, "cntr-%d", i);
+> 	* Replaced memalign_pages_flags() with memalign_pages()
+> 	* PV ASCEs will now recieve DT and TL fields from the main test ASCE
+> 
+> v2:
+> 	* Macro uses 64bit PSW mask
+> 	* SBLK reset on PV destroy and uv_init() early return have been split off
+> 
+> 
+> Janosch Frank (6):
+>   s390x: snippets: asm: Add a macro to write an exception PSW
+>   s390x: MAKEFILE: Use $< instead of pathsubst
+>   lib: s390x: sie: Improve validity handling and make it vm specific
+>   lib: s390x: Use a new asce for each PV guest
+>   lib: s390x: Enable reusability of VMs that were in PV mode
+>   lib: s390x: sie: Properly populate SCA
+> 
+>  lib/s390x/asm-offsets.c                  |  2 ++
+>  lib/s390x/sie.c                          | 37 +++++++++++++-------
+>  lib/s390x/sie.h                          | 43 ++++++++++++++++++++++--
+>  lib/s390x/uv.c                           | 35 +++++++++++++++++--
+>  lib/s390x/uv.h                           |  5 ++-
+>  s390x/Makefile                           |  2 +-
+>  s390x/cpu.S                              |  6 ++++
+>  s390x/snippets/asm/macros.S              | 28 +++++++++++++++
+>  s390x/snippets/asm/snippet-pv-diag-288.S |  4 +--
+>  s390x/snippets/asm/snippet-pv-diag-500.S |  6 ++--
+>  10 files changed, 140 insertions(+), 28 deletions(-)
+>  create mode 100644 s390x/snippets/asm/macros.S
+> 
 
-but it means some hardware counter defects, can you further confirm that this 
-hardware behaviour
-is in line with your expectations ?
-
-> 
-> but this does not explain the difference, that is for the same workload:
-> 
-> if a retired hw event like "PMCx0C0 [Retired Instructions] (ExRetInstr)" is 
-> configured,
-> then it's expected to count "the number of instructions retired", the value is 
-> only relevant
-> for workload and it should remain the same over multiple measurements,
-> 
-> but there are two hardware counters, one AMD and one Intel, both are reset to an 
-> identical value
-> (like "cnt.count = 1 - count"), and when they overflow, the Intel counter can 
-> stay exactly at 1,
-> while the AMD counter cannot.
-> 
-> I know there are ulterior hardware micro-arch implementation differences here,
-> but what AMD is doing violates the semantics of "retired".
-> 
-> Is this behavior normal by design ?
-> I'm not sure what I'm missing, this behavior is reinforced in zen4 as you said.
-> 
