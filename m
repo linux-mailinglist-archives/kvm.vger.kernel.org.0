@@ -2,120 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A409607BF7
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 18:18:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 48DB0607C09
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 18:20:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230398AbiJUQSW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 12:18:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51618 "EHLO
+        id S230382AbiJUQUA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 12:20:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230196AbiJUQSU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 12:18:20 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0340624E3B3
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 09:18:19 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id h14so2841876pjv.4
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 09:18:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PIRb6+ovxp5J4uJ1hVDeWHpfyBDCzaaTh1iPpdxBBXo=;
-        b=LBbRjb9HoKMsM0BrB5Yx8EKkNw2z2slGB6RREjreEOgAz6cf4w0roEfiOfI1ISkxC3
-         umCpqoYJ+BxiTeH6mDoFf2MIPMRAa8KHajTmAG5q0NIMZtDgJyPYDAp4OEAVmIJyfonP
-         YVdGEHCQT54p0r2x+JlsthZbC8pGVdj+LT/dxHs3Utvt9tNW6l/hE2qLrAwkHAoOVZeH
-         cqWWQ1T7dnKxpoX4VIogeOoRSjB+ibtFx6bQv9mAbDdRyNK9AcGDi4qG7P8xM/rtcTeQ
-         giQByT9/HXaV3sGzuy8Kux9ZJVNncssFk2zzM8JEHArzX1QytiIWnjlmf1c2NjGzQeqm
-         YCQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PIRb6+ovxp5J4uJ1hVDeWHpfyBDCzaaTh1iPpdxBBXo=;
-        b=T0vwXqjI1euonlKYp1ll9ruQCF1TbdDV02UfgnOrLptABZmmwKsTf1b2ees5sWq1C/
-         nAUnKwObBkhywRbQVHeUneN++0wgKKQ4v8rZiLsMUAoWGc/UyegVam3pL917xUsuMyiW
-         PBJ2gtJaTW5+p/hnxeWxgMeNiIHdiBsgiNLsmqCZaRnb7uC24Bkaq2SBA5NSYmHGgl1I
-         +sHiBpro47E5YvWKFi/ywOeBj9U04O63IUiU3F0iKktBckYbmRqdhBa1a9ZdFifHA4c1
-         gGJzBgfSNdkE3EtV36EmWiDJn039zv6rHgoPJ39M5VNu8tDpp9Y0VkZWo1vahenkN/eS
-         NfYg==
-X-Gm-Message-State: ACrzQf0ZaT244exBLFa1BLSPLNTzPzapARjjUR/AKqqXoOEacRiQ/BoH
-        NI5p3nCEhhrAAKv4oIAfF/rbvw==
-X-Google-Smtp-Source: AMsMyM7vsZ30ExGufg/GPlnIb76AAev1l4p5ZYo9iokYaR6mEcu4bpMFXgiNWD7ik43HxyivyjTj/A==
-X-Received: by 2002:a17:903:50e:b0:182:631b:df6f with SMTP id jn14-20020a170903050e00b00182631bdf6fmr20228449plb.66.1666369098415;
-        Fri, 21 Oct 2022 09:18:18 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id t3-20020a170902b20300b0017f61576dbesm14948739plr.304.2022.10.21.09.18.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Oct 2022 09:18:17 -0700 (PDT)
-Date:   Fri, 21 Oct 2022 16:18:14 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     Vishal Annapurve <vannapurve@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        with ESMTP id S230436AbiJUQTy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 12:19:54 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D557D4456E;
+        Fri, 21 Oct 2022 09:19:36 -0700 (PDT)
+Received: from zn.tnic (p200300ea9733e769329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e769:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 0CC6D1EC0731;
+        Fri, 21 Oct 2022 18:19:34 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1666369174;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=osvnA1VVG8lOO7CofSEE3U1qKE+FmJzIhRV7z1btuj4=;
+        b=kTrJPiFSirvT8QAitnYEpzpcdMbtcXA5yOQxTep7XgZPzoZ7lttGRZVygRLbYsnaOD+LzU
+        /RhEgA3iGecU55zSIGnw2ZiO8DllFm7LXz29lmQH3D3HkNrqJcr2lCuQHbKV8uRxNlwMvW
+        ITkPMYEdCWAcH8rJMRHThhLuixBO9Z8=
+Date:   Fri, 21 Oct 2022 18:19:29 +0200
+From:   Borislav Petkov <bp@alien8.de>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
-Message-ID: <Y1LGRvVaWwHS+Zna@google.com>
-References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
- <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
- <CAGtprH_MiCxT2xSxD2UrM4M+ghL0V=XEZzEX4Fo5wQKV4fAL4w@mail.gmail.com>
- <20221021134711.GA3607894@chaop.bj.intel.com>
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Tim Chen <tim.c.chen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "Chang S. Bae" <chang.seok.bae@intel.com>,
+        Jane Malalane <jane.malalane@citrix.com>,
+        Kees Cook <keescook@chromium.org>,
+        Kan Liang <kan.liang@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jiri Olsa <jolsa@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        linux-perf-users@vger.kernel.org,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH v2 2/5] x86/cpuid: refactor
+ setup_clear_cpu_cap()/clear_cpu_cap()
+Message-ID: <Y1LGkTXCksqAYLHD@zn.tnic>
+References: <20220718141123.136106-1-mlevitsk@redhat.com>
+ <20220718141123.136106-3-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221021134711.GA3607894@chaop.bj.intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <20220718141123.136106-3-mlevitsk@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 21, 2022, Chao Peng wrote:
-> > 
-> > In the context of userspace inaccessible memfd, what would be a
-> > suggested way to enforce NUMA memory policy for physical memory
-> > allocation? mbind[1] won't work here in absence of virtual address
-> > range.
+On Mon, Jul 18, 2022 at 05:11:20PM +0300, Maxim Levitsky wrote:
+> Currently setup_clear_cpu_cap passes NULL 'struct cpuinfo_x86*'
+> to clear_cpu_cap to indicate that capability should be cleared from boot_cpu_data.
 > 
-> How about set_mempolicy():
-> https://www.man7.org/linux/man-pages/man2/set_mempolicy.2.html
+> Later that is used in clear_feature to do recursive call to
+> clear_cpu_cap together with clearing the feature bit from 'cpu_caps_cleared'
+> 
+> Remove that code and just call the do_clear_cpu_cap on boot_cpu_data directly
+> from the setup_clear_cpu_cap.
+> 
+> The only functional change this introduces is that now calling clear_cpu_cap
+> explicitly on boot_cpu_data also sets the bits in cpu_caps_cleared,
+> which is the only thing that makes sense anyway.
+> 
+> All callers of both functions were checked for this and fixed.
 
-Andy Lutomirski brought this up in an off-list discussion way back when the whole
-private-fd thing was first being proposed.
+Change looks ok. What I can't grok is this sentence: what was checked
+and fixed where?
 
-  : The current Linux NUMA APIs (mbind, move_pages) work on virtual addresses.  If
-  : we want to support them for TDX private memory, we either need TDX private
-  : memory to have an HVA or we need file-based equivalents. Arguably we should add
-  : fmove_pages and fbind syscalls anyway, since the current API is quite awkward
-  : even for tools like numactl.
+What does need fixing and why?
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
