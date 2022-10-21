@@ -2,166 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 855A4606FCE
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 08:04:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5F33607039
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 08:43:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230047AbiJUGEz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 02:04:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59984 "EHLO
+        id S229732AbiJUGng (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 02:43:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229613AbiJUGEx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 02:04:53 -0400
-Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C680D27DC6
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 23:04:47 -0700 (PDT)
-Received: by mail-ot1-x32a.google.com with SMTP id f4-20020a9d0384000000b0066208c73094so1268905otf.0
-        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 23:04:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=atishpatra.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=X/GRjlz3OBLLftzrQwN2BllHc/DggggRf8lVr8VG4SA=;
-        b=PlbM5iStfkae1Q3fuihRV3OvtIMUFdbkjn19h/HY9jKFba1Tf4urYPX0EG/zB7yatG
-         s7vi3YRFmTBcLp1LBp6rk7GZYOgD1/amQUMV/ti4hR0UXKg4gZbsYdrIwLIUYvM2zsmx
-         6gTBEYHnhNuL58sglAB9TkyAsGMYRAk/2FexE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X/GRjlz3OBLLftzrQwN2BllHc/DggggRf8lVr8VG4SA=;
-        b=CoAty6faqy5SWRqTOz2VmIixA9ZfMBVkKsjNJV6TGzPNEnppdCDUaB9wrE0jtYEw9o
-         Yc/gwR+e15QdxsnPBHNfczRpCEUR4AH/Jxc9JMJYYIgHGRMM+/kwMW/jvZ9Hn+HUgnu/
-         cKXbf7jA8aa/Du2+WnTcO00m7xkDstn+gaDK/6LbxVevK6aQqMTlGBBIRnMUPDii+igC
-         SQK4q9qhEFn5j7BsWvVZaQXn40ev4oeBXjym0qwAOfw6akgcCza8cBfuRDjMhYO7npbo
-         qs+aVfFC0ZmOjhYsaEkfdRj6NLGhlttxZhC5M35kV+4D+R8suhekby8+hK5fHGJ5b3Q9
-         Z50g==
-X-Gm-Message-State: ACrzQf27rPXdXoZX+AuLOBTPuCCXJn8CHeTi647poCXXVHQparY1nbdH
-        XvW/m1JtiIUWOSZbbKJiVYwDndvw0ZyiE82jK8t8
-X-Google-Smtp-Source: AMsMyM7K0WAbqwMo/2+Tsz5RDOWzcEbuFbaCbLvJ8fnArjfYzaxeNfAApLoIPWQ2DzfEEIfMA3J1eUSOnC2ZFwE0G5c=
-X-Received: by 2002:a05:6830:6611:b0:662:2725:d309 with SMTP id
- cp17-20020a056830661100b006622725d309mr507738otb.293.1666332286395; Thu, 20
- Oct 2022 23:04:46 -0700 (PDT)
+        with ESMTP id S229484AbiJUGne (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 02:43:34 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE82C242C81
+        for <kvm@vger.kernel.org>; Thu, 20 Oct 2022 23:43:33 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29L6cRri009688
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 06:43:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=VGvpVhoP5PUA4LNMhvD3mrf+XZkV1ppVkgRUajdJGQw=;
+ b=s/8+yi7j3PPxRSUf6NTn3BH9xXaoIFQLD6mypLy31pQdoC0//oYer8C8Zx/4vlAi/yTR
+ z23X5OISBxbGUhZAHxm/V3qeoTYE7GOj7vTXnUM1hVF2RBjWSha80eKt2r/U3aX6RMT0
+ kXI2h+RR7MdBittJWCCdXfKb3DlX1EU86qD7FFCs0Nbg3/DY+VERxq4hmCHv1otIdSeD
+ 9QlZZidtbWq65VI02TtCIaqZYQcDwIaRfn9eUrbxifzUIjYPsSV0AdEHc+EpN1xgkZGa
+ umqxK7mxQc7OlHy/kKOJeGdTyweDnmjQeiGOb+6nF5mMO30sXhpWgIpZyqRjSxs9v9C+ kQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kbp1y8mjd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 06:43:33 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29L6MYaQ025926
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 06:43:33 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kbp1y8mhq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Oct 2022 06:43:33 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29L6aMFK021410;
+        Fri, 21 Oct 2022 06:43:30 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03fra.de.ibm.com with ESMTP id 3k7mg9fj60-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Oct 2022 06:43:30 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29L6hRmp2294414
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 21 Oct 2022 06:43:27 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4BC6F11C050;
+        Fri, 21 Oct 2022 06:43:27 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9B41511C04A;
+        Fri, 21 Oct 2022 06:43:26 +0000 (GMT)
+Received: from linux6.. (unknown [9.114.12.104])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 21 Oct 2022 06:43:26 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     imbrenda@linux.ibm.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        scgl@linux.ibm.com, thuth@redhat.com
+Subject: [kvm-unit-tests PATCH v3 0/6] s390x: PV fixups
+Date:   Fri, 21 Oct 2022 06:38:56 +0000
+Message-Id: <20221021063902.10878-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <20221019114535.131469-1-apatel@ventanamicro.com>
-In-Reply-To: <20221019114535.131469-1-apatel@ventanamicro.com>
-From:   Atish Patra <atishp@atishpatra.org>
-Date:   Thu, 20 Oct 2022 23:04:35 -0700
-Message-ID: <CAOnJCUJYQegEa3H+1drGAcy5ptEku9A3gtKWkOm=imC62S4UZw@mail.gmail.com>
-Subject: Re: [PATCH] RISC-V: KVM: Fix kvm_riscv_vcpu_timer_pending() for Sstc
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-        version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: xdV24ZERE4hzBVKuRLJA2_MHxkj5wmBP
+X-Proofpoint-GUID: G_V-rcLr-oMFjg5fybpYdY2HtSQx314D
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-21_01,2022-10-20_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxlogscore=744 phishscore=0 impostorscore=0
+ adultscore=0 malwarescore=0 priorityscore=1501 mlxscore=0 suspectscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210210038
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 19, 2022 at 4:45 AM Anup Patel <apatel@ventanamicro.com> wrote:
->
-> The kvm_riscv_vcpu_timer_pending() checks per-VCPU next_cycles
-> and per-VCPU software injected VS timer interrupt. This function
-> returns incorrect value when Sstc is available because the per-VCPU
-> next_cycles are only updated by kvm_riscv_vcpu_timer_save() called
-> from kvm_arch_vcpu_put(). As a result, when Sstc is available the
-> VCPU does not block properly upon WFI traps.
->
-> To fix the above issue, we introduce kvm_riscv_vcpu_timer_sync()
-> which will update per-VCPU next_cycles upon every VM exit instead
-> of kvm_riscv_vcpu_timer_save().
->
-> Fixes: 8f5cb44b1bae ("RISC-V: KVM: Support sstc extension")
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> ---
->  arch/riscv/include/asm/kvm_vcpu_timer.h |  1 +
->  arch/riscv/kvm/vcpu.c                   |  3 +++
->  arch/riscv/kvm/vcpu_timer.c             | 17 +++++++++++++++--
->  3 files changed, 19 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/riscv/include/asm/kvm_vcpu_timer.h b/arch/riscv/include/asm/kvm_vcpu_timer.h
-> index 0d8fdb8ec63a..82f7260301da 100644
-> --- a/arch/riscv/include/asm/kvm_vcpu_timer.h
-> +++ b/arch/riscv/include/asm/kvm_vcpu_timer.h
-> @@ -45,6 +45,7 @@ int kvm_riscv_vcpu_timer_deinit(struct kvm_vcpu *vcpu);
->  int kvm_riscv_vcpu_timer_reset(struct kvm_vcpu *vcpu);
->  void kvm_riscv_vcpu_timer_restore(struct kvm_vcpu *vcpu);
->  void kvm_riscv_guest_timer_init(struct kvm *kvm);
-> +void kvm_riscv_vcpu_timer_sync(struct kvm_vcpu *vcpu);
->  void kvm_riscv_vcpu_timer_save(struct kvm_vcpu *vcpu);
->  bool kvm_riscv_vcpu_timer_pending(struct kvm_vcpu *vcpu);
->
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index a032c4f0d600..71ebbc4821f0 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -708,6 +708,9 @@ void kvm_riscv_vcpu_sync_interrupts(struct kvm_vcpu *vcpu)
->                                 clear_bit(IRQ_VS_SOFT, &v->irqs_pending);
->                 }
->         }
-> +
-> +       /* Sync-up timer CSRs */
-> +       kvm_riscv_vcpu_timer_sync(vcpu);
->  }
->
->  int kvm_riscv_vcpu_set_interrupt(struct kvm_vcpu *vcpu, unsigned int irq)
-> diff --git a/arch/riscv/kvm/vcpu_timer.c b/arch/riscv/kvm/vcpu_timer.c
-> index 185f2386a747..ad34519c8a13 100644
-> --- a/arch/riscv/kvm/vcpu_timer.c
-> +++ b/arch/riscv/kvm/vcpu_timer.c
-> @@ -320,20 +320,33 @@ void kvm_riscv_vcpu_timer_restore(struct kvm_vcpu *vcpu)
->         kvm_riscv_vcpu_timer_unblocking(vcpu);
->  }
->
-> -void kvm_riscv_vcpu_timer_save(struct kvm_vcpu *vcpu)
-> +void kvm_riscv_vcpu_timer_sync(struct kvm_vcpu *vcpu)
->  {
->         struct kvm_vcpu_timer *t = &vcpu->arch.timer;
->
->         if (!t->sstc_enabled)
->                 return;
->
-> -       t = &vcpu->arch.timer;
->  #if defined(CONFIG_32BIT)
->         t->next_cycles = csr_read(CSR_VSTIMECMP);
->         t->next_cycles |= (u64)csr_read(CSR_VSTIMECMPH) << 32;
->  #else
->         t->next_cycles = csr_read(CSR_VSTIMECMP);
->  #endif
-> +}
-> +
-> +void kvm_riscv_vcpu_timer_save(struct kvm_vcpu *vcpu)
-> +{
-> +       struct kvm_vcpu_timer *t = &vcpu->arch.timer;
-> +
-> +       if (!t->sstc_enabled)
-> +               return;
-> +
-> +       /*
-> +        * The vstimecmp CSRs are saved by kvm_riscv_vcpu_timer_sync()
-> +        * upon every VM exit so no need to save here.
-> +        */
-> +
->         /* timer should be enabled for the remaining operations */
->         if (unlikely(!t->init_done))
->                 return;
-> --
-> 2.34.1
->
+A small set of patches that clean up the PV snippet handling.
 
-Ahh. That's a tricky one. Thanks for fixing it.
+v3:
+	* Dropped asm snippet linker script patch for now
+	* Replaced memalign_pages_flags() with memalign_pages()
+	* PV ASCEs will now recieve DT and TL fields from the main test ASCE
 
-Reviewed-by: Atish Patra <atishp@rivosinc.com>
+v2:
+	* Macro uses 64bit PSW mask
+	* SBLK reset on PV destroy and uv_init() early return have been split off
+
+
+Janosch Frank (6):
+  s390x: snippets: asm: Add a macro to write an exception PSW
+  s390x: MAKEFILE: Use $< instead of pathsubst
+  lib: s390x: sie: Improve validity handling and make it vm specific
+  lib: s390x: Use a new asce for each PV guest
+  lib: s390x: Enable reusability of VMs that were in PV mode
+  lib: s390x: sie: Properly populate SCA
+
+ lib/s390x/asm-offsets.c                  |  2 ++
+ lib/s390x/sie.c                          | 37 +++++++++++++-------
+ lib/s390x/sie.h                          | 43 ++++++++++++++++++++++--
+ lib/s390x/uv.c                           | 35 +++++++++++++++++--
+ lib/s390x/uv.h                           |  5 ++-
+ s390x/Makefile                           |  2 +-
+ s390x/cpu.S                              |  6 ++++
+ s390x/snippets/asm/macros.S              | 28 +++++++++++++++
+ s390x/snippets/asm/snippet-pv-diag-288.S |  4 +--
+ s390x/snippets/asm/snippet-pv-diag-500.S |  6 ++--
+ 10 files changed, 140 insertions(+), 28 deletions(-)
+ create mode 100644 s390x/snippets/asm/macros.S
+
 -- 
-Regards,
-Atish
+2.34.1
+
