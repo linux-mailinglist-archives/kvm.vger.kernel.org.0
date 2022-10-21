@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E16B606FCC
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 08:04:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A9358606FD1
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 08:05:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230018AbiJUGEi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 02:04:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58226 "EHLO
+        id S230074AbiJUGFk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 02:05:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229998AbiJUGEg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 02:04:36 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6023221E20;
-        Thu, 20 Oct 2022 23:04:29 -0700 (PDT)
+        with ESMTP id S230048AbiJUGFj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 02:05:39 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D43E31EF2;
+        Thu, 20 Oct 2022 23:05:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666332271; x=1697868271;
+  t=1666332334; x=1697868334;
   h=date:from:to:cc:subject:message-id:reply-to:references:
    in-reply-to:mime-version;
-  bh=O+bzw3s2LWrNgnmWD/ZLsQK8uzFcemCMCSeJuewmOXM=;
-  b=n3kNNsCkaNUWELrscfLZrwiNBbgLStpNq3fI2s0O61KeVqDfoZQ+O/2l
-   f3M6ttrxw1lQ9nWLdrvCDZZGN5sy71rW2OcCH3QCCq+zzELH28iDZmULw
-   KsqEqR6XAYkyfd2GLywdvZncQjQzCwa+gODXJnW912O4V3GctYHaKobCF
-   c3muxR/+kXRaSv23XND2uR9UridU6aml1UIsoGwpV3wGYVkvcspZ9baly
-   d21bSGLP71hNL+jot3reLgTEEphUAolji0SmDYkMEQsiTEDFaR16yJPDW
-   ILI8ljtYeB4Mh6A9CH9EZTihnwDbdCh55sKt1A1zeADS3f5Lo1gieitUg
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10506"; a="308018326"
+  bh=NkR1KXHj2YetnyqhSLw0CykjNKNOHs0bjKs9vmGB4b0=;
+  b=X+qJsEs/ij04l7KOE+8dDtrYI9tLivD9oXxFLL7B9gdQGDI/uK2XCYUV
+   opxxXnZo79AGAR6YLYssinBs/K1BCD1KzZvEesgjuNxZwv947wjJA82a8
+   b/DLtfiR2xIcxuCZKvs0VkQi5QOVrwmdN5vUKMKjl3cFhN/GVZ7pJf9h2
+   oLnBEKK5ytux/QjF7HLPWDiXJ6Sl7lfeauu+qD52KdT0CdV9z4IxpmiNR
+   DIPU+HXB/RxLc/g7DBB0SkeGFqNdwMcld0Dbl572TnNd6KdcdVfdomRVW
+   0alGriH/23fBricLnn6KnDavwtHb0ktgCf8mjIPIg8W/Y7zdU5l9H2o+i
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10506"; a="287321956"
 X-IronPort-AV: E=Sophos;i="5.95,200,1661842800"; 
-   d="scan'208";a="308018326"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2022 23:04:28 -0700
+   d="scan'208";a="287321956"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2022 23:05:31 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10506"; a="630302500"
+X-IronPort-AV: E=McAfee;i="6500,9779,10506"; a="719524229"
 X-IronPort-AV: E=Sophos;i="5.95,200,1661842800"; 
-   d="scan'208";a="630302500"
+   d="scan'208";a="719524229"
 Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga002.jf.intel.com with ESMTP; 20 Oct 2022 23:04:28 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+  by FMSMGA003.fm.intel.com with ESMTP; 20 Oct 2022 23:05:31 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
  fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 20 Oct 2022 23:04:28 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ 15.1.2375.31; Thu, 20 Oct 2022 23:05:31 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 20 Oct 2022 23:04:27 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ 15.1.2375.31; Thu, 20 Oct 2022 23:05:30 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31 via Frontend Transport; Thu, 20 Oct 2022 23:04:27 -0700
+ 15.1.2375.31 via Frontend Transport; Thu, 20 Oct 2022 23:05:30 -0700
 Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.31; Thu, 20 Oct 2022 23:04:27 -0700
+ 15.1.2375.31; Thu, 20 Oct 2022 23:05:30 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GUi0LqEB3dx/jkU7kSTkRGEN3XLEkiKl6rhm+dtGmPpiVXNoESWURAmADzu+WY+W+TCIafyW/oW1u3JVAtdzv05bBqpdxxx9I6GAdiBBpqX8akZUHaLEoxwJ6pUxBL+OrbxMOCOecg623uoR17jTBDkOO7uaTp6+Z0b2AKL+O6jvlON/4eyOpscfcGe0ZYqCDz2uNwqF97B9l1yAvTLAdGq2gfOU4yvgCISrev8qxoUcCTwSDJbKUjNWCKuel0xhUGVmcoIml6Ndebet4N6X4KbfyFveTMAOqODO5fjmyKDcv/qnAIO0q3Z5nffORw7rpwJgXxsDQqk3Bq4wsCw5RQ==
+ b=cZMuPfXy7jsZH9F5kplRRo7qfsr5355wU+2fNAJ1rYvzIgGka3ev7DdYzMaaJ2ZVKWm2bIX35sZIJHUlvrrN/nVl6Nv7m+U6o6+RI20D7xeR4E5gP3ShfX92MHoEtd2Ze+UGuMFOJq+HmNAJjy/YKTSuwv+Ya6Wn3lz4VR2oquOolkDYIL71vv77HdgpgMaR/OUZ9oca0GVBe3ggDqhRwMF897tgGVa1W+azJ0cIXgQVFAEtpQ85BgXnGZt6bX4dmqQIFMHM3JpD4yPycEJ6EmFYdKny6X98HwbMizPeEeagrKncwIAY2LF8yEIy5VUkx1enm85LvUWYi6yRvlVvvQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sDPfySK/bPIZsuAiYT7j0tUxLxr4p0rKBRElQT6b7Pc=;
- b=RMnGRgb/RWty8PChhESK5QyyoBk9hD6Mmjs9umj920i9K68w2E5PBFtSa/G1dJMm9hRqX35kT6udHE4lmK+LGunAwb7be5hA2mSpGOVyct8HhZWM3dEbQToHksiSX4Yg+MPLo9hlBLYvljPBPp9WrQO8fmsSLjF8Np33cuj20Mi5Thd+CfwMXGbtcS3w1XpS8IFcq/o9GreacVkIliTUU5rap97Xq9wXd4K61b+3FW5d0gKUdCUUnM0FOirSXpFgVnX5ZimAHihijLyai61LromAHi79BS2eQh+/mXINVwf1+wcymXSUSQiYrdFrYBre1g6nT3xPqyBmquqBOT1pGw==
+ bh=p33PNn48zZCeAbIRv1HmKU2zKuBIwOLVFkO8M7n6R4c=;
+ b=cmaSN7BKv0d2Z6aTbcmkWqQi2WYp66ZFPaUKyQRYK8U7xenjNkhYfrLkk4/kBfo11goblbasqNcHVNrmRbk+jwULQUOgxL+VHZ4o8BIl54O05B/eDx3t0qBbvnZlD/eMy8Z+tSgu9znRgfhZHrFQ32XI/4SdIO68by6fTt6mjCCka1G/SokG6EADn1h0aDyt8RJaoRMIDIsObKFBWhVAw3P67EBtXOKVxGrSP+LgZHBj4Lqud9IgFsHEDaOx1Z1bPXBI2dNo7UD+bGNgF96bbZBbJzRhuhp32MJth1nAyXkkQrifC3Tch15zVTZkYJZZ2C03BB1QlBbN9pnagFNKpg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
@@ -70,84 +70,83 @@ Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
  MW4PR11MB7054.namprd11.prod.outlook.com (2603:10b6:303:219::20) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.32; Fri, 21 Oct
- 2022 06:04:24 +0000
+ 2022 06:05:27 +0000
 Received: from DS7PR11MB5966.namprd11.prod.outlook.com
  ([fe80::e1be:376b:2662:16ad]) by DS7PR11MB5966.namprd11.prod.outlook.com
  ([fe80::e1be:376b:2662:16ad%3]) with mapi id 15.20.5723.033; Fri, 21 Oct 2022
- 06:04:24 +0000
-Date:   Fri, 21 Oct 2022 13:41:51 +0800
+ 06:05:27 +0000
+Date:   Fri, 21 Oct 2022 13:42:54 +0800
 From:   Yan Zhao <yan.y.zhao@intel.com>
 To:     Sean Christopherson <seanjc@google.com>
 CC:     Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, Mingwei Zhang <mizhang@google.com>,
         "David Matlack" <dmatlack@google.com>,
         Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH v6 7/8] KVM: x86/mmu: explicitly check nx_hugepage in
- disallowed_hugepage_adjust()
-Message-ID: <Y1IxH/GEa/LddQqU@yzhao56-desk.sh.intel.com>
+Subject: Re: [PATCH v6 5/8] KVM: x86/mmu: Track the number of TDP MMU pages,
+ but not the actual pages
+Message-ID: <Y1IxXviByW9/jCgr@yzhao56-desk.sh.intel.com>
 Reply-To: Yan Zhao <yan.y.zhao@intel.com>
 References: <20221019165618.927057-1-seanjc@google.com>
- <20221019165618.927057-8-seanjc@google.com>
+ <20221019165618.927057-6-seanjc@google.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20221019165618.927057-8-seanjc@google.com>
-X-ClientProxiedBy: SG2PR02CA0097.apcprd02.prod.outlook.com
- (2603:1096:4:92::13) To DS7PR11MB5966.namprd11.prod.outlook.com
+In-Reply-To: <20221019165618.927057-6-seanjc@google.com>
+X-ClientProxiedBy: SG2PR01CA0116.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:40::20) To DS7PR11MB5966.namprd11.prod.outlook.com
  (2603:10b6:8:71::6)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|MW4PR11MB7054:EE_
-X-MS-Office365-Filtering-Correlation-Id: 53a30611-7d9d-4887-ae7d-08dab32a1aad
+X-MS-Office365-Filtering-Correlation-Id: 19c7bd5e-a0ad-425c-2172-08dab32a4050
 X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: rsLSkbC1ptLu+SS1TtSu7FZj84uAks7Y+Ma1RAzbrPS6NM33QvR/RK1/EWqnE8zOoHwJZc+aUjOIrV7bSr70xCyp/2zfT122waUKNxZbO71kUWmSyePVCPVhW6lf3sEBzKuyYpwmzA95eTTs7oRKFj5qso2lMU7mcE+XXe5EBXI3Nrmmtl1td74AkkF3QD8r3UZYOCahMKnV3y2dPIVx8GypozJABKy5hAAHcYsHDvJtOHgCD1YhueoKvEPmSQWqMYpnSTiPPAtJhga+MsAfFDbVIDoML9uIUJl2DP+96qRyNTSQM/m2HnN7cgUlyNjzVZET7dGD+NRu6/wpme0AnC/eqbZg+oKB6BsAcoULNlLYwC2x4juMekRcRqdjms5MTVEOoGmE9chn1FEXnwjtEMyVLUNt09uSl7li2/mGkLmHGDiwbJqlO08eZ8Y1x0YT+EtV9pW3KY/BzR0W74RKauBZDYOIDQ/0yAPJUYBa040FH1oQFRu6mW+csV52nw2reEy2DHbeK0KsdKxuGxCXE3n2vqvEraFW3ueXc0AUleBdNXXJ0NLp1AGw1/3U3yd2rh0BYS9WSsezO1XZA18GNpUHFsnPZCHn00WGNTmypV7LkQnCc+WQy4ewORj5ZSueJhQvISQVjFZDdtVfChu7JjQWqJYSEEmQZZ0X71EdX4VE+Zgymy/NXP2m1pQIgUCtPQkm68cxjgrIyiNOTvS3hg==
+X-Microsoft-Antispam-Message-Info: thXgazk24fJnjd5RktJyxVo4yqrtYi8JDJE4E3tA816i9KPxaUxXCnzLx84Z2SAFYhAGecv0EJuxiL6MjSUT2O7xBiaCMpmEr05zazLdY/WvSuJVmT1RaWCrhf4xFdpeEYWbuIrtT81m/ZDdxVST0NzQ79k7pX2iDvm5Ucty4uwbiw+tbacINClGujIuewOWi/Ns/w8vRbNqQWDXNZQtz5xgZ7oImsXxVyxtFFr9uxLkUDtavv84kswKumxLeqbFkXBNCIXpTgayMlSoU+8ZaM6KaCJ7CixppVzVeKCcrJ1DesPMYDdNmgBwyjuAgp/cqQw6v+BjL/mT1iHkkO380YEn8z3D6yrKELQZ3QKu4efX8EVUTz5hCV49QbemQdDhOw1Bgmo4Ln8nWiFB5r+q3HR4LCekbc1qtCfPURHNtJlGM7ZvWLgG90jIdLbrIlBESYg6DCWXFKdQihy2LBNLkSy5r9/eNRpPaU1m3f3vMES3HkMcgw7S1Z+yD8BEdseB4a2NNp0hOUQhB2PiYGX8yGw69BaodN3EzJdyEZHVD6Rsc9Od18QdGno/rtfBdT9GsJ1kI0o/9ZmrFKOwSbc/lyAR3jZHFkjn040JM9HtuxfqgVOL46ksw194KKOahCEBI6NGIWp/fHCqblAYPQTTXjwMbG/bBXWthChjeHZePvWK6wpit0g/aO5mFQO6ut2bmwU5M3doWIWrGYrbL1dh3A==
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(366004)(39860400002)(136003)(396003)(376002)(451199015)(8936002)(2906002)(86362001)(82960400001)(5660300002)(66476007)(41300700001)(3450700001)(4326008)(38100700002)(66556008)(6506007)(66946007)(8676002)(316002)(6486002)(186003)(6916009)(54906003)(6666004)(26005)(83380400001)(6512007)(478600001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?0CRrRJyWg9e1vDKVIsKbWdLA1WJu8irxJwrP2+6yzcFDpnw3tuTabPPeVLcc?=
- =?us-ascii?Q?xYPtrbq+j27h9FUt5Y0vrcRrwfoi1farqu5aszUYMHB23R6RI8QqLgK+KVDO?=
- =?us-ascii?Q?tQbVGcWWcZIEcqhBMWV8M/JC3HwBYGTsPoseKPklwhc+93dWBYwIZkagnP4F?=
- =?us-ascii?Q?Hrppvo7N1d+MH1siF/n5304GYYrRpX40eCIN4KI6bwTju1+pxm3mVCH+RAD2?=
- =?us-ascii?Q?ik/zYGyUeMSo5nyad9nqbkf9RZk8pnXTjqfjCsakAaIxOdfujzmOJ2/dKjkY?=
- =?us-ascii?Q?X9q8+7LMkcc4D1wLXZZmn1ltumguHN5Y05hPJysL3ye4wXlD3xCWRDOkxaNA?=
- =?us-ascii?Q?ZU0Mp4bwwB19z1m7Ut8+TiiSKn9C1nycfrgCZjJNy55A2BkrUq0bSqFc/ujm?=
- =?us-ascii?Q?tmlXKzy8IhDQj1uDzxiYS8Uyu2CssI6iCaIQ6u4hQDaN7NmX3fQ+OmAltSZE?=
- =?us-ascii?Q?31hd+b8UaDXPwtV80+gIOEfq0F6CyDebPDQUxBZmdxZGkn7c6hx9HiP5lYY1?=
- =?us-ascii?Q?X7BlWkfRIVrm15mZxR8QRvO8/uSrwRSV/NA3fSIcvyYsehRL8gs7aUdxuJht?=
- =?us-ascii?Q?F53itfjtg6HZULHXyOlWFA/jgGDV9gH9NLMi6YDOaFdS7ISUVtf7H+HBJ/t8?=
- =?us-ascii?Q?+/8doAWNU9dWn1cHqVb2T2m8/nTIgLADXBjxqvrn0IAHJz2sJQdb8ucrMnKY?=
- =?us-ascii?Q?4dxv16InhAqM1MOf/44FmfpI93BHyIuFlTVnn7w5cx3m47N04FiDR4SWCVkl?=
- =?us-ascii?Q?6MHiJPzJn7GiscZkdiRbSUS5qMSSzsIwB7xE9aD350HWOCIP5yvhpFdmAXAP?=
- =?us-ascii?Q?Hy7U9GAEBalOBqYJGOCPkRonggfscQvzTknJlgmR/VUB0pnJQiZIG/8TrI1a?=
- =?us-ascii?Q?Fp5SblC8oTWKPhwD9X4kBepX6oj9WkQSb3Vb+XQUDxnVe3Ptmdwyqf0hZkns?=
- =?us-ascii?Q?YtzNhiI5nCPjolmGgsK0Gi6jVCccoawjh/C6Zf9dj4EvFXDRRDscq2ua6LL1?=
- =?us-ascii?Q?rISstipamOk3k4ele1HeywvLtfmAZUmZzeQWg0PbuC3IOxeXsX/DU/RIk7B2?=
- =?us-ascii?Q?bMihlf0gSH460rNLMqi9hPY1d6ZRAG0grVHO1uGkiEwRQbFxvTK68WDtbYeQ?=
- =?us-ascii?Q?ZybzuMxN32tnLWrAav1y6i9x0j2zIrmk3vsH4uKVnVUmEZogOVHPUyiX4I9R?=
- =?us-ascii?Q?8q8uGYxKWPZAnzzmWBEqKofZJtVFB/4+rR19Y53Gh8/ifOs6+TZ5l9UTd6E0?=
- =?us-ascii?Q?oSfljxY77w996uYlb7Gpr81q8Ekfy/wvIPz39GLXM/R+nhP3bBCgJ0BEnH16?=
- =?us-ascii?Q?tN1nhI2azMJ0aoshh1IccfOSqOZdbzlvCrmAvI86VyNI17wJkFZboN9Q0/kS?=
- =?us-ascii?Q?UMYi/y1yCLhkCRPK9EEtGvqciQ6BtnaexQakgKRNJORfKBZyxyE/WOsbIx3T?=
- =?us-ascii?Q?4W46QNxmNxwfHnm/mMUs3XnwVagRpAmYMjzNrbhkFW7UE8JodVwXXMAo8XDw?=
- =?us-ascii?Q?FfJvQprXMBvG/ZRfWKx8a8FswzM6bOb5m2hO/w8Hlct0dq5pBQQ5AwTVPzlq?=
- =?us-ascii?Q?rUtxEssFm0I7LguHUWlCCXnL7EXhSJQZNmhT0NWYxvbsWv9o+xp/uxzoKxp2?=
- =?us-ascii?Q?0g=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 53a30611-7d9d-4887-ae7d-08dab32a1aad
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?my3zZb0PYxefXT39L4m39M8hncg5+qpzPQWnY8rvaAWzFV4Ut/IRoUBOTrH7?=
+ =?us-ascii?Q?yRv2etvxeSnMktC3K+9MN1IhDP9buuM+bNhWrn7jVbfQ1n2Ul+IE/aXVHs8z?=
+ =?us-ascii?Q?Eyd1HmfqNX94ZBouiDHHxdTziFwSptVLARz6dUsZlF4We2R3cnglJ9ywjymw?=
+ =?us-ascii?Q?27f2W9kTLB2knS6V5PyIujtzGfBKr3tufeU+AbCrKqIeEhxA6blLwXIbMeTD?=
+ =?us-ascii?Q?Hy1k9p2El+yWvJ9n8OqHs8/DFxD2w4C/W1UXsUGj7q1zyc8nkTJBAeTlJ2Ie?=
+ =?us-ascii?Q?bwUbAwdtLuGfrfrhhbKqm8MhI5edUh4FBbbg04Kn/IPOUAidXwbsgHZtS6NR?=
+ =?us-ascii?Q?iuKVKXdrAURcZI0H7Ey0T8YbI932vPObGU2VBoWQw05Gd177V+ZQc7ZOS5VM?=
+ =?us-ascii?Q?JXM1wS+JaJRRutzoer6I1WcRUaCJkuoAdEPusmFO5VSDgrb6QBllM7G73G3F?=
+ =?us-ascii?Q?9EPSzvLzAuIn6rzve1bw/ZgLs1aF3lpPs5la4W6cII+Fi/P57FXFTB5ya/uQ?=
+ =?us-ascii?Q?j2d1vKTk0BvOmZV77xfVmG6gmOmWReq75SbTnbIZ5F7mazegZ0F5ep0i+qEC?=
+ =?us-ascii?Q?Z3tYtTXQK50R7Ai09x+IGhCJuBawWjc80l/4hAd4w/AagOWtKHGdfs9X0RQ6?=
+ =?us-ascii?Q?iMekClYXI6FonF6+8sOQ6bIzH1vuRgJNPB5NwJDbBNAdUf/xU1ks4a/+tUyy?=
+ =?us-ascii?Q?qZaGRJ8aZ2yfFVxGv354rxaneZxaEuuQ6HU417yrUC6jMAU00hLNtuQnWWHM?=
+ =?us-ascii?Q?Ywbpf7oxlxOdalm1HwQFgOH6nDlFzrbXg1ycdnRhN/Z/0xzpoqH0PCPC3kE8?=
+ =?us-ascii?Q?uQj1SwhZrJMkrbY89uf/ED5vZf1yuN1tS8/WD8NycpAulo71Q/xBZUdjnU15?=
+ =?us-ascii?Q?U6DtyJBk/zxIjFFJiOS3E4pIujCJ7fznt6+rviHG4s7kSw34iHNYf42t0mN8?=
+ =?us-ascii?Q?CRXFjvGfAhfAung4xNrfsx838va8RQ/JFKTXSVtfGiDc3w3ee+ka6xye6rQC?=
+ =?us-ascii?Q?ZEBSLT3vKZdVquEZ5CbXtI7/Z3LLmbKkAF1FN85d0VQ2F6DQkxSoXRIkB9O+?=
+ =?us-ascii?Q?SdM5smcPZB1V3TLhORPvbBFUqkgX6vz26WVxGlyMEHK0W+Zo58/HnSyMROC2?=
+ =?us-ascii?Q?MT7NGt9EYNRYx78k+KQUDcxLE0RPdgtSnBHADg3SLuL15OtLmBpGxdzx4glZ?=
+ =?us-ascii?Q?x1eH7JYpbCzuyszvGBt/aqqpfx59CPDmNI/wTHtvs+PaonbHjmU3YY3nh1Tu?=
+ =?us-ascii?Q?AXBoki6cAiLi9FnGmemyoSNEUOYQBF80g4Gp2QR/9CmzU5HZ8Gqsv6wUwaiZ?=
+ =?us-ascii?Q?V5vjQPOxmnXWukT1RcUnyT95E2ZE5pKEz1fx3a5jm1JBIZtBqAvN7B3La22Z?=
+ =?us-ascii?Q?G4SPFh/Yo1MFKltTxzc3i1aQ1SDQkUjje6nNYTO54ZPxMYlW8bd7j4P36DcC?=
+ =?us-ascii?Q?eKVWW75JMLRARcJZvgBfmjBjsZwImd5AdIHiYVz4ZtYZvMPev/kfmnJZga4F?=
+ =?us-ascii?Q?rBZVvN4416ALrqR7NyaIVFL79pDg3nvysd3IFZ+b7r9RcUZ+0Hv0dyrL5rZY?=
+ =?us-ascii?Q?yclBwoqQxQ+4ODvCRRhL7tWZadbNXJTC1kGrFJ3A?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 19c7bd5e-a0ad-425c-2172-08dab32a4050
 X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2022 06:04:24.4872
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2022 06:05:27.6744
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EiEim62f+2YBQIVW6HZdbV3Y85K3DIrEGSO93/mDX/WwHH7xLwLvol52P4zI9tyqNEsIewrH8C9P9aWhVy3LAA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: TEBKJ/8/8t12XGgncwDv+2At3X5PiVqy1/hEoEO98Ht87XECU8+TjHTtIoIl8MsZWNEg/5vxWo1ncC4KLey6HQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB7054
 X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-4.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -156,53 +155,138 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Reviewed-by: Yan Zhao <yan.y.zhao@intel.com>
 
-On Wed, Oct 19, 2022 at 04:56:17PM +0000, Sean Christopherson wrote:
-> From: Mingwei Zhang <mizhang@google.com>
+On Wed, Oct 19, 2022 at 04:56:15PM +0000, Sean Christopherson wrote:
+> Track the number of TDP MMU "shadow" pages instead of tracking the pages
+> themselves. With the NX huge page list manipulation moved out of the common
+> linking flow, elminating the list-based tracking means the happy path of
+> adding a shadow page doesn't need to acquire a spinlock and can instead
+> inc/dec an atomic.
 > 
-> Explicitly check if a NX huge page is disallowed when determining if a
-> page fault needs to be forced to use a smaller sized page.  KVM currently
-> assumes that the NX huge page mitigation is the only scenario where KVM
-> will force a shadow page instead of a huge page, and so unnecessarily
-> keeps an existing shadow page instead of replacing it with a huge page.
+> Keep the tracking as the WARN during TDP MMU teardown on leaked shadow
+> pages is very, very useful for detecting KVM bugs.
 > 
-> Any scenario that causes KVM to zap leaf SPTEs may result in having a SP
-> that can be made huge without violating the NX huge page mitigation.
-> E.g. prior to commit 5ba7c4c6d1c7 ("KVM: x86/MMU: Zap non-leaf SPTEs when
-> disabling dirty logging"), KVM would keep shadow pages after disabling
-> dirty logging due to a live migration being canceled, resulting in
-> degraded performance due to running with 4kb pages instead of huge pages.
+> Tracking the number of pages will also make it trivial to expose the
+> counter to userspace as a stat in the future, which may or may not be
+> desirable.
 > 
-> Although the dirty logging case is "fixed", that fix is coincidental,
-> i.e. is an implementation detail, and there are other scenarios where KVM
-> will zap leaf SPTEs.  E.g. zapping leaf SPTEs in response to a host page
-> migration (mmu_notifier invalidation) to create a huge page would yield a
-> similar result; KVM would see the shadow-present non-leaf SPTE and assume
-> a huge page is disallowed.
+> Note, the TDP MMU needs to use a separate counter (and stat if that ever
+> comes to be) from the existing n_used_mmu_pages. The TDP MMU doesn't bother
+> supporting the shrinker nor does it honor KVM_SET_NR_MMU_PAGES (because the
+> TDP MMU consumes so few pages relative to shadow paging), and including TDP
+> MMU pages in that counter would break both the shrinker and shadow MMUs,
+> e.g. if a VM is using nested TDP.
 > 
-> Fixes: b8e8c8303ff2 ("kvm: mmu: ITLB_MULTIHIT mitigation")
-> Reviewed-by: Ben Gardon <bgardon@google.com>
+> Cc: Yan Zhao <yan.y.zhao@intel.com>
+> Reviewed-by: Mingwei Zhang <mizhang@google.com>
 > Reviewed-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> [sean: use spte_to_child_sp(), massage changelog, fold into if-statement]
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/kvm/mmu/mmu.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  arch/x86/include/asm/kvm_host.h | 11 +++--------
+>  arch/x86/kvm/mmu/tdp_mmu.c      | 20 +++++++++-----------
+>  2 files changed, 12 insertions(+), 19 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index f4f1b1591a02..14674c9e10f7 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3111,7 +3111,8 @@ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_
->  	if (cur_level > PG_LEVEL_4K &&
->  	    cur_level == fault->goal_level &&
->  	    is_shadow_present_pte(spte) &&
-> -	    !is_large_pte(spte)) {
-> +	    !is_large_pte(spte) &&
-> +	    spte_to_child_sp(spte)->nx_huge_page_disallowed) {
->  		/*
->  		 * A small SPTE exists for this pfn, but FNAME(fetch)
->  		 * and __direct_map would like to create a large PTE
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 0333dbb8ec85..bbd2cecd34cb 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1290,6 +1290,9 @@ struct kvm_arch {
+>  	 */
+>  	bool tdp_mmu_enabled;
+>  
+> +	/* The number of TDP MMU pages across all roots. */
+> +	atomic64_t tdp_mmu_pages;
+> +
+>  	/*
+>  	 * List of kvm_mmu_page structs being used as roots.
+>  	 * All kvm_mmu_page structs in the list should have
+> @@ -1310,18 +1313,10 @@ struct kvm_arch {
+>  	 */
+>  	struct list_head tdp_mmu_roots;
+>  
+> -	/*
+> -	 * List of kvm_mmu_page structs not being used as roots.
+> -	 * All kvm_mmu_page structs in the list should have
+> -	 * tdp_mmu_page set and a tdp_mmu_root_count of 0.
+> -	 */
+> -	struct list_head tdp_mmu_pages;
+> -
+>  	/*
+>  	 * Protects accesses to the following fields when the MMU lock
+>  	 * is held in read mode:
+>  	 *  - tdp_mmu_roots (above)
+> -	 *  - tdp_mmu_pages (above)
+>  	 *  - the link field of kvm_mmu_page structs used by the TDP MMU
+>  	 *  - possible_nx_huge_pages;
+>  	 *  - the possible_nx_huge_page_link field of kvm_mmu_page structs used
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 059231c82345..4e5b3ae824c1 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -29,7 +29,6 @@ int kvm_mmu_init_tdp_mmu(struct kvm *kvm)
+>  	kvm->arch.tdp_mmu_enabled = true;
+>  	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_roots);
+>  	spin_lock_init(&kvm->arch.tdp_mmu_pages_lock);
+> -	INIT_LIST_HEAD(&kvm->arch.tdp_mmu_pages);
+>  	kvm->arch.tdp_mmu_zap_wq = wq;
+>  	return 1;
+>  }
+> @@ -54,7 +53,7 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
+>  	/* Also waits for any queued work items.  */
+>  	destroy_workqueue(kvm->arch.tdp_mmu_zap_wq);
+>  
+> -	WARN_ON(!list_empty(&kvm->arch.tdp_mmu_pages));
+> +	WARN_ON(atomic64_read(&kvm->arch.tdp_mmu_pages));
+>  	WARN_ON(!list_empty(&kvm->arch.tdp_mmu_roots));
+>  
+>  	/*
+> @@ -377,11 +376,13 @@ static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
+>  static void tdp_account_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+>  {
+>  	kvm_account_pgtable_pages((void *)sp->spt, +1);
+> +	atomic64_inc(&kvm->arch.tdp_mmu_pages);
+>  }
+>  
+>  static void tdp_unaccount_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+>  {
+>  	kvm_account_pgtable_pages((void *)sp->spt, -1);
+> +	atomic64_dec(&kvm->arch.tdp_mmu_pages);
+>  }
+>  
+>  /**
+> @@ -397,17 +398,17 @@ static void tdp_mmu_unlink_sp(struct kvm *kvm, struct kvm_mmu_page *sp,
+>  			      bool shared)
+>  {
+>  	tdp_unaccount_mmu_page(kvm, sp);
+> +
+> +	if (!sp->nx_huge_page_disallowed)
+> +		return;
+> +
+>  	if (shared)
+>  		spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+>  	else
+>  		lockdep_assert_held_write(&kvm->mmu_lock);
+>  
+> -	list_del(&sp->link);
+> -
+> -	if (sp->nx_huge_page_disallowed) {
+> -		sp->nx_huge_page_disallowed = false;
+> -		untrack_possible_nx_huge_page(kvm, sp);
+> -	}
+> +	sp->nx_huge_page_disallowed = false;
+> +	untrack_possible_nx_huge_page(kvm, sp);
+>  
+>  	if (shared)
+>  		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+> @@ -1140,9 +1141,6 @@ static int tdp_mmu_link_sp(struct kvm *kvm, struct tdp_iter *iter,
+>  		tdp_mmu_set_spte(kvm, iter, spte);
+>  	}
+>  
+> -	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+> -	list_add(&sp->link, &kvm->arch.tdp_mmu_pages);
+> -	spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+>  	tdp_account_mmu_page(kvm, sp);
+>  
+>  	return 0;
 > -- 
 > 2.38.0.413.g74048e4d9e-goog
 > 
