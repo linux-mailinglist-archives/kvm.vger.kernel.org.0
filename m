@@ -2,65 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A1C156075F7
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 13:19:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53ABF607631
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 13:32:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230133AbiJULTu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 07:19:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53014 "EHLO
+        id S229787AbiJULcp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 07:32:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230198AbiJULTs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 07:19:48 -0400
-Received: from mail-wr1-x449.google.com (mail-wr1-x449.google.com [IPv6:2a00:1450:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 162DF543F5
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 04:19:45 -0700 (PDT)
-Received: by mail-wr1-x449.google.com with SMTP id q21-20020adfb195000000b00235fc1cd01fso749427wra.11
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 04:19:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=SXYluVV8OuIAwAz2C5hZDcy+5LCar7ehD1UteGXJBs8=;
-        b=kim3VsBd3Mx6kXN5MZ0Ng49VioTgo+y3AZTz7ij9qxtBoaIzk/6g3mLS1A68Q8XgkL
-         jOE7qGLcpTpJMcOZ2aNLBeKyaNAVu+dnpElZlhZ2Xu1ezlo1dFmTIFKDgxHVAchuRbeM
-         b63d1+G2+sJkM0uHUViYFdAHwSjmPccsCQYn1gA8UnVKMeXltesQUjnARpulcM1VTWmB
-         p6sSKLj0IT34yWQMoZOrcH75jX5p7SYTHyE01GuJlpbZuAG0T1Qsz8MpC7Wmbgn4FQxG
-         bEX+HWfYlHOaQVW2HAseq5vJepcVAGv9rpcs+WFN7I2ZqcbSFUMxVEYmPUhubHtg2AZz
-         cPOw==
+        with ESMTP id S230198AbiJULce (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 07:32:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3293C25641E
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 04:32:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666351952;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4aKiNS+PFO+LUs42q31q2DUx3RXThHyGeIrjmWFGSKE=;
+        b=aPP5o5Wj9Rf3kRlhplx340sNIEYQsdjSEs8RNY9Ob0/DaH1/WPlTntx+nqiQ4kvKZfOKDa
+        JylnVCy/iFakCZWfBVdL2LnIzPR2izi33E0IT9wntBqGR0XTBTWVmJPmjkVPdRaENXFnx6
+        4ey5z8PbHV+wzaxO2QcBMZ+U30k23S4=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-376-60ngVcCbPb-1sEOEmxz2aQ-1; Fri, 21 Oct 2022 07:32:30 -0400
+X-MC-Unique: 60ngVcCbPb-1sEOEmxz2aQ-1
+Received: by mail-ed1-f69.google.com with SMTP id dz9-20020a0564021d4900b0045d9a3aded4so2100058edb.22
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 04:32:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SXYluVV8OuIAwAz2C5hZDcy+5LCar7ehD1UteGXJBs8=;
-        b=D9ktA8WPVknpCndmSyUdYnOxCcaZzZtc7H4yYWQnFZKPOcD9LgPVnxyibbBodlKRph
-         fS1qipS2nrGYB+SVwvNRkj/e/hh81zF5FCZENnnxwMgsyY7AvDvY3kQfdwGiO6P6vM4h
-         1OK7ygTD8YIqmTwGkdSJojDb+oTpn2/Q/VoN95v+PWlB30UCv/9M4HKVUZtYV8smP2XS
-         mwtpMRwL+eBcFEQQ2BvpyMHYc1NSX0Dt92eWc4yAjv9gFa9ewqGLQhTsB4SviPMjRV3a
-         w3m/DWS6KDJW44uygF9nDqbo/RVIJwkSbuBMBiaHggxuttSSSeFzJ9IK5Y2jeIcFbH1m
-         ldaQ==
-X-Gm-Message-State: ACrzQf2XOxbMpGumQ76RU9IalfFQ8CNGta/1RpOH0ZAwe7NKYiSNETt8
-        /3XXlO70H1PDr42ag0jbGMJ7TqDI5cTvWrcQXu4wZW4qOkDR7vZSYMf7lnZye+lJqxRgvrr9+xk
-        ka+/vqXeEJcx42P3lw5XT3mvEmBxyZZ9xGRjV6MT0N3fm2ITH6RqSnZg=
-X-Google-Smtp-Source: AMsMyM7mHv4M340Lzsj3zpqptebDb1AbCqxpdeVExIntWKeVZN02GapqRdAMvyImVFU0MK/m1vIWhD+//w==
-X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:1c97:b0:3c6:bf60:112c with SMTP id
- k23-20020a05600c1c9700b003c6bf60112cmr12657102wms.20.1666351174342; Fri, 21
- Oct 2022 04:19:34 -0700 (PDT)
-Date:   Fri, 21 Oct 2022 12:19:32 +0100
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.38.0.135.g90850a2211-goog
-Message-ID: <20221021111932.3291560-1-tabba@google.com>
-Subject: [PATCH] KVM: x86/mmu: Release the pfn in handle_abnormal_pfn() error path
-From:   Fuad Tabba <tabba@google.com>
-To:     kvm@vger.kernel.org
-Cc:     seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, will@kernel.org, tabba@google.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4aKiNS+PFO+LUs42q31q2DUx3RXThHyGeIrjmWFGSKE=;
+        b=EXfrZWXTlB7SjTHP+jPHTR6dQ7jkoenpdbeIm/inpsPiV2/vEw2vH9qSDzoefEugng
+         OjxJOSBHT6z9cDa/IPOSwDsDHq+DicPOLJNUs/rOmJYBikQM2QwuY1NH6PNPdHryB/oD
+         scpCUQVwk1zZjvifqQ9s9FqYBHLa/zMx+B0kX5vN0tBi1wrUT3gdw3FqxciG6ALeRNbN
+         s4AAzdti92xWPGp4QsJVCO+jljhcGOY4k/VWyMeX306PjMEzh2NE3j/gNqBxQ00uSEwy
+         dDAxQ7y6bOHR6mXgcjs1b2L6FomIpUbJ6UY3apdfNb8wT9aJBFnPtv4QafT4bf0TTnVW
+         vw8w==
+X-Gm-Message-State: ACrzQf10SO/WYtDXnA6Khkuz1nsBEa7al9zZjJFL6U0DjBQUyNneNcXy
+        tvHf0ODba4tPXb2nqC2FTA/z3jOT8awSQwQr+4FJ7w4QTju8v4yMSoXqhPFgjrjMNHy6N5q864D
+        ZA1IHowc4J3og
+X-Received: by 2002:a17:907:3e01:b0:730:a690:a211 with SMTP id hp1-20020a1709073e0100b00730a690a211mr15000195ejc.596.1666351949546;
+        Fri, 21 Oct 2022 04:32:29 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4fNKZLeu6sK4jJOdmyXbz7sPVNJg8ujyVUeSLl4EPNu68g9a+RTBbGB5tIv51YI+o8hF9x4Q==
+X-Received: by 2002:a17:907:3e01:b0:730:a690:a211 with SMTP id hp1-20020a1709073e0100b00730a690a211mr15000180ejc.596.1666351949359;
+        Fri, 21 Oct 2022 04:32:29 -0700 (PDT)
+Received: from ovpn-192-65.brq.redhat.com (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id q1-20020a170906360100b00773c60c2129sm11698144ejb.141.2022.10.21.04.32.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Oct 2022 04:32:28 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Rafael Mendonca <rafaelmendsr@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Andy Lutomirski <luto@kernel.org>
+Subject: Re: [PATCH] x86/kvm: Remove unused virt to phys translation in
+ kvm_guest_cpu_init()
+In-Reply-To: <20221021020113.922027-1-rafaelmendsr@gmail.com>
+References: <20221021020113.922027-1-rafaelmendsr@gmail.com>
+Date:   Fri, 21 Oct 2022 13:32:27 +0200
+Message-ID: <87a65pcsz8.fsf@ovpn-192-65.brq.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,64 +81,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently in case of error it returns without releasing the pfn
-faulted in earlier.
+Rafael Mendonca <rafaelmendsr@gmail.com> writes:
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
+> Presumably, this was introduced due to a conflict resolution with
+> commit ef68017eb570 ("x86/kvm: Handle async page faults directly through
+> do_page_fault()"), given that the last posted version [1] of the blamed
+> commit was not based on the aforementioned commit.
+>
+> [1] https://lore.kernel.org/kvm/20200525144125.143875-9-vkuznets@redhat.com/
+>
+> Fixes: b1d405751cd5 ("KVM: x86: Switch KVM guest to using interrupts for page ready APF delivery")
 
-Applies to 6.1-rc1. I think that kvm_release_pfn_clean() has been
-replaced with kvm_mmu_release_fault() in development branches,
-but the same issue is still there.
----
- arch/x86/kvm/mmu/mmu.c         | 3 ++-
- arch/x86/kvm/mmu/paging_tmpl.h | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+Indeed, this looks like a mid-air collision happened upon commit/merge.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 6f81539061d6..9adae837ccdd 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4250,7 +4250,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 
- 	r = handle_abnormal_pfn(vcpu, fault, ACC_ALL);
- 	if (r != RET_PF_CONTINUE)
--		return r;
-+		goto out_release;
- 
- 	r = RET_PF_RETRY;
- 
-@@ -4276,6 +4276,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 		read_unlock(&vcpu->kvm->mmu_lock);
- 	else
- 		write_unlock(&vcpu->kvm->mmu_lock);
-+out_release:
- 	kvm_release_pfn_clean(fault->pfn);
- 	return r;
- }
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 5ab5f94dcb6f..4a1e4e460990 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -847,7 +847,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 
- 	r = handle_abnormal_pfn(vcpu, fault, walker.pte_access);
- 	if (r != RET_PF_CONTINUE)
--		return r;
-+		goto out_release;
- 
- 	/*
- 	 * Do not change pte_access if the pfn is a mmio page, otherwise
-@@ -881,6 +881,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 
- out_unlock:
- 	write_unlock(&vcpu->kvm->mmu_lock);
-+out_release:
- 	kvm_release_pfn_clean(fault->pfn);
- 	return r;
- }
+> Signed-off-by: Rafael Mendonca <rafaelmendsr@gmail.com>
+> ---
+>  arch/x86/kernel/kvm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
+> index d4e48b4a438b..cf886f86038a 100644
+> --- a/arch/x86/kernel/kvm.c
+> +++ b/arch/x86/kernel/kvm.c
+> @@ -349,7 +349,7 @@ static notrace void kvm_guest_apic_eoi_write(u32 reg, u32 val)
+>  static void kvm_guest_cpu_init(void)
+>  {
+>  	if (kvm_para_has_feature(KVM_FEATURE_ASYNC_PF_INT) && kvmapf) {
+> -		u64 pa = slow_virt_to_phys(this_cpu_ptr(&apf_reason));
+> +		u64 pa;
+>  
+>  		WARN_ON_ONCE(!static_branch_likely(&kvm_async_pf_enabled));
 
-base-commit: 9abf2313adc1ca1b6180c508c25f22f9395cc780
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
 -- 
-2.38.0.135.g90850a2211-goog
+Vitaly
 
