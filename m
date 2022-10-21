@@ -2,193 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2FEB607EED
-	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 21:17:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4527E607F00
+	for <lists+kvm@lfdr.de>; Fri, 21 Oct 2022 21:23:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230416AbiJUTRR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 15:17:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52410 "EHLO
+        id S230141AbiJUTXJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 15:23:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230419AbiJUTRC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 15:17:02 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE54345213
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 12:16:56 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id x1-20020a17090ab00100b001fda21bbc90so7506492pjq.3
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 12:16:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=U2Z9ZRw5c+xGtGCcrQwmxNOVKWX2byTsnaEmUTfETvY=;
-        b=RnpgD5C7hYPDg/XNp9MBVa2yK5edP1Io2gSN/atKlNdD0kwy2SNAic3jWBRpnU0ggi
-         OiNAuWB4h8uP0Ft9ASHXGK4GEa+gI7MLMCLKleVzgeDEA9pL7e+0jKp5Q+pxgFZ5ZAK2
-         3LBufE5BDfWNLmilfcz01giVU6De0RIhmn0eKqo0NDE7jH4qkBm3siEkKl9hvgfKhq4H
-         H+RTdWlMX0xWOuMkAt61S1FJR2Uku112q69Ns5PhE+rKzqV+X/nF2sBquD7KI9Z4BZLE
-         stGjzZrT7s5Jca2OwRZj/AVjKEcyAnphPDmwjhfv171mhFnfAgUipTMMiZcKUGiXBQhH
-         nVcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U2Z9ZRw5c+xGtGCcrQwmxNOVKWX2byTsnaEmUTfETvY=;
-        b=msAL0HIQ6Oe6eYpXAD3d8AJ+8kMM6gUakr+MjlpBlZuljXYP4wTXIXoMW6FQWi+4Q9
-         8XFNyXkPVJQMVzB7KK+UJY6F65YWuJg3O3T+7kK41JVkPdqXLKtXMtgb9bDM7KZrbfzX
-         XljVvuiiRKdF//jsJTFtyC5Wo6bwyEvlic/UlOZnx+AXQXX5Q8eGj31QYC0TTRZEUrFY
-         3JNtcf/ljemnFcBfjfgdZ14B9Hn1hUPW1ol0fWfpjp3IG3riVIAuc2CzXe92zjq+4Ybl
-         mnCBL7aiS9Ks04C0el4mn794ksPLQlQhUV/scR6/7qScGskmAIBlT+mukZoPwsLL87Xs
-         9CVA==
-X-Gm-Message-State: ACrzQf2NFPTCdUKqTmyLvpxwi7zjiDr6e8NjlBlfPVSJYHvtyObrOBCJ
-        xgm4k2omkepXm/2xyx3XkcxAMBCgDmY4pg==
-X-Google-Smtp-Source: AMsMyM5/rEQm5DkiHtiGf2DWGn4xC37tKBKbi6R6ibkrhDHc+pqwYr+aIhsV1hvlEKYG/cgJ5iRs3w==
-X-Received: by 2002:a17:902:7883:b0:17f:9503:abe5 with SMTP id q3-20020a170902788300b0017f9503abe5mr21277067pll.41.1666379815048;
-        Fri, 21 Oct 2022 12:16:55 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id b14-20020a170903228e00b00176e8f85147sm15414425plh.83.2022.10.21.12.16.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Oct 2022 12:16:54 -0700 (PDT)
-Date:   Fri, 21 Oct 2022 19:16:50 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v3 03/13] x86/pmu: Reset the expected
- count of the fixed counter 0 when i386
-Message-ID: <Y1LwIgLp3gunyZ/j@google.com>
-References: <20220819110939.78013-1-likexu@tencent.com>
- <20220819110939.78013-4-likexu@tencent.com>
- <Yz4Ct/rxI2EZ+I7o@google.com>
- <2401d7da-9c71-4472-10b7-92f0a479ad50@gmail.com>
+        with ESMTP id S229998AbiJUTXG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 15:23:06 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48CCE297F13;
+        Fri, 21 Oct 2022 12:22:58 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29LJAOSw016332;
+        Fri, 21 Oct 2022 19:22:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=O2wrMryTEiAay8wx5tyw/G36BC6rjJNRPY6ceokv4ko=;
+ b=Mg2ttchFt+6glxcDusxlK/LuFfgS+MfNNcU4Pd4QuIrAAc0vZOPRDG+X+473YU7YmH6X
+ 2o73eck8h//PRdFNO8av5gcS+uYlNu1k0Iv50w7VR9WAkoy7+wDhqz/wdR1YnHcq8Sc7
+ E0Ds8TwIrSenF1D++qAvpgtuhThdYmWq11E1sqF9t81LlCS4LqXjYCY/kuhXZm3NNpJN
+ CMYBpj4HvVdGVhNNyvpfoWIYEQvig4qT70cFFC61zCQ20R/2o6j+vcqlmrxSVg2UyTmW
+ +ZT05OT/hDraoaCheZyJMskvq+YQZecMGA0NsbkTuHi3aZGZivrx8F6ZoVdEPzd43cx5 qw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kc0p69jsb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Oct 2022 19:22:53 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29LJMr9Y011350;
+        Fri, 21 Oct 2022 19:22:53 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kc0p69jrh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Oct 2022 19:22:53 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29LJKbQR015132;
+        Fri, 21 Oct 2022 19:22:51 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03fra.de.ibm.com with ESMTP id 3k7mg9g7pa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 21 Oct 2022 19:22:51 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29LJMlaK328250
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 21 Oct 2022 19:22:47 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C5F8EA405F;
+        Fri, 21 Oct 2022 19:22:47 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2819BA405B;
+        Fri, 21 Oct 2022 19:22:47 +0000 (GMT)
+Received: from osiris (unknown [9.145.190.216])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri, 21 Oct 2022 19:22:47 +0000 (GMT)
+Date:   Fri, 21 Oct 2022 21:22:45 +0200
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>
+Subject: Re: [PATCH v2 1/9] s390/uaccess: Add storage key checked cmpxchg
+ access to user space
+Message-ID: <Y1LxhaZaVZlM0Cl/@osiris>
+References: <20221012205609.2811294-1-scgl@linux.ibm.com>
+ <20221012205609.2811294-2-scgl@linux.ibm.com>
+ <166627325676.27216.13358887886569042677@t14-nrb>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2401d7da-9c71-4472-10b7-92f0a479ad50@gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <166627325676.27216.13358887886569042677@t14-nrb>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: g2hTvFXAjC5Zgx26NB4fqiBeHV2Lyv3D
+X-Proofpoint-GUID: 5CTYsYsWsjZDwPO2UxkN15iFYffX3NEc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-21_04,2022-10-21_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 lowpriorityscore=0 clxscore=1015 suspectscore=0 phishscore=0
+ adultscore=0 mlxscore=0 malwarescore=0 impostorscore=0 mlxlogscore=999
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210210112
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 17, 2022, Like Xu wrote:
-> On 6/10/2022 6:18 am, Sean Christopherson wrote:
-> > > ---
-> > >   x86/pmu.c | 3 +++
-> > >   1 file changed, 3 insertions(+)
-> > > 
-> > > diff --git a/x86/pmu.c b/x86/pmu.c
-> > > index 45ca2c6..057fd4a 100644
-> > > --- a/x86/pmu.c
-> > > +++ b/x86/pmu.c
-> > > @@ -315,6 +315,9 @@ static void check_counter_overflow(void)
-> > >   		if (i == nr_gp_counters) {
-> > >   			cnt.ctr = fixed_events[0].unit_sel;
-> > > +			__measure(&cnt, 0);
-> > > +			count = cnt.count;
-> > > +			cnt.count = 1 - count;
-> > 
-> > This definitely needs a comment.
-> > 
-> > Dumb question time: if the count is off by 2, why can't we just subtract 2?
+On Thu, Oct 20, 2022 at 03:40:56PM +0200, Nico Boehr wrote:
+> Quoting Janis Schoetterl-Glausch (2022-10-12 22:56:01)
+> > +               "2:     lr      %[old_word],%[tmp]\n"
+> > +               "3:     cs      %[tmp],%[new_word],%[aligned]\n"
+> > +               "4:     jnl     5f\n"
+> > +               /* We'll restore old_word before the cs, use reg for the diff */
+> > +               "       xr      %[old_word],%[tmp]\n"
+> > +               /* Apply diff assuming only bits outside target byte(s) changed */
+> > +               "       xr      %[new_word],%[old_word]\n"
+> > +               /* If prior assumption false we exit loop, so not an issue */
+> > +               "       nr      %[old_word],%[mask]\n"
+> > +               "       jz      2b\n"
 > 
-> More low-level code (bringing in differences between the 32-bit and 64-bit runtimes)
-> being added would break this.
-> 
-> The test goal is simply to set the initial value of a counter to overflow,
-> which is always off by 1, regardless of the involved rd/wrmsr or other
-> execution details.
+> So if the remainder changed but the actual value to exchange stays the same, we
+> loop in the kernel. Does it maybe make sense to limit the number of iterations
+> we spend retrying? I think while looping here the calling process can't be
+> killed, can it?
 
-Oooh, I see what this code is doing.  But wouldn't it be better to offset from '0'?
-E.g. if the measured workload is a single instruction, then the measured count
-will be '1' and thus "1 - count" will be zero, meaning no overflow will occur.
-
-Ah, but as per the SDM, the "+1" is needed to ensure the overflow is detected
-immediately.
-
-  Here, however, if an interrupt is to be generated after 100 event counts, the
-  counter should be preset to minus 100 plus 1 (-100 + 1), or -99. The counter
-  will then overflow after it counts 99 events and generate an interrupt on the
-  next (100th) event counted. The difference of 1 for this count enables the
-  interrupt to be generated immediately after the selected event count has been
-  reached, instead of waiting for the overflow to be propagation through the
-  counter.
-
-What about adding a helper to measure/compute the overflow preset value?  That
-would provide a convenient location to document the (IMO) weird behavior that's
-necessary to ensure immediate event delivery.  E.g.
-
----
- x86/pmu.c | 36 ++++++++++++++++++++++++------------
- 1 file changed, 24 insertions(+), 12 deletions(-)
-
-diff --git a/x86/pmu.c b/x86/pmu.c
-index f891053f..a38ae3f6 100644
---- a/x86/pmu.c
-+++ b/x86/pmu.c
-@@ -325,16 +325,30 @@ static void check_counters_many(void)
- 	report(i == n, "all counters");
- }
- 
--static void check_counter_overflow(void)
-+static uint64_t measure_for_overflow(pmu_counter_t *cnt)
- {
--	uint64_t count;
--	int i;
--	pmu_counter_t cnt = {
--		.ctr = gp_counter_base,
--		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel /* instructions */,
--	};
- 	__measure(&cnt, 0);
--	count = cnt.count;
-+
-+	/*
-+	 * To generate overflow, i.e. roll over to '0', the initial count just
-+	 * needs to be preset to the negative expected count.  However, as per
-+	 * Intel's SDM, the preset count needs to be incremented by 1 to ensure
-+	 * the overflow interrupt is generated immediately instead of possibly
-+	 * waiting for the overflow to propagate through the counter.
-+	 */
-+	assert(cnt.count > 1);
-+	return 1 - cnt.count;
-+}
-+
-+static void check_counter_overflow(void)
-+{
-+	uint64_t overflow_preset;
-+	int i;
-+	pmu_counter_t cnt = {
-+		.ctr = gp_counter_base,
-+		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel /* instructions */,
-+	};
-+	overflow_preset = measure_for_overflow(&cnt);
- 
- 	/* clear status before test */
- 	if (pmu_version() > 1) {
-@@ -349,7 +363,7 @@ static void check_counter_overflow(void)
- 		int idx;
- 
- 		cnt.ctr = get_gp_counter_msr(i);
--		cnt.count = 1 - count;
-+		cnt.count = overflow_preset;
- 		if (gp_counter_base == MSR_IA32_PMC0)
- 			cnt.count &= (1ull << pmu_gp_counter_width()) - 1;
- 
-@@ -358,9 +372,7 @@ static void check_counter_overflow(void)
- 				break;
- 
- 			cnt.ctr = fixed_events[0].unit_sel;
--			__measure(&cnt, 0);
--			count = cnt.count;
--			cnt.count = 1 - count;
-+			cnt.count = measure_for_overflow(&cnt);
- 			cnt.count &= (1ull << pmu_fixed_counter_width()) - 1;
- 		}
- 
-
-base-commit: c3e384a2268baed99d4b59dd239c98bd6a5471eb
--- 
-
+Yes, the number of loops should be limited; quite similar what arm64
+implemented with commit 03110a5cb216 ("arm64: futex: Bound number of
+LDXR/STXR loops in FUTEX_WAKE_OP").
