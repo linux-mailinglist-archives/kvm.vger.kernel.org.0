@@ -2,44 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 72BBF6082CA
-	for <lists+kvm@lfdr.de>; Sat, 22 Oct 2022 02:17:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 920436082E2
+	for <lists+kvm@lfdr.de>; Sat, 22 Oct 2022 02:34:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229519AbiJVARj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 21 Oct 2022 20:17:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45732 "EHLO
+        id S229767AbiJVAeE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 21 Oct 2022 20:34:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229535AbiJVARh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 21 Oct 2022 20:17:37 -0400
+        with ESMTP id S229776AbiJVAeD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 21 Oct 2022 20:34:03 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A9F62B091F
-        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 17:17:36 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C722B4EA5
+        for <kvm@vger.kernel.org>; Fri, 21 Oct 2022 17:34:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666397855;
+        s=mimecast20190719; t=1666398841;
         h=from:from:reply-to:reply-to:subject:subject:date:date:
          message-id:message-id:to:to:cc:cc:mime-version:mime-version:
          content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Fi75UPk8tWEWlK3sUS1lCpXUc1ok9RQzENDyCGsA+M0=;
-        b=cpAGVTX3bkccGJAj4KmA199AEYNGyIsIeIFalMFGKdXjK+r4p5pFudsbCAbllMJSCZTwSk
-        CQdU2lSzRyWNFeeRPfUdIY7eaCIwX26MJ+2uRVIRbXf+LoFyrJy2SMmwMBs1v+QIiGMX9a
-        BwPYfMP4wdDqHylb2daSQ6YTfyWJ2MM=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=dRmE3usPLT/+DOeenrYAe2e61ZJThI4ZaW7NJa+NZ5M=;
+        b=ESJ29D1WBXFvWzAOKNh/WIWauXc+utQt8KGFvQnEYC/e3sAX5qaUlnGu7KJBSzEu9UlNPm
+        PFTZolhT7GOMpO27lqpwvRiLNcyS+v7dUm9sMg6Yqohgh+Jj9jl3riz9QMXcS1BfzqZtcb
+        8GvAyofLygOCuHDoD6nn/acagH9GI8E=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-528-m7MjTqczNK2im7q9WOPOvA-1; Fri, 21 Oct 2022 20:17:31 -0400
-X-MC-Unique: m7MjTqczNK2im7q9WOPOvA-1
+ us-mta-78-ynjnnVcCPyGTIn5YF8mIzw-1; Fri, 21 Oct 2022 20:33:57 -0400
+X-MC-Unique: ynjnnVcCPyGTIn5YF8mIzw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F27CC3C01C12;
-        Sat, 22 Oct 2022 00:16:44 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3D1878027F5;
+        Sat, 22 Oct 2022 00:33:56 +0000 (UTC)
 Received: from [10.64.54.99] (vpn2-54-99.bne.redhat.com [10.64.54.99])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E79F22166B2C;
-        Sat, 22 Oct 2022 00:16:29 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7D4CF2166B2C;
+        Sat, 22 Oct 2022 00:33:44 +0000 (UTC)
 Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v6 1/8] KVM: x86: Introduce KVM_REQ_RING_SOFT_FULL
+Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in
+ conjunction with bitmap
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, peterx@redhat.com, maz@kernel.org,
@@ -49,18 +50,16 @@ Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
         suzuki.poulose@arm.com, alexandru.elisei@arm.com,
         oliver.upton@linux.dev, shan.gavin@gmail.com
 References: <20221011061447.131531-1-gshan@redhat.com>
- <20221011061447.131531-2-gshan@redhat.com> <Y1HO46UCyhc9M6nM@google.com>
- <db2cb7da-d3b1-c87e-4362-94764a7ea480@redhat.com>
- <Y1K5/MN9o7tEvYu5@google.com>
- <85d15a4a-bbae-c5e6-f6dc-1d972d07dafb@redhat.com>
- <Y1Mvwq5PJ0gxC+47@google.com>
+ <20221011061447.131531-4-gshan@redhat.com> <Y1Hdc/UVta3A5kHM@google.com>
+ <0adc538b-594e-c662-5a38-3ca6b98ab059@redhat.com>
+ <Y1MpQTprxk+XdYFb@google.com>
 From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <3862fc65-d3bf-21af-2fe3-61f55da96aa1@redhat.com>
-Date:   Sat, 22 Oct 2022 08:16:26 +0800
+Message-ID: <2ce535e9-f57a-0ab6-5c30-2b8afd4472e6@redhat.com>
+Date:   Sat, 22 Oct 2022 08:33:40 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <Y1Mvwq5PJ0gxC+47@google.com>
+In-Reply-To: <Y1MpQTprxk+XdYFb@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,101 +76,149 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Sean,
 
-On 10/22/22 7:48 AM, Sean Christopherson wrote:
-> On Sat, Oct 22, 2022, Gavin Shan wrote:
->>>> When dirty ring becomes full, the VCPU can't handle any operations, which will
->>>> bring more dirty pages.
+On 10/22/22 7:20 AM, Sean Christopherson wrote:
+> On Fri, Oct 21, 2022, Gavin Shan wrote:
+>>> What about inverting the naming to better capture that this is about the dirty
+>>> bitmap, and less so about the dirty ring?  It's not obvious what "exclusive"
+>>> means, e.g. I saw this stub before reading the changelog and assumed it was
+>>> making a dirty ring exclusive to something.
 >>>
->>> Right, but there's a buffer of 64 entries on top of what the CPU can buffer (VMX's
->>> PML can buffer 512 entries).  Hence the "soft full".  If x86 is already on the
->>> edge of exhausting that buffer, i.e. can fill 64 entries while handling requests,
->>> than we need to increase the buffer provided by the soft limit because sooner or
->>> later KVM will be able to fill 65 entries, at which point errors will occur
->>> regardless of when the "soft full" request is processed.
+>>> Something like this?
 >>>
->>> In other words, we can take advantage of the fact that the soft-limit buffer needs
->>> to be quite conservative.
->>>
->>
->> Right, there are extra 64 entries in the ring between soft full and hard full.
->> Another 512 entries are reserved when PML is enabled. However, the other requests,
->> who produce dirty pages, are producers to the ring. We can't just have the assumption
->> that those producers will need less than 64 entries.
-> 
-> But we're already assuming those producers will need less than 65 entries.  My point
-> is that if one (or even five) extra entries pushes KVM over the limit, then the
-> buffer provided by the soft limit needs to be jacked up regardless of when the
-> request is processed.
-> 
-> Hmm, but I suppose it's possible there's a pathological emulator path that can push
-> double digit entries, and servicing the request right away ensures that requests
-> have the full 64 entry buffer to play with.
-> 
-> So yeah, I agree, move it below the DEAD check, but keep it above most everything
-> else.
-> 
-
-Ok, Thanks for double confirm on this. I will move the check after READ in next
-revision.
-
->>>>> Would it make sense to clear the request in kvm_dirty_ring_reset()?  I don't care
->>>>> about the overhead of having to re-check the request, the goal would be to help
->>>>> document what causes the request to go away.
->>>>>
->>>>> E.g. modify kvm_dirty_ring_reset() to take @vcpu and then do:
->>>>>
->>>>> 	if (!kvm_dirty_ring_soft_full(ring))
->>>>> 		kvm_clear_request(KVM_REQ_RING_SOFT_FULL, vcpu);
->>>>>
->>>>
->>>> It's reasonable to clear KVM_REQ_DIRTY_RING_SOFT_FULL when the ring is reseted.
->>>> @vcpu can be achieved by container_of(..., ring).
->>>
->>> Using container_of() is silly, there's literally one caller that does:
->>>
->>> 	kvm_for_each_vcpu(i, vcpu, kvm)
->>> 		cleared += kvm_dirty_ring_reset(vcpu->kvm, &vcpu->dirty_ring);
+>>> bool kvm_use_dirty_bitmap(struct kvm *kvm)
+>>> {
+>>> 	return !kvm->dirty_ring_size || kvm->dirty_ring_with_bitmap;
+>>> }
 >>>
 >>
->> May I ask why it's silly by using container_of()?
+>> If you agree, I would rename is to kvm_dirty_ring_use_bitmap(). In this way,
+>> we will have "kvm_dirty_ring" prefix for the function name, consistent with
+>> other functions from same module.
 > 
-> Because container_of() is inherently dangerous, e.g. if it's used on a pointer that
-> isn't contained by the expected type, the code will compile cleanly but explode
-> at runtime.  That's unlikely to happen in this case, e.g. doesn't look like we'll
-> be adding a ring to "struct kvm", but if someone wanted to add a per-VM ring,
-> taking the vCPU makes it very obvious that pushing to a ring _requires_ a vCPU,
-> and enforces that requirement at compile time.
+> I'd prefer to avoid "ring" in the name at all, because in the common case (well,
+> legacy case at least) the dirty ring has nothing to do with using the dirty
+> bitmap, e.g. this code ends up being very confusing because the "dirty_ring"
+> part implies that KVM _doesn't_ need to allocate the bitmap when the dirty ring
+> isn't being used.
 > 
-> In other words, it's preferable to avoid container_of() unless using it solves a
-> real problem that doesn't have a better alternative.
+> 		if (!(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
+> 			new->dirty_bitmap = NULL;
+> 		else if (old && old->dirty_bitmap)
+> 			new->dirty_bitmap = old->dirty_bitmap;
+> 		else if (kvm_dirty_ring_use_bitmap(kvm) {
+> 			r = kvm_alloc_dirty_bitmap(new);
+> 			if (r)
+> 				return r;
 > 
-> In these cases, passing in the vCPU is most definitely a better alternative as
-> each of the functions in question has a sole caller that has easy access to the
-> container (vCPU), i.e. it's a trivial change.
+> 			if (kvm_dirty_log_manual_protect_and_init_set(kvm))
+> 				bitmap_set(new->dirty_bitmap, 0, new->npages);
+> 		}
+> 
+> The helper exists because the dirty ring exists, but the helper is fundamentally
+> about the dirty bitmap, not the ring.
 > 
 
-Right, container_of() can't ensure consistence and full sanity check by itself.
-It's reasonable to avoid using it if possible. Thanks for the details and
-explanation.
+Thanks for the details. Yeah, it makes sense to avoid "ring" then. Lets use
+the name kvm_use_dirty_bitmap() for the function.
 
->> In order to avoid using container_of(), kvm_dirty_ring_push() also need
->> @vcpu.
-> 
-> Yep, that one should be changed too.
-> 
-
-Ok.
-
->> So lets change those two functions to something like below. Please
->> double-check if they looks good to you?
+>>> But dirty_ring_with_bitmap really shouldn't need to exist.  It's mandatory for
+>>> architectures that have HAVE_KVM_DIRTY_RING_WITH_BITMAP, and unsupported for
+>>> architectures that don't.  In other words, the API for enabling the dirty ring
+>>> is a bit ugly.
+>>>
+>>> Rather than add KVM_CAP_DIRTY_LOG_RING_ACQ_REL, which hasn't been officially
+>>> released yet, and then KVM_CAP_DIRTY_LOG_ING_WITH_BITMAP on top, what about
+>>> usurping bits 63:32 of cap->args[0] for flags?  E.g.
+>>>
+>>> Ideally we'd use cap->flags directly, but we screwed up with KVM_CAP_DIRTY_LOG_RING
+>>> and didn't require flags to be zero :-(
+>>>
+>>> Actually, what's the point of allowing KVM_CAP_DIRTY_LOG_RING_ACQ_REL to be
+>>> enabled?  I get why KVM would enumerate this info, i.e. allowing checking, but I
+>>> don't seen any value in supporting a second method for enabling the dirty ring.
+>>>
+>>> The acquire-release thing is irrelevant for x86, and no other architecture
+>>> supports the dirty ring until this series, i.e. there's no need for KVM to detect
+>>> that userspace has been updated to gain acquire-release semantics, because the
+>>> fact that userspace is enabling the dirty ring on arm64 means userspace has been
+>>> updated.
+>>>
+>>> Same goes for the "with bitmap" capability.  There are no existing arm64 users,
+>>> so there's no risk of breaking existing userspace by suddenly shoving stuff into
+>>> the dirty bitmap.
+>>>
+>>> KVM doesn't even get the enabling checks right, e.g. KVM_CAP_DIRTY_LOG_RING can be
+>>> enabled on architectures that select CONFIG_HAVE_KVM_DIRTY_RING_ACQ_REL but not
+>>> KVM_CAP_DIRTY_LOG_RING.  The reverse is true (ignoring that x86 selects both and
+>>> is the only arch that selects the TSO variant).
+>>>
+>>> Ditto for KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP...
 >>
->>    void kvm_dirty_ring_push(struct kvm_vcpu *vcpu, u32 slot, u64 offset);
->>    int kvm_dirty_ring_reset(struct kvm_vcpu *vcpu);
+>> If I didn't miss anything in the previous discussions, we don't want to make
+>> KVM_CAP_DIRTY_LOG_RING_ACQ_REL and KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP
+>> architecture dependent. If they become architecture dependent, the userspace
+>> will have different stubs (x86, arm64, other architectures to support
+>> dirty-ring in future) to enable those capabilities. It's not friendly to
+>> userspace. So I intend to prefer the existing pattern: advertise, enable. To
+>> enable a capability without knowing if it's supported sounds a bit weird to
+>> me.
 > 
-> Yep, looks good.
+> Enabling without KVM advertising that it's supported would indeed be odd.  Ugh,
+> and QEMU doesn't have existing checks to restrict the dirty ring to x86, i.e. we
+> can't make the ACQ_REL capability a true attribute without breaking userspace.
+> 
+> Rats.
 > 
 
-Ok, Thanks for your confirm.
+Currently, QEMU doesn't use ACQ_REL and WITH_BITMAP. After both capability are
+supported by kvm, we need go ahead to change QEMU so that these two capabilities
+can be enabled in QEMU.
+
+>> I think it's a good idea to enable KVM_CAP_DIRTY_LOG_RING_{ACQ_REL, WITH_BITMAP} as
+>> flags, instead of standalone capabilities. In this way, those two capabilities can
+>> be treated as sub-capability of KVM_CAP_DIRTY_LOG_RING. The question is how these
+>> two flags can be exposed by kvm_vm_ioctl_check_extension_generic(), if we really
+>> want to expose those two flags.
+>>
+>> I don't understand your question on how KVM has wrong checks when KVM_CAP_DIRTY_LOG_RING
+>> and KVM_CAP_DIRTY_LOG_RING_ACQ_REL are enabled.
+> 
+> In the current code base, KVM only checks that _a_ form of dirty ring is supported,
+> by way of kvm_vm_ioctl_enable_dirty_log_ring()'s check on KVM_DIRTY_LOG_PAGE_OFFSET.
+> 
+> The callers don't verify that the "correct" capability is enabled.
+> 
+> 	case KVM_CAP_DIRTY_LOG_RING:
+> 	case KVM_CAP_DIRTY_LOG_RING_ACQ_REL:
+> 		return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
+> 
+> E.g. userspace could do
+> 
+> 	if (kvm_check(KVM_CAP_DIRTY_LOG_RING_ACQ_REL))
+> 		kvm_enable(KVM_CAP_DIRTY_LOG_RING)
+> 
+> and KVM would happily enable the dirty ring.  Functionally it doesn't cause
+> problems, it's just weird.
+> 
+> Heh, we can fix without more ifdeffery by using the check internally.
+> 
+
+Hmm, nice catch! Lets fix it up in a separate patch.
+
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index e30f1b4ecfa5..300489a0eba5 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4585,6 +4585,8 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
+>          }
+>          case KVM_CAP_DIRTY_LOG_RING:
+>          case KVM_CAP_DIRTY_LOG_RING_ACQ_REL:
+> +               if (!kvm_vm_ioctl_check_extension_generic(kvm, cap->cap))
+> +                       return -EINVAL;
+>                  return kvm_vm_ioctl_enable_dirty_log_ring(kvm, cap->args[0]);
+>          default:
+>                  return kvm_vm_ioctl_enable_cap(kvm, cap);
+> 
 
 Thanks,
 Gavin
