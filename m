@@ -2,113 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D7641608D06
-	for <lists+kvm@lfdr.de>; Sat, 22 Oct 2022 13:53:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 69BBB608E30
+	for <lists+kvm@lfdr.de>; Sat, 22 Oct 2022 17:48:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229615AbiJVLxx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 22 Oct 2022 07:53:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35002 "EHLO
+        id S229885AbiJVPsb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 22 Oct 2022 11:48:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229491AbiJVLxv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 22 Oct 2022 07:53:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B42BE59E87
-        for <kvm@vger.kernel.org>; Sat, 22 Oct 2022 04:53:50 -0700 (PDT)
+        with ESMTP id S229832AbiJVPs3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 22 Oct 2022 11:48:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFCB424F785
+        for <kvm@vger.kernel.org>; Sat, 22 Oct 2022 08:48:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666439630;
+        s=mimecast20190719; t=1666453705;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KPmvOeY7znrhinzMDTYzlhkvZyG6kRL1anJ+HPXl5ug=;
-        b=KhULDQrH1lsfDM/IxswWKtVQIDxZ1UMPNIzaryVj6XDMKQUpR/vF6PluSrfQ8e9ksI9GQb
-        WbwbyR1q221yDMQylh3sYG/YCH690eRmKP8voOli/4mod71Wht52U2E9Zt1D1xfaDVucI+
-        0qAP4Z5VfsJi7xQV3okT+tzjojJqhA0=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-549-J6G8DzcOM_GeFUl8k7gYjQ-1; Sat, 22 Oct 2022 07:53:48 -0400
-X-MC-Unique: J6G8DzcOM_GeFUl8k7gYjQ-1
-Received: by mail-ed1-f69.google.com with SMTP id x19-20020a05640226d300b0045dc858ce29so5112512edd.7
-        for <kvm@vger.kernel.org>; Sat, 22 Oct 2022 04:53:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KPmvOeY7znrhinzMDTYzlhkvZyG6kRL1anJ+HPXl5ug=;
-        b=KXkXnK2Y0XVrsf7dXSEvOUCA+ng489NM6TXIYinV8ZdnoZA4ljuEvwGg82U6qZhwB8
-         Mju3LfzTOF0GHDeXnPozx1Za/m9ePA1tidqmVp1QzBBoPTJw7zOTxXLGUQ4sSdqfbv7n
-         vpPgQMBFNqwLABckdU3Trvungd9b5r2kxXwwQORg71XKhdsllV5tjJEk72P1SnDP3Cvn
-         Y0EsTuSjZVvYSJkdOjSGUo7tbDwRm+M8YEWlSWQ+3hQT6d63J68R138bSyJ5UjJeozDS
-         q3AMFs3M6FtczaTzPf0Hj7Ib3Qjkh225G15YDIRjT+LkLWFENSQo+5dZrb7d7El+Ve8b
-         ctsw==
-X-Gm-Message-State: ACrzQf1aqKTCH+xsOH5BDkeQwCA0TJ5C6LcmcxvcFztNoz4lCITOg0ml
-        bUTUJUrFv4qw0WRIaC0Y2KRcQJ7tBnsZpa9zSGbeHv5f55yYpx0s6GA6Q+E7Lc7YwwQ4CNU8Qzt
-        zCgWN5Q0D1wE6
-X-Received: by 2002:a17:907:16a7:b0:79e:9eed:8f6 with SMTP id hc39-20020a17090716a700b0079e9eed08f6mr4603475ejc.731.1666439626787;
-        Sat, 22 Oct 2022 04:53:46 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7L4myOJ/0NIdAr5ZVQ+QtDR8RDZxDn9M+eafRx+6P9t9XZmCfx8weClDwmUUZOtYPytHfyTw==
-X-Received: by 2002:a17:907:16a7:b0:79e:9eed:8f6 with SMTP id hc39-20020a17090716a700b0079e9eed08f6mr4603462ejc.731.1666439626502;
-        Sat, 22 Oct 2022 04:53:46 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:2f4b:62da:3159:e077? ([2001:b07:6468:f312:2f4b:62da:3159:e077])
-        by smtp.googlemail.com with ESMTPSA id y16-20020a056402171000b0044e937ddcabsm18323edu.77.2022.10.22.04.53.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 22 Oct 2022 04:53:46 -0700 (PDT)
-Message-ID: <e436fc94-6bd7-989d-a1bb-5cd08a7d10c3@redhat.com>
-Date:   Sat, 22 Oct 2022 13:53:45 +0200
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ubaULjUrByYJfUfr92/n81pA5XqiKjFVYnSXLbaGMQI=;
+        b=WDr2tYd3p2cD3Klk+7vcl4XYlVrRMdZUfp3J2/LJDfgiFT6H2I0dK1khz6aXPQHEDOiwtD
+        iCzdhnI79uVgqsJS237R9dP5M9B+9lZ75NF0+MFgfOdN228wjfs9PyEKqcQAo9LIGxKcAI
+        dTViswD+/s7hMd5vvmoURyagLNA7Vn4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-140-N3ZNxMu6NdSkX-ZcmhlpQw-1; Sat, 22 Oct 2022 11:48:22 -0400
+X-MC-Unique: N3ZNxMu6NdSkX-ZcmhlpQw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E44E2862FDF;
+        Sat, 22 Oct 2022 15:48:21 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 287BB49BB60;
+        Sat, 22 Oct 2022 15:48:21 +0000 (UTC)
+From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Subject: [PATCH 0/4] KVM: API to block and resume all running vcpus in a vm
+Date:   Sat, 22 Oct 2022 11:48:15 -0400
+Message-Id: <20221022154819.1823133-1-eesposit@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH] tools: include: sync include/api/linux/kvm.h
-Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20221022114423.1741799-1-pbonzini@redhat.com>
- <87bkq4gjwc.wl-maz@kernel.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <87bkq4gjwc.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/22/22 13:47, Marc Zyngier wrote:
->> Provide a definition of KVM_CAP_DIRTY_LOG_RING_ACQ_REL.
->>
->> Fixes: 4b3402f1f4d9 ("KVM: selftests: dirty-log: Use KVM_CAP_DIRTY_LOG_RING_ACQ_REL if available")
->> Cc: Marc Zyngier<maz@kernel.org>
->> Signed-off-by: Paolo Bonzini<pbonzini@redhat.com>
->> ---
->>   tools/include/uapi/linux/kvm.h | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
->> index eed0315a77a6..0d5d4419139a 100644
->> --- a/tools/include/uapi/linux/kvm.h
->> +++ b/tools/include/uapi/linux/kvm.h
->> @@ -1177,6 +1177,7 @@ struct kvm_ppc_resize_hpt {
->>   #define KVM_CAP_VM_DISABLE_NX_HUGE_PAGES 220
->>   #define KVM_CAP_S390_ZPCI_OP 221
->>   #define KVM_CAP_S390_CPU_TOPOLOGY 222
->> +#define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
->>   
->>   #ifdef KVM_CAP_IRQ_ROUTING
->>   
-> Huh, I wonder how I missed that one, as the test were compiling here.
-> 
-> Acked-by: Marc Zyngier<maz@kernel.org>
+This new API allows the userspace to stop all running
+vcpus using KVM_KICK_ALL_RUNNING_VCPUS ioctl, and resume them with
+KVM_RESUME_ALL_KICKED_VCPUS.
+A "running" vcpu is a vcpu that is executing the KVM_RUN ioctl.
 
-5 minutes later -- The tests do not use that file, they use usr/include/ 
-in the build tree.  So the right Fixes tag is 17601bfed909 ("KVM: Add 
-KVM_CAP_DIRTY_LOG_RING_ACQ_REL capability and config option").
+This serie is especially helpful to userspace hypervisors like
+QEMU when they need to perform operations on memslots without the
+risk of having a vcpu reading them in the meanwhile.
+With "memslots operations" we mean grow, shrink, merge and split
+memslots, which are not "atomic" because there is a time window
+between the DELETE memslot operation and the CREATE one.
+Currently, each memslot operation is performed with one or more
+ioctls.
+For example, merging two memslots into one would imply:
+DELETE(m1)
+DELETE(m2)
+CREATE(m1+m2)
 
-Paolo
+And a vcpu could attempt to read m2 right after it is deleted, but
+before the new one is created.
+
+Therefore the simplest solution is to pause all vcpus in the kvm
+side, so that:
+- userspace just needs to call the new API before making memslots
+changes, keeping modifications to the minimum
+- dirty page updates are also performed when vcpus are blocked, so
+there is no time window between the dirty page ioctl and memslots
+modifications, since vcpus are all stopped.
+- no need to modify the existing memslots API
+
+Emanuele Giuseppe Esposito (4):
+  linux-headers/linux/kvm.h: introduce kvm_userspace_memory_region_list
+    ioctl
+  KVM: introduce kvm_clear_all_cpus_request
+  KVM: introduce memory transaction semaphore
+  KVM: use signals to abort enter_guest/blocking and retry
+
+ Documentation/virt/kvm/vcpu-requests.rst |  3 ++
+ arch/x86/include/asm/kvm_host.h          |  2 ++
+ arch/x86/kvm/x86.c                       |  8 +++++
+ include/uapi/linux/kvm.h                 |  3 ++
+ virt/kvm/kvm_main.c                      | 45 ++++++++++++++++++++++++
+ 5 files changed, 61 insertions(+)
+
+-- 
+2.31.1
 
