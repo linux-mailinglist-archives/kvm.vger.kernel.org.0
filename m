@@ -2,103 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D51BF609544
-	for <lists+kvm@lfdr.de>; Sun, 23 Oct 2022 19:51:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FE57609569
+	for <lists+kvm@lfdr.de>; Sun, 23 Oct 2022 20:15:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230261AbiJWRvG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 23 Oct 2022 13:51:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35686 "EHLO
+        id S230171AbiJWSO7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 23 Oct 2022 14:14:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230226AbiJWRvF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 23 Oct 2022 13:51:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 850FD66F0A
-        for <kvm@vger.kernel.org>; Sun, 23 Oct 2022 10:51:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666547463;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=D09MWv0UvzUmBKDXwZPzEI59Y82igwH0mMVX8RFHjcA=;
-        b=EpW2aYsSLlwNjDIRbfNdXxyD42LuGvVfxHF8SEZGhbVAeccFpXDNbN9lCMWPN709ATiT8E
-        9uizsGZO2kYnud2mTi8wJvj1dxiXdzE24ld+GvqGJHHh1MvBGb5FCWbxRIfwODFY2l1NAt
-        2WhP+MWbOqD/v16lV6XWnYlTHu10Wpc=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-493-XMK7AJHuNzOYwJqlwJqPyg-1; Sun, 23 Oct 2022 13:51:02 -0400
-X-MC-Unique: XMK7AJHuNzOYwJqlwJqPyg-1
-Received: by mail-ed1-f70.google.com with SMTP id m7-20020a056402430700b0045daff6ee5dso7283176edc.10
-        for <kvm@vger.kernel.org>; Sun, 23 Oct 2022 10:51:02 -0700 (PDT)
+        with ESMTP id S230023AbiJWSO4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 23 Oct 2022 14:14:56 -0400
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0A1F34DDA;
+        Sun, 23 Oct 2022 11:14:51 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id c3-20020a1c3503000000b003bd21e3dd7aso8573271wma.1;
+        Sun, 23 Oct 2022 11:14:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=wAEKWPZJlrfpEZ9/vlN9/0riKPaUQS9d2i2iQCHtGrs=;
+        b=oGj3vCIqKxYUSyGgfQIy0qqJoLvOGIYBaCtm2nG7AbK6H84nW0R1PMrKKsWP4wStHe
+         H2JKr93RGfynWLzhnjTN4QB3iBFZFrzUgCRTZGsYSUEP//C9pTcY0iFiTlL1QP26Xl2e
+         k6U89yKlegoM2mfNoRvVxgHATfTUkd0GwC6W6hhZabVPeDJQ9n1q8W24rDu2baxUUHHe
+         rAQ6Tos5ReKCLo5M106/nXkUZ11Xv6q3auhKQmLrLhN3SeHrMbofYv1Zj+HvkSFQFqj5
+         gLMBsZ/AH3prgaVO9BezJWarnONhJi7DGFbLCrCS7PYYcTuh6fDAJ9QDqlLbXbYlf7H1
+         pm5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D09MWv0UvzUmBKDXwZPzEI59Y82igwH0mMVX8RFHjcA=;
-        b=1srtP0kfSVnad4KX61vD/KS0kn9axpXWJDLv520PqvxKNN6oqGs+3J3fOw8tcstPmW
-         LwcsLaPH0+SlLdKewR0JBEHTzK7L6ZWs4F/toMLMtwtrduIZ4ct2kvcjazalwzRJ3ghF
-         hHizt7Dcdjes/NPOZXG/ryJ2uIqCj8bZnQFXAV5Tdj05dTsnNr1lGM4KEfmLaQqGmYeJ
-         EawjVkPn3cAnpD3SHZ+tpRxI1IxfajaIOD5OLy0x+E/3KCWMJOS/n8CiwLenLipD46+z
-         +W/3uv1Eeh5P6CraEZP/m25OywPCw4Z+d/SyKTqIYm6aOOgBaprPC1F4pFFjAdA/XE5W
-         Dhag==
-X-Gm-Message-State: ACrzQf26DJfZYIhkVZzVin5kHIlT/p+2YCbceGXfRZHpIW9/Qdz2MufM
-        L3Drh5ni+LouQa2l7qe23gFAQpX8V4w+XbWFCuPr2KRyHV/vCtYVDx1wzeJkmh4+/h/evjoUwMX
-        v8eGvQY7GY/lO
-X-Received: by 2002:a05:6402:5253:b0:45d:5914:245b with SMTP id t19-20020a056402525300b0045d5914245bmr28001383edd.227.1666547459345;
-        Sun, 23 Oct 2022 10:50:59 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4lselhb4mBLW2XIV0vJT8VL/BMXi1ZtLK17hfsJ/qDg+TASFANunS0l1JbfqLOFrZxQJtg7g==
-X-Received: by 2002:a17:907:9611:b0:78d:bb06:90a3 with SMTP id gb17-20020a170907961100b0078dbb0690a3mr24419521ejc.233.1666547448280;
-        Sun, 23 Oct 2022 10:50:48 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id d14-20020a170906304e00b0078250005a79sm14429105ejd.163.2022.10.23.10.50.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 23 Oct 2022 10:50:47 -0700 (PDT)
-Message-ID: <62500f94-b95b-1e16-4aa2-f67905fab01a@redhat.com>
-Date:   Sun, 23 Oct 2022 19:50:45 +0200
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wAEKWPZJlrfpEZ9/vlN9/0riKPaUQS9d2i2iQCHtGrs=;
+        b=j1Dmv/AyZOV5Hh+ce5/AjcRX8U0H9X83DMbg+4nqoUIf2fX/Nzs89vy13kVl7NkTyr
+         bYrdhidRc5DqJ+teQlXyQ3zACXmgHUEv56AvMX8wYfMxYAqk501SOWbhLLXI4anxdSgW
+         zrCHr4ifRSJdtm09HQYrrMU/gBuP8CzjNNm1OL8XUiqyWS40F6EBc57Q82ZbpcCq2/vz
+         BAmYV1Rqj2q3GFDsN1gKT1RPRMwtmkF+0JMtEr9lkp3xLOWjGq8E+uV4WNaNQDTZLQZR
+         cn+NkYGL3lC+9D5VyMf6z1b4xba2Ax+nq5+snqXyp3WwJE3eVCVLeG4r+xaP/bhFfRIa
+         jCBQ==
+X-Gm-Message-State: ACrzQf0X7uSJwXdCMwcXZhWurMM2mhvADvx8/s+uCu5Agq4Px5wIyTEZ
+        LENSkrpdxXGgvus3Sm4xgZKFZhJR8twYaKwF0NbfqHC6
+X-Google-Smtp-Source: AMsMyM5Ffe6y2yTBG1r4UmOxy8f5kKj0k94BQpPomUD7JD6cCR2tb/Gu3OwwSntQ7NKOWOE4amDyflW1VfCXJ7f/Txc=
+X-Received: by 2002:a05:600c:502c:b0:3ce:794f:d664 with SMTP id
+ n44-20020a05600c502c00b003ce794fd664mr1610329wmr.33.1666548889346; Sun, 23
+ Oct 2022 11:14:49 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH 3/4] KVM: introduce memory transaction semaphore
-Content-Language: en-US
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
-        kvm@vger.kernel.org
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20221022154819.1823133-1-eesposit@redhat.com>
- <20221022154819.1823133-4-eesposit@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20221022154819.1823133-4-eesposit@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+References: <CAMdYzYrUOoTmBL2c_+=xLBMXg38Pp4hANnzqxoe1cVDDrFvqTA@mail.gmail.com>
+ <Y0QnFHqrX2r/7oUz@rowland.harvard.edu> <CAMdYzYodS7Y4bZ+fzzAXMSiCfQHwMkmV8-C=b3FVUXDExavXgA@mail.gmail.com>
+ <Y0QzrI92f9BL+91W@rowland.harvard.edu> <CAMdYzYpdLEKMSytGStvM2Gi+gkBY7GTUHZfoBt5X-2BEzLrfOw@mail.gmail.com>
+ <Y0cuHHWL3r7+mpcq@rowland.harvard.edu> <CAMdYzYockLYigqgX+R28a_Xy=wGExGj-MXL79Jrc7Jv7B6Qh3w@mail.gmail.com>
+ <Y0tfXv2U7Izx5boj@rowland.harvard.edu>
+In-Reply-To: <Y0tfXv2U7Izx5boj@rowland.harvard.edu>
+From:   Peter Geis <pgwipeout@gmail.com>
+Date:   Sun, 23 Oct 2022 14:14:37 -0400
+Message-ID: <CAMdYzYqDMFT2a499RDnuqak75Y4fD=ktcoCOu=8wfKbeecQhaA@mail.gmail.com>
+Subject: Re: [BUG] KVM USB passthrough did not claim interface before use
+To:     Alan Stern <stern@rowland.harvard.edu>
+Cc:     kvm@vger.kernel.org, linux-usb@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/22/22 17:48, Emanuele Giuseppe Esposito wrote:
-> +static DECLARE_RWSEM(memory_transaction);
+On Sat, Oct 15, 2022 at 9:33 PM Alan Stern <stern@rowland.harvard.edu> wrote:
+>
+> On Sat, Oct 15, 2022 at 08:36:19PM -0400, Peter Geis wrote:
+> > On Wed, Oct 12, 2022 at 5:14 PM Alan Stern <stern@rowland.harvard.edu> wrote:
+> > >
+> > > There's one other thing you might try, although I'm not sure that it
+> > > will provide any useful new information.  Instead of collecting a
+> > > usbmon trace, collect a usbfs snoop log.  Before starting qemu, do:
+> > >
+> > >         echo 1 >/sys/module/usbcore/parameters/usbfs_snoop
+> > >
+> > > This will cause the accesses performed via usbfs, including those
+> > > performed by the qemu process, to be printed in the kernel log.  (Not
+> > > all of the accesses, but the more important ones.)  Let's see what shows
+> > > up.
+> >
+> > So I built and tested the newest version of QEMU, and it exhibits the
+> > same issue. I've also captured the log as requested and attached it
+> > here.
+>
+> Here's what appears to be the relevant parts of the log.
+>
+> > [93190.933026] usb 3-6.2: opened by process 149607: rpc-libvirtd
+> > [93191.006429] usb 3-6.2: opened by process 149605: qemu-system-x86
+>
+> The device is opened by proces 194605, which is probably the main qemu
+> process (or the main one in charge of USB I/O).  I assume this is the
+> process which goes ahead with initialization and enumeration, because
+> there are no indications of other processes opening the device.
+>
+> > [93195.712484] usb 3-6.2: usbdev_do_ioctl: RESET
+> > [93195.892482] usb 3-6.2: reset full-speed USB device number 70 using xhci_hcd
+> > [93196.095050] cdc_acm 3-6.2:1.0: ttyACM0: USB ACM device
+>
+> As part of initialization, qemu resets the device and its interfaces
+> then get claimed by the cdc_acm driver on the host.  This may be the
+> problem; there's no indication in the log that cdc_acm ever releases
+> those interfaces.
+>
+> > [93196.482584] usb 3-6.2: usbdev_do_ioctl: SUBMITURB
+> > [93196.482589] usb 3-6.2: usbfs: process 149617 (CPU 3/KVM) did not claim interface 0 before use
+> > [93209.729484] usb 3-6.2: usbdev_do_ioctl: SUBMITURB
+> > [93209.729489] usb 3-6.2: usbfs: process 149616 (CPU 2/KVM) did not claim interface 0 before use
+> > [93209.729574] usb 3-6.2: usbdev_do_ioctl: CLEAR_HALT
+> > [93209.729577] usb 3-6.2: usbfs: process 149617 (CPU 3/KVM) did not claim interface 1 before use
+> > [93209.729632] usb 3-6.2: usbdev_do_ioctl: SUBMITURB
+> > [93209.729635] usb 3-6.2: usbfs: process 149614 (CPU 0/KVM) did not claim interface 0 before use
+>
+> Unforunately these warning messages don't indicate directly whether
+> the attempts to use the interfaces were successful.  But it's clear
+> that something went wrong with those URB submissions because the snoop
+> log doesn't include the contents of the URBs or their results.
+>
+> My guess is that the attempts failed because the interfaces were
+> already claimed by cdc_acm in the host.  I would expect qemu to unbind
+> cdc_acm when it starts up, but apparently it doesn't.  And there are
+> no CLAIM_PORT messages in the log.
+>
+> Perhaps it will help if you do the unbind by hand before starting
+> qemu.  Try doing:
+>
+>         echo 3-6.2:1.0 >/sys/bus/usb/drivers/cdc_acm/unbind
+>         echo 3-6.2:1.1 >/sys/bus/usb/drivers/cdc_acm/unbind
+>
+> Or better yet, blacklist the cdc_acm driver on the host if you can.
 
-This cannot be global, it must be per-struct kvm.  Otherwise one VM can 
-keep the rwsem indefinitely while a second VM hangs in 
-KVM_KICK_ALL_RUNNING_VCPUS.
+Good Afternoon,
 
-It can also be changed to an SRCU (with the down_write+up_write sequence 
-changed to synchronize_srcu_expedited) which has similar characteristics 
-to your use of the rwsem.
+Thanks, blacklisting cdc_acm stopped usbfs from failing to claim it
+again. Unfortunately I ran into another issue, where KVM/QEMU doesn't
+claim the USB device again after the device resets. I've encountered
+this before with other devices and there doesn't seem to be a way to
+resolve it yet. It seems that my issue with this device was a
+different manifestation of the same problem, and there currently isn't
+a fix for that.
 
-Paolo
+Thank you for your assistance.
+Very Respectfully,
+Peter
 
+>
+> Alan Stern
