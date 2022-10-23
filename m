@@ -2,165 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E682E609536
-	for <lists+kvm@lfdr.de>; Sun, 23 Oct 2022 19:43:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DE5AC60953E
+	for <lists+kvm@lfdr.de>; Sun, 23 Oct 2022 19:49:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229728AbiJWRnm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 23 Oct 2022 13:43:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45094 "EHLO
+        id S230311AbiJWRtA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 23 Oct 2022 13:49:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229618AbiJWRnk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 23 Oct 2022 13:43:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6A786C775
-        for <kvm@vger.kernel.org>; Sun, 23 Oct 2022 10:43:39 -0700 (PDT)
+        with ESMTP id S230070AbiJWRsy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 23 Oct 2022 13:48:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28C4760C85
+        for <kvm@vger.kernel.org>; Sun, 23 Oct 2022 10:48:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666547019;
+        s=mimecast20190719; t=1666547332;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=3vt+KZx63WgRri2q1BTlkYWROLUWRToSyczWPx/yZ74=;
-        b=c39iViAMb4D0H3GDurZipu7pEoYiW0vVTqfaiBC+W4T1CD7rJa0QxSvWRpjS4yq1iAn4ix
-        HkdFxEHdC7m9Pd1uOJLuZHC+jlbvrCfotrX3mCy9WvV28exDv7RJb+cnxvUZkoTOiNnOuH
-        Zxtf6+fS8rl1BJEMd2zpTT47sonGqQE=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-532-YCYfz7G_Pk6jI4VlTPAnNg-1; Sun, 23 Oct 2022 13:43:35 -0400
-X-MC-Unique: YCYfz7G_Pk6jI4VlTPAnNg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BD22C38041D5;
-        Sun, 23 Oct 2022 17:43:19 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CD83739DB3;
-        Sun, 23 Oct 2022 17:43:08 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM patches for Linux 6.1-rc2
-Date:   Sun, 23 Oct 2022 13:43:07 -0400
-Message-Id: <20221023174307.1868939-1-pbonzini@redhat.com>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vEfdKErJsUmUR1/yos9QP+bNAkmXMZOsQ2d8ha8BHWU=;
+        b=eA+bk085fs22a6z9cRRCaOguYxH43SynmQReYqhkIh1fpQNbgQ/vAaTMpFzsZ4IDmbaziK
+        AOlUd3NKRMexwItwAuC11bkF2RgLOSMmnvVJcbZykGcyTkRPCh3H0/z9aaboUOK16bewvj
+        K+SxTInU0zxqYAJbuAVr9G8Pb0Bo9ls=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-573-Ip7Leo-zOYCT_yu5NFQ3cw-1; Sun, 23 Oct 2022 13:48:50 -0400
+X-MC-Unique: Ip7Leo-zOYCT_yu5NFQ3cw-1
+Received: by mail-ed1-f71.google.com with SMTP id y14-20020a056402270e00b0045d1baf4951so7336581edd.11
+        for <kvm@vger.kernel.org>; Sun, 23 Oct 2022 10:48:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vEfdKErJsUmUR1/yos9QP+bNAkmXMZOsQ2d8ha8BHWU=;
+        b=xIkze+OKOC1iIFDKhSOfkgfcf9hcsLJIykrNSyl093h0KFijK/bieTpWK3vAgmhaTX
+         iGAqzVJNvB/nlinvU2zzx4eiHubJXbxIRe/QSss8cjc4gig8rw1eZggTYirKPYoHqosV
+         XDCh4GC00er9w/ymmmVQF2SglZyfTyJm3CUPutnEoFNE4f7FCsMfXJ/OOTOV8Dh0XzqI
+         zFsItIJAkmi2GRvHGoG+Dp5V10O3o7AVBKnh7jPE8gHp/Bdm/05TzsN6eV/xM9Xl8I9i
+         fJNinuVqm1lJQ4r0XDFORkd0e4jVY0qU1salVP9Dl82fI+Wk8T5m19GSZfG2uVKCtPSX
+         m63A==
+X-Gm-Message-State: ACrzQf0FR8amqrpZn+gLFYKv3K56duJcijLd/lMnjt9GdnYVtafyvvwi
+        NlusWBG5xJmBiLaeecIGYaxL4oHxvrU9QE2KRtUXOsiyBABde95gw8DtcrXtyQBTSfgLNdvYRnV
+        6C5fzly1yUtzz
+X-Received: by 2002:a17:907:168e:b0:7a1:6786:f16 with SMTP id hc14-20020a170907168e00b007a167860f16mr6419721ejc.590.1666547329196;
+        Sun, 23 Oct 2022 10:48:49 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6mUSKfu9T6DkHEU5jtf2+fA27CrmXJC26pSFEwAcm+BNpJmvPPw8rKJG5A939hZ5MB5VCcgg==
+X-Received: by 2002:a17:907:168e:b0:7a1:6786:f16 with SMTP id hc14-20020a170907168e00b007a167860f16mr6419696ejc.590.1666547328896;
+        Sun, 23 Oct 2022 10:48:48 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id w5-20020a17090649c500b007789e7b47besm14238632ejv.25.2022.10.23.10.48.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 23 Oct 2022 10:48:47 -0700 (PDT)
+Message-ID: <5ee4eeb8-4d61-06fc-f80d-06efeeffe902@redhat.com>
+Date:   Sun, 23 Oct 2022 19:48:46 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [PATCH 4/4] KVM: use signals to abort enter_guest/blocking and
+ retry
+Content-Language: en-US
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     Jonathan Corbet <corbet@lwn.net>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20221022154819.1823133-1-eesposit@redhat.com>
+ <20221022154819.1823133-5-eesposit@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20221022154819.1823133-5-eesposit@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On 10/22/22 17:48, Emanuele Giuseppe Esposito wrote:
+> Once a vcpu exectues KVM_RUN, it could enter two states:
+> enter guest mode, or block/halt.
+> Use a signal to allow a vcpu to exit the guest state or unblock,
+> so that it can exit KVM_RUN and release the read semaphore,
+> allowing a pending KVM_KICK_ALL_RUNNING_VCPUS to continue.
+> 
+> Note that the signal is not deleted and used to propagate the
+> exit reason till vcpu_run(). It will be clearead only by
+> KVM_RESUME_ALL_KICKED_VCPUS. This allows the vcpu to keep try
+> entering KVM_RUN and perform again all checks done in
+> kvm_arch_vcpu_ioctl_run() before entering the guest state,
+> where it will return again if the request is still set.
+> 
+> However, the userspace hypervisor should also try to avoid
+> continuously calling KVM_RUN after invoking KVM_KICK_ALL_RUNNING_VCPUS,
+> because such call will just translate in a back-to-back down_read()
+> and up_read() (thanks to the signal).
 
-The following changes since commit 9abf2313adc1ca1b6180c508c25f22f9395cc780:
-
-  Linux 6.1-rc1 (2022-10-16 15:36:24 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to 9aec606c1609a5da177b579475a73f6c948e034a:
-
-  tools: include: sync include/api/linux/kvm.h (2022-10-22 07:54:19 -0400)
-
-----------------------------------------------------------------
-RISC-V:
-
-- Fix compilation without RISCV_ISA_ZICBOM
-
-- Fix kvm_riscv_vcpu_timer_pending() for Sstc
-
-ARM:
-
-- Fix a bug preventing restoring an ITS containing mappings
-  for very large and very sparse device topology
-
-- Work around a relocation handling error when compiling
-  the nVHE object with profile optimisation
-
-- Fix for stage-2 invalidation holding the VM MMU lock
-  for too long by limiting the walk to the largest
-  block mapping size
-
-- Enable stack protection and branch profiling for VHE
-
-- Two selftest fixes
-
-x86:
-
-- add compat implementation for KVM_X86_SET_MSR_FILTER ioctl
-
-selftests:
-
-- synchronize includes between include/uapi and tools/include/uapi
-
-----------------------------------------------------------------
-
-As a heads up, next week I will have a relatively large pull
-request in number of patches, with a series fixing various issues in
-virt/kvm/pfncache.c.
+Since the userspace should anyway avoid going into this effectively-busy 
+wait, what about clearing the request after the first exit?  The 
+cancellation ioctl can be kept for vCPUs that are never entered after 
+KVM_KICK_ALL_RUNNING_VCPUS.  Alternatively, kvm_clear_all_cpus_request 
+could be done right before up_write().
 
 Paolo
 
-Alexander Graf (3):
-      kvm: Add support for arch compat vm ioctls
-      KVM: x86: Copy filter arg outside kvm_vm_ioctl_set_msr_filter()
-      KVM: x86: Add compat handler for KVM_X86_SET_MSR_FILTER
-
-Andrew Jones (1):
-      RISC-V: Fix compilation without RISCV_ISA_ZICBOM
-
-Anup Patel (1):
-      RISC-V: KVM: Fix kvm_riscv_vcpu_timer_pending() for Sstc
-
-Denis Nikitin (1):
-      KVM: arm64: nvhe: Fix build with profile optimization
-
-Eric Ren (1):
-      KVM: arm64: vgic: Fix exit condition in scan_its_table()
-
-Gavin Shan (1):
-      KVM: selftests: Fix number of pages for memory slot in memslot_modification_stress_test
-
-Oliver Upton (2):
-      KVM: arm64: Work out supported block level at compile time
-      KVM: arm64: Limit stage2_apply_range() batch size to largest block
-
-Paolo Bonzini (4):
-      Merge tag 'kvmarm-fixes-6.1-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
-      Merge tag 'kvmarm-fixes-6.1-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
-      Merge tag 'kvm-riscv-fixes-6.1-1' of https://github.com/kvm-riscv/linux into HEAD
-      tools: include: sync include/api/linux/kvm.h
-
-Vincent Donnefort (1):
-      KVM: arm64: Enable stack protection and branch profiling for VHE
-
-Zenghui Yu (1):
-      KVM: arm64: selftests: Fix multiple versions of GIC creation
-
- arch/arm64/include/asm/kvm_pgtable.h               | 18 +++--
- arch/arm64/include/asm/stage2_pgtable.h            | 20 -----
- arch/arm64/kvm/hyp/Makefile                        |  5 +-
- arch/arm64/kvm/hyp/nvhe/Makefile                   |  7 ++
- arch/arm64/kvm/mmu.c                               |  9 ++-
- arch/arm64/kvm/vgic/vgic-its.c                     |  5 +-
- arch/riscv/include/asm/cacheflush.h                |  8 --
- arch/riscv/include/asm/kvm_vcpu_timer.h            |  1 +
- arch/riscv/kvm/vcpu.c                              |  3 +
- arch/riscv/kvm/vcpu_timer.c                        | 17 ++++-
- arch/riscv/mm/cacheflush.c                         | 38 ++++++++++
- arch/riscv/mm/dma-noncoherent.c                    | 41 ----------
- arch/x86/kvm/x86.c                                 | 87 ++++++++++++++++++----
- include/linux/kvm_host.h                           |  2 +
- tools/include/uapi/linux/kvm.h                     |  1 +
- tools/testing/selftests/kvm/aarch64/vgic_init.c    |  4 +-
- .../kvm/memslot_modification_stress_test.c         |  2 +-
- virt/kvm/kvm_main.c                                | 11 +++
- 18 files changed, 180 insertions(+), 99 deletions(-)
+> Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+> ---
+>   arch/x86/include/asm/kvm_host.h |  2 ++
+>   arch/x86/kvm/x86.c              |  8 ++++++++
+>   virt/kvm/kvm_main.c             | 21 +++++++++++++++++++++
+>   3 files changed, 31 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index aa381ab69a19..d5c37f344d65 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -108,6 +108,8 @@
+>   	KVM_ARCH_REQ_FLAGS(30, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>   #define KVM_REQ_MMU_FREE_OBSOLETE_ROOTS \
+>   	KVM_ARCH_REQ_FLAGS(31, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> +#define KVM_REQ_USERSPACE_KICK		\
+> +	KVM_ARCH_REQ_FLAGS(32, KVM_REQUEST_WAIT)
+>   
+>   #define CR0_RESERVED_BITS                                               \
+>   	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index b0c47b41c264..2af5f427b4e9 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10270,6 +10270,10 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>   	}
+>   
+>   	if (kvm_request_pending(vcpu)) {
+> +		if (kvm_test_request(KVM_REQ_USERSPACE_KICK, vcpu)) {
+> +			r = -EINTR;
+> +			goto out;
+> +		}
+>   		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) {
+>   			r = -EIO;
+>   			goto out;
+> @@ -10701,6 +10705,10 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
+>   			r = vcpu_block(vcpu);
+>   		}
+>   
+> +		/* vcpu exited guest/unblocked because of this request */
+> +		if (kvm_test_request(KVM_REQ_USERSPACE_KICK, vcpu))
+> +			return -EINTR;
+> +
+>   		if (r <= 0)
+>   			break;
+>   
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index ae0240928a4a..13fa7229b85d 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3431,6 +3431,8 @@ static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
+>   		goto out;
+>   	if (kvm_check_request(KVM_REQ_UNBLOCK, vcpu))
+>   		goto out;
+> +	if (kvm_test_request(KVM_REQ_USERSPACE_KICK, vcpu))
+> +		goto out;
+>   
+>   	ret = 0;
+>   out:
+> @@ -4668,6 +4670,25 @@ static long kvm_vm_ioctl(struct file *filp,
+>   		r = kvm_vm_ioctl_enable_cap_generic(kvm, &cap);
+>   		break;
+>   	}
+> +	case KVM_KICK_ALL_RUNNING_VCPUS: {
+> +		/*
+> +		 * Notify all running vcpus that they have to stop.
+> +		 * Caught in kvm_arch_vcpu_ioctl_run()
+> +		 */
+> +		kvm_make_all_cpus_request(kvm, KVM_REQ_USERSPACE_KICK);
+> +
+> +		/*
+> +		 * Use wr semaphore to wait for all vcpus to exit from KVM_RUN.
+> +		 */
+> +		down_write(&memory_transaction);
+> +		up_write(&memory_transaction);
+> +		break;
+> +	}
+> +	case KVM_RESUME_ALL_KICKED_VCPUS: {
+> +		/* Remove all requests sent with KVM_KICK_ALL_RUNNING_VCPUS */
+> +		kvm_clear_all_cpus_request(kvm, KVM_REQ_USERSPACE_KICK);
+> +		break;
+> +	}
+>   	case KVM_SET_USER_MEMORY_REGION: {
+>   		struct kvm_userspace_memory_region kvm_userspace_mem;
+>   
 
