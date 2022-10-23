@@ -2,105 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 782E56096FA
-	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 00:15:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 315B0609711
+	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 00:39:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229629AbiJWWPb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 23 Oct 2022 18:15:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51980 "EHLO
+        id S229732AbiJWWjm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 23 Oct 2022 18:39:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229455AbiJWWP3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 23 Oct 2022 18:15:29 -0400
-Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D7D446878
-        for <kvm@vger.kernel.org>; Sun, 23 Oct 2022 15:15:26 -0700 (PDT)
-Received: by mail-qv1-xf32.google.com with SMTP id ml12so4511124qvb.0
-        for <kvm@vger.kernel.org>; Sun, 23 Oct 2022 15:15:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=y24AOJSf6aWoSnenwrB4rB+v3E66RFlXKYZodyfNpmI=;
-        b=bYPvGCsIR4tXMVTQIDgsK6ovOEDTsnWnZFWagZ69yVWsOXt3quZB41d2pj+DwvzEgl
-         4v/a818ksm996aOQdG7sbDti2ShqA0oH5Zag95O6OrGmWkHFXcWE0eFFs2kMgb6ftKzg
-         UxtGjkNOPKmKt7VQ2ubIAOuanhlaZ59MN3WVM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=y24AOJSf6aWoSnenwrB4rB+v3E66RFlXKYZodyfNpmI=;
-        b=bgU+COJXiW/kd9GEEMquzaX1vlNZpLm+g7iDs2LsTReq0BGEmaEmOyB56Sr59vGNK+
-         AqnwG5/uehBJB4mfOXLfdibL1yknOyqCS7Y+7zagdrulEFJ4fEVMXQvB8/AgNpMfD4Mp
-         DuoFiqs0Nk/MQMi/o7z9Z838vbYoGl9KQXxjVAi47rBMti8z9iLd5O7/rorcoJ5bvlkI
-         cgL8WVTrugZFMcv1/Qe92N2N7HwN85RKnus416/BWhPpm0FBaXuJya5nQZDtuwqT1auV
-         GFdFLsIm+MyGSoANhs6d6V1FR6I0nKK8PxO+r5Ljwc6MW33Uv2QMf0fPoZoYSZXrlP1/
-         jHzw==
-X-Gm-Message-State: ACrzQf3LBI7y7klFaqKlD2B3r+zDLOj3TehalqN0gkx0OSIvsYk8PzlM
-        Y01EUtldA8YIiFyhA8IDLtfpYLb8LwK0ZA==
-X-Google-Smtp-Source: AMsMyM6y4FsCcbnkmeLydNmb3M0eoaJAhS1NYhjRnLIPViELIibsdq8RgEhbZ9OxGaFDl/83a3O0Dg==
-X-Received: by 2002:a05:6214:1d26:b0:4bb:5bb9:bd6d with SMTP id f6-20020a0562141d2600b004bb5bb9bd6dmr9534077qvd.69.1666563325367;
-        Sun, 23 Oct 2022 15:15:25 -0700 (PDT)
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com. [209.85.219.172])
-        by smtp.gmail.com with ESMTPSA id u24-20020a37ab18000000b006bb83c2be40sm13829407qke.59.2022.10.23.15.15.24
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 23 Oct 2022 15:15:24 -0700 (PDT)
-Received: by mail-yb1-f172.google.com with SMTP id 187so141793ybe.1
-        for <kvm@vger.kernel.org>; Sun, 23 Oct 2022 15:15:24 -0700 (PDT)
-X-Received: by 2002:a25:5389:0:b0:6bc:f12c:5d36 with SMTP id
- h131-20020a255389000000b006bcf12c5d36mr25687050ybb.184.1666563324398; Sun, 23
- Oct 2022 15:15:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <20221023174307.1868939-1-pbonzini@redhat.com>
-In-Reply-To: <20221023174307.1868939-1-pbonzini@redhat.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Sun, 23 Oct 2022 15:15:08 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wgL7sh-+6mPk7FGCFtjuh36fhOLNRTT0_4g3yd380P0+w@mail.gmail.com>
-Message-ID: <CAHk-=wgL7sh-+6mPk7FGCFtjuh36fhOLNRTT0_4g3yd380P0+w@mail.gmail.com>
+        with ESMTP id S229519AbiJWWjk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 23 Oct 2022 18:39:40 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 668E712AD9;
+        Sun, 23 Oct 2022 15:39:38 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CA77E60F04;
+        Sun, 23 Oct 2022 22:39:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3AEC6C433D7;
+        Sun, 23 Oct 2022 22:39:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1666564777;
+        bh=m5oRIXnhkNxVKNWVXq3RUP0v/9Lr2ucn11DVzo12OP0=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=SWaKspz9iL4yBj1cqgLxqI0B8cnIXuzre2y/1ZdDpu6e9DbgTrQ8BXP07BARrr9To
+         FEll98iLqDDln3Rvl1jrrVhKjZs9yd7yRz9bqDEq6rTHvFKdYqz8Hg60YPrDmDxO+0
+         qf6FXAXwcetl9XM1wPYztpB4WeQPM3Otj5gBwnoi1tD9sze+noT2QmXpItVApJZV5L
+         gXpZrxA3HuT2nrEKnD0HT5BHFC3/VnQO7CrVu1+7JGlSQA3tef2Cfu2eisHpZ/hlh7
+         RoS/C3SxSDOAIwPnD4LuFQ7laKYbEQS/wzzoEbo+V3q0qRQ2NbIO5p7Se+YyLclVST
+         WW62OFN8aYr2w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1E061E270DF;
+        Sun, 23 Oct 2022 22:39:37 +0000 (UTC)
 Subject: Re: [GIT PULL] KVM patches for Linux 6.1-rc2
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Alexander Graf <graf@amazon.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
-        autolearn_force=no version=3.4.6
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20221023174307.1868939-1-pbonzini@redhat.com>
+References: <20221023174307.1868939-1-pbonzini@redhat.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20221023174307.1868939-1-pbonzini@redhat.com>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+X-PR-Tracked-Commit-Id: 9aec606c1609a5da177b579475a73f6c948e034a
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 05b4ebd2c7cbb3671c376754b37b4963dd08a3a2
+Message-Id: <166656477709.18953.3124354710980701686.pr-tracker-bot@kernel.org>
+Date:   Sun, 23 Oct 2022 22:39:37 +0000
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Oct 23, 2022 at 10:43 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> x86:
->
-> - add compat implementation for KVM_X86_SET_MSR_FILTER ioctl
+The pull request you sent on Sun, 23 Oct 2022 13:43:07 -0400:
 
-Side note: this should probably have used
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-        compat_uptr_t bitmap;
-        ...
-        .bitmap = compat_ptr(cr->bitmap),
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/05b4ebd2c7cbb3671c376754b37b4963dd08a3a2
 
-instead of doing that
+Thank you!
 
-        __u32 bitmap;
-        ...
-       .bitmap = (__u8 *)(ulong)cr->bitmap,
-
-because not only are those casts really ugly, using that
-'compat_uptr_t" and "compat_ptr()" helper also really explains what is
-going on.
-
-compat_ptr() also happens to get the address space right (ie it
-returns a "void __user *" pointer). But since the non-compat 'struct
-kvm_msr_filter_range' bitmap member doesn't get that right either
-(because it uses the same type for kernel pointers as for user
-pointers - ugly uglt), that isn't such a big deal. The kvm code
-clearly doesn't do proper user pointer typing, and just uses random
-casts instead.
-
-                         Linus
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
