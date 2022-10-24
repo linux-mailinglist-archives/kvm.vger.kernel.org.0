@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A33B060A218
-	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 13:39:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C2D2460A237
+	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 13:39:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231240AbiJXLir (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 07:38:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50348 "EHLO
+        id S231241AbiJXLjs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Oct 2022 07:39:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230442AbiJXLiF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Oct 2022 07:38:05 -0400
+        with ESMTP id S231360AbiJXLjF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Oct 2022 07:39:05 -0400
 Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A2DCF02B;
-        Mon, 24 Oct 2022 04:37:47 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85B98356CB;
+        Mon, 24 Oct 2022 04:37:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666611467; x=1698147467;
+  t=1666611475; x=1698147475;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=xM7HXxH+B48BG++NWUWJKnJ1CNJFnMO26T4ZGCyIuOg=;
-  b=FksJcDXWvdP6ERPx+dsjiApPoiDY8EAvyj2y5RctRECnaFCFAkB8eAF9
-   0bSKz8+UxESa5BrGQt9Cwzen8FNRhf0nsUJsZhwMoP0GwTgwWu3B8s4Qa
-   9lGDfqucjhdKoenpjCCXIElDP3npVv/D+Qi6GElT0yAMNYmJXBErTn8a5
-   X5SEJWefkuWud9tYJ925vTerZeJSkuNCDvlSQCUccw3WlBp/Z3yGXN/8W
-   GL0OxVnW9Jwhtnl7jiPn41zJ4SPwr7LG/QpnCLQZ8sDfsPgzZit1d0nP3
-   0NdoawiaL1TDOd7h8EgbgOl1CLCNVXwg9uMUjgmi+rb4Lj6R6WsNXs3Xg
+  bh=4jBh95k+8xwo1JohtTSjVth9N3E+IK9boL8mgzWoN7E=;
+  b=OKB6cXOJBYkJsTt5y34AAkO4QxMqO5Fq5IsnDz+DNQUqjATYN43tC8jz
+   WBcclExBf6f2mK3nltTNmuxs8ctAFVCskdxOCZzJhfkLoskEKRKNo3G+d
+   I3Gbef+YcNeD1VuK90ZwBaJiw2Et4sTirbde9O6fmPO4QR59cPtHjsc7R
+   YYlRbxaeHWHWdXurWSaD8Z+SFNS6u5x5h8ovPhC9dZlUpyAu2UlKftCGN
+   Jy1kdnVlDJHIkQgEd4RqkhSSYltcB9P6t36HwG5sCLwzCKEI534KjPVbk
+   dIJY9HHX0cLLvsZs2tn72DpGPOYv7yedxK6eYcpUqsc2wZ2JtbS6Ou82p
    g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10509"; a="369462464"
+X-IronPort-AV: E=McAfee;i="6500,9779,10509"; a="369462469"
 X-IronPort-AV: E=Sophos;i="5.95,209,1661842800"; 
-   d="scan'208";a="369462464"
+   d="scan'208";a="369462469"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2022 04:35:22 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2022 04:35:25 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10509"; a="773785028"
+X-IronPort-AV: E=McAfee;i="6500,9779,10509"; a="773785039"
 X-IronPort-AV: E=Sophos;i="5.95,209,1661842800"; 
-   d="scan'208";a="773785028"
+   d="scan'208";a="773785039"
 Received: from tdx-lm.sh.intel.com ([10.239.53.27])
-  by fmsmga001.fm.intel.com with ESMTP; 24 Oct 2022 04:35:19 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 24 Oct 2022 04:35:22 -0700
 From:   Wei Wang <wei.w.wang@intel.com>
 To:     seanjc@google.com, pbonzini@redhat.com
 Cc:     dmatlack@google.com, vipinsh@google.com, ajones@ventanamicro.com,
         eric.auger@redhat.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Wei Wang <wei.w.wang@intel.com>
-Subject: [PATCH v1 13/18] KVM: selftests/perf_test_util: vcpu related code consolidation
-Date:   Mon, 24 Oct 2022 19:34:40 +0800
-Message-Id: <20221024113445.1022147-14-wei.w.wang@intel.com>
+Subject: [PATCH v1 14/18] KVM: selftest/memslot_perf_test: vcpu related code consolidation
+Date:   Mon, 24 Oct 2022 19:34:41 +0800
+Message-Id: <20221024113445.1022147-15-wei.w.wang@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20221024113445.1022147-1-wei.w.wang@intel.com>
 References: <20221024113445.1022147-1-wei.w.wang@intel.com>
@@ -60,464 +60,378 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Peform vcpu related code consolidation in lib/perf_test_util.c and its
-users. To be more precise:
-For the lib, perf_test_util.c:
-- remove the globally defined *vcpus[] array, as it is a duplicate of
-  vm->vcpus[i], and accordingly, remove the "*vcpus[]" input parameters
-  from the related APIs (e.g. perf_test_setup_vcpus);
-- remove the globally defined vcpu_thread array, as the vcpu thread has
-  been included into the kvm_vcpu struct, and simplify the implementation
-  in perf_test_start_vcpu_threads by using the related helper functions;
-- remove the redundant fields in "struct vcpu_thread" (e.g. vcpu_idx), as
-  they are already part of the vcpu struct. Also rename it to "struct
-  vcpu_thread_data" and change it to the vcpu thread's private_data, which
-  is passed to the vcpu threads' start_routine (i.e. vcpu_thread_main).
-- remove perf_test_join_vcpu_threads as we have a helper function to join
-  the vcpu threads (i.e. vm_vcpu_threads_join), and put it in
-  perf_test_destroy_vm so that users don't need to call threads_join
-  and destroy_vm separately.
-- change vcpu_fn (per-user vcpu hread's callback routine) to use
-  "struct kvm_vcpu" as an interface, as it is easier to get the related
-  info from vcpu (e.g. vcpu->id);
-
-For the users, access_tracking_perf_test.c, demand_paging_test.c, and
-memslot_modification_stress_test.c, dirty_log_perf_test.c:
-- change the input parameters of the functions (e.g. vcpu_thread_main)
-  to use "struct kvm_vcpu" as an interface to match the change in the lib;
-
-Finally, have the lib and user changes in one patch to ensure the
-interface and its users are updated together, so that the compilation
-doesn't complain with errors.
+Remove the vcpu and vcpu_thread fields in the vm_data struct and reuse
+the one in the kvm_vm strut. Rename vm_data to vcpu_thread_data and make
+it be the vcpu thread's private data. Also use the helper functions to
+create and join the vcpu thread.
 
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 ---
- .../selftests/kvm/access_tracking_perf_test.c | 18 +++--
- .../selftests/kvm/demand_paging_test.c        |  9 +--
- .../selftests/kvm/dirty_log_perf_test.c       | 11 ++-
- .../selftests/kvm/include/perf_test_util.h    |  9 ++-
- .../selftests/kvm/lib/perf_test_util.c        | 68 +++++++------------
- .../selftests/kvm/lib/x86_64/perf_test_util.c | 11 +--
- .../kvm/memslot_modification_stress_test.c    |  9 +--
- 7 files changed, 53 insertions(+), 82 deletions(-)
+ .../testing/selftests/kvm/memslot_perf_test.c | 137 +++++++++---------
+ 1 file changed, 71 insertions(+), 66 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-index 76c583a07ea2..878b9189774c 100644
---- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
-+++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-@@ -125,10 +125,10 @@ static void mark_page_idle(int page_idle_fd, uint64_t pfn)
- 		    "Set page_idle bits for PFN 0x%" PRIx64, pfn);
+diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
+index 44995446d942..bf37d1bb8d50 100644
+--- a/tools/testing/selftests/kvm/memslot_perf_test.c
++++ b/tools/testing/selftests/kvm/memslot_perf_test.c
+@@ -6,7 +6,6 @@
+  *
+  * Basic guest setup / host vCPU thread code lifted from set_memory_region_test.
+  */
+-#include <pthread.h>
+ #include <sched.h>
+ #include <semaphore.h>
+ #include <stdatomic.h>
+@@ -86,10 +85,7 @@ static_assert(MEM_TEST_MOVE_SIZE <= MEM_TEST_SIZE,
+ #define MEM_TEST_VAL_1 0x1122334455667788
+ #define MEM_TEST_VAL_2 0x99AABBCCDDEEFF00
+ 
+-struct vm_data {
+-	struct kvm_vm *vm;
+-	struct kvm_vcpu *vcpu;
+-	pthread_t vcpu_thread;
++struct vcpu_thread_data {
+ 	uint32_t nslots;
+ 	uint64_t npages;
+ 	uint64_t pages_per_slot;
+@@ -126,7 +122,7 @@ static bool verbose;
+ 			pr_info(__VA_ARGS__);	\
+ 	} while (0)
+ 
+-static void check_mmio_access(struct vm_data *data, struct kvm_run *run)
++static void check_mmio_access(struct vcpu_thread_data *data, struct kvm_run *run)
+ {
+ 	TEST_ASSERT(data->mmio_ok, "Unexpected mmio exit");
+ 	TEST_ASSERT(run->mmio.is_write, "Unexpected mmio read");
+@@ -140,8 +136,9 @@ static void check_mmio_access(struct vm_data *data, struct kvm_run *run)
+ 
+ static void *vcpu_worker(void *__data)
+ {
+-	struct vm_data *data = __data;
+-	struct kvm_vcpu *vcpu = data->vcpu;
++	struct kvm_vcpu *vcpu = (struct kvm_vcpu *)__data;
++	struct vcpu_thread_data *data =
++		(struct vcpu_thread_data *)vcpu->private_data;
+ 	struct kvm_run *run = vcpu->run;
+ 	struct ucall uc;
+ 
+@@ -187,7 +184,8 @@ static void wait_for_vcpu(void)
+ 		    "sem_timedwait() failed: %d\n", errno);
  }
  
--static void mark_vcpu_memory_idle(struct kvm_vm *vm,
--				  struct perf_test_vcpu_args *vcpu_args)
-+static void mark_vcpu_memory_idle(struct kvm_vm *vm, int vcpu_idx)
+-static void *vm_gpa2hva(struct vm_data *data, uint64_t gpa, uint64_t *rempages)
++static void *vm_gpa2hva(struct vcpu_thread_data *data,
++			  uint64_t gpa, uint64_t *rempages)
  {
--	int vcpu_idx = vcpu_args->vcpu_idx;
-+	struct perf_test_vcpu_args *vcpu_args =
-+				&perf_test_args.vcpu_args[vcpu_idx];
- 	uint64_t base_gva = vcpu_args->gva;
- 	uint64_t pages = vcpu_args->pages;
- 	uint64_t page;
-@@ -220,11 +220,10 @@ static bool spin_wait_for_next_iteration(int *current_iteration)
+ 	uint64_t gpage, pgoffs;
+ 	uint32_t slot, slotoffs;
+@@ -220,31 +218,19 @@ static void *vm_gpa2hva(struct vm_data *data, uint64_t gpa, uint64_t *rempages)
+ 	return (uint8_t *)base + slotoffs * 4096 + pgoffs;
+ }
+ 
+-static uint64_t vm_slot2gpa(struct vm_data *data, uint32_t slot)
++static uint64_t vm_slot2gpa(struct vcpu_thread_data *data, uint32_t slot)
+ {
+ 	TEST_ASSERT(slot < data->nslots, "Too high slot number");
+ 
+ 	return MEM_GPA + slot * data->pages_per_slot * 4096;
+ }
+ 
+-static struct vm_data *alloc_vm(void)
+-{
+-	struct vm_data *data;
+-
+-	data = malloc(sizeof(*data));
+-	TEST_ASSERT(data, "malloc(vmdata) failed");
+-
+-	data->vm = NULL;
+-	data->vcpu = NULL;
+-	data->hva_slots = NULL;
+-
+-	return data;
+-}
+-
+-static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
+-		       void *guest_code, uint64_t mempages,
+-		       struct timespec *slot_runtime)
++static bool prepare_vm(struct kvm_vm **out_vm, int nslots, uint64_t *maxslots,
++	void *guest_code, uint64_t mempages,  struct timespec *slot_runtime)
+ {
++	struct kvm_vm *vm;
++	struct kvm_vcpu *vcpu;
++	struct vcpu_thread_data *data;
+ 	uint32_t max_mem_slots;
+ 	uint64_t rempages;
+ 	uint64_t guest_addr;
+@@ -263,6 +249,11 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
+ 
+ 	TEST_ASSERT(mempages > 1,
+ 		    "Can't test without any memory");
++	vm = __vm_create_with_one_vcpu(&vcpu, mempages, guest_code);
++	*out_vm = vm;
++	vm_vcpu_threads_private_data_alloc(vm,
++					sizeof(struct vcpu_thread_data));
++	data = (struct vcpu_thread_data *)vcpu->private_data;
+ 
+ 	data->npages = mempages;
+ 	data->nslots = max_mem_slots - 1;
+@@ -276,8 +267,7 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
+ 	data->hva_slots = malloc(sizeof(*data->hva_slots) * data->nslots);
+ 	TEST_ASSERT(data->hva_slots, "malloc() fail");
+ 
+-	data->vm = __vm_create_with_one_vcpu(&data->vcpu, mempages, guest_code);
+-	ucall_init(data->vm, NULL);
++	ucall_init(vm, NULL);
+ 
+ 	pr_info_v("Adding slots 1..%i, each slot with %"PRIu64" pages + %"PRIu64" extra pages last\n",
+ 		max_mem_slots - 1, data->pages_per_slot, rempages);
+@@ -290,7 +280,7 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
+ 		if (slot == max_mem_slots - 1)
+ 			npages += rempages;
+ 
+-		vm_userspace_mem_region_add(data->vm, VM_MEM_SRC_ANONYMOUS,
++		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
+ 					    guest_addr, slot, npages,
+ 					    0);
+ 		guest_addr += npages * 4096;
+@@ -305,18 +295,18 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
+ 		if (slot == max_mem_slots - 2)
+ 			npages += rempages;
+ 
+-		gpa = vm_phy_pages_alloc(data->vm, npages, guest_addr,
++		gpa = vm_phy_pages_alloc(vm, npages, guest_addr,
+ 					 slot + 1);
+ 		TEST_ASSERT(gpa == guest_addr,
+ 			    "vm_phy_pages_alloc() failed\n");
+ 
+-		data->hva_slots[slot] = addr_gpa2hva(data->vm, guest_addr);
++		data->hva_slots[slot] = addr_gpa2hva(vm, guest_addr);
+ 		memset(data->hva_slots[slot], 0, npages * 4096);
+ 
+ 		guest_addr += npages * 4096;
+ 	}
+ 
+-	virt_map(data->vm, MEM_GPA, MEM_GPA, mempages);
++	virt_map(vm, MEM_GPA, MEM_GPA, mempages);
+ 
+ 	sync = (typeof(sync))vm_gpa2hva(data, MEM_SYNC_GPA, NULL);
+ 	atomic_init(&sync->start_flag, false);
+@@ -328,26 +318,22 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
  	return true;
  }
  
--static void vcpu_thread_main(struct perf_test_vcpu_args *vcpu_args)
-+static void vcpu_thread_main(struct kvm_vcpu *vcpu)
+-static void launch_vm(struct vm_data *data)
++static void launch_vm(struct kvm_vm *vm)
  {
--	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
--	struct kvm_vm *vm = perf_test_args.vm;
--	int vcpu_idx = vcpu_args->vcpu_idx;
-+	struct kvm_vm *vm = vcpu->vm;
-+	int vcpu_idx = vcpu->id;
- 	int current_iteration = 0;
+ 	pr_info_v("Launching the test VM\n");
  
- 	while (spin_wait_for_next_iteration(&current_iteration)) {
-@@ -234,7 +233,7 @@ static void vcpu_thread_main(struct perf_test_vcpu_args *vcpu_args)
- 			assert_ucall(vcpu, UCALL_SYNC);
- 			break;
- 		case ITERATION_MARK_IDLE:
--			mark_vcpu_memory_idle(vm, vcpu_args);
-+			mark_vcpu_memory_idle(vm, vcpu_idx);
- 			break;
- 		};
+-	pthread_create(&data->vcpu_thread, NULL, vcpu_worker, data);
++	vm_vcpu_threads_create(vm, vcpu_worker, 0);
  
-@@ -306,7 +305,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	vm = perf_test_create_vm(mode, nr_vcpus, params->vcpu_memory_bytes, 1,
- 				 params->backing_src, !overlap_memory_access);
- 
--	perf_test_start_vcpu_threads(nr_vcpus, vcpu_thread_main);
-+	perf_test_start_vcpu_threads(vm, vcpu_thread_main);
- 
- 	pr_info("\n");
- 	access_memory(vm, nr_vcpus, ACCESS_WRITE, "Populating memory");
-@@ -324,7 +323,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	/* Set done to signal the vCPU threads to exit */
- 	done = true;
- 
--	perf_test_join_vcpu_threads(nr_vcpus);
- 	perf_test_destroy_vm(vm);
+ 	/* Ensure the guest thread is spun up. */
+ 	wait_for_vcpu();
  }
  
-diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-index 779ae54f89c4..7b8aaf3a5d57 100644
---- a/tools/testing/selftests/kvm/demand_paging_test.c
-+++ b/tools/testing/selftests/kvm/demand_paging_test.c
-@@ -14,7 +14,6 @@
- #include <stdlib.h>
- #include <time.h>
- #include <poll.h>
--#include <pthread.h>
- #include <linux/userfaultfd.h>
- #include <sys/syscall.h>
- 
-@@ -42,10 +41,9 @@ static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
- static size_t demand_paging_size;
- static char *guest_data_prototype;
- 
--static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
-+static void vcpu_worker(struct kvm_vcpu *vcpu)
+-static void free_vm(struct vm_data *data)
++static void vcpu_thread_data_free(struct vcpu_thread_data *data)
  {
--	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
--	int vcpu_idx = vcpu_args->vcpu_idx;
-+	int vcpu_idx = vcpu->id;
- 	struct kvm_run *run = vcpu->run;
- 	struct timespec start;
- 	struct timespec ts_diff;
-@@ -336,10 +334,9 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	pr_info("Finished creating vCPUs and starting uffd threads\n");
- 
- 	clock_gettime(CLOCK_MONOTONIC, &start);
--	perf_test_start_vcpu_threads(nr_vcpus, vcpu_worker);
-+	perf_test_start_vcpu_threads(vm, vcpu_worker);
- 	pr_info("Started all vCPUs\n");
- 
--	perf_test_join_vcpu_threads(nr_vcpus);
- 	ts_diff = timespec_elapsed(start);
- 	pr_info("All vCPU threads joined\n");
- 
-diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-index f99e39a672d3..808d3d768c82 100644
---- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-+++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-@@ -11,7 +11,6 @@
- #include <stdio.h>
- #include <stdlib.h>
- #include <time.h>
--#include <pthread.h>
- #include <linux/bitmap.h>
- 
- #include "kvm_util.h"
-@@ -67,10 +66,11 @@ static bool host_quit;
- static int iteration;
- static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
- 
--static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
-+static void vcpu_worker(struct kvm_vcpu *vcpu)
- {
--	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
--	int vcpu_idx = vcpu_args->vcpu_idx;
-+	int vcpu_idx = vcpu->id;
-+	struct perf_test_vcpu_args *vcpu_args =
-+				&perf_test_args.vcpu_args[vcpu_idx];
- 	uint64_t pages_count = 0;
- 	struct kvm_run *run;
- 	struct timespec start;
-@@ -248,7 +248,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	for (i = 0; i < nr_vcpus; i++)
- 		vcpu_last_completed_iteration[i] = -1;
- 
--	perf_test_start_vcpu_threads(nr_vcpus, vcpu_worker);
-+	perf_test_start_vcpu_threads(vm, vcpu_worker);
- 
- 	/* Allow the vCPUs to populate memory */
- 	pr_debug("Starting iteration %d - Populating\n", iteration);
-@@ -329,7 +329,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	 * wait for them to exit.
- 	 */
- 	host_quit = true;
--	perf_test_join_vcpu_threads(nr_vcpus);
- 
- 	avg = timespec_div(get_dirty_log_total, p->iterations);
- 	pr_info("Get dirty log over %lu iterations took %ld.%.9lds. (Avg %ld.%.9lds/iteration)\n",
-diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-index eaa88df0555a..43816756c1da 100644
---- a/tools/testing/selftests/kvm/include/perf_test_util.h
-+++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-@@ -24,8 +24,7 @@ struct perf_test_vcpu_args {
- 	uint64_t gva;
- 	uint64_t pages;
- 
--	/* Only used by the host userspace part of the vCPU thread */
--	struct kvm_vcpu *vcpu;
-+	/* For guest to check if data is corrupted */
- 	int vcpu_idx;
- };
- 
-@@ -53,11 +52,11 @@ void perf_test_destroy_vm(struct kvm_vm *vm);
- 
- void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract);
- 
--void perf_test_start_vcpu_threads(int vcpus, void (*vcpu_fn)(struct perf_test_vcpu_args *));
--void perf_test_join_vcpu_threads(int vcpus);
-+void perf_test_start_vcpu_threads(struct kvm_vm *vm,
-+				  void (*vcpu_fn)(struct kvm_vcpu *vcpu));
- void perf_test_guest_code(uint32_t vcpu_id);
- 
- uint64_t perf_test_nested_pages(int nr_vcpus);
--void perf_test_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_vcpu *vcpus[]);
-+void perf_test_setup_nested(struct kvm_vm *vm);
- 
- #endif /* SELFTEST_KVM_PERF_TEST_UTIL_H */
-diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-index 9618b37c66f7..94c0f496c9c1 100644
---- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-+++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-@@ -16,28 +16,17 @@ struct perf_test_args perf_test_args;
-  */
- static uint64_t guest_test_virt_mem = DEFAULT_GUEST_TEST_MEM;
- 
--struct vcpu_thread {
--	/* The index of the vCPU. */
--	int vcpu_idx;
--
--	/* The pthread backing the vCPU. */
--	pthread_t thread;
--
-+struct vcpu_thread_data {
- 	/* Set to true once the vCPU thread is up and running. */
- 	bool running;
- };
- 
--/* The vCPU threads involved in this test. */
--static struct vcpu_thread vcpu_threads[KVM_MAX_VCPUS];
--
- /* The function run by each vCPU thread, as provided by the test. */
--static void (*vcpu_thread_fn)(struct perf_test_vcpu_args *);
-+static void (*vcpu_thread_fn)(struct kvm_vcpu *);
- 
- /* Set to true once all vCPU threads are up and running. */
- static bool all_vcpu_threads_running;
- 
--static struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
--
- /*
-  * Continuously write to the first 8 bytes of each page in the
-  * specified region.
-@@ -71,7 +60,6 @@ void perf_test_guest_code(uint32_t vcpu_idx)
- }
- 
- void perf_test_setup_vcpus(struct kvm_vm *vm, int nr_vcpus,
--			   struct kvm_vcpu *vcpus[],
- 			   uint64_t vcpu_memory_bytes,
- 			   bool partition_vcpu_memory_access)
- {
-@@ -82,7 +70,6 @@ void perf_test_setup_vcpus(struct kvm_vm *vm, int nr_vcpus,
- 	for (i = 0; i < nr_vcpus; i++) {
- 		vcpu_args = &pta->vcpu_args[i];
- 
--		vcpu_args->vcpu = vcpus[i];
- 		vcpu_args->vcpu_idx = i;
- 
- 		if (partition_vcpu_memory_access) {
-@@ -98,7 +85,7 @@ void perf_test_setup_vcpus(struct kvm_vm *vm, int nr_vcpus,
- 			vcpu_args->gpa = pta->gpa;
- 		}
- 
--		vcpu_args_set(vcpus[i], 1, i);
-+		vcpu_args_set(vm->vcpus[i], 1, i);
- 
- 		pr_debug("Added VCPU %d with test mem gpa [%lx, %lx)\n",
- 			 i, vcpu_args->gpa, vcpu_args->gpa +
-@@ -153,7 +140,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int nr_vcpus,
- 	 * effect as KVM allows aliasing HVAs in meslots.
- 	 */
- 	vm = __vm_create_with_vcpus(mode, nr_vcpus, slot0_pages + guest_num_pages,
--				    perf_test_guest_code, vcpus);
-+				    perf_test_guest_code, NULL);
- 
- 	pta->vm = vm;
- 
-@@ -201,12 +188,12 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int nr_vcpus,
- 	/* Do mapping for the demand paging memory slot */
- 	virt_map(vm, guest_test_virt_mem, pta->gpa, guest_num_pages);
- 
--	perf_test_setup_vcpus(vm, nr_vcpus, vcpus, vcpu_memory_bytes,
-+	perf_test_setup_vcpus(vm, nr_vcpus, vcpu_memory_bytes,
- 			      partition_vcpu_memory_access);
- 
- 	if (pta->nested) {
- 		pr_info("Configuring vCPUs to run in L2 (nested).\n");
--		perf_test_setup_nested(vm, nr_vcpus, vcpus);
-+		perf_test_setup_nested(vm);
- 	}
- 
- 	ucall_init(vm, NULL);
-@@ -219,6 +206,9 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int nr_vcpus,
- 
- void perf_test_destroy_vm(struct kvm_vm *vm)
- {
-+	vm_vcpu_threads_join(vm);
-+	pr_info("All vCPU threads joined\n");
-+
- 	ucall_uninit(vm);
- 	kvm_vm_free(vm);
- }
-@@ -234,7 +224,7 @@ uint64_t __weak perf_test_nested_pages(int nr_vcpus)
- 	return 0;
- }
- 
--void __weak perf_test_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_vcpu **vcpus)
-+void __weak perf_test_setup_nested(struct kvm_vm *vm)
- {
- 	pr_info("%s() not support on this architecture, skipping.\n", __func__);
- 	exit(KSFT_SKIP);
-@@ -242,9 +232,11 @@ void __weak perf_test_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_v
- 
- static void *vcpu_thread_main(void *data)
- {
--	struct vcpu_thread *vcpu = data;
-+	struct kvm_vcpu *vcpu = (struct kvm_vcpu *)data;
-+	struct vcpu_thread_data *thread_data =
-+		(struct vcpu_thread_data *)vcpu->private_data;
- 
--	WRITE_ONCE(vcpu->running, true);
-+	WRITE_ONCE(thread_data->running, true);
- 
- 	/*
- 	 * Wait for all vCPU threads to be up and running before calling the test-
-@@ -255,40 +247,30 @@ static void *vcpu_thread_main(void *data)
- 	while (!READ_ONCE(all_vcpu_threads_running))
- 		;
- 
--	vcpu_thread_fn(&perf_test_args.vcpu_args[vcpu->vcpu_idx]);
-+	vcpu_thread_fn(vcpu);
- 
- 	return NULL;
- }
- 
--void perf_test_start_vcpu_threads(int nr_vcpus,
--				  void (*vcpu_fn)(struct perf_test_vcpu_args *))
-+void perf_test_start_vcpu_threads(struct kvm_vm *vm,
-+				  void (*vcpu_fn)(struct kvm_vcpu *))
- {
- 	int i;
-+	struct kvm_vcpu *vcpu;
-+	struct vcpu_thread_data *thread_data;
- 
- 	vcpu_thread_fn = vcpu_fn;
- 	WRITE_ONCE(all_vcpu_threads_running, false);
- 
--	for (i = 0; i < nr_vcpus; i++) {
--		struct vcpu_thread *vcpu = &vcpu_threads[i];
--
--		vcpu->vcpu_idx = i;
--		WRITE_ONCE(vcpu->running, false);
-+	/* thread_data->running already false-initialized on allocation */
-+	vm_vcpu_threads_create(vm, vcpu_thread_main,
-+				sizeof(struct vcpu_thread_data));
- 
--		pthread_create(&vcpu->thread, NULL, vcpu_thread_main, vcpu);
--	}
--
--	for (i = 0; i < nr_vcpus; i++) {
--		while (!READ_ONCE(vcpu_threads[i].running))
-+	vm_iterate_over_vcpus(vm, vcpu, i) {
-+		thread_data = (struct vcpu_thread_data *)vcpu->private_data;
-+		while (!READ_ONCE(thread_data->running))
- 			;
- 	}
- 
- 	WRITE_ONCE(all_vcpu_threads_running, true);
- }
--
--void perf_test_join_vcpu_threads(int nr_vcpus)
--{
--	int i;
--
--	for (i = 0; i < nr_vcpus; i++)
--		pthread_join(vcpu_threads[i].thread, NULL);
+-	kvm_vm_free(data->vm);
+-	free(data->hva_slots);
+-	free(data);
 -}
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/perf_test_util.c b/tools/testing/selftests/kvm/lib/x86_64/perf_test_util.c
-index 0f344a7c89c4..8c4c87df5b8d 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/perf_test_util.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/perf_test_util.c
-@@ -77,16 +77,17 @@ void perf_test_setup_ept(struct vmx_pages *vmx, struct kvm_vm *vm)
- 	nested_identity_map_1g(vmx, vm, start, end - start);
- }
- 
--void perf_test_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_vcpu *vcpus[])
-+void perf_test_setup_nested(struct kvm_vm *vm)
- {
- 	struct vmx_pages *vmx, *vmx0 = NULL;
- 	struct kvm_regs regs;
- 	vm_vaddr_t vmx_gva;
- 	int vcpu_id;
-+	struct kvm_vcpu *vcpu;
- 
- 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
- 
--	for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
-+	vm_iterate_over_vcpus(vm, vcpu, vcpu_id) {
- 		vmx = vcpu_alloc_vmx(vm, &vmx_gva);
- 
- 		if (vcpu_id == 0) {
-@@ -103,9 +104,9 @@ void perf_test_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_vcpu *vc
- 		 * Override the vCPU to run perf_test_l1_guest_code() which will
- 		 * bounce it into L2 before calling perf_test_guest_code().
- 		 */
--		vcpu_regs_get(vcpus[vcpu_id], &regs);
-+		vcpu_regs_get(vcpu, &regs);
- 		regs.rip = (unsigned long) perf_test_l1_guest_code;
--		vcpu_regs_set(vcpus[vcpu_id], &regs);
--		vcpu_args_set(vcpus[vcpu_id], 2, vmx_gva, vcpu_id);
-+		vcpu_regs_set(vcpu, &regs);
-+		vcpu_args_set(vcpu, 2, vmx_gva, vcpu->id);
- 	}
- }
-diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-index bb1d17a1171b..d41d2b989a91 100644
---- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-+++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-@@ -16,7 +16,6 @@
- #include <asm/unistd.h>
- #include <time.h>
- #include <poll.h>
--#include <pthread.h>
- #include <linux/bitmap.h>
- #include <linux/bitops.h>
- #include <linux/userfaultfd.h>
-@@ -36,9 +35,8 @@ static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
- 
- static bool run_vcpus = true;
- 
--static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
-+static void vcpu_worker(struct kvm_vcpu *vcpu)
- {
--	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
- 	struct kvm_run *run;
- 	int ret;
- 
-@@ -103,7 +101,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 
- 	pr_info("Finished creating vCPUs\n");
- 
--	perf_test_start_vcpu_threads(nr_vcpus, vcpu_worker);
-+	perf_test_start_vcpu_threads(vm, vcpu_worker);
- 
- 	pr_info("Started all vCPUs\n");
- 
-@@ -112,9 +110,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 
- 	run_vcpus = false;
- 
--	perf_test_join_vcpu_threads(nr_vcpus);
--	pr_info("All vCPU threads joined\n");
 -
- 	perf_test_destroy_vm(vm);
+-static void wait_guest_exit(struct vm_data *data)
+-{
+-	pthread_join(data->vcpu_thread, NULL);
++	if (data) {
++		free(data->hva_slots);
++		free(data);
++	}
  }
  
+ static void let_guest_run(struct sync_area *sync)
+@@ -535,7 +521,7 @@ static void guest_code_test_memslot_rw(void)
+ 	GUEST_DONE();
+ }
+ 
+-static bool test_memslot_move_prepare(struct vm_data *data,
++static bool test_memslot_move_prepare(struct vcpu_thread_data *data,
+ 				      struct sync_area *sync,
+ 				      uint64_t *maxslots, bool isactive)
+ {
+@@ -565,31 +551,33 @@ static bool test_memslot_move_prepare(struct vm_data *data,
+ 	return true;
+ }
+ 
+-static bool test_memslot_move_prepare_active(struct vm_data *data,
++static bool test_memslot_move_prepare_active(struct vcpu_thread_data *data,
+ 					     struct sync_area *sync,
+ 					     uint64_t *maxslots)
+ {
+ 	return test_memslot_move_prepare(data, sync, maxslots, true);
+ }
+ 
+-static bool test_memslot_move_prepare_inactive(struct vm_data *data,
++static bool test_memslot_move_prepare_inactive(struct vcpu_thread_data *data,
+ 					       struct sync_area *sync,
+ 					       uint64_t *maxslots)
+ {
+ 	return test_memslot_move_prepare(data, sync, maxslots, false);
+ }
+ 
+-static void test_memslot_move_loop(struct vm_data *data, struct sync_area *sync)
++static void test_memslot_move_loop(struct kvm_vcpu *vcpu, struct sync_area *sync)
+ {
+ 	uint64_t movesrcgpa;
++	struct vcpu_thread_data *data =
++			(struct vcpu_thread_data *)vcpu->private_data;
+ 
+ 	movesrcgpa = vm_slot2gpa(data, data->nslots - 1);
+-	vm_mem_region_move(data->vm, data->nslots - 1 + 1,
++	vm_mem_region_move(vcpu->vm, data->nslots - 1 + 1,
+ 			   MEM_TEST_MOVE_GPA_DEST);
+-	vm_mem_region_move(data->vm, data->nslots - 1 + 1, movesrcgpa);
++	vm_mem_region_move(vcpu->vm, data->nslots - 1 + 1, movesrcgpa);
+ }
+ 
+-static void test_memslot_do_unmap(struct vm_data *data,
++static void test_memslot_do_unmap(struct vcpu_thread_data *data,
+ 				  uint64_t offsp, uint64_t count)
+ {
+ 	uint64_t gpa, ctr;
+@@ -613,7 +601,7 @@ static void test_memslot_do_unmap(struct vm_data *data,
+ 		    "madvise(MADV_DONTNEED) should exactly cover all of the requested area");
+ }
+ 
+-static void test_memslot_map_unmap_check(struct vm_data *data,
++static void test_memslot_map_unmap_check(struct vcpu_thread_data *data,
+ 					 uint64_t offsp, uint64_t valexp)
+ {
+ 	uint64_t gpa;
+@@ -630,8 +618,11 @@ static void test_memslot_map_unmap_check(struct vm_data *data,
+ 	*val = 0;
+ }
+ 
+-static void test_memslot_map_loop(struct vm_data *data, struct sync_area *sync)
++static void test_memslot_map_loop(struct kvm_vcpu *vcpu,
++				  struct sync_area *sync)
+ {
++	struct vcpu_thread_data *data =
++				(struct vcpu_thread_data *)vcpu->private_data;
+ 	/*
+ 	 * Unmap the second half of the test area while guest writes to (maps)
+ 	 * the first half.
+@@ -670,7 +661,7 @@ static void test_memslot_map_loop(struct vm_data *data, struct sync_area *sync)
+ 				     MEM_TEST_VAL_2);
+ }
+ 
+-static void test_memslot_unmap_loop_common(struct vm_data *data,
++static void test_memslot_unmap_loop_common(struct vcpu_thread_data *data,
+ 					   struct sync_area *sync,
+ 					   uint64_t chunk)
+ {
+@@ -697,21 +688,30 @@ static void test_memslot_unmap_loop_common(struct vm_data *data,
+ 		test_memslot_do_unmap(data, ctr, chunk);
+ }
+ 
+-static void test_memslot_unmap_loop(struct vm_data *data,
++static void test_memslot_unmap_loop(struct kvm_vcpu *vcpu,
+ 				    struct sync_area *sync)
+ {
++	struct vcpu_thread_data *data =
++			(struct vcpu_thread_data *)vcpu->private_data;
++
+ 	test_memslot_unmap_loop_common(data, sync, 1);
+ }
+ 
+-static void test_memslot_unmap_loop_chunked(struct vm_data *data,
++static void test_memslot_unmap_loop_chunked(struct kvm_vcpu *vcpu,
+ 					    struct sync_area *sync)
+ {
++	struct vcpu_thread_data *data =
++			(struct vcpu_thread_data *)vcpu->private_data;
++
+ 	test_memslot_unmap_loop_common(data, sync, MEM_TEST_UNMAP_CHUNK_PAGES);
+ }
+ 
+-static void test_memslot_rw_loop(struct vm_data *data, struct sync_area *sync)
++static void test_memslot_rw_loop(struct kvm_vcpu *vcpu,
++				 struct sync_area *sync)
+ {
+ 	uint64_t gptr;
++	struct vcpu_thread_data *data =
++			(struct vcpu_thread_data *)vcpu->private_data;
+ 
+ 	for (gptr = MEM_TEST_GPA + 4096 / 2;
+ 	     gptr < MEM_TEST_GPA + MEM_TEST_SIZE; gptr += 4096)
+@@ -737,9 +737,9 @@ struct test_data {
+ 	const char *name;
+ 	uint64_t mem_size;
+ 	void (*guest_code)(void);
+-	bool (*prepare)(struct vm_data *data, struct sync_area *sync,
++	bool (*prepare)(struct vcpu_thread_data *data, struct sync_area *sync,
+ 			uint64_t *maxslots);
+-	void (*loop)(struct vm_data *data, struct sync_area *sync);
++	void (*loop)(struct kvm_vcpu *vcpu, struct sync_area *sync);
+ };
+ 
+ static bool test_execute(int nslots, uint64_t *maxslots,
+@@ -750,18 +750,22 @@ static bool test_execute(int nslots, uint64_t *maxslots,
+ 			 struct timespec *guest_runtime)
+ {
+ 	uint64_t mem_size = tdata->mem_size ? : MEM_SIZE_PAGES;
+-	struct vm_data *data;
++	struct kvm_vm *vm;
++	struct kvm_vcpu *vcpu;
++	struct vcpu_thread_data *data = NULL;
+ 	struct sync_area *sync;
+ 	struct timespec tstart;
+ 	bool ret = true;
+ 
+-	data = alloc_vm();
+-	if (!prepare_vm(data, nslots, maxslots, tdata->guest_code,
++	if (!prepare_vm(&vm, nslots, maxslots, tdata->guest_code,
+ 			mem_size, slot_runtime)) {
+ 		ret = false;
+ 		goto exit_free;
+ 	}
+ 
++	vcpu = vm->vcpus[0];
++	data = (struct vcpu_thread_data *)vcpu->private_data;
++
+ 	sync = (typeof(sync))vm_gpa2hva(data, MEM_SYNC_GPA, NULL);
+ 
+ 	if (tdata->prepare &&
+@@ -770,7 +774,7 @@ static bool test_execute(int nslots, uint64_t *maxslots,
+ 		goto exit_free;
+ 	}
+ 
+-	launch_vm(data);
++	launch_vm(vm);
+ 
+ 	clock_gettime(CLOCK_MONOTONIC, &tstart);
+ 	let_guest_run(sync);
+@@ -780,16 +784,17 @@ static bool test_execute(int nslots, uint64_t *maxslots,
+ 		if (guest_runtime->tv_sec >= maxtime)
+ 			break;
+ 
+-		tdata->loop(data, sync);
++		tdata->loop(vcpu, sync);
+ 
+ 		(*nloops)++;
+ 	}
+ 
+ 	make_guest_exit(sync);
+-	wait_guest_exit(data);
++	vm_vcpu_threads_join(vm);
+ 
+ exit_free:
+-	free_vm(data);
++	vcpu_thread_data_free(data);
++	kvm_vm_free(vm);
+ 
+ 	return ret;
+ }
 -- 
 2.27.0
 
