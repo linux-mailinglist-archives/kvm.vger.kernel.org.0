@@ -2,161 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D849260B3DA
-	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 19:18:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DCCE60B401
+	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 19:24:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232237AbiJXRSV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 13:18:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45120 "EHLO
+        id S230204AbiJXRYx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Oct 2022 13:24:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232086AbiJXRRr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Oct 2022 13:17:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ABB05AA08
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 08:52:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666626675;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UBAegUasNa5RuqJ7q9GZwuYTzFErEwMDb+Eg1mrTrvE=;
-        b=cjDyOZS9+qibKDaZiSwq7e78kgPyqnkljFRHJd6T7GuQVMvZxq8XwatN0BKWrRM6eWqB2G
-        LHq74hKGZFBA4yZYNFqaH0KPFhZpef0RbiuEJHW88zL8nkBYccJuv0A3RMosc3fZOSeNJp
-        IXZjgFyNEjS6yHVfMviNwvkthKjBxfE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-426-aQZadwx4N2yi2UwFoxvjGA-1; Mon, 24 Oct 2022 11:26:39 -0400
-X-MC-Unique: aQZadwx4N2yi2UwFoxvjGA-1
-Received: by mail-wr1-f69.google.com with SMTP id o13-20020adfa10d000000b00232c00377a0so3542365wro.13
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 08:26:38 -0700 (PDT)
+        with ESMTP id S232982AbiJXRXl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Oct 2022 13:23:41 -0400
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A5F115B301
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 08:58:32 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id q71so9008045pgq.8
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 08:58:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xhVPQ5+dIkT7H8GzdC1Hj5D+mUwjV/3EIBqX7ahZJb8=;
+        b=sjFIyI04vx0cs1gow2DpqtMCKQ1Fs6ci3APl7zmnC44CID+qImSeekKnM09/9ngi5K
+         683BoV0Kalu9yMxA7YsaVtFT17INOHozoSMzJTxq9+hAV6CNM6+9asP22bEfbjsNcPP1
+         SEjxOnCcGo3s0Ha11T1Avy+NtACEquBAhRrd6tq5JOWQ5vX9BL+ZGLycubJP0K8duS3F
+         Jo0VOABsoSAiJr1HU2iUz1HH2Cqm+Z3J7UgSAyX0IXVjDNYCJ93u/kzML6yNMToNJwem
+         D8iHdbb4wa/mzPqwCzGIIVVn8FUHOuW5N35Xl3MVOOGw7B1hm7Ybu763Tf09iRs6MMI8
+         F0pQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UBAegUasNa5RuqJ7q9GZwuYTzFErEwMDb+Eg1mrTrvE=;
-        b=feFb1JmkLd8Vq2maGXG+s1Kw0Y4jvmVBM1jOAAJMkn2dJs/WlDLBb86S/BI8Fhx1rt
-         mzyp92ArqrAP8nhfigUNymOipbyEOoUUQSW1yG5yFapHjAAoQjf+H4p9L0/9jnDHK3Uq
-         JId2ZlUdx21kHRRbK1NZv8bLaN0/lWc/ndWgfYZ+1gStZroACVIWsS2FwSzd+Kn+z3eM
-         o/utZVRo2FxwM126viPARVPrRclSGRr99Ks5xtTbOUzk+Y72eXSMn/EunY1knYUhYpw9
-         TpiqKeGoKW+DzcAfz1WN4Os90N387shmi/wCipsstgHNy1tfBPUzEsOMMovqXPFWuy3T
-         /cAQ==
-X-Gm-Message-State: ACrzQf37uWm7MyJc3LVrPBri3CUxh5EfZOvZSmZRbeN+PItYRTN72gxX
-        hWH8kxT6xFwZYOx7YsbQs+6f2ZbERddM5dRd4xgUarmOMAZK9VMGeE+6J2K6WTQFleSz9zCjl7A
-        a/0eg4atTcxyV
-X-Received: by 2002:a5d:5a11:0:b0:22e:3ed1:e426 with SMTP id bq17-20020a5d5a11000000b0022e3ed1e426mr21883682wrb.642.1666625197882;
-        Mon, 24 Oct 2022 08:26:37 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4QYF0qpu+Yh4YQF+Y42ukyfMe46omRnCHz7TFmRMmq2+h+eVJ2IzD1faJk9A3cMFb5eNTxMw==
-X-Received: by 2002:a5d:5a11:0:b0:22e:3ed1:e426 with SMTP id bq17-20020a5d5a11000000b0022e3ed1e426mr21883650wrb.642.1666625197580;
-        Mon, 24 Oct 2022 08:26:37 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c704:f100:6371:a05b:e038:ac2c? (p200300cbc704f1006371a05be038ac2c.dip0.t-ipconnect.de. [2003:cb:c704:f100:6371:a05b:e038:ac2c])
-        by smtp.gmail.com with ESMTPSA id k21-20020a05600c0b5500b003cdf141f363sm194606wmr.11.2022.10.24.08.26.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Oct 2022 08:26:37 -0700 (PDT)
-Message-ID: <e0371b20-0edf-0fc3-71db-e0c94bd0f290@redhat.com>
-Date:   Mon, 24 Oct 2022 17:26:34 +0200
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xhVPQ5+dIkT7H8GzdC1Hj5D+mUwjV/3EIBqX7ahZJb8=;
+        b=jmzDwUt+AxtL904gjRogzEWQzhf2An85px+eLU6YyMFsogEaxrRZvA9Ik+uO6/w5cc
+         kNHaD4mLxuE0jB1Ojq/LDWSltUZ4RBmnrpw/R9UiYS5vyiCzFx1QpCZ3mC+FdZCNXYjT
+         tyPPFqf+33fP8+mCgTLXfDKtSevbX5n3V3VBVX2wq0Ok2v8lDQcIyMTM75OO1+H5rfvA
+         5jGh6l38P2qAtZ85w/Dj0la7lt2bGeRpEdiwNoPcfPsiI2sSAC1g6aWRLu+Pb43jgf+P
+         9djZ6SnoWoDZRDrCnwRbWrXgxXg/bNGtMYr6tzSorvBsj7NShjb+iTISG5/u2fmIu8VX
+         CP5g==
+X-Gm-Message-State: ACrzQf1oaqvbJbMLD97qRUPPpzLnntRNcssmTRdza0LoZrXb456xs0sE
+        7shpHYhqPzg+sQMfp1inRzWQEkOwPxRb4w==
+X-Google-Smtp-Source: AMsMyM7+Fsu8MVnZ+tCPi/6N4EEvflkwRny391GAU8Z6YL4QyjvxyPpKdzi0o7WrJrFkqQRLRZrHWQ==
+X-Received: by 2002:a63:a06:0:b0:458:2853:45e4 with SMTP id 6-20020a630a06000000b00458285345e4mr27995688pgk.20.1666626959009;
+        Mon, 24 Oct 2022 08:55:59 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id w6-20020a170902e88600b00186a6b6350esm1880380plg.268.2022.10.24.08.55.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Oct 2022 08:55:58 -0700 (PDT)
+Date:   Mon, 24 Oct 2022 15:55:55 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Alexander Graf <graf@amazon.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org, Xiao Guangrong <guangrong.xiao@gmail.com>,
+        "Chandrasekaran, Siddharth" <sidcha@amazon.de>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 11/27] KVM: x86/mmu: Zap only the relevant pages when
+ removing a memslot
+Message-ID: <Y1a1i9vbJ/pVmV9r@google.com>
+References: <20190813201914.GI13991@linux.intel.com>
+ <20190815092324.46bb3ac1@x1.home>
+ <a05b07d8-343b-3f3d-4262-f6562ce648f2@redhat.com>
+ <20190820200318.GA15808@linux.intel.com>
+ <20200626173250.GD6583@linux.intel.com>
+ <590c9312-a21f-8569-9da3-34508300afcc@amazon.com>
+ <Y1GxnGo3A8UF3iTt@google.com>
+ <cdaf34bc-b2ab-1a9d-22d0-3d9dc3364bf2@amazon.com>
+ <Y1L1t6Qw2CaLwJk3@google.com>
+ <490509f6-ae1a-4fc8-42a1-b037d6bffada@amazon.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
-Content-Language: en-US
-To:     "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        aarcange@redhat.com, ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
- <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
- <CAGtprH_MiCxT2xSxD2UrM4M+ghL0V=XEZzEX4Fo5wQKV4fAL4w@mail.gmail.com>
- <20221021134711.GA3607894@chaop.bj.intel.com> <Y1LGRvVaWwHS+Zna@google.com>
- <20221024145928.66uehsokp7bpa2st@box.shutemov.name>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20221024145928.66uehsokp7bpa2st@box.shutemov.name>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <490509f6-ae1a-4fc8-42a1-b037d6bffada@amazon.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24.10.22 16:59, Kirill A . Shutemov wrote:
-> On Fri, Oct 21, 2022 at 04:18:14PM +0000, Sean Christopherson wrote:
->> On Fri, Oct 21, 2022, Chao Peng wrote:
->>>>
->>>> In the context of userspace inaccessible memfd, what would be a
->>>> suggested way to enforce NUMA memory policy for physical memory
->>>> allocation? mbind[1] won't work here in absence of virtual address
->>>> range.
->>>
->>> How about set_mempolicy():
->>> https://www.man7.org/linux/man-pages/man2/set_mempolicy.2.html
->>
->> Andy Lutomirski brought this up in an off-list discussion way back when the whole
->> private-fd thing was first being proposed.
->>
->>    : The current Linux NUMA APIs (mbind, move_pages) work on virtual addresses.  If
->>    : we want to support them for TDX private memory, we either need TDX private
->>    : memory to have an HVA or we need file-based equivalents. Arguably we should add
->>    : fmove_pages and fbind syscalls anyway, since the current API is quite awkward
->>    : even for tools like numactl.
+On Mon, Oct 24, 2022, Alexander Graf wrote:
+> Hey Sean,
 > 
-> Yeah, we definitely have gaps in API wrt NUMA, but I don't think it be
-> addressed in the initial submission.
+> On 21.10.22 21:40, Sean Christopherson wrote:
+> > 
+> > On Thu, Oct 20, 2022, Alexander Graf wrote:
+> > > On 20.10.22 22:37, Sean Christopherson wrote:
+> > > > On Thu, Oct 20, 2022, Alexander Graf wrote:
+> > > > > On 26.06.20 19:32, Sean Christopherson wrote:
+> > > > > > /cast <thread necromancy>
+> > > > > > 
+> > > > > > On Tue, Aug 20, 2019 at 01:03:19PM -0700, Sean Christopherson wrote:
+> > > > > [...]
+> > > > > 
+> > > > > > I don't think any of this explains the pass-through GPU issue.  But, we
+> > > > > > have a few use cases where zapping the entire MMU is undesirable, so I'm
+> > > > > > going to retry upstreaming this patch as with per-VM opt-in.  I wanted to
+> > > > > > set the record straight for posterity before doing so.
+> > > > > Hey Sean,
+> > > > > 
+> > > > > Did you ever get around to upstream or rework the zap optimization? The way
+> > > > > I read current upstream, a memslot change still always wipes all SPTEs, not
+> > > > > only the ones that were changed.
+> > > > Nope, I've more or less given up hope on zapping only the deleted/moved memslot.
+> > > > TDX (and SNP?) will preserve SPTEs for guest private memory, but they're very
+> > > > much a special case.
+> > > > 
+> > > > Do you have use case and/or issue that doesn't play nice with the "zap all" behavior?
+> > > 
+> > > Yeah, we're looking at adding support for the Hyper-V VSM extensions which
+> > > Windows uses to implement Credential Guard. With that, the guest gets access
+> > > to hypercalls that allow it to set reduced permissions for arbitrary gfns.
+> > > To ensure that user space has full visibility into those for live migration,
+> > > memory slots to model access would be a great fit. But it means we'd do
+> > > ~100k memslot modifications on boot.
+> > Oof.  100k memslot updates is going to be painful irrespective of flushing.  And
+> > memslots (in their current form) won't work if the guest can drop executable
+> > permissions.
+> > 
+> > Assuming KVM needs to support a KVM_MEM_NO_EXEC flag, rather than trying to solve
+> > the "KVM flushes everything on memslot deletion", I think we should instead
+> > properly support toggling KVM_MEM_READONLY (and KVM_MEM_NO_EXEC) without forcing
+> > userspace to delete the memslot.  Commit 75d61fbcf563 ("KVM: set_memory_region:
 > 
-> BTW, it is not regression comparing to old KVM slots, if the memory is
-> backed by memfd or other file:
 > 
-> MBIND(2)
->         The  specified policy will be ignored for any MAP_SHARED mappings in the
->         specified memory range.  Rather the pages will be allocated according to
->         the  memory  policy  of the thread that caused the page to be allocated.
->         Again, this may not be the thread that called mbind().
+> That would be a cute acceleration for the case where we have to change
+> permissions for a full slot. Unfortunately, the bulk of the changes are slot
+> splits.
 
-IIRC, that documentation is imprecise/incorrect especially when it comes 
-to memfd. Page faults in shared mappings will similarly obey the set 
-mbind() policy when allocating new pages.
+Ah, right, the guest will be operating on per-page granularity.
 
-QEMU relies on that.
+> We already built a prototype implementation of an atomic memslot update
+> ioctl that allows us to keep other vCPUs running while we do the
+> delete/create/create/create operation.
 
-The "fun" begins when we have multiple mappings, and only some have a 
-policy set ... or if we already, previously allocated the pages.
+Please weigh in with your use case on a relevant upstream discussion regarding
+"atomic" memslot updates[*].  I suspect we'll end up with a different solution
+for this use case (see below), but we should at least capture all potential use
+cases and ideas for modifying memslots without pausing vCPUs.
 
--- 
-Thanks,
+[*] https://lore.kernel.org/all/20220909104506.738478-1-eesposit@redhat.com
 
-David / dhildenb
+> But even with that, we see up to 30 min boot times for larger guests that
+> most of the time are stuck in zapping pages.
 
+Out of curiosity, did you measure runtime performance?  I would expect some amount
+of runtime overhead as well dut to fragmenting memslots to that degree.
+
+> I guess we have 2 options to make this viable:
+> 
+>   1) Optimize memslot splits + modifications to a point where they're fast
+> enough
+>   2) Add a different, faster mechanism on top of memslots for page granular
+> permission bits
+
+#2 crossed my mind as well.  This is actually nearly identical to the confidential
+VM use case, where KVM needs to handle guest-initiated conversions of memory between
+"private" and "shared" on a per-page granularity.  The proposed solution for that
+is indeed a layer on top of memslots[*], which we arrived at in no small part because
+splitting memslots was going to be a bottleneck.
+
+Extending the proposed mem_attr_array to support additional state should be quite
+easy.  The framework is all there, KVM just needs a few extra flags values, e.g.
+
+	KVM_MEM_ATTR_SHARED	BIT(0)
+	KVM_MEM_ATTR_READONLY	BIT(1)
+	KVM_MEM_ATTR_NOEXEC	BIT(2)
+
+and then new ioctls to expose the functionality to userspace.  Actually, if we
+want to go this route, it might even make sense to define new a generic MEM_ATTR
+ioctl() right away instead of repurposing KVM_MEMORY_ENCRYPT_(UN)REG_REGION for
+the private vs. shared use case.
+
+[*] https://lore.kernel.org/all/20220915142913.2213336-6-chao.p.peng@linux.intel.com
