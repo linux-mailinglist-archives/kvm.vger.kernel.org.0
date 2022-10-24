@@ -2,134 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CA1A360B52E
-	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 20:13:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0715160B4EC
+	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 20:08:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231805AbiJXSNF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 14:13:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58756 "EHLO
+        id S231738AbiJXSII (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Oct 2022 14:08:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231936AbiJXSMW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Oct 2022 14:12:22 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 461B757E17;
-        Mon, 24 Oct 2022 09:54:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666630459; x=1698166459;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=f12+hDSs2xhh9+cgFUHAQwPz5EdOX4nrGTxSpB9xto8=;
-  b=Lx4O7B4HXPSw6eCOX6fxKVKroy/kLcxL2hy81b68CBxeeJRyLCmgMCfL
-   +GmcUQtQfNoaO0aKDUWtL30YejrZoBatDCS3PeFJE4DrVZy75n4meLb3V
-   lTd9rYHhJuaupDbeWYGNYIRyNXZj3pq47viEZfMgcU99FnPK0/qZgfmIi
-   gspbcVr59orDB9o72YPvLlrDzWGOkCq17RmNQJRAMNg2/pBM0j0LNOMfA
-   bj+i/Q+CUyf8nP7jn5Mf5krunxQliQkthbAZqVw/QMtNgTnCY5KYq20Fa
-   rnUMOQajJskrGGHNEtBU+aDreoW/sfo7JqEpyO72zuy8iUIvlJ76mj0/t
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10510"; a="290739879"
-X-IronPort-AV: E=Sophos;i="5.95,209,1661842800"; 
-   d="scan'208";a="290739879"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2022 07:59:41 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10510"; a="631284461"
-X-IronPort-AV: E=Sophos;i="5.95,209,1661842800"; 
-   d="scan'208";a="631284461"
-Received: from unisar-mobl.ger.corp.intel.com (HELO box.shutemov.name) ([10.249.38.228])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2022 07:59:30 -0700
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id 381A7104D5C; Mon, 24 Oct 2022 17:59:28 +0300 (+03)
-Date:   Mon, 24 Oct 2022 17:59:28 +0300
-From:   "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
-        Vishal Annapurve <vannapurve@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
-        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
-Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
-Message-ID: <20221024145928.66uehsokp7bpa2st@box.shutemov.name>
-References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
- <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
- <CAGtprH_MiCxT2xSxD2UrM4M+ghL0V=XEZzEX4Fo5wQKV4fAL4w@mail.gmail.com>
- <20221021134711.GA3607894@chaop.bj.intel.com>
- <Y1LGRvVaWwHS+Zna@google.com>
+        with ESMTP id S231492AbiJXSHv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Oct 2022 14:07:51 -0400
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39BA0209F8B
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 09:48:46 -0700 (PDT)
+Received: by mail-il1-x135.google.com with SMTP id 7so2541246ilg.11
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 09:48:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=T2Jc4h32Bt0aci9GRSoaXhxrr2DTvIRQnULZdhlZTa8=;
+        b=AzixFi1++1+BH63uq85wUr3BnbsDe3/LM/MNLw/PQ4sHZvfEjPZc61Q3nK9QqysBXo
+         Fl3+kAIu6n3CYQMFUMy0+wV3fq2mvSGUC0Q73DAtq9GuLyKA2DIbf5kf9Rp51NmKMJLQ
+         bilp2h2NmCbPVTHhCrnsgIl7kHr79AwXZPQptXQsjmD8SO++waq0yF7xu6bm/jdtfl6m
+         BByNSMZWWaYWDwMU1aaPTop71GIOVEkMYVOeJtfUTbyiPfyDCIOkT7FFF1TFdNED4dS/
+         kKKvoCbRb0/dUoevMB0sNHi41zq72buEJSz9WzCFGg2Tdc2zFQI/kUTVLtPr0n2NGvTj
+         oDWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=T2Jc4h32Bt0aci9GRSoaXhxrr2DTvIRQnULZdhlZTa8=;
+        b=mJAYMf1kaQ5LwfLvk9qrf4SYjRZf11Djt5XMnPvdaxk0wJ73N3Zn19O0yA8HWc2DXm
+         XDmeoLD4s9jdHrpUheunXk6VfD1P45JcMEmkLijXC4k0239VgvIbIgqizto7OGXNGZGO
+         HoaNf0bO0KYR8Q9yAo2N9Htk9I+RYHFs64XK8ZJdAayxEz0vT8mm24BYqzvRODMVal/q
+         RK7AzgiJtE2WuZfeEBWgGpShSUILOkQYSyNC/EdgO/TKxc4kgWqTMYDuUfQP8VikUkTB
+         pBsfVRT4PbUd6GpJQCydiV+xbni/QTm2WKoe5dtaDRLTTlnUUp4VJxMdssRCRE5x63Be
+         khkw==
+X-Gm-Message-State: ACrzQf3BgKej62nlnycrLELXjxZ/hfxLqqRUVoMBMxdHgtOlkavFjNE5
+        X4jjH2wK+e8KR9414sQZwQByirc2Ay/BBA==
+X-Google-Smtp-Source: AMsMyM5qvqgAkhlxowJoUG+IIyARDd++VCvHVwc3NUyZYvrqlIKJvMCiTP7dWqeESp271koBuPn4Xw==
+X-Received: by 2002:a63:1301:0:b0:457:f3b7:238b with SMTP id i1-20020a631301000000b00457f3b7238bmr28730628pgl.262.1666627833794;
+        Mon, 24 Oct 2022 09:10:33 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id q18-20020a170902eb9200b00178650510f9sm19354763plg.160.2022.10.24.09.10.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Oct 2022 09:10:33 -0700 (PDT)
+Date:   Mon, 24 Oct 2022 16:10:29 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Cathy Avery <cavery@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 02/16] x86: add few helper functions for
+ apic local timer
+Message-ID: <Y1a49abli07rqyww@google.com>
+References: <20221020152404.283980-1-mlevitsk@redhat.com>
+ <20221020152404.283980-3-mlevitsk@redhat.com>
+ <Y1GeEoC7qMz40QDc@google.com>
+ <de3d97ff23cc401e916b15b47207b45514446e4d.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <Y1LGRvVaWwHS+Zna@google.com>
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <de3d97ff23cc401e916b15b47207b45514446e4d.camel@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 21, 2022 at 04:18:14PM +0000, Sean Christopherson wrote:
-> On Fri, Oct 21, 2022, Chao Peng wrote:
-> > > 
-> > > In the context of userspace inaccessible memfd, what would be a
-> > > suggested way to enforce NUMA memory policy for physical memory
-> > > allocation? mbind[1] won't work here in absence of virtual address
-> > > range.
+On Mon, Oct 24, 2022, Maxim Levitsky wrote:
+> On Thu, 2022-10-20 at 19:14 +0000, Sean Christopherson wrote:
+> > On Thu, Oct 20, 2022, Maxim Levitsky wrote:
+> > > +       // ensure that a pending timer is serviced
+> > > +       irq_enable();
 > > 
-> > How about set_mempolicy():
-> > https://www.man7.org/linux/man-pages/man2/set_mempolicy.2.html
+> > Jumping back to the "nop" patch, I'm reinforcing my vote to add sti_nop().  I
+> > actually starting typing a response to say this is broken before remembering that
+> > a nop got added to irq_enable().
 > 
-> Andy Lutomirski brought this up in an off-list discussion way back when the whole
-> private-fd thing was first being proposed.
-> 
->   : The current Linux NUMA APIs (mbind, move_pages) work on virtual addresses.  If
->   : we want to support them for TDX private memory, we either need TDX private
->   : memory to have an HVA or we need file-based equivalents. Arguably we should add
->   : fmove_pages and fbind syscalls anyway, since the current API is quite awkward
->   : even for tools like numactl.
+> OK, although, for someone that doesn't know about the interrupt shadow (I
+> guess most of the people that will look at this code), the above won't
+> confuse them, in fact sti_nop() might confuse someone who doesn't know about
+> why this nop is needed.
 
-Yeah, we definitely have gaps in API wrt NUMA, but I don't think it be
-addressed in the initial submission.
+The difference is that sti_nop() might leave unfamiliar readers asking "why", but
+it won't actively mislead them.  And the "why" can be easily answered by a comment
+above sti_nop() to describe its purpose.  A "see also safe_halt()" with a comment
+there would be extra helpful, as "safe halt" is the main reason the STI shadow is
+even a thing.
 
-BTW, it is not regression comparing to old KVM slots, if the memory is
-backed by memfd or other file:
-
-MBIND(2)
-       The  specified policy will be ignored for any MAP_SHARED mappings in the
-       specified memory range.  Rather the pages will be allocated according to
-       the  memory  policy  of the thread that caused the page to be allocated.
-       Again, this may not be the thread that called mbind().
-
-It is not clear how to define fbind(2) semantics, considering that multiple
-processes may compete for the same region of page cache.
-
-Should it be per-inode or per-fd? Or maybe per-range in inode/fd?
-
-fmove_pages(2) should be relatively straight forward, since it is
-best-effort and does not guarantee that the page will note be moved
-somewhare else just after return from the syscall.
-
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+On the other hand, shoving a NOP into irq_enable() is pretty much guaranteed to
+cause problems for readers that do know about STI shadows since there's nothing
+in the name "irq_enable" that suggests that the helper also intentionally eats the
+interrupt shadow, and especically because the kernel's local_irq_enable() distills
+down to a bare STI.
