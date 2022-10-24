@@ -2,225 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1268C60B530
-	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 20:14:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 35DB360B5CE
+	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 20:40:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230494AbiJXSOW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 14:14:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52032 "EHLO
+        id S231608AbiJXSkk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Oct 2022 14:40:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232434AbiJXSNz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Oct 2022 14:13:55 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0290F100BC2
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 09:55:47 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id m14-20020a17090a3f8e00b00212dab39bcdso7020662pjc.0
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 09:55:47 -0700 (PDT)
+        with ESMTP id S231628AbiJXSkC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Oct 2022 14:40:02 -0400
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E555578AF
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 10:22:05 -0700 (PDT)
+Received: by mail-pj1-f50.google.com with SMTP id s22-20020a17090a075600b002130d2ad62aso2800577pje.2
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 10:22:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=m9QJ1WIMSrjBnka7vLbpchRih8LDKA+qYd06ktxI7R4=;
-        b=Kv6xPyP0h9SeVsnJBl+P8WKONUFDVsWJBpRGiHKjwQ828Ww+/f0UTSnBn+GM7yirvc
-         0dKFBbi2fTJGqi5Y4XabZSjqn8G3GiEEaOFpOpTtWkcIq/hvUwSVPTaoNliIzDQI5s76
-         akDlTHOmNpPVUCCSouSBfSLPZ4CrD3GSut1twtpMCXbM/RDcTVsGznc4ZYO3XgimElZ6
-         8nGfkNhtwPre9l9lfXUTiCubk3XL/RmrwCLfFOdSVpq+oLVCVZM74BThykJw/ZOEioYY
-         nv5rLUhO0eaaSAzdOPWzGY8p0LTQ1N0Slys7AOTpmsrBOdtA+A0Ce9ygfpMY/WznTugZ
-         +CZw==
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=AtQuDUARxlCh73hPuBPsqQZ+KcXq6YI07Q3eEDwHdKw=;
+        b=Mj1p/DZ0QLFNlOYCnq7Fo6K1Gie1shnIuH8mVCMkmUM/4lGllg1dSDDthPrVhMJpO7
+         yb8tXaxFTO0Z8hDmJ5Pu7LOYLyMPYOwWr4M5YiZLgxiViFjVNbtP19SINvAT3ftmoZhP
+         ZNPl2QxnpHiJroqVN6YAMkJCItyb/d7Gg8POQEffAiU/B88zTCgg+YPaiUsqMRBg2bHF
+         O8+dF/MIzdPYETlOxGsG1cZjIdNCNO3blIwWYTjAAs/gnaIvBPlRqOBqvnuefRFAdtdk
+         T3BERhko5/YtkLDNMjLX8zmnI/8unmsGlZkOHmQKv3wLx0PS9qQHC3riGS6K9AMOnN9C
+         gVSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m9QJ1WIMSrjBnka7vLbpchRih8LDKA+qYd06ktxI7R4=;
-        b=NznOAYxHLddqpiLQCOMaGSrnRnuMz1A4vSNCdphY5/cm3+X2Td5PYzgDFPbpiD7Gpu
-         OVLMX6lYTGwnKkk2QgGbc3Iu+NSkCcBmxQuWMr6PPOLG17UEi4dvg2b+G9wjioeme49B
-         SRVNhByWgnXSzlvB57jyLP2q/xljh72lUMop49XK7uNF4K6GumM7YKTXMslIHWQRhuqX
-         ip0xobgiCUwDK9USyCthI8Y8RtsYtxQFbv+Tr1K/4e/ZDsbxOpFoo0tMA18hsnaSk51w
-         HwVju1YGF1WdZtRf7Nv49t96S32pP+xxp8XqpCRyMuzu2w/lfWYF8rsyPBqcdr4fI4Xf
-         RPyg==
-X-Gm-Message-State: ACrzQf0tvm5anZmh8VnOv5Q+wIwEmvTbRfk1J23mTdWhXoBxechWc31W
-        cQURSh1Htm9Wm2qBQXo9qxiGgQ==
-X-Google-Smtp-Source: AMsMyM7dcxQSPW0FUdto1JW2+l8fTlyFVF9CIgDL8SlZ8Funn0x84eM66/S0fZozNwsB+9cRYW1wAA==
-X-Received: by 2002:a17:902:8698:b0:181:f060:7133 with SMTP id g24-20020a170902869800b00181f0607133mr34526960plo.1.1666630343161;
-        Mon, 24 Oct 2022 09:52:23 -0700 (PDT)
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AtQuDUARxlCh73hPuBPsqQZ+KcXq6YI07Q3eEDwHdKw=;
+        b=tAMbSdaTyMPeEbhq6zovd5QZbQgrza/zD91Mr0H1N71Q8qo+WBibEXhwfgjDOL7Aj/
+         lbEg2lKaRP19UMmfHqESOdL1KmELCEGJeOmknnHKaC7jNiZnj4VurLKVEEzPWU3xXgup
+         LT+vtttqUG0x/vPlCE/Fv2ILayhmWSgCH2dL+RArWkDEMrzgJmAIe8bsTf3mlFXCumLd
+         WgK0MB1ulKc1KKmpeDbo7K0yBIfdSb4KjN4n8XmtnbnBGIwaqSlX8RBVhPti7/HNUD5T
+         WicRYH+0xia4rBy8+PI5w9W0e/xUFDFGsXFo8PtgxIGr6BmE5+1/xTXWGV3mGJA0pclL
+         Gq+Q==
+X-Gm-Message-State: ACrzQf3ombexe1Ov2VvPnzuDAq0kBUuQjm1BVQbJZ8k0HD0zFt5/W2K3
+        5D8UQrfvJItfnVNSrLczMm1Lrg==
+X-Google-Smtp-Source: AMsMyM7nHpXnTX4ANbH9BFcwSwjCwOLUWz3M+e2i+3QAb5p3ng9b0Nzw5W1YrjpEJGGRo/EQwChxzg==
+X-Received: by 2002:a17:90b:2317:b0:213:26a3:246f with SMTP id mt23-20020a17090b231700b0021326a3246fmr3396299pjb.148.1666631988503;
+        Mon, 24 Oct 2022 10:19:48 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id n1-20020a17090a928100b00200b12f2bf3sm114852pjo.51.2022.10.24.09.52.22
+        by smtp.gmail.com with ESMTPSA id x11-20020a17090a6b4b00b0020ddea12227sm4122438pjl.55.2022.10.24.10.19.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Oct 2022 09:52:22 -0700 (PDT)
-Date:   Mon, 24 Oct 2022 16:52:18 +0000
+        Mon, 24 Oct 2022 10:19:48 -0700 (PDT)
+Date:   Mon, 24 Oct 2022 17:19:44 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Bandan Das <bsd@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: vmx/nested: avoid blindly setting
- SECONDARY_EXEC_ENCLS_EXITING when sgx is enabled
-Message-ID: <Y1bCwpU4a+TZhRE1@google.com>
-References: <20221024124845.1927035-1-eesposit@redhat.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Cathy Avery <cavery@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 16/16] add IPI loss stress test
+Message-ID: <Y1bJMF7HV4QesDsl@google.com>
+References: <20221020152404.283980-1-mlevitsk@redhat.com>
+ <20221020152404.283980-17-mlevitsk@redhat.com>
+ <Y1GuXoYm6JLpkUvq@google.com>
+ <d20ce69105402e4adc9ba6cb2c922fa2653bc80a.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20221024124845.1927035-1-eesposit@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d20ce69105402e4adc9ba6cb2c922fa2653bc80a.camel@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
+        USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-"nVMX" instead of "vmx/nested"
-
-On Mon, Oct 24, 2022, Emanuele Giuseppe Esposito wrote:
-> Currently vmx enables SECONDARY_EXEC_ENCLS_EXITING even when sgx
-> is not set in the host MSR.
-> This was probably introduced when sgx was not yet fully supported, and
-> we wanted to trap guests trying to use the feature.
-
-Nah, it's just a boneheaded bug.
-
-> When booting a guest, KVM checks that the cpuid bit is actually set
-> in vmx.c, and if not, it does not enable the feature.
-
-The CPUID thing is a red herring.  That's an _additional_ restriction, KVM honors
-MSR_IA32_VMX_PROCBASED_CTLS2 when configuring vmcs01.  See adjust_vmx_controls()
-for secondary controls in setup_vmcs_config().
-
-> However, in nesting this control bit is blindly copied, and will be
-
-It's not "copied", KVM sets the bit in the nVMX MSR irrespective of host support,
-which is the problem.
-
-> propagated to VMCS12 and VMCS02. Therefore, when L1 tries to boot
-> the guest, the host will try to execute VMLOAD with VMCS02 containing
-> a feature that the hardware does not support, making it fail with
-> hardware error 0x7.
+On Mon, Oct 24, 2022, Maxim Levitsky wrote:
+> On Thu, 2022-10-20 at 20:23 +0000, Sean Christopherson wrote:
+> > On Thu, Oct 20, 2022, Maxim Levitsky wrote:
+> > > +static void wait_for_ipi(volatile u64 *count)
+> > > +{
+> > > +       u64 old_count = *count;
+> > > +       bool use_halt;
+> > > +
+> > > +       switch (hlt_allowed) {
+> > > +       case -1:
+> > > +               use_halt = get_random(0,10000) == 0;
+> > 
+> > Randomly doing "halt" is going to be annoying to debug.  What about tying the
+> > this decision to the iteration and then providing a knob to let the user specify
+> > the frequency?  It seems unlikely that this test will expose a bug that occurs
+> > if and only if the halt path is truly random.
 > 
-> According with section A.3.3 of Intel System Programming Guide,
-> we should *always* check the value in the actual
+> This is stress test, it is pretty much impossible to debug, it is more like
+> pass/fail test.
 
-s/we/software
+There's a big difference between "hard to debug because there's a lot going on"
+and "hard to debug because failures are intermittent due to use of random numbers
+with no way to ensure a deterministic sequence.  I completely understand that this
+type of test is going to be really hard to debug, but that's argument for making
+the test as deterministic as possible, i.e. do what we can to make it slightly
+less awful to debug.
 
-> MSR_IA32_VMX_PROCBASED_CTLS2 before enabling this bit.
+> > > +                       asm volatile ("sti;nop;cli");
+> > 
+> > sti_nop_cli();
+> I think you mean sti_nop(); cli();
+
+I was thinking we could add another helper since it's such a common pattern.
+
+> > > +
+> > > +       } while (old_count == *count);
+> > 
+> > There's no need to loop in the use_halt case.  If KVM spuriously wakes the vCPU
+> > from halt, then that's a KVM bug.  Kinda ugly, but it does provide meaningfully
+> > coverage for the HLT case.
 > 
-> RHBZ: https://bugzilla.redhat.com/show_bug.cgi?id=2127128
+> Nope - KVM does spuriously wake up the CPU, for example when the vCPU thread
+> recieves a signal and anything else that makes the kvm_vcpu_check_block
+> return -EINTR.
+
+That doesn't (and shouldn't) wake the vCPU from the guest's perspective.  If/when
+userspace calls KVM_RUN again, the vCPU's state should still be KVM_MP_STATE_HALTED
+and thus KVM will invoke vcpu_block() until there is an actual wake event.
+
+This is something that KVM _must_ get correct,
+
+> > > +static void wait_for_ipi_in_l2(volatile u64 *count, struct svm_vcpu *vcpu)
+> > > +{
+> > > +       u64 old_count = *count;
+> > > +       bool irq_on_vmentry = get_random(0,1) == 0;
+> > 
+> > Same concerns about using random numbers.
 > 
-
-Fixes: 72add915fbd5 ("KVM: VMX: Enable SGX virtualization for SGX1, SGX2 and LC")
-Cc: stable@vger.kernel.org
-
-> Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
-> ---
->  arch/x86/kvm/vmx/nested.c | 22 ++++++++++++++++++++--
->  1 file changed, 20 insertions(+), 2 deletions(-)
+> I can also add a parameter to force this to true/false, or better long term,
+> is to provide a PRNG and just seed it with either RDRAND or a userspace given number.
+> RDRAND retrived value can be even printed so that the test can be replayed.
 > 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 8f67a9c4a287..f651084010cc 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -6678,6 +6678,25 @@ static u64 nested_vmx_calc_vmcs_enum_msr(void)
->  	return (u64)max_idx << VMCS_FIELD_INDEX_SHIFT;
->  }
->  
-> +/*
-> + * According with section A.3.3 of
+> You know just like the tools we both worked on at Intel did....
+> 
+> In fact I'll just do it - just need to pick some open source PRNG code.
+> Do you happen to know a good one? Mersenne Twister? 
 
-Avoid referencing sections/tables by "number" in comments (and changelogs), as the
-comment is all but guaranteed to become stale because future versions of the SDM
-will shift things around.
+It probably makes sense to use whatever we end up using for selftests[*] in order
+to minimize the code we have to maintain.
 
-The slightly more robust way to reference a specific SDM/APM section is to use the
-title, e.g. According to section "Secondary Processor-Based VM-Execution Controls"
-in Intel's SDM ...", as hardware vendors are less likely to arbitrarily rename
-sections and tables.  It's a bit more work for readers, but any decent PDF viewer
-can search these days.
+[*] https://lore.kernel.org/all/20221019221321.3033920-2-coltonlewis@google.com
 
-> Intel System Programming Guide
+> > > +               // GIF is set by VMRUN
+> > > +               SVM_VMRUN(vcpu->vmcb, &vcpu->regs);
+> > > +               // GIF is cleared by VMEXIT
+> > > +               asm volatile("cli;nop;stgi");
+> > 
+> > Why re-enable GIF on every exit?
+> 
+> And why not? KVM does this on each VMRUN.
 
-KVM typically uses "Intel's SDM" (and "AMD's APM").  Like "VMX" or "SVM", it's ok
-to use the SDM acronym without introducing since "SDM" is 
+Because doing work for no discernible reason is confusing.  E.g. if this were a
+"real" hypervisor, it should also context switch CR2.
 
-> + * we *can* set the guest MSR control X (in our case
+KVM enables STGI because GIF=0 blocks _all_ interrupts, i.e. KVM needs to recognize
+NMI, SMI, #MC, etc... asap and even if KVM stays in its tight run loop.  For KUT,
+there should be never be an NMI, SMI, #MC, etc... and so no need to enable GIF.
 
-Avoid pronouns in comments.  "we" and "us" are ambiguous, e.g. "we" can mean KVM,
-the developer, the user, etc...
+I suppose you could make the argument that the test should set GIF when running on
+bare metal, but that's tenuous at best as SMI is the only event that isn't fatal to
+the test.
 
-> + * SECONDARY_EXEC_ENCLS_EXITING) *iff* bit 32+X of
-> + * MSR_IA32_VMX_PROCBASED_CTLS2 is set to 1.
-> + * Otherwise it must remain zero.
+> > > +
+> > > +       printf("test started, waiting to end...\n");
+> > > +
+> > > +       while (cpus_active() > 1) {
+> > > +
+> > > +               unsigned long isr_count1, isr_count2;
+> > > +
+> > > +               isr_count1 = isr_counts[1];
+> > > +               delay(5ULL*1000*1000*1000);
+> > 
+> > Please add a macro or two for nanoseconds/milliseconds/seconds or whatever this
+> > expands to.
+> 
+> That is the problem - the delay is just in TSC freq units, and knowing TSC freq
+> for some reason on x86 is next to impossible on AMD
 
-As a general rule, if you find yourself writing a comment and a helper for
-something that KVM absolutely needs to get right (honoring VMX MSRs), then odds
-are very good that there's a simpler/easier fix, i.e. that you're effectively
-re-inventing part of the weel.
+Ah, delay() takes the number cycles.  Ugh.
 
-> + */
-> +static void nested_vmx_setup_encls_exiting(struct nested_vmx_msrs *msrs)
-> +{
-> +	u32 vmx_msr_procb_low, vmx_msr_procb_high;
-> +
-> +	rdmsr(MSR_IA32_VMX_PROCBASED_CTLS2, vmx_msr_procb_low, vmx_msr_procb_high);
-> +
-> +	WARN_ON(vmx_msr_procb_low & SECONDARY_EXEC_ENCLS_EXITING);
-> +
-> +	if (enable_sgx && (vmx_msr_procb_high & SECONDARY_EXEC_ENCLS_EXITING))
-> +		msrs->secondary_ctls_high |= SECONDARY_EXEC_ENCLS_EXITING;
-> +}
-> +
->  /*
->   * nested_vmx_setup_ctls_msrs() sets up variables containing the values to be
->   * returned for the various VMX controls MSRs when nested VMX is enabled.
-> @@ -6874,8 +6893,7 @@ void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
->  		msrs->secondary_ctls_high |=
->  			SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES;
->  
-> -	if (enable_sgx)
-> -		msrs->secondary_ctls_high |= SECONDARY_EXEC_ENCLS_EXITING;
+We should fix that, e.g. use the CPUID-provided frequency when possible (KVM should
+emulate this if it doesn't already), and then #define an arbitrary TSC frequency as
+a fall back so that we can write readable code, e.g. 2.4Ghz is probably close enough
+to work.
 
-The issue here is that I, who wrote this code long, long ago, copied the pattern
-used for enable_unrestricted_guest, flexpriority_enabled, etc... without fully
-appreciating the logic.  Unlike those module params, enable_sgx doesn't track
-hardware support, i.e. enable_sgx isn't cleared when SGX can't be enabled due to
-lack of hardware support.  As a result, KVM effectively enumerates to L1 that the
-control is always available, i.e. that KVM emulates ENCLS-exiting for L1, but KVM
-obviously doesn't actually emulating the behavior.
+> > And why not have multi configs, e.g. to run with and without x2APIC?
+> 
+> Good idea as well, although I don't know if I want to slow down the kvm unit
+> tests run too much.
 
-Not updating enable_sgx is responsible for a second bug: vmx_set_cpu_caps() doesn't
-clear the SGX bits when hardware support is unavailable.  This is a much less
-problematic bug as as it only pops up if SGX is soft-disabled (the case being
-handled by cpu_has_sgx()) or if SGX is supported for bare metal but not in the
-VMCS (will never happen when running on bare metal, but can theoertically happen
-when running in a VM).
-
-Last but not least, KVM should ideally have module params reflect KVM's actual
-configuration.
-
-Killing all birds with one stone, simply clear enable_sgx when ENCLS-exiting isn't
-supported.  The #ifdef is a little gross, but I think it's marginally less ugly
-than having vmx.c define a dummy boolean.
-
-Compile tested only...
-
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 9dba04b6b019..65f092e4a81b 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8263,6 +8263,11 @@ static __init int hardware_setup(void)
-        if (!cpu_has_virtual_nmis())
-                enable_vnmi = 0;
- 
-+#ifdef CONFIG_X86_SGX_KVM
-+       if (!cpu_has_vmx_encls_vmexit())
-+               enable_sgx = false;
-+#endif
-+
-        /*
-         * set_apic_access_page_addr() is used to reload apic access
-         * page upon invalidation.  No need to do anything if not
+We should add a way to flag and omit all "slow" tests, e.g. vmx_vmcs_shadow_test
+takes an absurd amount of time and is uninteresting for the vast majority of changes.
