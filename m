@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BC62609D97
-	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 11:13:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A840F609D9A
+	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 11:13:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231129AbiJXJN1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 05:13:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46264 "EHLO
+        id S231197AbiJXJNg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Oct 2022 05:13:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230523AbiJXJNW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Oct 2022 05:13:22 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E27867C99
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 02:13:14 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id q71so8180612pgq.8
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 02:13:14 -0700 (PDT)
+        with ESMTP id S231165AbiJXJNZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Oct 2022 05:13:25 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2116169BC4
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 02:13:15 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id f23so7939374plr.6
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 02:13:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1HCdfoJ+ufRET4NO1GLfMwugudiiGl/j2xp9aKOsdco=;
-        b=HG/onTOfg/WGUNTCcxGcy6ULR4bPodLRPz6cptMTKyroFFng2v//dZPOjhUsHmQUgE
-         X3e+5tmnTXL2GHbU6IhmJY1J2PgJi/X90DHCcJnweIfNzgOTweMyZtKZ/53ttI6FrD5G
-         0hdBfsIHxo9sXyKnOi/7ZfBFG9A/6CYidWB13J9mBxS297MD9tlfbQnQOSTP/QeZ7k8C
-         9xCnMXnxxdki0ByWs1mr+1i5OODh4MD/sAlZJwobdFie3Q1Qq8/Jtqcfl/R3pKNvvwxK
-         aozix2UbCbH3Ai3lGy2zLUurdirLl/I5skvRK4RPZ9ls4H08ZWI9O0H9Ma65bqh3ZmUo
-         SI3Q==
+        bh=NL81jaqKKFzrMCxOCGcpdgaauWXeDH5p8SvcsPbwmls=;
+        b=RblnWhL5S8XjnpDFO9vdvkfdHtr+kXptXKV+qEG1pJ3MPyTF2aAvcWVIqkObwc/Kp+
+         jsM1sqKFoNcACrE+6etqyxkThy2B0CUxLOkx4HjFXrqpHJpBfC6ewesewTqWTe39Site
+         ZDi2epwlIsEhlsVvBACmk3A7TIlkblfGAqKx4kKn1u2jRVw76kbQwpp/z+S2modJfS36
+         mMAVAkHxkd8po+jZQ9Z2+Desnoo1703c8M72WuAYYuQPgxA1dgWCEDQdjR2c0KXjiF2P
+         Wrj0ycd9acVmJv08KhVWGmnZSJw84iXsIg2O06xNsy5mEUc+ct7m/fZjG91/QKOAmuut
+         PX4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1HCdfoJ+ufRET4NO1GLfMwugudiiGl/j2xp9aKOsdco=;
-        b=7RS3lLorTlv5Eaj9/AwWviGc6HDQt0KvB7s55mswKo3qltRjbaA2kTL3ricN6qrOZg
-         2rpiXkRnm5TQ52ITde18CwFVPDdIPyqDpCcCyvI8jjEyF6x3TRCsJwU1zL/M8zYbkhPZ
-         GuRSyY00Lx+p/V3iUQzaCr4GZChLhf3ZCwhKVXI6pJkB+Ceg8sVo1uxu9mF1WfZS0vGy
-         XCd1BGrPtsshUDkc573HgRZeq7YiJe7LsZTWB3YEbDljHQPL53TxCyY9WE10ElaVCbsM
-         D2p2rfgU/8yaxMb6jt1xatSj0ehHVmf4LQ2BV5jSCLoO8nFbWUIQErEOxOMdI+pDfZpT
-         oLVw==
-X-Gm-Message-State: ACrzQf0OrWc96LsiThs5WebmZAjOyJj2oVtGk63jAJD5zo99NcsYkfK3
-        qIeAzkekpXcaXbiaJoGwTmQ=
-X-Google-Smtp-Source: AMsMyM5KXwR1ve7iqQ6Kfww7rCHheuMQSdq5NVx0XAWanm/Ohyu1WrwbIYVVW+9kWy1Age+86c1vKg==
-X-Received: by 2002:a63:d845:0:b0:44b:d074:97d with SMTP id k5-20020a63d845000000b0044bd074097dmr27888531pgj.32.1666602793048;
-        Mon, 24 Oct 2022 02:13:13 -0700 (PDT)
+        bh=NL81jaqKKFzrMCxOCGcpdgaauWXeDH5p8SvcsPbwmls=;
+        b=LAIhBEjo9kx6s/9Y7tdOrMjaw6GBkxvvRZGA6j0JDdOlBET3IXCwiFMmaUWa5z+m/M
+         oRYNyN3XIYJ9eR6bzIwGqrELTvpaNkxQiyM7P33EkWkjfymxwXLkL9NiuXBCc87vsGYB
+         UKyJCWIyg0bRLlVnw5DwEj/X0DBo1ZU2KrbRfS9hmBncGA1BJHJUWIm6YtD7Lwsf8k5p
+         ehLzCnSo8P0XGoMDWuPtv6wxSn1IiNFYQnYGZI1MKkZ/NTONYDECyTfrAGOpEFDC3Q7U
+         nyaq3LABtRAYHAvqfsEyPbfdiGXmHuNXGyRmsV66SmaROG6JTHRTz5NniDXJrsg3t+Be
+         qrKQ==
+X-Gm-Message-State: ACrzQf2COwsQD8l0VoDkJLHc//Hc7fxVD/bN2j44YY+RUfd6BU/K4Jre
+        y9VF/VBCXgWq+H2NLF7vk34FmtaNf6uOj5Dv
+X-Google-Smtp-Source: AMsMyM7jD64a2Q/5mfcmtlUYXwqw6ceR8lwszBGyJAGNyE/YCLTRy4MCLvXeKYm1qvFZPQSqWZ24LQ==
+X-Received: by 2002:a17:902:8d93:b0:17f:852e:f84e with SMTP id v19-20020a1709028d9300b0017f852ef84emr31818346plo.20.1666602794744;
+        Mon, 24 Oct 2022 02:13:14 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id r15-20020aa79ecf000000b00535da15a252sm19642213pfq.165.2022.10.24.02.13.11
+        by smtp.gmail.com with ESMTPSA id r15-20020aa79ecf000000b00535da15a252sm19642213pfq.165.2022.10.24.02.13.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Oct 2022 02:13:12 -0700 (PDT)
+        Mon, 24 Oct 2022 02:13:14 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v4 07/24] x86/pmu: Introduce multiple_{one, many}() to improve readability
-Date:   Mon, 24 Oct 2022 17:12:06 +0800
-Message-Id: <20221024091223.42631-8-likexu@tencent.com>
+Subject: [kvm-unit-tests PATCH v4 08/24] x86/pmu: Reset the expected count of the fixed counter 0 when i386
+Date:   Mon, 24 Oct 2022 17:12:07 +0800
+Message-Id: <20221024091223.42631-9-likexu@tencent.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221024091223.42631-1-likexu@tencent.com>
 References: <20221024091223.42631-1-likexu@tencent.com>
@@ -74,78 +74,88 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-The current measure_one() forces the common case to pass in unnecessary
-information in order to give flexibility to a single use case. It's just
-syntatic sugar, but it really does help readers as it's not obvious that
-the "1" specifies the number of events, whereas multiple_many() and
-measure_one() are relatively self-explanatory.
+The pmu test check_counter_overflow() always fails with 32-bit binaries.
+The cnt.count obtained from the latter run of measure() (based on fixed
+counter 0) is not equal to the expected value (based on gp counter 0) and
+there is a positive error with a value of 2.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
+The two extra instructions come from inline wrmsr() and inline rdmsr()
+inside the global_disable() binary code block. Specifically, for each msr
+access, the i386 code will have two assembly mov instructions before
+rdmsr/wrmsr (mark it for fixed counter 0, bit 32), but only one assembly
+mov is needed for x86_64 and gp counter 0 on i386.
+
+The sequence of instructions to count events using the #GP and #Fixed
+counters is different. Thus the fix is quite high level, to use the same
+counter (w/ same instruction sequences) to set initial value for the same
+counter. Fix the expected init cnt.count for fixed counter 0 overflow
+based on the same fixed counter 0, not always using gp counter 0.
+
+The difference of 1 for this count enables the interrupt to be generated
+immediately after the selected event count has been reached, instead of
+waiting for the overflow to be propagation through the counter.
+
+Adding a helper to measure/compute the overflow preset value. It
+provides a convenient location to document the weird behavior
+that's necessary to ensure immediate event delivery.
+
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- x86/pmu.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+ x86/pmu.c | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
 
 diff --git a/x86/pmu.c b/x86/pmu.c
-index ba67aa6..3b1ed16 100644
+index 3b1ed16..bb6e97e 100644
 --- a/x86/pmu.c
 +++ b/x86/pmu.c
-@@ -181,7 +181,7 @@ static void stop_event(pmu_counter_t *evt)
- 	evt->count = rdmsr(evt->ctr);
+@@ -288,17 +288,30 @@ static void check_counters_many(void)
+ 	report(i == n, "all counters");
  }
  
--static void measure(pmu_counter_t *evt, int count)
-+static void measure_many(pmu_counter_t *evt, int count)
- {
- 	int i;
- 	for (i = 0; i < count; i++)
-@@ -191,6 +191,11 @@ static void measure(pmu_counter_t *evt, int count)
- 		stop_event(&evt[i]);
- }
- 
-+static void measure_one(pmu_counter_t *evt)
++static uint64_t measure_for_overflow(pmu_counter_t *cnt)
 +{
-+	measure_many(evt, 1);
++	__measure(cnt, 0);
++	/*
++	 * To generate overflow, i.e. roll over to '0', the initial count just
++	 * needs to be preset to the negative expected count.  However, as per
++	 * Intel's SDM, the preset count needs to be incremented by 1 to ensure
++	 * the overflow interrupt is generated immediately instead of possibly
++	 * waiting for the overflow to propagate through the counter.
++	 */
++	assert(cnt->count > 1);
++	return 1 - cnt->count;
 +}
 +
- static void __measure(pmu_counter_t *evt, uint64_t count)
+ static void check_counter_overflow(void)
  {
- 	__start_event(evt, count);
-@@ -220,7 +225,7 @@ static void check_gp_counter(struct pmu_event *evt)
+ 	int nr_gp_counters = pmu_nr_gp_counters();
+-	uint64_t count;
++	uint64_t overflow_preset;
  	int i;
- 
- 	for (i = 0; i < nr_gp_counters; i++, cnt.ctr++) {
--		measure(&cnt, 1);
-+		measure_one(&cnt);
- 		report(verify_event(cnt.count, evt), "%s-%d", evt->name, i);
- 	}
- }
-@@ -247,7 +252,7 @@ static void check_fixed_counters(void)
- 
- 	for (i = 0; i < nr_fixed_counters; i++) {
- 		cnt.ctr = fixed_events[i].unit_sel;
--		measure(&cnt, 1);
-+		measure_one(&cnt);
- 		report(verify_event(cnt.count, &fixed_events[i]), "fixed-%d", i);
- 	}
- }
-@@ -274,7 +279,7 @@ static void check_counters_many(void)
- 		n++;
- 	}
- 
--	measure(cnt, n);
-+	measure_many(cnt, n);
- 
- 	for (i = 0; i < n; i++)
- 		if (!verify_counter(&cnt[i]))
-@@ -338,7 +343,7 @@ static void check_gp_counter_cmask(void)
+ 	pmu_counter_t cnt = {
+ 		.ctr = gp_counter_base,
  		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel /* instructions */,
  	};
- 	cnt.config |= (0x2 << EVNTSEL_CMASK_SHIFT);
--	measure(&cnt, 1);
-+	measure_one(&cnt);
- 	report(cnt.count < gp_events[1].min, "cmask");
- }
+-	__measure(&cnt, 0);
+-	count = cnt.count;
++	overflow_preset = measure_for_overflow(&cnt);
+ 
+ 	/* clear status before test */
+ 	wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL, rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
+@@ -309,12 +322,13 @@ static void check_counter_overflow(void)
+ 		uint64_t status;
+ 		int idx;
+ 
+-		cnt.count = 1 - count;
++		cnt.count = overflow_preset;
+ 		if (gp_counter_base == MSR_IA32_PMC0)
+ 			cnt.count &= (1ull << pmu_gp_counter_width()) - 1;
+ 
+ 		if (i == nr_gp_counters) {
+ 			cnt.ctr = fixed_events[0].unit_sel;
++			cnt.count = measure_for_overflow(&cnt);
+ 			cnt.count &= (1ull << pmu_fixed_counter_width()) - 1;
+ 		}
  
 -- 
 2.38.1
