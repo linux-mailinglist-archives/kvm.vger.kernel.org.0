@@ -2,162 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 243C160B585
-	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 20:30:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F052460B630
+	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 20:50:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232000AbiJXSav (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 14:30:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42224 "EHLO
+        id S232867AbiJXSuf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Oct 2022 14:50:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231775AbiJXSaM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Oct 2022 14:30:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2B5EEACAC
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 10:12:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666631448;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CuC35aE9FfHuspeUd2kBk1u2OekO/kcB+ox/G4yPZC4=;
-        b=GPbUG5BIMPkgfkczDvXcvF1XSQN/vYj2TRgwbXO2fbaG7CCfAPPoFYwwFkAOIxNqjD5pvZ
-        2Q3OKj7UFj0xJ9Qu43tLPdX+PdYYsBW+899Dcdq9x7NY0X+uu14DhAwOJYXdXiZtMTBI03
-        dKf9QIUxelyU4p9iDamg4BySJqNVsuc=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-621-PPk2SqgGPgS-dzEJoKrKrA-1; Mon, 24 Oct 2022 08:46:12 -0400
-X-MC-Unique: PPk2SqgGPgS-dzEJoKrKrA-1
-Received: by mail-qt1-f199.google.com with SMTP id e24-20020ac84918000000b0039878b3c676so6938312qtq.6
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 05:46:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CuC35aE9FfHuspeUd2kBk1u2OekO/kcB+ox/G4yPZC4=;
-        b=NtzJH8qq5hQWmrVauE2C3aboUn6K9kybnsG+HyyplYorhnqaeOG6EewOPxzwtpvmIW
-         QIfrg3RHLi2q4XCmr8/oPzKSu85t7YE9H/ct9ylXY4vrFVuuzBt1lRy4vwKTYrs4+LEe
-         WuveNzleeeARZCuLYJeGAstqZNgXRNfOkl9K8bpPU083Z0/RQspyWr98fvkZMshx5O+f
-         Q/BIcr7YjesN6TDdYFw0WASZz+ZAY19VC11TTH02GTivVaSlbeiF+5+w3abYhmhINwhr
-         voDg35ksmiJloooP2Z/OSqaBZYceTJWt1aK0MDd0RNdaHgC7M6u/F/cLfRwZdvF4NyE0
-         6yzw==
-X-Gm-Message-State: ACrzQf3Egr1kt98+0sJ3WrVRPf+iAoPSusGxayMYb9ra1hIPlJKr0cKp
-        xLio0cqRC4izoNmNiPfFENWnvIXeJL7f2V9deaeG9IFnHkmq0ypgEQKbscS4HbCHD18Jpz4ke4u
-        zl/TPvBPEtnb4
-X-Received: by 2002:a37:557:0:b0:6ee:790e:d1d1 with SMTP id 84-20020a370557000000b006ee790ed1d1mr22848855qkf.118.1666615571237;
-        Mon, 24 Oct 2022 05:46:11 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7pATUhIw9SoYTZh1di4Z72eDS/tKeQ/FCcNxUbvaSM+L7lqktPpJsR7Dg5UbrDBCyIeJkZpQ==
-X-Received: by 2002:a37:557:0:b0:6ee:790e:d1d1 with SMTP id 84-20020a370557000000b006ee790ed1d1mr22848841qkf.118.1666615571002;
-        Mon, 24 Oct 2022 05:46:11 -0700 (PDT)
-Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id r8-20020a05620a298800b006be8713f742sm15466019qkp.38.2022.10.24.05.46.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Oct 2022 05:46:10 -0700 (PDT)
-Message-ID: <56dd4f6794339700551bbbd5fbcd3491cba1eeeb.camel@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 15/16] svm: introduce svm_vcpu
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Cathy Avery <cavery@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Date:   Mon, 24 Oct 2022 15:46:08 +0300
-In-Reply-To: <Y1GbQbJxEAGqIP93@google.com>
-References: <20221020152404.283980-1-mlevitsk@redhat.com>
-         <20221020152404.283980-16-mlevitsk@redhat.com>
-         <Y1GbQbJxEAGqIP93@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
-MIME-Version: 1.0
+        with ESMTP id S232453AbiJXSuF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Oct 2022 14:50:05 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED7911181A;
+        Mon, 24 Oct 2022 10:30:53 -0700 (PDT)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29OE7KB0017402;
+        Mon, 24 Oct 2022 14:20:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=pbxnAhFCDpff1GUxMHUF6fZP5VjICHD6HXq0aRQWBtc=;
+ b=mT86c87DYfVopxMFxgAZBi9V4ZIzWr09zPq7SQ848Ok4J8DTS0lPU6NXTCT3IG7xyJK+
+ Xtl/gwzuqXZlUTNC0tNmLYDJTzlcyawV0yYZT6eIiWNeb/9a+8I/KkWW3UHb61utnWrE
+ go47aq9U/BYo7EQpyIgXDElXbwsPQJxeyoGWa/eYhICkCFQr2fXGFFZrcMqkXEz0f0lc
+ m37Gs6xkeachmP2uZUeyzKv2l7gyhcKLt2uxNMafBFKj+h6o+ORMHFx5HoYLvhOFP2B6
+ uCW7ia88b2GGY0KN8g/Tg5MGaQ9vXsfE9plAsOnXWJseUdoKG7g0SEHoP2erqFdHrcvB Eg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kduu7s6xq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Oct 2022 14:20:42 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29OE91gG027532;
+        Mon, 24 Oct 2022 14:20:42 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kduu7s6wn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Oct 2022 14:20:41 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29OE5cfi018375;
+        Mon, 24 Oct 2022 14:20:40 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 3kc859bf1w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Oct 2022 14:20:40 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29OEKbil41353512
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 24 Oct 2022 14:20:37 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0D02352050;
+        Mon, 24 Oct 2022 14:20:37 +0000 (GMT)
+Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.20.45])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 858695204E;
+        Mon, 24 Oct 2022 14:20:36 +0000 (GMT)
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        cohuck@redhat.com, imbrenda@linux.ibm.com, david@redhat.com,
+        nrb@linux.ibm.com, scgl@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v5 0/2] S390x: CPU Topology Information
+Date:   Mon, 24 Oct 2022 16:20:33 +0200
+Message-Id: <20221024142035.22668-1-pmorel@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: zAYTRceIOoHi3yTa0UauDJIf93pFdf8u
+X-Proofpoint-ORIG-GUID: ei4aMkU1mh5oRO2wU64sYxqOPoANjjJ-
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-24_04,2022-10-21_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ mlxlogscore=999 malwarescore=0 spamscore=0 clxscore=1011 phishscore=0
+ priorityscore=1501 suspectscore=0 bulkscore=0 mlxscore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210240086
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-10-20 at 19:02 +0000, Sean Christopherson wrote:
-> On Thu, Oct 20, 2022, Maxim Levitsky wrote:
-> > This adds minimum amout of code to support tests that
-> > run SVM on more that one vCPU.
-> 
-> s/that/than
-> 
-> > 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  lib/x86/svm_lib.c |   9 +
-> >  lib/x86/svm_lib.h |  10 +
-> >  x86/svm.c         |  37 ++-
-> >  x86/svm.h         |   5 +-
-> >  x86/svm_npt.c     |  44 ++--
-> >  x86/svm_tests.c   | 615 +++++++++++++++++++++++-----------------------
-> >  6 files changed, 362 insertions(+), 358 deletions(-)
-> > 
-> > diff --git a/lib/x86/svm_lib.c b/lib/x86/svm_lib.c
-> > index 2b067c65..1152c497 100644
-> > --- a/lib/x86/svm_lib.c
-> > +++ b/lib/x86/svm_lib.c
-> > @@ -157,3 +157,12 @@ void vmcb_ident(struct vmcb *vmcb)
-> >                 ctrl->tlb_ctl = TLB_CONTROL_FLUSH_ALL_ASID;
-> >         }
-> >  }
-> > +
-> > +void svm_vcpu_init(struct svm_vcpu *vcpu)
-> > +{
-> > +       vcpu->vmcb = alloc_page();
-> > +       vmcb_ident(vcpu->vmcb);
-> > +       memset(&vcpu->regs, 0, sizeof(vcpu->regs));
-> > +       vcpu->stack = alloc_pages(4) + (PAGE_SIZE << 4);
-> > +       vcpu->vmcb->save.rsp = (ulong)(vcpu->stack);
-> > +}
-> > diff --git a/lib/x86/svm_lib.h b/lib/x86/svm_lib.h
-> > index 59db26de..c6957dba 100644
-> > --- a/lib/x86/svm_lib.h
-> > +++ b/lib/x86/svm_lib.h
-> > @@ -89,6 +89,16 @@ struct svm_extra_regs
-> >      u64 r15;
-> >  };
-> >  
-> > +
-> > +struct svm_vcpu
-> > +{
-> > +       struct vmcb *vmcb;
-> > +       struct svm_extra_regs regs;
-> > +       void *stack;
-> > +};
-> > +
-> > +void svm_vcpu_init(struct svm_vcpu *vcpu);
-> > +
-> >  #define SWAP_GPRS(reg) \
-> >                 "xchg %%rcx, 0x08(%%" reg ")\n\t"       \
-> >                 "xchg %%rdx, 0x10(%%" reg ")\n\t"       \
-> > diff --git a/x86/svm.c b/x86/svm.c
-> > index 9484a6d1..7aa3ebd2 100644
-> > --- a/x86/svm.c
-> > +++ b/x86/svm.c
-> > @@ -16,7 +16,7 @@
-> >  #include "apic.h"
-> >  #include "svm_lib.h"
-> >  
-> > -struct vmcb *vmcb;
-> > +struct svm_vcpu vcpu0;
-> 
-> It's not strictly vCPU0, e.g. svm_init_intercept_test() deliberately runs on
-> vCPU2, presumably to avoid running on the BSP?
-> 
-> Since this is churning a lot of code anyways, why not clean this all up and have
-> run_svm_tests() dynamically allocate state instead of relying on global data?
+Hi,
 
-Makes sense.
+new version of the series with corrections.
 
-Best regards,
-	Maxim Levitsky
+When facility 11 is available inside the S390x architecture, 2 new
+instructions are available: PTF and STSI with function code 15.
 
-> 
+Let's check their availability in QEMU/KVM and their coherence
+with the CPU topology provided to the QEMU -smp parameter and as
+argument for the test.
 
+To run these tests successfully you will Linux 6.0 and the following
+QEMU patches (or newer):
+
+  https://lore.kernel.org/all/20221012162107.91734-1-pmorel@linux.ibm.com/#r
+
+
+To start the test just do:
+
+# ./run_tests.sh topology
+
+or
+
+# ./s390x-run s390x/topology.elf \
+	-smp 5,sockets=4,cores=4,maxcpus=16 \
+	-append "-mnest 2 -sockets 4 -cores 4"
+
+
+Of course the declaration of the number of socket and core must be
+coherent in -smp and -append arguments.
+The "mnest" argument represent the expected nesting level it will be
+2 until books and drawer are added to the topology.
+
+Regards,
+Pierre
+
+Pierre Morel (2):
+  s390x: topology: Check the Perform Topology Function
+  s390x: topology: Checking Configuration Topology Information
+
+ lib/s390x/stsi.h    |  44 ++++++
+ s390x/Makefile      |   1 +
+ s390x/topology.c    | 366 ++++++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg |   4 +
+ 4 files changed, 415 insertions(+)
+ create mode 100644 s390x/topology.c
+
+-- 
+2.31.1
+
+Changelog:
+
+From v4:
+
+- Simplify the tests for socket and cores only.
 
