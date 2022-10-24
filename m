@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C2D2460A237
-	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 13:39:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD67260A230
+	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 13:39:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231241AbiJXLjs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 07:39:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50284 "EHLO
+        id S231147AbiJXLjg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Oct 2022 07:39:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231360AbiJXLjF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Oct 2022 07:39:05 -0400
+        with ESMTP id S230487AbiJXLie (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Oct 2022 07:38:34 -0400
 Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85B98356CB;
-        Mon, 24 Oct 2022 04:37:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA50FB1E9;
+        Mon, 24 Oct 2022 04:38:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666611475; x=1698147475;
+  t=1666611482; x=1698147482;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=4jBh95k+8xwo1JohtTSjVth9N3E+IK9boL8mgzWoN7E=;
-  b=OKB6cXOJBYkJsTt5y34AAkO4QxMqO5Fq5IsnDz+DNQUqjATYN43tC8jz
-   WBcclExBf6f2mK3nltTNmuxs8ctAFVCskdxOCZzJhfkLoskEKRKNo3G+d
-   I3Gbef+YcNeD1VuK90ZwBaJiw2Et4sTirbde9O6fmPO4QR59cPtHjsc7R
-   YYlRbxaeHWHWdXurWSaD8Z+SFNS6u5x5h8ovPhC9dZlUpyAu2UlKftCGN
-   Jy1kdnVlDJHIkQgEd4RqkhSSYltcB9P6t36HwG5sCLwzCKEI534KjPVbk
-   dIJY9HHX0cLLvsZs2tn72DpGPOYv7yedxK6eYcpUqsc2wZ2JtbS6Ou82p
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10509"; a="369462469"
+  bh=VfbQaPDh8z2xxcOon1s6cTrPqmF5WJAx6/Ye0pT0g4o=;
+  b=gvdUL6ByCWqDhy8Km5LfNivDeZq98j17Oax7mlmuybFDO6fA6zELwBvc
+   7HTOIR2OxMSsVYABS8eVtSQ8/nSzIoKSsgot0fB5HN6AC5KGzZyRKNqvM
+   ZRD7cn7ZjSQW6MnwkiErKmfFAzQotpnX8TAJdlOUKgpm84pFCm5CvktLt
+   VmlRSFIErg6vVRYFdjamTQIYy2DF7t0F1lEObIwxL00gkoAq69okq3aFZ
+   LXhowZVv1jMDi229AtKfmD//ZmOfvvnWrqF3RxslRPbTDC4MfqymZEUmT
+   t3I7Vn0H8EmSgTpFwLKPwsBScM0WRzI5a/JtNfPXKaPO4oFz1Hk6gFo8R
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10509"; a="369462478"
 X-IronPort-AV: E=Sophos;i="5.95,209,1661842800"; 
-   d="scan'208";a="369462469"
+   d="scan'208";a="369462478"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2022 04:35:25 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2022 04:35:27 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10509"; a="773785039"
+X-IronPort-AV: E=McAfee;i="6500,9779,10509"; a="773785057"
 X-IronPort-AV: E=Sophos;i="5.95,209,1661842800"; 
-   d="scan'208";a="773785039"
+   d="scan'208";a="773785057"
 Received: from tdx-lm.sh.intel.com ([10.239.53.27])
-  by fmsmga001.fm.intel.com with ESMTP; 24 Oct 2022 04:35:22 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 24 Oct 2022 04:35:25 -0700
 From:   Wei Wang <wei.w.wang@intel.com>
 To:     seanjc@google.com, pbonzini@redhat.com
 Cc:     dmatlack@google.com, vipinsh@google.com, ajones@ventanamicro.com,
         eric.auger@redhat.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Wei Wang <wei.w.wang@intel.com>
-Subject: [PATCH v1 14/18] KVM: selftest/memslot_perf_test: vcpu related code consolidation
-Date:   Mon, 24 Oct 2022 19:34:41 +0800
-Message-Id: <20221024113445.1022147-15-wei.w.wang@intel.com>
+Subject: [PATCH v1 15/18] KVM: selftests/vgic_init: vcpu related code consolidation
+Date:   Mon, 24 Oct 2022 19:34:42 +0800
+Message-Id: <20221024113445.1022147-16-wei.w.wang@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20221024113445.1022147-1-wei.w.wang@intel.com>
 References: <20221024113445.1022147-1-wei.w.wang@intel.com>
@@ -60,378 +60,160 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove the vcpu and vcpu_thread fields in the vm_data struct and reuse
-the one in the kvm_vm strut. Rename vm_data to vcpu_thread_data and make
-it be the vcpu thread's private data. Also use the helper functions to
-create and join the vcpu thread.
+Remove the unnecessary definition of the *vcpu[] array and reuse the one
+from kvm_vm. Simplify the related function interface by removeing the
+*vcpu[].
 
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 ---
- .../testing/selftests/kvm/memslot_perf_test.c | 137 +++++++++---------
- 1 file changed, 71 insertions(+), 66 deletions(-)
+ .../testing/selftests/kvm/aarch64/vgic_init.c | 35 +++++++++----------
+ 1 file changed, 17 insertions(+), 18 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
-index 44995446d942..bf37d1bb8d50 100644
---- a/tools/testing/selftests/kvm/memslot_perf_test.c
-+++ b/tools/testing/selftests/kvm/memslot_perf_test.c
-@@ -6,7 +6,6 @@
-  *
-  * Basic guest setup / host vCPU thread code lifted from set_memory_region_test.
+diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
+index 9c131d977a1b..e24130a49581 100644
+--- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
++++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
+@@ -74,13 +74,12 @@ static int run_vcpu(struct kvm_vcpu *vcpu)
+ }
+ 
+ static struct vm_gic vm_gic_create_with_vcpus(uint32_t gic_dev_type,
+-					      uint32_t nr_vcpus,
+-					      struct kvm_vcpu *vcpus[])
++					      uint32_t nr_vcpus)
+ {
+ 	struct vm_gic v;
+ 
+ 	v.gic_dev_type = gic_dev_type;
+-	v.vm = vm_create_with_vcpus(nr_vcpus, guest_code, vcpus);
++	v.vm = vm_create_with_vcpus(nr_vcpus, guest_code, NULL);
+ 	v.gic_fd = kvm_create_device(v.vm, gic_dev_type);
+ 
+ 	return v;
+@@ -324,14 +323,15 @@ static void subtest_v3_redist_regions(struct vm_gic *v)
   */
--#include <pthread.h>
- #include <sched.h>
- #include <semaphore.h>
- #include <stdatomic.h>
-@@ -86,10 +85,7 @@ static_assert(MEM_TEST_MOVE_SIZE <= MEM_TEST_SIZE,
- #define MEM_TEST_VAL_1 0x1122334455667788
- #define MEM_TEST_VAL_2 0x99AABBCCDDEEFF00
- 
--struct vm_data {
--	struct kvm_vm *vm;
--	struct kvm_vcpu *vcpu;
--	pthread_t vcpu_thread;
-+struct vcpu_thread_data {
- 	uint32_t nslots;
- 	uint64_t npages;
- 	uint64_t pages_per_slot;
-@@ -126,7 +122,7 @@ static bool verbose;
- 			pr_info(__VA_ARGS__);	\
- 	} while (0)
- 
--static void check_mmio_access(struct vm_data *data, struct kvm_run *run)
-+static void check_mmio_access(struct vcpu_thread_data *data, struct kvm_run *run)
+ static void test_vgic_then_vcpus(uint32_t gic_dev_type)
  {
- 	TEST_ASSERT(data->mmio_ok, "Unexpected mmio exit");
- 	TEST_ASSERT(run->mmio.is_write, "Unexpected mmio read");
-@@ -140,8 +136,9 @@ static void check_mmio_access(struct vm_data *data, struct kvm_run *run)
+-	struct kvm_vcpu *vcpus[NR_VCPUS];
++	struct kvm_vcpu **vcpus;
+ 	struct vm_gic v;
+ 	int ret, i;
  
- static void *vcpu_worker(void *__data)
+-	v = vm_gic_create_with_vcpus(gic_dev_type, 1, vcpus);
++	v = vm_gic_create_with_vcpus(gic_dev_type, 1);
+ 
+ 	subtest_dist_rdist(&v);
+ 
++	vcpus = v.vm->vcpus;
+ 	/* Add the rest of the VCPUs */
+ 	for (i = 1; i < NR_VCPUS; ++i)
+ 		vcpus[i] = vm_vcpu_add(v.vm, i, guest_code);
+@@ -345,15 +345,14 @@ static void test_vgic_then_vcpus(uint32_t gic_dev_type)
+ /* All the VCPUs are created before the VGIC KVM device gets initialized */
+ static void test_vcpus_then_vgic(uint32_t gic_dev_type)
  {
--	struct vm_data *data = __data;
--	struct kvm_vcpu *vcpu = data->vcpu;
-+	struct kvm_vcpu *vcpu = (struct kvm_vcpu *)__data;
-+	struct vcpu_thread_data *data =
-+		(struct vcpu_thread_data *)vcpu->private_data;
- 	struct kvm_run *run = vcpu->run;
- 	struct ucall uc;
+-	struct kvm_vcpu *vcpus[NR_VCPUS];
+ 	struct vm_gic v;
+ 	int ret;
  
-@@ -187,7 +184,8 @@ static void wait_for_vcpu(void)
- 		    "sem_timedwait() failed: %d\n", errno);
- }
+-	v = vm_gic_create_with_vcpus(gic_dev_type, NR_VCPUS, vcpus);
++	v = vm_gic_create_with_vcpus(gic_dev_type, NR_VCPUS);
  
--static void *vm_gpa2hva(struct vm_data *data, uint64_t gpa, uint64_t *rempages)
-+static void *vm_gpa2hva(struct vcpu_thread_data *data,
-+			  uint64_t gpa, uint64_t *rempages)
+ 	subtest_dist_rdist(&v);
+ 
+-	ret = run_vcpu(vcpus[3]);
++	ret = run_vcpu(v.vm->vcpus[3]);
+ 	TEST_ASSERT(ret == -EINVAL, "dist/rdist overlap detected on 1st vcpu run");
+ 
+ 	vm_gic_destroy(&v);
+@@ -361,24 +360,25 @@ static void test_vcpus_then_vgic(uint32_t gic_dev_type)
+ 
+ static void test_v3_new_redist_regions(void)
  {
- 	uint64_t gpage, pgoffs;
- 	uint32_t slot, slotoffs;
-@@ -220,31 +218,19 @@ static void *vm_gpa2hva(struct vm_data *data, uint64_t gpa, uint64_t *rempages)
- 	return (uint8_t *)base + slotoffs * 4096 + pgoffs;
- }
+-	struct kvm_vcpu *vcpus[NR_VCPUS];
++	struct kvm_vcpu **vcpus;
+ 	void *dummy = NULL;
+ 	struct vm_gic v;
+ 	uint64_t addr;
+ 	int ret;
  
--static uint64_t vm_slot2gpa(struct vm_data *data, uint32_t slot)
-+static uint64_t vm_slot2gpa(struct vcpu_thread_data *data, uint32_t slot)
+-	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS, vcpus);
++	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS);
+ 	subtest_v3_redist_regions(&v);
+ 	kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+ 			    KVM_DEV_ARM_VGIC_CTRL_INIT, NULL);
+ 
++	vcpus = v.vm->vcpus;
+ 	ret = run_vcpu(vcpus[3]);
+ 	TEST_ASSERT(ret == -ENXIO, "running without sufficient number of rdists");
+ 	vm_gic_destroy(&v);
+ 
+ 	/* step2 */
+ 
+-	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS, vcpus);
++	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS);
+ 	subtest_v3_redist_regions(&v);
+ 
+ 	addr = REDIST_REGION_ATTR_ADDR(1, 0x280000, 0, 2);
+@@ -392,7 +392,7 @@ static void test_v3_new_redist_regions(void)
+ 
+ 	/* step 3 */
+ 
+-	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS, vcpus);
++	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS);
+ 	subtest_v3_redist_regions(&v);
+ 
+ 	ret = __kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+@@ -559,12 +559,12 @@ static void test_v3_last_bit_single_rdist(void)
+ /* Uses the legacy REDIST region API. */
+ static void test_v3_redist_ipa_range_check_at_vcpu_run(void)
  {
- 	TEST_ASSERT(slot < data->nslots, "Too high slot number");
+-	struct kvm_vcpu *vcpus[NR_VCPUS];
++	struct kvm_vcpu **vcpus;
+ 	struct vm_gic v;
+ 	int ret, i;
+ 	uint64_t addr;
  
- 	return MEM_GPA + slot * data->pages_per_slot * 4096;
- }
+-	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, 1, vcpus);
++	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, 1);
  
--static struct vm_data *alloc_vm(void)
--{
--	struct vm_data *data;
--
--	data = malloc(sizeof(*data));
--	TEST_ASSERT(data, "malloc(vmdata) failed");
--
--	data->vm = NULL;
--	data->vcpu = NULL;
--	data->hva_slots = NULL;
--
--	return data;
--}
--
--static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
--		       void *guest_code, uint64_t mempages,
--		       struct timespec *slot_runtime)
-+static bool prepare_vm(struct kvm_vm **out_vm, int nslots, uint64_t *maxslots,
-+	void *guest_code, uint64_t mempages,  struct timespec *slot_runtime)
+ 	/* Set space for 3 redists, we have 1 vcpu, so this succeeds. */
+ 	addr = max_phys_size - (3 * 2 * 0x10000);
+@@ -575,6 +575,7 @@ static void test_v3_redist_ipa_range_check_at_vcpu_run(void)
+ 	kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+ 			    KVM_VGIC_V3_ADDR_TYPE_DIST, &addr);
+ 
++	vcpus = v.vm->vcpus;
+ 	/* Add the rest of the VCPUs */
+ 	for (i = 1; i < NR_VCPUS; ++i)
+ 		vcpus[i] = vm_vcpu_add(v.vm, i, guest_code);
+@@ -592,12 +593,11 @@ static void test_v3_redist_ipa_range_check_at_vcpu_run(void)
+ 
+ static void test_v3_its_region(void)
  {
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+	struct vcpu_thread_data *data;
- 	uint32_t max_mem_slots;
- 	uint64_t rempages;
- 	uint64_t guest_addr;
-@@ -263,6 +249,11 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
+-	struct kvm_vcpu *vcpus[NR_VCPUS];
+ 	struct vm_gic v;
+ 	uint64_t addr;
+ 	int its_fd, ret;
  
- 	TEST_ASSERT(mempages > 1,
- 		    "Can't test without any memory");
-+	vm = __vm_create_with_one_vcpu(&vcpu, mempages, guest_code);
-+	*out_vm = vm;
-+	vm_vcpu_threads_private_data_alloc(vm,
-+					sizeof(struct vcpu_thread_data));
-+	data = (struct vcpu_thread_data *)vcpu->private_data;
+-	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS, vcpus);
++	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS);
+ 	its_fd = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_ITS);
  
- 	data->npages = mempages;
- 	data->nslots = max_mem_slots - 1;
-@@ -276,8 +267,7 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
- 	data->hva_slots = malloc(sizeof(*data->hva_slots) * data->nslots);
- 	TEST_ASSERT(data->hva_slots, "malloc() fail");
- 
--	data->vm = __vm_create_with_one_vcpu(&data->vcpu, mempages, guest_code);
--	ucall_init(data->vm, NULL);
-+	ucall_init(vm, NULL);
- 
- 	pr_info_v("Adding slots 1..%i, each slot with %"PRIu64" pages + %"PRIu64" extra pages last\n",
- 		max_mem_slots - 1, data->pages_per_slot, rempages);
-@@ -290,7 +280,7 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
- 		if (slot == max_mem_slots - 1)
- 			npages += rempages;
- 
--		vm_userspace_mem_region_add(data->vm, VM_MEM_SRC_ANONYMOUS,
-+		vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
- 					    guest_addr, slot, npages,
- 					    0);
- 		guest_addr += npages * 4096;
-@@ -305,18 +295,18 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
- 		if (slot == max_mem_slots - 2)
- 			npages += rempages;
- 
--		gpa = vm_phy_pages_alloc(data->vm, npages, guest_addr,
-+		gpa = vm_phy_pages_alloc(vm, npages, guest_addr,
- 					 slot + 1);
- 		TEST_ASSERT(gpa == guest_addr,
- 			    "vm_phy_pages_alloc() failed\n");
- 
--		data->hva_slots[slot] = addr_gpa2hva(data->vm, guest_addr);
-+		data->hva_slots[slot] = addr_gpa2hva(vm, guest_addr);
- 		memset(data->hva_slots[slot], 0, npages * 4096);
- 
- 		guest_addr += npages * 4096;
- 	}
- 
--	virt_map(data->vm, MEM_GPA, MEM_GPA, mempages);
-+	virt_map(vm, MEM_GPA, MEM_GPA, mempages);
- 
- 	sync = (typeof(sync))vm_gpa2hva(data, MEM_SYNC_GPA, NULL);
- 	atomic_init(&sync->start_flag, false);
-@@ -328,26 +318,22 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
- 	return true;
- }
- 
--static void launch_vm(struct vm_data *data)
-+static void launch_vm(struct kvm_vm *vm)
+ 	addr = 0x401000;
+@@ -637,12 +637,11 @@ static void test_v3_its_region(void)
+  */
+ int test_kvm_device(uint32_t gic_dev_type)
  {
- 	pr_info_v("Launching the test VM\n");
+-	struct kvm_vcpu *vcpus[NR_VCPUS];
+ 	struct vm_gic v;
+ 	uint32_t other;
+ 	int ret;
  
--	pthread_create(&data->vcpu_thread, NULL, vcpu_worker, data);
-+	vm_vcpu_threads_create(vm, vcpu_worker, 0);
+-	v.vm = vm_create_with_vcpus(NR_VCPUS, guest_code, vcpus);
++	v.vm = vm_create_with_vcpus(NR_VCPUS, guest_code, NULL);
  
- 	/* Ensure the guest thread is spun up. */
- 	wait_for_vcpu();
- }
- 
--static void free_vm(struct vm_data *data)
-+static void vcpu_thread_data_free(struct vcpu_thread_data *data)
- {
--	kvm_vm_free(data->vm);
--	free(data->hva_slots);
--	free(data);
--}
--
--static void wait_guest_exit(struct vm_data *data)
--{
--	pthread_join(data->vcpu_thread, NULL);
-+	if (data) {
-+		free(data->hva_slots);
-+		free(data);
-+	}
- }
- 
- static void let_guest_run(struct sync_area *sync)
-@@ -535,7 +521,7 @@ static void guest_code_test_memslot_rw(void)
- 	GUEST_DONE();
- }
- 
--static bool test_memslot_move_prepare(struct vm_data *data,
-+static bool test_memslot_move_prepare(struct vcpu_thread_data *data,
- 				      struct sync_area *sync,
- 				      uint64_t *maxslots, bool isactive)
- {
-@@ -565,31 +551,33 @@ static bool test_memslot_move_prepare(struct vm_data *data,
- 	return true;
- }
- 
--static bool test_memslot_move_prepare_active(struct vm_data *data,
-+static bool test_memslot_move_prepare_active(struct vcpu_thread_data *data,
- 					     struct sync_area *sync,
- 					     uint64_t *maxslots)
- {
- 	return test_memslot_move_prepare(data, sync, maxslots, true);
- }
- 
--static bool test_memslot_move_prepare_inactive(struct vm_data *data,
-+static bool test_memslot_move_prepare_inactive(struct vcpu_thread_data *data,
- 					       struct sync_area *sync,
- 					       uint64_t *maxslots)
- {
- 	return test_memslot_move_prepare(data, sync, maxslots, false);
- }
- 
--static void test_memslot_move_loop(struct vm_data *data, struct sync_area *sync)
-+static void test_memslot_move_loop(struct kvm_vcpu *vcpu, struct sync_area *sync)
- {
- 	uint64_t movesrcgpa;
-+	struct vcpu_thread_data *data =
-+			(struct vcpu_thread_data *)vcpu->private_data;
- 
- 	movesrcgpa = vm_slot2gpa(data, data->nslots - 1);
--	vm_mem_region_move(data->vm, data->nslots - 1 + 1,
-+	vm_mem_region_move(vcpu->vm, data->nslots - 1 + 1,
- 			   MEM_TEST_MOVE_GPA_DEST);
--	vm_mem_region_move(data->vm, data->nslots - 1 + 1, movesrcgpa);
-+	vm_mem_region_move(vcpu->vm, data->nslots - 1 + 1, movesrcgpa);
- }
- 
--static void test_memslot_do_unmap(struct vm_data *data,
-+static void test_memslot_do_unmap(struct vcpu_thread_data *data,
- 				  uint64_t offsp, uint64_t count)
- {
- 	uint64_t gpa, ctr;
-@@ -613,7 +601,7 @@ static void test_memslot_do_unmap(struct vm_data *data,
- 		    "madvise(MADV_DONTNEED) should exactly cover all of the requested area");
- }
- 
--static void test_memslot_map_unmap_check(struct vm_data *data,
-+static void test_memslot_map_unmap_check(struct vcpu_thread_data *data,
- 					 uint64_t offsp, uint64_t valexp)
- {
- 	uint64_t gpa;
-@@ -630,8 +618,11 @@ static void test_memslot_map_unmap_check(struct vm_data *data,
- 	*val = 0;
- }
- 
--static void test_memslot_map_loop(struct vm_data *data, struct sync_area *sync)
-+static void test_memslot_map_loop(struct kvm_vcpu *vcpu,
-+				  struct sync_area *sync)
- {
-+	struct vcpu_thread_data *data =
-+				(struct vcpu_thread_data *)vcpu->private_data;
- 	/*
- 	 * Unmap the second half of the test area while guest writes to (maps)
- 	 * the first half.
-@@ -670,7 +661,7 @@ static void test_memslot_map_loop(struct vm_data *data, struct sync_area *sync)
- 				     MEM_TEST_VAL_2);
- }
- 
--static void test_memslot_unmap_loop_common(struct vm_data *data,
-+static void test_memslot_unmap_loop_common(struct vcpu_thread_data *data,
- 					   struct sync_area *sync,
- 					   uint64_t chunk)
- {
-@@ -697,21 +688,30 @@ static void test_memslot_unmap_loop_common(struct vm_data *data,
- 		test_memslot_do_unmap(data, ctr, chunk);
- }
- 
--static void test_memslot_unmap_loop(struct vm_data *data,
-+static void test_memslot_unmap_loop(struct kvm_vcpu *vcpu,
- 				    struct sync_area *sync)
- {
-+	struct vcpu_thread_data *data =
-+			(struct vcpu_thread_data *)vcpu->private_data;
-+
- 	test_memslot_unmap_loop_common(data, sync, 1);
- }
- 
--static void test_memslot_unmap_loop_chunked(struct vm_data *data,
-+static void test_memslot_unmap_loop_chunked(struct kvm_vcpu *vcpu,
- 					    struct sync_area *sync)
- {
-+	struct vcpu_thread_data *data =
-+			(struct vcpu_thread_data *)vcpu->private_data;
-+
- 	test_memslot_unmap_loop_common(data, sync, MEM_TEST_UNMAP_CHUNK_PAGES);
- }
- 
--static void test_memslot_rw_loop(struct vm_data *data, struct sync_area *sync)
-+static void test_memslot_rw_loop(struct kvm_vcpu *vcpu,
-+				 struct sync_area *sync)
- {
- 	uint64_t gptr;
-+	struct vcpu_thread_data *data =
-+			(struct vcpu_thread_data *)vcpu->private_data;
- 
- 	for (gptr = MEM_TEST_GPA + 4096 / 2;
- 	     gptr < MEM_TEST_GPA + MEM_TEST_SIZE; gptr += 4096)
-@@ -737,9 +737,9 @@ struct test_data {
- 	const char *name;
- 	uint64_t mem_size;
- 	void (*guest_code)(void);
--	bool (*prepare)(struct vm_data *data, struct sync_area *sync,
-+	bool (*prepare)(struct vcpu_thread_data *data, struct sync_area *sync,
- 			uint64_t *maxslots);
--	void (*loop)(struct vm_data *data, struct sync_area *sync);
-+	void (*loop)(struct kvm_vcpu *vcpu, struct sync_area *sync);
- };
- 
- static bool test_execute(int nslots, uint64_t *maxslots,
-@@ -750,18 +750,22 @@ static bool test_execute(int nslots, uint64_t *maxslots,
- 			 struct timespec *guest_runtime)
- {
- 	uint64_t mem_size = tdata->mem_size ? : MEM_SIZE_PAGES;
--	struct vm_data *data;
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+	struct vcpu_thread_data *data = NULL;
- 	struct sync_area *sync;
- 	struct timespec tstart;
- 	bool ret = true;
- 
--	data = alloc_vm();
--	if (!prepare_vm(data, nslots, maxslots, tdata->guest_code,
-+	if (!prepare_vm(&vm, nslots, maxslots, tdata->guest_code,
- 			mem_size, slot_runtime)) {
- 		ret = false;
- 		goto exit_free;
- 	}
- 
-+	vcpu = vm->vcpus[0];
-+	data = (struct vcpu_thread_data *)vcpu->private_data;
-+
- 	sync = (typeof(sync))vm_gpa2hva(data, MEM_SYNC_GPA, NULL);
- 
- 	if (tdata->prepare &&
-@@ -770,7 +774,7 @@ static bool test_execute(int nslots, uint64_t *maxslots,
- 		goto exit_free;
- 	}
- 
--	launch_vm(data);
-+	launch_vm(vm);
- 
- 	clock_gettime(CLOCK_MONOTONIC, &tstart);
- 	let_guest_run(sync);
-@@ -780,16 +784,17 @@ static bool test_execute(int nslots, uint64_t *maxslots,
- 		if (guest_runtime->tv_sec >= maxtime)
- 			break;
- 
--		tdata->loop(data, sync);
-+		tdata->loop(vcpu, sync);
- 
- 		(*nloops)++;
- 	}
- 
- 	make_guest_exit(sync);
--	wait_guest_exit(data);
-+	vm_vcpu_threads_join(vm);
- 
- exit_free:
--	free_vm(data);
-+	vcpu_thread_data_free(data);
-+	kvm_vm_free(vm);
- 
- 	return ret;
- }
+ 	/* try to create a non existing KVM device */
+ 	ret = __kvm_test_create_device(v.vm, 0);
 -- 
 2.27.0
 
