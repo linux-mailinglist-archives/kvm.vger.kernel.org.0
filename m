@@ -2,209 +2,341 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F2EB260BE07
-	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 00:58:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CAE8160BE82
+	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 01:26:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231555AbiJXW6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 18:58:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35250 "EHLO
+        id S231325AbiJXX0K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Oct 2022 19:26:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230227AbiJXW6G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Oct 2022 18:58:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCA952764ED
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 14:19:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666646325;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JODcClftCms+c2Sg+OewrqadUKPqbmSmPOn2SgO5BJY=;
-        b=jGFE4Cz6GiSf5c2e88sWQmACVqj6yGaJXXwdNnrhPQPV0GJBqWw3fa7P/2fSWgJ1+lTQ+/
-        tLyG3PlJ3CCkViZcLwwHfwlBnQwOE5LvCsK117ryr6DOHNgbkR65wXZxR+EPutmi5v2OaK
-        6hGU+/QM5rNLb/Vh6LmboGwzbmSs3vE=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-635-fO0EZ8NqNyuXAzrxq7Duaw-1; Mon, 24 Oct 2022 08:36:40 -0400
-X-MC-Unique: fO0EZ8NqNyuXAzrxq7Duaw-1
-Received: by mail-pl1-f199.google.com with SMTP id q12-20020a170902dacc00b00184ba4faf1cso6381579plx.23
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 05:36:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JODcClftCms+c2Sg+OewrqadUKPqbmSmPOn2SgO5BJY=;
-        b=gukHJ2Qmz1sBxz6XrslDla8v/dxoAUIYkr/TZUyiZu2lietUco56M+iar26/37cBX7
-         laJIvCZFaoz00hLqO2hfuyR6kARdQ+S8sMAZtEscWqb6c2r/wt3IJF6nsW+fNdlNnka6
-         i0v0Wp6ILBaPjdHI4Wj3ywaU2h+v4yxcpSRpdlOtQExFaAv4m9aBzKM100sk7rTXmPfK
-         CujclhEKSLzhZXAEwSu+Z/RnImtdzKv2Fztg6o9QSsuL084RXMQ1Yp1gQKiGriRSHSs+
-         iraBwCylx4G4d87vBu+hUpqBw8c49r4oEPXxAwMeWfuSeDfcPxmMfPDjB7P8zPFFzmc2
-         ZQoQ==
-X-Gm-Message-State: ACrzQf0eMG5f2wSayB8vaPBVzoYdKWFc1xsF4/lHeqPduT7BRuOE4keZ
-        C6GLyvLXyU9BKZwaWqmduIjLnRobYw/C6Co72sbJSexEwVCeS6ejtXEWaVQiDQI8vE8qGDPK3hb
-        aNcw44eWeuFqA
-X-Received: by 2002:a17:902:8ec8:b0:186:9c32:79c8 with SMTP id x8-20020a1709028ec800b001869c3279c8mr8155040plo.105.1666614998248;
-        Mon, 24 Oct 2022 05:36:38 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM6fIf3T11GR9B8NvUdWfdyomTEwTceCEC39dnC40ZMPZ9N2l1U54ZJ8n4OOCrUhIePyfGcqtg==
-X-Received: by 2002:ad4:5b8b:0:b0:4b3:f368:de23 with SMTP id 11-20020ad45b8b000000b004b3f368de23mr26991296qvp.73.1666614987809;
-        Mon, 24 Oct 2022 05:36:27 -0700 (PDT)
-Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
-        by smtp.gmail.com with ESMTPSA id u9-20020a05622a198900b0039cbe823f3csm12968512qtc.10.2022.10.24.05.36.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Oct 2022 05:36:27 -0700 (PDT)
-Message-ID: <a52dfb9b126354f0ec6a3f6cb514cc5e426b22ae.camel@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 01/16] x86: make irq_enable avoid the
- interrupt shadow
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Cathy Avery <cavery@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Date:   Mon, 24 Oct 2022 15:36:24 +0300
-In-Reply-To: <Y1GNE9YdEuGPkadi@google.com>
-References: <20221020152404.283980-1-mlevitsk@redhat.com>
-         <20221020152404.283980-2-mlevitsk@redhat.com> <Y1GNE9YdEuGPkadi@google.com>
+        with ESMTP id S231326AbiJXXZm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Oct 2022 19:25:42 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E02A45E553
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 14:46:26 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29OJK01d006740;
+        Mon, 24 Oct 2022 19:25:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=oj4Xpi3y/sF3NwpyWc7gM1sVU1+h/ni/w2Fu+loJQoY=;
+ b=DomFDbpFVd22jZMm6qqgd2TdwPCrbZ9ueFN3Ck38dY0/MVgYHKR11vTCCJSZHkSE1leW
+ Lyrma/p42IwHA2M2aSEaNs20/wA9OlgUMI432qCgf37eOlrp17UCfvPsLVtUAa00d1AM
+ mTBnoaivPt4rzKjg6Zd2H84yIm2HT6MMp3OienAGlYwih04TVPZS2f5oQBw1r4Roaser
+ dT7E/rJaAm2J5hJCu7EB0x7vVwz5tcbT8PjWWQIfmjZH+caZ7IU2g83r/Th82U7uGKdx
+ cU88XiFtQZiI3qW4tUcBBJMHoYlfeTM+GzxGNvW9AFryX7nlRzhQs81CSfuTrohh8OIl 0w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ke0s7g4ck-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Oct 2022 19:25:30 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29OJKecC010025;
+        Mon, 24 Oct 2022 19:25:30 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ke0s7g4br-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Oct 2022 19:25:30 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29OJLsRh016078;
+        Mon, 24 Oct 2022 19:25:28 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04ams.nl.ibm.com with ESMTP id 3kc859bt70-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Oct 2022 19:25:28 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29OJPOOM48038384
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 24 Oct 2022 19:25:24 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C46434C040;
+        Mon, 24 Oct 2022 19:25:24 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E76864C044;
+        Mon, 24 Oct 2022 19:25:23 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.27.135])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 24 Oct 2022 19:25:23 +0000 (GMT)
+Message-ID: <65c3bfd263b03ca524444cdf5f96d937f582f2d7.camel@linux.ibm.com>
+Subject: Re: [PATCH v10 1/9] s390x/cpu topology: core_id sets s390x CPU
+ topology
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+Date:   Mon, 24 Oct 2022 21:25:23 +0200
+In-Reply-To: <20221012162107.91734-2-pmorel@linux.ibm.com>
+References: <20221012162107.91734-1-pmorel@linux.ibm.com>
+         <20221012162107.91734-2-pmorel@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
+User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 5tBexhp7Fh5ZvXxLe_nLQvgUZ7Nb_E1_
+X-Proofpoint-GUID: O5OQ_8LJ7V4QgM32HhiSVpbKFGeZV3rg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-24_06,2022-10-21_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 bulkscore=0 phishscore=0 mlxscore=0 malwarescore=0
+ adultscore=0 spamscore=0 lowpriorityscore=0 impostorscore=0 clxscore=1015
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210240114
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-10-20 at 18:01 +0000, Sean Christopherson wrote:
-> On Thu, Oct 20, 2022, Maxim Levitsky wrote:
-> > Tests that need interrupt shadow can't rely on irq_enable function anyway,
-> > as its comment states,  and it is useful to know for sure that interrupts
-> > are enabled after the call to this function.
-> > 
-> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > ---
-> >  lib/x86/processor.h       | 9 ++++-----
-> >  x86/apic.c                | 1 -
-> >  x86/ioapic.c              | 1 -
-> >  x86/svm_tests.c           | 9 ---------
-> >  x86/tscdeadline_latency.c | 1 -
-> >  x86/vmx_tests.c           | 7 -------
-> >  6 files changed, 4 insertions(+), 24 deletions(-)
-> > 
-> > diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-> > index 03242206..9db07346 100644
-> > --- a/lib/x86/processor.h
-> > +++ b/lib/x86/processor.h
-> > @@ -720,13 +720,12 @@ static inline void irq_disable(void)
-> >         asm volatile("cli");
-> >  }
-> >  
-> > -/* Note that irq_enable() does not ensure an interrupt shadow due
-> > - * to the vagaries of compiler optimizations.  If you need the
-> > - * shadow, use a single asm with "sti" and the instruction after it.
-> > - */
-> >  static inline void irq_enable(void)
-> >  {
-> > -       asm volatile("sti");
-> > +       asm volatile(
-> > +                       "sti \n\t"
+On Wed, 2022-10-12 at 18:20 +0200, Pierre Morel wrote:
+> In the S390x CPU topology the core_id specifies the CPU address
+> and the position of the core withing the topology.
 > 
-> Formatting is odd.  Doesn't really matter, but I think this can simply be:
+> Let's build the topology based on the core_id.
+> s390x/cpu topology: core_id sets s390x CPU topology
 > 
-> static inline void sti_nop(void)
-> {
->         asm volatile("sti; nop");
+> In the S390x CPU topology the core_id specifies the CPU address
+> and the position of the cpu withing the topology.
+> 
+> Let's build the topology based on the core_id.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  include/hw/s390x/cpu-topology.h |  45 +++++++++++
+>  hw/s390x/cpu-topology.c         | 132 ++++++++++++++++++++++++++++++++
+>  hw/s390x/s390-virtio-ccw.c      |  21 +++++
+>  hw/s390x/meson.build            |   1 +
+>  4 files changed, 199 insertions(+)
+>  create mode 100644 include/hw/s390x/cpu-topology.h
+>  create mode 100644 hw/s390x/cpu-topology.c
+> 
+> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
+> new file mode 100644
+> index 0000000000..66c171d0bc
+> --- /dev/null
+> +++ b/include/hw/s390x/cpu-topology.h
+> @@ -0,0 +1,45 @@
+> +/*
+> + * CPU Topology
+> + *
+> + * Copyright 2022 IBM Corp.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +#ifndef HW_S390X_CPU_TOPOLOGY_H
+> +#define HW_S390X_CPU_TOPOLOGY_H
+> +
+> +#include "hw/qdev-core.h"
+> +#include "qom/object.h"
+> +
+> +typedef struct S390TopoContainer {
+> +    int active_count;
+> +} S390TopoContainer;
+> +
+> +#define S390_TOPOLOGY_CPU_IFL 0x03
+> +#define S390_TOPOLOGY_MAX_ORIGIN ((63 + S390_MAX_CPUS) / 64)
+> +typedef struct S390TopoTLE {
+> +    uint64_t mask[S390_TOPOLOGY_MAX_ORIGIN];
+> +} S390TopoTLE;
 
-"\n\t" is what gcc manual recommends for separating the assembly lines as you know from the gcc manual:
-https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html
-"You may place multiple assembler instructions together in a single asm string, separated by 
-the characters normally used in assembly code for the system. A combination that works in 
-most places is a newline to break the line, plus a tab character to move to the instruction 
-field (written as ‘\n\t’). Some assemblers allow semicolons as a line separator. 
-However, note that some assembler dialects use semicolons to start a comment"
+Since this actually represents multiple TLEs, you might want to change the
+name of the struct to reflect this. S390TopoTLEList maybe?
 
-Looks like gnu assembler does use semicolon for new statements and hash for comments 
-but some assemblers do semicolon for comments.
+> +
+> +struct S390Topology {
+> +    SysBusDevice parent_obj;
+> +    int cpus;
+> +    S390TopoContainer *socket;
+> +    S390TopoTLE *tle;
+> +    MachineState *ms;
+> +};
+> +
+> +#define TYPE_S390_CPU_TOPOLOGY "s390-topology"
+> +OBJECT_DECLARE_SIMPLE_TYPE(S390Topology, S390_CPU_TOPOLOGY)
+> +
+> +S390Topology *s390_get_topology(void);
+> +void s390_topology_new_cpu(int core_id);
+> +
+> +static inline bool s390_has_topology(void)
+> +{
+> +    return false;
+> +}
+> +
+> +#endif
+> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+> new file mode 100644
+> index 0000000000..42b22a1831
+> --- /dev/null
+> +++ b/hw/s390x/cpu-topology.c
+> @@ -0,0 +1,132 @@
+> +/*
+> + * CPU Topology
+> + *
+> + * Copyright IBM Corp. 2022
+> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
+> +
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "qemu/error-report.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/qdev-properties.h"
+> +#include "hw/boards.h"
+> +#include "qemu/typedefs.h"
+> +#include "target/s390x/cpu.h"
+> +#include "hw/s390x/s390-virtio-ccw.h"
+> +#include "hw/s390x/cpu-topology.h"
+> +
+> +S390Topology *s390_get_topology(void)
+> +{
+> +    static S390Topology *s390Topology;
+> +
+> +    if (!s390Topology) {
+> +        s390Topology = S390_CPU_TOPOLOGY(
+> +            object_resolve_path(TYPE_S390_CPU_TOPOLOGY, NULL));
+> +    }
+> +
+> +    return s390Topology;
+> +}
+> +
+> +/*
+> + * s390_topology_new_cpu:
+> + * @core_id: the core ID is machine wide
+> + *
+> + * The topology returned by s390_get_topology(), gives us the CPU
+> + * topology established by the -smp QEMU aruments.
 
-I usually use just "\n", but the safest is "\n\t".
+s/aruments/arguments/
 
+> + * The core-id gives:
+> + *  - the Container TLE (Topology List Entry) containing the CPU TLE.
+> + *  - in the CPU TLE the origin, or offset of the first bit in the core mask
+> + *  - the bit in the CPU TLE core mask
+> + */
 
-> }
-> 
-> 
-> > +                       "nop\n\t"
-> 
-> I like the idea of a helper to enable IRQs and consume pending interrupts, but I
-> think we should add a new helper instead of changing irq_enable().
-> 
-> Hmm, or alternatively, kill off irq_enable() and irq_disable() entirely and instead
-> add sti_nop().  I like this idea even better.  The helpers are all x86-specific,
-> so there's no need to add a layer of abstraction, and sti() + sti_nop() has the
-> benefit of making it very clear what code is being emitted without having to come
-> up with clever function names.
-> 
-> And I think we should go even further and provide a helper to do the entire sequence
-> of enable->nop->disable, which is a very common pattern.  No idea what to call
-> this one, though I suppose sti_nop_cli() would work.
-> 
-> My vote is to replace all irq_enable() and irq_disable() usage with sti() and cli(),
-> and then introduce sti_nop() and sti_nop_cli() (or whatever it gets called) and
-> convert users as appropriate.
+Not sure if that comment helps if you don't already know how the topology list works.
+> +void s390_topology_new_cpu(int core_id)
+> +{
+> +    S390Topology *topo = s390_get_topology();
+> +    int socket_id;
+> +    int bit, origin;
+> +
+> +    /* In the case no Topology is used nothing is to be done here */
+> +    if (!topo) {
+> +        return;
+> +    }
+> +
+> +    socket_id = core_id / topo->cpus;
+> +
+> +    /*
+> +     * At the core level, each CPU is represented by a bit in a 64bit
+> +     * unsigned long which represent the presence of a CPU.
+> +     * The firmware assume that all CPU in a CPU TLE have the same
 
-OK.
+s/firmware assume/architecture specifies/
 
-> 
-> > +       );
-> >  }
-> >  
-> >  static inline void invlpg(volatile void *va)
-> > diff --git a/x86/apic.c b/x86/apic.c
-> > index 23508ad5..a8964d88 100644
-> > --- a/x86/apic.c
-> > +++ b/x86/apic.c
-> > @@ -36,7 +36,6 @@ static void __test_tsc_deadline_timer(void)
-> >      irq_enable();
-> >  
-> >      wrmsr(MSR_IA32_TSCDEADLINE, rdmsr(MSR_IA32_TSC));
-> > -    asm volatile ("nop");
-> 
-> I'm not entirely sure the existing nop is necessary here, but it's a functional
-> change since it hoists the nop above the WRMSR.  To be safe, probably best to
-> leave this as-is for now.
+> +     * type, polarization and are all dedicated or shared.
+> +     * In that case the origin variable represents the offset of the first
+> +     * CPU in the CPU container.
 
-I had doubts about this, IMHO both before and after are equally good, but anyway to be safe,
-I'll revert this change.
+This sentence is repeated further down.
 
+> +     * More than 64 CPUs per socket are represented in several CPU containers
+> +     * inside the socket container.
+> +     * The only reason to have several S390TopologyCores inside a socket is
+> +     * to have more than 64 CPUs.
+> +     * In that case the origin variable represents the offset of the first CPU
+> +     * in the CPU container. More than 64 CPUs per socket are represented in
+> +     * several CPU containers inside the socket container.
+> +     */
 
-> 
-> >      report(tdt_count == 1, "tsc deadline timer");
-> >      report(rdmsr(MSR_IA32_TSCDEADLINE) == 0, "tsc deadline timer clearing");
-> >  }
-> 
-> ...
-> 
-> > diff --git a/x86/tscdeadline_latency.c b/x86/tscdeadline_latency.c
-> > index a3bc4ea4..c54530dd 100644
-> > --- a/x86/tscdeadline_latency.c
-> > +++ b/x86/tscdeadline_latency.c
-> > @@ -73,7 +73,6 @@ static void start_tsc_deadline_timer(void)
-> >      irq_enable();
-> >  
-> >      wrmsr(MSR_IA32_TSCDEADLINE, rdmsr(MSR_IA32_TSC)+delta);
-> > -    asm volatile ("nop");
-> 
-> Another functional change that should be skipped, at least for now.
+In the last version you had:
++ /*
++ * At the core level, each CPU is represented by a bit in a 64bit
++ * unsigned long. Set on plug and clear on unplug of a CPU.
++ * The firmware assume that all CPU in a CPU TLE have the same
++ * type, polarization and are all dedicated or shared.
++ * In the case a socket contains CPU with different type, polarization
++ * or entitlement then they will be defined in different CPU containers.
++ * Currently we assume all CPU are identical IFL CPUs and that they are
++ * all dedicated CPUs.
++ * The only reason to have several S390TopologyCores inside a socket is
++ * to have more than 64 CPUs.
++ * In that case the origin field, representing the offset of the first CPU
++ * in the CPU container allows to represent up to the maximal number of
++ * CPU inside several CPU containers inside the socket container.
++ */
 
-OK.
+I would modify it thus (with better line wrapping):
++ /*
++ * At the core level, each CPU is represented by a bit in a 64bit
++ * unsigned long.
++ * The architecture specifies that all CPU in a CPU TLE have the same
++ * type, polarization and are all dedicated or shared.
++ * In the case that a socket contains CPUs with different type, polarization
++ * or entitlement then they will be defined in different CPU containers.
++ * Currently we assume all CPU are identical IFL CPUs and that they are
++ * all dedicated CPUs.
++ * Therefore, the only reason to have several S390TopologyCores inside a socket is
++ * to support CPU id differences > 64.
++ * In that case, the origin field in a container represents the offset of the first CPU
++ * in that CPU container, thereby allowing representation of all CPUs via multiple containers.
++ */
 
-> 
+> +    bit = core_id;
+> +    origin = bit / 64;
+> +    bit %= 64;
+> +    bit = 63 - bit;
 
+I'm not convinced that that is more readable than just
+ origin = core_id / 64;
+ bit = 63 - (core_id % 64);
 
-Best regards,
-	Maxim Levitsky
+but that is for you to decide.
+> +
+> +    topo->socket[socket_id].active_count++;
+> +    set_bit(bit, &topo->tle[socket_id].mask[origin]);
+> +}
+> +
+> +/**
+> + * s390_topology_realize:
+> + * @dev: the device state
+> + * @errp: the error pointer (not used)
+> + *
+> + * During realize the machine CPU topology is initialized with the
+> + * QEMU -smp parameters.
+> + * The maximum count of CPU TLE in the all Topology can not be greater
+> + * than the maximum CPUs.
+> + */
+> +static void s390_topology_realize(DeviceState *dev, Error **errp)
+> +{
+> +    MachineState *ms = MACHINE(qdev_get_machine());
+> +    S390Topology *topo = S390_CPU_TOPOLOGY(dev);
+> +
+> +    topo->cpus = ms->smp.cores * ms->smp.threads;
+> +
+> +    topo->socket = g_new0(S390TopoContainer, ms->smp.sockets);
+> +    topo->tle = g_new0(S390TopoTLE, ms->smp.max_cpus);
+
+As Cédric pointed out, the number of TLE(List)s should be the same as the
+sockets.
+> +
+> +    topo->ms = ms;
+> +}
+[...]
 
