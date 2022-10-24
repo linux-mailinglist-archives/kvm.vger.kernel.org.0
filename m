@@ -2,98 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 64BF96097DE
-	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 03:38:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 65B6A6098E4
+	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 05:31:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229823AbiJXBiG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 23 Oct 2022 21:38:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34906 "EHLO
+        id S229939AbiJXDa5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 23 Oct 2022 23:30:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229610AbiJXBiF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 23 Oct 2022 21:38:05 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 797B66D56C;
-        Sun, 23 Oct 2022 18:38:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666575484; x=1698111484;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=2H2z3QDOm830n+Fd6QFs4UpTvtG9t3ftZ4pDHombJ+o=;
-  b=FGEEKm1IWLh3zj/SRgSUBEorlRO3ssbZRgmgphgww1qiUKsh4qf8CNq4
-   gkAZiBijlaF5ailX8tRyxbaXEWtQ7jgxT+iY9m3G/QX42nS+45+UrDFrQ
-   9lEG2c9Ekc4oAmyLPMqiOTKtdkgRZY0gAjCMdojnMFRYmE3G/cRKtExHQ
-   WzLQUJbHkULVENJmrghgmhp7Ttx7o3RpUkkmucS+w2CFtT6b/IiU3vhV0
-   cBsQIBNGC9SYgL9JYf91inGzpVNSgh9JZfXVwvKUwHxIuREb6dQkkW9qs
-   Bs6DdCr9BcfkDturJUxUl7Eial7TOfowyB0SVIadU+xnwxAjgey/zMQV5
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10509"; a="371536635"
-X-IronPort-AV: E=Sophos;i="5.95,207,1661842800"; 
-   d="scan'208";a="371536635"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2022 18:38:04 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10509"; a="664392993"
-X-IronPort-AV: E=Sophos;i="5.95,207,1661842800"; 
-   d="scan'208";a="664392993"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.255.30.136]) ([10.255.30.136])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Oct 2022 18:38:02 -0700
-Message-ID: <70ea1214-38aa-3b51-9c1d-6661b3b45144@intel.com>
-Date:   Mon, 24 Oct 2022 09:37:59 +0800
+        with ESMTP id S229738AbiJXDa2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 23 Oct 2022 23:30:28 -0400
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35F967AC2E;
+        Sun, 23 Oct 2022 20:27:52 -0700 (PDT)
+Received: by mail-wr1-x429.google.com with SMTP id h9so3031075wrt.0;
+        Sun, 23 Oct 2022 20:27:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=O2esLByeb54271i903kEfYtOSyfIyaU9h31aBI1kHSw=;
+        b=lCa50AmhMTksHcOD90KBgXpupfnNLPbfG/5ZPGhmRq7XEue+QE1lgitzcgeCQrvplY
+         hzAWzEJ8uQ++kiBiZpV48ZTS2Irsi2kp/kyiJrwGlOz9NimpeR96yru/S1Eje+9x8D6h
+         iIVDFMEpvb9pVYYuYWakU4qie+9RfEb0dSVmrXPB+FW7Gtw8Rneh+IDU215btfBzf5iO
+         VplAG0In1C79anDxBVoDU/VrbqQSAhl1TOMioUowdZNnEdsgkZNu1xhgjn5bOI8KaWxQ
+         0mvJoCMW0htOmZXWBMd+d9GhKqbMfr/TT2gFmFkdbq55MSW2FtcEGS/5GWOxB/j/EVDw
+         DqQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=O2esLByeb54271i903kEfYtOSyfIyaU9h31aBI1kHSw=;
+        b=e5nExVe5YE2e3mLeswR3enz9s+SiGktzxAFJdDPnFzgukPZqtLMj/DVOaWDgqJNXlx
+         THbl+JEE+GxWEfLMfCHR4RFw+SqW7bo8srN8av6XD3m25LIA+BXbo9adRWP8nhoXQmp6
+         XpI8K3qqoXI5rhTRcVAv/yfvzvxeZ7jLnRSeBDBGMzSCfFWeBVP9ezjF9Avbtm/dIoat
+         9f1vpT8s2/v+EypwOCDNtTw6orwE00UjpBiaZ7qAlSnGObRyzXITd8uUT8uT6i88H5UV
+         0NpHAcTztK1Q4/vwaq633CrgkK/J7zaS3zmipBfVQ4Ji3iGVdK0bbf7rpMfxStk6Yeaj
+         dBYQ==
+X-Gm-Message-State: ACrzQf31Zog8+oYMM355msJoCHe25z6BbObe+VyYHlXz+RixTkXZO/+4
+        M0wlbD21/QhO71dRf6iOugM99qE6gggzEpz/sREO2NahbJBfWg==
+X-Google-Smtp-Source: AMsMyM4DhnQrMnsG4wcbCpqMZPxR8IShg+7kF/L6jDrU6EOYLyRvQe6ig0PatWYhRNhIhb1qc4kvGu7gcZJBrAsk0aI=
+X-Received: by 2002:adf:e502:0:b0:234:bb21:e9cc with SMTP id
+ j2-20020adfe502000000b00234bb21e9ccmr15184069wrm.389.1666582070646; Sun, 23
+ Oct 2022 20:27:50 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.3.3
-Subject: Re: [PATCH] KVM: x86: Fix the initial value of mcg_cap
-Content-Language: en-US
+References: <CAPm50a+aygp3T1mNjzGXtL2nyNm-mHFZ3YO8F7eO0gCxZDuQsA@mail.gmail.com>
+ <Y0BeEVxkDkctmTIX@google.com> <CAPm50aLzOLyURhvhYkCyp1hpRagAczFXg9jYbFg_86Qaf5usbg@mail.gmail.com>
+ <Y0RYp7CZO5u1Eg/s@google.com>
+In-Reply-To: <Y0RYp7CZO5u1Eg/s@google.com>
+From:   Hao Peng <flyingpenghao@gmail.com>
+Date:   Mon, 24 Oct 2022 11:27:38 +0800
+Message-ID: <CAPm50aJUjCumrMmEGCw2eNc6nPi5y=ZzTMi8MC2aJwkatQGnww@mail.gmail.com>
+Subject: Re: [PATCH] kvm: x86: keep srcu writer side operation mutually exclusive
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-References: <20221020031615.890400-1-xiaoyao.li@intel.com>
- <Y1FatU6Yf9n5pWB+@google.com>
- <092dc961-76f6-331a-6f91-a77a58f6732d@intel.com>
- <Y1F4AoeOhNFQnHnJ@google.com>
- <b40fd338-cb3b-b602-0059-39f775e77ad6@intel.com>
- <Y1LmWAyG7S4bgzBs@google.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <Y1LmWAyG7S4bgzBs@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
-        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/22/2022 2:35 AM, Sean Christopherson wrote:
-> On Fri, Oct 21, 2022, Xiaoyao Li wrote:
->> On 10/21/2022 12:32 AM, Sean Christopherson wrote:
->>> If we really want to clean up this code, I think the correct approach would be to
->>> inject #GP on all relevant MSRs if CPUID.MCA==0, e.g.
->>
->> It's what I thought of as well. But I didn't find any statement in SDM of
->> "Accessing Machine Check MSRs gets #GP if no CPUID.MCA"
-> 
-> Ugh, stupid SDM.  Really old SDMs, e.g. circa 1997, explicity state in the
-> CPUID.MCA entry that:
-> 
->    Processor supports the MCG_CAP MSR.
-> 
-> But, when Intel introduced the "Architectural MSRs" section (2001 or so), the
-> wording was changed to be less explicit:
-> 
->    The Machine Check Architecture, which provides a compatible mechanism for error
->    reporting in P6 family, Pentium 4, and Intel Xeon processors, and future processors,
->    is supported. The MCG_CAP MSR contains feature bits describing how many banks of
->    error reporting MSRs are supported.
-> 
-> and the entry in the MSR index just lists P6 as the dependency:
-> 
->    IA32_MCG_CAP (MCG_CAP) Global Machine Check Capability (R/O) 06_01H
-> 
-> So I think it's technically true that MCG_CAP is supposed to exist iff CPUID.MCA=1,
-> but we'd probably need an SDM change to really be able to enforce that :-(
+On Tue, Oct 11, 2022 at 1:38 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Sun, Oct 09, 2022, Hao Peng wrote:
+> > On Sat, Oct 8, 2022 at 1:12 AM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Sat, Oct 08, 2022, Hao Peng wrote:
+> > > > From: Peng Hao <flyingpeng@tencent.com>
+> > > >
+> > > > Synchronization operations on the writer side of SRCU should be
+> > > > invoked within the mutex.
+> > >
+> > > Why?  Synchronizing SRCU is necessary only to ensure that all previous readers go
+> > > away before the old filter is freed.  There's no need to serialize synchronization
+> > > between writers.  The mutex ensures each writer operates on the "new" filter that's
+> > > set by the previous writer, i.e. there's no danger of a double-free.  And the next
+> > > writer will wait for readers to _its_ "new" filter.
+> > >
+> > Array srcu_lock_count/srcu_unlock_count[] in srcu_data, which is used
+> > alternately to determine
+> > which readers need to wait to get out of the critical area. If  two
+> > synchronize_srcu are initiated concurrently,
+> > there may be a problem with the judgment of gp. But if it is confirmed
+> > that there will be no writer concurrency,
+> > it is not necessary to ensure that synchronize_srcu is executed within
+> > the scope of the mutex lock.
+>
+> I don't see anything in the RCU documentation or code that suggests that callers
+> need to serialize synchronization calls.  E.g. the "tree" SRCU implementation uses
+> a dedicated mutex to serialize grace period work
+>
+>         struct mutex srcu_gp_mutex;             /* Serialize GP work. */
+>
+> static void srcu_advance_state(struct srcu_struct *ssp)
+> {
+>         int idx;
+>
+>         mutex_lock(&ssp->srcu_gp_mutex);
+>
+>         <magic>
+> }
+>
+>
+> and its state machine explicitly accounts for "Someone else" starting a grace
+> period
+>
+>                 if (idx != SRCU_STATE_IDLE) {
+>                         mutex_unlock(&ssp->srcu_gp_mutex);
+>                         return; /* Someone else started the grace period. */
+>                 }
+>
+> and srcu_gp_end() also guards against creating more than 2 grace periods.
+>
+>         /* Prevent more than one additional grace period. */
+>         mutex_lock(&ssp->srcu_cb_mutex);
+>
+> And if this is a subtle requirement, there is a lot of broken kernel code, e.g.
+> mmu_notifier, other KVM code, srcu_notifier_chain_unregister(), etc...
 
-I'll talk to Intel architects for this. :)
+srcu_gp_mutex is meaningless because the workqueue already guarantees
+that the same work_struct will not be reentrant.
+If synchronize_srcu is not mutually exclusive on the update side, it may cause
+a GP to fail for a long time. I will continue to analyze when I have time.
