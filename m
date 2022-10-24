@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A96A609DA2
-	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 11:14:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 09226609DA5
+	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 11:14:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231182AbiJXJOA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 05:14:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46446 "EHLO
+        id S231194AbiJXJO1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Oct 2022 05:14:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230526AbiJXJNm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Oct 2022 05:13:42 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4B655AA36
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 02:13:37 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id io19so2986936plb.8
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 02:13:37 -0700 (PDT)
+        with ESMTP id S231208AbiJXJN4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Oct 2022 05:13:56 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DD636A535
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 02:13:41 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id y4so7951533plb.2
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 02:13:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=X01d27bImszq5JJeDGG8+c38fFyhTDHSDxshjcb4ihQ=;
-        b=QDssjgFV/CduyXGykFBw8agaHCNPslVwhFaonbpfD7POcvDENv/X95dS0v+C4ebA6S
-         SwQiRbCpJDkrjiCPUysOfflUyaMYtQHPcyFr5qdl+5kZ7RAS+eDgqVq9lUTnPnC65cO4
-         qXf1Ylo4/XM054nfK1V8jpqr+nXiBygER7EJU2YAqXvShrpxQhqbpVL1LCbQxhL2Qck5
-         C0V5RTiNArlUWEfkq1sIvr1SdlrBNBRz1dWw2dL9O0Z3zcXe7DCUZ9RZ6kivDzBvQjrg
-         BS4Tzm+ybQQEGus4gi+WBCij93CIxxE1iOO+GpR4YioBx/y7I0UDNLImubuzl6UqGuBh
-         IzIw==
+        bh=x5bWOD+v2BlHUhIdaS0K1ucB/W7XeYKRWhxTgH+JxYc=;
+        b=Bto57ZTybUsuftiCJ9+JzaXGtwjk2Qvd16kA4CyTfzQ1lgJpMcaaAiiQsIL6JeMmSF
+         E9mq5q80o9ypVZaiHQ2gaUQltMN/y/A8alzwdBc0tN9sjw/XEfwRBHgKRnpt6KEJ7CbE
+         k0DLNGIIaSrEehiqai8I6vOfV+s2eMuJzzON0jbgnWJKTj2Pujk3VdtW4sJ2DF15RG5A
+         AekrNUrg6daITmebrq/2mMHrP/fcqmnVm3nhHS7ZK5muzwUypog75FNA7iLLHMf1sFSt
+         3pl3m9Te8PEyGHJpT2xALiZvmDvQs3253SndDPJ5tOImNJm+appYXLXX5dqaog3v0LBq
+         VhfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=X01d27bImszq5JJeDGG8+c38fFyhTDHSDxshjcb4ihQ=;
-        b=IaFAfGujLpXEwxOdCSbETLgiPNv6oHD8TW6fj0qN7NNI5Pj9zYKnOLtFtmbV3ZInyk
-         47b5xR/JBP0PIz60GEBoiwyssOz2wuF9B4wxHxpmcVFtYq5ILxh5D10lZq9MRJ2ZMbEV
-         Adkz5adcChgTAdUH4O8VIzH7zYVpYKI9izie42gl4lv8rqYnqtxz3iYI1S5TKrl02Vss
-         RuQG+3i5LioiCJGV0msI2gjDIwHqlTUq4WX9ScHqUe8ItBIh181HI9K/JyT8T9tpse0B
-         iK/LAlmWrXZgn2FB428OL6MeHamZUVDEJ4d/5UDZfBY8p6xFM/a4Wgymrl0gvq/AhGWw
-         mQ7g==
-X-Gm-Message-State: ACrzQf0SexyaWk0R3VoCzFiJsW747DuMpZDMSFkaSy0NpEpNnkv8P8xO
-        cn5KOBZR1EM08hFk+xCJcmA=
-X-Google-Smtp-Source: AMsMyM4fZmAyowCIhKQGwQyMPqqnU1Lt0p9YbsEpgnQve25UYFSRSleYoraf8D/Rvvj8KbzaETl4uQ==
-X-Received: by 2002:a17:902:d512:b0:181:f1f4:fcb4 with SMTP id b18-20020a170902d51200b00181f1f4fcb4mr32938538plg.102.1666602815972;
-        Mon, 24 Oct 2022 02:13:35 -0700 (PDT)
+        bh=x5bWOD+v2BlHUhIdaS0K1ucB/W7XeYKRWhxTgH+JxYc=;
+        b=OJx+hBZZJU2bp9JBd4C95vgJV3bwnUNhMXXoeZmcAEH2tOnNjvsM+tZ0PJW18JGJqG
+         OrtTJQcuDIkwKJc3EEqcSEXCSnYoRb/NE8egw2iPjiBNlyjynOunQ9YV4COI3gFDQKSm
+         AJ8cgU2AkxHWMrXI00OOjSUBcHxmX95anpCiJAWIshgi/MVznnelTG60yC4/lowR3IZJ
+         4HG1+0BBrwygGKMMPW78EceXdJUisYVWhCJxZSWqf6dCsSRGLsFRj7f4YAyKGnGW0VGS
+         ZxLEIspgt4U2QBUrWm63DfBFzxTY/+RcOYUxjSskeEwXtOoeozQ6CL/CWroDb01AE4CK
+         It6w==
+X-Gm-Message-State: ACrzQf1y4MnpcuHUaZbX/hy8Tx0enrXUs348LQkqnzuXp/IvX9/FZ+xu
+        M2sW8SWk83K4Z5c18JRLf6mIqZKKgbSc8eT9
+X-Google-Smtp-Source: AMsMyM5A1GEBXISLDJOCrZgBb9x6sv3zCe9ItgsiYhxMi3eqfFq7LJoGRdYyTrPN1PMUDltfuQmoGw==
+X-Received: by 2002:a17:902:690a:b0:17a:32d:7acc with SMTP id j10-20020a170902690a00b0017a032d7accmr32790443plk.18.1666602817582;
+        Mon, 24 Oct 2022 02:13:37 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id r15-20020aa79ecf000000b00535da15a252sm19642213pfq.165.2022.10.24.02.13.34
+        by smtp.gmail.com with ESMTPSA id r15-20020aa79ecf000000b00535da15a252sm19642213pfq.165.2022.10.24.02.13.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Oct 2022 02:13:35 -0700 (PDT)
+        Mon, 24 Oct 2022 02:13:37 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v4 21/24] x86/pmu: Add gp_events pointer to route different event tables
-Date:   Mon, 24 Oct 2022 17:12:20 +0800
-Message-Id: <20221024091223.42631-22-likexu@tencent.com>
+Subject: [kvm-unit-tests PATCH v4 22/24] x86/pmu: Add nr_gp_counters to limit the number of test counters
+Date:   Mon, 24 Oct 2022 17:12:21 +0800
+Message-Id: <20221024091223.42631-23-likexu@tencent.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221024091223.42631-1-likexu@tencent.com>
 References: <20221024091223.42631-1-likexu@tencent.com>
@@ -74,95 +74,55 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-AMD and Intel do not share the same set of coding rules for performance
-events, and code to test the same performance event can be reused by
-pointing to a different coding table, noting that the table size also
-needs to be updated.
+The number of counters in amd is fixed (4 or 6), and the test code
+can be reused by dynamically switching the maximum number of counters
+(and register base addresses), with no change for Intel side.
 
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- x86/pmu.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
+ lib/x86/pmu.c | 1 +
+ lib/x86/pmu.h | 9 ++++++++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/x86/pmu.c b/x86/pmu.c
-index daeb7a2..24d015e 100644
---- a/x86/pmu.c
-+++ b/x86/pmu.c
-@@ -30,7 +30,7 @@ struct pmu_event {
- 	uint32_t unit_sel;
- 	int min;
- 	int max;
--} gp_events[] = {
-+} intel_gp_events[] = {
- 	{"core cycles", 0x003c, 1*N, 50*N},
- 	{"instructions", 0x00c0, 10*N, 10.2*N},
- 	{"ref cycles", 0x013c, 1*N, 30*N},
-@@ -46,6 +46,9 @@ struct pmu_event {
+diff --git a/lib/x86/pmu.c b/lib/x86/pmu.c
+index 43e6a43..25e21e5 100644
+--- a/lib/x86/pmu.c
++++ b/lib/x86/pmu.c
+@@ -10,6 +10,7 @@ void pmu_init(void)
+         pmu.perf_cap = rdmsr(MSR_IA32_PERF_CAPABILITIES);
+     pmu.msr_gp_counter_base = MSR_IA32_PERFCTR0;
+     pmu.msr_gp_event_select_base = MSR_P6_EVNTSEL0;
++    pmu.nr_gp_counters = (cpuid_10.a >> 8) & 0xff;
+     if (this_cpu_support_perf_status()) {
+         pmu.msr_global_status = MSR_CORE_PERF_GLOBAL_STATUS;
+         pmu.msr_global_ctl = MSR_CORE_PERF_GLOBAL_CTRL;
+diff --git a/lib/x86/pmu.h b/lib/x86/pmu.h
+index fa49a8f..4312b6e 100644
+--- a/lib/x86/pmu.h
++++ b/lib/x86/pmu.h
+@@ -54,6 +54,7 @@ struct pmu_caps {
+     u32 msr_global_status;
+     u32 msr_global_ctl;
+     u32 msr_global_status_clr;
++    unsigned int nr_gp_counters;
+ };
  
- char *buf;
+ extern struct cpuid cpuid_10;
+@@ -123,7 +124,13 @@ static inline bool this_cpu_support_perf_status(void)
  
-+static struct pmu_event *gp_events;
-+static unsigned int gp_events_size;
+ static inline u8 pmu_nr_gp_counters(void)
+ {
+-	return (cpuid_10.a >> 8) & 0xff;
++	return pmu.nr_gp_counters;
++}
 +
- static inline void loop(void)
- {
- 	unsigned long tmp, tmp2, tmp3;
-@@ -91,7 +94,7 @@ static struct pmu_event* get_counter_event(pmu_counter_t *cnt)
- 	if (is_gp(cnt)) {
- 		int i;
- 
--		for (i = 0; i < sizeof(gp_events)/sizeof(gp_events[0]); i++)
-+		for (i = 0; i < gp_events_size; i++)
- 			if (gp_events[i].unit_sel == (cnt->config & 0xffff))
- 				return &gp_events[i];
- 	} else
-@@ -212,7 +215,7 @@ static void check_gp_counters(void)
- {
- 	int i;
- 
--	for (i = 0; i < sizeof(gp_events)/sizeof(gp_events[0]); i++)
-+	for (i = 0; i < gp_events_size; i++)
- 		if (pmu_gp_counter_is_available(i))
- 			check_gp_counter(&gp_events[i]);
- 		else
-@@ -248,7 +251,7 @@ static void check_counters_many(void)
- 
- 		cnt[n].ctr = gp_counter_msr(n);
- 		cnt[n].config = EVNTSEL_OS | EVNTSEL_USR |
--			gp_events[i % ARRAY_SIZE(gp_events)].unit_sel;
-+			gp_events[i % gp_events_size].unit_sel;
- 		n++;
- 	}
- 	for (i = 0; i < nr_fixed_counters; i++) {
-@@ -603,7 +606,7 @@ static void set_ref_cycle_expectations(void)
- {
- 	pmu_counter_t cnt = {
- 		.ctr = MSR_IA32_PERFCTR0,
--		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[2].unit_sel,
-+		.config = EVNTSEL_OS | EVNTSEL_USR | intel_gp_events[2].unit_sel,
- 	};
- 	uint64_t tsc_delta;
- 	uint64_t t0, t1, t2, t3;
-@@ -639,8 +642,8 @@ static void set_ref_cycle_expectations(void)
- 	if (!tsc_delta)
- 		return;
- 
--	gp_events[2].min = (gp_events[2].min * cnt.count) / tsc_delta;
--	gp_events[2].max = (gp_events[2].max * cnt.count) / tsc_delta;
-+	intel_gp_events[2].min = (intel_gp_events[2].min * cnt.count) / tsc_delta;
-+	intel_gp_events[2].max = (intel_gp_events[2].max * cnt.count) / tsc_delta;
++static inline void set_nr_gp_counters(u8 new_num)
++{
++	if (new_num < pmu_nr_gp_counters())
++		pmu.nr_gp_counters = new_num;
  }
  
- static void check_invalid_rdpmc_gp(void)
-@@ -664,6 +667,8 @@ int main(int ac, char **av)
- 		return report_summary();
- 	}
- 
-+	gp_events = (struct pmu_event *)intel_gp_events;
-+	gp_events_size = sizeof(intel_gp_events)/sizeof(intel_gp_events[0]);
- 	set_ref_cycle_expectations();
- 
- 	printf("PMU version:         %d\n", pmu_version());
+ static inline u8 pmu_gp_counter_width(void)
 -- 
 2.38.1
 
