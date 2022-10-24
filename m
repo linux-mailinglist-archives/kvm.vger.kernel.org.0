@@ -2,341 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CAE8160BE82
-	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 01:26:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A549660BD29
+	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 00:12:22 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231325AbiJXX0K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 19:26:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47182 "EHLO
+        id S230355AbiJXWLv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Oct 2022 18:11:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231326AbiJXXZm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Oct 2022 19:25:42 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E02A45E553
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 14:46:26 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29OJK01d006740;
-        Mon, 24 Oct 2022 19:25:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=oj4Xpi3y/sF3NwpyWc7gM1sVU1+h/ni/w2Fu+loJQoY=;
- b=DomFDbpFVd22jZMm6qqgd2TdwPCrbZ9ueFN3Ck38dY0/MVgYHKR11vTCCJSZHkSE1leW
- Lyrma/p42IwHA2M2aSEaNs20/wA9OlgUMI432qCgf37eOlrp17UCfvPsLVtUAa00d1AM
- mTBnoaivPt4rzKjg6Zd2H84yIm2HT6MMp3OienAGlYwih04TVPZS2f5oQBw1r4Roaser
- dT7E/rJaAm2J5hJCu7EB0x7vVwz5tcbT8PjWWQIfmjZH+caZ7IU2g83r/Th82U7uGKdx
- cU88XiFtQZiI3qW4tUcBBJMHoYlfeTM+GzxGNvW9AFryX7nlRzhQs81CSfuTrohh8OIl 0w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ke0s7g4ck-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 24 Oct 2022 19:25:30 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29OJKecC010025;
-        Mon, 24 Oct 2022 19:25:30 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ke0s7g4br-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 24 Oct 2022 19:25:30 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29OJLsRh016078;
-        Mon, 24 Oct 2022 19:25:28 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma04ams.nl.ibm.com with ESMTP id 3kc859bt70-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 24 Oct 2022 19:25:28 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29OJPOOM48038384
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 24 Oct 2022 19:25:24 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C46434C040;
-        Mon, 24 Oct 2022 19:25:24 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E76864C044;
-        Mon, 24 Oct 2022 19:25:23 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.27.135])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 24 Oct 2022 19:25:23 +0000 (GMT)
-Message-ID: <65c3bfd263b03ca524444cdf5f96d937f582f2d7.camel@linux.ibm.com>
-Subject: Re: [PATCH v10 1/9] s390x/cpu topology: core_id sets s390x CPU
- topology
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-Date:   Mon, 24 Oct 2022 21:25:23 +0200
-In-Reply-To: <20221012162107.91734-2-pmorel@linux.ibm.com>
-References: <20221012162107.91734-1-pmorel@linux.ibm.com>
-         <20221012162107.91734-2-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        with ESMTP id S232132AbiJXWL2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Oct 2022 18:11:28 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10780303F29
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 13:26:51 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id k8so9212547wrh.1
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 13:26:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=xGRUq34sY2BcU0VG83zmHayB6ouI/Pi+41LBRR9R888=;
+        b=qnmD+76EU90dLFEzox/jjgBgvr3SF/Rt5FT93hrKpS1KJBM13MjuboaAzL/9SiUTGG
+         OASLggFFnLpSmhh9u67mBgL78BNej/MSy3WmyWVwX5rta0HB/sq+qPNIxk9D9Wq2R7kp
+         xCfHhEd4dUmLgErz6Zhpu/Pv7HCGgTBxootQacnPZ70q5MNI5sIYt7VH0+bxI7dX7MrX
+         fqpG2wa0TJ/Xuj2ZQ/QMhl+/7jzzxaLSsORQs1EpKsrZLi8SJft+I6PXxrYwx9xkwq9+
+         G094QXH+ulHW4KAs31Xl/8aOnrKnPnZzb82KZIJvDIY+Wk8Mir8E16LB8uxDMK1K1qOo
+         YjvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xGRUq34sY2BcU0VG83zmHayB6ouI/Pi+41LBRR9R888=;
+        b=WFaYPbaExcZGFaGYtHTF++CWL0Q/51+IU89kdsYrNxzs3fybD+p0knCay7ZMRgpUKF
+         2ED6vUsfnZqXzd1Ul+V4nnVlhrH+/W1So4Ub6HrmDc4cqW2M+wmTnJ4NJsVvXuaecD7c
+         n/gUSUv1CSvo3nQa4wYSsVprm3q2C1eOEx29s5iH3nsWcYHFFMSoMsNFa3uBcO4RBH2V
+         F+ZCp+MZGyJk5q8zuOFzMvWrMy3xdU7GdR3VExDByL1oB85l+jH3YP4EBgrmScBeEJMu
+         IV8/d+gcxaAbmkE6GdNXpnUz3uBVrgYVoFoTO/Kf57lRxwTNnRaXX1OhkpiPcKTjCmIQ
+         qkBQ==
+X-Gm-Message-State: ACrzQf3ENQWyeYAmjcv7WiXDgRBsR6yApxHJcYR4EMRsZmlSvg75R/ja
+        cXC/J5kskDcM6QsMPzF6xxUHqOAWTv6ZIBM3IRwmjg==
+X-Google-Smtp-Source: AMsMyM5FAUdkTzGBTeY5NjATCk2EFYG5Nn83B7nDB5iDQnymcfT58qDCIKjRWaHAHnfkfpMEJ1ttyDy/0hsf9BDg6Ck=
+X-Received: by 2002:adf:f081:0:b0:236:5e7c:4ec2 with SMTP id
+ n1-20020adff081000000b002365e7c4ec2mr9086578wro.641.1666643078179; Mon, 24
+ Oct 2022 13:24:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 5tBexhp7Fh5ZvXxLe_nLQvgUZ7Nb_E1_
-X-Proofpoint-GUID: O5OQ_8LJ7V4QgM32HhiSVpbKFGeZV3rg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-24_06,2022-10-21_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 bulkscore=0 phishscore=0 mlxscore=0 malwarescore=0
- adultscore=0 spamscore=0 lowpriorityscore=0 impostorscore=0 clxscore=1015
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210240114
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20221021185916.1494314-1-vipinsh@google.com> <Y1L9Z8RgIs8yrU6o@google.com>
+ <CAHVum0eoA5j7EPmmuuUb2y7XOU1jRpFwJO90tc+QBy0JNUtBsQ@mail.gmail.com>
+ <Y1MXgjtPT9U6Cukk@google.com> <87k04pbfqd.fsf@ovpn-193-3.brq.redhat.com>
+ <Y1atxgq2SDkHbP9I@google.com> <CAHVum0f=gRgrP=rTySn1zwPz65g6jm_3f-=qusmS7jOkKyUMSw@mail.gmail.com>
+ <Y1bpSlNGeVkqRYxI@google.com>
+In-Reply-To: <Y1bpSlNGeVkqRYxI@google.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Mon, 24 Oct 2022 13:24:01 -0700
+Message-ID: <CAHVum0cnj+bWwAwDeEj+MrqNNbWEYAW5k=-GWVJpm4g8sQ9-Xw@mail.gmail.com>
+Subject: Re: [RFC PATCH] Add Hyperv extended hypercall support in KVM
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, pbonzini@redhat.com,
+        dmatlack@google.com, kvm@vger.kernel.org, shujunxue@google.com,
+        terrytaehyun@google.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-10-12 at 18:20 +0200, Pierre Morel wrote:
-> In the S390x CPU topology the core_id specifies the CPU address
-> and the position of the core withing the topology.
-> 
-> Let's build the topology based on the core_id.
-> s390x/cpu topology: core_id sets s390x CPU topology
-> 
-> In the S390x CPU topology the core_id specifies the CPU address
-> and the position of the cpu withing the topology.
-> 
-> Let's build the topology based on the core_id.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  include/hw/s390x/cpu-topology.h |  45 +++++++++++
->  hw/s390x/cpu-topology.c         | 132 ++++++++++++++++++++++++++++++++
->  hw/s390x/s390-virtio-ccw.c      |  21 +++++
->  hw/s390x/meson.build            |   1 +
->  4 files changed, 199 insertions(+)
->  create mode 100644 include/hw/s390x/cpu-topology.h
->  create mode 100644 hw/s390x/cpu-topology.c
-> 
-> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
-> new file mode 100644
-> index 0000000000..66c171d0bc
-> --- /dev/null
-> +++ b/include/hw/s390x/cpu-topology.h
-> @@ -0,0 +1,45 @@
-> +/*
-> + * CPU Topology
-> + *
-> + * Copyright 2022 IBM Corp.
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
-> +#ifndef HW_S390X_CPU_TOPOLOGY_H
-> +#define HW_S390X_CPU_TOPOLOGY_H
-> +
-> +#include "hw/qdev-core.h"
-> +#include "qom/object.h"
-> +
-> +typedef struct S390TopoContainer {
-> +    int active_count;
-> +} S390TopoContainer;
-> +
-> +#define S390_TOPOLOGY_CPU_IFL 0x03
-> +#define S390_TOPOLOGY_MAX_ORIGIN ((63 + S390_MAX_CPUS) / 64)
-> +typedef struct S390TopoTLE {
-> +    uint64_t mask[S390_TOPOLOGY_MAX_ORIGIN];
-> +} S390TopoTLE;
+On Mon, Oct 24, 2022 at 12:36 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Oct 24, 2022, Vipin Sharma wrote:
+> > On Mon, Oct 24, 2022 at 8:22 AM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Mon, Oct 24, 2022, Vitaly Kuznetsov wrote:
+> > > enable():
+> > >
+> > >         case KVM_CAP_HYPERV_EXT_CALL:
+> > >                 r = -EINVAL;
+> > >                 if (mask & ~KVM_SUPPORTED_HYPERV_EXT_CALL)
+> > >                         break;
+> > >
+> > >                 mutex_lock(&kvm->lock);
+> > >                 if (!kvm->created_vcpus) {
+> >
+> > Any reason for setting capability only after vcpus are created?
+>
+> This only allows setting the capability _before_ vCPUs are created.  Attempting
+> to set the cap after vCPUs are created gets rejected with -EINVAL.  This
+> requirement means vCPUs don't need to take a lock to consume per-VM state, as KVM
+> prevents the state from changing once vCPUs are created.
 
-Since this actually represents multiple TLEs, you might want to change the
-name of the struct to reflect this. S390TopoTLEList maybe?
+I totally misread the condition and didn't notice the '!' in the if()
+statement.
 
-> +
-> +struct S390Topology {
-> +    SysBusDevice parent_obj;
-> +    int cpus;
-> +    S390TopoContainer *socket;
-> +    S390TopoTLE *tle;
-> +    MachineState *ms;
-> +};
-> +
-> +#define TYPE_S390_CPU_TOPOLOGY "s390-topology"
-> +OBJECT_DECLARE_SIMPLE_TYPE(S390Topology, S390_CPU_TOPOLOGY)
-> +
-> +S390Topology *s390_get_topology(void);
-> +void s390_topology_new_cpu(int core_id);
-> +
-> +static inline bool s390_has_topology(void)
-> +{
-> +    return false;
-> +}
-> +
-> +#endif
-> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
-> new file mode 100644
-> index 0000000000..42b22a1831
-> --- /dev/null
-> +++ b/hw/s390x/cpu-topology.c
-> @@ -0,0 +1,132 @@
-> +/*
-> + * CPU Topology
-> + *
-> + * Copyright IBM Corp. 2022
-> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
-> +
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "qemu/error-report.h"
-> +#include "hw/sysbus.h"
-> +#include "hw/qdev-properties.h"
-> +#include "hw/boards.h"
-> +#include "qemu/typedefs.h"
-> +#include "target/s390x/cpu.h"
-> +#include "hw/s390x/s390-virtio-ccw.h"
-> +#include "hw/s390x/cpu-topology.h"
-> +
-> +S390Topology *s390_get_topology(void)
-> +{
-> +    static S390Topology *s390Topology;
-> +
-> +    if (!s390Topology) {
-> +        s390Topology = S390_CPU_TOPOLOGY(
-> +            object_resolve_path(TYPE_S390_CPU_TOPOLOGY, NULL));
-> +    }
-> +
-> +    return s390Topology;
-> +}
-> +
-> +/*
-> + * s390_topology_new_cpu:
-> + * @core_id: the core ID is machine wide
-> + *
-> + * The topology returned by s390_get_topology(), gives us the CPU
-> + * topology established by the -smp QEMU aruments.
-
-s/aruments/arguments/
-
-> + * The core-id gives:
-> + *  - the Container TLE (Topology List Entry) containing the CPU TLE.
-> + *  - in the CPU TLE the origin, or offset of the first bit in the core mask
-> + *  - the bit in the CPU TLE core mask
-> + */
-
-Not sure if that comment helps if you don't already know how the topology list works.
-> +void s390_topology_new_cpu(int core_id)
-> +{
-> +    S390Topology *topo = s390_get_topology();
-> +    int socket_id;
-> +    int bit, origin;
-> +
-> +    /* In the case no Topology is used nothing is to be done here */
-> +    if (!topo) {
-> +        return;
-> +    }
-> +
-> +    socket_id = core_id / topo->cpus;
-> +
-> +    /*
-> +     * At the core level, each CPU is represented by a bit in a 64bit
-> +     * unsigned long which represent the presence of a CPU.
-> +     * The firmware assume that all CPU in a CPU TLE have the same
-
-s/firmware assume/architecture specifies/
-
-> +     * type, polarization and are all dedicated or shared.
-> +     * In that case the origin variable represents the offset of the first
-> +     * CPU in the CPU container.
-
-This sentence is repeated further down.
-
-> +     * More than 64 CPUs per socket are represented in several CPU containers
-> +     * inside the socket container.
-> +     * The only reason to have several S390TopologyCores inside a socket is
-> +     * to have more than 64 CPUs.
-> +     * In that case the origin variable represents the offset of the first CPU
-> +     * in the CPU container. More than 64 CPUs per socket are represented in
-> +     * several CPU containers inside the socket container.
-> +     */
-
-In the last version you had:
-+ /*
-+ * At the core level, each CPU is represented by a bit in a 64bit
-+ * unsigned long. Set on plug and clear on unplug of a CPU.
-+ * The firmware assume that all CPU in a CPU TLE have the same
-+ * type, polarization and are all dedicated or shared.
-+ * In the case a socket contains CPU with different type, polarization
-+ * or entitlement then they will be defined in different CPU containers.
-+ * Currently we assume all CPU are identical IFL CPUs and that they are
-+ * all dedicated CPUs.
-+ * The only reason to have several S390TopologyCores inside a socket is
-+ * to have more than 64 CPUs.
-+ * In that case the origin field, representing the offset of the first CPU
-+ * in the CPU container allows to represent up to the maximal number of
-+ * CPU inside several CPU containers inside the socket container.
-+ */
-
-I would modify it thus (with better line wrapping):
-+ /*
-+ * At the core level, each CPU is represented by a bit in a 64bit
-+ * unsigned long.
-+ * The architecture specifies that all CPU in a CPU TLE have the same
-+ * type, polarization and are all dedicated or shared.
-+ * In the case that a socket contains CPUs with different type, polarization
-+ * or entitlement then they will be defined in different CPU containers.
-+ * Currently we assume all CPU are identical IFL CPUs and that they are
-+ * all dedicated CPUs.
-+ * Therefore, the only reason to have several S390TopologyCores inside a socket is
-+ * to support CPU id differences > 64.
-+ * In that case, the origin field in a container represents the offset of the first CPU
-+ * in that CPU container, thereby allowing representation of all CPUs via multiple containers.
-+ */
-
-> +    bit = core_id;
-> +    origin = bit / 64;
-> +    bit %= 64;
-> +    bit = 63 - bit;
-
-I'm not convinced that that is more readable than just
- origin = core_id / 64;
- bit = 63 - (core_id % 64);
-
-but that is for you to decide.
-> +
-> +    topo->socket[socket_id].active_count++;
-> +    set_bit(bit, &topo->tle[socket_id].mask[origin]);
-> +}
-> +
-> +/**
-> + * s390_topology_realize:
-> + * @dev: the device state
-> + * @errp: the error pointer (not used)
-> + *
-> + * During realize the machine CPU topology is initialized with the
-> + * QEMU -smp parameters.
-> + * The maximum count of CPU TLE in the all Topology can not be greater
-> + * than the maximum CPUs.
-> + */
-> +static void s390_topology_realize(DeviceState *dev, Error **errp)
-> +{
-> +    MachineState *ms = MACHINE(qdev_get_machine());
-> +    S390Topology *topo = S390_CPU_TOPOLOGY(dev);
-> +
-> +    topo->cpus = ms->smp.cores * ms->smp.threads;
-> +
-> +    topo->socket = g_new0(S390TopoContainer, ms->smp.sockets);
-> +    topo->tle = g_new0(S390TopoTLE, ms->smp.max_cpus);
-
-As Cédric pointed out, the number of TLE(List)s should be the same as the
-sockets.
-> +
-> +    topo->ms = ms;
-> +}
-[...]
-
+Thanks for the feedback.
