@@ -2,82 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F052460B630
-	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 20:50:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CA1A360B52E
+	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 20:13:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232867AbiJXSuf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 14:50:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49434 "EHLO
+        id S231805AbiJXSNF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Oct 2022 14:13:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232453AbiJXSuF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Oct 2022 14:50:05 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED7911181A;
-        Mon, 24 Oct 2022 10:30:53 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29OE7KB0017402;
-        Mon, 24 Oct 2022 14:20:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : content-transfer-encoding : mime-version; s=pp1;
- bh=pbxnAhFCDpff1GUxMHUF6fZP5VjICHD6HXq0aRQWBtc=;
- b=mT86c87DYfVopxMFxgAZBi9V4ZIzWr09zPq7SQ848Ok4J8DTS0lPU6NXTCT3IG7xyJK+
- Xtl/gwzuqXZlUTNC0tNmLYDJTzlcyawV0yYZT6eIiWNeb/9a+8I/KkWW3UHb61utnWrE
- go47aq9U/BYo7EQpyIgXDElXbwsPQJxeyoGWa/eYhICkCFQr2fXGFFZrcMqkXEz0f0lc
- m37Gs6xkeachmP2uZUeyzKv2l7gyhcKLt2uxNMafBFKj+h6o+ORMHFx5HoYLvhOFP2B6
- uCW7ia88b2GGY0KN8g/Tg5MGaQ9vXsfE9plAsOnXWJseUdoKG7g0SEHoP2erqFdHrcvB Eg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kduu7s6xq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 24 Oct 2022 14:20:42 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29OE91gG027532;
-        Mon, 24 Oct 2022 14:20:42 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kduu7s6wn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 24 Oct 2022 14:20:41 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29OE5cfi018375;
-        Mon, 24 Oct 2022 14:20:40 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 3kc859bf1w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 24 Oct 2022 14:20:40 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29OEKbil41353512
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 24 Oct 2022 14:20:37 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0D02352050;
-        Mon, 24 Oct 2022 14:20:37 +0000 (GMT)
-Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.20.45])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 858695204E;
-        Mon, 24 Oct 2022 14:20:36 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        cohuck@redhat.com, imbrenda@linux.ibm.com, david@redhat.com,
-        nrb@linux.ibm.com, scgl@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v5 0/2] S390x: CPU Topology Information
-Date:   Mon, 24 Oct 2022 16:20:33 +0200
-Message-Id: <20221024142035.22668-1-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: zAYTRceIOoHi3yTa0UauDJIf93pFdf8u
-X-Proofpoint-ORIG-GUID: ei4aMkU1mh5oRO2wU64sYxqOPoANjjJ-
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S231936AbiJXSMW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Oct 2022 14:12:22 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 461B757E17;
+        Mon, 24 Oct 2022 09:54:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1666630459; x=1698166459;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=f12+hDSs2xhh9+cgFUHAQwPz5EdOX4nrGTxSpB9xto8=;
+  b=Lx4O7B4HXPSw6eCOX6fxKVKroy/kLcxL2hy81b68CBxeeJRyLCmgMCfL
+   +GmcUQtQfNoaO0aKDUWtL30YejrZoBatDCS3PeFJE4DrVZy75n4meLb3V
+   lTd9rYHhJuaupDbeWYGNYIRyNXZj3pq47viEZfMgcU99FnPK0/qZgfmIi
+   gspbcVr59orDB9o72YPvLlrDzWGOkCq17RmNQJRAMNg2/pBM0j0LNOMfA
+   bj+i/Q+CUyf8nP7jn5Mf5krunxQliQkthbAZqVw/QMtNgTnCY5KYq20Fa
+   rnUMOQajJskrGGHNEtBU+aDreoW/sfo7JqEpyO72zuy8iUIvlJ76mj0/t
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10510"; a="290739879"
+X-IronPort-AV: E=Sophos;i="5.95,209,1661842800"; 
+   d="scan'208";a="290739879"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2022 07:59:41 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10510"; a="631284461"
+X-IronPort-AV: E=Sophos;i="5.95,209,1661842800"; 
+   d="scan'208";a="631284461"
+Received: from unisar-mobl.ger.corp.intel.com (HELO box.shutemov.name) ([10.249.38.228])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2022 07:59:30 -0700
+Received: by box.shutemov.name (Postfix, from userid 1000)
+        id 381A7104D5C; Mon, 24 Oct 2022 17:59:28 +0300 (+03)
+Date:   Mon, 24 Oct 2022 17:59:28 +0300
+From:   "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>,
+        Vishal Annapurve <vannapurve@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>, luto@kernel.org,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com, aarcange@redhat.com, ddutile@redhat.com,
+        dhildenb@redhat.com, Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v8 1/8] mm/memfd: Introduce userspace inaccessible memfd
+Message-ID: <20221024145928.66uehsokp7bpa2st@box.shutemov.name>
+References: <20220915142913.2213336-1-chao.p.peng@linux.intel.com>
+ <20220915142913.2213336-2-chao.p.peng@linux.intel.com>
+ <CAGtprH_MiCxT2xSxD2UrM4M+ghL0V=XEZzEX4Fo5wQKV4fAL4w@mail.gmail.com>
+ <20221021134711.GA3607894@chaop.bj.intel.com>
+ <Y1LGRvVaWwHS+Zna@google.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-24_04,2022-10-21_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- mlxlogscore=999 malwarescore=0 spamscore=0 clxscore=1011 phishscore=0
- priorityscore=1501 suspectscore=0 bulkscore=0 mlxscore=0 adultscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210240086
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y1LGRvVaWwHS+Zna@google.com>
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -85,59 +90,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Fri, Oct 21, 2022 at 04:18:14PM +0000, Sean Christopherson wrote:
+> On Fri, Oct 21, 2022, Chao Peng wrote:
+> > > 
+> > > In the context of userspace inaccessible memfd, what would be a
+> > > suggested way to enforce NUMA memory policy for physical memory
+> > > allocation? mbind[1] won't work here in absence of virtual address
+> > > range.
+> > 
+> > How about set_mempolicy():
+> > https://www.man7.org/linux/man-pages/man2/set_mempolicy.2.html
+> 
+> Andy Lutomirski brought this up in an off-list discussion way back when the whole
+> private-fd thing was first being proposed.
+> 
+>   : The current Linux NUMA APIs (mbind, move_pages) work on virtual addresses.  If
+>   : we want to support them for TDX private memory, we either need TDX private
+>   : memory to have an HVA or we need file-based equivalents. Arguably we should add
+>   : fmove_pages and fbind syscalls anyway, since the current API is quite awkward
+>   : even for tools like numactl.
 
-new version of the series with corrections.
+Yeah, we definitely have gaps in API wrt NUMA, but I don't think it be
+addressed in the initial submission.
 
-When facility 11 is available inside the S390x architecture, 2 new
-instructions are available: PTF and STSI with function code 15.
+BTW, it is not regression comparing to old KVM slots, if the memory is
+backed by memfd or other file:
 
-Let's check their availability in QEMU/KVM and their coherence
-with the CPU topology provided to the QEMU -smp parameter and as
-argument for the test.
+MBIND(2)
+       The  specified policy will be ignored for any MAP_SHARED mappings in the
+       specified memory range.  Rather the pages will be allocated according to
+       the  memory  policy  of the thread that caused the page to be allocated.
+       Again, this may not be the thread that called mbind().
 
-To run these tests successfully you will Linux 6.0 and the following
-QEMU patches (or newer):
+It is not clear how to define fbind(2) semantics, considering that multiple
+processes may compete for the same region of page cache.
 
-  https://lore.kernel.org/all/20221012162107.91734-1-pmorel@linux.ibm.com/#r
+Should it be per-inode or per-fd? Or maybe per-range in inode/fd?
 
-
-To start the test just do:
-
-# ./run_tests.sh topology
-
-or
-
-# ./s390x-run s390x/topology.elf \
-	-smp 5,sockets=4,cores=4,maxcpus=16 \
-	-append "-mnest 2 -sockets 4 -cores 4"
-
-
-Of course the declaration of the number of socket and core must be
-coherent in -smp and -append arguments.
-The "mnest" argument represent the expected nesting level it will be
-2 until books and drawer are added to the topology.
-
-Regards,
-Pierre
-
-Pierre Morel (2):
-  s390x: topology: Check the Perform Topology Function
-  s390x: topology: Checking Configuration Topology Information
-
- lib/s390x/stsi.h    |  44 ++++++
- s390x/Makefile      |   1 +
- s390x/topology.c    | 366 ++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |   4 +
- 4 files changed, 415 insertions(+)
- create mode 100644 s390x/topology.c
+fmove_pages(2) should be relatively straight forward, since it is
+best-effort and does not guarantee that the page will note be moved
+somewhare else just after return from the syscall.
 
 -- 
-2.31.1
-
-Changelog:
-
-From v4:
-
-- Simplify the tests for socket and cores only.
-
+  Kiryl Shutsemau / Kirill A. Shutemov
