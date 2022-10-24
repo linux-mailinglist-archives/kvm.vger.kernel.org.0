@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77949609D99
-	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 11:13:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 34B35609D9B
+	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 11:13:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230499AbiJXJNf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 05:13:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46216 "EHLO
+        id S229717AbiJXJNi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Oct 2022 05:13:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230526AbiJXJNY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Oct 2022 05:13:24 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F0F669BFE
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 02:13:17 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id i3so8439053pfc.11
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 02:13:17 -0700 (PDT)
+        with ESMTP id S231171AbiJXJNZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Oct 2022 05:13:25 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30FDF6A48E
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 02:13:18 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id s196so8201610pgs.3
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 02:13:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SoScm23nDDX7JHFkbL9fpuIHnIArLeXAMMYwS7VZ3YY=;
-        b=Cv1AIVMJhkLp6GyXJ78ZOLYqfoqx0pbT5xw1vZ/duXZzOUCNLP8y+snJTRCOGCfbjv
-         Axv5YS4NvIM8mQHny5izQ2zEdaGH8RfuFzejpet3XH73fyfldy1hZZH6EaO09Gb8kjlG
-         L8V5TxCGNaD63seu7S6gD0eewSI6ABCjhWBJQ/EfRVvUDpuhElGdBwp7zWThNK9eHb0u
-         7WA2gfD7BdTVBxRKrLovgJEQqrRqqpaRcKwNwZKcmvbAEk78U4CBEDd6VdF6cYgj8lU5
-         F7A2vEKNMxb0yApkN6ZuPi09WzhcSo2EYxKi5eqoXTVM+ub93hTeTbUvyhVZSnhypKBl
-         DQdA==
+        bh=eOfqx+essPUE8lmXeQjnIuCL9UwXhImUnnXh9pI3KvM=;
+        b=ewfPXUBMDWRXLWxBUjPrA8gE6/K6t7jM5xffg3JCm7j8AKu9TpyNkvnV7VnveRGlnx
+         a2An1L0ikWriq4Q1tZWo/KJNfpCJuNzhI6t1XB4soPqw2zoZS5jntOqmnerseqhmFHUh
+         GL/OEhh3YGDdzw0aZ1TXH/fCaYZfnZOPC5001H4RmVuQ1NPCktBvNz2nb8o2EEVgaGPa
+         YAW94VlkyZYBdaP59s06anEIEniVCEHmu/1JQfbSgyyfZN5/F5MO7hhQdRcPHEI95zOC
+         b4GDH9pxa/idov7P4MYSKk1gAUHB67pdq9LDMvuZeFZRh3AVRSZXI3c0pAFDh5Zqhy1j
+         6t+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SoScm23nDDX7JHFkbL9fpuIHnIArLeXAMMYwS7VZ3YY=;
-        b=3UfBsiAT40GNebxFDDqN0Kaw/MDXntxp/sCEmqteAjhCprAfWxLwWSaZ1GMcOSuftt
-         AFVouG5MT1Or5VzmVwxBtD945kMufTYdCK7qHnyt/SwG+cD/7koTcADFFAqUxmEEOVIq
-         tTROwuZnuYRAh2Ert+iiW7rewMR8iGFOm7GXDZB+il+ivOR+HFPpmhrGxjs35a0qqhJ8
-         IcOJJUYQ9NpfMEubJpy+f50zACg7HXYyyk8Wjfll9hC7YjilYPnnSKko7AZvSJnogCSy
-         IPxnyMUMjQPweJ4Hxuv0gNO6Bdwz9QcaFXAtIcOBNB8Pc7M7xcK5SAxpTJ0l2nOfCz4S
-         sBXA==
-X-Gm-Message-State: ACrzQf0dOZu9VnDhweZYUKhG+80xSg1zjDh1YRLrXoNpcu5NVyThhNt1
-        4mOy1SW7eTIG49ljpMMd8eU=
-X-Google-Smtp-Source: AMsMyM64Njj+AxehMevOGMPM22qPsdPAcf1dK1q7D/unw5dUFfGkkAjOS/wqfJ2JabzAT7nOHvL10A==
-X-Received: by 2002:a63:6b88:0:b0:46a:ff3c:b64a with SMTP id g130-20020a636b88000000b0046aff3cb64amr27245050pgc.196.1666602796322;
-        Mon, 24 Oct 2022 02:13:16 -0700 (PDT)
+        bh=eOfqx+essPUE8lmXeQjnIuCL9UwXhImUnnXh9pI3KvM=;
+        b=YVz5Mpc++Sjml9vQkGonPONP5Uan3oIGpCWelxjqlgChVVz+HUVSOz0GHsVQQ146hZ
+         nOIsElwF38SsZFeWv1yqR/1Zd/Hu7PoqCMexAXfphmKpo/AHY9YXHIZumK9EA2KNaF1a
+         d6QJnCQ9Ynjf4AEBw154jNWZVJFL0b7wP+TT+S3BHo6hJ96VYifU+Gr66vlTr5+KB0Wi
+         sX+FrIS3/6ry+4Vw3vXwWp6M30g1jh/D/1k4O93MDIQIR+fKS0z4Q7fhaLA2RkwqraDk
+         u8CL7LAUglB2y+9XYvlAQqbx3gfKuc+PsJSqrxr/a0yTB4wFqRH73TZ+tyYfDeD2l9x3
+         6mRg==
+X-Gm-Message-State: ACrzQf1E3Jer+lOVsVsrihl06PvVFWeVHEWqKOGRz1CcnAJ/YlP6AfZg
+        1LG0y23l6MaGk0o7WfOYH6pnm8GxFMD0SIv0
+X-Google-Smtp-Source: AMsMyM5drsRBhb4L2L9qCVOzPOPv4VD3hlQk+hC820KGsG6+RyNiI/nem3I2Yw3I+PRI9l5aR3XaFQ==
+X-Received: by 2002:a63:1f5c:0:b0:469:d0e6:dac0 with SMTP id q28-20020a631f5c000000b00469d0e6dac0mr26683091pgm.427.1666602798004;
+        Mon, 24 Oct 2022 02:13:18 -0700 (PDT)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id r15-20020aa79ecf000000b00535da15a252sm19642213pfq.165.2022.10.24.02.13.15
+        by smtp.gmail.com with ESMTPSA id r15-20020aa79ecf000000b00535da15a252sm19642213pfq.165.2022.10.24.02.13.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Oct 2022 02:13:16 -0700 (PDT)
+        Mon, 24 Oct 2022 02:13:17 -0700 (PDT)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v4 09/24] x86: create pmu group for quick pmu-scope testing
-Date:   Mon, 24 Oct 2022 17:12:08 +0800
-Message-Id: <20221024091223.42631-10-likexu@tencent.com>
+Subject: [kvm-unit-tests PATCH v4 10/24] x86/pmu: Refine info to clarify the current support
+Date:   Mon, 24 Oct 2022 17:12:09 +0800
+Message-Id: <20221024091223.42631-11-likexu@tencent.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221024091223.42631-1-likexu@tencent.com>
 References: <20221024091223.42631-1-likexu@tencent.com>
@@ -74,35 +74,28 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-Any agent can run "./run_tests.sh -g pmu" to run all PMU tests easily,
-e.g. when verifying the x86/PMU KVM changes.
+Existing unit tests do not cover AMD pmu, nor Intel pmu that is not
+architecture (on some obsolete cpu's). AMD's PMU support will be
+coming in subsequent commits.
 
 Signed-off-by: Like Xu <likexu@tencent.com>
-Reviewed-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/unittests.cfg | 2 ++
- 1 file changed, 2 insertions(+)
+ x86/pmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index ed65185..07d0507 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -189,6 +189,7 @@ file = pmu.flat
- extra_params = -cpu max
- check = /proc/sys/kernel/nmi_watchdog=0
- accel = kvm
-+groups = pmu
+diff --git a/x86/pmu.c b/x86/pmu.c
+index bb6e97e..15572e3 100644
+--- a/x86/pmu.c
++++ b/x86/pmu.c
+@@ -658,7 +658,7 @@ int main(int ac, char **av)
+ 	buf = malloc(N*64);
  
- [pmu_lbr]
- arch = x86_64
-@@ -197,6 +198,7 @@ extra_params = -cpu host,migratable=no
- check = /sys/module/kvm/parameters/ignore_msrs=N
- check = /proc/sys/kernel/nmi_watchdog=0
- accel = kvm
-+groups = pmu
+ 	if (!pmu_version()) {
+-		report_skip("No pmu is detected!");
++		report_skip("No Intel Arch PMU is detected!");
+ 		return report_summary();
+ 	}
  
- [vmware_backdoors]
- file = vmware_backdoors.flat
 -- 
 2.38.1
 
