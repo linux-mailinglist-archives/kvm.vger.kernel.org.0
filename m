@@ -2,116 +2,221 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8501460B6D7
-	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 21:12:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BA6B460B7ED
+	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 21:37:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233039AbiJXTMM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 15:12:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48972 "EHLO
+        id S233340AbiJXThQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Oct 2022 15:37:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231951AbiJXTLo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Oct 2022 15:11:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3FAB36792
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 10:50:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666633735;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:mime-version:mime-version:
-         content-type:content-type:  content-transfer-encoding:content-transfer-encoding;
-        bh=E8U2lwzte2ArrE93NNq5YpgdgKlqmYf52lAguACgFO8=;
-        b=aRAsLjTNaJGEVf6oghdlTI4QjUtlHUJsaFGibeOVV/NuNSbAuez8K3sWCiDMD9MgHSPQrQ
-        zh105NtoMMnnUdZJ7rZ7g0N813tzYUKxsOW75j6OhsiSVWAwgsXeUJiieBMErk+dg/ZG/Z
-        w64LwNhllFYFPBHFns4lwzSvdzEqB64=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-462-kP9gy9QmP62q5UMBLctK0w-1; Mon, 24 Oct 2022 13:48:54 -0400
-X-MC-Unique: kP9gy9QmP62q5UMBLctK0w-1
-Received: by mail-wr1-f72.google.com with SMTP id n13-20020adf8b0d000000b0023658a75751so3062799wra.23
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 10:48:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:reply-to
-         :user-agent:subject:to:from:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=E8U2lwzte2ArrE93NNq5YpgdgKlqmYf52lAguACgFO8=;
-        b=Yw6jlzXP5RcBYOrMWAPYDPY0TFIzJNFUm+faBk4TE/86//WrbKZRjxdQ4GP1B7FSNC
-         1EkEnZl6ttdRU9JacG7BycNzEd32Me8buq5awZB1s2/JHE88EH9sIZQm5y+NhXD1vRyX
-         MKGhNifKcHJbhkYSodf1ZVZfylK3ONeb3sjno167LRC9HurtpmlNlS9t4KnIdfMO8ARO
-         S62Z5Kalm8bB8gtRBlQW/wpHVh6E5zBAM93cRZ4WWzPvh2iRgzFAH3H6Sh0gzot2PUDx
-         0i1ZqeCN9A5W+s0osvh/UKetNfRtT03dmCL4v1VjnH9iSssNrSN5+b1dBiyOwlt/res4
-         5aCw==
-X-Gm-Message-State: ACrzQf3VHoOCsFcxPQ9xYIAszA96mKE+RtmEogPW+5ogP/wXGB+wvHSR
-        tlrPpMG+aodorno44saSGT7RDPAXgilj9FucQ53wp/TrdZQdCSele+MY2IxPAdeaMurDJ/zyw4W
-        9vhNst/7e2aOnSZEe7NXzp47SXrwSq9JkR9ZGWXTv928/liytZXT42dzP3reXcjjl
-X-Received: by 2002:a05:600c:1616:b0:3cd:f079:e34a with SMTP id m22-20020a05600c161600b003cdf079e34amr5691052wmn.11.1666633732772;
-        Mon, 24 Oct 2022 10:48:52 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM6VUFD1ubAUWM5rvcmZeECVQ2fG/57AQF6qClJnt6APdhHCkm5ct9f3+wtxhJ2SYgP5uKxaVw==
-X-Received: by 2002:a05:600c:1616:b0:3cd:f079:e34a with SMTP id m22-20020a05600c161600b003cdf079e34amr5691041wmn.11.1666633732548;
-        Mon, 24 Oct 2022 10:48:52 -0700 (PDT)
-Received: from localhost (static-28-206-230-77.ipcom.comunitel.net. [77.230.206.28])
-        by smtp.gmail.com with ESMTPSA id e12-20020adfdbcc000000b002258235bda3sm246170wrj.61.2022.10.24.10.48.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Oct 2022 10:48:38 -0700 (PDT)
-From:   Juan Quintela <quintela@redhat.com>
-To:     kvm-devel <kvm@vger.kernel.org>, qemu-devel@nongnu.org,
-        Adam Williamson <awilliam@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: (Extra) KVM call for 2022-10-25
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.1 (gnu/linux)
-Reply-To: quintela@redhat.com
-Date:   Mon, 24 Oct 2022 19:48:29 +0200
-Message-ID: <87a65l9kpe.fsf@secure.mitica>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S233369AbiJXTg4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Oct 2022 15:36:56 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A42D25F1EB
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 11:07:10 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BF9DB6151D
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 18:05:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31E20C433C1;
+        Mon, 24 Oct 2022 18:05:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1666634715;
+        bh=B+c2N65DjkDMDGVo0eOlt+EOtgjk3znwuz//Nw5771g=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=lhR3syt4caWU8SMSSHvNdWWxn7AX82aUmCSuRKonW2VOVrFD5aAJ3iE3fnC3DDi60
+         MUoYqEX2Yd3oiacBtT8LDeWRgpVw4KgQkMXUkVh7Osw77Ae8AEkmCJ7ehnKasd1m2X
+         hPBJkNavDj4C0WAp/vhdil05E+vR9AnY690OmJJgKwFaLszcaYH5K/KLvfpFkg8rp8
+         5x4vAZSqwU2JeanQnX7y0hG+M1HLrgS7QsgFktUsYZ7B0GXC61iSTZzSKnXQ+32pXN
+         04JPceDn41Zpws9O5EAlnUPNnRe59TlEtiQkKkJGdtc1RakEu+6+X5eSAEKZAqq00K
+         4RgJ2AsQ81vkw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1on1p2-001IHZ-Rb;
+        Mon, 24 Oct 2022 19:05:13 +0100
+Date:   Mon, 24 Oct 2022 19:05:12 +0100
+Message-ID: <86y1t5m71j.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH 0/9] KVM: arm64: PMU: Fixing chained events, and PMUv3p5 support
+In-Reply-To: <YvbZ+OnPTjvIYbUz@google.com>
+References: <20220805135813.2102034-1-maz@kernel.org>
+        <YvP8/m9uDI2PcyoP@google.com>
+        <YvQIIWnUkCGl9Ltp@google.com>
+        <YvQpN3SYePyTw13z@google.com>
+        <87lervuefe.wl-maz@kernel.org>
+        <YvbZ+OnPTjvIYbUz@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ricarkol@google.com, oliver.upton@linux.dev, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Ricardo,
 
-Hi
+On Fri, 12 Aug 2022 23:53:44 +0100,
+Ricardo Koller <ricarkol@google.com> wrote:
+> 
+> On Thu, Aug 11, 2022 at 01:56:21PM +0100, Marc Zyngier wrote:
+> > On Wed, 10 Aug 2022 22:55:03 +0100,
+> > Ricardo Koller <ricarkol@google.com> wrote:
+> > > 
+> > > Just realized that KVM does not offer PMUv3p5 (with this series applied)
+> > > when the real hardware is only Armv8.2 (the setup I originally tried).
+> > > So, tried these other two setups on the fast model:
+> > > 
+> > > has_arm_v8-5=1
+> > > 
+> > > 	# ./lkvm-static run --nodefaults --pmu pmu.flat -p pmu-chained-sw-incr
+> > > 	# lkvm run -k pmu.flat -m 704 -c 8 --name guest-135
+> > > 
+> > > 	INFO: PMU version: 0x6
+> > >                            ^^^
+> > >                            PMUv3 for Armv8.5
+> > > 	INFO: PMU implementer/ID code: 0x41("A")/0
+> > > 	INFO: Implements 8 event counters
+> > > 	FAIL: pmu: pmu-chained-sw-incr: overflow and chain counter incremented after 100 SW_INCR/CHAIN
+> > > 	INFO: pmu: pmu-chained-sw-incr: overflow=0x0, #0=4294967380 #1=0
+> > >                                                  ^^^
+> > >                                                  no overflows
+> > > 	FAIL: pmu: pmu-chained-sw-incr: expected overflows and values after 100 SW_INCR/CHAIN
+> > > 	INFO: pmu: pmu-chained-sw-incr: overflow=0x0, #0=84 #1=-1
+> > > 	INFO: pmu: pmu-chained-sw-incr: overflow=0x0, #0=4294967380 #1=4294967295
+> > > 	SUMMARY: 2 tests, 2 unexpected failures
+> > 
+> > Hmm. I think I see what's wrong. In kvm_pmu_create_perf_event(), we
+> > have this:
+> > 
+> > 	if (kvm_pmu_idx_is_64bit(vcpu, select_idx))
+> > 		attr.config1 |= 1;
+> > 
+> > 	counter = kvm_pmu_get_counter_value(vcpu, select_idx);
+> > 
+> > 	/* The initial sample period (overflow count) of an event. */
+> > 	if (kvm_pmu_idx_has_64bit_overflow(vcpu, select_idx))
+> > 		attr.sample_period = (-counter) & GENMASK(63, 0);
+> > 	else
+> > 		attr.sample_period = (-counter) & GENMASK(31, 0);
+> > 
+> > but the initial sampling period shouldn't be based on the *guest*
+> > counter overflow. It really is about the getting to an overflow on the
+> > *host*, so the initial code was correct, and only the width of the
+> > counter matters here.
+> 
+> Right, I think this requires bringing back some of the chained related
+> code (like update_pmc_chained() and pmc_is_chained()), because
+> 
+> 	attr.sample_period = (-counter) & GENMASK(31, 0);
+> 
+> should also be used when the counter is chained.
 
-As discussed on last week KVM call, we repeate this Tuesday to
-continue talking about vfio migration. So far we need to discuss:
+Almost, but not quite. I came up with the following hack (not
+everything is relevant, but you'll get my drift):
 
-- My RFC series, if they are enough for vfio devices (i.e. they are able
-  to get a cheap call to calculate the size of the device state)
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index 9f29212e8fcd..6470a42e981d 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -450,6 +450,9 @@ static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
+ 			reg = lower_32_bits(reg);
+ 		__vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = reg;
+ 
++		if (!kvm_pmu_idx_has_64bit_overflow(vcpu, i))
++			reg = lower_32_bits(reg);
++
+ 		if (reg) /* No overflow? move on */
+ 			continue;
+ 
+@@ -483,7 +486,7 @@ static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
+ 	 */
+ 	period = -(local64_read(&perf_event->count));
+ 
+-	if (!kvm_pmu_idx_has_64bit_overflow(vcpu, pmc->idx))
++	if (!kvm_pmu_idx_is_64bit(vcpu, pmc->idx))
+ 		period &= GENMASK(31, 0);
+ 
+ 	local64_set(&perf_event->hw.period_left, 0);
+@@ -605,17 +608,24 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+ 	attr.exclude_host = 1; /* Don't count host events */
+ 	attr.config = eventsel;
+ 
+-	/* If counting a 64bit event, advertise it to the perf code */
+-	if (kvm_pmu_idx_is_64bit(vcpu, select_idx))
+-		attr.config1 |= 1;
+-
+ 	counter = kvm_pmu_get_counter_value(vcpu, select_idx);
+ 
+-	/* The initial sample period (overflow count) of an event. */
+-	if (kvm_pmu_idx_has_64bit_overflow(vcpu, select_idx))
+-		attr.sample_period = (-counter) & GENMASK(63, 0);
+-	else
++	/*
++	 * If counting with a 64bit counter, advertise it to the perf
++	 * code, carefully dealing with the initial sample period
++	 * which also depends on the overflow.
++	 */
++	if (kvm_pmu_idx_is_64bit(vcpu, select_idx)) {
++		attr.config1 |= 1;
++
++		if (!kvm_pmu_idx_has_64bit_overflow(vcpu, select_idx)) {
++			attr.sample_period = -(counter & GENMASK(31, 0));
++		} else {
++			attr.sample_period = (-counter) & GENMASK(63, 0);
++		}
++	} else {
+ 		attr.sample_period = (-counter) & GENMASK(31, 0);
++	}
+ 
+ 	event = perf_event_create_kernel_counter(&attr, -1, current,
+ 						 kvm_pmu_perf_overflow, pmc);
 
-- My (not yet s ent) way of sending data through new channels. I lost
-  the calendar entry for all calls during this years.
 
-KVM developers conference call
-Tuesday 2022-10-25 =E2=8B=85 15:00 =E2=80=93 16:00 Central European Time - =
-Madrid
+With this, I'm back in business (in QEMU, as I *still* cannot get ARM
+to give me a model that runs natively on arm64...):
 
-Location: http://bluejeans.com/quintela
+root@debian:~/kvm-unit-tests# ../kvmtool/lkvm run --nodefaults --pmu --firmware arm/pmu.flat -p pmu-chained-sw-incr
+  # lkvm run --firmware arm/pmu.flat -m 448 -c 4 --name guest-400
+  Info: Removed ghost socket file "/root/.lkvm//guest-400.sock".
+WARNING: early print support may not work. Found uart at 0x1000000, but early base is 0x9000000.
+INFO: PMU version: 0x6
+INFO: PMU implementer/ID code: 0x41("A")/0x1
+INFO: Implements 6 event counters
+FAIL: pmu: pmu-chained-sw-incr: no overflow and chain counter incremented after 100 SW_INCR/CHAIN
+INFO: pmu: pmu-chained-sw-incr: overflow=0x1, #0=4294967380 #1=1
+FAIL: pmu: pmu-chained-sw-incr: overflow on chain counter and expected values after 100 SW_INCR/CHAIN
+INFO: pmu: pmu-chained-sw-incr: overflow=0x3, #0=4294967380 #1=4294967296
+SUMMARY: 2 tests, 2 unexpected failures
 
-If you need call details or want to be on the calendar entry, please contac=
-t me: quintela@redhat.com
+The tests themselves need some extra love to account for the fact that
+the counters are always 64bit irrespective of the overflow, but at
+least I'm now correctly seeing the odd counter incrementing.
 
-url:
-https://calendar.google.com/calendar/event?action=3DTEMPLATE&tmeid=3DNWpzcz=
-hmMThzY29tNDJwY3I3dmEzbzE3cjcgZWdlZDdja2kwNWxtdTF0bmd2a2wzdGhpZHNAZw&tmsrc=
-=3Deged7cki05lmu1tngvkl3thids%40group.calendar.google.com
+I'll try to continue addressing the comments tomorrow.
 
-Later, Juan.
+Thanks,
 
-PD. The conference is on: https://bluejeans.com/quintela google calendar
-decides that it is a good idea to add a google link entry by
-default. I think that I removed it this time (who knows).
+	M.
 
-PD2: The entry should be public, if you can't access, just let me know
-     to figure it out what is going on.
-
-PD3: No, I have no clue how to convince google calendar to let someone
-     that is not logged somehow on gmail to show the entry.  I tried to
-     put it public everywhere.
-
+-- 
+Without deviation from the norm, progress is not possible.
