@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 869F760A1FF
-	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 13:38:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A86F960A207
+	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 13:38:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230452AbiJXLiH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 07:38:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50412 "EHLO
+        id S230472AbiJXLi0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Oct 2022 07:38:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230397AbiJXLhp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230475AbiJXLhp (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 24 Oct 2022 07:37:45 -0400
 Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF09263AC;
-        Mon, 24 Oct 2022 04:37:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07BA13ECF9;
+        Mon, 24 Oct 2022 04:37:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666611452; x=1698147452;
+  t=1666611454; x=1698147454;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=DB1bYR1A7NeiADV6itewTi7E2/TdqRod02cjfT4etd0=;
-  b=WrOgQsMIS3pkJnbunaNVVDYbr44SrfyC70DZPCvFsz/DBSfgOI/z2qiF
-   TsXaiQnySQfxYtKwU8lNN46MWAKSnCQPCcv45usw8MQr86bm+NWJema+v
-   2OB6sVu1jnyPYJq2q2Vgk7U1WtWeJlzw2yHk9jdIoFYb2krErdQwwUGk9
-   7X++9cInskc5/1KL4zwo3FP77Vc94aIhnM1XuFIHXUTO9kcM3iV4HhzYm
-   vLtJyWi4iqgfnq6ihX0YVNz00c7d1Cx/TjkxBXekeJALy6mJjXjxMABvr
-   ENJtXeh7JaXYXvQ6Rzft5x/2iM9SpOyqoZBe0JUVw3+4v+UirH6JWyfog
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10509"; a="369462433"
+  bh=/8kRGW6jheanoEsx0SN1Z08oqwhwoihZSgoeWklWb5s=;
+  b=g9vWJ4ItRESk1S8Gdme3JEU+CmkNT0pcy72yxr4g58H5nKWoCWvkRh8Z
+   CJZOdz9oCyU8Zum1wtMHuHIihHjVt5Ns09h3DspA7q0xzYTor11kl/6/7
+   3gIq7Ho44qgQAYe8O7DbsEXyRxIOobv7DEFTtLgaHbeHccTndkMcUz4yp
+   Iyaq0ugxQ2eWQlditiIzDrpQpEATbDNilrtYVOmijvYjvLIQ0+9SluN2K
+   2Kh2oTSBGdc8Y+48U79IJKL87W4hBhEO0AtLD6Oluv7Jpp+dW71SZMHqT
+   3BAhePG2vixWNZ+PPppHPn++4WPqlF23/BVbhdq3GbRikteqsBXLl79f5
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10509"; a="369462439"
 X-IronPort-AV: E=Sophos;i="5.95,209,1661842800"; 
-   d="scan'208";a="369462433"
+   d="scan'208";a="369462439"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2022 04:35:10 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2022 04:35:12 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10509"; a="773784858"
+X-IronPort-AV: E=McAfee;i="6500,9779,10509"; a="773784910"
 X-IronPort-AV: E=Sophos;i="5.95,209,1661842800"; 
-   d="scan'208";a="773784858"
+   d="scan'208";a="773784910"
 Received: from tdx-lm.sh.intel.com ([10.239.53.27])
-  by fmsmga001.fm.intel.com with ESMTP; 24 Oct 2022 04:35:08 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 24 Oct 2022 04:35:10 -0700
 From:   Wei Wang <wei.w.wang@intel.com>
 To:     seanjc@google.com, pbonzini@redhat.com
 Cc:     dmatlack@google.com, vipinsh@google.com, ajones@ventanamicro.com,
         eric.auger@redhat.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Wei Wang <wei.w.wang@intel.com>
-Subject: [PATCH v1 08/18] KVM: selftests/set_memory_region_test: vcpu related code consolidation
-Date:   Mon, 24 Oct 2022 19:34:35 +0800
-Message-Id: <20221024113445.1022147-9-wei.w.wang@intel.com>
+Subject: [PATCH v1 09/18] KVM: selftests/steal_time: vcpu related code consolidation and cleanup
+Date:   Mon, 24 Oct 2022 19:34:36 +0800
+Message-Id: <20221024113445.1022147-10-wei.w.wang@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20221024113445.1022147-1-wei.w.wang@intel.com>
 References: <20221024113445.1022147-1-wei.w.wang@intel.com>
@@ -60,93 +60,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove the unnecessary vcpu_thread definition and remove it from the
-related funtions' input as it can be referenced from the kvm_vcpu
-struct. Also use the helper functinos to create and join the vcpu thread.
+Remove the unnecessary definition of array of the vcpu pointers and
+re-use the one from the kvm_vm struct (i.e. vm->vcpus[]). Use the helper
+function to create the time stealing thread with name.
+
+Also add a check of the pthread_join return value.
 
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 ---
- .../selftests/kvm/set_memory_region_test.c       | 16 ++++++----------
- 1 file changed, 6 insertions(+), 10 deletions(-)
+ tools/testing/selftests/kvm/steal_time.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
-index 0d55f508d595..d233668957da 100644
---- a/tools/testing/selftests/kvm/set_memory_region_test.c
-+++ b/tools/testing/selftests/kvm/set_memory_region_test.c
-@@ -1,7 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0
- #define _GNU_SOURCE /* for program_invocation_short_name */
- #include <fcntl.h>
--#include <pthread.h>
+diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+index db8967f1a17b..857ed2c073fc 100644
+--- a/tools/testing/selftests/kvm/steal_time.c
++++ b/tools/testing/selftests/kvm/steal_time.c
+@@ -8,7 +8,6 @@
+ #include <stdio.h>
+ #include <time.h>
  #include <sched.h>
- #include <semaphore.h>
- #include <signal.h>
-@@ -108,8 +107,7 @@ static void wait_for_vcpu(void)
- 	usleep(100000);
- }
+-#include <pthread.h>
+ #include <linux/kernel.h>
+ #include <asm/kvm.h>
+ #include <asm/kvm_para.h>
+@@ -241,7 +240,7 @@ static void run_vcpu(struct kvm_vcpu *vcpu)
  
--static struct kvm_vm *spawn_vm(struct kvm_vcpu **vcpu, pthread_t *vcpu_thread,
--			       void *guest_code)
-+static struct kvm_vm *spawn_vm(struct kvm_vcpu **vcpu, void *guest_code)
+ int main(int ac, char **av)
  {
+-	struct kvm_vcpu *vcpus[NR_VCPUS];
++	struct kvm_vcpu **vcpus;
  	struct kvm_vm *vm;
- 	uint64_t *hva;
-@@ -134,7 +132,7 @@ static struct kvm_vm *spawn_vm(struct kvm_vcpu **vcpu, pthread_t *vcpu_thread,
- 	hva = addr_gpa2hva(vm, MEM_REGION_GPA);
- 	memset(hva, 0, 2 * 4096);
+ 	pthread_attr_t attr;
+ 	pthread_t thread;
+@@ -250,7 +249,7 @@ int main(int ac, char **av)
+ 	long stolen_time;
+ 	long run_delay;
+ 	bool verbose;
+-	int i;
++	int i, r;
  
--	pthread_create(vcpu_thread, NULL, vcpu_worker, *vcpu);
-+	vm_vcpu_threads_create(vm, vcpu_worker, 0);
+ 	verbose = ac > 1 && (!strncmp(av[1], "-v", 3) || !strncmp(av[1], "--verbose", 10));
  
- 	/* Ensure the guest thread is spun up. */
- 	wait_for_vcpu();
-@@ -175,12 +173,11 @@ static void guest_code_move_memory_region(void)
+@@ -262,7 +261,8 @@ int main(int ac, char **av)
+ 	pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
  
- static void test_move_memory_region(void)
- {
--	pthread_t vcpu_thread;
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_vm *vm;
- 	uint64_t *hva;
+ 	/* Create a VM and an identity mapped memslot for the steal time structure */
+-	vm = vm_create_with_vcpus(NR_VCPUS, guest_code, vcpus);
++	vm = vm_create_with_vcpus(NR_VCPUS, guest_code, NULL);
++	vcpus = vm->vcpus;
+ 	gpages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, STEAL_TIME_SIZE * NR_VCPUS);
+ 	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, ST_GPA_BASE, 1, gpages, 0);
+ 	virt_map(vm, ST_GPA_BASE, ST_GPA_BASE, gpages);
+@@ -290,11 +290,14 @@ int main(int ac, char **av)
  
--	vm = spawn_vm(&vcpu, &vcpu_thread, guest_code_move_memory_region);
-+	vm = spawn_vm(&vcpu, guest_code_move_memory_region);
- 
- 	hva = addr_gpa2hva(vm, MEM_REGION_GPA);
- 
-@@ -211,7 +208,7 @@ static void test_move_memory_region(void)
- 	/* Defered sync from when the memslot was misaligned (above). */
- 	wait_for_vcpu();
- 
--	pthread_join(vcpu_thread, NULL);
-+	vm_vcpu_threads_join(vm);
- 
- 	kvm_vm_free(vm);
- }
-@@ -254,13 +251,12 @@ static void guest_code_delete_memory_region(void)
- 
- static void test_delete_memory_region(void)
- {
--	pthread_t vcpu_thread;
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_regs regs;
- 	struct kvm_run *run;
- 	struct kvm_vm *vm;
- 
--	vm = spawn_vm(&vcpu, &vcpu_thread, guest_code_delete_memory_region);
-+	vm = spawn_vm(&vcpu, guest_code_delete_memory_region);
- 
- 	/* Delete the memory region, the guest should not die. */
- 	vm_mem_region_delete(vm, MEM_REGION_SLOT);
-@@ -282,7 +278,7 @@ static void test_delete_memory_region(void)
- 	 */
- 	vm_mem_region_delete(vm, 0);
- 
--	pthread_join(vcpu_thread, NULL);
-+	vm_vcpu_threads_join(vm);
- 
- 	run = vcpu->run;
- 
+ 		/* Steal time from the VCPU. The steal time thread has the same CPU affinity as the VCPUs. */
+ 		run_delay = get_run_delay();
+-		pthread_create(&thread, &attr, do_steal_time, NULL);
++		__pthread_create_with_name(&thread, &attr,
++					   do_steal_time, NULL, "steal-time");
+ 		do
+ 			sched_yield();
+ 		while (get_run_delay() - run_delay < MIN_RUN_DELAY_NS);
+-		pthread_join(thread, NULL);
++		r = pthread_join(thread, NULL);
++		TEST_ASSERT(!r, "failed to join the time stealing thread");
++
+ 		run_delay = get_run_delay() - run_delay;
+ 		TEST_ASSERT(run_delay >= MIN_RUN_DELAY_NS,
+ 			    "Expected run_delay >= %ld, got %ld",
 -- 
 2.27.0
 
