@@ -2,122 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B6F160B4B6
-	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 20:01:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAE4C60B7AE
+	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 21:30:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231706AbiJXSBo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 14:01:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40518 "EHLO
+        id S231574AbiJXTap (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Oct 2022 15:30:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232537AbiJXSAr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Oct 2022 14:00:47 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2083.outbound.protection.outlook.com [40.107.223.83])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA9C21AC1F9;
-        Mon, 24 Oct 2022 09:41:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bvODampSzGN2zGYVn/vUP9tylHUPzvxzytGy6bpl4Q0fKJW0gWj/9pGH2mDi7ctuyup1rgv+ZOiMiIPeMJY/qVh3H1Qa8E82VLk0lGsIIv+2+yu2k3XbL1d9JPrrB7E1vK6pEzSnw3Lmb4RNV6YOmFx0VPf7+b2ySW90TkczADamJTQ5R+LJ4u4TdIKChLyVm4FuRd5AmdEc0RpqYTdYGcwEqSunBNzGf+CaLWUBsbRuiUOvQLj4xcvV/q5I0EitbwCELbQexZvZypxcu5PFC9wBSJ5WWo5qvfcB4SC3/YyOyJT39FP2yqH+Uo4dbDlvtVu5WznsSavLI3doSAqFqA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2xSnzXcofB1PXgLdyTraaOZcbIPkV/2SQPjXR8/Q5P0=;
- b=EAoBvfTncwR834flBbfAYlANdm7N8+Kbe2aiOUCq4D2gPwOH+92jUqxf4ibgVFM5C6vgs7Aun4RP5Z1/pKba6LW5Lr0DYgbWXvCMWL30V0QHn3/b1WR393fJPfmyUtRxEBlCgdhwTdWjs0QBZPgNAdlGjXhmscC2lrixev7iA8FQZypdIxNjz+3KRJs0NSU5tX+OAJRqZvH1bF+reGLdIjthcsIIXP0fK73gtzH0t6gnxE1TCbhVHNX5wLFys+3fQBRZy6IPO2kHXHFpcQd7eqeHuwo7sItnwZRsnvJ0fe75WsLfjRwPCUlISQ6OGscsxa2QYuN/zBwYVHBgdx/CMg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2xSnzXcofB1PXgLdyTraaOZcbIPkV/2SQPjXR8/Q5P0=;
- b=3AUyvywnSsJalN5naJJc+L9oFwhDcU7qoKa0PdHml6u1b1ifZgezRp14BHRezzlJX5sW8AWxkwJ7tqYKsWCue6geBVnt1maDCZBt38xHyDbQuoylxBDiEX5fW4zizMCT2YZbTrtoDbOOFT2jpT+UjzKVymW8zg9US/Jtw71NdDQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL1PR12MB5995.namprd12.prod.outlook.com (2603:10b6:208:39b::20)
- by DM6PR12MB4203.namprd12.prod.outlook.com (2603:10b6:5:21f::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5746.23; Mon, 24 Oct
- 2022 16:23:47 +0000
-Received: from BL1PR12MB5995.namprd12.prod.outlook.com
- ([fe80::9e7d:6fa5:ddb4:986f]) by BL1PR12MB5995.namprd12.prod.outlook.com
- ([fe80::9e7d:6fa5:ddb4:986f%6]) with mapi id 15.20.5723.033; Mon, 24 Oct 2022
- 16:23:47 +0000
-Message-ID: <8c6a359c-0d8f-b524-984e-bc01be1866d6@amd.com>
-Date:   Mon, 24 Oct 2022 11:23:43 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.3
-Subject: Re: [RFC PATCH] x86/sev-es: Include XSS value in GHCB CPUID request
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, weijiang.yang@intel.com,
-        rick.p.edgecombe@intel.com, x86@kernel.org, thomas.lendacky@amd.com
-References: <20221012204716.204904-1-john.allen@amd.com>
- <Y0nGGeCK+/FPOZej@google.com>
-Content-Language: en-US
-From:   John Allen <John.Allen@amd.com>
-In-Reply-To: <Y0nGGeCK+/FPOZej@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR05CA0167.namprd05.prod.outlook.com
- (2603:10b6:a03:339::22) To BL1PR12MB5995.namprd12.prod.outlook.com
- (2603:10b6:208:39b::20)
+        with ESMTP id S233791AbiJXTaB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Oct 2022 15:30:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19BEA181C97
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 11:01:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666634411;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=phB/V5Y6/oBzz6XswfD29phsIzdRUAcXANgXmuPf+yM=;
+        b=TInasE7hPCqdtavyfZHIGgQ4TgisEFPqzUIXh2jQI3QsFRiq1BRevUPPoi4pkL1z0BjfBZ
+        vlx4qPkQrFmPhOLW3xZeMvNuy3NU6NINL9XDXTLHs85sC4p/k5X7YR1c51m/XqlZoU1QvY
+        4ZX6QFj/u8eRlF9B2sxw1Jj5FEPsWEY=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-335-bh2cwjKgNV648msVqavFZQ-1; Mon, 24 Oct 2022 08:32:31 -0400
+X-MC-Unique: bh2cwjKgNV648msVqavFZQ-1
+Received: by mail-qv1-f70.google.com with SMTP id h1-20020a0ceda1000000b004b899df67a4so5101223qvr.1
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 05:32:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=phB/V5Y6/oBzz6XswfD29phsIzdRUAcXANgXmuPf+yM=;
+        b=4VVx88eINGu5DUXoFDcmWRGXXCDxuFlko5DRxcwJq4frbVJlGokXlGCK54wxbePUiK
+         R6chRdsr1puvKCvXMiZo0i8lQZRlEOPygoEHe+aRSMuRhR2kW32RBEIFKejtA09A2FzQ
+         s98rZN6JJvTkvqK3xPsv9j2tUH/RK+MaYvGB0+/C8Pl3acnRR5og/RzCS57yBlsCoyrp
+         EZtFrttELjkc3BmcWoYjulKDP15IMmYMN2MTVlIR+AGmJLaMBcsxJGvmAVjedt2gbXiG
+         7xiIJygs3jen4Pgahwer1ygCePBdeUX7hJJtMFbVrWGIg1fmzQJNzVGRJiDsOBSidazu
+         Lyew==
+X-Gm-Message-State: ACrzQf1cOJgQXMcYNruQBzUtDgqUKkO4TOMEOBz7odq/zyg2MGP9SQj1
+        s2HgjGnsBzQHUdrLMX0af+BtLvk3ESKEWn/nMV8qHaz5C2N9b/BVGKeQbupeizuUzgtGc68qOP8
+        jkUSftNh9WJZS
+X-Received: by 2002:a05:622a:15cd:b0:39d:1b71:efc6 with SMTP id d13-20020a05622a15cd00b0039d1b71efc6mr15541494qty.225.1666614749965;
+        Mon, 24 Oct 2022 05:32:29 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4xcfsuedgCI7adWCYVVmtxmkRDc0Uys9vABJ9766173g8so0xwwwY1i50fWSmi7cOfV2AYtA==
+X-Received: by 2002:a05:622a:15cd:b0:39d:1b71:efc6 with SMTP id d13-20020a05622a15cd00b0039d1b71efc6mr15541464qty.225.1666614749552;
+        Mon, 24 Oct 2022 05:32:29 -0700 (PDT)
+Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
+        by smtp.gmail.com with ESMTPSA id f3-20020a05620a408300b006ce515196a7sm15072472qko.8.2022.10.24.05.32.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Oct 2022 05:32:29 -0700 (PDT)
+Message-ID: <75f70eb0daa03553671925e2daa95cdc5b83963c.camel@redhat.com>
+Subject: Re: [PATCH v2 4/8] KVM: x86: do not go through ctxt->ops when
+ emulating rsm
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, maciej.szmigiero@oracle.com
+Date:   Mon, 24 Oct 2022 15:32:26 +0300
+In-Reply-To: <20220929172016.319443-5-pbonzini@redhat.com>
+References: <20220929172016.319443-1-pbonzini@redhat.com>
+         <20220929172016.319443-5-pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5995:EE_|DM6PR12MB4203:EE_
-X-MS-Office365-Filtering-Correlation-Id: 74072910-9343-4482-1b14-08dab5dc20a3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: hUsyMr5+ocf20jD9pmuye+xQYOf5VP0ZmKX8kEOvaqHVy04HWDh5yjZqrgqZYRQVqCyCzRnZHMaM1Pb2pqoxxZiFMRanX+6Gc6Vh2cpI/cAvGamZCo1kcxBoe4bu/W0A8YAYmz+FA5nM+FFAHt3yR1+Y9zzpC2zH1eoBLulbDkDZ0+aB1Aq8UQ1Ddt3sGtvGBRWJKMuL6HxqXLtjkIVMtj9tCfCJ/pzLUu7KYPOUPdIdfliVWzsoDoAgqRNKnf793G3dWT/t3FTxHDzawFtaYUyjlpjxeX8yROLybUNXLLFnWXRNeQBPzp6Qoqk1dbqJJdvIrFigel3j2Pr9/ak4Hi9he/X3YdO7sPWfuY4SrKMB3h34mmwwatmZsze1qzttCexAuV18HnsuNwf3cd//rN9agJBR67sdwQ/mIEUtEOOzToNaN3KeLcGxUVS1fVeIhhjS5jG3S4FGxz50wT4Nz9yTKio5X8D5LmtkWYIwNBuSuxFVxA5c0JIDTD1tyTdJsS11VW5P3WMdeXwD+MZuVwqhpfBiTxXY16fbAQFVkQwivxszwKS2qRpvvA1Qdm+yOu8wtrWwswI5+qloKGYf3BIhjPLDJa8534xnknlG7r7PqGeY2Tb2DxX7f5GYo4qHTs8zE6TnR4NsemSGhFmgZ2B4/UqrRm+si6SlFP3dvmTreaKIwB9+6T+RfQ1hGASAhDZ3nGuKXsIoNyrGv0M3jNLmCNHscOzaTrqMW2rXNtOX0/S+E4NHmx2YqrYFZti/QcauUv3W41DnOHLK3Ig9OaZguTF+WmVtU+SYsXTLXr8HpkvuXqQUx/1s1NOIGB73
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5995.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(376002)(39860400002)(366004)(136003)(346002)(451199015)(6916009)(41300700001)(38100700002)(8936002)(478600001)(6486002)(83380400001)(5660300002)(36756003)(2906002)(66556008)(66946007)(8676002)(316002)(66476007)(4326008)(966005)(6512007)(186003)(2616005)(31686004)(45080400002)(6666004)(31696002)(86362001)(26005)(6506007)(53546011)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Sk5ZS3B4aUR4RGJEaEF2T08vYjFjWXR4ODh5bzBVTEg0QWZOM2JqMWd3ald2?=
- =?utf-8?B?bkpTSUhaeVZjelk1T0pkZSsycm9VcWRwYTd6K1ovTVdzODVaTHYyV0xyNzVW?=
- =?utf-8?B?Zmc2MDZUQVh6MnI2bHQzbGNFS2UrNFA2YzIwUml4THE4NE5nUVEvWHVWa2pP?=
- =?utf-8?B?enlhcUZDQ0d3Y1M4RjlPeE1LTVRKNVZ3UGFyMmI5YU1PbENnUkVxVTAxaWJB?=
- =?utf-8?B?OHJsTEdnOTlMM2F4VnhZeGluZ0l3UzlzdWdCM3FXUmpCZmpZcm56M3RkcGpn?=
- =?utf-8?B?MHBLUG5BRU9ES295eXFxdW5sNUdMWU5NdGZBUThGR2RERVkxLzdaamRCb2da?=
- =?utf-8?B?OCtBZVRwU29Na1kvdS9ncVJkZmo3VlMxVU5NOG13R0M1MStkZkc2OUVVbE1S?=
- =?utf-8?B?TVpNbGdoeEVXWW9QUmpsd2l1VFhwZGJVSDcyTVgrR2NNM2sxaXc4RUU1c3ZO?=
- =?utf-8?B?QVNQazlXTytCYTQvSUZTZXAveFhRVmZXUkdzdG9uUE9wWVRmTitiV3Z1eFQz?=
- =?utf-8?B?bVpMd2JJclRsdThJKzRUSEsvN2UzU0F3K1dydXF5SStmMTJrdmJhU0VOTmVa?=
- =?utf-8?B?RzlEdlo4ejNHYWptU05wYWdnd2ZBN0Z0YURzVnhUVWlrd05mRWt1U3RQbldF?=
- =?utf-8?B?RUdYOGdVdmM0dXVDUmF6ckt2Rk1KWU1EaFMwQXpFSXNDMXU3MS92SlpIZExN?=
- =?utf-8?B?dlFtNThJdTFPc0M4aU15Mm9KZlJpRTNRcWNNSDcrUzE3UWx5RFAyeVBkNzln?=
- =?utf-8?B?RThBR1N3NkFYdnJ1Vy9vWHZ1ZmVEbzJ3c1NlT1JhcEJIcGpIRjlyMkVIcjRz?=
- =?utf-8?B?Nk96QUtpUzNvdDBBOXZETW5BcEsyeHVqWmpnbWJqM1ZrZHIxSWtTMlA1NWJv?=
- =?utf-8?B?TGVtZFh2R2o0b1BJN3dnaENNcGZCZU9oS2JsdDRYZmNpWnlIWVJydHF4ZCti?=
- =?utf-8?B?M0FnZXlXWC8yR2xCTm5Fd3c3aW5QUWdKdnlTRW14MmpLSjNqZG15dWpqdWV0?=
- =?utf-8?B?YU9CY3VoMHNuVVVBR2Yvbk05RmVGQldUSmFOalhhejBuVWFkVlMvUldHVUdF?=
- =?utf-8?B?NVp3Nzh5SnN0L0NZK1dnNTN0TDZSUk1XZ3dxSWpEQmpTc0xOTDFQN2M4NEVa?=
- =?utf-8?B?T0pHaDJ3Q0NEeGlGZGZMNXVFUUFKNWlCektEWjZmQktrTC9POEtlZy9FdjZ1?=
- =?utf-8?B?dmJ5YTVuOTJFZktxOVRBVnBTOVZDcnU3c1dpR21LZkpRcW5FZHl0cXBQYnRz?=
- =?utf-8?B?azZBUzJOMmtWWFBpbVFKektyVXg0SmlSaDRTQTVoa09yd3dtUkhmRHp1ekgx?=
- =?utf-8?B?VFNDTkdWdmRVSmlEa3hITHhsOE5xalFPRENWOGpmMzdWWitSYzZ6cGNXN1Yy?=
- =?utf-8?B?QjhET2NhVDQrb3FpakR3OW00amFNNXdrZGtEMStMcjB1U2VWSHRlRUh6SnR3?=
- =?utf-8?B?OUtSUzBialEzYlNIT0RlU0ZWMUVGeC9henp5MEQ1eDlvMG4rUGpVTDgwZlRH?=
- =?utf-8?B?eUN1R2dTUll6Uk81eUJzakhzUGFsRG5QZ1h2UjNmc0FXd1pEOFBuSTBza0h0?=
- =?utf-8?B?K3gyMjZnNHVjMTBuWmIyRUxPR3dJOGgrYnkxVHk4WEhxTDMyei8ySFVsczk4?=
- =?utf-8?B?cjR6ZHlFSHNuTDQzNzVzUzlqcjhZeUxyUzJMNDdsVElnQ3VCSkNKUTlMckY4?=
- =?utf-8?B?UFVKS3ZxYkJEanN4VCtVN1ZEU1lGNjR3d2tVamRXT3pCZjdwNWlkNXkzSlFm?=
- =?utf-8?B?cVlIVkJsZGVKUXAyMTlRNkZRTi9nYitXTTJ4TDhlelJ3YzdrSWlzR2JtYUNa?=
- =?utf-8?B?bTFveS9WYkt6Ly9wUDdzSmRXc0RYWlRaUHJYV2QzS2p2Y3pGdllicU9yczEx?=
- =?utf-8?B?eGNhNkVFYVl5Y1BZeVJkSlU4RUJvaC94YlVxaFdrczU2aCtlVHhSNktvV1g0?=
- =?utf-8?B?QVdzTmUyNTVaZ1V5M3lCWlV3eDVnQTRHVVlNamlNOU9GMVB2dE93dnVObkpM?=
- =?utf-8?B?Q1BjS2hvTzdkY1JaUjJtMUZ1bklFc2E3R2Nac2VMSWNHNXlrRFZQL2tPU1lO?=
- =?utf-8?B?VGloUEExd3hQVVY4YmRobzRxY3pZT1hCemNNczhtYlpTTUtxQXp6cFptdXF6?=
- =?utf-8?Q?f5ttkKy0nvwrCY1Yu3seaXsja?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 74072910-9343-4482-1b14-08dab5dc20a3
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5995.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2022 16:23:47.3682
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: n8XOBiHeNIGh3gcETcOyk5lHvpHLUWP2H5cp09417d3B6uaR+cv4JjTvgY5pSIlfeRnpw0LPLsz/uKqPrzsOsg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4203
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -125,86 +80,504 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/14/2022 3:27 PM, Sean Christopherson wrote:
-> On Wed, Oct 12, 2022, John Allen wrote:
->> When a guest issues a cpuid instruction for Fn0000000D_x0B
->> (CetUserOffset), KVM will intercept and need to access the guest
+On Thu, 2022-09-29 at 13:20 -0400, Paolo Bonzini wrote:
+> Now that RSM is implemented in a single emulator callback, there is no
+> point in going through other callbacks for the sake of modifying
+> processor state.  Just invoke KVM's own internal functions directly,
+> and remove the callbacks that were only used by em_rsm; the only
+> substantial difference is in the handling of the segment registers
+> and descriptor cache, which have to be parsed into a struct kvm_segment
+> instead of a struct desc_struct.
 > 
-> s/KVM will/the hypervisor may
+> This also fixes a bug where emulator_set_segment was shifting the
+> limit left by 12 if the G bit is set, but the limit had not been
+> shifted right upon entry to SMM.
 > 
->> XSS value.
+> The emulator context is still used to restore EIP and the general
+> purpose registers.
 > 
-> Heh, "need" is debatable.
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/kvm_emulate.h |  13 ---
+>  arch/x86/kvm/smm.c         | 177 +++++++++++++++++--------------------
+>  arch/x86/kvm/x86.c         |  33 -------
+>  3 files changed, 81 insertions(+), 142 deletions(-)
 > 
->> For SEV-ES, this is encrypted and needs to be
->> included in the GHCB to be visible to the hypervisor. The rdmsr
->> instruction needs to be called directly as the code may be used in early
->> boot in which case the rdmsr wrappers should be avoided as they are
->> incompatible with the decompression boot phase.
->>
->> Signed-off-by: John Allen <john.allen@amd.com>
->> ---
->> This patch is logically part of the SVM guest shadow stack support series seen
->> here:
->> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fall%2F20221012203910.204793-1-john.allen%40amd.com%2F&amp;data=05%7C01%7Cjohn.allen%40amd.com%7C2ed48fc57d2247f809ed08daae227f2d%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638013760436182289%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=OIO3X5EQdTazOozvCHIF9E2tT%2B6aMqarmkA8o41wJ7M%3D&amp;reserved=0
->>
->> Sending this patch separately from the main series as it should apply to the
->> tip tree as opposed to the kvm tree as this patch is related to guest kernel
->> support.
->> ---
->>   arch/x86/kernel/sev-shared.c | 15 +++++++++++++++
->>   1 file changed, 15 insertions(+)
->>
->> diff --git a/arch/x86/kernel/sev-shared.c b/arch/x86/kernel/sev-shared.c
->> index 3a5b0c9c4fcc..34469fac03f0 100644
->> --- a/arch/x86/kernel/sev-shared.c
->> +++ b/arch/x86/kernel/sev-shared.c
->> @@ -887,6 +887,21 @@ static enum es_result vc_handle_cpuid(struct ghcb *ghcb,
->>   		/* xgetbv will cause #GP - use reset value for xcr0 */
->>   		ghcb_set_xcr0(ghcb, 1);
->>   
->> +	if (has_cpuflag(X86_FEATURE_SHSTK) && regs->ax == 0xd) {
-> 
-> IIRC, XCR0 and XSS are only needed for sub-leafs 0 and 1, i.e. this and the code
-> above don't need to expose XCR0/XSS to the host for ECX > 1.
-> 
-> FWIW, I think it's ridiculous that the guest willingly exposes state to the host,
-> it's not _that_ difficult to do the math in the guest.
+> diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
+> index d7afbc448dd2..84b1f2661463 100644
+> --- a/arch/x86/kvm/kvm_emulate.h
+> +++ b/arch/x86/kvm/kvm_emulate.h
+> @@ -116,16 +116,6 @@ struct x86_emulate_ops {
+>  			unsigned int bytes,
+>  			struct x86_exception *fault, bool system);
+>  
+> -	/*
+> -	 * read_phys: Read bytes of standard (non-emulated/special) memory.
+> -	 *            Used for descriptor reading.
+> -	 *  @addr:  [IN ] Physical address from which to read.
+> -	 *  @val:   [OUT] Value read from memory.
+> -	 *  @bytes: [IN ] Number of bytes to read from memory.
+> -	 */
+> -	int (*read_phys)(struct x86_emulate_ctxt *ctxt, unsigned long addr,
+> -			void *val, unsigned int bytes);
+> -
+>  	/*
+>  	 * write_std: Write bytes of standard (non-emulated/special) memory.
+>  	 *            Used for descriptor writing.
+> @@ -209,11 +199,8 @@ struct x86_emulate_ops {
+>  	int (*cpl)(struct x86_emulate_ctxt *ctxt);
+>  	void (*get_dr)(struct x86_emulate_ctxt *ctxt, int dr, ulong *dest);
+>  	int (*set_dr)(struct x86_emulate_ctxt *ctxt, int dr, ulong value);
+> -	u64 (*get_smbase)(struct x86_emulate_ctxt *ctxt);
+> -	void (*set_smbase)(struct x86_emulate_ctxt *ctxt, u64 smbase);
+>  	int (*set_msr_with_filter)(struct x86_emulate_ctxt *ctxt, u32 msr_index, u64 data);
+>  	int (*get_msr_with_filter)(struct x86_emulate_ctxt *ctxt, u32 msr_index, u64 *pdata);
+> -	int (*set_msr)(struct x86_emulate_ctxt *ctxt, u32 msr_index, u64 data);
+>  	int (*get_msr)(struct x86_emulate_ctxt *ctxt, u32 msr_index, u64 *pdata);
+>  	int (*check_pmc)(struct x86_emulate_ctxt *ctxt, u32 pmc);
+>  	int (*read_pmc)(struct x86_emulate_ctxt *ctxt, u32 pmc, u64 *pdata);
+> diff --git a/arch/x86/kvm/smm.c b/arch/x86/kvm/smm.c
+> index 773e07b6397d..41ca128478fc 100644
+> --- a/arch/x86/kvm/smm.c
+> +++ b/arch/x86/kvm/smm.c
+> @@ -271,71 +271,59 @@ void enter_smm(struct kvm_vcpu *vcpu)
+>  	kvm_mmu_reset_context(vcpu);
+>  }
+>  
+> -static int emulator_has_longmode(struct x86_emulate_ctxt *ctxt)
+> -{
+> -#ifdef CONFIG_X86_64
+> -	return ctxt->ops->guest_has_long_mode(ctxt);
+> -#else
+> -	return false;
+> -#endif
+> -}
+> -
+> -static void rsm_set_desc_flags(struct desc_struct *desc, u32 flags)
+> +static void rsm_set_desc_flags(struct kvm_segment *desc, u32 flags)
+>  {
+>  	desc->g    = (flags >> 23) & 1;
+> -	desc->d    = (flags >> 22) & 1;
+> +	desc->db   = (flags >> 22) & 1;
+>  	desc->l    = (flags >> 21) & 1;
+>  	desc->avl  = (flags >> 20) & 1;
+> -	desc->p    = (flags >> 15) & 1;
+> +	desc->present = (flags >> 15) & 1;
+>  	desc->dpl  = (flags >> 13) & 3;
+>  	desc->s    = (flags >> 12) & 1;
+>  	desc->type = (flags >>  8) & 15;
+> +
+> +	desc->unusable = !desc->present;
+> +	desc->padding = 0;
+>  }
+>  
+> -static int rsm_load_seg_32(struct x86_emulate_ctxt *ctxt, const char *smstate,
+> +static int rsm_load_seg_32(struct kvm_vcpu *vcpu, const char *smstate,
+>  			   int n)
+>  {
+> -	struct desc_struct desc;
+> +	struct kvm_segment desc;
+>  	int offset;
+> -	u16 selector;
+> -
+> -	selector = GET_SMSTATE(u32, smstate, 0x7fa8 + n * 4);
+>  
+>  	if (n < 3)
+>  		offset = 0x7f84 + n * 12;
+>  	else
+>  		offset = 0x7f2c + (n - 3) * 12;
+>  
+> -	set_desc_base(&desc,      GET_SMSTATE(u32, smstate, offset + 8));
+> -	set_desc_limit(&desc,     GET_SMSTATE(u32, smstate, offset + 4));
+> +	desc.selector =           GET_SMSTATE(u32, smstate, 0x7fa8 + n * 4);
+> +	desc.base =               GET_SMSTATE(u32, smstate, offset + 8);
+> +	desc.limit =              GET_SMSTATE(u32, smstate, offset + 4);
+>  	rsm_set_desc_flags(&desc, GET_SMSTATE(u32, smstate, offset));
+> -	ctxt->ops->set_segment(ctxt, selector, &desc, 0, n);
+> +	kvm_set_segment(vcpu, &desc, n);
+>  	return X86EMUL_CONTINUE;
+>  }
+>  
+>  #ifdef CONFIG_X86_64
+> -static int rsm_load_seg_64(struct x86_emulate_ctxt *ctxt, const char *smstate,
+> +static int rsm_load_seg_64(struct kvm_vcpu *vcpu, const char *smstate,
+>  			   int n)
+>  {
+> -	struct desc_struct desc;
+> +	struct kvm_segment desc;
+>  	int offset;
+> -	u16 selector;
+> -	u32 base3;
+>  
+>  	offset = 0x7e00 + n * 16;
+>  
+> -	selector =                GET_SMSTATE(u16, smstate, offset);
+> +	desc.selector =           GET_SMSTATE(u16, smstate, offset);
+>  	rsm_set_desc_flags(&desc, GET_SMSTATE(u16, smstate, offset + 2) << 8);
+> -	set_desc_limit(&desc,     GET_SMSTATE(u32, smstate, offset + 4));
+> -	set_desc_base(&desc,      GET_SMSTATE(u32, smstate, offset + 8));
+> -	base3 =                   GET_SMSTATE(u32, smstate, offset + 12);
+> -
+> -	ctxt->ops->set_segment(ctxt, selector, &desc, base3, n);
+> +	desc.limit =              GET_SMSTATE(u32, smstate, offset + 4);
+> +	desc.base =               GET_SMSTATE(u64, smstate, offset + 8);
+> +	kvm_set_segment(vcpu, &desc, n);
+>  	return X86EMUL_CONTINUE;
+>  }
+>  #endif
+>  
+> -static int rsm_enter_protected_mode(struct x86_emulate_ctxt *ctxt,
+> +static int rsm_enter_protected_mode(struct kvm_vcpu *vcpu,
+>  				    u64 cr0, u64 cr3, u64 cr4)
+>  {
+>  	int bad;
+> @@ -348,7 +336,7 @@ static int rsm_enter_protected_mode(struct x86_emulate_ctxt *ctxt,
+>  		cr3 &= ~0xfff;
+>  	}
+>  
+> -	bad = ctxt->ops->set_cr(ctxt, 3, cr3);
+> +	bad = kvm_set_cr3(vcpu, cr3);
+>  	if (bad)
+>  		return X86EMUL_UNHANDLEABLE;
+>  
+> @@ -357,20 +345,20 @@ static int rsm_enter_protected_mode(struct x86_emulate_ctxt *ctxt,
+>  	 * Then enable protected mode.	However, PCID cannot be enabled
+>  	 * if EFER.LMA=0, so set it separately.
+>  	 */
+> -	bad = ctxt->ops->set_cr(ctxt, 4, cr4 & ~X86_CR4_PCIDE);
+> +	bad = kvm_set_cr4(vcpu, cr4 & ~X86_CR4_PCIDE);
+>  	if (bad)
+>  		return X86EMUL_UNHANDLEABLE;
+>  
+> -	bad = ctxt->ops->set_cr(ctxt, 0, cr0);
+> +	bad = kvm_set_cr0(vcpu, cr0);
+>  	if (bad)
+>  		return X86EMUL_UNHANDLEABLE;
+>  
+>  	if (cr4 & X86_CR4_PCIDE) {
+> -		bad = ctxt->ops->set_cr(ctxt, 4, cr4);
+> +		bad = kvm_set_cr4(vcpu, cr4);
+>  		if (bad)
+>  			return X86EMUL_UNHANDLEABLE;
+>  		if (pcid) {
+> -			bad = ctxt->ops->set_cr(ctxt, 3, cr3 | pcid);
+> +			bad = kvm_set_cr3(vcpu, cr3 | pcid);
+>  			if (bad)
+>  				return X86EMUL_UNHANDLEABLE;
+>  		}
+> @@ -383,9 +371,9 @@ static int rsm_enter_protected_mode(struct x86_emulate_ctxt *ctxt,
+>  static int rsm_load_state_32(struct x86_emulate_ctxt *ctxt,
+>  			     const char *smstate)
+>  {
+> -	struct desc_struct desc;
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +	struct kvm_segment desc;
+>  	struct desc_ptr dt;
+> -	u16 selector;
+>  	u32 val, cr0, cr3, cr4;
+>  	int i;
+>  
+> @@ -399,56 +387,55 @@ static int rsm_load_state_32(struct x86_emulate_ctxt *ctxt,
+>  
+>  	val = GET_SMSTATE(u32, smstate, 0x7fcc);
+>  
+> -	if (ctxt->ops->set_dr(ctxt, 6, val))
+> +	if (kvm_set_dr(vcpu, 6, val))
+>  		return X86EMUL_UNHANDLEABLE;
+>  
+>  	val = GET_SMSTATE(u32, smstate, 0x7fc8);
+>  
+> -	if (ctxt->ops->set_dr(ctxt, 7, val))
+> +	if (kvm_set_dr(vcpu, 7, val))
+>  		return X86EMUL_UNHANDLEABLE;
+>  
+> -	selector =                 GET_SMSTATE(u32, smstate, 0x7fc4);
+> -	set_desc_base(&desc,       GET_SMSTATE(u32, smstate, 0x7f64));
+> -	set_desc_limit(&desc,      GET_SMSTATE(u32, smstate, 0x7f60));
+> +	desc.selector =            GET_SMSTATE(u32, smstate, 0x7fc4);
+> +	desc.base =                GET_SMSTATE(u32, smstate, 0x7f64);
+> +	desc.limit =               GET_SMSTATE(u32, smstate, 0x7f60);
+>  	rsm_set_desc_flags(&desc,  GET_SMSTATE(u32, smstate, 0x7f5c));
+> -	ctxt->ops->set_segment(ctxt, selector, &desc, 0, VCPU_SREG_TR);
+> +	kvm_set_segment(vcpu, &desc, VCPU_SREG_TR);
+>  
+> -	selector =                 GET_SMSTATE(u32, smstate, 0x7fc0);
+> -	set_desc_base(&desc,       GET_SMSTATE(u32, smstate, 0x7f80));
+> -	set_desc_limit(&desc,      GET_SMSTATE(u32, smstate, 0x7f7c));
+> +	desc.selector =            GET_SMSTATE(u32, smstate, 0x7fc0);
+> +	desc.base =                GET_SMSTATE(u32, smstate, 0x7f80);
+> +	desc.limit =               GET_SMSTATE(u32, smstate, 0x7f7c);
+>  	rsm_set_desc_flags(&desc,  GET_SMSTATE(u32, smstate, 0x7f78));
+> -	ctxt->ops->set_segment(ctxt, selector, &desc, 0, VCPU_SREG_LDTR);
+> +	kvm_set_segment(vcpu, &desc, VCPU_SREG_LDTR);
+>  
+>  	dt.address =               GET_SMSTATE(u32, smstate, 0x7f74);
+>  	dt.size =                  GET_SMSTATE(u32, smstate, 0x7f70);
+> -	ctxt->ops->set_gdt(ctxt, &dt);
+> +	static_call(kvm_x86_set_gdt)(vcpu, &dt);
+>  
+>  	dt.address =               GET_SMSTATE(u32, smstate, 0x7f58);
+>  	dt.size =                  GET_SMSTATE(u32, smstate, 0x7f54);
+> -	ctxt->ops->set_idt(ctxt, &dt);
+> +	static_call(kvm_x86_set_idt)(vcpu, &dt);
+>  
+>  	for (i = 0; i < 6; i++) {
+> -		int r = rsm_load_seg_32(ctxt, smstate, i);
+> +		int r = rsm_load_seg_32(vcpu, smstate, i);
+>  		if (r != X86EMUL_CONTINUE)
+>  			return r;
+>  	}
+>  
+>  	cr4 = GET_SMSTATE(u32, smstate, 0x7f14);
+>  
+> -	ctxt->ops->set_smbase(ctxt, GET_SMSTATE(u32, smstate, 0x7ef8));
+> +	vcpu->arch.smbase = GET_SMSTATE(u32, smstate, 0x7ef8);
+>  
+> -	return rsm_enter_protected_mode(ctxt, cr0, cr3, cr4);
+> +	return rsm_enter_protected_mode(vcpu, cr0, cr3, cr4);
+>  }
+>  
+>  #ifdef CONFIG_X86_64
+>  static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
+>  			     const char *smstate)
+>  {
+> -	struct desc_struct desc;
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +	struct kvm_segment desc;
+>  	struct desc_ptr dt;
+>  	u64 val, cr0, cr3, cr4;
+> -	u32 base3;
+> -	u16 selector;
+>  	int i, r;
+>  
+>  	for (i = 0; i < NR_EMULATOR_GPRS; i++)
+> @@ -459,51 +446,49 @@ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
+>  
+>  	val = GET_SMSTATE(u64, smstate, 0x7f68);
+>  
+> -	if (ctxt->ops->set_dr(ctxt, 6, val))
+> +	if (kvm_set_dr(vcpu, 6, val))
+>  		return X86EMUL_UNHANDLEABLE;
+>  
+>  	val = GET_SMSTATE(u64, smstate, 0x7f60);
+>  
+> -	if (ctxt->ops->set_dr(ctxt, 7, val))
+> +	if (kvm_set_dr(vcpu, 7, val))
+>  		return X86EMUL_UNHANDLEABLE;
+>  
+>  	cr0 =                       GET_SMSTATE(u64, smstate, 0x7f58);
+>  	cr3 =                       GET_SMSTATE(u64, smstate, 0x7f50);
+>  	cr4 =                       GET_SMSTATE(u64, smstate, 0x7f48);
+> -	ctxt->ops->set_smbase(ctxt, GET_SMSTATE(u32, smstate, 0x7f00));
+> +	vcpu->arch.smbase =         GET_SMSTATE(u32, smstate, 0x7f00);
+>  	val =                       GET_SMSTATE(u64, smstate, 0x7ed0);
+>  
+> -	if (ctxt->ops->set_msr(ctxt, MSR_EFER, val & ~EFER_LMA))
+> +	if (kvm_set_msr(vcpu, MSR_EFER, val & ~EFER_LMA))
+>  		return X86EMUL_UNHANDLEABLE;
+>  
+> -	selector =                  GET_SMSTATE(u32, smstate, 0x7e90);
+> +	desc.selector =             GET_SMSTATE(u32, smstate, 0x7e90);
+>  	rsm_set_desc_flags(&desc,   GET_SMSTATE(u32, smstate, 0x7e92) << 8);
+> -	set_desc_limit(&desc,       GET_SMSTATE(u32, smstate, 0x7e94));
+> -	set_desc_base(&desc,        GET_SMSTATE(u32, smstate, 0x7e98));
+> -	base3 =                     GET_SMSTATE(u32, smstate, 0x7e9c);
+> -	ctxt->ops->set_segment(ctxt, selector, &desc, base3, VCPU_SREG_TR);
+> +	desc.limit =                GET_SMSTATE(u32, smstate, 0x7e94);
+> +	desc.base =                 GET_SMSTATE(u64, smstate, 0x7e98);
+> +	kvm_set_segment(vcpu, &desc, VCPU_SREG_TR);
+>  
+>  	dt.size =                   GET_SMSTATE(u32, smstate, 0x7e84);
+>  	dt.address =                GET_SMSTATE(u64, smstate, 0x7e88);
+> -	ctxt->ops->set_idt(ctxt, &dt);
+> +	static_call(kvm_x86_set_idt)(vcpu, &dt);
+>  
+> -	selector =                  GET_SMSTATE(u32, smstate, 0x7e70);
+> +	desc.selector =             GET_SMSTATE(u32, smstate, 0x7e70);
+>  	rsm_set_desc_flags(&desc,   GET_SMSTATE(u32, smstate, 0x7e72) << 8);
+> -	set_desc_limit(&desc,       GET_SMSTATE(u32, smstate, 0x7e74));
+> -	set_desc_base(&desc,        GET_SMSTATE(u32, smstate, 0x7e78));
+> -	base3 =                     GET_SMSTATE(u32, smstate, 0x7e7c);
+> -	ctxt->ops->set_segment(ctxt, selector, &desc, base3, VCPU_SREG_LDTR);
+> +	desc.limit =                GET_SMSTATE(u32, smstate, 0x7e74);
+> +	desc.base =                 GET_SMSTATE(u64, smstate, 0x7e78);
+> +	kvm_set_segment(vcpu, &desc, VCPU_SREG_LDTR);
+>  
+>  	dt.size =                   GET_SMSTATE(u32, smstate, 0x7e64);
+>  	dt.address =                GET_SMSTATE(u64, smstate, 0x7e68);
+> -	ctxt->ops->set_gdt(ctxt, &dt);
+> +	static_call(kvm_x86_set_gdt)(vcpu, &dt);
+>  
+> -	r = rsm_enter_protected_mode(ctxt, cr0, cr3, cr4);
+> +	r = rsm_enter_protected_mode(vcpu, cr0, cr3, cr4);
+>  	if (r != X86EMUL_CONTINUE)
+>  		return r;
+>  
+>  	for (i = 0; i < 6; i++) {
+> -		r = rsm_load_seg_64(ctxt, smstate, i);
+> +		r = rsm_load_seg_64(vcpu, smstate, i);
+>  		if (r != X86EMUL_CONTINUE)
+>  			return r;
+>  	}
+> @@ -520,14 +505,14 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
+>  	u64 smbase;
+>  	int ret;
+>  
+> -	smbase = ctxt->ops->get_smbase(ctxt);
+> +	smbase = vcpu->arch.smbase;
+>  
+> -	ret = ctxt->ops->read_phys(ctxt, smbase + 0xfe00, buf, sizeof(buf));
+> -	if (ret != X86EMUL_CONTINUE)
+> +	ret = kvm_vcpu_read_guest(vcpu, smbase + 0xfe00, buf, sizeof(buf));
+> +	if (ret < 0)
+>  		return X86EMUL_UNHANDLEABLE;
+>  
+> -	if ((ctxt->ops->get_hflags(ctxt) & X86EMUL_SMM_INSIDE_NMI_MASK) == 0)
+> -		ctxt->ops->set_nmi_mask(ctxt, false);
+> +	if ((vcpu->arch.hflags & HF_SMM_INSIDE_NMI_MASK) == 0)
+> +		static_call(kvm_x86_set_nmi_mask)(vcpu, false);
+>  
+>  	kvm_smm_changed(vcpu, false);
+>  
+> @@ -535,41 +520,41 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
+>  	 * Get back to real mode, to prepare a safe state in which to load
+>  	 * CR0/CR3/CR4/EFER.  It's all a bit more complicated if the vCPU
+>  	 * supports long mode.
+> -	 *
+> -	 * The ctxt->ops callbacks will handle all side effects when writing
+> -	 * writing MSRs and CRs, e.g. MMU context resets, CPUID
+> -	 * runtime updates, etc.
+>  	 */
+> -	if (emulator_has_longmode(ctxt)) {
+> -		struct desc_struct cs_desc;
+> +#ifdef CONFIG_X86_64
+> +	if (guest_cpuid_has(vcpu, X86_FEATURE_LM)) {
+> +		struct kvm_segment cs_desc;
+>  
+>  		/* Zero CR4.PCIDE before CR0.PG.  */
+> -		cr4 = ctxt->ops->get_cr(ctxt, 4);
+> +		cr4 = kvm_read_cr4(vcpu);
+>  		if (cr4 & X86_CR4_PCIDE)
+> -			ctxt->ops->set_cr(ctxt, 4, cr4 & ~X86_CR4_PCIDE);
+> +			kvm_set_cr4(vcpu, cr4 & ~X86_CR4_PCIDE);
+>  
+>  		/* A 32-bit code segment is required to clear EFER.LMA.  */
+>  		memset(&cs_desc, 0, sizeof(cs_desc));
+>  		cs_desc.type = 0xb;
+> -		cs_desc.s = cs_desc.g = cs_desc.p = 1;
+> -		ctxt->ops->set_segment(ctxt, 0, &cs_desc, 0, VCPU_SREG_CS);
+> +		cs_desc.s = cs_desc.g = cs_desc.present = 1;
+> +		kvm_set_segment(vcpu, &cs_desc, VCPU_SREG_CS);
+>  	}
+> +#endif
+>  
+>  	/* For the 64-bit case, this will clear EFER.LMA.  */
+> -	cr0 = ctxt->ops->get_cr(ctxt, 0);
+> +	cr0 = kvm_read_cr0(vcpu);
+>  	if (cr0 & X86_CR0_PE)
+> -		ctxt->ops->set_cr(ctxt, 0, cr0 & ~(X86_CR0_PG | X86_CR0_PE));
+> +		kvm_set_cr0(vcpu, cr0 & ~(X86_CR0_PG | X86_CR0_PE));
+>  
+> -	if (emulator_has_longmode(ctxt)) {
+> +#ifdef CONFIG_X86_64
+> +	if (guest_cpuid_has(vcpu, X86_FEATURE_LM)) {
+>  		/* Clear CR4.PAE before clearing EFER.LME. */
+> -		cr4 = ctxt->ops->get_cr(ctxt, 4);
+> +		cr4 = kvm_read_cr4(vcpu);
+>  		if (cr4 & X86_CR4_PAE)
+> -			ctxt->ops->set_cr(ctxt, 4, cr4 & ~X86_CR4_PAE);
+> +			kvm_set_cr4(vcpu, cr4 & ~X86_CR4_PAE);
+>  
+>  		/* And finally go back to 32-bit mode.  */
+>  		efer = 0;
+> -		ctxt->ops->set_msr(ctxt, MSR_EFER, efer);
+> +		kvm_set_msr(vcpu, MSR_EFER, efer);
+>  	}
+> +#endif
+>  
+>  	/*
+>  	 * Give leave_smm() a chance to make ISA-specific changes to the vCPU
+> @@ -580,7 +565,7 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
+>  		return X86EMUL_UNHANDLEABLE;
+>  
+>  #ifdef CONFIG_X86_64
+> -	if (emulator_has_longmode(ctxt))
+> +	if (guest_cpuid_has(vcpu, X86_FEATURE_LM))
+>  		return rsm_load_state_64(ctxt, buf);
+>  	else
+>  #endif
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 97d6ee179109..97a871635986 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7201,15 +7201,6 @@ static int emulator_read_std(struct x86_emulate_ctxt *ctxt,
+>  	return kvm_read_guest_virt_helper(addr, val, bytes, vcpu, access, exception);
+>  }
+>  
+> -static int kvm_read_guest_phys_system(struct x86_emulate_ctxt *ctxt,
+> -		unsigned long addr, void *val, unsigned int bytes)
+> -{
+> -	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
+> -	int r = kvm_vcpu_read_guest(vcpu, addr, val, bytes);
+> -
+> -	return r < 0 ? X86EMUL_IO_NEEDED : X86EMUL_CONTINUE;
+> -}
+> -
+>  static int kvm_write_guest_virt_helper(gva_t addr, void *val, unsigned int bytes,
+>  				      struct kvm_vcpu *vcpu, u64 access,
+>  				      struct x86_exception *exception)
+> @@ -8001,26 +7992,6 @@ static int emulator_get_msr(struct x86_emulate_ctxt *ctxt,
+>  	return kvm_get_msr(emul_to_vcpu(ctxt), msr_index, pdata);
+>  }
+>  
+> -static int emulator_set_msr(struct x86_emulate_ctxt *ctxt,
+> -			    u32 msr_index, u64 data)
+> -{
+> -	return kvm_set_msr(emul_to_vcpu(ctxt), msr_index, data);
+> -}
+> -
+> -static u64 emulator_get_smbase(struct x86_emulate_ctxt *ctxt)
+> -{
+> -	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
+> -
+> -	return vcpu->arch.smbase;
+> -}
+> -
+> -static void emulator_set_smbase(struct x86_emulate_ctxt *ctxt, u64 smbase)
+> -{
+> -	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
+> -
+> -	vcpu->arch.smbase = smbase;
+> -}
+> -
+>  static int emulator_check_pmc(struct x86_emulate_ctxt *ctxt,
+>  			      u32 pmc)
+>  {
+> @@ -8119,7 +8090,6 @@ static const struct x86_emulate_ops emulate_ops = {
+>  	.write_gpr           = emulator_write_gpr,
+>  	.read_std            = emulator_read_std,
+>  	.write_std           = emulator_write_std,
+> -	.read_phys           = kvm_read_guest_phys_system,
+>  	.fetch               = kvm_fetch_guest_virt,
+>  	.read_emulated       = emulator_read_emulated,
+>  	.write_emulated      = emulator_write_emulated,
+> @@ -8139,11 +8109,8 @@ static const struct x86_emulate_ops emulate_ops = {
+>  	.cpl                 = emulator_get_cpl,
+>  	.get_dr              = emulator_get_dr,
+>  	.set_dr              = emulator_set_dr,
+> -	.get_smbase          = emulator_get_smbase,
+> -	.set_smbase          = emulator_set_smbase,
+>  	.set_msr_with_filter = emulator_set_msr_with_filter,
+>  	.get_msr_with_filter = emulator_get_msr_with_filter,
+> -	.set_msr             = emulator_set_msr,
+>  	.get_msr             = emulator_get_msr,
+>  	.check_pmc	     = emulator_check_pmc,
+>  	.read_pmc            = emulator_read_pmc,
 
-That makes sense to me. I think given that the XSS code here is tied in 
-with the SVM shadow stack patches, I'll submit a separate patch to first 
-address only exposing XCR0 for sub-leafs 0 and 1. Then I'll address XSS in 
-the next version of the SVM shadow stack patches.
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-> 
->> +		unsigned long lo, hi;
->> +		u64 xss;
->> +
->> +		/*
->> +		 * Since vc_handle_cpuid may be used during early boot, the
->> +		 * rdmsr wrappers are incompatible and should not be used.
->> +		 * Invoke the instruction directly.
->> +		 */
->> +		asm volatile("rdmsr" : "=a" (lo), "=d" (hi)
->> +				    : "c" (MSR_IA32_XSS));
-> 
-> Doesn't __rdmsr() do what you want?  But even that seems unnecessary, isn't the
-> current XSS available in xfeatures_mask_supervisor()?
+Best regards,
+	Maxim Levitsky
 
-Yes, I think you're right. That should make this change a lot more palatable.
 
-Thanks,
-John
-
-> 
->> +		xss = (hi << 32) | lo;
->> +		ghcb_set_xss(ghcb, xss);
->> +	}
->> +
->>   	ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_CPUID, 0, 0);
->>   	if (ret != ES_OK)
->>   		return ret;
->> -- 
->> 2.34.3
->>
 
