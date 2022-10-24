@@ -2,110 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F091360AE82
-	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 17:06:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ADB3960ADCE
+	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 16:35:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232386AbiJXPGO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 11:06:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55158 "EHLO
+        id S232153AbiJXOfS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Oct 2022 10:35:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232420AbiJXPFp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Oct 2022 11:05:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC30F14BB6E
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 06:42:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666618824;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TYYeY6WmbISjt57nThyLXvb2Wb4vuO7aGaq3NhLmbyU=;
-        b=WX6WE/TlV8YGOqLQjE1SgQjgapv6IexEnlQ/+PM53o5rv80Fp8MphSmMiKka36NR758CV9
-        OTBgR2oZYoXYOsXfC81GoDUKGvkkt11zWMh9OEx8nUVoaIoPDLZlWFCPmbzfZjPih7Di9v
-        9SIknBWcw/goa7nP101JQveQCcnSR20=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-220-IeN-0MqcMw2cuMOWYkyLxA-1; Mon, 24 Oct 2022 08:57:39 -0400
-X-MC-Unique: IeN-0MqcMw2cuMOWYkyLxA-1
-Received: by mail-qv1-f71.google.com with SMTP id e13-20020ad450cd000000b004bb49d98da4so4021345qvq.9
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 05:57:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TYYeY6WmbISjt57nThyLXvb2Wb4vuO7aGaq3NhLmbyU=;
-        b=DaTlguYygZR5sFmrbnizsJAwNBBHZQnUHCKdgLzh2et8tJzz84BS+GTj7goFGQYr4y
-         OIxkw/BF0tqiwhyZGpi3TnKkzJv7UBqhIPkVh+tNkx1bGB5VZV7gVnMA8CEZeA4daYMg
-         XsqiHywFpzzDGSD6jDho1CZaCw3MFhei7OqJhb2fEtQISP5GhKWfhzIzZyT9HkRryQ0g
-         uXz2Y5UIgDI8rZl0tR4CqaWFEenxrjKOVkOhn71Tl25/nplRufyYJlj7IwVbeNmm+wJl
-         A0JCmk4B3jQ6IMGLqOGOqTihpKx1n56/vihZI3nfM6Hz17VO/x7zymgscbhj8CfCzQ6p
-         lDrQ==
-X-Gm-Message-State: ACrzQf2WkMBD2299271tTHO1YZtDjRf7z5Qq4f0HMz2b4+w0G3lMdu2T
-        yNRVx09Gr/EGaeu0VQqNC064kn8hgXJJ71ucLf1ub+/FekbyP5K96XKlmbp/GSAL8Xu+05hGRIX
-        oh2ezEY5/Hscg
-X-Received: by 2002:a05:622a:5cd:b0:39c:fcaf:7b36 with SMTP id d13-20020a05622a05cd00b0039cfcaf7b36mr23058055qtb.117.1666616257079;
-        Mon, 24 Oct 2022 05:57:37 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7WC/42UgfWTDRy7m+TsBLfPQ7a53w+oMwbp6Q5j9cwx09EhMTQrNFPl7veBJ1xcH6Q+Absww==
-X-Received: by 2002:a05:622a:5cd:b0:39c:fcaf:7b36 with SMTP id d13-20020a05622a05cd00b0039cfcaf7b36mr23058043qtb.117.1666616256881;
-        Mon, 24 Oct 2022 05:57:36 -0700 (PDT)
-Received: from [192.168.149.123] (58.254.164.109.static.wline.lns.sme.cust.swisscom.ch. [109.164.254.58])
-        by smtp.gmail.com with ESMTPSA id bn39-20020a05620a2ae700b006cddf59a600sm14693814qkb.34.2022.10.24.05.57.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Oct 2022 05:57:36 -0700 (PDT)
-Message-ID: <fba8e829-0d28-8f4d-a8ce-84d533009eb9@redhat.com>
-Date:   Mon, 24 Oct 2022 14:57:33 +0200
+        with ESMTP id S237266AbiJXOeO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Oct 2022 10:34:14 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E60413F60;
+        Mon, 24 Oct 2022 06:09:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1666616976; x=1698152976;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=H+UH4sWxAAafC5t6pknnfnxHhfMUxgyES/6UxjAPSZ0=;
+  b=hy4I2kBIRmn5inwr3Cg49OmTZ7m/MPdFCoYqI4VepUH9JTw4YV6DKajS
+   FFw5d3PqwENDXkuvF1V5qkUwAg9qW0oVz6EsoySzoRmomKoJpftthJCCt
+   HpuFqPsyy6DjT47lHDVlVI8U8Php5TvzvcmK9mZ/FZ/Y2cfFfyIiArF9d
+   F7vvOkm7UBGplwJCdxK2SoTFLueYDHqfjCQeM/RheLjakyLn7WZh1MEjG
+   SN0PTjN+LGSwp6o78pi30WBXqdUYM5cNs3JSkOC0G1zJD7pps+ZWywxSI
+   +YT9ub2mEVrxpKVcs5kUwc0KZ7OumQrZk7t6f3F1LyGE50kfXLMBiYdxc
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10510"; a="333996261"
+X-IronPort-AV: E=Sophos;i="5.95,209,1661842800"; 
+   d="scan'208";a="333996261"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2022 06:06:55 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10510"; a="662424350"
+X-IronPort-AV: E=Sophos;i="5.95,209,1661842800"; 
+   d="scan'208";a="662424350"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.255.30.136]) ([10.255.30.136])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2022 06:06:52 -0700
+Message-ID: <d65ad6f3-1850-a82e-adaa-91657c38a6f4@intel.com>
+Date:   Mon, 24 Oct 2022 21:06:49 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 3/4] KVM: introduce memory transaction semaphore
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.3.3
+Subject: Re: [PATCH] KVM: x86: Do not expose the host value of CPUID.8000001EH
 Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20221022154819.1823133-1-eesposit@redhat.com>
- <20221022154819.1823133-4-eesposit@redhat.com>
- <62500f94-b95b-1e16-4aa2-f67905fab01a@redhat.com>
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-In-Reply-To: <62500f94-b95b-1e16-4aa2-f67905fab01a@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     seanjc@google.com, jmattson@google.com
+References: <20221022082643.1725875-1-pbonzini@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20221022082643.1725875-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,
+        RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-Am 23/10/2022 um 19:50 schrieb Paolo Bonzini:
-> On 10/22/22 17:48, Emanuele Giuseppe Esposito wrote:
->> +static DECLARE_RWSEM(memory_transaction);
+On 10/22/2022 4:26 PM, Paolo Bonzini wrote:
+> Several fields of CPUID.8000001EH (ExtendedApicId in EAX[31:0],
+> CoreId in EBX[7:0], NodeId in ECX[7:0]) vary on each processor,
+> and it is simply impossible to fit the right values in the
+> KVM_GET_SUPPORTED_CPUID API, in such a way that they can be
+> passed to KVM_SET_CPUID2.
 > 
-> This cannot be global, it must be per-struct kvm.  Otherwise one VM can
-> keep the rwsem indefinitely while a second VM hangs in
-> KVM_KICK_ALL_RUNNING_VCPUS.
+> The most likely way to avoid confusion in the guest is to zero
+> out all the values.  Userspace will most likely override it
+> anyway if it want to present a specific topology to the guest.
 > 
-> It can also be changed to an SRCU (with the down_write+up_write sequence
-> changed to synchronize_srcu_expedited) which has similar characteristics
-> to your use of the rwsem.
+> This patch essentially reverts commit 382409b4c43e ("kvm: x86: Include
+> CPUID leaf 0x8000001e in kvm's supported CPUID").
+
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   arch/x86/kvm/cpuid.c | 3 +++
+>   1 file changed, 3 insertions(+)
 > 
-
-Makes sense, but why synchronize_srcu_expedited and not synchronize_srcu?
-
-Thank you,
-Emanuele
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index a0292ba650df..380b71600a9e 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -1193,6 +1193,9 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>   		entry->ebx = entry->ecx = entry->edx = 0;
+>   		break;
+>   	case 0x8000001e:
+> +		/* Different on each processor, just hide it.  */
+> +		entry->eax = entry->ebx = entry->ecx = 0;
+> +		entry->edx = 0;
+>   		break;
+>   	case 0x8000001F:
+>   		if (!kvm_cpu_cap_has(X86_FEATURE_SEV)) {
 
