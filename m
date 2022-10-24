@@ -2,181 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DCCE60B401
-	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 19:24:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C6F2F60B41E
+	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 19:29:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230204AbiJXRYx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 13:24:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40040 "EHLO
+        id S231248AbiJXR3p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Oct 2022 13:29:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232982AbiJXRXl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Oct 2022 13:23:41 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A5F115B301
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 08:58:32 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id q71so9008045pgq.8
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 08:58:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=xhVPQ5+dIkT7H8GzdC1Hj5D+mUwjV/3EIBqX7ahZJb8=;
-        b=sjFIyI04vx0cs1gow2DpqtMCKQ1Fs6ci3APl7zmnC44CID+qImSeekKnM09/9ngi5K
-         683BoV0Kalu9yMxA7YsaVtFT17INOHozoSMzJTxq9+hAV6CNM6+9asP22bEfbjsNcPP1
-         SEjxOnCcGo3s0Ha11T1Avy+NtACEquBAhRrd6tq5JOWQ5vX9BL+ZGLycubJP0K8duS3F
-         Jo0VOABsoSAiJr1HU2iUz1HH2Cqm+Z3J7UgSAyX0IXVjDNYCJ93u/kzML6yNMToNJwem
-         D8iHdbb4wa/mzPqwCzGIIVVn8FUHOuW5N35Xl3MVOOGw7B1hm7Ybu763Tf09iRs6MMI8
-         F0pQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xhVPQ5+dIkT7H8GzdC1Hj5D+mUwjV/3EIBqX7ahZJb8=;
-        b=jmzDwUt+AxtL904gjRogzEWQzhf2An85px+eLU6YyMFsogEaxrRZvA9Ik+uO6/w5cc
-         kNHaD4mLxuE0jB1Ojq/LDWSltUZ4RBmnrpw/R9UiYS5vyiCzFx1QpCZ3mC+FdZCNXYjT
-         tyPPFqf+33fP8+mCgTLXfDKtSevbX5n3V3VBVX2wq0Ok2v8lDQcIyMTM75OO1+H5rfvA
-         5jGh6l38P2qAtZ85w/Dj0la7lt2bGeRpEdiwNoPcfPsiI2sSAC1g6aWRLu+Pb43jgf+P
-         9djZ6SnoWoDZRDrCnwRbWrXgxXg/bNGtMYr6tzSorvBsj7NShjb+iTISG5/u2fmIu8VX
-         CP5g==
-X-Gm-Message-State: ACrzQf1oaqvbJbMLD97qRUPPpzLnntRNcssmTRdza0LoZrXb456xs0sE
-        7shpHYhqPzg+sQMfp1inRzWQEkOwPxRb4w==
-X-Google-Smtp-Source: AMsMyM7+Fsu8MVnZ+tCPi/6N4EEvflkwRny391GAU8Z6YL4QyjvxyPpKdzi0o7WrJrFkqQRLRZrHWQ==
-X-Received: by 2002:a63:a06:0:b0:458:2853:45e4 with SMTP id 6-20020a630a06000000b00458285345e4mr27995688pgk.20.1666626959009;
-        Mon, 24 Oct 2022 08:55:59 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id w6-20020a170902e88600b00186a6b6350esm1880380plg.268.2022.10.24.08.55.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Oct 2022 08:55:58 -0700 (PDT)
-Date:   Mon, 24 Oct 2022 15:55:55 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Alexander Graf <graf@amazon.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
-        kvm@vger.kernel.org, Xiao Guangrong <guangrong.xiao@gmail.com>,
-        "Chandrasekaran, Siddharth" <sidcha@amazon.de>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 11/27] KVM: x86/mmu: Zap only the relevant pages when
- removing a memslot
-Message-ID: <Y1a1i9vbJ/pVmV9r@google.com>
-References: <20190813201914.GI13991@linux.intel.com>
- <20190815092324.46bb3ac1@x1.home>
- <a05b07d8-343b-3f3d-4262-f6562ce648f2@redhat.com>
- <20190820200318.GA15808@linux.intel.com>
- <20200626173250.GD6583@linux.intel.com>
- <590c9312-a21f-8569-9da3-34508300afcc@amazon.com>
- <Y1GxnGo3A8UF3iTt@google.com>
- <cdaf34bc-b2ab-1a9d-22d0-3d9dc3364bf2@amazon.com>
- <Y1L1t6Qw2CaLwJk3@google.com>
- <490509f6-ae1a-4fc8-42a1-b037d6bffada@amazon.com>
+        with ESMTP id S230291AbiJXR3K (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Oct 2022 13:29:10 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE799895F2;
+        Mon, 24 Oct 2022 09:05:10 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29OFHhIY008273;
+        Mon, 24 Oct 2022 16:02:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=cSBjRI2Tla03lkvgJJSHtdC8Er8iUaZ9m1+YWH6z0dQ=;
+ b=oWIpMMvy5WXQ4PIIwXBhhQaPRT0/FiJ/pQRnbPZ+KBXk3cXAQv6WII+lvAaLjWT1Pxhi
+ p6aGE3Jd5brWbOlu88aj3nQjHm913UZa7dL9quFebAEdUpBn9xxwGLrEo7r93cjLRa2w
+ 2GQDjXSMCmCaHKhzdaKWAI3Dv3wNorLe9PBJW55LepAA8ELpJkcmwCfJGmoXE8V952fe
+ XyL6xt3MtRkmUDhmls0i91y8N1lYhI3lC3q23F3VBxHjfIoLDyjSARCpdPSaHX2ZoalG
+ tzRB2GAVJs84Y7QUqF542LmpToCdXTa7eHE1aOc1efrg0J2dHoCb8U2esdYpx6M125ep hg== 
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kdw7dhr2c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Oct 2022 16:02:43 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29OFo8Zl000342;
+        Mon, 24 Oct 2022 16:02:41 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06fra.de.ibm.com with ESMTP id 3kc7sj2nkg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 24 Oct 2022 16:02:41 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29OG2cmt4391674
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 24 Oct 2022 16:02:38 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2ACA2AE04D;
+        Mon, 24 Oct 2022 16:02:38 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DF56BAE045;
+        Mon, 24 Oct 2022 16:02:37 +0000 (GMT)
+Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 24 Oct 2022 16:02:37 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [v1] KVM: s390: VSIE: sort out virtual/physical address in pin_guest_page
+Date:   Mon, 24 Oct 2022 18:02:37 +0200
+Message-Id: <20221024160237.33912-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <490509f6-ae1a-4fc8-42a1-b037d6bffada@amazon.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: -vkrPUleVb1gjwVtETmLhatzQgj1KZj8
+X-Proofpoint-ORIG-GUID: -vkrPUleVb1gjwVtETmLhatzQgj1KZj8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-24_04,2022-10-21_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 lowpriorityscore=0 adultscore=0 mlxlogscore=967 malwarescore=0
+ phishscore=0 mlxscore=0 bulkscore=0 clxscore=1015 impostorscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210240095
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 24, 2022, Alexander Graf wrote:
-> Hey Sean,
-> 
-> On 21.10.22 21:40, Sean Christopherson wrote:
-> > 
-> > On Thu, Oct 20, 2022, Alexander Graf wrote:
-> > > On 20.10.22 22:37, Sean Christopherson wrote:
-> > > > On Thu, Oct 20, 2022, Alexander Graf wrote:
-> > > > > On 26.06.20 19:32, Sean Christopherson wrote:
-> > > > > > /cast <thread necromancy>
-> > > > > > 
-> > > > > > On Tue, Aug 20, 2019 at 01:03:19PM -0700, Sean Christopherson wrote:
-> > > > > [...]
-> > > > > 
-> > > > > > I don't think any of this explains the pass-through GPU issue.  But, we
-> > > > > > have a few use cases where zapping the entire MMU is undesirable, so I'm
-> > > > > > going to retry upstreaming this patch as with per-VM opt-in.  I wanted to
-> > > > > > set the record straight for posterity before doing so.
-> > > > > Hey Sean,
-> > > > > 
-> > > > > Did you ever get around to upstream or rework the zap optimization? The way
-> > > > > I read current upstream, a memslot change still always wipes all SPTEs, not
-> > > > > only the ones that were changed.
-> > > > Nope, I've more or less given up hope on zapping only the deleted/moved memslot.
-> > > > TDX (and SNP?) will preserve SPTEs for guest private memory, but they're very
-> > > > much a special case.
-> > > > 
-> > > > Do you have use case and/or issue that doesn't play nice with the "zap all" behavior?
-> > > 
-> > > Yeah, we're looking at adding support for the Hyper-V VSM extensions which
-> > > Windows uses to implement Credential Guard. With that, the guest gets access
-> > > to hypercalls that allow it to set reduced permissions for arbitrary gfns.
-> > > To ensure that user space has full visibility into those for live migration,
-> > > memory slots to model access would be a great fit. But it means we'd do
-> > > ~100k memslot modifications on boot.
-> > Oof.  100k memslot updates is going to be painful irrespective of flushing.  And
-> > memslots (in their current form) won't work if the guest can drop executable
-> > permissions.
-> > 
-> > Assuming KVM needs to support a KVM_MEM_NO_EXEC flag, rather than trying to solve
-> > the "KVM flushes everything on memslot deletion", I think we should instead
-> > properly support toggling KVM_MEM_READONLY (and KVM_MEM_NO_EXEC) without forcing
-> > userspace to delete the memslot.  Commit 75d61fbcf563 ("KVM: set_memory_region:
-> 
-> 
-> That would be a cute acceleration for the case where we have to change
-> permissions for a full slot. Unfortunately, the bulk of the changes are slot
-> splits.
+pin_guest_page() used page_to_virt() to calculate the hpa of the pinned
+page. This currently works, because virtual and physical addresses are
+the same. Use page_to_phys() instead to resolve the virtual-real address
+confusion.
 
-Ah, right, the guest will be operating on per-page granularity.
+One caller of pin_guest_page() actually expected the hpa to be a hva, so
+add the missing phys_to_virt() conversion here.
 
-> We already built a prototype implementation of an atomic memslot update
-> ioctl that allows us to keep other vCPUs running while we do the
-> delete/create/create/create operation.
+Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+---
+ arch/s390/kvm/vsie.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Please weigh in with your use case on a relevant upstream discussion regarding
-"atomic" memslot updates[*].  I suspect we'll end up with a different solution
-for this use case (see below), but we should at least capture all potential use
-cases and ideas for modifying memslots without pausing vCPUs.
+diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+index 94138f8f0c1c..c6a10ff46d58 100644
+--- a/arch/s390/kvm/vsie.c
++++ b/arch/s390/kvm/vsie.c
+@@ -654,7 +654,7 @@ static int pin_guest_page(struct kvm *kvm, gpa_t gpa, hpa_t *hpa)
+ 	page = gfn_to_page(kvm, gpa_to_gfn(gpa));
+ 	if (is_error_page(page))
+ 		return -EINVAL;
+-	*hpa = (hpa_t) page_to_virt(page) + (gpa & ~PAGE_MASK);
++	*hpa = (hpa_t)page_to_phys(page) + (gpa & ~PAGE_MASK);
+ 	return 0;
+ }
+ 
+@@ -869,7 +869,7 @@ static int pin_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page,
+ 		WARN_ON_ONCE(rc);
+ 		return 1;
+ 	}
+-	vsie_page->scb_o = (struct kvm_s390_sie_block *) hpa;
++	vsie_page->scb_o = (struct kvm_s390_sie_block *)phys_to_virt(hpa);
+ 	return 0;
+ }
+ 
+-- 
+2.37.3
 
-[*] https://lore.kernel.org/all/20220909104506.738478-1-eesposit@redhat.com
-
-> But even with that, we see up to 30 min boot times for larger guests that
-> most of the time are stuck in zapping pages.
-
-Out of curiosity, did you measure runtime performance?  I would expect some amount
-of runtime overhead as well dut to fragmenting memslots to that degree.
-
-> I guess we have 2 options to make this viable:
-> 
->   1) Optimize memslot splits + modifications to a point where they're fast
-> enough
->   2) Add a different, faster mechanism on top of memslots for page granular
-> permission bits
-
-#2 crossed my mind as well.  This is actually nearly identical to the confidential
-VM use case, where KVM needs to handle guest-initiated conversions of memory between
-"private" and "shared" on a per-page granularity.  The proposed solution for that
-is indeed a layer on top of memslots[*], which we arrived at in no small part because
-splitting memslots was going to be a bottleneck.
-
-Extending the proposed mem_attr_array to support additional state should be quite
-easy.  The framework is all there, KVM just needs a few extra flags values, e.g.
-
-	KVM_MEM_ATTR_SHARED	BIT(0)
-	KVM_MEM_ATTR_READONLY	BIT(1)
-	KVM_MEM_ATTR_NOEXEC	BIT(2)
-
-and then new ioctls to expose the functionality to userspace.  Actually, if we
-want to go this route, it might even make sense to define new a generic MEM_ATTR
-ioctl() right away instead of repurposing KVM_MEMORY_ENCRYPT_(UN)REG_REGION for
-the private vs. shared use case.
-
-[*] https://lore.kernel.org/all/20220915142913.2213336-6-chao.p.peng@linux.intel.com
