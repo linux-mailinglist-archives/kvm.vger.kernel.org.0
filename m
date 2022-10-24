@@ -2,169 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CC1B609DA7
-	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 11:14:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D032609DE5
+	for <lists+kvm@lfdr.de>; Mon, 24 Oct 2022 11:22:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229615AbiJXJOc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 05:14:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47358 "EHLO
+        id S229959AbiJXJWg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 24 Oct 2022 05:22:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231276AbiJXJOF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Oct 2022 05:14:05 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 154EE696E6
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 02:13:51 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id 20so8195661pgc.5
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 02:13:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Lw9Y59Kn+xhaw6POjvDvw41k8paQq3td8sumIgfruR8=;
-        b=HUzOQscH4o8H+v0dhVH4qz3Igep9Vnd4woKHo4u5qbwBxLTla8t8JDanJ82vkvFS9g
-         80pniZniMkSxZbpolBGzaYYkIHRbQ5AUEZN/07IOOTeLrrksE3K8biXdU0wdcwrCZsXP
-         owRhNPOzXVxMfl7lQb32IIS9jKzFlU3aPejJ02wpiEk6nZkyHdLGnVj/KryUlNbW8RCr
-         9jAyQwiVmofqNeNafuTCpfITM4MXSZ16HeEPgPt87xGRvuq0jUqKDi3ZzDCRJFs7yZ0l
-         4+027pJeXhIh5O6CeQ7b5SYHIj+rE79NO4LL76wwNlnPZoGxhCOxDRQRvToNESGwhWVN
-         6cHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Lw9Y59Kn+xhaw6POjvDvw41k8paQq3td8sumIgfruR8=;
-        b=dlHEN0I/JEnUEa5dTN3UFqTGJAhA9EtzsH1KmaoYWqRnQLK8Peun1WQyLRnSsA2kt6
-         kymg7zzc1k35HKcuINHbQXj9KT8os+GH7o0aBxcvzvBjHNpaEkq9kZA0yJ1CAfg9gwMB
-         oB6GTWE4AKjJV9KLffO5xaGjftVNmOg9xTOtwFONLqJGripwGqtyQKLZvMZgsarBmbt6
-         aMXDP6KlkeE5j0uwAI5T1WTIZhGX63CwqLKH+OP12f+raZIfeMRSesIjgzGkEzZ0/EyG
-         jlDvQrBg4ojmg/8huBuN2t/ouRxzBgu0J6EAp6V9QDUF0/mmfDSUPkC/tLfbeNebCfcf
-         mNnw==
-X-Gm-Message-State: ACrzQf3RwPUfmIp1QzY0p0OndpweWg01loJ07s6syfm4ZJGLb2uzaKCO
-        V37VFaDIOJ5h5eMn4yoVb+o=
-X-Google-Smtp-Source: AMsMyM7lLAeTdPJNtwePcwQAkQ9ZpRNb4pQnz0KKu5t4nwKFLciG9wrwyepKL9O9dQ7qsLMM+7PdFA==
-X-Received: by 2002:a63:4e66:0:b0:456:b3a7:7a80 with SMTP id o38-20020a634e66000000b00456b3a77a80mr26864919pgl.467.1666602821130;
-        Mon, 24 Oct 2022 02:13:41 -0700 (PDT)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id r15-20020aa79ecf000000b00535da15a252sm19642213pfq.165.2022.10.24.02.13.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Oct 2022 02:13:40 -0700 (PDT)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v4 24/24] x86/pmu: Add AMD Guest PerfMonV2 testcases
-Date:   Mon, 24 Oct 2022 17:12:23 +0800
-Message-Id: <20221024091223.42631-25-likexu@tencent.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20221024091223.42631-1-likexu@tencent.com>
-References: <20221024091223.42631-1-likexu@tencent.com>
+        with ESMTP id S229955AbiJXJWf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 24 Oct 2022 05:22:35 -0400
+Received: from smtpout3.mo529.mail-out.ovh.net (smtpout3.mo529.mail-out.ovh.net [46.105.54.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCC0CB55
+        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 02:22:33 -0700 (PDT)
+Received: from mxplan5.mail.ovh.net (unknown [10.108.16.210])
+        by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 625D8135A8AF0;
+        Mon, 24 Oct 2022 11:22:31 +0200 (CEST)
+Received: from kaod.org (37.59.142.95) by DAG4EX2.mxp5.local (172.16.2.32)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.12; Mon, 24 Oct
+ 2022 11:22:30 +0200
+Authentication-Results: garm.ovh; auth=pass (GARM-95G001ecf31bd4-2aa5-49d2-8f04-f3d7e1676005,
+                    6590F3F04E20B41924A4A18FF3E3B83F50E47F7B) smtp.auth=clg@kaod.org
+X-OVh-ClientIp: 82.64.250.170
+Message-ID: <1d99c9e3-bbd7-299a-3d68-dc498745115d@kaod.org>
+Date:   Mon, 24 Oct 2022 11:22:29 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH v10 1/9] s390x/cpu topology: core_id sets s390x CPU
+ topology
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, <qemu-s390x@nongnu.org>
+CC:     <qemu-devel@nongnu.org>, <borntraeger@de.ibm.com>,
+        <pasic@linux.ibm.com>, <richard.henderson@linaro.org>,
+        <david@redhat.com>, <thuth@redhat.com>, <cohuck@redhat.com>,
+        <mst@redhat.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+        <ehabkost@redhat.com>, <marcel.apfelbaum@gmail.com>,
+        <eblake@redhat.com>, <armbru@redhat.com>, <seiden@linux.ibm.com>,
+        <nrb@linux.ibm.com>, <frankja@linux.ibm.com>, <berrange@redhat.com>
+References: <20221012162107.91734-1-pmorel@linux.ibm.com>
+ <20221012162107.91734-2-pmorel@linux.ibm.com>
+ <5d5ff3cb-43a0-3d15-ff17-50b46c57a525@kaod.org>
+ <b584418d-8a6d-d618-fd21-3b71d27f1e3e@linux.ibm.com>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+In-Reply-To: <b584418d-8a6d-d618-fd21-3b71d27f1e3e@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Originating-IP: [37.59.142.95]
+X-ClientProxiedBy: DAG6EX2.mxp5.local (172.16.2.52) To DAG4EX2.mxp5.local
+ (172.16.2.32)
+X-Ovh-Tracer-GUID: 45379858-eace-497f-959d-441f6896aa54
+X-Ovh-Tracer-Id: 6437614193720920848
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvfedrgedtgedguddtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkfffgggfuffvvehfhfgjtgfgihesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeekteejtdelkeejvdevffduhfetteelieefgeefffeugffhfeekheffueefledujeenucfkphepuddvjedrtddrtddruddpfeejrdehledrudegvddrleehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepuddvjedrtddrtddruddpmhgrihhlfhhrohhmpeeotghlgheskhgrohgurdhorhhgqedpnhgspghrtghpthhtohepuddprhgtphhtthhopehpmhhorhgvlheslhhinhhugidrihgsmhdrtghomhdpnhhrsgeslhhinhhugidrihgsmhdrtghomhdpshgvihguvghnsehlihhnuhigrdhisghmrdgtohhmpdgrrhhmsghruhesrhgvughhrghtrdgtohhmpdgvsghlrghkvgesrhgvughhrghtrdgtohhmpdhmrghrtggvlhdrrghpfhgvlhgsrghumhesghhmrghilhdrtghomhdpvghhrggskhhoshhtsehrvgguhhgrthdrtghomhdpkhhvmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdpphgsohhniihinhhisehrvgguhhgrthdrtghomh
+ dpmhhsthesrhgvughhrghtrdgtohhmpdgtohhhuhgtkhesrhgvughhrghtrdgtohhmpdhthhhuthhhsehrvgguhhgrthdrtghomhdpuggrvhhiugesrhgvughhrghtrdgtohhmpdhrihgthhgrrhgurdhhvghnuggvrhhsohhnsehlihhnrghrohdrohhrghdpphgrshhitgeslhhinhhugidrihgsmhdrtghomhdpsghorhhnthhrrggvghgvrhesuggvrdhisghmrdgtohhmpdhqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgpdhqvghmuhdqshefledtgiesnhhonhhgnhhurdhorhhgpdhfrhgrnhhkjhgrsehlihhnuhigrdhisghmrdgtohhmpdgsvghrrhgrnhhgvgesrhgvughhrghtrdgtohhmpdfovfetjfhoshhtpehmohehvdelpdhmohguvgepshhmthhpohhuth
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On 10/19/22 17:39, Pierre Morel wrote:
+> 
+> 
+> On 10/18/22 18:43, Cédric Le Goater wrote:
+>> Hello Pierre,
+>>
+>> On 10/12/22 18:20, Pierre Morel wrote:
+>>> In the S390x CPU topology the core_id specifies the CPU address
+>>> and the position of the core withing the topology.
+>>>
+>>> Let's build the topology based on the core_id.
+>>> s390x/cpu topology: core_id sets s390x CPU topology
+>>>
+>>> In the S390x CPU topology the core_id specifies the CPU address
+>>> and the position of the cpu withing the topology.
+>>>
+>>> Let's build the topology based on the core_id.
+>>
+>> The commit log is doubled.
+> 
+> Yes, thanks.
+> 
+>>
+>>>
+>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>> ---
+>>>   include/hw/s390x/cpu-topology.h |  45 +++++++++++
+>>>   hw/s390x/cpu-topology.c         | 132 ++++++++++++++++++++++++++++++++
+>>>   hw/s390x/s390-virtio-ccw.c      |  21 +++++
+>>>   hw/s390x/meson.build            |   1 +
+>>>   4 files changed, 199 insertions(+)
+>>>   create mode 100644 include/hw/s390x/cpu-topology.h
+>>>   create mode 100644 hw/s390x/cpu-topology.c
+>>>
+>>> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
+>>> new file mode 100644
+>>> index 0000000000..66c171d0bc
+>>> --- /dev/null
+>>> +++ b/include/hw/s390x/cpu-topology.h
+>>> @@ -0,0 +1,45 @@
+>>> +/*
+>>> + * CPU Topology
+>>> + *
+>>> + * Copyright 2022 IBM Corp.
+>>> + *
+>>> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+>>> + * your option) any later version. See the COPYING file in the top-level
+>>> + * directory.
+>>> + */
+>>> +#ifndef HW_S390X_CPU_TOPOLOGY_H
+>>> +#define HW_S390X_CPU_TOPOLOGY_H
+>>> +
+>>> +#include "hw/qdev-core.h"
+>>> +#include "qom/object.h"
+>>> +
+>>> +typedef struct S390TopoContainer {
+>>> +    int active_count;
+>>> +} S390TopoContainer;
+>>
+>> This structure does not seem very useful.
+>>
+>>> +
+>>> +#define S390_TOPOLOGY_CPU_IFL 0x03
+>>> +#define S390_TOPOLOGY_MAX_ORIGIN ((63 + S390_MAX_CPUS) / 64)
+>>> +typedef struct S390TopoTLE { 
+>>
+>> The 'Topo' is redundant as TLE stands for 'topology-list entry'. This is minor.
+>>
+>>> +    uint64_t mask[S390_TOPOLOGY_MAX_ORIGIN];
+>>> +} S390TopoTLE;
+>>> +
+>>> +struct S390Topology {
+>>> +    SysBusDevice parent_obj;
+>>> +    int cpus;
+>>> +    S390TopoContainer *socket;
+>>> +    S390TopoTLE *tle;
+>>> +    MachineState *ms;
+>>
+>> hmm, it would be cleaner to introduce the fields and properties needed
+>> by the S390Topology model and avoid dragging the machine object pointer.
+>> AFAICT, these properties would be :
+>>
+>>    "nr-cpus"
+>>    "max-cpus"
+>>    "nr-sockets"
+>>
+> 
+> OK
+> 
+>>
+>>
+>>> +};
+>>> +
+>>> +#define TYPE_S390_CPU_TOPOLOGY "s390-topology"
+>>> +OBJECT_DECLARE_SIMPLE_TYPE(S390Topology, S390_CPU_TOPOLOGY)
+>>> +
+>>> +S390Topology *s390_get_topology(void);
+>>> +void s390_topology_new_cpu(int core_id);
+>>> +
+>>> +static inline bool s390_has_topology(void)
+>>> +{
+>>> +    return false;
+>>> +}
+>>> +
+>>> +#endif
+>>> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+>>> new file mode 100644
+>>> index 0000000000..42b22a1831
+>>> --- /dev/null
+>>> +++ b/hw/s390x/cpu-topology.c
+>>> @@ -0,0 +1,132 @@
+>>> +/*
+>>> + * CPU Topology
+>>> + *
+>>> + * Copyright IBM Corp. 2022
+>>
+>> The Copyright tag is different in the .h file.
+> 
+> OK, I change this to be like in the header file it seems to be the most used format.
+> 
+>>
+>>> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
+>>> +
+>>> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+>>> + * your option) any later version. See the COPYING file in the top-level
+>>> + * directory.
+>>> + */
+>>> +
+>>> +#include "qemu/osdep.h"
+>>> +#include "qapi/error.h"
+>>> +#include "qemu/error-report.h"
+>>> +#include "hw/sysbus.h"
+>>> +#include "hw/qdev-properties.h"
+>>> +#include "hw/boards.h"
+>>> +#include "qemu/typedefs.h"
+>>> +#include "target/s390x/cpu.h"
+>>> +#include "hw/s390x/s390-virtio-ccw.h"
+>>> +#include "hw/s390x/cpu-topology.h"
+>>> +
+>>> +S390Topology *s390_get_topology(void)
+>>> +{
+>>> +    static S390Topology *s390Topology;
+>>> +
+>>> +    if (!s390Topology) {
+>>> +        s390Topology = S390_CPU_TOPOLOGY(
+>>> +            object_resolve_path(TYPE_S390_CPU_TOPOLOGY, NULL));
+>>> +    }
+>>> +
+>>> +    return s390Topology;
+>>
+>> I am not convinced this routine is useful. The s390Topology pointer
+>> could be stored under the machine state I think. It wouldn't be a
+>> problem when CPUs are hot plugged since we have access to the machine
+>> in the hot plug handler.
+> 
+> OK, I add a pointer to the machine state that will be initialised during s390_init_topology()
 
-Updated test cases to cover KVM enabling code for AMD Guest PerfMonV2.
+LGTM.
 
-The Intel-specific PMU helpers were added to check for AMD cpuid, and
-some of the same semantics of MSRs were assigned during the initialization
-phase. The vast majority of pmu test cases are reused seamlessly.
+> 
+>>
+>> For the stsi call, 'struct ArchCPU' probably lacks a back pointer to
+>> the machine objects with which CPU interact. These are typically
+>> interrupt controllers or this new s390Topology model. You could add
+>> the pointer there or, better, under a generic 'void *opaque' attribute.
+>>
+>> That said, what you did works fine. The modeling could be cleaner.
+> 
+> Yes. I think you are right and I add a opaque pointer to the topology.
 
-On some x86 machines (AMD only), even with retired events, the same
-workload is measured repeatedly and the number of events collected is
-erratic, which essentially reflects the details of hardware implementation,
-and from a software perspective, the type of event is an unprecise event,
-which brings a tolerance check in the counter overflow testcases.
+As an example, you could look at PPC where the PowerPCCPU CPU model is
+shared between two differents machine, a baremetal one PowerNV and the
+para-virtual one pSeries/sPAPR. Look for :
 
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- lib/x86/msr.h       | 5 +++++
- lib/x86/pmu.c       | 9 ++++++++-
- lib/x86/pmu.h       | 6 +++++-
- lib/x86/processor.h | 2 +-
- 4 files changed, 19 insertions(+), 3 deletions(-)
+    pnv_cpu_state(PowerPCCPU *cpu)
+    spapr_cpu_state(PowerPCCPU *cpu)
 
-diff --git a/lib/x86/msr.h b/lib/x86/msr.h
-index 6cf8f33..c9869be 100644
---- a/lib/x86/msr.h
-+++ b/lib/x86/msr.h
-@@ -426,6 +426,11 @@
- #define MSR_CORE_PERF_GLOBAL_CTRL	0x0000038f
- #define MSR_CORE_PERF_GLOBAL_OVF_CTRL	0x00000390
- 
-+/* AMD Performance Counter Global Status and Control MSRs */
-+#define MSR_AMD64_PERF_CNTR_GLOBAL_STATUS	0xc0000300
-+#define MSR_AMD64_PERF_CNTR_GLOBAL_CTL		0xc0000301
-+#define MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR	0xc0000302
-+
- /* Geode defined MSRs */
- #define MSR_GEODE_BUSCONT_CONF0		0x00001900
- 
-diff --git a/lib/x86/pmu.c b/lib/x86/pmu.c
-index 7fd2279..d4034cb 100644
---- a/lib/x86/pmu.c
-+++ b/lib/x86/pmu.c
-@@ -20,10 +20,17 @@ void pmu_init(void)
-     } else {
-         pmu.msr_gp_counter_base = MSR_F15H_PERF_CTR0;
-         pmu.msr_gp_event_select_base = MSR_F15H_PERF_CTL0;
--        if (!has_amd_perfctr_core())
-+        if (this_cpu_has(X86_FEATURE_AMD_PMU_V2))
-+            pmu.nr_gp_counters = cpuid(0x80000022).b & 0xf;
-+        else if (!has_amd_perfctr_core())
-             pmu.nr_gp_counters = AMD64_NUM_COUNTERS;
-         else
-             pmu.nr_gp_counters = AMD64_NUM_COUNTERS_CORE;
-+        if (this_cpu_support_perf_status()) {
-+            pmu.msr_global_status = MSR_AMD64_PERF_CNTR_GLOBAL_STATUS;
-+            pmu.msr_global_ctl = MSR_AMD64_PERF_CNTR_GLOBAL_CTL;
-+            pmu.msr_global_status_clr = MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR;
-+        }
-     }
-     reset_all_counters();
- }
-\ No newline at end of file
-diff --git a/lib/x86/pmu.h b/lib/x86/pmu.h
-index a4e00c5..8f5b5ac 100644
---- a/lib/x86/pmu.h
-+++ b/lib/x86/pmu.h
-@@ -115,8 +115,12 @@ static inline void write_gp_event_select(unsigned int i, u64 value)
- 
- static inline u8 pmu_version(void)
- {
--	if (!is_intel())
-+	if (!is_intel()) {
-+		/* Performance Monitoring Version 2 Supported */
-+		if (this_cpu_has(X86_FEATURE_AMD_PMU_V2))
-+			return 2;
- 		return 0;
-+	}
- 
- 	return cpuid_10.a & 0xff;
- }
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index 64b36cf..7f884f7 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -266,7 +266,7 @@ static inline bool is_intel(void)
- #define X86_FEATURE_PAUSEFILTER		(CPUID(0x8000000A, 0, EDX, 10))
- #define X86_FEATURE_PFTHRESHOLD		(CPUID(0x8000000A, 0, EDX, 12))
- #define	X86_FEATURE_VGIF		(CPUID(0x8000000A, 0, EDX, 16))
--
-+#define	X86_FEATURE_AMD_PMU_V2		(CPUID(0x80000022, 0, EAX, 0))
- 
- static inline bool this_cpu_has(u64 feature)
- {
--- 
-2.38.1
+the machine CPU state is stored under an opaque cpu->machine_data which is
+specific to each machine. It doesn't have to be as complex on s390 since
+we only have one type of z-machine. An opaque is a good idea still.
 
+Thanks,
+
+C.
