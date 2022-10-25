@@ -2,154 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2291360D4EE
-	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 21:49:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98A8360D516
+	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 21:58:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232463AbiJYTtt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Oct 2022 15:49:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41576 "EHLO
+        id S232651AbiJYT6o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Oct 2022 15:58:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232377AbiJYTtm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Oct 2022 15:49:42 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C2ECB37
-        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 12:49:27 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id 3-20020a17090a0f8300b00212d5cd4e5eso11885290pjz.4
-        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 12:49:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kzHE8qUOrnZbVgEao5KIQPfh0k9CuMJWkxVcD7LoNGc=;
-        b=hHQfIe3/SDtiYhvtIQ3aVNU2AyMfAc17qTeql39uE4U0aM+gZYtABeLk3rbVyRo9MI
-         gCGPw4ytWQGqRv/qoJ13S2ztvJIke0akthrQQn45FR+qyAzz2cVoaTjpuOxS+qpcLo/Y
-         dPRmGcZWaVodnhL3L/a8JT47nmUVFNVFXgUkv8q+Ek+VE0Mz055s9Eoj/wZPt3eviquR
-         aV1xA39tdq+lU8zU3Bt3ftE/aDqhBHftBLq8fKzDNCxZEN4DB9JRfBPGA4FH5a+5hEzG
-         VI+l/BEuumCRvq3+Ksrd/aIF0+rrV2cyJcPBdYNi+Ut2xmwZHicbNXJha2c0LnJA+gea
-         Xumg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kzHE8qUOrnZbVgEao5KIQPfh0k9CuMJWkxVcD7LoNGc=;
-        b=3O2JbLqUFji4LAmclj89eX/IfBP5q/SnKm+uCKNKJMmJ9S5vV3HJ0swymlomDDUXi/
-         Vfl2W2tJRXYLfcVilvbjR5aqBymPBsdkQROI9mvKiTDIMxN7AvtYW0hDpZB99ZhTSvPZ
-         2b1BeCliRaC3pvdr5X0SaCmJkglfIqXy/+evWSvDmgLc5kHuZRDAe4JkjXjqe07DTncL
-         MmoT5EL7GZyFRU7ScNNPhDl0DPSXnoe1KC+geTOpDHf/c0YlE5i799nvP59dFQ5OnCes
-         hT2bFrUF+fEPgK2Qk3abl/nnO87IqyyOEU0Xme3qSYXTj8d1c9Ebo9LvbbNP3/4xbMPi
-         XIJQ==
-X-Gm-Message-State: ACrzQf2Gi6XYLjBc8oCQpR6MNzkEi3cN2A/8r0Es5o3sY3iVcHbejkaI
-        +GdQdyqGWcrHbWVk3iTTIwwDE0UxT0PcKg==
-X-Google-Smtp-Source: AMsMyM7iQbRWHRfUinZ+Y7e0irNlNlDQEMTNgYDxBvMs0VthU8o46mR80uTvdBw9amaaWMHwXu+9Zw==
-X-Received: by 2002:a17:903:246:b0:179:96b5:1ad2 with SMTP id j6-20020a170903024600b0017996b51ad2mr39685546plh.37.1666727366272;
-        Tue, 25 Oct 2022 12:49:26 -0700 (PDT)
-Received: from crazyhorse.local ([174.127.229.57])
-        by smtp.googlemail.com with ESMTPSA id v6-20020a17090a00c600b001ef8ab65052sm1715961pjd.11.2022.10.25.12.49.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Oct 2022 12:49:25 -0700 (PDT)
-From:   Anthony DeRossi <ajderossi@gmail.com>
-To:     kvm@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com, jgg@ziepe.ca,
-        yishaih@nvidia.com, kevin.tian@intel.com
-Subject: [PATCH] vfio: Decrement open_count before close_device()
-Date:   Tue, 25 Oct 2022 12:38:20 -0700
-Message-Id: <20221025193820.4412-1-ajderossi@gmail.com>
-X-Mailer: git-send-email 2.37.4
+        with ESMTP id S232463AbiJYT6n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Oct 2022 15:58:43 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 586CD10EA18
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 12:58:42 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29PIUbqa021265;
+        Tue, 25 Oct 2022 19:58:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=JWqb3y/z8GNZrZ7+5y77h4Ti0NUGbmfUZCdPQ5x7qbs=;
+ b=fv9HUqFn0q1CSVfGVrUyfEVvj4a7KLQ/O0LYoPUZjJbjKkQe2Q2z4VLVjclkMEEfeJMS
+ KXFHI0Yw2yGDWc3WTF9uI0Jco+7LLi/7nzrx1rO9teVGLq+W5RCzCbNUX9KM2Kt904Yp
+ pf25PWt/DfyWeQVRfetypKxboMKQaMxfWHaBhup2Ns8PUJ6ItiDyxcwl/E3scImfgrv6
+ Hnm5lw8rdFKx2s9060ALTG9qS2+pkLVR6N2A31nmUZysj0gDyUtrnWXIFWscvIkTqQG6
+ sJL4XGaszo1bGGrknJxps/4mmvZzkcwAzBgbwypSaluwHpuKVSXbWwAPrhflv1SKeUTN PQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kee99aat3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Oct 2022 19:58:33 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29PJDT1O030628;
+        Tue, 25 Oct 2022 19:58:33 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kee99aasa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Oct 2022 19:58:33 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29PJoe5p023216;
+        Tue, 25 Oct 2022 19:58:30 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3kdugatt9s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Oct 2022 19:58:30 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29PJx1JK34931074
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 25 Oct 2022 19:59:01 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 02FE4AE051;
+        Tue, 25 Oct 2022 19:58:27 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2C817AE045;
+        Tue, 25 Oct 2022 19:58:26 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.41.31])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 25 Oct 2022 19:58:26 +0000 (GMT)
+Message-ID: <ad2a9892184cd5dc7597d411f42e330558146acf.camel@linux.ibm.com>
+Subject: Re: [PATCH v10 1/9] s390x/cpu topology: core_id sets s390x CPU
+ topology
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+Date:   Tue, 25 Oct 2022 21:58:25 +0200
+In-Reply-To: <20221012162107.91734-2-pmorel@linux.ibm.com>
+References: <20221012162107.91734-1-pmorel@linux.ibm.com>
+         <20221012162107.91734-2-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: w6Ws5AHCMyn7xTg-U1dvybSI5PjBpFpi
+X-Proofpoint-ORIG-GUID: ZbYpU7S_91N_pPiML05QxnAavYt-s_Bu
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-25_12,2022-10-25_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 suspectscore=0 mlxlogscore=999 spamscore=0 adultscore=0
+ mlxscore=0 malwarescore=0 lowpriorityscore=0 impostorscore=0 clxscore=1015
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210250110
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The implementation of close_device() for vfio-pci inspects the
-open_count of every device in the device set to determine whether a
-reset is needed. Unless open_count is decremented before invoking
-close_device(), the device set will always contain a device with
-open_count > 0, effectively disabling the reset logic.
+On Wed, 2022-10-12 at 18:20 +0200, Pierre Morel wrote:
+> In the S390x CPU topology the core_id specifies the CPU address
+> and the position of the core withing the topology.
+> 
+> Let's build the topology based on the core_id.
+> s390x/cpu topology: core_id sets s390x CPU topology
+> 
+> In the S390x CPU topology the core_id specifies the CPU address
+> and the position of the cpu withing the topology.
+> 
+> Let's build the topology based on the core_id.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  include/hw/s390x/cpu-topology.h |  45 +++++++++++
+>  hw/s390x/cpu-topology.c         | 132 ++++++++++++++++++++++++++++++++
+>  hw/s390x/s390-virtio-ccw.c      |  21 +++++
+>  hw/s390x/meson.build            |   1 +
+>  4 files changed, 199 insertions(+)
+>  create mode 100644 include/hw/s390x/cpu-topology.h
+>  create mode 100644 hw/s390x/cpu-topology.c
+> 
+[...]
 
-After commit 2cd8b14aaa66 ("vfio/pci: Move to the device set
-infrastructure"), failure to create a new file for a device would cause
-the reset to be skipped when closing the device in the error path.
+> +/**
+> + * s390_topology_realize:
+> + * @dev: the device state
+> + * @errp: the error pointer (not used)
+> + *
+> + * During realize the machine CPU topology is initialized with the
+> + * QEMU -smp parameters.
+> + * The maximum count of CPU TLE in the all Topology can not be greater
+> + * than the maximum CPUs.
+> + */
+> +static void s390_topology_realize(DeviceState *dev, Error **errp)
+> +{
+> +    MachineState *ms = MACHINE(qdev_get_machine());
+> +    S390Topology *topo = S390_CPU_TOPOLOGY(dev);
+> +
+> +    topo->cpus = ms->smp.cores * ms->smp.threads;
 
-After commit eadd86f835c6 ("vfio: Remove calls to
-vfio_group_add_container_user()"), releasing a device would always skip
-the reset.
-
-Failing to reset the device leaves it in an unknown state, potentially
-causing errors when it is bound to a different driver.
-
-This issue was observed with a Radeon RX Vega 56 [1002:687f] (rev c3)
-assigned to a Windows guest. After shutting down the guest, unbinding
-the device from vfio-pci, and binding the device to amdgpu:
-
-[  548.007102] [drm:psp_hw_start [amdgpu]] *ERROR* PSP create ring failed!
-[  548.027174] [drm:psp_hw_init [amdgpu]] *ERROR* PSP firmware loading failed
-[  548.027242] [drm:amdgpu_device_fw_loading [amdgpu]] *ERROR* hw_init of IP block <psp> failed -22
-[  548.027306] amdgpu 0000:0a:00.0: amdgpu: amdgpu_device_ip_init failed
-[  548.027308] amdgpu 0000:0a:00.0: amdgpu: Fatal error during GPU init
-
-Fixes: 2cd8b14aaa66 ("vfio/pci: Move to the device set infrastructure")
-Fixes: eadd86f835c6 ("vfio: Remove calls to vfio_group_add_container_user()")
-Signed-off-by: Anthony DeRossi <ajderossi@gmail.com>
----
- drivers/vfio/vfio_main.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 2d168793d4e1..7c3f1734fb35 100644
---- a/drivers/vfio/vfio_main.c
-+++ b/drivers/vfio/vfio_main.c
-@@ -763,8 +763,10 @@ static struct file *vfio_device_open(struct vfio_device *device)
- 
- 		if (device->ops->open_device) {
- 			ret = device->ops->open_device(device);
--			if (ret)
--				goto err_undo_count;
-+			if (ret) {
-+				device->open_count--;
-+				goto err_unlock;
-+			}
- 		}
- 		vfio_device_container_register(device);
- 		mutex_unlock(&device->group->group_lock);
-@@ -801,14 +803,13 @@ static struct file *vfio_device_open(struct vfio_device *device)
- err_close_device:
- 	mutex_lock(&device->dev_set->lock);
- 	mutex_lock(&device->group->group_lock);
--	if (device->open_count == 1 && device->ops->close_device) {
-+	if (!--device->open_count && device->ops->close_device) {
- 		device->ops->close_device(device);
- 
- 		vfio_device_container_unregister(device);
- 	}
--err_undo_count:
-+err_unlock:
- 	mutex_unlock(&device->group->group_lock);
--	device->open_count--;
- 	if (device->open_count == 0 && device->kvm)
- 		device->kvm = NULL;
- 	mutex_unlock(&device->dev_set->lock);
-@@ -1017,12 +1018,11 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
- 	mutex_lock(&device->dev_set->lock);
- 	vfio_assert_device_open(device);
- 	mutex_lock(&device->group->group_lock);
--	if (device->open_count == 1 && device->ops->close_device)
-+	if (!--device->open_count && device->ops->close_device)
- 		device->ops->close_device(device);
- 
- 	vfio_device_container_unregister(device);
- 	mutex_unlock(&device->group->group_lock);
--	device->open_count--;
- 	if (device->open_count == 0)
- 		device->kvm = NULL;
- 	mutex_unlock(&device->dev_set->lock);
--- 
-2.37.4
-
+Currently threads are not supported, effectively increasing the number of cpus,
+so this is currently correct. Once the machine version limits the threads to 1,
+it is also correct. However, once we support multiple threads, this becomes incorrect.
+I wonder if it's ok from a backward compatibility point of view to modify the smp values
+by doing cores *= threads, threads = 1 for old machines.
+Then you can just use the cores value and it is always correct.
+In any case, if you keep it as is, I'd like to see a comment here saying that this
+is correct only so long as we don't support threads.
+> +
+> +    topo->socket = g_new0(S390TopoContainer, ms->smp.sockets);
+> +    topo->tle = g_new0(S390TopoTLE, ms->smp.max_cpus);
+> +
+> +    topo->ms = ms;
+> +}
+> +
+[...]
