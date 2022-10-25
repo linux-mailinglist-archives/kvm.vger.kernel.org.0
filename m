@@ -2,124 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B236860CD3A
-	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 15:17:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 168CB60CDB2
+	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 15:37:54 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232747AbiJYNRt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Oct 2022 09:17:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32898 "EHLO
+        id S231963AbiJYNhu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Oct 2022 09:37:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232743AbiJYNRp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Oct 2022 09:17:45 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5944CE52E5;
-        Tue, 25 Oct 2022 06:17:44 -0700 (PDT)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29PCfeYp004049;
-        Tue, 25 Oct 2022 13:17:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=M9PK9LY4oTb8D3o+jZliwBeehdFYroiqI+wKOruGl0Y=;
- b=ACvKlCaAPkCFLIhwhFDzLYFHZ275xnWnUNQCdVr6jnrN+TyUE08NeDcmxljb19Yxx/Ml
- J3xwtiK2H7OIL6JjxV3qOkgNTb/hYUzq/+DBBWiqEXYGpNKTdtnf3veZizxaqacS4iHG
- rMDhypTzWXpDA5L11XhsJcL+99R2iL1BfZQn7USClQ911GFcHRvSNOuJmoN16RdEMqy+
- 8sOetSwSFFd+nVthwTdI+SyK6zpQZ67ccDyisfs6Ombv+3EbaxWwh4IEZEvkfS5/ut8V
- DH/r5nhXh3u47xlHUh5m/R5Up1qX/8B7V5tRYW4mQuzKOTmBKoEcSHXLM1LI7tTHslOb Rw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kee35wd89-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Oct 2022 13:17:43 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29PCfn9K004898;
-        Tue, 25 Oct 2022 13:17:43 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kee35wd6u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Oct 2022 13:17:43 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29PD6bOu013922;
-        Tue, 25 Oct 2022 13:17:40 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma01fra.de.ibm.com with ESMTP id 3kc8594351-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Oct 2022 13:17:40 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29PDHbZW2949656
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Oct 2022 13:17:37 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 84E25A4040;
-        Tue, 25 Oct 2022 13:17:37 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C769FA404D;
-        Tue, 25 Oct 2022 13:17:36 +0000 (GMT)
-Received: from [9.171.30.119] (unknown [9.171.30.119])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 25 Oct 2022 13:17:36 +0000 (GMT)
-Message-ID: <0117e263-2856-b2fd-1e61-59b21e5da2e5@linux.ibm.com>
-Date:   Tue, 25 Oct 2022 15:17:36 +0200
+        with ESMTP id S232640AbiJYNhi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Oct 2022 09:37:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 866D9193741
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 06:37:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666705055;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=exi/m0Abh7Peoy1eaDEpT6oKngaAyQ3kIL361TzbR/Y=;
+        b=ZzpDNMXyeHdE7XLJiaAqzgMgsO6yN/dpjDCwoBiocdSoYzB6AKii4DdPKss2HOM5Fo7eYd
+        CcJIgtKm+bBDUbkR3coXqrDr5BAEJ9y0LUfTNGRUO0IJ/zIRQglKPQuRpEHIwsaOFaej6S
+        NfPDJs3iAHT3sRy9hj4xkEzMLdvfpf4=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-660-cPOEBgW9P4ezMfAmTrww-A-1; Tue, 25 Oct 2022 09:37:33 -0400
+X-MC-Unique: cPOEBgW9P4ezMfAmTrww-A-1
+Received: by mail-qk1-f198.google.com with SMTP id ay43-20020a05620a17ab00b006f7ee90098aso1058652qkb.11
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 06:37:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=exi/m0Abh7Peoy1eaDEpT6oKngaAyQ3kIL361TzbR/Y=;
+        b=M4jPhN+WJVJG8Hz7tIHtyXBMQ28SccVRTx2/W0+Naq2KKdICePARkRc2Plo7Om/aaK
+         4xJO4hdAtSG25jEOvlMaTUBRbwJ4j2sayvbkwMFJPPhbi5We2UYIcVVycuE38ubw267v
+         677rAfFQ+ttQ1enNWJhnwUIBOULDarlkLWN64sOJHQsAsJUljC3ALw1yjGF5wwxnbcby
+         mkYGHOYB0lcAU7O+FAr9+k1KXQdKEjcHrMtkTSDIHMVoGF2RuzycABYcY6uTvScxfZ7K
+         2/mTxEnOoW8ag+OTARx46MLizxnxf/WyvRygv3UWvncsLPzQDRKmHO+jZrIBE/e1TWrg
+         32mQ==
+X-Gm-Message-State: ACrzQf3llrxCDbWWc1yKXBNNBIsZfEPFFdqTGyfxfug5v6Zvej/qoh9u
+        0T3zlUa3t75KdNXW8SPA8wquKrX0oLfAwOz+hxqNaiw2cXuC2mW6+KOMHAFOZFA6kIhdpaEs364
+        f1Qnj5zXef5eO
+X-Received: by 2002:a05:620a:4414:b0:6ee:76e4:1b6d with SMTP id v20-20020a05620a441400b006ee76e41b6dmr25236869qkp.360.1666705052599;
+        Tue, 25 Oct 2022 06:37:32 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM68HpWeY+CJiGKYkIVSR65r7FtSbw6IzHBXldUSNhKCTbouniAxrMfvQVq6EzqpiZi7la0B2w==
+X-Received: by 2002:a05:620a:4414:b0:6ee:76e4:1b6d with SMTP id v20-20020a05620a441400b006ee76e41b6dmr25236849qkp.360.1666705052322;
+        Tue, 25 Oct 2022 06:37:32 -0700 (PDT)
+Received: from [10.35.4.238] (bzq-82-81-161-50.red.bezeqint.net. [82.81.161.50])
+        by smtp.gmail.com with ESMTPSA id w3-20020ac857c3000000b0039442ee69c5sm1612489qta.91.2022.10.25.06.37.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Oct 2022 06:37:31 -0700 (PDT)
+Message-ID: <cc6f6e29ca844cccbefd9f2a3c0a25159ce3fecd.camel@redhat.com>
+Subject: Re: [PATCH 4/4] KVM: x86: forcibly leave nested mode on vCPU reset
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, stable@vger.kernel.org
+Date:   Tue, 25 Oct 2022 16:37:27 +0300
+In-Reply-To: <Y1FqXiBB7Bqzj8eh@google.com>
+References: <20221020093055.224317-1-mlevitsk@redhat.com>
+         <20221020093055.224317-5-mlevitsk@redhat.com> <Y1FqXiBB7Bqzj8eh@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-5.fc34) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH v2 1/1] KVM: s390: vsie: clarifications on setting the
- APCB
-To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, svens@linux.ibm.com
-References: <20221025091319.37110-1-pmorel@linux.ibm.com>
- <20221025091319.37110-2-pmorel@linux.ibm.com>
- <e9a237d7-3a34-11c8-1c5b-1a3c14e8cfb0@redhat.com>
-Content-Language: en-US
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <e9a237d7-3a34-11c8-1c5b-1a3c14e8cfb0@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: WFO04gaDUtMpOw2tljq--Y9LiVCAxz3h
-X-Proofpoint-GUID: MJRwK1_i_YK8wnWfVoWROUkVP3L55NiR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-25_06,2022-10-25_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=677
- suspectscore=0 adultscore=0 mlxscore=0 malwarescore=0 spamscore=0
- lowpriorityscore=0 priorityscore=1501 clxscore=1011 phishscore=0
- bulkscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2209130000 definitions=main-2210250075
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, 2022-10-20 at 15:33 +0000, Sean Christopherson wrote:
+> On Thu, Oct 20, 2022, Maxim Levitsky wrote:
+> > While not obivous, kvm_vcpu_reset leaves the nested mode by
+> 
+> Please add () when referencing function, and wrap closer to ~75 chars.
+> 
+> > clearing 'vcpu->arch.hflags' but it does so without all the
+> > required housekeeping.
+> > 
+> > This makes SVM and VMX continue to use vmcs02/vmcb02 while
+> 
+> This bug should be impossible to hit on VMX as INIT and TRIPLE_FAULT unconditionally
+> cause VM-Exit, i.e. will always be forwarded to L1.
 
+True I guess as I found out as well, in VMX the physical CPU can't be reset while
+in guest mode. I'll update the changelog.
 
-On 10/25/22 11:30, David Hildenbrand wrote:
-> On 25.10.22 11:13, Pierre Morel wrote:
->> The APCB is part of the CRYCB.
->> The calculation of the APCB origin can be done by adding
->> the APCB offset to the CRYCB origin.
->>
->> Current code makes confusing transformations, converting
->> the CRYCB origin to a pointer to calculate the APCB origin.
->>
+> 
+> > the cpu is not in nested mode.
+> 
+> Can you add a blurb to call out exactly how this bug can be triggered?  Doesn't
+> take much effort to suss out the "how", but it'd be nice to capture that info in
+> the changelog.
+
+I will add (in another patch) a selftest for this.
+
+> 
+> > In particular, in SVM code, it makes the 'svm_free_nested'
+> > free the vmcb02, while still in use, which later triggers
+> > use after free and a kernel crash.
+> > 
+> > This issue is assigned CVE-2022-3344
+> > 
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+> >  arch/x86/kvm/x86.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index d86a8aae1471d3..313c4a6dc65e45 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -11931,6 +11931,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+> >         WARN_ON_ONCE(!init_event &&
+> >                      (old_cr0 || kvm_read_cr3(vcpu) || kvm_read_cr4(vcpu)));
+> >  
+> > +       kvm_leave_nested(vcpu);
+> 
+> Not a big deal, especially if/when nested_ops are turned into static_calls, but
+> at the same time it's quite easy to do:
+> 
+>         if (is_guest_mode(vcpu))
+>                 kvm_leave_nested(vcpu);
+> 
+> I think it's worth adding a comment explaining how this can happen, and to also
+> call out that EFER is cleared on INIT, i.e. that virtualization is disabled due
+> to EFER.SVME=0.  Unsurprisingly, I don't see anything in the APM that explicitly
+> states what happens if INIT occurs in guest mode, i.e. it's not immediately obvious
+> that forcing the vCPU back to L1 is architecturally correct.
 > 
 > 
-> While at it, can we rename "crycb_o" to "crycb_gpa" and "apcb_o" to 
-> "apcb_gpa".
+> >         kvm_lapic_reset(vcpu, init_event);
+> >  
+> >         vcpu->arch.hflags = 0;
 > 
-> These are not pointers but guest physical addresses.
+> Maybe add a WARN above this to try and detect other potential issues?  Kinda silly,
+> but it'd at least help draw attention to the importance of hflags.
+> 
+> E.g. this?
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 4bd5f8a751de..c50fa0751a0b 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -11915,6 +11915,15 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>         unsigned long old_cr0 = kvm_read_cr0(vcpu);
+>         unsigned long new_cr0;
+>  
+> +       /*
+> +        * SVM doesn't unconditionally VM-Exit on INIT and SHUTDOWN, thus it's
+> +        * possible to INIT the vCPU while L2 is active.  Force the vCPU back
+> +        * into L1 as EFER.SVME is cleared on INIT (along with all other EFER
+> +        * bits), i.e. virtualization is disabled.
+> +        */
+
+
+> +       if (is_guest_mode(vcpu))
+> +               kvm_leave_nested(vcpu);
+> +
+>         /*
+>          * Several of the "set" flows, e.g. ->set_cr0(), read other registers
+>          * to handle side effects.  RESET emulation hits those flows and relies
+> @@ -11927,6 +11936,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>  
+>         kvm_lapic_reset(vcpu, init_event);
+>  
+> +       WARN_ON_ONCE(is_guest_mode(vcpu) || is_smm(vcpu));
+>         vcpu->arch.hflags = 0;
+>  
+>         vcpu->arch.smi_pending = 0;
 > 
 
-I can do that.
-the _o came from the name in the documentation "origin"
-but gpa is more obvious.
+Best regards,
+	Maxim Levitsky
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
