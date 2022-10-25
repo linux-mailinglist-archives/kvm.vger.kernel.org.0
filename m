@@ -2,160 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0686660C0AB
-	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 03:13:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9554860C3E1
+	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 08:37:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229851AbiJYBN3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 24 Oct 2022 21:13:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38604 "EHLO
+        id S231310AbiJYGhc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Oct 2022 02:37:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231394AbiJYBM5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 24 Oct 2022 21:12:57 -0400
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B98D13B53F
-        for <kvm@vger.kernel.org>; Mon, 24 Oct 2022 17:24:27 -0700 (PDT)
-Date:   Tue, 25 Oct 2022 00:24:19 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1666657465;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=maoLd9aJkDBZtv2kfarXZXxev38GBgnflgG2yK7ZibY=;
-        b=YQOwZYg7bd2taR4wifBPFQboPaDfdXazXLGaC4ijMKnCk75ViFTvY9IAlddZIzQXOIhu4o
-        XqCzvbruQ6bugkobmf8eUH5UZTzCRm+rLR2kWfLOLpA4LQ3qD5qJhZblrO/XtgZo8bC732
-        XAO0Utjdlgzdfl6VKgOvj8H3pq5PI40=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Gavin Shan <gshan@redhat.com>,
-        kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, peterx@redhat.com, will@kernel.org,
-        catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org,
-        andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com,
-        zhenyzha@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com,
-        alexandru.elisei@arm.com, shan.gavin@gmail.com
-Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in
- conjunction with bitmap
-Message-ID: <Y1css8k0gtFkVwFQ@google.com>
-References: <20221011061447.131531-1-gshan@redhat.com>
- <20221011061447.131531-4-gshan@redhat.com>
- <Y1Hdc/UVta3A5kHM@google.com>
- <8635bhfvnh.wl-maz@kernel.org>
- <Y1LDRkrzPeQXUHTR@google.com>
- <87edv0gnb3.wl-maz@kernel.org>
- <Y1ckxYst3tc0LCqb@google.com>
+        with ESMTP id S229730AbiJYGha (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Oct 2022 02:37:30 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20EE6FE92B;
+        Mon, 24 Oct 2022 23:37:29 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29P6EKFE023479;
+        Tue, 25 Oct 2022 06:37:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=zfrGsFpZfWvA5dGfkkX8JDm9CIZ8gkp0jNelTIsenRc=;
+ b=GRHKuIIbBM27fJBT2XCyFyvKdIM6HrfWC96m1XKBwR/m8WcXAgawK0vv4wQ+yB3cKMVe
+ Cbj70aIil46YafETZCqRYK529cy4H9bS/ZM8pqNEzG280aDm45bucx+diyZXhxfh+Thw
+ C2der1ssW1K6eIdRrd/Ld1vj4SqS8gz/gRw2z13NL2WcKpPwYcKVmzpZ81DPxvWBhW7r
+ lEuR0+QUU/iuXGjiiKGyREMRqv8BlptXtRdzSfC30a3VaKH/j931kuWNCoFliyyOb56+
+ 2wMPmfWUbcNTKTZtj28iJOZUAbGEburnj/dd/e9WzwEhq5P6uWBezpvBivrG5LoTkZoc OA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3keabx0na5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Oct 2022 06:37:28 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29P6Iprj010549;
+        Tue, 25 Oct 2022 06:37:27 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3keabx0n9h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Oct 2022 06:37:27 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29P6Yj2h028545;
+        Tue, 25 Oct 2022 06:37:26 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3kdugas793-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Oct 2022 06:37:25 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29P6bMim7275056
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 25 Oct 2022 06:37:22 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7902052050;
+        Tue, 25 Oct 2022 06:37:22 +0000 (GMT)
+Received: from [9.171.5.17] (unknown [9.171.5.17])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 321BC5204E;
+        Tue, 25 Oct 2022 06:37:22 +0000 (GMT)
+Message-ID: <6dec3e0e-4b77-ffe9-533f-207606e327c4@linux.ibm.com>
+Date:   Tue, 25 Oct 2022 08:37:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y1ckxYst3tc0LCqb@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [v1] KVM: s390: VSIE: sort out virtual/physical address in
+ pin_guest_page
+To:     Nico Boehr <nrb@linux.ibm.com>, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>
+References: <20221024160237.33912-1-nrb@linux.ibm.com>
+Content-Language: en-US
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20221024160237.33912-1-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: cQWvATlFSmi_dRwbY8oji6BSsfK0cc3w
+X-Proofpoint-ORIG-GUID: rfzguxbY2ceRjvWOchT76oZ8trP5edvf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-25_01,2022-10-21_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
+ priorityscore=1501 mlxscore=0 spamscore=0 suspectscore=0
+ lowpriorityscore=0 phishscore=0 bulkscore=0 impostorscore=0 malwarescore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210250036
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 24, 2022 at 11:50:29PM +0000, Sean Christopherson wrote:
-> On Sat, Oct 22, 2022, Marc Zyngier wrote:
-> > On Fri, 21 Oct 2022 17:05:26 +0100, Sean Christopherson <seanjc@google.com> wrote:
 
-[...]
 
-> > > Would it be possible to require a dirty bitmap when an ITS is
-> > > created?  That would allow treating the above condition as a KVM
-> > > bug.
-> > 
-> > No. This should be optional. Everything about migration should be
-> > absolutely optional (I run plenty of concurrent VMs on sub-2GB
-> > systems). You want to migrate a VM that has an ITS or will collect
-> > dirty bits originating from a SMMU with HTTU, you enable the dirty
-> > bitmap. You want to have *vcpu* based dirty rings, you enable them.
-> > 
-> > In short, there shouldn't be any reason for the two are either
-> > mandatory or conflated. Both should be optional, independent, because
-> > they cover completely disjoined use cases. *userspace* should be in
-> > charge of deciding this.
+Am 24.10.22 um 18:02 schrieb Nico Boehr:
+> pin_guest_page() used page_to_virt() to calculate the hpa of the pinned
+> page. This currently works, because virtual and physical addresses are
+> the same. Use page_to_phys() instead to resolve the virtual-real address
+> confusion.
 > 
-> I agree about userspace being in control, what I want to avoid is letting userspace
-> put KVM into a bad state without any indication from KVM that the setup is wrong
-> until something actually dirties a page.
+> One caller of pin_guest_page() actually expected the hpa to be a hva, so
+> add the missing phys_to_virt() conversion here.
 > 
-> Specifically, if mark_page_dirty_in_slot() is invoked without a running vCPU, on
-> a memslot with dirty tracking enabled but without a dirty bitmap, then the migration
-> is doomed.  Dropping the dirty page isn't a sane response as that'd all but
-> guaranatee memory corruption in the guest.  At best, KVM could kick all vCPUs out
-> to userspace with a new exit reason, but that's not a very good experience for
-> userspace as either the VM is unexpectedly unmigratable or the VM ends up being
-> killed (or I suppose userspace could treat the exit as a per-VM dirty ring of
-> size '1').
-
-This only works on the assumption that the VM is in fact running. In the
-case of the GIC ITS, I would expect that the VM has already been paused
-in preparation for serialization. So, there would never be a vCPU thread
-that would ever detect the kick.
-
-> That's why I asked if it's possible for KVM to require a dirty_bitmap when KVM
-> might end up collecting dirty information without a vCPU.  KVM is still
-> technically prescribing a solution to userspace, but only because there's only
-> one solution.
-
-I was trying to allude to something like this by flat-out requiring
-ring + bitmap on arm64.
-
-Otherwise, we'd either need to:
-
- (1) Document the features that explicitly depend on ring + bitmap (i.e.
- GIC ITS, whatever else may come) such that userspace sets up the
- correct configuration based on what its using. The combined likelihood
- of both KVM and userspace getting this right seems low.
-
- (2) Outright reject the use of features that require ring + bitmap.
- This pulls in ordering around caps and other UAPI.
-
-> > > > > The acquire-release thing is irrelevant for x86, and no other
-> > > > > architecture supports the dirty ring until this series, i.e. there's
-> > > > > no need for KVM to detect that userspace has been updated to gain
-> > > > > acquire-release semantics, because the fact that userspace is
-> > > > > enabling the dirty ring on arm64 means userspace has been updated.
-> > > > 
-> > > > Do we really need to make the API more awkward? There is an
-> > > > established pattern of "enable what is advertised". Some level of
-> > > > uniformity wouldn't hurt, really.
-> > > 
-> > > I agree that uniformity would be nice, but for capabilities I don't
-> > > think that's ever going to happen.  I'm pretty sure supporting
-> > > enabling is actually in the minority.  E.g. of the 20 capabilities
-> > > handled in kvm_vm_ioctl_check_extension_generic(), I believe only 3
-> > > support enabling (KVM_CAP_HALT_POLL, KVM_CAP_DIRTY_LOG_RING, and
-> > > KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2).
-> > 
-> > I understood that you were advocating that a check for KVM_CAP_FOO
-> > could result in enabling KVM_CAP_BAR. That I definitely object to.
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>   arch/s390/kvm/vsie.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> I was hoping KVM could make the ACQ_REL capability an extension of DIRTY_LOG_RING,
-> i.e. userspace would DIRTY_LOG_RING _and_ DIRTY_LOG_RING_ACQ_REL for ARM and other
-> architectures, e.g.
-> 
->   int enable_dirty_ring(void)
->   {
-> 	if (!kvm_check(KVM_CAP_DIRTY_LOG_RING))
-> 		return -EINVAL;
-> 
-> 	if (!tso && !kvm_check(KVM_CAP_DIRTY_LOG_RING_ACQ_REL))
-> 		return -EINVAL;
-> 
-> 	return kvm_enable(KVM_CAP_DIRTY_LOG_RING);
+> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+> index 94138f8f0c1c..c6a10ff46d58 100644
+> --- a/arch/s390/kvm/vsie.c
+> +++ b/arch/s390/kvm/vsie.c
+> @@ -654,7 +654,7 @@ static int pin_guest_page(struct kvm *kvm, gpa_t gpa, hpa_t *hpa)
+>   	page = gfn_to_page(kvm, gpa_to_gfn(gpa));
+>   	if (is_error_page(page))
+>   		return -EINVAL;
+> -	*hpa = (hpa_t) page_to_virt(page) + (gpa & ~PAGE_MASK);
+> +	*hpa = (hpa_t)page_to_phys(page) + (gpa & ~PAGE_MASK);
+>   	return 0;
 >   }
-> 
-> But I failed to consider that userspace might try to enable DIRTY_LOG_RING on
-> all architectures, i.e. wouldn't arbitrarily restrict DIRTY_LOG_RING to x86.
+>   
+> @@ -869,7 +869,7 @@ static int pin_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page,
+>   		WARN_ON_ONCE(rc);
+>   		return 1;
+>   	}
+> -	vsie_page->scb_o = (struct kvm_s390_sie_block *) hpa;
+> +	vsie_page->scb_o = (struct kvm_s390_sie_block *)phys_to_virt(hpa);
 
-The third option would be to toss DIRTY_LOG_RING_ACQ_REL this release
-and instead add DIRTY_LOG_RING2, this time checking the flags.
+Do we still need the cast here? phys_to_virt should return a void * and the assignment should succeed.
 
---
-Thanks,
-Oliver
+
+>   	return 0;
+>   }
+>   
