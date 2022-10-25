@@ -2,66 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E42FC60D4B2
-	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 21:31:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2291360D4EE
+	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 21:49:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231511AbiJYTbd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Oct 2022 15:31:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37138 "EHLO
+        id S232463AbiJYTtt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Oct 2022 15:49:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230134AbiJYTbb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Oct 2022 15:31:31 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89B60D038A
-        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 12:31:30 -0700 (PDT)
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29PI4jO2004124;
-        Tue, 25 Oct 2022 19:31:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2022-7-12;
- bh=hIWH2Ou//jnKTr9ST84eauTacDt2erWlMIRsuZiOAkE=;
- b=VV6OPs8JZDNwoqrVlJkfEqZ/CkxMOWadlTUHMKFP9gpXLcm25oz6qLx+kdDRDjQ1Nv7I
- 7po6A9Va93ARReS6QgytQQIo8zVorBAQWx9a5/WNFlwGtNHZ5sameLn/nTgS6O6tu4sT
- PjzZNRkxD5b9p/hDpSOd5wf0zMCLdYfF7GmL3UQTTniKSBsG59h43L1pRZzufN+6Sl/a
- 4C5L12XqnMcfVzwKA3b5BQiJO3fcapyC3GB2yuIKZljViit/hS7Wfi8OJ6ZAJnjsENd/
- 9PXtJmnLIA9XMdYgj+nTEaYPWXVYju85Wdj1IMDyRSemQ1jk+ISQjK65m5A1oFFlCZ0Y Tg== 
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3kc939d5yx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Oct 2022 19:31:27 +0000
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 29PJ5VkT012753;
-        Tue, 25 Oct 2022 19:31:26 GMT
-Received: from joaomart-mac.uk.oracle.com (dhcp-10-175-215-98.vpn.oracle.com [10.175.215.98])
-        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3kc6y4y1dp-3;
-        Tue, 25 Oct 2022 19:31:26 +0000
-From:   Joao Martins <joao.m.martins@oracle.com>
+        with ESMTP id S232377AbiJYTtm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Oct 2022 15:49:42 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C2ECB37
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 12:49:27 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id 3-20020a17090a0f8300b00212d5cd4e5eso11885290pjz.4
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 12:49:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kzHE8qUOrnZbVgEao5KIQPfh0k9CuMJWkxVcD7LoNGc=;
+        b=hHQfIe3/SDtiYhvtIQ3aVNU2AyMfAc17qTeql39uE4U0aM+gZYtABeLk3rbVyRo9MI
+         gCGPw4ytWQGqRv/qoJ13S2ztvJIke0akthrQQn45FR+qyAzz2cVoaTjpuOxS+qpcLo/Y
+         dPRmGcZWaVodnhL3L/a8JT47nmUVFNVFXgUkv8q+Ek+VE0Mz055s9Eoj/wZPt3eviquR
+         aV1xA39tdq+lU8zU3Bt3ftE/aDqhBHftBLq8fKzDNCxZEN4DB9JRfBPGA4FH5a+5hEzG
+         VI+l/BEuumCRvq3+Ksrd/aIF0+rrV2cyJcPBdYNi+Ut2xmwZHicbNXJha2c0LnJA+gea
+         Xumg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kzHE8qUOrnZbVgEao5KIQPfh0k9CuMJWkxVcD7LoNGc=;
+        b=3O2JbLqUFji4LAmclj89eX/IfBP5q/SnKm+uCKNKJMmJ9S5vV3HJ0swymlomDDUXi/
+         Vfl2W2tJRXYLfcVilvbjR5aqBymPBsdkQROI9mvKiTDIMxN7AvtYW0hDpZB99ZhTSvPZ
+         2b1BeCliRaC3pvdr5X0SaCmJkglfIqXy/+evWSvDmgLc5kHuZRDAe4JkjXjqe07DTncL
+         MmoT5EL7GZyFRU7ScNNPhDl0DPSXnoe1KC+geTOpDHf/c0YlE5i799nvP59dFQ5OnCes
+         hT2bFrUF+fEPgK2Qk3abl/nnO87IqyyOEU0Xme3qSYXTj8d1c9Ebo9LvbbNP3/4xbMPi
+         XIJQ==
+X-Gm-Message-State: ACrzQf2Gi6XYLjBc8oCQpR6MNzkEi3cN2A/8r0Es5o3sY3iVcHbejkaI
+        +GdQdyqGWcrHbWVk3iTTIwwDE0UxT0PcKg==
+X-Google-Smtp-Source: AMsMyM7iQbRWHRfUinZ+Y7e0irNlNlDQEMTNgYDxBvMs0VthU8o46mR80uTvdBw9amaaWMHwXu+9Zw==
+X-Received: by 2002:a17:903:246:b0:179:96b5:1ad2 with SMTP id j6-20020a170903024600b0017996b51ad2mr39685546plh.37.1666727366272;
+        Tue, 25 Oct 2022 12:49:26 -0700 (PDT)
+Received: from crazyhorse.local ([174.127.229.57])
+        by smtp.googlemail.com with ESMTPSA id v6-20020a17090a00c600b001ef8ab65052sm1715961pjd.11.2022.10.25.12.49.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Oct 2022 12:49:25 -0700 (PDT)
+From:   Anthony DeRossi <ajderossi@gmail.com>
 To:     kvm@vger.kernel.org
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Avihai Horon <avihaih@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: [PATCH v1 2/2] vfio/iova_bitmap: Fix PAGE_SIZE unaligned bitmaps
-Date:   Tue, 25 Oct 2022 20:31:14 +0100
-Message-Id: <20221025193114.58695-3-joao.m.martins@oracle.com>
-X-Mailer: git-send-email 2.37.0 (Apple Git-136)
-In-Reply-To: <20221025193114.58695-1-joao.m.martins@oracle.com>
-References: <20221025193114.58695-1-joao.m.martins@oracle.com>
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com, jgg@ziepe.ca,
+        yishaih@nvidia.com, kevin.tian@intel.com
+Subject: [PATCH] vfio: Decrement open_count before close_device()
+Date:   Tue, 25 Oct 2022 12:38:20 -0700
+Message-Id: <20221025193820.4412-1-ajderossi@gmail.com>
+X-Mailer: git-send-email 2.37.4
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-25_12,2022-10-25_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=856 bulkscore=0
- suspectscore=0 malwarescore=0 phishscore=0 mlxscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210250110
-X-Proofpoint-GUID: dxmYgZuO6zIJG_DawbH-90ioERIP44EP
-X-Proofpoint-ORIG-GUID: dxmYgZuO6zIJG_DawbH-90ioERIP44EP
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,56 +68,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-iova_bitmap_set() doesn't consider the end of the page boundary when the
-first bitmap page offset isn't zero, and wrongly changes the consecutive
-page right after. Consequently this leads to missing dirty pages from
-reported by the device as seen from the VMM.
+The implementation of close_device() for vfio-pci inspects the
+open_count of every device in the device set to determine whether a
+reset is needed. Unless open_count is decremented before invoking
+close_device(), the device set will always contain a device with
+open_count > 0, effectively disabling the reset logic.
 
-The current logic iterates over a given number of base pages and clamps it
-to the remaining indexes to iterate in the last page.  Instead of having to
-consider extra pages to pin (e.g. first and extra pages), just handle the
-first page as its own range and let the rest of the bitmap be handled as if
-it was base page aligned.
+After commit 2cd8b14aaa66 ("vfio/pci: Move to the device set
+infrastructure"), failure to create a new file for a device would cause
+the reset to be skipped when closing the device in the error path.
 
-This is done by changing iova_bitmap_mapped_remaining() to return PAGE_SIZE
-- pgoff (on the first bitmap page), and leads to pgoff being set to 0 on
-following iterations.
+After commit eadd86f835c6 ("vfio: Remove calls to
+vfio_group_add_container_user()"), releasing a device would always skip
+the reset.
 
-Fixes: 58ccf0190d19 ("vfio: Add an IOVA bitmap support")
-Reported-by: Avihai Horon <avihaih@nvidia.com>
-Tested-by: Avihai Horon <avihaih@nvidia.com>
-Signed-off-by: Joao Martins <joao.m.martins@oracle.com>
+Failing to reset the device leaves it in an unknown state, potentially
+causing errors when it is bound to a different driver.
+
+This issue was observed with a Radeon RX Vega 56 [1002:687f] (rev c3)
+assigned to a Windows guest. After shutting down the guest, unbinding
+the device from vfio-pci, and binding the device to amdgpu:
+
+[  548.007102] [drm:psp_hw_start [amdgpu]] *ERROR* PSP create ring failed!
+[  548.027174] [drm:psp_hw_init [amdgpu]] *ERROR* PSP firmware loading failed
+[  548.027242] [drm:amdgpu_device_fw_loading [amdgpu]] *ERROR* hw_init of IP block <psp> failed -22
+[  548.027306] amdgpu 0000:0a:00.0: amdgpu: amdgpu_device_ip_init failed
+[  548.027308] amdgpu 0000:0a:00.0: amdgpu: Fatal error during GPU init
+
+Fixes: 2cd8b14aaa66 ("vfio/pci: Move to the device set infrastructure")
+Fixes: eadd86f835c6 ("vfio: Remove calls to vfio_group_add_container_user()")
+Signed-off-by: Anthony DeRossi <ajderossi@gmail.com>
 ---
-I have a small test suite that I have been using for functional and some
-performance tests; I try to cover all the edge cases. Though I happened to
-miss having a test case (which is also fixed) ... leading to this bug.
-I wonder if this test suite is something of interest to have in tree?
----
- drivers/vfio/iova_bitmap.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ drivers/vfio/vfio_main.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/vfio/iova_bitmap.c b/drivers/vfio/iova_bitmap.c
-index 389f36cae355..40463c51da31 100644
---- a/drivers/vfio/iova_bitmap.c
-+++ b/drivers/vfio/iova_bitmap.c
-@@ -296,11 +296,15 @@ void iova_bitmap_free(struct iova_bitmap *bitmap)
-  */
- static unsigned long iova_bitmap_mapped_remaining(struct iova_bitmap *bitmap)
- {
--	unsigned long remaining;
-+	unsigned long remaining, bytes;
-+
-+	/* Cap to one page in the first iteration, if PAGE_SIZE unaligned. */
-+	bytes = !bitmap->mapped.pgoff ? bitmap->mapped.npages << PAGE_SHIFT :
-+					PAGE_SIZE - bitmap->mapped.pgoff;
+diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+index 2d168793d4e1..7c3f1734fb35 100644
+--- a/drivers/vfio/vfio_main.c
++++ b/drivers/vfio/vfio_main.c
+@@ -763,8 +763,10 @@ static struct file *vfio_device_open(struct vfio_device *device)
  
- 	remaining = bitmap->mapped_total_index - bitmap->mapped_base_index;
- 	remaining = min_t(unsigned long, remaining,
--	      (bitmap->mapped.npages << PAGE_SHIFT) / sizeof(*bitmap->bitmap));
-+			  bytes / sizeof(*bitmap->bitmap));
+ 		if (device->ops->open_device) {
+ 			ret = device->ops->open_device(device);
+-			if (ret)
+-				goto err_undo_count;
++			if (ret) {
++				device->open_count--;
++				goto err_unlock;
++			}
+ 		}
+ 		vfio_device_container_register(device);
+ 		mutex_unlock(&device->group->group_lock);
+@@ -801,14 +803,13 @@ static struct file *vfio_device_open(struct vfio_device *device)
+ err_close_device:
+ 	mutex_lock(&device->dev_set->lock);
+ 	mutex_lock(&device->group->group_lock);
+-	if (device->open_count == 1 && device->ops->close_device) {
++	if (!--device->open_count && device->ops->close_device) {
+ 		device->ops->close_device(device);
  
- 	return remaining;
- }
+ 		vfio_device_container_unregister(device);
+ 	}
+-err_undo_count:
++err_unlock:
+ 	mutex_unlock(&device->group->group_lock);
+-	device->open_count--;
+ 	if (device->open_count == 0 && device->kvm)
+ 		device->kvm = NULL;
+ 	mutex_unlock(&device->dev_set->lock);
+@@ -1017,12 +1018,11 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
+ 	mutex_lock(&device->dev_set->lock);
+ 	vfio_assert_device_open(device);
+ 	mutex_lock(&device->group->group_lock);
+-	if (device->open_count == 1 && device->ops->close_device)
++	if (!--device->open_count && device->ops->close_device)
+ 		device->ops->close_device(device);
+ 
+ 	vfio_device_container_unregister(device);
+ 	mutex_unlock(&device->group->group_lock);
+-	device->open_count--;
+ 	if (device->open_count == 0)
+ 		device->kvm = NULL;
+ 	mutex_unlock(&device->dev_set->lock);
 -- 
-2.17.2
+2.37.4
 
