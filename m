@@ -2,134 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9554860C3E1
-	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 08:37:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A95E560C4F3
+	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 09:23:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231310AbiJYGhc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Oct 2022 02:37:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36748 "EHLO
+        id S231680AbiJYHX3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Oct 2022 03:23:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229730AbiJYGha (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Oct 2022 02:37:30 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20EE6FE92B;
-        Mon, 24 Oct 2022 23:37:29 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29P6EKFE023479;
-        Tue, 25 Oct 2022 06:37:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=zfrGsFpZfWvA5dGfkkX8JDm9CIZ8gkp0jNelTIsenRc=;
- b=GRHKuIIbBM27fJBT2XCyFyvKdIM6HrfWC96m1XKBwR/m8WcXAgawK0vv4wQ+yB3cKMVe
- Cbj70aIil46YafETZCqRYK529cy4H9bS/ZM8pqNEzG280aDm45bucx+diyZXhxfh+Thw
- C2der1ssW1K6eIdRrd/Ld1vj4SqS8gz/gRw2z13NL2WcKpPwYcKVmzpZ81DPxvWBhW7r
- lEuR0+QUU/iuXGjiiKGyREMRqv8BlptXtRdzSfC30a3VaKH/j931kuWNCoFliyyOb56+
- 2wMPmfWUbcNTKTZtj28iJOZUAbGEburnj/dd/e9WzwEhq5P6uWBezpvBivrG5LoTkZoc OA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3keabx0na5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Oct 2022 06:37:28 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29P6Iprj010549;
-        Tue, 25 Oct 2022 06:37:27 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3keabx0n9h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Oct 2022 06:37:27 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29P6Yj2h028545;
-        Tue, 25 Oct 2022 06:37:26 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3kdugas793-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Oct 2022 06:37:25 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29P6bMim7275056
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 25 Oct 2022 06:37:22 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7902052050;
-        Tue, 25 Oct 2022 06:37:22 +0000 (GMT)
-Received: from [9.171.5.17] (unknown [9.171.5.17])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 321BC5204E;
-        Tue, 25 Oct 2022 06:37:22 +0000 (GMT)
-Message-ID: <6dec3e0e-4b77-ffe9-533f-207606e327c4@linux.ibm.com>
-Date:   Tue, 25 Oct 2022 08:37:21 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [v1] KVM: s390: VSIE: sort out virtual/physical address in
- pin_guest_page
-To:     Nico Boehr <nrb@linux.ibm.com>, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>
-References: <20221024160237.33912-1-nrb@linux.ibm.com>
-Content-Language: en-US
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20221024160237.33912-1-nrb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: cQWvATlFSmi_dRwbY8oji6BSsfK0cc3w
-X-Proofpoint-ORIG-GUID: rfzguxbY2ceRjvWOchT76oZ8trP5edvf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-25_01,2022-10-21_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
- priorityscore=1501 mlxscore=0 spamscore=0 suspectscore=0
- lowpriorityscore=0 phishscore=0 bulkscore=0 impostorscore=0 malwarescore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210250036
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231688AbiJYHX1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Oct 2022 03:23:27 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EA48104506
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 00:23:26 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 5FC8EB81BB0
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 07:23:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F04A3C433C1;
+        Tue, 25 Oct 2022 07:23:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1666682604;
+        bh=LvjNS9c68yAUfl8ysyKUAKXcHn8HXmGlMEbM687J2Zc=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=f4bMl3V3ksDVJ6suLRyhzPYs4czoyn0uSN8/RA3c39rPtOljG1ohO2BRHBO2HeicZ
+         eQxTr718WJugaSZgU2istobSPJji66zBpDqo7t8IqLr3ElP5be3exF6fcmduz64LK9
+         a5m3GwAhHZdBhpSPJVNNP/hI/KuUKqQdS5CCdf92bGwNRg2ey6e2XEOINYTe4cyJ3z
+         3VF0Klp+FOL1CFKufeMS5EVl2xpB6ZBZIPEAaJBqQkZKYV1Rbj+FFpyjXYMdYS7m1J
+         PGA8DmO3dAHTNPxxtd69UvcH6XVIKrp54RIQ3vIoWSb8J4gja5l4Lxb2EpIMPpY//0
+         qBx6xFTK0wshA==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1onEHQ-001Rwx-02;
+        Tue, 25 Oct 2022 08:23:21 +0100
+Date:   Tue, 25 Oct 2022 08:22:32 +0100
+Message-ID: <87a65kgyfb.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Gavin Shan <gshan@redhat.com>, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        peterx@redhat.com, will@kernel.org, catalin.marinas@arm.com,
+        bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev,
+        dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com,
+        james.morse@arm.com, suzuki.poulose@arm.com,
+        alexandru.elisei@arm.com, oliver.upton@linux.dev,
+        shan.gavin@gmail.com
+Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in conjunction with bitmap
+In-Reply-To: <Y1ckxYst3tc0LCqb@google.com>
+References: <20221011061447.131531-1-gshan@redhat.com>
+        <20221011061447.131531-4-gshan@redhat.com>
+        <Y1Hdc/UVta3A5kHM@google.com>
+        <8635bhfvnh.wl-maz@kernel.org>
+        <Y1LDRkrzPeQXUHTR@google.com>
+        <87edv0gnb3.wl-maz@kernel.org>
+        <Y1ckxYst3tc0LCqb@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: seanjc@google.com, gshan@redhat.com, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, peterx@redhat.com, will@kernel.org, catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-Am 24.10.22 um 18:02 schrieb Nico Boehr:
-> pin_guest_page() used page_to_virt() to calculate the hpa of the pinned
-> page. This currently works, because virtual and physical addresses are
-> the same. Use page_to_phys() instead to resolve the virtual-real address
-> confusion.
+On Tue, 25 Oct 2022 00:50:29 +0100,
+Sean Christopherson <seanjc@google.com> wrote:
 > 
-> One caller of pin_guest_page() actually expected the hpa to be a hva, so
-> add the missing phys_to_virt() conversion here.
+> On Sat, Oct 22, 2022, Marc Zyngier wrote:
+> > On Fri, 21 Oct 2022 17:05:26 +0100, Sean Christopherson <seanjc@google.com> wrote:
+> > > 
+> > > On Fri, Oct 21, 2022, Marc Zyngier wrote:
+> > > > Because dirtying memory outside of a vcpu context makes it
+> > > > incredibly awkward to handle a "ring full" condition?
+> > > 
+> > > Kicking all vCPUs with the soft-full request isn't _that_ awkward.
+> > > It's certainly sub-optimal, but if inserting into the per-VM ring is
+> > > relatively rare, then in practice it's unlikely to impact guest
+> > > performance.
+> > 
+> > But there is *nothing* to kick here. The kernel is dirtying pages,
+> > devices are dirtying pages (DMA), and there is no context associated
+> > with that. Which is why a finite ring is the wrong abstraction.
 > 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->   arch/s390/kvm/vsie.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+> I don't follow.  If there's a VM, KVM can always kick all vCPUs.
+> Again, might be far from optimal, but it's an option.  If there's
+> literally no VM, then KVM isn't involved at all and there's no "ring
+> vs. bitmap" decision.
+
+The key word is *device*. No vcpu is involved here. Actually, we
+actively prevent save/restore of the ITS while vcpus are running. How
+could you even expect to snapshot a consistent state if the interrupt
+state is changing under your feet?
+
 > 
-> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-> index 94138f8f0c1c..c6a10ff46d58 100644
-> --- a/arch/s390/kvm/vsie.c
-> +++ b/arch/s390/kvm/vsie.c
-> @@ -654,7 +654,7 @@ static int pin_guest_page(struct kvm *kvm, gpa_t gpa, hpa_t *hpa)
->   	page = gfn_to_page(kvm, gpa_to_gfn(gpa));
->   	if (is_error_page(page))
->   		return -EINVAL;
-> -	*hpa = (hpa_t) page_to_virt(page) + (gpa & ~PAGE_MASK);
-> +	*hpa = (hpa_t)page_to_phys(page) + (gpa & ~PAGE_MASK);
->   	return 0;
->   }
->   
-> @@ -869,7 +869,7 @@ static int pin_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page,
->   		WARN_ON_ONCE(rc);
->   		return 1;
->   	}
-> -	vsie_page->scb_o = (struct kvm_s390_sie_block *) hpa;
-> +	vsie_page->scb_o = (struct kvm_s390_sie_block *)phys_to_virt(hpa);
+> > > Would it be possible to require a dirty bitmap when an ITS is
+> > > created?  That would allow treating the above condition as a KVM
+> > > bug.
+> > 
+> > No. This should be optional. Everything about migration should be
+> > absolutely optional (I run plenty of concurrent VMs on sub-2GB
+> > systems). You want to migrate a VM that has an ITS or will collect
+> > dirty bits originating from a SMMU with HTTU, you enable the dirty
+> > bitmap. You want to have *vcpu* based dirty rings, you enable them.
+> > 
+> > In short, there shouldn't be any reason for the two are either
+> > mandatory or conflated. Both should be optional, independent, because
+> > they cover completely disjoined use cases. *userspace* should be in
+> > charge of deciding this.
+> 
+> I agree about userspace being in control, what I want to avoid is
+> letting userspace put KVM into a bad state without any indication
+> from KVM that the setup is wrong until something actually dirties a
+> page.
 
-Do we still need the cast here? phys_to_virt should return a void * and the assignment should succeed.
+I can't see how that can result in a bad state for KVM itself. All you
+lack is a way for userspace to *track* the dirtying. Just like we
+don't have a way to track the dirtying of a page from the VMM.
 
+> Specifically, if mark_page_dirty_in_slot() is invoked without a
+> running vCPU, on a memslot with dirty tracking enabled but without a
+> dirty bitmap, then the migration is doomed.
 
->   	return 0;
->   }
->   
+Yup, and that's a luser error. Too bad. Userspace can still transfer
+all the memory, and all will be fine.
+
+> Dropping the dirty page isn't a sane response as that'd all but
+> guaranatee memory corruption in the guest.
+
+Again, user error. Userspace can readily write over all the guest
+memory (virtio), and no amount of KVM-side tracking will help. What
+are you going to do about it?
+
+At the end of the day, what are you trying to do? All the dirty
+tracking muck (bitmap and ring) is only a way for userspace to track
+dirty pages more easily and accelerate the transfer. If userspace
+doesn't tell KVM to track these writes, tough luck. If the author of a
+VMM doesn't understand that, then maybe they shouldn't be in charge of
+the VMM. Worse case, they can still transfer the whole thing, no harm
+done.
+
+> At best, KVM could kick all vCPUs out to userspace
+> with a new exit reason, but that's not a very good experience for
+> userspace as either the VM is unexpectedly unmigratable or the VM
+> ends up being killed (or I suppose userspace could treat the exit as
+> a per-VM dirty ring of size '1').
+
+Can we please stop the exit nonsense? There is no vcpu involved
+here. This is a device (emulated or not) writing to memory, triggered
+by an ioctl from userspace. If you're thinking vcpu, you have the
+wrong end of the stick.
+
+Memory gets dirtied system wide, not just by CPUs, and no amount of
+per-vcpu resource is going to solve this problem. VM-based rings can
+help with if they provide a way to recover from an overflow. But that
+obviously doesn't work here as we can't checkpoint and restart the
+saving process on overflow.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
