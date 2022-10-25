@@ -2,87 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 71B9960CB2B
-	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 13:44:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2088560CB31
+	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 13:44:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231376AbiJYLo1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Oct 2022 07:44:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43886 "EHLO
+        id S232146AbiJYLog (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Oct 2022 07:44:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231766AbiJYLn6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Oct 2022 07:43:58 -0400
+        with ESMTP id S232164AbiJYLoC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Oct 2022 07:44:02 -0400
 Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A9FB172B6E
-        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 04:43:56 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29PB8T0D028356
-        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 11:43:55 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A494175372
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 04:44:01 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29PB8Wnd011996
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 11:44:00 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=LBNGIx0NhGmblKcVx4Tvn9bAbddOPCXabpCjyURzZa4=;
- b=Ihmo645eoFoQ8D8S9pTMEBw14nbGAkpSubFvJG8PxIeVL3c+nJrxGThQn7D7Y6Ce+bKc
- SnaoiAaZ+DZFRG2e1ro9XHIWU2TzzRMn72KAvv7w5aBhMI3uWCr9+kgeB57WAMPMgsFk
- yhcGY3cGcINW/mvcqiyfAq619xvUjhWSz6R6HJKlgXU3UyDm+ayVXyiLedXX3vFV07mC
- PedGEUSk0+JiXajRxf6qUetoqbw4KtEDC4d15S4xji83vKfyt9xHpxg0Ay3+3j9FPoQ5
- TaEGz5HJGDWoFzpQg/NprbTWF49jKiKaSbWmXGc3QjLAJ0n25BabK+IIQ/a0057vrAAP cg== 
+ bh=KBK7hxF6AsbVOiGUxhW8EfLU7ptE1OhO3ccu/YAmvLw=;
+ b=QrcqRcKU2LHydT3ah6CxWDrL/aYpEwMrdzwTVZPtdN0Pj3e3octw/+5HdPnRu+4/RGSz
+ Z0fqCMFqwtJbqke7oMSFbwRXyT+CwCs51FwBENvjuPZudXfAFsgANPPBpmDREu9l/MHz
+ +y1lk72fzvnzWWvPVJaie/30Or00W6IlQE9C46MYAxvsFJe6Z0nPvT12MjPVDZIf9D/z
+ yd/5dZNy+MGjnjtoUM5yaexSHgxRlQNF0M8FSf0kkpPzi1XYUbkuXoZ3UbXmV50Efby2
+ CmAvfRay6euEF4K4MLkN+DjCynHYVDBEwQxP6QWzz+YhWzDx1xt/tCJkvl8WuIj+IK7J +g== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kebjt8aaq-1
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kee02tdqw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 11:43:55 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29PBFMcL026943
-        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 11:43:55 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kebjt8aa1-1
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 11:44:00 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29PB9S0u015218
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 11:44:00 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3kee02tdnb-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 25 Oct 2022 11:43:55 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29PBc2fm026793;
+        Tue, 25 Oct 2022 11:43:59 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29PBdQcc014327;
         Tue, 25 Oct 2022 11:43:53 GMT
 Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 3kc859dhpr-1
+        by ppma06ams.nl.ibm.com with ESMTP id 3kc7sj5h74-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Tue, 25 Oct 2022 11:43:53 +0000
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29PBhoO24981398
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29PBhoF16685198
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Tue, 25 Oct 2022 11:43:50 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3589EAE045;
+        by IMSVA (Postfix) with ESMTP id 81DF6AE045;
         Tue, 25 Oct 2022 11:43:50 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 038A3AE051;
+        by IMSVA (Postfix) with ESMTP id 42463AE04D;
         Tue, 25 Oct 2022 11:43:50 +0000 (GMT)
 Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.252])
         by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 25 Oct 2022 11:43:49 +0000 (GMT)
+        Tue, 25 Oct 2022 11:43:50 +0000 (GMT)
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     pbonzini@redhat.com
 Cc:     kvm@vger.kernel.org, thuth@redhat.com, frankja@linux.ibm.com,
+        Steffen Eiden <seiden@linux.ibm.com>,
         Nico Boehr <nrb@linux.ibm.com>
-Subject: [kvm-unit-tests GIT PULL 17/22] s390x: snippets: asm: Add a macro to write an exception PSW
-Date:   Tue, 25 Oct 2022 13:43:40 +0200
-Message-Id: <20221025114345.28003-18-imbrenda@linux.ibm.com>
+Subject: [kvm-unit-tests GIT PULL 18/22] s390x: MAKEFILE: Use $< instead of pathsubst
+Date:   Tue, 25 Oct 2022 13:43:41 +0200
+Message-Id: <20221025114345.28003-19-imbrenda@linux.ibm.com>
 X-Mailer: git-send-email 2.37.3
 In-Reply-To: <20221025114345.28003-1-imbrenda@linux.ibm.com>
 References: <20221025114345.28003-1-imbrenda@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: UvGy8eSs2XqvYcjgr8f1wAt94uczpVwp
-X-Proofpoint-ORIG-GUID: CRhwr9B-kgS9IlV8ILYM9FCTq_ZOHkTV
+X-Proofpoint-GUID: RM0m4VEmmDeWNVMTW-B6Z6OR-abxUWUB
+X-Proofpoint-ORIG-GUID: njzunYGZCg_bbbLN3eOfADPJJN8nAS2v
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-10-25_05,2022-10-25_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- suspectscore=0 spamscore=0 clxscore=1015 mlxscore=0 adultscore=0
- lowpriorityscore=0 mlxlogscore=999 priorityscore=1501 impostorscore=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ mlxlogscore=673 impostorscore=0 phishscore=0 adultscore=0 malwarescore=0
+ mlxscore=0 suspectscore=0 spamscore=0 lowpriorityscore=0 clxscore=1015
  bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2209130000 definitions=main-2210250067
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -91,101 +92,31 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Janosch Frank <frankja@linux.ibm.com>
 
-Setting exception new PSWs is commonly needed so let's add a macro for
-that.
+No need to mangle strings if we already have the value at hand.
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
 Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
 Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Message-Id: <20221021063902.10878-2-frankja@linux.ibm.com>
+Message-Id: <20221021063902.10878-3-frankja@linux.ibm.com>
 Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 ---
- s390x/snippets/asm/macros.S              | 28 ++++++++++++++++++++++++
- s390x/snippets/asm/snippet-pv-diag-288.S |  4 ++--
- s390x/snippets/asm/snippet-pv-diag-500.S |  6 ++---
- 3 files changed, 32 insertions(+), 6 deletions(-)
- create mode 100644 s390x/snippets/asm/macros.S
+ s390x/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/s390x/snippets/asm/macros.S b/s390x/snippets/asm/macros.S
-new file mode 100644
-index 00000000..667fb6dc
---- /dev/null
-+++ b/s390x/snippets/asm/macros.S
-@@ -0,0 +1,28 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Commonly used assembly macros
-+ *
-+ * Copyright (c) 2022 IBM Corp
-+ *
-+ * Authors:
-+ *  Janosch Frank <frankja@linux.ibm.com>
-+ */
-+#include <asm/asm-offsets.h>
-+
-+/*
-+ * Writes a PSW to addr_psw, useful for exception PSWs in lowcore
-+ *
-+ * reg is the scratch register used for temporary storage, it's NOT restored
-+ * The psw address part is defined via psw_new_addr
-+ * The psw mask part is always 64 bit
-+ */
-+.macro SET_PSW_NEW_ADDR reg, psw_new_addr, addr_psw
-+larl	\reg, psw_mask_64
-+stg	\reg, \addr_psw
-+larl	\reg, \psw_new_addr
-+stg	\reg, \addr_psw + 8
-+.endm
-+
-+.section .rodata
-+psw_mask_64:
-+	.quad	0x0000000180000000
-diff --git a/s390x/snippets/asm/snippet-pv-diag-288.S b/s390x/snippets/asm/snippet-pv-diag-288.S
-index aaee3cd1..63f2113b 100644
---- a/s390x/snippets/asm/snippet-pv-diag-288.S
-+++ b/s390x/snippets/asm/snippet-pv-diag-288.S
-@@ -8,6 +8,7 @@
-  *  Janosch Frank <frankja@linux.ibm.com>
-  */
- #include <asm/asm-offsets.h>
-+#include "macros.S"
- .section .text
+diff --git a/s390x/Makefile b/s390x/Makefile
+index 5e0b4f39..bf1504f9 100644
+--- a/s390x/Makefile
++++ b/s390x/Makefile
+@@ -139,7 +139,7 @@ $(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o
+ 	truncate -s '%4096' $@
  
- /* Clean and pre-load registers that are used for diag 288 */
-@@ -19,8 +20,7 @@ lghi	%r1, 2
- lghi	%r2, 3
+ $(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS)
+-	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/snippets/c/flat.lds $(patsubst %.gbin,%.o,$@) $(snippet_lib) $(FLATLIBS)
++	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/snippets/c/flat.lds $< $(snippet_lib) $(FLATLIBS)
+ 	$(OBJCOPY) -O binary -j ".rodata" -j ".lowcore" -j ".text" -j ".data" -j ".bss" --set-section-flags .bss=alloc,load,contents $@ $@
+ 	truncate -s '%4096' $@
  
- /* Let's jump to the pgm exit label on a PGM */
--larl	%r4, exit_pgm
--stg     %r4, GEN_LC_PGM_NEW_PSW + 8
-+SET_PSW_NEW_ADDR 4, exit_pgm, GEN_LC_PGM_NEW_PSW
- 
- /* Execute the diag288 */
- diag	%r0, %r2, 0x288
-diff --git a/s390x/snippets/asm/snippet-pv-diag-500.S b/s390x/snippets/asm/snippet-pv-diag-500.S
-index 8dd66bd9..f4d75388 100644
---- a/s390x/snippets/asm/snippet-pv-diag-500.S
-+++ b/s390x/snippets/asm/snippet-pv-diag-500.S
-@@ -8,6 +8,7 @@
-  *  Janosch Frank <frankja@linux.ibm.com>
-  */
- #include <asm/asm-offsets.h>
-+#include "macros.S"
- .section .text
- 
- /* Clean and pre-load registers that are used for diag 500 */
-@@ -21,10 +22,7 @@ lghi	%r3, 3
- lghi	%r4, 4
- 
- /* Let's jump to the next label on a PGM */
--xgr	%r5, %r5
--stg	%r5, GEN_LC_PGM_NEW_PSW
--larl	%r5, next
--stg	%r5, GEN_LC_PGM_NEW_PSW + 8
-+SET_PSW_NEW_ADDR 5, next, GEN_LC_PGM_NEW_PSW
- 
- /* Execute the diag500 */
- diag	0, 0, 0x500
 -- 
 2.37.3
 
