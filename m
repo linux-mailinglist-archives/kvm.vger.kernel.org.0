@@ -2,71 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B60D60D7BE
-	for <lists+kvm@lfdr.de>; Wed, 26 Oct 2022 01:12:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E223860D7EB
+	for <lists+kvm@lfdr.de>; Wed, 26 Oct 2022 01:30:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232463AbiJYXMn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Oct 2022 19:12:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35404 "EHLO
+        id S230301AbiJYXac (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Oct 2022 19:30:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229904AbiJYXMl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Oct 2022 19:12:41 -0400
+        with ESMTP id S232662AbiJYXaa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Oct 2022 19:30:30 -0400
 Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19D5CD0CDA
-        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 16:12:41 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id f9so8668483pgj.2
-        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 16:12:41 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DD9C32079
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 16:30:27 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id q1so13083353pgl.11
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 16:30:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=i3mo0kixZ6m/otsAj6aTciSS2cXGwp+gHcCnQRslUJ0=;
-        b=H/u3vlT0BHl5n33n1xBAxGrADDqNOKyPm0FlJRlzico2g/s7/FJs00EyMO3T27/2rq
-         QZU392FQBdVkJXFTl4a+/ogmIro5Ycf9FJ9bmT6jGLuwVMuBJR0EcZRJlf8eSmYD6Yow
-         0tdpq/OcFr8rGYjzrPY4oISlJVMvAZHdQ2mLKzB5IXLliFHkQU3HeymsjYxCEvyA0za3
-         pg0WT+sgkzT1FPNOZy6U0S627ziXqCVpV+iZSg7jtZTsGE2pv+uS+LMR2NYWYAJG5Kvn
-         gMyJcb1meZvkc4Sa7726DnsyPTdaeFB1JkCaQ3+ANGGShjOxYh/W+8j41dZhNX8xQvy/
-         FnCA==
+        bh=nZDxRYzZuHWnfgFr4L29qmwLAhe1STmyZz5ZOtW4i9w=;
+        b=ABtMXBWvDK6YQbYXfqk9WH0NLdvhh3yu6CWfQvC28mvvsNmjy8yYlsB/0RxGVpPDTy
+         ZpRCDNhEByyAN0OeGVS6NfJ0LT4EE6R1Kksny2o3SWzZNjwepnhk0FlqRiaGi3CetFV9
+         njLyxiI3LOAa3VlP/V9DMVT6RekZXP0sThfu9vzd2ZCvWdlBionCQHve6ZG+xJfsv4tx
+         kxRKUyrZZ+lqicvu2D0WBnux2Tt3HRow8uxWU/KRxrL9I6eFvzQsACIsr/AN/7IEnq5T
+         K5drkHv2iPccqKUjvxDaZ21mfcgiOnRKi5CewfJYOIGPH/dxPsLg0x9Qqf4+S1oc2i+D
+         Yy4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=i3mo0kixZ6m/otsAj6aTciSS2cXGwp+gHcCnQRslUJ0=;
-        b=pLOJTYVLjNL9sbd2Qef3Uaonf0wTtvVtC0D/kBWQaU2LRox03ydhULfEsnW2CeJZVL
-         hPAszL5OuEU56PhLdC6sRfdj3uQJEynnC7aGd10g8bO2ukZxOc4i4Lx+eccmwOrxv9zJ
-         IR+OIU6L8NQ/L1rb2Ld+AHXFnDE2AHdCWYwvvXw2bsFEjTLuImnOz5W++P6y8KkUCu0L
-         z6w7RRB8bgYAslrsbCAL5WS0Lkni5ze49PVcjNMYqotD80+r5sVDFDYvEdk6j9dKsbuk
-         Llgr8OZql7xr34NK3hTt1lviQvuAGXKVJno1AGDTet36sk6PYao0zzTL6dlakTlB/8Jt
-         N54g==
-X-Gm-Message-State: ACrzQf0kQRMbHtOerjCz4HTyx2dMIGKuME8GDwVZc+Hd02CHPTONAQGq
-        v87tGJCwxSaG9Je3j3z4uXStbBt/U3zWmw==
-X-Google-Smtp-Source: AMsMyM4POv5qWsf+eLt5JF3Vn/9Av/I9JrLqVs9TwuMtX9R/daO2F/YmHC4mwWxysO2D2LtqtXkazw==
-X-Received: by 2002:a05:6a00:98b:b0:56b:d312:232e with SMTP id u11-20020a056a00098b00b0056bd312232emr12570371pfg.45.1666739560489;
-        Tue, 25 Oct 2022 16:12:40 -0700 (PDT)
+        bh=nZDxRYzZuHWnfgFr4L29qmwLAhe1STmyZz5ZOtW4i9w=;
+        b=dFnnfhguChqRGhCgOgZaTwg99mEdT1jJEQndfiXlEJprQknf3Heq3eRvil/NYLY12l
+         XH6cgDME9r1hTHtfzqhXcmcVFKUGdSgEK5H5VJXrr6CRYt1nBAGIIOE+Q2v2J3ZZKkcE
+         qQ30Ta0ArX+pyNZ14XnGOL1JUBIx2yoaEFfVE/knz8zRHqJ++CUMNxSx2I0yeYeOo5ZT
+         wwUBk+Knr8m4GKaEqglmdNse1RSeLe3fp1bLT8+xwb8i/roPQYAe5k//z8b0cYYHlyTm
+         8GMic6GucAGLwfbfzunORgKKIKcCeZD56ZUprfLCIkWLDgxaqoKl6UbtYUO3U0f39uFW
+         ajxQ==
+X-Gm-Message-State: ACrzQf20hi596L6H9fCKyHziLB2ewELJu0vZeW3VMGLaN31n9uwQTku8
+        OWJQ9S7y+j5PmCpxSTZ9U35X1Q==
+X-Google-Smtp-Source: AMsMyM6e1j2vFKPYTZ+VlCuFHZlCLr8LptKzQzmcn9hqI93xaoA4ZcSi+mSYw3Vw0knAs4LVIreNWw==
+X-Received: by 2002:a63:8bc8:0:b0:461:ff70:7546 with SMTP id j191-20020a638bc8000000b00461ff707546mr35353597pge.70.1666740626624;
+        Tue, 25 Oct 2022 16:30:26 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id n13-20020a170903404d00b00186b9196cbesm1670061pla.249.2022.10.25.16.12.40
+        by smtp.gmail.com with ESMTPSA id b11-20020a170902d50b00b00174c235e1fdsm1689809plg.199.2022.10.25.16.30.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Oct 2022 16:12:40 -0700 (PDT)
-Date:   Tue, 25 Oct 2022 23:12:36 +0000
+        Tue, 25 Oct 2022 16:30:26 -0700 (PDT)
+Date:   Tue, 25 Oct 2022 23:30:23 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Bill Wendling <morbo@google.com>
-Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Bill Wendling <isanbard@gmail.com>
-Subject: Re: [PATCH] x86/pmu: Disable inlining of measure()
-Message-ID: <Y1htZKmRt/+WXhIo@google.com>
-References: <20220601163012.3404212-1-morbo@google.com>
- <CALMp9eRgbc624bWe6wcTqpSsdEdnj+Q_xE8L21EdCZmQXBQPsw@mail.gmail.com>
- <CAGG=3QX218AyDM6LS8oe2-PH=eq=hBf5JrGedzb48DavE-5PPA@mail.gmail.com>
+To:     Yujie Liu <yujie.liu@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Exempt pending triple fault from event
+ injection sanity check
+Message-ID: <Y1hxjyqEjrH+/TpN@google.com>
+References: <20220930230008.1636044-1-seanjc@google.com>
+ <3d7389cf-8cea-624b-2fdd-f3fadfa65ba2@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAGG=3QX218AyDM6LS8oe2-PH=eq=hBf5JrGedzb48DavE-5PPA@mail.gmail.com>
+In-Reply-To: <3d7389cf-8cea-624b-2fdd-f3fadfa65ba2@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,47 +73,18 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 25, 2022, Bill Wendling wrote:
-> On Wed, Jun 1, 2022 at 10:22 AM Jim Mattson <jmattson@google.com> wrote:
-> >
-> > On Wed, Jun 1, 2022 at 9:30 AM Bill Wendling <morbo@google.com> wrote:
-> > >
-> > > From: Bill Wendling <isanbard@gmail.com>
-> > >
-> > > Clang can be more aggressive at inlining than GCC and will fully inline
-> > > calls to measure(). This can mess with the counter overflow check. To
-> > > set up the PMC overflow, check_counter_overflow() first records the
-> > > number of instructions retired in an invocation of measure() and checks
-> > > to see that subsequent calls to measure() retire the same number of
-> > > instructions. If inlining occurs, those numbers can be different and the
-> > > overflow test fails.
-> > >
-> > >   FAIL: overflow: cntr-0
-> > >   PASS: overflow: status-0
-> > >   PASS: overflow: status clear-0
-> > >   PASS: overflow: irq-0
-> > >   FAIL: overflow: cntr-1
-> > >   PASS: overflow: status-1
-> > >   PASS: overflow: status clear-1
-> > >   PASS: overflow: irq-1
-> > >   FAIL: overflow: cntr-2
-> > >   PASS: overflow: status-2
-> > >   PASS: overflow: status clear-2
-> > >   PASS: overflow: irq-2
-> > >   FAIL: overflow: cntr-3
-> > >   PASS: overflow: status-3
-> > >   PASS: overflow: status clear-3
-> > >   PASS: overflow: irq-3
-> > >
-> > > Disabling inlining of measure() keeps the assumption that all calls to
-> > > measure() retire the same number of instructions.
-> > >
-> > > Cc: Jim Mattson <jmattson@google.com>
-> > > Signed-off-by: Bill Wendling <morbo@google.com>
-> > Reviewed-by: Jim Mattson <jmattson@google.com>
-> 
-> Bumping for visibility.
+Paolo, I hope your bus factor is high, because I'm throwing you under one :-)
 
-Heh, make sure kvm-unit-tests is in the subject, i.e. [kvm-unit-tests PATCH].
-This slipped by on my end because I didn't realize at a quick glance that it was
-touching KVM-unit-tests and not kernel code.
+On Tue, Oct 25, 2022, Yujie Liu wrote:
+> Hi Sean and Paolo,
+> 
+> Thanks for posting this fix patch to address the issue we reported.
+> 
+> We noticed that commit 7055fb113116 has been merged to mainline, but seems
+> this patch is still under review, so the mmio_warning_test kvm selftests
+> still fails on the current head of mainline. Could you please help to
+> update the status that whether this patch will be applied? Thanks.
+
+Last I heard, Paolo is planning on handling patches for this cycle (fixes for 6.1
+and new features for 6.2), which is why I haven't been queuing anything.  Not sure
+what Paolo's excuse is.  ;-)
