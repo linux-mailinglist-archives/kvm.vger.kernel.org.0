@@ -2,65 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 620A560C974
-	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 12:08:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3AEA160C9AA
+	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 12:13:30 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230271AbiJYKIs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Oct 2022 06:08:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43474 "EHLO
+        id S232326AbiJYKN2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Oct 2022 06:13:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230078AbiJYKIC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Oct 2022 06:08:02 -0400
+        with ESMTP id S231249AbiJYKNK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Oct 2022 06:13:10 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D043C104538
-        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 03:01:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 012ED148F74
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 03:05:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666692094;
+        s=mimecast20190719; t=1666692307;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=knqQPG7pPxcHsfRxnyxJXNLDn4XFV6zEBhTCEqjUpIc=;
-        b=DjoIoNkniVxFFlkc+x7vcIm0UffHjQZJa5yXVOVL4kSdRjKLAdGZ1cFrISGiopGihN9fjS
-        S7zfPimfJBnGKcChHTOuN2EM5MYSXzgRKv0y3mZE/qydLFXl3s7Fsgc/Cud9cvtNXT/nGe
-        K4XG3TzHQCcEDKl/jxogdX+APrNCFPQ=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=WkMY2q7k/FRScATXzFjfEIt8wnjgYfKsZeIIXZ3g4lg=;
+        b=TQbOIQV3bDWg1hgoh2ldytt/Is6yZRqK4ahz/A9kG+iELNVo70FU80tpASLNEWqdyHJ8tI
+        s7D96cskDqVX7gLiUwXZ077y1OkzrEM4iGIVj1UQUt86VLKkWDQCBFjj/+uYJyizBBWval
+        6Xnk0t6j9RK1FL8yM7zIzjvwm/0Gh0M=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-299-_CTEzYgGMl-V3pf1efpGHA-1; Tue, 25 Oct 2022 06:01:33 -0400
-X-MC-Unique: _CTEzYgGMl-V3pf1efpGHA-1
-Received: by mail-qv1-f72.google.com with SMTP id q17-20020a056214019100b004b1d3c9f3acso6721292qvr.0
-        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 03:01:33 -0700 (PDT)
+ us-mta-483-AxfgyMAuPb2Up-uNoNNZwQ-1; Tue, 25 Oct 2022 06:05:06 -0400
+X-MC-Unique: AxfgyMAuPb2Up-uNoNNZwQ-1
+Received: by mail-qv1-f69.google.com with SMTP id c2-20020a05621401c200b004bb71b13dfcso2489140qvt.6
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 03:05:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=knqQPG7pPxcHsfRxnyxJXNLDn4XFV6zEBhTCEqjUpIc=;
-        b=D0mvAwtALHI6EcUqB0E1o7sjCOcj8RviY4YOhA0caXb/K+p4hGxkN/qzB0qYoFhvIe
-         SlurwfWBTq9KQRvwT9zqz6M1XiIi4Ax2BcnKCb77NGkPMPQ7qn2jQ81q0lPeu52x8lH+
-         0Ke6ln/+13KuR5sPy/lhjcsRMrt/EAm877vwzkbaesig8PmlIQgvzOrCp4KZ2jh1xx8n
-         jDYPpqKBrmkwRXxpjSqy6yVVUnP5XqtjIXKQ+Wvkzbuhoni1bn2gnefToNNTMG+RSs7y
-         9xEqIRqc1CVGnlHfQDV7xP0mX9wfqnq+fUt4Bsn/O7Dn+pM854vQJNjSvmUrYt9prFhl
-         Omqg==
-X-Gm-Message-State: ACrzQf2YIgF7es4fMdW41yh1ESgR4I0K+pTt6t5Woo+L2a1BBMqv7HgW
-        PLAbzv4x4o0Wi+lob6JhlmLP5PVjGzb40ZHzdMKWLCT3Ydhf4/B2dUk7S0LDcFll72gJSk+TTUK
-        Ss2nCtKIia72x
-X-Received: by 2002:a0c:e28a:0:b0:4b9:e578:1581 with SMTP id r10-20020a0ce28a000000b004b9e5781581mr8746746qvl.102.1666692092760;
-        Tue, 25 Oct 2022 03:01:32 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM6lwkNGGlIieZxceU7YsexC1Uy1WKs+oksCMdHc86K1X1v/ucnRVCyAJYYWCoPnyhFV1xt3uA==
-X-Received: by 2002:a0c:e28a:0:b0:4b9:e578:1581 with SMTP id r10-20020a0ce28a000000b004b9e5781581mr8746715qvl.102.1666692092521;
-        Tue, 25 Oct 2022 03:01:32 -0700 (PDT)
+        bh=WkMY2q7k/FRScATXzFjfEIt8wnjgYfKsZeIIXZ3g4lg=;
+        b=C2xypoSmHO/n+qYX37A6yo6c71VPVlmeAJrfGZoPMR7tCpTHiuMwtcgR91x7cNGbt4
+         MIRxQcZqztKYsuXLAjdx9qzo5WjafLSdRU+R9mRuGeV9sv0q9hBQpPbuTPQADqa3++EX
+         FvSeNtf755WCBFCpttyCF6wBihkERmYpFTnlkDW3Ut5g5ENthF8Vd1Hbv4CS5xRuDbUD
+         62Ijc57ePaXozRjv+4hEvWXWPSzlqjMdexaOjUnbOYYFjE2AO0Hog/WS2Zf7ymK9D3Nq
+         Oj94i8Qx7AJPMZa4dR7jXrsH8bGWw+gpQMSPlUbW/RMNcD+hM6eBBf+kfz83IL+sh66Z
+         tg1w==
+X-Gm-Message-State: ACrzQf00eCPZBDvG55pEBJFeH54gzOasy059fBQDmsYJyNZdHgW/Sf/l
+        TPQugoApScs7U1WJKNEeEc2mB2nirtea1394g3qKgQeey8uvFQGr25gt6UO5k6FNy/8mcFgXjNo
+        J5FaQmR9SnVC4
+X-Received: by 2002:a05:6214:21e5:b0:4b3:f3e0:5432 with SMTP id p5-20020a05621421e500b004b3f3e05432mr30997926qvj.19.1666692305292;
+        Tue, 25 Oct 2022 03:05:05 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM693U09GZt8c3TCu0FJo9qI1g4ScuhxN9DXfAJplWl/vGo09zLnXBtWBBG2qZwZQgoHuj3OGw==
+X-Received: by 2002:a05:6214:21e5:b0:4b3:f3e0:5432 with SMTP id p5-20020a05621421e500b004b3f3e05432mr30997911qvj.19.1666692305082;
+        Tue, 25 Oct 2022 03:05:05 -0700 (PDT)
 Received: from [10.201.49.36] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
-        by smtp.googlemail.com with ESMTPSA id ay37-20020a05620a17a500b006eeb3165565sm1755740qkb.80.2022.10.25.03.01.30
+        by smtp.googlemail.com with ESMTPSA id d13-20020a05620a240d00b006bc192d277csm1807519qkn.10.2022.10.25.03.05.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Oct 2022 03:01:32 -0700 (PDT)
-Message-ID: <f6032e45-5d14-ae05-5383-f6ea1e8a4070@redhat.com>
-Date:   Tue, 25 Oct 2022 12:01:29 +0200
+        Tue, 25 Oct 2022 03:05:04 -0700 (PDT)
+Message-ID: <6812bb87-f355-eddb-c484-b3bb089dd630@redhat.com>
+Date:   Tue, 25 Oct 2022 12:05:01 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.2.1
-Subject: Re: [PATCH 3/4] KVM: introduce memory transaction semaphore
+Subject: Re: [PATCH 4/4] KVM: use signals to abort enter_guest/blocking and
+ retry
 Content-Language: en-US
 To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
         kvm@vger.kernel.org
@@ -74,11 +75,11 @@ Cc:     Jonathan Corbet <corbet@lwn.net>,
         "H. Peter Anvin" <hpa@zytor.com>, linux-doc@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <20221022154819.1823133-1-eesposit@redhat.com>
- <20221022154819.1823133-4-eesposit@redhat.com>
- <62500f94-b95b-1e16-4aa2-f67905fab01a@redhat.com>
- <fba8e829-0d28-8f4d-a8ce-84d533009eb9@redhat.com>
+ <20221022154819.1823133-5-eesposit@redhat.com>
+ <5ee4eeb8-4d61-06fc-f80d-06efeeffe902@redhat.com>
+ <4ef882c2-1535-d7df-d474-e5fab2975f53@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <fba8e829-0d28-8f4d-a8ce-84d533009eb9@redhat.com>
+In-Reply-To: <4ef882c2-1535-d7df-d474-e5fab2975f53@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -91,27 +92,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/24/22 14:57, Emanuele Giuseppe Esposito wrote:
-> 
-> 
-> Am 23/10/2022 um 19:50 schrieb Paolo Bonzini:
->> On 10/22/22 17:48, Emanuele Giuseppe Esposito wrote:
->>> +static DECLARE_RWSEM(memory_transaction);
->>
->> This cannot be global, it must be per-struct kvm.  Otherwise one VM can
->> keep the rwsem indefinitely while a second VM hangs in
->> KVM_KICK_ALL_RUNNING_VCPUS.
->>
->> It can also be changed to an SRCU (with the down_write+up_write sequence
->> changed to synchronize_srcu_expedited) which has similar characteristics
->> to your use of the rwsem.
->>
-> 
-> Makes sense, but why synchronize_srcu_expedited and not synchronize_srcu?
+On 10/24/22 09:43, Emanuele Giuseppe Esposito wrote:
+>> Since the userspace should anyway avoid going into this effectively-busy
+>> wait, what about clearing the request after the first exit?  The
+>> cancellation ioctl can be kept for vCPUs that are never entered after
+>> KVM_KICK_ALL_RUNNING_VCPUS.  Alternatively, kvm_clear_all_cpus_request
+>> could be done right before up_write().
+>
+> Clearing makes sense, but should we "trust" the userspace not to go into
+> busy wait?
 
-Because (thanks to the kick) you expect the grace period to end almost 
-immediately, and synchronize_srcu() will slow down sensibly the changes 
-to the memory map.
+I think so, there are many other ways for userspace to screw up.
+
+> What's the typical "contract" between KVM and the userspace? Meaning,
+> should we cover the basic usage mistakes like forgetting to busy wait on
+> KVM_RUN?
+
+Being able to remove the second ioctl if you do (sort-of pseudocode 
+based on this v1)
+
+	kvm_make_all_cpus_request(kvm, KVM_REQ_USERSPACE_KICK);
+	down_write(&kvm->memory_transaction);
+	up_write(&kvm->memory_transaction);
+	kvm_clear_all_cpus_request(kvm, KVM_REQ_USERSPACE_KICK);
+
+would be worth it, I think.
 
 Paolo
 
