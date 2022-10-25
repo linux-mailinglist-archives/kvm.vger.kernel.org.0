@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A95E560C4F3
-	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 09:23:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6130560C534
+	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 09:32:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231680AbiJYHX3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Oct 2022 03:23:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46436 "EHLO
+        id S231758AbiJYHcg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Oct 2022 03:32:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231688AbiJYHX1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Oct 2022 03:23:27 -0400
+        with ESMTP id S231636AbiJYHcc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Oct 2022 03:32:32 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EA48104506
-        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 00:23:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09A657CE11
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 00:32:31 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5FC8EB81BB0
-        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 07:23:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F04A3C433C1;
-        Tue, 25 Oct 2022 07:23:23 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B82E2B81BB5
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 07:32:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 385EDC433C1;
+        Tue, 25 Oct 2022 07:32:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666682604;
-        bh=LvjNS9c68yAUfl8ysyKUAKXcHn8HXmGlMEbM687J2Zc=;
+        s=k20201202; t=1666683148;
+        bh=tBNkwO3cOXKnOowX13snOkKFao+dxrlC+LYHRf/nzzI=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=f4bMl3V3ksDVJ6suLRyhzPYs4czoyn0uSN8/RA3c39rPtOljG1ohO2BRHBO2HeicZ
-         eQxTr718WJugaSZgU2istobSPJji66zBpDqo7t8IqLr3ElP5be3exF6fcmduz64LK9
-         a5m3GwAhHZdBhpSPJVNNP/hI/KuUKqQdS5CCdf92bGwNRg2ey6e2XEOINYTe4cyJ3z
-         3VF0Klp+FOL1CFKufeMS5EVl2xpB6ZBZIPEAaJBqQkZKYV1Rbj+FFpyjXYMdYS7m1J
-         PGA8DmO3dAHTNPxxtd69UvcH6XVIKrp54RIQ3vIoWSb8J4gja5l4Lxb2EpIMPpY//0
-         qBx6xFTK0wshA==
+        b=kEpLkzMu9VFnb6SiLF5I4pFzTSgQn46P3ARbhETN/1c+TwHrdX70NqE3zGcqUrdXC
+         WxCRvu/ok3CrI5sPAm1q5vljjUbozeHwxoEaYJORAurmRrQ+SWAULbiHVxDCcdi2B5
+         Qu7DFtQosJofpWdxnKiUUfPaFBzxVz+959Q3zgCo1nvDNMrFctMYxxv//TDRtPRsOD
+         BlfSOVeIappfdnj2TBQoLuRom74TkBBYeErmcfzXH9Jna/ACJ8dteHPjOZP2550P0Q
+         IhLzXxuEtj4C3B59hT1jA11jkJMGYb65sKm7WiqvzmpW0uXyt4YO6XgW7E8tkc7wve
+         jHpgGTnRDsZRw==
 Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1onEHQ-001Rwx-02;
-        Tue, 25 Oct 2022 08:23:21 +0100
-Date:   Tue, 25 Oct 2022 08:22:32 +0100
-Message-ID: <87a65kgyfb.wl-maz@kernel.org>
+        id 1onEQD-001S5f-Pm;
+        Tue, 25 Oct 2022 08:32:26 +0100
+Date:   Tue, 25 Oct 2022 08:31:46 +0100
+Message-ID: <878rl4gxzx.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Gavin Shan <gshan@redhat.com>, kvmarm@lists.linux.dev,
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Gavin Shan <gshan@redhat.com>, kvmarm@lists.linux.dev,
         kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         peterx@redhat.com, will@kernel.org, catalin.marinas@arm.com,
         bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev,
         dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com,
         james.morse@arm.com, suzuki.poulose@arm.com,
-        alexandru.elisei@arm.com, oliver.upton@linux.dev,
-        shan.gavin@gmail.com
+        alexandru.elisei@arm.com, shan.gavin@gmail.com
 Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in conjunction with bitmap
-In-Reply-To: <Y1ckxYst3tc0LCqb@google.com>
+In-Reply-To: <Y1css8k0gtFkVwFQ@google.com>
 References: <20221011061447.131531-1-gshan@redhat.com>
         <20221011061447.131531-4-gshan@redhat.com>
         <Y1Hdc/UVta3A5kHM@google.com>
@@ -58,13 +58,14 @@ References: <20221011061447.131531-1-gshan@redhat.com>
         <Y1LDRkrzPeQXUHTR@google.com>
         <87edv0gnb3.wl-maz@kernel.org>
         <Y1ckxYst3tc0LCqb@google.com>
+        <Y1css8k0gtFkVwFQ@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: seanjc@google.com, gshan@redhat.com, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, peterx@redhat.com, will@kernel.org, catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, shan.gavin@gmail.com
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, seanjc@google.com, gshan@redhat.com, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, peterx@redhat.com, will@kernel.org, catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, shan.gavin@gmail.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -76,98 +77,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 25 Oct 2022 00:50:29 +0100,
-Sean Christopherson <seanjc@google.com> wrote:
+On Tue, 25 Oct 2022 01:24:19 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> On Sat, Oct 22, 2022, Marc Zyngier wrote:
-> > On Fri, 21 Oct 2022 17:05:26 +0100, Sean Christopherson <seanjc@google.com> wrote:
+> On Mon, Oct 24, 2022 at 11:50:29PM +0000, Sean Christopherson wrote:
+> > On Sat, Oct 22, 2022, Marc Zyngier wrote:
+> > > On Fri, 21 Oct 2022 17:05:26 +0100, Sean Christopherson <seanjc@google.com> wrote:
+> 
+> [...]
+> 
+> > > > Would it be possible to require a dirty bitmap when an ITS is
+> > > > created?  That would allow treating the above condition as a KVM
+> > > > bug.
 > > > 
-> > > On Fri, Oct 21, 2022, Marc Zyngier wrote:
-> > > > Because dirtying memory outside of a vcpu context makes it
-> > > > incredibly awkward to handle a "ring full" condition?
+> > > No. This should be optional. Everything about migration should be
+> > > absolutely optional (I run plenty of concurrent VMs on sub-2GB
+> > > systems). You want to migrate a VM that has an ITS or will collect
+> > > dirty bits originating from a SMMU with HTTU, you enable the dirty
+> > > bitmap. You want to have *vcpu* based dirty rings, you enable them.
 > > > 
-> > > Kicking all vCPUs with the soft-full request isn't _that_ awkward.
-> > > It's certainly sub-optimal, but if inserting into the per-VM ring is
-> > > relatively rare, then in practice it's unlikely to impact guest
-> > > performance.
+> > > In short, there shouldn't be any reason for the two are either
+> > > mandatory or conflated. Both should be optional, independent, because
+> > > they cover completely disjoined use cases. *userspace* should be in
+> > > charge of deciding this.
 > > 
-> > But there is *nothing* to kick here. The kernel is dirtying pages,
-> > devices are dirtying pages (DMA), and there is no context associated
-> > with that. Which is why a finite ring is the wrong abstraction.
-> 
-> I don't follow.  If there's a VM, KVM can always kick all vCPUs.
-> Again, might be far from optimal, but it's an option.  If there's
-> literally no VM, then KVM isn't involved at all and there's no "ring
-> vs. bitmap" decision.
-
-The key word is *device*. No vcpu is involved here. Actually, we
-actively prevent save/restore of the ITS while vcpus are running. How
-could you even expect to snapshot a consistent state if the interrupt
-state is changing under your feet?
-
-> 
-> > > Would it be possible to require a dirty bitmap when an ITS is
-> > > created?  That would allow treating the above condition as a KVM
-> > > bug.
+> > I agree about userspace being in control, what I want to avoid is letting userspace
+> > put KVM into a bad state without any indication from KVM that the setup is wrong
+> > until something actually dirties a page.
 > > 
-> > No. This should be optional. Everything about migration should be
-> > absolutely optional (I run plenty of concurrent VMs on sub-2GB
-> > systems). You want to migrate a VM that has an ITS or will collect
-> > dirty bits originating from a SMMU with HTTU, you enable the dirty
-> > bitmap. You want to have *vcpu* based dirty rings, you enable them.
-> > 
-> > In short, there shouldn't be any reason for the two are either
-> > mandatory or conflated. Both should be optional, independent, because
-> > they cover completely disjoined use cases. *userspace* should be in
-> > charge of deciding this.
+> > Specifically, if mark_page_dirty_in_slot() is invoked without a running vCPU, on
+> > a memslot with dirty tracking enabled but without a dirty bitmap, then the migration
+> > is doomed.  Dropping the dirty page isn't a sane response as that'd all but
+> > guaranatee memory corruption in the guest.  At best, KVM could kick all vCPUs out
+> > to userspace with a new exit reason, but that's not a very good experience for
+> > userspace as either the VM is unexpectedly unmigratable or the VM ends up being
+> > killed (or I suppose userspace could treat the exit as a per-VM dirty ring of
+> > size '1').
 > 
-> I agree about userspace being in control, what I want to avoid is
-> letting userspace put KVM into a bad state without any indication
-> from KVM that the setup is wrong until something actually dirties a
-> page.
+> This only works on the assumption that the VM is in fact running. In the
+> case of the GIC ITS, I would expect that the VM has already been paused
+> in preparation for serialization. So, there would never be a vCPU thread
+> that would ever detect the kick.
 
-I can't see how that can result in a bad state for KVM itself. All you
-lack is a way for userspace to *track* the dirtying. Just like we
-don't have a way to track the dirtying of a page from the VMM.
+This is indeed the case. The ioctl will return -EBUSY if any vcpu is
+running.
 
-> Specifically, if mark_page_dirty_in_slot() is invoked without a
-> running vCPU, on a memslot with dirty tracking enabled but without a
-> dirty bitmap, then the migration is doomed.
+> 
+> > That's why I asked if it's possible for KVM to require a dirty_bitmap when KVM
+> > might end up collecting dirty information without a vCPU.  KVM is still
+> > technically prescribing a solution to userspace, but only because there's only
+> > one solution.
+> 
+> I was trying to allude to something like this by flat-out requiring
+> ring + bitmap on arm64.
 
-Yup, and that's a luser error. Too bad. Userspace can still transfer
-all the memory, and all will be fine.
+And I claim that this is wrong. It may suit a particular use case, but
+that's definitely not a universal truth.
 
-> Dropping the dirty page isn't a sane response as that'd all but
-> guaranatee memory corruption in the guest.
+> 
+> Otherwise, we'd either need to:
+> 
+>  (1) Document the features that explicitly depend on ring + bitmap (i.e.
+>  GIC ITS, whatever else may come) such that userspace sets up the
+>  correct configuration based on what its using. The combined likelihood
+>  of both KVM and userspace getting this right seems low.
 
-Again, user error. Userspace can readily write over all the guest
-memory (virtio), and no amount of KVM-side tracking will help. What
-are you going to do about it?
+But what is there to get wrong? Absolutely nothing. Today, you can
+save/restore a GICv3-ITS VM without a bitmap at all. Just dump all of
+the memory. The bitmap only allows you to do it while the vcpus are
+running. Do you want a dirty ring because it makes things faster?
+Fine. But you need to understand what this does.
 
-At the end of the day, what are you trying to do? All the dirty
-tracking muck (bitmap and ring) is only a way for userspace to track
-dirty pages more easily and accelerate the transfer. If userspace
-doesn't tell KVM to track these writes, tough luck. If the author of a
-VMM doesn't understand that, then maybe they shouldn't be in charge of
-the VMM. Worse case, they can still transfer the whole thing, no harm
-done.
+Yes, this may require some additional documentation. But more
+importantly, it requires VMM authors to pay attention to what is
+happening. At least the QEMU folks are doing that.
 
-> At best, KVM could kick all vCPUs out to userspace
-> with a new exit reason, but that's not a very good experience for
-> userspace as either the VM is unexpectedly unmigratable or the VM
-> ends up being killed (or I suppose userspace could treat the exit as
-> a per-VM dirty ring of size '1').
+>  (2) Outright reject the use of features that require ring + bitmap.
+>  This pulls in ordering around caps and other UAPI.
 
-Can we please stop the exit nonsense? There is no vcpu involved
-here. This is a device (emulated or not) writing to memory, triggered
-by an ioctl from userspace. If you're thinking vcpu, you have the
-wrong end of the stick.
-
-Memory gets dirtied system wide, not just by CPUs, and no amount of
-per-vcpu resource is going to solve this problem. VM-based rings can
-help with if they provide a way to recover from an overflow. But that
-obviously doesn't work here as we can't checkpoint and restart the
-saving process on overflow.
+I don't think this makes any sense. Neither bitmap nor ring should be
+a prerequisite for *anything*.
 
 	M.
 
