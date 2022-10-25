@@ -2,100 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3095860CA08
-	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 12:27:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DACA60CAA6
+	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 13:09:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232369AbiJYK1l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Oct 2022 06:27:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45836 "EHLO
+        id S231688AbiJYLJl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Oct 2022 07:09:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232324AbiJYK1M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Oct 2022 06:27:12 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD2C6160ECF;
-        Tue, 25 Oct 2022 03:25:42 -0700 (PDT)
-Received: from zn.tnic (p200300ea9733e753329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e753:329c:23ff:fea6:a903])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C44E21EC03B9;
-        Tue, 25 Oct 2022 12:25:40 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1666693540;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=+geCwvxqT0myxZwE/PtJNWuF3ki1qM+58+9jGmk0+NA=;
-        b=QQmmBLsxaQ8Bj0ngcqs073Mv4GhGx8R/7EvI2yQ0oTRpnmgVXmmIW5JbwdhSXX6kTn5NXf
-        YXO+eYDiY/vhREBTWCVEionVrdwyNaIdtQO9FxHa5VrfMUThQoc9PY6PFOZslR+/E5H1aT
-        zYI89obq143eoU/a5IKjcDtSKRUzWJ4=
-Date:   Tue, 25 Oct 2022 12:25:36 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     "Kalra, Ashish" <ashish.kalra@amd.com>, vbabka@suse.cz
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        michael.roth@amd.com, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org
-Subject: Re: [PATCH Part2 v6 14/49] crypto: ccp: Handle the legacy TMR
- allocation when SNP is enabled
-Message-ID: <Y1e5oC9QyDlKpxZ9@zn.tnic>
-References: <cover.1655761627.git.ashish.kalra@amd.com>
- <3a51840f6a80c87b39632dc728dbd9b5dd444cd7.1655761627.git.ashish.kalra@amd.com>
- <Y0grhk1sq2tf/tUl@zn.tnic>
- <380c9748-1c86-4763-ea18-b884280a3b60@amd.com>
+        with ESMTP id S231656AbiJYLJc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Oct 2022 07:09:32 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 010F763F8;
+        Tue, 25 Oct 2022 04:09:23 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29PB8WQv018328;
+        Tue, 25 Oct 2022 11:09:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=3YOfkDKP0CcPTdIou62mwWmTAAg5NpH7eKPR5+Q7rIA=;
+ b=HqXlShKDuOJwqTvTqblzrkFK8Dd5o6zMfP9rmS7JoE4glbsjY8OOUs6MSUk3pBrxoMCC
+ vWwswMJZ0p8SMv+IdJk/nRJOUjjOEJVWQNBZQeZ48YfWsGkoN2Ut3FwU3/GvKdCE6z8X
+ 8MMmA2PSJ8GaSui0TP1xsnuwZIB/rwlGzIGS3RJRqFnFpa6M4ptqazEA9k19VlUTJY54
+ el3kxyBNzpNmKPoxZsfSoRCUz1MBsawW4Licv8Nt15msQEVev1o478ZGxgPCYsI06dDU
+ sQRDl1/SeRKAGMtr7wA2Ttoz6dSzsRZpkZgrYRuTVex1fL5FImWkToqjLA3kkQeYGzTN 7w== 
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3keea78sbh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Oct 2022 11:09:23 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29PB6ckA030332;
+        Tue, 25 Oct 2022 11:09:21 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3kdugat3sv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 25 Oct 2022 11:09:20 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29PB9H9K59113862
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 25 Oct 2022 11:09:17 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A3E0FAE05A;
+        Tue, 25 Oct 2022 11:09:17 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 70837AE056;
+        Tue, 25 Oct 2022 11:09:17 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.252])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 25 Oct 2022 11:09:17 +0000 (GMT)
+Date:   Tue, 25 Oct 2022 13:09:16 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [v2 1/1] KVM: s390: VSIE: sort out virtual/physical address in
+ pin_guest_page
+Message-ID: <20221025130916.1aa39c28@p-imbrenda>
+In-Reply-To: <20221025082039.117372-2-nrb@linux.ibm.com>
+References: <20221025082039.117372-1-nrb@linux.ibm.com>
+        <20221025082039.117372-2-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <380c9748-1c86-4763-ea18-b884280a3b60@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 0VrH9kXRNF8ANmR9_8_bwx6-S877A378
+X-Proofpoint-GUID: 0VrH9kXRNF8ANmR9_8_bwx6-S877A378
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-25_05,2022-10-25_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 lowpriorityscore=0 bulkscore=0 phishscore=0 mlxlogscore=999
+ mlxscore=0 spamscore=0 adultscore=0 impostorscore=0 clxscore=1011
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210250064
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 14, 2022 at 03:00:09PM -0500, Kalra, Ashish wrote:
-> If it is "still" accessed/touched then it can cause RMP #PF.
-> On the other hand,
+On Tue, 25 Oct 2022 10:20:39 +0200
+Nico Boehr <nrb@linux.ibm.com> wrote:
+
+> pin_guest_page() used page_to_virt() to calculate the hpa of the pinned
+> page. This currently works, because virtual and physical addresses are
+> the same. Use page_to_phys() instead to resolve the virtual-real address
+> confusion.
 > 
->  * PG_hwpoison... Accessing is
->  * not safe since it may cause another machine check. Don't touch!
+> One caller of pin_guest_page() actually expected the hpa to be a hva, so
+> add the missing phys_to_virt() conversion here.
 > 
-> That sounds exactly the state we want these page(s) to be in ?
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> ---
+>  arch/s390/kvm/vsie.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> Another possibility is PG_error.
+> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
+> index 94138f8f0c1c..0e9d020d7093 100644
+> --- a/arch/s390/kvm/vsie.c
+> +++ b/arch/s390/kvm/vsie.c
+> @@ -654,7 +654,7 @@ static int pin_guest_page(struct kvm *kvm, gpa_t gpa, hpa_t *hpa)
+>  	page = gfn_to_page(kvm, gpa_to_gfn(gpa));
+>  	if (is_error_page(page))
+>  		return -EINVAL;
+> -	*hpa = (hpa_t) page_to_virt(page) + (gpa & ~PAGE_MASK);
+> +	*hpa = (hpa_t)page_to_phys(page) + (gpa & ~PAGE_MASK);
+>  	return 0;
+>  }
+>  
+> @@ -869,7 +869,7 @@ static int pin_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page,
+>  		WARN_ON_ONCE(rc);
+>  		return 1;
+>  	}
+> -	vsie_page->scb_o = (struct kvm_s390_sie_block *) hpa;
+> +	vsie_page->scb_o = phys_to_virt(hpa);
+>  	return 0;
+>  }
+>  
 
-Something like this:
-
-diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-index e66f7aa3191d..baffa9c0dc30 100644
---- a/include/linux/page-flags.h
-+++ b/include/linux/page-flags.h
-@@ -186,6 +186,7 @@ enum pageflags {
- 	 * THP.
- 	 */
- 	PG_has_hwpoisoned = PG_error,
-+	PG_offlimits = PG_hwpoison,
- #endif
- 
- 	/* non-lru isolated movable page */
-
-and SNP will have to depend on CONFIG_MEMORY_FAILURE.
-
-But I'd let mm folks correct me here on the details.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
