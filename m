@@ -2,54 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21B7960D14C
-	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 18:08:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2E9860D179
+	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 18:17:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232893AbiJYQH6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Oct 2022 12:07:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43310 "EHLO
+        id S233038AbiJYQRu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Oct 2022 12:17:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229613AbiJYQH5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Oct 2022 12:07:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61A8118499D
-        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 09:07:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666714075;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=5KspUNdpIMJ1oi73gHAhE34NL4Dzppd2Wwilq7mP6L8=;
-        b=NvcTC61iqpXGy2+AhQpWLLJ9b4kq20C7zkVczavC5t5/9krFJ8yWuXviBUTWOu7gw1GRSj
-        Udqk8sF6wij+YYXMKHeC/p47OtwUxHnQNLtPtCgLj51yphkKEP7kMMsLa51LM6wV2+S7p1
-        W2zYhSr2C1xG96NVr9Tgq6UTXEWhv68=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-587-yzgsZNG4OMq5fO07-66Gqw-1; Tue, 25 Oct 2022 12:07:53 -0400
-X-MC-Unique: yzgsZNG4OMq5fO07-66Gqw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 16775185A7A3;
-        Tue, 25 Oct 2022 16:07:53 +0000 (UTC)
-Received: from gondolin.redhat.com (unknown [10.39.193.32])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A9405410B235;
-        Tue, 25 Oct 2022 16:07:37 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Andrew Jones <andrew.jones@linux.dev>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, Cornelia Huck <cohuck@redhat.com>
-Subject: [kvm-unit-tests PATCH] MAINTAINERS: new kvmarm mailing list
-Date:   Tue, 25 Oct 2022 18:07:30 +0200
-Message-Id: <20221025160730.40846-1-cohuck@redhat.com>
+        with ESMTP id S233286AbiJYQRh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Oct 2022 12:17:37 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 044041011A9
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 09:17:35 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id t10-20020a17090a4e4a00b0020af4bcae10so12457058pjl.3
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 09:17:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0XpehjN5/x0DVN6iNfQRcpwLRiHoknqSMi2DnBppXC4=;
+        b=VTegWoMotPt2w65LyX5l1RfBFsrVct34KfNYTQclV1Ej8EpD0Aka6DhRqFqKKPkKYF
+         dx/pMAu3a28hbLyvQafo+3Wa+3mCeMIJhF5AVwXriBoAuAKBIFTkfyEZGt3R9F9Nhi41
+         fj+nZajeXUNM6G2OtS9Tq69y8zmBsHay0qJIu6C8XDsQnxvChs2zKzG+iHzQM3CemyK7
+         rQ1rbv2xpfwgbK/hJO81F9yW0YMzSmbw6UXv81EZOUicFWm2Vd2NYV/mOhEHD+opJjML
+         IMkSJQctzTXXbBbp4cSFHMIFqYkomesQTa0hCcAW0LxBYbC7hn0bynG64p0PfcuPbXmb
+         uofw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0XpehjN5/x0DVN6iNfQRcpwLRiHoknqSMi2DnBppXC4=;
+        b=xpRWnh+CMZ5jH9kFAGjJQZ2Pao3O9oyabZkMst6BBu9vWw1z+x+5BO9LG5pHErTSRr
+         e5EritcaPuwEtfnHP1leN3e+IOH6P46dYH0DZsAVeXQfJB5IUou68MYPRh9RA0+VtPKK
+         JFDur65sSs2N2V7u0rf5UGmQCM3gux2B50yc1EsAMlxkQx1TcycqYi2RzR2iUbMfae/P
+         ZtghR8qwCfGUpjzEeKI/AdfTvBaFkgoI3S5sYAUgZSYKSU2fG+358lWiEz0cvO7SMCrK
+         goJPbFVHRcC71r1Zsf5RxkiQ9xV+0QJ6zvEsDBIpQcYlEZlcI3YTJD2I8M3hMAEc2dGX
+         cGOQ==
+X-Gm-Message-State: ACrzQf3zId4hNju9L5XoMouKMdkuWO9PJ/Kbqhjnz65QOuOWI5f0/hob
+        bHFvZ1/Qh0DygiHcWeS8HZhAd++4jxwBWA==
+X-Google-Smtp-Source: AMsMyM738RdpBPHm9pvc30fi3c2/lYdgFkQc2nwAzBbq52uGbxkdpRe8GUTzQNa3Uoldv8m3HWsH3Q==
+X-Received: by 2002:a17:903:41c7:b0:182:a32f:4db5 with SMTP id u7-20020a17090341c700b00182a32f4db5mr39384792ple.22.1666714654279;
+        Tue, 25 Oct 2022 09:17:34 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id b3-20020a1709027e0300b00186881e1feasm1399643plm.112.2022.10.25.09.17.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Oct 2022 09:17:33 -0700 (PDT)
+Date:   Tue, 25 Oct 2022 16:17:30 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Maydell <peter.maydell@linaro.org>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v9 3/8] KVM: Add KVM_EXIT_MEMORY_FAULT exit
+Message-ID: <Y1gMGpWpzzA/AC//@google.com>
+References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
+ <20221025151344.3784230-4-chao.p.peng@linux.intel.com>
+ <CAFEAcA-=Sc9Sc4oLq13HAFW49ZBw8u6DtN7bf_vjVYX_AAaKSg@mail.gmail.com>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-=Sc9Sc4oLq13HAFW49ZBw8u6DtN7bf_vjVYX_AAaKSg@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -57,29 +101,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM/arm64 development is moving to a new mailing list (see
-https://lore.kernel.org/all/20221001091245.3900668-1-maz@kernel.org/);
-kvm-unit-tests should advertise the new list as well.
+On Tue, Oct 25, 2022, Peter Maydell wrote:
+> On Tue, 25 Oct 2022 at 16:21, Chao Peng <chao.p.peng@linux.intel.com> wrote:
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index f3fa75649a78..975688912b8c 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -6537,6 +6537,29 @@ array field represents return values. The userspace should update the return
+> >  values of SBI call before resuming the VCPU. For more details on RISC-V SBI
+> >  spec refer, https://github.com/riscv/riscv-sbi-doc.
+> >
+> > +::
+> > +
+> > +               /* KVM_EXIT_MEMORY_FAULT */
+> > +               struct {
+> > +  #define KVM_MEMORY_EXIT_FLAG_PRIVATE (1 << 0)
+> > +                       __u32 flags;
+> > +                       __u32 padding;
+> > +                       __u64 gpa;
+> > +                       __u64 size;
+> > +               } memory;
+> > +
+> > +If exit reason is KVM_EXIT_MEMORY_FAULT then it indicates that the VCPU has
+> > +encountered a memory error which is not handled by KVM kernel module and
+> > +userspace may choose to handle it. The 'flags' field indicates the memory
+> > +properties of the exit.
+> > +
+> > + - KVM_MEMORY_EXIT_FLAG_PRIVATE - indicates the memory error is caused by
+> > +   private memory access when the bit is set. Otherwise the memory error is
+> > +   caused by shared memory access when the bit is clear.
+> > +
+> > +'gpa' and 'size' indicate the memory range the error occurs at. The userspace
+> > +may handle the error and return to KVM to retry the previous memory access.
+> > +
+> 
+> What's the difference between this and a plain old MMIO exit ?
+> Just that we can specify a wider size and some flags ?
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- MAINTAINERS | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+KVM_EXIT_MMIO is purely for cases where there is no memslot.  KVM_EXIT_MEMORY_FAULT
+will be used for scenarios where there is a valid memslot for a GPA, but for
+whatever reason KVM cannot map the memslot into the guest.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 90ead214a75d..649de509a511 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -67,7 +67,8 @@ ARM
- M: Andrew Jones <andrew.jones@linux.dev>
- S: Supported
- L: kvm@vger.kernel.org
--L: kvmarm@lists.cs.columbia.edu
-+L: kvmarm@lists.linux.dev
-+L: kvmarm@lists.cs.columbia.edu (deprecated)
- F: arm/
- F: lib/arm/
- F: lib/arm64/
--- 
-2.37.3
+In this series, the new exit type is use to handle guest-initiated conversions
+between shared and private memory.  By design, conversion requires explicit action
+from userspace, and so even though KVM has a valid memslot, KVM needs to exit to
+userspace to effectively forward the conversion request to userspace.
 
+Long term, I also hope to convert all guest-triggered -EFAULT paths to instead
+return KVM_EXIT_MEMORY_FAULT.  At minimum, returning KVM_EXIT_MEMORY_FAULT instead
+of -EFAULT will allow KVM to provide userspace with the "bad" GPA when something
+goes sideways, e.g. if faulting in the page failed because there's no valid
+userspace mapping.
+
+There have also been two potential use cases[1][2], though they both appear to have
+been abandoned, where userspace would do something more than just kill the guest
+in response to KVM_EXIT_MEMORY_FAULT.
+
+[1] https://lkml.kernel.org/r/20200617230052.GB27751@linux.intel.com
+[2] https://lore.kernel.org/all/YKxJLcg%2FWomPE422@google.com
