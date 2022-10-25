@@ -2,111 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C23A160D227
-	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 18:59:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7209860D23D
+	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 19:07:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232204AbiJYQ7G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Oct 2022 12:59:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54678 "EHLO
+        id S232364AbiJYRHX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Oct 2022 13:07:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231459AbiJYQ7C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Oct 2022 12:59:02 -0400
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE86B101E2B
-        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 09:59:01 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id bk15so22151422wrb.13
-        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 09:59:01 -0700 (PDT)
+        with ESMTP id S232392AbiJYRHL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Oct 2022 13:07:11 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3DAE15200D
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 10:07:01 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id f140so12465752pfa.1
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 10:07:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:sender:mime-version:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J0K5FduIrkPmMnSKpCjhTfhH6+1DY4nfr2hITA+MET8=;
-        b=mO9MZOyZUSTOfTTD0TkiYyVl9UdCUvQss7JXKpDotjn8CLkEtxxW0bOMqEFU3DX8bc
-         D2k+1GiqhRfqpwyzFu+0P+3dU3azlFaz+sCTgUJr8PKecFpouX+FVEEgF/FOW4mThRAb
-         wjwKJFbJgEzTqYSq1XMc5uEDqTOe1IUAkx5oBHGdoX4X27mZHRCWZDMQjKixf9IVQzvh
-         u39DsIJo942HsAAxOtWCKQ4LalJbyoiVjQHdRQU75+s3wELu4qW2Y6TW1OjluQNDlpx8
-         TpUjai6zvzi7twbi+TqGWNLbgHuozzb6APjwUxoqTOlP9jJe38zi2H7zz1zek4air9fW
-         ni7g==
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=napLP0njighkCcO4W1DZOY6rgUMs4xcUsx9lyU2OHdk=;
+        b=gPOSE8m2CJTzYky/bqt3bvTv2GqxLf0g5LzYFNecRaGofPocb4j5dbAh/8jSFL4e/A
+         aJoAGa7c2trrl3i19O3tj/5uDwjfXF6vplhXyO0+nUuSIY01QD0yBp3J+cQDxrK+Zgzo
+         w//NsicbvHJrxIdq+dAP9smd2hZHaWyKmf1Ht6/Diga2rt3N3LgOSU4q4u5bir1jCZQB
+         SYQn9KKKIMAVXyCmeQp0TAe02+PBOQkjpldxpW4D6Wn7LRkCgFOIBZcYoYkKbjPguy8B
+         Q9h3Yg2e9Hbgatqg7PAG66+F3/V04tKE9v/oIf8MLPlNTYV5P7h8L957K6kQLRFswCGa
+         1NtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:sender:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J0K5FduIrkPmMnSKpCjhTfhH6+1DY4nfr2hITA+MET8=;
-        b=xqW4UKaYiETpssFvoUAU1nV70PeT6vGYNlUGXhuwsPOOB5pZ4hzEEWz8F/FvuDDszA
-         j3+uOejAGDLDZPtuPmYzt9UNpjAQ+0Ofc4Dv0xODZPoyemT87smHQmzeSkDqZqm4U8ss
-         vKVHcnCSQJrqtKsrn8o5cDcN1kiz6j/J6OB2BY6ED/KvXjYyJYtQw99TlXdoYZJTQtLO
-         XxMP78jvkt8kdxC8FRUiTvW6FA5YsImyHvHo5QDfA9wk96i+kvl13pvZ8YGSmbi93OOV
-         gjDx4ckJY2Oy44pfvJPBMn79nlJ0xfAk8IVzp3VyiGIq0vrHSYyFUwdMgMPvbGA9giSX
-         rJNA==
-X-Gm-Message-State: ACrzQf0Urt4xehq4qbdpz+THPwIz9bo9deWyfQ5YOAHucbC/i7GdBsRZ
-        CgPbIDP0An3ObcMEylx4shYStN2mTTwuXffOGyM=
-X-Google-Smtp-Source: AMsMyM7TFVcCa4Y1TVOjMekNezoE/KoWx0nrGJhO1XfiK+zGQwb+7qUbsJqJe4VJjRt/pMX0EjlulP9NH5OUG2P35z0=
-X-Received: by 2002:a05:6000:1845:b0:22f:bfca:6439 with SMTP id
- c5-20020a056000184500b0022fbfca6439mr26352614wri.298.1666717140161; Tue, 25
- Oct 2022 09:59:00 -0700 (PDT)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=napLP0njighkCcO4W1DZOY6rgUMs4xcUsx9lyU2OHdk=;
+        b=pyV8qgfQe2OzG6dw7MgtQF3Yxee65O8ZrE3gNgmyXHiA3A/c60K+Q1aqa1sUEIY5Xp
+         r0GhmxgNDV72XHpizDNnWczAUYxOvgEapTUs7iC7Nf9G5pqEUrVDkqmLOm2+tMtIgw+M
+         4PhFC2zkYTGEKsHbylAvoybpUfYbIohtHP03muQPozU5+Oc8cocN2uMopcHp1djOVCE3
+         nH3lv5B7IbvjsEnORfzSuv7wsox6U0Qhz+y2MXo5u9dwHENrt1BFSRKLD8oS1bnRCWOJ
+         W6psPk/nGj8ztRLESB2FiLfMm+p9wmfhMrtI51mnNY6qewsOLm19BhWa2ufMgXozBzd8
+         p4Zg==
+X-Gm-Message-State: ACrzQf0K/s5ZFrskL2r+mQ9CkZhdhODFo7i70G8zdempABzllqsQFCyo
+        6pnYGrCk5J9Z2BOPnaSFv/af5Q==
+X-Google-Smtp-Source: AMsMyM6I6vLBD3d3/4wDmQWDD3rOE2C/HNRN5WzdWxYdwhclsUQhL1e+6B6e+wGDNL2Or2lbcChJcQ==
+X-Received: by 2002:a63:b59:0:b0:434:2374:6d12 with SMTP id a25-20020a630b59000000b0043423746d12mr33575235pgl.311.1666717621393;
+        Tue, 25 Oct 2022 10:07:01 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id jc20-20020a17090325d400b001830ed575c3sm1437993plb.117.2022.10.25.10.07.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Oct 2022 10:07:00 -0700 (PDT)
+Date:   Tue, 25 Oct 2022 17:06:57 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Mi, Dapeng1" <dapeng1.mi@intel.com>
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>
+Subject: Re: [PATCH] KVM: x86: disable halt polling when powersave governor
+ is used
+Message-ID: <Y1gXseyl0f3IUnDh@google.com>
+References: <20220915073121.1038840-1-dapeng1.mi@intel.com>
+ <Y0BnKIW+7sqJbTyY@google.com>
+ <PH0PR11MB48240C29F1DEBC79EA933285CD5E9@PH0PR11MB4824.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-Sender: klin.pai112@gmail.com
-Received: by 2002:a05:6000:152:0:0:0:0 with HTTP; Tue, 25 Oct 2022 09:58:59
- -0700 (PDT)
-From:   Sophia Erick <sdltdkggl3455@gmail.com>
-Date:   Tue, 25 Oct 2022 18:58:59 +0200
-X-Google-Sender-Auth: zOJA-LqT4P89zfdBKBiVTbLNQNY
-Message-ID: <CAL=EmoaOZveam1RG7__8wDp1MS6j1GOmhQoM8BPJjFjGdACFiw@mail.gmail.com>
-Subject: HELLO
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: Yes, score=5.1 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,FROM_LOCAL_NOVOWEL,HK_RANDOM_FROM,LOTS_OF_MONEY,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_MONEY_PERCENT,UNDISC_MONEY
-        autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2a00:1450:4864:20:0:0:0:42d listed in]
-        [list.dnswl.org]
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.5000]
-        *  0.5 FROM_LOCAL_NOVOWEL From: localpart has series of non-vowel
-        *      letters
-        *  1.0 HK_RANDOM_FROM From username looks random
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        *  0.2 FREEMAIL_ENVFROM_END_DIGIT Envelope-from freemail username ends
-        *       in digit
-        *      [klin.pai112[at]gmail.com]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [klin.pai112[at]gmail.com]
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        *  0.0 LOTS_OF_MONEY Huge... sums of money
-        *  0.0 T_MONEY_PERCENT X% of a lot of money for you
-        *  2.8 UNDISC_MONEY Undisclosed recipients + money/fraud signs
-X-Spam-Level: *****
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PH0PR11MB48240C29F1DEBC79EA933285CD5E9@PH0PR11MB4824.namprd11.prod.outlook.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On Sat, Oct 08, 2022, Mi, Dapeng1 wrote:
+> > > +				!strncmp(policy->governor->name,
+> > "powersave",
+> > 
+> > KVM should not be comparing magic strings.  If the cpufreq subsystem can't get
+> > policy->policy right, then that needs to be fixed.
+> 
+> Yeah, using magic strings looks a little bit strange, but this is what is
+> cpufreq doing.  Currently cpufreq mechanism supports two kinds of drivers,
+> one is the driver which has the built-in governor, like intel_pstate driver.
+> For this kind of driver, the cpufreq governor is saved in the policy->policy
+> field. The other is the traditional driver which is independent with cpufreq
+> governor and the cpufreq governor type is saved in the governor->name field.
+> For the second kind of cpufreq driver, the policy->policy field is
+> meaningless and we have to read the governor name. 
 
-It is my pleasure to communicate with you, I know that this message
-will be a surprise to you my name is Mrs. Sophia Erick, I am diagnosed
-with ovarian cancer which my doctor have confirmed that I have only
-some weeks to live so I have decided you handover the sum of(Eleven
-Million Dollars) in my account to you for help of the orphanage homes
-and the needy once
+That doesn't mean it's ok to bleed those internal details into KVM.  I would much
+rather cpufreq provide a helper to get the effective policy, e.g.
 
-Please   kindly reply me here as soon as possible to enable me give
-you more information but before handing over my details to you please
-assure me that you will only take 30%  of the money and share the rest
-to the poor orphanage home and the needy once, thank you am waiting to
-hear from you
+  unsigned int cpufreq_cpu_get_policy(unsigned int cpu)
+  {
+	struct cpufreq_policy *policy = cpufreq_cpu_get(cpu);
+	unsigned int pol;
 
-Mrs Sophia Erick.
+	if (!policy)
+		return CPUFREQ_POLICY_UNKNOWN;
+
+	pol = policy->policy
+	if (pol == CPUFREQ_POLICY_UNKNOWN && policy->governor)
+		pol = cpufreq_parse_policy(policy->governor->name);
+
+	cpufreq_cpu_put(policy);
+  }
