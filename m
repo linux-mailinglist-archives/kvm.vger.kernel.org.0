@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A078860C704
-	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 10:56:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 586B460C7AF
+	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 11:14:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231820AbiJYI4x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Oct 2022 04:56:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49050 "EHLO
+        id S230134AbiJYJOc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Oct 2022 05:14:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230294AbiJYI4w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Oct 2022 04:56:52 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32DB1E6F7A;
-        Tue, 25 Oct 2022 01:56:50 -0700 (PDT)
+        with ESMTP id S230169AbiJYJNn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Oct 2022 05:13:43 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35D13176B88;
+        Tue, 25 Oct 2022 02:07:19 -0700 (PDT)
 Received: from zn.tnic (p200300ea9733e753329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e753:329c:23ff:fea6:a903])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D25271EC0682;
-        Tue, 25 Oct 2022 10:56:46 +0200 (CEST)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 560641EC0138;
+        Tue, 25 Oct 2022 11:07:08 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1666688206;
+        t=1666688828;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=jzZuHCRT8tCn7Q/Cc28ysAO72/F5QJaLOhFhC2xnWuo=;
-        b=F6nuzK5egVyOWZD7QTs1xY//bjUly+5gwu9iPkQkz3X/qmkffNZ+tq/+xSuJ/Wqzc5kdt2
-        HdnHTNzbHU0q2syd5lZ0gmy6OoUpJIkNBXYWeExX9OSOkX1CBAVRA38ylozzbFg+2kf8Me
-        mnuYUA7WKZ+r2b5WPJ2HMfbPIAzXGI0=
-Date:   Tue, 25 Oct 2022 10:56:43 +0200
+        bh=RpZt/ekhm97/GCrxTm62WjrwmkfB+Hl6PYEoWkmLcSs=;
+        b=cJSawZk/4f1kVEpXP4DnaqZQDZCWU4J9ov+SV+016eVWeC8LfSqUNPn/mqfTwrdFMdHY41
+        NVlCjUdHw55zGKATrjh+CCmZY5qM1WeQeEJ6UX55CYy5aACwbF6dxJ+yRGmqVH6e82zKve
+        d1WhLf8YwB22RIEdI4LVqnlyjQjqDRQ=
+Date:   Tue, 25 Oct 2022 11:07:04 +0200
 From:   Borislav Petkov <bp@alien8.de>
 To:     "Kalra, Ashish" <ashish.kalra@amd.com>
 Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -46,16 +46,16 @@ Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         dgilbert@redhat.com, jarkko@kernel.org
 Subject: Re: [PATCH Part2 v6 12/49] crypto: ccp: Add support to initialize
  the AMD-SP for SEV-SNP
-Message-ID: <Y1ekyzdjUtpE1Z4n@zn.tnic>
+Message-ID: <Y1enOIfS3nnlcyyc@zn.tnic>
 References: <cover.1655761627.git.ashish.kalra@amd.com>
  <87a0481526e66ddd5f6192cbb43a50708aee2883.1655761627.git.ashish.kalra@amd.com>
  <Yzh558vy+rJfsBBq@zn.tnic>
  <f997dd38-a615-e343-44cd-a7aeb9447a1e@amd.com>
- <fac90493-fb40-d1dd-e40e-d522bf0f33cb@amd.com>
+ <d3ab29c8-8f22-28eb-dfe3-6100a8f16e4b@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <fac90493-fb40-d1dd-e40e-d522bf0f33cb@amd.com>
+In-Reply-To: <d3ab29c8-8f22-28eb-dfe3-6100a8f16e4b@amd.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
         URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
@@ -65,15 +65,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 14, 2022 at 04:31:42PM -0500, Kalra, Ashish wrote:
-> so that means we can't combine the IPIs.
+On Wed, Oct 19, 2022 at 01:48:48PM -0500, Kalra, Ashish wrote:
+> I see that other drivers are also using the same convention:
 
-Ok, thanks for checking.
+It is only convention. Look at the .rst output:
 
-> Also, this is not a performance critical path, so should we really be so
-> concerned about it?
+0 if the SEV successfully processed the command
+-``ENODEV``    if the SEV device is not available
+-``ENOTSUPP``  if the SEV does not support SEV
+-``ETIMEDOUT`` if the SEV command timed out
+-``EIO``       if the SEV returned a non-zero return code
 
-Not that concerned but we're always trying to be as optimal as possible.
+vs
+
+0 if the SEV successfully processed the command
+``-ENODEV``    if the SEV device is not available
+``-ENOTSUPP``  if the SEV does not support SEV
+``-ETIMEDOUT`` if the SEV command timed out
+``-EIO``       if the SEV returned a non-zero return code
+
+so in the html output of this, the minus sign will be displayed either
+with text font or with monospaced font as part of the error type.
+
+I wanna say the second is better as the '-' is part of the error code
+but won't waste too much time debating this. :)
+
+Btw
+
+$ ./scripts/kernel-doc include/linux/psp-sev.h
+
+complains a lot. Might wanna fix those up when bored or someone else
+who's reading this and feels bored too. :-)
 
 Thx.
 
