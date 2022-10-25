@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10C4960CC90
-	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 14:52:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9589360CC92
+	for <lists+kvm@lfdr.de>; Tue, 25 Oct 2022 14:52:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232209AbiJYMv7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 25 Oct 2022 08:51:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35102 "EHLO
+        id S231877AbiJYMwD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 25 Oct 2022 08:52:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232280AbiJYMva (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 25 Oct 2022 08:51:30 -0400
+        with ESMTP id S231864AbiJYMvd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 25 Oct 2022 08:51:33 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8764019C042
-        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 05:48:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F867196B75
+        for <kvm@vger.kernel.org>; Tue, 25 Oct 2022 05:48:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666702118;
+        s=mimecast20190719; t=1666702123;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=4rzrXGptVIsN6KuOsZNVu5cL4vgxSqIWXtkapsoMQsw=;
-        b=MmCG6nY/pXCIUfwMut8KYL8VDA17eUhOAcyJ364I8LvxCj3pOQb+B7UfUtmJ43vqyfaAJv
-        5GnHnGJ2cM3k3o1B/7WlAUVQ9Fen+o6FiqL2GSqGljN46uDgYld2Pj5zIYGHZFKa9ODpCM
-        RpCO9QJPaV2Fzyu/pTo/j139jQccI94=
+        bh=IkrTzU5rG8TBDhJXggqu3Ho3+X8GGbZwRVqLpyPTTs0=;
+        b=J6RtLjcYgBzCVupzebD3LWyXnEf2B+lxKFW5+m2OG1RRptB9CEakW0Z5oV2OzY8LYQognB
+        5XSbVgBrEevZgFC9UKu0Hv4WSFJYxeXWqqV9UJBCVOMtvpnoG3B9xVb1D0buRx8zq3Wn4O
+        3tWnolmriJ5zm2BD0+UZ2huzWJ9kdzo=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-56-gy_pALufPyCHIioYd9kcVg-1; Tue, 25 Oct 2022 08:48:33 -0400
-X-MC-Unique: gy_pALufPyCHIioYd9kcVg-1
+ us-mta-588-Bihkr0zeOZ2yMhRp5klk3Q-1; Tue, 25 Oct 2022 08:48:37 -0400
+X-MC-Unique: Bihkr0zeOZ2yMhRp5klk3Q-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7171186E921;
-        Tue, 25 Oct 2022 12:48:32 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1955580252C;
+        Tue, 25 Oct 2022 12:48:36 +0000 (UTC)
 Received: from amdlaptop.tlv.redhat.com (dhcp-4-238.tlv.redhat.com [10.35.4.238])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 98D1040C6FA0;
-        Tue, 25 Oct 2022 12:48:28 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B8BBE40C6EC6;
+        Tue, 25 Oct 2022 12:48:32 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Thomas Gleixner <tglx@linutronix.de>,
@@ -56,9 +56,9 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         linux-kselftest@vger.kernel.org, Kees Cook <keescook@chromium.org>,
         "H. Peter Anvin" <hpa@zytor.com>, Wei Wang <wei.w.wang@intel.com>,
         Borislav Petkov <bp@alien8.de>
-Subject: [PATCH RESEND v4 11/23] KVM: x86: emulator: introduce emulator_recalc_and_set_mode
-Date:   Tue, 25 Oct 2022 15:47:29 +0300
-Message-Id: <20221025124741.228045-12-mlevitsk@redhat.com>
+Subject: [PATCH RESEND v4 12/23] KVM: x86: emulator: update the emulation mode after rsm
+Date:   Tue, 25 Oct 2022 15:47:30 +0300
+Message-Id: <20221025124741.228045-13-mlevitsk@redhat.com>
 In-Reply-To: <20221025124741.228045-1-mlevitsk@redhat.com>
 References: <20221025124741.228045-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -74,158 +74,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Some instructions update the cpu execution mode, which needs to update the
-emulation mode.
+Update the emulation mode after RSM so that RIP will be correctly
+written back, because the RSM instruction can switch the CPU mode from
+32 bit (or less) to 64 bit.
 
-Extract this code, and make assign_eip_far use it.
-
-assign_eip_far now reads CS, instead of getting it via a parameter,
-which is ok, because callers always assign CS to the same value
-before calling this function.
-
-No functional change is intended.
+This fixes a guest crash in case the #SMI is received while the guest
+runs a code from an address > 32 bit.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/emulate.c | 85 ++++++++++++++++++++++++++++--------------
- 1 file changed, 57 insertions(+), 28 deletions(-)
+ arch/x86/kvm/emulate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-index e23c984d6aae09..c65f57b6da9bf1 100644
+index c65f57b6da9bf1..2c56d08b426065 100644
 --- a/arch/x86/kvm/emulate.c
 +++ b/arch/x86/kvm/emulate.c
-@@ -760,8 +760,7 @@ static int linearize(struct x86_emulate_ctxt *ctxt,
- 			   ctxt->mode, linear);
+@@ -2315,7 +2315,7 @@ static int em_rsm(struct x86_emulate_ctxt *ctxt)
+ 	if (ctxt->ops->leave_smm(ctxt))
+ 		ctxt->ops->triple_fault(ctxt);
+ 
+-	return X86EMUL_CONTINUE;
++	return emulator_recalc_and_set_mode(ctxt);
  }
  
--static inline int assign_eip(struct x86_emulate_ctxt *ctxt, ulong dst,
--			     enum x86emul_mode mode)
-+static inline int assign_eip(struct x86_emulate_ctxt *ctxt, ulong dst)
- {
- 	ulong linear;
- 	int rc;
-@@ -771,41 +770,71 @@ static inline int assign_eip(struct x86_emulate_ctxt *ctxt, ulong dst,
- 
- 	if (ctxt->op_bytes != sizeof(unsigned long))
- 		addr.ea = dst & ((1UL << (ctxt->op_bytes << 3)) - 1);
--	rc = __linearize(ctxt, addr, &max_size, 1, false, true, mode, &linear);
-+	rc = __linearize(ctxt, addr, &max_size, 1, false, true, ctxt->mode, &linear);
- 	if (rc == X86EMUL_CONTINUE)
- 		ctxt->_eip = addr.ea;
- 	return rc;
- }
- 
-+static inline int emulator_recalc_and_set_mode(struct x86_emulate_ctxt *ctxt)
-+{
-+	u64 efer;
-+	struct desc_struct cs;
-+	u16 selector;
-+	u32 base3;
-+
-+	ctxt->ops->get_msr(ctxt, MSR_EFER, &efer);
-+
-+	if (!(ctxt->ops->get_cr(ctxt, 0) & X86_CR0_PE)) {
-+		/* Real mode. cpu must not have long mode active */
-+		if (efer & EFER_LMA)
-+			return X86EMUL_UNHANDLEABLE;
-+		ctxt->mode = X86EMUL_MODE_REAL;
-+		return X86EMUL_CONTINUE;
-+	}
-+
-+	if (ctxt->eflags & X86_EFLAGS_VM) {
-+		/* Protected/VM86 mode. cpu must not have long mode active */
-+		if (efer & EFER_LMA)
-+			return X86EMUL_UNHANDLEABLE;
-+		ctxt->mode = X86EMUL_MODE_VM86;
-+		return X86EMUL_CONTINUE;
-+	}
-+
-+	if (!ctxt->ops->get_segment(ctxt, &selector, &cs, &base3, VCPU_SREG_CS))
-+		return X86EMUL_UNHANDLEABLE;
-+
-+	if (efer & EFER_LMA) {
-+		if (cs.l) {
-+			/* Proper long mode */
-+			ctxt->mode = X86EMUL_MODE_PROT64;
-+		} else if (cs.d) {
-+			/* 32 bit compatibility mode*/
-+			ctxt->mode = X86EMUL_MODE_PROT32;
-+		} else {
-+			ctxt->mode = X86EMUL_MODE_PROT16;
-+		}
-+	} else {
-+		/* Legacy 32 bit / 16 bit mode */
-+		ctxt->mode = cs.d ? X86EMUL_MODE_PROT32 : X86EMUL_MODE_PROT16;
-+	}
-+
-+	return X86EMUL_CONTINUE;
-+}
-+
- static inline int assign_eip_near(struct x86_emulate_ctxt *ctxt, ulong dst)
- {
--	return assign_eip(ctxt, dst, ctxt->mode);
-+	return assign_eip(ctxt, dst);
- }
- 
--static int assign_eip_far(struct x86_emulate_ctxt *ctxt, ulong dst,
--			  const struct desc_struct *cs_desc)
-+static int assign_eip_far(struct x86_emulate_ctxt *ctxt, ulong dst)
- {
--	enum x86emul_mode mode = ctxt->mode;
--	int rc;
-+	int rc = emulator_recalc_and_set_mode(ctxt);
- 
--#ifdef CONFIG_X86_64
--	if (ctxt->mode >= X86EMUL_MODE_PROT16) {
--		if (cs_desc->l) {
--			u64 efer = 0;
-+	if (rc != X86EMUL_CONTINUE)
-+		return rc;
- 
--			ctxt->ops->get_msr(ctxt, MSR_EFER, &efer);
--			if (efer & EFER_LMA)
--				mode = X86EMUL_MODE_PROT64;
--		} else
--			mode = X86EMUL_MODE_PROT32; /* temporary value */
--	}
--#endif
--	if (mode == X86EMUL_MODE_PROT16 || mode == X86EMUL_MODE_PROT32)
--		mode = cs_desc->d ? X86EMUL_MODE_PROT32 : X86EMUL_MODE_PROT16;
--	rc = assign_eip(ctxt, dst, mode);
--	if (rc == X86EMUL_CONTINUE)
--		ctxt->mode = mode;
--	return rc;
-+	return assign_eip(ctxt, dst);
- }
- 
- static inline int jmp_rel(struct x86_emulate_ctxt *ctxt, int rel)
-@@ -2141,7 +2170,7 @@ static int em_jmp_far(struct x86_emulate_ctxt *ctxt)
- 	if (rc != X86EMUL_CONTINUE)
- 		return rc;
- 
--	rc = assign_eip_far(ctxt, ctxt->src.val, &new_desc);
-+	rc = assign_eip_far(ctxt, ctxt->src.val);
- 	/* Error handling is not implemented. */
- 	if (rc != X86EMUL_CONTINUE)
- 		return X86EMUL_UNHANDLEABLE;
-@@ -2219,7 +2248,7 @@ static int em_ret_far(struct x86_emulate_ctxt *ctxt)
- 				       &new_desc);
- 	if (rc != X86EMUL_CONTINUE)
- 		return rc;
--	rc = assign_eip_far(ctxt, eip, &new_desc);
-+	rc = assign_eip_far(ctxt, eip);
- 	/* Error handling is not implemented. */
- 	if (rc != X86EMUL_CONTINUE)
- 		return X86EMUL_UNHANDLEABLE;
-@@ -3119,7 +3148,7 @@ static int em_call_far(struct x86_emulate_ctxt *ctxt)
- 	if (rc != X86EMUL_CONTINUE)
- 		return rc;
- 
--	rc = assign_eip_far(ctxt, ctxt->src.val, &new_desc);
-+	rc = assign_eip_far(ctxt, ctxt->src.val);
- 	if (rc != X86EMUL_CONTINUE)
- 		goto fail;
- 
+ static void
 -- 
 2.34.3
 
