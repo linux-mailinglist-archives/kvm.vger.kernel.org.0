@@ -2,98 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 997DF60DCE8
-	for <lists+kvm@lfdr.de>; Wed, 26 Oct 2022 10:18:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 449DF60DD1C
+	for <lists+kvm@lfdr.de>; Wed, 26 Oct 2022 10:35:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233132AbiJZISQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Oct 2022 04:18:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42092 "EHLO
+        id S233185AbiJZIfG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Oct 2022 04:35:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232773AbiJZISO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Oct 2022 04:18:14 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C491294137;
-        Wed, 26 Oct 2022 01:18:13 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29Q7912K028256;
-        Wed, 26 Oct 2022 08:18:13 GMT
+        with ESMTP id S232958AbiJZIfE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Oct 2022 04:35:04 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A98312C66F
+        for <kvm@vger.kernel.org>; Wed, 26 Oct 2022 01:35:01 -0700 (PDT)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29Q8FI4W020239;
+        Wed, 26 Oct 2022 08:34:46 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=MPfgZwv29DYJUEfpdJlIKjNHD5V5iJrN/pklKR3ByZM=;
- b=R1OmqoX7cibwzTkVJ3gssgrwcBPbzXu+0c3Bm2sObp1fVB4EeLVRf0rhTl16KdRuAKP0
- qdDjg6UFB7WLJrFBipZiQ0VIS/W+7TCzinCWZBfiJpsNY5g7UxqU5YDfAuXNqFkETSay
- 4xCZZCL9rdPYnyteDesJ7Bm8cUfj3eRrnigTciVKObftlLlI5BBBiySRxEabmHejSISb
- gCGXygsJQ8ASBut1X4u112K07ibsnrjUJOfeqSbIeu1UkGAUxZh3bCkFXPnLuZAg3/Lv
- eupIE5wWz7fZyJrqroj/ZVMbZeSOZhhgT3HKFcnzgZiGSz4F17GcD+E4xPlAje6j9QY+ Gw== 
+ bh=F0SfA9T2LZzCJCEztZXjD5LW4NhvethQEov4KTQbLSI=;
+ b=Ln463q3Pr0H6JFeQWrtXMBt5tnTf4MeTgo36X1lMpg35gIY6lmTmJPg+ybdZA548EPYH
+ jOyVuLb/AJVVZlx/2E1BmEWq399e/w6jiTt730QcOlJzHDlw/99KuxeAapeCVMfnLyOL
+ hMnrl3PPxRhLrgnJyql1OVbK86qIWesGpIFMN+LcsfQbUyyakkC3M8Cz+O4xBJilcidX
+ bfdiYPS6VbZNVcvr3hQCbFgPFwbOnV96DI/8om7yWwfOQzVV2y/0khOaRAo5p7yn3IfK
+ 13qPFyJNVMIx3/+q3GcJ2w7YYVtlUhu55TWiUjXKOxSjecgUK87qfWedkYgM9TnPY3Vt AA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3keydmucjq-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kevysys5u-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Oct 2022 08:18:13 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29Q7qoLk009174;
-        Wed, 26 Oct 2022 08:18:13 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3keydmuchr-1
+        Wed, 26 Oct 2022 08:34:46 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29Q69OGk023241;
+        Wed, 26 Oct 2022 08:34:46 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kevysys4m-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Oct 2022 08:18:12 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29Q87095015288;
-        Wed, 26 Oct 2022 08:18:10 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma06ams.nl.ibm.com with ESMTP id 3kc7sj71yf-1
+        Wed, 26 Oct 2022 08:34:46 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29Q8Lf2v010269;
+        Wed, 26 Oct 2022 08:34:44 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3kc859f39e-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Oct 2022 08:18:10 +0000
+        Wed, 26 Oct 2022 08:34:43 +0000
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29Q8CqSe49873252
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29Q8Ye0K4457056
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 26 Oct 2022 08:12:52 GMT
+        Wed, 26 Oct 2022 08:34:40 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 73613AE045;
-        Wed, 26 Oct 2022 08:18:07 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id D6C34AE051;
+        Wed, 26 Oct 2022 08:34:40 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D8C16AE04D;
-        Wed, 26 Oct 2022 08:18:06 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id AEE03AE04D;
+        Wed, 26 Oct 2022 08:34:39 +0000 (GMT)
 Received: from [9.171.85.254] (unknown [9.171.85.254])
         by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 26 Oct 2022 08:18:06 +0000 (GMT)
-Message-ID: <d29c3e4d-89cb-88dc-6809-5b52c8a2525e@linux.ibm.com>
-Date:   Wed, 26 Oct 2022 10:18:06 +0200
+        Wed, 26 Oct 2022 08:34:39 +0000 (GMT)
+Message-ID: <15b829ca-14d0-dc77-5e1e-1b4455784ed6@linux.ibm.com>
+Date:   Wed, 26 Oct 2022 10:34:39 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.3.1
-Subject: Re: [PATCH v2 1/1] KVM: s390: vsie: clarifications on setting the
- APCB
+Subject: Re: [PATCH v10 1/9] s390x/cpu topology: core_id sets s390x CPU
+ topology
 Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, frankja@linux.ibm.com, cohuck@redhat.com,
-        thuth@redhat.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        svens@linux.ibm.com
-References: <20221025091319.37110-1-pmorel@linux.ibm.com>
- <20221025091319.37110-2-pmorel@linux.ibm.com>
- <e9a237d7-3a34-11c8-1c5b-1a3c14e8cfb0@redhat.com>
- <0117e263-2856-b2fd-1e61-59b21e5da2e5@linux.ibm.com>
- <20221025182039.6dc82fbf@p-imbrenda>
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+References: <20221012162107.91734-1-pmorel@linux.ibm.com>
+ <20221012162107.91734-2-pmorel@linux.ibm.com>
+ <ad2a9892184cd5dc7597d411f42e330558146acf.camel@linux.ibm.com>
 From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <20221025182039.6dc82fbf@p-imbrenda>
+In-Reply-To: <ad2a9892184cd5dc7597d411f42e330558146acf.camel@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 5ORTNsOH7MlL5NJCH4gDNehffBoQzs2H
-X-Proofpoint-ORIG-GUID: zNGiCc8yTDMnVL6fxODyA9Rr4onSZQ4X
+X-Proofpoint-ORIG-GUID: _AzGhgOmEm0xo-MoR0Y22bJE5KsVckVK
+X-Proofpoint-GUID: xTUk4zfkFKm3-PlEVatTyc76Zy3jwXq6
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-10-26_04,2022-10-25_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- bulkscore=0 phishscore=0 spamscore=0 impostorscore=0 lowpriorityscore=0
- clxscore=1015 priorityscore=1501 adultscore=0 mlxlogscore=733
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210260044
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 clxscore=1015 spamscore=0 adultscore=0 phishscore=0
+ malwarescore=0 suspectscore=0 lowpriorityscore=0 mlxlogscore=999
+ mlxscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2210260047
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -102,38 +103,74 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 10/25/22 18:20, Claudio Imbrenda wrote:
-> On Tue, 25 Oct 2022 15:17:36 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
-> 
->> On 10/25/22 11:30, David Hildenbrand wrote:
->>> On 25.10.22 11:13, Pierre Morel wrote:
->>>> The APCB is part of the CRYCB.
->>>> The calculation of the APCB origin can be done by adding
->>>> the APCB offset to the CRYCB origin.
->>>>
->>>> Current code makes confusing transformations, converting
->>>> the CRYCB origin to a pointer to calculate the APCB origin.
->>>>   
->>>
->>>
->>> While at it, can we rename "crycb_o" to "crycb_gpa" and "apcb_o" to
->>> "apcb_gpa".
->>>
->>> These are not pointers but guest physical addresses.
->>>    
+On 10/25/22 21:58, Janis Schoetterl-Glausch wrote:
+> On Wed, 2022-10-12 at 18:20 +0200, Pierre Morel wrote:
+>> In the S390x CPU topology the core_id specifies the CPU address
+>> and the position of the core withing the topology.
 >>
->> I can do that.
->> the _o came from the name in the documentation "origin"
->> but gpa is more obvious.
+>> Let's build the topology based on the core_id.
+>> s390x/cpu topology: core_id sets s390x CPU topology
 >>
+>> In the S390x CPU topology the core_id specifies the CPU address
+>> and the position of the cpu withing the topology.
+>>
+>> Let's build the topology based on the core_id.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   include/hw/s390x/cpu-topology.h |  45 +++++++++++
+>>   hw/s390x/cpu-topology.c         | 132 ++++++++++++++++++++++++++++++++
+>>   hw/s390x/s390-virtio-ccw.c      |  21 +++++
+>>   hw/s390x/meson.build            |   1 +
+>>   4 files changed, 199 insertions(+)
+>>   create mode 100644 include/hw/s390x/cpu-topology.h
+>>   create mode 100644 hw/s390x/cpu-topology.c
+>>
+> [...]
 > 
-> with that fixed:
+>> +/**
+>> + * s390_topology_realize:
+>> + * @dev: the device state
+>> + * @errp: the error pointer (not used)
+>> + *
+>> + * During realize the machine CPU topology is initialized with the
+>> + * QEMU -smp parameters.
+>> + * The maximum count of CPU TLE in the all Topology can not be greater
+>> + * than the maximum CPUs.
+>> + */
+>> +static void s390_topology_realize(DeviceState *dev, Error **errp)
+>> +{
+>> +    MachineState *ms = MACHINE(qdev_get_machine());
+>> +    S390Topology *topo = S390_CPU_TOPOLOGY(dev);
+>> +
+>> +    topo->cpus = ms->smp.cores * ms->smp.threads;
 > 
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Currently threads are not supported, effectively increasing the number of cpus,
+> so this is currently correct. Once the machine version limits the threads to 1,
+> it is also correct. However, once we support multiple threads, this becomes incorrect.
+> I wonder if it's ok from a backward compatibility point of view to modify the smp values
+> by doing cores *= threads, threads = 1 for old machines.
 
-Thanks,
-Pierre
+Right, this will become incorrect with thread support.
+What about having a dedicated function:
+
+	topo->cpus = s390_get_cpus(ms);
+
+This function will use the S390CcwMachineClass->max_thread introduced 
+later to report the correct number of CPUs.
+
+
+> Then you can just use the cores value and it is always correct.
+> In any case, if you keep it as is, I'd like to see a comment here saying that this
+> is correct only so long as we don't support threads.
+>> +
+>> +    topo->socket = g_new0(S390TopoContainer, ms->smp.sockets);
+>> +    topo->tle = g_new0(S390TopoTLE, ms->smp.max_cpus);
+>> +
+>> +    topo->ms = ms;
+>> +}
+>> +
+> [...]
 
 -- 
 Pierre Morel
