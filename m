@@ -2,60 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1778B60E533
-	for <lists+kvm@lfdr.de>; Wed, 26 Oct 2022 18:05:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9756460E57C
+	for <lists+kvm@lfdr.de>; Wed, 26 Oct 2022 18:31:18 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234501AbiJZQFb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Oct 2022 12:05:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44222 "EHLO
+        id S233635AbiJZQbR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Oct 2022 12:31:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234430AbiJZQF2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Oct 2022 12:05:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9044A4A12E
-        for <kvm@vger.kernel.org>; Wed, 26 Oct 2022 09:05:24 -0700 (PDT)
+        with ESMTP id S233626AbiJZQbI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Oct 2022 12:31:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90482D8F6F
+        for <kvm@vger.kernel.org>; Wed, 26 Oct 2022 09:31:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666800323;
+        s=mimecast20190719; t=1666801866;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=JtuyE+/JhAwvLcTl5IV1s7J0KPJe3lRgENyKzlR0B2k=;
-        b=OnX1lY4ZhVJle2WwOsslelVE3jNFpz977eLNfbTojtaEB/zwLF42p941ce/au0+XOJH/po
-        ZLCZn33SsecQuVDuSJvFESBXGqFN0JogdsvVDioJz1rtzRt4ZJennH/KQJYJbsemHodHgJ
-        Mjn+OOl/8Q++tIR7Ys71rOOZjOoyTx4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-619-y71F_LfVOISmnaMCOxXvxQ-1; Wed, 26 Oct 2022 12:05:21 -0400
-X-MC-Unique: y71F_LfVOISmnaMCOxXvxQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 075701C0BC60;
-        Wed, 26 Oct 2022 16:05:21 +0000 (UTC)
-Received: from gondolin.redhat.com (unknown [10.39.193.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 50A68C15BAB;
-        Wed, 26 Oct 2022 16:05:19 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Peter Maydell <peter.maydell@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>
-Cc:     qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Eric Auger <eauger@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: [PATCH v3 2/2] qtests/arm: add some mte tests
-Date:   Wed, 26 Oct 2022 18:05:11 +0200
-Message-Id: <20221026160511.37162-3-cohuck@redhat.com>
-In-Reply-To: <20221026160511.37162-1-cohuck@redhat.com>
-References: <20221026160511.37162-1-cohuck@redhat.com>
+        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
+        b=M2HRgcaixl1vmoQ7jhurTIL9hqVdP6Nox8K0BT9eQXg1hCs8TGxmMmeXX24HAGFw9D6VL5
+        tpkVuUEF9nKDsQOgsrgGDESkgqqrPJIXa3rm7CcMJqZC2yM3ozBSyYshxG70R9T/FufWBv
+        qoYATRVvIoT6YjAsP9yoEUVJ5aXXJ9A=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-664-oBGZ7dGhO3W1Bpdlc6HREA-1; Wed, 26 Oct 2022 12:31:05 -0400
+X-MC-Unique: oBGZ7dGhO3W1Bpdlc6HREA-1
+Received: by mail-wr1-f72.google.com with SMTP id m24-20020adfa3d8000000b00236774fd74aso3461073wrb.8
+        for <kvm@vger.kernel.org>; Wed, 26 Oct 2022 09:31:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
+        b=OLl3sheuJz65YZNY2Ve8IvFYAmy1BV+No9soHXF7S5kiCQD0iXU0be3dYdWMl0bds/
+         2PUPo511L6ON/bIdq66nFjYzVba+sC9Pw+r1JtDJo+T2urX3MtJc3T+YrpCyJ0CgDUK8
+         V7p5wQkBKCydqf2/TZgF6t9wcrmEcZevUc+bzQ9hKMwmSzV3B0Quv2tGy4synj1jcrWP
+         ClUfk6LCThNryvVLGJRoi+6YWWtV/p+e27B88Tz05gxHhEWEhEFqQJDYJrNoQrATlf7a
+         wFa1ptK1sKXcyGmpujAXHi0r3Zc/mHJ1MRLq75k/aB8eZOfbTpZ3DsnfBmdh6d/K+nqG
+         PRaw==
+X-Gm-Message-State: ACrzQf0xVczEYJ5YljvPPVWr7ne1iOrfpuhHQbO6ceoAKQ0AtoWItuTi
+        rvEWjJ9jhLrFVzPKTWfrXnRg8wUSU4VIAUNV+hR4y43MkBZOTmxgln0lYgEXvLPc0sxPDEyTw7D
+        Rl8xCLnkN9k5r
+X-Received: by 2002:a05:600c:4ec7:b0:3c6:e3d4:d59d with SMTP id g7-20020a05600c4ec700b003c6e3d4d59dmr3070105wmq.181.1666801864161;
+        Wed, 26 Oct 2022 09:31:04 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM53Qxk8pe+041h+gVHRqCVcWzQgGtQn9ZfMb230IwD/XwmIrI1hxUEuEFHTRIipXqcAMYw3Iw==
+X-Received: by 2002:a05:600c:4ec7:b0:3c6:e3d4:d59d with SMTP id g7-20020a05600c4ec700b003c6e3d4d59dmr3070082wmq.181.1666801863930;
+        Wed, 26 Oct 2022 09:31:03 -0700 (PDT)
+Received: from avogadro.local ([2001:b07:6468:f312:1c09:f536:3de6:228c])
+        by smtp.gmail.com with ESMTPSA id l5-20020adfe9c5000000b00236863c02f5sm3958618wrn.96.2022.10.26.09.31.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Oct 2022 09:31:03 -0700 (PDT)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     Zeng Guang <guang.zeng@intel.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, Gao Chao <chao.gao@intel.com>
+Subject: Re: [PATCH v3] target/i386: Set maximum APIC ID to KVM prior to vCPU creation
+Date:   Wed, 26 Oct 2022 18:30:59 +0200
+Message-Id: <20221026163059.325663-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.37.3
+In-Reply-To: <20220825025246.26618-1-guang.zeng@intel.com>
+References: 
 MIME-Version: 1.0
-Content-type: text/plain
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -66,154 +82,7 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- tests/qtest/arm-cpu-features.c | 76 ++++++++++++++++++++++++++++++++++
- 1 file changed, 76 insertions(+)
+Queued, thanks.
 
-diff --git a/tests/qtest/arm-cpu-features.c b/tests/qtest/arm-cpu-features.c
-index 5a145273860c..e264d2178a8b 100644
---- a/tests/qtest/arm-cpu-features.c
-+++ b/tests/qtest/arm-cpu-features.c
-@@ -22,6 +22,7 @@
- 
- #define MACHINE     "-machine virt,gic-version=max -accel tcg "
- #define MACHINE_KVM "-machine virt,gic-version=max -accel kvm -accel tcg "
-+#define MACHINE_MTE "-machine virt,gic-version=max,mte=on -accel tcg "
- #define QUERY_HEAD  "{ 'execute': 'query-cpu-model-expansion', " \
-                     "  'arguments': { 'type': 'full', "
- #define QUERY_TAIL  "}}"
-@@ -155,6 +156,18 @@ static bool resp_get_feature(QDict *resp, const char *feature)
-     g_assert(qdict_get_bool(_props, feature) == (expected_value));     \
- })
- 
-+#define resp_assert_feature_str(resp, feature, expected_value)         \
-+({                                                                     \
-+    QDict *_props;                                                     \
-+                                                                       \
-+    g_assert(_resp);                                                   \
-+    g_assert(resp_has_props(_resp));                                   \
-+    _props = resp_get_props(_resp);                                    \
-+    g_assert(qdict_get(_props, feature));                              \
-+    g_assert_cmpstr(qdict_get_try_str(_props, feature), ==,            \
-+                    expected_value);                                   \
-+})
-+
- #define assert_feature(qts, cpu_type, feature, expected_value)         \
- ({                                                                     \
-     QDict *_resp;                                                      \
-@@ -165,6 +178,16 @@ static bool resp_get_feature(QDict *resp, const char *feature)
-     qobject_unref(_resp);                                              \
- })
- 
-+#define assert_feature_str(qts, cpu_type, feature, expected_value)     \
-+({                                                                     \
-+    QDict *_resp;                                                      \
-+                                                                       \
-+    _resp = do_query_no_props(qts, cpu_type);                          \
-+    g_assert(_resp);                                                   \
-+    resp_assert_feature_str(_resp, feature, expected_value);           \
-+    qobject_unref(_resp);                                              \
-+})
-+
- #define assert_set_feature(qts, cpu_type, feature, value)              \
- ({                                                                     \
-     const char *_fmt = (value) ? "{ %s: true }" : "{ %s: false }";     \
-@@ -176,6 +199,16 @@ static bool resp_get_feature(QDict *resp, const char *feature)
-     qobject_unref(_resp);                                              \
- })
- 
-+#define assert_set_feature_str(qts, cpu_type, feature, value, _fmt)    \
-+({                                                                     \
-+    QDict *_resp;                                                      \
-+                                                                       \
-+    _resp = do_query(qts, cpu_type, _fmt, feature);                    \
-+    g_assert(_resp);                                                   \
-+    resp_assert_feature_str(_resp, feature, value);                    \
-+    qobject_unref(_resp);                                              \
-+})
-+
- #define assert_has_feature_enabled(qts, cpu_type, feature)             \
-     assert_feature(qts, cpu_type, feature, true)
- 
-@@ -412,6 +445,24 @@ static void sve_tests_sve_off_kvm(const void *data)
-     qtest_quit(qts);
- }
- 
-+static void mte_tests_tag_memory_on(const void *data)
-+{
-+    QTestState *qts;
-+
-+    qts = qtest_init(MACHINE_MTE "-cpu max");
-+
-+    /*
-+     * With tag memory, "mte" should default to on, and explicitly specifying
-+     * either on or off should be fine.
-+     */
-+    assert_has_feature(qts, "max", "mte");
-+
-+    assert_set_feature_str(qts, "max", "mte", "off", "{ 'mte': 'off' }");
-+    assert_set_feature_str(qts, "max", "mte", "on", "{ 'mte': 'on' }");
-+
-+    qtest_quit(qts);
-+}
-+
- static void pauth_tests_default(QTestState *qts, const char *cpu_type)
- {
-     assert_has_feature_enabled(qts, cpu_type, "pauth");
-@@ -424,6 +475,21 @@ static void pauth_tests_default(QTestState *qts, const char *cpu_type)
-                  "{ 'pauth': false, 'pauth-impdef': true }");
- }
- 
-+static void mte_tests_default(QTestState *qts, const char *cpu_type)
-+{
-+    assert_has_feature(qts, cpu_type, "mte");
-+
-+    /*
-+     * Without tag memory, mte will be off under tcg.
-+     * Explicitly enabling it yields an error.
-+     */
-+    assert_has_feature(qts, cpu_type, "mte");
-+
-+    assert_set_feature_str(qts, "max", "mte", "off", "{ 'mte': 'off' }");
-+    assert_error(qts, cpu_type, "mte=on requires tag memory",
-+                 "{ 'mte': 'on' }");
-+}
-+
- static void test_query_cpu_model_expansion(const void *data)
- {
-     QTestState *qts;
-@@ -473,6 +539,7 @@ static void test_query_cpu_model_expansion(const void *data)
- 
-         sve_tests_default(qts, "max");
-         pauth_tests_default(qts, "max");
-+        mte_tests_default(qts, "max");
- 
-         /* Test that features that depend on KVM generate errors without. */
-         assert_error(qts, "max",
-@@ -516,6 +583,13 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
-         assert_set_feature(qts, "host", "pmu", false);
-         assert_set_feature(qts, "host", "pmu", true);
- 
-+        /*
-+         * Unfortunately, there's no easy way to test whether this instance
-+         * of KVM supports MTE. So we can only assert that the feature
-+         * is present, but not whether it can be toggled.
-+         */
-+        assert_has_feature(qts, "host", "mte");
-+
-         /*
-          * Some features would be enabled by default, but they're disabled
-          * because this instance of KVM doesn't support them. Test that the
-@@ -630,6 +704,8 @@ int main(int argc, char **argv)
-                             NULL, sve_tests_sve_off);
-         qtest_add_data_func("/arm/kvm/query-cpu-model-expansion/sve-off",
-                             NULL, sve_tests_sve_off_kvm);
-+        qtest_add_data_func("/arm/max/query-cpu-model-expansion/tag-memory",
-+                            NULL, mte_tests_tag_memory_on);
-     }
- 
-     return g_test_run();
--- 
-2.37.3
+Paolo
 
