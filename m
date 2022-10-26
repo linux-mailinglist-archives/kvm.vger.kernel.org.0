@@ -2,132 +2,225 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 468BB60E256
-	for <lists+kvm@lfdr.de>; Wed, 26 Oct 2022 15:41:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A20EA60E39A
+	for <lists+kvm@lfdr.de>; Wed, 26 Oct 2022 16:43:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233541AbiJZNlI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Oct 2022 09:41:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35806 "EHLO
+        id S233973AbiJZOnc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Oct 2022 10:43:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233381AbiJZNlC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Oct 2022 09:41:02 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2F3B543FC;
-        Wed, 26 Oct 2022 06:40:56 -0700 (PDT)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29QDVpR3021913;
-        Wed, 26 Oct 2022 13:40:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=00A1apqt2kKruKrD56FowRzbsUtdUcFY/b9tW/muIkY=;
- b=DR3s/Mc6OtJh5zvVPC1op46OlGzH5X+jAptJX41K+543/OXLQsGUb4P4W533R/5SqvPx
- S6P+pT3iy+xOk46YwMomGrofkrjRQj5pCXNPpcEqe7wKLWR1MZOn0n2NweiU8Tb2e+oQ
- 6Kg0j5C1IPhgT8FBGSrUfwedP10SV4EOZg+A26Tz0sN95KBY1xplHP2reINaD6/YhR6a
- 72ndy6ZrMUsmmCoUvnu8yI4q0XwioJKCoVt7isNma08eLZkmTEPOdyogyyEKnZO/8adD
- atmtXoLW8HaqdIb7sUT6qqtdah9TS22OvjxYH0FxQP6TkRuYy6PPR0i3Wgx6kQZ1oFd5 jQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kf5v10aag-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Oct 2022 13:40:55 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29QDWeZV023772;
-        Wed, 26 Oct 2022 13:40:55 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kf5v10a9a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Oct 2022 13:40:54 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29QDak6W006854;
-        Wed, 26 Oct 2022 13:40:53 GMT
-Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
-        by ppma03fra.de.ibm.com with ESMTP id 3kdv5fhbny-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 26 Oct 2022 13:40:52 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29QDfO0v51839310
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 26 Oct 2022 13:41:24 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D80D2A4060;
-        Wed, 26 Oct 2022 13:40:49 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 43774A405C;
-        Wed, 26 Oct 2022 13:40:49 +0000 (GMT)
-Received: from [9.171.91.40] (unknown [9.171.91.40])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 26 Oct 2022 13:40:49 +0000 (GMT)
-Message-ID: <b9abd0ab-79d8-5e41-20e4-d8218d58693b@linux.ibm.com>
-Date:   Wed, 26 Oct 2022 15:40:49 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.0
-Subject: Re: [PATCH] KVM: s390: pci: Fix allocation size of aift kzdev
- elements
-To:     Rafael Mendonca <rafaelmendsr@gmail.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20221026013234.960859-1-rafaelmendsr@gmail.com>
-Content-Language: en-US
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20221026013234.960859-1-rafaelmendsr@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 4-rcfqfu8sqA3OBB99fn0WKU2c3uhbvr
-X-Proofpoint-ORIG-GUID: T6i6fyjn-RYZ0H-Qa7mCxbAAH0sgL7xx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-26_06,2022-10-26_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 bulkscore=0 impostorscore=0 spamscore=0 clxscore=1015
- suspectscore=0 mlxscore=0 malwarescore=0 mlxlogscore=999 adultscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2210260076
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S234366AbiJZOnO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Oct 2022 10:43:14 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4286C11A95A
+        for <kvm@vger.kernel.org>; Wed, 26 Oct 2022 07:43:13 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id F18C9B82248
+        for <kvm@vger.kernel.org>; Wed, 26 Oct 2022 14:43:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D8DCC433C1;
+        Wed, 26 Oct 2022 14:43:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1666795390;
+        bh=PlHGblO8nWBuAWZ/hs9qmYpkuPsuKRusd0TWKBsswZc=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=jHHmhbk64uDLsOfWMpU46x1Yn587T0nY1tXg2r5ZB59auBlLJrCILBuUvKdlDb99D
+         i3EUV3HLI5mz3MPI9Iw1Vdj0Dgrdm0o6OH37d97FUwjNEpfOxck4jOqAWHj62BZWln
+         2zV0X22SYL1gzAl/Jv2QUN39UWCMH4l2eILnpm3lWxHzhEIm13FoRYapUD5XH4GajG
+         i5YAK+D8qSFPZQUld2ynbkRCgJFaNmE3K4OohFlp0TXUu3T9hZWG7IYHUlI2mDC4Sh
+         6rjOb+Ivwp7HQIH5b7HiBa9MQZdPQ3QK+b4ljsRvErtuNcFhO4/XEk04yr0gng2C3d
+         LMZPtY13zK0Cw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1onhca-001lyk-8C;
+        Wed, 26 Oct 2022 15:43:08 +0100
+Date:   Wed, 26 Oct 2022 15:43:07 +0100
+Message-ID: <86k04mejd0.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        kernel-team@android.com
+Subject: Re: [PATCH 6/9] KVM: arm64: PMU: Move the ID_AA64DFR0_EL1.PMUver limit to VM creation
+In-Reply-To: <CAAeT=FxheB7HKFxyZwE8LJSjRzxRXQYb7_uQYF9o1hMV6Dow-g@mail.gmail.com>
+References: <20220805135813.2102034-1-maz@kernel.org>
+        <20220805135813.2102034-7-maz@kernel.org>
+        <CAAeT=FzXyr7D24QCcwGckgnPFuo8QtN3GrPg9h+s+3uGETE9Dw@mail.gmail.com>
+        <CAAeT=FxheB7HKFxyZwE8LJSjRzxRXQYb7_uQYF9o1hMV6Dow-g@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 26.10.22 um 03:32 schrieb Rafael Mendonca:
-> The 'kzdev' field of struct 'zpci_aift' is an array of pointers to
-> 'kvm_zdev' structs. Allocate the proper size accordingly.
-> 
-> Reported by Coccinelle:
->    WARNING: Use correct pointer type argument for sizeof
-> 
-> Fixes: 98b1d33dac5f ("KVM: s390: pci: do initial setup for AEN interpretation")
-> Signed-off-by: Rafael Mendonca <rafaelmendsr@gmail.com>
+Hi Reiji,
 
-Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+Sorry it took so long to get back to this.
 
-> ---
->   arch/s390/kvm/pci.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+On Fri, 26 Aug 2022 07:02:21 +0100,
+Reiji Watanabe <reijiw@google.com> wrote:
 > 
-> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
-> index c50c1645c0ae..ded1af2ddae9 100644
-> --- a/arch/s390/kvm/pci.c
-> +++ b/arch/s390/kvm/pci.c
-> @@ -126,7 +126,7 @@ int kvm_s390_pci_aen_init(u8 nisc)
->   		return -EPERM;
->   
->   	mutex_lock(&aift->aift_lock);
-> -	aift->kzdev = kcalloc(ZPCI_NR_DEVICES, sizeof(struct kvm_zdev),
-> +	aift->kzdev = kcalloc(ZPCI_NR_DEVICES, sizeof(struct kvm_zdev *),
->   			      GFP_KERNEL);
->   	if (!aift->kzdev) {
->   		rc = -ENOMEM;
+> Hi Marc,
+> 
+> On Thu, Aug 25, 2022 at 9:34 PM Reiji Watanabe <reijiw@google.com> wrote:
+> >
+> > Hi Marc,
+> >
+> > On Fri, Aug 5, 2022 at 6:58 AM Marc Zyngier <maz@kernel.org> wrote:
+> > >
+> > > As further patches will enable the selection of a PMU revision
+> > > from userspace, sample the supported PMU revision at VM creation
+> > > time, rather than building each time the ID_AA64DFR0_EL1 register
+> > > is accessed.
+> > >
+> > > This shouldn't result in any change in behaviour.
+> > >
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h |  1 +
+> > >  arch/arm64/kvm/arm.c              |  6 ++++++
+> > >  arch/arm64/kvm/pmu-emul.c         | 11 +++++++++++
+> > >  arch/arm64/kvm/sys_regs.c         | 26 +++++++++++++++++++++-----
+> > >  include/kvm/arm_pmu.h             |  6 ++++++
+> > >  5 files changed, 45 insertions(+), 5 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index f38ef299f13b..411114510634 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -163,6 +163,7 @@ struct kvm_arch {
+> > >
+> > >         u8 pfr0_csv2;
+> > >         u8 pfr0_csv3;
+> > > +       u8 dfr0_pmuver;
+> > >
+> > >         /* Hypercall features firmware registers' descriptor */
+> > >         struct kvm_smccc_features smccc_feat;
+> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > index 8fe73ee5fa84..e4f80f0c1e97 100644
+> > > --- a/arch/arm64/kvm/arm.c
+> > > +++ b/arch/arm64/kvm/arm.c
+> > > @@ -164,6 +164,12 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+> > >         set_default_spectre(kvm);
+> > >         kvm_arm_init_hypercalls(kvm);
+> > >
+> > > +       /*
+> > > +        * Initialise the default PMUver before there is a chance to
+> > > +        * create an actual PMU.
+> > > +        */
+> > > +       kvm->arch.dfr0_pmuver = kvm_arm_pmu_get_host_pmuver();
+> > > +
+> > >         return ret;
+> > >  out_free_stage2_pgd:
+> > >         kvm_free_stage2_pgd(&kvm->arch.mmu);
+> > > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> > > index ddd79b64b38a..33a88ca7b7fd 100644
+> > > --- a/arch/arm64/kvm/pmu-emul.c
+> > > +++ b/arch/arm64/kvm/pmu-emul.c
+> > > @@ -1021,3 +1021,14 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+> > >
+> > >         return -ENXIO;
+> > >  }
+> > > +
+> > > +u8 kvm_arm_pmu_get_host_pmuver(void)
+> >
+> > Nit: Since this function doesn't simply return the host's pmuver, but the
+> > pmuver limit for guests, perhaps "kvm_arm_pmu_get_guest_pmuver_limit"
+> > might be more clear (closer to what it does) ?
+
+Maybe a bit verbose, but I'll work something out.
+
+> >
+> > > +{
+> > > +       u64 tmp;
+> > > +
+> > > +       tmp = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+> > > +       tmp = cpuid_feature_cap_perfmon_field(tmp,
+> > > +                                             ID_AA64DFR0_PMUVER_SHIFT,
+> > > +                                             ID_AA64DFR0_PMUVER_8_4);
+> > > +       return FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER), tmp);
+> > > +}
+> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > index 333efddb1e27..55451f49017c 100644
+> > > --- a/arch/arm64/kvm/sys_regs.c
+> > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > @@ -1062,6 +1062,22 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+> > >         return true;
+> > >  }
+> > >
+> > > +static u8 pmuver_to_perfmon(const struct kvm_vcpu *vcpu)
+> > > +{
+> > > +       if (!kvm_vcpu_has_pmu(vcpu))
+> > > +               return 0;
+> > > +
+> > > +       switch (vcpu->kvm->arch.dfr0_pmuver) {
+> > > +       case ID_AA64DFR0_PMUVER_8_0:
+> > > +               return ID_DFR0_PERFMON_8_0;
+> > > +       case ID_AA64DFR0_PMUVER_IMP_DEF:
+> > > +               return 0;
+> > > +       default:
+> > > +               /* Anything ARMv8.4+ has the same value. For now. */
+> > > +               return vcpu->kvm->arch.dfr0_pmuver;
+> > > +       }
+> > > +}
+> > > +
+> > >  /* Read a sanitised cpufeature ID register by sys_reg_desc */
+> > >  static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+> > >                 struct sys_reg_desc const *r, bool raz)
+> > > @@ -1112,10 +1128,10 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+> > >                 /* Limit debug to ARMv8.0 */
+> > >                 val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER);
+> > >                 val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), 6);
+> > > -               /* Limit guests to PMUv3 for ARMv8.4 */
+> > > -               val = cpuid_feature_cap_perfmon_field(val,
+> > > -                                                     ID_AA64DFR0_PMUVER_SHIFT,
+> > > -                                                     kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
+> > > +               /* Set PMUver to the required version */
+> > > +               val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER);
+> > > +               val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER),
+> > > +                                 kvm_vcpu_has_pmu(vcpu) ? vcpu->kvm->arch.dfr0_pmuver : 0);
+> 
+> I've just noticed one issue in this patch while I'm reviewing patch-7.
+> 
+> I would think that this patch makes PMUVER and PERFMON inconsistent
+> when PMU is not enabled for the vCPU, and the host's sanitised PMUVER
+> is IMP_DEF.
+> 
+> Previously, when PMU is not enabled for the vCPU and the host's
+> sanitized value of PMUVER is IMP_DEF(0xf), the vCPU's PMUVER and PERFMON
+> are set to IMP_DEF due to a bug of cpuid_feature_cap_perfmon_field().
+> (https://lore.kernel.org/all/20220214065746.1230608-11-reijiw@google.com/)
+> 
+> With this patch, the vCPU's PMUVER will be 0 for the same case,
+> while the vCPU's PERFMON will stay the same (IMP_DEF).
+> I guess you unintentionally corrected only the PMUVER value of the VCPU.
+
+I think that with this patch both PMUVer and Perfmon values get set to
+0 (pmuver_to_perfmon() returns 0 for both ID_AA64DFR0_PMUVER_IMP_DEF
+and no PMU at all). Am I missing anything here?
+
+However, you definitely have a point that we should handle a guest
+being restored with an IMPDEF PMU. Which means I need to revisit this
+patch and the userspace accessors. Oh well...
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
