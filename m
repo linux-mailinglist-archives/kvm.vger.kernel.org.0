@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9615560EB75
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 00:21:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5A2A60EB8A
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 00:23:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233264AbiJZWVU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Oct 2022 18:21:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45684 "EHLO
+        id S233497AbiJZWXd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Oct 2022 18:23:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229757AbiJZWVS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Oct 2022 18:21:18 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB7B5CF184
-        for <kvm@vger.kernel.org>; Wed, 26 Oct 2022 15:21:17 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id b185so10729046pfb.9
-        for <kvm@vger.kernel.org>; Wed, 26 Oct 2022 15:21:17 -0700 (PDT)
+        with ESMTP id S233348AbiJZWX2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Oct 2022 18:23:28 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4BEBEB756
+        for <kvm@vger.kernel.org>; Wed, 26 Oct 2022 15:23:25 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id b11so9341064pjp.2
+        for <kvm@vger.kernel.org>; Wed, 26 Oct 2022 15:23:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hiWtZIzTaAaWrui3JWnnI5G6dQ2zJZsEty+ohQxMpns=;
-        b=OfbKt/PzCkx8IH9c77QDVQo4BZxO1smbjIc6p1seYFzQc/Jmz+l2dwvWdsgg93sXbe
-         G0cBYfuMoHM7Eclo0zK+LI27OVdHAyqPu4JT/YFk7E3LroH/YuLLtRCd69Ysfk8hqPCM
-         NLUJymZplAcl0//1WeGFnHMkXJpTbArx7JzU7augCV9h2E53y081ZNcu2OQfdd/1B5cc
-         3ZnC7goTnseZhW6PmLp1X0sgMJYGpHaJVupX2ETgcFQ5LGj2n0GigUKjmZoOReLbu+KI
-         l0UROuepyprod6MHAGWo1CNYJB6rf3D6On0NmlQuovUtZ7MqRdRj9DXpR2AR/Zs8XX1X
-         /3aQ==
+        bh=MvOHvfFBj5xVXA9sW67Kiy7MMMPQotJvY1ZQTV38d+M=;
+        b=Cei9HUh3lDTaZT8LV9ktj6fhyNgljqaT42YFMjJ1E9hcqPhcSWbewNyycqObRSHoKZ
+         dFDUql6xZSzDUcLqcpAm3AzeziuDeUTq7/25Mh0OxPp24MmD9BncV5E0lPU011fF1+Zy
+         K0s8okCcxL/YAzJU3q3W3i8+7UCgyVWfTrmaC3pD8NIaBj8mdqIYsuH4H+yqzQOqwWoF
+         gbSX86AdNQSKr/G3SUIdC8rpVgGjjNNh2y5Ew1JS0vak/G1Yyh6octlLGu9wFddVkmHT
+         wVO16ylHoFDiHYXcKhegcvgEjEfGAOEqqtEihlnh+tklyIjsOOCLD3xqN/dMQSvWopX+
+         5odA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hiWtZIzTaAaWrui3JWnnI5G6dQ2zJZsEty+ohQxMpns=;
-        b=eB15Uee4EI+zesWxNMmWxWTGAs/2rXz0nVI9XDPZkIICaBXcG/wwPpPnBGj2TvCpTp
-         PIwzR2Z3ozDzyqrjFpm+VOI3kr7ySPesDAoWMEEQMoq4uVFg5ChvtusaAbFJsmCRfnqm
-         pyPh4AX3/Xnwwy/q0K5Q2cH4RA///ZkKwB5M3OK0ZWdj661JXGEU5QnsN3SGsQ6njc1p
-         JdzmR65Bz4jqQNslXYAmY/1N/yrBoA96OV3OuZJvGZj33GEjMEkhYRblguqApuarvNve
-         FcBPTUPDtYNxH9LV+PtWJzgqyb9AgbidL9pKMhPDlnNjygyEORcM+7d/JrVFf6qjT/ZT
-         Sqxw==
-X-Gm-Message-State: ACrzQf0FLzWJ3ByDMOVFJ1eTOL0ep0QSfEnX41Gvfm2LYZOnbaz/We52
-        fkzrwDLq6FGhaK+740fadKAefQ==
-X-Google-Smtp-Source: AMsMyM5hrpil9ugkudCVguUFVraWGSpBWC+wjecNYCjY2aSXAER/OmLQ6T9zhYEnvxyShg7mp5oJVg==
-X-Received: by 2002:a62:874f:0:b0:56c:45eb:1ffa with SMTP id i76-20020a62874f000000b0056c45eb1ffamr6925806pfe.58.1666822877077;
-        Wed, 26 Oct 2022 15:21:17 -0700 (PDT)
+        bh=MvOHvfFBj5xVXA9sW67Kiy7MMMPQotJvY1ZQTV38d+M=;
+        b=eAudAjov27MvGT+05OjrMxYjwhCXq4MUluX0Hk0Mzi1eo+yVmFMMwUhxV5S0HuLz2S
+         WFy8npclg8hkXynBJT4OVUFvU6+JuJerFxy1RUnglmOpeQyeks0QHWmw23hWEPPS+a93
+         EwCxvqrMzgfDXgk8jKfvnZ6xfefH8JIJBiMB7oGcfF405NJpVjO5QT2DFg0VNKTaBwdd
+         WAemEtjpLVfNw3BRujvD07qHXfBnsj+XxQdNKf5REAQyLX1NqVPJPQm5cF9MRRKPbUOu
+         zbo09cgA3GifrTnmkURy9MJgt0HuojcdAFCzRl9hwtLYdTvCJlKf9qqRncjnCvCAqnh7
+         kn2w==
+X-Gm-Message-State: ACrzQf0gruyPSClKTpIfpzzAkPVur6WeFwY2ZwH8jLjIo821V/gpGWvP
+        oRiEg+1gu6LPhovEVMaJytg02g==
+X-Google-Smtp-Source: AMsMyM5DtFempU0b3y4nR0FcfTRtrfOu1iOtXCU3iDtJMBIl2Co6CdH2L56hA2DEUIlLdHNLAW0cOg==
+X-Received: by 2002:a17:902:8695:b0:17f:71ed:dac1 with SMTP id g21-20020a170902869500b0017f71eddac1mr46227207plo.127.1666823005140;
+        Wed, 26 Oct 2022 15:23:25 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id m3-20020a63fd43000000b004393c5a8006sm3293275pgj.75.2022.10.26.15.21.16
+        by smtp.gmail.com with ESMTPSA id t18-20020aa79472000000b0056bf5e54961sm3464935pfq.161.2022.10.26.15.23.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Oct 2022 15:21:16 -0700 (PDT)
-Date:   Wed, 26 Oct 2022 22:21:13 +0000
+        Wed, 26 Oct 2022 15:23:24 -0700 (PDT)
+Date:   Wed, 26 Oct 2022 22:23:21 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -59,19 +59,19 @@ Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Yuan Yao <yuan.yao@linux.intel.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v12 44/46] KVM: selftests: evmcs_test: Introduce L2 TLB
- flush test
-Message-ID: <Y1my2eHz7QWme42e@google.com>
+Subject: Re: [PATCH v12 45/46] KVM: selftests: hyperv_svm_test: Introduce L2
+ TLB flush test
+Message-ID: <Y1mzWUx0bvv4YJJJ@google.com>
 References: <20221021153521.1216911-1-vkuznets@redhat.com>
- <20221021153521.1216911-45-vkuznets@redhat.com>
+ <20221021153521.1216911-46-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221021153521.1216911-45-vkuznets@redhat.com>
+In-Reply-To: <20221021153521.1216911-46-vkuznets@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,53 +80,71 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Oct 21, 2022, Vitaly Kuznetsov wrote:
-> @@ -48,6 +49,8 @@ static inline void rdmsr_gs_base(void)
+> Enable Hyper-V L2 TLB flush and check that Hyper-V TLB flush hypercalls
+> from L2 don't exit to L1 unless 'TlbLockCount' is set in the Partition
+> assist page.
+> 
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  .../selftests/kvm/include/x86_64/svm.h        |  4 ++
+>  .../selftests/kvm/x86_64/hyperv_svm_test.c    | 61 +++++++++++++++++--
+>  2 files changed, 60 insertions(+), 5 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/svm.h b/tools/testing/selftests/kvm/include/x86_64/svm.h
+> index 483e6ae12f69..4803e1056055 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/svm.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/svm.h
+> @@ -76,6 +76,10 @@ struct hv_vmcb_enlightenments {
+>   */
+>  #define HV_VMCB_NESTED_ENLIGHTENMENTS (1U << 31)
+>  
+> +/* Synthetic VM-Exit */
+> +#define HV_SVM_EXITCODE_ENL			0xf0000000
+> +#define HV_SVM_ENL_EXITCODE_TRAP_AFTER_FLUSH	(1)
+> +
+>  struct __attribute__ ((__packed__)) vmcb_control_area {
+>  	u32 intercept_cr;
+>  	u32 intercept_dr;
+> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
+> index 1c3fc38b4f15..edb779615a79 100644
+> --- a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
+> @@ -25,6 +25,8 @@
 >  
 >  void l2_guest_code(void)
 >  {
 > +	u64 unused;
 > +
->  	GUEST_SYNC(7);
+>  	GUEST_SYNC(3);
+>  	/* Exit to L1 */
+>  	vmmcall();
+> @@ -38,11 +40,30 @@ void l2_guest_code(void)
 >  
->  	GUEST_SYNC(8);
-> @@ -64,15 +67,33 @@ void l2_guest_code(void)
->  	vmcall();
->  	rdmsr_gs_base(); /* intercepted */
+>  	GUEST_SYNC(5);
 >  
 > +	/* L2 TLB flush tests */
-> +	hyperv_hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE | HV_HYPERCALL_FAST_BIT, 0x0,
-> +			 HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES | HV_FLUSH_ALL_PROCESSORS);
-> +	rdmsr_fs_base();
+> +	hyperv_hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE |
+> +			 HV_HYPERCALL_FAST_BIT, 0x0,
+> +			 HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES |
+> +			 HV_FLUSH_ALL_PROCESSORS);
+> +	rdmsr(MSR_FS_BASE);
+
+Why doesn't the SVM test need to clobber GPRs?
+
 > +	/*
 > +	 * Note: hypercall status (RAX) is not preserved correctly by L1 after
 > +	 * synthetic vmexit, use unchecked version.
 > +	 */
-> +	__hyperv_hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE | HV_HYPERCALL_FAST_BIT, 0x0,
-> +			   HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES | HV_FLUSH_ALL_PROCESSORS,
-> +			   &unused);
+> +	__hyperv_hypercall(HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE |
+> +			   HV_HYPERCALL_FAST_BIT, 0x0,
+> +			   HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES |
+> +			   HV_FLUSH_ALL_PROCESSORS, &unused);
 > +	/* Make sure we're not issuing Hyper-V TLB flush call again */
 > +	__asm__ __volatile__ ("mov $0xdeadbeef, %rcx");
 
-This needs a clobber.  It won't cause problems in the current code, but it will
-make someone really sad if they add more code after this.
+Heh, and a patch to vmmcall() itself "safe"...
 
-Using %ecx instead of %rcx will also suffice, 32-bit accesses clear bits 63:32.
-
-Even better, if a "nop" isn't required to get the compiler to emit preamble, would
-be to load ECX through an input constraint, that way the compiler "knows" the value
-of ECX and can optimize for it (though it's extremely unlikely 0xdeadbeef will be
-a useful value).
-
-Actually, not setting RCX in vmcall() is a nasty bug waiting to happen, e.g. if
-RCX just happens to contain a value that gets routed to L0.
-
-Rather than handle this as a one-off, can you insert a prep patch to have the
-common vmcall() stuff RCX with a "safe" value?
-
-Related side topic, rdmsr_{f,g}s_base() should also use input constraints, and
-should use a proper #define for the MSRs.  Also, why earth do those clobber all GPRs?
-Oooh, because they get routed to L1 and L1 doesn't preserve GPRs.
-
-Related side topic #2, KVM's kvm_xen_hypercall() is broken, it checks the wrong
-input register for 64-bit (checks RAX instead of RCX).  Not sure that's even a
-fixable bug though.
+> +
+>  	/* Done, exit to L1 and never come back.  */
+>  	vmmcall();
+>  }
