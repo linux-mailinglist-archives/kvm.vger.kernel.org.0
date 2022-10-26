@@ -2,372 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 768A360E714
-	for <lists+kvm@lfdr.de>; Wed, 26 Oct 2022 20:18:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C7CD60E79E
+	for <lists+kvm@lfdr.de>; Wed, 26 Oct 2022 20:47:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233845AbiJZSSZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Oct 2022 14:18:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59756 "EHLO
+        id S234193AbiJZSq6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Oct 2022 14:46:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233449AbiJZSSV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Oct 2022 14:18:21 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86AF0BECE0
-        for <kvm@vger.kernel.org>; Wed, 26 Oct 2022 11:18:20 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id bs21so11922416wrb.4
-        for <kvm@vger.kernel.org>; Wed, 26 Oct 2022 11:18:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ar1W8CHnQ3arlRC4SAVRQ6UfLOjT23QyPGPqxZrtkzM=;
-        b=NuGVOZ/BPhdEtnSmf+HL3WbY8vG+TAEg0JdPucXEZBhlVCVxm/wx2EHDHA6vrDCsrk
-         WQJL8GFYuzqqGGf5cic3JNppmqEPkpl5qS1TP6V9HRIcR3pl5kqv6qLWjYC6L/F9Fn+b
-         S1VLX8hqaPI9xaDT4AxHzuwya1XWRCMkdzgbkr8QHXakcCINxK1eGwRYFyuFzWkE/65/
-         v3gDq4os0fVzzjXoZWmQ8VeI8Dtx4lLGDbdyssVRpZ9LDnqFth6YbeXqCeDf0hLUzwMw
-         kh/HZBdrbl/MoqD65VY9g8XyNyMpGMpUp6qxED8ZApFFo8LUVh93FyqujD9etA2zNc9y
-         qWWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ar1W8CHnQ3arlRC4SAVRQ6UfLOjT23QyPGPqxZrtkzM=;
-        b=biPjIcVbwPWa/KVWGGfUvujFQzOGSNnqcEFLTyLuq1HB4LmQFIxkUfH0zwLgUpuF1R
-         ay8F0ECu9eB2xUfMD2YRwBWmn28aXdZFnT3RvpE1dWhefBRq3NkC+wwmeOOBZfCNzJLN
-         JuM0pSPTlZAQHadokrbMwOliHuq6LVXeyMWYE0TDHca/vQ/s3IJ3L4VhUvmoPYpOZOWO
-         ki+szgKrssbfngaDHJU2b+Bx6BQnle48fNlBMwMm50rFFLjNfpLbjvSTXPCZQuCkZof8
-         Lx1LGNfuyFpOisFir83owLrH+M6U9fHg2iqg5XD1UHMYVD9+RMgsJiU6kLyyP0vmly5u
-         FP7w==
-X-Gm-Message-State: ACrzQf1MvJVEO2U7onx69pHRUKluMRN2o6jtkE2wKObs612rfjsvkBdR
-        L9pDavrZUtboTWMKJggnGHShfX2WZsgIiFeq8azlng==
-X-Google-Smtp-Source: AMsMyM4h7yiYGsb3MlhiamXiqg8QB63N+vrHFHGaxkdN7diK1iBHk4RHzAblZ26qBPsTjdLMG+R44e47BHfRTh/tDuA=
-X-Received: by 2002:adf:f081:0:b0:236:5e7c:4ec2 with SMTP id
- n1-20020adff081000000b002365e7c4ec2mr15933656wro.641.1666808298850; Wed, 26
- Oct 2022 11:18:18 -0700 (PDT)
+        with ESMTP id S233783AbiJZSq4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Oct 2022 14:46:56 -0400
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2059.outbound.protection.outlook.com [40.107.243.59])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D962B7F4D;
+        Wed, 26 Oct 2022 11:46:54 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=J49TSxb8nK+6swWScrucYIz/vaZKy2nl/I2DY6qlP6nBuuyb6YhilUTuae2JyJApAQdPJ+mN0Fgdv9ltGlIaSf0ijHVzo1S94NgkRb1pDbzZhBGZ3ktjzYvbftfH9OVm/0qd/fDgAa9L+SIZ266vff4lbDY7qdhNB1Fa7ToqRQfk3l7CciqaLbs0+Cc0zzmpwb+8my+qOecc34iTpg3zbXJjfkqP7MLVxrMbIRbcNuJ7JfxEFiziWYSSawrYO244gxnlBAijIZm4bc9tsN07UHZLWRGhVstRIw6tQb+IEMSa8wrtX5K/SWK5Sl1vA+G86uplG5Y2p//laSral6hsnw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KN/VOE7OOWZ1MdP03KCPKUztW/RWtNVzFlmJ2qseu2c=;
+ b=GFvB34umPQ6klSB+FL2Za5pAQ/E9xg53nLIdXqJghv2foS+gK2zUZmD07Ywze4InGekLAEOGaMEjioahjXhjU7Cd8wD3Eupc4gaxqy0fWVtuEcyMBBD29gMoZmbTK80Nd87qHBeU2dhrQd9buzb0VLYez64G5eIpAp3ASyAjlOrRlnIBvWrFoxmcxLv2dLKcxI0JF4XTMWkFHxMskV1dVlOBGTTCi/oBFd8wRI85vGgaG/UImF72u/SaIEXd61c0HoVOGPzNbWYbWoTHRbnC2RGdWsLMdJeHIgQO1H53RsgGNN+04guuCqzkPYbENJyyV4lkBQmenSXqC2Y/l4V1bQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KN/VOE7OOWZ1MdP03KCPKUztW/RWtNVzFlmJ2qseu2c=;
+ b=dxX87Fj366FIh+EDmowSphppOwhhxU6SCpNiBDxMM6HhkdeMAMtat0/pWoA0v2PeKJeKpd82Ux0R2wMS2K8QW3XeylmkUcEXb5MP4xUz/9mZ+pTNsa5Ub7Ll/tFK/bZtLu+9QaRyWNw7yM8Pta13qa+mKPJNS3jeDxKFQQA3YwQ5JqDBqbgNKenlMgpS/lJ+RQ7D76MtOSQfu3+B1Uo1CSG8DJPeYW8bmothxAGpolYN/q4duILzS+pSo2pMdVHVPzXqpyWd6H1P/drNfSkfZ/p1SxlDb2KRTN/DG1UvEnDybQGHcJSCPV0vc4/ELLSHRafTa04JGjjabIRU4eNkIQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SN7PR12MB7346.namprd12.prod.outlook.com (2603:10b6:806:299::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5746.28; Wed, 26 Oct
+ 2022 18:46:51 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5746.021; Wed, 26 Oct 2022
+ 18:46:51 +0000
+Date:   Wed, 26 Oct 2022 15:46:50 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Lu Baolu <baolu.lu@linux.intel.com>, bpf@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v3 9/15] iommufd: Data structure to provide IOVA to PFN
+ mapping
+Message-ID: <Y1mAmivnEyQCMwO9@nvidia.com>
+References: <0-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+ <9-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+X-ClientProxiedBy: BL1P223CA0009.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:208:2c4::14) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-References: <20221021211816.1525201-1-vipinsh@google.com> <20221021211816.1525201-6-vipinsh@google.com>
- <DS0PR11MB637351B52E5F8752E7DA16A4DC309@DS0PR11MB6373.namprd11.prod.outlook.com>
- <Y1lV0l4uDjXdKpkL@google.com>
-In-Reply-To: <Y1lV0l4uDjXdKpkL@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Wed, 26 Oct 2022 11:17:42 -0700
-Message-ID: <CAHVum0d1Oaae0H4YO3GOJ5pCwV1vqNsE6n6mWV9wMGic6wN7_A@mail.gmail.com>
-Subject: Re: [PATCH v6 5/5] KVM: selftests: Allowing running
- dirty_log_perf_test on specific CPUs
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     "Wang, Wei W" <wei.w.wang@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "dmatlack@google.com" <dmatlack@google.com>,
-        "andrew.jones@linux.dev" <andrew.jones@linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SN7PR12MB7346:EE_
+X-MS-Office365-Filtering-Correlation-Id: f1b7dc55-69f0-47ff-0658-08dab7827201
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: IkOVNlb93KzYciqujqQC4nKi634vmucVeyz28St+qIYgy3l/Q2kKH/wL0yZHEQO75R0d2qsGAa1tudaO1aiL7tyyp4Jqx079Oa+yhx4xE0g3h9Ojiqjtj4KIwPXFp2yNr4s3tNnYv1MZrMBtrcsFhdsJoXnTDtBGBBPNdhfmgIhQ+lgC2hWOnz2SIifcFaohxU0GyvjRFRcPK8zX7E6x5agO7bvbgQFM/5sze28IOuF7EgyD9sb61hKLOUN19TnID/Z6jO08tyT2yj4zlYCk08sWVbuH06G4b2GFfZaPxtoDA+46XVGgER18IDeMpxSgQHDZ1WgWEkF2lKsEFgPIX/m5iuJV4QpswX+1fRNA1GvC0KMCYz8uYb/0KplHsdOxVl27wznEZLCaPX/VTb+5nZjHwz0L9dy4QSPHQstKiuVjqIJh/DpjJNF/YAgcgCOdlx6oWbF+2i/SNg6Nupaj75bmGjJR7iwHZfTZFFC/IeSKc+JDvSLzhZFDpskwJ7Q1FOrvQKmf7/vkQmRTVFQIOcN3Zs19/Itr8wpXRS7zWROPjaQ2GChH/pBt9B3wiEkKmfPCuVCeIhalrwlyDU32bZMtLwksbZvdj1e/AMEfReOP0JCO/RttGZtQVb4TV8NMnFBbsaFL3PQtv33o0cBMb770doKbBstKNrOrn0Z+XTNPRKbmjgBaH2b3chD9YmLypnxr/z84ixjL07esoBvmvWFG3vvxraVryjrDquMAdKmNrtluflvWQEua2V4w5FEZ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(396003)(376002)(136003)(366004)(346002)(451199015)(921005)(8676002)(36756003)(86362001)(41300700001)(26005)(66946007)(6512007)(4326008)(66476007)(66556008)(7416002)(7406005)(2616005)(5660300002)(4744005)(8936002)(478600001)(6486002)(54906003)(110136005)(316002)(38100700002)(6506007)(2906002)(83380400001)(186003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?j5C2jDPpHx6/xb6kt74wXVMB0PT2KWZj84fYVLdr3uxxurJg7hDICEsLvxOw?=
+ =?us-ascii?Q?U0sTPRIPAqzWm9W/+zMQkXKUw35Jhb0ruWmktClElhfCSs+W6gF5zySsop15?=
+ =?us-ascii?Q?mt7R2PgQ5ajMOO5WgQpJnzZSU2bEW+GKaaaTvO9hojqS1mGkxQIdxnq9nlci?=
+ =?us-ascii?Q?7eI3oKB2A24GBxRbg6TLv3Ersoi1/TsqkW1lr7lwv2rDJYTIgwQXHzAclu+O?=
+ =?us-ascii?Q?8BaNFQp4FpfnXxoZbim3NWnYPsgrE+mQHL7UY+rbQVdbKvrL7qTMCOYDGAMf?=
+ =?us-ascii?Q?bHrVz2wnHqWpvtMmX3gqsG8zC5Th0OyNgfFQpOfznxO/rg7tZs5f5uBU4gbz?=
+ =?us-ascii?Q?f9hUdfqm7DKvEgYH2SJ2lF/1wCfxhEpXvp2jcc0syn9oiKC9ntGVH6WpDPcI?=
+ =?us-ascii?Q?6tK4WuvjburgWoLgfpTt84+vmCb6aTX6pq1qADWNnpTImpulT9BQbJEP9EKY?=
+ =?us-ascii?Q?RZkYomHXBSv1J0FQ7DWcXpRJgeOYpryQSPSSsO9owG5oy/raMP6mEl17i3s/?=
+ =?us-ascii?Q?mC8KE5VhG1sk69DR2p9SRzBk0mA3IO30n9yBbUOfnxGj0xH7J33nqwnFYk9D?=
+ =?us-ascii?Q?Gat4ZaNQgwk3FmspZPmAwIbJ+aleODfFyv5Ms103Es8MMCmbnYPQjYU2DUKw?=
+ =?us-ascii?Q?rmW0aI8EB4SdYo432NOjqz0dpiY/arWMk77fn1sN4VXcaEXyUdm49CZqjjFR?=
+ =?us-ascii?Q?6Inu36zp9zbIYxJ5KLKihcNPzfQoQrbRtZdAtQ+ZChhTXJzyy69yGqvRV6qu?=
+ =?us-ascii?Q?IbxjlOEdaPnabaYqGGMDw1Jal3+nYeclxVeKmEaEY/JC55pMK1OcvpqNu72y?=
+ =?us-ascii?Q?pNsSqq7qVctaQRJHoUf5GaglVvfCfWICL8vHDm6t1mQzK0nRSU9rYz6bME9U?=
+ =?us-ascii?Q?yuARbFeC29bplawVzZE4c9oeMNe6RfQUyxQ38ZLEgCTxLG+IcMs4HZ4CJ7c3?=
+ =?us-ascii?Q?mBjLCvcA3bvpaV6o/rUGBkFoJv2/fbEcTqdt9DlIXmP/lN9fAI22rjNQmPU9?=
+ =?us-ascii?Q?r2bv2i8bRv345rEwghOWw0myaSlvkpP51t6nRdr8fdS1JS2UW71TuqhtAaQh?=
+ =?us-ascii?Q?FRAJ01SJx/UblK2IHRA9SKVpNQ1Tkk6eRtOH2A+2Petpu2hEnhhTxPLF+up7?=
+ =?us-ascii?Q?/yDuM8MM7JRXL7x8+z2jjM82HznubKezw/uLy148lZSz3ZLCbSbxWM2NiQS+?=
+ =?us-ascii?Q?sqKGxy7b+s6t6sC+oBXMn2hl1ghtSJwrm/+6Y3mftSaJ34Hr1/wzV2vwAxc2?=
+ =?us-ascii?Q?sLkrgX4bs706OtKEFKadlLP6BdqbBQjpWq59PGFghQENJPZO0YID4wHkw/7w?=
+ =?us-ascii?Q?beBuyfm9qv/4v21+aswYpOqw4I5zlIwJot+R0leuNSI6j4cL1ky/PQBau2fR?=
+ =?us-ascii?Q?Aspta6odLUGyVStmEcbjJswnXuLBabf2YzqH4IsS22M6Mfd7e24SRvbp+xfM?=
+ =?us-ascii?Q?LDZtlJTBSPq5tAbYutydXJSnWvG9D6Yfnq0t74QBcZVcc554LUoLsXX33TAm?=
+ =?us-ascii?Q?YrqzJXGvvWd9jEDCB9QfSDsctYrbofNkp/54EnIWJnnA9hojQVfw1NkkCPIS?=
+ =?us-ascii?Q?TzqWbGdwBBkQ1LlPDO4=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f1b7dc55-69f0-47ff-0658-08dab7827201
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Oct 2022 18:46:51.3897
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9mCSQLuKm/N3VJtlGuSWEoPyydaX4iyLBgC8pTeTilqB1LQRCn8L0vPMC9bFH7RV
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7346
+X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 26, 2022 at 8:44 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, Oct 26, 2022, Wang, Wei W wrote:
-> > On Saturday, October 22, 2022 5:18 AM, Vipin Sharma wrote:
-> > > +static void pin_this_task_to_pcpu(uint32_t pcpu) {
-> > > +   cpu_set_t mask;
-> > > +   int r;
-> > > +
-> > > +   CPU_ZERO(&mask);
-> > > +   CPU_SET(pcpu, &mask);
-> > > +   r = sched_setaffinity(0, sizeof(mask), &mask);
-> > > +   TEST_ASSERT(!r, "sched_setaffinity() failed for pCPU '%u'.\n", pcpu);
-> > > +}
-> > > +
-> > >  static void *vcpu_thread_main(void *data)  {
-> > > +   struct perf_test_vcpu_args *vcpu_args;
-> > >     struct vcpu_thread *vcpu = data;
-> > >
-> > > +   vcpu_args = &perf_test_args.vcpu_args[vcpu->vcpu_idx];
-> > > +
-> > > +   if (perf_test_args.pin_vcpus)
-> > > +           pin_this_task_to_pcpu(vcpu_args->pcpu);
-> > > +
-> >
-> > I think it would be better to do the thread pinning at the time when the
-> > thread is created by providing a pthread_attr_t attr, e.g. :
-> >
-> > pthread_attr_t attr;
-> >
-> > CPU_SET(vcpu->pcpu, &cpu_set);
-> > pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpu_set);
-> > pthread_create(thread, attr,...);
-> >
-> > Also, pinning a vCPU thread to a pCPU is a general operation
-> > which other users would need. I think we could make it more general and
-> > put it to kvm_util.
->
-> We could, but it taking advantage of the pinning functionality would require
-> plumbing a command line option for every test, or alternatively adding partial
-> command line parsing with a "hidden" global struct to kvm_selftest_init(), though
-> handling error checking for a truly generic case would be a mess.  Either way,
-> extending pinning to other tests would require non-trivial effort, and can be
-> done on top of this series.
->
-> That said, it's also trival to extract the pinning helpers to common code, and I
-> can't think of any reason not to do that straightaway.
->
-> Vipin, any objection to squashing the below diff with patch 5?
->
+On Tue, Oct 25, 2022 at 03:12:18PM -0300, Jason Gunthorpe wrote:
 
-Looks fine to me, I will send v7 with this change.
+> +int iopt_unmap_all(struct io_pagetable *iopt, unsigned long *unmapped)
+> +{
+> +	return iopt_unmap_iova_range(iopt, 0, ULONG_MAX, unmapped);
+> +}
 
-> >  e.g. adding it to the helper function that I'm trying to create
->
-> If we go this route in the future, we'd need to add a worker trampoline as the
-> pinning needs to happen in the worker task itself to guarantee that the pinning
-> takes effect before the worker does anything useful.  That should be very doable.
->
-> I do like the idea of extending __vcpu_thread_create(), but we can do that once
-> __vcpu_thread_create() lands to avoid further delaying this series.
->
-> ---
->  .../selftests/kvm/dirty_log_perf_test.c       |  7 ++-
->  .../selftests/kvm/include/kvm_util_base.h     |  4 ++
->  .../selftests/kvm/include/perf_test_util.h    |  8 +--
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 54 ++++++++++++++++++
->  .../selftests/kvm/lib/perf_test_util.c        | 57 +------------------
->  5 files changed, 68 insertions(+), 62 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> index 35504b36b126..a82fc51d57ca 100644
-> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> @@ -471,8 +471,11 @@ int main(int argc, char *argv[])
->                 }
->         }
->
-> -       if (pcpu_list)
-> -               perf_test_setup_pinning(pcpu_list, nr_vcpus);
-> +       if (pcpu_list) {
-> +               kvm_parse_vcpu_pinning(pcpu_list, perf_test_args.vcpu_to_pcpu,
-> +                                      nr_vcpus);
-> +               perf_test_args.pin_vcpus = true;
-> +       }
->
->         TEST_ASSERT(p.iterations >= 2, "The test should have at least two iterations");
->
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> index e42a09cd24a0..3bf2333ef95d 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> @@ -688,6 +688,10 @@ static inline struct kvm_vm *vm_create_with_one_vcpu(struct kvm_vcpu **vcpu,
->
->  struct kvm_vcpu *vm_recreate_with_one_vcpu(struct kvm_vm *vm);
->
-> +void kvm_pin_this_task_to_pcpu(uint32_t pcpu);
-> +void kvm_parse_vcpu_pinning(const char *pcpus_string, uint32_t vcpu_to_pcpu[],
-> +                           int nr_vcpus);
-> +
->  unsigned long vm_compute_max_gfn(struct kvm_vm *vm);
->  unsigned int vm_calc_num_guest_pages(enum vm_guest_mode mode, size_t size);
->  unsigned int vm_num_host_pages(enum vm_guest_mode mode, unsigned int num_guest_pages);
-> diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-> index ccfe3b9dc6bd..85320e0640fc 100644
-> --- a/tools/testing/selftests/kvm/include/perf_test_util.h
-> +++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-> @@ -27,8 +27,6 @@ struct perf_test_vcpu_args {
->         /* Only used by the host userspace part of the vCPU thread */
->         struct kvm_vcpu *vcpu;
->         int vcpu_idx;
-> -       /* The pCPU to which this vCPU is pinned. Only valid if pin_vcpus is true. */
-> -       uint32_t pcpu;
->  };
->
->  struct perf_test_args {
-> @@ -43,8 +41,12 @@ struct perf_test_args {
->         bool nested;
->         /* True if all vCPUs are pinned to pCPUs */
->         bool pin_vcpus;
-> +       /* The vCPU=>pCPU pinning map. Only valid if pin_vcpus is true. */
-> +       uint32_t vcpu_to_pcpu[KVM_MAX_VCPUS];
->
->         struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
-> +
-> +
->  };
->
->  extern struct perf_test_args perf_test_args;
-> @@ -64,6 +66,4 @@ void perf_test_guest_code(uint32_t vcpu_id);
->  uint64_t perf_test_nested_pages(int nr_vcpus);
->  void perf_test_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_vcpu *vcpus[]);
->
-> -void perf_test_setup_pinning(const char *pcpus_string, int nr_vcpus);
-> -
->  #endif /* SELFTEST_KVM_PERF_TEST_UTIL_H */
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index f1cb1627161f..8292af9d7660 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -11,6 +11,7 @@
->  #include "processor.h"
->
->  #include <assert.h>
-> +#include <sched.h>
->  #include <sys/mman.h>
->  #include <sys/types.h>
->  #include <sys/stat.h>
-> @@ -443,6 +444,59 @@ struct kvm_vcpu *vm_recreate_with_one_vcpu(struct kvm_vm *vm)
->         return vm_vcpu_recreate(vm, 0);
->  }
->
-> +void kvm_pin_this_task_to_pcpu(uint32_t pcpu)
-> +{
-> +       cpu_set_t mask;
-> +       int r;
-> +
-> +       CPU_ZERO(&mask);
-> +       CPU_SET(pcpu, &mask);
-> +       r = sched_setaffinity(0, sizeof(mask), &mask);
-> +       TEST_ASSERT(!r, "sched_setaffinity() failed for pCPU '%u'.\n", pcpu);
-> +}
-> +
-> +static uint32_t parse_pcpu(const char *cpu_str, const cpu_set_t *allowed_mask)
-> +{
-> +       uint32_t pcpu = atoi_non_negative(cpu_str);
-> +
-> +       TEST_ASSERT(CPU_ISSET(pcpu, allowed_mask),
-> +                   "Not allowed to run on pCPU '%d', check cgroups?\n", pcpu);
-> +       return pcpu;
-> +}
-> +
-> +void kvm_parse_vcpu_pinning(const char *pcpus_string, uint32_t vcpu_to_pcpu[],
-> +                           int nr_vcpus)
-> +{
-> +       cpu_set_t allowed_mask;
-> +       char *cpu, *cpu_list;
-> +       char delim[2] = ",";
-> +       int i, r;
-> +
-> +       cpu_list = strdup(pcpus_string);
-> +       TEST_ASSERT(cpu_list, "strdup() allocation failed.\n");
-> +
-> +       r = sched_getaffinity(0, sizeof(allowed_mask), &allowed_mask);
-> +       TEST_ASSERT(!r, "sched_getaffinity() failed");
-> +
-> +       cpu = strtok(cpu_list, delim);
-> +
-> +       /* 1. Get all pcpus for vcpus. */
-> +       for (i = 0; i < nr_vcpus; i++) {
-> +               TEST_ASSERT(cpu, "pCPU not provided for vCPU '%d'\n", i);
-> +               vcpu_to_pcpu[i] = parse_pcpu(cpu, &allowed_mask);
-> +               cpu = strtok(NULL, delim);
-> +       }
-> +
-> +       /* 2. Check if the main worker needs to be pinned. */
-> +       if (cpu) {
-> +               kvm_pin_this_task_to_pcpu(parse_pcpu(cpu, &allowed_mask));
-> +               cpu = strtok(NULL, delim);
-> +       }
-> +
-> +       TEST_ASSERT(!cpu, "pCPU list contains trailing garbage characters '%s'", cpu);
-> +       free(cpu_list);
-> +}
-> +
->  /*
->   * Userspace Memory Region Find
->   *
-> diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> index 520d1f896d61..1d133007d7de 100644
-> --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-> +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> @@ -5,7 +5,6 @@
->  #define _GNU_SOURCE
->
->  #include <inttypes.h>
-> -#include <sched.h>
->
->  #include "kvm_util.h"
->  #include "perf_test_util.h"
-> @@ -243,17 +242,6 @@ void __weak perf_test_setup_nested(struct kvm_vm *vm, int nr_vcpus, struct kvm_v
->         exit(KSFT_SKIP);
->  }
->
-> -static void pin_this_task_to_pcpu(uint32_t pcpu)
-> -{
-> -       cpu_set_t mask;
-> -       int r;
-> -
-> -       CPU_ZERO(&mask);
-> -       CPU_SET(pcpu, &mask);
-> -       r = sched_setaffinity(0, sizeof(mask), &mask);
-> -       TEST_ASSERT(!r, "sched_setaffinity() failed for pCPU '%u'.\n", pcpu);
-> -}
-> -
->  static void *vcpu_thread_main(void *data)
->  {
->         struct perf_test_vcpu_args *vcpu_args;
-> @@ -262,7 +250,7 @@ static void *vcpu_thread_main(void *data)
->         vcpu_args = &perf_test_args.vcpu_args[vcpu->vcpu_idx];
->
->         if (perf_test_args.pin_vcpus)
-> -               pin_this_task_to_pcpu(vcpu_args->pcpu);
-> +               kvm_pin_this_task_to_pcpu(perf_test_args.vcpu_to_pcpu[vcpu->vcpu_idx]);
->
->         WRITE_ONCE(vcpu->running, true);
->
-> @@ -312,46 +300,3 @@ void perf_test_join_vcpu_threads(int nr_vcpus)
->         for (i = 0; i < nr_vcpus; i++)
->                 pthread_join(vcpu_threads[i].thread, NULL);
->  }
-> -
-> -static uint32_t parse_pcpu(const char *cpu_str, const cpu_set_t *allowed_mask)
-> -{
-> -       uint32_t pcpu = atoi_non_negative(cpu_str);
-> -
-> -       TEST_ASSERT(CPU_ISSET(pcpu, allowed_mask),
-> -                   "Not allowed to run on pCPU '%d', check cgroups?\n", pcpu);
-> -       return pcpu;
-> -}
-> -
-> -void perf_test_setup_pinning(const char *pcpus_string, int nr_vcpus)
-> -{
-> -       cpu_set_t allowed_mask;
-> -       char *cpu, *cpu_list;
-> -       char delim[2] = ",";
-> -       int i, r;
-> -
-> -       cpu_list = strdup(pcpus_string);
-> -       TEST_ASSERT(cpu_list, "strdup() allocation failed.\n");
-> -
-> -       r = sched_getaffinity(0, sizeof(allowed_mask), &allowed_mask);
-> -       TEST_ASSERT(!r, "sched_getaffinity() failed");
-> -
-> -       cpu = strtok(cpu_list, delim);
-> -
-> -       /* 1. Get all pcpus for vcpus. */
-> -       for (i = 0; i < nr_vcpus; i++) {
-> -               TEST_ASSERT(cpu, "pCPU not provided for vCPU '%d'\n", i);
-> -               perf_test_args.vcpu_args[i].pcpu = parse_pcpu(cpu, &allowed_mask);
-> -               cpu = strtok(NULL, delim);
-> -       }
-> -
-> -       perf_test_args.pin_vcpus = true;
-> -
-> -       /* 2. Check if the main worker needs to be pinned. */
-> -       if (cpu) {
-> -               pin_this_task_to_pcpu(parse_pcpu(cpu, &allowed_mask));
-> -               cpu = strtok(NULL, delim);
-> -       }
-> -
-> -       TEST_ASSERT(!cpu, "pCPU list contains trailing garbage characters '%s'", cpu);
-> -       free(cpu_list);
-> -}
->
-> base-commit: 076ac4ca97225d6b8698a9b066153b556e97be7c
-> --
->
+syzkaller indirectly noticed that unmap all of an empty IOAS returns
+ENOENT, it makes more sense it should succeed:
+
+-       return iopt_unmap_iova_range(iopt, 0, ULONG_MAX, unmapped);
++       int rc;
++
++       rc = iopt_unmap_iova_range(iopt, 0, ULONG_MAX, unmapped);
++       /* If the IOVAs are empty then unmap all succeeds */
++       if (rc == -ENOENT)
++               return 0;
++       return rc;
+
+Plus a selftest to cover it
+
+Jason
