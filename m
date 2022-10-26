@@ -2,378 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 46BCA60EC44
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 01:20:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DC96B60EC2A
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 01:18:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233850AbiJZXUY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Oct 2022 19:20:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59786 "EHLO
+        id S233946AbiJZXSb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Oct 2022 19:18:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233871AbiJZXTe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Oct 2022 19:19:34 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F810D259D;
-        Wed, 26 Oct 2022 16:18:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666826307; x=1698362307;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=DXhfNmG40eNX4hHO1I24XinTjEqsVrNktuvvwcnfUjE=;
-  b=YajoDtyBpf1J9M/vCqSQfqJv+mz6VGshAG4yNB2tHptumEXAKQNk2xCT
-   9l9l06kT9nJHuPeFCt7FqP2vWEPOIRawL8ks34fUzRLEy7Q6cfUG8PWFo
-   z5VZs/oQm7Ky7rqgmd8GSIl9L4MPKkjjKmyq+ptTRxQRPq7B0bpZa9pGa
-   O48TskW5Gcm6Gz3+OGr9zFFINY6rAYp5kKReOjY5kTzafCXn5Hoct/b2V
-   Jwyls0IGA1UryjcoRMs747Eg2FnffxRZr2rr3qjziycpwlwH6C0x7ZvPj
-   sj27p00nStPN/Vugw6irRoIrjkzKU0OayNWqoycko2NVXMhjBEQXoptHf
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="309175677"
-X-IronPort-AV: E=Sophos;i="5.95,215,1661842800"; 
-   d="scan'208";a="309175677"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2022 16:18:27 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="737446583"
-X-IronPort-AV: E=Sophos;i="5.95,215,1661842800"; 
-   d="scan'208";a="737446583"
-Received: from fordon1x-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.24.177])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2022 16:18:23 -0700
-From:   Kai Huang <kai.huang@intel.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
-        dave.hansen@intel.com, dan.j.williams@intel.com,
-        rafael.j.wysocki@intel.com, kirill.shutemov@linux.intel.com,
-        reinette.chatre@intel.com, len.brown@intel.com,
-        tony.luck@intel.com, peterz@infradead.org, ak@linux.intel.com,
-        isaku.yamahata@intel.com, chao.gao@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
-        sagis@google.com, imammedo@redhat.com, kai.huang@intel.com
-Subject: [PATCH v6 21/21] Documentation/x86: Add documentation for TDX host support
-Date:   Thu, 27 Oct 2022 12:16:20 +1300
-Message-Id: <a3783eb87c0b3e652938dfd8714ed2fe93989c76.1666824663.git.kai.huang@intel.com>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <cover.1666824663.git.kai.huang@intel.com>
-References: <cover.1666824663.git.kai.huang@intel.com>
+        with ESMTP id S233844AbiJZXSE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Oct 2022 19:18:04 -0400
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2078.outbound.protection.outlook.com [40.107.95.78])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72702B8C0F;
+        Wed, 26 Oct 2022 16:17:43 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=j8U1rgEqoBQDM5RGYrZmspJMhXqz3A4SfeQmwwPVkz4zFL9rplxqdqpbtX994ZcbZ11z2tO9YvwtS3UyfnpsO3qaTulOKzXuCbNJYXfraJ+39kCdTmLAG5laIOuyhyEMXtAafZm92O1Uwa/LxqTsHf4VnYI0J0/Qp/MrjSbVoL/6hg7U2X1srQhbkzPK58j6NNHYe/kU2cgZC8Fpo+aT+PR8ruPP7QVrtUUCuJzaKuJGypZREkuZAcV5p5fHQOu4FXMa2cT8Agv+RO7KcuYAi1wMC1a45MIFWIADLehdbKr+fbzlpkQemQc7eHcZ1No/dP2zB90Bg/H1hZpUlZzEWQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WGNiizTFcUwCN/L1ZiKc5QLrDNWfMbQatWehMkc23Kc=;
+ b=dnNGS/xXTlwxawfFPdTBX0OE4rpPWukMZ7A9if+6l9vNQqJy9Is3abaK7tCfeSYuRfnNSfHNiSEcLXYf4H7KWzd9LPh1kCjt0T098E6UvVJlV13E49S3owvcPY2LiIasYfhsjtX01w0iVM914uoEKMF/kU1gix7vJfO7cFEP4MnAR0Zld5k2wl41qOgQo9movwKdnTOaagJaca3wSdGkDZ34f4VPNliqhFObNY8uCPCPWj3wxOSUmyprY4z85JjzQ0M72MBC3RNI5w8hXZwDGOEtnlZq5PVS2rL6BukhCy24TGYC3jFfr7OuP+hxfAERDW2M+uYLwYEzftTVbn1xSg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WGNiizTFcUwCN/L1ZiKc5QLrDNWfMbQatWehMkc23Kc=;
+ b=eABlgKZAgTC0PGVr8VfgnJ/VNOepNuAYt4a9BALH+fzdcVkRfbZ+DmHaKA77Y30jAbZrVIEMrjDiHWYfkzRHIIt9uczQWqnNjoYQJlOp/oMcHZ7uThiQPOSzcOd1+ZeVvX/DVor/JzqyXe5kLQ680eMy84Mi6dMBpOdgZd73cvQ4eAh8+kt/FVyiDJ6C0DGAwLy6AO/JckA5FVdPkPBkxvZyAC+bLRX8n/tHbLGCLJo5PFMlOOTgAn3QiFBV6HIhPOQldpt+bjx1k+gVGE6Ahm/BC1EHW1E23EWWhCEMVryRYn4rsiRTtO1ARBd5ccrB81WMLIc72fabLvl3VOKA1A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by IA1PR12MB7493.namprd12.prod.outlook.com (2603:10b6:208:41b::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5746.21; Wed, 26 Oct
+ 2022 23:17:38 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5746.021; Wed, 26 Oct 2022
+ 23:17:38 +0000
+Date:   Wed, 26 Oct 2022 20:17:37 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Lu Baolu <baolu.lu@linux.intel.com>, bpf@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v3 10/15] iommufd: IOCTLs for the io_pagetable
+Message-ID: <Y1nAEfNBYMswuqiM@nvidia.com>
+References: <0-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+ <10-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <10-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+X-ClientProxiedBy: YT1PR01CA0112.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:2c::21) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|IA1PR12MB7493:EE_
+X-MS-Office365-Filtering-Correlation-Id: 52103476-c604-4e6a-9645-08dab7a845f5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: YRIGgkrslRYmykmLkVqpIis9Q5bddhHJ/aajie6Gwu/oD6sPUdFv5qmjWa+eDqmWrYYwasTb2Q1NYf+wYUH7CcbB0yR0PRlHMJH0irtG1il4OChKeLwV4igCXRyzNE7wS4g5pVzHAmF3Rr11o/CgCMfOSbTAt5d3Vhyc47cJQF1C5ujptbMpfOXQU1JE9OMsbJ+zGMKUFvLiNVcKnczj3A4TIGq9lYMFcEEYTNf/aL2NgE8KvUcqprLORIjD54rzsRBc/MkQulYDDTZzSP+0rhJqp/qj9uFdYtYpheKRg18Bobj4knOo7I3UckFM+SHmS8HQfuf9xnBZJKEQjzJqgJn+MB/gMI9m1whcAe5UNIKCW/C4HeEAvtWjLQCVo6hQDFvZ1VuGEGFzGECVvUxAi7FEHSK9M0kpIeM1MwGp2RkTuv6A+m12fDvC5A8b4mNzswqQshmC1OfMbcIEfGmlHh2lrRy0FLuyuzTAlO5K+k0LfjuxgOCXIjoq6ssN7itBtM020q7Cy5HxEFk94Y2LaUzLy1CaSOHbC1F/UkfPgYSUK0aOL3sIF6ThyxG8MkZ9rGui+uKm5QcEmpVJI/EdKK4PIctmQysHj3eussWHPH98joTJLnpj5LVENHOnYsM4cWtVmqCC1MKaOjLDocsPhnsHMg6qtmq2pqVEZAmmp5BC1Kuz9Zjn88zsv3ZtCNKKgl4UKOiQ1el9uRHQ+mPulK95MyUbsRZ3L5bjVRgIMIM5XGNYeHmmlYSB0gRJH0z/
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(376002)(136003)(366004)(346002)(396003)(451199015)(36756003)(2906002)(54906003)(5660300002)(921005)(110136005)(4326008)(66476007)(66946007)(7416002)(66556008)(41300700001)(8676002)(7406005)(8936002)(316002)(4744005)(2616005)(6512007)(83380400001)(6506007)(38100700002)(86362001)(186003)(26005)(6486002)(478600001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?+VG9NLWHAzftHcCdcBU3VT297rcpkFdFleRh/83AFwecWpEh4s3dDGUbvZUg?=
+ =?us-ascii?Q?zdKja430W+9dhmVHHoq0n1wnwRS4rn18k5mSiEMgAdaR1PLVyB+zDqKF/Q7U?=
+ =?us-ascii?Q?K6X+ZgxvCYsOkO3ODm2/5mordrWUg63bio+ZFrsYtMzf4TtOimzMrb5lIEpM?=
+ =?us-ascii?Q?amk2X4teemGHYzxV+LToqgP0oETjZfUlqvl3KqBPS47GC/jXqDGlbygIfijk?=
+ =?us-ascii?Q?2VhyfilQJVeUiJd3AUst3uWnMCeCvYUc/Q04aLVaSsvsV8+uilmZIEQzIVwN?=
+ =?us-ascii?Q?EwQJldI+F32HubhhqfOzb7Av/XTWXOffSVhedKCc/yH42/gAkcGy1rAPvjtb?=
+ =?us-ascii?Q?QLiEOlJGAARuYeSGVtZwfuHUZKGGJ/bfVPOzymdy7+bf4g+1I7cjEGBPcUxw?=
+ =?us-ascii?Q?o4Id7N2PgEi/z7S3nPQ19YHGXm5CNlwaYq5BAPk4wxiEjdqbBUlJ6JhW7PIg?=
+ =?us-ascii?Q?LQN2oNBlyKh/ZG65bEZpVP4dOxxPpBA/uxRkuU4A/3wL/bFfdLkm2zIZyI2X?=
+ =?us-ascii?Q?0ouFJQE1/cM6RsjANyEI3XXG2dzBr7dgGYrnSC7BewwVOTyQrxTw9mO6YMak?=
+ =?us-ascii?Q?Ub/MJHZQ57/xN6BlgUOLdCgU6QuvWNRe3WHjWpZRmk4Tcl7nRENHpI18Icyh?=
+ =?us-ascii?Q?F/aMTzRIQfO7gpuUX+eSZYAoUj/P3fmynO5+LU8KdMDqNVrKLV/Vq9/aYYTv?=
+ =?us-ascii?Q?zHvM95oLRW/RUy0masVB9Nf+XTG8Tl1q9qHCa/MdscmjUv5WENiTjjUHvt1c?=
+ =?us-ascii?Q?viEnlMJCR6/fRzPaYfcgFmUwJAsexdJtadlaF9keskK94uX6bz0eYiKtzVBj?=
+ =?us-ascii?Q?cBSqiRjGyS+NET+ugHlYaHkiaDt9ThXcYa2tQRdHza8aeCcW6UtQlxtjC8xq?=
+ =?us-ascii?Q?ORcEIG/GPLENg7phS+9WEY/2QdamE23n8d4WKIa2djkpIOqHxQFaFn4ukneh?=
+ =?us-ascii?Q?i+OaEZPgLpq7oEanhNxBTEXqDZM0Wt2zZVcCjYjjrAt6msUj5cF22ZMBfvq4?=
+ =?us-ascii?Q?uIxahLKePbi+xyvELFjFmDKilZuWEk8GAEVrPJGCzSXe1f49A8OV6CAkb59P?=
+ =?us-ascii?Q?Nk0YwPAqYNXgvEYzUUZEINDH/Xqtobbu/OEufW4RRs3GbeTH8wZuZuU120qY?=
+ =?us-ascii?Q?wBtRwNpAoMbZ4SwiXI713MQwERu+XvyPlUGWglJdKrnIgjcT/vjXxhUWp27D?=
+ =?us-ascii?Q?RLI5PnL6MsNUmaBVHtSU1m7WG99KcbSTbycyMrhhjafAM5T6tVHuiLJShOap?=
+ =?us-ascii?Q?U7yUSHUiNzFW5AFhJrmKDvvebESXX5KpfAafTJYYUcYZc2lzJgaIv5RBmind?=
+ =?us-ascii?Q?pUG9Xk23+54Dc+6lbG7ebNwPK5jH7qJNoF22lDITekNuXhFRLb+PscwyzQJZ?=
+ =?us-ascii?Q?ruzrkd39LBEV9ipgd1W2/fuW0u7HeRs6iQqMGtUcoxbpsMtc8qanRLqyWUGp?=
+ =?us-ascii?Q?1e9g8jUqeXlfsF7pFofHSycNrcoZTZF2fq+9Of1vYXrAdjRSUNkck4rCOtZ/?=
+ =?us-ascii?Q?Pz7NgyFfu5B/jSmDfsMmvK9+ygE+aRxRR8iSevIMMEwqUEGJF/ZKVchrStYc?=
+ =?us-ascii?Q?TYMk2lwNzCps7zIomTYQHxORkNd1/Qavdayvs2aI?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52103476-c604-4e6a-9645-08dab7a845f5
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Oct 2022 23:17:38.4957
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /LOFoOFWi3WHuIlXKV9yr0iUfVZMGQ12CLwrPS8WoKgfOdY8rOZdoKLXfoHzzWnY
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7493
+X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+        URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add documentation for TDX host kernel support.  There is already one
-file Documentation/x86/tdx.rst containing documentation for TDX guest
-internals.  Also reuse it for TDX host kernel support.
+On Tue, Oct 25, 2022 at 03:12:19PM -0300, Jason Gunthorpe wrote:
+>  static struct iommufd_ioctl_op iommufd_ioctl_ops[] = {
+>  	IOCTL_OP(IOMMU_DESTROY, iommufd_destroy, struct iommu_destroy, id),
+> +	IOCTL_OP(IOMMU_IOAS_ALLOC, iommufd_ioas_alloc_ioctl,
+> +		 struct iommu_ioas_alloc, out_ioas_id),
+> +	IOCTL_OP(IOMMU_IOAS_ALLOW_IOVAS, iommufd_ioas_allow_iovas,
+> +		 struct iommu_ioas_allow_iovas, allowed_iovas),
+> +	IOCTL_OP(IOMMU_IOAS_COPY, iommufd_ioas_copy, struct iommu_ioas_copy,
+> +		 src_iova),
+> +	IOCTL_OP(IOMMU_IOAS_IOVA_RANGES, iommufd_ioas_iova_ranges,
+> +		 struct iommu_ioas_iova_ranges, out_iova_alignment),
+> +	IOCTL_OP(IOMMU_IOAS_MAP, iommufd_ioas_map, struct iommu_ioas_map,
+> +		 __reserved),
 
-Introduce a new level menu "TDX Guest Support" and move existing
-materials under it, and add a new menu for TDX host kernel support.
+Syzkaller indirectly noticed that __reserved is no longer the last
+item in this struct:
 
-Signed-off-by: Kai Huang <kai.huang@intel.com>
----
- Documentation/x86/tdx.rst | 209 ++++++++++++++++++++++++++++++++++++--
- 1 file changed, 198 insertions(+), 11 deletions(-)
+        IOCTL_OP(IOMMU_IOAS_MAP, iommufd_ioas_map, struct iommu_ioas_map,
+-                __reserved),
++                iova),
 
-diff --git a/Documentation/x86/tdx.rst b/Documentation/x86/tdx.rst
-index b8fa4329e1a5..59481dbe64b2 100644
---- a/Documentation/x86/tdx.rst
-+++ b/Documentation/x86/tdx.rst
-@@ -10,6 +10,193 @@ encrypting the guest memory. In TDX, a special module running in a special
- mode sits between the host and the guest and manages the guest/host
- separation.
- 
-+TDX Host Kernel Support
-+=======================
-+
-+TDX introduces a new CPU mode called Secure Arbitration Mode (SEAM) and
-+a new isolated range pointed by the SEAM Ranger Register (SEAMRR).  A
-+CPU-attested software module called 'the TDX module' runs inside the new
-+isolated range to provide the functionalities to manage and run protected
-+VMs.
-+
-+TDX also leverages Intel Multi-Key Total Memory Encryption (MKTME) to
-+provide crypto-protection to the VMs.  TDX reserves part of MKTME KeyIDs
-+as TDX private KeyIDs, which are only accessible within the SEAM mode.
-+BIOS is responsible for partitioning legacy MKTME KeyIDs and TDX KeyIDs.
-+
-+Before the TDX module can be used to create and run protected VMs, it
-+must be loaded into the isolated range and properly initialized.  The TDX
-+architecture doesn't require the BIOS to load the TDX module, but the
-+kernel assumes it is loaded by the BIOS.
-+
-+TDX boot-time detection
-+-----------------------
-+
-+The kernel detects TDX by detecting TDX private KeyIDs during kernel
-+boot.  Below dmesg shows when TDX is enabled by BIOS::
-+
-+  [..] tdx: TDX enabled by BIOS. TDX private KeyID range: [16, 64).
-+
-+TDX module detection and initialization
-+---------------------------------------
-+
-+There is no CPUID or MSR to detect the TDX module.  The kernel detects it
-+by initializing it.
-+
-+The kernel talks to the TDX module via the new SEAMCALL instruction.  The
-+TDX module implements SEAMCALL leaf functions to allow the kernel to
-+initialize it.
-+
-+Initializing the TDX module consumes roughly ~1/256th system RAM size to
-+use it as 'metadata' for the TDX memory.  It also takes additional CPU
-+time to initialize those metadata along with the TDX module itself.  Both
-+are not trivial.  The kernel initializes the TDX module at runtime on
-+demand.  The caller to call tdx_enable() to initialize the TDX module::
-+
-+        ret = tdx_enable();
-+        if (ret)
-+                goto no_tdx;
-+        // TDX is ready to use
-+
-+Initializing the TDX module requires all logical CPUs being online.
-+tdx_enable() internally temporarily disables CPU hotplug to prevent any
-+CPU from going offline, but the caller still needs to guarantee all
-+present CPUs are online before calling tdx_enable().
-+
-+Also, tdx_enable() requires all CPUs are already in VMX operation
-+(requirement of making SEAMCALL).  Currently, tdx_enable() doesn't handle
-+VMXON internally, but depends on the caller to guarantee that.  So far
-+KVM is the only user of TDX and KVM already handles VMXON.
-+
-+User can consult dmesg to see the presence of the TDX module, and whether
-+it has been initialized.
-+
-+If the TDX module is not loaded, dmesg shows below::
-+
-+  [..] tdx: TDX module is not loaded.
-+
-+If the TDX module is initialized successfully, dmesg shows something
-+like below::
-+
-+  [..] tdx: TDX module: attributes 0x0, vendor_id 0x8086, major_version 1, minor_version 0, build_date 20211209, build_num 160
-+  [..] tdx: 65667 pages allocated for PAMT.
-+  [..] tdx: TDX module initialized.
-+
-+If the TDX module failed to initialize, dmesg shows below::
-+
-+  [..] tdx: Failed to initialize TDX module. Shut it down.
-+
-+TDX Interaction to Other Kernel Components
-+------------------------------------------
-+
-+TDX Memory Policy
-+~~~~~~~~~~~~~~~~~
-+
-+The TDX module reports a list of "Convertible Memory Region" (CMR) to
-+indicate which memory regions are TDX-capable.  Those regions are
-+generated by BIOS and verified by the MCHECK so that they are truly
-+present during platform boot and can meet security guarantees.
-+
-+However those TDX convertible memory regions are not automatically usable
-+to the TDX module.  The kernel needs to choose all TDX-usable memory
-+regions and pass those regions to the TDX module when initializing it.
-+After TDX module is initialized, no more TDX-usable memory can be added
-+to the TDX module.
-+
-+To keep things simple, this initial implementation chooses to use all
-+boot-time present memory managed by the page allocator as TDX memory.
-+This _requires_ all boot-time present memory is TDX convertible memory,
-+which is true in practice.  If there's any boot-time memory isn't TDX
-+convertible memory (which is allowed from TDX architecture's point of
-+view), it will be caught later during TDX module initialization and the
-+initialization will fail.
-+
-+However one machine may support both TDX and non-TDX memory both at
-+machine boot time and runtime.  For example, any memory hot-added at
-+runtime cannot be TDX memory.  Also, for now NVDIMM and CXL memory are
-+not TDX memory, no matter whether they are present at machine boot time
-+or not.
-+
-+This raises a problem that, if any non-TDX memory is hot-added to the
-+system-wide memory allocation pool, a non-TDX page may be allocated to a
-+TDX guest, which will result in failing to create the TDX guest, or
-+killing it at runtime.
-+
-+The current implementation doesn't explicitly prevent adding any non-TDX
-+memory to system-wide memory pool, but depends on the machine owner to
-+make sure such operation won't happen.  For example, the machine owner
-+should never plug any NVDIMM or CXL memory to the machine, or use kmem
-+driver to hot-add any to the core-mm.
-+
-+This will be enhanced in the future.  One solution is the kernel can be
-+enforced to always guarantee all pages in the page allocator are TDX
-+memory (i.e. by rejecting non-TDX memory in memory hotplug).  Another
-+option is the kernel may support different memory capabilities on basis
-+of NUMA node.  For example, the kernel can have both TDX-compatible NUMA
-+node and non-TDX-compatible memory NUMA node, and the userspace needs to
-+explicitly bind TDX guests to those TDX-compatible memory NUMA nodes.
-+
-+CPU Hotplug
-+~~~~~~~~~~~
-+
-+TDX doesn't support physical (ACPI) CPU hotplug.  During machine boot,
-+TDX verifies all boot-time present logical CPUs are TDX compatible before
-+enabling TDX.  A non-buggy BIOS should never support hot-add/removal of
-+physical CPU.  Currently the kernel doesn't handle physical CPU hotplug,
-+but depends on the BIOS to behave correctly.
-+
-+Note TDX works with CPU logical online/offline, thus the kernel still
-+allows to offline logical CPU and online it again.
-+
-+Memory Hotplug
-+~~~~~~~~~~~~~~
-+
-+TDX doesn't support ACPI memory hotplug of convertible memory.  The list
-+of "Convertible Memory Regions" (CMR) is static during machine's runtime.
-+TDX also assumes convertible memory won't be hot-removed.  A non-buggy
-+BIOS should never support physical hot-removal of convertible memory.
-+Currently the kernel doesn't handle hot-removal of convertible memory but
-+depends on the BIOS to behave correctly.
-+
-+It's possible that one machine can have both TDX and non-TDX memory.
-+Specifically, all hot-added physical memory are not TDX convertible
-+memory.  Also, for now NVDIMM and CXL memory are not TDX convertible
-+memory, no matter whether they are physically present during boot or not.
-+
-+Plug non-TDX memory to the page allocator could result in failing to
-+create a TDX guest, or killing a running TDX guest.
-+
-+To keep things simple, this series doesn't handle memory hotplug at all,
-+but depends on the machine owner to not do any memory hotplug operation.
-+For example, the machine owner should not plug any NVDIMM or CXL memory
-+into the machine, or use kmem driver to plug NVDIMM or CXL memory to the
-+core-mm.
-+
-+Kexec()
-+~~~~~~~
-+
-+TDX (and MKTME) doesn't guarantee cache coherency among different KeyIDs.
-+If the TDX module is ever initialized, the kernel needs to flush dirty
-+cachelines associated with any TDX private KeyID, otherwise they may
-+slightly corrupt the new kernel.
-+
-+Similar to SME support, the kernel uses wbinvd() to flush cache in
-+stop_this_cpu().
-+
-+The current TDX module architecture doesn't play nicely with kexec().
-+The TDX module can only be initialized once during its lifetime, and
-+there is no SEAMCALL to reset the module to give a new clean slate to
-+the new kernel.  Therefore, ideally, if the module is ever initialized,
-+it's better to shut down the module.  The new kernel won't be able to
-+use TDX anyway (as it needs to go through the TDX module initialization
-+process which will fail immediately at the first step).
-+
-+However, there's no guarantee CPU is in VMX operation during kexec(), so
-+it's impractical to shut down the module.  Currently, the kernel just
-+leaves the module in open state.
-+
-+TDX Guest Support
-+=================
- Since the host cannot directly access guest registers or memory, much
- normal functionality of a hypervisor must be moved into the guest. This is
- implemented using a Virtualization Exception (#VE) that is handled by the
-@@ -20,7 +207,7 @@ TDX includes new hypercall-like mechanisms for communicating from the
- guest to the hypervisor or the TDX module.
- 
- New TDX Exceptions
--==================
-+------------------
- 
- TDX guests behave differently from bare-metal and traditional VMX guests.
- In TDX guests, otherwise normal instructions or memory accesses can cause
-@@ -30,7 +217,7 @@ Instructions marked with an '*' conditionally cause exceptions.  The
- details for these instructions are discussed below.
- 
- Instruction-based #VE
-----------------------
-+~~~~~~~~~~~~~~~~~~~~~
- 
- - Port I/O (INS, OUTS, IN, OUT)
- - HLT
-@@ -41,7 +228,7 @@ Instruction-based #VE
- - CPUID*
- 
- Instruction-based #GP
-----------------------
-+~~~~~~~~~~~~~~~~~~~~~
- 
- - All VMX instructions: INVEPT, INVVPID, VMCLEAR, VMFUNC, VMLAUNCH,
-   VMPTRLD, VMPTRST, VMREAD, VMRESUME, VMWRITE, VMXOFF, VMXON
-@@ -52,7 +239,7 @@ Instruction-based #GP
- - RDMSR*,WRMSR*
- 
- RDMSR/WRMSR Behavior
----------------------
-+~~~~~~~~~~~~~~~~~~~~
- 
- MSR access behavior falls into three categories:
- 
-@@ -73,7 +260,7 @@ trapping and handling in the TDX module.  Other than possibly being slow,
- these MSRs appear to function just as they would on bare metal.
- 
- CPUID Behavior
----------------
-+~~~~~~~~~~~~~~
- 
- For some CPUID leaves and sub-leaves, the virtualized bit fields of CPUID
- return values (in guest EAX/EBX/ECX/EDX) are configurable by the
-@@ -93,7 +280,7 @@ not know how to handle. The guest kernel may ask the hypervisor for the
- value with a hypercall.
- 
- #VE on Memory Accesses
--======================
-+----------------------
- 
- There are essentially two classes of TDX memory: private and shared.
- Private memory receives full TDX protections.  Its content is protected
-@@ -107,7 +294,7 @@ entries.  This helps ensure that a guest does not place sensitive
- information in shared memory, exposing it to the untrusted hypervisor.
- 
- #VE on Shared Memory
----------------------
-+~~~~~~~~~~~~~~~~~~~~
- 
- Access to shared mappings can cause a #VE.  The hypervisor ultimately
- controls whether a shared memory access causes a #VE, so the guest must be
-@@ -127,7 +314,7 @@ be careful not to access device MMIO regions unless it is also prepared to
- handle a #VE.
- 
- #VE on Private Pages
----------------------
-+~~~~~~~~~~~~~~~~~~~~
- 
- An access to private mappings can also cause a #VE.  Since all kernel
- memory is also private memory, the kernel might theoretically need to
-@@ -145,7 +332,7 @@ The hypervisor is permitted to unilaterally move accepted pages to a
- to handle the exception.
- 
- Linux #VE handler
--=================
-+-----------------
- 
- Just like page faults or #GP's, #VE exceptions can be either handled or be
- fatal.  Typically, an unhandled userspace #VE results in a SIGSEGV.
-@@ -167,7 +354,7 @@ While the block is in place, any #VE is elevated to a double fault (#DF)
- which is not recoverable.
- 
- MMIO handling
--=============
-+-------------
- 
- In non-TDX VMs, MMIO is usually implemented by giving a guest access to a
- mapping which will cause a VMEXIT on access, and then the hypervisor
-@@ -189,7 +376,7 @@ MMIO access via other means (like structure overlays) may result in an
- oops.
- 
- Shared Memory Conversions
--=========================
-+-------------------------
- 
- All TDX guest memory starts out as private at boot.  This memory can not
- be accessed by the hypervisor.  However, some kernel users like device
--- 
-2.37.3
+Also added a test to cover basic struct extensibility on all the ioctls.
 
+Jason
