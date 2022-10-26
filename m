@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 37E5260EC3C
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 01:19:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A8F660EC40
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 01:19:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234333AbiJZXTp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Oct 2022 19:19:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58812 "EHLO
+        id S234339AbiJZXTz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Oct 2022 19:19:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234138AbiJZXTI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Oct 2022 19:19:08 -0400
+        with ESMTP id S234290AbiJZXTP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Oct 2022 19:19:15 -0400
 Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05E1CD0188;
-        Wed, 26 Oct 2022 16:18:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20E3BB40D4;
+        Wed, 26 Oct 2022 16:18:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666826295; x=1698362295;
+  t=1666826299; x=1698362299;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=YQ8aEQPLV6Y2LINJF6mbeLLSFafErnmZ9drqr9B4TTw=;
-  b=j79ftuy+w+G6qyKvDe7SQdmB652i6+JB2JwCBgmE59mgEBHigWyRFYAX
-   5GU6YtnYb2HHnBdOkd++V5DqNFqFMgOSQP+6As1fP/CzYY3NRrZLqik22
-   tyFUlnBbBFMBpdOxGlUgKThJRl0aNYVbGIabkOsIOD6eqEySY0lR7xQ0q
-   ceOeLUtsmXRbpCTyIRn5qZQCPPg61e8lDrVVM1ul46399Z9k+hGDNpcA6
-   A2uXST4VbWG1i1usA5h06DTzZItgVqNLidFpnV4OfAemmdQDo0h1ar8k7
-   dGhd+rngilmYpqKyPZjV6IN032jJEg4P3TGjfwbtS11bN84hbNh2W2TcO
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="309175651"
+  bh=X8yqBDHPAxZ58eQMTu8KK6VQiFYdhPWhN364id0KIxU=;
+  b=edkqe28hXStfb9q7+RFvFUbRg6R3poLLaiwymQgVf4Kg1ZrF3eClfGyA
+   PeALnlY4C08pdZaIaIpwGSsznAw1Dl9UvS03hDFRMZywuLCdIURbcz3vG
+   vXURN/gTNBdV6IyogJXNeocJlf6byn4772iiSop4nO2GBFPguNdMWyFD6
+   FNJk5bDZkxF3VLZMzwNy5xSIakutxA3qy0ldzXtDVluwZs69dtYgUJJmO
+   E3/o9iVJ4KKw9NpcPYyrQCWhl511H5+FubSTnKzGbL8DGbi/ElYSeikud
+   39YH+eMqu7CKsCzsFKvYHlzvqzPochppRja9twdJErIGHyVg44bgmQxhP
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="309175656"
 X-IronPort-AV: E=Sophos;i="5.95,215,1661842800"; 
-   d="scan'208";a="309175651"
+   d="scan'208";a="309175656"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2022 16:18:14 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="737446538"
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2022 16:18:18 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="737446554"
 X-IronPort-AV: E=Sophos;i="5.95,215,1661842800"; 
-   d="scan'208";a="737446538"
+   d="scan'208";a="737446554"
 Received: from fordon1x-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.24.177])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2022 16:18:10 -0700
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2022 16:18:14 -0700
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
@@ -47,9 +47,9 @@ Cc:     linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
         isaku.yamahata@intel.com, chao.gao@intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
         sagis@google.com, imammedo@redhat.com, kai.huang@intel.com
-Subject: [PATCH v6 18/21] x86/virt/tdx: Configure global KeyID on all packages
-Date:   Thu, 27 Oct 2022 12:16:17 +1300
-Message-Id: <c88eb1d501abffc5b9181ef0930579871b7fcbff.1666824663.git.kai.huang@intel.com>
+Subject: [PATCH v6 19/21] x86/virt/tdx: Initialize all TDMRs
+Date:   Thu, 27 Oct 2022 12:16:18 +1300
+Message-Id: <c78e41604f5c5274da3d5a9a01632abfad0926a5.1666824663.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.37.3
 In-Reply-To: <cover.1666824663.git.kai.huang@intel.com>
 References: <cover.1666824663.git.kai.huang@intel.com>
@@ -65,158 +65,133 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-After the array of TDMRs and the global KeyID are configured to the TDX
-module, use TDH.SYS.KEY.CONFIG to configure the key of the global KeyID
-on all packages.
+Initialize TDMRs via TDH.SYS.TDMR.INIT as the last step to complete the
+TDX initialization.
 
-TDH.SYS.KEY.CONFIG must be done on one (any) cpu for each package.  And
-it cannot run concurrently on different CPUs.  Implement a helper to
-run SEAMCALL on one cpu for each package one by one, and use it to
-configure the global KeyID on all packages.
+All TDMRs need to be initialized using TDH.SYS.TDMR.INIT SEAMCALL before
+the memory pages can be used by the TDX module.  The time to initialize
+TDMR is proportional to the size of the TDMR because TDH.SYS.TDMR.INIT
+internally initializes the PAMT entries using the global KeyID.
 
-Intel hardware doesn't guarantee cache coherency across different
-KeyIDs.  The kernel needs to flush PAMT's dirty cachelines (associated
-with KeyID 0) before the TDX module uses the global KeyID to access the
-PAMT.  Following the TDX module specification, flush cache before
-configuring the global KeyID on all packages.
+To avoid long latency caused in one SEAMCALL, TDH.SYS.TDMR.INIT only
+initializes an (implementation-specific) subset of PAMT entries of one
+TDMR in one invocation.  The caller needs to call TDH.SYS.TDMR.INIT
+iteratively until all PAMT entries of the given TDMR are initialized.
 
-Given the PAMT size can be large (~1/256th of system RAM), just use
-WBINVD on all CPUs to flush.
+TDH.SYS.TDMR.INITs can run concurrently on multiple CPUs as long as they
+are initializing different TDMRs.  To keep it simple, just initialize
+all TDMRs one by one.  On a 2-socket machine with 2.2G CPUs and 64GB
+memory, each TDH.SYS.TDMR.INIT roughly takes couple of microseconds on
+average, and it takes roughly dozens of milliseconds to complete the
+initialization of all TDMRs while system is idle.
 
 Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
- arch/x86/virt/vmx/tdx/tdx.c | 83 ++++++++++++++++++++++++++++++++++++-
+ arch/x86/virt/vmx/tdx/tdx.c | 70 ++++++++++++++++++++++++++++++++++---
  arch/x86/virt/vmx/tdx/tdx.h |  1 +
- 2 files changed, 82 insertions(+), 2 deletions(-)
+ 2 files changed, 66 insertions(+), 5 deletions(-)
 
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index fdfce715dda6..9cfb01e7666a 100644
+index 9cfb01e7666a..68ec1ebecb49 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -354,6 +354,46 @@ static void seamcall_on_each_cpu(struct seamcall_ctx *sc)
- 	on_each_cpu(seamcall_smp_call_function, sc, true);
+@@ -1151,6 +1151,66 @@ static int config_global_keyid(void)
+ 	return seamcall_on_each_package_serialized(&sc);
  }
  
-+/*
-+ * Call one SEAMCALL on one (any) cpu for each physical package in
-+ * serialized way.  Return immediately in case of any error if
-+ * SEAMCALL fails on any cpu.
-+ *
-+ * Note for serialized calls 'struct seamcall_ctx::err' doesn't have
-+ * to be atomic, but for simplicity just reuse it instead of adding
-+ * a new one.
-+ */
-+static int seamcall_on_each_package_serialized(struct seamcall_ctx *sc)
++/* Initialize one TDMR */
++static int init_tdmr(struct tdmr_info *tdmr)
 +{
-+	cpumask_var_t packages;
-+	int cpu, ret = 0;
-+
-+	if (!zalloc_cpumask_var(&packages, GFP_KERNEL))
-+		return -ENOMEM;
-+
-+	for_each_online_cpu(cpu) {
-+		if (cpumask_test_and_set_cpu(topology_physical_package_id(cpu),
-+					packages))
-+			continue;
-+
-+		ret = smp_call_function_single(cpu, seamcall_smp_call_function,
-+				sc, true);
-+		if (ret)
-+			break;
-+
-+		/*
-+		 * Doesn't have to use atomic_read(), but it doesn't
-+		 * hurt either.
-+		 */
-+		ret = atomic_read(&sc->err);
-+		if (ret)
-+			break;
-+	}
-+
-+	free_cpumask_var(packages);
-+	return ret;
-+}
-+
- static int tdx_module_init_cpus(void)
- {
- 	struct seamcall_ctx sc = { .fn = TDH_SYS_LP_INIT };
-@@ -1096,6 +1136,21 @@ static int config_tdx_module(struct tdmr_info *tdmr_array, int tdmr_num,
- 	return ret;
- }
- 
-+static int config_global_keyid(void)
-+{
-+	struct seamcall_ctx sc = { .fn = TDH_SYS_KEY_CONFIG };
++	u64 next;
 +
 +	/*
-+	 * Configure the key of the global KeyID on all packages by
-+	 * calling TDH.SYS.KEY.CONFIG on all packages.
++	 * Initializing PAMT entries might be time-consuming (in
++	 * proportion to the size of the requested TDMR).  To avoid long
++	 * latency in one SEAMCALL, TDH.SYS.TDMR.INIT only initializes
++	 * an (implementation-defined) subset of PAMT entries in one
++	 * invocation.
 +	 *
-+	 * TDH.SYS.KEY.CONFIG may fail with entropy error (which is
-+	 * a recoverable error).  Assume this is exceedingly rare and
-+	 * just return error if encountered instead of retrying.
++	 * Call TDH.SYS.TDMR.INIT iteratively until all PAMT entries
++	 * of the requested TDMR are initialized (if next-to-initialize
++	 * address matches the end address of the TDMR).
 +	 */
-+	return seamcall_on_each_package_serialized(&sc);
++	do {
++		struct tdx_module_output out;
++		int ret;
++
++		ret = seamcall(TDH_SYS_TDMR_INIT, tdmr->base, 0, 0, 0, NULL,
++				&out);
++		if (ret)
++			return ret;
++		/*
++		 * RDX contains 'next-to-initialize' address if
++		 * TDH.SYS.TDMR.INT succeeded.
++		 */
++		next = out.rdx;
++		/* Allow scheduling when needed */
++		if (need_resched())
++			cond_resched();
++	} while (next < tdmr->base + tdmr->size);
++
++	return 0;
++}
++
++/* Initialize all TDMRs */
++static int init_tdmrs(struct tdmr_info *tdmr_array, int tdmr_num)
++{
++	int i;
++
++	/*
++	 * Initialize TDMRs one-by-one for simplicity, though the TDX
++	 * architecture does allow different TDMRs to be initialized in
++	 * parallel on multiple CPUs.  Parallel initialization could
++	 * be added later when the time spent in the serialized scheme
++	 * becomes a real concern.
++	 */
++	for (i = 0; i < tdmr_num; i++) {
++		int ret;
++
++		ret = init_tdmr(tdmr_array_entry(tdmr_array, i));
++		if (ret)
++			return ret;
++	}
++
++	return 0;
 +}
 +
  /*
   * Detect and initialize the TDX module.
   *
-@@ -1159,15 +1214,39 @@ static int init_tdx_module(void)
+@@ -1232,11 +1292,11 @@ static int init_tdx_module(void)
  	if (ret)
  		goto out_free_pamts;
  
-+	/*
-+	 * Hardware doesn't guarantee cache coherency across different
-+	 * KeyIDs.  The kernel needs to flush PAMT's dirty cachelines
-+	 * (associated with KeyID 0) before the TDX module can use the
-+	 * global KeyID to access the PAMT.  Given PAMTs are potentially
-+	 * large (~1/256th of system RAM), just use WBINVD on all cpus
-+	 * to flush the cache.
-+	 *
-+	 * Follow the TDX spec to flush cache before configuring the
-+	 * global KeyID on all packages.
-+	 */
-+	wbinvd_on_all_cpus();
-+
-+	/* Config the key of global KeyID on all packages */
-+	ret = config_global_keyid();
+-	/*
+-	 * Return -EINVAL until all steps of TDX module initialization
+-	 * process are done.
+-	 */
+-	ret = -EINVAL;
++	/* Initialize TDMRs to complete the TDX module initialization */
++	ret = init_tdmrs(tdmr_array, tdmr_num);
 +	if (ret)
 +		goto out_free_pamts;
 +
- 	/*
- 	 * Return -EINVAL until all steps of TDX module initialization
- 	 * process are done.
- 	 */
- 	ret = -EINVAL;
  out_free_pamts:
--	if (ret)
-+	if (ret) {
-+		/*
-+		 * Part of PAMT may already have been initialized by
-+		 * TDX module.  Flush cache before returning PAMT back
-+		 * to the kernel.
-+		 */
-+		wbinvd_on_all_cpus();
- 		tdmrs_free_pamt_all(tdmr_array, tdmr_num);
--	else
-+	} else
- 		pr_info("%lu pages allocated for PAMT.\n",
- 				tdmrs_count_pamt_pages(tdmr_array, tdmr_num));
- out_free_tdmrs:
+ 	if (ret) {
+ 		/*
 diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-index c26bab2555ca..768d097412ab 100644
+index 768d097412ab..891691b1ea50 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.h
 +++ b/arch/x86/virt/vmx/tdx/tdx.h
-@@ -15,6 +15,7 @@
- /*
-  * TDX module SEAMCALL leaf functions
-  */
-+#define TDH_SYS_KEY_CONFIG	31
+@@ -19,6 +19,7 @@
  #define TDH_SYS_INFO		32
  #define TDH_SYS_INIT		33
  #define TDH_SYS_LP_INIT		35
++#define TDH_SYS_TDMR_INIT	36
+ #define TDH_SYS_LP_SHUTDOWN	44
+ #define TDH_SYS_CONFIG		45
+ 
 -- 
 2.37.3
 
