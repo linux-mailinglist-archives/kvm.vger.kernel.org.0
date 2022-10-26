@@ -2,82 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 72E4E60E0D6
-	for <lists+kvm@lfdr.de>; Wed, 26 Oct 2022 14:37:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5865660E11F
+	for <lists+kvm@lfdr.de>; Wed, 26 Oct 2022 14:45:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233304AbiJZMhm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Oct 2022 08:37:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52348 "EHLO
+        id S233568AbiJZMpc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Oct 2022 08:45:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230057AbiJZMhk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Oct 2022 08:37:40 -0400
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 411398F26A
-        for <kvm@vger.kernel.org>; Wed, 26 Oct 2022 05:37:40 -0700 (PDT)
-Received: by mail-io1-f70.google.com with SMTP id l9-20020a5d8f89000000b006bd33712128so8586755iol.17
-        for <kvm@vger.kernel.org>; Wed, 26 Oct 2022 05:37:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=giEKpFCOAGFhFBssx0rXv7faluMBkRAJIt7vP3gQfcg=;
-        b=oZfSg4jRkom53+kpFxD/QLXcDbl9J60r355La4F0uzRZYNjhFBcD8TSfqAJMN+gZhZ
-         uJxmzK+Xne5t3o0T5RbkflQLIbjPz5/ZVOOy3svYRoh2Wj/0VmXOCd1N0hxCwz4Kg08C
-         c60CqIh8gikHyJ+PvPnNH8LysnFweys0KUAMxzuL6m7bOSIKyUb1IC12pIG6DsJbgs9j
-         mWNqQMc6iKIOIjrIbQcHYCtIFlBfMpdgyCJNjjYEo8NDJTitQ37vNYJdJkvT3gfb0N0S
-         gpGta5KPDZnAilUFz93XdFO0U56ETF7rJnvoDSMf0x1MVPVV7MLt0BoHQ6dE121XEuYO
-         Zk+Q==
-X-Gm-Message-State: ACrzQf3ZPdcqjMmQm7eAJQtz0+IIUqStbEudrFVESll4geUy6wTEB90z
-        Q9N10JeNq6O27wfVI+LAISx/ZKnFqp5A7rxXRIRNU6hvDL3x
-X-Google-Smtp-Source: AMsMyM5r7dsZdVt160YC5BPbjclJeotonvfTb9M6Y/9MqlbnqBdLkqd+gbWuZkwuxllvLriR5DttATdFDSwT+4VCwqbBOV/tsBmF
+        with ESMTP id S233473AbiJZMpa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Oct 2022 08:45:30 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 374508BB8A;
+        Wed, 26 Oct 2022 05:45:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1666788329; x=1698324329;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ABNx+msEoxiE0Up/NA4YUsZE1sxvOirm9dovIGgVQBY=;
+  b=eH7reX7OgdEIT5Us9JYkZEdF4sVa4hzCT/kGcwmvGEpz8F9+x0h+5/jj
+   bB4YWbEJ87gOTVQDueRtYOjzOxcRKCGd99ATT0H3U9UPi5Hz2fUE6LJO9
+   uMdVxscTqtkmpzRXafPvWKoiEZQcKw43VtLYQhH8VXa3R18Xi+n9kn7Dz
+   0sO5p7IJndkH8WjkJPNBAYz/60ZBMjVokhpzOfR6Xbw2ZdB1dkWCd+Xjg
+   i+Z515Zz56T/bfDxjmsmq+ayuynOxkg3Jy0tUw0AHpNBSOyEvxavh86+K
+   taypGzJzpP7yQMWzONHvVNInx+ZYGvzHKUso5+K82aLoHP+14/3EwOftd
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="334552548"
+X-IronPort-AV: E=Sophos;i="5.95,214,1661842800"; 
+   d="scan'208";a="334552548"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2022 05:45:25 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="609938092"
+X-IronPort-AV: E=Sophos;i="5.95,214,1661842800"; 
+   d="scan'208";a="609938092"
+Received: from blu2-mobl3.ccr.corp.intel.com (HELO [10.254.213.188]) ([10.254.213.188])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2022 05:45:17 -0700
+Message-ID: <2bcba1f1-e142-a752-eae5-69249f5a1021@linux.intel.com>
+Date:   Wed, 26 Oct 2022 20:45:15 +0800
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:170d:b0:2fc:3e76:b262 with SMTP id
- u13-20020a056e02170d00b002fc3e76b262mr26506480ill.152.1666787859573; Wed, 26
- Oct 2022 05:37:39 -0700 (PDT)
-Date:   Wed, 26 Oct 2022 05:37:39 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000049382505ebef4a0c@google.com>
-Subject: [syzbot] riscv/fixes build error
-From:   syzbot <syzbot+9d8dc6c2d48bbc419bb4@syzkaller.appspotmail.com>
-To:     anup@brainfault.org, aou@eecs.berkeley.edu, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
-        palmer@dabbelt.com, paul.walmsley@sifive.com,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Cc:     baolu.lu@linux.intel.com,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v3 01/15] iommu: Add IOMMU_CAP_ENFORCE_CACHE_COHERENCY
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>, bpf@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>
+References: <1-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <1-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_HI,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+        URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
+On 2022/10/26 2:12, Jason Gunthorpe wrote:
+> This queries if a domain linked to a device should expect to support
+> enforce_cache_coherency() so iommufd can negotiate the rules for when a
+> domain should be shared or not.
+> 
+> For iommufd a device that declares IOMMU_CAP_ENFORCE_CACHE_COHERENCY will
+> not be attached to a domain that does not support it.
+> 
+> Signed-off-by: Jason Gunthorpe<jgg@nvidia.com>
 
-syzbot found the following issue on:
+Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
 
-HEAD commit:    9abf2313adc1 Linux 6.1-rc1
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/riscv/linux.git fixes
-console output: https://syzkaller.appspot.com/x/log.txt?x=152b6b6a880000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9631ed0b9757aaab
-dashboard link: https://syzkaller.appspot.com/bug?extid=9d8dc6c2d48bbc419bb4
-compiler:       riscv64-linux-gnu-gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-userspace arch: riscv64
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9d8dc6c2d48bbc419bb4@syzkaller.appspotmail.com
-
-arch/riscv/kvm/vcpu.c:269: undefined reference to `riscv_cbom_block_size'
-riscv64-linux-gnu-ld: arch/riscv/kvm/vcpu.c:269: undefined reference to `riscv_cbom_block_size'
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Best regards,
+baolu
