@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DFDF60EC34
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 01:19:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AB71860EC36
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 01:19:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234197AbiJZXTL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Oct 2022 19:19:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58898 "EHLO
+        id S233965AbiJZXTR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Oct 2022 19:19:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234199AbiJZXSa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Oct 2022 19:18:30 -0400
+        with ESMTP id S229456AbiJZXSm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Oct 2022 19:18:42 -0400
 Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FC10C0980;
-        Wed, 26 Oct 2022 16:17:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD850C694F;
+        Wed, 26 Oct 2022 16:18:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666826278; x=1698362278;
+  t=1666826282; x=1698362282;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=hSfW4bJ5MptwqyAbvbhRogy6RGSa4Kgayz/Z+Dw3NS8=;
-  b=OMbAmDpU0sYPBMALT54YX9w3BAeDjsciUmVJAuULrVG/5lHSPHYdxVCK
-   K7oryLFL9uUEzOHlb8YrgniM92hYMu5xT4SFE6jegczJ3DvNkq/ovYcGY
-   YTD9yGLJJBVr/Hl/sw358sYv7VOyz8JYkcO5CHditqqUkYL/2pHq31mas
-   YpUCaYEt9Ldy6jE2ez4x0KVoK4GcxaqjzrA2AO/zDdRkq5qnEc5ZPzgDG
-   sXeO7q+5RDUxNxgbToZ/sClCvuxvESWiNGZVAeOrwclu+A0+/EidvDBPS
-   jFR7P75Rw8/rn+x8CiAxI3WQ7NnMz4hY6qVP6u66nFUE+ZrSrHsu7kdit
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="309175609"
+  bh=TR56OM4CfmVGYfY6LIC91MQ2Q91e8LDcsPGGWUQt60E=;
+  b=Sglv5IDJDK60UmDlwqeTt+Ez9T9UATppT5QMkNCUtIKFacw21IZBAyln
+   MKrhyp/ldNMNNymYkAR25UF/YtUjXYB4oe83w8vreWipE/Ksu/qnGgsNg
+   oCPaJgR8G4rd7ELhHlstMVhpV0GSFqK3Y6NjDlFHWDQeHRbaYFwLZQJLE
+   kxjQ+Z8emunmtk1YGjxXi4pwahDfKNUJo3wLxrTBTAI9PdEmWTdmeRVmW
+   AvCcAXBnNb7D5piygCoBJvz0Bc0ck5rQpaMc57ufJhjBUCbDv61s5Xtrf
+   plA+O15eabqdztzJodYfq6QBX2GlBZ7kd5Tjg8HfIqXmdXMyLhPclZYyq
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="309175616"
 X-IronPort-AV: E=Sophos;i="5.95,215,1661842800"; 
-   d="scan'208";a="309175609"
+   d="scan'208";a="309175616"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2022 16:17:58 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="737446442"
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2022 16:18:02 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="737446464"
 X-IronPort-AV: E=Sophos;i="5.95,215,1661842800"; 
-   d="scan'208";a="737446442"
+   d="scan'208";a="737446464"
 Received: from fordon1x-mobl.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.24.177])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2022 16:17:54 -0700
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2022 16:17:58 -0700
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
@@ -47,9 +47,9 @@ Cc:     linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
         isaku.yamahata@intel.com, chao.gao@intel.com,
         sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
         sagis@google.com, imammedo@redhat.com, kai.huang@intel.com
-Subject: [PATCH v6 14/21] x86/virt/tdx: Allocate and set up PAMTs for TDMRs
-Date:   Thu, 27 Oct 2022 12:16:13 +1300
-Message-Id: <71f0a13791f9bc3cbf92fc9f54508f7c4209a72a.1666824663.git.kai.huang@intel.com>
+Subject: [PATCH v6 15/21] x86/virt/tdx: Set up reserved areas for all TDMRs
+Date:   Thu, 27 Oct 2022 12:16:14 +1300
+Message-Id: <babddabb3cb4363f61ae8c102eae129f5601aaae.1666824663.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.37.3
 In-Reply-To: <cover.1666824663.git.kai.huang@intel.com>
 References: <cover.1666824663.git.kai.huang@intel.com>
@@ -65,42 +65,10 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The TDX module uses additional metadata to record things like which
-guest "owns" a given page of memory.  This metadata, referred as
-Physical Address Metadata Table (PAMT), essentially serves as the
-'struct page' for the TDX module.  PAMTs are not reserved by hardware
-up front.  They must be allocated by the kernel and then given to the
-TDX module.
-
-TDX supports 3 page sizes: 4K, 2M, and 1G.  Each "TD Memory Region"
-(TDMR) has 3 PAMTs to track the 3 supported page sizes.  Each PAMT must
-be a physically contiguous area from a Convertible Memory Region (CMR).
-However, the PAMTs which track pages in one TDMR do not need to reside
-within that TDMR but can be anywhere in CMRs.  If one PAMT overlaps with
-any TDMR, the overlapping part must be reported as a reserved area in
-that particular TDMR.
-
-Use alloc_contig_pages() since PAMT must be a physically contiguous area
-and it may be potentially large (~1/256th of the size of the given TDMR).
-The downside is alloc_contig_pages() may fail at runtime.  One (bad)
-mitigation is to launch a TD guest early during system boot to get those
-PAMTs allocated at early time, but the only way to fix is to add a boot
-option to allocate or reserve PAMTs during kernel boot.
-
-TDX only supports a limited number of reserved areas per TDMR to cover
-both PAMTs and memory holes within the given TDMR.  If many PAMTs are
-allocated within a single TDMR, the reserved areas may not be sufficient
-to cover all of them.
-
-Adopt the following policies when allocating PAMTs for a given TDMR:
-
-  - Allocate three PAMTs of the TDMR in one contiguous chunk to minimize
-    the total number of reserved areas consumed for PAMTs.
-  - Try to first allocate PAMT from the local node of the TDMR for better
-    NUMA locality.
-
-Also dump out how many pages are allocated for PAMTs when the TDX module
-is initialized successfully.
+As the last step of constructing TDMRs, set up reserved areas for all
+TDMRs.  For each TDMR, put all memory holes within this TDMR to the
+reserved areas.  And for all PAMTs which overlap with this TDMR, put
+all the overlapping parts to reserved areas too.
 
 Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Kai Huang <kai.huang@intel.com>
@@ -108,259 +76,229 @@ Signed-off-by: Kai Huang <kai.huang@intel.com>
 
 v5 -> v6:
  - Rebase due to using 'tdx_memblock' instead of memblock.
- - 'int pamt_entry_nr' -> 'unsigned long nr_pamt_entries' (Dave/Sagis).
- - Improved comment around tdmr_get_nid() (Dave).
- - Improved comment in tdmr_set_up_pamt() around breaking the PAMT
-   into PAMTs for 4K/2M/1G (Dave).
- - tdmrs_get_pamt_pages() -> tdmrs_count_pamt_pages() (Dave).   
-
-- v3 -> v5 (no feedback on v4):
- - Used memblock to get the NUMA node for given TDMR.
- - Removed tdmr_get_pamt_sz() helper but use open-code instead.
- - Changed to use 'switch .. case..' for each TDX supported page size in
-   tdmr_get_pamt_sz() (the original __tdmr_get_pamt_sz()).
- - Added printing out memory used for PAMT allocation when TDX module is
-   initialized successfully.
- - Explained downside of alloc_contig_pages() in changelog.
- - Addressed other minor comments.
+ - Split tdmr_set_up_rsvd_areas() into two functions to handle memory
+   hole and PAMT respectively.
+ - Added Isaku's Reviewed-by.
 
 ---
- arch/x86/Kconfig            |   1 +
- arch/x86/virt/vmx/tdx/tdx.c | 193 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 194 insertions(+)
+ arch/x86/virt/vmx/tdx/tdx.c | 190 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 188 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index f6f5e4f7a760..bb291b2de830 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -1961,6 +1961,7 @@ config INTEL_TDX_HOST
- 	depends on X86_64
- 	depends on KVM_INTEL
- 	depends on X86_X2APIC
-+	depends on CONTIG_ALLOC
- 	help
- 	  Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
- 	  host and certain physical attacks.  This option enables necessary TDX
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index f6dde82d94cc..f7142f45bb0c 100644
+index f7142f45bb0c..5d74ada072ca 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -669,6 +669,189 @@ static int create_tdmrs(struct tdmr_info *tdmr_array, int *tdmr_num)
- 	return 0;
+@@ -19,6 +19,7 @@
+ #include <linux/gfp.h>
+ #include <linux/align.h>
+ #include <linux/atomic.h>
++#include <linux/sort.h>
+ #include <asm/msr-index.h>
+ #include <asm/msr.h>
+ #include <asm/apic.h>
+@@ -852,6 +853,187 @@ static unsigned long tdmrs_count_pamt_pages(struct tdmr_info *tdmr_array,
+ 	return pamt_npages;
  }
  
-+/*
-+ * Calculate PAMT size given a TDMR and a page size.  The returned
-+ * PAMT size is always aligned up to 4K page boundary.
-+ */
-+static unsigned long tdmr_get_pamt_sz(struct tdmr_info *tdmr,
-+				      enum tdx_pg_level pgsz)
++static int tdmr_add_rsvd_area(struct tdmr_info *tdmr, int *p_idx,
++			      u64 addr, u64 size)
 +{
-+	unsigned long pamt_sz, nr_pamt_entries;
++	struct tdmr_reserved_area *rsvd_areas = tdmr->reserved_areas;
++	int idx = *p_idx;
 +
-+	switch (pgsz) {
-+	case TDX_PG_LEVEL_4K:
-+		nr_pamt_entries = tdmr->size >> PAGE_SHIFT;
-+		break;
-+	case TDX_PG_LEVEL_2M:
-+		nr_pamt_entries = tdmr->size >> PMD_SHIFT;
-+		break;
-+	case TDX_PG_LEVEL_1G:
-+		nr_pamt_entries = tdmr->size >> PUD_SHIFT;
-+		break;
-+	default:
-+		WARN_ON_ONCE(1);
-+		return 0;
-+	}
++	/* Reserved area must be 4K aligned in offset and size */
++	if (WARN_ON(addr & ~PAGE_MASK || size & ~PAGE_MASK))
++		return -EINVAL;
 +
-+	pamt_sz = nr_pamt_entries * tdx_sysinfo.pamt_entry_size;
-+	/* TDX requires PAMT size must be 4K aligned */
-+	pamt_sz = ALIGN(pamt_sz, PAGE_SIZE);
++	/* Cannot exceed maximum reserved areas supported by TDX */
++	if (idx >= tdx_sysinfo.max_reserved_per_tdmr)
++		return -E2BIG;
 +
-+	return pamt_sz;
++	rsvd_areas[idx].offset = addr - tdmr->base;
++	rsvd_areas[idx].size = size;
++
++	*p_idx = idx + 1;
++
++	return 0;
 +}
 +
-+/*
-+ * Pick a NUMA node on which to allocate this TDMR's metadata.
-+ *
-+ * This is imprecise since TDMRs are 1G aligned and NUMA nodes might
-+ * not be.  If the TDMR covers more than one node, just use the _first_
-+ * one.  This can lead to small areas of off-node metadata for some
-+ * memory.
-+ */
-+static int tdmr_get_nid(struct tdmr_info *tdmr)
++static int tdmr_set_up_memory_hole_rsvd_areas(struct tdmr_info *tdmr,
++					      int *rsvd_idx)
 +{
 +	struct tdx_memblock *tmb;
++	u64 prev_end;
++	int ret;
 +
-+	/* Find the first memory region covered by the TDMR */
++	/* Mark holes between memory regions as reserved */
++	prev_end = tdmr_start(tdmr);
 +	list_for_each_entry(tmb, &tdx_memlist, list) {
-+		if (tmb->end_pfn > (tdmr_start(tdmr) >> PAGE_SHIFT))
-+			return tmb->nid;
-+	}
++		u64 start, end;
 +
-+	/*
-+	 * Fall back to allocating the TDMR's metadata from node 0 when
-+	 * no TDX memory block can be found.  This should never happen
-+	 * since TDMRs originate from TDX memory blocks.
-+	 */
-+	WARN_ON_ONCE(1);
-+	return 0;
-+}
++		start = tmb->start_pfn << PAGE_SHIFT;
++		end = tmb->end_pfn << PAGE_SHIFT;
 +
-+static int tdmr_set_up_pamt(struct tdmr_info *tdmr)
-+{
-+	unsigned long pamt_base[TDX_PG_LEVEL_NUM];
-+	unsigned long pamt_size[TDX_PG_LEVEL_NUM];
-+	unsigned long tdmr_pamt_base;
-+	unsigned long tdmr_pamt_size;
-+	enum tdx_pg_level pgsz;
-+	struct page *pamt;
-+	int nid;
++		/* Break if this region is after the TDMR */
++		if (start >= tdmr_end(tdmr))
++			break;
 +
-+	nid = tdmr_get_nid(tdmr);
++		/* Exclude regions before this TDMR */
++		if (end < tdmr_start(tdmr))
++			continue;
 +
-+	/*
-+	 * Calculate the PAMT size for each TDX supported page size
-+	 * and the total PAMT size.
-+	 */
-+	tdmr_pamt_size = 0;
-+	for (pgsz = TDX_PG_LEVEL_4K; pgsz < TDX_PG_LEVEL_NUM; pgsz++) {
-+		pamt_size[pgsz] = tdmr_get_pamt_sz(tdmr, pgsz);
-+		tdmr_pamt_size += pamt_size[pgsz];
-+	}
++		/*
++		 * Skip if no hole exists before this region. "<=" is
++		 * used because one memory region might span two TDMRs
++		 * (when the previous TDMR covers part of this region).
++		 * In this case the start address of this region is
++		 * smaller than the start address of the second TDMR.
++		 *
++		 * Update the prev_end to the end of this region where
++		 * the possible memory hole starts.
++		 */
++		if (start <= prev_end) {
++			prev_end = end;
++			continue;
++		}
 +
-+	/*
-+	 * Allocate one chunk of physically contiguous memory for all
-+	 * PAMTs.  This helps minimize the PAMT's use of reserved areas
-+	 * in overlapped TDMRs.
-+	 */
-+	pamt = alloc_contig_pages(tdmr_pamt_size >> PAGE_SHIFT, GFP_KERNEL,
-+			nid, &node_online_map);
-+	if (!pamt)
-+		return -ENOMEM;
-+
-+	/*
-+	 * Break the contiguous allocation back up into the
-+	 * individual PAMTs for each page size.
-+	 */
-+	tdmr_pamt_base = page_to_pfn(pamt) << PAGE_SHIFT;
-+	for (pgsz = TDX_PG_LEVEL_4K; pgsz < TDX_PG_LEVEL_NUM; pgsz++) {
-+		pamt_base[pgsz] = tdmr_pamt_base;
-+		tdmr_pamt_base += pamt_size[pgsz];
-+	}
-+
-+	tdmr->pamt_4k_base = pamt_base[TDX_PG_LEVEL_4K];
-+	tdmr->pamt_4k_size = pamt_size[TDX_PG_LEVEL_4K];
-+	tdmr->pamt_2m_base = pamt_base[TDX_PG_LEVEL_2M];
-+	tdmr->pamt_2m_size = pamt_size[TDX_PG_LEVEL_2M];
-+	tdmr->pamt_1g_base = pamt_base[TDX_PG_LEVEL_1G];
-+	tdmr->pamt_1g_size = pamt_size[TDX_PG_LEVEL_1G];
-+
-+	return 0;
-+}
-+
-+static void tdmr_get_pamt(struct tdmr_info *tdmr, unsigned long *pamt_pfn,
-+			  unsigned long *pamt_npages)
-+{
-+	unsigned long pamt_base, pamt_sz;
-+
-+	/*
-+	 * The PAMT was allocated in one contiguous unit.  The 4K PAMT
-+	 * should always point to the beginning of that allocation.
-+	 */
-+	pamt_base = tdmr->pamt_4k_base;
-+	pamt_sz = tdmr->pamt_4k_size + tdmr->pamt_2m_size + tdmr->pamt_1g_size;
-+
-+	*pamt_pfn = pamt_base >> PAGE_SHIFT;
-+	*pamt_npages = pamt_sz >> PAGE_SHIFT;
-+}
-+
-+static void tdmr_free_pamt(struct tdmr_info *tdmr)
-+{
-+	unsigned long pamt_pfn, pamt_npages;
-+
-+	tdmr_get_pamt(tdmr, &pamt_pfn, &pamt_npages);
-+
-+	/* Do nothing if PAMT hasn't been allocated for this TDMR */
-+	if (!pamt_npages)
-+		return;
-+
-+	if (WARN_ON_ONCE(!pamt_pfn))
-+		return;
-+
-+	free_contig_range(pamt_pfn, pamt_npages);
-+}
-+
-+static void tdmrs_free_pamt_all(struct tdmr_info *tdmr_array, int tdmr_num)
-+{
-+	int i;
-+
-+	for (i = 0; i < tdmr_num; i++)
-+		tdmr_free_pamt(tdmr_array_entry(tdmr_array, i));
-+}
-+
-+/* Allocate and set up PAMTs for all TDMRs */
-+static int tdmrs_set_up_pamt_all(struct tdmr_info *tdmr_array, int tdmr_num)
-+{
-+	int i, ret = 0;
-+
-+	for (i = 0; i < tdmr_num; i++) {
-+		ret = tdmr_set_up_pamt(tdmr_array_entry(tdmr_array, i));
++		/* Add the hole before this region */
++		ret = tdmr_add_rsvd_area(tdmr, rsvd_idx, prev_end,
++				start - prev_end);
 +		if (ret)
-+			goto err;
++			return ret;
++
++		prev_end = end;
++	}
++
++	/* Add the hole after the last region if it exists. */
++	if (prev_end < tdmr_end(tdmr)) {
++		ret = tdmr_add_rsvd_area(tdmr, rsvd_idx, prev_end,
++				tdmr_end(tdmr) - prev_end);
++		if (ret)
++			return ret;
 +	}
 +
 +	return 0;
-+err:
-+	tdmrs_free_pamt_all(tdmr_array, tdmr_num);
-+	return ret;
 +}
 +
-+static unsigned long tdmrs_count_pamt_pages(struct tdmr_info *tdmr_array,
-+					  int tdmr_num)
++static int tdmr_set_up_pamt_rsvd_areas(struct tdmr_info *tdmr, int *rsvd_idx,
++				       struct tdmr_info *tdmr_array,
++				       int tdmr_num)
 +{
-+	unsigned long pamt_npages = 0;
++	int i, ret;
++
++	/*
++	 * If any PAMT overlaps with this TDMR, the overlapping part
++	 * must also be put to the reserved area too.  Walk over all
++	 * TDMRs to find out those overlapping PAMTs and put them to
++	 * reserved areas.
++	 */
++	for (i = 0; i < tdmr_num; i++) {
++		struct tdmr_info *tmp = tdmr_array_entry(tdmr_array, i);
++		unsigned long pamt_start_pfn, pamt_npages;
++		u64 pamt_start, pamt_end;
++
++		tdmr_get_pamt(tmp, &pamt_start_pfn, &pamt_npages);
++		/* Each TDMR must already have PAMT allocated */
++		WARN_ON_ONCE(!pamt_npages || !pamt_start_pfn);
++
++		pamt_start = pamt_start_pfn << PAGE_SHIFT;
++		pamt_end = pamt_start + (pamt_npages << PAGE_SHIFT);
++
++		/* Skip PAMTs outside of the given TDMR */
++		if ((pamt_end <= tdmr_start(tdmr)) ||
++				(pamt_start >= tdmr_end(tdmr)))
++			continue;
++
++		/* Only mark the part within the TDMR as reserved */
++		if (pamt_start < tdmr_start(tdmr))
++			pamt_start = tdmr_start(tdmr);
++		if (pamt_end > tdmr_end(tdmr))
++			pamt_end = tdmr_end(tdmr);
++
++		ret = tdmr_add_rsvd_area(tdmr, rsvd_idx, pamt_start,
++				pamt_end - pamt_start);
++		if (ret)
++			return ret;
++	}
++
++	return 0;
++}
++
++/* Compare function called by sort() for TDMR reserved areas */
++static int rsvd_area_cmp_func(const void *a, const void *b)
++{
++	struct tdmr_reserved_area *r1 = (struct tdmr_reserved_area *)a;
++	struct tdmr_reserved_area *r2 = (struct tdmr_reserved_area *)b;
++
++	if (r1->offset + r1->size <= r2->offset)
++		return -1;
++	if (r1->offset >= r2->offset + r2->size)
++		return 1;
++
++	/* Reserved areas cannot overlap.  The caller should guarantee. */
++	WARN_ON_ONCE(1);
++	return -1;
++}
++
++/* Set up reserved areas for a TDMR, including memory holes and PAMTs */
++static int tdmr_set_up_rsvd_areas(struct tdmr_info *tdmr,
++				  struct tdmr_info *tdmr_array,
++				  int tdmr_num)
++{
++	int ret, rsvd_idx = 0;
++
++	/* Put all memory holes within the TDMR into reserved areas */
++	ret = tdmr_set_up_memory_hole_rsvd_areas(tdmr, &rsvd_idx);
++	if (ret)
++		return ret;
++
++	/* Put all (overlapping) PAMTs within the TDMR into reserved areas */
++	ret = tdmr_set_up_pamt_rsvd_areas(tdmr, &rsvd_idx, tdmr_array, tdmr_num);
++	if (ret)
++		return ret;
++
++	/* TDX requires reserved areas listed in address ascending order */
++	sort(tdmr->reserved_areas, rsvd_idx, sizeof(struct tdmr_reserved_area),
++			rsvd_area_cmp_func, NULL);
++
++	return 0;
++}
++
++static int tdmrs_set_up_rsvd_areas_all(struct tdmr_info *tdmr_array,
++				       int tdmr_num)
++{
 +	int i;
 +
 +	for (i = 0; i < tdmr_num; i++) {
-+		unsigned long pfn, npages;
++		int ret;
 +
-+		tdmr_get_pamt(tdmr_array_entry(tdmr_array, i), &pfn, &npages);
-+		pamt_npages += npages;
++		ret = tdmr_set_up_rsvd_areas(tdmr_array_entry(tdmr_array, i),
++				tdmr_array, tdmr_num);
++		if (ret)
++			return ret;
 +	}
 +
-+	return pamt_npages;
++	return 0;
 +}
 +
  /*
   * Construct an array of TDMRs to cover all TDX memory ranges.
   * The actual number of TDMRs is kept to @tdmr_num.
-@@ -681,8 +864,13 @@ static int construct_tdmrs(struct tdmr_info *tdmr_array, int *tdmr_num)
+@@ -868,8 +1050,12 @@ static int construct_tdmrs(struct tdmr_info *tdmr_array, int *tdmr_num)
  	if (ret)
  		goto err;
  
-+	ret = tdmrs_set_up_pamt_all(tdmr_array, *tdmr_num);
+-	/* Return -EINVAL until constructing TDMRs is done */
+-	ret = -EINVAL;
++	ret = tdmrs_set_up_rsvd_areas_all(tdmr_array, *tdmr_num);
 +	if (ret)
-+		goto err;
++		goto err_free_pamts;
 +
- 	/* Return -EINVAL until constructing TDMRs is done */
- 	ret = -EINVAL;
-+	tdmrs_free_pamt_all(tdmr_array, *tdmr_num);
++	return 0;
++err_free_pamts:
+ 	tdmrs_free_pamt_all(tdmr_array, *tdmr_num);
  err:
  	return ret;
- }
-@@ -744,6 +932,11 @@ static int init_tdx_module(void)
- 	 * process are done.
- 	 */
- 	ret = -EINVAL;
-+	if (ret)
-+		tdmrs_free_pamt_all(tdmr_array, tdmr_num);
-+	else
-+		pr_info("%lu pages allocated for PAMT.\n",
-+				tdmrs_count_pamt_pages(tdmr_array, tdmr_num));
- out_free_tdmrs:
- 	/*
- 	 * The array of TDMRs is freed no matter the initialization is
 -- 
 2.37.3
 
