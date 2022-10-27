@@ -2,192 +2,301 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 72F326102B2
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 22:31:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8835A6102BD
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 22:33:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236890AbiJ0UbA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 16:31:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40480 "EHLO
+        id S236615AbiJ0UdW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 16:33:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235350AbiJ0Ua5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 16:30:57 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2253C6F26C
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 13:30:56 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id d3so5535756ljl.1
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 13:30:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=RJhLmmsZGJ8bUFvXGrjhxjigTY7tssuM34NIcqRQJks=;
-        b=ko4N/PqiVlcVf7rPdTn90/c1YL7CHD4kbLrdcKcGWYTUUSMtlKMiKyWHA+wDDKm3Ri
-         9e+QndcW1iHPHRjxD1ZSz74bPfh7+NQfvegupvFlxKBAE57swePOCKRNOtu8w+V5/LIh
-         oxfHuONcO0Ik1awpXYSMKm5/Us+dUNf4euurzQPxHHKyJd0J2aZg6aMTq63yWe/zpUHR
-         BdwcHWaYJTXY9nY7H0cZ5ZFnP+HjhVQMyXizdrg693dGmkkh+NZ1U3pB4zQGTKXjYAq1
-         O+7ty+Tq6vl57BKFDpOmZSjo8wIv9q+d+D2+wILbB19dg5S/gJyRJ3rpAwvrWr8JlqCE
-         oGcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RJhLmmsZGJ8bUFvXGrjhxjigTY7tssuM34NIcqRQJks=;
-        b=Mkm1T4NbLXotrjeuXhfWNCa2GgrFQ1HUgdvlJPVcDl6HbwdCSo0P7Bphsrs1oAtLQ7
-         tAiWeZq8WAsi479VUqT9oDs7YM77Xus2KRYX+6wHLY03Kv4sxPzDEuiifqDxhHyWLr3l
-         UV2MNNstnyVTcpt4lh97fAkrWqsSNAjDIAAnLJEELOL+zWg/+3RwGhRn5a0c6dClNop5
-         f07DSzxKJtFY6rg3ciQBhRF65gSjrJbVTdM+QsafRgcgj9ry/d6UuLAlshnWftvnBLk/
-         IFAzmmaQX46iory2BkIR/Vxu3yItxvcHdshEw6u7vDpIVrdOrUHfAB43IZ7HxEBMejI6
-         KEdw==
-X-Gm-Message-State: ACrzQf3VoW2wGgsyF/fzCcrRmCtR/9/E5Ku/moro3/2jqkus51YKoHxJ
-        LOD9WIefI4ua1s7oz1vafHKTeOg3GE4l7QMUW5CN0A==
-X-Google-Smtp-Source: AMsMyM5aP9GDCjgbJ8RdmCuiz8kw86pAQT51ja8FqsFb2OPVlHcT9WXJ4I4mEt7VBa1Y42QK1pGfOAzB7FUqg0u98iE=
-X-Received: by 2002:a05:651c:1a0a:b0:26f:ef12:9a42 with SMTP id
- by10-20020a05651c1a0a00b0026fef129a42mr20984010ljb.457.1666902654247; Thu, 27
- Oct 2022 13:30:54 -0700 (PDT)
-MIME-Version: 1.0
-References: <20221027150558.722062-1-pgonda@google.com> <20221027150558.722062-2-pgonda@google.com>
- <10e7e8df-69ba-c1bc-1f94-c77fe64774ab@amd.com> <CAMkAt6qzW0oW=2Mvq0uO+ccwRyYcRAkDoF47mH4hMET5wASzsQ@mail.gmail.com>
-In-Reply-To: <CAMkAt6qzW0oW=2Mvq0uO+ccwRyYcRAkDoF47mH4hMET5wASzsQ@mail.gmail.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Thu, 27 Oct 2022 14:30:42 -0600
-Message-ID: <CAMkAt6oWmX7iOe_vFKyrRZRbiyuNjO6GoSjSqExc5VPKcnOtDg@mail.gmail.com>
-Subject: Re: [PATCH V3 1/2] virt: sev: Prevent IV reuse in SNP guest driver
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Dionna Glaze <dionnaglaze@google.com>,
-        Borislav Petkov <bp@suse.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Haowen Bai <baihaowen@meizu.com>,
-        Yang Yingliang <yangyingliang@huawei.com>,
-        Marc Orr <marcorr@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+        with ESMTP id S233652AbiJ0UdV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 16:33:21 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7940900FE;
+        Thu, 27 Oct 2022 13:33:19 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29RKLLtl005486;
+        Thu, 27 Oct 2022 20:32:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=dM2hsnX47ZoLplJ4JmIomkgCl3XslJUxMwPDn3gg6fI=;
+ b=A1G6ehq7TcAvEAGgteuqhJwICyHXJWV7fmU/ECwfFTUMPFdJ1e8VyCdN9syDSZRj+xIO
+ bAOck/Ws8PdxysZbU9rBlAWK2jbx3RUWqhI0dxrtUJERhMaICDkAQwI7v0jzD90YgFbt
+ dfs4vvEZccENA2cqzdyxqhAPbllUP1C027nQWnHmcHUinLNYnKblenbtCt49pDbifAZ7
+ WeAgrp8Wwd0Av9BHcMo5EvkcFmoNivSYn4csEei14EDIfYO0g7wiaHJLr8ar//6Eu3PZ
+ lgvRkCQWtaHL3mRWSklvzBE4uQnvUuoTLRH8LKmEvncy7pqg0qswfZ8qkNujPq/m5OYv fg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kg0xw08tp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Oct 2022 20:32:12 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29RKMlPc008303;
+        Thu, 27 Oct 2022 20:32:11 GMT
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kg0xw08t3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Oct 2022 20:32:11 +0000
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29RKKK9w018187;
+        Thu, 27 Oct 2022 20:32:10 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma03dal.us.ibm.com with ESMTP id 3kfahg9jrp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Oct 2022 20:32:10 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com ([9.208.128.112])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29RKW8PG20316692
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Oct 2022 20:32:09 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9778A58054;
+        Thu, 27 Oct 2022 20:32:08 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3C8845806F;
+        Thu, 27 Oct 2022 20:32:04 +0000 (GMT)
+Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.65.225.56])
+        by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 27 Oct 2022 20:32:04 +0000 (GMT)
+Message-ID: <f5f4587f57db7f59d027bd5e1068e4eb7eaa5937.camel@linux.ibm.com>
+Subject: Re: [PATCH v1 1/7] vfio/ccw: create a parent struct
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>, Yi Liu <yi.l.liu@intel.com>
+Cc:     Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+        David Airlie <airlied@gmail.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Abhishek Sahu <abhsahu@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Date:   Thu, 27 Oct 2022 16:32:03 -0400
+In-Reply-To: <20221019162135.798901-2-farman@linux.ibm.com>
+References: <20221019162135.798901-1-farman@linux.ibm.com>
+         <20221019162135.798901-2-farman@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+MIME-Version: 1.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: b9a5tNzuBGRLtA3kALPGwvTcH48TI_1S
+X-Proofpoint-GUID: cupFNfORx_mLBlYT75b3yNAP0T6TuJX9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-27_07,2022-10-27_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=999
+ mlxscore=0 bulkscore=0 priorityscore=1501 spamscore=0 malwarescore=0
+ impostorscore=0 phishscore=0 suspectscore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2210270112
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 27, 2022 at 2:10 PM Peter Gonda <pgonda@google.com> wrote:
->
-> On Thu, Oct 27, 2022 at 12:06 PM Tom Lendacky <thomas.lendacky@amd.com> wrote:
-> >
-> > On 10/27/22 10:05, Peter Gonda wrote:
-> > > The ASP and an SNP guest use a series of AES-GCM keys called VMPCKs to
-> > > communicate securely with each other. The IV to this scheme is a
-> > > sequence number that both the ASP and the guest track. Currently this
-> > > sequence number in a guest request must exactly match the sequence
-> > > number tracked by the ASP. This means that if the guest sees an error
-> > > from the host during a request it can only retry that exact request or
-> > > disable the VMPCK to prevent an IV reuse. AES-GCM cannot tolerate IV
-> > > reuse see:
-> > > https://csrc.nist.gov/csrc/media/projects/block-cipher-techniques/documents/bcm/comments/800-38-series-drafts/gcm/joux_comments.pdf
-> > >
-> > > To handle userspace querying the cert_data length. Instead of requesting
-> > > the cert length from userspace use the size of the drivers allocated
-> > > shared buffer. Then copy that buffer to userspace, or give userspace an
-> > > error depending on the size of the buffer given by userspace.
-> > >
-> > > Fixes: fce96cf044308 ("virt: Add SEV-SNP guest driver")
-> > > Signed-off-by: Peter Gonda <pgonda@google.com>
-> > > Reported-by: Peter Gonda <pgonda@google.com>
-> > > Reviewed-by: Dionna Glaze <dionnaglaze@google.com>
-> > > Cc: Borislav Petkov <bp@suse.de>
-> > > Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> > > Cc: Michael Roth <michael.roth@amd.com>
-> > > Cc: Haowen Bai <baihaowen@meizu.com>
-> > > Cc: Yang Yingliang <yangyingliang@huawei.com>
-> > > Cc: Marc Orr <marcorr@google.com>
-> > > Cc: David Rientjes <rientjes@google.com>
-> > > Cc: Ashish Kalra <Ashish.Kalra@amd.com>
-> > > Cc: linux-kernel@vger.kernel.org
-> > > Cc: kvm@vger.kernel.org
-> > > ---
-> > >   drivers/virt/coco/sev-guest/sev-guest.c | 93 ++++++++++++++++---------
-> > >   1 file changed, 62 insertions(+), 31 deletions(-)
-> > >
-> > > diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
-> > > index f422f9c58ba7..8c54ea84bc57 100644
-> > > --- a/drivers/virt/coco/sev-guest/sev-guest.c
-> > > +++ b/drivers/virt/coco/sev-guest/sev-guest.c
-> > > @@ -41,7 +41,7 @@ struct snp_guest_dev {
-> > >       struct device *dev;
-> > >       struct miscdevice misc;
-> > >
-> > > -     void *certs_data;
-> > > +     u8 (*certs_data)[SEV_FW_BLOB_MAX_SIZE];
-> > >       struct snp_guest_crypto *crypto;
-> > >       struct snp_guest_msg *request, *response;
-> > >       struct snp_secrets_page_layout *layout;
-> > > @@ -67,8 +67,27 @@ static bool is_vmpck_empty(struct snp_guest_dev *snp_dev)
-> > >       return true;
-> > >   }
-> > >
-> > > +/*
-> > > + * If we receive an error from the host or ASP we have two options. We can
-> > > + * either retry the exact same encrypted request or we can discontinue using the
-> > > + * VMPCK.
-> > > + *
-> > > + * This is because in the current encryption scheme GHCB v2 uses AES-GCM to
-> > > + * encrypt the requests. The IV for this scheme is the sequence number. GCM
-> > > + * cannot tolerate IV reuse.
-> > > + *
-> > > + * The ASP FW v1.51 only increments the sequence numbers on a successful
-> > > + * guest<->ASP back and forth and only accepts messages at its exact sequence
-> > > + * number.
-> > > + *
-> > > + * So if we were to reuse the sequence number the encryption scheme is
-> > > + * vulnerable. If we encrypt the sequence number for a fresh IV the ASP will
-> > > + * reject our request.
-> > > + */
-> > >   static void snp_disable_vmpck(struct snp_guest_dev *snp_dev)
-> > >   {
-> > > +     dev_alert(snp_dev->dev, "Disabling vmpck_id: %d to prevent IV reuse.\n",
-> > > +               vmpck_id);
-> > >       memzero_explicit(snp_dev->vmpck, VMPCK_KEY_LEN);
-> > >       snp_dev->vmpck = NULL;
-> > >   }
-> > > @@ -326,29 +345,29 @@ static int handle_guest_request(struct snp_guest_dev *snp_dev, u64 exit_code, in
-> > >       if (fw_err)
-> > >               *fw_err = err;
-> > >
-> > > -     if (rc)
-> > > -             return rc;
-> > > +     if (rc) {
-> > > +             dev_alert(snp_dev->dev,
-> > > +                       "Detected error from ASP request. rc: %d, fw_err: %llu\n",
-> > > +                       rc, *fw_err);
-> > > +             goto disable_vmpck;
-> > > +     }
-> >
-> > Realize that snp_issue_guest_request() will return -EIO in the case that
-> > the returned SW_EXITINFO2 value is SNP_GUEST_REQ_INVALID_LEN. So all the
-> > work you do below in get_ext_report() doesn't matter because you end up
-> > disabling the key here.
-> >
-> > So maybe this patch should be split up and parts of it added to the second
-> > patch (but that patch seems like it would still hit this issue because
-> > -EIO is still returned.
-> >
->
-> Ack I see that. My testing didn't catch this since I realized I didn't
-> actually load any certificate data into the host. After doing so my
-> testing catches this bug.
->
-> I agree with Dionna's comments on 2/2. My suggestion would be to keep
-> the constraint that either handle_guest_request() leaves the sequence
-> number in a good state or disables the VMPCK. After seeing her V4
-> series I suggest we take this patch and follow up on the certificate
-> querying with the further changes to snp_issue_guest_request().
-> Thoughts?
+T24gV2VkLCAyMDIyLTEwLTE5IGF0IDE4OjIxICswMjAwLCBFcmljIEZhcm1hbiB3cm90ZToKPiBN
+b3ZlIHRoZSBzdHVmZiBhc3NvY2lhdGVkIHdpdGggdGhlIG1kZXYgcGFyZW50IChhbmQgdGh1cyB0
+aGUKPiBzdWJjaGFubmVsIHN0cnVjdCkgaW50byBpdHMgb3duIHN0cnVjdCwgYW5kIGxlYXZlIHRo
+ZSByZXN0IGluCj4gdGhlIGV4aXN0aW5nIHByaXZhdGUgc3RydWN0dXJlLgo+IAo+IFRoZSBzdWJj
+aGFubmVsIHdpbGwgcG9pbnQgdG8gdGhlIHBhcmVudCwgYW5kIHRoZSBwYXJlbnQgd2lsbCBwb2lu
+dAo+IHRvIHRoZSBwcml2YXRlLCBmb3IgdGhlIGFyZWFzIHdoZXJlIG9uZSBvciBib3RoIGFyZSBu
+ZWVkZWQuIEZ1cnRoZXIKPiBzZXBhcmF0aW9uIG9mIHRoZXNlIHN0cnVjdHMgd2lsbCBmb2xsb3cu
+Cj4gCj4gU2lnbmVkLW9mZi1ieTogRXJpYyBGYXJtYW4gPGZhcm1hbkBsaW51eC5pYm0uY29tPgo+
+IC0tLQo+IMKgZHJpdmVycy9zMzkwL2Npby92ZmlvX2Njd19kcnYuY8KgwqDCoMKgIHwgMTA0ICsr
+KysrKysrKysrKysrKysrKysrLS0tLS0tCj4gLS0KPiDCoGRyaXZlcnMvczM5MC9jaW8vdmZpb19j
+Y3dfb3BzLmPCoMKgwqDCoCB8wqDCoCA5ICsrLQo+IMKgZHJpdmVycy9zMzkwL2Npby92ZmlvX2Nj
+d19wYXJlbnQuaMKgIHzCoCAyOCArKysrKysrKwo+IMKgZHJpdmVycy9zMzkwL2Npby92ZmlvX2Nj
+d19wcml2YXRlLmggfMKgwqAgNSAtLQo+IMKgNCBmaWxlcyBjaGFuZ2VkLCAxMTIgaW5zZXJ0aW9u
+cygrKSwgMzQgZGVsZXRpb25zKC0pCj4gwqBjcmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy9zMzkw
+L2Npby92ZmlvX2Njd19wYXJlbnQuaAo+IAo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3MzOTAvY2lv
+L3ZmaW9fY2N3X2Rydi5jCj4gYi9kcml2ZXJzL3MzOTAvY2lvL3ZmaW9fY2N3X2Rydi5jCj4gaW5k
+ZXggN2Y1NDAyZmU4NTdhLi42MzQ3NjBjYTBkZWEgMTAwNjQ0Cj4gLS0tIGEvZHJpdmVycy9zMzkw
+L2Npby92ZmlvX2Njd19kcnYuYwo+ICsrKyBiL2RyaXZlcnMvczM5MC9jaW8vdmZpb19jY3dfZHJ2
+LmMKCi4uLnNuaXAuLi4KCj4gQEAgLTIxMywxOCArMjQxLDI4IEBAIHN0YXRpYyBpbnQgdmZpb19j
+Y3dfc2NoX3Byb2JlKHN0cnVjdCBzdWJjaGFubmVsCj4gKnNjaCkKPiDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoHJldHVybiAtRU5PREVWOwo+IMKgwqDCoMKgwqDCoMKgwqB9Cj4gwqAK
+PiArwqDCoMKgwqDCoMKgwqBwYXJlbnQgPSBremFsbG9jKHNpemVvZigqcGFyZW50KSwgR0ZQX0tF
+Uk5FTCk7Cj4gK8KgwqDCoMKgwqDCoMKgaWYgKElTX0VSUihwYXJlbnQpKQo+ICvCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gUFRSX0VSUihwYXJlbnQpOwo+ICsKPiArwqDCoMKg
+wqDCoMKgwqBwYXJlbnQtPmRldi5yZWxlYXNlID0gJnZmaW9fY2N3X2ZyZWVfcGFyZW50Owo+ICvC
+oMKgwqDCoMKgwqDCoGRldmljZV9pbml0aWFsaXplKCZwYXJlbnQtPmRldik7Cj4gKwoKT29wcy4g
+VGhpcyBzaG91bGQgZWl0aGVyIGJlIGRldmljZV9yZWdpc3Rlciwgb3IgSSBuZWVkZWQgYSBkZXZp
+Y2VfYWRkCnNvbWV3aGVyZSBhbG9uZyB0aGUgd2F5LiBUaGVyZSdzIG5vIG5lZWQgdG8gc2VwYXJh
+dGUgdGhlbSwgc28gdGhlCmZvcm1lciBpcyBwcm9iYWJseSBiZXR0ZXIsIGJ1dCBJIHN0aWxsIG5l
+ZWQgc29tZSBhZGRpdGlvbmFsIGxvZ2ljIHRvCmxpbmsgdGhpcyBiYWNrIHRvIHRoZSBjc3MgZHJp
+dmVyLgoKPiDCoMKgwqDCoMKgwqDCoMKgcHJpdmF0ZSA9IHZmaW9fY2N3X2FsbG9jX3ByaXZhdGUo
+c2NoKTsKPiAtwqDCoMKgwqDCoMKgwqBpZiAoSVNfRVJSKHByaXZhdGUpKQo+ICvCoMKgwqDCoMKg
+wqDCoGlmIChJU19FUlIocHJpdmF0ZSkpIHsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgcHV0X2RldmljZSgmcGFyZW50LT5kZXYpOwo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgcmV0dXJuIFBUUl9FUlIocHJpdmF0ZSk7Cj4gK8KgwqDCoMKgwqDCoMKgfQo+IMKgCj4g
+LcKgwqDCoMKgwqDCoMKgZGV2X3NldF9kcnZkYXRhKCZzY2gtPmRldiwgcHJpdmF0ZSk7Cj4gK8Kg
+wqDCoMKgwqDCoMKgZGV2X3NldF9kcnZkYXRhKCZzY2gtPmRldiwgcGFyZW50KTsKPiArwqDCoMKg
+wqDCoMKgwqBkZXZfc2V0X2RydmRhdGEoJnBhcmVudC0+ZGV2LCBwcml2YXRlKTsKPiDCoAo+IC3C
+oMKgwqDCoMKgwqDCoHByaXZhdGUtPm1kZXZfdHlwZS5zeXNmc19uYW1lID0gImlvIjsKPiAtwqDC
+oMKgwqDCoMKgwqBwcml2YXRlLT5tZGV2X3R5cGUucHJldHR5X25hbWUgPSAiSS9PIHN1YmNoYW5u
+ZWwgKE5vbi1RRElPKSI7Cj4gLcKgwqDCoMKgwqDCoMKgcHJpdmF0ZS0+bWRldl90eXBlc1swXSA9
+ICZwcml2YXRlLT5tZGV2X3R5cGU7Cj4gLcKgwqDCoMKgwqDCoMKgcmV0ID0gbWRldl9yZWdpc3Rl
+cl9wYXJlbnQoJnByaXZhdGUtPnBhcmVudCwgJnNjaC0+ZGV2LAo+ICvCoMKgwqDCoMKgwqDCoHBh
+cmVudC0+bWRldl90eXBlLnN5c2ZzX25hbWUgPSAiaW8iOwo+ICvCoMKgwqDCoMKgwqDCoHBhcmVu
+dC0+bWRldl90eXBlLnByZXR0eV9uYW1lID0gIkkvTyBzdWJjaGFubmVsIChOb24tUURJTykiOwo+
+ICvCoMKgwqDCoMKgwqDCoHBhcmVudC0+bWRldl90eXBlc1swXSA9ICZwYXJlbnQtPm1kZXZfdHlw
+ZTsKPiArwqDCoMKgwqDCoMKgwqByZXQgPSBtZGV2X3JlZ2lzdGVyX3BhcmVudCgmcGFyZW50LT5w
+YXJlbnQsICZzY2gtPmRldiwKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAmdmZpb19jY3dfbWRldl9kcml2ZXIsCj4g
+LcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoCBwcml2YXRlLT5tZGV2X3R5cGVzLCAxKTsKPiArwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHBhcmVudC0+
+bWRldl90eXBlcywgMSk7Cj4gwqDCoMKgwqDCoMKgwqDCoGlmIChyZXQpCj4gwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqBnb3RvIG91dF9mcmVlOwo+IMKgCj4gQEAgLTIzNCwyMCArMjcy
+LDI0IEBAIHN0YXRpYyBpbnQgdmZpb19jY3dfc2NoX3Byb2JlKHN0cnVjdCBzdWJjaGFubmVsCj4g
+KnNjaCkKPiDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIDA7Cj4gwqAKPiDCoG91dF9mcmVlOgo+ICvC
+oMKgwqDCoMKgwqDCoGRldl9zZXRfZHJ2ZGF0YSgmcGFyZW50LT5kZXYsIE5VTEwpOwo+IMKgwqDC
+oMKgwqDCoMKgwqBkZXZfc2V0X2RydmRhdGEoJnNjaC0+ZGV2LCBOVUxMKTsKPiDCoMKgwqDCoMKg
+wqDCoMKgdmZpb19jY3dfZnJlZV9wcml2YXRlKHByaXZhdGUpOwo+ICvCoMKgwqDCoMKgwqDCoHB1
+dF9kZXZpY2UoJnBhcmVudC0+ZGV2KTsKPiDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIHJldDsKPiDC
+oH0KPiDCoAo+IMKgc3RhdGljIHZvaWQgdmZpb19jY3dfc2NoX3JlbW92ZShzdHJ1Y3Qgc3ViY2hh
+bm5lbCAqc2NoKQo+IMKgewo+IC3CoMKgwqDCoMKgwqDCoHN0cnVjdCB2ZmlvX2Njd19wcml2YXRl
+ICpwcml2YXRlID0gZGV2X2dldF9kcnZkYXRhKCZzY2gtCj4gPmRldik7Cj4gK8KgwqDCoMKgwqDC
+oMKgc3RydWN0IHZmaW9fY2N3X3BhcmVudCAqcGFyZW50ID0gZGV2X2dldF9kcnZkYXRhKCZzY2gt
+PmRldik7Cj4gK8KgwqDCoMKgwqDCoMKgc3RydWN0IHZmaW9fY2N3X3ByaXZhdGUgKnByaXZhdGUg
+PSBkZXZfZ2V0X2RydmRhdGEoJnBhcmVudC0KPiA+ZGV2KTsKPiDCoAo+IC3CoMKgwqDCoMKgwqDC
+oG1kZXZfdW5yZWdpc3Rlcl9wYXJlbnQoJnByaXZhdGUtPnBhcmVudCk7Cj4gK8KgwqDCoMKgwqDC
+oMKgbWRldl91bnJlZ2lzdGVyX3BhcmVudCgmcGFyZW50LT5wYXJlbnQpOwo+IMKgCj4gwqDCoMKg
+wqDCoMKgwqDCoGRldl9zZXRfZHJ2ZGF0YSgmc2NoLT5kZXYsIE5VTEwpOwo+IMKgCj4gwqDCoMKg
+wqDCoMKgwqDCoHZmaW9fY2N3X2ZyZWVfcHJpdmF0ZShwcml2YXRlKTsKPiArwqDCoMKgwqDCoMKg
+wqBwdXRfZGV2aWNlKCZwYXJlbnQtPmRldik7Cj4gwqAKPiDCoMKgwqDCoMKgwqDCoMKgVkZJT19D
+Q1dfTVNHX0VWRU5UKDQsICJ1bmJvdW5kIGZyb20gc3ViY2hhbm5lbCAleC4leC4lMDR4XG4iLAo+
+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc2No
+LT5zY2hpZC5jc3NpZCwgc2NoLT5zY2hpZC5zc2lkLAo+IEBAIC0yNTYsNyArMjk4LDExIEBAIHN0
+YXRpYyB2b2lkIHZmaW9fY2N3X3NjaF9yZW1vdmUoc3RydWN0Cj4gc3ViY2hhbm5lbCAqc2NoKQo+
+IMKgCj4gwqBzdGF0aWMgdm9pZCB2ZmlvX2Njd19zY2hfc2h1dGRvd24oc3RydWN0IHN1YmNoYW5u
+ZWwgKnNjaCkKPiDCoHsKPiAtwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgdmZpb19jY3dfcHJpdmF0ZSAq
+cHJpdmF0ZSA9IGRldl9nZXRfZHJ2ZGF0YSgmc2NoLQo+ID5kZXYpOwo+ICvCoMKgwqDCoMKgwqDC
+oHN0cnVjdCB2ZmlvX2Njd19wYXJlbnQgKnBhcmVudCA9IGRldl9nZXRfZHJ2ZGF0YSgmc2NoLT5k
+ZXYpOwo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCB2ZmlvX2Njd19wcml2YXRlICpwcml2YXRlID0g
+ZGV2X2dldF9kcnZkYXRhKCZwYXJlbnQtCj4gPmRldik7Cj4gKwo+ICvCoMKgwqDCoMKgwqDCoGlm
+IChXQVJOX09OKCFwcml2YXRlKSkKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmV0
+dXJuOwo+IMKgCj4gwqDCoMKgwqDCoMKgwqDCoHZmaW9fY2N3X2ZzbV9ldmVudChwcml2YXRlLCBW
+RklPX0NDV19FVkVOVF9DTE9TRSk7Cj4gwqDCoMKgwqDCoMKgwqDCoHZmaW9fY2N3X2ZzbV9ldmVu
+dChwcml2YXRlLCBWRklPX0NDV19FVkVOVF9OT1RfT1BFUik7Cj4gQEAgLTI3NCw3ICszMjAsOCBA
+QCBzdGF0aWMgdm9pZCB2ZmlvX2Njd19zY2hfc2h1dGRvd24oc3RydWN0Cj4gc3ViY2hhbm5lbCAq
+c2NoKQo+IMKgICovCj4gwqBzdGF0aWMgaW50IHZmaW9fY2N3X3NjaF9ldmVudChzdHJ1Y3Qgc3Vi
+Y2hhbm5lbCAqc2NoLCBpbnQgcHJvY2VzcykKPiDCoHsKPiAtwqDCoMKgwqDCoMKgwqBzdHJ1Y3Qg
+dmZpb19jY3dfcHJpdmF0ZSAqcHJpdmF0ZSA9IGRldl9nZXRfZHJ2ZGF0YSgmc2NoLQo+ID5kZXYp
+Owo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCB2ZmlvX2Njd19wYXJlbnQgKnBhcmVudCA9IGRldl9n
+ZXRfZHJ2ZGF0YSgmc2NoLT5kZXYpOwo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCB2ZmlvX2Njd19w
+cml2YXRlICpwcml2YXRlID0gZGV2X2dldF9kcnZkYXRhKCZwYXJlbnQtCj4gPmRldik7Cj4gwqDC
+oMKgwqDCoMKgwqDCoHVuc2lnbmVkIGxvbmcgZmxhZ3M7Cj4gwqDCoMKgwqDCoMKgwqDCoGludCBy
+YyA9IC1FQUdBSU47Cj4gwqAKPiBAQCAtMjg3LDggKzMzNCwxMCBAQCBzdGF0aWMgaW50IHZmaW9f
+Y2N3X3NjaF9ldmVudChzdHJ1Y3Qgc3ViY2hhbm5lbAo+ICpzY2gsIGludCBwcm9jZXNzKQo+IMKg
+Cj4gwqDCoMKgwqDCoMKgwqDCoHJjID0gMDsKPiDCoAo+IC3CoMKgwqDCoMKgwqDCoGlmIChjaW9f
+dXBkYXRlX3NjaGliKHNjaCkpCj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHZmaW9f
+Y2N3X2ZzbV9ldmVudChwcml2YXRlLCBWRklPX0NDV19FVkVOVF9OT1RfT1BFUik7Cj4gK8KgwqDC
+oMKgwqDCoMKgaWYgKGNpb191cGRhdGVfc2NoaWIoc2NoKSkgewo+ICvCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqBpZiAocHJpdmF0ZSkKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoHZmaW9fY2N3X2ZzbV9ldmVudChwcml2YXRlLAo+IFZGSU9fQ0NX
+X0VWRU5UX05PVF9PUEVSKTsKPiArwqDCoMKgwqDCoMKgwqB9Cj4gwqAKPiDCoG91dF91bmxvY2s6
+Cj4gwqDCoMKgwqDCoMKgwqDCoHNwaW5fdW5sb2NrX2lycXJlc3RvcmUoc2NoLT5sb2NrLCBmbGFn
+cyk7Cj4gQEAgLTMyNiw3ICszNzUsOCBAQCBzdGF0aWMgdm9pZCB2ZmlvX2Njd19xdWV1ZV9jcnco
+c3RydWN0Cj4gdmZpb19jY3dfcHJpdmF0ZSAqcHJpdmF0ZSwKPiDCoHN0YXRpYyBpbnQgdmZpb19j
+Y3dfY2hwX2V2ZW50KHN0cnVjdCBzdWJjaGFubmVsICpzY2gsCj4gwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzdHJ1Y3QgY2hwX2xpbmsg
+KmxpbmssIGludCBldmVudCkKPiDCoHsKPiAtwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgdmZpb19jY3df
+cHJpdmF0ZSAqcHJpdmF0ZSA9IGRldl9nZXRfZHJ2ZGF0YSgmc2NoLQo+ID5kZXYpOwo+ICvCoMKg
+wqDCoMKgwqDCoHN0cnVjdCB2ZmlvX2Njd19wYXJlbnQgKnBhcmVudCA9IGRldl9nZXRfZHJ2ZGF0
+YSgmc2NoLT5kZXYpOwo+ICvCoMKgwqDCoMKgwqDCoHN0cnVjdCB2ZmlvX2Njd19wcml2YXRlICpw
+cml2YXRlID0gZGV2X2dldF9kcnZkYXRhKCZwYXJlbnQtCj4gPmRldik7Cj4gwqDCoMKgwqDCoMKg
+wqDCoGludCBtYXNrID0gY2hwX3NzZF9nZXRfbWFzaygmc2NoLT5zc2RfaW5mbywgbGluayk7Cj4g
+wqDCoMKgwqDCoMKgwqDCoGludCByZXRyeSA9IDI1NTsKPiDCoAo+IGRpZmYgLS1naXQgYS9kcml2
+ZXJzL3MzOTAvY2lvL3ZmaW9fY2N3X29wcy5jCj4gYi9kcml2ZXJzL3MzOTAvY2lvL3ZmaW9fY2N3
+X29wcy5jCj4gaW5kZXggNmFlNGQwMTJkODAwLi5iMWNkODlkOTAwYWIgMTAwNjQ0Cj4gLS0tIGEv
+ZHJpdmVycy9zMzkwL2Npby92ZmlvX2Njd19vcHMuYwo+ICsrKyBiL2RyaXZlcnMvczM5MC9jaW8v
+dmZpb19jY3dfb3BzLmMKPiBAQCAtMTQsNiArMTQsNyBAQAo+IMKgI2luY2x1ZGUgPGxpbnV4L25v
+c3BlYy5oPgo+IMKgI2luY2x1ZGUgPGxpbnV4L3NsYWIuaD4KPiDCoAo+ICsjaW5jbHVkZSAidmZp
+b19jY3dfcGFyZW50LmgiCj4gwqAjaW5jbHVkZSAidmZpb19jY3dfcHJpdmF0ZS5oIgo+IMKgCj4g
+wqBzdGF0aWMgY29uc3Qgc3RydWN0IHZmaW9fZGV2aWNlX29wcyB2ZmlvX2Njd19kZXZfb3BzOwo+
+IEBAIC01NSw3ICs1Niw5IEBAIHN0YXRpYyBpbnQgdmZpb19jY3dfbWRldl9pbml0X2RldihzdHJ1
+Y3QKPiB2ZmlvX2RldmljZSAqdmRldikKPiDCoAo+IMKgc3RhdGljIGludCB2ZmlvX2Njd19tZGV2
+X3Byb2JlKHN0cnVjdCBtZGV2X2RldmljZSAqbWRldikKPiDCoHsKPiAtwqDCoMKgwqDCoMKgwqBz
+dHJ1Y3QgdmZpb19jY3dfcHJpdmF0ZSAqcHJpdmF0ZSA9IGRldl9nZXRfZHJ2ZGF0YShtZGV2LQo+
+ID5kZXYucGFyZW50KTsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3Qgc3ViY2hhbm5lbCAqc2NoID0g
+dG9fc3ViY2hhbm5lbChtZGV2LT5kZXYucGFyZW50KTsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3Qg
+dmZpb19jY3dfcGFyZW50ICpwYXJlbnQgPSBkZXZfZ2V0X2RydmRhdGEoJnNjaC0+ZGV2KTsKPiAr
+wqDCoMKgwqDCoMKgwqBzdHJ1Y3QgdmZpb19jY3dfcHJpdmF0ZSAqcHJpdmF0ZSA9IGRldl9nZXRf
+ZHJ2ZGF0YSgmcGFyZW50LQo+ID5kZXYpOwo+IMKgwqDCoMKgwqDCoMKgwqBpbnQgcmV0Owo+IMKg
+Cj4gwqDCoMKgwqDCoMKgwqDCoGlmIChwcml2YXRlLT5zdGF0ZSA9PSBWRklPX0NDV19TVEFURV9O
+T1RfT1BFUikKPiBAQCAtMTAwLDcgKzEwMyw5IEBAIHN0YXRpYyB2b2lkIHZmaW9fY2N3X21kZXZf
+cmVsZWFzZV9kZXYoc3RydWN0Cj4gdmZpb19kZXZpY2UgKnZkZXYpCj4gwqAKPiDCoHN0YXRpYyB2
+b2lkIHZmaW9fY2N3X21kZXZfcmVtb3ZlKHN0cnVjdCBtZGV2X2RldmljZSAqbWRldikKPiDCoHsK
+PiAtwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgdmZpb19jY3dfcHJpdmF0ZSAqcHJpdmF0ZSA9IGRldl9n
+ZXRfZHJ2ZGF0YShtZGV2LQo+ID5kZXYucGFyZW50KTsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3Qg
+c3ViY2hhbm5lbCAqc2NoID0gdG9fc3ViY2hhbm5lbChtZGV2LT5kZXYucGFyZW50KTsKPiArwqDC
+oMKgwqDCoMKgwqBzdHJ1Y3QgdmZpb19jY3dfcGFyZW50ICpwYXJlbnQgPSBkZXZfZ2V0X2RydmRh
+dGEoJnNjaC0+ZGV2KTsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgdmZpb19jY3dfcHJpdmF0ZSAq
+cHJpdmF0ZSA9IGRldl9nZXRfZHJ2ZGF0YSgmcGFyZW50LQo+ID5kZXYpOwo+IMKgCj4gwqDCoMKg
+wqDCoMKgwqDCoFZGSU9fQ0NXX01TR19FVkVOVCgyLCAic2NoICV4LiV4LiUwNHg6IHJlbW92ZVxu
+IiwKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IHByaXZhdGUtPnNjaC0+c2NoaWQuY3NzaWQsCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvczM5MC9j
+aW8vdmZpb19jY3dfcGFyZW50LmgKPiBiL2RyaXZlcnMvczM5MC9jaW8vdmZpb19jY3dfcGFyZW50
+LmgKPiBuZXcgZmlsZSBtb2RlIDEwMDY0NAo+IGluZGV4IDAwMDAwMDAwMDAwMC4uODM0YzAwMDc3
+ODAyCj4gLS0tIC9kZXYvbnVsbAo+ICsrKyBiL2RyaXZlcnMvczM5MC9jaW8vdmZpb19jY3dfcGFy
+ZW50LmgKPiBAQCAtMCwwICsxLDI4IEBACj4gKy8qIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBH
+UEwtMi4wICovCj4gKy8qCj4gKyAqIE1ERVYgUGFyZW50IGNvbnRlbnRzIGZvciB2ZmlvX2NjdyBk
+cml2ZXIKPiArICoKPiArICogQ29weXJpZ2h0IElCTSBDb3JwLiAyMDIyCj4gKyAqLwo+ICsKPiAr
+I2lmbmRlZiBfVkZJT19DQ1dfUEFSRU5UX0hfCj4gKyNkZWZpbmUgX1ZGSU9fQ0NXX1BBUkVOVF9I
+Xwo+ICsKPiArI2luY2x1ZGUgPGxpbnV4L21kZXYuaD4KPiArCj4gKy8qKgo+ICsgKiBzdHJ1Y3Qg
+dmZpb19jY3dfcGFyZW50Cj4gKyAqCj4gKyAqIEBkZXY6IGVtYmVkZGVkIGRldmljZSBzdHJ1Y3QK
+PiArICogQHBhcmVudDogcGFyZW50IGRhdGEgc3RydWN0dXJlcyBmb3IgbWRldnMgY3JlYXRlZAo+
+ICsgKiBAbWRldl90eXBlKHMpOiBpZGVudGlmeWluZyBpbmZvcm1hdGlvbiBmb3IgbWRldnMgY3Jl
+YXRlZAo+ICsgKi8KPiArc3RydWN0IHZmaW9fY2N3X3BhcmVudCB7Cj4gK8KgwqDCoMKgwqDCoMKg
+c3RydWN0IGRldmljZcKgwqDCoMKgwqDCoMKgwqDCoMKgwqBkZXY7Cj4gKwo+ICvCoMKgwqDCoMKg
+wqDCoHN0cnVjdCBtZGV2X3BhcmVudMKgwqDCoMKgwqDCoHBhcmVudDsKPiArwqDCoMKgwqDCoMKg
+wqBzdHJ1Y3QgbWRldl90eXBlwqDCoMKgwqDCoMKgwqDCoG1kZXZfdHlwZTsKPiArwqDCoMKgwqDC
+oMKgwqBzdHJ1Y3QgbWRldl90eXBlwqDCoMKgwqDCoMKgwqDCoCptZGV2X3R5cGVzWzFdOwo+ICt9
+Owo+ICsKPiArI2VuZGlmCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvczM5MC9jaW8vdmZpb19jY3df
+cHJpdmF0ZS5oCj4gYi9kcml2ZXJzL3MzOTAvY2lvL3ZmaW9fY2N3X3ByaXZhdGUuaAo+IGluZGV4
+IGJkNWZiODE0NTZhZi4uNjczZTlhODFhMTcyIDEwMDY0NAo+IC0tLSBhL2RyaXZlcnMvczM5MC9j
+aW8vdmZpb19jY3dfcHJpdmF0ZS5oCj4gKysrIGIvZHJpdmVycy9zMzkwL2Npby92ZmlvX2Njd19w
+cml2YXRlLmgKPiBAQCAtODksNyArODksNiBAQCBzdHJ1Y3QgdmZpb19jY3dfY3J3IHsKPiDCoCAq
+IEBpb193b3JrOiB3b3JrIGZvciBkZWZlcnJhbCBwcm9jZXNzIG9mIEkvTyBoYW5kbGluZwo+IMKg
+ICogQGNyd193b3JrOiB3b3JrIGZvciBkZWZlcnJhbCBwcm9jZXNzIG9mIENSVyBoYW5kbGluZwo+
+IMKgICogQHJlbGVhc2VfY29tcDogc3luY2hyb25pemF0aW9uIGhlbHBlciBmb3IgdmZpbyBkZXZp
+Y2UgcmVsZWFzZQo+IC0gKiBAcGFyZW50OiBwYXJlbnQgZGF0YSBzdHJ1Y3R1cmVzIGZvciBtZGV2
+cyBjcmVhdGVkCj4gwqAgKi8KPiDCoHN0cnVjdCB2ZmlvX2Njd19wcml2YXRlIHsKPiDCoMKgwqDC
+oMKgwqDCoMKgc3RydWN0IHZmaW9fZGV2aWNlIHZkZXY7Cj4gQEAgLTExNiwxMCArMTE1LDYgQEAg
+c3RydWN0IHZmaW9fY2N3X3ByaXZhdGUgewo+IMKgwqDCoMKgwqDCoMKgwqBzdHJ1Y3Qgd29ya19z
+dHJ1Y3TCoMKgwqDCoMKgwqBjcndfd29yazsKPiDCoAo+IMKgwqDCoMKgwqDCoMKgwqBzdHJ1Y3Qg
+Y29tcGxldGlvbsKgwqDCoMKgwqDCoMKgcmVsZWFzZV9jb21wOwo+IC0KPiAtwqDCoMKgwqDCoMKg
+wqBzdHJ1Y3QgbWRldl9wYXJlbnTCoMKgwqDCoMKgwqBwYXJlbnQ7Cj4gLcKgwqDCoMKgwqDCoMKg
+c3RydWN0IG1kZXZfdHlwZcKgwqDCoMKgwqDCoMKgwqBtZGV2X3R5cGU7Cj4gLcKgwqDCoMKgwqDC
+oMKgc3RydWN0IG1kZXZfdHlwZcKgwqDCoMKgwqDCoMKgwqAqbWRldl90eXBlc1sxXTsKPiDCoH0g
+X19hbGlnbmVkKDgpOwo+IMKgCj4gwqBpbnQgdmZpb19jY3dfc2NoX3F1aWVzY2Uoc3RydWN0IHN1
+YmNoYW5uZWwgKnNjaCk7Cgo=
 
-Actually we want the V2 version of this patch, which forces userspace
-to use 4 pages and therefore doesn't let a short userspace request
-corrupt the sequence numbers.
