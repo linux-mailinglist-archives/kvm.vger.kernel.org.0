@@ -2,106 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8E4160FF46
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 19:24:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B25F460FF4A
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 19:27:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235677AbiJ0RYp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 13:24:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51882 "EHLO
+        id S235735AbiJ0R1f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 13:27:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235730AbiJ0RYm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 13:24:42 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21E431263E
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 10:24:38 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6D7F862362
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 17:24:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C88ACC433B5;
-        Thu, 27 Oct 2022 17:24:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666891477;
-        bh=5fx+7t9++1F1VmB8YaQOGyc/rEsxRR+nOp2+GO8srUM=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=EjbVZwgYYZ3rD5ChDt9vFEOn8hQQ3wgTRDB9mFDU451EbcSaH88wWDfiPGr5UmsOk
-         YVGSyKHnjSjP9A887RPB+cLb8MgH0BPdhlLKckjhc4Mds6EAqiyzBCz71cQCDwBvV3
-         1Q1ic228xwN/tKvuuJanwb+boD5U8hK74sVNLSjxFrKSAkRrVfqKHZhz0DVRMn3+q8
-         ot5npOmonBSKZBDzEQd41RrrUhDFMvxJ3BiYUY3ejUWjesEBHjfOFlj2tGZiUuEvIk
-         oQ6BnVNdjF6p3aBL7UKjEEl7j0g9PEDK/NCnifKatFvZTOUhBen+KLdWEn8+viUBVY
-         8O8VHgrSLlwaQ==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1oo6cN-0023RF-JP;
-        Thu, 27 Oct 2022 18:24:35 +0100
+        with ESMTP id S235064AbiJ0R1d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 13:27:33 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A706718D836
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 10:27:32 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id fy4so6659418ejc.5
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 10:27:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=iKwgc0IEVzdwHiCkgDGhcjbv4ywgJ7EoDsClZ3RBIFQ=;
+        b=RbC0vkTGEMUeQrfJXCft2qqEnZJJyBYFBsOMTIEMZCPtrp9s7yI8JISMrDg9xGjgWx
+         SaX7Wu/zbIT6zyIEqKxM8HfHRhzrylWfGwazIuBkgyxjTPk5M3xMS5/4ZkCjKwhWFavV
+         bXE7tgiBGemndv8v1Dzl99jyPMwtMGt/7j9V3Im3KgeJ9BLkZjGv+hj7t8l6KItdk5tf
+         klIYQwrpu2CykpntIeStHWnUW9O1SMhzG5DR8rN2qAz/VacH2qu+ye8MaBXw1Nq2B4hL
+         awrIS/shHd1ZNtcEGU2U2bvedTtxv7dAOdLBK6tMVGzGOJKVUB0kLBZDmy/RTo6e+RL5
+         FxSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iKwgc0IEVzdwHiCkgDGhcjbv4ywgJ7EoDsClZ3RBIFQ=;
+        b=MtcD8w8dw39tr4XmwYcHEtLImGqFGb4cagLAo5VLyCyD3l7TEEr8q0SCMKhxCdHP3f
+         P7Ojm/W9binDkGRZFEkgKH+koa8L1FGyOTJN71+CgGyfAkgePCCSfq/i256OCawFub+F
+         SbdmMK4tKpv1KoIwx8qTZBPSz4gG7K16pbDc8MVSp5AFDvwp92mmfjYMd+phNY1HHwPZ
+         ngVpVub7IKiDZS+SR6IEnvr8G82+q00nXmNVqIPS6q3NinIIpDwH+kK6PkX8R034xjW/
+         Zcv1Bw5cEFt+lVvNCHP5usy5Fi0c1rT1XxTwz2P2gJKA4v+MBXK1yhtQp17mdQnSoocZ
+         6KzQ==
+X-Gm-Message-State: ACrzQf2Vx4ubJMm57EYezhB5hmcUpoPircLNwSBvwXQ9I4mttMTA13n8
+        O/zCs9fwXBlEmXhdebjGG9Dxku5uMc/QDBToU5Ncq+nZJBk=
+X-Google-Smtp-Source: AMsMyM5twZ9tdWk2MZDWI7eWPTemq+JQna3Y1We9BVZLu3UcOLu8pNEbZLf/a6LZBhXDWqj4vAmNIRpWNNqMQPXWjHU=
+X-Received: by 2002:a17:906:fe46:b0:73d:939a:ec99 with SMTP id
+ wz6-20020a170906fe4600b0073d939aec99mr43726049ejb.169.1666891640744; Thu, 27
+ Oct 2022 10:27:20 -0700 (PDT)
 MIME-Version: 1.0
-Date:   Thu, 27 Oct 2022 18:24:35 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        kernel-team@android.com
-Subject: Re: [PATCH 6/9] KVM: arm64: PMU: Move the ID_AA64DFR0_EL1.PMUver
- limit to VM creation
-In-Reply-To: <CAAeT=FwFS+oTG3Q0sDMyobfQst2TWUqyU4XQFmmELPS1rwp96w@mail.gmail.com>
-References: <20220805135813.2102034-1-maz@kernel.org>
- <20220805135813.2102034-7-maz@kernel.org>
- <CAAeT=FzXyr7D24QCcwGckgnPFuo8QtN3GrPg9h+s+3uGETE9Dw@mail.gmail.com>
- <CAAeT=FxheB7HKFxyZwE8LJSjRzxRXQYb7_uQYF9o1hMV6Dow-g@mail.gmail.com>
- <86k04mejd0.wl-maz@kernel.org>
- <CAAeT=FwFS+oTG3Q0sDMyobfQst2TWUqyU4XQFmmELPS1rwp96w@mail.gmail.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <989ec7a63aff44e5fe2d85f691a7f330@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: reijiw@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20221027150558.722062-1-pgonda@google.com> <20221027150558.722062-3-pgonda@google.com>
+In-Reply-To: <20221027150558.722062-3-pgonda@google.com>
+From:   Dionna Amalie Glaze <dionnaglaze@google.com>
+Date:   Thu, 27 Oct 2022 10:27:09 -0700
+Message-ID: <CAAH4kHYTYtHBBzF-0BiTzmHHiF=mnQhRy+5Mfsj1WN4vyPoCZg@mail.gmail.com>
+Subject: Re: [PATCH V3 2/2] virt: sev: Allow for retrying SNP extended requests
+To:     Peter Gonda <pgonda@google.com>
+Cc:     thomas.lendacky@amd.com, Borislav Petkov <bp@suse.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Haowen Bai <baihaowen@meizu.com>,
+        Yang Yingliang <yangyingliang@huawei.com>,
+        Marc Orr <marcorr@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-10-27 17:09, Reiji Watanabe wrote:
->> I think that with this patch both PMUVer and Perfmon values get set to
->> 0 (pmuver_to_perfmon() returns 0 for both ID_AA64DFR0_PMUVER_IMP_DEF
->> and no PMU at all). Am I missing anything here?
-> 
-> When pmuver_to_perfmon() returns 0 for ID_AA64DFR0_PMUVER_IMP_DEF,
-> cpuid_feature_cap_perfmon_field() is called with 'cap' == 0.  Then,
-> the code in cpuid_feature_cap_perfmon_field() updates the 'val' with 0
-> if the given 'features' (sanitized) value is 
-> ID_AA64DFR0_PMUVER_IMP_DEF.
-> So, now the val(== 0) is not larger than the cap (== 0), and
-> cpuid_feature_cap_perfmon_field() ends up returning the given 
-> 'features'
-> value as it is without updating the PERFMON field.
+I think just no to this patch? Reasons below.
 
-Ah, thanks for spelling it out for me, I was definitely looking
-at the wrong side of things. You're absolutely right. The code
-I have now makes sure to:
+>
+>         if (ghcb->save.sw_exit_info_2) {
+> -               /* Number of expected pages are returned in RBX */
+> +               /* For a SNP Extended Request, if the request was placed with
+> +                * insufficient data pages. The host will return the number of
+> +                * pages required using RBX in the GHCB. We can than retry the
+> +                * call as an SNP Request to fulfill the command without getting
+> +                * the extended request data.
+> +                */
+>                 if (exit_code == SVM_VMGEXIT_EXT_GUEST_REQUEST &&
+> -                   ghcb->save.sw_exit_info_2 == SNP_GUEST_REQ_INVALID_LEN)
+> -                       input->data_npages = ghcb_get_rbx(ghcb);
+> -
+> -               *fw_err = ghcb->save.sw_exit_info_2;
+> +                   ghcb->save.sw_exit_info_2 == SNP_GUEST_REQ_INVALID_LEN) {
+> +                       int npages = ghcb_get_rbx(ghcb);
+> +
+> +                       ghcb_clear_rax(ghcb);
+> +                       ghcb_clear_rbx(ghcb);
+> +
+> +                       ret = sev_es_ghcb_hv_call(ghcb, &ctxt,
+> +                                                 SVM_VMGEXIT_GUEST_REQUEST,
+> +                                                 input->req_gpa,
+> +                                                 input->resp_gpa);
+> +                       if (ret)
+> +                               goto e_put;
+> +
 
-(1) preserve the IMP_DEF view of the PMU if userspace provides
-     such setting
+I'm not keen on reissuing the call in this function. I think
+issue_request should do its job of sending a request to the host and
+returning the specified data, in this case the number of pages in RBX.
+I know it's not particularly fun to interpret exitinfo2 in a couple
+places, but it serves a purpose. We don't want this function to grow
+to have special cases for all the commands that can be sent to the psp
+if they don't involve data passed back through the GHCB. The
+get_ghcb/put_ghcb frame is the only thing we really need to respect in
+here.
 
-(2) directly places the emulated PMU revision in the feature
-     set without calling cpuid_feature_cap_perfmon_field(),
-     which indeed does the wrong thing.
+The sev-guest device owns the VMPCKn keys, the message sequence
+number, and the responsibility of sending a coherent response back to
+user space. When we account for the host changing the certificate page
+length during the request and not wanting to return to the guest
+without completing the firmware call, the length might grow past the
+4KiB max constant we have so far. The driver can make the choice of
+issuing the request without extended data like you do here, or to
+reallocate its cert_data buffer and ask for the extended data again.
+It shouldn't matter to the core functionality of issuing a single
+request.
 
-Hopefully I got it right this time! ;-)
+When throttling comes into play and retrying needs to happen more than
+once, then we're in another situation where the sev-guest driver also
+owns the responsibility of trying not to get throttled too hard. My
+patches suggest a 2HZ rate limit to avoid any big penalties of running
+requests in a tight loop and looking like a DoS antagonist, but that
+doesn't belong in arch/x86/kernel/sev.c due to the variability of
+strategies.
 
-Thanks again,
+> +                       input->data_npages = npages;
+> +                       *fw_err = SNP_GUEST_REQ_INVALID_LEN;
+> +               } else
+> +                       *fw_err = ghcb->save.sw_exit_info_2;
 
-         M.
+I think in both branches of the conditional, fw_err gets set to
+exit_info_2. See v4 of my throttling patch series.
+
 -- 
-Jazz is not dead. It just smells funny...
+-Dionna Glaze, PhD (she/her)
