@@ -2,64 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BCEDB60FF01
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 19:11:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 182EE60FF3D
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 19:23:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237114AbiJ0RLe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 13:11:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50920 "EHLO
+        id S235396AbiJ0RW7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 13:22:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237111AbiJ0RLe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 13:11:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63B5A1958F5
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 10:11:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666890691;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8lJYSiNYjSEvbBLqdvUePKn5nQdwkNZajWpSz2fMUIg=;
-        b=HAAYMtf8T5beKGMwy2lLrqSI60OgxHK2jGxofpcp61uoNPz9G0z/CZQSjA+2+U0awKMI5p
-        aRwVGevJc5SfI9euJhoqwIvBQRsaEV5Ck/oQLFIUAn5AaUixM5q6n6RV5uC33WzBAIdut1
-        RrOZzKCqarNraMUXUJusWNNNKqiOViU=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-118-yx_-43EjPOy_KYJbnBxOxA-1; Thu, 27 Oct 2022 13:11:28 -0400
-X-MC-Unique: yx_-43EjPOy_KYJbnBxOxA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E796F3C10697;
-        Thu, 27 Oct 2022 17:11:12 +0000 (UTC)
-Received: from starship (ovpn-192-51.brq.redhat.com [10.40.192.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D27452027061;
-        Thu, 27 Oct 2022 17:11:10 +0000 (UTC)
-Message-ID: <384ce54f7369643b76d4e346d674b9340f95cf8d.camel@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 02/16] x86: add few helper functions for
- apic local timer
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Cathy Avery <cavery@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Date:   Thu, 27 Oct 2022 20:11:09 +0300
-In-Reply-To: <Y1qpyXWqvQLBeTta@google.com>
-References: <20221020152404.283980-1-mlevitsk@redhat.com>
-         <20221020152404.283980-3-mlevitsk@redhat.com> <Y1GeEoC7qMz40QDc@google.com>
-         <de3d97ff23cc401e916b15b47207b45514446e4d.camel@redhat.com>
-         <Y1a49abli07rqyww@google.com>
-         <b006eda72356d75b5ee308c3a91bf3359bb6e9ab.camel@redhat.com>
-         <Y1qpyXWqvQLBeTta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S234802AbiJ0RW5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 13:22:57 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49BDA18C42F
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 10:22:56 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id q1so2127143pgl.11
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 10:22:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xdt63SxEY4K5w2+Q3gX7B2Gg/JGFNAEvy1g4Fz6Bigs=;
+        b=mwkBETp7Xvfd3Q3OLg0X9IIOB8LNnUSkzSnhm0OTfyWbWfN3oK5uf763RGar2BdjU5
+         arLT/eHJrhVQNpkaStEFQ8+BhVfxgEUuRLlZNdORyEC8cwD+Q+4aJFnISlD+1pjt8xTW
+         1WtykhcYzWwr06eGi4SxRq8RPtQ7eXJB/ATOYTAhhlDOm472lps2aPwfx62D4B3bTbUm
+         LLHQYK4KQ0xgFz+1KIYEUdzCUCnk5AAkQyX7nqE14H28sG8mvHjo1kXzAb/QB3DsP5rJ
+         i/iYDj4qmdat4AeBPb/AT1PY2E8R7snjgQsaRSIrl0hMaMzHrj1tD2/9JLCoJsOHfCEE
+         m4Qg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xdt63SxEY4K5w2+Q3gX7B2Gg/JGFNAEvy1g4Fz6Bigs=;
+        b=KE1RrAVLJMJftnb0ouA6JNT5cEr5MOsW98gWqaN2mIUnUtWa4R3LyDjQFDEg+ib9r9
+         LOd7Vko62+T4S6b3L3SjKkp9abRfzi0Flak/cwFSDLIy/doUwfyE8OMCpAEtpewGql1h
+         mKgmBTb0rdpGfl75/dWR3MnI45zWqk9uWn3f1IrTAPyrr420nvXosVpoTIR+y8YdFk7i
+         Phd4dNAZuKieWxExWqvsjLjljCp6HUVRAu4MZYXK1bxaQiQwk8QgOfepAcN9kKI6isyg
+         WGVU29UMCbrhLIuVTDGa+Rep8R5S38IFu4867N+LMPjS+TnTtUlhxpTc7G3HE33WmZhb
+         821A==
+X-Gm-Message-State: ACrzQf1EnEubyEMpoyV0GJf1zz98V+vZbd3WbL/iwIfHydUU5v4ak6kk
+        yF6SOE4U869mm2O0qbcGiziTxuWUoE7C8w==
+X-Google-Smtp-Source: AMsMyM4Va5X7EVlPPmVuN2nFXHsVirgEyHnheYF9OPRkjs0ttBzH9CwemB+VfbK3vYt9XDKlEtPGUA==
+X-Received: by 2002:a63:1a07:0:b0:46b:2825:f9cf with SMTP id a7-20020a631a07000000b0046b2825f9cfmr44154524pga.370.1666891375310;
+        Thu, 27 Oct 2022 10:22:55 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id i26-20020aa796fa000000b0056b8e788acesm1412983pfq.82.2022.10.27.10.22.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Oct 2022 10:22:54 -0700 (PDT)
+Date:   Thu, 27 Oct 2022 17:22:51 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, mhal@rbox.co
+Subject: Re: [PATCH 03/16] KVM: x86: set gfn-to-pfn cache length consistently
+ with VM word size
+Message-ID: <Y1q+a3gtABqJPmmr@google.com>
+References: <20221027161849.2989332-1-pbonzini@redhat.com>
+ <20221027161849.2989332-4-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221027161849.2989332-4-pbonzini@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,52 +72,101 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-10-27 at 15:54 +0000, Sean Christopherson wrote:
-> On Thu, Oct 27, 2022, Maxim Levitsky wrote:
-> > On Mon, 2022-10-24 at 16:10 +0000, Sean Christopherson wrote:
-> > > On Mon, Oct 24, 2022, Maxim Levitsky wrote:
-> > > > On Thu, 2022-10-20 at 19:14 +0000, Sean Christopherson wrote:
-> > > > > On Thu, Oct 20, 2022, Maxim Levitsky wrote:
-> > > > > > +       // ensure that a pending timer is serviced
-> > > > > > +       irq_enable();
-> > > > > 
-> > > > > Jumping back to the "nop" patch, I'm reinforcing my vote to add sti_nop().  I
-> > > > > actually starting typing a response to say this is broken before remembering that
-> > > > > a nop got added to irq_enable().
-> > > > 
-> > > > OK, although, for someone that doesn't know about the interrupt shadow (I
-> > > > guess most of the people that will look at this code), the above won't
-> > > > confuse them, in fact sti_nop() might confuse someone who doesn't know about
-> > > > why this nop is needed.
-> > > 
-> > > The difference is that sti_nop() might leave unfamiliar readers asking "why", but
-> > > it won't actively mislead them.  And the "why" can be easily answered by a comment
-> > > above sti_nop() to describe its purpose.  A "see also safe_halt()" with a comment
-> > > there would be extra helpful, as "safe halt" is the main reason the STI shadow is
-> > > even a thing.
-> > > 
-> > > On the other hand, shoving a NOP into irq_enable() is pretty much guaranteed to
-> > > cause problems for readers that do know about STI shadows since there's nothing
-> > > in the name "irq_enable" that suggests that the helper also intentionally eats the
-> > > interrupt shadow, and especically because the kernel's local_irq_enable() distills
-> > > down to a bare STI.
-> > 
-> > I still don't agree with you on this at all. I would like to hear what other
-> > KVM developers think about it.
-> 
-> Why not just kill off irq_enable() and irq_disable() and use sti() and cli()?
-> Then we don't have to come to any agreement on whether or not shoving a NOP into
-> irq_enable() is a good idea.
-> 
-> > safe_halt actually is a example for function that abstacts away the nop -
-> > just what I want to do.
-> 
-> The difference is that "safe halt" is established terminology that specifically
-> means "STI immediately followed by HLT".
-> 
+On Thu, Oct 27, 2022, Paolo Bonzini wrote:
+> So, use the short size at activation time as well.  This means
+> re-activating the cache if the guest requests the hypercall page
+> multiple times with different word sizes (this can happen when
+> kexec-ing, for example).
 
-OK, let it be.
+I don't understand the motivation for allowing a conditionally valid GPA.  I see
+a lot of complexity and sub-optimal error handling for a use case that no one
+cares about.  Realistically, userspace is never going to provide a GPA that only
+works some of the time, because doing otherwise is just asking for a dead guest.
 
-Best regards,
-	Maxim Levitsky
+> +static int kvm_xen_reactivate_runstate_gpcs(struct kvm *kvm)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	unsigned long i;
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		if (vcpu->arch.xen.runstate_cache.active) {
 
+This is not safe when called from kvm_xen_write_hypercall_page(), which doesn't
+acquire kvm->lock and thus doesn't guard against a concurrent call via
+kvm_xen_vcpu_set_attr().  That's likely a bug in itself, but even if that issue
+is fixed, I don't see how this is yields a better uAPI than forcing userspace to
+provide an address that is valid for all modes.
+
+If the address becomes bad when the guest changes the hypercall page, the guest
+is completely hosed through no fault of its own, whereas limiting the misaligned
+detection to KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADDR means that any "bad" address
+will result in immediate failure, i.e. makes it so that errors are 100% userspace
+misconfiguration bugs.
+
+> +			int r = kvm_xen_activate_runstate_gpc(vcpu,
+> +					vcpu->arch.xen.runstate_cache.gpa);
+> +			if (r < 0)
+
+Returning immediately is wrong, as later vCPUs will have a valid, active cache
+that hasn't been verified for 64-bit mode.
+
+> +				return r;
+> +		}
+> +	}
+> +	return 0;
+> +}
+> +
+>  void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
+>  {
+>  	struct kvm_vcpu_xen *vx = &v->arch.xen;
+> @@ -212,11 +243,7 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
+>  	if (!vx->runstate_cache.active)
+>  		return;
+>  
+> -	if (IS_ENABLED(CONFIG_64BIT) && v->kvm->arch.xen.long_mode)
+> -		user_len = sizeof(struct vcpu_runstate_info);
+> -	else
+> -		user_len = sizeof(struct compat_vcpu_runstate_info);
+> -
+> +	user_len = kvm_xen_runstate_info_size(v->kvm);
+>  	read_lock_irqsave(&gpc->lock, flags);
+>  	while (!kvm_gfn_to_pfn_cache_check(v->kvm, gpc, gpc->gpa,
+>  					   user_len)) {
+> @@ -461,7 +488,7 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+>  			mutex_lock(&kvm->lock);
+>  			kvm->arch.xen.long_mode = !!data->u.long_mode;
+>  			mutex_unlock(&kvm->lock);
+> -			r = 0;
+> +			r = kvm_xen_reactivate_runstate_gpcs(kvm);
+
+Needs to be called under kvm->lock.  This path also needs to acquire kvm->srcu.
+
+>  		}
+>  		break;
+>  
+> @@ -596,9 +623,7 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+>  			break;
+>  		}
+>  
+> -		r = kvm_gpc_activate(vcpu->kvm, &vcpu->arch.xen.runstate_cache,
+> -				     NULL, KVM_HOST_USES_PFN, data->u.gpa,
+> -				     sizeof(struct vcpu_runstate_info));
+> +		r = kvm_xen_activate_runstate_gpc(vcpu, data->u.gpa);
+>  		break;
+>  
+>  	case KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_CURRENT:
+> @@ -843,9 +868,13 @@ int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
+>  	u32 page_num = data & ~PAGE_MASK;
+>  	u64 page_addr = data & PAGE_MASK;
+>  	bool lm = is_long_mode(vcpu);
+> +	int r;
+>  
+>  	/* Latch long_mode for shared_info pages etc. */
+>  	vcpu->kvm->arch.xen.long_mode = lm;
+> +	r = kvm_xen_reactivate_runstate_gpcs(kvm);
+> +	if (r < 0)
+> +		return 1;
+
+Aren't we just making up behavior at this point?  Injecting a #GP into the guest
+for what is a completely legal operation from the guest's perspective seems all
+kinds of wrong.
