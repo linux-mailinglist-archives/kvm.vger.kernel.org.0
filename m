@@ -2,81 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D0D560ECF7
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 02:22:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A03D060EDF0
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 04:28:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233961AbiJ0AWO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 26 Oct 2022 20:22:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34786 "EHLO
+        id S233804AbiJ0C2G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 26 Oct 2022 22:28:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233529AbiJ0AWN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 26 Oct 2022 20:22:13 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DDE932AB2
-        for <kvm@vger.kernel.org>; Wed, 26 Oct 2022 17:22:11 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d9so5655746pll.7
-        for <kvm@vger.kernel.org>; Wed, 26 Oct 2022 17:22:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gL9fkvyetCV1Bo4juUosdq663yh2iF/xfOUblLWF8b0=;
-        b=X+ikZz4N8iSORkePbs8KKFAw6/SMc/hBT2Lp36JJJ9UwFAzIffLIbQZ89F7LV1p1Es
-         Zwqb3/KV5EErGZLwLu6c+d55aFsXqcoXQ7a+03+6PNGJECdsNz5S+m6877qEgGMYqedE
-         9WIbZYu2ZX1eM0ljenU9obLoqtcxafobLUhMzly6BMH18guetLEQ6iJWn56UEIilIl6g
-         KNt/vS94GXjd2tOjWW20jZbB0j79EOQCAxyu6HsBfRZZPD8YuogjVZT4n73cYJJXKWWg
-         PXJ9eQZshqBs2Uh83w+L1EXalXzlZfQFQkBsikDbhHssZFWCg7crwx8gt8YpnJZNPfD1
-         pIJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gL9fkvyetCV1Bo4juUosdq663yh2iF/xfOUblLWF8b0=;
-        b=Cz8zXop4oxrz4I7cUj0thU0Qq/RHcpe4Vn3izZnAg9z+DCt0Hv+pziwTbEWCKgfpPv
-         ErZ6MSQCP/caj338J1oo05nZvnS4ELWCDQi3Xs7j4bLpnZmAp+WfOJlaZ2o6jhbFowts
-         RRRVxXBbKbcuXD5WtU+a5tkx1aHnNw8U9r6HTx6ZlbrrbI5ThPhWISuoalaRNpIg3/7o
-         t7KhZfIuw651orwtm5HFwI5FJbbaikCCBMgX7fq0+jj4CgOdlWaqn+7B/AgZoxGF9EYF
-         TyqntFWhuPOJN86ZU27bfZghiqaVjmoVGpPsp0eV2rDZi6Sn31uU17D/uY7CRNqqUVzI
-         /Vsg==
-X-Gm-Message-State: ACrzQf0obwTnM+BFVaQ50R29vsL+w6XEATrk90+1C2XjpycXI1j6oV/s
-        iCw4u2u9cTr52ontBIGlitoNlA==
-X-Google-Smtp-Source: AMsMyM6CD/Y7haI/KExpKQwtJ210I7ZMQY9GjXxFShh03utqVHZJ37k1rcflFBfWHz+H6N05MVxMcQ==
-X-Received: by 2002:a17:902:e752:b0:186:9efb:71f3 with SMTP id p18-20020a170902e75200b001869efb71f3mr20644688plf.153.1666830130438;
-        Wed, 26 Oct 2022 17:22:10 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id d8-20020a170902654800b001788ccecbf5sm3472832pln.31.2022.10.26.17.22.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Oct 2022 17:22:09 -0700 (PDT)
-Date:   Thu, 27 Oct 2022 00:22:06 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Wei Wang <wei.w.wang@intel.com>
-Cc:     pbonzini@redhat.com, dmatlack@google.com, vipinsh@google.com,
-        ajones@ventanamicro.com, eric.auger@redhat.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 18/18] KVM: selftests/kvm_create_max_vcpus: check
- KVM_MAX_VCPUS
-Message-ID: <Y1nPLpybEYWh+Znu@google.com>
-References: <20221024113445.1022147-1-wei.w.wang@intel.com>
- <20221024113445.1022147-19-wei.w.wang@intel.com>
+        with ESMTP id S234127AbiJ0C15 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 26 Oct 2022 22:27:57 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B580143A45;
+        Wed, 26 Oct 2022 19:27:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1666837673; x=1698373673;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=afo/CE2nmd8ntlb2SDjykBmeyxC2sXyG6CNK+1/fCLE=;
+  b=kJ72yHXZBaQRPrBgukF2N3RPqQCkV4Pkq7QdsSMTfs2+d8lFtHR4UiUd
+   MpJv95vc/mzrZ9wd5RprxWDOKeHcDEAX7R0l7cx+wqABOomI2u/9uZh1r
+   FJtfBTGIlLBOe5l5dBs3ncRzDkEPkgxpRdd7M4RxHQzhDfXsSITd2dulK
+   26zYF1Mnbvm0XHRgFhpNJLzoyibtnGNiwq1aQ1lkljCH/KJqDWh66qZUK
+   heFExs+sWpYVpfFlXQB5rs7mPoU3cZUdO3Ap2EiGmFs1eotWCmyKCIgMZ
+   VGukCoc8nUXmo3Xtyu75JgFPULv2dufeyGy2Gzj81gsmLpwXU3hafqm4G
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="287828482"
+X-IronPort-AV: E=Sophos;i="5.95,215,1661842800"; 
+   d="scan'208";a="287828482"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2022 19:27:53 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="634732714"
+X-IronPort-AV: E=Sophos;i="5.95,215,1661842800"; 
+   d="scan'208";a="634732714"
+Received: from jiaxiche-mobl.ccr.corp.intel.com (HELO [10.238.2.23]) ([10.238.2.23])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2022 19:27:48 -0700
+Message-ID: <4b50da57-f4ec-7bd7-b062-b495612868b4@linux.intel.com>
+Date:   Thu, 27 Oct 2022 10:27:46 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221024113445.1022147-19-wei.w.wang@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.2
+Subject: Re: [PATCH 1/6] x86: KVM: Enable CMPccXADD CPUID and expose it to
+ guest
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     kvm@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        pbonzini@redhat.com, ndesaulniers@google.com,
+        alexandre.belloni@bootlin.com, peterz@infradead.org,
+        jpoimboe@kernel.org, chang.seok.bae@intel.com,
+        pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com,
+        jmattson@google.com, sandipan.das@amd.com, tony.luck@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, fenghua.yu@intel.com,
+        keescook@chromium.org, jane.malalane@citrix.com, nathan@kernel.org,
+        linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>
+References: <20221019084734.3590760-1-jiaxi.chen@linux.intel.com>
+ <20221019084734.3590760-2-jiaxi.chen@linux.intel.com>
+ <Y1AUhlwWjIkKfZHA@google.com>
+ <cce514da-32b4-3b84-cfad-67a05705bc9f@linux.intel.com>
+ <Y1lrGgyIcgweVGup@zn.tnic>
+From:   Jiaxi Chen <jiaxi.chen@linux.intel.com>
+In-Reply-To: <Y1lrGgyIcgweVGup@zn.tnic>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 24, 2022, Wei Wang wrote:
-> If the KVM side max vcpu number is larger than the one supported by the
-> userspace selftests, adjust the max number.
 
-No, this defeats the purpose of the test.  "create max vCPUs" means "create the
-maximum number allowed by KVM", not "create the arbitrary max supported by selftests".
+
+On 10/27/2022 1:15 AM, Borislav Petkov wrote:
+> On Wed, Oct 26, 2022 at 11:40:31AM +0800, Jiaxi Chen wrote:
+>>> What do you think about moving CPUID_7_1_EAX to be a KVM-only leaf too?  AFAICT,
+>>> KVM passthrough is the only reason the existing features are defined.
+> 
+> Yap, looking at the patches which added those 2 feature flags upstream,
+> they don't look like some particular use was the goal but rather to
+> expose it to guests. Besides, AVX512 apps do their own CPUID detection.
+> 
+>> Since CPUID_7_1_EAX has only 5 features now, it is a big waste,       
+>> should we move it to KVM-only leaf as Sean suggested. What's your     
+>> opinion about this?                                                   
+> 
+> Yes, pls do.
+> 
+> And when you do, make sure to undo what
+> 
+>   b302e4b176d0 ("x86/cpufeatures: Enumerate the new AVX512 BFLOAT16 instructions")
+> 
+> added.
+> 
+> Thx.
+> 
+
+Yes, will do this in v2. Thanks for reminding~
+-- 
+Regards,
+Jiaxi
