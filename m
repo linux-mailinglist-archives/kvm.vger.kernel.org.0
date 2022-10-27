@@ -2,55 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D4436103EE
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 23:04:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 49DA86103F0
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 23:04:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237358AbiJ0VEM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 17:04:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46146 "EHLO
+        id S237393AbiJ0VER (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 17:04:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237046AbiJ0VDR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 17:03:17 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF21C95AD2
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 13:57:01 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-36ab1ae386bso24939667b3.16
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 13:57:01 -0700 (PDT)
+        with ESMTP id S236152AbiJ0VDS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 17:03:18 -0400
+Received: from mail-io1-xd49.google.com (mail-io1-xd49.google.com [IPv6:2607:f8b0:4864:20::d49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FE44B05
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 13:57:02 -0700 (PDT)
+Received: by mail-io1-xd49.google.com with SMTP id w6-20020a6bd606000000b006bcd951c261so2161488ioa.2
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 13:57:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=AYcGCIjxasuhuLfXLt9s+RfUZjGAKFoU0cNeJ5rpEgQ=;
-        b=dWuspeUOVCTg+NdrJ+f+5Jv+8gCf3NM4djnPu9kC2m9CnpNzFI03GpeBRF/nnogtod
-         CorckZb53SpLhBOZGzjCKjzRbV0PMbCNQQsvohys4t7tfsZW9UoVras/3cYko6bpoLAq
-         b3f+m8+fGe+LorhDxMbhOvvbl4jmbJAl84BqdaXB/BHXQzXmu2cEBGB0CbBVMIkt+jwB
-         Y2MpN+9BWgGRPLF4KA2CIiIiCJTD63qfcMgU/vFVu0L143Govy4UkasHkasxNZFv/lhc
-         /TUFWNipGr9HVhXVDGmUUx/jFEFXgqEBE/P3N7AKs2+0HyCFLRTRJ6INn9oQby7oCBRU
-         BGOA==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=w+ebisBkWPJ5RfFeeP4pPr1G3UX4W/TiA76RvuNqNLA=;
+        b=ZjdvwkrRMlhvSLfD5kKtUE/tigBMjTjznRjvYEOrjPe74SLU7gD59enpZVak2r0hUh
+         MsMX4ZmafqeKn6mUz04IxR/7dSsWdSDltuBO12TbxvJNuCPfeEdFOrUmLogJO2mk7Y7J
+         jZvpkhNT+WSCa2OwyJd/vJbMuawt0LEJq37ml6T7qxVUZpwE5lf+df7rA2PWsoVOymi8
+         vwfpOxl7V54EFvVDyDINGGeeXLUxprwDcDLfon3ljV7rDQFCt0AUQHEsRygcEYQqnvf3
+         C/BOiSUZ9LyzRFPmgkzaeZdj0beVS16Ur+0Jgm28q6Kw0JuYXVZpvFBpx0Au/TxJUAvg
+         o4mQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AYcGCIjxasuhuLfXLt9s+RfUZjGAKFoU0cNeJ5rpEgQ=;
-        b=NF+Q/hOvsXaE8qM1ZJWzePohgKtCvvgVnTGONIIOIURqwjWvrOHHaHXipVzCJjicka
-         7wocIlYGue+RbHBYoxB3ssZfia/pdvwuhEbBM0bbe5Gp5MN2f+TaVTWn98yjtpIz7mMd
-         8Brm+5cvbvqpwJiZ4zPZLUTX2pyhmjQBMIK65UWReZ9qAMzJ1qUUHhiz5sbBYJ26Wo4A
-         uQXiPj8z5D3sRfFr9FT9pDOM6s9S+KMB0S2kpIrqbbbe0Ox2dEN8F2I4x8I6CHBArcPZ
-         QTT0IpKmijKHkleP1/IYIn9EaNP+B2JM/cSL9go51qFsdl1Brxc7BBR9M7HZ5/9M83Lv
-         hDIQ==
-X-Gm-Message-State: ACrzQf1YWiuRB6fwtuvmo1POdBLknaZIk+91YV35CwX8FpVqDX1EwLio
-        +SfZnX1Va5DpZYoJNrCmFIgQqDXj6E/w1AEcOviV8rsK8SsIBjPQBScB68PXyxcU02svTrWt0v2
-        ZNIlrqsTjcQ3IwNJrXfThiWZSz+ww0oGFABJb+B+g/o6uM/LbHydl0oOdU7xJge2k4BamdOk=
-X-Google-Smtp-Source: AMsMyM4JlZYR1O0g9oxKMw0D8s9hJZ72enZPeO0599v8ppdz9WK8BGJvCB5X8pv6lilxHrjpl21Fxc5B4ynbVXFpFQ==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=w+ebisBkWPJ5RfFeeP4pPr1G3UX4W/TiA76RvuNqNLA=;
+        b=wft5VWL45XkLU7G43TLgmwOEMo8dCMhFTHela1fOqsYLyu6Zf+ryAgVu9uX7oI5mgP
+         R9UdnwUVRdEFgcTfecyuGFs+ucs1PS1cd/ur/wWlcmaH61xgjZQO/kwMc3VFqB6nyElp
+         LfU1W1cMTU3Dqftvudu7bNUhb4m6YujjaMoUi1qp90yFUXCP1CB+qvfC2ORSyIYs4OPB
+         CbI1ymaE2egOJBZ+4vml6sfLPJ6WbDhgk57IvUEKSu2nMaYAbTDLR3xYLhmXnfoa7AsI
+         F8CkT+KgY4AHCml5k8eFmpMZwN7NX6JOoZvzwpxqX4zml+7dOEQJwGTN5s273WhmFHtS
+         3ePw==
+X-Gm-Message-State: ACrzQf0VAbbhqgsD2awHzMfmFzz00gYQ+urfj170RavbYTCRPCnq3jyg
+        SliFcAVh2jYiJwSToPU0znIxKRiZcnE2DJenGX9G7sgE6C6kJfUu29ZMKnPihAxMX6qRRuxi4L3
+        jDRwSitoeW0XC/e7uJtyx60utRV01CFanAVJARdmi1SNJBpOSZEWt90JN4Au6Hvpvw3+Ty1c=
+X-Google-Smtp-Source: AMsMyM6e8iG0MQgrjrHwVUKo7RGkDRhmmxtlk2KKCHiu0t8FXwxHM/AhkgoQ5WRtfEbSfNLCE+FbUXwnWDbqIwgVKA==
 X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a25:c7c3:0:b0:6cb:b64e:dbde with SMTP
- id w186-20020a25c7c3000000b006cbb64edbdemr0ybe.496.1666904219909; Thu, 27 Oct
- 2022 13:56:59 -0700 (PDT)
-Date:   Thu, 27 Oct 2022 20:56:27 +0000
+ (user=coltonlewis job=sendgmr) by 2002:a05:6e02:1561:b0:300:3d37:6296 with
+ SMTP id k1-20020a056e02156100b003003d376296mr9830290ilu.233.1666904221444;
+ Thu, 27 Oct 2022 13:57:01 -0700 (PDT)
+Date:   Thu, 27 Oct 2022 20:56:28 +0000
+In-Reply-To: <20221027205631.340339-1-coltonlewis@google.com>
 Mime-Version: 1.0
+References: <20221027205631.340339-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.38.1.273.g43a17bfeac-goog
-Message-ID: <20221027205631.340339-1-coltonlewis@google.com>
-Subject: [PATCH v8 0/4] KVM: selftests: randomize memory access of dirty_log_perf_test
+Message-ID: <20221027205631.340339-2-coltonlewis@google.com>
+Subject: [PATCH v8 1/4] KVM: selftests: implement random number generator for
+ guest code
 From:   Colton Lewis <coltonlewis@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, maz@kernel.org, dmatlack@google.com,
@@ -67,35 +70,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the ability to randomize parts of dirty_log_perf_test,
-specifically the order pages are accessed and whether pages are read
-or written.
+Implement random number generator for guest code to randomize parts
+of the test, making it less predictable and a more accurate reflection
+of reality.
 
-v8:
+The random number generator chosen is the Park-Miller Linear
+Congruential Generator, a fancy name for a basic and well-understood
+random number generator entirely sufficient for this purpose. Each
+vCPU calculates its own seed by adding its index to the seed provided.
 
-NOTE: Ricardo and, David please look again. Sean requested I remove
-your Reviewed-by tags due to changes in the last round. Main change
-was the interface for the RNG.
+Signed-off-by: Colton Lewis <coltonlewis@google.com>
+---
+ tools/testing/selftests/kvm/include/test_util.h |  7 +++++++
+ tools/testing/selftests/kvm/lib/test_util.c     | 17 +++++++++++++++++
+ 2 files changed, 24 insertions(+)
 
-David: I made the default seed 1 since 0 isn't a valid input for this
-pRNG.
-
-Split random number generator from use in dirty_log_perf_test.c and
-perf_test_utils.c
-
-Colton Lewis (4):
-  KVM: selftests: implement random number generator for guest code
-  KVM: selftests: create -r argument to specify random seed
-  KVM: selftests: randomize which pages are written vs read
-  KVM: selftests: randomize page access order
-
- .../selftests/kvm/access_tracking_perf_test.c |  2 +-
- .../selftests/kvm/dirty_log_perf_test.c       | 57 ++++++++++++++-----
- .../selftests/kvm/include/perf_test_util.h    |  8 ++-
- .../testing/selftests/kvm/include/test_util.h |  7 +++
- .../selftests/kvm/lib/perf_test_util.c        | 32 +++++++++--
- tools/testing/selftests/kvm/lib/test_util.c   | 17 ++++++
- 6 files changed, 99 insertions(+), 24 deletions(-)
-
---
+diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
+index befc754ce9b3..9e4f36a1a8b0 100644
+--- a/tools/testing/selftests/kvm/include/test_util.h
++++ b/tools/testing/selftests/kvm/include/test_util.h
+@@ -152,4 +152,11 @@ static inline void *align_ptr_up(void *x, size_t size)
+ 	return (void *)align_up((unsigned long)x, size);
+ }
+ 
++struct guest_random_state {
++	uint32_t seed;
++};
++
++struct guest_random_state new_guest_random_state(uint32_t seed);
++uint32_t guest_random_u32(struct guest_random_state *state);
++
+ #endif /* SELFTEST_KVM_TEST_UTIL_H */
+diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
+index 6d23878bbfe1..c4d2749fb2c3 100644
+--- a/tools/testing/selftests/kvm/lib/test_util.c
++++ b/tools/testing/selftests/kvm/lib/test_util.c
+@@ -17,6 +17,23 @@
+ 
+ #include "test_util.h"
+ 
++/*
++ * Random number generator that is usable from guest code. This is the
++ * Park-Miller LCG using standard constants.
++ */
++
++struct guest_random_state new_guest_random_state(uint32_t seed)
++{
++	struct guest_random_state s = {.seed = seed};
++	return s;
++}
++
++uint32_t guest_random_u32(struct guest_random_state *state)
++{
++	state->seed = (uint64_t)state->seed * 48271 % ((uint32_t)(1 << 31) - 1);
++	return state->seed;
++}
++
+ /*
+  * Parses "[0-9]+[kmgt]?".
+  */
+-- 
 2.38.1.273.g43a17bfeac-goog
+
