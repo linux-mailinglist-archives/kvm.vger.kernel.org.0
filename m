@@ -2,115 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D7D6D60FD66
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 18:49:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E78A60FD6B
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 18:50:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235938AbiJ0QtQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 12:49:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49312 "EHLO
+        id S236452AbiJ0Qt7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 12:49:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230441AbiJ0QtO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 12:49:14 -0400
+        with ESMTP id S235770AbiJ0Qtv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 12:49:51 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 066BA18F0DC
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 09:49:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F1A932BB4
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 09:49:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666889353;
+        s=mimecast20190719; t=1666889389;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=SBR+zNlTAG21dDioM5sgF6nCCLjPvKzLkAHg4n7ta1Q=;
-        b=WiQ+eTb8304LY2NZvSgNH2D1Pmh5r/Xd6NT487D8g9aRe54/6fKnqh6XHxfP8C/7DBo+PC
-        yvnV4PIdkhVAN44wqfEYyCbA30mBIPgt5kHsIwFw26fv6MGF9Gg2W4yKEfYwUVz1/3qgfs
-        N8X6eTujuBM8pf4OVmN5TbXHj1q6fgM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-80-pY5d2FJ0NCCZ4KnVhH9okw-1; Thu, 27 Oct 2022 12:49:11 -0400
-X-MC-Unique: pY5d2FJ0NCCZ4KnVhH9okw-1
-Received: by mail-wm1-f71.google.com with SMTP id k34-20020a05600c1ca200b003c706e17799so941051wms.9
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 09:49:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SBR+zNlTAG21dDioM5sgF6nCCLjPvKzLkAHg4n7ta1Q=;
-        b=XyLCkKGbLSMUu0G2Ok3UQB3YWHhBtcEozh8ZCVd4QPMarAAP5xn4s/d4upxSRmEiWI
-         hxZqZnfKFqTdx1c5EYqnSOmuQq0RCJWq/IsX3BRhCW62cMB1Mn/NteMYr0FWF/HpTnYE
-         AcK+MYC2iui6K044OpN2jtMtxDGyw40g5L+d38MimGuXtCU/G8L1/00PVDglVrpOhLjF
-         OR9BI2k5z2nwyZ4R7JST89NLEmzGQ8juwHNZPcgxleLT9oOrAwXcRsw/JXA2kjAKPoFt
-         pSt4xMeNsdLAJbbjzW1gTvg2uLrHC1T9x5OaUtjZg+Y/DyVzS7TvsVrfdvJciIvXPlpf
-         ro+Q==
-X-Gm-Message-State: ACrzQf1DhB33yX9LzEdwNUh6Y89fGMpf+jPdIAVOfXvJvh4dRz5MmA3e
-        LSYnsG6mZbYt3tjDWkrlvi/iMrDs3Q8vjFT0WXxmuKWTI+3JJl6Apy3GegJdz7KUCcgQTCyioJ9
-        zDaKnZBdBf6VE
-X-Received: by 2002:a05:6000:10a:b0:236:6a79:f5cf with SMTP id o10-20020a056000010a00b002366a79f5cfmr15965890wrx.470.1666889350572;
-        Thu, 27 Oct 2022 09:49:10 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4Y6At6prTJyixBcdRFchUGzanWYZ2mDWqXwbRXFsEFagdyFpLO8S2LxyUFFO7cp89cHZAQDw==
-X-Received: by 2002:a05:6000:10a:b0:236:6a79:f5cf with SMTP id o10-20020a056000010a00b002366a79f5cfmr15965875wrx.470.1666889350283;
-        Thu, 27 Oct 2022 09:49:10 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id z17-20020a1c4c11000000b003b3365b38f9sm1937795wmf.10.2022.10.27.09.49.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Oct 2022 09:49:09 -0700 (PDT)
-Message-ID: <0e3a0cab-1093-3e83-9e9c-f8639ebe5da0@redhat.com>
-Date:   Thu, 27 Oct 2022 18:49:07 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: Re: [PATCH RESEND v4 00/23] SMM emulation and interrupt shadow fixes
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Yang Zhong <yang.zhong@intel.com>, x86@kernel.org,
-        Jim Mattson <jmattson@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Guang Zeng <guang.zeng@intel.com>,
-        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        linux-kselftest@vger.kernel.org, Kees Cook <keescook@chromium.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Wei Wang <wei.w.wang@intel.com>,
-        Borislav Petkov <bp@alien8.de>
-References: <20221025124741.228045-1-mlevitsk@redhat.com>
+         content-transfer-encoding:content-transfer-encoding;
+        bh=UmKsvDZphX6Q2tq3GUESuxV/7Plhh3YGmQbqJMgGeiE=;
+        b=ZXDvimmUVJ0gYc7GxXEsomC/TWc17HWkGYaOjXP6MVdKFjZgjm9iC9jZ5HFHlO3ifQhdzE
+        7Wg6cRk2KcEiL7AT4MH9KT9DAArpYIP3gRkNuxqWpbAM91tQ99NO7gSZzHDjlvWfuU+ZxA
+        Xv1p8ZBYrX+KVUe5lNoNW26zDTYGr5A=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-168-lUlGhf5GPOOeyy2scPubRw-1; Thu, 27 Oct 2022 12:49:45 -0400
+X-MC-Unique: lUlGhf5GPOOeyy2scPubRw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0C6AE85A5B6;
+        Thu, 27 Oct 2022 16:49:45 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DCCFB1121320;
+        Thu, 27 Oct 2022 16:49:44 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20221025124741.228045-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     mlevitsk@redhat.com, seanjc@google.com
+Subject: [PATCH v3 0/10] KVM: x86: allow compiling out SMM support
+Date:   Thu, 27 Oct 2022 12:49:34 -0400
+Message-Id: <20221027164944.3031588-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/25/22 14:47, Maxim Levitsky wrote:
-> This patch series is a result of long debug work to find out why
-> sometimes guests with win11 secure boot
-> were failing during boot.
-> 
-> During writing a unit test I found another bug, turns out
-> that on rsm emulation, if the rsm instruction was done in real
-> or 32 bit mode, KVM would truncate the restored RIP to 32 bit.
-> 
-> I also refactored the way we write SMRAM so it is easier
-> now to understand what is going on.
-> 
-> The main bug in this series which I fixed is that we
-> allowed #SMI to happen during the STI interrupt shadow,
-> and we did nothing to both reset it on #SMI handler
-> entry and restore it on RSM.
+Some users of KVM implement the UEFI variable store through a paravirtual device
+that does not require the "SMM lockbox" component of edk2; allow them to
+compile out system management mode, which is not a full implementation
+especially in how it interacts with nested virtualization.
 
-I have now sent out the final/new version of the first 8 patches and 
-will review these tomorrow.  Thanks for your patience. :)
+In order to limit the number and especially the size of the #ifdefs,
+the first 4 patches move most SMM code to a completely new file in
+arch/x86/kvm.  Patch 5 is the main change to introduce the Kconfig
+symbol and key smm.c's compilation off it; patches 6-10 instead
+eliminate other bits of SMM code that remain outside smm.c.
 
 Paolo
+
+v2->v3: remove kvm_smm_changed stub as well as more code in KVM_GET_VCPU_EVENTS
+	leave kvm_apic_init_sipi_allowed inline
+	change placement Kconfig to generate the right menu hierarchy
+
+Paolo Bonzini (9):
+  KVM: x86: start moving SMM-related functions to new files
+  KVM: x86: move SMM entry to a new file
+  KVM: x86: move SMM exit to a new file
+  KVM: x86: do not go through ctxt->ops when emulating rsm
+  KVM: allow compiling out SMM support
+  KVM: x86: compile out vendor-specific code if SMM is disabled
+  KVM: x86: remove SMRAM address space if SMM is not supported
+  KVM: x86: do not define KVM_REQ_SMI if SMM disabled
+  KVM: zero output of KVM_GET_VCPU_EVENTS before filling in the struct
+
+Sean Christopherson (1):
+  KVM: x86: do not define SMM-related constants if SMM disabled
+
+ arch/x86/include/asm/kvm-x86-ops.h            |   2 +
+ arch/x86/include/asm/kvm_host.h               |  25 +-
+ arch/x86/kvm/Kconfig                          |  11 +
+ arch/x86/kvm/Makefile                         |   1 +
+ arch/x86/kvm/emulate.c                        | 355 +----------
+ arch/x86/kvm/kvm_cache_regs.h                 |   5 -
+ arch/x86/kvm/kvm_emulate.h                    |  47 +-
+ arch/x86/kvm/lapic.c                          |   8 +-
+ arch/x86/kvm/lapic.h                          |   2 +-
+ arch/x86/kvm/mmu/mmu.c                        |   1 +
+ arch/x86/kvm/smm.c                            | 576 ++++++++++++++++++
+ arch/x86/kvm/smm.h                            |  37 ++
+ arch/x86/kvm/svm/nested.c                     |   3 +
+ arch/x86/kvm/svm/svm.c                        |  11 +-
+ arch/x86/kvm/vmx/nested.c                     |   1 +
+ arch/x86/kvm/vmx/vmx.c                        |   7 +
+ arch/x86/kvm/x86.c                            | 371 ++---------
+ tools/testing/selftests/kvm/x86_64/smm_test.c |   2 +
+ 18 files changed, 741 insertions(+), 724 deletions(-)
+ create mode 100644 arch/x86/kvm/smm.c
+ create mode 100644 arch/x86/kvm/smm.h
+
+-- 
+2.31.1
 
