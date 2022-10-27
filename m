@@ -2,216 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FED16105B0
-	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 00:24:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C7B306105C0
+	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 00:29:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235425AbiJ0WYD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 18:24:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41102 "EHLO
+        id S235291AbiJ0W3J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 18:29:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235410AbiJ0WYC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 18:24:02 -0400
-Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54AE2B18EA
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 15:24:00 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1666909439;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2jqzZ8fiB+x078wcXJwKsX5i+1F8LZpF8dTbWmKnaj8=;
-        b=V+k2e2ZzvbQW5B5Q7NX6/KUk+LvQFZGhoNNhoUrWl7oVaTNZq9WqAtLLio2CmzccfceUg4
-        QmwUnzGdaKhsIU1RZcMIR+Pi+rEn8tzrO0DzPLRz6nNgjSCjy3laqcn9dfIQX24rAwAb/1
-        OPbw4yOP4hdxYrUK1GOKF+heN3TLuC0=
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Quentin Perret <qperret@google.com>,
-        Ben Gardon <bgardon@google.com>, Gavin Shan <gshan@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        kvmarm@lists.linux.dev, Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 15/15] KVM: arm64: Handle stage-2 faults in parallel
-Date:   Thu, 27 Oct 2022 22:23:50 +0000
-Message-Id: <20221027222350.1685213-1-oliver.upton@linux.dev>
-In-Reply-To: <20221027221752.1683510-1-oliver.upton@linux.dev>
-References: <20221027221752.1683510-1-oliver.upton@linux.dev>
+        with ESMTP id S235203AbiJ0W3H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 18:29:07 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66FB0B18F6;
+        Thu, 27 Oct 2022 15:29:06 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id 3-20020a17090a0f8300b00212d5cd4e5eso8041248pjz.4;
+        Thu, 27 Oct 2022 15:29:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=AG4F1mROTpr5u4kkYvWVpYOMl+6kqWe5+k0RORa+c4g=;
+        b=T4vZkZRWPUNObV5wj1y8eBsDMmxjq/rVfbjt4764bS+he3bH07MXwrr9le5PAECL1o
+         qz/6G9wiU6YTeOp57WDKnx7zkVGAxNyuAnJq+RcN/cBsj1QrEGBFvb8VHj8gL/033AeP
+         RhU3ACCMAqbkUJeQ0j1x8qPljx6Y7l4dgh8y/O5W+ihmkuHLuLHGK7FocHqAgMfigrpa
+         f5ITNxq3aKjo9R3RHyit3MSBX1MogKvmRmehUEqLEXL30RV2e8bHVB6uqg5fFa7Ovgx7
+         RX+4oCE6zwoVlw2YKrcocUuX7f1x1XsEyllMPLVHziI8+/KoDYitN2i3GUKj7gyHFPk1
+         UMKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AG4F1mROTpr5u4kkYvWVpYOMl+6kqWe5+k0RORa+c4g=;
+        b=l8TT8oXlESg+XFyXXvMw2PX7sIhfzy4HNoIF3+K2LhDCygsKrYH3Aw2CPM07xJf6uu
+         GtIuONJCoxC9RPSLkGwL552ke9Z5XcSEj1gj6PYPuNZUfqN5yi7OoyijPGyXcNH5B3g/
+         QDbzN9QaZXOcq6Dvi5zYv5ZAlfEaDuaVuaJkxX9mtC8ccYxdqfwZl3vMV++jnUsYEEYn
+         OhmBfWiWcrZfoEDLvRlnashpRmfvTgLinAIofcRoBTfCMyWAZZHVpLg18PY4WtqyFoUZ
+         Wl2rEfTmXiQYd7XdXEb6UysIUFawONOiUMcU7epACXC5VdUfRmXXJdfA+mYS4nuwceTd
+         pwhQ==
+X-Gm-Message-State: ACrzQf0z0kXFeTrpp4qmlKa5bExwCEBZAvT4tAJZo//r4edNrYN7ZD3c
+        wWbLqJS+I0UJVBYlF8uijto=
+X-Google-Smtp-Source: AMsMyM612gH6T9pOfKHLdz1UcPyO4sKgtZrlaDV8LzFxGi7671k9SzAi8/ROucP9RznXGiDfXU0qaA==
+X-Received: by 2002:a17:903:124e:b0:178:6946:a2ba with SMTP id u14-20020a170903124e00b001786946a2bamr51281893plh.89.1666909706755;
+        Thu, 27 Oct 2022 15:28:26 -0700 (PDT)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id x184-20020a6263c1000000b00561b3ee73f6sm1676604pfb.144.2022.10.27.15.28.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Oct 2022 15:28:26 -0700 (PDT)
+Date:   Thu, 27 Oct 2022 15:28:24 -0700
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "Li, Xiaoyao" <xiaoyao.li@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        isaku.yamahata@gmail.com
+Subject: Re: [PATCH v6 01/21] x86/tdx: Use enum to define page level of TDX
+ supported page sizes
+Message-ID: <20221027222824.GA4101506@ls.amr.corp.intel.com>
+References: <cover.1666824663.git.kai.huang@intel.com>
+ <8a5b40d43f8b993a48b99d6647b16a82b433627c.1666824663.git.kai.huang@intel.com>
+ <80e8111b-76a2-4999-782b-fdd4b9f425fa@intel.com>
+ <d19c81ef34856f72c964322a7390d6fa21976e6f.camel@intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <d19c81ef34856f72c964322a7390d6fa21976e6f.camel@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The stage-2 map walker has been made parallel-aware, and as such can be
-called while only holding the read side of the MMU lock. Rip out the
-conditional locking in user_mem_abort() and instead grab the read lock.
-Continue to take the write lock from other callsites to
-kvm_pgtable_stage2_map().
+On Thu, Oct 27, 2022 at 08:42:16AM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/include/asm/kvm_pgtable.h  |  3 ++-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c |  2 +-
- arch/arm64/kvm/hyp/pgtable.c          |  5 +++--
- arch/arm64/kvm/mmu.c                  | 31 ++++++---------------------
- 4 files changed, 13 insertions(+), 28 deletions(-)
+> On Thu, 2022-10-27 at 15:08 +0800, Li, Xiaoyao wrote:
+> > > @@ -663,27 +662,16 @@ static bool try_accept_one(phys_addr_t *start,
+> > > unsigned long len,
+> > >    	if (len < accept_size)
+> > >    		return false;
+> > >    
+> > > +	/* TDX only supports 4K/2M/1G page sizes */
+> > 
+> > yes, a page can be mapped as 1G size to TD via secure/shared EPT. But 
+> > for this particular TDX_ACCEPT_PAGE case, it only supports 4K and 2M 
+> > currently, which is defined in TDX module spec.
+> 
+> I checked the TDX module public spec, and it appears you are right.  But I am
+> not sure whether it will be changed in the future?
+> 
+> Anyway this patch doesn't intend to bring any functional change (I should have
+> stated this in the changelog), so I think fixing to this, if ever needed, should
+> be another patch.
+> 
+> Hi Isaku,
+> 
+> You suggested to introduce a helper, but this reminds me how KVM is going to use
+> this helper? KVM secure EPT can accept more levels than try_accept_one().
+> 
+> Perhaps I can just get rid of this helper? TDX host series only needs some
+> definitions to represent 4K/2M/1G page to get rid of using magic numbers.
 
-diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-index 7634b6964779..a874ce0ce7b5 100644
---- a/arch/arm64/include/asm/kvm_pgtable.h
-+++ b/arch/arm64/include/asm/kvm_pgtable.h
-@@ -412,6 +412,7 @@ void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pg
-  * @prot:	Permissions and attributes for the mapping.
-  * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
-  *		page-table pages.
-+ * @flags:	Flags to control the page-table walk (ex. a shared walk)
-  *
-  * The offset of @addr within a page is ignored, @size is rounded-up to
-  * the next page boundary and @phys is rounded-down to the previous page
-@@ -433,7 +434,7 @@ void kvm_pgtable_stage2_free_removed(struct kvm_pgtable_mm_ops *mm_ops, void *pg
-  */
- int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 			   u64 phys, enum kvm_pgtable_prot prot,
--			   void *mc);
-+			   void *mc, enum kvm_pgtable_walk_flags flags);
- 
- /**
-  * kvm_pgtable_stage2_set_owner() - Unmap and annotate pages in the IPA space to
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 735769886b55..f6d82bf33ce1 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -257,7 +257,7 @@ static inline int __host_stage2_idmap(u64 start, u64 end,
- 				      enum kvm_pgtable_prot prot)
- {
- 	return kvm_pgtable_stage2_map(&host_kvm.pgt, start, end - start, start,
--				      prot, &host_s2_pool);
-+				      prot, &host_s2_pool, 0);
- }
- 
- /*
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index d08e14008bfb..9ffe2e0bccb9 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -912,7 +912,7 @@ static int stage2_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
- 
- int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 			   u64 phys, enum kvm_pgtable_prot prot,
--			   void *mc)
-+			   void *mc, enum kvm_pgtable_walk_flags flags)
- {
- 	int ret;
- 	struct stage2_map_data map_data = {
-@@ -923,7 +923,8 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
- 	};
- 	struct kvm_pgtable_walker walker = {
- 		.cb		= stage2_map_walker,
--		.flags		= KVM_PGTABLE_WALK_TABLE_PRE |
-+		.flags		= flags |
-+				  KVM_PGTABLE_WALK_TABLE_PRE |
- 				  KVM_PGTABLE_WALK_LEAF,
- 		.arg		= &map_data,
- 	};
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index a1a623c5b069..93f014a97abf 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -861,7 +861,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 
- 		write_lock(&kvm->mmu_lock);
- 		ret = kvm_pgtable_stage2_map(pgt, addr, PAGE_SIZE, pa, prot,
--					     &cache);
-+					     &cache, 0);
- 		write_unlock(&kvm->mmu_lock);
- 		if (ret)
- 			break;
-@@ -1156,7 +1156,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	gfn_t gfn;
- 	kvm_pfn_t pfn;
- 	bool logging_active = memslot_is_logging(memslot);
--	bool use_read_lock = false;
- 	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
- 	unsigned long vma_pagesize, fault_granule;
- 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-@@ -1191,8 +1190,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (logging_active) {
- 		force_pte = true;
- 		vma_shift = PAGE_SHIFT;
--		use_read_lock = (fault_status == FSC_PERM && write_fault &&
--				 fault_granule == PAGE_SIZE);
- 	} else {
- 		vma_shift = get_vma_page_shift(vma, hva);
- 	}
-@@ -1291,15 +1288,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (exec_fault && device)
- 		return -ENOEXEC;
- 
--	/*
--	 * To reduce MMU contentions and enhance concurrency during dirty
--	 * logging dirty logging, only acquire read lock for permission
--	 * relaxation.
--	 */
--	if (use_read_lock)
--		read_lock(&kvm->mmu_lock);
--	else
--		write_lock(&kvm->mmu_lock);
-+	read_lock(&kvm->mmu_lock);
- 	pgt = vcpu->arch.hw_mmu->pgt;
- 	if (mmu_invalidate_retry(kvm, mmu_seq))
- 		goto out_unlock;
-@@ -1343,15 +1332,12 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * permissions only if vma_pagesize equals fault_granule. Otherwise,
- 	 * kvm_pgtable_stage2_map() should be called to change block size.
- 	 */
--	if (fault_status == FSC_PERM && vma_pagesize == fault_granule) {
-+	if (fault_status == FSC_PERM && vma_pagesize == fault_granule)
- 		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
--	} else {
--		WARN_ONCE(use_read_lock, "Attempted stage-2 map outside of write lock\n");
--
-+	else
- 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
- 					     __pfn_to_phys(pfn), prot,
--					     memcache);
--	}
-+					     memcache, KVM_PGTABLE_WALK_SHARED);
- 
- 	/* Mark the page dirty only if the fault is handled successfully */
- 	if (writable && !ret) {
-@@ -1360,10 +1346,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	}
- 
- out_unlock:
--	if (use_read_lock)
--		read_unlock(&kvm->mmu_lock);
--	else
--		write_unlock(&kvm->mmu_lock);
-+	read_unlock(&kvm->mmu_lock);
- 	kvm_set_pfn_accessed(pfn);
- 	kvm_release_pfn_clean(pfn);
- 	return ret != -EAGAIN ? ret : 0;
-@@ -1569,7 +1552,7 @@ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- 	 */
- 	kvm_pgtable_stage2_map(kvm->arch.mmu.pgt, range->start << PAGE_SHIFT,
- 			       PAGE_SIZE, __pfn_to_phys(pfn),
--			       KVM_PGTABLE_PROT_R, NULL);
-+			       KVM_PGTABLE_PROT_R, NULL, 0);
- 
- 	return false;
- }
+Ok, let remove the helper function. The usage seems different from KVM case.
+In KVM side, it can introduce its own helper.
 -- 
-2.38.1.273.g43a17bfeac-goog
-
+Isaku Yamahata <isaku.yamahata@gmail.com>
