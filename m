@@ -2,108 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A67A460FAE3
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 16:55:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4039F60FB17
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 17:03:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235709AbiJ0OzE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 10:55:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49792 "EHLO
+        id S233619AbiJ0PDS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 11:03:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235924AbiJ0OzB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 10:55:01 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4F9130541
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 07:54:59 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id b185so1769047pfb.9
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 07:54:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kPYnXX3okow1kRCKteMrz1kZILFzqyga2dfyqPNexuw=;
-        b=cEfkDhbsG3tWzlruT2T+yhVrvDC0e4ykbkS6TUSvMJMueQ6BVIDiPTsqqcYZtsTc+8
-         LrYzP001ez9kpMJ/QQd4Gu+VMdkTELU1EMtFejqQc/LP9szyilchAjELqL/mwXd8ndzw
-         fywoH45H9zctKGaXnyld1myb4JXGwSCqPQYXLXtMcFJYgtPD5EdFILCHZgFvPMCs4Uow
-         +CVTppidf6VdXwZikxsTU+BJ+3ezaYvp6t/gSF/OTniNM53VRtW/XuAZ1+wZLTDliLEV
-         oqhC5aYEj4e5JZFE6h8T/Rq2k9QV3HQwEqmq84tVGXIDG3D9shf5SWJICcQjADFliAMU
-         lhKg==
+        with ESMTP id S235144AbiJ0PDP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 11:03:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57E0618E2AC
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 08:03:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666882994;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VJvDBKztTqHWH2ECApC5EZ1MlW+Ts28acLI3gKMXC7E=;
+        b=ANXHNuurU6sSzps43g6n75A1SMBIFbOlT/89uBYPEIW7qHXBfxXSnBDfTCYdqyyBlhhUAI
+        oQtA3HaxaYBxjXg2Qia3EOkPaHm/iAGpRsOGcpatl28v1rwpKDj77C+MKCrpLxUuKCc101
+        sTI/3Tno/upsp2mOU3mjkolqw2N170U=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-110-3DQK6GrINeKmrndQGik0Cw-1; Thu, 27 Oct 2022 11:03:13 -0400
+X-MC-Unique: 3DQK6GrINeKmrndQGik0Cw-1
+Received: by mail-wr1-f69.google.com with SMTP id s11-20020adfbc0b000000b0023659af24a8so483077wrg.14
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 08:03:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kPYnXX3okow1kRCKteMrz1kZILFzqyga2dfyqPNexuw=;
-        b=KZyog6dTVx9egL1ojxmGs+KUovTRnieVgIxcKJMG/uvv7FzI+gqNRjBYxKmUkdju4r
-         rEhxZFDfv73EmLeTH2pEi11Zs+Fi00qCTDQ1dTXCtn4tdSp9yj4HC+qdAXiHl0ZfWaUp
-         9g8c+wPHKwFpdLrSP367yEYvLTafHQwcNnNlc5azHbEVmXtND3tf8LLtClUDq+iO4Nhb
-         EFyue+IUefwmDFQNk1z8Q2FQyj0pCGv8YjlbXusMEByN/rA5ZgGpwgYIAE1wCfBLM3tm
-         iAhOig4CyY52NLDg4RIEwW1oP1MKB2yxOEvPSYpzOTEpLPi4ieGQ6wWzQlZZl8/EcL/w
-         6Edw==
-X-Gm-Message-State: ACrzQf0vBq+4iiAAvykLevyoDC5D7FPg1BNBTpStiesufLgqPTvE6Twk
-        pknyeH7qjbWsdhGxmeNqw5kXUg==
-X-Google-Smtp-Source: AMsMyM77yVvmwPODxDgAB3imONWVBFbWeOxtNYJsvGc7QT0gYGTWB6Y7DO0uZ0fKfEYkiUdl/H/obw==
-X-Received: by 2002:a63:c112:0:b0:443:94a1:f09 with SMTP id w18-20020a63c112000000b0044394a10f09mr42823906pgf.396.1666882499230;
-        Thu, 27 Oct 2022 07:54:59 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id 5-20020a170902e9c500b0018691ce1696sm1310297plk.131.2022.10.27.07.54.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Oct 2022 07:54:58 -0700 (PDT)
-Date:   Thu, 27 Oct 2022 14:54:55 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Wang, Wei W" <wei.w.wang@intel.com>
-Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "dmatlack@google.com" <dmatlack@google.com>,
-        "vipinsh@google.com" <vipinsh@google.com>,
-        "ajones@ventanamicro.com" <ajones@ventanamicro.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v1 03/18] KVM: selftests/kvm_util: helper functions for
- vcpus and threads
-Message-ID: <Y1qbv/HdkuILzNSa@google.com>
-References: <20221024113445.1022147-1-wei.w.wang@intel.com>
- <20221024113445.1022147-4-wei.w.wang@intel.com>
- <Y1nMQp11RKTDX7HX@google.com>
- <DS0PR11MB6373FBC16E8515174E444692DC339@DS0PR11MB6373.namprd11.prod.outlook.com>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VJvDBKztTqHWH2ECApC5EZ1MlW+Ts28acLI3gKMXC7E=;
+        b=iQ6qJYj4NZCy4DU240/PWS3uOXPLPplFzch9fANS/AE4Z6dQ7PPtBuSQGKmnda2luB
+         p0hKOc6hjRcXZEtuEDmbBpiBD8JLZgEoNiVUId9myR6wkdseisp4pgO7T9dHGN1VMfwk
+         u8erFhAUM34SsO3DXT5C7+jVrAwTsryq/djYnR3BeP34XLh+eRbw+DeGkxNU9Ge4ix+N
+         Jbijll8dpn3ImV1TBAiR5kJUzw+d7niFwPwnPUPKtFrVF6ZKQwoyZkWzZI+MAoW/BgFa
+         R1ShFR+VwXAu0csfww6H3cP98Eps+yzra0KtupCVwI1dv8+4r2vxP0x76YqjLRoHdVqB
+         DjCA==
+X-Gm-Message-State: ACrzQf0+4pnchC80njaeOqM4+jdvT0rGIsexxCQOjBzv7DcVa9tUyscD
+        /bCt/JeuIGWNEnIRYRbM2aPHo6OF7LAz6Z4OHXhTXHvU/Hz8q/X2PYpAw+FOBUK1rqJT7d7k2un
+        +Yg+wpYCDQYhI
+X-Received: by 2002:a1c:f20f:0:b0:3be:eff3:bda2 with SMTP id s15-20020a1cf20f000000b003beeff3bda2mr6127373wmc.125.1666882991489;
+        Thu, 27 Oct 2022 08:03:11 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4nVlOa+R+hUdc5WaG70oHT5KXVZtqksEvvPR8qBPnvxOulKaZTOuDjihr0t9y1sc8P/ozZsQ==
+X-Received: by 2002:a1c:f20f:0:b0:3be:eff3:bda2 with SMTP id s15-20020a1cf20f000000b003beeff3bda2mr6127347wmc.125.1666882991217;
+        Thu, 27 Oct 2022 08:03:11 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
+        by smtp.googlemail.com with ESMTPSA id y16-20020adfd090000000b0022ae401e9e0sm1285436wrh.78.2022.10.27.08.03.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Oct 2022 08:03:10 -0700 (PDT)
+Message-ID: <24768aa3-0e2e-6d29-2749-9d74a26f9205@redhat.com>
+Date:   Thu, 27 Oct 2022 17:03:08 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DS0PR11MB6373FBC16E8515174E444692DC339@DS0PR11MB6373.namprd11.prod.outlook.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [PATCH v2 03/16] KVM: x86: Always use non-compat
+ vcpu_runstate_info size for gfn=>pfn cache
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Michal Luczaj <mhal@rbox.co>,
+        David Woodhouse <dwmw2@infradead.org>
+References: <20221013211234.1318131-1-seanjc@google.com>
+ <20221013211234.1318131-4-seanjc@google.com>
+ <afad5f40-03ef-1380-9bfe-03bbaaed47a9@redhat.com>
+ <Y1qZagwM0dMBjYhe@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Y1qZagwM0dMBjYhe@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 27, 2022, Wang, Wei W wrote:
-> On Thursday, October 27, 2022 8:10 AM, Sean Christopherson wrote:
-> > > +void vm_vcpu_threads_create(struct kvm_vm *vm,
-> > > +		void *(*start_routine)(void *), uint32_t private_data_size)
-> > 
-> > I vote (very strongly) to not deal with allocating private data.  The private data
-> > isn't strictly related to threads, and the vast majority of callers don't need private
-> > data, i.e. the param is dead weight in most cases.
-> > 
-> > And unless I'm missing something, it's trivial to move to a separate helper,
-> > though honestly even that seems like overkill.
-> > 
-> > Wait, looking further, it already is a separate helper...  Forcing a bunch of
-> > callers to specify '0' just to eliminate one function call in a handful of cases is not
-> > a good tradeoff.
+On 10/27/22 16:44, Sean Christopherson wrote:
+>> - long mode cannot be changed after the shared info page is enabled (which
+>> makes sense because the shared info page also has a compat version)
 > 
-> The intention was to do the allocation within one vm_for_each_vcpu()
-> iteration when possible. Just a micro-optimization, but no problem, we can keep
-> them separate if that looks better (simpler).
+> How is this not introducing an additional restriction?  This seems way more
+> onerous than what is effectively a revert.
+>
+>> - the caches must be activated after the shared info page (which enforces
+>> that the vCPU attributes are set after the VM attributes)
+>>
+>> This is technically a userspace API break, but nobody is really using this
+>> API outside Amazon so...  Patches coming after I finish testing.
+> 
+> It's not just userspace break, it affects the guest ABI as well.
 
-Keep them separate, that level of optimization is not something that's ever going
-to be noticeable.
+Yes, I was talking of the VMM here; additional restrictions are fine there.
 
-I don't want to say that performance is an afterthought for KVM selftests, but in
-common code it's definitely way down the list of priorities because even the most
-naive implementation for things like configuring vCPUs is going to have a runtime
-measured in milliseconds.
+The guests however should be compatible with Xen, so you also need to 
+re-activate the cache after the hypercall page is written, but that's 
+two lines of code.
+
+Paolo
+
