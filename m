@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E9D2060FD69
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 18:49:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB58360FD77
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 18:50:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236284AbiJ0Qtx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 12:49:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51098 "EHLO
+        id S236259AbiJ0QuP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 12:50:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235517AbiJ0Qtv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 12:49:51 -0400
+        with ESMTP id S236519AbiJ0Qt4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 12:49:56 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B7342C648
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 09:49:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CB5133A0D
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 09:49:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666889387;
+        s=mimecast20190719; t=1666889392;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+qL/cZNClgp8pZjqxL/7o3yhq53avkZl78qPYIO/eSI=;
-        b=TbImDJqw8YyNFbE2sw8YDkWGdT4qekLnUcKxnHDNgtW/F+hmVPAhJkAPRD3dfM0MscYVBR
-        MZaYGbYl3KjQrWXyOdV/NDlD16PHJ6EljVdHzLFQFW1OlGp76YogFV6BrdQ+CEPor4Nndy
-        EYlRBUEWUjkC9ZoUL6nRAsU6DkIEEfY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=ZbsXB5Q9ZBQU91OESLNefvxmmTt9RyacdBGjdkRwAJo=;
+        b=TxOa/losxePhI6voEEygTXJ1/kdVXRymFYPbY73rU+VPEota9w6lfyIa7GGFDP5vAwTgFn
+        jfEwnDjFQJCFoq+OboDsDHvbcPfip9wTdwGNX6/Rrm7Zzbyhzz9eLWDCDXytkCfbklVZ/m
+        uidCnjU8y8vOkQbdyNjy8B3Lxft3S7s=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-127-4B2AQc9bOkaRJx-MvtRrWA-1; Thu, 27 Oct 2022 12:49:46 -0400
-X-MC-Unique: 4B2AQc9bOkaRJx-MvtRrWA-1
+ us-mta-383-h6pGH7zoOVCCTBYmK-cM3Q-1; Thu, 27 Oct 2022 12:49:49 -0400
+X-MC-Unique: h6pGH7zoOVCCTBYmK-cM3Q-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EA2D2185A794;
-        Thu, 27 Oct 2022 16:49:45 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2122E381796C;
+        Thu, 27 Oct 2022 16:49:46 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BF4BB1121320;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F3A091121320;
         Thu, 27 Oct 2022 16:49:45 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     mlevitsk@redhat.com, seanjc@google.com
-Subject: [PATCH 04/10] KVM: x86: do not go through ctxt->ops when emulating rsm
-Date:   Thu, 27 Oct 2022 12:49:38 -0400
-Message-Id: <20221027164944.3031588-5-pbonzini@redhat.com>
+Subject: [PATCH 05/10] KVM: allow compiling out SMM support
+Date:   Thu, 27 Oct 2022 12:49:39 -0400
+Message-Id: <20221027164944.3031588-6-pbonzini@redhat.com>
 In-Reply-To: <20221027164944.3031588-1-pbonzini@redhat.com>
 References: <20221027164944.3031588-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -59,501 +59,197 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that RSM is implemented in a single emulator callback, there is no
-point in going through other callbacks for the sake of modifying
-processor state.  Just invoke KVM's own internal functions directly,
-and remove the callbacks that were only used by em_rsm; the only
-substantial difference is in the handling of the segment registers
-and descriptor cache, which have to be parsed into a struct kvm_segment
-instead of a struct desc_struct.
+Some users of KVM implement the UEFI variable store through a paravirtual device
+that does not require the "SMM lockbox" component of edk2; allow them to
+compile out system management mode, which is not a full implementation
+especially in how it interacts with nested virtualization.
 
-This also fixes a bug where emulator_set_segment was shifting the
-limit left by 12 if the G bit is set, but the limit had not been
-shifted right upon entry to SMM.
-
-The emulator context is still used to restore EIP and the general
-purpose registers.
-
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Message-Id: <20220929172016.319443-5-pbonzini@redhat.com>
+Message-Id: <20220929172016.319443-6-pbonzini@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/kvm_emulate.h |  13 ---
- arch/x86/kvm/smm.c         | 177 +++++++++++++++++--------------------
- arch/x86/kvm/x86.c         |  33 -------
- 3 files changed, 81 insertions(+), 142 deletions(-)
+ arch/x86/kvm/Kconfig                          | 11 ++++++++++
+ arch/x86/kvm/Makefile                         |  2 +-
+ arch/x86/kvm/smm.h                            | 12 ++++++++++
+ arch/x86/kvm/svm/svm.c                        |  2 ++
+ arch/x86/kvm/vmx/vmx.c                        |  2 ++
+ arch/x86/kvm/x86.c                            | 22 +++++++++++++++++--
+ tools/testing/selftests/kvm/x86_64/smm_test.c |  2 ++
+ 7 files changed, 50 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/kvm_emulate.h b/arch/x86/kvm/kvm_emulate.h
-index d7afbc448dd2..84b1f2661463 100644
---- a/arch/x86/kvm/kvm_emulate.h
-+++ b/arch/x86/kvm/kvm_emulate.h
-@@ -116,16 +116,6 @@ struct x86_emulate_ops {
- 			unsigned int bytes,
- 			struct x86_exception *fault, bool system);
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index 67be7f217e37..fbeaa9ddef59 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -118,6 +118,17 @@ config KVM_AMD_SEV
+ 	  Provides support for launching Encrypted VMs (SEV) and Encrypted VMs
+ 	  with Encrypted State (SEV-ES) on AMD processors.
  
--	/*
--	 * read_phys: Read bytes of standard (non-emulated/special) memory.
--	 *            Used for descriptor reading.
--	 *  @addr:  [IN ] Physical address from which to read.
--	 *  @val:   [OUT] Value read from memory.
--	 *  @bytes: [IN ] Number of bytes to read from memory.
--	 */
--	int (*read_phys)(struct x86_emulate_ctxt *ctxt, unsigned long addr,
--			void *val, unsigned int bytes);
--
- 	/*
- 	 * write_std: Write bytes of standard (non-emulated/special) memory.
- 	 *            Used for descriptor writing.
-@@ -209,11 +199,8 @@ struct x86_emulate_ops {
- 	int (*cpl)(struct x86_emulate_ctxt *ctxt);
- 	void (*get_dr)(struct x86_emulate_ctxt *ctxt, int dr, ulong *dest);
- 	int (*set_dr)(struct x86_emulate_ctxt *ctxt, int dr, ulong value);
--	u64 (*get_smbase)(struct x86_emulate_ctxt *ctxt);
--	void (*set_smbase)(struct x86_emulate_ctxt *ctxt, u64 smbase);
- 	int (*set_msr_with_filter)(struct x86_emulate_ctxt *ctxt, u32 msr_index, u64 data);
- 	int (*get_msr_with_filter)(struct x86_emulate_ctxt *ctxt, u32 msr_index, u64 *pdata);
--	int (*set_msr)(struct x86_emulate_ctxt *ctxt, u32 msr_index, u64 data);
- 	int (*get_msr)(struct x86_emulate_ctxt *ctxt, u32 msr_index, u64 *pdata);
- 	int (*check_pmc)(struct x86_emulate_ctxt *ctxt, u32 pmc);
- 	int (*read_pmc)(struct x86_emulate_ctxt *ctxt, u32 pmc, u64 *pdata);
-diff --git a/arch/x86/kvm/smm.c b/arch/x86/kvm/smm.c
-index 773e07b6397d..41ca128478fc 100644
---- a/arch/x86/kvm/smm.c
-+++ b/arch/x86/kvm/smm.c
-@@ -271,71 +271,59 @@ void enter_smm(struct kvm_vcpu *vcpu)
- 	kvm_mmu_reset_context(vcpu);
- }
- 
--static int emulator_has_longmode(struct x86_emulate_ctxt *ctxt)
--{
--#ifdef CONFIG_X86_64
--	return ctxt->ops->guest_has_long_mode(ctxt);
--#else
--	return false;
--#endif
--}
--
--static void rsm_set_desc_flags(struct desc_struct *desc, u32 flags)
-+static void rsm_set_desc_flags(struct kvm_segment *desc, u32 flags)
- {
- 	desc->g    = (flags >> 23) & 1;
--	desc->d    = (flags >> 22) & 1;
-+	desc->db   = (flags >> 22) & 1;
- 	desc->l    = (flags >> 21) & 1;
- 	desc->avl  = (flags >> 20) & 1;
--	desc->p    = (flags >> 15) & 1;
-+	desc->present = (flags >> 15) & 1;
- 	desc->dpl  = (flags >> 13) & 3;
- 	desc->s    = (flags >> 12) & 1;
- 	desc->type = (flags >>  8) & 15;
++config KVM_SMM
++	bool "System Management Mode emulation"
++	default y
++	depends on KVM
++	help
++	  Provides support for KVM to emulate System Management Mode (SMM)
++	  in virtual machines.  This can be used by the virtual machine
++	  firmware to implement UEFI secure boot.
 +
-+	desc->unusable = !desc->present;
-+	desc->padding = 0;
- }
++	  If unsure, say Y.
++
+ config KVM_XEN
+ 	bool "Support for Xen hypercall interface"
+ 	depends on KVM
+diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+index ec6f7656254b..6cf40f668277 100644
+--- a/arch/x86/kvm/Makefile
++++ b/arch/x86/kvm/Makefile
+@@ -20,7 +20,7 @@ endif
  
--static int rsm_load_seg_32(struct x86_emulate_ctxt *ctxt, const char *smstate,
-+static int rsm_load_seg_32(struct kvm_vcpu *vcpu, const char *smstate,
- 			   int n)
+ kvm-$(CONFIG_X86_64) += mmu/tdp_iter.o mmu/tdp_mmu.o
+ kvm-$(CONFIG_KVM_XEN)	+= xen.o
+-kvm-y			+= smm.o
++kvm-$(CONFIG_KVM_SMM)	+= smm.o
+ 
+ kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o vmx/vmcs12.o \
+ 			   vmx/evmcs.o vmx/nested.o vmx/posted_intr.o
+diff --git a/arch/x86/kvm/smm.h b/arch/x86/kvm/smm.h
+index b0602a92e511..0e1bd8bd6dc4 100644
+--- a/arch/x86/kvm/smm.h
++++ b/arch/x86/kvm/smm.h
+@@ -8,6 +8,7 @@
+ #define PUT_SMSTATE(type, buf, offset, val)                      \
+ 	*(type *)((buf) + (offset) - 0x7e00) = val
+ 
++#ifdef CONFIG_KVM_SMM
+ static inline int kvm_inject_smi(struct kvm_vcpu *vcpu)
  {
--	struct desc_struct desc;
-+	struct kvm_segment desc;
- 	int offset;
--	u16 selector;
--
--	selector = GET_SMSTATE(u32, smstate, 0x7fa8 + n * 4);
- 
- 	if (n < 3)
- 		offset = 0x7f84 + n * 12;
- 	else
- 		offset = 0x7f2c + (n - 3) * 12;
- 
--	set_desc_base(&desc,      GET_SMSTATE(u32, smstate, offset + 8));
--	set_desc_limit(&desc,     GET_SMSTATE(u32, smstate, offset + 4));
-+	desc.selector =           GET_SMSTATE(u32, smstate, 0x7fa8 + n * 4);
-+	desc.base =               GET_SMSTATE(u32, smstate, offset + 8);
-+	desc.limit =              GET_SMSTATE(u32, smstate, offset + 4);
- 	rsm_set_desc_flags(&desc, GET_SMSTATE(u32, smstate, offset));
--	ctxt->ops->set_segment(ctxt, selector, &desc, 0, n);
-+	kvm_set_segment(vcpu, &desc, n);
- 	return X86EMUL_CONTINUE;
- }
- 
- #ifdef CONFIG_X86_64
--static int rsm_load_seg_64(struct x86_emulate_ctxt *ctxt, const char *smstate,
-+static int rsm_load_seg_64(struct kvm_vcpu *vcpu, const char *smstate,
- 			   int n)
- {
--	struct desc_struct desc;
-+	struct kvm_segment desc;
- 	int offset;
--	u16 selector;
--	u32 base3;
- 
- 	offset = 0x7e00 + n * 16;
- 
--	selector =                GET_SMSTATE(u16, smstate, offset);
-+	desc.selector =           GET_SMSTATE(u16, smstate, offset);
- 	rsm_set_desc_flags(&desc, GET_SMSTATE(u16, smstate, offset + 2) << 8);
--	set_desc_limit(&desc,     GET_SMSTATE(u32, smstate, offset + 4));
--	set_desc_base(&desc,      GET_SMSTATE(u32, smstate, offset + 8));
--	base3 =                   GET_SMSTATE(u32, smstate, offset + 12);
--
--	ctxt->ops->set_segment(ctxt, selector, &desc, base3, n);
-+	desc.limit =              GET_SMSTATE(u32, smstate, offset + 4);
-+	desc.base =               GET_SMSTATE(u64, smstate, offset + 8);
-+	kvm_set_segment(vcpu, &desc, n);
- 	return X86EMUL_CONTINUE;
- }
- #endif
- 
--static int rsm_enter_protected_mode(struct x86_emulate_ctxt *ctxt,
-+static int rsm_enter_protected_mode(struct kvm_vcpu *vcpu,
- 				    u64 cr0, u64 cr3, u64 cr4)
- {
- 	int bad;
-@@ -348,7 +336,7 @@ static int rsm_enter_protected_mode(struct x86_emulate_ctxt *ctxt,
- 		cr3 &= ~0xfff;
- 	}
- 
--	bad = ctxt->ops->set_cr(ctxt, 3, cr3);
-+	bad = kvm_set_cr3(vcpu, cr3);
- 	if (bad)
- 		return X86EMUL_UNHANDLEABLE;
- 
-@@ -357,20 +345,20 @@ static int rsm_enter_protected_mode(struct x86_emulate_ctxt *ctxt,
- 	 * Then enable protected mode.	However, PCID cannot be enabled
- 	 * if EFER.LMA=0, so set it separately.
- 	 */
--	bad = ctxt->ops->set_cr(ctxt, 4, cr4 & ~X86_CR4_PCIDE);
-+	bad = kvm_set_cr4(vcpu, cr4 & ~X86_CR4_PCIDE);
- 	if (bad)
- 		return X86EMUL_UNHANDLEABLE;
- 
--	bad = ctxt->ops->set_cr(ctxt, 0, cr0);
-+	bad = kvm_set_cr0(vcpu, cr0);
- 	if (bad)
- 		return X86EMUL_UNHANDLEABLE;
- 
- 	if (cr4 & X86_CR4_PCIDE) {
--		bad = ctxt->ops->set_cr(ctxt, 4, cr4);
-+		bad = kvm_set_cr4(vcpu, cr4);
- 		if (bad)
- 			return X86EMUL_UNHANDLEABLE;
- 		if (pcid) {
--			bad = ctxt->ops->set_cr(ctxt, 3, cr3 | pcid);
-+			bad = kvm_set_cr3(vcpu, cr3 | pcid);
- 			if (bad)
- 				return X86EMUL_UNHANDLEABLE;
- 		}
-@@ -383,9 +371,9 @@ static int rsm_enter_protected_mode(struct x86_emulate_ctxt *ctxt,
- static int rsm_load_state_32(struct x86_emulate_ctxt *ctxt,
- 			     const char *smstate)
- {
--	struct desc_struct desc;
-+	struct kvm_vcpu *vcpu = ctxt->vcpu;
-+	struct kvm_segment desc;
- 	struct desc_ptr dt;
--	u16 selector;
- 	u32 val, cr0, cr3, cr4;
- 	int i;
- 
-@@ -399,56 +387,55 @@ static int rsm_load_state_32(struct x86_emulate_ctxt *ctxt,
- 
- 	val = GET_SMSTATE(u32, smstate, 0x7fcc);
- 
--	if (ctxt->ops->set_dr(ctxt, 6, val))
-+	if (kvm_set_dr(vcpu, 6, val))
- 		return X86EMUL_UNHANDLEABLE;
- 
- 	val = GET_SMSTATE(u32, smstate, 0x7fc8);
- 
--	if (ctxt->ops->set_dr(ctxt, 7, val))
-+	if (kvm_set_dr(vcpu, 7, val))
- 		return X86EMUL_UNHANDLEABLE;
- 
--	selector =                 GET_SMSTATE(u32, smstate, 0x7fc4);
--	set_desc_base(&desc,       GET_SMSTATE(u32, smstate, 0x7f64));
--	set_desc_limit(&desc,      GET_SMSTATE(u32, smstate, 0x7f60));
-+	desc.selector =            GET_SMSTATE(u32, smstate, 0x7fc4);
-+	desc.base =                GET_SMSTATE(u32, smstate, 0x7f64);
-+	desc.limit =               GET_SMSTATE(u32, smstate, 0x7f60);
- 	rsm_set_desc_flags(&desc,  GET_SMSTATE(u32, smstate, 0x7f5c));
--	ctxt->ops->set_segment(ctxt, selector, &desc, 0, VCPU_SREG_TR);
-+	kvm_set_segment(vcpu, &desc, VCPU_SREG_TR);
- 
--	selector =                 GET_SMSTATE(u32, smstate, 0x7fc0);
--	set_desc_base(&desc,       GET_SMSTATE(u32, smstate, 0x7f80));
--	set_desc_limit(&desc,      GET_SMSTATE(u32, smstate, 0x7f7c));
-+	desc.selector =            GET_SMSTATE(u32, smstate, 0x7fc0);
-+	desc.base =                GET_SMSTATE(u32, smstate, 0x7f80);
-+	desc.limit =               GET_SMSTATE(u32, smstate, 0x7f7c);
- 	rsm_set_desc_flags(&desc,  GET_SMSTATE(u32, smstate, 0x7f78));
--	ctxt->ops->set_segment(ctxt, selector, &desc, 0, VCPU_SREG_LDTR);
-+	kvm_set_segment(vcpu, &desc, VCPU_SREG_LDTR);
- 
- 	dt.address =               GET_SMSTATE(u32, smstate, 0x7f74);
- 	dt.size =                  GET_SMSTATE(u32, smstate, 0x7f70);
--	ctxt->ops->set_gdt(ctxt, &dt);
-+	static_call(kvm_x86_set_gdt)(vcpu, &dt);
- 
- 	dt.address =               GET_SMSTATE(u32, smstate, 0x7f58);
- 	dt.size =                  GET_SMSTATE(u32, smstate, 0x7f54);
--	ctxt->ops->set_idt(ctxt, &dt);
-+	static_call(kvm_x86_set_idt)(vcpu, &dt);
- 
- 	for (i = 0; i < 6; i++) {
--		int r = rsm_load_seg_32(ctxt, smstate, i);
-+		int r = rsm_load_seg_32(vcpu, smstate, i);
- 		if (r != X86EMUL_CONTINUE)
- 			return r;
- 	}
- 
- 	cr4 = GET_SMSTATE(u32, smstate, 0x7f14);
- 
--	ctxt->ops->set_smbase(ctxt, GET_SMSTATE(u32, smstate, 0x7ef8));
-+	vcpu->arch.smbase = GET_SMSTATE(u32, smstate, 0x7ef8);
- 
--	return rsm_enter_protected_mode(ctxt, cr0, cr3, cr4);
-+	return rsm_enter_protected_mode(vcpu, cr0, cr3, cr4);
- }
- 
- #ifdef CONFIG_X86_64
- static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
- 			     const char *smstate)
- {
--	struct desc_struct desc;
-+	struct kvm_vcpu *vcpu = ctxt->vcpu;
-+	struct kvm_segment desc;
- 	struct desc_ptr dt;
- 	u64 val, cr0, cr3, cr4;
--	u32 base3;
--	u16 selector;
- 	int i, r;
- 
- 	for (i = 0; i < NR_EMULATOR_GPRS; i++)
-@@ -459,51 +446,49 @@ static int rsm_load_state_64(struct x86_emulate_ctxt *ctxt,
- 
- 	val = GET_SMSTATE(u64, smstate, 0x7f68);
- 
--	if (ctxt->ops->set_dr(ctxt, 6, val))
-+	if (kvm_set_dr(vcpu, 6, val))
- 		return X86EMUL_UNHANDLEABLE;
- 
- 	val = GET_SMSTATE(u64, smstate, 0x7f60);
- 
--	if (ctxt->ops->set_dr(ctxt, 7, val))
-+	if (kvm_set_dr(vcpu, 7, val))
- 		return X86EMUL_UNHANDLEABLE;
- 
- 	cr0 =                       GET_SMSTATE(u64, smstate, 0x7f58);
- 	cr3 =                       GET_SMSTATE(u64, smstate, 0x7f50);
- 	cr4 =                       GET_SMSTATE(u64, smstate, 0x7f48);
--	ctxt->ops->set_smbase(ctxt, GET_SMSTATE(u32, smstate, 0x7f00));
-+	vcpu->arch.smbase =         GET_SMSTATE(u32, smstate, 0x7f00);
- 	val =                       GET_SMSTATE(u64, smstate, 0x7ed0);
- 
--	if (ctxt->ops->set_msr(ctxt, MSR_EFER, val & ~EFER_LMA))
-+	if (kvm_set_msr(vcpu, MSR_EFER, val & ~EFER_LMA))
- 		return X86EMUL_UNHANDLEABLE;
- 
--	selector =                  GET_SMSTATE(u32, smstate, 0x7e90);
-+	desc.selector =             GET_SMSTATE(u32, smstate, 0x7e90);
- 	rsm_set_desc_flags(&desc,   GET_SMSTATE(u32, smstate, 0x7e92) << 8);
--	set_desc_limit(&desc,       GET_SMSTATE(u32, smstate, 0x7e94));
--	set_desc_base(&desc,        GET_SMSTATE(u32, smstate, 0x7e98));
--	base3 =                     GET_SMSTATE(u32, smstate, 0x7e9c);
--	ctxt->ops->set_segment(ctxt, selector, &desc, base3, VCPU_SREG_TR);
-+	desc.limit =                GET_SMSTATE(u32, smstate, 0x7e94);
-+	desc.base =                 GET_SMSTATE(u64, smstate, 0x7e98);
-+	kvm_set_segment(vcpu, &desc, VCPU_SREG_TR);
- 
- 	dt.size =                   GET_SMSTATE(u32, smstate, 0x7e84);
- 	dt.address =                GET_SMSTATE(u64, smstate, 0x7e88);
--	ctxt->ops->set_idt(ctxt, &dt);
-+	static_call(kvm_x86_set_idt)(vcpu, &dt);
- 
--	selector =                  GET_SMSTATE(u32, smstate, 0x7e70);
-+	desc.selector =             GET_SMSTATE(u32, smstate, 0x7e70);
- 	rsm_set_desc_flags(&desc,   GET_SMSTATE(u32, smstate, 0x7e72) << 8);
--	set_desc_limit(&desc,       GET_SMSTATE(u32, smstate, 0x7e74));
--	set_desc_base(&desc,        GET_SMSTATE(u32, smstate, 0x7e78));
--	base3 =                     GET_SMSTATE(u32, smstate, 0x7e7c);
--	ctxt->ops->set_segment(ctxt, selector, &desc, base3, VCPU_SREG_LDTR);
-+	desc.limit =                GET_SMSTATE(u32, smstate, 0x7e74);
-+	desc.base =                 GET_SMSTATE(u64, smstate, 0x7e78);
-+	kvm_set_segment(vcpu, &desc, VCPU_SREG_LDTR);
- 
- 	dt.size =                   GET_SMSTATE(u32, smstate, 0x7e64);
- 	dt.address =                GET_SMSTATE(u64, smstate, 0x7e68);
--	ctxt->ops->set_gdt(ctxt, &dt);
-+	static_call(kvm_x86_set_gdt)(vcpu, &dt);
- 
--	r = rsm_enter_protected_mode(ctxt, cr0, cr3, cr4);
-+	r = rsm_enter_protected_mode(vcpu, cr0, cr3, cr4);
- 	if (r != X86EMUL_CONTINUE)
- 		return r;
- 
- 	for (i = 0; i < 6; i++) {
--		r = rsm_load_seg_64(ctxt, smstate, i);
-+		r = rsm_load_seg_64(vcpu, smstate, i);
- 		if (r != X86EMUL_CONTINUE)
- 			return r;
- 	}
-@@ -520,14 +505,14 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
- 	u64 smbase;
- 	int ret;
- 
--	smbase = ctxt->ops->get_smbase(ctxt);
-+	smbase = vcpu->arch.smbase;
- 
--	ret = ctxt->ops->read_phys(ctxt, smbase + 0xfe00, buf, sizeof(buf));
--	if (ret != X86EMUL_CONTINUE)
-+	ret = kvm_vcpu_read_guest(vcpu, smbase + 0xfe00, buf, sizeof(buf));
-+	if (ret < 0)
- 		return X86EMUL_UNHANDLEABLE;
- 
--	if ((ctxt->ops->get_hflags(ctxt) & X86EMUL_SMM_INSIDE_NMI_MASK) == 0)
--		ctxt->ops->set_nmi_mask(ctxt, false);
-+	if ((vcpu->arch.hflags & HF_SMM_INSIDE_NMI_MASK) == 0)
-+		static_call(kvm_x86_set_nmi_mask)(vcpu, false);
- 
- 	kvm_smm_changed(vcpu, false);
- 
-@@ -535,41 +520,41 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
- 	 * Get back to real mode, to prepare a safe state in which to load
- 	 * CR0/CR3/CR4/EFER.  It's all a bit more complicated if the vCPU
- 	 * supports long mode.
--	 *
--	 * The ctxt->ops callbacks will handle all side effects when writing
--	 * writing MSRs and CRs, e.g. MMU context resets, CPUID
--	 * runtime updates, etc.
- 	 */
--	if (emulator_has_longmode(ctxt)) {
--		struct desc_struct cs_desc;
-+#ifdef CONFIG_X86_64
-+	if (guest_cpuid_has(vcpu, X86_FEATURE_LM)) {
-+		struct kvm_segment cs_desc;
- 
- 		/* Zero CR4.PCIDE before CR0.PG.  */
--		cr4 = ctxt->ops->get_cr(ctxt, 4);
-+		cr4 = kvm_read_cr4(vcpu);
- 		if (cr4 & X86_CR4_PCIDE)
--			ctxt->ops->set_cr(ctxt, 4, cr4 & ~X86_CR4_PCIDE);
-+			kvm_set_cr4(vcpu, cr4 & ~X86_CR4_PCIDE);
- 
- 		/* A 32-bit code segment is required to clear EFER.LMA.  */
- 		memset(&cs_desc, 0, sizeof(cs_desc));
- 		cs_desc.type = 0xb;
--		cs_desc.s = cs_desc.g = cs_desc.p = 1;
--		ctxt->ops->set_segment(ctxt, 0, &cs_desc, 0, VCPU_SREG_CS);
-+		cs_desc.s = cs_desc.g = cs_desc.present = 1;
-+		kvm_set_segment(vcpu, &cs_desc, VCPU_SREG_CS);
- 	}
+ 	kvm_make_request(KVM_REQ_SMI, vcpu);
+@@ -23,5 +24,16 @@ void kvm_smm_changed(struct kvm_vcpu *vcpu, bool in_smm);
+ void enter_smm(struct kvm_vcpu *vcpu);
+ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt);
+ void process_smi(struct kvm_vcpu *vcpu);
++#else
++static inline int kvm_inject_smi(struct kvm_vcpu *vcpu) { return -ENOTTY; }
++static inline bool is_smm(struct kvm_vcpu *vcpu) { return false; }
++static inline void enter_smm(struct kvm_vcpu *vcpu) { WARN_ON_ONCE(1); }
++static inline void process_smi(struct kvm_vcpu *vcpu) { WARN_ON_ONCE(1); }
++
++/*
++ * emulator_leave_smm is used as a function pointer, so the
++ * stub is defined in x86.c.
++ */
 +#endif
  
- 	/* For the 64-bit case, this will clear EFER.LMA.  */
--	cr0 = ctxt->ops->get_cr(ctxt, 0);
-+	cr0 = kvm_read_cr0(vcpu);
- 	if (cr0 & X86_CR0_PE)
--		ctxt->ops->set_cr(ctxt, 0, cr0 & ~(X86_CR0_PG | X86_CR0_PE));
-+		kvm_set_cr0(vcpu, cr0 & ~(X86_CR0_PG | X86_CR0_PE));
- 
--	if (emulator_has_longmode(ctxt)) {
-+#ifdef CONFIG_X86_64
-+	if (guest_cpuid_has(vcpu, X86_FEATURE_LM)) {
- 		/* Clear CR4.PAE before clearing EFER.LME. */
--		cr4 = ctxt->ops->get_cr(ctxt, 4);
-+		cr4 = kvm_read_cr4(vcpu);
- 		if (cr4 & X86_CR4_PAE)
--			ctxt->ops->set_cr(ctxt, 4, cr4 & ~X86_CR4_PAE);
-+			kvm_set_cr4(vcpu, cr4 & ~X86_CR4_PAE);
- 
- 		/* And finally go back to 32-bit mode.  */
- 		efer = 0;
--		ctxt->ops->set_msr(ctxt, MSR_EFER, efer);
-+		kvm_set_msr(vcpu, MSR_EFER, efer);
- 	}
-+#endif
- 
- 	/*
- 	 * Give leave_smm() a chance to make ISA-specific changes to the vCPU
-@@ -580,7 +565,7 @@ int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
- 		return X86EMUL_UNHANDLEABLE;
- 
- #ifdef CONFIG_X86_64
--	if (emulator_has_longmode(ctxt))
-+	if (guest_cpuid_has(vcpu, X86_FEATURE_LM))
- 		return rsm_load_state_64(ctxt, buf);
- 	else
  #endif
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 496ee7d1ae2f..6f7ceb35d2ff 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4150,6 +4150,8 @@ static bool svm_has_emulated_msr(struct kvm *kvm, u32 index)
+ 	case MSR_IA32_VMX_BASIC ... MSR_IA32_VMX_VMFUNC:
+ 		return false;
+ 	case MSR_IA32_SMBASE:
++		if (!IS_ENABLED(CONFIG_KVM_SMM))
++			return false;
+ 		/* SEV-ES guests do not support SMM, so report false */
+ 		if (kvm && sev_es_guest(kvm))
+ 			return false;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index b459ddf30abd..c2abe62d7cc0 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6841,6 +6841,8 @@ static bool vmx_has_emulated_msr(struct kvm *kvm, u32 index)
+ {
+ 	switch (index) {
+ 	case MSR_IA32_SMBASE:
++		if (!IS_ENABLED(CONFIG_KVM_SMM))
++			return false;
+ 		/*
+ 		 * We cannot do SMM unless we can run the guest in big
+ 		 * real mode.
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 676efc3d58ec..ec5e9a837a12 100644
+index ec5e9a837a12..3ec3d3632316 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -7255,15 +7255,6 @@ static int emulator_read_std(struct x86_emulate_ctxt *ctxt,
- 	return kvm_read_guest_virt_helper(addr, val, bytes, vcpu, access, exception);
+@@ -3641,7 +3641,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		break;
+ 	}
+ 	case MSR_IA32_SMBASE:
+-		if (!msr_info->host_initiated)
++		if (!IS_ENABLED(CONFIG_KVM_SMM) || !msr_info->host_initiated)
+ 			return 1;
+ 		vcpu->arch.smbase = data;
+ 		break;
+@@ -4057,7 +4057,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		msr_info->data = vcpu->arch.ia32_misc_enable_msr;
+ 		break;
+ 	case MSR_IA32_SMBASE:
+-		if (!msr_info->host_initiated)
++		if (!IS_ENABLED(CONFIG_KVM_SMM) || !msr_info->host_initiated)
+ 			return 1;
+ 		msr_info->data = vcpu->arch.smbase;
+ 		break;
+@@ -4431,6 +4431,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 			r |= KVM_X86_DISABLE_EXITS_MWAIT;
+ 		break;
+ 	case KVM_CAP_X86_SMM:
++		if (!IS_ENABLED(CONFIG_KVM_SMM))
++			break;
++
+ 		/* SMBASE is usually relocated above 1M on modern chipsets,
+ 		 * and SMM handlers might indeed rely on 4G segment limits,
+ 		 * so do not report SMM to be available if real mode is
+@@ -5181,6 +5184,7 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
+ 		vcpu->arch.apic->sipi_vector = events->sipi_vector;
+ 
+ 	if (events->flags & KVM_VCPUEVENT_VALID_SMM) {
++#ifdef CONFIG_KVM_SMM
+ 		if (!!(vcpu->arch.hflags & HF_SMM_MASK) != events->smi.smm) {
+ 			kvm_x86_ops.nested_ops->leave_nested(vcpu);
+ 			kvm_smm_changed(vcpu, events->smi.smm);
+@@ -5195,6 +5199,12 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
+ 				vcpu->arch.hflags &= ~HF_SMM_INSIDE_NMI_MASK;
+ 		}
+ 
++#else
++		if (events->smi.smm || events->smi.pending ||
++		    events->smi.smm_inside_nmi)
++			return -EINVAL;
++#endif
++
+ 		if (lapic_in_kernel(vcpu)) {
+ 			if (events->smi.latched_init)
+ 				set_bit(KVM_APIC_INIT, &vcpu->arch.apic->pending_events);
+@@ -8120,6 +8130,14 @@ static unsigned emulator_get_hflags(struct x86_emulate_ctxt *ctxt)
+ 	return emul_to_vcpu(ctxt)->arch.hflags;
  }
  
--static int kvm_read_guest_phys_system(struct x86_emulate_ctxt *ctxt,
--		unsigned long addr, void *val, unsigned int bytes)
--{
--	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
--	int r = kvm_vcpu_read_guest(vcpu, addr, val, bytes);
--
--	return r < 0 ? X86EMUL_IO_NEEDED : X86EMUL_CONTINUE;
--}
--
- static int kvm_write_guest_virt_helper(gva_t addr, void *val, unsigned int bytes,
- 				      struct kvm_vcpu *vcpu, u64 access,
- 				      struct x86_exception *exception)
-@@ -8055,26 +8046,6 @@ static int emulator_get_msr(struct x86_emulate_ctxt *ctxt,
- 	return kvm_get_msr(emul_to_vcpu(ctxt), msr_index, pdata);
- }
- 
--static int emulator_set_msr(struct x86_emulate_ctxt *ctxt,
--			    u32 msr_index, u64 data)
--{
--	return kvm_set_msr(emul_to_vcpu(ctxt), msr_index, data);
--}
--
--static u64 emulator_get_smbase(struct x86_emulate_ctxt *ctxt)
--{
--	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
--
--	return vcpu->arch.smbase;
--}
--
--static void emulator_set_smbase(struct x86_emulate_ctxt *ctxt, u64 smbase)
--{
--	struct kvm_vcpu *vcpu = emul_to_vcpu(ctxt);
--
--	vcpu->arch.smbase = smbase;
--}
--
- static int emulator_check_pmc(struct x86_emulate_ctxt *ctxt,
- 			      u32 pmc)
++#ifndef CONFIG_KVM_SMM
++static int emulator_leave_smm(struct x86_emulate_ctxt *ctxt)
++{
++	WARN_ON_ONCE(1);
++	return X86EMUL_UNHANDLEABLE;
++}
++#endif
++
+ static void emulator_triple_fault(struct x86_emulate_ctxt *ctxt)
  {
-@@ -8173,7 +8144,6 @@ static const struct x86_emulate_ops emulate_ops = {
- 	.write_gpr           = emulator_write_gpr,
- 	.read_std            = emulator_read_std,
- 	.write_std           = emulator_write_std,
--	.read_phys           = kvm_read_guest_phys_system,
- 	.fetch               = kvm_fetch_guest_virt,
- 	.read_emulated       = emulator_read_emulated,
- 	.write_emulated      = emulator_write_emulated,
-@@ -8193,11 +8163,8 @@ static const struct x86_emulate_ops emulate_ops = {
- 	.cpl                 = emulator_get_cpl,
- 	.get_dr              = emulator_get_dr,
- 	.set_dr              = emulator_set_dr,
--	.get_smbase          = emulator_get_smbase,
--	.set_smbase          = emulator_set_smbase,
- 	.set_msr_with_filter = emulator_set_msr_with_filter,
- 	.get_msr_with_filter = emulator_get_msr_with_filter,
--	.set_msr             = emulator_set_msr,
- 	.get_msr             = emulator_get_msr,
- 	.check_pmc	     = emulator_check_pmc,
- 	.read_pmc            = emulator_read_pmc,
+ 	kvm_make_request(KVM_REQ_TRIPLE_FAULT, emul_to_vcpu(ctxt));
+diff --git a/tools/testing/selftests/kvm/x86_64/smm_test.c b/tools/testing/selftests/kvm/x86_64/smm_test.c
+index 1f136a81858e..cb38a478e1f6 100644
+--- a/tools/testing/selftests/kvm/x86_64/smm_test.c
++++ b/tools/testing/selftests/kvm/x86_64/smm_test.c
+@@ -137,6 +137,8 @@ int main(int argc, char *argv[])
+ 	struct kvm_x86_state *state;
+ 	int stage, stage_reported;
+ 
++	TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_SMM));
++
+ 	/* Create VM */
+ 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+ 
 -- 
 2.31.1
 
