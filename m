@@ -2,149 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A911460F20F
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 10:18:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C27E60F255
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 10:30:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234884AbiJ0ISX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 04:18:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60518 "EHLO
+        id S234291AbiJ0Iav (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 04:30:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234581AbiJ0ISV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 04:18:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2A6AF88C0
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 01:18:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666858700;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=H+zjgwfHgHFBXNtS1dcXbFjT5C6bNkpnBbMlxremMWY=;
-        b=exNv1AAoPH87hdkSdMIegQEaIkbtPoC1Gge8wGbCz+H0KaWXI1HSB9WZOYrkHn/ENNTzSA
-        Vy1cKV9aISrbb8hUUQw48S72sHY3/SJfGl/k3kccjhDA/CEs2AbT7HQXhIM2FTtOEUE5P5
-        F5R8xncC3ilINkEcH6gtmJrXmjN9FHc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-31-n7T2k-UYPnuMjdP9Nw4xuQ-1; Thu, 27 Oct 2022 04:18:17 -0400
-X-MC-Unique: n7T2k-UYPnuMjdP9Nw4xuQ-1
-Received: by mail-wm1-f70.google.com with SMTP id n19-20020a7bcbd3000000b003c4a72334e7so260831wmi.8
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 01:18:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=H+zjgwfHgHFBXNtS1dcXbFjT5C6bNkpnBbMlxremMWY=;
-        b=PNYGGnGA0HSse5tnwca2ZfE+iPrDrvrENhvWnbXbvOr8qd+SqCokaP8DoN6eFIT1NC
-         dSvNz9U/nnjnpyUjGuwDOAEdENge83P7h+UxVcQAkoYctjWi1dnnnv2U3vHMrO8GR/Ns
-         uDHYxNmhbY2MN7vvfkiEcPG4GzptJdNPgEqPvaTVgn1NF1wno5HjPPJzT1MevWDimU4m
-         5YvwU2z3nEs3EX+R6hAp+D0feTh7Sl7lkAcySPt8MJTQPN0cZ3i8zAyB5XqWFIX4acaX
-         NXnjkzYtZdU6N0h3fqWhk5bfjlVrEfPL9kUCi2GH8Gr+CMxrHcztRz3OnoRJjxicfgMq
-         ZO/Q==
-X-Gm-Message-State: ACrzQf1UIAH3+om6KXllVOknRsDjIIJ3pnuld5SE4lt1rmyN3k/H89ja
-        aPMKWzDUQVHFWR0uZIUv7anx+vZLH2rq2U5PnsVPtw7vRBxsns+N5Qr/XHAIfa9pZzbURY6kJo1
-        FsvEddSwajuFm
-X-Received: by 2002:adf:ebcf:0:b0:22c:9eb4:d6f6 with SMTP id v15-20020adfebcf000000b0022c9eb4d6f6mr31409127wrn.251.1666858696587;
-        Thu, 27 Oct 2022 01:18:16 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM4CgeyUAU3EZlndfaRTAGP3JWCxEXgwxeBo73X8Vdko0Rf33SSC2AqFidTXI1tyqPqoddOuig==
-X-Received: by 2002:adf:ebcf:0:b0:22c:9eb4:d6f6 with SMTP id v15-20020adfebcf000000b0022c9eb4d6f6mr31409114wrn.251.1666858696314;
-        Thu, 27 Oct 2022 01:18:16 -0700 (PDT)
-Received: from ovpn-194-52.brq.redhat.com (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id k1-20020a05600c1c8100b003b4fe03c881sm4208779wms.48.2022.10.27.01.18.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Oct 2022 01:18:15 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+        with ESMTP id S234052AbiJ0Iar (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 04:30:47 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BE5F58DDA
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 01:30:44 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 683B5CE2537
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 08:30:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67F71C433C1;
+        Thu, 27 Oct 2022 08:30:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1666859438;
+        bh=arMQtq9DbRVuqGtl0NKqOp+U/tqrQrVnDDLZrYh0Cdc=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ExMd5+2nADS9V31yBA8t9CNi8RmWkDsuC+CV/tuxZiiM8olH8S4tchOJ32wzWCgy4
+         VdIDGm0P59b8dyDUYpHIckn2tuC39Tp3TJ/CYXrmvK+MVnwo4KkVj9weWKSWSFsqz7
+         JNWJJ3oxtEmgjctHYLFIjGhs8oA0X0wJpAbn73MedRNFddi/FV8kO/OMmXYNcERWhz
+         Fp+n3oqfXQMhGlxyvAvlWvBfrluwuk+mDAg58k0/D1KZ2EDhOluvE1/S2/1nLg1BqG
+         hJtJUuxMsGetcHqnuz6YXixLbVL2XcSn0/1p7tG0FzazNCTdTAWASUYOdyZSGHzp7G
+         KTWAiJlIUDkxA==
+Received: from [104.132.45.106] (helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1onyHb-001w1G-V7;
+        Thu, 27 Oct 2022 09:30:36 +0100
+Date:   Thu, 27 Oct 2022 09:29:58 +0100
+Message-ID: <877d0lhdo9.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        Siddharth Chandrasekaran <sidcha@amazon.de>,
-        Yuan Yao <yuan.yao@linux.intel.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v12 13/46] KVM: x86: Prepare kvm_hv_flush_tlb() to
- handle L2's GPAs
-In-Reply-To: <Y1m0HCMgwJen/NnU@google.com>
-References: <20221021153521.1216911-1-vkuznets@redhat.com>
- <20221021153521.1216911-14-vkuznets@redhat.com>
- <Y1m0HCMgwJen/NnU@google.com>
-Date:   Thu, 27 Oct 2022 10:18:14 +0200
-Message-ID: <87ilk5u1bt.fsf@ovpn-194-52.brq.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Gavin Shan <gshan@redhat.com>, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        peterx@redhat.com, will@kernel.org, catalin.marinas@arm.com,
+        bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev,
+        dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com,
+        james.morse@arm.com, suzuki.poulose@arm.com,
+        alexandru.elisei@arm.com, shan.gavin@gmail.com
+Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in conjunction with bitmap
+In-Reply-To: <Y1ghIKrAsRFwSFsO@google.com>
+References: <20221011061447.131531-1-gshan@redhat.com>
+        <20221011061447.131531-4-gshan@redhat.com>
+        <Y1Hdc/UVta3A5kHM@google.com>
+        <8635bhfvnh.wl-maz@kernel.org>
+        <Y1LDRkrzPeQXUHTR@google.com>
+        <87edv0gnb3.wl-maz@kernel.org>
+        <Y1ckxYst3tc0LCqb@google.com>
+        <Y1css8k0gtFkVwFQ@google.com>
+        <878rl4gxzx.wl-maz@kernel.org>
+        <Y1ghIKrAsRFwSFsO@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 104.132.45.106
+X-SA-Exim-Rcpt-To: seanjc@google.com, oliver.upton@linux.dev, gshan@redhat.com, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, peterx@redhat.com, will@kernel.org, catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On Tue, 25 Oct 2022 18:47:12 +0100,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> On Tue, Oct 25, 2022, Marc Zyngier wrote:
+> > On Tue, 25 Oct 2022 01:24:19 +0100, Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > > That's why I asked if it's possible for KVM to require a dirty_bitmap when KVM
+> > > > might end up collecting dirty information without a vCPU.  KVM is still
+> > > > technically prescribing a solution to userspace, but only because there's only
+> > > > one solution.
+> > > 
+> > > I was trying to allude to something like this by flat-out requiring
+> > > ring + bitmap on arm64.
+> > 
+> > And I claim that this is wrong. It may suit a particular use case, but
+> > that's definitely not a universal truth.
+> 
+> Agreed, KVM should not unconditionally require a dirty bitmap for arm64.
+> 
+> > > Otherwise, we'd either need to:
+> > > 
+> > >  (1) Document the features that explicitly depend on ring + bitmap (i.e.
+> > >  GIC ITS, whatever else may come) such that userspace sets up the
+> > >  correct configuration based on what its using. The combined likelihood
+> > >  of both KVM and userspace getting this right seems low.
+> > 
+> > But what is there to get wrong? Absolutely nothing.
+> 
+> I strongly disagree.  On x86, we've had two bugs escape where KVM
+> attempted to mark a page dirty without an active vCPU.
+> 
+>   2efd61a608b0 ("KVM: Warn if mark_page_dirty() is called without an active vCPU") 
+>   42dcbe7d8bac ("KVM: x86: hyper-v: Avoid writing to TSC page without an active vCPU")
+> 
+> Call us incompetent, but I have zero confidence that KVM will never
+> unintentionally add a path that invokes mark_page_dirty_in_slot()
+> without a running vCPU.
 
-> On Fri, Oct 21, 2022, Vitaly Kuznetsov wrote:
->> To handle L2 TLB flush requests, KVM needs to translate the specified
->> L2 GPA to L1 GPA to read hypercall arguments from there.
->> 
->> No functional change as KVM doesn't handle VMCALL/VMMCALL from L2 yet.
->> 
->> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>  arch/x86/kvm/hyperv.c | 7 +++++++
->>  1 file changed, 7 insertions(+)
->> 
->> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
->> index fca9c51891f5..df1efb821eb0 100644
->> --- a/arch/x86/kvm/hyperv.c
->> +++ b/arch/x86/kvm/hyperv.c
->> @@ -23,6 +23,7 @@
->>  #include "ioapic.h"
->>  #include "cpuid.h"
->>  #include "hyperv.h"
->> +#include "mmu.h"
->>  #include "xen.h"
->>  
->>  #include <linux/cpu.h>
->> @@ -1908,6 +1909,12 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
->>  	 */
->>  	BUILD_BUG_ON(KVM_HV_MAX_SPARSE_VCPU_SET_BITS > 64);
->>  
->> +	if (!hc->fast && is_guest_mode(vcpu)) {
->
-> Please add a comment explaining why only "slow" hypercalls need to translate the
-> GPA from L2=>L1.
->
-> With a comment (and assuming this isn't a bug),
+Well, maybe it is time that KVM acknowledges there is a purpose to
+dirtying memory outside of a vcpu context, and that if a write happens
+in a vcpu context, this vcpu must be explicitly passed down rather
+than obtained from kvm_get_running_vcpu(). Yes, this requires some
+heavy surgery.
 
-This is intended,
+> By completely dropping the rule that KVM must have an active vCPU on
+> architectures that support ring+bitmap, those types of bugs will go
+> silently unnoticed, and will manifest as guest data corruption after
+> live migration.
 
-For "slow" hypercalls 'hc->ingpa' is the GPA (or an 'nGPA' -- thus the
-patch) in guest memory where hypercall parameters are placed, kvm reads
-them with kvm_read_guest() later. For "fast" hypercalls 'ingpa' is a
-misnomer as it is not an address but the first parameter (in the 'tlb
-flush' case it's 'address space id' which we currently don't
-analyze). We may want to add a union in 'struct kvm_hv_hcall' to make
-this explicit.
+The elephant in the room is still userspace writing to its view of the
+guest memory for device emulation. Do they get it right? I doubt it.
 
-The comment I'm thinking of would be:
+> And ideally such bugs would detected without relying on userspace to
+> enabling dirty logging, e.g. the Hyper-V bug lurked for quite some
+> time and was only found when mark_page_dirty_in_slot() started
+> WARNing.
+> 
+> I'm ok if arm64 wants to let userspace shoot itself in the foot with
+> the ITS, but I'm not ok dropping the protections in the common
+> mark_page_dirty_in_slot().
+> 
+> One somewhat gross idea would be to let architectures override the
+> "there must be a running vCPU" rule, e.g. arm64 could toggle a flag
+> in kvm->arch in its kvm_write_guest_lock() to note that an expected
+> write without a vCPU is in-progress:
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 8c5c69ba47a7..d1da8914f749 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3297,7 +3297,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>         struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+>  
+>  #ifdef CONFIG_HAVE_KVM_DIRTY_RING
+> -       if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
+> +       if (!kvm_arch_allow_write_without_running_vcpu(kvm) && WARN_ON_ONCE(!vcpu))
+> +               return;
+> +
+> +       if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
+>                 return;
+>  #endif
+>  
+> @@ -3305,10 +3308,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
+>                 unsigned long rel_gfn = gfn - memslot->base_gfn;
+>                 u32 slot = (memslot->as_id << 16) | memslot->id;
+>  
+> -               if (kvm->dirty_ring_size)
+> +               if (kvm->dirty_ring_size && vcpu)
+>                         kvm_dirty_ring_push(&vcpu->dirty_ring,
+>                                             slot, rel_gfn);
+> -               else
+> +               else if (memslot->dirty_bitmap)
+>                         set_bit_le(rel_gfn, memslot->dirty_bitmap);
+>         }
+>  }
 
-"
-/*
- * 'Slow' hypercall's first parameter is the address in guest's memory where
- * hypercall parameters are placed. This is either a GPA or a nested GPA when
- * KVM is handling the call from L2 ('direct' TLB flush), translate the address
- * here so the memory can be uniformly read with kvm_read_guest().
- */
-"
+I think this is equally wrong. Writes occur from both CPUs and devices
+*concurrently*, and I don't see why KVM should keep ignoring this
+pretty obvious fact.
 
->
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
->
+Yes, your patch papers over the problem, and it can probably work if
+the kvm->arch flag only gets set in the ITS saving code, which is
+already exclusive of vcpus running.
+
+But in the long run, with dirty bits being collected from the IOMMU
+page tables or directly from devices, we will need a way to reconcile
+the dirty tracking. The above doesn't quite cut it, unfortunately.
+
+	M.
 
 -- 
-Vitaly
-
+Without deviation from the norm, progress is not possible.
