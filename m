@@ -2,90 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BF1060F6FE
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 14:18:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7808860F73C
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 14:29:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235322AbiJ0MSR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 08:18:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51296 "EHLO
+        id S235644AbiJ0M3O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 08:29:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235292AbiJ0MSO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 08:18:14 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D3EB2250B;
-        Thu, 27 Oct 2022 05:18:12 -0700 (PDT)
+        with ESMTP id S235730AbiJ0M24 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 08:28:56 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA292132240;
+        Thu, 27 Oct 2022 05:28:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666873092; x=1698409092;
+  t=1666873715; x=1698409715;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=ShT+ohHodXQdRMDxgmVsLbYg/HXuecdD39G5U/P15mc=;
-  b=YwiK1w3egyPVaXZqkSwiHIxOVDXp598INdPgf9GnWBT4D92TiflnFtSv
-   OoCr/NXnFjixEpZjT02xfcca5rBI6K/UMVLC/GnF8Ud3mZnDxs8i5PA+H
-   TPskjfFvEwF4+4TdpxOcOIDFqsMCkbulDHqfhUApzR+N2x88U1luAoaEz
-   WjFLgmGLlByc41kT2TV39uRMk4pA5qnq0rjWtKcicgbQU8iCWxffqmIf9
-   0TAflx6Zu/k7G9yZP7ls/qS/hw/V3jbwimDlVTYvSVSeU+S6WAR8pglvU
-   8e/h0IvA8AvMuOijVodqz6jeSuU61iCU3BVp7zzAEcazUN7sfS9mId2So
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="308200455"
+  bh=q2IcdsyP8S87jcl88a3KdcuYIcWmmzjOMkhpxHSYmPU=;
+  b=Sh69Gk6Q7schj1deGkipBInUv3HnmqUkQRe6rVivuQDSJK2kcrTEVNwx
+   ShBeeKswFkLXCMFWZrngOL5Bl3OhYCFhwgOyXdwYPMxocbBo40rxciuiF
+   omxX5yF0x0nz0Ct4u7z6LNHhrSvORAPRnvf33L6TCEpOL0SDEMTLA3bN3
+   mllcRKuIoMoy8D05mwFw4MrTXcKLYH29Re9fw1vitO9DB06SYj8h8omso
+   KTPXthr92Vj9XnfM+JpqJHF23usndIm3jUjPTO6/q/2X9UO3G+tIYjj7H
+   rfEBvfz+7qErW8W8dhcIGOMD9GY5D1DkcSYhX0RsWXfAoLP2Tf8wgwTUG
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="372421106"
 X-IronPort-AV: E=Sophos;i="5.95,217,1661842800"; 
-   d="scan'208";a="308200455"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2022 05:18:11 -0700
+   d="scan'208";a="372421106"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2022 05:28:35 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="737659058"
+X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="695786738"
 X-IronPort-AV: E=Sophos;i="5.95,217,1661842800"; 
-   d="scan'208";a="737659058"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga002.fm.intel.com with ESMTP; 27 Oct 2022 05:18:11 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+   d="scan'208";a="695786738"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga008.fm.intel.com with ESMTP; 27 Oct 2022 05:28:34 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 27 Oct 2022 05:18:11 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ 15.1.2375.31; Thu, 27 Oct 2022 05:28:34 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31 via Frontend Transport; Thu, 27 Oct 2022 05:18:11 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ 15.1.2375.31; Thu, 27 Oct 2022 05:28:34 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Thu, 27 Oct 2022 05:28:34 -0700
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.46) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2375.31; Thu, 27 Oct 2022 05:18:11 -0700
+ 15.1.2375.31; Thu, 27 Oct 2022 05:28:33 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=U9tHSz4hOFzWwMQKsDDmuSN53G849YSmhqveEWxhlJk/kXstK6EVYg4+K8VKfI2UNmNiE7lH0qH5py7nSbxlMXis6l+8ymEmhg900ezeOhAwFj6MTaMNj8Up2RGl64ZqG1TnVbq2zA6/2LjHOARQ0zA3ReNBCzxgPtTJ29FkNxi9WIrCGDTUYVQrAITdXh/Ocsbk1tQPae15GnAQbk2XMm+uVDCTnZ6XpfWmlqoHUqe3VehU978DhVi8qQq4SdwVdujVnFCoFs9ocX51/2kWmO0PiKqkrfoHPr+n/QNfR+Df4xyrn/ObXSP5RunRyfkOxC+CpqUbFntZMLFomQSmgw==
+ b=jtWLvp+c13BP7HbwJzQ4uK/rDmtDG8z/6Kd5ChP/kd8jFGWqi+nCbPKp1tLj7LNCtZgwL7E1HwcPJfRHR2m1GBj7pNzJHMU01txY/DYDGqW3hSDvtfLubgNfZjt74+A0UzVmLqs6FFM2SlKqLH3Sdf+LyS8ZCJwelV+yQ6Fuo3TgxpDTs0uAq6ZMaiXMAik4viU3GhWmLkRr5gQOHxRE+2uYTTY5XdVlZaqEtTzKhPhSeiMYw96UlH2t9mfRPprv6yB78cpPrYPatP8ZLdwkbqI7h7NL6LmosxUNlDn5GOAkBjI9+u/uPH98gq8C75ZWjnpEsscrFl/zylXaLuxwQg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dLW8M6epLTE/GeAjyX0aWHjo3NnvpSDls7i4nGS9IVM=;
- b=KINmd7YD4xQnVvWdTj+8EL4juvAoK6q+HnPJrfnc5cGXsO9cGnimCRPnpJ0uCwapHCME8jBlE0iRINPRp8p7V96hBTFxOHCJLmVePem8bavdKzKiKC2AkcYJiSIYY/lH0xH18F6NU5SS/dGv5fOrkiR6P9c+vkcC+i1t8WNDUGbHscPBnulr7Ch7j0tYaUv3yVCR3lsEJz0Q9v0eTE4cRsYRPuno7YVh0WPMg3YXH1k9kLSH46ykA4XScowwsTjPuMJae02sDX5LoGjVyE5uk6ODFaHod8K6DLU3MGlVtlo4OreACPj0z5yT+FdeL7CpfPfwL4IYYP5g1H1MRDtmqA==
+ bh=UAolB/QG5UWfBC+WKeNPo/ICs4kYv99/j51rhixtttM=;
+ b=Qjnql3znV6tnQEECMDVCTyEioFtihMsVFx8mRliNCYCJxCj8GooqP9LcB/sS8bGtUuwWp8M4drSBH+7h9Rilg5JeZHoS4KrHEAnazNFjaiqgmXTl4hclsvdTzP4vd5XXlFtATl1xDBry3TU1S1Quv/2peuPG2SxYKVjDs8CRYkgiUAw7AEiKKmhEnZikHrQDv2/5c2SfP2KEOoak2Zy5KFiqfUKrnsk899yOsMEvxID7DceijGiLpDLSNpU0Js13A932QnkMG34Xsymaf5yy5S+qLyp38Nldpx+d5LdLW1Wn1hCagKNSccSemcGNarRvuhDuw+eWIrJzZ6NDDltCDg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Received: from DS0PR11MB6373.namprd11.prod.outlook.com (2603:10b6:8:cb::20) by
- IA1PR11MB6444.namprd11.prod.outlook.com (2603:10b6:208:3a7::11) with
+ PH0PR11MB7471.namprd11.prod.outlook.com (2603:10b6:510:28a::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5769.14; Thu, 27 Oct
- 2022 12:18:08 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5746.27; Thu, 27 Oct
+ 2022 12:28:31 +0000
 Received: from DS0PR11MB6373.namprd11.prod.outlook.com
  ([fe80::4625:d63e:1152:1246]) by DS0PR11MB6373.namprd11.prod.outlook.com
  ([fe80::4625:d63e:1152:1246%6]) with mapi id 15.20.5746.021; Thu, 27 Oct 2022
- 12:18:08 +0000
+ 12:28:31 +0000
 From:   "Wang, Wei W" <wei.w.wang@intel.com>
-To:     David Matlack <dmatlack@google.com>
-CC:     "Christopherson,, Sean" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+To:     "Christopherson,, Sean" <seanjc@google.com>
+CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "dmatlack@google.com" <dmatlack@google.com>,
         "vipinsh@google.com" <vipinsh@google.com>,
         "ajones@ventanamicro.com" <ajones@ventanamicro.com>,
         "eric.auger@redhat.com" <eric.auger@redhat.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v1 00/18] KVM selftests code consolidation and cleanup
-Thread-Topic: [PATCH v1 00/18] KVM selftests code consolidation and cleanup
-Thread-Index: AQHY55yiwQJVciN2Gk26RCSAzzsjaa4hMvUAgACUSLA=
-Date:   Thu, 27 Oct 2022 12:18:08 +0000
-Message-ID: <DS0PR11MB63731F2B467D4084F5C8D9B5DC339@DS0PR11MB6373.namprd11.prod.outlook.com>
+Subject: RE: [PATCH v1 01/18] KVM: selftests/kvm_util: use array of pointers
+ to maintain vcpus in kvm_vm
+Thread-Topic: [PATCH v1 01/18] KVM: selftests/kvm_util: use array of pointers
+ to maintain vcpus in kvm_vm
+Thread-Index: AQHY55ylKGIU2b/Czky3MagHOAXjm64hW4iAgAB9rdA=
+Date:   Thu, 27 Oct 2022 12:28:31 +0000
+Message-ID: <DS0PR11MB6373E471C1378CBEEBD40A82DC339@DS0PR11MB6373.namprd11.prod.outlook.com>
 References: <20221024113445.1022147-1-wei.w.wang@intel.com>
- <Y1mlJqKdFtlgG3jR@google.com>
-In-Reply-To: <Y1mlJqKdFtlgG3jR@google.com>
+ <20221024113445.1022147-2-wei.w.wang@intel.com> <Y1nHL5BUoWPqUtt9@google.com>
+In-Reply-To: <Y1nHL5BUoWPqUtt9@google.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -96,58 +102,58 @@ dlp-version: 11.6.500.17
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB6373:EE_|IA1PR11MB6444:EE_
-x-ms-office365-filtering-correlation-id: 7cdd2982-5f3e-4d20-0e39-08dab8154ef3
+x-ms-traffictypediagnostic: DS0PR11MB6373:EE_|PH0PR11MB7471:EE_
+x-ms-office365-filtering-correlation-id: edc025f7-e201-4631-5eea-08dab816c217
 x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: HAEN6YbOguu1hoGwO3UhMvkhoPIcw6V3qR3af5gMjRspZYVNNrXrwcz6VmtF1YUZ4BWoMXuxlansb2VFGoU3PED8sb1oIiZ9e/svq1+ONS2uXPxxtWPqPfHY+jPHARamSlrev8U2rifgfBwBSBg4AcbEWJjEZQj3QYsCYRgvtI4gpQiq7qQkveF4TsIUrwxsDltJmokxZeWhQLN0oQ/89WE/g8OWYg5mbEfe3WY3Smu1CbtC/7fTVWUZ1+GzKRKGidKMLBpNTH3SPpNKgrIprPVqg1MwT867PkL8u/9xA2F76eYXg3v1QgRbVPUVSCZ8Gx9VwcycBSRHGI4KkSDR5W2NsRNFR+U9fizpR7DbuEA26dFVZwj1VccaK0Iqv4Vc3pz5d8HjmlXZLAYU9LBD9u+JsFsY5wgLqeSeZ11C9IwprNM9XCB2gjBpdgLrwjChwP65vVYdIBDyE6rHqTU6UuO+cgUSE+QYo+I6DVzECF4Th/fHibQZ/ndjEV5KRSLWJjb6scxX8dnU5XEoyDT7I5VDbjjqFHDoxtd9+kNRFIEj51urRNb1nnYvCfZA1SJr8RNjl7+sJQwz94PfAYLX8wG4Nh2WKYPp9TCXqgam02ojp627ZZGlL5NnICtSkgCCuZ/ohwVfJ+b4Q7IysaaGmnr5F7fWHTykniEB93Cc8yaCuOhOIIwT1BTDfdSWw1D24Lx9kt04MWWp10qz3L3Gbm32pUBGLfjvcmUxXwdwBcTGz3osxAt8SRfww16FLi47
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB6373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(376002)(366004)(396003)(39860400002)(136003)(451199015)(38100700002)(122000001)(478600001)(38070700005)(71200400001)(6916009)(55016003)(54906003)(316002)(86362001)(9686003)(26005)(76116006)(4326008)(8676002)(64756008)(66446008)(82960400001)(41300700001)(66476007)(83380400001)(2906002)(186003)(52536014)(8936002)(33656002)(5660300002)(66946007)(7696005)(6506007)(66556008);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: PpEjveLH+ahoSEaBStPpCXoSEjXIPn3r4MvsrKZuY5OtNlAbJMVowNjpaWSd2Rd2slo/4Np7HD+RAXsjNb0r/Pfd3LoD7fKETXcUs4DBptGo3gJjz3Rh9c3/AoZVS7BEAnHavwplVBKbsBIwWVbCXLzlwFscRiepoxf7XmDxXdXOmls/feCzl7a747tCAqW7wNpEKIA9Jhwk72VIrWOTVvO96WTp0U2G9hMbr/sfXEd81quVNe0nkuWBCkqNhxkvh1pmndNROS4m7j8QO0iTAHfYVMsuMkUmDqOqdaEWNsxpU1A/QVD81xWPFi0pqiHdKFBFJp2fcjIg+wPsk1gu9779AY4iBXx62ETTf/Caf5dQJGNSaRn/BHlug0woupgBWriClPU/qYuwHqCVANu+U4bT3U+906noBV6z3B5AvrRxZaJlgOR+9a/B7KUFk0VoS56XJv1xL2hKRCRNcMEOYKeFSBi3KWLW6G5GhI0Jx/IVWYMbjKiof4afT2a+PUgAbNtmeDKA+jZ+GuhC4ego5+xMoMeQ2rcKKox9m8kSmU2FtDwuKrl6LnCTXLAxneLpCb8rlE98A8OsK9tk+yNSqjVogGpImkQ8CMOK72eLzyWOPd2v8gk67vpbVRZjgBqC6lgDIROo2HgwqBAJhT4EKlgDNz9/35l6AwgJcrRapXdb5GvwZjlWT8X1yyLxY6sNVP812E4c6NKOEpSwGfiXA28P1ZIH2Yh7pQ8qglWdYNo1oqfDwVWRydvQYKxm0CgVIzbnobemtS0WfPyqujU1og==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB6373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(39860400002)(376002)(346002)(366004)(136003)(396003)(451199015)(478600001)(82960400001)(2906002)(186003)(71200400001)(38100700002)(66476007)(66556008)(76116006)(66446008)(4326008)(8676002)(66946007)(64756008)(41300700001)(38070700005)(53546011)(54906003)(6506007)(6916009)(7696005)(122000001)(26005)(8936002)(5660300002)(316002)(52536014)(9686003)(33656002)(86362001)(55016003);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?L/uk+gD0k5D1jr4CWKGpmM3LWRrkUjlzvCP0YwSGDqI3y8gb9kGj1GNdzTLa?=
- =?us-ascii?Q?jhvnB2fDO9fxqB/sUkTgbEvjYDnK/BZU/j9aSum92Qkm5MWAU2z68z4oak5i?=
- =?us-ascii?Q?ToHqA60LZd4VdAyw6+zNQRvQ5YUGGWgFZLynF3uDdHDN9U48Jy1n0ZiT+ZQk?=
- =?us-ascii?Q?CeWyvgGUA+WLUbYwRftz+y6Ac2l7jsBweT/gK65CSdLbqMI5aUubolR8k3Xt?=
- =?us-ascii?Q?cSTCnXDAJUCyttGw6miU9AlY56HkoR0WaFrEpCPEJFZY5ejEJMEiZl3nU21s?=
- =?us-ascii?Q?a9iwa67UmkwDcRH8oJCGldV6IHt3TlWntQQKXXqqN8mpXPs3X0GhmUmmNz+Z?=
- =?us-ascii?Q?01vKTMlF4YBWtG9FMCWiS6UeU3sPq4giG1fl8XS+1tWoPI5/+Dyrpa2RPdy5?=
- =?us-ascii?Q?SlW/P/JqG/X0D7wpTyuS8QJWs/aZ9yF5lWZKFmIwxEAr6Lz5dhXXZwD5Pp03?=
- =?us-ascii?Q?vEcbWnIY9LidF7T9b6jy5BnmwJlICoSmJA2AxYo5Tk3uaqgU9Y5vi1jMjI5l?=
- =?us-ascii?Q?vOh07C5vMpa8ugl8osydoxbP0C+ht1nNT8zOhPsQCyPzg+C8cxYY3Bka/z1O?=
- =?us-ascii?Q?74Ki914H/lnV7uaFQ63HKeDrQXQxNzh2CFk5WAJ1tl9rcJNbY/JqJKDAw49m?=
- =?us-ascii?Q?NE+3WvBenUnukxrBzSHDUmkr4uIoidENwJlPDnStWxuZbB34UEDU6pkRH9EL?=
- =?us-ascii?Q?mEhoECS7t6Ve8U0+faaOoI5GERpX7JB+ET0RTed4PmqM+DhsHxiXNxS/zHTM?=
- =?us-ascii?Q?qlwPmlfrwW9FG81fIxQ39Uq5lr58w+f/Xlrjnnmtmu68JZfXGl+8/FJLZRPZ?=
- =?us-ascii?Q?BpRY6vyJILngiOXWDiUAkIOCukl3cIcYJuJWYVKeWr4BOUJFwdUYkuwdyYAW?=
- =?us-ascii?Q?WOulibibuZ61psTTNMw7/ANvgzRxzEOOnIACwYMRVHwdiAr2B5v8emAs5n/W?=
- =?us-ascii?Q?BoNgIr3/I9yK/CaZ1fOydigMMWmpyMBQmVK1ry1Je60hzJdh447bCahVXuNf?=
- =?us-ascii?Q?vup99Rhi3iG/pGbj+KgePL1z/pgQ5YhxcZlUhaE8llwB9Vpyfl16UBQns7LB?=
- =?us-ascii?Q?9JmWbyBmxBbKy9wpKBRkZPy672IOgZpCFXIqwvwjFV98WJQgGT870n+6elm6?=
- =?us-ascii?Q?wsk+W6seROd52pCXLFe1KDZo7qeh6EgkkIBvbMPkpcG0TvrmU7Im6rpGvAEV?=
- =?us-ascii?Q?vjeuZrNiBHMlOA3M+U/tsALizRJpSJNklrEEGWggZlbzNVOb3y7h761HrqIv?=
- =?us-ascii?Q?QLdWMSJZIiuDqnWCB2Wv7IIm1rlnEgvKK7uh41UcL24IZeeM4NQ1ZywROSj4?=
- =?us-ascii?Q?QYvqUpNtkSLm3rFlqDwnLDWdEldDsS8G7nR1IFWHxNkoe+nB7jpuFmL7J/MW?=
- =?us-ascii?Q?41vt1gOn55f9b2Hg+uKno/BRRrHhq98aq+ak+WsZ5xFw4GseSmIHpee0zgXN?=
- =?us-ascii?Q?a5rExSIoG6HfiuNGm2LxHPBgiQjLsBmCqotYF3uWJYUSreX73lkxVg3d1+9x?=
- =?us-ascii?Q?r/3VYUW4f2u89ruK3ysXFrgmdaH2khuwLmzIQPcCN1J99aKNGkBBNZV80tns?=
- =?us-ascii?Q?49KzlaOIIjWGhm2vYs66ukfX81Ific6VP8EEg0IB?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?t08JEqmEbolPYgaVG2GI4yiEPeQQ1GeXefo/sNwr9B56jCM5yDaPTnqARO0b?=
+ =?us-ascii?Q?kqHPFM/BVcjsStH/lq5X5SzWIL+ZoEKDKiGzka7io0S+onodIUqz6t3E7FD0?=
+ =?us-ascii?Q?1xpyVNnpxVr1JOmXBrzc16FgeTAX+59oqu3t5yogKn54dUq5P7M7CSR4tARY?=
+ =?us-ascii?Q?v8qR3B4/LLntI5H8XP52AYhHFfPGH6BhI7qCdRkWTfJjMS9AsXqn0El4/ptx?=
+ =?us-ascii?Q?OxTW86WLiCwOvCwgG+0IcRbUqQwZKx67Uu5UuSvc5nQELmMPFSQXNy4xYxVk?=
+ =?us-ascii?Q?HFUI9Ofis+IwTw69SspVNCU/I1oMnaha/itLyUI/ArGdajy6muq8Juqz9K3M?=
+ =?us-ascii?Q?TLPjqSQdHc4nfEFsf+YLiiZ6Xu0Zxd/IXGy+0QIUvGchC5+KxWFrSitLeFma?=
+ =?us-ascii?Q?9c5udobHQnb3ZH17dOo7gt6ytGXt/5jwpa0UJ+gBdk80Zo7X75ZvXDaRAvLi?=
+ =?us-ascii?Q?n9CbXOUHZ3Pe9CeD+b8s6XBQ7iuXzMvH4tfp76LHHpdXUEGkG3XWbrP4ZpGC?=
+ =?us-ascii?Q?PWMbwfZh73hHmf6FyKfxcNwnwnJnSiPrqF7tXDkjupbH0YtX7dmgNALzQyUP?=
+ =?us-ascii?Q?KfDQMwYwlQlEtunATGgkPr0mGrtsY/MsoJ/G23vBqXQYQS/KIIRxmpWwUIoe?=
+ =?us-ascii?Q?dhv/D2kopXorsvvFO0EGciDOOAeSt+1v/0YstQmGbz7Pk1Xa16aiVs2tFMMt?=
+ =?us-ascii?Q?XLaD0Gkyp9aJHoUpilvPK3ws8BdP69paP+Bn7EWDWgRAeN3fTICB7k9jeyiP?=
+ =?us-ascii?Q?x42zGUks9cLX+mEjYv8Irz9FDEZlstamvmDQ1Zj1DSTaWlV9qeOsMVLpeQ+P?=
+ =?us-ascii?Q?ggF4t1TXBww5d5hlxhasFbFhAitS3qS0zAUcz+DQ/X1MblQnyiqtDWP+i6sf?=
+ =?us-ascii?Q?L8ElX8Vf0StWzMvsx8P6cN8MPTtNEAMRcu1lfkXbdbE0e6/D2ll4rg+w+Mh0?=
+ =?us-ascii?Q?RCVcZFFsCqrQrZNeRnT4Y1POLdtayRboSUqiT6JZCcAAnvC6spPISDRK1OxW?=
+ =?us-ascii?Q?HFZOd939qR4oELVD1InnUvrzToZlRXkfAvyEX0urOdp6aPt0i8A6RxUKzdG1?=
+ =?us-ascii?Q?YRs3daqowSzzhhMSsa68648kbrg7p7JYwbDLVlRMuF6Py++GbJu2jy1GYXm5?=
+ =?us-ascii?Q?oiAPYjyJfy65eIOye6UWr2Aty29o63RpYtF/edxLSWAZlcwOfTTKtq8nNz0N?=
+ =?us-ascii?Q?BjQVQIM2K1jjxloZiFpT0NElvOSNmWCSryNF5IjZvyPm4F27h6ta466KjcNd?=
+ =?us-ascii?Q?zjHzAWD4NIkR3rwubMPAs59lnI/rw1V7fYlN2IUvb5DNur8jnc1GMQqOkEUf?=
+ =?us-ascii?Q?WhLx5IwVjRfXoaxM5yaBJp2P4XRX4TMEv352b5V1XiMqy6FFpiwAdLfky6Ev?=
+ =?us-ascii?Q?pL2CGZV82DxO5SvQ73jdbprd58+c7IXvCN/oea65L3qdebCfQPeHmYZQFfR7?=
+ =?us-ascii?Q?ag1ugRJOsI157LDu2lQSCygUVy/fwVk/q45tRFOg3qXJjg+HlSu81yOMQ0iU?=
+ =?us-ascii?Q?n6TmsY9/k6/j2HG4MnMSyPZ2ouTBpfYepGFIKoKFBVwRf4mZkOwBEjiLckoI?=
+ =?us-ascii?Q?XspB3AntxhqDRZFAgRWgoSZlozBH3V1KzxbDyHNy?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB6373.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7cdd2982-5f3e-4d20-0e39-08dab8154ef3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Oct 2022 12:18:08.4253
+X-MS-Exchange-CrossTenant-Network-Message-Id: edc025f7-e201-4631-5eea-08dab816c217
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Oct 2022 12:28:31.0979
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 5CYLt9bnPOxOksQqWQ82cFiBJHxKonF4BmapSt3usT/NjR4ss61sZrQOXSAaMbsJ2L5z8Eikrn5DJSxrUn9G5g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6444
+X-MS-Exchange-CrossTenant-userprincipalname: g3xXbLiVWLh5sR8uRnNSm+UxX7ey9xWY1klxnFzXOsbbGDYiH2RY9UHSxWewPetp3YUWDC5wMy4jD8zRwrYNBQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7471
 X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -155,83 +161,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thursday, October 27, 2022 5:23 AM, David Matlack:
-> On Mon, Oct 24, 2022 at 07:34:27PM +0800, Wei Wang wrote:
-> > This patch series intends to improve kvm selftests with better code
-> > consolidation using the helper functions to perform vcpu and thread
-> > related operations.
+On Thursday, October 27, 2022 7:48 AM, Sean Christopherson wrote:
+> > +	for (i =3D 0, vcpu =3D vm->vcpus[0];				\
+> > +		vcpu && i < KVM_MAX_VCPUS; vcpu =3D vm->vcpus[++i])
+>=20
+> I hate pointer arithmetic more than most people, but in this case it avoi=
+ds the
+> need to pass in 'i', which in turn cuts down on boilerplate and churn.
+
+Hmm, indeed, this can be improved, how about this one:
+
++#define vm_iterate_over_vcpus(vm, vcpu)                         \
++       for (vcpu =3D vm->vcpus[0]; vcpu; vcpu =3D vm->vcpus[vcpu->id + 1])=
+ \
+
+
+>=20
+> >  #endif /* SELFTEST_KVM_UTIL_H */
+> > diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> > b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> > index e42a09cd24a0..c90a9609b853 100644
+> > --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> > +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> > @@ -45,7 +45,6 @@ struct userspace_mem_region {  };
 > >
-> > In general, several aspects are improved:
-> > 1) The current users allocate an array of vcpu pointers to the vcpus th=
-at
-> >    are added to a vm, and an array of vcpu threads. This isn't necessar=
-y
-> >    as kvm_vm already maintains a list of added vcpus. This series chang=
-es
-> >    the list of vcpus in the kvm_vm struct to a vcpu array for users to
-> >    work with and removes each user's own allocation of such vcpu arrays=
-.
-> >    Aslo add the vcpu thread to the kvm_vcpu struct, so that users don't
-> >    need to explicitly allocate a thread array to manage vcpu threads on
-> >    their own.
-> > 2) Change the users to use the helper functions provided by this series
-> >    with the following enhancements:
-> >    - Many users working with pthread_create/join forgot to check if
-> >      error on returning. The helper functions have handled thoses insid=
-e,
-> >      so users don't need to handle them by themselves;
-> >    - The vcpu threads created via the helper functions are named in
-> >      "vcpu-##id" format. Naming the threads facilitates debugging,
-> >      performance tuning, runtime pining etc;
-> >    - helper functions named with "vm_vcpu_threads_" iterates over all t=
-he
-> >      vcpus that have been added to the vm. Users don't need a explicit
-> >      loop to go through the added cpus by themselves.
-> > 3) kvm_vcpu is used as the interface parameter to the vcpu thread's
-> >    start routine, and the user specific data is made to be the private
-> >    data in kvm_vcpu. This can simplify the user specific data structure=
-s,
-> >    as kvm_vcpu has already included the required info for the thread, f=
-or
-> >    example, in patch 13, the cpu_idx field from "struct vcpu_thread"
-> >    is a duplicate of vcpu->id.
+> >  struct kvm_vcpu {
+> > -	struct list_head list;
+> >  	uint32_t id;
+> >  	int fd;
+> >  	struct kvm_vm *vm;
+> > @@ -75,7 +74,6 @@ struct kvm_vm {
+> >  	unsigned int pa_bits;
+> >  	unsigned int va_bits;
+> >  	uint64_t max_gfn;
+> > -	struct list_head vcpus;
+> >  	struct userspace_mem_regions regions;
+> >  	struct sparsebit *vpages_valid;
+> >  	struct sparsebit *vpages_mapped;
+> > @@ -92,6 +90,7 @@ struct kvm_vm {
+> >  	int stats_fd;
+> >  	struct kvm_stats_header stats_header;
+> >  	struct kvm_stats_desc *stats_desc;
+> > +	struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
 >=20
-> I haven't dug too much into the actual code yet, but I have some high lev=
-el
-> feedback based on a quick look through the series:
->=20
->  - Use the format "KVM: selftests: <Decsription>" for the shortlog.
+> We can dynamically allocate the array without too much trouble, though I'=
+m not
+> sure it's worth shaving the few KiB of memory.  For __vm_create(), the nu=
+mber
+> of vCPUs is known when the VM is created.  For vm_create_barebones(), we
+> could do the simple thing of allocating KVM_MAX_VCPU.
 
-I know it's not common to see so far, but curious is this the required form=
-at?
-I didn't find where it's documented. If it's indeed a requirement, probably=
- we
-also need to enhance checkpatch.pl to detect this.
-
-If it's not required, I think it is more obvious to have /sub_field in the =
-title,
-e.g. selftests/hardware_disable_test, to outline which specific part of
-selftests the patch is changing. (the selftests are growing larger with man=
-y
-usages independent of each other).
+The issue with dynamic allocation is that some users start with __vm_create=
+(nr_vcpus), and later
+could add more cpus with vm_vcpu_add (e.g. x86_64/xapic_ipi_test.c). To sup=
+port this we may
+need to re-allocate the array for later vm_vcpu_add(), and also need to add=
+ nr_vcpus to indicate
+the size.
+It's userspace memory, and not a problem to use a bit larger virtual memory=
+ (memory are not really
+allocated until we have that many vcpus to touch the array entries), I thin=
+k.
 
 >=20
->  - Make the shortlog more specific. "vcpu related code consolidation" is
->    vague.
+> > @@ -534,6 +533,10 @@ __weak void vcpu_arch_free(struct kvm_vcpu *vcpu)
+> > static void vm_vcpu_rm(struct kvm_vm *vm, struct kvm_vcpu *vcpu)  {
+> >  	int ret;
+> > +	uint32_t vcpu_id =3D vcpu->id;
+> > +
+> > +	TEST_ASSERT(!!vm->vcpus[vcpu_id], "vCPU%d wasn't added\n", vcpu_id);
 >=20
->  - Do not introduce bugs and then fix them in subsequent commits.  This
->    breaks bisection. For example, kvm_page_table_test is broken at "KVM:
->    selftests/kvm_util: use vm->vcpus[] when create vm with vcpus" and
->    then fixed by "KVM: selftests/kvm_page_table_test: vcpu related code
->    consolidation".
->=20
->  - Try to limit each patch to one logical change. This is somewhat more
->    art than science, but the basic idea is to avoid changing too much at
->    once so that the code is easier to review and bisect. For example,
->    "KVM: selftests/perf_test_util: vcpu related code consolidation" has
->    a list of 6 different changes being made in the commit description.
->    This is a sure sign this commit should be broken up. The same applies
->    to many of the other patches. This will also make it easier to come
->    up with more specific shortlogs.
+> This is unecessary, there's one caller and it's iterating over the array =
+of vCPUs.
 
-OK, will re-organize the patches.
+That's right, thanks.
