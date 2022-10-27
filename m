@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A455B60FD72
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 18:50:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 57BCE60FD6F
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 18:50:04 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235382AbiJ0QuD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 12:50:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51262 "EHLO
+        id S236670AbiJ0QuB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 12:50:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236140AbiJ0Qtw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 12:49:52 -0400
+        with ESMTP id S235798AbiJ0Qtv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 12:49:51 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4182339120
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 09:49:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E99332BB3
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 09:49:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666889390;
+        s=mimecast20190719; t=1666889388;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IG7RoSwTbh4XkVF3g7VEhn0b4tnvYokb/Hy8R5iEPaY=;
-        b=ddzc7AuzJ284qMe+mX49KrMwJXv/dYghk43qSaFwIZUglPXa6ylzruDEGJNEi66x00IUz8
-        ue+hF9T8UEhrvcN/d6943vHuUKldYZmiK4J2bEKpbQgwOmAl7lLz2wmbspLrqs4ScjivhG
-        Z/lhOLhx94rEUfaTWBqUA9ysoXjPTnI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=lXIKNzxn7gEudfn9nb45VSrNj59yt6Czo/wBWBxPUSE=;
+        b=fREazrcc4iw5WdE4OB2qB+TK8xeEzlFoPhhnEZ/A94sjbXtOzjebRSQTUWiCshLD9hqxkZ
+        QR+nOnBQG2HjZB9mJ/tlD+DAnCvdOx2Ab9EFb4xODLsR9dSxzYAlg5BuSlPSQRdWsCs7nV
+        IwWGDlKmW44bf+T/Xj7xj+yjf+XkV04=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-314-RnoFx3soM5q0oX6jTPeSQw-1; Thu, 27 Oct 2022 12:49:47 -0400
-X-MC-Unique: RnoFx3soM5q0oX6jTPeSQw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+ us-mta-288-LiZmI3BgM0uc_oG7P16kRw-1; Thu, 27 Oct 2022 12:49:47 -0400
+X-MC-Unique: LiZmI3BgM0uc_oG7P16kRw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C8DCA185A7A8;
-        Thu, 27 Oct 2022 16:49:46 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 14D0529324AF;
+        Thu, 27 Oct 2022 16:49:47 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A76B61121320;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E7F8F2166B26;
         Thu, 27 Oct 2022 16:49:46 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     mlevitsk@redhat.com, seanjc@google.com
-Subject: [PATCH 09/10] KVM: zero output of KVM_GET_VCPU_EVENTS before filling in the struct
-Date:   Thu, 27 Oct 2022 12:49:43 -0400
-Message-Id: <20221027164944.3031588-10-pbonzini@redhat.com>
+Subject: [PATCH 10/10] KVM: x86: do not define SMM-related constants if SMM disabled
+Date:   Thu, 27 Oct 2022 12:49:44 -0400
+Message-Id: <20221027164944.3031588-11-pbonzini@redhat.com>
 In-Reply-To: <20221027164944.3031588-1-pbonzini@redhat.com>
 References: <20221027164944.3031588-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -59,65 +59,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This allows making some fields optional, as will be the case soon
-for SMM-related data.
-
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/x86.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 3 ++-
+ arch/x86/kvm/smm.c              | 3 +++
+ arch/x86/kvm/x86.c              | 4 ++--
+ 3 files changed, 7 insertions(+), 3 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 7ddcc0e6fae5..89c89c70f74e 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1992,10 +1992,11 @@ enum {
+ #define HF_NMI_MASK		(1 << 3)
+ #define HF_IRET_MASK		(1 << 4)
+ #define HF_GUEST_MASK		(1 << 5) /* VCPU is in guest-mode */
++
++#ifdef CONFIG_KVM_SMM
+ #define HF_SMM_MASK		(1 << 6)
+ #define HF_SMM_INSIDE_NMI_MASK	(1 << 7)
+ 
+-#ifdef CONFIG_KVM_SMM
+ # define __KVM_VCPU_MULTIPLE_ADDRESS_SPACE
+ # define KVM_ADDRESS_SPACE_NUM 2
+ # define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
+diff --git a/arch/x86/kvm/smm.c b/arch/x86/kvm/smm.c
+index 41ca128478fc..44a8f7e57b77 100644
+--- a/arch/x86/kvm/smm.c
++++ b/arch/x86/kvm/smm.c
+@@ -10,6 +10,9 @@
+ 
+ void kvm_smm_changed(struct kvm_vcpu *vcpu, bool entering_smm)
+ {
++	BUILD_BUG_ON(HF_SMM_MASK != X86EMUL_SMM_MASK);
++	BUILD_BUG_ON(HF_SMM_INSIDE_NMI_MASK != X86EMUL_SMM_INSIDE_NMI_MASK);
++
+ 	trace_kvm_smm_transition(vcpu->vcpu_id, vcpu->arch.smbase, entering_smm);
+ 
+ 	if (entering_smm) {
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f6adb4145759..5959f74c5a0a 100644
+index 5959f74c5a0a..910e3757b222 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -5056,16 +5056,15 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
- 	    ex->pending && ex->has_payload)
- 		kvm_deliver_exception_payload(vcpu, ex);
+@@ -5092,10 +5092,12 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
  
-+	memset(events, 0, sizeof(events));
-+
- 	/*
- 	 * The API doesn't provide the instruction length for software
- 	 * exceptions, so don't report them. As long as the guest RIP
- 	 * isn't advanced, we should expect to encounter the exception
- 	 * again.
- 	 */
--	if (kvm_exception_is_soft(ex->vector)) {
--		events->exception.injected = 0;
--		events->exception.pending = 0;
--	} else {
-+	if (!kvm_exception_is_soft(ex->vector)) {
- 		events->exception.injected = ex->injected;
- 		events->exception.pending = ex->pending;
- 		/*
-@@ -5085,15 +5084,13 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
- 	events->interrupt.injected =
- 		vcpu->arch.interrupt.injected && !vcpu->arch.interrupt.soft;
- 	events->interrupt.nr = vcpu->arch.interrupt.nr;
--	events->interrupt.soft = 0;
- 	events->interrupt.shadow = static_call(kvm_x86_get_interrupt_shadow)(vcpu);
+ 	/* events->sipi_vector is never valid when reporting to user space */
  
- 	events->nmi.injected = vcpu->arch.nmi_injected;
- 	events->nmi.pending = vcpu->arch.nmi_pending != 0;
- 	events->nmi.masked = static_call(kvm_x86_get_nmi_mask)(vcpu);
--	events->nmi.pad = 0;
- 
--	events->sipi_vector = 0; /* never valid when reporting to user space */
-+	/* events->sipi_vector is never valid when reporting to user space */
- 
++#ifdef CONFIG_KVM_SMM
  	events->smi.smm = is_smm(vcpu);
  	events->smi.pending = vcpu->arch.smi_pending;
-@@ -5110,8 +5107,6 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
- 		events->triple_fault.pending = kvm_test_request(KVM_REQ_TRIPLE_FAULT, vcpu);
- 		events->flags |= KVM_VCPUEVENT_VALID_TRIPLE_FAULT;
- 	}
--
--	memset(&events->reserved, 0, sizeof(events->reserved));
- }
+ 	events->smi.smm_inside_nmi =
+ 		!!(vcpu->arch.hflags & HF_SMM_INSIDE_NMI_MASK);
++#endif
+ 	events->smi.latched_init = kvm_lapic_latched_init(vcpu);
  
- static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
+ 	events->flags = (KVM_VCPUEVENT_VALID_NMI_PENDING
+@@ -8266,8 +8268,6 @@ static void init_emulate_ctxt(struct kvm_vcpu *vcpu)
+ 		     cs_db				? X86EMUL_MODE_PROT32 :
+ 							  X86EMUL_MODE_PROT16;
+ 	BUILD_BUG_ON(HF_GUEST_MASK != X86EMUL_GUEST_MASK);
+-	BUILD_BUG_ON(HF_SMM_MASK != X86EMUL_SMM_MASK);
+-	BUILD_BUG_ON(HF_SMM_INSIDE_NMI_MASK != X86EMUL_SMM_INSIDE_NMI_MASK);
+ 
+ 	ctxt->interruptibility = 0;
+ 	ctxt->have_exception = false;
 -- 
 2.31.1
-
 
