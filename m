@@ -2,242 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CB8F61003F
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 20:32:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D69F61004B
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 20:34:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233946AbiJ0Scy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 14:32:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59252 "EHLO
+        id S235638AbiJ0Sei (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 14:34:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234021AbiJ0Scw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 14:32:52 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9F0A8E724
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 11:32:51 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 710E76240C
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 18:32:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A239BC433C1;
-        Thu, 27 Oct 2022 18:32:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666895570;
-        bh=GyavJEWFCP+S+nuZTi6xWSt2F7dNo4qEJljaBpVcJMg=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=t8S81Lc3o4eVtQSzqenASNJj5JvbF4TQbctOtBAEyNPtLmhFf2yCfOuhPZR+WFyDe
-         /Kb2be3PgWCGMg3ZFVy6fELC59bgofx3bFnD5dxZyUoFOEaWLqaT/6i9KsxsD7Lsja
-         AzMwznaVnrUqK1nsWUoZUHcFuQa9AU4GYwn6wMRMuQfn3xn224dqybIp6Y14Ingqo6
-         e90X3BtKalLb9J5NzMHvtWLOtFibjtEK/8vDAVq54PlOnn+oFO1uF4qOMK8r8eBtqs
-         cu9TQj33QTIw1PNJHPHh5cCqCZcZdykNU+TkTF10fQumP4o1tadqUtjxuvFTPheY80
-         SWHnn1k8ZdANA==
-Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1oo7gK-0024Al-PL;
-        Thu, 27 Oct 2022 19:32:48 +0100
-Date:   Thu, 27 Oct 2022 19:30:23 +0100
-Message-ID: <875yg5glvk.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
+        with ESMTP id S235484AbiJ0Seg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 14:34:36 -0400
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88BD49FE6
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 11:34:34 -0700 (PDT)
+Received: by mail-lj1-x22d.google.com with SMTP id j14so4872869ljh.12
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 11:34:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=rImRM8lUYQwKUuhHi33Xv0slNDyY9fPfRBiZY4CGcO8=;
+        b=pIlYlWR1qxP4Us0NHBx+aE76CTtlViPPRDK3+wueE5cjtAq26qHBbWpEP4mIjWcUWZ
+         YVqZdbRf/W6tdLjzUiVroX2d9vVt5fF8sEmwQ4q3YwQ/mfA/fdY2ABeCNLfIoTgbLNuA
+         aKsWrjullJiJp3MadhZ6dYErUCpCbX6Cs+6xawriBBcmT0OoYA2rUM9f0xI/8SMB65Q8
+         xsWL2A/0fBFwIcztXgMaUUQnMSOK7d9fdhoko7WN9UjBzfiQs03EnomhdDdAaHU/zbd0
+         lURafjqfblsqGQbyXeMOKpRy1Pwb5w1mAXuN7rTyeL24PRCL8k1GXLoARqARraNlQqGe
+         Za6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rImRM8lUYQwKUuhHi33Xv0slNDyY9fPfRBiZY4CGcO8=;
+        b=Zbdc3YYzYXKDQuB1O9KmlF3ikHafElO9AYzNUp/uTx06CkrWTVtNiwPlM5f8Dr+sFr
+         Tsvqsd1dEYXhlJuVk/ZfHLOEiV7jmtLsSUeNa5PCbia/R5SuOFiF7oigFSUubYit/rXf
+         yiBIOSmF9mhIT09+54AqbsW4VtgENAnux/yed1xzmxO7wtgaJ1cCDY8saEGl4EeV6GbD
+         6PYpSIEhJOwRiqhgZS4uT/kywtewG6fnxpYD3h25ovy6hFhW0ra+rfK2jVpIaoBb1zdO
+         xoqmjIkrqg2uj5xtYspLxUcfIjkNrrPQ0PfoiXGr+Sc2KVe2mDiEpAGAeXZhSpDV7dM/
+         x7MQ==
+X-Gm-Message-State: ACrzQf1ueWsWUaq6h/WD0ViTQED/VxMO2cyerD3w+c6aVJJI6bG9jNBi
+        l/qbkUZDbTGebnOTrOeMMxzvC8e4jmRvj+OqP+oiaQ==
+X-Google-Smtp-Source: AMsMyM79FbIl/dMM63/B6tvA+SnZTqv8/GlFeOpCpeOri6dVgmO2Wd/Omcxzo0njdk/R6ksMkMC4fWKCa7d2zmPIUDs=
+X-Received: by 2002:a2e:94cf:0:b0:26c:5d14:6ec7 with SMTP id
+ r15-20020a2e94cf000000b0026c5d146ec7mr20536772ljh.237.1666895671322; Thu, 27
+ Oct 2022 11:34:31 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220829171021.701198-1-pgonda@google.com> <20220829171021.701198-7-pgonda@google.com>
+ <Yz8dpB5+RFjEhA3n@google.com> <CAMkAt6oZQc4jqF7FOXOKkpbP3c4NXxPumVVjX9gXwPCh-zbtYg@mail.gmail.com>
+ <Y02ZLFcDQbX6lP9z@google.com> <CAMkAt6q0g5Ua=PwLXa2oA4zCQUaHuEQ3pTXycD61HU6-dtQ5Gg@mail.gmail.com>
+ <Y028WrU3pmEQqWDq@google.com> <CAMkAt6pvT15teuYWjz7r1vmUP5McDp76qjxQ26_oeg5mTnv5NA@mail.gmail.com>
+ <Y1AnHwVtOFShRxQD@google.com> <CAMkAt6rP7KbgUqmK+aiooSLfvRrMsRmp99cL0YWKBwpOJZc82A@mail.gmail.com>
+ <Y1rHDlDskvSacLNp@google.com>
+In-Reply-To: <Y1rHDlDskvSacLNp@google.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Thu, 27 Oct 2022 12:34:19 -0600
+Message-ID: <CAMkAt6p+npmn_AKH3pA6d1mRY2VURkEcpXSaKqg_=KPm6B9WkQ@mail.gmail.com>
+Subject: Re: [V4 6/8] KVM: selftests: add library for creating/interacting
+ with SEV guests
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Gavin Shan <gshan@redhat.com>, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        peterx@redhat.com, will@kernel.org, catalin.marinas@arm.com,
-        bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev,
-        dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com,
-        james.morse@arm.com, suzuki.poulose@arm.com,
-        alexandru.elisei@arm.com, shan.gavin@gmail.com
-Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in conjunction with bitmap
-In-Reply-To: <Y1rDkz6q8+ZgYFWW@google.com>
-References: <20221011061447.131531-4-gshan@redhat.com>
-        <Y1Hdc/UVta3A5kHM@google.com>
-        <8635bhfvnh.wl-maz@kernel.org>
-        <Y1LDRkrzPeQXUHTR@google.com>
-        <87edv0gnb3.wl-maz@kernel.org>
-        <Y1ckxYst3tc0LCqb@google.com>
-        <Y1css8k0gtFkVwFQ@google.com>
-        <878rl4gxzx.wl-maz@kernel.org>
-        <Y1ghIKrAsRFwSFsO@google.com>
-        <877d0lhdo9.wl-maz@kernel.org>
-        <Y1rDkz6q8+ZgYFWW@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: seanjc@google.com, oliver.upton@linux.dev, gshan@redhat.com, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, peterx@redhat.com, will@kernel.org, catalin.marinas@arm.com, bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev, dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, shan.gavin@gmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcorr@google.com, michael.roth@amd.com, thomas.lendacky@amd.com,
+        joro@8bytes.org, mizhang@google.com, pbonzini@redhat.com,
+        andrew.jones@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 27 Oct 2022 18:44:51 +0100,
-Sean Christopherson <seanjc@google.com> wrote:
-> 
-> On Thu, Oct 27, 2022, Marc Zyngier wrote:
-> > On Tue, 25 Oct 2022 18:47:12 +0100, Sean Christopherson <seanjc@google.com> wrote:
-> > > Call us incompetent, but I have zero confidence that KVM will never
-> > > unintentionally add a path that invokes mark_page_dirty_in_slot()
-> > > without a running vCPU.
-> > 
-> > Well, maybe it is time that KVM acknowledges there is a purpose to
-> > dirtying memory outside of a vcpu context, and that if a write happens
-> > in a vcpu context, this vcpu must be explicitly passed down rather
-> > than obtained from kvm_get_running_vcpu(). Yes, this requires some
-> > heavy surgery.
-> 
-> Heh, preaching to the choir on this one.
-> 
->   On Mon, Dec 02, 2019 at 12:10:36PM -0800, Sean Christopherson wrote:
->   > IMO, adding kvm_get_running_vcpu() is a hack that is just asking for future
->   > abuse and the vcpu/vm/as_id interactions in mark_page_dirty_in_ring() look
->   > extremely fragile.
-> 
-> I'm all in favor of not using kvm_get_running_vcpu() in this path.
-> 
-> That said, it's somewhat of an orthogonal issue, as I would still
-> want a sanity check in mark_page_dirty_in_slot() that a vCPU is
-> provided when there is no dirty bitmap.
-
-If we have a separate context and/or API, then all these checks become
-a lot less controversial, and we can start reasoning about these
-things. At the moment, this is just a mess.
-
-> 
-> > > By completely dropping the rule that KVM must have an active vCPU on
-> > > architectures that support ring+bitmap, those types of bugs will go
-> > > silently unnoticed, and will manifest as guest data corruption after
-> > > live migration.
-> > 
-> > The elephant in the room is still userspace writing to its view of the
-> > guest memory for device emulation. Do they get it right? I doubt it.
-> 
-> I don't see what that has to do with KVM though.  There are many
-> things userspace needs to get right, that doesn't mean that KVM
-> shouldn't strive to provide safeguards for the functionality that
-> KVM provides.
-
-I guess we have different expectations of what KVM should provide. My
-take is that userspace doesn't need a nanny, and that a decent level
-of documentation should make it obvious what feature captures which
-state.
-
-But we've argued for a while now, and I don't see that we're getting
-any closer to a resolution. So let's at least make some forward
-progress with the opt-out mechanism you mentioned, and arm64 will buy
-into it when snapshoting the ITS.
-
-> 
-> > > And ideally such bugs would detected without relying on userspace to
-> > > enabling dirty logging, e.g. the Hyper-V bug lurked for quite some
-> > > time and was only found when mark_page_dirty_in_slot() started
-> > > WARNing.
-> > > 
-> > > I'm ok if arm64 wants to let userspace shoot itself in the foot with
-> > > the ITS, but I'm not ok dropping the protections in the common
-> > > mark_page_dirty_in_slot().
-> > > 
-> > > One somewhat gross idea would be to let architectures override the
-> > > "there must be a running vCPU" rule, e.g. arm64 could toggle a flag
-> > > in kvm->arch in its kvm_write_guest_lock() to note that an expected
-> > > write without a vCPU is in-progress:
-> > > 
-> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > index 8c5c69ba47a7..d1da8914f749 100644
-> > > --- a/virt/kvm/kvm_main.c
-> > > +++ b/virt/kvm/kvm_main.c
-> > > @@ -3297,7 +3297,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
-> > >         struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
-> > >  
-> > >  #ifdef CONFIG_HAVE_KVM_DIRTY_RING
-> > > -       if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
-> > > +       if (!kvm_arch_allow_write_without_running_vcpu(kvm) && WARN_ON_ONCE(!vcpu))
-> > > +               return;
-> > > +
-> > > +       if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
-> > >                 return;
-> > >  #endif
-> > >  
-> > > @@ -3305,10 +3308,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
-> > >                 unsigned long rel_gfn = gfn - memslot->base_gfn;
-> > >                 u32 slot = (memslot->as_id << 16) | memslot->id;
-> > >  
-> > > -               if (kvm->dirty_ring_size)
-> > > +               if (kvm->dirty_ring_size && vcpu)
-> > >                         kvm_dirty_ring_push(&vcpu->dirty_ring,
-> > >                                             slot, rel_gfn);
-> > > -               else
-> > > +               else if (memslot->dirty_bitmap)
-> > >                         set_bit_le(rel_gfn, memslot->dirty_bitmap);
-> > >         }
-> > >  }
-> > 
-> > I think this is equally wrong. Writes occur from both CPUs and devices
-> > *concurrently*, and I don't see why KVM should keep ignoring this
-> > pretty obvious fact.
+On Thu, Oct 27, 2022 at 11:59 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Oct 27, 2022, Peter Gonda wrote:
+> > On Wed, Oct 19, 2022 at 10:34 AM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Tue, Oct 18, 2022, Peter Gonda wrote:
+> > > > On Mon, Oct 17, 2022 at 2:34 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > > >
+> > > > > On Mon, Oct 17, 2022, Peter Gonda wrote:
+> > > > > > I think this means we don't need to add VM_MODE_PXXV48_4K_SEV since we
+> > > > > > can set up the c-bit from inside of vm_sev_create_*(), thoughts?
+> > > > >
+> > > > > Configuring the C-bit inside vm_sev_create_*() won't work (at least not well).
+> > > > > The C-bit needs to be known before kvm_vm_elf_load(), i.e. can't be handled after
+> > > > > __vm_create(), and needs to be tracked inside the VM, i.e. can't be handled before
+> > > > > __vm_create().
+> > > > >
+> > > > > The proposed kvm_init_vm_address_properties() seems like the best fit since the
+> > > > > C-bit (and TDX's S-bit) is stolen from GPA space, i.e. directly affects the other
+> > > > > values computed in that path.
+> > > > >
+> > > > > As for the kvm_vm_arch allocation ugliness, when we talked off-list I didn't
+> > > > > consider the need to allocate in kvm_init_vm_address_properties().  That's quite
+> > > > > gross, especially since the pointer will be larger than the thing being allocated.
+> > > > >
+> > > > > With that in mind, adding .../include/<arch>/kvm_util.h so that "struct kvm_vm_arch"
+> > > > > can be defined and referenced directly doesn't seem so bad.  Having to stub in the
+> > > > > struct for the other architectures is annoying, but not the end of the world.
+> > > >
+> > > > I'll make "struct kvm_vm_arch" a non pointer member, so adding
+> > > > /include/<arch>/kvm_util.h files.
+> > > >
+> > > > But I think we do not need VM_MODE_PXXV48_4K_SEV, see:
+> > >
+> > > I really don't want to open code __vm_create() with a slight tweak.  E.g. the
+> > > below code will be broken by Ricardo's series to add memslot0 is moved out of
+> > > ____vm_create()[1], and kinda sorta be broken again by Vishal's series to add an
+> > > arch hook to __vm_create()[2].
+> > >
+> > > AFAICT, there is no requirement that KVM_SEV_INIT be called before computing the
+> > > C-Bit, the only requirement is that KVM_SEV_INIT is called before adding vCPUs.
+> > >
+> > > [1] https://lore.kernel.org/all/20221017195834.2295901-8-ricarkol@google.com
+> > > [2] https://lore.kernel.org/all/YzsC4ibDqGh5qaP9@google.com
 > >
-> > Yes, your patch papers over the problem, and it can probably work if
-> > the kvm->arch flag only gets set in the ITS saving code, which is
-> > already exclusive of vcpus running.
-> > 
-> > But in the long run, with dirty bits being collected from the IOMMU
-> > page tables or directly from devices, we will need a way to reconcile
-> > the dirty tracking. The above doesn't quite cut it, unfortunately.
-> 
-> Oooh, are you referring to IOMMU page tables and devices _in the
-> guest_?  E.g. if KVM itself were to emulate a vIOMMU, then KVM would
-> be responsible for updating dirty bits in the vIOMMU page tables.
+> > Oh I misunderstood your suggestion above.
+> >
+> > I should make KVM_SEV_INIT happen from kvm_arch_vm_post_create().  Add
+> > VM_MODE_PXXV48_4K_SEV for c-bit setting inside of
+> > kvm_init_vm_address_properties().
+> >
+> > Inside of vm_sev_create_with_one_vcpu() I use
+> > __vm_create_with_vcpus(), then call KVM_SEV_LAUNCH_FINISH.
+> >
+> > Is that correct?
+>
+> Yep, I'm pretty sure that was what I was thinking.
 
-No. I'm talking about the *physical* IOMMU, which is (with the correct
-architecture revision and feature set) capable of providing its own
-set of dirty bits, on a per-device, per-PTE basis. Once we enable
-that, we'll need to be able to sink these bits into the bitmap and
-provide a unified view of the dirty state to userspace.
-
-> Not that it really matters, but do we actually expect KVM to ever
-> emulate a vIOMMU?  On x86 at least, in-kernel acceleration of vIOMMU
-> emulation seems more like VFIO territory.
-
-I don't expect KVM/arm64 to fully emulate an IOMMU, but at least to
-eventually provide the required filtering to enable a stage-1 SMMU to
-be passed to a guest. This is the sort of things pKVM needs to
-implement for the host anyway, and going the extra mile to support
-arbitrary guests outside of the pKVM context isn't much more work.
-
-> Regardless, I don't think the above idea makes it any more difficult
-> to support in-KVM emulation of non-CPU stuff, which IIUC is the ITS
-> case.  I 100% agree that the above is a hack, but that's largely due
-> to the use of kvm_get_running_vcpu().
-
-That I agree.
-
-> A slightly different alternative would be have a completely separate
-> API for writing guest memory without an associated vCPU.  I.e. start
-> building up proper device emulation support.  Then the vCPU-based
-> APIs could yell if a vCPU isn't provided (or there is no running
-> vCPU in the current mess).  And the deviced-based API could be
-> provided if and only if the architecture actually supports emulating
-> writes from devices, i.e. x86 would not opt-in and so would even
-> have access to the API.
-
-Which is what I was putting under the "major surgery" label in my
-previous email.
-
-Anyhow, for the purpose of unblocking Gavin's series, I suggest to
-adopt your per-arch opt-out suggestion as a stop gap measure, and we
-will then be able to bike-shed for weeks on what the shape of the
-device-originated memory dirtying API should be.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Duh! Should have realized that at first. You said you were going to
+rebase your selftest series. I'll follow up with a V6 ontop of that
+rebase.
