@@ -2,94 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E565A6102E6
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 22:43:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 07391610385
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 22:56:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236103AbiJ0UnT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 16:43:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58580 "EHLO
+        id S237246AbiJ0U4W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 16:56:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234377AbiJ0UnS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 16:43:18 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BE556581D
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 13:43:17 -0700 (PDT)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29RKg0YG013915;
-        Thu, 27 Oct 2022 20:43:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=CBERSXABllz3dTGWZ84YxKOdh+5lW7czF/kzoC5n184=;
- b=gFrniCogH150ZuDLMS1Jw3p53XoQc+vjueCSOSolt1GeKGGJ2F0CA5/0rpn3XFB3eS+V
- FBFOgdGFIpe2iun/uLCYfK8vg2BgddnvcxzwgKL4tHG60UFqtYyZXKwgtUDcRCArtfzO
- xv7ggdJxPSt01dLCGsPRDXkhekW9j3h7NGKo+9CQ/AyiOuH913vaxfYit9esRF7/TppN
- igatn4/9SsmN8MYSc4TJT2OD9x1RWyUHcetAUzpazt50FMLEh9Aaw6FZY7u5GgItSQbk
- Yrqo2tdtDee4NTB3g0gQC83kb1wDP+w5M6qHdPzMInWr76mhWCGOld3FjJ2jTiXNeFvE IA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kg18g80h5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Oct 2022 20:43:03 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29RKh3me016934;
-        Thu, 27 Oct 2022 20:43:03 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kg18g80g9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Oct 2022 20:43:02 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29RKa6JG023499;
-        Thu, 27 Oct 2022 20:43:00 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06fra.de.ibm.com with ESMTP id 3kfbg29qtj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Oct 2022 20:43:00 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29RKgvmv39584070
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 27 Oct 2022 20:42:57 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3E9CD4C044;
-        Thu, 27 Oct 2022 20:42:57 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5CE914C040;
-        Thu, 27 Oct 2022 20:42:56 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.94.180])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 27 Oct 2022 20:42:56 +0000 (GMT)
-Message-ID: <4c5afcb5754cb829cd8b9ddbf4f74e610d5f6012.camel@linux.ibm.com>
-Subject: Re: [PATCH v10 2/9] s390x/cpu topology: reporting the CPU topology
- to the guest
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-Date:   Thu, 27 Oct 2022 22:42:56 +0200
-In-Reply-To: <20221012162107.91734-3-pmorel@linux.ibm.com>
-References: <20221012162107.91734-1-pmorel@linux.ibm.com>
-         <20221012162107.91734-3-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        with ESMTP id S237247AbiJ0U4F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 16:56:05 -0400
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7068AAA371;
+        Thu, 27 Oct 2022 13:48:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1666903692; x=1698439692;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=HuLIveWIy4LWjQN948FP1SQTsicVwWdw9U0yxS8CL+k=;
+  b=HC+uDrFJjSUCaBiiExFnv1+2xCseGr58XBUAJgPujgZN7+9j2jv3bL1i
+   YL8tpPz9EE7UtheyNS/LtAsvVfHODMtUCZQYNgOO5uSXvnxlZs2n7wxb/
+   20O+AzaODl6bOyPpTrdl6X8tmcGB/fh8jMvExqh6Fzl3LQsQwTY3MD3sv
+   w=;
+X-IronPort-AV: E=Sophos;i="5.95,218,1661817600"; 
+   d="scan'208";a="145136195"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-b1c0e1d0.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2022 20:48:12 +0000
+Received: from EX13MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2c-m6i4x-b1c0e1d0.us-west-2.amazon.com (Postfix) with ESMTPS id B077C803FC;
+        Thu, 27 Oct 2022 20:48:10 +0000 (UTC)
+Received: from EX19D030UWB002.ant.amazon.com (10.13.139.182) by
+ EX13MTAUWB001.ant.amazon.com (10.43.161.207) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.42; Thu, 27 Oct 2022 20:48:10 +0000
+Received: from u3c3f5cfe23135f.ant.amazon.com (10.43.160.223) by
+ EX19D030UWB002.ant.amazon.com (10.13.139.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.2.1118.15; Thu, 27 Oct 2022 20:48:10 +0000
+From:   Suraj Jitindar Singh <surajjs@amazon.com>
+To:     <stable@vger.kernel.org>
+CC:     <surajjs@amazon.com>, <sjitindarsingh@gmail.com>,
+        <cascardo@canonical.com>, <kvm@vger.kernel.org>,
+        <pbonzini@redhat.com>, <jpoimboe@kernel.org>,
+        <peterz@infradead.org>, <x86@kernel.org>
+Subject: [PATCH 4.14 00/34] Retbleed & PBRSB Mitigations
+Date:   Thu, 27 Oct 2022 13:48:01 -0700
+Message-ID: <20221027204801.13146-1-surajjs@amazon.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 2mEg6wgO-9ZnB2DOuxRIkGIsoZPZwJqS
-X-Proofpoint-GUID: ljsmVt65CWNw3WFNwknNhLNA6YOrmaVB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-27_07,2022-10-27_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 bulkscore=0 impostorscore=0 mlxscore=0 spamscore=0
- adultscore=0 suspectscore=0 phishscore=0 mlxlogscore=999 malwarescore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2210270115
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+Content-Type: text/plain
+X-Originating-IP: [10.43.160.223]
+X-ClientProxiedBy: EX13D25UWC004.ant.amazon.com (10.43.162.201) To
+ EX19D030UWB002.ant.amazon.com (10.13.139.182)
+X-Spam-Status: No, score=-12.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_SPF_WL
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -97,93 +62,119 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2022-10-12 at 18:21 +0200, Pierre Morel wrote:
-> The guest can use the STSI instruction to get a buffer filled
-> with the CPU topology description.
-> 
-> Let us implement the STSI instruction for the basis CPU topology
-> level, level 2.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  include/hw/s390x/cpu-topology.h |   3 +
->  target/s390x/cpu.h              |  48 ++++++++++++++
->  hw/s390x/cpu-topology.c         |   8 ++-
->  target/s390x/cpu_topology.c     | 109 ++++++++++++++++++++++++++++++++
->  target/s390x/kvm/kvm.c          |   6 +-
->  target/s390x/meson.build        |   1 +
->  6 files changed, 172 insertions(+), 3 deletions(-)
->  create mode 100644 target/s390x/cpu_topology.c
-> 
-> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
-> index 66c171d0bc..61c11db017 100644
-> --- a/include/hw/s390x/cpu-topology.h
-> +++ b/include/hw/s390x/cpu-topology.h
-> @@ -13,6 +13,8 @@
->  #include "hw/qdev-core.h"
->  #include "qom/object.h"
->  
-> +#define S390_TOPOLOGY_POLARITY_H  0x00
-> +
->  typedef struct S390TopoContainer {
->      int active_count;
->  } S390TopoContainer;
-> @@ -29,6 +31,7 @@ struct S390Topology {
->      S390TopoContainer *socket;
->      S390TopoTLE *tle;
->      MachineState *ms;
-> +    QemuMutex topo_mutex;
->  };
->  
->  #define TYPE_S390_CPU_TOPOLOGY "s390-topology"
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index 7d6d01325b..d604aa9c78 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> 
-[...]
-> +
-> +/* Maxi size of a SYSIB structure is when all CPU are alone in a container */
+This backport adds support for Retbleed and PBRSB mitigations for Intel parts.
 
-Max or Maximum.
+Some AMD parts are added to simplify context however support for IBPB or UNRET
+is not included in this series. The reporting of whether a cpu is affected
+should be correct however.
 
-> +#define S390_TOPOLOGY_SYSIB_SIZE (sizeof(SysIB_151x) +                         \
-> +                                  S390_MAX_CPUS * (sizeof(SysIBTl_container) + \
-> +                                                   sizeof(SysIBTl_cpu)))
+Most patches applied cleanly or required only context changes, the major
+difference between this series and upstream is the fact that the kvm entry
+path is in inline asm in the 4.14 tree and so this had to be accommodated
+in patches:
+ - x86/speculation: Fill RSB on vmexit for IBRS
+ - x86/speculation: Add RSB VM Exit protections
 
-Currently this is 16+248*3*8 == 5968 and will grow with books, drawer support to
-16+248*5*8 == 9936 ...
+This series is unsurprisingly very similar to that for the 5.4 backport [1].
 
-[...]
-> 
-> +
-> +void insert_stsi_15_1_x(S390CPU *cpu, int sel2, __u64 addr, uint8_t ar)
-> +{
-> +    uint64_t page[S390_TOPOLOGY_SYSIB_SIZE / sizeof(uint64_t)] = {};
+Boot tested on a variety of Intel and AMD systems.
 
-... so calling this page is a bit misleading. Also why not make it a char[]?
-And maybe use a union for type punning.
+Tested correct reporting of vulnerabilities and mitigation selection on Skylake,
+Cascade Lake, Ice Lake and Zen3 parts.
 
-> +    SysIB_151x *sysib = (SysIB_151x *) page;
-> +    int len;
-> +
-> +    if (s390_is_pv() || !s390_has_topology() ||
-> +        sel2 < 2 || sel2 > S390_TOPOLOGY_MAX_MNEST) {
-> +        setcc(cpu, 3);
-> +        return;
-> +    }
-> +
-> +    len = setup_stsi(sysib, sel2);
+[1] https://lore.kernel.org/stable/20221003131038.12645-1-cascardo@canonical.com/
 
-This should now be memory safe, but might be larger than 4k,
-the maximum size of the SYSIB. I guess you want to set cc code 3
-in this case and return.
-> +
-> +    sysib->length = cpu_to_be16(len);
-> +    s390_cpu_virt_mem_write(cpu, addr, ar, sysib, len);
-> +    setcc(cpu, 0);
-> +}
-> +
-> 
-[...]
+Alexandre Chartre (2):
+  x86/bugs: Report AMD retbleed vulnerability
+  x86/bugs: Add AMD retbleed= boot parameter
+
+Andrew Cooper (1):
+  x86/cpu/amd: Enumerate BTC_NO
+
+Daniel Sneddon (1):
+  x86/speculation: Add RSB VM Exit protections
+
+Ingo Molnar (1):
+  x86/cpufeature: Fix various quality problems in the
+    <asm/cpu_device_hd.h> header
+
+Josh Poimboeuf (8):
+  x86/speculation: Fix RSB filling with CONFIG_RETPOLINE=n
+  x86/speculation: Fix firmware entry SPEC_CTRL handling
+  x86/speculation: Fix SPEC_CTRL write on SMT state change
+  x86/speculation: Use cached host SPEC_CTRL value for guest entry/exit
+  x86/speculation: Remove x86_spec_ctrl_mask
+  KVM: VMX: Prevent guest RSB poisoning attacks with eIBRS
+  KVM: VMX: Fix IBRS handling after vmexit
+  x86/speculation: Fill RSB on vmexit for IBRS
+
+Kan Liang (1):
+  x86/cpufeature: Add facility to check for min microcode revisions
+
+Mark Gross (1):
+  x86/cpu: Add a steppings field to struct x86_cpu_id
+
+Nathan Chancellor (1):
+  x86/speculation: Use DECLARE_PER_CPU for x86_spec_ctrl_current
+
+Pawan Gupta (5):
+  x86/speculation: Add spectre_v2=ibrs option to support Kernel IBRS
+  x86/speculation: Add LFENCE to RSB fill sequence
+  x86/bugs: Add Cannon lake to RETBleed affected CPU list
+  x86/speculation: Disable RRSBA behavior
+  x86/bugs: Warn when "ibrs" mitigation is selected on Enhanced IBRS
+    parts
+
+Peter Zijlstra (9):
+  x86/entry: Remove skip_r11rcx
+  x86/cpufeatures: Move RETPOLINE flags to word 11
+  x86/bugs: Keep a per-CPU IA32_SPEC_CTRL value
+  x86/bugs: Optimize SPEC_CTRL MSR writes
+  x86/bugs: Split spectre_v2_select_mitigation() and
+    spectre_v2_user_select_mitigation()
+  x86/bugs: Report Intel retbleed vulnerability
+  entel_idle: Disable IBRS during long idle
+  x86/speculation: Change FILL_RETURN_BUFFER to work with objtool
+  x86/common: Stamp out the stepping madness
+
+Suraj Jitindar Singh (1):
+  Revert "x86/cpu: Add a steppings field to struct x86_cpu_id"
+
+Thadeu Lima de Souza Cascardo (1):
+  x86/entry: Add kernel IBRS implementation
+
+Thomas Gleixner (2):
+  x86/devicetable: Move x86 specific macro out of generic code
+  x86/cpu: Add consistent CPU match macros
+
+ Documentation/admin-guide/hw-vuln/spectre.rst |   8 +
+ .../admin-guide/kernel-parameters.txt         |  13 +
+ arch/x86/entry/calling.h                      |  68 ++-
+ arch/x86/entry/entry_32.S                     |   2 -
+ arch/x86/entry/entry_64.S                     |  38 +-
+ arch/x86/entry/entry_64_compat.S              |  12 +-
+ arch/x86/include/asm/cpu_device_id.h          | 168 ++++++-
+ arch/x86/include/asm/cpufeatures.h            |  16 +-
+ arch/x86/include/asm/intel-family.h           |   6 +
+ arch/x86/include/asm/msr-index.h              |  14 +
+ arch/x86/include/asm/nospec-branch.h          |  48 +-
+ arch/x86/kernel/cpu/amd.c                     |  21 +-
+ arch/x86/kernel/cpu/bugs.c                    | 415 +++++++++++++++---
+ arch/x86/kernel/cpu/common.c                  |  68 ++-
+ arch/x86/kernel/cpu/match.c                   |  44 +-
+ arch/x86/kernel/cpu/scattered.c               |   1 +
+ arch/x86/kernel/process.c                     |   2 +-
+ arch/x86/kvm/svm.c                            |   1 +
+ arch/x86/kvm/vmx.c                            |  51 ++-
+ drivers/base/cpu.c                            |   8 +
+ drivers/cpufreq/acpi-cpufreq.c                |   1 +
+ drivers/cpufreq/amd_freq_sensitivity.c        |   1 +
+ drivers/idle/intel_idle.c                     |  45 +-
+ include/linux/cpu.h                           |   2 +
+ include/linux/mod_devicetable.h               |   4 +-
+ tools/arch/x86/include/asm/cpufeatures.h      |   1 +
+ 26 files changed, 897 insertions(+), 161 deletions(-)
+
+-- 
+2.17.1
 
