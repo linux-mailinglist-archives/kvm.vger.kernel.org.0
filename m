@@ -2,240 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2173960F62A
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 13:26:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7917D60F62C
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 13:27:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235264AbiJ0L0Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 07:26:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49228 "EHLO
+        id S234721AbiJ0L1Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 07:27:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235239AbiJ0L0W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 07:26:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 735A7D0CC1
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 04:26:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666869980;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=gwD/VCqaaIgMoFgk+za7ctN3lKoPgxNu0PXew4sZKV0=;
-        b=Ilfc7aAdVcnO80HQ9y09S0lErH6X6XYnDuNT/qKjha8inoGTyyNLH6I0GuZ7hSGL25juuN
-        uSHe5/P3174oWTozwKz2QVibE2KE1mkY6SNxsHywmpad+JIgx9EBt+Ll/2pvXvfzD6Lfp7
-        xDCBMT6ibaSLlSwxccwfEjANfbAh5mQ=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-422-EaN3HGwqP3qmyS36ysjzyQ-1; Thu, 27 Oct 2022 07:26:19 -0400
-X-MC-Unique: EaN3HGwqP3qmyS36ysjzyQ-1
-Received: by mail-ed1-f71.google.com with SMTP id c9-20020a05640227c900b0045d4a88c750so896007ede.12
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 04:26:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gwD/VCqaaIgMoFgk+za7ctN3lKoPgxNu0PXew4sZKV0=;
-        b=TKqd65LBXwjuxKsj/ubaAdYcrIr3WhFQVRaPq4brBX7vsRnSKSgE234vCzCVwiL6w/
-         FkgJcRRobRKqE3pHXyR2zCreOMwCJbBee9XAgi1ypwR0Oa67xsVFKtsJBmHTHnF74DK/
-         22HmBZ0T9w9rJVm+RoGKF0/OLAdJsykbC3g3rEzsHeFJNDfCoAaN5GeBx2ZkBSgXsIYr
-         6I1hSFtBPsSagpoJ9Ve3Sg28cCQiGMkZRZ5t/9sP3wTP3YUx6w9IQEtydPMID7FQF6f+
-         jcLSbms5u6dK+PUIWI5R6I+ZpFooJ+EC+cVxjM7cXnFaVCec04JyX+Nh/pM8P2Rjk2zT
-         t7kw==
-X-Gm-Message-State: ACrzQf2ar1VlhT03TiCAUeVD0n/5OcLzKxucTSEQTacMGMQ/lBZB5gVl
-        L4QspviV7GWnegC7D4fmQv7i+xHB1JI1zhNEioFsgqkijFgMKvsMdKWJv8qdAjSKYOpW2xUv62g
-        B7V9t6Nb3mTy3
-X-Received: by 2002:a17:907:5c2:b0:77e:def7:65d8 with SMTP id wg2-20020a17090705c200b0077edef765d8mr42343944ejb.487.1666869977864;
-        Thu, 27 Oct 2022 04:26:17 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7WJxuWZ43iZYYhZ8MfPXNu3T6tKw0hM2BQl4n9aGq5ITWxA4LN5wc6fGSQb5BUv0s9i2wi1A==
-X-Received: by 2002:a17:907:5c2:b0:77e:def7:65d8 with SMTP id wg2-20020a17090705c200b0077edef765d8mr42343917ejb.487.1666869977557;
-        Thu, 27 Oct 2022 04:26:17 -0700 (PDT)
-Received: from ovpn-194-52.brq.redhat.com (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id 24-20020a170906319800b0073d84a321c8sm640878ejy.166.2022.10.27.04.26.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Oct 2022 04:26:16 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/4] KVM: VMX: Resurrect vmcs_conf sanitization for
- KVM-on-Hyper-V
-In-Reply-To: <Y1nD9QKqa1A1j7t+@google.com>
-References: <20221018101000.934413-1-vkuznets@redhat.com>
- <20221018101000.934413-5-vkuznets@redhat.com>
- <Y1nD9QKqa1A1j7t+@google.com>
-Date:   Thu, 27 Oct 2022 13:26:15 +0200
-Message-ID: <877d0ltsmg.fsf@ovpn-194-52.brq.redhat.com>
+        with ESMTP id S234043AbiJ0L1P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 07:27:15 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43277D73D2
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 04:27:14 -0700 (PDT)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29RAj0ds000302;
+        Thu, 27 Oct 2022 11:27:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=tH/Y3ccWV58Ne4I7NI1QWcbYOo2VJJlqfPRJxEExBrc=;
+ b=dGV3x92wyMXCvTnYR35Zt3oBUYMxFggRQgqc9ekp6oyvsUcZ1kQ5WdNZ83lWiSwElCeh
+ DEbjmMuwEGDqGJmEiJK7Tb4pNL1LXelncLv2lBjoWwV4y4DywvWyaNimv1qC8dY5IQrg
+ pXY4dCj61jXStVHTxbIQG+XZH+kcyaOiNr3fCdoaZS94AVJQTwrqsAsnrFIV5e33i/ng
+ wfsluQB20KuZEg5gT1RnEDymZ5D3fI/Zyb66YMinOoh+eBgjf9kk9+/Jz2o5vqZ8oIhy
+ GGGscB4O5TTatZHDEAhGOdSJQCezKStB9GLPZSEM3c175I/0jOcKOidZtuAIgXa72MGs 3A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kfrgsh81n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Oct 2022 11:27:01 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29RAjWLJ002179;
+        Thu, 27 Oct 2022 11:27:01 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kfrgsh80v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Oct 2022 11:27:00 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29RBL3j6000615;
+        Thu, 27 Oct 2022 11:26:58 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03ams.nl.ibm.com with ESMTP id 3kfahqhw06-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Oct 2022 11:26:58 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29RBQtoe63373598
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Oct 2022 11:26:55 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6A7E8A405B;
+        Thu, 27 Oct 2022 11:26:55 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7B2C5A4054;
+        Thu, 27 Oct 2022 11:26:54 +0000 (GMT)
+Received: from [9.179.10.218] (unknown [9.179.10.218])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 27 Oct 2022 11:26:54 +0000 (GMT)
+Message-ID: <443be3c8-0da8-8b6c-0067-59ff19b0bc4e@linux.ibm.com>
+Date:   Thu, 27 Oct 2022 13:26:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Subject: Re: [PATCH v10 3/9] s390x/cpu_topology: resetting the
+ Topology-Change-Report
+Content-Language: en-US
+To:     =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+        Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        frankja@linux.ibm.com, berrange@redhat.com
+References: <20221012162107.91734-1-pmorel@linux.ibm.com>
+ <20221012162107.91734-4-pmorel@linux.ibm.com>
+ <450544bf-4ff0-9d72-f57c-4274692916a5@redhat.com>
+ <77d52b82-aa44-ed79-2345-1b3c3a15fb7d@linux.ibm.com>
+ <cca5db4f-4c05-1fda-de77-19d1cc161748@kaod.org>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <cca5db4f-4c05-1fda-de77-19d1cc161748@kaod.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: GgsuIxG674P1NmpHQqEW9OF6Qdty-yHs
+X-Proofpoint-GUID: fpnwRWn2NNrzDvtou7l-VaBz35q5M15_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-27_05,2022-10-27_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
+ priorityscore=1501 phishscore=0 malwarescore=0 spamscore=0 suspectscore=0
+ clxscore=1015 mlxscore=0 bulkscore=0 lowpriorityscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
+ definitions=main-2210270061
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
 
-> On Tue, Oct 18, 2022, Vitaly Kuznetsov wrote:
->> @@ -362,6 +364,7 @@ uint16_t nested_get_evmcs_version(struct kvm_vcpu *vcpu)
->>  
->>  enum evmcs_revision {
->>  	EVMCSv1_LEGACY,
->> +	EVMCSv1_STRICT,
->
-> "strict" isn't really the right word, this is more like "raw" or "unfiltered",
-> because unless I'm misunderstanding the intent, this will always track KVM's
-> bleeding edge, i.e. everything that KVM can possibly enable.
->
 
-Yes, it's unclear from the patch but this is a pre-requisite to exposing
-'updated' eVMCSv1 controls (e.g. TSC scaling) for Hyper-V-on-KVM
-case. Previously (https://lore.kernel.org/kvm/20220824030138.3524159-10-seanjc@google.com/)
-we called it 'ENFORCED' but I misremembered and called it 'strict'.
+On 10/27/22 11:58, Cédric Le Goater wrote:
+> On 10/27/22 11:11, Pierre Morel wrote:
+>>
+>>
+>> On 10/27/22 10:14, Thomas Huth wrote:
+>>> On 12/10/2022 18.21, Pierre Morel wrote:
+>>>> During a subsystem reset the Topology-Change-Report is cleared
+>>>> by the machine.
+>>>> Let's ask KVM to clear the Modified Topology Change Report (MTCR)
+>>>>   bit of the SCA in the case of a subsystem reset.
+>>>>
+>>>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>>>> Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+>>>> Reviewed-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>>>> ---
+>>>>   target/s390x/cpu.h           |  1 +
+>>>>   target/s390x/kvm/kvm_s390x.h |  1 +
+>>>>   hw/s390x/cpu-topology.c      | 12 ++++++++++++
+>>>>   hw/s390x/s390-virtio-ccw.c   |  1 +
+>>>>   target/s390x/cpu-sysemu.c    |  7 +++++++
+>>>>   target/s390x/kvm/kvm.c       | 23 +++++++++++++++++++++++
+>>>>   6 files changed, 45 insertions(+)
+>>>>
+>>>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+>>>> index d604aa9c78..9b35795ac8 100644
+>>>> --- a/target/s390x/cpu.h
+>>>> +++ b/target/s390x/cpu.h
+>>>> @@ -825,6 +825,7 @@ void s390_enable_css_support(S390CPU *cpu);
+>>>>   void s390_do_cpu_set_diag318(CPUState *cs, run_on_cpu_data arg);
+>>>>   int s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t 
+>>>> sch_id,
+>>>>                                   int vq, bool assign);
+>>>> +void s390_cpu_topology_reset(void);
+>>>>   #ifndef CONFIG_USER_ONLY
+>>>>   unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu);
+>>>>   #else
+>>>> diff --git a/target/s390x/kvm/kvm_s390x.h 
+>>>> b/target/s390x/kvm/kvm_s390x.h
+>>>> index aaae8570de..a13c8fb9a3 100644
+>>>> --- a/target/s390x/kvm/kvm_s390x.h
+>>>> +++ b/target/s390x/kvm/kvm_s390x.h
+>>>> @@ -46,5 +46,6 @@ void kvm_s390_crypto_reset(void);
+>>>>   void kvm_s390_restart_interrupt(S390CPU *cpu);
+>>>>   void kvm_s390_stop_interrupt(S390CPU *cpu);
+>>>>   void kvm_s390_set_diag318(CPUState *cs, uint64_t diag318_info);
+>>>> +int kvm_s390_topology_set_mtcr(uint64_t attr);
+>>>>   #endif /* KVM_S390X_H */
+>>>> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+>>>> index c73cebfe6f..9f202621d0 100644
+>>>> --- a/hw/s390x/cpu-topology.c
+>>>> +++ b/hw/s390x/cpu-topology.c
+>>>> @@ -107,6 +107,17 @@ static void s390_topology_realize(DeviceState 
+>>>> *dev, Error **errp)
+>>>>       qemu_mutex_init(&topo->topo_mutex);
+>>>>   }
+>>>> +/**
+>>>> + * s390_topology_reset:
+>>>> + * @dev: the device
+>>>> + *
+>>>> + * Calls the sysemu topology reset
+>>>> + */
+>>>> +static void s390_topology_reset(DeviceState *dev)
+>>>> +{
+>>>> +    s390_cpu_topology_reset();
+>>>> +}
+>>>> +
+>>>>   /**
+>>>>    * topology_class_init:
+>>>>    * @oc: Object class
+>>>> @@ -120,6 +131,7 @@ static void topology_class_init(ObjectClass *oc, 
+>>>> void *data)
+>>>>       dc->realize = s390_topology_realize;
+>>>>       set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+>>>> +    dc->reset = s390_topology_reset;
+>>>>   }
+>>>>   static const TypeInfo cpu_topology_info = {
+>>>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+>>>> index aa99a62e42..362378454a 100644
+>>>> --- a/hw/s390x/s390-virtio-ccw.c
+>>>> +++ b/hw/s390x/s390-virtio-ccw.c
+>>>> @@ -113,6 +113,7 @@ static const char *const reset_dev_types[] = {
+>>>>       "s390-flic",
+>>>>       "diag288",
+>>>>       TYPE_S390_PCI_HOST_BRIDGE,
+>>>> +    TYPE_S390_CPU_TOPOLOGY,
+>>>>   };
+>>>>   static void subsystem_reset(void)
+>>>> diff --git a/target/s390x/cpu-sysemu.c b/target/s390x/cpu-sysemu.c
+>>>> index 948e4bd3e0..707c0b658c 100644
+>>>> --- a/target/s390x/cpu-sysemu.c
+>>>> +++ b/target/s390x/cpu-sysemu.c
+>>>> @@ -306,3 +306,10 @@ void s390_do_cpu_set_diag318(CPUState *cs, 
+>>>> run_on_cpu_data arg)
+>>>>           kvm_s390_set_diag318(cs, arg.host_ulong);
+>>>>       }
+>>>>   }
+>>>> +
+>>>> +void s390_cpu_topology_reset(void)
+>>>> +{
+>>>> +    if (kvm_enabled()) {
+>>>> +        kvm_s390_topology_set_mtcr(0);
+>>>> +    }
+>>>> +}
+>>>> diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
+>>>> index f96630440b..9c994d27d5 100644
+>>>> --- a/target/s390x/kvm/kvm.c
+>>>> +++ b/target/s390x/kvm/kvm.c
+>>>> @@ -2585,3 +2585,26 @@ int kvm_s390_get_zpci_op(void)
+>>>>   {
+>>>>       return cap_zpci_op;
+>>>>   }
+>>>> +
+>>>> +int kvm_s390_topology_set_mtcr(uint64_t attr)
+>>>> +{
+>>>> +    struct kvm_device_attr attribute = {
+>>>> +        .group = KVM_S390_VM_CPU_TOPOLOGY,
+>>>> +        .attr  = attr,
+>>>> +    };
+>>>> +    int ret;
+>>>> +
+>>>> +    if (!s390_has_feat(S390_FEAT_CONFIGURATION_TOPOLOGY)) {
+>>>> +        return -EFAULT;
+>>>
+>>> EFAULT is something that indicates a bad address (e.g. a segmentation 
+>>> fault) ... so this definitely sounds like a bad choice for an error 
+>>> code here.
+>>
+>> Hum, yes, ENODEV seems besser no?
+> 
+> -ENOTSUP would be 'meilleur' may be ?  :)
 
-> And in that case, we can avoid bikeshedding the name becase bouncing through
-> evmcs_supported_ctrls is unnecessary, just use the #defines directly.  And then
-> you can just fold the one (or two) #defines from patch 3 into this path.
->
+yes better :)
 
-Defines can be used directly indeed and 'strict/enforcing/...'
-discussion can happen when we finally come to exposing 'updated'
-controls (hope we're almost there). 
-
->> @@ -511,6 +525,52 @@ int nested_evmcs_check_controls(struct vmcs12 *vmcs12)
->>  	return 0;
->>  }
->>  
->> +#if IS_ENABLED(CONFIG_HYPERV)
->> +/*
->> + * KVM on Hyper-V always uses the newest known eVMCSv1 revision, the assumption
->> + * is: in case a feature has corresponding fields in eVMCS described and it was
->> + * exposed in VMX feature MSRs, KVM is free to use it. Warn if KVM meets a
->> + * feature which has no corresponding eVMCS field, this likely means that KVM
->> + * needs to be updated.
->> + */
->> +#define evmcs_check_vmcs_conf32(field, ctrl)					\
->> +	{									\
->> +		u32 supported, unsupported32;					\
->> +										\
->> +		supported = evmcs_get_supported_ctls(ctrl, EVMCSv1_STRICT);	\
->> +		unsupported32 = vmcs_conf->field & ~supported;			\
->> +		if (unsupported32) {						\
->> +			pr_warn_once(#field " unsupported with eVMCS: 0x%x\n",	\
->> +				     unsupported32);				\
->> +			vmcs_conf->field &= supported;				\
->> +		}								\
->> +	}
->> +
->> +#define evmcs_check_vmcs_conf64(field, ctrl)					\
->> +	{									\
->> +		u32 supported;							\
->> +		u64 unsupported64;						\
->
-> Channeling my inner Morpheus: Stop trying to use macros and use macros!  :-D
->
-> ---
->  arch/x86/kvm/vmx/evmcs.c | 34 ++++++++++++++++++++++++++++++++++
->  arch/x86/kvm/vmx/evmcs.h |  2 ++
->  arch/x86/kvm/vmx/vmx.c   |  5 +++++
->  3 files changed, 41 insertions(+)
->
-> diff --git a/arch/x86/kvm/vmx/evmcs.c b/arch/x86/kvm/vmx/evmcs.c
-> index 337783675731..f7f8eafeecf7 100644
-> --- a/arch/x86/kvm/vmx/evmcs.c
-> +++ b/arch/x86/kvm/vmx/evmcs.c
-> @@ -1,5 +1,7 @@
->  // SPDX-License-Identifier: GPL-2.0
->  
-> +#define pr_fmt(fmt) "kvm/hyper-v: " fmt
-> +
->  #include <linux/errno.h>
->  #include <linux/smp.h>
->  
-> @@ -507,6 +509,38 @@ int nested_evmcs_check_controls(struct vmcs12 *vmcs12)
->  	return 0;
->  }
->  
-> +#if IS_ENABLED(CONFIG_HYPERV)
-> +/*
-> + * KVM on Hyper-V always uses the newest known eVMCSv1 revision, the assumption
-> + * is: in case a feature has corresponding fields in eVMCS described and it was
-> + * exposed in VMX feature MSRs, KVM is free to use it. Warn if KVM meets a
-> + * feature which has no corresponding eVMCS field, this likely means that KVM
-> + * needs to be updated.
-> + */
-> +#define evmcs_check_vmcs_conf(field, ctrl)				\
-> +do {									\
-> +	typeof(vmcs_conf->field) unsupported;				\
-> +									\
-> +	unsupported = vmcs_conf->field & EVMCS1_UNSUPPORTED_ ## ctrl;	\
-> +	if (unsupported) {						\
-> +		pr_warn_once(#field " unsupported with eVMCS: 0x%llx\n",\
-> +			     (u64)unsupported);				\
-> +		vmcs_conf->field &= ~unsupported;			\
-> +	}								\
-> +}									\
-> +while (0)
-> +
-> +__init void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf)
-> +{
-> +	evmcs_check_vmcs_conf(cpu_based_exec_ctrl, EXEC_CTRL);
-> +	evmcs_check_vmcs_conf(pin_based_exec_ctrl, PINCTRL);
-> +	evmcs_check_vmcs_conf(cpu_based_2nd_exec_ctrl, 2NDEXEC);
-> +	evmcs_check_vmcs_conf(cpu_based_3rd_exec_ctrl, 3RDEXEC);
-> +	evmcs_check_vmcs_conf(vmentry_ctrl, VMENTRY_CTRL);
-> +	evmcs_check_vmcs_conf(vmexit_ctrl, VMEXIT_CTRL);
-> +}
-> +#endif
-> +
->  int nested_enable_evmcs(struct kvm_vcpu *vcpu,
->  			uint16_t *vmcs_version)
->  {
-> diff --git a/arch/x86/kvm/vmx/evmcs.h b/arch/x86/kvm/vmx/evmcs.h
-> index 6f746ef3c038..bc795c6e9059 100644
-> --- a/arch/x86/kvm/vmx/evmcs.h
-> +++ b/arch/x86/kvm/vmx/evmcs.h
-> @@ -58,6 +58,7 @@ DECLARE_STATIC_KEY_FALSE(enable_evmcs);
->  	 SECONDARY_EXEC_SHADOW_VMCS |					\
->  	 SECONDARY_EXEC_TSC_SCALING |					\
->  	 SECONDARY_EXEC_PAUSE_LOOP_EXITING)
-> +#define EVMCS1_UNSUPPORTED_3RDEXEC (~0ULL)
->  #define EVMCS1_UNSUPPORTED_VMEXIT_CTRL					\
->  	(VM_EXIT_SAVE_VMX_PREEMPTION_TIMER)
->  #define EVMCS1_UNSUPPORTED_VMENTRY_CTRL (0)
-> @@ -209,6 +210,7 @@ static inline void evmcs_load(u64 phys_addr)
->  	vp_ap->enlighten_vmentry = 1;
->  }
->  
-> +__init void evmcs_sanitize_exec_ctrls(struct vmcs_config *vmcs_conf);
->  #else /* !IS_ENABLED(CONFIG_HYPERV) */
->  static __always_inline void evmcs_write64(unsigned long field, u64 value) {}
->  static inline void evmcs_write32(unsigned long field, u32 value) {}
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 9dba04b6b019..7fd21b1fae1d 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2720,6 +2720,11 @@ static __init int setup_vmcs_config(struct vmcs_config *vmcs_conf,
->  	vmcs_conf->vmentry_ctrl        = _vmentry_control;
->  	vmcs_conf->misc	= misc_msr;
->  
-> +#if IS_ENABLED(CONFIG_HYPERV)
-> +	if (enlightened_vmcs)
-> +		evmcs_sanitize_exec_ctrls(vmcs_conf);
-> +#endif
-> +
->  	return 0;
->  }
->  
->
-> base-commit: 5b6b6bcc0ef138b55fdd17dc8f9d43dfd26f8bd7
+thanks,
+Pierre
 
 -- 
-Vitaly
-
+Pierre Morel
+IBM Lab Boeblingen
