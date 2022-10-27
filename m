@@ -2,185 +2,546 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5626460F656
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 13:37:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DBBF60F6B5
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 14:04:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233867AbiJ0Lhy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 07:37:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45506 "EHLO
+        id S235536AbiJ0MEZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 08:04:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235271AbiJ0Lhs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 07:37:48 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2060.outbound.protection.outlook.com [40.107.223.60])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0385E8A92;
-        Thu, 27 Oct 2022 04:37:47 -0700 (PDT)
+        with ESMTP id S235445AbiJ0MEY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 08:04:24 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7A2133A3A;
+        Thu, 27 Oct 2022 05:04:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1666872262; x=1698408262;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=5ZG8iBlPb7KHoiRb3xbVebjfuSqXPlIcn5PcQI9v1vg=;
+  b=Zu9afnpM0oFZcC4YT77XUzjJMc1i+TZh8PuQppMNSZ8qYPgYb+bbvZym
+   lpX+ppUtfOeklgRLe32J0PaQBcLiz6b3IlrapEHZiRVWGHm9g0Ne3pYsL
+   B9sk9tFRg9MyF45SYbxt7/VL+Z4Gnf2InrZLsc9zEsAmRXKq0NUmkaQh3
+   1Zc09FFdVj7KLP2q9CVVd2bZT+p5Ew7uK2WilKEQxXLRCiI/oPtL7DQc7
+   rERq7qzacmSnszxRvDiAY764vD/Pqdj+lIffOh7tC3Kjo/Zfd5HTE9EOM
+   3DGMjHajpLp026sQJrCtluSRB/vxaydsshD4TLuzfEgT8yMGfcGCL+bAy
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="306933616"
+X-IronPort-AV: E=Sophos;i="5.95,217,1661842800"; 
+   d="scan'208";a="306933616"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2022 05:04:12 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="665655929"
+X-IronPort-AV: E=Sophos;i="5.95,217,1661842800"; 
+   d="scan'208";a="665655929"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga001.jf.intel.com with ESMTP; 27 Oct 2022 05:04:12 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 27 Oct 2022 05:04:11 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Thu, 27 Oct 2022 05:04:11 -0700
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.49) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Thu, 27 Oct 2022 05:04:09 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jlGsgfkNiyDXSIkTrdIu93qBC5gK4NVGrcgL3f4lTrrQ3aAeYoiZPS0JfA5WYOo5veEXXOYiOZ7nQC7cuACHBRMZYFlve/MTA6vNW+Oznl+Hfg0LFoozZKzpEvWPDv1vn+D/Z250Aa4TlgsLlHpBX/0GiDbrZE/Qs30Ms2ecTp14DwWgTHcX6VLjzAyGRGyZEBn95Zi/t/06xSNCtWqVaorWt6etMkzzfzKZo7RPdHwKYAC1G6h09xX9xBZUEeGCDUg7WUd8uoS4iSc4cUGArQjYBhEgmeSSwRiEYgVsZsYdHqwutn1TOdrXN6YxJ5y0W+KKRTKrDk7nmMsifZH4zA==
+ b=UgelFeg3XcvYpM3O/sr1FsSLTPTASudDhzylPBAo4TRvOHxi0vkP/ndsl9cmWfhx0hqRaBlYXl0hDVAsiJSzIQvOqten9xH3e1ixefNwbDUIQLsuic+leuWGKbgYWmRR++IctR2ScxbmkFtuLfJJftW6FjSkFTnl64N7icyAb6gFIFGifXbaNVI8kjyMropEjJNw616Z3FLvtZ4oXhONLvXj9Zp1BHbWO7XybvRtEzkcRfL1myRbVdjnxqS9D2J5YketIJKo5DrOIYs9f4HCzoJSytM92z8E3MrSKhDcExZiW09oFAR4P4jI1HqA6ltAAasZCmUwnimSXvgpzUy4jA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wgJKFB5pGB+X/sHCfppLsTIrbT+ZsWsd8O+nLreUCzk=;
- b=UqWgoLAftWidu1w8ywerWR4TZWnOrfqiabdiOImvJ+2XNfSZju+ROGeSewiznDZC8mwmhg0+ntqQEQXjuKhTSTms4htTDe+bYSsUWNB+ti/ilisTstruFbGuJkbSLRRDtW6AE+YMfdgLN6JjW0wpmtqIDCerk4AuU5fxWoyCMi1oSyS1f2AZqsXR/LJakhSgQwWuWgBkIcYMTexAJTgLEpmwFyIYNx5qXEVEgkWfSJIRnElEuC70n7cbLTA7je6L6O/wXdRc0rZ1u5gNA5LVe6WcslWn4s9BOilFjPzZwud8EbQndk2Ws43J0FnrzdsnV+jJ9v/tYoLs/6XmZ0FyOQ==
+ bh=zwtmco2sUtrwPX6nLynTadeeETuD/eQ3MToWi1PciKE=;
+ b=RU3xAn95pHnBIdCWXIp5xNdx3YKZ4FmavPpSSbCmT4mP7CFZbYUYxJmYc/WxqAm4LPSGfOULFj5ahpBt3K6azSwKOMhDWjt5pxvwwbuUqBdNHQ+NTiknL5cgC3xv14MpRAMb0T72jU74fh3z/DQ3Uu7Gka37Hr+jlI3KUsxa35jJA+JSpyW8KJgdnLCAk1GCDdK546HELI+TgQswgplO5MJVsf52xtu0xHgUPmNYQjW1kVFLcTAGwrvYVUgvB/XTRb0jidnfX50M1bVC7f3chgNh1zFBea2ly/8M+s1Z7XjoAFjPV5Choe0GJ4Sl3BgwKN0rg1JGfOH7x2l4SM9ojQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wgJKFB5pGB+X/sHCfppLsTIrbT+ZsWsd8O+nLreUCzk=;
- b=PJrN5pOeJ3IkS0b1kjyePlA717Ibg+riK1I60XZBZF7XI7OLgQJaMp+DbBPEoMDa7YWg3Nr7TjKzMar5adpzIyPqJrIiZaI9UeyHnRkycah9yA8vs/Tjzvfn8mbs/TBLfeLOglOXM7/P7r6MX1jC/LUa8ixzoKLRQvYae/PZ6kPC/X7I6eFhNGoGL+7YMc9e+xQXbEKg+p5fjH4fJzdulL9S4xiGh6h4U+OKbhW78gmY0SRX08xUHfyvP9sJkq4v9Yi+HeEBT759uuETezRIKRs68OhP5+Vb/rRPX25X+Qa6HjoM1ayhU2lU4bLy9e9P5mfi61SUVgyQYZs4lAdnkQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by MW4PR12MB6827.namprd12.prod.outlook.com (2603:10b6:303:20b::11) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB6373.namprd11.prod.outlook.com (2603:10b6:8:cb::20) by
+ SN7PR11MB6827.namprd11.prod.outlook.com (2603:10b6:806:2a2::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5746.28; Thu, 27 Oct
- 2022 11:37:45 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5746.021; Thu, 27 Oct 2022
- 11:37:45 +0000
-Date:   Thu, 27 Oct 2022 08:37:44 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Lu Baolu <baolu.lu@linux.intel.com>, bpf@vger.kernel.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Shameerali Kolothum Thodi 
-        <shameerali.kolothum.thodi@huawei.com>,
-        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v3 9/15] iommufd: Data structure to provide IOVA to PFN
- mapping
-Message-ID: <Y1ptiMxTfslWZBW2@nvidia.com>
-References: <0-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
- <9-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
-X-ClientProxiedBy: MN2PR20CA0058.namprd20.prod.outlook.com
- (2603:10b6:208:235::27) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.33; Thu, 27 Oct
+ 2022 12:03:50 +0000
+Received: from DS0PR11MB6373.namprd11.prod.outlook.com
+ ([fe80::4625:d63e:1152:1246]) by DS0PR11MB6373.namprd11.prod.outlook.com
+ ([fe80::4625:d63e:1152:1246%6]) with mapi id 15.20.5746.021; Thu, 27 Oct 2022
+ 12:03:49 +0000
+From:   "Wang, Wei W" <wei.w.wang@intel.com>
+To:     "Christopherson,, Sean" <seanjc@google.com>
+CC:     Vipin Sharma <vipinsh@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "dmatlack@google.com" <dmatlack@google.com>,
+        "andrew.jones@linux.dev" <andrew.jones@linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v6 5/5] KVM: selftests: Allowing running
+ dirty_log_perf_test on specific CPUs
+Thread-Topic: [PATCH v6 5/5] KVM: selftests: Allowing running
+ dirty_log_perf_test on specific CPUs
+Thread-Index: AQHY5ZKzsJSoXiEDzEiLKUZFIm4C+q4f88hwgADksACAAOmJcA==
+Date:   Thu, 27 Oct 2022 12:03:49 +0000
+Message-ID: <DS0PR11MB6373E6CA4DDFFD47B64CB719DC339@DS0PR11MB6373.namprd11.prod.outlook.com>
+References: <20221021211816.1525201-1-vipinsh@google.com>
+ <20221021211816.1525201-6-vipinsh@google.com>
+ <DS0PR11MB637351B52E5F8752E7DA16A4DC309@DS0PR11MB6373.namprd11.prod.outlook.com>
+ <Y1lV0l4uDjXdKpkL@google.com>
+In-Reply-To: <Y1lV0l4uDjXdKpkL@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+dlp-version: 11.6.500.17
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB6373:EE_|SN7PR11MB6827:EE_
+x-ms-office365-filtering-correlation-id: 79bec9ed-8ff3-451d-fcef-08dab8134f37
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: yQ3uqv+GtYOsnyX0RRVuuQv9bj/r30Po02tbCYfxn1J3miTLrGdHkYpLZyGHUyHQqnEONA2XleAFCsPCioexaHPSi6tRLWCAVeP+aflqCoCIUr/Js/oZEdZ0j/P3JJPLOrsMWuWBxMppDLL6vh0ovbWI9+O7Um6AZW7vwBBOHahI7DICtVq79Uf921mbjnITgMMzXveZPsMe7m1noiwKnsfv20D40Owz+Z5PZvqUTkXEVQRTMZhAe6RuyxkqIh0mxuRZWtdVxMJyQh2tJDMo422ZeMKtzZZWz2Q5WVgabFxC0EdgQqwgQNhwW+Kj5XfMrcjpaNsl3EfEkbk7l7B1510azVvuf7pe/DvbTBnolq8Q5Pm+ZGP+V5ivNI7eTLiBCrImd5y+G0VNeT2UjJIc89y4D3o7Mp8NjyJuMpeHkuAgr64gykPCUfv44ms9hegxO3Hvg11Hq0Jusx14u4MhjJsEC0dHSSThIVsgBEkOtrbSq60JmIqpKuQaepgCRsKMQ0e885UJLgbGguKcu3gb0IvVOPj/v2XWIhGhRcc4IYKDMdDPN9GnnAxlNMJLuVZLDF1YhfTXBDRPE/t4VD2WgXx4hMBk6F7G0y/rTmsUb0+L/9eassUbjiaZIOFPkRWluA0J/33M4eJuQDde5RGGv1076u6bLXwbDykPFXa/gC9y+0FfOTmG9QoVhGjtgg/Dz7GpajO+nJHHOKZULi3NONl88Y7+gOPBnvgrER+KE/pwjCyieDbL375SZuCIJAE8iD4F8fMXa0rSdhcPihfnbKGY7/a0Xbe1uYJUbRRkozU=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB6373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(396003)(346002)(376002)(39860400002)(366004)(451199015)(55016003)(9686003)(186003)(52536014)(66446008)(8936002)(7696005)(41300700001)(38070700005)(2906002)(4326008)(8676002)(6506007)(76116006)(66946007)(66476007)(82960400001)(86362001)(53546011)(30864003)(5660300002)(83380400001)(33656002)(26005)(122000001)(478600001)(66556008)(38100700002)(316002)(71200400001)(64756008)(6916009)(54906003)(14143004);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?vX3x/ffxP5UArI4Ln/UlsSIo8ozttoSaDoFH2cr+H4wENPVNz7hU17QFvY3U?=
+ =?us-ascii?Q?XGYaAs8lqwch+Nltv4Q/MyIP8boxgjd6Whyj3vahUmoKonS7CkZshEdYJR0P?=
+ =?us-ascii?Q?ee4S3DfbrkygHb89Dn2KIyp5xUZ41csoMNSU2Zmh2gNHbeAyj0aLNlnb2gFm?=
+ =?us-ascii?Q?KAeV/VjULHs2ZVpB5M/sMviINqMpObtWpgUNuswPoUAg1hkHdKR/sLO0mh5E?=
+ =?us-ascii?Q?rm7wqs15vhhcNC4tuqa7L3hLJFc4+CnZNyBFHKYpkB+wsyqlv1scUrWQD+wA?=
+ =?us-ascii?Q?3vS4fZvx86bCZdq85SL7VWICe62xBZuHRUrbZrqOmmrsjY5dPmQbm5rA1cp9?=
+ =?us-ascii?Q?5K8TeYarYaVkg7lotm0XcAe5zxR+lR6P1mwyIaibWH/Czwn8T7f1VdlvruWV?=
+ =?us-ascii?Q?FioO3Um3U6tPrTsMcmQIbkJ07Dv2450lkVBXwDUVD4B4lCCKOidUN2BtiFpu?=
+ =?us-ascii?Q?J4MBBm78uOHs0lZMTcAju5stsm8etNZjW8g+0rS91mTX6p2p5LoAH9tBE8oc?=
+ =?us-ascii?Q?wvhFE56KxnRBKRR2i/0ZlZqeI79cJ8suuvyG0DLIUTsFr/ep5MbLe+m+c2Z4?=
+ =?us-ascii?Q?4X4KBRyEWc2Axu2u7jwZNYDghUuQnEB7xpBlK1KN8Z7IP8dpc7Rz7HOIfXMv?=
+ =?us-ascii?Q?LxM0HlRKm50a8KLWoO73LmzN6g/pY6dGmM8PHh/he0cEetl9muDJ98SWKIYh?=
+ =?us-ascii?Q?X011DnCGbosBPuput1BrJo+7ktAK3max7L/YZQq08IadZlwNnSOG0vgn8ZfA?=
+ =?us-ascii?Q?UPjn1GQsZJgiBOz7K/qfYZASNOdo6vfwIGehbIi2wDzEmxh0beaHIc08m6gR?=
+ =?us-ascii?Q?9IpcHMjFy6k2VUnADZXMiJ3ah+45eeTt2f5SEYeatB5cTvcLfGj1hmccAUH1?=
+ =?us-ascii?Q?YYOe/QXEMBMq3NzjSZaLA0VerBngzYxpzKUqolVxeHYXbeVohGkL+jCue1aJ?=
+ =?us-ascii?Q?enAhR0L35UZay8uZFUCFofWP2/i4C6OvOlSXjihzUaCTOIqDfSsEcyjBLvXm?=
+ =?us-ascii?Q?GTNjJADOxU1P5NsuI+ZtM9pbYIGuq5+tdOgaDeWCaFoRxUZsUn5qT7gOPoVP?=
+ =?us-ascii?Q?rprfBcWfzSu/vg0E59RoOiz/dzlDBQHyBS7AyxeHjqGwMCPCkfDGIc3tgEW6?=
+ =?us-ascii?Q?QNBphPd0VaQKNsMOgJbei+4HU01LHZksTnhMIr5vCPX2gZVyVMW2pyY7Kj/H?=
+ =?us-ascii?Q?bWgS/xpr0MZT60idv/zhoCNnGOjPCTFzm+9K19JE9ZX5dvLKoKsArshnRXkw?=
+ =?us-ascii?Q?1uZSgG//kodOC33/2oeMzaUtP3m+rvAX+5GSatSKRcVypYuDMdfwMY+e1JLw?=
+ =?us-ascii?Q?ikKMWaGEHxBLY6C6+gqX0Mvg84hOOoikDSFxJOwZxQ7UHoG93o8g5dmF3aIF?=
+ =?us-ascii?Q?bDihrzgA+z/eZa32byhhv613As5IX2Cs6joLC0FC1aa8LAg3vZMBkG/m0dtG?=
+ =?us-ascii?Q?cjfQmziPzd9DQwnHpwXhmNC9D2qNgGkNKjMuZjAod3jrNYdQeIO92feMMpEh?=
+ =?us-ascii?Q?aF3FmUf0TynFStgk7ztua9rs0QVr+022ybsizJ3F8AtKDFOUL2Htrff+9eAd?=
+ =?us-ascii?Q?EZhddReROxoHo3R4/80al1ZOYooYCBFAVxoq0wiU?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MW4PR12MB6827:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9019e03e-f3ad-487e-7bc6-08dab80faaab
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: LgBe0JPlksVhx2irXRgynvfiK42qVp4YJUyaiq+tSnR056M1P1ADmtQRWtG+tFdLguwJLmBszluLdECHnDe7sF8ja4JEkt80eGD9NWF7sblaTkRzy29LxxMfyvXjzYfX0Mni1nMAAbFDGIDIL5lcouC256qqbALWIW1DytBA69++R79EDz1vkAMRrKPuErblAJC7Z4Tjg4tYgtjJ5NsiP0AHg4D6wNJ6AlHOswe4PNaF5KWFln8j5DCtody29hTPSWPM92BIfSnW13yM73bw6e8wfoYIzI1QP7RgkaWoAO2NHdGhsXVwuAmwGfVI59HC2fvklWvOJVLRxaoe4Pa2vlnerDciOVnE0Xg4pIAgpLj+5VZQisoTw34oQY9xkjyu7OJDoqQ2qt/kY5pgceScIn4WplCIwvlHcihP6ChnS6WmrecMKaICC87zJ16ZjbmnT3BUwP9/cBiTSmMln0AFqIeTIfKkAOP3uOux1J56T499yMb65xHsrxWQ98KxD2EUFffXzkV+j8enaIS9LGxmuJrBvkRFDjS2kpvkoGB1AXMIIdHxB+l1hLyFF7uBrOfyewvU1q9UOg1tgBsLY5jyMCXQI0th4JsQ4NzNoWY37+6nVV8va0xPmMkrA8eqaGdCyzwx6Rg5NkfgSqfYHRl31+8H625gdjGvO9cFZfakQ4ewuQR7dlyLD2IX22QlO/LRXVS3fYEWNfCUl9jugHhxaVRSxypzGB8Vkwb0VDgaYptqnyhpoiOKavZyS1BCfDHk
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(136003)(376002)(39860400002)(366004)(396003)(451199015)(66899015)(54906003)(478600001)(8936002)(5660300002)(83380400001)(921005)(8676002)(4326008)(38100700002)(2906002)(110136005)(7416002)(66556008)(36756003)(7406005)(6486002)(66476007)(66946007)(41300700001)(6512007)(2616005)(316002)(186003)(86362001)(6506007)(26005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ZRnTxBspg9yByjHNbhCNSCcIBpe7GREWanwM1zidoRbLHojqxspTKHZM0LcQ?=
- =?us-ascii?Q?Ar1J9+M2QnksNmLxNsTS7f4OEg7T0RbPcz4cQr8xXouEczwvmfv5fyZ/9OYT?=
- =?us-ascii?Q?+gB2N2hlomIQgv/oUbszQpivVxmr9N+vo4MAA41kUWBpRQ/AWzK8OLZbFz//?=
- =?us-ascii?Q?73U+gFCFLD8xnn+QVyBKhsGnvT7uYdRwLToR4oy6prY6i5Nne9sIi6XamEEn?=
- =?us-ascii?Q?dAoOp+RaiY6+//IH7nscwgBatH5Ed2djtuq5GqDj5Uv4v3CkYCifArO367Kc?=
- =?us-ascii?Q?PMtbU1TkheZK9kVF7UtdG/CUowEmYUBigz+WPOGNImcwG5Kf6aVta1AA+84L?=
- =?us-ascii?Q?bhPL8QqjdYsqudoqqRYqUbJMGnOY0mFIP5ZIkIxqS3W7ALsKnVKMXrm+xoOt?=
- =?us-ascii?Q?7UgdI+yYC034YVCQ8ddf0Qn8/S9EkdC7FN3TFce9CDhXVRMumehdY5FHzlJ5?=
- =?us-ascii?Q?Zh+LvLnZmm9EQdbeQFabr/d5bF2nwpQGiGr6blgZJljT/zZufM2dfV/GVXcQ?=
- =?us-ascii?Q?D8c4i5mLeajA6Ai4AQVwSkKRM+A+szpeHfG1uZYOCPNAccbNkHt0iHwVNzM/?=
- =?us-ascii?Q?qC+WcYSlwIvg58Uml0djWAIojdP97JKh2DKs7/nfAIniWUom5uGMxQxls9G5?=
- =?us-ascii?Q?+lvcFeM+XcAsBQIzMHVMYE/RsflfU0eyUAF22C3/Gi8BVD3kBbEKdb8n6fLx?=
- =?us-ascii?Q?3PqYF9cuenOCvDnR9ue3z4Zm1ZU2ni4pI1bOAaV/wj231Mq9skqH0iRtA8GK?=
- =?us-ascii?Q?wcyaGjWbHl6XBqRdwT3hGKVntx1j1lL+GzyT6g6IzbYqT439f76Z/LVlw/z8?=
- =?us-ascii?Q?kxq8I2GbftvQxZAeCPe+sCOxkj+QYVgY39l4ZB7Cem37B1f986fbICTrJcsG?=
- =?us-ascii?Q?05RamT57r+oSljX0cF20dsN2OE3qlJhZv4tR4F+XbxWk238gbfWy7QNPifAz?=
- =?us-ascii?Q?GyQV8Uw1atXHtf44GgOvVW/jmD3ZZO1c/3YnfkrejIcnkXg7+TOemPXE7Lr2?=
- =?us-ascii?Q?VJI8GCtMKeadWpupp0R3RKxT4ISqCmrECdqejp/jkHI5GCTCvAmDZg5bgKxN?=
- =?us-ascii?Q?WarncN3HfuWHSr/2N73RKMdF38QXTmkRvseC0eDJna4maBwjJ6OkEj2ZOjng?=
- =?us-ascii?Q?iDy57r/o69U+yivED5/DAGoiIMANrdQuvn7hRjEl2EBPi33Pdy7xjmd2Dopl?=
- =?us-ascii?Q?a8m9EV3iSm8vRkuvf0c07lTuC8r+gc36dnlocPkXVxPbE0Pp4Fn+DyjYEdh0?=
- =?us-ascii?Q?6hkls0Ki2hyTW5oyLq8XdQKrLny1XiND2n7oZDJCTQiilv9+8G8aKd9HSNH7?=
- =?us-ascii?Q?ig8RQJ4GZ8QXxbV45l1ayLs3pRb/HEQrHe9nV5nmuXfUBx6lxMU8cOIYJrJ6?=
- =?us-ascii?Q?sUwv2DT9lJ+0899lFBidpa9+vguTCjKMASN1EsZId7RBNtP/pAw4PAKlJQ5L?=
- =?us-ascii?Q?vOuiMbcgGYUS+NdFP5ll9i7578nA+GU7zlu73ufhjIROmvSyQudcy7x/O8Bh?=
- =?us-ascii?Q?Zvu7v/fxXZVS85yFsHU7hUzkVv8SDW/dW4Q/F3V8KGMj0NJ2CbFSvRjo860p?=
- =?us-ascii?Q?A9Ef33jPjJBfG1Wo7yU=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9019e03e-f3ad-487e-7bc6-08dab80faaab
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2022 11:37:45.5137
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB6373.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 79bec9ed-8ff3-451d-fcef-08dab8134f37
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Oct 2022 12:03:49.8680
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uF07YGSkNedPk0j27Hj5NhkXJxuS7Q2Na7Sd8isu4s5Gav2tV9gt9/rHypNKAxGV
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6827
-X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: OIXh9wGkrjD6RxRQrgmsUN9ZFfbk3hq5Wupu7EobJkere2mQO5kInsI3kzpcKdQ60qZT3syZlLy7j9RSut6baQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6827
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 25, 2022 at 03:12:18PM -0300, Jason Gunthorpe wrote:
+On Wednesday, October 26, 2022 11:44 PM, Sean Christopherson wrote:
+> > I think it would be better to do the thread pinning at the time when
+> > the thread is created by providing a pthread_attr_t attr, e.g. :
+> >
+> > pthread_attr_t attr;
+> >
+> > CPU_SET(vcpu->pcpu, &cpu_set);
+> > pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpu_set);
+> > pthread_create(thread, attr,...);
+> >
+> > Also, pinning a vCPU thread to a pCPU is a general operation which
+> > other users would need. I think we could make it more general and put
+> > it to kvm_util.
+>=20
+> We could, but it taking advantage of the pinning functionality would requ=
+ire
+> plumbing a command line option for every test,=20
 
-> +static int iopt_check_iova(struct io_pagetable *iopt, unsigned long iova,
-> +			   unsigned long length)
-> +{
-> +	unsigned long last;
-> +
-> +	lockdep_assert_held(&iopt->iova_rwsem);
-> +
-> +	if ((iova & (iopt->iova_alignment - 1)) ||
-> +	    (length & (iopt->iova_alignment - 1)) || !length)
-> +		return -EINVAL;
+I think we could make this "pinning" be optional (no need to force everyone
+to use it).
 
-syzkaller noticed this length check is too late, if userpsace
-supplies an invalid length and asks for automatic IOVA allocation 
-it will trigger a WARN_ON.
+> or alternatively adding partial
+> command line parsing with a "hidden" global struct to kvm_selftest_init()=
+,
+> though handling error checking for a truly generic case would be a mess. =
+ Either
+> way, extending pinning to other tests would require non-trivial effort, a=
+nd can be
+> done on top of this series.
+>=20
+> That said, it's also trival to extract the pinning helpers to common code=
+, and I
+> can't think of any reason not to do that straightaway.
+>=20
+> Vipin, any objection to squashing the below diff with patch 5?
+>=20
+> >  e.g. adding it to the helper function that I'm trying to create
+>=20
+> If we go this route in the future, we'd need to add a worker trampoline a=
+s the
+> pinning needs to happen in the worker task itself to guarantee that the p=
+inning
+> takes effect before the worker does anything useful.  That should be very
+> doable.
 
-@@ -177,8 +177,7 @@ static int iopt_check_iova(struct io_pagetable *iopt, unsigned long iova,
- 
-        lockdep_assert_held(&iopt->iova_rwsem);
- 
--       if ((iova & (iopt->iova_alignment - 1)) ||
--           (length & (iopt->iova_alignment - 1)) || !length)
-+       if ((iova & (iopt->iova_alignment - 1)))
-                return -EINVAL;
- 
-        if (check_add_overflow(iova, length - 1, &last))
-@@ -248,6 +247,11 @@ static int iopt_alloc_area_pages(struct io_pagetable *iopt,
+The alternative way is the one I shared before, using this:
+
+/* Thread created with attribute ATTR will be limited to run only on
+   the processors represented in CPUSET.  */
+extern int pthread_attr_setaffinity_np (pthread_attr_t *__attr,
+                                 size_t __cpusetsize,
+                                 const cpu_set_t *__cpuset)
+
+Basically, the thread is created on the pCPU as user specified.
+I think this is better than "creating the thread on an arbitrary pCPU
+and then pinning it to the user specified pCPU in the thread's start routin=
+e".
+
+>=20
+> I do like the idea of extending __vcpu_thread_create(), but we can do tha=
+t once
+> __vcpu_thread_create() lands to avoid further delaying this series.
+
+Sounds good. I can move some of those to vcpu_thread_create() once it's rea=
+dy later.
+
+>  struct perf_test_args {
+> @@ -43,8 +41,12 @@ struct perf_test_args {
+>  	bool nested;
+>  	/* True if all vCPUs are pinned to pCPUs */
+>  	bool pin_vcpus;
+> +	/* The vCPU=3D>pCPU pinning map. Only valid if pin_vcpus is true. */
+> +	uint32_t vcpu_to_pcpu[KVM_MAX_VCPUS];
+
+How about putting the pcpu id to "struct kvm_vcpu"? (please see below code
+posed to shows how that works). This is helpful when we later make this mor=
+e generic,
+as kvm_vcpu is used by everyone.
+
+Probably we also don't need "bool pin_vcpus". We could initialize
+pcpu_id to -1 to indicate that the vcpu doesn't need pinning (this is also =
+what I meant=20
+above optional for other users).
+
+Put the whole changes together (tested and worked fine), FYI:
+
+diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tool=
+s/testing/selftests/kvm/access_tracking_perf_test.c
+index b30500cc197e..2829c98078d0 100644
+--- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
++++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+@@ -304,7 +304,7 @@ static void run_test(enum vm_guest_mode mode, void *arg=
+)
+        int nr_vcpus =3D params->nr_vcpus;
+
+        vm =3D perf_test_create_vm(mode, nr_vcpus, params->vcpu_memory_byte=
+s, 1,
+-                                params->backing_src, !overlap_memory_acces=
+s);
++                                params->backing_src, !overlap_memory_acces=
+s, NULL);
+
+        perf_test_start_vcpu_threads(nr_vcpus, vcpu_thread_main);
+
+diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testi=
+ng/selftests/kvm/demand_paging_test.c
+index dcdb6964b1dc..e19c3ce32c62 100644
+--- a/tools/testing/selftests/kvm/demand_paging_test.c
++++ b/tools/testing/selftests/kvm/demand_paging_test.c
+@@ -286,7 +286,7 @@ static void run_test(enum vm_guest_mode mode, void *arg=
+)
+        int r, i;
+
+        vm =3D perf_test_create_vm(mode, nr_vcpus, guest_percpu_mem_size, 1=
+,
+-                                p->src_type, p->partition_vcpu_memory_acce=
+ss);
++                                p->src_type, p->partition_vcpu_memory_acce=
+ss, NULL);
+
+        demand_paging_size =3D get_backing_src_pagesz(p->src_type);
+
+diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/test=
+ing/selftests/kvm/dirty_log_perf_test.c
+index 35504b36b126..cbe7de28e094 100644
+--- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+@@ -132,6 +132,7 @@ struct test_params {
+        bool partition_vcpu_memory_access;
+        enum vm_mem_backing_src_type backing_src;
+        int slots;
++       char *pcpu_list;
+ };
+
+ static void toggle_dirty_logging(struct kvm_vm *vm, int slots, bool enable=
+)
+@@ -223,7 +224,8 @@ static void run_test(enum vm_guest_mode mode, void *arg=
+)
+
+        vm =3D perf_test_create_vm(mode, nr_vcpus, guest_percpu_mem_size,
+                                 p->slots, p->backing_src,
+-                                p->partition_vcpu_memory_access);
++                                p->partition_vcpu_memory_access,
++                                p->pcpu_list);
+
+        perf_test_set_wr_fract(vm, p->wr_fract);
+
+@@ -401,13 +403,13 @@ static void help(char *name)
+ int main(int argc, char *argv[])
+ {
+        int max_vcpus =3D kvm_check_cap(KVM_CAP_MAX_VCPUS);
+-       const char *pcpu_list =3D NULL;
+        struct test_params p =3D {
+                .iterations =3D TEST_HOST_LOOP_N,
+                .wr_fract =3D 1,
+                .partition_vcpu_memory_access =3D true,
+                .backing_src =3D DEFAULT_VM_MEM_SRC,
+                .slots =3D 1,
++               .pcpu_list =3D NULL,
+        };
+        int opt;
+@@ -424,7 +426,7 @@ int main(int argc, char *argv[])
+                        guest_percpu_mem_size =3D parse_size(optarg);
+                        break;
+                case 'c':
+-                       pcpu_list =3D optarg;
++                       p.pcpu_list =3D optarg;
+                        break;
+                case 'e':
+                        /* 'e' is for evil. */
+@@ -471,9 +473,6 @@ int main(int argc, char *argv[])
+                }
         }
- 
-        down_write(&iopt->iova_rwsem);
-+       if ((length & (iopt->iova_alignment - 1)) || !length) {
-+               rc = -EINVAL;
-+               goto out_unlock;
+
+-       if (pcpu_list)
+-               perf_test_setup_pinning(pcpu_list, nr_vcpus);
+-
+        TEST_ASSERT(p.iterations >=3D 2, "The test should have at least two=
+ iterations");
+
+        pr_info("Test iterations: %"PRIu64"\n", p.iterations);
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing=
+/selftests/kvm/include/kvm_util.h
+index c9286811a4cb..d403b374bae5 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -7,7 +7,11 @@
+ #ifndef SELFTEST_KVM_UTIL_H
+ #define SELFTEST_KVM_UTIL_H
+
++#include <pthread.h>
++
+ #include "kvm_util_base.h"
+ #include "ucall_common.h"
+
++void kvm_parse_vcpu_pinning(struct kvm_vcpu **vcpu, int nr_vcpus, const ch=
+ar *pcpus_string);
++
+ #endif /* SELFTEST_KVM_UTIL_H */
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/te=
+sting/selftests/kvm/include/kvm_util_base.h
+index e42a09cd24a0..79867a478a81 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -47,6 +47,7 @@ struct userspace_mem_region {
+ struct kvm_vcpu {
+        struct list_head list;
+        uint32_t id;
++       int pcpu_id;
+        int fd;
+        struct kvm_vm *vm;
+        struct kvm_run *run;
+diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/t=
+esting/selftests/kvm/include/perf_test_util.h
+index ccfe3b9dc6bd..81428022bdb5 100644
+--- a/tools/testing/selftests/kvm/include/perf_test_util.h
++++ b/tools/testing/selftests/kvm/include/perf_test_util.h
+@@ -52,7 +52,8 @@ extern struct perf_test_args perf_test_args;
+ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int nr_vcpus,
+                                   uint64_t vcpu_memory_bytes, int slots,
+                                   enum vm_mem_backing_src_type backing_src=
+,
+-                                  bool partition_vcpu_memory_access);
++                                  bool partition_vcpu_memory_access,
++                                  char *pcpu_list);
+ void perf_test_destroy_vm(struct kvm_vm *vm);
+
+ void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract);
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/sel=
+ftests/kvm/lib/kvm_util.c
+index f1cb1627161f..8acee6d4ccbe 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -1114,6 +1114,7 @@ struct kvm_vcpu *__vm_vcpu_add(struct kvm_vm *vm, uin=
+t32_t vcpu_id)
+
+        vcpu->vm =3D vm;
+        vcpu->id =3D vcpu_id;
++       vcpu->pcpu_id =3D -1;
+        vcpu->fd =3D __vm_ioctl(vm, KVM_CREATE_VCPU, (void *)(unsigned long=
+)vcpu_id);
+        TEST_ASSERT(vcpu->fd >=3D 0, KVM_IOCTL_ERROR(KVM_CREATE_VCPU, vcpu-=
+>fd));
+
+@@ -2021,3 +2022,58 @@ void __vm_get_stat(struct kvm_vm *vm, const char *st=
+at_name, uint64_t *data,
+                break;
+        }
+ }
++
++void kvm_pin_this_task_to_pcpu(uint32_t pcpu)
++{
++       cpu_set_t mask;
++       int r;
++
++       CPU_ZERO(&mask);
++       CPU_SET(pcpu, &mask);
++       r =3D sched_setaffinity(0, sizeof(mask), &mask);
++       TEST_ASSERT(!r, "sched_setaffinity() failed for pCPU '%u'.\n", pcpu=
+);
++}
++
++static uint32_t parse_pcpu(const char *cpu_str, const cpu_set_t *allowed_m=
+ask)
++{
++       uint32_t pcpu =3D atoi_non_negative(cpu_str);
++
++       TEST_ASSERT(CPU_ISSET(pcpu, allowed_mask),
++                   "Not allowed to run on pCPU '%d', check cgroups?\n", pc=
+pu);
++       return pcpu;
++}
++
++void kvm_parse_vcpu_pinning(struct kvm_vcpu **vcpu, int nr_vcpus, const ch=
+ar *pcpus_string)
++{
++       cpu_set_t allowed_mask;
++       char *cpu, *cpu_list;
++       char delim[2] =3D ",";
++       int i, r;
++
++       if (!pcpus_string)
++               return;
++
++       cpu_list =3D strdup(pcpus_string);
++       TEST_ASSERT(cpu_list, "strdup() allocation failed.\n");
++
++       r =3D sched_getaffinity(0, sizeof(allowed_mask), &allowed_mask);
++       TEST_ASSERT(!r, "sched_getaffinity() failed");
++
++       cpu =3D strtok(cpu_list, delim);
++
++       /* 1. Get all pcpus for vcpus. */
++       for (i =3D 0; i < nr_vcpus; i++) {
++               TEST_ASSERT(cpu, "pCPU not provided for vCPU '%d'\n", i);
++               vcpu[i]->pcpu_id =3D parse_pcpu(cpu, &allowed_mask);
++               cpu =3D strtok(NULL, delim);
 +       }
 +
-        if (flags & IOPT_ALLOC_IOVA) {
-                /* Use the first entry to guess the ideal IOVA alignment */
-                elm = list_first_entry(pages_list, struct iopt_pages_list,
++       /* 2. Check if the main worker needs to be pinned. */
++       if (cpu) {
++               kvm_pin_this_task_to_pcpu(parse_pcpu(cpu, &allowed_mask));
++               cpu =3D strtok(NULL, delim);
++       }
++
++       TEST_ASSERT(!cpu, "pCPU list contains trailing garbage characters '=
+%s'", cpu);
++       free(cpu_list);
++}
+diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testi=
+ng/selftests/kvm/lib/perf_test_util.c
+index 520d1f896d61..95166c5a77f7 100644
+--- a/tools/testing/selftests/kvm/lib/perf_test_util.c
++++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
+@@ -112,7 +112,8 @@ void perf_test_setup_vcpus(struct kvm_vm *vm, int nr_vc=
+pus,
+ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int nr_vcpus,
+                                   uint64_t vcpu_memory_bytes, int slots,
+                                   enum vm_mem_backing_src_type backing_src=
+,
+-                                  bool partition_vcpu_memory_access)
++                                  bool partition_vcpu_memory_access,
++                                  char *pcpu_list)
+ {
+        struct perf_test_args *pta =3D &perf_test_args;
+        struct kvm_vm *vm;
+@@ -157,7 +158,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode m=
+ode, int nr_vcpus,
+         */
+        vm =3D __vm_create_with_vcpus(mode, nr_vcpus, slot0_pages + guest_n=
+um_pages,
+                                    perf_test_guest_code, vcpus);
+-
++       kvm_parse_vcpu_pinning(vcpus, nr_vcpus, pcpu_list);
+        pta->vm =3D vm;
 
-And a test to cover it
+        /* Put the test region at the top guest physical memory. */
+@@ -284,17 +285,29 @@ void perf_test_start_vcpu_threads(int nr_vcpus,
+                                  void (*vcpu_fn)(struct perf_test_vcpu_arg=
+s *))
+ {
+        int i;
++       pthread_attr_t attr, *attr_p;
++       cpu_set_t cpuset;
 
-Jason
+        vcpu_thread_fn =3D vcpu_fn;
+        WRITE_ONCE(all_vcpu_threads_running, false);
+
+        for (i =3D 0; i < nr_vcpus; i++) {
+                struct vcpu_thread *vcpu =3D &vcpu_threads[i];
++               attr_p =3D NULL;
+
+                vcpu->vcpu_idx =3D i;
+                WRITE_ONCE(vcpu->running, false);
+
+-               pthread_create(&vcpu->thread, NULL, vcpu_thread_main, vcpu)=
+;
++               if (vcpus[i]->pcpu_id !=3D -1) {
++                       CPU_ZERO(&cpuset);
++                       CPU_SET(vcpus[i]->pcpu_id, &cpuset);
++                       pthread_attr_init(&attr);
++                       pthread_attr_setaffinity_np(&attr,
++                                               sizeof(cpu_set_t), &cpuset)=
+;
++                       attr_p =3D &attr;
++               }
++
++               pthread_create(&vcpu->thread, attr_p, vcpu_thread_main, vcp=
+u);
+        }
+        for (i =3D 0; i < nr_vcpus; i++) {
+diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c=
+ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+index 9968800ec2ec..5dbe09537b2d 100644
+--- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
++++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+@@ -99,7 +99,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+
+        vm =3D perf_test_create_vm(mode, nr_vcpus, guest_percpu_mem_size, 1=
+,
+                                 VM_MEM_SRC_ANONYMOUS,
+-                                p->partition_vcpu_memory_access);
++                                p->partition_vcpu_memory_access, NULL);
+
+        pr_info("Finished creating vCPUs\n");
+
+=20
