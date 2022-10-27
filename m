@@ -2,228 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C931D60F6C2
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 14:07:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BF1060F6FE
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 14:18:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235521AbiJ0MHW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 08:07:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59026 "EHLO
+        id S235322AbiJ0MSR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 08:18:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235513AbiJ0MHV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 08:07:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A44A2ACF77
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 05:07:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666872439;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=q+2zMebd+ald9q0vyrSWWXfgEqnJJ8rrovWDRcuiW1g=;
-        b=S1m0NS5lNsaZEcaWQXzYxoLDX/jz8wJc6rhdMJ6ug5Txmh+0hEDLqfK72hr82AGXUkOaK7
-        4uS6YslNCiMKhpC/w89WLQNC7h1uWEtWd7qoGkGp8886klb+FAPdAvEuBcsggc0a2nDg1d
-        Q2zBxYwnXl+SghtR4E0BYOMXRKmqjcw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-206-x_io6mSoOG6bsrX7uU4UQA-1; Thu, 27 Oct 2022 08:07:16 -0400
-X-MC-Unique: x_io6mSoOG6bsrX7uU4UQA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4A2C4101A528;
-        Thu, 27 Oct 2022 12:07:15 +0000 (UTC)
-Received: from starship (ovpn-192-51.brq.redhat.com [10.40.192.51])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BD21E4EA4E;
-        Thu, 27 Oct 2022 12:07:11 +0000 (UTC)
-Message-ID: <0fdd437cfa347258de2841c4af2532e6b49751a7.camel@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 14/16] svm: rewerite vm entry macros
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Cathy Avery <cavery@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Date:   Thu, 27 Oct 2022 15:07:09 +0300
-In-Reply-To: <Y1bt5eGAOuYJINze@google.com>
-References: <20221020152404.283980-1-mlevitsk@redhat.com>
-         <20221020152404.283980-15-mlevitsk@redhat.com>
-         <Y1GZu5ztBadhFphk@google.com>
-         <35fe5a9c8ef5155f226df7beb24917d9b2020871.camel@redhat.com>
-         <Y1bt5eGAOuYJINze@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S235292AbiJ0MSO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 08:18:14 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D3EB2250B;
+        Thu, 27 Oct 2022 05:18:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1666873092; x=1698409092;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ShT+ohHodXQdRMDxgmVsLbYg/HXuecdD39G5U/P15mc=;
+  b=YwiK1w3egyPVaXZqkSwiHIxOVDXp598INdPgf9GnWBT4D92TiflnFtSv
+   OoCr/NXnFjixEpZjT02xfcca5rBI6K/UMVLC/GnF8Ud3mZnDxs8i5PA+H
+   TPskjfFvEwF4+4TdpxOcOIDFqsMCkbulDHqfhUApzR+N2x88U1luAoaEz
+   WjFLgmGLlByc41kT2TV39uRMk4pA5qnq0rjWtKcicgbQU8iCWxffqmIf9
+   0TAflx6Zu/k7G9yZP7ls/qS/hw/V3jbwimDlVTYvSVSeU+S6WAR8pglvU
+   8e/h0IvA8AvMuOijVodqz6jeSuU61iCU3BVp7zzAEcazUN7sfS9mId2So
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="308200455"
+X-IronPort-AV: E=Sophos;i="5.95,217,1661842800"; 
+   d="scan'208";a="308200455"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2022 05:18:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="737659058"
+X-IronPort-AV: E=Sophos;i="5.95,217,1661842800"; 
+   d="scan'208";a="737659058"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga002.fm.intel.com with ESMTP; 27 Oct 2022 05:18:11 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 27 Oct 2022 05:18:11 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31 via Frontend Transport; Thu, 27 Oct 2022 05:18:11 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2375.31; Thu, 27 Oct 2022 05:18:11 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=U9tHSz4hOFzWwMQKsDDmuSN53G849YSmhqveEWxhlJk/kXstK6EVYg4+K8VKfI2UNmNiE7lH0qH5py7nSbxlMXis6l+8ymEmhg900ezeOhAwFj6MTaMNj8Up2RGl64ZqG1TnVbq2zA6/2LjHOARQ0zA3ReNBCzxgPtTJ29FkNxi9WIrCGDTUYVQrAITdXh/Ocsbk1tQPae15GnAQbk2XMm+uVDCTnZ6XpfWmlqoHUqe3VehU978DhVi8qQq4SdwVdujVnFCoFs9ocX51/2kWmO0PiKqkrfoHPr+n/QNfR+Df4xyrn/ObXSP5RunRyfkOxC+CpqUbFntZMLFomQSmgw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dLW8M6epLTE/GeAjyX0aWHjo3NnvpSDls7i4nGS9IVM=;
+ b=KINmd7YD4xQnVvWdTj+8EL4juvAoK6q+HnPJrfnc5cGXsO9cGnimCRPnpJ0uCwapHCME8jBlE0iRINPRp8p7V96hBTFxOHCJLmVePem8bavdKzKiKC2AkcYJiSIYY/lH0xH18F6NU5SS/dGv5fOrkiR6P9c+vkcC+i1t8WNDUGbHscPBnulr7Ch7j0tYaUv3yVCR3lsEJz0Q9v0eTE4cRsYRPuno7YVh0WPMg3YXH1k9kLSH46ykA4XScowwsTjPuMJae02sDX5LoGjVyE5uk6ODFaHod8K6DLU3MGlVtlo4OreACPj0z5yT+FdeL7CpfPfwL4IYYP5g1H1MRDtmqA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB6373.namprd11.prod.outlook.com (2603:10b6:8:cb::20) by
+ IA1PR11MB6444.namprd11.prod.outlook.com (2603:10b6:208:3a7::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5769.14; Thu, 27 Oct
+ 2022 12:18:08 +0000
+Received: from DS0PR11MB6373.namprd11.prod.outlook.com
+ ([fe80::4625:d63e:1152:1246]) by DS0PR11MB6373.namprd11.prod.outlook.com
+ ([fe80::4625:d63e:1152:1246%6]) with mapi id 15.20.5746.021; Thu, 27 Oct 2022
+ 12:18:08 +0000
+From:   "Wang, Wei W" <wei.w.wang@intel.com>
+To:     David Matlack <dmatlack@google.com>
+CC:     "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "vipinsh@google.com" <vipinsh@google.com>,
+        "ajones@ventanamicro.com" <ajones@ventanamicro.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v1 00/18] KVM selftests code consolidation and cleanup
+Thread-Topic: [PATCH v1 00/18] KVM selftests code consolidation and cleanup
+Thread-Index: AQHY55yiwQJVciN2Gk26RCSAzzsjaa4hMvUAgACUSLA=
+Date:   Thu, 27 Oct 2022 12:18:08 +0000
+Message-ID: <DS0PR11MB63731F2B467D4084F5C8D9B5DC339@DS0PR11MB6373.namprd11.prod.outlook.com>
+References: <20221024113445.1022147-1-wei.w.wang@intel.com>
+ <Y1mlJqKdFtlgG3jR@google.com>
+In-Reply-To: <Y1mlJqKdFtlgG3jR@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+dlp-version: 11.6.500.17
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB6373:EE_|IA1PR11MB6444:EE_
+x-ms-office365-filtering-correlation-id: 7cdd2982-5f3e-4d20-0e39-08dab8154ef3
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: HAEN6YbOguu1hoGwO3UhMvkhoPIcw6V3qR3af5gMjRspZYVNNrXrwcz6VmtF1YUZ4BWoMXuxlansb2VFGoU3PED8sb1oIiZ9e/svq1+ONS2uXPxxtWPqPfHY+jPHARamSlrev8U2rifgfBwBSBg4AcbEWJjEZQj3QYsCYRgvtI4gpQiq7qQkveF4TsIUrwxsDltJmokxZeWhQLN0oQ/89WE/g8OWYg5mbEfe3WY3Smu1CbtC/7fTVWUZ1+GzKRKGidKMLBpNTH3SPpNKgrIprPVqg1MwT867PkL8u/9xA2F76eYXg3v1QgRbVPUVSCZ8Gx9VwcycBSRHGI4KkSDR5W2NsRNFR+U9fizpR7DbuEA26dFVZwj1VccaK0Iqv4Vc3pz5d8HjmlXZLAYU9LBD9u+JsFsY5wgLqeSeZ11C9IwprNM9XCB2gjBpdgLrwjChwP65vVYdIBDyE6rHqTU6UuO+cgUSE+QYo+I6DVzECF4Th/fHibQZ/ndjEV5KRSLWJjb6scxX8dnU5XEoyDT7I5VDbjjqFHDoxtd9+kNRFIEj51urRNb1nnYvCfZA1SJr8RNjl7+sJQwz94PfAYLX8wG4Nh2WKYPp9TCXqgam02ojp627ZZGlL5NnICtSkgCCuZ/ohwVfJ+b4Q7IysaaGmnr5F7fWHTykniEB93Cc8yaCuOhOIIwT1BTDfdSWw1D24Lx9kt04MWWp10qz3L3Gbm32pUBGLfjvcmUxXwdwBcTGz3osxAt8SRfww16FLi47
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB6373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(376002)(366004)(396003)(39860400002)(136003)(451199015)(38100700002)(122000001)(478600001)(38070700005)(71200400001)(6916009)(55016003)(54906003)(316002)(86362001)(9686003)(26005)(76116006)(4326008)(8676002)(64756008)(66446008)(82960400001)(41300700001)(66476007)(83380400001)(2906002)(186003)(52536014)(8936002)(33656002)(5660300002)(66946007)(7696005)(6506007)(66556008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?L/uk+gD0k5D1jr4CWKGpmM3LWRrkUjlzvCP0YwSGDqI3y8gb9kGj1GNdzTLa?=
+ =?us-ascii?Q?jhvnB2fDO9fxqB/sUkTgbEvjYDnK/BZU/j9aSum92Qkm5MWAU2z68z4oak5i?=
+ =?us-ascii?Q?ToHqA60LZd4VdAyw6+zNQRvQ5YUGGWgFZLynF3uDdHDN9U48Jy1n0ZiT+ZQk?=
+ =?us-ascii?Q?CeWyvgGUA+WLUbYwRftz+y6Ac2l7jsBweT/gK65CSdLbqMI5aUubolR8k3Xt?=
+ =?us-ascii?Q?cSTCnXDAJUCyttGw6miU9AlY56HkoR0WaFrEpCPEJFZY5ejEJMEiZl3nU21s?=
+ =?us-ascii?Q?a9iwa67UmkwDcRH8oJCGldV6IHt3TlWntQQKXXqqN8mpXPs3X0GhmUmmNz+Z?=
+ =?us-ascii?Q?01vKTMlF4YBWtG9FMCWiS6UeU3sPq4giG1fl8XS+1tWoPI5/+Dyrpa2RPdy5?=
+ =?us-ascii?Q?SlW/P/JqG/X0D7wpTyuS8QJWs/aZ9yF5lWZKFmIwxEAr6Lz5dhXXZwD5Pp03?=
+ =?us-ascii?Q?vEcbWnIY9LidF7T9b6jy5BnmwJlICoSmJA2AxYo5Tk3uaqgU9Y5vi1jMjI5l?=
+ =?us-ascii?Q?vOh07C5vMpa8ugl8osydoxbP0C+ht1nNT8zOhPsQCyPzg+C8cxYY3Bka/z1O?=
+ =?us-ascii?Q?74Ki914H/lnV7uaFQ63HKeDrQXQxNzh2CFk5WAJ1tl9rcJNbY/JqJKDAw49m?=
+ =?us-ascii?Q?NE+3WvBenUnukxrBzSHDUmkr4uIoidENwJlPDnStWxuZbB34UEDU6pkRH9EL?=
+ =?us-ascii?Q?mEhoECS7t6Ve8U0+faaOoI5GERpX7JB+ET0RTed4PmqM+DhsHxiXNxS/zHTM?=
+ =?us-ascii?Q?qlwPmlfrwW9FG81fIxQ39Uq5lr58w+f/Xlrjnnmtmu68JZfXGl+8/FJLZRPZ?=
+ =?us-ascii?Q?BpRY6vyJILngiOXWDiUAkIOCukl3cIcYJuJWYVKeWr4BOUJFwdUYkuwdyYAW?=
+ =?us-ascii?Q?WOulibibuZ61psTTNMw7/ANvgzRxzEOOnIACwYMRVHwdiAr2B5v8emAs5n/W?=
+ =?us-ascii?Q?BoNgIr3/I9yK/CaZ1fOydigMMWmpyMBQmVK1ry1Je60hzJdh447bCahVXuNf?=
+ =?us-ascii?Q?vup99Rhi3iG/pGbj+KgePL1z/pgQ5YhxcZlUhaE8llwB9Vpyfl16UBQns7LB?=
+ =?us-ascii?Q?9JmWbyBmxBbKy9wpKBRkZPy672IOgZpCFXIqwvwjFV98WJQgGT870n+6elm6?=
+ =?us-ascii?Q?wsk+W6seROd52pCXLFe1KDZo7qeh6EgkkIBvbMPkpcG0TvrmU7Im6rpGvAEV?=
+ =?us-ascii?Q?vjeuZrNiBHMlOA3M+U/tsALizRJpSJNklrEEGWggZlbzNVOb3y7h761HrqIv?=
+ =?us-ascii?Q?QLdWMSJZIiuDqnWCB2Wv7IIm1rlnEgvKK7uh41UcL24IZeeM4NQ1ZywROSj4?=
+ =?us-ascii?Q?QYvqUpNtkSLm3rFlqDwnLDWdEldDsS8G7nR1IFWHxNkoe+nB7jpuFmL7J/MW?=
+ =?us-ascii?Q?41vt1gOn55f9b2Hg+uKno/BRRrHhq98aq+ak+WsZ5xFw4GseSmIHpee0zgXN?=
+ =?us-ascii?Q?a5rExSIoG6HfiuNGm2LxHPBgiQjLsBmCqotYF3uWJYUSreX73lkxVg3d1+9x?=
+ =?us-ascii?Q?r/3VYUW4f2u89ruK3ysXFrgmdaH2khuwLmzIQPcCN1J99aKNGkBBNZV80tns?=
+ =?us-ascii?Q?49KzlaOIIjWGhm2vYs66ukfX81Ific6VP8EEg0IB?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB6373.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7cdd2982-5f3e-4d20-0e39-08dab8154ef3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Oct 2022 12:18:08.4253
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 5CYLt9bnPOxOksQqWQ82cFiBJHxKonF4BmapSt3usT/NjR4ss61sZrQOXSAaMbsJ2L5z8Eikrn5DJSxrUn9G5g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6444
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2022-10-24 at 19:56 +0000, Sean Christopherson wrote:
-> On Mon, Oct 24, 2022, Maxim Levitsky wrote:
-> > On Thu, 2022-10-20 at 18:55 +0000, Sean Christopherson wrote:
-> > > On Thu, Oct 20, 2022, Maxim Levitsky wrote:
-> > > 
-> > > Changelog please.  This patch in particular is extremely difficult to review
-> > > without some explanation of what is being done, and why.
-> > > 
-> > > If it's not too much trouble, splitting this over multiple patches would be nice.
-> > > 
-> > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > > > ---
-> > > >  lib/x86/svm_lib.h | 58 +++++++++++++++++++++++++++++++++++++++
-> > > >  x86/svm.c         | 51 ++++++++++------------------------
-> > > >  x86/svm.h         | 70 ++---------------------------------------------
-> > > >  x86/svm_tests.c   | 24 ++++++++++------
-> > > >  4 files changed, 91 insertions(+), 112 deletions(-)
-> > > > 
-> > > > diff --git a/lib/x86/svm_lib.h b/lib/x86/svm_lib.h
-> > > > index 27c3b137..59db26de 100644
-> > > > --- a/lib/x86/svm_lib.h
-> > > > +++ b/lib/x86/svm_lib.h
-> > > > @@ -71,4 +71,62 @@ u8* svm_get_io_bitmap(void);
-> > > >  #define MSR_BITMAP_SIZE 8192
-> > > >  
-> > > >  
-> > > > +struct svm_extra_regs
-> > > 
-> > > Why not just svm_gprs?  This could even include RAX by grabbing it from the VMCB
-> > > after VMRUN.
-> > 
-> > I prefer to have a single source of truth - if I grab it from vmcb, then
-> > it will have to be synced to vmcb on each vmrun, like the KVM does,
-> > but it also has dirty registers bitmap and such.
-> 
-> KUT doesn't need a dirty registers bitmap.  That's purely a performance optimization
-> for VMX so that KVM can avoid unnecessary VMWRITEs for RIP and RSP.  E.g. SVM
-> ignores the dirty bitmap entirely:
-I know that.
+On Thursday, October 27, 2022 5:23 AM, David Matlack:
+> On Mon, Oct 24, 2022 at 07:34:27PM +0800, Wei Wang wrote:
+> > This patch series intends to improve kvm selftests with better code
+> > consolidation using the helper functions to perform vcpu and thread
+> > related operations.
+> >
+> > In general, several aspects are improved:
+> > 1) The current users allocate an array of vcpu pointers to the vcpus th=
+at
+> >    are added to a vm, and an array of vcpu threads. This isn't necessar=
+y
+> >    as kvm_vm already maintains a list of added vcpus. This series chang=
+es
+> >    the list of vcpus in the kvm_vm struct to a vcpu array for users to
+> >    work with and removes each user's own allocation of such vcpu arrays=
+.
+> >    Aslo add the vcpu thread to the kvm_vcpu struct, so that users don't
+> >    need to explicitly allocate a thread array to manage vcpu threads on
+> >    their own.
+> > 2) Change the users to use the helper functions provided by this series
+> >    with the following enhancements:
+> >    - Many users working with pthread_create/join forgot to check if
+> >      error on returning. The helper functions have handled thoses insid=
+e,
+> >      so users don't need to handle them by themselves;
+> >    - The vcpu threads created via the helper functions are named in
+> >      "vcpu-##id" format. Naming the threads facilitates debugging,
+> >      performance tuning, runtime pining etc;
+> >    - helper functions named with "vm_vcpu_threads_" iterates over all t=
+he
+> >      vcpus that have been added to the vm. Users don't need a explicit
+> >      loop to go through the added cpus by themselves.
+> > 3) kvm_vcpu is used as the interface parameter to the vcpu thread's
+> >    start routine, and the user specific data is made to be the private
+> >    data in kvm_vcpu. This can simplify the user specific data structure=
+s,
+> >    as kvm_vcpu has already included the required info for the thread, f=
+or
+> >    example, in patch 13, the cpu_idx field from "struct vcpu_thread"
+> >    is a duplicate of vcpu->id.
+>=20
+> I haven't dug too much into the actual code yet, but I have some high lev=
+el
+> feedback based on a quick look through the series:
+>=20
+>  - Use the format "KVM: selftests: <Decsription>" for the shortlog.
 
-> 
->   static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
->   {
-> 	struct vcpu_svm *svm = to_svm(vcpu);
-> 
-> 	trace_kvm_entry(vcpu);
-> 
-> 	svm->vmcb->save.rax = vcpu->arch.regs[VCPU_REGS_RAX];
-> 	svm->vmcb->save.rsp = vcpu->arch.regs[VCPU_REGS_RSP];
-> 	svm->vmcb->save.rip = vcpu->arch.regs[VCPU_REGS_RIP];
-> 
-> 	...
-> 
->   }
-> 
-> And even for VMX, I can't imagine a nVMX test will ever be so performance
-> sensitive that an extra VMWRITE for RSP will be a problem.
-> 
-> > I prefer to keep it simple.
+I know it's not common to see so far, but curious is this the required form=
+at?
+I didn't find where it's documented. If it's indeed a requirement, probably=
+ we
+also need to enhance checkpatch.pl to detect this.
 
-I too. So the only other more or less clean way is to copy the RAX and RSP from vmcb to 
-svm_gprs on exit, and vise versa on VM entry. Is this what you mean?
+If it's not required, I think it is more obvious to have /sub_field in the =
+title,
+e.g. selftests/hardware_disable_test, to outline which specific part of
+selftests the patch is changing. (the selftests are growing larger with man=
+y
+usages independent of each other).
 
-> 
-> The issue is simplifying the assembly code increases the complexity of the users.
-> E.g. users and readers need to understand what "extra regs", which means documenting
-> what is included and what's not.  On the other hand, the assembly is already quite
-> complex, adding a few lines to swap RAX and RSP doesn't really change the overall
-> of complexity of that low level code.
-> 
-> The other bit of complexity is that if a test wants to access all GPRs, it needs
-> both this struct and the VMCB.  RSP is unlikely to be problematic, but I can see
-> guest.RAX being something a test wants access to.
-> 
-> > Plus there is also RSP in vmcb, and RFLAGS, and even RIP to some extent is a GPR.
-> 
-> RIP is definitely not a GPR, it has no assigned index.  RFLAGS is also not a GPR.
-> 
-> > To call this struct svm_gprs, I would have to include them there as well.
-> 
-> RAX and RSP are the only GPRs that need to be moved to/from the VMCB.  
-> 
-> > And also there is segment registers, etc, etc.
-> 
-> Which aren't GPRs.
+>=20
+>  - Make the shortlog more specific. "vcpu related code consolidation" is
+>    vague.
+>=20
+>  - Do not introduce bugs and then fix them in subsequent commits.  This
+>    breaks bisection. For example, kvm_page_table_test is broken at "KVM:
+>    selftests/kvm_util: use vm->vcpus[] when create vm with vcpus" and
+>    then fixed by "KVM: selftests/kvm_page_table_test: vcpu related code
+>    consolidation".
+>=20
+>  - Try to limit each patch to one logical change. This is somewhat more
+>    art than science, but the basic idea is to avoid changing too much at
+>    once so that the code is easier to review and bisect. For example,
+>    "KVM: selftests/perf_test_util: vcpu related code consolidation" has
+>    a list of 6 different changes being made in the commit description.
+>    This is a sure sign this commit should be broken up. The same applies
+>    to many of the other patches. This will also make it easier to come
+>    up with more specific shortlogs.
 
-But user can want to use them too.
-
-> 
-> > So instead of pretending that this struct contains all the GPRs of the guest
-> > (or host while guest is running) I renamed it to state that it contains only
-> > some gprs that SVM doesn't context switch.
-> 
-> ...
-> 
-> > > > +               "xchg %%rdx, 0x10(%%" reg ")\n\t"       \
-> > > > +               "xchg %%rbp, 0x18(%%" reg ")\n\t"       \
-> > > > +               "xchg %%rsi, 0x20(%%" reg ")\n\t"       \
-> > > > +               "xchg %%rdi, 0x28(%%" reg ")\n\t"       \
-> > > > +               "xchg %%r8,  0x30(%%" reg ")\n\t"       \
-> > > > +               "xchg %%r9,  0x38(%%" reg ")\n\t"       \
-> > > > +               "xchg %%r10, 0x40(%%" reg ")\n\t"       \
-> > > > +               "xchg %%r11, 0x48(%%" reg ")\n\t"       \
-> > > > +               "xchg %%r12, 0x50(%%" reg ")\n\t"       \
-> > > > +               "xchg %%r13, 0x58(%%" reg ")\n\t"       \
-> > > > +               "xchg %%r14, 0x60(%%" reg ")\n\t"       \
-> > > > +               "xchg %%r15, 0x68(%%" reg ")\n\t"       \
-> > > > +               \
-> > > 
-> > > Extra line.
-> > > 
-> > > > +               "xchg %%rbx, 0x00(%%" reg ")\n\t"       \
-> > > 
-> > > Why is RBX last here, but first in the struct?  Ah, because the initial swap uses
-> > > RBX as the scratch register.  Why use RAX for the post-VMRUN swap?  AFAICT, that's
-> > > completely arbitrary.
-> > 
-> > Let me explain:
-> > 
-> > On entry to the guest the code has to save the host GPRs and then load the guest GPRs.
-> > 
-> > Host RAX and RBX are set by the gcc as I requested with "a" and "b"
-> > modifiers, but even these should not be changed by the assembly code from the
-> > values set in the input.
-> > (At least I haven't found a way to mark a register as both input and clobber)
-> 
-> The way to achive input+clobber is to use input+output, i.e. "+b" (regs), but I
-> think that's a moot point...
-I'll try that.
-
-> 
-> > Now RAX is the hardcoded input to VMRUN, thus I leave it alone, and use RBX
-> > as regs pointer, which is restored to the guest value (and host value stored
-> > in the regs) at the end of SWAP_GPRs.
-> 
-> ...because SWAP_GPRs isn't the end of the asm blob.  As long as RBX holds the
-> same value (regs) at the end of the asm blob, no clobbering is necessary even if
-> RBX is changed within the blob.
-Exactly - I preserved it over the stack, but if I can tell gcc that my macro
-clobbers it, then I won't need to.
-
-
-> 
-> > If I switch to full blown assembly function for this, then I could do it.
-> > 
-> > Note though that my LBR tests do still need this as a macro because they must
-> > not do any extra jumps/calls as these clobber the LBR registers.
-> 
-> Shouldn't it be fairly easy to account for the CALL in the asm routine?  Taking
-> on that sort of dependency is quite gross, but it'd likely be less maintenance
-> in the long run than an inline asm blob.
-
-That is not possible - the SVM has just one LBR - so doing call will erase it.
-
-I'll think of something, I also do want to turn this into a function.
-
-Best regards,
-	Maxim Levitsky
-
-> 
-
-
+OK, will re-organize the patches.
