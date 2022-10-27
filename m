@@ -2,64 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 51DDC60F4F4
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 12:27:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8827D60F502
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 12:28:05 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235444AbiJ0K11 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 06:27:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57152 "EHLO
+        id S234928AbiJ0K16 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 06:27:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234428AbiJ0K1W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 06:27:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AE81106E20
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 03:26:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666866418;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4e29Szj0bWjoQcGGn3n5PPNT0uo5CPMikeS3uqJGsg4=;
-        b=Aih4eX3HdGJ+OhSu3LCRr0mh0R9P+Ub3KuKEXJMJeOzYmU7JCte7+h3kHwNoPOxr34RZ2H
-        VzTt4C0vp+ET83biMeKAa2CAOITUkrr/ePuZjcF/C0cAtNa98sGi2mVrSC6tUNYhjDE8xK
-        vHTYni/ApBu9hghyvJp/Pcyu8buNeVE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-139-kcLumE1WPuO6nfbYhntdeA-1; Thu, 27 Oct 2022 06:26:56 -0400
-X-MC-Unique: kcLumE1WPuO6nfbYhntdeA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D6E44823F91;
-        Thu, 27 Oct 2022 10:26:54 +0000 (UTC)
-Received: from localhost (unknown [10.39.195.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2E21E4A9265;
-        Thu, 27 Oct 2022 10:26:47 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Thomas Huth <thuth@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Laurent Vivier <lvivier@redhat.com>
-Cc:     qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Eric Auger <eauger@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v3 2/2] qtests/arm: add some mte tests
-In-Reply-To: <bfd29635-9742-741c-a6dc-145bcf4f8ef8@redhat.com>
-Organization: Red Hat GmbH
-References: <20221026160511.37162-1-cohuck@redhat.com>
- <20221026160511.37162-3-cohuck@redhat.com>
- <bfd29635-9742-741c-a6dc-145bcf4f8ef8@redhat.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Thu, 27 Oct 2022 12:26:43 +0200
-Message-ID: <87h6zpd0kc.fsf@redhat.com>
+        with ESMTP id S234956AbiJ0K1q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 06:27:46 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63010C7053
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 03:27:44 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id r14so1869694lfm.2
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 03:27:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ht1qDbWjn1s/Tw8Yqm0aVlTSVNxYRnuUWU/s2QqT7o4=;
+        b=i9fpSLzo5jMs1+PlsjmjCMb+bkUFi0v3Bacdvscp0fuYHO+3FGaxuBdH9ct3K7RBFW
+         GOHO2JyUIW1XW5jN40lUo04IVtr6sii/DKrSh0WfspjvZb3qBHVd8hHkcE/+pQE5KgUT
+         S2C3X4NjLiLtUUo2sU1/2YrB8+0hbHtyswI86zJlvJsldbkJ1TcRW77xj3Ekpg2FTn5F
+         yLbrMrtYI7k8BF9mLNKwdIJf3ttus48z491adWnKD4QvBxh4IYkD7eHihmuxCq7D5Fig
+         oDQgpPvQAoHoFBnco6A5aUUG8BlMm3axdurIL1eFAQNWMO59iSALUb8xpG0lZ7hWTkgh
+         HBow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ht1qDbWjn1s/Tw8Yqm0aVlTSVNxYRnuUWU/s2QqT7o4=;
+        b=UzgPcBczCIdLect/UGIxZ7o/WbFw++2Xn5iHGHIoKqFJPcVuPMmfInweO+juwprbD5
+         3BpKxth3Z0UD6Fzb1iU9HY5G9dH8GmMC++lTrW2qqJvPO5jMrvVDY0XiayXtmnO0LrIQ
+         /oEEAqrjBVhNbza6i72O6Jtte8lQdjhIPm5+/lQg8Vtw/wswvZK4eDWVlfkvRy8B5vi7
+         ud7VhQpXmbpGBg3Tyq8SvK6kn2OQhd4wtj68J4r9I04uo6Q0K694PGt3jnIOxJGBQqPy
+         7a2Rm2AGdB5XGoWJvODciLG7HdwDrCimLTuK55SRrqeVx/7YW8Q0rDTLb2DGpw0JT8DS
+         Adbw==
+X-Gm-Message-State: ACrzQf1FqZeLv15ho9zOJ2MPS37ciDwxHDUYUZ3dVshL7w1W6XVJZOtg
+        2fJ5sHvET0Y2xBiEiAzTg5UF0UJlrZctFM7q/fMaiA==
+X-Google-Smtp-Source: AMsMyM7ZrmnFdb+RDiq0D6Ba0YwSUUNSHZjttBJh/zpOd85NYIAHkkRHyIoh13rneHkuGCKm3HEm2TuLmTrwb52teuM=
+X-Received: by 2002:a05:6512:3f8b:b0:492:d1ed:5587 with SMTP id
+ x11-20020a0565123f8b00b00492d1ed5587mr19119426lfa.355.1666866462514; Thu, 27
+ Oct 2022 03:27:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com> <20221025151344.3784230-4-chao.p.peng@linux.intel.com>
+In-Reply-To: <20221025151344.3784230-4-chao.p.peng@linux.intel.com>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Thu, 27 Oct 2022 11:27:05 +0100
+Message-ID: <CA+EHjTxzLDAW=MyfKFcL2cGQimw3bdVYePUgRw+=1+AbCQouUQ@mail.gmail.com>
+Subject: Re: [PATCH v9 3/8] KVM: Add KVM_EXIT_MEMORY_FAULT exit
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,20 +96,110 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 27 2022, Thomas Huth <thuth@redhat.com> wrote:
+Hi,
 
-> On 26/10/2022 18.05, Cornelia Huck wrote:
->> +        qtest_add_data_func("/arm/max/query-cpu-model-expansion/tag-memory",
->> +                            NULL, mte_tests_tag_memory_on);
+On Tue, Oct 25, 2022 at 4:19 PM Chao Peng <chao.p.peng@linux.intel.com> wrote:
 >
-> Is it already possible to compile qemu-system-aarch64 with --disable-tcg ? 
-
-Not yet, the code is too entangled... I tried a bit ago, but didn't make
-much progress (on my todo list, but won't mind someone else doing it :)
-
-> If so, I'd recommend a qtest_has_accel("tcg") here ... but apart from that:
+> This new KVM exit allows userspace to handle memory-related errors. It
+> indicates an error happens in KVM at guest memory range [gpa, gpa+size).
+> The flags includes additional information for userspace to handle the
+> error. Currently bit 0 is defined as 'private memory' where '1'
+> indicates error happens due to private memory access and '0' indicates
+> error happens due to shared memory access.
 >
-> Acked-by: Thomas Huth <thuth@redhat.com>
+> When private memory is enabled, this new exit will be used for KVM to
+> exit to userspace for shared <-> private memory conversion in memory
+> encryption usage. In such usage, typically there are two kind of memory
+> conversions:
+>   - explicit conversion: happens when guest explicitly calls into KVM
+>     to map a range (as private or shared), KVM then exits to userspace
+>     to perform the map/unmap operations.
+>   - implicit conversion: happens in KVM page fault handler where KVM
+>     exits to userspace for an implicit conversion when the page is in a
+>     different state than requested (private or shared).
+>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> ---
 
-Thanks!
+Reviewed-by: Fuad Tabba <tabba@google.com>
 
+I have tested the V8 version of this patch on arm64/qemu, and
+considering this hasn't changed:
+Tested-by: Fuad Tabba <tabba@google.com>
+
+Cheers,
+/fuad
+
+
+
+>  Documentation/virt/kvm/api.rst | 23 +++++++++++++++++++++++
+>  include/uapi/linux/kvm.h       |  9 +++++++++
+>  2 files changed, 32 insertions(+)
+>
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index f3fa75649a78..975688912b8c 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6537,6 +6537,29 @@ array field represents return values. The userspace should update the return
+>  values of SBI call before resuming the VCPU. For more details on RISC-V SBI
+>  spec refer, https://github.com/riscv/riscv-sbi-doc.
+>
+> +::
+> +
+> +               /* KVM_EXIT_MEMORY_FAULT */
+> +               struct {
+> +  #define KVM_MEMORY_EXIT_FLAG_PRIVATE (1 << 0)
+> +                       __u32 flags;
+> +                       __u32 padding;
+> +                       __u64 gpa;
+> +                       __u64 size;
+> +               } memory;
+> +
+> +If exit reason is KVM_EXIT_MEMORY_FAULT then it indicates that the VCPU has
+> +encountered a memory error which is not handled by KVM kernel module and
+> +userspace may choose to handle it. The 'flags' field indicates the memory
+> +properties of the exit.
+> +
+> + - KVM_MEMORY_EXIT_FLAG_PRIVATE - indicates the memory error is caused by
+> +   private memory access when the bit is set. Otherwise the memory error is
+> +   caused by shared memory access when the bit is clear.
+> +
+> +'gpa' and 'size' indicate the memory range the error occurs at. The userspace
+> +may handle the error and return to KVM to retry the previous memory access.
+> +
+>  ::
+>
+>      /* KVM_EXIT_NOTIFY */
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index f1ae45c10c94..fa60b032a405 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -300,6 +300,7 @@ struct kvm_xen_exit {
+>  #define KVM_EXIT_RISCV_SBI        35
+>  #define KVM_EXIT_RISCV_CSR        36
+>  #define KVM_EXIT_NOTIFY           37
+> +#define KVM_EXIT_MEMORY_FAULT     38
+>
+>  /* For KVM_EXIT_INTERNAL_ERROR */
+>  /* Emulate instruction failed. */
+> @@ -538,6 +539,14 @@ struct kvm_run {
+>  #define KVM_NOTIFY_CONTEXT_INVALID     (1 << 0)
+>                         __u32 flags;
+>                 } notify;
+> +               /* KVM_EXIT_MEMORY_FAULT */
+> +               struct {
+> +#define KVM_MEMORY_EXIT_FLAG_PRIVATE   (1 << 0)
+> +                       __u32 flags;
+> +                       __u32 padding;
+> +                       __u64 gpa;
+> +                       __u64 size;
+> +               } memory;
+>                 /* Fix the size of the union. */
+>                 char padding[256];
+>         };
+> --
+> 2.25.1
+>
