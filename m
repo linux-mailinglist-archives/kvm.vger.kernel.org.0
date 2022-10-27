@@ -2,56 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57BCE60FD6F
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 18:50:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B72D960FD9C
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 18:56:23 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236670AbiJ0QuB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 12:50:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51186 "EHLO
+        id S235943AbiJ0Q4V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 12:56:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235798AbiJ0Qtv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 12:49:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E99332BB3
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 09:49:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666889388;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lXIKNzxn7gEudfn9nb45VSrNj59yt6Czo/wBWBxPUSE=;
-        b=fREazrcc4iw5WdE4OB2qB+TK8xeEzlFoPhhnEZ/A94sjbXtOzjebRSQTUWiCshLD9hqxkZ
-        QR+nOnBQG2HjZB9mJ/tlD+DAnCvdOx2Ab9EFb4xODLsR9dSxzYAlg5BuSlPSQRdWsCs7nV
-        IwWGDlKmW44bf+T/Xj7xj+yjf+XkV04=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-288-LiZmI3BgM0uc_oG7P16kRw-1; Thu, 27 Oct 2022 12:49:47 -0400
-X-MC-Unique: LiZmI3BgM0uc_oG7P16kRw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 14D0529324AF;
-        Thu, 27 Oct 2022 16:49:47 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E7F8F2166B26;
-        Thu, 27 Oct 2022 16:49:46 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     mlevitsk@redhat.com, seanjc@google.com
-Subject: [PATCH 10/10] KVM: x86: do not define SMM-related constants if SMM disabled
-Date:   Thu, 27 Oct 2022 12:49:44 -0400
-Message-Id: <20221027164944.3031588-11-pbonzini@redhat.com>
-In-Reply-To: <20221027164944.3031588-1-pbonzini@redhat.com>
-References: <20221027164944.3031588-1-pbonzini@redhat.com>
+        with ESMTP id S235822AbiJ0Q4R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 12:56:17 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27EDF1799BC
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 09:56:14 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id 130so2159290pfu.8
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 09:56:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=R53WK2VMBi999TWTmmW7DP/C36/3TjYtBesfKsubmBI=;
+        b=BN2fRaT/LM2Tn120Q3WjdWpDuJcEnDEKyc/+xL2D0uLq3p2tznv75V/u9RlG/IzA16
+         3A/u5tl93bXlEWIj5VYM68d0GJkGqeckmkChLDIrgJM7cNBwD+d6TA6Dc+wKSeKoyItI
+         cAAkd00zsgmsZOKUBU778IDDP8t6iwHd7AQM5TUX2FpxyRrd+5kduoNor1bJaQjRJq5t
+         z7ojCH82/Ok6xHMtBtDQZs54lI7lMq24kpVq1nfWwErhTEo7ohgu+RrkW4IBHH4ks9/5
+         HPWZr1RmwABEOwbCxpUEQ5arV8gDwwfkRrSXzvnfzTBpTgKB5trEXNRNGK5lV0LPVv4K
+         D1/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R53WK2VMBi999TWTmmW7DP/C36/3TjYtBesfKsubmBI=;
+        b=dBaj9PnPMXSxfymv6A4KJ0oucQ2eghgEREJOKM20NvcQntNAfHFqy6wJLEF4QmP8F5
+         qjIVbQL+cVgfKZt/Hyp10kQtHsaAHrW3QsHIfxxNxl5yg/acMwf4qKjFjGfdWElmSm4y
+         f1RHulpt8O6SrE4SnYeyQqZfYwCmf4XuZ+dQMurWJpbmhiY40S9+mytsToY0gZbd8nd/
+         dF7wI8Gphu17VbbWv/0WT9Fa/Mrct7ycCVQtaUsbiymBd+iF0xh9A9B+gnE1EXfUKMz/
+         OF/a9Uzg7lkP3dX80Kt/iwWWKB0Dw6eTb+VaMs80Zlhf2vIwvDlhmN2muDlmNOdz8I7U
+         VVcA==
+X-Gm-Message-State: ACrzQf2jq/B/ttoHdnkGUrIWd9bRiOG63OKjhh1X8xUr7VJqYe+dFzka
+        EyVpjzKL5zf0wuRlW9K4UaCWMA==
+X-Google-Smtp-Source: AMsMyM5rw2WyE82KgSud6t706admcPOeHNOoMBoT75zlOCAH8PlcfvdQnB7viaau/GMnM8pJAF6EzA==
+X-Received: by 2002:a63:fb09:0:b0:43c:b1c6:b335 with SMTP id o9-20020a63fb09000000b0043cb1c6b335mr43524190pgh.276.1666889774120;
+        Thu, 27 Oct 2022 09:56:14 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id i63-20020a62c142000000b0053e62b6fd22sm1377251pfg.126.2022.10.27.09.56.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Oct 2022 09:56:13 -0700 (PDT)
+Date:   Thu, 27 Oct 2022 16:56:10 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Michal Luczaj <mhal@rbox.co>,
+        David Woodhouse <dwmw2@infradead.org>
+Subject: Re: [PATCH v2 03/16] KVM: x86: Always use non-compat
+ vcpu_runstate_info size for gfn=>pfn cache
+Message-ID: <Y1q4KkVQLpuZSX+V@google.com>
+References: <20221013211234.1318131-1-seanjc@google.com>
+ <20221013211234.1318131-4-seanjc@google.com>
+ <afad5f40-03ef-1380-9bfe-03bbaaed47a9@redhat.com>
+ <Y1qZagwM0dMBjYhe@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y1qZagwM0dMBjYhe@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -59,71 +76,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/include/asm/kvm_host.h | 3 ++-
- arch/x86/kvm/smm.c              | 3 +++
- arch/x86/kvm/x86.c              | 4 ++--
- 3 files changed, 7 insertions(+), 3 deletions(-)
+On Thu, Oct 27, 2022, Sean Christopherson wrote:
+> On Thu, Oct 27, 2022, Paolo Bonzini wrote:
+> > On 10/13/22 23:12, Sean Christopherson wrote:
+> > > Always use the size of Xen's non-compat vcpu_runstate_info struct when
+> > > checking that the GPA+size doesn't cross a page boundary.  Conceptually,
+> > > using the current mode is more correct, but KVM isn't consistent with
+> > > itself as kvm_xen_vcpu_set_attr() unconditionally uses the "full" size
+> > > when activating the cache.  More importantly, prior to the introduction
+> > > of the gfn_to_pfn_cache, KVM _always_ used the full size, i.e. allowing
+> > > the guest (userspace?) to use a poorly aligned GPA in 32-bit mode but not
+> > > 64-bit mode is more of a bug than a feature, and fixing the bug doesn't
+> > > break KVM's historical ABI.
+> > 
+> > I'd rather not introduce additional restrictions in KVM,
+> 
+> But KVM already has this restriction.  "struct vcpu_info" is always checked for
+> the non-compat size, and as above, "struct vcpu_runstate_info" is checked for the
+> non-compat size during its initialization.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 7ddcc0e6fae5..89c89c70f74e 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1992,10 +1992,11 @@ enum {
- #define HF_NMI_MASK		(1 << 3)
- #define HF_IRET_MASK		(1 << 4)
- #define HF_GUEST_MASK		(1 << 5) /* VCPU is in guest-mode */
-+
-+#ifdef CONFIG_KVM_SMM
- #define HF_SMM_MASK		(1 << 6)
- #define HF_SMM_INSIDE_NMI_MASK	(1 << 7)
- 
--#ifdef CONFIG_KVM_SMM
- # define __KVM_VCPU_MULTIPLE_ADDRESS_SPACE
- # define KVM_ADDRESS_SPACE_NUM 2
- # define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
-diff --git a/arch/x86/kvm/smm.c b/arch/x86/kvm/smm.c
-index 41ca128478fc..44a8f7e57b77 100644
---- a/arch/x86/kvm/smm.c
-+++ b/arch/x86/kvm/smm.c
-@@ -10,6 +10,9 @@
- 
- void kvm_smm_changed(struct kvm_vcpu *vcpu, bool entering_smm)
- {
-+	BUILD_BUG_ON(HF_SMM_MASK != X86EMUL_SMM_MASK);
-+	BUILD_BUG_ON(HF_SMM_INSIDE_NMI_MASK != X86EMUL_SMM_INSIDE_NMI_MASK);
-+
- 	trace_kvm_smm_transition(vcpu->vcpu_id, vcpu->arch.smbase, entering_smm);
- 
- 	if (entering_smm) {
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5959f74c5a0a..910e3757b222 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -5092,10 +5092,12 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
- 
- 	/* events->sipi_vector is never valid when reporting to user space */
- 
-+#ifdef CONFIG_KVM_SMM
- 	events->smi.smm = is_smm(vcpu);
- 	events->smi.pending = vcpu->arch.smi_pending;
- 	events->smi.smm_inside_nmi =
- 		!!(vcpu->arch.hflags & HF_SMM_INSIDE_NMI_MASK);
-+#endif
- 	events->smi.latched_init = kvm_lapic_latched_init(vcpu);
- 
- 	events->flags = (KVM_VCPUEVENT_VALID_NMI_PENDING
-@@ -8266,8 +8268,6 @@ static void init_emulate_ctxt(struct kvm_vcpu *vcpu)
- 		     cs_db				? X86EMUL_MODE_PROT32 :
- 							  X86EMUL_MODE_PROT16;
- 	BUILD_BUG_ON(HF_GUEST_MASK != X86EMUL_GUEST_MASK);
--	BUILD_BUG_ON(HF_SMM_MASK != X86EMUL_SMM_MASK);
--	BUILD_BUG_ON(HF_SMM_INSIDE_NMI_MASK != X86EMUL_SMM_INSIDE_NMI_MASK);
- 
- 	ctxt->interruptibility = 0;
- 	ctxt->have_exception = false;
--- 
-2.31.1
+Ah, I forgot those are the same size:
 
+		BUILD_BUG_ON(sizeof(struct vcpu_info) !=
+			     sizeof(struct compat_vcpu_info));
