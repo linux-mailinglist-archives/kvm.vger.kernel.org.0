@@ -2,133 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3FA560FBC2
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 17:22:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 50A1660FBDE
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 17:27:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235699AbiJ0PWR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 11:22:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37640 "EHLO
+        id S235699AbiJ0P1M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 11:27:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236487AbiJ0PVq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 11:21:46 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 293336A508
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 08:21:34 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A1F75B826DA
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 15:21:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48301C433C1;
-        Thu, 27 Oct 2022 15:21:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666884091;
-        bh=H9WUjCzGGNN06EF+TlX9yvE8arkV5DGJVVT0ALe9MQM=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=YAel0MsaU6b9iw+V6SqZfCenO14l6YoNOssEiNX0pq4BLbUN/2N0iukDE3J5SpVWD
-         Sai+B/Hvv5+ZtwLr0kU7CiyGmY5nopq7lszd1WJfAIr3P/u4byZatGvNz2hCpJmcZ2
-         tYh+H8rTvwyHf/NX75p3sRI8xaTe1txYgpcB5HI8JE86lwZPiiwcGTt4YWm2YcyDB3
-         UXV71CkWqAStvsfX+fu2UTVEz4mRSzZ9+O59sEKfE4A5HWflAYBJlfq3n2Ee1H9dmC
-         UUM+OBpdky72YQ3ialxejhS4+lmICYzTqhpluzzC6GB5qGlIpsgVwb8d9SVlE9waCU
-         iW4gZZX037IQA==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1oo4hE-0021wH-He;
-        Thu, 27 Oct 2022 16:21:29 +0100
+        with ESMTP id S235642AbiJ0P1J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 11:27:09 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B20817537B;
+        Thu, 27 Oct 2022 08:27:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1666884429; x=1698420429;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=g6NyrQKF9LXeHoOqXcvYnumDkoDsCA06btGLwWECbcQ=;
+  b=cXx7AKZQxM6xMz9OYsAQ5QbCE8KHpy8BgZr6u0uDwZC3iTQpG35YnRpU
+   YZ4MPncpFMyVWnuHh7F+xp/0Pf4dZODiJ788CLyI0Nh8KBVRiNfwcxOGa
+   gCfP16DVTj8hOAPfPG9ccI3k4NosAifVCocsvXRhu9+rdLOf2MrDWaIbK
+   bz/gDnPvJeE2kX2nhVk2GwJmIV7RuAlpY11rDIF9U6eEVQ9DMrc++VAPk
+   hCohVOTMDAy4Giwm1KpjU5ig1iTPx2BYwsrzw11UbWrN3wZSKItf7THTb
+   9agaLMdW/AAyD8/HHE75a0r11WABFuPuB9EA+bNOBDDFjE/FD30ExJS5k
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10513"; a="291556175"
+X-IronPort-AV: E=Sophos;i="5.95,218,1661842800"; 
+   d="scan'208";a="291556175"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2022 08:27:08 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10513"; a="663657349"
+X-IronPort-AV: E=Sophos;i="5.95,218,1661842800"; 
+   d="scan'208";a="663657349"
+Received: from vstelter-mobl.amr.corp.intel.com (HELO [10.212.214.108]) ([10.212.214.108])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2022 08:27:07 -0700
+Message-ID: <03677288-2e96-a66e-fb1a-331e3b0d112f@intel.com>
+Date:   Thu, 27 Oct 2022 08:27:06 -0700
 MIME-Version: 1.0
-Date:   Thu, 27 Oct 2022 16:21:28 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        kernel-team@android.com
-Subject: Re: [PATCH 1/9] KVM: arm64: PMU: Align chained counter implementation
- with architecture pseudocode
-In-Reply-To: <CAAeT=FzbYp58Yw6QXqD92w4UMG8x+O81i6hoC+_jeOEL0vFjGA@mail.gmail.com>
-References: <20220805135813.2102034-1-maz@kernel.org>
- <20220805135813.2102034-2-maz@kernel.org>
- <CAAeT=Fz55H09PWpmMu1sBkV=iUEHWezwhghJskaWAoqQsi2N0A@mail.gmail.com>
- <86zgdlms58.wl-maz@kernel.org>
- <CAAeT=FzbYp58Yw6QXqD92w4UMG8x+O81i6hoC+_jeOEL0vFjGA@mail.gmail.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <cf1bb582d44cf2a40a3dfc12d21f24fa@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH v6 01/21] x86/tdx: Use enum to define page level of TDX
+ supported page sizes
+Content-Language: en-US
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
+        dan.j.williams@intel.com, rafael.j.wysocki@intel.com,
+        kirill.shutemov@linux.intel.com, reinette.chatre@intel.com,
+        len.brown@intel.com, tony.luck@intel.com, peterz@infradead.org,
+        ak@linux.intel.com, isaku.yamahata@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
+        sagis@google.com, imammedo@redhat.com
+References: <cover.1666824663.git.kai.huang@intel.com>
+ <8a5b40d43f8b993a48b99d6647b16a82b433627c.1666824663.git.kai.huang@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <8a5b40d43f8b993a48b99d6647b16a82b433627c.1666824663.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: reijiw@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
+On 10/26/22 16:16, Kai Huang wrote:
+> +/*
+> + * Get the TDX page level based on the kernel page level.  The caller
+> + * to make sure only pass 4K/2M/1G kernel page level.
+> + */
+> +static inline enum tdx_pg_level to_tdx_pg_level(enum pg_level pglvl)
+> +{
+> +	switch (pglvl) {
+> +	case PG_LEVEL_4K:
+> +		return TDX_PG_LEVEL_4K;
+> +	case PG_LEVEL_2M:
+> +		return TDX_PG_LEVEL_2M;
+> +	case PG_LEVEL_1G:
+> +		return TDX_PG_LEVEL_1G;
+> +	default:
+> +		WARN_ON_ONCE(1);
+> +	}
+> +	return TDX_PG_LEVEL_NUM;
+> +}
 
-On 2022-10-27 15:33, Reiji Watanabe wrote:
-> Hi Marc,
-> 
->> > > +static void kvm_pmu_counter_increment(struct kvm_vcpu *vcpu,
->> > > +                                     unsigned long mask, u32 event)
->> > > +{
->> > > +       int i;
->> > > +
->> > > +       if (!kvm_vcpu_has_pmu(vcpu))
->> > > +               return;
->> > > +
->> > > +       if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E))
->> > > +               return;
->> > > +
->> > > +       /* Weed out disabled counters */
->> > > +       mask &= __vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
->> > > +
->> > > +       for_each_set_bit(i, &mask, ARMV8_PMU_CYCLE_IDX) {
->> > > +               u64 type, reg;
->> > > +
->> > > +               /* Filter on event type */
->> > > +               type = __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i);
->> > > +               type &= kvm_pmu_event_mask(vcpu->kvm);
->> > > +               if (type != event)
->> > > +                       continue;
->> > > +
->> > > +               /* Increment this counter */
->> > > +               reg = __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) + 1;
->> > > +               reg = lower_32_bits(reg);
->> > > +               __vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = reg;
->> > > +
->> > > +               if (reg) /* No overflow? move on */
->> > > +                       continue;
->> > > +
->> > > +               /* Mark overflow */
->> > > +               __vcpu_sys_reg(vcpu, PMOVSSET_EL0) |= BIT(i);
->> >
->> > Perhaps it might be useful to create another helper that takes
->> > care of just one counter (it would essentially do the code above
->> > in the loop). The helper could be used (in addition to the above
->> > loop) from the code below for the CHAIN event case and from
->> > kvm_pmu_perf_overflow(). Then unnecessary execution of
->> > for_each_set_bit() could be avoided for these two cases.
->> 
->> I'm not sure it really helps. We would still need to check whether the
->> counter is enabled, and we'd need to bring that into the helper
->> instead of keeping it outside of the loop.
-> 
-> That's true. It seems that I overlooked that.
-> Although it appears checking with kvm_vcpu_has_pmu() is unnecessary
-> (redundant), the check with PMCR_EL0.E is necessary.
+Is TDX_PG_LEVEL_NUM part of the ABI?  Or, is this going to accidentally
+pass a whacky value to the SEAM module?
 
-Ah indeed, I'll drop the kvm_vcpu_has_pmu() check.
+This needs something like this at the call-site:
 
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+	page_size = to_tdx_pg_level(pg_level);
+	if (page_size >= TDX_PG_LEVEL_NUM)
+		return false;
