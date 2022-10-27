@@ -2,171 +2,240 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EA13060EF78
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 07:27:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28EEF60F079
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 08:42:19 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233506AbiJ0F1P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 01:27:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60574 "EHLO
+        id S234150AbiJ0GmR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 02:42:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229670AbiJ0F1O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 01:27:14 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2061.outbound.protection.outlook.com [40.107.220.61])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73F1015A32F;
-        Wed, 26 Oct 2022 22:27:13 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZJ9srAZ6ORKkm1vI7P4Oy3A2fXOXJlm+Mz8e4YHfYnBhwyitMVo5Pfydyq0I3s3Oqu2X6CXeW05A7H7m7H3xY7Gl/5T/LNal/bXj+88+po9g2HlOm4PEZIzjXMlTNZBRZw8z3pgSgpcGxucp1MIQxlEQWH32VoI6Eak76UjIkPDlRRK4cQv+EHn6AI8GML6aK5k3SQ0rxW+dtPHqn5kK2OXX8kfCo6Att1HtyQr3nt56YS1nvrzVapqJTIN+5roUktQovfrmC4RFKYFE7M1a4lIX3znXWVdR2hAjgSelNJaMJbonhMXw2KV+GqQUt8s1TkX7/jGa5HhKB/O29szaDQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WxpVqRrbQX2vXuNsDMd262iijiw3r66biyRCkfVIHyk=;
- b=N1FJdUhZFy7LE4dXP6vP3vVs8nB1JMbP4+y1hbuYc4/wjSoTG0B0dvXP/ebq+Iet6IGesRvmakmkVmEH7zuH2vq1YY+uG0RMoJ0OkaeLRuaAqZ6UewGs04F0fb6eHDgQlPjW74v9fKYbFvIDDp8dhtwVnv0nr1fDwu8eRX6YGoe3MORqBneaSnpfXoDOVyNrnauMlsim7qmQVGkecwFITLvcvpC58LrYDnTgUPzokJ3ZJTN/A7cREvJXxuLDUnPC4JHfnExy9v1JJ0+iwWGmR4Vni0axCOmqJEVQi2ube/1nY6JPEKfRUZjFrvS52H2WdC1kucZp1CeACNxJBjrspw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WxpVqRrbQX2vXuNsDMd262iijiw3r66biyRCkfVIHyk=;
- b=sDlD4i3rpiPmFToP/FUJBg2MAGHMeY+AZo3pRjSNYysu6opZPMWqSD05snyj7bQbwh9XRKdqsDuqhrfnkMXE2zL4prAbBMXlJTbPKS3Ch6AMdSvf3R+TNV2RgXWZWAYiMgYguoELyKrhLDX498wipmbQYRAe4gcqbfAAVjeTmwc=
-Received: from BN7PR02CA0030.namprd02.prod.outlook.com (2603:10b6:408:20::43)
- by SN7PR12MB6768.namprd12.prod.outlook.com (2603:10b6:806:268::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5746.25; Thu, 27 Oct
- 2022 05:27:11 +0000
-Received: from BN8NAM11FT115.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:20:cafe::e7) by BN7PR02CA0030.outlook.office365.com
- (2603:10b6:408:20::43) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5746.29 via Frontend
- Transport; Thu, 27 Oct 2022 05:27:11 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN8NAM11FT115.mail.protection.outlook.com (10.13.177.151) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5746.16 via Frontend Transport; Thu, 27 Oct 2022 05:27:11 +0000
-Received: from aiemdee.1.ozlabs.ru (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Thu, 27 Oct
- 2022 00:26:57 -0500
-From:   Alexey Kardashevskiy <aik@amd.com>
-To:     <kvm@vger.kernel.org>
-CC:     Alexey Kardashevskiy <aik@amd.com>, <linux-kernel@vger.kernel.org>,
-        <iommu@lists.linux.dev>, Ashish Kalra <ashish.kalra@amd.com>,
-        Pankaj Gupta <pankaj.gupta@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH kernel] x86/swiotlb/amd: Half the size if allocation failed
-Date:   Thu, 27 Oct 2022 16:26:07 +1100
-Message-ID: <20221027052607.260234-1-aik@amd.com>
-X-Mailer: git-send-email 2.37.3
+        with ESMTP id S229379AbiJ0GmP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 02:42:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64DAF1707B
+        for <kvm@vger.kernel.org>; Wed, 26 Oct 2022 23:42:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666852933;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XS3ic0iCUvn5ho/53uIrFNHi7ZNbpesOuXtxAnsqiX4=;
+        b=Nqe4NDRuqYLLUirYiPAI5yCnC60/MYXUuUGXfGiwjFV7R/gt+DXzRNneeUSyAM/BJnGfz4
+        GIPODjpIzgYOh65npnFteVmKb8csSEI/iAC1Ni6C9+U70drNMetNwVK7xqM/W1gVXyqx4C
+        OpFu8NNnsGRPffz3XDNC4JYXAox3yZA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-270-gxn5zhgrOuubBRz2XMtapg-1; Thu, 27 Oct 2022 02:42:05 -0400
+X-MC-Unique: gxn5zhgrOuubBRz2XMtapg-1
+Received: by mail-wm1-f70.google.com with SMTP id r18-20020a05600c35d200b003cb2ba79692so256293wmq.5
+        for <kvm@vger.kernel.org>; Wed, 26 Oct 2022 23:42:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XS3ic0iCUvn5ho/53uIrFNHi7ZNbpesOuXtxAnsqiX4=;
+        b=JGiuQ5ybFF7tJOiZK44a3Og4HKWjKENX71B36DOhPW1ZopfyvrSmiV58LIYtV7tXvz
+         +TYXtRcv0OGOo//hwkbckKqIch0EUNhBQDlB6dxjBE54czTdKFsMWsFIfjfmssLxdEfy
+         Qk6Ou/YOXeI5wydz/dLuBptCumIBx50qLZt6p60hMmBXAIfMDsmCx+N2QitGxzpbDwbE
+         xGc9Cemnb4uqQamy35r89HQj26CbgIYLiGq/Rvf84+p0b0TaLeH0AESaQdnm7lJUuBjm
+         C2z9dO9a8Qrj4W33butKDf88flvJ0im0DZ4jZgFWYDgK9WaNWoFljssGrB+estFdsKgY
+         vRlQ==
+X-Gm-Message-State: ACrzQf2/mo4JgGGvmxl4+rTxCioT1LqFVglw8hs7gdAavtdpmcSeFs85
+        IBcLWCeE0pPaHuB4Y5McCRiWqHNXfeEIF8hSHUHnDtVWL63k8JoBIW4/GZ1ryeNi/DR36pU2KnS
+        8nvwvFZAba2ZZ
+X-Received: by 2002:adf:c7d1:0:b0:236:7cde:a9b5 with SMTP id y17-20020adfc7d1000000b002367cdea9b5mr8668713wrg.381.1666852924270;
+        Wed, 26 Oct 2022 23:42:04 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM7MYmH4O1N8t97lPe6oZ1KZ0uy22V/IBAjSIZsCk97sDO9SaNmtgbPcbQDa8GVpW1AFeAoVCg==
+X-Received: by 2002:adf:c7d1:0:b0:236:7cde:a9b5 with SMTP id y17-20020adfc7d1000000b002367cdea9b5mr8668695wrg.381.1666852923965;
+        Wed, 26 Oct 2022 23:42:03 -0700 (PDT)
+Received: from [192.168.0.5] (ip-109-43-176-195.web.vodafone.de. [109.43.176.195])
+        by smtp.gmail.com with ESMTPSA id t8-20020a05600c198800b003cf490d1cf7sm4096597wmq.8.2022.10.26.23.42.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Oct 2022 23:42:03 -0700 (PDT)
+Message-ID: <bfd29635-9742-741c-a6dc-145bcf4f8ef8@redhat.com>
+Date:   Thu, 27 Oct 2022 08:42:01 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT115:EE_|SN7PR12MB6768:EE_
-X-MS-Office365-Filtering-Correlation-Id: a41ba58c-7a8d-409c-4d8c-08dab7dbe639
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Xi5uS5xgtzxV7Voi1Js4DS1E2fKZd6buCbl/GW8IyIxep5zzGLTdX+PMnabfofFG6fOdqFY9lp4Gdu/oHYFggMe0Cg16fDrUwdxCLdBVKyW8B12Xe7OTClBUHYkE1hs6sCgycVgxgRAoqP1tpPzIdR/rRo+tKIWgpEX4FI3o/DA8xh7hJGu4rhjUjP/LzSwmSUHNRta6i0MdYNuQhBR4wA/dR9tb54KPzu/M3TFPNkP2KXsZ4UqxkSfYM1sO8IF3oE0yOznRo4YUCtQf8Y59Zbfd4XE+K96Ulm5BKvCqEyqfACkFLj69x5knfJAgCfRTqDyz6Y+iPmnjfyhfL929+/C3flb0dsCwlMCMFWF/nYZus1HIlUWUQsIrQ4CGqivC8Edj0ti77tf3TM2FJoLhuH3rmI3thmS1ee1CMGH9PlNOeQ9GC233me9R+IBZDqd2J/ExiN1cy3HxL8/iTLv5VwmjxuIqTbE9QSsvG2u7nSSdCqHL4SlPOdeZ9ghSxHEXKOHPvSmwoloE+JA/ufezINKnis8s5DCUHOmiX1+gCimQLBeWu62KqHhYLeG7IXzXe7wmTbJs93SxkSdLLO8dDivyba5QN/qi2hLW2dZ0fcsw+VAt7OZjLDThswMeDIQkBJH7A6DP5n8yG3pKpY+SwdkbGanfq+PmZXzbT+Vx6f4xfnpfscDaJlF6eQ04V/ehmxB3eXSgyvUlY08vku4glvp9fJZFDFK/D4do6fthmg/yTK3RsWdW0dD2hmKd4lwY77grnDX3q2dgPoFerCLGv6zBR50WiPZR9NTZh9UssscMHjRcDLJxfB6n6qmd3AWL
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(376002)(136003)(346002)(396003)(451199015)(46966006)(40470700004)(36840700001)(2906002)(82740400003)(54906003)(47076005)(81166007)(5660300002)(41300700001)(8936002)(8676002)(70206006)(316002)(70586007)(4326008)(6916009)(336012)(40460700003)(83380400001)(426003)(1076003)(186003)(2616005)(36756003)(478600001)(82310400005)(40480700001)(36860700001)(26005)(356005)(6666004)(16526019)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2022 05:27:11.4113
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a41ba58c-7a8d-409c-4d8c-08dab7dbe639
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT115.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6768
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH v3 2/2] qtests/arm: add some mte tests
+Content-Language: en-US
+To:     Cornelia Huck <cohuck@redhat.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Laurent Vivier <lvivier@redhat.com>
+Cc:     qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Eric Auger <eauger@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Juan Quintela <quintela@redhat.com>,
+        Gavin Shan <gshan@redhat.com>
+References: <20221026160511.37162-1-cohuck@redhat.com>
+ <20221026160511.37162-3-cohuck@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20221026160511.37162-3-cohuck@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-At the moment the AMD encrypted platform reserves 6% of RAM for SWIOTLB
-or 1GB, whichever is less. However it is possible that there is no block
-big enough in the low memory which make SWIOTLB allocation fail and
-the kernel continues without DMA. In such case a VM hangs on DMA.
+On 26/10/2022 18.05, Cornelia Huck wrote:
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>   tests/qtest/arm-cpu-features.c | 76 ++++++++++++++++++++++++++++++++++
+>   1 file changed, 76 insertions(+)
+> 
+> diff --git a/tests/qtest/arm-cpu-features.c b/tests/qtest/arm-cpu-features.c
+> index 5a145273860c..e264d2178a8b 100644
+> --- a/tests/qtest/arm-cpu-features.c
+> +++ b/tests/qtest/arm-cpu-features.c
+> @@ -22,6 +22,7 @@
+>   
+>   #define MACHINE     "-machine virt,gic-version=max -accel tcg "
+>   #define MACHINE_KVM "-machine virt,gic-version=max -accel kvm -accel tcg "
+> +#define MACHINE_MTE "-machine virt,gic-version=max,mte=on -accel tcg "
+>   #define QUERY_HEAD  "{ 'execute': 'query-cpu-model-expansion', " \
+>                       "  'arguments': { 'type': 'full', "
+>   #define QUERY_TAIL  "}}"
+> @@ -155,6 +156,18 @@ static bool resp_get_feature(QDict *resp, const char *feature)
+>       g_assert(qdict_get_bool(_props, feature) == (expected_value));     \
+>   })
+>   
+> +#define resp_assert_feature_str(resp, feature, expected_value)         \
+> +({                                                                     \
+> +    QDict *_props;                                                     \
+> +                                                                       \
+> +    g_assert(_resp);                                                   \
+> +    g_assert(resp_has_props(_resp));                                   \
+> +    _props = resp_get_props(_resp);                                    \
+> +    g_assert(qdict_get(_props, feature));                              \
+> +    g_assert_cmpstr(qdict_get_try_str(_props, feature), ==,            \
+> +                    expected_value);                                   \
+> +})
+> +
+>   #define assert_feature(qts, cpu_type, feature, expected_value)         \
+>   ({                                                                     \
+>       QDict *_resp;                                                      \
+> @@ -165,6 +178,16 @@ static bool resp_get_feature(QDict *resp, const char *feature)
+>       qobject_unref(_resp);                                              \
+>   })
+>   
+> +#define assert_feature_str(qts, cpu_type, feature, expected_value)     \
+> +({                                                                     \
+> +    QDict *_resp;                                                      \
+> +                                                                       \
+> +    _resp = do_query_no_props(qts, cpu_type);                          \
+> +    g_assert(_resp);                                                   \
+> +    resp_assert_feature_str(_resp, feature, expected_value);           \
+> +    qobject_unref(_resp);                                              \
+> +})
+> +
+>   #define assert_set_feature(qts, cpu_type, feature, value)              \
+>   ({                                                                     \
+>       const char *_fmt = (value) ? "{ %s: true }" : "{ %s: false }";     \
+> @@ -176,6 +199,16 @@ static bool resp_get_feature(QDict *resp, const char *feature)
+>       qobject_unref(_resp);                                              \
+>   })
+>   
+> +#define assert_set_feature_str(qts, cpu_type, feature, value, _fmt)    \
+> +({                                                                     \
+> +    QDict *_resp;                                                      \
+> +                                                                       \
+> +    _resp = do_query(qts, cpu_type, _fmt, feature);                    \
+> +    g_assert(_resp);                                                   \
+> +    resp_assert_feature_str(_resp, feature, value);                    \
+> +    qobject_unref(_resp);                                              \
+> +})
+> +
+>   #define assert_has_feature_enabled(qts, cpu_type, feature)             \
+>       assert_feature(qts, cpu_type, feature, true)
+>   
+> @@ -412,6 +445,24 @@ static void sve_tests_sve_off_kvm(const void *data)
+>       qtest_quit(qts);
+>   }
+>   
+> +static void mte_tests_tag_memory_on(const void *data)
+> +{
+> +    QTestState *qts;
+> +
+> +    qts = qtest_init(MACHINE_MTE "-cpu max");
+> +
+> +    /*
+> +     * With tag memory, "mte" should default to on, and explicitly specifying
+> +     * either on or off should be fine.
+> +     */
+> +    assert_has_feature(qts, "max", "mte");
+> +
+> +    assert_set_feature_str(qts, "max", "mte", "off", "{ 'mte': 'off' }");
+> +    assert_set_feature_str(qts, "max", "mte", "on", "{ 'mte': 'on' }");
+> +
+> +    qtest_quit(qts);
+> +}
+> +
+>   static void pauth_tests_default(QTestState *qts, const char *cpu_type)
+>   {
+>       assert_has_feature_enabled(qts, cpu_type, "pauth");
+> @@ -424,6 +475,21 @@ static void pauth_tests_default(QTestState *qts, const char *cpu_type)
+>                    "{ 'pauth': false, 'pauth-impdef': true }");
+>   }
+>   
+> +static void mte_tests_default(QTestState *qts, const char *cpu_type)
+> +{
+> +    assert_has_feature(qts, cpu_type, "mte");
+> +
+> +    /*
+> +     * Without tag memory, mte will be off under tcg.
+> +     * Explicitly enabling it yields an error.
+> +     */
+> +    assert_has_feature(qts, cpu_type, "mte");
+> +
+> +    assert_set_feature_str(qts, "max", "mte", "off", "{ 'mte': 'off' }");
+> +    assert_error(qts, cpu_type, "mte=on requires tag memory",
+> +                 "{ 'mte': 'on' }");
+> +}
+> +
+>   static void test_query_cpu_model_expansion(const void *data)
+>   {
+>       QTestState *qts;
+> @@ -473,6 +539,7 @@ static void test_query_cpu_model_expansion(const void *data)
+>   
+>           sve_tests_default(qts, "max");
+>           pauth_tests_default(qts, "max");
+> +        mte_tests_default(qts, "max");
+>   
+>           /* Test that features that depend on KVM generate errors without. */
+>           assert_error(qts, "max",
+> @@ -516,6 +583,13 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+>           assert_set_feature(qts, "host", "pmu", false);
+>           assert_set_feature(qts, "host", "pmu", true);
+>   
+> +        /*
+> +         * Unfortunately, there's no easy way to test whether this instance
+> +         * of KVM supports MTE. So we can only assert that the feature
+> +         * is present, but not whether it can be toggled.
+> +         */
+> +        assert_has_feature(qts, "host", "mte");
+> +
+>           /*
+>            * Some features would be enabled by default, but they're disabled
+>            * because this instance of KVM doesn't support them. Test that the
+> @@ -630,6 +704,8 @@ int main(int argc, char **argv)
+>                               NULL, sve_tests_sve_off);
+>           qtest_add_data_func("/arm/kvm/query-cpu-model-expansion/sve-off",
+>                               NULL, sve_tests_sve_off_kvm);
+> +        qtest_add_data_func("/arm/max/query-cpu-model-expansion/tag-memory",
+> +                            NULL, mte_tests_tag_memory_on);
 
-This divides the size in half and tries again reusing the existing
-remapping logic.
+Is it already possible to compile qemu-system-aarch64 with --disable-tcg ? 
+If so, I'd recommend a qtest_has_accel("tcg") here ... but apart from that:
 
-This updates default_nslabs on successful allocation which looks like
-an oversight as not doing so should have broken callers of
-swiotlb_size_or_default().
+Acked-by: Thomas Huth <thuth@redhat.com>
 
-Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
---
-
-I hit the problem with
-QEMU's "-m 16819M" where SWIOTLB was adjusted to
-0x7e200 == 1,058,013,184 (slightly less than 1GB) while
-0x7e180 still worked.
-
-With guest errors enabled, there are many unassigned accesses from
-virtio.
-
----
- kernel/dma/swiotlb.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
-
-diff --git a/kernel/dma/swiotlb.c b/kernel/dma/swiotlb.c
-index 339a990554e7..d28c294320fd 100644
---- a/kernel/dma/swiotlb.c
-+++ b/kernel/dma/swiotlb.c
-@@ -338,21 +338,27 @@ void __init swiotlb_init_remap(bool addressing_limit, unsigned int flags,
- 	else
- 		tlb = memblock_alloc_low(bytes, PAGE_SIZE);
- 	if (!tlb) {
--		pr_warn("%s: failed to allocate tlb structure\n", __func__);
--		return;
--	}
--
--	if (remap && remap(tlb, nslabs) < 0) {
-+		pr_warn("%s: Failed to allocate %zu bytes tlb structure\n",
-+			__func__, bytes);
-+	} else if (remap && remap(tlb, nslabs) < 0) {
- 		memblock_free(tlb, PAGE_ALIGN(bytes));
-+		tlb = NULL;
-+		pr_warn("%s: Failed to remap %zu bytes\n", __func__, bytes);
-+	}
- 
-+	if (!tlb) {
- 		nslabs = ALIGN(nslabs >> 1, IO_TLB_SEGSIZE);
- 		if (nslabs >= IO_TLB_MIN_SLABS)
- 			goto retry;
--
--		pr_warn("%s: Failed to remap %zu bytes\n", __func__, bytes);
- 		return;
- 	}
- 
-+	if (default_nslabs != nslabs) {
-+		pr_info("SWIOTLB bounce buffer size adjusted %lu -> %lu slabs",
-+			default_nslabs, nslabs);
-+		default_nslabs = nslabs;
-+	}
-+
- 	alloc_size = PAGE_ALIGN(array_size(sizeof(*mem->slots), nslabs));
- 	mem->slots = memblock_alloc(alloc_size, PAGE_SIZE);
- 	if (!mem->slots) {
--- 
-2.37.3
 
