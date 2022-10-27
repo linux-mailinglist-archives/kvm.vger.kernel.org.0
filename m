@@ -2,101 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CB2A60F797
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 14:40:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2760660F8CB
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 15:14:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234908AbiJ0MkV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 08:40:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41220 "EHLO
+        id S235371AbiJ0NOb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 09:14:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235262AbiJ0MkS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 08:40:18 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 594ED24952;
-        Thu, 27 Oct 2022 05:40:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666874415; x=1698410415;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=gCO0Gi7jBp04JaT6Hozi8Zx3cpn252rR5ReZxqs5hCY=;
-  b=KOM1BCNT7d0j35P3H9WmFQhEc6CWmXUKKJUkrS1fwuf7fImwaTeDIGXe
-   /+s4HuW6q/RkYY8TYpH8kpSjree/rSwdRrr+brrDQI3xa0TeyL33FRZHk
-   S/H2g3iRpnLgxBHNa3pvXitg72pi03jSQQhZajfzV/LtVNwEidqrV49fS
-   mFXso0ny0KjL0u0NSd9Wv3dYIk4B9HElbARz0O6lMUhkUqR0MnQzepFBK
-   Vws2wBmzoY+1zFwNywDQE7MROZwDUgGpDSRbhnBucfKf3BC0xRm1mzGUj
-   v3FSIiXTf34zevm34qx88v8i1G3J1GR3CCOXnjW/XB1ITQBCWlbh+ULr6
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="309907166"
-X-IronPort-AV: E=Sophos;i="5.95,217,1661842800"; 
-   d="scan'208";a="309907166"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2022 05:40:14 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10512"; a="632392902"
-X-IronPort-AV: E=Sophos;i="5.95,217,1661842800"; 
-   d="scan'208";a="632392902"
-Received: from akleen-mobl1.amr.corp.intel.com (HELO [10.251.5.115]) ([10.251.5.115])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2022 05:40:14 -0700
-Message-ID: <85531c8e-e708-c76a-2d66-30ad7a3f8471@linux.intel.com>
-Date:   Thu, 27 Oct 2022 05:40:13 -0700
+        with ESMTP id S236182AbiJ0NOF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 09:14:05 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 622877C32B
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 06:13:45 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id 21so2668191edv.3
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 06:13:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6jud7Ls3+0knS57eOkqU3aPXs8XYGaLsC/MSEs6EmMo=;
+        b=coB5F5xlLS4ZGJBOq74G9Z7uo7MjBZy+xChFNFzoqe+qjUjBYjA4yG1TWEBHfNf4J1
+         mcdzCmwZ0+4mnlL09NJuhBUcMzD/vWbDQ0eJak2pQOQ6rdEccapzTYCXSbCn6AAj6Qiq
+         LNkUvDPQkbCCPKiXSonDd3/hYnygASrQyv1O1MR6gKEOmrBxy2KpnZWWbHDMZLUi/99d
+         0VgU3srN3IvjP2tmS6krA4c6Lw0mFYaB8+J6sA/FfR3/G7B2S4THT6CQSwIaIerUdMrK
+         AYrpNORcotEHf07jXdHVZLpktcyh0+MWOwlfTrhBESUzQ2kjXbTWRkBQAYcbtYUxMetE
+         RBPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6jud7Ls3+0knS57eOkqU3aPXs8XYGaLsC/MSEs6EmMo=;
+        b=uovSYCGB5YqyjLwlEatX7jPZ11iztl1QmJka00ta8LvY5Jlerllh/dyeTfDaMtwqKm
+         L4jC48X2fdAkheubu0n4uWJ1mdYsthsi59qcAT5IEmW7BnFLwPjXIKlKf3vfPQjltbjw
+         hqlafuWFGpUhERaAt1pPmWXelW0U7jtkzoTe/ob4owCmk6YkNX4A1eTRyA0uJmm1byxi
+         GuY35A058bxoeF03soywWqFA1HNnO9RRaLtAhtLQw/a3fDgLrnqm72Op+Kl4r5rx1GIe
+         FGSdoHbUX2SDhWoFncN8Xk8bw3LmnAsPuI+VzriNzitYrI6j80jorOkx24XOWFF1x+/V
+         /ibw==
+X-Gm-Message-State: ACrzQf29tVSbwmmh1nsg/ugpQ+caznuQEp/Hu2/xp9/g8g69nx2YVlvi
+        LZwOUxswVy2CZTeLis610LFmYg==
+X-Google-Smtp-Source: AMsMyM4WOdSgzl4SwTvaEe8U3ZIL/v1D5C65H+zxttEDUG8sVMzVnwecQoBMQyCHWGwQXYvykKJQfw==
+X-Received: by 2002:a05:6402:4312:b0:45c:c1e9:9dc8 with SMTP id m18-20020a056402431200b0045cc1e99dc8mr45490978edc.154.1666876423719;
+        Thu, 27 Oct 2022 06:13:43 -0700 (PDT)
+Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
+        by smtp.gmail.com with ESMTPSA id qo14-20020a170907874e00b00773f3cb67ffsm810765ejc.28.2022.10.27.06.13.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Oct 2022 06:13:42 -0700 (PDT)
+Date:   Thu, 27 Oct 2022 13:13:38 +0000
+From:   Quentin Perret <qperret@google.com>
+To:     Will Deacon <will@kernel.org>
+Cc:     kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
+        Vincent Donnefort <vdonnefort@google.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        James Morse <james.morse@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>, kernel-team@android.com,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v5 20/25] KVM: arm64: Return guest memory from EL2 via
+ dedicated teardown memcache
+Message-ID: <Y1qEAokfFPcLaWiq@google.com>
+References: <20221020133827.5541-1-will@kernel.org>
+ <20221020133827.5541-21-will@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH v6 16/21] x86/virt/tdx: Reserve TDX module global KeyID
-Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
-        dave.hansen@intel.com, dan.j.williams@intel.com,
-        rafael.j.wysocki@intel.com, kirill.shutemov@linux.intel.com,
-        reinette.chatre@intel.com, len.brown@intel.com,
-        tony.luck@intel.com, peterz@infradead.org,
-        isaku.yamahata@intel.com, chao.gao@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
-        sagis@google.com, imammedo@redhat.com
-References: <cover.1666824663.git.kai.huang@intel.com>
- <7558961d3dff6311c7872f57ac5bd6727f21e140.1666824663.git.kai.huang@intel.com>
-From:   Andi Kleen <ak@linux.intel.com>
-In-Reply-To: <7558961d3dff6311c7872f57ac5bd6727f21e140.1666824663.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221020133827.5541-21-will@kernel.org>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thursday 20 Oct 2022 at 14:38:22 (+0100), Will Deacon wrote:
+> +static void
+> +teardown_donated_memory(struct kvm_hyp_memcache *mc, void *addr, size_t size)
+> +{
+> +	size = PAGE_ALIGN(size);
+> +	memset(addr, 0, size);
+> +
+> +	for (void *start = addr; start < addr + size; start += PAGE_SIZE)
+> +		push_hyp_memcache(mc, start, hyp_virt_to_phys);
+> +
+> +	unmap_donated_memory_noclear(addr, size);
+> +}
+> +
+>  int __pkvm_teardown_vm(pkvm_handle_t handle)
+>  {
+> +	struct kvm_hyp_memcache *mc;
+>  	struct pkvm_hyp_vm *hyp_vm;
+>  	unsigned int idx;
+>  	size_t vm_size;
+> @@ -552,7 +565,8 @@ int __pkvm_teardown_vm(pkvm_handle_t handle)
+>  	hyp_spin_unlock(&vm_table_lock);
+>  
+>  	/* Reclaim guest pages (including page-table pages) */
+> -	reclaim_guest_pages(hyp_vm);
+> +	mc = &hyp_vm->host_kvm->arch.pkvm.teardown_mc;
+> +	reclaim_guest_pages(hyp_vm, mc);
+>  	unpin_host_vcpus(hyp_vm->vcpus, hyp_vm->nr_vcpus);
+>  
+>  	/* Push the metadata pages to the teardown memcache */
+> @@ -561,11 +575,11 @@ int __pkvm_teardown_vm(pkvm_handle_t handle)
+>  	for (idx = 0; idx < hyp_vm->nr_vcpus; ++idx) {
+>  		struct pkvm_hyp_vcpu *hyp_vcpu = hyp_vm->vcpus[idx];
+>  
+> -		unmap_donated_memory(hyp_vcpu, sizeof(*hyp_vcpu));
+> +		teardown_donated_memory(mc, hyp_vcpu, sizeof(*hyp_vcpu));
+>  	}
+>  
+>  	vm_size = pkvm_get_hyp_vm_size(hyp_vm->kvm.created_vcpus);
+> -	unmap_donated_memory(hyp_vm, vm_size);
+> +	teardown_donated_memory(mc, hyp_vm, vm_size);
 
-On 10/26/2022 4:16 PM, Kai Huang wrote:
-> TDX module initialization requires to use one TDX private KeyID as the
-> global KeyID to protect the TDX module metadata.  The global KeyID is
-> configured to the TDX module along with TDMRs.
->
-> Just reserve the first TDX private KeyID as the global KeyID.  Keep the
-> global KeyID as a static variable as KVM will need to use it too.
->
-> Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> ---
->   arch/x86/virt/vmx/tdx/tdx.c | 9 +++++++++
->   1 file changed, 9 insertions(+)
->
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index 5d74ada072ca..0820ba781f97 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -62,6 +62,9 @@ static struct tdsysinfo_struct tdx_sysinfo;
->   static struct cmr_info tdx_cmr_array[MAX_CMRS] __aligned(CMR_INFO_ARRAY_ALIGNMENT);
->   static int tdx_cmr_num;
->   
-> +/* TDX module global KeyID.  Used in TDH.SYS.CONFIG ABI. */
-> +static u32 tdx_global_keyid;
+We should move the unpinning of the host's kvm struct down here as 'mc'
+here is part of it. Otherwise nothing prevents the host from unsharing
+the pages and donating them, etc. Probably hard to exploit but still
+worth fixing IMO.
 
+Thanks,
+Quentin
 
-Comment how this is serialized (or doesn't need it)
-
-
-
+>  	return 0;
