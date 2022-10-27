@@ -2,145 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E60F36102C7
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 22:35:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E565A6102E6
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 22:43:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236933AbiJ0UfJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 16:35:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46058 "EHLO
+        id S236103AbiJ0UnT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 16:43:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236370AbiJ0UfD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 16:35:03 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 494146C111
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 13:35:00 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id r61-20020a17090a43c300b00212f4e9cccdso7726379pjg.5
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 13:35:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9ayCoTb3LsKceUxgZcNk0TwTqYqq4AwkbO8gPBAZhj4=;
-        b=Q9Ihh910YBWsYBrBfxxptFJKXGinmxQZrjNfFCjixaDAQgxpP3MVC1syBajdHnsKFT
-         HeN3vkahpIk4emy09QBWuvxPpFJ+G1FK7gl/a7UUbRD7d85ca3rYxj2M/+jmC1LUpdoY
-         zekHh2RzBLqSrVh4hG/F5nsKsUN+J4TFWpWg4eq3tOKBAOCgPiJ0Lmg9GKf7zCrbeFjj
-         wes3u9RxnHt4kzrfACfmNEG+tx29njnYd4ykiY+caF/AZeViFbvr6MJhPwm01Hvgy6Ui
-         fQfcP3QlB6XCLukS7nLZ6/xbPIJLboZ+/w4YxSETgG5vcamhkPymnwpSBTEUoEArsxdV
-         1MMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9ayCoTb3LsKceUxgZcNk0TwTqYqq4AwkbO8gPBAZhj4=;
-        b=TPk/wqekbPcY98LK9c9c/G55X0EcZCZEGeswtq1mawdygFh1fgbXCwF4Ot2fOsPJ4w
-         VDLQEudVkcLS/TzyR7UYmkFeg5V4/X5UqRhXDfjUrUr9VgL2aHWQZY5lLnL0bPFqExLd
-         FH5tnLUEiudMCm6gNTcGXusl2UjTl5HQ+THgc5pWXYOBNwdNqqvNwhY6mCbxDiauvO7U
-         p1lTJ3WQvSa9/jp1/Kuz5It1lokAWOyAF02F4a8SwFplZ1nJntK9jIj347uZ1r5anfEh
-         Bc2uYK+NEizX156E/V2sONYAdWBCv0+n/1pLDc18oA8yyd+OhJLLn9OkK5JctkuTAmhD
-         QW8w==
-X-Gm-Message-State: ACrzQf2ZFEoz5AOkbQe8WoVXdlavqnQv18jBw2iwPQ37FPBvbsXG6CiQ
-        XTv4uQROMeSF4j6UNPJeL5IoGMP7H6h2MQ==
-X-Google-Smtp-Source: AMsMyM5M1ufWvQOAPGPKgX2kTBBZGj2ERWntDBoqnuvSjiXNTomsOes4vULYEWwiuZBQNlvTYePahg==
-X-Received: by 2002:a17:902:8c81:b0:178:a33f:8b8f with SMTP id t1-20020a1709028c8100b00178a33f8b8fmr51818385plo.50.1666902899606;
-        Thu, 27 Oct 2022 13:34:59 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id i7-20020a170902c94700b00181e55d02dcsm1616363pla.139.2022.10.27.13.34.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Oct 2022 13:34:59 -0700 (PDT)
-Date:   Thu, 27 Oct 2022 20:34:56 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: Keep track of the number of memslots with dirty
- logging enabled
-Message-ID: <Y1rrcOcUJMo/VFSK@google.com>
-References: <20221027200316.2221027-1-dmatlack@google.com>
- <20221027200316.2221027-2-dmatlack@google.com>
+        with ESMTP id S234377AbiJ0UnS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 16:43:18 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BE556581D
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 13:43:17 -0700 (PDT)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29RKg0YG013915;
+        Thu, 27 Oct 2022 20:43:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=CBERSXABllz3dTGWZ84YxKOdh+5lW7czF/kzoC5n184=;
+ b=gFrniCogH150ZuDLMS1Jw3p53XoQc+vjueCSOSolt1GeKGGJ2F0CA5/0rpn3XFB3eS+V
+ FBFOgdGFIpe2iun/uLCYfK8vg2BgddnvcxzwgKL4tHG60UFqtYyZXKwgtUDcRCArtfzO
+ xv7ggdJxPSt01dLCGsPRDXkhekW9j3h7NGKo+9CQ/AyiOuH913vaxfYit9esRF7/TppN
+ igatn4/9SsmN8MYSc4TJT2OD9x1RWyUHcetAUzpazt50FMLEh9Aaw6FZY7u5GgItSQbk
+ Yrqo2tdtDee4NTB3g0gQC83kb1wDP+w5M6qHdPzMInWr76mhWCGOld3FjJ2jTiXNeFvE IA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kg18g80h5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Oct 2022 20:43:03 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29RKh3me016934;
+        Thu, 27 Oct 2022 20:43:03 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kg18g80g9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Oct 2022 20:43:02 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29RKa6JG023499;
+        Thu, 27 Oct 2022 20:43:00 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06fra.de.ibm.com with ESMTP id 3kfbg29qtj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Oct 2022 20:43:00 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29RKgvmv39584070
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 27 Oct 2022 20:42:57 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3E9CD4C044;
+        Thu, 27 Oct 2022 20:42:57 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5CE914C040;
+        Thu, 27 Oct 2022 20:42:56 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.94.180])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 27 Oct 2022 20:42:56 +0000 (GMT)
+Message-ID: <4c5afcb5754cb829cd8b9ddbf4f74e610d5f6012.camel@linux.ibm.com>
+Subject: Re: [PATCH v10 2/9] s390x/cpu topology: reporting the CPU topology
+ to the guest
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+Date:   Thu, 27 Oct 2022 22:42:56 +0200
+In-Reply-To: <20221012162107.91734-3-pmorel@linux.ibm.com>
+References: <20221012162107.91734-1-pmorel@linux.ibm.com>
+         <20221012162107.91734-3-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221027200316.2221027-2-dmatlack@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 2mEg6wgO-9ZnB2DOuxRIkGIsoZPZwJqS
+X-Proofpoint-GUID: ljsmVt65CWNw3WFNwknNhLNA6YOrmaVB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-27_07,2022-10-27_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 bulkscore=0 impostorscore=0 mlxscore=0 spamscore=0
+ adultscore=0 suspectscore=0 phishscore=0 mlxlogscore=999 malwarescore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2210270115
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 27, 2022, David Matlack wrote:
-> Add a new field to struct kvm that keeps track of the number of memslots
-> with dirty logging enabled. This will be used in a future commit to
-> cheaply check if any memslot is doing dirty logging.
+On Wed, 2022-10-12 at 18:21 +0200, Pierre Morel wrote:
+> The guest can use the STSI instruction to get a buffer filled
+> with the CPU topology description.
 > 
-> Signed-off-by: David Matlack <dmatlack@google.com>
+> Let us implement the STSI instruction for the basis CPU topology
+> level, level 2.
+> 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->  include/linux/kvm_host.h |  2 ++
->  virt/kvm/kvm_main.c      | 10 ++++++++++
-
-Why put this in common code?  I'm having a hard time coming up with a second use
-case since the count isn't stable, i.e. it can't be used for anything except
-scenarios like x86's NX huge page mitigation where a false negative/positive is benign.
-
->  2 files changed, 12 insertions(+)
+>  include/hw/s390x/cpu-topology.h |   3 +
+>  target/s390x/cpu.h              |  48 ++++++++++++++
+>  hw/s390x/cpu-topology.c         |   8 ++-
+>  target/s390x/cpu_topology.c     | 109 ++++++++++++++++++++++++++++++++
+>  target/s390x/kvm/kvm.c          |   6 +-
+>  target/s390x/meson.build        |   1 +
+>  6 files changed, 172 insertions(+), 3 deletions(-)
+>  create mode 100644 target/s390x/cpu_topology.c
 > 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 32f259fa5801..25ed8c1725ff 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -709,6 +709,8 @@ struct kvm {
->  	struct kvm_memslots __memslots[KVM_ADDRESS_SPACE_NUM][2];
->  	/* The current active memslot set for each address space */
->  	struct kvm_memslots __rcu *memslots[KVM_ADDRESS_SPACE_NUM];
-> +	/* The number of memslots with dirty logging enabled. */
-> +	int nr_memslots_dirty_logging;
-
-I believe this can technically be a u16, as even with SMM KVM ensures the total
-number of memslots fits in a u16.  A BUILD_BUG_ON() sanity check is probably a
-good idea regardless.
-
->  	struct xarray vcpu_array;
+> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
+> index 66c171d0bc..61c11db017 100644
+> --- a/include/hw/s390x/cpu-topology.h
+> +++ b/include/hw/s390x/cpu-topology.h
+> @@ -13,6 +13,8 @@
+>  #include "hw/qdev-core.h"
+>  #include "qom/object.h"
 >  
->  	/* Used to wait for completion of MMU notifiers.  */
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index e30f1b4ecfa5..57e4406005cd 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1641,6 +1641,9 @@ static void kvm_commit_memory_region(struct kvm *kvm,
->  				     const struct kvm_memory_slot *new,
->  				     enum kvm_mr_change change)
->  {
-> +	int old_flags = old ? old->flags : 0;
-> +	int new_flags = new ? new->flags : 0;
-
-Not that it really matters, but kvm_memory_slot.flags is a u32.
-
->  	/*
->  	 * Update the total number of memslot pages before calling the arch
->  	 * hook so that architectures can consume the result directly.
-> @@ -1650,6 +1653,13 @@ static void kvm_commit_memory_region(struct kvm *kvm,
->  	else if (change == KVM_MR_CREATE)
->  		kvm->nr_memslot_pages += new->npages;
->  
-> +	if ((old_flags ^ new_flags) & KVM_MEM_LOG_DIRTY_PAGES) {
-> +		if (new_flags & KVM_MEM_LOG_DIRTY_PAGES)
-> +			kvm->nr_memslots_dirty_logging++;
-> +		else
-> +			kvm->nr_memslots_dirty_logging--;
-
-A sanity check that KVM hasn't botched the count is probably a good idea.  E.g.
-__kvm_set_memory_region() as a WARN_ON_ONCE() sanity check that KVM won't end up
-underflowing nr_memslot_pages.
-
-> +	}
+> +#define S390_TOPOLOGY_POLARITY_H  0x00
 > +
->  	kvm_arch_commit_memory_region(kvm, old, new, change);
+>  typedef struct S390TopoContainer {
+>      int active_count;
+>  } S390TopoContainer;
+> @@ -29,6 +31,7 @@ struct S390Topology {
+>      S390TopoContainer *socket;
+>      S390TopoTLE *tle;
+>      MachineState *ms;
+> +    QemuMutex topo_mutex;
+>  };
 >  
->  	switch (change) {
-> -- 
-> 2.38.1.273.g43a17bfeac-goog
+>  #define TYPE_S390_CPU_TOPOLOGY "s390-topology"
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index 7d6d01325b..d604aa9c78 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
 > 
+[...]
+> +
+> +/* Maxi size of a SYSIB structure is when all CPU are alone in a container */
+
+Max or Maximum.
+
+> +#define S390_TOPOLOGY_SYSIB_SIZE (sizeof(SysIB_151x) +                         \
+> +                                  S390_MAX_CPUS * (sizeof(SysIBTl_container) + \
+> +                                                   sizeof(SysIBTl_cpu)))
+
+Currently this is 16+248*3*8 == 5968 and will grow with books, drawer support to
+16+248*5*8 == 9936 ...
+
+[...]
+> 
+> +
+> +void insert_stsi_15_1_x(S390CPU *cpu, int sel2, __u64 addr, uint8_t ar)
+> +{
+> +    uint64_t page[S390_TOPOLOGY_SYSIB_SIZE / sizeof(uint64_t)] = {};
+
+... so calling this page is a bit misleading. Also why not make it a char[]?
+And maybe use a union for type punning.
+
+> +    SysIB_151x *sysib = (SysIB_151x *) page;
+> +    int len;
+> +
+> +    if (s390_is_pv() || !s390_has_topology() ||
+> +        sel2 < 2 || sel2 > S390_TOPOLOGY_MAX_MNEST) {
+> +        setcc(cpu, 3);
+> +        return;
+> +    }
+> +
+> +    len = setup_stsi(sysib, sel2);
+
+This should now be memory safe, but might be larger than 4k,
+the maximum size of the SYSIB. I guess you want to set cc code 3
+in this case and return.
+> +
+> +    sysib->length = cpu_to_be16(len);
+> +    s390_cpu_virt_mem_write(cpu, addr, ar, sysib, len);
+> +    setcc(cpu, 0);
+> +}
+> +
+> 
+[...]
+
