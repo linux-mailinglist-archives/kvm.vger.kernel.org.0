@@ -2,68 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E44E61026E
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 22:11:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A5708610289
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 22:18:09 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235703AbiJ0ULY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 16:11:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33258 "EHLO
+        id S236900AbiJ0USF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 16:18:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236930AbiJ0ULE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 16:11:04 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6F6D5FF61
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 13:11:00 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id g12so4530185lfh.3
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 13:11:00 -0700 (PDT)
+        with ESMTP id S235798AbiJ0USC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 16:18:02 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A62C8BB8B
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 13:18:01 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id h2so2688740pgp.4
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 13:18:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=F8BavPFOAHXNO09BgfP4Q2HsQ7g6wEbyxvWgdnFD/5M=;
-        b=JYpuyDLHs1elyZB84rUPtDpDc5Tze8rcHtDcDwg/aI7hO7sQ8JQlwLEHu98tyKxDgN
-         rIZfEi5JJBP8HF5VB/RVwFkeHAKDWnnnnoHuJZb712KspOk/EBCLqqkJz952PIy4paUU
-         +dn2WjDUcLoBHJ2U/g0ApXim9ursB0p+DIKGzfJ8iAucmxqbNhiPzlzzvI20GaadVPNs
-         GcwL9Ty/zFL+FvPFQn5pkgboDchWUhd8qRM9Hz8SuHXmyMr2fuRqK9B9MLwV7jitP9mb
-         SkJkw4DHYBfajlzc9Lp67LRfyNpoTgEvUuO/o0t2Zd+qyLdL/V7pL9Q/UVU4xX4N6mAM
-         ig1Q==
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=vxZA1znDy2Dwa1rmOwbVomIIU9aSxHQFmkAXwl2pUiI=;
+        b=E9xAtk27u+gomJ2geVGml8dHpTtRuCOjTijQ9WhsaUHwIoV9YNlmmz0BJ08YEpZtrT
+         gareTQD2qM9w/94K0jnDlsev7NpMCNhRQFAPw8g7929FBB0CP0s3ZC0pIPI+U4dWs/OD
+         8HnAMh7U2HBCF/bEbg4LeHpJ6KhTTC5gzqvdus8Di1IAWkZpMIw3SHMLruNWc9YlC8iB
+         zAb5qxXCn7hPWYEdcRkZ+nB4vNk/SjK5wNwY8irMOgMkksNFKWWlHhqqTpm733NA56+p
+         MDgezKH3UFdjHysuI7V8LsNq8iozRMfgP5fo1MwosnLZBHd4OvhJd0OLf2KX25iacoFY
+         mvJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=F8BavPFOAHXNO09BgfP4Q2HsQ7g6wEbyxvWgdnFD/5M=;
-        b=yTKmWkYfXS4if7iETEq58/qTNa8yeDehe2Q9Dw3gKdcBOP32U+ag0qkCmzMedFKYSp
-         Rpnta3YJI95aYzoNIP3IZTrDJnurEqLyL2Jdxr34DdsclGi4EEiqBGl6tHUbvb8c9gpm
-         beNsiSGnDr0dVTFuEc8u1bLDRNVd7g/CIXAC5XrFeM1sB6J8hz6XiSZk0KN/7T65XFMn
-         HAzPOiiDAckH9XeatL/VGTa/IoRjf4iHqXB5eERxlNI417OkQ6G2OnfQwAuHfpdRlS+Q
-         zTWtd/nbEq6t+aVy3RJMczXye1Htv5xqYy8kDi2bUgVKuX+tjfiMKV52mGBAbTyZsp5O
-         zT4g==
-X-Gm-Message-State: ACrzQf0TeJ1hpSrthD02zWyrJ673lZOtiNpsZe6IMmApgSJ6RPbylC//
-        lqWkftTfPsBkbTZToVfIVkBIevlqB6oX70ZhzpHqSg==
-X-Google-Smtp-Source: AMsMyM4sMrItvaOQO4fUwqfRraRoLkSUR2YnOzX3N/94ueko/879dyN5xzHvi6zcExL6kGcJG7OyK6IJBQcQHnFNYeA=
-X-Received: by 2002:a05:6512:2a91:b0:4a4:69aa:9160 with SMTP id
- dt17-20020a0565122a9100b004a469aa9160mr20269872lfb.313.1666901458915; Thu, 27
- Oct 2022 13:10:58 -0700 (PDT)
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vxZA1znDy2Dwa1rmOwbVomIIU9aSxHQFmkAXwl2pUiI=;
+        b=24130LMEu0+d8v0cjU5SWLrz0v7w+kDVzVkYVAD/nY+6h7RapOKw4yaMoGWFOFLlLN
+         TgoEU9rjLF7qXQDah/gj6w3tdwHF2zTUOYDtybga30Tjq14NvygVEWd6uEJQf6ubOLDe
+         9On9qMEm+6S737K96sVzb5EQ4DQNwuEfe56p3LVQ0hhSphCq496BrVWA6jv7n79WmEkM
+         8HQHsk55FGBq9zcCt2rmyWEBS4a4VcmoCZYoPaNEUen6slwQieGmfbuvW8Fxzghkfoj6
+         fds+JPVS1Kc1Z/N6l2jITgKJx6MS00O0xToUVqqHqpR/RTJOkhq6LPzu81k34ykFu5mw
+         b/6w==
+X-Gm-Message-State: ACrzQf295m2CCXHanzxpP0oruKoSL2kP84I+GDaeVdI3kHJs6m8IDNne
+        O/t7S8w5+7rSIqB7V50iNf13vA==
+X-Google-Smtp-Source: AMsMyM4Ck4Uw9EU5nVym+B7u9G6sWKV+Zi/3X5c7wDMybCNYntNamYLbhrR7859icN98RRhureqCxw==
+X-Received: by 2002:a63:2c90:0:b0:439:ee2c:ab2f with SMTP id s138-20020a632c90000000b00439ee2cab2fmr5103592pgs.2.1666901880453;
+        Thu, 27 Oct 2022 13:18:00 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id jc19-20020a17090325d300b00186ae20e8dcsm1544786plb.271.2022.10.27.13.18.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Oct 2022 13:18:00 -0700 (PDT)
+Date:   Thu, 27 Oct 2022 20:17:56 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        dmatlack@google.com, oupton@google.com, ricarkol@google.com
+Subject: Re: [PATCH v7 1/3] KVM: selftests: implement random number
+ generation for guest code
+Message-ID: <Y1rndFkw7LcfQkZU@google.com>
+References: <Y1miBTa4cID5yH3Z@google.com>
+ <gsntv8o5126y.fsf@coltonlewis-kvm.c.googlers.com>
 MIME-Version: 1.0
-References: <20221027150558.722062-1-pgonda@google.com> <20221027150558.722062-2-pgonda@google.com>
- <10e7e8df-69ba-c1bc-1f94-c77fe64774ab@amd.com>
-In-Reply-To: <10e7e8df-69ba-c1bc-1f94-c77fe64774ab@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Thu, 27 Oct 2022 14:10:47 -0600
-Message-ID: <CAMkAt6qzW0oW=2Mvq0uO+ccwRyYcRAkDoF47mH4hMET5wASzsQ@mail.gmail.com>
-Subject: Re: [PATCH V3 1/2] virt: sev: Prevent IV reuse in SNP guest driver
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Dionna Glaze <dionnaglaze@google.com>,
-        Borislav Petkov <bp@suse.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Haowen Bai <baihaowen@meizu.com>,
-        Yang Yingliang <yangyingliang@huawei.com>,
-        Marc Orr <marcorr@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Ashish Kalra <Ashish.Kalra@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <gsntv8o5126y.fsf@coltonlewis-kvm.c.googlers.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -75,113 +75,105 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 27, 2022 at 12:06 PM Tom Lendacky <thomas.lendacky@amd.com> wrote:
->
-> On 10/27/22 10:05, Peter Gonda wrote:
-> > The ASP and an SNP guest use a series of AES-GCM keys called VMPCKs to
-> > communicate securely with each other. The IV to this scheme is a
-> > sequence number that both the ASP and the guest track. Currently this
-> > sequence number in a guest request must exactly match the sequence
-> > number tracked by the ASP. This means that if the guest sees an error
-> > from the host during a request it can only retry that exact request or
-> > disable the VMPCK to prevent an IV reuse. AES-GCM cannot tolerate IV
-> > reuse see:
-> > https://csrc.nist.gov/csrc/media/projects/block-cipher-techniques/documents/bcm/comments/800-38-series-drafts/gcm/joux_comments.pdf
-> >
-> > To handle userspace querying the cert_data length. Instead of requesting
-> > the cert length from userspace use the size of the drivers allocated
-> > shared buffer. Then copy that buffer to userspace, or give userspace an
-> > error depending on the size of the buffer given by userspace.
-> >
-> > Fixes: fce96cf044308 ("virt: Add SEV-SNP guest driver")
-> > Signed-off-by: Peter Gonda <pgonda@google.com>
-> > Reported-by: Peter Gonda <pgonda@google.com>
-> > Reviewed-by: Dionna Glaze <dionnaglaze@google.com>
-> > Cc: Borislav Petkov <bp@suse.de>
-> > Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> > Cc: Michael Roth <michael.roth@amd.com>
-> > Cc: Haowen Bai <baihaowen@meizu.com>
-> > Cc: Yang Yingliang <yangyingliang@huawei.com>
-> > Cc: Marc Orr <marcorr@google.com>
-> > Cc: David Rientjes <rientjes@google.com>
-> > Cc: Ashish Kalra <Ashish.Kalra@amd.com>
-> > Cc: linux-kernel@vger.kernel.org
-> > Cc: kvm@vger.kernel.org
-> > ---
-> >   drivers/virt/coco/sev-guest/sev-guest.c | 93 ++++++++++++++++---------
-> >   1 file changed, 62 insertions(+), 31 deletions(-)
-> >
-> > diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
-> > index f422f9c58ba7..8c54ea84bc57 100644
-> > --- a/drivers/virt/coco/sev-guest/sev-guest.c
-> > +++ b/drivers/virt/coco/sev-guest/sev-guest.c
-> > @@ -41,7 +41,7 @@ struct snp_guest_dev {
-> >       struct device *dev;
-> >       struct miscdevice misc;
-> >
-> > -     void *certs_data;
-> > +     u8 (*certs_data)[SEV_FW_BLOB_MAX_SIZE];
-> >       struct snp_guest_crypto *crypto;
-> >       struct snp_guest_msg *request, *response;
-> >       struct snp_secrets_page_layout *layout;
-> > @@ -67,8 +67,27 @@ static bool is_vmpck_empty(struct snp_guest_dev *snp_dev)
-> >       return true;
-> >   }
-> >
-> > +/*
-> > + * If we receive an error from the host or ASP we have two options. We can
-> > + * either retry the exact same encrypted request or we can discontinue using the
-> > + * VMPCK.
-> > + *
-> > + * This is because in the current encryption scheme GHCB v2 uses AES-GCM to
-> > + * encrypt the requests. The IV for this scheme is the sequence number. GCM
-> > + * cannot tolerate IV reuse.
-> > + *
-> > + * The ASP FW v1.51 only increments the sequence numbers on a successful
-> > + * guest<->ASP back and forth and only accepts messages at its exact sequence
-> > + * number.
-> > + *
-> > + * So if we were to reuse the sequence number the encryption scheme is
-> > + * vulnerable. If we encrypt the sequence number for a fresh IV the ASP will
-> > + * reject our request.
-> > + */
-> >   static void snp_disable_vmpck(struct snp_guest_dev *snp_dev)
-> >   {
-> > +     dev_alert(snp_dev->dev, "Disabling vmpck_id: %d to prevent IV reuse.\n",
-> > +               vmpck_id);
-> >       memzero_explicit(snp_dev->vmpck, VMPCK_KEY_LEN);
-> >       snp_dev->vmpck = NULL;
-> >   }
-> > @@ -326,29 +345,29 @@ static int handle_guest_request(struct snp_guest_dev *snp_dev, u64 exit_code, in
-> >       if (fw_err)
-> >               *fw_err = err;
-> >
-> > -     if (rc)
-> > -             return rc;
-> > +     if (rc) {
-> > +             dev_alert(snp_dev->dev,
-> > +                       "Detected error from ASP request. rc: %d, fw_err: %llu\n",
-> > +                       rc, *fw_err);
-> > +             goto disable_vmpck;
-> > +     }
->
-> Realize that snp_issue_guest_request() will return -EIO in the case that
-> the returned SW_EXITINFO2 value is SNP_GUEST_REQ_INVALID_LEN. So all the
-> work you do below in get_ext_report() doesn't matter because you end up
-> disabling the key here.
->
-> So maybe this patch should be split up and parts of it added to the second
-> patch (but that patch seems like it would still hit this issue because
-> -EIO is still returned.
->
+On Thu, Oct 27, 2022, Colton Lewis wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> 
+> > On Wed, Oct 19, 2022, Colton Lewis wrote:
+> > > Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> > > Reviewed-by: Ricardo Koller <ricarkol@google.com>
+> > > Reviewed-by: David Matlack <dmatlack@google.com>
+> 
+> > This patch has changed a fair bit since David and Ricardo gave their
+> > reviews, their Reviewed-by's should be dropped.  Alternatively, if a patch
+> > has is on the fence so to speak, i.e. has changed a little bit but not
+> > thaaaaat much, you can add something in the cover letter, e.g.
+> > "David/Ricardo, I kept your reviews, let me know if that's not ok".  But in
+> > this case, I think the code has changed enough that their reviews should be
+> > dropped.
+> 
+> 
+> I talked to Ricardo privately and he thought it was ok to leave the
+> names in this borderline case.
 
-Ack I see that. My testing didn't catch this since I realized I didn't
-actually load any certificate data into the host. After doing so my
-testing catches this bug.
+Heh, damned if you do, damned if you don't.  On a more serious note, this is why
+I avoid doing off-list reviews except for the most basic sanity checks.  Ask two
+people for their opinion and inevitably you'll get two different answers :-)
+By asking and responding on-list, there's is (a) a paper trail and (b) a chance
+for others to object before the decision is "finalized".
 
-I agree with Dionna's comments on 2/2. My suggestion would be to keep
-the constraint that either handle_guest_request() leaves the sequence
-number in a good state or disables the VMPCK. After seeing her V4
-series I suggest we take this patch and follow up on the certificate
-querying with the further changes to snp_issue_guest_request().
-Thoughts?
+> IMO, changing this interface doesn't change anything important of what the
+> patch is doing.
+
+Right, but the code is different.  E.g. hypothetically, if you botched something
+while reworking the code to fit the new interace, then it looks as if multiple
+people gave a thumbs up to broken code, which can cause a maintainer to not give
+the patch as much scrutiny as that might to a patch without reviews.
+
+A recent example that's somewhat similar is commit 4293ddb788c1 ("KVM: x86/mmu:
+Remove redundant spte present check in mmu_set_spte"), where a conflict during a
+rebase of a relatively simple patch was mishandled and resulted in a buggy commit
+with three Reviewed-by tags where none of the reviews were given for the buggy
+code.  There's no guarantee the bug would have been caught if the Reviewed-by
+tags had been dropped, but a "hey, I dropped your reviews from patch XYZ" likely
+would have drawn eyeballs to the patch in question.
+
+> Nevertheless, I'll drop the names and ask them to reconfirm.
+
+FWIW, if you've confirmed offline that someone is ok keeping _their_ review, that's
+totally fine, though throwing a comment in the cover letter is probably a good
+idea in that case.  That's a decent rule of thumb in general; if a decision was
+made off-list, make a note of it on-list to keep others in the loop.
+
+> > I think it makes sense to introduce "struct guest_random_state" separately
+> > from the usage in perf_test_util and dirty_log_perf_test.  E.g. so that if
+> > we need to revert the perf_test_util changes (extremely unlikely), we can
+> > do so without having to wipe out the pRNG at the same time.  Or so that
+> > someone can pull in the pRNG to their series without having to take a
+> > dependency on the other changes.
+> 
+> Will do. Was attempting to avoid adding unused code in its own commit
+> according to
+> https://www.kernel.org/doc/html/latest/process/5.Posting.html
+> 
+> "Whenever possible, a patch which adds new code should make that code
+> active immediately."
+
+Yeah, this is another "rule" that is sometimes subjective, e.g. in this case it
+conflicts with the "one change per patch" rule.  Since the RNG code can't be made
+completely active without pulling in yet more code (the guest_random_u32() usage
+in the next path), the intended benefit of the "use immediately" rule isn't really
+achieved, and so forcing the issue is a net negative.
+
+> > > diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c
+> > > b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> > > index 9618b37c66f7..5f0eebb626b5 100644
+> > > --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
+> > > +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> > > @@ -49,6 +49,7 @@ void perf_test_guest_code(uint32_t vcpu_idx)
+> > >   	uint64_t gva;
+> > >   	uint64_t pages;
+> > >   	int i;
+> > > +	struct guest_random_state rand_state =
+> > > new_guest_random_state(pta->random_seed + vcpu_idx);
+> 
+> > lib/perf_test_util.c: In function ‘perf_test_guest_code’:
+> > lib/perf_test_util.c:52:35: error: unused variable ‘rand_state’
+> > [-Werror=unused-variable]
+> >     52 |         struct guest_random_state rand_state =
+> > new_guest_random_state(pta->random_seed + vcpu_idx);
+> >        |                                   ^~~~~~~~~~
+> 
+> > This belongs in the next path.  I'd also prefer to split the declaration
+> > from the
+> > initialization as this is an unnecessarily long line, e.g.
+> 
+> Understood that this is implied by the previous comment. As for the line
+> length, checkpatch doesn't complain.
+
+Checkpatch now only complains if the line length is >100, but there is still an 80
+column "soft" limit that is preferred by most of the kernel, KVM included.
+Checkpatch was relaxed because too many people were wrapping code in really weird
+places "because checkpatch complained", but preferred style is still to say under
+the soft limit.
+
+In other words, stay under the soft limit unless the alternative sucks worse :-)
