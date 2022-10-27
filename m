@@ -2,68 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2675D60FABA
-	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 16:45:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A67A460FAE3
+	for <lists+kvm@lfdr.de>; Thu, 27 Oct 2022 16:55:08 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235764AbiJ0Opj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 10:45:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54722 "EHLO
+        id S235709AbiJ0OzE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 10:55:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235979AbiJ0OpU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 10:45:20 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77D85915DD
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 07:45:03 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id v4-20020a17090a088400b00212cb0ed97eso1645113pjc.5
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 07:45:03 -0700 (PDT)
+        with ESMTP id S235924AbiJ0OzB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 10:55:01 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4F9130541
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 07:54:59 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id b185so1769047pfb.9
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 07:54:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UwTsZJHpAarkVCfMmsk/OcucFJNCKaSnInJ8QxuSXZU=;
-        b=sK/ZCJilVFiHN1C0llpajbcmWUhuBQurlUT399lNJzCA0S5H5AVjT9UEHO3rZJ6QnD
-         XHmXOoBts3sIQ077Efrq2L+3+g2e2zApUrPZMO/CqimWYKvcZ76QrOLwmpHo8UEtV3aP
-         4u/64rq6qi3zm/WP4EB2sGC8AAgZ144Bes9/ryGoUrzIL6wvWV2fl5+GiHG1/1Nxxi59
-         T222EcV2+nJo/5p20aqajWU1WHXIJ5H2OjYXx/qq3fTcc3rWdLGsSlh7ud0zN5GQqT9K
-         3bMw79j+IX73Cwwauwy+3N/n/a2HM3TPVbQ1Rw++8ZJbqNzOn4Vm8j/fEPLiQbhaSsHL
-         HACQ==
+        bh=kPYnXX3okow1kRCKteMrz1kZILFzqyga2dfyqPNexuw=;
+        b=cEfkDhbsG3tWzlruT2T+yhVrvDC0e4ykbkS6TUSvMJMueQ6BVIDiPTsqqcYZtsTc+8
+         LrYzP001ez9kpMJ/QQd4Gu+VMdkTELU1EMtFejqQc/LP9szyilchAjELqL/mwXd8ndzw
+         fywoH45H9zctKGaXnyld1myb4JXGwSCqPQYXLXtMcFJYgtPD5EdFILCHZgFvPMCs4Uow
+         +CVTppidf6VdXwZikxsTU+BJ+3ezaYvp6t/gSF/OTniNM53VRtW/XuAZ1+wZLTDliLEV
+         oqhC5aYEj4e5JZFE6h8T/Rq2k9QV3HQwEqmq84tVGXIDG3D9shf5SWJICcQjADFliAMU
+         lhKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UwTsZJHpAarkVCfMmsk/OcucFJNCKaSnInJ8QxuSXZU=;
-        b=ZCCpycWodSPlgoKCJ15hHFmrYw+69j9WtXaWu3ulzxDgZGL+p6LXVoDCd06koucF6o
-         D5iHZqXhECV2TRxs6b2/hHBuMSGx1Q04wlqXdIt9843sHOp8MmEZyfrqKqVhEGmTfYlr
-         A0cy/+c1FXz3U38tv+R17uWB1P1Ic3ER/76JRbQFA6W9L8w+PhaQstbWEA+cOg936nLa
-         xRwNAKY6ddetJJ6gKWehSSRzKNd5O4TmnJMauRmhIPHa9wzpNleoFUK2kpvHcWcxmnwc
-         CsChdDzm1aP8kFbJA22Ef2kZqDVG1mGng+dI/NQb9H3m9Q2icLnCHeCGFdBmoVOBXl/l
-         xoFw==
-X-Gm-Message-State: ACrzQf0tgCLdJgPyLC3s9bHSIqJuBYogmduwypfMzopzBXchXIPa4QnP
-        dyondX8P8j00mxQ3i+Bz2heu2w==
-X-Google-Smtp-Source: AMsMyM7fOuK6peBJcnI1TXb7UvVWM0eTPQ6E2PcmhFOfxFUx13hJ6BhpqTQVGe2EVDMr8wWj+QGbwg==
-X-Received: by 2002:a17:902:bc88:b0:185:4421:250 with SMTP id bb8-20020a170902bc8800b0018544210250mr48418471plb.29.1666881902856;
-        Thu, 27 Oct 2022 07:45:02 -0700 (PDT)
+        bh=kPYnXX3okow1kRCKteMrz1kZILFzqyga2dfyqPNexuw=;
+        b=KZyog6dTVx9egL1ojxmGs+KUovTRnieVgIxcKJMG/uvv7FzI+gqNRjBYxKmUkdju4r
+         rEhxZFDfv73EmLeTH2pEi11Zs+Fi00qCTDQ1dTXCtn4tdSp9yj4HC+qdAXiHl0ZfWaUp
+         9g8c+wPHKwFpdLrSP367yEYvLTafHQwcNnNlc5azHbEVmXtND3tf8LLtClUDq+iO4Nhb
+         EFyue+IUefwmDFQNk1z8Q2FQyj0pCGv8YjlbXusMEByN/rA5ZgGpwgYIAE1wCfBLM3tm
+         iAhOig4CyY52NLDg4RIEwW1oP1MKB2yxOEvPSYpzOTEpLPi4ieGQ6wWzQlZZl8/EcL/w
+         6Edw==
+X-Gm-Message-State: ACrzQf0vBq+4iiAAvykLevyoDC5D7FPg1BNBTpStiesufLgqPTvE6Twk
+        pknyeH7qjbWsdhGxmeNqw5kXUg==
+X-Google-Smtp-Source: AMsMyM77yVvmwPODxDgAB3imONWVBFbWeOxtNYJsvGc7QT0gYGTWB6Y7DO0uZ0fKfEYkiUdl/H/obw==
+X-Received: by 2002:a63:c112:0:b0:443:94a1:f09 with SMTP id w18-20020a63c112000000b0044394a10f09mr42823906pgf.396.1666882499230;
+        Thu, 27 Oct 2022 07:54:59 -0700 (PDT)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id t2-20020a170902e84200b00176dc67df44sm1316925plg.132.2022.10.27.07.45.02
+        by smtp.gmail.com with ESMTPSA id 5-20020a170902e9c500b0018691ce1696sm1310297plk.131.2022.10.27.07.54.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Oct 2022 07:45:02 -0700 (PDT)
-Date:   Thu, 27 Oct 2022 14:44:58 +0000
+        Thu, 27 Oct 2022 07:54:58 -0700 (PDT)
+Date:   Thu, 27 Oct 2022 14:54:55 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Michal Luczaj <mhal@rbox.co>,
-        David Woodhouse <dwmw2@infradead.org>
-Subject: Re: [PATCH v2 03/16] KVM: x86: Always use non-compat
- vcpu_runstate_info size for gfn=>pfn cache
-Message-ID: <Y1qZagwM0dMBjYhe@google.com>
-References: <20221013211234.1318131-1-seanjc@google.com>
- <20221013211234.1318131-4-seanjc@google.com>
- <afad5f40-03ef-1380-9bfe-03bbaaed47a9@redhat.com>
+To:     "Wang, Wei W" <wei.w.wang@intel.com>
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "dmatlack@google.com" <dmatlack@google.com>,
+        "vipinsh@google.com" <vipinsh@google.com>,
+        "ajones@ventanamicro.com" <ajones@ventanamicro.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v1 03/18] KVM: selftests/kvm_util: helper functions for
+ vcpus and threads
+Message-ID: <Y1qbv/HdkuILzNSa@google.com>
+References: <20221024113445.1022147-1-wei.w.wang@intel.com>
+ <20221024113445.1022147-4-wei.w.wang@intel.com>
+ <Y1nMQp11RKTDX7HX@google.com>
+ <DS0PR11MB6373FBC16E8515174E444692DC339@DS0PR11MB6373.namprd11.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <afad5f40-03ef-1380-9bfe-03bbaaed47a9@redhat.com>
+In-Reply-To: <DS0PR11MB6373FBC16E8515174E444692DC339@DS0PR11MB6373.namprd11.prod.outlook.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -75,55 +80,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 27, 2022, Paolo Bonzini wrote:
-> On 10/13/22 23:12, Sean Christopherson wrote:
-> > Always use the size of Xen's non-compat vcpu_runstate_info struct when
-> > checking that the GPA+size doesn't cross a page boundary.  Conceptually,
-> > using the current mode is more correct, but KVM isn't consistent with
-> > itself as kvm_xen_vcpu_set_attr() unconditionally uses the "full" size
-> > when activating the cache.  More importantly, prior to the introduction
-> > of the gfn_to_pfn_cache, KVM _always_ used the full size, i.e. allowing
-> > the guest (userspace?) to use a poorly aligned GPA in 32-bit mode but not
-> > 64-bit mode is more of a bug than a feature, and fixing the bug doesn't
-> > break KVM's historical ABI.
+On Thu, Oct 27, 2022, Wang, Wei W wrote:
+> On Thursday, October 27, 2022 8:10 AM, Sean Christopherson wrote:
+> > > +void vm_vcpu_threads_create(struct kvm_vm *vm,
+> > > +		void *(*start_routine)(void *), uint32_t private_data_size)
+> > 
+> > I vote (very strongly) to not deal with allocating private data.  The private data
+> > isn't strictly related to threads, and the vast majority of callers don't need private
+> > data, i.e. the param is dead weight in most cases.
+> > 
+> > And unless I'm missing something, it's trivial to move to a separate helper,
+> > though honestly even that seems like overkill.
+> > 
+> > Wait, looking further, it already is a separate helper...  Forcing a bunch of
+> > callers to specify '0' just to eliminate one function call in a handful of cases is not
+> > a good tradeoff.
 > 
-> I'd rather not introduce additional restrictions in KVM,
+> The intention was to do the allocation within one vm_for_each_vcpu()
+> iteration when possible. Just a micro-optimization, but no problem, we can keep
+> them separate if that looks better (simpler).
 
-But KVM already has this restriction.  "struct vcpu_info" is always checked for
-the non-compat size, and as above, "struct vcpu_runstate_info" is checked for the
-non-compat size during its initialization.
+Keep them separate, that level of optimization is not something that's ever going
+to be noticeable.
 
-> actually easy to avoid this patch by instead enforcing that attributes are
-> set in a sensible order:
-
-I don't care about fixing XEN support, I care about forcing "length" to be immutable
-in order to simplify the gfn_to_pfn_cache implementation.  Avoiding this patch
-prevents doing that later in this series.
-
-> - long mode cannot be changed after the shared info page is enabled (which
-> makes sense because the shared info page also has a compat version)
-
-How is this not introducing an additional restriction?  This seems way more
-onerous than what is effectively a revert.
-
-> - the caches must be activated after the shared info page (which enforces
-> that the vCPU attributes are set after the VM attributes)
-> 
-> This is technically a userspace API break, but nobody is really using this
-> API outside Amazon so...  Patches coming after I finish testing.
-
-It's not just userspace break, it affects the guest ABI as well.  arch.xen.long_mode
-isn't set just by userspace, it's also snapshot when the guest changes the hypercall
-page.  Maybe there's something in the XEN ABI that says the hypercall page can never
-be changed, but barring that I don't see how to prevent ending up with a misaligned
-cache due to the guest enabling long mode.
-
-  int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
-  {
-	struct kvm *kvm = vcpu->kvm;
-	u32 page_num = data & ~PAGE_MASK;
-	u64 page_addr = data & PAGE_MASK;
-	bool lm = is_long_mode(vcpu);
-
-	/* Latch long_mode for shared_info pages etc. */
-	vcpu->kvm->arch.xen.long_mode = lm;
+I don't want to say that performance is an afterthought for KVM selftests, but in
+common code it's definitely way down the list of priorities because even the most
+naive implementation for things like configuring vCPUs is going to have a runtime
+measured in milliseconds.
