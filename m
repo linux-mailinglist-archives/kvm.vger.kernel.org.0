@@ -2,63 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8665A611D1A
-	for <lists+kvm@lfdr.de>; Sat, 29 Oct 2022 00:02:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0AD7611D77
+	for <lists+kvm@lfdr.de>; Sat, 29 Oct 2022 00:42:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229835AbiJ1WCB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Oct 2022 18:02:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55822 "EHLO
+        id S229661AbiJ1Wmb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Oct 2022 18:42:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230188AbiJ1WBx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Oct 2022 18:01:53 -0400
-Received: from mail-oa1-x2b.google.com (mail-oa1-x2b.google.com [IPv6:2001:4860:4864:20::2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBEC3246C1D
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 15:01:49 -0700 (PDT)
-Received: by mail-oa1-x2b.google.com with SMTP id 586e51a60fabf-12c8312131fso7785106fac.4
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 15:01:49 -0700 (PDT)
+        with ESMTP id S229458AbiJ1Wm3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Oct 2022 18:42:29 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 673281BA1EF
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 15:42:28 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id q1-20020a17090a750100b002139ec1e999so1365980pjk.1
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 15:42:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=A02e8sBdhkAFHlKOQrgQidSWAiZAEUfwAZZwCce8UM0=;
-        b=PYr8Tz9L+0yrX4g1ONBhCtetZ1hAjGI4rISzlYiyWPym0MWMpTFW6lCGhNAnBYeQJH
-         WnF96urxWLwKHgu0E5ecF+HxVeBF1q0yVZjXVC4vNud7Tsa6Ui9enxFxG2h1t4KCDjoU
-         n0CgKUByJA7Xf2HUfOL3TgLB5VMFZ4fFBln0TpZHGy3LSTWh9nAXoRi+CliWW2c1OqCy
-         CuXiq+8UGOSgz7ZA2XzFoO8cY6i8Mnp2afyOnKD70F5KOunUMo5kcF7r7aE1qZu0EcuI
-         1GxCuahZddfYtcpJDCkyU55Epl8SxfPt2FsAesNcCAIgSdplT+Pfqj13aqZhznqXwkHm
-         06tA==
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=qiyREI2SgqEB0J7OWHvr962cdqJ8Dp9P5OV9egU229Y=;
+        b=RMT+IuqVyDLxzVmXaVtVtqLevGLIyWNxAWTJBPXpIiQWhWr2HbTMty6+sDQVRUAPva
+         +lRry2mLQfsIjIOH1wclj9jcvG8dGoOGwtjb2sOTHDuX9EoZ7dfMWrYUUIQ9yr6i00Q7
+         jyJ6hPbNO+Npnuxj/JkvV3C7J72NONB7xto3ixhTU4ZbfYYqApiQiKPp/YGYEY9Di3YO
+         IrGaw2VOWZpf+mPFPUVUSt2+p607jbxmqSUk/hRYMl4CeBmTnPIpcd5LvTBmnBl+D3ry
+         ZsnR2POs2hnnRJBpzSHh6XSuRX2nuzvOmpYaErnyg9eT2C5vngho7r+qU3mDogzBh4T3
+         AxxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=A02e8sBdhkAFHlKOQrgQidSWAiZAEUfwAZZwCce8UM0=;
-        b=jg58hKNnW2Hq54euq/ppEk3eP9z/kPA8jW1aBZ/5/r1kUDXojnC+BSELoUDrTeR+lr
-         LlzZJL4+6pNE5SLV9kQZhdZT8+81moDbuResGIar2iR1VnrGOJLtVdAESqz1QqTMG/DN
-         xFIK6UT8Gpl2NUyiC8QwRo62VYXYnIx6fPJnegJ5G3yHivwItPnwJ3ZbMEHpeWIlN5Ww
-         3C7mbNM1q0Sf+i6r0hLaPVfVBIv5F+wtYI8imNWSZY5Iq1MiufH45N4DWZNSJQsLJKqc
-         XszwDErhOvVddebrmUUgih4iP73OxIcqwMD1x4y94B/aAAoOkf2JgmMEM5AaicsL3Y3C
-         x8yQ==
-X-Gm-Message-State: ACrzQf26qNcxEG+1DMC0Vll+hbmowF3SzRDC19v4/ja6QqnQ9fjMJNyA
-        GrnEptKwlQz1XIyy9dedUg/wGs+jmW8A+sCvj7LpCA==
-X-Google-Smtp-Source: AMsMyM4R7Bp9BV2PWN6PaGtpPnepNEzAKw0MR9Tcfs/MY8mxbWrLRClj6y34RI9sDlhP1kFzO5QmVJHkOtKIHh8SFoE=
-X-Received: by 2002:a05:6871:8a3:b0:13b:18ef:e8df with SMTP id
- r35-20020a05687108a300b0013b18efe8dfmr723703oaq.181.1666994508369; Fri, 28
- Oct 2022 15:01:48 -0700 (PDT)
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qiyREI2SgqEB0J7OWHvr962cdqJ8Dp9P5OV9egU229Y=;
+        b=ATxsrV3amWoWkD4eSRefhxwXFAFy2CUDA3CwpC6TWRgakb5iKmZeYyselDUc58rtqe
+         z6t7vAmbYIQMUQkgnfYtvEkI2+Cg7GPw7t+Gn9KiaeLrvzw2I2qziKgxbHa4gkiFnqqt
+         FN6LMvTcVw4M0xR9AU+bB94QFhqW0IOiFIgRfvWAMG0Jh0upZ6AwL+Pjz+4c0ID5padG
+         /gXztQtwmuge0HiBX7nu1n8HlipL4QkfQXYoX8m0jYrV8HkeAf1pSsHavZr+KTNTf9yh
+         BWtKbKoWBrV8jPwosYt0UkukdHZR9aKw/YMPF8Blb2WV/CJiO1y9tw/3eroZGsKCTtdw
+         6JAg==
+X-Gm-Message-State: ACrzQf2i8Zh+mFobvvwkakCyae06WGddsPvEyxo6Mb0CPRcx5wnQvHYg
+        eAgdGeJ9M+dizCFviNFgKMoAEw==
+X-Google-Smtp-Source: AMsMyM5+xtov/mwzo9L/TFZOlK/NdN5EmaYAp4NRYJSIxKolirKLt73cS+s9Xvq9FbBvgdjT7hY+lw==
+X-Received: by 2002:a17:902:f683:b0:184:d45b:a096 with SMTP id l3-20020a170902f68300b00184d45ba096mr1267483plg.23.1666996947750;
+        Fri, 28 Oct 2022 15:42:27 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id f13-20020a63f74d000000b00462612c2699sm3175221pgk.86.2022.10.28.15.42.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Oct 2022 15:42:27 -0700 (PDT)
+Date:   Fri, 28 Oct 2022 22:42:23 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Yang Zhong <yang.zhong@intel.com>, x86@kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Guang Zeng <guang.zeng@intel.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        linux-kselftest@vger.kernel.org, Kees Cook <keescook@chromium.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Wei Wang <wei.w.wang@intel.com>,
+        Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH RESEND v4 00/23] SMM emulation and interrupt shadow fixes
+Message-ID: <Y1xaz4pkH2FYSYvA@google.com>
+References: <20221025124741.228045-1-mlevitsk@redhat.com>
+ <0e3a0cab-1093-3e83-9e9c-f8639ebe5da0@redhat.com>
+ <b0e8da09162cc6f2194e445a6e566f1bc356d5d0.camel@redhat.com>
+ <4ce3d40e-9b2a-5f81-fc62-839f788fed16@redhat.com>
 MIME-Version: 1.0
-References: <20221028130035.1550068-1-aaronlewis@google.com>
- <Y1wCqAzJwvz4s8OR@google.com> <CAAAPnDEda-FBz+3suqtA868Szwp-YCoLEmK1c=UynibTWCU1hw@mail.gmail.com>
- <Y1xOvenzUxFIS0iz@google.com>
-In-Reply-To: <Y1xOvenzUxFIS0iz@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 28 Oct 2022 15:01:37 -0700
-Message-ID: <CALMp9eT9S4_k9cFR26idssjV+Yz4VH23hXA10PVTGJwNALKeWw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Fix a stall when KVM_SET_MSRS is called on the
- pmu counters
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4ce3d40e-9b2a-5f81-fc62-839f788fed16@redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -70,40 +88,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 28, 2022 at 2:51 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Oct 28, 2022, Aaron Lewis wrote:
-> > On Fri, Oct 28, 2022 at 4:26 PM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > On Fri, Oct 28, 2022, Aaron Lewis wrote:
-> > > @@ -3778,16 +3775,13 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> > >
-> > >     case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR3:
-> > >     case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR1:
-> > > -        pr = true;
-> > > -        fallthrough;
-> > >     case MSR_K7_EVNTSEL0 ... MSR_K7_EVNTSEL3:
-> > >     case MSR_P6_EVNTSEL0 ... MSR_P6_EVNTSEL1:
-> > >         if (kvm_pmu_is_valid_msr(vcpu, msr))
-> > >             return kvm_pmu_set_msr(vcpu, msr_info);
-> > >
-> > > -        if (pr || data != 0)
-> > > -            vcpu_unimpl(vcpu, "disabled perfctr wrmsr: "
-> > > -                  "0x%x data 0x%llx\n", msr, data);
-> > > +        if (data)
-> > > +            kvm_pr_unimpl_wrmsr(vcpu, msr, data);
-> >
-> > Any reason to keep the check for 'data' around?  Now that it's
-> > checking for 'report_ignored_msrs' maybe we don't need that check as
-> > well.  I'm not sure what the harm is in removing it, and with this
-> > change we are additionally restricting pmu counter == 0 from printing.
->
-> Checking 'dat' doesn't restrict counter 0, it skips printing if the guest (or host)
-> is writing '0', e.g. it would also skip the case you encountered where the host is
-> blindly "restoring" unused MSRs.
+On Fri, Oct 28, 2022, Paolo Bonzini wrote:
+> On 10/27/22 19:06, Maxim Levitsky wrote:
+> > On Thu, 2022-10-27 at 18:49 +0200, Paolo Bonzini wrote:
+> > > On 10/25/22 14:47, Maxim Levitsky wrote:
+> > > > This patch series is a result of long debug work to find out why
+> > > > sometimes guests with win11 secure boot
+> > > > were failing during boot.
+> > > > 
+> > > > During writing a unit test I found another bug, turns out
+> > > > that on rsm emulation, if the rsm instruction was done in real
+> > > > or 32 bit mode, KVM would truncate the restored RIP to 32 bit.
+> > > > 
+> > > > I also refactored the way we write SMRAM so it is easier
+> > > > now to understand what is going on.
+> > > > 
+> > > > The main bug in this series which I fixed is that we
+> > > > allowed #SMI to happen during the STI interrupt shadow,
+> > > > and we did nothing to both reset it on #SMI handler
+> > > > entry and restore it on RSM.
+> > > 
+> > > I have now sent out the final/new version of the first 8 patches and
+> > > will review these tomorrow.  Thanks for your patience. :)
+> > > 
+> > > Paolo
+> > > 
+> > Thank you very much!!
+> 
+> Queued, thanks.  Note that some emulator patches should go in stable
+> releases so I have reordered them in front.
 
-The VMM is only blind because KVM_GET_MSR_INDEX_LIST poked it in the
-eye. It would be nice to have an API that the VMM could query for the
-list of supported MSRs.
+Can you fix patch 04 (also patch 04 in your series[*]) before pushing to kvm/queue?
+The unused variable breaks CONFIG_KVM_WERROR=y builds.
 
-> Or did I misunderstand your comment?
+arch/x86/kvm/smm.c: In function ‘emulator_leave_smm’:
+arch/x86/kvm/smm.c:567:33: error: unused variable ‘efer’ [-Werror=unused-variable]
+  567 |         unsigned long cr0, cr4, efer;
+      |                                 ^~~~
+arch/x86/kvm/smm.c:567:28: error: unused variable ‘cr4’ [-Werror=unused-variable]
+  567 |         unsigned long cr0, cr4, efer;
+      |                      
+
+[*] https://lore.kernel.org/all/Y1xNso2nYZkSSZ0T@google.com
