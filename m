@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D6406610F1F
-	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 12:54:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 789EC610F18
+	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 12:54:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230199AbiJ1Kyd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Oct 2022 06:54:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52864 "EHLO
+        id S230197AbiJ1KyX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Oct 2022 06:54:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231173AbiJ1KyS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Oct 2022 06:54:18 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDC33108256
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 03:54:17 -0700 (PDT)
+        with ESMTP id S230265AbiJ1KyR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Oct 2022 06:54:17 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 678C917578E
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 03:54:16 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5AF10B8295B
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 10:54:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDE23C43143;
-        Fri, 28 Oct 2022 10:54:14 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CFD1A627A9
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 10:54:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 173A0C433D7;
+        Fri, 28 Oct 2022 10:54:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1666954455;
-        bh=1MGy/QeMLxL2CeOt6PAMUGtVNnUoFMhc4YFKjn7bA+o=;
+        bh=+0uL2LsE517XXiRSnYb+8lBrywGyDTjttJ4tHMrTfgQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=h4ACI/Mj5M2N8ZC1wrtD4q8bCqZrdFtkrek7AN03aqylYrgNEsD5/+tOwGXBfwq5K
-         nno+clWWlJIYBDIb1NVBS+P5EbAfL0tGbnwE4O/ek6VbOdKIUN5GPCsXENoGwF8eHG
-         CclVR+6Oeid+9p/inBODaOZ5Vc0RQ2IM18+6TUsFosU/heK20ZDJ085+G1UaQZyYcx
-         Ud+Q6BIvWWAGLq+MZ9hqCJJm8f25hbygfVggQUcuLDcMlWBQim+hfXSwUJ5LC5Uphm
-         6IHcrLO44WHgURsEPZ+JhqgNWDus4Fki64dafgjEv2BAzCA1Q7Q7n31S4a2z2e+i3/
-         hbTEX8H8F8U7w==
+        b=QChIP0DLsOPBU4LNpYo8lpdJmGz9Pm+T1PJxtb1cnNdz9Id0PbflfDWdB5vjM4nQi
+         FGKlGT7m3FJDj+1lHsBu1AUi0zC09fjn5L1jupNmdKcRLx6Fm+Xnlmud2KkCrlo6CV
+         6MpyXU5DdDLDRmaButNHnLWx5VtmBJwdru8bFToCyUiIh50zfUrRWyNVkcRK2LFH3X
+         wTUy1nTgNNA94GCOpMwlAZMZCR7yio9FavlHYkw+bp2IwpX+Yr52WmFBXQglEHe8kT
+         OiX5z49Or0vBo3OQl4YMeN4JxXhWFQfgHz4p/ZHQbuEvM1waX8iSU0IC5V+xDMnFUF
+         RtOhoYw8uWY2g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1ooN09-002E4C-2t;
+        id 1ooN09-002E4C-AN;
         Fri, 28 Oct 2022 11:54:13 +0100
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org,
@@ -47,9 +47,9 @@ Cc:     James Morse <james.morse@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Ricardo Koller <ricarkol@google.com>,
         Reiji Watanabe <reijiw@google.com>
-Subject: [PATCH v2 08/14] KVM: arm64: PMU: Simplify setting a counter to a specific value
-Date:   Fri, 28 Oct 2022 11:53:56 +0100
-Message-Id: <20221028105402.2030192-9-maz@kernel.org>
+Subject: [PATCH v2 09/14] KVM: arm64: PMU: Do not let AArch32 change the counters' top 32 bits
+Date:   Fri, 28 Oct 2022 11:53:57 +0100
+Message-Id: <20221028105402.2030192-10-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221028105402.2030192-1-maz@kernel.org>
 References: <20221028105402.2030192-1-maz@kernel.org>
@@ -68,48 +68,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_pmu_set_counter_value() is pretty odd, as it tries to update
-the counter value while taking into account the value that is
-currently held by the running perf counter.
+Even when using PMUv3p5 (which implies 64bit counters), there is
+no way for AArch32 to write to the top 32 bits of the counters.
+The only way to influence these bits (other than by counting
+events) is by writing PMCR.P==1.
 
-This is not only complicated, this is quite wrong. Nowhere in
-the architecture is it said that the counter would be offset
-by something that is pending. The counter should be updated
-with the value set by SW, and start counting from there if
-required.
-
-Remove the odd computation and just assign the provided value
-after having released the perf event (which is then restarted).
+Make sure we obey the architecture and preserve the top 32 bits
+on a counter update.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/pmu-emul.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/pmu-emul.c | 35 +++++++++++++++++++++++++++--------
+ 1 file changed, 27 insertions(+), 8 deletions(-)
 
 diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 44ad0fdba4db..03b761a63f5f 100644
+index 03b761a63f5f..87585c12ca41 100644
 --- a/arch/arm64/kvm/pmu-emul.c
 +++ b/arch/arm64/kvm/pmu-emul.c
-@@ -23,6 +23,7 @@ static LIST_HEAD(arm_pmus);
- static DEFINE_MUTEX(arm_pmus_lock);
+@@ -119,13 +119,8 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+ 	return counter;
+ }
  
- static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx);
-+static void kvm_pmu_release_perf_event(struct kvm_pmc *pmc);
- 
- static u32 kvm_pmu_event_mask(struct kvm *kvm)
+-/**
+- * kvm_pmu_set_counter_value - set PMU counter value
+- * @vcpu: The vcpu pointer
+- * @select_idx: The counter index
+- * @val: The counter value
+- */
+-void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
++static void kvm_pmu_set_counter(struct kvm_vcpu *vcpu, u64 select_idx, u64 val,
++				bool force)
  {
-@@ -131,8 +132,10 @@ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
- 	if (!kvm_vcpu_has_pmu(vcpu))
- 		return;
+ 	u64 reg;
  
-+	kvm_pmu_release_perf_event(&vcpu->arch.pmu.pmc[select_idx]);
-+
+@@ -135,12 +130,36 @@ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
+ 	kvm_pmu_release_perf_event(&vcpu->arch.pmu.pmc[select_idx]);
+ 
  	reg = counter_index_to_reg(select_idx);
--	__vcpu_sys_reg(vcpu, reg) += (s64)val - kvm_pmu_get_counter_value(vcpu, select_idx);
-+	__vcpu_sys_reg(vcpu, reg) = val;
++
++	if (vcpu_mode_is_32bit(vcpu) && select_idx != ARMV8_PMU_CYCLE_IDX &&
++	    !force) {
++		/*
++		 * Even with PMUv3p5, AArch32 cannot write to the top
++		 * 32bit of the counters. The only possible course of
++		 * action is to use PMCR.P, which will reset them to
++		 * 0 (the only use of the 'force' parameter).
++		 */
++		val  = lower_32_bits(val);
++		val |= upper_32_bits(__vcpu_sys_reg(vcpu, reg));
++	}
++
+ 	__vcpu_sys_reg(vcpu, reg) = val;
  
  	/* Recreate the perf event to reflect the updated sample_period */
  	kvm_pmu_create_perf_event(vcpu, select_idx);
+ }
+ 
++/**
++ * kvm_pmu_set_counter_value - set PMU counter value
++ * @vcpu: The vcpu pointer
++ * @select_idx: The counter index
++ * @val: The counter value
++ */
++void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
++{
++	kvm_pmu_set_counter(vcpu, select_idx, val, false);
++}
++
+ /**
+  * kvm_pmu_release_perf_event - remove the perf event
+  * @pmc: The PMU counter pointer
+@@ -535,7 +554,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
+ 		unsigned long mask = kvm_pmu_valid_counter_mask(vcpu);
+ 		mask &= ~BIT(ARMV8_PMU_CYCLE_IDX);
+ 		for_each_set_bit(i, &mask, 32)
+-			kvm_pmu_set_counter_value(vcpu, i, 0);
++			kvm_pmu_set_counter(vcpu, i, 0, true);
+ 	}
+ }
+ 
 -- 
 2.34.1
 
