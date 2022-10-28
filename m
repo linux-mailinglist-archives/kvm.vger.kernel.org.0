@@ -2,226 +2,354 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE98E610AB5
-	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 08:49:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 660FD610AE4
+	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 09:00:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229975AbiJ1Gth (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Oct 2022 02:49:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41410 "EHLO
+        id S229980AbiJ1HAn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Oct 2022 03:00:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230296AbiJ1GtN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Oct 2022 02:49:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1F231C2081
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 23:44:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666939452;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OIS6krfwlp4goyv08jor5j844HvFRVnqcPjr6/3Btb8=;
-        b=KVUlQhw/BCM56L9TMEi02tOb1BKkrhlpnpyUvz9jBmHEu7323WGAmB6pgp0BxA/Hmj9K1h
-        Yt81L+0yRZT85IMxJrA0FvsvQDXUYhHXhypukDQ5QhnANd7ImyXkQRuQ9g8/wf46kaHjS4
-        CtWc2rf5XUeHvmw9oGmj8H0WYCH4okE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-118-aKfA1HCgNOyiL2Cvg7uhaA-1; Fri, 28 Oct 2022 02:44:06 -0400
-X-MC-Unique: aKfA1HCgNOyiL2Cvg7uhaA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9F956185A794;
-        Fri, 28 Oct 2022 06:44:05 +0000 (UTC)
-Received: from [10.64.54.151] (vpn2-54-151.bne.redhat.com [10.64.54.151])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A5A03C15BA8;
-        Fri, 28 Oct 2022 06:43:58 +0000 (UTC)
-Reply-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v6 3/8] KVM: Add support for using dirty ring in
- conjunction with bitmap
-To:     Marc Zyngier <maz@kernel.org>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        peterx@redhat.com, will@kernel.org, catalin.marinas@arm.com,
-        bgardon@google.com, shuah@kernel.org, andrew.jones@linux.dev,
-        dmatlack@google.com, pbonzini@redhat.com, zhenyzha@redhat.com,
-        james.morse@arm.com, suzuki.poulose@arm.com,
-        alexandru.elisei@arm.com, shan.gavin@gmail.com
-References: <20221011061447.131531-4-gshan@redhat.com>
- <Y1Hdc/UVta3A5kHM@google.com> <8635bhfvnh.wl-maz@kernel.org>
- <Y1LDRkrzPeQXUHTR@google.com> <87edv0gnb3.wl-maz@kernel.org>
- <Y1ckxYst3tc0LCqb@google.com> <Y1css8k0gtFkVwFQ@google.com>
- <878rl4gxzx.wl-maz@kernel.org> <Y1ghIKrAsRFwSFsO@google.com>
- <877d0lhdo9.wl-maz@kernel.org> <Y1rDkz6q8+ZgYFWW@google.com>
- <875yg5glvk.wl-maz@kernel.org>
-From:   Gavin Shan <gshan@redhat.com>
-Message-ID: <36c97b96-1427-ce05-8fce-fd21c4711af9@redhat.com>
-Date:   Fri, 28 Oct 2022 14:43:55 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+        with ESMTP id S229934AbiJ1HAb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Oct 2022 03:00:31 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 147041863E9;
+        Fri, 28 Oct 2022 00:00:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1666940426; x=1698476426;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=rZH19hLtCXkt/XIwK4407iWl9P8woRCeaD24M869DYw=;
+  b=Y7SiFy3Y2OzcK43kRrUQN4UpG/qtJRrDMocMQPIuNnFSaemQqTQ3b1yE
+   9z+lVsSm8lhbeGN+FflihG3qPPFIHYVn3daa3nWMbrbYhTuIeOi/WCbW/
+   lBAzAq9VBJZ3bVwbf1duzrvZ9i60wN/BKDAPSMi2bYwnP5asp49is4zpm
+   f7qVMRtoWif43SYwrpv8i5I66P56lkszcSQys82MHG48JOkS65v70YKW4
+   jWJ8Ohs8FzEE3AYLbX8MUTHYmmEsBXWRMbBf6+vR2w5hh6h7lapXOvecy
+   gN8OcWrZn67X+grYiUkxxRFuL4v2Gkgt5Yhy8gbvAlJjB3rb6T3Flb6Mc
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10513"; a="310124673"
+X-IronPort-AV: E=Sophos;i="5.95,220,1661842800"; 
+   d="scan'208";a="310124673"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2022 00:00:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10513"; a="627437380"
+X-IronPort-AV: E=Sophos;i="5.95,220,1661842800"; 
+   d="scan'208";a="627437380"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by orsmga007.jf.intel.com with ESMTP; 28 Oct 2022 00:00:14 -0700
+Date:   Fri, 28 Oct 2022 14:55:45 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        Muchun Song <songmuchun@bytedance.com>, wei.w.wang@intel.com
+Subject: Re: [PATCH v9 7/8] KVM: Handle page fault for private memory
+Message-ID: <20221028065545.GD3885130@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20221025151344.3784230-1-chao.p.peng@linux.intel.com>
+ <20221025151344.3784230-8-chao.p.peng@linux.intel.com>
+ <20221026215425.GC3819453@ls.amr.corp.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <875yg5glvk.wl-maz@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221026215425.GC3819453@ls.amr.corp.intel.com>
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Sean and Marc,
+On Wed, Oct 26, 2022 at 02:54:25PM -0700, Isaku Yamahata wrote:
+> On Tue, Oct 25, 2022 at 11:13:43PM +0800,
+> Chao Peng <chao.p.peng@linux.intel.com> wrote:
+> 
+> > A memslot with KVM_MEM_PRIVATE being set can include both fd-based
+> > private memory and hva-based shared memory. Architecture code (like TDX
+> > code) can tell whether the on-going fault is private or not. This patch
+> > adds a 'is_private' field to kvm_page_fault to indicate this and
+> > architecture code is expected to set it.
+> > 
+> > To handle page fault for such memslot, the handling logic is different
+> > depending on whether the fault is private or shared. KVM checks if
+> > 'is_private' matches the host's view of the page (maintained in
+> > mem_attr_array).
+> >   - For a successful match, private pfn is obtained with
+> >     restrictedmem_get_page () from private fd and shared pfn is obtained
+> >     with existing get_user_pages().
+> >   - For a failed match, KVM causes a KVM_EXIT_MEMORY_FAULT exit to
+> >     userspace. Userspace then can convert memory between private/shared
+> >     in host's view and retry the fault.
+> > 
+> > Co-developed-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c          | 56 +++++++++++++++++++++++++++++++--
+> >  arch/x86/kvm/mmu/mmu_internal.h | 14 ++++++++-
+> >  arch/x86/kvm/mmu/mmutrace.h     |  1 +
+> >  arch/x86/kvm/mmu/spte.h         |  6 ++++
+> >  arch/x86/kvm/mmu/tdp_mmu.c      |  3 +-
+> >  include/linux/kvm_host.h        | 28 +++++++++++++++++
+> >  6 files changed, 103 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 67a9823a8c35..10017a9f26ee 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -3030,7 +3030,7 @@ static int host_pfn_mapping_level(struct kvm *kvm, gfn_t gfn,
+> >  
+> >  int kvm_mmu_max_mapping_level(struct kvm *kvm,
+> >  			      const struct kvm_memory_slot *slot, gfn_t gfn,
+> > -			      int max_level)
+> > +			      int max_level, bool is_private)
+> >  {
+> >  	struct kvm_lpage_info *linfo;
+> >  	int host_level;
+> > @@ -3042,6 +3042,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
+> >  			break;
+> >  	}
+> >  
+> > +	if (is_private)
+> > +		return max_level;
+> 
+> Below PG_LEVEL_NUM is passed by zap_collapsible_spte_range().  It doesn't make
+> sense.
+> 
+> > +
+> >  	if (max_level == PG_LEVEL_4K)
+> >  		return PG_LEVEL_4K;
+> >  
+> > @@ -3070,7 +3073,8 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+> >  	 * level, which will be used to do precise, accurate accounting.
+> >  	 */
+> >  	fault->req_level = kvm_mmu_max_mapping_level(vcpu->kvm, slot,
+> > -						     fault->gfn, fault->max_level);
+> > +						     fault->gfn, fault->max_level,
+> > +						     fault->is_private);
+> >  	if (fault->req_level == PG_LEVEL_4K || fault->huge_page_disallowed)
+> >  		return;
+> >  
+> > @@ -4141,6 +4145,32 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+> >  	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true);
+> >  }
+> >  
+> > +static inline u8 order_to_level(int order)
+> > +{
+> > +	BUILD_BUG_ON(KVM_MAX_HUGEPAGE_LEVEL > PG_LEVEL_1G);
+> > +
+> > +	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_1G))
+> > +		return PG_LEVEL_1G;
+> > +
+> > +	if (order >= KVM_HPAGE_GFN_SHIFT(PG_LEVEL_2M))
+> > +		return PG_LEVEL_2M;
+> > +
+> > +	return PG_LEVEL_4K;
+> > +}
+> > +
+> > +static int kvm_faultin_pfn_private(struct kvm_page_fault *fault)
+> > +{
+> > +	int order;
+> > +	struct kvm_memory_slot *slot = fault->slot;
+> > +
+> > +	if (kvm_restricted_mem_get_pfn(slot, fault->gfn, &fault->pfn, &order))
+> > +		return RET_PF_RETRY;
+> > +
+> > +	fault->max_level = min(order_to_level(order), fault->max_level);
+> > +	fault->map_writable = !(slot->flags & KVM_MEM_READONLY);
+> > +	return RET_PF_CONTINUE;
+> > +}
+> > +
+> >  static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> >  {
+> >  	struct kvm_memory_slot *slot = fault->slot;
+> > @@ -4173,6 +4203,22 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> >  			return RET_PF_EMULATE;
+> >  	}
+> >  
+> > +	if (kvm_slot_can_be_private(slot) &&
+> > +	    fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
+> > +		vcpu->run->exit_reason = KVM_EXIT_MEMORY_FAULT;
+> > +		if (fault->is_private)
+> > +			vcpu->run->memory.flags = KVM_MEMORY_EXIT_FLAG_PRIVATE;
+> > +		else
+> > +			vcpu->run->memory.flags = 0;
+> > +		vcpu->run->memory.padding = 0;
+> > +		vcpu->run->memory.gpa = fault->gfn << PAGE_SHIFT;
+> > +		vcpu->run->memory.size = PAGE_SIZE;
+> > +		return RET_PF_USER;
+> > +	}
+> > +
+> > +	if (fault->is_private)
+> > +		return kvm_faultin_pfn_private(fault);
+> > +
+> >  	async = false;
+> >  	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, &async,
+> >  					  fault->write, &fault->map_writable,
+> > @@ -5557,6 +5603,9 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
+> >  			return -EIO;
+> >  	}
+> >  
+> > +	if (r == RET_PF_USER)
+> > +		return 0;
+> > +
+> >  	if (r < 0)
+> >  		return r;
+> >  	if (r != RET_PF_EMULATE)
+> > @@ -6408,7 +6457,8 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
+> >  		 */
+> >  		if (sp->role.direct &&
+> >  		    sp->role.level < kvm_mmu_max_mapping_level(kvm, slot, sp->gfn,
+> > -							       PG_LEVEL_NUM)) {
+> > +							       PG_LEVEL_NUM,
+> > +							       false)) {
+> >  			kvm_zap_one_rmap_spte(kvm, rmap_head, sptep);
+> >  
+> >  			if (kvm_available_flush_tlb_with_range())
+> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> > index 582def531d4d..5cdff5ca546c 100644
+> > --- a/arch/x86/kvm/mmu/mmu_internal.h
+> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> > @@ -188,6 +188,7 @@ struct kvm_page_fault {
+> >  
+> >  	/* Derived from mmu and global state.  */
+> >  	const bool is_tdp;
+> > +	const bool is_private;
+> >  	const bool nx_huge_page_workaround_enabled;
+> >  
+> >  	/*
+> > @@ -236,6 +237,7 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+> >   * RET_PF_RETRY: let CPU fault again on the address.
+> >   * RET_PF_EMULATE: mmio page fault, emulate the instruction directly.
+> >   * RET_PF_INVALID: the spte is invalid, let the real page fault path update it.
+> > + * RET_PF_USER: need to exit to userspace to handle this fault.
+> >   * RET_PF_FIXED: The faulting entry has been fixed.
+> >   * RET_PF_SPURIOUS: The faulting entry was already fixed, e.g. by another vCPU.
+> >   *
+> > @@ -252,6 +254,7 @@ enum {
+> >  	RET_PF_RETRY,
+> >  	RET_PF_EMULATE,
+> >  	RET_PF_INVALID,
+> > +	RET_PF_USER,
+> >  	RET_PF_FIXED,
+> >  	RET_PF_SPURIOUS,
+> >  };
+> > @@ -309,7 +312,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+> >  
+> >  int kvm_mmu_max_mapping_level(struct kvm *kvm,
+> >  			      const struct kvm_memory_slot *slot, gfn_t gfn,
+> > -			      int max_level);
+> > +			      int max_level, bool is_private);
+> >  void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+> >  void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_level);
+> >  
+> > @@ -318,4 +321,13 @@ void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+> >  void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
+> >  void unaccount_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
+> >  
+> > +#ifndef CONFIG_HAVE_KVM_RESTRICTED_MEM
+> > +static inline int kvm_restricted_mem_get_pfn(struct kvm_memory_slot *slot,
+> > +					gfn_t gfn, kvm_pfn_t *pfn, int *order)
+> > +{
+> > +	WARN_ON_ONCE(1);
+> > +	return -EOPNOTSUPP;
+> > +}
+> > +#endif /* CONFIG_HAVE_KVM_RESTRICTED_MEM */
+> > +
+> >  #endif /* __KVM_X86_MMU_INTERNAL_H */
+> > diff --git a/arch/x86/kvm/mmu/mmutrace.h b/arch/x86/kvm/mmu/mmutrace.h
+> > index ae86820cef69..2d7555381955 100644
+> > --- a/arch/x86/kvm/mmu/mmutrace.h
+> > +++ b/arch/x86/kvm/mmu/mmutrace.h
+> > @@ -58,6 +58,7 @@ TRACE_DEFINE_ENUM(RET_PF_CONTINUE);
+> >  TRACE_DEFINE_ENUM(RET_PF_RETRY);
+> >  TRACE_DEFINE_ENUM(RET_PF_EMULATE);
+> >  TRACE_DEFINE_ENUM(RET_PF_INVALID);
+> > +TRACE_DEFINE_ENUM(RET_PF_USER);
+> >  TRACE_DEFINE_ENUM(RET_PF_FIXED);
+> >  TRACE_DEFINE_ENUM(RET_PF_SPURIOUS);
+> >  
+> > diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+> > index 7670c13ce251..9acdf72537ce 100644
+> > --- a/arch/x86/kvm/mmu/spte.h
+> > +++ b/arch/x86/kvm/mmu/spte.h
+> > @@ -315,6 +315,12 @@ static inline bool is_dirty_spte(u64 spte)
+> >  	return dirty_mask ? spte & dirty_mask : spte & PT_WRITABLE_MASK;
+> >  }
+> >  
+> > +static inline bool is_private_spte(u64 spte)
+> > +{
+> > +	/* FIXME: Query C-bit/S-bit for SEV/TDX. */
+> > +	return false;
+> > +}
+> > +
+> 
+> PFN encoded in spte doesn't make sense.  In VMM for TDX, private-vs-shared is
+> determined by S-bit of GFN.
 
-On 10/28/22 2:30 AM, Marc Zyngier wrote:
-> On Thu, 27 Oct 2022 18:44:51 +0100,
-> Sean Christopherson <seanjc@google.com> wrote:
->>
->> On Thu, Oct 27, 2022, Marc Zyngier wrote:
->>> On Tue, 25 Oct 2022 18:47:12 +0100, Sean Christopherson <seanjc@google.com> wrote:
+My understanding is we will have software bit in the spte, will we? In
+current TDX code I see we have SPTE_SHARED_MASK bit defined.
 
-[...]
-  
->>
->>>> And ideally such bugs would detected without relying on userspace to
->>>> enabling dirty logging, e.g. the Hyper-V bug lurked for quite some
->>>> time and was only found when mark_page_dirty_in_slot() started
->>>> WARNing.
->>>>
->>>> I'm ok if arm64 wants to let userspace shoot itself in the foot with
->>>> the ITS, but I'm not ok dropping the protections in the common
->>>> mark_page_dirty_in_slot().
->>>>
->>>> One somewhat gross idea would be to let architectures override the
->>>> "there must be a running vCPU" rule, e.g. arm64 could toggle a flag
->>>> in kvm->arch in its kvm_write_guest_lock() to note that an expected
->>>> write without a vCPU is in-progress:
->>>>
->>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->>>> index 8c5c69ba47a7..d1da8914f749 100644
->>>> --- a/virt/kvm/kvm_main.c
->>>> +++ b/virt/kvm/kvm_main.c
->>>> @@ -3297,7 +3297,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
->>>>          struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
->>>>   
->>>>   #ifdef CONFIG_HAVE_KVM_DIRTY_RING
->>>> -       if (WARN_ON_ONCE(!vcpu) || WARN_ON_ONCE(vcpu->kvm != kvm))
->>>> +       if (!kvm_arch_allow_write_without_running_vcpu(kvm) && WARN_ON_ONCE(!vcpu))
->>>> +               return;
->>>> +
->>>> +       if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
->>>>                  return;
->>>>   #endif
->>>>   
->>>> @@ -3305,10 +3308,10 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
->>>>                  unsigned long rel_gfn = gfn - memslot->base_gfn;
->>>>                  u32 slot = (memslot->as_id << 16) | memslot->id;
->>>>   
->>>> -               if (kvm->dirty_ring_size)
->>>> +               if (kvm->dirty_ring_size && vcpu)
->>>>                          kvm_dirty_ring_push(&vcpu->dirty_ring,
->>>>                                              slot, rel_gfn);
->>>> -               else
->>>> +               else if (memslot->dirty_bitmap)
->>>>                          set_bit_le(rel_gfn, memslot->dirty_bitmap);
->>>>          }
->>>>   }
->>>
->>> I think this is equally wrong. Writes occur from both CPUs and devices
->>> *concurrently*, and I don't see why KVM should keep ignoring this
->>> pretty obvious fact.
->>>
->>> Yes, your patch papers over the problem, and it can probably work if
->>> the kvm->arch flag only gets set in the ITS saving code, which is
->>> already exclusive of vcpus running.
->>>
->>> But in the long run, with dirty bits being collected from the IOMMU
->>> page tables or directly from devices, we will need a way to reconcile
->>> the dirty tracking. The above doesn't quite cut it, unfortunately.
->>
->> Oooh, are you referring to IOMMU page tables and devices _in the
->> guest_?  E.g. if KVM itself were to emulate a vIOMMU, then KVM would
->> be responsible for updating dirty bits in the vIOMMU page tables.
 > 
-> No. I'm talking about the *physical* IOMMU, which is (with the correct
-> architecture revision and feature set) capable of providing its own
-> set of dirty bits, on a per-device, per-PTE basis. Once we enable
-> that, we'll need to be able to sink these bits into the bitmap and
-> provide a unified view of the dirty state to userspace.
 > 
->> Not that it really matters, but do we actually expect KVM to ever
->> emulate a vIOMMU?  On x86 at least, in-kernel acceleration of vIOMMU
->> emulation seems more like VFIO territory.
+> >  static inline u64 get_rsvd_bits(struct rsvd_bits_validate *rsvd_check, u64 pte,
+> >  				int level)
+> >  {
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > index 672f0432d777..9f97aac90606 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > @@ -1768,7 +1768,8 @@ static void zap_collapsible_spte_range(struct kvm *kvm,
+> >  			continue;
+> >  
+> >  		max_mapping_level = kvm_mmu_max_mapping_level(kvm, slot,
+> > -							      iter.gfn, PG_LEVEL_NUM);
+> > +						iter.gfn, PG_LEVEL_NUM,
+> > +						is_private_spte(iter.old_spte));
+> >  		if (max_mapping_level < iter.level)
+> >  			continue;
 > 
-> I don't expect KVM/arm64 to fully emulate an IOMMU, but at least to
-> eventually provide the required filtering to enable a stage-1 SMMU to
-> be passed to a guest. This is the sort of things pKVM needs to
-> implement for the host anyway, and going the extra mile to support
-> arbitrary guests outside of the pKVM context isn't much more work.
-> 
->> Regardless, I don't think the above idea makes it any more difficult
->> to support in-KVM emulation of non-CPU stuff, which IIUC is the ITS
->> case.  I 100% agree that the above is a hack, but that's largely due
->> to the use of kvm_get_running_vcpu().
-> 
-> That I agree.
-> 
->> A slightly different alternative would be have a completely separate
->> API for writing guest memory without an associated vCPU.  I.e. start
->> building up proper device emulation support.  Then the vCPU-based
->> APIs could yell if a vCPU isn't provided (or there is no running
->> vCPU in the current mess).  And the deviced-based API could be
->> provided if and only if the architecture actually supports emulating
->> writes from devices, i.e. x86 would not opt-in and so would even
->> have access to the API.
-> 
-> Which is what I was putting under the "major surgery" label in my
-> previous email.
-> 
-> Anyhow, for the purpose of unblocking Gavin's series, I suggest to
-> adopt your per-arch opt-out suggestion as a stop gap measure, and we
-> will then be able to bike-shed for weeks on what the shape of the
-> device-originated memory dirtying API should be.
-> 
+> This is to merge pages into a large page on the next kvm page fault.  large page
+> support is not yet supported.  Let's skip the private slot until large page
+> support is done.
 
-It's really a 'major surgery' and I would like to make sure I fully understand
-'a completely separate API for writing guest memory without an associated vCPU",
-before I'm going to working on v7 for this.
+So what your suggestion is passing in a 'false' at this time for
+'is_private'? Unless we will decide not use the above is_private_spte,
+this code does not hurt, right? is_private_spte() return false before
+we finally get chance to add the large page support.
 
-There are 7 functions and 2 macros involved as below. I assume Sean is suggesting
-to add another argument, whose name can be 'has_vcpu', for these functions and macros?
-Sean, could you please double confirm?
-
-If I'm understanding correctly, and 'has_vcpu' argument will be added for these
-functions and macros. Except the call sites in vgic/its, 'has_vcpu' is set to 'true',
-and passed to these functions. It means we need a 'false' for the argument in vgic/its
-call sites. Please correct me if I'm wrong.
-
-   int kvm_write_guest_page(struct kvm *kvm, gfn_t gfn, const void *data,
-                            int offset, int len);
-   int kvm_write_guest(struct kvm *kvm, gpa_t gpa, const void *data,
-                       unsigned long len);
-   int kvm_write_guest_cached(struct kvm *kvm, struct gfn_to_hva_cache *ghc,
-                              void *data, unsigned long len);
-   int kvm_write_guest_offset_cached(struct kvm *kvm, struct gfn_to_hva_cache *ghc,
-                                     void *data, unsigned int offset,
-                                     unsigned long len);
-
-   void kvm_vcpu_mark_page_dirty(struct kvm_vcpu *vcpu, gfn_t gfn);
-   void mark_page_dirty(struct kvm *kvm, gfn_t gfn);
-   void mark_page_dirty_in_slot(struct kvm *kvm, const struct kvm_memory_slot *memslot, gfn_t gfn);
-
-   #define __kvm_put_guest(kvm, gfn, offset, v)
-   #define kvm_put_guest(kvm, gpa, v)
-   
 Thanks,
-Gavin
-
-
+Chao
+> -- 
+> Isaku Yamahata <isaku.yamahata@gmail.com>
