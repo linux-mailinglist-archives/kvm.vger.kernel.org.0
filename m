@@ -2,122 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE52061121C
-	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 15:01:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4973A6112EA
+	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 15:35:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230193AbiJ1NBf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Oct 2022 09:01:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46508 "EHLO
+        id S230261AbiJ1Nfp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Oct 2022 09:35:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230230AbiJ1NB0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Oct 2022 09:01:26 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FD681C843A
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 06:01:24 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id x16-20020a63b210000000b0045f5c1e18d0so2549493pge.0
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 06:01:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=cQWkgAS/kAsZneVDkQ0rxEB1PW/u8LB1bPfXtiPf7pA=;
-        b=rUaHJ1oVbQkRKMsgIAaolCQKje4eXBmWy1CYFR970wFLVNfI03tFEZy3D29OTddh9k
-         mjvgniP6fXFG5efpA2VBgdcoXKE3kSjP47UXLiKO5jACvrQb1TC7zydK85Br/pk63IKz
-         GH6GPhYK2gS6+kzZTApfFD/eh1+4AlZCOJyK3/2YCKp/QxyBlOpYWwpRE3KHC/+czb8n
-         IVXz9LMStT1Oll9TPw2jy44nc8PPRWSgGTzIKcOUMVSLegctDpLxP30zvKG53R7GM30A
-         XOdcpUB288LbJZW4o7OgxaiTV7dMFTKbvR62LQ25LnFk6d1ux3cyHYqcW6C01dzTLnaJ
-         fGtg==
+        with ESMTP id S230452AbiJ1Nfh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Oct 2022 09:35:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C380426AD8
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 06:34:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666964077;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vFqYz8MMVuDJ4sSoQ0v9rsso2qX+yaIQ4KXzcvg1mhc=;
+        b=RRcCt1GLLgy5sIFZQYGKzAdLJQ4QxtEOQmsKHu5wQAOvdtKxxJpiLCxA3eJQrfmgFfOvFr
+        OvXuEkrO1SH5Fl+2sT1diL3+wO4Mm2d/JKnWpKlATtLwECYBL+jtJxEecKkWWNWRM7UKpL
+        VrUzLe+CeNZZgkB3dRvOy6lZvr1teI8=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-137-X_pZPNTzOyiaK_hVNRtqRg-1; Fri, 28 Oct 2022 09:34:36 -0400
+X-MC-Unique: X_pZPNTzOyiaK_hVNRtqRg-1
+Received: by mail-wm1-f69.google.com with SMTP id t19-20020a1c7713000000b003cf5e738dd1so490957wmi.7
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 06:34:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cQWkgAS/kAsZneVDkQ0rxEB1PW/u8LB1bPfXtiPf7pA=;
-        b=bz5N5LLM+pJylfXV9/lX5o9lcIIHm6sqEuOyUvd5mTHUceOPDAbu/EdCcLe4TaIO1x
-         Cyrd/u9kcvdE7SELfY+BUczM9zj2DQ85bbP8sFWkyAURIaRv0wwZpNwIXFdkvWXWo0Fz
-         OuKnGQ8s7RSenqL9L/ZvAtc+V7o5lZgQ8hsbkNjWni4nV3nhaLSttMjCOAL2gbWEAnIX
-         cSgcySp3phH2OObgecsS9nKUQUc8GEDTzLfONq1srNKr9h3wXi0Yji/YWtoWFEtxqYkK
-         /3kL8qXOTgGTTW/yGf4SCw2gWiPLizD2iwuLFXEdcUp6cjEdRqxlhE+8dU30a1Yx7nhj
-         s2Xg==
-X-Gm-Message-State: ACrzQf3hF9Ij01Ivnd7MRLrsil2Cak3lRaL7+lBSFNGT8itcCiY+F34f
-        aNyZuTM7OQR52SYDxPMcfF3/QE4aAbVmgQ9NjIVuT9Q0qtZjGf7yGVZVpeO/4zBV5hf5PVT7xZC
-        OukvDvoWhmTxmzAcxXigGIDdMNlxUZCIZ3mmPKm+4pyrqbvsZumLTA6QIAvQP0VWY47XA
-X-Google-Smtp-Source: AMsMyM6y48cKJ1efL+oYy4GdE94peVL5GoyDXsaBQnFv48+3YxOIE2DodOznp69AwobxpG+3LlnnMQwZMbjWxt3h
-X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
- (user=aaronlewis job=sendgmr) by 2002:a17:902:f710:b0:178:a692:b1f7 with SMTP
- id h16-20020a170902f71000b00178a692b1f7mr55126530plo.112.1666962072962; Fri,
- 28 Oct 2022 06:01:12 -0700 (PDT)
-Date:   Fri, 28 Oct 2022 13:00:36 +0000
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.38.1.273.g43a17bfeac-goog
-Message-ID: <20221028130035.1550068-1-aaronlewis@google.com>
-Subject: [PATCH] KVM: x86: Fix a stall when KVM_SET_MSRS is called on the pmu counters
-From:   Aaron Lewis <aaronlewis@google.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
-        Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vFqYz8MMVuDJ4sSoQ0v9rsso2qX+yaIQ4KXzcvg1mhc=;
+        b=Vmt182ok+TXNpQAau6iJiNlUr02qzZrLD21EkSaUbEd9vzpC9bS7aLoYIaFY1oqp3s
+         ew+RIEGF8XF2YomkHf5+WSeNRDX7x8pY/ceefFxw+r2h9OhiG1vwF5eTCZZhVH/TAn6O
+         9LHwApSw6rgcG3sc9F9e1gVV8KyAixU7Od8IFc//hFQllm/ZjzDmQTgN2poq7ulj8DDO
+         TF0nd/s1WpdzZbIIqjRSrzZwa21vsZvUN2XzPzHuxGCHukx/30BBjWR9OqAiaxJq4rJn
+         JcDMXKflsG+4ZETsJXsZcx5u+kLuEGwUv6HIPVudhy8quDJlrJUp1Ka9keI9Bp6KNIG/
+         BFpQ==
+X-Gm-Message-State: ACrzQf1REABeRAcpsciCkPAzfV//1xAmT9J3C+Z5TXU+cgzZasdlPKk4
+        +O8MCGJFUVTgZy0XdrUhdnB8XurMNUpEeX0rEzi5rhkzdRoYOdPl4AGHC2OMQ3+bdQ5g7BRS6Mg
+        AQyn6eMxzheIw
+X-Received: by 2002:a5d:5142:0:b0:236:5d8d:6254 with SMTP id u2-20020a5d5142000000b002365d8d6254mr22326945wrt.514.1666964075459;
+        Fri, 28 Oct 2022 06:34:35 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM4qPWmRdmYeva1c0+81ekf4TqzWM8LrMLcjdZN9VgV4/YuhTz4wVkJR4JMmkiMCMKDREkRZhQ==
+X-Received: by 2002:a5d:5142:0:b0:236:5d8d:6254 with SMTP id u2-20020a5d5142000000b002365d8d6254mr22326919wrt.514.1666964075238;
+        Fri, 28 Oct 2022 06:34:35 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
+        by smtp.googlemail.com with ESMTPSA id m64-20020a1ca343000000b003b49ab8ff53sm4266963wme.8.2022.10.28.06.34.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Oct 2022 06:34:34 -0700 (PDT)
+Message-ID: <c0e342ac-32a3-4f92-65c1-e4c990af7698@redhat.com>
+Date:   Fri, 28 Oct 2022 15:34:32 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [PATCH RESEND v4 16/23] KVM: x86: smm: add structs for KVM's
+ smram layout
+Content-Language: en-US
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Yang Zhong <yang.zhong@intel.com>, x86@kernel.org,
+        Jim Mattson <jmattson@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Guang Zeng <guang.zeng@intel.com>,
+        Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        linux-kselftest@vger.kernel.org, Kees Cook <keescook@chromium.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Wei Wang <wei.w.wang@intel.com>,
+        Borislav Petkov <bp@alien8.de>
+References: <20221025124741.228045-1-mlevitsk@redhat.com>
+ <20221025124741.228045-17-mlevitsk@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20221025124741.228045-17-mlevitsk@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When the host initiates a wrmsr through KVM_SET_MSRS don't print an
-error if the PMU is disabled, doing so can cause a noticeable stall
-while printing the error message.
+On 10/25/22 14:47, Maxim Levitsky wrote:
+> +	u32 cr4; /* CR4 is not present in Intel/AMD SMRAM image */
+> +	u32 reserved3[5];
+> +
+> +	/*
+> +	 * Segment state is not present/documented in the Intel/AMD SMRAM image
+> +	 * Instead this area on Intel/AMD contains IO/HLT restart flags.
+> +	 */
 
-The profile below was taken while calling KVM_SET_MSRS on the pmu
-counters while the PMU was disabled in KVM.  Even though the print is
-rate limited it still manages to consume by far the majority of the
-time.
+Both of these are based on the Intel P6 layout at 
+https://www.sandpile.org/x86/smm.htm.
 
--   99.75%     0.00%  [.] __ioctl
-   - __ioctl
-      - 99.74% entry_SYSCALL_64_after_hwframe
-           do_syscall_64
-           sys_ioctl
-         - do_vfs_ioctl
-            - 92.48% kvm_vcpu_ioctl
-               - kvm_arch_vcpu_ioctl
-                  - 85.12% kvm_set_msr_ignored_check
-                       svm_set_msr
-                       kvm_set_msr_common
-                       printk
-                       vprintk_func
-                       vprintk_default
-                       vprintk_emit
-                       console_unlock
-                       call_console_drivers
-                       univ8250_console_write
-                       serial8250_console_write
-                       uart_console_write
-
-A stall in this situation could have an impact on live migration.  So,
-to avoid that disable the print if the write is initiated by the host.
-
-Fixes: 5753785fa977 ("KVM: do not #GP on perf MSR writes when vPMU is disabled")
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
----
- arch/x86/kvm/x86.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9cf1ba865562..a3b842467bd2 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3778,7 +3778,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 
- 	case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR3:
- 	case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR1:
--		pr = true;
-+		pr = !msr_info->host_initiated;
- 		fallthrough;
- 	case MSR_K7_EVNTSEL0 ... MSR_K7_EVNTSEL3:
- 	case MSR_P6_EVNTSEL0 ... MSR_P6_EVNTSEL1:
--- 
-2.38.1.273.g43a17bfeac-goog
+Paolo
 
