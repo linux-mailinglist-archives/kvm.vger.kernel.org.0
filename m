@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7904E610695
-	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 01:57:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A6B4961069F
+	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 02:03:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235414AbiJ0X5b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 27 Oct 2022 19:57:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35684 "EHLO
+        id S234642AbiJ1ADv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 27 Oct 2022 20:03:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235617AbiJ0X52 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 27 Oct 2022 19:57:28 -0400
+        with ESMTP id S229531AbiJ1ADt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 27 Oct 2022 20:03:49 -0400
 Received: from out162-62-57-137.mail.qq.com (out162-62-57-137.mail.qq.com [162.62.57.137])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B7126EF1F
-        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 16:57:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53FE67434D
+        for <kvm@vger.kernel.org>; Thu, 27 Oct 2022 17:03:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-        s=s201512; t=1666915043;
-        bh=eEZocbdq7Joiz0PpdyuALdGYXBfjSh8tuhffgVCHeMA=;
+        s=s201512; t=1666915425;
+        bh=dl6yBMYwe2DpRerjx1DwIpqPoeEi77jJTwJJ4yakXcw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References;
-        b=D/ugxse2bGS4DvaM/j9m43rSLCMqinijCvR3PCsomnxo9PFwFXCMVINAO2OMeMMCO
-         2PWssioaoGiWe55hrJvevuPUgQHoZm2MKV/eEETwf0etBq3TdI7Kf+lGTDaIpZ9+W7
-         /hzz21kPyIlUsvoRoE5x6hvGBy1/3ymBmKYi7yVA=
+        b=BQVBffIiI/5QS4W0/kOUAAlOZmMlFtlRBCUpmdAkLl5XLUI40DFEYu7MEOyry6yAK
+         jA8dScFX39B3tG+5rPo4iGVkF/cLruITsCW41zOyZb/7jNGJs6kf5EK5p4XINf0nYE
+         RgxjZrHmWdnPzzjd/pgebs+NYxxkK0ett2aFkBn0=
 Received: from localhost.localdomain ([39.156.73.13])
-        by newxmesmtplogicsvrszb6-0.qq.com (NewEsmtp) with SMTP
-        id E53814BE; Fri, 28 Oct 2022 07:57:19 +0800
-X-QQ-mid: xmsmtpt1666915039tehk9lwxx
-Message-ID: <tencent_A54B1715F957805155C449831821B3ACD207@qq.com>
-X-QQ-XMAILINFO: N7h1OCCDntuj7ZDten010uQiKjwB4LQwOQQjsVRVWR7BBp/rIsC+6RQxYJuXdf
-         n6B9my7rFhKAIvUHJdIYPRdW2yvEKk9Bq0flevNrUlLpi7I2ByVZMB9NofsOx2VOF5z9KuwgFher
-         00qbSgyFsb67hZE2fjX9Wo+EWXum4yOTzfTll4rPntpPb8RuzXQWdCjNo/j8De4lwdSOBVaxd4E6
-         SQ/hHqPkMMRz8Xl3v3uznJTcX/Jl6jK/0eNqWPforkM/Q8YxJlafsBeWTHTF3btNssSqiOIKBYdq
-         kLtwlDm0TqF9dfM5v4WH8jOzlIoU6503OZSLjUUUHYhgm24ElpTykmK1uQGU+HG5IQuE7Uj2XPnt
-         MJeGsqcKRPJ9g5geXPw6/pximC1WKCuaayN4RQopLgaGyRPKmXx7Zw8aUbRaPgLgAJMWAf3zntDN
-         i+uSUkoxadkyCnnreg+eOSMcZIZA8K0EyPim87nL0afJXre42G1YZSO63EKEJ4w9T7ru0jv+utL4
-         25RLmVQMoz7LN+qYTS5IJLXbZ9Ahh54pMlmLLU7cSTV5htU7oKuGwvc4ytU9wp9N0XwV4VNGyJ2m
-         xpt56OCUYji0wUT3A+SxlshFdZb/V7IWt/LXpZWawjojJxpDkm1htMuZCOD3gYoODeWEA4OJB8ZJ
-         SdxtBdWRI+hcCulOIc4ZVf9v+jU1JC2fpXZE0tpu3lY74Qt/RRSkiO4mMSwU1nAdIspnHZON4WBx
-         s7pHMx1uTo6sz1MtNe2NAa9pQauS0rIQ/Piq9vrF7DrxXOhx6HwEQhNihGXjOdp/miWJtVh5i/mP
-         3ugw0bpcQa07JbzlTnT8J2P6ltxCThoWBy1cwxWRSdT0M3m8VXWypER3p4bdCDkyYpPDFw9rkIXg
-         z4Us0gm8aPJFf7FZpyg5tt6kh52BihjD7tVduLsDhs5iBVs8G0fmEGDxPCC0/D8afyx6JgNlHKIx
-         g3kbTS4uDuZidKvnEEBQ==
+        by newxmesmtplogicsvrszc2-0.qq.com (NewEsmtp) with SMTP
+        id EA272E7; Fri, 28 Oct 2022 08:03:42 +0800
+X-QQ-mid: xmsmtpt1666915422tyxflzaif
+Message-ID: <tencent_1E036FA19AACC8CB3915EBD7AA5127C42107@qq.com>
+X-QQ-XMAILINFO: N+tZcXNNUKPOx9aF/32esR5b5Obql5Yi4lm//cVYJcwGbLo9alD9QoYI3afM5j
+         vCp2hNQcBrJZpFPWoSHrFL+jF4VRrhUfYY4TjvaBt/8o3VpcktWSAFqRNlf3LspM4uvmczGGsDe4
+         lhgtSuxu20DoTmTTMXddhZ8GzWCCexWcmVdV5/3ZFA6CtH84szVfvK5QCRQuF23PEzT0ewqcG1pb
+         UoThM90R4ndki4rc+TruJP09wes4kc4XwzI9FIyNVMTQngFPH1vj++34TdwxoLDaS7gq9h5ByRua
+         81bDoRJiMjzACJ+MRyt8RFeb5U6+AGdXxfwiN2FtFJLp9anZ4d/2Exi3UcMT5D5+w2OBuYdUKD86
+         3hDFGtfevVVaO3QX97F+ZY9QyFmHGtDi6L8b9Rj0RcXsE2HNbNiijMS+m1YwZAzi0SL2n8SM+eCM
+         kikO8ngkum/YoFIWW1BOG06ZKBjiuZdMyutA1xWRnBY3ic5KQxdC61O6GBQOdpChyYk0Vdr3PVrv
+         CtWv75n0RY/vJ2G7WRz4hPT/tPZgXSlHIWJr4czUn+M2hiWsLcqKEfwyDjV6WsHszhS0sCSxOsdl
+         HRu8mHkH1tERFdo0GBQ4YKKyNBDx7R+6VTX8dWGRZaIzIqFiiKFt/06PBXeExtGBrSQRK1Hfl4sw
+         RI01NgrAlp1ITnDGCHofZDTQbAemBVJA4oM1cY98IO6Q2Xt4ykeEI5ificUZLBaG/WbS+T1qnxFO
+         ldwyNRKXOAlruE2lI4iIrZU2byn+soc0F/SB726CbBxwrfsShTlxu81xw03dSgtP/m9BjsXVY/CU
+         U5wvpsy5h6qOzzTUuctyONSSuqMFbstyTaZu4Dfta4Ecy7+HolcEMT/w259IA/MB8BzBEIW2b9uN
+         LC6+NC/5JXISyFaZ4plFOBTmNRkAoMajDQIiFRACviIDoK347/8EcKx1YQSOckhy2Nau9ZEYokIZ
+         MHUE4ZmnM4B2RoNR/qnsrJGi2MbfIu
 From:   Rong Tao <rtoax@foxmail.com>
 To:     seanjc@google.com
 Cc:     Rong Tao <rongtao@cestc.cn>, Paolo Bonzini <pbonzini@redhat.com>,
@@ -51,12 +51,12 @@ Cc:     Rong Tao <rongtao@cestc.cn>, Paolo Bonzini <pbonzini@redhat.com>,
         kvm@vger.kernel.org (open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)),
         linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND
         64-BIT))
-Subject: [PATCH] KVM: VMX: Fix indentation coding style issue
-Date:   Fri, 28 Oct 2022 07:57:00 +0800
-X-OQ-MSGID: <20221027235700.85710-1-rtoax@foxmail.com>
+Subject: [PATCH] KVM: VMX: Use tabs instead of spaces for indentation
+Date:   Fri, 28 Oct 2022 08:03:40 +0800
+X-OQ-MSGID: <20221028000340.86450-1-rtoax@foxmail.com>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <Y1sMuSqh+oY/XtjY@google.com>
-References: <Y1sMuSqh+oY/XtjY@google.com>
+In-Reply-To: <Y1sMPJvZDj6hGvih@google.com>
+References: <Y1sMPJvZDj6hGvih@google.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -71,50 +71,35 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Rong Tao <rongtao@cestc.cn>
 
-Code indentation should use tabs where possible.
+Code indentation should use tabs where possible and miss a '*'.
 
 Signed-off-by: Rong Tao <rongtao@cestc.cn>
 ---
- arch/x86/kvm/vmx/vmx.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ arch/x86/kvm/vmx/vmenter.S | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 9dba04b6b019..c5c954fb0273 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -806,7 +806,7 @@ void vmx_update_exception_bitmap(struct kvm_vcpu *vcpu)
- 	 */
- 	if (is_guest_mode(vcpu))
- 		eb |= get_vmcs12(vcpu)->exception_bitmap;
--        else {
-+	else {
- 		int mask = 0, match = 0;
- 
- 		if (enable_ept && (eb & (1u << PF_VECTOR))) {
-@@ -1214,7 +1214,7 @@ void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
- 		}
- 	}
- 
--    	if (vmx->nested.need_vmcs12_to_shadow_sync)
-+	if (vmx->nested.need_vmcs12_to_shadow_sync)
- 		nested_sync_vmcs12_to_shadow(vcpu);
- 
- 	if (vmx->guest_state_loaded)
-@@ -4934,10 +4934,10 @@ static int vmx_interrupt_allowed(struct kvm_vcpu *vcpu, bool for_injection)
- 	if (to_vmx(vcpu)->nested.nested_run_pending)
- 		return -EBUSY;
- 
--       /*
--        * An IRQ must not be injected into L2 if it's supposed to VM-Exit,
--        * e.g. if the IRQ arrived asynchronously after checking nested events.
--        */
-+	/*
-+	 * An IRQ must not be injected into L2 if it's supposed to VM-Exit,
-+	 * e.g. if the IRQ arrived asynchronously after checking nested events.
+diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+index 8477d8bdd69c..f09e3aaab102 100644
+--- a/arch/x86/kvm/vmx/vmenter.S
++++ b/arch/x86/kvm/vmx/vmenter.S
+@@ -229,7 +229,7 @@ SYM_INNER_LABEL(vmx_vmexit, SYM_L_GLOBAL)
+ 	 * eIBRS has its own protection against poisoned RSB, so it doesn't
+ 	 * need the RSB filling sequence.  But it does need to be enabled, and a
+ 	 * single call to retire, before the first unbalanced RET.
+-         */
 +	 */
- 	if (for_injection && is_guest_mode(vcpu) && nested_exit_on_intr(vcpu))
- 		return -EBUSY;
  
+ 	FILL_RETURN_BUFFER %_ASM_CX, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT,\
+ 			   X86_FEATURE_RSB_VMEXIT_LITE
+@@ -273,7 +273,7 @@ SYM_FUNC_END(__vmx_vcpu_run)
+  * vmread_error_trampoline - Trampoline from inline asm to vmread_error()
+  * @field:	VMCS field encoding that failed
+  * @fault:	%true if the VMREAD faulted, %false if it failed
+-
++ *
+  * Save and restore volatile registers across a call to vmread_error().  Note,
+  * all parameters are passed on the stack.
+  */
 -- 
 2.31.1
 
