@@ -2,73 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 924E0611D7C
-	for <lists+kvm@lfdr.de>; Sat, 29 Oct 2022 00:43:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EC14E611DF3
+	for <lists+kvm@lfdr.de>; Sat, 29 Oct 2022 01:10:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229756AbiJ1Wnv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Oct 2022 18:43:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46320 "EHLO
+        id S229792AbiJ1XKM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Oct 2022 19:10:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbiJ1Wnt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Oct 2022 18:43:49 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0115C1BA1EF
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 15:43:48 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id m6-20020a17090a5a4600b00212f8dffec9so5782545pji.0
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 15:43:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cHR45kjH2znHWnFmIGNkJ/cSlv9LgRb4S3Wf/CHTVok=;
-        b=r15GPLT621sSCoeuICTdvZtS4e+kfBOLAlK79IwHbbKc3Xs0fEiEb7Ksdt9ZVIn9G+
-         x37ibpU3eJpN+UFiRBBWfIQ+skymrJfbHByqAEFyJtp0Oy+0m+a1dw3Imn0sTKo3AASS
-         vwFkVD2+0di/TqkCK6UbytLXk9Xn7HB+Sh9QvcbjknAXC37ySYrfdx0UJr39gdjK71Og
-         Z7Pb+RscQ2Xi5TRivctFe65WJcl7vae87gYMu57db5d0kcE9GXd6cbAkbb4vffzO7Mi+
-         Do2F5Wp3VhIxqwEeLeHeGH/krPQyvkUtLR2heAsNZpiM4XrlLpbL04xe6Et45AXWCenM
-         X4cQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cHR45kjH2znHWnFmIGNkJ/cSlv9LgRb4S3Wf/CHTVok=;
-        b=hGh9lFq9nWFqhpmbHHr6xdweQWCiFqHlK7UpGUNrbVSzitTQ8yqaEiOJ6yzlo9tU7J
-         UiUIqFGvUKyWV0I30FT/pCAl7u0tZf5gAtKPAhldir8t5aO4yYsK0L/u9IbPDwoW2bIo
-         raspkjw+grTtRnO/Bxjk5hpBT8qZuIHEXlyqgiEY5wCNOcd4xGl6m3l4XndxZ//lQDhy
-         hTeR2zhmi5l10+2BNAckn6TGL1+6YTErW/bWrRJsRRFWUKzSDbzDkdFzqIjnM23Is4aP
-         n9oJO2vC0MNIsIjgRni1NrfoOwHL/1ub+F6opVRCDxGG5plFJSFYO7Ld+MgzI7Xj4Y4a
-         I8Rg==
-X-Gm-Message-State: ACrzQf0y+cPkr0ul1Zy8QJlYDVEsLjTS1DeZArKVc6ZwKLL1BkZOJIGc
-        XzERaS3ooB+TbzB8ub+cM//RJ/MUAHzCZg==
-X-Google-Smtp-Source: AMsMyM6JeYeaTej9dClKxvUI5YjEFcJMyB+RUzO/TgK6XyL88smXVuR5N9OvBUbb3vmVXZyUs1Dqcw==
-X-Received: by 2002:a17:90b:33d0:b0:213:137b:1343 with SMTP id lk16-20020a17090b33d000b00213137b1343mr1645497pjb.128.1666997028410;
-        Fri, 28 Oct 2022 15:43:48 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id m11-20020a170902d18b00b0016d4f05eb95sm3460938plb.272.2022.10.28.15.43.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Oct 2022 15:43:47 -0700 (PDT)
-Date:   Fri, 28 Oct 2022 22:43:44 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com
-Subject: Re: [PATCH] KVM: x86: Fix a stall when KVM_SET_MSRS is called on the
- pmu counters
-Message-ID: <Y1xbINshcICWxxfa@google.com>
-References: <20221028130035.1550068-1-aaronlewis@google.com>
- <Y1wCqAzJwvz4s8OR@google.com>
- <CAAAPnDEda-FBz+3suqtA868Szwp-YCoLEmK1c=UynibTWCU1hw@mail.gmail.com>
- <Y1xOvenzUxFIS0iz@google.com>
- <CALMp9eT9S4_k9cFR26idssjV+Yz4VH23hXA10PVTGJwNALKeWw@mail.gmail.com>
+        with ESMTP id S229597AbiJ1XJn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Oct 2022 19:09:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B181237F8F
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 16:07:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666998474;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=A2c8ymd1GFvLBVMNdJ9tI50soRavZnzeQUSNcQq0dMs=;
+        b=ePc6SZ1CM9f7BAnoXR1kI9Jlt3YrihtbSkgTjMfZCCtQyoG1eqD1M0btP8eMTJGbjo+Exf
+        sed/o6jXX4RHhJ/1MvIKYN9UuA3IKI6+Kduz1fg1xj4DzkfdD0ejpifE2cYObZrbHlNYxY
+        6GuFuYfNP4qHneiSt3F+rdMQWvinj60=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-455-LZJSepqpOAikHMAm8TLHDg-1; Fri, 28 Oct 2022 19:07:50 -0400
+X-MC-Unique: LZJSepqpOAikHMAm8TLHDg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E9579857D0D;
+        Fri, 28 Oct 2022 23:07:39 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D7CC540C6EC3;
+        Fri, 28 Oct 2022 23:07:25 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     jmattson@google.com, seanjc@google.com, jpoimboe@kernel.org
+Subject: [RFC PATCH 0/7] KVM: SVM: move MSR_IA32_SPEC_CTRL save/restore to assembly
+Date:   Fri, 28 Oct 2022 19:07:16 -0400
+Message-Id: <20221028230723.3254250-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALMp9eT9S4_k9cFR26idssjV+Yz4VH23hXA10PVTGJwNALKeWw@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,42 +56,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 28, 2022, Jim Mattson wrote:
-> On Fri, Oct 28, 2022 at 2:51 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Fri, Oct 28, 2022, Aaron Lewis wrote:
-> > > On Fri, Oct 28, 2022 at 4:26 PM Sean Christopherson <seanjc@google.com> wrote:
-> > > >
-> > > > On Fri, Oct 28, 2022, Aaron Lewis wrote:
-> > > > @@ -3778,16 +3775,13 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> > > >
-> > > >     case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR3:
-> > > >     case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR1:
-> > > > -        pr = true;
-> > > > -        fallthrough;
-> > > >     case MSR_K7_EVNTSEL0 ... MSR_K7_EVNTSEL3:
-> > > >     case MSR_P6_EVNTSEL0 ... MSR_P6_EVNTSEL1:
-> > > >         if (kvm_pmu_is_valid_msr(vcpu, msr))
-> > > >             return kvm_pmu_set_msr(vcpu, msr_info);
-> > > >
-> > > > -        if (pr || data != 0)
-> > > > -            vcpu_unimpl(vcpu, "disabled perfctr wrmsr: "
-> > > > -                  "0x%x data 0x%llx\n", msr, data);
-> > > > +        if (data)
-> > > > +            kvm_pr_unimpl_wrmsr(vcpu, msr, data);
-> > >
-> > > Any reason to keep the check for 'data' around?  Now that it's
-> > > checking for 'report_ignored_msrs' maybe we don't need that check as
-> > > well.  I'm not sure what the harm is in removing it, and with this
-> > > change we are additionally restricting pmu counter == 0 from printing.
-> >
-> > Checking 'dat' doesn't restrict counter 0, it skips printing if the guest (or host)
-> > is writing '0', e.g. it would also skip the case you encountered where the host is
-> > blindly "restoring" unused MSRs.
-> 
-> The VMM is only blind because KVM_GET_MSR_INDEX_LIST poked it in the
-> eye. It would be nice to have an API that the VMM could query for the
-> list of supported MSRs.
+On the Intel side, restoration of the guest's IA32_SPEC_CTRL is done
+as late as possible before vmentry, with the comment:
 
-That should be a fairly easy bug fix, kvm_init_msr_list() can and should omit PMU
-MSRs if enable_pmu==false.
+* IMPORTANT: To avoid RSB underflow attacks and any other nastiness,
+* there must not be any returns or indirect branches between this code
+* and vmentry.
+
+On AMD, there is no need to avoid returns or indirect branches between
+wrmsr and vmrun because Linux doesn't use IBRS; however, restoration
+of the host IA32_SPEC_CTRL value is definitely way too late. With
+respect to the user/kernel boundary, AMD says, "If software chooses to
+toggle STIBP (e.g., set STIBP on kernel entry, and clear it on kernel
+exit), software should set STIBP to 1 before executing the return thunk
+training sequence." Assuming the same requirements apply to the guest/host
+boundary, KVM does not respect this recommendation: the return thunk
+training sequence is in vmenter.S, quite close to the VM-exit, while
+the host's IA32_SPEC_CTRL value is only restored much later for hosts
+without V_SPEC_CTRL.
+
+In the absence of clarifications for AMD, move all the SPEC_CTRL
+handling to assembly code and, in passing, also make the Intel and AMD
+code a bit more similar to each other.
+
+Patches 1-2 are the Intel side, which is just a cleanup.
+
+Patch 3 prepares for adding asm-offsets.c entries in arch/x86/kvm/svm/svm.h,
+and patches 4-5 are a similar cleanup to the earlier VMX ones.
+
+Patch 6 is the bulk of the change, and finally patch 7 removes now
+dead code in asm/spec-ctrl.h and arch/x86/kernel/.
+
+This is RFC because I haven't tested SEV-ES or 32-bit yet.
+
+Paolo
+
+Paolo Bonzini (7):
+  KVM: VMX: remove regs argument of __vmx_vcpu_run
+  KVM: VMX: more cleanups to __vmx_vcpu_run
+  KVM: SVM: extract VMCB accessors to a new file
+  KVM: SVM: replace argument of __svm_vcpu_run with vcpu_svm
+  KVM: SVM: adjust register allocation for __svm_vcpu_run
+  KVM: SVM: move MSR_IA32_SPEC_CTRL save/restore to assembly
+  x86, KVM: remove unnecessary argument to x86_virt_spec_ctrl and
+    callers
+
+ arch/x86/include/asm/spec-ctrl.h |  10 +-
+ arch/x86/kernel/asm-offsets.c    |   8 ++
+ arch/x86/kernel/cpu/bugs.c       |  15 +--
+ arch/x86/kvm/svm/avic.c          |   1 +
+ arch/x86/kvm/svm/nested.c        |   1 +
+ arch/x86/kvm/svm/sev.c           |   1 +
+ arch/x86/kvm/svm/svm.c           |  39 +++---
+ arch/x86/kvm/svm/svm.h           | 204 +-----------------------------
+ arch/x86/kvm/svm/svm_onhyperv.c  |   1 +
+ arch/x86/kvm/svm/vmcb.h          | 211 +++++++++++++++++++++++++++++++
+ arch/x86/kvm/svm/vmenter.S       | 164 ++++++++++++++++++------
+ arch/x86/kvm/vmx/nested.c        |   3 +-
+ arch/x86/kvm/vmx/vmenter.S       |  92 ++++++--------
+ arch/x86/kvm/vmx/vmx.c           |   3 +-
+ arch/x86/kvm/vmx/vmx.h           |   3 +-
+ 15 files changed, 419 insertions(+), 337 deletions(-)
+ create mode 100644 arch/x86/kvm/svm/vmcb.h
+
+-- 
+2.31.1
+
