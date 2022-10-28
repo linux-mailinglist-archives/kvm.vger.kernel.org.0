@@ -2,60 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 286C3611BBC
-	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 22:48:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 33343611BCF
+	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 22:50:10 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229619AbiJ1UsM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Oct 2022 16:48:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47594 "EHLO
+        id S229918AbiJ1UuH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Oct 2022 16:50:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbiJ1UsK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Oct 2022 16:48:10 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8ABD23AB5E
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 13:48:09 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id t4so3879862wmj.5
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 13:48:09 -0700 (PDT)
+        with ESMTP id S230081AbiJ1Utt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Oct 2022 16:49:49 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 637601274B
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 13:49:39 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id c15-20020a17090a1d0f00b0021365864446so5546586pjd.4
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 13:49:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+Ia+Ezvbp5KM775ScfRUFiPDwhlNlSnYM0zeKrcuYss=;
-        b=Hgk9Ba9mXyrGt+VF/I8vDJk37zea5mcWNtXIdvPW6dfwcjZkZlmOiS0kkecH/ICleu
-         FRtoK/V5cKFezomkkbRKIQpyVLIxid8a9qph2+/7dzI8i1WIMPKNIso+I9DJypZztJmq
-         71hcy+11w+6jvqA6be1/anHUbF8n2+MPGEAHuFFGeeGtl1WX86TsstlNEM0idfouds/m
-         IjHB7CdbKHNxbP+zjGnR5gzz+QZNWq011VzqBb92GENTG4p9QXMpuX31MX92fHCT8bN4
-         vEo53Yk40gTZSxnAL92iEX72pig661rxAxXrxB8FxuDhLQwtpwnKG/6EgjlwXdEoDAmO
-         5t7g==
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=4ahIxp5E6zgmY5llvMRcLGXl/NPQN8b67iS1NzJiQ4g=;
+        b=f9JfHYFunGGiulwrSHLagew+z+UplWS/odc9Hujt4kCZOWAxhUklZLpw9EJO6e50Uy
+         5TbVX4hJgrCTbiT3HXvTewliqxAoFgjygjXFLLhH+6u6EQicfJ3NqGLew7R/bVZXtF11
+         f8yQbUFcQoxfiwu1ZuQ1JP0h80R0CCcB+JlNBon7ZSK5Y5SdefibrydKMzKa/3PQRNqx
+         02jmCwf2iuqc0Tq/vzCcX/dunyW7ZyCJLhXsow0UDJb/u+x8f7G43acn31YiF/ACxbzq
+         s4GiKXzj9dxxPj5c5W99b5hTZBV/NpV99fDzAgIlQp2uyWIvC6aQ6S9TMb5OPQRRmu56
+         D0yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+Ia+Ezvbp5KM775ScfRUFiPDwhlNlSnYM0zeKrcuYss=;
-        b=dOGPHLIKNw05SVOAM5KhLWc+7K5kSbGk/6dVkD8Sik4C83ulx0u8NG8bSAIvWG8Sw3
-         f8bML0OJ6/BwkuQZfGwOuvCTxSP0Di3jkPUL8s/aNelbUPvHEp0bm0fVUUxvXFfk33eK
-         o4AmArGC7OuTKUb8B92NTtp92KDj/dGA3khKzdo/vlS1T/nBy68NLwrhPpyyxjBwyX9c
-         RdpVqpMwUPJh/4zyczVqB/kTpB9XQ75deqAzH9ihXgkTyadJPGw1jLcyfSgrxuOUUZIk
-         VuH9Q+8CASRISyXJYeCg19te3v8z5FnzbLcKbnPU16QY+0QJQ1LKnyxgEfkz1RD25bsl
-         mnbg==
-X-Gm-Message-State: ACrzQf2j4LtprqXCc9cKODc43werkwIPEHeJT1styV3sBFqyr1OBGte5
-        /UV8NLzZiQFzJcVT2ZyLX3yr0fMlB0FTmgT3ylCKnA==
-X-Google-Smtp-Source: AMsMyM45/AkG/ddDvuBZie5EyGj/h1k339+R4gNXroLF+dmn9LIahnWe2ztYqcO+/NvKlrASM0t32rLYEGWs4wyXLM0=
-X-Received: by 2002:a7b:cb8b:0:b0:3c5:9825:6f01 with SMTP id
- m11-20020a7bcb8b000000b003c598256f01mr10951133wmi.156.1666990088257; Fri, 28
- Oct 2022 13:48:08 -0700 (PDT)
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4ahIxp5E6zgmY5llvMRcLGXl/NPQN8b67iS1NzJiQ4g=;
+        b=n3Xf61D93J+1ShgLhPb6/76AYil6LYr/ZSIj3ctmJfYVJ9EUQZyf4o5dE3wHsiXjmq
+         GYVbxqZ+u8DtBUB/o/jMxZ9Z2Hh0gCY3f1FJCVwU1ZzLxzHhQLaQVSHq+c8DRMFrefxv
+         YadAxbEPgfNY/3m/1iqrHNqe5hAen+zbIaOTUAY1L4fYLtnAKEyBLQTfuoGZ50fzeHWg
+         D7hCEN7wbSHmNLOs8H/aBVccN2Hvn2wL1BykRNRmkRsGplC2rmyPjpi5ab+4rRVueRYf
+         RdackGo7tuT8vh1hr2d4UOPDBVEDgnX+QnixpGbUFzKiyn1UwNzVPc1sftPjVxDZn+nY
+         wdhg==
+X-Gm-Message-State: ACrzQf1tzC+Sa61ywlAmpqtzfmj8rgBukjH6MSG4Li9Ug82ikRHQMhlG
+        HWdjEoPWgHMyAHfXB5wVK7c6ew==
+X-Google-Smtp-Source: AMsMyM6Glu6sSyICcJkyXbPyf8ild7ksFSp1x5PWMbVMG1TLY+XHCzKbNMggcgYyNa1VpboWEgsc0Q==
+X-Received: by 2002:a17:903:26ce:b0:186:9029:fa22 with SMTP id jg14-20020a17090326ce00b001869029fa22mr858934plb.140.1666990178652;
+        Fri, 28 Oct 2022 13:49:38 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id f4-20020a62db04000000b00560cdb3784bsm3240657pfg.60.2022.10.28.13.49.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Oct 2022 13:49:37 -0700 (PDT)
+Date:   Fri, 28 Oct 2022 20:49:34 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        dmatlack@google.com, oupton@google.com, ricarkol@google.com
+Subject: Re: [PATCH v8 2/4] KVM: selftests: create -r argument to specify
+ random seed
+Message-ID: <Y1xAXtnQyTqbIMVE@google.com>
+References: <20221027205631.340339-1-coltonlewis@google.com>
+ <20221027205631.340339-3-coltonlewis@google.com>
 MIME-Version: 1.0
-References: <20221028130035.1550068-1-aaronlewis@google.com> <Y1wCqAzJwvz4s8OR@google.com>
-In-Reply-To: <Y1wCqAzJwvz4s8OR@google.com>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Fri, 28 Oct 2022 20:47:56 +0000
-Message-ID: <CAAAPnDEda-FBz+3suqtA868Szwp-YCoLEmK1c=UynibTWCU1hw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Fix a stall when KVM_SET_MSRS is called on the
- pmu counters
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20221027205631.340339-3-coltonlewis@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -67,93 +75,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 28, 2022 at 4:26 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Oct 28, 2022, Aaron Lewis wrote:
-> > A stall in this situation could have an impact on live migration. So,
-> > to avoid that disable the print if the write is initiated by the host.
->
-> ...
->
-> > Fixes: 5753785fa977 ("KVM: do not #GP on perf MSR writes when vPMU is disabled")
-> > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> > ---
-> > arch/x86/kvm/x86.c | 2 +-
-> > 1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 9cf1ba865562..a3b842467bd2 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -3778,7 +3778,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> >
-> >    case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR3:
-> >    case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR1:
-> > -       pr = true;
-> > +       pr = !msr_info->host_initiated;
->
-> Wasting guest cycles isn't any better, and there are plenty more MSRs that don't
-> honor report_ignored_msrs, i.e. you'll be playing whack-a-mole.
->
-> My first choice would be to delete all MSR printks, but since that's probably not
-> an option...
->
-> ---
-> From: Sean Christopherson <seanjc@google.com>
-> Date: Fri, 28 Oct 2022 09:20:03 -0700
-> Subject: [PATCH] KVM: x86: Gate all "unimplemented MSR" prints on
-> report_ignored_msrs
->
-> Add helpers to print unimplemented MSR accesses and condition all such
-> prints on report_ignored_msrs, i.e. honor userspace's request to not
-> print unimplemented MSRs. Even though vcpu_unimpl() is ratelimited,
-> printing can still be problematic, e.g. if a print gets stalled when host
-> userspace is writing MSRs during live migration, an effective stall can
-> result in very noticeable disruption in the guest.
->
+On Thu, Oct 27, 2022, Colton Lewis wrote:
+> diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> index 9618b37c66f7..5f0eebb626b5 100644
+> --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
+> +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> @@ -49,6 +49,7 @@ void perf_test_guest_code(uint32_t vcpu_idx)
+>  	uint64_t gva;
+>  	uint64_t pages;
+>  	int i;
+> +	struct guest_random_state rand_state = new_guest_random_state(pta->random_seed + vcpu_idx);
 
-Yeah, I like this approach better.
+This belong in the first patch that consumes rand_state, which I believe is patch 3.
 
-> @@ -3778,16 +3775,13 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->
->     case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR3:
->     case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR1:
-> -        pr = true;
-> -        fallthrough;
->     case MSR_K7_EVNTSEL0 ... MSR_K7_EVNTSEL3:
->     case MSR_P6_EVNTSEL0 ... MSR_P6_EVNTSEL1:
->         if (kvm_pmu_is_valid_msr(vcpu, msr))
->             return kvm_pmu_set_msr(vcpu, msr_info);
->
-> -        if (pr || data != 0)
-> -            vcpu_unimpl(vcpu, "disabled perfctr wrmsr: "
-> -                  "0x%x data 0x%llx\n", msr, data);
-> +        if (data)
-> +            kvm_pr_unimpl_wrmsr(vcpu, msr, data);
-
-Any reason to keep the check for 'data' around?  Now that it's
-checking for 'report_ignored_msrs' maybe we don't need that check as
-well.  I'm not sure what the harm is in removing it, and with this
-change we are additionally restricting pmu counter == 0 from printing.
-If there's nothing special about it, let them both print.
-
->         break;
->     case MSR_K7_CLK_CTL:
->         /*
-> @@ -3814,9 +3808,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->         /* Drop writes to this legacy MSR -- see rdmsr
->         * counterpart for further detail.
->         */
-> -        if (report_ignored_msrs)
-> -            vcpu_unimpl(vcpu, "ignored wrmsr: 0x%x data 0x%llx\n",
-> -                msr, data);
-> +        kvm_pr_unimpl_wrmsr(vcpu, msr, data);
->         break;
->     case MSR_AMD64_OSVW_ID_LENGTH:
->         if (!guest_cpuid_has(vcpu, X86_FEATURE_OSVW))
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index 829d3134c1eb..4921a0774bf7 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -330,6 +330,18 @@ extern bool report_ignored_msrs;
->
+lib/perf_test_util.c: In function ‘perf_test_guest_code’:
+lib/perf_test_util.c:52:35: error: unused variable ‘rand_state’ [-Werror=unused-variable]
+   52 |         struct guest_random_state rand_state = new_guest_random_state(pta->random_seed + vcpu_idx);
+      |               
