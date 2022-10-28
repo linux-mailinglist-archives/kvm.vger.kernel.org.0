@@ -2,123 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 474DF6115E0
-	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 17:31:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C364611641
+	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 17:49:39 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230165AbiJ1PbU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Oct 2022 11:31:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41886 "EHLO
+        id S229781AbiJ1Ptf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Oct 2022 11:49:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230202AbiJ1PbM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Oct 2022 11:31:12 -0400
-Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 224B81C73CB
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 08:31:10 -0700 (PDT)
-Date:   Fri, 28 Oct 2022 17:31:07 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1666971068;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mKCuPt/8IWceQBTjesPE2RI/v342KHoVYNbvb2oGIP8=;
-        b=cuKEiP9Bg1x9GoVMbysf+C4/1aQCs1sFDPgLKeGi1NcRcVmD1tizMDcG4TCF2SodD0+zks
-        0IHvBXJOV1lpsQirhekOgTB/NZ+SS2OflLj+ppq03FQectutagyp4FGQ9NPMhw6C0g1t6K
-        enOBU6s4b7+eDXJ6Hl+hiUMtz8U15yY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Andrew Jones <andrew.jones@linux.dev>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, alexandru.elisei@arm.com,
-        eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
-Subject: Re: [kvm-unit-tests PATCH v4 0/4] arm: pmu: Fixes for bare metal
-Message-ID: <20221028153107.ul5uexzwuwefes6a@kamzik>
-References: <20220811185210.234711-1-ricarkol@google.com>
- <20221028114041.5symayccvdgkqaor@kamzik>
- <86fsf8dmap.wl-maz@kernel.org>
+        with ESMTP id S229610AbiJ1Pt0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Oct 2022 11:49:26 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22D681F1836
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 08:49:25 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id c2so5165348plz.11
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 08:49:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bz9f4W1u+5LowQmFLyockgzF0Sn2c69dnPpsIt58fHM=;
+        b=QaMVn5zlnvJABPZ655YM9LGwSYohNg2YwDsROYVQBkBTkLQ2qniffWNofa32irCtaB
+         MTNGs++gyUnAgJIZhmvCUtdG/wTaFCCF4G1o/AshfTTGoegdcjMpfU2w8cZN/zqJ0Tlk
+         V0X/ON1hKghgp4gPUlcms1iD9eVkWWfFR8nppe8ySeefTTQ7Coq8ugrqiySHQT48kDC2
+         fbDUuPXWsll4vfjRH5xZkKjrsD58ya/TatwUmn8FwuylMbwmxGkAvpber9W6ZDtLaReC
+         /ydQWYH4FDAdQBstJX7bqLX5zY2KidZXt3LD6CXyKpygRJ951252KQbc3MijMgQoakB6
+         X9Ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bz9f4W1u+5LowQmFLyockgzF0Sn2c69dnPpsIt58fHM=;
+        b=sGi5taK5afdP2jsGYViGUhGaED5uJXgAiryZlHmE6nHZgd1X7YQxm5Ubb/dLaQtI4g
+         N0ywgUfuWIEsLWHcHw8pUIqbrSq4loNm9dAHHmYw/kl1GsZYH5Ql/hPpekZch8ljAhKS
+         bC8jMZCcWsD6isZqxVTjrHoF4tdkxceXsKnKHfvyX4iFDE6bDhgvokxZrNt0gd15D6Bj
+         tpAOxJTEaQSXIyLpnP91IQ45LP5JIMxSdFtAVjqjFwvC+PgQwoQBCuItC4X1R20mtPUE
+         0FVvUrO0LrJF8T3DRdq9iRHcjnKEVCN365561cBiWAVHsO78FTaYIf1aSG2BYVSRZm3v
+         Vp8w==
+X-Gm-Message-State: ACrzQf2C1C2ATsW9YnN/7ZhhrDcagW0T1oMVeJnedfkt8vKTIJdG3rlb
+        u5UmlDzs3M4MQOK3XMoyVf+VZA==
+X-Google-Smtp-Source: AMsMyM5Y0IRJyyDUSr5SMT+Tz+YYgUWzK/ysdVA/J+JtYgl2o1pF+1jN7ivU/UCLPetkHLDJZ27PsQ==
+X-Received: by 2002:a17:90b:1d83:b0:212:dc2f:8fc7 with SMTP id pf3-20020a17090b1d8300b00212dc2f8fc7mr16172020pjb.131.1666972164514;
+        Fri, 28 Oct 2022 08:49:24 -0700 (PDT)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id o1-20020a635a01000000b00434760ee36asm2853580pgb.16.2022.10.28.08.49.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Oct 2022 08:49:24 -0700 (PDT)
+Date:   Fri, 28 Oct 2022 15:49:20 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Andrew Jones <andrew.jones@linux.dev>
+Cc:     David Matlack <dmatlack@google.com>,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "vipinsh@google.com" <vipinsh@google.com>,
+        "ajones@ventanamicro.com" <ajones@ventanamicro.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v1 00/18] KVM selftests code consolidation and cleanup
+Message-ID: <Y1v6AEInngzRxSJ+@google.com>
+References: <20221024113445.1022147-1-wei.w.wang@intel.com>
+ <Y1mlJqKdFtlgG3jR@google.com>
+ <DS0PR11MB63731F2B467D4084F5C8D9B5DC339@DS0PR11MB6373.namprd11.prod.outlook.com>
+ <Y1qnWFzekT27rYka@google.com>
+ <CALzav=c4-FWVrWQebuYs--vbgnyPjEwZxfjSS1aMSRL3JMbWYw@mail.gmail.com>
+ <Y1rNm0E6/I5y6K2a@google.com>
+ <20221028124106.oze32j2lkq5ykifj@kamzik>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86fsf8dmap.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20221028124106.oze32j2lkq5ykifj@kamzik>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 28, 2022 at 04:01:50PM +0100, Marc Zyngier wrote:
-> Hi Drew,
-> 
-> On Fri, 28 Oct 2022 12:40:41 +0100,
-> Andrew Jones <andrew.jones@linux.dev> wrote:
+On Fri, Oct 28, 2022, Andrew Jones wrote:
+> On Thu, Oct 27, 2022 at 06:27:39PM +0000, Sean Christopherson wrote:
+> > On Thu, Oct 27, 2022, David Matlack wrote:
+> > > On Thu, Oct 27, 2022 at 8:44 AM Sean Christopherson <seanjc@google.com> wrote:
+> > > > I like the idea in theory, but that'd be a daunting task to set up, and quite the
+> > > > maintenance nightmare.  There are probably thousands of file => scope mappings
+> > > > throughout the kernel, with any number of exceptions and arbitrary rules.
+> > > 
+> > > I was thinking about proposing this in checkpatch.pl, or in some
+> > > KVM-specific check script. It seems like the following rule: If a
+> > > commit only modifies files in tools/testing/selftests/kvm/*, then
+> > > requires the shortlog match the regex "KVM: selftests: .*". That would
+> > > handle the vast majority of cases without affecting other subsystems.
+> > > 
+> > > Sean are you more concerned that if we start validating shortlogs in
+> > > checkpatch.pl then eventually it will get too out of hand? (i.e. not
+> > > so concerned with this specific case, but the general problem?)
 > > 
-> > On Thu, Aug 11, 2022 at 11:52:06AM -0700, Ricardo Koller wrote:
-> > > There are some tests that fail when running on bare metal (including a
-> > > passthrough prototype).  There are three issues with the tests.  The
-> > > first one is that there are some missing isb()'s between enabling event
-> > > counting and the actual counting. This wasn't an issue on KVM as
-> > > trapping on registers served as context synchronization events. The
-> > > second issue is that some tests assume that registers reset to 0.  And
-> > > finally, the third issue is that overflowing the low counter of a
-> > > chained event sets the overflow flag in PMVOS and some tests fail by
-> > > checking for it not being set.
-> > > 
-> > > Addressed all comments from the previous version:
-> > > https://lore.kernel.org/kvmarm/YvPsBKGbHHQP+0oS@google.com/T/#mb077998e2eb9fb3e15930b3412fd7ba2fb4103ca
-> > > - add pmu_reset() for 32-bit arm [Andrew]
-> > > - collect r-b from Alexandru
-> > > 
-> > > Thanks!
-> > > Ricardo
-> > > 
-> > > Ricardo Koller (4):
-> > >   arm: pmu: Add missing isb()'s after sys register writing
-> > >   arm: pmu: Add reset_pmu() for 32-bit arm
-> > >   arm: pmu: Reset the pmu registers before starting some tests
-> > >   arm: pmu: Check for overflow in the low counter in chained counters
-> > >     tests
-> > > 
-> > >  arm/pmu.c | 72 ++++++++++++++++++++++++++++++++++++++++++-------------
-> > >  1 file changed, 55 insertions(+), 17 deletions(-)
-> > >
+> > Ya, the general problem.  Hardcoding anything KVM specific in checkpatch.pl isn't
+> > going to fly.  The checkpatch maintainers most definitely don't want to take on
+> > the burden of maintaining subsystem rules.  Letting one subsystem add custom rules
+> > effectively opens the flood gates to all subsystems adding custom rules.  And from
+> > a KVM perspective, I don't want to have to get an Acked-by from a checkpatch
+> > maintiainer just to tweak a KVM rule.
 > > 
-> > Hi all,
+> > The only somewhat feasible approach I can think of would be to provide a generic
+> > "language" for shortlog scope rules, and have checkpatch look for a well-known
+> > file in relevant directories, e.g. add arch/x86/kvm/SCOPES or whatever.  But even
+> > that is a non-trivial problem to solve, as it means coming up with a "language"
+> > that has a reasonable chance of working for many subsystems without generating too
+> > many false positives.
 > > 
-> > Please refresh my memory. Does this series work on current platforms? Or
-> > was it introducing new test failures which may be in the test, as opposed
-> > to KVM? If they work on most platforms, but not on every platform, then
-> > have we identified what triggers them to fail and whether that should be
-> > fixed or just worked-around? I'm sorry I still can't help out with the
-> > testing as I haven't yet had time to setup the Rpi that Mark Rutland gave
-> > me in Dublin.
+> > It's definitely doable, and likely not actually a maintenance nightmare (I wrote
+> > that thinking of modifying a common rules file).  But it's still fairly daunting
+> > as getting buy-in on something that affects the kernel at large tends to be easier
+> > said then done.  Then again, I'm probably being pessimistic due to my sub-par
+> > regex+scripting skills :-)
 > 
-> This series does show that KVM is buggy, and I have patches out to fix
-> it [1]. The patches should work on anything, really.
-> 
-> > I know this series has been rotting on arm/queue for months, so I'll be
-> > happy to merge it if the consensus is to do so. I can also drop it, or
-> > some of the patches, if that's the consensus.
-> 
-> I'd be very happy to see these patches being merged.
+> How about adding support for checkpatch extension plugins? If we could add
+> a plugin script, e.g. tools/testing/selftests/kvm/.checkpatch, and modify
+> checkpatch to run .checkpatch scripts in the patched files' directories
+> (and recursively in the parent directories) when found, then we'd get
+> custom checkpatch behaviors. The scripts wouldn't even have to be written
+> in Perl (but I say that a bit sadly, because I like Perl).
 
-Thanks for the information, Marc. I've gone ahead and merged the tests.
-What's the worst than can happen :-)  Anyway, I agree that when the tests
-start failing in CIs, then they're doing their job. If your pending series
-can't be applied right away, then the CIs can likely be taught to
-temporarily ignore the known failures.
+That will work for simple cases, but patches that touch files in multiple directories
+will be messy.  E.g. a patch that touches virt/kvm/ and arch/x86/kvm/ will have
+two separate custom rules enforcing two different scopes.
 
-Thanks,
-drew
+Recursively executing plugins will also be problematic, e.g. except for KVM, arch/x86/
+is maintained by the tip-tree folks, and the tip-tree is quite opinionated on all
+sorts of things, whereas KVM tends to be a bit more relaxed.
 
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> [1] https://lore.kernel.org/r/20221028105402.2030192-1-maz@kernel.org
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+Enforcing scope through plugins would also lead to some amount of duplicate code
+throught subsystems.
+
+Anyways, if someone wants to pursue this, these ideas and the "requirement" should
+be run by the checkpatch maintainers.  They have far more experience and authority
+in this area, and I suspect we aren't the first people to want checkpatch to get
+involved in enforcing shortlog scope.
