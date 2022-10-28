@@ -2,128 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FA53610BE7
-	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 10:09:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F0C2610C4B
+	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 10:35:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229865AbiJ1IJm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Oct 2022 04:09:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45416 "EHLO
+        id S229948AbiJ1IfP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Oct 2022 04:35:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229861AbiJ1IJi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Oct 2022 04:09:38 -0400
-Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6294C13F52
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 01:09:35 -0700 (PDT)
-Date:   Fri, 28 Oct 2022 08:09:28 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1666944573;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=JM6jjCOg4B/nBsCLQJUX0tqnjcO62JfElm0bHX5zSwY=;
-        b=UPIe18vexaYmqZWm9yO6uzv/kq8kwiNK6ZQwKNfNajdfLGC8lX+uCs6hzgVZhxkaGWPHA2
-        2ZKTycrHY+SAbgZd3H9t7FpsRsaoREvEqxoFX0k+J8jE8LO3XWN9Ibe/RwJi7WUd1Ab62s
-        EoSQxaguZtogPxu0k3eDcROy88h/KtA=
+        with ESMTP id S229939AbiJ1IfO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Oct 2022 04:35:14 -0400
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5D0257DC4
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 01:35:11 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1666946110;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Yf+n15Bb2ai4QCnL88CYPPcwLq0iceY6iN9pF2k3P5Q=;
+        b=j4kJJ3RLELiXfnfiOSev4HcPjbiLyo2ZYe9906cwpPEHi5GeHTEmxSnwfS96sVLJ7mjH1M
+        UaQJZZS5mhInspdE4rPozTxnSUFZd4Se2DfO9BGIgRVW1UWkzvnbbQtjWa4twTwUAeFDEN
+        JGF0EqGst0zc7IPKVcnxshyf3KI15Bo=
 From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Will Deacon <will@kernel.org>
-Cc:     kvmarm@lists.linux.dev, Sean Christopherson <seanjc@google.com>,
+To:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Quentin Perret <qperret@google.com>,
+        kvmarm@lists.linux.dev, Will Deacon <will@kernel.org>,
+        Fuad Tabba <tabba@google.com>,
         Vincent Donnefort <vdonnefort@google.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-        James Morse <james.morse@arm.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>,
-        Quentin Perret <qperret@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Fuad Tabba <tabba@google.com>, Marc Zyngier <maz@kernel.org>,
-        kernel-team@android.com, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v5 02/25] KVM: arm64: Allow attaching of non-coalescable
- pages to a hyp pool
-Message-ID: <Y1uOOGUMDlJ2tu2M@google.com>
-References: <20221020133827.5541-1-will@kernel.org>
- <20221020133827.5541-3-will@kernel.org>
- <Y1sfpM3IjNvr8ckf@google.com>
+        Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH 0/2] KVM: arm64: pKVM memory transitions cleanup
+Date:   Fri, 28 Oct 2022 08:34:46 +0000
+Message-Id: <20221028083448.1998389-1-oliver.upton@linux.dev>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y1sfpM3IjNvr8ckf@google.com>
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 28, 2022 at 12:17:40AM +0000, Oliver Upton wrote:
-> On Thu, Oct 20, 2022 at 02:38:04PM +0100, Will Deacon wrote:
-> > From: Quentin Perret <qperret@google.com>
-> > 
-> > All the contiguous pages used to initialize a 'struct hyp_pool' are
-> > considered coalescable, which means that the hyp page allocator will
-> > actively try to merge them with their buddies on the hyp_put_page() path.
-> > However, using hyp_put_page() on a page that is not part of the inital
-> > memory range given to a hyp_pool() is currently unsupported.
-> > 
-> > In order to allow dynamically extending hyp pools at run-time, add a
-> > check to __hyp_attach_page() to allow inserting 'external' pages into
-> > the free-list of order 0. This will be necessary to allow lazy donation
-> > of pages from the host to the hypervisor when allocating guest stage-2
-> > page-table pages at EL2.
-> 
-> Is it ever going to be the case that we wind up mixing static and
-> dynamic memory within the same buddy allocator? Reading ahead a bit it
-> would seem pKVM uses separate allocators (i.e. pkvm_hyp_vm::pool for
-> donated memory) but just wanted to make sure.
-> 
-> I suppose what I'm getting at is the fact that the pool range makes
-> little sense in this case. Adding a field to hyp_pool describing the
-> type of pool that it is would make this more readable, such that we know
-> a pool contains only donated memory, and thus zero order pages should
-> never be coalesced.
-> 
-> > Tested-by: Vincent Donnefort <vdonnefort@google.com>
-> > Signed-off-by: Quentin Perret <qperret@google.com>
-> > Signed-off-by: Will Deacon <will@kernel.org>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/page_alloc.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-> > index 1ded09fc9b10..0d15227aced8 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-> > @@ -93,11 +93,15 @@ static inline struct hyp_page *node_to_page(struct list_head *node)
-> >  static void __hyp_attach_page(struct hyp_pool *pool,
-> >  			      struct hyp_page *p)
-> >  {
-> > +	phys_addr_t phys = hyp_page_to_phys(p);
-> >  	unsigned short order = p->order;
-> >  	struct hyp_page *buddy;
-> >  
-> >  	memset(hyp_page_to_virt(p), 0, PAGE_SIZE << p->order);
-> >  
-> > +	if (phys < pool->range_start || phys >= pool->range_end)
-> > +		goto insert;
-> > +
-> 
-> Assuming this is kept as-is...
-> 
-> This check reads really odd to me, but I understand how it applies to
-> the use case here. Perhaps create a helper (to be shared with
-> __find_buddy_nocheck()) and add a nice comment atop it describing the
-> significance of pages that exist outside the boundaries of the buddy
-> allocator.
+In order to help resolve my own bikeshedding on the outstanding pKVM
+patches [1], small deck of patches to polish up the existing memory
+transitions. Mainly:
 
-Sorry, I'm a moron. The check in __find_buddy_nocheck() is of course
-necessary and irrelevant to the comment I've made above. But maybe I've
-proved my point by tripping over it? :-)
+ - Rejig the layout of pkvm_mem_transition
+ - Stop using out pointers to get at the 'completer' addr
+ - Use better-fitting terminology (source/target) to describe the
+   addresses involved in a memory transition
 
---
-Thanks,
-Oliver
+Applies to 6.1-rc2. Politely compile tested, and that's just about it.
+
+Oliver Upton (2):
+  KVM: arm64: Clean out the odd handling of completer_addr
+  KVM: arm64: Redefine pKVM memory transitions in terms of source/target
+
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 124 +++++++++++---------------
+ 1 file changed, 52 insertions(+), 72 deletions(-)
+
+
+base-commit: 247f34f7b80357943234f93f247a1ae6b6c3a740
+-- 
+2.38.1.273.g43a17bfeac-goog
+
