@@ -2,159 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CEA8D610FD6
-	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 13:37:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 19EB3610FDA
+	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 13:38:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229898AbiJ1LhY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Oct 2022 07:37:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51422 "EHLO
+        id S229938AbiJ1Lig (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Oct 2022 07:38:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbiJ1LhX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Oct 2022 07:37:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B26C1D20C2
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 04:36:25 -0700 (PDT)
+        with ESMTP id S229613AbiJ1Lif (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Oct 2022 07:38:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91E141D20E8
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 04:37:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666956984;
+        s=mimecast20190719; t=1666957058;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=h+t73/ZljYXT5F7jsdtcoGf9en8qeiMUB5F5E4isrHQ=;
-        b=ZH0U8CQcggOfy+myYWbTXAlKIPvINnWrMlLkYYkrBH+FPB+Up5KoDqY4hVEjGdzagyjlkp
-        Ql8e0hw+aaagSDPMMQN4MfR9zLKKO5CCxv4sBm98YwFZI2Y14naiqPLC3komUccUgblJRP
-        LkeUB7Q0NcxSa3XFMfYJLzjuWiNAodk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-26-gT_XeInfOQCrl5AUq56RjA-1; Fri, 28 Oct 2022 07:36:23 -0400
-X-MC-Unique: gT_XeInfOQCrl5AUq56RjA-1
-Received: by mail-wm1-f69.google.com with SMTP id h204-20020a1c21d5000000b003cf4e055442so2185035wmh.1
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 04:36:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h+t73/ZljYXT5F7jsdtcoGf9en8qeiMUB5F5E4isrHQ=;
-        b=TV7XFbMxhFTMYh64uZOwXtabI57bqBvet1l+uwv59TgVwgwuwO5GsRC1iitfqoklNp
-         +N87QvR24LeYTh4ZS2RMQHV9kTCTnXzfaXy0+TDywkPing+d1X+2UQvoQHdY+2qzD2gA
-         ULk/71V8gTpi05NllVPniyCLKW+7WEbRNf6ReO6hlWHd8dNFrIekjGuhI5W/dny5atAv
-         YZr40Wq8XPGyfg/K5RdW+fMhpGK7prY1teuOa9Cjs6WmQB2Gqk+W87eOkRL9ur7kVf4C
-         PjKAX66N/eCrvXLlTzFd+D97VduYgMmvFi3zz9duQUks3akQVEwI+H+2uYvnJVNRBvYO
-         RInQ==
-X-Gm-Message-State: ACrzQf243TPA4KWweS++mYeN+j7ZnuGAMrPCUylMp9POFXJ4BWGFKnHZ
-        KgeUdhNzmeXkOjaQaEmk+4Kf2DqjmqGFMYJKo4xN0/7iJ//kyqiL658Qs2n+659/zj7tPenafUx
-        30jl5AA8/wMkF
-X-Received: by 2002:a5d:6dac:0:b0:236:6018:ebee with SMTP id u12-20020a5d6dac000000b002366018ebeemr20032898wrs.202.1666956981955;
-        Fri, 28 Oct 2022 04:36:21 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM7p9r6xcm2RUX/04gq2vplPI1McA86EjhkCcrLZg06y3OrwpTBWtFtl/FcN2KgtCRLGM98+Xw==
-X-Received: by 2002:a5d:6dac:0:b0:236:6018:ebee with SMTP id u12-20020a5d6dac000000b002366018ebeemr20032886wrs.202.1666956981673;
-        Fri, 28 Oct 2022 04:36:21 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id n15-20020a056000170f00b0022cd0c8c696sm3606024wrc.103.2022.10.28.04.36.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Oct 2022 04:36:20 -0700 (PDT)
-Message-ID: <c61f6089-57b7-e00f-d5ed-68e62237eab0@redhat.com>
-Date:   Fri, 28 Oct 2022 13:36:20 +0200
+        bh=7oxL0Wn6bgvSdMNJpuJx00jMn03xxj9+wteuUP1B+kQ=;
+        b=dda3Ui9xIOkCrDxJu2iWZYBPdKwz39odh+KEdB70bh5MXplMvuHtIR2mjVwQOV37wGj7W0
+        szmEVpeuY/txKb1aUvHizN78dQdGlQt8hLvL/O5XDYJf1BO7br8kcB+QcuhXWTf4ztXAYa
+        bOixnxTLzQQaR8CfWReIs/PM9sUv5m8=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-93-TldeBCsyNLa3XMgP1Ho9Qg-1; Fri, 28 Oct 2022 07:37:37 -0400
+X-MC-Unique: TldeBCsyNLa3XMgP1Ho9Qg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B925B3C0F67B;
+        Fri, 28 Oct 2022 11:37:36 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.13])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B09949BB61;
+        Fri, 28 Oct 2022 11:37:36 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Andrew Jones <andrew.jones@linux.dev>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu
+Subject: Re: [kvm-unit-tests PATCH] MAINTAINERS: new kvmarm mailing list
+In-Reply-To: <20221025160730.40846-1-cohuck@redhat.com>
+Organization: Red Hat GmbH
+References: <20221025160730.40846-1-cohuck@redhat.com>
+User-Agent: Notmuch/0.37 (https://notmuchmail.org)
+Date:   Fri, 28 Oct 2022 13:37:34 +0200
+Message-ID: <87a65gkwld.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, mhal@rbox.co
-References: <20221027161849.2989332-1-pbonzini@redhat.com>
- <20221027161849.2989332-4-pbonzini@redhat.com> <Y1q+a3gtABqJPmmr@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 03/16] KVM: x86: set gfn-to-pfn cache length consistently
- with VM word size
-In-Reply-To: <Y1q+a3gtABqJPmmr@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/27/22 19:22, Sean Christopherson wrote:
-> On Thu, Oct 27, 2022, Paolo Bonzini wrote:
->> So, use the short size at activation time as well.  This means
->> re-activating the cache if the guest requests the hypercall page
->> multiple times with different word sizes (this can happen when
->> kexec-ing, for example).
-> 
-> I don't understand the motivation for allowing a conditionally valid GPA.  I see
-> a lot of complexity and sub-optimal error handling for a use case that no one
-> cares about.  Realistically, userspace is never going to provide a GPA that only
-> works some of the time, because doing otherwise is just asking for a dead guest.
+On Tue, Oct 25 2022, Cornelia Huck <cohuck@redhat.com> wrote:
 
-We _should_ be following the Xen API, which does not even say that the
-areas have to fit in a single page.  In fact, even Linux's
+> KVM/arm64 development is moving to a new mailing list (see
+> https://lore.kernel.org/all/20221001091245.3900668-1-maz@kernel.org/);
+> kvm-unit-tests should advertise the new list as well.
+>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>  MAINTAINERS | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 90ead214a75d..649de509a511 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -67,7 +67,8 @@ ARM
+>  M: Andrew Jones <andrew.jones@linux.dev>
+>  S: Supported
+>  L: kvm@vger.kernel.org
+> -L: kvmarm@lists.cs.columbia.edu
+> +L: kvmarm@lists.linux.dev
+> +L: kvmarm@lists.cs.columbia.edu (deprecated)
 
-         struct vcpu_register_runstate_memory_area area;
+As the days of the Columbia list really seem to be numbered (see
+https://lore.kernel.org/all/364100e884023234e4ab9e525774d427@kernel.org/),
+should we maybe drop it completely from MAINTAINERS, depending on when
+this gets merged?
 
-         area.addr.v = &per_cpu(xen_runstate, cpu);
-         if (HYPERVISOR_vcpu_op(VCPUOP_register_runstate_memory_area,
-                                xen_vcpu_nr(cpu), &area))
-
-could fail or not just depending on the linker's whims, if I'm not
-very confused.
-
-Other data structures *do* have to fit in a page, but the runstate area
-does not and it's exactly the one where the cache comes the most handy.
-For this I'm going to wait for David to answer.
-
-That said, the whole gpc API is really messy and needs to be cleaned
-up beyond what this series does.  For example,
-
-         read_lock_irqsave(&gpc->lock, flags);
-         while (!kvm_gfn_to_pfn_cache_check(v->kvm, gpc, gpc->gpa,
-                                            sizeof(x))) {
-                 read_unlock_irqrestore(&gpc->lock, flags);
-
-                 if (kvm_gfn_to_pfn_cache_refresh(v->kvm, gpc, gpc->gpa, sizeof(x)))
-                         return;
-
-                 read_lock_irqsave(&gpc->lock, flags);
-         }
-	...
-         read_unlock_irqrestore(&gpc->lock, flags);
-
-should really be simplified to
-
-	khva = kvm_gpc_lock(gpc);
-	if (IS_ERR(khva))
-		return;
-	...
-	kvm_gpc_unlock(gpc);
-
-Only the special preempt-notifier cases would have to use check/refresh
-by hand.  If needed they could even pass whatever length they want to
-__kvm_gpc_refresh with, explicit marking that it's a here-be-dragons __API.
-
-Also because we're using the gpc from non-preemptible regions the rwlock
-critical sections should be enclosed in preempt_disable()/preempt_enable().
-Fortunately they're pretty small.
-
-For now I think the best course of action is to quickly get the bugfix
-patches to Linus, and for 6.2 drop this one but otherwise keep the length
-in kvm_gpc_activate().
-
-> Aren't we just making up behavior at this point?  Injecting a #GP into the guest
-> for what is a completely legal operation from the guest's perspective seems all
-> kinds of wrong.
-
-Yeah, it is and this patch was a steaming pile...  Though, while this
-one is particularly egregious because it comes from an MSR write, a lot
-of error returns in xen.c are inviting userspace to make up error
-conditions that aren't there in Xen.  In fact activate should probably
-ignore a refresh EFAULT altogether.
-
-Paolo
+>  F: arm/
+>  F: lib/arm/
+>  F: lib/arm64/
 
