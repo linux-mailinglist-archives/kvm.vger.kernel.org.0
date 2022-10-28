@@ -2,80 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C364611641
-	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 17:49:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C84961176E
+	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 18:22:38 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229781AbiJ1Ptf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Oct 2022 11:49:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54940 "EHLO
+        id S229652AbiJ1QWh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Oct 2022 12:22:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229610AbiJ1Pt0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Oct 2022 11:49:26 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22D681F1836
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 08:49:25 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id c2so5165348plz.11
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 08:49:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bz9f4W1u+5LowQmFLyockgzF0Sn2c69dnPpsIt58fHM=;
-        b=QaMVn5zlnvJABPZ655YM9LGwSYohNg2YwDsROYVQBkBTkLQ2qniffWNofa32irCtaB
-         MTNGs++gyUnAgJIZhmvCUtdG/wTaFCCF4G1o/AshfTTGoegdcjMpfU2w8cZN/zqJ0Tlk
-         V0X/ON1hKghgp4gPUlcms1iD9eVkWWfFR8nppe8ySeefTTQ7Coq8ugrqiySHQT48kDC2
-         fbDUuPXWsll4vfjRH5xZkKjrsD58ya/TatwUmn8FwuylMbwmxGkAvpber9W6ZDtLaReC
-         /ydQWYH4FDAdQBstJX7bqLX5zY2KidZXt3LD6CXyKpygRJ951252KQbc3MijMgQoakB6
-         X9Ug==
+        with ESMTP id S229473AbiJ1QWf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Oct 2022 12:22:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC0341CDCE5
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 09:21:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1666974095;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:mime-version:mime-version:
+         content-type:content-type; bh=h1IpVPQmelOzExrKI7Q1wX5nVXwi3nwXWMr9RzFeuk8=;
+        b=C08SUtgeYs4h2vIuXEr/swgpgflZJDLP6lQ0jorPvOqqw3zG/ex1H5ELYtELVPdi6AgQXP
+        /L0JS58PeeL+ivhNhKEL6SFviOC5DeVlrHRpBA0dC+P1jpwCm37/DBUyptUDMMo1PfQA3x
+        X5pAIdmpbzyllmZQaO71mEAwv01mvLY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-122-3FWvRLWxPfyRJ_sqBWMXsA-1; Fri, 28 Oct 2022 12:21:33 -0400
+X-MC-Unique: 3FWvRLWxPfyRJ_sqBWMXsA-1
+Received: by mail-wm1-f70.google.com with SMTP id l7-20020a7bc447000000b003cf6133063dso542618wmi.8
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 09:21:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bz9f4W1u+5LowQmFLyockgzF0Sn2c69dnPpsIt58fHM=;
-        b=sGi5taK5afdP2jsGYViGUhGaED5uJXgAiryZlHmE6nHZgd1X7YQxm5Ubb/dLaQtI4g
-         N0ywgUfuWIEsLWHcHw8pUIqbrSq4loNm9dAHHmYw/kl1GsZYH5Ql/hPpekZch8ljAhKS
-         bC8jMZCcWsD6isZqxVTjrHoF4tdkxceXsKnKHfvyX4iFDE6bDhgvokxZrNt0gd15D6Bj
-         tpAOxJTEaQSXIyLpnP91IQ45LP5JIMxSdFtAVjqjFwvC+PgQwoQBCuItC4X1R20mtPUE
-         0FVvUrO0LrJF8T3DRdq9iRHcjnKEVCN365561cBiWAVHsO78FTaYIf1aSG2BYVSRZm3v
-         Vp8w==
-X-Gm-Message-State: ACrzQf2C1C2ATsW9YnN/7ZhhrDcagW0T1oMVeJnedfkt8vKTIJdG3rlb
-        u5UmlDzs3M4MQOK3XMoyVf+VZA==
-X-Google-Smtp-Source: AMsMyM5Y0IRJyyDUSr5SMT+Tz+YYgUWzK/ysdVA/J+JtYgl2o1pF+1jN7ivU/UCLPetkHLDJZ27PsQ==
-X-Received: by 2002:a17:90b:1d83:b0:212:dc2f:8fc7 with SMTP id pf3-20020a17090b1d8300b00212dc2f8fc7mr16172020pjb.131.1666972164514;
-        Fri, 28 Oct 2022 08:49:24 -0700 (PDT)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id o1-20020a635a01000000b00434760ee36asm2853580pgb.16.2022.10.28.08.49.24
+        h=mime-version:message-id:date:reply-to:user-agent:subject:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=h1IpVPQmelOzExrKI7Q1wX5nVXwi3nwXWMr9RzFeuk8=;
+        b=tX8MvUp8DADC9hmXSdTofYKjGC+LkOFkgLq/XosJoiNNAcZKUrd6uYwi7EYjXER5hD
+         EM0nh00Ke9pHGDM+HYLS52FBza0fVpxm0Wzi91r/Xf9aLrgtLR+71lwJYcGmi1kClk8J
+         n6+Vr4BWgwRok0nvC/Ik91988VoiiNd+v8C8oLRfOkZLnO/235LePuqygfskr1UQ7dfi
+         Soo/kdvhSpdqR7AN39+SGVoCaxJvFJ8ctWvkKXTGjh37FA17tuRgBmED1Dgz5JbOVOrD
+         JL5i8mMkeJidgpwbSikYNnhSsFvTG+XoTl3J7HaErM3IBpZfbUPxaRyr8M3YoPIL9xih
+         YnvQ==
+X-Gm-Message-State: ACrzQf3VQEVp1AVvpOjQHr9SxcHfbJc2tJZoYiMNpbzcirJcgzszbtg+
+        XIfYo1+A2Wt8juQoDkibGtiWhoE1rWT9cGxu8mxyxBXleAQXpA3mr7GcWSMgKmJ/n1Ja2zMgmSj
+        Mt04UhErIV3BC
+X-Received: by 2002:a7b:c005:0:b0:3c3:6b2a:33bf with SMTP id c5-20020a7bc005000000b003c36b2a33bfmr7402wmb.167.1666974092643;
+        Fri, 28 Oct 2022 09:21:32 -0700 (PDT)
+X-Google-Smtp-Source: AMsMyM6U7D4L8Uoj4SveCT/kQkA8Mofy7/aenWFmFnzzO06Zx6XcWrChzydAcomOrPbEdUl7ESv3JQ==
+X-Received: by 2002:a7b:c005:0:b0:3c3:6b2a:33bf with SMTP id c5-20020a7bc005000000b003c36b2a33bfmr7383wmb.167.1666974092277;
+        Fri, 28 Oct 2022 09:21:32 -0700 (PDT)
+Received: from localhost (255.4.26.77.dynamic.reverse-mundo-r.com. [77.26.4.255])
+        by smtp.gmail.com with ESMTPSA id t14-20020a5d460e000000b002206203ed3dsm4030546wrq.29.2022.10.28.09.21.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Oct 2022 08:49:24 -0700 (PDT)
-Date:   Fri, 28 Oct 2022 15:49:20 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Andrew Jones <andrew.jones@linux.dev>
-Cc:     David Matlack <dmatlack@google.com>,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "vipinsh@google.com" <vipinsh@google.com>,
-        "ajones@ventanamicro.com" <ajones@ventanamicro.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v1 00/18] KVM selftests code consolidation and cleanup
-Message-ID: <Y1v6AEInngzRxSJ+@google.com>
-References: <20221024113445.1022147-1-wei.w.wang@intel.com>
- <Y1mlJqKdFtlgG3jR@google.com>
- <DS0PR11MB63731F2B467D4084F5C8D9B5DC339@DS0PR11MB6373.namprd11.prod.outlook.com>
- <Y1qnWFzekT27rYka@google.com>
- <CALzav=c4-FWVrWQebuYs--vbgnyPjEwZxfjSS1aMSRL3JMbWYw@mail.gmail.com>
- <Y1rNm0E6/I5y6K2a@google.com>
- <20221028124106.oze32j2lkq5ykifj@kamzik>
+        Fri, 28 Oct 2022 09:21:31 -0700 (PDT)
+From:   Juan Quintela <quintela@redhat.com>
+To:     qemu-devel@nongnu.org, kvm-devel <kvm@vger.kernel.org>
+Subject: KVM call for agenda for 2022-11-01
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.1 (gnu/linux)
+Reply-To: quintela@redhat.com
+Date:   Fri, 28 Oct 2022 18:21:31 +0200
+Message-ID: <87tu3nvrzo.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221028124106.oze32j2lkq5ykifj@kamzik>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,63 +71,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 28, 2022, Andrew Jones wrote:
-> On Thu, Oct 27, 2022 at 06:27:39PM +0000, Sean Christopherson wrote:
-> > On Thu, Oct 27, 2022, David Matlack wrote:
-> > > On Thu, Oct 27, 2022 at 8:44 AM Sean Christopherson <seanjc@google.com> wrote:
-> > > > I like the idea in theory, but that'd be a daunting task to set up, and quite the
-> > > > maintenance nightmare.  There are probably thousands of file => scope mappings
-> > > > throughout the kernel, with any number of exceptions and arbitrary rules.
-> > > 
-> > > I was thinking about proposing this in checkpatch.pl, or in some
-> > > KVM-specific check script. It seems like the following rule: If a
-> > > commit only modifies files in tools/testing/selftests/kvm/*, then
-> > > requires the shortlog match the regex "KVM: selftests: .*". That would
-> > > handle the vast majority of cases without affecting other subsystems.
-> > > 
-> > > Sean are you more concerned that if we start validating shortlogs in
-> > > checkpatch.pl then eventually it will get too out of hand? (i.e. not
-> > > so concerned with this specific case, but the general problem?)
-> > 
-> > Ya, the general problem.  Hardcoding anything KVM specific in checkpatch.pl isn't
-> > going to fly.  The checkpatch maintainers most definitely don't want to take on
-> > the burden of maintaining subsystem rules.  Letting one subsystem add custom rules
-> > effectively opens the flood gates to all subsystems adding custom rules.  And from
-> > a KVM perspective, I don't want to have to get an Acked-by from a checkpatch
-> > maintiainer just to tweak a KVM rule.
-> > 
-> > The only somewhat feasible approach I can think of would be to provide a generic
-> > "language" for shortlog scope rules, and have checkpatch look for a well-known
-> > file in relevant directories, e.g. add arch/x86/kvm/SCOPES or whatever.  But even
-> > that is a non-trivial problem to solve, as it means coming up with a "language"
-> > that has a reasonable chance of working for many subsystems without generating too
-> > many false positives.
-> > 
-> > It's definitely doable, and likely not actually a maintenance nightmare (I wrote
-> > that thinking of modifying a common rules file).  But it's still fairly daunting
-> > as getting buy-in on something that affects the kernel at large tends to be easier
-> > said then done.  Then again, I'm probably being pessimistic due to my sub-par
-> > regex+scripting skills :-)
-> 
-> How about adding support for checkpatch extension plugins? If we could add
-> a plugin script, e.g. tools/testing/selftests/kvm/.checkpatch, and modify
-> checkpatch to run .checkpatch scripts in the patched files' directories
-> (and recursively in the parent directories) when found, then we'd get
-> custom checkpatch behaviors. The scripts wouldn't even have to be written
-> in Perl (but I say that a bit sadly, because I like Perl).
 
-That will work for simple cases, but patches that touch files in multiple directories
-will be messy.  E.g. a patch that touches virt/kvm/ and arch/x86/kvm/ will have
-two separate custom rules enforcing two different scopes.
 
-Recursively executing plugins will also be problematic, e.g. except for KVM, arch/x86/
-is maintained by the tip-tree folks, and the tip-tree is quite opinionated on all
-sorts of things, whereas KVM tends to be a bit more relaxed.
+Hi
 
-Enforcing scope through plugins would also lead to some amount of duplicate code
-throught subsystems.
+Please, send any topic that you are interested in covering.
 
-Anyways, if someone wants to pursue this, these ideas and the "requirement" should
-be run by the checkpatch maintainers.  They have far more experience and authority
-in this area, and I suspect we aren't the first people to want checkpatch to get
-involved in enforcing shortlog scope.
+At the end of Monday I will send an email with the agenda or the
+cancellation of the call, so hurry up.
+
+Call details: By popular demand, a google
+calendar public entry with it:
+
+https://www.google.com/url?q=https://calendar.google.com/calendar/event?action%3DTEMPLATE%26tmeid%3DNWR0NWppODdqNXFyYzAwbzYza3RxN2dob3VfMjAyMjExMDFUMTMwMDAwWiBlZ2VkN2NraTA1bG11MXRuZ3ZrbDN0aGlkc0Bn%26tmsrc%3Deged7cki05lmu1tngvkl3thids%2540group.calendar.google.com%26scp%3DALL&sa=D&source=calendar&ust=1667405630835374&usg=AOvVaw3LYcQS3PjgGMlWJ-anZdRM
+
+(Let me know if you have any problems with the calendar entry. I just
+gave up about getting right at the same time CEST, CET, EDT and
+DST).
+
+If you contact details, contact me privately
+
+Thanks, Juan.
+
+PD. I am trying to setup this calendar entry again. If you are
+    interested to be in the invite, please send your information to
+    me. I added all the people that I had for the previous invite, but
+    probably there are still people left.
+
