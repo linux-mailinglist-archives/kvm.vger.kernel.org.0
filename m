@@ -2,153 +2,344 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E73B611A57
-	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 20:43:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id F3BFC611A53
+	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 20:43:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230133AbiJ1Sny (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Oct 2022 14:43:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60998 "EHLO
+        id S230100AbiJ1Snk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Oct 2022 14:43:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230151AbiJ1Snv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Oct 2022 14:43:51 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32EFC244730;
-        Fri, 28 Oct 2022 11:43:49 -0700 (PDT)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29SHnXR2028950;
-        Fri, 28 Oct 2022 18:43:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=SO4VW/8VmydBmQcvcXcbIveGkrMLYL3hskWB6VxXLow=;
- b=dbydvazLhzgAOT26kQOJg6tpJTihp8Se8b5SXRDODD3NMnc4a1YqfA3Eee+BzzHGyMB6
- 859awMpUfWW0MJyzadb6IIsGWWtR6+E45CjzOjwUBlr4Gx8k7ozsJsSdO/QzVzIulR9N
- cxEc48630QAbOyrCOLy0esXdNP/wYsPkIaRz+FvTfaswhkrfVcIGTBlGJWAgV5M/QZ+z
- dsHSbDhwirVkcKQfsU3L8bZObRlYO8OqKf+iAB4S+oIK3Lm9JzA4nsBeJ3vbOe7WUXy2
- TPgufyFdeAv6EVq5wTT4418Iem7yD+SpNgZdshnFdFwhNjd4OFR4pTmlJ8/mk0Oq31Ho ig== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kgktthru0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Oct 2022 18:43:11 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 29SHoHcs030205;
-        Fri, 28 Oct 2022 18:43:09 GMT
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3kgktthrr2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Oct 2022 18:43:08 +0000
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 29SIaB7c020594;
-        Fri, 28 Oct 2022 18:43:07 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma03wdc.us.ibm.com with ESMTP id 3kfahenqpj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Oct 2022 18:43:07 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com ([9.208.128.112])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 29SIh6vL6881864
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 28 Oct 2022 18:43:06 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F0FD15805A;
-        Fri, 28 Oct 2022 18:43:05 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 60CCA58058;
-        Fri, 28 Oct 2022 18:43:02 +0000 (GMT)
-Received: from [9.160.93.208] (unknown [9.160.93.208])
-        by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 28 Oct 2022 18:43:02 +0000 (GMT)
-Message-ID: <6ab3ceb4-37fa-a879-2db0-a59acacbdabd@linux.ibm.com>
-Date:   Fri, 28 Oct 2022 14:43:01 -0400
+        with ESMTP id S229379AbiJ1Snj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Oct 2022 14:43:39 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5CCB244737
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 11:43:37 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id c15-20020a17090a1d0f00b0021365864446so5273370pjd.4
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 11:43:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hoAxCVHxX2sxVJwGEqJEXvH7vhd6WIyb5dRaIwHFD/A=;
+        b=Dnrr4i4jemOPog1S+jWdcCLyETVfPBpx+w0oUE/1JPnCU4tZsmoldbGdJuZn8myO0j
+         kPeYVO89jdIxyh+XzquqDyj/dXqzwC+AjdsBbfGvweJD4oPiGh3NtVJB7Bw4dPp+bf4C
+         /W/ipYI3Nrh1Cw1mV6SDq08RsBffm9mOBHj4cHdkfpBWrSM7hi003VAGgraYD+mA6ss5
+         KuMPcaiJZapvNoM81vDtpEYWS/eTkIkuhIEwyvyFSpKiywX74h+7vwoVsuyB6oOtNG+t
+         Qo2om8bXkFfREHXKxAyXS98IAvfMenYG11LrbsoKBDZzMHP+DYv6GYnw/59NFjpMGf5z
+         vPJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hoAxCVHxX2sxVJwGEqJEXvH7vhd6WIyb5dRaIwHFD/A=;
+        b=SBgPpvfha9UtrHpnEnZrcFW+FEMmrWecQclmDq5B7Q8x2XejZBMowXym9T3qW+oQk9
+         4Ke6+MeeovliPsGs/1G3oLLLDDNXVoKnwZhOfDb2r0W59mzDC/GYjGTdzyUa6jIdGQTt
+         o/NrEGXKzT9bmWkv48b7u0tp2M/nuMwmWmXmm0QvHmAhb/whYHioeasJ8VDrQufMy/TH
+         196Vu/YBk8n/864HkN2FPadS9Ka2L7ZmSSQKBHuY8Om6T/4OUsDaFfVwlzr07Kwe9Sgn
+         O3Y/ylhs41Juz51wzhYEGjuwk2Pv1OGRiQHYZNcrQ2QLH4zeBA/d08b/YwpxICcm9XSv
+         oRjA==
+X-Gm-Message-State: ACrzQf3/kec+encret7s8WRD+nPAlfy12NUmDq33Uo2bkUYs+68A1w+r
+        nYILBNba2eg6DRABbtXqookYVA==
+X-Google-Smtp-Source: AMsMyM7t/V472Wfh8Sd+/rSFeel3BGbSa/tDFwUbxLoPjAomzjr61Jr2BiU4uBczh9NPP6JYh8ZbNg==
+X-Received: by 2002:a17:902:e742:b0:17f:6a44:ee4a with SMTP id p2-20020a170902e74200b0017f6a44ee4amr361667plf.103.1666982617158;
+        Fri, 28 Oct 2022 11:43:37 -0700 (PDT)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
+        by smtp.gmail.com with ESMTPSA id w15-20020a17090a15cf00b00202618f0df4sm4603848pjd.0.2022.10.28.11.43.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Oct 2022 11:43:36 -0700 (PDT)
+Date:   Fri, 28 Oct 2022 11:43:33 -0700
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Quentin Perret <qperret@google.com>,
+        Ben Gardon <bgardon@google.com>, Gavin Shan <gshan@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>,
+        Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev
+Subject: Re: [PATCH v2 06/15] KVM: arm64: Tear down unlinked stage-2 subtree
+ after break-before-make
+Message-ID: <Y1wi1QHhup9iHNNQ@google.com>
+References: <20221007232818.459650-1-oliver.upton@linux.dev>
+ <20221007232818.459650-7-oliver.upton@linux.dev>
+ <Y1widUxvi/yDAfO8@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH v1 2/7] vfio/ccw: remove private->sch
-Content-Language: en-US
-To:     Eric Farman <farman@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>, Yi Liu <yi.l.liu@intel.com>
-Cc:     Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        David Airlie <airlied@gmail.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Tony Krowiak <akrowiak@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Abhishek Sahu <abhsahu@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>,
-        intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20221019162135.798901-1-farman@linux.ibm.com>
- <20221019162135.798901-3-farman@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <20221019162135.798901-3-farman@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: QpgekcK-lB5oIfRTGRyS05JBVjDSEnMY
-X-Proofpoint-ORIG-GUID: JrmbtmFXU58Hkg5rBVXRqcrAbi_RHRSb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-10-28_07,2022-10-27_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- clxscore=1015 suspectscore=0 spamscore=0 bulkscore=0 impostorscore=0
- priorityscore=1501 adultscore=0 lowpriorityscore=0 mlxscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2210280113
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y1widUxvi/yDAfO8@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/19/22 12:21 PM, Eric Farman wrote:
-> These places all rely on the ability to jump from a private
-> struct back to the subchannel struct. Rather than keeping a
-> copy in our back pocket, let's use the relationship provided
-> by the vfio_device embedded within the private.
+On Fri, Oct 28, 2022 at 11:41:57AM -0700, Ricardo Koller wrote:
+> On Fri, Oct 07, 2022 at 11:28:09PM +0000, Oliver Upton wrote:
+> > The break-before-make sequence is a bit annoying as it opens a window
+> > wherein memory is unmapped from the guest. KVM should replace the PTE
+> > as quickly as possible and avoid unnecessary work in between.
+> > 
+> > Presently, the stage-2 map walker tears down a removed table before
+> > installing a block mapping when coalescing a table into a block. As the
+> > removed table is no longer visible to hardware walkers after the
+> > DSB+TLBI, it is possible to move the remaining cleanup to happen after
+> > installing the new PTE.
+> > 
+> > Reshuffle the stage-2 map walker to install the new block entry in
+> > the pre-order callback. Unwire all of the teardown logic and replace
+> > it with a call to kvm_pgtable_stage2_free_removed() after fixing
+> > the PTE. The post-order visitor is now completely unnecessary, so drop
+> > it. Finally, touch up the comments to better represent the now
+> > simplified map walker.
+> > 
+> > Note that the call to tear down the unlinked stage-2 is indirected
+> > as a subsequent change will use an RCU callback to trigger tear down.
+> > RCU is not available to pKVM, so there is a need to use different
+> > implementations on pKVM and non-pKVM VMs.
+> > 
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >  arch/arm64/include/asm/kvm_pgtable.h  |  3 +
+> >  arch/arm64/kvm/hyp/nvhe/mem_protect.c |  6 ++
+> >  arch/arm64/kvm/hyp/pgtable.c          | 84 ++++++++-------------------
+> >  arch/arm64/kvm/mmu.c                  |  8 +++
+> >  4 files changed, 40 insertions(+), 61 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index 71b7d154b78a..c33edcf36b5b 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -77,6 +77,8 @@ static inline bool kvm_level_supports_block_mapping(u32 level)
+> >   *				allocation is physically contiguous.
+> >   * @free_pages_exact:		Free an exact number of memory pages previously
+> >   *				allocated by zalloc_pages_exact.
+> > + * @free_removed_table:		Free a removed paging structure by unlinking and
+> > + *				dropping references.
+> >   * @get_page:			Increment the refcount on a page.
+> >   * @put_page:			Decrement the refcount on a page. When the
+> >   *				refcount reaches 0 the page is automatically
+> > @@ -95,6 +97,7 @@ struct kvm_pgtable_mm_ops {
+> >  	void*		(*zalloc_page)(void *arg);
+> >  	void*		(*zalloc_pages_exact)(size_t size);
+> >  	void		(*free_pages_exact)(void *addr, size_t size);
+> > +	void		(*free_removed_table)(void *addr, u32 level);
+> >  	void		(*get_page)(void *addr);
+> >  	void		(*put_page)(void *addr);
+> >  	int		(*page_count)(void *addr);
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > index d21d1b08a055..735769886b55 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> > @@ -79,6 +79,11 @@ static void host_s2_put_page(void *addr)
+> >  	hyp_put_page(&host_s2_pool, addr);
+> >  }
+> >  
+> > +static void host_s2_free_removed_table(void *addr, u32 level)
+> > +{
+> > +	kvm_pgtable_stage2_free_removed(&host_kvm.mm_ops, addr, level);
+> > +}
+> > +
+> >  static int prepare_s2_pool(void *pgt_pool_base)
+> >  {
+> >  	unsigned long nr_pages, pfn;
+> > @@ -93,6 +98,7 @@ static int prepare_s2_pool(void *pgt_pool_base)
+> >  	host_kvm.mm_ops = (struct kvm_pgtable_mm_ops) {
+> >  		.zalloc_pages_exact = host_s2_zalloc_pages_exact,
+> >  		.zalloc_page = host_s2_zalloc_page,
+> > +		.free_removed_table = host_s2_free_removed_table,
+> >  		.phys_to_virt = hyp_phys_to_virt,
+> >  		.virt_to_phys = hyp_virt_to_phys,
+> >  		.page_count = hyp_page_count,
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index 363a5cce7e1a..02c33fccb178 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -746,16 +746,19 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+> >  	return 0;
+> >  }
+> >  
+> > +static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+> > +				struct stage2_map_data *data);
+> > +
+> >  static int stage2_map_walk_table_pre(const struct kvm_pgtable_visit_ctx *ctx,
+> >  				     struct stage2_map_data *data)
+> >  {
+> > -	if (data->anchor)
+> > -		return 0;
+> > +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> > +	kvm_pte_t *childp = kvm_pte_follow(ctx->old, mm_ops);
+> > +	int ret;
+> >  
+> >  	if (!stage2_leaf_mapping_allowed(ctx, data))
+> >  		return 0;
+> >  
+> > -	data->childp = kvm_pte_follow(ctx->old, ctx->mm_ops);
+> >  	kvm_clear_pte(ctx->ptep);
+> >  
+> >  	/*
+> > @@ -764,8 +767,13 @@ static int stage2_map_walk_table_pre(const struct kvm_pgtable_visit_ctx *ctx,
+> >  	 * individually.
+> >  	 */
+> >  	kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
+> > -	data->anchor = ctx->ptep;
+> > -	return 0;
+> > +
+> > +	ret = stage2_map_walk_leaf(ctx, data);
+> > +
+> > +	mm_ops->put_page(ctx->ptep);
+> > +	mm_ops->free_removed_table(childp, ctx->level + 1);
 > 
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> ---
->  drivers/s390/cio/vfio_ccw_chp.c     |  5 +++--
->  drivers/s390/cio/vfio_ccw_drv.c     |  3 +--
->  drivers/s390/cio/vfio_ccw_fsm.c     | 27 ++++++++++++---------------
->  drivers/s390/cio/vfio_ccw_ops.c     | 12 ++++++------
->  drivers/s390/cio/vfio_ccw_private.h |  7 ++++---
->  5 files changed, 26 insertions(+), 28 deletions(-)
+> This could save some cycles:
 > 
-> diff --git a/drivers/s390/cio/vfio_ccw_chp.c b/drivers/s390/cio/vfio_ccw_chp.c
-> index 13b26a1c7988..d3f3a611f95b 100644
-> --- a/drivers/s390/cio/vfio_ccw_chp.c
-> +++ b/drivers/s390/cio/vfio_ccw_chp.c
-> @@ -16,6 +16,7 @@ static ssize_t vfio_ccw_schib_region_read(struct vfio_ccw_private *private,
->  					  char __user *buf, size_t count,
->  					  loff_t *ppos)
->  {
-> +	struct subchannel *sch = to_subchannel(private->vdev.dev->parent);
-
-I'm not a big fan of the amount of indirection there, but I prefer this over back-pocketing the subchannel in vfio_ccw_private anyway
-
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
-
+> 	if (stage2_pte_is_counted(childp) // typo: should be childp
+> 		mm_ops->free_removed_table(childp, ctx->level + 1);
+> 
+> as coming back using the stage2_free_walker() requires some preparation,
+> and it does the exact same check anyawy.
+> 
+> > +
+> > +	return ret;
+> >  }
+> >  
+> >  static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+> > @@ -775,13 +783,6 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+> >  	kvm_pte_t *childp;
+> >  	int ret;
+> >  
+> > -	if (data->anchor) {
+> > -		if (stage2_pte_is_counted(ctx->old))
+> > -			mm_ops->put_page(ctx->ptep);
+> > -
+> > -		return 0;
+> > -	}
+> > -
+> >  	ret = stage2_map_walker_try_leaf(ctx, data);
+> >  	if (ret != -E2BIG)
+> >  		return ret;
+> > @@ -810,49 +811,14 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+> >  	return 0;
+> >  }
+> >  
+> > -static int stage2_map_walk_table_post(const struct kvm_pgtable_visit_ctx *ctx,
+> > -				      struct stage2_map_data *data)
+> > -{
+> > -	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+> > -	kvm_pte_t *childp;
+> > -	int ret = 0;
+> > -
+> > -	if (!data->anchor)
+> > -		return 0;
+> > -
+> > -	if (data->anchor == ctx->ptep) {
+> > -		childp = data->childp;
+> > -		data->anchor = NULL;
+> > -		data->childp = NULL;
+> > -		ret = stage2_map_walk_leaf(ctx, data);
+> > -	} else {
+> > -		childp = kvm_pte_follow(ctx->old, mm_ops);
+> > -	}
+> > -
+> > -	mm_ops->put_page(childp);
+> > -	mm_ops->put_page(ctx->ptep);
+> > -
+> > -	return ret;
+> > -}
+> > -
+> >  /*
+> > - * This is a little fiddly, as we use all three of the walk flags. The idea
+> > - * is that the TABLE_PRE callback runs for table entries on the way down,
+> > - * looking for table entries which we could conceivably replace with a
+> > - * block entry for this mapping. If it finds one, then it sets the 'anchor'
+> > - * field in 'struct stage2_map_data' to point at the table entry, before
+> > - * clearing the entry to zero and descending into the now detached table.
+> > - *
+> > - * The behaviour of the LEAF callback then depends on whether or not the
+> > - * anchor has been set. If not, then we're not using a block mapping higher
+> > - * up the table and we perform the mapping at the existing leaves instead.
+> > - * If, on the other hand, the anchor _is_ set, then we drop references to
+> > - * all valid leaves so that the pages beneath the anchor can be freed.
+> > + * The TABLE_PRE callback runs for table entries on the way down, looking
+> > + * for table entries which we could conceivably replace with a block entry
+> > + * for this mapping. If it finds one it replaces the entry and calls
+> > + * kvm_pgtable_mm_ops::free_removed_table() to tear down the detached table.
+> >   *
+> > - * Finally, the TABLE_POST callback does nothing if the anchor has not
+> > - * been set, but otherwise frees the page-table pages while walking back up
+> > - * the page-table, installing the block entry when it revisits the anchor
+> > - * pointer and clearing the anchor to NULL.
+> > + * Otherwise, the LEAF callback performs the mapping at the existing leaves
+> > + * instead.
+> >   */
+> >  static int stage2_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> >  			     enum kvm_pgtable_walk_flags visit)
+> > @@ -864,11 +830,9 @@ static int stage2_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
+> >  		return stage2_map_walk_table_pre(ctx, data);
+> >  	case KVM_PGTABLE_WALK_LEAF:
+> >  		return stage2_map_walk_leaf(ctx, data);
+> > -	case KVM_PGTABLE_WALK_TABLE_POST:
+> > -		return stage2_map_walk_table_post(ctx, data);
+> > +	default:
+> > +		return -EINVAL;
+> >  	}
+> > -
+> > -	return -EINVAL;
+> >  }
+> >  
+> >  int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> > @@ -885,8 +849,7 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> >  	struct kvm_pgtable_walker walker = {
+> >  		.cb		= stage2_map_walker,
+> >  		.flags		= KVM_PGTABLE_WALK_TABLE_PRE |
+> > -				  KVM_PGTABLE_WALK_LEAF |
+> > -				  KVM_PGTABLE_WALK_TABLE_POST,
+> > +				  KVM_PGTABLE_WALK_LEAF,
+> >  		.arg		= &map_data,
+> >  	};
+> >  
+> > @@ -916,8 +879,7 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
+> >  	struct kvm_pgtable_walker walker = {
+> >  		.cb		= stage2_map_walker,
+> >  		.flags		= KVM_PGTABLE_WALK_TABLE_PRE |
+> > -				  KVM_PGTABLE_WALK_LEAF |
+> > -				  KVM_PGTABLE_WALK_TABLE_POST,
+> > +				  KVM_PGTABLE_WALK_LEAF,
+> >  		.arg		= &map_data,
+> >  	};
+> >  
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index c9a13e487187..04a25319abb0 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -102,6 +102,13 @@ static void *kvm_host_zalloc_pages_exact(size_t size)
+> >  	return alloc_pages_exact(size, GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> >  }
+> >  
+> > +static struct kvm_pgtable_mm_ops kvm_s2_mm_ops;
+> > +
+> > +static void stage2_free_removed_table(void *addr, u32 level)
+> > +{
+> > +	kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, addr, level);
+> > +}
+> > +
+> >  static void kvm_host_get_page(void *addr)
+> >  {
+> >  	get_page(virt_to_page(addr));
+> > @@ -627,6 +634,7 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
+> >  	.zalloc_page		= stage2_memcache_zalloc_page,
+> >  	.zalloc_pages_exact	= kvm_host_zalloc_pages_exact,
+> >  	.free_pages_exact	= free_pages_exact,
+> > +	.free_removed_table	= stage2_free_removed_table,
+> >  	.get_page		= kvm_host_get_page,
+> >  	.put_page		= kvm_host_put_page,
+> >  	.page_count		= kvm_host_page_count,
+> > -- 
+> > 2.38.0.rc1.362.ged0d419d3c-goog
+> > 
