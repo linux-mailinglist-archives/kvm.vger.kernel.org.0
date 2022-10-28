@@ -2,47 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 771ED611DEC
-	for <lists+kvm@lfdr.de>; Sat, 29 Oct 2022 01:09:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17510611DF6
+	for <lists+kvm@lfdr.de>; Sat, 29 Oct 2022 01:10:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229689AbiJ1XJE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Oct 2022 19:09:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41606 "EHLO
+        id S229874AbiJ1XKQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Oct 2022 19:10:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbiJ1XIr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Oct 2022 19:08:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B59023797B
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 16:07:53 -0700 (PDT)
+        with ESMTP id S229887AbiJ1XJr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Oct 2022 19:09:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8DB3237F87
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 16:07:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666998472;
+        s=mimecast20190719; t=1666998474;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vHRZxr5qqWRrp7NTnD6fUIb58CW6btv3cI7HhdrmD28=;
-        b=Sk+GEL/sc8JT+g7aZLPYf5e13x8JiRyjHNLkxgf4NcNlq7c+KiHvmjHQjPKkeXt/frMbAK
-        LmVDeL5zQS0Y+zd4Eu63KljtkEGla+7eeSmYHShjIM+LFy4L/+TdNoTdwmVP9dRCJolj1+
-        /AcgOOXFYeS+Z/paNV9517WhQ0whbo4=
+        bh=YGfDYy2FKRGq+kLUF8iKroe6+TjvZzPPI1zHdOCFjiw=;
+        b=a3nNTTPjKWynn6/OqhPXf3QJEkDdhjN+BhciK2HFmmoQKW1xsS4qg0EoouQZdPyOEgWfeh
+        tu58bHJmM0jAYR/0YVTcHshhMc6VFXgFPeTNpb+aaddU79+VGWnXwSQFK3v30bUTYclLFa
+        Jnx4WP3CpEczEzMzJNMV5o9tSoL7s+M=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-131-otlT118uM0awXUmu3OHeUQ-1; Fri, 28 Oct 2022 19:07:50 -0400
-X-MC-Unique: otlT118uM0awXUmu3OHeUQ-1
+ us-mta-312-nipQUrsKOqmwOy47cmzw3w-1; Fri, 28 Oct 2022 19:07:50 -0400
+X-MC-Unique: nipQUrsKOqmwOy47cmzw3w-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1BC9D857D19;
-        Fri, 28 Oct 2022 23:07:49 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 21412858282;
+        Fri, 28 Oct 2022 23:07:50 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D1B7540C94EC;
-        Fri, 28 Oct 2022 23:07:37 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0926340C94EE;
+        Fri, 28 Oct 2022 23:07:38 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     jmattson@google.com, seanjc@google.com, jpoimboe@kernel.org
-Subject: [PATCH 4/7] KVM: SVM: replace argument of __svm_vcpu_run with vcpu_svm
-Date:   Fri, 28 Oct 2022 19:07:20 -0400
-Message-Id: <20221028230723.3254250-5-pbonzini@redhat.com>
+Subject: [PATCH 5/7] KVM: SVM: adjust register allocation for __svm_vcpu_run
+Date:   Fri, 28 Oct 2022 19:07:21 -0400
+Message-Id: <20221028230723.3254250-6-pbonzini@redhat.com>
 In-Reply-To: <20221028230723.3254250-1-pbonzini@redhat.com>
 References: <20221028230723.3254250-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -51,7 +51,7 @@ Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
 X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -59,143 +59,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since registers are reachable through vcpu_svm, and we will
-need to access more fields of that struct, pass it instead
-of the regs[] array.
+In preparation for moving SPEC_CTRL access to __svm_vcpu_run,
+keep the pointer to the struct vcpu_svm in %rdi, which is not
+used by rdmsr/wrmsr.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kernel/asm-offsets.c |  6 ++++++
- arch/x86/kvm/svm/svm.c        |  2 +-
- arch/x86/kvm/svm/svm.h        |  2 +-
- arch/x86/kvm/svm/vmenter.S    | 36 +++++++++++++++++------------------
- 4 files changed, 26 insertions(+), 20 deletions(-)
+ arch/x86/kvm/svm/vmenter.S | 39 +++++++++++++++++++-------------------
+ 1 file changed, 20 insertions(+), 19 deletions(-)
 
-diff --git a/arch/x86/kernel/asm-offsets.c b/arch/x86/kernel/asm-offsets.c
-index 90da275ad223..7f1dd1138117 100644
---- a/arch/x86/kernel/asm-offsets.c
-+++ b/arch/x86/kernel/asm-offsets.c
-@@ -20,6 +20,7 @@
- #include <asm/tlbflush.h>
- #include <asm/tdx.h>
- #include "../kvm/vmx/vmx.h"
-+#include "../kvm/svm/svm.h"
- 
- #ifdef CONFIG_XEN
- #include <xen/interface/xen.h>
-@@ -109,6 +110,11 @@ static void __used common(void)
- 	OFFSET(TSS_sp1, tss_struct, x86_tss.sp1);
- 	OFFSET(TSS_sp2, tss_struct, x86_tss.sp2);
- 
-+	if (IS_ENABLED(CONFIG_KVM_AMD)) {
-+		BLANK();
-+		OFFSET(SVM_vcpu_arch_regs, vcpu_svm, vcpu.arch.regs);
-+	}
-+
- 	if (IS_ENABLED(CONFIG_KVM_INTEL)) {
- 		BLANK();
- 		OFFSET(VMX_vcpu_arch_regs, vcpu_vmx, vcpu.arch.regs);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index b793cfdce68d..64f5f0544b4f 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3932,7 +3932,7 @@ static noinstr void svm_vcpu_enter_exit(struct kvm_vcpu *vcpu)
- 		 * vmcb02 when switching vmcbs for nested virtualization.
- 		 */
- 		vmload(svm->vmcb01.pa);
--		__svm_vcpu_run(vmcb_pa, (unsigned long *)&vcpu->arch.regs);
-+		__svm_vcpu_run(vmcb_pa, svm);
- 		vmsave(svm->vmcb01.pa);
- 
- 		vmload(__sme_page_pa(sd->save_area));
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 222856788153..5f8dfc9cd9a7 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -484,6 +484,6 @@ void sev_es_unmap_ghcb(struct vcpu_svm *svm);
- /* vmenter.S */
- 
- void __svm_sev_es_vcpu_run(unsigned long vmcb_pa);
--void __svm_vcpu_run(unsigned long vmcb_pa, unsigned long *regs);
-+void __svm_vcpu_run(unsigned long vmcb_pa, struct vcpu_svm *svm);
- 
- #endif
 diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
-index 723f8534986c..8fac744361e5 100644
+index 8fac744361e5..51a63a47d74f 100644
 --- a/arch/x86/kvm/svm/vmenter.S
 +++ b/arch/x86/kvm/svm/vmenter.S
-@@ -8,23 +8,23 @@
- #define WORD_SIZE (BITS_PER_LONG / 8)
- 
- /* Intentionally omit RAX as it's context switched by hardware */
--#define VCPU_RCX	__VCPU_REGS_RCX * WORD_SIZE
--#define VCPU_RDX	__VCPU_REGS_RDX * WORD_SIZE
--#define VCPU_RBX	__VCPU_REGS_RBX * WORD_SIZE
-+#define VCPU_RCX	(SVM_vcpu_arch_regs + __VCPU_REGS_RCX * WORD_SIZE)
-+#define VCPU_RDX	(SVM_vcpu_arch_regs + __VCPU_REGS_RDX * WORD_SIZE)
-+#define VCPU_RBX	(SVM_vcpu_arch_regs + __VCPU_REGS_RBX * WORD_SIZE)
- /* Intentionally omit RSP as it's context switched by hardware */
--#define VCPU_RBP	__VCPU_REGS_RBP * WORD_SIZE
--#define VCPU_RSI	__VCPU_REGS_RSI * WORD_SIZE
--#define VCPU_RDI	__VCPU_REGS_RDI * WORD_SIZE
-+#define VCPU_RBP	(SVM_vcpu_arch_regs + __VCPU_REGS_RBP * WORD_SIZE)
-+#define VCPU_RSI	(SVM_vcpu_arch_regs + __VCPU_REGS_RSI * WORD_SIZE)
-+#define VCPU_RDI	(SVM_vcpu_arch_regs + __VCPU_REGS_RDI * WORD_SIZE)
- 
- #ifdef CONFIG_X86_64
--#define VCPU_R8		__VCPU_REGS_R8  * WORD_SIZE
--#define VCPU_R9		__VCPU_REGS_R9  * WORD_SIZE
--#define VCPU_R10	__VCPU_REGS_R10 * WORD_SIZE
--#define VCPU_R11	__VCPU_REGS_R11 * WORD_SIZE
--#define VCPU_R12	__VCPU_REGS_R12 * WORD_SIZE
--#define VCPU_R13	__VCPU_REGS_R13 * WORD_SIZE
--#define VCPU_R14	__VCPU_REGS_R14 * WORD_SIZE
--#define VCPU_R15	__VCPU_REGS_R15 * WORD_SIZE
-+#define VCPU_R8		(SVM_vcpu_arch_regs + __VCPU_REGS_R8  * WORD_SIZE)
-+#define VCPU_R9		(SVM_vcpu_arch_regs + __VCPU_REGS_R9  * WORD_SIZE)
-+#define VCPU_R10	(SVM_vcpu_arch_regs + __VCPU_REGS_R10 * WORD_SIZE)
-+#define VCPU_R11	(SVM_vcpu_arch_regs + __VCPU_REGS_R11 * WORD_SIZE)
-+#define VCPU_R12	(SVM_vcpu_arch_regs + __VCPU_REGS_R12 * WORD_SIZE)
-+#define VCPU_R13	(SVM_vcpu_arch_regs + __VCPU_REGS_R13 * WORD_SIZE)
-+#define VCPU_R14	(SVM_vcpu_arch_regs + __VCPU_REGS_R14 * WORD_SIZE)
-+#define VCPU_R15	(SVM_vcpu_arch_regs + __VCPU_REGS_R15 * WORD_SIZE)
- #endif
- 
- .section .noinstr.text, "ax"
-@@ -32,7 +32,7 @@
- /**
-  * __svm_vcpu_run - Run a vCPU via a transition to SVM guest mode
-  * @vmcb_pa:	unsigned long
-- * @regs:	unsigned long * (to guest registers)
-+ * @svm:	struct vcpu_svm *
-  */
- SYM_FUNC_START(__svm_vcpu_run)
- 	push %_ASM_BP
-@@ -47,13 +47,13 @@ SYM_FUNC_START(__svm_vcpu_run)
- #endif
- 	push %_ASM_BX
- 
--	/* Save @regs. */
-+	/* Save @svm. */
- 	push %_ASM_ARG2
- 
+@@ -53,30 +53,31 @@ SYM_FUNC_START(__svm_vcpu_run)
  	/* Save @vmcb. */
  	push %_ASM_ARG1
  
--	/* Move @regs to RAX. */
-+	/* Move @svm to RAX. */
- 	mov %_ASM_ARG2, %_ASM_AX
+-	/* Move @svm to RAX. */
+-	mov %_ASM_ARG2, %_ASM_AX
++	/* Move @svm to RDI. */
++	mov %_ASM_ARG2, %_ASM_DI
  
- 	/* Load guest registers. */
-@@ -89,7 +89,7 @@ SYM_FUNC_START(__svm_vcpu_run)
- 	FILL_RETURN_BUFFER %_ASM_AX, RSB_CLEAR_LOOPS, X86_FEATURE_RETPOLINE
- #endif
+-	/* Load guest registers. */
+-	mov VCPU_RCX(%_ASM_AX), %_ASM_CX
+-	mov VCPU_RDX(%_ASM_AX), %_ASM_DX
+-	mov VCPU_RBX(%_ASM_AX), %_ASM_BX
+-	mov VCPU_RBP(%_ASM_AX), %_ASM_BP
+-	mov VCPU_RSI(%_ASM_AX), %_ASM_SI
+-	mov VCPU_RDI(%_ASM_AX), %_ASM_DI
+-#ifdef CONFIG_X86_64
+-	mov VCPU_R8 (%_ASM_AX),  %r8
+-	mov VCPU_R9 (%_ASM_AX),  %r9
+-	mov VCPU_R10(%_ASM_AX), %r10
+-	mov VCPU_R11(%_ASM_AX), %r11
+-	mov VCPU_R12(%_ASM_AX), %r12
+-	mov VCPU_R13(%_ASM_AX), %r13
+-	mov VCPU_R14(%_ASM_AX), %r14
+-	mov VCPU_R15(%_ASM_AX), %r15
+-#endif
  
--	/* "POP" @regs to RAX. */
-+	/* "POP" @svm to RAX. */
+ 	/* "POP" @vmcb to RAX. */
  	pop %_ASM_AX
  
- 	/* Save all guest registers.  */
++	/* Load guest registers. */
++	mov VCPU_RCX(%_ASM_DI), %_ASM_CX
++	mov VCPU_RDX(%_ASM_DI), %_ASM_DX
++	mov VCPU_RBX(%_ASM_DI), %_ASM_BX
++	mov VCPU_RBP(%_ASM_DI), %_ASM_BP
++	mov VCPU_RSI(%_ASM_DI), %_ASM_SI
++#ifdef CONFIG_X86_64
++	mov VCPU_R8 (%_ASM_DI),  %r8
++	mov VCPU_R9 (%_ASM_DI),  %r9
++	mov VCPU_R10(%_ASM_DI), %r10
++	mov VCPU_R11(%_ASM_DI), %r11
++	mov VCPU_R12(%_ASM_DI), %r12
++	mov VCPU_R13(%_ASM_DI), %r13
++	mov VCPU_R14(%_ASM_DI), %r14
++	mov VCPU_R15(%_ASM_DI), %r15
++#endif
++	mov VCPU_RDI(%_ASM_DI), %_ASM_DI
++
+ 	/* Enter guest mode */
+ 	sti
+ 
 -- 
 2.31.1
 
