@@ -2,102 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4502C611446
-	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 16:16:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6168A61155C
+	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 17:02:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229597AbiJ1OQY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Oct 2022 10:16:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45004 "EHLO
+        id S230315AbiJ1PCA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Oct 2022 11:02:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230292AbiJ1OQJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Oct 2022 10:16:09 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E4C973913;
-        Fri, 28 Oct 2022 07:16:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666966566; x=1698502566;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=aEMuLa1b6x1jF2K/A81DVuq/EYef369Hcj1YRFD+GDo=;
-  b=ACSNVS4d/aOCAboULd0ol/FFktMFHtiRk42S06lE5cpFe+ZPFb5AuFWg
-   etJ9Lx+SKE0Jz+FeTBQnRdC28aOtL6e8ngHbCJ/bK0Py568a0PSkVGTmQ
-   hm6X+gsJ8VSL716Fcn5/yOF8ojjau4kcD7aBEjauEaUVcOZ9u4qb6vy9w
-   y6dphtB31wZeJjFuYX5r3/lTU+pquyv8tucSrgekPtzMOvC3xdOid9zOp
-   9ofHCrLfPRJrzbGIpdoipg4YERpXfkCYmruAGtKuIW4D3SAzXa4CyNxxg
-   daBq0Lxn1YS4uVcCLS5Z9WItsRbGEws9gC6dUQ0OBk4QzyyaHLQ0EP0Ly
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10513"; a="308489815"
-X-IronPort-AV: E=Sophos;i="5.95,221,1661842800"; 
-   d="scan'208";a="308489815"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2022 07:16:05 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10513"; a="696230408"
-X-IronPort-AV: E=Sophos;i="5.95,221,1661842800"; 
-   d="scan'208";a="696230408"
-Received: from jbandiax-mobl.amr.corp.intel.com (HELO [10.209.126.71]) ([10.209.126.71])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2022 07:16:04 -0700
-Message-ID: <c2145924-2448-4606-3de5-65df8da017ce@intel.com>
-Date:   Fri, 28 Oct 2022 07:16:04 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.2
-Subject: Re: [PATCH v6 21/21] Documentation/x86: Add documentation for TDX
- host support
-Content-Language: en-US
-To:     Bagas Sanjaya <bagasdotme@gmail.com>,
-        Kai Huang <kai.huang@intel.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-mm@kvack.org, seanjc@google.com, pbonzini@redhat.com,
-        dan.j.williams@intel.com, rafael.j.wysocki@intel.com,
-        kirill.shutemov@linux.intel.com, reinette.chatre@intel.com,
-        len.brown@intel.com, tony.luck@intel.com, peterz@infradead.org,
-        ak@linux.intel.com, isaku.yamahata@intel.com, chao.gao@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, sagis@google.com,
-        imammedo@redhat.com
-References: <cover.1666824663.git.kai.huang@intel.com>
- <a3783eb87c0b3e652938dfd8714ed2fe93989c76.1666824663.git.kai.huang@intel.com>
- <Y1vQd+HGhfxkHQrz@debian.me>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <Y1vQd+HGhfxkHQrz@debian.me>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        with ESMTP id S231253AbiJ1PB5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Oct 2022 11:01:57 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E98BD1D3A76
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 08:01:55 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8F7A2B82A8A
+        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 15:01:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A096C433C1;
+        Fri, 28 Oct 2022 15:01:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1666969313;
+        bh=YaZbsK17VEpH/0bAn+2G6cMJok1jwgGYoXMA7VpLhmI=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=OsMhVx7s09F436HGkTdccNW4fWIEvWRk/5s4c/jUnZamgJwBZRtUWKaDB8MFcdNea
+         5s1+fh4Sl1NeTFoGeDd+o7acoRKKELFfEzVfljU1jUtltrXpUBljV8ub07ngYQJ8i9
+         gRP9zob9sgSa99SuGWPFiLe6S5Qu11qOShCnWEfX9o+smpCS0KhHSCdq4DEu6FVQaB
+         MLNb1LXTI9ibxIo0tYgw6sxWitIc9ksZ/43Z0xi/NfYu28v/ly5Ui+bTWp69Wvpfnx
+         EHm+S+Vtd8qCZpZeLP9gsmASLV1uzKLHYpyUBsmTvB/OL5TRavXjMHGFT5c72lSsah
+         ta/5eUeqvKVfw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1ooQrn-002I5N-2c;
+        Fri, 28 Oct 2022 16:01:51 +0100
+Date:   Fri, 28 Oct 2022 16:01:50 +0100
+Message-ID: <86fsf8dmap.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Andrew Jones <andrew.jones@linux.dev>
+Cc:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, alexandru.elisei@arm.com,
+        eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
+Subject: Re: [kvm-unit-tests PATCH v4 0/4] arm: pmu: Fixes for bare metal
+In-Reply-To: <20221028114041.5symayccvdgkqaor@kamzik>
+References: <20220811185210.234711-1-ricarkol@google.com>
+        <20221028114041.5symayccvdgkqaor@kamzik>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: andrew.jones@linux.dev, ricarkol@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alexandru.elisei@arm.com, eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/28/22 05:52, Bagas Sanjaya wrote:
-> -architecture doesn't require the BIOS to load the TDX module, but the
-> -kernel assumes it is loaded by the BIOS.
-> +architecture doesn't require the BIOS to load the TDX module, however the
-> +kernel assumes that it is loaded by the BIOS.
+Hi Drew,
 
-Hi Bagas,
+On Fri, 28 Oct 2022 12:40:41 +0100,
+Andrew Jones <andrew.jones@linux.dev> wrote:
+> 
+> On Thu, Aug 11, 2022 at 11:52:06AM -0700, Ricardo Koller wrote:
+> > There are some tests that fail when running on bare metal (including a
+> > passthrough prototype).  There are three issues with the tests.  The
+> > first one is that there are some missing isb()'s between enabling event
+> > counting and the actual counting. This wasn't an issue on KVM as
+> > trapping on registers served as context synchronization events. The
+> > second issue is that some tests assume that registers reset to 0.  And
+> > finally, the third issue is that overflowing the low counter of a
+> > chained event sets the overflow flag in PMVOS and some tests fail by
+> > checking for it not being set.
+> > 
+> > Addressed all comments from the previous version:
+> > https://lore.kernel.org/kvmarm/YvPsBKGbHHQP+0oS@google.com/T/#mb077998e2eb9fb3e15930b3412fd7ba2fb4103ca
+> > - add pmu_reset() for 32-bit arm [Andrew]
+> > - collect r-b from Alexandru
+> > 
+> > Thanks!
+> > Ricardo
+> > 
+> > Ricardo Koller (4):
+> >   arm: pmu: Add missing isb()'s after sys register writing
+> >   arm: pmu: Add reset_pmu() for 32-bit arm
+> >   arm: pmu: Reset the pmu registers before starting some tests
+> >   arm: pmu: Check for overflow in the low counter in chained counters
+> >     tests
+> > 
+> >  arm/pmu.c | 72 ++++++++++++++++++++++++++++++++++++++++++-------------
+> >  1 file changed, 55 insertions(+), 17 deletions(-)
+> >
+> 
+> Hi all,
+> 
+> Please refresh my memory. Does this series work on current platforms? Or
+> was it introducing new test failures which may be in the test, as opposed
+> to KVM? If they work on most platforms, but not on every platform, then
+> have we identified what triggers them to fail and whether that should be
+> fixed or just worked-around? I'm sorry I still can't help out with the
+> testing as I haven't yet had time to setup the Rpi that Mark Rutland gave
+> me in Dublin.
 
-I just read the first hunk of your suggestions.  What Kai had was fine.
-There's no reason to change "but" to "however".  Both are, to my eye,
-perfectly fine.
+This series does show that KVM is buggy, and I have patches out to fix
+it [1]. The patches should work on anything, really.
 
-I appreciate that these suggestions are trying to improve things.  But,
-I don't think they're an appreciable improvement.
+> I know this series has been rotting on arm/queue for months, so I'll be
+> happy to merge it if the consensus is to do so. I can also drop it, or
+> some of the patches, if that's the consensus.
 
-OK, I lied.  I went and read one more random hunk:
+I'd be very happy to see these patches being merged.
 
-> -Currently the kernel doesn't handle hot-removal of convertible memory but
-> -depends on the BIOS to behave correctly.
-> +Currently the kernel that hot-removal but assumes that BIOS behaves
-> +correctly.
+Thanks,
 
-This turns a perfectly good sentence into gibberish.  It makes Kai's
-documentation demonstrably worse.  To make matters worse, it's mixed in
-with those arbitrary changes like but->however to make it harder to find.
+	M.
 
-Please stop sending these patches.  They're not helping.  In fact, they
-are consuming reviewer and contributor time, so they're actually making
-the situation _worse_.
+[1] https://lore.kernel.org/r/20221028105402.2030192-1-maz@kernel.org
+
+-- 
+Without deviation from the norm, progress is not possible.
