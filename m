@@ -2,349 +2,426 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 50B0D611A84
-	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 20:53:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8F0BC611AA7
+	for <lists+kvm@lfdr.de>; Fri, 28 Oct 2022 21:09:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229871AbiJ1Sxu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Oct 2022 14:53:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46764 "EHLO
+        id S229870AbiJ1TJP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 28 Oct 2022 15:09:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229613AbiJ1Sxs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Oct 2022 14:53:48 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11A371EEA3F
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 11:53:47 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id l22-20020a17090a3f1600b00212fbbcfb78so10660140pjc.3
-        for <kvm@vger.kernel.org>; Fri, 28 Oct 2022 11:53:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C4nJvhCiTQOjx5AF0eBF6jCp1IrzGh0wBrbwqc5Oko0=;
-        b=U750DNYeUR5gdpQo2toIAG5qUyuSuG2e8upJWAOQ1qXz3L+9gK/1TX70AyViQ8r+0b
-         /+lxLVWWM0NVCpnbKmJ4+s7V0ouZ/aPdg4iSnt3CLXbev/tWNhhwUtAD3XjumCNjBnbO
-         Ywlg0026Yuh7MpzcM7cX+RDrQ6RU4Tt65UnR0hFXtAse1IH4RLr9MGiw/Dhs2fStAPWe
-         y43p7eGJZcC2giB2gw/bDw9QHUBBwYWy/E+x7bocmLO6hDfckE0NIr+FSoldJ/iBTbv1
-         sC4Gj1uawmpLuHr64/63YEcQnUubECnUkm4L+swWD2vBIqJibZqDdbL8GdoXNFmmAYC0
-         a0nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C4nJvhCiTQOjx5AF0eBF6jCp1IrzGh0wBrbwqc5Oko0=;
-        b=S1x1Ui7k+rCIKYtsNBy1JwxM2Jgy9G1uFJHwD/4CxuEkqJ30x0Ra90rfkrtztvATAr
-         A3mbTWK5ymzdAbjwPnpSSygHKxWidwAenRusE2PSXrqDW+uIdh6HsLRsQ1emniC3Bn4w
-         SEfLiwhfw4It3yye2F/I4MJtwkbsN9gtke7bF9oZYan2J3+IsgxoOZjBS/qKVvTl2a1c
-         JqFTJSefyAnSfxLtgYABXl25UwjsPQ1hB/8ZeqC+JToGoz2KK9BlUdJA57oW5+rgr4xw
-         2fFhKJYJ/haoiLGdNyEpICvCAbF+hRZDbq7N9fHjQdZV16waA0hVklpgOnJZLNDA/tLd
-         R6XA==
-X-Gm-Message-State: ACrzQf364GxVkgOyld6sZe5Z61dewBgZHBZlO/7fuetIOCtiHxmLXZ1w
-        0ZjGMoUZ+dDIDAvlmfJ1EOe2bw==
-X-Google-Smtp-Source: AMsMyM5Uu59pq4A1q2lSvPkw7rR4Iq7OYMnqJKq0HP+on7dSkTUi7vseAJaaoHKvCOyUjUd3JRRXow==
-X-Received: by 2002:a17:903:18d:b0:186:9862:d15f with SMTP id z13-20020a170903018d00b001869862d15fmr438159plg.6.1666983226323;
-        Fri, 28 Oct 2022 11:53:46 -0700 (PDT)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id gd7-20020a17090b0fc700b00212d4cbcbfdsm2886854pjb.22.2022.10.28.11.53.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Oct 2022 11:53:45 -0700 (PDT)
-Date:   Fri, 28 Oct 2022 11:53:42 -0700
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Reiji Watanabe <reijiw@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Quentin Perret <qperret@google.com>,
-        Ben Gardon <bgardon@google.com>, Gavin Shan <gshan@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Will Deacon <will@kernel.org>,
-        Sean Christopherson <seanjc@google.com>, kvmarm@lists.linux.dev
-Subject: Re: [PATCH v2 06/15] KVM: arm64: Tear down unlinked stage-2 subtree
- after break-before-make
-Message-ID: <Y1wlNkTdYbErTueg@google.com>
-References: <20221007232818.459650-1-oliver.upton@linux.dev>
- <20221007232818.459650-7-oliver.upton@linux.dev>
- <Y1widUxvi/yDAfO8@google.com>
- <Y1wi1QHhup9iHNNQ@google.com>
-MIME-Version: 1.0
+        with ESMTP id S229379AbiJ1TJM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 28 Oct 2022 15:09:12 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C308E1E8BBB;
+        Fri, 28 Oct 2022 12:09:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=odPrVVu2N8KBAc5LuHG2TfNZzSDtaTZCD+UNituAuYQT1oAbzod46xVCw+u/gDcE7rXkAKWVxYVvyJRpuASa0aO4B0YAzE50ebRtpfKDVa9QYh5TNLJzyVAndS0XeYlIU8e2UCV0Bp/jmBLWFG7psEdtMu1J38lF49XTd6hWChdW/VgVNd983IYe7mBH8CTpvcU6BX1O/R4YtVVlN9gJA5qd6eh9vcrdWxxpHckflzYyfueCcdm3IHt0Nfl+T+zF8CHIElsC6TpkuJNgoDizVJDPMXij4tckMHGWFY8rqugemDIsnjrsZ24Dw/SrLjlSdJRArGsfwm98EaWnT2fsGg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=l66zJzKwo6e/bAC4pemRGz4vVm+9/CWUt7VT41vsPuc=;
+ b=KqsVqlAbhyveairADjxWhebuBiMl/pZQjlNd1EB/GvOKFljsXst5DnBlZSNk69oNLTHxpmmVwkPcwflC1a0DhJCJ/MVZh8LFDLfgN/AgPCaLzpgq6YreJK4hBzKqjvmwROYOEA5qN2OcV/XGhxtyp9svHaTomGhKFy8GyvjPvZ1VEmnioFYtDRfOsW9QDsh23/AJ8y9/+yFJ8GM90NOH/vePKP5uZeUOfhlGhI4qyfYvr3oLREK490NjD1fqvlqpVHCQD9yYWRKNjK237F795B3n+1GTOft6CVS6gRDLPtf+q9lcY3BVPp2poId2B73/PF4buNj+QxiO9cJ6goXc2A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=l66zJzKwo6e/bAC4pemRGz4vVm+9/CWUt7VT41vsPuc=;
+ b=KyTZCzKLtTB/lT+bgu2g0nni4Kw5R95SZvfcMqgMDZgYg48pbrjN8rm5iwNx9B+XAgt4lvjG23vnMmhZIWjTwYBTvKOB17wd/fPsh1K7VeODeyztmZUPcBW7QvHCRWovlmDpQMfWLv1IKt9NngPw8rhAuw3fghwChqFXLxP34gR0UXWAwCEs8y5ysyEUZQhZim4XPJpjXs7BxclqxI3K7sfV2I1GM3FaK6RSKtH3cZVlUPqHBZrcQZLbm7N0JsdCwWRRSk1EE9dRmB4qClHsb4gKKXIvCwy+AQKzuRANjHZtHI3i99L5DPBI7r06tXeYEmrkBWucnrhcDnyqTAMUKQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by CH0PR12MB5073.namprd12.prod.outlook.com (2603:10b6:610:e0::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5769.15; Fri, 28 Oct
+ 2022 19:09:07 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::7a81:a4e4:bb9c:d1de%6]) with mapi id 15.20.5769.015; Fri, 28 Oct 2022
+ 19:09:07 +0000
+Date:   Fri, 28 Oct 2022 16:09:06 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Bagas Sanjaya <bagasdotme@gmail.com>
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>, bpf@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joao Martins <joao.m.martins@oracle.com>, kvm@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Nicolin Chen <nicolinc@nvidia.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Shameerali Kolothum Thodi 
+        <shameerali.kolothum.thodi@huawei.com>,
+        Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v3 04/15] iommufd: Overview documentation
+Message-ID: <Y1wo0kkAhNb37ePi@nvidia.com>
+References: <0-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+ <4-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
+ <Y1i01MA4hfAC6+QF@debian.me>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y1wi1QHhup9iHNNQ@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <Y1i01MA4hfAC6+QF@debian.me>
+X-ClientProxiedBy: MN2PR01CA0017.prod.exchangelabs.com (2603:10b6:208:10c::30)
+ To LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH0PR12MB5073:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1bceb362-25b6-4055-1fbf-08dab917e331
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: RUA/mCDwUh/pCysMiVL5tm21BavZQiJvWk4npbRhRQhBkb0l8tTj/V0AQHpUZVyafiHdnqZnJnCdIYCmpt80vh+f+CAx/KhIs+QN0BLgvGaEswifN1ECiPpwsInZWO7fuu/zjbr8XmxSzRg9/sEMVEdtLw+NxYgJSwhNJE8RNHY5NCJtBd1esG4sV3fNDFYPJOHpstpAV+jo0JenVmPYknV5PZz8+mX9jRvvRFAAebRGB37APgkKeU3A5O4Hh4LWPhGJju1xIEDpyCHZ7BYPeIIC6KKwVi/mDTwBFK5e4WqjFQf3tgrOzKaqs0k076FUiPs7zO1LeYD5HRYRGJ73N0CHaBLEmYaoeOelNWrqeQKvMl0zaaHLr0duCZQez5Dd4moTwlVVKZrBoiAnNIly6bbWieFY3qusL6fQigv4ckK/84xyYyTKLAeYXgcvRKd4kLuzgTmzGs6odQIt+xn/20yfuKQGsgY9BFg2I9Sv9uX1KytoVae4wHNc+A8HnbxDHNCfj8XYlSiBhSBV9lnnKtZgpPdQpWg43fGXqUoyX7ch2Qj4Ocgeu2iiLAHMjj9LGISqpV+AtF5L15uEXbTKoK6yINCRxZxd4Lv3WnlwFINLuM2foB0c+FzjEkg3xyF/6ThlCN15T2UyiN7+YIUtMvzfk35ZFPvjnAoFNsFvs96HO4ssOAO06qQgqifmCYNm6UakhnXeB0AbncMRbyrCzQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(376002)(366004)(396003)(39860400002)(346002)(451199015)(54906003)(8936002)(6916009)(6506007)(36756003)(8676002)(4326008)(66556008)(66946007)(66476007)(316002)(41300700001)(83380400001)(38100700002)(26005)(6512007)(30864003)(86362001)(478600001)(2616005)(186003)(2906002)(6486002)(7406005)(7416002)(5660300002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?jRsHJkZmeczXoh8/lle10ZT3oVli/ooChkgtXTYGSX7MA7+M42eNXPpD0Ufb?=
+ =?us-ascii?Q?ThjKU1jCMKHllLqPenJeuQBrhW7UTOXmr9UHICA155l7I9fcl5FOgCYKQWxD?=
+ =?us-ascii?Q?KDYcujnqT9B1BK+Jq4uwUgXnwFMImMATMrHFLqSPosvE6a+3IGn64MyYGfJT?=
+ =?us-ascii?Q?1HAostDabJFL9VffLR+cbTGzb93qsvI7VIq+1XiGv+0bStB+WzQ+Jk2fm8eK?=
+ =?us-ascii?Q?DgHg00f21uVtTl2c6X4G4xrIGbar4znxq6sNHlwz6Mpcv9iasCRDjQFUhq8e?=
+ =?us-ascii?Q?vTRRKb5t+1kulCDAmCCJcUdZek5TdBsn7Hk6CytVFXwAqNgq2Pg8+GQ3yNna?=
+ =?us-ascii?Q?9fE0gaa2MtyPX4xgtHZLGpd6GXL/RvoCZiJxp1HaOJN0cnuiiYe+qGGhGqio?=
+ =?us-ascii?Q?R0QtZgl8nJgcYADQsgCOSPqV5G1bne6Ot+Nfbfwmm0/ni8QLtEtAb7cQvzaC?=
+ =?us-ascii?Q?6Rc3z2YD+0qGPMU22e3OHsEcUJ+rT7GW/LSjsJgkX5w7M1eNK9f/HQW9wqGR?=
+ =?us-ascii?Q?N/YyYMDRHxIJ2PEjeGg8ulpDGmDZtLDCwz4JRUcB4BeI9SjfKUUHBMxHdxd6?=
+ =?us-ascii?Q?WmQCz4Na0MJyWCR27HOuJa/9rcuQ1yRUnikAzLoh9Zk6useQVnCrXFpbHjaH?=
+ =?us-ascii?Q?yn0CsMY5I5xWbxg0D+Fu8mxs45fwsRfXYjf5ajGFg6Ly0NYhwdY/NcaJm4PE?=
+ =?us-ascii?Q?uiszIcZ3WE1Ob1N/e70RG7K0hHdlPD+BckVv+DeRi1JcvIdjU6ZbGqjsiadI?=
+ =?us-ascii?Q?7LKmEad1vqXtKvXxHo8oC3SQFgj/5Z2sNzXzQaidlPqq0xaWREdKBIMv5jtT?=
+ =?us-ascii?Q?M8oE+1nT7gDeT1rJP5PD/zxl5cFgRPcxbsVnG1ROS6LjUqaHb7C+6tCf6Gom?=
+ =?us-ascii?Q?kM7AYFiupM061q/hCr9KfeIV5gkk5wUunSq/BVmlHKm0KvTx2CL3phJIzPJX?=
+ =?us-ascii?Q?k7PqTqpERyOAK9ffVZnom0C+SIy3Vfh4IeRJjxv6D8JxA0GFbA4bfhNvN4Gg?=
+ =?us-ascii?Q?fJIVITMrrM+KmbIprJm+/rseG8IQyszK/CQSxweJjL2vTBBz2OL2wyP80h4C?=
+ =?us-ascii?Q?+Mksq/6AWx8BBhLFdm3pMVm5Jea24iQzya0aDY2RiBETIdDVXyzfgUAmJxnu?=
+ =?us-ascii?Q?o6PYtF18EqF1mAXc2ClQTr0UZkzQ5pm5TKWOQYEhGqcfaUaJXToEfATxhuEW?=
+ =?us-ascii?Q?23d7kXO8txj7u1qwM4IQTUJFD1crB5Go1RD9FnkE+bk3uT1KZFjbHVPfRrl9?=
+ =?us-ascii?Q?mzo/v5/KeoPzhK4QNEsaPHisA4cFGjujsKWJVfNfH2jDB7ezAfvdpYoBJoki?=
+ =?us-ascii?Q?bKuJudkWu7+WVTl/geX1QjixSht7w+KTVx9URKmyVVhK29otWHPT7s9GGc8Z?=
+ =?us-ascii?Q?oortBjuPvA/Z/qih4bBkHR+MmA7duXnzTBa9TC+AputvvwphCKy6hjikoHCE?=
+ =?us-ascii?Q?NO4+TGNKiJrViq7MrsUL9he8wbbNh8BQbGxL8vnPJFwZDTurMlWJRepLwZo4?=
+ =?us-ascii?Q?kgIpHFnTLxAeFiQOlJ3GxNx1AUiSC4nFPmsf6W6Oz1rhNz7Ld6kcZusLp7Fj?=
+ =?us-ascii?Q?Jvacx3eCGv6eSaDskCc=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1bceb362-25b6-4055-1fbf-08dab917e331
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2022 19:09:07.5879
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: R+EV/++TRl+L6Z6hJB2WI4mOgsaP0WabzmiMscsGHP173f88/G4Ax9HzhTQ15pPp
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5073
+X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 28, 2022 at 11:43:33AM -0700, Ricardo Koller wrote:
-> On Fri, Oct 28, 2022 at 11:41:57AM -0700, Ricardo Koller wrote:
-> > On Fri, Oct 07, 2022 at 11:28:09PM +0000, Oliver Upton wrote:
-> > > The break-before-make sequence is a bit annoying as it opens a window
-> > > wherein memory is unmapped from the guest. KVM should replace the PTE
-> > > as quickly as possible and avoid unnecessary work in between.
-> > > 
-> > > Presently, the stage-2 map walker tears down a removed table before
-> > > installing a block mapping when coalescing a table into a block. As the
-> > > removed table is no longer visible to hardware walkers after the
-> > > DSB+TLBI, it is possible to move the remaining cleanup to happen after
-> > > installing the new PTE.
-> > > 
-> > > Reshuffle the stage-2 map walker to install the new block entry in
-> > > the pre-order callback. Unwire all of the teardown logic and replace
-> > > it with a call to kvm_pgtable_stage2_free_removed() after fixing
-> > > the PTE. The post-order visitor is now completely unnecessary, so drop
-> > > it. Finally, touch up the comments to better represent the now
-> > > simplified map walker.
-> > > 
-> > > Note that the call to tear down the unlinked stage-2 is indirected
-> > > as a subsequent change will use an RCU callback to trigger tear down.
-> > > RCU is not available to pKVM, so there is a need to use different
-> > > implementations on pKVM and non-pKVM VMs.
-> > > 
-> > > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_pgtable.h  |  3 +
-> > >  arch/arm64/kvm/hyp/nvhe/mem_protect.c |  6 ++
-> > >  arch/arm64/kvm/hyp/pgtable.c          | 84 ++++++++-------------------
-> > >  arch/arm64/kvm/mmu.c                  |  8 +++
-> > >  4 files changed, 40 insertions(+), 61 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > > index 71b7d154b78a..c33edcf36b5b 100644
-> > > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > > @@ -77,6 +77,8 @@ static inline bool kvm_level_supports_block_mapping(u32 level)
-> > >   *				allocation is physically contiguous.
-> > >   * @free_pages_exact:		Free an exact number of memory pages previously
-> > >   *				allocated by zalloc_pages_exact.
-> > > + * @free_removed_table:		Free a removed paging structure by unlinking and
-> > > + *				dropping references.
-> > >   * @get_page:			Increment the refcount on a page.
-> > >   * @put_page:			Decrement the refcount on a page. When the
-> > >   *				refcount reaches 0 the page is automatically
-> > > @@ -95,6 +97,7 @@ struct kvm_pgtable_mm_ops {
-> > >  	void*		(*zalloc_page)(void *arg);
-> > >  	void*		(*zalloc_pages_exact)(size_t size);
-> > >  	void		(*free_pages_exact)(void *addr, size_t size);
-> > > +	void		(*free_removed_table)(void *addr, u32 level);
-> > >  	void		(*get_page)(void *addr);
-> > >  	void		(*put_page)(void *addr);
-> > >  	int		(*page_count)(void *addr);
-> > > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > > index d21d1b08a055..735769886b55 100644
-> > > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > > @@ -79,6 +79,11 @@ static void host_s2_put_page(void *addr)
-> > >  	hyp_put_page(&host_s2_pool, addr);
-> > >  }
-> > >  
-> > > +static void host_s2_free_removed_table(void *addr, u32 level)
-> > > +{
-> > > +	kvm_pgtable_stage2_free_removed(&host_kvm.mm_ops, addr, level);
-> > > +}
-> > > +
-> > >  static int prepare_s2_pool(void *pgt_pool_base)
-> > >  {
-> > >  	unsigned long nr_pages, pfn;
-> > > @@ -93,6 +98,7 @@ static int prepare_s2_pool(void *pgt_pool_base)
-> > >  	host_kvm.mm_ops = (struct kvm_pgtable_mm_ops) {
-> > >  		.zalloc_pages_exact = host_s2_zalloc_pages_exact,
-> > >  		.zalloc_page = host_s2_zalloc_page,
-> > > +		.free_removed_table = host_s2_free_removed_table,
-> > >  		.phys_to_virt = hyp_phys_to_virt,
-> > >  		.virt_to_phys = hyp_virt_to_phys,
-> > >  		.page_count = hyp_page_count,
-> > > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > > index 363a5cce7e1a..02c33fccb178 100644
-> > > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > > @@ -746,16 +746,19 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
-> > >  	return 0;
-> > >  }
-> > >  
-> > > +static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
-> > > +				struct stage2_map_data *data);
-> > > +
-> > >  static int stage2_map_walk_table_pre(const struct kvm_pgtable_visit_ctx *ctx,
-> > >  				     struct stage2_map_data *data)
-> > >  {
-> > > -	if (data->anchor)
-> > > -		return 0;
-> > > +	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-> > > +	kvm_pte_t *childp = kvm_pte_follow(ctx->old, mm_ops);
-> > > +	int ret;
-> > >  
-> > >  	if (!stage2_leaf_mapping_allowed(ctx, data))
-> > >  		return 0;
-> > >  
-> > > -	data->childp = kvm_pte_follow(ctx->old, ctx->mm_ops);
-> > >  	kvm_clear_pte(ctx->ptep);
-> > >  
-> > >  	/*
-> > > @@ -764,8 +767,13 @@ static int stage2_map_walk_table_pre(const struct kvm_pgtable_visit_ctx *ctx,
-> > >  	 * individually.
-> > >  	 */
-> > >  	kvm_call_hyp(__kvm_tlb_flush_vmid, data->mmu);
-> > > -	data->anchor = ctx->ptep;
-> > > -	return 0;
-> > > +
-> > > +	ret = stage2_map_walk_leaf(ctx, data);
-> > > +
-> > > +	mm_ops->put_page(ctx->ptep);
-> > > +	mm_ops->free_removed_table(childp, ctx->level + 1);
-> > 
-> > This could save some cycles:
-> > 
-> > 	if (stage2_pte_is_counted(childp) // typo: should be childp
-> > 		mm_ops->free_removed_table(childp, ctx->level + 1);
-> > 
-> > as coming back using the stage2_free_walker() requires some preparation,
-> > and it does the exact same check anyawy.
+On Wed, Oct 26, 2022 at 11:17:24AM +0700, Bagas Sanjaya wrote:
+> > + - Binding iommu_domain's to PASID/SSID
+> > + - Userspace page tables, for ARM, x86 and S390
+> > + - Kernel bypass'd invalidation of user page tables
+> > + - Re-use of the KVM page table in the IOMMU
+> > + - Dirty page tracking in the IOMMU
+> > + - Runtime Increase/Decrease of IOPTE size
+> > + - PRI support with faults resolved in userspace
+> 
+> What are "external driver"? Device drivers (most likely)? This is the
+> first time I hear the term.
 
-Ignore that, it doesn't make any difference: it is always a valid table.
+iommufd sits between two drivers, we have the iommu subsystem driver
+and we have the "external" driver, which would be the susystem driver
+using the iommufd kAPI.
 
-> > 
-> > > +
-> > > +	return ret;
-> > >  }
-> > >  
-> > >  static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
-> > > @@ -775,13 +783,6 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
-> > >  	kvm_pte_t *childp;
-> > >  	int ret;
-> > >  
-> > > -	if (data->anchor) {
-> > > -		if (stage2_pte_is_counted(ctx->old))
-> > > -			mm_ops->put_page(ctx->ptep);
-> > > -
-> > > -		return 0;
-> > > -	}
-> > > -
-> > >  	ret = stage2_map_walker_try_leaf(ctx, data);
-> > >  	if (ret != -E2BIG)
-> > >  		return ret;
-> > > @@ -810,49 +811,14 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
-> > >  	return 0;
-> > >  }
-> > >  
-> > > -static int stage2_map_walk_table_post(const struct kvm_pgtable_visit_ctx *ctx,
-> > > -				      struct stage2_map_data *data)
-> > > -{
-> > > -	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-> > > -	kvm_pte_t *childp;
-> > > -	int ret = 0;
-> > > -
-> > > -	if (!data->anchor)
-> > > -		return 0;
-> > > -
-> > > -	if (data->anchor == ctx->ptep) {
-> > > -		childp = data->childp;
-> > > -		data->anchor = NULL;
-> > > -		data->childp = NULL;
-> > > -		ret = stage2_map_walk_leaf(ctx, data);
-> > > -	} else {
-> > > -		childp = kvm_pte_follow(ctx->old, mm_ops);
-> > > -	}
-> > > -
-> > > -	mm_ops->put_page(childp);
-> > > -	mm_ops->put_page(ctx->ptep);
-> > > -
-> > > -	return ret;
-> > > -}
-> > > -
-> > >  /*
-> > > - * This is a little fiddly, as we use all three of the walk flags. The idea
-> > > - * is that the TABLE_PRE callback runs for table entries on the way down,
-> > > - * looking for table entries which we could conceivably replace with a
-> > > - * block entry for this mapping. If it finds one, then it sets the 'anchor'
-> > > - * field in 'struct stage2_map_data' to point at the table entry, before
-> > > - * clearing the entry to zero and descending into the now detached table.
-> > > - *
-> > > - * The behaviour of the LEAF callback then depends on whether or not the
-> > > - * anchor has been set. If not, then we're not using a block mapping higher
-> > > - * up the table and we perform the mapping at the existing leaves instead.
-> > > - * If, on the other hand, the anchor _is_ set, then we drop references to
-> > > - * all valid leaves so that the pages beneath the anchor can be freed.
-> > > + * The TABLE_PRE callback runs for table entries on the way down, looking
-> > > + * for table entries which we could conceivably replace with a block entry
-> > > + * for this mapping. If it finds one it replaces the entry and calls
-> > > + * kvm_pgtable_mm_ops::free_removed_table() to tear down the detached table.
-> > >   *
-> > > - * Finally, the TABLE_POST callback does nothing if the anchor has not
-> > > - * been set, but otherwise frees the page-table pages while walking back up
-> > > - * the page-table, installing the block entry when it revisits the anchor
-> > > - * pointer and clearing the anchor to NULL.
-> > > + * Otherwise, the LEAF callback performs the mapping at the existing leaves
-> > > + * instead.
-> > >   */
-> > >  static int stage2_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> > >  			     enum kvm_pgtable_walk_flags visit)
-> > > @@ -864,11 +830,9 @@ static int stage2_map_walker(const struct kvm_pgtable_visit_ctx *ctx,
-> > >  		return stage2_map_walk_table_pre(ctx, data);
-> > >  	case KVM_PGTABLE_WALK_LEAF:
-> > >  		return stage2_map_walk_leaf(ctx, data);
-> > > -	case KVM_PGTABLE_WALK_TABLE_POST:
-> > > -		return stage2_map_walk_table_post(ctx, data);
-> > > +	default:
-> > > +		return -EINVAL;
-> > >  	}
-> > > -
-> > > -	return -EINVAL;
-> > >  }
-> > >  
-> > >  int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > > @@ -885,8 +849,7 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > >  	struct kvm_pgtable_walker walker = {
-> > >  		.cb		= stage2_map_walker,
-> > >  		.flags		= KVM_PGTABLE_WALK_TABLE_PRE |
-> > > -				  KVM_PGTABLE_WALK_LEAF |
-> > > -				  KVM_PGTABLE_WALK_TABLE_POST,
-> > > +				  KVM_PGTABLE_WALK_LEAF,
-> > >  		.arg		= &map_data,
-> > >  	};
-> > >  
-> > > @@ -916,8 +879,7 @@ int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > >  	struct kvm_pgtable_walker walker = {
-> > >  		.cb		= stage2_map_walker,
-> > >  		.flags		= KVM_PGTABLE_WALK_TABLE_PRE |
-> > > -				  KVM_PGTABLE_WALK_LEAF |
-> > > -				  KVM_PGTABLE_WALK_TABLE_POST,
-> > > +				  KVM_PGTABLE_WALK_LEAF,
-> > >  		.arg		= &map_data,
-> > >  	};
-> > >  
-> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > index c9a13e487187..04a25319abb0 100644
-> > > --- a/arch/arm64/kvm/mmu.c
-> > > +++ b/arch/arm64/kvm/mmu.c
-> > > @@ -102,6 +102,13 @@ static void *kvm_host_zalloc_pages_exact(size_t size)
-> > >  	return alloc_pages_exact(size, GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-> > >  }
-> > >  
-> > > +static struct kvm_pgtable_mm_ops kvm_s2_mm_ops;
-> > > +
-> > > +static void stage2_free_removed_table(void *addr, u32 level)
-> > > +{
-> > > +	kvm_pgtable_stage2_free_removed(&kvm_s2_mm_ops, addr, level);
-> > > +}
-> > > +
-> > >  static void kvm_host_get_page(void *addr)
-> > >  {
-> > >  	get_page(virt_to_page(addr));
-> > > @@ -627,6 +634,7 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
-> > >  	.zalloc_page		= stage2_memcache_zalloc_page,
-> > >  	.zalloc_pages_exact	= kvm_host_zalloc_pages_exact,
-> > >  	.free_pages_exact	= free_pages_exact,
-> > > +	.free_removed_table	= stage2_free_removed_table,
-> > >  	.get_page		= kvm_host_get_page,
-> > >  	.put_page		= kvm_host_put_page,
-> > >  	.page_count		= kvm_host_page_count,
-> > > -- 
-> > > 2.38.0.rc1.362.ged0d419d3c-goog
-> > > 
+> -IOMMUFD is the user API to control the IOMMU subsystem as it relates to managing
+> -IO page tables that point at user space memory. It intends to be general and
+> -consumable by any driver that wants to DMA to userspace. These drivers are
+> -eventually expected to deprecate any internal IOMMU logic, if existing (e.g.
+> +IOMMUFD is the user API to control the IOMMU subsystem as it relates to
+> +managing IO page tables using file descriptors. It intends to be general and
+                
+I added "from userspace":
+
+ IO page tables from userspace using file descriptors. It intends to be general
+
+>  In this context the capital letter (IOMMUFD) refers to the subsystem while the
+> -small letter (iommufd) refers to the file descriptors created via /dev/iommu to
+> -run the user API over.
+> +small letter (iommufd) refers to the file descriptors created via /dev/iommu
+> +for use by uAPI.
+
+"use by userspace", uaPI reads weird
+
+  
+  Key Concepts
+>  ============
+> @@ -32,26 +32,26 @@ User Visible Objects
+>  
+>  Following IOMMUFD objects are exposed to userspace:
+>  
+> -- IOMMUFD_OBJ_IOAS, representing an I/O address space (IOAS) allowing map/unmap
+> -  of user space memory into ranges of I/O Virtual Address (IOVA).
+> +- IOMMUFD_OBJ_IOAS, representing an I/O address space (IOAS), allowing
+> +  map/unmap of user space memory into ranges of I/O Virtual Address (IOVA).
+>  
+> -  The IOAS is a functional replacement for the VFIO container, and like the VFIO
+> -  container copies its IOVA map to a list of iommu_domains held within it.
+> +  The IOAS is a functional replacement for the VFIO container, and like the
+> +  VFIO container it copies IOVA map to a list of iommu_domains held within it.
+
+"it copies IOVA map" is not good grammar, how about
+
+  VFIO container it copies an IOVA map to a list of iommu_domains held within it.
+
+> -- IOMMUFD_OBJ_DEVICE, representing a device that is bound to iommufd by an
+> +- IOMMUFD_OBJ_DEVICE, representing a device that is bound to iommufd by the
+>    external driver.
+
+I would say 'an' is correct here since there can be multiple external
+drivers using iommufd.
+
+> -1. IOMMUFD_OBJ_IOAS is created via the IOMMU_IOAS_ALLOC uAPI. One iommufd can
+> +1. IOMMUFD_OBJ_IOAS is created via the IOMMU_IOAS_ALLOC uAPI. A iommufd can
+
+"an iommufd"
+
+>  2. IOMMUFD_OBJ_DEVICE is created when an external driver calls the IOMMUFD kAPI
+> -   to bind a device to an iommufd. The external driver is expected to implement
+> -   proper uAPI for userspace to initiate the binding operation. 
+
+"uAPI" -> "set of ioctls":
+
+The driver is expected to implement proper a
+set of ioctls to allow userspace to initiate the binding operation.
+
+> +3. IOMMUFD_OBJ_HW_PAGETABLE is created when an external driver calls the
+> +   IOMMUFD kAPI to attach a bounded device to an IOAS. Similarly the external
+
+I think bound is correct here
+
+> -- In-kernel user, referring to something like a VFIO mdev that is accessing the
+> -  IOAS and using a 'struct page \*' for CPU based access. Such users require an
+> +- In-kernel user - refers to something like a VFIO mdev that is accessing the
+> +  IOAS and using a 'struct page \*' for CPU based access. Such users require
+>    isolation granularity smaller than what an iommu domain can afford. They must
+>    manually enforce the IOAS constraints on DMA buffers before those buffers can
+> -  be accessed by mdev. Though no kernel API for an external driver to bind a
+> -  mdev, the datastructure and algorithms are ready for such usage.
+> +  be accessed by mdev. Although there are no kernel drivers APIs to bind a
+> +  mdev, the datastructure and algorithms are ready for handling that use case.
+
+Ah, this is out dated, we now have a kernel API to bind mdev drivers
+
+- In-kernel user - refers to something like a VFIO mdev that is using the
+  IOMMUFD access interface to access the IOAS. This starts by creating an
+  iommufd_access object that is similar to the domain binding a physical device
+  would do. The access object will then allow converting IOVA ranges into struct
+  page * lists, or doing direct read/write to an IOVA.
+
+> -Each iopt_pages represents a logical linear array of full PFNs.  The PFNs are
+> +Each iopt_pages represents a logical linear array of full PFNs. The PFNs are
+>  ultimately derived from userspave VAs via an mm_struct. Once they have been
+> -pinned the PFN is stored in an iommu_domain's IOPTEs or inside the pinned_pages
+> -xarray if they are being "software accessed".
+> +pinned the PFN is stored in IOPTEs of the iommu_domain or inside
+> the
+
+> -Multiple io_pagetable's, through their iopt_area's, can share a single
+> -iopt_pages which avoids multi-pinning and double accounting of page consumption.
+> +Multiple io_pagetable-s, through their iopt_area-s, can share a single
+> +iopt_pages which avoids multi-pinning and double accounting of page
+> +consumption.
+
+I've never seen the use of - to pluralize like this before??
+
+I took substantially all of these edits, aside from the notes above
+
+Thanks!
+Jason
+
+diff --git a/Documentation/userspace-api/iommufd.rst b/Documentation/userspace-api/iommufd.rst
+index 3e1856469d96dd..64a135f3055adc 100644
+--- a/Documentation/userspace-api/iommufd.rst
++++ b/Documentation/userspace-api/iommufd.rst
+@@ -11,18 +11,18 @@ Overview
+========
+
+IOMMUFD is the user API to control the IOMMU subsystem as it relates to managing
+IO page tables [-that point at user space memory.-]{+from userspace using file descriptors.+} It intends to be general
+and consumable by any driver that wants to {+expose+} DMA to userspace. These
+drivers are eventually expected to deprecate any internal IOMMU [-logic,-]{+logic+} if [-existing-]{+exists+}
+(e.g. vfio_iommu_type1.c).
+
+At minimum iommufd provides[-a-] universal support of managing I/O address spaces and
+I/O page tables for all IOMMUs, with room in the design to add non-generic
+features to cater to specific hardware functionality.
+
+In this context the capital letter (IOMMUFD) refers to the subsystem while the
+small letter (iommufd) refers to the file descriptors created via /dev/iommu [-to-]
+[-run the user API over.-]{+for+}
+{+use by userspace.+}
+
+Key Concepts
+============
+@@ -32,26 +32,26 @@ User Visible Objects
+
+Following IOMMUFD objects are exposed to userspace:
+
+- IOMMUFD_OBJ_IOAS, representing an I/O address space [-(IOAS)-]{+(IOAS),+} allowing map/unmap
+  of user space memory into ranges of I/O Virtual Address (IOVA).
+
+  The IOAS is a functional replacement for the VFIO container, and like the VFIO
+  container {+it+} copies [-its-]{+an+} IOVA map to a list of iommu_domains held within it.
+
+- IOMMUFD_OBJ_DEVICE, representing a device that is bound to iommufd by an
+  external driver.
+
+- IOMMUFD_OBJ_HW_PAGETABLE, representing an actual hardware I/O page table
+  (i.e. a single struct iommu_domain) managed by the iommu driver.
+
+  The IOAS has a list of HW_PAGETABLES that share the same IOVA mapping and
+  [-the-]
+[-  IOAS-]{+it+} will synchronize its mapping with each member HW_PAGETABLE.
+
+All user-visible objects are destroyed via the IOMMU_DESTROY uAPI.
+
+[-Linkage-]{+The diagram below shows relationship+} between user-visible objects and[-external-] kernel
+datastructures [-are-]
+[-reflected by the arrows,-]{+(external to iommufd),+} with numbers [-referring-]{+referred+} to[-certain-] operations
+creating the objects and links::
+
+  _________________________________________________________
+ |                         iommufd                         |
+@@ -82,37 +82,38 @@ operations creating the objects and links::
+           |------------>|iommu_domain|    |struct device|
+                         |____________|    |_____________|
+
+1. IOMMUFD_OBJ_IOAS is created via the IOMMU_IOAS_ALLOC uAPI. [-One-]{+An+} iommufd can
+   hold multiple IOAS objects. IOAS is the most generic object and does not
+   expose interfaces that are specific to single IOMMU drivers. All operations
+   on the IOAS must operate equally on each of the iommu_domains[-that are-] inside {+of+} it.
+
+2. IOMMUFD_OBJ_DEVICE is created when an external driver calls the IOMMUFD kAPI
+   to bind a device to an iommufd. The[-external-] driver is expected to implement proper [-uAPI for-]{+a+}
+{+   set of ioctls to allow+} userspace to initiate the binding operation.
+   Successful completion of this operation establishes the desired DMA ownership
+   over the device. The[-external-] driver must {+also+} set {+the+} driver_managed_dma flag and
+   must not touch the device until this operation succeeds.
+
+3. IOMMUFD_OBJ_HW_PAGETABLE is created when an external driver calls the IOMMUFD
+   kAPI to attach a bound device to an IOAS. Similarly the external driver uAPI
+   allows userspace to initiate the attaching operation. If a compatible
+   pagetable already exists then it is reused for the attachment. Otherwise a
+   new pagetable object [-(and a new iommu_domain)-]{+and iommu_domain+} is created. Successful completion of
+   this operation sets up the linkages among[-an-] IOAS,[-a-] device and[-an-] iommu_domain. Once
+   this completes the device could do DMA.
+
+   Every iommu_domain inside the IOAS is also represented to userspace as a
+   HW_PAGETABLE object.
+
+   [-NOTE: Future additions to IOMMUFD will provide an API to create and-]
+[-   manipulate the HW_PAGETABLE directly.-]{+.. note::+}
+
+      [-One device can only bind-]{+Future IOMMUFD updates will provide an API+} to [-one iommufd (due to DMA ownership claim)-]{+create+} and [-attach-]
+[-to at most one IOAS object (no support of PASID yet).-]{+manipulate the+}
+{+      HW_PAGETABLE directly.+}
+
+{+A device can only bind to an iommufd due to DMA ownership claim and attach to at+}
+{+most one IOAS object (no support of PASID yet).+}
+
+Currently only PCI device is [-allowed.-]{+allowed to use IOMMUFD.+}
+
+Kernel Datastructure
+--------------------
+@@ -125,21 +126,20 @@ User visible objects are backed by following datastructures:
+
+Several terminologies when looking at these datastructures:
+
+- Automatic [-domain, referring-]{+domain - refers+} to an iommu domain created automatically when
+  attaching a device to an IOAS object. This is compatible to the semantics of
+  VFIO type1.
+
+- Manual [-domain, referring-]{+domain - refers+} to an iommu domain designated by the user as the
+  target pagetable to be attached to by a device. Though currently {+there are+}
+  no [-user API-]
+[-  for userspace-]{+uAPIs+} to directly create such domain, the datastructure and algorithms
+  are ready for {+handling+} that [-usage.-]{+use case.+}
+
+- In-kernel [-user, referring-]{+user - refers+} to something like a VFIO mdev that is[-accessing the-]
+[-  IOAS and-] using[-a 'struct page \*' for CPU based access. Such users require an-]
+[-  isolation granularity smaller than what an iommu domain can afford. They must-]
+[-  manually enforce-] the
+  [-IOAS constraints on DMA buffers before those buffers can-]
+[-  be accessed-]{+IOMMUFD access interface to access the IOAS. This starts+} by [-mdev. Though no kernel API for-]{+creating+} an
+  [-external driver-]{+iommufd_access object that is similar+} to[-bind a-]
+[-  mdev,-] the [-datastructure and algorithms are ready for such usage.-]{+domain binding a physical device+}
+{+  would do. The access object will then allow converting IOVA ranges into struct+}
+{+  page * lists, or doing direct read/write to an IOVA.+}
+
+iommufd_ioas serves as the metadata datastructure to manage how IOVA ranges are
+mapped to memory pages, composed of:
+@@ -149,13 +149,12 @@ mapped to memory pages, composed of:
+- struct iopt_pages representing the storage of PFNs
+- struct iommu_domain representing the IO page table in the IOMMU
+- struct iopt_pages_access representing in-kernel users of PFNs
+- struct xarray pinned_pfns holding a list of pages pinned by in-kernel [-Users-]{+users+}
+
+Each iopt_pages represents a logical linear array of full PFNs. The PFNs are
+ultimately derived from userspave VAs via an mm_struct. Once they have been
+pinned the PFN is stored in[-an iommu_domain's-] IOPTEs {+of an iommu_domain+} or inside the pinned_pages
+xarray if they [-are being "software accessed".-]{+have been pinned through an iommufd_access.+}
+
+PFN have to be copied between all combinations of storage locations, depending
+on what domains are present and what kinds of in-kernel "software access" users
+@@ -164,8 +163,9 @@ exists. The mechanism ensures that a page is pinned only once.
+An io_pagetable is composed of iopt_areas pointing at iopt_pages, along with a
+list of iommu_domains that mirror the IOVA to PFN map.
+
+Multiple [-io_pagetable's,-]{+io_pagetable-s,+} through their [-iopt_area's,-]{+iopt_area-s,+} can share a single
+iopt_pages which avoids multi-pinning and double accounting of page
+consumption.
+
+iommufd_ioas is sharable between subsystems, e.g. VFIO and VDPA, as long as
+devices managed by different subsystems are bound to a same iommufd.
+@@ -179,9 +179,9 @@ IOMMUFD Kernel API
+==================
+
+The IOMMUFD kAPI is device-centric with group-related tricks managed behind the
+scene. This allows the external [-driver-]{+drivers+} calling such kAPI to implement a simple
+device-centric uAPI for connecting its device to an iommufd, instead of
+explicitly imposing the group semantics in its uAPI [-(as-]{+as+} VFIO [-does).-]{+does.+}
+
+.. kernel-doc:: drivers/iommu/iommufd/device.c
+   :export:
+@@ -189,7 +189,7 @@ explicitly imposing the group semantics in its uAPI (as VFIO does).
+VFIO and IOMMUFD
+----------------
+
+Connecting a VFIO device to iommufd can be done in two [-approaches.-]{+ways.+}
+
+First is a VFIO compatible way by directly implementing the /dev/vfio/vfio
+container IOCTLs by mapping them into io_pagetable operations. Doing so allows
