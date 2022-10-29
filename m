@@ -2,59 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21BF9611FD8
-	for <lists+kvm@lfdr.de>; Sat, 29 Oct 2022 05:43:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 777EA6120F3
+	for <lists+kvm@lfdr.de>; Sat, 29 Oct 2022 09:19:56 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229752AbiJ2Dnh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 28 Oct 2022 23:43:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47964 "EHLO
+        id S229788AbiJ2HTx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 29 Oct 2022 03:19:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229681AbiJ2Dnf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 28 Oct 2022 23:43:35 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA0A61C8D7C;
-        Fri, 28 Oct 2022 20:43:34 -0700 (PDT)
+        with ESMTP id S229574AbiJ2HTw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 29 Oct 2022 03:19:52 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ADAA2648D;
+        Sat, 29 Oct 2022 00:19:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667015014; x=1698551014;
+  t=1667027986; x=1698563986;
   h=message-id:date:mime-version:cc:subject:to:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=lwhcsqVAPcB+BRLzzkySku/43hUGK299jANuukpJQiU=;
-  b=DU5uUi+sMPvwvQvrMrsKVZ7QYkhHdRbqX3edVEUBiX13HbqjrMb5Zjeo
-   PHEstuGA4JyAm3XM8ER+4XJKw8Q2ON8Q3DT9eWSAfZDIKjjA3W9x5gT9z
-   yZCeUG/39seUm49yg0mno4PoeehngrAK3ynElWQ/cNvFtXTAKHLrh3Eu4
-   44prwvaoYNMnf8Yo2jk5BU14jvVq4Is03d5ax0FVyyZMo38hlze/oI2o1
-   7hf6fyHD/vBT6+6AkrixetzF6jYZGazQ4MSxq8mh5H1+/aT+7y9DsWlyR
-   7FDqZv9FtaYggSrj1xpsRo/RArb6CAU77zibHcxobyCJQ4LV1UpGOJEVk
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10514"; a="309723947"
-X-IronPort-AV: E=Sophos;i="5.95,222,1661842800"; 
-   d="scan'208";a="309723947"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2022 20:43:34 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10514"; a="635522260"
-X-IronPort-AV: E=Sophos;i="5.95,222,1661842800"; 
-   d="scan'208";a="635522260"
+  bh=FhmH3plE0BSGDSUDNHfqp0mdEEM+/mvoaPeadfpkBxc=;
+  b=MyWMXcREeIB3slWphO3CUX7aSykcpLIHbUf5pgNQ2d1XsHUHWbM6NiS9
+   vnrrQi1bq0kH3Xn4VJYW08TcTaeO7of0SnCL4evrLlxe6qqVeTD0KMqPm
+   bE0VY3EYDRUMvyn9XkXLOe8kmMmze3GKh/2wze3/Xf0q10bnTB+hfuFrt
+   l8dbPQtP8H+RwvMz6xbsV8KvE2N3vrjpSayyrKE8dpS2WSzsNLoUXJj9X
+   R7f9qny9Y9WyajOMpOLE3HSu/QUIWvLxpaevOJdpPcB5xh/p7Lj0/VXjP
+   rgKAvaC/ESlcGgFMiJ8Mtp+455mUnXVE1wxLHNciLH+CcZNJDiqvTsMeh
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10514"; a="308644827"
+X-IronPort-AV: E=Sophos;i="5.95,223,1661842800"; 
+   d="scan'208";a="308644827"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 00:19:46 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10514"; a="701992575"
+X-IronPort-AV: E=Sophos;i="5.95,223,1661842800"; 
+   d="scan'208";a="701992575"
 Received: from blu2-mobl3.ccr.corp.intel.com (HELO [10.254.215.211]) ([10.254.215.211])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2022 20:43:25 -0700
-Message-ID: <8b165b88-eea1-c891-2754-33209a2711bf@linux.intel.com>
-Date:   Sat, 29 Oct 2022 11:43:23 +0800
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 00:19:39 -0700
+Message-ID: <b43a183f-b06a-6abb-0ec8-498e2a62f92d@linux.intel.com>
+Date:   Sat, 29 Oct 2022 15:19:36 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.4.0
-Cc:     baolu.lu@linux.intel.com, bpf@vger.kernel.org,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
+Cc:     baolu.lu@linux.intel.com,
         Alex Williamson <alex.williamson@redhat.com>,
         Chaitanya Kulkarni <chaitanyak@nvidia.com>,
         Cornelia Huck <cohuck@redhat.com>,
@@ -72,90 +60,104 @@ Cc:     baolu.lu@linux.intel.com, bpf@vger.kernel.org,
         Shameerali Kolothum Thodi 
         <shameerali.kolothum.thodi@huawei.com>,
         Yi Liu <yi.l.liu@intel.com>, Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v3 05/15] iommufd: File descriptor, context, kconfig and
- makefiles
+Subject: Re: [PATCH v3 12/15] iommufd: Add kAPI toward external drivers for
+ physical devices
 Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>
-References: <5-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
- <9a837538-6333-0973-c6f4-229064026330@linux.intel.com>
- <Y1lq2JJt1yLrzNjs@nvidia.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>, bpf@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, linux-doc@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Miguel Ojeda <ojeda@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>
+References: <12-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
 From:   Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <Y1lq2JJt1yLrzNjs@nvidia.com>
+In-Reply-To: <12-v3-402a7d6459de+24b-iommufd_jgg@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022/10/27 1:14, Jason Gunthorpe wrote:
-> On Wed, Oct 26, 2022 at 08:58:23PM +0800, Baolu Lu wrote:
->>> +	[_IOC_NR(_ioctl) - IOMMUFD_CMD_BASE] = {                               \
->>> +		.size = sizeof(_struct) +                                      \
->>> +			BUILD_BUG_ON_ZERO(sizeof(union ucmd_buffer) <          \
->>> +					  sizeof(_struct)),                    \
->>> +		.min_size = offsetofend(_struct, _last),                       \
->>> +		.ioctl_num = _ioctl,                                           \
->>> +		.execute = _fn,                                                \
->>> +	}
->>> +static struct iommufd_ioctl_op iommufd_ioctl_ops[] = {
->>
->> How about making the ops "static const"?
-> 
-> Yes both const's were missed
-> 
->>> +static void __exit iommufd_exit(void)
->>> +{
->>> +	misc_deregister(&iommu_misc_dev);
->>> +}
->>> +
->>> +module_init(iommufd_init);
->>> +module_exit(iommufd_exit);
->>> +
->>> +MODULE_DESCRIPTION("I/O Address Space Management for passthrough devices");
->>> +MODULE_LICENSE("GPL");
->>
->> Could above be "GPL v2"?
-> 
-> It should be just "GPL", see Documentation/process/license-rules.rst:
-> 
->      "GPL v2"                      Same as "GPL". It exists for historic
+On 2022/10/26 2:12, Jason Gunthorpe wrote:
+> +/*
+> + * When automatically managing the domains we search for a compatible domain in
+> + * the iopt and if one is found use it, otherwise create a new domain.
+> + * Automatic domain selection will never pick a manually created domain.
+> + */
+> +static int iommufd_device_auto_get_domain(struct iommufd_device *idev,
+> +					  struct iommufd_ioas *ioas,
+> +					  unsigned int flags)
+> +{
+> +	struct iommufd_hw_pagetable *hwpt;
+> +	int rc;
+> +
+> +	/*
+> +	 * There is no differentiation when domains are allocated, so any domain
+> +	 * that is willing to attach to the device is interchangeable with any
+> +	 * other.
+> +	 */
+> +	mutex_lock(&ioas->mutex);
+> +	list_for_each_entry(hwpt, &ioas->hwpt_list, hwpt_item) {
+> +		if (!hwpt->auto_domain ||
+> +		    !refcount_inc_not_zero(&hwpt->obj.users))
+> +			continue;
+> +
+> +		rc = iommufd_device_do_attach(idev, hwpt, flags);
+> +		refcount_dec(&hwpt->obj.users);
+> +		if (rc) {
+> +			/*
+> +			 * FIXME: Requires the series to return EINVAL for
+> +			 * incompatible domain attaches.
+> +			 */
+> +			if (rc == -EINVAL)
+> +				continue;
+> +			goto out_unlock;
+> +		}
+> +		goto out_unlock;
 
-Ah! Thanks for letting me know this.
+Can the above code be simplified as:
 
-> 
->>> --- /dev/null
->>> +++ b/include/uapi/linux/iommufd.h
->>> @@ -0,0 +1,55 @@
->>> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
->>> +/* Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES.
->>> + */
->>> +#ifndef _UAPI_IOMMUFD_H
->>> +#define _UAPI_IOMMUFD_H
->>> +
->>> +#include <linux/types.h>
->>> +#include <linux/ioctl.h>
->>> +
->>> +#define IOMMUFD_TYPE (';')
->>> +
->>> +/**
->>> + * DOC: General ioctl format
->>> + *
->>> + * The ioctl mechanims follows a general format to allow for extensibility. Each
->>                  ^^^^^^^^^ mechanism?
-> 
-> How about "interface" ?
+		if (rc == -EINVAL)
+			continue;
+		goto out_unlock;
+?
 
-Yes. It works.
-
-With above addressed,
-
-Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
+> +	}
+> +
+> +	hwpt = iommufd_hw_pagetable_alloc(idev->ictx, ioas, idev->dev);
+> +	if (IS_ERR(hwpt)) {
+> +		rc = PTR_ERR(hwpt);
+> +		goto out_unlock;
+> +	}
+> +	hwpt->auto_domain = true;
+> +
+> +	rc = iommufd_device_do_attach(idev, hwpt, flags);
+> +	if (rc)
+> +		goto out_abort;
+> +	list_add_tail(&hwpt->hwpt_item, &ioas->hwpt_list);
+> +
+> +	mutex_unlock(&ioas->mutex);
+> +	iommufd_object_finalize(idev->ictx, &hwpt->obj);
+> +	return 0;
+> +
+> +out_abort:
+> +	iommufd_object_abort_and_destroy(idev->ictx, &hwpt->obj);
+> +out_unlock:
+> +	mutex_unlock(&ioas->mutex);
+> +	return rc;
+> +}
 
 Best regards,
 baolu
